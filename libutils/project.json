@@ -1,0 +1,7 @@
+{
+    "id": "libutils",
+    "name": "Utils library",
+    "description": "Generic data structures and algorithms.",
+    "type": "lib",
+    "libs": ["libc"]
+}

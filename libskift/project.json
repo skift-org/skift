@@ -1,0 +1,7 @@
+{
+    "id": "libsk",
+    "name": "API library",
+    "description": "The SkiftOS's api for userland applications.",
+    "type": "lib",
+    "libs": ["libc"]
+}

@@ -1,6 +1,4 @@
 {
     "id": "libc",
-    "name": "C library",
-    "description": "The SkiftOS's libc implementations.",
     "type": "lib"
 }

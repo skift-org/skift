@@ -1,7 +1,5 @@
 {
     "id": "test-app",
-    "name": "Test Application",
-    "description": "A Project Template.",
     "type": "app",
     "libs": ["libc", "libsk", "libutils"]
 }

@@ -1,3 +1,6 @@
+# Python
+*.pyc
+
 # Prerequisites
 *.d
 
@@ -6,6 +9,9 @@
 *.ko
 *.obj
 *.elf
+__meta.h
+__assets.h
+__assets.s
 
 # Linker output
 *.ilk

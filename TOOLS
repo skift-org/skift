@@ -4,253 +4,69 @@ import json
 import os
 import subprocess
 import sys
-import pprint
 import shutil
 
-# --- Usefull links ---------------------------------------------------------- #
+import sys
+sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
 
-"""
-TODO  python -m pip install -U "pylint<2.0.0"
-last modification: https://docs.python.org/3/library/path.html#path.getmtime
-"""
+import project
 
-def GetFiles(path, ext):
-    files = []
-
-    for root, directories, filenames in os.walk(path):
-        for filename in filenames:
-            if filename.endswith(ext):
-                files.append(os.path.join(root, filename))
-
-    return files
-
-# --- Commands --------------------------------------------------------------- #
-
-
-def MKDIR(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-def RMDIR(directory):
-    if os.path.exists(directory):
-        shutil.rmtree(directory)
-
-def GCC(input_file, output_file, includes, defines):
-    print("gcc %s -c -o %s" % (input_file, output_filels))
-    pass
-
-
-def NASM():
-    pass
-
-def AR():
-    pass
-
-def LD(output, objects):
-    pass
-
-# --- Projects Managements --------------------------------------------------- #
-
-
-class Project(object):
-    def __init__(self, data):
-        self.data = data
-
-        if (not "id" in data or not "type" in data):
-            self.valid = False
-        else:
-            self.valid = True
-            self.builded = False
-
-            self.id = data["id"]
-            self.type = data["type"]
-            self.path = data["path"]
-            self.pathSources = os.path.join(self.path, "sources")
-            self.pathIncludes = os.path.join(self.path, "includes")
-            self.pathAssets = os.path.join(self.path, "assets")
-            self.pathObj = os.path.join(self.path, "obj")
-            self.pathBin = os.path.join(self.path, "bin")
-
-
-            if (self.type == "lib"):
-                self.output = os.path.join(self.pathBin, "%s.a" % self.id)
-            elif (self.type == "app"):
-                self.output = os.path.join(self.pathBin, "%s.app" % self.id)
-            elif (self.type == "kernel"):
-                self.output = os.path.join(self.pathBin, "kernel.bin")
-            else:
-                self.output = os.path.join(self.pathBin, self.id)
-
-            self.name = data["name"] if "name" in data else "Unamed"
-            self.description = data["description"] if "description" in data else "No description."
-            self.libs = data["libs"] if "libs" in data else []
-
-    def GetAssets(self):
-        assets = []
-
-        if os.path.exists(self.pathAssets):
-            assets = os.listdir(self.pathAssets)
-
-        return assets
-
-    def GenerateAssetsAsm(self):
-        with open(os.path.join(self.pathObj, "__assets.S"), 'w') as f:
-            assets = self.GetAssets()
-
-            f.write("bits 32\n")
-            f.write("section .rodata\n")
-
-            for asset in assets:
-                name = "__" + asset.replace(".", "_")
-                f.write("\n\n")
-                f.write("global %s_start\n" % name)
-                f.write("global %s_end\n" % name)
-                f.write("global %s_size\n" % name)
-
-                f.write("%s_start:   incbin \"../assets/%s\"\n" % (name, asset))
-                f.write("%s_end:\n" % name)
-                f.write("%s_size:    dd $-%s_start\n" % (name, name))
-
-    def GetSources(self):
-        if os.path.exists(self.pathSources):
-            c_sources = GetFiles(self.pathSources, '.c')
-            s_sources = GetFiles(self.pathSources, '.s')
-
-            return c_sources + s_sources
-        
-        return []
-
-    def GetIncludes(self):
-        if os.path.exists(self.pathIncludes):
-            return GetFiles(self.pathIncludes, '.h')
-
-        return []
-
-    def GetObjects(self):
-        objects = []
-
-        for source in self.GetSources():
-            objects.append(("source", source, source.replace(self.pathSources, self.pathObj) + ".o"))
-
-        for asset in self.GetAssets():
-            objects.append(("asset", asset, asset.replace(self.pathAssets, self.pathObj) + ".asset.o"))
-
-        return objects
-
-    def GetDependencies(self, projects):
-        dependancies = self.libs.copy()
-
-        for deps in dependancies.copy():
-            dependancies += projects[deps].libs
-
-        return list(set(dependancies))
-
-    # --- Operations --- #
-
-    def Print(self, projects):
-        """
-        Print all informations about the project.
-        """
-        print("")
-        print("Project %s(%s):" % (self.name, self.id))
-        pprint.pprint(self.data)
-        print("Output:")
-        pprint.pprint(self.output)
-        print("Dependencies:")
-        pprint.pprint(self.libs)
-        print("All dependencies:")
-        pprint.pprint(self.GetDependencies(projects))
-        print("Includes:")
-        pprint.pprint(self.GetIncludes())
-        print("Sources:")
-        pprint.pprint(self.GetSources())
-        print("Assets:")
-        pprint.pprint(self.GetAssets())
-
-    def Clean(self):
-        print("Cleaning up %s..." % self.id)
-        RMDIR(self.pathObj)
-        RMDIR(self.pathBin)
-
-    def Build(self, projects):
-        MKDIR(self.pathBin)
-        MKDIR(self.pathObj)
-        if self.builded: 
-            print("Skiping %s(%s)" % (self.name, self.id))
-            return True
-
-        print("Building %s(%s)'s dependencies..." % (self.name, self.id))
-        for deps in self.GetDependencies(projects):
-            if not projects[deps].Build(projects):
-                print("Failed to build dependencies for %s!" % (self.name))
-                return False
-
-        print("Building %s(%s): %s..." % (self.name, self.id, self.description))
-
-
-        self.GenerateAssetsAsm()
-
-        self.builded = True
-        return True
-
-def GetProjects(path):
+def get_projects(location):
     """
     Get all projects in a directory.
 
     Parameters
     ----------
-    path: path to the directorie (str).
+    location: location of the directorie (str).
 
     Return
     ------
-    A list of dictionary containing all project informations.
+    A list of all projects.
     """
     projects = {}
 
-    for file in os.listdir(path):
+    for file in os.listdir(location):
         # Get project's paths
-        project_path = os.path.join(os.getcwd(), file)
+        project_path = os.path.join(location, file)
         json_path = os.path.join(project_path, "project.json")
 
         if os.path.isdir(project_path) and os.path.exists(json_path):
             # Load project's json.
             data = json.loads(open(json_path).read())
-            data["path"] = project_path
 
-            projects[data["id"]] = Project(data)
+            projects[data["id"]] = project.Project(project_path, data)
 
     return projects
-
-def BuildAll(path):
-    pass
 
 # --- Build Script ----------------------------------------------------------- #
 
 
 if __name__ == "__main__":
-    projects = GetProjects(".")
+    projects = get_projects(".")
 
     if len(sys.argv) == 3 and sys.argv[1] == "info":
-        projects[sys.argv[2]].Print(projects)
+        projects[sys.argv[2]].info()
     
     if len(sys.argv) == 2 and sys.argv[1] == "list":
         for project in projects:
-            print(project, end=" ")
+            print(project, end=' ')
         print('')
 
     if len(sys.argv) == 3 and sys.argv[1] == "clean":
-        projects[sys.argv[2]].Clean()
+        projects[sys.argv[2]].clean()
 
     if len(sys.argv) == 2 and sys.argv[1] == "cleanall":
         for id in projects:
-            projects[id].Clean()
+            projects[id].clean()
 
     if len(sys.argv) == 3 and sys.argv[1] == "build":
-        projects[sys.argv[2]].Build(projects)
+        projects[sys.argv[2]].build(projects)
 
     if len(sys.argv) == 2 and sys.argv[1] == "buildall":
         for id in projects:
-            projects[id].Build(projects)
+            if projects[id].build(projects):
+                print("Building %s failed!" % id)
+                exit()
 
     if (len(sys.argv) == 1) or (len(sys.argv) == 2 and sys.argv[1] == "help"):
         print("skiftOS build system.")

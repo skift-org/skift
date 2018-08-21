@@ -1,0 +1,6 @@
+{
+    "id": "lodepng",
+    "type": "lib",
+    "libs": ["libc"],
+    "strict": false
+}

@@ -40,7 +40,7 @@ def GCC(input_file, output_file, includes, defines, strict):
     flags += ["-c", "-o", output_file, input_file ]
 
 
-    print(' '.join(flags))
+    # print(' '.join(flags))
 
     return subprocess.call(flags) == 0
 
@@ -49,12 +49,15 @@ def NASM(input_file, output_file):
         return True
 
     print(" AS %s -> %s" % (input_file, output_file))
-    return subprocess.call(["nasm", "-felf32", input_file, "-o", output_file]) == 0
+    return subprocess.call(["nasm", "-f" "elf32", input_file, "-o", output_file]) == 0
 
 def AR(objects, output_file):
     print(" AR %s -> %s" % (objects, output_file))
-    return subprocess.call(["as", "rcs"] + objects + [output_file])
+
+    command = ["ar", "rcs"] + [output_file] + objects
+    print(command)
+    return subprocess.call(command) == 0
 
 def LD(objects, libs, output_file, script):
     print(" LD %s (%s) -> %s" % (objects, libs, output_file))
-    return subprocess.call(["ld"] + ["-T", script] + ["-o", output_file] + objects + libs)
+    return subprocess.call(["ld"] + ["-T", script] + ["-o", output_file] + objects + libs) == 0

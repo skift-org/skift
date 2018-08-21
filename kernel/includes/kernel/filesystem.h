@@ -2,7 +2,7 @@
 #include "types.h"
 #include "utils.h"
 #include "ds/sllist.h"
-#include "lib/path.h"
+#include "utils/path.h"
 
 #define FS_PATH_SEPARATOR '/'
 

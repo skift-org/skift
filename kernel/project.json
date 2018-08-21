@@ -1,5 +1,5 @@
 {
     "id": "kernel",
     "type": "kernel",
-    "libs": ["libc", "libutils"]
+    "libs": ["libc-kernel", "libc", "libutils"]
 }

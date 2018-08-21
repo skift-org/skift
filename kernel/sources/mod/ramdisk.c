@@ -6,8 +6,8 @@
 
 #include "kernel/filesystem.h"
 #include "kernel/multiboot.h"
-#include "lib/tar.h"
 #include "kernel/logging.h"
+#include "utils/tar.h"
 
 void ramdisk_load(multiboot_module_t *module)
 {

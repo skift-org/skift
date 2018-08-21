@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
-#include "lib/term.h"
-#include "lib/ansi.h"
+#include "libterm/term.h"
+#include "libterm/ansi.h"
 #include "utils.h"
 
 term_t *term_alloc(uint width, uint height)

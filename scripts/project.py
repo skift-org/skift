@@ -53,7 +53,7 @@ class Project(object):
             if "strict" in data:
                 self.strict = data["strict"]
             else:
-                self.strict = False
+                self.strict = True
 
             self.bin_path = os.path.join(path, "bin")
             self.obj_path = os.path.join(path, "obj")
@@ -79,7 +79,7 @@ class Project(object):
         elif (self.type == ProjectTypes.MODULE):
             file_name += '.mod'
 
-        return os.path.join(self.path, file_name)
+        return os.path.join(self.bin_path, file_name)
 
 # --- Projects files --------------------------------------------------------- #
 
@@ -138,11 +138,11 @@ class Project(object):
 
         with open(os.path.join(self.obj_path, "__meta.h"), 'w') as f:
             f.write("#pragma once\n")
-            f.write("// This file is auto generated.\n")
+            f.write("// This file is auto generated.\n\n")
 
-            f.write('#define __PROJECT_ID="%s"\n' % self.id)
-            f.write('#define __PROJECT_TYPE="%s"\n' % self.type)
-            f.write('#define __PROJECT_BUILD_DATE="%s"\n' % str(datetime.datetime.now))
+            f.write('#define __PROJECT_ID "%s"\n' % self.id)
+            f.write('#define __PROJECT_TYPE "%s"\n' % self.type)
+            f.write('#define __PROJECT_BUILD_DATE "%s"\n' % str(datetime.datetime.now()))
 
     def generate_assets_header(self):
         """Generate '__assets.h' a header contaning all built-in assets references."""
@@ -170,6 +170,9 @@ class Project(object):
             f.write("section .rodata\n")
             f.write(";; This file is auto generated.\n")
 
+            f.write("global __assets_start\n")
+            f.write("__assets_start:\n")
+
             for a in self.get_assets_filenames():
                 name = ("__" + self.id + "_"+ a).replace(".", "_")
 
@@ -182,6 +185,9 @@ class Project(object):
                 f.write("%s_start:   incbin \"%s\"\n" % (name, os.path.join(self.assets_path, a)))
                 f.write("%s_end:\n" % name)
                 f.write("%s_size:    dd $-%s_start\n" % (name, name))
+
+            f.write("global __assets_end\n")
+            f.write("__assets_end:\n")
 
     def generate_all(self):
         self.generate_meta_header()
@@ -213,6 +219,16 @@ class Project(object):
         return True
         
     def link_output(self, projects):
+        objects = [obj["out"] for obj in self.get_objects()]
+
+        if self.type == ProjectTypes.APP:
+            pass
+        elif self.type == ProjectTypes.LIB:
+            return toolchain.AR(objects, self.get_output())
+        elif self.type == ProjectTypes.KERNEL:
+            pass
+        elif self.type == ProjectTypes.MODULE:
+            pass
         return True
 
 # --- Operations ------------------------------------------------------------- #

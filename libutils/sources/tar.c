@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "lib/tar.h"
+#include "utils/tar.h"
 
 typedef PACKED(struct)
 {

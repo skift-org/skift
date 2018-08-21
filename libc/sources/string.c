@@ -200,7 +200,7 @@ size_t strcspn(const char *string, const char *chars)
 
 char *strerror(int errnum)
 {
-    UNUSED(errnum);
+    (void)(errnum);
     return "Error";
 }
 

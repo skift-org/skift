@@ -1,5 +1,5 @@
 #include "sync/atomic.h"
-#include "cpu/cpu.h"
+#include "utils/cpu.h"
 
 bool is_atomic_enable = false;
 uint ATOMIC_COUNTER = 0;

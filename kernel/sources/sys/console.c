@@ -4,7 +4,7 @@
 
 #include "devices/uart.h"
 #include "devices/vga.h"
-#include "lib/ascii.h"
+#include "utils/ascii.h"
 #include "sync/lock.h"
 
 #define TAB_SIZE 4

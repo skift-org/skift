@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "lib/ansi.h"
+#include "libterm/ansi.h"
 
 // http://www.termsys.demon.co.uk/vtansi.htm
 // http://ascii-table.com/ansi-escape-sequences.php

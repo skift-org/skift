@@ -115,7 +115,7 @@ class Project(object):
     def get_includes_paths(self, projects):
         includes = [self.includes_path, self.obj_path]
 
-        for lib in self.libs:
+        for lib in self.get_dependencies(projects):
             includes.append(projects[lib].includes_path)
 
         return includes
@@ -132,17 +132,30 @@ class Project(object):
     
     def get_libs(self, projects):
         """"""
-        libs = self.libs.copy()
+        libs = []
+
+        for id in self.get_dependencies(projects):
+            dep = projects[id]
+            if dep.type == ProjectTypes.LIB:
+                libs.append(dep.get_output())
+
+        return libs
+
+    def get_dependencies(self, projects, found = None):
+        """Get all dependencies."""
+        if found is None:
+            found = [self.id]
+
         for lib in self.libs:
-            libs += projects[lib].libs
+            if (not lib in found):
+                projects[lib].get_dependencies(projects, found)
+                found.append(lib)
 
-        return list(set([projects[l].get_output() for l in libs]))
+        if self.id in found:
+            found.remove(self.id)
 
-    def get_libs_name(self, project):
-
-        libs = self.libs.copy()
-
-            
+        return found
+        
 
 # --- Auto generated files --------------------------------------------------- #
 
@@ -254,7 +267,7 @@ class Project(object):
         print("Project: %s" % self.id)
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
-        print("Libs: %s" % ', '.join(self.get_libs(projects)))
+        print("Libs: %s" % ', '.join(self.get_libs_name(projects)))
         # print("\nSources:")
         # pprint.pprint(self.get_sources())
         # print("\nAssets:")

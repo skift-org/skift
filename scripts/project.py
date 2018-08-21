@@ -248,14 +248,12 @@ class Project(object):
     def link_output(self, projects):
         objects = [obj["out"] for obj in self.get_objects()]
         
-
         if self.type == ProjectTypes.APP:
             return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/userspace.ld")
         elif self.type == ProjectTypes.LIB:
             return toolchain.AR(objects, self.get_output())
         elif self.type == ProjectTypes.KERNEL:
             return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld")
-            pass
         elif self.type == ProjectTypes.MODULE:
             pass
 
@@ -267,7 +265,7 @@ class Project(object):
         print("Project: %s" % self.id)
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
-        print("Libs: %s" % ', '.join(self.get_libs_name(projects)))
+        print("Libs: %s" % ', '.join(self.get_dependencies(projects)))
         # print("\nSources:")
         # pprint.pprint(self.get_sources())
         # print("\nAssets:")

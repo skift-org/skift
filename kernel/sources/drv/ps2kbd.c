@@ -8,9 +8,9 @@
 char *kbd_buffer;
 size_t kbd_buffer_size = 0;
 
-esp_t kbd_ird_handler(esp_t esp)
+esp_t kbd_ird_handler(esp_t esp, context_t * context)
 {
-
+    STUB(esp, context);
     return esp;
 }
 

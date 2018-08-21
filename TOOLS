@@ -45,7 +45,7 @@ if __name__ == "__main__":
     projects = get_projects(".")
 
     if len(sys.argv) == 3 and sys.argv[1] == "info":
-        projects[sys.argv[2]].info()
+        projects[sys.argv[2]].info(projects)
     
     if len(sys.argv) == 2 and sys.argv[1] == "list":
         for project in projects:
@@ -64,9 +64,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2 and sys.argv[1] == "buildall":
         for id in projects:
-            if not projects[id].build(projects):
-                print("Building %s failed!" % id)
-                exit()
+            if projects[id].type in (project.ProjectTypes.APP, project.ProjectTypes.KERNEL, project.ProjectTypes.MODULE):
+                if not projects[id].build(projects):
+                    print("Building %s failed!" % id)
+                    exit()
 
     if (len(sys.argv) == 1) or (len(sys.argv) == 2 and sys.argv[1] == "help"):
         print("skiftOS build system.")

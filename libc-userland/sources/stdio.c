@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "kernel/console.h"
-
 int putchar(int chr)
 {
-    console_put(chr);
-    return chr;
+    return -1;
 }
 
 int getchar()
@@ -16,12 +13,10 @@ int getchar()
 
 char * gets(char * str)
 {
-   UNUSED(str);
-   return NULL;
+    return 0;
 }
 
 int puts(const char * str)
 {
-    console_puts((char *)str);
-    return strlen(str);
+    return 0;
 }

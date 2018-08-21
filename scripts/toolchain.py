@@ -12,7 +12,7 @@ def RMDIR(directory):
         shutil.rmtree(directory)
 
 gcc_w_flags = ["-Wall", "-Wextra", "-Werror"]
-gcc_freestanding_flags = ["-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+gcc_freestanding_flags = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
 
 def GCC(input_file, output_file, includes, defines, strict):
     if utils.IsUpToDate(output_file, input_file):
@@ -52,12 +52,12 @@ def NASM(input_file, output_file):
     return subprocess.call(["nasm", "-f" "elf32", input_file, "-o", output_file]) == 0
 
 def AR(objects, output_file):
-    print(" AR %s -> %s" % (objects, output_file))
+    print(" AR %i objects -> %s" % (len(objects), output_file))
 
     command = ["ar", "rcs"] + [output_file] + objects
-    print(command)
+    # print(command)
     return subprocess.call(command) == 0
 
 def LD(objects, libs, output_file, script):
-    print(" LD %s (%s) -> %s" % (objects, libs, output_file))
-    return subprocess.call(["ld"] + ["-T", script] + ["-o", output_file] + objects + libs) == 0
+    print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
+    return subprocess.call(["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs) == 0

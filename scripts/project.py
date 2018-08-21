@@ -129,6 +129,14 @@ class Project(object):
             objects.append({"in": src, "out": src.replace(self.sources_path, self.obj_path) + '.o'})
 
         return objects
+    
+    def get_libs(self, projects):
+        libs = self.libs.copy()
+        for lib in self.libs:
+            libs += projects[lib].libs
+
+        return list(set([projects[l].get_output() for l in libs]))
+            
 
 # --- Auto generated files --------------------------------------------------- #
 
@@ -220,30 +228,33 @@ class Project(object):
         
     def link_output(self, projects):
         objects = [obj["out"] for obj in self.get_objects()]
+        
 
         if self.type == ProjectTypes.APP:
-            pass
+            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/userspace.ld")
         elif self.type == ProjectTypes.LIB:
             return toolchain.AR(objects, self.get_output())
         elif self.type == ProjectTypes.KERNEL:
+            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld")
             pass
         elif self.type == ProjectTypes.MODULE:
             pass
-        return True
+
+        return False
 
 # --- Operations ------------------------------------------------------------- #
 
-    def info(self):
+    def info(self, projects):
         print("Project: %s" % self.id)
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
-        print("Libs: %s" % ', '.join(self.libs))
-        print("\nSources:")
-        pprint.pprint(self.get_sources())
-        print("\nAssets:")
-        pprint.pprint(self.get_assets())
-        print("\nObjects:")
-        pprint.pprint(self.get_objects())
+        print("Libs: %s" % ', '.join(self.get_libs(projects)))
+        # print("\nSources:")
+        # pprint.pprint(self.get_sources())
+        # print("\nAssets:")
+        # pprint.pprint(self.get_assets())
+        # print("\nObjects:")
+        # pprint.pprint(self.get_objects())
 
     def build(self, projects):
         toolchain.MKDIR(self.obj_path)
@@ -256,6 +267,7 @@ class Project(object):
             return False
 
         self.generate_all()
+        self.builded = True
 
         success = self.build_dependencies(projects)
 
@@ -263,7 +275,6 @@ class Project(object):
         success = success and self.build_objects(projects) and\
                               self.link_output(projects)
 
-        self.builded = success
         return success
 
     def clean(self):

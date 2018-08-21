@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2 and sys.argv[1] == "buildall":
         for id in projects:
-            if projects[id].build(projects):
+            if not projects[id].build(projects):
                 print("Building %s failed!" % id)
                 exit()
 

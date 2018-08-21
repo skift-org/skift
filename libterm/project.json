@@ -1,0 +1,5 @@
+{
+    "id": "libterm",
+    "type": "lib",
+    "libs": ["libc", "libutils"]
+}

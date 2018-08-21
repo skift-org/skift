@@ -1,9 +1,10 @@
 #pragma once
 
-#define NULL ((void*)0)
+#include "defs/NULL.h"
+#include "defs/size_t.h"
+
 #define offsetof(st, m) ((size_t)&(((st *)0)->m))
 
-typedef unsigned int size_t;
 typedef long long ptrdiff_t;
 
 #ifndef __cplusplus

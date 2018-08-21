@@ -39,6 +39,7 @@ class Project(object):
         else:
             self.valide = True
             self.builded = False
+            self.failed = False
 
             self.id = data["id"]
             self.type = ProjectTypes.FromName(data["type"])
@@ -202,10 +203,12 @@ class Project(object):
         for o in objects:
             os.makedirs(os.path.dirname(o["out"]), exist_ok=True)
 
-            if o["in"].endswith(".s") and \
-                not toolchain.NASM(o["in"], o["out"]): return False
-            elif o["in"].endswith(".c") and \
-                not toolchain.GCC(o["in"], o["out"], self.get_includes_paths(projects), [], self.strict): return False
+            if o["in"].endswith(".s") and not toolchain.NASM(o["in"], o["out"]):
+                self.failed = True
+                return False
+            elif o["in"].endswith(".c") and not toolchain.GCC(o["in"], o["out"], self.get_includes_paths(projects), [], self.strict):
+                self.failed = True
+                return False
 
         return True
         
@@ -232,6 +235,9 @@ class Project(object):
 
         if (self.builded):
             return True
+
+        if (self.failed):
+            return False
 
         self.generate_all()
 

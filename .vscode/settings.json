@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "sstream": "cpp",
+        "istream": "c",
+        "optional": "c",
+        "ostream": "c",
+        "system_error": "c",
+        "type_traits": "c"
+    }
+}

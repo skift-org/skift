@@ -131,11 +131,17 @@ class Project(object):
         return objects
     
     def get_libs(self, projects):
+        """"""
         libs = self.libs.copy()
         for lib in self.libs:
             libs += projects[lib].libs
 
         return list(set([projects[l].get_output() for l in libs]))
+
+    def get_libs_name(self, project):
+
+        libs = self.libs.copy()
+
             
 
 # --- Auto generated files --------------------------------------------------- #

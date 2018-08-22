@@ -43,6 +43,11 @@ def get_projects(location):
 def build_ramdisk(location, projects):
     """
     Build the system ramdisk, in the future this will be a physical disk.
+
+    Parameters
+    ----------
+    location: location where to build the ramdisk (str).
+    projects: all loaded projects (dic).
     """
 
     print("\nGenerating ramdisk...")

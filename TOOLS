@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+"""
+The skiftOS toolchain
+=====================
+build, run and distribute the skift operating system
+"""
 
 import json
 import os
@@ -79,15 +84,24 @@ def build_ramdisk(location, projects):
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             toolchain.COPY(hdr, dest)
 
+    ramdisk_file = os.path.join(location, "ramdisk.tar")
+    toolchain.TAR(ram_disk, ramdisk_file)
+    return ramdisk_file
 
-    # Copy manuals
-    # TODO
-
-    toolchain.TAR(ram_disk, os.path.join(location, "ramdisk.tar"))
-
-def build_iso(location, projects):
+def build_iso(location, kernel, projects, ramdisk):
     iso_dir = toolchain.MKDIR(os.path.join(location, "iso"))
-    boot_grub_dir = toolchain.MKDIR(os.path.join(iso_dir, "boot/grub"))
+    boot_dir = toolchain.MKDIR(os.path.join(iso_dir, "boot"))
+    grub_dir = toolchain.MKDIR(os.path.join(boot_dir, "grub"))
+    
+    grub_file = os.path.join(grub_dir, "grub.cfg")
+
+    with open(grub_file, 'w') as f:
+        f.write("# This file is auto generated.\n")
+        f.write("set timeout=15\n")
+        f.write("set default=0\n\n")
+
+
+
 
 
 # --- Build Script ----------------------------------------------------------- #

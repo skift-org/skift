@@ -3,7 +3,12 @@ import os
 import shutil
 import subprocess
 
+def COPY(src, dest):
+    print(" CP %s -> %s" % (src, dest))
+    shutil.copyfile(src, dest)
+
 def MKDIR(directory):
+    print(" MKDIR", directory)
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -12,6 +17,9 @@ def MKDIR(directory):
 def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
+
+def TAR(directory, output_file):
+    subprocess.call(["tar", "-cvf", output_file, "-C", directory] + os.listdir(directory))
 
 gcc_w_flags = ["-Wall", "-Wextra", "-Werror"]
 gcc_freestanding_flags = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]

@@ -2,5 +2,6 @@
     "id": "lodepng",
     "type": "lib",
     "libs": ["libc"],
-    "strict": false
+    "strict": false,
+    "defines": ["LODEPNG_NO_COMPILE_DISK"]
 }

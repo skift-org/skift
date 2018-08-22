@@ -12,8 +12,6 @@ sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
 import project
 import toolchain
 
-path_join = os.path.join
-
 def get_projects(location):
     """
     Get all projects in a directory.
@@ -42,15 +40,37 @@ def get_projects(location):
     return projects
 
 def build_ramdisk(location, projects):
-    ram_disk = toolchain.MKDIR(path_join(location, "ramdisk"))
+    print("\nGenerating ramdisk...")
+    ram_disk = toolchain.MKDIR(os.path.join(location, "ramdisk"))
 
-    sys_dir = toolchain.MKDIR(path_joint(ram_disk, "system"))
-    app_dir = toolchain.MKDIR(path_joint(ram_disk, "applications"))
-    lib_dir = toolchain.MKDIR(path_joint(ram_disk, "library"))
-    usr_dir = toolchain.MKDIR(path_joint(ram_disk, "user"))
+    sys_dir = toolchain.MKDIR(os.path.join(ram_disk, "System"))
+    app_dir = toolchain.MKDIR(os.path.join(ram_disk, "Application"))
+    lib_dir = toolchain.MKDIR(os.path.join(ram_disk, "Library"))
+    hdr_dir = toolchain.MKDIR(os.path.join(lib_dir, "Library"))
+    usr_dir = toolchain.MKDIR(os.path.join(ram_disk, "User"))
+    man_dir = toolchain.MKDIR(os.path.join(ram_disk, "Manual"))
 
-    for p in projects.:
-        pass
+    # Copy apps
+    for app in [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.APP]:
+        destination = os.path.join(app_dir, os.path.basename(app.get_output()))
+        toolchain.COPY(app.get_output(), destination)
+
+    # Copy libs
+    for app in [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.LIB]:
+        destination = os.path.join(lib_dir, os.path.basename(app.get_output()))
+        toolchain.COPY(app.get_output(), destination)
+
+    #copy headers
+
+    # Copy manuals
+    # TODO
+
+    toolchain.TAR(ram_disk, os.path.join(location, "ramdisk.tar"))
+
+def build_iso(location, projects):
+    iso_dir = toolchain.MKDIR(os.path.join(location, "iso"))
+    boot_grub_dir = toolchain.MKDIR(os.path.join(iso_dir, "boot/grub"))
+
 
 # --- Build Script ----------------------------------------------------------- #
 
@@ -83,7 +103,7 @@ if __name__ == "__main__":
                     print("Building %s failed!" % id)
                     exit()
 
-        build_ramdisk("./build")
+        build_ramdisk("./build", projects)
 
     if (len(sys.argv) == 1) or (len(sys.argv) == 2 and sys.argv[1] == "help"):
         print("skiftOS build system.")

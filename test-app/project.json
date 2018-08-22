@@ -1,6 +1,6 @@
 {
     "id": "test-app",
     "type": "app",
-    "libs": ["libc-userland", "libc", "libsk", "libutils"],
+    "libs": ["libc-userland", "libsk", "libutils"],
     "strict": false
 }

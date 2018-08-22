@@ -1,6 +1,6 @@
 {
     "id": "libc-userland",
     "type": "lib",
-    "libs": ["libutils", "libc"],
+    "libs": ["libc"],
     "strict": false
 }

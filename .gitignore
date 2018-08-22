@@ -22,6 +22,10 @@ __assets.s
 *.gch
 *.pch
 
+#others
+*.bin
+*.tar
+
 # Libraries
 *.lib
 *.a

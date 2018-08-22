@@ -92,7 +92,7 @@ def build_iso(location, kernel, projects, ramdisk):
     iso_dir = toolchain.MKDIR(os.path.join(location, "iso"))
     boot_dir = toolchain.MKDIR(os.path.join(iso_dir, "boot"))
     grub_dir = toolchain.MKDIR(os.path.join(boot_dir, "grub"))
-    
+
     grub_file = os.path.join(grub_dir, "grub.cfg")
 
     with open(grub_file, 'w') as f:
@@ -102,34 +102,30 @@ def build_iso(location, kernel, projects, ramdisk):
 
 
 
-
-
 # --- Build Script ----------------------------------------------------------- #
-
-
 if __name__ == "__main__":
     projects = get_projects("sources")
 
     if len(sys.argv) == 3 and sys.argv[1] == "info":
         projects[sys.argv[2]].info(projects)
 
-    if len(sys.argv) == 2 and sys.argv[1] == "list":
+    elif len(sys.argv) == 2 and sys.argv[1] == "list":
         for project in projects:
             print(project, end=' ')
         print('')
 
-    if len(sys.argv) == 3 and sys.argv[1] == "clean":
+    elif len(sys.argv) == 3 and sys.argv[1] == "clean":
         projects[sys.argv[2]].clean()
 
-    if len(sys.argv) == 2 and sys.argv[1] == "cleanall":
+    elif len(sys.argv) == 2 and sys.argv[1] == "cleanall":
         toolchain.RMDIR("build")
         for id in projects:
             projects[id].clean()
 
-    if len(sys.argv) == 3 and sys.argv[1] == "build":
+    elif len(sys.argv) == 3 and sys.argv[1] == "build":
         projects[sys.argv[2]].build(projects)
 
-    if len(sys.argv) == 2 and sys.argv[1] == "buildall":
+    elif len(sys.argv) == 2 and sys.argv[1] == "buildall":
         for id in projects:
             if projects[id].type in (project.ProjectTypes.APP, project.ProjectTypes.KERNEL, project.ProjectTypes.MODULE):
                 if not projects[id].build(projects):
@@ -137,6 +133,6 @@ if __name__ == "__main__":
                     exit()
 
         build_ramdisk("./build", projects)
-
-    if (len(sys.argv) == 1) or (len(sys.argv) == 2 and sys.argv[1] == "help"):
+    else:
         print("skiftOS build system.")
+        print("info, list, clean, cleanall, build, buildall, target")

@@ -1,29 +1,41 @@
-import utils
 import os
 import shutil
 import subprocess
+import utils
 
-def COPY(src, dest):
-    print(" CP %s -> %s" % (src, dest))
-    shutil.copyfile(src, dest)
+# --- Utils ------------------------------------------------------------------ #
 
 def MKDIR(directory):
     print(" MKDIR", directory)
+
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     return directory
 
 def RMDIR(directory):
+    print(" RMDIR", directory)
+
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
+def COPY(src, dest):
+    print(" CP %s -> %s" % (src, dest))
+    shutil.copyfile(src, dest)
+
 def TAR(directory, output_file):
     print(" TAR %s -> %s" % (directory, output_file))
-    subprocess.call(["tar", "-cvf", output_file, "-C", directory] + os.listdir(directory))
+    subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
 
-gcc_w_flags = ["-Wall", "-Wextra", "-Werror"]
-gcc_freestanding_flags = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+# --- Compiler --------------------------------------------------------------- #
+
+def NASM(input_file, output_file):
+    if utils.IsUpToDate(output_file, input_file):
+        return True
+
+    print(" AS %s -> %s" % (input_file, output_file))
+    command = ["nasm", "-f" "elf32", input_file, "-o", output_file]
+    return subprocess.call(command) == 0
 
 def GCC(input_file, output_file, includes, defines, strict):
     if utils.IsUpToDate(output_file, input_file):
@@ -39,36 +51,24 @@ def GCC(input_file, output_file, includes, defines, strict):
     for i in includes:
         includes_flags.append("-I%s" % i)
 
-    flags = ["gcc"]
-    flags += ["-m32"]
-    flags += defines_flags 
-    flags += includes_flags 
-    
+    flags = ["gcc", "-m32"]
+    flags += ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+    flags += defines_flags
+    flags += includes_flags
+
     if strict:
-        flags += gcc_w_flags
+        flags += ["-Wall", "-Wextra", "-Werror"]
 
-    flags += gcc_freestanding_flags
     flags += ["-c", "-o", output_file, input_file ]
-
-
-    # print(' '.join(flags))
 
     return subprocess.call(flags) == 0
 
-def NASM(input_file, output_file):
-    if utils.IsUpToDate(output_file, input_file):
-        return True
-
-    print(" AS %s -> %s" % (input_file, output_file))
-    return subprocess.call(["nasm", "-f" "elf32", input_file, "-o", output_file]) == 0
-
 def AR(objects, output_file):
     print(" AR %i objects -> %s" % (len(objects), output_file))
-
     command = ["ar", "rcs"] + [output_file] + objects
-    # print(command)
     return subprocess.call(command) == 0
 
 def LD(objects, libs, output_file, script):
     print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
-    return subprocess.call(["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs) == 0
+    command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
+    return subprocess.call(command) == 0

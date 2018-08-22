@@ -1,12 +1,11 @@
-import json
-import os
 from enum import Enum
 
+import datetime
+import json
+import os
+import pprint
 import toolchain
 import utils
-import datetime
-import pprint
-
 
 class ProjectTypes(Enum):
     INVALID = 0
@@ -24,7 +23,7 @@ class ProjectTypes(Enum):
         elif name == "kernel":
             return ProjectTypes.KERNEL
         elif name == "module":
-            return ProjectTypes.LIB
+            return ProjectTypes.MODULE
         else:
             return ProjectTypes.INVALID
 
@@ -88,27 +87,27 @@ class Project(object):
         if os.path.exists(self.sources_path):
             return utils.GetFiles(self.sources_path, '.c')\
                  + utils.GetFiles(self.sources_path, '.s')
-        
+
         return []
 
     def get_includes(self):
         """Get all includes files of the current project."""
         if os.path.exists(self.includes_path):
             return utils.GetFiles(self.includes_path, '.h')
-        
+
         return []
 
     def get_assets(self):
         """Get all assets of the current project."""
         if os.path.exists(self.assets_path):
             return [os.path.join(self.assets_path, s) for s in os.listdir(self.assets_path)]
-        
+
         return []
 
     def get_assets_filenames(self):
         if os.path.exists(self.assets_path):
             return os.listdir(self.assets_path)
-        
+
         return []
 
 
@@ -129,7 +128,7 @@ class Project(object):
             objects.append({"in": src, "out": src.replace(self.sources_path, self.obj_path) + '.o'})
 
         return objects
-    
+
     def get_libs(self, projects):
         """"""
         libs = []
@@ -155,7 +154,7 @@ class Project(object):
             found.remove(self.id)
 
         return found
-        
+
 
 # --- Auto generated files --------------------------------------------------- #
 
@@ -192,7 +191,7 @@ class Project(object):
         toolchain.MKDIR(self.obj_path)
 
         with open(os.path.join(self.obj_path, "__assets.s"), 'w') as f:
-            
+
             f.write("bits 32\n")
             f.write("section .rodata\n")
             f.write(";; This file is auto generated.\n")
@@ -244,10 +243,10 @@ class Project(object):
                 return False
 
         return True
-        
+
     def link_output(self, projects):
         objects = [obj["out"] for obj in self.get_objects()]
-        
+
         if self.type == ProjectTypes.APP:
             return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/userspace.ld")
         elif self.type == ProjectTypes.LIB:
@@ -266,22 +265,13 @@ class Project(object):
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
         print("Libs: %s" % ', '.join(self.get_dependencies(projects)))
-        # print("\nSources:")
-        # pprint.pprint(self.get_sources())
-        # print("\nAssets:")
-        # pprint.pprint(self.get_assets())
-        # print("\nObjects:")
-        # pprint.pprint(self.get_objects())
 
     def build(self, projects):
         toolchain.MKDIR(self.obj_path)
         toolchain.MKDIR(self.bin_path)
 
-        if (self.builded):
-            return True
-
-        if (self.failed):
-            return False
+        if (self.builded): return True
+        if (self.failed): return False
 
         self.generate_all()
         self.builded = True
@@ -297,4 +287,3 @@ class Project(object):
     def clean(self):
         toolchain.RMDIR(self.obj_path)
         toolchain.RMDIR(self.bin_path)
-        

@@ -19,6 +19,7 @@ def RMDIR(directory):
         shutil.rmtree(directory)
 
 def TAR(directory, output_file):
+    print(" TAR %s -> %s" % (directory, output_file))
     subprocess.call(["tar", "-cvf", output_file, "-C", directory] + os.listdir(directory))
 
 gcc_w_flags = ["-Wall", "-Wextra", "-Werror"]

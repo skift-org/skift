@@ -7,6 +7,7 @@ import sys
 import shutil
 
 import sys
+
 sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
 
 import project
@@ -46,21 +47,28 @@ def build_ramdisk(location, projects):
     sys_dir = toolchain.MKDIR(os.path.join(ram_disk, "System"))
     app_dir = toolchain.MKDIR(os.path.join(ram_disk, "Application"))
     lib_dir = toolchain.MKDIR(os.path.join(ram_disk, "Library"))
-    hdr_dir = toolchain.MKDIR(os.path.join(lib_dir, "Library"))
+    hdr_dir = toolchain.MKDIR(os.path.join(lib_dir, "Header"))
     usr_dir = toolchain.MKDIR(os.path.join(ram_disk, "User"))
     man_dir = toolchain.MKDIR(os.path.join(ram_disk, "Manual"))
 
+    libs = [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.LIB]
+    apps = [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.APP]
+
     # Copy apps
-    for app in [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.APP]:
+    for app in apps:
         destination = os.path.join(app_dir, os.path.basename(app.get_output()))
         toolchain.COPY(app.get_output(), destination)
 
     # Copy libs
-    for app in [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.LIB]:
-        destination = os.path.join(lib_dir, os.path.basename(app.get_output()))
-        toolchain.COPY(app.get_output(), destination)
+    for lib in libs:
+        destination = os.path.join(lib_dir, os.path.basename(lib.get_output()))
+        toolchain.COPY(lib.get_output(), destination)
 
-    #copy headers
+        for hdr in lib.get_includes():
+            dest = hdr.replace(lib.includes_path, hdr_dir)
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            toolchain.COPY(hdr, dest)
+
 
     # Copy manuals
     # TODO
@@ -90,6 +98,7 @@ if __name__ == "__main__":
         projects[sys.argv[2]].clean()
 
     if len(sys.argv) == 2 and sys.argv[1] == "cleanall":
+        toolchain.RMDIR("build")
         for id in projects:
             projects[id].clean()
 

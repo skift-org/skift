@@ -1,3 +1,10 @@
+# skiftOS build system generated
+__meta.h
+__assets.h
+__assets.s
+
+build/
+
 # Python
 *.pyc
 
@@ -9,9 +16,6 @@
 *.ko
 *.obj
 *.elf
-__meta.h
-__assets.h
-__assets.s
 
 # Linker output
 *.ilk

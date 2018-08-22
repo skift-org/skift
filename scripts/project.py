@@ -71,7 +71,7 @@ class Project(object):
         file_name = self.id
 
         if (self.type == ProjectTypes.LIB):
-            file_name += '.a'
+            file_name += '.lib'
         elif (self.type == ProjectTypes.APP):
             file_name += '.app'
         elif (self.type == ProjectTypes.KERNEL):

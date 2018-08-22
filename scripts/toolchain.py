@@ -7,6 +7,8 @@ def MKDIR(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+    return directory
+
 def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)

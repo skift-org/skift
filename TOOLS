@@ -10,6 +10,9 @@ import sys
 sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
 
 import project
+import toolchain
+
+path_join = os.path.join
 
 def get_projects(location):
     """
@@ -37,6 +40,17 @@ def get_projects(location):
             projects[data["id"]] = project.Project(project_path, data)
 
     return projects
+
+def build_ramdisk(location, projects):
+    ram_disk = toolchain.MKDIR(path_join(location, "ramdisk"))
+
+    sys_dir = toolchain.MKDIR(path_joint(ram_disk, "system"))
+    app_dir = toolchain.MKDIR(path_joint(ram_disk, "applications"))
+    lib_dir = toolchain.MKDIR(path_joint(ram_disk, "library"))
+    usr_dir = toolchain.MKDIR(path_joint(ram_disk, "user"))
+
+    for p in projects.:
+        pass
 
 # --- Build Script ----------------------------------------------------------- #
 
@@ -68,6 +82,8 @@ if __name__ == "__main__":
                 if not projects[id].build(projects):
                     print("Building %s failed!" % id)
                     exit()
+
+        build_ramdisk("./build")
 
     if (len(sys.argv) == 1) or (len(sys.argv) == 2 and sys.argv[1] == "help"):
         print("skiftOS build system.")

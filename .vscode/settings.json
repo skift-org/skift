@@ -6,5 +6,6 @@
         "ostream": "c",
         "system_error": "c",
         "type_traits": "c"
-    }
+    },
+    "python.pythonPath": "/usr/bin/python3.6"
 }

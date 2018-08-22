@@ -64,6 +64,7 @@ def build_ramdisk(location, projects):
         destination = os.path.join(lib_dir, os.path.basename(lib.get_output()))
         toolchain.COPY(lib.get_output(), destination)
 
+        # Copy headers
         for hdr in lib.get_includes():
             dest = hdr.replace(lib.includes_path, hdr_dir)
             os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -84,7 +85,7 @@ def build_iso(location, projects):
 
 
 if __name__ == "__main__":
-    projects = get_projects(".")
+    projects = get_projects("sources")
 
     if len(sys.argv) == 3 and sys.argv[1] == "info":
         projects[sys.argv[2]].info(projects)

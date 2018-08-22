@@ -1,0 +1,2 @@
+blue: #0563D0
+cyan: #00D1FF

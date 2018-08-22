@@ -41,6 +41,10 @@ def get_projects(location):
     return projects
 
 def build_ramdisk(location, projects):
+    """
+    Build the system ramdisk, in the future this will be a physical disk.
+    """
+
     print("\nGenerating ramdisk...")
     ram_disk = toolchain.MKDIR(os.path.join(location, "ramdisk"))
 
@@ -89,7 +93,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 3 and sys.argv[1] == "info":
         projects[sys.argv[2]].info(projects)
-    
+
     if len(sys.argv) == 2 and sys.argv[1] == "list":
         for project in projects:
             print(project, end=' ')

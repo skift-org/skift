@@ -71,6 +71,15 @@ void main(multiboot_info_t * info, s32 magic)
     atomic_enable();
     sti();
 
+    file_t* file = file_open(NULL, "Library/Header/stdio.h");
+    if (file)
+    {
+      char* buffer = file_read_all(file);
+      printf(buffer);
+      file_close(file);
+      free(buffer);
+    }
+
     task_start_named(time_task, "clock");
     info(KERNEL_UNAME);
 

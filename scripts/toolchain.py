@@ -37,9 +37,11 @@ def GRUB(iso, output_file):
     #print(" GRUB %s -> %s" % (iso, output_file))
     command = []
 
-    status = subprocess.call(["grub-mkrescue", "-o", output_file, iso])
+    status = 1
 
-    if not status == 0:
+    try:
+        status = ubprocess.call(["grub-mkrescue", "-o", output_file, iso])
+    except:
         print("grub-mkrescue not found, fallback grub2-mkrescue...")
         status = subprocess.call(["grub2-mkrescue", "-o", output_file, iso])
 

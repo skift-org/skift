@@ -73,13 +73,14 @@ int file_existe(directory_t *relative, const char *path);
 
 int file_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
 int file_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
-void file_stat(file_t *file, file_stat_t *stat);
+void file_stat(file_t *file, fstat_t *stat);
 
 file_t *file_open(directory_t *relative, const char *path);
 void file_close(file_t *file);
 
-int file_write(file_t *file, uint offset, void *buffer, uint n);
+void* file_read_all(file_t* file);
 int file_read(file_t *file, uint offset, void *buffer, uint n);
+int file_write(file_t *file, uint offset, void *buffer, uint n);
 
 /* --- Directories Operation ------------------------------------------------ */
 

@@ -29,7 +29,7 @@ int file_create(directory_t *relative, const char *path, filesystem_t * fs, int 
         file->parent = parent;
 
         sll_add((u32)file, parent->files);
-        
+
         file->fs = fs;
         file->device = device;
         file->inode = inode;
@@ -95,9 +95,9 @@ void file_close(file_t *file)
     }
 }
 
-void file_stat(file_t * file, file_stat_t * stat)
+void file_stat(file_t * file, fstat_t * stat)
 {
-    if (file != NULL && file->fs->file_read !=NULL)
+    if (file != NULL && file->fs->file_stat != NULL)
     {
         file->fs->file_stat(file, stat);
     }

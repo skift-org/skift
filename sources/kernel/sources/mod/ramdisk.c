@@ -50,12 +50,14 @@ void ramdisk_load(multiboot_module_t *module)
 
 int rd_file_open(file_t *file)
 {
+    debug("File opened %s", file->name);
     tar_block_t block;
     return tar_read(ramdisk, &block, file->inode);
 }
 
 void rd_file_close(file_t *file)
 {
+    debug("File closed %s", file->name);
     UNUSED(file);
 }
 
@@ -68,6 +70,7 @@ int rd_file_read(file_t *file, uint offset, void *buffer, uint n)
 
     memcpy(buffer, block.data + offset, n);
 
+    debug("File readed %s", file->name);
     return n;
 }
 

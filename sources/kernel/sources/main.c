@@ -47,11 +47,11 @@ uint get_kernel_end(multiboot_info_t * minfo)
 
 void main(multiboot_info_t * info, s32 magic)
 {
-    console_setup(); puts("\n"); 
+    console_setup(); puts("\n");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC ) 
+    if (magic != MULTIBOOT_BOOTLOADER_MAGIC )
         panic("Invalid multiboot magic number (0x%x)!", magic);
 
     info("--- Setting up cpu tables ---");
@@ -60,20 +60,20 @@ void main(multiboot_info_t * info, s32 magic)
     setup(idt);
     setup(isr);
     setup(irq);
-    
+
     info("--- Setting up system ---");
     setup(physical, (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(memory, get_kernel_end(&mbootinfo));
     setup(task);
     setup(filesystem);
     setup(modules, &mbootinfo);
-    
+
     atomic_enable();
     sti();
 
     task_start_named(time_task, "clock");
     info(KERNEL_UNAME);
-        
+
     while(true){ hlt(); };
 
     panic("The end of the main function has been reached.");

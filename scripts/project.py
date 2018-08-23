@@ -6,6 +6,7 @@ import os
 import pprint
 import toolchain
 import utils
+import progress
 
 class ProjectTypes(Enum):
     INVALID = 0
@@ -230,9 +231,13 @@ class Project(object):
         return True
 
     def build_objects(self, projects):
+        print("\nBuilding " + self.id + "...")
+
         objects = self.get_objects()
 
-        for o in objects:
+        for i in range(len(objects)):
+            o = objects[i]
+
             os.makedirs(os.path.dirname(o["out"]), exist_ok=True)
 
             if o["in"].endswith(".s") and not toolchain.NASM(o["in"], o["out"]):
@@ -241,6 +246,8 @@ class Project(object):
             elif o["in"].endswith(".c") and not toolchain.GCC(o["in"], o["out"], self.get_includes_paths(projects), [], self.strict):
                 self.failed = True
                 return False
+
+            progress.printProgressBar(i + 1, len(objects))
 
         return True
 
@@ -278,7 +285,6 @@ class Project(object):
 
         success = self.build_dependencies(projects)
 
-        print("\nBuilding %s..." % self.id)
         success = success and self.build_objects(projects) and\
                               self.link_output(projects)
 

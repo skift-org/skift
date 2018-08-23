@@ -18,15 +18,15 @@ void ramdisk_load(multiboot_module_t *module)
     {
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            debug("Found folder: %s at 0x%x.", block.name, block.data);
+            // debug("Found folder: %s at 0x%x.", block.name, block.data);
             directory_create(NULL, block.name, 0);
         }
         else
         {
-            debug("Found file: %s at 0x%x.", block.name, block.data);
+            // debug("Found file: %s at 0x%x.", block.name, block.data);
             file_create(NULL, block.name, 0);
         }
     }
 
-    filesystem_dump(NULL, "");
+    // filesystem_dump(NULL, "");
 }

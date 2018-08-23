@@ -1,0 +1,5 @@
+{
+    "id": "libelf",
+    "type": "lib",
+    "libs": ["libc", "libutils"]
+}

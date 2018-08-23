@@ -5,7 +5,12 @@
         "optional": "c",
         "ostream": "c",
         "system_error": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "typeinfo": "c",
+        "array": "c",
+        "initializer_list": "c",
+        "string_view": "c",
+        "utility": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

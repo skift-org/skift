@@ -1,3 +1,4 @@
 {
-  "selected": ["kernel", "test-app"]
+  "selected": ["kernel", "test-app"],
+  "defines": [""]
 }

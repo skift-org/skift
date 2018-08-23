@@ -68,4 +68,5 @@ typedef struct
 } ELF_t;
 
 
-int elf_valid(void * elf);
+int elf_read_header(ELF_t * header, void * file);
+int elf_read_section(ELF_section_t * section, void * file,int index);

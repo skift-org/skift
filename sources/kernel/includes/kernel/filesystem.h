@@ -9,10 +9,28 @@
 struct file;
 struct directory;
 
-typedef int (* file_open_t)(struct file * file);
-typedef void(* file_close_t)(struct file * file);
-typedef int (* file_write_t)(struct file *file, uint offset, void *buffer, uint n);
-typedef int (* file_read_t)(struct file *file, uint offset, void *buffer, uint n);
+typedef struct
+{
+    int size;
+    int read;
+    int write;
+} fstat_t;
+
+typedef int (*file_open_t)(struct file *file);
+typedef void (*file_close_t)(struct file *file);
+typedef int (*file_read_t)(struct file *file, uint offset, void *buffer, uint n);
+typedef int (*file_write_t)(struct file *file, uint offset, void *buffer, uint n);
+
+typedef void (*file_stat_t)(struct file *file, fstat_t *stat);
+
+typedef struct
+{
+    file_open_t  file_open;
+    file_close_t file_close;
+    file_read_t  file_read;
+    file_write_t file_write;
+    file_stat_t  file_stat;
+} filesystem_t;
 
 typedef struct
 {
@@ -34,31 +52,28 @@ typedef struct file
 {
     uint device;
     uint inode;
+    filesystem_t* fs;
 
     char name[PATH_FILE_NAME_SIZE];
     struct directory *parent;
-
-    file_open_t open;
-    file_close_t close;
-    file_read_t read;
-    file_write_t write;
 } file_t;
 
 void filesystem_setup();
-void filesystem_dump(directory_t *relative, const char *path); 
+void filesystem_dump(directory_t *relative, const char *path);
 
-file_t      *filesystem_get_file(directory_t *relative, const char *path);
+file_t *filesystem_get_file(directory_t *relative, const char *path);
 directory_t *filesystem_get_directory(directory_t *relative, const char *path);
 
 /* --- Files Operation ------------------------------------------------------ */
 
-int file_create(directory_t *relative, const char *path, int flags);
+int file_create(directory_t *relative, const char *path, filesystem_t * fs, int device, int inode);
 int file_create_device(directory_t *relative, const char *path, int flags);
 int file_delete(directory_t *relative, const char *path);
 int file_existe(directory_t *relative, const char *path);
 
 int file_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
 int file_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
+void file_stat(file_t *file, file_stat_t *stat);
 
 file_t *file_open(directory_t *relative, const char *path);
 void file_close(file_t *file);

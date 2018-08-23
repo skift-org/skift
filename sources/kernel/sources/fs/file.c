@@ -16,10 +16,8 @@ file_t *alloc_file(const char *name)
 
 /* --- Create/Delete/Existe ------------------------------------------------- */
 
-int file_create(directory_t *relative, const char *path, int flags)
+int file_create(directory_t *relative, const char *path, filesystem_t * fs, int device, int inode)
 {
-    UNUSED(flags);
-
     char *dir_path = malloc(strlen(path));
     char file_name[128];
     file_t *file = NULL;
@@ -29,7 +27,12 @@ int file_create(directory_t *relative, const char *path, int flags)
         directory_t *parent = filesystem_get_directory(relative, path);
         file = alloc_file(file_name);
         file->parent = parent;
+
         sll_add((u32)file, parent->files);
+        
+        file->fs = fs;
+        file->device = device;
+        file->inode = inode;
     }
 
     free(dir_path);
@@ -74,7 +77,7 @@ file_t *file_open(directory_t *relative, const char *path)
 {
     file_t * file = filesystem_get_file(relative, path);
 
-    if (file != NULL && (file->open == NULL || file->open(file)))
+    if (file != NULL && (file->fs->file_open == NULL || file->fs->file_open(file)))
     {
         return file;
     }
@@ -86,27 +89,51 @@ file_t *file_open(directory_t *relative, const char *path)
 
 void file_close(file_t *file)
 {
-    if (file != NULL && file->close != NULL)
+    if (file != NULL && file->fs->file_close != NULL)
     {
-        file->close(file);
+        file->fs->file_close(file);
+    }
+}
+
+void file_stat(file_t * file, file_stat_t * stat)
+{
+    if (file != NULL && file->fs->file_read !=NULL)
+    {
+        file->fs->file_stat(file, stat);
     }
 }
 
 int file_read(file_t *file, uint offset, void *buffer, uint n)
 {
-    if (file != NULL && file->read !=NULL)
+    if (file != NULL && file->fs->file_read !=NULL)
     {
-        return file->read(file, offset, buffer, n);
+        return file->fs->file_read(file, offset, buffer, n);
     }
 
     return 0;
 }
 
+void* file_read_all(file_t* file)
+{
+    void* data = NULL;
+
+    if (file != NULL)
+    {
+        fstat_t stat;
+        file_stat(file, &stat);
+
+        data = malloc(stat.size);
+        file_read(file, 0, data, stat.size);
+    }
+
+    return data;
+}
+
 int file_write(file_t *file, uint offset, void *buffer, uint n)
 {
-    if (file != NULL && file->write !=NULL)
+    if (file != NULL && file->fs->file_write !=NULL)
     {
-        return file->write(file, offset, buffer, n);
+        return file->fs->file_write(file, offset, buffer, n);
     }
 
     return 0;

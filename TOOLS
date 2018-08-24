@@ -55,11 +55,14 @@ def build_ramdisk(location, projects):
     print("\nGenerating ramdisk...")
 
     ram_disk = toolchain.MKDIR(os.path.join(location, "ramdisk"))
+
     app_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Application"))
-    lib_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Library"))
     man_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Manual"))
     sys_dir  = toolchain.MKDIR(os.path.join(ram_disk, "System"))
     usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "User"))
+    usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "User"))
+
+    lib_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Library"))
     hdr_dir  = toolchain.MKDIR(os.path.join(lib_dir,  "Header"))
 
     libs = [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.LIB]

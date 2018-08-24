@@ -40,7 +40,7 @@ def GRUB(iso, output_file):
     status = 1
 
     try:
-        status = ubprocess.call(["grub-mkrescue", "-o", output_file, iso])
+        status = subprocess.call(["grub-mkrescue", "-o", output_file, iso])
     except:
         print("grub-mkrescue not found, fallback grub2-mkrescue...")
         status = subprocess.call(["grub2-mkrescue", "-o", output_file, iso])
@@ -72,7 +72,7 @@ def GCC(input_file, output_file, includes, defines, strict):
         includes_flags.append("-I%s" % i)
 
     flags = ["gcc", "-m32"]
-    flags += ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+    flags += ["-O3", "-g", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
     flags += defines_flags
     flags += includes_flags
 

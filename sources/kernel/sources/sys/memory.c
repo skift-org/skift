@@ -79,3 +79,8 @@ void memory_detroy_memory_space(page_directorie_t *dir)
 {
     UNUSED(dir);
 }
+
+page_directorie_t * get_kernel_page_dir()
+{
+    return &kernel_page_dir;
+}

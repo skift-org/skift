@@ -2,73 +2,98 @@
 #include "types.h"
 #include "utils.h"
 
-# define ELFMAG0	0x7F // e_ident[EI_MAG0]
-# define ELFMAG1	'E'  // e_ident[EI_MAG1]
-# define ELFMAG2	'L'  // e_ident[EI_MAG2]
-# define ELFMAG3	'F'  // e_ident[EI_MAG3]
+#include <stdint.h>
 
-# define ELFDATA2LSB	(1)  // Little Endian
-# define ELFCLASS32	(1)  // 32-bit Architecture
+typedef uint16_t Elf32_Half; // Unsigned half int
+typedef uint32_t Elf32_Off;  // Unsigned offset
+typedef uint32_t Elf32_Addr; // Unsigned address
+typedef uint32_t Elf32_Word; // Unsigned int
+typedef int32_t Elf32_Sword; // Signed int
 
-typedef PACKED(struct)
-{
-        unsigned char magic[16];      /* ELF identification */
-        u16 type;             /* 2 (exec file) */
-        u16 machine;          /* 3 (intel architecture) */
-        u32 version;          /* 1 */
-        u32 entry;            /* starting point */
-        u32 phoff;            /* program header table offset */
-        u32 shoff;            /* section header table offset */
-        u32 flags;            /* various flags */
-        u16 ehsize;           /* ELF header (this) size */
-        u16 phentsize;        /* program header table entry size */
-        u16 phnum;            /* number of entries */
-        u16 shentsize;        /* section header table entry size */
-        u16 shnum;            /* number of entries */
-        u16 shstrndx;         /* index of the section name string table */
-} raw_ELF_header_t;
+#define ELF_NIDENT 16
 
-typedef PACKED(struct)
-{
-        u32 type;             /* type of segment */
-        u32 offset;
-        u32 vaddr;
-        u32 paddr;
-        u32 filesz;
-        u32 memsz;
-        u32 flags;
-        u32 align;
-} raw_ELF_section_t;
-
-
+#define ELFMAG0 0x7F
+#define ELFMAG1 'E'
+#define ELFMAG2 'L'
+#define ELFMAG3 'F'
 
 typedef enum
 {
-    ELF_UNKOWN = 0,
-    ELF_REL = 1,
-    ELF_EXEC = 2
+    ELF_NONE = 0, // Unkown Type
+    ELF_REL = 1,  // Relocatable File
+    ELF_EXEC = 2  // Executable File
 } ELF_type_t;
 
+typedef PACKED(struct)
+{
+    uint8_t ident[ELF_NIDENT];
+    Elf32_Half type;
+    Elf32_Half machine;
+    Elf32_Word version;
+    Elf32_Addr entry;
+    Elf32_Off phoff;
+    Elf32_Off shoff;
+    Elf32_Word flags;
+    Elf32_Half ehsize;
+    Elf32_Half phentsize;
+    Elf32_Half phnum;
+    Elf32_Half shentsize;
+    Elf32_Half shnum;
+    Elf32_Half shstrndx;
+}
+ELF_header_t;
 
 typedef enum
 {
-} ELF_section_type_t;
+    ELFS_NULL = 0,     // Null section
+    ELFS_PROGBITS = 1, // Program information
+    ELFS_SYMTAB = 2,   // Symbol table
+    ELFS_STRTAB = 3,   // String table
+    ELFS_RELA = 4,     // Relocation (w/ addend)
+    ELFS_NOBITS = 8,   // Not present in file
+    ELFS_REL = 9,      // Relocation (no addend)
+} ELF_scection_type_t;
+
+typedef PACKED(struct)
+{
+    uint name;
+    uint type;
+    uint flags;
+    uint addr;
+    uint offset;
+    uint size;
+    uint link;
+    uint info;
+    uint addralign;
+    uint entsize;
+}
+ELF_section_t;
+
 typedef struct
 {
-    void * infile;
-    int address;
-
-    int size;
-    int memsize;
-} ELF_section_t;
+    Elf32_Word type;
+    Elf32_Off  offset;
+    Elf32_Addr vaddr;
+    Elf32_Addr paddr;
+    Elf32_Word filesz;
+    Elf32_Word memsz;
+    Elf32_Word flags;
+    Elf32_Word align;
+} ELF_program_t;
 
 typedef struct
 {
-    bool valid;
-    int type;
-    int entry;
-} ELF_t;
+    Elf32_Word name;
+    Elf32_Addr value;
+    Elf32_Word size;
+    uint8_t info;
+    uint8_t other;
+    Elf32_Half shndx;
+} Elf32_Sym_t;
 
+int ELF_valid(ELF_header_t *header);
 
-int elf_read_header(ELF_t * header, void * file);
-int elf_read_section(ELF_section_t * section, void * file,int index);
+int ELF_read_section(ELF_header_t *header, ELF_section_t *dest, uint index);
+int ELF_read_program(ELF_header_t *header, ELF_program_t *dest, uint index);
+
+char *ELF_lookup_string(ELF_header_t *header, int offset);

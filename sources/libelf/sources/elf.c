@@ -1,8 +1,9 @@
+#include <string.h>
 #include "libelf.h"
 
-int check_magic(raw_ELF_header_t * header)
+int check_magic(ELF_header_t *header)
 {
-    char * magic = (char*)&header->magic;
+    char *magic = (char *)&header->ident;
 
     return magic[0] == ELFMAG0 &&
            magic[1] == ELFMAG1 &&
@@ -12,47 +13,40 @@ int check_magic(raw_ELF_header_t * header)
            magic[5] == 1;
 }
 
-int elf_valid(void * file)
+int ELF_valid(ELF_header_t *header)
 {
-    raw_ELF_header_t * header = (raw_ELF_header_t *) file;
-
     return check_magic(header) &&
            (header->type == ELF_REL || ELF_EXEC) &&
            header->version == 1 &&
            header->machine == 3; // 386
 }
 
-int elf_read_header(ELF_t * header, void * file)
+int ELF_read_section(ELF_header_t *header, ELF_section_t *dest, uint index)
 {
-    raw_ELF_header_t * h = (raw_ELF_header_t *) file;
-
-    header->valid = elf_valid(file);
-
-    if (header->valid )
-    {
-        header->type = h->type;
-        header->entry = h->entry;
-
-        return 1;
-    }
-    else
-    {
-        header->type = ELF_UNKOWN;
+    if (index >= header->shnum)
         return 0;
-    }
+    ELF_section_t *section = (ELF_section_t *)((uint)header + header->shoff + sizeof(ELF_section_t) * index);
+
+    memcpy(dest, section, sizeof(ELF_section_t));
+
+    return 1;
 }
 
-int elf_read_section(ELF_section_t * section, void * file,int index)
+char *ELF_lookup_string(ELF_header_t *header, int offset)
 {
-    raw_ELF_header_t * h = (raw_ELF_header_t *) file;
-    raw_ELF_section_t * s = (raw_ELF_section_t *)(file + h->phoff + sizeof(raw_ELF_header_t) * index);
+    ELF_section_t section;
+    ELF_read_section(header, &section, header->shstrndx);
+    return (char *)header + section.offset + offset;
+}
 
-    if (index >= h->phnum) return 0;
+int ELF_read_program(ELF_header_t *header, ELF_program_t *dest, uint index)
+{
+    if (index >= header->phnum)
+        return 0;
+        
+    ELF_program_t *section = (ELF_program_t *)((uint)header + header->phoff + sizeof(ELF_program_t) * index);
 
-    section->infile = (void*)((uint)file + s->offset);
-    section->address = s->vaddr;
-    section->size = s->filesz;
-    section->memsize = s->memsz;
+    memcpy(dest, section, sizeof(ELF_program_t));
 
     return 1;
 }

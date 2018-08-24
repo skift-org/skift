@@ -6,11 +6,11 @@
 # define ELFMAG1	'E'  // e_ident[EI_MAG1]
 # define ELFMAG2	'L'  // e_ident[EI_MAG2]
 # define ELFMAG3	'F'  // e_ident[EI_MAG3]
- 
+
 # define ELFDATA2LSB	(1)  // Little Endian
 # define ELFCLASS32	(1)  // 32-bit Architecture
 
-typedef PACKED(struct) 
+typedef PACKED(struct)
 {
         unsigned char magic[16];      /* ELF identification */
         u16 type;             /* 2 (exec file) */
@@ -28,7 +28,7 @@ typedef PACKED(struct)
         u16 shstrndx;         /* index of the section name string table */
 } raw_ELF_header_t;
 
-typedef PACKED(struct) 
+typedef PACKED(struct)
 {
         u32 type;             /* type of segment */
         u32 offset;
@@ -42,17 +42,19 @@ typedef PACKED(struct)
 
 
 
-typedef enum 
+typedef enum
 {
     ELF_UNKOWN = 0,
     ELF_REL = 1,
     ELF_EXEC = 2
 } ELF_type_t;
 
-typedef struct 
-{
-    char * name;
 
+typedef enum
+{
+} ELF_section_type_t;
+typedef struct
+{
     void * infile;
     int address;
 

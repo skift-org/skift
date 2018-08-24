@@ -45,6 +45,8 @@ uint get_kernel_end(multiboot_info_t * minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
+
+int exec(char * path);
 void main(multiboot_info_t * info, s32 magic)
 {
     console_setup(); puts("\n");
@@ -71,17 +73,10 @@ void main(multiboot_info_t * info, s32 magic)
     atomic_enable();
     sti();
 
-    file_t* file = file_open(NULL, "Library/Header/stdio.h");
-    if (file)
-    {
-      char* buffer = file_read_all(file);
-      printf(buffer);
-      file_close(file);
-      free(buffer);
-    }
-
     task_start_named(time_task, "clock");
     info(KERNEL_UNAME);
+
+    exec("Application/test-app.app");
 
     while(true){ hlt(); };
 

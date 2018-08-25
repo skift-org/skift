@@ -21,8 +21,12 @@ void sll_display(sllist_t *list);
 
 void sll_add(int data, sllist_t *list);
 void sll_delete(int data, sllist_t *list);
+
 sllist_node_t* sll_index(sllist_t *list, uint index);
 void sll_reverse(sllist_t *list);
+
+int sll_dequeue(sllist_t *list);
+void sll_enqueue(int data, sllist_t *list);
 
 void sll_free(sllist_t *list);
 void sll_destroy(sllist_t *list);

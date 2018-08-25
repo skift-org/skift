@@ -11,7 +11,8 @@
         "initializer_list": "c",
         "string_view": "c",
         "utility": "c",
-        "filesystem.h": "c"
+        "filesystem.h": "c",
+        "sllist.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

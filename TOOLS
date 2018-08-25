@@ -139,6 +139,11 @@ def buildall(projects):
     ramdisk = build_ramdisk("./build", projects)
     return build_iso("./build", projects["kernel"].get_output(), ramdisk)
 
+def help():
+    print("skiftOS build and project managment toolbox")
+    print("usage: ./TOOLS [action]")
+    print("action: info, list, clean, cleanall, build, buildall")
+
 def main(argc, argv):
     projects = get_projects("sources")
 
@@ -171,10 +176,9 @@ def main(argc, argv):
             toolchain.QEMU(iso)
 
         else:
-            print("skiftOS toolbox.")
-            print("info, list, clean, cleanall, build, buildall")
+            help()
         
     else:
-        print("skiftOS toolbox.")
+        help()
 
 if __name__ == "__main__": main(len(sys.argv), sys.argv)

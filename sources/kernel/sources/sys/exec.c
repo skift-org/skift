@@ -1,6 +1,16 @@
+#include <string.h>
 #include "kernel/filesystem.h"
 #include "kernel/logging.h"
+#include "kernel/memory.h"
 #include "libelf.h"
+
+void load_segment(uint source, uint size, uint dest, uint destsize)
+{
+    memory_map((uint)dest, destsize / PAGE_SIZE);
+    memcpy((void*)dest, (void*)source, size);
+}
+
+typedef void (*entry_t)();
 
 int exec(char *path)
 {
@@ -28,8 +38,13 @@ int exec(char *path)
         for (int i = 0; ELF_read_program(elf, &program, i); i++)
         {
             debug("program 0x%x(%i) -> 0x%x(%i)", program.offset, program.filesz, program.vaddr, program.memsz);
+            load_segment((uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
         }
+
+        entry_t e = (entry_t)elf->entry;
+        e();
     }
+
 
     free(buffer);
 

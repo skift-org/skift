@@ -38,6 +38,24 @@ void memory_setup(uint kernel_end)
     info("Paging is now enabled!");
 }
 
+void *memory_map(uint addr, size_t count)
+{
+    void *mem = physical_alloc_contiguous(count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        int virtual = addr + PAGE_SIZE * i;
+        if (virtual2physical(&kernel_page_dir, virtual) == 0)
+        {
+            debug("mapping %x to %x", virtual, mem);
+            virtual_map(&kernel_page_dir, virtual, (uint)mem + PAGE_SIZE * i, false);
+            debug("mapping %x to %x", virtual, mem);
+        }
+    }
+
+    return mem;
+}
+
 void *memory_alloc(size_t count)
 {
     void *mem = physical_alloc_contiguous(count);

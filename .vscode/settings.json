@@ -12,7 +12,8 @@
         "string_view": "c",
         "utility": "c",
         "filesystem.h": "c",
-        "sllist.h": "c"
+        "sllist.h": "c",
+        "libelf.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

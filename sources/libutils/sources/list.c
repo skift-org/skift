@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "ds/list.h"
+
 list_item_t *list_item_alloc(int value)
 {
     list_item_t *item = malloc(sizeof(list_item_t));
@@ -204,7 +206,7 @@ int list_containe(list_t *list, int value)
 {
     FOREACH(item, list)
     {
-        if (item->value = value)
+        if (item->value == value)
         {
             return 1;
         }

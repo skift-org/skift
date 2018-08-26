@@ -3,14 +3,14 @@
 #include "kernel/logging.h"
 #include "kernel/memory.h"
 #include "libelf.h"
+#include "kernel/tasking.h"
 
 void load_segment(uint source, uint size, uint dest, uint destsize)
 {
     memory_map((uint)dest, PAGE_ALIGN(destsize) / PAGE_SIZE);
+    memset((void*)dest, 0, destsize);
     memcpy((void*)dest, (void*)source, size);
 }
-
-typedef void (*entry_t)();
 
 int exec(char *path)
 {
@@ -20,6 +20,7 @@ int exec(char *path)
         debug("%s file not found!", path);
         return 1;
     }
+
     void *buffer = file_read_all(file);
     file_close(file);
 
@@ -28,12 +29,6 @@ int exec(char *path)
         ELF_header_t *elf = (ELF_header_t *)buffer;
         debug("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEC=%i", ELF_valid(elf), elf->type, elf->entry, elf->shnum);
 
-        ELF_section_t section;
-        for (int i = 0; ELF_read_section(elf, &section, i); i++)
-        {
-            debug("section %s@%x", ELF_lookup_string(elf, section.name), (uint)elf + section.offset);
-        }
-
         ELF_program_t program;
         for (int i = 0; ELF_read_program(elf, &program, i); i++)
         {
@@ -41,13 +36,9 @@ int exec(char *path)
             load_segment((uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
         }
 
-
-        entry_t e = (entry_t)elf->entry;
-        e();
+        task_start_named((task_entry_t)elf->entry, path);
     }
 
-
     free(buffer);
-
     return 0;
 }

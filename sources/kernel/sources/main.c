@@ -78,6 +78,8 @@ void main(multiboot_info_t * info, s32 magic)
 
     exec("Application/test-app.app");
 
+    info("kernel running");
+
     while(true){ hlt(); };
 
     panic("The end of the main function has been reached.");

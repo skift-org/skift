@@ -193,6 +193,7 @@ int list_remove(list_t *list, int value)
                 list->tail = item->prev;
             }
 
+            list->count--;
             free(item);
 
             return 1;

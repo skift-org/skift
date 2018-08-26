@@ -1,6 +1,7 @@
-#include <stdio.h>
+#include <syscalls.h>
 
 int main(int argc, const char ** argv)
 {
-    printf("Hello wolrd!");
+    syscall_print("Hello world!\n");
+    syscall_exit(0);
 }

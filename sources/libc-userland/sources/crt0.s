@@ -13,8 +13,6 @@ _start:
 	extern main
 	call main
 
-	int 128
-
-.hang:	hlt
+.hang:
 	jmp .hang
 .end:

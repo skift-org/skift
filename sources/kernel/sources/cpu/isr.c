@@ -6,6 +6,7 @@
 #include "cpu/isr.h"
 
 #include "kernel/logging.h"
+#include "kernel/syscalls.h"
 
 static const char *exception_messages[32] = {
 	"Division by zero",
@@ -39,8 +40,7 @@ static const char *exception_messages[32] = {
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Reserved"
-};
+	"Reserved"};
 
 extern u32 isr_vector[];
 extern bool console_bypass_lock;
@@ -48,44 +48,44 @@ isr_handler_t isr_handlers[32];
 
 void isr_setup()
 {
-    for(u32 i = 0; i < 32; i++)
-    {
-        idt_entry(i, isr_vector[i], 0x08, INTGATE);
-    }  
+	for (u32 i = 0; i < 32; i++)
+	{
+		idt_entry(i, isr_vector[i], 0x08, INTGATE);
+	}
 
-    // syscall handler
-    idt_entry(128, isr_vector[32], 0x08, TRAPGATE);
+	// syscall handler
+	idt_entry(128, isr_vector[32], 0x08, TRAPGATE);
 }
 
 isr_handler_t isr_register(int index, isr_handler_t handler)
 {
-    if (index < 32)
-    {
-        isr_handlers[index] = handler;
-        return handler;
-    }
+	if (index < 32)
+	{
+		isr_handlers[index] = handler;
+		return handler;
+	}
 
-    return NULL;
+	return NULL;
 }
 
 void isr_handler(context_t context)
 {
 
-    if (isr_handlers[context.int_no] != NULL)
-    {
-        isr_handlers[context.int_no](&context);
-    }
-    else
-    {
-        if (context.int_no == 128)
-        {
-            panic("No syscalls handler!");
-        }
+	if (isr_handlers[context.int_no] != NULL)
+	{
+		isr_handlers[context.int_no](&context);
+	}
+	else
+	{
+		if (context.int_no == 128)
+		{
+			syscall_dispatcher(&context);
+		}
 		else
 		{
-        	cpanic(&context, "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",exception_messages[context.int_no], context.int_no, context.errcode);
+			cpanic(&context, "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !", exception_messages[context.int_no], context.int_no, context.errcode);
 		}
 	}
 
-    outb(0x20, 0x20);
+	outb(0x20, 0x20);
 }

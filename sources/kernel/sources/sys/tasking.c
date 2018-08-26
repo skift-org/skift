@@ -13,7 +13,7 @@ u32 running_task_count = 0;
 
 pid_t get_task_by_state(task_state_t state)
 {
-        
+
     for(pid_t tid = 0; tid < TASK_MAX_COUNT; tid++)
     {
         task_t * task = &tasks[tid];
@@ -25,14 +25,14 @@ pid_t get_task_by_state(task_state_t state)
 
 pid_t get_next_task_by_state(pid_t base, task_state_t state)
 {
-    
+
     for(u32 offset = 0; offset < TASK_MAX_COUNT; offset++)
     {
         pid_t tid = (base + offset + 1) %TASK_MAX_COUNT;
         task_t * task = &tasks[tid];
         if (task->state == state) return tid;
     }
-    
+
     return -1;
 }
 
@@ -70,12 +70,12 @@ pid_t task_start_named(task_entry_t entry, string name)
 
     pid_t free_task = get_task_by_state(TASK_FREE);
 
-    if (free_task == -1) 
+    if (free_task == -1)
     {
         panic("Out of task table entries!");
         return -1;
     }
-    
+
     task_t * task = &tasks[free_task];
     memset(task, 0, sizeof(task_t));
 
@@ -89,10 +89,10 @@ pid_t task_start_named(task_entry_t entry, string name)
     task->name[TASK_NAME_SIZE - 1] = '\0';
 
     // Setup the stack of the task;
-    task->esp = (u32)&task->stack + TASK_STACK_SIZE; 
+    task->esp = (u32)&task->stack + TASK_STACK_SIZE;
     task->esp -= sizeof(context_t);
     context_t * context = (context_t*)task->esp;
-    
+
     context->eflags = 0x202;
     context->cs = 0x08;
     context->eip = (u32)entry;
@@ -112,10 +112,12 @@ pid_t task_start_named(task_entry_t entry, string name)
     return task->id;
 }
 
-esp_t task_shedule(esp_t esp) 
+esp_t task_shedule(esp_t esp, context_t *context)
 {
     ticks++;
-    
+
+    UNUSED(context);
+
     // Save the old context
     tasks[current_task].esp = esp;
 

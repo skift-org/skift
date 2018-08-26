@@ -35,7 +35,7 @@ void task_setup();
 pid_t task_start(task_entry_t entry);
 pid_t task_start_named(task_entry_t entry, string name);
 
-esp_t task_shedule(esp_t esp);
+esp_t task_shedule(esp_t esp, context_t *context);
 
 #define PROCESS_STACK_SIZE 4096
 

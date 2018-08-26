@@ -6,7 +6,7 @@
 
 void load_segment(uint source, uint size, uint dest, uint destsize)
 {
-    memory_map((uint)dest, destsize / PAGE_SIZE);
+    memory_map((uint)dest, PAGE_ALIGN(destsize) / PAGE_SIZE);
     memcpy((void*)dest, (void*)source, size);
 }
 
@@ -40,6 +40,7 @@ int exec(char *path)
             debug("program 0x%x(%i) -> 0x%x(%i)", program.offset, program.filesz, program.vaddr, program.memsz);
             load_segment((uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
         }
+
 
         entry_t e = (entry_t)elf->entry;
         e();

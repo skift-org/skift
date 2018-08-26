@@ -13,7 +13,8 @@ _start:
 	extern main
 	call main
 
-	cli
+	int 128
+
 .hang:	hlt
 	jmp .hang
 .end:

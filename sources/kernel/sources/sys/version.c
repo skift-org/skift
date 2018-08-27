@@ -1,6 +1,6 @@
 #include "kernel/version.h"
 
-char * __kernel_name = "skift";
+char * __kernel_name = "skiftOS";
 
 int    __kernel_version_major = 0;
 int    __kernel_version_minor = 1;

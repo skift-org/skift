@@ -56,8 +56,8 @@ thread_t *thread_alloc(thread_entry_t entry, int user)
         context->gs = 0x10;
     }
 
-    debug("Thread create with ID=%d, EIP=%x, ESP=%x!", thread->id, context->eip, thread->esp);
-    dump_context(context);
+    // debug("Thread create with ID=%d, EIP=%x, ESP=%x!", thread->id, context->eip, thread->esp);
+    // dump_context(context);
 
     return thread;
 }
@@ -104,7 +104,7 @@ int thread_cancel(thread_t *thread)
     if (thread == NULL)
         return 0;
 
-    debug("Thread %d cancel!", thread->id);
+    //debug("Thread %d cancel!", thread->id);
 
     atomic_begin();
 

@@ -59,7 +59,7 @@ void time_task()
     
         for(u32 i = 0; i < 80; i++)
         {
-            vga_cell(i, 0, vga_entry(buffer[i], vga_white, vga_light_blue));  
+            vga_cell(i, 0, vga_entry(buffer[i], vga_white, vga_gray));  
         }
     }
 }

@@ -247,7 +247,7 @@ class Project(object):
                 self.failed = True
                 return False
 
-            progress.printProgressBar(i + 1, len(objects))
+            progress.printProgressBar(i + 1, len(objects), suffix="%d/%d objects" % (i + 1, len(objects)))
 
         return True
 

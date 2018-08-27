@@ -9,41 +9,21 @@
 #define TASK_STACK_SIZE 4096
 
 typedef u32 esp_t;
-typedef int pid_t;
-typedef void (*task_entry_t)();
+typedef void (*thread_entry_t)();
 
-typedef enum
-{
-    TASK_RUNNING,
-    TASK_DEAD, // Dead task need to free.
-    TASK_FREE
-} task_state_t;
 
 typedef PACKED(struct)
 {
-    pid_t id;
-    char name[TASK_NAME_SIZE];
-    task_state_t state;
-
+    int id;
     u32 esp;
-    task_entry_t entry;
+    thread_entry_t entry;
     u8 stack[TASK_STACK_SIZE];
 }
-task_t;
+thread_t;
 
-void task_setup();
-pid_t task_start(task_entry_t entry);
-pid_t task_start_named(task_entry_t entry, string name);
+void tasking_setup();
+thread_t* thread_create(thread_entry_t entry);
 
 esp_t task_shedule(esp_t esp, context_t *context);
 
 #define PROCESS_STACK_SIZE 4096
-
-typedef struct
-{
-    int id;
-    bool user;
-    void * page_directorie;
-    u32 esp;
-    void * stack;
-} process_t;

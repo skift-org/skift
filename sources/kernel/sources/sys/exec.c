@@ -27,7 +27,7 @@ int exec(char *path)
     if (buffer != NULL)
     {
         ELF_header_t *elf = (ELF_header_t *)buffer;
-        debug("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEC=%i", ELF_valid(elf), elf->type, elf->entry, elf->shnum);
+        debug("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 
         ELF_program_t program;
         for (int i = 0; ELF_read_program(elf, &program, i); i++)
@@ -36,7 +36,7 @@ int exec(char *path)
             load_segment((uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
         }
 
-        task_start_named((task_entry_t)elf->entry, path);
+        thread_create((thread_entry_t)elf->entry);
     }
 
     free(buffer);

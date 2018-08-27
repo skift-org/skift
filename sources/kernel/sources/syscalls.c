@@ -13,21 +13,32 @@ int sys_print(const char *string)
     return 0;
 }
 
+int sys_map(int memory, int size)
+{
+    STUB(memory, size);
+    return 0;
+}
+
+int sys_unmap(int memory, int size)
+{
+    STUB(memory, size);
+    return 0;
+}
+
+typedef int (*syscall_t)(int, int, int, int, int); 
+
+static int (*syscalls[])() = 
+{
+    [0] = sys_exit,
+    [1] = sys_print,
+    [2] = sys_map,
+    [3] = sys_unmap,
+};
+
 void syscall_dispatcher(context_t *context)
 {
-    debug("syscall %d.", context->eax);
+    debug("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
 
-    switch (context->eax)
-    {
-    case 0:
-        context->eax = sys_exit(context->ebx);
-        break;
-
-    case 1:
-        context->eax = sys_print((const char *)context->ebx);
-        break;
-
-    default:
-        break;
-    }
+    syscall_t syscall = (syscall_t)syscalls[context->eax];
+    context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);
 }

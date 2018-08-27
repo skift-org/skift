@@ -66,14 +66,14 @@ void main(multiboot_info_t * info, s32 magic)
     info("--- Setting up system ---");
     setup(physical, (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(memory, get_kernel_end(&mbootinfo));
-    setup(task);
+    setup(tasking);
     setup(filesystem);
     setup(modules, &mbootinfo);
 
     atomic_enable();
     sti();
 
-    task_start_named(time_task, "clock");
+    thread_create(time_task);
     info(KERNEL_UNAME);
 
     exec("Application/test-app.app");

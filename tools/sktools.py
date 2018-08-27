@@ -7,8 +7,8 @@ import subprocess as sb
 import sys
 from enum import Enum
 
-GCC_VERSION = 6.4.0
-BINUTILS_VERSION = 
+GCC_VERSION = "6.4.0"
+BINUTILS_VERSION = "2.27"
 
 # +--------------------------------------------------------------------------+ #
 # | Command line                                                             | #

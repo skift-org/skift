@@ -14,7 +14,8 @@
         "filesystem.h": "c",
         "sllist.h": "c",
         "libelf.h": "c",
-        "tasking.h": "c"
+        "tasking.h": "c",
+        "cpu.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

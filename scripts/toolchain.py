@@ -92,3 +92,10 @@ def LD(objects, libs, output_file, script):
     #print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
     command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
     return subprocess.call(command) == 0
+
+def OBJDUMP(bin, asm):
+    with open(asm, "w") as f:
+        command = ["objdump","-Mintel", "-S", bin]
+        return subprocess.call(command, stdout=f) == 0
+
+    return 0

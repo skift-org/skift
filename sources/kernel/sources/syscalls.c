@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include "kernel/tasking.h"
 #include "kernel/syscalls.h"
 #include "kernel/logging.h"
 
 int sys_exit(int code)
 {
+    thread_exit();
     return code;
 }
 
@@ -25,14 +27,14 @@ int sys_unmap(int memory, int size)
     return 0;
 }
 
-typedef int (*syscall_t)(int, int, int, int, int); 
+typedef int (*syscall_t)(int, int, int, int, int);
 
-static int (*syscalls[])() = 
+static int (*syscalls[])() =
 {
-    [0] = sys_exit,
-    [1] = sys_print,
-    [2] = sys_map,
-    [3] = sys_unmap,
+        [0] = sys_exit,
+        [1] = sys_print,
+        [2] = sys_map,
+        [3] = sys_unmap,
 };
 
 void syscall_dispatcher(context_t *context)

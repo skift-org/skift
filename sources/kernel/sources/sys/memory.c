@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <string.h>
+
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/physical.h"
@@ -77,7 +79,8 @@ void memory_free(void *p, size_t count)
 
 page_directorie_t *memory_construct_memory_space()
 {
-    page_directorie_t *dir = NULL;
+    page_directorie_t *dir = (page_directorie_t*)memory_alloc(1);
+    memset(dir, 0, sizeof(page_directorie_t));
 
     for (size_t i = 0; i < 256; i++)
     {

@@ -10,7 +10,7 @@ typedef struct node
   struct node *next;
 } sllist_node_t;
 
-typedef struct list
+typedef struct sllist
 {
   uint count;
   sllist_node_t *head;

@@ -1,13 +1,16 @@
 #include <stdlib.h>
 #include <string.h>
+#include "sync/atomic.h"
 
 #include "cpu/cpu.h"
 #include "cpu/gdt.h"
 #include "cpu/irq.h"
-#include "kernel/tasking.h"
-#include "sync/atomic.h"
+
 #include "kernel/memory.h"
 #include "kernel/system.h"
+#include "kernel/tasking.h"
+#include "kernel/virtual.h"
+#include "kernel/physical.h"
 
 esp_t shedule(esp_t esp, context_t *context);
 
@@ -20,8 +23,8 @@ thread_t *running;
 list_t *waiting;
 list_t *dead;
 
-list_t* process;
-process_t* kernel_process;
+list_t *process;
+process_t *kernel_process;
 
 thread_t *thread_alloc(thread_entry_t entry, int user)
 {
@@ -69,10 +72,9 @@ void thread_free(thread_t *thread)
     free(thread);
 }
 
-
-process_t * process_alloc(bool user)
+process_t *process_alloc(bool user)
 {
-    process_t * process = (process_t*)malloc(sizeof(process_t));
+    process_t *process = (process_t *)malloc(sizeof(process_t));
 
     process->id = PID++;
     process->user = user;
@@ -90,7 +92,7 @@ process_t * process_alloc(bool user)
     return process;
 }
 
-void process_free(process_t * process)
+void process_free(process_t *process)
 {
     atomic_begin();
 
@@ -118,9 +120,9 @@ void tasking_setup()
 thread_t *thread_create(thread_entry_t entry)
 {
     thread_t *thread = thread_alloc(entry, 0);
-    
+
     atomic_begin();
-    
+
     if (running)
     {
         list_pushback(waiting, (int)thread);
@@ -131,14 +133,14 @@ thread_t *thread_create(thread_entry_t entry)
     }
 
     atomic_end();
-    
+
     return thread;
 }
 
 int thread_cancel(thread_t *thread)
 {
     atomic_begin();
-    
+
     if (thread == NULL)
         return 0;
 
@@ -171,31 +173,34 @@ thread_t *thread_self()
 
 /* --- Process --- */
 
-process_t* process_exec(const char * path, int argc, char** argv)
+process_t *process_exec(const char *path, int argc, char **argv)
 {
-
+    STUB(path, argc, argv);
+    return NULL;
 }
 
-void process_cancel(process_t* process)
+void process_kill(process_t *process)
 {
     atomic_begin();
     FOREACH(i, process->threads)
     {
-        thread_cancel((thread_t*)i);
+        thread_cancel((thread_t *)i);
     }
     atomic_end();
 
     asm("int $32"); // yield
 }
 
-process_t* process_self()
+process_t *process_self()
 {
     return running->process;
 }
 
 void process_exit(int code)
 {
-    process_t * self = process_self();
+    UNUSED(code);
+
+    process_t *self = process_self();
     if (self != kernel_process)
     {
         process_kill(self);
@@ -206,7 +211,7 @@ void process_exit(int code)
     }
 }
 
-uint process_map(process_t * process, uint addr, uint count)
+uint process_map(process_t *process, uint addr, uint count)
 {
     void *mem = physical_alloc_contiguous(count);
 
@@ -219,23 +224,23 @@ uint process_map(process_t * process, uint addr, uint count)
         }
     }
 
-    return mem;
+    return (uint)mem;
 }
 
-uint process_unmap(process_t * process, uint addr, uint count)
-{   
-    for(size_t i = 0; i < count; i++)
+uint process_unmap(process_t *process, uint addr, uint count)
+{
+    for (size_t i = 0; i < count; i++)
     {
         uint virtual = addr + PAGE_SIZE * i;
         uint physical = virtual2physical(process->pdir, virtual);
 
         if (physical)
         {
-            physical_free(physical);
+            physical_free((void*)physical);
             virtual_unmap(process->pdir, virtual);
         }
     }
-    
+
     return 1;
 }
 

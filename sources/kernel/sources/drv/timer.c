@@ -2,10 +2,10 @@
 // See: LICENSE.md
 // Project URL: github.com/maker-dev/skift
 
-#include "devices/timer.h"
 #include "cpu/cpu.h"
-#include "kernel/logging.h"
 #include "cpu/irq.h"
+#include "devices/timer.h"
+#include "kernel/logger.h"
 
 uint ticks = 0;
 
@@ -31,7 +31,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    info("Timer frequency is %dhz.", hz);
+    log("Timer frequency is %dhz.", hz);
 }
 
 u32 timer_get_ticks()

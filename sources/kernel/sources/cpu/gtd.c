@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "cpu/gdt.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 
 gdt_t gdt;
 
@@ -47,7 +47,7 @@ void set_kernel_stack(u32 stack)
 
 void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint)
 {
-    debug("GDT[%d:%s]\t = { BASE=%x, LIMIT=%x, ACCESS=%b, FLAGS=%b }", index, hint, base, limit, access, flags);
+    log("GDT[%d:%s]\t = { BASE=%x, LIMIT=%x, ACCESS=%b, FLAGS=%b }", index, hint, base, limit, access, flags);
 
     gdt_entry_t * entry = &gdt.entries[index];
     entry->acces = access;
@@ -83,13 +83,13 @@ void gdt_tss_entry(int index, u16 ss0, u32 esp0)
 
 void gdt_dump()
 {
-    puts("\n&fGlobal descriptor table dump:\n&7");
+    puts("\nGlobal descriptor table dump:\n");
     for(u32 i = 0; i < GDT_ENTRY_COUNT; i++)
     {
         puts("\t");
         gdt_entry_dump(i);
     }    
-    puts("\n&f");
+    puts("\n");
 }
 
 void gdt_entry_dump(int index)

@@ -5,7 +5,7 @@
 #include "liballoc.h"
 #include "sync/atomic.h"
 #include "kernel/memory.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 
 int liballoc_lock()
 {
@@ -22,13 +22,13 @@ int liballoc_unlock()
 void* liballoc_alloc(size_t size)
 {
     void* p = memory_alloc(size);
-    debug("Liballoc hook alloc size: %d at 0x%x.", size, p);
+    log("LIBALLOC alloc size: %d at 0x%x.", size, p);
     return p;
 }
 
 int liballoc_free(void* p,size_t size)
 {
-    debug("Liballoc alloc free: %d at 0x%x.", size, p);
+    log("LIBALLOC free: %d at 0x%x.", size, p);
     memory_free(p, size);
     return 0;
 }

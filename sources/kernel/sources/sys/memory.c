@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/physical.h"
 #include "kernel/virtual.h"
@@ -27,7 +27,7 @@ void memory_setup(uint kernel_end)
         virtual_map(&kernel_page_dir, (uint)(i * PAGE_SIZE), (uint)(i * PAGE_SIZE), false);
     }
 
-    info("Memory: USED=%dk FREE=%dk TOTAL=%dk USAGE: %d%%",
+    log("Memory: USED=%dk FREE=%dk TOTAL=%dk USAGE: %d%%",
     physical_get_used() / 1024,
     physical_get_free() / 1024,
     physical_get_total() / 1024,
@@ -35,7 +35,7 @@ void memory_setup(uint kernel_end)
 
     paging_load_directorie(&kernel_page_dir);
     paging_enable();
-    info("Paging is now enabled!");
+    log("Paging is now enabled!");
 }
 
 void *memory_map(uint addr, size_t count)

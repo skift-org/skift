@@ -1,27 +1,27 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "kernel/console.h"
+#include "kernel/serial.h"
 
 int putchar(int chr)
 {
-    console_put(chr);
+    serial_putc(chr);
     return chr;
 }
 
 int getchar()
 {
-    return EOF;
+    return serial_getc();
 }
 
 char * gets(char * str)
 {
-   UNUSED(str);
-   return NULL;
+   serial_read(str, 100);
+   return str;
 }
 
 int puts(const char * str)
 {
-    console_puts((char *)str);
+    serial_print((char *)str);
     return strlen(str);
 }

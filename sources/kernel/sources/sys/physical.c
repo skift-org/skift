@@ -2,8 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "kernel/physical.h"
+#include "kernel/system.h"
 #include "sync/atomic.h"
 
 #define FRAME_SIZE 4096
@@ -60,7 +61,7 @@ void *physical_alloc()
 
     if (free_mem == NULL)
     {
-        panic("Out of memory!");
+        PANIC("Out of memory!");
     }
 
     physical_used(free_mem);
@@ -96,7 +97,7 @@ void *physical_alloc_contiguous(uint count)
 
     }
 
-    debug("physical_alloc_contiguous: failed!");
+    log("physical_alloc_contiguous: failed!");
     return NULL;
 }
 
@@ -109,7 +110,7 @@ void physical_free(void *mem)
     }
     else
     {
-        panic("Memory at 0x%x is already free!", mem);
+        PANIC("Memory at 0x%x is already free!", mem);
     }
     atomic_end();
 }

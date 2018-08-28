@@ -3,8 +3,8 @@
 // Project URL: github.com/maker-dev/skift
 
 #include <string.h>
+#include "kernel/logger.h"
 #include "kernel/filesystem.h"
-#include "kernel/logging.h"
 
 directory_t *root = NULL;
 
@@ -12,7 +12,7 @@ directory_t *alloc_directorie(const char *name);
 
 void filesystem_setup()
 {
-    info("Allocating root directorie.");
+    log("Allocating root directorie...");
     root = alloc_directorie("ROOT");
 }
 
@@ -78,7 +78,7 @@ void dump_directorie(directory_t *current, int depth, char * buffer)
         printf("\t");
     }
 
-    printf("&f%s/\n&7", current->name);
+    printf("%s/\n", current->name);
 
     for (size_t i = 0; directory_get_directories(current, buffer, i); i++)
     {
@@ -92,7 +92,7 @@ void dump_directorie(directory_t *current, int depth, char * buffer)
             printf("\t");
         }
 
-        printf("&7%s\n", buffer);
+        printf("%s\n", buffer);
     }
 }
 

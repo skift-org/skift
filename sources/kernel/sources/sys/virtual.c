@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/logging.h"
+#include "kernel/system.h"
 #include "kernel/physical.h"
 #include "kernel/virtual.h"
 
@@ -32,7 +32,7 @@ void virtual_map(page_directorie_t *dir, u32 virt, u32 phys, bool user)
 {
     if (!IS_PAGE_ALIGN(phys) || !IS_PAGE_ALIGN(virt))
     {
-        panic("Cannot page map 0x%x to 0x%x, because it's not page aligned!", virt, phys);
+        PANIC("Cannot page map 0x%x to 0x%x, because it's not page aligned!", virt, phys);
     }
 
     u32 pdindex = (u32)virt >> 22;
@@ -48,7 +48,7 @@ void virtual_map(page_directorie_t *dir, u32 virt, u32 phys, bool user)
 
         if (pt == NULL)
         {
-            panic("Cannot allocate a new page table!");
+            PANIC("Cannot allocate a new page table!");
         }
 
         pd_entry->Present = true;

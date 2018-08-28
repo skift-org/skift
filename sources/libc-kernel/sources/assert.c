@@ -1,7 +1,7 @@
 #include <assert.h>
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 
 void __assert_failed(const char * expr, const char * file, const char * function, int line)
 {
-    __panic((char *)file, (char *)function, line, NULL, "Kernel assert failed: %s !", (char *)expr);
+    log("Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
 }

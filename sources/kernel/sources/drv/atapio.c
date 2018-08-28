@@ -4,7 +4,7 @@
 
 #include "cpu/cpu.h"
 #include "devices/atapio.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "sync/atomic.h"
 
 int atapio_common(u8 drive, u32 numblock, u8 count)
@@ -34,7 +34,7 @@ void atapio_wait()
 int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 {
     atomic_begin();
-    debug("ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
+    log("ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
     u16 tmpword;
     int idx;
 
@@ -51,7 +51,7 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
         buf[idx * 2 + 1] = (unsigned char)(tmpword >> 8);
     }
 
-    debug("ATA::pio read done!");
+    log("ATA::pio read done!");
     atomic_end();
 
     return count;
@@ -59,8 +59,8 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 
 int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
 {
-    // atomic_begin();
-    debug("ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
+    atomic_begin();
+    log("ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
 
     u16 tmpword;
 
@@ -76,7 +76,7 @@ int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
         outw(0x1F0, tmpword);
     }
 
-    debug("ATA::pio write done!");
+    log("ATA::pio write done!");
     atomic_end();
 
     return count;

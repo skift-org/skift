@@ -9,5 +9,4 @@ char * __kernel_version_codename = "babystep";
 
 /* kernel version format major.minor.patch-codename */
 char * __kernel_version_format = "%d.%d.%d-%s";
-/* kernel uname format major.minor.patch-codename */
 char * __kernel_uname_format = "%s %d.%d.%d-%s";

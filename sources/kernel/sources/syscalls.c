@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 
 int sys_exit(int code)
 {
@@ -39,7 +39,7 @@ static int (*syscalls[])() =
 
 void syscall_dispatcher(context_t *context)
 {
-    //debug("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
 
     syscall_t syscall = (syscall_t)syscalls[context->eax];
     context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);

@@ -7,7 +7,7 @@
 
 #include "kernel/filesystem.h"
 #include "kernel/multiboot.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "utils/tar.h"
 
 int rd_file_open(file_t *file);
@@ -22,7 +22,7 @@ void * ramdisk;
 
 void ramdisk_load(multiboot_module_t *module)
 {
-    info("Loading ramdisk at 0x%x...", module->mod_start);
+    log("Loading ramdisk at 0x%x...", module->mod_start);
 
     ramdisk = (void *)module->mod_start;
     ramdisk_fs.file_open = rd_file_open;
@@ -35,12 +35,12 @@ void ramdisk_load(multiboot_module_t *module)
     {
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            // debug("Found folder: %s at 0x%x.", block.name, block.data);
+            // log("Found folder: %s at 0x%x.", block.name, block.data);
             directory_create(NULL, block.name, 0);
         }
         else
         {
-            // debug("Found file: %s at 0x%x.", block.name, block.data);
+            // log("Found file: %s at 0x%x.", block.name, block.data);
             file_create(NULL, block.name, &ramdisk_fs, 0, i);
         }
     }

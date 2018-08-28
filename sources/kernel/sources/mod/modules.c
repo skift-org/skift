@@ -5,13 +5,13 @@
 #include <string.h>
 #include "kernel/modules.h"
 #include "kernel/multiboot.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "kernel/ramdisk.h"
 
 void load_module(multiboot_module_t *module)
 {
-    info("Loading modules at 0x%x.", module);
-    info("Module command line: '%s'.", module->cmdline);
+    log("Loading modules at 0x%x.", module);
+    log("Module command line: '%s'.", module->cmdline);
 
     if (strcmp("ramdisk", (char*)module->cmdline) == 0)
     {
@@ -19,7 +19,7 @@ void load_module(multiboot_module_t *module)
     }
     else
     {
-        warn("Unknow module '%s'!", module->cmdline);
+        log("Unknow module '%s'!", module->cmdline);
     }
 }
 
@@ -37,9 +37,9 @@ uint modules_get_end(multiboot_info_t *minfo)
 
 void modules_setup(multiboot_info_t *minfo)
 {
-    info("Bootloader: %s.", minfo->boot_loader_name);
-    info("Kernel modules count: %d.", minfo->mods_count);
-    info("Kernel modules adresse: 0x%x.", minfo->mods_addr);
+    log("Bootloader: %s.", minfo->boot_loader_name);
+    log("Kernel modules count: %d.", minfo->mods_count);
+    log("Kernel modules adresse: 0x%x.", minfo->mods_addr);
 
     
     multiboot_module_t * module = (multiboot_module_t*)minfo->mods_addr;
@@ -50,5 +50,5 @@ void modules_setup(multiboot_info_t *minfo)
         module = (multiboot_module_t *)((u32)module->mod_end + 1);
     }
 
-    info("%d modules loaded!", minfo->mods_count);
+    log("%d modules loaded!", minfo->mods_count);
 }

@@ -1,11 +1,9 @@
 #include <stdarg.h>
-#include <stdio.h>
-
+#include <stdlib.h>
+#include "kernel/system.h"
 #include "devices/timer.h"
-#include "kernel/console.h"
-#include "kernel/logging.h"
 
-const char * const witty_comments[] = 
+const char *const witty_comments[] =
 {
     "Witty comment unavailable :(",
     "Surprise! Haha. Well, this is awkward.",
@@ -24,32 +22,30 @@ const char * const witty_comments[] =
     "Suspicious pointer corrupted the machine."
 };
 
-void __panic(const string file, const string function, const int line, context_t* context, string message, ...)
+void __panic(const string file, const string function, const int line, context_t *context, string message, ...)
 {
     cli();
-    console_bypass_lock = true;
-    console_clear();
     va_list va;
     va_start(va, message);
-    
-    printf("\n&8--- &4!!!&8 ------------------------------------------------------------------------&f\n");
-    
-    printf("\n\t&4KERNEL PANIC\n\t&8//%s\n\n\t&f", witty_comments[timer_get_ticks() % (9 + 4)]); 
-    
+
+    printf("\n--- !!! ------------------------------------------------------------------------\n");
+
+    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t", witty_comments[timer_get_ticks() % (9 + 4)]);
+
     vprintf(message, va);
-    printf("\n\t&7at %s &e%s&f() &7ln%d", file, function, line); 
-    
+    printf("\n\tat %s %s() ln%d", file, function, line);
+
     printf("\n");
-    printf("\n\t&eDiagnostic:&7");
-    printf("\n\tThe system was running for %d tick.&8", timer_get_ticks());
+    printf("\n\tDiagnostic:");
+    printf("\n\tThe system was running for %d tick.", timer_get_ticks());
     printf("\n\n");
-    
+
     if (context != NULL)
     {
         dump_context(context);
     }
 
-    puts("\n\t&fSystem halted!\n");
+    puts("\n\tSystem halted!\n");
 
-    while(1);
+    STOP;
 }

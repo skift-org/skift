@@ -14,10 +14,9 @@
 
 #include "devices/vga.h"
 
-#include "kernel/console.h"
 #include "kernel/dumping.h"
 #include "kernel/filesystem.h"
-#include "kernel/logging.h"
+#include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
 #include "kernel/multiboot.h"
@@ -27,6 +26,7 @@
 #include "kernel/time.h"
 #include "kernel/version.h"
 #include "kernel/virtual.h"
+#include "kernel/system.h"
 
 #include "sync/atomic.h"
 
@@ -35,8 +35,8 @@ multiboot_info_t mbootinfo;
 void boot_screen(string msg)
 {
     vga_clear(vga_white, vga_black);
-    vga_text(36, 10, "skift OS", vga_light_blue, vga_black);
-    vga_text(40 - strlen(msg) / 2, 14, msg, vga_white, vga_black);
+    vga_text(36, 11, __kernel_name, vga_light_blue, vga_black);
+    vga_text(40 - strlen(msg) / 2, 13, msg, vga_white, vga_black);
 }
 
 extern int __end;
@@ -45,42 +45,45 @@ uint get_kernel_end(multiboot_info_t * minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-
 int exec(char * path);
 void main(multiboot_info_t * info, s32 magic)
 {
-    console_setup(); puts("\n");
+    puts("\n");
+    boot_screen("Booting...");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC )
-        panic("Invalid multiboot magic number (0x%x)!", magic);
+        PANIC("Invalid multiboot magic number (0x%x)!", magic);
 
-    info("--- Setting up cpu tables ---");
+    log("--- Setting up cpu tables ---");
     setup(gdt);
     setup(pic);
     setup(idt);
     setup(isr);
     setup(irq);
 
-    info("--- Setting up system ---");
+    log("--- Setting up system ---");
     setup(physical, (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(memory, get_kernel_end(&mbootinfo));
     setup(tasking);
     setup(filesystem);
+    boot_screen("Loading ramdisk...");
     setup(modules, &mbootinfo);
 
+    boot_screen("Welcome!");
     atomic_enable();
     sti();
 
+
     thread_create(time_task);
-    info(KERNEL_UNAME);
+    log(KERNEL_UNAME);
 
     exec("Application/test-app.app");
 
-    info("kernel running");
+    log("kernel running");
 
     while(true){ hlt(); };
 
-    panic("The end of the main function has been reached.");
+    PANIC("The end of the main function has been reached.");
 }

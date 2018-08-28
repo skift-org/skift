@@ -5,7 +5,6 @@
 #include "cpu/cpu.h"
 #include "cpu/gdt.h"
 #include "cpu/irq.h"
-#include "kernel/logging.h"
 #include "kernel/tasking.h"
 #include "sync/atomic.h"
 
@@ -56,7 +55,7 @@ thread_t *thread_alloc(thread_entry_t entry, int user)
         context->gs = 0x10;
     }
 
-    // debug("Thread create with ID=%d, EIP=%x, ESP=%x!", thread->id, context->eip, thread->esp);
+    // log("Thread create with ID=%d, EIP=%x, ESP=%x!", thread->id, context->eip, thread->esp);
     // dump_context(context);
 
     return thread;

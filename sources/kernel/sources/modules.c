@@ -3,10 +3,10 @@
 // Project URL: github.com/maker-dev/skift
 
 #include <string.h>
+
+#include "kernel/logger.h"
 #include "kernel/modules.h"
 #include "kernel/multiboot.h"
-#include "kernel/logger.h"
-#include "kernel/ramdisk.h"
 
 void load_module(multiboot_module_t *module)
 {

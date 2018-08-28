@@ -14,14 +14,12 @@
 
 #include "devices/vga.h"
 
-#include "kernel/dumping.h"
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
 #include "kernel/multiboot.h"
 #include "kernel/physical.h"
-#include "kernel/ramdisk.h"
 #include "kernel/tasking.h"
 #include "kernel/time.h"
 #include "kernel/version.h"

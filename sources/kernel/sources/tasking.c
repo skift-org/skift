@@ -94,7 +94,7 @@ void process_free(process_t * process)
 {
     atomic_begin();
 
-    memory_detroy_memory_space(p->pdir);
+    memory_detroy_memory_space(process->pdir);
     list_free(process->threads);
     free(process);
 
@@ -215,7 +215,7 @@ uint process_map(process_t * process, uint addr, uint count)
         uint virtual = addr + PAGE_SIZE * i;
         if (virtual2physical(process->pdir, virtual) == 0)
         {
-            virtual_map(process->pdir, virtual, (uint)mem + PAGE_SIZE * i, false);
+            virtual_map(process->pdir, virtual, (uint)mem + PAGE_SIZE * i, true);
         }
     }
 

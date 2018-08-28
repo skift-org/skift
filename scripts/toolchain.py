@@ -5,7 +5,7 @@ import utils
 
 # --- Utils ------------------------------------------------------------------ #
 
-qemu_flags = ["-m", "256M", "-curses" ] # "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+qemu_flags = ["-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 def QEMU(disk):
     #print(" QEMU", disk)
@@ -21,7 +21,6 @@ def MKDIR(directory):
 
 def RMDIR(directory):
     #print(" RMDIR", directory)
-
     if os.path.exists(directory):
         shutil.rmtree(directory)
 

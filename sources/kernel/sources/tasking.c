@@ -9,13 +9,13 @@
 #include "kernel/tasking.h"
 #include "sync/atomic.h"
 
-esp_t task_shedule(esp_t esp, context_t *context);
+esp_t shedule(esp_t esp, context_t *context);
 
 extern uint ticks;
 
 int TID = 0;
-thread_t *running;
 
+thread_t *running;
 list_t *waiting;
 list_t *dead;
 
@@ -72,20 +72,21 @@ void thread_free(thread_t *thread)
 
 void tasking_setup()
 {
-    // clear the task table.
     waiting = list_alloc();
     dead = list_alloc();
 
     // Create the kernel task.
     thread_create(NULL);
 
-    irq_register(0, (irq_handler_t)&task_shedule);
+    irq_register(0, (irq_handler_t)&shedule);
 }
 
 thread_t *thread_create(thread_entry_t entry)
 {
     thread_t *thread = thread_alloc(entry, 0);
+    
     atomic_begin();
+    
     if (running)
     {
         list_pushback(waiting, (int)thread);
@@ -96,6 +97,7 @@ thread_t *thread_create(thread_entry_t entry)
     }
 
     atomic_end();
+    
     return thread;
 }
 
@@ -126,7 +128,7 @@ void thread_exit()
 
     while (1)
     {
-        debug("Alive");
+        hlt();
     };
 }
 
@@ -135,7 +137,7 @@ thread_t *thread_self()
     return running;
 }
 
-esp_t task_shedule(esp_t esp, context_t *context)
+esp_t shedule(esp_t esp, context_t *context)
 {
     ticks++;
 
@@ -153,6 +155,7 @@ esp_t task_shedule(esp_t esp, context_t *context)
     {
         thread_t *deadthread = (thread_t *)i;
         list_remove(waiting, (int)deadthread);
+        thread_free(deadthread);
     }
 
     list_pop(waiting, (int *)&running);

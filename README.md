@@ -9,21 +9,21 @@ skift<b>OS</b>
 <h2 align="center">Build infrastructure, kernel, and userspace</h2>
 
 # About skift**OS**
+
 skift**OS** is a handmade operating system build from scratch.
 
 # Featuring
+
 - Multitasking
 - File system
 - Userspace
 
-# Build-it
-```sh
-# Build the toolchain
-./TOOLS init
+# 🏗 Build-it
 
+```sh
 # Build the operating system
-./TOOLS buildtarget all
+./TOOLS buildall
 
 # Run it in qemu
-./TOOLS run qemu
+./TOOLS run
 ```

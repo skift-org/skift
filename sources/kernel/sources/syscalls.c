@@ -1,3 +1,7 @@
+/* Copyright (c) 2018 Nicolas Van Bossuyt.                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <stdio.h>
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"

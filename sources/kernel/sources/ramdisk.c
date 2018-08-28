@@ -1,6 +1,6 @@
-// This file is part of "skiftOS" licensed under the MIT License.
-// See: LICENSE.md
-// Project URL: github.com/maker-dev/skift
+/* Copyright (c) 2018 Nicolas Van Bossuyt.                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
 #include <string.h>
 #include <math.h>

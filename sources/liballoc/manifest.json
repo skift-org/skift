@@ -1,5 +1,5 @@
 {
-    "id": "libsk",
+    "id": "liballoc",
     "type": "lib",
     "libs": ["libc"]
 }

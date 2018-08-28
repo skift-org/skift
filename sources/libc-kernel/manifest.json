@@ -1,5 +1,5 @@
 {
     "id": "libc-kernel",
     "type": "lib",
-    "libs": ["libc", "kernel"]
+    "libs": ["libc", "kernel", "liballoc"]
 }

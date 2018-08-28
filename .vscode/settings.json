@@ -16,7 +16,8 @@
         "libelf.h": "c",
         "tasking.h": "c",
         "cpu.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "bga.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

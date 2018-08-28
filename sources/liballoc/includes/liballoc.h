@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include "types.h"
 
 //This lets you prefix malloc and friends
 #define PREFIX(func) func

@@ -43,22 +43,25 @@ int physical_is_used(uint addr, uint count)
 
 void physical_set_used(uint addr, uint count)
 {
+    log("P_S_USED ADDR=%d COUNT=%d", addr, count);
     for (uint i = 0; i < count; i++)
     {
-        PHYSICAL_SET_USED(addr + i * PAGE_SIZE);
+        PHYSICAL_SET_USED(addr + (i * PAGE_SIZE));
     }
 }
 
 void physical_set_free(uint addr, uint count)
 {
+    log("P_S_FREE ADDR=%d COUNT=%d", addr, count);
     for (uint i = 0; i < count; i++)
     {
-        PHYSICAL_SET_FREE(addr + i * PAGE_SIZE);
+        PHYSICAL_SET_FREE(addr + (i * PAGE_SIZE));
     }
 }
 
 uint physical_alloc(uint count)
 {
+    log("PALLOC COUNT=%d", count);
     for (uint i = 0; i < (TOTAL_MEMORY / PAGE_SIZE); i++)
     {
         uint addr = i * PAGE_SIZE;
@@ -81,7 +84,7 @@ void physical_free(uint addr, uint count)
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 
 // Page table index
-#define PT_INDEX(vaddr) ((vaddr) >> 12 && 0x03ff)
+#define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
 int virtual_absent(page_directorie_t *pdir, uint vaddr, uint count)
 {
@@ -147,6 +150,8 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
+
+    log("VMAP VADDR=%d PADDR=%d COUNT=%d", vaddr, paddr, count);
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
@@ -159,7 +164,6 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
 
         if (!pde->Present)
         {
-            // Allocate a new page table
             ptable = (page_table_t *)physical_alloc(1);
             virtual_map(&kpdir, (uint)ptable, (uint)ptable, 1, 0);
 
@@ -173,7 +177,7 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
         p->Present = 1;
         p->User = user;
         p->Write = 1;
-        p->PageFrameNumber = paddr >> 12;
+        p->PageFrameNumber = (paddr + offset) >> 12;
     }
 
     paging_invalidate_tlb();
@@ -207,13 +211,15 @@ void memory_setup(uint used, uint total)
 {
     TOTAL_MEMORY = total;
 
+    log("Memory: USED=%dko TOTAL=%dko", used / 1024, total / 1024);
+
     // Setup the kernel pagedirectorie.
     for (uint i = 0; i < 256; i++)
     {
         page_directorie_entry_t *e = &kpdir.entries[i];
-        e->User = false;
-        e->Write = true;
-        e->Present = true;
+        e->User = 0;
+        e->Write = 1;
+        e->Present = 1;
         e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
@@ -221,13 +227,15 @@ void memory_setup(uint used, uint total)
     uint count = PAGE_ALIGN(used) / PAGE_SIZE;
 
     physical_set_used(0, count);
-    virtual_map(&kpdir, 0, count, 0, 0);
+    virtual_map(&kpdir, 0, 0, count, 0);
 
+    log("Enabling paging...");
     paging_load_directorie(&kpdir);
     paging_enable();
+    log("Paging enabled!");
 }
 
-page_directorie_t * memory_kpdir()
+page_directorie_t *memory_kpdir()
 {
     return &kpdir;
 }
@@ -237,6 +245,7 @@ uint memory_alloc(uint count)
     atomic_begin();
 
     uint addr = physical_alloc(count);
+
     if (addr != 0)
         virtual_map(&kpdir, addr, addr, count, 0);
 
@@ -266,9 +275,9 @@ page_directorie_t *memory_alloc_pdir()
     for (uint i = 0; i < 256; i++)
     {
         page_directorie_entry_t *e = &pdir->entries[i];
-        e->User = false;
-        e->Write = true;
-        e->Present = true;
+        e->User = 0;
+        e->Write = 1;
+        e->Present = 1;
         e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
@@ -288,14 +297,14 @@ void memory_free_pdir(page_directorie_t *pdir)
 
         if (e->Present)
         {
-            page_table_t * pt = (page_table_t*)(e->PageFrameNumber * PAGE_SIZE);
-            for(size_t i = 0; i < 1024; i++)
+            page_table_t *pt = (page_table_t *)(e->PageFrameNumber * PAGE_SIZE);
+            for (size_t i = 0; i < 1024; i++)
             {
-                page_t * p = &pt->pages[i];
+                page_t *p = &pt->pages[i];
 
                 if (p->Present)
                 {
-                    physical_free(p->PageFrameNumber*PAGE_SIZE, 1);
+                    physical_free(p->PageFrameNumber * PAGE_SIZE, 1);
                 }
             }
 

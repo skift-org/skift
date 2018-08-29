@@ -1,6 +1,7 @@
 #pragma once
 #include "cpu/cpu.h"
 #include "kernel/logger.h"
+#include <stdio.h>
 
 void __panic(const string file, const string function, const int line, context_t * context, string message, ...);
 

@@ -14,9 +14,9 @@
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
+#include "kernel/paging.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-
 
 esp_t shedule(esp_t esp, context_t *context);
 
@@ -78,11 +78,12 @@ void thread_free(thread_t *thread)
     free(thread);
 }
 
-process_t *process_alloc(bool user)
+process_t *process_alloc(const char *name, int user)
 {
     process_t *process = (process_t *)malloc(sizeof(process_t));
 
     process->id = PID++;
+    strncpy(process->name, name, PROCNAME_SIZE);
     process->user = user;
     process->threads = list_alloc();
 
@@ -106,6 +107,7 @@ void process_free(process_t *process)
     {
         memory_free_pdir(process->pdir);
     }
+
     list_free(process->threads);
     free(process);
 
@@ -182,10 +184,69 @@ thread_t *thread_self()
 
 /* --- Process -------------------------------------------------------------- */
 
+void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
+{
+    atomic_begin();
+
+    // To avoid pagefault we need to switch page directorie.
+    page_directorie_t *pdir = running->process->pdir;
+    paging_load_directorie(process->pdir);
+
+    process_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
+    memset((void *)dest, 0, destsz);
+    memcpy((void *)dest, (void *)src, srcsz);
+
+    paging_load_directorie(pdir);
+
+    atomic_end();
+}
+
 process_t *process_exec(const char *path, int argc, char **argv)
 {
-    STUB(path, argc, argv);
-    return NULL;
+    UNUSED(argc);
+    UNUSED(argv);
+
+    file_t *fp = file_open(NULL, path);
+
+    if (!fp)
+    {
+        log("EXEC: %s file not found, exec failed!", path);
+        return NULL;
+    }
+
+    process_t *process = process_alloc(path, 1);
+
+    if (!process)
+    {
+        log("EXEC: Unable to allocate new process, exec failed!");
+        file_close(fp);
+        return NULL;
+    }
+
+    void *buffer = file_read_all(fp);
+    file_close(fp);
+
+    if (!buffer)
+    {
+        log("EXEC: Unable to read from file %s, exec failed!", path);
+        free(buffer);
+        process_free(process);
+        return NULL;
+    }
+
+    ELF_header_t *elf = (ELF_header_t *)buffer;
+    log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
+    ELF_program_t program;
+
+    for (int i = 0; ELF_read_program(elf, &program, i); i++)
+    {
+        log("program 0x%x(%i) -> 0x%x(%i)", program.offset, program.filesz, program.vaddr, program.memsz);
+        load_elfseg(process, (uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
+    }
+
+    free(buffer);
+
+    return process;
 }
 
 void process_kill(process_t *process)

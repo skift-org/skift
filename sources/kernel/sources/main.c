@@ -63,7 +63,6 @@ void main(multiboot_info_t *info, s32 magic)
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(filesystem);
-    boot_screen("Loading ramdisk...");
     setup(modules, &mbootinfo);
 
     boot_screen("Welcome!");
@@ -73,7 +72,7 @@ void main(multiboot_info_t *info, s32 magic)
     thread_create(time_task);
     log(KERNEL_UNAME);
 
-    exec("Application/test-app.app");
+    //exec("Application/test-app.app");
 
     log("kernel running");
 

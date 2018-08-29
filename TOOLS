@@ -57,14 +57,14 @@ def build_ramdisk(location, projects):
 
     ram_disk = toolchain.MKDIR(os.path.join(location, "ramdisk"))
 
-    app_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Application"))
-    man_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Manual"))
-    sys_dir  = toolchain.MKDIR(os.path.join(ram_disk, "System"))
-    usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "User"))
-    usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "User"))
+    app_dir  = toolchain.MKDIR(os.path.join(ram_disk, "application"))
+    man_dir  = toolchain.MKDIR(os.path.join(ram_disk, "manual"))
+    sys_dir  = toolchain.MKDIR(os.path.join(ram_disk, "system"))
+    usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "user"))
+    usr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "device"))
+    lib_dir  = toolchain.MKDIR(os.path.join(ram_disk, "library"))
 
-    lib_dir  = toolchain.MKDIR(os.path.join(ram_disk, "Library"))
-    hdr_dir  = toolchain.MKDIR(os.path.join(lib_dir,  "Header"))
+    hdr_dir  = toolchain.MKDIR(os.path.join(ram_disk, "library/header"))
 
     libs = [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.LIB]
     apps = [projects[p] for p in projects if projects[p].builded and projects[p].type == project.ProjectTypes.APP]

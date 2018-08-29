@@ -5,6 +5,7 @@
 #include "ds/list.h"
 #include "kernel/paging.h"
 
+#define PROCNAME_SIZE 128
 #define STACK_SIZE 4096
 
 typedef u32 esp_t;
@@ -13,6 +14,7 @@ typedef void (*thread_entry_t)();
 typedef struct
 {
     int id;
+    char name[PROCNAME_SIZE];
     bool user;
     list_t *threads;
     page_directorie_t *pdir;

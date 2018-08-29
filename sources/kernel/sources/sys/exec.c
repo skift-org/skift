@@ -1,8 +1,9 @@
 #include <string.h>
+#include "libelf.h"
+
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
-#include "libelf.h"
 #include "kernel/tasking.h"
 
 void load_segment(uint source, uint size, uint dest, uint destsize)
@@ -26,6 +27,7 @@ int exec(char *path)
 
     if (buffer != NULL)
     {
+
         ELF_header_t *elf = (ELF_header_t *)buffer;
         // log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 

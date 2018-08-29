@@ -38,5 +38,6 @@ process_t *process_exec(const char *path, int argc, char **argv);
 void process_cancel(process_t *process);
 process_t *process_self();
 void process_exit(int code);
-uint process_map(process_t *process, uint addr, uint count);
-uint process_unmap(process_t *process, uint addr, uint count);
+
+int process_map(process_t *process, uint addr, uint count);
+int process_unmap(process_t *process, uint addr, uint count);

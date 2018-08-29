@@ -1,4 +1,4 @@
-/* Copyright (c) 2018 Nicolas Van Bossuyt.                                    */
+/* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -19,12 +19,10 @@
 #include "kernel/memory.h"
 #include "kernel/modules.h"
 #include "kernel/multiboot.h"
-#include "kernel/physical.h"
+#include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/time.h"
 #include "kernel/version.h"
-#include "kernel/virtual.h"
-#include "kernel/system.h"
 
 #include "sync/atomic.h"
 
@@ -38,20 +36,20 @@ void boot_screen(string msg)
 }
 
 extern int __end;
-uint get_kernel_end(multiboot_info_t * minfo)
+uint get_kernel_end(multiboot_info_t *minfo)
 {
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-int exec(char * path);
-void main(multiboot_info_t * info, s32 magic)
+int exec(char *path);
+void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
     boot_screen("Booting...");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC )
+    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Invalid multiboot magic number (0x%x)!", magic);
 
     log("--- Setting up cpu tables ---");
@@ -62,8 +60,7 @@ void main(multiboot_info_t * info, s32 magic)
     setup(irq);
 
     log("--- Setting up system ---");
-    setup(physical, (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
-    setup(memory, get_kernel_end(&mbootinfo));
+    setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(filesystem);
     boot_screen("Loading ramdisk...");
@@ -73,7 +70,6 @@ void main(multiboot_info_t * info, s32 magic)
     atomic_enable();
     sti();
 
-
     thread_create(time_task);
     log(KERNEL_UNAME);
 
@@ -81,7 +77,10 @@ void main(multiboot_info_t * info, s32 magic)
 
     log("kernel running");
 
-    while(true){ hlt(); };
+    while (true)
+    {
+        hlt();
+    };
 
     PANIC("The end of the main function has been reached.");
 }

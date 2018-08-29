@@ -1,8 +1,8 @@
-/* Copyright (c) 2018 MAKER.                                                  */
+/* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* memory.c: Physical, virtual and logical memory managment                           */
+/* memory.c: Physical, virtual and logical memory managment                   */
 
 #include "types.h"
 #include "utils.h"
@@ -145,12 +145,11 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
     return ((p->PageFrameNumber & ~0xfff) + (vaddr & 0xfff));
 }
 
-uint virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
+int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
-        
 
         uint pdi = PD_INDEX(vaddr + offset);
         uint pti = PT_INDEX(vaddr + offset);
@@ -161,7 +160,7 @@ uint virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bo
         if (!pde->Present)
         {
             // Allocate a new page table
-            ptable = (page_table_t*)physical_alloc(1);
+            ptable = (page_table_t *)physical_alloc(1);
             virtual_map(&kpdir, (uint)ptable, (uint)ptable, 1, 0);
 
             pde->Present = 1;
@@ -174,10 +173,12 @@ uint virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bo
         p->Present = 1;
         p->User = user;
         p->Write = 1;
-        p->PageFrameNumber = paddr >> 12;        
+        p->PageFrameNumber = paddr >> 12;
     }
 
     paging_invalidate_tlb();
+
+    return 0;
 }
 
 void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
@@ -192,7 +193,7 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
         page_directorie_entry_t *pde = &pdir->entries[pdi];
         page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
         page_t *p = &ptable->pages[pti];
-        
+
         if (pde->Present)
             p->as_uint = 0;
     }
@@ -221,6 +222,14 @@ void memory_setup(uint used, uint total)
 
     physical_set_used(0, count);
     virtual_map(&kpdir, 0, count, 0, 0);
+
+    paging_load_directorie(&kpdir);
+    paging_enable();
+}
+
+page_directorie_t * memory_kpdir()
+{
+    return &kpdir;
 }
 
 uint memory_alloc(uint count)
@@ -228,9 +237,9 @@ uint memory_alloc(uint count)
     atomic_begin();
 
     uint addr = physical_alloc(count);
-    if (addr =! NULL)
+    if (addr != 0)
         virtual_map(&kpdir, addr, addr, count, 0);
-    
+
     atomic_end();
 
     return addr;
@@ -242,7 +251,7 @@ void memory_free(uint addr, uint count)
 
     physical_free(addr, count);
     virtual_unmap(&kpdir, addr, count);
-    
+
     atomic_end();
 }
 
@@ -251,10 +260,10 @@ page_directorie_t *memory_alloc_pdir()
 {
     atomic_begin();
 
-    page_directorie_t* pdir = (page_directorie_t*)memory_alloc(1);
+    page_directorie_t *pdir = (page_directorie_t *)memory_alloc(1);
 
     // Copy first gigs of virtual memory (kernel space);
-    for(uint i = 0; i < 256; i++)
+    for (uint i = 0; i < 256; i++)
     {
         page_directorie_entry_t *e = &pdir->entries[i];
         e->User = false;
@@ -264,23 +273,48 @@ page_directorie_t *memory_alloc_pdir()
     }
 
     atomic_end();
-    
+
     return pdir;
 }
 
 // Free the pdir of a dying process
 void memory_free_pdir(page_directorie_t *pdir)
 {
+    atomic_begin();
 
+    for (size_t i = 256; i < 1024; i++)
+    {
+        page_directorie_entry_t *e = &pdir->entries[i];
+
+        if (e->Present)
+        {
+            page_table_t * pt = (page_table_t*)(e->PageFrameNumber * PAGE_SIZE);
+            for(size_t i = 0; i < 1024; i++)
+            {
+                page_t * p = &pt->pages[i];
+
+                if (p->Present)
+                {
+                    physical_free(p->PageFrameNumber*PAGE_SIZE, 1);
+                }
+            }
+
+            memory_free((uint)pt, 1);
+        }
+    }
+
+    memory_free((uint)pdir, 1);
+
+    atomic_end();
 }
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
 
-    for(uint i = 0; i < count; i++)
+    for (uint i = 0; i < count; i++)
     {
-        uint vaddr = addr + i*PAGE_SIZE;
+        uint vaddr = addr + i * PAGE_SIZE;
 
         if (!virtual_present(pdir, vaddr, 1))
         {
@@ -288,7 +322,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
             virtual_map(pdir, vaddr, paddr, 1, user);
         }
     }
-    
+
     atomic_end();
 
     return 0;
@@ -298,19 +332,18 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
     atomic_begin();
 
-    for(uint i = 0; i < count; i++)
+    for (uint i = 0; i < count; i++)
     {
-        uint vaddr = addr + i*PAGE_SIZE;
+        uint vaddr = addr + i * PAGE_SIZE;
 
         if (virtual_present(pdir, vaddr, 1))
         {
             physical_free(virtual2physical(pdir, vaddr), 1);
-            uint paddr = physical_alloc(1);
             virtual_unmap(pdir, vaddr, 1);
         }
     }
 
     atomic_end();
-    
+
     return 0;
 }

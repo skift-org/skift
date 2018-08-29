@@ -1,20 +1,22 @@
-/* Copyright (c) 2018 Nicolas Van Bossuyt.                                    */
+/* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
 #include <stdlib.h>
 #include <string.h>
+#include "libelf.h"
 #include "sync/atomic.h"
 
 #include "cpu/cpu.h"
 #include "cpu/gdt.h"
 #include "cpu/irq.h"
 
+#include "kernel/filesystem.h"
+#include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/virtual.h"
-#include "kernel/physical.h"
+
 
 esp_t shedule(esp_t esp, context_t *context);
 
@@ -86,11 +88,11 @@ process_t *process_alloc(bool user)
 
     if (user)
     {
-        process->pdir = memory_construct_memory_space();
+        process->pdir = memory_alloc_pdir();
     }
     else
     {
-        process->pdir = get_kernel_page_dir();
+        process->pdir = memory_kpdir();
     }
 
     return process;
@@ -100,7 +102,10 @@ void process_free(process_t *process)
 {
     atomic_begin();
 
-    memory_detroy_memory_space(process->pdir);
+    if (process->pdir != memory_kpdir())
+    {
+        memory_free_pdir(process->pdir);
+    }
     list_free(process->threads);
     free(process);
 
@@ -215,37 +220,14 @@ void process_exit(int code)
     }
 }
 
-uint process_map(process_t *process, uint addr, uint count)
+int process_map(process_t *process, uint addr, uint count)
 {
-    void *mem = physical_alloc_contiguous(count);
-
-    for (size_t i = 0; i < count; i++)
-    {
-        uint virtual = addr + PAGE_SIZE * i;
-        if (virtual2physical(process->pdir, virtual) == 0)
-        {
-            virtual_map(process->pdir, virtual, (uint)mem + PAGE_SIZE * i, true);
-        }
-    }
-
-    return (uint)mem;
+    return memory_map(process->pdir, addr, count, 1);
 }
 
-uint process_unmap(process_t *process, uint addr, uint count)
+int process_unmap(process_t *process, uint addr, uint count)
 {
-    for (size_t i = 0; i < count; i++)
-    {
-        uint virtual = addr + PAGE_SIZE * i;
-        uint physical = virtual2physical(process->pdir, virtual);
-
-        if (physical)
-        {
-            physical_free((void*)physical);
-            virtual_unmap(process->pdir, virtual);
-        }
-    }
-
-    return 1;
+    return memory_unmap(process->pdir, addr, count);
 }
 
 esp_t shedule(esp_t esp, context_t *context)

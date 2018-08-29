@@ -1,4 +1,4 @@
-/* Copyright (c) 2018 Nicolas Van Bossuyt.                                    */
+/* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 

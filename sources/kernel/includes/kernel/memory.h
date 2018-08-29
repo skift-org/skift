@@ -1,6 +1,6 @@
 #pragma once
 
-/* Copyright (c) 2018 MAKER.                                                  */
+/* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -9,6 +9,8 @@
 #include "kernel/paging.h"
 
 void memory_setup(uint used, uint total);
+
+page_directorie_t * memory_kpdir();
 
 uint memory_alloc(uint count);
 void memory_free(uint addr, uint count);

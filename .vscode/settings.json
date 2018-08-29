@@ -29,5 +29,6 @@
         "**/bin" : true,
         "**/obj" : true,
         "**/__pycache__" : true
-    }
+    },
+    "editor.rulers": [80]
 }

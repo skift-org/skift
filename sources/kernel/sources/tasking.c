@@ -175,7 +175,7 @@ thread_t *thread_self()
     return running;
 }
 
-/* --- Process --- */
+/* --- Process -------------------------------------------------------------- */
 
 process_t *process_exec(const char *path, int argc, char **argv)
 {

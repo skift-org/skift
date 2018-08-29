@@ -152,6 +152,9 @@ uint virtual_map(page_directorie_t *pdir, uint vaddr, uint count, uint paddr, bo
 
         page_directorie_entry_t *pde = &pdir->entries[pdi];
         page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+
+        if 
+
         page_t *p = &ptable->pages[pti];
 
         p->as_uint = 0;

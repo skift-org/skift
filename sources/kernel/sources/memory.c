@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* memory.c: Physical, virtual and memory managment                           */
+/* memory.c: Physical, virtual and logical memory managment                           */
 
 #include "types.h"
 #include "utils.h"
@@ -223,32 +223,6 @@ void memory_setup(uint used, uint total)
     virtual_map(&kpdir, 0, count, 0, 0);
 }
 
-// Alloc a pdir for a process
-page_directorie_t *memory_alloc_pdir()
-{
-    page_directorie_t* pdir = (page_directorie_t*)physical_alloc(1);
-    virtual_map(&kpdir, (uint)pdir, (uint)pdir, 1, 0);
-
-    // Copy first gigs of virtual memory (kernel space);
-    for(uint i = 0; i < 256; i++)
-    {
-        page_directorie_entry_t *e = &pdir->entries[i];
-        e->User = false;
-        e->Write = true;
-        e->Present = true;
-        e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
-    }
-    
-    return NULL;
-}
-
-// Free the pdir of a dying process
-void memory_free_pdir(page_directorie_t *pdir)
-{
-    page_directorie_t* pdir = (page_directorie_t*)physical_alloc(1);
-    virtual_map(&kpdir, (uint)pdir, (uint)pdir, 1, 0);
-}
-
 uint memory_alloc(uint count)
 {
     atomic_begin();
@@ -272,14 +246,71 @@ void memory_free(uint addr, uint count)
     atomic_end();
 }
 
-int memory_map(page_directorie_t *pdir, uint addr, uint count)
+// Alloc a pdir for a process
+page_directorie_t *memory_alloc_pdir()
 {
-    STUB(pdir, addr, count);
+    atomic_begin();
+
+    page_directorie_t* pdir = (page_directorie_t*)memory_alloc(1);
+
+    // Copy first gigs of virtual memory (kernel space);
+    for(uint i = 0; i < 256; i++)
+    {
+        page_directorie_entry_t *e = &pdir->entries[i];
+        e->User = false;
+        e->Write = true;
+        e->Present = true;
+        e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
+    }
+
+    atomic_end();
+    
+    return pdir;
+}
+
+// Free the pdir of a dying process
+void memory_free_pdir(page_directorie_t *pdir)
+{
+
+}
+
+int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
+{
+    atomic_begin();
+
+    for(uint i = 0; i < count; i++)
+    {
+        uint vaddr = addr + i*PAGE_SIZE;
+
+        if (!virtual_present(pdir, vaddr, 1))
+        {
+            uint paddr = physical_alloc(1);
+            virtual_map(pdir, vaddr, paddr, 1, user);
+        }
+    }
+    
+    atomic_end();
+
     return 0;
 }
 
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
-    STUB(pdir, addr, count);
+    atomic_begin();
+
+    for(uint i = 0; i < count; i++)
+    {
+        uint vaddr = addr + i*PAGE_SIZE;
+
+        if (virtual_present(pdir, vaddr, 1))
+        {
+            physical_free(virtual2physical(pdir, vaddr), 1);
+            uint paddr = physical_alloc(1);
+            virtual_unmap(pdir, vaddr, 1);
+        }
+    }
+
+    atomic_end();
+    
     return 0;
 }

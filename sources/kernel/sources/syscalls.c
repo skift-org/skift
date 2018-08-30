@@ -9,7 +9,7 @@
 
 int sys_exit(int code)
 {
-    thread_exit();
+    thread_exit(code);
     return code;
 }
 
@@ -34,7 +34,7 @@ int sys_unmap(int memory, int size)
 typedef int (*syscall_t)(int, int, int, int, int);
 
 static int (*syscalls[])() =
-{
+    {
         [0] = sys_exit,
         [1] = sys_print,
         [2] = sys_map,

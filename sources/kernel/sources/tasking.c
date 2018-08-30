@@ -170,7 +170,7 @@ void tasking_setup()
     irq_register(0, (irq_handler_t)&shedule);
 }
 
-/* --- Threads -------------------------------------------------------------- */
+/* --- Thread managment ----------------------------------------------------- */
 
 THREAD thread_self()
 {
@@ -220,8 +220,9 @@ int thread_cancel(THREAD t)
 
 void thread_exit(void *retval)
 {
-    thread_cancel(thread_self());
+    UNUSED(retval);
 
+    thread_cancel(thread_self());
     asm("int $32"); // yield
 
     while (1)
@@ -230,7 +231,24 @@ void thread_exit(void *retval)
     };
 }
 
-/* --- Processes ------------------------------------------------------------ */
+/* --- Process managment ---------------------------------------------------- */
+
+PROCESS process_self()
+{
+    return running->process->id;
+}
+
+PROCESS process_create(const char *name, int user)
+{
+    atomic_begin();
+
+    process_t * process = alloc_process(name, user);
+    list_pushback(processes, process);
+    
+    atomic_end();
+
+    return process->id;
+}
 
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
@@ -245,13 +263,9 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         paging_load_directorie(process->pdir);
         paging_invalidate_tlb();
 
-        log("ok");
         process_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
-        log("ok");
         memset((void *)dest, 0, destsz);
-        log("ok");
         memcpy((void *)dest, (void *)src, srcsz);
-        log("switching page directorie");
 
         paging_load_directorie(memory_kpdir());
 
@@ -311,10 +325,6 @@ void process_kill(process_t *process)
     asm("int $32"); // yield
 }
 
-process_t *process_self()
-{
-    return running->process;
-}
 
 void process_exit(int code)
 {

@@ -27,12 +27,11 @@ int TID = 0;
 
 thread_t *running;
 list_t *waiting;
-list_t *dead;
 
-list_t *process;
-process_t *kernel_process;
+list_t *threads;
+list_t *processes;
 
-thread_t *thread_alloc(thread_entry_t entry, int user)
+thread_t *alloc_thread(thread_entry_t entry, int user)
 {
     thread_t *thread = (thread_t *)malloc(sizeof(thread_t));
     memset(thread, 0, sizeof(thread_t));
@@ -72,13 +71,7 @@ thread_t *thread_alloc(thread_entry_t entry, int user)
     return thread;
 }
 
-void thread_free(thread_t *thread)
-{
-    free(thread->stack);
-    free(thread);
-}
-
-process_t *process_alloc(const char *name, int user)
+process_t *alloc_process(const char *name, int user)
 {
     process_t *process = (process_t *)malloc(sizeof(process_t));
 
@@ -99,10 +92,14 @@ process_t *process_alloc(const char *name, int user)
     return process;
 }
 
-void process_free(process_t *process)
+void free_thread(thread_t *thread)
 {
-    atomic_begin();
+    free(thread->stack);
+    free(thread);
+}
 
+void free_process(process_t *process)
+{
     if (process->pdir != memory_kpdir())
     {
         memory_free_pdir(process->pdir);
@@ -110,62 +107,118 @@ void process_free(process_t *process)
 
     list_free(process->threads);
     free(process);
-
-    atomic_end();
 }
 
-/* --- Public Functions ----------------------------------------------------- */
+void kill_thread(thread_t *thread)
+{
+    list_remove(thread->process->threads, thread);
+
+    if (thread->process->threads->count == 0)
+    {
+        free_process(thread->process);
+    }
+
+    free_thread(thread);
+}
+
+void kill_process(process_t *process)
+{
+    FOREACH(i, process->threads)
+    {
+        free_thread((thread_t *)i->value);
+    }
+
+    free_process(process);
+}
+
+thread_t *thread_get(THREAD thread)
+{
+
+    FOREACH(i, threads)
+    {
+        thread_t *t = (thread_t *)i->value;
+
+        if (t->id == thread)
+            return t;
+    }
+
+    return NULL;
+}
+
+process_t *process_get(PROCESS process)
+{
+
+    FOREACH(i, processes)
+    {
+        process_t *p = (process_t *)i->value;
+
+        if (p->id == process)
+            return p;
+    }
+
+    return NULL;
+}
+
+/* --- Public functions ----------------------------------------------------- */
 
 void tasking_setup()
 {
     waiting = list_alloc();
-    dead = list_alloc();
-    process = list_alloc();
-
-    // Create the kernel task.
-    thread_create(NULL);
+    threads = list_alloc();
+    processes = list_alloc();
 
     irq_register(0, (irq_handler_t)&shedule);
 }
 
-thread_t *thread_create(thread_entry_t entry)
+/* --- Threads -------------------------------------------------------------- */
+
+THREAD thread_self()
 {
-    thread_t *thread = thread_alloc(entry, 0);
+    return running->id;
+}
+
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
+{
+    UNUSED(arg);
+    UNUSED(flags);
 
     atomic_begin();
 
+    process_t *process = process_get(p);
+    thread_t *thread = alloc_thread(entry, 0);
+
+    list_pushback(process->threads, thread);
+    thread->process = process;
+
     if (running)
     {
-        list_pushback(waiting, (int)thread);
+        list_pushback(waiting, thread);
     }
     else
     {
         running = thread;
     }
 
+    thread->state = THREAD_RUNNING;
+
     atomic_end();
 
-    return thread;
+    return thread->id;
 }
 
-int thread_cancel(thread_t *thread)
+int thread_cancel(THREAD t)
 {
     atomic_begin();
 
-    if (thread == NULL)
-        return 0;
-
-    if (!list_containe(dead, (int)thread))
-    {
-        list_pushback(dead, (int)thread);
-    }
+    thread_t *thread = thread_get(t);
+    thread->state = THREAD_CANCELED;
 
     atomic_end();
 
     return 1;
 }
 
-void thread_exit()
+void thread_exit(void *retval)
 {
     thread_cancel(thread_self());
 
@@ -177,35 +230,37 @@ void thread_exit()
     };
 }
 
-thread_t *thread_self()
-{
-    return running;
-}
-
-/* --- Process -------------------------------------------------------------- */
+/* --- Processes ------------------------------------------------------------ */
 
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
-    atomic_begin();
-
     log("Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
 
-    // To avoid pagefault we need to switch page directorie.
-    //page_directorie_t *pdir = running->process->pdir;
-    paging_load_directorie(process->pdir);
-    paging_invalidate_tlb();
+    if (dest >= 0x100000)
+    {
+        atomic_begin();
 
-    log("ok");
-    process_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
-    log("ok");
-    memset((void *)dest, 0, destsz);
-    log("ok");
-    memcpy((void *)dest, (void *)src, srcsz);
-    log("switching page directorie");
+        // To avoid pagefault we need to switch page directorie.
+        //page_directorie_t *pdir = running->process->pdir;
+        paging_load_directorie(process->pdir);
+        paging_invalidate_tlb();
 
-    paging_load_directorie(memory_kpdir());
+        log("ok");
+        process_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
+        log("ok");
+        memset((void *)dest, 0, destsz);
+        log("ok");
+        memcpy((void *)dest, (void *)src, srcsz);
+        log("switching page directorie");
 
-    atomic_end();
+        paging_load_directorie(memory_kpdir());
+
+        atomic_end();
+    }
+    else
+    {
+        log("Elf segment ignored, not in user memory!");
+    }
 }
 
 process_t *process_exec(const char *path, int argc, char **argv)
@@ -227,9 +282,8 @@ process_t *process_exec(const char *path, int argc, char **argv)
     file_close(fp);
 
     ELF_header_t *elf = (ELF_header_t *)buffer;
+
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
-    
-    // memory_dump(process->pdir);
 
     ELF_program_t program;
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
@@ -238,10 +292,7 @@ process_t *process_exec(const char *path, int argc, char **argv)
         load_elfseg(process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
-    thread_entry_t entry = (thread_entry_t)elf->entry;
-
     paging_load_directorie(process->pdir);
-    entry();
 
     free(buffer);
 
@@ -253,7 +304,7 @@ void process_kill(process_t *process)
     atomic_begin();
     FOREACH(i, process->threads)
     {
-        thread_cancel((thread_t *)i);
+        thread_cancel((thread_t *)i->value);
     }
     atomic_end();
 
@@ -306,7 +357,7 @@ esp_t shedule(esp_t esp, context_t *context)
 
     FOREACH(i, dead)
     {
-        thread_t *deadthread = (thread_t *)i;
+        thread_t *deadthread = (thread_t *)i->value;
         list_remove(waiting, (int)deadthread);
         thread_free(deadthread);
     }

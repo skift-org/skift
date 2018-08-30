@@ -8,8 +8,11 @@
 #define PROCNAME_SIZE 128
 #define STACK_SIZE 4096
 
+typedef int THREAD;
+typedef int PROCESS;
+
 typedef u32 esp_t;
-typedef void (*thread_entry_t)();
+typedef void *(*thread_entry_t)(void *);
 
 typedef struct
 {
@@ -20,26 +23,42 @@ typedef struct
     page_directorie_t *pdir;
 } process_t;
 
+typedef enum
+{
+    THREAD_RUNNING,
+    THREAD_CANCELED,
+} thread_state_t;
+
 typedef struct
 {
     int id;
-    void *stack;
-    uint esp;
-    thread_entry_t entry;
     process_t *process;
+    
+    uint esp;
+    void *stack;
+    
+    thread_entry_t entry;
+    thread_state_t state;
 } thread_t;
 
 void tasking_setup();
 
-thread_t *thread_create(thread_entry_t entry);
-int thread_cancel(thread_t *thread);
-void thread_exit();
-thread_t *thread_self();
+THREAD thread_self();
 
-process_t *process_exec(const char *path, int argc, char **argv);
-void process_cancel(process_t *process);
-process_t *process_self();
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
+int thread_cancel(THREAD thread);
+void *thread_wait(THREAD thread);
+void thread_exit(void *retval);
+void thread_sleep(int time);
+
+PROCESS process_self();
+
+PROCESS process_create(const char * name);
+PROCESS process_exec(const char *filename, int argc, char **argv);
+
+void process_cancel(PROCESS process);
 void process_exit(int code);
+int process_wait(PROCESS process);
 
-int process_map(process_t *process, uint addr, uint count);
-int process_unmap(process_t *process, uint addr, uint count);
+int process_map(PROCESS process, uint addr, uint count);
+int process_unmap(PROCESS process, uint addr, uint count);

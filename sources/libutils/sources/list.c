@@ -3,7 +3,7 @@
 
 #include "ds/list.h"
 
-list_item_t *list_item_alloc(int value)
+list_item_t *list_item_alloc(void* value)
 {
     list_item_t *item = malloc(sizeof(list_item_t));
 
@@ -77,7 +77,7 @@ void list_print(list_t *list)
     printf("\n");
 }
 
-void list_push(list_t *list, int value)
+void list_push(list_t *list, void* value)
 {
     list_item_t *item = list_item_alloc(value);
     list->count++;
@@ -95,7 +95,7 @@ void list_push(list_t *list, int value)
     }
 }
 
-int list_pop(list_t *list, int *value)
+int list_pop(list_t *list, void **value)
 {
     list_item_t *item = list->head;
 
@@ -123,7 +123,7 @@ int list_pop(list_t *list, int *value)
     return 1;
 }
 
-void list_pushback(list_t *list, int value)
+void list_pushback(list_t *list, void* value)
 {
     list_item_t *item = list_item_alloc(value);
     list->count++;
@@ -141,7 +141,7 @@ void list_pushback(list_t *list, int value)
     }
 }
 
-int list_popback(list_t *list, int *value)
+int list_popback(list_t *list, void **value)
 {
     list_item_t *item = list->tail;
 
@@ -169,7 +169,7 @@ int list_popback(list_t *list, int *value)
     return 1;
 }
 
-int list_remove(list_t *list, int value)
+int list_remove(list_t *list, void* value)
 {
     FOREACH(item, list)
     {
@@ -203,7 +203,7 @@ int list_remove(list_t *list, int value)
     return 0;
 }
 
-int list_containe(list_t *list, int value)
+int list_containe(list_t *list, void* value)
 {
     FOREACH(item, list)
     {

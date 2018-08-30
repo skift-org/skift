@@ -259,7 +259,7 @@ class Project(object):
         elif self.type == ProjectTypes.LIB:
             return toolchain.AR(objects, self.get_output())
         elif self.type == ProjectTypes.KERNEL:
-            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld")
+            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld") and toolchain.OBJDUMP(self.get_output(), self.get_output() + ".asm");
         elif self.type == ProjectTypes.MODULE:
             pass
 

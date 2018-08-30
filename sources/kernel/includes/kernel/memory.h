@@ -20,3 +20,5 @@ void memory_free_pdir(page_directorie_t *pdir);
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user);
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count);
+
+void memory_dump(page_directorie_t * pdir);

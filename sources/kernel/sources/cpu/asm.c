@@ -60,7 +60,7 @@ u32 CR4()
 
 void dump_context(context_t* context)
 {
-    printf("\t&8GS=%x FS=%x ES=%x DS=%x \n\tEDI=%x ESI=%x EBP=%x USELESS=%x \n\tEAX=%x EBX=%x ECX=%x EDX=%x\n\tINTNO=%x ERRCODE=%x EIP=%x CS=%x FLAGS=%x \n",
+    printf("\tGS=%x FS=%x ES=%x DS=%x \n\tEDI=%x ESI=%x EBP=%x USELESS=%x \n\tEAX=%x EBX=%x ECX=%x EDX=%x\n\tINTNO=%x ERRCODE=%x EIP=%x CS=%x FLAGS=%x \n",
     context->gs , context->fs , context->es , context->ds , context->edi, context->esi, context->ebp, context->USELESS, context->eax, context->ebx, context->ecx, context->edx, context->int_no, context->errcode, context->eip, context->cs , context->eflags);
 
     printf("\tCR0=%x CR2=%x CR3=%x CR4=%x\n", CR0(), CR2(), CR3(), CR4());

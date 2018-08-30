@@ -188,15 +188,22 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 {
     atomic_begin();
 
+    log("Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
+
     // To avoid pagefault we need to switch page directorie.
-    page_directorie_t *pdir = running->process->pdir;
+    //page_directorie_t *pdir = running->process->pdir;
     paging_load_directorie(process->pdir);
+    paging_invalidate_tlb();
 
+    log("ok");
     process_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
+    log("ok");
     memset((void *)dest, 0, destsz);
+    log("ok");
     memcpy((void *)dest, (void *)src, srcsz);
+    log("switching page directorie");
 
-    paging_load_directorie(pdir);
+    paging_load_directorie(memory_kpdir());
 
     atomic_end();
 }
@@ -216,33 +223,25 @@ process_t *process_exec(const char *path, int argc, char **argv)
 
     process_t *process = process_alloc(path, 1);
 
-    if (!process)
-    {
-        log("EXEC: Unable to allocate new process, exec failed!");
-        file_close(fp);
-        return NULL;
-    }
-
     void *buffer = file_read_all(fp);
     file_close(fp);
 
-    if (!buffer)
-    {
-        log("EXEC: Unable to read from file %s, exec failed!", path);
-        free(buffer);
-        process_free(process);
-        return NULL;
-    }
-
     ELF_header_t *elf = (ELF_header_t *)buffer;
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
-    ELF_program_t program;
+    
+    // memory_dump(process->pdir);
 
+    ELF_program_t program;
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
-        log("program 0x%x(%i) -> 0x%x(%i)", program.offset, program.filesz, program.vaddr, program.memsz);
-        load_elfseg(process, (uint)buffer + program.offset, program.filesz, program.vaddr, program.memsz);
+        printf("\n");
+        load_elfseg(process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
+
+    thread_entry_t entry = (thread_entry_t)elf->entry;
+
+    paging_load_directorie(process->pdir);
+    entry();
 
     free(buffer);
 

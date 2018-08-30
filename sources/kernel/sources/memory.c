@@ -43,7 +43,7 @@ int physical_is_used(uint addr, uint count)
 
 void physical_set_used(uint addr, uint count)
 {
-    log("P_S_USED ADDR=%d COUNT=%d", addr, count);
+    log("P_S_USED ADDR=0x%x COUNT=%d", addr, count);
     for (uint i = 0; i < count; i++)
     {
         PHYSICAL_SET_USED(addr + (i * PAGE_SIZE));
@@ -113,8 +113,6 @@ int virtual_absent(page_directorie_t *pdir, uint vaddr, uint count)
 
 int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
 {
-    int present = 1;
-
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
@@ -124,16 +122,24 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
 
         page_directorie_entry_t *pde = &pdir->entries[pdi];
 
-        if (pde->Present)
+        if (!pde->Present)
         {
-            page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-            page_t *p = &ptable->pages[pti];
+            log("0x%x absent!", vaddr);
+            return 0;
+        }
 
-            present = present && p->Present;
+        page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+        page_t *p = &ptable->pages[pti];
+
+        if (!p->Present)
+        {
+            log("0x%x absent!", vaddr);
+            return 0;
         }
     }
 
-    return present;
+    log("0x%x present!", vaddr);
+    return 1;
 }
 
 uint virtual2physical(page_directorie_t *pdir, uint vaddr)
@@ -151,7 +157,7 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
 
-    log("VMAP VADDR=%d PADDR=%d COUNT=%d", vaddr, paddr, count);
+    log("VMAP VADDR=0x%x PADDR=0x%x COUNT=%d", vaddr, paddr, count);
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
@@ -164,8 +170,9 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
 
         if (!pde->Present)
         {
-            ptable = (page_table_t *)physical_alloc(1);
-            virtual_map(&kpdir, (uint)ptable, (uint)ptable, 1, 0);
+            log("Missing page table! Allocating a new one");
+            ptable = (page_table_t *)memory_alloc(1);
+            log("New page table at %x", ptable);
 
             pde->Present = 1;
             pde->Write = 1;
@@ -278,7 +285,7 @@ page_directorie_t *memory_alloc_pdir()
         e->User = 0;
         e->Write = 1;
         e->Present = 1;
-        e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
+        e->PageFrameNumber = (uint)(&kptable[i]) / PAGE_SIZE;
     }
 
     atomic_end();
@@ -321,6 +328,8 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
 
+    log("MAP: PDIR=0x%x ADDR=0x%x COUNT=%d",pdir, addr, count);
+
     for (uint i = 0; i < count; i++)
     {
         uint vaddr = addr + i * PAGE_SIZE;
@@ -355,4 +364,26 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
     atomic_end();
 
     return 0;
+}
+
+void memory_dump(page_directorie_t * pdir)
+{
+    for(size_t i = 0; i < 1024; i++)
+    {
+        page_directorie_entry_t * pde = &pdir->entries[i];
+        if (pde->Present)
+        {
+            printf("pdir[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, pde->PageFrameNumber, pde->Present, pde->Write, pde->User);
+            page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+
+            for(size_t i = 0; i < 1024; i++)
+            {
+                page_t * p = &ptable->pages[i];
+                if (p->Present)
+                {
+                    printf("ptable[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, p->PageFrameNumber, p->Present, p->Write, p->User);
+                }
+            }
+        }
+    }
 }

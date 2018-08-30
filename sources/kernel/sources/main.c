@@ -72,7 +72,7 @@ void main(multiboot_info_t *info, s32 magic)
     thread_create(time_task);
     log(KERNEL_UNAME);
 
-    //exec("Application/test-app.app");
+    process_exec("application/test-app.app", 0, NULL);
 
     log("kernel running");
 

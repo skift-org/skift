@@ -17,7 +17,8 @@
         "tasking.h": "c",
         "cpu.h": "c",
         "cmath": "c",
-        "bga.h": "c"
+        "bga.h": "c",
+        "paging.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

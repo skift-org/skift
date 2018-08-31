@@ -1,8 +1,12 @@
 #pragma once
+
 #include <stdbool.h>
+
 #include "types.h"
 #include "utils.h"
+
 #include "ds/list.h"
+
 #include "kernel/paging.h"
 
 #define PROCNAME_SIZE 128
@@ -57,7 +61,7 @@ void thread_sleep(int time);
 
 PROCESS process_self();
 
-PROCESS process_create(const char *name);
+PROCESS process_create(const char *name, int user);
 PROCESS process_exec(const char *filename, int argc, char **argv);
 
 void process_cancel(PROCESS process);

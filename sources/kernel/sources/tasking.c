@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "libelf.h"
 #include "sync/atomic.h"
 
@@ -277,7 +278,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
 }
 
-process_t *process_exec(const char *path, int argc, char **argv)
+PROCESS process_exec(const char *path, int argc, char **argv)
 {
     UNUSED(argc);
     UNUSED(argv);
@@ -300,11 +301,16 @@ process_t *process_exec(const char *path, int argc, char **argv)
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 
     ELF_program_t program;
+    
+    atomic_begin();
+
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
         printf("\n");
         load_elfseg(process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
+    
+    atomic_end();
 
     paging_load_directorie(process->pdir);
 

@@ -307,7 +307,7 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
         printf("\n");
-        load_elfseg(process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+        load_elfseg(process, (uint)( buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
     
     atomic_end();
@@ -356,6 +356,15 @@ int process_unmap(process_t *process, uint addr, uint count)
 {
     return memory_unmap(process->pdir, addr, count);
 }
+
+
+/* --- Sheduler ------------------------------------------------------------- */
+
+void sheduler_setup()
+{
+
+}
+
 
 esp_t shedule(esp_t esp, context_t *context)
 {

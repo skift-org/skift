@@ -41,7 +41,6 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-int exec(char *path);
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
@@ -69,10 +68,10 @@ void main(multiboot_info_t *info, s32 magic)
     atomic_enable();
     sti();
 
-    thread_create(time_task);
+    //thread_create(time_task);
     log(KERNEL_UNAME);
 
-    process_exec("application/test-app.app", 0, NULL);
+    //process_exec("application/test-app.app", 0, NULL);
 
     log("kernel running");
 

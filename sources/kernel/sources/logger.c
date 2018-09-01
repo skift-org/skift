@@ -6,14 +6,14 @@
 #include "kernel/logger.h"
 #include "kernel/time.h"
 
-void log(const char *message, ...)
+void __log(const char * file, const char *message, ...)
 {
     va_list va;
     va_start(va, message);
     
-    printf("[%d:%d:%d] ", time_get(TIME_HOUR), time_get(TIME_MINUTE), time_get(TIME_SECOND));
+    printf("[%d:%d:%d] ", time_get(TIME_HOUR), time_get(TIME_MINUTE), time_get(TIME_SECOND), file);
     vprintf(message, va);
-    putchar('\n');
+    printf(" (%s)\n", file);
     
     va_end(va);
 }

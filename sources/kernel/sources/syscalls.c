@@ -9,7 +9,7 @@
 
 int sys_exit(int code)
 {
-    thread_exit(code);
+    process_exit(code);
     return code;
 }
 

@@ -68,6 +68,8 @@ void main(multiboot_info_t *info, s32 magic)
     atomic_enable();
     sti();
 
+    thread_create(process_self(), time_task, NULL, 0);
+
     //thread_create(time_task);
     log(KERNEL_UNAME);
 

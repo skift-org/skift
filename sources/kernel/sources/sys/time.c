@@ -45,11 +45,15 @@ u32 time_get(u32 selector)
 #include <stdio.h>
 #include <string.h>
 #include "devices/vga.h"
+#include "utils.h"
 
 
-void time_task()
+void* time_task(void* arg)
 {
+    UNUSED(arg);
+
     char buffer[80];
+
     while(true)
     {
         memset(buffer, 0, 80);
@@ -62,4 +66,6 @@ void time_task()
             vga_cell(i, 0, vga_entry(buffer[i], vga_white, vga_gray));  
         }
     }
+
+    return NULL;
 }

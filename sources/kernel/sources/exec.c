@@ -1,3 +1,6 @@
+#include "kernel/tasking.h"
+#include "kernel/filesystem.h"
+
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
     log("Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);

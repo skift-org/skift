@@ -18,7 +18,8 @@
         "cpu.h": "c",
         "cmath": "c",
         "bga.h": "c",
-        "paging.h": "c"
+        "paging.h": "c",
+        "time.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

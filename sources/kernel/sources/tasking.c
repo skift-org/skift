@@ -177,7 +177,7 @@ void tasking_setup()
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
 
     
-    // irq_register(0, (irq_handler_t)&shedule);
+    irq_register(0, (irq_handler_t)&shedule);
 }
 
 /* --- Thread managment ----------------------------------------------------- */
@@ -312,7 +312,6 @@ int process_unmap(PROCESS p, uint addr, uint count)
 }
 
 /* --- Sheduler ------------------------------------------------------------- */
-
 
 extern uint ticks;
 

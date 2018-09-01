@@ -1,5 +1,16 @@
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <string.h>
+#include <libelf.h>
+
+#include "sync/atomic.h"
+
+#include "kernel/logger.h"
 #include "kernel/tasking.h"
 #include "kernel/filesystem.h"
+#include "kernel/memory.h"
 
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
@@ -7,8 +18,6 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 
     if (dest >= 0x100000)
     {
-        atomic_begin();
-
         // To avoid pagefault we need to switch page directorie.
         //page_directorie_t *pdir = running->process->pdir;
         paging_load_directorie(process->pdir);
@@ -19,8 +28,6 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         memcpy((void *)dest, (void *)src, srcsz);
 
         paging_load_directorie(memory_kpdir());
-
-        atomic_end();
     }
     else
     {
@@ -51,15 +58,15 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 
     ELF_program_t program;
-    
+
     atomic_begin();
 
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
         printf("\n");
-        load_elfseg(process, (uint)( buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+        load_elfseg(process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
-    
+
     atomic_end();
 
     paging_load_directorie(process->pdir);

@@ -79,7 +79,10 @@ void main(multiboot_info_t *info, s32 magic)
 
     while (true)
     {
-        hlt();
+        for (size_t i = 0; i < 256; i++)
+        {
+            vga_cell(1, 1, vga_entry(i, vga_white, vga_red));
+        }
     };
 
     PANIC("The end of the main function has been reached.");

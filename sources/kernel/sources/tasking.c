@@ -327,6 +327,7 @@ esp_t shedule(esp_t esp, context_t *context)
     list_pushback(waiting, running);
     list_pop(waiting, (void*)&running);
     set_kernel_stack((uint)running->stack + STACK_SIZE);
+    
     paging_load_directorie(running->process->pdir);
 
     // Load the new context

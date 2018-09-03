@@ -1,6 +1,6 @@
-<center>
-  <img src="doc/logo/logo256.png">
-</center>
+<p align="center">
+    <img src="doc/logo/logo256.png">
+</p>
 
 # About skift**OS**
 
@@ -31,13 +31,7 @@ The userspace api
 ## `TOOLS` manual
 
 ```shell
-./TOOLS build test-app
-
-./TOOLS clean test-app
-
-./TOOLS rebuild test-app
-
-./TOOLS run test-app
+./TOOLS <action>
 ```
 
 ```shell
@@ -48,6 +42,20 @@ The userspace api
 ./TOOLS rebuildall
 
 ./TOOLS run
+```
+
+```shell
+./TOOLS <action> <target>
+```
+
+```shell
+./TOOLS build test-app
+
+./TOOLS clean test-app
+
+./TOOLS rebuild test-app
+
+./TOOLS run test-app
 ```
 
 ## About `manifest.json`
@@ -74,6 +82,23 @@ The userspace api
 
 ```c
 #include <skift/io.h>
+```
+
+```c
+typedef unsigned int FILE
+
+FILE sk_file_open(const char * path, int flags)
+void sk_file_close(FILE file)
+
+void sk_file_read()
+void sk_file_write()
+```
+
+```c
+typedef unsigned int DIRECTORY
+
+DIRECTORY sk_directory_open(const char * path, int flags)
+void sk_directory_close(DIRECTORY directory)
 ```
 
 ## Threads, process, and mutex

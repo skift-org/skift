@@ -43,13 +43,12 @@ typedef enum
 
 typedef struct
 {
-    int id;
-    char name[PROCNAME_SIZE];
+    int id;                   // Unique handle to the process
+    char name[PROCNAME_SIZE]; // Frendly name of the process
     int flags;
-    list_t *threads;
-    page_directorie_t *pdir;
-
-    process_state_t state;
+    list_t *threads;         // Child threads
+    page_directorie_t *pdir; // Page directorie
+    process_state_t state;   // State of the process (RUNNING, CANCELED)
 } process_t;
 
 typedef struct
@@ -100,4 +99,4 @@ int process_map(PROCESS p, uint addr, uint count);   // Map memory to the proces
 int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
 
 // Load and run a ELF file from the file system.
-PROCESS process_exec(const char *filename, int argc, char **argv); 
+PROCESS process_exec(const char *filename, int argc, char **argv);

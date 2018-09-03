@@ -156,6 +156,23 @@ process_t *process_get(PROCESS process)
     return NULL;
 }
 
+void notfy_threads(bool is_thread, int handle, int outcode)
+{
+    FOREACH(i, threads)
+    {
+        thread_t *thread = i->value;
+
+        bool is_waiting = (thread->state == THREAD_WAIT_THREAD  &&  is_thread) ||
+                          (thread->state == THREAD_WAIT_PROCESS && !is_thread);
+
+        if (is_waiting && thread->waitinfo.handle == handle)
+        {
+            *thread->waitinfo.outcode = outcode;
+            thread->state = THREAD_RUNNING;
+        }
+    }
+}
+
 /* --- Public functions ----------------------------------------------------- */
 
 PROCESS kernel_process;
@@ -176,7 +193,7 @@ void tasking_setup()
 
     kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-    
+
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -222,25 +239,34 @@ int thread_cancel(THREAD t)
 {
     atomic_begin();
 
-    thread_t * thread = thread_get(t);
-    thread->state = THREAD_CANCELED;
+    thread_t *thread;
+
+    if ((thread = thread_get(t)))
+    {
+        thread->state = THREAD_CANCELED;
+        notfy_threads(1, thread_self(), 0);
+        log("Thread n°%d got canceled.", t);
+    }
 
     atomic_end();
 
-    return 1;
+    return thread == NULL; // return 1 if canceling the thread failled!
 }
 
 void thread_exit(void *retval)
 {
-    UNUSED(retval);
+    atomic_begin();
 
-    thread_cancel(thread_self());
-    asm("int $32"); // yield
+    thread_t *thread = thread_get(thread_self());
+    thread->state = THREAD_CANCELED;
+    notfy_threads(1, thread_self(), (int)retval);
+
+    log("Thread n°%d exited with value 0x%x.", thread->id, retval);
+
+    atomic_end();
 
     while (1)
-    {
         hlt();
-    };
 }
 
 /* --- Process managment ---------------------------------------------------- */
@@ -268,22 +294,26 @@ void process_cancel(PROCESS p)
 {
     atomic_begin();
 
-    process_t * process = process_get(p);
-
-    FOREACH(i, process->threads)
+    if (p != kernel_process)
     {
-        thread_cancel(((thread_t*)i->value)->id);
-    }
 
-    process->state = PROCESS_CANCELED;
+        process_t *process = process_get(p);
+        process->state = PROCESS_CANCELED;
+        notfy_threads(0, p, -1);
+
+        log("Process '%s' ID=%d canceled!", process->name, process->id);
+    }
+    else
+    {
+        process_t *process = process_get(process_self());
+        log("Warning! Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process_self());
+    }
 
     atomic_end();
 }
 
 void process_exit(int code)
 {
-    UNUSED(code);
-
     atomic_begin();
 
     PROCESS p = process_self();
@@ -291,26 +321,21 @@ void process_exit(int code)
 
     if (p != kernel_process)
     {
-        process_cancel(p);
+        process->state = PROCESS_CANCELED;
+        log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
+
+        // Notify waiting thread that we exited.
+        notfy_threads(0, p, code);
     }
     else
     {
-        log("Kernel try to commit suicide!");
+        log("Warning! Kernel try to commit suicide!");
     }
-
-    FOREACH(i, threads)
-    {
-        thread_t * thread = i->value;
-        if (thread->state == THREAD_WAIT_PROCESS && thread->waitinfo.handle == p)
-        {
-            *thread->waitinfo.outcode = code;
-            thread->state == THREAD_RUNNING;
-        }
-    }
-
-    log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
     atomic_end();
+
+    while (1)
+        hlt();
 }
 
 int process_map(PROCESS p, uint addr, uint count)
@@ -337,9 +362,9 @@ esp_t shedule(esp_t esp, context_t *context)
     running->esp = esp;
 
     list_pushback(waiting, running);
-    list_pop(waiting, (void*)&running);
+    list_pop(waiting, (void *)&running);
     set_kernel_stack((uint)running->stack + STACK_SIZE);
-    
+
     paging_load_directorie(running->process->pdir);
 
     // Load the new context

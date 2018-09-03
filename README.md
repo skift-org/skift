@@ -1,7 +1,9 @@
-
-![logo](doc/logo/logo256.png)
+<center>
+  <img src="doc/logo/logo256.png">
+</center>
 
 # About skift**OS**
+
 ## Build infrastructure, kernel, and userspace
 
 skift**OS** is a handmade operating system build from scratch.

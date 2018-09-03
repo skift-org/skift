@@ -12,6 +12,8 @@
 #define PROCNAME_SIZE 128
 #define STACK_SIZE 4096
 
+#define TASK_USER 1
+
 typedef int THREAD;
 typedef int PROCESS;
 
@@ -39,14 +41,18 @@ typedef struct
 {
     int id;
     char name[PROCNAME_SIZE];
-    bool user;
+    int flags;
     list_t *threads;
     page_directorie_t *pdir;
 
     process_state_t state;
-    int exitcode;
-    int waithandle;
 } process_t;
+
+typedef struct 
+{
+    int handle;
+    int * outcode;
+} wait_info_t;
 
 typedef struct
 {
@@ -58,8 +64,7 @@ typedef struct
     void *stack;
 
     thread_state_t state;
-    void * exitvalue;
-    int waithandle;
+    wait_info_t waitinfo;
 } thread_t;
 
 void tasking_setup();
@@ -69,24 +74,26 @@ void tasking_setup();
 THREAD thread_self();
 
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
+
 int thread_cancel(THREAD t);
 void thread_exit(void *retval);
+
+void thread_sleep();
+void thread_wakeup(THREAD t);
+
 void *thread_wait(THREAD t);
-void thread_sleep(int time);
+int thread_waitproc(PROCESS p);
+
 
 /* --- Process managment ---------------------------------------------------- */
 
 PROCESS process_self();
 
-PROCESS process_create(const char *name, int user);
-
-PROCESS process_exec(const char *filename, int argc, char **argv);
-
+PROCESS process_create(const char *name, int flags);
 void process_cancel(PROCESS p);
 void process_exit(int code);
-int process_wait(PROCESS p);
-void process_sleep(int time);
 
-// Process memory managment
 int process_map(PROCESS p, uint addr, uint count);
 int process_unmap(PROCESS p, uint addr, uint count);
+
+PROCESS process_exec(const char *filename, int argc, char **argv);

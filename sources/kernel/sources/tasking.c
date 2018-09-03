@@ -25,7 +25,7 @@ int TID = 0;
 list_t *threads;
 list_t *processes;
 
-thread_t *alloc_thread(thread_entry_t entry, int user)
+thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
     thread_t *thread = (thread_t *)malloc(sizeof(thread_t));
     memset(thread, 0, sizeof(thread_t));
@@ -43,7 +43,7 @@ thread_t *alloc_thread(thread_entry_t entry, int user)
     context->eflags = 0x202;
     context->eip = (u32)entry;
 
-    if (user)
+    if (flags & TASK_USER)
     {
         context->cs = 0x18;
         context->ds = 0x20;
@@ -65,17 +65,17 @@ thread_t *alloc_thread(thread_entry_t entry, int user)
     return thread;
 }
 
-process_t *alloc_process(const char *name, int user)
+process_t *alloc_process(const char *name, int flags)
 {
     process_t *process = (process_t *)malloc(sizeof(process_t));
 
     process->id = PID++;
 
     strncpy(process->name, name, PROCNAME_SIZE);
-    process->user = user;
+    process->flags = flags;
     process->threads = list_alloc();
 
-    if (user)
+    if (flags & TASK_USER)
     {
         process->pdir = memory_alloc_pdir();
     }
@@ -168,14 +168,14 @@ esp_t shedule(esp_t esp, context_t *context);
 
 void tasking_setup()
 {
+    running = NULL;
+
     waiting = list_alloc();
     threads = list_alloc();
     processes = list_alloc();
 
-
     kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-
     
     irq_register(0, (irq_handler_t)&shedule);
 }
@@ -195,7 +195,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
     atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *thread = alloc_thread(entry, 0);
+    thread_t *thread = alloc_thread(entry, process->flags | flags);
 
     list_pushback(process->threads, thread);
     thread->process = process;
@@ -250,11 +250,11 @@ PROCESS process_self()
     return running->process->id;
 }
 
-PROCESS process_create(const char *name, int user)
+PROCESS process_create(const char *name, int flags)
 {
     atomic_begin();
 
-    process_t *process = alloc_process(name, user);
+    process_t *process = alloc_process(name, flags);
     list_pushback(processes, process);
 
     atomic_end();
@@ -275,6 +275,8 @@ void process_cancel(PROCESS p)
         thread_cancel(((thread_t*)i->value)->id);
     }
 
+    process->state = PROCESS_CANCELED;
+
     atomic_end();
 }
 
@@ -287,8 +289,6 @@ void process_exit(int code)
     PROCESS p = process_self();
     process_t *process = process_get(p);
 
-    process->exitcode = code;
-
     if (p != kernel_process)
     {
         process_cancel(p);
@@ -297,6 +297,18 @@ void process_exit(int code)
     {
         log("Kernel try to commit suicide!");
     }
+
+    FOREACH(i, threads)
+    {
+        thread_t * thread = i->value;
+        if (thread->state == THREAD_WAIT_PROCESS && thread->waitinfo.handle == p)
+        {
+            *thread->waitinfo.outcode = code;
+            thread->state == THREAD_RUNNING;
+        }
+    }
+
+    log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
     atomic_end();
 }

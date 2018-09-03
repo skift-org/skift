@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define KERNEL_VERSION __kernel_version_format, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
 #define KERNEL_UNAME __kernel_uname_format, __kernel_name, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
 

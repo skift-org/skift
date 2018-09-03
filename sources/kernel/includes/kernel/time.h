@@ -1,4 +1,9 @@
 #pragma once
+
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include "types.h"
 
 #define TIME_SECOND 0x00

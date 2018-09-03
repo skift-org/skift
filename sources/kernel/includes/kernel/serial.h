@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 void serial_setup();
 
 void serial_putc(char c);

@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <stdbool.h>
 
 #include "types.h"
@@ -33,7 +37,7 @@ typedef enum
 
     THREAD_WAIT_THREAD,
     THREAD_WAIT_PROCESS,
-    
+
     THREAD_CANCELED,
 } thread_state_t;
 
@@ -48,10 +52,10 @@ typedef struct
     process_state_t state;
 } process_t;
 
-typedef struct 
+typedef struct
 {
     int handle;
-    int * outcode;
+    int *outcode;
 } wait_info_t;
 
 typedef struct
@@ -71,29 +75,29 @@ void tasking_setup();
 
 /* --- Thread managment ----------------------------------------------------- */
 
-THREAD thread_self();
+THREAD thread_self(); // Return a handle to the current thread.
 
+// Create a new thread of a selected process.
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
 
-int thread_cancel(THREAD t);
-void thread_exit(void *retval);
-
-void thread_sleep();
-void thread_wakeup(THREAD t);
-
-void *thread_wait(THREAD t);
-int thread_waitproc(PROCESS p);
-
+int thread_cancel(THREAD t);    // Cancel the selected thread.
+void thread_exit(void *retval); // Exit the current thread and return a value.
+void thread_sleep();            // Send the current thread to bed.
+void thread_wakeup(THREAD t);   // Wake up the slected thread
+void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
+int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.
 
 /* --- Process managment ---------------------------------------------------- */
 
-PROCESS process_self();
+PROCESS process_self(); // Return a handler to the current process.
 
+// Create a new process.
 PROCESS process_create(const char *name, int flags);
-void process_cancel(PROCESS p);
-void process_exit(int code);
 
-int process_map(PROCESS p, uint addr, uint count);
-int process_unmap(PROCESS p, uint addr, uint count);
+void process_cancel(PROCESS p);                      // Cancle the selected process.
+void process_exit(int code);                         // Exit the current process and send and exit code.
+int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
+int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
 
-PROCESS process_exec(const char *filename, int argc, char **argv);
+// Load and run a ELF file from the file system.
+PROCESS process_exec(const char *filename, int argc, char **argv); 

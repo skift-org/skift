@@ -41,6 +41,33 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
+int k = 0;
+
+void *test(void *arg)
+{
+    UNUSED(arg);
+
+    atomic_begin();
+    int myk = k++;
+    atomic_end();
+
+    while (true)
+    {
+        for (size_t i = 0; i < 256; i++)
+        {
+            
+            for(size_t j = 0; j < 8; j++)
+            {
+                /* code */
+            vga_cell(8 + myk, 4 + j, vga_entry((i  + j), (vga_white + myk), (vga_red + myk)));
+            }
+            
+        }
+    };
+
+    return NULL;
+}
+
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
@@ -64,26 +91,28 @@ void main(multiboot_info_t *info, s32 magic)
     setup(filesystem);
     setup(modules, &mbootinfo);
 
-    boot_screen("Welcome!");
-    atomic_enable();
-    sti();
 
     thread_create(process_self(), time_task, NULL, 0);
 
-    //thread_create(time_task);
     log(KERNEL_UNAME);
 
     //process_exec("application/test-app.app", 0, NULL);
 
     log("kernel running");
 
-    while (true)
+    for (size_t i = 0; i < 10; i++)
     {
-        for (size_t i = 0; i < 256; i++)
-        {
-            vga_cell(1, 1, vga_entry(i, vga_white, vga_red));
-        }
-    };
+        /* code */
+        thread_create(process_self(), test, NULL, 0);
+    }
+
+    atomic_enable();
+    sti();
+
+    boot_screen("Welcome!");
+
+    while (1)
+        ;
 
     PANIC("The end of the main function has been reached.");
 }

@@ -86,6 +86,9 @@ void thread_wakeup(THREAD t);   // Wake up the slected thread
 void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
 int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.
 
+void thread_dump_all();
+void thread_dump(THREAD t);
+
 /* --- Process managment ---------------------------------------------------- */
 
 PROCESS process_self(); // Return a handler to the current process.

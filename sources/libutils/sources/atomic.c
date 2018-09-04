@@ -9,6 +9,11 @@ void atomic_enable()
     is_atomic_enable = true;
 }
 
+void atomic_disable()
+{
+    is_atomic_enable = false;
+}
+
 void atomic_begin()
 {
     if (is_atomic_enable)

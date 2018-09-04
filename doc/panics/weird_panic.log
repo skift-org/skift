@@ -1,0 +1,45 @@
+This panic after some time running the kernel (stack coruption ?)
+
+--- !!! ------------------------------------------------------------------------
+
+        KERNEL PANIC
+        // ...
+
+        CPU EXCEPTION: 'General protection fault' (INT:13 ERR:85D8) !
+        at sources/kernel/sources/cpu/isr.c isr_handler() ln86
+
+        Diagnostic:
+        The system was running for 30988 tick.
+
+        GS=10 FS=10 ES=10 DS=10
+        EDI=1B600 ESI=1F EBP=0 USELESS=2B5DD4
+        EAX=2B5DE8 EBX=1B ECX=2B7040 EDX=20
+        INTNO=D ERRCODE=85D8 EIP=10561E CS=8 FLAGS=216
+        CR0=80000011 CR2=0 CR3=119000 CR4=0
+
+        System halted!
+
+// Code where the fault occure
+00105600 <irq_common>:
+  105600:	60                   	pusha  
+  105601:	1e                   	push   ds
+  105602:	06                   	push   es
+  105603:	0f a0                	push   fs
+  105605:	0f a8                	push   gs
+  105607:	66 b8 10 00          	mov    ax,0x10
+  10560b:	8e d8                	mov    ds,eax
+  10560d:	8e c0                	mov    es,eax
+  10560f:	8e e0                	mov    fs,eax
+  105611:	8e e8                	mov    gs,eax
+  105613:	fc                   	cld    
+  105614:	89 e0                	mov    eax,esp
+  105616:	54                   	push   esp
+  105617:	e8 04 f2 ff ff       	call   104820 <irq_handler>
+  10561c:	89 c4                	mov    esp,eax
+  10561e:	0f a9                	pop    gs
+  105620:	0f a1                	pop    fs
+  105622:	07                   	pop    es
+  105623:	1f                   	pop    ds
+  105624:	61                   	popa   
+  105625:	83 c4 08             	add    esp,0x8
+  105628:	cf                   	iret   

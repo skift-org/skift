@@ -33,15 +33,18 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
     thread->id = TID++;
 
     thread->stack = malloc(STACK_SIZE);
+    memset(thread->stack, 0, STACK_SIZE);
+
     thread->entry = entry;
 
-    thread->esp = ((uint)thread->stack + STACK_SIZE);
+    thread->esp = ((uint)(thread->stack) + STACK_SIZE);
     thread->esp -= sizeof(context_t);
 
     context_t *context = (context_t *)thread->esp;
 
     context->eflags = 0x202;
     context->eip = (u32)entry;
+    context->ebp = ((uint)thread->stack + STACK_SIZE);
 
     if (flags & TASK_USER)
     {
@@ -60,7 +63,7 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
         context->gs = 0x10;
     }
 
-    log("Thread with ID=%d allocated.", thread->id);
+    log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
 
     return thread;
 }
@@ -156,7 +159,7 @@ process_t *process_get(PROCESS process)
     return NULL;
 }
 
-void notfy_threads(bool is_thread, int handle, int outcode)
+void notify_threads(bool is_thread, int handle, int outcode)
 {
     FOREACH(i, threads)
     {
@@ -178,10 +181,20 @@ void notfy_threads(bool is_thread, int handle, int outcode)
 PROCESS kernel_process;
 THREAD kernel_thread;
 
-thread_t *running;
+thread_t *running = NULL;
 list_t *waiting;
 
 esp_t shedule(esp_t esp, context_t *context);
+
+void timer_set_frequency(int hz)
+{
+    u32 divisor = 1193180 / hz;
+    outb(0x43, 0x36);
+    outb(0x40, divisor & 0xFF);
+    outb(0x40, (divisor >> 8) & 0xFF);
+
+    log("Timer frequency is %dhz.", hz);
+}
 
 void tasking_setup()
 {
@@ -194,6 +207,8 @@ void tasking_setup()
     kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
 
+
+    timer_set_frequency(1000);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -201,13 +216,13 @@ void tasking_setup()
 
 THREAD thread_self()
 {
+    if (running == NULL) return -1;
     return running->id;
 }
 
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 {
     UNUSED(arg);
-    UNUSED(flags);
 
     atomic_begin();
 
@@ -215,6 +230,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
     thread_t *thread = alloc_thread(entry, process->flags | flags);
 
     list_pushback(process->threads, thread);
+    list_pushback(threads, thread);
     thread->process = process;
 
     if (running)
@@ -230,7 +246,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     atomic_end();
 
-    log("Thread with ID=%d is running.", thread->id);
+    log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
 
     return thread->id;
 }
@@ -244,7 +260,7 @@ int thread_cancel(THREAD t)
     if ((thread = thread_get(t)))
     {
         thread->state = THREAD_CANCELED;
-        notfy_threads(1, thread_self(), 0);
+        notify_threads(1, thread_self(), 0);
         log("Thread n°%d got canceled.", t);
     }
 
@@ -259,7 +275,7 @@ void thread_exit(void *retval)
 
     thread_t *thread = thread_get(thread_self());
     thread->state = THREAD_CANCELED;
-    notfy_threads(1, thread_self(), (int)retval);
+    notify_threads(1, thread_self(), (int)retval);
 
     log("Thread n°%d exited with value 0x%x.", thread->id, retval);
 
@@ -269,10 +285,37 @@ void thread_exit(void *retval)
         hlt();
 }
 
+void thread_dump_all()
+{
+    atomic_begin();
+
+    printf("\n\tThreads:");
+
+    FOREACH(i, threads)
+    {
+        thread_dump(((thread_t*) i->value)->id);
+    }
+    
+    atomic_end();
+}
+
+void thread_dump(THREAD t)
+{
+    atomic_begin();
+
+    thread_t * thread = thread_get(t);
+
+    printf("\n\tThread ID=%d child of process '%s' ID=%d.", t, thread->process->name, thread->process->id);
+    printf("(ESP=0x%x STATE=%x)", thread->esp, thread->state);
+    
+    atomic_end();
+}
+
 /* --- Process managment ---------------------------------------------------- */
 
 PROCESS process_self()
 {
+    if (running == NULL) return -1;
     return running->process->id;
 }
 
@@ -299,7 +342,7 @@ void process_cancel(PROCESS p)
 
         process_t *process = process_get(p);
         process->state = PROCESS_CANCELED;
-        notfy_threads(0, p, -1);
+        notify_threads(0, p, -1);
 
         log("Process '%s' ID=%d canceled!", process->name, process->id);
     }
@@ -325,7 +368,7 @@ void process_exit(int code)
         log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         // Notify waiting thread that we exited.
-        notfy_threads(0, p, code);
+        notify_threads(0, p, code);
     }
     else
     {
@@ -350,7 +393,7 @@ int process_unmap(PROCESS p, uint addr, uint count)
 
 /* --- Sheduler ------------------------------------------------------------- */
 
-extern uint ticks;
+uint ticks = 0;
 
 esp_t shedule(esp_t esp, context_t *context)
 {
@@ -363,7 +406,7 @@ esp_t shedule(esp_t esp, context_t *context)
 
     list_pushback(waiting, running);
     list_pop(waiting, (void *)&running);
-    set_kernel_stack((uint)running->stack + STACK_SIZE);
+    //set_kernel_stack((uint)running->stack + STACK_SIZE);
 
     paging_load_directorie(running->process->pdir);
 

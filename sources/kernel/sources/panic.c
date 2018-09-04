@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "kernel/system.h"
 #include "devices/timer.h"
+#include "kernel/tasking.h"
+#include "sync/atomic.h"
 
 const char *const witty_comments[] =
 {
@@ -26,22 +28,31 @@ const char *const witty_comments[] =
     "Suspicious pointer corrupted the machine."
 };
 
+extern uint ticks;
+
 void __panic(const string file, const string function, const int line, context_t *context, string message, ...)
 {
+    
     cli();
+    atomic_disable();
+    
     va_list va;
     va_start(va, message);
 
     printf("\n--- !!! ------------------------------------------------------------------------\n");
 
-    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t", witty_comments[timer_get_ticks() % (9 + 4)]);
+    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t", witty_comments[ticks % (9 + 4)]);
 
     vprintf(message, va);
     printf("\n\tat %s %s() ln%d", file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", timer_get_ticks());
+    printf("\n\tThe system was running for %d tick.", ticks);
+    thread_dump(thread_self());
+    printf("\n");
+
+    thread_dump_all();
     printf("\n\n");
 
     if (context != NULL)

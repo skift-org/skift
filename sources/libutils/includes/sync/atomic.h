@@ -2,5 +2,6 @@
 #include "types.h"
 
 void atomic_enable();
+void atomic_disable();
 void atomic_begin();
 void atomic_end();

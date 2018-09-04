@@ -19,7 +19,8 @@
         "cmath": "c",
         "bga.h": "c",
         "paging.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "atomic.h": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {

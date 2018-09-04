@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-The skiftOS build system
+S.O.S.B.S: The (S)kift(O)(S) (B)uild (S)ystem
 """
 
 from pprint import pprint
@@ -125,7 +125,7 @@ def rebuild_all(targets):
 
 def help_command(targets):
     """Show this help message."""
-    print(BRIGHT_BLUE + "The skiftOS's build system." + "\n")
+    print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + "\n")
 
     print(BRIGHT_WHITE + "Usage :" + RESET + " ./tools [action] targets...")
     print("        ./tools [global action]")
@@ -143,7 +143,7 @@ def help_command(targets):
 
 def list_command(targets):
     """List all available targets."""
-    print(','.join(targets.keys()))
+    print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
 
 
 global_actions = \
@@ -159,6 +159,10 @@ global_actions = \
 
 # --- Main ------------------------------------------------------------------- #
 
+def missing_command(command):
+    print(BRIGHT_RED + "ERROR: " + RESET + "No action named '%s'!" % command)
+    print(BRIGHT_WHITE + "See: " + RESET + "./tools help.")
+
 def main(argc, argv):
 
     targets = list_targets("sources")
@@ -166,16 +170,24 @@ def main(argc, argv):
     if (argc >= 2):
         action = argv[1]
         
-        if action in actions:
-            #do it
-            pass
+        if action in actions:       
+            if argc < 3:
+                print(BRIGHT_RED + "ERROR: " + RESET + "No target specified!")
+            else:
+                target = argv[2]
+
+                if target in targets:
+                    actions[action](targets[target], targets)
+                else:
+                    print(BRIGHT_RED + "ERROR: " + RESET + "No target named '%s'!" % target)
+
+        elif action in global_actions:
+            global_actions[action](targets)
+
         else:
-            print(BRIGHT_RED + "ERROR: " + RESET + "No action named '%s'!" % action)
-            print(BRIGHT_WHITE + "See: " + RESET + "./tools help.")
+            missing_command
     else:
         help_command(targets)
-
-    pprint(argv)
 
 if __name__ == '__main__':
     main(len(sys.argv), sys.argv)

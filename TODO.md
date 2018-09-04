@@ -2,7 +2,7 @@
 
 ## Libs
 
-- [ ] libc
+- [ ] libc (wip)
 - [ ] libgfx
 - [ ] libui
 
@@ -11,7 +11,7 @@
 - [x] IDT, GDT, IRQ and ISR
 - [x] Pagging
 - [x] Memory managment
-- [x] Tasking
+- [ ] Tasking (wip)
 - [x] ATA pio driver
 - [x] RAM disk
 - [ ] Virtual file system (WIP)

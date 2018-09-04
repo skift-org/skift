@@ -1,4 +1,6 @@
 This panic after some time running the kernel (stack coruption ?)
+It's seem like the stask start to be share by multiple processes :/
+Maybe a bug in the list data structure
 
 --- !!! ------------------------------------------------------------------------
 

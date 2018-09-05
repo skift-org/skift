@@ -46,7 +46,7 @@ irq_common:
     popad
     
     add esp, 8 ; pop errcode and int number
-    
+
     iret
 
 IRQ 0 

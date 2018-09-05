@@ -100,7 +100,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     log("kernel running");
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 60; i++)
     {
         /* code */
         thread_create(process_self(), test, NULL, 0);

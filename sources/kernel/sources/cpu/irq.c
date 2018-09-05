@@ -5,6 +5,9 @@
 #include "cpu/irq.h"
 #include "cpu/idt.h"
 
+#include "sync/atomic.h"
+#include "kernel/logger.h"
+
 extern u32 irq_vector[];
 extern bool console_bypass_lock;
 irq_handler_t irq_handlers[16];
@@ -30,15 +33,17 @@ irq_handler_t irq_register(int index, irq_handler_t handler)
 
 esp_t irq_handler(esp_t esp, context_t context)
 {
+    atomic_begin();
+
+    //log("IRQ begin!");
+
     if (irq_handlers[context.int_no] != NULL)
     {
         esp = irq_handlers[context.int_no](esp, &context);
     }
     else
     {
-        // console_bypass_lock = true;
-        // debug("Unhandeled IRQ %d!", context.int_no);
-        // console_bypass_lock = false;
+        log("Unhandeled IRQ %d!", context.int_no);
     }
 
     if (context.int_no >= 8)
@@ -49,5 +54,9 @@ esp_t irq_handler(esp_t esp, context_t context)
     outb(0x20, 0x20);
 
     // this is only use for task switching.
+
+    //log("IRQ end!");
+
+    atomic_end();
     return esp;
 }

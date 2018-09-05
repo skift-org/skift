@@ -9,7 +9,7 @@
 #define DPL_USER   0b01100000 // ring 1
 
 #define INTGATE  0x8E
-#define TRAPGATE 0xEF
+#define TRAPGATE 0x8F
 #define IDT_ENTRY_COUNT 256
 
 typedef void (*int_handler_t)(context_t * states);

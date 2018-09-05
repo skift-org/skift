@@ -214,8 +214,9 @@ void tasking_setup()
     thread_t *kthread = thread_get(kernel_thread);
     free(kthread->stack);
     kthread->stack = &__stack_bottom;
+    kthread->esp = ((uint)(kthread->stack) + STACK_SIZE);
 
-    timer_set_frequency(1000);
+    timer_set_frequency(200);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -418,7 +419,8 @@ esp_t shedule(esp_t esp, context_t *context)
 {
     ticks++;
 
-    UNUSED(context);
+    int delta = (running->esp - esp);
+    printf("ID=%d esp=%x -> %x (%d) EIP=%x\n", running->id, running->esp, esp, delta, context->eip);
 
     // Save the old context
     running->esp = esp;
@@ -427,10 +429,10 @@ esp_t shedule(esp_t esp, context_t *context)
     list_pushback(waiting, running);
     list_pop(waiting, (void *)&running);
 
-    set_kernel_stack((uint)running->stack + STACK_SIZE);
-
-    paging_load_directorie(running->process->pdir);
 
     // Load the new context
+    set_kernel_stack((uint)running->stack + STACK_SIZE);
+    paging_load_directorie(running->process->pdir);
+
     return running->esp;
 }

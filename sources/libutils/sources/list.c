@@ -117,7 +117,7 @@ int list_pop(list_t *list, void **value)
         list->count--;
     }
 
-    *value = item->value;
+    *(value) = item->value;
     free(item);
 
     return 1;
@@ -163,7 +163,7 @@ int list_popback(list_t *list, void **value)
         list->count--;
     }
 
-    *value = item->value;
+    *(value) = item->value;
     free(item);
 
     return 1;

@@ -51,17 +51,18 @@ void *test(void *arg)
     int myk = k++;
     atomic_end();
 
+    //printf("my k is %d\n", myk);
+
     while (true)
     {
         for (size_t i = 0; i < 256; i++)
         {
-            
-            for(size_t j = 0; j < 8; j++)
+
+            for (size_t j = 0; j < 8; j++)
             {
                 /* code */
-            vga_cell(8 + myk, 4 + j, vga_entry((i  + j), (vga_white + myk), (vga_red + myk)));
+                vga_cell(8 + myk, 4 + j, vga_entry(i + j, vga_white + myk, vga_red + myk));
             }
-            
         }
     };
 
@@ -90,7 +91,6 @@ void main(multiboot_info_t *info, s32 magic)
     setup(tasking);
     setup(filesystem);
     setup(modules, &mbootinfo);
-
 
     thread_create(process_self(), time_task, NULL, 0);
 

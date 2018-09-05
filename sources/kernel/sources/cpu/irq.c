@@ -14,10 +14,10 @@ irq_handler_t irq_handlers[16];
 
 void irq_setup()
 {
-    for(u32 i = 0; i < 16; i++)
+    for (u32 i = 0; i < 16; i++)
     {
         idt_entry(32 + i, irq_vector[i], 0x08, INTGATE);
-    }   
+    }
 }
 
 irq_handler_t irq_register(int index, irq_handler_t handler)
@@ -35,8 +35,6 @@ esp_t irq_handler(esp_t esp, context_t context)
 {
     atomic_begin();
 
-    //log("IRQ begin!");
-
     if (irq_handlers[context.int_no] != NULL)
     {
         esp = irq_handlers[context.int_no](esp, &context);
@@ -53,10 +51,7 @@ esp_t irq_handler(esp_t esp, context_t context)
 
     outb(0x20, 0x20);
 
-    // this is only use for task switching.
-
-    //log("IRQ end!");
-
     atomic_end();
+
     return esp;
 }

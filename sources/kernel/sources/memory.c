@@ -43,7 +43,6 @@ int physical_is_used(uint addr, uint count)
 
 void physical_set_used(uint addr, uint count)
 {
-    log("P_S_USED ADDR=0x%x COUNT=%d", addr, count);
     for (uint i = 0; i < count; i++)
     {
         PHYSICAL_SET_USED(addr + (i * PAGE_SIZE));
@@ -52,7 +51,6 @@ void physical_set_used(uint addr, uint count)
 
 void physical_set_free(uint addr, uint count)
 {
-    log("P_S_FREE ADDR=%d COUNT=%d", addr, count);
     for (uint i = 0; i < count; i++)
     {
         PHYSICAL_SET_FREE(addr + (i * PAGE_SIZE));
@@ -61,7 +59,6 @@ void physical_set_free(uint addr, uint count)
 
 uint physical_alloc(uint count)
 {
-    log("PALLOC COUNT=%d", count);
     for (uint i = 0; i < (TOTAL_MEMORY / PAGE_SIZE); i++)
     {
         uint addr = i * PAGE_SIZE;
@@ -156,8 +153,6 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
-
-    log("VMAP VADDR=0x%x PADDR=0x%x COUNT=%d", vaddr, paddr, count);
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;

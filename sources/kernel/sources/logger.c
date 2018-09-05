@@ -4,14 +4,14 @@
 
 #include <stdio.h>
 #include "kernel/logger.h"
-#include "kernel/time.h"
+#include "kernel/clock.h"
 
 void __log(const char * file, const char *message, ...)
 {
     va_list va;
     va_start(va, message);
     
-    printf("[%d:%d:%d] ", time_get(TIME_HOUR), time_get(TIME_MINUTE), time_get(TIME_SECOND), file);
+    printf("[%d:%d:%d] ", clock_read(T_HOUR), clock_read(T_MINUTE), clock_read(T_SECOND), file);
     vprintf(message, va);
     printf(" (%s)\n", file);
     

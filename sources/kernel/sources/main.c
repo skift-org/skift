@@ -21,19 +21,11 @@
 #include "kernel/multiboot.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/time.h"
 #include "kernel/version.h"
 
 #include "sync/atomic.h"
 
 multiboot_info_t mbootinfo;
-
-void boot_screen(string msg)
-{
-    vga_clear(vga_white, vga_black);
-    vga_text(36, 11, __kernel_name, vga_light_blue, vga_black);
-    vga_text(40 - strlen(msg) / 2, 13, msg, vga_white, vga_black);
-}
 
 extern int __end;
 uint get_kernel_end(multiboot_info_t *minfo)
@@ -58,10 +50,9 @@ void *test(void *arg)
         for (size_t i = 0; i < 256; i++)
         {
 
-            for (size_t j = 0; j < 8; j++)
+            for (size_t j = 0; j < 25; j++)
             {
-                /* code */
-                vga_cell(8 + myk, 4 + j, vga_entry(i + j, vga_white + myk, vga_red + myk));
+                vga_cell(myk, j, vga_entry(j + (myk * 25), vga_white + myk, vga_red + myk));
             }
         }
     };
@@ -72,7 +63,6 @@ void *test(void *arg)
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
-    boot_screen("Booting...");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
@@ -92,27 +82,15 @@ void main(multiboot_info_t *info, s32 magic)
     setup(filesystem);
     setup(modules, &mbootinfo);
 
-    thread_create(process_self(), time_task, NULL, 0);
-
     log(KERNEL_UNAME);
-
-    //process_exec("application/test-app.app", 0, NULL);
-
-    log("kernel running");
-
-    for (size_t i = 0; i < 60; i++)
-    {
-        /* code */
-        thread_create(process_self(), test, NULL, 0);
-    }
-
+ 
     atomic_enable();
     sti();
 
-    boot_screen("Welcome!");
+    for (size_t i = 0; i < 80; i++)
+        thread_create(process_self(), test, NULL, 0);
 
-    while (1)
-        ;
+    while(1);
 
     PANIC("The end of the main function has been reached.");
 }

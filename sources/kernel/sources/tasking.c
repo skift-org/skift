@@ -216,7 +216,7 @@ void tasking_setup()
     kthread->stack = &__stack_bottom;
     kthread->esp = ((uint)(kthread->stack) + STACK_SIZE);
 
-    timer_set_frequency(500);
+    timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -421,8 +421,8 @@ esp_t shedule(esp_t esp, context_t *context)
 
     UNUSED(context);
 
-    //int delta = (running->esp - esp);
-    //printf("esp=%x -> %x (%d) EIP=%x ID=%d\n", running->esp, esp, delta, context->eip, running->id);
+    // int delta = (running->esp - esp);
+    // printf("esp=%x -> %x (%d) EIP=%x ID=%d\n", running->esp, esp, delta, context->eip, running->id);
 
     // Save the old context
     running->esp = esp;

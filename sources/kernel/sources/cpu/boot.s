@@ -19,9 +19,12 @@ align 4
 ; The multiboot header
 section .bss
 align 16
-stack_bottom:
+
+global __stack_bottom
+global __stack_top
+__stack_bottom:
 resb 16384 ; 16 KiB
-stack_top:
+__stack_top:
 
 section .text
 global _start:function (_start.end - _start)
@@ -29,7 +32,7 @@ _start:
 	cld
 	; To set up a stack, we set the esp register to point to the top of our
 	; stack (as it grows downwards on x86 systems).
-	mov esp, stack_top
+	mov esp, __stack_top
  
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.

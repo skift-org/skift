@@ -165,7 +165,7 @@ void notify_threads(bool is_thread, int handle, int outcode)
     {
         thread_t *thread = i->value;
 
-        bool is_waiting = (thread->state == THREAD_WAIT_THREAD  &&  is_thread) ||
+        bool is_waiting = (thread->state == THREAD_WAIT_THREAD && is_thread) ||
                           (thread->state == THREAD_WAIT_PROCESS && !is_thread);
 
         if (is_waiting && thread->waitinfo.handle == handle)
@@ -196,6 +196,9 @@ void timer_set_frequency(int hz)
     log("Timer frequency is %dhz.", hz);
 }
 
+// define in cpu/boot.s
+extern u32 __stack_bottom;
+
 void tasking_setup()
 {
     running = NULL;
@@ -207,6 +210,10 @@ void tasking_setup()
     kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
 
+    // Set the correct stack for the kernel main stack
+    thread_t *kthread = thread_get(kernel_thread);
+    free(kthread->stack);
+    kthread->stack = &__stack_bottom;
 
     timer_set_frequency(1000);
     irq_register(0, (irq_handler_t)&shedule);
@@ -216,7 +223,8 @@ void tasking_setup()
 
 THREAD thread_self()
 {
-    if (running == NULL) return -1;
+    if (running == NULL)
+        return -1;
     return running->id;
 }
 
@@ -233,7 +241,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
     list_pushback(threads, thread);
     thread->process = process;
 
-    if (running)
+    if (running != NULL)
     {
         list_pushback(waiting, thread);
     }
@@ -293,9 +301,9 @@ void thread_dump_all()
 
     FOREACH(i, threads)
     {
-        thread_dump(((thread_t*) i->value)->id);
+        thread_dump(((thread_t *)i->value)->id);
     }
-    
+
     atomic_end();
 }
 
@@ -303,11 +311,11 @@ void thread_dump(THREAD t)
 {
     atomic_begin();
 
-    thread_t * thread = thread_get(t);
+    thread_t *thread = thread_get(t);
 
     printf("\n\tThread ID=%d child of process '%s' ID=%d.", t, thread->process->name, thread->process->id);
-    printf("(ESP=0x%x STATE=%x)", thread->esp, thread->state);
-    
+    printf("(ESP=0x%x STACK=%x STATE=%x)", thread->esp, thread->stack, thread->state);
+
     atomic_end();
 }
 
@@ -315,7 +323,8 @@ void thread_dump(THREAD t)
 
 PROCESS process_self()
 {
-    if (running == NULL) return -1;
+    if (running == NULL)
+        return -1;
     return running->process->id;
 }
 
@@ -395,6 +404,16 @@ int process_unmap(PROCESS p, uint addr, uint count)
 
 uint ticks = 0;
 
+void sanity_check(thread_t *thread)
+{
+    uint stack = (uint)thread->stack;
+
+    if (!(thread->esp >= stack && thread->esp <= stack + STACK_SIZE))
+    {
+        PANIC("Thread ID=%d failed sanity check! (ESP=0x%x STACK=0x%x)", thread->id, thread->esp, thread->stack);
+    }
+}
+
 esp_t shedule(esp_t esp, context_t *context)
 {
     ticks++;
@@ -403,9 +422,11 @@ esp_t shedule(esp_t esp, context_t *context)
 
     // Save the old context
     running->esp = esp;
+    sanity_check(running);
 
     list_pushback(waiting, running);
     list_pop(waiting, (void *)&running);
+
     set_kernel_stack((uint)running->stack + STACK_SIZE);
 
     paging_load_directorie(running->process->pdir);

@@ -35,8 +35,26 @@ BRIGHT_WHITE    = ESCAPE + '37;1m'
 
 RESET    = ESCAPE + '0m'
 
+# ---- Utils ------------------------------------------------------------- #
+
 def join(a, b):
     return os.path.join(a, b)
+
+def is_uptodate(outfile, infiles):
+    if os.path.exists(outfile):
+        pass
+
+    return False
+
+def get_files(locations, ext):
+    files = []
+
+    for root, _, filenames in os.walk(locations):
+        for filename in filenames:
+            if filename.endswith(ext):
+                files.append(join(root, filename))
+
+    return files
 
 # --- Targets ---------------------------------------------------------------- #
 
@@ -65,6 +83,23 @@ class Target(object):
         self.name = data["id"]
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
+
+    def get_sources(self):
+        pass
+
+
+    def compile(self, source):
+        pass
+
+    def link(self):
+        pass
+
+    def build(self):
+        for source in self.get_sources():
+            if not self.compile(source):
+                return False
+
+        return self.link()
 
 def list_targets(location):
     """
@@ -125,7 +160,8 @@ def rebuild_all(targets):
 
 def help_command(targets):
     """Show this help message."""
-    print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + "\n")
+    print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + RESET)
+    print("The skiftOS build system\n")
 
     print(BRIGHT_WHITE + "Usage :" + RESET + " ./tools [action] targets...")
     print("        ./tools [global action]")
@@ -154,8 +190,6 @@ global_actions = \
     "list": list_command,
     "rebuild-all": rebuild_all,
 }
-
-# --- Commands --------------------------------------------------------------- #
 
 # --- Main ------------------------------------------------------------------- #
 

@@ -14,7 +14,7 @@
 #include "kernel/paging.h"
 
 #define PROCNAME_SIZE 128
-#define STACK_SIZE 4096
+#define STACK_SIZE 0x4000
 
 #define TASK_USER 1
 

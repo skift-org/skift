@@ -15,7 +15,11 @@ irq%1:
 %endmacro
 
 irq_common:
+    cli
+
     pushad
+
+    cld
 
     push ds
     push es
@@ -29,7 +33,6 @@ irq_common:
     mov fs, ax
     mov gs, ax
 
-    cld
 
     mov eax, esp
     push esp

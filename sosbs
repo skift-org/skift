@@ -35,7 +35,15 @@ BRIGHT_WHITE    = ESCAPE + '37;1m'
 
 RESET    = ESCAPE + '0m'
 
-# ---- Utils ------------------------------------------------------------- #
+# --- Crosscompiler ---------------------------------------------------------- #
+
+def crosscompiler_check():
+    pass
+
+def Crosscompiler_build():
+    pass
+
+# --- Utils ------------------------------------------------------------------ #
 
 def join(a, b):
     return os.path.join(a, b)

@@ -1,28 +1,4 @@
 {
-    "files.associations": {
-        "sstream": "cpp",
-        "istream": "c",
-        "optional": "c",
-        "ostream": "c",
-        "system_error": "c",
-        "type_traits": "c",
-        "typeinfo": "c",
-        "array": "c",
-        "initializer_list": "c",
-        "string_view": "c",
-        "utility": "c",
-        "filesystem.h": "c",
-        "sllist.h": "c",
-        "libelf.h": "c",
-        "tasking.h": "c",
-        "cpu.h": "c",
-        "cmath": "c",
-        "bga.h": "c",
-        "paging.h": "c",
-        "time.h": "c",
-        "atomic.h": "c",
-        "memory.h": "c"
-    },
     "python.pythonPath": "/usr/bin/python3",
     "files.exclude": {
         "**/.git": true,

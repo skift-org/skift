@@ -6,6 +6,9 @@ __assets.s
 *.asm
 
 build/
+toolchain/build/
+toolchain/tarballs/
+toolchain/local/
 
 # Python
 *.pyc

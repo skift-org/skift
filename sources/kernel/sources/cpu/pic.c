@@ -44,4 +44,7 @@ void pic_setup()
 	/* Request 8086 mode on each PIC */
 	outb(PIC1_DATA, 0x01); PIC_WAIT();
 	outb(PIC2_DATA, 0x01); PIC_WAIT();
+
+	outb(PIC1_DATA, 0x00); PIC_WAIT();
+	outb(PIC2_DATA, 0x00); PIC_WAIT();
 }

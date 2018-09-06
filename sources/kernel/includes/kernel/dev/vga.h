@@ -24,7 +24,7 @@
 
 #define vga_frame_buffer 0xB8000
 #define vga_color(fg, bg) (bg << 4 | fg)
-#define vga_entry(c, fg, bg) (((bg) << 4 | (fg)) << 8 | (c))
+#define vga_entry(c, fg, bg) ((((bg) & 0xf) << 4 | ((fg) & 0xf)) << 8 | ((c) & 0xff))
 
 typedef uchar vga_color_t;
 typedef ushort vga_entry_t;

@@ -52,10 +52,10 @@ void *test(void *arg)
 
             for (size_t j = 0; j < 25; j++)
             {
-                vga_cell(myk, j, vga_entry(j + (myk * 25), vga_white + myk, vga_red + myk));
+                vga_cell(myk, j, vga_entry(j + (myk * 25) + i, vga_white + myk, vga_red + myk));
             }
 
-            printf("I'm alive n°%d!\n", thread_self());
+            //printf("I'm alive n°%d!\n", thread_self());
         }
     };
 
@@ -86,6 +86,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     log(KERNEL_UNAME);
  
+
     atomic_enable();
     sti();
 

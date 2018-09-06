@@ -33,8 +33,6 @@ irq_handler_t irq_register(int index, irq_handler_t handler)
 
 esp_t irq_handler(esp_t esp, context_t context)
 {
-    atomic_begin();
-
     if (irq_handlers[context.int_no] != NULL)
     {
         esp = irq_handlers[context.int_no](esp, &context);
@@ -50,8 +48,6 @@ esp_t irq_handler(esp_t esp, context_t context)
     }
 
     outb(0x20, 0x20);
-
-    atomic_end();
 
     return esp;
 }

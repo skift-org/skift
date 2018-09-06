@@ -30,6 +30,8 @@ void idt_setup()
 
 void idt_entry(u8 index, u32 offset, u16 selector, u16 type)
 {
+    printf("IDT[%d]: OFFSET=0x%x SELECTOR=0x%x TYPE=%b\n", index, offset, selector, type);
+
     idt_entry_t * entry = &idt.entries[index];
 
     entry->offset0_15 = offset & 0xffff;
@@ -38,5 +40,5 @@ void idt_entry(u8 index, u32 offset, u16 selector, u16 type)
     entry->zero = 0;
 
     entry->selector = selector;
-    entry->type_attr = type | 0x60;
+    entry->type_attr = type;
 }

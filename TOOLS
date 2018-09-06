@@ -9,6 +9,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
+sys.path.insert(0, os.path.join(os.getcwd(), "toolchain/local/bin"))
 
 import json
 import project
@@ -28,6 +29,7 @@ def get_projects(location):
     ------
     A list of all projects.
     """
+
     projects = {}
 
     for file in os.listdir(location):

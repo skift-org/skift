@@ -1,7 +1,10 @@
 import os
+import sys
 import shutil
 import subprocess
 import utils
+
+PATH = sys.path[0]
 
 # --- Utils ------------------------------------------------------------------ #
 
@@ -70,8 +73,9 @@ def GCC(input_file, output_file, includes, defines, strict):
     for i in includes:
         includes_flags.append("-I%s" % i)
 
-    flags = ["gcc", "-m32"]
-    flags += ["-O3", "-g", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+    flags = [os.path.join(PATH, "i686-elf-gcc")]
+    # flags = ["gcc", "-m32"]
+    flags += ["-O3", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
     flags += defines_flags
     flags += includes_flags
 
@@ -80,21 +84,25 @@ def GCC(input_file, output_file, includes, defines, strict):
 
     flags += ["-c", "-o", output_file, input_file ]
 
-    return subprocess.call(flags) == 0
+    return subprocess.call(' '.join(flags), shell=True) == 0
 
 def AR(objects, output_file):
     #print(" AR %i objects -> %s" % (len(objects), output_file))
-    command = ["ar", "rcs"] + [output_file] + objects
-    return subprocess.call(command) == 0
+    command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + [output_file] + objects
+    print(command)
+    # command = ["ar", "rcs"] + [output_file] + objects
+    return subprocess.call(command, shell=True) == 0
 
 def LD(objects, libs, output_file, script):
     #print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
-    command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
-    return subprocess.call(command) == 0
+    command = [os.path.join(PATH, "i686-elf-ld"), "-T", script, "-o", output_file] + objects + libs
+    # command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
+    return subprocess.call(command, shell=True) == 0
 
 def OBJDUMP(bin, asm):
     with open(asm, "w") as f:
-        command = ["objdump","-Mintel", "-S", bin]
-        return subprocess.call(command, stdout=f) == 0
+        command = [os.path.join(PATH, "i686-elf-objdump"),"-Mintel", "-S", bin]
+        # command = ["objdump","-Mintel", "-S", bin]
+        return subprocess.call(command, stdout=f, shell=True) == 0
 
     return 0

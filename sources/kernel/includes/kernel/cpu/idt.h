@@ -1,5 +1,5 @@
 #pragma once
-#include "cpu/cpu.h"
+#include "kernel/cpu/cpu.h"
 #include "types.h"
 #include "utils.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "cpu/cpu.h"
+#include "kernel/cpu/cpu.h"
 
 typedef void (*isr_handler_t)(context_t *);
 

@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cpu/gdt.h"
-#include "cpu/idt.h"
-#include "cpu/irq.h"
-#include "cpu/isr.h"
+#include "kernel/cpu/gdt.h"
+#include "kernel/cpu/idt.h"
+#include "kernel/cpu/irq.h"
+#include "kernel/cpu/isr.h"
 
-#include "devices/vga.h"
+#include "kernel/dev/vga.h"
 
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
@@ -54,6 +54,8 @@ void *test(void *arg)
             {
                 vga_cell(myk, j, vga_entry(j + (myk * 25), vga_white + myk, vga_red + myk));
             }
+
+            printf("I'm alive n°%d!\n", thread_self());
         }
     };
 

@@ -2,8 +2,8 @@
 // See: LICENSE.md
 // Project URL: github.com/maker-dev/skift
 
-#include "cpu/cpu.h"
-#include "devices/atapio.h"
+#include "kernel/cpu/cpu.h"
+#include "kernel/dev/atapio.h"
 #include "kernel/logger.h"
 #include "sync/atomic.h"
 

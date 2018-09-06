@@ -2,7 +2,7 @@
 // See: LICENSE.md
 // Project URL: github.com/maker-dev/skift
 
-#include "cpu/idt.h"
+#include "kernel/cpu/idt.h"
 
 #define PIC_WAIT() \
     do { \

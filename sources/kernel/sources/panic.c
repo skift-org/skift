@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include "kernel/system.h"
-#include "devices/timer.h"
 #include "kernel/tasking.h"
 #include "sync/atomic.h"
 

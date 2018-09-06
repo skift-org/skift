@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "cpu/idt.h"
+#include "kernel/cpu/idt.h"
 
 idt_t idt;
 

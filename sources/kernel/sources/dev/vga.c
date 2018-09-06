@@ -2,8 +2,8 @@
 // See: LICENSE.md
 // Project URL: github.com/maker-dev/skift
 
-#include "devices/vga.h"
-#include "cpu/cpu.h"
+#include "kernel/dev/vga.h"
+#include "kernel/cpu/cpu.h"
 
 u16 *video_memory = (u16 *)vga_frame_buffer;
 

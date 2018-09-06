@@ -5,7 +5,7 @@ import utils
 
 # --- Utils ------------------------------------------------------------------ #
 
-qemu_flags = ["-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+qemu_flags = ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 def QEMU(disk):
     #print(" QEMU", disk)

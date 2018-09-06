@@ -2,8 +2,8 @@
 // See: LICENSE.md
 // Project URL: github.com/maker-dev/skift
 
-#include "cpu/irq.h"
-#include "cpu/idt.h"
+#include "kernel/cpu/irq.h"
+#include "kernel/cpu/idt.h"
 
 #include "sync/atomic.h"
 #include "kernel/logger.h"

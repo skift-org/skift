@@ -8,9 +8,9 @@
 #include "libelf.h"
 #include "sync/atomic.h"
 
-#include "cpu/cpu.h"
-#include "cpu/gdt.h"
-#include "cpu/irq.h"
+#include "kernel/cpu/cpu.h"
+#include "kernel/cpu/gdt.h"
+#include "kernel/cpu/irq.h"
 
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
@@ -63,7 +63,7 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
         context->gs = 0x10;
     }
 
-    log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
+    // log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
 
     return thread;
 }
@@ -87,7 +87,7 @@ process_t *alloc_process(const char *name, int flags)
         process->pdir = memory_kpdir();
     }
 
-    log("Process '%s' with ID=%d allocated.", process->name, process->id);
+    // log("Process '%s' with ID=%d allocated.", process->name, process->id);
 
     return process;
 }
@@ -216,7 +216,7 @@ void tasking_setup()
     kthread->stack = &__stack_bottom;
     kthread->esp = ((uint)(kthread->stack) + STACK_SIZE);
 
-    timer_set_frequency(100);
+    timer_set_frequency(50);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -255,7 +255,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     atomic_end();
 
-    log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
+    // log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
 
     return thread->id;
 }
@@ -485,8 +485,8 @@ esp_t shedule(esp_t esp, context_t *context)
 
     UNUSED(context);
 
-    // int delta = (running->esp - esp);
-    // printf("esp=%x -> %x (%d) EIP=%x ID=%d\n", running->esp, esp, delta, context->eip, running->id);
+    int delta = (running->esp - esp);
+    printf("esp=%x -> %x (%d) EIP=%x ID=%d\n", running->esp, esp, delta, context->eip, running->id);
 
     // Save the old context
     running->esp = esp;

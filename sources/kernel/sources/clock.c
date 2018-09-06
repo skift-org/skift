@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "cpu/cpu.h"
+#include "kernel/cpu/cpu.h"
 #include "kernel/clock.h"
 
 /* --- CMOS/RTC ------------------------------------------------------------- */

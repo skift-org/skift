@@ -1,5 +1,5 @@
-#include "cpu/cpu.h"
-#include "devices/bga.h"
+#include "kernel/cpu/cpu.h"
+#include "kernel/dev/bga.h"
 #include "kernel/logger.h"
 
 void bga_write_register(u16 IndexValue, u16 DataValue)

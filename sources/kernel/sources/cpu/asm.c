@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "cpu/cpu.h"
+#include "kernel/cpu/cpu.h"
 
 u8 inb(u16 port)
 {

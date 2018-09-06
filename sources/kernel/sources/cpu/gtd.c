@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "cpu/gdt.h"
+#include "kernel/cpu/gdt.h"
 #include "kernel/logger.h"
 
 gdt_t gdt;

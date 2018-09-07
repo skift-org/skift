@@ -91,18 +91,18 @@ def AR(objects, output_file):
     command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + [output_file] + objects
     print(command)
     # command = ["ar", "rcs"] + [output_file] + objects
-    return subprocess.call(command, shell=True) == 0
+    return subprocess.call(' '.join(command), shell=True) == 0
 
 def LD(objects, libs, output_file, script):
     #print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
     command = [os.path.join(PATH, "i686-elf-ld"), "-T", script, "-o", output_file] + objects + libs
     # command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
-    return subprocess.call(command, shell=True) == 0
+    return subprocess.call(' '.join(command), shell=True) == 0
 
 def OBJDUMP(bin, asm):
     with open(asm, "w") as f:
         command = [os.path.join(PATH, "i686-elf-objdump"),"-Mintel", "-S", bin]
         # command = ["objdump","-Mintel", "-S", bin]
-        return subprocess.call(command, stdout=f, shell=True) == 0
+        return subprocess.call(' '.join(command), stdout=f, shell=True) == 0
 
     return 0

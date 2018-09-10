@@ -171,8 +171,8 @@ def help_command(targets):
     print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + RESET)
     print("The skiftOS build system\n")
 
-    print(BRIGHT_WHITE + "Usage :" + RESET + " ./tools [action] targets...")
-    print("        ./tools [global action]")
+    print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
+    print("        ./SOSBS.py [global action]")
 
     print("\n" + BRIGHT_WHITE + "Targets:" + RESET)
     print("   " ,', '.join(targets.keys()))

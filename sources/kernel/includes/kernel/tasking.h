@@ -81,7 +81,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
 
 int thread_cancel(THREAD t);    // Cancel the selected thread.
 void thread_exit(void *retval); // Exit the current thread and return a value.
-void thread_sleep();            // Send the current thread to bed.
+void thread_sleep(int time);    // Send the current thread to bed.
 void thread_wakeup(THREAD t);   // Wake up the slected thread
 void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
 int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.

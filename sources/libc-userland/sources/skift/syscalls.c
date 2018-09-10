@@ -1,4 +1,4 @@
-#include "syscalls.h"
+#include <skift/syscall.h>
 
 DEFN_SYSCALL1(exit, 0, int);
 

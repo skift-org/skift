@@ -50,6 +50,11 @@ class Project(object):
             else:
                 self.libs = []
 
+            if "includes" in data:
+                self.includes = data["includes"]
+            else:
+                self.includes = []
+
             if "strict" in data:
                 self.strict = data["strict"]
             else:
@@ -117,6 +122,9 @@ class Project(object):
 
         for lib in self.get_dependencies(projects):
             includes.append(projects[lib].includes_path)
+
+        for incl in self.includes:
+            includes.append(projects[incl].includes_path)
 
         return includes
 

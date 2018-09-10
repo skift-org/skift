@@ -83,13 +83,13 @@ def GCC(input_file, output_file, includes, defines, strict):
         flags += ["-Wall", "-Wextra", "-Werror"]
 
     flags += ["-c", "-o", output_file, input_file ]
-
+    print(flags)
     return subprocess.call(' '.join(flags), shell=True) == 0
 
 def AR(objects, output_file):
     #print(" AR %i objects -> %s" % (len(objects), output_file))
     command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + [output_file] + objects
-    print(command)
+    # print(command)
     # command = ["ar", "rcs"] + [output_file] + objects
     return subprocess.call(' '.join(command), shell=True) == 0
 

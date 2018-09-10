@@ -2,7 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"
 #include "kernel/logger.h"

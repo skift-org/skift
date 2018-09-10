@@ -15,44 +15,49 @@ import json
 
 ESCAPE = '\033['
 
-BLACK    = ESCAPE + '30m'
-RED      = ESCAPE + '31m'
-GREEN    = ESCAPE + '32m'
-YELLOW   = ESCAPE + '33m'
-BLUE     = ESCAPE + '34m'
-MAGENTA  = ESCAPE + '35m'
-CYAN     = ESCAPE + '36m'
-WHITE    = ESCAPE + '37m'
+BLACK = ESCAPE + '30m'
+RED = ESCAPE + '31m'
+GREEN = ESCAPE + '32m'
+YELLOW = ESCAPE + '33m'
+BLUE = ESCAPE + '34m'
+MAGENTA = ESCAPE + '35m'
+CYAN = ESCAPE + '36m'
+WHITE = ESCAPE + '37m'
 
-BRIGHT_BLACK    = ESCAPE + '30;1m'
-BRIGHT_RED      = ESCAPE + '31;1m'
-BRIGHT_GREEN    = ESCAPE + '32;1m'
-BRIGHT_YELLOW   = ESCAPE + '33;1m'
-BRIGHT_BLUE     = ESCAPE + '34;1m'
-BRIGHT_MAGENTA  = ESCAPE + '35;1m'
-BRIGHT_CYAN     = ESCAPE + '36;1m'
-BRIGHT_WHITE    = ESCAPE + '37;1m'
+BRIGHT_BLACK = ESCAPE + '30;1m'
+BRIGHT_RED = ESCAPE + '31;1m'
+BRIGHT_GREEN = ESCAPE + '32;1m'
+BRIGHT_YELLOW = ESCAPE + '33;1m'
+BRIGHT_BLUE = ESCAPE + '34;1m'
+BRIGHT_MAGENTA = ESCAPE + '35;1m'
+BRIGHT_CYAN = ESCAPE + '36;1m'
+BRIGHT_WHITE = ESCAPE + '37;1m'
 
-RESET    = ESCAPE + '0m'
+RESET = ESCAPE + '0m'
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
+
 def crosscompiler_check():
     pass
+
 
 def Crosscompiler_build():
     pass
 
 # --- Utils ------------------------------------------------------------------ #
 
+
 def join(a, b):
     return os.path.join(a, b)
+
 
 def is_uptodate(outfile, infiles):
     if os.path.exists(outfile):
         pass
 
     return False
+
 
 def get_files(locations, ext):
     files = []
@@ -65,6 +70,7 @@ def get_files(locations, ext):
     return files
 
 # --- Targets ---------------------------------------------------------------- #
+
 
 class TargetTypes(Enum):
     INVALID = 0
@@ -86,6 +92,7 @@ class TargetTypes(Enum):
         else:
             return TargetTypes.INVALID
 
+
 class Target(object):
     def __init__(self, location, data):
         self.name = data["id"]
@@ -94,7 +101,6 @@ class Target(object):
 
     def get_sources(self):
         pass
-
 
     def compile(self, source):
         pass
@@ -109,9 +115,10 @@ class Target(object):
 
         return self.link()
 
+
 def list_targets(location):
     """
-    
+
     """
 
     targets = {}
@@ -134,37 +141,45 @@ def clean(target, targets):
     """Clean a target."""
     pass
 
+
 def build(target, targets):
     """Build a target."""
     pass
+
 
 def rebuild(target, targets):
     """Clean and build a target."""
     pass
 
+
 def run(target, targets):
     """Start the kernel and the specified target."""
     pass
+
 
 actions = \
     {
         "build": build,
         "clean": clean,
-        "rebuild" : rebuild,
+        "rebuild": rebuild,
         "run": run
     }
+
 
 def clean_all(targets):
     """Clean all targets."""
     pass
 
+
 def build_all(targets):
     """Build all tagets."""
     pass
 
+
 def rebuild_all(targets):
     """Clean and build all targets."""
     pass
+
 
 def help_command(targets):
     """Show this help message."""
@@ -175,7 +190,7 @@ def help_command(targets):
     print("        ./SOSBS.py [global action]")
 
     print("\n" + BRIGHT_WHITE + "Targets:" + RESET)
-    print("   " ,', '.join(targets.keys()))
+    print("   ", ', '.join(targets.keys()))
 
     print("\n" + BRIGHT_WHITE + "Actions:" + RESET)
     for act in actions:
@@ -185,25 +200,28 @@ def help_command(targets):
     for act in global_actions:
         print("    %-12s %s" % (act, global_actions[act].__doc__))
 
+
 def list_command(targets):
     """List all available targets."""
     print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
 
 
 global_actions = \
-{
-    "build-all": build_all,
-    "clean-all": clean_all,
-    "help": help_command,
-    "list": list_command,
-    "rebuild-all": rebuild_all,
-}
+    {
+        "build-all": build_all,
+        "clean-all": clean_all,
+        "help": help_command,
+        "list": list_command,
+        "rebuild-all": rebuild_all,
+    }
 
 # --- Main ------------------------------------------------------------------- #
+
 
 def missing_command(command):
     print(BRIGHT_RED + "ERROR: " + RESET + "No action named '%s'!" % command)
     print(BRIGHT_WHITE + "See: " + RESET + "./tools help.")
+
 
 def main(argc, argv):
 
@@ -211,8 +229,8 @@ def main(argc, argv):
 
     if (argc >= 2):
         action = argv[1]
-        
-        if action in actions:       
+
+        if action in actions:
             if argc < 3:
                 print(BRIGHT_RED + "ERROR: " + RESET + "No target specified!")
             else:
@@ -221,7 +239,8 @@ def main(argc, argv):
                 if target in targets:
                     actions[action](targets[target], targets)
                 else:
-                    print(BRIGHT_RED + "ERROR: " + RESET + "No target named '%s'!" % target)
+                    print(BRIGHT_RED + "ERROR: " + RESET +
+                          "No target named '%s'!" % target)
 
         elif action in global_actions:
             global_actions[action](targets)
@@ -230,6 +249,7 @@ def main(argc, argv):
             missing_command
     else:
         help_command(targets)
+
 
 if __name__ == '__main__':
     main(len(sys.argv), sys.argv)

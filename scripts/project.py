@@ -8,6 +8,7 @@ import toolchain
 import utils
 import progress
 
+
 class ProjectTypes(Enum):
     INVALID = 0
     LIB = 1
@@ -92,7 +93,7 @@ class Project(object):
         """Get all sources files of the current project."""
         if os.path.exists(self.sources_path):
             return utils.GetFiles(self.sources_path, '.c')\
-                 + utils.GetFiles(self.sources_path, '.s')
+                + utils.GetFiles(self.sources_path, '.s')
 
         return []
 
@@ -116,7 +117,6 @@ class Project(object):
 
         return []
 
-
     def get_includes_paths(self, projects):
         includes = [self.includes_path, self.obj_path]
 
@@ -131,10 +131,12 @@ class Project(object):
     def get_objects(self):
         objects = []
 
-        objects.append({"in": self.assets_file, "out": self.assets_file + '.o'})
+        objects.append(
+            {"in": self.assets_file, "out": self.assets_file + '.o'})
 
         for src in self.get_sources():
-            objects.append({"in": src, "out": src.replace(self.sources_path, self.obj_path) + '.o'})
+            objects.append({"in": src, "out": src.replace(
+                self.sources_path, self.obj_path) + '.o'})
 
         return objects
 
@@ -149,7 +151,7 @@ class Project(object):
 
         return libs
 
-    def get_dependencies(self, projects, found = None):
+    def get_dependencies(self, projects, found=None):
         """Get all dependencies."""
         if found is None:
             found = [self.id]
@@ -177,7 +179,8 @@ class Project(object):
 
             f.write('#define __PROJECT_ID "%s"\n' % self.id)
             f.write('#define __PROJECT_TYPE "%s"\n' % self.type)
-            f.write('#define __PROJECT_BUILD_DATE "%s"\n' % str(datetime.datetime.now()))
+            f.write('#define __PROJECT_BUILD_DATE "%s"\n' %
+                    str(datetime.datetime.now()))
 
     def generate_assets_header(self):
         """Generate '__assets.h' a header contaning all built-in assets references."""
@@ -189,7 +192,7 @@ class Project(object):
             f.write("// This file is auto generated.\n")
 
             for a in self.get_assets_filenames():
-                name = ("__" + self.id + "_"+ a).replace(".", "_")
+                name = ("__" + self.id + "_" + a).replace(".", "_")
                 f.write("\n")
                 f.write("extern const char %s_start;\n" % name)
                 f.write("extern const char %s_end;\n" % name)
@@ -209,7 +212,7 @@ class Project(object):
             f.write("__assets_start:\n")
 
             for a in self.get_assets_filenames():
-                name = ("__" + self.id + "_"+ a).replace(".", "_")
+                name = ("__" + self.id + "_" + a).replace(".", "_")
 
                 f.write("\n")
                 f.write("global %s_start\n" % name)
@@ -217,7 +220,8 @@ class Project(object):
                 f.write("global %s_size\n" % name)
 
                 f.write("\n")
-                f.write("%s_start:   incbin \"%s\"\n" % (name, os.path.join(self.assets_path, a)))
+                f.write("%s_start:   incbin \"%s\"\n" %
+                        (name, os.path.join(self.assets_path, a)))
                 f.write("%s_end:\n" % name)
                 f.write("%s_size:    dd $-%s_start\n" % (name, name))
 
@@ -255,7 +259,8 @@ class Project(object):
                 self.failed = True
                 return False
 
-            progress.printProgressBar(i + 1, len(objects), suffix="%d/%d objects" % (i + 1, len(objects)))
+            progress.printProgressBar(
+                i + 1, len(objects), suffix="%d/%d objects" % (i + 1, len(objects)))
 
         return True
 
@@ -267,7 +272,7 @@ class Project(object):
         elif self.type == ProjectTypes.LIB:
             return toolchain.AR(objects, self.get_output())
         elif self.type == ProjectTypes.KERNEL:
-            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld") and toolchain.OBJDUMP(self.get_output(), self.get_output() + ".asm");
+            return toolchain.LD(objects, self.get_libs(projects), self.get_output(), "./common/kernel.ld") and toolchain.OBJDUMP(self.get_output(), self.get_output() + ".asm")
         elif self.type == ProjectTypes.MODULE:
             pass
 
@@ -285,8 +290,10 @@ class Project(object):
         toolchain.MKDIR(self.obj_path)
         toolchain.MKDIR(self.bin_path)
 
-        if (self.builded): return True
-        if (self.failed): return False
+        if (self.builded):
+            return True
+        if (self.failed):
+            return False
 
         self.generate_all()
         self.builded = True
@@ -294,7 +301,7 @@ class Project(object):
         success = self.build_dependencies(projects)
 
         success = success and self.build_objects(projects) and\
-                              self.link_output(projects)
+            self.link_output(projects)
 
         return success
 

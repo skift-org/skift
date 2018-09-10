@@ -8,10 +8,13 @@ PATH = sys.path[0]
 
 # --- Utils ------------------------------------------------------------------ #
 
-qemu_flags = ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+qemu_flags = ["-display", "sdl", "-m", "256M",
+              "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+
 
 def QEMU(disk):
     subprocess.call(["qemu-system-i386", "-cdrom", disk] + qemu_flags)
+
 
 def MKDIR(directory):
     if not os.path.exists(directory):
@@ -19,15 +22,20 @@ def MKDIR(directory):
 
     return directory
 
+
 def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
+
 def COPY(src, dest):
     shutil.copyfile(src, dest)
 
+
 def TAR(directory, output_file):
-    subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
+    subprocess.call(["tar", "-cf", output_file, "-C",
+                     directory] + os.listdir(directory))
+
 
 def GRUB(iso, output_file):
     status = 1
@@ -42,6 +50,7 @@ def GRUB(iso, output_file):
 
 # --- Compiler --------------------------------------------------------------- #
 
+
 def NASM(input_file, output_file):
     if utils.IsUpToDate(output_file, input_file):
         return True
@@ -49,6 +58,7 @@ def NASM(input_file, output_file):
     # print(" AS %s -> %s" % (input_file, output_file))
     command = ["nasm", "-f" "elf32", input_file, "-o", output_file]
     return subprocess.call(command) == 0
+
 
 def GCC(input_file, output_file, includes, defines, strict):
     if utils.IsUpToDate(output_file, input_file):
@@ -66,29 +76,36 @@ def GCC(input_file, output_file, includes, defines, strict):
 
     flags = [os.path.join(PATH, "i686-elf-gcc")]
     # flags = ["gcc", "-m32"]
-    flags += ["-O3", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+    flags += ["-O3", "-fno-pie", "-ffreestanding",
+              "-nostdlib", "-std=gnu11", "-nostdinc"]
     flags += defines_flags
     flags += includes_flags
 
     if strict:
         flags += ["-Wall", "-Wextra", "-Werror"]
 
-    flags += ["-c", "-o", output_file, input_file ]
+    flags += ["-c", "-o", output_file, input_file]
     return subprocess.call(' '.join(flags), shell=True) == 0
 
+
 def AR(objects, output_file):
-    command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + [output_file] + objects
+    command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + \
+        [output_file] + objects
     return subprocess.call(' '.join(command), shell=True) == 0
+
 
 def LD(objects, libs, output_file, script):
     #print(" LD %i objects (%i libs) using '%s' -> %s" % (len(objects), len(libs), script, output_file))
-    command = [os.path.join(PATH, "i686-elf-ld"), "-T", script, "-o", output_file] + objects + libs
+    command = [os.path.join(PATH, "i686-elf-ld"), "-T",
+               script, "-o", output_file] + objects + libs
     # command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
     return subprocess.call(' '.join(command), shell=True) == 0
 
+
 def OBJDUMP(bin, asm):
     with open(asm, "w") as f:
-        command = [os.path.join(PATH, "i686-elf-objdump"),"-Mintel", "-S", bin]
+        command = [os.path.join(PATH, "i686-elf-objdump"),
+                   "-Mintel", "-S", bin]
         # command = ["objdump","-Mintel", "-S", bin]
         return subprocess.call(' '.join(command), stdout=f, shell=True) == 0
 

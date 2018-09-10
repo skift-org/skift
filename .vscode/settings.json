@@ -10,5 +10,10 @@
         "**/obj" : true,
         "**/__pycache__" : true
     },
-    "editor.rulers": [80]
+    "editor.rulers": [
+        80
+    ],
+    "files.associations": {
+        "cmath": "c"
+    }
 }

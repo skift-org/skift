@@ -15,11 +15,10 @@ irq%1:
 %endmacro
 
 irq_common:
-    cli
+    cld
 
     pushad
 
-    cld
 
     push ds
     push es
@@ -99,6 +98,7 @@ dd __isr%1
 %macro ISR_ERR 1
 __isr%1:
     cli
+    
     push %1
     jmp isr_common
 %endmacro
@@ -106,12 +106,15 @@ __isr%1:
 %macro ISR_NOERR 1
 __isr%1:
     cli
+
     push 0
     push %1
     jmp isr_common
 %endmacro
 
 isr_common:
+    cld
+
     pushad
 
     push ds

@@ -11,34 +11,25 @@ PATH = sys.path[0]
 qemu_flags = ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 def QEMU(disk):
-    #print(" QEMU", disk)
     subprocess.call(["qemu-system-i386", "-cdrom", disk] + qemu_flags)
 
 def MKDIR(directory):
-    #print(" MKDIR", directory)
-
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     return directory
 
 def RMDIR(directory):
-    #print(" RMDIR", directory)
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
 def COPY(src, dest):
-    #print(" CP %s -> %s" % (src, dest))
     shutil.copyfile(src, dest)
 
 def TAR(directory, output_file):
-    #print(" TAR %s -> %s" % (directory, output_file))
     subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
 
 def GRUB(iso, output_file):
-    #print(" GRUB %s -> %s" % (iso, output_file))
-    command = []
-
     status = 1
 
     try:
@@ -83,14 +74,10 @@ def GCC(input_file, output_file, includes, defines, strict):
         flags += ["-Wall", "-Wextra", "-Werror"]
 
     flags += ["-c", "-o", output_file, input_file ]
-    print(flags)
     return subprocess.call(' '.join(flags), shell=True) == 0
 
 def AR(objects, output_file):
-    #print(" AR %i objects -> %s" % (len(objects), output_file))
     command = [os.path.join(PATH, "i686-elf-ar"), "rcs"] + [output_file] + objects
-    # print(command)
-    # command = ["ar", "rcs"] + [output_file] + objects
     return subprocess.call(' '.join(command), shell=True) == 0
 
 def LD(objects, libs, output_file, script):

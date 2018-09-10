@@ -6,39 +6,59 @@
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"
 #include "kernel/logger.h"
+#include "kernel/serial.h"
 
-int sys_exit(int code)
+int sys_not_implemented()
 {
-    process_exit(code);
-    return code;
+    log("Not implemented syscall!");
+    return -1;
 }
 
-int sys_print(const char *string)
+int sys_io_print(const char * msg)
 {
-    printf(string);
-    return 0;
-}
+    serial_print(msg);
 
-int sys_map(int memory, int size)
-{
-    STUB(memory, size);
-    return 0;
-}
-
-int sys_unmap(int memory, int size)
-{
-    STUB(memory, size);
     return 0;
 }
 
 typedef int (*syscall_t)(int, int, int, int, int);
 
 static int (*syscalls[])() =
-    {
-        [0] = sys_exit,
-        [1] = sys_print,
-        [2] = sys_map,
-        [3] = sys_unmap,
+{
+    [SYS_PROCESS_SELF]    = sys_not_implemented,
+    [SYS_PROCESS_EXEC]    = sys_not_implemented,
+    [SYS_PROCESS_EXIT]    = sys_not_implemented,
+    [SYS_PROCESS_CANCEL] = sys_not_implemented,
+    [SYS_PROCESS_MAP] = sys_not_implemented,
+    [SYS_PROCESS_UNMAP] = sys_not_implemented,
+    [SYS_THREAD_SELF] = sys_not_implemented,
+    [SYS_THREAD_CREATE] = sys_not_implemented,
+    [SYS_THREAD_EXIT]     = sys_not_implemented,
+    [SYS_THREAD_CANCEL]   = sys_not_implemented,
+    [SYS_THREAD_SLEEP]    = sys_not_implemented,
+    [SYS_THREAD_WAKEUP]   = sys_not_implemented,
+    [SYS_THREAD_WAIT]     = sys_not_implemented,
+    [SYS_THREAD_WAITPROC] = sys_not_implemented,
+    [SYS_PRINT] = sys_io_print,
+    [SYS_READ] = sys_not_implemented,
+    [SYS_FILE_CREATE] = sys_not_implemented,
+    [SYS_FILE_DELETE] = sys_not_implemented,
+    [SYS_FILE_EXISTE] = sys_not_implemented,
+    [SYS_FILE_COPY] = sys_not_implemented,
+    [SYS_FILE_MOVE] = sys_not_implemented,
+    [SYS_FILE_STAT] = sys_not_implemented,
+    [SYS_FILE_OPEN] = sys_not_implemented,
+    [SYS_FILE_CLOSE] = sys_not_implemented,
+    [SYS_FILE_READ] = sys_not_implemented,
+    [SYS_FILE_WRITE] = sys_not_implemented,
+    [SYS_FILE_IOCTL] = sys_not_implemented,
+    [SYS_DIR_CREATE] = sys_not_implemented,
+    [SYS_DIR_DELETE] = sys_not_implemented,
+    [SYS_DIR_EXISTE] = sys_not_implemented,
+    [SYS_DIR_OPEN] = sys_not_implemented,
+    [SYS_DIR_CLOSE] = sys_not_implemented,
+    [SYS_DIR_LISTFILE] = sys_not_implemented,
+    [SYS_DIR_LISTDIR] = sys_not_implemented,
 };
 
 void syscall_dispatcher(context_t *context)

@@ -1,7 +1,8 @@
-#include <syscalls.h>
+#include <skift/io.h>
+#include <skift/process.h>
 
 int main(int argc, const char ** argv)
 {
-    syscall_print("Hello from userspace!\n");
-    syscall_exit(0);
+    sk_io_print("Hello from userspace!\n");
+    sk_process_exit(0);
 }

@@ -123,9 +123,11 @@ class Project(object):
         for lib in self.get_dependencies(projects):
             includes.append(projects[lib].includes_path)
 
-        for incl in self.includes:
+        for incl in self.get_dependencies_include(projects):
             includes.append(projects[incl].includes_path)
 
+
+        print(includes)
         return includes
 
     def get_objects(self):
@@ -160,6 +162,21 @@ class Project(object):
             if (not lib in found):
                 projects[lib].get_dependencies(projects, found)
                 found.append(lib)
+
+        if self.id in found:
+            found.remove(self.id)
+
+        return found
+
+    def get_dependencies_include(self, projects, found=None):
+        """Get all dependencies."""
+        if found is None:
+            found = [self.id]
+
+        for lib in (self.libs + self.includes):
+            if (not lib in found):
+                found.append(lib)
+                projects[lib].get_dependencies_include(projects, found)
 
         if self.id in found:
             found.remove(self.id)
@@ -285,6 +302,7 @@ class Project(object):
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
         print("Libs: %s" % ', '.join(self.get_dependencies(projects)))
+        print("Includes: %s" % ', '.join(self.get_dependencies_include(projects)))
 
     def build(self, projects):
         toolchain.MKDIR(self.obj_path)

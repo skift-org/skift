@@ -157,12 +157,23 @@ def run(target, targets):
     pass
 
 
+def info(target, targets):
+    """Dump information about the target."""
+    print(BRIGHT_WHITE + "Target " + target.name + ":" + RESET)
+    print("\tType: " + str(target.type.name.lower()))
+    print("\tDependencies: <TBD>")
+    print("\tLocation: " + target.location)
+    print("\tOutput: <TBD>")
+    pass
+
+
 actions = \
     {
         "build": build,
         "clean": clean,
         "rebuild": rebuild,
-        "run": run
+        "run": run,
+        "info": info
     }
 
 
@@ -206,12 +217,27 @@ def list_command(targets):
     print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
 
 
+def list_libs(targets):
+    """List all available libraries."""
+    libraries = {k: v for k, v in targets.items() if v.type == TargetTypes.LIB}
+    print(BRIGHT_WHITE + "Libraries: " + RESET + ', '.join(libraries.keys()))
+    pass
+
+
+def list_apps(targets):
+    """List all available applications."""
+    applications = {k: v for k, v in targets.items() if v.type == TargetTypes.APP}
+    print(BRIGHT_WHITE + "Applications: " + RESET + ', '.join(applications.keys()))
+
+
 global_actions = \
     {
         "build-all": build_all,
         "clean-all": clean_all,
         "help": help_command,
         "list": list_command,
+        "list-apps": list_apps,
+        "list-libs": list_libs,
         "rebuild-all": rebuild_all,
     }
 
@@ -246,7 +272,7 @@ def main(argc, argv):
             global_actions[action](targets)
 
         else:
-            missing_command
+            missing_command(action)
     else:
         help_command(targets)
 

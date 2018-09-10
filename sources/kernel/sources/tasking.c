@@ -22,6 +22,8 @@
 int PID = 0;
 int TID = 0;
 
+uint ticks = 0;
+
 list_t *threads;
 list_t *processes;
 
@@ -226,6 +228,7 @@ THREAD thread_self()
 {
     if (running == NULL)
         return -1;
+    
     return running->id;
 }
 
@@ -258,6 +261,17 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
     // log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
 
     return thread->id;
+}
+
+void thread_sleep(int time)
+{
+    atomic_begin();
+
+    thread_t * self = thread_get(thread_self());
+    self->state = THREAD_SLEEP;
+    self->sleepinfo.wakeuptick = ticks + time;
+
+    atomic_end();
 }
 
 int thread_cancel(THREAD t)
@@ -466,8 +480,6 @@ int process_unmap(PROCESS p, uint addr, uint count)
 }
 
 /* --- Sheduler ------------------------------------------------------------- */
-
-uint ticks = 0;
 
 void sanity_check(thread_t *thread)
 {

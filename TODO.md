@@ -1,5 +1,9 @@
 # TODO
 
+## BUILD TOOLS
+
+!! NEED A REWRITE :/
+
 ## Libs
 
 - [ ] libc (wip)
@@ -12,6 +16,7 @@
 - [x] Pagging
 - [x] Memory managment
 - [ ] Tasking (wip)
+  - [ ] Sync (Wait, sleep, wakeup)
 - [x] ATA pio driver
 - [x] RAM disk
 - [ ] Virtual file system (WIP)

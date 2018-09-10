@@ -57,6 +57,11 @@ typedef struct
     int *outcode;
 } wait_info_t;
 
+typedef struct 
+{
+    int wakeuptick;
+} sleep_info_t;
+
 typedef struct
 {
     int id;
@@ -67,7 +72,9 @@ typedef struct
     void *stack;
 
     thread_state_t state;
+
     wait_info_t waitinfo;
+    sleep_info_t sleepinfo;
 } thread_t;
 
 void tasking_setup();

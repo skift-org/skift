@@ -1,5 +1,5 @@
 {
-    "id": "test-app",
+    "id": "test",
     "type": "app",
     "libs": ["libc-userland", "libutils"],
     "strict": false

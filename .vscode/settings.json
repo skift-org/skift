@@ -12,8 +12,5 @@
     },
     "editor.rulers": [
         80
-    ],
-    "files.associations": {
-        "cmath": "c"
-    }
+    ]
 }

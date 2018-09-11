@@ -47,7 +47,6 @@ def Crosscompiler_build():
 
 # --- Utils ------------------------------------------------------------------ #
 
-
 def join(a, b):
     return os.path.join(a, b)
 
@@ -214,20 +213,28 @@ def help_command(targets):
 
 def list_command(targets):
     """List all available targets."""
-    print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
+    # print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
+    list_app(targets)
+    list_lib(targets)
+    list_other(targets)
 
 
-def list_libs(targets):
+def list_lib(targets):
     """List all available libraries."""
     libraries = {k: v for k, v in targets.items() if v.type == TargetTypes.LIB}
     print(BRIGHT_WHITE + "Libraries: " + RESET + ', '.join(libraries.keys()))
     pass
 
 
-def list_apps(targets):
+def list_app(targets):
     """List all available applications."""
     applications = {k: v for k, v in targets.items() if v.type == TargetTypes.APP}
     print(BRIGHT_WHITE + "Applications: " + RESET + ', '.join(applications.keys()))
+
+def list_other(targets):
+    """List all everithing else."""
+    applications = {k: v for k, v in targets.items() if v.type != TargetTypes.APP and  v.type != TargetTypes.LIB}
+    print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(applications.keys()))
 
 
 global_actions = \
@@ -236,8 +243,9 @@ global_actions = \
         "clean-all": clean_all,
         "help": help_command,
         "list": list_command,
-        "list-apps": list_apps,
-        "list-libs": list_libs,
+        "list-app": list_app,
+        "list-lib": list_lib,
+        "list-other": list_other,
         "rebuild-all": rebuild_all,
     }
 

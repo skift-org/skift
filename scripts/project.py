@@ -126,8 +126,6 @@ class Project(object):
         for incl in self.get_dependencies_include(projects):
             includes.append(projects[incl].includes_path)
 
-
-        print(includes)
         return includes
 
     def get_objects(self):

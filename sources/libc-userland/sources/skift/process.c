@@ -1,3 +1,4 @@
+#include <skift/process.h>
 #include <skift/syscall.h>
 
 DEFN_SYSCALL0(sk_process_self, SYS_PROCESS_SELF);

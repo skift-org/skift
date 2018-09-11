@@ -4,6 +4,7 @@
 
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"
+#include "kernel/syscalls_num.h"
 #include "kernel/logger.h"
 #include "kernel/serial.h"
 

@@ -5,6 +5,8 @@ __assets.s
 
 *.asm
 
+bin/
+obj/
 build/
 toolchain/build/
 toolchain/tarballs/

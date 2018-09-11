@@ -1,7 +1,6 @@
 #pragma once
 
-#define USERSPACE
-#include "kernel/syscalls.h"
+#include "kernel/syscalls_num.h"
 
 #define DECL_SYSCALL0(fn) int fn()
 #define DECL_SYSCALL1(fn, p1) int fn(p1)
@@ -76,8 +75,3 @@
                              : "0"(num), "r"((int)(p1)), "c"((int)(p2)), "d"((int)(p3)), "S"((int)(p4)), "D"((int)(p5))); \
         return __res;                                                                                                     \
     }
-
-DECL_SYSCALL1(exit, int);
-DECL_SYSCALL1(print, const char *);
-DECL_SYSCALL2(map, void *, int);
-DECL_SYSCALL2(unmap, void *, int);

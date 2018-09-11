@@ -1,3 +1,4 @@
+#include <skift/thread.h>
 #include <skift/syscall.h>
 
 DEFN_SYSCALL0(sk_thread_self, SYS_THREAD_SELF);

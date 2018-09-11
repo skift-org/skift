@@ -1,3 +1,4 @@
+#include <skift/io.h>
 #include <skift/syscall.h>
 
 DEFN_SYSCALL1(sk_io_print, SYS_PRINT, const char *);

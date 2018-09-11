@@ -54,7 +54,7 @@ typedef struct
 typedef struct
 {
     int handle;
-    int *outcode;
+    int outcode;
 } wait_info_t;
 
 typedef struct 
@@ -92,6 +92,8 @@ void thread_sleep(int time);    // Send the current thread to bed.
 void thread_wakeup(THREAD t);   // Wake up the slected thread
 void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
 int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.
+
+void thread_yield(); // Yield to the next thread.
 
 void thread_dump_all();
 void thread_dump(THREAD t);

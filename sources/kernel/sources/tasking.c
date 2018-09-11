@@ -161,6 +161,7 @@ process_t *process_get(PROCESS process)
     return NULL;
 }
 
+// Notify all waiting thread
 void notify_threads(bool is_thread, int handle, int outcode)
 {
     FOREACH(i, threads)
@@ -224,6 +225,11 @@ void tasking_setup()
 
 /* --- Thread managment ----------------------------------------------------- */
 
+void thread_hold()
+{
+    while(running->state != THREAD_RUNNING) hlt();
+}
+
 THREAD thread_self()
 {
     if (running == NULL)
@@ -264,23 +270,79 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 }
 
 void thread_sleep(int time)
+{    
+    atomic_begin();
+    running->state = THREAD_SLEEP;
+    running->sleepinfo.wakeuptick = ticks + time;
+    atomic_end();
+
+    thread_hold();
+}
+
+void thread_wakeup(THREAD t)
 {
     atomic_begin();
 
-    thread_t * self = thread_get(thread_self());
-    self->state = THREAD_SLEEP;
-    self->sleepinfo.wakeuptick = ticks + time;
+    thread_t * thread = thread_get(t);
+
+    if (thread != NULL && thread->state == THREAD_SLEEP)
+    {
+        thread->state = THREAD_RUNNING;
+        thread->sleepinfo.wakeuptick = 0;
+    }
 
     atomic_end();
+}
+
+void *thread_wait(THREAD t)
+{
+    atomic_begin();
+
+    thread_t* thread = thread_get(t);
+
+    running->waitinfo.outcode = 0;
+
+    if (thread != NULL && thread->state != THREAD_CANCELED)
+    {
+        running->waitinfo.handle = t;
+        running->state = THREAD_WAIT_THREAD;
+    }
+
+    atomic_end();
+
+    thread_hold();
+
+    return (void*)running->waitinfo.outcode;
+}
+
+int thread_waitproc(PROCESS p)
+{
+    atomic_begin();
+
+    process_t * process = process_get(p);
+
+    running->waitinfo.outcode = 0;
+
+    if (process != NULL && process->state != PROCESS_CANCELED)
+    {
+        running->waitinfo.handle = p;
+        running->state = THREAD_WAIT_PROCESS;
+    }
+
+    atomic_end();
+
+    thread_hold();
+
+    return running->waitinfo.outcode;    
 }
 
 int thread_cancel(THREAD t)
 {
     atomic_begin();
 
-    thread_t *thread;
+    thread_t *thread = thread_get(t);
 
-    if ((thread = thread_get(t)))
+    if ( thread != NULL )
     {
         thread->state = THREAD_CANCELED;
         notify_threads(1, thread_self(), 0);
@@ -296,11 +358,10 @@ void thread_exit(void *retval)
 {
     atomic_begin();
 
-    thread_t *thread = thread_get(thread_self());
-    thread->state = THREAD_CANCELED;
+    running->state = THREAD_CANCELED;
     notify_threads(1, thread_self(), (int)retval);
 
-    log("Thread n°%d exited with value 0x%x.", thread->id, retval);
+    log("Thread n°%d exited with value 0x%x.", running->id, retval);
 
     atomic_end();
 
@@ -489,6 +550,48 @@ void sanity_check(thread_t *thread)
     {
         PANIC("Thread ID=%d failed sanity check! (ESP=0x%x STACK=0x%x)", thread->id, thread->esp, thread->stack);
     }
+}
+
+thread_t * get_next_task()
+{
+    thread_t * thread = NULL;
+
+    do
+    {
+        list_pop(waiting, (void*)&thread);
+
+        switch (thread->state)
+        {
+            case THREAD_CANCELED:
+            // Free the dead thread.
+            free_thread(thread);
+            thread = NULL;
+            break;
+
+            case THREAD_SLEEP:
+            // Wakeup the thread
+            if (thread->sleepinfo.wakeuptick >= ticks)
+                thread->state = THREAD_RUNNING;
+            break;
+        
+            case THREAD_WAIT_PROCESS:
+            // Do nothing for now.
+            break;
+            
+            case THREAD_WAIT_THREAD:
+            // Do nothing for  now.
+            break;
+
+            default:
+                break;
+        }
+
+        if (thread != NULL && thread->state != THREAD_RUNNING)
+            list_pushback(waiting, thread);
+    } 
+    while(thread != NULL && thread->state == THREAD_RUNNING);
+
+    return thread;
 }
 
 esp_t shedule(esp_t esp, context_t *context)

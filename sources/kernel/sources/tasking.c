@@ -173,7 +173,7 @@ void notify_threads(bool is_thread, int handle, int outcode)
 
         if (is_waiting && thread->waitinfo.handle == handle)
         {
-            *thread->waitinfo.outcode = outcode;
+            thread->waitinfo.outcode = outcode;
             thread->state = THREAD_RUNNING;
         }
     }
@@ -191,7 +191,7 @@ esp_t shedule(esp_t esp, context_t *context);
 
 void timer_set_frequency(int hz)
 {
-    u32 divisor = 1193180 / hz;
+    u32 divisor = 119318 / hz;
     outb(0x43, 0x36);
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
@@ -219,7 +219,7 @@ void tasking_setup()
     kthread->stack = &__stack_bottom;
     kthread->esp = ((uint)(kthread->stack) + STACK_SIZE);
 
-    timer_set_frequency(1000);
+    timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -227,14 +227,19 @@ void tasking_setup()
 
 void thread_hold()
 {
-    while(running->state != THREAD_RUNNING) hlt();
+    while (running->state != THREAD_RUNNING)
+        hlt();
+}
+
+void thread_yield()
+{
 }
 
 THREAD thread_self()
 {
     if (running == NULL)
         return -1;
-    
+
     return running->id;
 }
 
@@ -270,7 +275,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 }
 
 void thread_sleep(int time)
-{    
+{
     atomic_begin();
     running->state = THREAD_SLEEP;
     running->sleepinfo.wakeuptick = ticks + time;
@@ -283,7 +288,7 @@ void thread_wakeup(THREAD t)
 {
     atomic_begin();
 
-    thread_t * thread = thread_get(t);
+    thread_t *thread = thread_get(t);
 
     if (thread != NULL && thread->state == THREAD_SLEEP)
     {
@@ -298,7 +303,7 @@ void *thread_wait(THREAD t)
 {
     atomic_begin();
 
-    thread_t* thread = thread_get(t);
+    thread_t *thread = thread_get(t);
 
     running->waitinfo.outcode = 0;
 
@@ -312,14 +317,14 @@ void *thread_wait(THREAD t)
 
     thread_hold();
 
-    return (void*)running->waitinfo.outcode;
+    return (void *)running->waitinfo.outcode;
 }
 
 int thread_waitproc(PROCESS p)
 {
     atomic_begin();
 
-    process_t * process = process_get(p);
+    process_t *process = process_get(p);
 
     running->waitinfo.outcode = 0;
 
@@ -333,7 +338,7 @@ int thread_waitproc(PROCESS p)
 
     thread_hold();
 
-    return running->waitinfo.outcode;    
+    return running->waitinfo.outcode;
 }
 
 int thread_cancel(THREAD t)
@@ -342,7 +347,7 @@ int thread_cancel(THREAD t)
 
     thread_t *thread = thread_get(t);
 
-    if ( thread != NULL )
+    if (thread != NULL)
     {
         thread->state = THREAD_CANCELED;
         notify_threads(1, thread_self(), 0);
@@ -552,44 +557,43 @@ void sanity_check(thread_t *thread)
     }
 }
 
-thread_t * get_next_task()
+thread_t *get_next_task()
 {
-    thread_t * thread = NULL;
+    thread_t *thread = NULL;
 
     do
     {
-        list_pop(waiting, (void*)&thread);
+        list_pop(waiting, (void *)&thread);
 
         switch (thread->state)
         {
-            case THREAD_CANCELED:
+        case THREAD_CANCELED:
             // Free the dead thread.
             free_thread(thread);
             thread = NULL;
             break;
 
-            case THREAD_SLEEP:
+        case THREAD_SLEEP:
             // Wakeup the thread
             if (thread->sleepinfo.wakeuptick >= ticks)
                 thread->state = THREAD_RUNNING;
             break;
-        
-            case THREAD_WAIT_PROCESS:
+
+        case THREAD_WAIT_PROCESS:
             // Do nothing for now.
             break;
-            
-            case THREAD_WAIT_THREAD:
+
+        case THREAD_WAIT_THREAD:
             // Do nothing for  now.
             break;
 
-            default:
-                break;
+        default:
+            break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
             list_pushback(waiting, thread);
-    } 
-    while(thread != NULL && thread->state == THREAD_RUNNING);
+    } while (thread == NULL || thread->state != THREAD_RUNNING);
 
     return thread;
 }
@@ -608,8 +612,9 @@ esp_t shedule(esp_t esp, context_t *context)
     sanity_check(running);
 
     list_pushback(waiting, running);
-    list_pop(waiting, (void *)&running);
+    // list_pop(waiting, (void *)&running);
 
+    running = get_next_task();
 
     // Load the new context
     set_kernel_stack((uint)running->stack + STACK_SIZE);

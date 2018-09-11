@@ -57,9 +57,9 @@ typedef struct
     int outcode;
 } wait_info_t;
 
-typedef struct 
+typedef struct
 {
-    int wakeuptick;
+    uint wakeuptick;
 } sleep_info_t;
 
 typedef struct

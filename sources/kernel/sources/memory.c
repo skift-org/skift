@@ -66,7 +66,7 @@ uint physical_alloc(uint count)
         uint addr = i * PAGE_SIZE;
         if (!physical_is_used(addr, count))
         {
-            memset(addr, 0, count * PAGE_SIZE);
+            memset((void*)addr, 0, count * PAGE_SIZE);
             physical_set_used(addr, count);
             return addr;
         }
@@ -124,7 +124,6 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
 
         if (!pde->Present)
         {
-            log("0x%x absent!", vaddr);
             return 0;
         }
 
@@ -133,7 +132,6 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
 
         if (!p->Present)
         {
-            log("0x%x absent!", vaddr);
             return 0;
         }
     }
@@ -231,10 +229,7 @@ void memory_setup(uint used, uint total)
     }
 
     // Map the kernel memory
-    uint count = PAGE_ALIGN(used) / PAGE_SIZE;
-
-    physical_set_used(0, count);
-    virtual_map(&kpdir, 0, 0, count, 0);
+    memory_identity_map(&kpdir, 0, PAGE_ALIGN(used) / PAGE_SIZE);
 
     log("Enabling paging...");
     paging_load_directorie(&kpdir);
@@ -346,6 +341,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
     return 0;
 }
 
+
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
     atomic_begin();
@@ -362,6 +358,22 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
     }
 
     atomic_end();
+
+    return 0;
+}
+
+int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
+{
+    physical_set_used(addr, count);
+    virtual_map(pdir, addr, addr, count, 0);
+
+    return 0;
+}
+
+int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
+{
+    physical_set_free(addr, count);
+    virtual_unmap(pdir, addr, count);
 
     return 0;
 }

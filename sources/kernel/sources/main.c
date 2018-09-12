@@ -35,32 +35,61 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
+void system_check(multiboot_info_t *info, s32 magic)
+{
+    log("System check...");
+    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
+        PANIC("Invalid multiboot magic number (0x%x)!", magic);
+
+    if (info->mem_lower + info->mem_upper > 256 * 1024)
+    {
+        PANIC("No enought memory!");
+    }
+}
+
+void setup_cpu_context()
+{
+    log("Initializing cpu context...");
+    setup(gdt);
+    setup(pic);
+    setup(idt);
+    setup(isr);
+    setup(irq);
+}
+
+void setup_system_context()
+{
+    log("Initializing system context...");
+    setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
+    setup(tasking);
+    setup(filesystem);
+    setup(modules, &mbootinfo);
+}
+
+void system_start()
+{
+    log("Enabling interupts, paging and atomics.");
+    paging_enable();
+    atomic_enable();
+    sti();
+    log(KERNEL_UNAME);
+}
+
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-        PANIC("Invalid multiboot magic number (0x%x)!", magic);
-
-    setup(gdt);
-    setup(pic);
-    setup(idt);
-    setup(isr);
-    setup(irq);
+    system_check(&mbootinfo, magic);
+    setup_cpu_context();
+    setup_system_context();
 
     setup(graphic, 1024, 768);
 
-    setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
-    setup(tasking);
-    setup(filesystem);
-    setup(modules, &mbootinfo);
+    system_start();
 
-    log(KERNEL_UNAME);
-
-    atomic_enable();
-    sti();
+    // End of the boot environement //
 
     while (1)
         ;

@@ -47,7 +47,8 @@ void set_kernel_stack(u32 stack)
 
 void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint)
 {
-    log("GDT[%d:%s]\t = { BASE=%x, LIMIT=%x, ACCESS=%b, FLAGS=%b }", index, hint, base, limit, access, flags);
+    UNUSED(hint);
+    // log("GDT[%d:%s]\t = { BASE=%x, LIMIT=%x, ACCESS=%b, FLAGS=%b }", index, hint, base, limit, access, flags);
 
     gdt_entry_t * entry = &gdt.entries[index];
     entry->acces = access;

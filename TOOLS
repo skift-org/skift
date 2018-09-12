@@ -107,7 +107,7 @@ def build_iso(location, kernel, ramdisk):
         f.write("set timeout=15\n")
         f.write("set default=0\n\n")
 
-        f.write("menuentry \"skiftOS\" {\n")
+        f.write("menuentry \"%s\" {\n" % ("skiftOS"))
         f.write("   multiboot /boot/kernel.bin\n")
         f.write("   module    /boot/ramdisk.tar ramdisk\n")
         f.write("   boot\n")

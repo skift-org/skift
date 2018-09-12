@@ -96,6 +96,8 @@ process_t *alloc_process(const char *name, int flags)
 
 void free_thread(thread_t *thread)
 {
+    list_remove(threads, thread);
+    list_remove(thread->process->threads, (void*)thread);
     free(thread->stack);
     free(thread);
 }
@@ -487,23 +489,32 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     return p;
 }
 
+void cancel_childs(process_t * process)
+{
+    FOREACH(i, process->threads)
+    {
+        thread_t * thread = (thread_t *)i->value;
+        thread_cancel(thread->id);
+    }
+}
+
 void process_cancel(PROCESS p)
 {
     atomic_begin();
 
     if (p != kernel_process)
     {
-
         process_t *process = process_get(p);
         process->state = PROCESS_CANCELED;
-        notify_threads(0, p, -1);
-
         log("Process '%s' ID=%d canceled!", process->name, process->id);
+
+        notify_threads(0, p, -1);
+        cancel_childs(process);
     }
     else
     {
         process_t *process = process_get(process_self());
-        log("Warning! Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process_self());
+        log("Warning! Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
     }
 
     atomic_end();
@@ -523,6 +534,7 @@ void process_exit(int code)
 
         // Notify waiting thread that we exited.
         notify_threads(0, p, code);
+        cancel_childs(process);
     }
     else
     {
@@ -567,32 +579,33 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-        case THREAD_CANCELED:
-            // Free the dead thread.
-            free_thread(thread);
-            thread = NULL;
-            break;
+            case THREAD_CANCELED:
+                kill_thread(thread);
 
-        case THREAD_SLEEP:
-            // Wakeup the thread
-            if (thread->sleepinfo.wakeuptick >= ticks)
-                thread->state = THREAD_RUNNING;
-            break;
+                thread = NULL;
+                break;
 
-        case THREAD_WAIT_PROCESS:
-            // Do nothing for now.
-            break;
+            case THREAD_SLEEP:
+                // Wakeup the thread
+                if (thread->sleepinfo.wakeuptick >= ticks)
+                    thread->state = THREAD_RUNNING;
+                break;
 
-        case THREAD_WAIT_THREAD:
-            // Do nothing for  now.
-            break;
+            case THREAD_WAIT_PROCESS:
+                // Do nothing for now.
+                break;
 
-        default:
-            break;
+            case THREAD_WAIT_THREAD:
+                // Do nothing for  now.
+                break;
+
+            default:
+                break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
             list_pushback(waiting, thread);
+
     } while (thread == NULL || thread->state != THREAD_RUNNING);
 
     return thread;

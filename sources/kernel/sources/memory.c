@@ -4,6 +4,8 @@
 
 /* memory.c: Physical, virtual and logical memory managment                   */
 
+#include <string.h>
+
 #include "types.h"
 #include "utils.h"
 #include "sync/atomic.h"
@@ -64,6 +66,7 @@ uint physical_alloc(uint count)
         uint addr = i * PAGE_SIZE;
         if (!physical_is_used(addr, count))
         {
+            memset(addr, 0, count * PAGE_SIZE);
             physical_set_used(addr, count);
             return addr;
         }
@@ -213,6 +216,8 @@ void memory_setup(uint used, uint total)
 {
     TOTAL_MEMORY = total;
 
+    memset(&MEMORY, 0, sizeof(MEMORY));
+
     log("Memory: USED=%dko TOTAL=%dko", used / 1024, total / 1024);
 
     // Setup the kernel pagedirectorie.
@@ -233,7 +238,7 @@ void memory_setup(uint used, uint total)
 
     log("Enabling paging...");
     paging_load_directorie(&kpdir);
-    paging_enable();
+    //paging_enable();
     log("Paging enabled!");
 }
 

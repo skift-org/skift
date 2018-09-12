@@ -59,43 +59,11 @@ u32 * bga_get_framebuffer()
 
 /* --- public functions ----------------------------------------------------- */
 
-u32 bga_width = 0;
-u32 bga_height = 0;
-u32 * bga_framebuffer = NULL;
-
-void bga_setup()
-{
-    if (bga_is_available())
-    {
-        bga_mode(1280, 720);
-        bga_framebuffer = bga_get_framebuffer();
-    }
-}
-
 void bga_mode(u32 width, u32 height)
 {
-    bga_width = width;
-    bga_height = height;
-
     bga_write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
     bga_write_register(VBE_DISPI_INDEX_XRES, width);
     bga_write_register(VBE_DISPI_INDEX_YRES, height);
     bga_write_register(VBE_DISPI_INDEX_BPP, 32);
     bga_write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
-}
-
-void bga_blit(buffer32_t buffer)
-{ 
-    for(u32 x = 0; x < bga_width; x++)
-    {
-        for(u32 y = 0; y < bga_height; x++)
-        {
-            bga_framebuffer[x + y * bga_width] = buffer[x + y * bga_width];
-        }
-    }
-}
-
-void bga_pixel(u32 x, u32 y, u32 value)
-{
-    bga_framebuffer[x + y * bga_width] = value;
 }

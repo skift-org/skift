@@ -81,6 +81,8 @@ void main(multiboot_info_t *info, s32 magic)
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
+    // Start of the boot environement (be very carefull what you do here ;) ) //
+
     system_check(&mbootinfo, magic);
     setup_cpu_context();
     setup_system_context();

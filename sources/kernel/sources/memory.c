@@ -66,7 +66,7 @@ uint physical_alloc(uint count)
         uint addr = i * PAGE_SIZE;
         if (!physical_is_used(addr, count))
         {
-            memset((void*)addr, 0, count * PAGE_SIZE);
+            memset((void *)addr, 0, count * PAGE_SIZE);
             physical_set_used(addr, count);
             return addr;
         }
@@ -208,6 +208,19 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
     paging_invalidate_tlb();
 }
 
+uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count)
+{
+    for(size_t i = 0; i < 256; i++)
+    {
+        for(size_t j = 0; j < 1024; j++)
+        {
+            /* code */
+        }
+    }
+    
+    return 0;
+}
+
 /* --- Public functions ----------------------------------------------------- */
 
 void memory_setup(uint used, uint total)
@@ -323,7 +336,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
 
-    log("MAP: PDIR=0x%x ADDR=0x%x COUNT=%d",pdir, addr, count);
+    log("MAP: PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     for (uint i = 0; i < count; i++)
     {
@@ -340,7 +353,6 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 
     return 0;
 }
-
 
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
@@ -378,19 +390,19 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-void memory_dump(page_directorie_t * pdir)
+void memory_dump(page_directorie_t *pdir)
 {
-    for(size_t i = 0; i < 1024; i++)
+    for (size_t i = 0; i < 1024; i++)
     {
-        page_directorie_entry_t * pde = &pdir->entries[i];
+        page_directorie_entry_t *pde = &pdir->entries[i];
         if (pde->Present)
         {
             printf("pdir[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, pde->PageFrameNumber, pde->Present, pde->Write, pde->User);
             page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
 
-            for(size_t i = 0; i < 1024; i++)
+            for (size_t i = 0; i < 1024; i++)
             {
-                page_t * p = &ptable->pages[i];
+                page_t *p = &ptable->pages[i];
                 if (p->Present)
                 {
                     printf("ptable[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, p->PageFrameNumber, p->Present, p->Write, p->User);

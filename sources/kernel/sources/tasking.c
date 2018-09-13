@@ -97,7 +97,7 @@ process_t *alloc_process(const char *name, int flags)
 void free_thread(thread_t *thread)
 {
     list_remove(threads, thread);
-    list_remove(thread->process->threads, (void*)thread);
+    list_remove(thread->process->threads, (void *)thread);
     free(thread->stack);
     free(thread);
 }
@@ -489,11 +489,11 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     return p;
 }
 
-void cancel_childs(process_t * process)
+void cancel_childs(process_t *process)
 {
     FOREACH(i, process->threads)
     {
-        thread_t * thread = (thread_t *)i->value;
+        thread_t *thread = (thread_t *)i->value;
         thread_cancel(thread->id);
     }
 }
@@ -579,28 +579,28 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-            case THREAD_CANCELED:
-                kill_thread(thread);
+        case THREAD_CANCELED:
+            kill_thread(thread);
 
-                thread = NULL;
-                break;
+            thread = NULL;
+            break;
 
-            case THREAD_SLEEP:
-                // Wakeup the thread
-                if (thread->sleepinfo.wakeuptick >= ticks)
-                    thread->state = THREAD_RUNNING;
-                break;
+        case THREAD_SLEEP:
+            // Wakeup the thread
+            if (thread->sleepinfo.wakeuptick >= ticks)
+                thread->state = THREAD_RUNNING;
+            break;
 
-            case THREAD_WAIT_PROCESS:
-                // Do nothing for now.
-                break;
+        case THREAD_WAIT_PROCESS:
+            // Do nothing for now.
+            break;
 
-            case THREAD_WAIT_THREAD:
-                // Do nothing for  now.
-                break;
+        case THREAD_WAIT_THREAD:
+            // Do nothing for  now.
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)

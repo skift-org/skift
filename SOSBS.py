@@ -13,27 +13,27 @@ import json
 
 # --- Utils ------------------------------------------------------------------ #
 
-ESCAPE = '\033['
+ESC = '\033['
 
-BLACK = ESCAPE + '30m'
-RED = ESCAPE + '31m'
-GREEN = ESCAPE + '32m'
-YELLOW = ESCAPE + '33m'
-BLUE = ESCAPE + '34m'
-MAGENTA = ESCAPE + '35m'
-CYAN = ESCAPE + '36m'
-WHITE = ESCAPE + '37m'
+BLACK = ESC + '30m'
+RED = ESC + '31m'
+GREEN = ESC + '32m'
+YELLOW = ESC + '33m'
+BLUE = ESC + '34m'
+MAGENTA = ESC + '35m'
+CYAN = ESC + '36m'
+WHITE = ESC + '37m'
 
-BRIGHT_BLACK = ESCAPE + '30;1m'
-BRIGHT_RED = ESCAPE + '31;1m'
-BRIGHT_GREEN = ESCAPE + '32;1m'
-BRIGHT_YELLOW = ESCAPE + '33;1m'
-BRIGHT_BLUE = ESCAPE + '34;1m'
-BRIGHT_MAGENTA = ESCAPE + '35;1m'
-BRIGHT_CYAN = ESCAPE + '36;1m'
-BRIGHT_WHITE = ESCAPE + '37;1m'
+BRIGHT_BLACK = ESC + '30;1m'
+BRIGHT_RED = ESC + '31;1m'
+BRIGHT_GREEN = ESC + '32;1m'
+BRIGHT_YELLOW = ESC + '33;1m'
+BRIGHT_BLUE = ESC + '34;1m'
+BRIGHT_MAGENTA = ESC + '35;1m'
+BRIGHT_CYAN = ESC + '36;1m'
+BRIGHT_WHITE = ESC + '37;1m'
 
-RESET = ESCAPE + '0m'
+RESET = ESC + '0m'
 
 # --- Crosscompiler ---------------------------------------------------------- #
 

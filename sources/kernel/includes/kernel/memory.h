@@ -10,7 +10,7 @@
 
 void memory_setup(uint used, uint total);
 
-page_directorie_t * memory_kpdir();
+page_directorie_t *memory_kpdir();
 
 uint memory_alloc(uint count);
 void memory_free(uint addr, uint count);
@@ -24,4 +24,4 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_map(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count);
 
-void memory_dump(page_directorie_t * pdir);
+void memory_dump(page_directorie_t *pdir);

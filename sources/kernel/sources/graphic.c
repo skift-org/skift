@@ -27,7 +27,7 @@ void graphic_setup(uint width, uint height)
         {
             for (uint y = 0; y < graphic_height; y++)
             {
-                graphic_pixel(x, y, 0xaaaaaa);
+                graphic_pixel(x, y, 0xAAAAAA);
             }
         }
     }
@@ -39,9 +39,8 @@ void graphic_setup(uint width, uint height)
         framebuffer = NULL;
     }
 
-
     log("Framebuffer at 0x%x.", framebuffer);
-    memory_map(memory_kpdir(), (uint)framebuffer, (graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE, 0);
+    memory_identity_map(memory_kpdir(), (uint)framebuffer, (graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE);
 }
 
 void graphic_blit(uint *buffer)

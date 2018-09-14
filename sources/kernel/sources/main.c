@@ -81,7 +81,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
-    // Start of the boot environement (be very carefull what you do here ;) ) //
+    // Start of the boot environement ( be very carefull what you do here ;) ) //
 
     system_check(&mbootinfo, magic);
     setup_cpu_context();
@@ -89,12 +89,11 @@ void main(multiboot_info_t *info, s32 magic)
 
     setup(graphic, 1024, 768);
 
+    // End of the boot environement //
     system_start();
 
-    // End of the boot environement //
 
-    while (1)
-        ;
+    while (1) ;
 
     PANIC("The end of the main function has been reached.");
 }

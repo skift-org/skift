@@ -193,13 +193,29 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
     paging_invalidate_tlb();
 }
 
-uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count)
+uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
 {
-    for (size_t i = 0; i < 256; i++)
+    if (count == 0) return 0;
+
+    uint current_size = 0;
+
+    for (size_t i = 0; i < 1024 * 1024; i++)
     {
-        for (size_t j = 0; j < 1024; j++)
+        int vaddr = i * PAGE_SIZE;
+
+        if (!page_present(pdir, vaddr))
         {
-            /* code */
+            current_size++;
+
+            if (current_size == count)
+            {
+                virtual_map(pdir, vaddr, paddr, count, user);
+                return vaddr;
+            }
+        }
+        else
+        {
+            current_size = 0;
         }
     }
 

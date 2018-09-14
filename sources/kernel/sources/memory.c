@@ -86,29 +86,27 @@ void physical_free(uint addr, uint count)
 // Page table index
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-int virtual_absent(page_directorie_t *pdir, uint vaddr, uint count)
+inline int page_present(page_directorie_t *pdir, uint vaddr)
 {
-    int absent = 1;
+    uint pdi = PD_INDEX(vaddr);
+    uint pti = PT_INDEX(vaddr);
 
-    for (uint i = 0; i < count; i++)
+    page_directorie_entry_t *pde = &pdir->entries[pdi];
+
+    if (!pde->Present)
     {
-        uint offset = i * PAGE_SIZE;
-
-        uint pdi = PD_INDEX(vaddr + offset);
-        uint pti = PT_INDEX(vaddr + offset);
-
-        page_directorie_entry_t *pde = &pdir->entries[pdi];
-
-        if (pde->Present)
-        {
-            page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-            page_t *p = &ptable->pages[pti];
-
-            absent = absent && !p->Present;
-        }
+        return 0;
     }
 
-    return absent;
+    page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+    page_t *p = &ptable->pages[pti];
+
+    if (!p->Present)
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
@@ -117,20 +115,7 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
     {
         uint offset = i * PAGE_SIZE;
 
-        uint pdi = PD_INDEX(vaddr + offset);
-        uint pti = PT_INDEX(vaddr + offset);
-
-        page_directorie_entry_t *pde = &pdir->entries[pdi];
-
-        if (!pde->Present)
-        {
-            return 0;
-        }
-
-        page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-        page_t *p = &ptable->pages[pti];
-
-        if (!p->Present)
+        if (!page_present(pdir, vaddr + offset))
         {
             return 0;
         }
@@ -210,14 +195,14 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
 
 uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count)
 {
-    for(size_t i = 0; i < 256; i++)
+    for (size_t i = 0; i < 256; i++)
     {
-        for(size_t j = 0; j < 1024; j++)
+        for (size_t j = 0; j < 1024; j++)
         {
             /* code */
         }
     }
-    
+
     return 0;
 }
 
@@ -244,10 +229,7 @@ void memory_setup(uint used, uint total)
     // Map the kernel memory
     memory_identity_map(&kpdir, 0, PAGE_ALIGN(used) / PAGE_SIZE);
 
-    log("Enabling paging...");
     paging_load_directorie(&kpdir);
-    //paging_enable();
-    log("Paging enabled!");
 }
 
 page_directorie_t *memory_kpdir()

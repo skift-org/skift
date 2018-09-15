@@ -222,6 +222,12 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
     return 0;
 }
 
+void virtual_free(page_directorie_t * pdir, uint vaddr, uint count)
+{
+    // TODO: Check if the memory was allocated with ´virtual_alloc´.
+    virtual_unmap(pdir, vaddr, count);
+}
+
 /* --- Public functions ----------------------------------------------------- */
 
 void memory_setup(uint used, uint total)
@@ -265,6 +271,19 @@ uint memory_alloc(uint count)
     atomic_end();
 
     return addr;
+}
+
+uint memory_alloc_at(uint count, uint paddr)
+{
+    if (count == 0) return 0;
+
+    atomic_begin();
+
+    uint vaddr = virtual_alloc(&kpdir, paddr, count, 0);
+
+    atomic_end();
+
+    return vaddr;
 }
 
 void memory_free(uint addr, uint count)

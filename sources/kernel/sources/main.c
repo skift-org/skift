@@ -92,6 +92,18 @@ void main(multiboot_info_t *info, s32 magic)
     // End of the boot environement //
     system_start();
 
+    
+    for(size_t x = 0; x < 16; x++)
+    {
+        
+        for(size_t y = 0; y < 16; y++)
+        {
+            graphic_pixel(16 + x,16 + y, 0xff0000);
+        }
+        
+    }
+    
+    graphic_pixel(16,16, 0xff0000);
 
     while (1) ;
 

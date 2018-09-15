@@ -3,6 +3,7 @@
 #include "kernel/dev/bga.h"
 #include "kernel/dev/vga_font.h"
 
+#include "kernel/memory.h"
 #include "kernel/graphic.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
@@ -21,7 +22,9 @@ void graphic_setup(uint width, uint height)
     {
         log("Bochs graphic adaptater found!");
         bga_mode(width, height);
-        framebuffer = (uint *)bga_get_framebuffer();
+        uint* physical_framebuffer = (uint *)bga_get_framebuffer();
+
+        framebuffer = (uint*)memory_alloc_at((width * height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer);
 
         for (uint x = 0; x < graphic_width; x++)
         {
@@ -40,7 +43,6 @@ void graphic_setup(uint width, uint height)
     }
 
     log("Framebuffer at 0x%x.", framebuffer);
-    memory_identity_map(memory_kpdir(), (uint)framebuffer, (graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE);
 }
 
 void graphic_blit(uint *buffer)

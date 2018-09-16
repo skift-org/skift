@@ -105,7 +105,7 @@ void main(multiboot_info_t *info, s32 magic)
     
     graphic_pixel(16,16, 0xff0000);
 
-    while (1) ;
+    while(1);
 
     PANIC("The end of the main function has been reached.");
 }

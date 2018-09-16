@@ -1,38 +1,20 @@
 #pragma once
 #include "types.h"
 
-typedef union 
+typedef struct
 {
-    struct
-    {
-        uchar alpha;
-        uchar red;
-        uchar green;
-        uchar blue;
-    } argb;
+    int shared;
 
-    uint value;
-} color_t;
-
-typedef struct 
-{
     uint width;
     uint height;
 
-    uint* data;
+    uint *buffer;
 } bitmap_t;
 
-typedef struct 
-{
-    bitmap_t * bitmap;
-} drawing_context_t;
+bitmap_t *graphic_bitmap_shared(uint width, uint height, uint *buffer);
+bitmap_t *graphic_bitmap_alloc(uint width, uint height);
+void graphic_bitmap_free(bitmap_t *bmp);
 
-bitmap_t * bitmap_alloc(uint width, uint height);
-void bitmap_free(bitmap_t * bitmap);
-void bitmap_resize(bitmap_t * bitmap, uint width, uint height);
-
-void png_decode_file();
-void png_decode_memory();
-void png_encode_file();
-void png_encode_memory();
-
+void graphic_pixel(bitmap_t *bmp, uint x, uint y, uint color);
+void graphic_line(bitmap_t *bmp);
+void graphic_rectangle(bitmap_t*bmp);

@@ -66,7 +66,6 @@ uint physical_alloc(uint count)
         uint addr = i * PAGE_SIZE;
         if (!physical_is_used(addr, count))
         {
-            memset((void *)addr, 0, count * PAGE_SIZE);
             physical_set_used(addr, count);
             return addr;
         }
@@ -253,6 +252,7 @@ void memory_setup(uint used, uint total)
     memory_identity_map(&kpdir, 0, PAGE_ALIGN(used) / PAGE_SIZE);
 
     paging_load_directorie(&kpdir);
+    paging_enable();
 }
 
 page_directorie_t *memory_kpdir()
@@ -286,6 +286,8 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     atomic_end();
 
+    memset((void *)vaddr, 0, count * PAGE_SIZE);
+
     return vaddr;
 }
 
@@ -299,6 +301,8 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
     uint vaddr = virtual_alloc(pdir, paddr, count, user);
 
     atomic_end();
+
+    memset((void *)vaddr, 0, count * PAGE_SIZE);
 
     return vaddr;
 }

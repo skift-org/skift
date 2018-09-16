@@ -69,7 +69,7 @@ void setup_system_context()
 void system_start()
 {
     log("Enabling interupts, paging and atomics.");
-    paging_enable();
+    //paging_enable();
     atomic_enable();
     sti();
     log(KERNEL_UNAME);
@@ -87,7 +87,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup_cpu_context();
     setup_system_context();
 
-    setup(graphic, 1024, 768);
+    //setup(graphic, 1024, 768);
 
     // End of the boot environement //
     system_start();

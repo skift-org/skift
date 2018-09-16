@@ -152,7 +152,7 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
         if (!pde->Present)
         {
             log("Missing page table! Allocating a new one");
-            ptable = (page_table_t *)memory_alloc(1);
+            ptable = (page_table_t *)memory_alloc(&kpdir, 1, 0);
             log("New page table at %x", ptable);
 
             pde->Present = 1;
@@ -195,11 +195,12 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
 
 uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
 {
-    if (count == 0) return 0;
+    if (count == 0)
+        return 0;
 
     uint current_size = 0;
 
-    for (size_t i = 0; i < 1024 * 1024; i++)
+    for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
     {
         int vaddr = i * PAGE_SIZE;
 
@@ -222,7 +223,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
     return 0;
 }
 
-void virtual_free(page_directorie_t * pdir, uint vaddr, uint count)
+void virtual_free(page_directorie_t *pdir, uint vaddr, uint count)
 {
     // TODO: Check if the memory was allocated with ´virtual_alloc´.
     virtual_unmap(pdir, vaddr, count);
@@ -259,39 +260,57 @@ page_directorie_t *memory_kpdir()
     return &kpdir;
 }
 
-uint memory_alloc(uint count)
+uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 {
-    atomic_begin();
-
-    uint addr = physical_alloc(count);
-
-    if (addr != 0)
-        virtual_map(&kpdir, addr, addr, count, 0);
-
-    atomic_end();
-
-    return addr;
-}
-
-uint memory_alloc_at(uint count, uint paddr)
-{
-    if (count == 0) return 0;
+    if (count == 0)
+        return 0;
 
     atomic_begin();
 
-    uint vaddr = virtual_alloc(&kpdir, paddr, count, 0);
+    uint paddr = physical_alloc(count);
+
+    if (paddr == 0)
+    {
+        atomic_end();
+        return 0;
+    }
+
+    uint vaddr = virtual_alloc(pdir, paddr, count, user);
+
+    if (vaddr == 0)
+    {
+        physical_free(paddr, count);
+        atomic_end();
+        return 0;
+    }
 
     atomic_end();
 
     return vaddr;
 }
 
-void memory_free(uint addr, uint count)
+uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 {
+    if (count == 0)
+        return 0;
+
+    atomic_begin();
+
+    uint vaddr = virtual_alloc(pdir, paddr, count, user);
+
+    atomic_end();
+
+    return vaddr;
+}
+
+void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
+{
+    UNUSED(user);
+
     atomic_begin();
 
     physical_free(addr, count);
-    virtual_unmap(&kpdir, addr, count);
+    virtual_unmap(pdir, addr, count);
 
     atomic_end();
 }
@@ -301,7 +320,7 @@ page_directorie_t *memory_alloc_pdir()
 {
     atomic_begin();
 
-    page_directorie_t *pdir = (page_directorie_t *)memory_alloc(1);
+    page_directorie_t *pdir = (page_directorie_t *)memory_alloc(&kpdir, 1, 0);
 
     // Copy first gigs of virtual memory (kernel space);
     for (uint i = 0; i < 256; i++)
@@ -340,11 +359,10 @@ void memory_free_pdir(page_directorie_t *pdir)
                 }
             }
 
-            memory_free((uint)pt, 1);
+            memory_free(&kpdir, (uint)pt, 1, 0);
         }
     }
-
-    memory_free((uint)pdir, 1);
+    memory_free(&kpdir, (uint)pdir, 1, 0);
 
     atomic_end();
 }

@@ -557,6 +557,16 @@ int process_unmap(PROCESS p, uint addr, uint count)
     return memory_unmap(process_get(p)->pdir, addr, count);
 }
 
+uint process_alloc(uint count)
+{
+    return memory_alloc(running->process->pdir, count, 1);
+}
+
+void process_free(uint addr, uint count)
+{
+    return memory_free(running->process->pdir, addr, count, 1);
+}
+
 /* --- Sheduler ------------------------------------------------------------- */
 
 void sanity_check(thread_t *thread)

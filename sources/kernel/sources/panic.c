@@ -48,10 +48,10 @@ void __panic(const string file, const string function, const int line, context_t
     printf("\n");
     printf("\n\tDiagnostic:");
     printf("\n\tThe system was running for %d tick.", ticks);
-    thread_dump(thread_self());
+    // thread_dump(thread_self());
     printf("\n");
 
-    thread_dump_all();
+    // thread_dump_all();
     printf("\n\n");
 
     if (context != NULL)

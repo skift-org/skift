@@ -105,10 +105,13 @@ PROCESS process_self(); // Return a handler to the current process.
 // Create a new process.
 PROCESS process_create(const char *name, int flags);
 
-void process_cancel(PROCESS p);                      // Cancle the selected process.
-void process_exit(int code);                         // Exit the current process and send and exit code.
+void process_cancel(PROCESS p); // Cancle the selected process.
+void process_exit(int code);    // Exit the current process and send and exit code.
+
 int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
 int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
+uint process_alloc(uint count);                      // Alloc some some memory page to the process memory space.
+void process_free(uint addr, uint count);            // Free perviously allocated memory.
 
 // Load and run a ELF file from the file system.
 PROCESS process_exec(const char *filename, int argc, char **argv);

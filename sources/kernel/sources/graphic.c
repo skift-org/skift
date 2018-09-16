@@ -24,7 +24,7 @@ void graphic_setup(uint width, uint height)
         bga_mode(width, height);
         uint* physical_framebuffer = (uint *)bga_get_framebuffer();
 
-        framebuffer = (uint*)memory_alloc_at((width * height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer);
+        framebuffer = (uint*)memory_alloc_at(memory_kpdir(), (width * height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer, 0);
 
         for (uint x = 0; x < graphic_width; x++)
         {

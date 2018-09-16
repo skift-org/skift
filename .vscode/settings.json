@@ -16,6 +16,7 @@
     "files.associations": {
         "cmath": "c",
         "array": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "irq.h": "c"
     }
 }

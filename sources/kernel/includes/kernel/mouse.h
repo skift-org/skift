@@ -19,6 +19,6 @@ typedef enum
 
 void mouse_setup();
 
-int mouse_get_position(uint * outxpos, uint * outypos);
+void mouse_get_position(uint * outxpos, uint * outypos);
 int mouse_set_position(uint xpos, uint ypos);
-mouse_bstate_t mouse_buttont(mouse_button_t button);
+mouse_bstate_t mouse_button(mouse_button_t button);

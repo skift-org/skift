@@ -12,13 +12,12 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/isr.h"
 
-#include "kernel/dev/vga.h"
-
 #include "kernel/filesystem.h"
 #include "kernel/graphic.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
+#include "kernel/mouse.h"
 #include "kernel/multiboot.h"
 #include "kernel/paging.h"
 #include "kernel/system.h"
@@ -84,17 +83,23 @@ void main(multiboot_info_t *info, s32 magic)
 
     system_check(&mbootinfo, magic);
 
-    graphic_early_setup(1920, 1080);
+    graphic_early_setup(1024, 768);
 
     setup_cpu_context();
     setup_system_context();
 
     setup(graphic);
+    setup(mouse);
 
     // End of the boot environement //
     system_start();
 
-    while(1);
+    while(1)
+    {
+        uint mousex, mousey;
+        mouse_get_position(&mousex, &mousey);
+        graphic_pixel(mousex, mousey, 0xff0000);
+    }
 
     PANIC("The end of the main function has been reached.");
 }

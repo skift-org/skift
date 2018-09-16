@@ -35,6 +35,8 @@ bool bga_is_available(void)
 
 u32 * bga_get_framebuffer()
 {
+    // TODO REMOVE: VERY bad hack
+
     bga_set_bank(0);
     u32 * lfb = 0;
     u32 * text_vid_mem = (u32 *)0xA0000;

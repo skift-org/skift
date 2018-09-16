@@ -80,30 +80,19 @@ void main(multiboot_info_t *info, s32 magic)
     puts("\n");
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-
     // Start of the boot environement ( be very carefull what you do here ;) ) //
 
     system_check(&mbootinfo, magic);
+
+    graphic_early_setup(1920, 1080);
+
     setup_cpu_context();
     setup_system_context();
 
-    //setup(graphic, 1024, 768);
+    setup(graphic);
 
     // End of the boot environement //
     system_start();
-
-    
-    for(size_t x = 0; x < 16; x++)
-    {
-        
-        for(size_t y = 0; y < 16; y++)
-        {
-            graphic_pixel(16 + x,16 + y, 0xff0000);
-        }
-        
-    }
-    
-    graphic_pixel(16,16, 0xff0000);
 
     while(1);
 

@@ -8,48 +8,51 @@
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 
+uint *physical_framebuffer = NULL;
 uint *framebuffer = NULL;
 
 uint graphic_width = 0;
 uint graphic_height = 0;
 
-void graphic_setup(uint width, uint height)
-{
-    graphic_width = width;
-    graphic_height = height;
+/* --- Graphic device setup ------------------------------------------------- */
 
+void graphic_early_setup(uint width, uint height)
+{
     if (bga_is_available())
     {
-        log("Bochs graphic adaptater found!");
+        log("Bochs graphics adaptor found!");
+        graphic_width = width;
+        graphic_height = height;
+
         bga_mode(width, height);
-        uint* physical_framebuffer = (uint *)bga_get_framebuffer();
-
-        framebuffer = (uint*)memory_alloc_at(memory_kpdir(), (width * height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer, 0);
-
-        for (uint x = 0; x < graphic_width; x++)
-        {
-            for (uint y = 0; y < graphic_height; y++)
-            {
-                graphic_pixel(x, y, 0xAAAAAA);
-            }
-        }
+        physical_framebuffer = (uint *)bga_get_framebuffer();
+        framebuffer = physical_framebuffer;
     }
     else
     {
         log("Warning, no graphic device found!");
         graphic_width = 0;
         graphic_height = 0;
-        framebuffer = NULL;
+        physical_framebuffer = NULL;
+    }
+
+    if (framebuffer != NULL)
+    {
+        graphic_print(1, 1, "skiftOS booting...");
+    }
+}
+
+void graphic_setup()
+{
+    if (physical_framebuffer != NULL)
+    {
+        framebuffer = (uint *)memory_alloc_at(memory_kpdir(), (graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer, 0);
     }
 
     log("Framebuffer at 0x%x.", framebuffer);
 }
 
-void graphic_blit(uint *buffer)
-{
-    if (framebuffer != NULL)
-        memcpy(framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
-}
+/* --- Screen size ---------------------------------------------------------- */
 
 void graphic_size_char(uint *width, uint *height)
 {
@@ -61,6 +64,20 @@ void graphic_size_pixel(uint *width, uint *height)
 {
     *width = graphic_width;
     *height = graphic_height;
+}
+
+/* --- Drawing to the screen ------------------------------------------------ */
+
+void graphic_blit(uint *buffer)
+{
+    if (framebuffer != NULL)
+        memcpy(framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
+}
+
+inline void graphic_pixel(uint x, uint y, uint color)
+{
+    if (framebuffer != NULL && x < graphic_width && y < graphic_height)
+        framebuffer[x + y * graphic_width] = color;
 }
 
 int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
@@ -81,8 +98,12 @@ void graphic_char(uint x, uint y, uchar c)
     }
 }
 
-void graphic_pixel(uint x, uint y, uint color)
+void graphic_print(uint x, uint y, char *s)
 {
-    if (framebuffer != NULL && x < graphic_width && y < graphic_height)
-        framebuffer[x + y * graphic_width] = color;
+    char c;
+
+    for (size_t i = 0; (c = s[i]); i++)
+    {
+        graphic_char(x + i, y, c);
+    }
 }

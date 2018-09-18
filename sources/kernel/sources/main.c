@@ -77,7 +77,8 @@ void system_start()
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
-
+    log("================================================================================");
+    
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     // Start of the boot environement ( be very carefull what you do here ;) ) //
 
@@ -93,6 +94,8 @@ void main(multiboot_info_t *info, s32 magic)
 
     // End of the boot environement //
     system_start();
+
+    process_exec("application/test-app.app", 0, NULL);
 
     while(1)
     {

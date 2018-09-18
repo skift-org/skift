@@ -420,7 +420,7 @@ PROCESS process_create(const char *name, int flags)
 
     atomic_end();
 
-    log("Process '%s' with ID=%d is running.", process->name, process->id);
+    log("Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
 
     return process->id;
 }
@@ -436,8 +436,8 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         // To avoid pagefault we need to switch page directorie.
         page_directorie_t *pdir = running->process->pdir;
 
+        log("Switching page directorie from %x to %x.", pdir, process->pdir);
         paging_load_directorie(process->pdir);
-
         process_map(process->id, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
         memset((void *)dest, 0, destsz);
         memcpy((void *)dest, (void *)src, srcsz);
@@ -465,13 +465,14 @@ PROCESS process_exec(const char *path, int argc, char **argv)
         return 0;
     }
 
-    PROCESS p = process_create(path, 0);
+    PROCESS p = process_create(path, TASK_USER);
 
     void *buffer = file_read_all(fp);
     file_close(fp);
 
     ELF_header_t *elf = (ELF_header_t *)buffer;
 
+    printf("\n");
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 
     ELF_program_t program;

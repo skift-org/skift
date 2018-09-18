@@ -288,7 +288,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    log("Memory allocated");
+    log("Memory allocated (PADDR=0x%x, VADDR=0x%x, COUNT=%d).", paddr, vaddr, count);
 
     return vaddr;
 }

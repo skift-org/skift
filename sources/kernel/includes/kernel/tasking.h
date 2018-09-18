@@ -3,9 +3,6 @@
 /* Copyright © 2018 MAKER.                                                    */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
-
-#include <stdbool.h>
-
 #include "types.h"
 #include "utils.h"
 
@@ -18,8 +15,8 @@
 
 #define TASK_USER 1
 
-typedef int THREAD;
-typedef int PROCESS;
+typedef int THREAD; // Thread handle
+typedef int PROCESS; // Process handler
 
 typedef u32 esp_t;
 typedef void *(*thread_entry_t)(void *);
@@ -88,8 +85,10 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
 
 int thread_cancel(THREAD t);    // Cancel the selected thread.
 void thread_exit(void *retval); // Exit the current thread and return a value.
+
 void thread_sleep(int time);    // Send the current thread to bed.
 void thread_wakeup(THREAD t);   // Wake up the slected thread
+
 void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
 int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.
 
@@ -110,8 +109,9 @@ void process_exit(int code);    // Exit the current process and send and exit co
 
 int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
 int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
+
 uint process_alloc(uint count);                      // Alloc some some memory page to the process memory space.
 void process_free(uint addr, uint count);            // Free perviously allocated memory.
 
-// Load and run a ELF file from the file system.
+// Load a ELF executable, create a adress space and run it.
 PROCESS process_exec(const char *filename, int argc, char **argv);

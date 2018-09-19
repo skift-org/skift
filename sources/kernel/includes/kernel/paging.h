@@ -11,7 +11,7 @@
 #define PAGE_DIRECTORIE_ENTRY_COUNT 1024
 
 #define PAGE_SIZE 0x1000
-#define PAGE_ALIGN(x) (x + PAGE_SIZE - (x % PAGE_SIZE))
+#define PAGE_ALIGN(x) ((x) + PAGE_SIZE - ((x) % PAGE_SIZE))
 #define IS_PAGE_ALIGN(x) (x % PAGE_SIZE == 0)
 
 typedef PACKED(union) // page table entry

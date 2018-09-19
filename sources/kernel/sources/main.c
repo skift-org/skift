@@ -75,17 +75,52 @@ void system_start()
     log(KERNEL_UNAME);
 }
 
+void line(int x0, int y0, int x1, int y1, int weight)
+{
+
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2, e2;
+
+    for (;;)
+    {
+        //graphic_pixel(x0, y0, x0 ^ y0);
+
+        for (int xoff = -weight; xoff < weight; xoff++)
+        {
+            for (int yoff = -weight; yoff < weight; yoff++)
+            {
+                graphic_pixel(x0 + xoff, y0 + yoff, x0 ^ y0);
+            }
+        }
+
+        if (x0 == x1 && y0 == y1)
+            break;
+        e2 = err;
+        if (e2 > -dx)
+        {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dy)
+        {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
     log("================================================================================");
-    
+
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     // Start of the boot environement ( be very carefull what you do here ;) ) //
 
     system_check(&mbootinfo, magic);
 
-    graphic_early_setup(1024, 768);
+    graphic_early_setup(800, 600);
 
     setup_cpu_context();
     setup_system_context();
@@ -97,13 +132,32 @@ void main(multiboot_info_t *info, s32 magic)
     // End of the boot environement //
     system_start();
 
-    process_exec("application/test-app.app", 0, NULL);
+    // process_exec("application/test-app.app", 0, NULL);
 
-    while(1)
+    uint oldmousex = 0;
+    uint oldmousey = 0;
+
+    for (size_t i = 0; 1; i++)
+    {
+        for (size_t x = 0; x < 800; x++)
+        {
+            for (size_t y = 0; y < 600; y++)
+            {
+                graphic_pixel(x, y, (x ^ y) + i);
+            }
+        }
+    }
+
+    while (1)
     {
         uint mousex, mousey;
         mouse_get_position(&mousex, &mousey);
-        graphic_pixel(mousex, mousey, 0xff0000);
+        // graphic_pixel(mousex, mousey, 0xff0000);
+
+        line(mousex, mousey, oldmousex, oldmousey, 10);
+
+        oldmousex = mousex;
+        oldmousey = mousey;
     }
 
     PANIC("The end of the main function has been reached.");

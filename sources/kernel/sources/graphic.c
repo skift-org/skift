@@ -46,7 +46,8 @@ void graphic_setup()
 {
     if (physical_framebuffer != NULL)
     {
-        framebuffer = (uint *)memory_alloc_at(memory_kpdir(), (graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE, (uint)physical_framebuffer, 0);
+        uint page_count = PAGE_ALIGN(graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE;
+        framebuffer = (uint *)memory_alloc_at(memory_kpdir(), page_count, (uint)physical_framebuffer, 0);
     }
 
     log("Framebuffer at 0x%x.", framebuffer);

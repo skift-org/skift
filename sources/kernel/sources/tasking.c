@@ -465,7 +465,7 @@ PROCESS process_exec(const char *path, int argc, char **argv)
         return 0;
     }
 
-    PROCESS p = process_create(path, TASK_USER);
+    PROCESS p = process_create(path, 0);
 
     void *buffer = file_read_all(fp);
     file_close(fp);

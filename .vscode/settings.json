@@ -17,6 +17,7 @@
         "cmath": "c",
         "array": "c",
         "string_view": "c",
-        "irq.h": "c"
+        "irq.h": "c",
+        "typeinfo": "cpp"
     }
 }

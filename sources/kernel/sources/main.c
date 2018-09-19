@@ -14,6 +14,7 @@
 
 #include "kernel/filesystem.h"
 #include "kernel/graphic.h"
+#include "kernel/keyboard.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
@@ -91,11 +92,12 @@ void main(multiboot_info_t *info, s32 magic)
 
     setup(graphic);
     setup(mouse);
+    setup(keyboard);
 
     // End of the boot environement //
     system_start();
 
-    process_exec("application/test-app.app", 0, NULL);
+    //process_exec("application/test-app.app", 0, NULL);
 
     while(1)
     {

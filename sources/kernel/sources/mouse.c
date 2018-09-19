@@ -17,29 +17,29 @@ esp_t mouse_irq(esp_t esp, context_t *context)
 
     switch (cycle)
     {
-    case 0:
-        packet[0] = inb(0x60);
-        if (packet[0] & 8) 
-        {
+        case 0:
+            packet[0] = inb(0x60);
+            if (packet[0] & 8) 
+            {
+                cycle++;
+            }
+            break;
+        case 1:
+            packet[1] = inb(0x60);
             cycle++;
-        }
-        break;
-    case 1:
-        packet[1] = inb(0x60);
-        cycle++;
-        break;
-    case 2:
-        packet[2] = inb(0x60);
-        char offx = packet[1];
-        char offy = packet[2];
+            break;
+        case 2:
+            packet[2] = inb(0x60);
+            char offx = packet[1];
+            char offy = packet[2];
 
-        mouse_x += offx;
-        mouse_y -= offy;
+            mouse_x += offx;
+            mouse_y -= offy;
 
-        log("Mouse %d %d (X=%d ,Y=%d)", (int)packet[1], (int)packet[2], mouse_x, mouse_y);
+            // log("Mouse %d %d (X=%d, Y=%d)", (int)packet[1], (int)packet[2], mouse_x, mouse_y);
 
-        cycle = 0;
-        break;
+            cycle = 0;
+            break;
     }
 
     return esp;

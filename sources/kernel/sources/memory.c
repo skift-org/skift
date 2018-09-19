@@ -18,9 +18,6 @@
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
-page_directorie_t ALIGNED(kpdir, PAGE_SIZE);
-page_table_t ALIGNED(kptable[256], PAGE_SIZE);
-
 uchar MEMORY[1024 * 1024 / 8];
 
 #define PHYSICAL_IS_USED(addr) \
@@ -79,11 +76,14 @@ void physical_free(uint addr, uint count)
     physical_set_free(addr, count);
 }
 
-// Page directory index
-#define PD_INDEX(vaddr) ((vaddr) >> 22)
 
-// Page table index
+/* --- Virtual memory managment --------------------------------------------- */
+
+#define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
+
+page_directorie_t ALIGNED(kpdir, PAGE_SIZE);
+page_table_t ALIGNED(kptable[256], PAGE_SIZE);
 
 inline int page_present(page_directorie_t *pdir, uint vaddr)
 {
@@ -151,8 +151,8 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
         if (!pde->Present)
         {
             log("Missing page table! Allocating a new one");
-            ptable = (page_table_t *)memory_alloc(&kpdir, 1, 0);
-            log("New page table at %x", ptable);
+            ptable = (page_table_t *)memory_alloc(pdir, 1, 0);
+            log("New page table at 0x%x", ptable);
 
             pde->Present = 1;
             pde->Write = 1;

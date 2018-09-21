@@ -408,6 +408,7 @@ PROCESS process_self()
 {
     if (running == NULL)
         return -1;
+
     return running->process->id;
 }
 

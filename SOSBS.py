@@ -39,10 +39,11 @@ RESET = ESC + '0m'
 
 
 def crosscompiler_check():
-    pass
+    return os.path.exists("./toolchain/local/bin/i686-elf-gcc") and \
+           os.path.exists("./toolchain/local/bin/i686-elf-ld")
 
 
-def Crosscompiler_build():
+def crosscompiler_build():
     pass
 
 # --- Utils ------------------------------------------------------------------ #
@@ -158,7 +159,7 @@ def run(target, targets):
 
 def info(target, targets):
     """Dump information about the target."""
-    print(BRIGHT_WHITE + "Target " + target.name + ":" + RESET)
+    print(BRIGHT_WHITE + "Target '" + target.name + "':" + RESET)
     print("\tType: " + str(target.type.name.lower()))
     print("\tDependencies: <TBD>")
     print("\tLocation: " + target.location)
@@ -190,16 +191,18 @@ def rebuild_all(targets):
     """Clean and build all targets."""
     pass
 
-
 def help_command(targets):
     """Show this help message."""
     print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + RESET)
-    print("The skiftOS build system\n")
+    print("The skiftOS build system")
+    print("")
 
-    print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
-    print("        ./SOSBS.py [global action]")
+    if not is_shell:
+        print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
+        print("        ./SOSBS.py [global action]")
+        print("")
 
-    print("\n" + BRIGHT_WHITE + "Targets:" + RESET)
+    print(BRIGHT_WHITE + "Targets:" + RESET)
     print("   ", ', '.join(targets.keys()))
 
     print("\n" + BRIGHT_WHITE + "Actions:" + RESET)
@@ -260,6 +263,25 @@ def missing_command(command):
 def main(argc, argv):
 
     targets = list_targets("sources")
+
+    global is_shell 
+    is_shell = False
+
+    if "--shell" in argv:
+        is_shell = True
+        argv.remove("--shell")
+        argc -= 1
+
+    if not crosscompiler_check():
+        print(BRIGHT_RED + "ERROR: " + RESET + "Toolchain not found!")
+
+        respond = input("Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
+
+        if respond in ['y', "yes"]:
+            pass
+        
+        else:
+            exit()
 
     if (argc >= 2):
         action = argv[1]

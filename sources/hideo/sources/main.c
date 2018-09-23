@@ -1,7 +1,8 @@
-// The Hideo compositor and window manager.
+// main.c - The Hideo compositor and window manager.
 
-#include "types.h"
-#include "utils.h"
+#include <types.h>
+#include <utils.h>
+
 #include "hideo.h"
 #include "hideo-internal.h"
 

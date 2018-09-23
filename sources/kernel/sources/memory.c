@@ -15,6 +15,11 @@
 
 /* --- Private functions ---------------------------------------------------- */
 
+typedef PACKED(struct)
+{
+    
+} physical_memory_region_t;
+
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
@@ -307,6 +312,44 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
     return vaddr;
+}
+
+// Alloc a identity mapped memory region, usefull for pagging data structurs
+uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
+{
+    if (count == 0)
+        return 0;
+
+    atomic_begin();
+
+
+    uint current_size = 0;
+
+    for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
+    {
+        int addr = i * PAGE_SIZE;
+
+        if (!(page_present(pdir, addr) && physical_is_used(addr, 1)))
+        {
+            current_size++;
+
+            if (current_size == count)
+            {
+                virtual_map(pdir, addr, addr, count, user);
+                atomic_end();
+                
+                return addr;
+            }
+        }
+        else
+        {
+            current_size = 0;
+        }
+    }
+
+    atomic_end();
+
+    return 0;
 }
 
 void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)

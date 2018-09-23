@@ -5,6 +5,7 @@ resb 16384 ; 16 KiB
 stack_top:
 
 section .text
+extern sk_process_exit
 global _start:function (_start.end - _start)
 _start:
 	; To set up a stack, we set the esp register to point to the top of our
@@ -13,6 +14,6 @@ _start:
 	extern main
 	call main
 
-.hang:
-	jmp .hang
+	push eax
+	call sk_process_exit
 .end:

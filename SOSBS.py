@@ -35,12 +35,15 @@ BRIGHT_WHITE = ESC + '37;1m'
 
 RESET = ESC + '0m'
 
+GCC = "./toolchain/local/bin/i686-elf-gcc"
+LD = "./toolchain/local/bin/i686-elf-ld"
+
 # --- Crosscompiler ---------------------------------------------------------- #
 
 
 def crosscompiler_check():
-    return os.path.exists("./toolchain/local/bin/i686-elf-gcc") and \
-           os.path.exists("./toolchain/local/bin/i686-elf-ld")
+    return os.path.exists(GCC) and \
+           os.path.exists(LD)
 
 
 def crosscompiler_build():
@@ -99,16 +102,32 @@ class Target(object):
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
 
+    def get_output(self):
+        if self.type == TargetTypes.LIB:
+            return join(self.location, self.name + ".lib")
+        elif self.type == TargetTypes.APP:
+            return join(self.location, self.name + ".app")
+        elif self.type == TargetTypes.KERNEL:
+            return join(self.location, self.name + ".bin")
+
+        return join(self.location, self.name + ".out")
+
     def get_sources(self):
-        pass
+        return get_files(join(self.location, "sources"), "c")
 
     def compile(self, source):
-        pass
+        print("    " + BRIGHT_BLACK + "%s" % source + RESET)
+        return True
 
     def link(self):
-        pass
+        print("    " + BRIGHT_WHITE + "Linking" + RESET + " %s" % self.get_output())
+        return True
 
-    def build(self):
+    def build(self, tagets):
+        print("")
+
+        print(BRIGHT_WHITE + "%s:" % self.name + RESET)
+
         for source in self.get_sources():
             if not self.compile(source):
                 return False
@@ -144,7 +163,8 @@ def clean(target, targets):
 
 def build(target, targets):
     """Build a target."""
-    pass
+
+    target.build(targets)
 
 
 def rebuild(target, targets):
@@ -159,12 +179,12 @@ def run(target, targets):
 
 def info(target, targets):
     """Dump information about the target."""
+
     print(BRIGHT_WHITE + "Target '" + target.name + "':" + RESET)
     print("\tType: " + str(target.type.name.lower()))
     print("\tDependencies: <TBD>")
     print("\tLocation: " + target.location)
     print("\tOutput: <TBD>")
-    pass
 
 
 actions = \
@@ -184,23 +204,31 @@ def clean_all(targets):
 
 def build_all(targets):
     """Build all tagets."""
-    pass
+    
+    for t in targets:
+        target = targets[t]
+        if not target.build(targets):
+            print(BRIGHT_RED + "ERROR: " + RESET + "'%s' compilation failed!" % t)
+            return
+
 
 
 def rebuild_all(targets):
     """Clean and build all targets."""
-    pass
+
+    clean_all(targets)
+    build_all(targets)
 
 def help_command(targets):
     """Show this help message."""
+
     print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + RESET)
     print("The skiftOS build system")
     print("")
 
-    if not is_shell:
-        print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
-        print("        ./SOSBS.py [global action]")
-        print("")
+    print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
+    print("        ./SOSBS.py [global action]")
+    print("")
 
     print(BRIGHT_WHITE + "Targets:" + RESET)
     print("   ", ', '.join(targets.keys()))
@@ -216,7 +244,7 @@ def help_command(targets):
 
 def list_command(targets):
     """List all available targets."""
-    # print(BRIGHT_WHITE + "Targets: " + RESET + ', '.join(targets.keys()))
+
     list_app(targets)
     list_lib(targets)
     list_other(targets)
@@ -224,18 +252,21 @@ def list_command(targets):
 
 def list_lib(targets):
     """List all available libraries."""
+
     libraries = {k: v for k, v in targets.items() if v.type == TargetTypes.LIB}
     print(BRIGHT_WHITE + "Libraries: " + RESET + ', '.join(libraries.keys()))
-    pass
 
 
 def list_app(targets):
     """List all available applications."""
+
     applications = {k: v for k, v in targets.items() if v.type == TargetTypes.APP}
     print(BRIGHT_WHITE + "Applications: " + RESET + ', '.join(applications.keys()))
 
+
 def list_other(targets):
     """List all everithing else."""
+
     applications = {k: v for k, v in targets.items() if v.type != TargetTypes.APP and  v.type != TargetTypes.LIB}
     print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(applications.keys()))
 
@@ -263,14 +294,6 @@ def missing_command(command):
 def main(argc, argv):
 
     targets = list_targets("sources")
-
-    global is_shell 
-    is_shell = False
-
-    if "--shell" in argv:
-        is_shell = True
-        argv.remove("--shell")
-        argc -= 1
 
     if not crosscompiler_check():
         print(BRIGHT_RED + "ERROR: " + RESET + "Toolchain not found!")

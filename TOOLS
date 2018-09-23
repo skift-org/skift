@@ -143,6 +143,7 @@ def buildall(projects):
     return build_iso("./build", projects["kernel"].get_output(), ramdisk)
 
 def help():
+    print("SOSBS 1.0")
     print("skiftOS build and project managment toolbox")
     print("usage: ./TOOLS [action]")
     print("action: info, list, clean, cleanall, build, buildall")

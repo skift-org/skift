@@ -132,21 +132,10 @@ void main(multiboot_info_t *info, s32 magic)
     // End of the boot environement //
     system_start();
 
-    // process_exec("application/test-app.app", 0, NULL);
+    process_exec("application/test-app.app", 0, NULL);
 
     uint oldmousex = 0;
     uint oldmousey = 0;
-
-    for (size_t i = 0; 1; i++)
-    {
-        for (size_t x = 0; x < 800; x++)
-        {
-            for (size_t y = 0; y < 600; y++)
-            {
-                graphic_pixel(x, y, (x ^ y) + i);
-            }
-        }
-    }
 
     while (1)
     {

@@ -10,8 +10,12 @@ from enum import Enum
 import os
 import sys
 import json
+import subprocess
+import shutil
 
 # --- Utils ------------------------------------------------------------------ #
+
+APP_NAME = sys.argv[0]
 
 ESC = '\033['
 
@@ -37,6 +41,12 @@ RESET = ESC + '0m'
 
 GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
+
+CFLAGS = ["-O3", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+LDFLAGS = []
+ASFLAGS = ["-f", "elf32"]
+
+QEMUFLAGS =  ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
@@ -226,8 +236,8 @@ def help_command(targets):
     print("The skiftOS build system")
     print("")
 
-    print(BRIGHT_WHITE + "Usage :" + RESET + " ./SOSBS.py [action] targets...")
-    print("        ./SOSBS.py [global action]")
+    print(BRIGHT_WHITE + "Usage :" + RESET + " %s [action] targets..." % APP_NAME)
+    print("        %s [global action]" % APP_NAME)
     print("")
 
     print(BRIGHT_WHITE + "Targets:" + RESET)

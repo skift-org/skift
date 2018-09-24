@@ -19,7 +19,6 @@ irq_common:
 
     pushad
 
-
     push ds
     push es
     push fs
@@ -31,7 +30,6 @@ irq_common:
     mov es, ax
     mov fs, ax
     mov gs, ax
-
 
     mov eax, esp
     push esp

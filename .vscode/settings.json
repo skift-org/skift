@@ -18,6 +18,7 @@
         "array": "c",
         "string_view": "c",
         "irq.h": "c",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "syscall.h": "c"
     }
 }

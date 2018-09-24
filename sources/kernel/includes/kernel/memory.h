@@ -15,6 +15,7 @@ page_directorie_t *memory_kpdir();
 uint memory_alloc(page_directorie_t *pdir, uint count, int user);
 void memory_free(page_directorie_t *pdir, uint addr, uint count, int user);
 uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user);
+uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user);
 
 page_directorie_t *memory_alloc_pdir();
 void memory_free_pdir(page_directorie_t *pdir);

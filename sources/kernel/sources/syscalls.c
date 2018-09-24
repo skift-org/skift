@@ -8,6 +8,8 @@
 #include "kernel/logger.h"
 #include "kernel/serial.h"
 
+typedef int (*syscall_t)(int, int, int, int, int);
+
 int sys_not_implemented()
 {
     log("Not implemented syscall!");
@@ -20,8 +22,6 @@ int sys_io_print(const char * msg)
 
     return 0;
 }
-
-typedef int (*syscall_t)(int, int, int, int, int);
 
 static int (*syscalls[])() =
 {
@@ -63,7 +63,7 @@ static int (*syscalls[])() =
 
 void syscall_dispatcher(context_t *context)
 {
-    // log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
 
     syscall_t syscall = (syscall_t)syscalls[context->eax];
     context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);

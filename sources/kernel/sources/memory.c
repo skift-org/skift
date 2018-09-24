@@ -143,6 +143,8 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
+    UNUSED(user);
+
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
@@ -156,18 +158,18 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
         if (!pde->Present)
         {
             log("Missing page table! Allocating a new one");
-            ptable = (page_table_t *)memory_alloc(pdir, 1, 0);
+            ptable = (page_table_t *)memory_alloc_identity(pdir, 1, 0);
             log("New page table at 0x%x", ptable);
 
             pde->Present = 1;
             pde->Write = 1;
-            pde->User = user;
+            pde->User = 0; //user;
             pde->PageFrameNumber = (u32)(ptable) >> 12;
         }
 
         page_t *p = &ptable->pages[pti];
         p->Present = 1;
-        p->User = user;
+        p->User = 0; //user;
         p->Write = 1;
         p->PageFrameNumber = (paddr + offset) >> 12;
     }
@@ -317,11 +319,12 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 // Alloc a identity mapped memory region, usefull for pagging data structurs
 uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
 {
+    log("MALLOCI PDIR=0x%x COUNT=%d", pdir, count);
+
     if (count == 0)
         return 0;
 
     atomic_begin();
-
 
     uint current_size = 0;
 
@@ -329,7 +332,7 @@ uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
     {
         int addr = i * PAGE_SIZE;
 
-        if (!(page_present(pdir, addr) && physical_is_used(addr, 1)))
+        if (!(page_present(pdir, addr) || physical_is_used(addr, 1)))
         {
             current_size++;
 
@@ -369,7 +372,7 @@ page_directorie_t *memory_alloc_pdir()
 {
     atomic_begin();
 
-    page_directorie_t *pdir = (page_directorie_t *)memory_alloc(&kpdir, 1, 0);
+    page_directorie_t *pdir = (page_directorie_t *)memory_alloc_identity(&kpdir, 1, 0);
 
     // Copy first gigs of virtual memory (kernel space);
     for (uint i = 0; i < 256; i++)

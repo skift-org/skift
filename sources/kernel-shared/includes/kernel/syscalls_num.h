@@ -1,57 +1,43 @@
 #pragma once
 
-/* --- Processes managment -------------------------------------------------- */
+enum
+{
+    SYS_PROCESS_SELF = 0,
+    SYS_PROCESS_EXEC,
+    SYS_PROCESS_EXIT,
+    SYS_PROCESS_CANCEL,
+    SYS_PROCESS_MAP,
+    SYS_PROCESS_UNMAP,
 
-#define SYS_PROCESS_SELF __COUNTER__
+    SYS_THREAD_SELF,
+    SYS_THREAD_CREATE,
+    SYS_THREAD_EXIT,
+    SYS_THREAD_CANCEL,
+    SYS_THREAD_SLEEP,
+    SYS_THREAD_WAKEUP,
+    SYS_THREAD_WAIT,
+    SYS_THREAD_WAITPROC,
 
-#define SYS_PROCESS_EXEC __COUNTER__
-#define SYS_PROCESS_EXIT __COUNTER__
-#define SYS_PROCESS_CANCEL __COUNTER__
+    SYS_PRINT,
+    SYS_READ,
 
-#define SYS_PROCESS_MAP __COUNTER__
-#define SYS_PROCESS_UNMAP __COUNTER__
-
-/* --- Thread managment ----------------------------------------------------- */
-
-#define SYS_THREAD_SELF __COUNTER__
-
-#define SYS_THREAD_CREATE __COUNTER__
-#define SYS_THREAD_EXIT __COUNTER__
-#define SYS_THREAD_CANCEL __COUNTER__
-
-#define SYS_THREAD_SLEEP __COUNTER__
-#define SYS_THREAD_WAKEUP __COUNTER__
-
-#define SYS_THREAD_WAIT __COUNTER__
-#define SYS_THREAD_WAITPROC __COUNTER__
-
-/* --- I/O ------------------------------------------------------------------ */
-
-// CONSOLE
-#define SYS_PRINT __COUNTER__
-#define SYS_READ __COUNTER__
-
-// FILES
-#define SYS_FILE_CREATE __COUNTER__
-#define SYS_FILE_DELETE __COUNTER__
-#define SYS_FILE_EXISTE __COUNTER__
-
-#define SYS_FILE_COPY __COUNTER__
-#define SYS_FILE_MOVE __COUNTER__
-#define SYS_FILE_STAT __COUNTER__
-
-#define SYS_FILE_OPEN __COUNTER__
-#define SYS_FILE_CLOSE __COUNTER__
-#define SYS_FILE_READ __COUNTER__
-#define SYS_FILE_WRITE __COUNTER__
-#define SYS_FILE_IOCTL __COUNTER__
-
-// DIRECTORIES
-#define SYS_DIR_CREATE __COUNTER__
-#define SYS_DIR_DELETE __COUNTER__
-#define SYS_DIR_EXISTE __COUNTER__
-
-#define SYS_DIR_OPEN __COUNTER__
-#define SYS_DIR_CLOSE __COUNTER__
-#define SYS_DIR_LISTFILE __COUNTER__
-#define SYS_DIR_LISTDIR __COUNTER__
+    SYS_FILE_CREATE,
+    SYS_FILE_DELETE,
+    SYS_FILE_EXISTE,
+    SYS_FILE_COPY,
+    SYS_FILE_MOVE,
+    SYS_FILE_STAT,
+    SYS_FILE_OPEN,
+    SYS_FILE_CLOSE,
+    SYS_FILE_READ,
+    SYS_FILE_WRITE,
+    SYS_FILE_IOCTL,
+    
+    SYS_DIR_CREATE,
+    SYS_DIR_DELETE,
+    SYS_DIR_EXISTE,
+    SYS_DIR_OPEN,
+    SYS_DIR_CLOSE,
+    SYS_DIR_LISTFILE,
+    SYS_DIR_LISTDIR
+};

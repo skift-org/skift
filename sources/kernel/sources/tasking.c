@@ -50,11 +50,17 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
 
     if (flags & TASK_USER)
     {
-        context->cs = 0x18;
-        context->ds = 0x20;
-        context->es = 0x20;
-        context->fs = 0x20;
-        context->gs = 0x20;
+        // context->cs = 0x18;
+        // context->ds = 0x20;
+        // context->es = 0x20;
+        // context->fs = 0x20;
+        // context->gs = 0x20;
+
+        context->cs = 0x08;
+        context->ds = 0x10;
+        context->es = 0x10;
+        context->fs = 0x10;
+        context->gs = 0x10;
     }
     else
     {
@@ -65,7 +71,7 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
         context->gs = 0x10;
     }
 
-    // log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
+    log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
 
     return thread;
 }
@@ -89,7 +95,7 @@ process_t *alloc_process(const char *name, int flags)
         process->pdir = memory_kpdir();
     }
 
-    // log("Process '%s' with ID=%d allocated.", process->name, process->id);
+    log("Process '%s' with ID=%d allocated.", process->name, process->id);
 
     return process;
 }
@@ -269,9 +275,10 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     thread->state = THREAD_RUNNING;
 
+    log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
+    
     atomic_end();
 
-    // log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
 
     return thread->id;
 }
@@ -466,23 +473,24 @@ PROCESS process_exec(const char *path, int argc, char **argv)
         return 0;
     }
 
-    PROCESS p = process_create(path, 0);
+    PROCESS p = process_create(path, TASK_USER);
 
     void *buffer = file_read_all(fp);
     file_close(fp);
 
     ELF_header_t *elf = (ELF_header_t *)buffer;
 
-    printf("\n");
     log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
 
     ELF_program_t program;
 
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
-        printf("\n");
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
+
+
+    log("ELF file loaded!");
 
     thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
 
@@ -591,27 +599,27 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-        case THREAD_CANCELED:
-            kill_thread(thread);
+            case THREAD_CANCELED:
+                kill_thread(thread);
 
-            thread = NULL;
-            break;
+                thread = NULL;
+                break;
 
-        case THREAD_SLEEP:
-            // Wakeup the thread
-            if (thread->sleepinfo.wakeuptick >= ticks)
-                thread->state = THREAD_RUNNING;
-            break;
+            case THREAD_SLEEP:
+                // Wakeup the thread
+                if (thread->sleepinfo.wakeuptick >= ticks)
+                    thread->state = THREAD_RUNNING;
+                break;
 
-        case THREAD_WAIT_PROCESS:
-            // Do nothing for now.
-            break;
+            case THREAD_WAIT_PROCESS:
+                // Do nothing for now.
+                break;
 
-        case THREAD_WAIT_THREAD:
-            // Do nothing for  now.
-            break;
+            case THREAD_WAIT_THREAD:
+                // Do nothing for  now.
+                break;
 
-        default:
+            default:
             break;
         }
 
@@ -634,7 +642,7 @@ esp_t shedule(esp_t esp, context_t *context)
 
     // Save the old context
     running->esp = esp;
-    sanity_check(running);
+    // sanity_check(running);
 
     list_pushback(waiting, running);
     // list_pop(waiting, (void *)&running);

@@ -3,7 +3,8 @@
 
 int main(int argc, const char ** argv)
 {
-    sk_io_print("Hello from userspace!\n");
+    while(1)
+        sk_io_print("Hello from userspace!\n");
 
     return 0;
 }

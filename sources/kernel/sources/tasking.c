@@ -635,6 +635,8 @@ esp_t shedule(esp_t esp, context_t *context)
 {
     ticks++;
 
+    if (waiting->count == 0) return esp;
+
     UNUSED(context);
 
     // int delta = (running->esp - esp);
@@ -646,12 +648,16 @@ esp_t shedule(esp_t esp, context_t *context)
 
     list_pushback(waiting, running);
     // list_pop(waiting, (void *)&running);
-
+    // int old_thread = running->id;
     running = get_next_task();
+
+    // log("Switching from %d(EIP=%x) to %d.", old_thread, context->eip, running->id);
+    // log("Page directorie 0x%x", running->process->pdir);
 
     // Load the new context
     set_kernel_stack((uint)running->stack + STACK_SIZE);
     paging_load_directorie(running->process->pdir);
+    paging_invalidate_tlb();
 
     return running->esp;
 }

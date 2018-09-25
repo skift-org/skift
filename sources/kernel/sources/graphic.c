@@ -48,6 +48,8 @@ void graphic_setup()
     {
         uint page_count = PAGE_ALIGN(graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE;
         framebuffer = (uint *)memory_alloc_at(memory_kpdir(), page_count, (uint)physical_framebuffer, 0);
+
+        graphic_print(1, 1, "skiftOS booting...");
     }
 
     log("Framebuffer at 0x%x.", framebuffer);

@@ -110,6 +110,11 @@ void line(int x0, int y0, int x1, int y1, int weight)
     }
 }
 
+void test()
+{
+    while(1){}
+}
+
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
@@ -132,7 +137,10 @@ void main(multiboot_info_t *info, s32 magic)
     // End of the boot environement //
     system_start();
 
-    process_exec("application/test-app.app", 0, NULL);
+    // process_exec("application/test-app.app", 0, NULL);
+    
+    for(size_t i = 0; i < 256; i++)    
+        thread_create(process_self(), (thread_entry_t)test, NULL, 0);
 
     uint oldmousex = 0;
     uint oldmousey = 0;

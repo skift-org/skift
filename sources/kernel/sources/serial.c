@@ -51,8 +51,8 @@ void serial_read(char *buffer, int size)
 
 void serial_print(const char *str)
 {
-    for(int i = 0; str[i]; i++)
+    for (int i = 0; str[i]; i++)
     {
         serial_putc(str[i]);
-    }   
+    }
 }

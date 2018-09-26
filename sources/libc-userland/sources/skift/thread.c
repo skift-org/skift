@@ -1,3 +1,7 @@
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/thread.h>
 #include <skift/syscall.h>
 

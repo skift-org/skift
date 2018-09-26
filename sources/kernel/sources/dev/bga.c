@@ -1,3 +1,7 @@
+/* Copyright © 2018 MAKER.                                                    */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include "kernel/cpu/cpu.h"
 #include "kernel/dev/bga.h"
 #include "kernel/logger.h"
@@ -33,13 +37,13 @@ bool bga_is_available(void)
     return found;
 }
 
-u32 * bga_get_framebuffer()
+u32 *bga_get_framebuffer()
 {
     // TODO REMOVE: VERY bad hack
 
     bga_set_bank(0);
-    u32 * lfb = 0;
-    u32 * text_vid_mem = (u32 *)0xA0000;
+    u32 *lfb = 0;
+    u32 *text_vid_mem = (u32 *)0xA0000;
     text_vid_mem[0] = 0xA5ADFACE;
 
     for (u32 fb_offset = 0xE0000000; fb_offset < 0xFF000000; fb_offset += 0x01000000)
@@ -57,7 +61,6 @@ u32 * bga_get_framebuffer()
 
     return lfb;
 }
-
 
 /* --- public functions ----------------------------------------------------- */
 

@@ -42,24 +42,27 @@ RESET = ESC + '0m'
 GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
 
-CFLAGS = ["-O3", "-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+CFLAGS = ["-O3", "-fno-pie", "-ffreestanding",
+          "-nostdlib", "-std=gnu11", "-nostdinc"]
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS =  ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+QEMUFLAGS = ["-display", "sdl", "-m", "256M",
+             "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
 
 def crosscompiler_check():
     return os.path.exists(GCC) and \
-           os.path.exists(LD)
+        os.path.exists(LD)
 
 
 def crosscompiler_build():
     pass
 
 # --- Utils ------------------------------------------------------------------ #
+
 
 def join(a, b):
     return os.path.join(a, b)
@@ -130,7 +133,8 @@ class Target(object):
         return True
 
     def link(self):
-        print("    " + BRIGHT_WHITE + "Linking" + RESET + " %s" % self.get_output())
+        print("    " + BRIGHT_WHITE + "Linking" +
+              RESET + " %s" % self.get_output())
         return True
 
     def build(self, tagets):
@@ -214,13 +218,13 @@ def clean_all(targets):
 
 def build_all(targets):
     """Build all tagets."""
-    
+
     for t in targets:
         target = targets[t]
         if not target.build(targets):
-            print(BRIGHT_RED + "ERROR: " + RESET + "'%s' compilation failed!" % t)
+            print(BRIGHT_RED + "ERROR: " + RESET +
+                  "'%s' compilation failed!" % t)
             return
-
 
 
 def rebuild_all(targets):
@@ -229,6 +233,7 @@ def rebuild_all(targets):
     clean_all(targets)
     build_all(targets)
 
+
 def help_command(targets):
     """Show this help message."""
 
@@ -236,7 +241,8 @@ def help_command(targets):
     print("The skiftOS build system")
     print("")
 
-    print(BRIGHT_WHITE + "Usage :" + RESET + " %s [action] targets..." % APP_NAME)
+    print(BRIGHT_WHITE + "Usage :" + RESET +
+          " %s [action] targets..." % APP_NAME)
     print("        %s [global action]" % APP_NAME)
     print("")
 
@@ -270,14 +276,17 @@ def list_lib(targets):
 def list_app(targets):
     """List all available applications."""
 
-    applications = {k: v for k, v in targets.items() if v.type == TargetTypes.APP}
-    print(BRIGHT_WHITE + "Applications: " + RESET + ', '.join(applications.keys()))
+    applications = {k: v for k, v in targets.items() if v.type ==
+                    TargetTypes.APP}
+    print(BRIGHT_WHITE + "Applications: " +
+          RESET + ', '.join(applications.keys()))
 
 
 def list_other(targets):
     """List all everithing else."""
 
-    applications = {k: v for k, v in targets.items() if v.type != TargetTypes.APP and  v.type != TargetTypes.LIB}
+    applications = {k: v for k, v in targets.items(
+    ) if v.type != TargetTypes.APP and v.type != TargetTypes.LIB}
     print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(applications.keys()))
 
 
@@ -308,11 +317,12 @@ def main(argc, argv):
     if not crosscompiler_check():
         print(BRIGHT_RED + "ERROR: " + RESET + "Toolchain not found!")
 
-        respond = input("Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
+        respond = input(
+            "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
 
         if respond in ['y', "yes"]:
             pass
-        
+
         else:
             exit()
 

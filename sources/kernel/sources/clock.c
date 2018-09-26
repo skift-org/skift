@@ -28,18 +28,20 @@ char get_realtime_reg(int reg)
 
 void clock_time(time_t *time)
 {
-    while (is_cmos_update());
+    while (is_cmos_update())
+        ;
 
     time->second = from_bcd(get_realtime_reg(T_SECOND));
     time->minute = from_bcd(get_realtime_reg(T_MINUTE));
-    time->hour   = from_bcd(get_realtime_reg(T_HOUR));
-    time->day    = from_bcd(get_realtime_reg(T_DAY));
-    time->month  = from_bcd(get_realtime_reg(T_MONTH));
-    time->year   = from_bcd(get_realtime_reg(T_YEAR));
+    time->hour = from_bcd(get_realtime_reg(T_HOUR));
+    time->day = from_bcd(get_realtime_reg(T_DAY));
+    time->month = from_bcd(get_realtime_reg(T_MONTH));
+    time->year = from_bcd(get_realtime_reg(T_YEAR));
 }
 
 uint clock_read(time_selector_t selector)
 {
-    while (is_cmos_update());
+    while (is_cmos_update())
+        ;
     return from_bcd(get_realtime_reg(selector));
 }

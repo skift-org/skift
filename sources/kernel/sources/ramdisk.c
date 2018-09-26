@@ -16,9 +16,8 @@ int rd_file_read(file_t *file, uint offset, void *buffer, uint n);
 int rd_file_write(file_t *file, uint offset, void *buffer, uint n);
 void rd_file_stat(file_t *file, fstat_t *stat);
 
-
 filesystem_t ramdisk_fs;
-void * ramdisk;
+void *ramdisk;
 
 void ramdisk_load(multiboot_module_t *module)
 {

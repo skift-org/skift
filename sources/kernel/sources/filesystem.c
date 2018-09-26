@@ -19,10 +19,10 @@ void filesystem_setup()
 directory_t *filesystem_get_directory(directory_t *relative, const char *path)
 {
     char buffer[128];
-    
-    directory_t * current = relative ? relative : root;
 
-    for (int i = 0; path_read(path, i, buffer); i++) 
+    directory_t *current = relative ? relative : root;
+
+    for (int i = 0; path_read(path, i, buffer); i++)
     {
         if (strcmp(buffer, "..") == 0)
         {
@@ -42,7 +42,7 @@ directory_t *filesystem_get_directory(directory_t *relative, const char *path)
             }
         }
     }
-    
+
     return current;
 }
 
@@ -58,7 +58,7 @@ file_t *filesystem_get_file(directory_t *relative, const char *path)
 
         SLL_FOREARCH(i, dir->files)
         {
-            file_t* f = (file_t *)i->data;
+            file_t *f = (file_t *)i->data;
             if (strcmp(file_name, f->name) == 0)
                 file = f;
         }
@@ -70,9 +70,9 @@ file_t *filesystem_get_file(directory_t *relative, const char *path)
 
 /* --- Dump ---------------------------------------------------------------- */
 
-void dump_directorie(directory_t *current, int depth, char * buffer)
+void dump_directorie(directory_t *current, int depth, char *buffer)
 {
-   
+
     for (int i = 0; i < depth; i++)
     {
         printf("\t");
@@ -98,7 +98,7 @@ void dump_directorie(directory_t *current, int depth, char * buffer)
 
 void filesystem_dump(directory_t *relative, const char *path)
 {
-    char * buffer = malloc(PATH_FILE_NAME_SIZE);
+    char *buffer = malloc(PATH_FILE_NAME_SIZE);
     dump_directorie(filesystem_get_directory(relative, path), 0, buffer);
     free(buffer);
 }
@@ -232,7 +232,7 @@ file_t *alloc_file(const char *name)
 
 /* --- Create/Delete/Existe ------------------------------------------------- */
 
-int file_create(directory_t *relative, const char *path, filesystem_t * fs, int device, int inode)
+int file_create(directory_t *relative, const char *path, filesystem_t *fs, int device, int inode)
 {
     char *dir_path = malloc(strlen(path));
     char file_name[128];
@@ -291,7 +291,7 @@ int file_move(directory_t *relative_s, const char *source, directory_t *relative
 
 file_t *file_open(directory_t *relative, const char *path)
 {
-    file_t * file = filesystem_get_file(relative, path);
+    file_t *file = filesystem_get_file(relative, path);
 
     if (file != NULL && (file->fs->file_open == NULL || file->fs->file_open(file)))
     {
@@ -311,7 +311,7 @@ void file_close(file_t *file)
     }
 }
 
-void file_stat(file_t * file, fstat_t * stat)
+void file_stat(file_t *file, fstat_t *stat)
 {
     if (file != NULL && file->fs->file_stat != NULL)
     {
@@ -321,7 +321,7 @@ void file_stat(file_t * file, fstat_t * stat)
 
 int file_read(file_t *file, uint offset, void *buffer, uint n)
 {
-    if (file != NULL && file->fs->file_read !=NULL)
+    if (file != NULL && file->fs->file_read != NULL)
     {
         return file->fs->file_read(file, offset, buffer, n);
     }
@@ -329,9 +329,9 @@ int file_read(file_t *file, uint offset, void *buffer, uint n)
     return 0;
 }
 
-void* file_read_all(file_t* file)
+void *file_read_all(file_t *file)
 {
-    void* data = NULL;
+    void *data = NULL;
 
     if (file != NULL)
     {
@@ -347,11 +347,10 @@ void* file_read_all(file_t* file)
 
 int file_write(file_t *file, uint offset, void *buffer, uint n)
 {
-    if (file != NULL && file->fs->file_write !=NULL)
+    if (file != NULL && file->fs->file_write != NULL)
     {
         return file->fs->file_write(file, offset, buffer, n);
     }
 
     return 0;
 }
-

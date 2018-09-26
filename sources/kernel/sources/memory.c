@@ -17,8 +17,8 @@
 
 typedef PACKED(struct)
 {
-    
-} physical_memory_region_t;
+}
+physical_memory_region_t;
 
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
@@ -80,7 +80,6 @@ void physical_free(uint addr, uint count)
 {
     physical_set_free(addr, count);
 }
-
 
 /* --- Virtual memory managment --------------------------------------------- */
 
@@ -323,7 +322,7 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 }
 
 // Alloc a identity mapped memory region, usefull for pagging data structurs
-uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
+uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 {
     log("MALLOCI PDIR=0x%x COUNT=%d", pdir, count);
 
@@ -339,7 +338,7 @@ uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
     {
         int addr = i * PAGE_SIZE;
 
-        if ( !(page_present(pdir, addr) || physical_is_used(addr, 1)) )
+        if (!(page_present(pdir, addr) || physical_is_used(addr, 1)))
         {
             if (current_size == 0)
             {
@@ -354,7 +353,7 @@ uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
                 virtual_map(pdir, startaddr, startaddr, count, user);
 
                 atomic_end();
-                
+
                 return startaddr;
             }
         }

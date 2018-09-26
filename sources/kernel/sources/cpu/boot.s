@@ -1,6 +1,6 @@
-; This file is part of "skiftOS" licensed under the MIT License.
-; See: LICENSE.md
-; Project URL: github.com/maker-dev/skift
+;; Copyright © 2018 MAKER.                                                    ;;
+;; This code is licensed under the MIT License.                               ;;
+;; See: LICENSE.md                                                            ;;
 
 ; Declare constants for the multiboot header.
 MBALIGN  equ  1 << 0            ; align loaded modules on page boundaries

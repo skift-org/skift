@@ -12,13 +12,5 @@
     },
     "editor.rulers": [
         80
-    ],
-    "files.associations": {
-        "cmath": "c",
-        "array": "c",
-        "string_view": "c",
-        "irq.h": "c",
-        "typeinfo": "cpp",
-        "syscall.h": "c"
-    }
+    ]
 }

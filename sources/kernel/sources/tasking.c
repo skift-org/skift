@@ -276,9 +276,8 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
     thread->state = THREAD_RUNNING;
 
     log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
-    
-    atomic_end();
 
+    atomic_end();
 
     return thread->id;
 }
@@ -489,7 +488,6 @@ PROCESS process_exec(const char *path, int argc, char **argv)
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
-
     log("ELF file loaded!");
 
     thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
@@ -599,27 +597,27 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-            case THREAD_CANCELED:
-                kill_thread(thread);
+        case THREAD_CANCELED:
+            kill_thread(thread);
 
-                thread = NULL;
-                break;
+            thread = NULL;
+            break;
 
-            case THREAD_SLEEP:
-                // Wakeup the thread
-                if (thread->sleepinfo.wakeuptick >= ticks)
-                    thread->state = THREAD_RUNNING;
-                break;
+        case THREAD_SLEEP:
+            // Wakeup the thread
+            if (thread->sleepinfo.wakeuptick >= ticks)
+                thread->state = THREAD_RUNNING;
+            break;
 
-            case THREAD_WAIT_PROCESS:
-                // Do nothing for now.
-                break;
+        case THREAD_WAIT_PROCESS:
+            // Do nothing for now.
+            break;
 
-            case THREAD_WAIT_THREAD:
-                // Do nothing for  now.
-                break;
+        case THREAD_WAIT_THREAD:
+            // Do nothing for  now.
+            break;
 
-            default:
+        default:
             break;
         }
 
@@ -635,7 +633,8 @@ esp_t shedule(esp_t esp, context_t *context)
 {
     ticks++;
 
-    if (waiting->count == 0) return esp;
+    if (waiting->count == 0)
+        return esp;
 
     UNUSED(context);
 
@@ -656,8 +655,11 @@ esp_t shedule(esp_t esp, context_t *context)
 
     // Load the new context
     set_kernel_stack((uint)running->stack + STACK_SIZE);
+
+    log("Switching...");
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
+    log("Done!");
 
     return running->esp;
 }

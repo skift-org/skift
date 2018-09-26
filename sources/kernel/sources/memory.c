@@ -205,6 +205,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         return 0;
 
     uint current_size = 0;
+    uint startaddr = 0;
 
     for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
     {
@@ -212,12 +213,17 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
 
         if (!page_present(pdir, vaddr))
         {
+            if (current_size == 0)
+            {
+                startaddr = vaddr;
+            }
+
             current_size++;
 
             if (current_size == count)
             {
-                virtual_map(pdir, vaddr, paddr, count, user);
-                return vaddr;
+                virtual_map(pdir, startaddr, paddr, count, user);
+                return startaddr;
             }
         }
         else
@@ -327,21 +333,29 @@ uint memory_alloc_identity(page_directorie_t * pdir, uint count, int user)
     atomic_begin();
 
     uint current_size = 0;
+    uint startaddr = 0;
 
     for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
     {
         int addr = i * PAGE_SIZE;
 
-        if (!(page_present(pdir, addr) || physical_is_used(addr, 1)))
+        if ( !(page_present(pdir, addr) || physical_is_used(addr, 1)) )
         {
+            if (current_size == 0)
+            {
+                startaddr = addr;
+            }
+
             current_size++;
 
             if (current_size == count)
             {
-                virtual_map(pdir, addr, addr, count, user);
+                physical_set_used(startaddr, count);
+                virtual_map(pdir, startaddr, startaddr, count, user);
+
                 atomic_end();
                 
-                return addr;
+                return startaddr;
             }
         }
         else

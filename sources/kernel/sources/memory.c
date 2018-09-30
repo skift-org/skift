@@ -15,11 +15,6 @@
 
 /* --- Private functions ---------------------------------------------------- */
 
-typedef PACKED(struct)
-{
-}
-physical_memory_region_t;
-
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
@@ -124,7 +119,6 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
         }
     }
 
-    log("0x%x present!", vaddr);
     return 1;
 }
 
@@ -156,9 +150,7 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
 
         if (!pde->Present)
         {
-            log("Missing page table! Allocating a new one");
             ptable = (page_table_t *)memory_alloc_identity(pdir, 1, 0);
-            log("New page table at 0x%x", ptable);
 
             pde->Present = 1;
             pde->Write = 1;
@@ -248,8 +240,6 @@ void memory_setup(uint used, uint total)
 
     memset(&MEMORY, 0, sizeof(MEMORY));
 
-    log("Memory: USED=%dko TOTAL=%dko", used / 1024, total / 1024);
-
     // Setup the kernel pagedirectorie.
     for (uint i = 0; i < 256; i++)
     {
@@ -284,6 +274,8 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (paddr == 0)
     {
         atomic_end();
+        
+        log("Failed!");
         return 0;
     }
 
@@ -293,6 +285,8 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     {
         physical_free(paddr, count);
         atomic_end();
+
+        log("Failed!");
         return 0;
     }
 
@@ -300,7 +294,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    log("Memory allocated (PADDR=0x%x, VADDR=0x%x, COUNT=%d).", paddr, vaddr, count);
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
 
     return vaddr;
 }
@@ -318,14 +312,14 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
+
     return vaddr;
 }
 
 // Alloc a identity mapped memory region, usefull for pagging data structurs
 uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 {
-    log("MALLOCI PDIR=0x%x COUNT=%d", pdir, count);
-
     if (count == 0)
         return 0;
 
@@ -354,6 +348,8 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
                 atomic_end();
 
+                log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
+
                 return startaddr;
             }
         }
@@ -364,6 +360,8 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
     }
 
     atomic_end();
+
+    log("Failed!");
 
     return 0;
 }
@@ -378,6 +376,8 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
     virtual_unmap(pdir, addr, count);
 
     atomic_end();
+
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 }
 
 // Alloc a pdir for a process
@@ -398,6 +398,8 @@ page_directorie_t *memory_alloc_pdir()
     }
 
     atomic_end();
+
+    log("PDIR=0x%x", pdir);
 
     return pdir;
 }
@@ -430,13 +432,13 @@ void memory_free_pdir(page_directorie_t *pdir)
     memory_free(&kpdir, (uint)pdir, 1, 0);
 
     atomic_end();
+
+    log("PDIR=0x%x", pdir);
 }
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
-
-    log("MAP: PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     for (uint i = 0; i < count; i++)
     {
@@ -450,6 +452,8 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
     }
 
     atomic_end();
+
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
     return 0;
 }
@@ -471,6 +475,8 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 
     atomic_end();
 
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
+
     return 0;
 }
 
@@ -479,6 +485,8 @@ int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
     physical_set_used(addr, count);
     virtual_map(pdir, addr, addr, count, 0);
 
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
+
     return 0;
 }
 
@@ -486,6 +494,8 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
     physical_set_free(addr, count);
     virtual_unmap(pdir, addr, count);
+
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     return 0;
 }

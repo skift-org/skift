@@ -49,6 +49,7 @@ void system_check(multiboot_info_t *info, s32 magic)
 
 void setup_cpu_context()
 {
+    log("================================================================================");
     log("Initializing cpu context...");
     setup(gdt);
     setup(pic);
@@ -59,6 +60,7 @@ void setup_cpu_context()
 
 void setup_system_context()
 {
+    log("================================================================================");
     log("Initializing system context...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
@@ -68,14 +70,14 @@ void setup_system_context()
 
 void system_start()
 {
+    log("================================================================================");
     log("Enabling interupts, paging and atomics.");
-    //paging_enable();
     atomic_enable();
     sti();
     log(KERNEL_UNAME);
 }
 
-void line(int x0, int y0, int x1, int y1, int weight)
+void line(int x0, int y0, int x1, int y1, int weight, uint color)
 {
 
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
@@ -84,18 +86,17 @@ void line(int x0, int y0, int x1, int y1, int weight)
 
     for (;;)
     {
-        //graphic_pixel(x0, y0, x0 ^ y0);
-
-        for (int xoff = -weight; xoff < weight; xoff++)
+        for (int xoff = -weight + 1; xoff < weight; xoff++)
         {
-            for (int yoff = -weight; yoff < weight; yoff++)
+            for (int yoff = -weight + 1; yoff < weight; yoff++)
             {
-                graphic_pixel(x0 + xoff, y0 + yoff, x0 ^ y0);
+                graphic_pixel(x0 + xoff, y0 + yoff, color);
             }
         }
 
         if (x0 == x1 && y0 == y1)
             break;
+
         e2 = err;
         if (e2 > -dx)
         {
@@ -138,6 +139,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     // End of the boot environement //
     system_start();
+    log("================================================================================");
 
     process_exec("application/test-app.app", 0, NULL);
 
@@ -151,9 +153,9 @@ void main(multiboot_info_t *info, s32 magic)
     {
         uint mousex, mousey;
         mouse_get_position(&mousex, &mousey);
-        // graphic_pixel(mousex, mousey, 0xff0000);
+        //graphic_pixel(mousex, mousey, 0xff0000);
 
-        line(mousex, mousey, oldmousex, oldmousey, 10);
+        line(oldmousex, oldmousey, mousex, mousey, 1, mousex ^ mousey);
 
         oldmousex = mousex;
         oldmousey = mousey;

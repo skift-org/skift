@@ -16,9 +16,20 @@ int sys_not_implemented()
     return -1;
 }
 
+/* --- Process -------------------------------------------------------------- */
+
+int sys_io_process_exit(int code)
+{
+    process_exit(code);
+    
+    return 0;
+}
+
+/* --- System I/O ----------------------------------------------------------- */
+
 int sys_io_print(const char *msg)
 {
-    serial_print(msg);
+    log("[PID:%d] %s", process_self(), msg);
 
     return 0;
 }

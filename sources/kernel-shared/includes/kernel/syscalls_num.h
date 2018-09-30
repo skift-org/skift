@@ -7,7 +7,10 @@ typedef enum SYSCALL_CODE
 /* --- Porcess and Threads -------------------------------------------------- */
 
     // Process
+    #define PROCESS_SELF_ARGS 
     SYS_PROCESS_SELF,
+
+    
     SYS_PROCESS_EXEC,
     SYS_PROCESS_EXIT,
     SYS_PROCESS_CANCEL,

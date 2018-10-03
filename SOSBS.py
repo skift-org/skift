@@ -52,30 +52,49 @@ QEMUFLAGS = ["-display", "sdl", "-m", "256M",
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
-
 def crosscompiler_check():
+    """
+    Check if the cross compiler is present.
+    """
     return os.path.exists(GCC) and \
         os.path.exists(LD)
 
 
 def crosscompiler_build():
+    """
+    Build the cross compiler.
+    """
     pass
 
 # --- Utils ------------------------------------------------------------------ #
 
-
 def join(a, b):
+    """
+    Joint to paths
+    """
     return os.path.join(a, b)
 
 
 def is_uptodate(outfile, infiles):
-    if os.path.exists(outfile):
-        pass
+    """
+    Check if a file is uptodate with its dependancies.
+    """
+    if type(infiles) == list:
+        uptodate = 0
+        
+        for i in infiles:
+            if is_uptodate(outfile, infiles):
+                uptodate = uptodate + 1
 
-    return False
+        return len(infiles) == uptodate
+
+    return os.path.exists(outfile) and (os.path.getmtime(output_file) > os.path.getmtime(input_file))
 
 
 def get_files(locations, ext):
+    """
+    Return all files of a givent extention in specified folder.
+    """
     files = []
 
     for root, _, filenames in os.walk(locations):
@@ -86,7 +105,6 @@ def get_files(locations, ext):
     return files
 
 # --- Targets ---------------------------------------------------------------- #
-
 
 class TargetTypes(Enum):
     INVALID = 0
@@ -110,12 +128,18 @@ class TargetTypes(Enum):
 
 
 class Target(object):
+    """
+    Target building class.
+    """
     def __init__(self, location, data):
         self.name = data["id"]
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
 
     def get_output(self):
+        """
+        Return the name of the output file of the current target.
+        """
         if self.type == TargetTypes.LIB:
             return join(self.location, self.name + ".lib")
         elif self.type == TargetTypes.APP:
@@ -126,32 +150,46 @@ class Target(object):
         return join(self.location, self.name + ".out")
 
     def get_sources(self):
+        """
+        Return all source file of the current target.
+        """
         return get_files(join(self.location, "sources"), "c")
 
     def compile(self, source):
+        """
+        Compile a source file of the current target.
+        """
         print("    " + BRIGHT_BLACK + "%s" % source + RESET)
         return True
 
-    def link(self):
+    def link(self, targets):
+        """
+        Link the target
+        """
         print("    " + BRIGHT_WHITE + "Linking" +
               RESET + " %s" % self.get_output())
         return True
 
-    def build(self, tagets):
-        print("")
-
+    def build(self, targets):
+        """
+        Build source files and link the target.
+        """
+        # Skip a line so it's easier on the eyes.
+        print("") 
         print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
+        # Build all source file of the current target
         for source in self.get_sources():
             if not self.compile(source):
                 return False
 
-        return self.link()
+        # Link and output the result of the target
+        return self.link(targets)
 
 
 def list_targets(location):
     """
-
+    List all targets in a given folder.
     """
 
     targets = {}
@@ -166,7 +204,6 @@ def list_targets(location):
             targets[data["id"]] = Target(target_location, data)
 
     return targets
-
 
 # --- Action ----------------------------------------------------------------- #
 
@@ -198,7 +235,7 @@ def info(target, targets):
     print("\tType: " + str(target.type.name.lower()))
     print("\tDependencies: <TBD>")
     print("\tLocation: " + target.location)
-    print("\tOutput: <TBD>")
+    print("\tOutput: " + target.get_output())
 
 
 actions = \
@@ -304,37 +341,45 @@ global_actions = \
 
 # --- Main ------------------------------------------------------------------- #
 
-
 def missing_command(command):
     print(BRIGHT_RED + "ERROR: " + RESET + "No action named '%s'!" % command)
     print(BRIGHT_WHITE + "See: " + RESET + "./tools help.")
 
 
 def main(argc, argv):
-
+    """
+    Entry point of the SOSBS toolset.
+    """
     targets = list_targets("sources")
 
+    # Check and build the cross compiler if the user say 'YES'.
     if not crosscompiler_check():
         print(BRIGHT_RED + "ERROR: " + RESET + "Toolchain not found!")
 
         respond = input(
             "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
 
-        if respond in ['y', "yes"]:
+        if respond in ['y', "yes", 'o', "oui"]:
             pass
-
         else:
             exit()
 
-    if (argc >= 2):
+    # Command parsing
+
+    if argc < 2:
+        help_command(targets)
+    else:
         action = argv[1]
 
+        # Check if the actions is a valid one
         if action in actions:
+            # Check if a target is specified
             if argc < 3:
                 print(BRIGHT_RED + "ERROR: " + RESET + "No target specified!")
             else:
                 target = argv[2]
 
+                # check  if the target is valid.
                 if target in targets:
                     actions[action](targets[target], targets)
                 else:
@@ -346,9 +391,8 @@ def main(argc, argv):
 
         else:
             missing_command(action)
-    else:
-        help_command(targets)
 
 
+# Jump to the entry point.
 if __name__ == '__main__':
     main(len(sys.argv), sys.argv)

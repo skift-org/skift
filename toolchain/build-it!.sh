@@ -38,13 +38,13 @@ pushd "$DIR/build/"
 
     pushd binutils
         $DIR/tarballs/binutils-2.27/configure --target=$TARGET --prefix=$PREFIX --disable-werror || exit 1
-        make -j4
+        make -j $(nproc)
         make install
     popd
 
     pushd gcc
         $DIR/tarballs/gcc-6.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --enable-languages=c,c++ --disable-libssp --without-headers || exit 1
-        make -j4 all-gcc all-target-libgcc
+        make -j $(nproc) all-gcc all-target-libgcc
         make install-gcc install-target-libgcc
     popd
 

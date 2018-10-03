@@ -144,20 +144,21 @@ void main(multiboot_info_t *info, s32 magic)
     // for(size_t i = 0; i < 256; i++)
     //     thread_create(process_self(), (thread_entry_t)test, NULL, 0);
 
-    uint oldmousex = 0;
-    uint oldmousey = 0;
+    //uint oldmousex = 0;
+    //uint oldmousey = 0;
+//
+    //while (1)
+    //{
+    //    uint mousex, mousey;
+    //    mouse_get_position(&mousex, &mousey);
+    //    // graphic_pixel(mousex, mousey, 0xff0000);
+//
+    //    line(mousex, mousey, oldmousex, oldmousey, 10);
+//
+    //    oldmousex = mousex;
+    //    oldmousey = mousey;
+    //}
 
-    while (1)
-    {
-        uint mousex, mousey;
-        mouse_get_position(&mousex, &mousey);
-        // graphic_pixel(mousex, mousey, 0xff0000);
-
-        line(mousex, mousey, oldmousex, oldmousey, 10);
-
-        oldmousex = mousex;
-        oldmousey = mousey;
-    }
-
+    while(1);
     PANIC("The end of the main function has been reached.");
 }

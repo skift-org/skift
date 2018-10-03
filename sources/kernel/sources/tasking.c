@@ -598,6 +598,7 @@ thread_t *get_next_task()
         switch (thread->state)
         {
         case THREAD_CANCELED:
+            log("Thread %d killed!", thread->id);
             kill_thread(thread);
 
             thread = NULL;
@@ -607,6 +608,7 @@ thread_t *get_next_task()
             // Wakeup the thread
             if (thread->sleepinfo.wakeuptick >= ticks)
                 thread->state = THREAD_RUNNING;
+                log("Thread %d wake up!", thread->id);
             break;
 
         case THREAD_WAIT_PROCESS:
@@ -631,32 +633,23 @@ thread_t *get_next_task()
 
 esp_t shedule(esp_t esp, context_t *context)
 {
+    UNUSED(context);
+    
     ticks++;
 
     if (waiting->count == 0)
         return esp;
 
-    UNUSED(context);
-
-    // int delta = (running->esp - esp);
-    // printf("esp=%x -> %x (%d) EIP=%x ID=%d\n", running->esp, esp, delta, context->eip, running->id);
 
     // Save the old context
     running->esp = esp;
-    // sanity_check(running);
-
     list_pushback(waiting, running);
-    // list_pop(waiting, (void *)&running);
-    // int old_thread = running->id;
-    running = get_next_task();
-
-    // log("Switching from %d(EIP=%x) to %d.", old_thread, context->eip, running->id);
-    // log("Page directorie 0x%x", running->process->pdir);
-
+    
     // Load the new context
+    running = get_next_task();
     set_kernel_stack((uint)running->stack + STACK_SIZE);
 
-    log("Switching...");
+    log("Switching PDIR=0x%x...", running->process->pdir);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
     log("Done!");

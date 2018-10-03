@@ -464,8 +464,10 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     UNUSED(argc);
     UNUSED(argv);
 
-    file_t *fp = file_open(NULL, path);
+    log("--------------------------------------------------------------------------------");
 
+    file_t *fp = file_open(NULL, path);
+    
     if (!fp)
     {
         log("EXEC: %s file not found, exec failed!", path);
@@ -489,6 +491,8 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     }
 
     log("ELF file loaded!");
+
+    log("--------------------------------------------------------------------------------");
 
     thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
 

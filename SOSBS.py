@@ -44,11 +44,22 @@ LD = "./toolchain/local/bin/i686-elf-ld"
 
 CFLAGS = ["-O3", "-fno-pie", "-ffreestanding",
           "-nostdlib", "-std=gnu11", "-nostdinc"]
+
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
 QEMUFLAGS = ["-display", "sdl", "-m", "256M",
              "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+
+
+def ERROR(msg):
+    print(BRIGHT_RED + "ERROR: " + RESET + msg)
+
+
+def ABORT():
+    print("Aborted!")
+    exit(-1)
+
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
@@ -68,6 +79,7 @@ def crosscompiler_build():
 
 # --- Utils ------------------------------------------------------------------ #
 
+
 def join(a, b):
     """
     Joint to paths
@@ -81,9 +93,9 @@ def is_uptodate(outfile, infiles):
     """
     if type(infiles) == list:
         uptodate = 0
-        
+
         for i in infiles:
-            if is_uptodate(outfile, infiles):
+            if is_uptodate(outfile, i):
                 uptodate = uptodate + 1
 
         return len(infiles) == uptodate
@@ -105,6 +117,7 @@ def get_files(locations, ext):
     return files
 
 # --- Targets ---------------------------------------------------------------- #
+
 
 class TargetTypes(Enum):
     INVALID = 0
@@ -131,10 +144,34 @@ class Target(object):
     """
     Target building class.
     """
+
     def __init__(self, location, data):
         self.name = data["id"]
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
+        self.deps = data["libs"] if "libs" in data else []
+
+    def get_dependancies(self, targets):
+        dependancies = self.get_dependancies_internal(targets)
+
+        dependancies.remove(self)
+
+        return dependancies
+
+    def get_dependancies_internal(self, targets, found=[]):
+        for d in self.deps:
+            if d in targets:
+                dep = targets[d]
+
+                if not dep in found:
+                    found.append(dep)
+                    dep.get_dependancies_internal(targets, found)
+
+            else:
+                ERROR("Missing dependancies %s of target %s." % (d, self.name))
+                ABORT()
+
+        return found
 
     def get_output(self):
         """
@@ -155,11 +192,23 @@ class Target(object):
         """
         return get_files(join(self.location, "sources"), "c")
 
+    def is_uptodate(self):
+        return is_uptodate(self.get_output(), self.get_sources())
+
+    # --- Target actions ----------------------------------------------------- #
+
     def compile(self, source):
         """
         Compile a source file of the current target.
         """
         print("    " + BRIGHT_BLACK + "%s" % source + RESET)
+
+        if source.endswith(".c"):
+            command = [GCC] + CFLAGS + ["-o", source + ".o", source]
+            print(" ".join(command))
+        elif source.endswith(".s"):
+            pass
+
         return True
 
     def link(self, targets):
@@ -168,6 +217,7 @@ class Target(object):
         """
         print("    " + BRIGHT_WHITE + "Linking" +
               RESET + " %s" % self.get_output())
+
         return True
 
     def build(self, targets):
@@ -175,7 +225,7 @@ class Target(object):
         Build source files and link the target.
         """
         # Skip a line so it's easier on the eyes.
-        print("") 
+        print("")
         print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
         # Build all source file of the current target
@@ -186,6 +236,8 @@ class Target(object):
         # Link and output the result of the target
         return self.link(targets)
 
+
+# --- Target actions --------------------------------------------------------- #
 
 def list_targets(location):
     """
@@ -204,6 +256,7 @@ def list_targets(location):
             targets[data["id"]] = Target(target_location, data)
 
     return targets
+
 
 # --- Action ----------------------------------------------------------------- #
 
@@ -233,7 +286,12 @@ def info(target, targets):
 
     print(BRIGHT_WHITE + "Target '" + target.name + "':" + RESET)
     print("\tType: " + str(target.type.name.lower()))
-    print("\tDependencies: <TBD>")
+    print("\tUptodate: " + str(target.is_uptodate()))
+    print("\tDirect Dependencies: " + ", ".join(target.deps))
+
+    all_deps = target.get_dependancies(targets)
+    print("\tAll dependencies: " + ", ".join([a.name for a in all_deps]))
+
     print("\tLocation: " + target.location)
     print("\tOutput: " + target.get_output())
 
@@ -259,9 +317,8 @@ def build_all(targets):
     for t in targets:
         target = targets[t]
         if not target.build(targets):
-            print(BRIGHT_RED + "ERROR: " + RESET +
-                  "'%s' compilation failed!" % t)
-            return
+            ERROR("'%s' compilation failed!" % t)
+            ABORT()
 
 
 def rebuild_all(targets):
@@ -341,9 +398,10 @@ global_actions = \
 
 # --- Main ------------------------------------------------------------------- #
 
+
 def missing_command(command):
-    print(BRIGHT_RED + "ERROR: " + RESET + "No action named '%s'!" % command)
-    print(BRIGHT_WHITE + "See: " + RESET + "./tools help.")
+    ERROR("No action named '%s'!" % command)
+    print(BRIGHT_WHITE + "See: " + RESET + "'" + APP_NAME + " help'.")
 
 
 def main(argc, argv):
@@ -354,7 +412,7 @@ def main(argc, argv):
 
     # Check and build the cross compiler if the user say 'YES'.
     if not crosscompiler_check():
-        print(BRIGHT_RED + "ERROR: " + RESET + "Toolchain not found!")
+        ERROR("Toolchain not found!")
 
         respond = input(
             "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
@@ -375,7 +433,8 @@ def main(argc, argv):
         if action in actions:
             # Check if a target is specified
             if argc < 3:
-                print(BRIGHT_RED + "ERROR: " + RESET + "No target specified!")
+                ERROR("No target specified!")
+                ABORT()
             else:
                 target = argv[2]
 
@@ -383,8 +442,8 @@ def main(argc, argv):
                 if target in targets:
                     actions[action](targets[target], targets)
                 else:
-                    print(BRIGHT_RED + "ERROR: " + RESET +
-                          "No target named '%s'!" % target)
+                    ERROR("No target named '%s'!" % target)
+                    ABORT()
 
         elif action in global_actions:
             global_actions[action](targets)

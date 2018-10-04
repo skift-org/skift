@@ -394,7 +394,7 @@ page_directorie_t *memory_alloc_pdir()
         e->User = 0;
         e->Write = 1;
         e->Present = 1;
-        e->PageFrameNumber = (uint)(&kptable[i]) / PAGE_SIZE;
+        e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
     atomic_end();

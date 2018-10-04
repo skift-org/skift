@@ -656,7 +656,6 @@ esp_t shedule(esp_t esp, context_t *context)
     log("Switching PDIR=0x%x...", running->process->pdir);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
-    log("Done!");
 
     return running->esp;
 }

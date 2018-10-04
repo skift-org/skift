@@ -156,7 +156,7 @@ void main(multiboot_info_t *info, s32 magic)
         mouse_get_position(&mousex, &mousey);
         //graphic_pixel(mousex, mousey, 0xff0000);
 
-        line(oldmousex, oldmousey, mousex, mousey, 1, mousex ^ mousey);
+        line(oldmousex, oldmousey, mousex, mousey, 1, 0xff);
 
         oldmousex = mousex;
         oldmousey = mousey;

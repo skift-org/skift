@@ -184,6 +184,7 @@ class Project(object):
 
 # --- Auto generated files --------------------------------------------------- #
 
+
     def generate_meta_header(self):
         """Generate '__meta.h' a header containg some build information from the project."""
         toolchain.MKDIR(self.obj_path)
@@ -300,7 +301,8 @@ class Project(object):
         print("Type: %s" % self.type)
         print("Output: %s" % self.get_output())
         print("Libs: %s" % ', '.join(self.get_dependencies(projects)))
-        print("Includes: %s" % ', '.join(self.get_dependencies_include(projects)))
+        print("Includes: %s" % ', '.join(
+            self.get_dependencies_include(projects)))
 
     def build(self, projects):
         toolchain.MKDIR(self.obj_path)

@@ -52,6 +52,41 @@ QEMUFLAGS = ["-display", "sdl", "-m", "256M",
              "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 
+def QEMU(disk):
+    subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS)
+
+
+def MKDIR(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    return directory
+
+
+def RMDIR(directory):
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
+
+
+def COPY(src, dest):
+    shutil.copyfile(src, dest)
+
+
+def TAR(directory, output_file):
+    subprocess.call(["tar", "-cf", output_file, "-C",
+                     directory] + os.listdir(directory))
+
+
+def GRUB(iso, output_file):
+    try:
+        return 0 == subprocess.call(["grub-mkrescue", "-o", output_file, iso])
+    except:
+        print("grub-mkrescue not found, fallback grub2-mkrescue...")
+        return 0 == subprocess.call(["grub2-mkrescue", "-o", output_file, iso])
+
+    return False
+
+
 def ERROR(msg):
     print(BRIGHT_RED + "ERROR: " + RESET + msg)
 
@@ -363,25 +398,23 @@ def list_command(targets):
 def list_lib(targets):
     """List all available libraries."""
 
-    libraries = {k: v for k, v in targets.items() if v.type == TargetTypes.LIB}
-    print(BRIGHT_WHITE + "Libraries: " + RESET + ', '.join(libraries.keys()))
+    result = [i for i in targets if targets[i].type == TargetTypes.LIB]
+    print(BRIGHT_WHITE + "Libraries: " + RESET + ', '.join(result))
 
 
 def list_app(targets):
     """List all available applications."""
 
-    applications = {k: v for k, v in targets.items() if v.type ==
-                    TargetTypes.APP}
-    print(BRIGHT_WHITE + "Applications: " +
-          RESET + ', '.join(applications.keys()))
+    result = [i for i in targets if targets[i].type == TargetTypes.APP]
+    print(BRIGHT_WHITE + "Applications: " + RESET + ', '.join(result))
 
 
 def list_other(targets):
     """List all everithing else."""
 
-    applications = {k: v for k, v in targets.items(
-    ) if v.type != TargetTypes.APP and v.type != TargetTypes.LIB}
-    print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(applications.keys()))
+    excluded = [TargetTypes.APP, TargetTypes.LIB]
+    result = [i for i in targets if not targets[i].type in excluded]
+    print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(result))
 
 
 global_actions = \
@@ -418,9 +451,11 @@ def main(argc, argv):
             "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
 
         if respond in ['y', "yes", 'o', "oui"]:
-            pass
+            if subprocess.call('./toolchain/build-it!.sh', shell=True) != 0:
+                ERROR("Building toolchain failed!")
+                ABORT()
         else:
-            exit()
+            ABORT()
 
     # Command parsing
 

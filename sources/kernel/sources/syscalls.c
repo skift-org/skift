@@ -38,7 +38,7 @@ static int (*syscalls[])() =
     {
         [SYS_PROCESS_SELF] = sys_not_implemented,
         [SYS_PROCESS_EXEC] = sys_not_implemented,
-        [SYS_PROCESS_EXIT] = sys_not_implemented,
+        [SYS_PROCESS_EXIT] = sys_io_process_exit,
         [SYS_PROCESS_CANCEL] = sys_not_implemented,
         [SYS_PROCESS_MAP] = sys_not_implemented,
         [SYS_PROCESS_UNMAP] = sys_not_implemented,
@@ -74,7 +74,7 @@ static int (*syscalls[])() =
 
 void syscall_dispatcher(context_t *context)
 {
-    log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    //log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
 
     syscall_t syscall = (syscall_t)syscalls[context->eax];
     context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);

@@ -416,6 +416,7 @@ void memory_free_pdir(page_directorie_t *pdir)
         if (e->Present)
         {
             page_table_t *pt = (page_table_t *)(e->PageFrameNumber * PAGE_SIZE);
+            
             for (size_t i = 0; i < 1024; i++)
             {
                 page_t *p = &pt->pages[i];

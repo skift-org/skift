@@ -42,14 +42,14 @@ RESET = ESC + '0m'
 GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
 
-CFLAGS = ["-O3", "-fno-pie", "-ffreestanding",
-          "-nostdlib", "-std=gnu11", "-nostdinc"]
+CFLAGS = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+CFLAGS_OPTIMIZATION = ["-O0", "-O1", "-O2", "-O3"]
+CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-display", "sdl", "-m", "256M",
-             "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+QEMUFLAGS = ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 
 def QEMU(disk):
@@ -110,7 +110,9 @@ def crosscompiler_build():
     """
     Build the cross compiler.
     """
-    pass
+    if subprocess.call('./toolchain/build-it!.sh', shell=True) != 0:
+        ERROR("Building toolchain failed!")
+        ABORT()
 
 # --- Utils ------------------------------------------------------------------ #
 
@@ -135,7 +137,7 @@ def is_uptodate(outfile, infiles):
 
         return len(infiles) == uptodate
 
-    return os.path.exists(outfile) and (os.path.getmtime(output_file) > os.path.getmtime(input_file))
+    return os.path.exists(outfile) and (os.path.getmtime(outfile) > os.path.getmtime(infiles))
 
 
 def get_files(locations, ext):
@@ -271,6 +273,13 @@ class Target(object):
         # Link and output the result of the target
         return self.link(targets)
 
+# ---- Distribution ---------------------------------------------------------- #
+
+def generate_ramdisk(targets):
+    pass
+
+def generate_bootdisk(targets):
+    pass
 
 # --- Target actions --------------------------------------------------------- #
 
@@ -362,6 +371,9 @@ def rebuild_all(targets):
     clean_all(targets)
     build_all(targets)
 
+def distrib(targets):
+    """Generate a distribution file."""
+    pass
 
 def help_command(targets):
     """Show this help message."""
@@ -451,9 +463,7 @@ def main(argc, argv):
             "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
 
         if respond in ['y', "yes", 'o', "oui"]:
-            if subprocess.call('./toolchain/build-it!.sh', shell=True) != 0:
-                ERROR("Building toolchain failed!")
-                ABORT()
+            crosscompiler_build()
         else:
             ABORT()
 

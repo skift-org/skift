@@ -275,7 +275,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     {
         atomic_end();
         
-        log("Failed!");
+        // log("Failed!");
         return 0;
     }
 
@@ -286,7 +286,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
         physical_free(paddr, count);
         atomic_end();
 
-        log("Failed!");
+        // log("Failed!");
         return 0;
     }
 
@@ -294,7 +294,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
 
     return vaddr;
 }
@@ -312,7 +312,7 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
 
     return vaddr;
 }
@@ -348,7 +348,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
                 atomic_end();
 
-                log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
+                // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
                 return startaddr;
             }
@@ -361,7 +361,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
     atomic_end();
 
-    log("Failed!");
+    // log("Failed!");
 
     return 0;
 }
@@ -377,7 +377,7 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 
     atomic_end();
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 }
 
 // Alloc a pdir for a process
@@ -399,7 +399,7 @@ page_directorie_t *memory_alloc_pdir()
 
     atomic_end();
 
-    log("PDIR=0x%x", pdir);
+    // log("PDIR=0x%x", pdir);
 
     return pdir;
 }
@@ -434,7 +434,7 @@ void memory_free_pdir(page_directorie_t *pdir)
 
     atomic_end();
 
-    log("PDIR=0x%x", pdir);
+    // log("PDIR=0x%x", pdir);
 }
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
@@ -454,7 +454,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 
     atomic_end();
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
     return 0;
 }
@@ -476,7 +476,7 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 
     atomic_end();
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     return 0;
 }
@@ -486,7 +486,7 @@ int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
     physical_set_used(addr, count);
     virtual_map(pdir, addr, addr, count, 0);
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     return 0;
 }
@@ -496,7 +496,7 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
     physical_set_free(addr, count);
     virtual_unmap(pdir, addr, count);
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
+    // log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 
     return 0;
 }

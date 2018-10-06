@@ -443,7 +443,6 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         // To avoid pagefault we need to switch page directorie.
         page_directorie_t *pdir = running->process->pdir;
 
-        log("Switching page directorie from %x to %x.", pdir, process->pdir);
         paging_load_directorie(process->pdir);
         process_map(process->id, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
         memset((void *)dest, 0, destsz);
@@ -464,8 +463,6 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     UNUSED(argc);
     UNUSED(argv);
 
-    log("--------------------------------------------------------------------------------");
-
     file_t *fp = file_open(NULL, path);
 
     if (!fp)
@@ -481,18 +478,12 @@ PROCESS process_exec(const char *path, int argc, char **argv)
 
     ELF_header_t *elf = (ELF_header_t *)buffer;
 
-    log("ELF file: VALID=%d TYPE=%d ENTRY=0x%x SEG_COUNT=%i", ELF_valid(elf), elf->type, elf->entry, elf->phnum);
-
     ELF_program_t program;
 
     for (int i = 0; ELF_read_program(elf, &program, i); i++)
     {
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
-
-    log("ELF file loaded!");
-
-    log("--------------------------------------------------------------------------------");
 
     thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
 

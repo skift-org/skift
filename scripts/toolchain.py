@@ -85,7 +85,7 @@ def GCC(input_file, output_file, includes, defines, strict):
         flags += ["-Wall", "-Wextra", "-Werror"]
 
     flags += ["-c", "-o", output_file, input_file]
-    print(" ".join(flags))
+    #print(" ".join(flags))
     return subprocess.call(' '.join(flags), shell=True) == 0
 
 

@@ -1,5 +1,5 @@
 {
-    "id": "libhideo",
+    "id": "libui",
     "type": "lib",
     "libs": ["libc", "libutils", "hideo-shared"]
 }

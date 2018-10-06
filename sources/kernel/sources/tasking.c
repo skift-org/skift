@@ -467,7 +467,7 @@ PROCESS process_exec(const char *path, int argc, char **argv)
     log("--------------------------------------------------------------------------------");
 
     file_t *fp = file_open(NULL, path);
-    
+
     if (!fp)
     {
         log("EXEC: %s file not found, exec failed!", path);
@@ -612,19 +612,12 @@ thread_t *get_next_task()
             // Wakeup the thread
             if (thread->sleepinfo.wakeuptick >= ticks)
                 thread->state = THREAD_RUNNING;
-                log("Thread %d wake up!", thread->id);
+            log("Thread %d wake up!", thread->id);
             break;
 
-        case THREAD_WAIT_PROCESS:
-            // Do nothing for now.
-            break;
-
-        case THREAD_WAIT_THREAD:
-            // Do nothing for  now.
-            break;
-
-        default:
-            break;
+        case THREAD_WAIT_PROCESS: break;
+        case THREAD_WAIT_THREAD: break;
+        default: break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
@@ -638,22 +631,19 @@ thread_t *get_next_task()
 esp_t shedule(esp_t esp, context_t *context)
 {
     UNUSED(context);
-    
+
     ticks++;
 
-    if (waiting->count == 0)
-        return esp;
-
+    if (waiting->count == 0) return esp;
 
     // Save the old context
     running->esp = esp;
     list_pushback(waiting, running);
-    
+
     // Load the new context
     running = get_next_task();
     set_kernel_stack((uint)running->stack + STACK_SIZE);
 
-    log("Switching PDIR=0x%x...", running->process->pdir);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
 

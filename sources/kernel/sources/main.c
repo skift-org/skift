@@ -27,6 +27,9 @@
 
 #include "sync/atomic.h"
 
+#define LINE \
+"================================================================================"
+
 multiboot_info_t mbootinfo;
 
 extern int __end;
@@ -49,7 +52,7 @@ void system_check(multiboot_info_t *info, s32 magic)
 
 void setup_cpu_context()
 {
-    log("================================================================================");
+    log(LINE);
     log("Initializing cpu context...");
     setup(gdt);
     setup(pic);
@@ -60,7 +63,7 @@ void setup_cpu_context()
 
 void setup_system_context()
 {
-    log("================================================================================");
+    log(LINE);
     log("Initializing system context...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
@@ -70,7 +73,7 @@ void setup_system_context()
 
 void system_start()
 {
-    log("================================================================================");
+    log(LINE);
     log("Enabling interupts, paging and atomics.");
     atomic_enable();
     sti();
@@ -111,21 +114,12 @@ void line(int x0, int y0, int x1, int y1, int weight, uint color)
     }
 }
 
-void test()
-{
-    while (1)
-    {
-    }
-}
-
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
-    log("================================================================================");
+    log(LINE);
 
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-    // Start of the boot environement ( be very carefull what you do here ;) ) //
-
     system_check(&mbootinfo, magic);
 
     graphic_early_setup(800, 600);
@@ -139,28 +133,11 @@ void main(multiboot_info_t *info, s32 magic)
 
     // End of the boot environement //
     system_start();
-    log("================================================================================");
+    log(LINE);
 
     process_exec("application/test-app.app", 0, NULL);
 
-    // for(size_t i = 0; i < 256; i++)
-    //     thread_create(process_self(), (thread_entry_t)test, NULL, 0);
-
-
-    uint oldmousex = 0;
-    uint oldmousey = 0;
-
-    while (1)
-    {
-        uint mousex, mousey;
-        mouse_get_position(&mousex, &mousey);
-        //graphic_pixel(mousex, mousey, 0xff0000);
-
-        line(oldmousex, oldmousey, mousex, mousey, 1, 0xff);
-
-        oldmousex = mousex;
-        oldmousey = mousey;
-    }
+    while(1) hlt();
 
     PANIC("The end of the main function has been reached.");
 }

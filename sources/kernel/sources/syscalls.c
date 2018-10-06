@@ -42,6 +42,7 @@ static int (*syscalls[])() =
         [SYS_PROCESS_CANCEL] = sys_not_implemented,
         [SYS_PROCESS_MAP] = sys_not_implemented,
         [SYS_PROCESS_UNMAP] = sys_not_implemented,
+        
         [SYS_THREAD_SELF] = sys_not_implemented,
         [SYS_THREAD_CREATE] = sys_not_implemented,
         [SYS_THREAD_EXIT] = sys_not_implemented,
@@ -50,8 +51,10 @@ static int (*syscalls[])() =
         [SYS_THREAD_WAKEUP] = sys_not_implemented,
         [SYS_THREAD_WAIT] = sys_not_implemented,
         [SYS_THREAD_WAITPROC] = sys_not_implemented,
-        [SYS_PRINT] = sys_io_print,
-        [SYS_READ] = sys_not_implemented,
+
+        [SYS_IO_PRINT] = sys_io_print,
+        [SYS_IO_READ] = sys_not_implemented,
+        
         [SYS_FILE_CREATE] = sys_not_implemented,
         [SYS_FILE_DELETE] = sys_not_implemented,
         [SYS_FILE_EXISTE] = sys_not_implemented,
@@ -63,6 +66,7 @@ static int (*syscalls[])() =
         [SYS_FILE_READ] = sys_not_implemented,
         [SYS_FILE_WRITE] = sys_not_implemented,
         [SYS_FILE_IOCTL] = sys_not_implemented,
+
         [SYS_DIR_CREATE] = sys_not_implemented,
         [SYS_DIR_DELETE] = sys_not_implemented,
         [SYS_DIR_EXISTE] = sys_not_implemented,

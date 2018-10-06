@@ -7,6 +7,8 @@
 #include "kernel/mouse.h"
 #include "kernel/logger.h"
 
+#include "sync/atomic.h"
+
 uint mouse_x;
 uint mouse_y;
 
@@ -130,8 +132,10 @@ void mouse_setup()
 
 void mouse_get_position(uint *outxpos, uint *outypos)
 {
+    atomic_begin();
     *outxpos = mouse_x;
     *outypos = mouse_y;
+    atomic_end();
 }
 
 // int mouse_set_position(uint xpos, uint ypos)

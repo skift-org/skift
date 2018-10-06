@@ -1,9 +1,10 @@
 #pragma once
 #include "types.h"
+#include "utils.h"
 
 typedef struct
 {
-    int shared;
+    bool shared;
 
     uint width;
     uint height;
@@ -11,10 +12,14 @@ typedef struct
     uint *buffer;
 } bitmap_t;
 
-bitmap_t *graphic_bitmap_shared(uint width, uint height, uint *buffer);
-bitmap_t *graphic_bitmap_alloc(uint width, uint height);
-void graphic_bitmap_free(bitmap_t *bmp);
+bitmap_t *bitmap_ctor(uint width, uint height);
+void bitmap_dtor(bitmap_t *bmp);
 
-void graphic_pixel(bitmap_t *bmp, uint x, uint y, uint color);
-void graphic_line(bitmap_t *bmp);
-void graphic_rectangle(bitmap_t*bmp);
+void libgfx_clear(bitmap_t *bmp, uint color);
+inline void libgfx_pixel(bitmap_t *bmp, int x, int y, uint color);
+void libgfx_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color);
+void libgfx_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color);
+void libgfx_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color);
+
+void libgfx_char(bitmap_t *bmp, int x, int y, char c);
+void libgfx_text(bitmap_t *bmp, int x, int y, const char *str);

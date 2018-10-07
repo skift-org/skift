@@ -49,7 +49,8 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-display", "sdl", "-m", "256M", "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+QEMUFLAGS = ["-display", "sdl", "-m", "256M",
+             "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 
 def QEMU(disk):
@@ -188,10 +189,13 @@ class Target(object):
         self.location = location
         self.deps = data["libs"] if "libs" in data else []
 
+        self.builded = False
+
     def get_dependancies(self, targets):
         dependancies = self.get_dependancies_internal(targets)
 
-        dependancies.remove(self)
+        if self in dependancies:
+            dependancies.remove(self)
 
         return dependancies
 
@@ -215,36 +219,60 @@ class Target(object):
         Return the name of the output file of the current target.
         """
         if self.type == TargetTypes.LIB:
-            return join(self.location, self.name + ".lib")
+            return join(self.location, "bin/" + self.name + ".lib")
         elif self.type == TargetTypes.APP:
-            return join(self.location, self.name + ".app")
+            return join(self.location, "bin/" + self.name + ".app")
         elif self.type == TargetTypes.KERNEL:
-            return join(self.location, self.name + ".bin")
+            return join(self.location, "bin/" + self.name + ".bin")
 
-        return join(self.location, self.name + ".out")
+        return join(self.location, "bin/" + self.name + ".out")
 
     def get_sources(self):
         """
         Return all source file of the current target.
         """
-        return get_files(join(self.location, "sources"), "c")
+        return get_files(join(self.location, "sources"), "c") + get_files(join(self.location, "sources"), "s")
+
+    def get_objects(self):
+        objects = []
+
+        for s in self.get_sources():
+            objects.append(s.replace(join(self.location, "sources"),
+                                     join(self.location, "obj")) + ".o")
+
+        return objects
+
+    def get_includes(self, targets):
+
+        deps = self.get_dependancies(targets)
+
+        includes = [join(self.location, "includes")]
+
+        for d in deps:
+            includes.append(join(d.location, "includes"))
+
+        return includes
 
     def is_uptodate(self):
         return is_uptodate(self.get_output(), self.get_sources())
 
     # --- Target actions ----------------------------------------------------- #
 
-    def compile(self, source):
+    def compile(self, source, output, targets):
         """
         Compile a source file of the current target.
         """
-        print("    " + BRIGHT_BLACK + "%s" % source + RESET)
+        if not is_uptodate(output, source):
+            print("    " + BRIGHT_BLACK + "%s" % source + RESET)
 
-        if source.endswith(".c"):
-            command = [GCC] + CFLAGS + ["-o", source + ".o", source]
-            print(" ".join(command))
-        elif source.endswith(".s"):
-            pass
+            if source.endswith(".c"):
+                includes = [("-I" + i) for i in self.get_includes(targets)]
+                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + \
+                    CFLAGS_STRICT + includes + ["-c", "-o", output, source]
+                # return subprocess.run(command) == 0
+                return False
+            elif source.endswith(".s"):
+                return False
 
         return True
 
@@ -261,13 +289,31 @@ class Target(object):
         """
         Build source files and link the target.
         """
+
+        # print(self.name)
+
+        if self.builded:
+            return True
+        else:
+            self.builded = True
+
+        MKDIR(join(self.location, "bin"))
+        MKDIR(join(self.location, "obj"))
+
+        for dep in self.get_dependancies(targets):
+            if not dep.build(targets):
+                ERROR("Failed to build dependancies %s of %s" %
+                      (dep.name, self.name))
+                return False
+
         # Skip a line so it's easier on the eyes.
         print("")
         print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
         # Build all source file of the current target
-        for source in self.get_sources():
-            if not self.compile(source):
+        for src, obj in zip(self.get_sources(), self.get_objects()):
+            if not self.compile(src, obj, targets):
+                ERROR("Failed to compile %s to %s" % (src, obj))
                 return False
 
         # Link and output the result of the target
@@ -275,13 +321,16 @@ class Target(object):
 
 # ---- Distribution ---------------------------------------------------------- #
 
+
 def generate_ramdisk(targets):
     pass
+
 
 def generate_bootdisk(targets):
     pass
 
 # --- Target actions --------------------------------------------------------- #
+
 
 def list_targets(location):
     """
@@ -371,9 +420,11 @@ def rebuild_all(targets):
     clean_all(targets)
     build_all(targets)
 
+
 def distrib(targets):
     """Generate a distribution file."""
     pass
+
 
 def help_command(targets):
     """Show this help message."""

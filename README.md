@@ -12,7 +12,7 @@
 
 ## What **skiftOS** look like
 
-![](doc/screenshots/capture.png)
+![screenshots](doc/screenshots/capture.png)
 
 ## Build-it
 
@@ -27,6 +27,7 @@
 ## Features
 
 ## Kernel
+
 - [x] IDT, GDT, IRQ and ISR
 - [x] Memory managment
   - [x] Pagging
@@ -42,6 +43,7 @@
   - [ ] Virtual file system (WIP)
 
 ### Libraries
+
 - [ ] libc (wip)
   - [ ] stdio.h
   - [ ] stdlib.h
@@ -49,6 +51,7 @@
 - [ ] libui
 
 ### Application
+
 - [ ] Basic shell
 - [ ] coreutils (ls, cat, ...)
 - [ ] Compositor 

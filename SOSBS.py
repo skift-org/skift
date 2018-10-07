@@ -199,7 +199,10 @@ class Target(object):
 
         return dependancies
 
-    def get_dependancies_internal(self, targets, found=[]):
+    def get_dependancies_internal(self, targets, found=None):
+        if found == None:
+            found = []
+
         for d in self.deps:
             if d in targets:
                 dep = targets[d]
@@ -290,8 +293,6 @@ class Target(object):
         Build source files and link the target.
         """
 
-        # print(self.name)
-
         if self.builded:
             return True
         else:
@@ -300,18 +301,15 @@ class Target(object):
         MKDIR(join(self.location, "bin"))
         MKDIR(join(self.location, "obj"))
 
-        # Skip a line so it's easier on the eyes.
-        print("")
-        print(BRIGHT_WHITE + "%s:" % self.name + RESET)
-
-        print(self.deps)
-        print([dep.name for dep in self.get_dependancies(targets)])
-
         for dep in self.get_dependancies(targets):
             if not dep.build(targets):
                 ERROR("Failed to build dependancies %s of %s" %
                       (dep.name, self.name))
                 return False
+
+        # Skip a line so it's easier on the eyes.
+        print("")
+        print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
         # Build all source file of the current target
         for src, obj in zip(self.get_sources(), self.get_objects()):

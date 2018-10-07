@@ -2,19 +2,19 @@
     <img src="doc/logo/logo256.png">
 </p>
 
-# About skift**OS**
+<h1 align="center">skiftOS</h1>
 
-## Build infrastructure, kernel, and userspace
+**skiftOS** is a simple, handmade, build from scratch, 32bit operating system for intel x86 CPU.
 
-skift**OS** is a handmade operating system build from scratch.
+**skiftOS** support virtual memory, multi processing with threads, and filesystem.
 
-## Featuring
+**skiftOS** provide a rich syscall interface for user application.
 
-- Multitasking
-- File system
-- Userspace
+## What **skiftOS** look like
 
-## 🏗 Build-it
+![](doc/screenshots/capture.png)
+
+## Build-it
 
 ```sh
 # Build the operating system
@@ -24,93 +24,37 @@ skift**OS** is a handmade operating system build from scratch.
 ./TOOLS run
 ```
 
-# Documentation - WIP
+## Features
 
-The userspace api
+## Kernel
+- [x] IDT, GDT, IRQ and ISR
+- [x] Memory managment
+  - [x] Pagging
+- [ ] Tasking (wip)
+  - [ ] Sync (Wait, sleep, wakeup)
+  - [ ] IPC (Shared memory, mailbox, pipes?) (wip)
+  - [ ] ELF loader (wip)
+  - [ ] System calls (wip)
+  - [ ] Jump to user mode (wip)
+- [ ] File System
+  - [x] ATA pio driver
+  - [x] RAM disk
+  - [ ] Virtual file system (WIP)
 
-## `TOOLS` manual
+### Libraries
+- [ ] libc (wip)
+  - [ ] stdio.h
+  - [ ] stdlib.h
+- [ ] libgfx (wip)
+- [ ] libui
 
-```shell
-./TOOLS <action>
-```
-
-```shell
-./TOOLS cleanall
-
-./TOOLS buildall
-
-./TOOLS rebuildall
-
-./TOOLS run
-```
-
-```shell
-./TOOLS <action> <target>
-```
-
-```shell
-./TOOLS build test-app
-
-./TOOLS clean test-app
-
-./TOOLS rebuild test-app
-
-./TOOLS run test-app
-```
-
-## About `manifest.json`
-
-```json
-{
-    "id": "test-app",
-    "type": "app",
-    "libs": ["libc-userland", "libutils"],
-    "strict": false
-}
-```
-
-## "Standart" lib c
-
-```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <...>
-```
-
-## File system
-
-```c
-#include <skift/io.h>
-```
-
-```c
-typedef unsigned int FILE
-
-FILE sk_file_open(const char * path, int flags)
-void sk_file_close(FILE file)
-
-void sk_file_read()
-void sk_file_write()
-```
-
-```c
-typedef unsigned int DIRECTORY
-
-DIRECTORY sk_directory_open(const char * path, int flags)
-void sk_directory_close(DIRECTORY directory)
-```
-
-## Threads, process, and mutex
-
-```c
-#include <skift/thread.h>
-#include <skift/mutex.h>
-#include <skift/proc.h>
-```
-
-## IPC (Shared memory, Messaging and signals)
-
-```c
-#include <skift/ipc.h>
-```
+### Application
+- [ ] Basic shell
+- [ ] coreutils (ls, cat, ...)
+- [ ] Compositor 
+- [ ] Panels
+- [ ] Desktop
+- [ ] Terminal
+- [ ] File browser
+- [ ] Text editor
+- [ ] Manual browser

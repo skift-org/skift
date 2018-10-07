@@ -12,5 +12,8 @@
     },
     "editor.rulers": [
         80
-    ]
+    ],
+    "files.associations": {
+        "system.h": "c"
+    }
 }

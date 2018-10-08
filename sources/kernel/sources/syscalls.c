@@ -18,11 +18,28 @@ int sys_not_implemented()
 
 /* --- Process -------------------------------------------------------------- */
 
-int sys_io_process_exit(int code)
+int sys_process_self()
+{
+    return process_self();
+}
+
+int sys_process_exec(const char *file_name)
+{
+    process_exec(file_name, 0, NULL);
+}
+
+int sys_process_exit(int code)
 {
     process_exit(code);
     
     return 0;
+}
+
+/* --- Threads -------------------------------------------------------------- */
+
+int sys_thread_self()
+{
+    return thread_self();
 }
 
 /* --- System I/O ----------------------------------------------------------- */
@@ -36,44 +53,44 @@ int sys_io_print(const char *msg)
 
 static int (*syscalls[])() =
     {
-        [SYS_PROCESS_SELF] = sys_not_implemented,
-        [SYS_PROCESS_EXEC] = sys_not_implemented,
-        [SYS_PROCESS_EXIT] = sys_io_process_exit,
-        [SYS_PROCESS_CANCEL] = sys_not_implemented,
-        [SYS_PROCESS_MAP] = sys_not_implemented,
-        [SYS_PROCESS_UNMAP] = sys_not_implemented,
+        [SYS_PROCESS_SELF] = sys_process_self,
+        [SYS_PROCESS_EXEC] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_PROCESS_EXIT] = sys_process_exit,
+        [SYS_PROCESS_CANCEL] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_PROCESS_MAP] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_PROCESS_UNMAP] = sys_not_implemented /* NOT IMPLEMENTED */,
         
-        [SYS_THREAD_SELF] = sys_not_implemented,
-        [SYS_THREAD_CREATE] = sys_not_implemented,
-        [SYS_THREAD_EXIT] = sys_not_implemented,
-        [SYS_THREAD_CANCEL] = sys_not_implemented,
-        [SYS_THREAD_SLEEP] = sys_not_implemented,
-        [SYS_THREAD_WAKEUP] = sys_not_implemented,
-        [SYS_THREAD_WAIT] = sys_not_implemented,
-        [SYS_THREAD_WAITPROC] = sys_not_implemented,
+        [SYS_THREAD_SELF] = sys_thread_self,
+        [SYS_THREAD_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_EXIT] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_CANCEL] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_SLEEP] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_WAKEUP] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_WAIT] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_WAITPROC] = sys_not_implemented /* NOT IMPLEMENTED */,
 
         [SYS_IO_PRINT] = sys_io_print,
-        [SYS_IO_READ] = sys_not_implemented,
+        [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
         
-        [SYS_FILE_CREATE] = sys_not_implemented,
-        [SYS_FILE_DELETE] = sys_not_implemented,
-        [SYS_FILE_EXISTE] = sys_not_implemented,
-        [SYS_FILE_COPY] = sys_not_implemented,
-        [SYS_FILE_MOVE] = sys_not_implemented,
-        [SYS_FILE_STAT] = sys_not_implemented,
-        [SYS_FILE_OPEN] = sys_not_implemented,
-        [SYS_FILE_CLOSE] = sys_not_implemented,
-        [SYS_FILE_READ] = sys_not_implemented,
-        [SYS_FILE_WRITE] = sys_not_implemented,
-        [SYS_FILE_IOCTL] = sys_not_implemented,
+        [SYS_FILE_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_DELETE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_EXISTE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_COPY] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_MOVE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_STAT] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_OPEN] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_CLOSE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_WRITE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_FILE_IOCTL] = sys_not_implemented /* NOT IMPLEMENTED */,
 
-        [SYS_DIR_CREATE] = sys_not_implemented,
-        [SYS_DIR_DELETE] = sys_not_implemented,
-        [SYS_DIR_EXISTE] = sys_not_implemented,
-        [SYS_DIR_OPEN] = sys_not_implemented,
-        [SYS_DIR_CLOSE] = sys_not_implemented,
-        [SYS_DIR_LISTFILE] = sys_not_implemented,
-        [SYS_DIR_LISTDIR] = sys_not_implemented,
+        [SYS_DIR_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_DELETE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_EXISTE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_OPEN] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_CLOSE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_LISTFILE] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_DIR_LISTDIR] = sys_not_implemented /* NOT IMPLEMENTED */,
 };
 
 void syscall_dispatcher(context_t *context)

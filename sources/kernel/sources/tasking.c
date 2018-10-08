@@ -223,9 +223,7 @@ void thread_yield()
 void thread_hold()
 {
     while (running->state != THREAD_RUNNING)
-    {
         hlt();
-    }
 }
 
 #pragma GCC pop_options

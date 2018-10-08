@@ -559,14 +559,9 @@ thread_t *get_next_task()
 {
     thread_t *thread = NULL;
 
-    puts("\n");
-    log("Begin thread...");
-
     do
     {
         list_pop(waiting, (void *)&thread);
-
-        log("Thread %d state %d", thread->id, thread->state);
 
         switch (thread->state)
         {
@@ -625,7 +620,7 @@ thread_t *get_next_task()
 
     } while (thread == NULL || thread->state != THREAD_RUNNING);
 
-    log("The thread is %d", thread->id);
+
     return thread;
 }
 
@@ -634,7 +629,7 @@ esp_t shedule(esp_t esp, context_t *context)
     UNUSED(context);
 
     ticks++;
-    log("Here %x", context->eip);
+
     if (waiting->count == 0)
         return esp;
 

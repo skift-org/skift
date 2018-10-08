@@ -41,6 +41,7 @@ RESET = ESC + '0m'
 
 GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
+AR = "./toolchain/local/bin/i686-elf-ar"
 
 CFLAGS = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
 CFLAGS_OPTIMIZATION = ["-O0", "-O1", "-O2", "-O3"]
@@ -188,6 +189,7 @@ class Target(object):
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
         self.deps = data["libs"] if "libs" in data else []
+        self.strict = data["strict"] if "strict" in data else True
 
         self.builded = False
 
@@ -221,14 +223,15 @@ class Target(object):
         """
         Return the name of the output file of the current target.
         """
-        if self.type == TargetTypes.LIB:
-            return join(self.location, "bin/" + self.name + ".lib")
-        elif self.type == TargetTypes.APP:
-            return join(self.location, "bin/" + self.name + ".app")
-        elif self.type == TargetTypes.KERNEL:
-            return join(self.location, "bin/" + self.name + ".bin")
 
-        return join(self.location, "bin/" + self.name + ".out")
+        type_to_ext = {TargetTypes.LIB: ".lib",
+                       TargetTypes.APP: ".app",
+                       TargetTypes.KERNEL: ".bin"}
+
+        if self.type in type_to_ext:
+            return join(self.location, "bin/" + self.name + type_to_ext[self.type])
+        else:
+            return join(self.location, "bin/" + self.name + ".out")
 
     def get_sources(self):
         """
@@ -266,16 +269,17 @@ class Target(object):
         Compile a source file of the current target.
         """
         if not is_uptodate(output, source):
+            MKDIR(os.path.dirname(output))
+
             print("    " + BRIGHT_BLACK + "%s" % source + RESET)
 
             if source.endswith(".c"):
                 includes = [("-I" + i) for i in self.get_includes(targets)]
-                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + \
-                    CFLAGS_STRICT + includes + ["-c", "-o", output, source]
-                # return subprocess.run(command) == 0
-                return False
+                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + (CFLAGS_STRICT if self.strict else []) + ["-c", "-o", output, source]
             elif source.endswith(".s"):
-                return False
+                command = ["nasm", "-f" "elf32", source, "-o", output]
+
+            return subprocess.call(command) == 0
 
         return True
 
@@ -283,10 +287,19 @@ class Target(object):
         """
         Link the target
         """
-        print("    " + BRIGHT_WHITE + "Linking" +
-              RESET + " %s" % self.get_output())
+        output_file = self.get_output()
+        objects_files = self.get_objects()
 
-        return True
+        print("    " + BRIGHT_WHITE + "Linking " + RESET + output_file)
+
+        if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
+            script = "./common/kernel.ld" if self.type == TargetTypes.KERNEL else "./common/userspace.ld"
+            dependancies = [dep.get_output() for dep in self.get_dependancies(targets)]
+            command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
+        elif self.type == TargetTypes.LIB:
+            command = [AR, "rcs"] + [output_file] + objects_files
+
+        return subprocess.call(command) == 0
 
     def build(self, targets):
         """
@@ -303,8 +316,8 @@ class Target(object):
 
         for dep in self.get_dependancies(targets):
             if not dep.build(targets):
-                ERROR("Failed to build dependancies %s of %s" %
-                      (dep.name, self.name))
+                ERROR("Failed to build " + YELLOW + "%s " %
+                      (dep.name))
                 return False
 
         # Skip a line so it's easier on the eyes.
@@ -314,7 +327,7 @@ class Target(object):
         # Build all source file of the current target
         for src, obj in zip(self.get_sources(), self.get_objects()):
             if not self.compile(src, obj, targets):
-                ERROR("Failed to compile %s to %s" % (src, obj))
+                ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
                 return False
 
         # Link and output the result of the target

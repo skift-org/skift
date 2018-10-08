@@ -21,14 +21,14 @@ typedef int PROCESS; // Process handler
 typedef u32 esp_t;
 typedef void *(*thread_entry_t)(void *);
 
-typedef enum
+typedef enum process_state
 {
     PROCESS_RUNNING,
     PROCESS_CANCELING,
     PROCESS_CANCELED,
 } process_state_t;
 
-typedef enum
+typedef enum thread_state
 {
     THREAD_RUNNING,
     THREAD_SLEEP,

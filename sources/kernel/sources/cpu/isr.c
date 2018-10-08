@@ -80,7 +80,6 @@ void isr_handler(context_t context)
 		if (context.int_no == 128)
 		{
 			syscall_dispatcher(&context);
-			log("Syscall end!");
 		}
 		else
 		{

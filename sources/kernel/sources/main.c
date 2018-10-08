@@ -80,40 +80,6 @@ void system_start()
     log(KERNEL_UNAME);
 }
 
-void line(int x0, int y0, int x1, int y1, int weight, uint color)
-{
-
-    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = (dx > dy ? dx : -dy) / 2, e2;
-
-    for (;;)
-    {
-        for (int xoff = -weight + 1; xoff < weight; xoff++)
-        {
-            for (int yoff = -weight + 1; yoff < weight; yoff++)
-            {
-                graphic_pixel(x0 + xoff, y0 + yoff, color);
-            }
-        }
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
-        e2 = err;
-        if (e2 > -dx)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dy)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
-
 void main(multiboot_info_t *info, s32 magic)
 {
     puts("\n");
@@ -135,8 +101,10 @@ void main(multiboot_info_t *info, s32 magic)
     system_start();
     log(LINE);
 
-    process_exec("application/test-app.app", 0, NULL);
-
+    PROCESS init = process_exec("application/test-app.app", 0, NULL);
+    thread_waitproc(init);
+    log("Hello, world for the kernel!");
+    
     while(1) hlt();
 
     PANIC("The end of the main function has been reached.");

@@ -27,6 +27,25 @@ uint ticks = 0;
 list_t *threads;
 list_t *processes;
 
+#define THREAD_FREE(thread)                                    \
+    {                                                          \
+        list_remove(threads, thread);                          \
+        list_remove(thread->process->threads, (void *)thread); \
+        free(thread->stack);                                   \
+        free(thread);                                          \
+    }
+
+#define PROCESS_FREE(process)                \
+    {                                        \
+        if (process->pdir != memory_kpdir()) \
+        {                                    \
+            memory_free_pdir(process->pdir); \
+        }                                    \
+                                             \
+        list_free(process->threads);         \
+        free(process);                       \
+    }
+
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
     thread_t *thread = (thread_t *)malloc(sizeof(thread_t));
@@ -100,50 +119,28 @@ process_t *alloc_process(const char *name, int flags)
     return process;
 }
 
-void free_thread(thread_t *thread)
-{
-    list_remove(threads, thread);
-    list_remove(thread->process->threads, (void *)thread);
-    free(thread->stack);
-    free(thread);
-}
-
-void free_process(process_t *process)
-{
-    if (process->pdir != memory_kpdir())
-    {
-        memory_free_pdir(process->pdir);
-    }
-
-    list_free(process->threads);
-    free(process);
-}
-
 void kill_thread(thread_t *thread)
 {
     list_remove(thread->process->threads, thread);
 
     if (thread->process->threads->count == 0)
     {
-        free_process(thread->process);
+        PROCESS_FREE(thread->process);
     }
 
-    free_thread(thread);
+    THREAD_FREE(thread);
 }
 
 void kill_process(process_t *process)
 {
-    FOREACH(i, process->threads)
-    {
-        free_thread((thread_t *)i->value);
-    }
+    FOREACH(i, process->threads){
+        THREAD_FREE(((thread_t *)i->value))}
 
-    free_process(process);
+    PROCESS_FREE(process);
 }
 
 thread_t *thread_get(THREAD thread)
 {
-
     FOREACH(i, threads)
     {
         thread_t *t = (thread_t *)i->value;
@@ -167,24 +164,6 @@ process_t *process_get(PROCESS process)
     }
 
     return NULL;
-}
-
-// Notify all waiting thread
-void notify_threads(bool is_thread, int handle, int outcode)
-{
-    FOREACH(i, threads)
-    {
-        thread_t *thread = i->value;
-
-        bool is_waiting = (thread->state == THREAD_WAIT_THREAD && is_thread) ||
-                          (thread->state == THREAD_WAIT_PROCESS && !is_thread);
-
-        if (is_waiting && thread->waitinfo.handle == handle)
-        {
-            thread->waitinfo.outcode = outcode;
-            thread->state = THREAD_RUNNING;
-        }
-    }
 }
 
 /* --- Public functions ----------------------------------------------------- */
@@ -357,8 +336,8 @@ int thread_cancel(THREAD t)
 
     if (thread != NULL)
     {
-        thread->state = THREAD_CANCELED;
-        notify_threads(1, thread_self(), 0);
+        thread->state = THREAD_CANCELING;
+        thread->exit_value = NULL;
         log("Thread n°%d got canceled.", t);
     }
 
@@ -371,8 +350,8 @@ void thread_exit(void *retval)
 {
     atomic_begin();
 
-    running->state = THREAD_CANCELED;
-    notify_threads(1, thread_self(), (int)retval);
+    running->state = THREAD_CANCELING;
+    running->exit_value = retval;
 
     log("Thread n°%d exited with value 0x%x.", running->id, retval);
 
@@ -508,10 +487,10 @@ void process_cancel(PROCESS p)
     if (p != kernel_process)
     {
         process_t *process = process_get(p);
-        process->state = PROCESS_CANCELED;
+        process->state = PROCESS_CANCELING;
+        process->exit_code = -1;
         log("Process '%s' ID=%d canceled!", process->name, process->id);
 
-        notify_threads(0, p, -1);
         cancel_childs(process);
     }
     else
@@ -532,11 +511,10 @@ void process_exit(int code)
 
     if (p != kernel_process)
     {
-        process->state = PROCESS_CANCELED;
+        process->state = PROCESS_CANCELING;
+        process->exit_code = code;
         log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
-        // Notify waiting thread that we exited.
-        notify_threads(0, p, code);
         cancel_childs(process);
     }
     else
@@ -592,23 +570,51 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-        case THREAD_CANCELED:
-            log("Thread %d killed!", thread->id);
-            kill_thread(thread);
-
-            thread = NULL;
+        case THREAD_CANCELING:
+        {
+            log("Thread %d canceled!", thread->id);
+            thread->state = THREAD_CANCELED;
+            // TODO: cleanup the thread.
+            // TODO: cleanup the process if no thread is still running.
             break;
-
+        }
         case THREAD_SLEEP:
             // Wakeup the thread
             if (thread->sleepinfo.wakeuptick >= ticks)
+            {
                 thread->state = THREAD_RUNNING;
-            log("Thread %d wake up!", thread->id);
+                log("Thread %d wake up!", thread->id);
+            }
             break;
 
-        case THREAD_WAIT_PROCESS: break;
-        case THREAD_WAIT_THREAD: break;
-        default: break;
+        case THREAD_WAIT_PROCESS:
+        {
+            process_t *wproc = process_get(thread->waitinfo.handle);
+
+            if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
+            {
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = wproc->exit_code;
+                log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+            }
+
+            break;
+        }
+        case THREAD_WAIT_THREAD:
+        {
+            thread_t *wthread = thread_get(thread->waitinfo.handle);
+
+            if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
+            {
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = (uint)wthread->exit_value;
+                log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
+            }
+
+            break;
+        }
+        default:
+            break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
@@ -625,7 +631,8 @@ esp_t shedule(esp_t esp, context_t *context)
 
     ticks++;
 
-    if (waiting->count == 0) return esp;
+    if (waiting->count == 0)
+        return esp;
 
     // Save the old context
     running->esp = esp;

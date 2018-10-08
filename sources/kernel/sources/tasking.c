@@ -212,17 +212,23 @@ void tasking_setup()
 
 /* --- Thread managment ----------------------------------------------------- */
 
+void thread_yield()
+{
+    asm("int $32");   
+}
+
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+// Look like gcc like to break this functions XD 
 void thread_hold()
 {
-    while (running->state != THREAD_RUNNING) 
+    while (running->state != THREAD_RUNNING)
     {
-        log("Holding %d...", running->id);
         hlt();
     }
 }
 
-void thread_yield()
-{ /* TODO yield to the next thread */ STUB(NULL); }
+#pragma GCC pop_options
 
 THREAD thread_self()
 {
@@ -296,7 +302,7 @@ void *thread_wait(THREAD t)
 
     running->waitinfo.outcode = 0;
 
-    if (thread != NULL && thread->state != THREAD_CANCELED)
+    if (thread != NULL)
     {
         running->waitinfo.handle = t;
         running->state = THREAD_WAIT_THREAD;
@@ -317,7 +323,7 @@ int thread_waitproc(PROCESS p)
 
     running->waitinfo.outcode = 0;
 
-    if (process != NULL && process->state != PROCESS_CANCELED)
+    if (process != NULL)
     {
         running->waitinfo.handle = p;
         running->state = THREAD_WAIT_PROCESS;
@@ -556,9 +562,14 @@ thread_t *get_next_task()
 {
     thread_t *thread = NULL;
 
+    puts("\n");
+    log("Begin thread...");
+
     do
     {
         list_pop(waiting, (void *)&thread);
+
+        log("Thread %d state %d", thread->id, thread->state);
 
         switch (thread->state)
         {
@@ -615,9 +626,9 @@ thread_t *get_next_task()
             list_pushback(waiting, thread);
         }
 
-
     } while (thread == NULL || thread->state != THREAD_RUNNING);
 
+    log("The thread is %d", thread->id);
     return thread;
 }
 
@@ -626,7 +637,7 @@ esp_t shedule(esp_t esp, context_t *context)
     UNUSED(context);
 
     ticks++;
-
+    log("Here %x", context->eip);
     if (waiting->count == 0)
         return esp;
 

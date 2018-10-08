@@ -28,7 +28,7 @@
 #include "sync/atomic.h"
 
 #define LINE \
-"================================================================================"
+    "================================================================================"
 
 multiboot_info_t mbootinfo;
 
@@ -38,8 +38,17 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-void system_check(multiboot_info_t *info, s32 magic)
+void main(multiboot_info_t *info, s32 magic)
 {
+    log(KERNEL_UNAME);
+    log("Booting...");
+    log(LINE);
+
+    /* --- Early operation -------------------------------------------------- */
+    memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
+    graphic_early_setup(800, 600);
+
+    /* --- System check ----------------------------------------------------- */
     log("System check...");
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Invalid multiboot magic number (0x%x)!", magic);
@@ -48,10 +57,8 @@ void system_check(multiboot_info_t *info, s32 magic)
     {
         PANIC("No enought memory!");
     }
-}
 
-void setup_cpu_context()
-{
+    /* --- Setup cpu context ------------------------------------------------ */
     log(LINE);
     log("Initializing cpu context...");
     setup(gdt);
@@ -59,48 +66,31 @@ void setup_cpu_context()
     setup(idt);
     setup(isr);
     setup(irq);
-}
 
-void setup_system_context()
-{
+    /* --- System context --------------------------------------------------- */
     log(LINE);
     log("Initializing system context...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(filesystem);
     setup(modules, &mbootinfo);
-}
 
-void system_start()
-{
+    /* --- Devices ---------------------------------------------------------- */
+    log(LINE);
+    log("Initializing graphic context...");
+    setup(graphic);
+    setup(mouse);
+    setup(keyboard);
+
+    /* --- Finalizing System ------------------------------------------------ */
     log(LINE);
     log("Enabling interupts, paging and atomics.");
     atomic_enable();
     sti();
     log(KERNEL_UNAME);
-}
-
-void main(multiboot_info_t *info, s32 magic)
-{
-    puts("\n");
     log(LINE);
 
-    memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-    system_check(&mbootinfo, magic);
-
-    graphic_early_setup(800, 600);
-
-    setup_cpu_context();
-    setup_system_context();
-
-    setup(graphic);
-    setup(mouse);
-    setup(keyboard);
-
-    // End of the boot environement //
-    system_start();
-    log(LINE);
-
+    /* --- Entering userspace ----------------------------------------------- */
     PROCESS init = process_exec("application/test-app.app", 0, NULL);
     thread_waitproc(init);
     PANIC("The init process has return!");

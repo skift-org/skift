@@ -103,9 +103,5 @@ void main(multiboot_info_t *info, s32 magic)
 
     PROCESS init = process_exec("application/test-app.app", 0, NULL);
     thread_waitproc(init);
-    log("Hello, world for the kernel!");
-    
-    while(1) hlt();
-
-    PANIC("The end of the main function has been reached.");
+    PANIC("The init process has return!");
 }

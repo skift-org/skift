@@ -3,11 +3,14 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdio.h>
+#include "sync/atomic.h"
 #include "kernel/logger.h"
 #include "kernel/clock.h"
 
 void __log(const char *file, const char *message, ...)
 {
+    atomic_begin();
+
     va_list va;
     va_start(va, message);
 
@@ -16,4 +19,6 @@ void __log(const char *file, const char *message, ...)
     printf(" (%s)\n", file);
 
     va_end(va);
+
+    atomic_end();
 }

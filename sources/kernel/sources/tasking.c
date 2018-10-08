@@ -48,7 +48,7 @@ list_t *processes;
 
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
-    thread_t *thread = (thread_t *)malloc(sizeof(thread_t));
+    thread_t *thread = MALLOC(thread_t);
     memset(thread, 0, sizeof(thread_t));
 
     thread->id = TID++;
@@ -97,7 +97,7 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
 
 process_t *alloc_process(const char *name, int flags)
 {
-    process_t *process = (process_t *)malloc(sizeof(process_t));
+    process_t *process = MALLOC(process_t);
 
     process->id = PID++;
 
@@ -214,13 +214,15 @@ void tasking_setup()
 
 void thread_hold()
 {
-    while (running->state != THREAD_RUNNING)
+    while (running->state != THREAD_RUNNING) 
+    {
+        log("Holding %d...", running->id);
         hlt();
+    }
 }
 
 void thread_yield()
-{
-}
+{ /* TODO yield to the next thread */ STUB(NULL); }
 
 THREAD thread_self()
 {
@@ -550,16 +552,6 @@ void process_free(uint addr, uint count)
 
 /* --- Sheduler ------------------------------------------------------------- */
 
-void sanity_check(thread_t *thread)
-{
-    uint stack = (uint)thread->stack;
-
-    if (!(thread->esp >= stack && thread->esp <= stack + STACK_SIZE))
-    {
-        PANIC("Thread ID=%d failed sanity check! (ESP=0x%x STACK=0x%x)", thread->id, thread->esp, thread->stack);
-    }
-}
-
 thread_t *get_next_task()
 {
     thread_t *thread = NULL;
@@ -579,6 +571,7 @@ thread_t *get_next_task()
             break;
         }
         case THREAD_SLEEP:
+        {
             // Wakeup the thread
             if (thread->sleepinfo.wakeuptick >= ticks)
             {
@@ -586,7 +579,7 @@ thread_t *get_next_task()
                 log("Thread %d wake up!", thread->id);
             }
             break;
-
+        }
         case THREAD_WAIT_PROCESS:
         {
             process_t *wproc = process_get(thread->waitinfo.handle);
@@ -618,7 +611,10 @@ thread_t *get_next_task()
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
+        {
             list_pushback(waiting, thread);
+        }
+
 
     } while (thread == NULL || thread->state != THREAD_RUNNING);
 

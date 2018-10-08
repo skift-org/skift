@@ -25,7 +25,7 @@ int sys_process_self()
 
 int sys_process_exec(const char *file_name)
 {
-    process_exec(file_name, 0, NULL);
+    return process_exec(file_name, NULL);
 }
 
 int sys_process_exit(int code)

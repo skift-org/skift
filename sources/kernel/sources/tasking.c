@@ -443,10 +443,9 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
 }
 
-PROCESS process_exec(const char *path, int argc, char **argv)
+PROCESS process_exec(const char *path, char **arg)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    UNUSED(arg);
 
     file_t *fp = file_open(NULL, path);
 

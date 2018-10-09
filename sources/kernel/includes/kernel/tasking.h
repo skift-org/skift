@@ -122,4 +122,4 @@ uint process_alloc(uint count);           // Alloc some some memory page to the 
 void process_free(uint addr, uint count); // Free perviously allocated memory.
 
 // Load a ELF executable, create a adress space and run it.
-PROCESS process_exec(const char *filename, char **argv);
+PROCESS process_exec(const char *filename, const char **argv);

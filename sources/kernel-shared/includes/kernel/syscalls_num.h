@@ -36,6 +36,12 @@ typedef enum SYSCALL_CODE
     SYS_IO_PRINT,
     SYS_IO_READ,
 
+    SYS_IO_MOUSE_GET_POSITION,
+    SYS_IO_MOUSE_SET_POSITION,
+
+    SYS_IO_GRAPHIC_BLIT,
+    SYS_IO_GRAPHIC_SIZE,
+
 /* --- Filesystem ----------------------------------------------------------- */
 
     // Files

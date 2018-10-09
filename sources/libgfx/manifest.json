@@ -1,0 +1,5 @@
+{
+    "id": "libgfx",
+    "type": "lib",
+    "libs": ["libc", "libutils"]
+}

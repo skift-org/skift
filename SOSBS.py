@@ -299,6 +299,7 @@ class Target(object):
         elif self.type == TargetTypes.LIB:
             command = [AR, "rcs"] + [output_file] + objects_files
 
+        pprint(command)
         return subprocess.call(command) == 0
 
     def build(self, targets):

@@ -7,6 +7,8 @@
 #include "kernel/syscalls_num.h"
 #include "kernel/logger.h"
 #include "kernel/serial.h"
+#include "kernel/graphic.h"
+#include "kernel/mouse.h"
 
 typedef int (*syscall_t)(int, int, int, int, int);
 
@@ -23,15 +25,42 @@ int sys_process_self()
     return process_self();
 }
 
-int sys_process_exec(const char *file_name)
+int sys_process_exec(const char *file_name, const char **argv)
 {
-    return process_exec(file_name, NULL);
+    return process_exec(file_name, argv);
 }
 
 int sys_process_exit(int code)
 {
     process_exit(code);
-    
+
+    return 0;
+}
+
+int sys_process_cancel(int pid)
+{
+    process_cancel(pid);
+    return 0;
+}
+
+int sys_process_map(uint addr, uint count)
+{
+    return process_map(process_self(), addr, count);
+}
+
+int sys_process_unmap(uint addr, uint count)
+{
+    return process_unmap(process_self(), addr, count);
+}
+
+int sys_process_alloc(uint count)
+{
+    return process_alloc(count);
+}
+
+int sys_process_free(uint addr, uint count)
+{
+    process_free(addr, count);
     return 0;
 }
 
@@ -51,15 +80,41 @@ int sys_io_print(const char *msg)
     return 0;
 }
 
+int sys_io_mouse_get_position(int *outxpos, int *outypos)
+{
+    mouse_get_position(outxpos, outypos);
+    return 0;
+}
+
+int sys_io_mouse_set_position(int xpos, int ypos)
+{
+    mouse_set_position(xpos, ypos);
+    return 0;
+}
+
+int sys_io_graphic_blit(unsigned int *buffer)
+{
+    graphic_blit(buffer);
+    return 0;
+}
+
+int sys_io_graphic_size(unsigned int *width, unsigned int *height)
+{
+    graphic_size(width, height);
+    return 0;
+}
+
 static int (*syscalls[])() =
     {
         [SYS_PROCESS_SELF] = sys_process_self,
-        [SYS_PROCESS_EXEC] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_PROCESS_EXEC] = sys_process_exec,
         [SYS_PROCESS_EXIT] = sys_process_exit,
-        [SYS_PROCESS_CANCEL] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_PROCESS_MAP] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_PROCESS_UNMAP] = sys_not_implemented /* NOT IMPLEMENTED */,
-        
+        [SYS_PROCESS_CANCEL] = sys_process_cancel,
+        [SYS_PROCESS_MAP] = sys_process_map,
+        [SYS_PROCESS_UNMAP] = sys_process_unmap,
+        [SYS_PROCESS_ALLOC] = sys_process_alloc,
+        [SYS_PROCESS_FREE] = sys_process_free,
+
         [SYS_THREAD_SELF] = sys_thread_self,
         [SYS_THREAD_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
         [SYS_THREAD_EXIT] = sys_not_implemented /* NOT IMPLEMENTED */,
@@ -71,7 +126,13 @@ static int (*syscalls[])() =
 
         [SYS_IO_PRINT] = sys_io_print,
         [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
-        
+
+        [SYS_IO_MOUSE_GET_POSITION] = sys_io_mouse_get_position,
+        [SYS_IO_MOUSE_SET_POSITION] = sys_io_mouse_set_position,
+
+        [SYS_IO_GRAPHIC_BLIT] = sys_io_graphic_blit,
+        [SYS_IO_GRAPHIC_SIZE] = sys_io_graphic_size,
+
         [SYS_FILE_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
         [SYS_FILE_DELETE] = sys_not_implemented /* NOT IMPLEMENTED */,
         [SYS_FILE_EXISTE] = sys_not_implemented /* NOT IMPLEMENTED */,

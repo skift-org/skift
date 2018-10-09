@@ -9,8 +9,8 @@
 
 #include "sync/atomic.h"
 
-uint mouse_x;
-uint mouse_y;
+int mouse_x;
+int mouse_y;
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -130,7 +130,7 @@ void mouse_setup()
     irq_register(12, mouse_irq);
 }
 
-void mouse_get_position(uint *outxpos, uint *outypos)
+void mouse_get_position(int *outxpos, int *outypos)
 {
     atomic_begin();
     *outxpos = mouse_x;
@@ -138,10 +138,10 @@ void mouse_get_position(uint *outxpos, uint *outypos)
     atomic_end();
 }
 
-// int mouse_set_position(uint xpos, uint ypos)
-// {
-// }
-//
-// mouse_bstate_t mouse_button(mouse_button_t button)
-// {
-// }
+void mouse_set_position(int xpos, int ypos)
+{
+    atomic_begin();
+    mouse_x = xpos;
+    mouse_y = ypos;
+    atomic_end();
+}

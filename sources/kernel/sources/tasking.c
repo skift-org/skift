@@ -443,7 +443,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
 }
 
-PROCESS process_exec(const char *path, char **arg)
+PROCESS process_exec(const char *path, const char **arg)
 {
     UNUSED(arg);
 
@@ -521,6 +521,9 @@ void process_exit(int code)
         log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         cancel_childs(process);
+        
+        atomic_end();
+        while (1) hlt();
     }
     else
     {
@@ -528,9 +531,6 @@ void process_exit(int code)
     }
 
     atomic_end();
-
-    while (1)
-        hlt();
 }
 
 int process_map(PROCESS p, uint addr, uint count)
@@ -565,52 +565,52 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-        case THREAD_CANCELING:
-        {
-            log("Thread %d canceled!", thread->id);
-            thread->state = THREAD_CANCELED;
-            // TODO: cleanup the thread.
-            // TODO: cleanup the process if no thread is still running.
-            break;
-        }
-        case THREAD_SLEEP:
-        {
-            // Wakeup the thread
-            if (thread->sleepinfo.wakeuptick >= ticks)
+            case THREAD_CANCELING:
             {
-                thread->state = THREAD_RUNNING;
-                log("Thread %d wake up!", thread->id);
+                log("Thread %d canceled!", thread->id);
+                thread->state = THREAD_CANCELED;
+                // TODO: cleanup the thread.
+                // TODO: cleanup the process if no thread is still running.
+                break;
             }
-            break;
-        }
-        case THREAD_WAIT_PROCESS:
-        {
-            process_t *wproc = process_get(thread->waitinfo.handle);
-
-            if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
+            case THREAD_SLEEP:
             {
-                thread->state = THREAD_RUNNING;
-                thread->waitinfo.outcode = wproc->exit_code;
-                log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+                // Wakeup the thread
+                if (thread->sleepinfo.wakeuptick >= ticks)
+                {
+                    thread->state = THREAD_RUNNING;
+                    log("Thread %d wake up!", thread->id);
+                }
+                break;
             }
-
-            break;
-        }
-        case THREAD_WAIT_THREAD:
-        {
-            thread_t *wthread = thread_get(thread->waitinfo.handle);
-
-            if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
+            case THREAD_WAIT_PROCESS:
             {
-                thread->state = THREAD_RUNNING;
-                thread->waitinfo.outcode = (uint)wthread->exit_value;
-                log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
-            }
+                process_t *wproc = process_get(thread->waitinfo.handle);
 
-            break;
-        }
-        default:
-            break;
+                if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
+                {
+                    thread->state = THREAD_RUNNING;
+                    thread->waitinfo.outcode = wproc->exit_code;
+                    log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+                }
+
+                break;
+            }
+            case THREAD_WAIT_THREAD:
+            {
+                thread_t *wthread = thread_get(thread->waitinfo.handle);
+
+                if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
+                {
+                    thread->state = THREAD_RUNNING;
+                    thread->waitinfo.outcode = (uint)wthread->exit_value;
+                    log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
+                }
+
+                break;
+            }
+            default:
+                break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)

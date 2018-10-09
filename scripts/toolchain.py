@@ -85,7 +85,7 @@ def GCC(input_file, output_file, includes, defines, strict):
         flags += ["-Wall", "-Wextra", "-Werror"]
 
     flags += ["-c", "-o", output_file, input_file]
-    print(" ".join(flags))
+    #print(" ".join(flags))
     return subprocess.call(' '.join(flags), shell=True) == 0
 
 
@@ -100,7 +100,7 @@ def LD(objects, libs, output_file, script):
     command = [os.path.join(PATH, "i686-elf-ld"), "-T",
                script, "-o", output_file] + objects + libs
     # command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
-    print(command)
+    # print(command)
     return subprocess.call(' '.join(command), shell=True) == 0
 
 

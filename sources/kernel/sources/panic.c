@@ -16,8 +16,8 @@ const char *const witty_comments[] =
         "Uh... Did I do that?",
         "Oops.",
         "On the bright side, I bought you a teddy bear!",
-        "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can error while you error",
-        "Excuse Me Sir, \n\t// Do You Have a Moment to Talk About Jesus Christ?",
+        "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can get error while you get error",
+        "Excuse Me Sir, \n\t// Do You Have a Moment to Talk About TempleOS?",
         "DON'T PANIC!",
         "...",
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "libgfx.h"
+#include <math.h>
+#include <libgfx.h>
 
 #define BMP_SIZE(bmp) (bmp->width * bmp->height * sizeof(uint))
 
@@ -9,7 +10,10 @@ bitmap_t *bitmap_ctor(uint width, uint height)
 {
     bitmap_t *bmp = MALLOC(bitmap_t);
     bmp->buffer = (uint *)malloc(width * height * sizeof(uint));
+    
     bmp->shared = 0;
+    bmp->width = width;
+    bmp->height = height;
 
     return bmp;
 }
@@ -18,7 +22,10 @@ bitmap_t *bitmap_from_buffer(uint width, uint height, uint * buffer)
 {
     bitmap_t *bmp = MALLOC(bitmap_t);
     bmp->buffer = buffer;
+
     bmp->shared = 1;
+    bmp->width = width;
+    bmp->height = height;
 
     return bmp;
 }
@@ -37,7 +44,7 @@ void libgfx_clear(bitmap_t *bmp, uint color)
         bmp->buffer[i] = color;
 }
 
-inline void libgfx_pixel(bitmap_t *bmp, int x, int y, uint color)
+void libgfx_pixel(bitmap_t *bmp, int x, int y, uint color)
 {
     if (x >= 0 && x < bmp->width && y >= 0 && y < bmp->height)
         bmp->buffer[x + y * bmp->width] = color;
@@ -103,7 +110,7 @@ void libgfx_char(bitmap_t *bmp, int x, int y, char c)
 
     for (int cy = 0; cy < 16; cy++)
         for (int cx = 0; cx < 8; cx++)
-            graphic_pixel(x + cx, y + cy, gylph[cy] & mask[cx] ? 0xffffff : 0x0);
+            libgfx_pixel(bmp, x + cx, y + cy, gylph[cy] & mask[cx] ? 0xffffff : 0x0);
 }
 
 void libgfx_text(bitmap_t *bmp, int x, int y, const char *str)
@@ -111,5 +118,5 @@ void libgfx_text(bitmap_t *bmp, int x, int y, const char *str)
     char c;
 
     for (size_t i = 0; (c = str[i]); i++)
-        graphic_char(x + i, y, c);
+        libgfx_char(bmp, x + i, y, c);
 }

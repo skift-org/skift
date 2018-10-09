@@ -1,8 +1,12 @@
 section .text
+
 extern sk_process_exit
+extern stdlib_init
+extern main
+
 global _start:function (_start.end - _start)
 _start:
-	extern main
+	call stdlib_init
 	call main
 
 	push eax

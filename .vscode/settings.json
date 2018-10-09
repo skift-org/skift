@@ -15,6 +15,8 @@
     ],
     "files.associations": {
         "system.h": "c",
-        "libgfx.h": "c"
+        "libgfx.h": "c",
+        "syscall.h": "c",
+        "process.h": "c"
     }
 }

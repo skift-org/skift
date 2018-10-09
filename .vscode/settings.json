@@ -17,6 +17,7 @@
         "system.h": "c",
         "libgfx.h": "c",
         "syscall.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "math.h": "c"
     }
 }

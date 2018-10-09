@@ -1,5 +1,5 @@
 {
     "id": "hideo",
     "type": "app",
-    "libs": ["libc-userland", "libutils", "libgfx", "hideo-shared"]
+    "libs": ["libc-userland", "libgfx", "hideo-shared"]
 }

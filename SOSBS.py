@@ -300,6 +300,7 @@ class Target(object):
             command = [AR, "rcs"] + [output_file] + objects_files
 
         pprint(command)
+        print(" ".join(command))
         return subprocess.call(command) == 0
 
     def build(self, targets):

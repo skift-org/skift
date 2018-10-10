@@ -1,5 +1,5 @@
 {
     "id": "hideo-shared",
     "type": "lib",
-    "libs": ["libc", "libutils"]
+    "libs": ["libc-shared", "libutils"]
 }

@@ -1,5 +1,5 @@
 {
     "id": "libutils",
     "type": "lib",
-    "libs": ["libc"]
+    "libs": ["libc-shared"]
 }

@@ -1,5 +1,5 @@
 {
     "id": "liballoc",
     "type": "lib",
-    "libs": ["libc"]
+    "libs": ["libc-shared"]
 }

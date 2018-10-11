@@ -1,5 +1,0 @@
-{
-    "id": "liballoc",
-    "type": "lib",
-    "libs": ["libc-shared"]
-}

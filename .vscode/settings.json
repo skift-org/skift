@@ -18,6 +18,8 @@
         "libgfx.h": "c",
         "syscall.h": "c",
         "process.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stdlib.h": "c",
+        "atomic.h": "c"
     }
 }

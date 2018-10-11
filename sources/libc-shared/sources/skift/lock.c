@@ -1,6 +1,5 @@
 #include <skift/lock.h>
 
-
 void __sk_lock_init(lock_t* lock)
 {
     lock->locked = 0;

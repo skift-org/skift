@@ -1,7 +1,5 @@
 #include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <libgfx.h>
+#include <skift/drawing.h>
 
 #define BMP_SIZE(bmp) (bmp->width * bmp->height * sizeof(uint))
 
@@ -39,19 +37,19 @@ void bitmap_dtor(bitmap_t *bmp)
 
 /* --- Graphic -------------------------------------------------------------- */
 
-void libgfx_clear(bitmap_t *bmp, uint color)
+void drawing_clear(bitmap_t *bmp, uint color)
 {
     for (size_t i = 0; i < BMP_SIZE(bmp); i++)
         bmp->buffer[i] = color;
 }
 
-void libgfx_pixel(bitmap_t *bmp, int x, int y, uint color)
+void drawing_pixel(bitmap_t *bmp, int x, int y, uint color)
 {
     if (x >= 0 && x < bmp->width && y >= 0 && y < bmp->height)
         bmp->buffer[x + y * bmp->width] = color;
 }
 
-void libgfx_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color)
+void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color)
 {
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -61,7 +59,7 @@ void libgfx_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint
     {
         for (int xoff = -weight + 1; xoff < weight; xoff++)
             for (int yoff = -weight + 1; yoff < weight; yoff++)
-                libgfx_pixel(bmp, x0 + xoff, y0 + yoff, color);
+                drawing_pixel(bmp, x0 + xoff, y0 + yoff, color);
 
         if (x0 == x1 && y0 == y1)
             break;
@@ -80,44 +78,50 @@ void libgfx_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint
     }
 }
 
-void libgfx_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color)
+void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color)
 {
 
     // + A +
     // B   D
     // + C +
 
-    libgfx_line(bmp, x, y, x + w, y, weight, color); // A
-    libgfx_line(bmp, x, y, x, y + h, weight, color); // B
+    drawing_line(bmp, x, y, x + w, y, weight, color); // A
+    drawing_line(bmp, x, y, x, y + h, weight, color); // B
 
-    libgfx_line(bmp, x + w, y, x + w, y + h, weight, color); // D
-    libgfx_line(bmp, x, y + h, x + w, y + h, weight, color); // C
+    drawing_line(bmp, x + w, y, x + w, y + h, weight, color); // D
+    drawing_line(bmp, x, y + h, x + w, y + h, weight, color); // C
 }
 
-void libgfx_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
+void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
 {
     for (int xx = 0; xx < w; xx++)
         for (int yy = 0; yy < h; yy++)
-            libgfx_pixel(bmp, x + xx, y + yy, color);
+            drawing_pixel(bmp, x + xx, y + yy, color);
 }
 
 int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
 
 extern unsigned char vgafont16[256 * 16];
 
-void libgfx_char(bitmap_t *bmp, int x, int y, char c)
+void drawing_char(bitmap_t *bmp, int x, int y, char c)
 {
     uchar *gylph = vgafont16 + (int)c * 16;
 
     for (int cy = 0; cy < 16; cy++)
+    {
         for (int cx = 0; cx < 8; cx++)
-            libgfx_pixel(bmp, x + cx, y + cy, gylph[cy] & mask[cx] ? 0xffffff : 0x0);
+        {
+            drawing_pixel(bmp, x + cx, y + cy, gylph[cy] & mask[cx] ? 0xffffff : 0x0);
+        }
+    }
 }
 
-void libgfx_text(bitmap_t *bmp, int x, int y, const char *str)
+void drawing_text(bitmap_t *bmp, int x, int y, const char *str)
 {
     char c;
 
     for (size_t i = 0; (c = str[i]); i++)
-        libgfx_char(bmp, x + i, y, c);
+    {
+        drawing_char(bmp, x + i * 8, y, c);
+    }
 }

@@ -1,5 +1,0 @@
-{
-    "id": "libgfx",
-    "type": "lib",
-    "libs": ["libc-shared", "libutils"]
-}

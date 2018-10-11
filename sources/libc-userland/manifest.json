@@ -1,6 +1,9 @@
 {
     "id": "libc-userland",
     "type": "lib",
-    "libs": ["libc-shared", "liballoc", "kernel-shared"],
+    "libs": [
+        "libc-shared",
+        "kernel-shared"
+    ],
     "strict": false
 }

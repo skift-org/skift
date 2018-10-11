@@ -7,8 +7,8 @@
 #include "hideo.h"
 #include "hideo-internal.h"
 
-#include "skift/io.h"
-#include "libgfx.h"
+#include <skift/io.h>
+#include <skift/drawing.h>
 
 int main(int argc, char const *argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
     sk_io_graphic_size(&width, &height);
 
     bitmap_t* screen = bitmap_ctor(width, height);
-    libgfx_clear(screen, 0xff);
+    drawing_clear(screen, 0xff);
     sk_io_graphic_blit(screen->buffer);
 
     while(1) 

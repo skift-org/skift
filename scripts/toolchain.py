@@ -100,7 +100,7 @@ def LD(objects, libs, output_file, script):
     command = [os.path.join(PATH, "i686-elf-ld"), "-T",
                script, "-o", output_file] + objects + libs
     # command = ["ld"] + ["-melf_i386", "-T", script] + ["-o", output_file] + objects + libs
-    # print(command)
+    print(" ".join(command))
     return subprocess.call(' '.join(command), shell=True) == 0
 
 

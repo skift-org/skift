@@ -1,5 +1,8 @@
 {
     "id": "hideo",
     "type": "app",
-    "libs": ["libc-userland", "libgfx", "hideo-shared"]
+    "libs": [
+        "hideo-shared",
+        "libc-userland"
+    ]
 }

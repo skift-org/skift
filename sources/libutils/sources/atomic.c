@@ -17,13 +17,18 @@ void atomic_disable()
 void atomic_begin()
 {
     if (is_atomic_enable)
+    {
         cli();
         ATOMIC_COUNTER++;
+    }
 }
 
 void atomic_end()
 {
-    ATOMIC_COUNTER--;
-    if (is_atomic_enable && ATOMIC_COUNTER == 0)
-        sti();
+    if (is_atomic_enable)
+    {
+        ATOMIC_COUNTER--;
+        if (ATOMIC_COUNTER == 0)
+            sti();
+    }
 }

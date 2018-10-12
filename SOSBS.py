@@ -161,9 +161,9 @@ def get_files(locations, ext):
 class TargetTypes(Enum):
     INVALID = 0
     LIB = 1
-    APP = 2
-    KERNEL = 3
-    MODULE = 4
+    SHARED = 2
+    APP = 3
+    KERNEL = 4
 
     @staticmethod
     def FromStr(s):
@@ -173,11 +173,10 @@ class TargetTypes(Enum):
             return TargetTypes.APP
         elif s == "kernel":
             return TargetTypes.KERNEL
-        elif s == "module":
-            return TargetTypes.MODULE
+        else s == "shared":
+            return TargetTypes.SHARED
         else:
             return TargetTypes.INVALID
-
 
 class Target(object):
     """
@@ -290,6 +289,7 @@ class Target(object):
         output_file = self.get_output()
         objects_files = self.get_objects()
 
+
         print("    " + BRIGHT_WHITE + "Linking " + RESET + output_file)
 
         if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
@@ -298,6 +298,9 @@ class Target(object):
             command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
         elif self.type == TargetTypes.LIB:
             command = [AR, "rcs"] + [output_file] + objects_files
+        else:
+            print("No linking required, skipping...")
+            return True
 
         pprint(command)
         print(" ".join(command))

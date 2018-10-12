@@ -90,7 +90,7 @@ def GRUB(iso, output_file):
 
 
 def ERROR(msg):
-    print(BRIGHT_RED + "ERROR: " + RESET + msg)
+    print(BRIGHT_RED + "\nERROR: " + RESET + msg)
 
 
 def ABORT():
@@ -173,7 +173,7 @@ class TargetTypes(Enum):
             return TargetTypes.APP
         elif s == "kernel":
             return TargetTypes.KERNEL
-        else s == "shared":
+        elif s == "shared":
             return TargetTypes.SHARED
         else:
             return TargetTypes.INVALID
@@ -302,8 +302,6 @@ class Target(object):
             print("No linking required, skipping...")
             return True
 
-        pprint(command)
-        print(" ".join(command))
         return subprocess.call(command) == 0
 
     def build(self, targets):
@@ -442,7 +440,30 @@ def rebuild_all(targets):
 
 def distrib(targets):
     """Generate a distribution file."""
-    pass
+    
+    # build_all(targets)
+
+    MKDIR("build")
+
+    ramdisk = MKDIR("build/ramdisk")
+    bootdisk = MKDIR("build/bootdisk")
+
+    print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
+
+    app_dir = MKDIR(join(ramdisk, "app"))
+
+    for t in targets:
+        target = targets[t]
+        if target.type == TargetTypes.APP:
+            print( BRIGHT_WHITE + "    Copying " + RESET + "application '%s.app'" % t)
+    print( BRIGHT_WHITE + "    Generating" + RESET +" the tarball")
+
+
+    print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
+
+    print( BRIGHT_WHITE + "    Copying" + RESET +" the kernel")
+    print( BRIGHT_WHITE + "    Copying" + RESET +" the ramdisk")
+    print( BRIGHT_WHITE + "    Generating" + RESET +" the ISO")
 
 
 def help_command(targets):
@@ -509,6 +530,7 @@ global_actions = \
         "list-lib": list_lib,
         "list-other": list_other,
         "rebuild-all": rebuild_all,
+        "distrib": distrib,
     }
 
 # --- Main ------------------------------------------------------------------- #

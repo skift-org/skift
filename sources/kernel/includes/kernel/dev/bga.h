@@ -1,5 +1,5 @@
 #pragma once
-#include <types.h>
+#include <skift/types.h>
 
 #define VBE_DISPI_BANK_ADDRESS          0xA0000
 #define VBE_DISPI_BANK_SIZE_KB          64
@@ -30,6 +30,3 @@ bool bga_is_available(void);
 u32 * bga_get_framebuffer();
 
 void bga_mode(u32 width, u32 height);
-void bga_blit(buffer32_t buffer);
-void bga_blit_region(u32 * buffer, uint x, uint y, uint w, uint h);
-void bga_pixel(u32 x, u32 y, u32 value);

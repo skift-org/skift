@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <types.h>
-#include "utils.h"
+#include <skift/types.h>
+#include <skift/utils.h>
 #include "kernel/paging.h"
 
 void memory_setup(uint used, uint total);

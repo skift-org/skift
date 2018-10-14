@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "utils.h"
+#include <skift/utils.h>
 #include "kernel/cpu/cpu.h"
 #include "kernel/serial.h"
 

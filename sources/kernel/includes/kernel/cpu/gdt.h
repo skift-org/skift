@@ -1,6 +1,6 @@
 #pragma once
-#include <types.h>
-#include "utils.h"
+#include <skift/types.h>
+#include <skift/utils.h>
 
 #define GDT_ENTRY_COUNT 6
 

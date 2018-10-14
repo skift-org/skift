@@ -1,7 +1,7 @@
 #pragma once
 #include "kernel/cpu/cpu.h"
-#include <types.h>
-#include "utils.h"
+#include <skift/types.h>
+#include <skift/utils.h>
 
 // Gate call protection. 
 // Specifies which privilege Level the calling Descriptor minimum should have. 

@@ -6,8 +6,8 @@
 
 #include <string.h>
 
-#include <types.h>
-#include "utils.h"
+#include <skift/types.h>
+#include <skift/utils.h>
 #include <skift/atomic.h>
 #include "kernel/logger.h"
 #include "kernel/memory.h"

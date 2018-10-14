@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libelf.h"
+#include <skift/elf.h>
 #include <skift/atomic.h>
 
 #include "kernel/cpu/cpu.h"
@@ -460,11 +460,11 @@ PROCESS process_exec(const char *path, const char **arg)
     void *buffer = file_read_all(fp);
     file_close(fp);
 
-    ELF_header_t *elf = (ELF_header_t *)buffer;
+    elf_header_t *elf = (elf_header_t *)buffer;
 
-    ELF_program_t program;
+    elf_program_t program;
 
-    for (int i = 0; ELF_read_program(elf, &program, i); i++)
+    for (int i = 0; elf_read_program(elf, &program, i); i++)
     {
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }

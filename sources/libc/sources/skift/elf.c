@@ -3,9 +3,9 @@
 /* See: LICENSE.md                                                            */
 
 #include <string.h>
-#include "libelf.h"
+#include <skift/elf.h>
 
-int check_magic(ELF_header_t *header)
+int check_magic(elf_header_t *header)
 {
     char *magic = (char *)&header->ident;
 
@@ -17,7 +17,7 @@ int check_magic(ELF_header_t *header)
            magic[5] == 1;
 }
 
-int ELF_valid(ELF_header_t *header)
+int elf_valid(elf_header_t *header)
 {
     return check_magic(header) &&
            (header->type == ELF_REL || ELF_EXEC) &&
@@ -25,32 +25,32 @@ int ELF_valid(ELF_header_t *header)
            header->machine == 3; // 386
 }
 
-int ELF_read_section(ELF_header_t *header, ELF_section_t *dest, uint index)
+int elf_read_section(elf_header_t *header, elf_section_t *dest, uint index)
 {
     if (index >= header->shnum)
         return 0;
-    ELF_section_t *section = (ELF_section_t *)((uint)header + header->shoff + sizeof(ELF_section_t) * index);
+    elf_section_t *section = (elf_section_t *)((uint)header + header->shoff + sizeof(elf_section_t) * index);
 
-    memcpy(dest, section, sizeof(ELF_section_t));
+    memcpy(dest, section, sizeof(elf_section_t));
 
     return 1;
 }
 
-char *ELF_lookup_string(ELF_header_t *header, int offset)
+char *elf_lookup_string(elf_header_t *header, int offset)
 {
-    ELF_section_t section;
-    ELF_read_section(header, &section, header->shstrndx);
+    elf_section_t section;
+    elf_read_section(header, &section, header->shstrndx);
     return (char *)header + section.offset + offset;
 }
 
-int ELF_read_program(ELF_header_t *header, ELF_program_t *dest, uint index)
+int elf_read_program(elf_header_t *header, elf_program_t *dest, uint index)
 {
     if (index >= header->phnum)
         return 0;
         
-    ELF_program_t *section = (ELF_program_t *)((uint)header + header->phoff + sizeof(ELF_program_t) * index);
+    elf_program_t *section = (elf_program_t *)((uint)header + header->phoff + sizeof(elf_program_t) * index);
 
-    memcpy(dest, section, sizeof(ELF_program_t));
+    memcpy(dest, section, sizeof(elf_program_t));
 
     return 1;
 }

@@ -1,14 +1,10 @@
 #pragma once
 
+#include <stdbool.h>
 #include "defs/NULL.h"
 #include "defs/size_t.h"
 
-#define true 1
-#define false 0
-
 typedef char *string;
-
-typedef _Bool bool;
 
 typedef char s8;
 typedef short s16;

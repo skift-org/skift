@@ -1,5 +1,5 @@
 #include <string.h>
-#include "utils/path.h"
+#include <skift/path.h>
 
 int path_read(const char * path, int index, char * buffer)
 {

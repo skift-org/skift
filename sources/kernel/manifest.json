@@ -2,9 +2,7 @@
     "id": "kernel",
     "type": "kernel",
     "libs": [
-        "libc-shared",
-        "libutils",
-        "libelf",
+        "libc",
         "kernel-shared"
     ]
 }

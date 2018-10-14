@@ -5,8 +5,7 @@
 /* See: LICENSE.md                                                            */
 #include <skift/types.h>
 #include <skift/utils.h>
-
-#include "ds/list.h"
+#include <skift/list.h>
 
 #include "kernel/paging.h"
 

@@ -3,6 +3,6 @@
     "type": "app",
     "libs": [
         "hideo-shared",
-        "libc-userland"
+        "ulibc"
     ]
 }

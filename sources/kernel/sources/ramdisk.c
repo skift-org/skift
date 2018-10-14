@@ -5,10 +5,11 @@
 #include <string.h>
 #include <math.h>
 
+#include <skift/tar.h>
+
 #include "kernel/filesystem.h"
 #include "kernel/multiboot.h"
 #include "kernel/logger.h"
-#include "utils/tar.h"
 
 int rd_file_open(file_t *file);
 void rd_file_close(file_t *file);

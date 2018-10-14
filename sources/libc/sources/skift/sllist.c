@@ -1,5 +1,5 @@
 // Single Linked sllist_t
-#include "ds/sllist.h"
+#include <skift/sllist.h>
 
 sllist_node_t *createnode(int data)
 {

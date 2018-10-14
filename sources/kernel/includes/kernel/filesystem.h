@@ -6,8 +6,8 @@
 
 #include <skift/types.h>
 #include <skift/utils.h>
-#include "ds/sllist.h"
-#include "utils/path.h"
+#include <skift/sllist.h>
+#include <skift/path.h>
 
 #define FS_PATH_SEPARATOR '/'
 

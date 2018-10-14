@@ -1,8 +1,8 @@
 {
-    "id": "libc-userland",
+    "id": "libu",
     "type": "lib",
     "libs": [
-        "libc-shared",
+        "libc",
         "kernel-shared"
     ],
     "strict": false

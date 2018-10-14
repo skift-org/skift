@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include <types.h>
 
 void graphic_early_setup(uint width, uint height);
 void graphic_setup();

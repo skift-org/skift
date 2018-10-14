@@ -3,22 +3,20 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdio.h>
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 #include "kernel/logger.h"
 #include "kernel/clock.h"
 
 void __log(const char *file, const char *message, ...)
 {
-    atomic_begin();
+    ATOMIC({
+        va_list va;
+        va_start(va, message);
 
-    va_list va;
-    va_start(va, message);
+        printf("[%d:%d:%d] ", clock_read(T_HOUR), clock_read(T_MINUTE), clock_read(T_SECOND), file);
+        vprintf(message, va);
+        printf(" (%s)\n", file);
 
-    printf("[%d:%d:%d] ", clock_read(T_HOUR), clock_read(T_MINUTE), clock_read(T_SECOND), file);
-    vprintf(message, va);
-    printf(" (%s)\n", file);
-
-    va_end(va);
-
-    atomic_end();
+        va_end(va);
+    });
 }

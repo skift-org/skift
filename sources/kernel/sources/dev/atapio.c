@@ -5,7 +5,7 @@
 #include "kernel/cpu/cpu.h"
 #include "kernel/dev/atapio.h"
 #include "kernel/logger.h"
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 
 int atapio_common(u8 drive, u32 numblock, u8 count)
 {
@@ -33,7 +33,7 @@ void atapio_wait()
 
 int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 {
-    atomic_begin();
+    sk_atomic_begin();
     log("ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
     u16 tmpword;
     int idx;
@@ -52,14 +52,14 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
     }
 
     log("ATA::pio read done!");
-    atomic_end();
+    sk_atomic_end();
 
     return count;
 }
 
 int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
 {
-    atomic_begin();
+    sk_atomic_begin();
     log("ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
 
     u16 tmpword;
@@ -77,7 +77,7 @@ int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
     }
 
     log("ATA::pio write done!");
-    atomic_end();
+    sk_atomic_end();
 
     return count;
 }

@@ -25,7 +25,7 @@
 #include "kernel/tasking.h"
 #include "kernel/version.h"
 
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 
 #define LINE \
     "================================================================================"
@@ -85,7 +85,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Finalizing System ------------------------------------------------ */
     log(LINE);
     log("Enabling interupts, paging and atomics.");
-    atomic_enable();
+    sk_atomic_enable();
     sti();
     log(KERNEL_UNAME);
     log(LINE);

@@ -1,6 +1,6 @@
 #pragma once
 #include "kernel/cpu/cpu.h"
-#include "types.h"
+#include <types.h>
 #include "utils.h"
 
 // Gate call protection. 

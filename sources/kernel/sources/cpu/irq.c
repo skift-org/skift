@@ -5,7 +5,7 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/idt.h"
 
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 #include "kernel/logger.h"
 
 extern u32 irq_vector[];
@@ -33,7 +33,7 @@ irq_handler_t irq_register(int index, irq_handler_t handler)
 
 esp_t irq_handler(esp_t esp, context_t context)
 {
-    atomic_disable();
+    sk_atomic_disable();
 
     if (irq_handlers[context.int_no] != NULL)
     {
@@ -51,7 +51,7 @@ esp_t irq_handler(esp_t esp, context_t context)
 
     outb(0x20, 0x20);
 
-    atomic_enable();
+    sk_atomic_enable();
 
     return esp;
 }

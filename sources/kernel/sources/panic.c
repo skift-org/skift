@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 
 const char *const witty_comments[] =
     {
@@ -32,7 +32,7 @@ void __panic(const string file, const string function, const int line, context_t
 {
 
     cli();
-    atomic_disable();
+    sk_atomic_disable();
 
     va_list va;
     va_start(va, message);

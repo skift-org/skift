@@ -6,9 +6,9 @@
 
 #include <string.h>
 
-#include "types.h"
+#include <types.h>
 #include "utils.h"
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/paging.h"
@@ -267,14 +267,14 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (count == 0)
         return 0;
 
-    atomic_begin();
+    sk_atomic_begin();
 
     uint paddr = physical_alloc(count);
 
     if (paddr == 0)
     {
-        atomic_end();
-        
+        sk_atomic_end();
+
         // log("Failed!");
         return 0;
     }
@@ -284,13 +284,13 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (vaddr == 0)
     {
         physical_free(paddr, count);
-        atomic_end();
+        sk_atomic_end();
 
         // log("Failed!");
         return 0;
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
@@ -304,11 +304,11 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
     if (count == 0)
         return 0;
 
-    atomic_begin();
+    sk_atomic_begin();
 
     uint vaddr = virtual_alloc(pdir, paddr, count, user);
 
-    atomic_end();
+    sk_atomic_end();
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
@@ -323,7 +323,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
     if (count == 0)
         return 0;
 
-    atomic_begin();
+    sk_atomic_begin();
 
     uint current_size = 0;
     uint startaddr = 0;
@@ -346,7 +346,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
                 physical_set_used(startaddr, count);
                 virtual_map(pdir, startaddr, startaddr, count, user);
 
-                atomic_end();
+                sk_atomic_end();
 
                 // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
@@ -359,7 +359,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
         }
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("Failed!");
 
@@ -370,12 +370,12 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     UNUSED(user);
 
-    atomic_begin();
+    sk_atomic_begin();
 
     physical_free(addr, count);
     virtual_unmap(pdir, addr, count);
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 }
@@ -383,7 +383,7 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 // Alloc a pdir for a process
 page_directorie_t *memory_alloc_pdir()
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     page_directorie_t *pdir = (page_directorie_t *)memory_alloc_identity(&kpdir, 1, 0);
 
@@ -397,7 +397,7 @@ page_directorie_t *memory_alloc_pdir()
         e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("PDIR=0x%x", pdir);
 
@@ -407,7 +407,7 @@ page_directorie_t *memory_alloc_pdir()
 // Free the pdir of a dying process
 void memory_free_pdir(page_directorie_t *pdir)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     for (size_t i = 256; i < 1024; i++)
     {
@@ -416,7 +416,7 @@ void memory_free_pdir(page_directorie_t *pdir)
         if (e->Present)
         {
             page_table_t *pt = (page_table_t *)(e->PageFrameNumber * PAGE_SIZE);
-            
+
             for (size_t i = 0; i < 1024; i++)
             {
                 page_t *p = &pt->pages[i];
@@ -432,14 +432,14 @@ void memory_free_pdir(page_directorie_t *pdir)
     }
     memory_free(&kpdir, (uint)pdir, 1, 0);
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("PDIR=0x%x", pdir);
 }
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     for (uint i = 0; i < count; i++)
     {
@@ -452,7 +452,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
         }
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
@@ -461,7 +461,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     for (uint i = 0; i < count; i++)
     {
@@ -474,7 +474,7 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
         }
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     // log("PDIR=0x%x ADDR=0x%x COUNT=%d", pdir, addr, count);
 

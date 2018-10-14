@@ -458,8 +458,9 @@ def distrib(targets):
     for t in targets:
         target = targets[t]
         if target.type == TargetTypes.APP:
-            print(BRIGHT_WHITE + "    Copying " +
-                  RESET + "application '%s.app'" % t)
+            print(BRIGHT_WHITE + "    Copying " + RESET + "application '%s'" % t)
+            COPY(target.get_output(), join(app_dir, target.name))
+
     print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
 
     print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)

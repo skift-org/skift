@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include <types.h>
 #include "kernel/cpu/cpu.h"
 
 typedef u32 esp_t;

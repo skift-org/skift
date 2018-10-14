@@ -1,17 +1,17 @@
 #include "liballoc.h"
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 #include "kernel/memory.h"
 #include "kernel/logger.h"
 
 int liballoc_lock()
 {
-    atomic_begin();
+    sk_atomic_begin();
     return 0;
 }
 
 int liballoc_unlock()
 {
-    atomic_end();
+    sk_atomic_end();
     return 0;
 }
 

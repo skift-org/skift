@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "libelf.h"
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/gdt.h"
@@ -240,7 +240,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 {
     UNUSED(arg);
 
-    atomic_begin();
+    sk_atomic_begin();
 
     process_t *process = process_get(p);
     thread_t *thread = alloc_thread(entry, process->flags | flags);
@@ -262,24 +262,24 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
 
-    atomic_end();
+    sk_atomic_end();
 
     return thread->id;
 }
 
 void thread_sleep(int time)
 {
-    atomic_begin();
+    sk_atomic_begin();
     running->state = THREAD_SLEEP;
     running->sleepinfo.wakeuptick = ticks + time;
-    atomic_end();
+    sk_atomic_end();
 
     thread_hold();
 }
 
 void thread_wakeup(THREAD t)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     thread_t *thread = thread_get(t);
 
@@ -289,12 +289,12 @@ void thread_wakeup(THREAD t)
         thread->sleepinfo.wakeuptick = 0;
     }
 
-    atomic_end();
+    sk_atomic_end();
 }
 
 void *thread_wait(THREAD t)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     thread_t *thread = thread_get(t);
 
@@ -306,7 +306,7 @@ void *thread_wait(THREAD t)
         running->state = THREAD_WAIT_THREAD;
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     thread_hold();
 
@@ -315,7 +315,7 @@ void *thread_wait(THREAD t)
 
 int thread_waitproc(PROCESS p)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     process_t *process = process_get(p);
 
@@ -327,7 +327,7 @@ int thread_waitproc(PROCESS p)
         running->state = THREAD_WAIT_PROCESS;
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     thread_hold();
 
@@ -336,7 +336,7 @@ int thread_waitproc(PROCESS p)
 
 int thread_cancel(THREAD t)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     thread_t *thread = thread_get(t);
 
@@ -347,21 +347,21 @@ int thread_cancel(THREAD t)
         log("Thread n°%d got canceled.", t);
     }
 
-    atomic_end();
+    sk_atomic_end();
 
     return thread == NULL; // return 1 if canceling the thread failled!
 }
 
 void thread_exit(void *retval)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     running->state = THREAD_CANCELING;
     running->exit_value = retval;
 
     log("Thread n°%d exited with value 0x%x.", running->id, retval);
 
-    atomic_end();
+    sk_atomic_end();
 
     while (1)
         hlt();
@@ -369,7 +369,7 @@ void thread_exit(void *retval)
 
 void thread_dump_all()
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     printf("\n\tThreads:");
 
@@ -378,19 +378,19 @@ void thread_dump_all()
         thread_dump(((thread_t *)i->value)->id);
     }
 
-    atomic_end();
+    sk_atomic_end();
 }
 
 void thread_dump(THREAD t)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     thread_t *thread = thread_get(t);
 
     printf("\n\tThread ID=%d child of process '%s' ID=%d.", t, thread->process->name, thread->process->id);
     printf("(ESP=0x%x STACK=%x STATE=%x)", thread->esp, thread->stack, thread->state);
 
-    atomic_end();
+    sk_atomic_end();
 }
 
 /* --- Process managment ---------------------------------------------------- */
@@ -405,12 +405,12 @@ PROCESS process_self()
 
 PROCESS process_create(const char *name, int flags)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     process_t *process = alloc_process(name, flags);
     list_pushback(processes, process);
 
-    atomic_end();
+    sk_atomic_end();
 
     log("Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
 
@@ -423,7 +423,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 
     if (dest >= 0x100000)
     {
-        atomic_begin();
+        sk_atomic_begin();
 
         // To avoid pagefault we need to switch page directorie.
         page_directorie_t *pdir = running->process->pdir;
@@ -435,7 +435,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 
         paging_load_directorie(pdir);
 
-        atomic_end();
+        sk_atomic_end();
     }
     else
     {
@@ -487,7 +487,7 @@ void cancel_childs(process_t *process)
 
 void process_cancel(PROCESS p)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     if (p != kernel_process)
     {
@@ -504,12 +504,12 @@ void process_cancel(PROCESS p)
         log("Warning! Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
     }
 
-    atomic_end();
+    sk_atomic_end();
 }
 
 void process_exit(int code)
 {
-    atomic_begin();
+    sk_atomic_begin();
 
     PROCESS p = process_self();
     process_t *process = process_get(p);
@@ -522,7 +522,7 @@ void process_exit(int code)
 
         cancel_childs(process);
         
-        atomic_end();
+        sk_atomic_end();
         while (1) hlt();
     }
     else
@@ -530,7 +530,7 @@ void process_exit(int code)
         log("Warning! Kernel try to commit suicide!");
     }
 
-    atomic_end();
+    sk_atomic_end();
 }
 
 int process_map(PROCESS p, uint addr, uint count)

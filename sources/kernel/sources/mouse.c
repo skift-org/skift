@@ -7,7 +7,7 @@
 #include "kernel/mouse.h"
 #include "kernel/logger.h"
 
-#include "sync/atomic.h"
+#include <skift/atomic.h>
 
 int mouse_x;
 int mouse_y;
@@ -132,16 +132,16 @@ void mouse_setup()
 
 void mouse_get_position(int *outxpos, int *outypos)
 {
-    atomic_begin();
-    *outxpos = mouse_x;
-    *outypos = mouse_y;
-    atomic_end();
+    ATOMIC({
+        *outxpos = mouse_x;
+        *outypos = mouse_y;
+    });
 }
 
 void mouse_set_position(int xpos, int ypos)
 {
-    atomic_begin();
-    mouse_x = xpos;
-    mouse_y = ypos;
-    atomic_end();
+    ATOMIC({
+        mouse_x = xpos;
+        mouse_y = ypos;
+    });
 }

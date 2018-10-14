@@ -1,7 +1,0 @@
-{
-    "id": "hideo-shared",
-    "type": "lib",
-    "libs": [
-        "libc"
-    ]
-}

@@ -4,7 +4,7 @@ typedef enum SYSCALL_CODE
 {
     SYS_DEBUG = 0,
 
-/* --- Porcess and Threads -------------------------------------------------- */
+/* --- Process and Threads -------------------------------------------------- */
 
     // Process
     SYS_PROCESS_SELF,

@@ -2,7 +2,6 @@
     "id": "hideo",
     "type": "app",
     "libs": [
-        "hideo-shared",
-        "ulibc"
+        "libu"
     ]
 }

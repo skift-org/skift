@@ -178,6 +178,7 @@ class TargetTypes(Enum):
         else:
             return TargetTypes.INVALID
 
+
 class Target(object):
     """
     Target building class.
@@ -274,7 +275,9 @@ class Target(object):
 
             if source.endswith(".c"):
                 includes = [("-I" + i) for i in self.get_includes(targets)]
-                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + (CFLAGS_STRICT if self.strict else []) + ["-c", "-o", output, source]
+                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
+                    (CFLAGS_STRICT if self.strict else []) + \
+                    ["-c", "-o", output, source]
             elif source.endswith(".s"):
                 command = ["nasm", "-f" "elf32", source, "-o", output]
 
@@ -289,12 +292,12 @@ class Target(object):
         output_file = self.get_output()
         objects_files = self.get_objects()
 
-
         print("    " + BRIGHT_WHITE + "Linking " + RESET + output_file)
 
         if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
             script = "./common/kernel.ld" if self.type == TargetTypes.KERNEL else "./common/userspace.ld"
-            dependancies = [dep.get_output() for dep in self.get_dependancies(targets)]
+            dependancies = [dep.get_output()
+                            for dep in self.get_dependancies(targets)]
             command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
         elif self.type == TargetTypes.LIB:
             command = [AR, "rcs"] + [output_file] + objects_files
@@ -440,7 +443,7 @@ def rebuild_all(targets):
 
 def distrib(targets):
     """Generate a distribution file."""
-    
+
     # build_all(targets)
 
     MKDIR("build")
@@ -455,15 +458,15 @@ def distrib(targets):
     for t in targets:
         target = targets[t]
         if target.type == TargetTypes.APP:
-            print( BRIGHT_WHITE + "    Copying " + RESET + "application '%s.app'" % t)
-    print( BRIGHT_WHITE + "    Generating" + RESET +" the tarball")
-
+            print(BRIGHT_WHITE + "    Copying " +
+                  RESET + "application '%s.app'" % t)
+    print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
 
     print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
-    print( BRIGHT_WHITE + "    Copying" + RESET +" the kernel")
-    print( BRIGHT_WHITE + "    Copying" + RESET +" the ramdisk")
-    print( BRIGHT_WHITE + "    Generating" + RESET +" the ISO")
+    print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
+    print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
+    print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
 
 
 def help_command(targets):

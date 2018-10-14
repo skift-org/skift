@@ -20,6 +20,7 @@
         "process.h": "c",
         "math.h": "c",
         "stdlib.h": "c",
-        "atomic.h": "c"
+        "atomic.h": "c",
+        "types.h": "c"
     }
 }

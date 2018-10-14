@@ -1,5 +1,10 @@
 #pragma once
 
+#define true 1
+#define false 0
+
+typedef _Bool bool;
+
 typedef char s8;
 typedef short s16;
 typedef long s32;
@@ -10,6 +15,9 @@ typedef unsigned short u16;
 typedef unsigned long u32;
 typedef unsigned long long u64;
 
+typedef char byte;
+typedef unsigned char ubyte;
 typedef unsigned char uchar;
+typedef unsigned short wchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;

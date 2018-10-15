@@ -462,6 +462,8 @@ def distrib(targets):
     ramdisk = MKDIR("build/ramdisk")
     bootdisk = MKDIR("build/bootdisk")
 
+## --- RAMDISK -------------------------------------------------------------- ##
+
     print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
 
     app_dir = MKDIR(join(ramdisk, "app"))
@@ -475,11 +477,23 @@ def distrib(targets):
     print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
     TAR(ramdisk, "build/ramdisk.tar")
 
+## --- BOOTDISK ------------------------------------------------------------- ##
+
     print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
+    bootdir = MKDIR("build/bootdisk/boot")
+    grubdir = MKDIR("build/bootdisk/boot/grub")
+
+    COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
+
     print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
+    COPY(targets["kernel"].get_output(), join(bootdir, "kernel.bin"))
+
     print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
+    COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
+
     print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
+    GRUB("build/bootdisk", "build/bootdisk.iso")
 
 
 def help_command(targets):

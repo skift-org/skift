@@ -394,12 +394,6 @@ def rebuild(target, targets):
     target.clean()
     target.build(targets)
 
-
-def run(target, targets):
-    """Start the kernel and the specified target."""
-    pass
-
-
 def info(target, targets):
     """Dump information about the target."""
 
@@ -420,7 +414,6 @@ actions = \
         "build": build,
         "clean": clean,
         "rebuild": rebuild,
-        "run": run,
         "info": info
     }
 
@@ -551,6 +544,11 @@ def list_other(targets):
     print(BRIGHT_WHITE + "Other: " + RESET + ', '.join(result))
 
 
+def run_command(targets):
+    """Start skiftOS in QEMU."""
+    distrib(targets)
+    QEMU("build/bootdisk.iso")
+
 global_actions = \
     {
         "build-all": build_all,
@@ -562,6 +560,7 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
+        "run": run_command
     }
 
 # --- Main ------------------------------------------------------------------- #

@@ -130,16 +130,22 @@ def is_uptodate(outfile, infiles):
     """
     Check if a file is uptodate with its dependancies.
     """
-    if type(infiles) == list:
-        uptodate = 0
 
-        for i in infiles:
-            if is_uptodate(outfile, i):
-                uptodate = uptodate + 1
+    if not os.path.exists(outfile):
+        return False
 
-        return len(infiles) == uptodate
+    else:
+        if type(infiles) == list:
+            uptodate = 0
 
-    return os.path.exists(outfile) and (os.path.getmtime(outfile) > os.path.getmtime(infiles))
+            for i in infiles:
+                if is_uptodate(outfile, i):
+                    uptodate = uptodate + 1
+
+            return len(infiles) == uptodate
+
+        else:
+            return os.path.getmtime(outfile) > os.path.getmtime(infiles)
 
 
 def get_files(locations, ext):
@@ -296,8 +302,7 @@ class Target(object):
 
         if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
             script = "./common/kernel.ld" if self.type == TargetTypes.KERNEL else "./common/userspace.ld"
-            dependancies = [dep.get_output()
-                            for dep in self.get_dependancies(targets)]
+            dependancies = [dep.get_output() for dep in self.get_dependancies(targets)]
             command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
         elif self.type == TargetTypes.LIB:
             command = [AR, "rcs"] + [output_file] + objects_files
@@ -326,28 +331,28 @@ class Target(object):
                       (dep.name))
                 return False
 
-        # Skip a line so it's easier on the eyes.
         print("")
-        print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
-        # Build all source file of the current target
-        for src, obj in zip(self.get_sources(), self.get_objects()):
-            if not self.compile(src, obj, targets):
-                ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
-                return False
+        if is_uptodate(self.get_output(), self.get_sources() + [dep.get_output() for dep in self.get_dependancies(targets)]):
+            self.builded = True
+            print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
+            return True
+        else:
+            # Skip a line so it's easier on the eyes.
+            print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
-        # Link and output the result of the target
-        return self.link(targets)
+            # Build all source file of the current target
+            for src, obj in zip(self.get_sources(), self.get_objects()):
+                if not self.compile(src, obj, targets):
+                    ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
+                    return False
 
-# ---- Distribution ---------------------------------------------------------- #
-
-
-def generate_ramdisk(targets):
-    pass
-
-
-def generate_bootdisk(targets):
-    pass
+            # Link and output the result of the target
+            return self.link(targets)
+    
+    def clean(self):
+        RMDIR(join(self.location, "bin"))
+        RMDIR(join(self.location, "obj"))
 
 # --- Target actions --------------------------------------------------------- #
 
@@ -375,7 +380,7 @@ def list_targets(location):
 
 def clean(target, targets):
     """Clean a target."""
-    pass
+    target.clean()
 
 
 def build(target, targets):
@@ -386,7 +391,8 @@ def build(target, targets):
 
 def rebuild(target, targets):
     """Clean and build a target."""
-    pass
+    target.clean()
+    target.build(targets)
 
 
 def run(target, targets):
@@ -421,7 +427,12 @@ actions = \
 
 def clean_all(targets):
     """Clean all targets."""
-    pass
+    for t in targets:
+        target = targets[t]
+
+        target.clean()
+
+    RMDIR("build")
 
 
 def build_all(targets):
@@ -444,7 +455,7 @@ def rebuild_all(targets):
 def distrib(targets):
     """Generate a distribution file."""
 
-    # build_all(targets)
+    build_all(targets)
 
     MKDIR("build")
 
@@ -462,6 +473,7 @@ def distrib(targets):
             COPY(target.get_output(), join(app_dir, target.name))
 
     print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
+    TAR(ramdisk, "build/ramdisk.tar")
 
     print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 

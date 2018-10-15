@@ -1,3 +1,1 @@
-# Hidea
-
-The skiftOS's window manager
+# Hideo - The skiftOS's window manager

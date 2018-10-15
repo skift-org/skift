@@ -1,3 +1,1 @@
-# Kernel
-
-## The skiftOS's kernel
+# hjerte - The skiftOS's kernel

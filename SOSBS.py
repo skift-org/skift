@@ -75,16 +75,16 @@ def COPY(src, dest):
 
 
 def TAR(directory, output_file):
-    subprocess.call(["tar", "-cf", output_file, "-C",
-                     directory] + os.listdir(directory))
+    subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
 
 
 def GRUB(iso, output_file):
-    try:
-        return 0 == subprocess.call(["grub-mkrescue", "-o", output_file, iso])
-    except:
-        print("grub-mkrescue not found, fallback grub2-mkrescue...")
-        return 0 == subprocess.call(["grub2-mkrescue", "-o", output_file, iso])
+    with open("/dev/null", "w") as f:
+        try:
+            return 0 == subprocess.call(["grub-mkrescue", "-o", output_file, iso], stdout=f, stderr=f)
+        except:
+            print("grub-mkrescue not found, fallback grub2-mkrescue...")
+            return 0 == subprocess.call(["grub2-mkrescue", "-o", output_file, iso], stdout=f, stderr=f)
 
     return False
 
@@ -495,6 +495,7 @@ def distrib(targets):
     print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
     GRUB("build/bootdisk", "build/bootdisk.iso")
 
+    print(BRIGHT_YELLOW + "\n    Distribution suceed!" + RESET)
 
 def help_command(targets):
     """Show this help message."""

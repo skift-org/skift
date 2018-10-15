@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <skift/atomic.h>
+
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
 #include "kernel/cpu/irq.h"
@@ -24,8 +26,6 @@
 #include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/version.h"
-
-#include <skift/atomic.h>
 
 #define LINE \
     "================================================================================"
@@ -91,7 +91,7 @@ void main(multiboot_info_t *info, s32 magic)
     log(LINE);
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("app/test-app", NULL);
+    PROCESS init = process_exec("app/hideo", NULL);
     thread_waitproc(init);
     process_exit(-1);
     PANIC("The init process has return!");

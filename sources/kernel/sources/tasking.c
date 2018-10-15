@@ -260,7 +260,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     thread->state = THREAD_RUNNING;
 
-    log("Thread with ID=%d child of process '%s' (ID=%d) is running.", thread->id, process->name, process->id);
+    log("Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", thread->id, entry, process->name, process->id);
 
     sk_atomic_end();
 
@@ -545,11 +545,14 @@ int process_unmap(PROCESS p, uint addr, uint count)
 
 uint process_alloc(uint count)
 {
-    return memory_alloc(running->process->pdir, count, 1);
+    uint addr = memory_alloc(running->process->pdir, count, 1);
+    log("Process alloc (COUNT=%x, ADDR=%x)", count, addr);
+    return addr;
 }
 
 void process_free(uint addr, uint count)
 {
+    log("Process free");
     return memory_free(running->process->pdir, addr, count, 1);
 }
 

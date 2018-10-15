@@ -46,7 +46,7 @@ void __panic(const string file, const string function, const int line, context_t
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", ticks);
+    printf("\n\tThe system was running for %d tick.\n", ticks);
 
 
     if (context != NULL)

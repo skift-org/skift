@@ -29,6 +29,6 @@ void sk_atomic_end()
     {
         depth--;
         if (depth == 0)
-            asm volatile("cli");
+            asm volatile("sti");
     }
 }

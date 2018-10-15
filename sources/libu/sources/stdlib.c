@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 
 #include <skift/io.h>
 #include <skift/lock.h>
@@ -25,10 +26,12 @@ int liballoc_unlock()
 
 void* liballoc_alloc(size_t size)
 {
-    return (void*)sk_process_alloc(size);;
+    unsigned int addr = sk_process_alloc(size);
+    printf("LIBALLOC ALOCC %x", addr);
+    return (void*)addr;
 }
 
 int liballoc_free(void* p,size_t size)
 {
-    return sk_process_free((unsigned int)p, size);;
+    return sk_process_free((unsigned int)p, size);
 }

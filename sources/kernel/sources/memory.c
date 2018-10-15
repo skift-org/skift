@@ -198,7 +198,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
     uint current_size = 0;
     uint startaddr = 0;
 
-    for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
+    for (size_t i = (user ? 256 : 0) * 1024; i < (user ? 1024 : 256) * 1024; i++)
     {
         int vaddr = i * PAGE_SIZE;
 
@@ -294,7 +294,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
+    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
 
     return vaddr;
 }

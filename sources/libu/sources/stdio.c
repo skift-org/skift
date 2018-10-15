@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <skift/io.h>
+
 int putchar(int chr)
 {
     return -1;
@@ -18,5 +20,6 @@ char * gets(char * str)
 
 int puts(const char * str)
 {
-    return 0;
+    sk_io_print(str);
+    return strlen(str);
 }

@@ -98,6 +98,12 @@ int sys_io_graphic_blit(unsigned int *buffer)
     return 0;
 }
 
+int sys_io_graphic_blit_region(unsigned int *buffer, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+{
+    graphic_blit_region(buffer, x, y, w, h);
+    return 0;
+}
+
 int sys_io_graphic_size(unsigned int *width, unsigned int *height)
 {
     graphic_size(width, height);
@@ -131,6 +137,7 @@ static int (*syscalls[])() =
         [SYS_IO_MOUSE_SET_POSITION] = sys_io_mouse_set_position,
 
         [SYS_IO_GRAPHIC_BLIT] = sys_io_graphic_blit,
+        [SYS_IO_GRAPHIC_BLIT_REGION] = sys_io_graphic_blit_region,
         [SYS_IO_GRAPHIC_SIZE] = sys_io_graphic_size,
 
         [SYS_FILE_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,

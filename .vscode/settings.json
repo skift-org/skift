@@ -22,6 +22,7 @@
         "stdlib.h": "c",
         "atomic.h": "c",
         "types.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "graphic.h": "c"
     }
 }

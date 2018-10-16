@@ -65,6 +65,20 @@ void graphic_blit(uint *buffer)
         memcpy(framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
 }
 
+void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)
+{
+    if (framebuffer != NULL)
+    {
+        for (uint xx = 0; xx < w; xx++)
+        {
+            for (uint yy = 0; yy < h; yy++)
+            {
+                graphic_pixel(x + xx, y + yy, buffer[x + y * w]);
+            }
+        }
+    }
+}
+
 inline void graphic_pixel(uint x, uint y, uint color)
 {
     if (framebuffer != NULL && x < graphic_width && y < graphic_height)

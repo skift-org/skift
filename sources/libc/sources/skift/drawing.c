@@ -98,6 +98,7 @@ void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
     for (int xx = 0; xx < w; xx++)
         for (int yy = 0; yy < h; yy++)
             drawing_pixel(bmp, x + xx, y + yy, color);
+            //bmp->buffer[(x + xx) + (y + yy) * bmp->width] = color;
 }
 
 int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};

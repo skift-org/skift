@@ -11,3 +11,4 @@ typedef PACKED(struct)
     uint width;
     uint height;
 } hideo_window_t;
+

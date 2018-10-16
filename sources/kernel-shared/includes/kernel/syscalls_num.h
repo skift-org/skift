@@ -40,6 +40,7 @@ typedef enum SYSCALL_CODE
     SYS_IO_MOUSE_SET_POSITION,
 
     SYS_IO_GRAPHIC_BLIT,
+    SYS_IO_GRAPHIC_BLIT_REGION,
     SYS_IO_GRAPHIC_SIZE,
 
 /* --- Filesystem ----------------------------------------------------------- */

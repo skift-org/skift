@@ -73,7 +73,7 @@ void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)
         {
             for (uint yy = 0; yy < h; yy++)
             {
-                graphic_pixel(x + xx, y + yy, buffer[x + y * w]);
+                graphic_pixel(x + xx, y + yy, buffer[(x + xx) + (y + yy) * graphic_width]);
             }
         }
     }

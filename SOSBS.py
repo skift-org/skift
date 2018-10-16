@@ -199,14 +199,6 @@ class Target(object):
 
         self.builded = False
 
-    def get_dependancies(self, targets):
-        dependancies = self.get_dependancies_internal(targets)
-
-        if self in dependancies:
-            dependancies.remove(self)
-
-        return dependancies
-
     def get_dependancies_internal(self, targets, found=None):
         if found == None:
             found = []
@@ -224,6 +216,31 @@ class Target(object):
                 ABORT()
 
         return found
+
+    def get_dependancies(self, targets):
+        dependancies = self.get_dependancies_internal(targets)
+
+        if self in dependancies:
+            dependancies.remove(self)
+
+        return dependancies
+
+    def get_libraries(self, targets):
+        libraries = []
+
+        for dep in self.get_dependancies(targets):
+            if dep.type == TargetTypes.LIB:
+                libraries.append(dep.get_output())
+
+        return libraries
+
+    def get_includes(self, targets):
+        includes = [join(self.location, "includes")]
+
+        for dep in self.get_dependancies(targets):
+            includes.append(join(dep.location, "includes"))
+
+        return includes
 
     def get_output(self):
         """
@@ -245,6 +262,25 @@ class Target(object):
         """
         return get_files(join(self.location, "sources"), "c") + get_files(join(self.location, "sources"), "s")
 
+    def get_shared_objects(self, targets):
+
+        objects = []
+
+        for d in self.deps:
+            if d in targets:
+                dep = targets[d]
+
+                if dep.type == TargetTypes.SHARED:
+                    for s in dep.get_sources():
+                        objects.append(s.replace(join(dep.location, "sources"),
+                                                 join(dep.location, "obj")) + ".o")
+
+            else:
+                ERROR("Missing dependancies %s of target %s." % (d, self.name))
+                ABORT()
+
+        return objects
+
     def get_objects(self):
         objects = []
 
@@ -252,18 +288,8 @@ class Target(object):
             objects.append(s.replace(join(self.location, "sources"),
                                      join(self.location, "obj")) + ".o")
 
+
         return objects
-
-    def get_includes(self, targets):
-
-        deps = self.get_dependancies(targets)
-
-        includes = [join(self.location, "includes")]
-
-        for d in deps:
-            includes.append(join(d.location, "includes"))
-
-        return includes
 
     def is_uptodate(self):
         return is_uptodate(self.get_output(), self.get_sources())
@@ -297,14 +323,15 @@ class Target(object):
         """
         output_file = self.get_output()
         objects_files = self.get_objects()
+        objects_files = objects_files + self.get_shared_objects(targets)
 
         print("    " + BRIGHT_WHITE + "Linking " + RESET + output_file)
 
         if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
             script = "./common/kernel.ld" if self.type == TargetTypes.KERNEL else "./common/userspace.ld"
-            dependancies = [dep.get_output() for dep in self.get_dependancies(targets)]
+            dependancies = self.get_libraries(targets)
             command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
-        elif self.type == TargetTypes.LIB:
+        elif self.type in [TargetTypes.LIB, TargetTypes.SHARED]:
             command = [AR, "rcs"] + [output_file] + objects_files
         else:
             print("No linking required, skipping...")
@@ -327,8 +354,7 @@ class Target(object):
 
         for dep in self.get_dependancies(targets):
             if not dep.build(targets):
-                ERROR("Failed to build " + YELLOW + "%s " %
-                      (dep.name))
+                ERROR("Failed to build " + YELLOW + "%s " % (dep.name))
                 return False
 
         print("")

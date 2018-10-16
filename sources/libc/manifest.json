@@ -1,4 +1,4 @@
 {
     "id": "libc",
-    "type": "lib"
+    "type": "shared"
 }

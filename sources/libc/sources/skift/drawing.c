@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <skift/drawing.h>
 
-#define BMP_SIZE(bmp) (bmp->width * bmp->height * sizeof(uint))
+#define BMP_SIZE_MEM(bmp) (bmp->width * bmp->height * sizeof(uint))
+#define BMP_SIZE(bmp) (uint)(bmp->width * bmp->height)
 
 /* --- Bitmap --------------------------------------------------------------- */
 

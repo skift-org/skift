@@ -7,6 +7,7 @@ typedef struct
 {
     uint width;
     uint height;
+    
     bitmap_t * screen;
 } hideo_context_t;
 

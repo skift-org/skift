@@ -36,6 +36,7 @@ void bitmap_dtor(bitmap_t *bmp)
     free(bmp);
 }
 
+
 /* --- Graphic -------------------------------------------------------------- */
 
 void drawing_pixel(bitmap_t *bmp, int x, int y, uint color)

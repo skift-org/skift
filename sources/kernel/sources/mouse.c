@@ -2,21 +2,50 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <string.h>
+#include <skift/atomic.h>
+
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/irq.h"
 #include "kernel/mouse.h"
 #include "kernel/logger.h"
 
-#include <skift/atomic.h>
-
-int mouse_x;
-int mouse_y;
+mouse_state_t mouse;
 
 /* --- Private functions ---------------------------------------------------- */
 
-uchar cycle = 0;
-char packet[3];
+void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
+{
+    //TODO: Scroll whell not suported yet
+    UNUSED(packet3);
 
+    int offx = packet1;
+
+    if (offx && (packet0 & (1 << 4)))
+    {
+        offx -= 0x100;
+    }
+
+    int offy = packet2;
+
+    if (offy && (packet0 & (1 << 5)))
+    {
+        offy -= 0x100;
+    }
+
+    mouse.x += offx;
+    mouse.y -= offy;
+    mouse.scroll = 0;
+
+    mouse.center = (packet0 >> 2) & 1;
+    mouse.right = (packet0 >> 1) & 1;
+    mouse.left = (packet0)&1;
+
+    // log("Mouse %d %d (X=%d, Y=%d, L=%d, M=%d, R=%d)", (int)offx, (int)offy, mouse.x, mouse.y, mouse.left, mouse.center, mouse.right);
+}
+
+uchar cycle = 0;
+ubyte packet[4];
 esp_t mouse_irq(esp_t esp, context_t *context)
 {
     UNUSED(context);
@@ -36,14 +65,8 @@ esp_t mouse_irq(esp_t esp, context_t *context)
         break;
     case 2:
         packet[2] = inb(0x60);
-        char offx = packet[1];
-        char offy = packet[2];
 
-        mouse_x += offx;
-        mouse_y -= offy;
-
-        // log("Mouse %d %d (X=%d, Y=%d)", (int)packet[1], (int)packet[2], mouse_x, mouse_y);
-
+        mouse_handle_packet(packet[0], packet[1], packet[2], packet[3]);
         cycle = 0;
         break;
     }
@@ -111,7 +134,7 @@ void mouse_setup()
     mouse_wait(1);
     outb(0x64, 0x20);
     mouse_wait(0);
-    _status = (inb(0x60) | 2);
+    _status = (inb(0x60) | 3);
     mouse_wait(1);
     outb(0x64, 0x60);
     mouse_wait(1);
@@ -125,23 +148,22 @@ void mouse_setup()
     mouse_write(0xF4);
     mouse_read(); //Acknowledge
 
-    //Setup the mouse handler
+    // try to enable mouse whell
 
+    //Setup the mouse handler
     irq_register(12, mouse_irq);
 }
 
-void mouse_get_position(int *outxpos, int *outypos)
+void mouse_get_state(mouse_state_t *state)
 {
     ATOMIC({
-        *outxpos = mouse_x;
-        *outypos = mouse_y;
+        memcpy(state, &mouse, sizeof(mouse_state_t));
     });
 }
 
-void mouse_set_position(int xpos, int ypos)
+void mouse_set_state(mouse_state_t *state)
 {
     ATOMIC({
-        mouse_x = xpos;
-        mouse_y = ypos;
+        memcpy(&mouse, state, sizeof(mouse_state_t));
     });
 }

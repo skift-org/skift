@@ -18,11 +18,30 @@ typedef PACKED(struct)
     
     uint width;
     uint height;
+
+    char * title;
 } hideo_window_t;
+
+typedef enum
+{
+    BTN_PRESSED,
+    BTN_RELEASED,
+    BTN_UP,
+    BTN_DOWN,
+} hideo_button_state_t;
+
+typedef PACKED(struct)
+{    
+    int x;
+    int y;
+    
+    hideo_button_state_t leftbtn;
+    hideo_button_state_t rightbtn;
+    hideo_button_state_t middlebtn;
+} hideo_cursor_t;
 
 typedef PACKED(struct)
 {
-    int x;
-    int y;
-} hideo_cursor_t;
+
+} hideo_keyboard_t;
 

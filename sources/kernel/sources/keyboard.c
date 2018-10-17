@@ -24,8 +24,3 @@ void keyboard_setup()
 {
     irq_register(1, keyboard_irq);
 }
-
-void keyboard_load_keymap(keymap_t *keymap)
-{
-    UNUSED(keymap);
-}

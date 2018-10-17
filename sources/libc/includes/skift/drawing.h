@@ -5,38 +5,8 @@
 
 /* --- Colors --------------------------------------------------------------- */
 
-typedef PACKED(struct)
-{
-    union {
-        struct
-        {
-            byte a;
-            byte r;
-            byte g;
-            byte b;
-        };
-
-        uint as_uint;
-    };
-}
-color_t;
-
-#define COLOR(A, R, G, B)                              \
-    {                                                  \
-        .a = 0x##A, .r = 0x##R, .g = 0x##G, .b = 0x##B \
-    }
-
-#define COLOR_HEX(HEX)     \
-    {                      \
-        .as_uint = 0x##HEX \
-    }
-
-#define BLACK COLOR(0, 00, 00, 00)
-#define WHITE COLOR(0, FF, FF, FF)
-
-#define RED COLOR(0, FF, 00, 00)
-#define GREEN COLOR(0, 00, FF, 00)
-#define BLUE COLOR(0, 00, 00, FF)
+typedef unsigned int color_t;
+#define rbg(r, g, b) (r & 0xff) | (g & 0xff) | (b & 0xff)
 
 /* --- Bitmap --------------------------------------------------------------- */
 

@@ -4,7 +4,7 @@
 
 #include "kernel/tasking.h"
 #include "kernel/syscalls.h"
-#include "kernel/syscalls_num.h"
+#include "kernel/shared_syscalls.h"
 #include "kernel/logger.h"
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
@@ -80,15 +80,15 @@ int sys_io_print(const char *msg)
     return 0;
 }
 
-int sys_io_mouse_get_position(int *outxpos, int *outypos)
+int sys_io_mouse_get_state(mouse_state_t* state)
 {
-    mouse_get_position(outxpos, outypos);
+    mouse_get_state(state);
     return 0;
 }
 
-int sys_io_mouse_set_position(int xpos, int ypos)
+int sys_io_mouse_set_state(mouse_state_t* state)
 {
-    mouse_set_position(xpos, ypos);
+    mouse_set_state(state);
     return 0;
 }
 
@@ -133,8 +133,8 @@ static int (*syscalls[])() =
         [SYS_IO_PRINT] = sys_io_print,
         [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
 
-        [SYS_IO_MOUSE_GET_POSITION] = sys_io_mouse_get_position,
-        [SYS_IO_MOUSE_SET_POSITION] = sys_io_mouse_set_position,
+        [SYS_IO_MOUSE_GET_STATE] = sys_io_mouse_get_state,
+        [SYS_IO_MOUSE_SET_STATE] = sys_io_mouse_set_state,
 
         [SYS_IO_GRAPHIC_BLIT] = sys_io_graphic_blit,
         [SYS_IO_GRAPHIC_BLIT_REGION] = sys_io_graphic_blit_region,
@@ -163,7 +163,7 @@ static int (*syscalls[])() =
 
 void syscall_dispatcher(context_t *context)
 {
-    // log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    //log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
 
     syscall_t syscall = (syscall_t)syscalls[context->eax];
     context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);

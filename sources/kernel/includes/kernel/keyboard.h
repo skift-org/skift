@@ -1,18 +1,7 @@
 #pragma once
 
-#define KEYCOUNT 0
+#include "kernel/shared_keyboard.h"
 
 void keyboard_setup();
 
-typedef struct 
-{
-    char regular;
-    char shift;
-    char ctrl;
-} key_mapping_t;
-
-typedef struct 
-{
-    const char * name;
-
-} keymap_t;
+void keyborad_get_state(keyboard_state_t * state);

@@ -6,7 +6,7 @@
 /* --- Colors --------------------------------------------------------------- */
 
 typedef unsigned int color_t;
-#define rbg(r, g, b) (r & 0xff) | (g & 0xff) | (b & 0xff)
+#define rbg(r, g, b) (color_t)((r) & 0xff) | ((g) & 0xff) | ((b) & 0xff)
 
 /* --- Bitmap --------------------------------------------------------------- */
 

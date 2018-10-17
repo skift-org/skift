@@ -36,11 +36,13 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
 
 void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
 {
-    drawing_filltri(ctx->screen, c->x, c->y, c->x, c->y + 12, c->x + 8, c->y + 8, 0xffffff);
+    #define SCALE 1
 
-    drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12, 1, 0x0);
-    drawing_line(ctx->screen, c->x, c->y, c->x + 8, c->y + 8, 1, 0x0);
-    drawing_line(ctx->screen, c->x, c->y + 12, c->x + 8, c->y + 8, 1, 0x0);
+    drawing_filltri(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 0xffffff);
+
+    drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, SCALE, 0x0);
+    drawing_line(ctx->screen, c->x, c->y, c->x + 8 * SCALE, c->y + 8 * SCALE, SCALE, 0x0);
+    drawing_line(ctx->screen, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, SCALE, 0x0);
 }
 
 /* --- Hideo ---------------------------------------------------------------- */

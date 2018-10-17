@@ -357,13 +357,13 @@ class Target(object):
                 ERROR("Failed to build " + YELLOW + "%s " % (dep.name))
                 return False
 
-        print("")
 
         if is_uptodate(self.get_output(), self.get_sources() + [dep.get_output() for dep in self.get_dependancies(targets)]):
             self.builded = True
-            print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
+            # print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
             return True
         else:
+            print("")
             # Skip a line so it's easier on the eyes.
             print(BRIGHT_WHITE + "%s:" % self.name + RESET)
 
@@ -482,39 +482,45 @@ def distrib(targets):
     bootdisk = MKDIR("build/bootdisk")
 
 ## --- RAMDISK -------------------------------------------------------------- ##
+    if not is_uptodate("build/ramdisk.tar", [targets[t].get_output() for t in targets if targets[t].type == TargetTypes.APP]):
 
-    print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
+        print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
 
-    app_dir = MKDIR(join(ramdisk, "app"))
+        app_dir = MKDIR(join(ramdisk, "app"))
 
-    for t in targets:
-        target = targets[t]
-        if target.type == TargetTypes.APP:
-            print(BRIGHT_WHITE + "    Copying " + RESET + "application '%s'" % t)
-            COPY(target.get_output(), join(app_dir, target.name))
+        for t in targets:
+            target = targets[t]
+            if target.type == TargetTypes.APP:
+                print(BRIGHT_WHITE + "    Copying " + RESET + "application '%s'" % t)
+                COPY(target.get_output(), join(app_dir, target.name))
 
-    print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
-    TAR(ramdisk, "build/ramdisk.tar")
+        print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
+        TAR(ramdisk, "build/ramdisk.tar")
+    # else:
+    #     print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " ramdisk")
 
 ## --- BOOTDISK ------------------------------------------------------------- ##
 
-    print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
+    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["kernel"].get_output(), "build/ramdisk.tar"]):
+        print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
-    bootdir = MKDIR("build/bootdisk/boot")
-    grubdir = MKDIR("build/bootdisk/boot/grub")
+        bootdir = MKDIR("build/bootdisk/boot")
+        grubdir = MKDIR("build/bootdisk/boot/grub")
 
-    COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
+        COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
 
-    print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
-    COPY(targets["kernel"].get_output(), join(bootdir, "kernel.bin"))
+        print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
+        COPY(targets["kernel"].get_output(), join(bootdir, "kernel.bin"))
 
-    print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
-    COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
+        print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
+        COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
 
-    print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
-    GRUB("build/bootdisk", "build/bootdisk.iso")
+        print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
+        GRUB("build/bootdisk", "build/bootdisk.iso")
+    # else:
+    #     print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
-    print(BRIGHT_YELLOW + "\n    Distribution suceed!" + RESET)
+    # print(BRIGHT_YELLOW + "\nDistribution suceed 👌 !" + RESET)
 
 def help_command(targets):
     """Show this help message."""
@@ -573,6 +579,8 @@ def list_other(targets):
 def run_command(targets):
     """Start skiftOS in QEMU."""
     distrib(targets)
+    
+    print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso")
 
 global_actions = \

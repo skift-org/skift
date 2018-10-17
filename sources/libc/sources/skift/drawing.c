@@ -161,6 +161,6 @@ void drawing_text(bitmap_t *bmp, const char * str, int x, int y, uint color)
 
     for (size_t i = 0; (c = str[i]); i++)
     {
-        drawing_char(bmp, c, x + i * 8, y, color);
+        drawing_char(bmp, c, x + i * 9, y, color);
     }
 }

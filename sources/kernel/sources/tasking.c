@@ -214,12 +214,12 @@ void tasking_setup()
 
 void thread_yield()
 {
-    asm("int $32");   
+    asm("int $32");
 }
 
 #pragma GCC push_options
-#pragma GCC optimize ("O0")
-// Look like gcc like to break this functions XD 
+#pragma GCC optimize("O0")
+// Look like gcc like to break this functions XD
 void thread_hold()
 {
     while (running->state != THREAD_RUNNING)
@@ -521,9 +521,10 @@ void process_exit(int code)
         log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         cancel_childs(process);
-        
+
         sk_atomic_end();
-        while (1) hlt();
+        while (1)
+            hlt();
     }
     else
     {
@@ -556,6 +557,77 @@ void process_free(uint addr, uint count)
     return memory_free(running->process->pdir, addr, count, 1);
 }
 
+/* --- Messaging ------------------------------------------------------------ */
+
+uint MSG_ID = 0;
+
+uint messaging_id()
+{
+    uint id;
+
+    ATOMIC({
+        id = MSG_ID++;
+    });
+
+    return id;
+}
+
+int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
+{
+    sk_atomic_begin();
+    {
+        process_t *process = process_get(to);
+
+        if (process == NULL)
+        {
+            return -1;
+        }
+
+        message_t *msg = MALLOC(message_t);
+
+        msg->from = process_self();
+        msg->to = to;
+
+        if (msg == NULL)
+        {
+            return 1;
+        }
+
+        strncpy(&msg->name[0], name, MSG_MAXNAME);
+
+        msg->payload = malloc(size);
+
+        if (msg->payload == NULL)
+        {
+            free(msg);
+            return 1;
+        }
+
+        memcpy(msg->payload, payload, size);
+
+        msg->flags = flags;
+
+        list_pushback(process->inbox, (uint)msg);
+    }
+    sk_atomic_end();
+
+    return 0;
+}
+
+/* TODO Broadcasting
+int messaging_broadcast(const char *name, void *payload, uint size, uint flags)
+{
+}
+*/
+
+int messaging_receive(message_t *msg)
+{
+}
+
+int messageing_accept_payload(message_t *msg)
+{
+}
+
 /* --- Sheduler ------------------------------------------------------------- */
 
 thread_t *get_next_task()
@@ -568,52 +640,61 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-            case THREAD_CANCELING:
+        case THREAD_CANCELING:
+        {
+            log("Thread %d canceled!", thread->id);
+            thread->state = THREAD_CANCELED;
+            // TODO: cleanup the thread.
+            // TODO: cleanup the process if no thread is still running.
+            break;
+        }
+        case THREAD_SLEEP:
+        {
+            // Wakeup the thread
+            if (thread->sleepinfo.wakeuptick >= ticks)
             {
-                log("Thread %d canceled!", thread->id);
-                thread->state = THREAD_CANCELED;
-                // TODO: cleanup the thread.
-                // TODO: cleanup the process if no thread is still running.
-                break;
+                thread->state = THREAD_RUNNING;
+                log("Thread %d wake up!", thread->id);
             }
-            case THREAD_SLEEP:
+            break;
+        }
+        case THREAD_WAIT_PROCESS:
+        {
+            process_t *wproc = process_get(thread->waitinfo.handle);
+
+            if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
             {
-                // Wakeup the thread
-                if (thread->sleepinfo.wakeuptick >= ticks)
-                {
-                    thread->state = THREAD_RUNNING;
-                    log("Thread %d wake up!", thread->id);
-                }
-                break;
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = wproc->exit_code;
+                log("Thread %d finish waiting process %d.", thread->id, wproc->id);
             }
-            case THREAD_WAIT_PROCESS:
+
+            break;
+        }
+        case THREAD_WAIT_THREAD:
+        {
+            thread_t *wthread = thread_get(thread->waitinfo.handle);
+
+            if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
             {
-                process_t *wproc = process_get(thread->waitinfo.handle);
-
-                if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
-                {
-                    thread->state = THREAD_RUNNING;
-                    thread->waitinfo.outcode = wproc->exit_code;
-                    log("Thread %d finish waiting process %d.", thread->id, wproc->id);
-                }
-
-                break;
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = (uint)wthread->exit_value;
+                log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
             }
-            case THREAD_WAIT_THREAD:
+
+            break;
+        }
+        case THREAD_WAIT_MESSAGE:
+        {
+            if (thread->process->inbox->count > 0)
             {
-                thread_t *wthread = thread_get(thread->waitinfo.handle);
-
-                if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
-                {
-                    thread->state = THREAD_RUNNING;
-                    thread->waitinfo.outcode = (uint)wthread->exit_value;
-                    log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
-                }
-
-                break;
+                thread->state = THREAD_RUNNING;
+                log("Thread %d finish waiting for incoming message.", thread->id);
             }
-            default:
-                break;
+            break;
+        }
+        default:
+            break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
@@ -622,7 +703,6 @@ thread_t *get_next_task()
         }
 
     } while (thread == NULL || thread->state != THREAD_RUNNING);
-
 
     return thread;
 }

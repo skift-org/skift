@@ -23,6 +23,7 @@
         "atomic.h": "c",
         "types.h": "c",
         "stddef.h": "c",
-        "graphic.h": "c"
+        "graphic.h": "c",
+        "tasking.h": "c"
     }
 }

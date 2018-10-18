@@ -133,7 +133,6 @@ def is_uptodate(outfile, infiles):
 
     if not os.path.exists(outfile):
         return False
-
     else:
         if type(infiles) == list:
             uptodate = 0
@@ -651,7 +650,6 @@ def main(argc, argv):
 
         else:
             missing_command(action)
-
 
 # Jump to the entry point.
 if __name__ == '__main__':

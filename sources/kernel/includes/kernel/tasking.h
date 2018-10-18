@@ -8,6 +8,7 @@
 #include <skift/list.h>
 
 #include "kernel/paging.h"
+#include "kernel/shared_protocole.h"
 
 #define PROCNAME_SIZE 128
 #define STACK_SIZE 0x4000
@@ -34,6 +35,7 @@ typedef enum thread_state
 
     THREAD_WAIT_THREAD,
     THREAD_WAIT_PROCESS,
+    THREAD_WAIT_MESSAGE,
 
     THREAD_CANCELING,
     THREAD_CANCELED,
@@ -46,6 +48,7 @@ typedef struct
 
     int flags;
     list_t *threads; // Child threads
+    list_t *inbox;
 
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
@@ -122,3 +125,5 @@ void process_free(uint addr, uint count); // Free perviously allocated memory.
 
 // Load a ELF executable, create a adress space and run it.
 PROCESS process_exec(const char *filename, const char **argv);
+
+/* --- Messaging ------------------------------------------------------------ */

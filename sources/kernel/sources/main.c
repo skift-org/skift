@@ -93,6 +93,6 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS init = process_exec("app/hideo", NULL);
     thread_waitproc(init);
-    process_exit(-1);
+
     PANIC("The init process has return!");
 }

@@ -607,7 +607,7 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
 
         msg->flags = flags;
 
-        list_pushback(process->inbox, (uint)msg);
+        list_pushback(process->inbox, (void*)msg);
     }
     sk_atomic_end();
 
@@ -618,7 +618,6 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
 int messaging_broadcast(const char *name, void *payload, uint size, uint flags)
 {
 }
-*/
 
 int messaging_receive(message_t *msg)
 {
@@ -627,6 +626,7 @@ int messaging_receive(message_t *msg)
 int messageing_accept_payload(message_t *msg)
 {
 }
+*/
 
 /* --- Sheduler ------------------------------------------------------------- */
 

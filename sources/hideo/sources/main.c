@@ -315,6 +315,7 @@ int main(int argc, char const *argv[])
 
         // Draw
         drawing_clear(ctx->screen, 0xe5e5e5);
+        drawing_text(ctx->screen, "com.skift.compositor", 8, 8, 0x939393);
 
         FOREACH(w, ctx->windows)
         {

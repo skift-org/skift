@@ -4,6 +4,7 @@
 #include <skift/utils.h>
 
 #define HEADER_HEIGHT 32
+#define RESIZE_AREA    8
 
 typedef PACKED(struct)
 {
@@ -28,17 +29,17 @@ typedef enum
 {
     CURSOR_POINTER,
     CURSOR_DRAG,
-    CURSOR_RESIZE_HORIZONTAL,
-    CURSOR_RESIZE_VERTICAL,
+    CURSOR_RESIZEH,
+    CURSOR_RESIZEV,
+    CURSOR_RESIZEHV,
 } hideo_cursor_state_t;
 
 typedef enum
 {
-    WIN_EDGE_TOP,
-    WIN_EDGE_BOTTOM,
-    WIN_EDGE_LEFT,
-    WIN_EDGE_RIGHT,
-} hideo_window_edge_t;
+    WIN_RESIZE_H,
+    WIN_RESIZE_V,
+    WIN_RESIZE_HV,
+} hideo_resize_t;
 
 typedef PACKED(struct)
 {    
@@ -77,8 +78,11 @@ typedef struct
     struct 
     {
         hideo_window_t * resized;
-        hideo_window_edge_t edge;
+        hideo_resize_t edge;
         bool horizontal;
         bool vertical;
+
+        int offx;
+        int offy;
     } resizestate;
 } hideo_context_t;

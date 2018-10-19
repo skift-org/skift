@@ -23,7 +23,7 @@ bool check_colision(int x0, int y0, int w0, int h0, int x1, int y1, int w1, int 
 
 /* --- Windows -------------------------------------------------------------- */
 
-hideo_window_t *hideo_create_window(hideo_context_t* ctx, char *title, int x, int y, int w, int h)
+hideo_window_t *hideo_create_window(hideo_context_t *ctx, char *title, int x, int y, int w, int h)
 {
     hideo_window_t *win = MALLOC(hideo_window_t);
 
@@ -53,6 +53,15 @@ void hideo_window_update(hideo_context_t *ctx, hideo_window_t *w, hideo_cursor_t
         ctx->dragstate.dragged->x = c->x + ctx->dragstate.offx;
         ctx->dragstate.dragged->y = c->y + ctx->dragstate.offy;
     }
+
+    if (ctx->resizestate.resized == w)
+    {
+        if (ctx->resizestate.horizontal)
+            w->width = max(c->x - w->x + ctx->resizestate.offx, 256);
+
+        if (ctx->resizestate.vertical)
+            w->height = max(c->y - w->y + ctx->resizestate.offy, HEADER_HEIGHT);
+    }
 }
 
 void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
@@ -69,7 +78,7 @@ void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
     {
         drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x939393);
         drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x939393);
-    }    
+    }
 }
 
 /* --- Mouse cursor --------------------------------------------------------- */
@@ -101,7 +110,6 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
 
     new_state.x = max(min(new_state.x, (int)ctx->width - 1), 0);
     new_state.y = max(min(new_state.y, (int)ctx->height - 1), 0);
-
 
     sk_io_mouse_set_state(&new_state);
     c->x = new_state.x;
@@ -152,8 +160,8 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
         c->middlebtn = new_state.middle ? BTN_DOWN : BTN_UP;
     }
 
-    hideo_window_t * win = hideo_window_at(ctx, c->x, c->y, false);
-    
+    hideo_window_t *win = hideo_window_at(ctx, c->x, c->y, false);
+
     if (win != NULL)
     {
         if (c->leftbtn == BTN_PRESSED)
@@ -162,18 +170,63 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
             list_remove(ctx->windows, win);
             list_pushback(ctx->windows, win);
 
-            if (check_colision(win->x, win->y, win->width, HEADER_HEIGHT, c->x, c->y, 1, 1))
+            if (check_colision(win->x + win->width - RESIZE_AREA, win->y + win->height - RESIZE_AREA, RESIZE_AREA, RESIZE_AREA, c->x, c->y, 1, 1))
+            {
+                c->state = CURSOR_RESIZEHV;
+                ctx->resizestate.resized = win;
+
+                ctx->resizestate.horizontal = true;
+                ctx->resizestate.vertical = true;
+
+                ctx->resizestate.offx = win->x + win->width - c->x;
+                ctx->resizestate.offy = win->y + win->height - c->y;
+            }
+            else if (check_colision(win->x, win->y + win->height - RESIZE_AREA, win->width, RESIZE_AREA, c->x, c->y, 1, 1))
+            {
+                c->state = CURSOR_RESIZEV;
+                ctx->resizestate.resized = win;
+
+                ctx->resizestate.horizontal = false;
+                ctx->resizestate.vertical = true;
+
+                ctx->resizestate.offx = win->x + win->width - c->x;
+                ctx->resizestate.offy = win->y + win->height - c->y;
+            }
+            else if (check_colision(win->x + win->width - RESIZE_AREA, win->y, RESIZE_AREA, win->height, c->x, c->y, 1, 1))
+            {
+                c->state = CURSOR_RESIZEH;
+                ctx->resizestate.resized = win;
+
+                ctx->resizestate.horizontal = true;
+                ctx->resizestate.vertical = false;
+
+                ctx->resizestate.offx = win->x + win->width - c->x;
+                ctx->resizestate.offy = win->y + win->height - c->y;
+            }
+            else if (check_colision(win->x, win->y, win->width, HEADER_HEIGHT, c->x, c->y, 1, 1))
             {
                 ctx->dragstate.dragged = win;
                 ctx->dragstate.offx = win->x - c->x;
                 ctx->dragstate.offy = win->y - c->y;
+
+                c->state = CURSOR_DRAG;
             }
         }
     }
 
-    if (ctx->dragstate.dragged != NULL && c->leftbtn == BTN_RELEASED)
+    if (c->leftbtn == BTN_RELEASED)
     {
-        ctx->dragstate.dragged = NULL;
+        if (ctx->resizestate.resized != NULL)
+        {
+            c->state = CURSOR_POINTER;
+            ctx->resizestate.resized = NULL;
+        }
+
+        if (ctx->dragstate.dragged != NULL)
+        {
+            c->state = CURSOR_POINTER;
+            ctx->dragstate.dragged = NULL;
+        }
     }
 }
 
@@ -181,11 +234,36 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
 {
 #define SCALE 2
 
-    drawing_filltri(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 0xffffff);
+    switch (c->state)
+    {
+    case CURSOR_POINTER:
+        drawing_filltri(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 0xffffff);
 
-    drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, 1, 0x0);
-    drawing_line(ctx->screen, c->x, c->y, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
-    drawing_line(ctx->screen, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
+        drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, 1, 0x0);
+        drawing_line(ctx->screen, c->x, c->y, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
+        drawing_line(ctx->screen, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
+        break;
+
+    case CURSOR_DRAG:
+        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 2, 0x0);
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 2, 0x0);
+        break;
+
+    case CURSOR_RESIZEH:
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 2, 0x0);
+        break;
+
+    case CURSOR_RESIZEV:
+        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 2, 0x0);
+        break;
+
+    case CURSOR_RESIZEHV:
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y - 4 * SCALE, c->x + 4 * SCALE, c->y + 4 * SCALE, 2, 0x0);
+        break;
+
+    default:
+        break;
+    }
 }
 
 /* --- Hideo ---------------------------------------------------------------- */
@@ -222,6 +300,7 @@ int main(int argc, char const *argv[])
 
     hideo_create_window(ctx, "Hello, world!", 54, 96, 256, 128);
     hideo_create_window(ctx, "Good bye!", 300, 128, 256, 128);
+    hideo_create_window(ctx, "Wow such window!", 100, 200, 256, 256);
 
     while (1)
     {

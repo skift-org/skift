@@ -21,14 +21,9 @@ bool check_colision(int x0, int y0, int w0, int h0, int x1, int y1, int w1, int 
     return x0 < x1 + w1 && x1 < x0 + w0 && y0 < y1 + h1 && y1 < y0 + h0;
 }
 
-hideo_window_t *selected;
-
-list_t *winstack;
-lock_t winstacklock;
-
 /* --- Windows -------------------------------------------------------------- */
 
-hideo_window_t *hideo_create_window(char *title, int x, int y, int w, int h)
+hideo_window_t *hideo_create_window(hideo_context_t* ctx, char *title, int x, int y, int w, int h)
 {
     hideo_window_t *win = MALLOC(hideo_window_t);
 
@@ -39,8 +34,8 @@ hideo_window_t *hideo_create_window(char *title, int x, int y, int w, int h)
     win->width = w;
     win->height = h;
 
-    list_pushback(winstack, (void *)win);
-    selected = win;
+    list_pushback(ctx->windows, (void *)win);
+    ctx->focus = win;
 
     printf("Window@%x create", win);
 
@@ -50,43 +45,44 @@ hideo_window_t *hideo_create_window(char *title, int x, int y, int w, int h)
 void hideo_window_update(hideo_context_t *ctx, hideo_window_t *w, hideo_cursor_t *c)
 {
     UNUSED(ctx);
+    UNUSED(w);
+    UNUSED(c);
 
-    if (check_colision(w->x, w->y, w->width, w->height, c->x, c->y, 1, 1) && c->leftbtn)
+    if (ctx->dragstate.dragged == w)
     {
-        selected = w;
+        ctx->dragstate.dragged->x = c->x + ctx->dragstate.offx;
+        ctx->dragstate.dragged->y = c->y + ctx->dragstate.offy;
     }
 }
 
 void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
 {
     drawing_fillrect(ctx->screen, w->x, w->y, w->width, w->height, 0xf5f5f5);
-    drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
 
-    if (w == selected)
+    if (w == ctx->focus)
     {
+        drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
         drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x0A64CD);
+        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
     }
     else
     {
         drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x939393);
-    }
-
-    drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
+        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x939393);
+    }    
 }
 
 /* --- Mouse cursor --------------------------------------------------------- */
 
-mouse_state_t mstate;
-
-hideo_window_t *hideo_cursor_window(hideo_context_t *ctx, hideo_cursor_t *cur)
+hideo_window_t *hideo_window_at(hideo_context_t *ctx, int x, int y, bool header)
 {
     hideo_window_t *result = NULL;
 
-    FOREACH(w, winstack)
+    FOREACH(w, ctx->windows)
     {
         hideo_window_t *window = (hideo_window_t *)w->value;
 
-        if (check_colision(window->x, window->y, window->width, window->height, cur->x, cur->y, 1, 1) && c->leftbtn)
+        if (check_colision(window->x, window->y, window->width, header ? HEADER_HEIGHT : window->height, x, y, 1, 1))
         {
             result = window;
         }
@@ -97,20 +93,86 @@ hideo_window_t *hideo_cursor_window(hideo_context_t *ctx, hideo_cursor_t *cur)
 
 void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
 {
+    static mouse_state_t old_state;
+    static mouse_state_t new_state;
 
-    sk_io_mouse_get_state(&mstate);
+    old_state = new_state;
+    sk_io_mouse_get_state(&new_state);
 
-    mstate.x = max(min(mstate.x, (int)ctx->width - 1), 0);
-    mstate.y = max(min(mstate.y, (int)ctx->height - 1), 0);
+    new_state.x = max(min(new_state.x, (int)ctx->width - 1), 0);
+    new_state.y = max(min(new_state.y, (int)ctx->height - 1), 0);
 
-    c->x = mstate.x;
-    c->y = mstate.y;
 
-    c->leftbtn = mstate.left;
-    c->rightbtn = mstate.right;
-    c->middlebtn = mstate.center;
+    sk_io_mouse_set_state(&new_state);
+    c->x = new_state.x;
+    c->y = new_state.y;
 
-    sk_io_mouse_set_state(&mstate);
+    c->rightbtn = new_state.right ? BTN_DOWN : BTN_UP;
+    c->middlebtn = new_state.middle ? BTN_DOWN : BTN_UP;
+
+    // Left button
+    if (new_state.left && !old_state.left)
+    {
+        c->leftbtn = BTN_PRESSED;
+    }
+    else if (!new_state.left && old_state.left)
+    {
+        c->leftbtn = BTN_RELEASED;
+    }
+    else
+    {
+        c->leftbtn = new_state.left ? BTN_DOWN : BTN_UP;
+    }
+
+    // Right button
+    if (new_state.right && !old_state.right)
+    {
+        c->rightbtn = BTN_PRESSED;
+    }
+    else if (!new_state.right && old_state.right)
+    {
+        c->rightbtn = BTN_RELEASED;
+    }
+    else
+    {
+        c->rightbtn = new_state.right ? BTN_DOWN : BTN_UP;
+    }
+
+
+    // middle button.
+    if (new_state.middle && !old_state.middle)
+    {
+        c->middlebtn = BTN_PRESSED;
+    }
+    else if (!new_state.middle && old_state.middle)
+    {
+        c->middlebtn = BTN_RELEASED;
+    }
+    else
+    {
+        c->middlebtn = new_state.middle ? BTN_DOWN : BTN_UP;
+    }
+
+    hideo_window_t * win = hideo_window_at(ctx, c->x, c->y, true);
+    
+    if (win != NULL)
+    {
+        if (c->leftbtn == BTN_PRESSED)
+        {
+            ctx->focus = win;
+            list_remove(ctx->windows, win);
+            list_pushback(ctx->windows, win);
+
+            ctx->dragstate.dragged = win;
+            ctx->dragstate.offx = win->x - c->x;
+            ctx->dragstate.offy = win->y - c->y;
+        }
+    }
+
+    if (ctx->dragstate.dragged != NULL && c->leftbtn == BTN_RELEASED)
+    {
+        ctx->dragstate.dragged = NULL;
+    }
 }
 
 void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
@@ -134,7 +196,9 @@ hideo_context_t *hideo_ctor(uint screen_width, uint screen_height)
     ctx->height = screen_height;
 
     ctx->screen = bitmap_ctor(screen_width, screen_height);
-    drawing_clear(ctx->screen, 0x0);
+
+    ctx->windows = list_alloc();
+    ctx->focus = NULL;
 
     return ctx;
 }
@@ -148,29 +212,32 @@ int main(int argc, char const *argv[])
 
     uint width, height = 0;
     sk_io_graphic_size(&width, &height);
-
-    winstack = list_alloc();
-    sk_lock_init(winstacklock);
+    printf("Graphic context created %dx%d", width, height);
 
     hideo_context_t *ctx = hideo_ctor(width, height);
 
     hideo_cursor_t cur = {.x = ctx->width / 2, .y = ctx->height / 2};
 
-    hideo_create_window("Hello, world!", 54, 96, 256, 128);
-    hideo_create_window("Good bye!", 300, 128, 256, 128);
+    hideo_create_window(ctx, "Hello, world!", 54, 96, 256, 128);
+    hideo_create_window(ctx, "Good bye!", 300, 128, 256, 128);
 
     while (1)
     {
         // Update
         hideo_cursor_update(ctx, &cur);
 
-        // Draw
-        drawing_clear(ctx->screen, 0xe5e5e5);
-
-        FOREACH(w, winstack)
+        FOREACH(w, ctx->windows)
         {
             hideo_window_t *window = (hideo_window_t *)w->value;
             hideo_window_update(ctx, window, &cur);
+        }
+
+        // Draw
+        drawing_clear(ctx->screen, 0xe5e5e5);
+
+        FOREACH(w, ctx->windows)
+        {
+            hideo_window_t *window = (hideo_window_t *)w->value;
             hideo_window_draw(ctx, window);
         }
 

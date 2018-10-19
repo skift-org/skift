@@ -374,7 +374,7 @@ class Target(object):
 
             # Link and output the result of the target
             return self.link(targets)
-    
+
     def clean(self):
         RMDIR(join(self.location, "bin"))
         RMDIR(join(self.location, "obj"))
@@ -568,7 +568,7 @@ def list_app(targets):
 
 
 def list_other(targets):
-    """List all everithing else."""
+    """List everithing else."""
 
     excluded = [TargetTypes.APP, TargetTypes.LIB]
     result = [i for i in targets if not targets[i].type in excluded]
@@ -578,7 +578,7 @@ def list_other(targets):
 def run_command(targets):
     """Start skiftOS in QEMU."""
     distrib(targets)
-    
+
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso")
 

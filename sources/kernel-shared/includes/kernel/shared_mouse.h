@@ -8,5 +8,5 @@ typedef PACKED(struct)
 
     bool left;
     bool right;
-    bool center;
+    bool middle;
 } mouse_state_t;

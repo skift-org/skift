@@ -37,7 +37,7 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     mouse.y -= offy;
     mouse.scroll = 0;
 
-    mouse.center = (packet0 >> 2) & 1;
+    mouse.middle = (packet0 >> 2) & 1;
     mouse.right = (packet0 >> 1) & 1;
     mouse.left = (packet0)&1;
 

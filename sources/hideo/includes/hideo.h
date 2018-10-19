@@ -3,13 +3,7 @@
 #include <skift/types.h>
 #include <skift/utils.h>
 
-typedef struct 
-{
-    uint width;
-    uint height;
-    
-    bitmap_t * screen;
-} hideo_context_t;
+#define HEADER_HEIGHT 32
 
 typedef PACKED(struct)
 {
@@ -55,3 +49,20 @@ typedef PACKED(struct)
 
 } hideo_keyboard_t;
 
+typedef struct 
+{
+    uint width;
+    uint height;
+
+    hideo_window_t *focus;
+    list_t *windows;
+
+    bitmap_t * screen;
+
+    struct 
+    {
+        hideo_window_t * dragged;
+        int offx;
+        int offy;
+    } dragstate;
+} hideo_context_t;

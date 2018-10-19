@@ -52,7 +52,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System check ----------------------------------------------------- */
     log("System check...");
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-        PANIC("Invalid multiboot magic number (0x%x)!", magic);
+        PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
 
     if (info->mem_lower + info->mem_upper > 256 * 1024)
     {

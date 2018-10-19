@@ -138,7 +138,6 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
         c->rightbtn = new_state.right ? BTN_DOWN : BTN_UP;
     }
 
-
     // middle button.
     if (new_state.middle && !old_state.middle)
     {
@@ -153,7 +152,7 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
         c->middlebtn = new_state.middle ? BTN_DOWN : BTN_UP;
     }
 
-    hideo_window_t * win = hideo_window_at(ctx, c->x, c->y, true);
+    hideo_window_t * win = hideo_window_at(ctx, c->x, c->y, false);
     
     if (win != NULL)
     {
@@ -163,9 +162,12 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
             list_remove(ctx->windows, win);
             list_pushback(ctx->windows, win);
 
-            ctx->dragstate.dragged = win;
-            ctx->dragstate.offx = win->x - c->x;
-            ctx->dragstate.offy = win->y - c->y;
+            if (check_colision(win->x, win->y, win->width, HEADER_HEIGHT, c->x, c->y, 1, 1))
+            {
+                ctx->dragstate.dragged = win;
+                ctx->dragstate.offx = win->x - c->x;
+                ctx->dragstate.offy = win->y - c->y;
+            }
         }
     }
 

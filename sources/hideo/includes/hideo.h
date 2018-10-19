@@ -32,6 +32,14 @@ typedef enum
     CURSOR_RESIZE_VERTICAL,
 } hideo_cursor_state_t;
 
+typedef enum
+{
+    WIN_EDGE_TOP,
+    WIN_EDGE_BOTTOM,
+    WIN_EDGE_LEFT,
+    WIN_EDGE_RIGHT,
+} hideo_window_edge_t;
+
 typedef PACKED(struct)
 {    
     int x;
@@ -65,4 +73,12 @@ typedef struct
         int offx;
         int offy;
     } dragstate;
+
+    struct 
+    {
+        hideo_window_t * resized;
+        hideo_window_edge_t edge;
+        bool horizontal;
+        bool vertical;
+    } resizestate;
 } hideo_context_t;

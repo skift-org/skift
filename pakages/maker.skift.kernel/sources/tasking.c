@@ -585,6 +585,7 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
 
         message_t *msg = MALLOC(message_t);
 
+        msg->id = messaging_id();
         msg->from = process_self();
         msg->to = to;
 

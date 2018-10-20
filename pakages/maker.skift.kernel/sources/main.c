@@ -54,9 +54,9 @@ void main(multiboot_info_t *info, s32 magic)
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
 
-    if (info->mem_lower + info->mem_upper > 256 * 1024)
+    if ((info->mem_lower + info->mem_upper) < 255 * 1024)
     {
-        PANIC("No enought memory!");
+        PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
 
     /* --- Setup cpu context ------------------------------------------------ */
@@ -78,7 +78,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Devices ---------------------------------------------------------- */
     log(LINE);
-    log("Initializing graphic context...");
+    log("Initializing device context...");
     setup(graphic);
     setup(mouse);
     setup(keyboard);
@@ -93,7 +93,14 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS init = process_exec("app/maker.hideo.compositor", NULL);
-    thread_waitproc(init);
+    if (init)
+    {
+        thread_waitproc(init);
+    }
+    else
+    {
+       PANIC("Init not found!"); 
+    }
 
     PANIC("The init process has return!");
 }

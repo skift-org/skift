@@ -44,10 +44,6 @@ hideo_window_t *hideo_create_window(hideo_context_t *ctx, char *title, int x, in
 
 void hideo_window_update(hideo_context_t *ctx, hideo_window_t *w, hideo_cursor_t *c)
 {
-    UNUSED(ctx);
-    UNUSED(w);
-    UNUSED(c);
-
     if (ctx->dragstate.dragged == w)
     {
         ctx->dragstate.dragged->x = c->x + ctx->dragstate.offx;

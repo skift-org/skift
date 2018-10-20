@@ -4,9 +4,9 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>540</x>
-      <y>410</y>
-      <w>580</w>
+      <x>840</x>
+      <y>500</y>
+      <w>340</w>
       <h>50</h>
     </coordinates>
     <panel_attributes>kernel
@@ -16,66 +16,74 @@ IPC, Process, Memory, Security</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>660</x>
-      <y>270</y>
+      <x>720</x>
+      <y>350</y>
       <w>100</w>
-      <h>120</h>
+      <h>190</h>
     </coordinates>
-    <panel_attributes>Driver</panel_attributes>
+    <panel_attributes>Driver
+--
+mouse
+keyboard
+framebuffer
+disk
+etc..</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>790</x>
-      <y>270</y>
+      <x>850</x>
+      <y>350</y>
       <w>100</w>
       <h>120</h>
     </coordinates>
-    <panel_attributes>Application
-bg=blue</panel_attributes>
+    <panel_attributes>Application</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>900</x>
-      <y>270</y>
-      <w>100</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>Application
-bg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1010</x>
-      <y>270</y>
+      <x>960</x>
+      <y>350</y>
       <w>100</w>
       <h>120</h>
     </coordinates>
     <panel_attributes>Application
-bg=blue</panel_attributes>
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>550</x>
-      <y>270</y>
+      <x>1070</x>
+      <y>350</y>
       <w>100</w>
       <h>120</h>
     </coordinates>
-    <panel_attributes>Server</panel_attributes>
+    <panel_attributes>Application
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>540</x>
-      <y>470</y>
+      <x>610</x>
+      <y>350</y>
+      <w>100</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Server
+--
+File system
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>560</y>
       <w>580</w>
       <h>30</h>
     </coordinates>
@@ -85,24 +93,23 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLPackage</id>
     <coordinates>
-      <x>780</x>
-      <y>240</y>
+      <x>840</x>
+      <y>320</y>
       <w>340</w>
       <h>160</h>
     </coordinates>
     <panel_attributes>User session
 --
-bg=gray
-fg=red</panel_attributes>
+bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLPackage</id>
     <coordinates>
-      <x>540</x>
-      <y>240</y>
+      <x>600</x>
+      <y>320</y>
       <w>230</w>
-      <h>160</h>
+      <h>230</h>
     </coordinates>
     <panel_attributes>System
 --
@@ -112,23 +119,36 @@ bg=orange</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>690</x>
-      <y>380</y>
-      <w>390</w>
+      <x>810</x>
+      <y>460</y>
+      <w>330</w>
       <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;70.0;370.0;70.0;370.0;10.0</additional_attributes>
+    <additional_attributes>10.0;70.0;310.0;70.0;310.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>860</x>
-      <y>380</y>
+      <x>920</x>
+      <y>460</y>
       <w>110</w>
-      <h>60</h>
+      <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0;90.0;40.0;90.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0;90.0;50.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>440</x>
+      <y>480</y>
+      <w>830</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=RING0
+fg=red</panel_attributes>
+    <additional_attributes>10.0;10.0;810.0;10.0</additional_attributes>
   </element>
 </diagram>

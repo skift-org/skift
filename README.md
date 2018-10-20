@@ -1,8 +1,7 @@
-<p align="center">
-    <img src="doc/logo/logo256.png">
-</p>
+<img src="doc/logo/logo128.png" align="right" />
 
-<h1 align="center">skiftOS</h1>
+# skiftOS
+> Build infrastructure, kernel, and core pakages of the skift Operating System
 
 **skiftOS** is a simple, handmade, build from scratch, 32bit operating system for intel x86 CPU.
 
@@ -10,13 +9,13 @@
 
 **skiftOS** provide a rich syscall interface for user application.
 
-## What **skiftOS** look like
+# What **skiftOS** look like
 
 <p align="center">
     <img src="doc/screenshots/Capture d’écran_2018-10-20_16-37-52.png">
 </p>
 
-## Build-it
+# Build-it
 
 ```sh
 # Build the operating system

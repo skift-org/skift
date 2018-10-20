@@ -1,0 +1,10 @@
+{
+    "id": "maker.skift.runtime",
+    "type": "lib",
+    "libs": [
+        "maker.skift.framework",
+        "kernel-shared"
+    ],
+    "includes" : ["com.skift.kernel"],
+    "strict": false
+}

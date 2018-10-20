@@ -1,1 +1,0 @@
-# hjerte - The skiftOS's kernel

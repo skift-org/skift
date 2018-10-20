@@ -1,8 +1,8 @@
 {
-    "id": "kernel",
+    "id": "maker.skift.kernel",
     "type": "kernel",
     "libs": [
-        "libc",
+        "maker.skift.framework",
         "kernel-shared"
     ]
 }

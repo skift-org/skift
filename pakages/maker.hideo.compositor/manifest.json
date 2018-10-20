@@ -1,0 +1,7 @@
+{
+    "id": "maker.hideo.compositor",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

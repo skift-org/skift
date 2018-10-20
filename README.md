@@ -18,46 +18,8 @@
 
 ```sh
 # Build the operating system
-./TOOLS buildall
+./SOSBS.py build-all
 
 # Run it in qemu
-./TOOLS run
+./SOSBS.py run
 ```
-
-## Features
-
-## Kernel
-
-- [x] IDT, GDT, IRQ and ISR
-- [x] Memory managment
-  - [x] Pagging
-- [ ] Tasking (wip)
-  - [ ] Sync (Wait, sleep, wakeup)
-  - [ ] IPC (Shared memory, mailbox, pipes?) (wip)
-  - [ ] ELF loader (wip)
-  - [ ] System calls (wip)
-  - [ ] Jump to user mode (wip)
-- [ ] File System
-  - [x] ATA pio driver
-  - [x] RAM disk
-  - [ ] Virtual file system (WIP)
-
-### Libraries
-
-- [ ] libc (wip)
-  - [ ] stdio.h
-  - [ ] stdlib.h
-- [ ] libgfx (wip)
-- [ ] libui
-
-### Application
-
-- [ ] Basic shell
-- [ ] coreutils (ls, cat, ...)
-- [ ] Compositor 
-- [ ] Panels
-- [ ] Desktop
-- [ ] Terminal
-- [ ] File browser
-- [ ] Text editor
-- [ ] Manual browser

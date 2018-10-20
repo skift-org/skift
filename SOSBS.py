@@ -194,15 +194,16 @@ class Target(object):
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
         self.deps = data["libs"] if "libs" in data else []
+        self.incl = data["includes"] if "includes" in data else []
         self.strict = data["strict"] if "strict" in data else True
 
         self.builded = False
 
-    def get_dependancies_internal(self, targets, found=None):
+    def get_dependancies_internal(self, targets, found=None, with_includes = False):
         if found == None:
             found = []
 
-        for d in self.deps:
+        for d in self.deps + (self.incl if with_includes else []):
             if d in targets:
                 dep = targets[d]
 
@@ -500,7 +501,7 @@ def distrib(targets):
 
 ## --- BOOTDISK ------------------------------------------------------------- ##
 
-    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["kernel"].get_output(), "build/ramdisk.tar"]):
+    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["maker.skift.kernel"].get_output(), "build/ramdisk.tar"]):
         print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
         bootdir = MKDIR("build/bootdisk/boot")
@@ -509,7 +510,7 @@ def distrib(targets):
         COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
-        COPY(targets["kernel"].get_output(), join(bootdir, "kernel.bin"))
+        COPY(targets["maker.skift.kernel"].get_output(), join(bootdir, "kernel.bin"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
         COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
@@ -608,7 +609,7 @@ def main(argc, argv):
     """
     Entry point of the SOSBS toolset.
     """
-    targets = list_targets("sources")
+    targets = list_targets("pakages")
 
     # Check and build the cross compiler if the user say 'YES'.
     if not crosscompiler_check():

@@ -197,7 +197,7 @@ void tasking_setup()
     threads = list_alloc();
     processes = list_alloc();
 
-    kernel_process = process_create("kernel", 0);
+    kernel_process = process_create("maker.skift.kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
 
     // Set the correct stack for the kernel main stack

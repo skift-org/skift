@@ -1,8 +1,0 @@
-{
-    "id": "test-app",
-    "type": "app",
-    "libs": [
-        "libu"
-    ],
-    "strict": false
-}

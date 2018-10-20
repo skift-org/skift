@@ -47,7 +47,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     //graphic_early_setup(1366, 768);
-    graphic_early_setup(960, 720);
+    graphic_early_setup(800, 600);
 
     /* --- System check ----------------------------------------------------- */
     log("System check...");

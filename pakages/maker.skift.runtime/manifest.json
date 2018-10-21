@@ -3,7 +3,7 @@
     "type": "lib",
     "libs": [
         "maker.skift.framework",
-        "kernel-shared"
+        "maker.skift.protocol"
     ],
     "includes" : ["com.skift.kernel"],
     "strict": false

@@ -21,11 +21,13 @@
 
 int PID = 0;
 int TID = 0;
+int MID = 1;
 
 uint ticks = 0;
 
 list_t *threads;
 list_t *processes;
+list_t *channels;
 
 #define THREAD_FREE(thread)                                    \
     {                                                          \
@@ -119,24 +121,35 @@ process_t *alloc_process(const char *name, int flags)
     return process;
 }
 
-void kill_thread(thread_t *thread)
+channel_t * alloc_channel(const char * name)
 {
-    list_remove(thread->process->threads, thread);
+    channel_t *channel = MALLOC(channel_t);
 
-    if (thread->process->threads->count == 0)
-    {
-        PROCESS_FREE(thread->process);
-    }
+    channel->subscribers = list_alloc();
+    strncpy(channel->name, name, CHANNAME_SIZE);
 
-    THREAD_FREE(thread);
+    return channel;
 }
 
-void kill_process(process_t *process)
+message_t * alloc_message(const char * name, void * payload, uint size, uint flags)
 {
-    FOREACH(i, process->threads){
-        THREAD_FREE(((thread_t *)i->value))}
+    message_t * message = MALLOC(message_t);
 
-    PROCESS_FREE(process);
+    if (payload != NULL && size > 0)
+    {
+        message->size = min(MSGPAYLOAD_SIZE, size);
+        message->payload = malloc(message->size);
+        memcpy(message->payload, payload, size);
+    }
+    else
+    {
+        message->size = 0;
+        message->payload = NULL;
+    }
+
+    strncpy(message->name, name, CHANNAME_SIZE);
+
+    return message;
 }
 
 thread_t *thread_get(THREAD thread)
@@ -154,13 +167,25 @@ thread_t *thread_get(THREAD thread)
 
 process_t *process_get(PROCESS process)
 {
-
     FOREACH(i, processes)
     {
         process_t *p = (process_t *)i->value;
 
         if (p->id == process)
             return p;
+    }
+
+    return NULL;
+}
+
+channel_t *channel_get(const char * channel)
+{
+    FOREACH(i, channels)
+    {
+        channel_t *c = (channel_t *)i->value;
+
+        if (strcmp(channel, c->name) == 0)
+            return c;
     }
 
     return NULL;
@@ -559,7 +584,8 @@ void process_free(uint addr, uint count)
 
 /* --- Messaging ------------------------------------------------------------ */
 
-uint MSG_ID = 0;
+uint MSG_ID = 1;
+
 
 uint messaging_id()
 {
@@ -570,6 +596,11 @@ uint messaging_id()
     });
 
     return id;
+}
+
+void messaging_setup()
+{
+
 }
 
 int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
@@ -594,7 +625,7 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
             return 1;
         }
 
-        strncpy(&msg->name[0], name, MSG_MAXNAME);
+        strncpy(&msg->name[0], name, MSGNAME_SIZE);
 
         msg->payload = malloc(size);
 
@@ -615,19 +646,30 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
     return 0;
 }
 
-/* TODO Broadcasting
-int messaging_broadcast(const char *name, void *payload, uint size, uint flags)
+int messaging_broadcast(const char * channel, const char * name, void * payload, uint size, uint flags)
 {
+
 }
 
-int messaging_receive(message_t *msg)
+int messaging_receive(message_t * msg)
 {
+
 }
 
-int messageing_accept_payload(message_t *msg)
+int messaging_payload(void* buffer)
 {
+
 }
-*/
+
+int messaging_subscribe(const char * channel)
+{
+
+}
+
+int messaging_unsubscribe(const char * channel)
+{
+
+}
 
 /* --- Sheduler ------------------------------------------------------------- */
 
@@ -690,6 +732,7 @@ thread_t *get_next_task()
             if (thread->process->inbox->count > 0)
             {
                 thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode;
                 log("Thread %d finish waiting for incoming message.", thread->id);
             }
             break;
@@ -723,8 +766,8 @@ esp_t shedule(esp_t esp, context_t *context)
 
     // Load the new context
     running = get_next_task();
-    set_kernel_stack((uint)running->stack + STACK_SIZE);
 
+    set_kernel_stack((uint)running->stack + STACK_SIZE);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
 

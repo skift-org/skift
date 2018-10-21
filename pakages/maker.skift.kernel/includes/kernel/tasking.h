@@ -10,6 +10,7 @@
 #include "kernel/paging.h"
 #include "kernel/shared_protocole.h"
 
+#define CHANNAME_SIZE 128
 #define PROCNAME_SIZE 128
 #define STACK_SIZE 0x4000
 
@@ -127,3 +128,18 @@ void process_free(uint addr, uint count); // Free perviously allocated memory.
 PROCESS process_exec(const char *filename, const char **argv);
 
 /* --- Messaging ------------------------------------------------------------ */
+
+typedef struct 
+{
+    const char name[CHANNAME_SIZE];
+    list_t * subscribers;
+} channel_t;
+
+int messaging_send(PROCESS to, const char * name, void * payload, uint size, uint flags);
+int messaging_broadcast(const char * channel, const char * name, void * payload, uint size, uint flags);
+
+int messaging_receive(message_t * msg);
+int messaging_payload(void* buffer);
+
+int messaging_subscribe(const char * channel);
+int messaging_unsubscribe(const char * channel);

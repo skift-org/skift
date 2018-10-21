@@ -6,7 +6,7 @@
 
 #include <skift/types.h>
 #include <skift/utils.h>
-#include <skift/sllist.h>
+#include <skift/list.h>
 #include <skift/path.h>
 
 #define FS_PATH_SEPARATOR '/'
@@ -47,8 +47,8 @@ typedef struct directory
 {
     char name[PATH_FILE_NAME_SIZE];
 
-    sllist_t *files;
-    sllist_t *directories;
+    list_t *files;
+    list_t *directories;
 
     struct directory *parent;
 } directory_t;

@@ -24,6 +24,7 @@
         "types.h": "c",
         "stddef.h": "c",
         "graphic.h": "c",
-        "tasking.h": "c"
+        "tasking.h": "c",
+        "filesystem.h": "c"
     }
 }

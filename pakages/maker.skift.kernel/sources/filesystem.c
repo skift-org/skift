@@ -2,12 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <stdlib.h>
 #include <string.h>
 #include "kernel/logger.h"
 #include "kernel/filesystem.h"
 
 directory_t *root = NULL;
-
 directory_t *alloc_directorie(const char *name);
 
 void filesystem_setup()
@@ -34,9 +34,9 @@ directory_t *filesystem_get_directory(directory_t *relative, const char *path)
         }
         else
         {
-            SLL_FOREARCH(i, current->directories)
+            FOREACH(i, current->directories)
             {
-                directory_t *d = (directory_t *)i->data;
+                directory_t *d = (directory_t *)i->value;
                 if (strcmp(buffer, d->name) == 0)
                     current = d;
             }
@@ -56,9 +56,9 @@ file_t *filesystem_get_file(directory_t *relative, const char *path)
     {
         directory_t *dir = filesystem_get_directory(relative, dir_name);
 
-        SLL_FOREARCH(i, dir->files)
+        FOREACH(i, dir->files)
         {
-            file_t *f = (file_t *)i->data;
+            file_t *f = (file_t *)i->value;
             if (strcmp(file_name, f->name) == 0)
                 file = f;
         }
@@ -66,41 +66,6 @@ file_t *filesystem_get_file(directory_t *relative, const char *path)
 
     free(dir_name);
     return file;
-}
-
-/* --- Dump ---------------------------------------------------------------- */
-
-void dump_directorie(directory_t *current, int depth, char *buffer)
-{
-
-    for (int i = 0; i < depth; i++)
-    {
-        printf("\t");
-    }
-
-    printf("%s/\n", current->name);
-
-    for (size_t i = 0; directory_get_directories(current, buffer, i); i++)
-    {
-        dump_directorie(filesystem_get_directory(current, buffer), depth + 1, buffer);
-    }
-
-    for (size_t i = 0; (directory_get_files(current, buffer, i)); i++)
-    {
-        for (int y = 0; y < depth + 1; y++)
-        {
-            printf("\t");
-        }
-
-        printf("%s\n", buffer);
-    }
-}
-
-void filesystem_dump(directory_t *relative, const char *path)
-{
-    char *buffer = malloc(PATH_FILE_NAME_SIZE);
-    dump_directorie(filesystem_get_directory(relative, path), 0, buffer);
-    free(buffer);
 }
 
 /* === Directories ========================================================== */
@@ -111,8 +76,8 @@ directory_t *alloc_directorie(const char *name)
 
     dir->name[0] = '\0';
     strncpy((char *)&dir->name, name, PATH_FILE_NAME_SIZE);
-    dir->directories = sll_new();
-    dir->files = sll_new();
+    dir->directories = list_alloc();
+    dir->files = list_alloc();
 
     return dir;
 }
@@ -132,7 +97,7 @@ int directory_create(directory_t *relative, const char *path, int flags)
         directory_t *parent = filesystem_get_directory(relative, dir_path);
         dir = alloc_directorie(dir_name);
         dir->parent = parent;
-        sll_add((u32)dir, parent->directories);
+        list_pushback(parent->directories, dir);
     }
 
     free(dir_path);
@@ -187,11 +152,11 @@ int directory_get_files(directory_t *directory, char *name, int index)
 {
     name[0] = '\0';
 
-    SLL_FOREARCH(i, directory->files)
+    FOREACH(i, directory->files)
     {
         if (index == 0)
         {
-            strcpy(name, ((file_t *)i->data)->name);
+            strcpy(name, ((file_t *)i->value)->name);
             return 1;
         }
 
@@ -205,11 +170,11 @@ int directory_get_directories(directory_t *directory, char *name, int index)
 {
     name[0] = '\0';
 
-    SLL_FOREARCH(i, directory->directories)
+    FOREACH(i, directory->directories)
     {
         if (index == 0)
         {
-            strcpy(name, ((directory_t *)i->data)->name);
+            strcpy(name, ((directory_t *)i->value)->name);
             return 1;
         }
 
@@ -244,7 +209,7 @@ int file_create(directory_t *relative, const char *path, filesystem_t *fs, int d
         file = alloc_file(file_name);
         file->parent = parent;
 
-        sll_add((u32)file, parent->files);
+        list_pushback(parent->files, file);
 
         file->fs = fs;
         file->device = device;

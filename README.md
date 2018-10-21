@@ -12,9 +12,7 @@
 
 # What **skiftOS** look like
 
-<p align="center">
-    <img src="doc/screenshots/Capture d’écran_2018-10-20_16-37-52.png">
-</p>
+<img src="doc/screenshots/Capture d’écran_2018-10-20_16-37-52.png" align="center" />
 
 # Build-it
 

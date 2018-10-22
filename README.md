@@ -6,9 +6,13 @@
 
 **skiftOS** is a simple, handmade, build from scratch, 32bit operating system for intel x86 CPU.
 
+**skiftOS** feature the *hjerte* microkernel.
+
 **skiftOS** support virtual memory, multi processing with threads, and filesystem.
 
 **skiftOS** provide a rich syscall interface for user application.
+
+**skiftOS** is **NOT** a POSIX system.
 
 # What **skiftOS** look like
 

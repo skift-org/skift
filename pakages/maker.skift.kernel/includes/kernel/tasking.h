@@ -137,7 +137,7 @@ PROCESS process_exec(const char *filename, const char **argv);
 
 typedef struct 
 {
-    const char name[CHANNAME_SIZE];
+    char name[CHANNAME_SIZE];
     list_t * subscribers;
 } channel_t;
 
@@ -145,7 +145,7 @@ int messaging_send(PROCESS to, const char * name, void * payload, uint size, uin
 int messaging_broadcast(const char * channel, const char * name, void * payload, uint size, uint flags);
 
 int messaging_receive(message_t * msg);
-int messaging_payload(void* buffer);
+int messaging_payload(void* buffer, uint size);
 
 int messaging_subscribe(const char * channel);
 int messaging_unsubscribe(const char * channel);

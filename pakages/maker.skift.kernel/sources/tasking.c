@@ -30,25 +30,6 @@ list_t *threads;
 list_t *processes;
 list_t *channels;
 
-#define THREAD_FREE(thread)                                    \
-    {                                                          \
-        list_remove(threads, thread);                          \
-        list_remove(thread->process->threads, (void *)thread); \
-        free(thread->stack);                                   \
-        free(thread);                                          \
-    }
-
-#define PROCESS_FREE(process)                \
-    {                                        \
-        if (process->pdir != memory_kpdir()) \
-        {                                    \
-            memory_free_pdir(process->pdir); \
-        }                                    \
-                                             \
-        list_free(process->threads);         \
-        free(process);                       \
-    }
-
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
     thread_t *thread = MALLOC(thread_t);
@@ -149,6 +130,7 @@ message_t *alloc_message(int id, const char *name, void *payload, uint size, uin
     }
 
     message->id = id;
+    message->flags = flags;
     strncpy(message->name, name, CHANNAME_SIZE);
 
     return message;
@@ -638,9 +620,10 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
     return id;
 }
 
-int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
-{
-}
+// TODO: broadcasting
+// int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
+// {
+// }
 
 int messaging_receive(message_t *msg)
 {
@@ -661,11 +644,11 @@ int messaging_receive(message_t *msg)
     return 0;
 }
 
-int messaging_payload(void *buffer, int size)
+int messaging_payload(void *buffer, uint size)
 {
     message_t *incoming = running->messageinfo.message;
 
-    if (incoming != NULL && incoming->size != NULL && incoming->payload != NULL)
+    if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {
         memcpy(buffer, incoming->payload, min(size, incoming->size));
         return 1;
@@ -674,13 +657,14 @@ int messaging_payload(void *buffer, int size)
     return 0;
 }
 
-int messaging_subscribe(const char *channel)
-{
-}
-
-int messaging_unsubscribe(const char *channel)
-{
-}
+// TODO: Channels
+// int messaging_subscribe(const char *channel)
+// {
+// }
+// 
+// int messaging_unsubscribe(const char *channel)
+// {
+// }
 
 /* --- Sheduler ------------------------------------------------------------- */
 
@@ -750,7 +734,7 @@ thread_t *get_next_task()
                 }
 
                 message_t * message;
-                list_pop(thread->process->inbox, &message);
+                list_pop(thread->process->inbox, (void**)&message);
                 thread->messageinfo.message = message;
                 log("Thread %d recivied message ID=%d from %d to %d.", thread->id,  message->id,  message->from, message->to);
             }

@@ -238,8 +238,12 @@ void thread_yield()
 // Look like gcc like to break this functions XD
 void thread_hold()
 {
+    thread_yield(); // Let's try to save some clock cicle
+
     while (running->state != THREAD_RUNNING)
+    {
         hlt();
+    }
 }
 
 #pragma GCC pop_options
@@ -285,10 +289,10 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
 void thread_sleep(int time)
 {
-    sk_atomic_begin();
-    running->state = THREAD_SLEEP;
-    running->sleepinfo.wakeuptick = ticks + time;
-    sk_atomic_end();
+    ATOMIC({
+        running->state = THREAD_SLEEP;
+        running->sleepinfo.wakeuptick = ticks + time;
+    });
 
     thread_hold();
 }
@@ -421,12 +425,12 @@ PROCESS process_self()
 
 PROCESS process_create(const char *name, int flags)
 {
-    sk_atomic_begin();
+    process_t *process;
 
-    process_t *process = alloc_process(name, flags);
-    list_pushback(processes, process);
-
-    sk_atomic_end();
+    ATOMIC({
+        process = alloc_process(name, flags);
+        list_pushback(processes, process);
+    });
 
     log("Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
 
@@ -563,13 +567,11 @@ int process_unmap(PROCESS p, uint addr, uint count)
 uint process_alloc(uint count)
 {
     uint addr = memory_alloc(running->process->pdir, count, 1);
-    log("Process alloc (COUNT=%x, ADDR=%x)", count, addr);
     return addr;
 }
 
 void process_free(uint addr, uint count)
 {
-    log("Process free");
     return memory_free(running->process->pdir, addr, count, 1);
 }
 
@@ -609,13 +611,11 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
 int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
 {
-    int id;
+    int id = 0;
 
-    sk_atomic_begin();
-    {
+    ATOMIC({
         id = messaging_send_internal(process_self(), to, messaging_id(), name, payload, size, flags);
-    }
-    sk_atomic_end();
+    });
 
     return id;
 }
@@ -625,7 +625,7 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
 // {
 // }
 
-int messaging_receive(message_t *msg)
+status_t messaging_receive(message_t *msg)
 {
     ATOMIC({
         running->state = THREAD_WAIT_MESSAGE;
@@ -638,30 +638,43 @@ int messaging_receive(message_t *msg)
     if (incoming != NULL)
     {
         memcpy(msg, incoming, sizeof(message_t));
-        return 1;
+        return SUCCESS;
     }
 
-    return 0;
+    return FAILURE;
 }
 
-int messaging_payload(void *buffer, uint size)
+status_t messaging_payload(void *buffer, uint size)
 {
     message_t *incoming = running->messageinfo.message;
 
     if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {
         memcpy(buffer, incoming->payload, min(size, incoming->size));
-        return 1;
+        return SUCCESS;
     }
 
-    return 0;
+    return FAILURE;
 }
 
-// TODO: Channels
-// int messaging_subscribe(const char *channel)
-// {
-// }
-// 
+status_t messaging_subscribe(const char *channel)
+{
+    sk_atomic_begin();
+    {
+        channel_t *c = channel_get(channel);
+
+        if (c == NULL)
+        {
+            c = alloc_channel(channel);
+            list_pushback(channels, c);
+        }
+
+        list_pushback(c->subscribers, running->process);
+    }
+    sk_atomic_end();
+    return SUCCESS;
+}
+//
 // int messaging_unsubscribe(const char *channel)
 // {
 // }
@@ -733,10 +746,10 @@ thread_t *get_next_task()
                     free_message(thread->messageinfo.message);
                 }
 
-                message_t * message;
-                list_pop(thread->process->inbox, (void**)&message);
+                message_t *message;
+                list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                log("Thread %d recivied message ID=%d from %d to %d.", thread->id,  message->id,  message->from, message->to);
+                log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

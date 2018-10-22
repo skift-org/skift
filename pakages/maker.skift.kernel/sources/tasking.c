@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,7 +25,7 @@ int TID = 0;
 int MID = 1;
 
 uint ticks = 0;
-
+list_t *threads;
 list_t *threads;
 list_t *processes;
 list_t *channels;
@@ -121,7 +122,7 @@ process_t *alloc_process(const char *name, int flags)
     return process;
 }
 
-channel_t * alloc_channel(const char * name)
+channel_t *alloc_channel(const char *name)
 {
     channel_t *channel = MALLOC(channel_t);
 
@@ -131,9 +132,9 @@ channel_t * alloc_channel(const char * name)
     return channel;
 }
 
-message_t * alloc_message(const char * name, void * payload, uint size, uint flags)
+message_t *alloc_message(int id, const char *name, void *payload, uint size, uint flags)
 {
-    message_t * message = MALLOC(message_t);
+    message_t *message = MALLOC(message_t);
 
     if (payload != NULL && size > 0)
     {
@@ -147,9 +148,16 @@ message_t * alloc_message(const char * name, void * payload, uint size, uint fla
         message->payload = NULL;
     }
 
+    message->id = id;
     strncpy(message->name, name, CHANNAME_SIZE);
 
     return message;
+}
+
+void free_message(message_t *msg)
+{
+    free(msg->payload);
+    free(msg);
 }
 
 thread_t *thread_get(THREAD thread)
@@ -178,7 +186,7 @@ process_t *process_get(PROCESS process)
     return NULL;
 }
 
-channel_t *channel_get(const char * channel)
+channel_t *channel_get(const char *channel)
 {
     FOREACH(i, channels)
     {
@@ -221,6 +229,7 @@ void tasking_setup()
     waiting = list_alloc();
     threads = list_alloc();
     processes = list_alloc();
+    channels = list_alloc();
 
     kernel_process = process_create("maker.skift.kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
@@ -584,91 +593,93 @@ void process_free(uint addr, uint count)
 
 /* --- Messaging ------------------------------------------------------------ */
 
-uint MSG_ID = 1;
-
-
 uint messaging_id()
 {
     uint id;
 
     ATOMIC({
-        id = MSG_ID++;
+        id = MID++;
     });
 
     return id;
 }
 
-void messaging_setup()
+int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
+    process_t *process = process_get(to);
 
+    if (process == NULL)
+    {
+        return 0;
+    }
+
+    message_t *message = alloc_message(id, name, payload, size, flags);
+
+    message->from = process_self();
+    message->to = to;
+
+    list_pushback(process->inbox, (void *)message);
+
+    log("Message ID=%d from %d send to %d.", id, from, to);
+
+    return id;
 }
 
 int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
 {
+    int id;
+
     sk_atomic_begin();
     {
-        process_t *process = process_get(to);
-
-        if (process == NULL)
-        {
-            return -1;
-        }
-
-        message_t *msg = MALLOC(message_t);
-
-        msg->id = messaging_id();
-        msg->from = process_self();
-        msg->to = to;
-
-        if (msg == NULL)
-        {
-            return 1;
-        }
-
-        strncpy(&msg->name[0], name, MSGNAME_SIZE);
-
-        msg->payload = malloc(size);
-
-        if (msg->payload == NULL)
-        {
-            free(msg);
-            return 1;
-        }
-
-        memcpy(msg->payload, payload, size);
-
-        msg->flags = flags;
-
-        list_pushback(process->inbox, (void*)msg);
+        id = messaging_send_internal(process_self(), to, messaging_id(), name, payload, size, flags);
     }
     sk_atomic_end();
+
+    return id;
+}
+
+int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
+{
+}
+
+int messaging_receive(message_t *msg)
+{
+    ATOMIC({
+        running->state = THREAD_WAIT_MESSAGE;
+    });
+
+    thread_hold();
+
+    message_t *incoming = running->messageinfo.message;
+
+    if (incoming != NULL)
+    {
+        memcpy(msg, incoming, sizeof(message_t));
+        return 1;
+    }
 
     return 0;
 }
 
-int messaging_broadcast(const char * channel, const char * name, void * payload, uint size, uint flags)
+int messaging_payload(void *buffer, int size)
 {
+    message_t *incoming = running->messageinfo.message;
 
+    if (incoming != NULL && incoming->size != NULL && incoming->payload != NULL)
+    {
+        memcpy(buffer, incoming->payload, min(size, incoming->size));
+        return 1;
+    }
+
+    return 0;
 }
 
-int messaging_receive(message_t * msg)
+int messaging_subscribe(const char *channel)
 {
-
 }
 
-int messaging_payload(void* buffer)
+int messaging_unsubscribe(const char *channel)
 {
-
-}
-
-int messaging_subscribe(const char * channel)
-{
-
-}
-
-int messaging_unsubscribe(const char * channel)
-{
-
 }
 
 /* --- Sheduler ------------------------------------------------------------- */
@@ -732,8 +743,16 @@ thread_t *get_next_task()
             if (thread->process->inbox->count > 0)
             {
                 thread->state = THREAD_RUNNING;
-                thread->waitinfo.outcode;
-                log("Thread %d finish waiting for incoming message.", thread->id);
+
+                if (thread->messageinfo.message != NULL)
+                {
+                    free_message(thread->messageinfo.message);
+                }
+
+                message_t * message;
+                list_pop(thread->process->inbox, &message);
+                thread->messageinfo.message = message;
+                log("Thread %d recivied message ID=%d from %d to %d.", thread->id,  message->id,  message->from, message->to);
             }
             break;
         }
@@ -743,6 +762,7 @@ thread_t *get_next_task()
 
         if (thread != NULL && thread->state != THREAD_RUNNING)
         {
+            // The thread is not a running thread, pushing it back...
             list_pushback(waiting, thread);
         }
 

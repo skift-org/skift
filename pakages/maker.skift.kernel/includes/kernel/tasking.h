@@ -65,6 +65,11 @@ typedef struct
 
 typedef struct
 {
+    message_t * message;
+} wait_message_t;
+
+typedef struct
+{
     uint wakeuptick;
 } sleep_info_t;
 
@@ -81,6 +86,7 @@ typedef struct
 
     wait_info_t waitinfo;
     sleep_info_t sleepinfo;
+    wait_message_t messageinfo;
 
     void *exit_value;
 } thread_t;

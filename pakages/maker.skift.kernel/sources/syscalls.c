@@ -15,7 +15,7 @@ typedef int (*syscall_t)(int, int, int, int, int);
 int sys_not_implemented()
 {
     log("Not implemented syscall!");
-    return -1;
+    return 0;
 }
 
 /* --- Process -------------------------------------------------------------- */
@@ -71,6 +71,37 @@ int sys_thread_self()
     return thread_self();
 }
 
+/* --- Messaging ------------------------------------------------------------ */
+int sys_messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
+{
+    return messaging_send(to, name, payload, size, flags);
+}
+
+int sys_messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
+{
+    return messaging_broadcast(channel, name, payload, size, flags);
+}
+
+int sys_messaging_receive(message_t *msg)
+{
+    return messaging_receive(msg);
+}
+
+int sys_messaging_payload(void *buffer, uint size)
+{
+    return messaging_payload(buffer, size);
+}
+
+int sys_messaging_subscribe(const char *channel)
+{
+    return messaging_subscribe(channel);
+}
+
+int sys_messaging_unsubscribe(const char *channel)
+{
+    return sys_messaging_unsubscribe(channel);
+}
+
 /* --- System I/O ----------------------------------------------------------- */
 
 int sys_io_print(const char *msg)
@@ -80,13 +111,13 @@ int sys_io_print(const char *msg)
     return 0;
 }
 
-int sys_io_mouse_get_state(mouse_state_t* state)
+int sys_io_mouse_get_state(mouse_state_t *state)
 {
     mouse_get_state(state);
     return 0;
 }
 
-int sys_io_mouse_set_state(mouse_state_t* state)
+int sys_io_mouse_set_state(mouse_state_t *state)
 {
     mouse_set_state(state);
     return 0;
@@ -130,6 +161,13 @@ static int (*syscalls[])() =
         [SYS_THREAD_WAIT] = sys_not_implemented /* NOT IMPLEMENTED */,
         [SYS_THREAD_WAITPROC] = sys_not_implemented /* NOT IMPLEMENTED */,
 
+        [SYS_MSG_SEND] = sys_messaging_send,
+        [SYS_MSG_BROADCAST] = sys_messaging_broadcast,
+        [SYS_MSG_RECEIVE] = sys_messaging_receive,
+        [SYS_MSG_PAYLOAD] = sys_messaging_payload,
+        [SYS_MSG_SUBSCRIBE] = sys_messaging_subscribe,
+        [SYS_MSG_UNSUBSCRIBE] = sys_messaging_unsubscribe,
+
         [SYS_IO_PRINT] = sys_io_print,
         [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
 
@@ -163,8 +201,16 @@ static int (*syscalls[])() =
 
 void syscall_dispatcher(context_t *context)
 {
-    //log("syscall %d (EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d).", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
-
-    syscall_t syscall = (syscall_t)syscalls[context->eax];
-    context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    int syscall_number = context->eax;
+    if (syscall_number >= 0 && syscall_number < SYSCALL_COUNT)
+    {
+        syscall_t syscall = (syscall_t)syscalls[syscall_number];
+        context->eax = syscall(context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    }
+    else
+    {
+        log("Unknow syscall ID=%d call by PROCESS=%d.", syscall_number, process_self());
+        log("EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        context->eax = 0;
+    }
 }

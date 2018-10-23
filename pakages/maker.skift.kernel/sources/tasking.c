@@ -88,6 +88,7 @@ process_t *alloc_process(const char *name, int flags)
     strncpy(process->name, name, PROCNAME_SIZE);
     process->flags = flags;
     process->threads = list_alloc();
+    process->inbox = list_alloc();
 
     if (flags & TASK_USER)
     {
@@ -590,6 +591,8 @@ uint messaging_id()
 
 int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
+    log("Sending message ID=%d from %d send to %d.", id, from, to);
+
     process_t *process = process_get(to);
 
     if (process == NULL)
@@ -603,8 +606,6 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
     message->to = to;
 
     list_pushback(process->inbox, (void *)message);
-
-    log("Message ID=%d from %d send to %d.", id, from, to);
 
     return id;
 }
@@ -621,9 +622,28 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
 }
 
 // TODO: broadcasting
-// int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
-// {
-// }
+int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
+{
+    int id = 0;
+
+    sk_atomic_begin();
+
+    channel_t *c = channel_get(channel);
+
+    if (c != NULL)
+    {
+        id = messaging_id();
+
+        FOREACH(p, c->subscribers)
+        {
+            messaging_send_internal(process_self(), ((process_t *)p->value)->id, id, name, payload, size, flags);
+        }
+    }
+
+    sk_atomic_end();
+
+    return id;
+}
 
 status_t messaging_receive(message_t *msg)
 {
@@ -672,12 +692,25 @@ status_t messaging_subscribe(const char *channel)
         list_pushback(c->subscribers, running->process);
     }
     sk_atomic_end();
+
     return SUCCESS;
 }
-//
-// int messaging_unsubscribe(const char *channel)
-// {
-// }
+
+status_t messaging_unsubscribe(const char *channel)
+{
+    sk_atomic_begin();
+    {
+        channel_t *c = channel_get(channel);
+
+        if (c != NULL)
+        {
+            list_remove(c->subscribers, running->process);
+        }
+    }
+    sk_atomic_end();
+
+    return SUCCESS;
+}
 
 /* --- Sheduler ------------------------------------------------------------- */
 

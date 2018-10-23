@@ -152,5 +152,14 @@ status_t messaging_unsubscribe(const char * channel);
 
 /* --- Shared memory -------------------------------------------------------- */
 
+typedef struct 
+{
+    
+} shared_memory_t;
 
 /* --- Stream --------------------------------------------------------------- */
+
+typedef struct 
+{
+    
+} stream_t;

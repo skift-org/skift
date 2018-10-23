@@ -31,6 +31,15 @@ typedef enum SYSCALL_CODE
     SYS_THREAD_WAIT,
     SYS_THREAD_WAITPROC,
 
+    // Messaging
+    SYS_MSG_SEND,
+    SYS_MSG_BROADCAST,
+    SYS_MSG_RECEIVE,
+    SYS_MSG_PAYLOAD,
+
+    SYS_MSG_SUBSCRIBE,
+    SYS_MSG_UNSUBSCRIBE,
+
 /* --- I/O ------------------------------------------------------------------ */
 
     SYS_IO_PRINT,
@@ -74,5 +83,9 @@ typedef enum SYSCALL_CODE
     SYS_DIR_CLOSE,
     
     SYS_DIR_LISTFILE,
-    SYS_DIR_LISTDIR
+    SYS_DIR_LISTDIR,
+
+////////////////////////////////////////////////////////////////////////////////
+
+    SYSCALL_COUNT
 } syscall_code_t;

@@ -93,9 +93,16 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS init = process_exec("app/maker.hideo.compositor", NULL);
+
     if (init)
     {
-        thread_waitproc(init);
+        //thread_waitproc(init);
+
+        message_t msg;
+        while(messaging_receive(&msg) == SUCCESS)
+        {
+            log("Recieved message ID=%d from PROCESS=%d: %s.", msg.id, msg.from, msg.name);
+        }
     }
     else
     {

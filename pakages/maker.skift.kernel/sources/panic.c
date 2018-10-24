@@ -39,7 +39,7 @@ void __panic(const string file, const string function, const int line, context_t
 
     printf("\n--- !!! ------------------------------------------------------------------------\n");
 
-    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t", witty_comments[ticks % (9 + 4)]);
+    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t", witty_comments[ticks % (14)]);
 
     vprintf(message, va);
     printf("\n\tat %s %s() ln%d", file, function, line);
@@ -47,7 +47,6 @@ void __panic(const string file, const string function, const int line, context_t
     printf("\n");
     printf("\n\tDiagnostic:");
     printf("\n\tThe system was running for %d tick.\n", ticks);
-
 
     if (context != NULL)
     {

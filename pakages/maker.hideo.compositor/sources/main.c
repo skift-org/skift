@@ -13,7 +13,6 @@
 #include <skift/io.h>
 #include <skift/list.h>
 #include <skift/lock.h>
-#include <skift/messaging.h>
 
 #include "hideo.h"
 
@@ -284,9 +283,6 @@ int main(int argc, char const *argv[])
 {
     UNUSED(argc);
     UNUSED(argv);
-
-    sk_io_print("Hideo compositor and window manager");
-    sk_messaging_send(0, "Hello from userspace!", NULL, 0, 0);
 
     uint width, height = 0;
     sk_io_graphic_size(&width, &height);

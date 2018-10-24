@@ -96,18 +96,11 @@ void main(multiboot_info_t *info, s32 magic)
 
     if (init)
     {
-        //thread_waitproc(init);
-
-        message_t msg;
-        while(messaging_receive(&msg) == SUCCESS)
-        {
-            log("Recieved message ID=%d from PROCESS=%d: %s.", msg.id, msg.from, msg.name);
-        }
+        thread_waitproc(init);
+        PANIC("The init process has return!");
     }
     else
     {
        PANIC("Init not found!"); 
     }
-
-    PANIC("The init process has return!");
 }

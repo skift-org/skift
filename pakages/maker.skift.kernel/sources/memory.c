@@ -361,7 +361,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
     sk_atomic_end();
 
-    // log("Failed!");
+    //log("Failed!");
 
     return 0;
 }

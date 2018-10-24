@@ -591,12 +591,24 @@ uint messaging_id()
 
 int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    log("Sending message ID=%d from %d send to %d.", id, from, to);
+    if (from == to)
+    {
+        log("PROCESS=%d try to send a message to himself!");
+        return 0;
+    }
+
+    // log("Sending message ID=%d from %d to %d.", id, from, to);
 
     process_t *process = process_get(to);
 
     if (process == NULL)
     {
+        return 0;
+    }
+
+    if (process->inbox->count > 1024)
+    {
+        log("PROCESS=%d inbox is full!", to);
         return 0;
     }
 
@@ -782,7 +794,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                //log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

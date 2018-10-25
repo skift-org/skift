@@ -348,7 +348,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
                 sk_atomic_end();
 
-                // log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
+                log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, addr, count, user);
 
                 return startaddr;
             }

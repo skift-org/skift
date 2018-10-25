@@ -5,6 +5,22 @@
 
 #define HEADER_HEIGHT 32
 #define RESIZE_AREA    8
+#define SNAP_AREA     32
+
+typedef enum
+{
+    WINSTATE_FLOATING,
+    WINSTATE_MINIMIZED,
+    WINSTATE_MAXIMIZED,
+    WINSTATE_TILED,
+} hideo_winstate_t;
+
+typedef enum 
+{
+    WINTYPE_MAIN,
+    WINTYPE_POPOVER,
+    WINTYPE_POPUP,
+} hideo_wintype_t;
 
 typedef PACKED(struct)
 {
@@ -13,6 +29,11 @@ typedef PACKED(struct)
     
     uint width;
     uint height;
+
+    uint floating_width;
+    uint floating_height;
+
+    hideo_winstate_t state;
 
     char * title;
 } hideo_window_t;

@@ -8,7 +8,8 @@
 #include "kernel/syscalls.h"
 #include "kernel/system.h"
 
-static const char *exception_messages[32] = {
+static const char *exception_messages[32] = 
+{
 	"Division by zero",
 	"Debug",
 	"Non-maskable interrupt",
@@ -40,7 +41,8 @@ static const char *exception_messages[32] = {
 	"Reserved",
 	"Reserved",
 	"Reserved",
-	"Reserved"};
+	"Reserved"
+};
 
 extern u32 isr_vector[];
 extern bool console_bypass_lock;

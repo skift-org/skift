@@ -34,6 +34,8 @@ hideo_window_t *hideo_create_window(hideo_context_t *ctx, char *title, int x, in
     win->width = w;
     win->height = h;
 
+    win->state = WINSTATE_FLOATING;
+
     list_pushback(ctx->windows, (void *)win);
     ctx->focus = win;
 
@@ -220,6 +222,23 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
 
         if (ctx->dragstate.dragged != NULL)
         {
+            hideo_window_t *dragged = ctx->dragstate.dragged;
+
+            if (c->x < SNAP_AREA)
+            {
+                dragged->x = 0;
+                dragged->y = 0;
+                dragged->width = ctx->width / 2;
+                dragged->height = ctx->height;
+            }
+            else if (c->x > (int)(ctx->width - SNAP_AREA))
+            {
+                dragged->x = ctx->width / 2;
+                dragged->y = 0;
+                dragged->width = ctx->width / 2;
+                dragged->height = ctx->height;
+            }
+
             c->state = CURSOR_POINTER;
             ctx->dragstate.dragged = NULL;
         }
@@ -259,6 +278,18 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
 
     default:
         break;
+    }
+
+    if (ctx->dragstate.dragged != NULL)
+    {
+        if (c->x < SNAP_AREA)
+        {
+            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 1, 0xff);
+        }
+        else if (c->x > (int)(ctx->width - SNAP_AREA))
+        {
+            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 1, 0xff);
+        }
     }
 }
 

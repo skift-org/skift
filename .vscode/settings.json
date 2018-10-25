@@ -25,6 +25,7 @@
         "stddef.h": "c",
         "graphic.h": "c",
         "tasking.h": "c",
-        "filesystem.h": "c"
+        "filesystem.h": "c",
+        "hideo.h": "c"
     }
 }

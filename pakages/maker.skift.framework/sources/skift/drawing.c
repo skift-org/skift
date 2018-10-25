@@ -96,8 +96,8 @@ void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint co
     drawing_line(bmp, x, y, x + w, y, weight, color); // A
     drawing_line(bmp, x, y, x, y + h, weight, color); // B
 
-    drawing_line(bmp, x + w, y, x + w, y + h, weight, color); // D
-    drawing_line(bmp, x, y + h, x + w, y + h, weight, color); // C
+    drawing_line(bmp, x + w - weight, y, x + w - weight, y + h, weight, color); // D
+    drawing_line(bmp, x, y + h - weight, x + w, y + h - weight, weight, color); // C
 }
 
 void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)

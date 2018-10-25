@@ -70,6 +70,7 @@ void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
     {
         drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
         drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x0A64CD);
+        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 9, 0xd5d5d5);
         drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
     }
     else
@@ -284,11 +285,11 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
     {
         if (c->x < SNAP_AREA)
         {
-            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 1, 0xff);
+            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 1, 0x0A64CD);
         }
         else if (c->x > (int)(ctx->width - SNAP_AREA))
         {
-            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 1, 0xff);
+            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 1, 0x0A64CD);
         }
     }
 }
@@ -340,11 +341,13 @@ int main(int argc, char const *argv[])
 
         // Draw
         drawing_clear(ctx->screen, 0xe5e5e5);
+        //drawing_fillrect(ctx->screen, cur.x - 32, cur.y - 32, 64, 64, 0xe5e5e5);
         drawing_text(ctx->screen, "maker.hideo.compositor", 8, 8, 0x939393);
 
         FOREACH(w, ctx->windows)
         {
             hideo_window_t *window = (hideo_window_t *)w->value;
+
             hideo_window_draw(ctx, window);
         }
 

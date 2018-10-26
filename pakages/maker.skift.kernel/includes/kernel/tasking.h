@@ -48,8 +48,9 @@ typedef struct
     char name[PROCNAME_SIZE]; // Frendly name of the process
 
     int flags;
-    list_t *threads; // Child threads
+    list_t *threads; // Child threads;
     list_t *inbox;
+    list_t *shared; // Shared memory region;
 
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
@@ -152,10 +153,20 @@ status_t messaging_unsubscribe(const char * channel);
 
 /* --- Shared memory -------------------------------------------------------- */
 
+typedef unsigned int SHARED_MEMORY;
+
 typedef struct 
 {
-    
+    uint id;
+    uint begin;
+    uint size;
 } shared_memory_t;
+
+SHARED_MEMORY sharedmem_create(uint size);
+void sharedmem_destroy(SHARED_MEMORY shm);
+
+uint sharedmem_mount(SHARED_MEMORY shm);
+void sharedmem_unmount(SHARED_MEMORY shm);
 
 /* --- Stream --------------------------------------------------------------- */
 

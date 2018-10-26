@@ -40,15 +40,20 @@ uint get_kernel_end(multiboot_info_t *minfo)
 
 void main(multiboot_info_t *info, s32 magic)
 {
+    /* --- Say hello -------------------------------------------------------- */
     log(KERNEL_UNAME);
+    log("Copyright © 2018 MAKER.");
+
     log("Booting...");
-    log(LINE);
 
     /* --- Early operation -------------------------------------------------- */
+    log(LINE);
+    log("Early setup...");
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     graphic_early_setup(800, 600);
 
     /* --- System check ----------------------------------------------------- */
+    log(LINE);
     log("System check...");
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
@@ -57,6 +62,7 @@ void main(multiboot_info_t *info, s32 magic)
     {
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
+    log("Passed!");
 
     /* --- Setup cpu context ------------------------------------------------ */
     log(LINE);
@@ -88,9 +94,10 @@ void main(multiboot_info_t *info, s32 magic)
     sk_atomic_enable();
     sti();
     log(KERNEL_UNAME);
-    log(LINE);
 
     /* --- Entering userspace ----------------------------------------------- */
+    log(LINE);
+    log("Entering userland...");
     PROCESS init = process_exec("app/maker.hideo.compositor", NULL);
 
     if (init)
@@ -100,6 +107,8 @@ void main(multiboot_info_t *info, s32 magic)
     }
     else
     {
-       PANIC("Init not found!"); 
+        PANIC("Init not found!");
     }
+
+    PANIC("END OF KERNEL!");
 }

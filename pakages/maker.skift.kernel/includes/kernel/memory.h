@@ -8,6 +8,18 @@
 #include <skift/utils.h>
 #include "kernel/paging.h"
 
+/* --- Physical Memory ------------------------------------------------------ */
+
+uint physical_alloc(uint count);
+void physical_free(uint addr, uint count);
+
+/* --- Virtual Memory ------------------------------------------------------- */
+
+uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user);
+void virtual_free(page_directorie_t *pdir, uint vaddr, uint count);
+
+/* --- Logical Memory ------------------------------------------------------- */
+
 void memory_setup(uint used, uint total);
 
 page_directorie_t *memory_kpdir();

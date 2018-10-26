@@ -9,6 +9,7 @@
 #include <skift/types.h>
 #include <skift/utils.h>
 #include <skift/atomic.h>
+
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/paging.h"
@@ -136,8 +137,6 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
-    UNUSED(user);
-
     for (uint i = 0; i < count; i++)
     {
         uint offset = i * PAGE_SIZE;
@@ -154,13 +153,13 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
 
             pde->Present = 1;
             pde->Write = 1;
-            pde->User = 0; //user;
+            pde->User = user;
             pde->PageFrameNumber = (u32)(ptable) >> 12;
         }
 
         page_t *p = &ptable->pages[pti];
         p->Present = 1;
-        p->User = 0; //user;
+        p->User = user;
         p->Write = 1;
         p->PageFrameNumber = (paddr + offset) >> 12;
     }
@@ -294,7 +293,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
-    log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
+    //log("PDIR=0x%x ADDR=0x%x COUNT=%d USER=%d", pdir, vaddr, count, user);
 
     return vaddr;
 }

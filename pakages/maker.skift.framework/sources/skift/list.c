@@ -39,7 +39,7 @@ void list_free(list_t *list)
     free(list);
 }
 
-void list_destrory(list_t *list)
+void list_destroy(list_t *list)
 {
     list_item_t *current = list->head;
 

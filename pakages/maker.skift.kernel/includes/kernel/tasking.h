@@ -66,7 +66,7 @@ typedef struct
 
 typedef struct
 {
-    message_t * message;
+    message_t *message;
 } wait_message_t;
 
 typedef struct
@@ -136,30 +136,32 @@ PROCESS process_exec(const char *filename, const char **argv);
 
 /* --- Messaging ------------------------------------------------------------ */
 
-typedef struct 
+typedef struct
 {
     char name[CHANNAME_SIZE];
-    list_t * subscribers;
+    list_t *subscribers;
 } channel_t;
 
-int messaging_send(PROCESS to, const char * name, void * payload, uint size, uint flags);
-int messaging_broadcast(const char * channel, const char * name, void * payload, uint size, uint flags);
+int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags);
+int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags);
 
-status_t messaging_receive(message_t * msg);
-status_t messaging_payload(void* buffer, uint size);
+int messaging_receive(message_t *msg);
+int messaging_payload(void *buffer, uint size);
 
-status_t messaging_subscribe(const char * channel);
-status_t messaging_unsubscribe(const char * channel);
+int messaging_subscribe(const char *channel);
+int messaging_unsubscribe(const char *channel);
 
 /* --- Shared memory -------------------------------------------------------- */
 
 typedef unsigned int SHARED_MEMORY;
 
-typedef struct 
+typedef struct
 {
     uint id;
     uint begin;
     uint size;
+
+    uint refcount;
 } shared_memory_t;
 
 SHARED_MEMORY sharedmem_create(uint size);
@@ -170,7 +172,7 @@ void sharedmem_unmount(SHARED_MEMORY shm);
 
 /* --- Stream --------------------------------------------------------------- */
 
-typedef struct 
+typedef struct
 {
-    
+
 } stream_t;

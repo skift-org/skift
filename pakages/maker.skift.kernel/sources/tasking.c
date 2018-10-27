@@ -79,13 +79,10 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
     return thread;
 }
 
-void cleanup_thread(thread_t *t)
+void cleanup_thread(thread_t *thread)
 {
     // Close all reference to/from this thread.
-    list_remove(threads, (void*)t);
-    list_remove(t->process->threads, (void*)t);
-    free(t->stack);
-    free(t);
+    UNUSED(thread);
 }
 
 process_t *alloc_process(const char *name, int flags)
@@ -116,6 +113,7 @@ process_t *alloc_process(const char *name, int flags)
 void cleanup_process(process_t *process)
 {
     // Close all reference to/from this process.
+    UNUSED(process);
 }
 
 channel_t *alloc_channel(const char *name)
@@ -249,8 +247,8 @@ void thread_yield()
 }
 
 #pragma GCC push_options
-#pragma GCC optimize("O0")
-// Look like gcc like to break this functions XD
+#pragma GCC optimize("O0") // Look like gcc like to break this functions XD
+
 void thread_hold()
 {
     thread_yield(); // Let's try to save some clock cicle
@@ -671,7 +669,7 @@ int messaging_broadcast(const char *channel, const char *name, void *payload, ui
     return id;
 }
 
-status_t messaging_receive(message_t *msg)
+int messaging_receive(message_t *msg)
 {
     ATOMIC({
         running->state = THREAD_WAIT_MESSAGE;
@@ -684,26 +682,26 @@ status_t messaging_receive(message_t *msg)
     if (incoming != NULL)
     {
         memcpy(msg, incoming, sizeof(message_t));
-        return SUCCESS;
+        return 0;
     }
 
-    return FAILURE;
+    return 1;
 }
 
-status_t messaging_payload(void *buffer, uint size)
+int messaging_payload(void *buffer, uint size)
 {
     message_t *incoming = running->messageinfo.message;
 
     if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {
         memcpy(buffer, incoming->payload, min(size, incoming->size));
-        return SUCCESS;
+        return 0;
     }
 
-    return FAILURE;
+    return 1;
 }
 
-status_t messaging_subscribe(const char *channel)
+int messaging_subscribe(const char *channel)
 {
     sk_atomic_begin();
     {
@@ -719,10 +717,10 @@ status_t messaging_subscribe(const char *channel)
     }
     sk_atomic_end();
 
-    return SUCCESS;
+    return 0;
 }
 
-status_t messaging_unsubscribe(const char *channel)
+int messaging_unsubscribe(const char *channel)
 {
     sk_atomic_begin();
     {
@@ -735,7 +733,7 @@ status_t messaging_unsubscribe(const char *channel)
     }
     sk_atomic_end();
 
-    return SUCCESS;
+    return 0;
 }
 
 /* --- Shared Memory -------------------------------------------------------- */

@@ -4,12 +4,6 @@
 #include "defs/NULL.h"
 #include "defs/size_t.h"
 
-typedef enum 
-{
-    SUCCESS,
-    FAILURE
-} status_t;
-
 typedef char *string;
 
 typedef char s8;

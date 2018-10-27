@@ -17,7 +17,7 @@ typedef struct list
 
 list_t *list_alloc();
 void list_free(list_t *list);
-void list_destrory(list_t *list);
+void list_destroy(list_t *list);
 
 void list_print(list_t *list);
 

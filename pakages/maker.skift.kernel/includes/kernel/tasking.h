@@ -158,13 +158,19 @@ typedef unsigned int SHARED_MEMORY;
 typedef struct
 {
     uint id;
-    uint begin;
+    uint paddr;
     uint size;
 
     uint refcount;
 } shared_memory_t;
 
-SHARED_MEMORY sharedmem_create(uint size);
+typedef struct
+{
+    uint vaddr;
+    shared_memory_t * shm;
+} shared_memory_region_t;
+
+SHARED_MEMORY sharedmem_create(uint count);
 void sharedmem_destroy(SHARED_MEMORY shm);
 
 uint sharedmem_mount(SHARED_MEMORY shm);

@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* tasking.c: Sheduling, messaging, sharedmemory and sheduling                */
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +30,7 @@ uint ticks = 0;
 list_t *threads;
 list_t *processes;
 list_t *channels;
+list_t *shared_memory;
 
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
@@ -738,25 +741,34 @@ int messaging_unsubscribe(const char *channel)
 
 /* --- Shared Memory -------------------------------------------------------- */
 
-//// SHARED_MEMORY sharedmem_create(uint size)
-//// {
-////
-//// }
-////
-//// void sharedmem_destroy(SHARED_MEMORY shm)
-//// {
-////
-//// }
-////
-//// uint sharedmem_mount(SHARED_MEMORY shm)
-//// {
-////
-//// }
-////
-//// void sharedmem_unmount(SHARED_MEMORY shm)
-//// {
-////
-//// }
+// SHARED_MEMORY sharedmem_create(uint count)
+// {
+//     sk_atomic_begin();
+// 
+//     uint paddr = physical_alloc(count);
+// 
+//     if (paddr != 0)
+//     {
+//         shared_memory_t* shm = MALLOC(shared_memory_t); 
+//         shm->paddr = paddr;
+//         shm->size = count;
+//     }
+// 
+// 
+//     sk_atomic_end();
+// }
+// 
+// void sharedmem_destroy(SHARED_MEMORY shm)
+// {
+// }
+// 
+// uint sharedmem_mount(SHARED_MEMORY shm)
+// {
+// }
+// 
+// void sharedmem_unmount(SHARED_MEMORY shm)
+// {
+// }
 
 /* --- Sheduler ------------------------------------------------------------- */
 
@@ -770,73 +782,73 @@ thread_t *get_next_task()
 
         switch (thread->state)
         {
-            case THREAD_CANCELING:
-            {
-                log("Thread %d canceled!", thread->id);
-                thread->state = THREAD_CANCELED;
-                // TODO: cleanup the thread.
-                // TODO: cleanup the process if no thread is still running.
+        case THREAD_CANCELING:
+        {
+            log("Thread %d canceled!", thread->id);
+            thread->state = THREAD_CANCELED;
+            // TODO: cleanup the thread.
+            // TODO: cleanup the process if no thread is still running.
 
-                cleanup_thread(thread);
-                thread = NULL;
-                break;
-            }
-            case THREAD_SLEEP:
+            cleanup_thread(thread);
+            thread = NULL;
+            break;
+        }
+        case THREAD_SLEEP:
+        {
+            // Wakeup the thread
+            if (thread->sleepinfo.wakeuptick >= ticks)
             {
-                // Wakeup the thread
-                if (thread->sleepinfo.wakeuptick >= ticks)
+                thread->state = THREAD_RUNNING;
+                log("Thread %d wake up!", thread->id);
+            }
+            break;
+        }
+        case THREAD_WAIT_PROCESS:
+        {
+            process_t *wproc = process_get(thread->waitinfo.handle);
+
+            if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
+            {
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = wproc->exit_code;
+                log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+            }
+
+            break;
+        }
+        case THREAD_WAIT_THREAD:
+        {
+            thread_t *wthread = thread_get(thread->waitinfo.handle);
+
+            if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
+            {
+                thread->state = THREAD_RUNNING;
+                thread->waitinfo.outcode = (uint)wthread->exit_value;
+                log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
+            }
+
+            break;
+        }
+        case THREAD_WAIT_MESSAGE:
+        {
+            if (thread->process->inbox->count > 0)
+            {
+                thread->state = THREAD_RUNNING;
+
+                if (thread->messageinfo.message != NULL)
                 {
-                    thread->state = THREAD_RUNNING;
-                    log("Thread %d wake up!", thread->id);
-                }
-                break;
-            }
-            case THREAD_WAIT_PROCESS:
-            {
-                process_t *wproc = process_get(thread->waitinfo.handle);
-
-                if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
-                {
-                    thread->state = THREAD_RUNNING;
-                    thread->waitinfo.outcode = wproc->exit_code;
-                    log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+                    free_message(thread->messageinfo.message);
                 }
 
-                break;
+                message_t *message;
+                list_pop(thread->process->inbox, (void **)&message);
+                thread->messageinfo.message = message;
+                //log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
-            case THREAD_WAIT_THREAD:
-            {
-                thread_t *wthread = thread_get(thread->waitinfo.handle);
-
-                if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
-                {
-                    thread->state = THREAD_RUNNING;
-                    thread->waitinfo.outcode = (uint)wthread->exit_value;
-                    log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
-                }
-
-                break;
-            }
-            case THREAD_WAIT_MESSAGE:
-            {
-                if (thread->process->inbox->count > 0)
-                {
-                    thread->state = THREAD_RUNNING;
-
-                    if (thread->messageinfo.message != NULL)
-                    {
-                        free_message(thread->messageinfo.message);
-                    }
-
-                    message_t *message;
-                    list_pop(thread->process->inbox, (void **)&message);
-                    thread->messageinfo.message = message;
-                    //log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
-                }
-                break;
-            }
-            default:
-                break;
+            break;
+        }
+        default:
+            break;
         }
 
         if (thread != NULL && thread->state != THREAD_RUNNING)

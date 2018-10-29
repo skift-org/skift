@@ -20,8 +20,8 @@ typedef struct
     uint *buffer;
 } bitmap_t;
 
-bitmap_t *bitmap_ctor(uint width, uint height);
-void bitmap_dtor(bitmap_t *bmp);
+bitmap_t *bitmap(uint width, uint height);
+void bitmap_delete(bitmap_t *bmp);
 
 /* --- Drawing -------------------------------------------------------------- */
 

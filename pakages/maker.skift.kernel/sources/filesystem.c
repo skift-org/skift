@@ -76,8 +76,8 @@ directory_t *alloc_directorie(const char *name)
 
     dir->name[0] = '\0';
     strncpy((char *)&dir->name, name, PATH_FILE_NAME_SIZE);
-    dir->directories = list_alloc();
-    dir->files = list_alloc();
+    dir->directories = list();
+    dir->files = list();
 
     return dir;
 }

@@ -49,7 +49,7 @@ void serial_read(char *buffer, int size)
     STUB(buffer, size);
 }
 
-void serial_print(const char *str)
+void serial_writeln(const char *str)
 {
     for (int i = 0; str[i]; i++)
     {

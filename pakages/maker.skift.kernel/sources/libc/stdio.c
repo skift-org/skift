@@ -22,6 +22,6 @@ char * gets(char * str)
 
 int puts(const char * str)
 {
-    serial_print((char *)str);
+    serial_writeln((char *)str);
     return strlen(str);
 }

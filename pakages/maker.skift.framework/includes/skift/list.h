@@ -1,4 +1,8 @@
 #pragma once
+
+#include <skift/types.h>
+#include <skift/utils.h>
+
 #define FOREACH(item, list) for (list_item_t *item = list->head; item != NULL; item = item->next)
 
 typedef struct list_node
@@ -15,8 +19,9 @@ typedef struct list
     list_item_t *tail;
 } list_t;
 
-list_t *list_alloc();
-void list_free(list_t *list);
+list_t *list();
+void list_delete(list_t *l);
+
 void list_destroy(list_t *list);
 
 void list_print(list_t *list);

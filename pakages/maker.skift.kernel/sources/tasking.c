@@ -96,8 +96,8 @@ process_t *alloc_process(const char *name, int flags)
 
     strncpy(process->name, name, PROCNAME_SIZE);
     process->flags = flags;
-    process->threads = list_alloc();
-    process->inbox = list_alloc();
+    process->threads = list();
+    process->inbox = list();
 
     if (flags & TASK_USER)
     {
@@ -123,7 +123,7 @@ channel_t *alloc_channel(const char *name)
 {
     channel_t *channel = MALLOC(channel_t);
 
-    channel->subscribers = list_alloc();
+    channel->subscribers = list();
     strncpy(channel->name, name, CHANNAME_SIZE);
 
     return channel;
@@ -224,10 +224,10 @@ void tasking_setup()
 {
     running = NULL;
 
-    waiting = list_alloc();
-    threads = list_alloc();
-    processes = list_alloc();
-    channels = list_alloc();
+    waiting = list();
+    threads = list();
+    processes = list();
+    channels = list();
 
     kernel_process = process_create("maker.skift.kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);

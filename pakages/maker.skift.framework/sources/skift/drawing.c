@@ -6,7 +6,7 @@
 
 /* --- Bitmap --------------------------------------------------------------- */
 
-bitmap_t *bitmap_ctor(uint width, uint height)
+bitmap_t *bitmap(uint width, uint height)
 {
     bitmap_t *bmp = MALLOC(bitmap_t);
     bmp->buffer = (uint *)malloc(width * height * sizeof(uint));
@@ -30,12 +30,11 @@ bitmap_t *bitmap_from_buffer(uint width, uint height, uint * buffer)
     return bmp;
 }
 
-void bitmap_dtor(bitmap_t *bmp)
+void bitmap_delete(bitmap_t *bmp)
 {
     if (!bmp->shared) free(bmp->buffer);
     free(bmp);
 }
-
 
 /* --- Graphic -------------------------------------------------------------- */
 

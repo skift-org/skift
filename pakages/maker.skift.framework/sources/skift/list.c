@@ -3,9 +3,9 @@
 
 #include <skift/list.h>
 
-list_item_t *list_item_alloc(void* value)
+list_item_t *list_item(void* value)
 {
-    list_item_t *item = malloc(sizeof(list_item_t));
+    list_item_t *item = MALLOC(list_item_t);
 
     item->prev = NULL;
     item->next = NULL;
@@ -14,20 +14,20 @@ list_item_t *list_item_alloc(void* value)
     return item;
 }
 
-list_t *list_alloc()
+list_t *list()
 {
-    list_t *list = malloc(sizeof(list_t));
+    list_t *l = malloc(sizeof(list_t));
 
-    list->count = 0;
-    list->head = NULL;
-    list->tail = NULL;
+    l->count = 0;
+    l->head = NULL;
+    l->tail = NULL;
 
-    return list;
+    return l;
 }
 
-void list_free(list_t *list)
+void list_delete(list_t *l)
 {
-    list_item_t *current = list->head;
+    list_item_t *current = l->head;
 
     while (current)
     {
@@ -36,12 +36,12 @@ void list_free(list_t *list)
         current = next;
     }
 
-    free(list);
+    free(l);
 }
 
-void list_destroy(list_t *list)
+void list_destroy(list_t *l)
 {
-    list_item_t *current = list->head;
+    list_item_t *current = l->head;
 
     while (current)
     {
@@ -51,21 +51,21 @@ void list_destroy(list_t *list)
         current = next;
     }
 
-    free(list);
+    free(l);
 }
 
-void list_print(list_t *list)
+void list_print(list_t *l)
 {
-    printf("c:%d ", list->count);
-    if (list->head) printf("h:%d", list->head->value);
+    printf("c:%d ", l->count);
+    if (l->head) printf("h:%d", l->head->value);
     else printf("h:NULL ");
 
-    if (list->tail) printf("t:%d",list->tail->value);
+    if (l->tail) printf("t:%d",l->tail->value);
     else printf("t:NULL ");
 
     printf("\n");
 
-    FOREACH(item, list)
+    FOREACH(item, l)
     {
         if (item->prev) printf("%d", item->prev->value);
         else printf("-");
@@ -77,44 +77,44 @@ void list_print(list_t *list)
     printf("\n");
 }
 
-void list_push(list_t *list, void* value)
+void list_push(list_t *l, void* value)
 {
-    list_item_t *item = list_item_alloc(value);
-    list->count++;
+    list_item_t *item = list_item(value);
+    l->count++;
 
-    if (list->head == NULL)
+    if (l->head == NULL)
     {
-        list->head = item;
-        list->tail = item;
+        l->head = item;
+        l->tail = item;
     }
     else
     {
-        list->head->prev = item;
-        item->next = list->head;
-        list->head = item;
+        l->head->prev = item;
+        item->next = l->head;
+        l->head = item;
     }
 }
 
-int list_pop(list_t *list, void **value)
+int list_pop(list_t *l, void **value)
 {
-    list_item_t *item = list->head;
+    list_item_t *item = l->head;
 
-    if (list->count == 0)
+    if (l->count == 0)
     {
         return 0;
     }
-    else if (list->count == 1)
+    else if (l->count == 1)
     {
-        list->count = 0;
-        list->head = NULL;
-        list->tail = NULL;
+        l->count = 0;
+        l->head = NULL;
+        l->tail = NULL;
     }
-    else if (list->count > 1)
+    else if (l->count > 1)
     {
         item->next->prev = NULL;
-        list->head = item->next;
+        l->head = item->next;
 
-        list->count--;
+        l->count--;
     }
 
     *(value) = item->value;
@@ -123,44 +123,44 @@ int list_pop(list_t *list, void **value)
     return 1;
 }
 
-void list_pushback(list_t *list, void* value)
+void list_pushback(list_t *l, void* value)
 {
-    list_item_t *item = list_item_alloc(value);
-    list->count++;
+    list_item_t *item = list_item(value);
+    l->count++;
 
-    if (list->tail == NULL)
+    if (l->tail == NULL)
     {
-        list->tail = item;
-        list->head = item;
+        l->tail = item;
+        l->head = item;
     }
     else
     {
-        list->tail->next = item;
-        item->prev = list->tail;
-        list->tail = item;
+        l->tail->next = item;
+        item->prev = l->tail;
+        l->tail = item;
     }
 }
 
-int list_popback(list_t *list, void **value)
+int list_popback(list_t *l, void **value)
 {
-    list_item_t *item = list->tail;
+    list_item_t *item = l->tail;
 
-    if (list->count == 0)
+    if (l->count == 0)
     {
         return 0;
     }
-    else if (list->count == 1)
+    else if (l->count == 1)
     {
-        list->count = 0;
-        list->head = NULL;
-        list->tail = NULL;
+        l->count = 0;
+        l->head = NULL;
+        l->tail = NULL;
     }
-    else if (list->count > 1)
+    else if (l->count > 1)
     {
         item->prev->next = NULL;
-        list->tail = item->prev;
+        l->tail = item->prev;
 
-        list->count--;
+        l->count--;
     }
 
     *(value) = item->value;
@@ -169,9 +169,9 @@ int list_popback(list_t *list, void **value)
     return 1;
 }
 
-int list_remove(list_t *list, void* value)
+int list_remove(list_t *l, void* value)
 {
-    FOREACH(item, list)
+    FOREACH(item, l)
     {
         if (item->value == value)
         {
@@ -181,7 +181,7 @@ int list_remove(list_t *list, void* value)
             }
             else
             {
-                list->head = item->next;
+                l->head = item->next;
             }
 
             if (item->next != NULL)
@@ -190,10 +190,10 @@ int list_remove(list_t *list, void* value)
             }
             else
             {
-                list->tail = item->prev;
+                l->tail = item->prev;
             }
 
-            list->count--;
+            l->count--;
             free(item);
 
             return 1;
@@ -203,9 +203,9 @@ int list_remove(list_t *list, void* value)
     return 0;
 }
 
-int list_containe(list_t *list, void* value)
+int list_containe(list_t *l, void* value)
 {
-    FOREACH(item, list)
+    FOREACH(item, l)
     {
         if (item->value == value)
         {

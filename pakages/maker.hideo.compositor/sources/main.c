@@ -303,9 +303,9 @@ hideo_context_t *hideo_ctor(uint screen_width, uint screen_height)
     ctx->width = screen_width;
     ctx->height = screen_height;
 
-    ctx->screen = bitmap_ctor(screen_width, screen_height);
+    ctx->screen = bitmap(screen_width, screen_height);
 
-    ctx->windows = list_alloc();
+    ctx->windows = list();
     ctx->focus = NULL;
 
     return ctx;

@@ -50,7 +50,7 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-display", "sdl", "-m", "256M",
+QEMUFLAGS = ["-m", "256M", # "-display", "sdl",
              "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
 
 

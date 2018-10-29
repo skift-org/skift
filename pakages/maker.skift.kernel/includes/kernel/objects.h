@@ -43,7 +43,7 @@ typedef enum
     __type__##_t *__type__(kobject_t *parent)                        \
     {                                                                \
         __type__##_t *object = MALLOC(__type__##_t);                 \
-        __type__##_t *__type__##_ctor(object);                       \
+        __type__##_ctor(object);                                     \
         kobject_mount(parent, kobj_##__type__, (kobject_t *)object); \
         return object;                                               \
     }                                                                \

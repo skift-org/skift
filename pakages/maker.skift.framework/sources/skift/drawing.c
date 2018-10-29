@@ -10,7 +10,7 @@ bitmap_t *bitmap(uint width, uint height)
 {
     bitmap_t *bmp = MALLOC(bitmap_t);
     bmp->buffer = (uint *)malloc(width * height * sizeof(uint));
-    
+
     bmp->shared = 0;
     bmp->width = width;
     bmp->height = height;
@@ -18,7 +18,7 @@ bitmap_t *bitmap(uint width, uint height)
     return bmp;
 }
 
-bitmap_t *bitmap_from_buffer(uint width, uint height, uint * buffer)
+bitmap_t *bitmap_from_buffer(uint width, uint height, uint *buffer)
 {
     bitmap_t *bmp = MALLOC(bitmap_t);
     bmp->buffer = buffer;
@@ -32,7 +32,8 @@ bitmap_t *bitmap_from_buffer(uint width, uint height, uint * buffer)
 
 void bitmap_delete(bitmap_t *bmp)
 {
-    if (!bmp->shared) free(bmp->buffer);
+    if (!bmp->shared)
+        free(bmp->buffer);
     free(bmp);
 }
 
@@ -104,10 +105,10 @@ void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
     for (int xx = 0; xx < w; xx++)
         for (int yy = 0; yy < h; yy++)
             drawing_pixel_inline(bmp, x + xx, y + yy, color);
-            //bmp->buffer[(x + xx) + (y + yy) * bmp->width] = color;
+    //bmp->buffer[(x + xx) + (y + yy) * bmp->width] = color;
 }
 
-void drawing_filltri(bitmap_t * bmp, int x0, int y0, int x1, int y1, int x2, int y2, uint color)
+void drawing_filltri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int y2, uint color)
 {
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -115,7 +116,7 @@ void drawing_filltri(bitmap_t * bmp, int x0, int y0, int x1, int y1, int x2, int
 
     for (;;)
     {
-        drawing_line(bmp, x2, y2, x0, y0 , 1, color);
+        drawing_line(bmp, x2, y2, x0, y0, 1, color);
 
         if (x0 == x1 && y0 == y1)
             break;
@@ -154,7 +155,7 @@ void drawing_char(bitmap_t *bmp, char c, int x, int y, uint color)
     }
 }
 
-void drawing_text(bitmap_t *bmp, const char * str, int x, int y, uint color)
+void drawing_text(bitmap_t *bmp, const char *str, int x, int y, uint color)
 {
     char c;
 

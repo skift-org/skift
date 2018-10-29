@@ -3,11 +3,11 @@
 #include "defs/NULL.h"
 
 // NOT STANDART
-void strapd(char * str, char c);
-void strbs(char * str);
-void strrvs(char * str);
-void strleadtrim(char * str, char c);
-void strtrailtrim(char * str, char c);
+void strapd(char *str, char c);
+void strbs(char *str);
+void strrvs(char *str);
+void strleadtrim(char *str, char c);
+void strtrailtrim(char *str, char c);
 
 // STANDART
 void *memchr(const void *str, int c, size_t n);
@@ -36,5 +36,5 @@ char *strpbrk(const char *str1, const char *str2);
 char *strrchr(const char *str, int c);
 size_t strspn(const char *str1, const char *str2);
 char *strstr(const char *haystack, const char *needle);
-char *strtok(char *s, char** state, const char *delim);
+char *strtok(char *s, char **state, const char *delim);
 size_t strxfrm(char *dest, const char *src, size_t n);

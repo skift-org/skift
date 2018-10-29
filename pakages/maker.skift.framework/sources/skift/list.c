@@ -3,7 +3,7 @@
 
 #include <skift/list.h>
 
-list_item_t *list_item(void* value)
+list_item_t *list_item(void *value)
 {
     list_item_t *item = MALLOC(list_item_t);
 
@@ -57,27 +57,35 @@ void list_destroy(list_t *l)
 void list_print(list_t *l)
 {
     printf("c:%d ", l->count);
-    if (l->head) printf("h:%d", l->head->value);
-    else printf("h:NULL ");
+    if (l->head)
+        printf("h:%d", l->head->value);
+    else
+        printf("h:NULL ");
 
-    if (l->tail) printf("t:%d",l->tail->value);
-    else printf("t:NULL ");
+    if (l->tail)
+        printf("t:%d", l->tail->value);
+    else
+        printf("t:NULL ");
 
     printf("\n");
 
     FOREACH(item, l)
     {
-        if (item->prev) printf("%d", item->prev->value);
-        else printf("-");
+        if (item->prev)
+            printf("%d", item->prev->value);
+        else
+            printf("-");
         printf(" %d ", item->value);
-        if (item->next) printf("%d", item->next->value);
-        else printf("-");
+        if (item->next)
+            printf("%d", item->next->value);
+        else
+            printf("-");
         printf("\n");
     }
     printf("\n");
 }
 
-void list_push(list_t *l, void* value)
+void list_push(list_t *l, void *value)
 {
     list_item_t *item = list_item(value);
     l->count++;
@@ -123,7 +131,7 @@ int list_pop(list_t *l, void **value)
     return 1;
 }
 
-void list_pushback(list_t *l, void* value)
+void list_pushback(list_t *l, void *value)
 {
     list_item_t *item = list_item(value);
     l->count++;
@@ -169,7 +177,7 @@ int list_popback(list_t *l, void **value)
     return 1;
 }
 
-int list_remove(list_t *l, void* value)
+int list_remove(list_t *l, void *value)
 {
     FOREACH(item, l)
     {
@@ -203,7 +211,7 @@ int list_remove(list_t *l, void* value)
     return 0;
 }
 
-int list_containe(list_t *l, void* value)
+int list_containe(list_t *l, void *value)
 {
     FOREACH(item, l)
     {

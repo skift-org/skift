@@ -13,10 +13,10 @@ void __sk_lock_release(lock_t *lock);
 #define sk_lock_acquire(lock) __sk_lock_acquire(&lock)
 #define sk_lock_release(lock) __sk_lock_release(&lock)
 
-#define LOCK(lock, code)         \
-    do                           \
-    {                            \
+#define LOCK(lock, code)          \
+    do                            \
+    {                             \
         __sk_lock_acquire(&lock); \
-        code;                    \
+        code;                     \
         __sk_lock_release(&lock); \
     } while (0);

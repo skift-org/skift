@@ -47,7 +47,7 @@ int elf_read_program(elf_header_t *header, elf_program_t *dest, uint index)
 {
     if (index >= header->phnum)
         return 0;
-        
+
     elf_program_t *section = (elf_program_t *)((uint)header + header->phoff + sizeof(elf_program_t) * index);
 
     memcpy(dest, section, sizeof(elf_program_t));

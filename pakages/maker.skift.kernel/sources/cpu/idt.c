@@ -32,10 +32,10 @@ void idt_entry(u8 index, u32 offset, u16 selector, u16 type)
 {
     // printf("IDT[%d]: OFFSET=0x%x SELECTOR=0x%x TYPE=%b\n", index, offset, selector, type);
 
-    idt_entry_t * entry = &idt.entries[index];
+    idt_entry_t *entry = &idt.entries[index];
 
     entry->offset0_15 = offset & 0xffff;
-    entry->offset16_31 = (offset>>16) & 0xffff;
+    entry->offset16_31 = (offset >> 16) & 0xffff;
 
     entry->zero = 0;
 

@@ -30,5 +30,5 @@ int vsprintf(char *str, const char *format, va_list va);
 int putchar(int chr);
 int getchar();
 
-char * gets(char * str);
-int puts(const char * str);
+char *gets(char *str);
+int puts(const char *str);

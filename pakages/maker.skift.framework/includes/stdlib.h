@@ -17,4 +17,4 @@ int abs(int value);
 unsigned int stoi(const char * str, unsigned char base);
 
 // uint to string
-void itos(unsigned int value, char * buffer, unsigned char base);
+void itos(unsigned int value, char *buffer, unsigned char base);

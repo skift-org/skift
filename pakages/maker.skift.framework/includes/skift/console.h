@@ -32,7 +32,6 @@ typedef struct
 
     console_cell_t *buffer;
 
-    
 } console_t;
 
 console_t *console(uint width, uint height);
@@ -40,5 +39,5 @@ void console_delete(console_t *c);
 
 void console_clear(console_t *c);
 void console_scroll(console_t *c);
-void console_writeln(console_t* c, const char * message);
-uint console_readln(console_t* c, char * buffer, uint size);
+void console_writeln(console_t *c, const char *message);
+uint console_readln(console_t *c, char *buffer, uint size);

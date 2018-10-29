@@ -6,7 +6,7 @@
 /* --- Colors --------------------------------------------------------------- */
 
 typedef unsigned int color_t;
-#define rbg(r, g, b) (color_t)((r) & 0xff) | ((g) & 0xff) | ((b) & 0xff)
+#define rbg(r, g, b) (color_t)((r)&0xff) | ((g)&0xff) | ((b)&0xff)
 
 /* --- Bitmap --------------------------------------------------------------- */
 
@@ -25,20 +25,20 @@ void bitmap_delete(bitmap_t *bmp);
 
 /* --- Drawing -------------------------------------------------------------- */
 
-typedef struct 
+typedef struct
 {
-    bitmap_t * surface;
+    bitmap_t *surface;
     color_t color;
 } drawing_context_t;
 
-void drawing_begin(drawing_context_t * ctx, bitmap_t * surface);
-void drawing_end(drawing_context_t * ctx);
+void drawing_begin(drawing_context_t *ctx, bitmap_t *surface);
+void drawing_end(drawing_context_t *ctx);
 
 void drawing_clear(bitmap_t *bmp, uint color);
 
 void drawing_pixel(bitmap_t *bmp, int x, int y, uint color);
 void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color);
-void drawing_fill(bitmap_t * bmp, int x, int y, uint color);
+void drawing_fill(bitmap_t *bmp, int x, int y, uint color);
 
 void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color);
 void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color);

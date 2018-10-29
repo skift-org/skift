@@ -7,14 +7,14 @@
 
 #include "kernel/serial.h"
 
-console_t * c;
+console_t *c;
 
 void terminal_setup()
 {
     c = console(80, 25);
 }
 
-void terminal_writeln(const char * message)
+void terminal_writeln(const char *message)
 {
     console_writeln(c, message);
     serial_writeln(message);

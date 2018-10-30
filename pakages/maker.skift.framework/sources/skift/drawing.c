@@ -57,7 +57,7 @@ void drawing_clear(bitmap_t *bmp, uint color)
         bmp->buffer[i] = color;
 }
 
-void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color)
+void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, uint color)
 {
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -65,9 +65,7 @@ void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uin
 
     for (;;)
     {
-        for (int xoff = -weight + 1; xoff < weight; xoff++)
-            for (int yoff = -weight + 1; yoff < weight; yoff++)
-                drawing_pixel_inline(bmp, x0 + xoff, y0 + yoff, color);
+        drawing_pixel_inline(bmp, x0, y0, color);
 
         if (x0 == x1 && y0 == y1)
             break;
@@ -86,18 +84,18 @@ void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uin
     }
 }
 
-void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color)
+void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
 {
 
     // + A +
     // B   D
     // + C +
 
-    drawing_line(bmp, x, y, x + w, y, weight, color); // A
-    drawing_line(bmp, x, y, x, y + h, weight, color); // B
+    drawing_line(bmp, x, y, x + w  - 1, y, color); // A
+    drawing_line(bmp, x, y, x, y + h  - 1, color); // B
 
-    drawing_line(bmp, x + w - weight, y, x + w - weight, y + h, weight, color); // D
-    drawing_line(bmp, x, y + h - weight, x + w, y + h - weight, weight, color); // C
+    drawing_line(bmp, x + w - 1, y, x + w - 1, y + h - 1, color); // D
+    drawing_line(bmp, x, y + h - 1, x + w - 1, y + h - 1, color); // C
 }
 
 void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
@@ -116,7 +114,7 @@ void drawing_filltri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int 
 
     for (;;)
     {
-        drawing_line(bmp, x2, y2, x0, y0, 1, color);
+        drawing_line(bmp, x2, y2, x0, y0, color);
 
         if (x0 == x1 && y0 == y1)
             break;

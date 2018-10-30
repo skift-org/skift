@@ -57,7 +57,9 @@ QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
 def QEMU(disk):
     with open("/dev/null", "w") as f:
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS, stderr=f) != 0:
-            subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM, stderr=f)
+            if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM, stderr=f) != 0:
+                ERROR("Failed to start QEMU!")
+                ABORT()
 
 
 def MKDIR(directory):
@@ -461,7 +463,7 @@ def build_all(targets):
     for t in targets:
         target = targets[t]
         if not target.build(targets):
-            ERROR("'%s' compilation failed!" % t)
+            ERROR("Failed to build " + YELLOW + "%s " % (t))
             ABORT()
 
 

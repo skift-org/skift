@@ -37,10 +37,10 @@ void drawing_end(drawing_context_t *ctx);
 void drawing_clear(bitmap_t *bmp, uint color);
 
 void drawing_pixel(bitmap_t *bmp, int x, int y, uint color);
-void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, int weight, uint color);
+void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, uint color);
 void drawing_fill(bitmap_t *bmp, int x, int y, uint color);
 
-void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, int weight, uint color);
+void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, uint color);
 void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color);
 
 void drawing_tri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int y2, uint color);

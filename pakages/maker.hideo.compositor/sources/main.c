@@ -69,13 +69,13 @@ void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
     if (w == ctx->focus)
     {
         drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x0A64CD);
+        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x0A64CD);
         drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 9, 0xd5d5d5);
         drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
     }
     else
     {
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 1, 0x939393);
+        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x939393);
         drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x939393);
     }
 }
@@ -255,26 +255,26 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
     case CURSOR_POINTER:
         drawing_filltri(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 0xffffff);
 
-        drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, 1, 0x0);
-        drawing_line(ctx->screen, c->x, c->y, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
-        drawing_line(ctx->screen, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 1, 0x0);
+        drawing_line(ctx->screen, c->x, c->y, c->x, c->y + 12 * SCALE, 0x0);
+        drawing_line(ctx->screen, c->x, c->y, c->x + 8 * SCALE, c->y + 8 * SCALE, 0x0);
+        drawing_line(ctx->screen, c->x, c->y + 12 * SCALE, c->x + 8 * SCALE, c->y + 8 * SCALE, 0x0);
         break;
 
     case CURSOR_DRAG:
-        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 2, 0x0);
-        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 2, 0x0);
+        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 0x0);
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 0x0);
         break;
 
     case CURSOR_RESIZEH:
-        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 2, 0x0);
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y, c->x + 4 * SCALE, c->y, 0x0);
         break;
 
     case CURSOR_RESIZEV:
-        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 2, 0x0);
+        drawing_line(ctx->screen, c->x, c->y - 4 * SCALE, c->x, c->y + 4 * SCALE, 0x0);
         break;
 
     case CURSOR_RESIZEHV:
-        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y - 4 * SCALE, c->x + 4 * SCALE, c->y + 4 * SCALE, 2, 0x0);
+        drawing_line(ctx->screen, c->x - 4 * SCALE, c->y - 4 * SCALE, c->x + 4 * SCALE, c->y + 4 * SCALE, 0x0);
         break;
 
     default:
@@ -285,11 +285,11 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
     {
         if (c->x < SNAP_AREA)
         {
-            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 1, 0x0A64CD);
+            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 0x0A64CD);
         }
         else if (c->x > (int)(ctx->width - SNAP_AREA))
         {
-            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 1, 0x0A64CD);
+            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 0x0A64CD);
         }
     }
 }

@@ -50,12 +50,14 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 LDFLAGS = []
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-m", "256M", # "-display", "sdl",
-             "-serial", "mon:stdio", "-M", "accel=kvm:tcg"]
+QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
+QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
 
 
 def QEMU(disk):
-    subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS)
+    with open("/dev/null", "w") as f:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS, stderr=f) != 0:
+            subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM, stderr=f)
 
 
 def MKDIR(directory):
@@ -72,7 +74,6 @@ def RMDIR(directory):
 
 def COPY(src, dest):
     shutil.copyfile(src, dest)
-
 
 def TAR(directory, output_file):
     subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
@@ -496,8 +497,9 @@ def distrib(targets):
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
         TAR(ramdisk, "build/ramdisk.tar")
-    # else:
-    #     print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " ramdisk")
+
+    else:
+        print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " ramdisk")
 
 ## --- BOOTDISK ------------------------------------------------------------- ##
 
@@ -516,11 +518,13 @@ def distrib(targets):
         COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
-        GRUB("build/bootdisk", "build/bootdisk.iso")
-    # else:
-    #     print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
+        if not GRUB(bootdisk, "build/bootdisk.iso"):
+            ERROR("Failled to generate bootdisk... (check if xorriso, mtools is installed)")
+            ABORT()
+    else:
+        print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
-    # print(BRIGHT_YELLOW + "\nDistribution suceed 👌 !" + RESET)
+    print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
 
 def help_command(targets):
     """Show this help message."""
@@ -579,7 +583,8 @@ def list_other(targets):
 def run_command(targets):
     """Start skiftOS in QEMU."""
     distrib(targets)
-
+    
+    print("")
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso")
 

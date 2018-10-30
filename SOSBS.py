@@ -482,7 +482,8 @@ def distrib(targets):
     ramdisk = MKDIR("build/ramdisk")
     bootdisk = MKDIR("build/bootdisk")
 
-## --- RAMDISK -------------------------------------------------------------- ##
+    ## --- RAMDISK ---------------------------------------------------------- ##
+    
     if not is_uptodate("build/ramdisk.tar", [targets[t].get_output() for t in targets if targets[t].type == TargetTypes.APP]):
 
         print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
@@ -501,7 +502,7 @@ def distrib(targets):
     else:
         print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " ramdisk")
 
-## --- BOOTDISK ------------------------------------------------------------- ##
+    ## --- BOOTDISK --------------------------------------------------------- ##
 
     if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["maker.skift.kernel"].get_output(), "build/ramdisk.tar"]):
         print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
@@ -519,12 +520,13 @@ def distrib(targets):
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
         if not GRUB(bootdisk, "build/bootdisk.iso"):
-            ERROR("Failled to generate bootdisk... (check if xorriso, mtools is installed)")
+            ERROR("Failled to generate bootdisk... (check if xorriso or mtools is installed)")
             ABORT()
+
     else:
         print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
-    print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
+    # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
 
 def help_command(targets):
     """Show this help message."""
@@ -539,7 +541,8 @@ def help_command(targets):
     print("")
 
     print(BRIGHT_WHITE + "Targets:" + RESET)
-    print("   ", ', '.join(targets.keys()))
+    for t in targets.keys():
+        print("    %s" % (t))
 
     print("\n" + BRIGHT_WHITE + "Actions:" + RESET)
     for act in actions:
@@ -583,7 +586,7 @@ def list_other(targets):
 def run_command(targets):
     """Start skiftOS in QEMU."""
     distrib(targets)
-    
+
     print("")
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso")

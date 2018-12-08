@@ -1,10 +1,8 @@
-#include "panel.h"
-
 #include <skift/utils.h>
 
-int main(int argc, char const *argv[])
+#include "panel.h"
+
+int program()
 {
-    UNUSED(argc);
-    UNUSED(argv);
     return 0;
 }

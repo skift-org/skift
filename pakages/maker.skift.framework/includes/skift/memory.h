@@ -10,10 +10,10 @@
 #define memset(addr, value, size) sk_memory_set((addr), (size), (value))
 #define memzero(addr, size) sk_memory_zero((addr), (size))
 
-void *memory_alloc(uint size);
-void memory_free(void *addr);
+void *sk_memory_alloc(uint size);
+void sk_memory_free(void *addr);
 
-void memory_copy(void *src, void *dest, uint size);
-void memory_move(void *src, void *dest, uint size);
-void memory_set(void *addr, uint size, byte value);
-void memory_zero(void *addr, uint size);
+void sk_memory_copy(void *src, void *dest, uint size);
+void sk_memory_move(void *src, void *dest, uint size);
+void sk_memory_set(void *addr, uint size, byte value);
+void sk_memory_zero(void *addr, uint size);

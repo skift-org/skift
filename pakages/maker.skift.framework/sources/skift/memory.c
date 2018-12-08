@@ -1,6 +1,6 @@
 #include <skift/memory.h>
 
-void memory_copy(void *src, void *dest, uint size)
+void sk_memory_copy(void *src, void *dest, uint size)
 {
     byte *d = dest;
     byte *s = src;
@@ -11,7 +11,7 @@ void memory_copy(void *src, void *dest, uint size)
     }
 }
 
-void memory_move(void *src, void *dest, uint size)
+void sk_memory_move(void *src, void *dest, uint size)
 {
     byte *d = dest;
     byte *s = src;
@@ -28,7 +28,7 @@ void memory_move(void *src, void *dest, uint size)
     }
 }
 
-void memory_set(void *addr, uint size, byte value)
+void sk_memory_set(void *addr, uint size, byte value)
 {
     byte *a = addr;
 
@@ -38,7 +38,7 @@ void memory_set(void *addr, uint size, byte value)
     }
 }
 
-void memory_zero(void *addr, uint size)
+void sk_memory_zero(void *addr, uint size)
 {
     byte *a = addr;
 

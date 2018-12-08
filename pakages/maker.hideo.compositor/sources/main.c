@@ -311,11 +311,8 @@ hideo_context_t *hideo_ctor(uint screen_width, uint screen_height)
     return ctx;
 }
 
-int main(int argc, char const *argv[])
+int program()
 {
-    UNUSED(argc);
-    UNUSED(argv);
-
     uint width, height = 0;
     sk_io_graphic_size(&width, &height);
     printf("Graphic context created %dx%d", width, height);

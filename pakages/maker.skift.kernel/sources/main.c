@@ -30,6 +30,9 @@
 #define LINE \
     "================================================================================"
 
+#define THIN_LINE \
+    "--------------------------------------------------------------------------------"
+
 multiboot_info_t mbootinfo;
 
 extern int __end;
@@ -47,13 +50,13 @@ void main(multiboot_info_t *info, s32 magic)
     log("Booting...");
 
     /* --- Early operation -------------------------------------------------- */
-    log(LINE);
+    log(THIN_LINE);
     log("Early setup...");
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     graphic_early_setup(800, 600);
 
     /* --- System check ----------------------------------------------------- */
-    log(LINE);
+    log(THIN_LINE);
     log("System check...");
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
@@ -62,10 +65,10 @@ void main(multiboot_info_t *info, s32 magic)
     {
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
-    log("Passed!");
+    log("Tests passed!");
 
     /* --- Setup cpu context ------------------------------------------------ */
-    log(LINE);
+    log(THIN_LINE);
     log("Initializing cpu context...");
     setup(gdt);
     setup(pic);
@@ -74,7 +77,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(irq);
 
     /* --- System context --------------------------------------------------- */
-    log(LINE);
+    log(THIN_LINE);
     log("Initializing system context...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
@@ -82,14 +85,14 @@ void main(multiboot_info_t *info, s32 magic)
     setup(modules, &mbootinfo);
 
     /* --- Devices ---------------------------------------------------------- */
-    log(LINE);
+    log(THIN_LINE);
     log("Initializing device context...");
     setup(graphic);
     setup(mouse);
     setup(keyboard);
 
     /* --- Finalizing System ------------------------------------------------ */
-    log(LINE);
+    log(THIN_LINE);
     log("Enabling interupts, paging and atomics.");
     sk_atomic_enable();
     sti();
@@ -98,16 +101,16 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Entering userspace ----------------------------------------------- */
     log(LINE);
     log("Entering userland...");
-    PROCESS init = process_exec("app/maker.hideo.compositor", NULL);
+    PROCESS session = process_exec("app/maker.hideo.compositor", NULL);
 
-    if (init)
+    if (session)
     {
-        thread_waitproc(init);
-        PANIC("The init process has return!");
+        thread_waitproc(session);
+        PANIC("The session has return!");
     }
     else
     {
-        PANIC("Init not found!");
+        PANIC("Session not found!");
     }
 
     PANIC("END OF KERNEL!");

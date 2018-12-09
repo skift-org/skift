@@ -2,6 +2,7 @@
 
 """
 S.O.S.B.S: The (S)kift(O)(S) (B)uild (S)ystem
+S.O.S.D.K: The (S)kift(O)(S) (D)evelopment (K)it
 """
 
 from pprint import pprint
@@ -74,8 +75,30 @@ def RMDIR(directory):
         shutil.rmtree(directory)
 
 
+def copytree(src, dst, ignore=None):
+    if os.path.isdir(src):
+        if not os.path.isdir(dst):
+            os.makedirs(dst)
+        files = os.listdir(src)
+        if ignore is not None:
+            ignored = ignore(src, files)
+        else:
+            ignored = set()
+        for f in files:
+            if f not in ignored:
+                copytree(os.path.join(src, f), 
+                                    os.path.join(dst, f), 
+                                    ignore)
+    else:
+        shutil.copyfile(src, dst)
+
 def COPY(src, dest):
-    shutil.copyfile(src, dest)
+    if os.path.isdir(src):
+        copytree(src, dest)
+    else:
+        shutil.copyfile(src, dest)
+
+    return dest
 
 def TAR(directory, output_file):
     subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
@@ -530,6 +553,37 @@ def distrib(targets):
 
     # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
 
+def distrib_sdk(targets):
+    """Generate a distribution of the skiftOS sdk"""
+    
+    distrib(targets)
+
+    sdk = MKDIR("build/sdk")
+
+    boot = COPY("build/bootdisk", "build/sdk/boot")
+    system = COPY("build/ramdisk", "build/sdk/system")
+
+    # copy pakages
+    pakages = MKDIR("build/sdk/pakages")
+    COPY("pakages/exemple" , pakages + "/exemple")
+
+    # copy all includes files
+    includes  = MKDIR(sdk + "/includes")
+
+    for t in targets:
+        t = targets[t]
+        COPY(join(t.location, "includes"), includes)
+
+    # copy all libraries
+    libraries = MKDIR(sdk + "/libraries")
+
+    # copy SOSBS.py
+    COPY("./SOSBS.py", "build/sdk/SOSDK.py")
+
+    # copy the toolchain
+    COPY("toolchain/local", sdk + "/toolchain")
+
+
 def help_command(targets):
     """Show this help message."""
 
@@ -604,6 +658,7 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
+        "distrib-sdk": distrib_sdk,
         "run": run_command
     }
 

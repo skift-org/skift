@@ -56,64 +56,63 @@ int vsprintf(char *str, const char *format, va_list va)
             char temp[32];
             switch (c)
             {
-                case 'b':
-                    itos(va_arg(va, unsigned int), temp, 2);
-                    strcat(str, "0b");
-                    strcat(str, temp);
-                    break;
+            case 'b':
+                itos(va_arg(va, unsigned int), temp, 2);
+                strcat(str, temp);
+                break;
 
-                case 'i':
-                case 'd':
-                    {
-                        bool isneg = false;
-                        int value = va_arg(va, unsigned int);
-                        unsigned int uvalue = 0;
-                        
-                        if (value < 0)
-                        {
-                            isneg = true;
-                            uvalue = 0 - value;
-                        }
-                        else
-                        {
-                            uvalue = value;
-                        }
+            case 'i':
+            case 'd':
+            {
+                bool isneg = false;
+                int value = va_arg(va, unsigned int);
+                unsigned int uvalue = 0;
 
-                        if (isneg)
-                        {
-                            strcat(str, "-");
-                        }
+                if (value < 0)
+                {
+                    isneg = true;
+                    uvalue = 0 - value;
+                }
+                else
+                {
+                    uvalue = value;
+                }
 
-                        itos(uvalue, temp, 10);
-                        strcat(str, temp);
-                    }
-                    break;
-                case 'u':
-                    itos(va_arg(va, unsigned int), temp, 10);
-                    strcat(str, temp);
-                    break;
+                if (isneg)
+                {
+                    strcat(str, "-");
+                }
 
-                case 'x':
-                    itos(va_arg(va, unsigned int), temp, 16);
-                    strcat(str, temp);
-                    break;
+                itos(uvalue, temp, 10);
+                strcat(str, temp);
+            }
+            break;
+            case 'u':
+                itos(va_arg(va, unsigned int), temp, 10);
+                strcat(str, temp);
+                break;
 
-                case 'c':
-                    strapd(str, va_arg(va, char));
-                    break;
+            case 'x':
+                itos(va_arg(va, unsigned int), temp, 16);
+                strcat(str, temp);
+                break;
 
-                case 's':
-                    strcat(str, va_arg(va, const char *));
-                    break;
+            case 'c':
+                strapd(str, va_arg(va, char));
+                break;
 
-                case '%':
-                    strapd(str, '%');
-                    break;
+            case 's':
+                strcat(str, va_arg(va, const char *));
+                break;
 
-                default:
-                    strapd(str, '%');
-                    strapd(str, c);
-                    break;
+            case '%':
+                strapd(str, '%');
+                break;
+
+            default:
+                strapd(str, '%');
+                strapd(str, c);
+                break;
             }
 
             wait_for_format = false;

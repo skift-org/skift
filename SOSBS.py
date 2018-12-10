@@ -44,7 +44,8 @@ GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
 AR = "./toolchain/local/bin/i686-elf-ar"
 
-CFLAGS = ["-fno-pie", "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
+CFLAGS = ["-fno-pie", "-fno-stack-protector", "-fno-builtin",
+          "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
 CFLAGS_OPTIMIZATION = ["-O0", "-O1", "-O2", "-O3"]
 CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 
@@ -53,7 +54,6 @@ ASFLAGS = ["-f", "elf32"]
 
 QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
 QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
-
 
 def QEMU(disk):
     with open("/dev/null", "w") as f:
@@ -84,13 +84,17 @@ def copytree(src, dst, ignore=None):
             ignored = ignore(src, files)
         else:
             ignored = set()
+
         for f in files:
             if f not in ignored:
-                copytree(os.path.join(src, f), 
+                copytree(os.path.join(src, f),
+                         os.path.join(dst, f),
                                     os.path.join(dst, f), 
-                                    ignore)
+                         os.path.join(dst, f),
+                         ignore)
     else:
         shutil.copyfile(src, dst)
+
 
 def COPY(src, dest):
     if os.path.isdir(src):
@@ -100,8 +104,10 @@ def COPY(src, dest):
 
     return dest
 
+
 def TAR(directory, output_file):
-    subprocess.call(["tar", "-cf", output_file, "-C", directory] + os.listdir(directory))
+    subprocess.call(["tar", "-cf", output_file, "-C",
+                     directory] + os.listdir(directory))
 
 
 def GRUB(iso, output_file):
@@ -225,7 +231,7 @@ class Target(object):
 
         self.builded = False
 
-    def get_dependancies_internal(self, targets, found=None, with_includes = False):
+    def get_dependancies_internal(self, targets, found=None, with_includes=False):
         if found == None:
             found = []
 
@@ -314,7 +320,6 @@ class Target(object):
             objects.append(s.replace(join(self.location, "sources"),
                                      join(self.location, "obj")) + ".o")
 
-
         return objects
 
     def is_uptodate(self):
@@ -356,7 +361,8 @@ class Target(object):
         if self.type in [TargetTypes.APP, TargetTypes.KERNEL]:
             script = "./common/kernel.ld" if self.type == TargetTypes.KERNEL else "./common/userspace.ld"
             dependancies = self.get_libraries(targets)
-            command = [LD, "-T", script, "-o", output_file] + objects_files + dependancies
+            command = [LD] + LDFLAGS + ["-T", script, "-o", output_file] + \
+                objects_files + dependancies
         elif self.type in [TargetTypes.LIB, TargetTypes.SHARED]:
             command = [AR, "rcs"] + [output_file] + objects_files
         else:
@@ -382,7 +388,6 @@ class Target(object):
             if not dep.build(targets):
                 ERROR("Failed to build " + YELLOW + "%s " % (dep.name))
                 return False
-
 
         if is_uptodate(self.get_output(), self.get_sources() + [dep.get_output() for dep in self.get_dependancies(targets)]):
             self.builded = True
@@ -446,6 +451,7 @@ def rebuild(target, targets):
     target.clean()
     target.build(targets)
 
+
 def info(target, targets):
     """Dump information about the target."""
 
@@ -508,7 +514,7 @@ def distrib(targets):
     bootdisk = MKDIR("build/bootdisk")
 
     ## --- RAMDISK ---------------------------------------------------------- ##
-    
+
     if not is_uptodate("build/ramdisk.tar", [targets[t].get_output() for t in targets if targets[t].type == TargetTypes.APP]):
 
         print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
@@ -518,7 +524,8 @@ def distrib(targets):
         for t in targets:
             target = targets[t]
             if target.type == TargetTypes.APP:
-                print(BRIGHT_WHITE + "    Copying " + RESET + "application '%s'" % t)
+                print(BRIGHT_WHITE + "    Copying " +
+                      RESET + "application '%s'" % t)
                 COPY(target.get_output(), join(app_dir, target.name))
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
@@ -538,14 +545,16 @@ def distrib(targets):
         COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
-        COPY(targets["maker.skift.kernel"].get_output(), join(bootdir, "kernel.bin"))
+        COPY(targets["maker.skift.kernel"].get_output(),
+             join(bootdir, "kernel.bin"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
         COPY("build/ramdisk.tar", join(bootdir, "ramdisk.tar"))
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the ISO")
         if not GRUB(bootdisk, "build/bootdisk.iso"):
-            ERROR("Failled to generate bootdisk... (check if xorriso or mtools is installed)")
+            ERROR(
+                "Failled to generate bootdisk... (check if xorriso or mtools is installed)")
             ABORT()
 
     else:
@@ -553,9 +562,10 @@ def distrib(targets):
 
     # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
 
+
 def distrib_sdk(targets):
     """Generate a distribution of the skiftOS sdk"""
-    
+
     distrib(targets)
 
     sdk = MKDIR("build/sdk")
@@ -565,10 +575,10 @@ def distrib_sdk(targets):
 
     # copy pakages
     pakages = MKDIR("build/sdk/pakages")
-    COPY("pakages/exemple" , pakages + "/exemple")
+    COPY("pakages/exemple", pakages + "/exemple")
 
     # copy all includes files
-    includes  = MKDIR(sdk + "/includes")
+    includes = MKDIR(sdk + "/includes")
 
     for t in targets:
         t = targets[t]
@@ -647,6 +657,7 @@ def run_command(targets):
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso")
 
+
 global_actions = \
     {
         "build-all": build_all,
@@ -677,6 +688,7 @@ def main(argc, argv):
     targets = list_targets("pakages")
 
     # Check and build the cross compiler if the user say 'YES'.
+    """
     if not crosscompiler_check():
         ERROR("Toolchain not found!")
 
@@ -687,7 +699,7 @@ def main(argc, argv):
             crosscompiler_build()
         else:
             ABORT()
-
+    """
     # Command parsing
 
     if argc < 2:
@@ -716,6 +728,25 @@ def main(argc, argv):
 
         else:
             missing_command(action)
+
+
+if not crosscompiler_check():
+    ERROR("Toolchain not found!")
+
+    respond = input(
+        "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
+
+    if respond in ['y', "yes", 'o', "oui"]:
+        crosscompiler_build()
+    else:
+        print("Falling back to the system toolchain (WARNING! this is not really supported)")
+
+        GCC = "gcc"
+        LD = "ld"
+        AR = "ar"
+
+        CFLAGS.append("-m32")
+        LDFLAGS += ["-m", "elf_i386"]
 
 # Jump to the entry point.
 if __name__ == '__main__':

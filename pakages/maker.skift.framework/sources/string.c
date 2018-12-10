@@ -322,8 +322,10 @@ void strrvs(char * str)
 void strleadtrim(char * str, char c)
 {
     char *start = str;
+    
     while (*start == c)
         start++;
+
     memmove(str, start, strlen(str + 1));
 }
 

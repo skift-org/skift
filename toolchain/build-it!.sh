@@ -43,7 +43,7 @@ pushd "$DIR/build/"
     popd
 
     pushd gcc
-        $DIR/tarballs/gcc-6.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --enable-languages=c,c++ --disable-libssp --without-headers || exit 1
+        $DIR/tarballs/gcc-6.4.0/configure --target=$TARGET --prefix=$PREFIX --disable-nls --enable-languages=c --disable-libssp --without-headers || exit 1
         make -j $(nproc) all-gcc all-target-libgcc
         make install-gcc install-target-libgcc
     popd

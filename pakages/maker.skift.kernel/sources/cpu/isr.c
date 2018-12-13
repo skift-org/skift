@@ -45,7 +45,6 @@ static const char *exception_messages[32] =
 };
 
 extern u32 isr_vector[];
-extern bool console_bypass_lock;
 isr_handler_t isr_handlers[32];
 
 void isr_setup()

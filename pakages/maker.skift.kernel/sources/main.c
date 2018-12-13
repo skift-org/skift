@@ -101,7 +101,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Entering userspace ----------------------------------------------- */
     log(LINE);
     log("Entering userland...");
-    PROCESS session = process_exec("app/exemple", NULL);
+    PROCESS session = process_exec("app/maker.hideo.compositor", NULL);
 
     if (session)
     {

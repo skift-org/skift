@@ -56,11 +56,10 @@ QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
 QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
 
 def QEMU(disk):
-    with open("/dev/null", "w") as f:
-        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS, stderr=f) != 0:
-            if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM, stderr=f) != 0:
-                ERROR("Failed to start QEMU!")
-                ABORT()
+    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
+            ERROR("Failed to start QEMU!")
+            ABORT()
 
 
 def MKDIR(directory):
@@ -126,7 +125,7 @@ def ERROR(msg):
 
 
 def ABORT():
-    print("Aborted!")
+    print("Aborted!" + RESET)
     exit(-1)
 
 
@@ -751,3 +750,5 @@ if not crosscompiler_check():
 # Jump to the entry point.
 if __name__ == '__main__':
     main(len(sys.argv), sys.argv)
+
+print(RESET)

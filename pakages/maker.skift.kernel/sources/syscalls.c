@@ -71,6 +71,44 @@ int sys_thread_self()
     return thread_self();
 }
 
+int sys_thread_create(thread_entry_t entry, void * args, int flags)
+{
+    return thread_create(process_self(), entry, args, flags | TASK_USER);
+}
+
+int sys_thread_exit(void* retval)
+{
+    thread_exit(retval);
+    return 0;
+}
+
+int sys_thread_cancel(THREAD t)
+{
+    return thread_cancel(t);
+}
+
+int sys_thread_sleep(int time)
+{
+    thread_sleep(time);
+    return 0;
+}
+
+int sys_thread_wakeup(THREAD t)
+{
+    thread_wakeup(t);
+    return 0;
+}
+
+int sys_thread_wait(THREAD t)
+{
+    return (int)thread_wait(t);
+}
+
+int sys_thread_waitproc(PROCESS p)
+{
+    return thread_waitproc(p);
+}
+
 /* --- Messaging ------------------------------------------------------------ */
 int sys_messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
 {
@@ -153,13 +191,13 @@ static int (*syscalls[])() =
         [SYS_PROCESS_FREE] = sys_process_free,
 
         [SYS_THREAD_SELF] = sys_thread_self,
-        [SYS_THREAD_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_EXIT] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_CANCEL] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_SLEEP] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_WAKEUP] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_WAIT] = sys_not_implemented /* NOT IMPLEMENTED */,
-        [SYS_THREAD_WAITPROC] = sys_not_implemented /* NOT IMPLEMENTED */,
+        [SYS_THREAD_CREATE] = sys_thread_create,
+        [SYS_THREAD_EXIT] = sys_thread_exit,
+        [SYS_THREAD_CANCEL] = sys_thread_cancel,
+        [SYS_THREAD_SLEEP] = sys_thread_sleep,
+        [SYS_THREAD_WAKEUP] = sys_thread_wakeup,
+        [SYS_THREAD_WAIT] = sys_thread_wait,
+        [SYS_THREAD_WAITPROC] = sys_thread_waitproc,
 
         [SYS_MSG_SEND] = sys_messaging_send,
         [SYS_MSG_BROADCAST] = sys_messaging_broadcast,

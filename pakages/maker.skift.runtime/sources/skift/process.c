@@ -5,6 +5,11 @@
 #include <skift/process.h>
 #include <skift/syscall.h>
 
+#ifndef NO_MACRO
+    #define sk_exec(file, args) sk_process_exec(file, arg)
+    #define sk_exit(code) sk_process_exit(code)
+#endif
+
 DEFN_SYSCALL0(sk_process_self, SYS_PROCESS_SELF);
 DEFN_SYSCALL2(sk_process_exec, SYS_PROCESS_EXEC, const char *, const char **);
 

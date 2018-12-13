@@ -18,10 +18,10 @@ void sk_console_println(const char *msg)
 }
 
 /* --- Printf logic --------------------------------------------------------- */
-/*void sk_console_printf(char *fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-    
-    va_end(va);
-}*/
+// void sk_console_printf(char *fmt, ...)
+// {
+//     va_list va;
+//     va_start(va, fmt);
+// 
+//     va_end(va);
+// }

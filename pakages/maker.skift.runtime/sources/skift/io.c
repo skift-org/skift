@@ -5,6 +5,11 @@
 #include <skift/io.h>
 #include <skift/syscall.h>
 
+#ifndef NO_MACRO
+    #define sk_print(msg) sk_io_print(msg)
+    #define sk_read(buffer, size) sk_io_read(buffer, size);
+#endif
+
 DEFN_SYSCALL1(sk_io_print, SYS_IO_PRINT, const char *);
 DEFN_SYSCALL2(sk_io_read, SYS_IO_READ, char *, int);
 

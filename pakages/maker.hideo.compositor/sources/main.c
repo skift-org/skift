@@ -338,7 +338,6 @@ int program()
 
         // Draw
         drawing_clear(ctx->screen, 0xe5e5e5);
-        //drawing_fillrect(ctx->screen, cur.x - 32, cur.y - 32, 64, 64, 0xe5e5e5);
         drawing_text(ctx->screen, "maker.hideo.compositor", 8, 8, 0x939393);
 
         FOREACH(w, ctx->windows)

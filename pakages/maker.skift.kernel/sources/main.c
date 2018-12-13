@@ -45,7 +45,7 @@ void main(multiboot_info_t *info, s32 magic)
 {
     /* --- Say hello -------------------------------------------------------- */
     log(KERNEL_UNAME);
-    log("Copyright © 2018 MAKER.");
+    log("Copyright © 2018-2019 MAKER.");
 
     log("Booting...");
 
@@ -101,7 +101,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Entering userspace ----------------------------------------------- */
     log(LINE);
     log("Entering userland...");
-    PROCESS session = process_exec("app/maker.hideo.compositor", NULL);
+    PROCESS session = process_exec("app/maker.hideo.session", NULL);
 
     if (session)
     {

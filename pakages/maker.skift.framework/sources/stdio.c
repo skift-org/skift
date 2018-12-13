@@ -94,6 +94,13 @@ int vsprintf(char *str, const char *format, va_list va)
 
             case 'x':
                 itos(va_arg(va, unsigned int), temp, 16);
+                int size = strlen(temp);
+                
+                for(int i = 0; i < 8 - size; i++)
+                {
+                    strapd(str, '0');
+                }
+            
                 strcat(str, temp);
                 break;
 

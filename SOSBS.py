@@ -225,6 +225,7 @@ class Target(object):
     """
 
     def __init__(self, location, data):
+        self.name_friendly = data["name"] if "name" in data else data["id"]
         self.name = data["id"]
         self.type = TargetTypes.FromStr(data["type"])
         self.location = location
@@ -399,7 +400,7 @@ class Target(object):
         else:
             print("")
             # Skip a line so it's easier on the eyes.
-            print(BRIGHT_WHITE + "%s:" % self.name + RESET)
+            print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
             # Build all source file of the current target
             for src, obj in zip(self.get_sources(), self.get_objects()):

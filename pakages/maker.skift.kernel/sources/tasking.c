@@ -21,8 +21,8 @@
 
 #include "kernel/tasking.h"
 
-int PID = 0;
-int TID = 0;
+int PID = 1;
+int TID = 1;
 int MID = 1;
 
 uint ticks = 0;

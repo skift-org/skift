@@ -1,4 +1,6 @@
 {
+    "name":"Skift Runtime",
+
     "id": "maker.skift.runtime",
     "type": "lib",
     "libs": [

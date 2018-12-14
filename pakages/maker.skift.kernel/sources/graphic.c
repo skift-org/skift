@@ -53,8 +53,16 @@ void graphic_setup()
 
 void graphic_size(uint *width, uint *height)
 {
-    *width = graphic_width;
-    *height = graphic_height;
+    if (framebuffer == NULL)
+    {
+        *width = 0;
+        *height = 0; 
+    }
+    else
+    {
+        *width = graphic_width;
+        *height = graphic_height;
+    }
 }
 
 /* --- Drawing to the screen ------------------------------------------------ */

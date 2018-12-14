@@ -4,7 +4,7 @@
 
 int program()
 {
-    printf(GREATING);
+    puts(GREATING);
 
     return 0;
 }

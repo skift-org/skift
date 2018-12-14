@@ -1,3 +1,3 @@
 #pragma once
 
-#define GREATING "Hello, world!"
+#define GREATING "Hello, world!\n"

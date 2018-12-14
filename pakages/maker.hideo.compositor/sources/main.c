@@ -166,7 +166,12 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
     {
         if (c->leftbtn == BTN_PRESSED)
         {
-            ctx->focus = win;
+            if (ctx->focus != win)
+            {
+                sk_log(LOG_DEBUG, "Window@%x got the focus.", win);
+                ctx->focus = win;
+            }
+            
             list_remove(ctx->windows, win);
             list_pushback(ctx->windows, win);
 
@@ -316,43 +321,52 @@ int program()
 {
     uint width, height = 0;
     sk_io_graphic_size(&width, &height);
-    sk_log(LOG_INFO, "Graphic context created %dx%d", width, height);
 
-    hideo_context_t *ctx = hideo_ctor(width, height);
-
-    hideo_cursor_t cur = {.x = ctx->width / 2, .y = ctx->height / 2};
-
-    hideo_create_window(ctx, "Hello, world!", 54, 96, 256, 128);
-    hideo_create_window(ctx, "Good bye!", 300, 128, 256, 128);
-    hideo_create_window(ctx, "Wow such window!", 100, 200, 256, 256);
-
-    while (1)
+    if (width != 0 && height != 0)
     {
-        // Update
-        hideo_cursor_update(ctx, &cur);
+        sk_log(LOG_INFO, "Graphic context created %dx%d", width, height);
 
-        FOREACH(w, ctx->windows)
+        hideo_context_t *ctx = hideo_ctor(width, height);
+
+        hideo_cursor_t cur = {.x = ctx->width / 2, .y = ctx->height / 2};
+
+        hideo_create_window(ctx, "Hello, world!", 54, 96, 256, 128);
+        hideo_create_window(ctx, "Good bye!", 300, 128, 256, 128);
+        hideo_create_window(ctx, "Wow such window!", 100, 200, 256, 256);
+
+        while (1)
         {
-            hideo_window_t *window = (hideo_window_t *)w->value;
-            hideo_window_update(ctx, window, &cur);
+            // Update
+            hideo_cursor_update(ctx, &cur);
+
+            FOREACH(w, ctx->windows)
+            {
+                hideo_window_t *window = (hideo_window_t *)w->value;
+                hideo_window_update(ctx, window, &cur);
+            }
+
+            // Draw
+            drawing_clear(ctx->screen, 0xe5e5e5);
+            drawing_text(ctx->screen, "maker.hideo.compositor", 8, 8, 0x939393);
+
+            FOREACH(w, ctx->windows)
+            {
+                hideo_window_t *window = (hideo_window_t *)w->value;
+
+                hideo_window_draw(ctx, window);
+            }
+
+            hideo_cursor_draw(ctx, &cur);
+
+            // Blit
+            sk_io_graphic_blit(ctx->screen->buffer);
         }
 
-        // Draw
-        drawing_clear(ctx->screen, 0xe5e5e5);
-        drawing_text(ctx->screen, "maker.hideo.compositor", 8, 8, 0x939393);
-
-        FOREACH(w, ctx->windows)
-        {
-            hideo_window_t *window = (hideo_window_t *)w->value;
-
-            hideo_window_draw(ctx, window);
-        }
-
-        hideo_cursor_draw(ctx, &cur);
-
-        // Blit
-        sk_io_graphic_blit(ctx->screen->buffer);
+        return 0;
     }
-
-    return 0;
+    else
+    {
+        sk_log(LOG_FATAL, "No graphic context found, aborting");
+        return -1;
+    }
 }

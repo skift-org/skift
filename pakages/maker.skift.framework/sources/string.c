@@ -1,3 +1,5 @@
+#include <skift/generic.h>
+
 #include "string.h"
 #include "math.h"
 

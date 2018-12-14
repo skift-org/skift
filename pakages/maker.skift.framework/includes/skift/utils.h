@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define PACKED(x) x __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))

@@ -1,4 +1,6 @@
 {
+    "name": "Hideo Compositor",
+
     "id": "maker.hideo.compositor",
     "type": "app",
     "libs": [

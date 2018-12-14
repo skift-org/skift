@@ -1,4 +1,6 @@
 {
+    "name": "Hjerte Kernel",
+
     "id": "maker.skift.kernel",
     "type": "kernel",
     "libs": [

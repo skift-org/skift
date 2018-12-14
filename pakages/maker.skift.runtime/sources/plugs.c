@@ -14,7 +14,6 @@
 lock_t memlock;
 lock_t loglock;
 
-
 void __plug_init(void)
 {
     sk_lock_init(memlock);

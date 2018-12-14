@@ -1,4 +1,6 @@
 {
+    "name": "Hideo Panels",
+    
     "id": "maker.hideo.panel",
     "type": "app",
     "libs": [

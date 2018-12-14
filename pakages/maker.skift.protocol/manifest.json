@@ -1,4 +1,6 @@
 {
+    "name": "Hjerte Protocol",
+    
     "id": "maker.skift.protocol",
     "type": "shared"
 }

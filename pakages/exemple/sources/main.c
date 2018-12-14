@@ -1,11 +1,10 @@
-#include <skift/generic.h>
-#include <skift/io.h>
+#include <stdio.h>
 
 #include "exemple.h"
 
 int program()
 {
-    sk_io_print(GREATING);
+    printf(GREATING);
 
     return 0;
 }

@@ -11,10 +11,13 @@
 #include <skift/__plugs.h>
 
 lock_t memlock;
+lock_t loglock;
+
 
 void __plug_init(void)
 {
     sk_lock_init(memlock);
+    sk_lock_init(loglock);
 }
 
 int __plug_print(const char *buffer)
@@ -45,6 +48,18 @@ void __plug_read(char * buffer, uint size)
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
     printf("assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+}
+
+int __plug_logger_lock()
+{
+    sk_lock_acquire(loglock);
+    return 0;
+}
+
+int __plug_logger_unlock()
+{
+    sk_lock_release(loglock);
+    return 0;
 }
 
 int __plug_memalloc_lock()

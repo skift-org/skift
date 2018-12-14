@@ -7,3 +7,4 @@
 #define UNUSED(x) (void)(x)
 #define MALLOC(type) ((type *)malloc(sizeof(type)))
 #define STUB(a...) printf("STUB REACHED %s\n", __FUNCTION__, a)
+#define ARRAY_SIZE(array)  (sizeof(array) / sizeof(array[0]))

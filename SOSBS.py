@@ -18,6 +18,11 @@ import shutil
 
 APP_NAME = sys.argv[0]
 
+SDK = True
+
+if (sys.argv[0].endswith("SOSBS.py")):
+    SDK = False
+
 ESC = '\033['
 
 BLACK = ESC + '30m'
@@ -589,14 +594,19 @@ def distrib_sdk(targets):
     COPY("./SOSBS.py", "build/sdk/SOSDK.py")
 
     # copy the toolchain
-    COPY("toolchain/local", sdk + "/toolchain")
+    COPY("toolchain/local", sdk + "/toolchain/local")
 
 
 def help_command(targets):
     """Show this help message."""
 
-    print(BRIGHT_WHITE + "S.O.S.B.S, version 2.0" + RESET)
-    print("The skiftOS build system")
+    if SDK:
+        print(BRIGHT_WHITE + "S.O.S.D.K, version 3.0" + RESET)
+        print("The skiftOS dev kit")
+    else:
+        print(BRIGHT_WHITE + "S.O.S.B.S, version 3.0" + RESET)
+        print("The skiftOS build system")
+
     print("")
 
     print(BRIGHT_WHITE + "Usage :" + RESET +
@@ -667,9 +677,13 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "distrib-sdk": distrib_sdk,
         "run": run_command
     }
+
+if not SDK:
+    global_actions.update({
+        "distrib-sdk": distrib_sdk
+    }) 
 
 # --- Main ------------------------------------------------------------------- #
 
@@ -685,21 +699,7 @@ def main(argc, argv):
     """
     targets = list_targets("pakages")
 
-    # Check and build the cross compiler if the user say 'YES'.
-    """
-    if not crosscompiler_check():
-        ERROR("Toolchain not found!")
-
-        respond = input(
-            "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
-
-        if respond in ['y', "yes", 'o', "oui"]:
-            crosscompiler_build()
-        else:
-            ABORT()
-    """
     # Command parsing
-
     if argc < 2:
         help_command(targets)
     else:
@@ -746,6 +746,7 @@ if not crosscompiler_check():
 
         CFLAGS.append("-m32")
         LDFLAGS += ["-m", "elf_i386"]
+
 
 # Jump to the entry point.
 if __name__ == '__main__':

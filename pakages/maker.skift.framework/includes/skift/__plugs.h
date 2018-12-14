@@ -10,6 +10,9 @@ void __plug_read(char * buffer, uint size);
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 
+int __plug_logger_lock();
+int __plug_logger_unlock();
+
 // Memory allocator plugs
 int __plug_memalloc_lock();
 int __plug_memalloc_unlock();

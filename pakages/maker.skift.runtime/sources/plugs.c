@@ -8,6 +8,7 @@
 #include <skift/io.h>
 #include <skift/lock.h>
 #include <skift/process.h>
+#include <skift/logger.h>
 #include <skift/__plugs.h>
 
 lock_t memlock;
@@ -28,12 +29,12 @@ int __plug_print(const char *buffer)
 
 void __plug_putchar(int c)
 {
-    printf("__plug_putchar() not implemented!");
+    sk_log(LOG_ERROR, "__plug_putchar() not implemented!");
 }
 
 int __plug_getchar()
 {
-    printf("__plug_getchar() not implemented!");
+    sk_log(LOG_ERROR, "__plug_getchar() not implemented!");
     return EOF;
 }
 
@@ -42,12 +43,13 @@ void __plug_read(char * buffer, uint size)
     UNUSED(buffer);
     UNUSED(size);
 
-    printf("__plug_read() not implemented!");
+    sk_log(LOG_ERROR, "__plug_read() not implemented!");
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    printf("assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    sk_log(LOG_FATAL, "assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    sk_process_exit(-1);
 }
 
 int __plug_logger_lock()
@@ -77,7 +79,6 @@ int __plug_memalloc_unlock()
 void* __plug_memalloc_alloc(uint size)
 {
     uint addr = sk_process_alloc(size);
-    printf("LIBALLOC ALOCC %x", addr);
     return (void*)addr;
 }
 

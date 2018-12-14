@@ -48,18 +48,13 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Say hello -------------------------------------------------------- */
     printf(KERNEL_UNAME);
     log("\nCopyright © 2018-2019 MAKER.");
-
     log("Booting...");
 
     /* --- Early operation -------------------------------------------------- */
-    log(THIN_LINE);
-    log("Early setup...");
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
     graphic_early_setup(800, 600);
 
     /* --- System check ----------------------------------------------------- */
-    log(THIN_LINE);
-    log("System check...");
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
 
@@ -67,11 +62,8 @@ void main(multiboot_info_t *info, s32 magic)
     {
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
-    log("Tests passed!");
 
     /* --- Setup cpu context ------------------------------------------------ */
-    log(THIN_LINE);
-    log("Initializing cpu context...");
     setup(gdt);
     setup(pic);
     setup(idt);
@@ -79,29 +71,21 @@ void main(multiboot_info_t *info, s32 magic)
     setup(irq);
 
     /* --- System context --------------------------------------------------- */
-    log(THIN_LINE);
-    log("Initializing system context...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(filesystem);
     setup(modules, &mbootinfo);
 
     /* --- Devices ---------------------------------------------------------- */
-    log(THIN_LINE);
-    log("Initializing device context...");
     setup(graphic);
     setup(mouse);
     setup(keyboard);
 
     /* --- Finalizing System ------------------------------------------------ */
-    log(THIN_LINE);
-    log("Enabling interupts, paging and atomics.");
     sk_atomic_enable();
     sti();
 
     /* --- Entering userspace ----------------------------------------------- */
-    log(LINE);
-    log("Entering userland...");
     PROCESS session = process_exec("app/maker.hideo.session", NULL);
 
     if (session)

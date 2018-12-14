@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <skift/drawing.h>
+#include <skift/logger.h>
 #include <skift/io.h>
 #include <skift/list.h>
 #include <skift/lock.h>
@@ -39,7 +40,7 @@ hideo_window_t *hideo_create_window(hideo_context_t *ctx, char *title, int x, in
     list_pushback(ctx->windows, (void *)win);
     ctx->focus = win;
 
-    printf("Window@%x create", win);
+    sk_log(LOG_DEBUG, "Window@%x create", win);
 
     return win;
 }
@@ -315,7 +316,7 @@ int program()
 {
     uint width, height = 0;
     sk_io_graphic_size(&width, &height);
-    printf("Graphic context created %dx%d", width, height);
+    sk_log(LOG_INFO, "Graphic context created %dx%d", width, height);
 
     hideo_context_t *ctx = hideo_ctor(width, height);
 

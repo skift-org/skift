@@ -3,10 +3,10 @@
 /* See: LICENSE.md                                                            */
 
 #include <string.h>
+#include <skift/logger.h>
 
 #include "kernel/dev/bga.h"
 #include "kernel/memory.h"
-#include "kernel/logger.h"
 #include "kernel/memory.h"
 
 #include "kernel/graphic.h"
@@ -23,7 +23,7 @@ void graphic_early_setup(uint width, uint height)
 {
     if (bga_is_available())
     {
-        log("Bochs graphics adaptor found!");
+        sk_log(LOG_FINE, "Bochs graphics adaptor found!");
         graphic_width = width;
         graphic_height = height;
 
@@ -33,7 +33,7 @@ void graphic_early_setup(uint width, uint height)
     }
     else
     {
-        log("Warning, no graphic device found!");
+        sk_log(LOG_WARNING, "No graphic device found!");
         graphic_width = 0;
         graphic_height = 0;
         physical_framebuffer = NULL;

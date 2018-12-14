@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include <skift/atomic.h>
+#include <skift/logger.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -17,7 +18,6 @@
 #include "kernel/filesystem.h"
 #include "kernel/graphic.h"
 #include "kernel/keyboard.h"
-#include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
 #include "kernel/mouse.h"
@@ -33,6 +33,8 @@
 #define THIN_LINE \
     "--------------------------------------------------------------------------------"
 
+#define log(a) printf(a "\n")
+
 multiboot_info_t mbootinfo;
 
 extern int __end;
@@ -44,8 +46,8 @@ uint get_kernel_end(multiboot_info_t *minfo)
 void main(multiboot_info_t *info, s32 magic)
 {
     /* --- Say hello -------------------------------------------------------- */
-    log(KERNEL_UNAME);
-    log("Copyright © 2018-2019 MAKER.");
+    printf(KERNEL_UNAME);
+    log("\nCopyright © 2018-2019 MAKER.");
 
     log("Booting...");
 
@@ -96,7 +98,6 @@ void main(multiboot_info_t *info, s32 magic)
     log("Enabling interupts, paging and atomics.");
     sk_atomic_enable();
     sti();
-    log(KERNEL_UNAME);
 
     /* --- Entering userspace ----------------------------------------------- */
     log(LINE);

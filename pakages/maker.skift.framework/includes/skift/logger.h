@@ -20,6 +20,7 @@ typedef enum
     LOG_ALL = 0
 } log_level_t;
 
-#define sk_log(level, fmt, va...) sk_logger_log(level, __FILE__, __LINE__, __FUNCTION__, fmt, a)
-
+void sk_logger_setlevel(log_level_t level);
 void sk_logger_log(log_level_t level, const char * file, uint line, const char * function, const char * fmt, ...);
+
+#define sk_log(level,va...) sk_logger_log(level, __FILE__, __LINE__, __FUNCTION__, va)

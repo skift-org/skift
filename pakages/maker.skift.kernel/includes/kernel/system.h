@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include "cpu/cpu.h"
-#include "kernel/logger.h"
 
 void __panic(const string file, const string function, const int line, context_t * context, string message, ...);
 

@@ -6,12 +6,12 @@
 
 #include <string.h>
 #include <skift/atomic.h>
+#include <skift/logger.h>
 #include <skift/__plugs.h>
 
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/memory.h"
-#include "kernel/logger.h"
 
 int __plug_print(const char *buffer)
 {
@@ -26,7 +26,7 @@ void __plug_putchar(int c)
 
 int __plug_getchar()
 {
-    log("__plug_getchar() not implemented!");
+    sk_log(LOG_ERROR, "__plug_getchar() not implemented!");
     return EOF;
 }
 
@@ -35,12 +35,12 @@ void __plug_read(char *buffer, uint size)
     UNUSED(buffer);
     UNUSED(size);
 
-    log("__plug_read() not implemented!");
+    sk_log(LOG_ERROR, "__plug_read() not implemented!");
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    log("Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    sk_log(LOG_FATAL, "Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
     PANIC("Kernel assert failed (see logs).");
 }
 

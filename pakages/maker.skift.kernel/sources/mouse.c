@@ -7,8 +7,6 @@
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/irq.h"
-#include "kernel/logger.h"
-
 #include "kernel/mouse.h"
 
 mouse_state_t mouse;
@@ -41,8 +39,6 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     mouse.middle = (packet0 >> 2) & 1;
     mouse.right = (packet0 >> 1) & 1;
     mouse.left = (packet0)&1;
-
-    // log("Mouse %d %d (X=%d, Y=%d, L=%d, M=%d, R=%d)", (int)offx, (int)offy, mouse.x, mouse.y, mouse.left, mouse.center, mouse.right);
 }
 
 uchar cycle = 0;

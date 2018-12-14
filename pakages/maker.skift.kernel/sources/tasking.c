@@ -9,12 +9,12 @@
 #include <string.h>
 #include <skift/elf.h>
 #include <skift/atomic.h>
+#include <skift/logger.h>
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/irq.h"
 #include "kernel/filesystem.h"
-#include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/paging.h"
 #include "kernel/system.h"
@@ -76,7 +76,7 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
         context->gs = 0x10;
     }
 
-    log("Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
+    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
 
     return thread;
 }
@@ -107,7 +107,7 @@ process_t *alloc_process(const char *name, int flags)
         process->pdir = memory_kpdir();
     }
 
-    log("Process '%s' with ID=%d allocated.", process->name, process->id);
+    sk_log(LOG_FINE, "Process '%s' with ID=%d allocated.", process->name, process->id);
 
     return process;
 }
@@ -213,7 +213,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    log("Timer frequency is %dhz.", hz);
+    sk_log(LOG_INFO, "Timer frequency is %dhz.", hz);
 }
 
 // define in cpu/boot.s
@@ -295,7 +295,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
 
     thread->state = THREAD_RUNNING;
 
-    log("Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", thread->id, entry, process->name, process->id);
+    sk_log(LOG_FINE, "Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", thread->id, entry, process->name, process->id);
 
     sk_atomic_end();
 
@@ -379,7 +379,7 @@ int thread_cancel(THREAD t)
     {
         thread->state = THREAD_CANCELING;
         thread->exit_value = NULL;
-        log("Thread n°%d got canceled.", t);
+        sk_log(LOG_INFO, "Thread n°%d got canceled.", t);
     }
 
     sk_atomic_end();
@@ -394,7 +394,7 @@ void thread_exit(void *retval)
     running->state = THREAD_CANCELING;
     running->exit_value = retval;
 
-    log("Thread n°%d exited with value 0x%x.", running->id, retval);
+    sk_log(LOG_INFO, "Thread n°%d exited with value 0x%x.", running->id, retval);
 
     sk_atomic_end();
 
@@ -447,14 +447,14 @@ PROCESS process_create(const char *name, int flags)
         list_pushback(processes, process);
     });
 
-    log("Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
+    sk_log(LOG_FINE,"Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
 
     return process->id;
 }
 
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
-    log("Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
+    sk_log(LOG_INFO, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
 
     if (dest >= 0x100000)
     {
@@ -474,7 +474,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
     else
     {
-        log("Elf segment ignored, not in user memory!");
+        sk_log(LOG_WARNING, "Elf segment ignored, not in user memory!");
     }
 }
 
@@ -486,7 +486,7 @@ PROCESS process_exec(const char *path, const char **arg)
 
     if (!fp)
     {
-        log("EXEC: %s file not found, exec failed!", path);
+        sk_log(LOG_WARNING, "EXEC: %s file not found, exec failed!", path);
         return 0;
     }
 
@@ -529,14 +529,14 @@ void process_cancel(PROCESS p)
         process_t *process = process_get(p);
         process->state = PROCESS_CANCELING;
         process->exit_code = -1;
-        log("Process '%s' ID=%d canceled!", process->name, process->id);
+        sk_log(LOG_INFO, "Process '%s' ID=%d canceled!", process->name, process->id);
 
         cancel_childs(process);
     }
     else
     {
         process_t *process = process_get(process_self());
-        log("Warning! Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
+        sk_log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
     }
 
     sk_atomic_end();
@@ -553,7 +553,7 @@ void process_exit(int code)
     {
         process->state = PROCESS_CANCELING;
         process->exit_code = code;
-        log("Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
+        sk_log(LOG_INFO, "Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         cancel_childs(process);
 
@@ -563,7 +563,7 @@ void process_exit(int code)
     }
     else
     {
-        log("Warning! Kernel try to commit suicide!");
+        sk_log(LOG_WARNING, "Kernel try to commit suicide!");
     }
 
     sk_atomic_end();
@@ -607,11 +607,11 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 {
     if (from == to)
     {
-        log("PROCESS=%d try to send a message to himself!");
+        sk_log(LOG_WARNING, "PROCESS=%d try to send a message to himself!");
         return 0;
     }
 
-    // log("Sending message ID=%d from %d to %d.", id, from, to);
+    sk_log(LOG_INFO, "Sending message ID=%d from %d to %d.", id, from, to);
 
     process_t *process = process_get(to);
 
@@ -622,7 +622,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     if (process->inbox->count > 1024)
     {
-        log("PROCESS=%d inbox is full!", to);
+        sk_log(LOG_WARNING, "PROCESS=%d inbox is full!", to);
         return 0;
     }
 
@@ -632,6 +632,8 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
     message->to = to;
 
     list_pushback(process->inbox, (void *)message);
+
+    sk_log(LOG_FINE, "Message ID=%d from %d to %d sended!", id, from, to);
 
     return id;
 }
@@ -738,37 +740,6 @@ int messaging_unsubscribe(const char *channel)
     return 0;
 }
 
-/* --- Shared Memory -------------------------------------------------------- */
-
-// SHARED_MEMORY sharedmem_create(uint count)
-// {
-//     sk_atomic_begin();
-// 
-//     uint paddr = physical_alloc(count);
-// 
-//     if (paddr != 0)
-//     {
-//         shared_memory_t* shm = MALLOC(shared_memory_t); 
-//         shm->paddr = paddr;
-//         shm->size = count;
-//     }
-// 
-// 
-//     sk_atomic_end();
-// }
-// 
-// void sharedmem_destroy(SHARED_MEMORY shm)
-// {
-// }
-// 
-// uint sharedmem_mount(SHARED_MEMORY shm)
-// {
-// }
-// 
-// void sharedmem_unmount(SHARED_MEMORY shm)
-// {
-// }
-
 /* --- Sheduler ------------------------------------------------------------- */
 
 thread_t *get_next_task()
@@ -783,7 +754,7 @@ thread_t *get_next_task()
         {
         case THREAD_CANCELING:
         {
-            log("Thread %d canceled!", thread->id);
+            sk_log(LOG_INFO, "Thread %d canceled!", thread->id);
             thread->state = THREAD_CANCELED;
             // TODO: cleanup the thread.
             // TODO: cleanup the process if no thread is still running.
@@ -798,7 +769,7 @@ thread_t *get_next_task()
             if (thread->sleepinfo.wakeuptick >= ticks)
             {
                 thread->state = THREAD_RUNNING;
-                log("Thread %d wake up!", thread->id);
+                sk_log(LOG_INFO, "Thread %d wake up!", thread->id);
             }
             break;
         }
@@ -810,7 +781,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = wproc->exit_code;
-                log("Thread %d finish waiting process %d.", thread->id, wproc->id);
+                sk_log(LOG_INFO, "Thread %d finish waiting process %d.", thread->id, wproc->id);
             }
 
             break;
@@ -823,7 +794,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = (uint)wthread->exit_value;
-                log("Thread %d finish waiting thread %d.", thread->id, wthread->id);
+                sk_log(LOG_INFO, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
             }
 
             break;
@@ -842,7 +813,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                //log("Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                sk_log(LOG_INFO, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

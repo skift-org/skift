@@ -4,8 +4,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <skift/logger.h>
 
-#include "kernel/logger.h"
 #include "kernel/filesystem.h"
 
 directory_t *root = NULL;
@@ -13,7 +13,7 @@ directory_t *alloc_directorie(const char *name);
 
 void filesystem_setup()
 {
-    log("Allocating root directorie...");
+    sk_log(LOG_INFO, "Allocating root directorie...");
     root = alloc_directorie("ROOT");
 }
 

@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/cpu/irq.h"
-#include "kernel/logger.h"
+#include <skift/logger.h>
 
+#include "kernel/cpu/irq.h"
 #include "kernel/keyboard.h"
 
 /* --- Private functions ---------------------------------------------------- */
@@ -14,7 +14,7 @@ esp_t keyboard_irq(esp_t esp, context_t *context)
     UNUSED(context);
 
     uchar scan_code = inb(0x60);
-    log("Scancode: 0x%x.", scan_code);
+    sk_log(LOG_INFO, "Scancode: 0x%x.", scan_code);
 
     return esp;
 }

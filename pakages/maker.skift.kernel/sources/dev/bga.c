@@ -2,9 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/logger.h>
+
 #include "kernel/cpu/cpu.h"
 #include "kernel/dev/bga.h"
-#include "kernel/logger.h"
 
 void bga_write_register(u16 IndexValue, u16 DataValue)
 {
@@ -30,7 +31,7 @@ bool bga_is_available(void)
     {
         if (bga_read_register(VBE_DISPI_INDEX_ID) == 0xB0C0 + i)
         {
-            log("BGA video device detected (version %x).", i);
+            sk_log(LOG_INFO, "BGA video device detected (version %x).", i);
             found = true;
         }
     }

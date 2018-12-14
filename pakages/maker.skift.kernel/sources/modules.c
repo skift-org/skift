@@ -3,8 +3,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <string.h>
+#include <skift/logger.h>
 
-#include "kernel/logger.h"
 #include "kernel/multiboot.h"
 
 #include "kernel/modules.h"
@@ -17,7 +17,7 @@ void load_module(multiboot_module_t *module)
     }
     else
     {
-        log("WARNING! Unknow module '%s'!", module->cmdline);
+        sk_log(LOG_WARNING, "Unknow module '%s'!", module->cmdline);
     }
 }
 

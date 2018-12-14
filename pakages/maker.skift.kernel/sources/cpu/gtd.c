@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "kernel/cpu/gdt.h"
-#include "kernel/logger.h"
 
 gdt_t gdt;
 
@@ -48,8 +47,7 @@ void set_kernel_stack(u32 stack)
 void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint)
 {
     UNUSED(hint);
-    // log("GDT[%d:%s]\t = { BASE=%x, LIMIT=%x, ACCESS=%b, FLAGS=%b }", index, hint, base, limit, access, flags);
-
+    
     gdt_entry_t * entry = &gdt.entries[index];
     entry->acces = access;
     entry->flags = flags;

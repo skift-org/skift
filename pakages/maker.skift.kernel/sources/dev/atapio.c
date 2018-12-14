@@ -3,10 +3,10 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/atomic.h>
+#include <skift/logger.h>
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/dev/atapio.h"
-#include "kernel/logger.h"
 
 int atapio_common(u8 drive, u32 numblock, u8 count)
 {
@@ -35,7 +35,7 @@ void atapio_wait()
 int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 {
     sk_atomic_begin();
-    log("ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
+    sk_log(LOG_INFO, "ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
     u16 tmpword;
     int idx;
 
@@ -52,7 +52,7 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
         buf[idx * 2 + 1] = (unsigned char)(tmpword >> 8);
     }
 
-    log("ATA::pio read done!");
+    sk_log(LOG_INFO, "ATA::pio read done!");
     sk_atomic_end();
 
     return count;
@@ -61,7 +61,7 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
 {
     sk_atomic_begin();
-    log("ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
+    sk_log(LOG_INFO, "ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
 
     u16 tmpword;
 
@@ -77,7 +77,7 @@ int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
         outw(0x1F0, tmpword);
     }
 
-    log("ATA::pio write done!");
+    sk_log(LOG_FINE, "ATA::pio write done!");
     sk_atomic_end();
 
     return count;

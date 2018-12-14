@@ -2,13 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <string.h>
 #include <math.h>
+#include <string.h>
 #include <skift/tar.h>
+#include <skift/logger.h>
 
 #include "kernel/filesystem.h"
 #include "kernel/multiboot.h"
-#include "kernel/logger.h"
 
 int rd_file_open(file_t *file);
 void rd_file_close(file_t *file);
@@ -21,7 +21,7 @@ void *ramdisk;
 
 void ramdisk_load(multiboot_module_t *module)
 {
-    log("Loading ramdisk at 0x%x...", module->mod_start);
+    sk_log(LOG_INFO, "Loading ramdisk at 0x%x...", module->mod_start);
 
     ramdisk = (void *)module->mod_start;
     ramdisk_fs.file_open = rd_file_open;
@@ -34,17 +34,15 @@ void ramdisk_load(multiboot_module_t *module)
     {
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            // log("Found folder: %s at 0x%x.", block.name, block.data);
             directory_create(NULL, block.name, 0);
         }
         else
         {
-            // log("Found file: %s at 0x%x.", block.name, block.data);
             file_create(NULL, block.name, &ramdisk_fs, 0, i);
         }
     }
 
-    // filesystem_dump(NULL, "");
+    sk_log(LOG_FINE, "Loading ramdisk succeeded.");
 }
 
 int rd_file_open(file_t *file)

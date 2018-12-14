@@ -2,9 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/logger.h>
+
 #include "kernel/tasking.h"
 #include "kernel/shared_syscalls.h"
-#include "kernel/logger.h"
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
 #include "kernel/mouse.h"
@@ -15,7 +16,7 @@ typedef int (*syscall_t)(int, int, int, int, int);
 
 int sys_not_implemented()
 {
-    log("Not implemented syscall!");
+    sk_log(LOG_WARNING, "Not implemented syscall!");
     return 0;
 }
 
@@ -145,7 +146,7 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_io_print(const char *msg)
 {
-    log("[PID:%d] %s", process_self(), msg);
+    printf(msg);
 
     return 0;
 }
@@ -248,8 +249,8 @@ void syscall_dispatcher(context_t *context)
     }
     else
     {
-        log("Unknow syscall ID=%d call by PROCESS=%d.", syscall_number, process_self());
-        log("EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        sk_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall_number, process_self());
+        sk_log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }
 }

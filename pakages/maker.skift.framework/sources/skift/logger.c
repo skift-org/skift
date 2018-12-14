@@ -35,17 +35,25 @@ const char *log_describe(log_level_t level)
     return "all";
 }
 
+void sk_logger_setlevel(log_level_t level)
+{
+    log_level = level;
+}
+
 void sk_logger_log(log_level_t level, const char * file, uint line, const char * function, const char * fmt, ...)
 {
-    __plug_logger_lock();
+    if (level >= log_level)
+    {
+        __plug_logger_lock();
 
-    va_list va;
-    va_start(va, fmt);
+        va_list va;
+        va_start(va, fmt);
 
-    printf("%s:%d: %s: In function %s:", file, line, log_describe(level), function);
-    vprintf(fmt, va);
+        printf("%s:%d: %s: In function %s: ", file, line, log_describe(level), function);
+        vprintf(fmt, va);
+        printf("\n");
+        va_end(va);
 
-    va_end(va);
-
-    __plug_logger_unlock();
+        __plug_logger_unlock();
+    }
 }

@@ -3,11 +3,10 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/atomic.h>
+#include <skift/logger.h>
 
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/idt.h"
-
-#include "kernel/logger.h"
 
 extern u32 irq_vector[];
 extern bool console_bypass_lock;
@@ -42,7 +41,7 @@ esp_t irq_handler(esp_t esp, context_t context)
     }
     else
     {
-        log("Unhandeled IRQ %d!", context.int_no);
+        sk_log(LOG_WARNING,  "Unhandeled IRQ %d!", context.int_no);
     }
 
     if (context.int_no >= 8)

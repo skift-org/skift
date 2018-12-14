@@ -3,7 +3,9 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/utils.h>
+
 #include "kernel/cpu/cpu.h"
+
 #include "kernel/serial.h"
 
 #define PORT 0x3f8

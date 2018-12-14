@@ -2,10 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/atomic.h>
+
 #include "kernel/cpu/cpu.h"
 #include "kernel/dev/atapio.h"
 #include "kernel/logger.h"
-#include <skift/atomic.h>
 
 int atapio_common(u8 drive, u32 numblock, u8 count)
 {

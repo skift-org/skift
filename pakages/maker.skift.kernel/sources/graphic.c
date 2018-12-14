@@ -5,11 +5,11 @@
 #include <string.h>
 
 #include "kernel/dev/bga.h"
-
 #include "kernel/memory.h"
-#include "kernel/graphic.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
+
+#include "kernel/graphic.h"
 
 uint *physical_framebuffer = NULL;
 uint *framebuffer = NULL;

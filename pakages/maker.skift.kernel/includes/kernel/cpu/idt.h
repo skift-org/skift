@@ -1,7 +1,12 @@
 #pragma once
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <skift/generic.h>
+
 #include "kernel/cpu/cpu.h"
-#include <skift/types.h>
-#include <skift/utils.h>
 
 // Gate call protection. 
 // Specifies which privilege Level the calling Descriptor minimum should have. 

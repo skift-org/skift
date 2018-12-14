@@ -2,10 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/atomic.h>
+
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/idt.h"
 
-#include <skift/atomic.h>
 #include "kernel/logger.h"
 
 extern u32 irq_vector[];

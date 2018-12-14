@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/generic.h>
+
 void serial_setup();
 
 void serial_putc(char c);

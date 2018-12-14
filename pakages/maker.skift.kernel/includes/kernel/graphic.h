@@ -1,5 +1,10 @@
 #pragma once
-#include <skift/types.h>
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <skift/generic.h>
 
 void graphic_early_setup(uint width, uint height);
 void graphic_setup();

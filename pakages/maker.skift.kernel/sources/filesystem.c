@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "kernel/logger.h"
 #include "kernel/filesystem.h"
 

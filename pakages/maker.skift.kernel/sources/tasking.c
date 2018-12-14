@@ -7,19 +7,18 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <skift/elf.h>
 #include <skift/atomic.h>
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/irq.h"
-
 #include "kernel/filesystem.h"
 #include "kernel/logger.h"
 #include "kernel/memory.h"
 #include "kernel/paging.h"
 #include "kernel/system.h"
+
 #include "kernel/tasking.h"
 
 int PID = 0;

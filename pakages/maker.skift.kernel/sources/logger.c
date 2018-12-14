@@ -3,9 +3,12 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <skift/atomic.h>
-#include "kernel/logger.h"
+
 #include "kernel/clock.h"
+
+#include "kernel/logger.h"
 
 void __log(const char *file, const char *message, ...)
 {

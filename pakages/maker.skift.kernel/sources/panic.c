@@ -4,9 +4,10 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
-#include "kernel/system.h"
-#include "kernel/tasking.h"
 #include <skift/atomic.h>
+
+#include "kernel/tasking.h"
+#include "kernel/system.h"
 
 const char *const witty_comments[] =
     {

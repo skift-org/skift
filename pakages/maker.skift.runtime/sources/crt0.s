@@ -1,12 +1,12 @@
 section .text
 
-extern sk_process_exit
-extern stdlib_init
+extern __plug_init
 extern program
+extern sk_process_exit
 
 global _start:function (_start.end - _start)
 _start:
-	call stdlib_init
+	call __plug_init
 	call program
 
 	push eax

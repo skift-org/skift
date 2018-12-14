@@ -3,8 +3,8 @@
 /* Copyright © 2018-2019 MAKER.                                               */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
-#include <skift/types.h>
-#include <skift/utils.h>
+
+#include <skift/generic.h>
 #include <skift/list.h>
 
 #include "kernel/paging.h"

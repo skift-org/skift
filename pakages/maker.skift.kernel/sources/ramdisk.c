@@ -4,7 +4,6 @@
 
 #include <string.h>
 #include <math.h>
-
 #include <skift/tar.h>
 
 #include "kernel/filesystem.h"

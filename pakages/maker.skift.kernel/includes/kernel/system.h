@@ -4,9 +4,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/generic.h>
+
+#include <stdio.h>
 #include "cpu/cpu.h"
 #include "kernel/logger.h"
-#include <stdio.h>
 
 void __panic(const string file, const string function, const int line, context_t * context, string message, ...);
 

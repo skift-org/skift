@@ -3,12 +3,13 @@
 /* See: LICENSE.md                                                            */
 
 #include "kernel/tasking.h"
-#include "kernel/syscalls.h"
 #include "kernel/shared_syscalls.h"
 #include "kernel/logger.h"
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
 #include "kernel/mouse.h"
+
+#include "kernel/syscalls.h"
 
 typedef int (*syscall_t)(int, int, int, int, int);
 

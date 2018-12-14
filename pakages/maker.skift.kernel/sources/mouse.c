@@ -7,8 +7,9 @@
 
 #include "kernel/cpu/cpu.h"
 #include "kernel/cpu/irq.h"
-#include "kernel/mouse.h"
 #include "kernel/logger.h"
+
+#include "kernel/mouse.h"
 
 mouse_state_t mouse;
 

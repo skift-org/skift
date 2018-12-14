@@ -5,14 +5,14 @@
 /* memory.c: Physical, virtual and logical memory managment                   */
 
 #include <string.h>
-
 #include <skift/types.h>
 #include <skift/utils.h>
 #include <skift/atomic.h>
 
 #include "kernel/logger.h"
-#include "kernel/memory.h"
 #include "kernel/paging.h"
+
+#include "kernel/memory.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

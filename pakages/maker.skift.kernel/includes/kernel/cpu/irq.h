@@ -1,5 +1,11 @@
 #pragma once
-#include <skift/types.h>
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <skift/generic.h>
+
 #include "kernel/cpu/cpu.h"
 
 typedef u32 esp_t;

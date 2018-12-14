@@ -55,6 +55,7 @@ ASFLAGS = ["-f", "elf32"]
 QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
 QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
 
+
 def QEMU(disk):
     if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
@@ -87,8 +88,6 @@ def copytree(src, dst, ignore=None):
         for f in files:
             if f not in ignored:
                 copytree(os.path.join(src, f),
-                         os.path.join(dst, f),
-                                    os.path.join(dst, f), 
                          os.path.join(dst, f),
                          ignore)
     else:
@@ -738,7 +737,8 @@ if not crosscompiler_check():
     if respond in ['y', "yes", 'o', "oui"]:
         crosscompiler_build()
     else:
-        print("Falling back to the system toolchain (WARNING! this is not really supported)")
+        print(
+            "Falling back to the system toolchain (WARNING! this is not really supported)")
 
         GCC = "gcc"
         LD = "ld"

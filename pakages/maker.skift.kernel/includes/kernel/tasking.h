@@ -150,35 +150,3 @@ int messaging_payload(void *buffer, uint size);
 
 int messaging_subscribe(const char *channel);
 int messaging_unsubscribe(const char *channel);
-
-/* --- Shared memory -------------------------------------------------------- */
-
-typedef unsigned int SHARED_MEMORY;
-
-typedef struct
-{
-    uint id;
-    uint paddr;
-    uint size;
-
-    uint refcount;
-} shared_memory_t;
-
-typedef struct
-{
-    uint vaddr;
-    shared_memory_t * shm;
-} shared_memory_region_t;
-
-SHARED_MEMORY sharedmem_create(uint count);
-void sharedmem_destroy(SHARED_MEMORY shm);
-
-uint sharedmem_mount(SHARED_MEMORY shm);
-void sharedmem_unmount(SHARED_MEMORY shm);
-
-/* --- Stream --------------------------------------------------------------- */
-
-typedef struct
-{
-
-} stream_t;

@@ -6,7 +6,7 @@
 #include <skift/__plugs.h>
 #include <skift/logger.h>
 
-log_level_t log_level = LOG_WARNING;
+log_level_t log_level = LOG_ALL;
 bool show_file_name = false;
 
 struct
@@ -15,14 +15,14 @@ struct
     const char *name;
 } level_names[] =
 {
-    { LOG_FATAL,   "\033[31;1mfatal" },
-    { LOG_SEVERE,  "\033[31msevere"  },
-    { LOG_ERROR,   "\033[31merror"   },
+    { LOG_FATAL, "\033[31;1mfatal"   },
+    { LOG_SEVERE, "\033[31msevere"   },
+    { LOG_ERROR, "\033[31merror"     },
     { LOG_WARNING, "\033[33mwarning" },
-    { LOG_INFO,    "\033[34minfo"    },
-    { LOG_CONFIG,  "\033[37mconfig"  },
-    { LOG_DEBUG,   "\033[37mdebug"   },
-    { LOG_FINE,    "\033[37mfine"    }
+    { LOG_INFO, "\033[34minfo"       },
+    { LOG_CONFIG, "\033[37mconfig"   },
+    { LOG_DEBUG, "\033[37mdebug"     },
+    { LOG_FINE, "\033[37mfine"       }
 };
 
 const char *log_describe(log_level_t level)
@@ -45,7 +45,7 @@ void sk_logger_setlevel(log_level_t level)
 
 char logbuffer[1024];
 
-void sk_logger_log(log_level_t level, const char * file, uint line, const char * function, const char * fmt, ...)
+void sk_logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...)
 {
     if (level >= log_level)
     {
@@ -54,21 +54,21 @@ void sk_logger_log(log_level_t level, const char * file, uint line, const char *
         va_list va;
         va_start(va, fmt);
 
-        char * buffer = logbuffer;
+        char *buffer = logbuffer;
         buffer[0] = '\0';
 
-        if (show_file_name) 
+        if (show_file_name)
         {
             buffer += sprintf(buffer, "%s:%d: %s: In function %s: ", file, line, log_describe(level), function);
         }
-        else 
+        else
         {
             buffer += sprintf(buffer, "%s: In function %s: ", log_describe(level), function);
         }
 
-        buffer+=vsprintf(buffer, fmt, va);
+        buffer += vsprintf(buffer, fmt, va);
         strcat(buffer, "\033[0m\n");
-        
+
         __plug_print(logbuffer);
 
         va_end(va);

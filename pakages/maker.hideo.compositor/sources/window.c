@@ -23,7 +23,7 @@ hideo_window_t *hideo_window(hideo_context_t *ctx, const char *title, int x, int
     list_pushback(ctx->windows, (void *)win);
     ctx->focus = win;
 
-    sk_log(LOG_DEBUG, "Window { @%x, TITLE='%s'} create", win);
+    sk_log(LOG_DEBUG, "Window { @%x, TITLE='%s'} create", win, win->title);
 
     return win;
 }

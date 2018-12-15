@@ -29,11 +29,16 @@ hideo_window_t *hideo_window_at(hideo_context_t *ctx, int x, int y, bool header)
 
     FOREACH(w, ctx->windows)
     {
-        hideo_window_t *window = (hideo_window_t *)w->value;
+        hideo_window_t *win = (hideo_window_t *)w->value;
 
-        if (check_colision(window->x, window->y, window->width, header ? WIN_HEADER_HEIGHT : window->height, x, y, 1, 1))
+        int winx = hideo_window_posx(ctx, win);
+        int winy = hideo_window_posy(ctx, win);
+        uint winwidth = hideo_window_width(ctx, win);
+        uint winheight = hideo_window_height(ctx, win);
+
+        if (check_colision(winx, winy, winwidth, header ? WIN_HEADER_HEIGHT : winheight, x, y, 1, 1))
         {
-            result = window;
+            result = win;
         }
     }
 
@@ -111,11 +116,16 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
                 sk_log(LOG_DEBUG, "Window@%x got the focus.", win);
                 ctx->focus = win;
             }
-            
+
             list_remove(ctx->windows, win);
             list_pushback(ctx->windows, win);
 
-            if (check_colision(win->x + win->width - RESIZE_AREA, win->y + win->height - RESIZE_AREA, RESIZE_AREA, RESIZE_AREA, c->x, c->y, 1, 1))
+            int winx = hideo_window_posx(ctx, win);
+            int winy = hideo_window_posy(ctx, win);
+            uint winwidth = hideo_window_width(ctx, win);
+            // uint winheight = hideo_window_height(ctx, win);
+
+            if (win->state == WINSTATE_FLOATING && check_colision(winx + win->width - RESIZE_AREA, win->y + win->height - RESIZE_AREA, RESIZE_AREA, RESIZE_AREA, c->x, c->y, 1, 1))
             {
                 c->state = CURSOR_RESIZEHV;
                 ctx->resizestate.resized = win;
@@ -126,7 +136,7 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
                 ctx->resizestate.offx = win->x + win->width - c->x;
                 ctx->resizestate.offy = win->y + win->height - c->y;
             }
-            else if (check_colision(win->x, win->y + win->height - RESIZE_AREA, win->width, RESIZE_AREA, c->x, c->y, 1, 1))
+            else if (win->state == WINSTATE_FLOATING && check_colision(win->x, win->y + win->height - RESIZE_AREA, win->width, RESIZE_AREA, c->x, c->y, 1, 1))
             {
                 c->state = CURSOR_RESIZEV;
                 ctx->resizestate.resized = win;
@@ -137,7 +147,7 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
                 ctx->resizestate.offx = win->x + win->width - c->x;
                 ctx->resizestate.offy = win->y + win->height - c->y;
             }
-            else if (check_colision(win->x + win->width - RESIZE_AREA, win->y, RESIZE_AREA, win->height, c->x, c->y, 1, 1))
+            else if (win->state == WINSTATE_FLOATING && check_colision(win->x + win->width - RESIZE_AREA, win->y, RESIZE_AREA, win->height, c->x, c->y, 1, 1))
             {
                 c->state = CURSOR_RESIZEH;
                 ctx->resizestate.resized = win;
@@ -148,13 +158,22 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
                 ctx->resizestate.offx = win->x + win->width - c->x;
                 ctx->resizestate.offy = win->y + win->height - c->y;
             }
-            else if (check_colision(win->x, win->y, win->width, WIN_HEADER_HEIGHT, c->x, c->y, 1, 1))
+            else if (check_colision(winx, winy, winwidth, WIN_HEADER_HEIGHT, c->x, c->y, 1, 1))
             {
                 ctx->dragstate.dragged = win;
-                ctx->dragstate.offx = win->x - c->x;
-                ctx->dragstate.offy = win->y - c->y;
+                if (win->state == WINSTATE_FLOATING)
+                {
+                    ctx->dragstate.offx = winx - c->x;
+                    ctx->dragstate.offy = winy - c->y;
+                }
+                else
+                {
+                    ctx->dragstate.offx = -(win->width / 2);
+                    ctx->dragstate.offy = winy - c->y;
+                }
 
                 c->state = CURSOR_DRAG;
+                win->state = WINSTATE_FLOATING;
             }
         }
     }
@@ -173,17 +192,23 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
 
             if (c->x < SNAP_AREA)
             {
-                dragged->x = 0;
-                dragged->y = 0;
-                dragged->width = ctx->width / 2;
-                dragged->height = ctx->height;
+                dragged->state = WINSTATE_TILED_LEFT;
             }
             else if (c->x > (int)(ctx->width - SNAP_AREA))
             {
-                dragged->x = ctx->width / 2;
-                dragged->y = 0;
-                dragged->width = ctx->width / 2;
-                dragged->height = ctx->height;
+                dragged->state = WINSTATE_TILED_RIGHT;
+            }
+            else if (c->y < SNAP_AREA)
+            {
+                dragged->state = WINSTATE_TILED_TOP;
+            }
+            else if (c->y > (int)(ctx->height - SNAP_AREA))
+            {
+                dragged->state = WINSTATE_TILED_BOTTOM;
+            }
+            else
+            {
+                dragged->state = WINSTATE_FLOATING;
             }
 
             c->state = CURSOR_POINTER;
@@ -237,6 +262,14 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
         {
             drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 0x0A64CD);
         }
+        else if (c->y < SNAP_AREA)
+        {
+            drawing_rect(ctx->screen, 0, 0, ctx->width, ctx->height / 2, 0x0A64CD);
+        }
+        else if (c->y > (int)(ctx->height - SNAP_AREA))
+        {
+            drawing_rect(ctx->screen, 0, ctx->height / 2, ctx->width, ctx->height / 2, 0x0A64CD);
+        }
     }
 }
 
@@ -286,7 +319,7 @@ int program()
             }
 
             // Draw
-            drawing_clear(ctx->screen, 0xe5e5e5);
+            //drawing_clear(ctx->screen, 0xe5e5e5);
             drawing_text(ctx->screen, "maker.hideo.compositor", 8, 8, 0x939393);
 
             FOREACH(w, ctx->windows)

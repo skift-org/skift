@@ -7,7 +7,7 @@
 
 #include "hideo_window.h"
 
-hideo_window_t *hideo_window(hideo_context_t *ctx, const char * title, int x, int y, uint w, uint h)
+hideo_window_t *hideo_window(hideo_context_t *ctx, const char *title, int x, int y, uint w, uint h)
 {
     hideo_window_t *win = MALLOC(hideo_window_t);
 
@@ -32,7 +32,7 @@ void hideo_window_delete(hideo_context_t *ctx, hideo_window_t *win)
 {
     sk_log(LOG_DEBUG, "Window { @%x, TITLE='%s'} deleted", win, win->title);
 
-    list_remove(ctx->windows, (void*)win);
+    list_remove(ctx->windows, (void *)win);
     free(win);
 }
 
@@ -56,21 +56,26 @@ void hideo_window_update(hideo_context_t *ctx, hideo_window_t *w, hideo_cursor_t
     }
 }
 
-void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
+void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *win)
 {
-    drawing_fillrect(ctx->screen, w->x, w->y, w->width, w->height, 0xf5f5f5);
+    int winx = hideo_window_posx(ctx, win);
+    int winy = hideo_window_posy(ctx, win);
+    uint winwidth = hideo_window_width(ctx, win);
+    uint winheight = hideo_window_height(ctx, win);
 
-    if (w == ctx->focus)
+    drawing_fillrect(ctx->screen, winx, winy, winwidth, winheight, 0xf5f5f5);
+
+    if (win == ctx->focus)
     {
-        drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x0A64CD);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 9, 0xd5d5d5);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
+        drawing_fillrect(ctx->screen, winx, winy, winwidth, 32, 0xffffff);
+        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, 0x0A64CD);
+        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 9, 0xd5d5d5);
+        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, 0x0);
     }
     else
     {
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x939393);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x939393);
+        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, 0x939393);
+        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, 0x939393);
     }
 }
 
@@ -85,7 +90,7 @@ int hideo_window_posx(hideo_context_t *ctx, hideo_window_t *win)
 
     case WINSTATE_TILED_RIGHT:
         return ctx->width / 2;
-    
+
     default:
         return 0;
     }
@@ -112,16 +117,19 @@ uint hideo_window_width(hideo_context_t *ctx, hideo_window_t *win)
     {
     case WINSTATE_MINIMIZED:
     case WINSTATE_FLOATING:
+        return win->width;
+
     case WINSTATE_TILED_LEFT:
     case WINSTATE_TILED_RIGHT:
-        return win->width;
+        return ctx->width / 2;
 
     case WINSTATE_MAXIMIZED:
     case WINSTATE_TILED_TOP:
     case WINSTATE_TILED_BOTTOM:
         return ctx->width;
 
-    default: return 256;
+    default:
+        return 256;
     }
 }
 
@@ -131,15 +139,18 @@ uint hideo_window_height(hideo_context_t *ctx, hideo_window_t *win)
     {
     case WINSTATE_MINIMIZED:
     case WINSTATE_FLOATING:
+        return win->height;
+
     case WINSTATE_TILED_TOP:
     case WINSTATE_TILED_BOTTOM:
-        return win->height;
+        return ctx->height / 2;
 
     case WINSTATE_MAXIMIZED:
     case WINSTATE_TILED_LEFT:
     case WINSTATE_TILED_RIGHT:
         return ctx->height;
 
-    default: return 256;
+    default:
+        return 256;
     }
 }

@@ -4,6 +4,7 @@
 #include <skift/logger.h>
 #include <skift/list.h>
 #include <skift/drawing.h>
+#include <skift/color.h>
 
 #include "hideo_window.h"
 
@@ -63,19 +64,19 @@ void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *win)
     uint winwidth = hideo_window_width(ctx, win);
     uint winheight = hideo_window_height(ctx, win);
 
-    drawing_fillrect(ctx->screen, winx, winy, winwidth, winheight, 0xf5f5f5);
 
     if (win == ctx->focus)
     {
-        drawing_fillrect(ctx->screen, winx, winy, winwidth, 32, 0xffffff);
-        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, 0x0A64CD);
-        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 9, 0xd5d5d5);
-        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, 0x0);
+        drawing_fillrect(ctx->screen, winx, winy + WIN_HEADER_HEIGHT, winwidth, winheight - WIN_HEADER_HEIGHT, COLOR_WHITESMOKE);
+        drawing_fillrect(ctx->screen, winx, winy, winwidth, WIN_HEADER_HEIGHT, COLOR_WHITE);
+        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, COLOR_BLUE);
+        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, COLOR_BLACK);
     }
     else
     {
-        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, 0x939393);
-        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, 0x939393);
+        drawing_fillrect(ctx->screen, winx, winy, winwidth, winheight, COLOR_WHITESMOKE);
+        drawing_rect(ctx->screen, winx, winy, winwidth, winheight, COLOR_GREY);
+        drawing_text(ctx->screen, win->title, winx + (winwidth / 2) - (strlen(win->title) * 8) / 2, winy + 8, COLOR_GREY);
     }
 }
 

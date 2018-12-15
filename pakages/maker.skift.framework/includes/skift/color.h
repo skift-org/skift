@@ -1,5 +1,8 @@
 #pragma once
 
-#define UI_BACKGROUND 0xf5f5f5
-#define UI_ACCENT     0x0A64CD
-#define UI_DISABLED   0x939393
+#define COLOR_WHITE   0xFFFFFF
+#define COLOR_BLACK   0x000000
+#define COLOR_WHITESMOKE    0xF5F5F5
+#define COLOR_LIGHTGREY    0xD5D5D5
+#define COLOR_GREY    0x939393
+#define COLOR_BLUE    0x0066CC

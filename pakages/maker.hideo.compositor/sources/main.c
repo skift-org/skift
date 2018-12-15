@@ -14,6 +14,7 @@
 #include <skift/io.h>
 #include <skift/list.h>
 #include <skift/lock.h>
+#include <skift/color.h>
 
 #include "hideo_window.h"
 #include "hideo.h"
@@ -256,19 +257,19 @@ void hideo_cursor_draw(hideo_context_t *ctx, hideo_cursor_t *c)
     {
         if (c->x < SNAP_AREA)
         {
-            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, 0x0A64CD);
+            drawing_rect(ctx->screen, 0, 0, ctx->width / 2, ctx->height, COLOR_BLUE);
         }
         else if (c->x > (int)(ctx->width - SNAP_AREA))
         {
-            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, 0x0A64CD);
+            drawing_rect(ctx->screen, ctx->width / 2, 0, ctx->width / 2, ctx->height, COLOR_BLUE);
         }
         else if (c->y < SNAP_AREA)
         {
-            drawing_rect(ctx->screen, 0, 0, ctx->width, ctx->height / 2, 0x0A64CD);
+            drawing_rect(ctx->screen, 0, 0, ctx->width, ctx->height / 2, COLOR_BLUE);
         }
         else if (c->y > (int)(ctx->height - SNAP_AREA))
         {
-            drawing_rect(ctx->screen, 0, ctx->height / 2, ctx->width, ctx->height / 2, 0x0A64CD);
+            drawing_rect(ctx->screen, 0, ctx->height / 2, ctx->width, ctx->height / 2, COLOR_BLUE);
         }
     }
 }

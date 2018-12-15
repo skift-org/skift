@@ -15,73 +15,13 @@
 #include <skift/list.h>
 #include <skift/lock.h>
 
+#include "hideo_window.h"
 #include "hideo.h"
 
 bool check_colision(int x0, int y0, int w0, int h0, int x1, int y1, int w1, int h1)
 {
     return x0 < x1 + w1 && x1 < x0 + w0 && y0 < y1 + h1 && y1 < y0 + h0;
 }
-
-/* --- Windows -------------------------------------------------------------- */
-
-hideo_window_t *hideo_create_window(hideo_context_t *ctx, char *title, int x, int y, int w, int h)
-{
-    hideo_window_t *win = MALLOC(hideo_window_t);
-
-    win->title = title;
-
-    win->x = x;
-    win->y = y;
-    win->width = w;
-    win->height = h;
-
-    win->state = WINSTATE_FLOATING;
-
-    list_pushback(ctx->windows, (void *)win);
-    ctx->focus = win;
-
-    sk_log(LOG_DEBUG, "Window@%x create", win);
-
-    return win;
-}
-
-void hideo_window_update(hideo_context_t *ctx, hideo_window_t *w, hideo_cursor_t *c)
-{
-    if (ctx->dragstate.dragged == w)
-    {
-        ctx->dragstate.dragged->x = c->x + ctx->dragstate.offx;
-        ctx->dragstate.dragged->y = c->y + ctx->dragstate.offy;
-    }
-
-    if (ctx->resizestate.resized == w)
-    {
-        if (ctx->resizestate.horizontal)
-            w->width = max(c->x - w->x + ctx->resizestate.offx, 256);
-
-        if (ctx->resizestate.vertical)
-            w->height = max(c->y - w->y + ctx->resizestate.offy, HEADER_HEIGHT);
-    }
-}
-
-void hideo_window_draw(hideo_context_t *ctx, hideo_window_t *w)
-{
-    drawing_fillrect(ctx->screen, w->x, w->y, w->width, w->height, 0xf5f5f5);
-
-    if (w == ctx->focus)
-    {
-        drawing_fillrect(ctx->screen, w->x, w->y, w->width, 32, 0xffffff);
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x0A64CD);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 9, 0xd5d5d5);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x0);
-    }
-    else
-    {
-        drawing_rect(ctx->screen, w->x, w->y, w->width, w->height, 0x939393);
-        drawing_text(ctx->screen, w->title, w->x + (w->width / 2) - (strlen(w->title) * 8) / 2, w->y + 8, 0x939393);
-    }
-}
-
-/* --- Mouse cursor --------------------------------------------------------- */
 
 hideo_window_t *hideo_window_at(hideo_context_t *ctx, int x, int y, bool header)
 {
@@ -91,7 +31,7 @@ hideo_window_t *hideo_window_at(hideo_context_t *ctx, int x, int y, bool header)
     {
         hideo_window_t *window = (hideo_window_t *)w->value;
 
-        if (check_colision(window->x, window->y, window->width, header ? HEADER_HEIGHT : window->height, x, y, 1, 1))
+        if (check_colision(window->x, window->y, window->width, header ? WIN_HEADER_HEIGHT : window->height, x, y, 1, 1))
         {
             result = window;
         }
@@ -208,7 +148,7 @@ void hideo_cursor_update(hideo_context_t *ctx, hideo_cursor_t *c)
                 ctx->resizestate.offx = win->x + win->width - c->x;
                 ctx->resizestate.offy = win->y + win->height - c->y;
             }
-            else if (check_colision(win->x, win->y, win->width, HEADER_HEIGHT, c->x, c->y, 1, 1))
+            else if (check_colision(win->x, win->y, win->width, WIN_HEADER_HEIGHT, c->x, c->y, 1, 1))
             {
                 ctx->dragstate.dragged = win;
                 ctx->dragstate.offx = win->x - c->x;
@@ -330,9 +270,9 @@ int program()
 
         hideo_cursor_t cur = {.x = ctx->width / 2, .y = ctx->height / 2};
 
-        hideo_create_window(ctx, "Hello, world!", 54, 96, 256, 128);
-        hideo_create_window(ctx, "Good bye!", 300, 128, 256, 128);
-        hideo_create_window(ctx, "Wow such window!", 100, 200, 256, 256);
+        hideo_window(ctx, "Hello, world!", 54, 96, 256, 128);
+        hideo_window(ctx, "Good bye!", 300, 128, 256, 128);
+        hideo_window(ctx, "Wow such window!", 100, 200, 256, 256);
 
         while (1)
         {

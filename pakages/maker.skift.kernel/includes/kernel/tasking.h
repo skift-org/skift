@@ -20,7 +20,7 @@ typedef int THREAD;  // Thread handle
 typedef int PROCESS; // Process handler
 
 typedef u32 esp_t;
-typedef void *(*thread_entry_t)(void *);
+typedef void (*thread_entry_t)();
 
 typedef enum process_state
 {

@@ -3,40 +3,9 @@
 #include <skift/types.h>
 #include <skift/utils.h>
 
-#define HEADER_HEIGHT 32
+
 #define RESIZE_AREA    8
 #define SNAP_AREA     32
-
-typedef enum
-{
-    WINSTATE_FLOATING,
-    WINSTATE_MINIMIZED,
-    WINSTATE_MAXIMIZED,
-    WINSTATE_TILED,
-} hideo_winstate_t;
-
-typedef enum 
-{
-    WINTYPE_MAIN,
-    WINTYPE_POPOVER,
-    WINTYPE_POPUP,
-} hideo_wintype_t;
-
-typedef PACKED(struct)
-{
-    int x;
-    int y;
-    
-    uint width;
-    uint height;
-
-    uint floating_width;
-    uint floating_height;
-
-    hideo_winstate_t state;
-
-    char * title;
-} hideo_window_t;
 
 typedef enum
 {
@@ -73,11 +42,6 @@ typedef PACKED(struct)
     hideo_button_state_t rightbtn;
     hideo_button_state_t middlebtn;
 } hideo_cursor_t;
-
-typedef PACKED(struct)
-{
-
-} hideo_keyboard_t;
 
 typedef struct 
 {

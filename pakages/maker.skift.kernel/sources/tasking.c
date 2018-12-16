@@ -24,6 +24,7 @@
 int PID = 1;
 int TID = 1;
 int MID = 1;
+int SHM = 1;
 
 uint ticks = 0;
 list_t *threads;
@@ -227,6 +228,7 @@ void tasking_setup()
     threads = list();
     processes = list();
     channels = list();
+    shared_memories = list();
 
     kernel_process = process_create("maker.skift.kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
@@ -588,6 +590,41 @@ uint process_alloc(uint count)
 void process_free(uint addr, uint count)
 {
     return memory_free(running->process->pdir, addr, count, 1);
+}
+
+/* --- Shared Memory -------------------------------------------------------- */
+
+shared_memory_t * shared_memory(uint size)
+{
+    shared_memory_t *shm = MALLOC(shared_memory_t);
+
+    shm->id = SHM++;
+    shm->memory = memory_alloc(memory_kpdir(), size, 0);
+    shm->size = size;
+    shm->refcount = 0;
+
+    sk_log(LOG_DEBUG, "Shared memory region created @%x.", shm->memory);
+}
+
+void shared_memory_delete(shared_memory_t * shm)
+{
+    memory_free(memory_kpdir(), shm->memory, shm->size, 0);
+    free(shm);
+}
+
+int shared_memory_create(int size)
+{
+
+}
+
+void* shared_memory_aquired(int id)
+{
+
+}
+
+void  shared_memory_release(int id)
+{
+
 }
 
 /* --- Messaging ------------------------------------------------------------ */

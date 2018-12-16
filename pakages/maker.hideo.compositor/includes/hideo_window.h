@@ -18,6 +18,11 @@ typedef enum
     WINSTATE_TILED_BOTTOM,
 } window_state_t;
 
+typedef enum 
+{
+    
+} window_type_t;
+
 typedef struct
 {
     int x;

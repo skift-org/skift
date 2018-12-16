@@ -165,7 +165,7 @@ def is_uptodate(outfile, infiles):
     """
     Check if a file is uptodate with its dependancies.
     """
-
+    
     if not os.path.exists(outfile):
         return False
     else:

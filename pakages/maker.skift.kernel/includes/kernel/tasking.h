@@ -147,6 +147,7 @@ typedef struct
 shared_memory_t * shared_memory(uint size);
 void shared_memory_delete(shared_memory_t * memory);
 
+int shared_memory_create(int size);
 void* shared_memory_aquired(int id);
 void  shared_memory_release(int id);
 

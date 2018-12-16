@@ -29,7 +29,7 @@ uint ticks = 0;
 list_t *threads;
 list_t *processes;
 list_t *channels;
-list_t *shared_memory;
+list_t *shared_memories;
 
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {

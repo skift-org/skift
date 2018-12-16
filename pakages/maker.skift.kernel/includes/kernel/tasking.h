@@ -134,6 +134,22 @@ void process_free(uint addr, uint count); // Free perviously allocated memory.
 // Load a ELF executable, create a adress space and run it.
 PROCESS process_exec(const char *filename, const char **argv);
 
+/* --- Shared Memory -------------------------------------------------------- */
+
+typedef struct 
+{
+    int id;
+    uint refcount;
+    uint size;
+    void * memory;
+} shared_memory_t;
+
+shared_memory_t * shared_memory(uint size);
+void shared_memory_delete(shared_memory_t * memory);
+
+void* shared_memory_aquired(int id);
+void  shared_memory_release(int id);
+
 /* --- Messaging ------------------------------------------------------------ */
 
 typedef struct

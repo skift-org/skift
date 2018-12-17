@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* bga.c: bosh graphic adaptater device driver.                               */
+
 #include <skift/logger.h>
 
 #include "kernel/cpu/cpu.h"

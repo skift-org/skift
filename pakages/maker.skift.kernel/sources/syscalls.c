@@ -2,6 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* syscalls.c syscalls handeling code                                         */
+
+/*
+ * TODO:
+ * - Check pointers from user space.
+ */
+
 #include <skift/logger.h>
 
 #include "kernel/tasking.h"

@@ -4,6 +4,11 @@
 
 /* memory.c: Physical, virtual and logical memory managment                   */
 
+/*
+ * TODO:
+ * - ADD: improve the allocator to prevent starving of indentity mapped pages.
+ */
+
 #include <string.h>
 #include <skift/types.h>
 #include <skift/utils.h>

@@ -2,8 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/dev/vga.h"
+/* vga.c: legacy vga textmode graphic.                                        */
+
 #include "kernel/cpu/cpu.h"
+
+#include "kernel/dev/vga.h"
 
 u16 *video_memory = (u16 *)vga_frame_buffer;
 

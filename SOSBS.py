@@ -54,7 +54,7 @@ CFLAGS = ["-fno-pie", "-fno-stack-protector", "-fno-builtin",
 CFLAGS_OPTIMIZATION = ["-O0", "-O1", "-O2", "-O3"]
 CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror"]
 
-LDFLAGS = []
+LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
 QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
@@ -342,7 +342,7 @@ class Target(object):
 
             if source.endswith(".c"):
                 includes = [("-I" + i) for i in self.get_includes(targets)]
-                command = [GCC] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
+                command = [GCC] + ["-D__FILENAME__=\"" + source.split("/")[-1] + '"'] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
                     (CFLAGS_STRICT if self.strict else []) + \
                     ["-c", "-o", output, source]
             elif source.endswith(".s"):

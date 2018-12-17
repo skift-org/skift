@@ -138,18 +138,17 @@ PROCESS process_exec(const char *filename, const char **argv);
 
 typedef struct 
 {
-    int id;
+    void * memory;
     uint refcount;
     uint size;
-    void * memory;
 } shared_memory_t;
 
 shared_memory_t * shared_memory(uint size);
 void shared_memory_delete(shared_memory_t * memory);
 
-int shared_memory_create(int size);
-void* shared_memory_aquired(int id);
-void  shared_memory_release(int id);
+void* shared_memory_create(uint size);
+void* shared_memory_aquire(void* mem);
+void* shared_memory_realease(void* mem);
 
 /* --- Messaging ------------------------------------------------------------ */
 

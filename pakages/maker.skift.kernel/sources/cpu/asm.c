@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* asm.c: x86 assembly helpers.                                               */
+
 #include <stdio.h>
 
 #include "kernel/cpu/cpu.h"

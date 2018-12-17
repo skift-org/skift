@@ -4,6 +4,17 @@
 
 /* tasking.c: Sheduling, messaging, sharedmemory and sheduling                */
 
+/*
+ * TODO:
+ * - The name of somme function need refactor.
+ * - Get ride of unique process/thread/messages id, just use thei adresses
+ * - Isolate user space process in ring 3
+ * - Add a process/thread garbage colector
+ * - Move the sheduler in his own file.
+ * - Allow to pass parameters to thread and then return values
+ * - Add priority to the round robine sheduler
+ */
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +35,6 @@
 int PID = 1;
 int TID = 1;
 int MID = 1;
-int SHM = 1;
 
 uint ticks = 0;
 list_t *threads;
@@ -85,6 +95,10 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
 void cleanup_thread(thread_t *thread)
 {
     // Close all reference to/from this thread.
+
+    // Free the stack.
+    free(thread->stack);
+
     UNUSED(thread);
 }
 
@@ -116,6 +130,15 @@ process_t *alloc_process(const char *name, int flags)
 void cleanup_process(process_t *process)
 {
     // Close all reference to/from this process.
+    
+    // Cleanup the inbox.
+
+    // Free all shared memory region.
+
+    // Free all allocated memory.
+
+    // Mark this process a dead to be free later by the garbage collector.
+    
     UNUSED(process);
 }
 
@@ -598,33 +621,95 @@ shared_memory_t * shared_memory(uint size)
 {
     shared_memory_t *shm = MALLOC(shared_memory_t);
 
-    shm->id = SHM++;
     shm->memory = memory_alloc(memory_kpdir(), size, 0);
     shm->size = size;
     shm->refcount = 0;
 
     sk_log(LOG_DEBUG, "Shared memory region created @%x.", shm->memory);
+
+    list_pushback(shared_memories, shm);
 }
 
 void shared_memory_delete(shared_memory_t * shm)
 {
+    list_remove(shared_memories, shm);
     memory_free(memory_kpdir(), shm->memory, shm->size, 0);
+    
     free(shm);
 }
 
-int shared_memory_create(int size)
+shared_memory_t * shared_memory_get(void* mem)
 {
+    FOREACH(i, shared_memories)
+    {
+        shared_memory_t *shm = (shared_memory_t*)i->value;
 
+        if (shm->memory == mem)
+        {
+            return shm;
+        }
+    }
+
+    return NULL;
 }
 
-void* shared_memory_aquired(int id)
+void* shared_memory_create(uint size)
 {
+    sk_atomic_begin();
 
+    shared_memory_t * shm = shared_memorie(size);
+
+    if (shm != NULL)
+    {
+        shared_memory_aquire(shm->memory);
+    }
+
+    sk_atomic_end();
+
+    return shm != NULL ? shm->memory : NULL;
 }
 
-void  shared_memory_release(int id)
+void* shared_memory_aquire(void* mem)
 {
+    sk_atomic_begin();
 
+    shared_memory_t* shm = shared_memory_get(mem);
+
+    if (shm != NULL)
+    {
+        list_pushback(running->process->shared, shm);
+        shm->refcount++;
+
+        sk_atomic_end();
+
+        return mem;
+    }
+    else
+    {
+        sk_atomic_end();
+
+        return NULL;
+    }
+}
+
+void* shared_memory_realease(void* mem)
+{
+    sk_atomic_begin();
+
+    shared_memory_t* shm = shared_memory_get(mem);
+
+    if (shm != NULL && list_containe(running->process->shared, shm))
+    {
+        list_remove(running->process->shared, shm);
+        shm->refcount--;
+
+        if (shm->refcount == 0)
+        {
+            shared_memory_delete(shm);
+        }
+    }
+    
+    sk_atomic_end();
 }
 
 /* --- Messaging ------------------------------------------------------------ */

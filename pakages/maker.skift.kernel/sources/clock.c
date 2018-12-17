@@ -3,6 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include "kernel/cpu/cpu.h"
+
 #include "kernel/clock.h"
 
 /* --- CMOS/RTC ------------------------------------------------------------- */
@@ -11,6 +12,8 @@
 #define CMOS_DATA 0x71
 
 #define from_bcd(val) (((val) / 16) * 10 + ((val)&0xf))
+
+#define CMOS_WAIT while (is_cmos_update())
 
 bool is_cmos_update()
 {
@@ -28,8 +31,7 @@ char get_realtime_reg(int reg)
 
 void clock_time(time_t *time)
 {
-    while (is_cmos_update())
-        ;
+    CMOS_WAIT;
 
     time->second = from_bcd(get_realtime_reg(T_SECOND));
     time->minute = from_bcd(get_realtime_reg(T_MINUTE));
@@ -41,7 +43,7 @@ void clock_time(time_t *time)
 
 uint clock_read(time_selector_t selector)
 {
-    while (is_cmos_update())
-        ;
+    CMOS_WAIT;
+
     return from_bcd(get_realtime_reg(selector));
 }

@@ -6,6 +6,7 @@
 #include <skift/logger.h>
 
 #include "kernel/cpu/cpu.h"
+
 #include "kernel/dev/atapio.h"
 
 int atapio_common(u8 drive, u32 numblock, u8 count)

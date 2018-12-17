@@ -2,6 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* graphic.c: graphic device frontend.                                        */
+
+/*
+ * TODO:
+ * - ADD support for textmod graphics
+ */
+
 #include <string.h>
 #include <skift/logger.h>
 

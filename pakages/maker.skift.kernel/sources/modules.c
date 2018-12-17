@@ -2,6 +2,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* modules.c : kernel modules/ramdisk loader                                  */
+
+/*
+ * TODO:
+ * - ADD support for kernel modules maybe pass some kind of struct
+ *   with kernel function pointer.
+ */
+
 #include <string.h>
 #include <skift/logger.h>
 

@@ -2,6 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* main.c : the entry point of the kernel.                                    */
+
+/*
+ * TODO:
+ * - ADD support for kernel command line options.
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

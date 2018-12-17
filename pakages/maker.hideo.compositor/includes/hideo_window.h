@@ -20,7 +20,8 @@ typedef enum
 
 typedef enum 
 {
-    
+    WINTYPE_POPOVER,
+    WINTYPE_POPUP,
 } window_type_t;
 
 typedef struct

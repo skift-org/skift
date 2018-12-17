@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* filesystem.c: the skiftOS virtual filesystem.                              */
+
 #include <stdlib.h>
 #include <string.h>
 #include <skift/logger.h>

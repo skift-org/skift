@@ -14,7 +14,7 @@ esp_t keyboard_irq(esp_t esp, context_t *context)
     UNUSED(context);
 
     uchar scan_code = inb(0x60);
-    sk_log(LOG_INFO, "Scancode: 0x%x.", scan_code);
+    sk_log(LOG_DEBUG, "Scancode: 0x%x.", scan_code);
 
     return esp;
 }

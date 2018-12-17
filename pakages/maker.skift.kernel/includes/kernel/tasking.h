@@ -148,7 +148,7 @@ void shared_memory_delete(shared_memory_t * memory);
 
 void* shared_memory_create(uint size);
 void* shared_memory_aquire(void* mem);
-void* shared_memory_realease(void* mem);
+void  shared_memory_realease(void* mem);
 
 /* --- Messaging ------------------------------------------------------------ */
 

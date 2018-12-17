@@ -621,21 +621,25 @@ shared_memory_t * shared_memory(uint size)
 {
     shared_memory_t *shm = MALLOC(shared_memory_t);
 
-    shm->memory = memory_alloc(memory_kpdir(), size, 0);
+    shm->memory = (void*)memory_alloc(memory_kpdir(), size, 0);
     shm->size = size;
     shm->refcount = 0;
 
     sk_log(LOG_DEBUG, "Shared memory region created @%x.", shm->memory);
 
     list_pushback(shared_memories, shm);
+
+    return shm;
 }
 
 void shared_memory_delete(shared_memory_t * shm)
 {
     list_remove(shared_memories, shm);
-    memory_free(memory_kpdir(), shm->memory, shm->size, 0);
-    
+    memory_free(memory_kpdir(), (uint)shm->memory, shm->size, 0);
+
     free(shm);
+
+    sk_log(LOG_DEBUG, "Shared memory region deleted @%x.", shm->memory);
 }
 
 shared_memory_t * shared_memory_get(void* mem)
@@ -657,7 +661,9 @@ void* shared_memory_create(uint size)
 {
     sk_atomic_begin();
 
-    shared_memory_t * shm = shared_memorie(size);
+    shared_memory_t * shm = shared_memory(size);
+
+    sk_log(LOG_INFO, "Shared memory region created @%x by process '%s'@%d.", shm->memory, running->process->name, running->id);
 
     if (shm != NULL)
     {
@@ -677,6 +683,7 @@ void* shared_memory_aquire(void* mem)
 
     if (shm != NULL)
     {
+        sk_log(LOG_INFO, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, running->process->name, running->id);
         list_pushback(running->process->shared, shm);
         shm->refcount++;
 
@@ -686,13 +693,14 @@ void* shared_memory_aquire(void* mem)
     }
     else
     {
+        sk_log(LOG_WARNING, "Process '%s'@%d tried to aquire a shared memory region @%x.", running->process->name, running->id, mem);
         sk_atomic_end();
 
         return NULL;
     }
 }
 
-void* shared_memory_realease(void* mem)
+void shared_memory_realease(void* mem)
 {
     sk_atomic_begin();
 
@@ -700,6 +708,7 @@ void* shared_memory_realease(void* mem)
 
     if (shm != NULL && list_containe(running->process->shared, shm))
     {
+        sk_log(LOG_INFO, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, running->process->name, running->id);
         list_remove(running->process->shared, shm);
         shm->refcount--;
 
@@ -707,6 +716,10 @@ void* shared_memory_realease(void* mem)
         {
             shared_memory_delete(shm);
         }
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Process '%s'@%d tried to realease a shared memory region @%x.", running->process->name, running->id, mem);
     }
     
     sk_atomic_end();

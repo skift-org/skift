@@ -34,14 +34,6 @@
 #include "kernel/tasking.h"
 #include "kernel/version.h"
 
-#define LINE \
-    "================================================================================"
-
-#define THIN_LINE \
-    "--------------------------------------------------------------------------------"
-
-#define log(a) printf(a "\n")
-
 multiboot_info_t mbootinfo;
 
 extern int __end;
@@ -54,8 +46,8 @@ void main(multiboot_info_t *info, s32 magic)
 {
     /* --- Say hello -------------------------------------------------------- */
     printf(KERNEL_UNAME);
-    log("\nCopyright © 2018-2019 MAKER.");
-    log("Booting...");
+    printf("\nCopyright © 2018-2019 MAKER.\n");
+    printf("Booting...\n");
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
@@ -69,6 +61,8 @@ void main(multiboot_info_t *info, s32 magic)
     {
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
+
+    sk_log(LOG_INFO, "Booting from '%s' using command lines options '%s'.", info->boot_loader_name, info->cmdline);
 
     /* --- Setup cpu context ------------------------------------------------ */
     setup(gdt);
@@ -91,6 +85,8 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Finalizing System ------------------------------------------------ */
     sk_atomic_enable();
     sti();
+
+    shared_memory_create(1);
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS session = process_exec("app/maker.hideo.session", NULL);

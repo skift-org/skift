@@ -59,7 +59,6 @@ void sk_logger_log(log_level_t level, const char *file, uint line, const char *f
 
         if (show_file_name)
         {
-            //buffer += sprintf(buffer, "%s:%d: %s:%s(): ", file, line, log_describe(level), function);
             buffer += sprintf(buffer, "%s %s:%s() ln%d ", log_describe(level), file, function, line);
         }
         else

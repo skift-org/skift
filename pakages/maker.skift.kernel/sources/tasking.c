@@ -112,6 +112,7 @@ process_t *alloc_process(const char *name, int flags)
     process->flags = flags;
     process->threads = list();
     process->inbox = list();
+    process->shared = list();
 
     if (flags & TASK_USER)
     {

@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-
 #define VERSION 	"1.1"
 #define ALIGNMENT	16ul
 #define ALIGN_TYPE  char ///unsigned char[16] /// unsigned short
@@ -16,7 +15,7 @@
 #define USE_CASE4
 #define USE_CASE5
 
-// #define DEBUG
+//#define DEBUG
 #define FLUSH()
 // #define atexit(x) x(); panic("LIBALLOC FATAL!")
 

@@ -3,17 +3,6 @@
 
 #include <skift/list.h>
 
-list_item_t *list_item(void *value)
-{
-    list_item_t *item = MALLOC(list_item_t);
-
-    item->prev = NULL;
-    item->next = NULL;
-    item->value = value;
-
-    return item;
-}
-
 list_t *list()
 {
     list_t *l = malloc(sizeof(list_t));
@@ -46,7 +35,7 @@ void list_destroy(list_t *l)
     while (current)
     {
         list_item_t *next = current->next;
-        free((void *)current->value);
+        free(current->value);
         free(current);
         current = next;
     }
@@ -54,40 +43,14 @@ void list_destroy(list_t *l)
     free(l);
 }
 
-void list_print(list_t *l)
-{
-    printf("c:%d ", l->count);
-    if (l->head)
-        printf("h:%d", l->head->value);
-    else
-        printf("h:NULL ");
-
-    if (l->tail)
-        printf("t:%d", l->tail->value);
-    else
-        printf("t:NULL ");
-
-    printf("\n");
-
-    FOREACH(item, l)
-    {
-        if (item->prev)
-            printf("%d", item->prev->value);
-        else
-            printf("-");
-        printf(" %d ", item->value);
-        if (item->next)
-            printf("%d", item->next->value);
-        else
-            printf("-");
-        printf("\n");
-    }
-    printf("\n");
-}
-
 void list_push(list_t *l, void *value)
 {
-    list_item_t *item = list_item(value);
+    list_item_t *item = MALLOC(list_item_t);
+
+    item->prev = NULL;
+    item->next = NULL;
+    item->value = value;
+
     l->count++;
 
     if (l->head == NULL)
@@ -133,7 +96,12 @@ int list_pop(list_t *l, void **value)
 
 void list_pushback(list_t *l, void *value)
 {
-    list_item_t *item = list_item(value);
+    list_item_t *item = MALLOC(list_item_t);
+
+    item->prev = NULL;
+    item->next = NULL;
+    item->value = value;
+
     l->count++;
 
     if (l->tail == NULL)

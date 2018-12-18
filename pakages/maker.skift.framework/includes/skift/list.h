@@ -21,10 +21,7 @@ typedef struct list
 
 list_t *list();
 void list_delete(list_t *l);
-
 void list_destroy(list_t *list);
-
-void list_print(list_t *list);
 
 void list_push(list_t *list, void *value);
 int list_pop(list_t *list, void **value);

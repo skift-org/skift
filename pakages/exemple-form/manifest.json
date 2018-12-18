@@ -1,7 +1,7 @@
 {
-    "name": "Hideo Compositor",
-
-    "id": "maker.hideo.compositor",
+    "name": "Exemple",
+    
+    "id": "exemple-form",
     "type": "app",
     "libs": [
         "maker.skift.runtime",

@@ -9,6 +9,7 @@
 #include <skift/lock.h>
 #include <skift/process.h>
 #include <skift/logger.h>
+#include <skift/formater.h>
 #include <skift/__plugs.h>
 
 lock_t memlock;
@@ -18,6 +19,7 @@ void __plug_init(void)
 {
     sk_lock_init(memlock);
     sk_lock_init(loglock);
+    sk_formater_init();
 }
 
 int __plug_print(const char *buffer)

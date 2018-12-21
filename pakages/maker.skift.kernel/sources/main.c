@@ -23,6 +23,7 @@
 
 #include <skift/atomic.h>
 #include <skift/logger.h>
+#include <skift/__plugs.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -51,6 +52,8 @@ uint get_kernel_end(multiboot_info_t *minfo)
 
 void main(multiboot_info_t *info, s32 magic)
 {
+    __plug_init();
+
     /* --- Say hello -------------------------------------------------------- */
     printf(KERNEL_UNAME);
     printf("\nCopyright © 2018-2019 MAKER.\n");

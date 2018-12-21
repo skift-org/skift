@@ -1,7 +1,9 @@
 #pragma once
 #include <skift/generic.h>
-// Framework plugs to the syscalls or the kernel.
 
+void __plug_init(void);
+
+// Framework plugs to the syscalls or the kernel.
 void __plug_putchar(int c);
 int __plug_print(const char *buffer);
 

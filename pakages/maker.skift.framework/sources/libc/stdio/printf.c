@@ -1,13 +1,18 @@
+#include <stdarg.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <skift/formater.h>
 
-/*int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
+int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
 {
     printf_info_t _info = 
     {
-        .state = PFSTATE_ESC
+        .output = s,
+        .output_size = n,
+        .format = fmt,
+
+        .state = PFSTATE_ESC,
     };
 
     printf_info_t* info = &_info;
@@ -16,7 +21,6 @@
 
     while(1)
     {
-        
         switch (info->state)
         {
             case PFSTATE_ESC:
@@ -63,17 +67,26 @@
                     
                     PEEK();
                 }
-                else
+                else if (isalpha(info->c))
                 {
                     info->state = PFSTATE_PARSE;
+                }
+                else
+                {
+                    info->state = PFSTATE_ESC;
                 }
                 break;
 
             case PFSTATE_FINALIZE:
+                sk_formater_format(info, info->c, &va);
+                info->lenght = 0;
+                info->state = PFSTATE_ESC;
 
+                PEEK();
+                break;
+            
             default:
                 break;
         }
     }
 }
-*/

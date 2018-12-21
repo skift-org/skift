@@ -1,6 +1,6 @@
 #pragma once
 
-typedef char *va_list;
+typedef void *va_list;
 
 #define _INTSIZEOF(n) ((sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1))
 

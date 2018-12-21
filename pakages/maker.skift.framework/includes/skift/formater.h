@@ -24,7 +24,7 @@ typedef struct
     uint  output_offset;
     uint  output_size;
 
-    char* format;
+    const char* format;
     uint format_offset;
 
     char padding;
@@ -62,9 +62,8 @@ do                                                    \
     if (info->c == '\0') return strlen(info->output); \
 } while(0)
 
-
-
+void sk_formater_init();
 bool sk_formater_register(char c, formater_t formater);
-int sk_formater_format(printf_info_t* info, char sel, void* v);
+int sk_formater_format(printf_info_t* info, char sel, va_list* va);
 //TODO: int sk_formater_format_stream(printf_info_t* info, char sel, void* v);
 

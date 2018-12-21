@@ -5,17 +5,16 @@
 #include <stdarg.h>
 
 #define EOF -1
+#define SEEK_SET 1
+#define SEEK_CUR 2
+#define SEEK_END 3
 
 /* --- Files operations ----------------------------------------------------- */
 
 typedef struct 
 {
-
+    int handle;
 } FILE;
-
-#define SEEK_SET 1
-#define SEEK_CUR 2
-#define SEEK_END 3
 
 FILE *fopen(const char *filename, const char *mode);
 int fclose(FILE *stream);

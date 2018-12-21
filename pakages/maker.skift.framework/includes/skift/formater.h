@@ -49,9 +49,9 @@ do                                                             \
 #define APPEND(c)                                     \
 do                                                    \
 {                                                     \
-    if (info->output_offset <= info->output_size - 1) \
+    if (info->output_offset >= info->output_size - 1) \
         return strlen(info->output);                  \
-    info->output[info->output_offset++] = c;              \
+    info->output[info->output_offset++] = c;          \
     info->output[info->output_offset] = '\0';         \
 } while(0)
 

@@ -34,10 +34,10 @@ char *gets(char *str);
 int puts(const char *str);
 
 /* --- Printf --------------------------------------------------------------- */
-int printf(const char *format, ...);
-int sprintf(char *str, const char *format, ...);
-int snprintf(char* s, const char * fmt, ...);
 
-int vprintf(const char *format, va_list va);
-int vsprintf(char *str, const char *format, va_list va);
+int printf(const char *fmt, ...);
+int vprintf(const char *fmt, va_list va);
+int sprintf(char *s, const char *fmt, ...);
+int vsprintf(char *s, const char *fmt, va_list va);
+int snprintf(char *s, int n, const char *fmt, ...);
 int vsnprintf(char* s, size_t n, const char * fmt, va_list va);

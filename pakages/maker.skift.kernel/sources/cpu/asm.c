@@ -74,10 +74,10 @@ u32 CR4()
 
 void dump_context(context_t *context)
 {
-    printf("\t CS=%x  DS=%x  ES=%x  FS=%x  GS=%x\n", context->cs,  context->ds,  context->es,  context->fs, context->gs);
-    printf("\tEAX=%x EBX=%x ECX=%x EDX=%x\n", context->eax, context->ebx, context->ecx, context->edx);
-    printf("\tEDI=%x ESI=%x EBP=%x ESP=%x\n", context->edi, context->esi, context->ebp, context->USELESS);
-    printf("\tINT=%x ERR=%x EIP=%x FLG=%x\n", context->int_no, context->errcode, context->eip, context->eflags);
+    printf("\t CS=%08x  DS=%08x  ES=%08x  FS=%08x  GS=%08x\n", context->cs,  context->ds,  context->es,  context->fs, context->gs);
+    printf("\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", context->eax, context->ebx, context->ecx, context->edx);
+    printf("\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", context->edi, context->esi, context->ebp, context->USELESS);
+    printf("\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", context->int_no, context->errcode, context->eip, context->eflags);
 
-    printf("\tCR0=%x CR2=%x CR3=%x CR4=%x\n", CR0(), CR2(), CR3(), CR4());
+    printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }

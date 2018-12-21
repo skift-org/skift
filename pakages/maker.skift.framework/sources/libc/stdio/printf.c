@@ -4,15 +4,70 @@
 #include <string.h>
 #include <skift/formater.h>
 
+int printf(const char *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+
+    int result = vprintf(fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
+int vprintf(const char *fmt, va_list va)
+{
+    char buffer[1024];
+    int result = vsnprintf(buffer, 1024, fmt, va);
+    puts(buffer);
+
+    return result;
+}
+
+int sprintf(char *s, const char *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+
+    int result = vsnprintf(s, 0xFFFFFF, fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
+int vsprintf(char *s, const char *fmt, va_list va)
+{
+    return vsnprintf(s, 0xFFFFFF, fmt, va);
+}
+
+int snprintf(char *s, int n, const char *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+
+    int result = vsnprintf(s, n, fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
 int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
 {
     printf_info_t _info = 
     {
         .output = s,
         .output_size = n,
+        .output_offset = 0,
+
         .format = fmt,
+        .format_offset = 0,
 
         .state = PFSTATE_ESC,
+        .align = PFALIGN_RIGHT,
+        .padding = '0',
     };
 
     printf_info_t* info = &_info;
@@ -40,10 +95,12 @@ int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
                 if (info->c == '0')
                 {
                     info->padding = '0';
+                    PEEK();
                 }
                 else if (info->c == '-')
                 {
                     info->align = PFALIGN_LEFT;
+                    PEEK();
                 }
                 else if (isdigit(info->c))
                 {
@@ -79,8 +136,11 @@ int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
 
             case PFSTATE_FINALIZE:
                 sk_formater_format(info, info->c, &va);
+                
                 info->lenght = 0;
                 info->state = PFSTATE_ESC;
+                info->padding = ' ';
+                info->align = PFALIGN_RIGHT;
 
                 PEEK();
                 break;

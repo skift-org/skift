@@ -1,7 +1,7 @@
-#include <skift/__plugs.h>
-
 #include <stdio.h>
 #include <string.h>
+
+#include <skift/__plugs.h>
 
 int putchar(int chr)
 {

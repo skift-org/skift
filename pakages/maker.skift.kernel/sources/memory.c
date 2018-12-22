@@ -13,6 +13,7 @@
 #include <skift/types.h>
 #include <skift/utils.h>
 #include <skift/atomic.h>
+#include <skift/logger.h>
 
 #include "kernel/paging.h"
 
@@ -73,6 +74,7 @@ uint physical_alloc(uint count)
         }
     }
 
+    sk_log(LOG_WARNING, "alloc failed!");
     return 0;
 }
 
@@ -226,6 +228,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         }
     }
 
+    sk_log(LOG_WARNING, "alloc failed!");
     return 0;
 }
 
@@ -278,6 +281,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     {
         sk_atomic_end();
 
+        sk_log(LOG_WARNING, "alloc failed!");
         return 0;
     }
 
@@ -288,6 +292,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
         physical_free(paddr, count);
         sk_atomic_end();
 
+        sk_log(LOG_WARNING, "alloc failed!");
         return 0;
     }
 
@@ -356,6 +361,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
     sk_atomic_end();
 
+    sk_log(LOG_WARNING, "alloc failed!");
     return 0;
 }
 

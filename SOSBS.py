@@ -45,6 +45,7 @@ BRIGHT_WHITE = ESC + '37;1m'
 
 RESET = ESC + '0m'
 
+OBJDUMP = "./toolchain/local/bin/i686-elf-objdump"
 GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
 AR = "./toolchain/local/bin/i686-elf-ar"
@@ -122,7 +123,6 @@ def GRUB(iso, output_file):
             return 0 == subprocess.call(["grub2-mkrescue", "-o", output_file, iso], stdout=f, stderr=f)
 
     return False
-
 
 def ERROR(msg):
     print(BRIGHT_RED + "\nERROR: " + RESET + msg)
@@ -373,7 +373,12 @@ class Target(object):
             print("No linking required, skipping...")
             return True
 
-        return subprocess.call(command) == 0
+        if subprocess.call(command) == 0:
+            with open(output_file + ".asm", "w") as f:
+                command = [OBJDUMP, "-Mintel", "-S", output_file]
+                return subprocess.call(command, stdout=f) == 0
+
+        return False
 
     def build(self, targets):
         """

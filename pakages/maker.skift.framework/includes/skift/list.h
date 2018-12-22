@@ -4,6 +4,7 @@
 #include <skift/utils.h>
 
 #define FOREACH(item, list) for (list_item_t *item = list->head; item != NULL; item = item->next)
+#define FOREACHR(item, list) for (list_item_t *item = list->tail; item != NULL; item = item->prev)
 
 typedef struct list_node
 {

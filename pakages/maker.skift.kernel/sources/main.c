@@ -30,6 +30,7 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/isr.h"
 
+#include "kernel/console.h"
 #include "kernel/filesystem.h"
 #include "kernel/graphic.h"
 #include "kernel/keyboard.h"
@@ -91,12 +92,16 @@ void main(multiboot_info_t *info, s32 magic)
     setup(graphic);
     setup(mouse);
     setup(keyboard);
+    setup(console);
 
     /* --- Finalizing System ------------------------------------------------ */
     sk_atomic_enable();
     sti();
 
-    shared_memory_create(1);
+    console_print("Hello world!\n");
+    console_print("Do you know the wea!\n");
+
+    while(1);
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS session = process_exec("app/maker.hideo.session", NULL);

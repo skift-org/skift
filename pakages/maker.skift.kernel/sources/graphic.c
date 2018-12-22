@@ -78,8 +78,6 @@ void graphic_blit(uint *buffer)
 {
     if (framebuffer != NULL)
         memcpy(framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
-
-    sk_log(LOG_DEBUG, "blit!");
 }
 
 void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)

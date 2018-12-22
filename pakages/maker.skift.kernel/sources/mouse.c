@@ -43,7 +43,7 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
 
 uchar cycle = 0;
 ubyte packet[4];
-esp_t mouse_irq(esp_t esp, context_t *context)
+reg32_t mouse_irq(reg32_t esp, context_t *context)
 {
     UNUSED(context);
 

@@ -124,6 +124,7 @@ def GRUB(iso, output_file):
 
     return False
 
+
 def ERROR(msg):
     print(BRIGHT_RED + "\nERROR: " + RESET + msg)
 
@@ -408,10 +409,21 @@ class Target(object):
             print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
             # Build all source file of the current target
+            succeed = 0
+            failed = 0
+
             for src, obj in zip(self.get_sources(), self.get_objects()):
-                if not self.compile(src, obj, targets):
+                if self.compile(src, obj, targets):
+                    succeed += 1
+                else:
+                    failed += 1
                     ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
-                    return False
+
+            print("    %d %s builded, %s%d%s succeed and %s%d%s failed.\n" % (succeed + failed,
+                                                                              "files" if succeed + failed > 1 else "file", BRIGHT_GREEN, succeed, RESET, BRIGHT_RED, failed, RESET))
+
+            if failed > 0:
+                return False
 
             # Link and output the result of the target
             return self.link(targets)
@@ -689,7 +701,7 @@ global_actions = \
 if not SDK:
     global_actions.update({
         "distrib-sdk": distrib_sdk
-    }) 
+    })
 
 # --- Main ------------------------------------------------------------------- #
 

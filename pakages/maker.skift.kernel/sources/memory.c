@@ -257,7 +257,7 @@ void memory_setup(uint used, uint total)
     }
 
     // Map the kernel memory
-    memory_identity_map(&kpdir, 0, PAGE_ALIGN(used) / PAGE_SIZE);
+    memory_identity_map(&kpdir, 0, PAGE_ALIGN(used + 1) / PAGE_SIZE);
 
     paging_load_directorie(&kpdir);
     paging_enable();

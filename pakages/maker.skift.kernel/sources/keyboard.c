@@ -9,7 +9,7 @@
 
 /* --- Private functions ---------------------------------------------------- */
 
-esp_t keyboard_irq(esp_t esp, context_t *context)
+reg32_t keyboard_irq(reg32_t esp, context_t *context)
 {
     UNUSED(context);
 

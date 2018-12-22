@@ -28,6 +28,16 @@ typedef enum
     CSLC_DEFAULT_BACKGROUND,
 } console_color_t;
 
+typedef enum
+{
+    CSSTATE_ESC,
+    CSSTATE_BRACKET,
+    CSSTATE_PARSE,
+    CSSTATE_BGCOLOR,
+    CSSTATE_FGCOLOR,
+    CSSTATE_ENDVAL,
+} console_state_t;
+
 typedef struct
 {
     char c;
@@ -41,30 +51,10 @@ typedef struct
     list_t *cells;
 } console_line_t;
 
-typedef enum
-{
-    CSSTATE_ESC,
-    CSSTATE_BRACKET,
-    CSSTATE_PARSE,
-    CSSTATE_BGCOLOR,
-    CSSTATE_FGCOLOR,
-    CSSTATE_ENDVAL,
-} console_state_t;
-
 typedef struct
 {
-    lock_t lock;
-
-    console_state_t state;
-
     list_t *lines;
     console_line_t *current_line;
-
-    console_color_t fg;
-    console_color_t bg;
-
-    console_color_t newfg;
-    console_color_t newbg;
 } console_t;
 
 void console_setup();

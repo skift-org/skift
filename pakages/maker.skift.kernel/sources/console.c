@@ -28,260 +28,81 @@ int colors[] =
         [CSLC_DEFAULT_BACKGROUND] = 0x1D1F21,
 };
 
-console_t console;
-bitmap_t *framebuffer;
+console_line_t* line();
 
-void console_setup()
+console_t* console()
 {
-    sk_lock_init(console.lock);
+    console_t* c = MALLOC(console_t);
 
-    console.state = CSSTATE_ESC;
+    c->lines = list();
+    c->current_line = line();
+    list_pushback(c->lines, c->current_line);
 
-    console.lines = list();
-    console.current_line = NULL;
-
-    console.bg = CSLC_DEFAULT_BACKGROUND;
-    console.fg = CSLC_DEFAULT_FORGROUND;
-    
-    uint width, height;
-    graphic_size(&width, &height);
-    sk_log(LOG_DEBUG, "w: %d h: %d", width, height);
-    framebuffer = bitmap(width, height);
+    return c;
 }
 
-void console_render()
+console_line_t* line()
 {
-    sk_log(LOG_DEBUG, "begin rendering");
+    console_line_t* line = MALLOC(console_line_t);
 
-    drawing_clear(framebuffer, colors[CSLC_DEFAULT_BACKGROUND]);
-    drawing_line(framebuffer, 0,0, 800,66, colors[CSLC_RED]);
+    line->cells = list();
 
-    int ll = 0;
-    FOREACH(l, console.lines)
-    {
-        console_line_t *line = l->value;
-        sk_log(LOG_DEBUG, "line %d", ll);
-
-        int cc = 0;
-        FOREACH(c, line->cells)
-        {
-            console_cell_t *cell = c->value;
-
-            drawing_fillrect(framebuffer, cc * 8, framebuffer->height - ll * 16, 8, 16, colors[cell->bg]);
-            drawing_char(framebuffer, cell->c, cc * 8, framebuffer->height - ll * 16, colors[cell->fg]);
-            sk_log(LOG_DEBUG, "char %c", cell->c);
-            cc++;
-        }
-
-        ll++;
-    }
-
-    graphic_blit(framebuffer->buffer);
+    return line;
 }
 
-console_cell_t *console_cell(char c)
+console_cell_t* cell(char c)
 {
-    console_cell_t *cell = MALLOC(console_cell_t);
-
-    cell->fg = console.fg;
-    cell->bg = console.bg;
+    console_cell_t* cell = MALLOC(console_cell_t);
 
     cell->c = c;
 
     return cell;
 }
 
-console_line_t *console_newline()
+console_t* cons;
+bitmap_t* framebuffer;
+
+void console_setup()
 {
-    console_line_t *line = MALLOC(console_line_t);
-    line->cells = list();
+    //cons = console();
+    uint width, height = 0;
+    graphic_size(&width, &height);
+    framebuffer = bitmap(width, height);
+    graphic_blit(framebuffer->buffer);
 
-    sk_log(LOG_DEBUG, "Line %x created", line);
-
-    return line;
+    sk_log(LOG_INFO, "console created at 0x0%8x with framebuffer at 0x%08x.", cons, framebuffer->buffer);
 }
 
-void console_append_char(char c)
+void console_draw()
 {
-    if (console.current_line == NULL)
+    drawing_clear(framebuffer, colors[CSLC_DEFAULT_BACKGROUND]);
+
+    int y = 0;
+    FOREACH(l, cons->lines)
     {
-        console.current_line = console_newline();
-        list_push(console.lines, console.current_line);
+        console_line_t* line = (console_line_t*)l->value;
+
+        int x = 0;
+        FOREACH(c, line->cells)
+        {
+            console_cell_t* cell = (console_cell_t*)c->value;
+
+            drawing_char(framebuffer, cell->c, x * 8, y * 16, colors[CSLC_DEFAULT_FORGROUND]);
+            x++;
+        }
+
+        y++;
     }
 
-    if (c == '\n')
-    {
-        console.current_line = console_newline();
-        list_push(console.lines, console.current_line);
-    }
-    else
-    {
-        sk_log(LOG_DEBUG, "writting char %c", c);
-        list_pushback(console.current_line->cells, console_cell(c));
-        sk_log(LOG_DEBUG, "writting char %c ok", c);
-    }
-}
-
-void console_putchar_internal(char c)
-{
-
-    switch (console.state)
-    {
-    case CSSTATE_ESC:
-        if (c == '\033')
-        {
-            console.newfg = console.fg;
-            console.newbg = console.bg;
-
-            console.state = CSSTATE_BRACKET;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    case CSSTATE_BRACKET:
-        if (c == '[')
-        {
-            console.state = CSSTATE_PARSE;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    case CSSTATE_PARSE:
-        if (c == '3')
-        {
-            console.state = CSSTATE_FGCOLOR;
-        }
-        else if (c == '4')
-        {
-            console.state = CSSTATE_BGCOLOR;
-        }
-        else if (c == '0')
-        {
-            // Reset colors
-            console.newbg = CSLC_DEFAULT_BACKGROUND;
-            console.newfg = CSLC_DEFAULT_FORGROUND;
-
-            console.state = CSSTATE_ENDVAL;
-        }
-        else if (c == '1')
-        {
-            // Make it bright
-            if (console.newfg < CSLC_DARK_GREY)
-            {
-                console.newfg += CSLC_DARK_GREY;
-            }
-
-            console.state = CSSTATE_ENDVAL;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    case CSSTATE_BGCOLOR:
-        if (c >= '0' && c <= '7')
-        {
-            console.newbg = c - '0';
-            console.state = CSSTATE_ENDVAL;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    case CSSTATE_FGCOLOR:
-        if (c >= '0' && c <= '7')
-        {
-            if (console.newfg >= CSLC_DARK_GREY)
-            {
-                console.newfg = c - '0' + CSLC_DARK_GREY;
-            }
-            else
-            {
-                console.newfg = c - '0';
-            }
-
-            console.state = CSSTATE_ENDVAL;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    case CSSTATE_ENDVAL:
-        if (c == ';')
-        {
-            console.state = CSSTATE_PARSE;
-        }
-        else if (c == 'm')
-        {
-            console.fg = console.newfg;
-            console.bg = console.newbg;
-
-            console.state = CSSTATE_ESC;
-        }
-        else
-        {
-            console.state = CSSTATE_ESC;
-            console_append_char(c);
-        }
-        break;
-
-    default:
-        break;
-    }
+    graphic_blit(framebuffer->buffer);
 }
 
 void console_print(const char *s)
-{
-    sk_log(LOG_DEBUG, "begin");
-
-    LOCK(console.lock,
-         {
-             for (uint i = 0; s[i]; i++)
-             {
-                 console_append_char(s[i]);
-                //console_putchar_internal(s[i]);
-             }
-
-             console_render();
-         });
-
-    sk_log(LOG_DEBUG, "end");
+{   
+    for(uint i = 0; s[i]; i++)
+    {
+        list_pushback(cons->current_line->cells, cell(s[i]));
+    }
+    
+    console_draw();
 }
-
-void console_putchar(char c)
-{
-    LOCK(console.lock,
-         {
-             console_putchar_internal(c);
-
-             console_render();
-         });
-}
-
-/* TODO: need full keyboad driver!
-void console_read(const char * s, uint size)
-{
-
-}
-
-void console_getchar(char c)
-{
-
-}
-*/

@@ -24,6 +24,7 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 #include <skift/__plugs.h>
+#include <skift/drawing.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -50,6 +51,8 @@ uint get_kernel_end(multiboot_info_t *minfo)
 {
     return max((uint)&__end, modules_get_end(minfo));
 }
+
+bitmap_t* bmp;
 
 void main(multiboot_info_t *info, s32 magic)
 {
@@ -98,10 +101,12 @@ void main(multiboot_info_t *info, s32 magic)
     sk_atomic_enable();
     sti();
 
-    console_print("Hello world!\n");
-    console_print("Do you know the wea!\n");
+    uint width, height = 0;
+    graphic_size(&width, &height);
 
-    while(1);
+    bmp = bitmap(width, height);
+    drawing_clear(bmp, 0xc1c1c1);
+    graphic_blit(bmp->buffer);
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS session = process_exec("app/maker.hideo.session", NULL);

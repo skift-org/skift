@@ -4,6 +4,9 @@
 #include <skift/list.h>
 #include <skift/lock.h>
 
+#define CONSOLE_CELL_HEIGHT 16
+#define CONSOLE_CELL_WIDTH 8 
+
 typedef enum
 {
     CSLC_DEFAULT_FORGROUND,

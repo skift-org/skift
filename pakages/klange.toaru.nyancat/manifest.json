@@ -1,0 +1,9 @@
+{
+    "name": "Nyancat",
+    
+    "id": "klange.toaru.nyancat",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

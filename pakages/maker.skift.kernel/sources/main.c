@@ -105,7 +105,7 @@ void main(multiboot_info_t *info, s32 magic)
     printf("Booting...\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS session = process_exec("bin/exemple", NULL);
+    PROCESS session = process_exec("bin/klange.toaru.nyancat", NULL);
 
     if (session)
     {

@@ -4,6 +4,8 @@
  *  - Support for \t, \b
  */
 
+#include <math.h>
+
 #include <skift/logger.h>
 #include <skift/drawing.h>
 #include <skift/atomic.h>
@@ -16,14 +18,14 @@ int colors[] =
         [CSLC_DEFAULT_FORGROUND] = 0xC5C8C6,
         [CSLC_DEFAULT_BACKGROUND] = 0x1D1F21,
 
-        [CSLC_BLACK] = 0x1D1F21,
-        [CSLC_RED] = 0xA54242,
-        [CSLC_GREEN] = 0x8C9440,
-        [CSLC_YELLOW] = 0xDE935F,
-        [CSLC_BLUE] = 0x5F819D,
-        [CSLC_MAGENTA] = 0x85678F,
-        [CSLC_CYAN] = 0x5E8D87,
-        [CSLC_LIGHT_GREY] = 0x707880,
+        [CSLC_BLACK] = 0x1D1F21, // 0
+        [CSLC_RED] = 0xA54242,   // 1
+        [CSLC_GREEN] = 0x8C9440, // 2
+        [CSLC_YELLOW] = 0xDE935F, // 3
+        [CSLC_BLUE] = 0x5F819D, // 4
+        [CSLC_MAGENTA] = 0x85678F, // 5
+        [CSLC_CYAN] = 0x5E8D87, // 6
+        [CSLC_LIGHT_GREY] = 0x707880,  // 7
 
         [CSLC_DARK_GREY] = 0x373B41,
         [CSLC_LIGHT_RED] = 0xCC6666,
@@ -82,12 +84,17 @@ void console_setup()
     console_framebuffer = bitmap(width, height);;
 }
 
+
 void console_draw()
 {
     drawing_clear(console_framebuffer, colors[CSLC_DEFAULT_BACKGROUND]);
 
+    int screen_height = console_framebuffer->height / CONSOLE_CELL_HEIGHT;
+    int screen_width = console_framebuffer->width / CONSOLE_CELL_WIDTH;
+    int screen_origine = min(screen_height, cons->lines->count);
+
     int y = 0;
-    FOREACH(l, cons->lines)
+    FOREACHR(l, cons->lines)
     {
         console_line_t* line = (console_line_t*)l->value;
 
@@ -96,12 +103,13 @@ void console_draw()
         {
             console_cell_t* cell = (console_cell_t*)c->value;
 
-            drawing_fillrect(console_framebuffer,x * 8, y * 16, 8, 16, colors[cell->bg]);
-            drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
-            x++;
+            drawing_fillrect(console_framebuffer,x * 8, (screen_origine - y) * 16, 8, 16, colors[cell->bg]);
+            drawing_char(console_framebuffer, cell->c, x * 8, (screen_origine - y) * 16, colors[cell->fg]);
+            
+            if (x++>screen_width) break;
         }
 
-        y++;
+        if (y++>screen_height) break;
     }
 
     graphic_blit(console_framebuffer->buffer);

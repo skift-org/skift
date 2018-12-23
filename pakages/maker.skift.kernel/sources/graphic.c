@@ -19,7 +19,7 @@
 #include "kernel/graphic.h"
 
 uint *physical_framebuffer = NULL;
-uint *framebuffer = NULL;
+uint *virtual_framebuffer = NULL;
 
 uint graphic_width = 0;
 uint graphic_height = 0;
@@ -36,7 +36,7 @@ void graphic_early_setup(uint width, uint height)
 
         bga_mode(width, height);
         physical_framebuffer = (uint *)bga_get_framebuffer();
-        framebuffer = physical_framebuffer;
+        virtual_framebuffer = physical_framebuffer;
     }
     else
     {
@@ -52,7 +52,7 @@ void graphic_setup()
     if (physical_framebuffer != NULL)
     {
         uint page_count = PAGE_ALIGN(graphic_width * graphic_height * sizeof(uint)) / PAGE_SIZE;
-        framebuffer = (uint *)memory_alloc_at(memory_kpdir(), page_count, (uint)physical_framebuffer, 0);
+        virtual_framebuffer = (uint *)memory_alloc_at(memory_kpdir(), page_count, (uint)physical_framebuffer, 0);
     }
 }
 
@@ -60,7 +60,7 @@ void graphic_setup()
 
 void graphic_size(uint *width, uint *height)
 {
-    if (framebuffer == NULL)
+    if (virtual_framebuffer == NULL)
     {
         *width = 0;
         *height = 0; 
@@ -76,13 +76,13 @@ void graphic_size(uint *width, uint *height)
 
 void graphic_blit(uint *buffer)
 {
-    if (framebuffer != NULL)
-        memcpy(framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
+    if (virtual_framebuffer != NULL)
+        memcpy(virtual_framebuffer, buffer, graphic_width * graphic_height * sizeof(uint));
 }
 
 void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)
 {
-    if (framebuffer != NULL)
+    if (virtual_framebuffer != NULL)
     {
         for (uint xx = 0; xx < w; xx++)
         {
@@ -96,6 +96,6 @@ void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)
 
 inline void graphic_pixel(uint x, uint y, uint color)
 {
-    if (framebuffer != NULL && x < graphic_width && y < graphic_height)
-        framebuffer[x + y * graphic_width] = color;
+    if (virtual_framebuffer != NULL && x < graphic_width && y < graphic_height)
+        virtual_framebuffer[x + y * graphic_width] = color;
 }

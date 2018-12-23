@@ -7,6 +7,8 @@
 /*
  * TODO:
  * - Check pointers from user space.
+ * - File system syscalls.
+ * - Shared memory syscalls.
  */
 
 #include <skift/logger.h>

@@ -6,6 +6,9 @@
 
 typedef enum
 {
+    CSLC_DEFAULT_FORGROUND,
+    CSLC_DEFAULT_BACKGROUND,
+    
     CSLC_BLACK,
     CSLC_RED,
     CSLC_GREEN,
@@ -24,8 +27,6 @@ typedef enum
     CSLC_LIGHT_CYAN,
     CSLC_WHITE,
 
-    CSLC_DEFAULT_FORGROUND,
-    CSLC_DEFAULT_BACKGROUND,
 } console_color_t;
 
 typedef enum
@@ -55,6 +56,13 @@ typedef struct
 {
     list_t *lines;
     console_line_t *current_line;
+
+    console_state_t state;
+
+    console_color_t fg;
+    console_color_t bg;
+    console_color_t newfg;
+    console_color_t newbg;
 } console_t;
 
 void console_setup();

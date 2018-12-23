@@ -24,7 +24,6 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 #include <skift/__plugs.h>
-#include <skift/drawing.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -52,8 +51,6 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-bitmap_t* bmp;
-
 void main(multiboot_info_t *info, s32 magic)
 {
     __plug_init();
@@ -69,7 +66,9 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
+    {
         PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
+    }
 
     if ((info->mem_lower + info->mem_upper) < 255 * 1024)
     {
@@ -101,12 +100,18 @@ void main(multiboot_info_t *info, s32 magic)
     sk_atomic_enable();
     sti();
 
-    uint width, height = 0;
-    graphic_size(&width, &height);
+    console_print("\033[30mHello\033[0m, \033[30;1mworld!\033[0m\n");
+    console_print("\033[31mHello\033[0m, \033[31;1mworld!\033[0m\n");
+    console_print("\033[32mHello\033[0m, \033[32;1mworld!\033[0m\n");
+    console_print("\033[33mHello\033[0m, \033[33;1mworld!\033[0m\n");
+    console_print("\033[34mHello\033[0m, \033[34;1mworld!\033[0m\n");
+    console_print("\033[35mHello\033[0m, \033[35;1mworld!\033[0m\n");
+    console_print("\033[36mHello\033[0m, \033[36;1mworld!\033[0m\n");
+    console_print("\033[30;47mHello world!\033[0m\n");
+    console_print("Hello world!\n");
+    console_print("Hello world!\n");
 
-    bmp = bitmap(width, height);
-    drawing_clear(bmp, 0xc1c1c1);
-    graphic_blit(bmp->buffer);
+    while(true);
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS session = process_exec("app/maker.hideo.session", NULL);

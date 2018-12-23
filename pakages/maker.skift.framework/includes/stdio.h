@@ -11,10 +11,14 @@
 
 /* --- Files operations ----------------------------------------------------- */
 
-typedef struct 
+typedef struct
 {
     int handle;
 } FILE;
+
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
 
 FILE *fopen(const char *filename, const char *mode);
 int fclose(FILE *stream);
@@ -34,10 +38,9 @@ char *gets(char *str);
 int puts(const char *str);
 
 /* --- Printf --------------------------------------------------------------- */
-
 int printf(const char *fmt, ...);
 int vprintf(const char *fmt, va_list va);
 int sprintf(char *s, const char *fmt, ...);
 int vsprintf(char *s, const char *fmt, va_list va);
 int snprintf(char *s, int n, const char *fmt, ...);
-int vsnprintf(char* s, size_t n, const char * fmt, va_list va);
+int vsnprintf(char *s, size_t n, const char *fmt, va_list va);

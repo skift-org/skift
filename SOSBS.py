@@ -143,15 +143,6 @@ def crosscompiler_check():
     return os.path.exists(GCC) and \
         os.path.exists(LD)
 
-
-def crosscompiler_build():
-    """
-    Build the cross compiler.
-    """
-    if subprocess.call('./toolchain/build-it!.sh', shell=True) != 0:
-        ERROR("Building toolchain failed!")
-        ABORT()
-
 # --- Utils ------------------------------------------------------------------ #
 
 
@@ -336,22 +327,20 @@ class Target(object):
         """
         Compile a source file of the current target.
         """
-        if not is_uptodate(output, source):
-            MKDIR(os.path.dirname(output))
 
-            print("    " + BRIGHT_BLACK + "%s" % source + RESET)
+        MKDIR(os.path.dirname(output))
 
-            if source.endswith(".c"):
-                includes = [("-I" + i) for i in self.get_includes(targets)]
-                command = [GCC] + ["-D__FILENAME__=\"" + source.split("/")[-1] + '"'] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
-                    (CFLAGS_STRICT if self.strict else []) + \
-                    ["-c", "-o", output, source]
-            elif source.endswith(".s"):
-                command = ["nasm", "-f" "elf32", source, "-o", output]
+        print("    " + BRIGHT_BLACK + "%s" % source + RESET)
 
-            return subprocess.call(command) == 0
+        if source.endswith(".c"):
+            includes = [("-I" + i) for i in self.get_includes(targets)]
+            command = [GCC] + ["-D__FILENAME__=\"" + source.split("/")[-1] + '"'] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
+                (CFLAGS_STRICT if self.strict else []) + \
+                ["-c", "-o", output, source]
+        elif source.endswith(".s"):
+            command = ["nasm", "-f" "elf32", source, "-o", output]
 
-        return True
+        return subprocess.call(command) == 0
 
     def link(self, targets):
         """
@@ -413,11 +402,12 @@ class Target(object):
             failed = 0
 
             for src, obj in zip(self.get_sources(), self.get_objects()):
-                if self.compile(src, obj, targets):
-                    succeed += 1
-                else:
-                    failed += 1
-                    ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
+                if not is_uptodate(obj, src):
+                    if self.compile(src, obj, targets):
+                        succeed += 1
+                    else:
+                        failed += 1
+                        ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
 
             print("    %d %s builded, %s%d%s succeed and %s%d%s failed.\n" % (succeed + failed,
                                                                               "files" if succeed + failed > 1 else "file", BRIGHT_GREEN, succeed, RESET, BRIGHT_RED, failed, RESET))
@@ -540,7 +530,7 @@ def distrib(targets):
 
         print(BRIGHT_WHITE + "\nGenerating ramdisk:" + RESET)
 
-        app_dir = MKDIR(join(ramdisk, "app"))
+        app_dir = MKDIR(join(ramdisk, "bin"))
 
         for t in targets:
             target = targets[t]
@@ -748,22 +738,15 @@ def main(argc, argv):
 
 if not crosscompiler_check():
     ERROR("Toolchain not found!")
+    print("Falling back to the system toolchain (WARNING! this is not supported)")
 
-    respond = input(
-        "Would you like to build one (may take 5 to 15 minutes depending of your system)? [yes/no]\n > ")
+    GCC = "gcc"
+    LD = "ld"
+    AR = "ar"
+    OBJDUMP = "objdump"
 
-    if respond in ['y', "yes", 'o', "oui"]:
-        crosscompiler_build()
-    else:
-        print(
-            "Falling back to the system toolchain (WARNING! this is not really supported)")
-
-        GCC = "gcc"
-        LD = "ld"
-        AR = "ar"
-
-        CFLAGS.append("-m32")
-        LDFLAGS += ["-m", "elf_i386"]
+    CFLAGS.append("-m32")
+    LDFLAGS += ["-m", "elf_i386"]
 
 
 # Jump to the entry point.

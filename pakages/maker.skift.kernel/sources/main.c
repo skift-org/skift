@@ -100,21 +100,12 @@ void main(multiboot_info_t *info, s32 magic)
     sk_atomic_enable();
     sti();
 
-    console_print("\033[30mHello\033[0m, \033[30;1mworld!\033[0m\n");
-    console_print("\033[31mHello\033[0m, \033[31;1mworld!\033[0m\n");
-    console_print("\033[32mHello\033[0m, \033[32;1mworld!\033[0m\n");
-    console_print("\033[33mHello\033[0m, \033[33;1mworld!\033[0m\n");
-    console_print("\033[34mHello\033[0m, \033[34;1mworld!\033[0m\n");
-    console_print("\033[35mHello\033[0m, \033[35;1mworld!\033[0m\n");
-    console_print("\033[36mHello\033[0m, \033[36;1mworld!\033[0m\n");
-    console_print("\033[30;47mHello world!\033[0m\n");
-    console_print("Hello world!\n");
-    console_print("Hello world!\n");
-
-    while(true);
+    printf(KERNEL_UNAME);
+    printf("\nCopyright (c) 2018-2019 MAKER.\n");
+    printf("Booting...\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS session = process_exec("app/maker.hideo.session", NULL);
+    PROCESS session = process_exec("bin/exemple", NULL);
 
     if (session)
     {

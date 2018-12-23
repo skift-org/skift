@@ -13,6 +13,7 @@
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/memory.h"
+#include "kernel/console.h"
 
 void __plug_init(void)
 {
@@ -21,6 +22,7 @@ void __plug_init(void)
 
 int __plug_print(const char *buffer)
 {
+    console_print(buffer);
     serial_writeln((char *)buffer);
     return strlen(buffer);
 }

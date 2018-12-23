@@ -238,7 +238,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    sk_log(LOG_INFO, "Timer frequency is %dhz.", hz);
+    sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
 // define in cpu/boot.s
@@ -405,7 +405,7 @@ int thread_cancel(THREAD t)
     {
         thread->state = THREAD_CANCELING;
         thread->exit_value = NULL;
-        sk_log(LOG_INFO, "Thread n°%d got canceled.", t);
+        sk_log(LOG_DEBUG, "Thread n°%d got canceled.", t);
     }
 
     sk_atomic_end();
@@ -420,7 +420,7 @@ void thread_exit(void *retval)
     running->state = THREAD_CANCELING;
     running->exit_value = retval;
 
-    sk_log(LOG_INFO, "Thread n°%d exited with value 0x%x.", running->id, retval);
+    sk_log(LOG_DEBUG, "Thread n°%d exited with value 0x%x.", running->id, retval);
 
     sk_atomic_end();
 
@@ -480,7 +480,7 @@ PROCESS process_create(const char *name, int flags)
 
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
-    sk_log(LOG_INFO, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
+    sk_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
 
     if (dest >= 0x100000)
     {
@@ -555,7 +555,7 @@ void process_cancel(PROCESS p)
         process_t *process = process_get(p);
         process->state = PROCESS_CANCELING;
         process->exit_code = -1;
-        sk_log(LOG_INFO, "Process '%s' ID=%d canceled!", process->name, process->id);
+        sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
 
         cancel_childs(process);
     }
@@ -579,7 +579,7 @@ void process_exit(int code)
     {
         process->state = PROCESS_CANCELING;
         process->exit_code = code;
-        sk_log(LOG_INFO, "Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
+        sk_log(LOG_DEBUG, "Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         cancel_childs(process);
 
@@ -664,7 +664,7 @@ void* shared_memory_create(uint size)
 
     shared_memory_t * shm = shared_memory(size);
 
-    sk_log(LOG_INFO, "Shared memory region created @%x by process '%s'@%d.", shm->memory, running->process->name, running->id);
+    sk_log(LOG_DEBUG, "Shared memory region created @%x by process '%s'@%d.", shm->memory, running->process->name, running->id);
 
     if (shm != NULL)
     {
@@ -684,7 +684,7 @@ void* shared_memory_aquire(void* mem)
 
     if (shm != NULL)
     {
-        sk_log(LOG_INFO, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, running->process->name, running->id);
+        sk_log(LOG_DEBUG, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, running->process->name, running->id);
         list_pushback(running->process->shared, shm);
         shm->refcount++;
 
@@ -709,7 +709,7 @@ void shared_memory_realease(void* mem)
 
     if (shm != NULL && list_containe(running->process->shared, shm))
     {
-        sk_log(LOG_INFO, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, running->process->name, running->id);
+        sk_log(LOG_DEBUG, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, running->process->name, running->id);
         list_remove(running->process->shared, shm);
         shm->refcount--;
 
@@ -747,7 +747,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
         return 0;
     }
 
-    sk_log(LOG_INFO, "Sending message ID=%d from %d to %d.", id, from, to);
+    sk_log(LOG_DEBUG, "Sending message ID=%d from %d to %d.", id, from, to);
 
     process_t *process = process_get(to);
 
@@ -890,7 +890,7 @@ thread_t *get_next_task()
         {
         case THREAD_CANCELING:
         {
-            sk_log(LOG_INFO, "Thread %d canceled!", thread->id);
+            sk_log(LOG_DEBUG, "Thread %d canceled!", thread->id);
             thread->state = THREAD_CANCELED;
             // TODO: cleanup the thread.
             // TODO: cleanup the process if no thread is still running.
@@ -905,7 +905,7 @@ thread_t *get_next_task()
             if (thread->sleepinfo.wakeuptick >= ticks)
             {
                 thread->state = THREAD_RUNNING;
-                sk_log(LOG_INFO, "Thread %d wake up!", thread->id);
+                sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
             }
             break;
         }
@@ -917,7 +917,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = wproc->exit_code;
-                sk_log(LOG_INFO, "Thread %d finish waiting process %d.", thread->id, wproc->id);
+                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
             }
 
             break;
@@ -930,7 +930,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = (uint)wthread->exit_value;
-                sk_log(LOG_INFO, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
+                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
             }
 
             break;
@@ -949,7 +949,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                sk_log(LOG_INFO, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

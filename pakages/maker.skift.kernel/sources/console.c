@@ -6,6 +6,7 @@
 
 #include <skift/logger.h>
 #include <skift/drawing.h>
+#include <skift/atomic.h>
 
 #include "kernel/graphic.h"
 #include "kernel/console.h"
@@ -70,7 +71,7 @@ console_cell_t* cell(char c, console_color_t fg, console_color_t bg)
     return cell;
 }
 
-console_t* cons;
+console_t* cons = NULL;
 bitmap_t* console_framebuffer;
 
 void console_setup()
@@ -95,7 +96,7 @@ void console_draw()
         {
             console_cell_t* cell = (console_cell_t*)c->value;
 
-            drawing_fillrect(console_framebuffer,x * 8, y * 16,8, 16, colors[cell->bg]);
+            drawing_fillrect(console_framebuffer,x * 8, y * 16, 8, 16, colors[cell->bg]);
             drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
             x++;
         }
@@ -243,10 +244,17 @@ void console_process(char c)
 
 void console_print(const char *s)
 {   
-    for(uint i = 0; s[i]; i++)
+    sk_atomic_begin();
+
+    if (cons != NULL)
     {
-        console_process(s[i]);
+        for(uint i = 0; s[i]; i++)
+        {
+            console_process(s[i]);
+        }
+        
+        console_draw();
     }
-    
-    console_draw();
+
+    sk_atomic_end();
 }

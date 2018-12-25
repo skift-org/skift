@@ -5,6 +5,7 @@
  */
 
 #include <math.h>
+#include <string.h>
 
 #include <skift/logger.h>
 #include <skift/drawing.h>
@@ -37,40 +38,59 @@ int colors[] =
         [CSLC_WHITE] = 0xC5C8C6,
 };
 
-console_line_t* line();
-
-console_t* console()
+console_t* console(uint w, uint h)
 {
     console_t* c = MALLOC(console_t);
 
+    c->cx = 0;
+    c->cy = 0;
+    c->w = w;
+    c->h = h;
+
+    c->screen = (console_cell_t*)malloc(sizeof(console_cell_t) * w * h);
+
     c->fg = CSLC_DEFAULT_FORGROUND;
     c->bg = CSLC_DEFAULT_BACKGROUND;
-    c->lines = list();
-    c->current_line = line();
-    list_pushback(c->lines, c->current_line);
 
     return c;
 }
 
-console_line_t* line()
+console_cell_t* console_cell(console_t* c, uint x, uint y)
 {
-    console_line_t* line = MALLOC(console_line_t);
+    if (x < c->w && y < c->h)
+    {
+        return &c->screen[x + y * c->w];
+    }
 
-    line->cells = list();
-
-    return line;
+    return NULL;
 }
 
-console_cell_t* cell(char c, console_color_t fg, console_color_t bg)
+void console_scroll(console_t *c)
 {
-    console_cell_t* cell = MALLOC(console_cell_t);
+    memcpy(c->screen, (byte*)c->screen + (sizeof(console_cell_t) * c->w), (c->h - 1) * c->w * sizeof(console_cell_t));
 
-    cell->c = c;
+    
+    for(uint x = 0; x < c->w; x++)
+    {
+        console_cell_t *cell = console_cell(c, x, c->h-1);
+        
+        cell->c = ' ';
+        cell->bg = CSLC_DEFAULT_BACKGROUND;
+        cell->fg = CSLC_DEFAULT_FORGROUND;
+    }
+    
+    c->cy--;
+}
 
-    cell->fg = fg;
-    cell->bg = bg;
+void console_newline(console_t *c)
+{
+    c->cx = 0;
+    c->cy++;
 
-    return cell;
+    if (c->cy >= c->h)
+    {
+        console_scroll(c);
+    }
 }
 
 console_t* cons = NULL;
@@ -78,9 +98,9 @@ bitmap_t* console_framebuffer;
 
 void console_setup()
 {
-    cons = console();
     uint width, height = 0;
     graphic_size(&width, &height);
+    cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);;
 }
 
@@ -89,27 +109,15 @@ void console_draw()
 {
     drawing_clear(console_framebuffer, colors[CSLC_DEFAULT_BACKGROUND]);
 
-    int screen_height = console_framebuffer->height / CONSOLE_CELL_HEIGHT;
-    int screen_width = console_framebuffer->width / CONSOLE_CELL_WIDTH;
-    int screen_origine = min(screen_height, cons->lines->count);
-
-    int y = 0;
-    FOREACHR(l, cons->lines)
+    for(uint y = 0; y < cons->h; y++)
     {
-        console_line_t* line = (console_line_t*)l->value;
-
-        int x = 0;
-        FOREACH(c, line->cells)
+        for(uint x = 0; x < cons->w; x++)
         {
-            console_cell_t* cell = (console_cell_t*)c->value;
+            console_cell_t* cell = console_cell(cons, x, y);
 
-            drawing_fillrect(console_framebuffer,x * 8, (screen_origine - y) * 16, 8, 16, colors[cell->bg]);
-            drawing_char(console_framebuffer, cell->c, x * 8, (screen_origine - y) * 16, colors[cell->fg]);
-            
-            if (x++>screen_width) break;
+            drawing_fillrect(console_framebuffer,x * 8, y * 16, 8, 16, colors[cell->bg]);
+            drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
         }
-
-        if (y++>screen_height) break;
     }
 
     graphic_blit(console_framebuffer->buffer);
@@ -119,12 +127,18 @@ void console_append(char c)
 {
     if (c == '\n')
     {
-        cons->current_line = line();
-        list_pushback(cons->lines, cons->current_line);
+        console_newline(cons);
     }
     else
     {
-        list_pushback(cons->current_line->cells, cell(c, cons->fg, cons->bg));
+        console_cell_t* cell = console_cell(cons, cons->cx, cons->cy);
+        cell->c = c;
+        cell->bg = cons->bg;
+        cell->fg = cons->fg;
+
+        cons->cx++;
+
+        if (cons->cx >= cons->w) console_newline(cons);
     }
 }
 
@@ -184,6 +198,13 @@ void console_process(char c)
              }
  
              cons->state = CSSTATE_ENDVAL;
+         }
+         else if (c== 'H')
+         {
+            cons->cx = 0;
+            cons->cy = 0;
+
+            cons->state = CSSTATE_ESC;
          }
          else
          {
@@ -260,7 +281,7 @@ void console_print(const char *s)
         {
             console_process(s[i]);
         }
-        
+
         console_draw();
     }
 

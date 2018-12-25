@@ -859,7 +859,7 @@ int program() {
 		if (!frames[i]) {
 			i = 0;
 		}
-		printf("\n");//"\033[H");
+		printf("\033[H");
 		//usleep(90000);
 	}
 

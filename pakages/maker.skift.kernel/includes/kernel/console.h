@@ -29,7 +29,6 @@ typedef enum
     CSLC_LIGHT_MAGENTA,
     CSLC_LIGHT_CYAN,
     CSLC_WHITE,
-
 } console_color_t;
 
 typedef enum
@@ -52,13 +51,13 @@ typedef struct
 
 typedef struct
 {
-    list_t *cells;
-} console_line_t;
+    console_cell_t *screen;
+   
 
-typedef struct
-{
-    list_t *lines;
-    console_line_t *current_line;
+    uint cx;
+    uint cy;
+    uint w;
+    uint h;
 
     console_state_t state;
 

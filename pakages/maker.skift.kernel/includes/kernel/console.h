@@ -4,41 +4,40 @@
 #include <skift/list.h>
 #include <skift/lock.h>
 
+#define CONSOLE_MAX_ATTR 8
 #define CONSOLE_CELL_HEIGHT 16
-#define CONSOLE_CELL_WIDTH 8 
+#define CONSOLE_CELL_WIDTH 8
 
 typedef enum
 {
-    CSLC_DEFAULT_FORGROUND,
-    CSLC_DEFAULT_BACKGROUND,
-    
-    CSLC_BLACK,
-    CSLC_RED,
-    CSLC_GREEN,
-    CSLC_YELLOW,
-    CSLC_BLUE,
-    CSLC_MAGENTA,
-    CSLC_CYAN,
-    CSLC_LIGHT_GREY,
+    CCOLOR_DEFAULT_FORGROUND,
+    CCOLOR_DEFAULT_BACKGROUND,
 
-    CSLC_DARK_GREY,
-    CSLC_LIGHT_RED,
-    CSLC_LIGHT_GREEN,
-    CSLC_LIGHT_YELLOW,
-    CSLC_LIGHT_BLUE,
-    CSLC_LIGHT_MAGENTA,
-    CSLC_LIGHT_CYAN,
-    CSLC_WHITE,
+    CCOLOR_BLACK,
+    CCOLOR_RED,
+    CCOLOR_GREEN,
+    CCOLOR_YELLOW,
+    CCOLOR_BLUE,
+    CCOLOR_MAGENTA,
+    CCOLOR_CYAN,
+    CCOLOR_LIGHT_GREY,
+    CCOLOR_DARK_GREY,
+
+    CCOLOR_LIGHT_RED,
+    CCOLOR_LIGHT_GREEN,
+    CCOLOR_LIGHT_YELLOW,
+    CCOLOR_LIGHT_BLUE,
+    CCOLOR_LIGHT_MAGENTA,
+    CCOLOR_LIGHT_CYAN,
+    CCOLOR_WHITE,
 } console_color_t;
 
 typedef enum
 {
-    CSSTATE_ESC,
-    CSSTATE_BRACKET,
-    CSSTATE_PARSE,
-    CSSTATE_BGCOLOR,
-    CSSTATE_FGCOLOR,
-    CSSTATE_ENDVAL,
+    CSTATE_ESC,
+    CSTATE_BRACKET,
+    CSTATE_ATTR,
+    CSTATE_ENDVAL,
 } console_state_t;
 
 typedef struct
@@ -51,8 +50,8 @@ typedef struct
 
 typedef struct
 {
+
     console_cell_t *screen;
-   
 
     uint cx;
     uint cy;
@@ -60,6 +59,9 @@ typedef struct
     uint h;
 
     console_state_t state;
+
+    int attr_stack[CONSOLE_MAX_ATTR];
+    int attr_sel;
 
     console_color_t fg;
     console_color_t bg;

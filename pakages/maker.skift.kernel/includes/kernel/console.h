@@ -10,8 +10,8 @@
 
 typedef enum
 {
-    CCOLOR_DEFAULT_FORGROUND,
     CCOLOR_DEFAULT_BACKGROUND,
+    CCOLOR_DEFAULT_FORGROUND,
 
     CCOLOR_BLACK,
     CCOLOR_RED,
@@ -60,13 +60,11 @@ typedef struct
 
     console_state_t state;
 
-    int attr_stack[CONSOLE_MAX_ATTR];
-    int attr_sel;
+    uint attr_stack[CONSOLE_MAX_ATTR];
+    uint attr_sel;
 
     console_color_t fg;
     console_color_t bg;
-    console_color_t newfg;
-    console_color_t newbg;
 } console_t;
 
 void console_setup();

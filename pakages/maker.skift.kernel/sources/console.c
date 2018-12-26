@@ -20,8 +20,8 @@
 
 int colors[] =
     {
-        [CCOLOR_DEFAULT_FORGROUND] = 0xC5C8C6,
         [CCOLOR_DEFAULT_BACKGROUND] = 0x1D1F21,
+        [CCOLOR_DEFAULT_FORGROUND] = 0xC5C8C6,
 
         [CCOLOR_BLACK] = 0x1D1F21,      // 0
         [CCOLOR_RED] = 0xA54242,        // 1
@@ -55,6 +55,7 @@ console_t *console(uint w, uint h)
 
     c->fg = CCOLOR_DEFAULT_FORGROUND;
     c->bg = CCOLOR_DEFAULT_BACKGROUND;
+    c->state = CSTATE_ESC;
 
     c->attr_sel = 0;
 
@@ -107,25 +108,22 @@ void console_setup()
     graphic_size(&width, &height);
     cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);
-    ;
 }
 
 void console_draw()
 {
-    drawing_clear(console_framebuffer, colors[CCOLOR_DEFAULT_BACKGROUND]);
+    //for (uint y = 0; y < cons->h; y++)
+    //{
+    //    for (uint x = 0; x < cons->w; x++)
+    //    {
+    //        console_cell_t *cell = console_cell(cons, x, y);
+//
+    //        drawing_fillrect(console_framebuffer, x * 8, y * 16, 8, 16, colors[cell->bg]);
+    //        drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
+    //    }
+    //}
 
-    for (uint y = 0; y < cons->h; y++)
-    {
-        for (uint x = 0; x < cons->w; x++)
-        {
-            console_cell_t *cell = console_cell(cons, x, y);
-
-            drawing_fillrect(console_framebuffer, x * 8, y * 16, 8, 16, colors[cell->bg]);
-            drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
-        }
-    }
-
-    graphic_blit(console_framebuffer->buffer);
+    //graphic_blit(console_framebuffer->buffer);
 }
 
 void console_append(char c)
@@ -141,6 +139,11 @@ void console_append(char c)
         cell->bg = cons->bg;
         cell->fg = cons->fg;
 
+        // blit the char to the screen
+        drawing_fillrect(console_framebuffer, cons->cx * 8, cons->cy * 16, 8, 16, colors[cell->bg]);
+        drawing_char(console_framebuffer, cell->c, cons->cx * 8, cons->cy * 16, colors[cell->fg]);
+        graphic_blit_region(console_framebuffer->buffer, cons->cx * 8, cons->cy * 16, 8, 16);
+
         cons->cx++;
 
         if (cons->cx >= cons->w)
@@ -155,8 +158,6 @@ void console_process(char c)
     case CSTATE_ESC:
         if (c == '\033')
         {
-            cons->newfg = cons->fg;
-            cons->newbg = cons->bg;
             cons->state = CSTATE_BRACKET;
 
             cons->attr_sel = 0;
@@ -184,11 +185,16 @@ void console_process(char c)
         if (isdigit(c))
         {
             cons->attr_stack[cons->attr_sel] *= 10;
-            cons->attr_stack[cons->attr_sel] += c - '0';
+            cons->attr_stack[cons->attr_sel] += (c - '0');
         }
         else
         {
-            cons->attr_sel++;
+            if ((cons->attr_sel) < CONSOLE_MAX_ATTR + 1)
+            {
+                cons->attr_sel++;   
+            }
+
+            cons->attr_stack[cons->attr_sel] = 0;
             cons->state = CSTATE_ENDVAL;
         }
         break;
@@ -202,26 +208,62 @@ void console_process(char c)
         {
             cons->state = CSTATE_ATTR;
         }
-        else if (c== 'm')
-        { 
-            for(uint i = 0; i < cons->attr_sel; i++)
-            {
-                /* code */
-            }   
-        }
-        else if (c == 'H')
-        {
-            for(uint i = 0; i < cons->attr_sel; i++)
-            {
-                /* code */
-            }  
-        }
-        else if (c == 'J')
-        {
-
-        }
         else
         {
+            if (c == 'm')
+            { 
+                for(uint i = 0; i < cons->attr_sel; i++)
+                {
+                    uint attr = cons->attr_stack[i];
+
+                    if (attr >= 30 && attr <= 37)
+                    {
+                        // Set the forground color
+                        if (cons->fg >= CCOLOR_DARK_GREY)
+                        {
+                            cons->fg = attr - 30 + CCOLOR_BLACK + 8;
+                        }
+                        else
+                        {
+                            cons->fg = attr - 30 + CCOLOR_BLACK;
+                        }
+                    }
+                    else if (attr >= 40 && attr <= 47)
+                    {
+                        // Set the background color
+                        cons->bg = attr - 40 + CCOLOR_BLACK;
+                    }
+                    else if (attr == 1)
+                    {
+                        // Make the color bright
+                        if (cons->fg < CCOLOR_DARK_GREY)
+                            cons->fg += 8;
+                    }
+                    else if (attr == 0)
+                    {
+                        // reset all display attributes
+                        cons->bg = CCOLOR_DEFAULT_BACKGROUND;
+                        cons->fg = CCOLOR_DEFAULT_FORGROUND;
+                    }
+                }   
+            }
+            else if (c == 'H')
+            {
+                if (cons->attr_sel - 1 == 0)
+                {
+                    cons->cx = 0;
+                    cons->cy = 0;
+                }
+
+                for(uint i = 0; i < cons->attr_sel; i++)
+                {
+                    /* code */
+                }
+            }
+            else if (c == 'J')
+            {
+            }
+
             cons->state = CSTATE_ESC;
         }
     }

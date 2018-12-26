@@ -13,6 +13,9 @@
  * - Move the sheduler in his own file.
  * - Allow to pass parameters to thread and then return values
  * - Add priority to the round robine sheduler
+ * 
+ * BUG:
+ * - Deadlock wen using thread_sleep() and a single thread is running.
  */
 
 #include <math.h>
@@ -902,7 +905,7 @@ thread_t *get_next_task()
         case THREAD_SLEEP:
         {
             // Wakeup the thread
-            if (thread->sleepinfo.wakeuptick >= ticks)
+            if (thread->sleepinfo.wakeuptick <= ticks)
             {
                 thread->state = THREAD_RUNNING;
                 sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);

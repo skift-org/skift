@@ -23,7 +23,7 @@ void __plug_init(void)
 int __plug_print(const char *buffer)
 {
     console_print(buffer);
-    serial_writeln((char *)buffer);
+    //serial_writeln((char *)buffer);
     return strlen(buffer);
 }
 

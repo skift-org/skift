@@ -1,7 +1,5 @@
 <img src="doc/brand/LOGO_skift_dark.png" align="center" height=128 />
 
-# skiftOS
-
 > Build infrastructure, kernel, and core pakages of the skift Operating System
 
 **skiftOS** is a simple, handmade, build from scratch, 32bit operating system for intel x86 CPU.

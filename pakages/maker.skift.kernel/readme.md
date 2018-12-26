@@ -1,6 +1,6 @@
 <img src="doc/logo/logo128.png" align="right" />
 
-# The **HJERTE** kernel (maker.skift.kernel)
+# The **HJERT** kernel (maker.skift.kernel)
 > The skiftOS kernel
 
 ## TODO

@@ -22,4 +22,4 @@
 
 - Build system: `SOSBS.py`
 - Desktop environement: `hideo`
-- Kernel: `hjerte`
+- Kernel: `hjert`

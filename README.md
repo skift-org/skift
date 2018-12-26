@@ -1,27 +1,17 @@
+<p align="center">
+<img src="doc/brand/FLAG_skift.png" align="center" height=64 />
+<img src="doc/brand/FLAG_hjert.png" align="center" height=64 />
+<img src="doc/brand/FLAG_core.png" align="center" height=64 />
+</p>
+
 <img src="doc/brand/LOGO_skift_dark.png" align="center" height=128 />
 
-> Build infrastructure, kernel, and core pakages of the skift Operating System
+## A simple, handmade, operating system for x86.
+ 
+<img src="doc/brand/LOGO_hjert_dark.png" align="center" height=128 />
 
-**skiftOS** is a simple, handmade, build from scratch, 32bit operating system for intel x86 CPU.
+## A minimal kernel supporting multiprocessing and inter-process communication.
 
-**skiftOS** feature the *hjerte* microkernel.
+<img src="doc/brand/LOGO_core_dark.png" align="center" height=128 />
 
-**skiftOS** support virtual memory, multi processing with threads, and filesystem.
-
-**skiftOS** provide a rich syscall interface for user application.
-
-**skiftOS** is **NOT** a POSIX system.
-
-# What **skiftOS** look like
-
-<img src="doc/screenshots/Capture d’écran_2018-10-20_16-37-52.png" align="center" />
-
-# Build-it
-
-```sh
-# Build the operating system
-./SOSBS.py build-all
-
-# Run it in qemu
-./SOSBS.py run
-```
+## A minimal colection of application.

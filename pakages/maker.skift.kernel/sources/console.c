@@ -18,6 +18,9 @@
 #include "kernel/graphic.h"
 #include "kernel/console.h"
 
+console_t *cons = NULL;
+bitmap_t *console_framebuffer;
+
 int colors[] =
     {
         [CCOLOR_DEFAULT_BACKGROUND] = 0x1D1F21,
@@ -72,6 +75,30 @@ console_cell_t *console_cell(console_t *c, uint x, uint y)
     return NULL;
 }
 
+void console_draw_cell(console_t *c, uint x, uint y)
+{
+    console_cell_t *cell = console_cell(c, x, y);
+
+    if (cell != NULL)
+    {
+        // blit the char to the screen
+        drawing_fillrect(console_framebuffer, x * 8, y * 16, 8, 16, colors[cell->bg]);
+        if (cell->c != ' ') drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
+        graphic_blit_region(console_framebuffer->buffer, x * 8, y * 16, 8, 16);
+    }
+}
+
+void console_draw(console_t *c)
+{
+    for(uint y = 0; y < c->h; y++)
+    {
+        for(uint x = 0; x < c->w; x++)
+        {
+            console_draw_cell(c, x, y);
+        }   
+    }
+}
+
 void console_scroll(console_t *c)
 {
     memcpy(c->screen, (byte *)c->screen + (sizeof(console_cell_t) * c->w), (c->h - 1) * c->w * sizeof(console_cell_t));
@@ -86,6 +113,8 @@ void console_scroll(console_t *c)
     }
 
     c->cy--;
+
+    console_draw(c);
 }
 
 void console_newline(console_t *c)
@@ -99,8 +128,21 @@ void console_newline(console_t *c)
     }
 }
 
-console_t *cons = NULL;
-bitmap_t *console_framebuffer;
+void console_clear(console_t *c)
+{
+    for (uint y = 0; y < c->h; y++)
+    {
+        for (uint x = 0; x < c->w; x++)
+        {
+            console_cell_t *cell = console_cell(c, x, y);
+            cell->bg = CCOLOR_DEFAULT_BACKGROUND;
+            cell->fg = CCOLOR_DEFAULT_FORGROUND;
+            cell->c = ' ';
+
+            console_draw_cell(cons, x, y);
+        }
+    }
+}
 
 void console_setup()
 {
@@ -108,22 +150,7 @@ void console_setup()
     graphic_size(&width, &height);
     cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);
-}
-
-void console_draw()
-{
-    //for (uint y = 0; y < cons->h; y++)
-    //{
-    //    for (uint x = 0; x < cons->w; x++)
-    //    {
-    //        console_cell_t *cell = console_cell(cons, x, y);
-//
-    //        drawing_fillrect(console_framebuffer, x * 8, y * 16, 8, 16, colors[cell->bg]);
-    //        drawing_char(console_framebuffer, cell->c, x * 8, y * 16, colors[cell->fg]);
-    //    }
-    //}
-
-    //graphic_blit(console_framebuffer->buffer);
+    console_clear(cons);
 }
 
 void console_append(char c)
@@ -139,10 +166,7 @@ void console_append(char c)
         cell->bg = cons->bg;
         cell->fg = cons->fg;
 
-        // blit the char to the screen
-        drawing_fillrect(console_framebuffer, cons->cx * 8, cons->cy * 16, 8, 16, colors[cell->bg]);
-        drawing_char(console_framebuffer, cell->c, cons->cx * 8, cons->cy * 16, colors[cell->fg]);
-        graphic_blit_region(console_framebuffer->buffer, cons->cx * 8, cons->cy * 16, 8, 16);
+        console_draw_cell(cons, cons->cx, cons->cy);
 
         cons->cx++;
 
@@ -191,7 +215,7 @@ void console_process(char c)
         {
             if ((cons->attr_sel) < CONSOLE_MAX_ATTR + 1)
             {
-                cons->attr_sel++;   
+                cons->attr_sel++;
             }
 
             cons->attr_stack[cons->attr_sel] = 0;
@@ -211,8 +235,8 @@ void console_process(char c)
         else
         {
             if (c == 'm')
-            { 
-                for(uint i = 0; i < cons->attr_sel; i++)
+            {
+                for (uint i = 0; i < cons->attr_sel; i++)
                 {
                     uint attr = cons->attr_stack[i];
 
@@ -245,7 +269,7 @@ void console_process(char c)
                         cons->bg = CCOLOR_DEFAULT_BACKGROUND;
                         cons->fg = CCOLOR_DEFAULT_FORGROUND;
                     }
-                }   
+                }
             }
             else if (c == 'H')
             {
@@ -255,13 +279,14 @@ void console_process(char c)
                     cons->cy = 0;
                 }
 
-                for(uint i = 0; i < cons->attr_sel; i++)
+                for (uint i = 0; i < cons->attr_sel; i++)
                 {
                     /* code */
                 }
             }
             else if (c == 'J')
             {
+                console_clear(cons);
             }
 
             cons->state = CSTATE_ESC;
@@ -279,8 +304,6 @@ void console_print(const char *s)
         {
             console_process(s[i]);
         }
-
-        console_draw();
     }
 
     sk_atomic_end();
@@ -293,7 +316,6 @@ void console_putchar(char c)
     if (cons != NULL)
     {
         console_process(c);
-        console_draw();
     }
 
     sk_atomic_end();

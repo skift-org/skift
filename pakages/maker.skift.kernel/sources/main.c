@@ -62,7 +62,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-    graphic_early_setup(800, 600);
+    graphic_early_setup(1280, 720);
 
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
@@ -105,7 +105,7 @@ void main(multiboot_info_t *info, s32 magic)
     printf("Booting...\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS session = process_exec("bin/klange.toaru.nyancat", NULL);
+    PROCESS session = process_exec("bin/klange.nyancat", NULL);
 
     if (session)
     {

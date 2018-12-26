@@ -1,4 +1,4 @@
-<img src="doc/logo/logo128.png" align="right" />
+<img src="doc/brand/LOGO_skift_dark.png" align="center" height=128 />
 
 # skiftOS
 

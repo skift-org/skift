@@ -247,6 +247,14 @@ void timer_set_frequency(int hz)
 // define in cpu/boot.s
 extern u32 __stack_bottom;
 
+void idle()
+{
+    while (1)
+    {
+        hlt();
+    }
+}
+
 void tasking_setup()
 {
     running = NULL;
@@ -259,6 +267,7 @@ void tasking_setup()
 
     kernel_process = process_create("maker.skift.kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
+    thread_create(kernel_process, idle, NULL, 0);
 
     // Set the correct stack for the kernel main stack
     thread_t *kthread = thread_get(kernel_thread);
@@ -908,7 +917,7 @@ thread_t *get_next_task()
             if (thread->sleepinfo.wakeuptick <= ticks)
             {
                 thread->state = THREAD_RUNNING;
-                sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
+                // sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
             }
             break;
         }
@@ -920,7 +929,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = wproc->exit_code;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
+                // sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
             }
 
             break;
@@ -933,7 +942,7 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = (uint)wthread->exit_value;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
+                // sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
             }
 
             break;
@@ -952,7 +961,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                // sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

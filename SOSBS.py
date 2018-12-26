@@ -407,7 +407,8 @@ class Target(object):
                         succeed += 1
                     else:
                         failed += 1
-                        ERROR("Failed to build " + BRIGHT_WHITE + "'%s'" % (src))
+                        ERROR("Failed to build " +
+                              BRIGHT_WHITE + "'%s'" % (src))
 
             print("    %d %s builded, %s%d%s succeed and %s%d%s failed.\n" % (succeed + failed,
                                                                               "files" if succeed + failed > 1 else "file", BRIGHT_GREEN, succeed, RESET, BRIGHT_RED, failed, RESET))
@@ -705,7 +706,11 @@ def main(argc, argv):
     """
     Entry point of the SOSBS toolset.
     """
-    targets = list_targets("pakages")
+    targets = {**list_targets("pakages"),
+               **list_targets("system"),
+               **list_targets("coreutils"),
+               **list_targets("desktop"), 
+               **list_targets("ports")}
 
     # Command parsing
     if argc < 2:

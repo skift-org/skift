@@ -5,9 +5,12 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/generic.h>
+#include "kernel/shared/keyboard.h"
 
-#include "kernel/shared_keyboard.h"
+typedef struct
+{
+    char c;
+    keyboard_key_t key;
+} keyboard_event_t;
 
 void keyboard_setup();
-
-void keyborad_get_state(keyboard_state_t * state);

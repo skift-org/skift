@@ -7,7 +7,6 @@
 /*
  * TODO:
  * - The name of somme function need refactor.
- * - Get ride of unique process/thread/messages id, just use thei adresses
  * - Isolate user space process in ring 3
  * - Add a process/thread garbage colector
  * - Move the sheduler in his own file.
@@ -15,7 +14,8 @@
  * - Add priority to the round robine sheduler
  * 
  * BUG:
- * - Deadlock wen using thread_sleep() and a single thread is running.
+ * - Deadlock when using thread_sleep() and a single thread is running. 
+ *   (kinda fixed by adding a dummy hidle thread)
  */
 
 #include <math.h>
@@ -827,7 +827,7 @@ int messaging_receive(message_t *msg)
         running->state = THREAD_WAIT_MESSAGE;
     });
 
-    thread_hold();
+    thread_hold(); // Wait for the sheduler to give us a message.
 
     message_t *incoming = running->messageinfo.message;
 
@@ -960,7 +960,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                sk_log(LOG_DEBUG, "Thread %d received message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }
@@ -995,7 +995,7 @@ esp_t shedule(esp_t esp, context_t *context)
     // Load the new context
     running = get_next_task();
 
-    set_kernel_stack((uint)running->stack + STACK_SIZE);
+    // TODO: set_kernel_stack(...);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
 

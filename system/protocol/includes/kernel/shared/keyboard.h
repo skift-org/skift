@@ -60,7 +60,7 @@ typedef enum
     KPMULTI,
     LALT,
     SPACE,
-    CAPSL,
+    CAPS_LOCK,
     F1,
     F2,
     F3,
@@ -71,8 +71,8 @@ typedef enum
     F8,
     F9,
     F10,
-    NLOCK,
-    SLOCK,
+    NUM_LOCK,
+    SCROLL_LOCK,
     KP7,
     KP8,
     KP9,
@@ -87,10 +87,18 @@ typedef enum
     KP0,
     KPPOINT,
     F11,
-    F12
+    F12,
+    ANGLE_BRACKET,
+
+    // SPECIAL KEYS
+    UP = 128,
+    DOWN,
+    LEFT,
+    RIGHT,
+
+    KPENTER,
+    RCONTROL,
+    RALT,
+
+    KEYBOAD_KEY_END
 } keyboard_key_t;
-
-typedef struct
-{
-
-} keyboard_state_t;

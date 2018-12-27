@@ -1,7 +1,7 @@
 #pragma once
 
 #include <skift/syscall.h>
-#include "kernel/shared_protocole.h"
+#include "kernel/protocol.h"
 
 DECL_SYSCALL5(sk_messaging_send, int to, const char * name, void * payload, unsigned int size, unsigned int flags);
 DECL_SYSCALL5(sk_messaging_broadcast, const char * channel, const char * name, void * payload, unsigned int size, unsigned int flags);

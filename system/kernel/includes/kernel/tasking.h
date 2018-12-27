@@ -8,7 +8,7 @@
 #include <skift/list.h>
 
 #include "kernel/paging.h"
-#include "kernel/shared_protocole.h"
+#include "kernel/protocol.h"
 
 #define CHANNAME_SIZE 128
 #define PROCNAME_SIZE 128

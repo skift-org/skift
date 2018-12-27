@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/shared_syscalls.h"
+#include "kernel/shared/syscalls.h"
 
 #define DECL_SYSCALL0(fn) int fn()
 #define DECL_SYSCALL1(fn, p1) int fn(p1)

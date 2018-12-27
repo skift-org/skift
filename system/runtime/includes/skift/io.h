@@ -3,7 +3,7 @@
 #include <skift/types.h>
 #include <skift/utils.h>
 #include <skift/syscall.h>
-#include "kernel/shared_mouse.h"
+#include "kernel/protocol.h"
 
 DECL_SYSCALL1(sk_io_print, const char * msg);
 DECL_SYSCALL2(sk_io_read, char * buffer, int size);

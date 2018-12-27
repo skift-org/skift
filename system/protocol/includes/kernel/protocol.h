@@ -47,6 +47,18 @@ typedef struct
 #define MOUSE_UP      "dev:mouse.up"
 #define MOUSE_CLICK   "dev:mouse.click"
 
+//XXX: stop using mouse_syscalls
+typedef PACKED(struct) 
+{
+    int x;
+    int y;
+    int scroll;
+
+    bool left;
+    bool right;
+    bool middle;
+} mouse_state_t;
+
 typedef enum
 {
     MOUSE_BUTTON_LEFT,

@@ -45,6 +45,7 @@ typedef enum SYSCALL_CODE
     SYS_IO_PRINT,
     SYS_IO_READ,
 
+    //XXX: stop using mouse_syscalls
     SYS_IO_MOUSE_GET_STATE,
     SYS_IO_MOUSE_SET_STATE,
 

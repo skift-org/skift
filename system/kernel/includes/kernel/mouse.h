@@ -5,8 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/generic.h>
-
-#include "kernel/shared_mouse.h"
+#include "kernel/protocol.h"
 
 void mouse_setup();
 

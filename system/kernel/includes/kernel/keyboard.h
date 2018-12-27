@@ -7,10 +7,4 @@
 #include <skift/generic.h>
 #include "kernel/shared/keyboard.h"
 
-typedef struct
-{
-    char c;
-    keyboard_key_t key;
-} keyboard_event_t;
-
 void keyboard_setup();

@@ -14,11 +14,11 @@
 #include <skift/logger.h>
 
 #include "kernel/tasking.h"
-#include "kernel/shared_syscalls.h"
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
 #include "kernel/mouse.h"
 
+#include "kernel/shared/syscalls.h"
 #include "kernel/syscalls.h"
 
 typedef int (*syscall_t)(int, int, int, int, int);

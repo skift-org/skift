@@ -13,8 +13,21 @@ reg32_t keyboard_irq(reg32_t esp, context_t *context)
 {
     UNUSED(context);
 
-    uchar scan_code = inb(0x60);
-    sk_log(LOG_DEBUG, "Scancode: 0x%x.", scan_code);
+    uchar scancode = inb(0x60);
+
+    if (scancode < 128)
+    {
+        sk_log(LOG_DEBUG, "down: %d.", scancode);
+    }
+    else if (scancode == 224)
+    {
+        sk_log(LOG_DEBUG, "Meta");
+    }
+    else
+    {
+        sk_log(LOG_DEBUG, "up: %d.", scancode);
+        printf("\n");
+    }
 
     return esp;
 }

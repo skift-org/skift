@@ -291,8 +291,6 @@ void thread_yield()
 
 void thread_hold()
 {
-    thread_yield(); // Let's try to save some clock cicle
-
     while (running->state != THREAD_RUNNING)
     {
         hlt();
@@ -391,6 +389,8 @@ int thread_waitproc(PROCESS p)
     sk_atomic_begin();
 
     process_t *process = process_get(p);
+
+    sk_log(LOG_DEBUG, "Thread %d wait process %d'%s'", running->id, process->id, process->name);
 
     running->waitinfo.outcode = 0;
 
@@ -781,7 +781,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     list_pushback(process->inbox, (void *)message);
 
-    sk_log(LOG_FINE, "Message ID=%d from %d to %d sended!", id, from, to);
+    sk_log(LOG_DEBUG, "Message ID=%d from %d to %d sended!", id, from, to);
 
     return id;
 }
@@ -917,7 +917,7 @@ thread_t *get_next_task()
             if (thread->sleepinfo.wakeuptick <= ticks)
             {
                 thread->state = THREAD_RUNNING;
-                // sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
+                sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
             }
             break;
         }
@@ -929,9 +929,8 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = wproc->exit_code;
-                // sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
+                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
             }
-
             break;
         }
         case THREAD_WAIT_THREAD:
@@ -942,9 +941,9 @@ thread_t *get_next_task()
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = (uint)wthread->exit_value;
-                // sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
+                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", thread->id, wthread->id);
             }
-
+            
             break;
         }
         case THREAD_WAIT_MESSAGE:
@@ -961,7 +960,7 @@ thread_t *get_next_task()
                 message_t *message;
                 list_pop(thread->process->inbox, (void **)&message);
                 thread->messageinfo.message = message;
-                // sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
+                sk_log(LOG_DEBUG, "Thread %d recivied message ID=%d from %d to %d.", thread->id, message->id, message->from, message->to);
             }
             break;
         }

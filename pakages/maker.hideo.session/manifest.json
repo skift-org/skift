@@ -1,9 +1,0 @@
-{
-    "name": "Hideo Session Manager",
-
-    "id": "maker.hideo.session",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

@@ -1,0 +1,9 @@
+{
+    "name": "Echo",
+    
+    "id": "echo",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

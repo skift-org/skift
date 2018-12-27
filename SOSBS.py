@@ -433,14 +433,15 @@ def list_targets(location):
 
     targets = {}
 
-    for i in os.listdir(location):
-        target_location = join(location, i)
+    if os.path.isdir(location):
+        for i in os.listdir(location):
+            target_location = join(location, i)
 
-        json_file = join(target_location, "manifest.json")
+            json_file = join(target_location, "manifest.json")
 
-        if (os.path.exists(json_file)):
-            data = json.loads(open(json_file).read())
-            targets[data["id"]] = Target(target_location, data)
+            if (os.path.exists(json_file)):
+                data = json.loads(open(json_file).read())
+                targets[data["id"]] = Target(target_location, data)
 
     return targets
 

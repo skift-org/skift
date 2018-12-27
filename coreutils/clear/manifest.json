@@ -1,0 +1,9 @@
+{
+    "name": "Clear",
+    
+    "id": "clear",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

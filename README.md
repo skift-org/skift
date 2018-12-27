@@ -4,14 +4,18 @@
 <img src="doc/brand/FLAG_core.png"  align="center" height=64 />
 </p>
 
-<img src="doc/brand/LOGO_skift_dark.png" align="center" height=128 />
+<p align="center">
+<img src="doc/screenshots/capture.png" height=400 />
+</p>
+
+<img src="doc/brand/LOGO_skift_dark.png" height=128 />
 
 ## A simple, handmade, operating system for x86.
  
-<img src="doc/brand/LOGO_hjert_dark.png" align="center" height=128 />
+<img src="doc/brand/LOGO_hjert_dark.png" height=128 />
 
 ## A minimal kernel supporting multiprocessing and inter-process communication.
 
-<img src="doc/brand/LOGO_core_dark.png" align="center" height=128 />
+<img src="doc/brand/LOGO_core_dark.png" height=128 />
 
 ## A minimal colection of application.

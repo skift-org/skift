@@ -25,9 +25,8 @@ int main(int argc, char **argv)
     (void)argc; (void)argv;
     printf("\033[0;36mWelcome to skiftOS\033[0m\n");
 
-    int nyancat = init_exec("/bin/klange.nyancat");
+    int nyancat = init_exec("/bin/maker.hideo.compositor");
     sk_thread_wait(nyancat);
-
 
     return 0;
 }

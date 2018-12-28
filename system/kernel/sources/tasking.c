@@ -14,7 +14,7 @@
  * - Add priority to the round robine sheduler
  * 
  * BUG:
- * - Deadlock when using thread_sleep() and a single thread is running. 
+ * - Deadlock when using thread_sleep() when a single thread is running. 
  *   (kinda fixed by adding a dummy hidle thread)
  */
 

@@ -310,6 +310,26 @@ void strapd(char * str, char c)
     str[len + 1] = '\0';
 }
 
+void strbs(char *str)
+{
+    unsigned int len = strlen(str);
+    str[len - 1] = '\0';
+}
+
+void strnapd(char * str, char c, size_t n)
+{
+    if (n > 1)
+    {
+        unsigned int len = strlen(str);
+
+        if (len <= n - 2)
+        {
+            str[len] = c;
+            str[len + 1] = '\0';
+        }
+    }
+}
+
 void strrvs(char * str)
 {
     int c, i, j;

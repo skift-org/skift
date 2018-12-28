@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include "kernel/processor.h"
 
+/* --- Public functions ----------------------------------------------------- */
+
+void processor_setup()
+{
+
+}
+
 void processor_dump_context(processor_context_t *context)
 {
     printf("\t CS=%08x  DS=%08x  ES=%08x  FS=%08x  GS=%08x\n", context->cs,  context->ds,  context->es,  context->fs, context->gs);

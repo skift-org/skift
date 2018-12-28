@@ -77,26 +77,3 @@ void gdt_tss_entry(int index, u16 ss0, u32 esp0)
 	tss->fs = 0x13;
 	tss->gs = 0x13;
 }
-
-/* --- debug ---------------------------------------------------------------- */
-
-void gdt_dump()
-{
-    puts("\nGlobal descriptor table dump:\n");
-    for(u32 i = 0; i < GDT_ENTRY_COUNT; i++)
-    {
-        puts("\t");
-        gdt_entry_dump(i);
-    }    
-    puts("\n");
-}
-
-void gdt_entry_dump(int index)
-{
-    gdt_entry_t * entry = &gdt.entries[index];
-    printf("%d: base=%x limite=%x access=%x flags=%x\n", 
-        index,
-        entry->base0_15 | entry->base16_23 << 16 | entry->base24_31 << 24,
-        entry->limit0_15 | entry->limit16_19 << 16,
-        entry->acces, entry->flags);
-}

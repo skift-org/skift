@@ -76,6 +76,4 @@ void gdt_setup();
 void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint);
 void gdt_tss_entry(int index, u16 ss0, u32 esp0);
 
-void gdt_dump();
-void gdt_entry_dump(int index);
 void set_kernel_stack(u32 stack);

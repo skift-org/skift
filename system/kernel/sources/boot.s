@@ -2,7 +2,10 @@
 ;; This code is licensed under the MIT License.                               ;;
 ;; See: LICENSE.md                                                            ;;
 
-; Declare constants for the multiboot header.
+;; boots.s: the HJERT kernel entry point from the bootloader.                 ;;
+
+;; --- multiboot header. ---------------------------------------------------- ;;
+
 MBALIGN  equ  1 << 0            ; align loaded modules on page boundaries
 MEMINFO  equ  1 << 1            ; provide memory map
 FLAGS    equ  MBALIGN | MEMINFO ; this is the Multiboot 'flag' field
@@ -16,7 +19,8 @@ align 4
 	dd FLAGS
 	dd CHECKSUM
  
-; The multiboot header
+;; --- kernel stack --------------------------------------------------------- ;;
+
 section .bss
 align 16
 
@@ -25,6 +29,8 @@ global __stack_top
 __stack_bottom:
 resb 16384 ; 16 KiB
 __stack_top:
+
+;; --- kernel entry point --------------------------------------------------- ;;
 
 section .text
 global _start:function (_start.end - _start)

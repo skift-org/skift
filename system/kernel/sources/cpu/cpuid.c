@@ -14,13 +14,6 @@ static inline int cpuid_string(int code, int where[4])
     return (int)where[0];
 }
  
-string cpuid_get_vendorid() 
-{
-    static char s[16] = "BogusProces!";
-    cpuid_string(0, (int*)(s));
-    return s;
-}
-
 cpuid_t cpuid()
 {
     cpuid_t cid;

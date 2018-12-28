@@ -3,6 +3,7 @@
 #include "defs/NULL.h"
 
 // NOT STANDART
+void strnapd(char * str, char c, size_t n);
 void strapd(char *str, char c);
 void strbs(char *str);
 void strrvs(char *str);

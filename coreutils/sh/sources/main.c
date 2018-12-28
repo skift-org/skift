@@ -8,11 +8,10 @@
 #include "kernel/protocol.h"
 
 bool exited = false;
-
 void readline(char* buffer, uint size)
 {
-    (void)size;
-    buffer[0] = '\0';
+    int i = 0;    
+    buffer[i] = '\0';
 
     while(true)
     {
@@ -29,10 +28,21 @@ void readline(char* buffer, uint size)
                 printf("\n");
                 return;
             }
-            else if (!(event.c == '\0' || event.c == '\t' || event.c == '\b'))
+            else if (event.c == '\b')
             {
-                strapd(buffer, event.c);
-                printf("%c", event.c);
+                if (strlen(buffer) > 0)
+                {
+                    strbs(buffer);
+                    printf("\b");
+                }
+            }
+            else if (!(event.c == '\0' || event.c == '\t'))
+            {
+                if (strlen(buffer) < size - 1)
+                {
+                    strnapd(buffer, event.c, size);
+                    printf("%c", event.c);
+                }
             }
         }
     }

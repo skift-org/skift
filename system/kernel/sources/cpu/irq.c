@@ -31,7 +31,7 @@ irq_handler_t irq_register(int index, irq_handler_t handler)
     return NULL;
 }
 
-reg32_t irq_handler(reg32_t esp, context_t context)
+reg32_t irq_handler(reg32_t esp, processor_context_t context)
 {
     sk_atomic_disable();
 

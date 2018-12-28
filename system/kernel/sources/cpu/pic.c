@@ -4,14 +4,14 @@
 
 #include "kernel/cpu/idt.h"
 
-#define PIC_WAIT() \
-    do { \
-      asm volatile("jmp 1f\n\t" \
-                  "1:\n\t" \
-                  "    jmp 2f\n\t" \
-                  "2:"); \
-    } while (0)
-
+#define PIC_WAIT()                    \
+	do                                \
+	{                                 \
+		asm volatile("jmp 1f\n\t"     \
+					 "1:\n\t"         \
+					 "    jmp 2f\n\t" \
+					 "2:");           \
+	} while (0)
 
 #define PIC1           0x20
 #define PIC1_COMMAND   PIC1

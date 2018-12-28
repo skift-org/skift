@@ -36,7 +36,7 @@ void cpuid_dump()
 {
     cpuid_t cid = cpuid();
     
-    printf("&fCPUID dump:&7\n\tVendorid: %s\n\tFeatures:", cid.vendorid);    
+    printf("CPUID dump:\n\tVendorid: %s\n\tFeatures:", cid.vendorid);    
 
     // if (cid.PCLMUL ) { puts(" PCLMUL"); }      
     // if (cid.DTES64 ) { puts(" DTES64"); }       

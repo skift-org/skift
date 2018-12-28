@@ -4,7 +4,7 @@
 
 #include <skift/utils.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 
 #include "kernel/serial.h"
 

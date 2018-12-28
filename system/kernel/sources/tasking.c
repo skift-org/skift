@@ -25,7 +25,7 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/irq.h"
 #include "kernel/filesystem.h"
@@ -58,9 +58,9 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
     thread->entry = entry;
 
     thread->esp = ((uint)(thread->stack) + STACK_SIZE);
-    thread->esp -= sizeof(context_t);
+    thread->esp -= sizeof(processor_context_t);
 
-    context_t *context = (context_t *)thread->esp;
+    processor_context_t *context = (processor_context_t *)thread->esp;
 
     context->eflags = 0x202;
     context->eip = (u32)entry;
@@ -232,7 +232,7 @@ THREAD kernel_thread;
 thread_t *running = NULL;
 list_t *waiting;
 
-esp_t shedule(esp_t esp, context_t *context);
+esp_t shedule(esp_t esp, processor_context_t *context);
 
 void timer_set_frequency(int hz)
 {
@@ -978,7 +978,7 @@ thread_t *get_next_task()
     return thread;
 }
 
-esp_t shedule(esp_t esp, context_t *context)
+esp_t shedule(esp_t esp, processor_context_t *context)
 {
     UNUSED(context);
 

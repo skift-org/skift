@@ -248,7 +248,7 @@ static int (*syscalls[])() =
         [SYS_DIR_LISTDIR] = sys_not_implemented /* NOT IMPLEMENTED */,
 };
 
-void syscall_dispatcher(context_t *context)
+void syscall_dispatcher(processor_context_t *context)
 {
     int syscall_number = context->eax;
     if (syscall_number >= 0 && syscall_number < SYSCALL_COUNT)

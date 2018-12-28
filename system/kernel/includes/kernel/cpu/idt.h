@@ -6,7 +6,7 @@
 
 #include <skift/generic.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 
 // Gate call protection. 
 // Specifies which privilege Level the calling Descriptor minimum should have. 
@@ -17,7 +17,7 @@
 #define TRAPGATE 0x8F
 #define IDT_ENTRY_COUNT 256
 
-typedef void (*int_handler_t)(context_t * states);
+typedef void (*int_handler_t)(processor_context_t * states);
 
 typedef PACKED(struct) 
 {

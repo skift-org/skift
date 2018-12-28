@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/generic.h>
+#include "kernel/processor.h"
 
-#include "cpu/cpu.h"
-
-void syscall_dispatcher(context_t *context);
+void syscall_dispatcher(processor_context_t *context);

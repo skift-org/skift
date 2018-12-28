@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 
 #include "kernel/clock.h"
 

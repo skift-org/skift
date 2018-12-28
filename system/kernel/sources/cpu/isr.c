@@ -69,7 +69,7 @@ isr_handler_t isr_register(int index, isr_handler_t handler)
 	return NULL;
 }
 
-void isr_handler(context_t context)
+void isr_handler(processor_context_t context)
 {
 
 	if (isr_handlers[context.int_no] != NULL)

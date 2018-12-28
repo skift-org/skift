@@ -4,7 +4,7 @@
 
 /* vga.c: legacy vga textmode graphic.                                        */
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 
 #include "kernel/dev/vga.h"
 

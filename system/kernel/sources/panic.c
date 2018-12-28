@@ -28,7 +28,7 @@ const char *const witty_comments[] =
 
 extern uint ticks;
 
-void __panic(const string file, const string function, const int line, context_t *context, string message, ...)
+void __panic(const string file, const string function, const int line, processor_context_t *context, string message, ...)
 {
 
     cli();
@@ -50,7 +50,7 @@ void __panic(const string file, const string function, const int line, context_t
 
     if (context != NULL)
     {
-        dump_context(context);
+        processor_dump_context(context);
     }
 
     puts("\n\tSystem halted!\n");

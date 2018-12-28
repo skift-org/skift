@@ -6,7 +6,7 @@
 
 #include <skift/logger.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 #include "kernel/dev/bga.h"
 
 void bga_write_register(u16 IndexValue, u16 DataValue)

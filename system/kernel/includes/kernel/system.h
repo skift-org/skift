@@ -8,9 +8,9 @@
 #include <skift/generic.h>
 #include <skift/logger.h>
 
-#include "cpu/cpu.h"
+#include "kernel/processor.h"
 
-void __panic(const string file, const string function, const int line, context_t * context, string message, ...);
+void __panic(const string file, const string function, const int line, processor_context_t * context, string message, ...);
 
 #define STOP while(1){ cli(); hlt(); }
 #define PANIC(x...) __panic(__FILE__, (string)__FUNCTION__, __LINE__, NULL, x)

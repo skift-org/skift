@@ -175,7 +175,7 @@ char keyboard_getchar(uchar scancode)
     }
 }
 
-reg32_t keyboard_irq(reg32_t esp, context_t *context)
+reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 {
     UNUSED(context);
 

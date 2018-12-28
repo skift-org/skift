@@ -5,7 +5,7 @@
 #include <string.h>
 #include <skift/atomic.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 #include "kernel/cpu/irq.h"
 #include "kernel/mouse.h"
 
@@ -43,7 +43,7 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
 
 uchar cycle = 0;
 ubyte packet[4];
-reg32_t mouse_irq(reg32_t esp, context_t *context)
+reg32_t mouse_irq(reg32_t esp, processor_context_t *context)
 {
     UNUSED(context);
 
@@ -71,7 +71,7 @@ reg32_t mouse_irq(reg32_t esp, context_t *context)
     return esp;
 }
 
-inline void mouse_wait(uchar a_type) //unsigned char
+static inline void mouse_wait(uchar a_type) //unsigned char
 {
     uint _time_out = 100000; //unsigned int
     if (a_type == 0)
@@ -98,7 +98,7 @@ inline void mouse_wait(uchar a_type) //unsigned char
     }
 }
 
-inline void mouse_write(uchar a_write) //unsigned char
+static inline void mouse_write(uchar a_write) //unsigned char
 {
     //Wait to be able to send a command
     mouse_wait(1);
@@ -110,7 +110,7 @@ inline void mouse_write(uchar a_write) //unsigned char
     outb(0x60, a_write);
 }
 
-uchar mouse_read()
+static inline uchar mouse_read()
 {
     //Get's response from mouse
     mouse_wait(0);

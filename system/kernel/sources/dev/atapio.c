@@ -5,7 +5,7 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
-#include "kernel/cpu/cpu.h"
+#include "kernel/processor.h"
 
 #include "kernel/dev/atapio.h"
 

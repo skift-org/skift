@@ -390,8 +390,6 @@ int thread_waitproc(PROCESS p)
 
     process_t *process = process_get(p);
 
-    sk_log(LOG_DEBUG, "Thread %d wait process %d'%s'", running->id, process->id, process->name);
-
     running->waitinfo.outcode = 0;
 
     if (process != NULL)

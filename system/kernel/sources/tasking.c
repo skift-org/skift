@@ -753,11 +753,11 @@ uint messaging_id()
 
 int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    if (from == to)
-    {
-        sk_log(LOG_WARNING, "PROCESS=%d try to send a message to himself!");
-        return 0;
-    }
+    // if (from == to)
+    // {
+    //     sk_log(LOG_WARNING, "PROCESS=%d try to send a message to himself!", from);
+    //     return 0;
+    // }
 
     sk_log(LOG_DEBUG, "Sending message ID=%d from %d to %d.", id, from, to);
 
@@ -797,7 +797,6 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
     return id;
 }
 
-// TODO: broadcasting
 int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
 {
     int id = 0;

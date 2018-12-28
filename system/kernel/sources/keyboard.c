@@ -7,6 +7,12 @@
 
 #include "kernel/cpu/irq.h"
 #include "kernel/keyboard.h"
+#include "kernel/tasking.h"
+
+/*
+ * TODO:
+ * - Send messages to subscribers
+ */
 
 char keymap_FRBE[128][3] = 
 {
@@ -55,7 +61,7 @@ char keymap_FRBE[128][3] =
     { 'l',  'L', '\0'}, // 38 L
     { 'm',  'M', '\0'}, // 39 M
     {'\0',  '%', '\0'}, // 40 ù
-    {'\0', '\0', '\0'}, // 41 NOT ON FRBE
+    {'\0', '\0', '\0'}, // 41 ² ³ 
     {'\0', '\0', '\0'}, // 42 LSHIFT
     {'\0', '\0', ASCII_BACKTICK}, // 53 µ £ `
     { 'w',  'W', '\0'}, // 44 w 
@@ -100,14 +106,16 @@ char keymap_FRBE[128][3] =
     { '.',  '.', '\0'}, // KP_POINT
     {'\0', '\0', '\0'}, // F11
     {'\0', '\0', '\0'}, // F12
-    { '<', '>',  '\\'}, // 
+    { '<', '>',  '\\'}, // ANGLE_BRACKET
 
     // SPECIAl KEY
     {'\0', '\0', '\0'}, // UP
     {'\0', '\0', '\0'}, // DOWN
     {'\0', '\0', '\0'}, // LEFT
     {'\0', '\0', '\0'}, // RIGHT
+    
     {'\n', '\n', '\n'}, // KP_ENTER
+
     {'\0', '\0', '\0'}, // 
     {'\0', '\0', '\0'}, // 
     {'\0', '\0', '\0'}, // 
@@ -180,53 +188,44 @@ reg32_t keyboard_irq(reg32_t esp, context_t *context)
 
             switch (scancode)
             {
-            case 72: // UP
-                scancode = UP;
-                break;
+                
+            case 28: scancode = KPENTER;   break;
+            case 29: scancode = RCONTROL;  break;
+            case 56: scancode = RALT;      break;
+            case 71: scancode = HOME;      break;
+            case 72: scancode = UP;        break;
+            case 73: scancode = PAGE_UP;   break;
+            case 75: scancode = LEFT;      break;
+            case 77: scancode = RIGHT;     break;
+            case 79: scancode = END;       break;
+            case 80: scancode = DOWN;      break;
+            case 81: scancode = PAGE_DOWN; break;
+            case 82: scancode = INSERT;    break;
+            case 83: scancode = DELETE;    break;
 
-            case 80: // DOWN
-                scancode = DOWN;
-                break;
-
-            case 75: // LEFT
-                scancode = LEFT;
-                break;
-
-            case 77: // RIGHT
-                scancode = RIGHT;
-                break;
-
-            case 28: // KPENTER
-                scancode = KPENTER;
-                break;
-
-            case 29: // RCONTROL
-                scancode = RCONTROL;
-                break;
-
-            case 56: // RALT
-                scancode = RALT;
-                break;
-
-            default:
+            default: 
                 break;
             }
 
             extended = false;
         }
 
-        ispressed[scancode] = true;
+        keyboard_event_t keyevent = {
+            .c = keyboard_getchar(scancode),
+            .key = scancode};
 
-        //sk_log(LOG_DEBUG, "down: %d.", scancode);
-        char c = keyboard_getchar(scancode);
-        if (c)
+        if (!ispressed[scancode])
         {
-            printf("%c", c);
-        }    
+            messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYDOWN, &keyevent, sizeof(keyevent), 0);
+            ispressed[scancode] = true;
+        }
+
+        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYTYPED, &keyevent, sizeof(keyevent), 0);
+
+        sk_log(LOG_DEBUG, "down: %d.", scancode);
     }    
     else if (scancode == 224)
     {
-        sk_log(LOG_DEBUG, "Meta");
         extended = true;
     }
     else
@@ -236,34 +235,21 @@ reg32_t keyboard_irq(reg32_t esp, context_t *context)
 
             switch (scancode)
             {
-            case 200: // UP
-                scancode = UP;
-                break;
 
-            case 208: // DOWN
-                scancode = DOWN;
-                break;
-
-            case 203: // LEFT
-                scancode = LEFT;
-                break;
-
-            case 205: // RIGHT
-                scancode = RIGHT;
-                break;
-
-            case 156: // KPENTER
-                scancode = KPENTER;
-                break;
-
-            case 157: // RCONTROL
-                scancode = RCONTROL;
-                break;
-
-            case 184: // RALT
-                scancode = RALT;
-                break;
-
+            case 156: scancode = KPENTER;   break;
+            case 157: scancode = RCONTROL;  break;
+            case 184: scancode = RALT;      break;
+            case 199: scancode = HOME;      break;
+            case 200: scancode = UP;        break;
+            case 201: scancode = PAGE_UP;   break;
+            case 203: scancode = LEFT;      break;
+            case 205: scancode = RIGHT;     break;
+            case 207: scancode = END;       break;
+            case 208: scancode = DOWN;      break;
+            case 209: scancode = PAGE_DOWN; break;
+            case 210: scancode = INSERT;    break;
+            case 211: scancode = DELETE;    break;
+            
             default:
                 break;
             }
@@ -275,9 +261,13 @@ reg32_t keyboard_irq(reg32_t esp, context_t *context)
             scancode -= 128;
         }
 
+
+        keyboard_event_t keyevent = {
+            .c = '\0',
+            .key = scancode};
+
+        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYUP, &keyevent, sizeof(keyevent), 0);
         ispressed[scancode] = false;
-        //sk_log(LOG_DEBUG, "up: %d.", scancode);
-        //printf("\n");
     }
 
     return esp;

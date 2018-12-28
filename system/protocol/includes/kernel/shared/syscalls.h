@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum SYSCALL_CODE
+typedef enum
 {
     SYS_DEBUG = 0,
 

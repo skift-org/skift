@@ -22,8 +22,13 @@ void __plug_init(void)
 
 int __plug_print(const char *buffer)
 {
+    sk_atomic_begin();
+    
     console_print(buffer);
     //serial_writeln((char *)buffer);
+    
+    sk_atomic_end();
+    
     return strlen(buffer);
 }
 

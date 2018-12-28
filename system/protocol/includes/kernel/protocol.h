@@ -1,6 +1,7 @@
 #pragma once
 
 #include <skift/generic.h>
+#include "kernel/shared/keyboard.h"
 
 #define MSGPAYLOAD_SIZE 1024
 #define MSGNAME_SIZE 128
@@ -24,17 +25,14 @@ typedef struct
 
 #define KEYBOARD_CHANNEL  "#dev:keyboard"
 
-#define KEYBOARD_KEYPRESS "dev:keyboard.keydown"
+#define KEYBOARD_KEYDOWN "dev:keyboard.keydown"
 #define KEYBOARD_KEYUP    "dev:keyboard.keyup"
 #define KEYBOARD_KEYTYPED "dev:keyboard.keytyped"
 
 typedef struct
 {
     char c;
-
-    bool ctrl;
-    bool altgr;
-    bool shift;
+    keyboard_key_t key;
 } keyboard_event_t;
 
 /* --- Mouse events --------------------------------------------------------- */

@@ -1,7 +1,12 @@
 #include <stdio.h>
+#include <string.h>
+
+#include "kernel/protocol.h"
+
 #include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/thread.h>
+#include <skift/messaging.h>
 
 int init_exec(const char* filename)
 {
@@ -23,10 +28,11 @@ int init_exec(const char* filename)
 int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
-    printf("\033[0;36mWelcome to skiftOS\033[0m\n");
+    printf("\n\n\033[0;36mWelcome to skiftOS\033[0m\n\n");
 
-    int nyancat = init_exec("/bin/sysinfo");
-    sk_thread_waitproc(nyancat);
+    int shell = init_exec("/bin/sh");
+    sk_thread_waitproc(shell);
     while(1);
+
     return 0;
 }

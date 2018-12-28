@@ -91,7 +91,7 @@ typedef enum
     ANGLE_BRACKET,
 
     // SPECIAL KEYS
-    UP = 128,
+    UP,
     DOWN,
     LEFT,
     RIGHT,
@@ -99,6 +99,13 @@ typedef enum
     KPENTER,
     RCONTROL,
     RALT,
+
+    INSERT,
+    DELETE,
+    HOME, 
+    END,
+    PAGE_UP,
+    PAGE_DOWN,
 
     KEYBOAD_KEY_END
 } keyboard_key_t;

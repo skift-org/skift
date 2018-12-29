@@ -5,11 +5,14 @@
 #include <string.h>
 #include <skift/atomic.h>
 
-#include "kernel/processor.h"
 #include "kernel/cpu/irq.h"
+#include "kernel/processor.h"
+#include "kernel/protocol.h"
+#include "kernel/tasking.h"
+
 #include "kernel/mouse.h"
 
-mouse_state_t mouse;
+mouse_state_t oldmouse;
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -32,13 +35,72 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
         offy -= 0x100;
     }
 
-    mouse.x += offx;
-    mouse.y -= offy;
-    mouse.scroll = 0;
+    // decode the new mouse packet
+    mouse_state_t newmouse;
 
-    mouse.middle = (packet0 >> 2) & 1;
-    mouse.right = (packet0 >> 1) & 1;
-    mouse.left = (packet0)&1;
+    newmouse.x = offx;
+    newmouse.y = -offy;
+    newmouse.scroll = 0;
+    newmouse.middle = (packet0 >> 2) & 1;
+    newmouse.right = (packet0 >> 1) & 1;
+    newmouse.left = (packet0)&1;
+
+    if (newmouse.x != 0 && newmouse.y != 0)
+    {
+        // The mouse move
+        mouse_move_event_t event = {.offx = newmouse.x, .offy = newmouse.y};
+        messaging_broadcast(MOUSE_CHANNEL, MOUSE_MOVE, &event, sizeof(mouse_move_event_t), NULL);
+    }
+
+    if (newmouse.scroll != 0)
+    {
+        mouse_scroll_event_t event = { .off = newmouse.scroll };
+        messaging_broadcast(MOUSE_CHANNEL, MOUSE_SCROLL, &event, sizeof(mouse_scroll_event_t), NULL);
+    }
+
+    if (oldmouse.left != newmouse.left)
+    {
+        if (oldmouse.left = false)
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+        }
+        else
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+        }
+    }
+
+    if (oldmouse.right != newmouse.right)
+    {
+        if (oldmouse.right = false)
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+        }
+        else
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+        }
+    }
+
+    if (oldmouse.middle != newmouse.middle)
+    {
+        if (oldmouse.middle = false)
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+        }
+        else
+        {
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+        }
+    }
+
+    oldmouse = newmouse;
 }
 
 uchar cycle = 0;
@@ -149,18 +211,4 @@ void mouse_setup()
 
     //Setup the mouse handler
     irq_register(12, mouse_irq);
-}
-
-void mouse_get_state(mouse_state_t *state)
-{
-    ATOMIC({
-        memcpy(state, &mouse, sizeof(mouse_state_t));
-    });
-}
-
-void mouse_set_state(mouse_state_t *state)
-{
-    ATOMIC({
-        memcpy(&mouse, state, sizeof(mouse_state_t));
-    });
 }

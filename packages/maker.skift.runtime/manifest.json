@@ -5,7 +5,7 @@
     "type": "lib",
     "libs": [
         "maker.skift.framework",
-        "maker.skift.protocol"
+        "maker.hjert.protocol"
     ],
     "includes" : ["com.skift.kernel"],
     "strict": false

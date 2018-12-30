@@ -1,10 +1,10 @@
 {
     "name": "Hjert Kernel",
 
-    "id": "maker.skift.kernel",
+    "id": "maker.hjert.kernel",
     "type": "kernel",
     "libs": [
         "maker.skift.framework",
-        "maker.skift.protocol"
+        "maker.hjert.protocol"
     ]
 }

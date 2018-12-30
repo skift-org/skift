@@ -7,15 +7,6 @@
 #include <skift/generic.h>
 #include "kernel/protocol.h"
 
-typedef PACKED(struct) 
-{
-    int x;
-    int y;
-    int scroll;
-
-    bool left;
-    bool right;
-    bool middle;
-} mouse_state_t;
-
 void mouse_setup();
+void mouse_get_state(mouse_state_t *state);
+void mouse_set_state(mouse_state_t *state);

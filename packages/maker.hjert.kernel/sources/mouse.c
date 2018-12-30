@@ -212,3 +212,19 @@ void mouse_setup()
     //Setup the mouse handler
     irq_register(12, mouse_irq);
 }
+
+
+// XXX: this is no longer needed...
+void mouse_get_state(mouse_state_t *state)
+{
+    ATOMIC({
+        memcpy(state, &oldmouse, sizeof(mouse_state_t));
+    });
+}
+
+void mouse_set_state(mouse_state_t *state)
+{
+    ATOMIC({
+        memcpy(&oldmouse, state, sizeof(mouse_state_t));
+    });
+}

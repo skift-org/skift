@@ -49,54 +49,54 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     {
         // The mouse move
         mouse_move_event_t event = {.offx = newmouse.x, .offy = newmouse.y};
-        messaging_broadcast(MOUSE_CHANNEL, MOUSE_MOVE, &event, sizeof(mouse_move_event_t), NULL);
+        messaging_broadcast(MOUSE_CHANNEL, MOUSE_MOVE, &event, sizeof(mouse_move_event_t), 0);
     }
 
     if (newmouse.scroll != 0)
     {
         mouse_scroll_event_t event = { .off = newmouse.scroll };
-        messaging_broadcast(MOUSE_CHANNEL, MOUSE_SCROLL, &event, sizeof(mouse_scroll_event_t), NULL);
+        messaging_broadcast(MOUSE_CHANNEL, MOUSE_SCROLL, &event, sizeof(mouse_scroll_event_t), 0);
     }
 
     if (oldmouse.left != newmouse.left)
     {
-        if (oldmouse.left = false)
+        if (oldmouse.left == false)
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
 
     if (oldmouse.right != newmouse.right)
     {
-        if (oldmouse.right = false)
+        if (oldmouse.right == false)
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
 
     if (oldmouse.middle != newmouse.middle)
     {
-        if (oldmouse.middle = false)
+        if (oldmouse.middle == false)
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
             mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), NULL);
+            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
 

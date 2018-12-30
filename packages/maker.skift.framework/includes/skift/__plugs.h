@@ -1,4 +1,7 @@
 #pragma once
+
+// this header list all "plugs" function between the library and the syscalls or the kernel
+
 #include <skift/generic.h>
 
 void __plug_init(void);

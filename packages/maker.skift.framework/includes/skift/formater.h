@@ -65,5 +65,6 @@ do                                                    \
 void sk_formater_init();
 bool sk_formater_register(char c, formater_t formater);
 int sk_formater_format(printf_info_t* info, char sel, va_list* va);
-//TODO: int sk_formater_format_stream(printf_info_t* info, char sel, void* v);
+//TODO: for fprintf
+// int sk_formater_format_stream(printf_info_t* info, char sel, void* v);
 

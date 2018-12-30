@@ -1,21 +1,29 @@
 <p align="center">
-<img src="doc/brand/FLAG_skift.png" align="center" height=64 />
-<img src="doc/brand/FLAG_hjert.png" align="center" height=64 />
-<img src="doc/brand/FLAG_core.png"  align="center" height=64 />
+<img src="manual/assets/skift.svg" align="center" height=64 />
+<img src="manual/assets/hjert.svg" align="center" height=64 />
+<img src="manual/assets/coreutils.svg"  align="center" height=64 />
 </p>
+
+# skiftOS
 
 <p align="center">
-<img src="doc/screenshots/capture.png" height=400 />
+<img src="manual/assets/capture.png" height=400 />
 </p>
 
-<img src="doc/brand/LOGO_skift_dark.png" height=128 />
+# Components
+
+<img src="manual/assets/skift_dark.svg" height=128 />
 
 ## A simple, handmade, operating system for x86.
  
-<img src="doc/brand/LOGO_hjert_dark.png" height=128 />
+<img src="manual/assets/hjert_dark.svg" height=128 />
 
 ## A minimal kernel supporting multiprocessing and inter-process communication.
 
-<img src="doc/brand/LOGO_core_dark.png" height=128 />
+<img src="manual/assets/coreutils_dark.svg" height=128 />
 
 ## A minimal colection of application.
+
+# License
+The skift operating and its core components are licensed under the **MIT License**.              
+See: LICENSE.md

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <skift/formater.h>
+#include <skift/formatter.h>
 
 int printf(const char *fmt, ...)
 {
@@ -136,7 +136,7 @@ int vsnprintf(char* s, size_t n, const char * fmt, va_list va)
                 break;
 
             case PFSTATE_FINALIZE:
-                sk_formater_format(info, info->c, &va);
+                sk_formatter_format(info, info->c, &va);
                 
                 info->lenght = 0;
                 info->state = PFSTATE_ESC;

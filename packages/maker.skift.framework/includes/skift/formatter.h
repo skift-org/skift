@@ -32,7 +32,7 @@ typedef struct
     uint lenght;
 } printf_info_t;
 
-typedef int (*formater_t)(printf_info_t* info, void* v);
+typedef int (*formatter_t)(printf_info_t* info, void* v);
 
 #define PADDING(buffer, a)                                 \
 do                                                             \
@@ -62,9 +62,9 @@ do                                                    \
     if (info->c == '\0') return strlen(info->output); \
 } while(0)
 
-void sk_formater_init();
-bool sk_formater_register(char c, formater_t formater);
-int sk_formater_format(printf_info_t* info, char sel, va_list* va);
+void sk_formatter_init();
+bool sk_formatter_register(char c, formatter_t formatter);
+int sk_formatter_format(printf_info_t* info, char sel, va_list* va);
 //TODO: for fprintf
-// int sk_formater_format_stream(printf_info_t* info, char sel, void* v);
+// int sk_formatter_format_stream(printf_info_t* info, char sel, void* v);
 

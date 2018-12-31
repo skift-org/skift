@@ -7,7 +7,7 @@
 #include <string.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>
-#include <skift/formater.h>
+#include <skift/formatter.h>
 #include <skift/__plugs.h>
 
 #include "kernel/serial.h"
@@ -17,7 +17,7 @@
 
 void __plug_init(void)
 {
-    sk_formater_init();
+    sk_formatter_init();
 }
 
 int __plug_print(const char *buffer)

@@ -4,9 +4,9 @@
 #include <string.h>
 #include <skift/ascii.h>
 
-#include <skift/formater.h>
+#include <skift/formatter.h>
 
-/* --- Build in formaters --------------------------------------------------- */
+/* --- Build in formatters --------------------------------------------------- */
 
 int sk_format_binary(printf_info_t* info, va_list* va)
 {
@@ -50,7 +50,7 @@ int sk_format_decimal(printf_info_t* info, va_list* va)
 
     if (v < 0)
     {
-        v = 0 - v;
+        v -= v;
 
         buffer[0] = '-';
         buffer[1] = '\0';
@@ -119,22 +119,22 @@ int sk_format_string(printf_info_t* info, va_list* va)
     return strlen(info->output);
 }
 
-/* --- Formaters managment -------------------------------------------------- */
+/* --- formatters managment -------------------------------------------------- */
 
-formater_t formaters[52];
+formatter_t formatters[52];
 
-void sk_formater_init()
+void sk_formatter_init()
 {
-    sk_formater_register('b', (formater_t)sk_format_binary);
-    sk_formater_register('o', (formater_t)sk_format_octal);
-    sk_formater_register('d', (formater_t)sk_format_decimal);
-    sk_formater_register('x', (formater_t)sk_format_hexadecimal);
-    sk_formater_register('c', (formater_t)sk_format_char);
+    sk_formatter_register('b', (formatter_t)sk_format_binary);
+    sk_formatter_register('o', (formatter_t)sk_format_octal);
+    sk_formatter_register('d', (formatter_t)sk_format_decimal);
+    sk_formatter_register('x', (formatter_t)sk_format_hexadecimal);
+    sk_formatter_register('c', (formatter_t)sk_format_char);
     
-    sk_formater_register('s', (formater_t)sk_format_string);
+    sk_formatter_register('s', (formatter_t)sk_format_string);
 }
 
-bool sk_formater_register(char c, formater_t formater)
+bool sk_formatter_register(char c, formatter_t formatter)
 {
     if (isalpha(c))
     {
@@ -148,7 +148,7 @@ bool sk_formater_register(char c, formater_t formater)
             c = c - ASCII_A + 26;
         }
 
-        formaters[(int)c] = formater;
+        formatters[(int)c] = formatter;
 
         return true;
     }
@@ -158,7 +158,7 @@ bool sk_formater_register(char c, formater_t formater)
     }
 }
 
-int sk_formater_format(printf_info_t* info, char sel, va_list* va)
+int sk_formatter_format(printf_info_t* info, char sel, va_list* va)
 {
     if (isalpha(sel))
     {
@@ -171,9 +171,9 @@ int sk_formater_format(printf_info_t* info, char sel, va_list* va)
             sel = sel - ASCII_A + 26;
         }
 
-        if (formaters[(int)sel] != NULL)
+        if (formatters[(int)sel] != NULL)
         {
-            return formaters[(int)sel](info, va);
+            return formatters[(int)sel](info, va);
         }
         else
         {

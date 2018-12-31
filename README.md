@@ -24,6 +24,13 @@
 
 ## A minimal colection of application.
 
+# Getting involved
+
+We welcome all contributions, just pick a task in the todo list and open a issue to let us know you work on that.
+
+- [Building](manual/building.md)
+- [Todo list](manual/todo.md)
+
 # License
 The skift operating and its core components are licensed under the **MIT License**.              
 See: LICENSE.md

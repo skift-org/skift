@@ -1,6 +1,7 @@
 #pragma once
 
-#include <skift/syscall.h>
+#include <skift/generic.h>
+#include <skift/syscalls.h>
 
 DECL_SYSCALL0(sk_process_self);
 DECL_SYSCALL2(sk_process_exec, const char * path, const char ** argv);

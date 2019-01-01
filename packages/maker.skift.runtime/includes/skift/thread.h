@@ -1,6 +1,7 @@
 #pragma once
 
-#include <skift/syscall.h>
+#include <skift/generic.h>
+#include <skift/syscalls.h>
 
 DECL_SYSCALL0(sk_thread_self);
 DECL_SYSCALL3(sk_thread_create, int entry, void *arg, int flags);

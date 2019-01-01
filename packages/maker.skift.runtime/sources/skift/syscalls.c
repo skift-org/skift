@@ -2,4 +2,5 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/syscall.h>
+#include <skift/syscalls.h>
+

@@ -3,7 +3,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/thread.h>
-#include <skift/syscall.h>
 
 DEFN_SYSCALL0(sk_thread_self, SYS_THREAD_SELF);
 DEFN_SYSCALL3(sk_thread_create, SYS_THREAD_CREATE, int, void *, int);

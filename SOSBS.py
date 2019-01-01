@@ -441,7 +441,11 @@ def list_targets(location):
 
             if (os.path.exists(json_file)):
                 data = json.loads(open(json_file).read())
-                targets[data["id"]] = Target(target_location, data)
+
+                if (data["type"] == "compound"):
+                    targets = {**targets, **list_targets(target_location)}
+                else:
+                    targets[data["id"]] = Target(target_location, data)
 
     return targets
 
@@ -707,8 +711,7 @@ def main(argc, argv):
     """
     Entry point of the SOSBS toolset.
     """
-    targets = {**list_targets("packages"),
-               **list_targets("packages/maker.coreutils")}
+    targets = list_targets("packages")
 
     # Command parsing
     if argc < 2:

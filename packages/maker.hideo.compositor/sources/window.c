@@ -6,7 +6,7 @@
 #include <skift/drawing.h>
 #include <skift/color.h>
 
-#include "hideo_window.h"
+#include "hideo.h"
 
 hideo_window_t *hideo_window(hideo_context_t *ctx, const char *title, int x, int y, uint w, uint h)
 {

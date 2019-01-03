@@ -45,7 +45,7 @@ typedef struct
 #define MOUSE_BUTTONUP   "dev:mouse.buttonup"
 
 //XXX: stop using mouse_syscalls
-typedef PACKED(struct) 
+typedef struct 
 {
     int x;
     int y;

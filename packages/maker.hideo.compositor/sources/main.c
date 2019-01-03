@@ -65,7 +65,7 @@ void window_end_resizing()
 
 /* --- Mouse events handlers ------------------------------------------------ */
 
-#define MOUSE_SIZE 16
+#define MOUSE_SIZE 32
 
 void hideo_handle_mouse_move(hideo_context_t *context, mouse_move_event_t event)
 {
@@ -175,48 +175,48 @@ int main(int argc, char const *argv[])
         message_t msg;
         sk_messaging_receive(&msg);
 
-        // sk_log(LOG_DEBUG, "hideo msg: %s", msg.label);
+        //sk_log(LOG_DEBUG, "hideo msg: %s", msg.label);
 
         if (strcmp(msg.label, MOUSE_MOVE) == 0)
         {
             mouse_move_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(mouse_move_event_t));
             hideo_handle_mouse_move(&context, event);
         }
         else if (strcmp(msg.label, MOUSE_SCROLL) == 0)
         {
             mouse_scroll_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(mouse_scroll_event_t));
             hideo_handle_mouse_scroll(&context, event);
         }
         else if (strcmp(msg.label, MOUSE_BUTTONDOWN) == 0)
         {
             mouse_button_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(mouse_button_event_t));
             hideo_handle_mouse_pressed(&context, event);
         }
         else if (strcmp(msg.label, MOUSE_BUTTONUP) == 0)
         {
             mouse_button_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(mouse_button_event_t));
             hideo_handle_mouse_released(&context, event);
         }
         else if (strcmp(msg.label, KEYBOARD_KEYDOWN) == 0)
         {
             keyboard_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(keyboard_event_t));
             hideo_handle_keyboard_pressed(&context, event);
         }
         else if (strcmp(msg.label, KEYBOARD_KEYUP) == 0)
         {
             keyboard_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(keyboard_event_t));
             hideo_handle_keyboard_released(&context, event);
         }
         else if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
         {
             keyboard_event_t event;
-            sk_messaging_payload(&event, sizeof(event));
+            sk_messaging_payload(&event, sizeof(keyboard_event_t));
             hideo_handle_keyboard_typed(&context, event);
         }
     }

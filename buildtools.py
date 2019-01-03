@@ -18,11 +18,6 @@ import shutil
 
 APP_NAME = sys.argv[0]
 
-SDK = True
-
-if (sys.argv[0].endswith("SOSBS.py")):
-    SDK = False
-
 ESC = '\033['
 
 BLACK = ESC + '30m'
@@ -614,12 +609,8 @@ def distrib_sdk(targets):
 def help_command(targets):
     """Show this help message."""
 
-    if SDK:
-        print(BRIGHT_WHITE + "S.O.S.D.K, version 3.0" + RESET)
-        print("The skiftOS dev kit")
-    else:
-        print(BRIGHT_WHITE + "S.O.S.B.S, version 3.0" + RESET)
-        print("The skiftOS build system")
+    print(BRIGHT_WHITE + "Build tools, version 3.0" + RESET)
+    print("The skiftOS build system")
 
     print("")
 
@@ -691,16 +682,11 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "run": run_command
+        "run": run_command,
+        "distrib-sdk": distrib_sdk
     }
 
-if not SDK:
-    global_actions.update({
-        "distrib-sdk": distrib_sdk
-    })
-
 # --- Main ------------------------------------------------------------------- #
-
 
 def missing_command(command):
     ERROR("No action named '%s'!" % command)

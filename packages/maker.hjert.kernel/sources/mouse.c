@@ -45,7 +45,7 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     newmouse.right = (packet0 >> 1) & 1;
     newmouse.left = (packet0)&1;
 
-    if (newmouse.x != 0 && newmouse.y != 0)
+    if (newmouse.x != 0 || newmouse.y != 0)
     {
         // The mouse move
         mouse_move_event_t event = {.offx = newmouse.x, .offy = newmouse.y};

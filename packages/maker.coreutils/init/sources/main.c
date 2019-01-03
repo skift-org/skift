@@ -30,7 +30,6 @@ int main(int argc, char **argv)
     (void)argc; (void)argv;
     printf("Welcome to \033[0;34mskift\033[0m!\n");
 
-    // int shell = init_exec("/bin/sh");
     int shell = init_exec("/bin/maker.hideo.compositor");
     sk_thread_waitproc(shell);
 

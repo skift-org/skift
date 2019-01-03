@@ -156,7 +156,7 @@ channel_t *alloc_channel(const char *name)
     return channel;
 }
 
-message_t *alloc_message(int id, const char *name, void *payload, uint size, uint flags)
+message_t *alloc_message(int id, const char *label, void *payload, uint size, uint flags)
 {
     message_t *message = MALLOC(message_t);
 
@@ -174,7 +174,7 @@ message_t *alloc_message(int id, const char *name, void *payload, uint size, uin
 
     message->id = id;
     message->flags = flags;
-    strncpy(message->name, name, CHANNAME_SIZE);
+    strncpy(message->label, label, MSGLABEL_SIZE);
 
     return message;
 }

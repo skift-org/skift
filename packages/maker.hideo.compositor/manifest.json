@@ -3,6 +3,7 @@
 
     "id": "maker.hideo.compositor",
     "type": "app",
+    "strict": false,
     "libs": [
         "maker.skift.runtime",
         "maker.hideo.protocol"

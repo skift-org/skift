@@ -13,12 +13,14 @@ void readline(char* buffer, uint size)
     int i = 0;    
     buffer[i] = '\0';
 
+    sk_messaging_subscribe(KEYBOARD_CHANNEL);
+
     while(true)
     {
         message_t msg;
         sk_messaging_receive(&msg);
 
-        if (strcmp(msg.name, KEYBOARD_KEYTYPED) == 0)
+        if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
         {
             keyboard_event_t event;
             sk_messaging_payload(&event, sizeof(keyboard_event_t));
@@ -26,7 +28,7 @@ void readline(char* buffer, uint size)
             if (event.c == '\n')
             {
                 printf("\n");
-                return;
+                break;
             }
             else if (event.c == '\b')
             {
@@ -46,6 +48,8 @@ void readline(char* buffer, uint size)
             }
         }
     }
+
+    sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
 }
 
 int main(int argc, char **argv)
@@ -53,7 +57,6 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    sk_messaging_subscribe(KEYBOARD_CHANNEL);
 
     while (!exited)
     {

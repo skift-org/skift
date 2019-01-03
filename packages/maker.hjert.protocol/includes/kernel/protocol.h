@@ -4,13 +4,13 @@
 #include "kernel/shared/keyboard.h"
 
 #define MSGPAYLOAD_SIZE 1024
-#define MSGNAME_SIZE 128
+#define MSGLABEL_SIZE 128
 
 typedef struct 
 {
     uint id;
     uint reply;
-    char name[MSGNAME_SIZE];
+    char label[MSGLABEL_SIZE];
 
     uint flags;
     

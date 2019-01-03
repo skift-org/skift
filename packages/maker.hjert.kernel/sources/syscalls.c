@@ -148,7 +148,7 @@ int sys_messaging_subscribe(const char *channel)
 
 int sys_messaging_unsubscribe(const char *channel)
 {
-    return sys_messaging_unsubscribe(channel);
+    return messaging_unsubscribe(channel);
 }
 
 /* --- System I/O ----------------------------------------------------------- */

@@ -69,17 +69,34 @@ void window_end_resizing()
 
 void hideo_handle_mouse_move(hideo_context_t *context, mouse_move_event_t event)
 {
+    // Restor the damaged region of the screen
+    bitmap_copy(context->mouse.oldscreen, 0, 0, 
+                context->screen, context->mouse.x, context->mouse.y, MOUSE_SIZE, MOUSE_SIZE);
+
+    sk_io_graphic_blit_region(context->screen->buffer, context->mouse.x, context->mouse.y, MOUSE_SIZE, MOUSE_SIZE);
+
     context->mouse.x = min(context->width, max(0, context->mouse.x + event.offx));
     context->mouse.y = min(context->height, max(0, context->mouse.y + event.offy));
 
     int x = context->mouse.x;
     int y = context->mouse.y;
+    
+    // Save the screen
+    bitmap_copy(context->screen, x, y, context->mouse.oldscreen, 0, 0, MOUSE_SIZE, MOUSE_SIZE);
 
-    drawing_filltri(context->screen, x, y, x, y + MOUSE_SIZE, x + MOUSE_SIZE / 2, y + MOUSE_SIZE / 2, 0xffffff);
+    #define P1 x, y
+    #define P2 x, y + MOUSE_SIZE - 1
+    #define P3 x + MOUSE_SIZE / 2 + MOUSE_SIZE / 8, y + MOUSE_SIZE / 2 + MOUSE_SIZE / 8
 
-    drawing_line(context->screen, x, y, x, y + MOUSE_SIZE, 0x0);
-    drawing_line(context->screen, x, y, x + MOUSE_SIZE / 2, y + MOUSE_SIZE / 2, 0x0);
-    drawing_line(context->screen, x, y + MOUSE_SIZE, x + MOUSE_SIZE / 2, y + MOUSE_SIZE / 2, 0x0);
+    drawing_filltri(context->screen, P1, P2, P3, 0xffffff);
+
+    drawing_line(context->screen, P1, P2, 0x0);
+    drawing_line(context->screen, P1, P3, 0x0);
+    drawing_line(context->screen, P2, P3, 0x0);
+
+    #undef P1
+    #undef P2
+    #undef P3
 
     sk_io_graphic_blit_region(context->screen->buffer, x, y, MOUSE_SIZE, MOUSE_SIZE);
 }
@@ -144,7 +161,10 @@ int main(int argc, char const *argv[])
         .mouse = {
             .x = width / 2,
             .y = height / 2,
+            .oldscreen = bitmap(MOUSE_SIZE, MOUSE_SIZE),
         }};
+
+    drawing_clear(context.mouse.oldscreen, 0xff);
 
     // Enter the message loop
     sk_messaging_subscribe(KEYBOARD_CHANNEL);

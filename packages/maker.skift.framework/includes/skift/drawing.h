@@ -22,6 +22,7 @@ typedef struct
 
 bitmap_t *bitmap(uint width, uint height);
 void bitmap_delete(bitmap_t *bmp);
+void bitmap_copy(bitmap_t *src, int sx, int sy, bitmap_t *dest, int dx, int dy, uint w, uint h);
 
 /* --- Drawing -------------------------------------------------------------- */
 

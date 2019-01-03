@@ -4,6 +4,20 @@
 #define BMP_SIZE_MEM(bmp) (bmp->width * bmp->height * sizeof(uint))
 #define BMP_SIZE(bmp) (uint)(bmp->width * bmp->height)
 
+static inline void bitmap_set_pixel(bitmap_t *bmp, int x, int y, uint color)
+{
+    if ((x >= 0 && x < bmp->width) && (y >= 0 && y < bmp->height))
+        bmp->buffer[x + y * bmp->width] = color;
+}
+
+static inline uint bitmap_get_pixel(bitmap_t *bmp, int x, int y)
+{
+    if ((x >= 0 && x < bmp->width) && (y >= 0 && y < bmp->height))
+        return bmp->buffer[x + y * bmp->width];
+
+    return 0x0;
+}
+
 /* --- Bitmap --------------------------------------------------------------- */
 
 bitmap_t *bitmap(uint width, uint height)
@@ -37,15 +51,20 @@ void bitmap_delete(bitmap_t *bmp)
     free(bmp);
 }
 
+void bitmap_copy(bitmap_t *src, int sx, int sy, bitmap_t *dest, int dx, int dy, uint w, uint h)
+{
+    for(uint x = 0; x < w; x++)
+    {
+        for(uint y = 0; y < h; y++)
+        {
+            bitmap_set_pixel(dest, dx + x, dy + y, bitmap_get_pixel(src, sx + x, sy + y));
+        }   
+    }
+}
+
 /* --- Graphic -------------------------------------------------------------- */
 
 void drawing_pixel(bitmap_t *bmp, int x, int y, uint color)
-{
-    if (x >= 0 && x < bmp->width && y >= 0 && y < bmp->height)
-        bmp->buffer[x + y * bmp->width] = color;
-}
-
-inline void drawing_pixel_inline(bitmap_t *bmp, int x, int y, uint color)
 {
     if (x >= 0 && x < bmp->width && y >= 0 && y < bmp->height)
         bmp->buffer[x + y * bmp->width] = color;
@@ -65,7 +84,7 @@ void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, uint color)
 
     for (;;)
     {
-        drawing_pixel_inline(bmp, x0, y0, color);
+        bitmap_set_pixel(bmp, x0, y0, color);
 
         if (x0 == x1 && y0 == y1)
             break;
@@ -102,8 +121,7 @@ void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
 {
     for (int xx = 0; xx < w; xx++)
         for (int yy = 0; yy < h; yy++)
-            drawing_pixel_inline(bmp, x + xx, y + yy, color);
-    //bmp->buffer[(x + xx) + (y + yy) * bmp->width] = color;
+            bitmap_set_pixel(bmp, x + xx, y + yy, color);
 }
 
 void drawing_filltri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int y2, uint color)
@@ -147,7 +165,7 @@ void drawing_char(bitmap_t *bmp, char c, int x, int y, uint color)
         {
             if (gylph[cy] & mask[cx])
             {
-                drawing_pixel_inline(bmp, x + cx, y + cy, color);
+                bitmap_set_pixel(bmp, x + cx, y + cy, color);
             }
         }
     }

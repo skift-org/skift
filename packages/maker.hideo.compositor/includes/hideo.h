@@ -46,7 +46,7 @@ typedef struct
     int x;
     int y;
 
-    bitmap_t oldscreen;
+    bitmap_t* oldscreen;
 } hideo_mouse_t;
 
 typedef struct 

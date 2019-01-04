@@ -227,7 +227,8 @@ channel_t *channel_get(const char *channel)
 /* --- Public functions ----------------------------------------------------- */
 
 PROCESS kernel_process;
-THREAD kernel_thread;
+THREAD  kernel_thread;
+THREAD  kernel_idle;
 
 thread_t *running = NULL;
 list_t *waiting;
@@ -266,8 +267,8 @@ void tasking_setup()
     shared_memories = list();
 
     kernel_process = process_create("maker.skift.kernel", 0);
-    kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-    thread_create(kernel_process, idle, NULL, 0);
+    kernel_thread  = thread_create(kernel_process, NULL, NULL, 0);
+    kernel_idle    = thread_create(kernel_process, idle, NULL, 0);
 
     // Set the correct stack for the kernel main stack
     thread_t *kthread = thread_get(kernel_thread);
@@ -987,6 +988,7 @@ esp_t shedule(esp_t esp, processor_context_t *context)
 
     // Save the old context
     running->esp = esp;
+    
     list_pushback(waiting, running);
 
     // Load the new context

@@ -105,11 +105,11 @@ void main(multiboot_info_t *info, s32 magic)
     printf("Booting...\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS session = process_exec("bin/init", NULL);
+    PROCESS init = process_exec("bin/init", NULL);
 
-    if (session)
+    if (init)
     {
-        thread_waitproc(session);
+        thread_waitproc(init);
         PANIC("Init has return!");
     }
     else

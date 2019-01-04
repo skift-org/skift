@@ -25,9 +25,9 @@ typedef struct
 
 #define KEYBOARD_CHANNEL  "#dev:keyboard"
 
-#define KEYBOARD_KEYDOWN  "dev:keyboard.keydown"
-#define KEYBOARD_KEYUP    "dev:keyboard.keyup"
-#define KEYBOARD_KEYTYPED "dev:keyboard.keytyped"
+#define KEYBOARD_KEYPRESSED  "dev:keyboard.keypressed"
+#define KEYBOARD_KEYRELEASED "dev:keyboard.keyreleased"
+#define KEYBOARD_KEYTYPED    "dev:keyboard.keytyped"
 
 typedef struct
 {
@@ -41,8 +41,8 @@ typedef struct
 
 #define MOUSE_MOVE       "dev:mouse.move"
 #define MOUSE_SCROLL     "dev:mouse.scroll"
-#define MOUSE_BUTTONDOWN "dev:mouse.buttondown"
-#define MOUSE_BUTTONUP   "dev:mouse.buttonup"
+#define MOUSE_BUTTONDOWN "dev:mouse.buttonpressed"
+#define MOUSE_BUTTONUP   "dev:mouse.buttonreleased"
 
 //XXX: stop using mouse_syscalls
 typedef struct 

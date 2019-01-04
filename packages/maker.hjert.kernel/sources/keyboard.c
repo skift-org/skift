@@ -218,7 +218,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
         if (!ispressed[scancode])
         {
-            messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYDOWN, &keyevent, sizeof(keyevent), 0);
+            messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYPRESSED, &keyevent, sizeof(keyevent), 0);
             ispressed[scancode] = true;
         }
 
@@ -268,7 +268,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             .c = '\0',
             .key = scancode};
 
-        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYUP, &keyevent, sizeof(keyevent), 0);
+        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYRELEASED, &keyevent, sizeof(keyevent), 0);
         ispressed[scancode] = false;
     }
 

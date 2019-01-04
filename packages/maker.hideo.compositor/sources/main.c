@@ -65,15 +65,18 @@ void window_end_resizing()
 
 /* --- Mouse events handlers ------------------------------------------------ */
 
-#define MOUSE_SIZE 32
+#define MOUSE_SIZE 26
 
 void hideo_handle_mouse_move(hideo_context_t *context, mouse_move_event_t event)
 {
     // Restor the damaged region of the screen
-    bitmap_copy(context->mouse.oldscreen, 0, 0, 
-                context->screen, context->mouse.x, context->mouse.y, MOUSE_SIZE, MOUSE_SIZE);
+    int oldx = context->mouse.x;
+    int oldy = context->mouse.y;
 
-    sk_io_graphic_blit_region(context->screen->buffer, context->mouse.x, context->mouse.y, MOUSE_SIZE, MOUSE_SIZE);
+    bitmap_copy(context->mouse.oldscreen, 0, 0, 
+                context->screen, oldx, oldy, MOUSE_SIZE, MOUSE_SIZE);
+
+    //sk_io_graphic_blit_region(context->screen->buffer, context->mouse.x, context->mouse.y, MOUSE_SIZE, MOUSE_SIZE);
 
     context->mouse.x = min(context->width, max(0, context->mouse.x + event.offx));
     context->mouse.y = min(context->height, max(0, context->mouse.y + event.offy));
@@ -98,7 +101,17 @@ void hideo_handle_mouse_move(hideo_context_t *context, mouse_move_event_t event)
     #undef P2
     #undef P3
 
-    sk_io_graphic_blit_region(context->screen->buffer, x, y, MOUSE_SIZE, MOUSE_SIZE);
+    int xx = min(x, oldx);
+    int yy = min(y, oldy);
+
+    int ww = (max(x, oldx)) - xx + MOUSE_SIZE;
+    int hh = (max(y, oldy)) - yy + MOUSE_SIZE;
+
+    // FOR DEBBUGING
+    // drawing_fillrect(context->screen, xx, yy, ww, hh, 0xffffff);
+    // drawing_rect(context->screen, xx, yy, ww, hh, 0x0);
+
+    sk_io_graphic_blit_region(context->screen->buffer, xx, yy, ww, hh);
 }
 
 void hideo_handle_mouse_scroll(hideo_context_t *context, mouse_scroll_event_t event)
@@ -164,8 +177,9 @@ int main(int argc, char const *argv[])
             .oldscreen = bitmap(MOUSE_SIZE, MOUSE_SIZE),
         }};
 
-    drawing_clear(context.mouse.oldscreen, 0xff);
-
+    drawing_clear(context.mouse.oldscreen, 0xc1c1c1);
+    drawing_clear(context.screen, 0xc1c1c1);
+    
     // Enter the message loop
     sk_messaging_subscribe(KEYBOARD_CHANNEL);
     sk_messaging_subscribe(MOUSE_CHANNEL);
@@ -201,13 +215,13 @@ int main(int argc, char const *argv[])
             sk_messaging_payload(&event, sizeof(mouse_button_event_t));
             hideo_handle_mouse_released(&context, event);
         }
-        else if (strcmp(msg.label, KEYBOARD_KEYDOWN) == 0)
+        else if (strcmp(msg.label, KEYBOARD_KEYPRESSED) == 0)
         {
             keyboard_event_t event;
             sk_messaging_payload(&event, sizeof(keyboard_event_t));
             hideo_handle_keyboard_pressed(&context, event);
         }
-        else if (strcmp(msg.label, KEYBOARD_KEYUP) == 0)
+        else if (strcmp(msg.label, KEYBOARD_KEYRELEASED) == 0)
         {
             keyboard_event_t event;
             sk_messaging_payload(&event, sizeof(keyboard_event_t));

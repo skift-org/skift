@@ -1,8 +1,8 @@
 #pragma once
 
 #define PI (3.141592654)
-#define min(a, b) (a) < (b) ? (a) : (b)
-#define max(a, b) (a) > (b) ? (a) : (b)
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #define NAN (0.0 / 0.0)
 #define INFINITY (1.0 / 0.0)

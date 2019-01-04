@@ -2,8 +2,17 @@
 
 #include <skift/generic.h>
 
+#define HIDEO_KEYPRESSED
+#define HIDEO_KEYRELESSED
+
 typedef struct
 {
     uint width;
     uint height;
-} hideo_create_window_t;
+} hideo_wincreate_t;
+
+typedef struct 
+{
+    uint width;
+    uint height;
+} hideo_winresize_t;

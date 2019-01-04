@@ -913,7 +913,7 @@ int main() {
 		}
 		printf("\033[H");
 		
-		// sk_thread_sleep(40);
+		sk_thread_sleep(40);
 		// usleep(90000);
 	}
 

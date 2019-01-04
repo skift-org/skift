@@ -1,0 +1,8 @@
+{
+    "name": "Hideo exemple client",
+    "id": "maker.hideo.exemple",
+    "type": "lib",
+    "libs": [
+        "maker.skift.framework"
+    ]
+}

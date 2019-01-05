@@ -14,6 +14,8 @@
 #include <skift/logger.h>
 
 #include "kernel/tasking.h"
+#include "kernel/messaging.h"
+#include "kernel/shared_memory.h"
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
 #include "kernel/mouse.h"
@@ -110,14 +112,19 @@ int sys_thread_wakeup(THREAD t)
     return 0;
 }
 
-int sys_thread_wait(THREAD t)
+int sys_thread_wait_thread(THREAD t)
 {
-    return (int)thread_wait(t);
+    return thread_wait_thread(t);
 }
 
-int sys_thread_waitproc(PROCESS p)
+int sys_thread_wait_process(PROCESS p)
 {
-    return thread_waitproc(p);
+    return thread_wait_process(p);
+}
+
+int sys_thread_wait_message(message_t* m)
+{
+    return thread_wait_message(m);
 }
 
 /* --- Messaging ------------------------------------------------------------ */
@@ -160,18 +167,6 @@ int sys_io_print(const char *msg)
     return 0;
 }
 
-int sys_io_mouse_get_state(mouse_state_t *state)
-{
-    mouse_get_state(state);
-    return 0;
-}
-
-int sys_io_mouse_set_state(mouse_state_t *state)
-{
-    mouse_set_state(state);
-    return 0;
-}
-
 int sys_io_graphic_blit(unsigned int *buffer)
 {
     graphic_blit(buffer);
@@ -207,8 +202,9 @@ static int (*syscalls[])() =
     [SYS_THREAD_CANCEL] = sys_thread_cancel,
     [SYS_THREAD_SLEEP] = sys_thread_sleep,
     [SYS_THREAD_WAKEUP] = sys_thread_wakeup,
-    [SYS_THREAD_WAIT] = sys_thread_wait,
-    [SYS_THREAD_WAITPROC] = sys_thread_waitproc,
+    [SYS_THREAD_WAIT_THREAD] = sys_thread_wait_thread,
+    [SYS_THREAD_WAIT_PROCESS] = sys_thread_wait_process,
+    [SYS_THREAD_WAIT_MESSAGE] = sys_thread_wait_message,
 
     [SYS_MSG_SEND] = sys_messaging_send,
     [SYS_MSG_BROADCAST] = sys_messaging_broadcast,
@@ -219,9 +215,6 @@ static int (*syscalls[])() =
 
     [SYS_IO_PRINT] = sys_io_print,
     [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
-
-    [SYS_IO_MOUSE_GET_STATE] = sys_io_mouse_get_state,
-    [SYS_IO_MOUSE_SET_STATE] = sys_io_mouse_set_state,
 
     [SYS_IO_GRAPHIC_BLIT] = sys_io_graphic_blit,
     [SYS_IO_GRAPHIC_BLIT_REGION] = sys_io_graphic_blit_region,

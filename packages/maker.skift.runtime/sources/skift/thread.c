@@ -13,5 +13,6 @@ DEFN_SYSCALL1(sk_thread_cancel, SYS_THREAD_CANCEL, int);
 DEFN_SYSCALL1(sk_thread_sleep, SYS_THREAD_SLEEP, int);
 DEFN_SYSCALL1(sk_thread_wakeup, SYS_THREAD_WAKEUP, int);
 
-DEFN_SYSCALL1(sk_thread_wait, SYS_THREAD_WAIT, int);
-DEFN_SYSCALL1(sk_thread_waitproc, SYS_THREAD_WAITPROC, int);
+DEFN_SYSCALL1(sk_thread_wait_thread,  SYS_THREAD_WAIT_THREAD,  int);
+DEFN_SYSCALL1(sk_thread_wait_process, SYS_THREAD_WAIT_PROCESS, int);
+DEFN_SYSCALL1(sk_thread_wait_message, SYS_THREAD_WAIT_MESSAGE, message_t *);

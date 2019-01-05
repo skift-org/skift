@@ -18,7 +18,7 @@ void readline(char* buffer, uint size)
     while(true)
     {
         message_t msg;
-        sk_messaging_receive(&msg);
+        sk_thread_wait_message(&msg);
 
         if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
         {
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
         int process = sk_process_exec(buffer, NULL);
         if (process)
         {
-            sk_thread_waitproc(process);
+            sk_thread_wait_process(process);
         }
         else
         {

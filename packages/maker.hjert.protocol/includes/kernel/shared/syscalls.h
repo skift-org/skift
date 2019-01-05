@@ -28,8 +28,9 @@ typedef enum
     SYS_THREAD_SLEEP,
     SYS_THREAD_WAKEUP,
 
-    SYS_THREAD_WAIT,
-    SYS_THREAD_WAITPROC,
+    SYS_THREAD_WAIT_THREAD,
+    SYS_THREAD_WAIT_PROCESS,
+    SYS_THREAD_WAIT_MESSAGE,
 
     // Messaging
     SYS_MSG_SEND,
@@ -41,13 +42,8 @@ typedef enum
     SYS_MSG_UNSUBSCRIBE,
 
     /* --- I/O ------------------------------------------------------------------ */
-
     SYS_IO_PRINT,
     SYS_IO_READ,
-
-    //XXX: stop using mouse_syscalls
-    SYS_IO_MOUSE_GET_STATE,
-    SYS_IO_MOUSE_SET_STATE,
 
     SYS_IO_GRAPHIC_BLIT,
     SYS_IO_GRAPHIC_BLIT_REGION,

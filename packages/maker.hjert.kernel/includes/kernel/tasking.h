@@ -10,7 +10,6 @@
 #include "kernel/paging.h"
 #include "kernel/protocol.h"
 
-#define CHANNAME_SIZE 128
 #define PROCNAME_SIZE 128
 #define STACK_SIZE 0x4000
 
@@ -85,11 +84,10 @@ typedef struct
 
     thread_state_t state;
 
-    union
-    {
-    wait_info_t waitinfo;
-    sleep_info_t sleepinfo;
-    wait_message_t messageinfo;
+    union {
+        wait_info_t waitinfo;
+        sleep_info_t sleepinfo;
+        wait_message_t messageinfo;
     };
 
     void *exit_value;
@@ -100,6 +98,9 @@ void tasking_setup();
 /* --- Thread managment ----------------------------------------------------- */
 
 THREAD thread_self(); // Return a handle to the current thread.
+thread_t *thread_running();
+thread_t *thread_get(THREAD thread);
+void thread_hold();
 
 // Create a new thread of a selected process.
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
@@ -110,8 +111,9 @@ void thread_exit(void *retval); // Exit the current thread and return a value.
 void thread_sleep(int time);  // Send the current thread to bed.
 void thread_wakeup(THREAD t); // Wake up the slected thread
 
-void *thread_wait(THREAD t);    // Wait for the selected thread to exit and return the exit value
-int thread_waitproc(PROCESS p); // Wait for the slected process to exit and return the exit code.
+int thread_wait_thread(THREAD t);        // Wait for the selected thread to exit and return the exit value
+int thread_wait_process(PROCESS p);      // Wait for the slected process to exit and return the exit code.
+int thread_wait_message(message_t* msg); // Wait for a incoming message.
 
 void thread_yield(); // Yield to the next thread.
 
@@ -121,12 +123,14 @@ void thread_dump(THREAD t);
 /* --- Process managment ---------------------------------------------------- */
 
 PROCESS process_self(); // Return a handler to the current process.
+process_t *process_running();
+process_t *process_get(PROCESS process);
 
 // Create a new process.
 PROCESS process_create(const char *name, int flags);
 
-void process_cancel(PROCESS p); // Cancle the selected process.
-void process_exit(int code);    // Exit the current process and send and exit code.
+void process_cancel(PROCESS p); // Cancel the selected process.
+void process_exit(int code);    // Exit the current process and send a exit code.
 
 int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
 int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
@@ -136,36 +140,3 @@ void process_free(uint addr, uint count); // Free perviously allocated memory.
 
 // Load a ELF executable, create a adress space and run it.
 PROCESS process_exec(const char *filename, const char **argv);
-
-/* --- Shared Memory -------------------------------------------------------- */
-
-typedef struct 
-{
-    void * memory;
-    uint refcount;
-    uint size;
-} shared_memory_t;
-
-shared_memory_t * shared_memory(uint size);
-void shared_memory_delete(shared_memory_t * memory);
-
-void* shared_memory_create(uint size);
-void* shared_memory_aquire(void* mem);
-void  shared_memory_realease(void* mem);
-
-/* --- Messaging ------------------------------------------------------------ */
-
-typedef struct
-{
-    char name[CHANNAME_SIZE];
-    list_t *subscribers;
-} channel_t;
-
-int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags);
-int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags);
-
-int messaging_receive(message_t *msg);
-int messaging_payload(void *buffer, uint size);
-
-int messaging_subscribe(const char *channel);
-int messaging_unsubscribe(const char *channel);

@@ -41,6 +41,7 @@
 #include "kernel/paging.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
+#include "kernel/messaging.h"
 #include "kernel/version.h"
 
 multiboot_info_t mbootinfo;
@@ -87,6 +88,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System context --------------------------------------------------- */
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
+    setup(messaging);
     setup(filesystem);
     setup(modules, &mbootinfo);
 
@@ -95,6 +97,8 @@ void main(multiboot_info_t *info, s32 magic)
     setup(mouse);
     setup(keyboard);
     setup(console);
+
+    sk_log(LOG_DEBUG, "Starting the userspace...");
 
     /* --- Finalizing System ------------------------------------------------ */
     sk_atomic_enable();
@@ -109,7 +113,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     if (init)
     {
-        thread_waitproc(init);
+        thread_wait_process(init);
         PANIC("Init has return!");
     }
     else

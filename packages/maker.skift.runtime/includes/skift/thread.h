@@ -9,5 +9,6 @@ DECL_SYSCALL1(sk_thread_exit, void *exitval);
 DECL_SYSCALL1(sk_thread_cancel, int thread);
 DECL_SYSCALL1(sk_thread_sleep, int time);
 DECL_SYSCALL1(sk_thread_wakeup, int thread);
-DECL_SYSCALL1(sk_thread_wait, int thread);
-DECL_SYSCALL1(sk_thread_waitproc, int process);
+DECL_SYSCALL1(sk_thread_wait_thread, int thread);
+DECL_SYSCALL1(sk_thread_wait_process, int process);
+DECL_SYSCALL1(sk_thread_wait_message, message_t* m);

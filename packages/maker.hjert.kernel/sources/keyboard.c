@@ -9,7 +9,7 @@
 
 #include "kernel/cpu/irq.h"
 #include "kernel/keyboard.h"
-#include "kernel/tasking.h"
+#include "kernel/messaging.h"
 
 /*
  * TODO:

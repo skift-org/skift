@@ -187,7 +187,7 @@ int main(int argc, char const *argv[])
     while (context.running)
     {
         message_t msg;
-        sk_messaging_receive(&msg);
+        sk_thread_wait_message(&msg);
 
         //sk_log(LOG_DEBUG, "hideo msg: %s", msg.label);
 

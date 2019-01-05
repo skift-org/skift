@@ -4,7 +4,6 @@
 #include <skift/logger.h>
 
 #include "kernel/tasking.h"
-
 #include "kernel/messaging.h"
 
 static int MID = 1;
@@ -156,21 +155,21 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
     return id;
 }
 
-message_t *messaging_receive_internal()
+message_t *messaging_receive_internal(thread_t *thread)
 {
     sk_atomic_begin();
 
-    if (thread_running()->process->inbox->count > 0)
+    if (thread->process->inbox->count > 0)
     {
-        if (thread_running()->messageinfo.message != NULL)
+        if (thread->messageinfo.message != NULL)
         {
-            message_delete(thread_running()->messageinfo.message);
+            message_delete(thread->messageinfo.message);
         }
 
         message_t *msg;
 
-        list_pop(thread_running()->process->inbox, (void **)&msg);
-        thread_running()->messageinfo.message = msg;
+        list_pop(thread->process->inbox, (void **)&msg);
+        thread->messageinfo.message = msg;
 
         sk_atomic_end();
         return msg;
@@ -182,7 +181,7 @@ message_t *messaging_receive_internal()
 
 int messaging_receive(message_t *msg)
 {
-    message_t *incoming = messaging_receive_internal();
+    message_t *incoming = messaging_receive_internal(thread_running());
 
     if (incoming != NULL)
     {

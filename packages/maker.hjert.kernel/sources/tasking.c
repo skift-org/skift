@@ -776,7 +776,7 @@ thread_t *get_next_task()
         }
         case THREAD_WAIT_MESSAGE:
         {
-            message_t* incoming = messaging_receive_internal();
+            message_t* incoming = messaging_receive_internal(thread);
 
             if (incoming != NULL)
             {

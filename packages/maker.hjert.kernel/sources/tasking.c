@@ -213,7 +213,7 @@ void tasking_setup()
     processes = list();
     shared_memories = list();
 
-    kernel_process = process_create("maker.skift.kernel", 0);
+    kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     kernel_idle = thread_create(kernel_process, idle, NULL, 0);
 
@@ -365,7 +365,7 @@ int thread_wait_message(message_t* msg)
     ATOMIC({
         thread_running()->state = THREAD_WAIT_MESSAGE;
     });
-
+    
     thread_hold(); // Wait for the sheduler to give us a message.
 
     incoming = thread_running()->messageinfo.message;
@@ -389,7 +389,7 @@ int thread_cancel(THREAD t)
     {
         thread->state = THREAD_CANCELING;
         thread->exit_value = NULL;
-        sk_log(LOG_DEBUG, "Thread n°%d got canceled.", t);
+        sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
     }
 
     sk_atomic_end();
@@ -404,7 +404,7 @@ void thread_exit(void *retval)
     running->state = THREAD_CANCELING;
     running->exit_value = retval;
 
-    sk_log(LOG_DEBUG, "Thread n°%d exited with value 0x%x.", running->id, retval);
+    sk_log(LOG_DEBUG, "Thread(%d) exited with value 0x%x.", running->id, retval);
 
     sk_atomic_end();
 
@@ -416,15 +416,34 @@ void thread_dump_all()
 {
     sk_atomic_begin();
 
+    printf("\n\tCurrent thread:");
+    thread_dump(running->id);
+    
+    printf("\n");
+
     printf("\n\tThreads:");
 
     FOREACH(i, threads)
     {
-        thread_dump(((thread_t *)i->value)->id);
+        if ((thread_t *)i->value != running)
+        {
+            thread_dump(((thread_t *)i->value)->id);
+        }
     }
 
     sk_atomic_end();
 }
+
+static char* THREAD_STATES[] =
+{
+    "RUNNING",
+    "SLEEP",
+    "WAIT_THREAD",
+    "WAIT_PROCESS",
+    "WAIT_MESSAGE",
+    "CANCELING",
+    "CANCELED",
+};
 
 void thread_dump(THREAD t)
 {
@@ -432,8 +451,8 @@ void thread_dump(THREAD t)
 
     thread_t *thread = thread_get(t);
 
-    printf("\n\tThread ID=%d child of process '%s' ID=%d.", t, thread->process->name, thread->process->id);
-    printf("(ESP=0x%x STACK=%x STATE=%x)", thread->esp, thread->stack, thread->state);
+    printf("\n\t- ID=%d PROC=('%s', %d) ", t, thread->process->name, thread->process->id);
+    printf("ESP=0x%x STACK=%x STATE=%s", thread->esp, thread->stack, THREAD_STATES[thread->state]);
 
     sk_atomic_end();
 }
@@ -737,7 +756,6 @@ thread_t *get_next_task()
             // TODO: cleanup the thread.
             // TODO: cleanup the process if no thread is still running.
 
-            cleanup_thread(thread);
             thread = NULL;
             break;
         }
@@ -781,7 +799,6 @@ thread_t *get_next_task()
             if (incoming != NULL)
             {
                 thread->state = THREAD_RUNNING;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting message %d.", thread->id, incoming->id);
             }
             break;
         }
@@ -800,8 +817,11 @@ thread_t *get_next_task()
     return thread;
 }
 
+bool is_context_switch = false;
+
 esp_t shedule(esp_t esp, processor_context_t *context)
 {
+    is_context_switch = true;
     UNUSED(context);
 
     ticks++;
@@ -820,6 +840,8 @@ esp_t shedule(esp_t esp, processor_context_t *context)
     // TODO: set_kernel_stack(...);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();
+
+    is_context_switch = false;
 
     return running->esp;
 }

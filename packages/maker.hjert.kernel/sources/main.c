@@ -109,7 +109,7 @@ void main(multiboot_info_t *info, s32 magic)
     printf("Booting...\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("bin/init", NULL);
+    PROCESS init = process_exec("/bin/init", NULL);
 
     if (init)
     {

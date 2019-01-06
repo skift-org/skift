@@ -13,8 +13,6 @@ void readline(char* buffer, uint size)
     int i = 0;    
     buffer[i] = '\0';
 
-    sk_messaging_subscribe(KEYBOARD_CHANNEL);
-
     while(true)
     {
         message_t msg;
@@ -48,8 +46,6 @@ void readline(char* buffer, uint size)
             }
         }
     }
-
-    sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
 }
 
 int main(int argc, char **argv)
@@ -57,6 +53,7 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
+    sk_messaging_subscribe(KEYBOARD_CHANNEL);
 
     while (!exited)
     {
@@ -64,15 +61,14 @@ int main(int argc, char **argv)
         
         char buffer[128];
         readline(buffer, 128);
+
         int process = sk_process_exec(buffer, NULL);
+        
         if (process)
-        {
             sk_thread_wait_process(process);
-        }
         else
-        {
             printf("Command not found !\n");
-        }
+        
     }
 
     return 0;

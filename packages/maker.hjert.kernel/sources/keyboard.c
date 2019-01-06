@@ -223,8 +223,6 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
         }
 
         messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYTYPED, &keyevent, sizeof(keyevent), 0);
-
-        sk_log(LOG_DEBUG, "down: %d.", scancode);
     }    
     else if (scancode == 224)
     {

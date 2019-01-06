@@ -6,7 +6,7 @@
 #include <skift/__plugs.h>
 #include <skift/logger.h>
 
-log_level_t log_level = LOG_OFF;
+log_level_t log_level = LOG_ALL;
 bool show_file_name = true;
 
 struct
@@ -15,14 +15,14 @@ struct
     const char *name;
 } level_names[] =
 {
-    { LOG_FATAL,  "\033[31;1m[ fatal  ]" },
-    { LOG_SEVERE, "\033[31;1m[ severe ]" },
-    { LOG_ERROR,    "\033[31m[ error ]" },
-    { LOG_WARNING,  "\033[33m[ warn ]" },
-    { LOG_INFO,     "\033[37m[ info ]" },
-    { LOG_CONFIG, "\033[30;1m[ conf ]" },
-    { LOG_DEBUG,  "\033[30;1m[ debug ]" },
-    { LOG_FINE,   "\033[30;1m[ fine ]" }
+    { LOG_FATAL,   "\033[31;1m[ fatal  ]" },
+    { LOG_SEVERE,  "\033[31;1m[ severe ]" },
+    { LOG_ERROR,   "\033[31m[ error ]"    },
+    { LOG_WARNING, "\033[33m[ warn ]"     },
+    { LOG_INFO,    "\033[37m[ info ]"     },
+    { LOG_CONFIG,  "\033[30;1m[ conf ]"   },
+    { LOG_DEBUG,   "\033[30;1m[ debug ]"  },
+    { LOG_FINE,    "\033[30;1m[ fine ]"   }
 };
 
 const char *log_describe(log_level_t level)

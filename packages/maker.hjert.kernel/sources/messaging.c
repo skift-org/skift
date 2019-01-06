@@ -65,7 +65,7 @@ message_t *message(int id, const char *label, void *payload, uint size, uint fla
 
 void message_delete(message_t *msg)
 {
-    free(msg->payload);
+    if (msg->payload) free(msg->payload);
     free(msg);
 }
 
@@ -88,14 +88,6 @@ void messaging_setup(void)
 
 int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    // if (from == to)
-    // {
-    //     sk_log(LOG_WARNING, "PROCESS=%d try to send a message to himself!", from);
-    //     return 0;
-    // }
-
-    sk_log(LOG_DEBUG, "Sending message ID=%d from %d to %d.", id, from, to);
-
     process_t *process = process_get(to);
 
     if (process == NULL)
@@ -105,18 +97,16 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     if (process->inbox->count > 1024)
     {
-        sk_log(LOG_WARNING, "PROCESS=%d inbox is full!", to);
+        sk_log(LOG_WARNING, "PROC=%d inbox is full!", to);
         return 0;
     }
 
     message_t *msg = message(id, name, payload, size, flags);
 
-    msg->from = process_self();
+    msg->from = from;
     msg->to = to;
 
     list_pushback(process->inbox, (void *)msg);
-
-    sk_log(LOG_DEBUG, "Message ID=%d from %d to %d sended!", id, from, to);
 
     return id;
 }
@@ -208,17 +198,17 @@ int messaging_payload(void *buffer, uint size)
 int messaging_subscribe(const char *channel_name)
 {
     sk_atomic_begin();
+    
+    channel_t *c = channel_get(channel_name);
+
+    if (c == NULL)
     {
-        channel_t *c = channel_get(channel_name);
-
-        if (c == NULL)
-        {
-            c = channel(channel_name);
-            list_pushback(channels, c);
-        }
-
-        list_pushback(c->subscribers, thread_running()->process);
+        c = channel(channel_name);
+        list_pushback(channels, c);
     }
+
+    list_pushback(c->subscribers, thread_running()->process);
+    
     sk_atomic_end();
 
     return 0;
@@ -227,14 +217,14 @@ int messaging_subscribe(const char *channel_name)
 int messaging_unsubscribe(const char *channel_name)
 {
     sk_atomic_begin();
-    {
-        channel_t *c = channel_get(channel_name);
+    
+    channel_t *c = channel_get(channel_name);
 
-        if (c != NULL)
-        {
-            list_remove(c->subscribers, thread_running()->process);
-        }
+    if (c != NULL)
+    {
+        list_remove(c->subscribers, thread_running()->process);
     }
+    
     sk_atomic_end();
 
     return 0;

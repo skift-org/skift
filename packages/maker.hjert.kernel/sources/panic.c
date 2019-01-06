@@ -27,6 +27,7 @@ const char *const witty_comments[] =
         "Suspicious pointer corrupted the machine."};
 
 extern uint ticks;
+extern bool is_context_switch;
 
 void __panic(const string file, const string function, const int line, processor_context_t *context, string message, ...)
 {
@@ -46,12 +47,26 @@ void __panic(const string file, const string function, const int line, processor
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.\n", ticks);
+    printf("\n\tThe system was running for %d tick.", ticks);
+    
+    if (is_context_switch)
+    {
+        printf("\n\tWe are context switching\n", ticks);
+    }
+    else
+    {
+        printf("\n");
+    }
 
     if (context != NULL)
     {
+        printf("\n\tContext:\n");
         processor_dump_context(context);
     }
+
+    thread_dump_all();
+
+    printf("\n");
 
     puts("\n\tSystem halted!\n");
 

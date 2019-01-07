@@ -24,3 +24,11 @@ int __plug_memalloc_unlock();
 
 void* __plug_memalloc_alloc(uint size);
 int __plug_memalloc_free(void* memory, uint size);
+
+// File io (TODO)
+int __plug_file_open(const char* path, int flags);
+int __plug_file_close();
+int __plug_file_read();
+int __plug_file_write();
+int __plug_file_tell();
+int __plug_file_seek();

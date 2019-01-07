@@ -193,7 +193,7 @@ void timer_set_frequency(int hz)
     sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-// define in cpu/boot.s
+// define in boot.s
 extern u32 __stack_bottom;
 
 void idle()
@@ -360,15 +360,13 @@ int thread_wait_process(PROCESS p)
 
 int thread_wait_message(message_t* msg)
 {
-    message_t *incoming;
-
     ATOMIC({
         thread_running()->state = THREAD_WAIT_MESSAGE;
     });
     
     thread_hold(); // Wait for the sheduler to give us a message.
 
-    incoming = thread_running()->messageinfo.message;
+    message_t *incoming = thread_running()->messageinfo.message;
 
     if (incoming != NULL)
     {

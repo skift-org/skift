@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <skift/drawing.h>
+#include <skift/vgafont.h>
 
 #define BMP_SIZE_MEM(bmp) (bmp->width * bmp->height * sizeof(uint))
 #define BMP_SIZE(bmp) (uint)(bmp->width * bmp->height)
@@ -152,8 +153,6 @@ void drawing_filltri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int 
 }
 
 int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
-
-extern unsigned char vgafont16[256 * 16];
 
 void drawing_char(bitmap_t *bmp, char c, int x, int y, uint color)
 {

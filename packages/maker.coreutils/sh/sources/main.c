@@ -53,14 +53,14 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    sk_messaging_subscribe(KEYBOARD_CHANNEL);
-
     while (!exited)
     {
         printf("\n\033[0;31m $ \033[0m");
         
         char buffer[128];
+        sk_messaging_subscribe(KEYBOARD_CHANNEL);
         readline(buffer, 128);
+        sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
 
         int process = sk_process_exec(buffer, NULL);
         

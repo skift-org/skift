@@ -35,13 +35,14 @@
 #include "kernel/graphic.h"
 #include "kernel/keyboard.h"
 #include "kernel/memory.h"
+#include "kernel/messaging.h"
 #include "kernel/modules.h"
 #include "kernel/mouse.h"
 #include "kernel/multiboot.h"
 #include "kernel/paging.h"
+#include "kernel/shared_memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/messaging.h"
 #include "kernel/version.h"
 
 multiboot_info_t mbootinfo;
@@ -54,7 +55,7 @@ uint get_kernel_end(multiboot_info_t *minfo)
 
 void main(multiboot_info_t *info, s32 magic)
 {
-    __plug_init();
+    __plug_init(); // init maker.skift.framework glue code.
 
     /* --- Say hello -------------------------------------------------------- */
     printf(KERNEL_UNAME);
@@ -68,7 +69,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
-        PANIC("Wrong boot loader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
+        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
     }
 
     if ((info->mem_lower + info->mem_upper) < 255 * 1024)
@@ -89,6 +90,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(messaging);
+    setup(shared_memory);
     setup(filesystem);
     setup(modules, &mbootinfo);
 

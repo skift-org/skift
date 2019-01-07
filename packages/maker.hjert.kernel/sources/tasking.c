@@ -43,7 +43,6 @@ int TID = 1;
 uint ticks = 0;
 list_t *threads;
 list_t *processes;
-list_t *shared_memories;
 
 thread_t *alloc_thread(thread_entry_t entry, int flags)
 {
@@ -211,7 +210,6 @@ void tasking_setup()
     waiting = list();
     threads = list();
     processes = list();
-    shared_memories = list();
 
     kernel_process = process_create("kernel", 0);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
@@ -623,116 +621,6 @@ uint process_alloc(uint count)
 void process_free(uint addr, uint count)
 {
     return memory_free(running->process->pdir, addr, count, 1);
-}
-
-/* --- Shared Memory -------------------------------------------------------- */
-
-shared_memory_t *shared_memory(uint size)
-{
-    shared_memory_t *shm = MALLOC(shared_memory_t);
-
-    shm->memory = (void *)memory_alloc(memory_kpdir(), size, 0);
-    shm->size = size;
-    shm->refcount = 0;
-
-    sk_log(LOG_DEBUG, "Shared memory region created @%x.", shm->memory);
-
-    list_pushback(shared_memories, shm);
-
-    return shm;
-}
-
-void shared_memory_delete(shared_memory_t *shm)
-{
-    list_remove(shared_memories, shm);
-    memory_free(memory_kpdir(), (uint)shm->memory, shm->size, 0);
-
-    free(shm);
-
-    sk_log(LOG_DEBUG, "Shared memory region deleted @%x.", shm->memory);
-}
-
-shared_memory_t *shared_memory_get(void *mem)
-{
-    FOREACH(i, shared_memories)
-    {
-        shared_memory_t *shm = (shared_memory_t *)i->value;
-
-        if (shm->memory == mem)
-        {
-            return shm;
-        }
-    }
-
-    return NULL;
-}
-
-void *shared_memory_create(uint size)
-{
-    sk_atomic_begin();
-
-    shared_memory_t *shm = shared_memory(size);
-
-    sk_log(LOG_DEBUG, "Shared memory region created @%x by process '%s'@%d.", shm->memory, running->process->name, running->id);
-
-    if (shm != NULL)
-    {
-        shared_memory_aquire(shm->memory);
-    }
-
-    sk_atomic_end();
-
-    return shm != NULL ? shm->memory : NULL;
-}
-
-void *shared_memory_aquire(void *mem)
-{
-    sk_atomic_begin();
-
-    shared_memory_t *shm = shared_memory_get(mem);
-
-    if (shm != NULL)
-    {
-        sk_log(LOG_DEBUG, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, running->process->name, running->id);
-        list_pushback(running->process->shared, shm);
-        shm->refcount++;
-
-        sk_atomic_end();
-
-        return mem;
-    }
-    else
-    {
-        sk_log(LOG_WARNING, "Process '%s'@%d tried to aquire a shared memory region @%x.", running->process->name, running->id, mem);
-        sk_atomic_end();
-
-        return NULL;
-    }
-}
-
-void shared_memory_realease(void *mem)
-{
-    sk_atomic_begin();
-
-    shared_memory_t *shm = shared_memory_get(mem);
-
-    if (shm != NULL && list_containe(running->process->shared, shm))
-    {
-        sk_log(LOG_DEBUG, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, running->process->name, running->id);
-        list_remove(running->process->shared, shm);
-        shm->refcount--;
-
-        if (shm->refcount == 0)
-        {
-            shared_memory_delete(shm);
-        }
-    }
-    else
-    {
-        sk_log(LOG_WARNING, "Process '%s'@%d tried to realease a shared memory region @%x.", running->process->name, running->id, mem);
-    }
-
-    sk_atomic_end();
 }
 
 /* --- Sheduler ------------------------------------------------------------- */

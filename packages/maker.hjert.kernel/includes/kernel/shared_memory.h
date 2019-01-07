@@ -9,6 +9,8 @@ typedef struct
     uint size;
 } shared_memory_t;
 
+void shared_memory_setup(void);
+
 shared_memory_t * shared_memory(uint size);
 void shared_memory_delete(shared_memory_t * memory);
 

@@ -810,9 +810,10 @@ thread_t *get_next_task()
         {
             // The thread is not a running thread, pushing it back...
             list_pushback(waiting, thread);
+            thread = NULL;
         }
 
-    } while (thread == NULL || thread->state != THREAD_RUNNING);
+    } while (thread == NULL);
 
     return thread;
 }

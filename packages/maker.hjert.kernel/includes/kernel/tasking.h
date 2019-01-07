@@ -84,11 +84,9 @@ typedef struct
 
     thread_state_t state;
 
-    union {
-        wait_info_t waitinfo;
-        sleep_info_t sleepinfo;
-        wait_message_t messageinfo;
-    };
+    wait_info_t waitinfo;
+    sleep_info_t sleepinfo;
+    wait_message_t messageinfo;
 
     void *exit_value;
 } thread_t;

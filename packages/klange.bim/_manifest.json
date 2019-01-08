@@ -1,0 +1,8 @@
+{
+    "name": "Terminal text editor",
+    "id": "klange.bim",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

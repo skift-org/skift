@@ -5,6 +5,10 @@
 /*
  * TODO:
  *  - Support for \t, \b
+ *  - Support for cursor movements: https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
+ *  - Support for true color
+ *      ESC[ 38;2;<r>;<g>;<b>m Select RGB foreground color
+ *      ESC[ 48;2;<r>;<g>;<b>m Select RGB background color
  */
 
 #include <ctype.h>

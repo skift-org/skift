@@ -1,0 +1,439 @@
+packages/klange.bim/sources/bim.c:205:2: error: 'STDIN_FILENO' undeclared here (not in a function)
+  STDIN_FILENO, /* tty_in */
+  ^~~~~~~~~~~~
+packages/klange.bim/sources/bim.c: In function 'bim_getch_timeout':
+packages/klange.bim/sources/bim.c:243:16: error: array type has incomplete element type 'struct pollfd'
+  struct pollfd fds[1];
+                ^~~
+packages/klange.bim/sources/bim.c:245:18: error: 'POLLIN' undeclared (first use in this function)
+  fds[0].events = POLLIN;
+                  ^~~~~~
+packages/klange.bim/sources/bim.c:245:18: note: each undeclared identifier is reported only once for each function it appears in
+packages/klange.bim/sources/bim.c:246:12: error: implicit declaration of function 'poll' [-Werror=implicit-function-declaration]
+  int ret = poll(fds,1,timeout);
+            ^~~~
+packages/klange.bim/sources/bim.c:249:3: error: implicit declaration of function 'read' [-Werror=implicit-function-declaration]
+   read(global_config.tty_in, buf, 1);
+   ^~~~
+packages/klange.bim/sources/bim.c:243:16: error: unused variable 'fds' [-Werror=unused-variable]
+  struct pollfd fds[1];
+                ^~~
+packages/klange.bim/sources/bim.c: In function 'syn_c_iskeywordchar':
+packages/klange.bim/sources/bim.c:632:6: error: implicit declaration of function 'isalnum' [-Werror=implicit-function-declaration]
+  if (isalnum(c)) return 1;
+      ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'syn_c_extended':
+packages/klange.bim/sources/bim.c:686:35: error: implicit declaration of function 'isxdigit' [-Werror=implicit-function-declaration]
+    for (; i + j < line->actual && isxdigit(line->text[i+j].codepoint); ++j);
+                                   ^~~~~~~~
+packages/klange.bim/sources/bim.c: In function 'get_initial_termios':
+packages/klange.bim/sources/bim.c:2025:2: error: implicit declaration of function 'tcgetattr' [-Werror=implicit-function-declaration]
+  tcgetattr(STDOUT_FILENO, &old);
+  ^~~~~~~~~
+packages/klange.bim/sources/bim.c:2025:12: error: 'STDOUT_FILENO' undeclared (first use in this function)
+  tcgetattr(STDOUT_FILENO, &old);
+            ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c: In function 'set_unbuffered':
+packages/klange.bim/sources/bim.c:2029:9: error: variable 'new' has initializer but incomplete type
+  struct termios new = old;
+         ^~~~~~~
+packages/klange.bim/sources/bim.c:2029:17: error: storage size of 'new' isn't known
+  struct termios new = old;
+                 ^~~
+packages/klange.bim/sources/bim.c:2030:19: error: 'ICRNL' undeclared (first use in this function)
+  new.c_iflag &= (~ICRNL);
+                   ^~~~~
+packages/klange.bim/sources/bim.c:2031:19: error: 'ICANON' undeclared (first use in this function)
+  new.c_lflag &= (~ICANON) & (~ECHO);
+                   ^~~~~~
+packages/klange.bim/sources/bim.c:2031:31: error: 'ECHO' undeclared (first use in this function)
+  new.c_lflag &= (~ICANON) & (~ECHO);
+                               ^~~~
+packages/klange.bim/sources/bim.c:2032:11: error: 'VINTR' undeclared (first use in this function)
+  new.c_cc[VINTR] = 0;
+           ^~~~~
+packages/klange.bim/sources/bim.c:2033:2: error: implicit declaration of function 'tcsetattr' [-Werror=implicit-function-declaration]
+  tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new);
+  ^~~~~~~~~
+packages/klange.bim/sources/bim.c:2033:12: error: 'STDOUT_FILENO' undeclared (first use in this function)
+  tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new);
+            ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:2033:27: error: 'TCSAFLUSH' undeclared (first use in this function)
+  tcsetattr(STDOUT_FILENO, TCSAFLUSH, &new);
+                           ^~~~~~~~~
+packages/klange.bim/sources/bim.c:2029:17: error: unused variable 'new' [-Werror=unused-variable]
+  struct termios new = old;
+                 ^~~
+packages/klange.bim/sources/bim.c: In function 'set_buffered':
+packages/klange.bim/sources/bim.c:2037:12: error: 'STDOUT_FILENO' undeclared (first use in this function)
+  tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old);
+            ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:2037:27: error: 'TCSAFLUSH' undeclared (first use in this function)
+  tcsetattr(STDOUT_FILENO, TCSAFLUSH, &old);
+                           ^~~~~~~~~
+packages/klange.bim/sources/bim.c: At top level:
+packages/klange.bim/sources/bim.c:2081:21: error: unknown type name 'wchar_t'
+ int codepoint_width(wchar_t codepoint) {
+                     ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'place_cursor':
+packages/klange.bim/sources/bim.c:2119:2: error: implicit declaration of function 'fflush' [-Werror=implicit-function-declaration]
+  fflush(stdout);
+  ^~~~~~
+packages/klange.bim/sources/bim.c: In function 'set_colors':
+packages/klange.bim/sources/bim.c:2134:13: error: implicit declaration of function 'atoi' [-Werror=implicit-function-declaration]
+   int _bg = atoi(bg+1);
+             ^~~~
+packages/klange.bim/sources/bim.c: In function 'update_title':
+packages/klange.bim/sources/bim.c:2817:2: error: implicit declaration of function 'getcwd' [-Werror=implicit-function-declaration]
+  getcwd(cwd, 1024);
+  ^~~~~~
+packages/klange.bim/sources/bim.c: In function 'update_screen_size':
+packages/klange.bim/sources/bim.c:3026:17: error: storage size of 'w' isn't known
+  struct winsize w;
+                 ^
+packages/klange.bim/sources/bim.c:3027:2: error: implicit declaration of function 'ioctl' [-Werror=implicit-function-declaration]
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  ^~~~~
+packages/klange.bim/sources/bim.c:3027:8: error: 'STDOUT_FILENO' undeclared (first use in this function)
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:3027:23: error: 'TIOCGWINSZ' undeclared (first use in this function)
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+                       ^~~~~~~~~~
+packages/klange.bim/sources/bim.c:3026:17: error: unused variable 'w' [-Werror=unused-variable]
+  struct winsize w;
+                 ^
+packages/klange.bim/sources/bim.c: In function 'SIGWINCH_handler':
+packages/klange.bim/sources/bim.c:3040:2: error: implicit declaration of function 'signal' [-Werror=implicit-function-declaration]
+  signal(SIGWINCH, SIGWINCH_handler);
+  ^~~~~~
+packages/klange.bim/sources/bim.c:3040:9: error: 'SIGWINCH' undeclared (first use in this function)
+  signal(SIGWINCH, SIGWINCH_handler);
+         ^~~~~~~~
+packages/klange.bim/sources/bim.c: In function 'SIGTSTP_handler':
+packages/klange.bim/sources/bim.c:3056:9: error: 'SIGTSTP' undeclared (first use in this function)
+  signal(SIGTSTP, SIG_DFL);
+         ^~~~~~~
+packages/klange.bim/sources/bim.c:3056:18: error: 'SIG_DFL' undeclared (first use in this function)
+  signal(SIGTSTP, SIG_DFL);
+                  ^~~~~~~
+packages/klange.bim/sources/bim.c:3057:2: error: implicit declaration of function 'raise' [-Werror=implicit-function-declaration]
+  raise(SIGTSTP);
+  ^~~~~
+packages/klange.bim/sources/bim.c: In function 'SIGCONT_handler':
+packages/klange.bim/sources/bim.c:3066:9: error: 'SIGCONT' undeclared (first use in this function)
+  signal(SIGCONT, SIGCONT_handler);
+         ^~~~~~~
+packages/klange.bim/sources/bim.c:3067:9: error: 'SIGTSTP' undeclared (first use in this function)
+  signal(SIGTSTP, SIGTSTP_handler);
+         ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'add_buffer':
+packages/klange.bim/sources/bim.c:3150:24: error: implicit declaration of function 'codepoint_width' [-Werror=implicit-function-declaration]
+     _c.display_width = codepoint_width((wchar_t)c);
+                        ^~~~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:3150:41: error: 'wchar_t' undeclared (first use in this function)
+     _c.display_width = codepoint_width((wchar_t)c);
+                                         ^~~~~~~
+packages/klange.bim/sources/bim.c:3150:49: error: expected ')' before 'c'
+     _c.display_width = codepoint_width((wchar_t)c);
+                                                 ^
+packages/klange.bim/sources/bim.c: In function 'open_file':
+packages/klange.bim/sources/bim.c:3211:26: error: 'STDERR_FILENO' undeclared (first use in this function)
+   global_config.tty_in = STDERR_FILENO;
+                          ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:3221:15: error: storage size of 'statbuf' isn't known
+   struct stat statbuf;
+               ^~~~~~~
+packages/klange.bim/sources/bim.c:3222:8: error: implicit declaration of function 'stat' [-Werror=implicit-function-declaration]
+   if (!stat(file, &statbuf) && S_ISDIR(statbuf.st_mode)) {
+        ^~~~
+packages/klange.bim/sources/bim.c:3222:32: error: implicit declaration of function 'S_ISDIR' [-Werror=implicit-function-declaration]
+   if (!stat(file, &statbuf) && S_ISDIR(statbuf.st_mode)) {
+                                ^~~~~~~
+packages/klange.bim/sources/bim.c:3223:4: error: unknown type name 'DIR'
+    DIR * dirp = opendir(file);
+    ^~~
+packages/klange.bim/sources/bim.c:3223:17: error: implicit declaration of function 'opendir' [-Werror=implicit-function-declaration]
+    DIR * dirp = opendir(file);
+                 ^~~~~~~
+packages/klange.bim/sources/bim.c:3223:17: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+packages/klange.bim/sources/bim.c:3228:26: error: implicit declaration of function 'readdir' [-Werror=implicit-function-declaration]
+    struct dirent * ent = readdir(dirp);
+                          ^~~~~~~
+packages/klange.bim/sources/bim.c:3228:26: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+packages/klange.bim/sources/bim.c:3230:35: error: dereferencing pointer to incomplete type 'struct dirent'
+     add_buffer((unsigned char*)ent->d_name, strlen(ent->d_name));
+                                   ^~
+packages/klange.bim/sources/bim.c:3232:9: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+     ent = readdir(dirp);
+         ^
+packages/klange.bim/sources/bim.c:3234:4: error: implicit declaration of function 'closedir' [-Werror=implicit-function-declaration]
+    closedir(dirp);
+    ^~~~~~~~
+packages/klange.bim/sources/bim.c:3235:21: error: implicit declaration of function 'strdup' [-Werror=implicit-function-declaration]
+    env->file_name = strdup(file);
+                     ^~~~~~
+packages/klange.bim/sources/bim.c:3235:19: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    env->file_name = strdup(file);
+                   ^
+packages/klange.bim/sources/bim.c:3241:18: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+   env->file_name = strdup(file);
+                  ^
+packages/klange.bim/sources/bim.c:3221:15: error: unused variable 'statbuf' [-Werror=unused-variable]
+   struct stat statbuf;
+               ^~~~~~~
+packages/klange.bim/sources/bim.c:3256:10: error: implicit declaration of function 'feof' [-Werror=implicit-function-declaration]
+  while (!feof(f) && !ferror(f)) {
+          ^~~~
+packages/klange.bim/sources/bim.c:3256:22: error: implicit declaration of function 'ferror' [-Werror=implicit-function-declaration]
+  while (!feof(f) && !ferror(f)) {
+                      ^~~~~~
+packages/klange.bim/sources/bim.c: In function 'write_file':
+packages/klange.bim/sources/bim.c:3414:3: error: implicit declaration of function 'fputc' [-Werror=implicit-function-declaration]
+   fputc('\n', f);
+   ^~~~~
+packages/klange.bim/sources/bim.c: In function 'process_command':
+packages/klange.bim/sources/bim.c:3729:3: error: implicit declaration of function 'system' [-Werror=implicit-function-declaration]
+   system(&cmd[1]);
+   ^~~~~~
+packages/klange.bim/sources/bim.c:3747:12: error: implicit declaration of function 'strtok_r' [-Werror=implicit-function-declaration]
+  for ((p = strtok_r(cmd, " ", &last)); p;
+            ^~~~~~~~
+packages/klange.bim/sources/bim.c:3747:10: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+  for ((p = strtok_r(cmd, " ", &last)); p;
+          ^
+packages/klange.bim/sources/bim.c:3748:7: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    (p = strtok_r(NULL, " ", &last)), argc++) {
+       ^
+packages/klange.bim/sources/bim.c: In function 'command_tab_complete':
+packages/klange.bim/sources/bim.c:3986:15: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+  char * buf = strdup(buffer);
+               ^~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4034:3: note: in expansion of macro 'add_candidate'
+   add_candidate("help");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4035:3: note: in expansion of macro 'add_candidate'
+   add_candidate("recalc");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4036:3: note: in expansion of macro 'add_candidate'
+   add_candidate("syntax");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4037:3: note: in expansion of macro 'add_candidate'
+   add_candidate("tabn");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4038:3: note: in expansion of macro 'add_candidate'
+   add_candidate("tabp");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4039:3: note: in expansion of macro 'add_candidate'
+   add_candidate("tabnew");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4040:3: note: in expansion of macro 'add_candidate'
+   add_candidate("theme");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4041:3: note: in expansion of macro 'add_candidate'
+   add_candidate("tabs");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4042:3: note: in expansion of macro 'add_candidate'
+   add_candidate("tabstop");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4043:3: note: in expansion of macro 'add_candidate'
+   add_candidate("spaces");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4044:3: note: in expansion of macro 'add_candidate'
+   add_candidate("noh");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4045:3: note: in expansion of macro 'add_candidate'
+   add_candidate("clearyank");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4046:3: note: in expansion of macro 'add_candidate'
+   add_candidate("indent");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4047:3: note: in expansion of macro 'add_candidate'
+   add_candidate("noindent");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4048:3: note: in expansion of macro 'add_candidate'
+   add_candidate("padding");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4049:3: note: in expansion of macro 'add_candidate'
+   add_candidate("hlparen");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4050:3: note: in expansion of macro 'add_candidate'
+   add_candidate("cursorcolumn");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4051:3: note: in expansion of macro 'add_candidate'
+   add_candidate("smartcase");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4057:3: note: in expansion of macro 'add_candidate'
+   add_candidate("none");
+   ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4059:4: note: in expansion of macro 'add_candidate'
+    add_candidate(s->name);
+    ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4067:4: note: in expansion of macro 'add_candidate'
+    add_candidate(s->name);
+    ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4076:16: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+   char * tmp = strdup(args[arg]);
+                ^~~~~~
+packages/klange.bim/sources/bim.c:4078:3: error: unknown type name 'DIR'
+   DIR * dirp;
+   ^~~
+packages/klange.bim/sources/bim.c:4083:10: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+     dirp = opendir("/");
+          ^
+packages/klange.bim/sources/bim.c:4085:10: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+     dirp = opendir(tmp);
+          ^
+packages/klange.bim/sources/bim.c:4089:9: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    dirp = opendir(".");
+         ^
+packages/klange.bim/sources/bim.c:4099:25: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+   struct dirent * ent = readdir(dirp);
+                         ^~~~~~~
+packages/klange.bim/sources/bim.c:4101:11: error: dereferencing pointer to incomplete type 'struct dirent'
+    if (ent->d_name[0] != '.' || (last_slash ? (last_slash[1] == '.') : (tmp[0] == '.'))) {
+           ^~
+packages/klange.bim/sources/bim.c:4102:17: error: storage size of 'statbuf' isn't known
+     struct stat statbuf;
+                 ^~~~~~~
+packages/klange.bim/sources/bim.c:4027:32: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    candidates[candidate_count] = strdup(candidate); \
+                                ^
+packages/klange.bim/sources/bim.c:4129:5: note: in expansion of macro 'add_candidate'
+     add_candidate(s);
+     ^~~~~~~~~~~~~
+packages/klange.bim/sources/bim.c:4102:17: error: unused variable 'statbuf' [-Werror=unused-variable]
+     struct stat statbuf;
+                 ^~~~~~~
+packages/klange.bim/sources/bim.c:4131:8: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+    ent = readdir(dirp);
+        ^
+packages/klange.bim/sources/bim.c: In function 'search_matches':
+packages/klange.bim/sources/bim.c:4266:10: error: implicit declaration of function 'tolower' [-Werror=implicit-function-declaration]
+   return tolower(a) == tolower(b);
+          ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'word_left':
+packages/klange.bim/sources/bim.c:5008:11: error: implicit declaration of function 'isspace' [-Werror=implicit-function-declaration]
+  } while (isspace(env->lines[line_no-1]->text[col_no-1].codepoint));
+           ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'load_bimrc':
+packages/klange.bim/sources/bim.c:6290:15: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+  char * tmp = strdup(global_config.bimrc_path);
+               ^~~~~~
+packages/klange.bim/sources/bim.c:6300:17: error: implicit declaration of function 'getenv' [-Werror=implicit-function-declaration]
+   char * home = getenv("HOME");
+                 ^~~~~~
+packages/klange.bim/sources/bim.c:6300:17: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+packages/klange.bim/sources/bim.c:6310:7: error: assignment makes pointer from integer without a cast [-Werror=int-conversion]
+   tmp = strdup(path);
+       ^
+packages/klange.bim/sources/bim.c:6325:14: error: implicit declaration of function 'fgets' [-Werror=implicit-function-declaration]
+   char * l = fgets(line, 1023, bimrc);
+              ^~~~~
+packages/klange.bim/sources/bim.c:6325:14: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+packages/klange.bim/sources/bim.c: In function 'detect_weird_terminals':
+packages/klange.bim/sources/bim.c:6381:16: error: initialization makes pointer from integer without a cast [-Werror=int-conversion]
+  char * term = getenv("TERM");
+                ^~~~~~
+packages/klange.bim/sources/bim.c: In function 'initialize':
+packages/klange.bim/sources/bim.c:6418:2: error: implicit declaration of function 'setlocale' [-Werror=implicit-function-declaration]
+  setlocale(LC_ALL, "");
+  ^~~~~~~~~
+packages/klange.bim/sources/bim.c:6418:12: error: 'LC_ALL' undeclared (first use in this function)
+  setlocale(LC_ALL, "");
+            ^~~~~~
+packages/klange.bim/sources/bim.c: In function 'init_terminal':
+packages/klange.bim/sources/bim.c:6438:9: error: 'SIGWINCH' undeclared (first use in this function)
+  signal(SIGWINCH, SIGWINCH_handler);
+         ^~~~~~~~
+packages/klange.bim/sources/bim.c:6439:9: error: 'SIGCONT' undeclared (first use in this function)
+  signal(SIGCONT,  SIGCONT_handler);
+         ^~~~~~~
+packages/klange.bim/sources/bim.c:6440:9: error: 'SIGTSTP' undeclared (first use in this function)
+  signal(SIGTSTP,  SIGTSTP_handler);
+         ^~~~~~~
+packages/klange.bim/sources/bim.c: In function 'main':
+packages/klange.bim/sources/bim.c:6445:16: error: implicit declaration of function 'getopt' [-Werror=implicit-function-declaration]
+  while ((opt = getopt(argc, argv, "?c:C:u:RO:-:")) != -1) {
+                ^~~~~~
+packages/klange.bim/sources/bim.c:6455:15: error: 'optarg' undeclared (first use in this function)
+     open_file(optarg);
+               ^~~~~~
+packages/klange.bim/sources/bim.c:6462:6: error: implicit declaration of function 'fprintf' [-Werror=implicit-function-declaration]
+      fprintf(stdout, "\n");
+      ^~~~~~~
+packages/klange.bim/sources/bim.c:6512:13: error: 'optind' undeclared (first use in this function)
+  if (argc > optind) {
+             ^~~~~~
+packages/klange.bim/sources/bim.c: At top level:
+packages/klange.bim/sources/bim.c:2023:16: error: storage size of 'old' isn't known
+ struct termios old;
+                ^~~
+packages/klange.bim/sources/bim.c: In function 'bim_getch_timeout':
+packages/klange.bim/sources/bim.c:254:1: error: control reaches end of non-void function [-Werror=return-type]
+ }
+ ^
+cc1: all warnings being treated as errors

@@ -5,7 +5,7 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    printf("\033[J\033[H");
+    printf("\033[H\033[J");
 
     return 0;
 }

@@ -23,7 +23,8 @@ typedef enum
     FSNODE_FILE,
     FSNODE_DEVICE,
     FSNODE_LINK,
-    FSNODE_DIRECTORY
+    FSNODE_DIRECTORY,
+    //TODO: FSNODE_FIFO,
 } fsnode_type_t;
 
 static const char* fsnode_type_str[] = 
@@ -31,8 +32,15 @@ static const char* fsnode_type_str[] =
     "FILE",
     "DEVICE",
     "LINK",
-    "DIRECTORY"
+    "DIRECTORY",
+    "FIFO"
 };
+
+typedef enum
+{
+    FSRESULT_EOF,
+    FSRESULT_NOTSUPPORTED,
+} fsresult_t;
 
 typedef struct 
 {

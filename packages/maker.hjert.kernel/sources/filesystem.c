@@ -11,7 +11,6 @@
 #include "kernel/filesystem.h"
 
 directory_t *root = NULL;
-directory_t *alloc_directorie(const char *name);
 
 void filesystem_setup()
 {
@@ -19,34 +18,37 @@ void filesystem_setup()
     root = alloc_directorie("ROOT");
 }
 
-directory_t *filesystem_get_directory(directory_t *relative, const char *path)
+fsnode_t *filesystem_resolve(fsnode_t *relative, const char *path)
 {
-    char buffer[128];
+    fsnode_t *current = relative == NULL ? relative : root;
 
-    directory_t *current = relative ? relative : root;
-
-    for (int i = 0; path_read(path, i, buffer); i++)
+    if (relative->type == FSDIRECTORY)
     {
-        if (strcmp(buffer, "..") == 0)
+        char buffer[FSNAME_SIZE];
+
+        for (int i = 0; path_read(path, i, buffer); i++)
         {
-            current = current->parent;
-        }
-        else if (strcmp(buffer, ".") == 0)
-        {
-            current = current;
-        }
-        else
-        {
-            FOREACH(i, current->directories)
+            if (current->type == FSNODE_DIRECTORY)
             {
-                directory_t *d = (directory_t *)i->value;
-                if (strcmp(buffer, d->name) == 0)
-                    current = d;
+                FOREACH(i, current->directory.childs)
+                {
+                    fsnode_t *d = (fsnode_t *)i->value;
+                    if (strcmp(buffer, d->name) == 0)
+                        current = d;
+                }
+            }
+            else
+            {
+                return NULL;
             }
         }
-    }
 
-    return current;
+        return current;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 file_t *filesystem_get_file(directory_t *relative, const char *path)
@@ -239,20 +241,6 @@ int file_existe(directory_t *relative, const char *path)
     {
         return 0;
     }
-}
-
-/* --- Move/Copy ------------------------------------------------------------ */
-
-int file_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination)
-{
-    STUB(relative_s, source, relative_d, destination);
-    return 1;
-}
-
-int file_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination)
-{
-    STUB(relative_s, source, relative_d, destination);
-    return 1;
 }
 
 /* --- Open/Close/Read/Write ------------------------------------------------ */

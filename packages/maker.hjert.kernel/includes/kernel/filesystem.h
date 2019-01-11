@@ -8,95 +8,72 @@
 #include <skift/list.h>
 #include <skift/path.h>
 
-#define FS_PATH_SEPARATOR '/'
+#include "kernel/shared/filesystem.h"
 
-struct file;
-struct directory;
+struct fsnode;
 
 typedef struct
 {
     int size;
-    int read;
-    int write;
+
+    bool read;
+    bool write;
 } fstat_t;
 
-typedef int (*file_open_t)(struct file *file);
-typedef void (*file_close_t)(struct file *file);
-typedef int (*file_read_t)(struct file *file, uint offset, void *buffer, uint n);
-typedef int (*file_write_t)(struct file *file, uint offset, void *buffer, uint n);
+typedef int (*fsop_open_t)(struct fsnode *n);
+typedef void (*fsop_close_t)(struct fsnode *n);
+typedef int (*fsop_read_t)(struct fsnode *n, uint offset, void *buffer, uint n);
+typedef int (*fsop_write_t)(struct fsnode *n, uint offset, void *buffer, uint n);
 
-typedef void (*file_stat_t)(struct file *file, fstat_t *stat);
+typedef enum 
+{
+    FSFILE,
+    FSDEVICE,
+    FSDIRECTORY,
+} fsnode_type_t;
 
 typedef struct
 {
-    file_open_t  file_open;
-    file_close_t file_close;
-    file_read_t  file_read;
-    file_write_t file_write;
-    file_stat_t  file_stat;
-} filesystem_t;
-
-typedef struct
-{
-    char name[PATH_SIZE];
-    bool is_directory;
-} direntry_t;
+    fsop_open_t  open;
+    fsop_close_t close;
+    fsop_read_t  read;
+    fsop_write_t write;
+} device_t;
 
 typedef struct directory
 {
-    char name[PATH_FILE_NAME_SIZE];
-
-    list_t *files;
-    list_t *directories;
-
-    struct directory *parent;
+    list_t *childs;
 } directory_t;
 
 typedef struct file
 {
-    uint device;
-    uint inode;
-    filesystem_t* fs;
-
-    char name[PATH_FILE_NAME_SIZE];
-    struct directory *parent;
+    bool opened;
+    byte *buffer;
+    int size;
 } file_t;
 
-void filesystem_setup();
-void filesystem_dump(directory_t *relative, const char *path);
+typedef struct fsnode
+{
+    char name[FSNAME_SIZE];
+    fsnode_type_t type;
 
-file_t *filesystem_get_file(directory_t *relative, const char *path);
-directory_t *filesystem_get_directory(directory_t *relative, const char *path);
+    union
+    {
+        file_t file;
+        directory_t directory;
+    };
+
+    int refcount;
+} fsnode_t;
+
+void filesystem_setup(void);
+fsnode_t *filesystem_resolve(fsnode_t *relative, const char *path);
 
 /* --- Files Operation ------------------------------------------------------ */
+fsnode_t *filesystem_open(fsnode_t *relative, const char *path);
+void filesystem_close(fsnode_t *node);
 
-int file_create(directory_t *relative, const char *path, filesystem_t * fs, int device, int inode);
-int file_create_device(directory_t *relative, const char *path, int flags);
-int file_delete(directory_t *relative, const char *path);
-int file_existe(directory_t *relative, const char *path);
+int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
+int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n);
 
-int file_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
-int file_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
-void file_stat(file_t *file, fstat_t *stat);
-
-file_t *file_open(directory_t *relative, const char *path);
-void file_close(file_t *file);
-
-void* file_read_all(file_t* file);
-int file_read(file_t *file, uint offset, void *buffer, uint n);
-int file_write(file_t *file, uint offset, void *buffer, uint n);
-
-/* --- Directories Operation ------------------------------------------------ */
-
-int directory_create(directory_t *relative, const char *path, int flags);
-int directory_delete(directory_t *relative, const char *path, bool recursive);
-int directory_existe(directory_t *relative, const char *path);
-
-int directory_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
-int directory_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination);
-
-directory_t *directory_open(directory_t *relative, const char *path);
-void directory_close(directory_t *directory);
-
-int directory_get_files(directory_t *directory, char *name, int index);
-int directory_get_directories(directory_t *directory, char *name, int index);
+int filesystem_mkdir(fsnode_t *relative, const char *path);

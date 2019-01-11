@@ -35,9 +35,13 @@ static const char* fsnode_type_str[] =
 typedef enum
 {
     FSRESULT_EOF = -128,
-    FSRESULT_SUCEED,
+    
     FSRESULT_NOTFOUND,
     FSRESULT_NOTSUPPORTED,
+    FSRESULT_READNOTPERMITTED,
+    FSRESULT_WRITENOTPERMITTED,
+
+    FSRESULT_SUCCEED,
 } fsresult_t;
 
 typedef struct 

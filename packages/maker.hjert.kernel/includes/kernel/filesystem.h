@@ -6,6 +6,7 @@
 
 #include <skift/generic.h>
 #include <skift/list.h>
+#include <skift/lock.h>
 #include <skift/path.h>
 
 #include "kernel/shared/filesystem.h"
@@ -34,6 +35,9 @@ typedef struct
 {
     bool opened;
 
+    bool read;
+    bool write;
+
     byte *buffer;
     int size;
     int realsize;
@@ -43,11 +47,13 @@ typedef struct fsnode
 {
     char name[FSNAME_SIZE];
     fsnode_type_t type;
+    lock_t lock;
 
     union
     {
         file_t file;
         directory_t directory;
+        device_t device;
     };
 
     int refcount;
@@ -56,10 +62,10 @@ typedef struct fsnode
 void filesystem_setup(void);
 
 /* --- Files Operation ------------------------------------------------------ */
-fsnode_t *filesystem_open(fsnode_t *relative, const char *path, fsopenopt_t option);
+fsnode_t *filesystem_open(const char *path, fsopenopt_t option);
 void filesystem_close(fsnode_t *node);
 
 int  filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
 int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n);
 
-int filesystem_mkdir(fsnode_t *relative, const char *path);
+int filesystem_mkdir(const char *path);

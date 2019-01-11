@@ -12,25 +12,10 @@
 
 struct fsnode;
 
-typedef struct
-{
-    int size;
-
-    bool read;
-    bool write;
-} fstat_t;
-
-typedef int (*fsop_open_t)(struct fsnode *n);
-typedef void (*fsop_close_t)(struct fsnode *n);
-typedef int (*fsop_read_t)(struct fsnode *n, uint offset, void *buffer, uint n);
-typedef int (*fsop_write_t)(struct fsnode *n, uint offset, void *buffer, uint n);
-
-typedef enum 
-{
-    FSFILE,
-    FSDEVICE,
-    FSDIRECTORY,
-} fsnode_type_t;
+typedef int   (*fsop_open_t)(struct fsnode *node);
+typedef void (*fsop_close_t)(struct fsnode *node);
+typedef int   (*fsop_read_t)(struct fsnode *node, uint offset, void *buffer, uint n);
+typedef int  (*fsop_write_t)(struct fsnode *node, uint offset, void *buffer, uint n);
 
 typedef struct
 {
@@ -40,16 +25,18 @@ typedef struct
     fsop_write_t write;
 } device_t;
 
-typedef struct directory
+typedef struct
 {
     list_t *childs;
 } directory_t;
 
-typedef struct file
+typedef struct
 {
     bool opened;
+
     byte *buffer;
     int size;
+    int realsize;
 } file_t;
 
 typedef struct fsnode
@@ -67,13 +54,12 @@ typedef struct fsnode
 } fsnode_t;
 
 void filesystem_setup(void);
-fsnode_t *filesystem_resolve(fsnode_t *relative, const char *path);
 
 /* --- Files Operation ------------------------------------------------------ */
-fsnode_t *filesystem_open(fsnode_t *relative, const char *path);
+fsnode_t *filesystem_open(fsnode_t *relative, const char *path, fsopenopt_t option);
 void filesystem_close(fsnode_t *node);
 
-int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
+int  filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
 int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n);
 
 int filesystem_mkdir(fsnode_t *relative, const char *path);

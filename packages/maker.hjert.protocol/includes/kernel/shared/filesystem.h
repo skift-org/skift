@@ -14,31 +14,29 @@ typedef enum
 {
     OPENOPT_READ = 1 << 0,
     OPENOPT_WRITE = 1 << 1,
+
     OPENOPT_CREATE = 1 << 2,
-    OPENOPT_APPEND = 1 << 3,
-} open_option_t;
+} fsopenopt_t;
 
 typedef enum
 {
-    FSNODE_FILE,
-    FSNODE_DEVICE,
-    FSNODE_LINK,
-    FSNODE_DIRECTORY,
-    //TODO: FSNODE_FIFO,
+    FSFILE,
+    FSDEVICE,
+    FSDIRECTORY,
 } fsnode_type_t;
 
 static const char* fsnode_type_str[] = 
 {
     "FILE",
     "DEVICE",
-    "LINK",
     "DIRECTORY",
-    "FIFO"
 };
 
 typedef enum
 {
-    FSRESULT_EOF,
+    FSRESULT_EOF = -128,
+    FSRESULT_SUCEED,
+    FSRESULT_NOTFOUND,
     FSRESULT_NOTSUPPORTED,
 } fsresult_t;
 

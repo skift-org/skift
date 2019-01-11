@@ -6,307 +6,173 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include <skift/logger.h>
+#include <skift/atomic.h>
 
 #include "kernel/filesystem.h"
 
-directory_t *root = NULL;
+static directory_t *root = NULL;
+
+/* --- Constructor/Destructor ----------------------------------------------- */
+
+fsnode_t *fsnode(const char *name, fsnode_type_t type)
+{
+    fsnode_t *node = MALLOC(fsnode_t);
+
+    node->type = type;
+    strncpy(node->name, name, FSNAME_SIZE);
+    node->refcount = 0;
+
+    switch (type)
+    {
+    case FSFILE:
+        file_t *file = &node->file;
+
+        file->opened = false;
+
+        file->buffer = malloc(512);
+        file->realsize = 512;
+        file->size = 0;
+        break;
+
+    case FSDIRECTORY:
+        directory_t *dir = &node->directory;
+
+        dir->childs = list();
+        break;
+
+    default:
+        break;
+    }
+
+    return node;
+}
+
+void fsnode_delete(fsnode_t *node)
+{
+    switch (node->type)
+    {
+    case FSFILE:
+        free(node->file.buffer);
+        break;
+
+    case FSDIRECTORY:
+        FOREACH(item, node->directory.childs)
+        {
+            // TODO: use refcount.
+            fsnode_t* n = item->value;
+            fsnode_delete(n);
+        }
+
+        list_delete(node->directory.childs); 
+        break;
+
+    default:
+        break;
+    }
+
+    free(node);
+}
+
+/* --- Private functions ---------------------------------------------------- */
+
+fsnode_t *filesystem_resolve(const char *path)
+{
+    fsnode_t *current = root;
+
+    char buffer[FSNAME_SIZE];
+
+    for (int i = 0; path_read(path, i, buffer); i++)
+    {
+        if (current->type == FSDIRECTORY)
+        {
+            FOREACH(i, current->directory.childs)
+            {
+                fsnode_t *d = (fsnode_t *)i->value;
+
+                if (strcmp(buffer, d->name) == 0)
+                {
+                    current = d;
+                }
+            }
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    return current;
+}
+
+/* --- Public functions ----------------------------------------------------- */
 
 void filesystem_setup()
 {
-    sk_log(LOG_INFO, "Allocating root directorie...");
-    root = alloc_directorie("ROOT");
+    root = fsnode("ROOT", FSDIRECTORY);
 }
 
-fsnode_t *filesystem_resolve(fsnode_t *relative, const char *path)
+fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
 {
-    fsnode_t *current = relative == NULL ? relative : root;
+    sk_atomic_begin();
 
-    if (relative->type == FSDIRECTORY)
+    fsnode_t *node = filesystem_resolve(path);
+
+    if (node == NULL && option & OPENOPT_CREATE)
     {
-        char buffer[FSNAME_SIZE];
 
-        for (int i = 0; path_read(path, i, buffer); i++)
+    }
+
+    sk_atomic_end();
+
+    return node;
+}
+
+void filesystem_close(fsnode_t *node)
+{
+    sk_atomic_begin();
+
+    if (node->type == FSFILE)
+    {
+        node->file.opened = false;
+    }
+    
+    sk_atomic_end();
+}
+
+int  filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
+{
+
+}
+
+int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
+{
+
+}
+
+int filesystem_mkdir(const char *path)
+{
+    int result = 0;
+
+    char *child = malloc(FSNAME_SIZE);
+    char *parent = malloc(strlen(path));
+
+    if (path_split(path, parent, child))
+    {
+        fsnode_t* p = filesystem_resolve(parent);
+
+        if (p->type == FSDIRECTORY)
         {
-            if (current->type == FSNODE_DIRECTORY)
-            {
-                FOREACH(i, current->directory.childs)
-                {
-                    fsnode_t *d = (fsnode_t *)i->value;
-                    if (strcmp(buffer, d->name) == 0)
-                        current = d;
-                }
-            }
-            else
-            {
-                return NULL;
-            }
-        }
+            fsnode_t* c = fsnode(child, FSDIRECTORY);
+            list_pushback(p->directory.childs, c);
 
-        return current;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-file_t *filesystem_get_file(directory_t *relative, const char *path)
-{
-    char *dir_name = malloc(strlen(path));
-    char file_name[128];
-    file_t *file = NULL;
-
-    if (path_split(path, dir_name, file_name))
-    {
-        directory_t *dir = filesystem_get_directory(relative, dir_name);
-
-        FOREACH(i, dir->files)
-        {
-            file_t *f = (file_t *)i->value;
-            if (strcmp(file_name, f->name) == 0)
-                file = f;
+            result = 1;
         }
     }
 
-    free(dir_name);
-    return file;
-}
+    free(child);
+    free(parent);
 
-/* === Directories ========================================================== */
-
-directory_t *alloc_directorie(const char *name)
-{
-    directory_t *dir = MALLOC(directory_t);
-
-    dir->name[0] = '\0';
-    strncpy((char *)&dir->name, name, PATH_FILE_NAME_SIZE);
-    dir->directories = list();
-    dir->files = list();
-
-    return dir;
-}
-
-/* --- Create/Delete/Existe ------------------------------------------------- */
-
-int directory_create(directory_t *relative, const char *path, int flags)
-{
-    UNUSED(flags);
-
-    char *dir_path = malloc(strlen(path));
-    char dir_name[128];
-    directory_t *dir = NULL;
-
-    if (path_split(path, dir_path, dir_name))
-    {
-        directory_t *parent = filesystem_get_directory(relative, dir_path);
-        dir = alloc_directorie(dir_name);
-        dir->parent = parent;
-        list_pushback(parent->directories, dir);
-    }
-
-    free(dir_path);
-    return dir == NULL ? 0 : 1;
-}
-
-int directory_delete(directory_t *relative, const char *path, bool recursive)
-{
-    STUB(relative, path, recursive);
-    return 1;
-}
-
-int directory_existe(directory_t *relative, const char *path)
-{
-    if (filesystem_get_directory(relative, path) != NULL)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-/* --- Move/Copy ------------------------------------------------------------ */
-
-int directory_copy(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination)
-{
-    STUB(relative_s, source, relative_d, destination);
-    return 1;
-}
-
-int directory_move(directory_t *relative_s, const char *source, directory_t *relative_d, const char *destination)
-{
-    STUB(relative_s, source, relative_d, destination);
-    return 1;
-}
-
-/* --- Open/Close/Read/Write ------------------------------------------------ */
-
-directory_t *directory_open(directory_t *relative, const char *path)
-{
-    return filesystem_get_directory(relative, path);
-}
-
-void directory_close(directory_t *directory)
-{
-    UNUSED(directory);
-}
-
-int directory_get_files(directory_t *directory, char *name, int index)
-{
-    name[0] = '\0';
-
-    FOREACH(i, directory->files)
-    {
-        if (index == 0)
-        {
-            strcpy(name, ((file_t *)i->value)->name);
-            return 1;
-        }
-
-        index--;
-    }
-
-    return 0;
-}
-
-int directory_get_directories(directory_t *directory, char *name, int index)
-{
-    name[0] = '\0';
-
-    FOREACH(i, directory->directories)
-    {
-        if (index == 0)
-        {
-            strcpy(name, ((directory_t *)i->value)->name);
-            return 1;
-        }
-
-        index--;
-    }
-
-    return 0;
-}
-
-/* === FILES ================================================================ */
-
-file_t *alloc_file(const char *name)
-{
-    file_t *file = MALLOC(file_t);
-
-    strncpy((char *)&file->name, name, PATH_FILE_NAME_SIZE);
-
-    return file;
-}
-
-/* --- Create/Delete/Existe ------------------------------------------------- */
-
-int file_create(directory_t *relative, const char *path, filesystem_t *fs, int device, int inode)
-{
-    char *dir_path = malloc(strlen(path));
-    char file_name[128];
-    file_t *file = NULL;
-
-    if (path_split(path, dir_path, file_name))
-    {
-        directory_t *parent = filesystem_get_directory(relative, path);
-        file = alloc_file(file_name);
-        file->parent = parent;
-
-        list_pushback(parent->files, file);
-
-        file->fs = fs;
-        file->device = device;
-        file->inode = inode;
-    }
-
-    free(dir_path);
-    return file == NULL ? 0 : 1;
-}
-
-int file_delete(directory_t *relative, const char *path)
-{
-    STUB(relative, path);
-    return 1;
-}
-
-int file_existe(directory_t *relative, const char *path)
-{
-    if (filesystem_get_file(relative, path) != NULL)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-/* --- Open/Close/Read/Write ------------------------------------------------ */
-
-file_t *file_open(directory_t *relative, const char *path)
-{
-    file_t *file = filesystem_get_file(relative, path);
-
-    if (file != NULL && (file->fs->file_open == NULL || file->fs->file_open(file)))
-    {
-        return file;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-void file_close(file_t *file)
-{
-    if (file != NULL && file->fs->file_close != NULL)
-    {
-        file->fs->file_close(file);
-    }
-}
-
-void file_stat(file_t *file, fstat_t *stat)
-{
-    if (file != NULL && file->fs->file_stat != NULL)
-    {
-        file->fs->file_stat(file, stat);
-    }
-}
-
-int file_read(file_t *file, uint offset, void *buffer, uint n)
-{
-    if (file != NULL && file->fs->file_read != NULL)
-    {
-        return file->fs->file_read(file, offset, buffer, n);
-    }
-
-    return 0;
-}
-
-void *file_read_all(file_t *file)
-{
-    void *data = NULL;
-
-    if (file != NULL)
-    {
-        fstat_t stat;
-        file_stat(file, &stat);
-
-        data = malloc(stat.size);
-        file_read(file, 0, data, stat.size);
-    }
-
-    return data;
-}
-
-int file_write(file_t *file, uint offset, void *buffer, uint n)
-{
-    if (file != NULL && file->fs->file_write != NULL)
-    {
-        return file->fs->file_write(file, offset, buffer, n);
-    }
-
-    return 0;
+    return result;
 }

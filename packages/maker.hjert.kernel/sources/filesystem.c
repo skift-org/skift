@@ -64,7 +64,6 @@ void fsnode_delete(fsnode_t *node)
     case FSDIRECTORY:
         FOREACH(item, node->directory.childs)
         {
-            // TODO: use refcount.
             fsnode_t *n = item->value;
 
             n->refcount--;
@@ -89,11 +88,27 @@ void fsnode_delete(fsnode_t *node)
 
 void file_flush(fsnode_t *node)
 {
+    sk_log(LOG_DEBUG, "Flushing file %s.", node->name);
     free(node->file.buffer);
 
     node->file.buffer = malloc(512);
     node->file.realsize = 512;
     node->file.size = 0;
+}
+
+fsnode_t *directory_getchild(fsnode_t *dir, const char *child)
+{
+    FOREACH(i, dir->directory.childs)
+    {
+        fsnode_t *d = (fsnode_t *)i->value;
+
+        if (strcmp(child, d->name) == 0)
+        {
+            return d;
+        }
+    }
+
+    return NULL;
 }
 
 fsnode_t *filesystem_resolve(const char *path)
@@ -106,14 +121,11 @@ fsnode_t *filesystem_resolve(const char *path)
     {
         if (current->type == FSDIRECTORY)
         {
-            FOREACH(i, current->directory.childs)
-            {
-                fsnode_t *d = (fsnode_t *)i->value;
+            current = directory_getchild(current, buffer);
 
-                if (strcmp(buffer, d->name) == 0)
-                {
-                    current = d;
-                }
+            if (current == NULL)
+            {
+                return NULL;
             }
         }
         else
@@ -133,10 +145,53 @@ void filesystem_setup()
     root = fsnode("ROOT", FSDIRECTORY);
 }
 
-#define RETURN_OPEN_FAIL()       \
-    {                            \
-        sk_lock_release(fslock); \
-        return NULL;             \
+void filesystem_dump_internal(fsnode_t *node, int depth)
+{
+
+    for (int i = 0; i < depth; i++)
+    {
+        printf("  ");
+    }
+
+    if (node->type == FSDIRECTORY)
+    {
+        printf("* '%s' %d childs\n", node->name, node->directory.childs->count);
+
+        FOREACH(i, node->directory.childs)
+        {
+            fsnode_t *d = (fsnode_t *)i->value;
+
+            filesystem_dump_internal(d, depth + 1);
+        }
+    }
+    else if (node->type == FSFILE)
+    {
+        printf("  '%s' size: %d\n", node->name, node->file.size);
+    }
+    else
+    {
+        printf("! '%s'\n", node->name);
+    }
+}
+
+void filesystem_dump(void)
+{
+    sk_lock_acquire(fslock);
+
+    printf("--- FILE SYSTEM DUMP -----------------------------------------------------------\n");
+
+    filesystem_dump_internal(root, 0);
+
+    printf("--------------------------------------------------------------------------------\n");
+
+    sk_lock_release(fslock);
+}
+
+#define RETURN_OPEN_FAIL(why)                         \
+    {                                                 \
+        sk_lock_release(fslock);                      \
+        sk_log(LOG_DEBUG, "File open fail: %s", why); \
+        return NULL;                                  \
     }
 
 #define OPEN_OPTION(__opt) ((option & __opt) && 1)
@@ -149,22 +204,25 @@ fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
 
     if (node == NULL && OPEN_OPTION(OPENOPT_CREATE))
     {
-        char *child = malloc(FSNAME_SIZE);
-        char *parent = malloc(strlen(path));
+        char *parent_path = malloc(strlen(path));
+        char *child_name = malloc(FSNAME_SIZE);
 
-        if (path_split(path, parent, child))
+        if (path_split(path, parent_path, child_name))
         {
-            fsnode_t *p = filesystem_resolve(parent);
+            sk_log(LOG_DEBUG, "Path %s %s", path, parent_path);
 
-            if (p->type == FSDIRECTORY)
+            fsnode_t *parent = filesystem_resolve(parent_path);
+
+            if (parent->type == FSDIRECTORY)
             {
-                node = fsnode(child, FSFILE);
-                list_pushback(p->directory.childs, node);
+                sk_log(LOG_DEBUG, "File create %s", path);
+                node = fsnode(child_name, FSFILE);
+                list_pushback(parent->directory.childs, node);
             }
         }
 
-        free(child);
-        free(parent);
+        free(parent_path);
+        free(child_name);
     }
 
     if (node != NULL)
@@ -186,16 +244,16 @@ fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
             }
             else
             {
-                RETURN_OPEN_FAIL();
+                RETURN_OPEN_FAIL("The file is already appened");
             }
             break;
 
         case FSDIRECTORY:
-            RETURN_OPEN_FAIL();
+            RETURN_OPEN_FAIL("It's a directory");
             break;
 
         default:
-            RETURN_OPEN_FAIL();
+            RETURN_OPEN_FAIL("\\(o_o)/");
             break;
         }
 
@@ -225,13 +283,14 @@ void filesystem_close(fsnode_t *node)
     sk_lock_release(fslock);
 }
 
-#define READ_FAIL(reason)            \
-    {                                \
-        sk_lock_release(node->lock); \
-        return reason;               \
+#define READ_FAIL(reason)                     \
+    {                                         \
+        sk_lock_release(node->lock);          \
+        sk_log(LOG_DEBUG, "File read fail!"); \
+        return reason;                        \
     }
 
-int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
+int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
 {
     if (node != NULL)
     {
@@ -250,8 +309,8 @@ int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
                 if (file->size < offset)
                     READ_FAIL(FSRESULT_EOF);
 
-                memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, n));
-                result = min(file->size - offset, n);
+                memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, size));
+                result = min(file->size - offset, size);
             }
             else
             {
@@ -278,23 +337,24 @@ int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
     }
 }
 
-void* filesystem_readall(fsnode_t *node)
+void *filesystem_readall(fsnode_t *node)
 {
     file_stat_t stat = {0};
     filesystem_stat(node, &stat);
-    void* buffer = malloc(stat.size);
-    filesystem_read(node, 0, buffer, stat.size);
+    void *buffer = malloc(stat.size);
+    filesystem_read(node, 0,stat.size, buffer);
 
     return buffer;
 }
 
-#define WRITE_FAIL(reason)           \
-    {                                \
-        sk_lock_release(node->lock); \
-        return reason;               \
+#define WRITE_FAIL(reason)                     \
+    {                                          \
+        sk_lock_release(node->lock);           \
+        sk_log(LOG_DEBUG, "File write fail!"); \
+        return reason;                         \
     }
 
-int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
+int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
 {
     if (node != NULL)
     {
@@ -310,15 +370,15 @@ int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
 
             if (file->write)
             {
-                if (file->realsize < (offset + n))
+                if (file->realsize < (offset + size))
                 {
-                    node->file.buffer = realloc(node->file.buffer, offset + n);
-                    node->file.realsize = offset + n;
+                    node->file.buffer = realloc(node->file.buffer, offset + size);
+                    node->file.realsize = offset + size;
                 }
 
-                node->file.size = max(offset + n, node->file.size);
-                memcpy((byte *)(file->buffer) + offset, buffer, n);
-                result = n;
+                node->file.size = max(offset + size, node->file.size);
+                memcpy((byte *)(file->buffer) + offset, buffer, size);
+                result = size;
             }
             else
             {
@@ -345,10 +405,11 @@ int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
     }
 }
 
-#define STAT_FAIL(reason)            \
-    {                                \
-        sk_lock_release(node->lock); \
-        return reason;               \
+#define STAT_FAIL(reason)                      \
+    {                                          \
+        sk_lock_release(node->lock);           \
+        sk_log(LOG_DEBUG, "File state fail!"); \
+        return reason;                         \
     }
 
 int filesystem_stat(fsnode_t *node, file_stat_t *stat)
@@ -396,7 +457,7 @@ int filesystem_mkdir(const char *path)
             list_pushback(p->directory.childs, c);
             c->refcount++;
 
-            result = 1;
+            result = FSRESULT_SUCCEED;
         }
     }
 

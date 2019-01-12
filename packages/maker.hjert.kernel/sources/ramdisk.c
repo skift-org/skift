@@ -12,8 +12,11 @@
 
 void *ramdisk;
 
+
 void ramdisk_load(multiboot_module_t *module)
 {
+    // Extract the ramdisk tar archive.
+
     sk_log(LOG_INFO, "Loading ramdisk at 0x%x...", module->mod_start);
 
     ramdisk = (void *)module->mod_start;
@@ -24,16 +27,31 @@ void ramdisk_load(multiboot_module_t *module)
         if (block.name[strlen(block.name) - 1] == '/')
         {
             sk_log(LOG_DEBUG, "Creating %s directory...", block.name);
-            filesystem_mkdir(block.name);
+            if (FSRESULT_SUCCEED != filesystem_mkdir(block.name))
+            {
+                sk_log(LOG_WARNING, "Failed to create directory %s...", block.name);
+            }
         }
         else
         {
             sk_log(LOG_DEBUG, "Loading file %s...", block.name);
             fsnode_t *file = filesystem_open(block.name, OPENOPT_WRITE | OPENOPT_CREATE);
-            filesystem_write(file, 0, block.data, block.size);
-            filesystem_close(file);
+            
+            if (file != NULL)
+            {
+                filesystem_write(file, 0, block.size, block.data);
+                filesystem_close(file);
+
+                filesystem_dump();
+            }
+            else
+            {
+                sk_log(LOG_WARNING, "Failed to open file %s!", block.name);
+            }
         }
     }
 
     sk_log(LOG_FINE, "Loading ramdisk succeeded.");
+
+    filesystem_dump();
 }

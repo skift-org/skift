@@ -60,14 +60,16 @@ typedef struct fsnode
 } fsnode_t;
 
 void filesystem_setup(void);
+void filesystem_dump(void);
 
 /* --- Files Operation ------------------------------------------------------ */
 fsnode_t *filesystem_open(const char *path, fsopenopt_t option);
 void filesystem_close(fsnode_t *node);
 
-int  filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
-void* filesystem_readall(fsnode_t *node);
-int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n);
-int filesystem_stat(fsnode_t *node, file_stat_t *stat);
+int  filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer);
+int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer);
+int  filesystem_stat(fsnode_t *node, file_stat_t *stat);
 
 int filesystem_mkdir(const char *path);
+
+void* filesystem_readall(fsnode_t *node);

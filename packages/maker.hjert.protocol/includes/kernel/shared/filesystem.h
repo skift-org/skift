@@ -25,19 +25,14 @@ typedef enum
     FSDIRECTORY,
 } fsnode_type_t;
 
-static const char* fsnode_type_str[] = 
-{
-    "FILE",
-    "DEVICE",
-    "DIRECTORY",
-};
-
 typedef enum
 {
     FSRESULT_EOF = -128,
     
     FSRESULT_NOTFOUND,
     FSRESULT_NOTSUPPORTED,
+    FSRESULT_NULLNODE,
+
     FSRESULT_READNOTPERMITTED,
     FSRESULT_WRITENOTPERMITTED,
 
@@ -48,10 +43,10 @@ typedef struct
 {
     uint size;
     fsnode_type_t type;
-} file_state_t;
+} file_stat_t;
 
 typedef struct
 {
     char name[FSNAME_SIZE];
-    file_state_t state;
+    file_stat_t state;
 } directory_entry_t;

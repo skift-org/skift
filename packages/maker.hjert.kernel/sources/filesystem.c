@@ -4,6 +4,7 @@
 
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,6 +28,8 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
     switch (type)
     {
     case FSFILE:
+    {
+
         file_t *file = &node->file;
 
         file->opened = false;
@@ -35,13 +38,14 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
         file->realsize = 512;
         file->size = 0;
         break;
-
+    }
     case FSDIRECTORY:
+    {
         directory_t *dir = &node->directory;
 
         dir->childs = list();
         break;
-
+    }
     default:
         break;
     }
@@ -221,10 +225,10 @@ void filesystem_close(fsnode_t *node)
     sk_lock_release(fslock);
 }
 
-#define READ_FAIL(raison)            \
+#define READ_FAIL(reason)            \
     {                                \
         sk_lock_release(node->lock); \
-        return raison;               \
+        return reason;               \
     }
 
 int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
@@ -241,10 +245,18 @@ int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
         {
             file_t *file = &node->file;
 
-            if (file->size < offset)
-                READ_FAIL(FSRESULT_EOF);
+            if (file->read)
+            {
+                if (file->size < offset)
+                    READ_FAIL(FSRESULT_EOF);
 
-            memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, n));
+                memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, n));
+                result = min(file->size - offset, n);
+            }
+            else
+            {
+                READ_FAIL(FSRESULT_READNOTPERMITTED);
+            }
         }
         break;
 
@@ -262,9 +274,25 @@ int filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n)
     }
     else
     {
-        return 0;
+        return FSRESULT_NULLNODE;
     }
 }
+
+void* filesystem_readall(fsnode_t *node)
+{
+    file_stat_t stat = {0};
+    filesystem_stat(node, &stat);
+    void* buffer = malloc(stat.size);
+    filesystem_read(node, 0, buffer, stat.size);
+
+    return buffer;
+}
+
+#define WRITE_FAIL(reason)           \
+    {                                \
+        sk_lock_release(node->lock); \
+        return reason;               \
+    }
 
 int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
 {
@@ -272,11 +300,81 @@ int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n)
     {
         sk_lock_acquire(node->lock);
 
+        int result = 0;
+
+        switch (node->type)
+        {
+        case FSFILE:
+        {
+            file_t *file = &node->file;
+
+            if (file->write)
+            {
+                if (file->realsize < (offset + n))
+                {
+                    node->file.buffer = realloc(node->file.buffer, offset + n);
+                    node->file.realsize = offset + n;
+                }
+
+                node->file.size = max(offset + n, node->file.size);
+                memcpy((byte *)(file->buffer) + offset, buffer, n);
+                result = n;
+            }
+            else
+            {
+                READ_FAIL(FSRESULT_READNOTPERMITTED);
+            }
+        }
+        break;
+
+        case FSDEVICE:
+            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            break;
+
+        default:
+            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            break;
+        }
+
         sk_lock_release(node->lock);
+        return result;
     }
     else
     {
+        return FSRESULT_NULLNODE;
+    }
+}
+
+#define STAT_FAIL(reason)            \
+    {                                \
+        sk_lock_release(node->lock); \
+        return reason;               \
+    }
+
+int filesystem_stat(fsnode_t *node, file_stat_t *stat)
+{
+    if (node != NULL)
+    {
+        sk_lock_acquire(node->lock);
+
+        stat->type = node->type;
+
+        if (node->type == FSFILE)
+        {
+            stat->size = node->file.size;
+        }
+        else
+        {
+            stat->size = 0;
+        }
+
+        sk_lock_release(node->lock);
+
         return 0;
+    }
+    else
+    {
+        return FSRESULT_NULLNODE;
     }
 }
 

@@ -515,7 +515,7 @@ PROCESS process_exec(const char *path, const char **arg)
 {
     UNUSED(arg);
 
-    file_t *fp = file_open(NULL, path);
+    fsnode_t *fp = filesystem_open(path, OPENOPT_READ);
 
     if (!fp)
     {
@@ -525,8 +525,8 @@ PROCESS process_exec(const char *path, const char **arg)
 
     PROCESS p = process_create(path, TASK_USER);
 
-    void *buffer = file_read_all(fp);
-    file_close(fp);
+    void *buffer = filesystem_readall(fp);
+    filesystem_close(fp);
 
     elf_header_t *elf = (elf_header_t *)buffer;
 

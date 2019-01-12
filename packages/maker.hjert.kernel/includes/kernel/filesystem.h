@@ -39,8 +39,8 @@ typedef struct
     bool write;
 
     byte *buffer;
-    int size;
-    int realsize;
+    uint size;
+    uint realsize;
 } file_t;
 
 typedef struct fsnode
@@ -66,6 +66,8 @@ fsnode_t *filesystem_open(const char *path, fsopenopt_t option);
 void filesystem_close(fsnode_t *node);
 
 int  filesystem_read(fsnode_t *node, uint offset, void *buffer, uint n);
+void* filesystem_readall(fsnode_t *node);
 int filesystem_write(fsnode_t *node, uint offset, void *buffer, uint n);
+int filesystem_stat(fsnode_t *node, file_stat_t *stat);
 
 int filesystem_mkdir(const char *path);

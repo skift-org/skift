@@ -1,0 +1,3 @@
+# The skiftOS filesystem.
+
+- etc

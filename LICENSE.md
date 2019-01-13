@@ -1,4 +1,4 @@
-# MIT License
+# skiftOS
 
 Copyright © 2018-2019 MAKER
 

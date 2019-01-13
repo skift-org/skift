@@ -133,20 +133,36 @@ void console_newline(console_t *c)
     }
 }
 
-void console_clear(console_t *c)
-{
-    for (uint y = 0; y < c->h; y++)
-    {
-        for (uint x = 0; x < c->w; x++)
-        {
-            console_cell_t *cell = console_cell(c, x, y);
-            cell->bg = CCOLOR_DEFAULT_BACKGROUND;
-            cell->fg = CCOLOR_DEFAULT_FORGROUND;
-            cell->c = ' ';
+// void console_clear(console_t *c)
+// {
+//     for (uint y = 0; y < c->h; y++)
+//     {
+//         for (uint x = 0; x < c->w; x++)
+//         {
+//             console_cell_t *cell = console_cell(c, x, y);
+//             cell->bg = CCOLOR_DEFAULT_BACKGROUND;
+//             cell->fg = CCOLOR_DEFAULT_FORGROUND;
+//             cell->c = ' ';
+// 
+//             console_draw_cell(cons, x, y);
+//         }
+//     }
+// }
 
-            console_draw_cell(cons, x, y);
-        }
+void console_clear(console_t* c, uint fromx, uint fromy, uint tox, uint toy)
+{
+    
+    for(uint i = fromx + fromy * c->w; i < tox + toy * c->w; i++)
+    {
+        console_cell_t *cell = &c->screen[i];
+
+        cell->bg = CCOLOR_DEFAULT_BACKGROUND;
+        cell->fg = CCOLOR_DEFAULT_FORGROUND;
+        cell->c = ' ';
+
+        console_draw_cell(cons, i % c->w, i / c->w);
     }
+    
 }
 
 void console_setup()
@@ -155,7 +171,7 @@ void console_setup()
     graphic_size(&width, &height);
     cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);
-    console_clear(cons);
+    console_clear(cons, 0, 0, cons->w, cons->h);
 
     filesystem_mkdev("/dev/tty", (device_t){0});
 }
@@ -171,6 +187,20 @@ void console_append(char c)
         for(uint i = 0; i < 8; i++)
         {
             console_append(' ');
+        }
+    }
+    else if (c == '\b')
+    {
+        if (cons->cx != 0)
+        {
+            cons->cx--;
+        }
+        else
+        {
+            if (cons->cy != 0)
+            {
+                cons->cy--;
+            }
         }
     }
     else
@@ -300,7 +330,25 @@ void console_process(char c)
             }
             else if (c == 'J')
             {
-                console_clear(cons);
+                if (cons->attr_sel - 1 == 0)
+                {
+                    console_clear(cons, cons->cx, cons->cy, cons->w, cons->h);
+                }
+                else if (cons->attr_sel - 1 > 1)
+                {
+                    if (cons->attr_stack[0] == 0)
+                    {
+                        console_clear(cons, cons->cx, cons->cy, cons->w, cons->h);
+                    }
+                    else if (cons->attr_stack[0] == 1)
+                    {
+                        console_clear(cons, 0, 0, cons->cx, cons->cy);
+                    }
+                    else if (cons->attr_stack[0] == 2)
+                    {
+                        console_clear(cons, 0, 0, cons->w, cons->h);
+                    }
+                }
             }
 
             cons->state = CSTATE_ESC;

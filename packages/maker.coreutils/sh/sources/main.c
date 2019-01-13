@@ -33,7 +33,7 @@ void readline(char* buffer, uint size)
                 if (strlen(buffer) > 0)
                 {
                     strbs(buffer);
-                    printf("\b");
+                    printf("\b\033[2J");
                 }
             }
             else if (!(event.c == '\0' || event.c == '\t'))

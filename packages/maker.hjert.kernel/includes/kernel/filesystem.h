@@ -24,6 +24,8 @@ typedef struct
     fsop_close_t close;
     fsop_read_t  read;
     fsop_write_t write;
+
+    void* p;
 } device_t;
 
 typedef struct
@@ -68,8 +70,10 @@ void filesystem_close(fsnode_t *node);
 
 int  filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer);
 int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer);
-int  filesystem_stat(fsnode_t *node, file_stat_t *stat);
+int  filesystem_fstat(fsnode_t *node, file_stat_t *stat);
 
 int filesystem_mkdir(const char *path);
+int filesystem_mkdev(const char* path, device_t dev);
+int filesystem_mkfile(const char* path);
 
 void* filesystem_readall(fsnode_t *node);

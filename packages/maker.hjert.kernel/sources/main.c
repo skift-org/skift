@@ -40,6 +40,7 @@
 #include "kernel/mouse.h"
 #include "kernel/multiboot.h"
 #include "kernel/paging.h"
+#include "kernel/serial.h"
 #include "kernel/shared_memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
@@ -95,10 +96,14 @@ void main(multiboot_info_t *info, s32 magic)
     setup(modules, &mbootinfo);
 
     /* --- Devices ---------------------------------------------------------- */
+    filesystem_mkdir("/dev");
+    setup(serial);
     setup(graphic);
     setup(mouse);
     setup(keyboard);
     setup(console);
+
+    // filesystem_dump();
 
     sk_log(LOG_DEBUG, "Starting the userspace...");
 

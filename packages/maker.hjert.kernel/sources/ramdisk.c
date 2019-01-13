@@ -10,16 +10,13 @@
 #include "kernel/filesystem.h"
 #include "kernel/multiboot.h"
 
-void *ramdisk;
-
-
 void ramdisk_load(multiboot_module_t *module)
 {
     // Extract the ramdisk tar archive.
 
     sk_log(LOG_INFO, "Loading ramdisk at 0x%x...", module->mod_start);
 
-    ramdisk = (void *)module->mod_start;
+    void *ramdisk = (void *)module->mod_start;
 
     tar_block_t block;
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
@@ -34,15 +31,13 @@ void ramdisk_load(multiboot_module_t *module)
         }
         else
         {
-            sk_log(LOG_DEBUG, "Loading file %s...", block.name);
+            sk_log(LOG_DEBUG, "Loading file %s [%d/%d]...", block.name);
             fsnode_t *file = filesystem_open(block.name, OPENOPT_WRITE | OPENOPT_CREATE);
             
             if (file != NULL)
             {
                 filesystem_write(file, 0, block.size, block.data);
                 filesystem_close(file);
-
-                filesystem_dump();
             }
             else
             {
@@ -52,6 +47,4 @@ void ramdisk_load(multiboot_module_t *module)
     }
 
     sk_log(LOG_FINE, "Loading ramdisk succeeded.");
-
-    filesystem_dump();
 }

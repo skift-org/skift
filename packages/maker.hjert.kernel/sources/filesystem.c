@@ -29,7 +29,6 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
     {
     case FSFILE:
     {
-
         file_t *file = &node->file;
 
         file->opened = false;
@@ -88,7 +87,6 @@ void fsnode_delete(fsnode_t *node)
 
 void file_flush(fsnode_t *node)
 {
-    sk_log(LOG_DEBUG, "Flushing file %s.", node->name);
     free(node->file.buffer);
 
     node->file.buffer = malloc(512);
@@ -166,7 +164,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
     }
     else if (node->type == FSFILE)
     {
-        printf("  '%s' size: %d\n", node->name, node->file.size);
+        printf("  '%s' size: %dkio\n", node->name, node->file.size / 1024);
     }
     else
     {
@@ -209,14 +207,12 @@ fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
 
         if (path_split(path, parent_path, child_name))
         {
-            sk_log(LOG_DEBUG, "Path %s %s", path, parent_path);
-
             fsnode_t *parent = filesystem_resolve(parent_path);
 
             if (parent->type == FSDIRECTORY)
             {
-                sk_log(LOG_DEBUG, "File create %s", path);
                 node = fsnode(child_name, FSFILE);
+                node->refcount++;
                 list_pushback(parent->directory.childs, node);
             }
         }
@@ -283,11 +279,11 @@ void filesystem_close(fsnode_t *node)
     sk_lock_release(fslock);
 }
 
-#define READ_FAIL(reason)                     \
-    {                                         \
-        sk_lock_release(node->lock);          \
-        sk_log(LOG_DEBUG, "File read fail!"); \
-        return reason;                        \
+#define READ_FAIL(reason, why)                         \
+    {                                                  \
+        sk_lock_release(node->lock);                   \
+        sk_log(LOG_DEBUG, "File read fail!: %s", why); \
+        return reason;                                 \
     }
 
 int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
@@ -307,24 +303,24 @@ int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
             if (file->read)
             {
                 if (file->size < offset)
-                    READ_FAIL(FSRESULT_EOF);
+                    READ_FAIL(FSRESULT_EOF, "End of file!");
 
                 memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, size));
                 result = min(file->size - offset, size);
             }
             else
             {
-                READ_FAIL(FSRESULT_READNOTPERMITTED);
+                READ_FAIL(FSRESULT_READNOTPERMITTED, "This file is not opened for write");
             }
         }
         break;
 
         case FSDEVICE:
-            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            READ_FAIL(FSRESULT_NOTSUPPORTED, "Device file are WIP.");
             break;
 
         default:
-            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            READ_FAIL(FSRESULT_NOTSUPPORTED, "NOT SUPPORTED FSOBJECT");
             break;
         }
 
@@ -340,9 +336,9 @@ int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
 void *filesystem_readall(fsnode_t *node)
 {
     file_stat_t stat = {0};
-    filesystem_stat(node, &stat);
+    filesystem_fstat(node, &stat);
     void *buffer = malloc(stat.size);
-    filesystem_read(node, 0,stat.size, buffer);
+    filesystem_read(node, 0, stat.size, buffer);
 
     return buffer;
 }
@@ -382,17 +378,17 @@ int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
             }
             else
             {
-                READ_FAIL(FSRESULT_READNOTPERMITTED);
+                WRITE_FAIL(FSRESULT_READNOTPERMITTED);
             }
         }
         break;
 
         case FSDEVICE:
-            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            WRITE_FAIL(FSRESULT_NOTSUPPORTED);
             break;
 
         default:
-            READ_FAIL(FSRESULT_NOTSUPPORTED);
+            WRITE_FAIL(FSRESULT_NOTSUPPORTED);
             break;
         }
 
@@ -412,23 +408,23 @@ int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
         return reason;                         \
     }
 
-int filesystem_stat(fsnode_t *node, file_stat_t *stat)
+int filesystem_fstat(fsnode_t *node, file_stat_t *stat)
 {
     if (node != NULL)
     {
         sk_lock_acquire(node->lock);
-
-        stat->type = node->type;
-
-        if (node->type == FSFILE)
         {
-            stat->size = node->file.size;
-        }
-        else
-        {
-            stat->size = 0;
-        }
+            stat->type = node->type;
 
+            if (node->type == FSFILE)
+            {
+                stat->size = node->file.size;
+            }
+            else
+            {
+                stat->size = 0;
+            }
+        }
         sk_lock_release(node->lock);
 
         return 0;
@@ -444,25 +440,92 @@ int filesystem_mkdir(const char *path)
     int result = 0;
 
     sk_lock_acquire(fslock);
-    char *child = malloc(FSNAME_SIZE);
-    char *parent = malloc(strlen(path));
-
-    if (path_split(path, parent, child))
     {
-        fsnode_t *p = filesystem_resolve(parent);
+        char *child = malloc(FSNAME_SIZE);
+        char *parent = malloc(strlen(path));
 
-        if (p->type == FSDIRECTORY)
+        if (path_split(path, parent, child))
         {
-            fsnode_t *c = fsnode(child, FSDIRECTORY);
-            list_pushback(p->directory.childs, c);
-            c->refcount++;
+            fsnode_t *p = filesystem_resolve(parent);
 
-            result = FSRESULT_SUCCEED;
+            if (p->type == FSDIRECTORY)
+            {
+                fsnode_t *c = fsnode(child, FSDIRECTORY);
+                list_pushback(p->directory.childs, c);
+                c->refcount++;
+
+                result = FSRESULT_SUCCEED;
+            }
         }
-    }
 
-    free(child);
-    free(parent);
+        free(child);
+        free(parent);
+    }
+    sk_lock_release(fslock);
+
+    return result;
+}
+
+int filesystem_mkdev(const char* path, device_t dev)
+{
+    int result = 0;
+
+    sk_lock_acquire(fslock);
+    {
+        char *child = malloc(FSNAME_SIZE);
+        char *parent = malloc(strlen(path));
+
+        if (path_split(path, parent, child))
+        {
+            fsnode_t *p = filesystem_resolve(parent);
+
+            if (p->type == FSDIRECTORY)
+            {
+                fsnode_t *c = fsnode(child, FSDEVICE);
+                list_pushback(p->directory.childs, c);
+                
+                c->refcount++;
+                c->device = dev;
+                
+                result = FSRESULT_SUCCEED;
+            }
+        }
+
+        free(child);
+        free(parent);
+    }
+    sk_lock_release(fslock);
+
+    return result;
+}
+
+int filesystem_mkfile(const char* path)
+{
+    int result = 0;
+
+    sk_lock_acquire(fslock);
+    {
+        char *child = malloc(FSNAME_SIZE);
+        char *parent = malloc(strlen(path));
+
+        if (path_split(path, parent, child))
+        {
+            fsnode_t *p = filesystem_resolve(parent);
+
+            if (p->type == FSDIRECTORY)
+            {
+                fsnode_t *c = fsnode(child, FSFILE);
+                list_pushback(p->directory.childs, c);
+                
+                c->refcount++;
+                
+                result = FSRESULT_SUCCEED;
+            }
+        }
+
+        free(child);
+        free(parent);
+    }
     sk_lock_release(fslock);
 
     return result;

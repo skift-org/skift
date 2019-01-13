@@ -5,6 +5,7 @@
 #include <skift/utils.h>
 
 #include "kernel/processor.h"
+#include "kernel/filesystem.h"
 
 #include "kernel/serial.h"
 
@@ -20,6 +21,8 @@ void serial_setup()
     outb(PORT + 3, 0x03);
     outb(PORT + 2, 0xC7);
     outb(PORT + 4, 0x0B);
+
+    filesystem_mkdev("/dev/com", (device_t){0});
 }
 
 void wait_read()

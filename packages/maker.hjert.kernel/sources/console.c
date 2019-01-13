@@ -19,6 +19,7 @@
 #include <skift/drawing.h>
 #include <skift/atomic.h>
 
+#include "kernel/filesystem.h"
 #include "kernel/graphic.h"
 #include "kernel/console.h"
 
@@ -155,6 +156,8 @@ void console_setup()
     cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);
     console_clear(cons);
+
+    filesystem_mkdev("/dev/tty", (device_t){0});
 }
 
 void console_append(char c)

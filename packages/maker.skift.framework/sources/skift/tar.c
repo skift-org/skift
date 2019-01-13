@@ -37,6 +37,26 @@ uint get_file_size(tar_rawblock_t *header)
     return size;
 }
 
+uint tar_count(void *tarfile)
+{
+    tar_rawblock_t *header = (tar_rawblock_t *)tarfile;
+    uint count = 0;
+
+    while (header->name[0] != '\0')
+    {
+        count++;
+
+        u32 size = get_file_size(header);
+
+        header = (tar_rawblock_t *)((char *)header + ((size / 512) + 1) * 512);
+
+        if (size % 512)
+            header = (tar_rawblock_t *)((char *)header + 512);
+    }
+
+    return count;
+}
+
 bool tar_read(void *tarfile, tar_block_t *block, uint index)
 {
     tar_rawblock_t *header = (tar_rawblock_t *)tarfile;

@@ -22,7 +22,7 @@ Here is a list
 
 ## **Application** (packages/)
  - File manager
- - Terminal emulator
+ - Terminal emulator (move console.c out of the kernel)
 
 ## **Ports**
  - nyancat

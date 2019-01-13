@@ -46,7 +46,7 @@ cd toolchain/
 ## Build the tool chain
 ./build-it!.sh
 
-## Then wait for complition
+## Then wait for completion
 ```
 
 ## Building skiftOS
@@ -54,10 +54,10 @@ From the root of this repo do:
 
 ```sh
 # For a simple build
-./SOSBS.py build-all
+./buildtools.py build-all
 
 # For a clean build (release)
-./SOSBS.py rebuild-all
+./buildtools.py rebuild-all
 ```
 
 ## Testing
@@ -66,8 +66,8 @@ From the root of this repo do:
 
 ```sh
 # Run the operation system in qemu
-./SOSBS.py run
+./buildtools.py run
 
 # Run the operating system in qemu with debugging (WIP)
-./SOSBS.py debug
+./buildtools.py debug
 ```

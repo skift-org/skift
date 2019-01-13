@@ -28,6 +28,7 @@
 
 We welcome all contributions, just pick a task in the todo list and open a issue to let us know you work on that.
 
+- [Manual](manual/readme.md)
 - [Building](manual/building.md)
 - [Todo list](manual/todo.md)
 

@@ -7,9 +7,13 @@
 
 #include "kernel/protocol.h"
 
+#define PROMPT "\n\033[0;31m $ \033[0m"
+
 bool exited = false;
 void readline(char* buffer, uint size)
 {
+    sk_messaging_subscribe(KEYBOARD_CHANNEL);
+
     int i = 0;    
     buffer[i] = '\0';
 
@@ -46,6 +50,8 @@ void readline(char* buffer, uint size)
             }
         }
     }
+
+    sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
 }
 
 int main(int argc, char **argv)
@@ -55,19 +61,25 @@ int main(int argc, char **argv)
 
     while (!exited)
     {
-        printf("\n\033[0;31m $ \033[0m");
+        printf(PROMPT);
         
-        char buffer[128];
-        sk_messaging_subscribe(KEYBOARD_CHANNEL);
-        readline(buffer, 128);
-        sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
+        char command[128];
+        
+        readline(command, 128);
 
-        int process = sk_process_exec(buffer, NULL);
+        int process = sk_process_exec(command, NULL);
+
+        if (!process)
+        {
+            char pathbuffer[144];
+            snprintf(pathbuffer, 144, "/bin/%s", command);
+            process = sk_process_exec(pathbuffer, NULL);
+        }
         
         if (process)
             sk_thread_wait_process(process);
         else
-            printf("Command not found !\n");
+            printf("Command '%s' not found !\n", command);
         
     }
 

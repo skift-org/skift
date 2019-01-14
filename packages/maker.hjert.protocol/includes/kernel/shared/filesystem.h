@@ -14,7 +14,6 @@ typedef enum
 {
     OPENOPT_READ = 1 << 0,
     OPENOPT_WRITE = 1 << 1,
-
     OPENOPT_CREATE = 1 << 2,
 } fsopenopt_t;
 
@@ -23,6 +22,7 @@ typedef enum
     FSFILE,
     FSDEVICE,
     FSDIRECTORY,
+    /* TODO FIFO */
 } fsnode_type_t;
 
 typedef enum
@@ -37,6 +37,7 @@ typedef enum
     FSRESULT_WRITENOTPERMITTED,
 
     FSRESULT_SUCCEED,
+    FSRESULT_FAILED,
 } fsresult_t;
 
 typedef struct 

@@ -243,7 +243,17 @@ fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
                 RETURN_OPEN_FAIL("The file is already appened");
             }
             break;
+        case FSDEVICE:
+        {
+            device_t* dev = &node->device;
 
+            if (dev->open != NULL && !dev->open(node))
+            {
+                RETURN_OPEN_FAIL("Device doesn't open.");
+            }
+        }
+        break;
+    
         case FSDIRECTORY:
             RETURN_OPEN_FAIL("It's a directory");
             break;
@@ -297,26 +307,37 @@ int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
         switch (node->type)
         {
         case FSFILE:
-        {
-            file_t *file = &node->file;
-
-            if (file->read)
             {
-                if (file->size < offset)
-                    READ_FAIL(FSRESULT_EOF, "End of file!");
+                file_t *file = &node->file;
 
-                memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, size));
-                result = min(file->size - offset, size);
+                if (file->read)
+                {
+                    if (file->size < offset)
+                        READ_FAIL(FSRESULT_EOF, "End of file!");
+
+                    memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, size));
+                    result = min(file->size - offset, size);
+                }
+                else
+                {
+                    READ_FAIL(FSRESULT_READNOTPERMITTED, "This file is not opened for write");
+                }
             }
-            else
-            {
-                READ_FAIL(FSRESULT_READNOTPERMITTED, "This file is not opened for write");
-            }
-        }
-        break;
+            break;
 
         case FSDEVICE:
-            READ_FAIL(FSRESULT_NOTSUPPORTED, "Device file are WIP.");
+            {
+                device_t* dev = &node->device;
+
+                if (dev->read != NULL)
+                {
+                    result = dev->read(node, offset, size, buffer);
+                }
+                else
+                {
+                    READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support read operation.");
+                }
+            }
             break;
 
         default:
@@ -350,7 +371,7 @@ void *filesystem_readall(fsnode_t *node)
         return reason;                         \
     }
 
-int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
+fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
 {
     if (node != NULL)
     {
@@ -384,7 +405,18 @@ int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
         break;
 
         case FSDEVICE:
-            WRITE_FAIL(FSRESULT_NOTSUPPORTED);
+            {
+                device_t* dev = &node->device;
+
+                if (dev->read != NULL)
+                {
+                    result = dev->write(node, offset, size, buffer);
+                }
+                else
+                {
+                    READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support write operation.");
+                }
+            }
             break;
 
         default:
@@ -408,7 +440,7 @@ int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
         return reason;                         \
     }
 
-int filesystem_fstat(fsnode_t *node, file_stat_t *stat)
+fsresult_t filesystem_fstat(fsnode_t *node, file_stat_t *stat)
 {
     if (node != NULL)
     {
@@ -468,7 +500,7 @@ int filesystem_mkdir(const char *path)
 
 int filesystem_mkdev(const char* path, device_t dev)
 {
-    int result = 0;
+    int result = FSRESULT_FAILED;
 
     sk_lock_acquire(fslock);
     {
@@ -501,7 +533,7 @@ int filesystem_mkdev(const char* path, device_t dev)
 
 int filesystem_mkfile(const char* path)
 {
-    int result = 0;
+    int result = FSRESULT_FAILED;
 
     sk_lock_acquire(fslock);
     {

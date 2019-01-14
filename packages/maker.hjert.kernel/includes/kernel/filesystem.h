@@ -15,8 +15,8 @@ struct fsnode;
 
 typedef int   (*fsop_open_t)(struct fsnode *node);
 typedef void (*fsop_close_t)(struct fsnode *node);
-typedef int   (*fsop_read_t)(struct fsnode *node, uint offset, void *buffer, uint n);
-typedef int  (*fsop_write_t)(struct fsnode *node, uint offset, void *buffer, uint n);
+typedef int   (*fsop_read_t)(struct fsnode *node, uint offset, uint size, void *buffer);
+typedef int  (*fsop_write_t)(struct fsnode *node, uint offset, uint size, void *buffer);
 
 typedef struct
 {
@@ -61,6 +61,11 @@ typedef struct fsnode
     int refcount;
 } fsnode_t;
 
+typedef struct 
+{
+    fsnode_t* handles[];
+} fhandle_table_t;
+
 void filesystem_setup(void);
 void filesystem_dump(void);
 
@@ -68,8 +73,8 @@ void filesystem_dump(void);
 fsnode_t *filesystem_open(const char *path, fsopenopt_t option);
 void filesystem_close(fsnode_t *node);
 
-int  filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer);
-int filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer);
+fsresult_t filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer);
+fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer);
 int  filesystem_fstat(fsnode_t *node, file_stat_t *stat);
 
 int filesystem_mkdir(const char *path);

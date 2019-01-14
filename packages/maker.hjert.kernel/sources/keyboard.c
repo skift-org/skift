@@ -183,6 +183,8 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
     uchar scancode = inb(0x60);
 
+    sk_log(LOG_DEBUG, "scancode %d", scancode);
+
     if (scancode < 128)
     {
         if (extended)
@@ -204,6 +206,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             case 81: scancode = PAGE_DOWN; break;
             case 82: scancode = INSERT;    break;
             case 83: scancode = DELETE;    break;
+            case 91: scancode = SUPER;     break;
 
             default: 
                 break;
@@ -249,6 +252,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             case 209: scancode = PAGE_DOWN; break;
             case 210: scancode = INSERT;    break;
             case 211: scancode = DELETE;    break;
+            case 216: scancode = SUPER;     break;
             
             default:
                 break;

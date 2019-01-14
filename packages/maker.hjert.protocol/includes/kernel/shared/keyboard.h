@@ -99,6 +99,8 @@ typedef enum
     KPENTER,
     RCONTROL,
     RALT,
+    
+    SUPER,
 
     INSERT,
     DELETE,

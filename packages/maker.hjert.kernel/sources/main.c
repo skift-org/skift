@@ -30,6 +30,10 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/isr.h"
 
+#include "kernel/dev/null.h"
+#include "kernel/dev/random.h"
+#include "kernel/dev/zero.h"
+
 #include "kernel/console.h"
 #include "kernel/filesystem.h"
 #include "kernel/graphic.h"
@@ -106,7 +110,11 @@ void main(multiboot_info_t *info, s32 magic)
     setup(keyboard);
     setup(console);
 
-    // filesystem_dump();
+    setup(null);
+    setup(zero);
+    setup(random);
+
+    filesystem_dump();
 
     sk_log(LOG_DEBUG, "Starting the userspace...");
 

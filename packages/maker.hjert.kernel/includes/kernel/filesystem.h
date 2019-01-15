@@ -74,7 +74,7 @@ stream_t *filesystem_open(const char *path, fsoflags_t flags);
 void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
-fsresult_t filesystem_write(stream_t *s, void *buffer, uint size);
+int filesystem_write(stream_t *s, void *buffer, uint size);
 
 fsresult_t filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
 fsresult_t filesystem_tell(stream_t *s);

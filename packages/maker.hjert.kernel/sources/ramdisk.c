@@ -31,8 +31,6 @@ void ramdisk_load(multiboot_module_t *module)
         }
         else
         {
-            sk_log(LOG_DEBUG, "Loading file %s [%d/%d]...", block.name);
-
             stream_t *s = filesystem_open(block.name, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
             
             if (s != NULL)

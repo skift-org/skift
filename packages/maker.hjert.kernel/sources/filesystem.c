@@ -163,7 +163,7 @@ int file_write(stream_t *stream, void *buffer, uint size)
         stream->offset = file->size;
     }
 
-    if (file->realsize < (stream->offset + size))
+    if ((stream->offset + size) > file->realsize)
     {
         file->buffer = realloc(file->buffer, stream->offset + size);
         file->realsize = stream->offset + size;
@@ -293,7 +293,6 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     {
         return -1;
     }
-
 }
 
 #pragma endregion
@@ -402,7 +401,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
     }
     else if (node->type == FSFILE)
     {
-        printf("  '%s' size: %dkio\n", node->name, node->file.size / 1024);
+        printf("  '%s' size: %dbytes\n", node->name, node->file.size);
     }
     else
     {
@@ -414,11 +413,11 @@ void filesystem_dump(void)
 {
     sk_lock_acquire(fslock);
 
-    printf("--- FILE SYSTEM DUMP -----------------------------------------------------------\n");
+    printf("\n--- FILE SYSTEM DUMP -----------------------------------------------------------\n\n");
 
     filesystem_dump_internal(root, 0);
 
-    printf("--------------------------------------------------------------------------------\n");
+    printf("\n--------------------------------------------------------------------------------\n\n");
 
     sk_lock_release(fslock);
 }
@@ -519,7 +518,7 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
 
-    if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
+    if ((s->flags & OPENOPT_WRITE) || (s->flags & OPENOPT_READWRITE))
     {
         switch (s->node->type)
         {
@@ -546,18 +545,11 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
     return result;
 }
 
-#define STAT_FAIL(reason)                      \
-    {                                          \
-        sk_lock_release(node->lock);           \
-        sk_log(LOG_DEBUG, "File state fail!"); \
-        return reason;                         \
-    }
-
 int filesystem_fstat(stream_t *s, file_stat_t *stat)
 {
     stat->type = s->node->type;
     stat->size = 0;
-    
+
     if (s->node->type == FSFILE)
     {
         file_stat(s->node, stat);
@@ -603,7 +595,7 @@ int filesystem_mkdev(const char *path, device_t dev)
 
     sk_lock_acquire(fslock);
     {
-        char *child  = malloc(FSNAME_SIZE);
+        char *child = malloc(FSNAME_SIZE);
         char *parent = malloc(strlen(path));
 
         if (path_split(path, parent, child))

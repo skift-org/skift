@@ -515,33 +515,35 @@ PROCESS process_exec(const char *path, const char **arg)
 {
     UNUSED(arg);
 
-    fsnode_t *fp = filesystem_open(path, OPENOPT_READ);
+    stream_t *s = filesystem_open(path, OPENOPT_READ);
 
-    if (!fp)
+    if (s != NULL)
+    {
+        PROCESS p = process_create(path, TASK_USER);
+
+        void *buffer = filesystem_readall(s);
+        filesystem_close(s);
+
+        elf_header_t *elf = (elf_header_t *)buffer;
+
+        elf_program_t program;
+
+        for (int i = 0; elf_read_program(elf, &program, i); i++)
+        {
+            load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+        }
+
+        thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
+
+        free(buffer);
+
+        return p;
+    }
+    else
     {
         sk_log(LOG_WARNING, "EXEC: %s file not found, exec failed!", path);
         return 0;
     }
-
-    PROCESS p = process_create(path, TASK_USER);
-
-    void *buffer = filesystem_readall(fp);
-    filesystem_close(fp);
-
-    elf_header_t *elf = (elf_header_t *)buffer;
-
-    elf_program_t program;
-
-    for (int i = 0; elf_read_program(elf, &program, i); i++)
-    {
-        load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
-    }
-
-    thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
-
-    free(buffer);
-
-    return p;
 }
 
 void cancel_childs(process_t *process)

@@ -73,7 +73,7 @@ void filesystem_dump(void);
 stream_t *filesystem_open(const char *path, fsoflags_t flags);
 void filesystem_close(stream_t *s);
 
-fsresult_t filesystem_read(stream_t *s, void *buffer, uint size);
+int filesystem_read(stream_t *s, void *buffer, uint size);
 fsresult_t filesystem_write(stream_t *s, void *buffer, uint size);
 
 fsresult_t filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
@@ -85,7 +85,7 @@ void *filesystem_readall(stream_t *s);
 
 /* --- File system operation ------------------------------------------------ */
 int filesystem_mkfile(const char *path);
-int filesystem_mkfifo(const char *path);
+int filesystem_mkfifo(const char *path); /* TODO */
 int filesystem_mkdev(const char *path, device_t dev);
 int filesystem_mkdir(const char *path);
 

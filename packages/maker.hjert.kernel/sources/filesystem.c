@@ -17,6 +17,7 @@ static fsnode_t *root = NULL;
 static lock_t fslock;
 
 /* --- Fsnode --------------------------------------------------------------- */
+
 #pragma region
 
 fsnode_t *fsnode(const char *name, fsnode_type_t type)
@@ -86,6 +87,7 @@ void fsnode_delete(fsnode_t *node)
 #pragma endregion
 
 /* --- Streams -------------------------------------------------------------- */
+
 #pragma region
 
 stream_t *stream(fsnode_t *node, fsoflags_t flags)
@@ -110,6 +112,7 @@ void stream_delete(stream_t *s)
 #pragma endregion
 
 /* --- Files ---------------------------------------------------------------- */
+
 #pragma region
 
 void file_trunc(fsnode_t *node)
@@ -155,6 +158,11 @@ int file_write(stream_t *stream, void *buffer, uint size)
 
     file_t *file = &stream->node->file;
 
+    if (stream->flags & OPENOPT_APPEND)
+    {
+        stream->offset = file->size;
+    }
+
     if (file->realsize < (stream->offset + size))
     {
         file->buffer = realloc(file->buffer, stream->offset + size);
@@ -184,6 +192,7 @@ void file_stat(fsnode_t *node, file_stat_t *stat)
 #pragma endregion
 
 /* --- Directories ---------------------------------------------------------- */
+
 #pragma region
 
 fsnode_t *directory_child(fsnode_t *dir, const char *child)
@@ -264,22 +273,33 @@ int directory_read(stream_t *stream, void *buffer, uint size)
 {
     int index = stream->offset / sizeof(stream_t);
 
-    if (index < stream->direntries.count && size == sizeof(directory_entries_t))
+    if (size == sizeof(directory_entries_t))
     {
-        int entrysize = sizeof(directory_entry_t);
-        
-        memcpy(buffer, &stream->direntries.entries[index], entrysize);
-        stream->offset += entrysize;
+        if (index < stream->direntries.count)
+        {
+            int entrysize = sizeof(directory_entry_t);
 
-        return entrysize;
+            memcpy(buffer, &stream->direntries.entries[index], entrysize);
+            stream->offset += entrysize;
+
+            return entrysize;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return -1;
     }
 
-    return -1;
 }
 
 #pragma endregion
 
 /* --- Filesystem ----------------------------------------------------------- */
+
 #pragma region
 
 void filesystem_setup()
@@ -406,6 +426,7 @@ void filesystem_dump(void)
 #pragma endregion
 
 /* --- Filesystem Operations ------------------------------------------------ */
+
 #pragma region
 
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
@@ -448,13 +469,6 @@ void filesystem_close(stream_t *s)
 
     stream_delete(s);
 }
-
-#define READ_FAIL(reason, why)                         \
-    {                                                  \
-        sk_lock_release(node->lock);                   \
-        sk_log(LOG_DEBUG, "File read fail!: %s", why); \
-        return reason;                                 \
-    }
 
 int filesystem_read(stream_t *s, void *buffer, uint size)
 {
@@ -501,73 +515,35 @@ void *filesystem_readall(stream_t *s)
     return buffer;
 }
 
-#define WRITE_FAIL(reason)                     \
-    {                                          \
-        sk_lock_release(node->lock);           \
-        sk_log(LOG_DEBUG, "File write fail!"); \
-        return reason;                         \
-    }
-
-fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer)
+int filesystem_write(stream_t *s, void *buffer, uint size)
 {
-    if (node != NULL)
+    int result = -1;
+
+    if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
     {
-        sk_lock_acquire(node->lock);
-
-        int result = 0;
-
-        switch (node->type)
+        switch (s->node->type)
         {
         case FSFILE:
-        {
-            file_t *file = &node->file;
-
-            if (file->write)
-            {
-                if (file->realsize < (offset + size))
-                {
-                    node->file.buffer = realloc(node->file.buffer, offset + size);
-                    node->file.realsize = offset + size;
-                }
-
-                node->file.size = max(offset + size, node->file.size);
-                memcpy((byte *)(file->buffer) + offset, buffer, size);
-                result = size;
-            }
-            else
-            {
-                WRITE_FAIL(FSRESULT_READNOTPERMITTED);
-            }
-        }
-        break;
+            result = file_write(s, buffer, size);
+            break;
 
         case FSDEVICE:
         {
-            device_t *dev = &node->device;
+            device_t *dev = &s->node->device;
 
             if (dev->read != NULL)
             {
-                result = dev->write(node, offset, size, buffer);
-            }
-            else
-            {
-                READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support write operation.");
+                result = dev->write(s, size, buffer);
             }
         }
         break;
 
         default:
-            WRITE_FAIL(FSRESULT_NOTSUPPORTED);
             break;
         }
+    }
 
-        sk_lock_release(node->lock);
-        return result;
-    }
-    else
-    {
-        return FSRESULT_NULLNODE;
-    }
+    return result;
 }
 
 #define STAT_FAIL(reason)                      \
@@ -577,31 +553,17 @@ fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer
         return reason;                         \
     }
 
-fsresult_t filesystem_fstat(fsnode_t *node, file_stat_t *stat)
+int filesystem_fstat(stream_t *s, file_stat_t *stat)
 {
-    if (node != NULL)
+    stat->type = s->node->type;
+    stat->size = 0;
+    
+    if (s->node->type == FSFILE)
     {
-        sk_lock_acquire(node->lock);
-        {
-            stat->type = node->type;
-
-            if (node->type == FSFILE)
-            {
-                stat->size = node->file.size;
-            }
-            else
-            {
-                stat->size = 0;
-            }
-        }
-        sk_lock_release(node->lock);
-
-        return 0;
+        file_stat(s->node, stat);
     }
-    else
-    {
-        return FSRESULT_NULLNODE;
-    }
+
+    return 0;
 }
 
 int filesystem_mkdir(const char *path)
@@ -641,7 +603,7 @@ int filesystem_mkdev(const char *path, device_t dev)
 
     sk_lock_acquire(fslock);
     {
-        char *child = malloc(FSNAME_SIZE);
+        char *child  = malloc(FSNAME_SIZE);
         char *parent = malloc(strlen(path));
 
         if (path_split(path, parent, child))

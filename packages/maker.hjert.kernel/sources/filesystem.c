@@ -359,8 +359,11 @@ fsnode_t *filesystem_acquire(const char *path, bool create)
         free(parent_path);
         free(child_name);
     }
-
-    node->refcount++;
+    
+    if (node != NULL)
+    {
+        node->refcount++;
+    }
 
     sk_lock_release(fslock);
 

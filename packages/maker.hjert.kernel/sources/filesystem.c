@@ -127,7 +127,7 @@ void file_trunc(fsnode_t *node)
 
 int file_read(stream_t *stream, void *buffer, uint size)
 {
-    int result = -1;
+    int result = 0;
 
     sk_lock_acquire(stream->node->lock);
 
@@ -149,7 +149,7 @@ int file_read(stream_t *stream, void *buffer, uint size)
 
 int file_write(stream_t *stream, void *buffer, uint size)
 {
-    int result = -1;
+    int result = 0;
 
     sk_lock_acquire(stream->node->lock);
 
@@ -264,10 +264,14 @@ int directory_read(stream_t *stream, void *buffer, uint size)
 {
     int index = stream->offset / sizeof(stream_t);
 
-    if (index < stream->direntries.count && size >= sizeof(directory_entries_t))
+    if (index < stream->direntries.count && size == sizeof(directory_entries_t))
     {
-        memcpy(buffer, &stream->direntries.entries[index], sizeof(directory_entry_t));
-        return sizeof(directory_entry_t);
+        int entrysize = sizeof(directory_entry_t);
+        
+        memcpy(buffer, &stream->direntries.entries[index], entrysize);
+        stream->offset += entrysize;
+
+        return entrysize;
     }
 
     return -1;
@@ -419,7 +423,8 @@ stream_t *filesystem_open(const char *path, fsoflags_t flags)
 
         if (node->type == FSFILE)
         {
-            if (OPEN_OPTION(OPENOPT_TRUNC)) file_trunc(node);
+            if (OPEN_OPTION(OPENOPT_TRUNC))
+                file_trunc(node);
         }
         else if (node->type == FSDIRECTORY)
         {
@@ -455,37 +460,43 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
 
-    switch (s->node->type)
+    if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
     {
-    case FSFILE:
-        result = file_read(s, buffer, size);
-        break;
-
-    case FSDEVICE:
-    {
-        device_t *dev = &node->device;
-
-        if (dev->read != NULL)
+        switch (s->node->type)
         {
-            result = dev->read(node, offset, size, buffer);
-        }
-    }
-    break;
+        case FSFILE:
+            result = file_read(s, buffer, size);
+            break;
 
-    default:
-        READ_FAIL(FSRESULT_NOTSUPPORTED, "NOT SUPPORTED FSOBJECT");
+        case FSDEVICE:
+        {
+            device_t *dev = &s->node->device;
+
+            if (dev->read != NULL)
+            {
+                result = dev->read(s, size, buffer);
+            }
+        }
         break;
+
+        case FSDIRECTORY:
+            result = directory_read(s, buffer, size);
+            break;
+
+        default:
+            break;
+        }
     }
 
     return result;
 }
 
-void *filesystem_readall(fsnode_t *node)
+void *filesystem_readall(stream_t *s)
 {
     file_stat_t stat = {0};
-    filesystem_fstat(node, &stat);
+    filesystem_fstat(s, &stat);
     void *buffer = malloc(stat.size);
-    filesystem_read(node, 0, stat.size, buffer);
+    filesystem_read(s, buffer, stat.size);
 
     return buffer;
 }

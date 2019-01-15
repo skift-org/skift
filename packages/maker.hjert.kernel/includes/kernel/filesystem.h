@@ -12,11 +12,17 @@
 #include "kernel/shared/filesystem.h"
 
 struct fsnode;
+struct stream;
 
-typedef int (*fsop_open_t)(struct fsnode *node);
-typedef void (*fsop_close_t)(struct fsnode *node);
-typedef int (*fsop_read_t)(struct fsnode *node, uint offset, uint size, void *buffer);
-typedef int (*fsop_write_t)(struct fsnode *node, uint offset, uint size, void *buffer);
+typedef int (*fsop_read_t)(struct stream *s, uint size, void *buffer);
+typedef int (*fsop_write_t)(struct stream *s, uint size, void *buffer);
+
+typedef struct
+{
+    byte *buffer;
+    uint realsize;
+    uint size;
+} file_t;
 
 typedef struct
 {
@@ -30,13 +36,6 @@ typedef struct
 {
     list_t *childs;
 } directory_t;
-
-typedef struct
-{
-    byte *buffer;
-    uint realsize;
-    uint size;
-} file_t;
 
 typedef struct fsnode
 {
@@ -55,7 +54,7 @@ typedef struct fsnode
 
 typedef struct { int count; directory_entry_t* entries; } directory_entries_t;
 
-typedef struct
+typedef struct stream
 {
     fsnode_t *node;
     uint offset;

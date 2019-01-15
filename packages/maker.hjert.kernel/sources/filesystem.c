@@ -9,13 +9,15 @@
 #include <string.h>
 
 #include <skift/logger.h>
+#include <skift/ringbuffer.h>
 
 #include "kernel/filesystem.h"
 
 static fsnode_t *root = NULL;
 static lock_t fslock;
 
-/* --- Constructor/Destructor ----------------------------------------------- */
+/* --- Fsnode --------------------------------------------------------------- */
+#pragma region
 
 fsnode_t *fsnode(const char *name, fsnode_type_t type)
 {
@@ -30,8 +32,6 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
     case FSFILE:
     {
         file_t *file = &node->file;
-
-        file->opened = false;
 
         file->buffer = malloc(512);
         file->realsize = 512;
@@ -83,30 +83,205 @@ void fsnode_delete(fsnode_t *node)
     free(node);
 }
 
-/* --- Private functions ---------------------------------------------------- */
+#pragma endregion
 
-void file_flush(fsnode_t *node)
+/* --- Streams -------------------------------------------------------------- */
+#pragma region
+
+stream_t *stream(fsnode_t *node, fsoflags_t flags)
 {
+    if (node == NULL)
+        return NULL;
+
+    stream_t *s = MALLOC(stream_t);
+
+    s->node = node;
+    s->offset = 0;
+    s->flags = flags;
+
+    return s;
+}
+
+void stream_delete(stream_t *s)
+{
+    free(s);
+}
+
+#pragma endregion
+
+/* --- Files ---------------------------------------------------------------- */
+#pragma region
+
+void file_trunc(fsnode_t *node)
+{
+    sk_lock_acquire(node->lock);
+
     free(node->file.buffer);
 
     node->file.buffer = malloc(512);
     node->file.realsize = 512;
     node->file.size = 0;
+
+    sk_lock_release(node->lock);
 }
 
-fsnode_t *directory_getchild(fsnode_t *dir, const char *child)
+int file_read(stream_t *stream, void *buffer, uint size)
 {
+    int result = -1;
+
+    sk_lock_acquire(stream->node->lock);
+
+    file_t *file = &stream->node->file;
+
+    if (stream->offset <= size)
+    {
+        int readedsize = min(file->size - stream->offset, size);
+        memcpy(buffer, (byte *)file->buffer + stream->offset, readedsize);
+
+        result = readedsize;
+        stream->offset += readedsize;
+    }
+
+    sk_lock_release(stream->node->lock);
+
+    return result;
+}
+
+int file_write(stream_t *stream, void *buffer, uint size)
+{
+    int result = -1;
+
+    sk_lock_acquire(stream->node->lock);
+
+    file_t *file = &stream->node->file;
+
+    if (file->realsize < (stream->offset + size))
+    {
+        file->buffer = realloc(file->buffer, stream->offset + size);
+        file->realsize = stream->offset + size;
+    }
+
+    file->size = max(stream->offset + size, file->size);
+    memcpy((byte *)(file->buffer) + stream->offset, buffer, size);
+
+    result = size;
+    stream->offset += size;
+
+    sk_lock_release(stream->node->lock);
+
+    return result;
+}
+
+void file_stat(fsnode_t *node, file_stat_t *stat)
+{
+    sk_lock_acquire(node->lock);
+
+    stat->size = node->file.size;
+
+    sk_lock_release(node->lock);
+}
+
+#pragma endregion
+
+/* --- Directories ---------------------------------------------------------- */
+#pragma region
+
+fsnode_t *directory_child(fsnode_t *dir, const char *child)
+{
+    sk_lock_acquire(dir->lock);
+
     FOREACH(i, dir->directory.childs)
     {
         fsnode_t *d = (fsnode_t *)i->value;
 
         if (strcmp(child, d->name) == 0)
         {
+            sk_lock_release(dir->lock);
             return d;
         }
     }
 
+    sk_lock_release(dir->lock);
+
     return NULL;
+}
+
+directory_entries_t directory_entries(fsnode_t *dir)
+{
+    sk_lock_acquire(dir->lock);
+
+    int entries_count = dir->directory.childs->count;
+    directory_entry_t *entries = malloc(sizeof(directory_entry_t) * entries_count);
+    directory_entry_t *current = &entries[0];
+
+    FOREACH(i, dir->directory.childs)
+    {
+        fsnode_t *c = (fsnode_t *)i->value;
+
+        strncpy(current->name, c->name, FSNAME_SIZE);
+        current->type = c->type;
+
+        current++;
+    }
+
+    sk_lock_release(dir->lock);
+
+    return (directory_entries_t){.count = entries_count, .entries = entries};
+}
+
+void directory_addchild(fsnode_t *dir, fsnode_t *child)
+{
+    sk_lock_acquire(dir->lock);
+
+    if (!list_containe(dir->directory.childs, child))
+    {
+        child->refcount++;
+        list_pushback(dir->directory.childs, child);
+    }
+
+    sk_lock_release(dir->lock);
+}
+
+void directory_removechild(fsnode_t *dir, fsnode_t *child)
+{
+    sk_lock_acquire(dir->lock);
+
+    if (list_containe(dir->directory.childs, child))
+    {
+        child->refcount--;
+        if (child->refcount == 0)
+        {
+            fsnode_delete(child);
+        }
+
+        list_remove(dir->directory.childs, child);
+    }
+
+    sk_lock_release(dir->lock);
+}
+
+int directory_read(stream_t *stream, void *buffer, uint size)
+{
+    int index = stream->offset / sizeof(stream_t);
+
+    if (index < stream->direntries.count && size >= sizeof(directory_entries_t))
+    {
+        memcpy(buffer, &stream->direntries.entries[index], sizeof(directory_entry_t));
+        return sizeof(directory_entry_t);
+    }
+
+    return -1;
+}
+
+#pragma endregion
+
+/* --- Filesystem ----------------------------------------------------------- */
+#pragma region
+
+void filesystem_setup()
+{
+    sk_lock_init(fslock);
+    root = fsnode("ROOT", FSDIRECTORY);
 }
 
 fsnode_t *filesystem_resolve(const char *path)
@@ -119,7 +294,7 @@ fsnode_t *filesystem_resolve(const char *path)
     {
         if (current->type == FSDIRECTORY)
         {
-            current = directory_getchild(current, buffer);
+            current = directory_child(current, buffer);
 
             if (current == NULL)
             {
@@ -135,17 +310,56 @@ fsnode_t *filesystem_resolve(const char *path)
     return current;
 }
 
-/* --- Public functions ----------------------------------------------------- */
-
-void filesystem_setup()
+fsnode_t *filesystem_acquire(const char *path, bool create)
 {
-    sk_lock_init(fslock);
-    root = fsnode("ROOT", FSDIRECTORY);
+    sk_lock_acquire(fslock);
+
+    fsnode_t *node = filesystem_resolve(path);
+
+    if (node == NULL && create)
+    {
+        char *parent_path = malloc(strlen(path));
+        char *child_name = malloc(FSNAME_SIZE);
+
+        if (path_split(path, parent_path, child_name))
+        {
+            fsnode_t *parent = filesystem_resolve(parent_path);
+
+            if (parent != NULL && parent->type == FSDIRECTORY)
+            {
+                node = fsnode(child_name, FSFILE);
+                node->refcount++;
+                list_pushback(parent->directory.childs, node);
+            }
+        }
+
+        free(parent_path);
+        free(child_name);
+    }
+
+    node->refcount++;
+
+    sk_lock_release(fslock);
+
+    return node;
+}
+
+void filesystem_release(fsnode_t *node)
+{
+    sk_lock_acquire(fslock);
+
+    node->refcount--;
+
+    if (node->refcount == 0)
+    {
+        fsnode_delete(node);
+    }
+
+    sk_lock_release(fslock);
 }
 
 void filesystem_dump_internal(fsnode_t *node, int depth)
 {
-
     for (int i = 0; i < depth; i++)
     {
         printf("  ");
@@ -185,108 +399,49 @@ void filesystem_dump(void)
     sk_lock_release(fslock);
 }
 
-#define RETURN_OPEN_FAIL(why)                         \
-    {                                                 \
-        sk_lock_release(fslock);                      \
-        sk_log(LOG_DEBUG, "File open fail: %s", why); \
-        return NULL;                                  \
-    }
+#pragma endregion
 
-#define OPEN_OPTION(__opt) ((option & __opt) && 1)
+/* --- Filesystem Operations ------------------------------------------------ */
+#pragma region
 
-fsnode_t *filesystem_open(const char *path, fsopenopt_t option)
+#define OPEN_OPTION(__opt) ((flags & __opt) && 1)
+stream_t *filesystem_open(const char *path, fsoflags_t flags)
 {
-    sk_lock_acquire(fslock);
+    fsnode_t *node = filesystem_acquire(path, OPEN_OPTION(OPENOPT_CREATE));
 
-    fsnode_t *node = filesystem_resolve(path);
-
-    if (node == NULL && OPEN_OPTION(OPENOPT_CREATE))
+    if (node == NULL)
     {
-        char *parent_path = malloc(strlen(path));
-        char *child_name = malloc(FSNAME_SIZE);
-
-        if (path_split(path, parent_path, child_name))
-        {
-            fsnode_t *parent = filesystem_resolve(parent_path);
-
-            if (parent->type == FSDIRECTORY)
-            {
-                node = fsnode(child_name, FSFILE);
-                node->refcount++;
-                list_pushback(parent->directory.childs, node);
-            }
-        }
-
-        free(parent_path);
-        free(child_name);
+        return NULL;
     }
-
-    if (node != NULL)
+    else
     {
-        switch (node->type)
+        stream_t *s = stream(node, flags);
+
+        if (node->type == FSFILE)
         {
-        case FSFILE:
-            if (node->file.opened == false)
-            {
-                node->file.write = OPEN_OPTION(OPENOPT_WRITE);
-                node->file.read = OPEN_OPTION(OPENOPT_READ);
-
-                if (OPEN_OPTION(OPENOPT_WRITE))
-                {
-                    file_flush(node);
-                }
-
-                node->file.opened = true;
-            }
-            else
-            {
-                RETURN_OPEN_FAIL("The file is already appened");
-            }
-            break;
-        case FSDEVICE:
-        {
-            device_t* dev = &node->device;
-
-            if (dev->open != NULL && !dev->open(node))
-            {
-                RETURN_OPEN_FAIL("Device doesn't open.");
-            }
+            if (OPEN_OPTION(OPENOPT_TRUNC)) file_trunc(node);
         }
-        break;
-    
-        case FSDIRECTORY:
-            RETURN_OPEN_FAIL("It's a directory");
-            break;
-
-        default:
-            RETURN_OPEN_FAIL("\\(o_o)/");
-            break;
+        else if (node->type == FSDIRECTORY)
+        {
+            s->direntries = directory_entries(node);
         }
 
-        node->refcount++;
+        return s;
     }
-
-    sk_lock_release(fslock);
-
-    return node;
 }
 
-void filesystem_close(fsnode_t *node)
+void filesystem_close(stream_t *s)
 {
-    sk_lock_acquire(fslock);
+    fsnode_type_t type = s->node->type;
 
-    if (node->type == FSFILE)
+    filesystem_release(s->node);
+
+    if (type == FSDIRECTORY)
     {
-        node->file.opened = false;
+        free(s->direntries.entries);
     }
 
-    node->refcount--;
-    if (node->refcount == 0)
-    {
-        fsnode_delete(node);
-    }
-
-    sk_lock_release(fslock);
+    stream_delete(s);
 }
 
 #define READ_FAIL(reason, why)                         \
@@ -296,62 +451,33 @@ void filesystem_close(fsnode_t *node)
         return reason;                                 \
     }
 
-int filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer)
+int filesystem_read(stream_t *s, void *buffer, uint size)
 {
-    if (node != NULL)
+    int result = -1;
+
+    switch (s->node->type)
     {
-        sk_lock_acquire(node->lock);
+    case FSFILE:
+        result = file_read(s, buffer, size);
+        break;
 
-        int result = 0;
+    case FSDEVICE:
+    {
+        device_t *dev = &node->device;
 
-        switch (node->type)
+        if (dev->read != NULL)
         {
-        case FSFILE:
-            {
-                file_t *file = &node->file;
-
-                if (file->read)
-                {
-                    if (file->size < offset)
-                        READ_FAIL(FSRESULT_EOF, "End of file!");
-
-                    memcpy(buffer, (byte *)file->buffer + offset, min(file->size - offset, size));
-                    result = min(file->size - offset, size);
-                }
-                else
-                {
-                    READ_FAIL(FSRESULT_READNOTPERMITTED, "This file is not opened for write");
-                }
-            }
-            break;
-
-        case FSDEVICE:
-            {
-                device_t* dev = &node->device;
-
-                if (dev->read != NULL)
-                {
-                    result = dev->read(node, offset, size, buffer);
-                }
-                else
-                {
-                    READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support read operation.");
-                }
-            }
-            break;
-
-        default:
-            READ_FAIL(FSRESULT_NOTSUPPORTED, "NOT SUPPORTED FSOBJECT");
-            break;
+            result = dev->read(node, offset, size, buffer);
         }
+    }
+    break;
 
-        sk_lock_release(node->lock);
-        return result;
+    default:
+        READ_FAIL(FSRESULT_NOTSUPPORTED, "NOT SUPPORTED FSOBJECT");
+        break;
     }
-    else
-    {
-        return FSRESULT_NULLNODE;
-    }
+
+    return result;
 }
 
 void *filesystem_readall(fsnode_t *node)
@@ -405,19 +531,19 @@ fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer
         break;
 
         case FSDEVICE:
-            {
-                device_t* dev = &node->device;
+        {
+            device_t *dev = &node->device;
 
-                if (dev->read != NULL)
-                {
-                    result = dev->write(node, offset, size, buffer);
-                }
-                else
-                {
-                    READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support write operation.");
-                }
+            if (dev->read != NULL)
+            {
+                result = dev->write(node, offset, size, buffer);
             }
-            break;
+            else
+            {
+                READ_FAIL(FSRESULT_NOTSUPPORTED, "The devices don't support write operation.");
+            }
+        }
+        break;
 
         default:
             WRITE_FAIL(FSRESULT_NOTSUPPORTED);
@@ -498,7 +624,7 @@ int filesystem_mkdir(const char *path)
     return result;
 }
 
-int filesystem_mkdev(const char* path, device_t dev)
+int filesystem_mkdev(const char *path, device_t dev)
 {
     int result = FSRESULT_FAILED;
 
@@ -515,10 +641,10 @@ int filesystem_mkdev(const char* path, device_t dev)
             {
                 fsnode_t *c = fsnode(child, FSDEVICE);
                 list_pushback(p->directory.childs, c);
-                
+
                 c->refcount++;
                 c->device = dev;
-                
+
                 result = FSRESULT_SUCCEED;
             }
         }
@@ -531,7 +657,7 @@ int filesystem_mkdev(const char* path, device_t dev)
     return result;
 }
 
-int filesystem_mkfile(const char* path)
+int filesystem_mkfile(const char *path)
 {
     int result = FSRESULT_FAILED;
 
@@ -548,9 +674,9 @@ int filesystem_mkfile(const char* path)
             {
                 fsnode_t *c = fsnode(child, FSFILE);
                 list_pushback(p->directory.childs, c);
-                
+
                 c->refcount++;
-                
+
                 result = FSRESULT_SUCCEED;
             }
         }
@@ -562,3 +688,5 @@ int filesystem_mkfile(const char* path)
 
     return result;
 }
+
+#pragma endregion

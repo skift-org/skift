@@ -13,19 +13,17 @@
 
 struct fsnode;
 
-typedef int   (*fsop_open_t)(struct fsnode *node);
+typedef int (*fsop_open_t)(struct fsnode *node);
 typedef void (*fsop_close_t)(struct fsnode *node);
-typedef int   (*fsop_read_t)(struct fsnode *node, uint offset, uint size, void *buffer);
-typedef int  (*fsop_write_t)(struct fsnode *node, uint offset, uint size, void *buffer);
+typedef int (*fsop_read_t)(struct fsnode *node, uint offset, uint size, void *buffer);
+typedef int (*fsop_write_t)(struct fsnode *node, uint offset, uint size, void *buffer);
 
 typedef struct
 {
-    fsop_open_t  open;
-    fsop_close_t close;
-    fsop_read_t  read;
+    fsop_read_t read;
     fsop_write_t write;
 
-    void* p;
+    void *p;
 } device_t;
 
 typedef struct
@@ -35,14 +33,9 @@ typedef struct
 
 typedef struct
 {
-    bool opened;
-
-    bool read;
-    bool write;
-
     byte *buffer;
-    uint size;
     uint realsize;
+    uint size;
 } file_t;
 
 typedef struct fsnode
@@ -51,8 +44,7 @@ typedef struct fsnode
     fsnode_type_t type;
     lock_t lock;
 
-    union
-    {
+    union {
         file_t file;
         directory_t directory;
         device_t device;
@@ -61,24 +53,41 @@ typedef struct fsnode
     int refcount;
 } fsnode_t;
 
-typedef struct 
+typedef struct { int count; directory_entry_t* entries; } directory_entries_t;
+
+typedef struct
 {
-    fsnode_t* handles[];
-} fhandle_table_t;
+    fsnode_t *node;
+    uint offset;
+    fsoflags_t flags;
+
+    union
+    {
+        directory_entries_t direntries;
+    };
+} stream_t;
 
 void filesystem_setup(void);
 void filesystem_dump(void);
 
-/* --- Files Operation ------------------------------------------------------ */
-fsnode_t *filesystem_open(const char *path, fsopenopt_t option);
-void filesystem_close(fsnode_t *node);
+/* --- File IO -------------------------------------------------------------- */
+stream_t *filesystem_open(const char *path, fsoflags_t flags);
+void filesystem_close(stream_t *s);
 
-fsresult_t filesystem_read(fsnode_t *node, uint offset, uint size, void *buffer);
-fsresult_t filesystem_write(fsnode_t *node, uint offset, uint size, void *buffer);
-int  filesystem_fstat(fsnode_t *node, file_stat_t *stat);
+fsresult_t filesystem_read(stream_t *s, void *buffer, uint size);
+fsresult_t filesystem_write(stream_t *s, void *buffer, uint size);
 
+fsresult_t filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
+fsresult_t filesystem_tell(stream_t *s);
+
+int filesystem_fstat(stream_t *s, file_stat_t *stat);
+
+void *filesystem_readall(stream_t *s);
+
+/* --- File system operation ------------------------------------------------ */
+int filesystem_mkfile(const char *path);
+int filesystem_mkfifo(const char *path);
+int filesystem_mkdev(const char *path, device_t dev);
 int filesystem_mkdir(const char *path);
-int filesystem_mkdev(const char* path, device_t dev);
-int filesystem_mkfile(const char* path);
 
-void* filesystem_readall(fsnode_t *node);
+int filesystem_rm(const char *path);

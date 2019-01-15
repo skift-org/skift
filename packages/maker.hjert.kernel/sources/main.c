@@ -89,11 +89,14 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- System context --------------------------------------------------- */
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
+    
     setup(tasking);
     setup(messaging);
     setup(shared_memory);
+
     setup(filesystem);
     setup(modules, &mbootinfo);
+    
 
     /* --- Devices ---------------------------------------------------------- */
     filesystem_mkdir("/dev");

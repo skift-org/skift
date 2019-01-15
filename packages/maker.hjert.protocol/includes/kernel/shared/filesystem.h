@@ -14,15 +14,18 @@ typedef enum
 {
     OPENOPT_READ = 1 << 0,
     OPENOPT_WRITE = 1 << 1,
-    OPENOPT_CREATE = 1 << 2,
-} fsopenopt_t;
+    OPENOPT_READWRITE = 1 << 2,
+    OPENOPT_CREATE = 1 << 3,
+    OPENOPT_APPEND = 1 << 4,
+    OPENOPT_TRUNC = 1 << 5,
+} fsoflags_t;
 
 typedef enum
 {
     FSFILE,
     FSDEVICE,
     FSDIRECTORY,
-    /* TODO FIFO */
+    FSFIFO,
 } fsnode_type_t;
 
 typedef enum
@@ -49,5 +52,5 @@ typedef struct
 typedef struct
 {
     char name[FSNAME_SIZE];
-    file_stat_t state;
+    fsnode_type_t type;
 } directory_entry_t;

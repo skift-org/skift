@@ -67,20 +67,24 @@ int main(int argc, char **argv)
         
         readline(command, 128);
 
-        int process = sk_process_exec(command, NULL);
+        strleadtrim(command, ' ');
 
-        if (!process)
+        if (strlen(command) != 0)
         {
-            char pathbuffer[144];
-            snprintf(pathbuffer, 144, "/bin/%s", command);
-            process = sk_process_exec(pathbuffer, NULL);
-        }
-        
-        if (process)
-            sk_thread_wait_process(process);
-        else
-            printf("Command '%s' not found !\n", command);
-        
+            int process = sk_process_exec(command, NULL);
+
+            if (!process)
+            {
+                char pathbuffer[144];
+                snprintf(pathbuffer, 144, "/bin/%s", command);
+                process = sk_process_exec(pathbuffer, NULL);
+            }
+            
+            if (process)
+                sk_thread_wait_process(process);
+            else
+                printf("Command '%s' not found !\n", command);
+        } 
     }
 
     return 0;

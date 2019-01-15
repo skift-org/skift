@@ -114,7 +114,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(zero);
     setup(random);
 
-    filesystem_dump();
+    //filesystem_dump();
 
     sk_log(LOG_DEBUG, "Starting the userspace...");
 

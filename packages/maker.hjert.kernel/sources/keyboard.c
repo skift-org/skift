@@ -183,13 +183,10 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
     uchar scancode = inb(0x60);
 
-    sk_log(LOG_DEBUG, "scancode %d", scancode);
-
     if (scancode < 128)
     {
         if (extended)
         {
-
             switch (scancode)
             {
                 

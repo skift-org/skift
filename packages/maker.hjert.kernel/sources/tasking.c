@@ -517,33 +517,47 @@ PROCESS process_exec(const char *path, const char **arg)
 
     stream_t *s = filesystem_open(path, OPENOPT_READ);
 
-    if (s != NULL)
+    if (s == NULL)
     {
-        PROCESS p = process_create(path, TASK_USER);
-
-        void *buffer = filesystem_readall(s);
-        filesystem_close(s);
-
-        elf_header_t *elf = (elf_header_t *)buffer;
-
-        elf_program_t program;
-
-        for (int i = 0; elf_read_program(elf, &program, i); i++)
-        {
-            load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
-        }
-
-        thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
-
-        free(buffer);
-
-        return p;
-    }
-    else
-    {
-        sk_log(LOG_WARNING, "EXEC: %s file not found, exec failed!", path);
+        sk_log(LOG_WARNING, "'%s' file not found, exec failed!", path);
         return 0;
     }
+
+    file_stat_t stat;
+    filesystem_fstat(s, &stat);
+
+    if (stat.type != FSFILE)
+    {
+        sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", path);
+        return 0; 
+    }
+
+    void *buffer = filesystem_readall(s);
+    filesystem_close(s);
+
+    if (buffer == NULL)
+    {
+        sk_log(LOG_WARNING, "Failed to read from '%s', exec failed!", path);
+        return 0;
+    }
+
+    PROCESS p = process_create(path, TASK_USER);
+
+    elf_header_t *elf = (elf_header_t *)buffer;
+
+    elf_program_t program;
+
+    for (int i = 0; elf_read_program(elf, &program, i); i++)
+    {
+        load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+    }
+
+    thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
+
+    free(buffer);
+
+    return p;
+
 }
 
 void cancel_childs(process_t *process)

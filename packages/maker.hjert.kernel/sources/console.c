@@ -304,7 +304,7 @@ void console_process(char c)
                     }
                     else if (attr == 1)
                     {
-                        // Make the color bright
+                        // 
                         if (cons->fg < CCOLOR_DARK_GREY)
                             cons->fg += 8;
                     }

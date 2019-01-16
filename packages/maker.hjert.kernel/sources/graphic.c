@@ -23,26 +23,26 @@ typedef enum
     GFXDEV_BGA,
 } graphic_device_t;
 
-static int COLOR24[] =
-{
-    [TMCOLOR_BLACK] = 0x1D1F21,
-    [TMCOLOR_RED] = 0xA54242,
-    [TMCOLOR_GREEN] = 0x8C9440,
-    [TMCOLOR_YELLOW] = 0xDE935F,
-    [TMCOLOR_BLUE] = 0x5F819D,
-    [TMCOLOR_MAGENTA] = 0x85678F,
-    [TMCOLOR_CYAN] = 0x5E8D87,
-    [TMCOLOR_LIGHT_GREY] = 0x707880,
-
-    [TMCOLOR_DARK_GREY] = 0x373B41,
-    [TMCOLOR_LIGHT_RED] = 0xCC6666,
-    [TMCOLOR_LIGHT_GREEN] = 0xB5BD68,
-    [TMCOLOR_LIGHT_YELLOW] = 0xF0C674,
-    [TMCOLOR_LIGHT_BLUE] = 0x81A2BE,
-    [TMCOLOR_LIGHT_MAGENTA] = 0xB294BB,
-    [TMCOLOR_LIGHT_CYAN] = 0x8ABEB7,
-    [TMCOLOR_WHITE] = 0xC5C8C6,
-};
+// static int COLOR24[] =
+// {
+//     [TMCOLOR_BLACK] = 0x1D1F21,
+//     [TMCOLOR_RED] = 0xA54242,
+//     [TMCOLOR_GREEN] = 0x8C9440,
+//     [TMCOLOR_YELLOW] = 0xDE935F,
+//     [TMCOLOR_BLUE] = 0x5F819D,
+//     [TMCOLOR_MAGENTA] = 0x85678F,
+//     [TMCOLOR_CYAN] = 0x5E8D87,
+//     [TMCOLOR_LIGHT_GREY] = 0x707880,
+// 
+//     [TMCOLOR_DARK_GREY] = 0x373B41,
+//     [TMCOLOR_LIGHT_RED] = 0xCC6666,
+//     [TMCOLOR_LIGHT_GREEN] = 0xB5BD68,
+//     [TMCOLOR_LIGHT_YELLOW] = 0xF0C674,
+//     [TMCOLOR_LIGHT_BLUE] = 0x81A2BE,
+//     [TMCOLOR_LIGHT_MAGENTA] = 0xB294BB,
+//     [TMCOLOR_LIGHT_CYAN] = 0x8ABEB7,
+//     [TMCOLOR_WHITE] = 0xC5C8C6,
+// };
 
 static int COLORVGA[] =
 {
@@ -148,7 +148,7 @@ void graphic_blit_region(uint *buffer, uint x, uint y, uint w, uint h)
     }
 }
 
-inline void graphic_char(uint x, uint y, char c, textmode_color_t fg, textmode_color_t bg)
+void graphic_char(uint x, uint y, char c, textmode_color_t fg, textmode_color_t bg)
 {
     if (x < textmode_width && y < textmode_height)
     {

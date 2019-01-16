@@ -62,14 +62,9 @@ void main(multiboot_info_t *info, s32 magic)
 {
     __plug_init(); // init maker.skift.framework glue code.
 
-    /* --- Say hello -------------------------------------------------------- */
-    printf(KERNEL_UNAME);
-    printf("\nCopyright © 2018-2019 MAKER.\n");
-    printf("Booting...\n");
-
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-    graphic_early_setup(800, 600);
+//    graphic_early_setup(1366, 768);
 
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
@@ -114,7 +109,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(zero);
     setup(random);
 
-    //filesystem_dump();
+//    filesystem_dump();
 
     sk_log(LOG_DEBUG, "Starting the userspace...");
 

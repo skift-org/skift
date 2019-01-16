@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define PI (3.141592654)
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))

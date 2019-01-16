@@ -169,6 +169,7 @@ void console_setup()
 {
     uint width, height = 0;
     graphic_size(&width, &height);
+
     cons = console(width / 8, height / 16);
     console_framebuffer = bitmap(width, height);
     console_clear(cons, 0, 0, cons->w, cons->h);
@@ -334,19 +335,45 @@ void console_process(char c)
                 {
                     console_clear(cons, cons->cx, cons->cy, cons->w, cons->h);
                 }
-                else if (cons->attr_sel - 1 > 1)
+                else if (cons->attr_sel - 1 == 1)
                 {
-                    if (cons->attr_stack[0] == 0)
+                    uint attr = cons->attr_stack[0];
+
+                    if (attr == 0)
                     {
                         console_clear(cons, cons->cx, cons->cy, cons->w, cons->h);
                     }
-                    else if (cons->attr_stack[0] == 1)
+                    else if (attr == 1)
                     {
                         console_clear(cons, 0, 0, cons->cx, cons->cy);
                     }
-                    else if (cons->attr_stack[0] == 2)
+                    else if (attr == 2)
                     {
                         console_clear(cons, 0, 0, cons->w, cons->h);
+                    }
+                }
+            }
+            else if (c == 'K')
+            {
+                if (cons->attr_sel - 1 == 0)
+                {
+                    console_clear(cons, cons->cx, cons->cy, cons->w, cons->cy);
+                }
+                else if (cons->attr_sel - 1 == 1)
+                {
+                    uint attr = cons->attr_stack[0];
+
+                    if (attr == 0)
+                    {
+                        console_clear(cons, cons->cx, cons->cy, cons->w, cons->cy);
+                    }
+                    else if (attr == 1)
+                    {
+                        console_clear(cons, 0, cons->cy, cons->cx, cons->cy);
+                    }
+                    else if (attr == 2)
+                    {
+                        console_clear(cons, 0, cons->cy, cons->w, cons->cy);
                     }
                 }
             }

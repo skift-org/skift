@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 void sk_atomic_enable();
 void sk_atomic_disable();
 void sk_atomic_begin();

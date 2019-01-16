@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -37,7 +41,7 @@ void readline(char* buffer, uint size)
                 if (strlen(buffer) > 0)
                 {
                     strbs(buffer);
-                    printf("\b\033[2J");
+                    printf("\b\033[K");
                 }
             }
             else if (!(event.c == '\0' || event.c == '\t'))

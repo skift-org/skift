@@ -76,8 +76,8 @@ void filesystem_close(stream_t *s);
 int filesystem_read(stream_t *s, void *buffer, uint size);
 int filesystem_write(stream_t *s, void *buffer, uint size);
 
-fsresult_t filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
-fsresult_t filesystem_tell(stream_t *s);
+int filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
+int filesystem_tell(stream_t *s);
 
 int filesystem_fstat(stream_t *s, file_stat_t *stat);
 

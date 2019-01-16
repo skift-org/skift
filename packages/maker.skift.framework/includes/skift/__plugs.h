@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 // this header list all "plugs" function between the library and the syscalls or the kernel
 
 #include <skift/generic.h>

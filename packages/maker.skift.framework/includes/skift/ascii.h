@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define ASCII_NUL	0
 #define ASCII_SOH	1
 #define ASCII_STX	2

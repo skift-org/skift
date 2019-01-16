@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define assert(expr) \
     if (!(expr)) \
         __assert_failed( #expr, __FILE__,  __FUNCTION__, __LINE__ )

@@ -4,6 +4,12 @@
 
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
+/*
+ * TODO:
+ *  - A lot of error checking is missing
+ *  - Add support for on disk file system 
+ */
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,6 +61,8 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
+    sk_log(LOG_DEBUG, "Fsnode free: '%s'", node->name);
+
     switch (node->type)
     {
     case FSFILE:
@@ -271,10 +279,11 @@ void directory_removechild(fsnode_t *dir, fsnode_t *child)
 
 int directory_read(stream_t *stream, void *buffer, uint size)
 {
-    int index = stream->offset / sizeof(stream_t);
+    int index = stream->offset / sizeof(directory_entry_t);
 
-    if (size == sizeof(directory_entries_t))
+    if (size == sizeof(directory_entry_t))
     {
+        sk_log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
         if (index < stream->direntries.count)
         {
             int entrysize = sizeof(directory_entry_t);
@@ -291,6 +300,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     }
     else
     {
+        sk_log(LOG_DEBUG, "Directory read fail!");
         return -1;
     }
 }
@@ -351,8 +361,7 @@ fsnode_t *filesystem_acquire(const char *path, bool create)
             if (parent != NULL && parent->type == FSDIRECTORY)
             {
                 node = fsnode(child_name, FSFILE);
-                node->refcount++;
-                list_pushback(parent->directory.childs, node);
+                directory_addchild(parent, node);
             }
         }
 
@@ -561,14 +570,57 @@ int filesystem_fstat(stream_t *s, file_stat_t *stat)
     return 0;
 }
 
+int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
+{
+    switch (origine)
+    {
+        case SEEKFROM_START:
+            s->offset = offset;
+            break;
+    
+        case SEEKFROM_HERE:
+            s->offset += offset;
+            break;
+
+        case SEEKFROM_END:
+            if (s->node->type == FSFILE)
+            {
+                sk_lock_acquire(s->node->lock);
+                s->offset = s->node->file.size + offset;
+                sk_lock_release(s->node->lock);
+            }
+            else if (s->node->type == FSDIRECTORY)
+            {
+                s->offset = s->direntries.count * sizeof(directory_entry_t) + offset;
+            }
+            else
+            {
+                // TODO: We don't support seeking for devices, now.
+                // But this is going to be usefull for block devices.
+                s->offset = offset;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return s->offset;
+}
+
+int filesystem_tell(stream_t *s)
+{
+    return s->offset;
+}
+
 int filesystem_mkdir(const char *path)
 {
-    int result = 0;
+    int result = -1;
 
     sk_lock_acquire(fslock);
     {
-        char *child = malloc(FSNAME_SIZE);
         char *parent = malloc(strlen(path));
+        char *child = malloc(FSNAME_SIZE);
 
         if (path_split(path, parent, child))
         {
@@ -577,10 +629,8 @@ int filesystem_mkdir(const char *path)
             if (p->type == FSDIRECTORY)
             {
                 fsnode_t *c = fsnode(child, FSDIRECTORY);
-                list_pushback(p->directory.childs, c);
-                c->refcount++;
-
-                result = FSRESULT_SUCCEED;
+                directory_addchild(p, c);  
+                result = 0;
             }
         }
 
@@ -594,7 +644,7 @@ int filesystem_mkdir(const char *path)
 
 int filesystem_mkdev(const char *path, device_t dev)
 {
-    int result = FSRESULT_FAILED;
+    int result = -1;
 
     sk_lock_acquire(fslock);
     {
@@ -608,12 +658,10 @@ int filesystem_mkdev(const char *path, device_t dev)
             if (p->type == FSDIRECTORY)
             {
                 fsnode_t *c = fsnode(child, FSDEVICE);
-                list_pushback(p->directory.childs, c);
-
-                c->refcount++;
+                directory_addchild(p, c);
                 c->device = dev;
 
-                result = FSRESULT_SUCCEED;
+                result = 0;
             }
         }
 
@@ -627,7 +675,7 @@ int filesystem_mkdev(const char *path, device_t dev)
 
 int filesystem_mkfile(const char *path)
 {
-    int result = FSRESULT_FAILED;
+    int result = -1;
 
     sk_lock_acquire(fslock);
     {
@@ -641,11 +689,38 @@ int filesystem_mkfile(const char *path)
             if (p->type == FSDIRECTORY)
             {
                 fsnode_t *c = fsnode(child, FSFILE);
-                list_pushback(p->directory.childs, c);
+                directory_addchild(p, c);
 
-                c->refcount++;
+                result = 0;
+            }
+        }
 
-                result = FSRESULT_SUCCEED;
+        free(child);
+        free(parent);
+    }
+    sk_lock_release(fslock);
+
+    return result;
+}
+
+int filesystem_rm(const char *path)
+{
+    int result = -1;
+
+    sk_lock_acquire(fslock);
+    {
+        char *child = malloc(FSNAME_SIZE);
+        char *parent = malloc(strlen(path));
+
+        if (path_split(path, parent, child))
+        {
+            fsnode_t *p = filesystem_resolve(parent);
+            fsnode_t *c = filesystem_resolve(path);
+
+            if (c != root && p != NULL && p->type == FSDIRECTORY && c != NULL)
+            {
+                directory_removechild(p, c);
+                result = 0;
             }
         }
 

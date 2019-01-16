@@ -1,4 +1,9 @@
 #pragma once
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include "defs/size_t.h"
 #include "defs/NULL.h"
 

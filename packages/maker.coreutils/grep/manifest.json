@@ -1,0 +1,9 @@
+{
+    "name": "grep",
+    
+    "id": "grep",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

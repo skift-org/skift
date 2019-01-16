@@ -1,5 +1,8 @@
-#include <string.h>
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
+#include <string.h>
 #include <skift/tar.h>
 
 typedef PACKED(struct)

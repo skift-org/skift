@@ -1,7 +1,10 @@
-#include <skift/generic.h>
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
-#include "string.h"
-#include "math.h"
+#include <math.h>
+#include <string.h>
+#include <skift/generic.h>
 
 void *memchr(const void *str, int c, size_t n)
 {

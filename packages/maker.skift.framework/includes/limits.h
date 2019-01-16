@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define CHAR_BIT 8
 #define SCHAR_MIN -128
 #define SCHAR_MAX +127

@@ -56,7 +56,7 @@
 #include <unistd.h>
 #include <skift/thread.h>
 
-char * colors[256] = {NULL};
+char * colors[256] = { NULL };
 
 const char * frame0[] = {
 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,,,,,,,,",
@@ -866,11 +866,11 @@ const char ** frames[] = {
 	NULL
 };
 
-#define MIN_ROW 20
-#define MAX_ROW 44
+#define MIN_ROW 14
+#define MAX_ROW 50
 
-#define MIN_COL 10
-#define MAX_COL 50
+#define MIN_COL 8
+#define MAX_COL 56
 
 int main() {
 	printf("\033[H\033[2J");
@@ -893,10 +893,9 @@ int main() {
 	int playing = 1;
 	size_t i = 0;
 	char last = 0;
-	size_t y, x;
 	while (playing) {
-		for (y = MIN_ROW; y < MAX_ROW; ++y) {
-			for (x = MIN_COL; x < MAX_COL; ++x) {
+		for (int y = MIN_ROW; y < MAX_ROW; ++y) {
+			for (int x = MIN_COL; x < MAX_COL; ++x) {
 				if (frames[i][y][x] != last && colors[(int)frames[i][y][x]]) {
 					last = frames[i][y][x];
 					printf("%s##", colors[(int)frames[i][y][x]]);
@@ -913,7 +912,7 @@ int main() {
 		}
 		printf("\033[H");
 		
-		sk_thread_sleep(40);
+		// sk_thread_sleep(40);
 		// usleep(90000);
 	}
 

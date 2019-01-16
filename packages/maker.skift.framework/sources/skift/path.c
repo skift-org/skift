@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <string.h>
 #include <skift/path.h>
 
@@ -38,11 +42,9 @@ int path_read(const char *path, int index, char *buffer)
 int path_len(const char *path)
 {
     char buffer[128];
-    int count;
-
-    for (count = 0; path_read(path, count, buffer); count++)
-    {
-    }
+    
+    int count = 0;
+    while(path_read(path, count, buffer)) count++;
 
     return count;
 }

@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 typedef enum
 {
     SYS_DEBUG = 0,
@@ -51,36 +55,17 @@ typedef enum
 
     /* --- Filesystem ----------------------------------------------------------- */
 
-    // Files
-    SYS_FILE_CREATE,
-    SYS_FILE_DELETE,
-    SYS_FILE_EXISTE,
+    SYS_FILESYSTEM_OPEN,
+    SYS_FILESYSTEM_CLOSE,
 
-    SYS_FILE_COPY,
-    SYS_FILE_MOVE,
+    SYS_FILESYSTEM_READ,
+    SYS_FILESYSTEM_WRITE,
+    SYS_FILESYSTEM_FSTAT,
+    SYS_FILESYSTEM_SEEK,
+    SYS_FILESYSTEM_TELL,
 
-    SYS_FILE_STAT,
-
-    SYS_FILE_OPEN,
-    SYS_FILE_CLOSE,
-
-    SYS_FILE_READ,
-    SYS_FILE_WRITE,
-    SYS_FILE_IOCTL,
-
-    // Directories
-    SYS_DIR_CREATE,
-    SYS_DIR_DELETE,
-    SYS_DIR_EXISTE,
-
-    SYS_DIR_COPY,
-    SYS_DIR_MOVE,
-
-    SYS_DIR_OPEN,
-    SYS_DIR_CLOSE,
-
-    SYS_DIR_LISTFILE,
-    SYS_DIR_LISTDIR,
+    SYS_FILESYSTEM_MKDIR,
+    SYS_FILESYSTEM_RM,
 
     ////////////////////////////////////////////////////////////////////////////////
 

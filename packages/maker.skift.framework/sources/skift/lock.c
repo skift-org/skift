@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/lock.h>
 
 void __sk_lock_init(lock_t *lock)

@@ -1,9 +1,12 @@
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
 #include <stdlib.h>
 #include <string.h>
 
 const char * basechar     = "0123456789abcdefghijklmnopqrstuvwxyz";
-const char *  basechar_maj = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const char * basechar_maj = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 unsigned int stoi(const char * str, unsigned char base)
 {

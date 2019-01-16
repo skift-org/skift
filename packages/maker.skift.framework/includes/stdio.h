@@ -1,8 +1,13 @@
 #pragma once
-#include "defs/NULL.h"
-#include "defs/size_t.h"
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
 #include <stdarg.h>
+
+#include "defs/NULL.h"
+#include "defs/size_t.h"
 
 #define EOF -1
 #define SEEK_SET 1

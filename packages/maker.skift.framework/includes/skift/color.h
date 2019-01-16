@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define COLOR_WHITE   0xFFFFFF
 #define COLOR_BLACK   0x000000
 #define COLOR_WHITESMOKE    0xF5F5F5

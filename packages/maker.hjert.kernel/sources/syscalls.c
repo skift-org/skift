@@ -16,9 +16,10 @@
 #include "kernel/tasking.h"
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"
+#include "kernel/filesystem.h"
+
 #include "kernel/serial.h"
 #include "kernel/graphic.h"
-#include "kernel/mouse.h"
 
 #include "kernel/shared/syscalls.h"
 #include "kernel/syscalls.h"
@@ -185,6 +186,56 @@ int sys_io_graphic_size(unsigned int *width, unsigned int *height)
     return 0;
 }
 
+/* --- Filesystem and IO ---------------------------------------------------- */
+
+// TODO file decriptor
+
+int sys_filesystem_open(const char* path, fsoflags_t flags)
+{
+    return (int)filesystem_open(path, flags);
+}
+
+int sys_filesystem_close(int fd)
+{
+    filesystem_close((stream_t*) fd);
+    return 0;
+}
+
+int sys_filesystem_read(int fd, void* buffer, uint size)
+{
+    return filesystem_read((stream_t*)fd, buffer, size);
+}
+
+int sys_filesystem_write(int fd, void* buffer, uint size)
+{
+    return filesystem_write((stream_t*)fd, buffer, size);
+}
+
+int sys_filesystem_fstat(int fd, file_stat_t *stat)
+{
+    return filesystem_fstat((stream_t*)fd, stat);
+}
+
+int sys_filesystem_seek(int fd, int offset, seek_origin_t origin)
+{
+    return filesystem_seek((stream_t*)fd, offset, origin);
+}
+
+int sys_filesystem_tell(int fd)
+{
+    return filesystem_tell((stream_t*)fd);
+}
+
+int sys_filesystem_mkdir(const char *path)
+{
+    return filesystem_mkdir(path);
+}
+
+int sys_filesystem_rm(const char *path)
+{
+    return filesystem_rm(path);
+}
+
 static int (*syscalls[])() =
 {
     [SYS_PROCESS_SELF] = sys_process_self,
@@ -220,25 +271,15 @@ static int (*syscalls[])() =
     [SYS_IO_GRAPHIC_BLIT_REGION] = sys_io_graphic_blit_region,
     [SYS_IO_GRAPHIC_SIZE] = sys_io_graphic_size,
 
-    [SYS_FILE_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_DELETE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_EXISTE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_COPY] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_MOVE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_STAT] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_OPEN] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_CLOSE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_WRITE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_FILE_IOCTL] = sys_not_implemented /* NOT IMPLEMENTED */,
-
-    [SYS_DIR_CREATE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_DELETE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_EXISTE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_OPEN] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_CLOSE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_LISTFILE] = sys_not_implemented /* NOT IMPLEMENTED */,
-    [SYS_DIR_LISTDIR] = sys_not_implemented /* NOT IMPLEMENTED */,
+    [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
+    [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,
+    [SYS_FILESYSTEM_READ] = sys_filesystem_read,
+    [SYS_FILESYSTEM_WRITE] = sys_filesystem_write,
+    [SYS_FILESYSTEM_FSTAT] = sys_filesystem_fstat,
+    [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
+    [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
+    [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
+    [SYS_FILESYSTEM_RM] = sys_filesystem_rm,
 };
 
 void syscall_dispatcher(processor_context_t *context)

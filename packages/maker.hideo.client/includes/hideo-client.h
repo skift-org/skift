@@ -1,7 +1,12 @@
 #pragma once
-#include <skift/generic.h>
+
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
 /* hideo-client.h: Hideo client API                                           */
+
+#include <skift/generic.h>
 
 typedef struct 
 {

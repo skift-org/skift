@@ -36,7 +36,6 @@
 
 #include "kernel/console.h"
 #include "kernel/filesystem.h"
-#include "kernel/graphic.h"
 #include "kernel/keyboard.h"
 #include "kernel/memory.h"
 #include "kernel/messaging.h"
@@ -64,7 +63,6 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-//    graphic_early_setup(1366, 768);
 
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
@@ -100,7 +98,6 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- Devices ---------------------------------------------------------- */
     filesystem_mkdir("/dev");
     setup(serial);
-    setup(graphic);
     setup(mouse);
     setup(keyboard);
     setup(console);

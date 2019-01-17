@@ -1,8 +1,11 @@
+#include <ctype.h>
+#include <math.h>
+
 #include <skift/vtconsole.h>
 
 /* --- Constructor/Destructor ----------------------------------------------- */
 
-vtconsole_t *vtconsole(uint width, uint height, vtc_paint_handler_t on_paint)
+vtconsole_t *vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move)
 {
     vtconsole_t *vtc = MALLOC(vtconsole_t);
 
@@ -14,7 +17,7 @@ vtconsole_t *vtconsole(uint width, uint height, vtc_paint_handler_t on_paint)
 
     vtc->buffer = malloc(width * height * sizeof(vtcell_t));
 
-    for (uint i = 0; i < width * height; i++)
+    for (int i = 0; i < width * height; i++)
     {
         vtcell_t *cell = &vtc->buffer[i];
         cell->c = ' ';
@@ -24,6 +27,9 @@ vtconsole_t *vtconsole(uint width, uint height, vtc_paint_handler_t on_paint)
     vtc->cursor = (vtcursor_t){0, 0};
 
     vtc->on_paint = on_paint;
+    vtc->on_move = on_move;
+
+    return vtc;
 }
 
 void vtconsole_delete(vtconsole_t *vtc)
@@ -34,27 +40,10 @@ void vtconsole_delete(vtconsole_t *vtc)
 
 /* --- Internal methodes ---------------------------------------------------- */
 
-// Set the cursor position
-void vtconsole_set_cursor(vtconsole_t *vtc, uint x, uint y)
-{
-    vtc->cursor.x = min(x, vtc->width);
-    vtc->cursor.y = min(y, vtc->height);
-
-    if (vtc->on_move)
-    {
-        vtc->on_move(vtc, &vtc->cursor);
-    }
-}
-
-void vtconsole_move_cursor(vtconsole_t *vtc, int offx, int offy)
-{
-    vtconsole_set_cursor(vtc, vtc->cursor.x + offx, vtc->cursor.y + offy);
-}
-
 // Clear the console buffer.
-void vtconsole_clear(vtconsole_t *vtc, uint fromx, uint fromy, uint tox, uint toy)
+void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy)
 {
-    for (uint i = fromx + fromy * vtc->width; i < tox + toy * vtc->width; i++)
+    for (int i = fromx + fromy * vtc->width; i < tox + toy * vtc->width; i++)
     {
         vtcell_t *cell = &vtc->buffer[i];
 
@@ -81,16 +70,29 @@ void vtconsole_scroll(vtconsole_t *vtc)
         }
     }
 
-    vtconsole_move_cursor(vtc, 0, -1);
+    if (vtc->cursor.y > 0)
+    {
+        vtc->cursor.y--;
+    }
+
+    if (vtc->on_move)
+    {
+        vtc->on_move(vtc, &vtc->cursor);
+    }
 }
 
 // Append a new line
 void vtconsole_newline(vtconsole_t *vtc)
 {
-    vtconsole_set_cursor(vtc, 0, vtc->cursor.y);
-    vtconsole_move_cursor(vtc, 0, +1);
+    vtc->cursor.y++;
+    vtc->cursor.x = 0;
 
-    if (vtc->cursor.y >= vtc->width)
+    if (vtc->on_move)
+    {
+        vtc->on_move(vtc, &vtc->cursor);
+    }
+
+    if (vtc->cursor.y == vtc->width)
     {
         vtconsole_scroll(vtc);
     }
@@ -105,15 +107,15 @@ void vtconsole_append(vtconsole_t *vtc, char c)
     }
     else if (c == '\t')
     {
-        // TODO: tabs stops
-        for (uint i = 0; i < 8; i++)
+        // TODO: tabstops
+        for (int i = 0; i < 8; i++)
         {
-            console_append(' ');
+            vtconsole_append(vtc, ' ');
         }
     }
     else if (c == '\b')
     {
-        if (vtc->cursor.x != 0)
+        if (vtc->cursor.x > 0)
         {
             vtc->cursor.x--;
 
@@ -147,29 +149,72 @@ void vtconsole_append(vtconsole_t *vtc, char c)
 }
 
 // Moves the cursor to row n, column m. The values are 1-based,
-void vtconsole_csi_cup(vtconsole_t *vtc, uint *stack, uint count)
+void vtconsole_csi_cup(vtconsole_t *vtc, int *stack, int count)
 {
     if (count == 0)
     {
+        vtc->cursor.x = 1;
+        vtc->cursor.y = 1;
+    }
+    else if (count == 2)
+    {
+        if (stack[0] == 0) stack[0] = 1;
+        if (stack[1] == 0) stack[1] = 1;
+
+        vtc->cursor.x = min(stack[0] - 1, vtc->width  - 1);
+        vtc->cursor.y = min(stack[1] - 1, vtc->height - 1);
+    }
+
+    if (vtc->on_move)
+    {
+        vtc->on_move(vtc, &vtc->cursor);
     }
 }
 
 // Clears part of the screen.
-void vtconsole_csi_ed(vtconsole_t *vtc, uint *stack, uint count)
+void vtconsole_csi_ed(vtconsole_t *vtc, int *stack, int count)
 {
+    vtcursor_t cursor = vtc->cursor;
+
+    if (count == 0)
+    {
+        vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height);
+    }
+    else
+    {
+        int attr = stack[0];
+
+        if (attr == 0)      vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height);
+        else if (attr == 1) vtconsole_clear(vtc,        0,        0,   cursor.x,    cursor.y);
+        else if (attr == 2) vtconsole_clear(vtc,        0,        0, vtc->width, vtc->height);
+    }
 }
 
 // Erases part of the line.
-void vtconsole_csi_el(vtconsole_t *vtc, uint *stack, uint count)
+void vtconsole_csi_el(vtconsole_t *vtc, int *stack, int count)
 {
+    vtcursor_t cursor = vtc->cursor;
+
+    if (count == 0)
+    {
+        vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, cursor.y);
+    }
+    else
+    {
+        int attr = stack[0];
+
+        if (attr == 0)      vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, cursor.y);
+        else if (attr == 1) vtconsole_clear(vtc,        0, cursor.y,   cursor.x, cursor.y);
+        else if (attr == 2) vtconsole_clear(vtc,        0, cursor.y, vtc->width, cursor.y);
+    }
 }
 
 // Sets the appearance of the following characters
-void vtconsole_csi_sgr(vtconsole_t *vtc, uint *stack, uint count)
+void vtconsole_csi_sgr(vtconsole_t *vtc, int *stack, int count)
 {
     for (int i = 0; i < count; i++)
     {
-        uint attr = stack[i];
+        int attr = stack[i];
 
         if (attr == 0) // Reset
         {
@@ -220,7 +265,7 @@ void vtconsole_process(vtconsole_t *vtc, char c)
         else
         {
             parser->state = VTSTATE_ESC;
-            console_append(c);
+            vtconsole_append(vtc, c);
         }
         break;
     case VTSTATE_ATTR:

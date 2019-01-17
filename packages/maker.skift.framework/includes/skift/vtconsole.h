@@ -7,6 +7,8 @@
 #define VTC_DEFAULT_ATTR (vtattr_t){ false, VTC_DEFAULT_FOREGROUND, VTC_DEFAULT_BACKGROUND }
 #define VTC_ANSI_PARSER_STACK_SIZE 8
 
+struct vtconsole;
+
 typedef enum
 {
     VTCOLOR_BLACK,
@@ -30,8 +32,8 @@ typedef enum
 typedef struct
 {
     vtansi_parser_state_t state;
-    uint stack[VTC_ANSI_PARSER_STACK_SIZE];
-    uint index;
+    int stack[VTC_ANSI_PARSER_STACK_SIZE];
+    int index;
 } vtansi_parser_t;
 
 typedef struct
@@ -49,18 +51,18 @@ typedef struct
 
 typedef struct
 {
-    uint x;
-    uint y;
+    int x;
+    int y;
 } vtcursor_t;
 
-typedef void (*vtc_paint_handler_t)(vtconsole_t* vtc, vtcell_t* cell, uint x, uint y);
-typedef void (*vtc_cursor_handler_t)(vtconsole_t* vtc, vtcursor_t* cur);
+typedef void  (*vtc_paint_handler_t)(struct vtconsole* vtc, vtcell_t* cell, int x, int y);
+typedef void (*vtc_cursor_handler_t)(struct vtconsole* vtc, vtcursor_t* cur);
 
-typedef struct
+typedef struct vtconsole
 {
 
-    uint width;
-    uint height;
+    int width;
+    int height;
 
     vtattr_t attr;
     vtansi_parser_t ansiparser;
@@ -72,7 +74,7 @@ typedef struct
     vtc_cursor_handler_t on_move;
 } vtconsole_t;
 
-vtconsole_t* vtconsole(uint width, uint height, vtc_paint_handler_t on_paint);
+vtconsole_t* vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move);
 void vtconsole_delete(vtconsole_t *c);
 
 void vtconsole_putchar(vtconsole_t *vtc, char c);

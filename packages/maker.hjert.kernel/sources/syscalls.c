@@ -19,7 +19,6 @@
 #include "kernel/filesystem.h"
 
 #include "kernel/serial.h"
-#include "kernel/graphic.h"
 
 #include "kernel/shared/syscalls.h"
 #include "kernel/syscalls.h"
@@ -170,19 +169,27 @@ int sys_io_print(const char *msg)
 
 int sys_io_graphic_blit(unsigned int *buffer)
 {
-    graphic_blit(buffer);
+    UNUSED(buffer);
+
     return 0;
 }
 
 int sys_io_graphic_blit_region(unsigned int *buffer, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
-    graphic_blit_region(buffer, x, y, w, h);
+    UNUSED(buffer);
+    UNUSED(x);
+    UNUSED(y);
+    UNUSED(w);
+    UNUSED(h);
+
     return 0;
 }
 
 int sys_io_graphic_size(unsigned int *width, unsigned int *height)
 {
-    graphic_size(width, height);
+    UNUSED(width);
+    UNUSED(height);
+    
     return 0;
 }
 

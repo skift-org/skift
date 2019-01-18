@@ -47,19 +47,20 @@ void console_paint(vtconsole_t* vtc, vtcell_t* cell, int x, int y)
     }
     else
     {
-        vga_cell(x, y, vga_entry(cell->c, brightcolors[cell->attr.fg], brightcolors[cell->attr.bg]));
+        vga_cell(x, y, vga_entry(cell->c, brightcolors[cell->attr.fg], colors[cell->attr.bg]));
     }
 }
 
 void console_cursor_move(vtconsole_t* vtc, vtcursor_t* cur)
 {
     UNUSED(vtc);
-    vga_cursor(cur->x, cur->y);
+    UNUSED(cur);
+    //vga_cursor(cur->x, cur->y);
 }
 
 void console_setup(void)
 {
-    vtc = vtconsole(80, 25, console_paint, console_cursor_move);
+    vtc = vtconsole(vga_screen_width, vga_screen_height, console_paint, console_cursor_move);
 }
 
 void console_print(const char *s)

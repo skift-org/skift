@@ -29,10 +29,16 @@ typedef enum
     VTSTATE_ENDVAL,
 } vtansi_parser_state_t;
 
+typedef struct 
+{
+    int value;
+    bool empty;
+} vtansi_arg_t;
+
 typedef struct
 {
     vtansi_parser_state_t state;
-    int stack[VTC_ANSI_PARSER_STACK_SIZE];
+    vtansi_arg_t stack[VTC_ANSI_PARSER_STACK_SIZE];
     int index;
 } vtansi_parser_t;
 

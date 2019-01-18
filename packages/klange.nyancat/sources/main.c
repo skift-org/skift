@@ -866,8 +866,8 @@ const char ** frames[] = {
 	NULL
 };
 
-#define MIN_ROW 14
-#define MAX_ROW 50
+#define MIN_ROW 20
+#define MAX_ROW 44
 
 #define MIN_COL 8
 #define MAX_COL 56
@@ -898,9 +898,9 @@ int main() {
 			for (int x = MIN_COL; x < MAX_COL; ++x) {
 				if (frames[i][y][x] != last && colors[(int)frames[i][y][x]]) {
 					last = frames[i][y][x];
-					printf("%s##", colors[(int)frames[i][y][x]]);
+					printf("%s#", colors[(int)frames[i][y][x]]);
 				} else {
-					printf("##");
+					printf("#");
 				}
 			}
 			if (y != MAX_ROW - 1)

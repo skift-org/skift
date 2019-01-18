@@ -48,7 +48,7 @@ void vtconsole_delete(vtconsole_t *vtc)
 // Clear the console buffer.
 void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy)
 {
-    for (int i = fromx + fromy * vtc->width; i < tox + (toy - 1) * vtc->width; i++)
+    for (int i = fromx + fromy * vtc->width; i < tox + toy * vtc->width; i++)
     {
         vtcell_t *cell = &vtc->buffer[i];
 
@@ -75,11 +75,11 @@ void vtconsole_scroll(vtconsole_t *vtc)
             vtc->on_paint(vtc, &vtc->buffer[i], i % vtc->width, i / vtc->width);
         }
     }
-    
+
     // Clear the last line.
-    for(int i = ((vtc->width * vtc->height) - vtc->width) ; i < vtc->width * vtc->height; i++)
+    for (int i = ((vtc->width * vtc->height) - vtc->width); i < vtc->width * vtc->height; i++)
     {
-        vtcell_t* cell = &vtc->buffer[i];
+        vtcell_t *cell = &vtc->buffer[i];
         cell->attr = VTC_DEFAULT_ATTR;
         cell->c = ' ';
 
@@ -88,7 +88,7 @@ void vtconsole_scroll(vtconsole_t *vtc)
             vtc->on_paint(vtc, &vtc->buffer[i], i % vtc->width, i / vtc->width);
         }
     }
-    
+
     if (vtc->cursor.y > 0)
     {
         vtc->cursor.y--;
@@ -186,13 +186,13 @@ void vtconsole_csi_cup(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
             vtc->cursor.y = min(stack[0].value - 1, vtc->height - 1);
         }
 
-        if (stack[1].empty) 
+        if (stack[1].empty)
         {
             vtc->cursor.y = 0;
         }
         else
         {
-            vtc->cursor.x = min(stack[1].value - 1, vtc->width  - 1);
+            vtc->cursor.x = min(stack[1].value - 1, vtc->width - 1);
         }
     }
 
@@ -211,15 +211,18 @@ void vtconsole_csi_ed(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 
     if (stack[0].empty)
     {
-        vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height);
+        vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height - 1);
     }
     else
     {
         int attr = stack[0].value;
 
-        if (attr == 0)      vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height);
-        else if (attr == 1) vtconsole_clear(vtc,        0,        0,   cursor.x,    cursor.y);
-        else if (attr == 2) vtconsole_clear(vtc,        0,        0, vtc->width, vtc->height);
+        if (attr == 0)
+            vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, vtc->height - 1);
+        else if (attr == 1)
+            vtconsole_clear(vtc, 0, 0, cursor.x, cursor.y);
+        else if (attr == 2)
+            vtconsole_clear(vtc, 0, 0, vtc->width, vtc->height - 1);
     }
 }
 
@@ -238,9 +241,12 @@ void vtconsole_csi_el(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
     {
         int attr = stack[0].value;
 
-        if (attr == 0)      vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, cursor.y);
-        else if (attr == 1) vtconsole_clear(vtc,        0, cursor.y,   cursor.x, cursor.y);
-        else if (attr == 2) vtconsole_clear(vtc,        0, cursor.y, vtc->width, cursor.y);
+        if (attr == 0)
+            vtconsole_clear(vtc, cursor.x, cursor.y, vtc->width, cursor.y);
+        else if (attr == 1)
+            vtconsole_clear(vtc, 0, cursor.y, cursor.x, cursor.y);
+        else if (attr == 2)
+            vtconsole_clear(vtc, 0, cursor.y, vtc->width, cursor.y);
     }
 }
 
@@ -249,15 +255,15 @@ void vtconsole_csi_sgr(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 {
     for (int i = 0; i < count; i++)
     {
-        if (!stack[i].empty)
+        if (stack[i].empty || stack[i].value == 0)
+        {
+            vtc->attr = VTC_DEFAULT_ATTR;
+        }
+        else
         {
             int attr = stack[i].value;
 
-            if (attr == 0) // Reset
-            {
-                vtc->attr = VTC_DEFAULT_ATTR;
-            }
-            else if (attr == 1) // Increased intensity
+            if (attr == 1) // Increased intensity
             {
                 vtc->attr.bright = true;
             }

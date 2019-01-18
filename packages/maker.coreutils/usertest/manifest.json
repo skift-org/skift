@@ -1,0 +1,9 @@
+{
+    "name": "Userspace unit test",
+    
+    "id": "usertest",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

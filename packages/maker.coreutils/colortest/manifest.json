@@ -1,7 +1,7 @@
 {
-    "name": "Userspace unit test",
+    "name": "Ansi escape sequences test",
     
-    "id": "usertest",
+    "id": "colortest",
     "type": "app",
     "libs": [
         "maker.skift.runtime"

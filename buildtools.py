@@ -325,7 +325,7 @@ class Target(object):
 
         MKDIR(os.path.dirname(output))
 
-        print("    " + BRIGHT_BLACK + "%s" % source + RESET)
+        print("    " + BRIGHT_BLACK + "%s" % source.split("/")[-1] + RESET)
 
         if source.endswith(".c"):
             includes = [("-I" + i) for i in self.get_includes(targets)]

@@ -11,47 +11,47 @@
 #include "kernel/filesystem.h"
 #include "kernel/console.h"
 
-vtconsole_t* vtc;
+static vtconsole_t *vtc;
 
-byte colors[] = 
+static byte colors[] =
 {
-    [VTCOLOR_BLACK] = vga_black,
-    [VTCOLOR_RED] = vga_red,
-    [VTCOLOR_GREEN] = vga_green,
-    [VTCOLOR_YELLOW] = vga_brown,
-    [VTCOLOR_BLUE] = vga_blue,
-    [VTCOLOR_MAGENTA] = vga_magenta,
-    [VTCOLOR_CYAN] = vga_cyan,
-    [VTCOLOR_GREY] = vga_light_gray,
+    [VTCOLOR_BLACK] = VGACOLOR_BLACK,
+    [VTCOLOR_RED] = VGACOLOR_RED,
+    [VTCOLOR_GREEN] = VGACOLOR_GREEN,
+    [VTCOLOR_YELLOW] = VGACOLOR_BROWN,
+    [VTCOLOR_BLUE] = VGACOLOR_BLUE,
+    [VTCOLOR_MAGENTA] = VGACOLOR_MAGENTA,
+    [VTCOLOR_CYAN] = VGACOLOR_CYAN,
+    [VTCOLOR_GREY] = VGACOLOR_LIGHT_GRAY,
 };
 
-byte brightcolors[] = 
+static byte brightcolors[] =
 {
-    [VTCOLOR_BLACK] = vga_gray,
-    [VTCOLOR_RED] = vga_light_red,
-    [VTCOLOR_GREEN] = vga_light_green,
-    [VTCOLOR_YELLOW] = vga_light_yellow,
-    [VTCOLOR_BLUE] = vga_light_blue,
-    [VTCOLOR_MAGENTA] = vga_light_magenta,
-    [VTCOLOR_CYAN] = vga_light_cyan,
-    [VTCOLOR_GREY] = vga_white,
+    [VTCOLOR_BLACK] = VGACOLOR_GRAY,
+    [VTCOLOR_RED] = VGACOLOR_LIGHT_RED,
+    [VTCOLOR_GREEN] = VGACOLOR_LIGHT_GREEN,
+    [VTCOLOR_YELLOW] = VGACOLOR_LIGHT_YELLOW,
+    [VTCOLOR_BLUE] = VGACOLOR_LIGHT_BLUE,
+    [VTCOLOR_MAGENTA] = VGACOLOR_LIGHT_MAGENTA,
+    [VTCOLOR_CYAN] = VGACOLOR_LIGHT_CYAN,
+    [VTCOLOR_GREY] = VGACOLOR_WHITE,
 };
 
-void console_paint(vtconsole_t* vtc, vtcell_t* cell, int x, int y)
+void console_paint(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
 {
     UNUSED(vtc);
 
     if (cell->attr.bright)
     {
-        vga_cell(x, y, vga_entry(cell->c, brightcolors[cell->attr.fg], colors[cell->attr.bg]));
+        vga_cell(x, y, VGA_ENTRY(cell->c, brightcolors[cell->attr.fg], colors[cell->attr.bg]));
     }
     else
     {
-        vga_cell(x, y, vga_entry(cell->c, colors[cell->attr.fg], colors[cell->attr.bg]));
+        vga_cell(x, y, VGA_ENTRY(cell->c, colors[cell->attr.fg], colors[cell->attr.bg]));
     }
 }
 
-void console_cursor_move(vtconsole_t* vtc, vtcursor_t* cur)
+void console_cursor_move(vtconsole_t *vtc, vtcursor_t *cur)
 {
     UNUSED(vtc);
     vga_cursor(cur->x, cur->y);
@@ -59,7 +59,7 @@ void console_cursor_move(vtconsole_t* vtc, vtcursor_t* cur)
 
 void console_setup(void)
 {
-    vtc = vtconsole(vga_screen_width, vga_screen_height, console_paint, console_cursor_move);
+    vtc = vtconsole(VGA_SCREEN_WIDTH, VGA_SCREEN_HEIGHT, console_paint, console_cursor_move);
 }
 
 void console_print(const char *s)

@@ -6,38 +6,31 @@
 
 #include <skift/generic.h>
 
-#define vga_screen_width 80
-#define vga_screen_height 25
+#define VGA_FRAME_BUFFER 0XB8000
 
-#define vga_black         0x0
-#define vga_blue          0x1
-#define vga_green         0x2
-#define vga_cyan          0x3
-#define vga_red           0x4
-#define vga_magenta       0x5
-#define vga_brown         0x6
-#define vga_light_gray    0x7
+#define VGA_SCREEN_WIDTH 80
+#define VGA_SCREEN_HEIGHT 25
 
-#define vga_gray          0x8
-#define vga_light_blue    0x9
-#define vga_light_green   0xA
-#define vga_light_cyan    0xB
-#define vga_light_red     0xC
-#define vga_light_magenta 0xD
-#define vga_light_yellow  0xE
-#define vga_white         0xF
+#define VGACOLOR_BLACK         0X0
+#define VGACOLOR_BLUE          0X1
+#define VGACOLOR_GREEN         0X2
+#define VGACOLOR_CYAN          0X3
+#define VGACOLOR_RED           0X4
+#define VGACOLOR_MAGENTA       0X5
+#define VGACOLOR_BROWN         0X6
+#define VGACOLOR_LIGHT_GRAY    0X7
+#define VGACOLOR_GRAY          0X8
+#define VGACOLOR_LIGHT_BLUE    0X9
+#define VGACOLOR_LIGHT_GREEN   0XA
+#define VGACOLOR_LIGHT_CYAN    0XB
+#define VGACOLOR_LIGHT_RED     0XC
+#define VGACOLOR_LIGHT_MAGENTA 0XD
+#define VGACOLOR_LIGHT_YELLOW  0XE
+#define VGACOLOR_WHITE         0XF
 
-#define vga_frame_buffer 0xB8000
-#define vga_color(fg, bg) (bg << 4 | fg)
-#define vga_entry(c, fg, bg) ((((bg) & 0xf) << 4 | ((fg) & 0xf)) << 8 | ((c) & 0xff))
+#define VGA_COLOR(__fg, __bg) (__bg << 4 | __fg)
+#define VGA_ENTRY(__c, __fg, __bg) ((((__bg) & 0XF) << 4 | ((__fg) & 0XF)) << 8 | ((__c) & 0XFF))
 
-typedef uchar vga_color_t;
-typedef ushort vga_entry_t;
-
-void vga_setup();
-void vga_clear(vga_color_t fg, vga_color_t bg);
-void vga_scroll(vga_color_t bg);
-void vga_cell(u32 x, u32 y, vga_entry_t entry);
-void vga_text(u32 x, u32 y, string text, vga_color_t fg, vga_color_t bg);
+void vga_cell(u32 x, u32 y, ushort entry);
 void vga_cursor(s32 x, s32 y);
 void vga_hide_cursor();

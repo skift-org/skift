@@ -94,16 +94,6 @@ thread_t *alloc_thread(thread_entry_t entry, bool user)
     return t;
 }
 
-void cleanup_thread(thread_t *thread)
-{
-    // Close all reference to/from this thread.
-
-    // Free the stack.
-    free(thread->stack);
-
-    UNUSED(thread);
-}
-
 process_t *alloc_process(const char *name, bool user)
 {
     process_t *process = MALLOC(process_t);
@@ -128,21 +118,6 @@ process_t *alloc_process(const char *name, bool user)
     sk_log(LOG_FINE, "Process '%s' with ID=%d allocated.", process->name, process->id);
 
     return process;
-}
-
-void cleanup_process(process_t *process)
-{
-    // Close all reference to/from this process.
-
-    // Cleanup the inbox.
-
-    // Free all shared memory region.
-
-    // Free all allocated memory.
-
-    // Mark this process a dead to be free later by the garbage collector.
-
-    UNUSED(process);
 }
 
 thread_t *thread_get(THREAD thread)

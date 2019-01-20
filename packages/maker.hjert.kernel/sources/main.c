@@ -115,8 +115,7 @@ void main(multiboot_info_t *info, s32 magic)
     sti();
 
     printf(KERNEL_UNAME);
-    printf("\nCopyright (c) 2018-2019 MAKER.\n");
-    printf("Booting...\n");
+    printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
     PROCESS init = process_exec("/bin/init", NULL);

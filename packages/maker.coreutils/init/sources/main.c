@@ -32,7 +32,6 @@ int init_exec(const char* filename)
 int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
-    printf("Welcome to \033[0;34mskift\033[0m!\n");
 
     int shell = init_exec("/bin/sh");
     sk_thread_wait_process(shell);

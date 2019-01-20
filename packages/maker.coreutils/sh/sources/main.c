@@ -11,7 +11,7 @@
 
 #include "kernel/protocol.h"
 
-#define PROMPT "\n\033[0;31m $ \033[0m"
+#define PROMPT "\n\033[0;1;34m $ \033[0;1m"
 
 bool exited = false;
 void readline(char* buffer, uint size)
@@ -72,6 +72,8 @@ int main(int argc, char **argv)
         readline(command, 128);
 
         strleadtrim(command, ' ');
+
+        printf("\033[0m");
 
         if (strlen(command) != 0)
         {

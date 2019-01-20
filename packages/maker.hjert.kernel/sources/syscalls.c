@@ -84,9 +84,9 @@ int sys_thread_self()
     return thread_self();
 }
 
-int sys_thread_create(thread_entry_t entry, void * args, int flags)
+int sys_thread_create(thread_entry_t entry, void * args)
 {
-    return thread_create(process_self(), entry, args, flags | TASK_USER);
+    return thread_create(process_self(), entry, args, true);
 }
 
 int sys_thread_exit(void* retval)

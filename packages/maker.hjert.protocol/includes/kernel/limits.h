@@ -24,7 +24,7 @@
 /* Size of a thread name */
 #define MAX_THREAD_NAMESIZE 128 
 
-#define MAX_THREAD_STACKSIZE 4096
+#define MAX_THREAD_STACKSIZE 16384
 
 /* --- Limits for filesystem ------------------------------------------------ */
 

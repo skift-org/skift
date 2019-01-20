@@ -21,16 +21,16 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <skift/elf.h>
 #include <skift/atomic.h>
+#include <skift/elf.h>
 #include <skift/logger.h>
 
-#include "kernel/processor.h"
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/irq.h"
 #include "kernel/filesystem.h"
 #include "kernel/memory.h"
 #include "kernel/paging.h"
+#include "kernel/processor.h"
 #include "kernel/system.h"
 
 #include "kernel/tasking.h"
@@ -44,28 +44,28 @@ uint ticks = 0;
 list_t *threads;
 list_t *processes;
 
-thread_t *alloc_thread(thread_entry_t entry, int flags)
+thread_t *alloc_thread(thread_entry_t entry, bool user)
 {
-    thread_t *thread = MALLOC(thread_t);
-    memset(thread, 0, sizeof(thread_t));
+    thread_t *t = MALLOC(thread_t);
+    memset(t, 0, sizeof(thread_t));
 
-    thread->id = TID++;
+    t->id = TID++;
 
-    thread->stack = malloc(STACK_SIZE);
-    memset(thread->stack, 0, STACK_SIZE);
+    t->stack = malloc(MAX_THREAD_STACKSIZE);
+    memset(t->stack, 0, MAX_THREAD_STACKSIZE);
 
-    thread->entry = entry;
+    t->entry = entry;
 
-    thread->esp = ((uint)(thread->stack) + STACK_SIZE);
-    thread->esp -= sizeof(processor_context_t);
+    t->esp = ((uint)(t->stack) + MAX_THREAD_STACKSIZE);
+    t->esp -= sizeof(processor_context_t);
 
-    processor_context_t *context = (processor_context_t *)thread->esp;
+    processor_context_t *context = (processor_context_t *)t->esp;
 
     context->eflags = 0x202;
     context->eip = (u32)entry;
-    context->ebp = ((uint)thread->stack + STACK_SIZE);
+    context->ebp = ((uint)t->stack + MAX_THREAD_STACKSIZE);
 
-    if (flags & TASK_USER)
+    if (user)
     {
         // TODO: userspace thread
         // context->cs = 0x18;
@@ -89,9 +89,9 @@ thread_t *alloc_thread(thread_entry_t entry, int flags)
         context->gs = 0x10;
     }
 
-    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", thread->id, thread->stack, thread->esp);
+    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", t->id, t->stack, t->esp);
 
-    return thread;
+    return t;
 }
 
 void cleanup_thread(thread_t *thread)
@@ -104,19 +104,19 @@ void cleanup_thread(thread_t *thread)
     UNUSED(thread);
 }
 
-process_t *alloc_process(const char *name, int flags)
+process_t *alloc_process(const char *name, bool user)
 {
     process_t *process = MALLOC(process_t);
 
     process->id = PID++;
 
-    strncpy(process->name, name, PROCNAME_SIZE);
-    process->flags = flags;
+    strncpy(process->name, name, MAX_PROCESS_NAMESIZE);
+    process->user = user;
     process->threads = list();
     process->inbox = list();
     process->shared = list();
 
-    if (flags & TASK_USER)
+    if (user)
     {
         process->pdir = memory_alloc_pdir();
     }
@@ -211,7 +211,7 @@ void tasking_setup()
     threads = list();
     processes = list();
 
-    kernel_process = process_create("kernel", 0);
+    kernel_process = process_create("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     kernel_idle = thread_create(kernel_process, idle, NULL, 0);
 
@@ -219,7 +219,7 @@ void tasking_setup()
     thread_t *kthread = thread_get(kernel_thread);
     free(kthread->stack);
     kthread->stack = &__stack_bottom;
-    kthread->esp = ((uint)(kthread->stack) + STACK_SIZE);
+    kthread->esp = ((uint)(kthread->stack) + MAX_THREAD_STACKSIZE);
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
@@ -258,14 +258,14 @@ thread_t *thread_running()
     return running;
 }
 
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags)
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
 {
     UNUSED(arg);
 
     sk_atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *thread = alloc_thread(entry, process->flags | flags);
+    thread_t *thread = alloc_thread(entry, process->user | user);
 
     list_pushback(process->threads, thread);
     list_pushback(threads, thread);
@@ -356,12 +356,12 @@ int thread_wait_process(PROCESS p)
     return running->waitinfo.outcode;
 }
 
-int thread_wait_message(message_t* msg)
+int thread_wait_message(message_t *msg)
 {
     ATOMIC({
         thread_running()->state = THREAD_WAIT_MESSAGE;
     });
-    
+
     thread_hold(); // Wait for the sheduler to give us a message.
 
     message_t *incoming = thread_running()->messageinfo.message;
@@ -414,7 +414,7 @@ void thread_dump_all()
 
     printf("\n\tCurrent thread:");
     thread_dump(running->id);
-    
+
     printf("\n");
 
     printf("\n\tThreads:");
@@ -430,15 +430,15 @@ void thread_dump_all()
     sk_atomic_end();
 }
 
-static char* THREAD_STATES[] =
-{
-    "RUNNING",
-    "SLEEP",
-    "WAIT_THREAD",
-    "WAIT_PROCESS",
-    "WAIT_MESSAGE",
-    "CANCELING",
-    "CANCELED",
+static char *THREAD_STATES[] =
+    {
+        "RUNNING",
+        "SLEEP",
+        "WAIT_THREAD",
+        "WAIT_PROCESS",
+        "WAIT_MESSAGE",
+        "CANCELING",
+        "CANCELED",
 };
 
 void thread_dump(THREAD t)
@@ -471,12 +471,12 @@ process_t *process_running()
     return running->process;
 }
 
-PROCESS process_create(const char *name, int flags)
+PROCESS process_create(const char *name, bool user)
 {
     process_t *process;
 
     ATOMIC({
-        process = alloc_process(name, flags);
+        process = alloc_process(name, user);
         list_pushback(processes, process);
     });
 
@@ -529,7 +529,7 @@ PROCESS process_exec(const char *path, const char **arg)
     if (stat.type != FSFILE)
     {
         sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", path);
-        return 0; 
+        return 0;
     }
 
     void *buffer = filesystem_readall(s);
@@ -541,7 +541,7 @@ PROCESS process_exec(const char *path, const char **arg)
         return 0;
     }
 
-    PROCESS p = process_create(path, TASK_USER);
+    PROCESS p = process_create(path, true);
 
     elf_header_t *elf = (elf_header_t *)buffer;
 
@@ -557,7 +557,6 @@ PROCESS process_exec(const char *path, const char **arg)
     free(buffer);
 
     return p;
-
 }
 
 void cancel_childs(process_t *process)
@@ -675,7 +674,8 @@ thread_t *get_next_task()
         {
             process_t *wproc = process_get(thread->waitinfo.handle);
 
-            if (wproc->state == PROCESS_CANCELED || wproc->state == PROCESS_CANCELING)
+            if (wproc->state == PROCESS_CANCELED ||
+                wproc->state == PROCESS_CANCELING)
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = wproc->exit_code;
@@ -687,7 +687,8 @@ thread_t *get_next_task()
         {
             thread_t *wthread = thread_get(thread->waitinfo.handle);
 
-            if (wthread->state == THREAD_CANCELED || wthread->state == THREAD_CANCELING)
+            if (wthread->state == THREAD_CANCELED ||
+                wthread->state == THREAD_CANCELING)
             {
                 thread->state = THREAD_RUNNING;
                 thread->waitinfo.outcode = (uint)wthread->exit_value;
@@ -696,7 +697,7 @@ thread_t *get_next_task()
         }
         case THREAD_WAIT_MESSAGE:
         {
-            message_t* incoming = messaging_receive_internal(thread);
+            message_t *incoming = messaging_receive_internal(thread);
 
             if (incoming != NULL)
             {

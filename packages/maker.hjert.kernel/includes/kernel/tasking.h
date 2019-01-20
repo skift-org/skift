@@ -9,11 +9,7 @@
 
 #include "kernel/paging.h"
 #include "kernel/protocol.h"
-
-#define PROCNAME_SIZE 128
-#define STACK_SIZE 0x4000
-
-#define TASK_USER 1
+#include "kernel/limits.h"
 
 typedef int THREAD;  // Thread handle
 typedef int PROCESS; // Process handler
@@ -44,9 +40,9 @@ typedef enum thread_state
 typedef struct
 {
     int id;                   // Unique handle to the process
-    char name[PROCNAME_SIZE]; // Frendly name of the process
+    char name[MAX_PROCESS_NAMESIZE]; // Frendly name of the process
 
-    int flags;
+    bool user;
     list_t *threads; // Child threads;
     list_t *inbox;
     list_t *shared; // Shared memory region;
@@ -101,7 +97,7 @@ thread_t *thread_get(THREAD thread);
 void thread_hold();
 
 // Create a new thread of a selected process.
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, int flags);
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);
 
 int thread_cancel(THREAD t);    // Cancel the selected thread.
 void thread_exit(void *retval); // Exit the current thread and return a value.
@@ -125,7 +121,7 @@ process_t *process_running();
 process_t *process_get(PROCESS process);
 
 // Create a new process.
-PROCESS process_create(const char *name, int flags);
+PROCESS process_create(const char *name, bool user);
 
 void process_cancel(PROCESS p); // Cancel the selected process.
 void process_exit(int code);    // Exit the current process and send a exit code.

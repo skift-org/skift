@@ -77,9 +77,10 @@ typedef struct
     process_t *process;
     thread_entry_t entry;
 
-
     thread_state_t state;
 
+
+    bool user;
     uint sp;
     byte stack[MAX_THREAD_STACKSIZE];
 

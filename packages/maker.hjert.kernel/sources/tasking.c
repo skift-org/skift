@@ -46,7 +46,11 @@ list_t *processes;
 /* --- thread table --------------------------------------------------------- */
 
 thread_t idle;
-void idle_code() { while (1) hlt(); }
+void idle_code()
+{
+    while (1)
+        hlt();
+}
 
 thread_t thread_table[MAX_THREAD];
 
@@ -83,7 +87,70 @@ thread_t *thread_getbyid(int id)
     return NULL;
 }
 
+void thread_init(thread_t *t, thread_entry_t entry, bool user)
+{
+    t->entry = entry;
+    t->user = user;
+    // setup the stack
+    memset(t->stack, 0, MAX_THREAD_STACKSIZE);
+    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
+}
 
+void thread_stack_push(thread_t *t, void *value, uint size)
+{
+    t->sp -= size;
+    memcpy((void *)t->sp, value, size);
+}
+
+void thread_attach_process(thread_t *t, process_t *p)
+{
+    if (t->process == NULL)
+    {
+        list_pushback(p->threads, t);
+        t->process = p;
+    }
+    else
+    {
+        PANIC("Trying to attaching thread %d of process %d to process %d.", t->id, t->process->id, p->id);
+    }
+}
+
+void thread_ready(thread_t *t)
+{
+    processor_context_t ctx;
+
+    ctx.eflags = 0x202;
+    ctx.eip = (reg32_t)t->entry;
+    ctx.ebp = ((reg32_t)t->stack + MAX_THREAD_STACKSIZE);
+
+    if (t->user)
+    {
+        // TODO: userspace thread
+        // context->cs = 0x18;
+        // context->ds = 0x20;
+        // context->es = 0x20;
+        // context->fs = 0x20;
+        // context->gs = 0x20;
+
+        ctx.cs = 0x08;
+        ctx.ds = 0x10;
+        ctx.es = 0x10;
+        ctx.fs = 0x10;
+        ctx.gs = 0x10;
+    }
+    else
+    {
+        ctx.cs = 0x08;
+        ctx.ds = 0x10;
+        ctx.es = 0x10;
+        ctx.fs = 0x10;
+        ctx.gs = 0x10;
+    }
+
+    thread_stack_push(t, &ctx, sizeof(ctx));
+
+    t->state = THREAD_RUNNING;
+}
 
 thread_t *thread(thread_entry_t entry, bool user)
 {
@@ -94,11 +161,11 @@ thread_t *thread(thread_entry_t entry, bool user)
         PANIC("No more free threads!");
     }
 
-    memset(t->stack, 0, MAX_THREAD_STACKSIZE);
+    memset(&t->stack[0], 0, MAX_THREAD_STACKSIZE);
 
     t->entry = entry;
 
-    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE);
+    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
 
     t->sp -= sizeof(processor_context_t);
     processor_context_t *context = (processor_context_t *)t->sp;
@@ -197,8 +264,6 @@ void timer_set_frequency(int hz)
 
 // define in boot.s
 extern u32 __stack_bottom;
-
-
 
 void tasking_setup()
 {
@@ -408,7 +473,8 @@ void thread_dump_all()
     for (int i = 0; i < MAX_THREAD; i++)
     {
         thread_t *t = &thread_table[i];
-        if (t != running && t->state != THREAD_FREE) thread_dump(t);
+        if (t != running && t->state != THREAD_FREE)
+            thread_dump(t);
     }
 
     sk_atomic_end();
@@ -633,7 +699,7 @@ void sheduler_update_threads(void)
 
         case THREAD_SLEEP:
         {
-            if (t->sleepinfo.wakeuptick >= ticks)
+            if (t->sleepinfo.wakeuptick <= ticks)
             {
                 t->state = THREAD_RUNNING;
                 sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
@@ -701,9 +767,9 @@ void sheduler_update_threads(void)
     }
 }
 
-thread_t* sheduler_next_thread(void)
+thread_t *sheduler_next_thread(void)
 {
-    thread_t* t = thread_getbystate(running->id + 1, THREAD_RUNNING);
+    thread_t *t = thread_getbystate(running->id + 1, THREAD_RUNNING);
 
     if (t == NULL)
     {

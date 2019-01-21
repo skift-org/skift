@@ -54,6 +54,7 @@ void console_paint(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
 void console_cursor_move(vtconsole_t *vtc, vtcursor_t *cur)
 {
     UNUSED(vtc);
+    UNUSED(cur);
     vga_cursor(cur->x, cur->y);
 }
 

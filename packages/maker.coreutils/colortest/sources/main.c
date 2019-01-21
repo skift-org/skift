@@ -30,8 +30,10 @@ int main(int argc, char **argv)
         {
             printf("\033[%d;%dm##", 30 + i, 40 + j);
         }
-        printf("\n\033[0m");
+        printf("\n");
     }
+
+    printf("\033[0m");
 
     return 0;
 }

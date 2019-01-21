@@ -44,7 +44,7 @@ uint ticks = 0;
 list_t *threads;
 list_t *processes;
 
-thread_t *alloc_thread(thread_entry_t entry, bool user)
+thread_t *thread(thread_entry_t entry, bool user)
 {
     thread_t *t = MALLOC(thread_t);
     memset(t, 0, sizeof(thread_t));
@@ -240,28 +240,28 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     sk_atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *thread = alloc_thread(entry, process->user | user);
+    thread_t *t = thread(entry, process->user | user);
 
-    list_pushback(process->threads, thread);
-    list_pushback(threads, thread);
-    thread->process = process;
+    list_pushback(process->threads, t);
+    list_pushback(threads, t);
+    t->process = process;
 
     if (running != NULL)
     {
-        list_pushback(waiting, thread);
+        list_pushback(waiting, t);
     }
     else
     {
-        running = thread;
+        running = t;
     }
 
-    thread->state = THREAD_RUNNING;
+    t->state = THREAD_RUNNING;
 
-    sk_log(LOG_FINE, "Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", thread->id, entry, process->name, process->id);
+    sk_log(LOG_FINE, "Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", t->id, entry, process->name, process->id);
 
     sk_atomic_end();
 
-    return thread->id;
+    return t->id;
 }
 
 void thread_sleep(int time)

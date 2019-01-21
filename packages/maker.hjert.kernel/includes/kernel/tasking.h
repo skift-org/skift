@@ -77,7 +77,7 @@ typedef struct
     process_t *process;
     thread_entry_t entry;
 
-    uint esp;
+    uint sp;
     void *stack;
 
     thread_state_t state;

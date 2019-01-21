@@ -94,10 +94,10 @@ thread_t *thread(thread_entry_t entry, bool user)
 
     t->entry = entry;
 
-    t->esp = ((uint)(t->stack) + MAX_THREAD_STACKSIZE);
-    t->esp -= sizeof(processor_context_t);
+    t->sp = ((uint)(t->stack) + MAX_THREAD_STACKSIZE);
+    t->sp -= sizeof(processor_context_t);
 
-    processor_context_t *context = (processor_context_t *)t->esp;
+    processor_context_t *context = (processor_context_t *)t->sp;
 
     context->eflags = 0x202;
     context->eip = (u32)entry;
@@ -127,7 +127,7 @@ thread_t *thread(thread_entry_t entry, bool user)
         context->gs = 0x10;
     }
 
-    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, ESP=0x%x)", t->id, t->stack, t->esp);
+    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, SP=0x%x)", t->id, t->stack, t->sp);
 
     return t;
 }
@@ -221,7 +221,7 @@ void tasking_setup()
     thread_t *kthread = thread_getbyid(kernel_thread);
     free(kthread->stack);
     kthread->stack = &__stack_bottom;
-    kthread->esp = ((uint)(kthread->stack) + MAX_THREAD_STACKSIZE);
+    kthread->sp = ((uint)(kthread->stack) + MAX_THREAD_STACKSIZE);
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
@@ -445,7 +445,7 @@ void thread_dump(thread_t* t)
     sk_atomic_begin();
 
     printf("\n\t- ID=%d PROC=('%s', %d) ", t->id, t->process->name, t->process->id);
-    printf("ESP=0x%x STACK=%x %s", t->esp, t->stack, THREAD_STATES[t->state]);
+    printf("ESP=0x%x STACK=%x %s", t->sp, t->stack, THREAD_STATES[t->state]);
 
     sk_atomic_end();
 }
@@ -720,7 +720,7 @@ thread_t *get_next_task()
 
 bool is_context_switch = false;
 
-esp_t shedule(esp_t esp, processor_context_t *context)
+esp_t shedule(esp_t sp, processor_context_t *context)
 {
     is_context_switch = true;
     UNUSED(context);
@@ -728,10 +728,10 @@ esp_t shedule(esp_t esp, processor_context_t *context)
     ticks++;
 
     if (waiting->count == 0)
-        return esp;
+        return sp;
 
     // Save the old context
-    running->esp = esp;
+    running->sp = sp;
 
     list_pushback(waiting, running);
 
@@ -744,5 +744,5 @@ esp_t shedule(esp_t esp, processor_context_t *context)
 
     is_context_switch = false;
 
-    return running->esp;
+    return running->sp;
 }

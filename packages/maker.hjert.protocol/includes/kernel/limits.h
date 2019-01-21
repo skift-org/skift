@@ -7,7 +7,7 @@
 /* --- Limits for processes ------------------------------------------------- */
 
 /* Maximum number of running processes. */
-#define MAX_PROCESS 1024
+#define MAX_PROCESS 128
 
 /* Size of a process name */
 #define MAX_PROCESS_NAMESIZE 128 
@@ -19,7 +19,7 @@
 #define MAX_PROCESS_PENDING_MESSAGES 256
 
 /* Maximum number of threads. */
-#define MAX_THREAD 4096
+#define MAX_THREAD 1024
 
 /* Size of a thread name */
 #define MAX_THREAD_NAMESIZE 128 

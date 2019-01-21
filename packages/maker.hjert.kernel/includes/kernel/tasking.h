@@ -77,10 +77,11 @@ typedef struct
     process_t *process;
     thread_entry_t entry;
 
-    uint sp;
-    void *stack;
 
     thread_state_t state;
+
+    uint sp;
+    byte stack[MAX_THREAD_STACKSIZE];
 
     wait_info_t waitinfo;
     sleep_info_t sleepinfo;

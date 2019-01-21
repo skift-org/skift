@@ -43,34 +43,37 @@ int PID = 1;
 uint ticks = 0;
 list_t *processes;
 
-
 /* --- thread table --------------------------------------------------------- */
+
+thread_t idle;
+void idle_code() { while (1) hlt(); }
 
 thread_t thread_table[MAX_THREAD];
 
 void thread_setup(void)
 {
-    for(int i = 0; i < MAX_THREAD; i++)
+    for (int i = 0; i < MAX_THREAD; i++)
     {
         thread_t *t = &thread_table[i];
 
         t->id = i;
         t->state = THREAD_FREE;
-    }   
+    }
 }
 
-thread_t* thread_getbystate(int start, thread_state_t state)
+thread_t *thread_getbystate(int start, thread_state_t state)
 {
-    for(int i = 0; i < MAX_THREAD; i++)
+    for (int i = 0; i < MAX_THREAD; i++)
     {
-        thread_t* t = &thread_table[(start + i) % MAX_THREAD];
-        if (t->state == state) return t;
+        thread_t *t = &thread_table[(start + i) % MAX_THREAD];
+        if (t->state == state)
+            return t;
     }
 
     return NULL;
 }
 
-thread_t* thread_getbyid(int id)
+thread_t *thread_getbyid(int id)
 {
     if (id >= 0 && id < MAX_THREAD)
     {
@@ -79,6 +82,8 @@ thread_t* thread_getbyid(int id)
 
     return NULL;
 }
+
+
 
 thread_t *thread(thread_entry_t entry, bool user)
 {
@@ -89,14 +94,13 @@ thread_t *thread(thread_entry_t entry, bool user)
         PANIC("No more free threads!");
     }
 
-    t->stack = malloc(MAX_THREAD_STACKSIZE);
     memset(t->stack, 0, MAX_THREAD_STACKSIZE);
 
     t->entry = entry;
 
-    t->sp = ((uint)(t->stack) + MAX_THREAD_STACKSIZE);
-    t->sp -= sizeof(processor_context_t);
+    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE);
 
+    t->sp -= sizeof(processor_context_t);
     processor_context_t *context = (processor_context_t *)t->sp;
 
     context->eflags = 0x202;
@@ -158,7 +162,6 @@ process_t *alloc_process(const char *name, bool user)
     return process;
 }
 
-
 process_t *process_get(PROCESS process)
 {
     FOREACH(i, processes)
@@ -179,7 +182,6 @@ THREAD kernel_thread;
 THREAD kernel_idle;
 
 thread_t *running = NULL;
-list_t *waiting;
 
 esp_t shedule(esp_t esp, processor_context_t *context);
 
@@ -196,32 +198,19 @@ void timer_set_frequency(int hz)
 // define in boot.s
 extern u32 __stack_bottom;
 
-void idle()
-{
-    while (1)
-    {
-        hlt();
-    }
-}
+
 
 void tasking_setup()
 {
     running = NULL;
 
-    waiting = list();
     processes = list();
 
     thread_setup();
 
     kernel_process = process_create("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-    kernel_idle = thread_create(kernel_process, idle, NULL, 0);
-
-    // Set the correct stack for the kernel main stack
-    thread_t *kthread = thread_getbyid(kernel_thread);
-    free(kthread->stack);
-    kthread->stack = &__stack_bottom;
-    kthread->sp = ((uint)(kthread->stack) + MAX_THREAD_STACKSIZE);
+    kernel_idle = thread_create(kernel_process, idle_code, NULL, 0);
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
@@ -272,11 +261,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     list_pushback(process->threads, t);
     t->process = process;
 
-    if (running != NULL)
-    {
-        list_pushback(waiting, t);
-    }
-    else
+    if (running == NULL)
     {
         running = t;
     }
@@ -420,10 +405,10 @@ void thread_dump_all()
 
     printf("\n\tThreads:");
 
-    for(int i = 0; i < MAX_THREAD; i++)
+    for (int i = 0; i < MAX_THREAD; i++)
     {
-        thread_t* t = &thread_table[i];
-        thread_dump(t);
+        thread_t *t = &thread_table[i];
+        if (t != running && t->state != THREAD_FREE) thread_dump(t);
     }
 
     sk_atomic_end();
@@ -440,12 +425,12 @@ static char *THREAD_STATES[] =
         "CANCELED",
 };
 
-void thread_dump(thread_t* t)
+void thread_dump(thread_t *t)
 {
     sk_atomic_begin();
 
     printf("\n\t- ID=%d PROC=('%s', %d) ", t->id, t->process->name, t->process->id);
-    printf("ESP=0x%x STACK=%x %s", t->sp, t->stack, THREAD_STATES[t->state]);
+    printf("ESP=%08x STACK=%08x %s", t->sp, t->stack, THREAD_STATES[t->state]);
 
     sk_atomic_end();
 }
@@ -637,89 +622,97 @@ void process_free(uint addr, uint count)
 
 /* --- Sheduler ------------------------------------------------------------- */
 
-thread_t *get_next_task()
+void sheduler_update_threads(void)
 {
-    thread_t *thread = NULL;
-
-    do
+    for (int i = 0; i < MAX_THREAD; i++)
     {
-        list_pop(waiting, (void *)&thread);
+        thread_t *t = thread_getbyid(i);
 
-        switch (thread->state)
+        switch (t->state)
         {
-        case THREAD_CANCELING:
-        {
-            sk_log(LOG_DEBUG, "Thread %d canceled!", thread->id);
-            thread->state = THREAD_CANCELED;
-            // TODO: cleanup the thread.
-            // TODO: cleanup the process if no thread is still running.
 
-            thread = NULL;
-            break;
-        }
         case THREAD_SLEEP:
         {
-            // Wakeup the thread
-            if (thread->sleepinfo.wakeuptick <= ticks)
+            if (t->sleepinfo.wakeuptick >= ticks)
             {
-                thread->state = THREAD_RUNNING;
-                sk_log(LOG_DEBUG, "Thread %d wake up!", thread->id);
+                t->state = THREAD_RUNNING;
+                sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
             }
-            break;
         }
-        case THREAD_WAIT_PROCESS:
-        {
-            process_t *wproc = process_get(thread->waitinfo.handle);
+        break;
 
-            if (wproc->state == PROCESS_CANCELED ||
-                wproc->state == PROCESS_CANCELING)
-            {
-                thread->state = THREAD_RUNNING;
-                thread->waitinfo.outcode = wproc->exit_code;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, wproc->id);
-            }
-            break;
-        }
         case THREAD_WAIT_THREAD:
         {
-            thread_t *wthread = thread_getbyid(thread->waitinfo.handle);
+            // Get the thread we are waiting.
+            thread_t *wthread = thread_getbyid(t->waitinfo.handle);
 
             if (wthread->state == THREAD_CANCELED ||
                 wthread->state == THREAD_CANCELING)
             {
-                thread->state = THREAD_RUNNING;
-                thread->waitinfo.outcode = (uint)wthread->exit_value;
+                t->state = THREAD_RUNNING;
+                t->waitinfo.outcode = (uint)wthread->exit_value;
+                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", t->id, wthread->id);
             }
-            break;
         }
+        break;
+
+        case THREAD_WAIT_PROCESS:
+        {
+            // Get the process we are waiting.
+            process_t *wproc = process_get(t->waitinfo.handle);
+
+            if (wproc->state == PROCESS_CANCELED ||
+                wproc->state == PROCESS_CANCELING)
+            {
+                t->state = THREAD_RUNNING;
+                t->waitinfo.outcode = wproc->exit_code;
+                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", t->id, wproc->id);
+            }
+        }
+        break;
+
         case THREAD_WAIT_MESSAGE:
         {
-            message_t *incoming = messaging_receive_internal(thread);
+            message_t *incoming = messaging_receive_internal(t);
 
             if (incoming != NULL)
             {
-                thread->state = THREAD_RUNNING;
+                t->state = THREAD_RUNNING;
             }
-            break;
         }
+        break;
+
+        case THREAD_CANCELING:
+        {
+            sk_log(LOG_DEBUG, "Thread %d canceled!", t->id);
+            t->state = THREAD_CANCELED;
+        }
+        break;
+
+        case THREAD_CANCELED:
+        {
+            // TODO: cleanup the process if the process is stopped.
+        }
+        break;
+
         default:
             break;
         }
+    }
+}
 
-        if (thread != NULL && thread->state != THREAD_RUNNING)
-        {
-            // The thread is not a running thread, pushing it back...
-            list_pushback(waiting, thread);
-            thread = NULL;
-        }
+thread_t* sheduler_next_thread(void)
+{
+    thread_t* t = thread_getbystate(running->id + 1, THREAD_RUNNING);
 
-    } while (thread == NULL);
+    if (t == NULL)
+    {
+    }
 
-    return thread;
+    return t;
 }
 
 bool is_context_switch = false;
-
 esp_t shedule(esp_t sp, processor_context_t *context)
 {
     is_context_switch = true;
@@ -727,16 +720,11 @@ esp_t shedule(esp_t sp, processor_context_t *context)
 
     ticks++;
 
-    if (waiting->count == 0)
-        return sp;
-
     // Save the old context
     running->sp = sp;
 
-    list_pushback(waiting, running);
-
-    // Load the new context
-    running = get_next_task();
+    sheduler_update_threads();
+    running = sheduler_next_thread();
 
     // TODO: set_kernel_stack(...);
     paging_load_directorie(running->process->pdir);

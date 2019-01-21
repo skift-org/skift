@@ -32,24 +32,62 @@
 #include "kernel/paging.h"
 #include "kernel/processor.h"
 #include "kernel/system.h"
+#include "kernel/limits.h"
 
 #include "kernel/tasking.h"
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"
 
 int PID = 1;
-int TID = 1;
 
 uint ticks = 0;
-list_t *threads;
 list_t *processes;
+
+
+/* --- thread table --------------------------------------------------------- */
+
+thread_t thread_table[MAX_THREAD];
+
+void thread_setup(void)
+{
+    for(int i = 0; i < MAX_THREAD; i++)
+    {
+        thread_t *t = &thread_table[i];
+
+        t->id = i;
+        t->state = THREAD_FREE;
+    }   
+}
+
+thread_t* thread_getbystate(int start, thread_state_t state)
+{
+    for(int i = 0; i < MAX_THREAD; i++)
+    {
+        thread_t* t = &thread_table[(start + i) % MAX_THREAD];
+        if (t->state == state) return t;
+    }
+
+    return NULL;
+}
+
+thread_t* thread_getbyid(int id)
+{
+    if (id >= 0 && id < MAX_THREAD)
+    {
+        return &thread_table[id];
+    }
+
+    return NULL;
+}
 
 thread_t *thread(thread_entry_t entry, bool user)
 {
-    thread_t *t = MALLOC(thread_t);
-    memset(t, 0, sizeof(thread_t));
+    thread_t *t = thread_getbystate(0, THREAD_FREE);
 
-    t->id = TID++;
+    if (t == NULL)
+    {
+        PANIC("No more free threads!");
+    }
 
     t->stack = malloc(MAX_THREAD_STACKSIZE);
     memset(t->stack, 0, MAX_THREAD_STACKSIZE);
@@ -120,18 +158,6 @@ process_t *alloc_process(const char *name, bool user)
     return process;
 }
 
-thread_t *thread_get(THREAD thread)
-{
-    FOREACH(i, threads)
-    {
-        thread_t *t = (thread_t *)i->value;
-
-        if (t->id == thread)
-            return t;
-    }
-
-    return NULL;
-}
 
 process_t *process_get(PROCESS process)
 {
@@ -183,15 +209,16 @@ void tasking_setup()
     running = NULL;
 
     waiting = list();
-    threads = list();
     processes = list();
+
+    thread_setup();
 
     kernel_process = process_create("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     kernel_idle = thread_create(kernel_process, idle, NULL, 0);
 
     // Set the correct stack for the kernel main stack
-    thread_t *kthread = thread_get(kernel_thread);
+    thread_t *kthread = thread_getbyid(kernel_thread);
     free(kthread->stack);
     kthread->stack = &__stack_bottom;
     kthread->esp = ((uint)(kthread->stack) + MAX_THREAD_STACKSIZE);
@@ -243,7 +270,6 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     thread_t *t = thread(entry, process->user | user);
 
     list_pushback(process->threads, t);
-    list_pushback(threads, t);
     t->process = process;
 
     if (running != NULL)
@@ -278,7 +304,7 @@ void thread_wakeup(THREAD t)
 {
     sk_atomic_begin();
 
-    thread_t *thread = thread_get(t);
+    thread_t *thread = thread_getbyid(t);
 
     if (thread != NULL && thread->state == THREAD_SLEEP)
     {
@@ -293,7 +319,7 @@ int thread_wait_thread(THREAD t)
 {
     sk_atomic_begin();
 
-    thread_t *thread = thread_get(t);
+    thread_t *thread = thread_getbyid(t);
 
     running->waitinfo.outcode = 0;
 
@@ -354,7 +380,7 @@ int thread_cancel(THREAD t)
 {
     sk_atomic_begin();
 
-    thread_t *thread = thread_get(t);
+    thread_t *thread = thread_getbyid(t);
 
     if (thread != NULL)
     {
@@ -388,18 +414,16 @@ void thread_dump_all()
     sk_atomic_begin();
 
     printf("\n\tCurrent thread:");
-    thread_dump(running->id);
+    thread_dump(running);
 
     printf("\n");
 
     printf("\n\tThreads:");
 
-    FOREACH(i, threads)
+    for(int i = 0; i < MAX_THREAD; i++)
     {
-        if ((thread_t *)i->value != running)
-        {
-            thread_dump(((thread_t *)i->value)->id);
-        }
+        thread_t* t = &thread_table[i];
+        thread_dump(t);
     }
 
     sk_atomic_end();
@@ -416,14 +440,12 @@ static char *THREAD_STATES[] =
         "CANCELED",
 };
 
-void thread_dump(THREAD t)
+void thread_dump(thread_t* t)
 {
     sk_atomic_begin();
 
-    thread_t *thread = thread_get(t);
-
-    printf("\n\t- ID=%d PROC=('%s', %d) ", t, thread->process->name, thread->process->id);
-    printf("ESP=0x%x STACK=%x STATE=%s", thread->esp, thread->stack, THREAD_STATES[thread->state]);
+    printf("\n\t- ID=%d PROC=('%s', %d) ", t->id, t->process->name, t->process->id);
+    printf("ESP=0x%x STACK=%x %s", t->esp, t->stack, THREAD_STATES[t->state]);
 
     sk_atomic_end();
 }
@@ -660,7 +682,7 @@ thread_t *get_next_task()
         }
         case THREAD_WAIT_THREAD:
         {
-            thread_t *wthread = thread_get(thread->waitinfo.handle);
+            thread_t *wthread = thread_getbyid(thread->waitinfo.handle);
 
             if (wthread->state == THREAD_CANCELED ||
                 wthread->state == THREAD_CANCELING)

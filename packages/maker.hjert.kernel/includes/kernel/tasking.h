@@ -35,16 +35,18 @@ typedef enum thread_state
 
     THREAD_CANCELING,
     THREAD_CANCELED,
+    
+    THREAD_FREE,
 } thread_state_t;
 
 typedef struct
 {
-    int id;                   // Unique handle to the process
+    int id;                          // Unique handle to the process
     char name[MAX_PROCESS_NAMESIZE]; // Frendly name of the process
 
     bool user;
     list_t *threads; // Child threads;
-    list_t *inbox;
+    list_t *inbox;   // process main message queu
     list_t *shared; // Shared memory region;
 
     page_directorie_t *pdir; // Page directorie
@@ -112,7 +114,7 @@ int thread_wait_message(message_t* msg); // Wait for a incoming message.
 void thread_yield(); // Yield to the next thread.
 
 void thread_dump_all();
-void thread_dump(THREAD t);
+void thread_dump(thread_t* t);
 
 /* --- Process managment ---------------------------------------------------- */
 

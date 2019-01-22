@@ -152,57 +152,6 @@ void thread_ready(thread_t *t)
     t->state = THREAD_RUNNING;
 }
 
-thread_t *thread(thread_entry_t entry, bool user)
-{
-    thread_t *t = thread_getbystate(0, THREAD_FREE);
-
-    if (t == NULL)
-    {
-        PANIC("No more free threads!");
-    }
-
-    memset(&t->stack[0], 0, MAX_THREAD_STACKSIZE);
-
-    t->entry = entry;
-
-    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
-
-    t->sp -= sizeof(processor_context_t);
-    processor_context_t *context = (processor_context_t *)t->sp;
-
-    context->eflags = 0x202;
-    context->eip = (u32)entry;
-    context->ebp = ((uint)t->stack + MAX_THREAD_STACKSIZE);
-
-    if (user)
-    {
-        // TODO: userspace thread
-        // context->cs = 0x18;
-        // context->ds = 0x20;
-        // context->es = 0x20;
-        // context->fs = 0x20;
-        // context->gs = 0x20;
-
-        context->cs = 0x08;
-        context->ds = 0x10;
-        context->es = 0x10;
-        context->fs = 0x10;
-        context->gs = 0x10;
-    }
-    else
-    {
-        context->cs = 0x08;
-        context->ds = 0x10;
-        context->es = 0x10;
-        context->fs = 0x10;
-        context->gs = 0x10;
-    }
-
-    sk_log(LOG_FINE, "Thread with ID=%d allocated. (STACK=0x%x, SP=0x%x)", t->id, t->stack, t->sp);
-
-    return t;
-}
-
 process_t *alloc_process(const char *name, bool user)
 {
     process_t *process = MALLOC(process_t);
@@ -275,8 +224,13 @@ void tasking_setup()
 
     kernel_process = process_create("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-    kernel_idle = thread_create(kernel_process, idle_code, NULL, 0);
 
+    // Setup the idle task
+    idle.id = -1;
+    thread_init(&idle, idle_code, false);
+    thread_attach_process(&idle, process_get(kernel_process));
+    thread_ready(&idle);
+    
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
@@ -321,17 +275,16 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     sk_atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *t = thread(entry, process->user | user);
+    thread_t *t = thread_getbystate(0, THREAD_FREE);
 
-    list_pushback(process->threads, t);
-    t->process = process;
+    thread_init(t, entry, user);
+    thread_attach_process(t, process);
+    thread_ready(t);
 
     if (running == NULL)
     {
         running = t;
     }
-
-    t->state = THREAD_RUNNING;
 
     sk_log(LOG_FINE, "Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", t->id, entry, process->name, process->id);
 
@@ -773,6 +726,8 @@ thread_t *sheduler_next_thread(void)
 
     if (t == NULL)
     {
+        // No more running threads now we idle.
+        return &idle;
     }
 
     return t;

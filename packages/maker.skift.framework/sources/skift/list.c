@@ -47,6 +47,22 @@ void list_destroy(list_t *l)
     free(l);
 }
 
+void list_clear(list_t *list)
+{
+    list_item_t *current = list->head;
+
+    while (current)
+    {
+        list_item_t *next = current->next;
+        free(current);
+        current = next;
+    }
+
+    list->count = 0;
+    list->head = NULL;
+    list->tail = NULL;
+}
+
 void list_push(list_t *l, void *value)
 {
     list_item_t *item = MALLOC(list_item_t);

@@ -229,7 +229,7 @@ void tasking_setup()
     thread_init(&idle, idle_code, false);
     thread_attach_process(&idle, process_get(kernel_process));
     thread_ready(&idle);
-    
+
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
@@ -247,7 +247,9 @@ void thread_yield()
 void thread_hold()
 {
     while (running->state != THREAD_RUNNING)
-    { hlt(); }
+    {
+        hlt();
+    }
 }
 
 #pragma GCC pop_options
@@ -265,10 +267,35 @@ thread_t *thread_running()
     return running;
 }
 
+// Create the main thread of a user application
+THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, char **argv)
+{
+    sk_atomic_begin();
+
+    process_t *process = process_get(p);
+    thread_t *t = thread_getbystate(0, THREAD_FREE);
+
+    thread_init(t, entry, true);
+    thread_attach_process(t, process);
+
+    // push arguments
+    int argc;
+    for(argc = 0; argv[argc]; argc++)
+    {
+        thread_stack_push(t, &argv[argc], strlen(argv[argc]) + 1);
+    }
+    thread_stack_push(t, &argc, sizeof(argc));
+
+    
+    thread_ready(t);
+
+    sk_atomic_end();
+
+    return t->id;
+}
+
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
 {
-    UNUSED(arg);
-
     sk_atomic_begin();
 
     process_t *process = process_get(p);
@@ -276,14 +303,13 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
 
     thread_init(t, entry, user);
     thread_attach_process(t, process);
+    thread_stack_push(t, &arg, sizeof(arg));
     thread_ready(t);
 
     if (running == NULL)
     {
         running = t;
     }
-
-    sk_log(LOG_FINE, "Thread with ID=%d ENTRY=%x child of process '%s' (ID=%d) is running.", t->id, entry, process->name, process->id);
 
     sk_atomic_end();
 
@@ -431,14 +457,14 @@ void thread_dump_all()
 }
 
 static char *THREAD_STATES[] =
-{
-    "RUNNING",
-    "SLEEP",
-    "WAIT(thread)",
-    "WAIT(process)",
-    "WAIT(message)",
-    "CANCELING",
-    "CANCELED",
+    {
+        "RUNNING",
+        "SLEEP",
+        "WAIT(thread)",
+        "WAIT(process)",
+        "WAIT(message)",
+        "CANCELING",
+        "CANCELED",
 };
 
 void thread_dump(thread_t *t)

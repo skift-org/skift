@@ -28,6 +28,7 @@ list_t *list();
 
 void list_delete(list_t *l); // Free the data structure, BUT doesn't free the childs.
 void list_destroy(list_t *list); // Free the data structure, AND free the childs.
+void list_clear(list_t *list);
 
 void list_push(list_t *list, void *value);
 int list_pop(list_t *list, void **value);

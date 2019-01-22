@@ -8,7 +8,7 @@ int main(int argc, char **argv)
     (void)argv;
 
     // do a page fault
-    *(char*)(0xffffffff) = 1;
+    asm("int $1");
 
     return 0;
 }

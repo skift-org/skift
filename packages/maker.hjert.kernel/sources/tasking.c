@@ -195,7 +195,6 @@ process_t *process_get(PROCESS process)
 
 PROCESS kernel_process;
 THREAD kernel_thread;
-THREAD kernel_idle;
 
 thread_t *running = NULL;
 
@@ -248,9 +247,7 @@ void thread_yield()
 void thread_hold()
 {
     while (running->state != THREAD_RUNNING)
-    {
-        hlt();
-    }
+    { hlt(); }
 }
 
 #pragma GCC pop_options
@@ -434,14 +431,14 @@ void thread_dump_all()
 }
 
 static char *THREAD_STATES[] =
-    {
-        "RUNNING",
-        "SLEEP",
-        "WAIT_THREAD",
-        "WAIT_PROCESS",
-        "WAIT_MESSAGE",
-        "CANCELING",
-        "CANCELED",
+{
+    "RUNNING",
+    "SLEEP",
+    "WAIT(thread)",
+    "WAIT(process)",
+    "WAIT(message)",
+    "CANCELING",
+    "CANCELED",
 };
 
 void thread_dump(thread_t *t)

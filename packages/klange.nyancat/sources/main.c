@@ -912,8 +912,8 @@ int main() {
 		}
 		printf("\033[H");
 		
-		sk_thread_sleep(40);
-		// usleep(90000);
+		sk_thread_sleep(90);
+		// usleep(90 000);
 	}
 
 	return 0;

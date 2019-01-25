@@ -30,6 +30,9 @@ void list_delete(list_t *l); // Free the data structure, BUT doesn't free the ch
 void list_destroy(list_t *list); // Free the data structure, AND free the childs.
 void list_clear(list_t *list);
 
+bool list_peek(list_t* list, void** value);
+bool list_peekback(list_t* list, void** value);
+
 void list_push(list_t *list, void *value);
 int list_pop(list_t *list, void **value);
 
@@ -37,4 +40,4 @@ void list_pushback(list_t *list, void *value);
 int list_popback(list_t *list, void **value);
 
 int list_remove(list_t *list, void *value); // Remove the first occurence of a value in the list.
-int list_containe(list_t *list, void *value);
+bool list_containe(list_t *list, void *value);

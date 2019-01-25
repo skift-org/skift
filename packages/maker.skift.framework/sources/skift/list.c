@@ -63,6 +63,32 @@ void list_clear(list_t *list)
     list->tail = NULL;
 }
 
+bool list_peek(list_t* list, void** value)
+{
+    if (list->head != NULL)
+    {
+        *value = list->head->value;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool list_peekback(list_t* list, void** value)
+{
+    if (list->tail != NULL)
+    {
+        *value = list->tail->value;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void list_push(list_t *l, void *value)
 {
     list_item_t *item = MALLOC(list_item_t);
@@ -199,15 +225,15 @@ int list_remove(list_t *l, void *value)
     return 0;
 }
 
-int list_containe(list_t *l, void *value)
+bool list_containe(list_t *l, void *value)
 {
     FOREACH(item, l)
     {
         if (item->value == value)
         {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }

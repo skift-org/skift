@@ -49,7 +49,9 @@ thread_t idle;
 void idle_code()
 {
     while (1)
+    {
         hlt();
+    }
 }
 
 thread_t thread_table[MAX_THREAD];
@@ -230,7 +232,7 @@ void tasking_setup()
     thread_attach_process(&idle, process_get(kernel_process));
     thread_ready(&idle);
 
-    timer_set_frequency(100);
+    timer_set_frequency(50);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -319,7 +321,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
 void thread_sleep(int time)
 {
     ATOMIC({
-        running->state = THREAD_SLEEP;
+        running->state = THREAD_WAIT_TIME;
         running->sleepinfo.wakeuptick = ticks + time;
     });
 
@@ -332,7 +334,7 @@ void thread_wakeup(THREAD t)
 
     thread_t *thread = thread_getbyid(t);
 
-    if (thread != NULL && thread->state == THREAD_SLEEP)
+    if (thread != NULL && thread->state == THREAD_WAIT_TIME)
     {
         thread->state = THREAD_RUNNING;
         thread->sleepinfo.wakeuptick = 0;
@@ -673,7 +675,7 @@ void sheduler_update_threads(void)
         switch (t->state)
         {
 
-        case THREAD_SLEEP:
+        case THREAD_WAIT_TIME:
         {
             if (t->sleepinfo.wakeuptick <= ticks)
             {
@@ -749,11 +751,12 @@ thread_t *sheduler_next_thread(void)
 
     if (t == NULL)
     {
-        // No more running threads now we idle.
         return &idle;
     }
-
-    return t;
+    else
+    {
+        return t;
+    }
 }
 
 bool is_context_switch = false;

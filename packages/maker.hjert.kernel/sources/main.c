@@ -114,6 +114,8 @@ void main(multiboot_info_t *info, s32 magic)
     sk_atomic_enable();
     sti();
 
+    sk_log(LOG_INFO, "What?!");
+
     printf(KERNEL_UNAME);
     printf("\n");
 

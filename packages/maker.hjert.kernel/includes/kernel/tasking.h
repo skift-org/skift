@@ -27,8 +27,8 @@ typedef enum process_state
 typedef enum thread_state
 {
     THREAD_RUNNING,
-    THREAD_SLEEP,
-
+    
+    THREAD_WAIT_TIME,
     THREAD_WAIT_THREAD,
     THREAD_WAIT_PROCESS,
     THREAD_WAIT_MESSAGE,

@@ -10,7 +10,7 @@
 #include <skift/__plugs.h>
 #include <skift/logger.h>
 
-log_level_t log_level = LOG_ERROR;
+log_level_t log_level = LOG_OFF;
 bool show_file_name = true;
 
 struct

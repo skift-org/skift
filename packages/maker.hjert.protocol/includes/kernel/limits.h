@@ -19,7 +19,7 @@
 #define MAX_PROCESS_PENDING_MESSAGES 256
 
 /* Maximum number of threads. */
-#define MAX_THREAD 1024
+#define MAX_THREAD 512
 
 /* Size of a thread name */
 #define MAX_THREAD_NAMESIZE 128 

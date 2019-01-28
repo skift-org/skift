@@ -322,16 +322,22 @@ class Target(object):
         """
         Compile a source file of the current target.
         """
+        filename = source.split("/")[-1]
+        includes = [("-I" + i) for i in self.get_includes(targets)]
+        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"']
 
+        print("    " + BRIGHT_BLACK + "%s" % filename + RESET)
         MKDIR(os.path.dirname(output))
-
-        print("    " + BRIGHT_BLACK + "%s" % source.split("/")[-1] + RESET)
-
         if source.endswith(".c"):
-            includes = [("-I" + i) for i in self.get_includes(targets)]
-            command = [GCC] + ["-D__FILENAME__=\"" + source.split("/")[-1] + '"'] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
+            command =                                    \
+                [GCC] +                                  \
+                preprocessor +                           \
+                includes +                               \
+                CFLAGS +                                 \
                 (CFLAGS_STRICT if self.strict else []) + \
-                ["-c", "-o", output, source]
+                [CFLAGS_OPTIMIZATION[3]] +               \
+                ["-c", "-o", output, source]             \
+
         elif source.endswith(".s"):
             command = ["nasm", "-f" "elf32", source, "-o", output]
 
@@ -388,8 +394,7 @@ class Target(object):
             # print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
             return True
         else:
-            print("")
-            # Skip a line so it's easier on the eyes.
+            print("") # Skip a line so it's easier on the eyes.
             print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
             # Build all source file of the current target

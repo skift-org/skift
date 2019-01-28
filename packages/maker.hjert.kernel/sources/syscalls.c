@@ -89,9 +89,9 @@ int sys_thread_create(thread_entry_t entry, void * args)
     return thread_create(process_self(), entry, args, true);
 }
 
-int sys_thread_exit(void* retval)
+int sys_thread_exit(int exitval)
 {
-    thread_exit(retval);
+    thread_exit(exitval);
     return 0;
 }
 

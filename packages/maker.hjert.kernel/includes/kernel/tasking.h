@@ -52,24 +52,30 @@ typedef struct
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
 
-    int exit_code;
+    int exitvalue;
 } process_t;
 
 typedef struct
 {
-    int handle;
-    int outcode;
-} wait_info_t;
+    uint wakeuptick;
+} thread_wait_time_t;
+
+typedef struct
+{
+    int process_handle;
+    int exitvalue;
+} thread_wait_process_t;
+
+typedef struct
+{
+    int thread_handle;
+    int exitvalue;
+} thread_wait_thread_t;
 
 typedef struct
 {
     message_t *message;
-} wait_message_t;
-
-typedef struct
-{
-    uint wakeuptick;
-} sleep_info_t;
+} thread_wait_message_t;
 
 typedef struct
 {
@@ -84,11 +90,14 @@ typedef struct
     uint sp;
     byte stack[MAX_THREAD_STACKSIZE];
 
-    wait_info_t waitinfo;
-    sleep_info_t sleepinfo;
-    wait_message_t messageinfo;
+    struct  {
+        thread_wait_time_t time;
+        thread_wait_process_t process;
+        thread_wait_thread_t thread;
+        thread_wait_message_t message;
+    } wait;
 
-    void *exit_value;
+    int exitvalue;
 } thread_t;
 
 void tasking_setup();
@@ -104,7 +113,7 @@ void thread_hold();
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);
 
 int thread_cancel(THREAD t);    // Cancel the selected thread.
-void thread_exit(void *retval); // Exit the current thread and return a value.
+void thread_exit(int exitvalue); // Exit the current thread and return a value.
 
 void thread_sleep(int time);  // Send the current thread to bed.
 void thread_wakeup(THREAD t); // Wake up the slected thread

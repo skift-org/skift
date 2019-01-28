@@ -322,7 +322,7 @@ void thread_sleep(int time)
 {
     ATOMIC({
         running->state = THREAD_WAIT_TIME;
-        running->sleepinfo.wakeuptick = ticks + time;
+        running->wait.time.wakeuptick = ticks + time;
     });
 
     thread_hold();
@@ -337,7 +337,7 @@ void thread_wakeup(THREAD t)
     if (thread != NULL && thread->state == THREAD_WAIT_TIME)
     {
         thread->state = THREAD_RUNNING;
-        thread->sleepinfo.wakeuptick = 0;
+        running->wait.time.wakeuptick = 0;
     }
 
     sk_atomic_end();
@@ -349,19 +349,21 @@ int thread_wait_thread(THREAD t)
 
     thread_t *thread = thread_getbyid(t);
 
-    running->waitinfo.outcode = 0;
-
     if (thread != NULL)
     {
-        running->waitinfo.handle = t;
+        running->wait.thread.thread_handle = t;
         running->state = THREAD_WAIT_THREAD;
+        sk_atomic_end();
+
+        thread_hold();
+    }
+    else
+    {
+        running->wait.thread.exitvalue = 0;
+        sk_atomic_end();
     }
 
-    sk_atomic_end();
-
-    thread_hold();
-
-    return running->waitinfo.outcode;
+    return running->wait.thread.exitvalue;
 }
 
 int thread_wait_process(PROCESS p)
@@ -370,30 +372,32 @@ int thread_wait_process(PROCESS p)
 
     process_t *process = process_get(p);
 
-    running->waitinfo.outcode = 0;
-
     if (process != NULL)
     {
-        running->waitinfo.handle = p;
+        running->wait.process.process_handle = p;
         running->state = THREAD_WAIT_PROCESS;
+        sk_atomic_end();
+
+        thread_hold();
+    }
+    else
+    {
+        sk_atomic_end();
+        running->wait.process.exitvalue = 0;
     }
 
-    sk_atomic_end();
-
-    thread_hold();
-
-    return running->waitinfo.outcode;
+    return running->wait.process.exitvalue;
 }
 
 int thread_wait_message(message_t *msg)
 {
     ATOMIC({
-        thread_running()->state = THREAD_WAIT_MESSAGE;
+        running->state = THREAD_WAIT_MESSAGE;
     });
 
     thread_hold(); // Wait for the sheduler to give us a message.
 
-    message_t *incoming = thread_running()->messageinfo.message;
+    message_t *incoming = running->wait.message.message;
 
     if (incoming != NULL)
     {
@@ -413,7 +417,7 @@ int thread_cancel(THREAD t)
     if (thread != NULL)
     {
         thread->state = THREAD_CANCELING;
-        thread->exit_value = NULL;
+        thread->exitvalue = 0;
         sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
     }
 
@@ -422,14 +426,14 @@ int thread_cancel(THREAD t)
     return thread == NULL; // return 1 if canceling the thread failled!
 }
 
-void thread_exit(void *retval)
+void thread_exit(int exitvalue)
 {
     sk_atomic_begin();
 
     running->state = THREAD_CANCELING;
-    running->exit_value = retval;
+    running->exitvalue = exitvalue;
 
-    sk_log(LOG_DEBUG, "Thread(%d) exited with value 0x%x.", running->id, retval);
+    sk_log(LOG_DEBUG, "Thread(%d) exited with value 0x%x.", running->id, exitvalue);
 
     sk_atomic_end();
 
@@ -602,7 +606,7 @@ void process_cancel(PROCESS p)
     {
         process_t *process = process_get(p);
         process->state = PROCESS_CANCELING;
-        process->exit_code = -1;
+        process->exitvalue = -1;
         sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
 
         cancel_childs(process);
@@ -626,7 +630,7 @@ void process_exit(int code)
     if (p != kernel_process)
     {
         process->state = PROCESS_CANCELING;
-        process->exit_code = code;
+        process->exitvalue = code;
         sk_log(LOG_DEBUG, "Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
 
         cancel_childs(process);
@@ -677,7 +681,7 @@ void sheduler_update_threads(void)
 
         case THREAD_WAIT_TIME:
         {
-            if (t->sleepinfo.wakeuptick <= ticks)
+            if (t->wait.time.wakeuptick <= ticks)
             {
                 t->state = THREAD_RUNNING;
                 sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
@@ -688,13 +692,13 @@ void sheduler_update_threads(void)
         case THREAD_WAIT_THREAD:
         {
             // Get the thread we are waiting.
-            thread_t *wthread = thread_getbyid(t->waitinfo.handle);
+            thread_t *wthread = thread_getbyid(t->wait.thread.thread_handle);
 
             if (wthread->state == THREAD_CANCELED ||
                 wthread->state == THREAD_CANCELING)
             {
                 t->state = THREAD_RUNNING;
-                t->waitinfo.outcode = (uint)wthread->exit_value;
+                t->wait.thread.exitvalue = (uint)wthread->exitvalue;
                 sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", t->id, wthread->id);
             }
         }
@@ -703,13 +707,13 @@ void sheduler_update_threads(void)
         case THREAD_WAIT_PROCESS:
         {
             // Get the process we are waiting.
-            process_t *wproc = process_get(t->waitinfo.handle);
+            process_t *wproc = process_get(t->wait.process.process_handle);
 
             if (wproc->state == PROCESS_CANCELED ||
                 wproc->state == PROCESS_CANCELING)
             {
                 t->state = THREAD_RUNNING;
-                t->waitinfo.outcode = wproc->exit_code;
+                t->wait.process.exitvalue = wproc->exitvalue;
                 sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", t->id, wproc->id);
             }
         }

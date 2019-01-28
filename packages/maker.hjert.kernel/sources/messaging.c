@@ -155,15 +155,15 @@ message_t *messaging_receive_internal(thread_t *thread)
 
     if (thread->process->inbox->count > 0)
     {
-        if (thread->messageinfo.message != NULL)
+        if (thread->wait.message.message != NULL)
         {
-            message_delete(thread->messageinfo.message);
+            message_delete(thread->wait.message.message);
         }
 
         message_t *msg;
 
         list_pop(thread->process->inbox, (void **)&msg);
-        thread->messageinfo.message = msg;
+        thread->wait.message.message = msg;
 
         sk_atomic_end();
         return msg;
@@ -188,7 +188,7 @@ int messaging_receive(message_t *msg)
 
 int messaging_payload(void *buffer, uint size)
 {
-    message_t *incoming = thread_running()->messageinfo.message;
+    message_t *incoming = thread_running()->wait.message.message;
 
     if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {

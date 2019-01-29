@@ -1,18 +1,17 @@
 #!/usr/bin/python3
 
-"""
-S.O.S.B.S: The (S)kift(O)(S) (B)uild (S)ystem
-S.O.S.D.K: The (S)kift(O)(S) (D)evelopment (K)it
-"""
+# Copyright © 2018-2019 MAKER.
+# This code is licensed under the MIT License.
+# See: LICENSE.md
 
-from pprint import pprint
-from enum import Enum
+# buildtools.py: the skift os build system.
 
-import os
-import sys
-import json
-import subprocess
 import shutil
+import subprocess
+import json
+import sys
+import os
+from enum import Enum
 
 # --- Utils ------------------------------------------------------------------ #
 
@@ -394,7 +393,7 @@ class Target(object):
             # print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
             return True
         else:
-            print("") # Skip a line so it's easier on the eyes.
+            print("")  # Skip a line so it's easier on the eyes.
             print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
             # Build all source file of the current target
@@ -692,6 +691,7 @@ global_actions = \
     }
 
 # --- Main ------------------------------------------------------------------- #
+
 
 def missing_command(command):
     ERROR("No action named '%s'!" % command)

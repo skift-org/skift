@@ -58,7 +58,7 @@ QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
 
 
 def QEMU(disk):
-    if True or subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
+    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
             ERROR("Failed to start QEMU!")
             ABORT()

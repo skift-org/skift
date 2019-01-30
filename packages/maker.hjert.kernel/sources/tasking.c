@@ -200,7 +200,7 @@ THREAD kernel_thread;
 
 thread_t *running = NULL;
 
-esp_t shedule(esp_t esp, processor_context_t *context);
+reg32_t shedule(reg32_t esp, processor_context_t *context);
 
 void timer_set_frequency(int hz)
 {
@@ -764,7 +764,7 @@ thread_t *sheduler_next_thread(void)
 }
 
 bool is_context_switch = false;
-esp_t shedule(esp_t sp, processor_context_t *context)
+reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     is_context_switch = true;
     UNUSED(context);

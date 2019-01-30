@@ -52,12 +52,13 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror", "-Wno-unknown-pragmas"]
 LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
-QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
+QEMUFLAGS = ["-sdl", "-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
+QEMUFLAGS_NOKVM = ["-sdl", "-m", "256M", "-serial", "mon:stdio"]
 
 
 def QEMU(disk):
     if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
+        print("Lol no kvm")
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
             ERROR("Failed to start QEMU!")
             ABORT()
@@ -743,7 +744,7 @@ if not crosscompiler_check():
     AR = "ar"
     OBJDUMP = "objdump"
 
-    CFLAGS.append("-m32")
+    CFLAGS  += ["-m32", "-fno-stack-protector", "-mno-sse"]
     LDFLAGS += ["-m", "elf_i386"]
 
 

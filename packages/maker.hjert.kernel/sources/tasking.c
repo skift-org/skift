@@ -232,7 +232,7 @@ void tasking_setup()
     thread_attach_process(&idle, process_get(kernel_process));
     thread_ready(&idle);
 
-    timer_set_frequency(50);
+    timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -416,7 +416,7 @@ int thread_cancel(THREAD t)
 
     if (thread != NULL)
     {
-        thread->state = THREAD_CANCELING;
+        thread->state = THREAD_CANCELED;
         thread->exitvalue = 0;
         sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
     }
@@ -430,8 +430,11 @@ void thread_exit(int exitvalue)
 {
     sk_atomic_begin();
 
-    running->state = THREAD_CANCELING;
+    running->state = THREAD_CANCELED;
     running->exitvalue = exitvalue;
+
+    // notify all waiting thread
+    // TODO
 
     sk_log(LOG_DEBUG, "Thread(%d) exited with value 0x%x.", running->id, exitvalue);
 
@@ -469,7 +472,6 @@ static char *THREAD_STATES[] =
         "WAIT(thread)",
         "WAIT(process)",
         "WAIT(message)",
-        "CANCELING",
         "CANCELED",
 };
 
@@ -477,8 +479,7 @@ void thread_dump(thread_t *t)
 {
     sk_atomic_begin();
 
-    printf("\n\t- ID=%d PROC=('%s', %d) ", t->id, t->process->name, t->process->id);
-    printf("ESP=%08x STACK=%08x %s", t->sp, t->stack, THREAD_STATES[t->state]);
+    printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
 
     sk_atomic_end();
 }
@@ -694,8 +695,7 @@ void sheduler_update_threads(void)
             // Get the thread we are waiting.
             thread_t *wthread = thread_getbyid(t->wait.thread.thread_handle);
 
-            if (wthread->state == THREAD_CANCELED ||
-                wthread->state == THREAD_CANCELING)
+            if (wthread->state == THREAD_CANCELED)
             {
                 t->state = THREAD_RUNNING;
                 t->wait.thread.exitvalue = (uint)wthread->exitvalue;
@@ -730,13 +730,6 @@ void sheduler_update_threads(void)
         }
         break;
 
-        case THREAD_CANCELING:
-        {
-            sk_log(LOG_DEBUG, "Thread %d canceled!", t->id);
-            t->state = THREAD_CANCELED;
-        }
-        break;
-
         case THREAD_CANCELED:
         {
             // TODO: cleanup the process if the process is stopped.
@@ -766,11 +759,10 @@ thread_t *sheduler_next_thread(void)
 bool is_context_switch = false;
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    is_context_switch = true;
     UNUSED(context);
-
+    is_context_switch = true;
     ticks++;
-
+    
     // Save the old context
     running->sp = sp;
 

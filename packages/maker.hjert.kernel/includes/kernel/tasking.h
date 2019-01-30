@@ -53,7 +53,6 @@ typedef enum thread_state
     THREAD_WAIT_PROCESS,
     THREAD_WAIT_MESSAGE,
 
-    THREAD_CANCELING,
     THREAD_CANCELED,
     
     THREAD_FREE,
@@ -88,7 +87,6 @@ typedef struct
     thread_entry_t entry;
 
     thread_state_t state;
-
 
     bool user;
     uint sp;

@@ -527,6 +527,7 @@ def distrib(targets):
     MKDIR("build")
 
     ramdisk = MKDIR("build/ramdisk")
+    COPY("files", ramdisk)
     bootdisk = MKDIR("build/bootdisk")
 
     ## --- RAMDISK ---------------------------------------------------------- ##

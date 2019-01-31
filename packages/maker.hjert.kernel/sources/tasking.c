@@ -18,7 +18,6 @@
  *   (kinda fixed by adding a dummy hidle thread)
  */
 
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <skift/atomic.h>

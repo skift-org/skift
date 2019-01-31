@@ -58,7 +58,6 @@ QEMUFLAGS_NOKVM = ["-sdl", "-m", "256M", "-serial", "mon:stdio"]
 
 def QEMU(disk):
     if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
-        print("Lol no kvm")
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
             ERROR("Failed to start QEMU!")
             ABORT()
@@ -324,7 +323,7 @@ class Target(object):
         """
         filename = source.split("/")[-1]
         includes = [("-I" + i) for i in self.get_includes(targets)]
-        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"']
+        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"', "-D__PACKAGE__=\"" + self.name + '"']
 
         print("    " + BRIGHT_BLACK + "%s" % filename + RESET)
         MKDIR(os.path.dirname(output))

@@ -1,0 +1,20 @@
+{
+    "name": "maker.skift.framework",
+
+    "sources": 
+    [
+        "sources/*"
+    ],
+
+    "includes":
+    [
+        "$maker.hjert.kernel"
+    ],
+
+    "define":
+    {
+        "LOGGER_LOG_LEVEL": "LOG_ALL"
+    },
+
+    "output": "framework.a"
+}

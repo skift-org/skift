@@ -24,7 +24,7 @@ void readline(char* buffer, uint size)
     while(true)
     {
         message_t msg;
-        sk_thread_wait_message(&msg);
+        sk_messaging_receive(&msg, 1);
 
         if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
         {

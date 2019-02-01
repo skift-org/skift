@@ -388,25 +388,6 @@ int thread_wait_process(PROCESS p)
     return running->wait.process.exitvalue;
 }
 
-int thread_wait_message(message_t *msg)
-{
-    ATOMIC({
-        running->state = THREAD_WAIT_MESSAGE;
-    });
-
-    thread_hold(); // Wait for the sheduler to give us a message.
-
-    message_t *incoming = running->wait.message.message;
-
-    if (incoming != NULL)
-    {
-        memcpy(msg, incoming, sizeof(message_t));
-        return 1;
-    }
-
-    return 0;
-}
-
 int thread_cancel(THREAD t)
 {
     sk_atomic_begin();
@@ -714,17 +695,6 @@ void sheduler_update_threads(void)
                 t->state = THREAD_RUNNING;
                 t->wait.process.exitvalue = wproc->exitvalue;
                 sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", t->id, wproc->id);
-            }
-        }
-        break;
-
-        case THREAD_WAIT_MESSAGE:
-        {
-            message_t *incoming = messaging_receive_internal(t);
-
-            if (incoming != NULL)
-            {
-                t->state = THREAD_RUNNING;
             }
         }
         break;

@@ -112,6 +112,18 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     list_pushback(process->inbox, (void *)msg);
 
+    FOREACH(t, process->threads)
+    {
+        thread_t* thread = t->value;
+
+        if (thread->state == THREAD_WAIT_MESSAGE)
+        {
+            messaging_receive_internal(thread);
+            thread->state = THREAD_RUNNING;
+            break;
+        }
+    }
+
     return id;
 }
 
@@ -151,6 +163,8 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 
 message_t *messaging_receive_internal(thread_t *thread)
 {
+    message_t *msg = NULL;
+
     sk_atomic_begin();
 
     if (thread->process->inbox->count > 0)
@@ -160,30 +174,37 @@ message_t *messaging_receive_internal(thread_t *thread)
             message_delete(thread->wait.message.message);
         }
 
-        message_t *msg;
 
         list_pop(thread->process->inbox, (void **)&msg);
         thread->wait.message.message = msg;
-
-        sk_atomic_end();
-        return msg;
     }
 
     sk_atomic_end();
-    return NULL;
+    return msg;
 }
 
-int messaging_receive(message_t *msg)
+bool messaging_receive(message_t *msg, bool wait)
 {
     message_t *incoming = messaging_receive_internal(thread_running());
+
+    if (incoming == NULL && wait)
+    {
+        sk_atomic_begin();
+        thread_running()->state = THREAD_WAIT_MESSAGE;
+        sk_atomic_end(); 
+
+        thread_hold(); // Wait until we get a message.
+
+        incoming = thread_running()->wait.message.message;
+    }
 
     if (incoming != NULL)
     {
         memcpy(msg, incoming, sizeof(message_t));
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 int messaging_payload(void *buffer, uint size)

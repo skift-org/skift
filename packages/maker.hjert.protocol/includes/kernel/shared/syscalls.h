@@ -34,7 +34,6 @@ typedef enum
 
     SYS_THREAD_WAIT_THREAD,
     SYS_THREAD_WAIT_PROCESS,
-    SYS_THREAD_WAIT_MESSAGE,
 
     // Messaging
     SYS_MSG_SEND,

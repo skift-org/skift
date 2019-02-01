@@ -24,7 +24,7 @@ int messaging_send(int to, const char *name, void *payload, uint size, uint flag
 int messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags);
 
 message_t* messaging_receive_internal(thread_t* thread);
-int messaging_receive(message_t *msg);
+bool messaging_receive(message_t *msg, bool wait);
 int messaging_payload(void *buffer, uint size);
 
 int messaging_subscribe(const char *channel);

@@ -122,11 +122,6 @@ int sys_thread_wait_process(PROCESS p)
     return thread_wait_process(p);
 }
 
-int sys_thread_wait_message(message_t* m)
-{
-    return thread_wait_message(m);
-}
-
 /* --- Messaging ------------------------------------------------------------ */
 int sys_messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
 {
@@ -138,9 +133,9 @@ int sys_messaging_broadcast(const char *channel, const char *name, void *payload
     return messaging_broadcast(channel, name, payload, size, flags);
 }
 
-int sys_messaging_receive(message_t *msg)
+int sys_messaging_receive(message_t *msg, int wait)
 {
-    return messaging_receive(msg);
+    return messaging_receive(msg, wait && true);
 }
 
 int sys_messaging_payload(void *buffer, uint size)
@@ -262,7 +257,6 @@ static int (*syscalls[])() =
     [SYS_THREAD_WAKEUP] = sys_thread_wakeup,
     [SYS_THREAD_WAIT_THREAD] = sys_thread_wait_thread,
     [SYS_THREAD_WAIT_PROCESS] = sys_thread_wait_process,
-    [SYS_THREAD_WAIT_MESSAGE] = sys_thread_wait_message,
 
     [SYS_MSG_SEND] = sys_messaging_send,
     [SYS_MSG_BROADCAST] = sys_messaging_broadcast,

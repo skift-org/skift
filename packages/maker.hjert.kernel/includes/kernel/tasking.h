@@ -123,8 +123,6 @@ void thread_wakeup(THREAD t); // Wake up the slected thread
 
 int thread_wait_thread(THREAD t);        // Wait for the selected thread to exit and return the exit value
 int thread_wait_process(PROCESS p);      // Wait for the selected process to exit and return the exit value.
-int thread_wait_message(message_t* msg); // Wait for a incoming message.
-
 void thread_yield(); // Yield to the next thread.
 
 void thread_dump_all();

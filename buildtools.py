@@ -282,7 +282,7 @@ class Target(object):
         """
         Return all source file of the current target.
         """
-        return get_files(join(self.location, "sources"), "c") + get_files(join(self.location, "sources"), "s")
+        return get_files(join(self.location, "."), "c") + get_files(join(self.location, "sources"), "s")
 
     def get_shared_objects(self, targets):
 

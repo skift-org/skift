@@ -1,7 +1,7 @@
 {
     "name": "System information",
     
-    "id": "sysinfo",
+    "id": "sysfetch",
     "type": "app",
     "libs": [
         "maker.skift.runtime"

@@ -121,29 +121,12 @@ void thread_ready(thread_t *t)
     ctx.eip = (reg32_t)t->entry;
     ctx.ebp = ((reg32_t)t->stack + MAX_THREAD_STACKSIZE);
 
-    if (t->user)
-    {
-        // TODO: userspace thread
-        // context->cs = 0x18;
-        // context->ds = 0x20;
-        // context->es = 0x20;
-        // context->fs = 0x20;
-        // context->gs = 0x20;
-
-        ctx.cs = 0x08;
-        ctx.ds = 0x10;
-        ctx.es = 0x10;
-        ctx.fs = 0x10;
-        ctx.gs = 0x10;
-    }
-    else
-    {
-        ctx.cs = 0x08;
-        ctx.ds = 0x10;
-        ctx.es = 0x10;
-        ctx.fs = 0x10;
-        ctx.gs = 0x10;
-    }
+    // TODO: userspace thread
+    ctx.cs = 0x08;
+    ctx.ds = 0x10;
+    ctx.es = 0x10;
+    ctx.fs = 0x10;
+    ctx.gs = 0x10;
 
     thread_stack_push(t, &ctx, sizeof(ctx));
 
@@ -200,7 +183,7 @@ reg32_t shedule(reg32_t esp, processor_context_t *context);
 
 void timer_set_frequency(int hz)
 {
-    u32 divisor = 119318 / hz;
+    u32 divisor = 1193180 / hz;
     outb(0x43, 0x36);
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);

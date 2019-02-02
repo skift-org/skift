@@ -55,6 +55,12 @@ ASFLAGS = ["-f", "elf32"]
 QEMUFLAGS = ["-sdl", "-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
 QEMUFLAGS_NOKVM = ["-sdl", "-m", "256M", "-serial", "mon:stdio"]
 
+def getoutput(command):
+    result = subprocess.run(command, stdout=subprocess.PIPE)
+    return result.stdout.decode("utf-8").strip()
+
+GIT_REV = getoutput(["git", "rev-parse", "--short", "HEAD"])
+
 def MKDIR(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -315,7 +321,9 @@ class Target(object):
         """
         filename = source.split("/")[-1]
         includes = [("-I" + i) for i in self.get_includes(targets)]
-        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"', "-D__PACKAGE__=\"" + self.name + '"']
+        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"', \
+                               "-D__PACKAGE__=\"" + self.name + '"', \
+                               "-D__COMMIT__=\"" + GIT_REV + '"']
 
         print("    " + BRIGHT_BLACK + "%s" % filename + RESET)
         MKDIR(os.path.dirname(output))

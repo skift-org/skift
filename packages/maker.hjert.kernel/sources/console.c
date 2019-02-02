@@ -37,7 +37,7 @@ static byte brightcolors[] =
     [VTCOLOR_GREY] = VGACOLOR_WHITE,
 };
 
-void console_paint(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
+static void paint_callback(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
 {
     UNUSED(vtc);
 
@@ -51,7 +51,7 @@ void console_paint(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
     }
 }
 
-void console_cursor_move(vtconsole_t *vtc, vtcursor_t *cur)
+static void cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
     UNUSED(vtc);
     UNUSED(cur);
@@ -60,7 +60,7 @@ void console_cursor_move(vtconsole_t *vtc, vtcursor_t *cur)
 
 void console_setup(void)
 {
-    vtc = vtconsole(VGA_SCREEN_WIDTH, VGA_SCREEN_HEIGHT, console_paint, console_cursor_move);
+    vtc = vtconsole(VGA_SCREEN_WIDTH, VGA_SCREEN_HEIGHT, paint_callback, cursor_move_callback);
 }
 
 void console_print(const char *s)

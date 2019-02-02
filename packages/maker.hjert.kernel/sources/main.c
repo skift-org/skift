@@ -106,15 +106,11 @@ void main(multiboot_info_t *info, s32 magic)
     setup(zero);
     setup(random);
 
-//    filesystem_dump();
-
     sk_log(LOG_DEBUG, "Starting the userspace...");
 
     /* --- Finalizing System ------------------------------------------------ */
     sk_atomic_enable();
     sti();
-
-    sk_log(LOG_INFO, "What?!");
 
     printf(KERNEL_UNAME);
     printf("\n");
@@ -132,6 +128,4 @@ void main(multiboot_info_t *info, s32 magic)
     {
         PANIC("No working init found.");
     }
-
-    PANIC("END OF KERNEL!");
 }

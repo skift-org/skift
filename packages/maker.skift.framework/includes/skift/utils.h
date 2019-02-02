@@ -15,6 +15,10 @@
     #define __FILENAME__ "(NULL)"
 #endif
 
+#ifndef __COMMIT__
+    #define __COMMIT__ "(NULL)"
+#endif
+
 #define PACKED(x) x __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))
 #define UNUSED(x) (void)(x)

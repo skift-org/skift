@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-# Copyright © 2018-2019 MAKER.
-# This code is licensed under the MIT License.
-# See: LICENSE.md
+# Copyright © 2018-2019 MAKER.                                                #
+# This code is licensed under the MIT License.                                #
+# See: LICENSE.md                                                             #
 
 # buildtools.py: the skift os build system.
 
@@ -55,14 +55,6 @@ ASFLAGS = ["-f", "elf32"]
 QEMUFLAGS = ["-sdl", "-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
 QEMUFLAGS_NOKVM = ["-sdl", "-m", "256M", "-serial", "mon:stdio"]
 
-
-def QEMU(disk):
-    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
-        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
-            ERROR("Failed to start QEMU!")
-            ABORT()
-
-
 def MKDIR(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -74,26 +66,6 @@ def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
-
-def copytree(src, dst, ignore=None):
-    if os.path.isdir(src):
-        if not os.path.isdir(dst):
-            os.makedirs(dst)
-        files = os.listdir(src)
-        if ignore is not None:
-            ignored = ignore(src, files)
-        else:
-            ignored = set()
-
-        for f in files:
-            if f not in ignored:
-                copytree(os.path.join(src, f),
-                         os.path.join(dst, f),
-                         ignore)
-    else:
-        shutil.copyfile(src, dst)
-
-
 def COPY(src, dest):
     if os.path.isdir(src):
         copytree(src, dest)
@@ -102,11 +74,11 @@ def COPY(src, dest):
 
     return dest
 
-
-def TAR(directory, output_file):
-    subprocess.call(["tar", "-cf", output_file, "-C",
-                     directory] + os.listdir(directory))
-
+def QEMU(disk):
+    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
+            ERROR("Failed to start QEMU!")
+            ABORT()
 
 def GRUB(iso, output_file):
     with open("/dev/null", "w") as f:
@@ -118,15 +90,16 @@ def GRUB(iso, output_file):
 
     return False
 
+def TAR(directory, output_file):
+    subprocess.call(["tar", "-cf", output_file, "-C",
+                     directory] + os.listdir(directory))
 
 def ERROR(msg):
     print(BRIGHT_RED + "\nERROR: " + RESET + msg)
 
-
 def ABORT():
     print("Aborted!" + RESET)
     exit(-1)
-
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
@@ -138,7 +111,6 @@ def crosscompiler_check():
         os.path.exists(LD)
 
 # --- Utils ------------------------------------------------------------------ #
-
 
 def join(a, b):
     """
@@ -181,6 +153,25 @@ def get_files(locations, ext):
 
     return files
 
+def copytree(src, dst, ignore=None):
+    if os.path.isdir(src):
+        if not os.path.isdir(dst):
+            os.makedirs(dst)
+        files = os.listdir(src)
+
+        if ignore is not None:
+            ignored = ignore(src, files)
+        else:
+            ignored = set()
+
+        for f in files:
+            if f not in ignored:
+                copytree(os.path.join(src, f),
+                         os.path.join(dst, f),
+                         ignore)
+    else:
+        shutil.copyfile(src, dst)
+
 # --- Targets ---------------------------------------------------------------- #
 
 
@@ -211,13 +202,14 @@ class Target(object):
     """
 
     def __init__(self, location, data):
-        self.name_friendly = data["name"] if "name" in data else data["id"]
         self.name = data["id"]
+        self.name_friendly = data["name"] if "name" in data else data["id"]
         self.type = TargetTypes.FromStr(data["type"])
-        self.location = location
         self.deps = data["libs"] if "libs" in data else []
         self.incl = data["includes"] if "includes" in data else []
         self.strict = data["strict"] if "strict" in data else True
+        
+        self.location = location
 
         self.builded = False
 
@@ -412,11 +404,8 @@ class Target(object):
             print("    %d %s builded, %s%d%s succeed and %s%d%s failed.\n" % (succeed + failed,
                                                                               "files" if succeed + failed > 1 else "file", BRIGHT_GREEN, succeed, RESET, BRIGHT_RED, failed, RESET))
 
-            if failed > 0:
-                return False
-
             # Link and output the result of the target
-            return self.link(targets)
+            return False if failed > 0 else self.link(targets)
 
     def clean(self):
         RMDIR(join(self.location, "bin"))
@@ -496,7 +485,6 @@ def clean_all(targets):
     """Clean all targets."""
     for t in targets:
         target = targets[t]
-
         target.clean()
 
     RMDIR("build")
@@ -579,38 +567,6 @@ def distrib(targets):
 
     # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
 
-
-def distrib_sdk(targets):
-    """Generate a distribution of the skiftOS sdk"""
-
-    distrib(targets)
-
-    sdk = MKDIR("build/sdk")
-
-    boot = COPY("build/bootdisk", "build/sdk/boot")
-    system = COPY("build/ramdisk", "build/sdk/system")
-
-    # copy pakages
-    pakages = MKDIR("build/sdk/pakages")
-    COPY("pakages/exemple", pakages + "/exemple")
-
-    # copy all includes files
-    includes = MKDIR(sdk + "/includes")
-
-    for t in targets:
-        t = targets[t]
-        COPY(join(t.location, "includes"), includes)
-
-    # copy all libraries
-    libraries = MKDIR(sdk + "/libraries")
-
-    # copy SOSBS.py
-    COPY("./SOSBS.py", "build/sdk/SOSDK.py")
-
-    # copy the toolchain
-    COPY("toolchain/local", sdk + "/toolchain/local")
-
-
 def help_command(targets):
     """Show this help message."""
 
@@ -687,8 +643,7 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "run": run_command,
-        "distrib-sdk": distrib_sdk
+        "run": run_command
     }
 
 # --- Main ------------------------------------------------------------------- #
@@ -697,7 +652,6 @@ global_actions = \
 def missing_command(command):
     ERROR("No action named '%s'!" % command)
     print(BRIGHT_WHITE + "See: " + RESET + "'" + APP_NAME + " help'.")
-
 
 def main(argc, argv):
     """

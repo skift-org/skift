@@ -11,7 +11,7 @@
 
 #include "kernel/protocol.h"
 
-#define PROMPT "\n\033[0;1;34m $ \033[0;1m"
+#define PROMPT "\033[0;1;34m $ \033[0;1m"
 
 bool exited = false;
 void readline(char* buffer, uint size)
@@ -63,8 +63,15 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
+    int exitvalue = 0;
+
     while (!exited)
     {
+        if (exitvalue != 0)
+        {
+            printf("\033[0;1;31m%d", exitvalue);
+        }
+
         printf(PROMPT);
         
         char command[128];
@@ -87,7 +94,7 @@ int main(int argc, char **argv)
             }
             
             if (process)
-                sk_thread_wait_process(process);
+                sk_thread_wait_process(process, &exitvalue);
             else
                 printf("Command '%s' not found !\n", command);
         } 

@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     (void)argc; (void)argv;
 
     int shell = init_exec("/bin/sh");
-    sk_thread_wait_process(shell);
+    sk_thread_wait_process(shell, NULL);
 
     return 0;
 }

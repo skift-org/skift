@@ -11,7 +11,6 @@
 #include "kernel/protocol.h"
 #include "kernel/limits.h"
 
-
 /* --- Process -------------------------------------------------------------- */
 
 typedef int PROCESS; // Process handler
@@ -31,7 +30,7 @@ typedef struct
     bool user;
     list_t *threads; // Child threads;
     list_t *inbox;   // process main message queu
-    list_t *shared; // Shared memory region;
+    list_t *shared;  // Shared memory region;
 
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
@@ -41,20 +40,20 @@ typedef struct
 
 /* --- Thread --------------------------------------------------------------- */
 
-typedef int THREAD;  // Thread handle
+typedef int THREAD; // Thread handle
 typedef void (*thread_entry_t)();
 
 typedef enum thread_state
 {
     THREAD_RUNNING,
-    
+
     THREAD_WAIT_TIME,
     THREAD_WAIT_THREAD,
     THREAD_WAIT_PROCESS,
     THREAD_WAIT_MESSAGE,
 
     THREAD_CANCELED,
-    
+
     THREAD_FREE,
 } thread_state_t;
 
@@ -92,7 +91,8 @@ typedef struct
     uint sp;
     byte stack[MAX_THREAD_STACKSIZE];
 
-    struct  {
+    struct
+    {
         thread_wait_time_t time;
         thread_wait_process_t process;
         thread_wait_thread_t thread;
@@ -115,18 +115,18 @@ void thread_hold();
 
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); // Create a new thread of a selected process.
 
-int thread_cancel(THREAD t);    // Cancel the selected thread.
+int thread_cancel(THREAD t);     // Cancel the selected thread.
 void thread_exit(int exitvalue); // Exit the current thread and return a value.
 
 void thread_sleep(int time);  // Send the current thread to bed.
 void thread_wakeup(THREAD t); // Wake up the slected thread
 
-int thread_wait_thread(THREAD t);        // Wait for the selected thread to exit and return the exit value
-int thread_wait_process(PROCESS p);      // Wait for the selected process to exit and return the exit value.
-void thread_yield(); // Yield to the next thread.
+int thread_wait_thread(THREAD t);                    // Wait for the selected thread to exit and return the exit value
+bool thread_wait_process(PROCESS p, int *exitvalue); // Wait for the selected process to exit and return the exit value.
+void thread_yield();                                 // Yield to the next thread.
 
 void thread_dump_all();
-void thread_dump(thread_t* t);
+void thread_dump(thread_t *t);
 
 /* --- Process managment ---------------------------------------------------- */
 
@@ -136,7 +136,7 @@ process_t *process_get(PROCESS process);
 
 PROCESS process_create(const char *name, bool user); // Create a new process.
 
-void process_cancel(PROCESS p); // Cancel the selected process.
+void process_cancel(PROCESS p, int exitvalue); // Cancel the selected process.
 void process_exit(int code);    // Exit the current process and send a exit code.
 
 int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.

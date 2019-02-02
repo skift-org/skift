@@ -6,10 +6,6 @@
 
 #include <skift/generic.h>
 
-#ifndef __FILENAME__
-    #define __FILENAME__ "(NULL)"
-#endif
-
 typedef enum
 {
     LOG_OFF = 9,

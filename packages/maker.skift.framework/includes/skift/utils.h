@@ -7,6 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef __PACKAGE__
+    #define __PACKAGE__ "(NULL)"
+#endif
+
+#ifndef __FILENAME__
+    #define __FILENAME__ "(NULL)"
+#endif
+
 #define PACKED(x) x __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))
 #define UNUSED(x) (void)(x)

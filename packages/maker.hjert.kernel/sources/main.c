@@ -124,8 +124,9 @@ void main(multiboot_info_t *info, s32 magic)
 
     if (init)
     {
-        thread_wait_process(init);
-        PANIC("Init has return!");
+        int exitvalue = 0;
+        thread_wait_process(init, &exitvalue);
+        PANIC("Init has return with code %d!", exitvalue);
     }
     else
     {

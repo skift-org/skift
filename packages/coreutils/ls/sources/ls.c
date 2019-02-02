@@ -21,7 +21,7 @@ int ls(const char* path)
         {
             printf("%s  ", entry.name);
         }
-
+        printf("\n");
         sk_filesystem_close(dir);
 
         return 0;
@@ -32,7 +32,5 @@ int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-
-
     return ls("/bin");
 }

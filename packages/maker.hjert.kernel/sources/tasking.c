@@ -12,10 +12,7 @@
  * - Move the sheduler in his own file.
  * - Allow to pass parameters to thread and then return values
  * - Add priority to the round robine sheduler
- * 
- * BUG:
- * - Deadlock when using thread_sleep() when a single thread is running. 
- *   (kinda fixed by adding a dummy hidle thread)
+ *
  */
 
 #include <stdlib.h>
@@ -365,7 +362,7 @@ int thread_wait_thread(THREAD t)
     return running->wait.thread.exitvalue;
 }
 
-int thread_wait_process(PROCESS p)
+bool thread_wait_process(PROCESS p, int* exitvalue)
 {
     sk_atomic_begin();
 
@@ -373,19 +370,36 @@ int thread_wait_process(PROCESS p)
 
     if (process != NULL)
     {
-        running->wait.process.process_handle = p;
-        running->state = THREAD_WAIT_PROCESS;
-        sk_atomic_end();
+        if (process->state == PROCESS_CANCELED || process->state == PROCESS_CANCELING)
+        {
+            if (exitvalue != NULL)
+            {
+                *exitvalue = process->exitvalue;
+            }
 
-        thread_hold();
+            sk_atomic_end();
+        }
+        else
+        {
+            running->wait.process.process_handle = p;
+            running->state = THREAD_WAIT_PROCESS;
+
+            sk_atomic_end();
+            thread_hold();
+
+            if (exitvalue != NULL)
+            {
+                *exitvalue = running->wait.process.exitvalue;
+            }
+        }
+
+        return true;
     }
     else
     {
         sk_atomic_end();
-        running->wait.process.exitvalue = 0;
+        return false;
     }
-
-    return running->wait.process.exitvalue;
 }
 
 int thread_cancel(THREAD t)
@@ -527,7 +541,6 @@ PROCESS process_exec(const char *path, const char **arg)
     UNUSED(arg);
 
     stream_t *s = filesystem_open(path, OPENOPT_READ);
-
     if (s == NULL)
     {
         sk_log(LOG_WARNING, "'%s' file not found, exec failed!", path);
@@ -563,6 +576,7 @@ PROCESS process_exec(const char *path, const char **arg)
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
+    // todo pass argc, argv
     thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
 
     free(buffer);
@@ -570,27 +584,40 @@ PROCESS process_exec(const char *path, const char **arg)
     return p;
 }
 
-void cancel_childs(process_t *process)
-{
-    FOREACH(i, process->threads)
-    {
-        thread_t *thread = (thread_t *)i->value;
-        thread_cancel(thread->id);
-    }
-}
 
-void process_cancel(PROCESS p)
+void process_cancel(PROCESS p, int exitvalue)
 {
     sk_atomic_begin();
 
     if (p != kernel_process)
     {
         process_t *process = process_get(p);
-        process->state = PROCESS_CANCELING;
-        process->exitvalue = -1;
+
+        // Set our new process state
+        process->state = PROCESS_CANCELED;
+        process->exitvalue = exitvalue;
+        
         sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
 
-        cancel_childs(process);
+        // Wake up waiting threads
+        for(int i = 0; i < MAX_THREAD; i++)
+        {
+            thread_t* thread = &thread_table[i];
+
+            if (thread->state == THREAD_WAIT_PROCESS && thread->wait.process.process_handle == p)
+            {
+                thread->state = THREAD_RUNNING;
+                thread->wait.process.exitvalue = exitvalue;
+                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, p);
+            }
+        }
+        
+        // Cancel childs threads.
+        FOREACH(i, process->threads)
+        {
+            thread_t *thread = (thread_t *)i->value;
+            thread_cancel(thread->id);
+        }
     }
     else
     {
@@ -601,31 +628,22 @@ void process_cancel(PROCESS p)
     sk_atomic_end();
 }
 
-void process_exit(int code)
+void process_exit(int exitvalue)
 {
-    sk_atomic_begin();
+    PROCESS self = process_self();
 
-    PROCESS p = process_self();
-    process_t *process = process_get(p);
-
-    if (p != kernel_process)
+    if (self != kernel_process)
     {
-        process->state = PROCESS_CANCELING;
-        process->exitvalue = code;
-        sk_log(LOG_DEBUG, "Process '%s' ID=%d exited with code %d.", process->name, process->id, code);
+        process_cancel(self, exitvalue);
 
-        cancel_childs(process);
-
-        sk_atomic_end();
+        // Hang
         while (1)
             hlt();
     }
     else
     {
-        sk_log(LOG_WARNING, "Kernel try to commit suicide!");
+        PANIC("Kernel try to commit suicide!");
     }
-
-    sk_atomic_end();
 }
 
 int process_map(PROCESS p, uint addr, uint count)
@@ -680,21 +698,6 @@ void sheduler_update_threads(void)
                 t->state = THREAD_RUNNING;
                 t->wait.thread.exitvalue = (uint)wthread->exitvalue;
                 sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", t->id, wthread->id);
-            }
-        }
-        break;
-
-        case THREAD_WAIT_PROCESS:
-        {
-            // Get the process we are waiting.
-            process_t *wproc = process_get(t->wait.process.process_handle);
-
-            if (wproc->state == PROCESS_CANCELED ||
-                wproc->state == PROCESS_CANCELING)
-            {
-                t->state = THREAD_RUNNING;
-                t->wait.process.exitvalue = wproc->exitvalue;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", t->id, wproc->id);
             }
         }
         break;

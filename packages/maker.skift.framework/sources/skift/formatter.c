@@ -54,7 +54,7 @@ int sk_format_decimal(printf_info_t* info, va_list* va)
 
     if (v < 0)
     {
-        v -= v;
+        v = 0 - v;
 
         buffer[0] = '-';
         buffer[1] = '\0';

@@ -52,7 +52,7 @@ int sys_process_exit(int code)
 
 int sys_process_cancel(int pid)
 {
-    process_cancel(pid);
+    process_cancel(pid, -1);
     return 0;
 }
 
@@ -117,9 +117,9 @@ int sys_thread_wait_thread(THREAD t)
     return thread_wait_thread(t);
 }
 
-int sys_thread_wait_process(PROCESS p)
+int sys_thread_wait_process(PROCESS p, int* exitvalue)
 {
-    return thread_wait_process(p);
+    return thread_wait_process(p, exitvalue);
 }
 
 /* --- Messaging ------------------------------------------------------------ */

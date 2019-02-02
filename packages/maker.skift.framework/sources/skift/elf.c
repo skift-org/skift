@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* elf.c: in memory elf fiel parser.                                          */
+
 #include <string.h>
 #include <skift/elf.h>
 

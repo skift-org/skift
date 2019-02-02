@@ -7,7 +7,7 @@
 
 vtconsole_t *vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move)
 {
-    vtconsole_t *vtc = MALLOC(vtconsole_t);
+    vtconsole_t *vtc = malloc(sizeof(vtconsole_t));
 
     vtc->width = width;
     vtc->height = height;

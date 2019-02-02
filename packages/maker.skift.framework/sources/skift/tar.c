@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* tar.c: read in memory tar archive                                          */
+
 #include <string.h>
 #include <skift/tar.h>
 

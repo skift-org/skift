@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* ringbuffer.c: a fifo buffer.                                               */
+
 #include <stdlib.h>
 #include <skift/ringbuffer.h>
 

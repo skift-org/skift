@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+/* formatter.c: vsnprintf backend.                                            */
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdarg.h>

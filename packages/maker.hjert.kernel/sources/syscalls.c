@@ -52,8 +52,7 @@ int sys_process_exit(int code)
 
 int sys_process_cancel(int pid)
 {
-    process_cancel(pid, -1);
-    return 0;
+    return process_cancel(pid, -1);
 }
 
 int sys_process_map(uint addr, uint count)
@@ -95,9 +94,9 @@ int sys_thread_exit(int exitval)
     return 0;
 }
 
-int sys_thread_cancel(THREAD t)
+int sys_thread_cancel(THREAD t, int exitvalue)
 {
-    return thread_cancel(t);
+    return thread_cancel(t, exitvalue);
 }
 
 int sys_thread_sleep(int time)
@@ -112,9 +111,9 @@ int sys_thread_wakeup(THREAD t)
     return 0;
 }
 
-int sys_thread_wait_thread(THREAD t)
+int sys_thread_wait_thread(THREAD t, int* exitvalue)
 {
-    return thread_wait_thread(t);
+    return thread_wait_thread(t, exitvalue);
 }
 
 int sys_thread_wait_process(PROCESS p, int* exitvalue)

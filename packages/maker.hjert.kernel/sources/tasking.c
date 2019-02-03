@@ -259,7 +259,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, char **argv)
     thread_init(t, entry, true);
     thread_attach_process(t, process);
 
-    // push arguments
+    // WIP: push arguments
     int argc;
     for(argc = 0; argv[argc]; argc++)
     {
@@ -322,7 +322,7 @@ void thread_wakeup(THREAD t)
     sk_atomic_end();
 }
 
-int thread_wait_thread(THREAD t)
+bool thread_wait_thread(THREAD t, int* exitvalue)
 {
     sk_atomic_begin();
 
@@ -330,19 +330,37 @@ int thread_wait_thread(THREAD t)
 
     if (thread != NULL)
     {
-        running->wait.thread.thread_handle = t;
-        running->state = THREAD_WAIT_THREAD;
-        sk_atomic_end();
+        if (thread->state == THREAD_CANCELED)
+        {
+            if (exitvalue != NULL)
+            {
+                *exitvalue = thread->exitvalue;
+            }
 
-        thread_hold();
+            sk_atomic_end();
+        }
+        else
+        {
+            running->wait.thread.thread_handle = t;
+            running->state = THREAD_WAIT_THREAD;
+
+            sk_atomic_end();
+            thread_hold();
+
+            if (exitvalue != NULL)
+            {
+                *exitvalue = running->wait.thread.exitvalue;
+            }
+        }
+
+        return true;
     }
     else
     {
-        running->wait.thread.exitvalue = 0;
         sk_atomic_end();
+        return false;
     }
 
-    return running->wait.thread.exitvalue;
 }
 
 bool thread_wait_process(PROCESS p, int* exitvalue)
@@ -385,37 +403,48 @@ bool thread_wait_process(PROCESS p, int* exitvalue)
     }
 }
 
-int thread_cancel(THREAD t)
+bool thread_cancel(THREAD t, int exitvalue)
 {
     sk_atomic_begin();
 
     thread_t *thread = thread_getbyid(t);
 
-    if (thread != NULL)
+    if (thread != NULL && thread->process == running->process)
     {
+        // Set the new thread state
         thread->state = THREAD_CANCELED;
-        thread->exitvalue = 0;
+        thread->exitvalue = exitvalue;
+
         sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
+    
+        // Wake up waiting threads
+        FOREACH(i, thread->process->threads)
+        {
+            thread_t* waitthread = i->value;
+
+            if (waitthread->state == THREAD_WAIT_THREAD &&
+                waitthread->wait.thread.thread_handle == t)
+            {
+                waitthread->state = THREAD_RUNNING;
+                waitthread->wait.thread.exitvalue = exitvalue;
+            
+                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
+            }
+        }
+
+        sk_atomic_end();
+        return true;
     }
-
-    sk_atomic_end();
-
-    return thread == NULL; // return 1 if canceling the thread failled!
+    else
+    {
+        sk_atomic_end();
+        return false;
+    }
 }
 
 void thread_exit(int exitvalue)
 {
-    sk_atomic_begin();
-
-    running->state = THREAD_CANCELED;
-    running->exitvalue = exitvalue;
-
-    // notify all waiting thread
-    // TODO
-
-    sk_log(LOG_DEBUG, "Thread(%d) exited with value 0x%x.", running->id, exitvalue);
-
-    sk_atomic_end();
+    thread_cancel(running->id, exitvalue);
 
     while (1)
         hlt();
@@ -443,13 +472,13 @@ void thread_dump_all()
 }
 
 static char *THREAD_STATES[] =
-    {
-        "RUNNING",
-        "SLEEP",
-        "WAIT(thread)",
-        "WAIT(process)",
-        "WAIT(message)",
-        "CANCELED",
+{
+    "RUNNING",
+    "SLEEP",
+    "WAIT(thread)",
+    "WAIT(process)",
+    "WAIT(message)",
+    "CANCELED",
 };
 
 void thread_dump(thread_t *t)
@@ -568,7 +597,7 @@ PROCESS process_exec(const char *path, const char **arg)
 }
 
 
-void process_cancel(PROCESS p, int exitvalue)
+bool process_cancel(PROCESS p, int exitvalue)
 {
     sk_atomic_begin();
 
@@ -599,16 +628,20 @@ void process_cancel(PROCESS p, int exitvalue)
         FOREACH(i, process->threads)
         {
             thread_t *thread = (thread_t *)i->value;
-            thread_cancel(thread->id);
+            thread_cancel(thread->id, 0);
         }
+
+        sk_atomic_end();
+        return true;
     }
     else
     {
         process_t *process = process_get(process_self());
         sk_log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
+    
+        sk_atomic_end();
+        return false;
     }
-
-    sk_atomic_end();
 }
 
 void process_exit(int exitvalue)
@@ -670,27 +703,6 @@ void sheduler_update_threads(void)
             }
         }
         break;
-
-        case THREAD_WAIT_THREAD:
-        {
-            // Get the thread we are waiting.
-            thread_t *wthread = thread_getbyid(t->wait.thread.thread_handle);
-
-            if (wthread->state == THREAD_CANCELED)
-            {
-                t->state = THREAD_RUNNING;
-                t->wait.thread.exitvalue = (uint)wthread->exitvalue;
-                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", t->id, wthread->id);
-            }
-        }
-        break;
-
-        case THREAD_CANCELED:
-        {
-            // TODO: cleanup the process if the process is stopped.
-        }
-        break;
-
         default:
             break;
         }

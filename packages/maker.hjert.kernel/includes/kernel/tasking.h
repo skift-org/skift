@@ -115,13 +115,13 @@ void thread_hold();
 
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); // Create a new thread of a selected process.
 
-int thread_cancel(THREAD t);     // Cancel the selected thread.
-void thread_exit(int exitvalue); // Exit the current thread and return a value.
+bool thread_cancel(THREAD t, int exitvalue); // Cancel the selected thread.
+void thread_exit(int exitvalue);             // Exit the current thread and return a value.
 
 void thread_sleep(int time);  // Send the current thread to bed.
 void thread_wakeup(THREAD t); // Wake up the slected thread
 
-int thread_wait_thread(THREAD t);                    // Wait for the selected thread to exit and return the exit value
+bool thread_wait_thread(THREAD t, int *exitvalue);   // Wait for the selected thread to exit and return the exit value
 bool thread_wait_process(PROCESS p, int *exitvalue); // Wait for the selected process to exit and return the exit value.
 void thread_yield();                                 // Yield to the next thread.
 
@@ -136,8 +136,8 @@ process_t *process_get(PROCESS process);
 
 PROCESS process_create(const char *name, bool user); // Create a new process.
 
-void process_cancel(PROCESS p, int exitvalue); // Cancel the selected process.
-void process_exit(int code);    // Exit the current process and send a exit code.
+bool process_cancel(PROCESS p, int exitvalue); // Cancel the selected process.
+void process_exit(int code);                   // Exit the current process and send a exit code.
 
 int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
 int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.

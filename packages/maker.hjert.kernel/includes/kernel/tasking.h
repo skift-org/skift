@@ -114,7 +114,8 @@ thread_t *thread_getbyid(int id);
 void thread_hold();
 void thread_setstate(thread_t *thread, thread_state_t state);
 
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); // Create a new thread of a selected process.
+// Create a new thread of a selected process.
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); 
 
 bool thread_cancel(THREAD t, int exitvalue); // Cancel the selected thread.
 void thread_exit(int exitvalue);             // Exit the current thread and return a value.

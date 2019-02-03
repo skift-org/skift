@@ -116,7 +116,7 @@ void main(multiboot_info_t *info, s32 magic)
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("/bin/init", NULL);
+    PROCESS init = process_exec("/bin/init", (const char*[]){"/bin/init", NULL});
 
     if (init)
     {

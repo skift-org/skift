@@ -84,13 +84,13 @@ int main(int argc, char **argv)
 
         if (strlen(command) != 0)
         {
-            int process = sk_process_exec(command, NULL);
+            int process = sk_process_exec(command, (const char*[]){command, "lol", NULL});
 
             if (!process)
             {
                 char pathbuffer[144];
                 snprintf(pathbuffer, 144, "/bin/%s", command);
-                process = sk_process_exec(pathbuffer, NULL);
+                process = sk_process_exec(pathbuffer, (const char*[]){command, "lol", NULL});
             }
             
             if (process)

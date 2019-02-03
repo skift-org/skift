@@ -121,7 +121,7 @@ void thread_init(thread_t *t, thread_entry_t entry, bool user)
     t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
 }
 
-uint thread_stack_push(thread_t *t, void *value, uint size)
+uint thread_stack_push(thread_t *t, const void *value, uint size)
 {
     t->sp -= size;
     memcpy((void *)t->sp, value, size);
@@ -278,7 +278,7 @@ thread_t *thread_running()
 }
 
 // Create the main thread of a user application
-THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, char **argv)
+THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **argv)
 {
     sk_atomic_begin();
 
@@ -294,7 +294,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, char **argv)
     int argc;
     for (argc = 0; argv[argc] && argc < MAX_PROCESS_ARGV; argc++)
     {
-        argv_list[argc] = thread_stack_push(t, &argv[argc], strlen(argv[argc]) + 1);
+        argv_list[argc] = thread_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
     }
 
     uint argv_list_ref = thread_stack_push(t, &argv_list, sizeof(argv_list));
@@ -584,10 +584,8 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
 }
 
-PROCESS process_exec(const char *path, const char **arg)
+PROCESS process_exec(const char *path, const char **argv)
 {
-    UNUSED(arg);
-
     stream_t *s = filesystem_open(path, OPENOPT_READ);
     if (s == NULL)
     {
@@ -624,8 +622,7 @@ PROCESS process_exec(const char *path, const char **arg)
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
-    // todo pass argc, argv
-    thread_create(p, (thread_entry_t)elf->entry, NULL, 0);
+    thread_create_mainthread(p, (thread_entry_t)elf->entry, argv);
 
     free(buffer);
 

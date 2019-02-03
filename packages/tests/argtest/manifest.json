@@ -1,0 +1,9 @@
+{
+    "name": "Argc and argv test",
+    
+    "id": "argtest",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

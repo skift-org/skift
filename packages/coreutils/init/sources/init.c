@@ -15,7 +15,7 @@
 int init_exec(const char* filename)
 {
     sk_log(LOG_INFO, "Starting '%s'", filename);
-    int process = sk_process_exec(filename, NULL);
+    int process = sk_process_exec(filename, (const char*[]){filename, NULL});
 
     if (process == 0)
     {

@@ -30,7 +30,13 @@ int ls(const char* path)
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
-    return ls("/bin");
+    if (argc >= 2)
+    {
+        return ls(argv[1]);
+
+    }
+    else
+    {
+        return ls("/");
+    }
 }

@@ -315,6 +315,7 @@ void filesystem_setup()
 {
     sk_lock_init(fslock);
     root = fsnode("ROOT", FSDIRECTORY);
+    root->refcount++;
 }
 
 fsnode_t *filesystem_resolve(const char *path)

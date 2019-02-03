@@ -10,11 +10,13 @@
 #include <skift/thread.h>
 
 #include "kernel/protocol.h"
+#include "kernel/limits.h"
 
 #define PROMPT "\033[0;1;34m $ \033[0;1m"
 
-bool exited = false;
-void readline(char* buffer, uint size)
+static bool exited = false;
+
+int shell_readline(char* buffer, uint size)
 {
     sk_messaging_subscribe(KEYBOARD_CHANNEL);
 
@@ -56,6 +58,71 @@ void readline(char* buffer, uint size)
     }
 
     sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
+
+    printf("\033[0m");
+
+    return strlen(buffer);
+}
+
+char** shell_split(char* command)
+{
+    strleadtrim(command, ' ');
+    strtrailtrim(command, ' ');
+
+    if (strlen(command) == 0) return NULL;
+
+    int token_index = 0;
+
+    char** tokens = malloc(MAX_PROCESS_ARGV * sizeof(char*));
+    char* start = &command[0];
+
+    for(size_t i = 0; i < strlen(command) + 1; i++)
+    {
+        char c = command[i];
+
+        if (c == ' ' || c == '\0')
+        {
+            int buffer_len = &command[i] - start + 1;
+
+            if (buffer_len > 1)
+            {
+                char* buffer = malloc(buffer_len);
+                memcpy(buffer, start, buffer_len);
+                buffer[buffer_len - 1] = '\0';
+
+                tokens[token_index++] = buffer;
+                // printf("'%s'\n", buffer);
+            }
+
+            start = &command[i] + 1;
+        }
+    }
+
+    tokens[token_index++] = NULL;
+    
+    return tokens;
+}
+
+int shell_eval(const char** command)
+{
+    
+    int exitvalue = -1;
+
+    int process = sk_process_exec(command[0], command);
+
+    if (!process)
+    {
+        char pathbuffer[144];
+        snprintf(pathbuffer, 144, "/bin/%s", command[0]);
+        process = sk_process_exec(pathbuffer, command);
+    }
+    
+    if (process)
+        sk_thread_wait_process(process, &exitvalue);
+    else
+        printf("Command '%s' not found !\n", command[0]);
+
+    return exitvalue;
 }
 
 int main(int argc, char **argv)
@@ -74,30 +141,26 @@ int main(int argc, char **argv)
 
         printf(PROMPT);
         
+        char** tokens;
         char command[128];
         
-        readline(command, 128);
-
-        strleadtrim(command, ' ');
-
-        printf("\033[0m");
-
-        if (strlen(command) != 0)
+        if (shell_readline(command, 128) > 0 && (tokens = shell_split(command)) != NULL)
         {
-            int process = sk_process_exec(command, (const char*[]){command, "lol", NULL});
-
-            if (!process)
+            exitvalue = shell_eval((const char**)tokens);
+            
+            for(size_t i = 0; tokens[i]; i++)
             {
-                char pathbuffer[144];
-                snprintf(pathbuffer, 144, "/bin/%s", command);
-                process = sk_process_exec(pathbuffer, (const char*[]){command, "lol", NULL});
+                free(tokens[i]);
             }
             
-            if (process)
-                sk_thread_wait_process(process, &exitvalue);
-            else
-                printf("Command '%s' not found !\n", command);
-        } 
+            free(tokens);
+        }
+        else
+        {
+            printf("Empty command!\n");
+        }
+
+
     }
 
     return 0;

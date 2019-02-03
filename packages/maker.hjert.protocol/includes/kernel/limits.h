@@ -18,6 +18,8 @@
 /* Maximum number of pending messages for a processes. */
 #define MAX_PROCESS_PENDING_MESSAGES 256
 
+#define MAX_PROCESS_ARGV 32
+
 /* Maximum number of threads. */
 #define MAX_THREAD 512
 

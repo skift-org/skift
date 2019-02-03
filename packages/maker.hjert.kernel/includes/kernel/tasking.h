@@ -45,16 +45,16 @@ typedef void (*thread_entry_t)();
 
 typedef enum thread_state
 {
-    THREAD_RUNNING,
+    THREADSTATE_NONE = -1,
 
-    THREAD_WAIT_TIME,
-    THREAD_WAIT_THREAD,
-    THREAD_WAIT_PROCESS,
-    THREAD_WAIT_MESSAGE,
+    THREADSTATE_RUNNING,
+    THREADSTATE_WAIT_TIME,
+    THREADSTATE_WAIT_THREAD,
+    THREADSTATE_WAIT_PROCESS,
+    THREADSTATE_WAIT_MESSAGE,
+    THREADSTATE_CANCELED,
 
-    THREAD_CANCELED,
-
-    THREAD_FREE,
+    THREADSTATE_COUNT
 } thread_state_t;
 
 typedef struct
@@ -110,8 +110,9 @@ void tasking_setup();
 
 THREAD thread_self(); // Return a handle to the current thread.
 thread_t *thread_running();
-thread_t *thread_get(THREAD thread);
+thread_t *thread_getbyid(int id);
 void thread_hold();
+void thread_setstate(thread_t *thread, thread_state_t state);
 
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); // Create a new thread of a selected process.
 

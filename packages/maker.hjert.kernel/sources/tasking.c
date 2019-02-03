@@ -12,7 +12,6 @@
  * - Move the sheduler in his own file.
  * - Allow to pass parameters to thread and then return values
  * - Add priority to the round robine sheduler
- *
  */
 
 #include <stdlib.h>
@@ -35,9 +34,13 @@
 #include "kernel/shared_memory.h"
 
 int PID = 1;
+int TID = 1;
 
 uint ticks = 0;
 list_t *processes;
+
+list_t *threads;
+list_t *threads_bystates[THREADSTATE_COUNT];
 
 /* --- thread table --------------------------------------------------------- */
 
@@ -50,39 +53,63 @@ void idle_code()
     }
 }
 
-thread_t thread_table[MAX_THREAD];
-
 void thread_setup(void)
 {
-    for (int i = 0; i < MAX_THREAD; i++)
-    {
-        thread_t *t = &thread_table[i];
+    threads = list();
 
-        t->id = i;
-        t->state = THREAD_FREE;
+    for (int i = 0; i < THREADSTATE_COUNT; i++)
+    {
+        threads_bystates[i] = list();
     }
 }
 
-thread_t *thread_getbystate(int start, thread_state_t state)
+thread_t *thread()
 {
-    for (int i = 0; i < MAX_THREAD; i++)
-    {
-        thread_t *t = &thread_table[(start + i) % MAX_THREAD];
-        if (t->state == state)
-            return t;
-    }
+    thread_t *thread = MALLOC(thread_t);
 
-    return NULL;
+    thread->id = TID++;
+    thread->state = THREADSTATE_NONE;
+
+    list_pushback(threads, thread);
+
+    return thread;
 }
 
 thread_t *thread_getbyid(int id)
 {
-    if (id >= 0 && id < MAX_THREAD)
+    FOREACH(i, threads)
     {
-        return &thread_table[id];
+        thread_t *thread = i->value;
+
+        if (thread->id == id)
+            return thread;
     }
 
     return NULL;
+}
+
+bool shortest_sleep_first(void *left, void *right)
+{
+    return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
+}
+
+void thread_setstate(thread_t *thread, thread_state_t state)
+{
+    if (thread->state != THREADSTATE_NONE)
+    {
+        list_remove(threads_bystates[thread->state], thread);
+    }
+
+    thread->state = state;
+
+    if (thread->state == THREADSTATE_WAIT_TIME)
+    {
+        list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
+    }
+    else
+    {
+        list_push(threads_bystates[thread->state], thread);
+    }
 }
 
 void thread_init(thread_t *t, thread_entry_t entry, bool user)
@@ -94,10 +121,12 @@ void thread_init(thread_t *t, thread_entry_t entry, bool user)
     t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
 }
 
-void thread_stack_push(thread_t *t, void *value, uint size)
+uint thread_stack_push(thread_t *t, void *value, uint size)
 {
     t->sp -= size;
     memcpy((void *)t->sp, value, size);
+
+    return t->sp;
 }
 
 void thread_attach_process(thread_t *t, process_t *p)
@@ -130,7 +159,7 @@ void thread_ready(thread_t *t)
 
     thread_stack_push(t, &ctx, sizeof(ctx));
 
-    t->state = THREAD_RUNNING;
+    thread_setstate(t, THREADSTATE_RUNNING);
 }
 
 process_t *alloc_process(const char *name, bool user)
@@ -227,7 +256,7 @@ void thread_yield()
 
 void thread_hold()
 {
-    while (running->state != THREAD_RUNNING)
+    while (running->state != THREADSTATE_RUNNING)
     {
         hlt();
     }
@@ -254,20 +283,25 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, char **argv)
     sk_atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *t = thread_getbystate(0, THREAD_FREE);
+    thread_t *t = thread();
 
     thread_init(t, entry, true);
     thread_attach_process(t, process);
 
     // WIP: push arguments
+    uint argv_list[MAX_PROCESS_ARGV];
+
     int argc;
-    for(argc = 0; argv[argc]; argc++)
+    for (argc = 0; argv[argc] && argc < MAX_PROCESS_ARGV; argc++)
     {
-        thread_stack_push(t, &argv[argc], strlen(argv[argc]) + 1);
+        argv_list[argc] = thread_stack_push(t, &argv[argc], strlen(argv[argc]) + 1);
     }
+
+    uint argv_list_ref = thread_stack_push(t, &argv_list, sizeof(argv_list));
+
+    thread_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
     thread_stack_push(t, &argc, sizeof(argc));
 
-    
     thread_ready(t);
 
     sk_atomic_end();
@@ -280,7 +314,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     sk_atomic_begin();
 
     process_t *process = process_get(p);
-    thread_t *t = thread_getbystate(0, THREAD_FREE);
+    thread_t *t = thread();
 
     thread_init(t, entry, user);
     thread_attach_process(t, process);
@@ -300,8 +334,8 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
 void thread_sleep(int time)
 {
     ATOMIC({
-        running->state = THREAD_WAIT_TIME;
         running->wait.time.wakeuptick = ticks + time;
+        thread_setstate(running, THREADSTATE_WAIT_TIME);
     });
 
     thread_hold();
@@ -313,16 +347,15 @@ void thread_wakeup(THREAD t)
 
     thread_t *thread = thread_getbyid(t);
 
-    if (thread != NULL && thread->state == THREAD_WAIT_TIME)
+    if (thread != NULL && thread->state == THREADSTATE_WAIT_TIME)
     {
-        thread->state = THREAD_RUNNING;
-        running->wait.time.wakeuptick = 0;
+        thread_setstate(running, THREADSTATE_RUNNING);
     }
 
     sk_atomic_end();
 }
 
-bool thread_wait_thread(THREAD t, int* exitvalue)
+bool thread_wait_thread(THREAD t, int *exitvalue)
 {
     sk_atomic_begin();
 
@@ -330,7 +363,7 @@ bool thread_wait_thread(THREAD t, int* exitvalue)
 
     if (thread != NULL)
     {
-        if (thread->state == THREAD_CANCELED)
+        if (thread->state == THREADSTATE_CANCELED)
         {
             if (exitvalue != NULL)
             {
@@ -342,7 +375,7 @@ bool thread_wait_thread(THREAD t, int* exitvalue)
         else
         {
             running->wait.thread.thread_handle = t;
-            running->state = THREAD_WAIT_THREAD;
+            thread_setstate(running, THREADSTATE_WAIT_THREAD);
 
             sk_atomic_end();
             thread_hold();
@@ -360,10 +393,9 @@ bool thread_wait_thread(THREAD t, int* exitvalue)
         sk_atomic_end();
         return false;
     }
-
 }
 
-bool thread_wait_process(PROCESS p, int* exitvalue)
+bool thread_wait_process(PROCESS p, int *exitvalue)
 {
     sk_atomic_begin();
 
@@ -383,7 +415,7 @@ bool thread_wait_process(PROCESS p, int* exitvalue)
         else
         {
             running->wait.process.process_handle = p;
-            running->state = THREAD_WAIT_PROCESS;
+            thread_setstate(running, THREADSTATE_WAIT_PROCESS);
 
             sk_atomic_end();
             thread_hold();
@@ -412,22 +444,22 @@ bool thread_cancel(THREAD t, int exitvalue)
     if (thread != NULL && thread->process == running->process)
     {
         // Set the new thread state
-        thread->state = THREAD_CANCELED;
         thread->exitvalue = exitvalue;
+        thread_setstate(running, THREADSTATE_CANCELED);
 
         sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
-    
+
         // Wake up waiting threads
         FOREACH(i, thread->process->threads)
         {
-            thread_t* waitthread = i->value;
+            thread_t *waitthread = i->value;
 
-            if (waitthread->state == THREAD_WAIT_THREAD &&
+            if (waitthread->state == THREADSTATE_WAIT_THREAD &&
                 waitthread->wait.thread.thread_handle == t)
             {
-                waitthread->state = THREAD_RUNNING;
                 waitthread->wait.thread.exitvalue = exitvalue;
-            
+                thread_setstate(waitthread, THREADSTATE_RUNNING);
+
                 sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
             }
         }
@@ -461,24 +493,28 @@ void thread_dump_all()
 
     printf("\n\tThreads:");
 
+    FOREACH(i, threads)
+    {
+        thread_t *t = i->value;
+        if (t != running && t->state != THREADSTATE_NONE)
+            thread_dump(t);
+    }
+
     for (int i = 0; i < MAX_THREAD; i++)
     {
-        thread_t *t = &thread_table[i];
-        if (t != running && t->state != THREAD_FREE)
-            thread_dump(t);
     }
 
     sk_atomic_end();
 }
 
 static char *THREAD_STATES[] =
-{
-    "RUNNING",
-    "SLEEP",
-    "WAIT(thread)",
-    "WAIT(process)",
-    "WAIT(message)",
-    "CANCELED",
+    {
+        "RUNNING",
+        "SLEEP",
+        "WAIT(thread)",
+        "WAIT(process)",
+        "WAIT(message)",
+        "CANCELED",
 };
 
 void thread_dump(thread_t *t)
@@ -596,7 +632,6 @@ PROCESS process_exec(const char *path, const char **arg)
     return p;
 }
 
-
 bool process_cancel(PROCESS p, int exitvalue)
 {
     sk_atomic_begin();
@@ -608,22 +643,22 @@ bool process_cancel(PROCESS p, int exitvalue)
         // Set our new process state
         process->state = PROCESS_CANCELED;
         process->exitvalue = exitvalue;
-        
+
         sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
 
         // Wake up waiting threads
-        for(int i = 0; i < MAX_THREAD; i++)
+        FOREACH(i, threads)
         {
-            thread_t* thread = &thread_table[i];
+            thread_t *thread = i->value;
 
-            if (thread->state == THREAD_WAIT_PROCESS && thread->wait.process.process_handle == p)
+            if (thread->state == THREADSTATE_WAIT_PROCESS && thread->wait.process.process_handle == p)
             {
-                thread->state = THREAD_RUNNING;
                 thread->wait.process.exitvalue = exitvalue;
+                thread_setstate(thread, THREADSTATE_RUNNING);
                 sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, p);
             }
         }
-        
+
         // Cancel childs threads.
         FOREACH(i, process->threads)
         {
@@ -638,7 +673,7 @@ bool process_cancel(PROCESS p, int exitvalue)
     {
         process_t *process = process_get(process_self());
         sk_log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
-    
+
         sk_atomic_end();
         return false;
     }
@@ -685,41 +720,23 @@ void process_free(uint addr, uint count)
 
 /* --- Sheduler ------------------------------------------------------------- */
 
-void sheduler_update_threads(void)
+void wakeup_sleeping_threads(void)
 {
-    for (int i = 0; i < MAX_THREAD; i++)
+    if (!list_empty(threads_bystates[THREADSTATE_WAIT_TIME]))
     {
-        thread_t *t = thread_getbyid(i);
+        thread_t *t;
 
-        switch (t->state)
+        do
         {
+            list_peek(threads_bystates[THREADSTATE_WAIT_TIME], (void **)&t);
 
-        case THREAD_WAIT_TIME:
-        {
             if (t->wait.time.wakeuptick <= ticks)
             {
-                t->state = THREAD_RUNNING;
+                thread_setstate(t, THREADSTATE_RUNNING);
                 sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
             }
-        }
-        break;
-        default:
-            break;
-        }
-    }
-}
 
-thread_t *sheduler_next_thread(void)
-{
-    thread_t *t = thread_getbystate(running->id + 1, THREAD_RUNNING);
-
-    if (t == NULL)
-    {
-        return &idle;
-    }
-    else
-    {
-        return t;
+        } while (t->stack == THREADSTATE_RUNNING);
     }
 }
 
@@ -729,12 +746,20 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     UNUSED(context);
     is_context_switch = true;
     ticks++;
-    
+    wakeup_sleeping_threads();
+
     // Save the old context
     running->sp = sp;
 
-    sheduler_update_threads();
-    running = sheduler_next_thread();
+    // Get the next thread
+    if (list_pop(threads_bystates[THREADSTATE_RUNNING], (void **)&running))
+    {
+        list_pushback(threads_bystates[THREADSTATE_RUNNING], running);
+    }
+    else
+    {
+        running = &idle;
+    }
 
     // TODO: set_kernel_stack(...);
     paging_load_directorie(running->process->pdir);

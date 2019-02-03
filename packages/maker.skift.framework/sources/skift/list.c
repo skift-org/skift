@@ -63,7 +63,43 @@ void list_clear(list_t *list)
     list->tail = NULL;
 }
 
-bool list_peek(list_t* list, void** value)
+void list_insert_sorted(list_t *list, void *value, list_comparator_t comparator)
+{
+    if (list->head == NULL || comparator(value, list->head->value))
+    {
+        list_push(list, value);
+    }
+    else
+    {
+        list_item_t *current = list->head;
+
+        while (current->next != NULL && comparator(current->next->value, value))
+        {
+            current = current->next;
+        }
+
+        list_item_t *item = MALLOC(list_item_t);
+
+        item->prev = current;
+        item->next = current->next;
+        item->value = value;
+
+        if (current->next == NULL)
+        {
+            list->tail = item;
+        }
+        else
+        {
+            current->next->prev = item;
+        }
+
+        current->next = item;
+
+        list->count++;
+    }
+}
+
+bool list_peek(list_t *list, void **value)
 {
     if (list->head != NULL)
     {
@@ -76,7 +112,7 @@ bool list_peek(list_t* list, void** value)
     }
 }
 
-bool list_peekback(list_t* list, void** value)
+bool list_peekback(list_t *list, void **value)
 {
     if (list->tail != NULL)
     {

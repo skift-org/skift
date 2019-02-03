@@ -116,10 +116,10 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
     {
         thread_t* thread = t->value;
 
-        if (thread->state == THREAD_WAIT_MESSAGE)
+        if (thread->state == THREADSTATE_WAIT_MESSAGE)
         {
             messaging_receive_internal(thread);
-            thread->state = THREAD_RUNNING;
+            thread_setstate(thread, THREADSTATE_RUNNING);
             break;
         }
     }
@@ -190,7 +190,7 @@ bool messaging_receive(message_t *msg, bool wait)
     if (incoming == NULL && wait)
     {
         sk_atomic_begin();
-        thread_running()->state = THREAD_WAIT_MESSAGE;
+        thread_setstate(thread_running(), THREADSTATE_WAIT_MESSAGE);
         sk_atomic_end(); 
 
         thread_hold(); // Wait until we get a message.

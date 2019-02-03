@@ -30,10 +30,19 @@ int ls(const char* path)
 
 int main(int argc, char **argv)
 {
-    if (argc >= 2)
+    if (argc == 2)
     {
         return ls(argv[1]);
+    }
+    else if (argc > 2)
+    {
+        for(int i = 1; i < argc; i++)
+        {
+            printf("%s:\n", argv[i]);
+            ls(argv[1]);
+        }
 
+        return 0;
     }
     else
     {

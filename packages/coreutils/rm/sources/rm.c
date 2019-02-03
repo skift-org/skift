@@ -2,14 +2,19 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
+#include <skift/filesystem.h>
+
+int rm(const char *path)
+{
+    return sk_filesystem_rm(path);
+}
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    if (argc == 2)
+    {
+        return rm(argv[1]);
+    }
 
-    printf("argc = %d\n", argc);
-
-    return 0;
+    return -1;
 }

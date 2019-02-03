@@ -161,6 +161,8 @@ int main(int argc, char **argv)
         }
 
 
+        printf("\033[0m");
+
     }
 
     return 0;

@@ -12,11 +12,13 @@
  */
 
 #include <skift/generic.h>
+#include <skift/io.h>
 
 // Intialize the framework.
 void __plug_init(void);
 
 // **DEPRECATED** Print a null terminated string to the screen.
+// use for logging
 int __plug_print(const char *buffer);
 
 // Framework plugs to the syscalls or the kernel.
@@ -45,6 +47,10 @@ void *__plug_memalloc_alloc(uint size);
 // Free previously allocated page of memory
 int __plug_memalloc_free(void *memory, uint size);
 
+/* ========================================================================== */
+/* = File & I/O                                                             = */
+/* ========================================================================== */
+
 // Open a file and return the file descriptor.
 int __plug_open(const char *path, int oflags);
 
@@ -68,6 +74,8 @@ uint __plug_pwrite(int fd, void *buffer, uint size, uint offset);
 
 // Send a io control signal *ctl* to the file. Usefull for device and tty files.
 int __plug_ioctl(int fd, int ctl, void *args);
+
+int __plug_fstat(int fd, fstat_t *stat);
 
 // Move the write head at *offset* relative to *whence*.
 int __plug_seek(int fd, int offset, int whence);

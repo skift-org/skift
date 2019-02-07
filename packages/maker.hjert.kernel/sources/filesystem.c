@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <skift/io.h>
 #include <skift/logger.h>
 #include <skift/ringbuffer.h>
 
@@ -166,7 +167,7 @@ int file_write(stream_t *stream, void *buffer, uint size)
 
     file_t *file = &stream->node->file;
 
-    if (stream->flags & OPENOPT_APPEND)
+    if (stream->flags & O_APPEND)
     {
         stream->offset = file->size;
     }
@@ -444,7 +445,7 @@ void filesystem_dump(void)
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
 stream_t *filesystem_open(const char *path, fsoflags_t flags)
 {
-    fsnode_t *node = filesystem_acquire(path, OPEN_OPTION(OPENOPT_CREATE));
+    fsnode_t *node = filesystem_acquire(path, OPEN_OPTION(O_CREATE));
 
     if (node == NULL)
     {
@@ -456,7 +457,7 @@ stream_t *filesystem_open(const char *path, fsoflags_t flags)
 
         if (node->type == FSFILE)
         {
-            if (OPEN_OPTION(OPENOPT_TRUNC))
+            if (OPEN_OPTION(O_TRUNC))
                 file_trunc(node);
         }
         else if (node->type == FSDIRECTORY)
@@ -486,7 +487,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
 
-    if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
+    if (s->flags & O_READ || s->flags & O_READWRITE)
     {
         switch (s->node->type)
         {
@@ -531,7 +532,7 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
 
-    if ((s->flags & OPENOPT_WRITE) || (s->flags & OPENOPT_READWRITE))
+    if ((s->flags & O_WRITE) || (s->flags & O_READWRITE))
     {
         switch (s->node->type)
         {
@@ -575,15 +576,15 @@ int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
 {
     switch (origine)
     {
-        case SEEKFROM_START:
+        case FROM_START:
             s->offset = offset;
             break;
     
-        case SEEKFROM_HERE:
+        case FROM_HERE:
             s->offset += offset;
             break;
 
-        case SEEKFROM_END:
+        case FROM_END:
             if (s->node->type == FSFILE)
             {
                 sk_lock_acquire(s->node->lock);

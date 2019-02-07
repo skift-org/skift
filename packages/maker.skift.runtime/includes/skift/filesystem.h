@@ -2,6 +2,7 @@
 
 #include <skift/generic.h>
 #include "kernel/shared/filesystem.h"
+#include <skift/io.h>
 
 int  sk_filesystem_open(const char *path, fsoflags_t flags);
 void sk_filesystem_close(int fd);

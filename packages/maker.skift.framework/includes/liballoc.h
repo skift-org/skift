@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stddef.h>
+#include <skift/generic.h>
 
 //This lets you prefix malloc and friends
 #define PREFIX(func) func

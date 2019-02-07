@@ -19,6 +19,7 @@
     #define __COMMIT__ "(NULL)"
 #endif
 
+#define FLAG(__i) (1 << __i)
 #define PACKED(x) x __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))
 #define UNUSED(x) (void)(x)

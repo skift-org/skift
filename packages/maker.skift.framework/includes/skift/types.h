@@ -4,13 +4,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <stdbool.h>
 #include "defs/NULL.h"
 #include "defs/size_t.h"
 
-typedef _Bool bool;
-
-#define true 1
-#define false 0
+typedef char *string;
 
 typedef void s0;
 typedef char s8;
@@ -30,6 +28,3 @@ typedef unsigned char uchar;
 typedef unsigned short wchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
-
-typedef long intptr_t;
-typedef unsigned long uintptr_t;

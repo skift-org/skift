@@ -1,6 +1,7 @@
 /* Durand's Amazing Super Duper Memory functions. */
 
 #include "liballoc.h"
+#include <stdint.h>
 #include <stdio.h>
 
 #define VERSION 	"1.1"

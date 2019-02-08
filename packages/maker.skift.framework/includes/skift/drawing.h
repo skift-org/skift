@@ -4,7 +4,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <stdbool.h>
+#include <skift/types.h>
+#include <skift/utils.h>
 
 /* --- Colors --------------------------------------------------------------- */
 

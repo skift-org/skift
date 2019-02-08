@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* plugs.c: Plugs functions for using the skift Framework in userspace.      */
+/* plugs.c: Plugs functions for using the skift Framework in the userspace.   */
 
 #include <string.h>
 #include <skift/io.h>
@@ -12,8 +12,8 @@
 #include <skift/formatter.h>
 #include <skift/__plugs.h>
 
-static lock_t memlock;
-static lock_t loglock;
+lock_t memlock;
+lock_t loglock;
 
 void __plug_init(void)
 {
@@ -24,8 +24,27 @@ void __plug_init(void)
 
 int __plug_print(const char *buffer)
 {
-    __syscall(SYS_IO_PRINT, (int)buffer, 0, 0, 0, 0);
+    sk_io_print(buffer);
     return strlen(buffer);
+}
+
+void __plug_putchar(int c)
+{
+    sk_log(LOG_ERROR, "__plug_putchar() not implemented!");
+}
+
+int __plug_getchar()
+{
+    sk_log(LOG_ERROR, "__plug_getchar() not implemented!");
+    return EOF;
+}
+
+void __plug_read(char * buffer, uint size)
+{
+    UNUSED(buffer);
+    UNUSED(size);
+
+    sk_log(LOG_ERROR, "__plug_read() not implemented!");
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
@@ -58,13 +77,13 @@ int __plug_memalloc_unlock()
     return 0;
 }
 
-void *__plug_memalloc_alloc(uint size)
+void* __plug_memalloc_alloc(uint size)
 {
     uint addr = sk_process_alloc(size);
-    return (void *)addr;
+    return (void*)addr;
 }
 
-int __plug_memalloc_free(void *memory, uint size)
+int __plug_memalloc_free(void* memory, uint size)
 {
     return sk_process_free((unsigned int)memory, size);
 }

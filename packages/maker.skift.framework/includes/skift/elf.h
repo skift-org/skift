@@ -4,7 +4,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/types.h>
+#include <skift/utils.h>
+
+#include <stdint.h>
 
 #define ELF_NIDENT 16
 
@@ -82,8 +85,8 @@ typedef struct
     u32 name;
     u32 value;
     u32 size;
-    u8 info;
-    u8 other;
+    uint8_t info;
+    uint8_t other;
     u16 shndx;
 } elf_sym_t;
 

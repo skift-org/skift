@@ -31,7 +31,7 @@ const char *const witty_comments[] =
 extern uint ticks;
 extern bool is_context_switch;
 
-void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, char* message, ...)
+void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, string message, ...)
 {
     sk_atomic_begin();
 

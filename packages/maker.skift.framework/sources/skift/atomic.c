@@ -5,34 +5,38 @@
 #include <skift/types.h>
 #include <skift/atomic.h>
 
-bool enabled = 0;
-uint depth = 0;
+static bool atomic_enabled = 0;
+static uint atomic_depth = 0;
 
 void sk_atomic_enable()
 {
-    enabled = true;
+    atomic_enabled = true;
 }
 
 void sk_atomic_disable()
 {
-    enabled = false;
+    atomic_enabled = false;
 }
 
 void sk_atomic_begin()
 {
-    if (enabled)
+    if (atomic_enabled)
     {
         asm volatile("cli");
-        depth++;
+        atomic_depth++;
+        
     }
 }
 
 void sk_atomic_end()
 {
-    if (enabled)
+    if (atomic_enabled)
     {
-        depth--;
-        if (depth == 0)
+        atomic_depth--;
+
+        if (atomic_depth == 0)
+        {
             asm volatile("sti");
+        }
     }
 }

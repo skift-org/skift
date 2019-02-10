@@ -4,8 +4,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/generic.h>
+
+#include "kernel/limits.h"
+
 #define FSPATH_SEP '/'
-#define FSNAME_SIZE 128
 
 typedef enum
 {
@@ -55,6 +58,6 @@ typedef struct
 
 typedef struct
 {
-    char name[FSNAME_SIZE];
+    char name[MAX_FILENAME_LENGHT];
     fsnode_type_t type;
 } directory_entry_t;

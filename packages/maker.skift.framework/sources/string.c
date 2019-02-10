@@ -278,7 +278,7 @@ char *strstr(const char *s1, const char *s2)
     return NULL;
 }
 
-char *strtok(char *s, char** state, const char *delim)
+char *strtok(char *s, char **state, const char *delim)
 {
     register int ch;
 
@@ -306,7 +306,7 @@ size_t strxfrm(char *dest, const char *src, size_t n)
     return len;
 }
 
-void strapd(char * str, char c)
+void strapd(char *str, char c)
 {
     unsigned int len = strlen(str);
     str[len] = c;
@@ -319,7 +319,7 @@ void strbs(char *str)
     str[len - 1] = '\0';
 }
 
-void strnapd(char * str, char c, size_t n)
+void strnapd(char *str, char c, size_t n)
 {
     if (n > 1)
     {
@@ -333,7 +333,7 @@ void strnapd(char * str, char c, size_t n)
     }
 }
 
-void strrvs(char * str)
+void strrvs(char *str)
 {
     int c, i, j;
     for (i = 0, j = strlen(str) - 1; i < j; i++, j--)
@@ -344,17 +344,17 @@ void strrvs(char * str)
     }
 }
 
-void strleadtrim(char * str, char c)
+void strleadtrim(char *str, char c)
 {
     char *start = str;
-    
+
     while (*start == c)
         start++;
 
     memmove(str, start, strlen(str + 1));
 }
 
-void strtrailtrim(char * str, char c)
+void strtrailtrim(char *str, char c)
 {
     char *end = str + strlen(str) - 1;
 

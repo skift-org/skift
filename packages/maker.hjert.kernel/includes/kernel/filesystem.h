@@ -39,7 +39,7 @@ typedef struct
 
 typedef struct fsnode
 {
-    char name[FSNAME_SIZE];
+    char name[MAX_FILENAME_LENGHT];
     fsnode_type_t type;
     lock_t lock;
 

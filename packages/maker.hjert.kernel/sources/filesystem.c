@@ -31,7 +31,7 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
     fsnode_t *node = MALLOC(fsnode_t);
 
     node->type = type;
-    strncpy(node->name, name, FSNAME_SIZE);
+    strncpy(node->name, name, MAX_FILENAME_LENGHT);
     node->refcount = 0;
 
     switch (type)
@@ -235,7 +235,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
     {
         fsnode_t *c = (fsnode_t *)i->value;
 
-        strncpy(current->name, c->name, FSNAME_SIZE);
+        strncpy(current->name, c->name, MAX_FILENAME_LENGHT);
         current->type = c->type;
 
         current++;
@@ -322,7 +322,7 @@ fsnode_t *filesystem_resolve(const char *path)
 {
     fsnode_t *current = root;
 
-    char buffer[FSNAME_SIZE];
+    char buffer[MAX_FILENAME_LENGHT];
 
     for (int i = 0; path_read(path, i, buffer); i++)
     {
@@ -353,7 +353,7 @@ fsnode_t *filesystem_acquire(const char *path, bool create)
     if (node == NULL && create)
     {
         char *parent_path = malloc(strlen(path));
-        char *child_name = malloc(FSNAME_SIZE);
+        char *child_name = malloc(MAX_FILENAME_LENGHT);
 
         if (path_split(path, parent_path, child_name))
         {
@@ -369,7 +369,7 @@ fsnode_t *filesystem_acquire(const char *path, bool create)
         free(parent_path);
         free(child_name);
     }
-    
+
     if (node != NULL)
     {
         node->refcount++;
@@ -547,9 +547,9 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
             {
                 result = dev->write(s, size, buffer);
             }
-        }
-        break;
 
+            break;
+        }
         default:
             break;
         }
@@ -575,35 +575,35 @@ int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
 {
     switch (origine)
     {
-        case SEEKFROM_START:
+    case SEEKFROM_START:
+        s->offset = offset;
+        break;
+
+    case SEEKFROM_HERE:
+        s->offset += offset;
+        break;
+
+    case SEEKFROM_END:
+        if (s->node->type == FSFILE)
+        {
+            sk_lock_acquire(s->node->lock);
+            s->offset = s->node->file.size + offset;
+            sk_lock_release(s->node->lock);
+        }
+        else if (s->node->type == FSDIRECTORY)
+        {
+            s->offset = s->direntries.count * sizeof(directory_entry_t) + offset;
+        }
+        else
+        {
+            // TODO: We don't support seeking for devices, now.
+            // But this is going to be usefull for block devices.
             s->offset = offset;
-            break;
-    
-        case SEEKFROM_HERE:
-            s->offset += offset;
-            break;
+        }
+        break;
 
-        case SEEKFROM_END:
-            if (s->node->type == FSFILE)
-            {
-                sk_lock_acquire(s->node->lock);
-                s->offset = s->node->file.size + offset;
-                sk_lock_release(s->node->lock);
-            }
-            else if (s->node->type == FSDIRECTORY)
-            {
-                s->offset = s->direntries.count * sizeof(directory_entry_t) + offset;
-            }
-            else
-            {
-                // TODO: We don't support seeking for devices, now.
-                // But this is going to be usefull for block devices.
-                s->offset = offset;
-            }
-            break;
-
-        default:
-            break;
+    default:
+        break;
     }
 
     return s->offset;
@@ -621,7 +621,7 @@ int filesystem_mkdir(const char *path)
     sk_lock_acquire(fslock);
     {
         char *parent = malloc(strlen(path));
-        char *child = malloc(FSNAME_SIZE);
+        char *child = malloc(MAX_FILENAME_LENGHT);
 
         if (path_split(path, parent, child))
         {
@@ -630,7 +630,7 @@ int filesystem_mkdir(const char *path)
             if (p->type == FSDIRECTORY)
             {
                 fsnode_t *c = fsnode(child, FSDIRECTORY);
-                directory_addchild(p, c);  
+                directory_addchild(p, c);
                 result = 0;
             }
         }
@@ -649,7 +649,7 @@ int filesystem_mkdev(const char *path, device_t dev)
 
     sk_lock_acquire(fslock);
     {
-        char *child = malloc(FSNAME_SIZE);
+        char *child = malloc(MAX_FILENAME_LENGHT);
         char *parent = malloc(strlen(path));
 
         if (path_split(path, parent, child))
@@ -680,7 +680,7 @@ int filesystem_mkfile(const char *path)
 
     sk_lock_acquire(fslock);
     {
-        char *child = malloc(FSNAME_SIZE);
+        char *child = malloc(MAX_FILENAME_LENGHT);
         char *parent = malloc(strlen(path));
 
         if (path_split(path, parent, child))
@@ -710,7 +710,7 @@ int filesystem_rm(const char *path)
 
     sk_lock_acquire(fslock);
     {
-        char *child = malloc(FSNAME_SIZE);
+        char *child = malloc(MAX_FILENAME_LENGHT);
         char *parent = malloc(strlen(path));
 
         if (path_split(path, parent, child))

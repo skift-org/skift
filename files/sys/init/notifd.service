@@ -1,0 +1,2 @@
+command: ["/bin/notifd"]
+ports: ["/sys/srv/notifd"]

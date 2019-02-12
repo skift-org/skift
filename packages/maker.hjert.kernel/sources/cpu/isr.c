@@ -44,6 +44,11 @@ static const char *exception_messages[32] =
 	"Reserved"
 };
 
+void page_fault(processor_context_t* context)
+{
+	CPANIC(context, "PAGE FAULT at %08x", CR2());
+}
+
 extern u32 isr_vector[];
 isr_handler_t isr_handlers[32];
 
@@ -56,6 +61,8 @@ void isr_setup()
 
 	// syscall handler
 	idt_entry(128, isr_vector[32], 0x08, TRAPGATE);
+
+	isr_register(14, page_fault);
 }
 
 isr_handler_t isr_register(int index, isr_handler_t handler)
@@ -84,6 +91,7 @@ void isr_handler(processor_context_t context)
 		}
 		else
 		{
+			// TODO: check if the fault is in user process and terminate it.
 			CPANIC(&context, "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !", exception_messages[context.int_no], context.int_no, context.errcode);
 		}
 	}

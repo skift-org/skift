@@ -18,19 +18,27 @@ typedef int PROCESS; // Process handler
 typedef enum process_state
 {
     PROCESS_RUNNING,
+
+    // This is like a *zombie* process in **UNIX**.
+    // But in **hjert** if your parent die you die with him.
+    // This is why we have **srvhost**.
     PROCESS_CANCELING,
-    PROCESS_CANCELED,
+
+    PROCESS_CANCELED, // This process is read to be garbage colected.
 } process_state_t;
 
-typedef struct
+typedef struct struct_process
 {
     int id;                          // Unique handle to the process
+    bool user;                       // Is this a user process
     char name[MAX_PROCESS_NAMESIZE]; // Frendly name of the process
+    struct struct_process *parent;   // Our parent
 
-    bool user;
-    list_t *threads; // Child threads;
-    list_t *inbox;   // process main message queu
-    list_t *shared;  // Shared memory region;
+    list_t *threads;   // Child threads
+    list_t *processes; // Child processes
+
+    list_t *inbox;  // process main message queu
+    list_t *shared; // Shared memory region
 
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
@@ -82,14 +90,14 @@ typedef struct
 typedef struct
 {
     int id;
-    process_t *process;
-    thread_entry_t entry;
+    process_t *process;   // The parent process
+    thread_entry_t entry; // Our entry point
 
     thread_state_t state;
 
     bool user;
     uint sp;
-    byte stack[MAX_THREAD_STACKSIZE];
+    byte stack[MAX_THREAD_STACKSIZE]; // Kernel stack
 
     struct
     {
@@ -115,7 +123,7 @@ void thread_hold();
 void thread_setstate(thread_t *thread, thread_state_t state);
 
 // Create a new thread of a selected process.
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user); 
+THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);
 
 bool thread_cancel(THREAD t, int exitvalue); // Cancel the selected thread.
 void thread_exit(int exitvalue);             // Exit the current thread and return a value.

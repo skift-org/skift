@@ -25,7 +25,7 @@ const char *const witty_comments[] =
     "Typo in the code.",
     "System consumed all the paper for paging!",
     "Suspicious pointer corrupted the machine.",
-    "Please contact microsoft technicians\n\t// at toll free: *INDIAN PHONE NUMBER*",
+    "I'm tired of this ;_;",
 };
 
 extern uint ticks;

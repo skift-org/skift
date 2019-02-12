@@ -6,7 +6,7 @@
 
 /*
  * TODO:
- * - The name of somme function need refactor.
+ * - The name of some function need refactor.
  * - Isolate user space process in ring 3
  * - Add a process/thread garbage colector
  * - Move the sheduler in his own file.
@@ -53,6 +53,68 @@ void idle_code()
     }
 }
 
+void collect_and_free_thread(void)
+{
+    list_t *thread_to_free = list();
+
+    // Search for thread with a canceled parent process.
+    FOREACH(i, threads_bystates[THREADSTATE_CANCELED])
+    {
+        thread_t *thread = i->value;
+
+        if (thread->process->state == PROCESS_CANCELED)
+        {
+            list_pushback(thread_to_free, thread);
+        }
+    }
+
+    // Cleanup all of those dead threads.
+    FOREACH(i, thread_to_free)
+    {
+        thread_t *thread = i->value;
+        int thread_id = thread->id;
+
+        sk_log(LOG_DEBUG, "free'ing thread %d", thread_id);
+
+        // All those guys have a ptr to us we need to remove them.
+        thread_setstate(thread, THREADSTATE_NONE);
+        list_remove(threads, thread);
+        list_remove(thread->process->threads, thread);
+
+        // Now no one should still have a ptr to us we can die in peace.
+        free(thread);
+
+        sk_log(LOG_DEBUG, "Thread %d free'd.", thread_id);
+    }
+
+    list_delete(thread_to_free);
+}
+
+void collect_and_free_process(void)
+{
+    // Ho god, this is going to be hard :/
+    list_t* process_to_free = list();
+
+    list_delete(process_to_free);
+}
+
+void garbage_colector()
+{
+    while (true)
+    {
+        thread_sleep(100); // We don't do this really often.
+
+        // sk_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
+
+        sk_atomic_begin();
+        collect_and_free_thread();
+        collect_and_free_process();
+        sk_atomic_end();
+
+        // sk_log(LOG_DEBUG, "Garbage collect end!");
+    }
+}
+
 void thread_setup(void)
 {
     threads = list();
@@ -66,6 +128,13 @@ void thread_setup(void)
 thread_t *thread()
 {
     thread_t *thread = MALLOC(thread_t);
+
+    if (thread == NULL)
+    {
+        PANIC("Failed to allocated a new thread.");
+    }
+
+    memset(thread, 0, sizeof(thread_t));
 
     thread->id = TID++;
     thread->state = THREADSTATE_NONE;
@@ -102,13 +171,16 @@ void thread_setstate(thread_t *thread, thread_state_t state)
 
     thread->state = state;
 
-    if (thread->state == THREADSTATE_WAIT_TIME)
+    if (thread->state != THREADSTATE_NONE)
     {
-        list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
-    }
-    else
-    {
-        list_push(threads_bystates[thread->state], thread);
+        if (thread->state == THREADSTATE_WAIT_TIME)
+        {
+            list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
+        }
+        else
+        {
+            list_push(threads_bystates[thread->state], thread);
+        }
     }
 }
 
@@ -165,6 +237,11 @@ void thread_ready(thread_t *t)
 process_t *alloc_process(const char *name, bool user)
 {
     process_t *process = MALLOC(process_t);
+
+    if (process == NULL)
+    {
+        PANIC("Failed to allocated a new process.");
+    }
 
     process->id = PID++;
 
@@ -233,6 +310,7 @@ void tasking_setup()
 
     kernel_process = process_create("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
+    thread_create(kernel_process, garbage_colector, NULL, false);
 
     // Setup the idle task
     idle.id = -1;
@@ -730,7 +808,7 @@ void wakeup_sleeping_threads(void)
             if (t->wait.time.wakeuptick <= ticks)
             {
                 thread_setstate(t, THREADSTATE_RUNNING);
-                sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                // sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
             }
 
         } while (t->stack == THREADSTATE_RUNNING);
@@ -742,11 +820,13 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     UNUSED(context);
     is_context_switch = true;
-    ticks++;
-    wakeup_sleeping_threads();
 
     // Save the old context
     running->sp = sp;
+
+    // Update the system ticks
+    ticks++;
+    wakeup_sleeping_threads();
 
     // Get the next thread
     if (list_pop(threads_bystates[THREADSTATE_RUNNING], (void **)&running))
@@ -758,6 +838,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
         running = &idle;
     }
 
+    // Restore the context
     // TODO: set_kernel_stack(...);
     paging_load_directorie(running->process->pdir);
     paging_invalidate_tlb();

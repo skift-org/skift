@@ -1,0 +1,9 @@
+{
+    "name": "Init system and Service Manager",
+    
+    "id": "skift.system.init",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

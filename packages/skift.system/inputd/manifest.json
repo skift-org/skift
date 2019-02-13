@@ -1,0 +1,9 @@
+{
+    "name": "Input Daemon",
+    
+    "id": "skift.system.inputd",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

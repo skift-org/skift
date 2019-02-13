@@ -1,0 +1,9 @@
+{
+    "name": "Notification Daemon",
+    
+    "id": "skift.system.notifd",
+    "type": "app",
+    "libs": [
+        "maker.skift.runtime"
+    ]
+}

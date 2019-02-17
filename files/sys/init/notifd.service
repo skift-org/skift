@@ -1,2 +1,3 @@
-command: ["/bin/notifd"]
+[service]
+commands: ["/bin/notifd"]
 ports: ["/sys/srv/notifd"]

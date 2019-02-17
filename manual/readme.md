@@ -1,6 +1,24 @@
 # The skiftOS manual
 
-## Topics
+# About this manual
 
-- [Building](manual/building.md)
-- [Todo list](manual/todo.md)
+# Topics
+
+## Build system
+
+## Syscalls
+
+## Libraries
+
+## Files
+
+## Formats
+
+## Games
+
+## Miscs
+
+## System
+
+- [Building](building.md)
+- [Todo list](todo.md)

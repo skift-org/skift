@@ -1,0 +1,3 @@
+[service]
+start: ["skift.hideo.compositor --realy"]
+need: ["inputd"]

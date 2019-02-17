@@ -30,6 +30,7 @@ int __plug_print(const char *buffer)
 
 void __plug_putchar(int c)
 {
+    UNUSED(c);
     sk_log(LOG_ERROR, "__plug_putchar() not implemented!");
 }
 

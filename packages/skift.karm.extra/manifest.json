@@ -1,0 +1,10 @@
+{
+    "name": "Extra Framework",
+    
+    "id": "skift.karm.extra",
+    "type": "lib",
+
+    "libs": [
+        "skift.karm.core"
+    ]
+}

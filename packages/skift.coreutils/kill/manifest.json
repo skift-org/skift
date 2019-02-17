@@ -3,7 +3,8 @@
     
     "id": "kill",
     "type": "app",
+    
     "libs": [
-        "maker.skift.runtime"
+        "skift.karm.user"
     ]
 }

@@ -9,7 +9,6 @@ A simple, handmade, operating system for intel x86 cpu.
 Skift is a student project, don't espect it to be secure or stable a this stage.
 
 # Getting involved
-
 We welcome all contributions, just pick a task in the todo list and open a issue to let us know you work on that.
 
 - [Manual](manual/readme.md)

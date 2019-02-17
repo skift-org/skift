@@ -1,0 +1,11 @@
+{
+    "name": "Hjert Kernel",
+
+    "id": "skift.hjert.kernel",
+    "type": "kernel",
+    
+    "libs": [
+        "skift.karm.core",
+        "skift.hjert.protocol"
+    ]
+}

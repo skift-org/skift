@@ -1,0 +1,11 @@
+{
+    "name":"Userspace library",
+
+    "id": "skift.karm.user",
+    "type": "lib",
+    
+    "libs": [
+        "skift.karm.core",
+        "skift.hjert.protocol"
+    ]
+}

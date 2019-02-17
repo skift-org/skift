@@ -1,9 +1,0 @@
-{
-    "name": "Service Host",
-    
-    "id": "skift.system.srvhost",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

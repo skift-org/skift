@@ -549,7 +549,7 @@ def distrib(targets):
 
     ## --- BOOTDISK --------------------------------------------------------- ##
 
-    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["maker.hjert.kernel"].get_output(), "build/ramdisk.tar"]):
+    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["skift.hjert.kernel"].get_output(), "build/ramdisk.tar"]):
         print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
         bootdir = MKDIR("build/bootdisk/boot")
@@ -558,7 +558,7 @@ def distrib(targets):
         COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
-        COPY(targets["maker.hjert.kernel"].get_output(),
+        COPY(targets["skift.hjert.kernel"].get_output(),
              join(bootdir, "kernel.bin"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")

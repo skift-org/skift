@@ -13,102 +13,8 @@
 
 /* --- Process -------------------------------------------------------------- */
 
-typedef int PROCESS; // Process handler
-
-typedef enum process_state
-{
-    PROCESS_RUNNING,
-
-    // This is like a *zombie* process in **UNIX**.
-    // But in **hjert** if your parent die you die with him.
-    // This is why we have **srvhost**.
-    PROCESS_CANCELING,
-
-    PROCESS_CANCELED, // This process is read to be garbage colected.
-} process_state_t;
-
-typedef struct struct_process
-{
-    int id;                          // Unique handle to the process
-    bool user;                       // Is this a user process
-    char name[MAX_PROCESS_NAMESIZE]; // Frendly name of the process
-    struct struct_process *parent;   // Our parent
-
-    list_t *threads;   // Child threads
-    list_t *processes; // Child processes
-
-    list_t *inbox;  // process main message queu
-    list_t *shared; // Shared memory region
-
-    page_directorie_t *pdir; // Page directorie
-    process_state_t state;   // State of the process (RUNNING, CANCELED)
-
-    int exitvalue;
-} process_t;
-
-/* --- Thread --------------------------------------------------------------- */
-
-typedef int THREAD; // Thread handle
-typedef void (*thread_entry_t)();
-
-typedef enum thread_state
-{
-    THREADSTATE_NONE = -1,
-
-    THREADSTATE_RUNNING,
-    THREADSTATE_WAIT_TIME,
-    THREADSTATE_WAIT_THREAD,
-    THREADSTATE_WAIT_PROCESS,
-    THREADSTATE_WAIT_MESSAGE,
-    THREADSTATE_CANCELED,
-
-    THREADSTATE_COUNT
-} thread_state_t;
-
-typedef struct
-{
-    uint wakeuptick;
-} thread_wait_time_t;
-
-typedef struct
-{
-    int process_handle;
-    int exitvalue;
-} thread_wait_process_t;
-
-typedef struct
-{
-    int thread_handle;
-    int exitvalue;
-} thread_wait_thread_t;
-
-typedef struct
-{
-    message_t *message;
-} thread_wait_message_t;
-
-typedef struct
-{
-    int id;
-    process_t *process;   // The parent process
-    thread_entry_t entry; // Our entry point
-
-    thread_state_t state;
-
-    bool user;
-    uint sp;
-    byte stack[MAX_THREAD_STACKSIZE]; // Kernel stack
-
-    struct
-    {
-        thread_wait_time_t time;
-        thread_wait_process_t process;
-        thread_wait_thread_t thread;
-        thread_wait_message_t message;
-    } wait;
-
-    int exitvalue;
-} thread_t;
+#include "kernel/process.h"
+#include "kernel/thread.h"
 
 /* --- Tasking initialisation ----------------------------------------------- */
 
@@ -118,9 +24,7 @@ void tasking_setup();
 
 THREAD thread_self(); // Return a handle to the current thread.
 thread_t *thread_running();
-thread_t *thread_getbyid(int id);
 void thread_hold();
-void thread_setstate(thread_t *thread, thread_state_t state);
 
 // Create a new thread of a selected process.
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);

@@ -34,205 +34,14 @@
 #include "kernel/shared_memory.h"
 
 int PID = 1;
-int TID = 1;
 
 uint ticks = 0;
 list_t *processes;
 
-list_t *threads;
-list_t *threads_bystates[THREADSTATE_COUNT];
-
+void garbage_colector();
 /* --- thread table --------------------------------------------------------- */
 
-thread_t idle;
-void idle_code()
-{
-    while (1)
-    {
-        hlt();
-    }
-}
 
-void collect_and_free_thread(void)
-{
-    list_t *thread_to_free = list();
-
-    // Search for thread with a canceled parent process.
-    FOREACH(i, threads_bystates[THREADSTATE_CANCELED])
-    {
-        thread_t *thread = i->value;
-
-        if (thread->process->state == PROCESS_CANCELED)
-        {
-            list_pushback(thread_to_free, thread);
-        }
-    }
-
-    // Cleanup all of those dead threads.
-    FOREACH(i, thread_to_free)
-    {
-        thread_t *thread = i->value;
-        int thread_id = thread->id;
-
-        sk_log(LOG_DEBUG, "free'ing thread %d", thread_id);
-
-        // All those guys have a ptr to us we need to remove them.
-        thread_setstate(thread, THREADSTATE_NONE);
-        list_remove(threads, thread);
-        list_remove(thread->process->threads, thread);
-
-        // Now no one should still have a ptr to us we can die in peace.
-        free(thread);
-
-        sk_log(LOG_DEBUG, "Thread %d free'd.", thread_id);
-    }
-
-    list_delete(thread_to_free);
-}
-
-void collect_and_free_process(void)
-{
-    // Ho god, this is going to be hard :/
-    list_t* process_to_free = list();
-
-    list_delete(process_to_free);
-}
-
-void garbage_colector()
-{
-    while (true)
-    {
-        thread_sleep(100); // We don't do this really often.
-
-        // sk_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
-
-        sk_atomic_begin();
-        collect_and_free_thread();
-        collect_and_free_process();
-        sk_atomic_end();
-
-        // sk_log(LOG_DEBUG, "Garbage collect end!");
-    }
-}
-
-void thread_setup(void)
-{
-    threads = list();
-
-    for (int i = 0; i < THREADSTATE_COUNT; i++)
-    {
-        threads_bystates[i] = list();
-    }
-}
-
-thread_t *thread()
-{
-    thread_t *thread = MALLOC(thread_t);
-
-    if (thread == NULL)
-    {
-        PANIC("Failed to allocated a new thread.");
-    }
-
-    memset(thread, 0, sizeof(thread_t));
-
-    thread->id = TID++;
-    thread->state = THREADSTATE_NONE;
-
-    list_pushback(threads, thread);
-
-    return thread;
-}
-
-thread_t *thread_getbyid(int id)
-{
-    FOREACH(i, threads)
-    {
-        thread_t *thread = i->value;
-
-        if (thread->id == id)
-            return thread;
-    }
-
-    return NULL;
-}
-
-bool shortest_sleep_first(void *left, void *right)
-{
-    return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
-}
-
-void thread_setstate(thread_t *thread, thread_state_t state)
-{
-    if (thread->state != THREADSTATE_NONE)
-    {
-        list_remove(threads_bystates[thread->state], thread);
-    }
-
-    thread->state = state;
-
-    if (thread->state != THREADSTATE_NONE)
-    {
-        if (thread->state == THREADSTATE_WAIT_TIME)
-        {
-            list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
-        }
-        else
-        {
-            list_push(threads_bystates[thread->state], thread);
-        }
-    }
-}
-
-void thread_init(thread_t *t, thread_entry_t entry, bool user)
-{
-    t->entry = entry;
-    t->user = user;
-    // setup the stack
-    memset(t->stack, 0, MAX_THREAD_STACKSIZE);
-    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
-}
-
-uint thread_stack_push(thread_t *t, const void *value, uint size)
-{
-    t->sp -= size;
-    memcpy((void *)t->sp, value, size);
-
-    return t->sp;
-}
-
-void thread_attach_process(thread_t *t, process_t *p)
-{
-    if (t->process == NULL)
-    {
-        list_pushback(p->threads, t);
-        t->process = p;
-    }
-    else
-    {
-        PANIC("Trying to attaching thread %d of process %d to process %d.", t->id, t->process->id, p->id);
-    }
-}
-
-void thread_ready(thread_t *t)
-{
-    processor_context_t ctx;
-
-    ctx.eflags = 0x202;
-    ctx.eip = (reg32_t)t->entry;
-    ctx.ebp = ((reg32_t)t->stack + MAX_THREAD_STACKSIZE);
-
-    // TODO: userspace thread
-    ctx.cs = 0x08;
-    ctx.ds = 0x10;
-    ctx.es = 0x10;
-    ctx.fs = 0x10;
-    ctx.gs = 0x10;
-
-    thread_stack_push(t, &ctx, sizeof(ctx));
-
-    thread_setstate(t, THREADSTATE_RUNNING);
-}
 
 process_t *alloc_process(const char *name, bool user)
 {
@@ -287,15 +96,7 @@ thread_t *running = NULL;
 
 reg32_t shedule(reg32_t esp, processor_context_t *context);
 
-void timer_set_frequency(int hz)
-{
-    u32 divisor = 1193180 / hz;
-    outb(0x43, 0x36);
-    outb(0x40, divisor & 0xFF);
-    outb(0x40, (divisor >> 8) & 0xFF);
 
-    sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
-}
 
 // define in boot.s
 extern u32 __stack_bottom;
@@ -312,14 +113,11 @@ void tasking_setup()
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     thread_create(kernel_process, garbage_colector, NULL, false);
 
+    sheduler_setup(kernel_thread);
     // Setup the idle task
-    idle.id = -1;
-    thread_init(&idle, idle_code, false);
-    thread_attach_process(&idle, process_get(kernel_process));
-    thread_ready(&idle);
 
-    timer_set_frequency(100);
-    irq_register(0, (irq_handler_t)&shedule);
+
+    setup(sheduler)
 }
 
 /* --- Thread managment ----------------------------------------------------- */
@@ -363,8 +161,8 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     process_t *process = process_get(p);
     thread_t *t = thread();
 
-    thread_init(t, entry, true);
-    thread_attach_process(t, process);
+    thread_setentry(t, entry, true);
+    thread_attach_to_process(t, process);
 
     // WIP: push arguments
     uint argv_list[MAX_PROCESS_ARGV];
@@ -380,7 +178,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
     thread_stack_push(t, &argc, sizeof(argc));
 
-    thread_ready(t);
+    thread_setready(t);
 
     sk_atomic_end();
 
@@ -394,15 +192,10 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     process_t *process = process_get(p);
     thread_t *t = thread();
 
-    thread_init(t, entry, user);
-    thread_attach_process(t, process);
+    thread_setentry(t, entry, user);
+    thread_attach_to_process(t, process);
     thread_stack_push(t, &arg, sizeof(arg));
-    thread_ready(t);
-
-    if (running == NULL)
-    {
-        running = t;
-    }
+    thread_setready(t);
 
     sk_atomic_end();
 
@@ -560,50 +353,6 @@ void thread_exit(int exitvalue)
         hlt();
 }
 
-void thread_dump_all()
-{
-    sk_atomic_begin();
-
-    printf("\n\tCurrent thread:");
-    thread_dump(running);
-
-    printf("\n");
-
-    printf("\n\tThreads:");
-
-    FOREACH(i, threads)
-    {
-        thread_t *t = i->value;
-        if (t != running && t->state != THREADSTATE_NONE)
-            thread_dump(t);
-    }
-
-    for (int i = 0; i < MAX_THREAD; i++)
-    {
-    }
-
-    sk_atomic_end();
-}
-
-static char *THREAD_STATES[] =
-    {
-        "RUNNING",
-        "SLEEP",
-        "WAIT(thread)",
-        "WAIT(process)",
-        "WAIT(message)",
-        "CANCELED",
-};
-
-void thread_dump(thread_t *t)
-{
-    sk_atomic_begin();
-
-    printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
-
-    sk_atomic_end();
-}
-
 /* --- Process managment ---------------------------------------------------- */
 
 PROCESS process_self()
@@ -722,11 +471,11 @@ bool process_cancel(PROCESS p, int exitvalue)
         sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
 
         // Wake up waiting threads
-        FOREACH(i, threads)
+        FOREACH(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
         {
             thread_t *thread = i->value;
 
-            if (thread->state == THREADSTATE_WAIT_PROCESS && thread->wait.process.process_handle == p)
+            if (thread->wait.process.process_handle == p)
             {
                 thread->wait.process.exitvalue = exitvalue;
                 thread_setstate(thread, THREADSTATE_RUNNING);
@@ -793,57 +542,60 @@ void process_free(uint addr, uint count)
     return memory_free(running->process->pdir, addr, count, 1);
 }
 
-/* --- Sheduler ------------------------------------------------------------- */
+/* --- Garbage colector ----------------------------------------------------- */
 
-void wakeup_sleeping_threads(void)
+void collect_and_free_thread(void)
 {
-    if (!list_empty(threads_bystates[THREADSTATE_WAIT_TIME]))
+    list_t *thread_to_free = list();
+
+    // Search for thread with a canceled parent process.
+    FOREACH(i, thread_bystate(THREADSTATE_CANCELED))
     {
-        thread_t *t;
+        thread_t *thread = i->value;
 
-        do
+        if (thread->process->state == PROCESS_CANCELED)
         {
-            list_peek(threads_bystates[THREADSTATE_WAIT_TIME], (void **)&t);
-
-            if (t->wait.time.wakeuptick <= ticks)
-            {
-                thread_setstate(t, THREADSTATE_RUNNING);
-                // sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
-            }
-
-        } while (t->stack == THREADSTATE_RUNNING);
+            list_pushback(thread_to_free, thread);
+        }
     }
+
+    // Cleanup all of those dead threads.
+    FOREACH(i, thread_to_free)
+    {
+        thread_t *thread = i->value;
+        int thread_id = thread->id;
+
+        sk_log(LOG_DEBUG, "free'ing thread %d", thread_id);
+
+        thread_delete(thread);
+
+        sk_log(LOG_DEBUG, "Thread %d free'd.", thread_id);
+    }
+
+    list_delete(thread_to_free);
 }
 
-bool is_context_switch = false;
-reg32_t shedule(reg32_t sp, processor_context_t *context)
+void collect_and_free_process(void)
 {
-    UNUSED(context);
-    is_context_switch = true;
+    // Ho god, this is going to be hard :/
+    list_t *process_to_free = list();
 
-    // Save the old context
-    running->sp = sp;
+    list_delete(process_to_free);
+}
 
-    // Update the system ticks
-    ticks++;
-    wakeup_sleeping_threads();
-
-    // Get the next thread
-    if (list_pop(threads_bystates[THREADSTATE_RUNNING], (void **)&running))
+void garbage_colector()
+{
+    while (true)
     {
-        list_pushback(threads_bystates[THREADSTATE_RUNNING], running);
+        thread_sleep(100); // We don't do this really often.
+
+        // sk_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
+
+        sk_atomic_begin();
+        collect_and_free_thread();
+        collect_and_free_process();
+        sk_atomic_end();
+
+        // sk_log(LOG_DEBUG, "Garbage collect end!");
     }
-    else
-    {
-        running = &idle;
-    }
-
-    // Restore the context
-    // TODO: set_kernel_stack(...);
-    paging_load_directorie(running->process->pdir);
-    paging_invalidate_tlb();
-
-    is_context_switch = false;
-
-    return running->sp;
 }

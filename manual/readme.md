@@ -2,5 +2,5 @@
 
 ## Topics
 
-- [Building](manual/building.md)
-- [Todo list](manual/todo.md)
+- [Building](building.md)
+- [Todo list](todo.md)

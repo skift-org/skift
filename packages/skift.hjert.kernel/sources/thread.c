@@ -5,6 +5,7 @@
 #include "kernel/system.h"
 #include "kernel/thread.h"
 #include "kernel/processor.h"
+#include "kernel/sheduler.h"
 
 static int TID = 1;
 static list_t *threads;
@@ -14,9 +15,19 @@ void thread_setup(void)
 {
     threads = list();
 
+    if (threads == NULL)
+    {
+        PANIC("Failed to allocate thread list!");
+    }
+
     for (int i = 0; i < THREADSTATE_COUNT; i++)
     {
         threads_bystates[i] = list();
+
+        if (threads_bystates[i] == NULL)
+        {
+            PANIC("Failled to allocate threadbystate list!");
+        }
     }
 }
 
@@ -77,7 +88,7 @@ void thread_dumpall()
     sk_atomic_begin();
 
     printf("\n\tCurrent thread:");
-    thread_dump(running);
+    thread_dump(sheduler_thread_running());
 
     printf("\n");
 
@@ -86,7 +97,7 @@ void thread_dumpall()
     FOREACH(i, threads)
     {
         thread_t *t = i->value;
-        if (t != running && t->state != THREADSTATE_NONE)
+        if (t != sheduler_thread_running() && t->state != THREADSTATE_NONE)
             thread_dump(t);
     }
 
@@ -189,6 +200,4 @@ void thread_setready(thread_t *t)
     ctx.gs = 0x10;
 
     thread_stack_push(t, &ctx, sizeof(ctx));
-
-    thread_setstate(t, THREADSTATE_RUNNING);
 }

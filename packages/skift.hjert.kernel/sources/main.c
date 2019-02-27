@@ -86,15 +86,12 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- System context --------------------------------------------------- */
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
-    
     setup(tasking);
     setup(messaging);
     setup(shared_memory);
-
     setup(filesystem);
     setup(modules, &mbootinfo);
     
-
     /* --- Devices ---------------------------------------------------------- */
     filesystem_mkdir("/dev");
     setup(serial);
@@ -106,9 +103,8 @@ void main(multiboot_info_t *info, s32 magic)
     setup(zero);
     setup(random);
 
-    sk_log(LOG_DEBUG, "Starting the userspace...");
-
     /* --- Finalizing System ------------------------------------------------ */
+    sk_log(LOG_DEBUG, "Starting the userspace...");
     sk_atomic_enable();
     sti();
 
@@ -122,6 +118,7 @@ void main(multiboot_info_t *info, s32 magic)
     {
         int exitvalue = 0;
         thread_wait_process(init, &exitvalue);
+        
         PANIC("Init has return with code %d!", exitvalue);
     }
     else

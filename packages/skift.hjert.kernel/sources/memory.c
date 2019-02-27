@@ -472,16 +472,20 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 
 int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
 {
+    sk_atomic_begin();
     physical_set_used(addr, count);
     virtual_map(pdir, addr, addr, count, 0);
+    sk_atomic_end();
 
     return 0;
 }
 
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
-{
+{   
+    sk_atomic_begin();
     physical_set_free(addr, count);
     virtual_unmap(pdir, addr, count);
+    sk_atomic_end();
 
     return 0;
 }

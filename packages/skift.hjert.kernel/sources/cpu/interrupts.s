@@ -114,6 +114,13 @@ __isr%1:
     jmp isr_common
 %endmacro
 
+%macro ISR_SYSCALL 1
+__isr%1:
+    push 0
+    push %1
+    jmp isr_common
+%endmacro
+
 isr_common:
     cld
 
@@ -177,7 +184,7 @@ ISR_NOERR 29
 ISR_NOERR 30
 ISR_NOERR 31
 
-ISR_NOERR 128
+ISR_SYSCALL 128
 
 
 global isr_vector

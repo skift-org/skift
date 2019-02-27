@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <string.h>
 #include <skift/logger.h>
 
 #include "kernel/cpu/irq.h"
@@ -9,8 +10,8 @@
 #include "kernel/tasking.h"
 #include "kernel/sheduler.h"
 
-static thread_t* running;
-static uint ticks;
+thread_t* running; 
+uint ticks;
 
 /* --- Idle thread ---------------------------------------------------------- */
 static thread_t idle;
@@ -45,6 +46,7 @@ void wakeup_sleeping_threads(void)
 bool is_context_switch = false;
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
+    // sk_log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     is_context_switch = true;
 
@@ -72,6 +74,8 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     is_context_switch = false;
 
+    // sk_log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
+
     return running->sp;
 }
 
@@ -87,11 +91,12 @@ void timer_set_frequency(int hz)
     sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(thread_t* main_kernel_thread)
+void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process)
 {
     running = main_kernel_thread;
 
     // Create the idle thread.
+    memset(&idle, 0, sizeof(thread_t));
     idle.id = -1;
     thread_setentry(&idle, idle_code, false);
     thread_attach_to_process(&idle, process_get(kernel_process));
@@ -99,4 +104,9 @@ void sheduler_setup(thread_t* main_kernel_thread)
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
+}
+
+thread_t* sheduler_thread_running()
+{
+    return running;
 }

@@ -32,6 +32,7 @@
 #include "kernel/tasking.h"
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"
+#include "kernel/sheduler.h"
 
 int PID = 1;
 
@@ -39,10 +40,8 @@ uint ticks = 0;
 list_t *processes;
 
 void garbage_colector();
+
 /* --- thread table --------------------------------------------------------- */
-
-
-
 process_t *alloc_process(const char *name, bool user)
 {
     process_t *process = MALLOC(process_t);
@@ -96,11 +95,6 @@ thread_t *running = NULL;
 
 reg32_t shedule(reg32_t esp, processor_context_t *context);
 
-
-
-// define in boot.s
-extern u32 __stack_bottom;
-
 void tasking_setup()
 {
     running = NULL;
@@ -113,11 +107,7 @@ void tasking_setup()
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     thread_create(kernel_process, garbage_colector, NULL, false);
 
-    sheduler_setup(kernel_thread);
-    // Setup the idle task
-
-
-    setup(sheduler)
+    sheduler_setup(thread_getbyid(kernel_thread), kernel_process);
 }
 
 /* --- Thread managment ----------------------------------------------------- */
@@ -156,6 +146,8 @@ thread_t *thread_running()
 // Create the main thread of a user application
 THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **argv)
 {
+    sk_log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", p, entry);
+
     sk_atomic_begin();
 
     process_t *process = process_get(p);
@@ -165,7 +157,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_attach_to_process(t, process);
 
     // WIP: push arguments
-    uint argv_list[MAX_PROCESS_ARGV];
+    uint argv_list[MAX_PROCESS_ARGV] = { 0 };
 
     int argc;
     for (argc = 0; argv[argc] && argc < MAX_PROCESS_ARGV; argc++)
@@ -179,6 +171,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_stack_push(t, &argc, sizeof(argc));
 
     thread_setready(t);
+    thread_setstate(t, THREADSTATE_RUNNING);
 
     sk_atomic_end();
 
@@ -196,6 +189,7 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     thread_attach_to_process(t, process);
     thread_stack_push(t, &arg, sizeof(arg));
     thread_setready(t);
+    thread_setstate(t, THREADSTATE_RUNNING);
 
     sk_atomic_end();
 
@@ -449,10 +443,14 @@ PROCESS process_exec(const char *path, const char **argv)
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
+
+    sk_log(LOG_DEBUG, "Executable loaded, creating main thread...");
+
     thread_create_mainthread(p, (thread_entry_t)elf->entry, argv);
 
     free(buffer);
 
+    sk_log(LOG_DEBUG, "Process created, back to caller..");
     return p;
 }
 

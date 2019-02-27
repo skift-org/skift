@@ -55,20 +55,20 @@ void process_delete(process_t *process);
 process_t *process_byid(int id);
 
 uint process_load_executable(process_t *process, const char *executable);
-void process_create_main_thread(thread_entry_t entry, const char **argv);
-void process_create_thread(process_t* process, thread_entry_t entry, void* arg, bool user);
+void process_create_main_thread(process_t* process, void* entry, const char **argv);
+void process_create_thread(process_t* process, void* entry, void* arg, bool user);
 void process_setready(process_t* process);
 
-uint process_memory_map(uint addr, uint pagecount);
-uint process_memory_alloc(uint pagecount);
-void process_memory_free(uint addr, uint pagecount);
+uint process_memory_map(process_t* process, uint addr, uint pagecount);
+uint process_memory_alloc(process_t* process, uint pagecount);
+void process_memory_free(process_t* process, uint addr, uint pagecount);
 void process_memory_copyout(process_t* process, void* src, void* dest, uint size);
 
-int process_fildes_alloc();
-void process_fildes_set_stream(int fd, stream_t* stream);
-void process_fildes_free(int fd);
+int process_fildes_alloc(process_t* process);
+void process_fildes_set_stream(process_t* process, int fd, stream_t* stream);
+void process_fildes_free(process_t* process, int fd);
 
-stre process_fildes_aquired();
-void process_fildes_release();
+stream_t* process_fildes_aquired(process_t* process, int fd);
+void process_fildes_release(process_t* process, int fd);
 
 

@@ -44,7 +44,7 @@ GCC = "./toolchain/local/bin/i686-elf-gcc"
 LD = "./toolchain/local/bin/i686-elf-ld"
 AR = "./toolchain/local/bin/i686-elf-ar"
 
-CFLAGS = ["-fno-pie", "-fno-builtin",
+CFLAGS = ["-g", "-fno-pie", "-fno-builtin",
           "-ffreestanding", "-nostdlib", "-std=gnu11", "-nostdinc"]
 CFLAGS_OPTIMIZATION = ["-O0", "-O1", "-O2", "-O3"]
 CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror", "-Wno-unknown-pragmas"]

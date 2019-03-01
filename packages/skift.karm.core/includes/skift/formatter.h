@@ -39,18 +39,6 @@ typedef struct
 
 typedef int (*formatter_t)(printf_info_t* info, void* v);
 
-#define PADDING(buffer, a)                                 \
-do                                                             \
-{                                                              \
-    if (info->align == a && strlen(buffer) < info->lenght) \
-    {                                                          \
-        for(uint i = 0; i < info->lenght - strlen(buffer); i++) \
-        {                                                      \
-            APPEND(info->padding);                             \
-        }                                                      \
-    }                                                          \
-} while(0)
-
 #define APPEND(c)                                     \
 do                                                    \
 {                                                     \
@@ -58,6 +46,18 @@ do                                                    \
         return strlen(info->output);                  \
     info->output[info->output_offset++] = c;          \
     info->output[info->output_offset] = '\0';         \
+} while(0)
+
+#define PADDING(buffer, a)                                      \
+do                                                              \
+{                                                               \
+    if (info->align == a && strlen(buffer) < info->lenght)      \
+    {                                                           \
+        for(uint i = 0; i < info->lenght - strlen(buffer); i++) \
+        {                                                       \
+            APPEND(info->padding);                              \
+        }                                                       \
+    }                                                           \
 } while(0)
 
 #define PEEK()                                        \
@@ -70,6 +70,7 @@ do                                                    \
 void sk_formatter_init();
 bool sk_formatter_register(char c, formatter_t formatter);
 int sk_formatter_format(printf_info_t* info, char sel, va_list* va);
+
 //TODO: for fprintf
 // int sk_formatter_format_stream(printf_info_t* info, char sel, void* v);
 

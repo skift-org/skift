@@ -24,7 +24,7 @@
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
-uchar MEMORY[1024 * 1024 / 8];
+uchar MEMORY[1024 * 1024 / 8] = {0};
 
 #define PHYSICAL_IS_USED(addr) \
     (MEMORY[(uint)(addr) / PAGE_SIZE / 8] & (1 << ((uint)(addr) / PAGE_SIZE % 8)))
@@ -88,10 +88,10 @@ void physical_free(uint addr, uint count)
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-page_directorie_t ALIGNED(kpdir, PAGE_SIZE);
-page_table_t ALIGNED(kptable[256], PAGE_SIZE);
+page_directorie_t ALIGNED(kpdir, PAGE_SIZE) = {0};
+page_table_t ALIGNED(kptable[256], PAGE_SIZE) = {0};
 
-inline int page_present(page_directorie_t *pdir, uint vaddr)
+int page_present(page_directorie_t *pdir, uint vaddr)
 {
     uint pdi = PD_INDEX(vaddr);
     uint pti = PT_INDEX(vaddr);
@@ -383,6 +383,14 @@ page_directorie_t *memory_alloc_pdir()
     sk_atomic_begin();
 
     page_directorie_t *pdir = (page_directorie_t *)memory_alloc_identity(&kpdir, 1, 0);
+
+    if (pdir == NULL)
+    {
+        sk_log(LOG_ERROR, "Page directory allocation failled!");
+        return NULL;
+    }
+
+    memset(pdir, 0, sizeof(page_directorie_t));
 
     // Copy first gigs of virtual memory (kernel space);
     for (uint i = 0; i < 256; i++)

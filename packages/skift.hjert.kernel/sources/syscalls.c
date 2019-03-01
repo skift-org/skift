@@ -283,9 +283,7 @@ static int (*syscalls[])() =
 };
 
 void syscall_dispatcher(processor_context_t *context)
-{
-    sk_log(LOG_INFO, "Syscall");
-    
+{    
     syscall_t syscall = context->eax;
     if (syscall >= 0 && syscall < SYSCALL_COUNT)
     {

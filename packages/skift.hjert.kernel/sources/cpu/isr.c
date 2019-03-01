@@ -50,7 +50,7 @@ void page_fault(processor_context_t* context)
 }
 
 extern u32 isr_vector[];
-isr_handler_t isr_handlers[32];
+static isr_handler_t isr_handlers[32] = {0};
 
 void isr_setup()
 {
@@ -61,8 +61,6 @@ void isr_setup()
 
 	// syscall handler
 	idt_entry(128, isr_vector[32], 0x08, TRAPGATE);
-
-	isr_register(14, page_fault);
 }
 
 isr_handler_t isr_register(int index, isr_handler_t handler)

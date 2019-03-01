@@ -5,6 +5,6 @@
     "type": "app",
     
     "libs": [
-        "skift.karm.user"
+        "skift.hjert.protocol"
     ]
 }

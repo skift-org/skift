@@ -407,6 +407,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 
 PROCESS process_exec(const char *path, const char **argv)
 {
+    // Check if the file existe and open the file.
     stream_t *s = filesystem_open(path, OPENOPT_READ);
     if (s == NULL)
     {
@@ -414,6 +415,7 @@ PROCESS process_exec(const char *path, const char **argv)
         return 0;
     }
 
+    // Check if the file isn't a directory.
     file_stat_t stat;
     filesystem_fstat(s, &stat);
 
@@ -423,6 +425,7 @@ PROCESS process_exec(const char *path, const char **argv)
         return 0;
     }
 
+    // Read the content of the file.
     void *buffer = filesystem_readall(s);
     filesystem_close(s);
 
@@ -432,9 +435,18 @@ PROCESS process_exec(const char *path, const char **argv)
         return 0;
     }
 
-    PROCESS p = process_create(path, true);
-
+    // Decode the elf file header.
     elf_header_t *elf = (elf_header_t *)buffer;
+
+    if (!elf_valid(elf))
+    {
+        sk_log(LOG_WARNING, "Invalid elf program!", path);
+        return 0;
+    }
+
+
+    // Create the process and load the executable.
+    PROCESS p = process_create(path, true);
 
     elf_program_t program;
 

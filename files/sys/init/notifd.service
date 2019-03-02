@@ -1,3 +1,0 @@
-[service]
-commands: ["/bin/notifd"]
-ports: ["/sys/srv/notifd"]

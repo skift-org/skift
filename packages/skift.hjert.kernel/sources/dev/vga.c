@@ -24,10 +24,11 @@ void vga_cell(u32 x, u32 y, ushort entry)
 void vga_cursor(s32 x, s32 y)
 {
     s16 cursorLocation = y * VGA_SCREEN_WIDTH + x;
+
     outb(0x3D4, 14);                  // Tell the VGA board we are setting the high cursor byte.
-    outb(0x3D5, cursorLocation >> 8); // Send the high cursor byte.
+    outb(0x3D5, (u8)(cursorLocation >> 8)); // Send the high cursor byte.
     outb(0x3D4, 15);                  // Tell the VGA board we are setting the low cursor byte.
-    outb(0x3D5, cursorLocation);      // Send the low cursor byte.
+    outb(0x3D5, (u8)(cursorLocation));      // Send the low cursor byte.
 }
 
 void vga_hide_cursor()

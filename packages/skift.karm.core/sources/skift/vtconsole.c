@@ -137,11 +137,16 @@ void vtconsole_append(vtconsole_t *vtc, char c)
         if (vtc->cursor.x > 0)
         {
             vtc->cursor.x--;
+        }
+        else
+        {
+            vtc->cursor.y--;
+            vtc->cursor.x = vtc->width - 1;
+        }
 
-            if (vtc->on_move)
-            {
-                vtc->on_move(vtc, &vtc->cursor);
-            }
+        if (vtc->on_move)
+        {
+            vtc->on_move(vtc, &vtc->cursor);
         }
     }
     else

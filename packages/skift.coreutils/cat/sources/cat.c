@@ -9,8 +9,7 @@ int cat(const char* path)
     int fd = sk_filesystem_open(path, OPENOPT_READ);
 
     int size;
-    byte buffer[1025];
-    buffer[1024] = '\0';
+    byte buffer[1025] = {0};
 
     while ((size = sk_filesystem_read(fd, &buffer, 1024)) > 0)
     {

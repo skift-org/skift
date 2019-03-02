@@ -144,7 +144,7 @@ int file_read(stream_t *stream, void *buffer, uint size)
 
     file_t *file = &stream->node->file;
 
-    if (stream->offset <= size)
+    if (stream->offset <= file->size)
     {
         int readedsize = min(file->size - stream->offset, size);
         memcpy(buffer, (byte *)file->buffer + stream->offset, readedsize);

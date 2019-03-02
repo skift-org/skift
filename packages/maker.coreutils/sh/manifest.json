@@ -1,9 +1,0 @@
-{
-    "name": "Shell",
-    
-    "id": "sh",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

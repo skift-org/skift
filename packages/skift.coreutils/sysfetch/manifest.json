@@ -1,0 +1,10 @@
+{
+    "name": "System information",
+    
+    "id": "sysfetch",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user"
+    ]
+}

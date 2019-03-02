@@ -1,9 +1,0 @@
-{
-    "name": "panic",
-    
-    "id": "panic",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

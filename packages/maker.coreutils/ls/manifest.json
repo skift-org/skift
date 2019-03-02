@@ -1,9 +1,0 @@
-{
-    "name": "List",
-    
-    "id": "ls",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

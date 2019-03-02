@@ -4,7 +4,7 @@
  - [ ] Generating a SDK *(toolchain + prebuild distro for app-developper)*
  - [ ] Support of ports
 
-## **Kernel** `packages/maker.hjert.kernel`
+## **Kernel** `packages/skift.hjert.kernel`
 
  - [ ] Proper cleanup of finish processes and threads (see: tasking.c)
  - [ ] Add support for kernel boot-time command-line arguments

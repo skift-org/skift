@@ -1,18 +1,17 @@
 #!/usr/bin/python3
 
-"""
-S.O.S.B.S: The (S)kift(O)(S) (B)uild (S)ystem
-S.O.S.D.K: The (S)kift(O)(S) (D)evelopment (K)it
-"""
+# Copyright © 2018-2019 MAKER.                                                #
+# This code is licensed under the MIT License.                                #
+# See: LICENSE.md                                                             #
 
-from pprint import pprint
-from enum import Enum
+# buildtools.py: the skift os build system.
 
-import os
-import sys
-import json
-import subprocess
 import shutil
+import subprocess
+import json
+import sys
+import os
+from enum import Enum
 
 # --- Utils ------------------------------------------------------------------ #
 
@@ -53,16 +52,15 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror", "-Wno-unknown-pragmas"]
 LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-enable-kvm"]
-QEMUFLAGS_NOKVM = ["-m", "256M", "-serial", "mon:stdio"]
+QEMUFLAGS = ["-d", "guest_errors", "-sdl", "-m", "256M", "-serial", "mon:stdio"]
+QEMUFLAGS_KVM   = QEMUFLAGS + ["-enable-kvm"]
+QEMUFLAGS_NOKVM = QEMUFLAGS
 
+def getoutput(command):
+    result = subprocess.run(command, stdout=subprocess.PIPE)
+    return result.stdout.decode("utf-8").strip()
 
-def QEMU(disk):
-    if True or subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS) != 0:
-        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
-            ERROR("Failed to start QEMU!")
-            ABORT()
-
+GIT_REV = getoutput(["git", "rev-parse", "--short", "HEAD"])
 
 def MKDIR(directory):
     if not os.path.exists(directory):
@@ -75,26 +73,6 @@ def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
-
-def copytree(src, dst, ignore=None):
-    if os.path.isdir(src):
-        if not os.path.isdir(dst):
-            os.makedirs(dst)
-        files = os.listdir(src)
-        if ignore is not None:
-            ignored = ignore(src, files)
-        else:
-            ignored = set()
-
-        for f in files:
-            if f not in ignored:
-                copytree(os.path.join(src, f),
-                         os.path.join(dst, f),
-                         ignore)
-    else:
-        shutil.copyfile(src, dst)
-
-
 def COPY(src, dest):
     if os.path.isdir(src):
         copytree(src, dest)
@@ -103,11 +81,11 @@ def COPY(src, dest):
 
     return dest
 
-
-def TAR(directory, output_file):
-    subprocess.call(["tar", "-cf", output_file, "-C",
-                     directory] + os.listdir(directory))
-
+def QEMU(disk):
+    if True or subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
+            ERROR("Failed to start QEMU!")
+            ABORT()
 
 def GRUB(iso, output_file):
     with open("/dev/null", "w") as f:
@@ -119,15 +97,16 @@ def GRUB(iso, output_file):
 
     return False
 
+def TAR(directory, output_file):
+    subprocess.call(["tar", "-cf", output_file, "-C",
+                     directory] + os.listdir(directory))
 
 def ERROR(msg):
     print(BRIGHT_RED + "\nERROR: " + RESET + msg)
 
-
 def ABORT():
     print("Aborted!" + RESET)
     exit(-1)
-
 
 # --- Crosscompiler ---------------------------------------------------------- #
 
@@ -139,7 +118,6 @@ def crosscompiler_check():
         os.path.exists(LD)
 
 # --- Utils ------------------------------------------------------------------ #
-
 
 def join(a, b):
     """
@@ -182,6 +160,25 @@ def get_files(locations, ext):
 
     return files
 
+def copytree(src, dst, ignore=None):
+    if os.path.isdir(src):
+        if not os.path.isdir(dst):
+            os.makedirs(dst)
+        files = os.listdir(src)
+
+        if ignore is not None:
+            ignored = ignore(src, files)
+        else:
+            ignored = set()
+
+        for f in files:
+            if f not in ignored:
+                copytree(os.path.join(src, f),
+                         os.path.join(dst, f),
+                         ignore)
+    else:
+        shutil.copyfile(src, dst)
+
 # --- Targets ---------------------------------------------------------------- #
 
 
@@ -212,13 +209,14 @@ class Target(object):
     """
 
     def __init__(self, location, data):
-        self.name_friendly = data["name"] if "name" in data else data["id"]
         self.name = data["id"]
+        self.name_friendly = data["name"] if "name" in data else data["id"]
         self.type = TargetTypes.FromStr(data["type"])
-        self.location = location
         self.deps = data["libs"] if "libs" in data else []
         self.incl = data["includes"] if "includes" in data else []
         self.strict = data["strict"] if "strict" in data else True
+        
+        self.location = location
 
         self.builded = False
 
@@ -322,16 +320,24 @@ class Target(object):
         """
         Compile a source file of the current target.
         """
+        filename = source.split("/")[-1]
+        includes = [("-I" + i) for i in self.get_includes(targets)]
+        preprocessor = ["-MD", "-D__FILENAME__=\"" + filename + '"', \
+                               "-D__PACKAGE__=\"" + self.name + '"', \
+                               "-D__COMMIT__=\"" + GIT_REV + '"']
 
+        print("    " + BRIGHT_BLACK + "%s" % filename + RESET)
         MKDIR(os.path.dirname(output))
-
-        print("    " + BRIGHT_BLACK + "%s" % source.split("/")[-1] + RESET)
-
         if source.endswith(".c"):
-            includes = [("-I" + i) for i in self.get_includes(targets)]
-            command = [GCC] + ["-D__FILENAME__=\"" + source.split("/")[-1] + '"'] + [CFLAGS_OPTIMIZATION[3]] + CFLAGS + includes + \
+            command =                                    \
+                [GCC] +                                  \
+                preprocessor +                           \
+                includes +                               \
+                CFLAGS +                                 \
                 (CFLAGS_STRICT if self.strict else []) + \
-                ["-c", "-o", output, source]
+                [CFLAGS_OPTIMIZATION[3]] +               \
+                ["-c", "-o", output, source]             \
+
         elif source.endswith(".s"):
             command = ["nasm", "-f" "elf32", source, "-o", output]
 
@@ -388,8 +394,7 @@ class Target(object):
             # print(BRIGHT_WHITE + self.name + RESET + " is up-to-date")
             return True
         else:
-            print("")
-            # Skip a line so it's easier on the eyes.
+            print("")  # Skip a line so it's easier on the eyes.
             print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
             # Build all source file of the current target
@@ -408,11 +413,8 @@ class Target(object):
             print("    %d %s builded, %s%d%s succeed and %s%d%s failed.\n" % (succeed + failed,
                                                                               "files" if succeed + failed > 1 else "file", BRIGHT_GREEN, succeed, RESET, BRIGHT_RED, failed, RESET))
 
-            if failed > 0:
-                return False
-
             # Link and output the result of the target
-            return self.link(targets)
+            return False if failed > 0 else self.link(targets)
 
     def clean(self):
         RMDIR(join(self.location, "bin"))
@@ -492,7 +494,6 @@ def clean_all(targets):
     """Clean all targets."""
     for t in targets:
         target = targets[t]
-
         target.clean()
 
     RMDIR("build")
@@ -523,6 +524,7 @@ def distrib(targets):
     MKDIR("build")
 
     ramdisk = MKDIR("build/ramdisk")
+    COPY("files", ramdisk)
     bootdisk = MKDIR("build/bootdisk")
 
     ## --- RAMDISK ---------------------------------------------------------- ##
@@ -548,7 +550,7 @@ def distrib(targets):
 
     ## --- BOOTDISK --------------------------------------------------------- ##
 
-    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["maker.hjert.kernel"].get_output(), "build/ramdisk.tar"]):
+    if not is_uptodate("build/bootdisk.iso", ["common/grub.cfg", targets["skift.hjert.kernel"].get_output(), "build/ramdisk.tar"]):
         print(BRIGHT_WHITE + "\nGenerating bootdisk:" + RESET)
 
         bootdir = MKDIR("build/bootdisk/boot")
@@ -557,7 +559,7 @@ def distrib(targets):
         COPY("common/grub.cfg", join(grubdir, "grub.cfg"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the kernel")
-        COPY(targets["maker.hjert.kernel"].get_output(),
+        COPY(targets["skift.hjert.kernel"].get_output(),
              join(bootdir, "kernel.bin"))
 
         print(BRIGHT_WHITE + "    Copying" + RESET + " the ramdisk")
@@ -573,38 +575,6 @@ def distrib(targets):
         print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
     # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
-
-
-def distrib_sdk(targets):
-    """Generate a distribution of the skiftOS sdk"""
-
-    distrib(targets)
-
-    sdk = MKDIR("build/sdk")
-
-    boot = COPY("build/bootdisk", "build/sdk/boot")
-    system = COPY("build/ramdisk", "build/sdk/system")
-
-    # copy pakages
-    pakages = MKDIR("build/sdk/pakages")
-    COPY("pakages/exemple", pakages + "/exemple")
-
-    # copy all includes files
-    includes = MKDIR(sdk + "/includes")
-
-    for t in targets:
-        t = targets[t]
-        COPY(join(t.location, "includes"), includes)
-
-    # copy all libraries
-    libraries = MKDIR(sdk + "/libraries")
-
-    # copy SOSBS.py
-    COPY("./SOSBS.py", "build/sdk/SOSDK.py")
-
-    # copy the toolchain
-    COPY("toolchain/local", sdk + "/toolchain/local")
-
 
 def help_command(targets):
     """Show this help message."""
@@ -682,16 +652,15 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "run": run_command,
-        "distrib-sdk": distrib_sdk
+        "run": run_command
     }
 
 # --- Main ------------------------------------------------------------------- #
 
+
 def missing_command(command):
     ERROR("No action named '%s'!" % command)
     print(BRIGHT_WHITE + "See: " + RESET + "'" + APP_NAME + " help'.")
-
 
 def main(argc, argv):
     """
@@ -737,7 +706,7 @@ if not crosscompiler_check():
     AR = "ar"
     OBJDUMP = "objdump"
 
-    CFLAGS.append("-m32")
+    CFLAGS  += ["-m32", "-fno-stack-protector", "-mno-sse"]
     LDFLAGS += ["-m", "elf_i386"]
 
 

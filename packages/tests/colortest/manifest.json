@@ -1,0 +1,10 @@
+{
+    "name": "Ansi escape sequences test",
+    
+    "id": "colortest",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user"
+    ]
+}

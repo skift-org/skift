@@ -1,0 +1,10 @@
+{
+    "name": "panic",
+    
+    "id": "panic",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user"
+    ]
+}

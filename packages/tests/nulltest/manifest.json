@@ -1,0 +1,10 @@
+{
+    "name": "Empty application",
+    
+    "id": "nulltest",
+    "type": "app",
+    
+    "libs": [
+        "skift.hjert.protocol"
+    ]
+}

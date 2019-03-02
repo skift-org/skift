@@ -1,9 +1,0 @@
-{
-    "name": "System information",
-    
-    "id": "sysinfo",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

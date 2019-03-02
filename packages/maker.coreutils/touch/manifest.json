@@ -1,9 +1,0 @@
-{
-    "name": "System information",
-    
-    "id": "touch",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

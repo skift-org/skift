@@ -1,9 +1,0 @@
-{
-    "name": "Kill",
-    
-    "id": "kill",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

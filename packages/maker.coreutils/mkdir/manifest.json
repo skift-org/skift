@@ -1,9 +1,0 @@
-{
-    "name": "mkdir",
-    
-    "id": "mkdir",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

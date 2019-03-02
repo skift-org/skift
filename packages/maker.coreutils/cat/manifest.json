@@ -1,9 +1,0 @@
-{
-    "name": "Cat",
-    
-    "id": "cat",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

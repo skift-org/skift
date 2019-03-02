@@ -1,9 +1,0 @@
-{
-    "name": "Ansi escape sequences test",
-    
-    "id": "colortest",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

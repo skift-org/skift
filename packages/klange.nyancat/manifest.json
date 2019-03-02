@@ -1,8 +1,0 @@
-{
-    "name": "Nyancat",
-    "id": "klange.nyancat",
-    "type": "app",
-    "libs": [
-        "maker.skift.runtime"
-    ]
-}

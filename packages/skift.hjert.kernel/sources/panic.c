@@ -26,6 +26,9 @@ const char *const witty_comments[] =
     "System consumed all the paper for paging!",
     "Suspicious pointer corrupted the machine.",
     "I'm tired of this ;_;",
+    "PC LOAD LETTER",
+    "Abort, Retry, Fail?",
+    "Bad command or file name",
 };
 
 extern uint ticks;

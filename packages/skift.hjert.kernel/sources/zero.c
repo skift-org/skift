@@ -27,5 +27,5 @@ static device_t zero;
 void zero_setup(void)
 {
     zero = (device_t){zero_read, zero_write, NULL};
-    filesystem_mkdev("/dev/zero", zero);
+    filesystem_mkdev("/Devices/zero", zero);
 }

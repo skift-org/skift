@@ -85,6 +85,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(irq);
 
     /* --- System context --------------------------------------------------- */
+    sk_log(LOG_INFO, "Initializing system...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(messaging);
@@ -93,7 +94,8 @@ void main(multiboot_info_t *info, s32 magic)
     setup(modules, &mbootinfo);
     
     /* --- Devices ---------------------------------------------------------- */
-    filesystem_mkdir("/dev");
+    sk_log(LOG_INFO, "Mounting devices...");
+    filesystem_mkdir("/Devices");
     setup(serial);
     setup(mouse);
     setup(keyboard);
@@ -104,7 +106,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(random);
 
     /* --- Finalizing System ------------------------------------------------ */
-    sk_log(LOG_DEBUG, "Starting the userspace...");
+    sk_log(LOG_INFO, "Starting the userspace...");
     sk_atomic_enable();
     sti();
 

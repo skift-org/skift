@@ -28,5 +28,5 @@ static device_t null;
 void null_setup(void)
 {
     null = (device_t){null_read, null_write, NULL};
-    filesystem_mkdev("/dev/null", null);
+    filesystem_mkdev("/Devices/null", null);
 }

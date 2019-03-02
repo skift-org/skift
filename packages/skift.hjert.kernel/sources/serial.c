@@ -22,7 +22,7 @@ void serial_setup()
     outb(PORT + 2, 0xC7);
     outb(PORT + 4, 0x0B);
 
-    filesystem_mkdev("/dev/com", (device_t){0});
+    filesystem_mkdev("/Devices/com", (device_t){0});
 }
 
 void wait_read()

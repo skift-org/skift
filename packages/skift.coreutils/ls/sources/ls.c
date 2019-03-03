@@ -19,7 +19,8 @@ int ls(const char* path)
 
         while (sk_filesystem_read(dir, &entry, sizeof(entry)) > 0)
         {
-            printf("%s  ", entry.name);
+            if (entry.name[0] != '.')
+                printf("%s  ", entry.name);
         }
         printf("\n");
         sk_filesystem_close(dir);

@@ -1,0 +1,130 @@
+#include <stdlib.h>
+#include <string.h>
+
+#include <skift/argparser.h>
+
+/* --- Private functions ---------------------------------------------------- */
+
+static argparser_option_t *get_long_option(argparser_t *self, const char *name)
+{
+    for (int i = 0; self->options[i].type != ARGPARSER_TYPE_END; i++)
+    {
+        argparser_option_t *option = &self->options[i];
+        if (strcmp(option->short_name, name) == 0)
+        {
+            return option;
+        }
+    }
+
+    return NULL;
+}
+
+static argparser_option_t *get_short_option(argparser_t *self, char name)
+{
+    for (int i = 0; self->options[i].type != ARGPARSER_TYPE_END; i++)
+    {
+        argparser_option_t *option = &self->options[i];
+        if (option->short_name == name)
+        {
+            return option;
+        }
+    }
+
+    return NULL;
+}
+
+static bool process_option(argparser_t *self, argparser_option_t *option, const char *next_argv)
+{
+    switch (option->type)
+    {
+        case ARGPARSER_TYPE_FLAG:
+        {
+            *((bool*)option->value) = true;
+            break;
+        }
+        case ARGPARSER_TYPE_INTEGER:
+        {
+            if (next_argv != NULL)
+            {
+                *((int*)option->value) = stio(next_argv, 10);
+            }
+            else
+            {
+                printf("%s expects an integer value.\n", option->long_name);
+                return false;
+            }
+            break;
+        }
+        case ARGPARSER_TYPE_STRING:
+        {
+            if (next_argv != NULL)
+            {
+                *((char*)option->value) = next_argv;
+            }
+            else
+            {
+                printf("%s expects a value.\n", option->long_name);
+                return false;
+            }
+            break;
+        }
+        default: case ARGPARSER_TYPE_END:
+        {
+            return false;
+            break;
+        }
+    }
+
+    if (option->callback != NULL)
+    {
+        option->callback(self, option, option->value);
+    }
+
+    return true;
+}
+
+/* --- Public functions ----------------------------------------------------- */
+
+argparser_t *argparser(argparser_option_t *options, const char *description, const char *epilogue)
+{
+    argparser_t *self = MALLOC(argparser_t);
+
+    self->options = options;
+    self->description = description;
+    self->epilogue = epilogue;
+
+    return self;
+}
+
+void argparser_delete(argparser_t *self)
+{
+    free(self);
+}
+
+char** argparser_parse(argparser_t *self, int argc, char **argv)
+{
+    for (int i = 0; i < argc; i++)
+    {
+        char *arg = argv[i];
+
+        if (arg[0] = '-')
+        {
+            if (arg[1] = '-')
+            {
+                self->current = get_long_option(self, &arg[2]);
+            }
+            else
+            {
+                for (int i = 0; arg[i]; i++)
+                {
+                    self->current = get_long_option(self, &arg[2]);
+
+                    if (self->current->type != ARGPARSER_TYPE_INTEGER ||
+                        self->current->type != ARGPARSER_TYPE_STRING)
+                    {
+                    }
+                }
+            }
+        }
+    }
+}

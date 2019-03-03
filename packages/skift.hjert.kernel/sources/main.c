@@ -1,8 +1,8 @@
-/*                  .d8888. db   dD d888888b d88888b d888888b                 */ 
-/*                  88'  YP 88 ,8P'   `88'   88'     `~~88~~'                 */ 
-/*                  `8bo.   88,8P      88    88ooo      88                    */ 
-/*                    `Y8b. 88`8b      88    88~~~      88                    */ 
-/*                  db   8D 88 `88.   .88.   88         88                    */ 
+/*                  .d8888. db   dD d888888b d88888b d888888b                 */
+/*                  88'  YP 88 ,8P'   `88'   88'     `~~88~~'                 */
+/*                  `8bo.   88,8P      88    88ooo      88                    */
+/*                    `Y8b. 88`8b      88    88~~~      88                    */
+/*                  db   8D 88 `88.   .88.   88         88                    */
 /*                  `8888Y' YP   YD Y888888P YP         YP                    */
 
 /* Copyright © 2018-2019 MAKER.                                               */
@@ -92,7 +92,7 @@ void main(multiboot_info_t *info, s32 magic)
     setup(shared_memory);
     setup(filesystem);
     setup(modules, &mbootinfo);
-    
+
     /* --- Devices ---------------------------------------------------------- */
     sk_log(LOG_INFO, "Mounting devices...");
     filesystem_mkdir("/Devices");
@@ -114,13 +114,13 @@ void main(multiboot_info_t *info, s32 magic)
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("/bin/init", (const char*[]){"/bin/init", NULL});
+    PROCESS init = process_exec("/bin/init", (const char *[]){"/bin/init", NULL});
 
     if (init)
     {
         int exitvalue = 0;
         thread_wait_process(init, &exitvalue);
-        
+
         PANIC("Init has return with code %d!", exitvalue);
     }
     else

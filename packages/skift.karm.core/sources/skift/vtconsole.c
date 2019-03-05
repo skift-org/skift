@@ -126,8 +126,9 @@ void vtconsole_append(vtconsole_t *vtc, char c)
     }
     else if (c == '\t')
     {
-        // TODO: tabstops
-        for (int i = 0; i < 8; i++)
+        int n = 8 - (vtc->cursor.x % 8);
+        
+        for (int i = 0; i < n; i++)
         {
             vtconsole_append(vtc, ' ');
         }

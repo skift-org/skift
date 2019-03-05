@@ -15,7 +15,7 @@ static const char *usages[] = {
 
 static cmdline_option_t options[] = {
     CMDLINE_OPT_HELP,
-    {.type = CMDLINE_BOOLEAN, .long_name = "all", .short_name = 'a', .value = &option_all},
+    {.type = CMDLINE_BOOLEAN, .long_name = "all", .short_name = 'a', .value = &option_all, .help = "Do not ignore entries starting with '.'."},
     CMDLINE_OPT_END};
 
 static cmdline_t cmdline = CMDLINE(usages, options, "List all file and directory.", "The skiftOS project.");

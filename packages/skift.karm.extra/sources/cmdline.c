@@ -1,3 +1,9 @@
+/* Copyright © 2018-2019 MAKER.                                               */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+/* cmdline.c: skiftOS command line application utils                          */
+
 #include <string.h>
 #include <stdlib.h>
 #include <skift/cmdline.h>
@@ -70,9 +76,15 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
 {
     UNUSED(option);
 
+    if (cmdline->prologue)
+    {
+        printf(cmdline->prologue);
+        printf("\n\n");
+    }
+
     if (cmdline->usages != NULL)
     {
-        printf("Usages: ");
+        printf("\e[1mUsages:\e[0m ");
 
         for(int i = 0; cmdline->usages[i]; i++)
         {
@@ -82,19 +94,36 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
         printf("\n");
     }
 
-    if (cmdline->prologue)
+    printf("\e[1mOptions:\e[0m");
+    for (int i = 0; cmdline->options[i].type != CMDLINE_END; i++)
     {
-        printf("Prologue:\n\t");
-        printf(cmdline->prologue);
-        printf("\n\n");
-    }
+        cmdline_option_t* opt = &cmdline->options[i];
+        if (opt->short_name != '\0')
+        {
+            printf(" -%c, ", opt->short_name);
+        }
+        else
+        {
+            printf("      ");
+        }
 
-    printf("Options:\n\t");
-    printf("\n\n");
+        if (opt->long_name != NULL)
+        {
+            printf("--%s ", opt->long_name);
+        }
+        printf("\t");
+
+        if (opt->help != NULL)
+        {
+           printf("%s", opt->help); 
+        }
+
+        printf("\n\t");
+    }
+    printf("\n");
 
     if (cmdline->epiloge)
     {
-        printf("Epilogue:\n\t");
         printf(cmdline->epiloge);
         printf("\n\n");
     }

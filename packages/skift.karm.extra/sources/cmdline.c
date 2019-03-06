@@ -86,18 +86,18 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
     {
         printf("\e[1mUsages:\e[0m ");
 
-        for(int i = 0; cmdline->usages[i]; i++)
+        for (int i = 0; cmdline->usages[i]; i++)
         {
             printf("%s\n\t", cmdline->usages[i]);
         }
-        
+
         printf("\n");
     }
 
     printf("\e[1mOptions:\e[0m");
     for (int i = 0; cmdline->options[i].type != CMDLINE_END; i++)
     {
-        cmdline_option_t* opt = &cmdline->options[i];
+        cmdline_option_t *opt = &cmdline->options[i];
         if (opt->short_name != '\0')
         {
             printf(" -%c, ", opt->short_name);
@@ -115,7 +115,7 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
 
         if (opt->help != NULL)
         {
-           printf("%s", opt->help); 
+            printf("%s", opt->help);
         }
 
         printf("\n\t");
@@ -150,6 +150,10 @@ int cmdline_parse(cmdline_t *cmdline, int argc, char **argv)
                 {
                     do_option(cmdline, opt, i, argc, argv);
                 }
+                else
+                {
+                    printf("Unknow option '%s'!\n", arg + 2);
+                }
             }
             else
             {
@@ -160,6 +164,10 @@ int cmdline_parse(cmdline_t *cmdline, int argc, char **argv)
                     if (opt != NULL)
                     {
                         do_option(cmdline, opt, i, argc, argv);
+                    }
+                    else
+                    {
+                        printf("Unknow option '%c'!\n", arg[1 + j]);
                     }
                 }
             }

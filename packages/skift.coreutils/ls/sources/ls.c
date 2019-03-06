@@ -6,19 +6,64 @@
 #include <skift/cmdline.h>
 
 static bool option_all = false;
+static bool option_list = false;
 
-static const char *usages[] = {
+static const char *usages[] = 
+{
     "ls",
     "ls FILES...",
     "ls OPTION... FILES...",
-    NULL};
+    NULL
+};
 
-static cmdline_option_t options[] = {
+static cmdline_option_t options[] = 
+{
     CMDLINE_OPT_HELP,
-    {.type = CMDLINE_BOOLEAN, .long_name = "all", .short_name = 'a', .value = &option_all, .help = "Do not ignore entries starting with '.'."},
-    CMDLINE_OPT_END};
 
-static cmdline_t cmdline = CMDLINE(usages, options, "List all file and directory.", "The skiftOS project.");
+    {
+        .type = CMDLINE_BOOLEAN, 
+        .long_name = "all", 
+        .short_name = 'a', 
+        .value = &option_all, 
+        .help = "Do not ignore entries starting with '.'."
+    },
+
+    {
+        .type = CMDLINE_BOOLEAN, 
+        .long_name = "list", 
+        .short_name = 'l', 
+        .value = &option_list, 
+        .help = "Long listing mode."
+    },
+
+    CMDLINE_OPT_END
+};
+
+static cmdline_t cmdline = CMDLINE(usages, options, "List file and directory in the current working directory by default.", "Options can be combined.");
+
+const char* file_type_name[] = 
+{
+    "file ",
+    "dev  ",
+    "dir  ",
+    "fifo ",
+};
+
+void ls_print_entry(directory_entry_t *entry)
+{
+    if (option_list)
+    {
+        printf(file_type_name[entry->type]);
+    }
+
+    if (option_all || entry->name[0] != '.')
+        printf("%s  ", entry->name);
+
+    if (option_list)
+    {
+        printf("\n");
+    }
+}
 
 int ls(const char *path)
 {
@@ -35,8 +80,7 @@ int ls(const char *path)
 
         while (sk_filesystem_read(dir, &entry, sizeof(entry)) > 0)
         {
-            if (option_all || entry.name[0] != '.')
-                printf("%s  ", entry.name);
+            ls_print_entry(&entry);
         }
 
         printf("\n");

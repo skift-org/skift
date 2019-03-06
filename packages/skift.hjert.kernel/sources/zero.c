@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+#include "kernel/system.h"
 #include "kernel/filesystem.h"
 
 int zero_read(stream_t *s, uint size, void *buffer)
@@ -27,5 +28,8 @@ static device_t zero;
 void zero_setup(void)
 {
     zero = (device_t){zero_read, zero_write, NULL};
-    filesystem_mkdev("/Devices/zero", zero);
+    if (filesystem_mkdev("/Devices/zero", zero))
+    {
+        PANIC("Failled to create the 'zero' device.");
+    }
 }

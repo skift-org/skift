@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+#include "kernel/system.h"
 #include "kernel/filesystem.h"
 
 static int state = 1411743402;
@@ -41,5 +42,8 @@ static device_t random;
 void random_setup(void)
 {
     random = (device_t){random_read, random_write, NULL};
-    filesystem_mkdev("/Devices/random", random);
+    if (filesystem_mkdev("/Devices/random", random))
+    {
+        PANIC("Failled to create the 'random' device.");
+    }
 }

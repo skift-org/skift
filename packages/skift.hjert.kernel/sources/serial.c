@@ -4,6 +4,7 @@
 
 #include <skift/utils.h>
 
+#include "kernel/system.h"
 #include "kernel/processor.h"
 #include "kernel/filesystem.h"
 
@@ -22,7 +23,10 @@ void serial_setup()
     outb(PORT + 2, 0xC7);
     outb(PORT + 4, 0x0B);
 
-    filesystem_mkdev("/Devices/com", (device_t){0});
+    if (filesystem_mkdev("/Devices/serial", (device_t){0}))
+    {
+        PANIC("Failled to create the 'serial' device.");
+    }
 }
 
 void wait_read()

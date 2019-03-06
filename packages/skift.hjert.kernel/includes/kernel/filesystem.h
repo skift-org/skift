@@ -8,6 +8,7 @@
 #include <skift/list.h>
 #include <skift/lock.h>
 #include <skift/path.h>
+#include <skift/ringbuffer.h>
 
 #include "kernel/shared/filesystem.h"
 
@@ -37,6 +38,11 @@ typedef struct
     list_t *childs;
 } directory_t;
 
+typedef struct
+{
+    ringbuffer_t *buffer;
+} fifo_t;
+
 typedef struct fsnode
 {
     char name[MAX_FILENAME_LENGHT];
@@ -47,12 +53,17 @@ typedef struct fsnode
         file_t file;
         directory_t directory;
         device_t device;
+        fifo_t fifo;
     };
 
     int refcount;
 } fsnode_t;
 
-typedef struct { int count; directory_entry_t* entries; } directory_entries_t;
+typedef struct
+{
+    int count;
+    directory_entry_t *entries;
+} directory_entries_t;
 
 typedef struct stream
 {
@@ -60,8 +71,7 @@ typedef struct stream
     uint offset;
     fsoflags_t flags;
 
-    union
-    {
+    union {
         directory_entries_t direntries;
     };
 } stream_t;

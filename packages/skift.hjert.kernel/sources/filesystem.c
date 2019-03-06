@@ -15,7 +15,6 @@
 #include <string.h>
 
 #include <skift/logger.h>
-#include <skift/ringbuffer.h>
 
 #include "kernel/filesystem.h"
 
@@ -627,7 +626,7 @@ int filesystem_mkdir(const char *path)
         {
             fsnode_t *p = filesystem_resolve(parent);
 
-            if (p->type == FSDIRECTORY)
+            if (p->type == FSDIRECTORY && directory_child(p, child) == NULL)
             {
                 fsnode_t *c = fsnode(child, FSDIRECTORY);
                 directory_addchild(p, c);
@@ -656,7 +655,7 @@ int filesystem_mkdev(const char *path, device_t dev)
         {
             fsnode_t *p = filesystem_resolve(parent);
 
-            if (p->type == FSDIRECTORY)
+            if (p->type == FSDIRECTORY && directory_child(p, child) == NULL)
             {
                 fsnode_t *c = fsnode(child, FSDEVICE);
                 directory_addchild(p, c);
@@ -687,7 +686,7 @@ int filesystem_mkfile(const char *path)
         {
             fsnode_t *p = filesystem_resolve(parent);
 
-            if (p->type == FSDIRECTORY)
+            if (p->type == FSDIRECTORY && directory_child(p, child) == NULL)
             {
                 fsnode_t *c = fsnode(child, FSFILE);
                 directory_addchild(p, c);

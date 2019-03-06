@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
  - More witty comments to the kerne panic screen
  - argparser helper to framework
- - `all, list, help` options to `ls`
+ - `all, color, list, help` options to `ls`
 
 ## Fixed
  - `\t` now behaves as espected.

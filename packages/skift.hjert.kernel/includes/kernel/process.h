@@ -54,7 +54,7 @@ void process_delete(process_t *process);
 
 process_t *process_byid(int id);
 
-uint process_load_executable(process_t *process, const char *executable);
+uint process_load_executable(process_t *process, const char *executable_path);
 void process_create_main_thread(process_t* process, void* entry, const char **argv);
 void process_create_thread(process_t* process, void* entry, void* arg, bool user);
 void process_setready(process_t* process);
@@ -63,6 +63,8 @@ uint process_memory_map(process_t* process, uint addr, uint pagecount);
 uint process_memory_alloc(process_t* process, uint pagecount);
 void process_memory_free(process_t* process, uint addr, uint pagecount);
 void process_memory_copyout(process_t* process, void* src, void* dest, uint size);
+
+/* --- Files descriptors ---------------------------------------------------- */
 
 int process_fildes_alloc(process_t* process);
 void process_fildes_set_stream(process_t* process, int fd, stream_t* stream);

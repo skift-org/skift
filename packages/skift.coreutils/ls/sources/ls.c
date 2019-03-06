@@ -7,6 +7,7 @@
 
 static bool option_all = false;
 static bool option_list = false;
+static bool option_color = false;
 
 static const char *usages[] = 
 {
@@ -36,6 +37,14 @@ static cmdline_option_t options[] =
         .help = "Long listing mode."
     },
 
+    {
+        .type = CMDLINE_BOOLEAN, 
+        .long_name = "color", 
+        .short_name = 'c', 
+        .value = &option_color, 
+        .help = "Enable colored output."
+    },
+
     CMDLINE_OPT_END
 };
 
@@ -57,7 +66,7 @@ void ls_print_entry(directory_entry_t *entry)
     }
 
     if (option_all || entry->name[0] != '.')
-        printf("%s  ", entry->name);
+        printf((entry->type == FSDIRECTORY && option_color)? "\e[1m%s  \e[0m" : "%s  ", entry->name);
 
     if (option_list)
     {

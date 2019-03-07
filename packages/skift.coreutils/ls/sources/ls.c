@@ -20,7 +20,7 @@ static const char *usages[] =
 static cmdline_option_t options[] = 
 {
     CMDLINE_OPT_HELP,
-
+    
     {
         .type = CMDLINE_BOOLEAN, 
         .long_name = "all", 

@@ -469,48 +469,61 @@ stream_t *filesystem_open(const char *path, fsoflags_t flags)
 
 void filesystem_close(stream_t *s)
 {
-    fsnode_type_t type = s->node->type;
-
-    filesystem_release(s->node);
-
-    if (type == FSDIRECTORY)
+    if (s != NULL)
     {
-        free(s->direntries.entries);
-    }
+        fsnode_type_t type = s->node->type;
 
-    stream_delete(s);
+        filesystem_release(s->node);
+
+        if (type == FSDIRECTORY)
+        {
+            free(s->direntries.entries);
+        }
+
+        stream_delete(s);
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+    }
 }
 
 int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
-
-    if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
+    if (s != NULL)
     {
-        switch (s->node->type)
+        if (s->flags & OPENOPT_READ || s->flags & OPENOPT_READWRITE)
         {
-        case FSFILE:
-            result = file_read(s, buffer, size);
+            switch (s->node->type)
+            {
+            case FSFILE:
+                result = file_read(s, buffer, size);
+                break;
+
+            case FSDEVICE:
+            {
+                device_t *dev = &s->node->device;
+
+                if (dev->read != NULL)
+                {
+                    result = dev->read(s, size, buffer);
+                }
+            }
             break;
 
-        case FSDEVICE:
-        {
-            device_t *dev = &s->node->device;
+            case FSDIRECTORY:
+                result = directory_read(s, buffer, size);
+                break;
 
-            if (dev->read != NULL)
-            {
-                result = dev->read(s, size, buffer);
+            default:
+                break;
             }
         }
-        break;
-
-        case FSDIRECTORY:
-            result = directory_read(s, buffer, size);
-            break;
-
-        default:
-            break;
-        }
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
     }
 
     return result;
@@ -518,40 +531,55 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 
 void *filesystem_readall(stream_t *s)
 {
-    file_stat_t stat = {0};
-    filesystem_fstat(s, &stat);
-    void *buffer = malloc(stat.size);
-    filesystem_read(s, buffer, stat.size);
+    if (s != NULL)
+    {
+        file_stat_t stat = {0};
+        filesystem_fstat(s, &stat);
+        void *buffer = malloc(stat.size);
+        filesystem_read(s, buffer, stat.size);
 
-    return buffer;
+        return buffer;
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+        return NULL;
+    }
 }
 
 int filesystem_write(stream_t *s, void *buffer, uint size)
 {
     int result = -1;
 
-    if ((s->flags & OPENOPT_WRITE) || (s->flags & OPENOPT_READWRITE))
+    if (s != NULL)
     {
-        switch (s->node->type)
+        if ((s->flags & OPENOPT_WRITE) || (s->flags & OPENOPT_READWRITE))
         {
-        case FSFILE:
-            result = file_write(s, buffer, size);
-            break;
-
-        case FSDEVICE:
-        {
-            device_t *dev = &s->node->device;
-
-            if (dev->read != NULL)
+            switch (s->node->type)
             {
-                result = dev->write(s, size, buffer);
-            }
+            case FSFILE:
+                result = file_write(s, buffer, size);
+                break;
 
-            break;
+            case FSDEVICE:
+            {
+                device_t *dev = &s->node->device;
+
+                if (dev->read != NULL)
+                {
+                    result = dev->write(s, size, buffer);
+                }
+
+                break;
+            }
+            default:
+                break;
+            }
         }
-        default:
-            break;
-        }
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
     }
 
     return result;
@@ -559,58 +587,82 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 
 int filesystem_fstat(stream_t *s, file_stat_t *stat)
 {
-    stat->type = s->node->type;
-    stat->size = 0;
-
-    if (s->node->type == FSFILE)
+    if (s != NULL)
     {
-        file_stat(s->node, stat);
-    }
+        stat->type = s->node->type;
+        stat->size = 0;
 
-    return 0;
+        if (s->node->type == FSFILE)
+        {
+            file_stat(s->node, stat);
+        }
+
+        return 0;
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+        return 1;
+    }
 }
 
 int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
 {
-    switch (origine)
+    if (s != NULL)
     {
-    case SEEKFROM_START:
-        s->offset = offset;
-        break;
-
-    case SEEKFROM_HERE:
-        s->offset += offset;
-        break;
-
-    case SEEKFROM_END:
-        if (s->node->type == FSFILE)
+        switch (origine)
         {
-            sk_lock_acquire(s->node->lock);
-            s->offset = s->node->file.size + offset;
-            sk_lock_release(s->node->lock);
-        }
-        else if (s->node->type == FSDIRECTORY)
-        {
-            s->offset = s->direntries.count * sizeof(directory_entry_t) + offset;
-        }
-        else
-        {
-            // TODO: We don't support seeking for devices, now.
-            // But this is going to be usefull for block devices.
+        case SEEKFROM_START:
             s->offset = offset;
+            break;
+
+        case SEEKFROM_HERE:
+            s->offset += offset;
+            break;
+
+        case SEEKFROM_END:
+            if (s->node->type == FSFILE)
+            {
+                sk_lock_acquire(s->node->lock);
+                s->offset = s->node->file.size + offset;
+                sk_lock_release(s->node->lock);
+            }
+            else if (s->node->type == FSDIRECTORY)
+            {
+                s->offset = s->direntries.count * sizeof(directory_entry_t) + offset;
+            }
+            else
+            {
+                // TODO: We don't support seeking for devices, now.
+                // But this is going to be usefull for block devices.
+                s->offset = offset;
+            }
+            break;
+
+        default:
+            break;
         }
-        break;
 
-    default:
-        break;
+        return s->offset;
     }
-
-    return s->offset;
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+        return -1;
+    }
 }
 
 int filesystem_tell(stream_t *s)
 {
-    return s->offset;
+    if (s != NULL)
+    {
+        return s->offset;
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+        return -1;
+    }
 }
 
 int filesystem_mkdir(const char *path)

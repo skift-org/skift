@@ -14,12 +14,18 @@
 
 static void wait_read()
 {
-    while ((inb(PORT_COM1 + 5) & 1) == 0);
+    while ((inb(PORT_COM1 + 5) & 1) == 0)
+    {
+        // do nothing
+    }
 }
 
 static void wait_write()
 {
-    while ((inb(PORT_COM1 + 5) & 0x20) == 0);
+    while ((inb(PORT_COM1 + 5) & 0x20) == 0)
+    {
+        // do nothing
+    }
 }
 
 /* --- Device driver -------------------------------------------------------- */
@@ -38,11 +44,6 @@ static int serial_device_read(stream_t *s, void *buffer, uint size)
     return serial_read(buffer, size);
 }
 
-static device_t serial_device = {
-    .read = serial_device_read,
-    .write = serial_device_write,
-    .p = NULL
-};
 
 /* --- Public functions ----------------------------------------------------- */
 
@@ -57,10 +58,13 @@ void serial_setup()
     outb(PORT_COM1 + 2, 0xC7);
     outb(PORT_COM1 + 4, 0x0B);
 
-    if (filesystem_mkdev("/Devices/serial", serial_device))
+    device_t serial_device = 
     {
-        PANIC("Failled to create the 'serial' device.");
-    }
+        .read = serial_device_read,
+        .write = serial_device_write,
+    };
+
+    FILESYSTEM_MKDEV("serial", serial_device);
 }
 
 char serial_getc()
@@ -92,7 +96,7 @@ int serial_read(char *buffer, uint size)
 
 int serial_write(const char *buffer, uint size)
 {
-    for(uint i = 0; i < size; i++)
+    for (uint i = 0; i < size; i++)
     {
         serial_putc(buffer[i]);
     }

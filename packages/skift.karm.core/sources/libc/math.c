@@ -369,7 +369,6 @@ static double sin_table[] =
     0.0
 };
 
-
 int abs(int value)
 {
     return value < 0 ? -value : value;
@@ -377,16 +376,16 @@ int abs(int value)
 
 double floor(double x)
 {
-	if (x > -1.0 && x < 1.0)
+    if (x > -1.0 && x < 1.0)
     {
         return x >= 0 ? 0.0 : -1.0;
-	}
+    }
 
-	if (x < 0) 
+    if (x < 0)
     {
-		int x_i = x;
-		return (double)(x_i - 1);
-	} 
+        int x_i = x;
+        return (double)(x_i - 1);
+    }
 
     int x_i = x;
     return (double)x_i;
@@ -399,33 +398,33 @@ double fabs(double value)
 
 double fmod(double left, double right)
 {
-	if (left >= 0.0) 
+    if (left >= 0.0)
     {
-		while (left > right) 
+        while (left > right)
         {
-			left -= right;
-		}
-		
+            left -= right;
+        }
+
         return left;
-	} 
-    else 
+    }
+    else
     {
-		return 0.0;
-	}
+        return 0.0;
+    }
 }
 
 double sin(double value)
 {
-	if (value < 0.0)
+    if (value < 0.0)
     {
-		value += PI * 2.0 * 100.0;
-	}
+        value += PI * 2.0 * 100.0;
+    }
 
-	double z = fmod(value, PI * 2.0);
+    double z = fmod(value, PI * 2.0);
 
-	int i = z * 360.0 / (3.141582654 * 2.0);
+    int i = z * 360.0 / (PI * 2.0);
 
-	return sin_table[i];
+    return sin_table[i];
 }
 
 double cos(double value)

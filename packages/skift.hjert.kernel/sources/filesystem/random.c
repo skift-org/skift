@@ -35,19 +35,17 @@ int random_device_write(stream_t *s, void *buffer, uint size)
     UNUSED(s);
     UNUSED(buffer);
     UNUSED(size);
+    
     return 0;
 }
 
-static device_t random_device = {
-    .read = random_device_read,
-    .write = random_device_write,
-    .p = NULL
-};
 
 void random_setup(void)
 {
-    if (filesystem_mkdev("/Devices/random", random_device))
-    {
-        PANIC("Failled to create the 'random' device.");
-    }
+    device_t random_device = {
+        .read = random_device_read,
+        .write = random_device_write,
+    };
+
+    FILESYSTEM_MKDEV("random", random_device);
 }

@@ -7,7 +7,7 @@
 #include "kernel/system.h"
 #include "kernel/filesystem.h"
 
-int null_read(stream_t *s, void *buffer, uint size)
+int null_device_read(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
     UNUSED(size);
@@ -16,7 +16,7 @@ int null_read(stream_t *s, void *buffer, uint size)
     return 0;
 }
 
-int null_write(stream_t *s, void *buffer, uint size)
+int null_device_write(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
     UNUSED(buffer);
@@ -24,12 +24,15 @@ int null_write(stream_t *s, void *buffer, uint size)
     return size;
 }
 
-static device_t null;
-
 void null_setup(void)
 {
-    null = (device_t){null_read, null_write, NULL};
-    if (filesystem_mkdev("/Devices/null", null))
+    device_t null_device = 
+    {
+        .read = null_device_read,
+        .write = null_device_write
+    };
+
+    if (filesystem_mkdev("/Devices/null", null_device))
     {
         PANIC("Failled to create the 'null' device.");
     }

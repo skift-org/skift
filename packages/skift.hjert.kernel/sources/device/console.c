@@ -60,9 +60,32 @@ static void cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
     vga_cursor(cur->x, cur->y);
 }
 
+/* --- Device driver -------------------------------------------------------- */
+
+static int console_device_read(stream_t* stream, void* buffer, uint size)
+{
+
+}
+
+static int console_device_write(stream_t* stream, void* buffer, uint size)
+{
+    vtconsole_write(vtc, buffer, size);
+    return size;
+}
+
+/* --- Public functions ----------------------------------------------------- */
+
 void console_setup(void)
 {
+    device_t console_device = 
+    {
+        .read = console_device_read,
+        .write = console_device_write,
+    };
+
     vtc = vtconsole(VGA_SCREEN_WIDTH, VGA_SCREEN_HEIGHT, paint_callback, cursor_move_callback);
+    
+    FILESYSTEM_MKDEV("console", console_device);
 }
 
 void console_print(const char *s)

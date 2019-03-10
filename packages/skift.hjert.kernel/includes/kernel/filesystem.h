@@ -100,3 +100,10 @@ int filesystem_mkdev(const char *path, device_t dev);
 int filesystem_mkdir(const char *path);
 
 int filesystem_rm(const char *path);
+
+// *filesystem_mkdev* with error checking.
+#define FILESYSTEM_MKDEV(__name, __object)                   \
+    if (filesystem_mkdev("/Devices/" __name, (__object)))    \
+    {                                                        \
+        PANIC("Failled to create the '" __name "' device."); \
+    }

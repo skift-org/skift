@@ -12,11 +12,11 @@
 
 #include "kernel/mouse.h"
 
-mouse_state_t oldmouse;
+static mouse_state_t oldmouse = {0};
 
 /* --- Private functions ---------------------------------------------------- */
 
-void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
+static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
 {
     //TODO: Scroll whell not suported yet
     UNUSED(packet3);
@@ -54,7 +54,7 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
 
     if (newmouse.scroll != 0)
     {
-        mouse_scroll_event_t event = { .off = newmouse.scroll };
+        mouse_scroll_event_t event = {.off = newmouse.scroll};
         messaging_broadcast(MOUSE_CHANNEL, MOUSE_SCROLL, &event, sizeof(mouse_scroll_event_t), 0);
     }
 
@@ -62,12 +62,12 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     {
         if (oldmouse.left == false)
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
@@ -76,12 +76,12 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     {
         if (oldmouse.right == false)
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
@@ -90,12 +90,12 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     {
         if (oldmouse.middle == false)
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
         }
         else
         {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE };
+            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE};
             messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
         }
     }
@@ -103,8 +103,9 @@ void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte pack
     oldmouse = newmouse;
 }
 
-uchar cycle = 0;
-ubyte packet[4];
+static uchar cycle = 0;
+static ubyte packet[4];
+
 reg32_t mouse_irq(reg32_t esp, processor_context_t *context)
 {
     UNUSED(context);
@@ -135,10 +136,10 @@ reg32_t mouse_irq(reg32_t esp, processor_context_t *context)
 
 static inline void mouse_wait(uchar a_type) //unsigned char
 {
-    uint _time_out = 100000; //unsigned int
+    uint time_out = 100000;
     if (a_type == 0)
     {
-        while (_time_out--) //Data
+        while (time_out--)
         {
             if ((inb(0x64) & 1) == 1)
             {
@@ -149,7 +150,7 @@ static inline void mouse_wait(uchar a_type) //unsigned char
     }
     else
     {
-        while (_time_out--) //Signal
+        while (time_out--)
         {
             if ((inb(0x64) & 2) == 0)
             {
@@ -172,7 +173,7 @@ static inline void mouse_write(uchar a_write) //unsigned char
     outb(0x60, a_write);
 }
 
-static inline uchar mouse_read()
+static inline uchar mouse_read(void)
 {
     //Get's response from mouse
     mouse_wait(0);
@@ -181,15 +182,15 @@ static inline uchar mouse_read()
 
 /* --- Public functions ----------------------------------------------------- */
 
-void mouse_setup()
+void mouse_setup(void)
 {
-    uchar _status; //unsigned char
+    uchar _status;
 
-    //Enable the auxiliary mouse device
+    // Enable the auxiliary mouse device
     mouse_wait(1);
     outb(0x64, 0xA8);
 
-    //Enable the interrupts
+    // Enable the interrupts
     mouse_wait(1);
     outb(0x64, 0x20);
     mouse_wait(0);
@@ -199,17 +200,17 @@ void mouse_setup()
     mouse_wait(1);
     outb(0x60, _status);
 
-    //Tell the mouse to use default settings
+    // Tell the mouse to use default settings
     mouse_write(0xF6);
     mouse_read(); //Acknowledge
 
-    //Enable the mouse
+    // Enable the mouse
     mouse_write(0xF4);
     mouse_read(); //Acknowledge
 
     // try to enable mouse whell
     // TODO
 
-    //Setup the mouse handler
+    // Setup the mouse handler
     irq_register(12, mouse_irq);
 }

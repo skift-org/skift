@@ -8,14 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
  - More witty comments to the kerne panic screen
- - argparser helper to framework
- - `all, color, list, help` options to `ls`
+ - Command line argument parser to framework
+ - `all, color, list` and `help` options to `ls`
 
 ## Fixed
- - `\t` now behaves as espected.
- - `sk_filesystem_read` was woking only once on regular files.
+ - `\t` does't behaves as espected in the terminal
+ - `sk_filesystem_read` was woking only once on regular files
  - `ls folder0 folder1 folder2` syntaxe wasn't working properly
- - It was possible to create several files with the same name in the same directory.
+ - #15 It was possible to create several files with the same name in the same directory
+ - #16 Page fault when reading from a invalid file descriptor
 
 # v0.1.0 
  - Initial release

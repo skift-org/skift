@@ -51,6 +51,12 @@ fsnode_t *fsnode(const char *name, fsnode_type_t type)
         dir->childs = list();
         break;
     }
+    case FSFIFO:
+    {
+        fifo_t *fifo = &node->fifo;
+        fifo->buffer = ringbuffer(4096);
+        break;
+    }
     default:
         break;
     }
@@ -65,10 +71,12 @@ void fsnode_delete(fsnode_t *node)
     switch (node->type)
     {
     case FSFILE:
+    {
         free(node->file.buffer);
         break;
-
+    }
     case FSDIRECTORY:
+    {
         FOREACH(item, node->directory.childs)
         {
             fsnode_t *n = item->value;
@@ -83,7 +91,12 @@ void fsnode_delete(fsnode_t *node)
 
         list_delete(node->directory.childs);
         break;
-
+    }
+    case FSFIFO:
+    {
+        ringbuffer_delete(node->fifo.buffer);
+        break;
+    }
     default:
         break;
     }
@@ -498,8 +511,10 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
             switch (s->node->type)
             {
             case FSFILE:
+            {
                 result = file_read(s, buffer, size);
                 break;
+            }
 
             case FSDEVICE:
             {
@@ -509,12 +524,23 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
                 {
                     result = dev->read(s, buffer, size);
                 }
+
+                break;
             }
-            break;
 
             case FSDIRECTORY:
+            {
                 result = directory_read(s, buffer, size);
+
                 break;
+            }
+
+            case FSFIFO:
+            {
+                result = ringbuffer_read(s->node->fifo.buffer, buffer, size);
+
+                break;
+            }
 
             default:
                 break;
@@ -558,8 +584,11 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
             switch (s->node->type)
             {
             case FSFILE:
+            {
                 result = file_write(s, buffer, size);
+
                 break;
+            }
 
             case FSDEVICE:
             {
@@ -572,6 +601,14 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 
                 break;
             }
+
+            case FSFIFO:
+            {
+                result = ringbuffer_write(s->node->fifo.buffer, buffer, size);
+
+                break;
+            }
+
             default:
                 break;
             }

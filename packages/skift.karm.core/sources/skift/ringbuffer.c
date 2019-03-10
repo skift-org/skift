@@ -26,32 +26,42 @@ void ringbuffer_delete(ringbuffer_t *rb)
     free(rb);
 }
 
-bool ringbuffer_write(ringbuffer_t *rb, byte c)
+int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size)
+{
+
+}
+
+int ringbuffer_write(ringbuffer_t *rb, void* buffer, uint size)
+{
+
+}
+
+int ringbuffer_putc(ringbuffer_t *rb, int c)
 {
     uint index = (rb->head + 1) % rb->size;
 
     if (index == rb->tail)
     {
-        return false;
+        return -1;
     }
 
-    rb->buffer[index] = c;
+    rb->buffer[index] = (uchar)c;
     rb->head = index;
 
-    return true;
+    return (uchar)c;
 }
 
-bool ringbuffer_read(ringbuffer_t *rb, byte *c)
+int ringbuffer_getc(ringbuffer_t *rb)
 {
     if (rb->head != rb->tail)
     {
         uint index = (rb->head + 1) % rb->size;
 
-        *c = rb->buffer[index];
+        int c = rb->buffer[index];
         rb->tail = index;
 
-        return true;
+        return c;
     }
 
-    return false;
+    return -1;
 }

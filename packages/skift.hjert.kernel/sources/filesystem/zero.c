@@ -7,7 +7,7 @@
 #include "kernel/system.h"
 #include "kernel/filesystem.h"
 
-int zero_read(stream_t *s, uint size, void *buffer)
+int zero_read(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
 
@@ -16,7 +16,7 @@ int zero_read(stream_t *s, uint size, void *buffer)
     return size;
 }
 
-int zero_write(stream_t *s, uint size, void *buffer)
+int zero_write(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
     UNUSED(buffer);

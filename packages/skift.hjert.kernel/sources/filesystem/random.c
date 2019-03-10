@@ -9,7 +9,7 @@
 
 static int state = 1411743402;
 
-int random_read(stream_t *s, uint size, void *buffer)
+int random_device_read(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
 
@@ -30,19 +30,23 @@ int random_read(stream_t *s, uint size, void *buffer)
     return size;
 }
 
-int random_write(stream_t *s, uint size, void *buffer)
+int random_device_write(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
     UNUSED(buffer);
-    return size;
+    UNUSED(size);
+    return 0;
 }
 
-static device_t random;
+static device_t random_device = {
+    .read = random_device_read,
+    .write = random_device_write,
+    .p = NULL
+};
 
 void random_setup(void)
 {
-    random = (device_t){random_read, random_write, NULL};
-    if (filesystem_mkdev("/Devices/random", random))
+    if (filesystem_mkdev("/Devices/random", random_device))
     {
         PANIC("Failled to create the 'random' device.");
     }

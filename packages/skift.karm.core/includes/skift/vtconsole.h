@@ -84,4 +84,4 @@ vtconsole_t* vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_
 void vtconsole_delete(vtconsole_t *c);
 
 void vtconsole_putchar(vtconsole_t *vtc, char c);
-void vtconsole_write(vtconsole_t *vtc, const char *buffer);
+void vtconsole_write(vtconsole_t *vtc, const char *buffer, uint size);

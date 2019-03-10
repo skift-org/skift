@@ -15,8 +15,8 @@
 struct fsnode;
 struct stream;
 
-typedef int (*fsop_read_t)(struct stream *s, uint size, void *buffer);
-typedef int (*fsop_write_t)(struct stream *s, uint size, void *buffer);
+typedef int (*fsop_read_t)(struct stream *s, void *buffer, uint size);
+typedef int (*fsop_write_t)(struct stream *s, void *buffer, uint size);
 
 typedef struct
 {

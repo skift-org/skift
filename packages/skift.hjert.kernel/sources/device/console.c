@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <string.h>
+
 #include <skift/logger.h>
 #include <skift/drawing.h>
 #include <skift/atomic.h>
@@ -69,7 +71,7 @@ void console_print(const char *s)
 
     if (vtc != NULL)
     {
-        vtconsole_write(vtc, s);
+        vtconsole_write(vtc, s, strlen(s));
     }
 
     sk_atomic_end();

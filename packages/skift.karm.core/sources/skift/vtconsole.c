@@ -380,10 +380,10 @@ void vtconsole_putchar(vtconsole_t *vtc, char c)
     vtconsole_process(vtc, c);
 }
 
-void vtconsole_write(vtconsole_t *vtc, const char *buffer)
+void vtconsole_write(vtconsole_t *vtc, const char *buffer, uint size)
 {
-    for (int i = 0; buffer[i]; i++)
+    for (uint i = 0; i < size; i++)
     {
-        vtconsole_putchar(vtc, buffer[i]);
+        vtconsole_process(vtc, buffer[i]);
     }
 }

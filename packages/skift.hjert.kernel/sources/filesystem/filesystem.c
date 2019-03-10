@@ -507,7 +507,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 
                 if (dev->read != NULL)
                 {
-                    result = dev->read(s, size, buffer);
+                    result = dev->read(s, buffer, size);
                 }
             }
             break;
@@ -567,7 +567,7 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 
                 if (dev->read != NULL)
                 {
-                    result = dev->write(s, size, buffer);
+                    result = dev->write(s, buffer, size);
                 }
 
                 break;

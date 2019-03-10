@@ -8,7 +8,9 @@
 
 void serial_setup();
 
-void serial_putc(char c);
 char serial_getc();
-void serial_writeln(const char *str);
-void serial_read(char *buffer, int size);
+void serial_putc(char c);
+
+int serial_read(char *buffer, uint size);
+int serial_write(const char *buffer, uint size);
+int serial_writeln(const char *str);

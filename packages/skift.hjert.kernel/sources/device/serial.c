@@ -10,58 +10,103 @@
 
 #include "kernel/serial.h"
 
-#define PORT 0x3f8
+#define PORT_COM1 0x3f8
+
+static void wait_read()
+{
+    while ((inb(PORT_COM1 + 5) & 1) == 0);
+}
+
+static void wait_write()
+{
+    while ((inb(PORT_COM1 + 5) & 0x20) == 0);
+}
+
+/* --- Device driver -------------------------------------------------------- */
+
+static int serial_device_write(stream_t *s, void *buffer, uint size)
+{
+    UNUSED(s);
+
+    return serial_write(buffer, size);
+}
+
+static int serial_device_read(stream_t *s, void *buffer, uint size)
+{
+    UNUSED(s);
+
+    return serial_read(buffer, size);
+}
+
+static device_t serial_device = {
+    .read = serial_device_read,
+    .write = serial_device_write,
+    .p = NULL
+};
+
+/* --- Public functions ----------------------------------------------------- */
 
 void serial_setup()
 {
     // See: https://wiki.osdev.org/Serial_Ports
-    outb(PORT + 1, 0x00);
-    outb(PORT + 3, 0x80);
-    outb(PORT + 0, 0x03);
-    outb(PORT + 1, 0x00);
-    outb(PORT + 3, 0x03);
-    outb(PORT + 2, 0xC7);
-    outb(PORT + 4, 0x0B);
+    outb(PORT_COM1 + 1, 0x00);
+    outb(PORT_COM1 + 3, 0x80);
+    outb(PORT_COM1 + 0, 0x03);
+    outb(PORT_COM1 + 1, 0x00);
+    outb(PORT_COM1 + 3, 0x03);
+    outb(PORT_COM1 + 2, 0xC7);
+    outb(PORT_COM1 + 4, 0x0B);
 
-    if (filesystem_mkdev("/Devices/serial", (device_t){0}))
+    if (filesystem_mkdev("/Devices/serial", serial_device))
     {
         PANIC("Failled to create the 'serial' device.");
     }
 }
 
-void wait_read()
-{
-    while ((inb(PORT + 5) & 1) == 0)
-        ;
-}
-
-void wait_write()
-{
-    while ((inb(PORT + 5) & 0x20) == 0)
-        ;
-}
-
 char serial_getc()
 {
     wait_read();
-    return inb(PORT);
+    return inb(PORT_COM1);
 }
 
 void serial_putc(char c)
 {
     wait_write();
-    outb(PORT, c);
+    outb(PORT_COM1, c);
 }
 
-void serial_read(char *buffer, int size)
+int serial_read(char *buffer, uint size)
 {
-    STUB(buffer, size);
+    for (uint i = 0; i < size; i++)
+    {
+        buffer[i] = serial_getc();
+
+        if (buffer[i] == '\n')
+        {
+            return i + 1;
+        }
+    }
+
+    return size;
 }
 
-void serial_writeln(const char *str)
+int serial_write(const char *buffer, uint size)
 {
+    for(uint i = 0; i < size; i++)
+    {
+        serial_putc(buffer[i]);
+    }
+
+    return size;
+}
+
+int serial_writeln(const char *str)
+{
+    int n = 0;
     for (int i = 0; str[i]; i++)
     {
         serial_putc(str[i]);
+        n++;
     }
+    return n;
 }

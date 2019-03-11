@@ -83,5 +83,9 @@ typedef struct vtconsole
 vtconsole_t* vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move);
 void vtconsole_delete(vtconsole_t *c);
 
+void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy);
+void vtconsole_scroll(vtconsole_t *vtc);
+void vtconsole_newline(vtconsole_t *vtc);
+
 void vtconsole_putchar(vtconsole_t *vtc, char c);
 void vtconsole_write(vtconsole_t *vtc, const char *buffer, uint size);

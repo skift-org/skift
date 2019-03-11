@@ -28,12 +28,22 @@ void ringbuffer_delete(ringbuffer_t *rb)
 
 int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size)
 {
+    UNUSED(rb);
+    UNUSED(buffer);
+    UNUSED(size);
 
+    // TODO
+    return -1;
 }
 
 int ringbuffer_write(ringbuffer_t *rb, void* buffer, uint size)
 {
+    UNUSED(rb);
+    UNUSED(buffer);
+    UNUSED(size);
 
+    // TODO
+    return -1;    
 }
 
 int ringbuffer_putc(ringbuffer_t *rb, int c)

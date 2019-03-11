@@ -11,6 +11,7 @@
 #include <skift/ringbuffer.h>
 
 #include "kernel/shared/filesystem.h"
+#include "kernel/system.h"
 
 struct fsnode;
 struct stream;

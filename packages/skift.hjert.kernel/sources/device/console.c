@@ -64,12 +64,19 @@ static void cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 
 static int console_device_read(stream_t* stream, void* buffer, uint size)
 {
+    UNUSED(stream);
+    UNUSED(buffer);
+    UNUSED(size);
 
+    return -1;
 }
 
 static int console_device_write(stream_t* stream, void* buffer, uint size)
 {
+    UNUSED(stream);
+
     vtconsole_write(vtc, buffer, size);
+    
     return size;
 }
 

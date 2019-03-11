@@ -48,14 +48,19 @@ u32 *bga_get_framebuffer()
     u32 *lfb = 0;
     u32 *text_vid_mem = (u32 *)0xA0000;
     text_vid_mem[0] = 0xA5ADFACE;
+    text_vid_mem[1] = 0x12345678;
+    text_vid_mem[2] = 0xABCDEF00;
 
     for (u32 fb_offset = 0xE0000000; fb_offset < 0xFF000000; fb_offset += 0x01000000)
     {
-
         /* Go find it */
         for (u32 x = fb_offset; x < fb_offset + 0xFF0000; x += 0x1000)
         {
-            if (((u32 *)x)[0] == 0xA5ADFACE)
+            u32* maybe_framebuffer = (u32*)x;
+
+            if (maybe_framebuffer[0] == 0xA5ADFACE &&
+                maybe_framebuffer[1] == 0x12345678 &&
+                maybe_framebuffer[2] == 0xABCDEF00)
             {
                 lfb = (u32 *)x;
             }

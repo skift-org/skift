@@ -22,17 +22,7 @@ vtconsole_t *vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_
     vtc->on_paint = on_paint;
     vtc->on_move = on_move;
 
-    for (int i = 0; i < width * height; i++)
-    {
-        vtcell_t *cell = &vtc->buffer[i];
-        cell->c = ' ';
-        cell->attr = VTC_DEFAULT_ATTR;
-
-        if (vtc->on_paint)
-        {
-            vtc->on_paint(vtc, cell, i % vtc->width, i / vtc->width);
-        }
-    }
+    vtconsole_clear(vtc, 0, 0, width, height - 1);
 
     return vtc;
 }
@@ -45,7 +35,6 @@ void vtconsole_delete(vtconsole_t *vtc)
 
 /* --- Internal methodes ---------------------------------------------------- */
 
-// Clear the console buffer.
 void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy)
 {
     for (int i = fromx + fromy * vtc->width; i < tox + toy * vtc->width; i++)
@@ -62,10 +51,9 @@ void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy)
     }
 }
 
-// Scroll the console
 void vtconsole_scroll(vtconsole_t *vtc)
 {
-    // Scroll the screen
+    // Scroll the screen.
     for (int i = 0; i < ((vtc->width * vtc->height) - vtc->width); i++)
     {
         vtc->buffer[i] = vtc->buffer[i + vtc->width];
@@ -89,6 +77,7 @@ void vtconsole_scroll(vtconsole_t *vtc)
         }
     }
 
+    // Move the cursor up a line.
     if (vtc->cursor.y > 0)
     {
         vtc->cursor.y--;

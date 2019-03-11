@@ -20,6 +20,13 @@
 
 static fsnode_t *root = NULL;
 static lock_t fslock;
+static bool filesystem_ready = false;
+
+#define IS_FS_READY                                                    \
+    if (!filesystem_ready)                                             \
+    {                                                                  \
+        PANIC("Trying to use the file system before initialization."); \
+    }
 
 /* --- Fsnode --------------------------------------------------------------- */
 
@@ -328,6 +335,8 @@ void filesystem_setup()
     sk_lock_init(fslock);
     root = fsnode("ROOT", FSDIRECTORY);
     root->refcount++;
+
+    filesystem_ready = true;
 }
 
 fsnode_t *filesystem_resolve(const char *path)
@@ -456,6 +465,8 @@ void filesystem_dump(void)
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
 stream_t *filesystem_open(const char *path, fsoflags_t flags)
 {
+    IS_FS_READY;
+
     fsnode_t *node = filesystem_acquire(path, OPEN_OPTION(OPENOPT_CREATE));
 
     if (node == NULL)
@@ -482,6 +493,8 @@ stream_t *filesystem_open(const char *path, fsoflags_t flags)
 
 void filesystem_close(stream_t *s)
 {
+    IS_FS_READY;
+
     if (s != NULL)
     {
         fsnode_type_t type = s->node->type;
@@ -503,6 +516,8 @@ void filesystem_close(stream_t *s)
 
 int filesystem_read(stream_t *s, void *buffer, uint size)
 {
+    IS_FS_READY;
+
     int result = -1;
     if (s != NULL)
     {
@@ -557,6 +572,8 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 
 void *filesystem_readall(stream_t *s)
 {
+    IS_FS_READY;
+
     if (s != NULL)
     {
         file_stat_t stat = {0};
@@ -575,6 +592,8 @@ void *filesystem_readall(stream_t *s)
 
 int filesystem_write(stream_t *s, void *buffer, uint size)
 {
+    IS_FS_READY;
+
     int result = -1;
 
     if (s != NULL)
@@ -624,6 +643,8 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
 
 int filesystem_fstat(stream_t *s, file_stat_t *stat)
 {
+    IS_FS_READY;
+
     if (s != NULL)
     {
         stat->type = s->node->type;
@@ -645,6 +666,8 @@ int filesystem_fstat(stream_t *s, file_stat_t *stat)
 
 int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
 {
+    IS_FS_READY;
+
     if (s != NULL)
     {
         switch (origine)
@@ -670,7 +693,7 @@ int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
             }
             else
             {
-                // TODO: We don't support seeking for devices, now.
+                // TODO: We don't support seeking for devices.
                 // But this is going to be usefull for block devices.
                 s->offset = offset;
             }
@@ -691,6 +714,8 @@ int filesystem_seek(stream_t *s, int offset, seek_origin_t origine)
 
 int filesystem_tell(stream_t *s)
 {
+    IS_FS_READY;
+
     if (s != NULL)
     {
         return s->offset;
@@ -704,6 +729,8 @@ int filesystem_tell(stream_t *s)
 
 int filesystem_mkdir(const char *path)
 {
+    IS_FS_READY;
+
     int result = -1;
 
     sk_lock_acquire(fslock);
@@ -733,6 +760,8 @@ int filesystem_mkdir(const char *path)
 
 int filesystem_mkdev(const char *path, device_t dev)
 {
+    IS_FS_READY;
+
     int result = -1;
 
     sk_lock_acquire(fslock);
@@ -764,6 +793,8 @@ int filesystem_mkdev(const char *path, device_t dev)
 
 int filesystem_mkfile(const char *path)
 {
+    IS_FS_READY;
+
     int result = -1;
 
     sk_lock_acquire(fslock);
@@ -794,6 +825,8 @@ int filesystem_mkfile(const char *path)
 
 int filesystem_rm(const char *path)
 {
+    IS_FS_READY;
+
     int result = -1;
 
     sk_lock_acquire(fslock);

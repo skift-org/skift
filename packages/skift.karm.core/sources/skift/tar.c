@@ -26,8 +26,7 @@ typedef PACKED(struct)
     char devminor[8];   /* 337 */
     char prefix[155];   /* 345 */
                         /* 500 */
-}
-tar_rawblock_t;
+} tar_rawblock_t;
 
 uint get_file_size(tar_rawblock_t *header)
 {

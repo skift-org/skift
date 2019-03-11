@@ -18,6 +18,7 @@ struct stream;
 
 typedef int (*fsop_read_t)(struct stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct stream *s, void *buffer, uint size);
+typedef int (*fsop_ioctl_t)(struct stream *s, int request, void* args);
 
 typedef struct
 {
@@ -30,6 +31,7 @@ typedef struct
 {
     fsop_read_t read;
     fsop_write_t write;
+    fsop_ioctl_t ioctl;
 
     void *p;
 } device_t;
@@ -86,6 +88,8 @@ void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
 int filesystem_write(stream_t *s, void *buffer, uint size);
+
+int filesystem_ioctl(stream_t *s, int request, void* args);
 
 int filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
 int filesystem_tell(stream_t *s);

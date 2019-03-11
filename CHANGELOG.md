@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - More witty comments to the kerne panic screen
  - Command line argument parser to framework
  - `all, color, list` and `help` options to `ls`
+ - `filesystem_ioctl` juste for device file, but WIP
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal

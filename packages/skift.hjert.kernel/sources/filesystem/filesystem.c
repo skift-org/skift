@@ -641,6 +641,32 @@ int filesystem_write(stream_t *s, void *buffer, uint size)
     return result;
 }
 
+int filesystem_ioctl(stream_t *s, int request, void* args)
+{
+    IS_FS_READY;
+
+    int result = -1;
+
+    if (s != NULL)
+    {
+        if (s->node->type == FSDEVICE)
+        {
+            device_t* device = &s->node->device;
+
+            if (device->ioctl != NULL)
+            {
+                result = device->ioctl(s, request, args);
+            }
+        }
+    }
+    else
+    {
+        sk_log(LOG_WARNING, "Null stream passed");
+    }
+
+    return result;
+}
+
 int filesystem_fstat(stream_t *s, file_stat_t *stat)
 {
     IS_FS_READY;

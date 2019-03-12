@@ -13,12 +13,12 @@
 #include "kernel/shared/filesystem.h"
 #include "kernel/system.h"
 
-struct fsnode;
-struct stream;
+struct s_fsnode;
+struct s_stream;
 
-typedef int (*fsop_read_t)(struct stream *s, void *buffer, uint size);
-typedef int (*fsop_write_t)(struct stream *s, void *buffer, uint size);
-typedef int (*fsop_ioctl_t)(struct stream *s, int request, void* args);
+typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
+typedef int (*fsop_write_t)(struct s_stream *s, void *buffer, uint size);
+typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void* args);
 
 typedef struct
 {
@@ -36,6 +36,12 @@ typedef struct
     void *p;
 } device_t;
 
+typedef struct 
+{
+    char name[MAX_FILENAME_LENGHT];
+    struct s_fsnode* node;
+} directory_entry_t;
+
 typedef struct
 {
     list_t *childs;
@@ -46,7 +52,7 @@ typedef struct
     ringbuffer_t *buffer;
 } fifo_t;
 
-typedef struct fsnode
+typedef struct s_fsnode
 {
     char name[MAX_FILENAME_LENGHT];
     fsnode_type_t type;
@@ -68,7 +74,7 @@ typedef struct
     directory_entry_t *entries;
 } directory_entries_t;
 
-typedef struct stream
+typedef struct s_stream
 {
     fsnode_t *node;
     uint offset;

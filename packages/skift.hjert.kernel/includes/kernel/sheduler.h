@@ -6,5 +6,6 @@
 
 #include "kernel/thread.h"
 
+thread_t* sheduler_running_thread();
+
 void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process);
-thread_t* sheduler_thread_running();

@@ -9,7 +9,7 @@ static bool option_all = false;
 static bool option_list = false;
 static bool option_color = false;
 
-static const char *usages[] = 
+static const char *usages[] =
 {
     "ls",
     "ls FILES...",
@@ -20,38 +20,17 @@ static const char *usages[] =
 static cmdline_option_t options[] = 
 {
     CMDLINE_OPT_HELP,
-    
-    {
-        .type = CMDLINE_BOOLEAN, 
-        .long_name = "all", 
-        .short_name = 'a', 
-        .value = &option_all, 
-        .help = "Do not ignore entries starting with '.'."
-    },
 
-    {
-        .type = CMDLINE_BOOLEAN, 
-        .long_name = "list", 
-        .short_name = 'l', 
-        .value = &option_list, 
-        .help = "Long listing mode."
-    },
-
-    {
-        .type = CMDLINE_BOOLEAN, 
-        .long_name = "color", 
-        .short_name = 'c', 
-        .value = &option_color, 
-        .help = "Enable colored output."
-    },
+    CMDLINE_OPT_BOOL("all", 'a', option_all, "Do not ignore entries starting with '.'.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("list", 'l', option_list, "Long listing mode.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("color", 'c', option_color, "Enable colored output.", CMDLINE_NO_CALLBACK),
 
     CMDLINE_OPT_END
 };
 
 static cmdline_t cmdline = CMDLINE(usages, options, "List file and directory in the current working directory by default.", "Options can be combined.");
 
-const char* file_type_name[] = 
-{
+const char *file_type_name[] = {
     "file ",
     "dev  ",
     "dir  ",
@@ -66,7 +45,7 @@ void ls_print_entry(directory_entry_t *entry)
     }
 
     if (option_all || entry->name[0] != '.')
-        printf((entry->type == FSDIRECTORY && option_color)? "\e[1m%s  \e[0m" : "%s  ", entry->name);
+        printf((entry->type == FSDIRECTORY && option_color) ? "\e[1m%s  \e[0m" : "%s  ", entry->name);
 
     if (option_list)
     {
@@ -78,24 +57,35 @@ int ls(const char *path)
 {
     int dir = sk_filesystem_open(path, OPENOPT_READ);
 
-    if (dir == 0)
+    if (dir != 0)
     {
-        printf("Failed to open directory '%s'.\n", path);
-        return -1;
-    }
-    else
-    {
-        directory_entry_t entry;
+        file_stat_t state = {0};
+        sk_filesystem_fstat(dir, &state);
 
-        while (sk_filesystem_read(dir, &entry, sizeof(entry)) > 0)
+        if (state.type == FSDIRECTORY)
         {
-            ls_print_entry(&entry);
+            directory_entry_t entry;
+
+            while (sk_filesystem_read(dir, &entry, sizeof(entry)) > 0)
+            {
+                ls_print_entry(&entry);
+            }
+        }
+        else
+        {
+            printf(path);
         }
 
         printf("\n");
+
         sk_filesystem_close(dir);
 
         return 0;
+    }
+    else
+    {
+        printf("%s: file not found!\n", path);
+        return -1;
     }
 }
 

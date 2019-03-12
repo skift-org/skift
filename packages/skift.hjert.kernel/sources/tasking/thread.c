@@ -88,7 +88,7 @@ void thread_dumpall()
     sk_atomic_begin();
 
     printf("\n\tCurrent thread:");
-    thread_dump(sheduler_thread_running());
+    thread_dump(sheduler_running_thread());
 
     printf("\n");
 
@@ -97,7 +97,7 @@ void thread_dumpall()
     FOREACH(i, threads)
     {
         thread_t *t = i->value;
-        if (t != sheduler_thread_running() && t->state != THREADSTATE_NONE)
+        if (t != sheduler_running_thread() && t->state != THREADSTATE_NONE)
             thread_dump(t);
     }
 

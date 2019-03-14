@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `\t` does't behaves as espected in the terminal
  - `sk_filesystem_read` was woking only once on regular files
  - `ls folder0 folder1 folder2` syntaxe wasn't working properly
+ - `cat` was working on directory
+ - `ls` was cat'ing file when apply to regular files
+
  - #15 It was possible to create several files with the same name in the same directory
  - #16 Page fault when reading from a invalid file descriptor
 

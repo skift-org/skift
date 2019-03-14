@@ -28,7 +28,7 @@ static cmdline_option_t options[] =
     CMDLINE_OPT_END
 };
 
-static cmdline_t cmdline = CMDLINE(usages, options, "List file and directory in the current working directory by default.", "Options can be combined.");
+static cmdline_t cmdline = CMDLINE(usages, options, "List files and directories in the current working directory by default.", "Options can be combined.");
 
 const char *file_type_name[] = {
     "file ",
@@ -84,7 +84,7 @@ int ls(const char *path)
     }
     else
     {
-        printf("%s: file not found!\n", path);
+        printf("%s: no such file or directory\n", path);
         return -1;
     }
 }

@@ -4,20 +4,33 @@
 
 #include <skift/filesystem.h>
 
-int cat(const char* path)
+int cat(const char *path)
 {
     int fd = sk_filesystem_open(path, OPENOPT_READ);
 
-    int size;
-    byte buffer[1025] = {0};
-
-    while ((size = sk_filesystem_read(fd, &buffer, 1024)) > 0)
+    if (fd != 0)
     {
-        buffer[size] = '\0';
-        puts(buffer);
-    }
+        file_stat_t stat = {0};
+        sk_filesystem_fstat(fd, &stat);
 
-    sk_filesystem_close(fd);
+        if (stat.type == FSDIRECTORY)
+        {
+            printf("%s: is a directory\n", path);
+        }
+        else
+        {
+            int size;
+            byte buffer[1025] = {0};
+
+            while ((size = sk_filesystem_read(fd, &buffer, 1024)) > 0)
+            {
+                buffer[size] = '\0';
+                puts(buffer);
+            }
+        }
+
+        sk_filesystem_close(fd);
+    }
 
     return 0;
 }

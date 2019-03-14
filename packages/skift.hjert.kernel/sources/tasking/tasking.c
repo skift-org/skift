@@ -87,9 +87,6 @@ void thread_yield()
     asm("int $32");
 }
 
-#pragma GCC push_options
-#pragma GCC optimize("O0") // Look like gcc like to break this functions XD
-
 void thread_hold()
 {
     while (running->state != THREADSTATE_RUNNING)
@@ -97,8 +94,6 @@ void thread_hold()
         hlt();
     }
 }
-
-#pragma GCC pop_options
 
 THREAD thread_self()
 {

@@ -12,6 +12,7 @@
 
 #include "kernel/shared/filesystem.h"
 #include "kernel/system.h"
+#include "kernel/mutex.h"
 
 struct s_fsnode;
 struct s_stream;
@@ -36,11 +37,11 @@ typedef struct
     void *p;
 } device_t;
 
-typedef struct 
-{
-    char name[MAX_FILENAME_LENGHT];
-    struct s_fsnode* node;
-} directory_entry_t;
+// typedef struct 
+// {
+//     char name[MAX_FILENAME_LENGHT];
+//     struct s_fsnode* node;
+// } directory_entry_t;
 
 typedef struct
 {

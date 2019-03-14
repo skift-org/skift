@@ -1,0 +1,11 @@
+{
+    "name": "Hideo compositor and display server",
+    
+    "id": "hideo",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user",
+        "skift.karm.extra"
+    ]
+}

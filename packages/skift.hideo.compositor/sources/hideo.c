@@ -4,7 +4,7 @@
 
 static const char *usages[] = 
 {
-    "hideo",
+    "",
     NULL
 };
 
@@ -17,7 +17,7 @@ static cmdline_option_t options[] =
 
 static cmdline_t cmdline = CMDLINE(usages, options, "Start a new graphical session.", "Options can be combined.");
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 

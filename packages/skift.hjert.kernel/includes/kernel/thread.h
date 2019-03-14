@@ -7,6 +7,7 @@
 #include <skift/generic.h>
 #include <skift/list.h>
 
+#include "kernel/process.h"
 #include "kernel/protocol.h"
 #include "kernel/limits.h"
 

@@ -95,7 +95,7 @@ void main(multiboot_info_t *info, s32 magic)
 
     /* --- Devices ---------------------------------------------------------- */
     sk_log(LOG_INFO, "Mounting devices...");
-    filesystem_mkdir("/Devices");
+    filesystem_mkdir("/dev");
     setup(serial);
     setup(mouse);
     setup(keyboard);

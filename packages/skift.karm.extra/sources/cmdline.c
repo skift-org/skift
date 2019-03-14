@@ -88,7 +88,7 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
 
         for (int i = 0; cmdline->usages[i]; i++)
         {
-            printf("%s\n\t", cmdline->usages[i]);
+            printf("%s %s\n\t", cmdline->name, cmdline->usages[i]);
         }
 
         printf("\n");
@@ -133,6 +133,8 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
 
 int cmdline_parse(cmdline_t *cmdline, int argc, char **argv)
 {
+    cmdline->name = argv[0];
+
     // Parsing arguments
     for (int i = 1; i < argc; i++)
     {

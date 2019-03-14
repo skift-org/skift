@@ -52,7 +52,7 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror", "-Wno-unknown-pragmas"]
 LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-d", "guest_errors", "-sdl", "-m", "256M", "-serial", "mon:stdio"]
+QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio"]
 QEMUFLAGS_KVM   = QEMUFLAGS + ["-enable-kvm"]
 QEMUFLAGS_NOKVM = QEMUFLAGS
 
@@ -82,7 +82,7 @@ def COPY(src, dest):
     return dest
 
 def QEMU(disk):
-    if True or subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
+    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
             ERROR("Failed to start QEMU!")
             ABORT()

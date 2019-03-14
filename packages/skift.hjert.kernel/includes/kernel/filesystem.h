@@ -12,7 +12,6 @@
 
 #include "kernel/shared/filesystem.h"
 #include "kernel/system.h"
-#include "kernel/mutex.h"
 
 struct s_fsnode;
 struct s_stream;
@@ -115,7 +114,7 @@ int filesystem_rm(const char *path);
 
 // *filesystem_mkdev* with error checking.
 #define FILESYSTEM_MKDEV(__name, __object)                   \
-    if (filesystem_mkdev("/Devices/" __name, (__object)))    \
+    if (filesystem_mkdev("/dev/" __name, (__object)))    \
     {                                                        \
         PANIC("Failled to create the '" __name "' device."); \
     }

@@ -32,8 +32,5 @@ void null_setup(void)
         .write = null_device_write
     };
 
-    if (filesystem_mkdev("/Devices/null", null_device))
-    {
-        PANIC("Failled to create the 'null' device.");
-    }
+    FILESYSTEM_MKDEV("null", null_device);
 }

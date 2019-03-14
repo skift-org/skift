@@ -38,6 +38,7 @@ typedef struct s_cmdline_option
 
 typedef struct s_cmdline
 {
+    const char *name; 
     const char *const *usages;
     const char *prologue;
     cmdline_option_t *options;

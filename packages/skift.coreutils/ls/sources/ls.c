@@ -11,9 +11,9 @@ static bool option_color = false;
 
 static const char *usages[] =
 {
-    "ls",
-    "ls FILES...",
-    "ls OPTION... FILES...",
+    "",
+    "FILES...",
+    "OPTION... FILES...",
     NULL
 };
 

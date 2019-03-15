@@ -36,11 +36,11 @@ typedef struct
     void *p;
 } device_t;
 
-// typedef struct 
-// {
-//     char name[MAX_FILENAME_LENGHT];
-//     struct s_fsnode* node;
-// } directory_entry_t;
+typedef struct 
+{
+    char name[MAX_FILENAME_LENGHT];
+    struct s_fsnode* node;
+} fsdirectory_entry_t;
 
 typedef struct
 {

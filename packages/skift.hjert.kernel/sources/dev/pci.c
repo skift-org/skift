@@ -1,5 +1,5 @@
+#include "kernel/dev/pci.h"
 #include "kernel/filesystem.h"
-#include "kernel/pci.h"
 #include "kernel/processor.h"
 #include "kernel/system.h"
 #include <string.h>

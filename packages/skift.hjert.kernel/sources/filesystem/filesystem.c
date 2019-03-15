@@ -224,25 +224,29 @@ void file_stat(fsnode_t *node, file_stat_t *stat)
 
 #pragma region
 
+// only call this method if you old the directory lock.
 fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 {
-    sk_lock_acquire(dir->lock);
-
     FOREACH(i, dir->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
         if (strcmp(child, entry->name) == 0)
         {
-            sk_lock_release(dir->lock);
-
             return entry;
         }
     }
 
+    return NULL;
+}
+
+bool directory_has_entry(fsnode_t *dir, const char *child)
+{
+    sk_lock_acquire(dir->lock);
+    bool has_entry = directory_entry(dir, child) != NULL;
     sk_lock_release(dir->lock);
 
-    return NULL;
+    return has_entry;
 }
 
 directory_entries_t directory_entries(fsnode_t *dir)
@@ -271,6 +275,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
 bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 {
     sk_lock_acquire(dir->lock);
+    sk_log(LOG_DEBUG, "Linking node to '%s'", name);
 
     if (directory_entry(dir, name) == NULL)
     {
@@ -295,21 +300,21 @@ bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 bool directory_unlink(fsnode_t *dir, const char *name)
 {
     sk_lock_acquire(dir->lock);
-
     fsdirectory_entry_t *entry = directory_entry(dir, name);
 
     if (entry != NULL)
     {
         fsnode_t *node = entry->node;
+
+        list_remove(dir->directory.childs, entry);
+        free(entry);
+
         node->refcount--;
 
         if (node->refcount == 0)
         {
             fsnode_delete(node);
         }
-
-        list_remove(dir->directory.childs, entry);
-        free(entry);
 
         sk_lock_release(dir->lock);
         return true;
@@ -378,14 +383,18 @@ fsnode_t *filesystem_resolve(fsnode_t *at, const char *path)
     {
         if (current->type == FSDIRECTORY)
         {
+            fsnode_t* directory = current;
+            sk_lock_acquire(directory->lock);
             fsdirectory_entry_t *entry = directory_entry(current, buffer);
 
             if (entry != NULL)
             {
                 current = entry->node;
+                sk_lock_release(directory->lock);
             }
             else
             {
+                sk_lock_release(directory->lock);
                 return NULL;
             }
         }
@@ -442,6 +451,8 @@ fsnode_t *filesystem_mknode(fsnode_t *at, const char *path, fsnode_type_t type)
 
     sk_lock_acquire(fslock);
     {
+        sk_log(LOG_DEBUG, "Creating node '%s' of type %d...", path, type);
+        
         char *parent_name = malloc(strlen(path));
         char *child_name = malloc(MAX_FILENAME_LENGHT);
 
@@ -449,7 +460,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, const char *path, fsnode_type_t type)
         {
             fsnode_t *parent = filesystem_resolve(at, parent_name);
 
-            if (parent->type == FSDIRECTORY && directory_entry(parent, child_name) == NULL)
+            if (parent->type == FSDIRECTORY && !directory_has_entry(parent, child_name))
             {
                 child = fsnode(type);
                 directory_link(parent, child, child_name);

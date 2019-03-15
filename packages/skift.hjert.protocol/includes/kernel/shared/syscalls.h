@@ -8,7 +8,7 @@ typedef enum
 {
     SYS_DEBUG = 0,
 
-    /* --- Process and Threads -------------------------------------------------- */
+/* --- Process and Threads -------------------------------------------------- */
 
     // Process
     SYS_PROCESS_SELF,
@@ -44,7 +44,7 @@ typedef enum
     SYS_MSG_SUBSCRIBE,
     SYS_MSG_UNSUBSCRIBE,
 
-    /* --- I/O ------------------------------------------------------------------ */
+/* --- I/O ------------------------------------------------------------------ */
     SYS_IO_PRINT,
     SYS_IO_READ,
 
@@ -52,9 +52,11 @@ typedef enum
     SYS_IO_GRAPHIC_BLIT_REGION,
     SYS_IO_GRAPHIC_SIZE,
 
-    /* --- Filesystem ----------------------------------------------------------- */
+/* --- Filesystem ----------------------------------------------------------- */
 
     SYS_FILESYSTEM_OPEN,
+    SYS_FILESYSTEM_OPENAT,
+    
     SYS_FILESYSTEM_CLOSE,
 
     SYS_FILESYSTEM_READ,
@@ -64,9 +66,15 @@ typedef enum
     SYS_FILESYSTEM_TELL,
 
     SYS_FILESYSTEM_MKDIR,
-    SYS_FILESYSTEM_RM,
+    SYS_FILESYSTEM_MKDIRAT,
+    
+    SYS_FILESYSTEM_LINK,
+    SYS_FILESYSTEM_LINKAT,
 
-    ////////////////////////////////////////////////////////////////////////////////
+    SYS_FILESYSTEM_UNLINK,
+    SYS_FILESYSTEM_UNLINKAT,
+
+////////////////////////////////////////////////////////////////////////////////
 
     SYSCALL_COUNT
 } syscall_t;

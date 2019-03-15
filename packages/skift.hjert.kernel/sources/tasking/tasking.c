@@ -373,7 +373,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 PROCESS process_exec(const char *path, const char **argv)
 {
     // Check if the file existe and open the file.
-    stream_t *s = filesystem_open(path, OPENOPT_READ);
+    stream_t *s = filesystem_open(ROOT, path, OPENOPT_READ);
     if (s == NULL)
     {
         sk_log(LOG_WARNING, "'%s' file not found, exec failed!", path);

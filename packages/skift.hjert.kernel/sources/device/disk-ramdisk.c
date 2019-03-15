@@ -24,14 +24,14 @@ void ramdisk_load(multiboot_module_t *module)
         if (block.name[strlen(block.name) - 1] == '/')
         {
             sk_log(LOG_DEBUG, "Creating %s directory...", block.name);
-            if (FSRESULT_SUCCEED != filesystem_mkdir(block.name))
+            if (FSRESULT_SUCCEED != filesystem_mkdir(ROOT, block.name))
             {
                 sk_log(LOG_WARNING, "Failed to create directory %s...", block.name);
             }
         }
         else
         {
-            stream_t *s = filesystem_open(block.name, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
+            stream_t *s = filesystem_open(ROOT, block.name, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
             
             if (s != NULL)
             {

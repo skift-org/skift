@@ -41,7 +41,7 @@ int sk_filesystem_mkdir(const char *path)
     return __syscall(SYS_FILESYSTEM_MKDIR, (int)path, 0, 0, 0, 0);
 }
 
-int sk_filesystem_rm(const char *path)
+int sk_filesystem_unlink(const char *path)
 {
-    return __syscall(SYS_FILESYSTEM_RM, (int)path, 0, 0, 0, 0);
+    return __syscall(SYS_FILESYSTEM_UNLINK, (int)path, 0, 0, 0, 0);
 }

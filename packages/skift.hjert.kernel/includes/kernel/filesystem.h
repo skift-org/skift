@@ -13,12 +13,14 @@
 #include "kernel/shared/filesystem.h"
 #include "kernel/system.h"
 
+#define ROOT NULL
+
 struct s_fsnode;
 struct s_stream;
 
 typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct s_stream *s, void *buffer, uint size);
-typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void* args);
+typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void *args);
 
 typedef struct
 {
@@ -36,10 +38,10 @@ typedef struct
     void *p;
 } device_t;
 
-typedef struct 
+typedef struct
 {
     char name[MAX_FILENAME_LENGHT];
-    struct s_fsnode* node;
+    struct s_fsnode *node;
 } fsdirectory_entry_t;
 
 typedef struct
@@ -89,13 +91,13 @@ void filesystem_setup(void);
 void filesystem_dump(void);
 
 /* --- File IO -------------------------------------------------------------- */
-stream_t *filesystem_open(const char *path, fsoflags_t flags);
+stream_t *filesystem_open(fsnode_t *at, const char *path, fsoflags_t flags);
 void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
 int filesystem_write(stream_t *s, void *buffer, uint size);
 
-int filesystem_ioctl(stream_t *s, int request, void* args);
+int filesystem_ioctl(stream_t *s, int request, void *args);
 
 int filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
 int filesystem_tell(stream_t *s);
@@ -105,16 +107,16 @@ int filesystem_fstat(stream_t *s, file_stat_t *stat);
 void *filesystem_readall(stream_t *s);
 
 /* --- File system operation ------------------------------------------------ */
-int filesystem_mkfile(const char *path);
-int filesystem_mkfifo(const char *path); /* TODO */
-int filesystem_mkdev(const char *path, device_t dev);
-int filesystem_mkdir(const char *path);
+int filesystem_mkfile(fsnode_t *at, const char *path);
+int filesystem_mkfifo(fsnode_t *at, const char *path); /* TODO */
+int filesystem_mkdev(fsnode_t *at, const char *path, device_t dev);
+int filesystem_mkdir(fsnode_t *at, const char *path);
 
-int filesystem_rm(const char *path);
+int filesystem_unlink(fsnode_t *at, const char *path);
 
 // *filesystem_mkdev* with error checking.
 #define FILESYSTEM_MKDEV(__name, __object)                   \
-    if (filesystem_mkdev("/dev/" __name, (__object)))    \
+    if (filesystem_mkdev(NULL, "/dev/" __name, (__object)))        \
     {                                                        \
         PANIC("Failled to create the '" __name "' device."); \
     }

@@ -15,4 +15,4 @@ int sk_filesystem_tell(int fd);
 int sk_filesystem_fstat(int fd, file_stat_t *stat);
 
 int sk_filesystem_mkdir(const char *path);
-int sk_filesystem_rm(const char *path);
+int sk_filesystem_unlink(const char *path);

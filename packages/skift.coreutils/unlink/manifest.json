@@ -1,7 +1,7 @@
 {
-    "name": "rm",
+    "name": "unlink",
     
-    "id": "rm",
+    "id": "unlink",
     "type": "app",
     
     "libs": [

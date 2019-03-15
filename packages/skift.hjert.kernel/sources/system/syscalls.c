@@ -193,7 +193,7 @@ int sys_io_graphic_size(unsigned int *width, unsigned int *height)
 
 int sys_filesystem_open(const char* path, fsoflags_t flags)
 {
-    return (int)filesystem_open(path, flags);
+    return (int)filesystem_open(ROOT, path, flags);
 }
 
 int sys_filesystem_close(int fd)
@@ -229,12 +229,12 @@ int sys_filesystem_tell(int fd)
 
 int sys_filesystem_mkdir(const char *path)
 {
-    return filesystem_mkdir(path);
+    return filesystem_mkdir(ROOT, path);
 }
 
-int sys_filesystem_rm(const char *path)
+int sys_filesystem_unlink(const char *path)
 {
-    return filesystem_rm(path);
+    return filesystem_unlink(ROOT, path);
 }
 
 static int (*syscalls[])() =
@@ -279,7 +279,7 @@ static int (*syscalls[])() =
     [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
     [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
     [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
-    [SYS_FILESYSTEM_RM] = sys_filesystem_rm,
+    [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
 };
 
 void syscall_dispatcher(processor_context_t *context)

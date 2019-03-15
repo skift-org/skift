@@ -4,16 +4,16 @@
 
 #include <skift/filesystem.h>
 
-int rm(const char *path)
+int unlink(const char *path)
 {
-    return sk_filesystem_rm(path);
+    return sk_filesystem_unlink(path);
 }
 
 int main(int argc, char **argv)
 {
     if (argc == 2)
     {
-        return rm(argv[1]);
+        return unlink(argv[1]);
     }
 
     return -1;

@@ -122,7 +122,7 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_attach_to_process(t, process);
 
     // WIP: push arguments
-    uint argv_list[MAX_PROCESS_ARGV] = { 0 };
+    uint argv_list[MAX_PROCESS_ARGV] = {0};
 
     int argc;
     for (argc = 0; argv[argc] && argc < MAX_PROCESS_ARGV; argc++)
@@ -409,7 +409,6 @@ PROCESS process_exec(const char *path, const char **argv)
         return 0;
     }
 
-
     // Create the process and load the executable.
     PROCESS p = process_create(path, true);
 
@@ -419,7 +418,6 @@ PROCESS process_exec(const char *path, const char **argv)
     {
         load_elfseg(process_get(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
-
 
     sk_log(LOG_DEBUG, "Executable loaded, creating main thread...");
 

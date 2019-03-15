@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Command line argument parser to framework
  - `all, color, list` and `help` options to `ls`
  - `filesystem_ioctl` juste for device file, but WIP
+ - `filesystem_link` and `filesystem_unlink`
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal
@@ -18,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `ls folder0 folder1 folder2` syntaxe wasn't working properly
  - `cat` was working on directory
  - `ls` was cat'ing file when apply to regular files
-
+ - file name is no longer stored in the inode
  - #15 It was possible to create several files with the same name in the same directory
  - #16 Page fault when reading from a invalid file descriptor
 

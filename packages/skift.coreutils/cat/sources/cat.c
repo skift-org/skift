@@ -16,6 +16,7 @@ int cat(const char *path)
         if (stat.type == FSDIRECTORY)
         {
             printf("%s: is a directory\n", path);
+            return -1;
         }
         else
         {
@@ -30,9 +31,14 @@ int cat(const char *path)
         }
 
         sk_filesystem_close(fd);
+        
+        return 0;
     }
-
-    return 0;
+    else
+    {
+        printf("%s: no such file\n", path);
+        return -1;
+    }
 }
 
 int main(int argc, char **argv)

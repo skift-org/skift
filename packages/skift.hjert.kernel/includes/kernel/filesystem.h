@@ -112,6 +112,7 @@ int filesystem_mkfifo(fsnode_t *at, const char *path); /* TODO */
 int filesystem_mkdev(fsnode_t *at, const char *path, device_t dev);
 int filesystem_mkdir(fsnode_t *at, const char *path);
 
+int filesystem_link(fsnode_t *oldat, const char *oldpath, fsnode_t *newat, const char *newpath);
 int filesystem_unlink(fsnode_t *at, const char *path);
 
 // *filesystem_mkdev* with error checking.

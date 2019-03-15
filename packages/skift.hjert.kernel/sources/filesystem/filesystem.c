@@ -861,6 +861,43 @@ int filesystem_mkfile(fsnode_t *at, const char *path)
     }
 }
 
+int filesystem_link(fsnode_t *oldat, const char *oldpath, fsnode_t *newat, const char *newpath)
+{
+    IS_FS_READY;
+
+    int result = -1;
+
+    sk_lock_acquire(fslock);
+    {
+        fsnode_t* node = filesystem_resolve(oldat, oldpath);
+
+        if (node != NULL)
+        {
+            char *parent_name = malloc(strlen(newpath));
+            char *child_name = malloc(MAX_FILENAME_LENGHT);
+
+            if (path_split(newpath, parent_name, child_name))
+            {
+                fsnode_t *parent = filesystem_resolve(newat, parent_name);
+
+                if (parent != NULL && parent->type == FSDIRECTORY)
+                {
+                    if (directory_link(parent, node, child_name))
+                    {
+                        result = 0;
+                    }
+                }
+            }
+
+            free(child_name);
+            free(parent_name);
+        }
+    }
+    sk_lock_release(fslock);
+
+    return result;
+}
+
 int filesystem_unlink(fsnode_t *at, const char *path)
 {
     IS_FS_READY;

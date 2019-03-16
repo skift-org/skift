@@ -82,24 +82,6 @@ void tasking_setup()
 
 /* --- Thread managment ----------------------------------------------------- */
 
-void thread_yield()
-{
-    asm("int $32");
-}
-
-THREAD thread_self()
-{
-    if (running == NULL)
-        return 0;
-
-    return running->id;
-}
-
-thread_t *thread_running()
-{
-    return running;
-}
-
 // Create the main thread of a user application
 THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **argv)
 {
@@ -160,7 +142,7 @@ void thread_sleep(int time)
         thread_setstate(running, THREADSTATE_WAIT_TIME);
     });
 
-    thread_yield();
+    sheduler_yield();
 }
 
 void thread_wakeup(THREAD t)
@@ -200,7 +182,7 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
             thread_setstate(running, THREADSTATE_WAIT_THREAD);
 
             sk_atomic_end();
-            thread_yield();
+            sheduler_yield();
 
             if (exitvalue != NULL)
             {
@@ -240,7 +222,7 @@ bool thread_wait_process(PROCESS p, int *exitvalue)
             thread_setstate(running, THREADSTATE_WAIT_PROCESS);
 
             sk_atomic_end();
-            thread_yield();
+            sheduler_yield();
 
             if (exitvalue != NULL)
             {

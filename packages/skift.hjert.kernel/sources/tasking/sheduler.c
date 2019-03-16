@@ -110,3 +110,20 @@ thread_t* sheduler_running_thread()
 {
     return running;
 }
+
+int sheduler_running_thread_id()
+{
+    if (running != NULL)
+    {
+        return running->id;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void sheduler_yield()
+{
+    asm("int $32");
+}

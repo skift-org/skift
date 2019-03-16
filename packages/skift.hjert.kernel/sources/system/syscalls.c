@@ -17,6 +17,7 @@
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"
 #include "kernel/filesystem.h"
+#include "kernel/sheduler.h"
 
 #include "kernel/serial.h"
 
@@ -80,7 +81,7 @@ int sys_process_free(uint addr, uint count)
 
 int sys_thread_self()
 {
-    return thread_self();
+    return sheduler_running_thread_id();
 }
 
 int sys_thread_create(thread_entry_t entry, void * args)

@@ -8,7 +8,9 @@
 #include <skift/logger.h>
 
 #include "kernel/tasking.h"
+#include "kernel/sheduler.h"
 #include "kernel/messaging.h"
+
 
 static int MID = 1;
 static list_t *channels;
@@ -185,17 +187,17 @@ message_t *messaging_receive_internal(thread_t *thread)
 
 bool messaging_receive(message_t *msg, bool wait)
 {
-    message_t *incoming = messaging_receive_internal(thread_running());
+    message_t *incoming = messaging_receive_internal(sheduler_running_thread());
 
     if (incoming == NULL && wait)
     {
         sk_atomic_begin();
-        thread_setstate(thread_running(), THREADSTATE_WAIT_MESSAGE);
+        thread_setstate(sheduler_running_thread(), THREADSTATE_WAIT_MESSAGE);
         sk_atomic_end(); 
 
-        thread_yield(); // Wait until we get a message.
+        sheduler_yield(); // Wait until we get a message.
 
-        incoming = thread_running()->wait.message.message;
+        incoming = sheduler_running_thread()->wait.message.message;
     }
 
     if (incoming != NULL)
@@ -209,7 +211,7 @@ bool messaging_receive(message_t *msg, bool wait)
 
 int messaging_payload(void *buffer, uint size)
 {
-    message_t *incoming = thread_running()->wait.message.message;
+    message_t *incoming = sheduler_running_thread()->wait.message.message;
 
     if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {
@@ -232,7 +234,7 @@ int messaging_subscribe(const char *channel_name)
         list_pushback(channels, c);
     }
 
-    list_pushback(c->subscribers, thread_running()->process);
+    list_pushback(c->subscribers, sheduler_running_thread()->process);
     
     sk_atomic_end();
 
@@ -247,7 +249,7 @@ int messaging_unsubscribe(const char *channel_name)
 
     if (c != NULL)
     {
-        list_remove(c->subscribers, thread_running()->process);
+        list_remove(c->subscribers, sheduler_running_thread()->process);
     }
     
     sk_atomic_end();

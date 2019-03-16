@@ -21,11 +21,6 @@
 void tasking_setup();
 
 /* --- Thread managment ----------------------------------------------------- */
-
-THREAD thread_self(); // Return a handle to the current thread.
-thread_t *thread_running();
-void thread_hold();
-
 // Create a new thread of a selected process.
 THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);
 
@@ -37,7 +32,6 @@ void thread_wakeup(THREAD t); // Wake up the slected thread
 
 bool thread_wait_thread(THREAD t, int *exitvalue);   // Wait for the selected thread to exit and return the exit value
 bool thread_wait_process(PROCESS p, int *exitvalue); // Wait for the selected process to exit and return the exit value.
-void thread_yield();                                 // Yield to the next thread.
 
 void thread_dump_all();
 void thread_dump(thread_t *t);

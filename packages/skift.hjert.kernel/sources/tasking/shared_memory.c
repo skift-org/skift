@@ -8,6 +8,7 @@
 
 #include "kernel/memory.h"
 #include "kernel/tasking.h"
+#include "kernel/sheduler.h"
 #include "kernel/shared_memory.h"
 
 static list_t *shared_memories;
@@ -67,7 +68,7 @@ void *shared_memory_create(uint size)
 
     shared_memory_t *shm = shared_memory(size);
 
-    sk_log(LOG_DEBUG, "Shared memory region created @%x by process '%s'@%d.", shm->memory, thread_running()->process->name, thread_running()->id);
+    sk_log(LOG_DEBUG, "Shared memory region created @%x by process '%s'@%d.", shm->memory, sheduler_running_thread()->process->name, sheduler_running_thread()->id);
 
     if (shm != NULL)
     {
@@ -87,8 +88,8 @@ void *shared_memory_aquire(void *mem)
 
     if (shm != NULL)
     {
-        sk_log(LOG_DEBUG, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, thread_running()->process->name, thread_running()->id);
-        list_pushback(thread_running()->process->shared, shm);
+        sk_log(LOG_DEBUG, "Shared memory region @%x aquire by process '%s'@%d.", shm->memory, sheduler_running_thread()->process->name, sheduler_running_thread()->id);
+        list_pushback(sheduler_running_thread()->process->shared, shm);
         shm->refcount++;
 
         sk_atomic_end();
@@ -97,7 +98,7 @@ void *shared_memory_aquire(void *mem)
     }
     else
     {
-        sk_log(LOG_WARNING, "Process '%s'@%d tried to aquire a shared memory region @%x.", thread_running()->process->name, thread_running()->id, mem);
+        sk_log(LOG_WARNING, "Process '%s'@%d tried to aquire a shared memory region @%x.", sheduler_running_thread()->process->name, sheduler_running_thread()->id, mem);
         sk_atomic_end();
 
         return NULL;
@@ -110,10 +111,10 @@ void shared_memory_realease(void *mem)
 
     shared_memory_t *shm = shared_memory_get(mem);
 
-    if (shm != NULL && list_containe(thread_running()->process->shared, shm))
+    if (shm != NULL && list_containe(sheduler_running_thread()->process->shared, shm))
     {
-        sk_log(LOG_DEBUG, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, thread_running()->process->name, thread_running()->id);
-        list_remove(thread_running()->process->shared, shm);
+        sk_log(LOG_DEBUG, "Shared memory region @%x realease by process '%s'@%d.", shm->memory, sheduler_running_thread()->process->name, sheduler_running_thread()->id);
+        list_remove(sheduler_running_thread()->process->shared, shm);
         shm->refcount--;
 
         if (shm->refcount == 0)
@@ -123,7 +124,7 @@ void shared_memory_realease(void *mem)
     }
     else
     {
-        sk_log(LOG_WARNING, "Process '%s'@%d tried to realease a shared memory region @%x.", thread_running()->process->name, thread_running()->id, mem);
+        sk_log(LOG_WARNING, "Process '%s'@%d tried to realease a shared memory region @%x.", sheduler_running_thread()->process->name, sheduler_running_thread()->id, mem);
     }
 
     sk_atomic_end();

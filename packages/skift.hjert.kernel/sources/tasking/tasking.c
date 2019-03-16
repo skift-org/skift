@@ -87,14 +87,6 @@ void thread_yield()
     asm("int $32");
 }
 
-void thread_hold()
-{
-    while (running->state != THREADSTATE_RUNNING)
-    {
-        hlt();
-    }
-}
-
 THREAD thread_self()
 {
     if (running == NULL)
@@ -168,7 +160,7 @@ void thread_sleep(int time)
         thread_setstate(running, THREADSTATE_WAIT_TIME);
     });
 
-    thread_hold();
+    thread_yield();
 }
 
 void thread_wakeup(THREAD t)
@@ -208,7 +200,7 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
             thread_setstate(running, THREADSTATE_WAIT_THREAD);
 
             sk_atomic_end();
-            thread_hold();
+            thread_yield();
 
             if (exitvalue != NULL)
             {
@@ -248,7 +240,7 @@ bool thread_wait_process(PROCESS p, int *exitvalue)
             thread_setstate(running, THREADSTATE_WAIT_PROCESS);
 
             sk_atomic_end();
-            thread_hold();
+            thread_yield();
 
             if (exitvalue != NULL)
             {

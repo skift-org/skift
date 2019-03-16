@@ -193,7 +193,7 @@ bool messaging_receive(message_t *msg, bool wait)
         thread_setstate(thread_running(), THREADSTATE_WAIT_MESSAGE);
         sk_atomic_end(); 
 
-        thread_hold(); // Wait until we get a message.
+        thread_yield(); // Wait until we get a message.
 
         incoming = thread_running()->wait.message.message;
     }

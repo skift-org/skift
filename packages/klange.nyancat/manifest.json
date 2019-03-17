@@ -1,0 +1,10 @@
+{
+    "name": "Nya nya nya nya...",
+    
+    "id": "nyancat",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user"
+    ]
+}

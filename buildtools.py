@@ -52,7 +52,7 @@ CFLAGS_STRICT = ["-Wall", "-Wextra", "-Werror", "-Wno-unknown-pragmas"]
 LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
-QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio"]
+QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-rtc", "base=localtime"]
 QEMUFLAGS_KVM   = QEMUFLAGS + ["-enable-kvm"]
 QEMUFLAGS_NOKVM = QEMUFLAGS
 

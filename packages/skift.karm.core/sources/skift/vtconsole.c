@@ -95,10 +95,8 @@ void vtconsole_newline(vtconsole_t *vtc)
     vtc->cursor.x = 0;
     vtc->cursor.y++;
 
-    if (vtc->cursor.y == vtc->height)
-    {
+    if (vtc->cursor.y >= vtc->height)
         vtconsole_scroll(vtc);
-    }
 
     if (vtc->on_move)
     {
@@ -141,6 +139,9 @@ void vtconsole_append(vtconsole_t *vtc, char c)
     }
     else
     {
+        if (vtc->cursor.x >= vtc->width)
+            vtconsole_newline(vtc);
+
         vtcell_t *cell = &vtc->buffer[vtc->cursor.x + vtc->cursor.y * vtc->width];
         cell->c = c;
         cell->attr = vtc->attr;
@@ -151,10 +152,7 @@ void vtconsole_append(vtconsole_t *vtc, char c)
         }
 
         vtc->cursor.x++;
-
-        if (vtc->cursor.x >= vtc->width)
-            vtconsole_newline(vtc);
-
+        
         if (vtc->on_move)
         {
             vtc->on_move(vtc, &vtc->cursor);

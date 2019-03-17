@@ -11,7 +11,6 @@
 #include "kernel/sheduler.h"
 #include "kernel/messaging.h"
 
-
 static int MID = 1;
 static list_t *channels;
 
@@ -71,7 +70,8 @@ message_t *message(int id, const char *label, void *payload, uint size, uint fla
 
 void message_delete(message_t *msg)
 {
-    if (msg->payload) free(msg->payload);
+    if (msg->payload)
+        free(msg->payload);
     free(msg);
 }
 
@@ -116,7 +116,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     FOREACH(t, process->threads)
     {
-        thread_t* thread = t->value;
+        thread_t *thread = t->value;
 
         if (thread->state == THREADSTATE_WAIT_MESSAGE)
         {
@@ -176,7 +176,6 @@ message_t *messaging_receive_internal(thread_t *thread)
             message_delete(thread->wait.message.message);
         }
 
-
         list_pop(thread->process->inbox, (void **)&msg);
         thread->wait.message.message = msg;
     }
@@ -193,7 +192,7 @@ bool messaging_receive(message_t *msg, bool wait)
     {
         sk_atomic_begin();
         thread_setstate(sheduler_running_thread(), THREADSTATE_WAIT_MESSAGE);
-        sk_atomic_end(); 
+        sk_atomic_end();
 
         sheduler_yield(); // Wait until we get a message.
 
@@ -225,7 +224,7 @@ int messaging_payload(void *buffer, uint size)
 int messaging_subscribe(const char *channel_name)
 {
     sk_atomic_begin();
-    
+
     channel_t *c = channel_get(channel_name);
 
     if (c == NULL)
@@ -235,7 +234,7 @@ int messaging_subscribe(const char *channel_name)
     }
 
     list_pushback(c->subscribers, sheduler_running_thread()->process);
-    
+
     sk_atomic_end();
 
     return 0;
@@ -244,14 +243,14 @@ int messaging_subscribe(const char *channel_name)
 int messaging_unsubscribe(const char *channel_name)
 {
     sk_atomic_begin();
-    
+
     channel_t *c = channel_get(channel_name);
 
     if (c != NULL)
     {
         list_remove(c->subscribers, sheduler_running_thread()->process);
     }
-    
+
     sk_atomic_end();
 
     return 0;

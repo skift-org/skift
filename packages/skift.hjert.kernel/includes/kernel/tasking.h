@@ -11,8 +11,6 @@
 #include "kernel/protocol.h"
 #include "kernel/limits.h"
 
-/* --- Process -------------------------------------------------------------- */
-
 #include "kernel/process.h"
 #include "kernel/thread.h"
 
@@ -28,7 +26,7 @@ bool thread_cancel(THREAD t, int exitvalue); // Cancel the selected thread.
 void thread_exit(int exitvalue);             // Exit the current thread and return a value.
 
 void thread_sleep(int time);  // Send the current thread to bed.
-void thread_wakeup(THREAD t); // Wake up the slected thread
+void thread_wakeup(THREAD t); // Wake up the selected thread
 
 bool thread_wait_thread(THREAD t, int *exitvalue);   // Wait for the selected thread to exit and return the exit value
 bool thread_wait_process(PROCESS p, int *exitvalue); // Wait for the selected process to exit and return the exit value.

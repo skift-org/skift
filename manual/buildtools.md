@@ -22,7 +22,7 @@ buildtools [ACTION] [TARGET]
 ./buildtools.py help
 
 # Build a target
-./buildtools.py build maker.hideo.compositor
+./buildtools.py build skift.hjert.kernel
 
 # For a simple build
 ./buildtools.py build-all

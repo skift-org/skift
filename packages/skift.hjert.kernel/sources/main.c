@@ -5,7 +5,7 @@
 /*                  db   8D 88 `88.   .88.   88         88                    */
 /*                  `8888Y' YP   YD Y888888P YP         YP                    */
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                               */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -59,7 +59,7 @@ uint get_kernel_end(multiboot_info_t *minfo)
 
 void main(multiboot_info_t *info, s32 magic)
 {
-    __plug_init(); // init maker.skift.framework glue code.
+    __plug_init(); // init skift.karm.core glue code.
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));

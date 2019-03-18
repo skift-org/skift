@@ -5,7 +5,7 @@
 /*                  db   8D 88 `88.   .88.   88         88                    */
 /*                  `8888Y' YP   YD Y888888P YP         YP                    */
 
-/* Copyright © 2018-2019 N. Van Bossuyt.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 

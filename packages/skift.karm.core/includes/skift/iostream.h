@@ -12,7 +12,8 @@ struct s_iostream;
 
 typedef enum
 {
-    IOSTREAM_BEGINNIN,
+    IOSTREAM_START,
+    IOSTREAM_HERE,
     IOSTREAM_END,
 } iostream_whence_t;
 

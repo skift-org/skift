@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `all, color, list` and `help` options to `ls`
  - `filesystem_ioctl` juste for device file, but WIP
  - `filesystem_link` and `filesystem_unlink`
+ - `iostream` a stdio like library
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal

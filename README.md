@@ -1,4 +1,8 @@
 <p align="center">
+<b>See the <a href="https://github.com/skiftOS/skift/tree/develop">develop branch</a> for the lastest development</p>
+</p>
+
+<p align="center">
 <img src="manual/assets/capture.png" height=400 />
 </p>
 <p align="center">

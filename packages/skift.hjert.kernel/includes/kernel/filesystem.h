@@ -90,6 +90,11 @@ typedef struct s_stream
 void filesystem_setup(void);
 void filesystem_dump(void);
 
+/* --- fsnode --------------------------------------------------------------- */
+
+fsnode_t *filesystem_acquire(fsnode_t *at, const char *path, bool create);
+void filesystem_release(fsnode_t *node);
+
 /* --- File IO -------------------------------------------------------------- */
 stream_t *filesystem_open(fsnode_t *at, const char *path, fsoflags_t flags);
 void filesystem_close(stream_t *s);

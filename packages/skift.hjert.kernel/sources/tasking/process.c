@@ -40,3 +40,40 @@ process_t *alloc_process(const char *name, bool user)
 
     return process;
 }
+
+void process_delete(process_t* process)
+{
+    if (process->pdir != memory_kpdir())
+    {
+        memory_free_pdir(process->pdir);
+    }
+
+    if (list_any(process->threads))
+    {
+        PANIC("Process's threads-list isn't empty!");
+    }
+    else
+    {
+        list_delete(process->threads);
+    }
+
+    if (list_any(process->inbox  ))
+    {
+        PANIC("Process's inbox-list isn't empty!");
+    }
+    else
+    {
+        list_delete(process->inbox);
+    }
+
+    if (list_any(process->shared ))
+    {
+        PANIC("Process's shared-list isn't empty!");
+    }
+    else
+    {
+        list_delete(process->shared );
+    }
+
+    free(process);
+}

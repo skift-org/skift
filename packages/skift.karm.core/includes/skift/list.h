@@ -79,11 +79,11 @@ bool list_remove(list_t *list, void *value);
 // For zero alloc and free list operation this is greate when memory allocation
 // are to slow (see: skift.hjert.kernel::sheduler.c).
 
-bool list_node_peek(list_t* list, list_item_t** value);
-bool list_node_peekback(list_t* list, list_item_t** value);
-
-void list_node_push(list_t *list, list_item_t *value);
-void list_node_pushback(list_t *list, list_item_t *value);
-
-bool  list_node_pop(list_t *list, list_item_t **value);
-bool  list_node_popback(list_t *list, list_item_t **value);
+// bool list_node_peek(list_t* list, list_item_t** value);
+// bool list_node_peekback(list_t* list, list_item_t** value);
+// 
+// void list_node_push(list_t *list, list_item_t *value);
+// void list_node_pushback(list_t *list, list_item_t *value);
+// 
+// bool  list_node_pop(list_t *list, list_item_t **value);
+// bool  list_node_popback(list_t *list, list_item_t **value);

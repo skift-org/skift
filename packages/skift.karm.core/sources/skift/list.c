@@ -18,42 +18,25 @@ list_t *list()
     return l;
 }
 
-void list_delete(list_t *l)
+void list_delete(list_t *l, bool free_items)
 {
-    list_item_t *current = l->head;
-
-    while (current)
-    {
-        list_item_t *next = current->next;
-        free(current);
-        current = next;
-    }
-
+    list_clear(l, free_items);
     free(l);
 }
 
-void list_destroy(list_t *l)
-{
-    list_item_t *current = l->head;
-
-    while (current)
-    {
-        list_item_t *next = current->next;
-        free(current->value);
-        free(current);
-        current = next;
-    }
-
-    free(l);
-}
-
-void list_clear(list_t *list)
+void list_clear(list_t *list, bool free_items)
 {
     list_item_t *current = list->head;
 
     while (current)
     {
         list_item_t *next = current->next;
+        
+        if (free_items) 
+        {
+            free(current->value);
+        }
+
         free(current);
         current = next;
     }
@@ -148,13 +131,13 @@ void list_push(list_t *l, void *value)
     }
 }
 
-int list_pop(list_t *l, void **value)
+bool list_pop(list_t *l, void **value)
 {
     list_item_t *item = l->head;
 
     if (l->count == 0)
     {
-        return 0;
+        return false;
     }
     else if (l->count == 1)
     {
@@ -173,7 +156,7 @@ int list_pop(list_t *l, void **value)
     *(value) = item->value;
     free(item);
 
-    return 1;
+    return true;
 }
 
 void list_pushback(list_t *l, void *value)
@@ -199,7 +182,7 @@ void list_pushback(list_t *l, void *value)
     }
 }
 
-int list_popback(list_t *l, void **value)
+bool list_popback(list_t *l, void **value)
 {
     list_item_t *item = l->tail;
 
@@ -224,10 +207,10 @@ int list_popback(list_t *l, void **value)
     *(value) = item->value;
     free(item);
 
-    return 1;
+    return true;
 }
 
-int list_remove(list_t *l, void *value)
+bool list_remove(list_t *l, void *value)
 {
     FOREACH(item, l)
     {
@@ -254,11 +237,11 @@ int list_remove(list_t *l, void *value)
             l->count--;
             free(item);
 
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 bool list_containe(list_t *l, void *value)

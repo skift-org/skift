@@ -98,7 +98,7 @@ void fsnode_delete(fsnode_t *node)
             }
         }
 
-        list_delete(node->directory.childs);
+        list_delete(node->directory.childs, LIST_FREE_VALUES);
         break;
     }
     case FSFIFO:

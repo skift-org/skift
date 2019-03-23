@@ -32,7 +32,7 @@ void collect_and_free_thread(void)
         sk_log(LOG_DEBUG, "Thread %d free'd.", thread_id);
     }
 
-    list_delete(thread_to_free);
+    list_delete(thread_to_free, LIST_KEEP_VALUES);
 }
 
 void collect_and_free_process(void)
@@ -40,7 +40,7 @@ void collect_and_free_process(void)
     // Ho god, this is going to be hard :/
     list_t *process_to_free = list();
 
-    list_delete(process_to_free);
+    list_delete(process_to_free, LIST_KEEP_VALUES);
 }
 
 void garbage_colector()

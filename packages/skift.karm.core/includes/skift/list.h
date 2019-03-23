@@ -34,6 +34,9 @@ typedef bool (*list_comparator_t)(void* left, void* right); // return true if th
 // Create a new list object in memory.
 list_t *list();
 
+#define LIST_KEEP_VALUES false
+#define LIST_FREE_VALUES true
+
 // Free the memory used by the list
 void list_delete(list_t *l, bool free_items); 
 

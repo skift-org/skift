@@ -28,7 +28,7 @@ channel_t *channel(const char *name)
 
 void channel_delete(channel_t *channel)
 {
-    list_delete(channel->subscribers);
+    list_delete(channel->subscribers, LIST_KEEP_VALUES);
     free(channel);
 }
 

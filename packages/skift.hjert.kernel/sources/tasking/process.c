@@ -54,7 +54,7 @@ void process_delete(process_t* process)
     }
     else
     {
-        list_delete(process->threads);
+        list_delete(process->threads, LIST_KEEP_VALUES);
     }
 
     if (list_any(process->inbox  ))
@@ -63,7 +63,7 @@ void process_delete(process_t* process)
     }
     else
     {
-        list_delete(process->inbox);
+        list_delete(process->inbox, LIST_KEEP_VALUES);
     }
 
     if (list_any(process->shared ))
@@ -72,7 +72,7 @@ void process_delete(process_t* process)
     }
     else
     {
-        list_delete(process->shared );
+        list_delete(process->shared, LIST_KEEP_VALUES);
     }
 
     free(process);

@@ -12,20 +12,39 @@ struct s_iostream;
 
 typedef enum
 {
-    IOSTREAM_START,
-    IOSTREAM_HERE,
-    IOSTREAM_END,
+    IOSTREAM_SEEKFROM_START,
+    IOSTREAM_SEEKFROM_HERE,
+    IOSTREAM_SEEKFROM_END,
 } iostream_whence_t;
 
 typedef enum
 {
-    IOSTREAM_CREATE,
-    IOSTREAM_TRUNC,
+    IOSTREAM_DYNAMIC_MEMORY,
+    IOSTREAM_STATIC_MEMORY,
+
+    IOSTREAM_FILE_REGULAR,
+    IOSTREAM_FILE_DEVICE,
+    IOSTREAM_FILE_DIRECTORY,
+    IOSTREAM_FILE_FIFO,
+} iostream_type_t;
+
+typedef enum
+{
+    IOSTREAM_READ = FLAG(0),
+    IOSTREAM_WRITE = FLAG(1),
+    
+    IOSTREAM_CREATE = FLAG(2),
+    IOSTREAM_APPEND = FLAG(3),
+    IOSTREAM_TRUNC = FLAG(4),
+
+    IOSTREAM_BUFFERED_READ = FLAG(5),
+    IOSTREAM_BUFFERED_WRITE = FLAG(6)
 } iostream_flag_t;
 
 typedef struct
 {
     int size;
+    iostream_type_t type;
 } iostream_stat_t;
 
 typedef int iostream_read_t(struct s_iostream *stream, void *buffer, uint size);
@@ -36,8 +55,12 @@ typedef int iostream_fstat_t(struct s_iostream *stream, iostream_stat_t* stat);
 typedef int iostream_ioctl_t(struct s_iostream *stream, int request, void *arg);
 typedef int iostream_close_t(struct s_iostream *stream);
 
+#define IOSTREAM_BUFFER_SIZE 512
+
 typedef struct s_iostream
 {
+    iostream_flag_t flags;
+
     iostream_read_t *read;
     iostream_write_t *write;
     iostream_tell_t *tell;
@@ -46,7 +69,6 @@ typedef struct s_iostream
     iostream_ioctl_t *ioctl;
     iostream_close_t *close;
 
-#define IOSTREAM_BUFFER_SIZE 512
 
     void* write_buffer;
     uint write_head;
@@ -55,6 +77,8 @@ typedef struct s_iostream
 } iostream_t;
 
 iostream_t *iostream(
+    iostream_flag_t flags,
+
     iostream_read_t *read,
     iostream_write_t *write,
     iostream_tell_t *tell,
@@ -62,9 +86,6 @@ iostream_t *iostream(
     iostream_fstat_t *fstat,
     iostream_ioctl_t *ioctl,
     iostream_close_t *close,
-
-    bool write_buffered,
-    bool read_buffered,
 
     void *p);
 

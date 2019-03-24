@@ -4,8 +4,28 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/types.h>
+#include <skift/generic.h>
+#include <skift/list.h>
 
+typedef struct
+{
+    list_t* elements;
+} path_t;
+
+path_t* path(const char* raw_path);
+void path_delete(path_t* p);
+
+const char* path_filename(path_t* p);
+const char* path_element(path_t* p, int index);
+bool path_is_relative(path_t* p);
+bool path_is_absolue(path_t* p);
+
+
+int path_length(path_t* p);
+void path_normalize(path_t* p);
+void path_append(path_t* p, const char* path);
+
+// old path manipulation api
 int path_len(const char *path);
 int path_read(const char *path, int index, char *buffer);
 char *path_cat(const char *pathA, const char *pathB, char *dest);

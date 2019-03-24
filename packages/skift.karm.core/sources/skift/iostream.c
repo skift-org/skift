@@ -6,6 +6,8 @@
 #include <skift/iostream.h>
 
 iostream_t *iostream(
+    iostream_flag_t flags,
+
     iostream_read_t *read,
     iostream_write_t *write,
     iostream_tell_t *tell,
@@ -13,9 +15,6 @@ iostream_t *iostream(
     iostream_fstat_t *stat,
     iostream_ioctl_t *ioctl,
     iostream_close_t *close,
-
-    bool write_buffered,
-    bool read_buffered,
 
     void *p)
 {
@@ -31,7 +30,7 @@ iostream_t *iostream(
 
     stream->p = p;
 
-    if (write_buffered)
+    if (flags & IOSTREAM_BUFFERED_WRITE)
     {
         stream->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
         stream->write_head = 0;
@@ -42,7 +41,7 @@ iostream_t *iostream(
         stream->write_head = 0;
     }
 
-    if (read_buffered)
+    if (flags & IOSTREAM_BUFFERED_READ)
     {
 
     }
@@ -50,6 +49,8 @@ iostream_t *iostream(
     {
 
     }
+
+    stream->flags = flags;
 
     return stream;
 }

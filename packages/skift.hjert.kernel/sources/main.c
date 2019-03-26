@@ -110,6 +110,7 @@ void main(multiboot_info_t *info, s32 magic)
     sti();
 
     printf(KERNEL_UNAME);
+    printf(" (%dmio used out %dmio)", USED_MEMORY / 1024 / 1024, TOTAL_MEMORY / 1024 / 1024);
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */

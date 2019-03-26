@@ -363,3 +363,16 @@ void strtrailtrim(char *str, char c)
 
     end[1] = '\0';
 }
+
+char* strdup(const char* s)
+{
+    int lenght = strlen(s) + 1;
+    char* new = malloc(lenght);
+
+    if (new != NULL)
+    {
+        memcpy(new, s, lenght);
+    }
+    
+    return new;
+}

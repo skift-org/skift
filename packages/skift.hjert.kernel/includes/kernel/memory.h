@@ -8,6 +8,9 @@
 
 #include "kernel/paging.h"
 
+extern uint TOTAL_MEMORY;
+extern uint USED_MEMORY;
+
 /* --- Physical Memory ------------------------------------------------------ */
 
 uint physical_alloc(uint count);

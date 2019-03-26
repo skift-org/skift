@@ -9,6 +9,7 @@
 
 typedef struct
 {
+    bool is_absolue;
     list_t* elements;
 } path_t;
 
@@ -17,13 +18,13 @@ void path_delete(path_t* p);
 
 const char* path_filename(path_t* p);
 const char* path_element(path_t* p, int index);
-bool path_is_relative(path_t* p);
 bool path_is_absolue(path_t* p);
-
+bool path_is_relative(path_t* p);
 
 int path_length(path_t* p);
 void path_normalize(path_t* p);
-void path_append(path_t* p, const char* path);
+void path_append(path_t* p, const char* element);
+path_t* path_combine(path_t* left, path_t* right);
 
 // old path manipulation api
 int path_len(const char *path);

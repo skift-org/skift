@@ -9,7 +9,7 @@
 
 list_t *list()
 {
-    list_t *l = malloc(sizeof(list_t));
+    list_t *l = MALLOC(list_t);
 
     l->count = 0;
     l->head = NULL;
@@ -108,6 +108,27 @@ bool list_peekback(list_t *list, void **value)
     }
 }
 
+bool list_peekat(list_t *list, int index, void **value)
+{
+    if (index < list->count)
+    {
+        list_item_t* current = list->head;
+
+        for(int i = 0; i < index; i++)
+        {
+            current = current->next;
+        }
+        
+        *value = current->value;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void list_push(list_t *l, void *value)
 {
     list_item_t *item = MALLOC(list_item_t);
@@ -153,7 +174,9 @@ bool list_pop(list_t *l, void **value)
         l->count--;
     }
 
-    *(value) = item->value;
+    if (value != NULL)
+        *(value) = item->value;
+
     free(item);
 
     return true;
@@ -204,7 +227,9 @@ bool list_popback(list_t *l, void **value)
         l->count--;
     }
 
-    *(value) = item->value;
+    if (value != NULL)
+        *(value) = item->value;
+        
     free(item);
 
     return true;

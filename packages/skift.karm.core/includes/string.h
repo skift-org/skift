@@ -34,6 +34,7 @@ size_t strnlen(const char *s, size_t maxlen);
 char *strcpy(char *dest, const char *src);
 char *strncpy(char *dest, const char *src, size_t n);
 
+char* strdup(const char* s);
 char *strchr(const char *str, int c);
 int strcoll(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);

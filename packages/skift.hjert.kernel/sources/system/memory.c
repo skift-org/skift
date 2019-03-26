@@ -50,7 +50,11 @@ void physical_set_used(uint addr, uint count)
 {
     for (uint i = 0; i < count; i++)
     {
-        PHYSICAL_SET_USED(addr + (i * PAGE_SIZE));
+        if (!PHYSICAL_IS_USED(addr + (i * PAGE_SIZE)))
+        {
+            USED_MEMORY += PAGE_SIZE;
+            PHYSICAL_SET_USED(addr + (i * PAGE_SIZE));
+        }
     }
 }
 
@@ -58,7 +62,11 @@ void physical_set_free(uint addr, uint count)
 {
     for (uint i = 0; i < count; i++)
     {
-        PHYSICAL_SET_FREE(addr + (i * PAGE_SIZE));
+        if (PHYSICAL_IS_USED(addr + (i * PAGE_SIZE)))
+        {
+            USED_MEMORY -= PAGE_SIZE;
+            PHYSICAL_SET_FREE(addr + (i * PAGE_SIZE));
+        }
     }
 }
 
@@ -489,7 +497,7 @@ int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
 }
 
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
-{   
+{
     sk_atomic_begin();
     physical_set_free(addr, count);
     virtual_unmap(pdir, addr, count);

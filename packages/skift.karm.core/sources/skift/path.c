@@ -12,20 +12,24 @@ path_t* path(const char* raw_path)
 
     const char* begin = raw_path;
 
+    p->is_absolue = (raw_path[0] == '/');
+    
     for(int i = 0; raw_path[i]; i++)
     {
-        char c = raw_path[i];
-
-        if (c == '/')
+        if (raw_path[i] == '/' || raw_path[i] == '\0')
         {
-            int elem_size = (&raw_path[i] - begin) + 1;
+            int lenght = &raw_path[i] - begin;
 
-            if (elem_size > 1)
+            if(lenght > 0)
             {
-                char* element = malloc(elem_size);
-                memcpy(element, begin, elem_size);
+                char* element = malloc(lenght + 1);
+                element[lenght] = '\0';
+                strncpy(element, begin, lenght);
                 list_pushback(p->elements, element);
             }
+
+            // set the beginning of the next path element and skip the '/'
+            begin = &raw_path[i] + 1;
         }
     }
     
@@ -34,65 +38,119 @@ path_t* path(const char* raw_path)
 
 void path_delete(path_t* path)
 {
-    list_delete(path, LIST_FREE_VALUES);
+    list_delete(path->elements, LIST_FREE_VALUES);
     free(path);
 }
 
-
-
-
-
-/*
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-int main(int argc, char const *argv[])
+const char* path_filename(path_t* p)
 {
-    const char* path = "/home//nicolas/project/skift";
+    const char* element;
 
-    if (path[0] == '/') 
+    if (list_peekback(p->elements, (void**)&element))
     {
-        printf("This a absolute path\n");
+        return element;
     }
 
-    const char* begin = path;
+    return NULL;
+}
 
-    for(int i = 0; i <= strlen(path); i++)
+bool path_is_absolue(path_t* p)
+{
+    return p->is_absolue;
+}
+
+bool path_is_relative(path_t* p)
+{
+    return !p->is_absolue;
+}
+
+int path_length(path_t* p)
+{
+    return list_count(p->elements);
+}
+
+void path_normalize(path_t* p)
+{
+    list_t* stack = list();
+
+    int depth = 0;
+
+    FOREACH(i, p->elements)
     {
-        if (path[i] == '/' || path[i] == '\0')
+        const char* element = i->value;
+
+        if ((strcmp(element, "..") == 0) && (depth > 0))
         {
-            int lenght = &path[i] - begin;
-            if (lenght > 0)
-            {
-                char buffer[lenght + 1];
-                buffer[lenght] = '\0';
-                strncpy(buffer, begin, lenght);
-                printf("%d '%s'\n", lenght, buffer);
-            }
-            begin = &path[i] + 1;
+            char* value;
+            list_pop(stack, (void**)&value);
+            free(value);
+            depth--;
+        }
+        else if (strcmp(element, ".") != 0)
+        {
+            list_push(stack, strdup(element));
+            depth++;
         }
     }
-    
-    return 0;
+
+    list_delete(p->elements, LIST_FREE_VALUES);
+
+    p->elements = stack;
 }
-*/
 
+void path_append(path_t* p, const char* e)
+{
+    int lenght = strlen(e);
 
+    if(lenght > 0)
+    {
+        list_pushback(p->elements, strdup(e));
+    }
+}
 
+path_t* path_combine(path_t* left, path_t* right)
+{
+    path_t* p = MALLOC(path_t);
+    p->elements = list();
 
+    // Check if the resulting path is absolue
+    if (left != NULL)
+    {
+        p->is_absolue = left->is_absolue;
+    }
+    else if (right != NULL)
+    {
+        p->is_absolue = right->is_absolue;
+    }
+    else
+    {
+        p->is_absolue = false;
+    }
 
+    // Append the left part of the path
+    if (left != NULL)
+    {
+        p->is_absolue = left->is_absolue;
 
+        FOREACH(i, left->elements)
+        {
+            path_append(p, i->value);
+        }
+    }
 
+    // Append the rigt parte of the path
+    if (right != NULL)
+    {
+        FOREACH(i, right->elements)
+        {
+            path_append(p, i->value);
+        }
+    }
 
+    return p;
+}
 
-
-
-
-
-
-
-
+/* --- Old path api --------------------------------------------------------- */
 
 int path_read(const char *path, int index, char *buffer)
 {

@@ -27,7 +27,8 @@ typedef struct list
     list_item_t *tail;
 } list_t;
 
-typedef bool (*list_comparator_t)(void* left, void* right); // return true if the two value are ordered
+// Return true if the two value are ordered
+typedef bool (*list_comparator_t)(void* left, void* right); 
 
 /* --- List object constructor and destructor ------------------------------- */
 
@@ -48,11 +49,14 @@ void list_clear(list_t *list, bool free_items);
 // Insert a list item sorted.
 void list_insert_sorted(list_t* list, void* value, list_comparator_t comparator);
 
-// Take a look at the first item of the list.
+// Take a look at the **first item** of the list.
 bool list_peek(list_t* list, void** value);
 
-// Take a look at the last item of the list.
+// Take a look at the **last item** of the list.
 bool list_peekback(list_t* list, void** value);
+
+// Take a look at the item at the **position specified by index** in the list.
+bool list_peekat(list_t *list, int index, void **value);
 
 // Push an item to the head of the list.
 void list_push(list_t *list, void *value);
@@ -78,9 +82,12 @@ bool list_remove(list_t *list, void *value);
 // Is the list has any item in it?
 #define list_any(__list) ((__list)->count != 0)
 
+// Get item count
+#define list_count(__list) ((__list)->count)
+
 /* --- List node operation -------------------------------------------------- */
 // For zero alloc and free list operation this is greate when memory allocation
-// are to slow (see: skift.hjert.kernel::sheduler.c).
+// are to expensive (see: skift.hjert.kernel::sheduler.c).
 
 // bool list_node_peek(list_t* list, list_item_t** value);
 // bool list_node_peekback(list_t* list, list_item_t** value);

@@ -98,7 +98,7 @@ void path_normalize(path_t* p)
     p->elements = stack;
 }
 
-void path_append(path_t* p, const char* e)
+void path_push(path_t* p, const char* e)
 {
     int lenght = strlen(e);
 
@@ -106,6 +106,13 @@ void path_append(path_t* p, const char* e)
     {
         list_pushback(p->elements, strdup(e));
     }
+}
+
+const char* path_pop(path_t* p)
+{
+    const char* element = NULL;
+    list_popback(p->elements, (void**)&element);
+    return element;
 }
 
 path_t* path_combine(path_t* left, path_t* right)
@@ -134,7 +141,7 @@ path_t* path_combine(path_t* left, path_t* right)
 
         FOREACH(i, left->elements)
         {
-            path_append(p, i->value);
+            path_push(p, strdup(i->value));
         }
     }
 
@@ -143,83 +150,9 @@ path_t* path_combine(path_t* left, path_t* right)
     {
         FOREACH(i, right->elements)
         {
-            path_append(p, i->value);
+            path_push(p, strdup(i->value));
         }
     }
 
     return p;
-}
-
-/* --- Old path api --------------------------------------------------------- */
-
-int path_read(const char *path, int index, char *buffer)
-{
-    int current_index = 0;
-    buffer[0] = '\0';
-
-    if (path[0] == '/')
-        path++;
-
-    for (int i = 0; path[i]; i++)
-    {
-        char c = path[i];
-
-        if (current_index == index)
-        {
-            if (c == '/')
-            {
-                break;
-            }
-            else
-            {
-                strapd(buffer, c);
-            }
-        }
-
-        if (c == '/')
-        {
-            current_index++;
-            buffer[0] = '\0';
-        }
-    }
-
-    return (current_index == index && strlen(buffer)) ? 1 : 0;
-}
-
-int path_len(const char *path)
-{
-    char buffer[128];
-    
-    int count = 0;
-    while(path_read(path, count, buffer)) count++;
-
-    return count;
-}
-
-int path_split(const char *path, char *dir, char *file)
-{
-    if (path == NULL || dir == NULL || file == NULL)
-        return 0;
-
-    int pathlen = path_len(path);
-
-    dir[0] = '\0';
-    file[0] = '\0';
-
-    char buffer[128];
-
-    for (int i = 0; path_read(path, i, buffer); i++)
-    {
-        if (i < pathlen - 1)
-        {
-            strcat(dir, buffer);
-            strapd(dir, '/');
-        }
-        else
-        {
-            strcpy(file, buffer);
-        }
-    }
-
-    return 1;
 }

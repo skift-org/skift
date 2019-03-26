@@ -5,9 +5,9 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/generic.h>
+#include <skift/path.h>
 #include <skift/list.h>
 #include <skift/lock.h>
-#include <skift/path.h>
 #include <skift/ringbuffer.h>
 
 #include "kernel/shared/filesystem.h"

@@ -1,5 +1,5 @@
 <p align="center">
-<b>See the <a href="https://github.com/skiftOS/skift/tree/develop">develop branch</a> for the lastest development</p>
+<b>See the <a href="https://github.com/skiftOS/skift/tree/develop">develop branch</a> for the lastest development</b>
 </p>
 
 <p align="center">

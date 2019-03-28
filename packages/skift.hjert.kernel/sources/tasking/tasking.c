@@ -344,13 +344,16 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
     }
 }
 
-PROCESS process_exec(const char *path, const char **argv)
+PROCESS process_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    stream_t *s = filesystem_open(ROOT, path, OPENOPT_READ);
+    path_t* exec_path = path(executable_path);
+    stream_t *s = filesystem_open(ROOT, exec_path, OPENOPT_READ);
+    path_delete(exec_path);
+
     if (s == NULL)
     {
-        sk_log(LOG_WARNING, "'%s' file not found, exec failed!", path);
+        sk_log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
         return 0;
     }
 
@@ -360,7 +363,7 @@ PROCESS process_exec(const char *path, const char **argv)
 
     if (stat.type != FSFILE)
     {
-        sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", path);
+        sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         return 0;
     }
 
@@ -370,7 +373,7 @@ PROCESS process_exec(const char *path, const char **argv)
 
     if (buffer == NULL)
     {
-        sk_log(LOG_WARNING, "Failed to read from '%s', exec failed!", path);
+        sk_log(LOG_WARNING, "Failed to read from '%s', exec failed!", executable_path);
         return 0;
     }
 
@@ -379,12 +382,12 @@ PROCESS process_exec(const char *path, const char **argv)
 
     if (!elf_valid(elf))
     {
-        sk_log(LOG_WARNING, "Invalid elf program!", path);
+        sk_log(LOG_WARNING, "Invalid elf program!", executable_path);
         return 0;
     }
 
     // Create the process and load the executable.
-    PROCESS p = process_create(path, true);
+    PROCESS p = process_create(executable_path, true);
 
     elf_program_t program;
 

@@ -14,7 +14,7 @@ path_t* path(const char* raw_path)
 
     p->is_absolue = (raw_path[0] == '/');
     
-    for(int i = 0; raw_path[i]; i++)
+    for(uint i = 0; i <= strlen(raw_path); i++)
     {
         if (raw_path[i] == '/' || raw_path[i] == '\0')
         {
@@ -52,6 +52,19 @@ const char* path_filename(path_t* p)
     }
 
     return NULL;
+}
+
+const char* path_element(path_t* p, int index)
+{
+    const char* element;
+    if (list_peekat(p->elements, index, (void**)&element))
+    {
+        return element;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 bool path_is_absolue(path_t* p)
@@ -155,4 +168,12 @@ path_t* path_combine(path_t* left, path_t* right)
     }
 
     return p;
+}
+
+void path_dump(path_t* p)
+{
+    for(int i = 0; i < path_length(p); i++)
+    {
+        printf("/%s", path_element(p, i));
+    }
 }

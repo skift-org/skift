@@ -162,39 +162,16 @@ int sys_io_print(const char *msg)
     return 0;
 }
 
-int sys_io_graphic_blit(unsigned int *buffer)
-{
-    UNUSED(buffer);
-
-    return 0;
-}
-
-int sys_io_graphic_blit_region(unsigned int *buffer, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
-{
-    UNUSED(buffer);
-    UNUSED(x);
-    UNUSED(y);
-    UNUSED(w);
-    UNUSED(h);
-
-    return 0;
-}
-
-int sys_io_graphic_size(unsigned int *width, unsigned int *height)
-{
-    UNUSED(width);
-    UNUSED(height);
-    
-    return 0;
-}
-
 /* --- Filesystem and IO ---------------------------------------------------- */
 
 // TODO file decriptor
 
-int sys_filesystem_open(const char* path, fsoflags_t flags)
+int sys_filesystem_open(const char* file_path, fsoflags_t flags)
 {
-    return (int)filesystem_open(ROOT, path, flags);
+    path_t* p = path(file_path);
+    int result = (int)filesystem_open(ROOT, p, flags);
+    path_delete(p);
+    return result;
 }
 
 int sys_filesystem_close(int fd)
@@ -228,14 +205,20 @@ int sys_filesystem_tell(int fd)
     return filesystem_tell((stream_t*)fd);
 }
 
-int sys_filesystem_mkdir(const char *path)
+int sys_filesystem_mkdir(const char *dir_path)
 {
-    return filesystem_mkdir(ROOT, path);
+    path_t* p = path(dir_path);
+    int result = filesystem_mkdir(ROOT, p);
+    path_delete(p);
+    return result; 
 }
 
-int sys_filesystem_unlink(const char *path)
+int sys_filesystem_unlink(const char *link_path)
 {
-    return filesystem_unlink(ROOT, path);
+    path_t* p = path(link_path);
+    int result = filesystem_unlink(ROOT, p);
+    path_delete(p);
+    return result; 
 }
 
 static int (*syscalls[])() =
@@ -267,10 +250,6 @@ static int (*syscalls[])() =
 
     [SYS_IO_PRINT] = sys_io_print,
     [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
-
-    [SYS_IO_GRAPHIC_BLIT] = sys_io_graphic_blit,
-    [SYS_IO_GRAPHIC_BLIT_REGION] = sys_io_graphic_blit_region,
-    [SYS_IO_GRAPHIC_SIZE] = sys_io_graphic_size,
 
     [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
     [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,

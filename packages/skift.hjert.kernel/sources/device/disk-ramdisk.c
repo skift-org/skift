@@ -21,17 +21,27 @@ void ramdisk_load(multiboot_module_t *module)
     tar_block_t block;
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
     {
+        path_t* file_path = path(block.name);
+        printf("The path is : ");
+        path_dump(file_path);
+        printf("\n");
+
         if (block.name[strlen(block.name) - 1] == '/')
         {
             sk_log(LOG_DEBUG, "Creating %s directory...", block.name);
-            if (FSRESULT_SUCCEED != filesystem_mkdir(ROOT, block.name))
+
+
+            if (FSRESULT_SUCCEED != filesystem_mkdir(ROOT, file_path))
             {
                 sk_log(LOG_WARNING, "Failed to create directory %s...", block.name);
             }
+
         }
         else
         {
-            stream_t *s = filesystem_open(ROOT, block.name, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
+            sk_log(LOG_DEBUG, "Creating %s file...", block.name);            
+
+            stream_t *s = filesystem_open(ROOT, file_path, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
             
             if (s != NULL)
             {
@@ -43,6 +53,8 @@ void ramdisk_load(multiboot_module_t *module)
                 sk_log(LOG_WARNING, "Failed to open file %s!", block.name);
             }
         }
+
+        path_delete(file_path);
     }
 
     sk_log(LOG_FINE, "Loading ramdisk succeeded.");

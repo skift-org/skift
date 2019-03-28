@@ -45,12 +45,9 @@ typedef enum
     SYS_MSG_UNSUBSCRIBE,
 
 /* --- I/O ------------------------------------------------------------------ */
+    
     SYS_IO_PRINT,
     SYS_IO_READ,
-
-    SYS_IO_GRAPHIC_BLIT,
-    SYS_IO_GRAPHIC_BLIT_REGION,
-    SYS_IO_GRAPHIC_SIZE,
 
 /* --- Filesystem ----------------------------------------------------------- */
 

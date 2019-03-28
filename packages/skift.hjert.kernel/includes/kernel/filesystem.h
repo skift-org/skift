@@ -92,11 +92,14 @@ void filesystem_dump(void);
 
 /* --- fsnode --------------------------------------------------------------- */
 
-fsnode_t *filesystem_acquire(fsnode_t *at, const char *path, bool create);
+// Resolve and acquire a fsnode.
+fsnode_t *filesystem_acquire(fsnode_t *at, path_t* p, bool create);
+
+// Release the fsnode.
 void filesystem_release(fsnode_t *node);
 
 /* --- File IO -------------------------------------------------------------- */
-stream_t *filesystem_open(fsnode_t *at, const char *path, fsoflags_t flags);
+stream_t *filesystem_open(fsnode_t *at, path_t* p, fsoflags_t flags);
 void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
@@ -112,17 +115,21 @@ int filesystem_fstat(stream_t *s, file_stat_t *stat);
 void *filesystem_readall(stream_t *s);
 
 /* --- File system operation ------------------------------------------------ */
-int filesystem_mkfile(fsnode_t *at, const char *path);
-int filesystem_mkfifo(fsnode_t *at, const char *path); /* TODO */
-int filesystem_mkdev(fsnode_t *at, const char *path, device_t dev);
-int filesystem_mkdir(fsnode_t *at, const char *path);
+int filesystem_mkfile(fsnode_t *at, path_t* p);
+int filesystem_mkfifo(fsnode_t *at, path_t* p); /* TODO */
+int filesystem_mkdev(fsnode_t *at, path_t* p, device_t dev);
+int filesystem_mkdir(fsnode_t *at, path_t* p);
 
-int filesystem_link(fsnode_t *oldat, const char *oldpath, fsnode_t *newat, const char *newpath);
-int filesystem_unlink(fsnode_t *at, const char *path);
+int filesystem_link(fsnode_t * atfile, path_t* file, fsnode_t *atlink, path_t* link);
+int filesystem_unlink(fsnode_t *at, path_t* p);
 
 // *filesystem_mkdev* with error checking.
 #define FILESYSTEM_MKDEV(__name, __object)                   \
-    if (filesystem_mkdev(NULL, "/dev/" __name, (__object)))        \
+    path_t* __dev_path = path("/dev/" __name );               \
+    path_dump(__dev_path); printf("\n");\
+    sk_log(LOG_DEBUG, "Creating device " __name " at /dev/" __name); \
+    if (filesystem_mkdev(NULL, __dev_path, (__object)))      \
     {                                                        \
         PANIC("Failled to create the '" __name "' device."); \
-    }
+    }                                                        \
+    path_delete(__dev_path);

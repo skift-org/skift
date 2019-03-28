@@ -30,3 +30,5 @@ void path_push(path_t* p, const char* element);
 const char* path_pop(path_t* p);
 
 path_t* path_combine(path_t* left, path_t* right);
+
+void path_dump(path_t* p);

@@ -78,8 +78,8 @@ void thread_setup(void);
 thread_t *thread();
 void thread_delete(thread_t *thread);
 
+void thread_panic_dump(void);
 void thread_dump(thread_t *t);
-void thread_dumpall();
 
 thread_t *thread_getbyid(int id);
 void thread_setstate(thread_t *thread, thread_state_t state);

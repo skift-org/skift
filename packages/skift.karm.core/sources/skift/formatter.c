@@ -134,6 +134,7 @@ void sk_formatter_init()
     sk_formatter_register('b', (formatter_t)sk_format_binary);
     sk_formatter_register('o', (formatter_t)sk_format_octal);
     sk_formatter_register('d', (formatter_t)sk_format_decimal);
+    sk_formatter_register('i', (formatter_t)sk_format_decimal);
     sk_formatter_register('x', (formatter_t)sk_format_hexadecimal);
     sk_formatter_register('c', (formatter_t)sk_format_char);
     

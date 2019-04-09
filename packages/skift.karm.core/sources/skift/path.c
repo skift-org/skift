@@ -50,13 +50,16 @@ const char* path_filename(path_t* p)
     {
         return element;
     }
-
-    return NULL;
+    else
+    {
+        return NULL;
+    }
 }
 
 const char* path_element(path_t* p, int index)
 {
     const char* element;
+
     if (list_peekat(p->elements, index, (void**)&element))
     {
         return element;
@@ -117,7 +120,7 @@ void path_push(path_t* p, const char* e)
 
     if(lenght > 0)
     {
-        list_pushback(p->elements, strdup(e));
+        list_pushback(p->elements, (char*)e);
     }
 }
 

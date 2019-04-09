@@ -33,6 +33,8 @@ int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
 
+    sk_logger_setlevel(LOG_ALL);
+
     int shell = init_exec("/bin/sh");
     sk_thread_wait_process(shell, NULL);
 

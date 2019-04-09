@@ -69,7 +69,6 @@ typedef struct s_iostream
     iostream_ioctl_t *ioctl;
     iostream_close_t *close;
 
-
     void* write_buffer;
     uint write_head;
 

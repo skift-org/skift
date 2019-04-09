@@ -39,6 +39,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
     node->type = type;
     node->refcount = 0;
+    sk_lock_init(node->lock);
 
     switch (type)
     {
@@ -73,7 +74,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
-    sk_log(LOG_DEBUG, "Fsnode free: '%s'", node->name);
+    sk_log(LOG_DEBUG, "Fsnode free: %08X", node);
 
     switch (node->type)
     {
@@ -225,7 +226,7 @@ void file_stat(fsnode_t *node, file_stat_t *stat)
 
 #pragma region
 
-// only call this method if you old the directory lock.
+// only call this method if you hold the directory lock.
 fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 {
     FOREACH(i, dir->directory.childs)
@@ -487,38 +488,65 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
 
-        for (int i = 0; i < depth; i++)
-        {
-            printf("  ");
-        }
 
-        if (node->type == FSFILE)
+        if (node->type != FSDIRECTORY)
         {
-            printf("  '%s' size: %dbytes\n", entry->name, node->file.size);
-        }
-        else if (node->type == FSDIRECTORY)
-        {
-            printf("* '%s' %d childs\n", entry->name, node->directory.childs->count);
-            filesystem_dump_internal(node, depth + 1);
-        }
-        else
-        {
-            printf("! '%s'\n", node->name);
+            printf("\t");
+            for (int i = 0; i < depth; i++)
+            {
+                printf("| \t");
+            }
+
+            if (node->type == FSFILE)
+            {
+                printf("|-%s size: %dbytes\n", entry->name, node->file.size);
+            }
+            else
+            {
+                printf("|-%s\n", entry->name);
+            }
         }
     }
+
+    FOREACH(i, node->directory.childs)
+    {
+        fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
+        fsnode_t *node = entry->node;
+
+        if (node->type == FSDIRECTORY)
+        {
+            printf("\t");
+            for (int i = 0; i < depth; i++)
+            {
+                printf("| \t");
+            }
+
+            printf("|-%s %d childs\n", entry->name, node->directory.childs->count);
+            filesystem_dump_internal(node, depth + 1);
+        }
+    }
+
+    printf("\t");
+    for (int i = 0; i < depth; i++)
+    {
+        printf("| \t");
+    }
+    printf("+\n");
+    printf("\t");
+    for (int i = 0; i < depth; i++)
+    {
+        printf("| \t");
+    }
+    printf("\n");
 }
 
-void filesystem_dump(void)
+void filesystem_panic_dump(void)
 {
-    sk_lock_acquire(fslock);
-
-    printf("\n--- FILE SYSTEM DUMP -----------------------------------------------------------\n\n");
-
-    filesystem_dump_internal(root, 0);
-
-    printf("\n--------------------------------------------------------------------------------\n\n");
-
-    sk_lock_release(fslock);
+    if (filesystem_ready)
+    {
+        printf("\n\tFile system:\n");
+        filesystem_dump_internal(root, 0);
+    }
 }
 
 #pragma endregion
@@ -644,7 +672,17 @@ void *filesystem_readall(stream_t *s)
         file_stat_t stat = {0};
         filesystem_fstat(s, &stat);
         void *buffer = malloc(stat.size);
-        filesystem_read(s, buffer, stat.size);
+        int readed = filesystem_read(s, buffer, stat.size);
+
+
+        int hash = 0;
+
+        for(uint i = 0; i < stat.size; i++)
+        {
+            hash+= ((char*)buffer)[i];
+        }
+        
+        sk_log(LOG_DEBUG, "readed %d out of %d hash:%08x", readed, stat.size, hash);
 
         return buffer;
     }

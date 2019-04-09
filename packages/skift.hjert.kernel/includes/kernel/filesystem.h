@@ -88,7 +88,7 @@ typedef struct s_stream
 } stream_t;
 
 void filesystem_setup(void);
-void filesystem_dump(void);
+void filesystem_panic_dump(void);
 
 /* --- fsnode --------------------------------------------------------------- */
 
@@ -124,12 +124,11 @@ int filesystem_link(fsnode_t * atfile, path_t* file, fsnode_t *atlink, path_t* l
 int filesystem_unlink(fsnode_t *at, path_t* p);
 
 // *filesystem_mkdev* with error checking.
-#define FILESYSTEM_MKDEV(__name, __object)                   \
-    path_t* __dev_path = path("/dev/" __name );               \
-    path_dump(__dev_path); printf("\n");\
+#define FILESYSTEM_MKDEV(__name, __object)                           \
+    path_t* __dev_path = path("/dev/" __name );                      \
     sk_log(LOG_DEBUG, "Creating device " __name " at /dev/" __name); \
-    if (filesystem_mkdev(NULL, __dev_path, (__object)))      \
-    {                                                        \
-        PANIC("Failled to create the '" __name "' device."); \
-    }                                                        \
+    if (filesystem_mkdev(NULL, __dev_path, (__object)))              \
+    {                                                                \
+        PANIC("Failled to create the '" __name "' device.");         \
+    }                                                                \
     path_delete(__dev_path);

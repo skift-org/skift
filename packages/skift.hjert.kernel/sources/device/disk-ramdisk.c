@@ -22,9 +22,6 @@ void ramdisk_load(multiboot_module_t *module)
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
     {
         path_t* file_path = path(block.name);
-        printf("The path is : ");
-        path_dump(file_path);
-        printf("\n");
 
         if (block.name[strlen(block.name) - 1] == '/')
         {

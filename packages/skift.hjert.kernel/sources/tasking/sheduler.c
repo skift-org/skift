@@ -46,7 +46,7 @@ void wakeup_sleeping_threads(void)
 bool is_context_switch = false;
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    // sk_log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
+    //sk_log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     is_context_switch = true;
 
@@ -74,7 +74,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     is_context_switch = false;
 
-    // sk_log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
+    //sk_log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
 
     return running->sp;
 }

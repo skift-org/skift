@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <skift/atomic.h>
 
+#include "kernel/thread.h"
 #include "kernel/tasking.h"
 #include "kernel/system.h"
 
@@ -34,6 +35,9 @@ const char *const witty_comments[] =
 extern uint ticks;
 extern bool is_context_switch;
 
+static bool has_panic = false;
+static bool nested_panic = false;
+
 void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, string message, ...)
 {
     sk_atomic_begin();
@@ -41,9 +45,21 @@ void __panic(const char* package, const char* file, const char* function, const 
     va_list va;
     va_start(va, message);
 
-    printf("\n\033[0;33m--- \033[0;31m!!!\033[0;33m ------------------------------------------------------------------------\033[0m\n");
+    if (!has_panic)
+    {
+        printf("\n\033[0;33m--- \033[0;31m!!!\033[0;33m ------------------------------------------------------------------------\033[0m\n");
+        printf("\n\tKERNEL");
+    }
+    else
+    {
+        nested_panic = true;
+        printf("\n\n\033[0;33m- - \033[0;31mNESTED\033[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m\n");
+        printf("\n\tNESTED");
+    }
 
-    printf("\n\tKERNEL PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[ticks % (sizeof(witty_comments)/sizeof(char*))]);
+    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[ticks % (sizeof(witty_comments)/sizeof(char*))]);
+
+    has_panic = true;
 
     vprintf(message, va);
     printf("\033[0m\n\tat %s::%s %s() ln%d",package, file, function, line);
@@ -67,7 +83,11 @@ void __panic(const char* package, const char* file, const char* function, const 
         processor_dump_context(context);
     }
 
-    //thread_dump_all();
+    if (!nested_panic)
+    {
+        // filesystem_panic_dump();
+        thread_panic_dump();
+    }
 
     printf("\n");
 

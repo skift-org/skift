@@ -81,17 +81,16 @@ static char *THREAD_STATES[] =
 void thread_dump(thread_t *t)
 {
     sk_atomic_begin();
-
     printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
 
     sk_atomic_end();
 }
 
-void thread_dumpall()
+void thread_panic_dump(void)
 {
     sk_atomic_begin();
 
-    printf("\n\tCurrent thread:");
+    printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
     thread_dump(sheduler_running_thread());
 
     printf("\n");

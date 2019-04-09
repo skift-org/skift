@@ -13,7 +13,6 @@ void __sk_lock_acquire(lock_t *lock)
 {
     while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
         asm("hlt"); // Don't burn the CPU ;)
-    
     __sync_synchronize();
 }
 

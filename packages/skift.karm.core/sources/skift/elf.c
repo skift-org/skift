@@ -15,7 +15,7 @@ int check_magic(elf_header_t *header)
            magic[1] == ELFMAG1 &&
            magic[2] == ELFMAG2 &&
            magic[3] == ELFMAG3 &&
-           magic[4] == 1 && /* is 32bit */
+           magic[4] == 1       &&
            magic[5] == 1;
 }
 

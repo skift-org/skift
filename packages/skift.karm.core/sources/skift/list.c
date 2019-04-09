@@ -211,7 +211,7 @@ bool list_popback(list_t *l, void **value)
 
     if (l->count == 0)
     {
-        return 0;
+        return NULL;
     }
     else if (l->count == 1)
     {

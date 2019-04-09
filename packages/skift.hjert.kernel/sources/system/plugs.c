@@ -18,7 +18,7 @@
 void __plug_init(void)
 {
     sk_formatter_init();
-    sk_logger_setlevel(LOG_ALL);
+    sk_logger_setlevel(LOG_OFF);
 }
 
 int __plug_print(const char *buffer)

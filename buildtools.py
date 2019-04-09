@@ -53,6 +53,7 @@ LDFLAGS = ["-flto"]
 ASFLAGS = ["-f", "elf32"]
 
 QEMUFLAGS = ["-m", "256M", "-serial", "mon:stdio", "-rtc", "base=localtime"]
+QEMU_DEBUG = ["-S", "-s"]
 QEMUFLAGS_KVM   = QEMUFLAGS + ["-enable-kvm"]
 QEMUFLAGS_NOKVM = QEMUFLAGS
 
@@ -81,11 +82,16 @@ def COPY(src, dest):
 
     return dest
 
-def QEMU(disk):
-    if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
-        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
+def QEMU(disk, debug):
+    if debug:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMU_DEBUG + QEMUFLAGS_NOKVM) != 0:
             ERROR("Failed to start QEMU!")
             ABORT()
+    else:
+        if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
+            if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
+                ERROR("Failed to start QEMU!")
+                ABORT()
 
 def GRUB(iso, output_file):
     with open("/dev/null", "w") as f:
@@ -638,7 +644,15 @@ def run_command(targets):
 
     print("")
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
-    QEMU("build/bootdisk.iso")
+    QEMU("build/bootdisk.iso", False)
+
+def debug_command(targets):
+    """Start skiftOS in QEMU."""
+    distrib(targets)
+
+    print("")
+    print(BRIGHT_WHITE + "Starting VM (DEBUG MODE)..." + RESET)
+    QEMU("build/bootdisk.iso", True)
 
 
 global_actions = \
@@ -652,11 +666,11 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "run": run_command
+        "run": run_command,
+        "debug" : debug_command
     }
 
 # --- Main ------------------------------------------------------------------- #
-
 
 def missing_command(command):
     ERROR("No action named '%s'!" % command)

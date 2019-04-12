@@ -38,7 +38,7 @@ extern bool is_context_switch;
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, string message, ...)
+void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...)
 {
     sk_atomic_begin();
 
@@ -62,7 +62,7 @@ void __panic(const char* package, const char* file, const char* function, const 
     has_panic = true;
 
     vprintf(message, va);
-    printf("\033[0m\n\tat %s::%s %s() ln%d",package, file, function, line);
+    printf("\033[0m\n\tthrow by %s::%s %s() ln%d",package, file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");

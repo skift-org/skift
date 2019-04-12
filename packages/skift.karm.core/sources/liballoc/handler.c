@@ -1,5 +1,5 @@
 #include <skift/generic.h>
-#include <skift/__plugs.h>
+#include <skift/__plugs__.h>
 
 int liballoc_lock()
 {

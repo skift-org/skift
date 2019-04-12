@@ -143,7 +143,7 @@ typedef PACKED(struct)
 } cpuid_t;
 
 cpuid_t cpuid();
-string cpuid_get_vendorid();
+char* cpuid_get_vendorid();
 extern u32 cpuid_get_feature_EDX();
 extern u32 cpuid_get_feature_ECX();
 void cpuid_dump();

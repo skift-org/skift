@@ -27,6 +27,15 @@ process_t *alloc_process(const char *name, bool user)
     process->inbox = list();
     process->shared = list();
 
+    sk_lock_init(process->fds_lock);
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    {
+        process_filedescriptor_t *fd = &process->fds[i];
+        fd->stream = NULL;
+        fd->free = true;
+        sk_lock_init(fd->lock);
+    }
+
     if (user)
     {
         process->pdir = memory_alloc_pdir();
@@ -41,7 +50,7 @@ process_t *alloc_process(const char *name, bool user)
     return process;
 }
 
-void process_delete(process_t* process)
+void process_delete(process_t *process)
 {
     if (process->pdir != memory_kpdir())
     {
@@ -57,7 +66,7 @@ void process_delete(process_t* process)
         list_delete(process->threads, LIST_KEEP_VALUES);
     }
 
-    if (list_any(process->inbox  ))
+    if (list_any(process->inbox))
     {
         PANIC("Process's inbox-list isn't empty!");
     }
@@ -66,7 +75,7 @@ void process_delete(process_t* process)
         list_delete(process->inbox, LIST_KEEP_VALUES);
     }
 
-    if (list_any(process->shared ))
+    if (list_any(process->shared))
     {
         PANIC("Process's shared-list isn't empty!");
     }

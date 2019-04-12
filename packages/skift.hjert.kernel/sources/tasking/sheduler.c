@@ -106,6 +106,11 @@ void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process)
     irq_register(0, (irq_handler_t)&shedule);
 }
 
+process_t* sheduler_running_process()
+{
+    return running->process;
+}
+
 thread_t* sheduler_running_thread()
 {
     return running;

@@ -10,7 +10,7 @@
 #include <skift/process.h>
 #include <skift/logger.h>
 #include <skift/formatter.h>
-#include <skift/__plugs.h>
+#include <skift/__plugs__.h>
 
 lock_t memlock;
 lock_t loglock;
@@ -26,26 +26,6 @@ int __plug_print(const char *buffer)
 {
     sk_io_print(buffer);
     return strlen(buffer);
-}
-
-void __plug_putchar(int c)
-{
-    UNUSED(c);
-    sk_log(LOG_ERROR, "__plug_putchar() not implemented!");
-}
-
-int __plug_getchar()
-{
-    sk_log(LOG_ERROR, "__plug_getchar() not implemented!");
-    return EOF;
-}
-
-void __plug_read(char * buffer, uint size)
-{
-    UNUSED(buffer);
-    UNUSED(size);
-
-    sk_log(LOG_ERROR, "__plug_read() not implemented!");
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)

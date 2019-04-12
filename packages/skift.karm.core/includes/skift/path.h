@@ -7,10 +7,17 @@
 #include <skift/generic.h>
 #include <skift/list.h>
 
+#define PATH_SEPARATOR '/'
+
+// Lenght of a path element including the \0
+#define PATH_ELEMENT_LENGHT 128
+
+#define PATH_MAX_DEPTH 128
+
+
 typedef struct
 {
-    list_t* elements;
-    
+    list_t* elements;    
     bool is_absolue;
 } path_t;
 

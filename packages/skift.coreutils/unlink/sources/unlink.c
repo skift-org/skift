@@ -6,7 +6,7 @@
 
 int unlink(const char *path)
 {
-    return sk_filesystem_unlink(path);
+    return filesystem_unlink(path);
 }
 
 int main(int argc, char **argv)

@@ -9,6 +9,8 @@ void sk_atomic_disable();
 void sk_atomic_begin();
 void sk_atomic_end();
 
+#define ASSERT_ATOMIC();
+
 #define ATOMIC(code)       \
     do                     \
     {                      \

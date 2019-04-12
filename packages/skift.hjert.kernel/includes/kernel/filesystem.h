@@ -9,8 +9,8 @@
 #include <skift/list.h>
 #include <skift/lock.h>
 #include <skift/ringbuffer.h>
+#include <skift/iostream.h>
 
-#include "kernel/shared/filesystem.h"
 #include "kernel/system.h"
 
 #define ROOT NULL
@@ -40,7 +40,7 @@ typedef struct
 
 typedef struct
 {
-    char name[MAX_FILENAME_LENGHT];
+    char name[PATH_ELEMENT_LENGHT];
     struct s_fsnode *node;
 } fsdirectory_entry_t;
 
@@ -56,8 +56,8 @@ typedef struct
 
 typedef struct s_fsnode
 {
-    char name[MAX_FILENAME_LENGHT];
-    fsnode_type_t type;
+    char name[PATH_ELEMENT_LENGHT];
+    iostream_type_t type;
     lock_t lock;
 
     union {
@@ -73,14 +73,14 @@ typedef struct s_fsnode
 typedef struct
 {
     int count;
-    directory_entry_t *entries;
+    iostream_direntry_t *entries;
 } directory_entries_t;
 
 typedef struct s_stream
 {
     fsnode_t *node;
     uint offset;
-    fsoflags_t flags;
+    iostream_flag_t flags;
 
     union {
         directory_entries_t direntries;
@@ -99,7 +99,7 @@ fsnode_t *filesystem_acquire(fsnode_t *at, path_t* p, bool create);
 void filesystem_release(fsnode_t *node);
 
 /* --- File IO -------------------------------------------------------------- */
-stream_t *filesystem_open(fsnode_t *at, path_t* p, fsoflags_t flags);
+stream_t *filesystem_open(fsnode_t *at, path_t* p, iostream_flag_t flags);
 void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
@@ -107,10 +107,10 @@ int filesystem_write(stream_t *s, void *buffer, uint size);
 
 int filesystem_ioctl(stream_t *s, int request, void *args);
 
-int filesystem_seek(stream_t *s, int offset, seek_origin_t origine);
-int filesystem_tell(stream_t *s);
+int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine);
+int filesystem_tell(stream_t *s, iostream_whence_t whence);
 
-int filesystem_fstat(stream_t *s, file_stat_t *stat);
+int filesystem_fstat(stream_t *s, iostream_stat_t *stat);
 
 void *filesystem_readall(stream_t *s);
 

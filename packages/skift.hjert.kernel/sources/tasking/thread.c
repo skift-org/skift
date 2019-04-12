@@ -35,6 +35,60 @@ void thread_setup(void)
     }
 }
 
+thread_t *thread_getbyid(int id)
+{
+    FOREACH(i, threads)
+    {
+        thread_t *thread = i->value;
+
+        if (thread->id == id)
+            return thread;
+    }
+
+    return NULL;
+}
+
+// Thread state mamanagment ------------------------------------------------- //
+list_t* thread_bystate(thread_state_t state)
+{
+    return threads_bystates[state];
+}
+
+bool shortest_sleep_first(void *left, void *right)
+{
+    return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
+}
+
+void thread_setstate(thread_t *thread, thread_state_t state)
+{
+    if (thread->state == state)
+        return;
+
+    // Remove the thread from its old groupe.
+    if (thread->state != THREADSTATE_NONE)
+    {
+        list_remove(threads_bystates[thread->state], thread);
+    }
+
+    // Update the thread state
+    thread->state = state;
+
+    // Add the thread to the groupe
+    if (thread->state != THREADSTATE_NONE)
+    {
+        if (thread->state == THREADSTATE_WAIT_TIME)
+        {
+            list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
+        }
+        else
+        {
+            list_push(threads_bystates[thread->state], thread);
+        }
+    }
+}
+
+// Thread creation ---------------------------------------------------------- //
+
 thread_t *thread()
 {
     thread_t *thread = MALLOC(thread_t);
@@ -66,94 +120,6 @@ void thread_delete(thread_t *thread)
 
     // Now no one should still have a ptr to us we can die in peace.
     free(thread);
-}
-
-static char *THREAD_STATES[] =
-    {
-        "RUNNING",
-        "SLEEP",
-        "WAIT(thread)",
-        "WAIT(process)",
-        "WAIT(message)",
-        "CANCELED",
-};
-
-void thread_dump(thread_t *t)
-{
-    sk_atomic_begin();
-    printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
-
-    sk_atomic_end();
-}
-
-void thread_panic_dump(void)
-{
-    sk_atomic_begin();
-
-    printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
-    thread_dump(sheduler_running_thread());
-
-    printf("\n");
-
-    printf("\n\tThreads:");
-
-    FOREACH(i, threads)
-    {
-        thread_t *t = i->value;
-        if (t != sheduler_running_thread() && t->state != THREADSTATE_NONE)
-            thread_dump(t);
-    }
-
-    for (int i = 0; i < MAX_THREAD; i++)
-    {
-    }
-
-    sk_atomic_end();
-}
-
-thread_t *thread_getbyid(int id)
-{
-    FOREACH(i, threads)
-    {
-        thread_t *thread = i->value;
-
-        if (thread->id == id)
-            return thread;
-    }
-
-    return NULL;
-}
-
-list_t* thread_bystate(thread_state_t state)
-{
-    return threads_bystates[state];
-}
-
-bool shortest_sleep_first(void *left, void *right)
-{
-    return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
-}
-
-void thread_setstate(thread_t *thread, thread_state_t state)
-{
-    if (thread->state != THREADSTATE_NONE)
-    {
-        list_remove(threads_bystates[thread->state], thread);
-    }
-
-    thread->state = state;
-
-    if (thread->state != THREADSTATE_NONE)
-    {
-        if (thread->state == THREADSTATE_WAIT_TIME)
-        {
-            list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
-        }
-        else
-        {
-            list_push(threads_bystates[thread->state], thread);
-        }
-    }
 }
 
 void thread_setentry(thread_t *t, thread_entry_t entry, bool user)
@@ -203,4 +169,50 @@ void thread_setready(thread_t *t)
     ctx.gs = 0x10;
 
     thread_stack_push(t, &ctx, sizeof(ctx));
+
+    thread_setstate(t, THREADSTATE_RUNNING);
+}
+
+// Runtime thread mamangment ------------------------------------------------ //
+
+// Thread dump -------------------------------------------------------------- //
+// Dump all thread info on the panic screen.
+
+static char *THREAD_STATES[] =
+{
+    "RUNNING",
+    "SLEEP",
+    "WAIT(thread)",
+    "WAIT(process)",
+    "WAIT(message)",
+    "CANCELED",
+};
+
+void thread_dump(thread_t *t)
+{
+    sk_atomic_begin();
+    printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
+
+    sk_atomic_end();
+}
+
+void thread_panic_dump(void)
+{
+    sk_atomic_begin();
+
+    printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
+    thread_dump(sheduler_running_thread());
+
+    printf("\n");
+
+    printf("\n\tThreads:");
+
+    FOREACH(i, threads)
+    {
+        thread_t *t = i->value;
+        if (t != sheduler_running_thread() && t->state != THREADSTATE_NONE)
+            thread_dump(t);
+    }
+
+    sk_atomic_end();
 }

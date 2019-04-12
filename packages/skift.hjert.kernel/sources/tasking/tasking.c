@@ -63,8 +63,6 @@ THREAD kernel_thread;
 
 thread_t *running = NULL;
 
-reg32_t shedule(reg32_t esp, processor_context_t *context);
-
 void tasking_setup()
 {
     running = NULL;
@@ -110,7 +108,6 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_stack_push(t, &argc, sizeof(argc));
 
     thread_setready(t);
-    thread_setstate(t, THREADSTATE_RUNNING);
 
     sk_atomic_end();
 
@@ -128,7 +125,6 @@ THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
     thread_attach_to_process(t, process);
     thread_stack_push(t, &arg, sizeof(arg));
     thread_setready(t);
-    thread_setstate(t, THREADSTATE_RUNNING);
 
     sk_atomic_end();
 
@@ -462,8 +458,7 @@ void process_exit(int exitvalue)
         process_cancel(self, exitvalue);
 
         // Hang
-        while (1)
-            hlt();
+        while (1) hlt();
     }
     else
     {

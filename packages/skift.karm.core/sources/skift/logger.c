@@ -7,10 +7,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <skift/__plugs.h>
+#include <skift/__plugs__.h>
 #include <skift/logger.h>
 
-log_level_t log_level = LOG_OFF;
+log_level_t log_level = LOG_ERROR;
 bool show_file_name = true;
 
 struct

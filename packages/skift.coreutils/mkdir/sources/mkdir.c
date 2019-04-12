@@ -6,7 +6,7 @@
 
 int mkdir(const char *path)
 {
-    return sk_filesystem_mkdir(path);
+    return filesystem_mkdir(path);
 }
 
 int main(int argc, char **argv)

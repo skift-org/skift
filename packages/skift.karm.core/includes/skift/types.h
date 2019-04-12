@@ -8,8 +8,6 @@
 #include "defs/NULL.h"
 #include "defs/size_t.h"
 
-typedef char *string;
-
 typedef void s0;
 typedef char s8;
 typedef short s16;

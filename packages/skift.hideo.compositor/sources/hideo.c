@@ -19,7 +19,7 @@ static cmdline_t cmdline = CMDLINE(usages, options, "Start a new graphical sessi
 
 int main(int argc, char *argv[])
 {
-    argc = cmdline_parse(&cmdline, argc, argv);
+    argc = cmdline_parse(&cmdline, argc, argv); 
 
     return 0;
 }

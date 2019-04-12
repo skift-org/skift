@@ -2,18 +2,19 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/filesystem.h>
+#include <stdio.h>
+#include <skift/iostream.h>
 
 int cat(const char *path)
 {
-    int fd = sk_filesystem_open(path, OPENOPT_READ);
+    iostream_t *stream = iostream_open(path, IOSTREAM_READ);
 
-    if (fd != 0)
+    if (stream != NULL)
     {
-        file_stat_t stat = {0};
-        sk_filesystem_fstat(fd, &stat);
+        iostream_stat_t stat = {0};
+        iostream_fstat(stream, &stat);
 
-        if (stat.type == FSDIRECTORY)
+        if (stat.type == FILE_DIRECTORY)
         {
             printf("%s: is a directory\n", path);
             return -1;
@@ -23,15 +24,15 @@ int cat(const char *path)
             int size;
             byte buffer[1025] = {0};
 
-            while ((size = sk_filesystem_read(fd, &buffer, 1024)) > 0)
+            while ((size = iostream_read(stream, &buffer, 1024)) > 0)
             {
                 buffer[size] = '\0';
                 puts(buffer);
             }
         }
 
-        sk_filesystem_close(fd);
-        
+        iostream_close(stream);
+
         return 0;
     }
     else
@@ -43,9 +44,16 @@ int cat(const char *path)
 
 int main(int argc, char **argv)
 {
-    if (argc == 2)
+    if (argc >= 2)
     {
-        return cat(argv[1]);
+        int result = 0;
+
+        for (int i = 1; i < argc; i++)
+        {
+            result |= cat(argv[i]);
+        }
+
+        return result;
     }
 
     return -1;

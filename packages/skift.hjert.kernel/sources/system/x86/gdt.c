@@ -44,7 +44,7 @@ void set_kernel_stack(u32 stack)
 
 /* --- gdt entry setup ------------------------------------------------------ */
 
-void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint)
+void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, const char* hint)
 {
     UNUSED(hint);
     

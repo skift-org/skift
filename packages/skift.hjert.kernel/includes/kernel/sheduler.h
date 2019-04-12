@@ -8,6 +8,7 @@
 
 void sheduler_yield();
 
+process_t* sheduler_running_process();
 thread_t* sheduler_running_thread();
 int sheduler_running_thread_id();
 

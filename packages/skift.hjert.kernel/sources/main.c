@@ -23,7 +23,7 @@
 
 #include <skift/atomic.h>
 #include <skift/logger.h>
-#include <skift/__plugs.h>
+#include <skift/__plugs__.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"

@@ -4,9 +4,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/__plugs__.h>
+
 #define assert(expr) \
     if (!(expr)) \
-        __assert_failed( #expr, __FILE__,  __FUNCTION__, __LINE__ )
-
-extern void __assert_failed(const char * expr, const char * file, const char * function, int line);
+        __plug_assert_failed( #expr, __FILE__,  __FUNCTION__, __LINE__ )
         

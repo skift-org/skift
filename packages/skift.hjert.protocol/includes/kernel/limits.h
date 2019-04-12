@@ -27,10 +27,3 @@
 #define MAX_THREAD_NAMESIZE 128 
 
 #define MAX_THREAD_STACKSIZE 16384
-
-/* --- Limits for filesystem ------------------------------------------------ */
-
-/* Maximum number of char in a path including \0. */
-#define MAX_PATH_LENGHT 1024
-
-#define MAX_FILENAME_LENGHT 128

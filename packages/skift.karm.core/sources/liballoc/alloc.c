@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <skift/logger.h>
+
 #define VERSION 	"1.1"
 #define ALIGNMENT	16ul
 #define ALIGN_TYPE  char ///unsigned char[16] /// unsigned short
@@ -630,32 +632,23 @@ void PREFIX(free)(void *ptr)
 		   )
 		{
 			l_possibleOverruns += 1;
-			#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Possible 1-3 byte overrun for magic 0x%x != 0x%x\n",
+			sk_log(LOG_ERROR,  "Possible 1-3 byte overrun for magic 0x%x != 0x%x\n",
 								min->magic,
 								LIBALLOC_MAGIC );
-			FLUSH();
-			#endif
 		}
 						
 						
 		if ( min->magic == LIBALLOC_DEAD )
 		{
-			#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: multiple PREFIX(free)() attempt on 0x%x from 0x%x.\n", 
+			sk_log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.\n", 
 									ptr,
 									__builtin_return_address(0) );
-			FLUSH();
-			#endif
 		}
 		else
 		{
-			#if defined DEBUG || defined INFO
-			printf( "liballoc: ERROR: Bad PREFIX(free)( 0x%x ) called from 0x%x\n",
+		sk_log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x\n",
 								ptr,
 								__builtin_return_address(0) );
-			FLUSH();
-			#endif
 		}
 			
 		// being lied to...
@@ -664,10 +657,10 @@ void PREFIX(free)(void *ptr)
 	}
 
 	#ifdef DEBUG
-	printf( "liballoc: 0x%x PREFIX(free)( 0x%x ): ", 
-				__builtin_return_address( 0 ),
-				ptr );
-	FLUSH();
+		printf( "liballoc: 0x%x PREFIX(free)( 0x%x ): ", 
+					__builtin_return_address( 0 ),
+					ptr );
+		FLUSH();
 	#endif
 	
 

@@ -16,6 +16,16 @@ void __sk_lock_acquire(lock_t *lock)
     __sync_synchronize();
 }
 
+bool __sk_lock_try_acquire(lock_t *lock)
+{
+    while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
+        return false;
+        
+    __sync_synchronize();
+
+    return true;
+}
+
 void __sk_lock_release(lock_t *lock)
 {
     __sync_synchronize();

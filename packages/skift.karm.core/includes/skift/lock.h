@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/generic.h>
+
 typedef struct
 {
     int locked;
@@ -12,9 +14,11 @@ typedef struct
 void __sk_lock_init(lock_t *lock);
 void __sk_lock_acquire(lock_t *lock);
 void __sk_lock_release(lock_t *lock);
+bool __sk_lock_try_acquire(lock_t *lock);
 
 #define sk_lock_init(lock) __sk_lock_init(&lock)
 #define sk_lock_acquire(lock) __sk_lock_acquire(&lock)
+#define sk_lock_try_acquire(lock) __sk_lock_try_acquire(&lock)
 #define sk_lock_release(lock) __sk_lock_release(&lock)
 
 #define LOCK(lock, code)          \

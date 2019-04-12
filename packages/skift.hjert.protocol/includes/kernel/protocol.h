@@ -48,18 +48,6 @@ typedef struct
 #define MOUSE_BUTTONDOWN "dev:mouse.buttonpressed"
 #define MOUSE_BUTTONUP   "dev:mouse.buttonreleased"
 
-//XXX: stop using mouse_syscalls
-typedef struct 
-{
-    int x;
-    int y;
-    int scroll;
-
-    bool left;
-    bool right;
-    bool middle;
-} mouse_state_t;
-
 typedef enum
 {
     MOUSE_BUTTON_LEFT,

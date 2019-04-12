@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/logger.h>
 #include <skift/iostream.h>
 #include <skift/cmdline.h>
 
@@ -69,6 +70,7 @@ int ls(const char *path)
         }
         else
         {
+            sk_log(LOG_DEBUG,"This was not a directory");
             printf(path);
         }
 

@@ -22,11 +22,14 @@ int process_filedescriptor_alloc_and_acquire(process_t *p, stream_t *stream)
 
             sk_lock_release(p->fds_lock);
 
+            sk_log(LOG_DEBUG, "File descriptor %d allocated for process %d'%s'", i, p->id, p->name);
+
             return i;
         }
     }
     
     sk_lock_release(p->fds_lock);
+    sk_log(LOG_WARNING, "We run out of file descriptor on process %d'%s'", p->id, p->name);
 
     return -1;
 }
@@ -44,6 +47,8 @@ stream_t *process_filedescriptor_acquire(process_t *p, int fd_index)
         }
     }
 
+    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, p->id, p->name);
+
     return NULL;
 }
 
@@ -57,6 +62,8 @@ int process_filedescriptor_release(process_t *p, int fd_index)
 
         return 0;
     }
+
+    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, p->id, p->name);
 
     return -1;
 }
@@ -72,8 +79,12 @@ int process_filedescriptor_free_and_release(process_t *p, int fd_index)
         fd->free = true;
         fd->stream = NULL;
 
+        sk_log(LOG_DEBUG, "File descriptor %d free for process %d'%s'", fd_index, p->id, p->name);
+
         return 0;
     }
+
+    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, p->id, p->name);
 
     return -1;
 }
@@ -82,7 +93,7 @@ int process_filedescriptor_free_and_release(process_t *p, int fd_index)
 
 int process_open_file(process_t* process, const char *file_path, iostream_flag_t flags)
 {
-    path_t *p = path(path);
+    path_t *p = path(file_path);
     stream_t *stream = filesystem_open(NULL, p, flags);
 
     if (stream == NULL)

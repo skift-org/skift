@@ -53,15 +53,20 @@ typedef enum
 
     SYS_FILESYSTEM_OPEN,
     SYS_FILESYSTEM_CLOSE,
+
     SYS_FILESYSTEM_READ,
     SYS_FILESYSTEM_WRITE,
+   
     SYS_FILESYSTEM_IOCTL,
-    SYS_FILESYSTEM_FSTAT,
     SYS_FILESYSTEM_SEEK,
     SYS_FILESYSTEM_TELL,
-    SYS_FILESYSTEM_MKDIR,
+    
+    SYS_FILESYSTEM_FSTAT,
+    
     SYS_FILESYSTEM_LINK,
     SYS_FILESYSTEM_UNLINK,
+   
+    SYS_FILESYSTEM_MKDIR,
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/messaging.h>
 #include <skift/thread.h>
@@ -74,6 +75,10 @@ char** shell_split(char* command)
     int token_index = 0;
 
     char** tokens = malloc(MAX_PROCESS_ARGV * sizeof(char*));
+
+    sk_log(LOG_DEBUG, "tokens list at %08x", tokens);
+
+    memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char*));
     char* start = &command[0];
 
     for(size_t i = 0; i < strlen(command) + 1; i++)
@@ -114,6 +119,7 @@ int shell_eval(const char** command)
     {
         char pathbuffer[144];
         snprintf(pathbuffer, 144, "/bin/%s", command[0]);
+
         process = sk_process_exec(pathbuffer, command);
     }
     
@@ -127,6 +133,8 @@ int shell_eval(const char** command)
 
 int main(int argc, char **argv)
 {
+    sk_logger_setlevel(LOG_ALL);
+
     (void)argc;
     (void)argv;
 
@@ -148,9 +156,11 @@ int main(int argc, char **argv)
         {
             exitvalue = shell_eval((const char**)tokens);
             
-            for(size_t i = 0; tokens[i]; i++)
+            for(int i = 0; tokens[i] != NULL; i++)
             {
-                free(tokens[i]);
+                sk_log(LOG_DEBUG, "%d %08x", i, tokens[i]);
+                // FIXME : cause page fault
+                //free(tokens[i]);
             }
             
             free(tokens);

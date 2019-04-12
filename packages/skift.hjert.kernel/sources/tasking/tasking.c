@@ -343,8 +343,8 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 PROCESS process_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    path_t* exec_path = path(executable_path);
-    stream_t *s = filesystem_open(ROOT, exec_path, OPENOPT_READ);
+    path_t *exec_path = path(executable_path);
+    stream_t *s = filesystem_open(ROOT, exec_path, IOSTREAM_READ);
     path_delete(exec_path);
 
     if (s == NULL)
@@ -354,10 +354,10 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     }
 
     // Check if the file isn't a directory.
-    file_stat_t stat;
+    iostream_stat_t stat;
     filesystem_fstat(s, &stat);
 
-    if (stat.type != FSFILE)
+    if (stat.type != FILE_REGULAR)
     {
         sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         return 0;
@@ -458,7 +458,8 @@ void process_exit(int exitvalue)
         process_cancel(self, exitvalue);
 
         // Hang
-        while (1) hlt();
+        while (1)
+            hlt();
     }
     else
     {
@@ -479,10 +480,12 @@ int process_unmap(PROCESS p, uint addr, uint count)
 uint process_alloc(uint count)
 {
     uint addr = memory_alloc(running->process->pdir, count, 1);
+    sk_log(LOG_DEBUG, "Giving userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
 void process_free(uint addr, uint count)
 {
+    sk_log(LOG_DEBUG, "Userspace free %d memory block at 0x%08x", count, addr);
     return memory_free(running->process->pdir, addr, count, 1);
 }

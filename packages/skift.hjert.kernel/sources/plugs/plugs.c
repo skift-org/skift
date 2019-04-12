@@ -20,7 +20,7 @@
 void __plug_init(void)
 {
     sk_formatter_init();
-    sk_logger_setlevel(LOG_ERROR);
+    sk_logger_setlevel(LOG_ALL);
 }
 
 int __plug_print(const char *buffer)

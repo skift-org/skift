@@ -28,7 +28,7 @@ void ramdisk_load(multiboot_module_t *module)
             sk_log(LOG_DEBUG, "Creating %s directory...", block.name);
 
 
-            if (FSRESULT_SUCCEED != filesystem_mkdir(ROOT, file_path))
+            if (filesystem_mkdir(ROOT, file_path) != 0)
             {
                 sk_log(LOG_WARNING, "Failed to create directory %s...", block.name);
             }
@@ -38,7 +38,7 @@ void ramdisk_load(multiboot_module_t *module)
         {
             sk_log(LOG_DEBUG, "Creating %s file...", block.name);            
 
-            stream_t *s = filesystem_open(ROOT, file_path, OPENOPT_WRITE | OPENOPT_CREATE | OPENOPT_TRUNC);
+            stream_t *s = filesystem_open(ROOT, file_path, IOSTREAM_WRITE | IOSTREAM_CREATE | IOSTREAM_TRUNC);
             
             if (s != NULL)
             {

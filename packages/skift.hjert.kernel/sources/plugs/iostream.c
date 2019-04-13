@@ -5,6 +5,19 @@
 #include "kernel/sheduler.h"
 #include "kernel/process.h"
 
+iostream_t *in_stream ;
+iostream_t *out_stream;
+iostream_t *err_stream;
+iostream_t *log_stream;
+
+void __plug_iostream_init(void)
+{
+    in_stream  = NULL;
+    out_stream = NULL;
+    err_stream = NULL;
+    log_stream = NULL;
+}
+
 int __plug_iostream_open(const char *file_path, iostream_flag_t flags)
 {
     return process_open_file(sheduler_running_process(), file_path, flags);
@@ -20,7 +33,7 @@ int __plug_iostream_read(int fd, void *buffer, uint size)
     return process_read_file(sheduler_running_process(), fd, buffer, size);
 }
 
-int __plug_iostream_write(int fd, void *buffer, uint size)
+int __plug_iostream_write(int fd, const void *buffer, uint size)
 {
     return process_write_file(sheduler_running_process(), fd, buffer, size);
 }

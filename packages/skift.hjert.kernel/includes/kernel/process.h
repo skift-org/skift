@@ -119,7 +119,7 @@ int process_close_file(process_t *process, int fd);
 
 int process_read_file(process_t *process, int fd, void *buffer, uint size);
 
-int process_write_file(process_t *process, int fd, void *buffer, uint size);
+int process_write_file(process_t *process, int fd, const void *buffer, uint size);
 
 int process_ioctl_file(process_t *process, int fd, int request, void *args);
 

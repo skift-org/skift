@@ -30,7 +30,7 @@ static void wait_write()
 
 /* --- Device driver -------------------------------------------------------- */
 
-static int serial_device_write(stream_t *s, void *buffer, uint size)
+static int serial_device_write(stream_t *s, const void *buffer, uint size)
 {
     UNUSED(s);
 

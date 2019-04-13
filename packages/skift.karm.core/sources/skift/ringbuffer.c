@@ -36,7 +36,7 @@ int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size)
     return -1;
 }
 
-int ringbuffer_write(ringbuffer_t *rb, void* buffer, uint size)
+int ringbuffer_write(ringbuffer_t *rb, const void* buffer, uint size)
 {
     UNUSED(rb);
     UNUSED(buffer);

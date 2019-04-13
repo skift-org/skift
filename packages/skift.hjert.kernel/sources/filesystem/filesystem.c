@@ -191,7 +191,7 @@ int file_read(stream_t *stream, void *buffer, uint size)
     return result;
 }
 
-int file_write(stream_t *stream, void *buffer, uint size)
+int file_write(stream_t *stream, const void *buffer, uint size)
 {
     int result = 0;
 
@@ -704,7 +704,7 @@ void *filesystem_readall(stream_t *s)
     }
 }
 
-int filesystem_write(stream_t *s, void *buffer, uint size)
+int filesystem_write(stream_t *s, const void *buffer, uint size)
 {
     IS_FS_READY;
 

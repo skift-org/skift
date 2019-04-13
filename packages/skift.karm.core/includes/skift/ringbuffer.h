@@ -20,7 +20,7 @@ ringbuffer_t *ringbuffer(uint size);
 void ringbuffer_delete(ringbuffer_t *rb);
 
 int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size);
-int ringbuffer_write(ringbuffer_t *rb, void* buffer, uint size);
+int ringbuffer_write(ringbuffer_t *rb, const void* buffer, uint size);
 
 int ringbuffer_putc(ringbuffer_t *rb, int c);
 int ringbuffer_getc(ringbuffer_t *rb);

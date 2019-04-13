@@ -71,7 +71,7 @@ static int console_device_read(stream_t* stream, void* buffer, uint size)
     return -1;
 }
 
-static int console_device_write(stream_t* stream, void* buffer, uint size)
+static int console_device_write(stream_t* stream, const void* buffer, uint size)
 {
     UNUSED(stream);
 

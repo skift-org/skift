@@ -3,6 +3,19 @@
 #include <skift/iostream.h>
 #include <skift/syscalls.h>
 
+iostream_t *in_stream ;
+iostream_t *out_stream;
+iostream_t *err_stream;
+iostream_t *log_stream;
+
+void __plug_iostream_init(void)
+{
+    in_stream  = NULL;
+    out_stream = NULL;
+    err_stream = NULL;
+    log_stream = NULL;
+}
+
 int __plug_iostream_open(const char *path, iostream_flag_t flags)
 {
     return __syscall(SYS_FILESYSTEM_OPEN, (int)path, flags, 0, 0, 0);
@@ -18,7 +31,7 @@ int __plug_iostream_read(int fd, void *buffer, uint size)
     return __syscall(SYS_FILESYSTEM_READ, fd, (int)buffer, size, 0, 0);
 }
 
-int __plug_iostream_write(int fd, void *buffer, uint size)
+int __plug_iostream_write(int fd, const void *buffer, uint size)
 {
     return __syscall(SYS_FILESYSTEM_WRITE, fd, (int)buffer, size, 0, 0);
 }

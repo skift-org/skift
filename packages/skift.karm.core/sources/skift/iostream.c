@@ -117,7 +117,7 @@ int iostream_read(iostream_t *stream, void *buffer, uint size)
     return -1;
 }
 
-static int iostream_write_no_buffered(iostream_t *stream, void *buffer, uint size)
+static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream->write != NULL)
     {
@@ -132,7 +132,7 @@ static int iostream_write_no_buffered(iostream_t *stream, void *buffer, uint siz
     return -1;
 }
 
-static int iostream_write_buffered(iostream_t *stream, void *buffer, uint size)
+static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint size)
 {
     int data_left = size;
 
@@ -158,7 +158,7 @@ static int iostream_write_buffered(iostream_t *stream, void *buffer, uint size)
     return size;
 }
 
-int iostream_write(iostream_t *stream, void *buffer, uint size)
+int iostream_write(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
@@ -268,20 +268,39 @@ int iostream_ioctl(iostream_t *stream, int request, void *arg)
 }
 
 // IO Stream scanf and printf ----------------------------------------------- //
+int iostream_printf(iostream_t* stream, const char* fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
 
-// TODO: int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
-//       {
-//           if (stream != NULL)
-//           {
-//               int n = 0;
-//       
-//               return n;
-//           }
-//           else
-//           {
-//               return -1;
-//           }
-//       }
+    int result = iostream_vprintf(stream, fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
+int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
+{
+    UNUSED(va);
+
+    if (stream != NULL)
+    {
+        int n = 0;
+
+        for(int i = 0; fmt[i]; i++)
+        {
+            iostream_write(stream, &fmt[i], 1);
+            n++;
+        }
+        
+        return n;
+    }
+    else
+    {
+        return -1;
+    }
+}
 
 // TODO: int iostream_scanf(iostream_t *stream, const char *fmt, ...)
 //       {

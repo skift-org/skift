@@ -54,7 +54,7 @@ typedef struct
 } iostream_direntry_t;
 
 typedef int iostream_read_t(struct s_iostream *stream, void *buffer, uint size);
-typedef int iostream_write_t(struct s_iostream *stream, void *buffer, uint size);
+typedef int iostream_write_t(struct s_iostream *stream, const void *buffer, uint size);
 typedef int iostream_tell_t(struct s_iostream *stream, iostream_whence_t whence);
 typedef int iostream_seek_t(struct s_iostream *stream, int offset, iostream_whence_t whence);
 typedef int iostream_fstat_t(struct s_iostream *stream, iostream_stat_t *stat);
@@ -100,7 +100,7 @@ void iostream_close(iostream_t *stream);
 
 int iostream_read(iostream_t *stream, void *buffer, uint size);
 
-int iostream_write(iostream_t *stream, void *buffer, uint size);
+int iostream_write(iostream_t *stream, const void *buffer, uint size);
 
 int iostream_flush(iostream_t *stream);
 

@@ -19,7 +19,7 @@ struct s_fsnode;
 struct s_stream;
 
 typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
-typedef int (*fsop_write_t)(struct s_stream *s, void *buffer, uint size);
+typedef int (*fsop_write_t)(struct s_stream *s, const void *buffer, uint size);
 typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void *args);
 
 typedef struct
@@ -103,7 +103,7 @@ stream_t *filesystem_open(fsnode_t *at, path_t* p, iostream_flag_t flags);
 void filesystem_close(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
-int filesystem_write(stream_t *s, void *buffer, uint size);
+int filesystem_write(stream_t *s, const void *buffer, uint size);
 
 int filesystem_ioctl(stream_t *s, int request, void *args);
 

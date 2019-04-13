@@ -17,6 +17,8 @@ lock_t loglock;
 
 void __plug_init(void)
 {
+    __plug_iostream_init();
+    
     sk_lock_init(memlock);
     sk_lock_init(loglock);
     sk_formatter_init();

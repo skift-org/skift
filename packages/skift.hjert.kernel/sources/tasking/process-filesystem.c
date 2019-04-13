@@ -145,7 +145,7 @@ int process_read_file(process_t* process, int fd, void *buffer, uint size)
     return result;
 }
 
-int process_write_file(process_t* process, int fd, void *buffer, uint size)
+int process_write_file(process_t* process, int fd, const void *buffer, uint size)
 {
     stream_t *stream = process_filedescriptor_acquire(process, fd);
 

@@ -10,6 +10,7 @@
 #include <skift/iostream.h>
 
 void __plug_init(void);
+void __plug_iostream_init(void);
 
 int __plug_print(const char *buffer);
 
@@ -39,7 +40,7 @@ int __plug_iostream_close(int fd);
 
 int __plug_iostream_read(int fd, void *buffer, uint size);
 
-int __plug_iostream_write(int fd, void *buffer, uint size);
+int __plug_iostream_write(int fd, const void *buffer, uint size);
 
 int __plug_iostream_ioctl(int fd, int request, void *args);
 

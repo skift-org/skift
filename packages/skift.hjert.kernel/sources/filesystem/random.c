@@ -30,7 +30,7 @@ int random_device_read(stream_t *s, void *buffer, uint size)
     return size;
 }
 
-int random_device_write(stream_t *s, void *buffer, uint size)
+int random_device_write(stream_t *s, const void *buffer, uint size)
 {
     UNUSED(s);
     UNUSED(buffer);

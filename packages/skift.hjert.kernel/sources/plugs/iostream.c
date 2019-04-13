@@ -2,6 +2,7 @@
 
 #include <skift/iostream.h>
 
+#include "kernel/serial.h"
 #include "kernel/sheduler.h"
 #include "kernel/process.h"
 
@@ -10,12 +11,24 @@ iostream_t *out_stream;
 iostream_t *err_stream;
 iostream_t *log_stream;
 
+iostream_t internal_log_stream;
+
+int log_stream_write(iostream_t* stream, const void* buffer, uint size)
+{
+    UNUSED(stream);
+    return serial_write(buffer, size);
+}
+
 void __plug_iostream_init(void)
 {
+
+    internal_log_stream = (iostream_t){0};
+    internal_log_stream.write = log_stream_write;
+
     in_stream  = NULL;
     out_stream = NULL;
     err_stream = NULL;
-    log_stream = NULL;
+    log_stream = &internal_log_stream;
 }
 
 int __plug_iostream_open(const char *file_path, iostream_flag_t flags)

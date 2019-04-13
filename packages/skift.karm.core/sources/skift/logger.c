@@ -2,12 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include <skift/__plugs__.h>
+#include <skift/iostream.h>
 #include <skift/logger.h>
 
 log_level_t log_level = LOG_ERROR;
@@ -47,8 +47,6 @@ void sk_logger_setlevel(log_level_t level)
     log_level = level;
 }
 
-char logbuffer[1024];
-
 void sk_logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...)
 {
     if (level >= log_level)
@@ -58,22 +56,18 @@ void sk_logger_log(log_level_t level, const char *file, uint line, const char *f
         va_list va;
         va_start(va, fmt);
 
-        char *buffer = logbuffer;
-        buffer[0] = '\0';
-
         if (show_file_name)
         {
-            buffer += sprintf(buffer, "%s %s:%s() ln%d ", log_describe(level), file, function, line);
+            iostream_printf(log_stream, "%s %s:%s() ln%d ", log_describe(level), file, function, line);
         }
         else
         {
-            buffer += sprintf(buffer, "%s %s() ", log_describe(level), function);
+            iostream_printf(log_stream, "%s %s() ", log_describe(level), function);
         }
 
-        buffer += vsprintf(buffer, fmt, va);
-        strcat(buffer, "\033[0m\n");
-
-        __plug_print(logbuffer);
+        iostream_vprintf(log_stream, fmt, va);
+        iostream_printf(log_stream, "\033[0m\n");
+        iostream_flush(log_stream);
 
         va_end(va);
 

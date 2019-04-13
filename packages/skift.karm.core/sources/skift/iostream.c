@@ -267,34 +267,25 @@ int iostream_ioctl(iostream_t *stream, int request, void *arg)
     return -1;
 }
 
-// IO Stream scanf and printf ----------------------------------------------- //
-int iostream_printf(iostream_t* stream, const char* fmt, ...)
+int iostream_putchar(iostream_t *stream, int c)
 {
-    va_list va;
-    va_start(va, fmt);
-
-    int result = iostream_vprintf(stream, fmt, va);
-
-    va_end(va);
-
-    return result;
+    if (iostream_write(stream, &c, 1) == 1)
+    {
+        return (int)(uchar)c;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
-int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
+int iostream_getchar(iostream_t *stream)
 {
-    UNUSED(va);
+    uchar c;
 
-    if (stream != NULL)
+    if (iostream_read(stream, &c, 1) == 1)
     {
-        int n = 0;
-
-        for(int i = 0; fmt[i]; i++)
-        {
-            iostream_write(stream, &fmt[i], 1);
-            n++;
-        }
-        
-        return n;
+        return (int)c;
     }
     else
     {

@@ -112,6 +112,10 @@ int iostream_tell(iostream_t *stream, iostream_whence_t whence);
 
 int iostream_fstat(iostream_t *stream, iostream_stat_t *stat);
 
+int iostream_putchar(iostream_t *stream, int c);
+
+int iostream_getchar(iostream_t *stream);
+
 int iostream_printf(iostream_t *stream, const char *fmt, ...);
 
 int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va);

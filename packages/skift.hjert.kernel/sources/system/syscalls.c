@@ -58,22 +58,22 @@ int sys_process_cancel(int pid)
 
 int sys_process_map(uint addr, uint count)
 {
-    return process_map(process_self(), addr, count);
+    return process_memory_map(sheduler_running_process(), addr, count);
 }
 
 int sys_process_unmap(uint addr, uint count)
 {
-    return process_unmap(process_self(), addr, count);
+    return process_memory_unmap(sheduler_running_process(), addr, count);
 }
 
 int sys_process_alloc(uint count)
 {
-    return process_alloc(count);
+    return process_memory_alloc(sheduler_running_process(), count);
 }
 
 int sys_process_free(uint addr, uint count)
 {
-    process_free(addr, count);
+    process_memory_free(sheduler_running_process(), addr, count);
     return 0;
 }
 

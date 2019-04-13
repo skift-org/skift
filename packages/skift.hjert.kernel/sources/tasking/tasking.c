@@ -326,7 +326,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         page_directorie_t *pdir = running->process->pdir;
 
         paging_load_directorie(process->pdir);
-        process_map(process->id, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
+        process_memory_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
         memset((void *)dest, 0, destsz);
         memcpy((void *)dest, (void *)src, srcsz);
 
@@ -465,27 +465,4 @@ void process_exit(int exitvalue)
     {
         PANIC("Kernel try to commit suicide!");
     }
-}
-
-int process_map(PROCESS p, uint addr, uint count)
-{
-    return memory_map(process_get(p)->pdir, addr, count, 1);
-}
-
-int process_unmap(PROCESS p, uint addr, uint count)
-{
-    return memory_unmap(process_get(p)->pdir, addr, count);
-}
-
-uint process_alloc(uint count)
-{
-    uint addr = memory_alloc(running->process->pdir, count, 1);
-    sk_log(LOG_DEBUG, "Giving userspace %d memory block at 0x%08x", count, addr);
-    return addr;
-}
-
-void process_free(uint addr, uint count)
-{
-    sk_log(LOG_DEBUG, "Userspace free %d memory block at 0x%08x", count, addr);
-    return memory_free(running->process->pdir, addr, count, 1);
 }

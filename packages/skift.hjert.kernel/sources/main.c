@@ -1,9 +1,9 @@
-/*                  .d8888. db   dD d888888b d88888b d888888b                 */
-/*                  88'  YP 88 ,8P'   `88'   88'     `~~88~~'                 */
-/*                  `8bo.   88,8P      88    88ooo      88                    */
-/*                    `Y8b. 88`8b      88    88~~~      88                    */
-/*                  db   8D 88 `88.   .88.   88         88                    */
-/*                  `8888Y' YP   YD Y888888P YP         YP                    */
+/*                       _   _     _ _____ ____ _____                         */
+/*                      | | | |   | | ____|  _ \_   _|                        */
+/*                      | |_| |_  | |  _| | |_) || |                          */
+/*                      |  _  | |_| | |___|  _ < | |                          */
+/*                      |_| |_|\___/|_____|_| \_\|_|                          */
+/*                                                                            */
 
 /* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
@@ -67,7 +67,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
-        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
+        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\t Magic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
     }
 
     if ((info->mem_lower + info->mem_upper) < 255 * 1024)

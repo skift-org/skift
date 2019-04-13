@@ -45,10 +45,4 @@ PROCESS process_create(const char *name, bool user); // Create a new process.
 bool process_cancel(PROCESS p, int exitvalue); // Cancel the selected process.
 void process_exit(int code);                   // Exit the current process and send a exit code.
 
-int process_map(PROCESS p, uint addr, uint count);   // Map memory to the process memory space.
-int process_unmap(PROCESS p, uint addr, uint count); // Unmap memory from the current thread.
-
-uint process_alloc(uint count);           // Alloc some some memory page to the process memory space.
-void process_free(uint addr, uint count); // Free perviously allocated memory.
-
 PROCESS process_exec(const char *filename, const char **argv); // Load a ELF executable, create a adress space and run it.

@@ -4,8 +4,32 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
-#include <stdlib.h>
+#define NULL ((void*)0)
+
+#define bool _Bool
+#define true 1
+#define false 0
+
+typedef unsigned int size_t;
+
+typedef void s0;
+typedef char s8;
+typedef short s16;
+typedef long s32;
+typedef long long s64;
+
+typedef void u0;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned long u32;
+typedef unsigned long long u64;
+
+typedef char byte;
+typedef unsigned char ubyte;
+typedef unsigned char uchar;
+typedef unsigned short wchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
 
 #ifndef __PACKAGE__
     #define __PACKAGE__ "(NULL)"
@@ -24,7 +48,6 @@
 
 #define UNUSED(x) (void)(x)
 #define MALLOC(type) ((type *)malloc(sizeof(type)))
-#define STUB(a...) printf("STUB REACHED %s\n", __FUNCTION__, a)
 
 #define ARRAY_SIZE(array)  (sizeof(array) / sizeof(array[0]))
 #define FLAG(__i) (1 << (__i))

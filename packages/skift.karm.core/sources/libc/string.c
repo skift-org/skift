@@ -4,7 +4,7 @@
 
 #include <math.h>
 #include <string.h>
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 void *memchr(const void *str, int c, size_t n)
 {

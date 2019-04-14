@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #define VTC_DEFAULT_FOREGROUND VTCOLOR_GREY
 #define VTC_DEFAULT_BACKGROUND VTCOLOR_BLACK

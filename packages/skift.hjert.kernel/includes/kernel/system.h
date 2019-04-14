@@ -5,7 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdio.h>
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/logger.h>
 
 #include "kernel/processor.h"

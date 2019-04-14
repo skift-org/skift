@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #define GDT_ENTRY_COUNT 6
 

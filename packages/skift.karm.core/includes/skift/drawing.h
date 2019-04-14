@@ -5,8 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdbool.h>
-#include <skift/types.h>
-#include <skift/utils.h>
+#include <skift/runtime.h>
 
 /* --- Colors --------------------------------------------------------------- */
 

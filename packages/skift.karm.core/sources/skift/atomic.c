@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/types.h>
+#include <skift/runtime.h>
 #include <skift/atomic.h>
 
 static bool atomic_enabled = 0;

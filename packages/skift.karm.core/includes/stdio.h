@@ -6,7 +6,7 @@
 
 #include <stdarg.h>
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #include "defs/NULL.h"
 #include "defs/size_t.h"

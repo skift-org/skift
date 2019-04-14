@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/utils.h>
+#include <skift/runtime.h>
 
 #include "kernel/system.h"
 #include "kernel/processor.h"

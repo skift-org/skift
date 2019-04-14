@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #define VBE_DISPI_BANK_ADDRESS          0xA0000
 #define VBE_DISPI_BANK_SIZE_KB          64

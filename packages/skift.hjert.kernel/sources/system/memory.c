@@ -10,8 +10,7 @@
  */
 
 #include <string.h>
-#include <skift/types.h>
-#include <skift/utils.h>
+#include <skift/runtime.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>
 

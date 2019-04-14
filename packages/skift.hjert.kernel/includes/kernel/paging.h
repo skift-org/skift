@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #define PAGE_TABLE_ENTRY_COUNT 1024
 #define PAGE_DIRECTORIE_ENTRY_COUNT 1024

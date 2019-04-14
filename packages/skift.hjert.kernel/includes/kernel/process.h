@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/list.h>
 #include <skift/lock.h>
 

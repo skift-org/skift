@@ -6,7 +6,7 @@
 
 /* iostream.h: generic io interface                                           */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/path.h>
 
 struct s_iostream;

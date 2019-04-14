@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/syscalls.h>
 
 DECL_SYSCALL5(sk_messaging_send, int to, const char *name, void *payload, unsigned int size, unsigned int flags);

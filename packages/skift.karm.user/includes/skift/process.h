@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/syscalls.h>
 
 DECL_SYSCALL0(sk_process_self);

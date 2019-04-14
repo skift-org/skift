@@ -11,8 +11,7 @@
  *  - Add support for .. and .
  */
 
-#include <math.h>
-#include <stdlib.h>
+#include <skift/math.h>
 #include <string.h>
 
 #include <skift/logger.h>

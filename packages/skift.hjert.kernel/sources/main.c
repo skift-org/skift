@@ -16,9 +16,8 @@
  * - ADD support for kernel command line options.
  */
 
-#include <math.h>
+#include <skift/math.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <skift/atomic.h>

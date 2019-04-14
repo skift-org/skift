@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdlib.h>
+#include <skift/math.h>
 #include <skift/drawing.h>
 #include <skift/vgafont.h>
 

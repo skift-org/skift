@@ -1,5 +1,5 @@
 #include <ctype.h>
-#include <math.h>
+#include <skift/math.h>
 
 #include <skift/vtconsole.h>
 

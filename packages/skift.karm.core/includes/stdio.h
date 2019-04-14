@@ -4,12 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdarg.h>
-
 #include <skift/runtime.h>
-
-#include "defs/NULL.h"
-#include "defs/size_t.h"
 
 #define EOF -1
 

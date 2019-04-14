@@ -1,10 +1,10 @@
 /* Durand's Amazing Super Duper Memory functions. */
 
+#include <skift/runtime.h>
+#include <skift/logger.h>
 #include "liballoc.h"
-#include <stdint.h>
 #include <stdio.h>
 
-#include <skift/logger.h>
 
 #define VERSION 	"1.1"
 #define ALIGNMENT	16ul
@@ -56,7 +56,7 @@
 
 #if defined DEBUG || defined INFO
 #include <stdio.h>
-#include <stdlib.h>
+
 
 //#define FLUSH()		fflush( stdout )
 

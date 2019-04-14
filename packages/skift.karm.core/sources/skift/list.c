@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdlib.h>
+
 #include <stdio.h>
 
 #include <skift/list.h>

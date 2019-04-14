@@ -4,7 +4,7 @@
 
 /* ringbuffer.c: a fifo buffer.                                               */
 
-#include <stdlib.h>
+
 #include <skift/ringbuffer.h>
 
 ringbuffer_t *ringbuffer(uint size)

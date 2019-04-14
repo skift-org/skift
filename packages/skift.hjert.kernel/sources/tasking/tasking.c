@@ -14,7 +14,7 @@
  * - Add priority to the round robine sheduler
  */
 
-#include <stdlib.h>
+
 #include <string.h>
 #include <skift/atomic.h>
 #include <skift/elf.h>

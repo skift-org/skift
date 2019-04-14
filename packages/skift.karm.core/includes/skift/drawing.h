@@ -4,13 +4,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdbool.h>
 #include <skift/runtime.h>
 
 /* --- Colors --------------------------------------------------------------- */
 
 typedef unsigned int color_t;
-#define rbg(r, g, b) (color_t)((r)&0xff) | ((g)&0xff) | ((b)&0xff)
+#define rbg(r, g, b) (color_t)(((r)&0xff) | ((g)&0xff) << 8 | ((b)&0xff) << 16)
+#define rbga(r, g, b, a) (color_t)(((r)&0xff) | ((g)&0xff) << 8 | ((b)&0xff) << 16 | ((a)&0xff) << 24)
 
 /* --- Bitmap --------------------------------------------------------------- */
 

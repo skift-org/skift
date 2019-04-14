@@ -6,8 +6,6 @@
 
 #include <skift/runtime.h>
 
-#include <stdint.h>
-
 #define ELF_NIDENT 16
 
 #define ELFMAG0 0x7F

@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <math.h>
+#include <skift/math.h>
 #include <string.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>

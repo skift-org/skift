@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdarg.h>
-#include <stdlib.h>
+
+
 #include <skift/atomic.h>
 
 #include "kernel/thread.h"

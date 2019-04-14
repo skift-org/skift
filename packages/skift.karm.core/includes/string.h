@@ -4,10 +4,15 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "defs/size_t.h"
-#include "defs/NULL.h"
+#include <skift/runtime.h>
 
 // NOT STANDART
+// string to uint
+unsigned int stoi(const char * str, unsigned char base);
+
+// uint to string
+void itos(unsigned int value, char *buffer, unsigned char base);
+
 void strnapd(char * str, char c, size_t n);
 void strapd(char *str, char c);
 void strbs(char *str);

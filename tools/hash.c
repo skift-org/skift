@@ -1,6 +1,6 @@
 // Really simple hash just for quick check ;)
 
-#include <stdlib.h>
+
 #include <stdio.h>
 
 int main(int argc, char const *argv[])

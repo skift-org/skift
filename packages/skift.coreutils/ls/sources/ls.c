@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <stdio.h>
 #include <skift/logger.h>
 #include <skift/iostream.h>
 #include <skift/cmdline.h>

@@ -5,8 +5,8 @@
 /* formatter.c: vsnprintf backend.                                            */
 
 #include <ctype.h>
-#include <stdlib.h>
-#include <stdarg.h>
+
+
 #include <string.h>
 #include <skift/ascii.h>
 

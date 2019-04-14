@@ -2,8 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdarg.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include <skift/__plugs__.h>

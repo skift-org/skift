@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdlib.h>
+
 #include <string.h>
 
 const char * basechar     = "0123456789abcdefghijklmnopqrstuvwxyz";

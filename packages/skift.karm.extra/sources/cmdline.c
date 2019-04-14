@@ -4,8 +4,8 @@
 
 /* cmdline.c: skiftOS command line application utils                          */
 
+#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <skift/cmdline.h>
 
 /* --- Private functions ---------------------------------------------------- */

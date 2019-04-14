@@ -127,7 +127,7 @@ int sk_format_string(printf_info_t* info, va_list* va)
 
 /* --- formatters managment -------------------------------------------------- */
 
-static formatter_t formatters[52];
+static formatter_t formatters[52] = {0};
 
 void sk_formatter_init()
 {

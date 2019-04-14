@@ -4,6 +4,14 @@
 #include "kernel/filesystem.h"
 #include "kernel/process.h"
 
+void process_filedescriptor_close_all(process_t* p)
+{
+    for(int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    {
+        process_close_file(p, i);
+    }
+}
+
 // File descriptor allocation and locking ----------------------------------- //
 
 int process_filedescriptor_alloc_and_acquire(process_t *p, stream_t *stream) 

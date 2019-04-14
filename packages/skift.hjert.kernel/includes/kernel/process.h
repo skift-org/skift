@@ -102,6 +102,9 @@ void process_memory_free(process_t *p, uint addr, uint count);
 
 // File descriptor allocation and locking ----------------------------------- //
 
+// Close all file descriptors
+void process_filedescriptor_close_all(process_t* p);
+
 // Allocate a new file descriptor and acquire it
 int process_filedescriptor_alloc_and_acquire(process_t *p, stream_t *stream);
 

@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -12,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `all, color, list` and `help` options to `ls`
  - `filesystem_ioctl` juste for device file, but WIP
  - `filesystem_link` and `filesystem_unlink`
- - `iostream` a stdio like library
+ - `skift/iostream.h` a stdio like library
+ - `skift/launchpad.h` a process creation API inspired by the fushia project
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - file name is no longer stored in the inode
  - #15 It was possible to create several files with the same name in the same directory
  - #16 Page fault when reading from a invalid file descriptor
+ - Nested panic
 
 # v0.1.0 
  - Initial release

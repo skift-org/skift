@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/drawing.h>
+#include <gfx/drawing.h>
 
 typedef struct
 {

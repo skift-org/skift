@@ -5,9 +5,8 @@
 #include <string.h>
 
 #include <skift/logger.h>
-#include <skift/drawing.h>
 #include <skift/atomic.h>
-#include <skift/vtconsole.h>
+#include <vtconsole.h>
 
 #include "kernel/dev/vga.h"
 #include "kernel/filesystem.h"

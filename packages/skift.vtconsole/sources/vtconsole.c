@@ -1,7 +1,7 @@
 #include <ctype.h>
 #include <skift/math.h>
 
-#include <skift/vtconsole.h>
+#include <vtconsole.h>
 
 /* --- Constructor/Destructor ----------------------------------------------- */
 

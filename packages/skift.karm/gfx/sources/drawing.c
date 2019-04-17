@@ -3,8 +3,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/math.h>
-#include <skift/drawing.h>
-#include <skift/vgafont.h>
+#include <gfx/drawing.h>
+#include <gfx/vgafont.h>
 
 #define BMP_SIZE_MEM(bmp) (bmp->width * bmp->height * sizeof(uint))
 #define BMP_SIZE(bmp) (uint)(bmp->width * bmp->height)

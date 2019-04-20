@@ -51,16 +51,22 @@ void list_insert_sorted(list_t* list, void* value, list_comparator_t comparator)
 // Take a look at the **first item** of the list.
 bool list_peek(list_t* list, void** value);
 
+// Take a look at the **first item** of the list, and push it to the **tail** of the list
+bool list_peek_and_pushback(list_t* list, void** value);
+
 // Take a look at the **last item** of the list.
 bool list_peekback(list_t* list, void** value);
+
+// Take a look at the **last item** of the list, and push it to the **head** of the list
+bool list_peekback_and_push(list_t* list, void** value);
 
 // Take a look at the item at the **position specified by index** in the list.
 bool list_peekat(list_t *list, int index, void **value);
 
-// Push an item to the head of the list.
+// Push an item to the **head** of the list.
 void list_push(list_t *list, void *value);
 
-// Push an item to the tail of the list
+// Push an item to the **tail** of the list
 void list_pushback(list_t *list, void *value);
 
 // Pop the head item of the list.
@@ -83,16 +89,3 @@ bool list_remove(list_t *list, void *value);
 
 // Get item count
 #define list_count(__list) ((__list)->count)
-
-/* --- List node operation -------------------------------------------------- */
-// For zero alloc and free list operation this is greate when memory allocation
-// are to expensive (see: skift.hjert.kernel::sheduler.c).
-
-// bool list_node_peek(list_t* list, list_item_t** value);
-// bool list_node_peekback(list_t* list, list_item_t** value);
-// 
-// void list_node_push(list_t *list, list_item_t *value);
-// void list_node_pushback(list_t *list, list_item_t *value);
-// 
-// bool  list_node_pop(list_t *list, list_item_t **value);
-// bool  list_node_popback(list_t *list, list_item_t **value);

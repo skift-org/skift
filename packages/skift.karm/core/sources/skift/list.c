@@ -95,6 +95,53 @@ bool list_peek(list_t *list, void **value)
     }
 }
 
+bool list_peek_and_pushback(list_t* l, void** value)
+{
+    if (list_peek(l, value))
+    {
+        list_item_t *item = l->head;
+
+        // Pop
+        if (l->count == 1)
+        {
+            l->count = 0;
+            l->head = NULL;
+            l->tail = NULL;
+        }
+        else if (l->count > 1)
+        {
+            item->next->prev = NULL;
+            l->head = item->next;
+
+            l->count--;
+        }
+
+        // Push back
+        item->prev = NULL;
+        item->next = NULL;
+
+        l->count++;
+
+        if (l->tail == NULL)
+        {
+            l->tail = item;
+            l->head = item;
+        }
+        else
+        {
+            l->tail->next = item;
+            item->prev = l->tail;
+            l->tail = item;
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool list_peekback(list_t *list, void **value)
 {
     if (list->tail != NULL)

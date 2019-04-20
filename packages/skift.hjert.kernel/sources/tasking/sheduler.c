@@ -58,12 +58,9 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     wakeup_sleeping_threads();
 
     // Get the next thread
-    if (list_pop(thread_bystate(THREADSTATE_RUNNING), (void **)&running))
+    if (!list_peek_and_pushback(thread_bystate(THREADSTATE_RUNNING), (void **)&running))
     {
-        list_pushback(thread_bystate(THREADSTATE_RUNNING), running);
-    }
-    else
-    {
+        // Or the idle thread if there are no running threads.
         running = &idle;
     }
 

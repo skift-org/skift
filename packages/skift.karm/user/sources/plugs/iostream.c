@@ -11,9 +11,9 @@ iostream_t *log_stream;
 void __plug_iostream_init(void)
 {
     in_stream  = NULL;
-    out_stream = iostream_open("/dev/console", IOSTREAM_WRITE);
+    out_stream = iostream_open("/dev/console", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     err_stream = NULL;
-    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE);
+    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
 }
 
 int __plug_iostream_open(const char *path, iostream_flag_t flags)

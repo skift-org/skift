@@ -260,8 +260,9 @@ void *PREFIX(malloc)(size_t req_size)
 	{
 		size += ALIGNMENT + ALIGN_INFO;
 	}
-				// So, ideally, we really want an alignment of 0 or 1 in order
-				// to save space.
+	
+	// So, ideally, we really want an alignment of 0 or 1 in order
+	// to save space.
 	
 	liballoc_lock();
 
@@ -632,7 +633,7 @@ void PREFIX(free)(void *ptr)
 		   )
 		{
 			l_possibleOverruns += 1;
-			sk_log(LOG_ERROR,  "Possible 1-3 byte overrun for magic 0x%x != 0x%x\n",
+			sk_log(LOG_ERROR,  "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
 								min->magic,
 								LIBALLOC_MAGIC );
 		}
@@ -640,13 +641,13 @@ void PREFIX(free)(void *ptr)
 						
 		if ( min->magic == LIBALLOC_DEAD )
 		{
-			sk_log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.\n", 
+			sk_log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.", 
 									ptr,
 									__builtin_return_address(0) );
 		}
 		else
 		{
-		sk_log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x\n",
+		sk_log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x",
 								ptr,
 								__builtin_return_address(0) );
 		}

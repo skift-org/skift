@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <skift/__plugs__.h>
+#include <skift/__printf__.h>
 
 #include <skift/iostream.h>
 
@@ -291,6 +292,38 @@ int iostream_getchar(iostream_t *stream)
     {
         return -1;
     }
+}
+
+void iostream_printf_append(printf_info_t *info, char c)
+{
+    iostream_t* stream = info->p;
+    iostream_write(stream, &c, 1);
+}
+
+int iostream_printf(iostream_t* stream, const char* fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+
+    int result = iostream_vprintf(stream, fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
+int iostream_vprintf(iostream_t* stream, const char* fmt, va_list va)
+{
+
+    printf_info_t info = (printf_info_t)
+    {
+        .format = fmt,
+        .append = iostream_printf_append,
+        .p = (void*)stream,
+        .max_n = -1,
+    };
+
+    return __printf(&info, va);
 }
 
 // TODO: int iostream_scanf(iostream_t *stream, const char *fmt, ...)

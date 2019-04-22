@@ -24,12 +24,6 @@ void __plug_init(void)
     sk_formatter_init();
 }
 
-int __plug_print(const char *buffer)
-{
-    sk_io_print(buffer);
-    return strlen(buffer);
-}
-
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
     sk_log(LOG_FATAL, "assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);

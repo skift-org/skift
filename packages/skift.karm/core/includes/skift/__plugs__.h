@@ -12,8 +12,6 @@
 void __plug_init(void);
 void __plug_iostream_init(void);
 
-int __plug_print(const char *buffer);
-
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 
 // Logger ------------------------------------------------------------------- //

@@ -9,8 +9,8 @@
  * - ADD: improve the allocator to prevent starving of indentity mapped pages.
  */
 
-#include <stdio.h>
 #include <string.h>
+#include <skift/iostream.h>
 #include <skift/runtime.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>

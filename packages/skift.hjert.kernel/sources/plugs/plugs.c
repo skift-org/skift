@@ -9,7 +9,6 @@
 #include <string.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>
-#include <skift/formatter.h>
 #include <skift/iostream.h>
 
 #include "kernel/serial.h"
@@ -17,11 +16,28 @@
 #include "kernel/memory.h"
 #include "kernel/console.h"
 
+iostream_t *in_stream ;
+iostream_t *out_stream;
+iostream_t *err_stream;
+iostream_t *log_stream;
+
+iostream_t internal_log_stream = {0};
+
+int log_stream_write(iostream_t* stream, const void* buffer, uint size)
+{
+    UNUSED(stream);
+    return serial_write(buffer, size);
+}
+
 void __plug_init(void)
 {
-    __plug_iostream_init();
+    internal_log_stream.write = log_stream_write;
 
-    sk_formatter_init();
+    in_stream  = NULL;
+    out_stream = &internal_log_stream;
+    err_stream = &internal_log_stream;
+    log_stream = &internal_log_stream;
+
     sk_logger_setlevel(LOG_ALL);
 }
 

@@ -76,10 +76,10 @@ typedef struct s_iostream
     iostream_close_t *close;
 
     void *write_buffer;
-    uint write_head;
+    uint write_used;
 
     void *read_buffer;
-    uint read_head;
+    uint read_used;
 
     int fd;
     void* p;
@@ -94,9 +94,11 @@ iostream_t *iostream(iostream_flag_t flags);
 
 void iostream_delete(iostream_t *stream);
 
+
 iostream_t *iostream_open(const char *path, iostream_flag_t flags);
 
 void iostream_close(iostream_t *stream);
+
 
 int iostream_read(iostream_t *stream, void *buffer, uint size);
 
@@ -104,21 +106,36 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size);
 
 int iostream_flush(iostream_t *stream);
 
+
 int iostream_ioctl(iostream_t *stream, int request, void *arg);
 
 int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence);
 
 int iostream_tell(iostream_t *stream, iostream_whence_t whence);
 
+
 int iostream_fstat(iostream_t *stream, iostream_stat_t *stat);
+
+
+int iostream_puts(iostream_t* stream, const char* string);
+
+#define puts(__string) iostream_puts(out_stream, __string)
+
+int iostream_gets(iostream_t* stream, char* string, int n);
+
 
 int iostream_putchar(iostream_t *stream, int c);
 
 int iostream_getchar(iostream_t *stream);
 
+
 int iostream_printf(iostream_t *stream, const char *fmt, ...);
 
+#define printf(__args...) iostream_printf(out_stream, __args)
+
 int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va);
+
+#define vprintf(__fmt, __va) iostream_vprintf(out_stream, __fmt, __va)
 
 int iostream_scanf(iostream_t *stream, const char *fmt, ...);
 

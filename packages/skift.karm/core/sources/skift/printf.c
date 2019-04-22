@@ -91,7 +91,6 @@ int __printf_formate_char(printf_info_t* info, va_list* va)
     char v = va_arg(*va, char);
 
     char buffer[2] = {v, 0};
-    itos(v, buffer, 16);
     
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 

@@ -3,7 +3,7 @@
 #include <skift/runtime.h>
 #include <skift/logger.h>
 #include "liballoc.h"
-#include <stdio.h>
+#include <skift/iostream.h>
 
 
 #define VERSION 	"1.1"

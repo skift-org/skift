@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include <string.h>
 
+#include <skift/iostream.h>
 #include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/messaging.h>
@@ -96,7 +96,7 @@ char** shell_split(char* command)
                 buffer[buffer_len - 1] = '\0';
 
                 tokens[token_index++] = buffer;
-                // printf("'%s'\n", buffer);
+                printf("'%s'\n", buffer);
             }
 
             start = &command[i] + 1;
@@ -115,6 +115,7 @@ int shell_eval(const char** command)
 
     int process = sk_process_exec(command[0], command);
 
+    /* FIXME
     if (!process)
     {
         char pathbuffer[144];
@@ -122,6 +123,7 @@ int shell_eval(const char** command)
 
         process = sk_process_exec(pathbuffer, command);
     }
+    */
     
     if (process)
         sk_thread_wait_process(process, &exitvalue);
@@ -134,6 +136,10 @@ int shell_eval(const char** command)
 int main(int argc, char **argv)
 {
     sk_logger_setlevel(LOG_ALL);
+
+    // HACK: Disable line buffering
+    out_stream->write_buffer = 0;
+    out_stream->write_buffer = NULL;
 
     (void)argc;
     (void)argv;
@@ -158,12 +164,12 @@ int main(int argc, char **argv)
             
             for(int i = 0; tokens[i] != NULL; i++)
             {
-                sk_log(LOG_DEBUG, "%d %08x", i, tokens[i]);
+                sk_log(LOG_DEBUG, "%d '%s'", i, tokens[i]);
                 // FIXME : cause page fault
                 //free(tokens[i]);
             }
             
-            free(tokens);
+            //free(tokens);
         }
         else
         {

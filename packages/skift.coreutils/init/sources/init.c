@@ -2,7 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include <string.h>
 
 #include "kernel/protocol.h"
@@ -36,6 +35,7 @@ int main(int argc, char **argv)
     sk_logger_setlevel(LOG_ALL);
 
     int shell = init_exec("/bin/sh");
+    
     sk_thread_wait_process(shell, NULL);
 
     return 0;

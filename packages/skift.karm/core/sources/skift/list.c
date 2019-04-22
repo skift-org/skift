@@ -3,8 +3,6 @@
 /* See: LICENSE.md                                                            */
 
 
-#include <stdio.h>
-
 #include <skift/list.h>
 
 list_t *list()

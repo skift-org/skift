@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <string.h>
-#include <stdio.h>
+#include <skift/iostream.h>
 #include <skift/path.h>
 
 path_t* path(const char* raw_path)

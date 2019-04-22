@@ -6,6 +6,7 @@
 #include <skift/__plugs__.h>
 #include <skift/__printf__.h>
 
+#include <skift/math.h>
 #include <skift/iostream.h>
 
 // IO Stream constructor and destructor ------------------------------------- //
@@ -30,23 +31,23 @@ iostream_t *iostream(iostream_flag_t flags)
     if (flags & IOSTREAM_BUFFERED_WRITE)
     {
         stream->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
-        stream->write_head = 0;
+        stream->write_used = 0;
     }
     else
     {
         stream->write_buffer = NULL;
-        stream->write_head = 0;
+        stream->write_used = 0;
     }
 
     if (flags & IOSTREAM_BUFFERED_READ)
     {
         stream->read_buffer = malloc(IOSTREAM_BUFFER_SIZE);
-        stream->read_head = 0;
+        stream->read_used = 0;
     }
     else
     {
         stream->read_buffer = NULL;
-        stream->read_head = 0;
+        stream->read_used = 0;
     }
 
     return stream;
@@ -86,6 +87,8 @@ void iostream_close(iostream_t *stream)
 {
     if (stream != NULL)
     {
+        iostream_flush(stream);
+
         if (stream->close != NULL)
         {
             stream->close(stream);
@@ -142,15 +145,16 @@ static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint 
     while (data_left > 0)
     {
         // Append the data to the buffer
-        int free_space = IOSTREAM_BUFFER_SIZE - stream->write_head;
+        int free_space = IOSTREAM_BUFFER_SIZE - stream->write_used;
+        int data_added = min(free_space, data_left % IOSTREAM_BUFFER_SIZE);
 
-        memcpy(((byte *)(stream->write_buffer)) + stream->write_head, data_to_write, free_space);
-        stream->write_head += free_space;
-        data_left -= free_space;
-        data_to_write += free_space;
+        memcpy(((byte *)(stream->write_buffer)) + stream->write_used, data_to_write, data_added);
+        stream->write_used += data_added;
+        data_left -= data_added;
+        data_to_write += data_added;
 
         // flush the data if buffer is full
-        if (stream->write_head == IOSTREAM_BUFFER_SIZE)
+        if (stream->write_used == IOSTREAM_BUFFER_SIZE)
         {
             iostream_flush(stream);
         }
@@ -184,8 +188,8 @@ int iostream_flush(iostream_t *stream)
     {
         if (stream->write_buffer != NULL)
         {
-            iostream_write_no_buffered(stream, stream->write_buffer, stream->write_head);
-            stream->write_head = 0;
+            iostream_write_no_buffered(stream, stream->write_buffer, stream->write_used);
+            stream->write_used = 0;
         }
 
         return 0;
@@ -293,6 +297,17 @@ int iostream_getchar(iostream_t *stream)
         return -1;
     }
 }
+
+int iostream_puts(iostream_t* stream, const char* string)
+{
+    return iostream_write(stream, string, strlen(string));
+}
+
+// int iostream_gets(iostream_t* stream, char* string, int n)
+// {
+// 
+//     return 0;
+// }
 
 void iostream_printf_append(printf_info_t *info, char c)
 {

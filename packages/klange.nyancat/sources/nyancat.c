@@ -1,8 +1,8 @@
-#include <stdio.h>
 #include <string.h>
+#include <skift/iostream.h>
 #include <skift/thread.h>
 
-char * colors[256] = {NULL};
+char * colors[256] = { NULL };
 
 const char * frame0[] = {
 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,.,,,,,,,,,,,,,,,,,,,,,,,,,",
@@ -859,6 +859,8 @@ int main() {
 		}
 		printf("\033[H");
 		
+		iostream_flush(out_stream);
+
 		sk_thread_sleep(9);
 		// usleep(90000);
 	}

@@ -2,7 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include <skift/iostream.h>
 
 int cat(const char *path)
@@ -22,16 +21,16 @@ int cat(const char *path)
         else
         {
             int size;
-            byte buffer[1025] = {0};
+            byte buffer[1024];
 
             while ((size = iostream_read(stream, &buffer, 1024)) > 0)
             {
-                buffer[size] = '\0';
-                puts(buffer);
+                iostream_write(out_stream, buffer, size);
             }
         }
 
         iostream_close(stream);
+        iostream_flush(out_stream);
 
         return 0;
     }

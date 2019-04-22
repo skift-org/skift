@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
 #include <string.h>
+#include <skift/iostream.h>
 
 #include "kernel/cpu/cpuid.h"
 

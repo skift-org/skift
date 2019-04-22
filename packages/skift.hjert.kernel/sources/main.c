@@ -16,13 +16,13 @@
  * - ADD support for kernel command line options.
  */
 
-#include <skift/math.h>
-#include <stdio.h>
 #include <string.h>
 
-#include <skift/atomic.h>
-#include <skift/logger.h>
+#include <skift/math.h>
 #include <skift/__plugs__.h>
+#include <skift/iostream.h>
+#include <skift/logger.h>
+#include <skift/atomic.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"

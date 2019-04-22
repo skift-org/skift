@@ -36,7 +36,7 @@ void wakeup_sleeping_threads(void)
             if (t->wait.time.wakeuptick <= ticks)
             {
                 thread_setstate(t, THREADSTATE_RUNNING);
-                sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                // sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
             }
 
         } while (t->stack == THREADSTATE_RUNNING);

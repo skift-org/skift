@@ -326,7 +326,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         page_directorie_t *pdir = running->process->pdir;
 
         paging_load_directorie(process->pdir);
-        process_memory_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE);
+        process_memory_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE + PAGE_SIZE);
         memset((void *)dest, 0, destsz);
         memcpy((void *)dest, (void *)src, srcsz);
 
@@ -350,7 +350,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (s == NULL)
     {
         sk_log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
-        return 0;
+        return -1;
     }
 
     // Check if the file isn't a directory.
@@ -360,7 +360,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (stat.type != FILE_REGULAR)
     {
         sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
-        return 0;
+        return -1;
     }
 
     // Read the content of the file.
@@ -370,7 +370,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (buffer == NULL)
     {
         sk_log(LOG_WARNING, "Failed to read from '%s', exec failed!", executable_path);
-        return 0;
+        return -1;
     }
 
     // Decode the elf file header.
@@ -379,7 +379,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (!elf_valid(elf))
     {
         sk_log(LOG_WARNING, "Invalid elf program!", executable_path);
-        return 0;
+        return -1;
     }
 
     // Create the process and load the executable.

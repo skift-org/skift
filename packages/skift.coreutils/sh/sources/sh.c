@@ -110,7 +110,6 @@ char** shell_split(char* command)
 
 int shell_eval(const char** command)
 {
-    
     int exitvalue = -1;
 
     int process = sk_process_exec(command[0], command);
@@ -124,11 +123,15 @@ int shell_eval(const char** command)
         process = sk_process_exec(pathbuffer, command);
     }
     */
-    
-    if (process)
-        sk_thread_wait_process(process, &exitvalue);
-    else
+
+    if (process < 0)
+    {
         printf("Command '%s' not found !\n", command[0]);
+    }
+    else
+    {
+        sk_thread_wait_process(process, &exitvalue);
+    }
 
     return exitvalue;
 }
@@ -162,9 +165,9 @@ int main(int argc, char **argv)
         {
             exitvalue = shell_eval((const char**)tokens);
             
-            for(int i = 0; tokens[i] != NULL; i++)
+            for(int i = 0; i < MAX_PROCESS_ARGV; i++)
             {
-                sk_log(LOG_DEBUG, "%d '%s'", i, tokens[i]);
+                sk_log(LOG_DEBUG, "%d %08x '%s'", i, tokens[i], tokens[i]);
                 // FIXME : cause page fault
                 //free(tokens[i]);
             }

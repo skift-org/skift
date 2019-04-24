@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "kernel/memory.h"
-
 #include "kernel/process.h"
 
 static int PID = 1;

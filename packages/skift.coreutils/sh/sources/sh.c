@@ -19,6 +19,7 @@ static bool exited = false;
 
 int shell_readline(char* buffer, uint size)
 {
+    // FIXME: All user input should come from in_stream
     sk_messaging_subscribe(KEYBOARD_CHANNEL);
 
     int i = 0;    
@@ -96,7 +97,7 @@ char** shell_split(char* command)
                 buffer[buffer_len - 1] = '\0';
 
                 tokens[token_index++] = buffer;
-                printf("'%s'\n", buffer);
+                sk_log(LOG_DEBUG, "Token '%s'", buffer);
             }
 
             start = &command[i] + 1;
@@ -168,7 +169,7 @@ int main(int argc, char **argv)
             for(int i = 0; i < MAX_PROCESS_ARGV; i++)
             {
                 sk_log(LOG_DEBUG, "%d %08x '%s'", i, tokens[i], tokens[i]);
-                // FIXME : cause page fault
+                // FIXME : cause page fault cause memory managment is broken :/
                 //free(tokens[i]);
             }
             

@@ -10,6 +10,7 @@
 #include "kernel/thread.h"
 #include "kernel/processor.h"
 #include "kernel/sheduler.h"
+#include "kernel/memory.h"
 
 static int TID = 1;
 static list_t *threads;
@@ -202,6 +203,8 @@ void thread_panic_dump(void)
 
     printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
     thread_dump(sheduler_running_thread());
+
+    memory_layout_dump(sheduler_running_process()->pdir);
 
     printf("\n");
 

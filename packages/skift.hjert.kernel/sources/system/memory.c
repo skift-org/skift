@@ -82,7 +82,7 @@ uint physical_alloc(uint count)
         }
     }
 
-    sk_log(LOG_WARNING, "alloc failed!");
+    sk_log(LOG_WARNING, "Out of physical memory!");
     return 0;
 }
 
@@ -173,8 +173,8 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
 
         page_t *p = &ptable->pages[pti];
         p->Present = 1;
-        p->User = user;
         p->Write = 1;
+        p->User = user;
         p->PageFrameNumber = (paddr + offset) >> 12;
     }
 
@@ -236,7 +236,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         }
     }
 
-    sk_log(LOG_WARNING, "alloc failed!");
+    sk_log(LOG_ERROR, "Out of virtual memory!");
     return 0;
 }
 
@@ -288,8 +288,6 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (paddr == 0)
     {
         sk_atomic_end();
-
-        sk_log(LOG_WARNING, "alloc failed!");
         return 0;
     }
 
@@ -300,7 +298,6 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
         physical_free(paddr, count);
         sk_atomic_end();
 
-        sk_log(LOG_WARNING, "alloc failed!");
         return 0;
     }
 
@@ -357,6 +354,8 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
                 virtual_map(pdir, startaddr, startaddr, count, user);
 
                 sk_atomic_end();
+
+                memset((void *)startaddr, 0, count * PAGE_SIZE);
 
                 return startaddr;
             }
@@ -506,24 +505,47 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-void memory_dump(page_directorie_t *pdir)
+#define MEMORY_DUMP_REGION_START(__addr) \
+    {                                    \
+        memory_used = true;              \
+        printf("\n\t - %8x ", __addr);   \
+    }
+
+#define MEMORY_DUMP_REGION_END(__addr) \
+    {                                  \
+        memory_used = false;           \
+        printf("to %8x", __addr);      \
+    }
+
+void memory_layout_dump(page_directorie_t *pdir)
 {
+    printf("\n\n\tMemory layout: ");
+    bool memory_used = false;
+
     for (size_t i = 0; i < 1024; i++)
     {
         page_directorie_entry_t *pde = &pdir->entries[i];
         if (pde->Present)
         {
-            printf("pdir[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, pde->PageFrameNumber, pde->Present, pde->Write, pde->User);
             page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
 
-            for (size_t i = 0; i < 1024; i++)
+            for (size_t j = 0; j < 1024; j++)
             {
-                page_t *p = &ptable->pages[i];
-                if (p->Present)
+                page_t *p = &ptable->pages[j];
+
+                if (p->Present && !memory_used)
                 {
-                    printf("ptable[%d]={ PFN=%d PRESENT=%d WRITE=%d USER=%d }\n", i, p->PageFrameNumber, p->Present, p->Write, p->User);
+                    MEMORY_DUMP_REGION_START((i * 1024 + j) * PAGE_SIZE);
+                }
+                else if (!p->Present && memory_used)
+                {
+                    MEMORY_DUMP_REGION_END((i * 1024 + j) * PAGE_SIZE);
                 }
             }
+        }
+        else if (memory_used)
+        {
+            MEMORY_DUMP_REGION_END((i * 1024) * PAGE_SIZE);
         }
     }
 }

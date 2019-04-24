@@ -10,7 +10,7 @@ A simple, handmade, operating system for intel x86 cpu.
 </p>
 
 # About
-Skift is a student project, don't espect it to be secure or stable at this stage.
+Skift is a student project, don't expect it to be secure or stable at this stage.
 
 - [Manual](manual/readme.md)
 - [Building](manual/building.md)

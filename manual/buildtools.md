@@ -2,37 +2,80 @@
 
 ## Name
 
-buildtools - a python3 script for building skiftOS.
+automagicaly - a python3 script for building skiftOS.
 
 ## Synopsis
 
 ```sh
-buildtools [ACTION] [TARGET]
+
+automagicaly [ACTION] [TARGET]
+
 ```
 
-## Description
+## Actions
+
+### `run` - start the kernel in qemu
+
+This action will:
+   1. build all targets
+   2. generate a iso file
+   3. start qemu  
+
+```sh
+
+./automagicaly run
+
+```
+
+### `build` - Build a target and it's dependancies
+
+```sh
+
+./automagicaly build skift.hjert.kernel
+
+```
+
+### `clean` - Delete all build file of the target
+
+```sh
+
+./automagicaly clear skift.hjert.kernel
+
+```
+
+### `rebuild` - Clean and build a target
+
+```sh
+
+./automagicaly re-build skift.hjert.kernel
+
+```
+
+### The `-all` modifier
+
+Append `-all` to apply an *action* to all targets.
+
+```sh
+
+./automagicaly build-all
+
+```
 
 ## Exemples
 
 ```sh
 # Run the operation system in qemu
-./buildtools.py run
+./automagicaly run
 
 # Show help
-./buildtools.py help
+./automagicaly help
 
 # Build a target
-./buildtools.py build skift.hjert.kernel
+./automagicaly build skift.hjert.kernel
 
 # For a simple build
-./buildtools.py build-all
+./automagicaly build-all
 
 # For a clean build (release)
-./buildtools.py rebuild-all
-```
-
-## See also
-
-```sh
-./buildtools.py help
+./automagicaly rebuild-all
 ```

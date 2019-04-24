@@ -7,6 +7,10 @@
 /*
  * TODO:
  * - ADD: improve the allocator to prevent starving of indentity mapped pages.
+ * - ADD: support for shared memory objects
+ * - IMPROVE: the memory allocator (faster and smarter)
+ * - MAYBE ADD: support for copy on write
+ * - MAYBE ADD: page level memory
  */
 
 #include <string.h>

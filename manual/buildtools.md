@@ -31,7 +31,7 @@ This action will:
 
 ```sh
 
-./automagicaly build skift.hjert.kernel
+./automagicaly build [TARGET]
 
 ```
 
@@ -39,7 +39,7 @@ This action will:
 
 ```sh
 
-./automagicaly clear skift.hjert.kernel
+./automagicaly clear [TARGET]
 
 ```
 
@@ -47,7 +47,7 @@ This action will:
 
 ```sh
 
-./automagicaly re-build skift.hjert.kernel
+./automagicaly re-build [TARGET]
 
 ```
 

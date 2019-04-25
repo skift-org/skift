@@ -150,7 +150,7 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
     page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
     page_t *p = &ptable->pages[pti];
 
-    return ((p->PageFrameNumber & ~0xfff) + (vaddr & 0xfff));
+    return (p->PageFrameNumber*PAGE_SIZE) + (vaddr & 0xfff);
 }
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
@@ -316,7 +316,7 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 {
     if (count == 0)
         return 0;
-
+	
     sk_atomic_begin();
 
     uint vaddr = virtual_alloc(pdir, paddr, count, user);
@@ -509,16 +509,16 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-#define MEMORY_DUMP_REGION_START(__addr) \
+#define MEMORY_DUMP_REGION_START(__pdir, __addr) \
     {                                    \
         memory_used = true;              \
-        printf("\n\t - %8x ", __addr);   \
+        printf("\n\t - %8x(%08x) ", (__addr), virtual2physical(__pdir, __addr));   \
     }
 
-#define MEMORY_DUMP_REGION_END(__addr) \
+#define MEMORY_DUMP_REGION_END(__pdir, __addr) \
     {                                  \
         memory_used = false;           \
-        printf("to %8x", __addr);      \
+        printf("to %8x(%08x)", (__addr), virtual2physical(__pdir, __addr));      \
     }
 
 void memory_layout_dump(page_directorie_t *pdir)
@@ -539,17 +539,17 @@ void memory_layout_dump(page_directorie_t *pdir)
 
                 if (p->Present && !memory_used)
                 {
-                    MEMORY_DUMP_REGION_START((i * 1024 + j) * PAGE_SIZE);
+                    MEMORY_DUMP_REGION_START(pdir, (i * 1024 + j) * PAGE_SIZE);
                 }
                 else if (!p->Present && memory_used)
                 {
-                    MEMORY_DUMP_REGION_END((i * 1024 + j) * PAGE_SIZE);
+                    MEMORY_DUMP_REGION_END(pdir, (i * 1024 + j - 1) * PAGE_SIZE);
                 }
             }
         }
         else if (memory_used)
         {
-            MEMORY_DUMP_REGION_END((i * 1024) * PAGE_SIZE);
+            MEMORY_DUMP_REGION_END(pdir, (i * 1024 - 1) * PAGE_SIZE);
         }
     }
 }

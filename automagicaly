@@ -403,7 +403,7 @@ class Target(object):
             print("")  # Skip a line so it's easier on the eyes.
             print(BRIGHT_WHITE + "%s:" % self.name_friendly + RESET)
 
-            # Build all source file of the current target
+            # bUILD ALL Source file of the current target
             succeed = 0
             failed = 0
 
@@ -713,7 +713,7 @@ def main(argc, argv):
 
 if not crosscompiler_check():
     ERROR("Toolchain not found!")
-    print("Falling back to the system toolchain (WARNING! this is not supported)")
+    print("Falling back to the system toolchain (WARNING! this can backfire badly)")
 
     GCC = "gcc"
     LD = "ld"

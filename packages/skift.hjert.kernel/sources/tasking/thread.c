@@ -203,8 +203,7 @@ void thread_panic_dump(void)
 
     printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
     thread_dump(sheduler_running_thread());
-
-    memory_layout_dump(sheduler_running_process()->pdir);
+    memory_layout_dump(sheduler_running_process()->pdir, true);
 
     printf("\n");
 
@@ -214,7 +213,10 @@ void thread_panic_dump(void)
     {
         thread_t *t = i->value;
         if (t != sheduler_running_thread() && t->state != THREADSTATE_NONE)
+        {
+            memory_layout_dump(t->process->pdir, true);
             thread_dump(t);
+        }
     }
 
     sk_atomic_end();

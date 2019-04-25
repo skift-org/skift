@@ -9,6 +9,7 @@
 #include "kernel/thread.h"
 #include "kernel/tasking.h"
 #include "kernel/system.h"
+#include "kernel/memory.h"
 
 const char *const witty_comments[] =
 {
@@ -82,6 +83,8 @@ void __panic(const char* package, const char* file, const char* function, const 
         printf("\n\tContext:\n");
         processor_dump_context(context);
     }
+
+    memory_dump();
 
     if (!nested_panic)
     {

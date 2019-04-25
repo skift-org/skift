@@ -156,7 +156,7 @@ int __printf(printf_info_t *info, va_list va)
     info->format_offset = 0;
     info->state = PFSTATE_ESC;
     info->align = PFALIGN_RIGHT;
-    info->padding = '0';
+    info->padding = ' ';
     info->lenght = 0;
 
     if (info->format == NULL)

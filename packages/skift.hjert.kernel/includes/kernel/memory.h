@@ -41,4 +41,5 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_map(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count);
 
-void memory_layout_dump(page_directorie_t *pdir);
+void memory_dump(void);
+void memory_layout_dump(page_directorie_t *pdir, bool user);

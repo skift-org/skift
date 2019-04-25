@@ -168,12 +168,10 @@ int main(int argc, char **argv)
             
             for(int i = 0; i < MAX_PROCESS_ARGV; i++)
             {
-                sk_log(LOG_DEBUG, "%d %08x '%s'", i, tokens[i], tokens[i]);
-                // FIXME : cause page fault cause memory managment is broken :/
-                //free(tokens[i]);
+                free(tokens[i]);
             }
             
-            //free(tokens);
+            free(tokens);
         }
         else
         {

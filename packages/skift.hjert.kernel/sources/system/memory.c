@@ -30,20 +30,20 @@ uint USED_MEMORY = 0;
 
 uchar MEMORY[1024 * 1024 / 8] = {0};
 
-#define PHYSICAL_IS_USED(addr) \
-    (MEMORY[(uint)(addr) / PAGE_SIZE / 8] & (1 << ((uint)(addr) / PAGE_SIZE % 8)))
+#define PHYSICAL_IS_USED(__addr) \
+    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] &   (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
 
-#define PHYSICAL_SET_USED(addr) \
-    (MEMORY[(uint)(addr) / PAGE_SIZE / 8] |= (1 << ((uint)(addr) / PAGE_SIZE % 8)))
+#define PHYSICAL_SET_USED(__addr) \
+    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] |=  (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
 
-#define PHYSICAL_SET_FREE(addr) \
-    (MEMORY[(uint)(addr) / PAGE_SIZE / 8] &= ~(1 << ((uint)(addr) / PAGE_SIZE % 8)))
+#define PHYSICAL_SET_FREE(__addr) \
+    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] &= ~(1 << ((uint)(__addr) / PAGE_SIZE % 8)))
 
 int physical_is_used(uint addr, uint count)
 {
     for (uint i = 0; i < count; i++)
     {
-        if (PHYSICAL_IS_USED(addr + i * PAGE_SIZE))
+        if (PHYSICAL_IS_USED(addr + (i * PAGE_SIZE)))
             return 1;
     }
 
@@ -150,7 +150,7 @@ uint virtual2physical(page_directorie_t *pdir, uint vaddr)
     page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
     page_t *p = &ptable->pages[pti];
 
-    return (p->PageFrameNumber*PAGE_SIZE) + (vaddr & 0xfff);
+    return (p->PageFrameNumber * PAGE_SIZE) + (vaddr & 0xfff);
 }
 
 int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
@@ -316,7 +316,7 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 {
     if (count == 0)
         return 0;
-	
+
     sk_atomic_begin();
 
     uint vaddr = virtual_alloc(pdir, paddr, count, user);
@@ -382,8 +382,11 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 
     sk_atomic_begin();
 
-    physical_free(addr, count);
-    virtual_unmap(pdir, addr, count);
+    if (virtual_present(pdir, addr, count))
+    {
+        physical_free(virtual2physical(pdir, addr), count);
+        virtual_unmap(pdir, addr, count);
+    }
 
     sk_atomic_end();
 }
@@ -509,31 +512,42 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-#define MEMORY_DUMP_REGION_START(__pdir, __addr) \
-    {                                    \
-        memory_used = true;              \
-        printf("\n\t - %8x(%08x) ", (__addr), virtual2physical(__pdir, __addr));   \
+void memory_dump(void)
+{
+    printf("\n\n\tMemory status:");
+    printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
+    printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
+}
+
+#define MEMORY_DUMP_REGION_START(__pdir, __addr)                 \
+    {                                                            \
+        memory_used = true;                                      \
+        memory_empty = false; \
+        current_physical = virtual2physical(__pdir, __addr);     \
+        printf("\n\t - %8x [%08x:", (__addr), current_physical); \
     }
 
-#define MEMORY_DUMP_REGION_END(__pdir, __addr) \
-    {                                  \
-        memory_used = false;           \
-        printf("to %8x(%08x)", (__addr), virtual2physical(__pdir, __addr));      \
+#define MEMORY_DUMP_REGION_END(__pdir, __addr)                              \
+    {                                                                       \
+        memory_used = false;                                                \
+        printf("%08x] %08x", virtual2physical(__pdir, __addr), (__addr)); \
     }
 
-void memory_layout_dump(page_directorie_t *pdir)
+void memory_layout_dump(page_directorie_t *pdir, bool user)
 {
     printf("\n\n\tMemory layout: ");
     bool memory_used = false;
+    bool memory_empty = true;
+    uint current_physical = 0;
 
-    for (size_t i = 0; i < 1024; i++)
+    for (int i = user ? 256: 0; i < 1024; i++)
     {
         page_directorie_entry_t *pde = &pdir->entries[i];
         if (pde->Present)
         {
             page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
 
-            for (size_t j = 0; j < 1024; j++)
+            for (int j = 0; j < 1024; j++)
             {
                 page_t *p = &ptable->pages[j];
 
@@ -545,11 +559,28 @@ void memory_layout_dump(page_directorie_t *pdir)
                 {
                     MEMORY_DUMP_REGION_END(pdir, (i * 1024 + j - 1) * PAGE_SIZE);
                 }
+                else if (p->Present)
+                {
+                    uint new_physical = virtual2physical(pdir, (i * 1024 + j) * PAGE_SIZE);
+
+                    if (!(current_physical + PAGE_SIZE == new_physical)) 
+                    {
+                        printf("%08x | ", current_physical);
+                        printf("%08x:", new_physical);
+                    }
+
+                    current_physical = new_physical;
+                }
             }
         }
         else if (memory_used)
         {
             MEMORY_DUMP_REGION_END(pdir, (i * 1024 - 1) * PAGE_SIZE);
         }
+    }
+
+    if (memory_empty)
+    {
+        printf("\n\t - [empty]");
     }
 }

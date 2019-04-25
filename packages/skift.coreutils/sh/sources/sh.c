@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <string.h>
+#include <skift/cstring.h>
 
 #include <skift/iostream.h>
 #include <skift/logger.h>
@@ -113,23 +113,34 @@ int shell_eval(const char** command)
 {
     int exitvalue = -1;
 
-    int process = sk_process_exec(command[0], command);
+    iostream_t* s = iostream_open(command[0], IOSTREAM_READ);
 
-    /* FIXME
-    if (!process)
+    int process = 0;
+
+    if (s != NULL)
     {
-        char pathbuffer[144];
-        snprintf(pathbuffer, 144, "/bin/%s", command[0]);
-
-        process = sk_process_exec(pathbuffer, command);
-    }
-    */
-
-    if (process < 0)
-    {
-        printf("Command '%s' not found !\n", command[0]);
+        iostream_close(s);
+        process = sk_process_exec(command[0], command);
     }
     else
+    {
+        char pathbuffer[144];
+        sprintf(pathbuffer, 144, "/bin/%s", command[0]);
+
+        s = iostream_open(pathbuffer, IOSTREAM_READ);
+
+        if (s != NULL) 
+        {
+            iostream_close(s);
+            process = sk_process_exec(pathbuffer, command);
+        }
+        else
+        {
+            printf("Command '%s' not found !\n", command[0]);
+        }
+    }
+
+    if (process > 0)
     {
         sk_thread_wait_process(process, &exitvalue);
     }

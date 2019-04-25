@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 
-#include <string.h>
+#include <skift/cstring.h>
 
 const char * basechar     = "0123456789abcdefghijklmnopqrstuvwxyz";
 const char * basechar_maj = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

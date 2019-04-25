@@ -6,7 +6,7 @@
 
 #include <skift/__plugs__.h>
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>
 #include <skift/iostream.h>

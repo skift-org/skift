@@ -2,7 +2,7 @@
 // printf.c : printf and sprintf internals
 
 #include <ctype.h>
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/__printf__.h>
 
 int __printf_formate_binary(printf_info_t* info, va_list* va)

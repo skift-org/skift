@@ -4,7 +4,7 @@
 
 /* cmdline.c: skiftOS command line application utils                          */
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/iostream.h>
 #include <skift/cmdline.h>
 

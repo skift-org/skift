@@ -15,7 +15,7 @@
  */
 
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/atomic.h>
 #include <skift/elf.h>
 #include <skift/logger.h>

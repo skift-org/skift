@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/math.h>
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/tar.h>
 #include <skift/logger.h>
 

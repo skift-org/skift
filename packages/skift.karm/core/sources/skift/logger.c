@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <string.h>
+#include <skift/cstring.h>
 
 #include <skift/__plugs__.h>
 #include <skift/iostream.h>

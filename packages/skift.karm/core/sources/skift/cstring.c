@@ -2,9 +2,57 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/__printf__.h>
 #include <skift/math.h>
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/runtime.h>
+#include <skift/iostream.h>
+
+// Sprintf ------------------------------------------------------------------ //
+
+void string_printf_append(printf_info_t *info, char c)
+{
+    if (info->n < 0)
+    {
+        strapd(info->p, c);
+    }
+    else
+    {
+        strnapd(info->p, c, info->n);
+    }
+}
+
+int sprintf(char *s, int n, const char *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+
+    int result = vsprintf(s, n, fmt, va);
+
+    va_end(va);
+
+    return result;
+}
+
+int vsprintf(char *s, int n, const char *fmt, va_list va)
+{
+
+    if (n == 0) return 0;
+
+    printf_info_t info = (printf_info_t)
+    {
+        .format = fmt,
+        .append = string_printf_append,
+        .p = (char*)s,
+        .max_n = n,
+    };
+
+    // We need it to start with a 0 because we use strapd.
+    s[0] = '\0';
+    return __printf(&info, va);
+}
+
+// mem* functions ----------------------------------------------------------- //
 
 void *memchr(const void *str, int c, size_t n)
 {
@@ -321,16 +369,8 @@ void strbs(char *str)
 
 void strnapd(char *str, char c, size_t n)
 {
-    if (n > 1)
-    {
-        unsigned int len = strlen(str);
-
-        if (len <= n - 2)
-        {
-            str[len] = c;
-            str[len + 1] = '\0';
-        }
-    }
+    char tmp[2] = {c, '\0'};
+    strncat(str, tmp, n);
 }
 
 void strrvs(char *str)

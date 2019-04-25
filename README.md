@@ -17,7 +17,7 @@ A simple, handmade, operating system for intel x86 cpu.
 # About
 ![](manual/assets/skift_dark.svg)
 
-> Skift is a student project, don't espect it to be secure or stable at this stage.
+> Skift is a student project, don't expect it to be secure or stable at this stage.
 
 # Screenshots
 

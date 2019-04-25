@@ -10,7 +10,7 @@
  *   with kernel function pointer.
  */
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/logger.h>
 
 #include "kernel/multiboot.h"

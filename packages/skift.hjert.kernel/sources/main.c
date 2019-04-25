@@ -16,7 +16,7 @@
  * - ADD support for kernel command line options.
  */
 
-#include <string.h>
+#include <skift/cstring.h>
 
 #include <skift/math.h>
 #include <skift/__plugs__.h>

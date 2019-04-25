@@ -4,7 +4,7 @@
 
 /* elf.c: in memory elf fiel parser.                                          */
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/elf.h>
 
 int check_magic(elf_header_t *header)

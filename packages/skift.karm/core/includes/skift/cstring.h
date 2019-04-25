@@ -20,9 +20,8 @@ void strrvs(char *str);
 void strleadtrim(char *str, char c);
 void strtrailtrim(char *str, char c);
 
-
 int sprintf(char *s, int n, const char *fmt, ...);
-int vsprintf(char *s, size_t n, const char *fmt, va_list va);
+int vsprintf(char *s, int n, const char *fmt, va_list va);
 
 // STANDART
 void *memchr(const void *str, int c, size_t n);

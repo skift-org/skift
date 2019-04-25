@@ -4,7 +4,7 @@
 
 /* tar.c: read in memory tar archive                                          */
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/tar.h>
 
 typedef PACKED(struct)

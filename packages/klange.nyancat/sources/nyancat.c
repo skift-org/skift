@@ -1,4 +1,4 @@
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/iostream.h>
 #include <skift/thread.h>
 

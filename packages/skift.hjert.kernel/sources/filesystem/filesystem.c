@@ -12,7 +12,7 @@
  */
 
 #include <skift/math.h>
-#include <string.h>
+#include <skift/cstring.h>
 
 #include <skift/logger.h>
 
@@ -183,6 +183,7 @@ int file_read(stream_t *stream, void *buffer, uint size)
 
         result = readedsize;
         stream->offset += readedsize;
+    
     }
 
     sk_lock_release(stream->node->lock);
@@ -682,18 +683,14 @@ void *filesystem_readall(stream_t *s)
         iostream_stat_t stat = {0};
         filesystem_fstat(s, &stat);
         void *buffer = malloc(stat.size);
-        int readed = filesystem_read(s, buffer, stat.size);
 
-
-        int hash = 0;
-
-        for(uint i = 0; i < stat.size; i++)
+        if (buffer == NULL)
         {
-            hash+= ((char*)buffer)[i];
+            return NULL;
         }
-        
-        sk_log(LOG_DEBUG, "readed %d out of %d hash:%08x", readed, stat.size, hash);
 
+        filesystem_read(s, buffer, stat.size);
+    
         return buffer;
     }
     else

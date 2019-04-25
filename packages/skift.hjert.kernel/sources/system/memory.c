@@ -13,7 +13,7 @@
  * - MAYBE ADD: page level memory
  */
 
-#include <string.h>
+#include <skift/cstring.h>
 #include <skift/iostream.h>
 #include <skift/runtime.h>
 #include <skift/atomic.h>

@@ -9,6 +9,9 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
+    // FIXME: - get the uptime from the kernel.
+    //        - get user and the machine name from the system
+
     printf("\033[1;34m    _____   \033[1;34muser\033[1;37m@\033[1;34mcore\n");
     printf("\033[1;34m   / ____|  \033[1;37mOS:       \033[0;37mskift\n");
     printf("\033[1;34m  | (___    \033[1;37mKERNEL:   \033[0;37mhjert\n");

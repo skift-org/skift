@@ -192,8 +192,11 @@ static char *THREAD_STATES[] =
 void thread_dump(thread_t *t)
 {
     sk_atomic_begin();
-    printf("\n\t- ID=%d PROC=('%s', %d) %s", t->id, t->process->name, t->process->id, THREAD_STATES[t->state]);
-
+    printf("\n\t . Thread %d", t->id);
+    printf("\n\t   State: %s", THREAD_STATES[t->state]);
+    printf("\n\t   Process: %d %s", t->id, t->process->name);
+    printf("\n\t   User memory: "); memory_layout_dump(t->process->pdir, true);
+    printf("\n");
     sk_atomic_end();
 }
 
@@ -201,23 +204,18 @@ void thread_panic_dump(void)
 {
     sk_atomic_begin();
 
-    printf("\n\tRunning thread %d at %08x :", sheduler_running_thread_id(), sheduler_running_thread());
-    thread_dump(sheduler_running_thread());
-    memory_layout_dump(sheduler_running_process()->pdir, true);
 
     printf("\n");
-
+    printf("\n\tRunning thread %d", sheduler_running_thread_id());
+    printf("\n");
     printf("\n\tThreads:");
 
     FOREACH(i, threads)
     {
         thread_t *t = i->value;
-        if (t != sheduler_running_thread() && t->state != THREADSTATE_NONE)
-        {
-            memory_layout_dump(t->process->pdir, true);
-            thread_dump(t);
-        }
+        thread_dump(t);
     }
+
 
     sk_atomic_end();
 }

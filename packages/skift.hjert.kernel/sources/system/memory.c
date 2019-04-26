@@ -19,8 +19,8 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
+#include "kernel/system.h"
 #include "kernel/paging.h"
-
 #include "kernel/memory.h"
 
 /* --- Private functions ---------------------------------------------------- */
@@ -86,7 +86,7 @@ uint physical_alloc(uint count)
         }
     }
 
-    sk_log(LOG_WARNING, "Out of physical memory!");
+    PANIC("Out of physical memory! Trying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / PAGE_SIZE);
     return 0;
 }
 
@@ -524,7 +524,7 @@ void memory_dump(void)
         memory_used = true;                                      \
         memory_empty = false; \
         current_physical = virtual2physical(__pdir, __addr);     \
-        printf("\n\t - %8x [%08x:", (__addr), current_physical); \
+        printf("%8x [%08x:", (__addr), current_physical); \
     }
 
 #define MEMORY_DUMP_REGION_END(__pdir, __addr)                              \
@@ -535,7 +535,6 @@ void memory_dump(void)
 
 void memory_layout_dump(page_directorie_t *pdir, bool user)
 {
-    printf("\n\n\tMemory layout: ");
     bool memory_used = false;
     bool memory_empty = true;
     uint current_physical = 0;
@@ -581,6 +580,6 @@ void memory_layout_dump(page_directorie_t *pdir, bool user)
 
     if (memory_empty)
     {
-        printf("\n\t - [empty]");
+        printf("[empty]");
     }
 }

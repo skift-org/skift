@@ -38,7 +38,7 @@ void __plug_init(void)
     err_stream = &internal_log_stream;
     log_stream = &internal_log_stream;
 
-    sk_logger_setlevel(LOG_ALL);
+    sk_logger_setlevel(LOG_ERROR);
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)

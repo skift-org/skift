@@ -89,6 +89,7 @@ def QEMU(disk, debug):
             ABORT()
     else:
         if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_KVM) != 0:
+            ERROR("Failed to start QEMU with KVM!")
             if subprocess.call(["qemu-system-i386", "-cdrom", disk] + QEMUFLAGS_NOKVM) != 0:
                 ERROR("Failed to start QEMU!")
                 ABORT()
@@ -580,7 +581,7 @@ def distrib(targets):
     else:
         print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
-    # print(BRIGHT_YELLOW + "\nDistribution succeed 👌 !" + RESET)
+    print(BRIGHT_GREEN + "\nDistribution succeed 👌 !" + RESET)
 
 def help_command(targets):
     """Show this help message."""

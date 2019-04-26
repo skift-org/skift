@@ -77,8 +77,6 @@ char** shell_split(char* command)
 
     char** tokens = malloc(MAX_PROCESS_ARGV * sizeof(char*));
 
-    sk_log(LOG_DEBUG, "tokens list at %08x", tokens);
-
     memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char*));
     char* start = &command[0];
 
@@ -97,7 +95,6 @@ char** shell_split(char* command)
                 buffer[buffer_len - 1] = '\0';
 
                 tokens[token_index++] = buffer;
-                sk_log(LOG_DEBUG, "Token '%s'", buffer);
             }
 
             start = &command[i] + 1;

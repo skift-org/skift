@@ -15,7 +15,9 @@ int __printf_formate_binary(printf_info_t* info, va_list* va)
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
     for(int i = 0; buffer[i]; i++)
+    {
         PRINTF_APPEND(buffer[i]);
+    }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
     
@@ -32,7 +34,9 @@ int __printf_formate_octal(printf_info_t* info, va_list* va)
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
     for(int i = 0; buffer[i]; i++)
+    {
         PRINTF_APPEND(buffer[i]);
+    }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
     
@@ -62,7 +66,9 @@ int __printf_formate_decimal(printf_info_t* info, va_list* va)
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
     for(int i = 0; buffer[i]; i++)
+    {
         PRINTF_APPEND(buffer[i]);
+    }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
     
@@ -79,7 +85,9 @@ int __printf_formate_hexadecimal(printf_info_t* info, va_list* va)
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
     for(int i = 0; buffer[i]; i++)
+    {
         PRINTF_APPEND(buffer[i]);
+    }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
     
@@ -95,7 +103,9 @@ int __printf_formate_char(printf_info_t* info, va_list* va)
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
     for(int i = 0; buffer[i]; i++)
+    {
         PRINTF_APPEND(buffer[i]);
+    }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
     
@@ -111,7 +121,9 @@ int __printf_formate_string(printf_info_t *info, va_list *va)
     PRINTF_PADDING(v, PFALIGN_RIGHT);
 
     for(int i = 0; v[i]; i++)
+    {
         PRINTF_APPEND(v[i]);
+    }
 
     PRINTF_PADDING(v, PFALIGN_LEFT);
 
@@ -161,6 +173,10 @@ int __printf(printf_info_t *info, va_list va)
 
     if (info->format == NULL)
     {
+        for (int i = 0; "(null)"[0];i++)
+        {
+            PRINTF_APPEND("(null)"[i]);
+        }
         return 0;
     }
 

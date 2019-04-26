@@ -8,6 +8,7 @@
 
 #include <skift/runtime.h>
 #include <skift/iostream.h>
+#include <skift/system.h>
 
 void __plug_init(void);
 void __plug_fini(int exit_code);
@@ -55,3 +56,7 @@ int __plug_filesystem_link(const char* oldpath, const char* newpath);
 int __plug_filesystem_unlink(const char* path);
 
 int __plug_filesystem_mkdir(const char* path);
+
+// System ------------------------------------------------------------------- //
+
+void __system_get_info(system_info_t* info);

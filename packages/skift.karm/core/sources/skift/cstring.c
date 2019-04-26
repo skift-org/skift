@@ -3,6 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/__printf__.h>
+
 #include <skift/math.h>
 #include <skift/cstring.h>
 #include <skift/runtime.h>
@@ -18,7 +19,7 @@ void string_printf_append(printf_info_t *info, char c)
     }
     else
     {
-        strnapd(info->p, c, info->n);
+        strnapd((char*)info->p, c, info->lenght);
     }
 }
 
@@ -369,8 +370,15 @@ void strbs(char *str)
 
 void strnapd(char *str, char c, size_t n)
 {
-    char tmp[2] = {c, '\0'};
-    strncat(str, tmp, n);
+    for(uint i = 0; i < (n - 1); i++)
+    {
+        if (str[i] == '\0')
+        {
+            str[i] = c;
+            str[i+1]='\0';
+            return;
+        }
+    }
 }
 
 void strrvs(char *str)

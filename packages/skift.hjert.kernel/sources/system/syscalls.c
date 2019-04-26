@@ -11,8 +11,11 @@
  * - Shared memory syscalls.
  */
 
+#include <skift/cstring.h>
 #include <skift/logger.h>
+#include <skift/system.h>
 
+#include "kernel/version.h"
 #include "kernel/tasking.h"
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"
@@ -233,6 +236,26 @@ int sys_filesystem_unlink(const char *link_path)
     return result;
 }
 
+int sys_system_get_info(system_info_t* info)
+{
+    strncpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
+    
+    sprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE, 
+            __kernel_version_format, 
+            
+            __kernel_version_major, 
+            __kernel_version_minor, 
+            __kernel_version_patch, 
+            __kernel_version_codename);
+    
+    strncpy(info->system_name, "skift", SYSTEM_INFO_FIELD_SIZE);
+
+    // FIXME: this should not be hard coded.
+    strncpy(info->machine, "machine", SYSTEM_INFO_FIELD_SIZE);
+
+    return 0;
+}
+
 static int (*syscalls[])() =
     {
         [SYS_PROCESS_SELF] = sys_process_self,
@@ -275,6 +298,8 @@ static int (*syscalls[])() =
         [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
         [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
         [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
+
+        [SYS_SYSTEM_GET_INFO] = sys_system_get_info
 };
 
 void syscall_dispatcher(processor_context_t *context)

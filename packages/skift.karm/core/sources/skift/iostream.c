@@ -140,15 +140,15 @@ static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint 
 {
     int data_left = size;
 
-    byte *data_to_write = (byte *)buffer;
+    char *data_to_write = (char *)buffer;
 
     while (data_left > 0)
     {
         // Append the data to the buffer
         int free_space = IOSTREAM_BUFFER_SIZE - stream->write_used;
-        int data_added = min(free_space, data_left % IOSTREAM_BUFFER_SIZE);
+        int data_added = min(free_space, data_left);
 
-        memcpy(((byte *)(stream->write_buffer)) + stream->write_used, data_to_write, data_added);
+        memcpy(((char *)(stream->write_buffer)) + stream->write_used, data_to_write, data_added);
         stream->write_used += data_added;
         data_left -= data_added;
         data_to_write += data_added;

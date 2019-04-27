@@ -3,6 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/cstring.h>
+#include <skift/iostream.h>
 
 #include "kernel/protocol.h"
 
@@ -33,6 +34,9 @@ int main(int argc, char **argv)
     (void)argc; (void)argv;
 
     sk_logger_setlevel(LOG_ALL);
+
+    printf("Welcome to \033[1;34mskiftOS\033[0m!\n\n");
+    iostream_flush(out_stream);
 
     int shell = init_exec("/bin/sh");
     

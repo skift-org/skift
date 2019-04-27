@@ -583,3 +583,29 @@ void memory_layout_dump(page_directorie_t *pdir, bool user)
         printf("[empty]");
     }
 }
+
+uint memory_get_used(void)
+{
+    uint result;
+    
+    sk_atomic_begin();
+
+    result = USED_MEMORY;
+
+    sk_atomic_end();
+
+    return result;
+}
+
+uint memory_get_total(void)
+{
+    uint result;
+    
+    sk_atomic_begin();
+
+    result = TOTAL_MEMORY;
+
+    sk_atomic_end();
+
+    return result;
+}

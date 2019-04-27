@@ -1,5 +1,7 @@
 #pragma once
 
+#include <skift/runtime.h>
+
 #define SYSTEM_INFO_FIELD_SIZE 65
 
 typedef struct
@@ -11,5 +13,17 @@ typedef struct
     char machine[SYSTEM_INFO_FIELD_SIZE]; // The machine name
 } system_info_t;
 
+typedef struct
+{
+    uint64_t uptime;
+
+    uint total_ram;
+    uint used_ram;
+
+    int running_process;
+    int running_threads;
+} system_status_t;
+
 // Retrived system information like kernel name and system release.
 void system_get_info(system_info_t *info);
+void system_get_status(system_status_t * status);

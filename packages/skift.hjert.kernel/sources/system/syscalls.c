@@ -21,6 +21,7 @@
 #include "kernel/shared_memory.h"
 #include "kernel/filesystem.h"
 #include "kernel/sheduler.h"
+#include "kernel/memory.h"
 
 #include "kernel/serial.h"
 
@@ -256,6 +257,20 @@ int sys_system_get_info(system_info_t* info)
     return 0;
 }
 
+int sys_system_get_status(system_status_t* status)
+{
+    // FIXME: get a real uptime value;
+    status->uptime = 0;
+
+    status->total_ram = memory_get_total();
+    status->used_ram = memory_get_used();
+
+    status->running_process = process_count();
+    status->running_threads = thread_count();
+
+    return 0;
+}
+
 static int (*syscalls[])() =
     {
         [SYS_PROCESS_SELF] = sys_process_self,
@@ -299,7 +314,8 @@ static int (*syscalls[])() =
         [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
         [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
 
-        [SYS_SYSTEM_GET_INFO] = sys_system_get_info
+        [SYS_SYSTEM_GET_INFO] = sys_system_get_info,
+        [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,
 };
 
 void syscall_dispatcher(processor_context_t *context)

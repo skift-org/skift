@@ -59,4 +59,6 @@ int __plug_filesystem_mkdir(const char* path);
 
 // System ------------------------------------------------------------------- //
 
-void __system_get_info(system_info_t* info);
+void __plug_system_get_info(system_info_t* info);
+
+void __plug_system_get_status(system_status_t* status);

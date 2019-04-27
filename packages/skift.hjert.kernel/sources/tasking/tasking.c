@@ -314,6 +314,19 @@ PROCESS process_create(const char *name, bool user)
     return process->id;
 }
 
+int process_count(void)
+{
+    int result;
+
+    sk_atomic_begin();
+
+    result = list_count(processes);
+
+    sk_atomic_end();
+
+    return result;
+}
+
 void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
 {
     sk_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);

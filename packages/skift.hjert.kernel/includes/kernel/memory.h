@@ -43,3 +43,6 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count);
 
 void memory_dump(void);
 void memory_layout_dump(page_directorie_t *pdir, bool user);
+
+uint memory_get_used(void);
+uint memory_get_total(void);

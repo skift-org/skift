@@ -54,6 +54,8 @@ typedef struct s_process
 
 process_t *alloc_process(const char *name, bool user);
 
+int process_count(void);
+
 // Process launchpad -------------------------------------------------------- //
 
 // Create a new launchpad process

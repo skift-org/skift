@@ -49,6 +49,15 @@ thread_t *thread_getbyid(int id)
     return NULL;
 }
 
+int thread_count(void)
+{
+    sk_atomic_begin();
+    int result = list_count(threads);
+    sk_atomic_end();
+
+    return result;
+}
+
 // Thread state mamanagment ------------------------------------------------- //
 list_t* thread_bystate(thread_state_t state)
 {

@@ -488,10 +488,27 @@ def info(target, targets):
     print("\tOutput: " + target.get_output())
 
 
+def debug_command(target, targets):
+    """Start qemu and attach gdb to it."""
+    distrib(targets)
+
+    print("")
+    print(BRIGHT_WHITE + "Starting VM (DEBUG MODE)..." + RESET)
+
+    with open(".gdbinit", "w") as f:
+        f.write("target remote localhost:1234")
+        f.write("file " + target.get_output())
+        f.write("break main")
+
+    gdb = subprocess.Popen(["st", "gdb"])
+    QEMU("build/bootdisk.iso", True)
+    gdb.wait()
+
 actions = \
     {
         "build": build,
         "clean": clean,
+        "debug": debug_command,
         "rebuild": rebuild,
         "info": info
     }
@@ -647,15 +664,6 @@ def run_command(targets):
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
     QEMU("build/bootdisk.iso", False)
 
-def debug_command(targets):
-    """Start skiftOS in QEMU."""
-    distrib(targets)
-
-    print("")
-    print(BRIGHT_WHITE + "Starting VM (DEBUG MODE)..." + RESET)
-    QEMU("build/bootdisk.iso", True)
-
-
 global_actions = \
     {
         "build-all": build_all,
@@ -667,8 +675,7 @@ global_actions = \
         "list-other": list_other,
         "rebuild-all": rebuild_all,
         "distrib": distrib,
-        "run": run_command,
-        "debug" : debug_command
+        "run": run_command
     }
 
 # --- Main ------------------------------------------------------------------- #

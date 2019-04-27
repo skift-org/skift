@@ -42,7 +42,7 @@ void ls_print_entry(iostream_direntry_t *entry)
     }
 
     if (option_all || entry->name[0] != '.')
-        printf((entry->type == FILE_DIRECTORY && option_color) ? "\e[1m%s  \e[0m" : "%s  ", entry->name);
+        printf((entry->type == IOSTREAM_TYPE_DIRECTORY && option_color) ? "\e[1m%s  \e[0m" : "%s  ", entry->name);
 
     if (option_list)
     {
@@ -59,7 +59,7 @@ int ls(const char *path)
         iostream_stat_t state = {0};
         iostream_fstat(dir, &state);
 
-        if (state.type == FILE_DIRECTORY)
+        if (state.type == IOSTREAM_TYPE_DIRECTORY)
         {
             iostream_direntry_t entry;
 

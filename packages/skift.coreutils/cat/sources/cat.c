@@ -13,7 +13,7 @@ int cat(const char *path)
         iostream_stat_t stat = {0};
         iostream_fstat(stream, &stat);
 
-        if (stat.type == FILE_DIRECTORY)
+        if (stat.type == IOSTREAM_TYPE_DIRECTORY)
         {
             printf("%s: is a directory\n", path);
             return -1;

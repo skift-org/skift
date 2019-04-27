@@ -370,7 +370,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     iostream_stat_t stat;
     filesystem_fstat(s, &stat);
 
-    if (stat.type != FILE_REGULAR)
+    if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
         sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         return -1;

@@ -42,7 +42,7 @@ fsnode_t *fsnode(iostream_type_t type)
 
     switch (type)
     {
-    case FILE_REGULAR:
+    case FSNODE_FILE:
     {
         file_t *file = &node->file;
 
@@ -51,14 +51,14 @@ fsnode_t *fsnode(iostream_type_t type)
         file->size = 0;
         break;
     }
-    case FILE_DIRECTORY:
+    case FSNODE_DIRECTORY:
     {
         directory_t *dir = &node->directory;
 
         dir->childs = list();
         break;
     }
-    case FILE_FIFO:
+    case FSNODE_FIFO:
     {
         fifo_t *fifo = &node->fifo;
         fifo->buffer = ringbuffer(4096);
@@ -77,12 +77,12 @@ void fsnode_delete(fsnode_t *node)
 
     switch (node->type)
     {
-    case FILE_REGULAR:
+    case FSNODE_FILE:
     {
         free(node->file.buffer);
         break;
     }
-    case FILE_DIRECTORY:
+    case FSNODE_DIRECTORY:
     {
         FOREACH(item, node->directory.childs)
         {
@@ -102,7 +102,7 @@ void fsnode_delete(fsnode_t *node)
         list_delete(node->directory.childs, LIST_FREE_VALUES);
         break;
     }
-    case FILE_FIFO:
+    case FSNODE_FIFO:
     {
         ringbuffer_delete(node->fifo.buffer);
         break;
@@ -116,7 +116,7 @@ void fsnode_delete(fsnode_t *node)
 
 int fsnode_size(fsnode_t* node)
 {
-    if (node->type == FILE_REGULAR)
+    if (node->type == FSNODE_FILE)
     {
         return node->file.size;
     }
@@ -345,6 +345,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     if (size == sizeof(iostream_direntry_t))
     {
         sk_log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
+        
         if (index < stream->direntries.count)
         {
             int entrysize = sizeof(iostream_direntry_t);
@@ -376,7 +377,7 @@ void filesystem_setup()
 {
     sk_lock_init(fslock);
 
-    root = fsnode(FILE_DIRECTORY);
+    root = fsnode(FSNODE_DIRECTORY);
     root->refcount++;
 
     filesystem_ready = true;
@@ -390,7 +391,7 @@ fsnode_t *filesystem_resolve(fsnode_t *at, path_t* p)
     {
         const char* element = path_element(p, i);
 
-        if (current->type == FILE_DIRECTORY)
+        if (current->type == FSNODE_DIRECTORY)
         {
             fsnode_t* directory = current;
             sk_lock_acquire(directory->lock);
@@ -433,7 +434,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t* node_path, iostream_type_t typ
     
     fsnode_t* parent_node = filesystem_resolve_parent(at, node_path);
 
-    if (parent_node == NULL || parent_node->type != FILE_DIRECTORY)
+    if (parent_node == NULL || parent_node->type != FSNODE_DIRECTORY)
     {
         return NULL;
     }
@@ -464,7 +465,7 @@ fsnode_t *filesystem_acquire(fsnode_t *at, path_t* p, bool create)
 
     if (node == NULL && create)
     {
-        node = filesystem_mknode(at, p, FILE_REGULAR);
+        node = filesystem_mknode(at, p, FSNODE_FILE);
     }
 
     if (node != NULL)
@@ -499,7 +500,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
         fsnode_t *node = entry->node;
 
 
-        if (node->type != FILE_DIRECTORY)
+        if (node->type != FSNODE_DIRECTORY)
         {
             printf("\t");
             for (int i = 0; i < depth; i++)
@@ -507,7 +508,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
                 printf("| \t");
             }
 
-            if (node->type == FILE_REGULAR)
+            if (node->type == FSNODE_FILE)
             {
                 printf("|-%s size: %dbytes\n", entry->name, node->file.size);
             }
@@ -523,7 +524,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
 
-        if (node->type == FILE_DIRECTORY)
+        if (node->type == FSNODE_DIRECTORY)
         {
             printf("\t");
             for (int i = 0; i < depth; i++)
@@ -580,12 +581,12 @@ stream_t *filesystem_open(fsnode_t *at, path_t* p, iostream_flag_t flags)
     {
         stream_t *s = stream(node, flags);
 
-        if (node->type == FILE_REGULAR)
+        if (node->type == FSNODE_FILE)
         {
             if (OPEN_OPTION(IOSTREAM_TRUNC))
                 file_trunc(node);
         }
-        else if (node->type == FILE_DIRECTORY)
+        else if (node->type == FSNODE_DIRECTORY)
         {
             s->direntries = directory_entries(node);
         }
@@ -600,11 +601,11 @@ void filesystem_close(stream_t *s)
 
     if (s != NULL)
     {
-        iostream_type_t type = s->node->type;
+        fsnode_type_t type = s->node->type;
 
         filesystem_release(s->node);
 
-        if (type == FILE_DIRECTORY)
+        if (type == FSNODE_DIRECTORY)
         {
             free(s->direntries.entries);
         }
@@ -628,13 +629,13 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
         {
             switch (s->node->type)
             {
-            case FILE_REGULAR:
+            case FSNODE_FILE:
             {
                 result = file_read(s, buffer, size);
                 break;
             }
 
-            case FILE_DEVICE:
+            case FSNODE_DEVICE:
             {
                 device_t *dev = &s->node->device;
 
@@ -646,14 +647,14 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
                 break;
             }
 
-            case FILE_DIRECTORY:
+            case FSNODE_DIRECTORY:
             {
                 result = directory_read(s, buffer, size);
 
                 break;
             }
 
-            case FILE_FIFO:
+            case FSNODE_FIFO:
             {
                 result = ringbuffer_read(s->node->fifo.buffer, buffer, size);
 
@@ -712,14 +713,14 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
         {
             switch (s->node->type)
             {
-            case FILE_REGULAR:
+            case FSNODE_FILE:
             {
                 result = file_write(s, buffer, size);
 
                 break;
             }
 
-            case FILE_DEVICE:
+            case FSNODE_DEVICE:
             {
                 device_t *dev = &s->node->device;
 
@@ -731,7 +732,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
                 break;
             }
 
-            case FILE_FIFO:
+            case FSNODE_FIFO:
             {
                 result = ringbuffer_write(s->node->fifo.buffer, buffer, size);
 
@@ -759,7 +760,7 @@ int filesystem_ioctl(stream_t *s, int request, void *args)
 
     if (s != NULL)
     {
-        if (s->node->type == FILE_DEVICE)
+        if (s->node->type == FSNODE_DEVICE)
         {
             device_t *device = &s->node->device;
 
@@ -783,10 +784,30 @@ int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
 
     if (s != NULL)
     {
-        stat->type = s->node->type;
+        switch (s->node->type)
+        {
+            case FSNODE_SYNTHETIC:
+            case FSNODE_DIRECTORY:
+                stat->type = IOSTREAM_TYPE_DIRECTORY;
+                break;
+        
+            case FSNODE_FIFO:
+                stat->type = IOSTREAM_TYPE_FIFO;
+                break;
+
+                    
+            case FSNODE_DEVICE:
+                stat->type = IOSTREAM_TYPE_FIFO;
+                break;
+
+            default:
+                stat->type = IOSTREAM_TYPE_REGULAR;
+                break;
+        }
+        
         stat->size = 0;
 
-        if (s->node->type == FILE_REGULAR)
+        if (s->node->type == FSNODE_FILE)
         {
             file_stat(s->node, stat);
         }
@@ -817,13 +838,13 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
             break;
 
         case IOSTREAM_WHENCE_END:
-            if (s->node->type == FILE_REGULAR)
+            if (s->node->type == FSNODE_FILE)
             {
                 sk_lock_acquire(s->node->lock);
                 s->offset = s->node->file.size + offset;
                 sk_lock_release(s->node->lock);
             }
-            else if (s->node->type == FILE_DIRECTORY)
+            else if (s->node->type == FSNODE_DIRECTORY)
             {
                 s->offset = s->direntries.count * sizeof(iostream_direntry_t) + offset;
             }
@@ -888,7 +909,7 @@ int filesystem_mkdir(fsnode_t *at, path_t* p)
     IS_FS_READY;
     sk_lock_acquire(fslock);
     
-    if (filesystem_mknode(at, p, FILE_DIRECTORY) != NULL)
+    if (filesystem_mknode(at, p, FSNODE_DIRECTORY) != NULL)
     {
         sk_lock_release(fslock);
         return 0;
@@ -905,7 +926,7 @@ int filesystem_mkdev(fsnode_t *at, path_t* p, device_t dev)
     IS_FS_READY;
     sk_lock_acquire(fslock);
 
-    fsnode_t *device_file = filesystem_mknode(at, p, FILE_DEVICE);
+    fsnode_t *device_file = filesystem_mknode(at, p, FSNODE_DEVICE);
 
     if (device_file != NULL)
     {
@@ -924,7 +945,7 @@ int filesystem_mkfile(fsnode_t *at, path_t* p)
 {
     IS_FS_READY;
     sk_lock_acquire(fslock);
-    if (filesystem_mknode(at, p, FILE_REGULAR) != NULL)
+    if (filesystem_mknode(at, p, FSNODE_FILE) != NULL)
     {
         sk_lock_release(fslock);
         return 0;
@@ -950,7 +971,7 @@ int filesystem_link(fsnode_t * file_at, path_t* file_path, fsnode_t *link_at, pa
         {
             fsnode_t *parent = filesystem_resolve_parent(link_at, link_path);
 
-            if (parent != NULL && parent->type == FILE_DIRECTORY)
+            if (parent != NULL && parent->type == FSNODE_DIRECTORY)
             {
                 if (directory_link(parent, node, path_filename(link_path)))
                 {
@@ -974,7 +995,7 @@ int filesystem_unlink(fsnode_t *at, path_t* link_path)
     {
         fsnode_t *parent = filesystem_resolve_parent(at, link_path);
 
-        if (parent != NULL && parent->type == FILE_DIRECTORY)
+        if (parent != NULL && parent->type == FSNODE_DIRECTORY)
         {
             if (directory_unlink(parent, path_filename(link_path)))
             {

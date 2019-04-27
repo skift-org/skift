@@ -20,12 +20,12 @@ typedef enum
 
 typedef enum
 {
-    FILE_UNKNOWN,
+    IOSTREAM_TYPE_UNKNOWN,
 
-    FILE_REGULAR,
-    FILE_DEVICE,
-    FILE_DIRECTORY,
-    FILE_FIFO,
+    IOSTREAM_TYPE_REGULAR,
+    IOSTREAM_TYPE_DEVICE,
+    IOSTREAM_TYPE_DIRECTORY,
+    IOSTREAM_TYPE_FIFO,
 } iostream_type_t;
 
 typedef enum

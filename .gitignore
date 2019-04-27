@@ -3,6 +3,8 @@ __meta.h
 __assets.h
 __assets.s
 
+.gdbinit
+
 *.asm
 
 bin/

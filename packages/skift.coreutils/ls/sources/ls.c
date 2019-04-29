@@ -28,6 +28,7 @@ static cmdline_option_t options[] = {
 static cmdline_t cmdline = CMDLINE(usages, options, "List files and directories in the current working directory by default.", "Options can be combined.");
 
 const char *file_type_name[] = {
+    "unk  ",
     "file ",
     "dev  ",
     "dir  ",

@@ -174,6 +174,26 @@ path_t* path_combine(path_t* left, path_t* right)
     return p;
 }
 
+path_t* path_split_at(path_t* path, int index)
+{
+    path_t* p = MALLOC(path_t);
+    p->elements = list();
+    p->is_absolue = false;
+
+    int current_element_index = 0;
+    FOREACH(i, path->elements)
+    {
+        if (current_element_index >= index)
+        {
+            path_push(p, strdup(i->value));
+        }
+
+        current_element_index++;
+    }
+
+    return p;
+}
+
 void path_dump(path_t* p)
 {
     for(int i = 0; i < path_length(p); i++)

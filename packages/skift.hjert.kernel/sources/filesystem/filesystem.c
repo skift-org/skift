@@ -43,7 +43,7 @@ iostream_type_t fsnode_to_iostream_type(fsnode_type_t type)
     }
 }
 
-fsnode_t *fsnode(iostream_type_t type)
+fsnode_t *fsnode(fsnode_type_t type)
 {
     fsnode_t *node = MALLOC(fsnode_t);
 
@@ -436,7 +436,7 @@ fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t *p)
     return child;
 }
 
-fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, iostream_type_t type)
+fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 {
     IS_FS_READY;
 
@@ -446,6 +446,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, iostream_type_t typ
 
     if (parent_node == NULL || parent_node->type != FSNODE_DIRECTORY)
     {
+        sk_log(LOG_WARNING, "Failed to create new node, parent not found!");
         return NULL;
     }
 
@@ -453,6 +454,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, iostream_type_t typ
 
     if (child_name == NULL || directory_has_entry(parent_node, child_name))
     {
+        sk_log(LOG_WARNING, "Failed to create new node, the file exist!");
         return NULL;
     }
 
@@ -460,6 +462,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, iostream_type_t typ
 
     if (!directory_link(parent_node, child_node, child_name))
     {
+        sk_log(LOG_WARNING, "Failed to create new node, link() failed!");
         fsnode_delete(child_node);
         return NULL;
     }

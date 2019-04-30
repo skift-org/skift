@@ -32,6 +32,17 @@ static bool filesystem_ready = false;
 
 #pragma region
 
+iostream_type_t fsnode_to_iostream_type(fsnode_type_t type)
+{
+    switch (type)
+    {
+        case FSNODE_DIRECTORY: return IOSTREAM_TYPE_DIRECTORY;
+        case FSNODE_FIFO: return IOSTREAM_TYPE_FIFO;
+        case FSNODE_DEVICE: return IOSTREAM_TYPE_FIFO;
+        default: return IOSTREAM_TYPE_REGULAR;
+    }
+}
+
 fsnode_t *fsnode(iostream_type_t type)
 {
     fsnode_t *node = MALLOC(fsnode_t);
@@ -114,7 +125,7 @@ void fsnode_delete(fsnode_t *node)
     free(node);
 }
 
-int fsnode_size(fsnode_t* node)
+int fsnode_size(fsnode_t *node)
 {
     if (node->type == FSNODE_FILE)
     {
@@ -183,7 +194,6 @@ int file_read(stream_t *stream, void *buffer, uint size)
 
         result = readedsize;
         stream->offset += readedsize;
-    
     }
 
     sk_lock_release(stream->node->lock);
@@ -274,7 +284,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
         strncpy(current->name, entry->name, PATH_ELEMENT_LENGHT);
-        current->type = entry->node->type;
+        current->type = fsnode_to_iostream_type(entry->node->type);
 
         current++;
     }
@@ -345,7 +355,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     if (size == sizeof(iostream_direntry_t))
     {
         sk_log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
-        
+
         if (index < stream->direntries.count)
         {
             int entrysize = sizeof(iostream_direntry_t);
@@ -383,17 +393,17 @@ void filesystem_setup()
     filesystem_ready = true;
 }
 
-fsnode_t *filesystem_resolve(fsnode_t *at, path_t* p)
+fsnode_t *filesystem_resolve(fsnode_t *at, path_t *p)
 {
     fsnode_t *current = (at == NULL) ? root : at;
 
-    for(int i = 0; i < path_length(p); i++)
+    for (int i = 0; i < path_length(p); i++)
     {
-        const char* element = path_element(p, i);
+        const char *element = path_element(p, i);
 
         if (current->type == FSNODE_DIRECTORY)
         {
-            fsnode_t* directory = current;
+            fsnode_t *directory = current;
             sk_lock_acquire(directory->lock);
             fsdirectory_entry_t *entry = directory_entry(current, element);
 
@@ -413,40 +423,40 @@ fsnode_t *filesystem_resolve(fsnode_t *at, path_t* p)
             return NULL;
         }
     }
-    
+
     return current;
 }
 
-fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t* p)
+fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t *p)
 {
-    const char* child_name = path_pop(p);
-    fsnode_t* child = filesystem_resolve(at, p);
+    const char *child_name = path_pop(p);
+    fsnode_t *child = filesystem_resolve(at, p);
     path_push(p, child_name);
 
     return child;
 }
 
-fsnode_t *filesystem_mknode(fsnode_t *at, path_t* node_path, iostream_type_t type)
+fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, iostream_type_t type)
 {
     IS_FS_READY;
 
     sk_log(LOG_DEBUG, "Creating node '%s' of type %d...", path_filename(node_path), type);
-    
-    fsnode_t* parent_node = filesystem_resolve_parent(at, node_path);
+
+    fsnode_t *parent_node = filesystem_resolve_parent(at, node_path);
 
     if (parent_node == NULL || parent_node->type != FSNODE_DIRECTORY)
     {
         return NULL;
     }
 
-    const char* child_name = path_filename(node_path);
+    const char *child_name = path_filename(node_path);
 
     if (child_name == NULL || directory_has_entry(parent_node, child_name))
     {
         return NULL;
     }
 
-    fsnode_t* child_node = fsnode(type);
+    fsnode_t *child_node = fsnode(type);
 
     if (!directory_link(parent_node, child_node, child_name))
     {
@@ -457,7 +467,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t* node_path, iostream_type_t typ
     return child_node;
 }
 
-fsnode_t *filesystem_acquire(fsnode_t *at, path_t* p, bool create)
+fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create)
 {
     sk_lock_acquire(fslock);
 
@@ -498,7 +508,6 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
-
 
         if (node->type != FSNODE_DIRECTORY)
         {
@@ -567,7 +576,7 @@ void filesystem_panic_dump(void)
 #pragma region
 
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
-stream_t *filesystem_open(fsnode_t *at, path_t* p, iostream_flag_t flags)
+stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags)
 {
     IS_FS_READY;
 
@@ -691,7 +700,7 @@ void *filesystem_readall(stream_t *s)
         }
 
         filesystem_read(s, buffer, stat.size);
-    
+
         return buffer;
     }
     else
@@ -784,27 +793,7 @@ int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
 
     if (s != NULL)
     {
-        switch (s->node->type)
-        {
-            case FSNODE_SYNTHETIC:
-            case FSNODE_DIRECTORY:
-                stat->type = IOSTREAM_TYPE_DIRECTORY;
-                break;
-        
-            case FSNODE_FIFO:
-                stat->type = IOSTREAM_TYPE_FIFO;
-                break;
-
-                    
-            case FSNODE_DEVICE:
-                stat->type = IOSTREAM_TYPE_FIFO;
-                break;
-
-            default:
-                stat->type = IOSTREAM_TYPE_REGULAR;
-                break;
-        }
-        
+        stat->type = fsnode_to_iostream_type(s->node->type);
         stat->size = 0;
 
         if (s->node->type == FSNODE_FILE)
@@ -895,7 +884,6 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
                 return offset;
             }
         }
-
     }
     else
     {
@@ -904,11 +892,11 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
     }
 }
 
-int filesystem_mkdir(fsnode_t *at, path_t* p)
+int filesystem_mkdir(fsnode_t *at, path_t *p)
 {
     IS_FS_READY;
     sk_lock_acquire(fslock);
-    
+
     if (filesystem_mknode(at, p, FSNODE_DIRECTORY) != NULL)
     {
         sk_lock_release(fslock);
@@ -921,7 +909,7 @@ int filesystem_mkdir(fsnode_t *at, path_t* p)
     }
 }
 
-int filesystem_mkdev(fsnode_t *at, path_t* p, device_t dev)
+int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev)
 {
     IS_FS_READY;
     sk_lock_acquire(fslock);
@@ -941,7 +929,7 @@ int filesystem_mkdev(fsnode_t *at, path_t* p, device_t dev)
     }
 }
 
-int filesystem_mkfile(fsnode_t *at, path_t* p)
+int filesystem_mkfile(fsnode_t *at, path_t *p)
 {
     IS_FS_READY;
     sk_lock_acquire(fslock);
@@ -957,7 +945,7 @@ int filesystem_mkfile(fsnode_t *at, path_t* p)
     }
 }
 
-int filesystem_link(fsnode_t * file_at, path_t* file_path, fsnode_t *link_at, path_t* link_path)
+int filesystem_link(fsnode_t *file_at, path_t *file_path, fsnode_t *link_at, path_t *link_path)
 {
     IS_FS_READY;
 
@@ -965,7 +953,7 @@ int filesystem_link(fsnode_t * file_at, path_t* file_path, fsnode_t *link_at, pa
 
     sk_lock_acquire(fslock);
     {
-        fsnode_t* node = filesystem_resolve(file_at, file_path);
+        fsnode_t *node = filesystem_resolve(file_at, file_path);
 
         if (node != NULL)
         {
@@ -985,7 +973,7 @@ int filesystem_link(fsnode_t * file_at, path_t* file_path, fsnode_t *link_at, pa
     return result;
 }
 
-int filesystem_unlink(fsnode_t *at, path_t* link_path)
+int filesystem_unlink(fsnode_t *at, path_t *link_path)
 {
     IS_FS_READY;
 

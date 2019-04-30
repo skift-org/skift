@@ -1,4 +1,8 @@
 <p align="center">
+<b>See the <a href="https://github.com/skiftOS/skift/tree/develop">develop branch</a> for the lastest development</b>
+</p>
+
+<p align="center">
 <img src="manual/assets/capture.png" height=400 />
 </p>
 
@@ -19,16 +23,17 @@ A simple, handmade, operating system for intel x86 cpu.
 
 > Skift is a student project, don't expect it to be secure or stable at this stage.
 
+FIXME
+
 # Screenshots
 
-
+FIXME
 
 # Getting involved
 We welcome all contributions, just pick a task in the todo list and open an issue to let us know you are working on that.
 
 - [Manual](manual/readme.md)
 - [Building](manual/building.md)
-- [Todo](manual/todo.md)
 
 # License
 The skift operating and its core components are licensed under the **MIT License**.              

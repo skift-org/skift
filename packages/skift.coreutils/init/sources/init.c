@@ -1,9 +1,9 @@
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
-#include <string.h>
+#include <skift/cstring.h>
+#include <skift/iostream.h>
 
 #include "kernel/protocol.h"
 
@@ -17,7 +17,7 @@ int init_exec(const char* filename)
     sk_log(LOG_INFO, "Starting '%s'", filename);
     int process = sk_process_exec(filename, (const char*[]){filename, NULL});
 
-    if (process == 0)
+    if (process < 0)
     {
         sk_log(LOG_WARNING, "Failed to start process: '%s'!", filename);
     }
@@ -33,7 +33,13 @@ int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
 
+    sk_logger_setlevel(LOG_ALL);
+
+    printf("Welcome to \033[1;34mskiftOS\033[0m!\n\n");
+    iostream_flush(out_stream);
+
     int shell = init_exec("/bin/sh");
+    
     sk_thread_wait_process(shell, NULL);
 
     return 0;

@@ -1,11 +1,11 @@
-/*                  .d8888. db   dD d888888b d88888b d888888b                 */ 
-/*                  88'  YP 88 ,8P'   `88'   88'     `~~88~~'                 */ 
-/*                  `8bo.   88,8P      88    88ooo      88                    */ 
-/*                    `Y8b. 88`8b      88    88~~~      88                    */ 
-/*                  db   8D 88 `88.   .88.   88         88                    */ 
-/*                  `8888Y' YP   YD Y888888P YP         YP                    */
+/*                       _   _     _ _____ ____ _____                         */
+/*                      | | | |   | | ____|  _ \_   _|                        */
+/*                      | |_| |_  | |  _| | |_) || |                          */
+/*                      |  _  | |_| | |___|  _ < | |                          */
+/*                      |_| |_|\___/|_____|_| \_\|_|                          */
+/*                                                                            */
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -16,14 +16,13 @@
  * - ADD support for kernel command line options.
  */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <skift/cstring.h>
 
-#include <skift/atomic.h>
+#include <skift/math.h>
+#include <skift/__plugs__.h>
+#include <skift/iostream.h>
 #include <skift/logger.h>
-#include <skift/__plugs.h>
+#include <skift/atomic.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -59,7 +58,7 @@ uint get_kernel_end(multiboot_info_t *minfo)
 
 void main(multiboot_info_t *info, s32 magic)
 {
-    __plug_init(); // init maker.skift.framework glue code.
+    __plug_init(); // init skift.karm.core glue code.
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
@@ -67,7 +66,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
-        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader (MBOOT_MAGIC=0x%x)!", magic);
+        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\t Magic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
     }
 
     if ((info->mem_lower + info->mem_upper) < 255 * 1024)
@@ -85,15 +84,16 @@ void main(multiboot_info_t *info, s32 magic)
     setup(irq);
 
     /* --- System context --------------------------------------------------- */
+    sk_log(LOG_INFO, "Initializing system...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(messaging);
     setup(shared_memory);
     setup(filesystem);
     setup(modules, &mbootinfo);
-    
+
     /* --- Devices ---------------------------------------------------------- */
-    filesystem_mkdir("/dev");
+    sk_log(LOG_INFO, "Mounting devices...");
     setup(serial);
     setup(mouse);
     setup(keyboard);
@@ -104,21 +104,22 @@ void main(multiboot_info_t *info, s32 magic)
     setup(random);
 
     /* --- Finalizing System ------------------------------------------------ */
-    sk_log(LOG_DEBUG, "Starting the userspace...");
+    sk_log(LOG_INFO, "Starting the userspace...");
     sk_atomic_enable();
     sti();
 
     printf(KERNEL_UNAME);
+    printf(" (%dmio used out %dmio)", USED_MEMORY / 1024 / 1024, TOTAL_MEMORY / 1024 / 1024);
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("/bin/init", (const char*[]){"/bin/init", NULL});
+    PROCESS init = process_exec("/bin/init", (const char *[]){"/bin/init", NULL});
 
     if (init)
     {
         int exitvalue = 0;
         thread_wait_process(init, &exitvalue);
-        
+
         PANIC("Init has return with code %d!", exitvalue);
     }
     else

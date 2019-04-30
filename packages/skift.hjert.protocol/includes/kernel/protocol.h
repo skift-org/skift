@@ -1,10 +1,10 @@
 #pragma once
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include "kernel/shared/keyboard.h"
 
 #define MSGPAYLOAD_SIZE 1024
@@ -47,18 +47,6 @@ typedef struct
 #define MOUSE_SCROLL     "dev:mouse.scroll"
 #define MOUSE_BUTTONDOWN "dev:mouse.buttonpressed"
 #define MOUSE_BUTTONUP   "dev:mouse.buttonreleased"
-
-//XXX: stop using mouse_syscalls
-typedef struct 
-{
-    int x;
-    int y;
-    int scroll;
-
-    bool left;
-    bool right;
-    bool middle;
-} mouse_state_t;
 
 typedef enum
 {

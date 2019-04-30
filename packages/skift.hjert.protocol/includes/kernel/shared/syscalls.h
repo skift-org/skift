@@ -1,6 +1,6 @@
 #pragma once
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -8,7 +8,7 @@ typedef enum
 {
     SYS_DEBUG = 0,
 
-    /* --- Process and Threads -------------------------------------------------- */
+/* --- Process and Threads -------------------------------------------------- */
 
     // Process
     SYS_PROCESS_SELF,
@@ -44,29 +44,37 @@ typedef enum
     SYS_MSG_SUBSCRIBE,
     SYS_MSG_UNSUBSCRIBE,
 
-    /* --- I/O ------------------------------------------------------------------ */
+/* --- I/O ------------------------------------------------------------------ */
+    
     SYS_IO_PRINT,
     SYS_IO_READ,
 
-    SYS_IO_GRAPHIC_BLIT,
-    SYS_IO_GRAPHIC_BLIT_REGION,
-    SYS_IO_GRAPHIC_SIZE,
-
-    /* --- Filesystem ----------------------------------------------------------- */
+/* --- Filesystem ----------------------------------------------------------- */
 
     SYS_FILESYSTEM_OPEN,
     SYS_FILESYSTEM_CLOSE,
 
     SYS_FILESYSTEM_READ,
     SYS_FILESYSTEM_WRITE,
-    SYS_FILESYSTEM_FSTAT,
+   
+    SYS_FILESYSTEM_IOCTL,
     SYS_FILESYSTEM_SEEK,
     SYS_FILESYSTEM_TELL,
-
+    
+    SYS_FILESYSTEM_FSTAT,
+    
+    SYS_FILESYSTEM_LINK,
+    SYS_FILESYSTEM_UNLINK,
+   
     SYS_FILESYSTEM_MKDIR,
-    SYS_FILESYSTEM_RM,
 
-    ////////////////////////////////////////////////////////////////////////////////
+// System ------------------------------------------------------------------- //
+
+    SYS_SYSTEM_GET_INFO,
+    
+    SYS_SYSTEM_GET_STATUS,
+
+////////////////////////////////////////////////////////////////////////////////
 
     SYSCALL_COUNT
 } syscall_t;

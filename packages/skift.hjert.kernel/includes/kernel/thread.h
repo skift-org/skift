@@ -1,12 +1,13 @@
 #pragma once
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 #include <skift/list.h>
 
+#include "kernel/process.h"
 #include "kernel/protocol.h"
 #include "kernel/limits.h"
 
@@ -77,8 +78,9 @@ void thread_setup(void);
 thread_t *thread();
 void thread_delete(thread_t *thread);
 
+void thread_panic_dump(void);
 void thread_dump(thread_t *t);
-void thread_dumpall();
+int thread_count(void);
 
 thread_t *thread_getbyid(int id);
 void thread_setstate(thread_t *thread, thread_state_t state);

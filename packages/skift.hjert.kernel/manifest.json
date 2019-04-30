@@ -6,6 +6,7 @@
     
     "libs": [
         "skift.karm.core",
-        "skift.hjert.protocol"
+        "skift.hjert.protocol",
+        "skift.vtconsole"
     ]
 }

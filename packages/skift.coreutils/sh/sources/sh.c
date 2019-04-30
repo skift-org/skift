@@ -1,10 +1,11 @@
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdio.h>
-#include <string.h>
+#include <skift/cstring.h>
 
+#include <skift/iostream.h>
+#include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/messaging.h>
 #include <skift/thread.h>
@@ -18,6 +19,7 @@ static bool exited = false;
 
 int shell_readline(char* buffer, uint size)
 {
+    // FIXME: All user input should come from in_stream
     sk_messaging_subscribe(KEYBOARD_CHANNEL);
 
     int i = 0;    
@@ -74,6 +76,8 @@ char** shell_split(char* command)
     int token_index = 0;
 
     char** tokens = malloc(MAX_PROCESS_ARGV * sizeof(char*));
+
+    memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char*));
     char* start = &command[0];
 
     for(size_t i = 0; i < strlen(command) + 1; i++)
@@ -91,7 +95,6 @@ char** shell_split(char* command)
                 buffer[buffer_len - 1] = '\0';
 
                 tokens[token_index++] = buffer;
-                // printf("'%s'\n", buffer);
             }
 
             start = &command[i] + 1;
@@ -105,28 +108,51 @@ char** shell_split(char* command)
 
 int shell_eval(const char** command)
 {
-    
     int exitvalue = -1;
 
-    int process = sk_process_exec(command[0], command);
+    iostream_t* s = iostream_open(command[0], IOSTREAM_READ);
 
-    if (!process)
+    int process = 0;
+
+    if (s != NULL)
+    {
+        iostream_close(s);
+        process = sk_process_exec(command[0], command);
+    }
+    else
     {
         char pathbuffer[144];
-        snprintf(pathbuffer, 144, "/bin/%s", command[0]);
-        process = sk_process_exec(pathbuffer, command);
+        sprintf(pathbuffer, 144, "/bin/%s", command[0]);
+
+        s = iostream_open(pathbuffer, IOSTREAM_READ);
+
+        if (s != NULL) 
+        {
+            iostream_close(s);
+            process = sk_process_exec(pathbuffer, command);
+        }
+        else
+        {
+            printf("Command '%s' not found !\n", command[0]);
+        }
     }
-    
-    if (process)
+
+    if (process > 0)
+    {
         sk_thread_wait_process(process, &exitvalue);
-    else
-        printf("Command '%s' not found !\n", command[0]);
+    }
 
     return exitvalue;
 }
 
 int main(int argc, char **argv)
 {
+    sk_logger_setlevel(LOG_ALL);
+
+    // HACK: Disable line buffering
+    out_stream->write_buffer = 0;
+    out_stream->write_buffer = NULL;
+
     (void)argc;
     (void)argv;
 
@@ -148,7 +174,7 @@ int main(int argc, char **argv)
         {
             exitvalue = shell_eval((const char**)tokens);
             
-            for(size_t i = 0; tokens[i]; i++)
+            for(int i = 0; i < MAX_PROCESS_ARGV; i++)
             {
                 free(tokens[i]);
             }

@@ -1,0 +1,10 @@
+{
+    "name": "vtconsole",
+    
+    "id": "skift.vtconsole",
+    "type": "lib",
+
+    "libs": [
+        "skift.karm.core"
+    ]
+}

@@ -1,4 +1,4 @@
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
@@ -6,7 +6,7 @@
 
 int mkdir(const char *path)
 {
-    return sk_filesystem_mkdir(path);
+    return filesystem_mkdir(path);
 }
 
 int main(int argc, char **argv)

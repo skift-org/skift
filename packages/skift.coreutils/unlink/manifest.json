@@ -1,0 +1,10 @@
+{
+    "name": "unlink",
+    
+    "id": "unlink",
+    "type": "app",
+    
+    "libs": [
+        "skift.karm.user"
+    ]
+}

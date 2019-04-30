@@ -21,7 +21,7 @@ apt install nasm gcc make binutils python3 grub-pc-bin qemu-system-x86
 
 ## Setting up the toolchain
 
-Building the toolchain is pretty strainforward.
+Building the toolchain is pretty straightforward.
 First make sure you have all gcc and binutils dependancies:
 
 - build-essential
@@ -32,8 +32,8 @@ First make sure you have all gcc and binutils dependancies:
 - libmpfr-dev
 - texinfo
 
+Install the dependancies on ubuntu:
 ```sh
-# On Ubuntu
 apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 ```
 
@@ -49,15 +49,18 @@ cd toolchain/
 ## Then wait for completion
 ```
 
+### More info
+  - [CC_Cross-Compiler](https://wiki.osdev.org/GCC_Cross-Compiler) - OSDEV.org
+
 ## Building skiftOS
 From the root of this repo do:
 
 ```sh
 # For a simple build
-./buildtools.py build-all
+./automagicaly build-all
 
-# For a clean build (release)
-./buildtools.py rebuild-all
+# For a clean build
+./automagicaly rebuild-all
 ```
 
 ## Testing
@@ -66,8 +69,8 @@ From the root of this repo do:
 
 ```sh
 # Run the operation system in qemu
-./buildtools.py run
+./automagicaly run
 
 # Run the operating system in qemu with debugging (WIP)
-./buildtools.py debug
+./automagicaly debug
 ```

@@ -1,12 +1,15 @@
 #pragma once
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #include "kernel/paging.h"
+
+extern uint TOTAL_MEMORY;
+extern uint USED_MEMORY;
 
 /* --- Physical Memory ------------------------------------------------------ */
 
@@ -38,4 +41,8 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_map(page_directorie_t *pdir, uint addr, uint count);
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count);
 
-void memory_dump(page_directorie_t *pdir);
+void memory_dump(void);
+void memory_layout_dump(page_directorie_t *pdir, bool user);
+
+uint memory_get_used(void);
+uint memory_get_total(void);

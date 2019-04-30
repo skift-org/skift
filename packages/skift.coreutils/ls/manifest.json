@@ -5,6 +5,7 @@
     "type": "app",
     
     "libs": [
-        "skift.karm.user"
+        "skift.karm.user",
+        "skift.karm.extra"
     ]
 }

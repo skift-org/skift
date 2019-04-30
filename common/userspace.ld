@@ -4,6 +4,8 @@ SECTIONS
 {
 	. = 1024M;
 
+	__start = .;
+
 	.text BLOCK(4K) : ALIGN(4K)
 	{
 		*(.text)
@@ -24,4 +26,6 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
+
+	__end = .;
 }

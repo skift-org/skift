@@ -1,0 +1,10 @@
+{
+    "name": "Graphic library",
+    
+    "id": "skift.karm.gfx",
+    "type": "lib",
+
+    "libs": [
+        "skift.karm.core"
+    ]
+}

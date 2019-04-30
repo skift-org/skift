@@ -1,10 +1,10 @@
 #pragma once
 
-/* Copyright © 2018-2019 MAKER.                                               */
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/generic.h>
+#include <skift/runtime.h>
 
 #define GDT_ENTRY_COUNT 6
 
@@ -73,7 +73,7 @@ typedef struct
 } gdt_t;
 
 void gdt_setup();
-void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, string hint);
+void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, const char* hint);
 void gdt_tss_entry(int index, u16 ss0, u32 esp0);
 
 void set_kernel_stack(u32 stack);

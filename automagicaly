@@ -611,11 +611,6 @@ def help_command(targets):
     print(BRIGHT_WHITE + "Usage :" + RESET +
           " %s [action] targets..." % APP_NAME)
     print("        %s [global action]" % APP_NAME)
-    print("")
-
-    print(BRIGHT_WHITE + "Targets:" + RESET)
-    for t in targets.keys():
-        print("    %s" % (t))
 
     print("\n" + BRIGHT_WHITE + "Actions:" + RESET)
     for act in actions:

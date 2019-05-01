@@ -23,7 +23,7 @@ A simple, handmade, operating system for intel x86 cpu.
 skiftOS 0.2.0 running on QEMU 3.0.0
 </p>
 
-skiftOS is a simple, handmade, operating system for intel x86 cpu. Haiming for clean and elegant API while keeping the sprite of UNIX.
+**skiftOS** is a simple, handmade, operating system for intel x86 cpu. Haiming for clean and pretty API while keeping the sprite of UNIX.
 
 # Disclaimers
 
@@ -31,10 +31,7 @@ skiftOS is a simple, handmade, operating system for intel x86 cpu. Haiming for c
   
 # Getting started
 
-Folow the build guide if you whant to build skiftOS from source
-
-- [Manual](manual/readme.md)
-- [Building](manual/building.md)
+SkiftOS is pretty easy to build from source juste follow the [build guide](manual/building.md)
 
 # Getting involved
 

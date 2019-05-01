@@ -1,6 +1,4 @@
-# Buildtools
-
-## Name
+# Automagicaly
 
 automagicaly - a python3 script for building skiftOS.
 
@@ -47,7 +45,7 @@ This action will:
 
 ```sh
 
-./automagicaly re-build [TARGET]
+./automagicaly rebuild [TARGET]
 
 ```
 
@@ -73,7 +71,7 @@ Append `-all` to apply an *action* to all targets.
 # Build a target
 ./automagicaly build skift.hjert.kernel
 
-# For a simple build
+# Build everythings
 ./automagicaly build-all
 
 # For a clean build (release)

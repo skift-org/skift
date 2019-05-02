@@ -84,7 +84,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
-    sk_log(LOG_DEBUG, "Fsnode free: %08X", node);
+    sk_log(LOG_DEBUG, "Fsnode free: %08x", node);
 
     switch (node->type)
     {
@@ -99,8 +99,6 @@ void fsnode_delete(fsnode_t *node)
         {
             fsdirectory_entry_t *entry = item->value;
             fsnode_t *n = entry->node;
-
-            free(entry);
 
             n->refcount--;
 
@@ -997,6 +995,18 @@ int filesystem_unlink(fsnode_t *at, path_t *link_path)
     sk_lock_release(fslock);
 
     return result;
+}
+
+bool filesystem_exist(fsnode_t* at, path_t* p)
+{
+    fsnode_t* node = filesystem_acquire(at, p, false);
+    
+    if (node != NULL)
+    {
+        filesystem_release(node);
+    }
+
+    return node != NULL;
 }
 
 #pragma endregion

@@ -93,7 +93,6 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     thread_setentry(t, entry, true);
     thread_attach_to_process(t, process);
 
-    // WIP: push arguments
     uint argv_list[MAX_PROCESS_ARGV] = {0};
 
     int argc;

@@ -194,6 +194,20 @@ path_t* path_split_at(path_t* path, int index)
     return p;
 }
 
+path_t* path_dup(path_t*path)
+{
+    path_t* p = MALLOC(path_t);
+    p->elements = list();
+    p->is_absolue = path->is_absolue;
+
+    FOREACH(i, path->elements)
+    {
+        path_push(p, strdup(i->value));
+    }
+
+    return p;
+}
+
 void path_dump(path_t* p)
 {
     for(int i = 0; i < path_length(p); i++)

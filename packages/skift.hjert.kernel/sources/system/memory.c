@@ -10,7 +10,6 @@
  * - ADD: support for shared memory objects
  * - IMPROVE: the memory allocator (faster and smarter)
  * - MAYBE ADD: support for copy on write
- * - MAYBE ADD: page level memory
  */
 
 #include <skift/cstring.h>
@@ -251,9 +250,11 @@ void virtual_free(page_directorie_t *pdir, uint vaddr, uint count)
 }
 
 /* --- Public functions ----------------------------------------------------- */
+bool is_memory_initialized = false;
 
 void memory_setup(uint used, uint total)
 {
+    is_memory_initialized = true;
     TOTAL_MEMORY = total;
 
     memset(&MEMORY, 0, sizeof(MEMORY));
@@ -514,7 +515,7 @@ int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
 
 void memory_dump(void)
 {
-    printf("\n\n\tMemory status:");
+    printf("\n\tMemory status:");
     printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
     printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
@@ -535,6 +536,8 @@ void memory_dump(void)
 
 void memory_layout_dump(page_directorie_t *pdir, bool user)
 {
+    if (!is_memory_initialized) return;
+    
     bool memory_used = false;
     bool memory_empty = true;
     uint current_physical = 0;

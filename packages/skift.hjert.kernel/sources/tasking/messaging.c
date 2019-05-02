@@ -87,6 +87,7 @@ uint messaging_id()
 }
 
 /* --- Public functions ----------------------------------------------------- */
+
 void messaging_setup(void)
 {
     channels = list();

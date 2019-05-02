@@ -46,4 +46,7 @@ path_t* path_combine(path_t* left, path_t* right);
 // Split the path a the index (inclusif)
 path_t* path_split_at(path_t* path, int index);
 
+// Duplicate a path
+path_t* path_dup(path_t*path);
+
 void path_dump(path_t* p);

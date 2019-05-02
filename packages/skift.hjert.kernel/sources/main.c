@@ -16,13 +16,13 @@
  * - ADD support for kernel command line options.
  */
 
-#include <skift/cstring.h>
-
-#include <skift/math.h>
 #include <skift/__plugs__.h>
+
+#include <skift/atomic.h>
+#include <skift/cstring.h>
 #include <skift/iostream.h>
 #include <skift/logger.h>
-#include <skift/atomic.h>
+#include <skift/math.h>
 
 #include "kernel/cpu/gdt.h"
 #include "kernel/cpu/idt.h"
@@ -46,7 +46,6 @@
 #include "kernel/shared_memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/version.h"
 
 multiboot_info_t mbootinfo;
 
@@ -66,7 +65,7 @@ void main(multiboot_info_t *info, s32 magic)
     /* --- System check ----------------------------------------------------- */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
-        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\t Magic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
+        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
     }
 
     if ((info->mem_lower + info->mem_upper) < 255 * 1024)
@@ -109,7 +108,6 @@ void main(multiboot_info_t *info, s32 magic)
     sti();
 
     printf(KERNEL_UNAME);
-    printf(" (%dmio used out %dmio)", USED_MEMORY / 1024 / 1024, TOTAL_MEMORY / 1024 / 1024);
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */

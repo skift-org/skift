@@ -15,3 +15,17 @@ void __panic(const char* package, const char* file, const char* function, const 
 #define PANIC(x...) __panic(__PACKAGE__, __FILENAME__, __FUNCTION__, __LINE__, NULL, x)
 #define CPANIC(ctx, x...) __panic(__PACKAGE__, __FILENAME__, __FUNCTION__, __LINE__, ctx, x)
 #define setup(x, arg...) { sk_log(LOG_INFO, "Setting up " #x "..."); x##_setup(arg); }
+
+
+
+#define KERNEL_VERSION __kernel_version_format, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
+#define KERNEL_UNAME __kernel_uname_format, __kernel_name, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
+
+extern char *__kernel_name;
+extern int __kernel_version_major;
+extern int __kernel_version_minor;
+extern int __kernel_version_patch;
+extern char *__kernel_version_codename;
+
+extern char *__kernel_version_format;
+extern char *__kernel_uname_format;

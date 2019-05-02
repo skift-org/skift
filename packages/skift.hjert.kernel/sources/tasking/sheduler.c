@@ -99,7 +99,7 @@ void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process)
     thread_attach_to_process(&idle, process_get(kernel_process));
     thread_setready(&idle);
 
-    timer_set_frequency(100);
+    timer_set_frequency(1000);
     irq_register(0, (irq_handler_t)&shedule);
 }
 

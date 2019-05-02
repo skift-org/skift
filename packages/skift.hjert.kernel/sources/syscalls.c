@@ -15,7 +15,6 @@
 #include <skift/logger.h>
 #include <skift/system.h>
 
-#include "kernel/version.h"
 #include "kernel/tasking.h"
 #include "kernel/messaging.h"
 #include "kernel/shared_memory.h"

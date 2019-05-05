@@ -95,7 +95,7 @@ void messaging_setup(void)
 
 int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    process_t *process = process_get(to);
+    process_t *process = process_getbyid(to);
 
     if (process == NULL)
     {

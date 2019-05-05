@@ -38,7 +38,7 @@ void thread_dump(thread_t *t);
 
 PROCESS process_self(); // Return a handler to the current process.
 process_t *process_running();
-process_t *process_get(PROCESS process);
+process_t *process_getbyid(PROCESS process);
 
 PROCESS process_create(const char *name, bool user); // Create a new process.
 

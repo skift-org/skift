@@ -27,7 +27,7 @@ void tasking_setup()
     process_setup();
     thread_setup();
 
-    kernel_process = alloc_process("kernel", false);
+    kernel_process = process("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     thread_create(kernel_process, garbage_colector, NULL, false);
 
@@ -462,7 +462,7 @@ void process_setup(void)
     processes = list();
 }
 
-process_t *alloc_process(const char *name, bool user)
+process_t *process(const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
@@ -687,7 +687,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     // Create the process and load the executable.
     sk_atomic_begin();
 
-    process_t* new_process = alloc_process(executable_path, true);
+    process_t* new_process = process(executable_path, true);
     int new_process_id = new_process->id;
 
     elf_program_t program;

@@ -179,7 +179,7 @@ void thread_panic_dump(void);
 
 void process_setup(void);
 
-process_t *alloc_process(const char *name, bool user);
+process_t *process(const char *name, bool user);
 
 void process_delete(process_t *process);
 

@@ -2,6 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/cstring.h>
+#include <skift/atomic.h>
+#include <skift/elf.h>
+#include <skift/math.h>
+
+#include "kernel/cpu/irq.h"
 #include "kernel/tasking.h"
 
 /* -------------------------------------------------------------------------- */
@@ -17,7 +23,6 @@ void tasking_setup()
 {
     running = NULL;
 
-    
     process_setup();
     thread_setup();
 
@@ -618,7 +623,7 @@ bool process_cancel(PROCESS p, int exitvalue)
     }
     else
     {
-        process_t *process = process_getbyid(process_self());
+        process_t *process = sheduler_running_process();
         sk_log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
 
         sk_atomic_end();
@@ -628,7 +633,7 @@ bool process_cancel(PROCESS p, int exitvalue)
 
 void process_exit(int exitvalue)
 {
-    PROCESS self = process_self();
+    PROCESS self = sheduler_running_process_id();
 
     if (self != kernel_process)
     {
@@ -992,6 +997,9 @@ void process_memory_free(process_t* p, uint addr, uint count)
 /*   MESSAGING                                                                */      
 /* -------------------------------------------------------------------------- */
 
+static int MID = 1;
+static list_t *channels;
+
 /* --- Channel -------------------------------------------------------------- */
 
 channel_t *channel(const char *name)
@@ -1068,9 +1076,6 @@ uint messaging_id()
 
 /* --- Messaging API -------------------------------------------------------- */
 
-static int MID = 1;
-static list_t *channels;
-
 void messaging_setup(void)
 {
     channels = list();
@@ -1118,7 +1123,7 @@ int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint 
     int id = 0;
 
     ATOMIC({
-        id = messaging_send_internal(process_self(), to, messaging_id(), name, payload, size, flags);
+        id = messaging_send_internal(sheduler_running_process_id(), to, messaging_id(), name, payload, size, flags);
     });
 
     return id;
@@ -1138,7 +1143,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 
         FOREACH(p, c->subscribers)
         {
-            messaging_send_internal(process_self(), ((process_t *)p->value)->id, id, name, payload, size, flags);
+            messaging_send_internal(sheduler_running_process_id(), ((process_t *)p->value)->id, id, name, payload, size, flags);
         }
     }
 
@@ -1396,6 +1401,10 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
 /* --- Sheduler info -------------------------------------------------------- */
 
+uint sheduler_get_ticks(void){
+    return ticks;
+}
+
 bool sheduler_is_context_switch(void)
 {
     return sheduler_context_switch;
@@ -1416,7 +1425,7 @@ process_t* sheduler_running_process(void)
     }
     else
     {
-        return running;
+        return NULL;
     }
 }
 

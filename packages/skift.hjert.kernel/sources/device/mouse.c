@@ -8,7 +8,7 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/processor.h"
 #include "kernel/protocol.h"
-#include "kernel/messaging.h"
+#include "kernel/tasking.h"
 
 #include "kernel/mouse.h"
 

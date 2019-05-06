@@ -45,9 +45,6 @@ const char *const witty_comments[] =
     "Bad command or file name",
 };
 
-extern uint ticks;
-extern bool is_context_switch;
-
 static bool has_panic = false;
 static bool nested_panic = false;
 
@@ -70,7 +67,7 @@ void __panic(const char* package, const char* file, const char* function, const 
         printf("\n\tNESTED");
     }
 
-    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[ticks % (sizeof(witty_comments)/sizeof(char*))]);
+    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments)/sizeof(char*))]);
 
     has_panic = true;
 
@@ -79,11 +76,11 @@ void __panic(const char* package, const char* file, const char* function, const 
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", ticks);
-    
-    if (is_context_switch)
+    printf("\n\tThe system was running for %d tick.", sheduler_get_ticks());
+
+    if (sheduler_is_context_switch())
     {
-        printf("\n\tWe are context switching\n", ticks);
+        printf("\n\tWe are context switching\n", sheduler_get_ticks());
     }
     else
     {

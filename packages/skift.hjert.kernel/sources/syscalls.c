@@ -16,10 +16,7 @@
 #include <skift/system.h>
 
 #include "kernel/tasking.h"
-#include "kernel/messaging.h"
-#include "kernel/shared_memory.h"
 #include "kernel/filesystem.h"
-#include "kernel/sheduler.h"
 #include "kernel/memory.h"
 
 #include "kernel/serial.h"
@@ -39,7 +36,7 @@ int sys_not_implemented()
 
 int sys_process_self()
 {
-    return process_self();
+    return sheduler_running_process_id();
 }
 
 int sys_process_exec(const char *file_name, const char **argv)
@@ -89,7 +86,7 @@ int sys_thread_self()
 
 int sys_thread_create(thread_entry_t entry, void *args)
 {
-    return thread_create(process_self(), entry, args, true);
+    return thread_create(sheduler_running_process_id(), entry, args, true);
 }
 
 int sys_thread_exit(int exitval)
@@ -327,7 +324,7 @@ void syscall_dispatcher(processor_context_t *context)
     }
     else
     {
-        sk_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, process_self());
+        sk_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_process_id());
         sk_log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }

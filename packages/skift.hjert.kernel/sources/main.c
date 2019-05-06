@@ -37,13 +37,11 @@
 #include "kernel/filesystem.h"
 #include "kernel/keyboard.h"
 #include "kernel/memory.h"
-#include "kernel/messaging.h"
 #include "kernel/modules.h"
 #include "kernel/mouse.h"
 #include "kernel/multiboot.h"
 #include "kernel/paging.h"
 #include "kernel/serial.h"
-#include "kernel/shared_memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
 
@@ -87,7 +85,6 @@ void main(multiboot_info_t *info, s32 magic)
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(messaging);
-    setup(shared_memory);
     setup(filesystem);
     setup(modules, &mbootinfo);
 

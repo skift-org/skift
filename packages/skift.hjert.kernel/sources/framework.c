@@ -4,10 +4,9 @@
 #include <skift/atomic.h>
 #include <skift/assert.h>
 
-#include "kernel/serial.h"
-#include "kernel/sheduler.h"
-#include "kernel/process.h"
+#include "kernel/tasking.h"
 #include "kernel/memory.h"
+#include "kernel/serial.h"
 
 /* --- Framework initialization --------------------------------------------- */ 
 
@@ -42,7 +41,7 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
 
 /* --- Systeme API ---------------------------------------------------------- */
 
-// We are the system so we does't need that ;)
+// We are the system so we doesn't need that ;)
 void __plug_system_get_info(system_info_t* info)
 {
     UNUSED(info);

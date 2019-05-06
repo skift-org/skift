@@ -4,12 +4,15 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-void sk_atomic_enable();
-void sk_atomic_disable();
-void sk_atomic_begin();
-void sk_atomic_end();
+#include <skift/runtime.h>
 
-#define ASSERT_ATOMIC();
+void sk_atomic_enable(void);
+void sk_atomic_disable(void);
+void sk_atomic_begin(void);
+void sk_atomic_end(void);
+bool sk_is_atomic(void);
+
+#define ASSERT_ATOMIC assert(sk_is_atomic())
 
 #define ATOMIC(code)       \
     do                     \

@@ -5,8 +5,13 @@
 #include <skift/runtime.h>
 #include <skift/atomic.h>
 
-static bool atomic_enabled = 0;
+static bool atomic_enabled = false;
 static uint atomic_depth = 0;
+
+bool sk_is_atomic()
+{
+    return !(atomic_enabled && atomic_depth == 0);
+}
 
 void sk_atomic_enable()
 {

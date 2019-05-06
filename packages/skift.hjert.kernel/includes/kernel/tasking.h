@@ -47,7 +47,6 @@ typedef struct s_process
     list_t *processes; // Child processes
 
     list_t *inbox;  // process main message queu
-    list_t *shared; // Shared memory region
 
     lock_t fds_lock;
     process_filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
@@ -144,9 +143,9 @@ thread_t *thread_getbyid(int id);
 
 int thread_count(void);
 
-THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **argv);
+THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry, const char **argv);
 
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user);
+THREAD thread_create(process_t* parent_process, thread_entry_t entry, void *arg, bool user);
 
 void thread_setstate(thread_t *thread, thread_state_t state);
 
@@ -184,13 +183,11 @@ process_t *alloc_process(const char *name, bool user);
 
 void process_delete(process_t *process);
 
-PROCESS process_create(const char *name, bool user);
-
 process_t *process_getbyid(PROCESS process);
 
 int process_count(void);
 
-bool process_cancel(PROCESS p, int exitvalue);
+bool process_cancel(process_t* self, int exitvalue);
 
 void process_exit(int exitvalue);
 
@@ -286,7 +283,7 @@ void garbage_colector();
 
 void timer_set_frequency(int hz);
 
-void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process);
+void sheduler_setup(thread_t* main_kernel_thread, process_t* kernel_process);
 
 void wakeup_sleeping_threads(void);
 

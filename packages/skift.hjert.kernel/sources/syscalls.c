@@ -14,6 +14,7 @@
 #include <skift/cstring.h>
 #include <skift/logger.h>
 #include <skift/system.h>
+#include <skift/atomic.h>
 
 #include "kernel/tasking.h"
 #include "kernel/filesystem.h"
@@ -53,7 +54,11 @@ int sys_process_exit(int code)
 
 int sys_process_cancel(int pid)
 {
-    return process_cancel(pid, -1);
+    sk_atomic_begin();
+    int result = process_cancel(process_getbyid(pid), -1);
+    sk_atomic_end();
+
+    return result;
 }
 
 int sys_process_map(uint addr, uint count)
@@ -86,7 +91,7 @@ int sys_thread_self()
 
 int sys_thread_create(thread_entry_t entry, void *args)
 {
-    return thread_create(sheduler_running_process_id(), entry, args, true);
+    return thread_create(sheduler_running_process(), entry, args, true);
 }
 
 int sys_thread_exit(int exitval)

@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/assert.h>
 #include <skift/cstring.h>
 #include <skift/atomic.h>
 #include <skift/elf.h>
@@ -16,7 +17,7 @@
 
 static uint ticks = 0;
 static thread_t* running = NULL; 
-PROCESS kernel_process;
+process_t* kernel_process;
 THREAD kernel_thread;
 
 void tasking_setup()
@@ -26,7 +27,7 @@ void tasking_setup()
     process_setup();
     thread_setup();
 
-    kernel_process = process_create("kernel", false);
+    kernel_process = alloc_process("kernel", false);
     kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
     thread_create(kernel_process, garbage_colector, NULL, false);
 
@@ -121,17 +122,16 @@ int thread_count(void)
     return result;
 }
 
-THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **argv)
+THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry, const char **argv)
 {
-    sk_log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", p, entry);
+    sk_log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", parent_process->id, entry);
 
     sk_atomic_begin();
 
-    process_t *process = process_getbyid(p);
     thread_t *t = thread();
 
     thread_setentry(t, entry, true);
-    thread_attach_to_process(t, process);
+    thread_attach_to_process(t, parent_process);
 
     uint argv_list[MAX_PROCESS_ARGV] = {0};
 
@@ -153,19 +153,16 @@ THREAD thread_create_mainthread(PROCESS p, thread_entry_t entry, const char **ar
     return t->id;
 }
 
-THREAD thread_create(PROCESS p, thread_entry_t entry, void *arg, bool user)
+THREAD thread_create(process_t* parent_process, thread_entry_t entry, void *arg, bool user)
 {
-    sk_atomic_begin();
+    ASSERT_ATOMIC;
 
-    process_t *process = process_getbyid(p);
     thread_t *t = thread();
 
     thread_setentry(t, entry, user);
-    thread_attach_to_process(t, process);
+    thread_attach_to_process(t, parent_process);
     thread_stack_push(t, &arg, sizeof(arg));
     thread_setready(t);
-
-    sk_atomic_end();
 
     return t->id;
 }
@@ -467,6 +464,8 @@ void process_setup(void)
 
 process_t *alloc_process(const char *name, bool user)
 {
+    ASSERT_ATOMIC;
+
     process_t *process = MALLOC(process_t);
 
     if (process == NULL)
@@ -480,7 +479,6 @@ process_t *alloc_process(const char *name, bool user)
     process->user = user;
     process->threads = list();
     process->inbox = list();
-    process->shared = list();
 
     sk_lock_init(process->fds_lock);
     for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
@@ -500,8 +498,9 @@ process_t *alloc_process(const char *name, bool user)
         process->pdir = memory_kpdir();
     }
 
-    sk_log(LOG_FINE, "Process '%s' with ID=%d allocated.", process->name, process->id);
+    sk_log(LOG_FINE, "Process '%s' with ID=%d Created.", process->name, process->id);
 
+    list_pushback(processes, process);
     return process;
 }
 
@@ -512,48 +511,16 @@ void process_delete(process_t *process)
         memory_free_pdir(process->pdir);
     }
 
-    if (list_any(process->threads))
-    {
-        PANIC("Process's threads-list isn't empty!");
-    }
-    else
-    {
-        list_delete(process->threads, LIST_KEEP_VALUES);
-    }
+    assert(!list_any(process->processes));
+    list_delete(process->processes, LIST_KEEP_VALUES);
 
-    if (list_any(process->inbox))
-    {
-        PANIC("Process's inbox-list isn't empty!");
-    }
-    else
-    {
-        list_delete(process->inbox, LIST_KEEP_VALUES);
-    }
-
-    if (list_any(process->shared))
-    {
-        PANIC("Process's shared-list isn't empty!");
-    }
-    else
-    {
-        list_delete(process->shared, LIST_KEEP_VALUES);
-    }
+    assert(!list_any(process->threads));
+    list_delete(process->threads, LIST_KEEP_VALUES);
+    
+    assert(!list_any(process->inbox));
+    list_delete(process->inbox, LIST_KEEP_VALUES);
 
     free(process);
-}
-
-PROCESS process_create(const char *name, bool user)
-{
-    process_t *process;
-
-    ATOMIC({
-        process = alloc_process(name, user);
-        list_pushback(processes, process);
-    });
-
-    sk_log(LOG_FINE, "Process '%s' with ID=%d and PDIR=%x is running.", process->name, process->id, process->pdir);
-
-    return process->id;
 }
 
 process_t *process_getbyid(PROCESS process)
@@ -584,35 +551,33 @@ int process_count(void)
 
 /* --- Process exit and canceling ------------------------------------------- */
 
-bool process_cancel(PROCESS p, int exitvalue)
+bool process_cancel(process_t* self, int exitvalue)
 {
     sk_atomic_begin();
 
-    if (p != kernel_process)
+    if (self != kernel_process)
     {
-        process_t *process = process_getbyid(p);
-
         // Set our new process state
-        process->state = PROCESS_CANCELED;
-        process->exitvalue = exitvalue;
+        self->state = PROCESS_CANCELED;
+        self->exitvalue = exitvalue;
 
-        sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", process->name, process->id);
+        sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", self->name, self->id);
 
         // Wake up waiting threads
         FOREACH(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
         {
             thread_t *thread = i->value;
 
-            if (thread->wait.process.process_handle == p)
+            if (thread->wait.process.process_handle == self->id)
             {
                 thread->wait.process.exitvalue = exitvalue;
                 thread_setstate(thread, THREADSTATE_RUNNING);
-                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, p);
+                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, self->id);
             }
         }
 
         // Cancel childs threads.
-        FOREACH(i, process->threads)
+        FOREACH(i, self->threads)
         {
             thread_t *thread = (thread_t *)i->value;
             thread_cancel(thread->id, 0);
@@ -633,7 +598,7 @@ bool process_cancel(PROCESS p, int exitvalue)
 
 void process_exit(int exitvalue)
 {
-    PROCESS self = sheduler_running_process_id();
+    process_t* self = sheduler_running_process();
 
     if (self != kernel_process)
     {
@@ -720,23 +685,29 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     }
 
     // Create the process and load the executable.
-    PROCESS p = process_create(executable_path, true);
+    sk_atomic_begin();
+
+    process_t* new_process = alloc_process(executable_path, true);
+    int new_process_id = new_process->id;
 
     elf_program_t program;
 
     for (int i = 0; elf_read_program(elf, &program, i); i++)
     {
-        load_elfseg(process_getbyid(p), (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+        load_elfseg(new_process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
     }
 
     sk_log(LOG_DEBUG, "Executable loaded, creating main thread...");
 
-    thread_create_mainthread(p, (thread_entry_t)elf->entry, argv);
+    thread_create_mainthread(new_process, (thread_entry_t)elf->entry, argv);
 
     free(buffer);
 
     sk_log(LOG_DEBUG, "Process created, back to caller..");
-    return p;
+
+    sk_atomic_end();
+    
+    return new_process_id;
 }
 
 /* File descriptor allocation and locking ----------------------------------- */
@@ -1330,7 +1301,7 @@ void timer_set_frequency(int hz)
     sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process)
+void sheduler_setup(thread_t* main_kernel_thread, process_t* kernel_process)
 {
     running = main_kernel_thread;
 
@@ -1338,7 +1309,7 @@ void sheduler_setup(thread_t* main_kernel_thread, PROCESS kernel_process)
     memset(&idle, 0, sizeof(thread_t));
     idle.id = -1;
     thread_setentry(&idle, idle_code, false);
-    thread_attach_to_process(&idle, process_getbyid(kernel_process));
+    thread_attach_to_process(&idle, kernel_process);
     thread_setready(&idle);
 
     timer_set_frequency(1000);

@@ -23,7 +23,6 @@ typedef enum e_process_state
     PROCESS_RUNNING,
 
     // This is like a *zombie* process in **UNIX**.
-    // But in **HJERT** if your parent die you die with him.
     PROCESS_CANCELING,
 
     PROCESS_CANCELED, // This process is ready to be garbage colected.

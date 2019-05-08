@@ -11,6 +11,7 @@
 
 void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...);
 
+#define HANG while(1){ hlt(); }
 #define STOP while(1){ cli(); hlt(); }
 #define PANIC(x...) __panic(__PACKAGE__, __FILENAME__, __FUNCTION__, __LINE__, NULL, x)
 #define CPANIC(ctx, x...) __panic(__PACKAGE__, __FILENAME__, __FUNCTION__, __LINE__, ctx, x)

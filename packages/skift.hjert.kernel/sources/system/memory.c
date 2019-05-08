@@ -6,7 +6,7 @@
 
 /*
  * TODO:
- * - ADD: improve the allocator to prevent starving of indentity mapped pages.
+ * - ADD: improve the allocator to prevent starving of identity mapped pages.
  * - ADD: support for shared memory objects
  * - IMPROVE: the memory allocator (faster and smarter)
  * - MAYBE ADD: support for copy on write
@@ -27,13 +27,14 @@
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
+uint FREE_MEMORY_SHORTCUT = 0;
 uchar MEMORY[1024 * 1024 / 8] = {0};
 
 #define PHYSICAL_IS_USED(__addr) \
-    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] &   (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
+    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] & (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
 
 #define PHYSICAL_SET_USED(__addr) \
-    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] |=  (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
+    (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] |= (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
 
 #define PHYSICAL_SET_FREE(__addr) \
     (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] &= ~(1 << ((uint)(__addr) / PAGE_SIZE % 8)))
@@ -85,7 +86,7 @@ uint physical_alloc(uint count)
         }
     }
 
-    PANIC("Out of physical memory! Trying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / PAGE_SIZE);
+    PANIC("Out of physical memory!\n\tTrying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / PAGE_SIZE);
     return 0;
 }
 
@@ -520,29 +521,30 @@ void memory_dump(void)
     printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
 
-#define MEMORY_DUMP_REGION_START(__pdir, __addr)                 \
-    {                                                            \
-        memory_used = true;                                      \
-        memory_empty = false; \
-        current_physical = virtual2physical(__pdir, __addr);     \
-        printf("%8x [%08x:", (__addr), current_physical); \
+#define MEMORY_DUMP_REGION_START(__pdir, __addr)             \
+    {                                                        \
+        memory_used = true;                                  \
+        memory_empty = false;                                \
+        current_physical = virtual2physical(__pdir, __addr); \
+        printf("%8x [%08x:", (__addr), current_physical);    \
     }
 
-#define MEMORY_DUMP_REGION_END(__pdir, __addr)                              \
-    {                                                                       \
-        memory_used = false;                                                \
+#define MEMORY_DUMP_REGION_END(__pdir, __addr)                            \
+    {                                                                     \
+        memory_used = false;                                              \
         printf("%08x] %08x", virtual2physical(__pdir, __addr), (__addr)); \
     }
 
 void memory_layout_dump(page_directorie_t *pdir, bool user)
 {
-    if (!is_memory_initialized) return;
-    
+    if (!is_memory_initialized)
+        return;
+
     bool memory_used = false;
     bool memory_empty = true;
     uint current_physical = 0;
 
-    for (int i = user ? 256: 0; i < 1024; i++)
+    for (int i = user ? 256 : 0; i < 1024; i++)
     {
         page_directorie_entry_t *pde = &pdir->entries[i];
         if (pde->Present)
@@ -565,7 +567,7 @@ void memory_layout_dump(page_directorie_t *pdir, bool user)
                 {
                     uint new_physical = virtual2physical(pdir, (i * 1024 + j) * PAGE_SIZE);
 
-                    if (!(current_physical + PAGE_SIZE == new_physical)) 
+                    if (!(current_physical + PAGE_SIZE == new_physical))
                     {
                         printf("%08x | ", current_physical);
                         printf("%08x:", new_physical);
@@ -590,7 +592,7 @@ void memory_layout_dump(page_directorie_t *pdir, bool user)
 uint memory_get_used(void)
 {
     uint result;
-    
+
     sk_atomic_begin();
 
     result = USED_MEMORY;
@@ -603,7 +605,7 @@ uint memory_get_used(void)
 uint memory_get_total(void)
 {
     uint result;
-    
+
     sk_atomic_begin();
 
     result = TOTAL_MEMORY;

@@ -403,8 +403,9 @@ void thread_exit(int exitvalue)
 {
     thread_cancel(running->id, exitvalue);
 
-    while (1)
-        hlt();
+    sheduler_yield();
+
+    PANIC("sheduler_yield return but the thread is canceled!");
 }
 
 /* --- Thread dump ---------------------------------------------------------- */
@@ -504,32 +505,34 @@ process_t *process(const char *name, bool user)
     return process;
 }
 
-void process_delete(process_t *process)
+void process_delete(process_t *this)
 {
-    if (process->pdir != memory_kpdir())
+    if (this->pdir != memory_kpdir())
     {
-        memory_free_pdir(process->pdir);
+        memory_free_pdir(this->pdir);
     }
 
-    assert(!list_any(process->processes));
-    list_delete(process->processes, LIST_KEEP_VALUES);
+    assert(!list_any(this->processes));
+    list_delete(this->processes, LIST_KEEP_VALUES);
 
-    assert(!list_any(process->threads));
-    list_delete(process->threads, LIST_KEEP_VALUES);
+    assert(!list_any(this->threads));
+    list_delete(this->threads, LIST_KEEP_VALUES);
     
-    assert(!list_any(process->inbox));
-    list_delete(process->inbox, LIST_KEEP_VALUES);
+    assert(!list_any(this->inbox));
+    list_delete(this->inbox, LIST_KEEP_VALUES);
 
-    free(process);
+    list_remove(processes, this);
+
+    free(this);
 }
 
-process_t *process_getbyid(PROCESS process)
+process_t *process_getbyid(PROCESS pid)
 {
     FOREACH(i, processes)
     {
         process_t *p = (process_t *)i->value;
 
-        if (p->id == process)
+        if (p->id == pid)
             return p;
     }
 
@@ -604,9 +607,9 @@ void process_exit(int exitvalue)
     {
         process_cancel(self, exitvalue);
 
-        // Hang
-        while (1)
-            hlt();
+        sheduler_yield();
+
+        PANIC("sheduler_yield return but the process is stopped!");
     }
     else
     {
@@ -817,13 +820,11 @@ int process_open_file(process_t* this, const char *file_path, iostream_flag_t fl
 
     int fd = process_filedescriptor_alloc_and_acquire(this, stream);
 
-    if (fd == -1)
+    if (fd != -1)
     {
-        return -1;
+        process_filedescriptor_release(this, fd);
     }
-
-    process_filedescriptor_release(this, fd);
-
+    
     return fd;
 }
 
@@ -1251,14 +1252,6 @@ void collect_and_free_thread(void)
     list_delete(thread_to_free, LIST_KEEP_VALUES);
 }
 
-void collect_and_free_process(void)
-{
-    // Ho god, this is going to be hard :/
-    list_t *process_to_free = list();
-
-    list_delete(process_to_free, LIST_KEEP_VALUES);
-}
-
 void garbage_colector()
 {
     while (true)
@@ -1269,7 +1262,6 @@ void garbage_colector()
 
         sk_atomic_begin();
         collect_and_free_thread();
-        collect_and_free_process();
         sk_atomic_end();
 
         // sk_log(LOG_DEBUG, "Garbage collect end!");
@@ -1338,6 +1330,10 @@ void wakeup_sleeping_threads(void)
     }
 }
 
+#include "kernel/dev/vga.h"
+
+static const char* animation = "|/-\\|/-\\";
+
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     //sk_log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
@@ -1357,6 +1353,8 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
         // Or the idle thread if there are no running threads.
         running = &idle;
     }
+
+    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == &idle) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
 
     // Restore the context
     // TODO: set_kernel_stack(...);

@@ -105,7 +105,7 @@ void path_normalize(path_t* p)
         }
         else if (strcmp(element, ".") != 0)
         {
-            list_push(stack, strdup(element));
+            list_pushback(stack, strdup(element));
             depth++;
         }
     }

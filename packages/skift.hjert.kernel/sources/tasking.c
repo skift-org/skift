@@ -807,6 +807,7 @@ int process_filedescriptor_free_and_release(process_t *this, int fd_index)
 int process_open_file(process_t* this, const char *file_path, iostream_flag_t flags)
 {
     path_t *p = path(file_path);
+    path_normalize(p);
     stream_t *stream = filesystem_open(NULL, p, flags);
 
     if (stream == NULL)

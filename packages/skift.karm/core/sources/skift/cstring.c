@@ -106,7 +106,7 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
-static void *memcpy(void *s1, const void *s2, size_t n)
+void *memcpy(void *s1, const void *s2, size_t n)
 {
 	char *cdest;
 	char *csrc;

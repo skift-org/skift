@@ -665,6 +665,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
         sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
+        iostream_close(s);
         return -1;
     }
 
@@ -676,6 +677,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     if (!elf_valid(&elf_header))
     {
         sk_log(LOG_WARNING, "Invalid elf program!", executable_path);
+        iostream_close(s);
         return -1;
     }
 
@@ -703,6 +705,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     sk_atomic_end();
     
+    iostream_close(s);
     return new_process_id;
 }
 

@@ -106,17 +106,29 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
-void *memcpy(void *dest, const void *src, size_t n)
+static void *memcpy(void *s1, const void *s2, size_t n)
 {
-    char *d = dest;
-    const char *s = src;
+	char *cdest;
+	char *csrc;
+	unsigned int *ldest = (unsigned int *)s1;
+	unsigned int *lsrc = (unsigned int *)s2;
 
-    for (size_t i = 0; i < n; i++)
-    {
-        d[i] = s[i];
-    }
+	while (n >= sizeof(unsigned int))
+	{
+		*ldest++ = *lsrc++;
+		n -= sizeof(unsigned int);
+	}
 
-    return dest;
+	cdest = (char *)ldest;
+	csrc = (char *)lsrc;
+
+	while (n > 0)
+	{
+		*cdest++ = *csrc++;
+		n -= 1;
+	}
+
+	return s1;
 }
 
 void *memset(void *str, int c, size_t n)

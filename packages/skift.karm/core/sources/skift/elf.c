@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* elf.c: in memory elf fiel parser.                                          */
+/* elf.c: in memory elf file parser.                                          */
 
 #include <skift/cstring.h>
 #include <skift/elf.h>
@@ -24,35 +24,5 @@ int elf_valid(elf_header_t *header)
     return check_magic(header) &&
            (header->type == ELF_REL || ELF_EXEC) &&
            header->version == 1 &&
-           header->machine == 3; // 386
-}
-
-int elf_read_section(elf_header_t *header, elf_section_t *dest, uint index)
-{
-    if (index >= header->shnum)
-        return 0;
-    elf_section_t *section = (elf_section_t *)((uint)header + header->shoff + sizeof(elf_section_t) * index);
-
-    memcpy(dest, section, sizeof(elf_section_t));
-
-    return 1;
-}
-
-char *elf_lookup_string(elf_header_t *header, int offset)
-{
-    elf_section_t section;
-    elf_read_section(header, &section, header->shstrndx);
-    return (char *)header + section.offset + offset;
-}
-
-int elf_read_program(elf_header_t *header, elf_program_t *dest, uint index)
-{
-    if (index >= header->phnum)
-        return 0;
-
-    elf_program_t *section = (elf_program_t *)((uint)header + header->phoff + sizeof(elf_program_t) * index);
-
-    memcpy(dest, section, sizeof(elf_program_t));
-
-    return 1;
+           header->machine == 3; // x86
 }

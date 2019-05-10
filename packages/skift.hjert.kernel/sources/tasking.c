@@ -619,11 +619,11 @@ void process_exit(int exitvalue)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint destsz)
+void load_elfseg(process_t *process, iostream_t* s, elf_program_t* program)
 {
-    sk_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", src, srcsz, dest, destsz);
+    sk_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
-    if (dest >= 0x100000)
+    if (program->vaddr >= 0x100000)
     {
         sk_atomic_begin();
 
@@ -631,9 +631,11 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
         page_directorie_t *pdir = running->process->pdir;
 
         paging_load_directorie(process->pdir);
-        process_memory_map(process, dest, PAGE_ALIGN(destsz) / PAGE_SIZE + PAGE_SIZE);
-        memset((void *)dest, 0, destsz);
-        memcpy((void *)dest, (void *)src, srcsz);
+        process_memory_map(process, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
+        memset((void *)program->vaddr, 0, program->memsz);
+
+        iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
+        iostream_read(s, (void*)program->vaddr, program->filesz);
 
         paging_load_directorie(pdir);
 
@@ -648,9 +650,7 @@ void load_elfseg(process_t *process, uint src, uint srcsz, uint dest, uint dests
 PROCESS process_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    path_t *exec_path = path(executable_path);
-    stream_t *s = filesystem_open(ROOT, exec_path, IOSTREAM_READ);
-    path_delete(exec_path);
+    iostream_t *s = iostream_open(executable_path, IOSTREAM_READ);
 
     if (s == NULL)
     {
@@ -660,7 +660,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     // Check if the file isn't a directory.
     iostream_stat_t stat;
-    filesystem_fstat(s, &stat);
+    iostream_fstat(s, &stat);
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
@@ -668,20 +668,12 @@ PROCESS process_exec(const char *executable_path, const char **argv)
         return -1;
     }
 
-    // Read the content of the file.
-    void *buffer = filesystem_readall(s);
-    filesystem_close(s);
-
-    if (buffer == NULL)
-    {
-        sk_log(LOG_WARNING, "Failed to read from '%s', exec failed!", executable_path);
-        return -1;
-    }
-
     // Decode the elf file header.
-    elf_header_t *elf = (elf_header_t *)buffer;
+    elf_header_t elf_header = {0};
+    iostream_seek(s, 0, IOSTREAM_WHENCE_START);
+    iostream_read(s, &elf_header, sizeof(elf_header_t));
 
-    if (!elf_valid(elf))
+    if (!elf_valid(&elf_header))
     {
         sk_log(LOG_WARNING, "Invalid elf program!", executable_path);
         return -1;
@@ -695,16 +687,17 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     elf_program_t program;
 
-    for (int i = 0; elf_read_program(elf, &program, i); i++)
+    for (int i = 0; i < elf_header.phnum; i++)
     {
-        load_elfseg(new_process, (uint)(buffer) + program.offset, program.filesz, program.vaddr, program.memsz);
+        iostream_seek(s, elf_header.phoff + (elf_header.phentsize*i), IOSTREAM_WHENCE_START);
+        iostream_read(s, &program, sizeof(elf_program_t));
+
+        load_elfseg(new_process, s, &program);
     }
 
     sk_log(LOG_DEBUG, "Executable loaded, creating main thread...");
 
-    thread_create_mainthread(new_process, (thread_entry_t)elf->entry, argv);
-
-    free(buffer);
+    thread_create_mainthread(new_process, (thread_entry_t)elf_header.entry, argv);
 
     sk_log(LOG_DEBUG, "Process created, back to caller..");
 

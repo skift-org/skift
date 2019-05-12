@@ -99,7 +99,7 @@ void path_normalize(path_t* p)
         if ((strcmp(element, "..") == 0) && (depth > 0))
         {
             char* value;
-            list_pop(stack, (void**)&value);
+            list_popback(stack, (void**)&value);
             free(value);
             depth--;
         }

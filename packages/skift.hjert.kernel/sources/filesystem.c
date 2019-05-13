@@ -47,7 +47,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
     node->type = type;
     node->refcount = 0;
-    sk_lock_init(node->lock);
+    lock_init(node->lock);
 
     switch (type)
     {
@@ -156,7 +156,7 @@ void stream_delete(stream_t *s)
 
 void file_trunc(fsnode_t *node)
 {
-    sk_lock_acquire(node->lock);
+    lock_acquire(node->lock);
 
     free(node->file.buffer);
 
@@ -164,14 +164,14 @@ void file_trunc(fsnode_t *node)
     node->file.realsize = 512;
     node->file.size = 0;
 
-    sk_lock_release(node->lock);
+    lock_release(node->lock);
 }
 
 int file_read(stream_t *stream, void *buffer, uint size)
 {
     int result = 0;
 
-    sk_lock_acquire(stream->node->lock);
+    lock_acquire(stream->node->lock);
 
     file_t *file = &stream->node->file;
 
@@ -184,7 +184,7 @@ int file_read(stream_t *stream, void *buffer, uint size)
         stream->offset += readedsize;
     }
 
-    sk_lock_release(stream->node->lock);
+    lock_release(stream->node->lock);
 
     return result;
 }
@@ -193,7 +193,7 @@ int file_write(stream_t *stream, const void *buffer, uint size)
 {
     int result = 0;
 
-    sk_lock_acquire(stream->node->lock);
+    lock_acquire(stream->node->lock);
 
     file_t *file = &stream->node->file;
 
@@ -214,18 +214,18 @@ int file_write(stream_t *stream, const void *buffer, uint size)
     result = size;
     stream->offset += size;
 
-    sk_lock_release(stream->node->lock);
+    lock_release(stream->node->lock);
 
     return result;
 }
 
 void file_stat(fsnode_t *node, iostream_stat_t *stat)
 {
-    sk_lock_acquire(node->lock);
+    lock_acquire(node->lock);
 
     stat->size = node->file.size;
 
-    sk_lock_release(node->lock);
+    lock_release(node->lock);
 }
 
 /* --- Directories ---------------------------------------------------------- */
@@ -248,16 +248,16 @@ fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 
 bool directory_has_entry(fsnode_t *dir, const char *child)
 {
-    sk_lock_acquire(dir->lock);
+    lock_acquire(dir->lock);
     bool has_entry = directory_entry(dir, child) != NULL;
-    sk_lock_release(dir->lock);
+    lock_release(dir->lock);
 
     return has_entry;
 }
 
 directory_entries_t directory_entries(fsnode_t *dir)
 {
-    sk_lock_acquire(dir->lock);
+    lock_acquire(dir->lock);
 
     int entries_count = dir->directory.childs->count;
     iostream_direntry_t *entries = malloc(sizeof(iostream_direntry_t) * entries_count);
@@ -273,14 +273,14 @@ directory_entries_t directory_entries(fsnode_t *dir)
         current++;
     }
 
-    sk_lock_release(dir->lock);
+    lock_release(dir->lock);
 
     return (directory_entries_t){.count = entries_count, .entries = entries};
 }
 
 bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 {
-    sk_lock_acquire(dir->lock);
+    lock_acquire(dir->lock);
     sk_log(LOG_DEBUG, "Linking node to '%s'", name);
 
     if (directory_entry(dir, name) == NULL)
@@ -293,19 +293,19 @@ bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 
         list_pushback(dir->directory.childs, entry);
 
-        sk_lock_release(dir->lock);
+        lock_release(dir->lock);
         return true;
     }
     else
     {
-        sk_lock_release(dir->lock);
+        lock_release(dir->lock);
         return false;
     }
 }
 
 bool directory_unlink(fsnode_t *dir, const char *name)
 {
-    sk_lock_acquire(dir->lock);
+    lock_acquire(dir->lock);
     fsdirectory_entry_t *entry = directory_entry(dir, name);
 
     if (entry != NULL)
@@ -322,12 +322,12 @@ bool directory_unlink(fsnode_t *dir, const char *name)
             fsnode_delete(node);
         }
 
-        sk_lock_release(dir->lock);
+        lock_release(dir->lock);
         return true;
     }
     else
     {
-        sk_lock_release(dir->lock);
+        lock_release(dir->lock);
         return false;
     }
 }
@@ -365,7 +365,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
 
 void filesystem_setup()
 {
-    sk_lock_init(fslock);
+    lock_init(fslock);
 
     root = fsnode(FSNODE_DIRECTORY);
     root->refcount++;
@@ -384,17 +384,17 @@ fsnode_t *filesystem_resolve(fsnode_t *at, path_t *p)
         if (current->type == FSNODE_DIRECTORY)
         {
             fsnode_t *directory = current;
-            sk_lock_acquire(directory->lock);
+            lock_acquire(directory->lock);
             fsdirectory_entry_t *entry = directory_entry(current, element);
 
             if (entry != NULL)
             {
                 current = entry->node;
-                sk_lock_release(directory->lock);
+                lock_release(directory->lock);
             }
             else
             {
-                sk_lock_release(directory->lock);
+                lock_release(directory->lock);
                 return NULL;
             }
         }
@@ -452,7 +452,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
 fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create)
 {
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
 
     fsnode_t *node = filesystem_resolve(at, p);
 
@@ -466,14 +466,14 @@ fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create)
         node->refcount++;
     }
 
-    sk_lock_release(fslock);
+    lock_release(fslock);
 
     return node;
 }
 
 void filesystem_release(fsnode_t *node)
 {
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
 
     node->refcount--;
 
@@ -482,7 +482,7 @@ void filesystem_release(fsnode_t *node)
         fsnode_delete(node);
     }
 
-    sk_lock_release(fslock);
+    lock_release(fslock);
 }
 
 void filesystem_dump_internal(fsnode_t *node, int depth)
@@ -781,9 +781,9 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
         case IOSTREAM_WHENCE_END:
             if (s->node->type == FSNODE_FILE)
             {
-                sk_lock_acquire(s->node->lock);
+                lock_acquire(s->node->lock);
                 s->offset = s->node->file.size + offset;
-                sk_lock_release(s->node->lock);
+                lock_release(s->node->lock);
             }
             else if (s->node->type == FSNODE_DIRECTORY)
             {
@@ -816,10 +816,10 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
 
     if (s != NULL)
     {
-        sk_lock_acquire(s->node->lock);
+        lock_acquire(s->node->lock);
         int offset = s->offset;
         int size = fsnode_size(s->node);
-        sk_lock_release(s->node->lock);
+        lock_release(s->node->lock);
 
         if (size == -1)
         {
@@ -847,16 +847,16 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
 int filesystem_mkdir(fsnode_t *at, path_t *p)
 {
     IS_FS_READY;
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
 
     if (filesystem_mknode(at, p, FSNODE_DIRECTORY) != NULL)
     {
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return 0;
     }
     else
     {
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return -1;
     }
 }
@@ -864,19 +864,19 @@ int filesystem_mkdir(fsnode_t *at, path_t *p)
 int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev)
 {
     IS_FS_READY;
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
 
     fsnode_t *device_file = filesystem_mknode(at, p, FSNODE_DEVICE);
 
     if (device_file != NULL)
     {
         device_file->device = dev;
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return 0;
     }
     else
     {
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return -1;
     }
 }
@@ -884,15 +884,15 @@ int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev)
 int filesystem_mkfile(fsnode_t *at, path_t *p)
 {
     IS_FS_READY;
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
     if (filesystem_mknode(at, p, FSNODE_FILE) != NULL)
     {
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return 0;
     }
     else
     {
-        sk_lock_release(fslock);
+        lock_release(fslock);
         return -1;
     }
 }
@@ -903,7 +903,7 @@ int filesystem_link(fsnode_t *file_at, path_t *file_path, fsnode_t *link_at, pat
 
     int result = -1;
 
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
     {
         fsnode_t *node = filesystem_resolve(file_at, file_path);
 
@@ -920,7 +920,7 @@ int filesystem_link(fsnode_t *file_at, path_t *file_path, fsnode_t *link_at, pat
             }
         }
     }
-    sk_lock_release(fslock);
+    lock_release(fslock);
 
     return result;
 }
@@ -931,7 +931,7 @@ int filesystem_unlink(fsnode_t *at, path_t *link_path)
 
     int result = -1;
 
-    sk_lock_acquire(fslock);
+    lock_acquire(fslock);
     {
         fsnode_t *parent = filesystem_resolve_parent(at, link_path);
 
@@ -943,7 +943,7 @@ int filesystem_unlink(fsnode_t *at, path_t *link_path)
             }
         }
     }
-    sk_lock_release(fslock);
+    lock_release(fslock);
 
     return result;
 }

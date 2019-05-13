@@ -21,8 +21,8 @@ iostream_t *log_stream;
 
 void __plug_init(void)
 {
-    sk_lock_init(memlock);
-    sk_lock_init(loglock);
+    lock_init(memlock);
+    lock_init(loglock);
 
     // Open io stream
     in_stream = NULL; // FIXME: no stdin,
@@ -48,25 +48,25 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
 
 int __plug_logger_lock()
 {
-    sk_lock_acquire(loglock);
+    lock_acquire(loglock);
     return 0;
 }
 
 int __plug_logger_unlock()
 {
-    sk_lock_release(loglock);
+    lock_release(loglock);
     return 0;
 }
 
 int __plug_memalloc_lock()
 {
-    sk_lock_acquire(memlock);
+    lock_acquire(memlock);
     return 0;
 }
 
 int __plug_memalloc_unlock()
 {
-    sk_lock_release(memlock);
+    lock_release(memlock);
     return 0;
 }
 

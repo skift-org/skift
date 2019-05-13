@@ -21,7 +21,7 @@ object_t *object(uint size, object_dtor_t dtor)
     header->refcount = 1;
     header->dtor = dtor;
     header->size = size;
-    sk_lock_init(header->lock);
+    lock_init(header->lock);
 
     return (object_t*)(header + 1);
 }
@@ -34,7 +34,7 @@ void object_lock(object_t *this)
 
     assert(header->magic == OBJECT_MAGIC);
 
-    sk_lock_acquire(header->lock);
+    lock_acquire(header->lock);
 }
 
 bool object_trylock(object_t *this)
@@ -45,7 +45,7 @@ bool object_trylock(object_t *this)
 
     assert(header->magic == OBJECT_MAGIC);
 
-    return sk_lock_try_acquire(header->lock);
+    return lock_try_acquire(header->lock);
 }
 
 void object_unlock(object_t *this)
@@ -56,7 +56,7 @@ void object_unlock(object_t *this)
 
     assert(header->magic == OBJECT_MAGIC);
 
-    sk_lock_release(header->lock);
+    lock_release(header->lock);
 }
 
 object_t *object_retain(object_t *this)

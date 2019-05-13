@@ -9,22 +9,23 @@
 typedef struct
 {
     int locked;
+    int holder;
 } lock_t;
 
-void __sk_lock_init(lock_t *lock);
-void __sk_lock_acquire(lock_t *lock);
-void __sk_lock_release(lock_t *lock);
-bool __sk_lock_try_acquire(lock_t *lock);
+void __lock_init(lock_t *lock);
+void __lock_acquire(lock_t *lock);
+void __lock_release(lock_t *lock);
+bool __lock_try_acquire(lock_t *lock);
 
-#define sk_lock_init(lock) __sk_lock_init(&lock)
-#define sk_lock_acquire(lock) __sk_lock_acquire(&lock)
-#define sk_lock_try_acquire(lock) __sk_lock_try_acquire(&lock)
-#define sk_lock_release(lock) __sk_lock_release(&lock)
+#define lock_init(lock) __lock_init(&lock)
+#define lock_acquire(lock) __lock_acquire(&lock)
+#define lock_try_acquire(lock) __lock_try_acquire(&lock)
+#define lock_release(lock) __lock_release(&lock)
 
-#define LOCK(lock, code)          \
-    do                            \
-    {                             \
-        __sk_lock_acquire(&lock); \
-        code;                     \
-        __sk_lock_release(&lock); \
+#define LOCK(lock, code)       \
+    do                         \
+    {                          \
+        __lock_acquire(&lock); \
+        code;                  \
+        __lock_release(&lock); \
     } while (0);

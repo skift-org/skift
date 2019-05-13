@@ -44,6 +44,19 @@ typedef unsigned long long uint64_t;
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 
+#define PACKED(x) x __attribute__((packed))
+#define ALIGNED(x, align) x __attribute__((aligned(align)))
+
+#define UNUSED(x) (void)(x)
+#define MALLOC(type) ((type *)malloc(sizeof(type)))
+
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+#define FLAG(__i) (1 << (__i))
+
+#define offsetof(st, m) ((size_t) & (((st *)0)->m))
+
+/* --- Automagicaly variables filler ---------------------------------------- */
+
 #ifndef __PACKAGE__
 #define __PACKAGE__ "(NULL)"
 #endif
@@ -56,17 +69,7 @@ typedef unsigned long uintptr_t;
 #define __COMMIT__ "(NULL)"
 #endif
 
-#define PACKED(x) x __attribute__((packed))
-#define ALIGNED(x, align) x __attribute__((aligned(align)))
-
-#define UNUSED(x) (void)(x)
-#define MALLOC(type) ((type *)malloc(sizeof(type)))
-
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-#define FLAG(__i) (1 << (__i))
-
-#define offsetof(st, m) ((size_t) & (((st *)0)->m))
-
+/* --- Variadic arguments --------------------------------------------------- */
 
 typedef void *va_list;
 
@@ -76,7 +79,26 @@ typedef void *va_list;
 #define va_arg(ap, t) (*(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)))
 #define va_end(ap) (ap = (va_list)0)
 
+/* --- Raw memory allocation ------------------------------------------------ */
+
 void *malloc(size_t size);
 void *realloc(void *p, size_t size);
 void *calloc(size_t, size_t);
 void free(void *);
+
+/* --- Refcounted object runtime -------------------------------------------- */
+
+typedef void (*object_dtor_t)(void *object);
+
+typedef void object_t;
+
+object_t *object(uint size, object_dtor_t dtor);
+
+void object_lock(object_t *this);
+bool object_trylock(object_t *this);
+void object_unlock(object_t *this);
+
+object_t *object_retain(object_t *this);
+void object_release(object_t *this);
+int object_refcount(object_t *this);
+int object_size(object_t* this)

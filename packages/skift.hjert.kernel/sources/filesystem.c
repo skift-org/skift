@@ -30,8 +30,6 @@ static bool filesystem_ready = false;
 
 /* --- Fsnode --------------------------------------------------------------- */
 
-#pragma region
-
 iostream_type_t fsnode_to_iostream_type(fsnode_type_t type)
 {
     switch (type)
@@ -133,11 +131,7 @@ int fsnode_size(fsnode_t *node)
     return -1;
 }
 
-#pragma endregion
-
 /* --- Streams -------------------------------------------------------------- */
-
-#pragma region
 
 stream_t *stream(fsnode_t *node, iostream_flag_t flags)
 {
@@ -158,11 +152,7 @@ void stream_delete(stream_t *s)
     free(s);
 }
 
-#pragma endregion
-
 /* --- Files ---------------------------------------------------------------- */
-
-#pragma region
 
 void file_trunc(fsnode_t *node)
 {
@@ -238,11 +228,7 @@ void file_stat(fsnode_t *node, iostream_stat_t *stat)
     sk_lock_release(node->lock);
 }
 
-#pragma endregion
-
 /* --- Directories ---------------------------------------------------------- */
-
-#pragma region
 
 // only call this method if you hold the directory lock.
 fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
@@ -375,11 +361,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     }
 }
 
-#pragma endregion
-
 /* --- Filesystem ----------------------------------------------------------- */
-
-#pragma region
 
 void filesystem_setup()
 {
@@ -570,11 +552,7 @@ void filesystem_panic_dump(void)
     }
 }
 
-#pragma endregion
-
 /* --- Filesystem Operations ------------------------------------------------ */
-
-#pragma region
 
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
 stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags)
@@ -682,33 +660,6 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
     }
 
     return result;
-}
-
-// TODO REMOVE: reading whole file is a bad idea
-void *filesystem_readall(stream_t *s)
-{
-    IS_FS_READY;
-
-    if (s != NULL)
-    {
-        iostream_stat_t stat = {0};
-        filesystem_fstat(s, &stat);
-        void *buffer = malloc(stat.size);
-
-        if (buffer == NULL)
-        {
-            return NULL;
-        }
-
-        filesystem_read(s, buffer, stat.size);
-
-        return buffer;
-    }
-    else
-    {
-        sk_log(LOG_WARNING, "Null stream passed");
-        return NULL;
-    }
 }
 
 int filesystem_write(stream_t *s, const void *buffer, uint size)
@@ -1008,5 +959,3 @@ bool filesystem_exist(fsnode_t* at, path_t* p)
 
     return node != NULL;
 }
-
-#pragma endregion

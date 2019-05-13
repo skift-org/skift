@@ -158,8 +158,6 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence);
 
 int filesystem_fstat(stream_t *s, iostream_stat_t *stat);
 
-void *filesystem_readall(stream_t *s);
-
 /* --- File system operation ------------------------------------------------ */
 
 int filesystem_mkfile(fsnode_t *at, path_t *p);

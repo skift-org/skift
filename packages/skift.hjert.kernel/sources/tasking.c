@@ -115,18 +115,18 @@ thread_t *thread_getbyid(int id)
 
 int thread_count(void)
 {
-    sk_atomic_begin();
+    atomic_begin();
     int result = list_count(threads);
-    sk_atomic_end();
+    atomic_end();
 
     return result;
 }
 
 THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry, const char **argv)
 {
-    sk_log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", parent_process->id, entry);
+    log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", parent_process->id, entry);
 
-    sk_atomic_begin();
+    atomic_begin();
 
     thread_t *t = thread();
 
@@ -148,7 +148,7 @@ THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry,
 
     thread_setready(t);
 
-    sk_atomic_end();
+    atomic_end();
 
     return t->id;
 }
@@ -266,7 +266,7 @@ void thread_sleep(int time)
 
 void thread_wakeup(THREAD t)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     thread_t *thread = thread_getbyid(t);
 
@@ -275,12 +275,12 @@ void thread_wakeup(THREAD t)
         thread_setstate(running, THREADSTATE_RUNNING);
     }
 
-    sk_atomic_end();
+    atomic_end();
 }
 
 bool thread_wait_thread(THREAD t, int *exitvalue)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     thread_t *thread = thread_getbyid(t);
 
@@ -293,14 +293,14 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
                 *exitvalue = thread->exitvalue;
             }
 
-            sk_atomic_end();
+            atomic_end();
         }
         else
         {
             running->wait.thread.thread_handle = t;
             thread_setstate(running, THREADSTATE_WAIT_THREAD);
 
-            sk_atomic_end();
+            atomic_end();
             sheduler_yield();
 
             if (exitvalue != NULL)
@@ -313,14 +313,14 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
     }
     else
     {
-        sk_atomic_end();
+        atomic_end();
         return false;
     }
 }
 
 bool thread_wait_process(PROCESS p, int *exitvalue)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     process_t *process = process_getbyid(p);
 
@@ -333,14 +333,14 @@ bool thread_wait_process(PROCESS p, int *exitvalue)
                 *exitvalue = process->exitvalue;
             }
 
-            sk_atomic_end();
+            atomic_end();
         }
         else
         {
             running->wait.process.process_handle = p;
             thread_setstate(running, THREADSTATE_WAIT_PROCESS);
 
-            sk_atomic_end();
+            atomic_end();
             sheduler_yield();
 
             if (exitvalue != NULL)
@@ -353,7 +353,7 @@ bool thread_wait_process(PROCESS p, int *exitvalue)
     }
     else
     {
-        sk_atomic_end();
+        atomic_end();
         return false;
     }
 }
@@ -362,7 +362,7 @@ bool thread_wait_process(PROCESS p, int *exitvalue)
 
 bool thread_cancel(THREAD t, int exitvalue)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     thread_t *thread = thread_getbyid(t);
 
@@ -372,7 +372,7 @@ bool thread_cancel(THREAD t, int exitvalue)
         thread->exitvalue = exitvalue;
         thread_setstate(running, THREADSTATE_CANCELED);
 
-        sk_log(LOG_DEBUG, "Thread(%d) got canceled.", t);
+        log(LOG_DEBUG, "Thread(%d) got canceled.", t);
 
         // Wake up waiting threads
         FOREACH(i, thread->process->threads)
@@ -385,16 +385,16 @@ bool thread_cancel(THREAD t, int exitvalue)
                 waitthread->wait.thread.exitvalue = exitvalue;
                 thread_setstate(waitthread, THREADSTATE_RUNNING);
 
-                sk_log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
+                log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
             }
         }
 
-        sk_atomic_end();
+        atomic_end();
         return true;
     }
     else
     {
-        sk_atomic_end();
+        atomic_end();
         return false;
     }
 }
@@ -422,18 +422,18 @@ static char *THREAD_STATES[] =
 
 void thread_dump(thread_t *t)
 {
-    sk_atomic_begin();
+    atomic_begin();
     printf("\n\t . Thread %d", t->id);
     printf("\n\t   State: %s", THREAD_STATES[t->state]);
     printf("\n\t   Process: %d %s", t->id, t->process->name);
     printf("\n\t   User memory: "); memory_layout_dump(t->process->pdir, true);
     printf("\n");
-    sk_atomic_end();
+    atomic_end();
 }
 
 void thread_panic_dump(void)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
 
     printf("\n");
@@ -448,7 +448,7 @@ void thread_panic_dump(void)
     }
 
 
-    sk_atomic_end();
+    atomic_end();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -499,7 +499,7 @@ process_t *process(const char *name, bool user)
         process->pdir = memory_kpdir();
     }
 
-    sk_log(LOG_FINE, "Process '%s' with ID=%d Created.", process->name, process->id);
+    log(LOG_FINE, "Process '%s' with ID=%d Created.", process->name, process->id);
 
     list_pushback(processes, process);
     return process;
@@ -543,11 +543,11 @@ int process_count(void)
 {
     int result;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     result = list_count(processes);
 
-    sk_atomic_end();
+    atomic_end();
 
     return result;
 }
@@ -556,7 +556,7 @@ int process_count(void)
 
 bool process_cancel(process_t* self, int exitvalue)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     if (self != kernel_process)
     {
@@ -564,7 +564,7 @@ bool process_cancel(process_t* self, int exitvalue)
         self->state = PROCESS_CANCELED;
         self->exitvalue = exitvalue;
 
-        sk_log(LOG_DEBUG, "Process '%s' ID=%d canceled!", self->name, self->id);
+        log(LOG_DEBUG, "Process '%s' ID=%d canceled!", self->name, self->id);
 
         // Wake up waiting threads
         FOREACH(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
@@ -575,7 +575,7 @@ bool process_cancel(process_t* self, int exitvalue)
             {
                 thread->wait.process.exitvalue = exitvalue;
                 thread_setstate(thread, THREADSTATE_RUNNING);
-                sk_log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, self->id);
+                log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, self->id);
             }
         }
 
@@ -586,15 +586,15 @@ bool process_cancel(process_t* self, int exitvalue)
             thread_cancel(thread->id, 0);
         }
 
-        sk_atomic_end();
+        atomic_end();
         return true;
     }
     else
     {
         process_t *process = sheduler_running_process();
-        sk_log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
+        log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
 
-        sk_atomic_end();
+        atomic_end();
         return false;
     }
 }
@@ -621,11 +621,11 @@ void process_exit(int exitvalue)
 
 void load_elfseg(process_t *process, iostream_t* s, elf_program_t* program)
 {
-    sk_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
+    log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
     if (program->vaddr >= 0x100000)
     {
-        sk_atomic_begin();
+        atomic_begin();
 
         // To avoid pagefault we need to switch page directorie.
         page_directorie_t *pdir = running->process->pdir;
@@ -639,11 +639,11 @@ void load_elfseg(process_t *process, iostream_t* s, elf_program_t* program)
 
         paging_load_directorie(pdir);
 
-        sk_atomic_end();
+        atomic_end();
     }
     else
     {
-        sk_log(LOG_WARNING, "Elf segment ignored, not in user memory!");
+        log(LOG_WARNING, "Elf segment ignored, not in user memory!");
     }
 }
 
@@ -654,7 +654,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     if (s == NULL)
     {
-        sk_log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
+        log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
         return -1;
     }
 
@@ -664,7 +664,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
-        sk_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
+        log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         iostream_close(s);
         return -1;
     }
@@ -676,13 +676,13 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
     if (!elf_valid(&elf_header))
     {
-        sk_log(LOG_WARNING, "Invalid elf program!", executable_path);
+        log(LOG_WARNING, "Invalid elf program!", executable_path);
         iostream_close(s);
         return -1;
     }
 
     // Create the process and load the executable.
-    sk_atomic_begin();
+    atomic_begin();
 
     process_t* new_process = process(executable_path, true);
     int new_process_id = new_process->id;
@@ -697,13 +697,13 @@ PROCESS process_exec(const char *executable_path, const char **argv)
         load_elfseg(new_process, s, &program);
     }
 
-    sk_log(LOG_DEBUG, "Executable loaded, creating main thread...");
+    log(LOG_DEBUG, "Executable loaded, creating main thread...");
 
     thread_create_mainthread(new_process, (thread_entry_t)elf_header.entry, argv);
 
-    sk_log(LOG_DEBUG, "Process created, back to caller..");
+    log(LOG_DEBUG, "Process created, back to caller..");
 
-    sk_atomic_end();
+    atomic_end();
     
     iostream_close(s);
     return new_process_id;
@@ -735,14 +735,14 @@ int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream)
 
             lock_release(this->fds_lock);
 
-            sk_log(LOG_DEBUG, "File descriptor %d allocated for process %d'%s'", i, this->id, this->name);
+            log(LOG_DEBUG, "File descriptor %d allocated for process %d'%s'", i, this->id, this->name);
 
             return i;
         }
     }
     
     lock_release(this->fds_lock);
-    sk_log(LOG_WARNING, "We run out of file descriptor on process %d'%s'", this->id, this->name);
+    log(LOG_WARNING, "We run out of file descriptor on process %d'%s'", this->id, this->name);
 
     return -1;
 }
@@ -760,7 +760,7 @@ stream_t *process_filedescriptor_acquire(process_t *this, int fd_index)
         }
     }
 
-    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
+    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
 
     return NULL;
 }
@@ -776,7 +776,7 @@ int process_filedescriptor_release(process_t *this, int fd_index)
         return 0;
     }
 
-    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
+    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
 
     return -1;
 }
@@ -792,12 +792,12 @@ int process_filedescriptor_free_and_release(process_t *this, int fd_index)
         fd->free = true;
         fd->stream = NULL;
 
-        sk_log(LOG_DEBUG, "File descriptor %d free for process %d'%s'", fd_index, this->id, this->name);
+        log(LOG_DEBUG, "File descriptor %d free for process %d'%s'", fd_index, this->id, this->name);
 
         return 0;
     }
 
-    sk_log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
+    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
 
     return -1;
 }
@@ -952,13 +952,13 @@ int process_memory_unmap(process_t* p, uint addr, uint count)
 uint process_memory_alloc(process_t* p, uint count)
 {
     uint addr = memory_alloc(p->pdir, count, 1);
-    sk_log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
+    log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
 void process_memory_free(process_t* p, uint addr, uint count)
 {
-    sk_log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
+    log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
     return memory_free(p->pdir, addr, count, 1);
 }
 
@@ -1061,7 +1061,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     if (process->inbox->count > 1024)
     {
-        sk_log(LOG_WARNING, "PROC=%d inbox is full!", to);
+        log(LOG_WARNING, "PROC=%d inbox is full!", to);
         return 0;
     }
 
@@ -1102,7 +1102,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 {
     int id = 0;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     channel_t *c = channel_get(channel_name);
 
@@ -1116,7 +1116,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
         }
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     return id;
 }
@@ -1125,7 +1125,7 @@ message_t *messaging_receive_internal(thread_t *thread)
 {
     message_t *msg = NULL;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     if (thread->process->inbox->count > 0)
     {
@@ -1138,7 +1138,7 @@ message_t *messaging_receive_internal(thread_t *thread)
         thread->wait.message.message = msg;
     }
 
-    sk_atomic_end();
+    atomic_end();
     return msg;
 }
 
@@ -1148,9 +1148,9 @@ bool messaging_receive(message_t *msg, bool wait)
 
     if (incoming == NULL && wait)
     {
-        sk_atomic_begin();
+        atomic_begin();
         thread_setstate(sheduler_running_thread(), THREADSTATE_WAIT_MESSAGE);
-        sk_atomic_end();
+        atomic_end();
 
         sheduler_yield(); // Wait until we get a message.
 
@@ -1181,7 +1181,7 @@ int messaging_payload(void *buffer, uint size)
 
 int messaging_subscribe(const char *channel_name)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     channel_t *c = channel_get(channel_name);
 
@@ -1193,14 +1193,14 @@ int messaging_subscribe(const char *channel_name)
 
     list_pushback(c->subscribers, sheduler_running_thread()->process);
 
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
 
 int messaging_unsubscribe(const char *channel_name)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     channel_t *c = channel_get(channel_name);
 
@@ -1209,7 +1209,7 @@ int messaging_unsubscribe(const char *channel_name)
         list_remove(c->subscribers, sheduler_running_thread()->process);
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
@@ -1239,11 +1239,11 @@ void collect_and_free_thread(void)
         thread_t *thread = i->value;
         int thread_id = thread->id;
 
-        sk_log(LOG_DEBUG, "free'ing thread %d", thread_id);
+        log(LOG_DEBUG, "free'ing thread %d", thread_id);
 
         thread_delete(thread);
 
-        sk_log(LOG_DEBUG, "Thread %d free'd.", thread_id);
+        log(LOG_DEBUG, "Thread %d free'd.", thread_id);
     }
 
     list_delete(thread_to_free, LIST_KEEP_VALUES);
@@ -1255,13 +1255,13 @@ void garbage_colector()
     {
         thread_sleep(100); // We don't do this really often.
 
-        // sk_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
+        // log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
 
-        sk_atomic_begin();
+        atomic_begin();
         collect_and_free_thread();
-        sk_atomic_end();
+        atomic_end();
 
-        // sk_log(LOG_DEBUG, "Garbage collect end!");
+        // log(LOG_DEBUG, "Garbage collect end!");
     }
 }
 
@@ -1287,7 +1287,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    sk_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
+    log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
 void sheduler_setup(thread_t* main_kernel_thread, process_t* kernel_process)
@@ -1320,7 +1320,7 @@ void wakeup_sleeping_threads(void)
             if (t->wait.time.wakeuptick <= ticks)
             {
                 thread_setstate(t, THREADSTATE_RUNNING);
-                // sk_log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                // log(LOG_DEBUG, "Thread %d wake up!", t->id);
             }
 
         } while (t->stack == THREADSTATE_RUNNING);
@@ -1333,7 +1333,7 @@ static const char* animation = "|/-\\|/-\\";
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    //sk_log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
+    //log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     sheduler_context_switch = true;
 
@@ -1360,7 +1360,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     sheduler_context_switch = false;
 
-    //sk_log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
+    //log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
 
     return running->sp;
 }

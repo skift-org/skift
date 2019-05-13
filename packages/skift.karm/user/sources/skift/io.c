@@ -4,5 +4,5 @@
 
 #include <skift/io.h>
 
-DEFN_SYSCALL1(sk_io_print, SYS_IO_PRINT, const char *);
-DEFN_SYSCALL2(sk_io_read, SYS_IO_READ, char *, int);
+DEFN_SYSCALL1(io_print, SYS_IO_PRINT, const char *);
+DEFN_SYSCALL2(io_read, SYS_IO_READ, char *, int);

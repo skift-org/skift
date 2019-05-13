@@ -96,24 +96,24 @@ void console_setup(void)
 
 void console_print(const char *s)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     if (vtc != NULL)
     {
         vtconsole_write(vtc, s, strlen(s));
     }
 
-    sk_atomic_end();
+    atomic_end();
 }
 
 void console_putchar(char c)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     if (vtc != NULL)
     {
         vtconsole_putchar(vtc, c);
     }
 
-    sk_atomic_end();
+    atomic_end();
 }

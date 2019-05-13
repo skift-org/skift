@@ -3,7 +3,7 @@ section .text
 extern __plug_init
 extern __plug_fini
 extern main
-extern sk_process_exit
+extern process_exit
 
 global _start:function (_start.end - _start)
 _start:

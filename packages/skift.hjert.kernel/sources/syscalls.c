@@ -29,7 +29,7 @@ typedef int (*syscall_handler_t)(int, int, int, int, int);
 
 int sys_not_implemented()
 {
-    sk_log(LOG_WARNING, "Not implemented syscall!");
+    log(LOG_WARNING, "Not implemented syscall!");
     return 0;
 }
 
@@ -54,9 +54,9 @@ int sys_process_exit(int code)
 
 int sys_process_cancel(int pid)
 {
-    sk_atomic_begin();
+    atomic_begin();
     int result = process_cancel(process_getbyid(pid), -1);
-    sk_atomic_end();
+    atomic_end();
 
     return result;
 }
@@ -329,8 +329,8 @@ void syscall_dispatcher(processor_context_t *context)
     }
     else
     {
-        sk_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_process_id());
-        sk_log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_process_id());
+        log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }
 }

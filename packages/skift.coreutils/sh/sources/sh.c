@@ -20,7 +20,7 @@ static bool exited = false;
 int shell_readline(char* buffer, uint size)
 {
     // FIXME: All user input should come from in_stream
-    sk_messaging_subscribe(KEYBOARD_CHANNEL);
+    messaging_subscribe(KEYBOARD_CHANNEL);
 
     int i = 0;    
     buffer[i] = '\0';
@@ -28,12 +28,12 @@ int shell_readline(char* buffer, uint size)
     while(true)
     {
         message_t msg;
-        sk_messaging_receive(&msg, 1);
+        messaging_receive(&msg, 1);
 
         if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
         {
             keyboard_event_t event;
-            sk_messaging_payload(&event, sizeof(keyboard_event_t));
+            messaging_payload(&event, sizeof(keyboard_event_t));
 
             if (event.c == '\n')
             {
@@ -59,7 +59,7 @@ int shell_readline(char* buffer, uint size)
         }
     }
 
-    sk_messaging_unsubscribe(KEYBOARD_CHANNEL);
+    messaging_unsubscribe(KEYBOARD_CHANNEL);
 
     printf("\033[0m");
 
@@ -117,7 +117,7 @@ int shell_eval(const char** command)
     if (s != NULL)
     {
         iostream_close(s);
-        process = sk_process_exec(command[0], command);
+        process = process_exec(command[0], command);
     }
     else
     {
@@ -129,7 +129,7 @@ int shell_eval(const char** command)
         if (s != NULL) 
         {
             iostream_close(s);
-            process = sk_process_exec(pathbuffer, command);
+            process = process_exec(pathbuffer, command);
         }
         else
         {
@@ -139,7 +139,7 @@ int shell_eval(const char** command)
 
     if (process > 0)
     {
-        sk_thread_wait_process(process, &exitvalue);
+        thread_wait_process(process, &exitvalue);
     }
 
     return exitvalue;
@@ -147,7 +147,7 @@ int shell_eval(const char** command)
 
 int main(int argc, char **argv)
 {
-    sk_logger_setlevel(LOG_ALL);
+    logger_setlevel(LOG_ALL);
 
     // HACK: Disable line buffering
     out_stream->write_buffer = 0;

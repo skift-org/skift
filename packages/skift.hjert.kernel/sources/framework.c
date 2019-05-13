@@ -35,7 +35,7 @@ void __plug_init(void)
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    sk_log(LOG_FATAL, "Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    log(LOG_FATAL, "Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
     PANIC("Kernel assert failed (see logs).");
 }
 
@@ -58,27 +58,27 @@ void __plug_system_get_status(system_status_t * status)
 
 int __plug_memalloc_lock()
 {
-    sk_atomic_begin();
+    atomic_begin();
     return 0;
 }
 
 int __plug_memalloc_unlock()
 {
-    sk_atomic_end();
+    atomic_end();
     return 0;
 }
 
 void *__plug_memalloc_alloc(uint size)
 {
     void *p = (void *)memory_alloc(memory_kpdir(), size, 0);
-    sk_log(LOG_DEBUG, "Allocated %d pages for the kernel at %08x.", size, p);
+    log(LOG_DEBUG, "Allocated %d pages for the kernel at %08x.", size, p);
     return p;
 }
 
 int __plug_memalloc_free(void *memory, uint size)
 {
     memory_free(memory_kpdir(), (uint)memory, size, 0);
-    sk_log(LOG_DEBUG, "Free'ed %d pages for the kernel at %08x.", size, memory);
+    log(LOG_DEBUG, "Free'ed %d pages for the kernel at %08x.", size, memory);
     return 0;
 }
 
@@ -86,13 +86,13 @@ int __plug_memalloc_free(void *memory, uint size)
 
 int __plug_logger_lock()
 {
-    sk_atomic_begin();
+    atomic_begin();
     return 0;
 }
 
 int __plug_logger_unlock()
 {
-    sk_atomic_end();
+    atomic_end();
     return 0;
 }
 

@@ -861,7 +861,7 @@ int main() {
 		
 		iostream_flush(out_stream);
 
-		sk_thread_sleep(9);
+		thread_sleep(9);
 		// usleep(90000);
 	}
 

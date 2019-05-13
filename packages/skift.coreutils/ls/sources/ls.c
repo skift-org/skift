@@ -71,7 +71,7 @@ int ls(const char *path)
         }
         else
         {
-            sk_log(LOG_DEBUG,"This was not a directory");
+            log(LOG_DEBUG,"This was not a directory");
             printf(path);
         }
 

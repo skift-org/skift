@@ -50,7 +50,7 @@ static bool nested_panic = false;
 
 void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     va_list va;
     va_start(va, message);

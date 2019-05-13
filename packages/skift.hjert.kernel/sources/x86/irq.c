@@ -33,7 +33,7 @@ irq_handler_t irq_register(int index, irq_handler_t handler)
 
 reg32_t irq_handler(reg32_t esp, processor_context_t context)
 {
-    sk_atomic_disable();
+    atomic_disable();
 
     if (irq_handlers[context.int_no] != NULL)
     {
@@ -41,7 +41,7 @@ reg32_t irq_handler(reg32_t esp, processor_context_t context)
     }
     else
     {
-        sk_log(LOG_WARNING,  "Unhandeled IRQ %d!", context.int_no);
+        log(LOG_WARNING,  "Unhandeled IRQ %d!", context.int_no);
     }
 
     if (context.int_no >= 8)
@@ -51,7 +51,7 @@ reg32_t irq_handler(reg32_t esp, processor_context_t context)
 
     outb(0x20, 0x20);
 
-    sk_atomic_enable();
+    atomic_enable();
 
     return esp;
 }

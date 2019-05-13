@@ -6,18 +6,18 @@
 
 #include <skift/runtime.h>
 
-void sk_atomic_enable(void);
-void sk_atomic_disable(void);
-void sk_atomic_begin(void);
-void sk_atomic_end(void);
-bool sk_is_atomic(void);
+void atomic_enable(void);
+void atomic_disable(void);
+void atomic_begin(void);
+void atomic_end(void);
+bool is_atomic(void);
 
-#define ASSERT_ATOMIC assert(sk_is_atomic())
+#define ASSERT_ATOMIC assert(is_atomic())
 
 #define ATOMIC(code)       \
     do                     \
     {                      \
-        sk_atomic_begin(); \
+        atomic_begin(); \
         code;              \
-        sk_atomic_end();   \
+        atomic_end();   \
     } while (0);

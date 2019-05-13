@@ -42,8 +42,8 @@ void __plug_fini(int exit_code)
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    sk_log(LOG_FATAL, "assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
-    sk_process_exit(-1);
+    log(LOG_FATAL, "assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    process_exit(-1);
 }
 
 int __plug_logger_lock()
@@ -72,11 +72,11 @@ int __plug_memalloc_unlock()
 
 void *__plug_memalloc_alloc(uint size)
 {
-    uint addr = sk_process_alloc(size);
+    uint addr = process_alloc(size);
     return (void *)addr;
 }
 
 int __plug_memalloc_free(void *memory, uint size)
 {
-    return sk_process_free((unsigned int)memory, size);
+    return process_free((unsigned int)memory, size);
 }

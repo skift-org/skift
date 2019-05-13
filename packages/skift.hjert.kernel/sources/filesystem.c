@@ -82,7 +82,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
-    sk_log(LOG_DEBUG, "Fsnode free: %08x", node);
+    log(LOG_DEBUG, "Fsnode free: %08x", node);
 
     switch (node->type)
     {
@@ -281,7 +281,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
 bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 {
     lock_acquire(dir->lock);
-    sk_log(LOG_DEBUG, "Linking node to '%s'", name);
+    log(LOG_DEBUG, "Linking node to '%s'", name);
 
     if (directory_entry(dir, name) == NULL)
     {
@@ -338,7 +338,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
 
     if (size == sizeof(iostream_direntry_t))
     {
-        sk_log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
+        log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
 
         if (index < stream->direntries.count)
         {
@@ -356,7 +356,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     }
     else
     {
-        sk_log(LOG_DEBUG, "Directory read fail!");
+        log(LOG_DEBUG, "Directory read fail!");
         return -1;
     }
 }
@@ -420,13 +420,13 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 {
     IS_FS_READY;
 
-    sk_log(LOG_DEBUG, "Creating node '%s' of type %d...", path_filename(node_path), type);
+    log(LOG_DEBUG, "Creating node '%s' of type %d...", path_filename(node_path), type);
 
     fsnode_t *parent_node = filesystem_resolve_parent(at, node_path);
 
     if (parent_node == NULL || parent_node->type != FSNODE_DIRECTORY)
     {
-        sk_log(LOG_WARNING, "Failed to create new node, parent not found!");
+        log(LOG_WARNING, "Failed to create new node, parent not found!");
         return NULL;
     }
 
@@ -434,7 +434,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
     if (child_name == NULL || directory_has_entry(parent_node, child_name))
     {
-        sk_log(LOG_WARNING, "Failed to create new node, the file exist!");
+        log(LOG_WARNING, "Failed to create new node, the file exist!");
         return NULL;
     }
 
@@ -442,7 +442,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
     if (!directory_link(parent_node, child_node, child_name))
     {
-        sk_log(LOG_WARNING, "Failed to create new node, link() failed!");
+        log(LOG_WARNING, "Failed to create new node, link() failed!");
         fsnode_delete(child_node);
         return NULL;
     }
@@ -602,7 +602,7 @@ void filesystem_close(stream_t *s)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
     }
 }
 
@@ -656,7 +656,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
     }
 
     return result;
@@ -707,7 +707,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
     }
 
     return result;
@@ -733,7 +733,7 @@ int filesystem_ioctl(stream_t *s, int request, void *args)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
     }
 
     return result;
@@ -757,7 +757,7 @@ int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
         return 1;
     }
 }
@@ -805,7 +805,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
         return -1;
     }
 }
@@ -839,7 +839,7 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
     }
     else
     {
-        sk_log(LOG_WARNING, "Null stream passed");
+        log(LOG_WARNING, "Null stream passed");
         return -1;
     }
 }

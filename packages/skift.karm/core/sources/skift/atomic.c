@@ -8,22 +8,22 @@
 static bool atomic_enabled = false;
 static uint atomic_depth = 0;
 
-bool sk_is_atomic()
+bool is_atomic()
 {
     return !(atomic_enabled && atomic_depth == 0);
 }
 
-void sk_atomic_enable()
+void atomic_enable()
 {
     atomic_enabled = true;
 }
 
-void sk_atomic_disable()
+void atomic_disable()
 {
     atomic_enabled = false;
 }
 
-void sk_atomic_begin()
+void atomic_begin()
 {
     if (atomic_enabled)
     {
@@ -33,7 +33,7 @@ void sk_atomic_begin()
     }
 }
 
-void sk_atomic_end()
+void atomic_end()
 {
     if (atomic_enabled)
     {

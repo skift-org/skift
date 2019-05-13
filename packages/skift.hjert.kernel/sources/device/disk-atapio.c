@@ -35,8 +35,8 @@ void atapio_wait()
 
 int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
 {
-    sk_atomic_begin();
-    sk_log(LOG_INFO, "ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
+    atomic_begin();
+    log(LOG_INFO, "ATA::pio read drive:%d block:%d count:%d", drive, numblock, count);
     u16 tmpword;
     int idx;
 
@@ -53,16 +53,16 @@ int atapio_read(u8 drive, u32 numblock, u8 count, char *buf)
         buf[idx * 2 + 1] = (unsigned char)(tmpword >> 8);
     }
 
-    sk_log(LOG_INFO, "ATA::pio read done!");
-    sk_atomic_end();
+    log(LOG_INFO, "ATA::pio read done!");
+    atomic_end();
 
     return count;
 }
 
 int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
 {
-    sk_atomic_begin();
-    sk_log(LOG_INFO, "ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
+    atomic_begin();
+    log(LOG_INFO, "ATA::pio write drive:%d block:%d count:%d", drive, numblock, count);
 
     u16 tmpword;
 
@@ -78,8 +78,8 @@ int atapio_write(u8 drive, u32 numblock, u8 count, char *buf)
         outw(0x1F0, tmpword);
     }
 
-    sk_log(LOG_FINE, "ATA::pio write done!");
-    sk_atomic_end();
+    log(LOG_FINE, "ATA::pio write done!");
+    atomic_end();
 
     return count;
 }

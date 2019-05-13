@@ -240,7 +240,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         }
     }
 
-    sk_log(LOG_ERROR, "Out of virtual memory!");
+    log(LOG_ERROR, "Out of virtual memory!");
     return 0;
 }
 
@@ -287,13 +287,13 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (count == 0)
         return 0;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     uint paddr = physical_alloc(count);
 
     if (paddr == 0)
     {
-        sk_atomic_end();
+        atomic_end();
         return 0;
     }
 
@@ -302,12 +302,12 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     if (vaddr == 0)
     {
         physical_free(paddr, count);
-        sk_atomic_end();
+        atomic_end();
 
         return 0;
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
@@ -319,11 +319,11 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
     if (count == 0)
         return 0;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     uint vaddr = virtual_alloc(pdir, paddr, count, user);
 
-    sk_atomic_end();
+    atomic_end();
 
     memset((void *)vaddr, 0, count * PAGE_SIZE);
 
@@ -336,7 +336,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
     if (count == 0)
         return 0;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     uint current_size = 0;
     uint startaddr = 0;
@@ -359,7 +359,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
                 physical_set_used(startaddr, count);
                 virtual_map(pdir, startaddr, startaddr, count, user);
 
-                sk_atomic_end();
+                atomic_end();
 
                 memset((void *)startaddr, 0, count * PAGE_SIZE);
 
@@ -372,9 +372,9 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
         }
     }
 
-    sk_atomic_end();
+    atomic_end();
 
-    sk_log(LOG_WARNING, "alloc failed!");
+    log(LOG_WARNING, "alloc failed!");
     return 0;
 }
 
@@ -382,7 +382,7 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 {
     UNUSED(user);
 
-    sk_atomic_begin();
+    atomic_begin();
 
     if (virtual_present(pdir, addr, count))
     {
@@ -390,19 +390,19 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
         virtual_unmap(pdir, addr, count);
     }
 
-    sk_atomic_end();
+    atomic_end();
 }
 
 // Alloc a pdir for a process
 page_directorie_t *memory_alloc_pdir()
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     page_directorie_t *pdir = (page_directorie_t *)memory_alloc_identity(&kpdir, 1, 0);
 
     if (pdir == NULL)
     {
-        sk_log(LOG_ERROR, "Page directory allocation failled!");
+        log(LOG_ERROR, "Page directory allocation failled!");
         return NULL;
     }
 
@@ -418,7 +418,7 @@ page_directorie_t *memory_alloc_pdir()
         e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     return pdir;
 }
@@ -426,7 +426,7 @@ page_directorie_t *memory_alloc_pdir()
 // Free the pdir of a dying process
 void memory_free_pdir(page_directorie_t *pdir)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     for (size_t i = 256; i < 1024; i++)
     {
@@ -451,12 +451,12 @@ void memory_free_pdir(page_directorie_t *pdir)
     }
     memory_free(&kpdir, (uint)pdir, 1, 0);
 
-    sk_atomic_end();
+    atomic_end();
 }
 
 int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     for (uint i = 0; i < count; i++)
     {
@@ -469,14 +469,14 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
         }
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
 
 int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
-    sk_atomic_begin();
+    atomic_begin();
 
     for (uint i = 0; i < count; i++)
     {
@@ -489,27 +489,27 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
         }
     }
 
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
 
 int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
 {
-    sk_atomic_begin();
+    atomic_begin();
     physical_set_used(addr, count);
     virtual_map(pdir, addr, addr, count, 0);
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
 
 int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
 {
-    sk_atomic_begin();
+    atomic_begin();
     physical_set_free(addr, count);
     virtual_unmap(pdir, addr, count);
-    sk_atomic_end();
+    atomic_end();
 
     return 0;
 }
@@ -593,11 +593,11 @@ uint memory_get_used(void)
 {
     uint result;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     result = USED_MEMORY;
 
-    sk_atomic_end();
+    atomic_end();
 
     return result;
 }
@@ -606,11 +606,11 @@ uint memory_get_total(void)
 {
     uint result;
 
-    sk_atomic_begin();
+    atomic_begin();
 
     result = TOTAL_MEMORY;
 
-    sk_atomic_end();
+    atomic_end();
 
     return result;
 }

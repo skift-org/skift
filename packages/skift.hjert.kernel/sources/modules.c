@@ -21,11 +21,11 @@ void load_module(multiboot_module_t *module)
 {
     if (strcmp("ramdisk", (char *)module->cmdline) == 0)
     {
-        ramdisk_load(module);
+        ramdiload(module);
     }
     else
     {
-        sk_log(LOG_WARNING, "Unknow module '%s'!", module->cmdline);
+        log(LOG_WARNING, "Unknow module '%s'!", module->cmdline);
     }
 }
 

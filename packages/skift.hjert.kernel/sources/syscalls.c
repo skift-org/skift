@@ -158,15 +158,6 @@ int sys_messaging_unsubscribe(const char *channel)
     return messaging_unsubscribe(channel);
 }
 
-/* --- System I/O ----------------------------------------------------------- */
-
-int sys_io_print(const char *msg)
-{
-    printf(msg);
-
-    return 0;
-}
-
 /* --- Filesystem and IO ---------------------------------------------------- */
 
 int sys_filesystem_open(const char *path, iostream_flag_t flags)
@@ -298,9 +289,6 @@ static int (*syscalls[])() =
         [SYS_MSG_PAYLOAD] = sys_messaging_payload,
         [SYS_MSG_SUBSCRIBE] = sys_messaging_subscribe,
         [SYS_MSG_UNSUBSCRIBE] = sys_messaging_unsubscribe,
-
-        [SYS_IO_PRINT] = sys_io_print,
-        [SYS_IO_READ] = sys_not_implemented /* NOT IMPLEMENTED */,
 
         [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
         [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,

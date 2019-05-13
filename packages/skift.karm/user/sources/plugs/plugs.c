@@ -5,7 +5,6 @@
 /* plugs.c: Plugs functions for using the skift Framework in the userspace.   */
 
 #include <skift/cstring.h>
-#include <skift/io.h>
 #include <skift/lock.h>
 #include <skift/process.h>
 #include <skift/logger.h>

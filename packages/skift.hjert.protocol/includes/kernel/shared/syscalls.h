@@ -44,11 +44,6 @@ typedef enum
     SYS_MSG_SUBSCRIBE,
     SYS_MSG_UNSUBSCRIBE,
 
-/* --- I/O ------------------------------------------------------------------ */
-    
-    SYS_IO_PRINT,
-    SYS_IO_READ,
-
 /* --- Filesystem ----------------------------------------------------------- */
 
     SYS_FILESYSTEM_OPEN,

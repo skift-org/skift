@@ -730,33 +730,37 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
 /* --- Current working directory -------------------------------------------- */
 
+path_t* process_cwd_resolve(process_t* this, const char* path_to_resolve)
+{
+    path_t *p = path(path_to_resolve);
+
+    if (path_is_relative(p))
+    {
+        lock_acquire(this->cwd_lock);
+
+        path_t *combined = path_combine(this->cwd_path, p);
+        path_delete(p);
+        p = combined;
+
+        lock_release(this->cwd_lock);
+    }
+
+    path_normalize(p);
+
+    return p;
+}
+
 bool process_set_cwd(process_t *this, const char *new_path)
 {
     log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
+    
+    path_t *work_path = process_cwd_resolve(this, new_path);
+    
     lock_acquire(this->cwd_lock);
-
-    path_t *work_path = path(new_path);
-
-    if (path_is_relative(work_path))
-    {
-        path_t *combined_path = path_combine(this->cwd_path, work_path);
-        path_delete(work_path);
-        work_path = combined_path;
-    }
-
-    path_normalize(work_path);
 
     fsnode_t *new_cwd = filesystem_acquire(NULL, work_path, false);
 
-    if (new_cwd == NULL)
-    {
-        goto file_not_found;
-    }
-    else if (fsnode_to_iostream_type(new_cwd->type) != IOSTREAM_TYPE_DIRECTORY)
-    {
-        goto file_not_directory;
-    }
-    else
+    if (new_cwd != NULL && fsnode_to_iostream_type(new_cwd->type) == IOSTREAM_TYPE_DIRECTORY)
     {
         // Cleanup the old path
         path_delete(this->cwd_path);
@@ -770,15 +774,18 @@ bool process_set_cwd(process_t *this, const char *new_path)
 
         return true;
     }
+    else
+    {
+        if (new_cwd != NULL)
+        {
+            filesystem_release(new_cwd);
+        }
 
-file_not_directory:
-    filesystem_release(new_cwd);
+        path_delete(work_path);
+        lock_release(this->cwd_lock);
 
-file_not_found:
-    path_delete(work_path);
-    lock_release(this->cwd_lock);
-
-    return false;
+        return false;
+    }
 }
 
 void process_get_cwd(process_t *this, char *buffer, uint size)
@@ -883,25 +890,15 @@ int process_filedescriptor_free_and_release(process_t *this, int fd_index)
     return -1;
 }
 
-/* Process file operations -------------------------------------------------- */
+/* --- Process file operations -------------------------------------------------- */
 
 int process_open_file(process_t *this, const char *file_path, iostream_flag_t flags)
 {
-    path_t *p = path(file_path);
+    path_t *p = process_cwd_resolve(this, file_path);
 
-    if (path_is_relative(p))
-    {
-        lock_acquire(this->cwd_lock);
-
-        path_t *combined = path_combine(this->cwd_path, p);
-        path_delete(p);
-        p = combined;
-
-        lock_release(this->cwd_lock);
-    }
-
-    path_normalize(p);
     stream_t *stream = filesystem_open(NULL, p, flags);
+
+    path_delete(p);
 
     if (stream == NULL)
     {
@@ -913,6 +910,10 @@ int process_open_file(process_t *this, const char *file_path, iostream_flag_t fl
     if (fd != -1)
     {
         process_filedescriptor_release(this, fd);
+    }
+    else
+    {
+        filesystem_close(stream);
     }
 
     return fd;
@@ -1394,7 +1395,7 @@ void sheduler_setup(thread_t *main_kernel_thread, process_t *kernel_process)
     thread_attach_to_process(&idle, kernel_process);
     thread_setready(&idle);
 
-    timer_set_frequency(1000);
+    timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
 }
 

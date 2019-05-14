@@ -33,7 +33,7 @@ int shell_builtin_exit(shell_t *shell, int argc, const char **argv)
     UNUSED(shell);
     UNUSED(argc);
     UNUSED(argv);
-    // FIXME: exit status
+
     shell->do_continue = false;
     if (argc == 2)
     {

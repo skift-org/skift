@@ -13,7 +13,7 @@ bool shell_eval(shell_t* this)
     if (builtin != NULL)
     {
         this->command_exit_value = builtin(this, this->command_argc, (const char**)this->command_argv);
-        return this->command_exit_value;
+        return true;
     }
 
     // Or exec a real command

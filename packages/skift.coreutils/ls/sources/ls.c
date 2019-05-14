@@ -108,6 +108,6 @@ int main(int argc, char **argv)
     }
     else
     {
-        return ls("/");
+        return ls(".");
     }
 }

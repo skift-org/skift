@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/__plugs__.h>
 #include <skift/cstring.h>
 
 #include <skift/iostream.h>
@@ -17,15 +18,15 @@
 
 static bool exited = false;
 
-int shell_readline(char* buffer, uint size)
+int shell_readline(char *buffer, uint size)
 {
     // FIXME: All user input should come from in_stream
     messaging_subscribe(KEYBOARD_CHANNEL);
 
-    int i = 0;    
+    int i = 0;
     buffer[i] = '\0';
 
-    while(true)
+    while (true)
     {
         message_t msg;
         messaging_receive(&msg, 1);
@@ -66,21 +67,22 @@ int shell_readline(char* buffer, uint size)
     return strlen(buffer);
 }
 
-char** shell_split(char* command)
+char **shell_split(char *command)
 {
     strleadtrim(command, ' ');
     strtrailtrim(command, ' ');
 
-    if (strlen(command) == 0) return NULL;
+    if (strlen(command) == 0)
+        return NULL;
 
     int token_index = 0;
 
-    char** tokens = malloc(MAX_PROCESS_ARGV * sizeof(char*));
+    char **tokens = malloc(MAX_PROCESS_ARGV * sizeof(char *));
 
-    memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char*));
-    char* start = &command[0];
+    memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char *));
+    char *start = &command[0];
 
-    for(size_t i = 0; i < strlen(command) + 1; i++)
+    for (size_t i = 0; i < strlen(command) + 1; i++)
     {
         char c = command[i];
 
@@ -90,7 +92,7 @@ char** shell_split(char* command)
 
             if (buffer_len > 1)
             {
-                char* buffer = malloc(buffer_len);
+                char *buffer = malloc(buffer_len);
                 memcpy(buffer, start, buffer_len);
                 buffer[buffer_len - 1] = '\0';
 
@@ -102,15 +104,27 @@ char** shell_split(char* command)
     }
 
     tokens[token_index++] = NULL;
-    
+
     return tokens;
 }
 
-int shell_eval(const char** command)
+int shell_eval(const char **command)
 {
     int exitvalue = -1;
 
-    iostream_t* s = iostream_open(command[0], IOSTREAM_READ);
+    if (strcmp(command[0], "cd") == 0)
+    {
+        if (command[1] != NULL)
+        {
+            if (!__plug_process_set_workdir(command[1]))
+            {
+                printf("File '%s' not found!\n", command[1]);
+            }
+            return 0;
+        }
+    }
+
+    iostream_t *s = iostream_open(command[0], IOSTREAM_READ);
 
     int process = 0;
 
@@ -126,7 +140,7 @@ int shell_eval(const char** command)
 
         s = iostream_open(pathbuffer, IOSTREAM_READ);
 
-        if (s != NULL) 
+        if (s != NULL)
         {
             iostream_close(s);
             process = process_exec(pathbuffer, command);
@@ -165,20 +179,24 @@ int main(int argc, char **argv)
             printf("\033[0;1;31m%d", exitvalue);
         }
 
+        // Display the prompt
+        char buffer[1024];
+        __plug_process_get_workdir(buffer, 1024);
+        printf(" %s", buffer);
         printf(PROMPT);
-        
-        char** tokens;
+
+        char **tokens;
         char command[128];
-        
+
         if (shell_readline(command, 128) > 0 && (tokens = shell_split(command)) != NULL)
         {
-            exitvalue = shell_eval((const char**)tokens);
-            
-            for(int i = 0; i < MAX_PROCESS_ARGV; i++)
+            exitvalue = shell_eval((const char **)tokens);
+
+            for (int i = 0; i < MAX_PROCESS_ARGV; i++)
             {
                 free(tokens[i]);
             }
-            
+
             free(tokens);
         }
         else
@@ -186,9 +204,7 @@ int main(int argc, char **argv)
             printf("Empty command!\n");
         }
 
-
         printf("\033[0m");
-
     }
 
     return 0;

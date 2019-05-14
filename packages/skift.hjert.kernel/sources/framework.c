@@ -137,3 +137,17 @@ int __plug_iostream_fstat(int fd, iostream_stat_t *stat)
 {
     return process_fstat_file(sheduler_running_process(), fd, stat);
 }
+
+/* --- Threads -------------------------------------------------------------- */
+
+int __plug_thread_this(void)
+{
+    return sheduler_running_thread_id();
+}
+
+/* --- Processes ------------------------------------------------------------ */
+
+int __plug_process_this(void)
+{
+    return sheduler_running_process_id();
+}

@@ -2,6 +2,8 @@
 #include <skift/lock.h>
 
 #define OBJECT_MAGIC 0xBADF00CA
+#define GET_OBJECT_HEADER(__object) (((object_header_t*)(__object)) - 1) 
+
 typedef struct 
 {
     uint magic;
@@ -10,8 +12,6 @@ typedef struct
     uint size;
     object_dtor_t dtor;
 } object_header_t;
-
-#define GET_OBJECT_HEADER(__object) (((object_header_t*)(__object)) - 1) 
 
 object_t *object(uint size, object_dtor_t dtor)
 {

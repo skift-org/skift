@@ -79,3 +79,17 @@ int __plug_memalloc_free(void *memory, uint size)
 {
     return process_free((unsigned int)memory, size);
 }
+
+/* --- Threads -------------------------------------------------------------- */
+
+int __plug_thread_this(void)
+{
+    return __syscall(SYS_THREAD_SELF, 0, 0, 0, 0, 0);
+}
+
+/* --- Processes ------------------------------------------------------------ */
+
+int __plug_process_this(void)
+{
+    return __syscall(SYS_PROCESS_SELF, 0, 0, 0, 0, 0);
+}

@@ -76,12 +76,12 @@ struct liballoc_major
  */
 struct liballoc_minor
 {
-	struct liballoc_minor *prev;  ///< Linked list information.
-	struct liballoc_minor *next;  ///< Linked list information.
-	struct liballoc_major *block; ///< The owning block. A pointer to the major structure.
 	unsigned int magic;			  ///< A magic number to idenfity correctness.
 	unsigned int size;			  ///< The size of the memory allocated. Could be 1 byte or more.
 	unsigned int req_size;		  ///< The size of memory requested.
+	struct liballoc_minor *prev;  ///< Linked list information.
+	struct liballoc_minor *next;  ///< Linked list information.
+	struct liballoc_major *block; ///< The owning block. A pointer to the major structure.
 };
 
 static struct liballoc_major *l_memRoot = NULL; ///< The root memory block acquired from the system.
@@ -217,9 +217,9 @@ void *PREFIX(malloc)(size_t req_size)
 	{
 		l_warningCount += 1;
 
-		log(LOG_WARNING ,"alloc( 0 ) called from 0x%x\n", __builtin_return_address(0));
+		log(LOG_WARNING, "alloc( 0 ) called from 0x%x\n", __builtin_return_address(0));
 		__plug_memalloc_unlock();
-		
+
 		return PREFIX(malloc)(1);
 	}
 
@@ -556,21 +556,21 @@ void PREFIX(free)(void *ptr)
 		{
 			l_possibleOverruns += 1;
 			log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
-				   min->magic,
-				   LIBALLOC_MAGIC);
+				min->magic,
+				LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
 			log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.",
-				   ptr,
-				   __builtin_return_address(0));
+				ptr,
+				__builtin_return_address(0));
 		}
 		else
 		{
 			log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x",
-				   ptr,
-				   __builtin_return_address(0));
+				ptr,
+				__builtin_return_address(0));
 		}
 
 		// being lied to...

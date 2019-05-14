@@ -49,7 +49,7 @@ int __plug_iostream_tell(int fd, iostream_whence_t whence);
 
 int __plug_iostream_fstat(int fd, iostream_stat_t *stat);
 
-// File system -------------------------------------------------------------- //
+/* --- File system ---------------------------------------------------------- */
 
 int __plug_filesystem_link(const char* oldpath, const char* newpath);
 
@@ -57,8 +57,17 @@ int __plug_filesystem_unlink(const char* path);
 
 int __plug_filesystem_mkdir(const char* path);
 
-// System ------------------------------------------------------------------- //
+/* --- System --------------------------------------------------------------- */
 
 void __plug_system_get_info(system_info_t* info);
 
 void __plug_system_get_status(system_status_t* status);
+
+
+/* --- Threads -------------------------------------------------------------- */
+
+int __plug_thread_this(void);
+
+/* --- Processes ------------------------------------------------------------ */
+
+int __plug_process_this(void);

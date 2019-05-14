@@ -82,6 +82,17 @@ int sys_process_free(uint addr, uint count)
     return 0;
 }
 
+int sys_process_set_cwd(const char* path)
+{
+    return process_set_cwd(sheduler_running_process(), path);
+}
+
+int sys_process_get_cwd(char* buffer, uint size)
+{
+    process_get_cwd(sheduler_running_process(), buffer, size);
+    return 0;
+}
+
 /* --- Threads -------------------------------------------------------------- */
 
 int sys_thread_self()
@@ -273,6 +284,8 @@ static int (*syscalls[])() =
         [SYS_PROCESS_UNMAP] = sys_process_unmap,
         [SYS_PROCESS_ALLOC] = sys_process_alloc,
         [SYS_PROCESS_FREE] = sys_process_free,
+        [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
+        [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
 
         [SYS_THREAD_SELF] = sys_thread_self,
         [SYS_THREAD_CREATE] = sys_thread_create,

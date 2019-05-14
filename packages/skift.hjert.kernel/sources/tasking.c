@@ -12,12 +12,12 @@
 #include "kernel/tasking.h"
 
 /* -------------------------------------------------------------------------- */
-/*   TASKING                                                                  */      
+/*   TASKING                                                                  */
 /* -------------------------------------------------------------------------- */
 
 static uint ticks = 0;
-static thread_t* running = NULL; 
-process_t* kernel_process;
+static thread_t *running = NULL;
+process_t *kernel_process;
 THREAD kernel_thread;
 
 void tasking_setup()
@@ -35,7 +35,7 @@ void tasking_setup()
 }
 
 /* -------------------------------------------------------------------------- */
-/*   THREADS                                                                  */      
+/*   THREADS                                                                  */
 /* -------------------------------------------------------------------------- */
 
 static int TID = 1;
@@ -95,7 +95,7 @@ void thread_delete(thread_t *thread)
     free(thread);
 }
 
-list_t* thread_bystate(thread_state_t state)
+list_t *thread_bystate(thread_state_t state)
 {
     return threads_bystates[state];
 }
@@ -122,7 +122,7 @@ int thread_count(void)
     return result;
 }
 
-THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry, const char **argv)
+THREAD thread_create_mainthread(process_t *parent_process, thread_entry_t entry, const char **argv)
 {
     log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", parent_process->id, entry);
 
@@ -153,7 +153,7 @@ THREAD thread_create_mainthread(process_t* parent_process, thread_entry_t entry,
     return t->id;
 }
 
-THREAD thread_create(process_t* parent_process, thread_entry_t entry, void *arg, bool user)
+THREAD thread_create(process_t *parent_process, thread_entry_t entry, void *arg, bool user)
 {
     ASSERT_ATOMIC;
 
@@ -411,13 +411,13 @@ void thread_exit(int exitvalue)
 /* --- Thread dump ---------------------------------------------------------- */
 
 static char *THREAD_STATES[] =
-{
-    "RUNNING",
-    "SLEEP",
-    "WAIT(thread)",
-    "WAIT(process)",
-    "WAIT(message)",
-    "CANCELED",
+    {
+        "RUNNING",
+        "SLEEP",
+        "WAIT(thread)",
+        "WAIT(process)",
+        "WAIT(message)",
+        "CANCELED",
 };
 
 void thread_dump(thread_t *t)
@@ -426,7 +426,8 @@ void thread_dump(thread_t *t)
     printf("\n\t . Thread %d", t->id);
     printf("\n\t   State: %s", THREAD_STATES[t->state]);
     printf("\n\t   Process: %d %s", t->id, t->process->name);
-    printf("\n\t   User memory: "); memory_layout_dump(t->process->pdir, true);
+    printf("\n\t   User memory: ");
+    memory_layout_dump(t->process->pdir, true);
     printf("\n");
     atomic_end();
 }
@@ -434,7 +435,6 @@ void thread_dump(thread_t *t)
 void thread_panic_dump(void)
 {
     atomic_begin();
-
 
     printf("\n");
     printf("\n\tRunning thread %d", sheduler_running_thread_id());
@@ -447,12 +447,11 @@ void thread_panic_dump(void)
         thread_dump(t);
     }
 
-
     atomic_end();
 }
 
 /* -------------------------------------------------------------------------- */
-/*   PROCESSES                                                                */      
+/*   PROCESSES                                                                */
 /* -------------------------------------------------------------------------- */
 
 static int PID = 1;
@@ -481,6 +480,7 @@ process_t *process(const char *name, bool user)
     process->threads = list();
     process->inbox = list();
 
+    // Setup fildes
     lock_init(process->fds_lock);
     for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
     {
@@ -490,6 +490,25 @@ process_t *process(const char *name, bool user)
         lock_init(fd->lock);
     }
 
+    // Setup cwd.
+    process_t *parent = sheduler_running_process();
+
+    lock_init(process->cwd_lock);
+
+    if (parent != NULL)
+    {
+        parent->cwd_node->refcount++;
+        process->cwd_node = parent->cwd_node;
+        process->cwd_path = path_dup(parent->cwd_path);
+    }
+    else
+    {
+        path_t *p = path("/");
+        process->cwd_node = filesystem_acquire(NULL, p, false);
+        process->cwd_path = p;
+    }
+
+    // Setup virtual memnory
     if (user)
     {
         process->pdir = memory_alloc_pdir();
@@ -517,7 +536,7 @@ void process_delete(process_t *this)
 
     assert(!list_any(this->threads));
     list_delete(this->threads, LIST_KEEP_VALUES);
-    
+
     assert(!list_any(this->inbox));
     list_delete(this->inbox, LIST_KEEP_VALUES);
 
@@ -554,7 +573,7 @@ int process_count(void)
 
 /* --- Process exit and canceling ------------------------------------------- */
 
-bool process_cancel(process_t* self, int exitvalue)
+bool process_cancel(process_t *self, int exitvalue)
 {
     atomic_begin();
 
@@ -601,7 +620,7 @@ bool process_cancel(process_t* self, int exitvalue)
 
 void process_exit(int exitvalue)
 {
-    process_t* self = sheduler_running_process();
+    process_t *self = sheduler_running_process();
 
     if (self != kernel_process)
     {
@@ -619,7 +638,7 @@ void process_exit(int exitvalue)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(process_t *process, iostream_t* s, elf_program_t* program)
+void load_elfseg(process_t *process, iostream_t *s, elf_program_t *program)
 {
     log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
@@ -635,7 +654,7 @@ void load_elfseg(process_t *process, iostream_t* s, elf_program_t* program)
         memset((void *)program->vaddr, 0, program->memsz);
 
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
-        iostream_read(s, (void*)program->vaddr, program->filesz);
+        iostream_read(s, (void *)program->vaddr, program->filesz);
 
         paging_load_directorie(pdir);
 
@@ -684,14 +703,14 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     // Create the process and load the executable.
     atomic_begin();
 
-    process_t* new_process = process(executable_path, true);
+    process_t *new_process = process(executable_path, true);
     int new_process_id = new_process->id;
 
     elf_program_t program;
 
     for (int i = 0; i < elf_header.phnum; i++)
     {
-        iostream_seek(s, elf_header.phoff + (elf_header.phentsize*i), IOSTREAM_WHENCE_START);
+        iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
         iostream_read(s, &program, sizeof(elf_program_t));
 
         load_elfseg(new_process, s, &program);
@@ -704,26 +723,88 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     log(LOG_DEBUG, "Process created, back to caller..");
 
     atomic_end();
-    
+
     iostream_close(s);
     return new_process_id;
 }
 
+/* --- Current working directory -------------------------------------------- */
+
+bool process_set_cwd(process_t *this, const char *new_path)
+{
+    log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
+    lock_acquire(this->cwd_lock);
+
+    path_t *work_path = path(new_path);
+
+    if (path_is_relative(work_path))
+    {
+        path_t *combined_path = path_combine(this->cwd_path, work_path);
+        path_delete(work_path);
+        work_path = combined_path;
+    }
+
+    path_normalize(work_path);
+
+    fsnode_t *new_cwd = filesystem_acquire(NULL, work_path, false);
+
+    if (new_cwd == NULL)
+    {
+        goto file_not_found;
+    }
+    else if (fsnode_to_iostream_type(new_cwd->type) != IOSTREAM_TYPE_DIRECTORY)
+    {
+        goto file_not_directory;
+    }
+    else
+    {
+        // Cleanup the old path
+        path_delete(this->cwd_path);
+        filesystem_release(this->cwd_node);
+
+        // Set the new path
+        this->cwd_node = new_cwd;
+        this->cwd_path = work_path;
+
+        lock_release(this->cwd_lock);
+
+        return true;
+    }
+
+file_not_directory:
+    filesystem_release(new_cwd);
+
+file_not_found:
+    path_delete(work_path);
+    lock_release(this->cwd_lock);
+
+    return false;
+}
+
+void process_get_cwd(process_t *this, char *buffer, uint size)
+{
+    lock_acquire(this->cwd_lock);
+
+    path_to_cstring(this->cwd_path, buffer, size);
+
+    lock_release(this->cwd_lock);
+}
+
 /* File descriptor allocation and locking ----------------------------------- */
 
-void process_filedescriptor_close_all(process_t* this)
+void process_filedescriptor_close_all(process_t *this)
 {
-    for(int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
     {
         process_close_file(this, i);
     }
 }
 
-int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream) 
+int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream)
 {
     lock_acquire(this->fds_lock);
 
-    for(int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
     {
         process_filedescriptor_t *fd = &this->fds[i];
 
@@ -740,14 +821,14 @@ int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream)
             return i;
         }
     }
-    
+
     lock_release(this->fds_lock);
     log(LOG_WARNING, "We run out of file descriptor on process %d'%s'", this->id, this->name);
 
     return -1;
 }
 
-stream_t *process_filedescriptor_acquire(process_t *this, int fd_index) 
+stream_t *process_filedescriptor_acquire(process_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
@@ -765,7 +846,7 @@ stream_t *process_filedescriptor_acquire(process_t *this, int fd_index)
     return NULL;
 }
 
-int process_filedescriptor_release(process_t *this, int fd_index) 
+int process_filedescriptor_release(process_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
@@ -781,7 +862,7 @@ int process_filedescriptor_release(process_t *this, int fd_index)
     return -1;
 }
 
-int process_filedescriptor_free_and_release(process_t *this, int fd_index) 
+int process_filedescriptor_free_and_release(process_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
@@ -804,9 +885,21 @@ int process_filedescriptor_free_and_release(process_t *this, int fd_index)
 
 /* Process file operations -------------------------------------------------- */
 
-int process_open_file(process_t* this, const char *file_path, iostream_flag_t flags)
+int process_open_file(process_t *this, const char *file_path, iostream_flag_t flags)
 {
     path_t *p = path(file_path);
+
+    if (path_is_relative(p))
+    {
+        lock_acquire(this->cwd_lock);
+
+        path_t *combined = path_combine(this->cwd_path, p);
+        path_delete(p);
+        p = combined;
+
+        lock_release(this->cwd_lock);
+    }
+
     path_normalize(p);
     stream_t *stream = filesystem_open(NULL, p, flags);
 
@@ -821,11 +914,11 @@ int process_open_file(process_t* this, const char *file_path, iostream_flag_t fl
     {
         process_filedescriptor_release(this, fd);
     }
-    
+
     return fd;
 }
 
-int process_close_file(process_t* this, int fd)
+int process_close_file(process_t *this, int fd)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -841,7 +934,7 @@ int process_close_file(process_t* this, int fd)
     return 0;
 }
 
-int process_read_file(process_t* this, int fd, void *buffer, uint size)
+int process_read_file(process_t *this, int fd, void *buffer, uint size)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -857,7 +950,7 @@ int process_read_file(process_t* this, int fd, void *buffer, uint size)
     return result;
 }
 
-int process_write_file(process_t* this, int fd, const void *buffer, uint size)
+int process_write_file(process_t *this, int fd, const void *buffer, uint size)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -873,7 +966,7 @@ int process_write_file(process_t* this, int fd, const void *buffer, uint size)
     return result;
 }
 
-int process_ioctl_file(process_t* this, int fd, int request, void *args)
+int process_ioctl_file(process_t *this, int fd, int request, void *args)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -889,7 +982,7 @@ int process_ioctl_file(process_t* this, int fd, int request, void *args)
     return result;
 }
 
-int process_seek_file(process_t* this, int fd, int offset, iostream_whence_t whence)
+int process_seek_file(process_t *this, int fd, int offset, iostream_whence_t whence)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -905,7 +998,7 @@ int process_seek_file(process_t* this, int fd, int offset, iostream_whence_t whe
     return result;
 }
 
-int process_tell_file(process_t* this, int fd, iostream_whence_t whence)
+int process_tell_file(process_t *this, int fd, iostream_whence_t whence)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -921,7 +1014,7 @@ int process_tell_file(process_t* this, int fd, iostream_whence_t whence)
     return result;
 }
 
-int process_fstat_file(process_t* this, int fd, iostream_stat_t *stat)
+int process_fstat_file(process_t *this, int fd, iostream_stat_t *stat)
 {
     stream_t *stream = process_filedescriptor_acquire(this, fd);
 
@@ -939,31 +1032,31 @@ int process_fstat_file(process_t* this, int fd, iostream_stat_t *stat)
 
 /* --- Process Memory managment --------------------------------------------- */
 
-int process_memory_map(process_t* p, uint addr, uint count)
+int process_memory_map(process_t *p, uint addr, uint count)
 {
     return memory_map(p->pdir, addr, count, 1);
 }
 
-int process_memory_unmap(process_t* p, uint addr, uint count)
+int process_memory_unmap(process_t *p, uint addr, uint count)
 {
     return memory_unmap(p->pdir, addr, count);
 }
 
-uint process_memory_alloc(process_t* p, uint count)
+uint process_memory_alloc(process_t *p, uint count)
 {
     uint addr = memory_alloc(p->pdir, count, 1);
     log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
-void process_memory_free(process_t* p, uint addr, uint count)
+void process_memory_free(process_t *p, uint addr, uint count)
 {
     log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
     return memory_free(p->pdir, addr, count, 1);
 }
 
 /* -------------------------------------------------------------------------- */
-/*   MESSAGING                                                                */      
+/*   MESSAGING                                                                */
 /* -------------------------------------------------------------------------- */
 
 static int MID = 1;
@@ -1215,7 +1308,7 @@ int messaging_unsubscribe(const char *channel_name)
 }
 
 /* -------------------------------------------------------------------------- */
-/*   GARBAGE COLECTOR                                                         */      
+/*   GARBAGE COLECTOR                                                         */
 /* -------------------------------------------------------------------------- */
 
 void collect_and_free_thread(void)
@@ -1266,7 +1359,7 @@ void garbage_colector()
 }
 
 /* -------------------------------------------------------------------------- */
-/*   SHEDULER                                                                 */      
+/*   SHEDULER                                                                 */
 /* -------------------------------------------------------------------------- */
 
 static bool sheduler_context_switch = false;
@@ -1290,7 +1383,7 @@ void timer_set_frequency(int hz)
     log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(thread_t* main_kernel_thread, process_t* kernel_process)
+void sheduler_setup(thread_t *main_kernel_thread, process_t *kernel_process)
 {
     running = main_kernel_thread;
 
@@ -1329,7 +1422,7 @@ void wakeup_sleeping_threads(void)
 
 #include "kernel/dev/vga.h"
 
-static const char* animation = "|/-\\|/-\\";
+static const char *animation = "|/-\\|/-\\";
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
@@ -1367,7 +1460,8 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
 /* --- Sheduler info -------------------------------------------------------- */
 
-uint sheduler_get_ticks(void){
+uint sheduler_get_ticks(void)
+{
     return ticks;
 }
 
@@ -1383,7 +1477,7 @@ void sheduler_yield()
 
 /* --- Running thread info -------------------------------------------------- */
 
-process_t* sheduler_running_process(void)
+process_t *sheduler_running_process(void)
 {
     if (running != NULL)
     {
@@ -1407,7 +1501,7 @@ int sheduler_running_process_id(void)
     }
 }
 
-thread_t* sheduler_running_thread(void)
+thread_t *sheduler_running_thread(void)
 {
     return running;
 }

@@ -70,4 +70,6 @@ int __plug_thread_this(void);
 
 /* --- Processes ------------------------------------------------------------ */
 
-int __plug_process_this(void);
+int  __plug_process_this(void);
+bool __plug_process_set_workdir(const char* path);
+void __plug_process_get_workdir(const char* path, uint size);

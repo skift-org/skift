@@ -22,6 +22,9 @@ typedef enum
     SYS_PROCESS_UNMAP,
     SYS_PROCESS_ALLOC,
     SYS_PROCESS_FREE,
+    
+    SYS_PROCESS_GET_CWD,
+    SYS_PROCESS_SET_CWD,
 
     // Threads
     SYS_THREAD_SELF,

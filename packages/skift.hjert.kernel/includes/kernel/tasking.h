@@ -53,6 +53,10 @@ typedef struct s_process
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
 
+    lock_t cwd_lock;
+    fsnode_t* cwd_node;
+    path_t* cwd_path;
+
     int exitvalue;
 } process_t;
 
@@ -191,6 +195,10 @@ bool process_cancel(process_t* self, int exitvalue);
 void process_exit(int exitvalue);
 
 PROCESS process_exec(const char *executable_path, const char **argv);
+
+bool process_set_cwd(process_t* this, const char* new_wd);
+
+void process_get_cwd(process_t* this, char* buffer, uint size);
 
 void process_filedescriptor_close_all(process_t* this);
 

@@ -49,4 +49,6 @@ path_t* path_split_at(path_t* path, int index);
 // Duplicate a path
 path_t* path_dup(path_t*path);
 
+void path_to_cstring(path_t* this, char* buffer, uint size);
+
 void path_dump(path_t* p);

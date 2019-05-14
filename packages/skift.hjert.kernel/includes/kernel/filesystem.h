@@ -129,6 +129,8 @@ typedef struct s_stream
     };
 } stream_t;
 
+iostream_type_t fsnode_to_iostream_type(fsnode_type_t type);
+
 void filesystem_setup(void);
 void filesystem_panic_dump(void);
 

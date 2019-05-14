@@ -27,7 +27,7 @@ void __plug_init(void)
     in_stream = NULL; // FIXME: no stdin,
     out_stream = iostream_open("/dev/console", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     err_stream = iostream_open("/dev/console", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
-    log_stream = iostream_open("/dev/serial",  IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
+    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
 }
 
 void __plug_fini(int exit_code)
@@ -92,4 +92,14 @@ int __plug_thread_this(void)
 int __plug_process_this(void)
 {
     return __syscall(SYS_PROCESS_SELF, 0, 0, 0, 0, 0);
+}
+
+bool __plug_process_set_workdir(const char *path)
+{
+    return __syscall(SYS_PROCESS_SET_CWD, (int)path, 0, 0, 0, 0);
+}
+
+void __plug_process_get_workdir(const char *path, uint size)
+{
+    __syscall(SYS_PROCESS_GET_CWD, (int)path, size, 0, 0, 0);
 }

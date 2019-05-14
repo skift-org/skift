@@ -35,12 +35,14 @@ int main(int argc, char **argv)
 
     logger_setlevel(LOG_ALL);
 
-    printf("Welcome to \033[1;34mskiftOS\033[0m!\n\n");
+    printf("Welcome to \033[1;34mskiftOS\033[0m!\n");
     iostream_flush(out_stream);
 
     int shell = init_exec("/bin/sh");
     
     thread_wait_process(shell, NULL);
+
+    printf("\n\e[1;34mGoodbye!");
 
     return 0;
 }

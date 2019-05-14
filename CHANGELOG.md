@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
  - More witty comments to the kerne panic screen
  - Command line argument parser to framework
+ - Path manipulation and parsing to framework
  - `all, color, list` and `help` options to `ls`
  - `filesystem_ioctl` juste for device file, but WIP
  - `filesystem_link` and `filesystem_unlink`
  - `skift/iostream.h` a stdio like library
  - `skift/launchpad.h` a process creation API inspired by the fushia project
+ - `cd` command to the shell
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal
@@ -26,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - #15 It was possible to create several files with the same name in the same directory
  - #16 Page fault when reading from a invalid file descriptor
  - Nested panic
+ - The memory was free'ing the wrong physical page when doing a `memory_free` or `memory_unmap`
 
 # v0.1.0 
  - Initial release

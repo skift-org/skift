@@ -41,6 +41,13 @@ typedef enum
     IOSTREAM_BUFFERED_WRITE = FLAG(6)
 } iostream_flag_t;
 
+typedef enum
+{
+    IOSTREAM_BUFFERED_LINE,
+    IOSTREAM_BUFFERED_BLOCK,
+    IOSTREAM_BUFFERED_NONE,
+} iostream_buffer_mode_t;
+
 typedef struct
 {
     uint size;
@@ -75,14 +82,17 @@ typedef struct s_iostream
     iostream_ioctl_t *ioctl;
     iostream_close_t *close;
 
+    iostream_buffer_mode_t read_mode;
     void *write_buffer;
-    uint write_used;
+    int write_used;
 
+    iostream_buffer_mode_t write_mode;
     void *read_buffer;
-    uint read_used;
+    int read_used;
+    int read_head;
 
     int fd;
-    void* p;
+    void *p;
 } iostream_t;
 
 extern iostream_t *in_stream;
@@ -94,11 +104,13 @@ iostream_t *iostream(iostream_flag_t flags);
 
 void iostream_delete(iostream_t *stream);
 
-
 iostream_t *iostream_open(const char *path, iostream_flag_t flags);
 
 void iostream_close(iostream_t *stream);
 
+void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode);
+
+void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode);
 
 int iostream_read(iostream_t *stream, void *buffer, uint size);
 
@@ -106,28 +118,23 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size);
 
 int iostream_flush(iostream_t *stream);
 
-
 int iostream_ioctl(iostream_t *stream, int request, void *arg);
 
 int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence);
 
 int iostream_tell(iostream_t *stream, iostream_whence_t whence);
 
-
 int iostream_fstat(iostream_t *stream, iostream_stat_t *stat);
 
-
-int iostream_puts(iostream_t* stream, const char* string);
+int iostream_puts(iostream_t *stream, const char *string);
 
 #define puts(__string) iostream_puts(out_stream, __string)
 
-int iostream_gets(iostream_t* stream, char* string, int n);
-
+int iostream_gets(iostream_t *stream, char *string, int n);
 
 int iostream_putchar(iostream_t *stream, int c);
 
 int iostream_getchar(iostream_t *stream);
-
 
 int iostream_printf(iostream_t *stream, const char *fmt, ...);
 

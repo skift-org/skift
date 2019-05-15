@@ -2,12 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
 #include <skift/__plugs__.h>
 #include <skift/__printf__.h>
-
-#include <skift/math.h>
+#include <skift/assert.h>
+#include <skift/cstring.h>
 #include <skift/iostream.h>
+#include <skift/math.h>
 
 // IO Stream constructor and destructor ------------------------------------- //
 
@@ -30,22 +30,26 @@ iostream_t *iostream(iostream_flag_t flags)
 
     if (flags & IOSTREAM_BUFFERED_WRITE)
     {
+        stream->write_mode = IOSTREAM_BUFFERED_LINE;
         stream->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
         stream->write_used = 0;
     }
     else
     {
+        stream->write_mode = IOSTREAM_BUFFERED_NONE;
         stream->write_buffer = NULL;
         stream->write_used = 0;
     }
 
     if (flags & IOSTREAM_BUFFERED_READ)
     {
+        stream->read_mode = IOSTREAM_BUFFERED_BLOCK;
         stream->read_buffer = malloc(IOSTREAM_BUFFER_SIZE);
         stream->read_used = 0;
     }
     else
     {
+        stream->read_mode = IOSTREAM_BUFFERED_NONE;
         stream->read_buffer = NULL;
         stream->read_used = 0;
     }
@@ -103,9 +107,23 @@ void iostream_close(iostream_t *stream)
     }
 }
 
+void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
+{
+    iostream_flush(this);
+    //FIXME: enable buffering if disabled
+    this->write_mode = mode;
+}
+
+void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
+{
+    iostream_flush(this);
+    //FIXME: enable buffering if disabled    
+    this->read_mode = mode;
+}
+
 // IO Stream generic io operation ------------------------------------------- //
 
-int iostream_read(iostream_t *stream, void *buffer, uint size)
+int iostream_read_no_buffered(iostream_t *stream, void *buffer, uint size)
 {
 
     if (stream->read != NULL)
@@ -121,7 +139,41 @@ int iostream_read(iostream_t *stream, void *buffer, uint size)
     return -1;
 }
 
-static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, uint size)
+int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
+{
+    
+
+    if (stream->read_head == 0)
+    {
+        if (iostream_fill(stream) == 0)
+        {
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+int iostream_read(iostream_t *stream, void *buffer, uint size)
+{
+    if (stream != NULL)
+    {
+        return iostream_read_buffered(stream, buffer, size);
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+int iostream_fill(iostream_t*stream)
+{
+    stream->read_used = iostream_read_no_buffered(stream, stream->read_buffer, IOSTREAM_BUFFER_SIZE);
+    stream->read_head = 0;
+    return stream->read_used;
+}
+
+static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, int size)
 {
     if (stream->write != NULL)
     {
@@ -136,8 +188,32 @@ static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, ui
     return -1;
 }
 
+static int iostream_write_linebuffered(iostream_t*  stream, const void* buffer, uint size)
+{
+    assert(stream->write_buffer != NULL);
+
+    for (uint i = 0; i < size; i++)
+    {
+        char c = ((char*)buffer)[i];
+
+        // Append to the buffer
+        ((char*)stream->write_buffer)[stream->write_used] = c;
+        stream->write_used++;
+
+        // Flush if this is a new line or the end of the buffer
+        if (c == '\n' || stream->write_used == IOSTREAM_BUFFER_SIZE)
+        {
+            iostream_flush(stream);
+        }
+    }
+
+    return size;
+}
+
 static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint size)
 {
+    assert(stream->write_buffer != NULL);    
+
     int data_left = size;
 
     char *data_to_write = (char *)buffer;
@@ -167,7 +243,11 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
-        if (stream->write_buffer != NULL)
+        if (stream->write_mode == IOSTREAM_BUFFERED_LINE)
+        {
+            return iostream_write_linebuffered(stream, buffer, size);
+        }
+        else if (stream->write_mode == IOSTREAM_BUFFERED_BLOCK)
         {
             return iostream_write_buffered(stream, buffer, size);
         }

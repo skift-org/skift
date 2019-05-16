@@ -267,7 +267,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
-        strncpy(current->name, entry->name, PATH_ELEMENT_LENGHT);
+        strlcpy(current->name, entry->name, PATH_ELEMENT_LENGHT);
         current->type = fsnode_to_iostream_type(entry->node->type);
 
         current++;
@@ -287,7 +287,7 @@ bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
     {
         fsdirectory_entry_t *entry = MALLOC(fsdirectory_entry_t);
 
-        strncpy(entry->name, name, PATH_ELEMENT_LENGHT);
+        strlcpy(entry->name, name, PATH_ELEMENT_LENGHT);
         child->refcount++;
         entry->node = child;
 

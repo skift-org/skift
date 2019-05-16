@@ -475,7 +475,7 @@ process_t *process(const char *name, bool user)
 
     process->id = PID++;
 
-    strncpy(process->name, name, MAX_PROCESS_NAMESIZE);
+    strlcpy(process->name, name, MAX_PROCESS_NAMESIZE);
     process->user = user;
     process->threads = list();
     process->inbox = list();
@@ -1070,7 +1070,7 @@ channel_t *channel(const char *name)
     channel_t *channel = MALLOC(channel_t);
 
     channel->subscribers = list();
-    strncpy(channel->name, name, CHANNAME_SIZE);
+    strlcpy(channel->name, name, CHANNAME_SIZE);
 
     return channel;
 }
@@ -1114,7 +1114,7 @@ message_t *message(int id, const char *label, void *payload, uint size, uint fla
 
     message->id = id;
     message->flags = flags;
-    strncpy(message->label, label, MSGLABEL_SIZE);
+    strlcpy(message->label, label, MSGLABEL_SIZE);
 
     return message;
 }

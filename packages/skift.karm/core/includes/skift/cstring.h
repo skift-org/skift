@@ -8,12 +8,12 @@
 
 // NOT STANDART
 // string to uint
-unsigned int stoi(const char * str, unsigned char base);
+unsigned int stoi(const char *str, unsigned char base);
 
 // uint to string
 void itos(unsigned int value, char *buffer, unsigned char base);
 
-void strnapd(char * str, char c, size_t n);
+void strnapd(char *str, char c, size_t n);
 void strapd(char *str, char c);
 void strbs(char *str);
 void strrvs(char *str);
@@ -32,6 +32,7 @@ void *memset(void *str, int c, size_t n);
 
 char *strcat(char *dest, const char *src);
 char *strncat(char *dest, const char *src, size_t n);
+size_t strlcat(char *dst, const char *src, size_t maxlen);
 
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
@@ -41,8 +42,9 @@ size_t strnlen(const char *s, size_t maxlen);
 
 char *strcpy(char *dest, const char *src);
 char *strncpy(char *dest, const char *src, size_t n);
+size_t strlcpy(char *dst, const char *src, size_t maxlen);
 
-char* strdup(const char* s);
+char *strdup(const char *s);
 char *strchr(const char *str, int c);
 int strcoll(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);

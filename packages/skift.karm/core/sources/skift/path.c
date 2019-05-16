@@ -25,7 +25,7 @@ path_t *path(const char *raw_path)
             {
                 char *element = malloc(lenght + 1);
                 element[lenght] = '\0';
-                strncpy(element, begin, lenght);
+                strlcpy(element, begin, lenght);
                 list_pushback(p->elements, element);
             }
 
@@ -214,7 +214,7 @@ void path_to_cstring(path_t *this, char *buffer, uint size)
 
     if (path_length(this) == 0)
     {
-        strncpy(buffer, "/", size);
+        strlcpy(buffer, "/", size);
     }
     else
     {

@@ -19,7 +19,7 @@ void string_printf_append(printf_info_t *info, char c)
     }
     else
     {
-        strnapd((char*)info->p, c, info->lenght);
+        strnapd((char *)info->p, c, info->lenght);
     }
 }
 
@@ -38,13 +38,13 @@ int sprintf(char *s, int n, const char *fmt, ...)
 int vsprintf(char *s, int n, const char *fmt, va_list va)
 {
 
-    if (n == 0) return 0;
+    if (n == 0)
+        return 0;
 
-    printf_info_t info = (printf_info_t)
-    {
+    printf_info_t info = (printf_info_t){
         .format = fmt,
         .append = string_printf_append,
-        .p = (char*)s,
+        .p = (char *)s,
         .max_n = n,
     };
 
@@ -108,27 +108,27 @@ void *memmove(void *dest, const void *src, size_t n)
 
 void *memcpy(void *s1, const void *s2, size_t n)
 {
-	char *cdest;
-	char *csrc;
-	unsigned int *ldest = (unsigned int *)s1;
-	unsigned int *lsrc = (unsigned int *)s2;
+    char *cdest;
+    char *csrc;
+    unsigned int *ldest = (unsigned int *)s1;
+    unsigned int *lsrc = (unsigned int *)s2;
 
-	while (n >= sizeof(unsigned int))
-	{
-		*ldest++ = *lsrc++;
-		n -= sizeof(unsigned int);
-	}
+    while (n >= sizeof(unsigned int))
+    {
+        *ldest++ = *lsrc++;
+        n -= sizeof(unsigned int);
+    }
 
-	cdest = (char *)ldest;
-	csrc = (char *)lsrc;
+    cdest = (char *)ldest;
+    csrc = (char *)lsrc;
 
-	while (n > 0)
-	{
-		*cdest++ = *csrc++;
-		n -= 1;
-	}
+    while (n > 0)
+    {
+        *cdest++ = *csrc++;
+        n -= 1;
+    }
 
-	return s1;
+    return s1;
 }
 
 void *memset(void *str, int c, size_t n)
@@ -176,6 +176,24 @@ char *strncat(char *s1, const char *s2, size_t n)
     s1[ss] = '\0';
     memcpy(s1, s2, ss);
     return s;
+}
+
+size_t strlcat(char *dst, const char *src, size_t maxlen)
+{
+    const size_t srclen = strlen(src);
+    const size_t dstlen = strnlen(dst, maxlen);
+    if (dstlen == maxlen)
+        return maxlen + srclen;
+    if (srclen < maxlen - dstlen)
+    {
+        memcpy(dst + dstlen, src, srclen + 1);
+    }
+    else
+    {
+        memcpy(dst + dstlen, src, maxlen - 1);
+        dst[dstlen + maxlen - 1] = '\0';
+    }
+    return dstlen + srclen;
 }
 
 char *strchr(const char *p, int ch)
@@ -245,6 +263,21 @@ char *strncpy(char *s1, const char *s2, size_t n)
     if (size != n)
         memset(s1 + size, '\0', n - size);
     return memcpy(s1, s2, size);
+}
+
+size_t strlcpy(char *dst, const char *src, size_t maxlen)
+{
+    const size_t srclen = strlen(src);
+    if (srclen + 1 < maxlen)
+    {
+        memcpy(dst, src, srclen + 1);
+    }
+    else if (maxlen != 0)
+    {
+        memcpy(dst, src, maxlen - 1);
+        dst[maxlen - 1] = '\0';
+    }
+    return srclen;
 }
 
 size_t strcspn(const char *string, const char *chars)
@@ -382,12 +415,12 @@ void strbs(char *str)
 
 void strnapd(char *str, char c, size_t n)
 {
-    for(uint i = 0; i < (n - 1); i++)
+    for (uint i = 0; i < (n - 1); i++)
     {
         if (str[i] == '\0')
         {
             str[i] = c;
-            str[i+1]='\0';
+            str[i + 1] = '\0';
             return;
         }
     }
@@ -424,15 +457,15 @@ void strtrailtrim(char *str, char c)
     end[1] = '\0';
 }
 
-char* strdup(const char* s)
+char *strdup(const char *s)
 {
     int lenght = strlen(s) + 1;
-    char* new = malloc(lenght);
+    char *new = malloc(lenght);
 
     if (new != NULL)
     {
         memcpy(new, s, lenght);
     }
-    
+
     return new;
 }

@@ -242,7 +242,7 @@ int sys_filesystem_unlink(const char *link_path)
 
 int sys_system_get_info(system_info_t* info)
 {
-    strncpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
+    strlcpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
     
     sprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE, 
             __kernel_version_format, 
@@ -252,10 +252,10 @@ int sys_system_get_info(system_info_t* info)
             __kernel_version_patch, 
             __kernel_version_codename);
     
-    strncpy(info->system_name, "skift", SYSTEM_INFO_FIELD_SIZE);
+    strlcpy(info->system_name, "skift", SYSTEM_INFO_FIELD_SIZE);
 
     // FIXME: this should not be hard coded.
-    strncpy(info->machine, "machine", SYSTEM_INFO_FIELD_SIZE);
+    strlcpy(info->machine, "machine", SYSTEM_INFO_FIELD_SIZE);
 
     return 0;
 }

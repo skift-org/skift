@@ -96,13 +96,13 @@ void iostream_close(iostream_t *stream)
         if (stream->close != NULL)
         {
             stream->close(stream);
-            return; 
+            return;
         }
 
         if (stream->fd != -1)
         {
             __plug_iostream_close(stream->fd);
-            return; 
+            return;
         }
     }
 }
@@ -117,7 +117,7 @@ void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode
 void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
 {
     iostream_flush(this);
-    //FIXME: enable buffering if disabled    
+    //FIXME: enable buffering if disabled
     this->read_mode = mode;
 }
 
@@ -125,52 +125,76 @@ void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mod
 
 int iostream_read_no_buffered(iostream_t *stream, void *buffer, uint size)
 {
-
     if (stream->read != NULL)
     {
         return stream->read(stream, buffer, size);
     }
-
-    if (stream->fd != -1)
+    else if (stream->fd != -1)
     {
         return __plug_iostream_read(stream->fd, buffer, size);
     }
+    else
+    {
+        return -1;
+    }
+}
 
-    return -1;
+int iostream_fill(iostream_t *stream)
+{
+    stream->read_used = iostream_read_no_buffered(stream, stream->read_buffer, IOSTREAM_BUFFER_SIZE);
+    stream->read_head = 0;
+    return stream->read_used;
 }
 
 int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
 {
-    
+    uint data_left = size;
+    char* data_to_read = (char*)buffer;
 
-    if (stream->read_head == 0)
+    while (data_left != 0)
     {
-        if (iostream_fill(stream) == 0)
+        // Fill the buffer with data
+        if (stream->read_head == stream->read_used)
         {
-            return 0;
+            if (iostream_fill(stream) == 0)
+            {
+                // Look like we have no more data to read
+                return size - data_left;
+            }
         }
-    }
 
-    return -1;
+        // How many data can we copy from the buffer
+        uint used_space = stream->read_used - stream->read_head;
+        uint data_added = min(used_space, data_left);
+
+        // Copy the data from the buffer
+        memcpy(data_to_read, ((char*)stream->read_buffer) + stream->read_head, data_added);
+        
+        // 
+        data_left -= data_added;
+        stream->read_head += data_added;
+    }
+    
+    return size - data_left;
 }
 
 int iostream_read(iostream_t *stream, void *buffer, uint size)
 {
     if (stream != NULL)
     {
-        return iostream_read_buffered(stream, buffer, size);
+        if (stream->write_mode == IOSTREAM_BUFFERED_NONE)
+        {
+            return iostream_read_no_buffered(stream, buffer, size);
+        }
+        else
+        {
+            return iostream_read_buffered(stream, buffer, size);
+        }
     }
     else
     {
-        return NULL;
+        return -1;
     }
-}
-
-int iostream_fill(iostream_t*stream)
-{
-    stream->read_used = iostream_read_no_buffered(stream, stream->read_buffer, IOSTREAM_BUFFER_SIZE);
-    stream->read_head = 0;
-    return stream->read_used;
 }
 
 static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, int size)
@@ -179,25 +203,44 @@ static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, in
     {
         return stream->write(stream, buffer, size);
     }
-
-    if (stream->fd != -1)
+    else if (stream->fd != -1)
     {
         return __plug_iostream_write(stream->fd, buffer, size);
     }
-
-    return -1;
+    else
+    {
+        return -1;
+    }
 }
 
-static int iostream_write_linebuffered(iostream_t*  stream, const void* buffer, uint size)
+int iostream_flush(iostream_t *stream)
+{
+    if (stream != NULL)
+    {
+        if (stream->write_buffer != NULL)
+        {
+            iostream_write_no_buffered(stream, stream->write_buffer, stream->write_used);
+            stream->write_used = 0;
+        }
+
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+static int iostream_write_linebuffered(iostream_t *stream, const void *buffer, uint size)
 {
     assert(stream->write_buffer != NULL);
 
     for (uint i = 0; i < size; i++)
     {
-        char c = ((char*)buffer)[i];
+        char c = ((char *)buffer)[i];
 
         // Append to the buffer
-        ((char*)stream->write_buffer)[stream->write_used] = c;
+        ((char *)stream->write_buffer)[stream->write_used] = c;
         stream->write_used++;
 
         // Flush if this is a new line or the end of the buffer
@@ -212,7 +255,7 @@ static int iostream_write_linebuffered(iostream_t*  stream, const void* buffer, 
 
 static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint size)
 {
-    assert(stream->write_buffer != NULL);    
+    assert(stream->write_buffer != NULL);
 
     int data_left = size;
 
@@ -224,6 +267,7 @@ static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint 
         int free_space = IOSTREAM_BUFFER_SIZE - stream->write_used;
         int data_added = min(free_space, data_left);
 
+        // Copy the data to the buffer
         memcpy(((char *)(stream->write_buffer)) + stream->write_used, data_to_write, data_added);
         stream->write_used += data_added;
         data_left -= data_added;
@@ -243,36 +287,25 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
-        if (stream->write_mode == IOSTREAM_BUFFERED_LINE)
+        if (stream->write_mode != IOSTREAM_BUFFERED_NONE && stream->write_buffer != NULL)
         {
-            return iostream_write_linebuffered(stream, buffer, size);
-        }
-        else if (stream->write_mode == IOSTREAM_BUFFERED_BLOCK)
-        {
-            return iostream_write_buffered(stream, buffer, size);
+            if (stream->write_mode == IOSTREAM_BUFFERED_LINE)
+            {
+                return iostream_write_linebuffered(stream, buffer, size);
+            }
+            else if (stream->write_mode == IOSTREAM_BUFFERED_BLOCK)
+            {
+                return iostream_write_buffered(stream, buffer, size);
+            }
+            else
+            {
+                return iostream_write_no_buffered(stream, buffer, size);
+            }
         }
         else
         {
             return iostream_write_no_buffered(stream, buffer, size);
         }
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-int iostream_flush(iostream_t *stream)
-{
-    if (stream != NULL)
-    {
-        if (stream->write_buffer != NULL)
-        {
-            iostream_write_no_buffered(stream, stream->write_buffer, stream->write_used);
-            stream->write_used = 0;
-        }
-
-        return 0;
     }
     else
     {
@@ -378,24 +411,24 @@ int iostream_getchar(iostream_t *stream)
     }
 }
 
-int iostream_puts(iostream_t* stream, const char* string)
+int iostream_puts(iostream_t *stream, const char *string)
 {
     return iostream_write(stream, string, strlen(string));
 }
 
 // int iostream_gets(iostream_t* stream, char* string, int n)
 // {
-// 
+//
 //     return 0;
 // }
 
 void iostream_printf_append(printf_info_t *info, char c)
 {
-    iostream_t* stream = info->p;
+    iostream_t *stream = info->p;
     iostream_write(stream, &c, 1);
 }
 
-int iostream_printf(iostream_t* stream, const char* fmt, ...)
+int iostream_printf(iostream_t *stream, const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -407,14 +440,13 @@ int iostream_printf(iostream_t* stream, const char* fmt, ...)
     return result;
 }
 
-int iostream_vprintf(iostream_t* stream, const char* fmt, va_list va)
+int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
 {
 
-    printf_info_t info = (printf_info_t)
-    {
+    printf_info_t info = (printf_info_t){
         .format = fmt,
         .append = iostream_printf_append,
-        .p = (void*)stream,
+        .p = (void *)stream,
         .max_n = -1,
     };
 

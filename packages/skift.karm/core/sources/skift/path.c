@@ -19,12 +19,11 @@ path_t *path(const char *raw_path)
     {
         if (raw_path[i] == '/' || raw_path[i] == '\0')
         {
-            int lenght = &raw_path[i] - begin;
+            int lenght = (&raw_path[i] - begin) + 1;
 
-            if (lenght > 0)
+            if (lenght > 1) // 1 for the null terminator
             {
-                char *element = malloc(lenght + 1);
-                element[lenght] = '\0';
+                char *element = malloc(lenght);
                 strlcpy(element, begin, lenght);
                 list_pushback(p->elements, element);
             }

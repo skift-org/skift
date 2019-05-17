@@ -28,22 +28,36 @@ void ringbuffer_delete(ringbuffer_t *rb)
 
 int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size)
 {
-    UNUSED(rb);
-    UNUSED(buffer);
-    UNUSED(size);
+    int chr;
+    uint offset = 0;
 
-    // TODO
-    return -1;
+    do 
+    {
+        chr = ringbuffer_getc(rb);
+        if (chr != -1)
+        {
+            ((char*)buffer)[offset] = (char)chr;
+            offset++;
+        }
+    }
+    while(chr != -1 && offset < size);
+
+    return offset;
 }
 
 int ringbuffer_write(ringbuffer_t *rb, const void* buffer, uint size)
 {
-    UNUSED(rb);
-    UNUSED(buffer);
-    UNUSED(size);
+    int chr;
+    uint offset = 0;
 
-    // TODO
-    return -1;    
+    do 
+    {
+        chr = ringbuffer_putc(rb, ((char*)buffer)[offset]);
+        offset++;
+    }
+    while(chr != -1 && offset < size);
+
+    return offset;  
 }
 
 int ringbuffer_putc(ringbuffer_t *rb, int c)

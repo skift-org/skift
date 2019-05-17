@@ -228,6 +228,34 @@ void file_stat(fsnode_t *node, iostream_stat_t *stat)
     lock_release(node->lock);
 }
 
+/* --- Fifo ----------------------------------------------------------------- */
+
+int fifo_read(stream_t *stream, void *buffer, uint size)
+{
+    fifo_t* fifo = &stream->node->fifo;
+
+    lock_acquire(fifo->buffer_lock);
+    
+    int result = ringbuffer_read(fifo->buffer, buffer, size);
+        
+    lock_release(fifo->buffer_lock);
+
+    return result;
+}
+
+int fifo_write(stream_t *stream, const void *buffer, uint size)
+{
+    fifo_t* fifo = &stream->node->fifo;
+
+    lock_acquire(fifo->buffer_lock);
+    
+    int result = ringbuffer_write(fifo->buffer, buffer, size);
+        
+    lock_release(fifo->buffer_lock);
+
+    return result;
+}
+
 /* --- Directories ---------------------------------------------------------- */
 
 // only call this method if you hold the directory lock.
@@ -644,7 +672,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 
             case FSNODE_FIFO:
             {
-                result = ringbuffer_read(s->node->fifo.buffer, buffer, size);
+                result = fifo_read(s, buffer, size);
 
                 break;
             }
@@ -695,7 +723,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
 
             case FSNODE_FIFO:
             {
-                result = ringbuffer_write(s->node->fifo.buffer, buffer, size);
+                result = fifo_write(s, buffer, size);
 
                 break;
             }

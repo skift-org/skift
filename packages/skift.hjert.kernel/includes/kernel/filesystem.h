@@ -84,6 +84,7 @@ typedef struct
 
 typedef struct
 {
+    lock_t buffer_lock;
     ringbuffer_t *buffer;
 } fifo_t;
 

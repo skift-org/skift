@@ -149,6 +149,8 @@ stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags);
 
 void filesystem_close(stream_t *s);
 
+stream_t* filesystem_dup(stream_t* s);
+
 int filesystem_read(stream_t *s, void *buffer, uint size);
 
 int filesystem_write(stream_t *s, const void *buffer, uint size);

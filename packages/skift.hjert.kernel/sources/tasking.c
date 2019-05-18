@@ -797,7 +797,7 @@ void process_get_cwd(process_t *this, char *buffer, uint size)
     lock_release(this->cwd_lock);
 }
 
-/* File descriptor allocation and locking ----------------------------------- */
+/* --- File descriptor allocation and locking ------------------------------- */
 
 void process_filedescriptor_close_all(process_t *this)
 {
@@ -890,7 +890,7 @@ int process_filedescriptor_free_and_release(process_t *this, int fd_index)
     return -1;
 }
 
-/* --- Process file operations -------------------------------------------------- */
+/* --- Process file operations ---------------------------------------------- */
 
 int process_open_file(process_t *this, const char *file_path, iostream_flag_t flags)
 {

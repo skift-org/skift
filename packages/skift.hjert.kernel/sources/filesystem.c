@@ -634,6 +634,13 @@ void filesystem_close(stream_t *s)
     }
 }
 
+ stream_t* filesystem_dup(stream_t* s)
+{
+    s->node->refcount++;
+    stream_t* dup = stream(s->node, s->flags);
+    return dup;
+}
+
 int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     IS_FS_READY;

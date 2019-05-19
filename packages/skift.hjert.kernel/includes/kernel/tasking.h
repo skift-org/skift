@@ -45,8 +45,6 @@ typedef struct s_process
     list_t *threads;   // Child threads
     list_t *processes; // Child processes
 
-    list_t *inbox;  // process main message queu
-
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
 
@@ -113,6 +111,9 @@ typedef struct
         thread_wait_thread_t thread;
         thread_wait_message_t message;
     } wait;
+
+    lock_t inbox_lock;
+    list_t *inbox;  // process main message queu
 
     lock_t fds_lock;
     process_filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
@@ -264,9 +265,9 @@ message_t *message(int id, const char *label, void *payload, uint size, uint fla
 
 void message_delete(message_t *msg);
 
-int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags);
+int messaging_send_internal(thread_t*  from, thread_t*  to, int id, const char *name, void *payload, uint size, uint flags);
 
-int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags);
+int messaging_send(thread_t* to, const char *name, void *payload, uint size, uint flags);
 
 int messaging_broadcast(const char *channel_name, const char *name, void *payload, uint size, uint flags);
 

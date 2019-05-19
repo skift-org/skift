@@ -80,6 +80,10 @@ thread_t *thread()
 
     list_pushback(threads, thread);
 
+    // Setup inbox
+    lock_init(thread->inbox_lock);
+    thread->inbox = list();
+
     // Setup current working directory.
     lock_init(thread->cwd_lock);
 
@@ -120,6 +124,13 @@ void thread_delete(thread_t *thread)
         list_remove(thread->process->threads, thread);
 
     thread_filedescriptor_close_all(thread);
+
+    
+    list_foreach(i, thread->inbox)
+    {
+        message_delete(i->value);
+    }
+    list_delete(thread->inbox, LIST_KEEP_VALUES);
 
     // Now no one should still have a ptr to us we can die in peace.
     free(thread);
@@ -745,7 +756,6 @@ process_t *process(const char *name, bool user)
     strlcpy(process->name, name, MAX_PROCESS_NAMESIZE);
     process->user = user;
     process->threads = list();
-    process->inbox = list();
 
     // Setup virtual memnory
     if (user)
@@ -775,9 +785,6 @@ void process_delete(process_t *this)
 
     assert(!list_any(this->threads));
     list_delete(this->threads, LIST_KEEP_VALUES);
-
-    assert(!list_any(this->inbox));
-    list_delete(this->inbox, LIST_KEEP_VALUES);
 
     list_remove(processes, this);
 
@@ -1149,16 +1156,14 @@ void messaging_setup(void)
     channels = list();
 }
 
-int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, void *payload, uint size, uint flags)
+int messaging_send_internal(thread_t* from, thread_t*  to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    process_t *process = process_getbyid(to);
-
-    if (process == NULL)
+    if (to == NULL)
     {
         return 0;
     }
 
-    if (process->inbox->count > 1024)
+    if (to->inbox->count > 1024)
     {
         log(LOG_WARNING, "PROC=%d inbox is full!", to);
         return 0;
@@ -1166,32 +1171,26 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     message_t *msg = message(id, name, payload, size, flags);
 
-    msg->from = from;
-    msg->to = to;
+    msg->from = from->id;
+    msg->to = to->id;
 
-    list_pushback(process->inbox, (void *)msg);
+    list_pushback(to->inbox, (void *)msg);
 
-    list_foreach(t, process->threads)
+    if (to->state == THREADSTATE_WAIT_MESSAGE)
     {
-        thread_t *thread = t->value;
-
-        if (thread->state == THREADSTATE_WAIT_MESSAGE)
-        {
-            messaging_receive_internal(thread);
-            thread_setstate(thread, THREADSTATE_RUNNING);
-            break;
-        }
+        messaging_receive_internal(to);
+        thread_setstate(to, THREADSTATE_RUNNING);
     }
 
     return id;
 }
 
-int messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
+int messaging_send(thread_t* to, const char *name, void *payload, uint size, uint flags)
 {
     int id = 0;
 
     ATOMIC({
-        id = messaging_send_internal(sheduler_running_process_id(), to, messaging_id(), name, payload, size, flags);
+        id = messaging_send_internal(sheduler_running_thread(), to, messaging_id(), name, payload, size, flags);
     });
 
     return id;
@@ -1211,7 +1210,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 
         list_foreach(p, c->subscribers)
         {
-            messaging_send_internal(sheduler_running_process_id(), ((process_t *)p->value)->id, id, name, payload, size, flags);
+            messaging_send_internal(sheduler_running_thread(), ((thread_t *)p->value), id, name, payload, size, flags);
         }
     }
 
@@ -1226,14 +1225,14 @@ message_t *messaging_receive_internal(thread_t *thread)
 
     atomic_begin();
 
-    if (thread->process->inbox->count > 0)
+    if (thread->inbox->count > 0)
     {
         if (thread->wait.message.message != NULL)
         {
             message_delete(thread->wait.message.message);
         }
 
-        list_pop(thread->process->inbox, (void **)&msg);
+        list_pop(thread->inbox, (void **)&msg);
         thread->wait.message.message = msg;
     }
 
@@ -1290,7 +1289,7 @@ int messaging_subscribe(const char *channel_name)
         list_pushback(channels, c);
     }
 
-    list_pushback(c->subscribers, sheduler_running_thread()->process);
+    list_pushback(c->subscribers, sheduler_running_thread());
 
     atomic_end();
 
@@ -1305,7 +1304,7 @@ int messaging_unsubscribe(const char *channel_name)
 
     if (c != NULL)
     {
-        list_remove(c->subscribers, sheduler_running_thread()->process);
+        list_remove(c->subscribers, sheduler_running_thread());
     }
 
     atomic_end();

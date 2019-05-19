@@ -173,42 +173,42 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_filesystem_open(const char *path, iostream_flag_t flags)
 {
-    return process_open_file(sheduler_running_process(), path, flags);
+    return thread_open_file(sheduler_running_thread(), path, flags);
 }
 
 int sys_filesystem_close(int fd)
 {
-    return process_close_file(sheduler_running_process(), fd);
+    return thread_close_file(sheduler_running_thread(), fd);
 }
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
 {
-    return process_read_file(sheduler_running_process(), fd, buffer, size);
+    return thread_read_file(sheduler_running_thread(), fd, buffer, size);
 }
 
 int sys_filesystem_write(int fd, void *buffer, uint size)
 {
-    return process_write_file(sheduler_running_process(), fd, buffer, size);
+    return thread_write_file(sheduler_running_thread(), fd, buffer, size);
 }
 
 int sys_filesystem_ioctl(int fd, int request, void *args)
 {
-    return process_ioctl_file(sheduler_running_process(), fd, request, args);
+    return thread_ioctl_file(sheduler_running_thread(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, iostream_whence_t whence)
 {
-    return process_seek_file(sheduler_running_process(), fd, offset, whence);
+    return thread_seek_file(sheduler_running_thread(), fd, offset, whence);
 }
 
 int sys_filesystem_tell(int fd, iostream_whence_t whence)
 {
-    return process_tell_file(sheduler_running_process(), fd, whence);
+    return thread_tell_file(sheduler_running_thread(), fd, whence);
 }
 
 int sys_filesystem_fstat(int fd, iostream_stat_t *stat)
 {
-    return process_fstat_file(sheduler_running_process(), fd, stat);
+    return thread_fstat_file(sheduler_running_thread(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)

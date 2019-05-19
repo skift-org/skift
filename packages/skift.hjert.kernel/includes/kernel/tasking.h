@@ -47,9 +47,6 @@ typedef struct s_process
 
     list_t *inbox;  // process main message queu
 
-    lock_t fds_lock;
-    process_filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
-
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
 
@@ -121,6 +118,9 @@ typedef struct
         thread_wait_message_t message;
     } wait;
 
+    lock_t fds_lock;
+    process_filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
+
     int exitvalue;
 } thread_t;
 
@@ -176,6 +176,34 @@ void thread_dump(thread_t *t);
 
 void thread_panic_dump(void);
 
+/* --- Thread file system access -------------------------------------------- */
+
+void thread_filedescriptor_close_all(thread_t* this);
+
+int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream);
+
+stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index);
+
+int thread_filedescriptor_release(thread_t *this, int fd_index);
+
+int thread_filedescriptor_free_and_release(thread_t *this, int fd_index);
+
+int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags);
+
+int thread_close_file(thread_t* this, int fd);
+
+int thread_read_file(thread_t* this, int fd, void *buffer, uint size);
+
+int thread_write_file(thread_t* this, int fd, const void *buffer, uint size);
+
+int thread_ioctl_file(thread_t* this, int fd, int request, void *args);
+
+int thread_seek_file(thread_t* this, int fd, int offset, iostream_whence_t whence);
+
+int thread_tell_file(thread_t* this, int fd, iostream_whence_t whence);
+
+int thread_fstat_file(thread_t* this, int fd, iostream_stat_t *stat);
+
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */      
 /* -------------------------------------------------------------------------- */
@@ -196,35 +224,11 @@ void process_exit(int exitvalue);
 
 PROCESS process_exec(const char *executable_path, const char **argv);
 
+path_t* process_cwd_resolve(process_t* this, const char* path_to_resolve);
+
 bool process_set_cwd(process_t* this, const char* new_wd);
 
 void process_get_cwd(process_t* this, char* buffer, uint size);
-
-void process_filedescriptor_close_all(process_t* this);
-
-int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream);
-
-stream_t *process_filedescriptor_acquire(process_t *this, int fd_index);
-
-int process_filedescriptor_release(process_t *this, int fd_index);
-
-int process_filedescriptor_free_and_release(process_t *this, int fd_index);
-
-int process_open_file(process_t* this, const char *file_path, iostream_flag_t flags);
-
-int process_close_file(process_t* this, int fd);
-
-int process_read_file(process_t* this, int fd, void *buffer, uint size);
-
-int process_write_file(process_t* this, int fd, const void *buffer, uint size);
-
-int process_ioctl_file(process_t* this, int fd, int request, void *args);
-
-int process_seek_file(process_t* this, int fd, int offset, iostream_whence_t whence);
-
-int process_tell_file(process_t* this, int fd, iostream_whence_t whence);
-
-int process_fstat_file(process_t* this, int fd, iostream_stat_t *stat);
 
 int process_memory_map(process_t* p, uint addr, uint count);
 

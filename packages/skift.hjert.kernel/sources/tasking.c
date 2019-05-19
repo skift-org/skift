@@ -78,6 +78,16 @@ thread_t *thread()
 
     list_pushback(threads, thread);
 
+    // Setup fildes
+    lock_init(thread->fds_lock);
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    {
+        process_filedescriptor_t *fd = &thread->fds[i];
+        fd->stream = NULL;
+        fd->free = true;
+        lock_init(fd->lock);
+    }
+
     return thread;
 }
 
@@ -90,6 +100,8 @@ void thread_delete(thread_t *thread)
 
     if (thread->process != NULL)
         list_remove(thread->process->threads, thread);
+
+    thread_filedescriptor_close_all(thread);
 
     // Now no one should still have a ptr to us we can die in peace.
     free(thread);
@@ -408,6 +420,243 @@ void thread_exit(int exitvalue)
     PANIC("sheduler_yield return but the thread is canceled!");
 }
 
+/* File descriptor allocation and locking ----------------------------------- */
+
+void thread_filedescriptor_close_all(thread_t* this)
+{
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    {
+        if (this->fds[i].stream != NULL)
+        {
+            thread_close_file(this, i);
+        }
+    }
+}
+
+int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
+{
+    lock_acquire(this->fds_lock);
+
+    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    {
+        process_filedescriptor_t *fd = &this->fds[i];
+
+        if (fd->free)
+        {
+            fd->free = false;
+            fd->stream = stream;
+            lock_acquire(fd->lock);
+
+            lock_release(this->fds_lock);
+
+            log(LOG_DEBUG, "File descriptor %d allocated for thread %d", i, this->id);
+
+            return i;
+        }
+    }
+
+    lock_release(this->fds_lock);
+    log(LOG_WARNING, "We run out of file descriptor on thread %d", this->id);
+
+    return -1;
+}
+
+stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
+{
+    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    {
+        process_filedescriptor_t *fd = &this->fds[fd_index];
+        lock_acquire(fd->lock);
+
+        if (!fd->free)
+        {
+            return fd->stream;
+        }
+    }
+
+    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+
+    return NULL;
+}
+
+int thread_filedescriptor_release(thread_t *this, int fd_index)
+{
+    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    {
+        process_filedescriptor_t *fd = &this->fds[fd_index];
+
+        lock_release(fd->lock);
+
+        return 0;
+    }
+
+    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+
+    return -1;
+}
+
+int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
+{
+    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    {
+        process_filedescriptor_t *fd = &this->fds[fd_index];
+
+        lock_release(fd->lock);
+
+        fd->free = true;
+        fd->stream = NULL;
+
+        log(LOG_DEBUG, "File descriptor %d free for thread %d", fd_index, this->id);
+
+        return 0;
+    }
+
+    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+
+    return -1;
+}
+
+/* --- Process file operations -------------------------------------------------- */
+
+int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags)
+{
+    path_t *p = process_cwd_resolve(this->process, file_path);
+
+    stream_t *stream = filesystem_open(NULL, p, flags);
+
+    path_delete(p);
+
+    if (stream == NULL)
+    {
+        return -1;
+    }
+
+    int fd = thread_filedescriptor_alloc_and_acquire(this, stream);
+
+    if (fd != -1)
+    {
+        thread_filedescriptor_release(this, fd);
+    }
+    else
+    {
+        filesystem_close(stream);
+    }
+
+    return fd;
+}
+
+int thread_close_file(thread_t* this, int fd)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return -1;
+    }
+
+    filesystem_close(stream);
+
+    thread_filedescriptor_free_and_release(this, fd);
+
+    return 0;
+}
+
+int thread_read_file(thread_t *this, int fd, void *buffer, uint size)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_read(stream, buffer, size);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
+int thread_write_file(thread_t *this, int fd, const void *buffer, uint size)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_write(stream, buffer, size);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
+int thread_ioctl_file(thread_t *this, int fd, int request, void *args)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_ioctl(stream, request, args);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
+int thread_seek_file(thread_t *this, int fd, int offset, iostream_whence_t whence)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_seek(stream, offset, whence);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
+int thread_tell_file(thread_t *this, int fd, iostream_whence_t whence)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_tell(stream, whence);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
+int thread_fstat_file(thread_t *this, int fd, iostream_stat_t *stat)
+{
+    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+
+    if (stream == NULL)
+    {
+        return 0;
+    }
+
+    int result = filesystem_fstat(stream, stat);
+
+    thread_filedescriptor_release(this, fd);
+
+    return result;
+}
+
 /* --- Thread dump ---------------------------------------------------------- */
 
 static char *THREAD_STATES[] =
@@ -479,16 +728,6 @@ process_t *process(const char *name, bool user)
     process->user = user;
     process->threads = list();
     process->inbox = list();
-
-    // Setup fildes
-    lock_init(process->fds_lock);
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
-    {
-        process_filedescriptor_t *fd = &process->fds[i];
-        fd->stream = NULL;
-        fd->free = true;
-        lock_init(fd->lock);
-    }
 
     // Setup cwd.
     process_t *parent = sheduler_running_process();
@@ -795,240 +1034,6 @@ void process_get_cwd(process_t *this, char *buffer, uint size)
     path_to_cstring(this->cwd_path, buffer, size);
 
     lock_release(this->cwd_lock);
-}
-
-/* File descriptor allocation and locking ----------------------------------- */
-
-void process_filedescriptor_close_all(process_t *this)
-{
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
-    {
-        process_close_file(this, i);
-    }
-}
-
-int process_filedescriptor_alloc_and_acquire(process_t *this, stream_t *stream)
-{
-    lock_acquire(this->fds_lock);
-
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
-    {
-        process_filedescriptor_t *fd = &this->fds[i];
-
-        if (fd->free)
-        {
-            fd->free = false;
-            fd->stream = stream;
-            lock_acquire(fd->lock);
-
-            lock_release(this->fds_lock);
-
-            log(LOG_DEBUG, "File descriptor %d allocated for process %d'%s'", i, this->id, this->name);
-
-            return i;
-        }
-    }
-
-    lock_release(this->fds_lock);
-    log(LOG_WARNING, "We run out of file descriptor on process %d'%s'", this->id, this->name);
-
-    return -1;
-}
-
-stream_t *process_filedescriptor_acquire(process_t *this, int fd_index)
-{
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
-    {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
-        lock_acquire(fd->lock);
-
-        if (!fd->free)
-        {
-            return fd->stream;
-        }
-    }
-
-    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
-
-    return NULL;
-}
-
-int process_filedescriptor_release(process_t *this, int fd_index)
-{
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
-    {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
-
-        lock_release(fd->lock);
-
-        return 0;
-    }
-
-    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
-
-    return -1;
-}
-
-int process_filedescriptor_free_and_release(process_t *this, int fd_index)
-{
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
-    {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
-
-        lock_release(fd->lock);
-
-        fd->free = true;
-        fd->stream = NULL;
-
-        log(LOG_DEBUG, "File descriptor %d free for process %d'%s'", fd_index, this->id, this->name);
-
-        return 0;
-    }
-
-    log(LOG_WARNING, "Got a bad file descriptor %d from process %d'%s'", fd_index, this->id, this->name);
-
-    return -1;
-}
-
-/* --- Process file operations -------------------------------------------------- */
-
-int process_open_file(process_t *this, const char *file_path, iostream_flag_t flags)
-{
-    path_t *p = process_cwd_resolve(this, file_path);
-
-    stream_t *stream = filesystem_open(NULL, p, flags);
-
-    path_delete(p);
-
-    if (stream == NULL)
-    {
-        return -1;
-    }
-
-    int fd = process_filedescriptor_alloc_and_acquire(this, stream);
-
-    if (fd != -1)
-    {
-        process_filedescriptor_release(this, fd);
-    }
-    else
-    {
-        filesystem_close(stream);
-    }
-
-    return fd;
-}
-
-int process_close_file(process_t *this, int fd)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return -1;
-    }
-
-    filesystem_close(stream);
-
-    process_filedescriptor_free_and_release(this, fd);
-
-    return 0;
-}
-
-int process_read_file(process_t *this, int fd, void *buffer, uint size)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_read(stream, buffer, size);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int process_write_file(process_t *this, int fd, const void *buffer, uint size)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_write(stream, buffer, size);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int process_ioctl_file(process_t *this, int fd, int request, void *args)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_ioctl(stream, request, args);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int process_seek_file(process_t *this, int fd, int offset, iostream_whence_t whence)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_seek(stream, offset, whence);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int process_tell_file(process_t *this, int fd, iostream_whence_t whence)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_tell(stream, whence);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int process_fstat_file(process_t *this, int fd, iostream_stat_t *stat)
-{
-    stream_t *stream = process_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_fstat(stream, stat);
-
-    process_filedescriptor_release(this, fd);
-
-    return result;
 }
 
 /* --- Process Memory managment --------------------------------------------- */

@@ -8,15 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # v0.2.0 - **unreleased**
 
 ## Added
- - More witty comments to the kerne panic screen
+ - More witty comments to the kernel panic screen
  - Command line argument parser to framework
- - Path manipulation and parsing to framework
- - `all, color, list` and `help` options to `ls`
+ - Path manipulation and parsing module to framework
+ - Command line option to `ls`, 
  - `filesystem_ioctl` juste for device file, but WIP
  - `filesystem_link` and `filesystem_unlink`
  - `skift/iostream.h` a stdio like library
  - `skift/launchpad.h` a process creation API inspired by the fushia project
- - `cd` command to the shell
+ - `cd` and `exit` command to the shell
+
+## Removed
+ - `skift/thread.h` all processes related function go to `skift/process.h`
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal

@@ -108,12 +108,12 @@ void main(multiboot_info_t *info, s32 magic)
     printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
-    PROCESS init = process_exec("/bin/init", (const char *[]){"/bin/init", NULL});
+    int init = thread_exec("/bin/init", (const char *[]){"/bin/init", NULL});
 
     if (init)
     {
         int exitvalue = 0;
-        thread_wait_process(init, &exitvalue);
+        thread_wait(init, &exitvalue);
 
         PANIC("Init has return with code %d!", exitvalue);
     }

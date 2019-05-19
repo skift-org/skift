@@ -17,21 +17,30 @@
 
 static uint ticks = 0;
 static thread_t *running = NULL;
-process_t *kernel_process;
-THREAD kernel_thread;
+
+static thread_t* kernel_thread;
+static thread_t* garbage_thread;
+static thread_t* idle_thread;
+
+void idle_code(){ HANG; }
 
 void tasking_setup()
 {
     running = NULL;
 
-    process_setup();
     thread_setup();
 
-    kernel_process = process("kernel", false);
-    kernel_thread = thread_create(kernel_process, NULL, NULL, 0);
-    thread_create(kernel_process, garbage_colector, NULL, false);
+    kernel_thread = thread_spawn(NULL, "kernel", NULL, NULL, 0);
+    thread_go(kernel_thread);
 
-    sheduler_setup(thread_getbyid(kernel_thread), kernel_process);
+    garbage_thread = thread_spawn(kernel_thread, "finalizer", garbage_colector, NULL, false);
+    thread_go(garbage_thread);
+
+    idle_thread = thread_spawn(kernel_thread, "idle", idle_code, NULL, false);
+    thread_go(idle_thread);
+    thread_setstate(idle_thread, THREADSTATE_HANG);
+
+    sheduler_setup(kernel_thread);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -62,78 +71,90 @@ void thread_setup(void)
     }
 }
 
-thread_t *thread()
+thread_t *thread(thread_t* parent, const char* name, bool user)
 {
     ASSERT_ATOMIC;
 
-    thread_t *thread = MALLOC(thread_t);
+    thread_t *this = MALLOC(thread_t);
 
-    if (thread == NULL)
+    if (this == NULL)
     {
         PANIC("Failed to allocated a new thread.");
     }
 
-    memset(thread, 0, sizeof(thread_t));
+    memset(this, 0, sizeof(thread_t));
 
-    thread->id = TID++;
-    thread->state = THREADSTATE_NONE;
+    this->id = TID++;
+    strlcpy(this->name, name, MAX_PROCESS_NAMESIZE);
+    this->state = THREADSTATE_NONE;
 
-    list_pushback(threads, thread);
+    list_pushback(threads, this);
 
     // Setup inbox
-    lock_init(thread->inbox_lock);
-    thread->inbox = list();
+    lock_init(this->inbox_lock);
+    this->inbox = list();
 
     // Setup current working directory.
-    lock_init(thread->cwd_lock);
+    lock_init(this->cwd_lock);
 
-    if (sheduler_running_thread() != NULL)
+    if (parent != NULL)
     {
-        sheduler_running_thread()->cwd_node->refcount++;
-        thread->cwd_node = sheduler_running_thread()->cwd_node;
-        thread->cwd_path = path_dup(sheduler_running_thread()->cwd_path);
+        parent->cwd_node->refcount++;
+        this->cwd_node = parent->cwd_node;
+        this->cwd_path = path_dup(parent->cwd_path);
     }
     else
     {
         path_t *p = path("/");
-        thread->cwd_node = filesystem_acquire(NULL, p, false);
-        thread->cwd_path = p;
+        this->cwd_node = filesystem_acquire(NULL, p, false);
+        this->cwd_path = p;
     }
 
     // Setup fildes
-    lock_init(thread->fds_lock);
+    lock_init(this->fds_lock);
     for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
     {
-        process_filedescriptor_t *fd = &thread->fds[i];
+        filedescriptor_t *fd = &this->fds[i];
         fd->stream = NULL;
         fd->free = true;
         lock_init(fd->lock);
     }
 
-    return thread;
+    // Setup memory space
+    if (user)
+    {
+        this->pdir = memory_alloc_pdir();
+    }
+    else
+    {
+        this->pdir = memory_kpdir();
+    }
+
+    return this;
 }
 
-void thread_delete(thread_t *thread)
+void thread_delete(thread_t *this)
 {
-    if (thread->state != THREADSTATE_NONE)
-        thread_setstate(thread, THREADSTATE_NONE);
+    if (this->state != THREADSTATE_NONE)
+        thread_setstate(this, THREADSTATE_NONE);
 
-    list_remove(threads, thread);
+    list_remove(threads, this);
 
-    if (thread->process != NULL)
-        list_remove(thread->process->threads, thread);
-
-    thread_filedescriptor_close_all(thread);
-
+    thread_filedescriptor_close_all(this);
     
-    list_foreach(i, thread->inbox)
+    list_foreach(i, this->inbox)
     {
         message_delete(i->value);
     }
-    list_delete(thread->inbox, LIST_KEEP_VALUES);
+    list_delete(this->inbox, LIST_KEEP_VALUES);
+
+    if (this->pdir != memory_kpdir())
+    {
+        memory_free_pdir(this->pdir);
+    }
 
     // Now no one should still have a ptr to us we can die in peace.
-    free(thread);
+    free(this);
 }
 
 list_t *thread_bystate(thread_state_t state)
@@ -163,16 +184,25 @@ int thread_count(void)
     return result;
 }
 
-THREAD thread_create_mainthread(process_t *parent_process, thread_entry_t entry, const char **argv)
+thread_t* thread_spawn(thread_t* parent, const char* name, thread_entry_t entry, void *arg, bool user)
 {
-    log(LOG_DEBUG, "Creating process %d main thread with eip@%08x.", parent_process->id, entry);
+    ASSERT_ATOMIC;
 
+    thread_t *t = thread(parent, name, user);
+
+    thread_setentry(t, entry, user);
+    thread_stack_push(t, &arg, sizeof(arg));
+
+    return t;
+}
+
+thread_t* thread_spawn_with_argv(thread_t* parent, const char* name, thread_entry_t entry, const char **argv, bool user)
+{
     atomic_begin();
 
-    thread_t *t = thread();
+    thread_t *t = thread(parent, name, user);
 
     thread_setentry(t, entry, true);
-    thread_attach_to_process(t, parent_process);
 
     uint argv_list[MAX_PROCESS_ARGV] = {0};
 
@@ -187,25 +217,9 @@ THREAD thread_create_mainthread(process_t *parent_process, thread_entry_t entry,
     thread_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
     thread_stack_push(t, &argc, sizeof(argc));
 
-    thread_setready(t);
-
     atomic_end();
 
-    return t->id;
-}
-
-THREAD thread_create(process_t *parent_process, thread_entry_t entry, void *arg, bool user)
-{
-    ASSERT_ATOMIC;
-
-    thread_t *t = thread();
-
-    thread_setentry(t, entry, user);
-    thread_attach_to_process(t, parent_process);
-    thread_stack_push(t, &arg, sizeof(arg));
-    thread_setready(t);
-
-    return t->id;
+    return t;
 }
 
 /* --- Threads methodes ----------------------------------------------------- */
@@ -260,20 +274,7 @@ uint thread_stack_push(thread_t *t, const void *value, uint size)
     return t->sp;
 }
 
-void thread_attach_to_process(thread_t *t, process_t *p)
-{
-    if (t->process == NULL)
-    {
-        list_pushback(p->threads, t);
-        t->process = p;
-    }
-    else
-    {
-        PANIC("Trying to attaching thread %d of process %d to process %d.", t->id, t->process->id, p->id);
-    }
-}
-
-void thread_setready(thread_t *t)
+void thread_go(thread_t *t)
 {
     processor_context_t ctx;
 
@@ -305,25 +306,24 @@ void thread_sleep(int time)
     sheduler_yield();
 }
 
-void thread_wakeup(THREAD t)
+int thread_wakeup(thread_t* thread)
 {
-    atomic_begin();
-
-    thread_t *thread = thread_getbyid(t);
+    ASSERT_ATOMIC;
 
     if (thread != NULL && thread->state == THREADSTATE_WAIT_TIME)
     {
         thread_setstate(running, THREADSTATE_RUNNING);
+        return 0;
     }
 
-    atomic_end();
+    return -1;
 }
 
-bool thread_wait_thread(THREAD t, int *exitvalue)
+bool thread_wait(int thread_id, int *exitvalue)
 {
     atomic_begin();
 
-    thread_t *thread = thread_getbyid(t);
+    thread_t* thread = thread_getbyid(thread_id);
 
     if (thread != NULL)
     {
@@ -338,10 +338,11 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
         }
         else
         {
-            running->wait.thread.thread_handle = t;
+            running->wait.thread.thread_handle = thread->id;
             thread_setstate(running, THREADSTATE_WAIT_THREAD);
-
+            
             atomic_end();
+            
             sheduler_yield();
 
             if (exitvalue != NULL)
@@ -355,73 +356,31 @@ bool thread_wait_thread(THREAD t, int *exitvalue)
     else
     {
         atomic_end();
-        return false;
-    }
-}
 
-bool thread_wait_process(PROCESS p, int *exitvalue)
-{
-    atomic_begin();
-
-    process_t *process = process_getbyid(p);
-
-    if (process != NULL)
-    {
-        if (process->state == PROCESS_CANCELED || process->state == PROCESS_CANCELING)
-        {
-            if (exitvalue != NULL)
-            {
-                *exitvalue = process->exitvalue;
-            }
-
-            atomic_end();
-        }
-        else
-        {
-            running->wait.process.process_handle = p;
-            thread_setstate(running, THREADSTATE_WAIT_PROCESS);
-
-            atomic_end();
-            sheduler_yield();
-
-            if (exitvalue != NULL)
-            {
-                *exitvalue = running->wait.process.exitvalue;
-            }
-        }
-
-        return true;
-    }
-    else
-    {
-        atomic_end();
         return false;
     }
 }
 
 /* --- Thread stopping and canceling ---------------------------------------- */
 
-bool thread_cancel(THREAD t, int exitvalue)
+bool thread_cancel(thread_t* thread, int exitvalue)
 {
     atomic_begin();
 
-    thread_t *thread = thread_getbyid(t);
-
-    if (thread != NULL && thread->process == running->process)
+    if (thread != NULL)
     {
         // Set the new thread state
         thread->exitvalue = exitvalue;
         thread_setstate(running, THREADSTATE_CANCELED);
 
-        log(LOG_DEBUG, "Thread(%d) got canceled.", t);
+        log(LOG_DEBUG, "Thread(%d) got canceled.", thread->id);
 
         // Wake up waiting threads
-        list_foreach(i, thread->process->threads)
+        list_foreach(i, thread_bystate(THREADSTATE_WAIT_THREAD))
         {
             thread_t *waitthread = i->value;
 
-            if (waitthread->state == THREADSTATE_WAIT_THREAD &&
-                waitthread->wait.thread.thread_handle == t)
+            if (waitthread->wait.thread.thread_handle == thread->id)
             {
                 waitthread->wait.thread.exitvalue = exitvalue;
                 thread_setstate(waitthread, THREADSTATE_RUNNING);
@@ -442,11 +401,36 @@ bool thread_cancel(THREAD t, int exitvalue)
 
 void thread_exit(int exitvalue)
 {
-    thread_cancel(running->id, exitvalue);
+    thread_cancel(running, exitvalue);
 
     sheduler_yield();
 
     PANIC("sheduler_yield return but the thread is canceled!");
+}
+
+/* --- Thread Memory managment ---------------------------------------------- */
+
+int thread_memory_map(thread_t* this, uint addr, uint count)
+{
+    return memory_map(this->pdir, addr, count, 1);
+}
+
+int thread_memory_unmap(thread_t* this, uint addr, uint count)
+{
+    return memory_unmap(this->pdir, addr, count);
+}
+
+uint thread_memory_alloc(thread_t* this, uint count)
+{
+    uint addr = memory_alloc(this->pdir, count, 1);
+    log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
+    return addr;
+}
+
+void thread_memory_free(thread_t* this, uint addr, uint count)
+{
+    log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
+    return memory_free(this->pdir, addr, count, 1);
 }
 
 /* File descriptor allocation and locking ----------------------------------- */
@@ -468,7 +452,7 @@ int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
 
     for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
     {
-        process_filedescriptor_t *fd = &this->fds[i];
+        filedescriptor_t *fd = &this->fds[i];
 
         if (fd->free)
         {
@@ -494,7 +478,7 @@ stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
+        filedescriptor_t *fd = &this->fds[fd_index];
         lock_acquire(fd->lock);
 
         if (!fd->free)
@@ -512,7 +496,7 @@ int thread_filedescriptor_release(thread_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
+        filedescriptor_t *fd = &this->fds[fd_index];
 
         lock_release(fd->lock);
 
@@ -528,7 +512,7 @@ int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
     {
-        process_filedescriptor_t *fd = &this->fds[fd_index];
+        filedescriptor_t *fd = &this->fds[fd_index];
 
         lock_release(fd->lock);
 
@@ -545,7 +529,7 @@ int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
     return -1;
 }
 
-/* --- Process file operations -------------------------------------------------- */
+/* --- thread file operations ----------------------------------------------- */
 
 int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags)
 {
@@ -690,22 +674,21 @@ int thread_fstat_file(thread_t *this, int fd, iostream_stat_t *stat)
 
 static char *THREAD_STATES[] =
     {
+        "HANG",
         "RUNNING",
         "SLEEP",
-        "WAIT(thread)",
-        "WAIT(process)",
-        "WAIT(message)",
+        "WAIT",
+        "WAIT_FOR_MESSAGE",
         "CANCELED",
 };
 
 void thread_dump(thread_t *t)
 {
     atomic_begin();
-    printf("\n\t . Thread %d", t->id);
+    printf("\n\t . Thread %d %s", t->id, t->name);
     printf("\n\t   State: %s", THREAD_STATES[t->state]);
-    printf("\n\t   Process: %d %s", t->id, t->process->name);
     printf("\n\t   User memory: ");
-    memory_layout_dump(t->process->pdir, true);
+    memory_layout_dump(t->pdir, true);
     printf("\n");
     atomic_end();
 }
@@ -715,7 +698,7 @@ void thread_panic_dump(void)
     atomic_begin();
 
     printf("\n");
-    printf("\n\tRunning thread %d", sheduler_running_thread_id());
+    printf("\n\tRunning thread %d: '%s'", sheduler_running_id(), sheduler_running()->name);
     printf("\n");
     printf("\n\tThreads:");
 
@@ -732,159 +715,9 @@ void thread_panic_dump(void)
 /*   PROCESSES                                                                */
 /* -------------------------------------------------------------------------- */
 
-static int PID = 1;
-static list_t *processes;
-
-void process_setup(void)
-{
-    processes = list();
-}
-
-process_t *process(const char *name, bool user)
-{
-    ASSERT_ATOMIC;
-
-    process_t *process = MALLOC(process_t);
-
-    if (process == NULL)
-    {
-        PANIC("Failed to allocated a new process.");
-    }
-
-    process->id = PID++;
-
-    strlcpy(process->name, name, MAX_PROCESS_NAMESIZE);
-    process->user = user;
-    process->threads = list();
-
-    // Setup virtual memnory
-    if (user)
-    {
-        process->pdir = memory_alloc_pdir();
-    }
-    else
-    {
-        process->pdir = memory_kpdir();
-    }
-
-    log(LOG_FINE, "Process '%s' with ID=%d Created.", process->name, process->id);
-
-    list_pushback(processes, process);
-    return process;
-}
-
-void process_delete(process_t *this)
-{
-    if (this->pdir != memory_kpdir())
-    {
-        memory_free_pdir(this->pdir);
-    }
-
-    assert(!list_any(this->processes));
-    list_delete(this->processes, LIST_KEEP_VALUES);
-
-    assert(!list_any(this->threads));
-    list_delete(this->threads, LIST_KEEP_VALUES);
-
-    list_remove(processes, this);
-
-    free(this);
-}
-
-process_t *process_getbyid(PROCESS pid)
-{
-    list_foreach(i, processes)
-    {
-        process_t *p = (process_t *)i->value;
-
-        if (p->id == pid)
-            return p;
-    }
-
-    return NULL;
-}
-
-int process_count(void)
-{
-    int result;
-
-    atomic_begin();
-
-    result = list_count(processes);
-
-    atomic_end();
-
-    return result;
-}
-
-/* --- Process exit and canceling ------------------------------------------- */
-
-bool process_cancel(process_t *self, int exitvalue)
-{
-    atomic_begin();
-
-    if (self != kernel_process)
-    {
-        // Set our new process state
-        self->state = PROCESS_CANCELED;
-        self->exitvalue = exitvalue;
-
-        log(LOG_DEBUG, "Process '%s' ID=%d canceled!", self->name, self->id);
-
-        // Wake up waiting threads
-        list_foreach(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
-        {
-            thread_t *thread = i->value;
-
-            if (thread->wait.process.process_handle == self->id)
-            {
-                thread->wait.process.exitvalue = exitvalue;
-                thread_setstate(thread, THREADSTATE_RUNNING);
-                log(LOG_DEBUG, "Thread %d finish waiting process %d.", thread->id, self->id);
-            }
-        }
-
-        // Cancel childs threads.
-        list_foreach(i, self->threads)
-        {
-            thread_t *thread = (thread_t *)i->value;
-            thread_cancel(thread->id, 0);
-        }
-
-        atomic_end();
-        return true;
-    }
-    else
-    {
-        process_t *process = sheduler_running_process();
-        log(LOG_WARNING, "Process '%s' ID=%d tried to commit murder on the kernel!", process->name, process->id);
-
-        atomic_end();
-        return false;
-    }
-}
-
-void process_exit(int exitvalue)
-{
-    process_t *self = sheduler_running_process();
-
-    if (self != kernel_process)
-    {
-        process_cancel(self, exitvalue);
-
-        sheduler_yield();
-
-        PANIC("sheduler_yield return but the process is stopped!");
-    }
-    else
-    {
-        PANIC("Kernel try to commit suicide!");
-    }
-}
-
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(process_t *process, iostream_t *s, elf_program_t *program)
+void load_elfseg(thread_t *this, iostream_t *s, elf_program_t *program)
 {
     log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
@@ -893,10 +726,10 @@ void load_elfseg(process_t *process, iostream_t *s, elf_program_t *program)
         atomic_begin();
 
         // To avoid pagefault we need to switch page directorie.
-        page_directorie_t *pdir = running->process->pdir;
+        page_directorie_t *pdir = running->pdir;
 
-        paging_load_directorie(process->pdir);
-        process_memory_map(process, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
+        paging_load_directorie(this->pdir);
+        thread_memory_map(this, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
         memset((void *)program->vaddr, 0, program->memsz);
 
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
@@ -912,7 +745,7 @@ void load_elfseg(process_t *process, iostream_t *s, elf_program_t *program)
     }
 }
 
-PROCESS process_exec(const char *executable_path, const char **argv)
+int thread_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
     iostream_t *s = iostream_open(executable_path, IOSTREAM_READ);
@@ -949,8 +782,8 @@ PROCESS process_exec(const char *executable_path, const char **argv)
     // Create the process and load the executable.
     atomic_begin();
 
-    process_t *new_process = process(executable_path, true);
-    int new_process_id = new_process->id;
+    thread_t * new_thread = thread_spawn_with_argv(sheduler_running(), executable_path, (thread_entry_t)elf_header.entry, argv, true);
+    int new_thread_id = new_thread->id;
 
     elf_program_t program;
 
@@ -959,19 +792,19 @@ PROCESS process_exec(const char *executable_path, const char **argv)
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
         iostream_read(s, &program, sizeof(elf_program_t));
 
-        load_elfseg(new_process, s, &program);
+        load_elfseg(new_thread, s, &program);
     }
 
     log(LOG_DEBUG, "Executable loaded, creating main thread...");
 
-    thread_create_mainthread(new_process, (thread_entry_t)elf_header.entry, argv);
+    thread_go(new_thread);
 
     log(LOG_DEBUG, "Process created, back to caller..");
 
     atomic_end();
 
     iostream_close(s);
-    return new_process_id;
+    return new_thread_id;
 }
 
 /* --- Current working directory -------------------------------------------- */
@@ -1041,31 +874,6 @@ void thread_get_cwd(thread_t *this, char *buffer, uint size)
     path_to_cstring(this->cwd_path, buffer, size);
 
     lock_release(this->cwd_lock);
-}
-
-/* --- Process Memory managment --------------------------------------------- */
-
-int process_memory_map(process_t *p, uint addr, uint count)
-{
-    return memory_map(p->pdir, addr, count, 1);
-}
-
-int process_memory_unmap(process_t *p, uint addr, uint count)
-{
-    return memory_unmap(p->pdir, addr, count);
-}
-
-uint process_memory_alloc(process_t *p, uint count)
-{
-    uint addr = memory_alloc(p->pdir, count, 1);
-    log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
-    return addr;
-}
-
-void process_memory_free(process_t *p, uint addr, uint count)
-{
-    log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
-    return memory_free(p->pdir, addr, count, 1);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1190,7 +998,7 @@ int messaging_send(thread_t* to, const char *name, void *payload, uint size, uin
     int id = 0;
 
     ATOMIC({
-        id = messaging_send_internal(sheduler_running_thread(), to, messaging_id(), name, payload, size, flags);
+        id = messaging_send_internal(sheduler_running(), to, messaging_id(), name, payload, size, flags);
     });
 
     return id;
@@ -1210,7 +1018,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 
         list_foreach(p, c->subscribers)
         {
-            messaging_send_internal(sheduler_running_thread(), ((thread_t *)p->value), id, name, payload, size, flags);
+            messaging_send_internal(sheduler_running(), ((thread_t *)p->value), id, name, payload, size, flags);
         }
     }
 
@@ -1242,17 +1050,17 @@ message_t *messaging_receive_internal(thread_t *thread)
 
 bool messaging_receive(message_t *msg, bool wait)
 {
-    message_t *incoming = messaging_receive_internal(sheduler_running_thread());
+    message_t *incoming = messaging_receive_internal(sheduler_running());
 
     if (incoming == NULL && wait)
     {
         atomic_begin();
-        thread_setstate(sheduler_running_thread(), THREADSTATE_WAIT_MESSAGE);
+        thread_setstate(sheduler_running(), THREADSTATE_WAIT_MESSAGE);
         atomic_end();
 
         sheduler_yield(); // Wait until we get a message.
 
-        incoming = sheduler_running_thread()->wait.message.message;
+        incoming = sheduler_running()->wait.message.message;
     }
 
     if (incoming != NULL)
@@ -1266,7 +1074,7 @@ bool messaging_receive(message_t *msg, bool wait)
 
 int messaging_payload(void *buffer, uint size)
 {
-    message_t *incoming = sheduler_running_thread()->wait.message.message;
+    message_t *incoming = sheduler_running()->wait.message.message;
 
     if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
     {
@@ -1289,7 +1097,7 @@ int messaging_subscribe(const char *channel_name)
         list_pushback(channels, c);
     }
 
-    list_pushback(c->subscribers, sheduler_running_thread());
+    list_pushback(c->subscribers, sheduler_running());
 
     atomic_end();
 
@@ -1304,7 +1112,7 @@ int messaging_unsubscribe(const char *channel_name)
 
     if (c != NULL)
     {
-        list_remove(c->subscribers, sheduler_running_thread());
+        list_remove(c->subscribers, sheduler_running());
     }
 
     atomic_end();
@@ -1320,15 +1128,11 @@ void collect_and_free_thread(void)
 {
     list_t *thread_to_free = list();
 
-    // Search for thread with a canceled parent process.
+    // Get canceled threads
     list_foreach(i, thread_bystate(THREADSTATE_CANCELED))
     {
         thread_t *thread = i->value;
-
-        if (thread->process->state == PROCESS_CANCELED)
-        {
-            list_pushback(thread_to_free, thread);
-        }
+        list_pushback(thread_to_free, thread);
     }
 
     // Cleanup all of those dead threads.
@@ -1369,15 +1173,6 @@ void garbage_colector()
 
 static bool sheduler_context_switch = false;
 
-static thread_t idle;
-void idle_code()
-{
-    while (1)
-    {
-        hlt();
-    }
-}
-
 void timer_set_frequency(int hz)
 {
     u32 divisor = 1193180 / hz;
@@ -1388,16 +1183,9 @@ void timer_set_frequency(int hz)
     log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(thread_t *main_kernel_thread, process_t *kernel_process)
+void sheduler_setup(thread_t *main_kernel_thread)
 {
     running = main_kernel_thread;
-
-    // Create the idle thread.
-    memset(&idle, 0, sizeof(thread_t));
-    idle.id = -1;
-    thread_setentry(&idle, idle_code, false);
-    thread_attach_to_process(&idle, kernel_process);
-    thread_setready(&idle);
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
@@ -1413,15 +1201,16 @@ void wakeup_sleeping_threads(void)
 
         do
         {
-            list_peek(thread_bystate(THREADSTATE_WAIT_TIME), (void **)&t);
-
-            if (t->wait.time.wakeuptick <= ticks)
+            if (list_peek(thread_bystate(THREADSTATE_WAIT_TIME), (void **)&t))
             {
-                thread_setstate(t, THREADSTATE_RUNNING);
-                // log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                if (t->wait.time.wakeuptick <= ticks)
+                {
+                    thread_setstate(t, THREADSTATE_RUNNING);
+                    log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                }
             }
 
-        } while (t->stack == THREADSTATE_RUNNING);
+        } while (t != NULL && t->state == THREADSTATE_RUNNING);
     }
 }
 
@@ -1446,14 +1235,14 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     if (!list_peek_and_pushback(thread_bystate(THREADSTATE_RUNNING), (void **)&running))
     {
         // Or the idle thread if there are no running threads.
-        running = &idle;
+        running = idle_thread;
     }
 
-    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == &idle) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
+    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == idle_thread) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
 
     // Restore the context
     // TODO: set_kernel_stack(...);
-    paging_load_directorie(running->process->pdir);
+    paging_load_directorie(running->pdir);
     paging_invalidate_tlb();
 
     sheduler_context_switch = false;
@@ -1482,36 +1271,12 @@ void sheduler_yield()
 
 /* --- Running thread info -------------------------------------------------- */
 
-process_t *sheduler_running_process(void)
-{
-    if (running != NULL)
-    {
-        return running->process;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
-int sheduler_running_process_id(void)
-{
-    if (running != NULL)
-    {
-        return running->process->id;
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-thread_t *sheduler_running_thread(void)
+thread_t *sheduler_running(void)
 {
     return running;
 }
 
-int sheduler_running_thread_id(void)
+int sheduler_running_id(void)
 {
     if (running != NULL)
     {

@@ -89,6 +89,7 @@ bool list_peek(list_t *list, void **value)
     }
     else
     {
+        *value = NULL;
         return false;
     }
 }

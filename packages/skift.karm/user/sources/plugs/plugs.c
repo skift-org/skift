@@ -4,11 +4,11 @@
 
 /* plugs.c: Plugs functions for using the skift Framework in the userspace.   */
 
+#include <skift/__plugs__.h>
 #include <skift/cstring.h>
 #include <skift/lock.h>
-#include <skift/process.h>
 #include <skift/logger.h>
-#include <skift/__plugs__.h>
+#include <skift/process.h>
 
 lock_t memlock;
 lock_t loglock;
@@ -36,7 +36,7 @@ void __plug_fini(int exit_code)
     iostream_flush(err_stream);
     iostream_flush(log_stream);
 
-    __syscall(SYS_PROCESS_EXIT, exit_code, 0, 0, 0, 0);
+    process_exit(exit_code);
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
@@ -78,28 +78,4 @@ void *__plug_memalloc_alloc(uint size)
 int __plug_memalloc_free(void *memory, uint size)
 {
     return process_free((unsigned int)memory, size);
-}
-
-/* --- Threads -------------------------------------------------------------- */
-
-int __plug_thread_this(void)
-{
-    return __syscall(SYS_THREAD_SELF, 0, 0, 0, 0, 0);
-}
-
-/* --- Processes ------------------------------------------------------------ */
-
-int __plug_process_this(void)
-{
-    return __syscall(SYS_PROCESS_SELF, 0, 0, 0, 0, 0);
-}
-
-bool __plug_process_set_workdir(const char *path)
-{
-    return __syscall(SYS_PROCESS_SET_CWD, (int)path, 0, 0, 0, 0);
-}
-
-void __plug_process_get_workdir(const char *path, uint size)
-{
-    __syscall(SYS_PROCESS_GET_CWD, (int)path, size, 0, 0, 0);
 }

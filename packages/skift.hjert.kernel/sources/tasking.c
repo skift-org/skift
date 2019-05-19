@@ -64,6 +64,8 @@ void thread_setup(void)
 
 thread_t *thread()
 {
+    ASSERT_ATOMIC;
+
     thread_t *thread = MALLOC(thread_t);
 
     if (thread == NULL)
@@ -77,6 +79,22 @@ thread_t *thread()
     thread->state = THREADSTATE_NONE;
 
     list_pushback(threads, thread);
+
+    // Setup current working directory.
+    lock_init(thread->cwd_lock);
+
+    if (sheduler_running_thread() != NULL)
+    {
+        sheduler_running_thread()->cwd_node->refcount++;
+        thread->cwd_node = sheduler_running_thread()->cwd_node;
+        thread->cwd_path = path_dup(sheduler_running_thread()->cwd_path);
+    }
+    else
+    {
+        path_t *p = path("/");
+        thread->cwd_node = filesystem_acquire(NULL, p, false);
+        thread->cwd_path = p;
+    }
 
     // Setup fildes
     lock_init(thread->fds_lock);
@@ -520,7 +538,7 @@ int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
 
 int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags)
 {
-    path_t *p = process_cwd_resolve(this->process, file_path);
+    path_t *p = thread_cwd_resolve(this, file_path);
 
     stream_t *stream = filesystem_open(NULL, p, flags);
 
@@ -728,24 +746,6 @@ process_t *process(const char *name, bool user)
     process->user = user;
     process->threads = list();
     process->inbox = list();
-
-    // Setup cwd.
-    process_t *parent = sheduler_running_process();
-
-    lock_init(process->cwd_lock);
-
-    if (parent != NULL)
-    {
-        parent->cwd_node->refcount++;
-        process->cwd_node = parent->cwd_node;
-        process->cwd_path = path_dup(parent->cwd_path);
-    }
-    else
-    {
-        path_t *p = path("/");
-        process->cwd_node = filesystem_acquire(NULL, p, false);
-        process->cwd_path = p;
-    }
 
     // Setup virtual memnory
     if (user)
@@ -969,7 +969,7 @@ PROCESS process_exec(const char *executable_path, const char **argv)
 
 /* --- Current working directory -------------------------------------------- */
 
-path_t* process_cwd_resolve(process_t* this, const char* path_to_resolve)
+path_t* thread_cwd_resolve(thread_t* this, const char* path_to_resolve)
 {
     path_t *p = path(path_to_resolve);
 
@@ -989,11 +989,11 @@ path_t* process_cwd_resolve(process_t* this, const char* path_to_resolve)
     return p;
 }
 
-bool process_set_cwd(process_t *this, const char *new_path)
+bool thread_set_cwd(thread_t *this, const char *new_path)
 {
     log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
     
-    path_t *work_path = process_cwd_resolve(this, new_path);
+    path_t *work_path = thread_cwd_resolve(this, new_path);
     
     lock_acquire(this->cwd_lock);
 
@@ -1027,7 +1027,7 @@ bool process_set_cwd(process_t *this, const char *new_path)
     }
 }
 
-void process_get_cwd(process_t *this, char *buffer, uint size)
+void thread_get_cwd(thread_t *this, char *buffer, uint size)
 {
     lock_acquire(this->cwd_lock);
 

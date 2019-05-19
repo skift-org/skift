@@ -84,12 +84,12 @@ int sys_process_free(uint addr, uint count)
 
 int sys_process_set_cwd(const char* path)
 {
-    return process_set_cwd(sheduler_running_process(), path);
+    return thread_set_cwd(sheduler_running_thread(), path);
 }
 
 int sys_process_get_cwd(char* buffer, uint size)
 {
-    process_get_cwd(sheduler_running_process(), buffer, size);
+    thread_get_cwd(sheduler_running_thread(), buffer, size);
     return 0;
 }
 

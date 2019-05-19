@@ -50,10 +50,6 @@ typedef struct s_process
     page_directorie_t *pdir; // Page directorie
     process_state_t state;   // State of the process (RUNNING, CANCELED)
 
-    lock_t cwd_lock;
-    fsnode_t* cwd_node;
-    path_t* cwd_path;
-
     int exitvalue;
 } process_t;
 
@@ -121,6 +117,10 @@ typedef struct
     lock_t fds_lock;
     process_filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
 
+    lock_t cwd_lock;
+    fsnode_t* cwd_node;
+    path_t* cwd_path;
+
     int exitvalue;
 } thread_t;
 
@@ -176,6 +176,14 @@ void thread_dump(thread_t *t);
 
 void thread_panic_dump(void);
 
+/* ---- Thread current working directory ------------------------------------ */
+
+path_t* thread_cwd_resolve(thread_t* this, const char* path_to_resolve);
+
+bool thread_set_cwd(thread_t* this, const char* new_wd);
+
+void thread_get_cwd(thread_t* this, char* buffer, uint size);
+
 /* --- Thread file system access -------------------------------------------- */
 
 void thread_filedescriptor_close_all(thread_t* this);
@@ -223,12 +231,6 @@ bool process_cancel(process_t* self, int exitvalue);
 void process_exit(int exitvalue);
 
 PROCESS process_exec(const char *executable_path, const char **argv);
-
-path_t* process_cwd_resolve(process_t* this, const char* path_to_resolve);
-
-bool process_set_cwd(process_t* this, const char* new_wd);
-
-void process_get_cwd(process_t* this, char* buffer, uint size);
 
 int process_memory_map(process_t* p, uint addr, uint count);
 

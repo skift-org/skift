@@ -52,7 +52,7 @@ int map_geti(map_t* map, const char * key, int default_)
 
 bool map_exist(map_t* map, const char * key)
 {
-    FOREACH(k, map->keys)
+    list_foreach(k, map->keys)
     {
         if (!strcmp(k->value, key)) return true;
     }
@@ -62,7 +62,7 @@ bool map_exist(map_t* map, const char * key)
 
 bool map_containe(map_t* map, const void* value)
 {
-    FOREACH(v, map->values)
+    list_foreach(v, map->values)
     {
         if (v->value == value) return true;
     }
@@ -72,7 +72,7 @@ bool map_containe(map_t* map, const void* value)
 
 bool map_containei(map_t* map, int value)
 {
-    FOREACH(v, map->values)
+    list_foreach(v, map->values)
     {
         if ((int)v->value == value) return true;
     }

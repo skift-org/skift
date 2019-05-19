@@ -102,7 +102,7 @@ list_t *thread_bystate(thread_state_t state)
 
 thread_t *thread_getbyid(int id)
 {
-    FOREACH(i, threads)
+    list_foreach(i, threads)
     {
         thread_t *thread = i->value;
 
@@ -375,7 +375,7 @@ bool thread_cancel(THREAD t, int exitvalue)
         log(LOG_DEBUG, "Thread(%d) got canceled.", t);
 
         // Wake up waiting threads
-        FOREACH(i, thread->process->threads)
+        list_foreach(i, thread->process->threads)
         {
             thread_t *waitthread = i->value;
 
@@ -441,7 +441,7 @@ void thread_panic_dump(void)
     printf("\n");
     printf("\n\tThreads:");
 
-    FOREACH(i, threads)
+    list_foreach(i, threads)
     {
         thread_t *t = i->value;
         thread_dump(t);
@@ -547,7 +547,7 @@ void process_delete(process_t *this)
 
 process_t *process_getbyid(PROCESS pid)
 {
-    FOREACH(i, processes)
+    list_foreach(i, processes)
     {
         process_t *p = (process_t *)i->value;
 
@@ -586,7 +586,7 @@ bool process_cancel(process_t *self, int exitvalue)
         log(LOG_DEBUG, "Process '%s' ID=%d canceled!", self->name, self->id);
 
         // Wake up waiting threads
-        FOREACH(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
+        list_foreach(i, thread_bystate(THREADSTATE_WAIT_PROCESS))
         {
             thread_t *thread = i->value;
 
@@ -599,7 +599,7 @@ bool process_cancel(process_t *self, int exitvalue)
         }
 
         // Cancel childs threads.
-        FOREACH(i, self->threads)
+        list_foreach(i, self->threads)
         {
             thread_t *thread = (thread_t *)i->value;
             thread_cancel(thread->id, 0);
@@ -1083,7 +1083,7 @@ void channel_delete(channel_t *channel)
 
 channel_t *channel_get(const char *channel_name)
 {
-    FOREACH(i, channels)
+    list_foreach(i, channels)
     {
         channel_t *c = (channel_t *)i->value;
 
@@ -1166,7 +1166,7 @@ int messaging_send_internal(PROCESS from, PROCESS to, int id, const char *name, 
 
     list_pushback(process->inbox, (void *)msg);
 
-    FOREACH(t, process->threads)
+    list_foreach(t, process->threads)
     {
         thread_t *thread = t->value;
 
@@ -1204,7 +1204,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
     {
         id = messaging_id();
 
-        FOREACH(p, c->subscribers)
+        list_foreach(p, c->subscribers)
         {
             messaging_send_internal(sheduler_running_process_id(), ((process_t *)p->value)->id, id, name, payload, size, flags);
         }
@@ -1317,7 +1317,7 @@ void collect_and_free_thread(void)
     list_t *thread_to_free = list();
 
     // Search for thread with a canceled parent process.
-    FOREACH(i, thread_bystate(THREADSTATE_CANCELED))
+    list_foreach(i, thread_bystate(THREADSTATE_CANCELED))
     {
         thread_t *thread = i->value;
 
@@ -1328,7 +1328,7 @@ void collect_and_free_thread(void)
     }
 
     // Cleanup all of those dead threads.
-    FOREACH(i, thread_to_free)
+    list_foreach(i, thread_to_free)
     {
         thread_t *thread = i->value;
         int thread_id = thread->id;

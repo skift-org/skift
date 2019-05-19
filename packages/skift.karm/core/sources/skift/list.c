@@ -282,7 +282,7 @@ bool list_popback(list_t *l, void **value)
 
 bool list_remove(list_t *l, void *value)
 {
-    FOREACH(item, l)
+    list_foreach(item, l)
     {
         if (item->value == value)
         {
@@ -316,7 +316,7 @@ bool list_remove(list_t *l, void *value)
 
 bool list_containe(list_t *l, void *value)
 {
-    FOREACH(item, l)
+    list_foreach(item, l)
     {
         if (item->value == value)
         {

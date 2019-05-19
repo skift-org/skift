@@ -1,4 +1,4 @@
-#include <skift/__plugs__.h>
+#include <skift/process.h>
 #include <skift/iostream.h>
 #include "shell.h"
 
@@ -17,7 +17,7 @@ void shell_prompt(shell_t* this)
 
     // Current directory
     char buffer[1024];
-    __plug_process_get_workdir(buffer, 1024);
+    process_get_cwd(buffer, 1024);
     printf("%s", buffer);
 
     // The prompt

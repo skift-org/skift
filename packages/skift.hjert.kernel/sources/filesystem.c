@@ -93,7 +93,7 @@ void fsnode_delete(fsnode_t *node)
     }
     case FSNODE_DIRECTORY:
     {
-        FOREACH(item, node->directory.childs)
+        list_foreach(item, node->directory.childs)
         {
             fsdirectory_entry_t *entry = item->value;
             fsnode_t *n = entry->node;
@@ -261,7 +261,7 @@ int fifo_write(stream_t *stream, const void *buffer, uint size)
 // only call this method if you hold the directory lock.
 fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 {
-    FOREACH(i, dir->directory.childs)
+    list_foreach(i, dir->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
@@ -291,7 +291,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
     iostream_direntry_t *entries = malloc(sizeof(iostream_direntry_t) * entries_count);
     iostream_direntry_t *current = &entries[0];
 
-    FOREACH(i, dir->directory.childs)
+    list_foreach(i, dir->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
@@ -515,7 +515,7 @@ void filesystem_release(fsnode_t *node)
 
 void filesystem_dump_internal(fsnode_t *node, int depth)
 {
-    FOREACH(i, node->directory.childs)
+    list_foreach(i, node->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
@@ -539,7 +539,7 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
         }
     }
 
-    FOREACH(i, node->directory.childs)
+    list_foreach(i, node->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;

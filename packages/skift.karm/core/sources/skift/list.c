@@ -89,6 +89,7 @@ bool list_peek(list_t *list, void **value)
     }
     else
     {
+        *value = NULL;
         return false;
     }
 }
@@ -282,7 +283,7 @@ bool list_popback(list_t *l, void **value)
 
 bool list_remove(list_t *l, void *value)
 {
-    FOREACH(item, l)
+    list_foreach(item, l)
     {
         if (item->value == value)
         {
@@ -316,7 +317,7 @@ bool list_remove(list_t *l, void *value)
 
 bool list_containe(list_t *l, void *value)
 {
-    FOREACH(item, l)
+    list_foreach(item, l)
     {
         if (item->value == value)
         {

@@ -1,5 +1,6 @@
-#include <skift/__plugs__.h>
 #include <skift/cstring.h>
+#include <skift/process.h>
+#include <skift/iostream.h>
 
 #include "shell.h"
 
@@ -9,7 +10,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
     if (argc == 2)
     {
-        if (__plug_process_set_workdir(argv[1]))
+        if (process_set_cwd(argv[1]))
         {
             return 0;
         }
@@ -21,7 +22,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
     }
     else
     {
-        __plug_process_set_workdir("/");
+        process_set_cwd("/");
         
         return 0;
     }

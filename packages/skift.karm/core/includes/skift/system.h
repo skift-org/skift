@@ -19,8 +19,7 @@ typedef struct
 
     uint total_ram;
     uint used_ram;
-
-    int running_process;
+    
     int running_threads;
 } system_status_t;
 

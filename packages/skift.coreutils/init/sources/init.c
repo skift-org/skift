@@ -9,7 +9,6 @@
 
 #include <skift/logger.h>
 #include <skift/process.h>
-#include <skift/thread.h>
 #include <skift/messaging.h>
 
 int init_exec(const char* filename)
@@ -40,7 +39,7 @@ int main(int argc, char **argv)
 
     int shell = init_exec("/bin/sh");
     
-    thread_wait_process(shell, NULL);
+    process_wait(shell, NULL);
 
     printf("\n\e[1;34mGoodbye!");
 

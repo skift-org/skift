@@ -11,19 +11,17 @@
  * - Shared memory syscalls.
  */
 
+#include <skift/atomic.h>
 #include <skift/cstring.h>
 #include <skift/logger.h>
 #include <skift/system.h>
-#include <skift/atomic.h>
-
-#include "kernel/tasking.h"
-#include "kernel/filesystem.h"
-#include "kernel/memory.h"
-
-#include "kernel/serial.h"
 
 #include "kernel/shared/syscalls.h"
+#include "kernel/filesystem.h"
+#include "kernel/memory.h"
+#include "kernel/serial.h"
 #include "kernel/syscalls.h"
+#include "kernel/tasking.h"
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
 
@@ -35,113 +33,97 @@ int sys_not_implemented()
 
 /* --- Process -------------------------------------------------------------- */
 
-int sys_process_self()
+int sys_process_this(void)
 {
-    return sheduler_running_process_id();
+    return sheduler_running_id();
 }
 
 int sys_process_exec(const char *file_name, const char **argv)
 {
-    return process_exec(file_name, argv);
+    return thread_exec(file_name, argv);
 }
 
 int sys_process_exit(int code)
 {
-    process_exit(code);
-
+    thread_exit(code);
     return 0;
 }
 
 int sys_process_cancel(int pid)
 {
-    atomic_begin();
-    int result = process_cancel(process_getbyid(pid), -1);
-    atomic_end();
+    int result;
+    
+    ATOMIC({
+        result = thread_cancel(thread_getbyid(pid), -1);
+    });
 
     return result;
 }
 
 int sys_process_map(uint addr, uint count)
 {
-    return process_memory_map(sheduler_running_process(), addr, count);
+    return thread_memory_map(sheduler_running(), addr, count);
 }
 
 int sys_process_unmap(uint addr, uint count)
 {
-    return process_memory_unmap(sheduler_running_process(), addr, count);
+    return thread_memory_unmap(sheduler_running(), addr, count);
 }
 
 int sys_process_alloc(uint count)
 {
-    return process_memory_alloc(sheduler_running_process(), count);
+    return thread_memory_alloc(sheduler_running(), count);
 }
 
 int sys_process_free(uint addr, uint count)
 {
-    process_memory_free(sheduler_running_process(), addr, count);
+    thread_memory_free(sheduler_running(), addr, count);
+    return 0;
+}
+
+int sys_process_get_cwd(char* buffer, uint size)
+{
+    thread_get_cwd(sheduler_running(), buffer, size);
     return 0;
 }
 
 int sys_process_set_cwd(const char* path)
 {
-    return process_set_cwd(sheduler_running_process(), path);
+    return thread_set_cwd(sheduler_running(), path);
 }
 
-int sys_process_get_cwd(char* buffer, uint size)
-{
-    process_get_cwd(sheduler_running_process(), buffer, size);
-    return 0;
-}
-
-/* --- Threads -------------------------------------------------------------- */
-
-int sys_thread_self()
-{
-    return sheduler_running_thread_id();
-}
-
-int sys_thread_create(thread_entry_t entry, void *args)
-{
-    return thread_create(sheduler_running_process(), entry, args, true);
-}
-
-int sys_thread_exit(int exitval)
-{
-    thread_exit(exitval);
-    return 0;
-}
-
-int sys_thread_cancel(THREAD t, int exitvalue)
-{
-    return thread_cancel(t, exitvalue);
-}
-
-int sys_thread_sleep(int time)
+int sys_process_sleep(int time)
 {
     thread_sleep(time);
     return 0;
 }
 
-int sys_thread_wakeup(THREAD t)
+int sys_process_wakeup(THREAD t)
 {
-    thread_wakeup(t);
-    return 0;
+    int result;
+    
+    ATOMIC({
+        result = thread_wakeup(thread_getbyid(t));
+    });
+
+    return result; 
 }
 
-int sys_thread_wait_thread(THREAD t, int *exitvalue)
+int sys_process_wait(THREAD t, int *exitvalue)
 {
-    return thread_wait_thread(t, exitvalue);
-}
-
-int sys_thread_wait_process(PROCESS p, int *exitvalue)
-{
-    return thread_wait_process(p, exitvalue);
+    return thread_wait(t, exitvalue);
 }
 
 /* --- Messaging ------------------------------------------------------------ */
-int sys_messaging_send(PROCESS to, const char *name, void *payload, uint size, uint flags)
+int sys_messaging_send(THREAD to, const char *name, void *payload, uint size, uint flags)
 {
-    return messaging_send(to, name, payload, size, flags);
+    int result;
+    
+    ATOMIC({
+        result = messaging_send(thread_getbyid(to), name, payload, size, flags);
+    });
+
+    return result; 
 }
 
 int sys_messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
@@ -151,6 +133,7 @@ int sys_messaging_broadcast(const char *channel, const char *name, void *payload
 
 int sys_messaging_receive(message_t *msg, int wait)
 {
+    // FIXME: why "&& true" !?
     return messaging_receive(msg, wait && true);
 }
 
@@ -173,42 +156,42 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_filesystem_open(const char *path, iostream_flag_t flags)
 {
-    return process_open_file(sheduler_running_process(), path, flags);
+    return thread_open_file(sheduler_running(), path, flags);
 }
 
 int sys_filesystem_close(int fd)
 {
-    return process_close_file(sheduler_running_process(), fd);
+    return thread_close_file(sheduler_running(), fd);
 }
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
 {
-    return process_read_file(sheduler_running_process(), fd, buffer, size);
+    return thread_read_file(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_write(int fd, void *buffer, uint size)
 {
-    return process_write_file(sheduler_running_process(), fd, buffer, size);
+    return thread_write_file(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_ioctl(int fd, int request, void *args)
 {
-    return process_ioctl_file(sheduler_running_process(), fd, request, args);
+    return thread_ioctl_file(sheduler_running(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, iostream_whence_t whence)
 {
-    return process_seek_file(sheduler_running_process(), fd, offset, whence);
+    return thread_seek_file(sheduler_running(), fd, offset, whence);
 }
 
 int sys_filesystem_tell(int fd, iostream_whence_t whence)
 {
-    return process_tell_file(sheduler_running_process(), fd, whence);
+    return thread_tell_file(sheduler_running(), fd, whence);
 }
 
 int sys_filesystem_fstat(int fd, iostream_stat_t *stat)
 {
-    return process_fstat_file(sheduler_running_process(), fd, stat);
+    return thread_fstat_file(sheduler_running(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)
@@ -268,7 +251,6 @@ int sys_system_get_status(system_status_t* status)
     status->total_ram = memory_get_total();
     status->used_ram = memory_get_used();
 
-    status->running_process = process_count();
     status->running_threads = thread_count();
 
     return 0;
@@ -276,8 +258,9 @@ int sys_system_get_status(system_status_t* status)
 
 static int (*syscalls[])() =
     {
-        [SYS_PROCESS_SELF] = sys_process_self,
+        [SYS_PROCESS_SELF] = sys_process_this,
         [SYS_PROCESS_EXEC] = sys_process_exec,
+        [SYS_PROCESS_SPAWN] = sys_not_implemented,
         [SYS_PROCESS_EXIT] = sys_process_exit,
         [SYS_PROCESS_CANCEL] = sys_process_cancel,
         [SYS_PROCESS_MAP] = sys_process_map,
@@ -286,15 +269,9 @@ static int (*syscalls[])() =
         [SYS_PROCESS_FREE] = sys_process_free,
         [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
         [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
-
-        [SYS_THREAD_SELF] = sys_thread_self,
-        [SYS_THREAD_CREATE] = sys_thread_create,
-        [SYS_THREAD_EXIT] = sys_thread_exit,
-        [SYS_THREAD_CANCEL] = sys_thread_cancel,
-        [SYS_THREAD_SLEEP] = sys_thread_sleep,
-        [SYS_THREAD_WAKEUP] = sys_thread_wakeup,
-        [SYS_THREAD_WAIT_THREAD] = sys_thread_wait_thread,
-        [SYS_THREAD_WAIT_PROCESS] = sys_thread_wait_process,
+        [SYS_PROCESS_SLEEP] = sys_process_sleep,
+        [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
+        [SYS_PROCESS_WAIT] = sys_process_wait,
 
         [SYS_MSG_SEND] = sys_messaging_send,
         [SYS_MSG_BROADCAST] = sys_messaging_broadcast,
@@ -330,7 +307,7 @@ void syscall_dispatcher(processor_context_t *context)
     }
     else
     {
-        log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_process_id());
+        log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
         log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }

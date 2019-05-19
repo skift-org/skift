@@ -91,7 +91,7 @@ void path_normalize(path_t *p)
 
     int depth = 0;
 
-    FOREACH(i, p->elements)
+    list_foreach(i, p->elements)
     {
         const char *element = i->value;
 
@@ -155,7 +155,7 @@ path_t *path_combine(path_t *left, path_t *right)
     {
         p->is_absolue = left->is_absolue;
 
-        FOREACH(i, left->elements)
+        list_foreach(i, left->elements)
         {
             path_push(p, strdup(i->value));
         }
@@ -164,7 +164,7 @@ path_t *path_combine(path_t *left, path_t *right)
     // Append the rigt parte of the path
     if (right != NULL)
     {
-        FOREACH(i, right->elements)
+        list_foreach(i, right->elements)
         {
             path_push(p, strdup(i->value));
         }
@@ -180,7 +180,7 @@ path_t *path_split_at(path_t *path, int index)
     p->is_absolue = false;
 
     int current_element_index = 0;
-    FOREACH(i, path->elements)
+    list_foreach(i, path->elements)
     {
         if (current_element_index >= index)
         {
@@ -199,7 +199,7 @@ path_t *path_dup(path_t *path)
     p->elements = list();
     p->is_absolue = path->is_absolue;
 
-    FOREACH(i, path->elements)
+    list_foreach(i, path->elements)
     {
         path_push(p, strdup(i->value));
     }
@@ -217,7 +217,7 @@ void path_to_cstring(path_t *this, char *buffer, uint size)
     }
     else
     {
-        FOREACH(i, this->elements)
+        list_foreach(i, this->elements)
         {
             const char *element = (const char *)i->value;
             strnapd(buffer, '/', size);

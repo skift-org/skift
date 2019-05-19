@@ -1,6 +1,5 @@
 #include <skift/iostream.h>
 #include <skift/process.h>
-#include <skift/thread.h>
 #include <skift/cstring.h>
 
 #include "shell.h"
@@ -42,7 +41,7 @@ bool shell_eval(shell_t* this)
 
     if (process > 0)
     {
-        thread_wait_process(process, &this->command_exit_value);
+        process_wait(process, &this->command_exit_value);
         return true;
     }
 

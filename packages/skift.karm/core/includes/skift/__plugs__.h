@@ -63,13 +63,30 @@ void __plug_system_get_info(system_info_t* info);
 
 void __plug_system_get_status(system_status_t* status);
 
-
-/* --- Threads -------------------------------------------------------------- */
-
-int __plug_thread_this(void);
-
 /* --- Processes ------------------------------------------------------------ */
 
 int  __plug_process_this(void);
-bool __plug_process_set_workdir(const char* path);
-void __plug_process_get_workdir(const char* path, uint size);
+
+int  __plug_process_exec(const char *file_name, const char **argv);
+
+int  __plug_process_exit(int code);
+
+int  __plug_process_cancel(int pid);
+
+int  __plug_process_map(uint addr, uint count);
+
+int  __plug_process_unmap(uint addr, uint count);
+
+uint __plug_process_alloc(uint count);
+
+int  __plug_process_free(uint addr, uint count);
+
+int  __plug_process_get_cwd(char* buffer, uint size);
+
+int  __plug_process_set_cwd(const char* cwd);
+
+int  __plug_process_sleep(int time);
+
+int  __plug_process_wakeup(int pid);
+
+int  __plug_process_wait(int pid, int* exit_value);

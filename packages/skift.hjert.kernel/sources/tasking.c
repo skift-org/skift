@@ -135,10 +135,12 @@ thread_t *thread(thread_t* parent, const char* name, bool user)
 
 void thread_delete(thread_t *this)
 {
+    atomic_begin();
     if (this->state != THREADSTATE_NONE)
         thread_setstate(this, THREADSTATE_NONE);
 
     list_remove(threads, this);
+    atomic_end();
 
     thread_filedescriptor_close_all(this);
     
@@ -231,6 +233,8 @@ bool shortest_sleep_first(void *left, void *right)
 
 void thread_setstate(thread_t *thread, thread_state_t state)
 {
+    ASSERT_ATOMIC;
+
     if (thread->state == state)
         return;
 
@@ -1129,12 +1133,15 @@ void collect_and_free_thread(void)
 {
     list_t *thread_to_free = list();
 
+    atomic_begin();
     // Get canceled threads
     list_foreach(i, thread_bystate(THREADSTATE_CANCELED))
     {
         thread_t *thread = i->value;
         list_pushback(thread_to_free, thread);
     }
+
+    atomic_end();
 
     // Cleanup all of those dead threads.
     list_foreach(i, thread_to_free)
@@ -1159,10 +1166,7 @@ void garbage_colector()
         thread_sleep(100); // We don't do this really often.
 
         // log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
-
-        atomic_begin();
         collect_and_free_thread();
-        atomic_end();
 
         // log(LOG_DEBUG, "Garbage collect end!");
     }

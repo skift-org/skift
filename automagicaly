@@ -438,7 +438,7 @@ class Target(object):
                 return False
 
     def install(self, sysroot):
-        if self.type != TargetTypes.APP and os.path.isdir(join(self.location, "includes")):
+        if self.type != TargetTypes.APP and self.type != TargetTypes.KERNEL and os.path.isdir(join(self.location, "includes")):
             COPY(join(self.location, "includes"), join(sysroot, "usr/includes"))
 
         if self.type == TargetTypes.APP:
@@ -516,7 +516,7 @@ def info(target, targets):
 
 def debug_command(target, targets):
     """Start qemu and attach gdb to it."""
-    distrib(targets)
+    sync(targets)
 
     print("")
     print(BRIGHT_WHITE + "Starting VM (DEBUG MODE)..." + RESET)
@@ -575,8 +575,8 @@ def rebuild_all(targets):
     build_all(targets)
 
 
-def distrib(targets):
-    """Generate a distribution file."""
+def sync(targets):
+    """Generate a syncution file."""
 
     build_all(targets)
 
@@ -585,12 +585,11 @@ def distrib(targets):
     ramdisk = MKDIR("build/ramdisk")
     COPY("files", ramdisk)
     bootdisk = MKDIR("build/bootdisk")
-    sysroot = MKDIR("sysroot")
-    MKDIR("sysroot/bin")
-    MKDIR("sysroot/usr")
-    MKDIR("sysroot/usr/lib")
-    MKDIR("sysroot/usr/includes")
-    MKDIR("sysroot/boot")
+    MKDIR(join(ramdisk, "bin"))
+    MKDIR(join(ramdisk, "usr"))
+    MKDIR(join(ramdisk, "usr/lib"))
+    MKDIR(join(ramdisk, "usr/includes"))
+    MKDIR(join(ramdisk, "boot"))
 
     ## --- RAMDISK ---------------------------------------------------------- ##
 
@@ -602,11 +601,7 @@ def distrib(targets):
 
         for t in targets:
             target = targets[t]
-            target.install(sysroot)
-            if target.type == TargetTypes.APP:
-                print(BRIGHT_WHITE + "    Copying " +
-                      RESET + "application '%s'" % t)
-                COPY(target.get_output(), join(app_dir, target.name))
+            target.install(ramdisk)
 
         print(BRIGHT_WHITE + "    Generating" + RESET + " the tarball")
         TAR(ramdisk, "build/ramdisk.tar")
@@ -641,6 +636,12 @@ def distrib(targets):
         print("\n" + BRIGHT_WHITE + "Skipping" + RESET + " bootdisk")
 
     print(BRIGHT_GREEN + "\nDistribution succeed 👌 !" + RESET)
+
+def re_sync(targets):
+    RMDIR("build/ramdisk")
+    RMDIR("build/bootdisk")
+
+    sync(targets)
 
 def help_command(targets):
     """Show this help message."""
@@ -695,7 +696,7 @@ def list_other(targets):
 
 def run_command(targets):
     """Start skiftOS in QEMU."""
-    distrib(targets)
+    sync(targets)
 
     print("")
     print(BRIGHT_WHITE + "Starting VM..." + RESET)
@@ -706,13 +707,14 @@ global_actions = \
         "build-all": build_all,
         "clean-all": clean_all,
         "help": help_command,
-        "list": list_command,
         "list-app": list_app,
         "list-lib": list_lib,
         "list-other": list_other,
+        "list": list_command,
         "rebuild-all": rebuild_all,
-        "distrib": distrib,
-        "run": run_command
+        "run": run_command,
+        "re-sync" : re_sync,
+        "sync": sync
     }
 
 # --- Main ------------------------------------------------------------------- #

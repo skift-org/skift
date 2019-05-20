@@ -2,5 +2,9 @@
     "name": "Core Framework",
     
     "id": "skift.karm.core",
-    "type": "shared"
+    "type": "shared",
+
+    "libs": [
+        "skift.hjert.protocol"
+    ]
 }

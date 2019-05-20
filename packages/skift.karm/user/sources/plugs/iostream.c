@@ -1,7 +1,7 @@
 #include <skift/__plugs__.h>
 
 #include <skift/iostream.h>
-#include <skift/syscalls.h>
+#include <hjert/shared/syscalls.h>
 
 int __plug_iostream_open(const char *path, iostream_flag_t flags)
 {

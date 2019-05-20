@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-#include "kernel/protocol.h"
 
 typedef struct 
 {

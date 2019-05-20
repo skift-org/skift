@@ -38,7 +38,7 @@ void tasking_setup()
 
     idle_thread = thread_spawn(kernel_thread, "idle", idle_code, NULL, false);
     thread_go(idle_thread);
-    thread_setstate(idle_thread, THREADSTATE_HANG);
+    thread_setstate(idle_thread, TASK_STATE_HANG);
 
     sheduler_setup(kernel_thread);
 }
@@ -49,7 +49,7 @@ void tasking_setup()
 
 static int TID = 1;
 static list_t *threads;
-static list_t *threads_bystates[THREADSTATE_COUNT];
+static list_t *threads_bystates[TASK_STATE_COUNT];
 
 void thread_setup(void)
 {
@@ -60,7 +60,7 @@ void thread_setup(void)
         PANIC("Failed to allocate thread list!");
     }
 
-    for (int i = 0; i < THREADSTATE_COUNT; i++)
+    for (int i = 0; i < TASK_STATE_COUNT; i++)
     {
         threads_bystates[i] = list();
 
@@ -85,8 +85,8 @@ thread_t *thread(thread_t* parent, const char* name, bool user)
     memset(this, 0, sizeof(thread_t));
 
     this->id = TID++;
-    strlcpy(this->name, name, MAX_PROCESS_NAMESIZE);
-    this->state = THREADSTATE_NONE;
+    strlcpy(this->name, name, TASK_NAMESIZE);
+    this->state = TASK_STATE_NONE;
 
     list_pushback(threads, this);
 
@@ -112,7 +112,7 @@ thread_t *thread(thread_t* parent, const char* name, bool user)
 
     // Setup fildes
     lock_init(this->fds_lock);
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
         filedescriptor_t *fd = &this->fds[i];
         fd->stream = NULL;
@@ -136,8 +136,8 @@ thread_t *thread(thread_t* parent, const char* name, bool user)
 void thread_delete(thread_t *this)
 {
     atomic_begin();
-    if (this->state != THREADSTATE_NONE)
-        thread_setstate(this, THREADSTATE_NONE);
+    if (this->state != TASK_STATE_NONE)
+        thread_setstate(this, TASK_STATE_NONE);
 
     list_remove(threads, this);
     atomic_end();
@@ -159,7 +159,7 @@ void thread_delete(thread_t *this)
     free(this);
 }
 
-list_t *thread_bystate(thread_state_t state)
+list_t *thread_bystate(task_state_t state)
 {
     return threads_bystates[state];
 }
@@ -206,10 +206,10 @@ thread_t* thread_spawn_with_argv(thread_t* parent, const char* name, thread_entr
 
     thread_setentry(t, entry, true);
 
-    uint argv_list[MAX_PROCESS_ARGV] = {0};
+    uint argv_list[TASK_ARGV_COUNT] = {0};
 
     int argc;
-    for (argc = 0; argv[argc] && argc < MAX_PROCESS_ARGV; argc++)
+    for (argc = 0; argv[argc] && argc < TASK_ARGV_COUNT; argc++)
     {
         argv_list[argc] = thread_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
     }
@@ -231,7 +231,7 @@ bool shortest_sleep_first(void *left, void *right)
     return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
 }
 
-void thread_setstate(thread_t *thread, thread_state_t state)
+void thread_setstate(thread_t *thread, task_state_t state)
 {
     ASSERT_ATOMIC;
 
@@ -239,7 +239,7 @@ void thread_setstate(thread_t *thread, thread_state_t state)
         return;
 
     // Remove the thread from its old groupe.
-    if (thread->state != THREADSTATE_NONE)
+    if (thread->state != TASK_STATE_NONE)
     {
         list_remove(threads_bystates[thread->state], thread);
     }
@@ -248,11 +248,11 @@ void thread_setstate(thread_t *thread, thread_state_t state)
     thread->state = state;
 
     // Add the thread to the groupe
-    if (thread->state != THREADSTATE_NONE)
+    if (thread->state != TASK_STATE_NONE)
     {
-        if (thread->state == THREADSTATE_WAIT_TIME)
+        if (thread->state == TASK_STATE_WAIT_TIME)
         {
-            list_insert_sorted(threads_bystates[THREADSTATE_WAIT_TIME], thread, shortest_sleep_first);
+            list_insert_sorted(threads_bystates[TASK_STATE_WAIT_TIME], thread, shortest_sleep_first);
         }
         else
         {
@@ -266,8 +266,8 @@ void thread_setentry(thread_t *t, thread_entry_t entry, bool user)
     t->entry = entry;
     t->user = user;
     // setup the stack
-    memset(t->stack, 0, MAX_THREAD_STACKSIZE);
-    t->sp = (reg32_t)(&t->stack[0] + MAX_THREAD_STACKSIZE - 1);
+    memset(t->stack, 0, TASK_STACKSIZE);
+    t->sp = (reg32_t)(&t->stack[0] + TASK_STACKSIZE - 1);
 }
 
 uint thread_stack_push(thread_t *t, const void *value, uint size)
@@ -284,7 +284,7 @@ void thread_go(thread_t *t)
 
     ctx.eflags = 0x202;
     ctx.eip = (reg32_t)t->entry;
-    ctx.ebp = ((reg32_t)t->stack + MAX_THREAD_STACKSIZE);
+    ctx.ebp = ((reg32_t)t->stack + TASK_STACKSIZE);
 
     // TODO: userspace thread
     ctx.cs = 0x08;
@@ -295,7 +295,7 @@ void thread_go(thread_t *t)
 
     thread_stack_push(t, &ctx, sizeof(ctx));
 
-    thread_setstate(t, THREADSTATE_RUNNING);
+    thread_setstate(t, TASK_STATE_RUNNING);
 }
 
 /* --- Thread wait state ---------------------------------------------------- */
@@ -304,7 +304,7 @@ void thread_sleep(int time)
 {
     ATOMIC({
         running->wait.time.wakeuptick = ticks + time;
-        thread_setstate(running, THREADSTATE_WAIT_TIME);
+        thread_setstate(running, TASK_STATE_WAIT_TIME);
     });
 
     sheduler_yield();
@@ -314,9 +314,9 @@ int thread_wakeup(thread_t* thread)
 {
     ASSERT_ATOMIC;
 
-    if (thread != NULL && thread->state == THREADSTATE_WAIT_TIME)
+    if (thread != NULL && thread->state == TASK_STATE_WAIT_TIME)
     {
-        thread_setstate(running, THREADSTATE_RUNNING);
+        thread_setstate(running, TASK_STATE_RUNNING);
         return 0;
     }
 
@@ -331,7 +331,7 @@ bool thread_wait(int thread_id, int *exitvalue)
 
     if (thread != NULL)
     {
-        if (thread->state == THREADSTATE_CANCELED)
+        if (thread->state == TASK_STATE_CANCELED)
         {
             if (exitvalue != NULL)
             {
@@ -343,7 +343,7 @@ bool thread_wait(int thread_id, int *exitvalue)
         else
         {
             running->wait.thread.thread_handle = thread->id;
-            thread_setstate(running, THREADSTATE_WAIT_THREAD);
+            thread_setstate(running, TASK_STATE_WAIT_THREAD);
             
             atomic_end();
             
@@ -375,19 +375,19 @@ bool thread_cancel(thread_t* thread, int exitvalue)
     {
         // Set the new thread state
         thread->exitvalue = exitvalue;
-        thread_setstate(thread, THREADSTATE_CANCELED);
+        thread_setstate(thread, TASK_STATE_CANCELED);
 
         log(LOG_DEBUG, "Thread(%d) got canceled.", thread->id);
 
         // Wake up waiting threads
-        list_foreach(i, thread_bystate(THREADSTATE_WAIT_THREAD))
+        list_foreach(i, thread_bystate(TASK_STATE_WAIT_THREAD))
         {
             thread_t *waitthread = i->value;
 
             if (waitthread->wait.thread.thread_handle == thread->id)
             {
                 waitthread->wait.thread.exitvalue = exitvalue;
-                thread_setstate(waitthread, THREADSTATE_RUNNING);
+                thread_setstate(waitthread, TASK_STATE_RUNNING);
 
                 log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
             }
@@ -441,7 +441,7 @@ void thread_memory_free(thread_t* this, uint addr, uint count)
 
 void thread_filedescriptor_close_all(thread_t* this)
 {
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
         if (this->fds[i].stream != NULL)
         {
@@ -454,7 +454,7 @@ int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
 {
     lock_acquire(this->fds_lock);
 
-    for (int i = 0; i < MAX_PROCESS_OPENED_FILES; i++)
+    for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
         filedescriptor_t *fd = &this->fds[i];
 
@@ -480,7 +480,7 @@ int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
 
 stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
 {
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
         filedescriptor_t *fd = &this->fds[fd_index];
         lock_acquire(fd->lock);
@@ -498,7 +498,7 @@ stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
 
 int thread_filedescriptor_release(thread_t *this, int fd_index)
 {
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
         filedescriptor_t *fd = &this->fds[fd_index];
 
@@ -514,7 +514,7 @@ int thread_filedescriptor_release(thread_t *this, int fd_index)
 
 int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
 {
-    if (fd_index >= 0 && fd_index < MAX_PROCESS_OPENED_FILES)
+    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
         filedescriptor_t *fd = &this->fds[fd_index];
 
@@ -989,10 +989,10 @@ int messaging_send_internal(thread_t* from, thread_t*  to, int id, const char *n
 
     list_pushback(to->inbox, (void *)msg);
 
-    if (to->state == THREADSTATE_WAIT_MESSAGE)
+    if (to->state == TASK_STATE_WAIT_MESSAGE)
     {
         messaging_receive_internal(to);
-        thread_setstate(to, THREADSTATE_RUNNING);
+        thread_setstate(to, TASK_STATE_RUNNING);
     }
 
     return id;
@@ -1060,7 +1060,7 @@ bool messaging_receive(message_t *msg, bool wait)
     if (incoming == NULL && wait)
     {
         atomic_begin();
-        thread_setstate(sheduler_running(), THREADSTATE_WAIT_MESSAGE);
+        thread_setstate(sheduler_running(), TASK_STATE_WAIT_MESSAGE);
         atomic_end();
 
         sheduler_yield(); // Wait until we get a message.
@@ -1135,7 +1135,7 @@ void collect_and_free_thread(void)
 
     atomic_begin();
     // Get canceled threads
-    list_foreach(i, thread_bystate(THREADSTATE_CANCELED))
+    list_foreach(i, thread_bystate(TASK_STATE_CANCELED))
     {
         thread_t *thread = i->value;
         list_pushback(thread_to_free, thread);
@@ -1177,6 +1177,8 @@ void garbage_colector()
 /* -------------------------------------------------------------------------- */
 
 static bool sheduler_context_switch = false;
+#define SHEDULER_RECORD_COUNT 1024
+static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
 
 void timer_set_frequency(int hz)
 {
@@ -1200,22 +1202,22 @@ void sheduler_setup(thread_t *main_kernel_thread)
 
 void wakeup_sleeping_threads(void)
 {
-    if (!list_empty(thread_bystate(THREADSTATE_WAIT_TIME)))
+    if (!list_empty(thread_bystate(TASK_STATE_WAIT_TIME)))
     {
         thread_t *t;
 
         do
         {
-            if (list_peek(thread_bystate(THREADSTATE_WAIT_TIME), (void **)&t))
+            if (list_peek(thread_bystate(TASK_STATE_WAIT_TIME), (void **)&t))
             {
                 if (t->wait.time.wakeuptick <= ticks)
                 {
-                    thread_setstate(t, THREADSTATE_RUNNING);
+                    thread_setstate(t, TASK_STATE_RUNNING);
                     log(LOG_DEBUG, "Thread %d wake up!", t->id);
                 }
             }
 
-        } while (t != NULL && t->state == THREADSTATE_RUNNING);
+        } while (t != NULL && t->state == TASK_STATE_RUNNING);
     }
 }
 
@@ -1237,11 +1239,13 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     wakeup_sleeping_threads();
 
     // Get the next thread
-    if (!list_peek_and_pushback(thread_bystate(THREADSTATE_RUNNING), (void **)&running))
+    if (!list_peek_and_pushback(thread_bystate(TASK_STATE_RUNNING), (void **)&running))
     {
         // Or the idle thread if there are no running threads.
         running = idle_thread;
     }
+
+    sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
 
     vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == idle_thread) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
 
@@ -1291,4 +1295,21 @@ int sheduler_running_id(void)
     {
         return -1;
     }
+}
+
+int sheduler_get_usage(int thread_id)
+{
+    int count = 0;
+
+    atomic_begin();
+    for (int i = 0; i < SHEDULER_RECORD_COUNT; i++)
+    {
+        if (sheduler_record[i] == thread_id)
+        {
+            count++;
+        }
+    }
+    atomic_end();
+    
+    return count;
 }

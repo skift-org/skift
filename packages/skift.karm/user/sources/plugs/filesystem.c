@@ -1,7 +1,7 @@
 #include <skift/__plugs__.h>
 
 #include <skift/filesystem.h>
-#include <skift/syscalls.h>
+#include <hjert/shared/syscalls.h>
 
 int filesystem_link(const char *oldpath, const char *newpath)
 {

@@ -1,5 +1,5 @@
+#include <hjert/shared/task.h>
 #include <skift/cstring.h>
-#include <kernel/limits.h>
 
 #include "shell.h"
 
@@ -13,9 +13,9 @@ int shell_split(shell_t* this)
 
     int token_index = 0;
 
-    char **tokens = malloc(MAX_PROCESS_ARGV * sizeof(char *));
+    char **tokens = malloc(TASK_ARGV_COUNT * sizeof(char *));
 
-    memset(tokens, 0, MAX_PROCESS_ARGV * sizeof(char *));
+    memset(tokens, 0, TASK_ARGV_COUNT * sizeof(char *));
     char *start = &this->command_string[0];
 
     for (size_t i = 0; i < strlen(this->command_string) + 1; i++)
@@ -49,7 +49,7 @@ int shell_split(shell_t* this)
 
 void shell_cleanup(shell_t* this)
 {
-    for (int i = 0; i < MAX_PROCESS_ARGV; i++)
+    for (int i = 0; i < TASK_ARGV_COUNT; i++)
     {
         free(this->command_argv[i]);
     }

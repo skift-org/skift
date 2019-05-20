@@ -4,15 +4,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <hjert/shared/filesystem.h>
+
 #include <skift/runtime.h>
 #include <skift/list.h>
 
 #define PATH_SEPARATOR '/'
 
 // Lenght of a path element including the \0
-#define PATH_ELEMENT_LENGHT 128
-
-#define PATH_MAX_DEPTH 128
 
 typedef struct
 {

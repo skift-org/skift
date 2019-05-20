@@ -7,10 +7,11 @@
 #include <skift/runtime.h>
 #include <skift/list.h>
 
+#include <hjert/shared/message.h>
+#include <hjert/shared/task.h>
+
 #include "kernel/memory.h"
 #include "kernel/filesystem.h"
-#include "kernel/protocol.h"
-#include "kernel/limits.h"
 
 /* --- Thread data structure ------------------------------------------------ */
 
@@ -24,21 +25,6 @@ typedef struct
     stream_t *stream;
     bool free;
 } filedescriptor_t;
-
-typedef enum thread_state
-{
-    THREADSTATE_NONE = -1,
-
-    THREADSTATE_HANG,
-
-    THREADSTATE_RUNNING,
-    THREADSTATE_WAIT_TIME,
-    THREADSTATE_WAIT_THREAD,
-    THREADSTATE_WAIT_MESSAGE,
-    THREADSTATE_CANCELED,
-
-    THREADSTATE_COUNT
-} thread_state_t;
 
 typedef struct
 {
@@ -60,13 +46,13 @@ typedef struct
 typedef struct thread
 {
     int id;
-    char name[MAX_PROCESS_NAMESIZE]; // Frendly name of the process
-    thread_state_t state;
+    char name[TASK_NAMESIZE]; // Frendly name of the process
+    task_state_t state;
 
     bool user;
 
     uint sp;
-    byte stack[MAX_THREAD_STACKSIZE]; // Kernel stack
+    byte stack[TASK_STACKSIZE]; // Kernel stack
     thread_entry_t entry; // Our entry point
 
     struct
@@ -80,7 +66,7 @@ typedef struct thread
     list_t *inbox;  // process main message queu
 
     lock_t fds_lock;
-    filedescriptor_t fds[MAX_PROCESS_OPENED_FILES];
+    filedescriptor_t fds[TASK_FILDES_COUNT];
 
     lock_t cwd_lock;
     fsnode_t* cwd_node;
@@ -107,7 +93,7 @@ thread_t *thread(thread_t* parent, const char* name, bool user);
 
 void thread_delete(thread_t *thread);
 
-list_t* thread_bystate(thread_state_t state);
+list_t* thread_bystate(task_state_t state);
 
 thread_t *thread_getbyid(int id);
 
@@ -117,7 +103,7 @@ thread_t* thread_spawn(thread_t* parent, const char* name, thread_entry_t entry,
 
 thread_t* thread_spawn_with_argv(thread_t* parent, const char* name, thread_entry_t entry, const char **argv, bool user);
 
-void thread_setstate(thread_t *thread, thread_state_t state);
+void thread_setstate(thread_t *thread, task_state_t state);
 
 void thread_setentry(thread_t *t, thread_entry_t entry, bool user);
 

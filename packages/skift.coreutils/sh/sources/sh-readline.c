@@ -5,7 +5,8 @@
 #include <skift/messaging.h>
 #include <skift/cstring.h>
 #include <skift/iostream.h>
-#include <kernel/protocol.h>
+
+#include <hjert/devkit/keyboard.h>
 
 #include "shell.h"
 

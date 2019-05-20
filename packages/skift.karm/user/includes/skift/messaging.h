@@ -1,7 +1,9 @@
 #pragma once
 
 #include <skift/runtime.h>
-#include <skift/syscalls.h>
+
+#include <hjert/shared/syscalls.h>
+#include <hjert/shared/message.h>
 
 DECL_SYSCALL5(messaging_send, int to, const char *name, void *payload, unsigned int size, unsigned int flags);
 DECL_SYSCALL5(messaging_broadcast, const char *channel, const char *name, void *payload, unsigned int size, unsigned int flags);

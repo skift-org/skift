@@ -5,9 +5,11 @@
 #include <skift/cstring.h>
 #include <skift/atomic.h>
 
+#include <hjert/devkit/mouse.h>
+#include <hjert/shared/message.h>
+
 #include "kernel/cpu/irq.h"
 #include "kernel/processor.h"
-#include "kernel/protocol.h"
 #include "kernel/tasking.h"
 
 #include "kernel/mouse.h"

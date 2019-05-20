@@ -16,7 +16,8 @@
 #include <skift/logger.h>
 #include <skift/system.h>
 
-#include "kernel/shared/syscalls.h"
+#include <hjert/shared/syscalls.h>
+
 #include "kernel/filesystem.h"
 #include "kernel/memory.h"
 #include "kernel/serial.h"

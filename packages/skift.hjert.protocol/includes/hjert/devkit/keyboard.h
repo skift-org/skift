@@ -1,9 +1,5 @@
 #pragma once
 
-/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 typedef enum
 {
     ERROR = 0,
@@ -115,3 +111,15 @@ typedef enum
 
     KEYBOAD_KEY_END
 } keyboard_key_t;
+
+#define KEYBOARD_CHANNEL  "#dev:keyboard"
+
+#define KEYBOARD_KEYPRESSED  "dev:keyboard.keypressed"
+#define KEYBOARD_KEYRELEASED "dev:keyboard.keyreleased"
+#define KEYBOARD_KEYTYPED    "dev:keyboard.keytyped"
+
+typedef struct
+{
+    char c;
+    keyboard_key_t key;
+} keyboard_event_t;

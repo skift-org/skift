@@ -5,8 +5,6 @@
 #include <skift/cstring.h>
 #include <skift/iostream.h>
 
-#include "kernel/protocol.h"
-
 #include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/messaging.h>

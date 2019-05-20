@@ -7,6 +7,9 @@
 #include <skift/logger.h>
 #include <skift/ascii.h>
 
+#include <hjert/shared/message.h>
+#include <hjert/devkit/keyboard.h>
+
 #include "kernel/cpu/irq.h"
 #include "kernel/keyboard.h"
 #include "kernel/tasking.h"

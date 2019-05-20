@@ -5,6 +5,5 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-#include "kernel/shared/keyboard.h"
 
 void keyboard_setup();

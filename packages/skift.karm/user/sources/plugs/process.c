@@ -1,5 +1,5 @@
 #include <skift/__plugs__.h>
-#include <skift/syscalls.h>
+#include <hjert/shared/syscalls.h>
 #include <skift/assert.h>
 
 int __plug_process_this(void)

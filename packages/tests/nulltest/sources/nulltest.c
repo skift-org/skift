@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/shared/syscalls.h"
+#include <hjert/shared/syscalls.h>
 
 int main(int argc, char **argv)
 {

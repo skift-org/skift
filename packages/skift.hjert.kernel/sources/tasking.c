@@ -375,7 +375,7 @@ bool thread_cancel(thread_t* thread, int exitvalue)
     {
         // Set the new thread state
         thread->exitvalue = exitvalue;
-        thread_setstate(running, THREADSTATE_CANCELED);
+        thread_setstate(thread, THREADSTATE_CANCELED);
 
         log(LOG_DEBUG, "Thread(%d) got canceled.", thread->id);
 

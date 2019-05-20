@@ -17,3 +17,8 @@ int filesystem_mkdir(const char *path)
 {
     return __syscall(SYS_FILESYSTEM_MKDIR, (int)path, 0, 0, 0, 0);
 }
+
+int filesystem_rename(const char* old_path, const char* new_path)
+{
+    return __syscall(SYS_FILESYSTEM_RENAME, (int)old_path, (int)new_path, 0, 0, 0);
+}

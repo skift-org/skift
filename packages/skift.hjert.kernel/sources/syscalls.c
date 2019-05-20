@@ -197,16 +197,19 @@ int sys_filesystem_fstat(int fd, iostream_stat_t *stat)
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
-    path_t *p = path(dir_path);
+    path_t *p = thread_cwd_resolve(sheduler_running(), dir_path);
+
     int result = filesystem_mkdir(ROOT, p);
+    
     path_delete(p);
+    
     return result;
 }
 
 int sys_filesystem_link(const char* old_path, const char* new_path)
 {
-    path_t *oldp = path(old_path);
-    path_t *newp = path(new_path);
+    path_t *oldp = thread_cwd_resolve(sheduler_running(), old_path);
+    path_t *newp = thread_cwd_resolve(sheduler_running(), new_path);
     
     int result = filesystem_link(ROOT, oldp, ROOT, newp);
 
@@ -218,11 +221,29 @@ int sys_filesystem_link(const char* old_path, const char* new_path)
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    path_t *p = path(link_path);
+    path_t *p = thread_cwd_resolve(sheduler_running(),link_path);
+    
     int result = filesystem_unlink(ROOT, p);
+    
     path_delete(p);
+    
     return result;
 }
+
+int sys_filesystem_rename(const char *old_path, const char* new_path)
+{
+    path_t* oldp = thread_cwd_resolve(sheduler_running(), old_path);
+    path_t* newp = thread_cwd_resolve(sheduler_running(), new_path);
+
+    int result = filesystem_rename(NULL, oldp, NULL, newp);
+
+    path_delete(oldp);
+    path_delete(newp);
+
+    return result;
+}
+
+/* --- Sytem info getter ---------------------------------------------------- */
 
 int sys_system_get_info(system_info_t* info)
 {
@@ -290,9 +311,11 @@ static int (*syscalls[])() =
         [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
         [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
         [SYS_FILESYSTEM_FSTAT] = sys_filesystem_fstat,
+
         [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
         [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
         [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
+        [SYS_FILESYSTEM_RENAME] = sys_filesystem_rename,
 
         [SYS_SYSTEM_GET_INFO] = sys_system_get_info,
         [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,

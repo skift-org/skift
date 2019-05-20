@@ -177,6 +177,8 @@ int filesystem_link(fsnode_t *atfile, path_t *file, fsnode_t *atlink, path_t *li
 
 int filesystem_unlink(fsnode_t *at, path_t *p);
 
+int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath, path_t *newpath);
+
 bool filesystem_exist(fsnode_t* at, path_t* p);
 
 // *filesystem_mkdev* with error checking.

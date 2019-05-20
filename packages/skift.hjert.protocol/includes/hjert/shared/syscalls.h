@@ -56,13 +56,12 @@ typedef enum
     
     SYS_FILESYSTEM_LINK,
     SYS_FILESYSTEM_UNLINK,
-   
     SYS_FILESYSTEM_MKDIR,
+    SYS_FILESYSTEM_RENAME,
 
 // System ------------------------------------------------------------------- //
 
     SYS_SYSTEM_GET_INFO,
-    
     SYS_SYSTEM_GET_STATUS,
 
 ////////////////////////////////////////////////////////////////////////////////

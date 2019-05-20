@@ -983,6 +983,34 @@ int filesystem_unlink(fsnode_t *at, path_t *link_path)
     return result;
 }
 
+int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath, path_t *newpath)
+{
+    IS_FS_READY;
+
+    int result = -1;
+
+    lock_acquire(fslock);
+    {
+        fsnode_t* node = filesystem_resolve(atoldpath, oldpath);
+        if (node != NULL)
+        {
+            fsnode_t *parent = filesystem_resolve_parent(atnewpath, newpath);
+
+            if (parent != NULL && parent->type == FSNODE_DIRECTORY)
+            {
+                if (directory_link(parent, node, path_filename(newpath)))
+                {
+                    directory_unlink(parent, path_filename(oldpath));
+                    result = 0;
+                }
+            }
+        }
+    }
+    lock_release(fslock);
+
+    return result;
+}
+
 bool filesystem_exist(fsnode_t* at, path_t* p)
 {
     fsnode_t* node = filesystem_acquire(at, p, false);

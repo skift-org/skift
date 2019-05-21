@@ -98,7 +98,7 @@ void __panic(const char* package, const char* file, const char* function, const 
     if (!nested_panic)
     {
         // filesystem_panic_dump();
-        // thread_panic_dump();
+        // task_panic_dump();
     }
 
     printf("\n");

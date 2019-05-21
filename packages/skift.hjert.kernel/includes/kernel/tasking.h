@@ -13,11 +13,11 @@
 #include "kernel/memory.h"
 #include "kernel/filesystem.h"
 
-/* --- Thread data structure ------------------------------------------------ */
+/* --- Task data structure -------------------------------------------------- */
 
-typedef int THREAD; // Thread handle
+typedef int TASK; // Task handle
 
-typedef void (*thread_entry_t)();
+typedef void (*task_entry_t)();
 
 typedef struct
 {
@@ -29,21 +29,20 @@ typedef struct
 typedef struct
 {
     uint wakeuptick;
-} thread_wait_time_t;
-
+} task_wait_time_t;
 
 typedef struct
 {
-    int thread_handle;
+    int task_handle;
     int exitvalue;
-} thread_wait_thread_t;
+} task_wait_task_t;
 
 typedef struct
 {
     message_t *message;
-} thread_wait_message_t;
+} task_wait_message_t;
 
-typedef struct thread
+typedef struct task
 {
     int id;
     char name[TASK_NAMESIZE]; // Frendly name of the process
@@ -53,13 +52,13 @@ typedef struct thread
 
     uint sp;
     byte stack[TASK_STACKSIZE]; // Kernel stack
-    thread_entry_t entry; // Our entry point
+    task_entry_t entry; // Our entry point
 
     struct
     {
-        thread_wait_time_t time;
-        thread_wait_thread_t thread;
-        thread_wait_message_t message;
+        task_wait_time_t time;
+        task_wait_task_t task;
+        task_wait_message_t message;
     } wait;
 
     lock_t inbox_lock;
@@ -75,7 +74,7 @@ typedef struct thread
     page_directorie_t *pdir; // Page directorie
 
     int exitvalue;
-} thread_t;
+} task_t;
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */      
@@ -84,98 +83,98 @@ typedef struct thread
 void tasking_setup(void);
 
 /* -------------------------------------------------------------------------- */
-/*   THREADS                                                                  */      
+/*   TASKS                                                                    */      
 /* -------------------------------------------------------------------------- */
 
-void thread_setup(void);
+void task_setup(void);
 
-thread_t *thread(thread_t* parent, const char* name, bool user);
+task_t *task(task_t* parent, const char* name, bool user);
 
-void thread_delete(thread_t *thread);
+void task_delete(task_t *task);
 
-list_t* thread_bystate(task_state_t state);
+list_t* task_bystate(task_state_t state);
 
-thread_t *thread_getbyid(int id);
+task_t *task_getbyid(int id);
 
-int thread_count(void);
+int task_count(void);
 
-thread_t* thread_spawn(thread_t* parent, const char* name, thread_entry_t entry, void *arg, bool user);
+task_t* task_spawn(task_t* parent, const char* name, task_entry_t entry, void *arg, bool user);
 
-thread_t* thread_spawn_with_argv(thread_t* parent, const char* name, thread_entry_t entry, const char **argv, bool user);
+task_t* task_spawn_with_argv(task_t* parent, const char* name, task_entry_t entry, const char **argv, bool user);
 
-void thread_setstate(thread_t *thread, task_state_t state);
+void task_setstate(task_t *task, task_state_t state);
 
-void thread_setentry(thread_t *t, thread_entry_t entry, bool user);
+void task_setentry(task_t *t, task_entry_t entry, bool user);
 
-uint thread_stack_push(thread_t *t, const void *value, uint size);
+uint task_stack_push(task_t *t, const void *value, uint size);
 
-void thread_go(thread_t *t);
+void task_go(task_t *t);
 
-void thread_sleep(int time);
+void task_sleep(int time);
 
-int thread_wakeup(thread_t* thread);
+int task_wakeup(task_t* task);
 
-bool thread_wait(int thread_id, int *exitvalue);
+bool task_wait(int task_id, int *exitvalue);
 
-bool thread_cancel(thread_t* thread, int exitvalue);
+bool task_cancel(task_t* task, int exitvalue);
 
-void thread_exit(int exitvalue);
+void task_exit(int exitvalue);
 
-void thread_dump(thread_t *t);
+void task_dump(task_t *t);
 
-void thread_panic_dump(void);
+void task_panic_dump(void);
 
-/* --- Thread memory management --------------------------------------------- */
+/* --- Task memory management ----------------------------------------------- */
 
-int thread_memory_map(thread_t* this, uint addr, uint count);
+int task_memory_map(task_t* this, uint addr, uint count);
 
-int thread_memory_unmap(thread_t* this, uint addr, uint count);
+int task_memory_unmap(task_t* this, uint addr, uint count);
 
-uint thread_memory_alloc(thread_t* this, uint count);
+uint task_memory_alloc(task_t* this, uint count);
 
-void thread_memory_free(thread_t* this, uint addr, uint count);
+void task_memory_free(task_t* this, uint addr, uint count);
 
-/* --- Thread current working directory ------------------------------------- */
+/* --- Task current working directory --------------------------------------- */
 
-path_t* thread_cwd_resolve(thread_t* this, const char* path_to_resolve);
+path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve);
 
-bool thread_set_cwd(thread_t* this, const char* new_wd);
+bool task_set_cwd(task_t* this, const char* new_wd);
 
-void thread_get_cwd(thread_t* this, char* buffer, uint size);
+void task_get_cwd(task_t* this, char* buffer, uint size);
 
-/* --- Thread file system access -------------------------------------------- */
+/* --- Task file system access ---------------------------------------------- */
 
-void thread_filedescriptor_close_all(thread_t* this);
+void task_filedescriptor_close_all(task_t* this);
 
-int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream);
+int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream);
 
-stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index);
+stream_t *task_filedescriptor_acquire(task_t *this, int fd_index);
 
-int thread_filedescriptor_release(thread_t *this, int fd_index);
+int task_filedescriptor_release(task_t *this, int fd_index);
 
-int thread_filedescriptor_free_and_release(thread_t *this, int fd_index);
+int task_filedescriptor_free_and_release(task_t *this, int fd_index);
 
-int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags);
+int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags);
 
-int thread_close_file(thread_t* this, int fd);
+int task_close_file(task_t* this, int fd);
 
-int thread_read_file(thread_t* this, int fd, void *buffer, uint size);
+int task_read_file(task_t* this, int fd, void *buffer, uint size);
 
-int thread_write_file(thread_t* this, int fd, const void *buffer, uint size);
+int task_write_file(task_t* this, int fd, const void *buffer, uint size);
 
-int thread_ioctl_file(thread_t* this, int fd, int request, void *args);
+int task_ioctl_file(task_t* this, int fd, int request, void *args);
 
-int thread_seek_file(thread_t* this, int fd, int offset, iostream_whence_t whence);
+int task_seek_file(task_t* this, int fd, int offset, iostream_whence_t whence);
 
-int thread_tell_file(thread_t* this, int fd, iostream_whence_t whence);
+int task_tell_file(task_t* this, int fd, iostream_whence_t whence);
 
-int thread_fstat_file(thread_t* this, int fd, iostream_stat_t *stat);
+int task_fstat_file(task_t* this, int fd, iostream_stat_t *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */      
 /* -------------------------------------------------------------------------- */
 
-int thread_exec(const char *executable_path, const char **argv);
+int task_exec(const char *executable_path, const char **argv);
 
 /* -------------------------------------------------------------------------- */
 /*   MESSAGING                                                                */      
@@ -201,13 +200,13 @@ message_t *message(int id, const char *label, void *payload, uint size, uint fla
 
 void message_delete(message_t *msg);
 
-int messaging_send_internal(thread_t*  from, thread_t*  to, int id, const char *name, void *payload, uint size, uint flags);
+int messaging_send_internal(task_t*  from, task_t*  to, int id, const char *name, void *payload, uint size, uint flags);
 
-int messaging_send(thread_t* to, const char *name, void *payload, uint size, uint flags);
+int messaging_send(task_t* to, const char *name, void *payload, uint size, uint flags);
 
 int messaging_broadcast(const char *channel_name, const char *name, void *payload, uint size, uint flags);
 
-message_t *messaging_receive_internal(thread_t *thread);
+message_t *messaging_receive_internal(task_t *task);
 
 bool messaging_receive(message_t *msg, bool wait);
 
@@ -221,7 +220,7 @@ int messaging_unsubscribe(const char *channel_name);
 /*   GARBAGE COLECTOR                                                         */      
 /* -------------------------------------------------------------------------- */
 
-void collect_and_free_thread(void);
+void collect_and_free_task(void);
 
 void collect_and_free_process(void);
 
@@ -233,9 +232,9 @@ void garbage_colector();
 
 void timer_set_frequency(int hz);
 
-void sheduler_setup(thread_t *main_kernel_thread);
+void sheduler_setup(task_t *main_kernel_task);
 
-void wakeup_sleeping_threads(void);
+void wakeup_sleeping_tasks(void);
 
 reg32_t shedule(reg32_t sp, processor_context_t *context);
 
@@ -245,6 +244,6 @@ bool sheduler_is_context_switch(void);
 
 void sheduler_yield(void);
 
-thread_t* sheduler_running(void);
+task_t* sheduler_running(void);
 
 int sheduler_running_id(void);

@@ -100,42 +100,42 @@ int __plug_logger_unlock()
 
 int __plug_iostream_open(const char *file_path, iostream_flag_t flags)
 {
-    return thread_open_file(sheduler_running(), file_path, flags);
+    return task_open_file(sheduler_running(), file_path, flags);
 }
 
 int __plug_iostream_close(int fd)
 {
-    return thread_close_file(sheduler_running(), fd);
+    return task_close_file(sheduler_running(), fd);
 }
 
 int __plug_iostream_read(int fd, void *buffer, uint size)
 {
-    return thread_read_file(sheduler_running(), fd, buffer, size);
+    return task_read_file(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_write(int fd, const void *buffer, uint size)
 {
-    return thread_write_file(sheduler_running(), fd, buffer, size);
+    return task_write_file(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_ioctl(int fd, int request, void *args)
 {
-    return thread_ioctl_file(sheduler_running(), fd, request, args);
+    return task_ioctl_file(sheduler_running(), fd, request, args);
 }
 
 int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence)
 {
-    return thread_seek_file(sheduler_running(), fd, offset, whence);
+    return task_seek_file(sheduler_running(), fd, offset, whence);
 }
 
 int __plug_iostream_tell(int fd, iostream_whence_t whence)
 {
-    return thread_tell_file(sheduler_running(), fd, whence);
+    return task_tell_file(sheduler_running(), fd, whence);
 }
 
 int __plug_iostream_fstat(int fd, iostream_stat_t *stat)
 {
-    return thread_fstat_file(sheduler_running(), fd, stat);
+    return task_fstat_file(sheduler_running(), fd, stat);
 }
 
 /* --- Processes ------------------------------------------------------------ */
@@ -147,16 +147,16 @@ int __plug_process_this(void)
 
 int __plug_process_exec(const char *file_name, const char **argv)
 {
-    return thread_exec(file_name, argv);
+    return task_exec(file_name, argv);
 }
 
 // TODO: void __plug_process_spawn();
 
 int __plug_process_exit(int code)
 {
-    thread_exit(code);
+    task_exit(code);
 
-    PANIC("Thread exit failled!");
+    PANIC("Task exit failled!");
 
     return 0; 
 }
@@ -166,7 +166,7 @@ int __plug_process_cancel(int pid)
     int result;
     
     ATOMIC({
-        result = thread_cancel(thread_getbyid(pid), -1);
+        result = task_cancel(task_getbyid(pid), -1);
     });
 
     return result;
@@ -174,39 +174,39 @@ int __plug_process_cancel(int pid)
 
 int __plug_process_map(uint addr, uint count)
 {
-    return thread_memory_map(sheduler_running(), addr, count);
+    return task_memory_map(sheduler_running(), addr, count);
 }
 
 int __plug_process_unmap(uint addr, uint count)
 {
-    return thread_memory_unmap(sheduler_running(), addr, count);
+    return task_memory_unmap(sheduler_running(), addr, count);
 }
 
 uint __plug_process_alloc(uint count)
 {
-    return thread_memory_alloc(sheduler_running(), count);
+    return task_memory_alloc(sheduler_running(), count);
 }
 
 int __plug_process_free(uint addr, uint count)
 {
-    thread_memory_free(sheduler_running(), addr, count);
+    task_memory_free(sheduler_running(), addr, count);
     return 0;
 }
 
 int __plug_process_get_cwd(char* buffer, uint size)
 {
-    thread_get_cwd(sheduler_running(), buffer, size);
+    task_get_cwd(sheduler_running(), buffer, size);
     return 0;
 }
 
 int __plug_process_set_cwd(const char* cwd)
 {
-    return thread_set_cwd(sheduler_running(), cwd);
+    return task_set_cwd(sheduler_running(), cwd);
 }
 
 int __plug_process_sleep(int time)
 {
-    thread_sleep(time);
+    task_sleep(time);
     return 0;
 }
 
@@ -215,7 +215,7 @@ int __plug_process_wakeup(int pid)
     int result;
     
     ATOMIC({
-        result = thread_wakeup(thread_getbyid(pid));
+        result = task_wakeup(task_getbyid(pid));
     });
 
     return result; 
@@ -223,5 +223,5 @@ int __plug_process_wakeup(int pid)
 
 int __plug_process_wait(int pid, int* exit_value)
 {
-    return thread_wait(pid, exit_value);
+    return task_wait(pid, exit_value);
 }

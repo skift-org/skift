@@ -41,12 +41,12 @@ int sys_process_this(void)
 
 int sys_process_exec(const char *file_name, const char **argv)
 {
-    return thread_exec(file_name, argv);
+    return task_exec(file_name, argv);
 }
 
 int sys_process_exit(int code)
 {
-    thread_exit(code);
+    task_exit(code);
     return 0;
 }
 
@@ -55,7 +55,7 @@ int sys_process_cancel(int pid)
     int result;
     
     ATOMIC({
-        result = thread_cancel(thread_getbyid(pid), -1);
+        result = task_cancel(task_getbyid(pid), -1);
     });
 
     return result;
@@ -63,65 +63,65 @@ int sys_process_cancel(int pid)
 
 int sys_process_map(uint addr, uint count)
 {
-    return thread_memory_map(sheduler_running(), addr, count);
+    return task_memory_map(sheduler_running(), addr, count);
 }
 
 int sys_process_unmap(uint addr, uint count)
 {
-    return thread_memory_unmap(sheduler_running(), addr, count);
+    return task_memory_unmap(sheduler_running(), addr, count);
 }
 
 int sys_process_alloc(uint count)
 {
-    return thread_memory_alloc(sheduler_running(), count);
+    return task_memory_alloc(sheduler_running(), count);
 }
 
 int sys_process_free(uint addr, uint count)
 {
-    thread_memory_free(sheduler_running(), addr, count);
+    task_memory_free(sheduler_running(), addr, count);
     return 0;
 }
 
 int sys_process_get_cwd(char* buffer, uint size)
 {
-    thread_get_cwd(sheduler_running(), buffer, size);
+    task_get_cwd(sheduler_running(), buffer, size);
     return 0;
 }
 
 int sys_process_set_cwd(const char* path)
 {
-    return thread_set_cwd(sheduler_running(), path);
+    return task_set_cwd(sheduler_running(), path);
 }
 
 int sys_process_sleep(int time)
 {
-    thread_sleep(time);
+    task_sleep(time);
     return 0;
 }
 
-int sys_process_wakeup(THREAD t)
+int sys_process_wakeup(TASK t)
 {
     int result;
     
     ATOMIC({
-        result = thread_wakeup(thread_getbyid(t));
+        result = task_wakeup(task_getbyid(t));
     });
 
     return result; 
 }
 
-int sys_process_wait(THREAD t, int *exitvalue)
+int sys_process_wait(TASK t, int *exitvalue)
 {
-    return thread_wait(t, exitvalue);
+    return task_wait(t, exitvalue);
 }
 
 /* --- Messaging ------------------------------------------------------------ */
-int sys_messaging_send(THREAD to, const char *name, void *payload, uint size, uint flags)
+int sys_messaging_send(TASK to, const char *name, void *payload, uint size, uint flags)
 {
     int result;
     
     ATOMIC({
-        result = messaging_send(thread_getbyid(to), name, payload, size, flags);
+        result = messaging_send(task_getbyid(to), name, payload, size, flags);
     });
 
     return result; 
@@ -157,47 +157,47 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_filesystem_open(const char *path, iostream_flag_t flags)
 {
-    return thread_open_file(sheduler_running(), path, flags);
+    return task_open_file(sheduler_running(), path, flags);
 }
 
 int sys_filesystem_close(int fd)
 {
-    return thread_close_file(sheduler_running(), fd);
+    return task_close_file(sheduler_running(), fd);
 }
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
 {
-    return thread_read_file(sheduler_running(), fd, buffer, size);
+    return task_read_file(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_write(int fd, void *buffer, uint size)
 {
-    return thread_write_file(sheduler_running(), fd, buffer, size);
+    return task_write_file(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_ioctl(int fd, int request, void *args)
 {
-    return thread_ioctl_file(sheduler_running(), fd, request, args);
+    return task_ioctl_file(sheduler_running(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, iostream_whence_t whence)
 {
-    return thread_seek_file(sheduler_running(), fd, offset, whence);
+    return task_seek_file(sheduler_running(), fd, offset, whence);
 }
 
 int sys_filesystem_tell(int fd, iostream_whence_t whence)
 {
-    return thread_tell_file(sheduler_running(), fd, whence);
+    return task_tell_file(sheduler_running(), fd, whence);
 }
 
 int sys_filesystem_fstat(int fd, iostream_stat_t *stat)
 {
-    return thread_fstat_file(sheduler_running(), fd, stat);
+    return task_fstat_file(sheduler_running(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
-    path_t *p = thread_cwd_resolve(sheduler_running(), dir_path);
+    path_t *p = task_cwd_resolve(sheduler_running(), dir_path);
 
     int result = filesystem_mkdir(ROOT, p);
     
@@ -208,8 +208,8 @@ int sys_filesystem_mkdir(const char *dir_path)
 
 int sys_filesystem_link(const char* old_path, const char* new_path)
 {
-    path_t *oldp = thread_cwd_resolve(sheduler_running(), old_path);
-    path_t *newp = thread_cwd_resolve(sheduler_running(), new_path);
+    path_t *oldp = task_cwd_resolve(sheduler_running(), old_path);
+    path_t *newp = task_cwd_resolve(sheduler_running(), new_path);
     
     int result = filesystem_link(ROOT, oldp, ROOT, newp);
 
@@ -221,7 +221,7 @@ int sys_filesystem_link(const char* old_path, const char* new_path)
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    path_t *p = thread_cwd_resolve(sheduler_running(),link_path);
+    path_t *p = task_cwd_resolve(sheduler_running(),link_path);
     
     int result = filesystem_unlink(ROOT, p);
     
@@ -232,8 +232,8 @@ int sys_filesystem_unlink(const char *link_path)
 
 int sys_filesystem_rename(const char *old_path, const char* new_path)
 {
-    path_t* oldp = thread_cwd_resolve(sheduler_running(), old_path);
-    path_t* newp = thread_cwd_resolve(sheduler_running(), new_path);
+    path_t* oldp = task_cwd_resolve(sheduler_running(), old_path);
+    path_t* newp = task_cwd_resolve(sheduler_running(), new_path);
 
     int result = filesystem_rename(NULL, oldp, NULL, newp);
 
@@ -273,7 +273,7 @@ int sys_system_get_status(system_status_t* status)
     status->total_ram = memory_get_total();
     status->used_ram = memory_get_used();
 
-    status->running_threads = thread_count();
+    status->running_tasks = task_count();
 
     return 0;
 }

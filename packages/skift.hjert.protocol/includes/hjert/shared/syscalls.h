@@ -8,7 +8,7 @@ typedef enum
 {
     SYS_DEBUG = 0,
 
-/* --- Process and Threads -------------------------------------------------- */
+/* --- Process and Tasks ---------------------------------------------------- */
 
     // Process
     SYS_PROCESS_SELF,

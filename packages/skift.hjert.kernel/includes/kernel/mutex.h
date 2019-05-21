@@ -6,8 +6,7 @@
 
 #include <skift/runtime.h>
 #include <skift/list.h>
-
-#include "kernel/thread.h"
+#include "kernel/tasking.h"
 
 typedef struct 
 {
@@ -15,7 +14,7 @@ typedef struct
 
     bool aquired;
 
-    thread_t* holder;
+    task_t* holder;
     list_t* wait_queue;
 } mutex_t;
 

@@ -16,11 +16,11 @@
 /* -------------------------------------------------------------------------- */
 
 static uint ticks = 0;
-static thread_t *running = NULL;
+static task_t *running = NULL;
 
-static thread_t* kernel_thread;
-static thread_t* garbage_thread;
-static thread_t* idle_thread;
+static task_t* kernel_task;
+static task_t* garbage_task;
+static task_t* idle_task;
 
 void idle_code(){ HANG; }
 
@@ -28,67 +28,67 @@ void tasking_setup()
 {
     running = NULL;
 
-    thread_setup();
+    task_setup();
 
-    kernel_thread = thread_spawn(NULL, "kernel", NULL, NULL, 0);
-    thread_go(kernel_thread);
+    kernel_task = task_spawn(NULL, "kernel", NULL, NULL, 0);
+    task_go(kernel_task);
 
-    garbage_thread = thread_spawn(kernel_thread, "finalizer", garbage_colector, NULL, false);
-    thread_go(garbage_thread);
+    garbage_task = task_spawn(kernel_task, "finalizer", garbage_colector, NULL, false);
+    task_go(garbage_task);
 
-    idle_thread = thread_spawn(kernel_thread, "idle", idle_code, NULL, false);
-    thread_go(idle_thread);
-    thread_setstate(idle_thread, TASK_STATE_HANG);
+    idle_task = task_spawn(kernel_task, "idle", idle_code, NULL, false);
+    task_go(idle_task);
+    task_setstate(idle_task, TASK_STATE_HANG);
 
-    sheduler_setup(kernel_thread);
+    sheduler_setup(kernel_task);
 }
 
 /* -------------------------------------------------------------------------- */
-/*   THREADS                                                                  */
+/*   TASKS                                                                    */
 /* -------------------------------------------------------------------------- */
 
 static int TID = 1;
-static list_t *threads;
-static list_t *threads_bystates[TASK_STATE_COUNT];
+static list_t *tasks;
+static list_t *tasks_bystates[TASK_STATE_COUNT];
 
-void thread_setup(void)
+void task_setup(void)
 {
-    threads = list();
+    tasks = list();
 
-    if (threads == NULL)
+    if (tasks == NULL)
     {
-        PANIC("Failed to allocate thread list!");
+        PANIC("Failed to allocate task list!");
     }
 
     for (int i = 0; i < TASK_STATE_COUNT; i++)
     {
-        threads_bystates[i] = list();
+        tasks_bystates[i] = list();
 
-        if (threads_bystates[i] == NULL)
+        if (tasks_bystates[i] == NULL)
         {
-            PANIC("Failled to allocate threadbystate list!");
+            PANIC("Failled to allocate taskbystate list!");
         }
     }
 }
 
-thread_t *thread(thread_t* parent, const char* name, bool user)
+task_t *task(task_t* parent, const char* name, bool user)
 {
     ASSERT_ATOMIC;
 
-    thread_t *this = MALLOC(thread_t);
+    task_t *this = MALLOC(task_t);
 
     if (this == NULL)
     {
-        PANIC("Failed to allocated a new thread.");
+        PANIC("Failed to allocated a new task.");
     }
 
-    memset(this, 0, sizeof(thread_t));
+    memset(this, 0, sizeof(task_t));
 
     this->id = TID++;
     strlcpy(this->name, name, TASK_NAMESIZE);
     this->state = TASK_STATE_NONE;
 
-    list_pushback(threads, this);
+    list_pushback(tasks, this);
 
     // Setup inbox
     lock_init(this->inbox_lock);
@@ -133,16 +133,16 @@ thread_t *thread(thread_t* parent, const char* name, bool user)
     return this;
 }
 
-void thread_delete(thread_t *this)
+void task_delete(task_t *this)
 {
     atomic_begin();
     if (this->state != TASK_STATE_NONE)
-        thread_setstate(this, TASK_STATE_NONE);
+        task_setstate(this, TASK_STATE_NONE);
 
-    list_remove(threads, this);
+    list_remove(tasks, this);
     atomic_end();
 
-    thread_filedescriptor_close_all(this);
+    task_filedescriptor_close_all(this);
     
     list_foreach(i, this->inbox)
     {
@@ -159,109 +159,109 @@ void thread_delete(thread_t *this)
     free(this);
 }
 
-list_t *thread_bystate(task_state_t state)
+list_t *task_bystate(task_state_t state)
 {
-    return threads_bystates[state];
+    return tasks_bystates[state];
 }
 
-thread_t *thread_getbyid(int id)
+task_t *task_getbyid(int id)
 {
-    list_foreach(i, threads)
+    list_foreach(i, tasks)
     {
-        thread_t *thread = i->value;
+        task_t *task = i->value;
 
-        if (thread->id == id)
-            return thread;
+        if (task->id == id)
+            return task;
     }
 
     return NULL;
 }
 
-int thread_count(void)
+int task_count(void)
 {
     atomic_begin();
-    int result = list_count(threads);
+    int result = list_count(tasks);
     atomic_end();
 
     return result;
 }
 
-thread_t* thread_spawn(thread_t* parent, const char* name, thread_entry_t entry, void *arg, bool user)
+task_t* task_spawn(task_t* parent, const char* name, task_entry_t entry, void *arg, bool user)
 {
     ASSERT_ATOMIC;
 
-    thread_t *t = thread(parent, name, user);
+    task_t *t = task(parent, name, user);
 
-    thread_setentry(t, entry, user);
-    thread_stack_push(t, &arg, sizeof(arg));
+    task_setentry(t, entry, user);
+    task_stack_push(t, &arg, sizeof(arg));
 
     return t;
 }
 
-thread_t* thread_spawn_with_argv(thread_t* parent, const char* name, thread_entry_t entry, const char **argv, bool user)
+task_t* task_spawn_with_argv(task_t* parent, const char* name, task_entry_t entry, const char **argv, bool user)
 {
     atomic_begin();
 
-    thread_t *t = thread(parent, name, user);
+    task_t *t = task(parent, name, user);
 
-    thread_setentry(t, entry, true);
+    task_setentry(t, entry, true);
 
     uint argv_list[TASK_ARGV_COUNT] = {0};
 
     int argc;
     for (argc = 0; argv[argc] && argc < TASK_ARGV_COUNT; argc++)
     {
-        argv_list[argc] = thread_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
+        argv_list[argc] = task_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
     }
 
-    uint argv_list_ref = thread_stack_push(t, &argv_list, sizeof(argv_list));
+    uint argv_list_ref = task_stack_push(t, &argv_list, sizeof(argv_list));
 
-    thread_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
-    thread_stack_push(t, &argc, sizeof(argc));
+    task_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
+    task_stack_push(t, &argc, sizeof(argc));
 
     atomic_end();
 
     return t;
 }
 
-/* --- Threads methodes ----------------------------------------------------- */
+/* --- Tasks methodes ----------------------------------------------------- */
 
 bool shortest_sleep_first(void *left, void *right)
 {
-    return ((thread_t *)left)->wait.time.wakeuptick < ((thread_t *)right)->wait.time.wakeuptick;
+    return ((task_t *)left)->wait.time.wakeuptick < ((task_t *)right)->wait.time.wakeuptick;
 }
 
-void thread_setstate(thread_t *thread, task_state_t state)
+void task_setstate(task_t *task, task_state_t state)
 {
     ASSERT_ATOMIC;
 
-    if (thread->state == state)
+    if (task->state == state)
         return;
 
-    // Remove the thread from its old groupe.
-    if (thread->state != TASK_STATE_NONE)
+    // Remove the task from its old groupe.
+    if (task->state != TASK_STATE_NONE)
     {
-        list_remove(threads_bystates[thread->state], thread);
+        list_remove(tasks_bystates[task->state], task);
     }
 
-    // Update the thread state
-    thread->state = state;
+    // Update the task state
+    task->state = state;
 
-    // Add the thread to the groupe
-    if (thread->state != TASK_STATE_NONE)
+    // Add the task to the groupe
+    if (task->state != TASK_STATE_NONE)
     {
-        if (thread->state == TASK_STATE_WAIT_TIME)
+        if (task->state == TASK_STATE_WAIT_TIME)
         {
-            list_insert_sorted(threads_bystates[TASK_STATE_WAIT_TIME], thread, shortest_sleep_first);
+            list_insert_sorted(tasks_bystates[TASK_STATE_WAIT_TIME], task, shortest_sleep_first);
         }
         else
         {
-            list_push(threads_bystates[thread->state], thread);
+            list_push(tasks_bystates[task->state], task);
         }
     }
 }
 
-void thread_setentry(thread_t *t, thread_entry_t entry, bool user)
+void task_setentry(task_t *t, task_entry_t entry, bool user)
 {
     t->entry = entry;
     t->user = user;
@@ -270,7 +270,7 @@ void thread_setentry(thread_t *t, thread_entry_t entry, bool user)
     t->sp = (reg32_t)(&t->stack[0] + TASK_STACKSIZE - 1);
 }
 
-uint thread_stack_push(thread_t *t, const void *value, uint size)
+uint task_stack_push(task_t *t, const void *value, uint size)
 {
     t->sp -= size;
     memcpy((void *)t->sp, value, size);
@@ -278,7 +278,7 @@ uint thread_stack_push(thread_t *t, const void *value, uint size)
     return t->sp;
 }
 
-void thread_go(thread_t *t)
+void task_go(task_t *t)
 {
     processor_context_t ctx;
 
@@ -286,64 +286,64 @@ void thread_go(thread_t *t)
     ctx.eip = (reg32_t)t->entry;
     ctx.ebp = ((reg32_t)t->stack + TASK_STACKSIZE);
 
-    // TODO: userspace thread
+    // TODO: userspace task
     ctx.cs = 0x08;
     ctx.ds = 0x10;
     ctx.es = 0x10;
     ctx.fs = 0x10;
     ctx.gs = 0x10;
 
-    thread_stack_push(t, &ctx, sizeof(ctx));
+    task_stack_push(t, &ctx, sizeof(ctx));
 
-    thread_setstate(t, TASK_STATE_RUNNING);
+    task_setstate(t, TASK_STATE_RUNNING);
 }
 
-/* --- Thread wait state ---------------------------------------------------- */
+/* --- Task wait state ---------------------------------------------------- */
 
-void thread_sleep(int time)
+void task_sleep(int time)
 {
     ATOMIC({
         running->wait.time.wakeuptick = ticks + time;
-        thread_setstate(running, TASK_STATE_WAIT_TIME);
+        task_setstate(running, TASK_STATE_WAIT_TIME);
     });
 
     sheduler_yield();
 }
 
-int thread_wakeup(thread_t* thread)
+int task_wakeup(task_t* task)
 {
     ASSERT_ATOMIC;
 
-    if (thread != NULL && thread->state == TASK_STATE_WAIT_TIME)
+    if (task != NULL && task->state == TASK_STATE_WAIT_TIME)
     {
-        thread_setstate(running, TASK_STATE_RUNNING);
+        task_setstate(running, TASK_STATE_RUNNING);
         return 0;
     }
 
     return -1;
 }
 
-bool thread_wait(int thread_id, int *exitvalue)
+bool task_wait(int task_id, int *exitvalue)
 {
     atomic_begin();
 
-    thread_t* thread = thread_getbyid(thread_id);
+    task_t* task = task_getbyid(task_id);
 
-    if (thread != NULL)
+    if (task != NULL)
     {
-        if (thread->state == TASK_STATE_CANCELED)
+        if (task->state == TASK_STATE_CANCELED)
         {
             if (exitvalue != NULL)
             {
-                *exitvalue = thread->exitvalue;
+                *exitvalue = task->exitvalue;
             }
 
             atomic_end();
         }
         else
         {
-            running->wait.thread.thread_handle = thread->id;
-            thread_setstate(running, TASK_STATE_WAIT_THREAD);
+            running->wait.task.task_handle = task->id;
+            task_setstate(running, TASK_STATE_WAIT_TASK);
             
             atomic_end();
             
@@ -351,7 +351,7 @@ bool thread_wait(int thread_id, int *exitvalue)
 
             if (exitvalue != NULL)
             {
-                *exitvalue = running->wait.thread.exitvalue;
+                *exitvalue = running->wait.task.exitvalue;
             }
         }
 
@@ -365,31 +365,31 @@ bool thread_wait(int thread_id, int *exitvalue)
     }
 }
 
-/* --- Thread stopping and canceling ---------------------------------------- */
+/* --- Task stopping and canceling ---------------------------------------- */
 
-bool thread_cancel(thread_t* thread, int exitvalue)
+bool task_cancel(task_t* task, int exitvalue)
 {
     atomic_begin();
 
-    if (thread != NULL)
+    if (task != NULL)
     {
-        // Set the new thread state
-        thread->exitvalue = exitvalue;
-        thread_setstate(thread, TASK_STATE_CANCELED);
+        // Set the new task state
+        task->exitvalue = exitvalue;
+        task_setstate(task, TASK_STATE_CANCELED);
 
-        log(LOG_DEBUG, "Thread(%d) got canceled.", thread->id);
+        log(LOG_DEBUG, "Task(%d) got canceled.", task->id);
 
-        // Wake up waiting threads
-        list_foreach(i, thread_bystate(TASK_STATE_WAIT_THREAD))
+        // Wake up waiting tasks
+        list_foreach(i, task_bystate(TASK_STATE_WAIT_TASK))
         {
-            thread_t *waitthread = i->value;
+            task_t *waittask = i->value;
 
-            if (waitthread->wait.thread.thread_handle == thread->id)
+            if (waittask->wait.task.task_handle == task->id)
             {
-                waitthread->wait.thread.exitvalue = exitvalue;
-                thread_setstate(waitthread, TASK_STATE_RUNNING);
+                waittask->wait.task.exitvalue = exitvalue;
+                task_setstate(waittask, TASK_STATE_RUNNING);
 
-                log(LOG_DEBUG, "Thread %d finish waiting thread %d.", waitthread->id, thread->id);
+                log(LOG_DEBUG, "Task %d finish waiting task %d.", waittask->id, task->id);
             }
         }
 
@@ -403,35 +403,35 @@ bool thread_cancel(thread_t* thread, int exitvalue)
     }
 }
 
-void thread_exit(int exitvalue)
+void task_exit(int exitvalue)
 {
-    thread_cancel(running, exitvalue);
+    task_cancel(running, exitvalue);
 
     sheduler_yield();
 
-    PANIC("sheduler_yield return but the thread is canceled!");
+    PANIC("sheduler_yield return but the task is canceled!");
 }
 
-/* --- Thread Memory managment ---------------------------------------------- */
+/* --- Task Memory managment ---------------------------------------------- */
 
-int thread_memory_map(thread_t* this, uint addr, uint count)
+int task_memory_map(task_t* this, uint addr, uint count)
 {
     return memory_map(this->pdir, addr, count, 1);
 }
 
-int thread_memory_unmap(thread_t* this, uint addr, uint count)
+int task_memory_unmap(task_t* this, uint addr, uint count)
 {
     return memory_unmap(this->pdir, addr, count);
 }
 
-uint thread_memory_alloc(thread_t* this, uint count)
+uint task_memory_alloc(task_t* this, uint count)
 {
     uint addr = memory_alloc(this->pdir, count, 1);
     log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
-void thread_memory_free(thread_t* this, uint addr, uint count)
+void task_memory_free(task_t* this, uint addr, uint count)
 {
     log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
     return memory_free(this->pdir, addr, count, 1);
@@ -439,18 +439,18 @@ void thread_memory_free(thread_t* this, uint addr, uint count)
 
 /* --- File descriptor allocation and locking ------------------------------- */
 
-void thread_filedescriptor_close_all(thread_t* this)
+void task_filedescriptor_close_all(task_t* this)
 {
     for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
         if (this->fds[i].stream != NULL)
         {
-            thread_close_file(this, i);
+            task_close_file(this, i);
         }
     }
 }
 
-int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
+int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream)
 {
     lock_acquire(this->fds_lock);
 
@@ -466,19 +466,19 @@ int thread_filedescriptor_alloc_and_acquire(thread_t *this, stream_t *stream)
 
             lock_release(this->fds_lock);
 
-            log(LOG_DEBUG, "File descriptor %d allocated for thread %d", i, this->id);
+            log(LOG_DEBUG, "File descriptor %d allocated for task %d", i, this->id);
 
             return i;
         }
     }
 
     lock_release(this->fds_lock);
-    log(LOG_WARNING, "We run out of file descriptor on thread %d", this->id);
+    log(LOG_WARNING, "We run out of file descriptor on task %d", this->id);
 
     return -1;
 }
 
-stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
+stream_t *task_filedescriptor_acquire(task_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
@@ -491,12 +491,12 @@ stream_t *thread_filedescriptor_acquire(thread_t *this, int fd_index)
         }
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return NULL;
 }
 
-int thread_filedescriptor_release(thread_t *this, int fd_index)
+int task_filedescriptor_release(task_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
@@ -507,12 +507,12 @@ int thread_filedescriptor_release(thread_t *this, int fd_index)
         return 0;
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -1;
 }
 
-int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
+int task_filedescriptor_free_and_release(task_t *this, int fd_index)
 {
     if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
     {
@@ -523,22 +523,22 @@ int thread_filedescriptor_free_and_release(thread_t *this, int fd_index)
         fd->free = true;
         fd->stream = NULL;
 
-        log(LOG_DEBUG, "File descriptor %d free for thread %d", fd_index, this->id);
+        log(LOG_DEBUG, "File descriptor %d free for task %d", fd_index, this->id);
 
         return 0;
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from thread %d", fd_index, this->id);
+    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -1;
 }
 
 
-/* --- thread file operations ----------------------------------------------- */
+/* --- task file operations ----------------------------------------------- */
 
-int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flags)
+int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags)
 {
-    path_t *p = thread_cwd_resolve(this, file_path);
+    path_t *p = task_cwd_resolve(this, file_path);
 
     stream_t *stream = filesystem_open(NULL, p, flags);
 
@@ -549,11 +549,11 @@ int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flag
         return -1;
     }
 
-    int fd = thread_filedescriptor_alloc_and_acquire(this, stream);
+    int fd = task_filedescriptor_alloc_and_acquire(this, stream);
 
     if (fd != -1)
     {
-        thread_filedescriptor_release(this, fd);
+        task_filedescriptor_release(this, fd);
     }
     else
     {
@@ -563,9 +563,9 @@ int thread_open_file(thread_t* this, const char *file_path, iostream_flag_t flag
     return fd;
 }
 
-int thread_close_file(thread_t* this, int fd)
+int task_close_file(task_t* this, int fd)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -574,14 +574,14 @@ int thread_close_file(thread_t* this, int fd)
 
     filesystem_close(stream);
 
-    thread_filedescriptor_free_and_release(this, fd);
+    task_filedescriptor_free_and_release(this, fd);
 
     return 0;
 }
 
-int thread_read_file(thread_t *this, int fd, void *buffer, uint size)
+int task_read_file(task_t *this, int fd, void *buffer, uint size)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -590,14 +590,14 @@ int thread_read_file(thread_t *this, int fd, void *buffer, uint size)
 
     int result = filesystem_read(stream, buffer, size);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-int thread_write_file(thread_t *this, int fd, const void *buffer, uint size)
+int task_write_file(task_t *this, int fd, const void *buffer, uint size)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -606,14 +606,14 @@ int thread_write_file(thread_t *this, int fd, const void *buffer, uint size)
 
     int result = filesystem_write(stream, buffer, size);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-int thread_ioctl_file(thread_t *this, int fd, int request, void *args)
+int task_ioctl_file(task_t *this, int fd, int request, void *args)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -622,14 +622,14 @@ int thread_ioctl_file(thread_t *this, int fd, int request, void *args)
 
     int result = filesystem_ioctl(stream, request, args);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-int thread_seek_file(thread_t *this, int fd, int offset, iostream_whence_t whence)
+int task_seek_file(task_t *this, int fd, int offset, iostream_whence_t whence)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -638,14 +638,14 @@ int thread_seek_file(thread_t *this, int fd, int offset, iostream_whence_t whenc
 
     int result = filesystem_seek(stream, offset, whence);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-int thread_tell_file(thread_t *this, int fd, iostream_whence_t whence)
+int task_tell_file(task_t *this, int fd, iostream_whence_t whence)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -654,14 +654,14 @@ int thread_tell_file(thread_t *this, int fd, iostream_whence_t whence)
 
     int result = filesystem_tell(stream, whence);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-int thread_fstat_file(thread_t *this, int fd, iostream_stat_t *stat)
+int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
 {
-    stream_t *stream = thread_filedescriptor_acquire(this, fd);
+    stream_t *stream = task_filedescriptor_acquire(this, fd);
 
     if (stream == NULL)
     {
@@ -670,16 +670,17 @@ int thread_fstat_file(thread_t *this, int fd, iostream_stat_t *stat)
 
     int result = filesystem_fstat(stream, stat);
 
-    thread_filedescriptor_release(this, fd);
+    task_filedescriptor_release(this, fd);
 
     return result;
 }
 
-/* --- Thread dump ---------------------------------------------------------- */
+/* --- Task dump ---------------------------------------------------------- */
 
-static char *THREAD_STATES[] =
+static char *TASK_STATES[] =
     {
         "HANG",
+        "LAUNCHPAD"
         "RUNNING",
         "SLEEP",
         "WAIT",
@@ -687,30 +688,30 @@ static char *THREAD_STATES[] =
         "CANCELED",
 };
 
-void thread_dump(thread_t *t)
+void task_dump(task_t *t)
 {
     atomic_begin();
-    printf("\n\t . Thread %d %s", t->id, t->name);
-    printf("\n\t   State: %s", THREAD_STATES[t->state]);
+    printf("\n\t . Task %d %s", t->id, t->name);
+    printf("\n\t   State: %s", TASK_STATES[t->state]);
     printf("\n\t   User memory: ");
     memory_layout_dump(t->pdir, true);
     printf("\n");
     atomic_end();
 }
 
-void thread_panic_dump(void)
+void task_panic_dump(void)
 {
     atomic_begin();
 
     printf("\n");
-    printf("\n\tRunning thread %d: '%s'", sheduler_running_id(), sheduler_running()->name);
+    printf("\n\tRunning task %d: '%s'", sheduler_running_id(), sheduler_running()->name);
     printf("\n");
-    printf("\n\tThreads:");
+    printf("\n\tTasks:");
 
-    list_foreach(i, threads)
+    list_foreach(i, tasks)
     {
-        thread_t *t = i->value;
-        thread_dump(t);
+        task_t *t = i->value;
+        task_dump(t);
     }
 
     atomic_end();
@@ -718,7 +719,7 @@ void thread_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(thread_t *this, iostream_t *s, elf_program_t *program)
+void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 {
     log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
@@ -730,7 +731,7 @@ void load_elfseg(thread_t *this, iostream_t *s, elf_program_t *program)
         page_directorie_t *pdir = running->pdir;
 
         paging_load_directorie(this->pdir);
-        thread_memory_map(this, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
+        task_memory_map(this, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
         memset((void *)program->vaddr, 0, program->memsz);
 
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
@@ -746,7 +747,7 @@ void load_elfseg(thread_t *this, iostream_t *s, elf_program_t *program)
     }
 }
 
-int thread_exec(const char *executable_path, const char **argv)
+int task_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
     iostream_t *s = iostream_open(executable_path, IOSTREAM_READ);
@@ -783,8 +784,8 @@ int thread_exec(const char *executable_path, const char **argv)
     // Create the process and load the executable.
     atomic_begin();
 
-    thread_t * new_thread = thread_spawn_with_argv(sheduler_running(), executable_path, (thread_entry_t)elf_header.entry, argv, true);
-    int new_thread_id = new_thread->id;
+    task_t * new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
+    int new_task_id = new_task->id;
 
     elf_program_t program;
 
@@ -793,24 +794,24 @@ int thread_exec(const char *executable_path, const char **argv)
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
         iostream_read(s, &program, sizeof(elf_program_t));
 
-        load_elfseg(new_thread, s, &program);
+        load_elfseg(new_task, s, &program);
     }
 
-    log(LOG_DEBUG, "Executable loaded, creating main thread...");
+    log(LOG_DEBUG, "Executable loaded, creating main task...");
 
-    thread_go(new_thread);
+    task_go(new_task);
 
     log(LOG_DEBUG, "Process created, back to caller..");
 
     atomic_end();
 
     iostream_close(s);
-    return new_thread_id;
+    return new_task_id;
 }
 
 /* --- Current working directory -------------------------------------------- */
 
-path_t* thread_cwd_resolve(thread_t* this, const char* path_to_resolve)
+path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
 {
     path_t *p = path(path_to_resolve);
 
@@ -830,11 +831,11 @@ path_t* thread_cwd_resolve(thread_t* this, const char* path_to_resolve)
     return p;
 }
 
-bool thread_set_cwd(thread_t *this, const char *new_path)
+bool task_set_cwd(task_t *this, const char *new_path)
 {
     log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
     
-    path_t *work_path = thread_cwd_resolve(this, new_path);
+    path_t *work_path = task_cwd_resolve(this, new_path);
     
     lock_acquire(this->cwd_lock);
 
@@ -868,7 +869,7 @@ bool thread_set_cwd(thread_t *this, const char *new_path)
     }
 }
 
-void thread_get_cwd(thread_t *this, char *buffer, uint size)
+void task_get_cwd(task_t *this, char *buffer, uint size)
 {
     lock_acquire(this->cwd_lock);
 
@@ -965,7 +966,7 @@ void messaging_setup(void)
     channels = list();
 }
 
-int messaging_send_internal(thread_t* from, thread_t*  to, int id, const char *name, void *payload, uint size, uint flags)
+int messaging_send_internal(task_t* from, task_t*  to, int id, const char *name, void *payload, uint size, uint flags)
 {
     if (to == NULL)
     {
@@ -988,13 +989,13 @@ int messaging_send_internal(thread_t* from, thread_t*  to, int id, const char *n
     if (to->state == TASK_STATE_WAIT_MESSAGE)
     {
         messaging_receive_internal(to);
-        thread_setstate(to, TASK_STATE_RUNNING);
+        task_setstate(to, TASK_STATE_RUNNING);
     }
 
     return id;
 }
 
-int messaging_send(thread_t* to, const char *name, void *payload, uint size, uint flags)
+int messaging_send(task_t* to, const char *name, void *payload, uint size, uint flags)
 {
     int id = 0;
 
@@ -1019,7 +1020,7 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
 
         list_foreach(p, c->subscribers)
         {
-            messaging_send_internal(sheduler_running(), ((thread_t *)p->value), id, name, payload, size, flags);
+            messaging_send_internal(sheduler_running(), ((task_t *)p->value), id, name, payload, size, flags);
         }
     }
 
@@ -1028,21 +1029,21 @@ int messaging_broadcast(const char *channel_name, const char *name, void *payloa
     return id;
 }
 
-message_t *messaging_receive_internal(thread_t *thread)
+message_t *messaging_receive_internal(task_t *task)
 {
     message_t *msg = NULL;
 
     atomic_begin();
 
-    if (thread->inbox->count > 0)
+    if (task->inbox->count > 0)
     {
-        if (thread->wait.message.message != NULL)
+        if (task->wait.message.message != NULL)
         {
-            message_delete(thread->wait.message.message);
+            message_delete(task->wait.message.message);
         }
 
-        list_pop(thread->inbox, (void **)&msg);
-        thread->wait.message.message = msg;
+        list_pop(task->inbox, (void **)&msg);
+        task->wait.message.message = msg;
     }
 
     atomic_end();
@@ -1056,7 +1057,7 @@ bool messaging_receive(message_t *msg, bool wait)
     if (incoming == NULL && wait)
     {
         atomic_begin();
-        thread_setstate(sheduler_running(), TASK_STATE_WAIT_MESSAGE);
+        task_setstate(sheduler_running(), TASK_STATE_WAIT_MESSAGE);
         atomic_end();
 
         sheduler_yield(); // Wait until we get a message.
@@ -1125,44 +1126,44 @@ int messaging_unsubscribe(const char *channel_name)
 /*   GARBAGE COLECTOR                                                         */
 /* -------------------------------------------------------------------------- */
 
-void collect_and_free_thread(void)
+void collect_and_free_task(void)
 {
-    list_t *thread_to_free = list();
+    list_t *task_to_free = list();
 
     atomic_begin();
-    // Get canceled threads
-    list_foreach(i, thread_bystate(TASK_STATE_CANCELED))
+    // Get canceled tasks
+    list_foreach(i, task_bystate(TASK_STATE_CANCELED))
     {
-        thread_t *thread = i->value;
-        list_pushback(thread_to_free, thread);
+        task_t *task = i->value;
+        list_pushback(task_to_free, task);
     }
 
     atomic_end();
 
-    // Cleanup all of those dead threads.
-    list_foreach(i, thread_to_free)
+    // Cleanup all of those dead tasks.
+    list_foreach(i, task_to_free)
     {
-        thread_t *thread = i->value;
-        int thread_id = thread->id;
+        task_t *task = i->value;
+        int task_id = task->id;
 
-        log(LOG_DEBUG, "free'ing thread %d", thread_id);
+        log(LOG_DEBUG, "free'ing task %d", task_id);
 
-        thread_delete(thread);
+        task_delete(task);
 
-        log(LOG_DEBUG, "Thread %d free'd.", thread_id);
+        log(LOG_DEBUG, "Task %d free'd.", task_id);
     }
 
-    list_delete(thread_to_free, LIST_KEEP_VALUES);
+    list_delete(task_to_free, LIST_KEEP_VALUES);
 }
 
 void garbage_colector()
 {
     while (true)
     {
-        thread_sleep(100); // We don't do this really often.
+        task_sleep(100); // We don't do this really often.
 
         // log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
-        collect_and_free_thread();
+        collect_and_free_task();
 
         // log(LOG_DEBUG, "Garbage collect end!");
     }
@@ -1186,9 +1187,9 @@ void timer_set_frequency(int hz)
     log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(thread_t *main_kernel_thread)
+void sheduler_setup(task_t *main_kernel_task)
 {
-    running = main_kernel_thread;
+    running = main_kernel_task;
 
     timer_set_frequency(100);
     irq_register(0, (irq_handler_t)&shedule);
@@ -1196,20 +1197,20 @@ void sheduler_setup(thread_t *main_kernel_thread)
 
 /* --- Sheduling ------------------------------------------------------------ */
 
-void wakeup_sleeping_threads(void)
+void wakeup_sleeping_tasks(void)
 {
-    if (!list_empty(thread_bystate(TASK_STATE_WAIT_TIME)))
+    if (!list_empty(task_bystate(TASK_STATE_WAIT_TIME)))
     {
-        thread_t *t;
+        task_t *t;
 
         do
         {
-            if (list_peek(thread_bystate(TASK_STATE_WAIT_TIME), (void **)&t))
+            if (list_peek(task_bystate(TASK_STATE_WAIT_TIME), (void **)&t))
             {
                 if (t->wait.time.wakeuptick <= ticks)
                 {
-                    thread_setstate(t, TASK_STATE_RUNNING);
-                    log(LOG_DEBUG, "Thread %d wake up!", t->id);
+                    task_setstate(t, TASK_STATE_RUNNING);
+                    log(LOG_DEBUG, "Task %d wake up!", t->id);
                 }
             }
 
@@ -1223,7 +1224,7 @@ static const char *animation = "|/-\\|/-\\";
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    //log(LOG_DEBUG, "Current thread %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
+    //log(LOG_DEBUG, "Current task %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     sheduler_context_switch = true;
 
@@ -1232,18 +1233,18 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     // Update the system ticks
     ticks++;
-    wakeup_sleeping_threads();
+    wakeup_sleeping_tasks();
 
-    // Get the next thread
-    if (!list_peek_and_pushback(thread_bystate(TASK_STATE_RUNNING), (void **)&running))
+    // Get the next task
+    if (!list_peek_and_pushback(task_bystate(TASK_STATE_RUNNING), (void **)&running))
     {
-        // Or the idle thread if there are no running threads.
-        running = idle_thread;
+        // Or the idle task if there are no running tasks.
+        running = idle_task;
     }
 
     sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
 
-    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == idle_thread) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
+    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == idle_task) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
 
     // Restore the context
     // TODO: set_kernel_stack(...);
@@ -1252,7 +1253,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     sheduler_context_switch = false;
 
-    //log(LOG_DEBUG, "Now current thread is %d(%s)", running->id, running->process->name);
+    //log(LOG_DEBUG, "Now current task is %d(%s)", running->id, running->process->name);
 
     return running->sp;
 }
@@ -1274,9 +1275,9 @@ void sheduler_yield()
     asm("int $32");
 }
 
-/* --- Running thread info -------------------------------------------------- */
+/* --- Running task info -------------------------------------------------- */
 
-thread_t *sheduler_running(void)
+task_t *sheduler_running(void)
 {
     return running;
 }
@@ -1293,14 +1294,14 @@ int sheduler_running_id(void)
     }
 }
 
-int sheduler_get_usage(int thread_id)
+int sheduler_get_usage(int task_id)
 {
     int count = 0;
 
     atomic_begin();
     for (int i = 0; i < SHEDULER_RECORD_COUNT; i++)
     {
-        if (sheduler_record[i] == thread_id)
+        if (sheduler_record[i] == task_id)
         {
             count++;
         }

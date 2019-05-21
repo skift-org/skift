@@ -20,7 +20,7 @@ typedef struct
     uint total_ram;
     uint used_ram;
     
-    int running_threads;
+    int running_tasks;
 } system_status_t;
 
 // Retrived system information like kernel name and system release.

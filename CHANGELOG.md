@@ -19,7 +19,7 @@ s
 
 
 ## Changes
- - Thread and processes are now the same thing
+ - Task and processes are now the same thing
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal

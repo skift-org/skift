@@ -142,7 +142,6 @@ void task_delete(task_t *this)
     list_remove(tasks, this);
     atomic_end();
 
-    task_filedescriptor_close_all(this);
     
     list_foreach(i, this->inbox)
     {
@@ -150,12 +149,17 @@ void task_delete(task_t *this)
     }
     list_delete(this->inbox, LIST_KEEP_VALUES);
 
+    task_filedescriptor_close_all(this);
+
+    lock_acquire(this->cwd_lock);
+    path_delete(this->cwd_path);
+    filesystem_release(this->cwd_node);
+
     if (this->pdir != memory_kpdir())
     {
         memory_free_pdir(this->pdir);
     }
 
-    // Now no one should still have a ptr to us we can die in peace.
     free(this);
 }
 

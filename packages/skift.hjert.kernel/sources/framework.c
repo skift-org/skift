@@ -39,6 +39,12 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
     PANIC("Kernel assert failed (see logs).");
 }
 
+void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line)
+{
+    log(LOG_FATAL, "Kernel lock assert failed: %s in %s:%s() ln%d!", (char *)lock->name, (char *)file, (char *)function, line);
+    PANIC("Kernel lock assert failed (see logs)."); 
+}
+
 /* --- Systeme API ---------------------------------------------------------- */
 
 // We are the system so we doesn't need that ;)

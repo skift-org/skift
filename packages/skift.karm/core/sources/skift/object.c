@@ -78,7 +78,7 @@ object_t *object_retain(object_t *this)
 
 void object_release(object_t *this)
 {
-    assert(this != NULL);
+    if (this != NULL) return;
 
     object_header_t* header = GET_OBJECT_HEADER(this);
 
@@ -86,7 +86,7 @@ void object_release(object_t *this)
 
     object_lock(this);
     
-    header->refcount++;
+    header->refcount--;
 
     if (header->refcount == 0)
     {

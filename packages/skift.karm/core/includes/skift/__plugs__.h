@@ -9,11 +9,14 @@
 #include <skift/runtime.h>
 #include <skift/iostream.h>
 #include <skift/system.h>
+#include <skift/lock.h>
 
 void __plug_init(void);
 void __plug_fini(int exit_code);
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
+
+void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line);
 
 // Logger ------------------------------------------------------------------- //
 

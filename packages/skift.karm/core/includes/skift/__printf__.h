@@ -2,9 +2,9 @@
 
 #include <skift/runtime.h>
 
-struct s_printf_info;
+struct printf_info;
 
-typedef void (*printf_append_t)(struct s_printf_info *info, char c);
+typedef void (*printf_append_t)(struct printf_info *info, char c);
 
 typedef enum
 {
@@ -20,7 +20,7 @@ typedef enum
     PFALIGN_RIGHT
 } printf_align_t;
 
-typedef struct s_printf_info
+typedef struct printf_info
 {
     char c;
     printf_state_t state;

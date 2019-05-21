@@ -173,7 +173,7 @@ int __printf(printf_info_t *info, va_list va)
 
     if (info->format == NULL)
     {
-        for (int i = 0; "(null)"[0];i++)
+        for (int i = 0; "(null)"[i];i++)
         {
             PRINTF_APPEND("(null)"[i]);
         }

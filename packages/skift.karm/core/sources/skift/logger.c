@@ -8,7 +8,7 @@
 #include <skift/iostream.h>
 #include <skift/logger.h>
 
-log_level_t log_level = LOG_ALL;
+log_level_t log_level = LOG_WARNING;
 bool show_file_name = true;
 
 struct

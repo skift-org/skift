@@ -716,10 +716,6 @@ void thread_panic_dump(void)
     atomic_end();
 }
 
-/* -------------------------------------------------------------------------- */
-/*   PROCESSES                                                                */
-/* -------------------------------------------------------------------------- */
-
 /* --- Process elf file loading --------------------------------------------- */
 
 void load_elfseg(thread_t *this, iostream_t *s, elf_program_t *program)

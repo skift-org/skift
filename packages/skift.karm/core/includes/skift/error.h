@@ -138,3 +138,4 @@ typedef enum
 const char *error_to_string(error_t error);
 error_t* error_get(void);
 void error_print(const char* message);
+void if_error_throw_and_catch_fire(const char* message);

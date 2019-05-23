@@ -4,7 +4,8 @@
     "id": "skift.karm.extra",
     "type": "lib",
 
-    "libs": [
-        "skift.karm.core"
+    "includes": [
+        "skift.karm.core",
+        "skift.hjert.protocol"
     ]
 }

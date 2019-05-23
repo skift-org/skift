@@ -85,6 +85,10 @@ def RMDIR(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
 
+def RM(file):
+    if os.path.exists(file):
+        os.remove(file)
+
 def COPY(src, dest):
     if os.path.isdir(src):
         copytree(src, dest)
@@ -226,13 +230,15 @@ class Target(object):
     Target building class.
     """
 
-    def __init__(self, location, data):
-        self.name = data["id"]
-        self.name_friendly = data["name"] if "name" in data else data["id"]
-        self.type = TargetTypes.FromStr(data["type"])
-        self.deps = data["libs"] if "libs" in data else []
-        self.incl = data["includes"] if "includes" in data else []
-        self.strict = data["strict"] if "strict" in data else True
+    def __init__(self, location, meta):
+        self.meta = meta
+
+        self.name = meta["id"]
+        self.name_friendly = meta["name"] if "name" in meta else meta["id"]
+        self.type = TargetTypes.FromStr(meta["type"])
+        self.deps = meta["libs"] if "libs" in meta else []
+        self.incl = meta["includes"] if "includes" in meta else []
+        self.strict = meta["strict"] if "strict" in meta else True
         
         self.location = location
 
@@ -256,8 +262,8 @@ class Target(object):
 
         return found
 
-    def get_dependancies(self, targets):
-        dependancies = self.get_dependancies_internal(targets)
+    def get_dependancies(self, targets, with_includes=False):
+        dependancies = self.get_dependancies_internal(targets, None, with_includes)
 
         if self in dependancies:
             dependancies.remove(self)
@@ -276,24 +282,30 @@ class Target(object):
     def get_includes(self, targets):
         includes = [join(self.location, "includes")]
 
-        for dep in self.get_dependancies(targets):
+        for dep in self.get_dependancies(targets, with_includes=True):
             includes.append(join(dep.location, "includes"))
 
         return includes
+
 
     def get_output(self):
         """
         Return the name of the output file of the current target.
         """
 
-        type_to_ext = {TargetTypes.LIB: ".lib",
-                       TargetTypes.APP: ".app",
-                       TargetTypes.KERNEL: ".bin"}
+        return join(self.location, "bin/" + self.get_output_filename())
 
-        if self.type in type_to_ext:
-            return join(self.location, "bin/" + self.name + type_to_ext[self.type])
+    def get_output_filename(self):
+        type_to_ext = {TargetTypes.LIB: ".a",
+                        TargetTypes.APP: "",
+                        TargetTypes.KERNEL: ".bin"}
+
+        if "output" in self.meta:
+            return self.meta["output"]
+        elif self.type in type_to_ext:
+            return self.name + type_to_ext[self.type]
         else:
-            return join(self.location, "bin/" + self.name + ".out")
+            return self.name + ".out"
 
     def get_sources(self):
         """
@@ -442,11 +454,11 @@ class Target(object):
             COPY(join(self.location, "includes"), join(sysroot, "usr/includes"))
 
         if self.type == TargetTypes.APP:
-            COPY(self.get_output(), join(join(sysroot, "bin"), self.name))
+            COPY(self.get_output(), join(join(sysroot, "bin"), self.get_output_filename()))
         elif self.type == TargetTypes.LIB:
-            COPY(self.get_output(), join(join(sysroot, "usr/lib"), self.name))
+            COPY(self.get_output(), join(join(sysroot, "usr/lib"), self.get_output_filename()))
         elif self.type == TargetTypes.KERNEL:
-            COPY(self.get_output(), join(join(sysroot, "boot"), self.name))
+            COPY(self.get_output(), join(join(sysroot, "boot"), self.get_output_filename()))
 
     def clean(self):
         print("    " + WHITE + "Cleaning " + self.name_friendly + RESET)
@@ -640,6 +652,8 @@ def sync(targets):
 def re_sync(targets):
     RMDIR("build/ramdisk")
     RMDIR("build/bootdisk")
+    RM("build/ramdisk.tar")
+    RM("build/bootdisk.tar")
 
     sync(targets)
 

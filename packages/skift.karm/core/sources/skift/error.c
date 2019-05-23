@@ -4,7 +4,7 @@
 
 #define ERROR_ENUM_STRING(__value) #__value,
 
-static error_t* error_value = ERR_SUCESS;
+static error_t error_value = ERR_SUCESS;
 
 const char *ERROR_NAMES[] = {ERROR_ENUM(ERROR_ENUM_STRING)};
 
@@ -13,7 +13,7 @@ const char *error_to_string(error_t error)
     return ERROR_NAMES[error];
 }
 
-error_t* error_get(void)
+error_t error_get(void)
 {
     return error_value;
 }

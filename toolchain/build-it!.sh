@@ -49,8 +49,6 @@ pushd tarballs
     fi
 popd
 
-exit 0
-
 mkdir -p $PREFIX
 
 mkdir -p "$DIR/build/binutils"

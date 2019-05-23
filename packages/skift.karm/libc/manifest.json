@@ -1,0 +1,14 @@
+{
+    "name":"C standard library",
+
+    "id": "skift.karm.libc",
+    "type": "lib",
+    
+    "output": "libc.a",
+
+    "libs": [
+        "skift.karm.core",
+        "skift.karm.user",
+        "skift.hjert.protocol"
+    ]
+}

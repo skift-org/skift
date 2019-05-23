@@ -451,12 +451,12 @@ class Target(object):
 
     def install(self, sysroot):
         if self.type != TargetTypes.APP and self.type != TargetTypes.KERNEL and os.path.isdir(join(self.location, "includes")):
-            COPY(join(self.location, "includes"), join(sysroot, "usr/includes"))
+            COPY(join(self.location, "includes"), join(sysroot, "lib/include"))
 
         if self.type == TargetTypes.APP:
             COPY(self.get_output(), join(join(sysroot, "bin"), self.get_output_filename()))
         elif self.type == TargetTypes.LIB:
-            COPY(self.get_output(), join(join(sysroot, "usr/lib"), self.get_output_filename()))
+            COPY(self.get_output(), join(join(sysroot, "lib"), self.get_output_filename()))
         elif self.type == TargetTypes.KERNEL:
             COPY(self.get_output(), join(join(sysroot, "boot"), self.get_output_filename()))
 
@@ -599,8 +599,8 @@ def sync(targets):
     bootdisk = MKDIR("build/bootdisk")
     MKDIR(join(ramdisk, "bin"))
     MKDIR(join(ramdisk, "usr"))
-    MKDIR(join(ramdisk, "usr/lib"))
-    MKDIR(join(ramdisk, "usr/includes"))
+    MKDIR(join(ramdisk, "lib"))
+    MKDIR(join(ramdisk, "lib/includes"))
     MKDIR(join(ramdisk, "boot"))
 
     ## --- RAMDISK ---------------------------------------------------------- ##

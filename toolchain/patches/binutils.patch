@@ -1,0 +1,141 @@
+diff -Nru binutils-2.31_clean/bfd/config.bfd binutils-2.31/bfd/config.bfd
+--- binutils-2.31_clean/bfd/config.bfd	2018-07-09 09:44:53.000000000 +0200
++++ binutils-2.31/bfd/config.bfd	2019-05-23 19:46:59.898051478 +0200
+@@ -222,6 +222,19 @@
+     ;;
+ 
+ # START OF targmatch.h
++  i[3-7]86-*-skift*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
++#ifdef BFD64
++  x86_64-*-skift*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
++#endif
++
+ #ifdef BFD64
+   aarch64-*-darwin*)
+     targ_defvec=aarch64_mach_o_vec
+diff -Nru binutils-2.31_clean/config.sub binutils-2.31/config.sub
+--- binutils-2.31_clean/config.sub	2018-07-06 09:13:31.000000000 +0200
++++ binutils-2.31/config.sub	2019-05-23 19:46:59.898051478 +0200
+@@ -1350,6 +1350,7 @@
+ 	# Each alternative MUST end in a * to match a version number.
+ 	# sysv* is not here because it comes later, after sysvr4.
+ 	gnu* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
++		 | skift* \
+ 	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]*\
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+ 	     | sym* | kopensolaris* | plan9* \
+diff -Nru binutils-2.31_clean/gas/configure.tgt binutils-2.31/gas/configure.tgt
+--- binutils-2.31_clean/gas/configure.tgt	2018-06-24 20:38:57.000000000 +0200
++++ binutils-2.31/gas/configure.tgt	2019-05-23 19:46:59.898051478 +0200
+@@ -208,6 +208,7 @@
+   h8300-*-elf)				fmt=elf ;;
+   h8300-*-linux*)			fmt=elf em=linux ;;
+ 
++  i386-*-skift*)    fmt=elf ;;
+   i386-*-beospe*)			fmt=coff em=pe ;;
+   i386-*-beos*)				fmt=elf ;;
+   i386-*-elfiamcu)			fmt=elf arch=iamcu ;;
+diff -Nru binutils-2.31_clean/ld/Makefile.am binutils-2.31/ld/Makefile.am
+--- binutils-2.31_clean/ld/Makefile.am	2018-06-24 20:38:57.000000000 +0200
++++ binutils-2.31/ld/Makefile.am	2019-05-23 19:46:59.898051478 +0200
+@@ -1277,6 +1277,10 @@
+ eelf_i386.c: $(srcdir)/emulparams/elf_i386.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_i386_skift.c: $(srcdir)/emulparams/elf_i386_skift.sh \
++  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_skift "$(tdir_elf_i386_skift)"
++
+ eelf_i386_be.c: $(srcdir)/emulparams/elf_i386_be.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
+@@ -1833,6 +1837,10 @@
+ eelf_x86_64.c: $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_x86_64_skift.c: $(srcdir)/emulparams/elf_x86_64_skift.sh \
++  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_x86_64_skift "$(tdir_elf_x86_64_skift)"
++
+ eelf_x86_64_cloudabi.c: $(srcdir)/emulparams/elf_x86_64_cloudabi.sh \
+   $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+diff -Nru binutils-2.31_clean/ld/Makefile.in binutils-2.31/ld/Makefile.in
+--- binutils-2.31_clean/ld/Makefile.in	2018-07-14 19:57:58.000000000 +0200
++++ binutils-2.31/ld/Makefile.in	2019-05-23 19:46:59.898051478 +0200
+@@ -2878,6 +2878,10 @@
+ eelf_i386.c: $(srcdir)/emulparams/elf_i386.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_i386_skift.c: $(srcdir)/emulparams/elf_i386_skift.sh \
++  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_skift "$(tdir_elf_i386_skift)"
++
+ eelf_i386_be.c: $(srcdir)/emulparams/elf_i386_be.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
+@@ -3434,6 +3438,10 @@
+ eelf_x86_64.c: $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_x86_64_skift.c: $(srcdir)/emulparams/elf_x86_64_skift.sh \
++  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_x86_64_skift "$(tdir_elf_x86_64_skift)"
++
+ eelf_x86_64_cloudabi.c: $(srcdir)/emulparams/elf_x86_64_cloudabi.sh \
+   $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+diff -Nru binutils-2.31_clean/ld/configure.tgt binutils-2.31/ld/configure.tgt
+--- binutils-2.31_clean/ld/configure.tgt	2018-07-09 09:44:53.000000000 +0200
++++ binutils-2.31/ld/configure.tgt	2019-05-23 19:46:59.901384811 +0200
+@@ -230,6 +230,15 @@
+ hppa*-*-netbsd*)	targ_emul=hppanbsd ;;
+ hppa*-*-openbsd*)	targ_emul=hppaobsd
+ 			;;
++i[3-7]86-*-skift*)
++			targ_emul=elf_i386_skift
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_skift elf_x86_64"
++			;;
++x86_64-*-skift*)
++			targ_emul=elf_x86_64_skift
++			targ_extra_emuls="elf_i386_skift elf_x86_64 elf_i386"
++			;;
+ i[3-7]86-*-nto-qnx*)	targ_emul=i386nto ;;
+ i[3-7]86-*-go32)	targ_emul=i386go32 ;;
+ i[3-7]86-*-msdosdjgpp*) targ_emul=i386go32 ;;
+@@ -778,6 +787,10 @@
+ NATIVE_LIB_DIRS='/usr/local/lib /lib /usr/lib'
+ case "${target}" in
+ 
++*-*-skift*)
++  NATIVE_LIB_DIRS='/lib /local/lib'
++  ;;
++
+ *-*-dragonfly*)
+   NATIVE_LIB_DIRS='/lib /usr/lib /usr/pkg/lib /usr/local/lib'
+   ;;
+diff -Nru binutils-2.31_clean/ld/emulparams/elf_i386_skift.sh binutils-2.31/ld/emulparams/elf_i386_skift.sh
+--- binutils-2.31_clean/ld/emulparams/elf_i386_skift.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.31/ld/emulparams/elf_i386_skift.sh	2019-05-23 19:46:59.901384811 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++TEXT_START_ADDR=0x40000000
+\ Pas de fin de ligne à la fin du fichier
+diff -Nru binutils-2.31_clean/ld/emulparams/elf_x86_64_skift.sh binutils-2.31/ld/emulparams/elf_x86_64_skift.sh
+--- binutils-2.31_clean/ld/emulparams/elf_x86_64_skift.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.31/ld/emulparams/elf_x86_64_skift.sh	2019-05-23 19:46:59.901384811 +0200
+@@ -0,0 +1,2 @@
++. ${srcdir}/emulparams/elf_x86_64.sh
++TEXT_START_ADDR=0x40000000
+\ Pas de fin de ligne à la fin du fichier

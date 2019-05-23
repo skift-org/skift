@@ -6,6 +6,7 @@
 #include <skift/__printf__.h>
 #include <skift/assert.h>
 #include <skift/cstring.h>
+#include <skift/error.h>
 #include <skift/iostream.h>
 #include <skift/math.h>
 
@@ -73,6 +74,7 @@ iostream_t *iostream_open(const char *path, iostream_flag_t flags)
 
     if (fd < 0)
     {
+        error_set(-fd);
         return NULL;
     }
 

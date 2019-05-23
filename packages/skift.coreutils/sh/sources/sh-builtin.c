@@ -1,6 +1,7 @@
 #include <skift/cstring.h>
 #include <skift/process.h>
 #include <skift/iostream.h>
+#include <skift/error.h>
 
 #include "shell.h"
 
@@ -10,15 +11,14 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
     if (argc == 2)
     {
-        if (process_set_cwd(argv[1]))
+        int result = process_set_cwd(argv[1]);
+        if (result == -1)
         {
-            return 0;
+            iostream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            error_print("");
+            return -1;
         }
-        else
-        {
-            printf("File '%s' not found!\n", argv[1]);
-            return 1;
-        }
+        return result;
     }
     else
     {

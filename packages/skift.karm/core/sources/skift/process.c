@@ -1,4 +1,5 @@
 #include <skift/__plugs__.h>
+#include <skift/error.h>
 #include <skift/process.h>
 #include <skift/assert.h>
 
@@ -51,7 +52,7 @@ int process_get_cwd(char* buffer, uint size)
 
 int process_set_cwd(const char* cwd)
 {
-    return __plug_process_set_cwd(cwd);
+    RETURN_AND_SET_ERROR(__plug_process_set_cwd(cwd), -1);
 }
 
 int process_sleep(int time)

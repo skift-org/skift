@@ -135,15 +135,15 @@ typedef enum
     ERROR_ENUM(ERROR_ENUM_VALUE)
 } error_t;
 
-#define RETURN_AND_SET_ERROR(__value, __return) \
-    if ((__value) < 0)                          \
-    {                                           \
-        error_set(-(__value));                  \
-        return (__return);                      \
-    }                                           \
-    else                                        \
-    {                                           \
-        return (__value);                       \
+#define RETURN_AND_SET_ERROR(__value, __on_error_return) \
+    if ((__value) < 0)                                   \
+    {                                                    \
+        error_set(-(__value));                           \
+        return (__on_error_return);                      \
+    }                                                    \
+    else                                                 \
+    {                                                    \
+        return (__value);                                \
     }
 
 const char *error_to_string(error_t error);

@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/error.h>
 #include <skift/iostream.h>
 
 int cat(const char *path)
@@ -36,7 +37,8 @@ int cat(const char *path)
     }
     else
     {
-        printf("%s: no such file\n", path);
+        iostream_printf(err_stream, "cat: cannot access '%s'", path);
+        error_print("");
         return -1;
     }
 }

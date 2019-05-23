@@ -7,6 +7,7 @@
 #include <skift/atomic.h>
 #include <skift/elf.h>
 #include <skift/math.h>
+#include <skift/error.h>
 
 #include "kernel/cpu/irq.h"
 #include "kernel/tasking.h"
@@ -479,7 +480,7 @@ int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream)
     lock_release(this->fds_lock);
     log(LOG_WARNING, "We run out of file descriptor on task %d", this->id);
 
-    return -1;
+    return -ERR_TOO_MANY_OPEN_FILES;
 }
 
 stream_t *task_filedescriptor_acquire(task_t *this, int fd_index)
@@ -513,7 +514,7 @@ int task_filedescriptor_release(task_t *this, int fd_index)
 
     log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
-    return -1;
+    return -ERR_BAD_FILE_DESCRIPTOR;
 }
 
 int task_filedescriptor_free_and_release(task_t *this, int fd_index)
@@ -534,7 +535,7 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
 
     log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
-    return -1;
+    return -ERR_BAD_FILE_DESCRIPTOR;
 }
 
 
@@ -550,12 +551,12 @@ int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags)
 
     if (stream == NULL)
     {
-        return -1;
+        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     int fd = task_filedescriptor_alloc_and_acquire(this, stream);
 
-    if (fd != -1)
+    if (fd >= 0)
     {
         task_filedescriptor_release(this, fd);
     }
@@ -573,7 +574,7 @@ int task_close_file(task_t* this, int fd)
 
     if (stream == NULL)
     {
-        return -1;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     filesystem_close(stream);
@@ -589,7 +590,7 @@ int task_read_file(task_t *this, int fd, void *buffer, uint size)
 
     if (stream == NULL)
     {
-        return 0;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     int result = filesystem_read(stream, buffer, size);
@@ -621,7 +622,7 @@ int task_ioctl_file(task_t *this, int fd, int request, void *args)
 
     if (stream == NULL)
     {
-        return 0;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     int result = filesystem_ioctl(stream, request, args);
@@ -637,7 +638,7 @@ int task_seek_file(task_t *this, int fd, int offset, iostream_whence_t whence)
 
     if (stream == NULL)
     {
-        return 0;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     int result = filesystem_seek(stream, offset, whence);
@@ -653,7 +654,7 @@ int task_tell_file(task_t *this, int fd, iostream_whence_t whence)
 
     if (stream == NULL)
     {
-        return 0;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     int result = filesystem_tell(stream, whence);
@@ -669,7 +670,7 @@ int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
 
     if (stream == NULL)
     {
-        return 0;
+        return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
     int result = filesystem_fstat(stream, stat);
@@ -759,7 +760,7 @@ int task_exec(const char *executable_path, const char **argv)
     if (s == NULL)
     {
         log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
-        return -1;
+        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     // Check if the file isn't a directory.
@@ -770,7 +771,7 @@ int task_exec(const char *executable_path, const char **argv)
     {
         log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         iostream_close(s);
-        return -1;
+        return -ERR_IS_A_DIRECTORY;
     }
 
     // Decode the elf file header.
@@ -782,7 +783,7 @@ int task_exec(const char *executable_path, const char **argv)
     {
         log(LOG_WARNING, "Invalid elf program!", executable_path);
         iostream_close(s);
-        return -1;
+        return -ERR_EXEC_FORMAT_ERROR;
     }
 
     // Create the process and load the executable.
@@ -835,7 +836,7 @@ path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
     return p;
 }
 
-bool task_set_cwd(task_t *this, const char *new_path)
+int task_set_cwd(task_t *this, const char *new_path)
 {
     log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
     
@@ -845,19 +846,27 @@ bool task_set_cwd(task_t *this, const char *new_path)
 
     fsnode_t *new_cwd = filesystem_acquire(NULL, work_path, false);
 
-    if (new_cwd != NULL && fsnode_to_iostream_type(new_cwd->type) == IOSTREAM_TYPE_DIRECTORY)
+    if (new_cwd != NULL)
     {
-        // Cleanup the old path
-        path_delete(this->cwd_path);
-        filesystem_release(this->cwd_node);
+        if (fsnode_to_iostream_type(new_cwd->type) == IOSTREAM_TYPE_DIRECTORY)
+        {
+            // Cleanup the old path
+            path_delete(this->cwd_path);
+            filesystem_release(this->cwd_node);
 
-        // Set the new path
-        this->cwd_node = new_cwd;
-        this->cwd_path = work_path;
+            // Set the new path
+            this->cwd_node = new_cwd;
+            this->cwd_path = work_path;
 
-        lock_release(this->cwd_lock);
+            lock_release(this->cwd_lock);
 
-        return true;
+            return -ERR_SUCESS;
+        }
+        else
+        {
+            lock_release(this->cwd_lock);
+            return -ERR_NOT_A_DIRECTORY;
+        }
     }
     else
     {
@@ -869,7 +878,7 @@ bool task_set_cwd(task_t *this, const char *new_path)
         path_delete(work_path);
         lock_release(this->cwd_lock);
 
-        return false;
+        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 }
 
@@ -949,6 +958,7 @@ void message_delete(message_t *msg)
 {
     if (msg->payload)
         free(msg->payload);
+        
     free(msg);
 }
 

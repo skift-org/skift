@@ -138,7 +138,7 @@ void task_memory_free(task_t* this, uint addr, uint count);
 
 path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve);
 
-bool task_set_cwd(task_t* this, const char* new_wd);
+int task_set_cwd(task_t* this, const char* new_wd);
 
 void task_get_cwd(task_t* this, char* buffer, uint size);
 

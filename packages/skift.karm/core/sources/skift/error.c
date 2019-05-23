@@ -18,9 +18,14 @@ error_t error_get(void)
     return error_value;
 }
 
+void error_set(error_t error)
+{
+    error_value = error;
+}
+
 void error_print(const char* message)
 {
-    printf("%s: %s\n", message, error_to_string(error_value));
+    iostream_printf(err_stream, "%s: %s\n", message, error_to_string(error_value));
 }
  
 void if_error_throw_and_catch_fire(const char* message)

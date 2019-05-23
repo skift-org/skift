@@ -13,7 +13,7 @@
 
 #include <skift/math.h>
 #include <skift/cstring.h>
-
+#include <skift/error.h>
 #include <skift/logger.h>
 
 #include "kernel/filesystem.h"

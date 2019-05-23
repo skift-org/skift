@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/error.h>
 #include <skift/logger.h>
 #include <skift/iostream.h>
 #include <skift/cmdline.h>
@@ -83,7 +84,8 @@ int ls(const char *path)
     }
     else
     {
-        printf("%s: no such file or directory\n", path);
+        iostream_printf(err_stream, "ls: cannot access '%s'", path);
+        error_print("");
         return -1;
     }
 }

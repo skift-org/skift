@@ -43,8 +43,8 @@ _start:
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.
 	
-	extern main
-	call main
+	extern kmain
+	call kmain
 
 	cli
 .hang:	hlt

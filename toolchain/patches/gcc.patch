@@ -5,7 +5,7 @@ diff -Nru gcc-8.2.0_clean/config.sub gcc-8.2.0/config.sub
  	# Each alternative MUST end in a * to match a version number.
  	# -sysv* is not here because it comes later, after sysvr4.
  	-gnu* | -bsd* | -mach* | -minix* | -genix* | -ultrix* | -irix* \
-+				| -skift* \
++		  | -skift* \
  	      | -*vms* | -sco* | -esix* | -isc* | -aix* | -cnk* | -sunos | -sunos[34]*\
  	      | -hpux* | -unos* | -osf* | -luna* | -dgux* | -auroraux* | -solaris* \
  	      | -sym* | -kopensolaris* | -plan9* \
@@ -56,7 +56,7 @@ diff -Nru gcc-8.2.0_clean/gcc/config/skift.h gcc-8.2.0/gcc/config/skift.h
 +    builtin_assert ("system=unix");   \
 +    builtin_assert ("system=posix");   \
 +  } while(0);
-+
++  
 diff -Nru gcc-8.2.0_clean/gcc/config.gcc gcc-8.2.0/gcc/config.gcc
 --- gcc-8.2.0_clean/gcc/config.gcc	2018-06-25 21:34:01.000000000 +0200
 +++ gcc-8.2.0/gcc/config.gcc	2019-05-23 19:47:05.038051526 +0200

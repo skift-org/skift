@@ -28,7 +28,7 @@ bool shell_eval(shell_t* this)
     else
     {
         char pathbuffer[144];
-        sprintf(pathbuffer, 144, "/bin/%s", this->command_argv[0]);
+        snprintf(pathbuffer, 144, "/bin/%s", this->command_argv[0]);
 
         s = iostream_open(pathbuffer, IOSTREAM_READ);
 

@@ -1,5 +1,5 @@
 
-// printf.c : printf and sprintf internals
+// printf.c : printf and snprintf internals
 
 #include <ctype.h>
 #include <skift/cstring.h>

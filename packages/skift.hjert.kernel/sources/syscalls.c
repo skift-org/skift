@@ -249,7 +249,7 @@ int sys_system_get_info(system_info_t* info)
 {
     strlcpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
     
-    sprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE, 
+    snprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE, 
             __kernel_version_format, 
             
             __kernel_version_major, 

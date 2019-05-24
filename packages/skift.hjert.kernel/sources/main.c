@@ -53,7 +53,7 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-void main(multiboot_info_t *info, s32 magic)
+void kmain(multiboot_info_t *info, s32 magic)
 {
     __plug_init(); // init skift.karm.core glue code.
 

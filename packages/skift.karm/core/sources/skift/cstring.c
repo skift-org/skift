@@ -9,7 +9,7 @@
 #include <skift/runtime.h>
 #include <skift/iostream.h>
 
-// Sprintf ------------------------------------------------------------------ //
+/* --- snprintf ------------------------------------------------------------- */
 
 void string_printf_append(printf_info_t *info, char c)
 {
@@ -23,19 +23,19 @@ void string_printf_append(printf_info_t *info, char c)
     }
 }
 
-int sprintf(char *s, int n, const char *fmt, ...)
+int snprintf(char *s, int n, const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
 
-    int result = vsprintf(s, n, fmt, va);
+    int result = vsnprintf(s, n, fmt, va);
 
     va_end(va);
 
     return result;
 }
 
-int vsprintf(char *s, int n, const char *fmt, va_list va)
+int vsnprintf(char *s, int n, const char *fmt, va_list va)
 {
 
     if (n == 0)

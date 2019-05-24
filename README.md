@@ -44,7 +44,7 @@ Some skiftOS's pieces can usefull for your own projects see:
  - [vtconsole](https://github.com/skiftOS/vtconsole): an ansi escape sequence parser and renderer
 
 # License
-The skift operating and its core components are licensed under the **MIT License**.              
+The skift operating system and its core components are licensed under the **MIT License**.              
 See: [LICENSE.md](LICENSE.md)
 
 # Acknowledgements

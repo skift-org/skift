@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 TARGET=i686-pc-skift
 PREFIX="$DIR/local"
-SYSROOT="$DIR/../build/ramdisk"
+SYSROOT="$DIR/../build/sysroot"
 
 cd "$DIR"
 

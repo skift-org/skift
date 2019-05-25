@@ -13,7 +13,6 @@ build/
 toolchain/build/
 toolchain/tarballs/
 toolchain/local/
-toolchain/_local/
 sysroot/
 .vscode
 

@@ -5,12 +5,17 @@ export SYSROOT = $(REPOROOT)$(BUILDROOT)/sysroot
 export BOOTROOT = $(REPOROOT)$(BUILDROOT)/bootroot
 
 export CC=i686-pc-skift-gcc
+export CFLAGS=-std=gnu11 -O2
+
 export LD=i686-pc-skift-ld
-export AR=i686-pc-skift-ar
+export LDFLAGS=-flto
+
 export AS=nasm
 export ASFLAGS=-f elf32
 
-INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" -exec "echo" "{}/." ";")
+export AR=i686-pc-skift-ar
+
+INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*" -exec "echo" "{}/." ";")
 
 all: build/bootdisk.iso
 
@@ -44,7 +49,10 @@ kernel: $(BOOTROOT) libraries
 shell: $(SYSROOT) libraries
 	make -C shell install
 
-.PHONY: all clean libraries coreutils kernel shell tests
+sync:
+	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
+
+.PHONY: all clean libraries coreutils kernel shell tests sync
 
 $(SYSROOT):
 	mkdir -p $(SYSROOT)
@@ -52,7 +60,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/dev
 	mkdir -p $(SYSROOT)/lib
 	mkdir -p $(SYSROOT)/lib/include
-	cp -a $(INCLUDES) $(SYSROOT)/lib/include
+	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)
@@ -61,7 +69,7 @@ $(BOOTROOT):
 	cp grub.cfg $(BOOTROOT)/boot/grub/
 
 build/ramdisk.tar: $(SYSROOT) shell kernel coreutils tests
-	cd $(SYSROOT); tar -cvf ../../$@ *
+	cd $(SYSROOT); tar -cf ../../$@ *
 	
 build/bootdisk.iso: $(BOOTROOT) build/ramdisk.tar
 	cp build/ramdisk.tar $(BOOTROOT)/boot/

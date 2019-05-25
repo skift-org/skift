@@ -1,22 +1,25 @@
-AS=nasm
+KERNEL=kernel.bin
+
 CSOURCES=$(wildcard *.c) $(wildcard */*.c)
 SSOURCES=$(wildcard *.s) $(wildcard */*.s)
 OBJECTS= ${CSOURCES:.c=.o} ${SSOURCES:.s=.o}
 
-all: kernel.bin
+CFLAGS += -ffreestanding -nostdlib
+
+all: $(KERNEL)
 
 clean:
 	rm -f $(OBJECTS) $(OBJECTS)
-	rm -f kernel.bin
+	rm -f $(KERNEL)
 
 install: all
-	cp kernel.bin $(BOOTROOT)/boot/kernel.bin
+	cp $(KERNEL) $(BOOTROOT)/boot/$(KERNEL)
 
-kernel.bin: $(OBJECTS)
-	$(LD) -T kernel.ld -o kernel.bin $(OBJECTS) $(SYSROOT)/lib/libvtc.a $(SYSROOT)/lib/libk.a
+$(KERNEL): $(OBJECTS)
+	$(LD) -T kernel.ld -o $@ $(OBJECTS) $(SYSROOT)/lib/libvtc.a $(SYSROOT)/lib/libk.a
 
 %.o: %.c
-	$(CC) -ffreestanding -nostdlib -c -o $@ $^
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 %.o: %.s
-	$(AS) -f elf32 $^ -o $@
+	$(AS) $(ASFLAGS) $^ -o $@

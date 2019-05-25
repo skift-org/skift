@@ -9,10 +9,10 @@ install: libc.a libk.a
 	cp libk.a $(SYSROOT)/lib
 
 clean:
-	rm -f $(LIBC_OBJECTS) $(LIBK_OBJECTS)
+	rm -f $(LIBC_OBJECTS) $(LIBK_OBJECTS) libc.a libk.a
 
 libc.a: $(LIBC_OBJECTS)
-	ar rcs libc.a $(LIBC_OBJECTS)
+	$(AR) rcs libc.a $(LIBC_OBJECTS)
 
 libk.a: $(LIBK_OBJECTS)
-	ar rcs libk.a $(LIBK_OBJECTS)
+	$(AR) rcs libk.a $(LIBK_OBJECTS)

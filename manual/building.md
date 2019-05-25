@@ -14,7 +14,6 @@ Building skiftOS required
 And for testing et debuging
 - qemu-system-i386
 - gdb
-- suckless terminal (if you whant to use `./automagicaly debug`)
 
 
 ```sh
@@ -56,13 +55,7 @@ toolchain/build-it!.sh
 From the root of this repo do:
 
 ```sh
-# For a simple build
-./automagicaly build-all
-
-# For a clean build
-./automagicaly rebuild-all
-
-## Then wait for completion
+make all
 ```
 
 ## Testing
@@ -70,10 +63,5 @@ From the root of this repo do:
 From the root of this repo do:
 
 ```sh
-# Run the operation system in QEMU
-./automagicaly run
-
-# Run the operating system in QEMU with debugging (WIP)
-# Required gdb and the suckless terminal emulator.
-./automagicaly debug skift.hjert.kernel
+make run
 ```

@@ -860,7 +860,7 @@ int task_set_cwd(task_t *this, const char *new_path)
 
             lock_release(this->cwd_lock);
 
-            return -ERR_SUCESS;
+            return 0;
         }
         else
         {

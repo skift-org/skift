@@ -2,11 +2,12 @@
 #include <skift/iostream.h>
 #include <skift/process.h>
 
-#define ERROR_ENUM_STRING(__value) #__value,
+#define ERROR_ENUM_ENTRY_STRING(__entry) #__entry,
+#define ERROR_ENUM_ENTRY_STRING_WITH_VALUE(__entry, __value) #__entry,
 
 static error_t error_value = ERR_SUCESS;
 
-const char *ERROR_NAMES[] = {ERROR_ENUM(ERROR_ENUM_STRING)};
+const char *ERROR_NAMES[] = {ERROR_ENUM(ERROR_ENUM_ENTRY_STRING, ERROR_ENUM_ENTRY_STRING_WITH_VALUE)};
 
 const char *error_to_string(error_t error)
 {

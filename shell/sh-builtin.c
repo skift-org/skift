@@ -12,19 +12,27 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
     if (argc == 2)
     {
         int result = process_set_cwd(argv[1]);
-        
-        if (result == -1)
+
+        if (result < 0)
         {
             iostream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
             error_print("");
             return -1;
         }
-        return result;
+
+        return 0;
     }
     else
     {
-        process_set_cwd("/");
+        int result = process_set_cwd("/");
         
+        if (result < 0)
+        {
+            iostream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            error_print("");
+            return -1;
+        }
+
         return 0;
     }
 

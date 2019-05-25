@@ -52,7 +52,8 @@ int process_get_cwd(char* buffer, uint size)
 
 int process_set_cwd(const char* cwd)
 {
-    RETURN_AND_SET_ERROR(__plug_process_set_cwd(cwd), -1);
+    int result = __plug_process_set_cwd(cwd);
+    RETURN_AND_SET_ERROR(result, result, -1);
 }
 
 int process_sleep(int time)

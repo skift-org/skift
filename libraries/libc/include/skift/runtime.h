@@ -4,13 +4,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <stddef.h>
+#include <stdarg.h>
+
 #define NULL ((void *)0)
 
 #define bool _Bool
 #define true 1
 #define false 0
-
-typedef unsigned int size_t;
 
 typedef void s0;
 typedef char s8;
@@ -68,16 +69,6 @@ typedef unsigned long uintptr_t;
 #ifndef __COMMIT__
 #define __COMMIT__ "(NULL)"
 #endif
-
-/* --- Variadic arguments --------------------------------------------------- */
-
-typedef void *va_list;
-
-#define _INTSIZEOF(n) ((sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1))
-
-#define va_start(ap, v) (ap = (va_list)&v + _INTSIZEOF(v))
-#define va_arg(ap, t) (*(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)))
-#define va_end(ap) (ap = (va_list)0)
 
 /* --- Raw memory allocation ------------------------------------------------ */
 

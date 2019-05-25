@@ -27,6 +27,7 @@ clean:
 	make -C coreutils clean
 	make -C kernel clean
 	make -C shell clean
+	make -C tests clean
 
 libraries: $(SYSROOT)
 	make -C libraries install

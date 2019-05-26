@@ -5,7 +5,7 @@
 #include <skift/cstring.h>
 #include <skift/__printf__.h>
 
-int __printf_formate_binary(printf_info_t* info, va_list* va)
+int __printf_formate_binary(printf_info_t* info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
@@ -24,7 +24,7 @@ int __printf_formate_binary(printf_info_t* info, va_list* va)
     return info->n;
 }
 
-int __printf_formate_octal(printf_info_t* info, va_list* va)
+int __printf_formate_octal(printf_info_t* info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
@@ -43,7 +43,7 @@ int __printf_formate_octal(printf_info_t* info, va_list* va)
     return info->n;
 }
 
-int __printf_formate_decimal(printf_info_t* info, va_list* va)
+int __printf_formate_decimal(printf_info_t* info, va_list *va)
 {
     int v = va_arg(*va, int);
 
@@ -75,7 +75,7 @@ int __printf_formate_decimal(printf_info_t* info, va_list* va)
     return info->n;
 }
 
-int __printf_formate_hexadecimal(printf_info_t* info, va_list* va)
+int __printf_formate_hexadecimal(printf_info_t* info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
@@ -94,9 +94,9 @@ int __printf_formate_hexadecimal(printf_info_t* info, va_list* va)
     return info->n;
 }
 
-int __printf_formate_char(printf_info_t* info, va_list* va)
+int __printf_formate_char(printf_info_t* info, va_list *va)
 {
-    char v = va_arg(*va, char);
+    char v = va_arg(*va, int);
 
     char buffer[2] = {v, 0};
     
@@ -144,7 +144,7 @@ static printf_formatter_t formaters[] =
 
         /* End of the list */ {'\0', NULL}};
 
-void __printf_formate(printf_info_t *info, char c, va_list va)
+void __printf_formate(printf_info_t *info, char c, va_list *va)
 {
     for(int i = 0; formaters[i].c; i++)
     {
@@ -156,7 +156,7 @@ void __printf_formate(printf_info_t *info, char c, va_list va)
     }
 
     // For unknown format string juste put into the output.
-    const int trash = va_arg(va, int);
+    const int trash = va_arg(*va, int);
     UNUSED(trash);
     info->append(info, '%');
     info->append(info, c);

@@ -5,7 +5,7 @@ export SYSROOT = $(REPOROOT)$(BUILDROOT)/sysroot
 export BOOTROOT = $(REPOROOT)$(BUILDROOT)/bootroot
 
 export CC=i686-pc-skift-gcc
-export CFLAGS=-std=gnu11 -O2
+export CFLAGS=-std=gnu11 -O2 -Wall -Wextra -Werror -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 export LD=i686-pc-skift-ld
 export LDFLAGS=-flto

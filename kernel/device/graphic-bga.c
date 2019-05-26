@@ -33,7 +33,7 @@ bool bga_is_available(void)
     {
         if (bga_read_register(VBE_DISPI_INDEX_ID) == 0xB0C0 + i)
         {
-            log(LOG_INFO, "BGA video device detected (version %x).", i);
+            logger_log(LOG_INFO, "BGA video device detected (version %x).", i);
             found = true;
         }
     }

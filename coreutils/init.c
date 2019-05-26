@@ -11,16 +11,16 @@
 
 int init_exec(const char* filename)
 {
-    log(LOG_INFO, "Starting '%s'", filename);
+    logger_log(LOG_INFO, "Starting '%s'", filename);
     int process = process_exec(filename, (const char*[]){filename, NULL});
 
     if (process < 0)
     {
-        log(LOG_WARNING, "Failed to start process: '%s'!", filename);
+        logger_log(LOG_WARNING, "Failed to start process: '%s'!", filename);
     }
     else
     {
-        log(LOG_FINE, "'%s' started!", filename);
+        logger_log(LOG_FINE, "'%s' started!", filename);
     }
 
     return process;

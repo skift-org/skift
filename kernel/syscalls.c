@@ -28,7 +28,7 @@ typedef int (*syscall_handler_t)(int, int, int, int, int);
 
 int sys_not_implemented()
 {
-    log(LOG_WARNING, "Not implemented syscall!");
+    logger_log(LOG_WARNING, "Not implemented syscall!");
     return 0;
 }
 
@@ -331,8 +331,8 @@ void syscall_dispatcher(processor_context_t *context)
     }
     else
     {
-        log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
-        log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        logger_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
+        logger_log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }
 }

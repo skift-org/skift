@@ -240,7 +240,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         }
     }
 
-    log(LOG_ERROR, "Out of virtual memory!");
+    logger_log(LOG_ERROR, "Out of virtual memory!");
     return 0;
 }
 
@@ -374,7 +374,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
     atomic_end();
 
-    log(LOG_WARNING, "alloc failed!");
+    logger_log(LOG_WARNING, "alloc failed!");
     return 0;
 }
 
@@ -402,7 +402,7 @@ page_directorie_t *memory_alloc_pdir()
 
     if (pdir == NULL)
     {
-        log(LOG_ERROR, "Page directory allocation failled!");
+        logger_log(LOG_ERROR, "Page directory allocation failled!");
         return NULL;
     }
 

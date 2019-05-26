@@ -62,10 +62,6 @@ typedef unsigned long uintptr_t;
 #define __PACKAGE__ "(NULL)"
 #endif
 
-#ifndef __FILENAME__
-#define __FILENAME__ "(NULL)"
-#endif
-
 #ifndef __COMMIT__
 #define __COMMIT__ "(NULL)"
 #endif

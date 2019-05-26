@@ -45,7 +45,7 @@ void logger_setlevel(log_level_t level)
     log_level = level;
 }
 
-void logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...)
+void __logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...)
 {
     if (level >= log_level)
     {

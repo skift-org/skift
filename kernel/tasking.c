@@ -382,7 +382,7 @@ bool task_cancel(task_t* task, int exitvalue)
         task->exitvalue = exitvalue;
         task_setstate(task, TASK_STATE_CANCELED);
 
-        log(LOG_DEBUG, "Task(%d) got canceled.", task->id);
+        logger_log(LOG_DEBUG, "Task(%d) got canceled.", task->id);
 
         // Wake up waiting tasks
         list_foreach(i, task_bystate(TASK_STATE_WAIT_TASK))
@@ -394,7 +394,7 @@ bool task_cancel(task_t* task, int exitvalue)
                 waittask->wait.task.exitvalue = exitvalue;
                 task_setstate(waittask, TASK_STATE_RUNNING);
 
-                log(LOG_DEBUG, "Task %d finish waiting task %d.", waittask->id, task->id);
+                logger_log(LOG_DEBUG, "Task %d finish waiting task %d.", waittask->id, task->id);
             }
         }
 
@@ -432,13 +432,13 @@ int task_memory_unmap(task_t* this, uint addr, uint count)
 uint task_memory_alloc(task_t* this, uint count)
 {
     uint addr = memory_alloc(this->pdir, count, 1);
-    log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
+    logger_log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
 void task_memory_free(task_t* this, uint addr, uint count)
 {
-    log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
+    logger_log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
     return memory_free(this->pdir, addr, count, 1);
 }
 
@@ -471,14 +471,14 @@ int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream)
 
             lock_release(this->fds_lock);
 
-            log(LOG_DEBUG, "File descriptor %d allocated for task %d", i, this->id);
+            logger_log(LOG_DEBUG, "File descriptor %d allocated for task %d", i, this->id);
 
             return i;
         }
     }
 
     lock_release(this->fds_lock);
-    log(LOG_WARNING, "We run out of file descriptor on task %d", this->id);
+    logger_log(LOG_WARNING, "We run out of file descriptor on task %d", this->id);
 
     return -ERR_TOO_MANY_OPEN_FILES;
 }
@@ -496,7 +496,7 @@ stream_t *task_filedescriptor_acquire(task_t *this, int fd_index)
         }
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return NULL;
 }
@@ -512,7 +512,7 @@ int task_filedescriptor_release(task_t *this, int fd_index)
         return 0;
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -ERR_BAD_FILE_DESCRIPTOR;
 }
@@ -528,12 +528,12 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
         fd->free = true;
         fd->stream = NULL;
 
-        log(LOG_DEBUG, "File descriptor %d free for task %d", fd_index, this->id);
+        logger_log(LOG_DEBUG, "File descriptor %d free for task %d", fd_index, this->id);
 
         return 0;
     }
 
-    log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -ERR_BAD_FILE_DESCRIPTOR;
 }
@@ -726,7 +726,7 @@ void task_panic_dump(void)
 
 void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 {
-    log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
+    logger_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
 
     if (program->vaddr >= 0x100000)
     {
@@ -748,7 +748,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
     }
     else
     {
-        log(LOG_WARNING, "Elf segment ignored, not in user memory!");
+        logger_log(LOG_WARNING, "Elf segment ignored, not in user memory!");
     }
 }
 
@@ -759,7 +759,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (s == NULL)
     {
-        log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
+        logger_log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
         return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -769,7 +769,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
-        log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
+        logger_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
         iostream_close(s);
         return -ERR_IS_A_DIRECTORY;
     }
@@ -781,7 +781,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (!elf_valid(&elf_header))
     {
-        log(LOG_WARNING, "Invalid elf program!", executable_path);
+        logger_log(LOG_WARNING, "Invalid elf program!", executable_path);
         iostream_close(s);
         return -ERR_EXEC_FORMAT_ERROR;
     }
@@ -802,11 +802,11 @@ int task_exec(const char *executable_path, const char **argv)
         load_elfseg(new_task, s, &program);
     }
 
-    log(LOG_DEBUG, "Executable loaded, creating main task...");
+    logger_log(LOG_DEBUG, "Executable loaded, creating main task...");
 
     task_go(new_task);
 
-    log(LOG_DEBUG, "Process created, back to caller..");
+    logger_log(LOG_DEBUG, "Process created, back to caller..");
 
     atomic_end();
 
@@ -838,7 +838,7 @@ path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
 
 int task_set_cwd(task_t *this, const char *new_path)
 {
-    log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
+    logger_log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
     
     path_t *work_path = task_cwd_resolve(this, new_path);
     
@@ -989,7 +989,7 @@ int messaging_send_internal(task_t* from, task_t*  to, int id, const char *name,
 
     if (to->inbox->count > 1024)
     {
-        log(LOG_WARNING, "PROC=%d inbox is full!", to);
+        logger_log(LOG_WARNING, "PROC=%d inbox is full!", to);
         return 0;
     }
 
@@ -1160,11 +1160,11 @@ void collect_and_free_task(void)
         task_t *task = i->value;
         int task_id = task->id;
 
-        log(LOG_DEBUG, "free'ing task %d", task_id);
+        logger_log(LOG_DEBUG, "free'ing task %d", task_id);
 
         task_delete(task);
 
-        log(LOG_DEBUG, "Task %d free'd.", task_id);
+        logger_log(LOG_DEBUG, "Task %d free'd.", task_id);
     }
 
     list_delete(task_to_free, LIST_KEEP_VALUES);
@@ -1176,10 +1176,10 @@ void garbage_colector()
     {
         task_sleep(100); // We don't do this really often.
 
-        // log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
+        // logger_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
         collect_and_free_task();
 
-        // log(LOG_DEBUG, "Garbage collect end!");
+        // logger_log(LOG_DEBUG, "Garbage collect end!");
     }
 }
 
@@ -1198,7 +1198,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
+    logger_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
 }
 
 void sheduler_setup(task_t *main_kernel_task)
@@ -1224,7 +1224,7 @@ void wakeup_sleeping_tasks(void)
                 if (t->wait.time.wakeuptick <= ticks)
                 {
                     task_setstate(t, TASK_STATE_RUNNING);
-                    log(LOG_DEBUG, "Task %d wake up!", t->id);
+                    logger_log(LOG_DEBUG, "Task %d wake up!", t->id);
                 }
             }
 
@@ -1238,7 +1238,7 @@ static const char *animation = "|/-\\|/-\\";
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    //log(LOG_DEBUG, "Current task %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
+    //logger_log(LOG_DEBUG, "Current task %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     sheduler_context_switch = true;
 
@@ -1267,7 +1267,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     sheduler_context_switch = false;
 
-    //log(LOG_DEBUG, "Now current task is %d(%s)", running->id, running->process->name);
+    //logger_log(LOG_DEBUG, "Now current task is %d(%s)", running->id, running->process->name);
 
     return running->sp;
 }

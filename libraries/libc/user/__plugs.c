@@ -41,13 +41,13 @@ void __plug_fini(int exit_code)
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    log(LOG_FATAL, "Assert failed: %s in %s:%s() ln%d!", expr, file, function, line);
+    logger_log(LOG_FATAL, "Assert failed: %s in %s:%s() ln%d!", expr, file, function, line);
     process_exit(-1);
 }
 
 void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line)
 {
-    log(LOG_FATAL, "Lock assert failed: %s hold by %d in %s:%s() ln%d!", lock->name, lock->holder, file, function, line);
+    logger_log(LOG_FATAL, "Lock assert failed: %s hold by %d in %s:%s() ln%d!", lock->name, lock->holder, file, function, line);
     process_exit(-1);
 }
 

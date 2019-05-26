@@ -71,7 +71,7 @@ void kmain(multiboot_info_t *info, s32 magic)
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
 
-    log(LOG_INFO, "Booting from '%s' using command lines options '%s'.", info->boot_loader_name, info->cmdline);
+    logger_log(LOG_INFO, "Booting from '%s' using command lines options '%s'.", info->boot_loader_name, info->cmdline);
 
     /* --- Setup cpu context ------------------------------------------------ */
     setup(gdt);
@@ -81,7 +81,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(irq);
 
     /* --- System context --------------------------------------------------- */
-    log(LOG_INFO, "Initializing system...");
+    logger_log(LOG_INFO, "Initializing system...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
     setup(tasking);
     setup(messaging);
@@ -89,7 +89,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(modules, &mbootinfo);
 
     /* --- Devices ---------------------------------------------------------- */
-    log(LOG_INFO, "Mounting devices...");
+    logger_log(LOG_INFO, "Mounting devices...");
     setup(serial);
     setup(mouse);
     setup(keyboard);
@@ -100,7 +100,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(random);
 
     /* --- Finalizing System ------------------------------------------------ */
-    log(LOG_INFO, "Starting the userspace...");
+    logger_log(LOG_INFO, "Starting the userspace...");
     atomic_enable();
     sti();
 

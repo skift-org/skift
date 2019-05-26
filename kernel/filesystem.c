@@ -82,7 +82,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
-    logger_log(LOG_DEBUG, "Fsnode free: %08x", node);
+    logger_log(LOG_INFO, "Fsnode free: %08x", node);
 
     switch (node->type)
     {
@@ -309,7 +309,6 @@ directory_entries_t directory_entries(fsnode_t *dir)
 bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 {
     lock_acquire(dir->lock);
-    logger_log(LOG_DEBUG, "Linking node to '%s'", name);
 
     if (directory_entry(dir, name) == NULL)
     {
@@ -366,8 +365,6 @@ int directory_read(stream_t *stream, void *buffer, uint size)
 
     if (size == sizeof(iostream_direntry_t))
     {
-        logger_log(LOG_DEBUG, "Entry count %d", stream->direntries.count);
-
         if (index < stream->direntries.count)
         {
             int entrysize = sizeof(iostream_direntry_t);
@@ -384,7 +381,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     }
     else
     {
-        logger_log(LOG_DEBUG, "Directory read fail!");
+        logger_log(LOG_WARNING, "Directory read fail!");
         return -1;
     }
 }
@@ -447,8 +444,6 @@ fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t *p)
 fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 {
     IS_FS_READY;
-
-    logger_log(LOG_DEBUG, "Creating node '%s' of type %d...", path_filename(node_path), type);
 
     fsnode_t *parent_node = filesystem_resolve_parent(at, node_path);
 

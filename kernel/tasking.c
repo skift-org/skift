@@ -382,8 +382,6 @@ bool task_cancel(task_t* task, int exitvalue)
         task->exitvalue = exitvalue;
         task_setstate(task, TASK_STATE_CANCELED);
 
-        logger_log(LOG_DEBUG, "Task(%d) got canceled.", task->id);
-
         // Wake up waiting tasks
         list_foreach(i, task_bystate(TASK_STATE_WAIT_TASK))
         {
@@ -393,8 +391,6 @@ bool task_cancel(task_t* task, int exitvalue)
             {
                 waittask->wait.task.exitvalue = exitvalue;
                 task_setstate(waittask, TASK_STATE_RUNNING);
-
-                logger_log(LOG_DEBUG, "Task %d finish waiting task %d.", waittask->id, task->id);
             }
         }
 
@@ -432,13 +428,11 @@ int task_memory_unmap(task_t* this, uint addr, uint count)
 uint task_memory_alloc(task_t* this, uint count)
 {
     uint addr = memory_alloc(this->pdir, count, 1);
-    logger_log(LOG_DEBUG, "Gived userspace %d memory block at 0x%08x", count, addr);
     return addr;
 }
 
 void task_memory_free(task_t* this, uint addr, uint count)
 {
-    logger_log(LOG_DEBUG, "Userspace free'd %d memory block at 0x%08x", count, addr);
     return memory_free(this->pdir, addr, count, 1);
 }
 
@@ -471,14 +465,11 @@ int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream)
 
             lock_release(this->fds_lock);
 
-            logger_log(LOG_DEBUG, "File descriptor %d allocated for task %d", i, this->id);
-
             return i;
         }
     }
 
     lock_release(this->fds_lock);
-    logger_log(LOG_WARNING, "We run out of file descriptor on task %d", this->id);
 
     return -ERR_TOO_MANY_OPEN_FILES;
 }
@@ -527,8 +518,6 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
 
         fd->free = true;
         fd->stream = NULL;
-
-        logger_log(LOG_DEBUG, "File descriptor %d free for task %d", fd_index, this->id);
 
         return 0;
     }
@@ -726,8 +715,6 @@ void task_panic_dump(void)
 
 void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 {
-    logger_log(LOG_DEBUG, "Loading ELF segment: SRC=0x%x(%d) DEST=0x%x(%d)", program->offset, program->filesz, program->vaddr, program->memsz);
-
     if (program->vaddr >= 0x100000)
     {
         atomic_begin();
@@ -802,11 +789,7 @@ int task_exec(const char *executable_path, const char **argv)
         load_elfseg(new_task, s, &program);
     }
 
-    logger_log(LOG_DEBUG, "Executable loaded, creating main task...");
-
     task_go(new_task);
-
-    logger_log(LOG_DEBUG, "Process created, back to caller..");
 
     atomic_end();
 
@@ -837,9 +820,7 @@ path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
 }
 
 int task_set_cwd(task_t *this, const char *new_path)
-{
-    logger_log(LOG_DEBUG, "Process %d set cwd to '%s'", this->id, new_path);
-    
+{    
     path_t *work_path = task_cwd_resolve(this, new_path);
     
     lock_acquire(this->cwd_lock);
@@ -1157,14 +1138,7 @@ void collect_and_free_task(void)
     // Cleanup all of those dead tasks.
     list_foreach(i, task_to_free)
     {
-        task_t *task = i->value;
-        int task_id = task->id;
-
-        logger_log(LOG_DEBUG, "free'ing task %d", task_id);
-
-        task_delete(task);
-
-        logger_log(LOG_DEBUG, "Task %d free'd.", task_id);
+        task_delete((task_t*)i->value);
     }
 
     list_delete(task_to_free, LIST_KEEP_VALUES);
@@ -1175,11 +1149,7 @@ void garbage_colector()
     while (true)
     {
         task_sleep(100); // We don't do this really often.
-
-        // logger_log(LOG_DEBUG, "Garbage collect begin %d !", ticks);
         collect_and_free_task();
-
-        // logger_log(LOG_DEBUG, "Garbage collect end!");
     }
 }
 
@@ -1198,7 +1168,7 @@ void timer_set_frequency(int hz)
     outb(0x40, divisor & 0xFF);
     outb(0x40, (divisor >> 8) & 0xFF);
 
-    logger_log(LOG_DEBUG, "Timer frequency is %dhz.", hz);
+    logger_log(LOG_INFO, "Timer frequency is %dhz.", hz);
 }
 
 void sheduler_setup(task_t *main_kernel_task)
@@ -1224,7 +1194,6 @@ void wakeup_sleeping_tasks(void)
                 if (t->wait.time.wakeuptick <= ticks)
                 {
                     task_setstate(t, TASK_STATE_RUNNING);
-                    logger_log(LOG_DEBUG, "Task %d wake up!", t->id);
                 }
             }
 
@@ -1238,7 +1207,6 @@ static const char *animation = "|/-\\|/-\\";
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    //logger_log(LOG_DEBUG, "Current task %d(%s) with eip@%08x.", running->id, running->process->name, context->eip);
     UNUSED(context);
     sheduler_context_switch = true;
 
@@ -1266,8 +1234,6 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     paging_invalidate_tlb();
 
     sheduler_context_switch = false;
-
-    //logger_log(LOG_DEBUG, "Now current task is %d(%s)", running->id, running->process->name);
 
     return running->sp;
 }

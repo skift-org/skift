@@ -25,19 +25,13 @@ void ramdiload(multiboot_module_t *module)
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            logger_log(LOG_DEBUG, "Creating %s directory...", block.name);
-
-
             if (filesystem_mkdir(ROOT, file_path) != 0)
             {
                 logger_log(LOG_WARNING, "Failed to create directory %s...", block.name);
             }
-
         }
         else
         {
-            logger_log(LOG_DEBUG, "Creating %s file...", block.name);            
-
             stream_t *s = filesystem_open(ROOT, file_path, IOSTREAM_WRITE | IOSTREAM_CREATE | IOSTREAM_TRUNC);
             
             if (s != NULL)

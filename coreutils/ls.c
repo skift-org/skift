@@ -72,7 +72,6 @@ int ls(const char *path)
         }
         else
         {
-            logger_log(LOG_DEBUG,"This was not a directory");
             printf(path);
         }
 

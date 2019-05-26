@@ -185,7 +185,7 @@ bool filesystem_exist(fsnode_t* at, path_t* p);
 #define FILESYSTEM_MKDEV(__name, __object)                               \
     {                                                                    \
         path_t *__dev_path = path("/dev/" __name);                       \
-        logger_log(LOG_DEBUG, "Creating device " __name " at /dev/" __name); \
+        logger_log(LOG_INFO, "Creating device " __name " at /dev/" __name); \
         if (filesystem_mkdev(NULL, __dev_path, (__object)))              \
         {                                                                \
             PANIC("Failled to create the '" __name "' device.");         \

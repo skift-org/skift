@@ -57,6 +57,8 @@ void kmain(multiboot_info_t *info, s32 magic)
 {
     __plug_init(); // init skift.karm.core glue code.
 
+    logger_setlevel(LOG_ALL);
+
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
@@ -83,6 +85,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     /* --- System context --------------------------------------------------- */
     logger_log(LOG_INFO, "Initializing system...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
+    setup(console);
     setup(tasking);
     setup(messaging);
     setup(filesystem);
@@ -93,7 +96,6 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(serial);
     setup(mouse);
     setup(keyboard);
-    setup(console);
 
     setup(null);
     setup(zero);

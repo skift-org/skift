@@ -7,6 +7,7 @@
 #include <skift/cstring.h>
 #include <skift/iostream.h>
 #include <skift/cmdline.h>
+#include <skift/process.h>
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -127,6 +128,8 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
         printf(cmdline->epiloge);
         printf("\n\n");
     }
+
+    process_exit(0);
 }
 
 /* --- Public functions ----------------------------------------------------- */

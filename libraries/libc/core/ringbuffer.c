@@ -34,6 +34,7 @@ int ringbuffer_read(ringbuffer_t *rb, void* buffer, uint size)
     do 
     {
         chr = ringbuffer_getc(rb);
+
         if (chr != -1)
         {
             ((char*)buffer)[offset] = (char)chr;
@@ -79,10 +80,8 @@ int ringbuffer_getc(ringbuffer_t *rb)
 {
     if (rb->head != rb->tail)
     {
-        uint index = (rb->head + 1) % rb->size;
-
-        int c = rb->buffer[index];
-        rb->tail = index;
+        int c = rb->buffer[rb->tail];
+        rb->tail = (rb->tail + 1) % rb->size;
 
         return c;
     }

@@ -1,8 +1,8 @@
-export REPOROOT = $(shell pwd)/
+export REPOROOT = $(shell pwd)
 export PATH = $(shell toolchain/use-it!.sh)
-export BUILDROOT = build
-export SYSROOT = $(REPOROOT)$(BUILDROOT)/sysroot
-export BOOTROOT = $(REPOROOT)$(BUILDROOT)/bootroot
+export BUILDROOT = $(REPOROOT)/build
+export SYSROOT = $(BUILDROOT)/sysroot
+export BOOTROOT = $(BUILDROOT)/bootroot
 
 export CC=i686-pc-skift-gcc
 export CFLAGS=-std=gnu11 -O2 -Wall -Wextra -Werror -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
@@ -60,7 +60,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/dev
 	mkdir -p $(SYSROOT)/lib
 	mkdir -p $(SYSROOT)/lib/include
-	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
+	cp -ua $(INCLUDES) $(SYSROOT)/lib/include/
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)

@@ -23,6 +23,7 @@
 #include <skift/iostream.h>
 #include <skift/logger.h>
 #include <skift/math.h>
+#include <skift/error.h>
 
 #include <hjert/cpu/gdt.h>
 #include <hjert/cpu/idt.h>
@@ -85,7 +86,6 @@ void kmain(multiboot_info_t *info, s32 magic)
     /* --- System context --------------------------------------------------- */
     logger_log(LOG_INFO, "Initializing system...");
     setup(memory, get_kernel_end(&mbootinfo), (mbootinfo.mem_lower + mbootinfo.mem_upper) * 1024);
-    setup(console);
     setup(tasking);
     setup(messaging);
     setup(filesystem);
@@ -93,6 +93,7 @@ void kmain(multiboot_info_t *info, s32 magic)
 
     /* --- Devices ---------------------------------------------------------- */
     logger_log(LOG_INFO, "Mounting devices...");
+    setup(console);
     setup(serial);
     setup(mouse);
     setup(keyboard);
@@ -112,15 +113,15 @@ void kmain(multiboot_info_t *info, s32 magic)
     /* --- Entering userspace ----------------------------------------------- */
     int init = task_exec("/bin/init", (const char *[]){"/bin/init", NULL});
 
-    if (init)
+    if (init < 0)
+    {
+        PANIC("Failled to start init : %s", error_to_string(-init));
+    }
+    else
     {
         int exitvalue = 0;
         task_wait(init, &exitvalue);
 
         PANIC("Init has return with code %d!", exitvalue);
-    }
-    else
-    {
-        PANIC("No working init found.");
     }
 }

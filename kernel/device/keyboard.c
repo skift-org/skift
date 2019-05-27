@@ -6,18 +6,23 @@
 
 #include <skift/logger.h>
 #include <skift/ascii.h>
+#include <skift/ringbuffer.h>
+#include <skift/atomic.h>
 
 #include <hjert/shared/message.h>
 #include <hjert/dev/keyboard.h>
 
 #include <hjert/cpu/irq.h>
-#include <hjert/keyboard.h>
+#include <hjert/filesystem.h>
 #include <hjert/tasking.h>
+#include <hjert/keyboard.h>
 
 /*
  * TODO:
  * - Send messages to subscribers
  */
+
+ringbuffer_t* keyboard_buffer;
 
 char keymap_FRBE[128][3] = 
 {
@@ -215,8 +220,10 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             extended = false;
         }
 
+        char c = keyboard_getchar(scancode);
+
         keyboard_event_t keyevent = {
-            .c = keyboard_getchar(scancode),
+            .c = c,
             .key = scancode};
 
         if (!ispressed[scancode])
@@ -225,6 +232,10 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             ispressed[scancode] = true;
         }
 
+        if (c!='\0')
+        {
+            ringbuffer_putc(keyboard_buffer, keyboard_getchar(scancode));
+        }
         messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYTYPED, &keyevent, sizeof(keyevent), 0);
     }    
     else if (scancode == 224)
@@ -238,7 +249,6 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
             switch (scancode)
             {
-
             case 156: scancode = KPENTER;   break;
             case 157: scancode = RCONTROL;  break;
             case 184: scancode = RALT;      break;
@@ -279,7 +289,27 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 /* --- Public functions ----------------------------------------------------- */
 
+int keyboard_device_read(stream_t *s, void *buffer, uint size)
+{
+    UNUSED(s);
+
+    atomic_begin();
+    int result = ringbuffer_read(keyboard_buffer, buffer, size);
+    atomic_end();
+
+    return result;
+}
+
 void keyboard_setup()
 {
     irq_register(1, keyboard_irq);
+
+    keyboard_buffer = ringbuffer(512);
+
+    device_t keyboard_device = 
+    {
+        .read = keyboard_device_read,
+    };
+
+    FILESYSTEM_MKDEV("keyboard", keyboard_device);
 }

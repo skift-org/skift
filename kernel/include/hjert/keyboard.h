@@ -6,4 +6,4 @@
 
 #include <skift/runtime.h>
 
-void keyboard_setup();
+void keyboard_setup(void);

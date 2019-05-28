@@ -99,29 +99,29 @@ int sys_process_sleep(int time)
     return 0;
 }
 
-int sys_process_wakeup(TASK t)
+int sys_process_wakeup(int tid)
 {
     int result;
     
     ATOMIC({
-        result = task_wakeup(task_getbyid(t));
+        result = task_wakeup(task_getbyid(tid));
     });
 
     return result; 
 }
 
-int sys_process_wait(TASK t, int *exitvalue)
+int sys_process_wait(int tid, int *exitvalue)
 {
-    return task_wait(t, exitvalue);
+    return task_wait(tid, exitvalue);
 }
 
 /* --- Messaging ------------------------------------------------------------ */
-int sys_messaging_send(TASK to, const char *name, void *payload, uint size, uint flags)
+int sys_messaging_send(int destination_tid, const char *name, void *payload, uint size, uint flags)
 {
     int result;
     
     ATOMIC({
-        result = messaging_send(task_getbyid(to), name, payload, size, flags);
+        result = messaging_send(task_getbyid(destination_tid), name, payload, size, flags);
     });
 
     return result; 

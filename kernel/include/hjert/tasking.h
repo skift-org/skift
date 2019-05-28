@@ -15,8 +15,6 @@
 
 /* --- Task data structure -------------------------------------------------- */
 
-typedef int TASK; // Task handle
-
 typedef void (*task_entry_t)();
 
 typedef struct

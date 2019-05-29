@@ -112,15 +112,45 @@ void iostream_close(iostream_t *stream)
 void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
 {
     iostream_flush(this);
-    //FIXME: enable buffering if disabled
-    this->write_mode = mode;
+
+    if (mode == IOSTREAM_BUFFERED_NONE)
+    {
+        if (this->read_buffer != NULL)
+        {
+            free(this->read_buffer);
+        }
+    }
+    else
+    {
+        if (this->read_buffer == NULL)
+        {
+            this->read_buffer = malloc(IOSTREAM_BUFFER_SIZE);
+        }
+    }
+
+    this->read_mode = mode;
 }
 
 void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
 {
     iostream_flush(this);
-    //FIXME: enable buffering if disabled
-    this->read_mode = mode;
+
+    if (mode == IOSTREAM_BUFFERED_NONE)
+    {
+        if (this->write_buffer != NULL)
+        {
+            free(this->write_buffer);
+        }
+    }
+    else
+    {
+        if (this->write_buffer == NULL)
+        {
+            this->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
+        }
+    }
+
+    this->write_mode = mode;
 }
 
 // IO Stream generic io operation ------------------------------------------- //
@@ -151,7 +181,7 @@ int iostream_fill(iostream_t *stream)
 int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
 {
     uint data_left = size;
-    char* data_to_read = (char*)buffer;
+    char *data_to_read = (char *)buffer;
 
     while (data_left != 0)
     {
@@ -170,13 +200,13 @@ int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
         uint data_added = min(used_space, data_left);
 
         // Copy the data from the buffer
-        memcpy(data_to_read, ((char*)stream->read_buffer) + stream->read_head, data_added);
-        
-        // 
+        memcpy(data_to_read, ((char *)stream->read_buffer) + stream->read_head, data_added);
+
+        // Update the amount readed
         data_left -= data_added;
         stream->read_head += data_added;
     }
-    
+
     return size - data_left;
 }
 
@@ -418,11 +448,35 @@ int iostream_puts(iostream_t *stream, const char *string)
     return iostream_write(stream, string, strlen(string));
 }
 
-// int iostream_gets(iostream_t* stream, char* string, int n)
-// {
-//
-//     return 0;
-// }
+char *iostream_gets(iostream_t *stream, char *string, int n)
+{
+    if (stream != NULL && string != NULL)
+    {
+        for (int readed = 0; readed < n - 1; readed++)
+        {
+            int c = iostream_getchar(stream);
+
+            if (c == -1)
+            {
+                return readed == 0 ? NULL : string;
+            }
+
+            string[readed] = c;
+            string[readed + 1] = '\0';
+
+            if (c == '\n')
+            {
+                return string;
+            }
+        }
+
+        return string;
+    }
+    else
+    {
+        return NULL;
+    }
+}
 
 void iostream_printf_append(printf_info_t *info, char c)
 {

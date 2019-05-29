@@ -130,7 +130,7 @@ int iostream_puts(iostream_t *stream, const char *string);
 
 #define puts(__string) iostream_puts(out_stream, __string)
 
-int iostream_gets(iostream_t *stream, char *string, int n);
+char *iostream_gets(iostream_t *stream, char *string, int n);
 
 int iostream_putchar(iostream_t *stream, int c);
 

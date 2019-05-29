@@ -4,6 +4,7 @@
 
 #include <skift/atomic.h>
 
+#include <hjert/cpu/cpuid.h>
 #include <hjert/system.h>
 #include <hjert/tasking.h>
 #include <hjert/memory.h>
@@ -98,7 +99,8 @@ void __panic(const char* package, const char* file, const char* function, const 
     if (!nested_panic)
     {
         // filesystem_panic_dump();
-        // task_panic_dump();
+        task_panic_dump();
+        cpuid_dump();
     }
 
     printf("\n");

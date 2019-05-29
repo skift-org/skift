@@ -57,7 +57,7 @@ typedef struct
 typedef struct
 {
     char name[PATH_ELEMENT_LENGHT];
-    iostream_type_t type;
+    iostream_stat_t stat;
 } iostream_direntry_t;
 
 typedef int iostream_read_t(struct s_iostream *stream, void *buffer, uint size);

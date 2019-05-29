@@ -36,7 +36,7 @@ iostream_type_t fsnode_to_iostream_type(fsnode_type_t type)
     {
         case FSNODE_DIRECTORY: return IOSTREAM_TYPE_DIRECTORY;
         case FSNODE_FIFO: return IOSTREAM_TYPE_FIFO;
-        case FSNODE_DEVICE: return IOSTREAM_TYPE_FIFO;
+        case FSNODE_DEVICE: return IOSTREAM_TYPE_DEVICE;
         default: return IOSTREAM_TYPE_REGULAR;
     }
 }
@@ -128,8 +128,17 @@ int fsnode_size(fsnode_t *node)
         return node->file.size;
     }
 
-    return -1;
+    return 0;
 }
+
+int fsnode_stat(fsnode_t *node, iostream_stat_t* stat)
+{
+    stat->type = fsnode_to_iostream_type(node->type);
+    stat->size = fsnode_size(node);
+
+    return 0;
+}
+
 
 /* --- Streams -------------------------------------------------------------- */
 
@@ -219,15 +228,6 @@ int file_write(stream_t *stream, const void *buffer, uint size)
     return result;
 }
 
-void file_stat(fsnode_t *node, iostream_stat_t *stat)
-{
-    lock_acquire(node->lock);
-
-    stat->size = node->file.size;
-
-    lock_release(node->lock);
-}
-
 /* --- Fifo ----------------------------------------------------------------- */
 
 //FIXME: this is kind of naive
@@ -298,7 +298,7 @@ directory_entries_t directory_entries(fsnode_t *dir)
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
 
         strlcpy(current->name, entry->name, PATH_ELEMENT_LENGHT);
-        current->type = fsnode_to_iostream_type(entry->node->type);
+        fsnode_stat(entry->node, &current->stat);
 
         current++;
     }
@@ -784,15 +784,7 @@ int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
 
     if (s != NULL)
     {
-        stat->type = fsnode_to_iostream_type(s->node->type);
-        stat->size = 0;
-
-        if (s->node->type == FSNODE_FILE)
-        {
-            file_stat(s->node, stat);
-        }
-
-        return 0;
+        return fsnode_stat(s->node, stat);
     }
     else
     {
@@ -925,6 +917,22 @@ int filesystem_mkfile(fsnode_t *at, path_t *p)
     IS_FS_READY;
     lock_acquire(fslock);
     if (filesystem_mknode(at, p, FSNODE_FILE) != NULL)
+    {
+        lock_release(fslock);
+        return 0;
+    }
+    else
+    {
+        lock_release(fslock);
+        return -1;
+    }
+}
+
+int filesystem_mkfifo(fsnode_t *at, path_t *p)
+{
+    IS_FS_READY;
+    lock_acquire(fslock);
+    if (filesystem_mknode(at, p, FSNODE_FIFO) != NULL)
     {
         lock_release(fslock);
         return 0;

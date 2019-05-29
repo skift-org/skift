@@ -13,4 +13,3 @@ void serial_putc(char c);
 
 int serial_read(char *buffer, uint size);
 int serial_write(const char *buffer, uint size);
-int serial_writeln(const char *str);

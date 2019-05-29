@@ -15,7 +15,7 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
-INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*" -exec "echo" "{}/." ";")
+INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*")
 
 all: build/bootdisk.iso
 
@@ -30,6 +30,7 @@ clean:
 
 	make -C libraries clean
 	make -C coreutils clean
+	make -C drivers clean
 	make -C kernel clean
 	make -C shell clean
 	make -C tests clean
@@ -39,6 +40,9 @@ libraries: $(SYSROOT)
 
 coreutils: $(SYSROOT) libraries
 	make -C coreutils install
+
+drivers: $(SYSROOT) libraries
+	make -C drivers install
 
 tests: $(SYSROOT) libraries
 	make -C tests install
@@ -68,7 +72,7 @@ $(BOOTROOT):
 	mkdir -p $(BOOTROOT)/boot/grub
 	cp grub.cfg $(BOOTROOT)/boot/grub/
 
-build/ramdisk.tar: $(SYSROOT) shell kernel coreutils tests
+build/ramdisk.tar: $(SYSROOT) shell kernel drivers coreutils tests
 	cd $(SYSROOT); tar -cf ../../$@ *
 	
 build/bootdisk.iso: $(BOOTROOT) build/ramdisk.tar

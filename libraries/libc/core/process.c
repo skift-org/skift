@@ -10,7 +10,8 @@ int process_this(void)
 
 int process_exec(const char *file_name, const char **argv)
 {
-    return __plug_process_exec(file_name, argv);
+    int result = __plug_process_exec(file_name, argv);
+    RETURN_AND_SET_ERROR(result, result, -1);
 }
 
 // TODO: void process_spawn();

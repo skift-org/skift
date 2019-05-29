@@ -63,8 +63,8 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/bin
 	mkdir -p $(SYSROOT)/dev
 	mkdir -p $(SYSROOT)/lib
-	mkdir -p $(SYSROOT)/lib/include
-	cp -ua $(INCLUDES) $(SYSROOT)/lib/include/
+	mkdir -p $(SYSROOT)/lib/
+	cp -ua $(INCLUDES) $(SYSROOT)/lib/
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)

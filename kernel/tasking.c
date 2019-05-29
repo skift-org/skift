@@ -674,7 +674,7 @@ int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
 static char *TASK_STATES[] =
     {
         "HANG",
-        "LAUNCHPAD"
+        "LAUNCHPAD",
         "RUNNING",
         "SLEEP",
         "WAIT",

@@ -19,11 +19,11 @@
 static uint ticks = 0;
 static task_t *running = NULL;
 
-static task_t* kernel_task;
-static task_t* garbage_task;
-static task_t* idle_task;
+static task_t *kernel_task;
+static task_t *garbage_task;
+static task_t *idle_task;
 
-void idle_code(){ HANG; }
+void idle_code() { HANG; }
 
 void tasking_setup()
 {
@@ -72,7 +72,7 @@ void task_setup(void)
     }
 }
 
-task_t *task(task_t* parent, const char* name, bool user)
+task_t *task(task_t *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
@@ -143,7 +143,6 @@ void task_delete(task_t *this)
     list_remove(tasks, this);
     atomic_end();
 
-    
     list_foreach(i, this->inbox)
     {
         message_delete(i->value);
@@ -191,7 +190,7 @@ int task_count(void)
     return result;
 }
 
-task_t* task_spawn(task_t* parent, const char* name, task_entry_t entry, void *arg, bool user)
+task_t *task_spawn(task_t *parent, const char *name, task_entry_t entry, void *arg, bool user)
 {
     ASSERT_ATOMIC;
 
@@ -203,7 +202,7 @@ task_t* task_spawn(task_t* parent, const char* name, task_entry_t entry, void *a
     return t;
 }
 
-task_t* task_spawn_with_argv(task_t* parent, const char* name, task_entry_t entry, const char **argv, bool user)
+task_t *task_spawn_with_argv(task_t *parent, const char *name, task_entry_t entry, const char **argv, bool user)
 {
     atomic_begin();
 
@@ -315,7 +314,7 @@ void task_sleep(int time)
     sheduler_yield();
 }
 
-int task_wakeup(task_t* task)
+int task_wakeup(task_t *task)
 {
     ASSERT_ATOMIC;
 
@@ -332,7 +331,7 @@ bool task_wait(int task_id, int *exitvalue)
 {
     atomic_begin();
 
-    task_t* task = task_getbyid(task_id);
+    task_t *task = task_getbyid(task_id);
 
     if (task != NULL)
     {
@@ -349,9 +348,9 @@ bool task_wait(int task_id, int *exitvalue)
         {
             running->wait.task.task_handle = task->id;
             task_setstate(running, TASK_STATE_WAIT_TASK);
-            
+
             atomic_end();
-            
+
             sheduler_yield();
 
             if (exitvalue != NULL)
@@ -372,7 +371,7 @@ bool task_wait(int task_id, int *exitvalue)
 
 /* --- Task stopping and canceling ---------------------------------------- */
 
-bool task_cancel(task_t* task, int exitvalue)
+bool task_cancel(task_t *task, int exitvalue)
 {
     atomic_begin();
 
@@ -415,30 +414,30 @@ void task_exit(int exitvalue)
 
 /* --- Task Memory managment ---------------------------------------------- */
 
-int task_memory_map(task_t* this, uint addr, uint count)
+int task_memory_map(task_t *this, uint addr, uint count)
 {
     return memory_map(this->pdir, addr, count, 1);
 }
 
-int task_memory_unmap(task_t* this, uint addr, uint count)
+int task_memory_unmap(task_t *this, uint addr, uint count)
 {
     return memory_unmap(this->pdir, addr, count);
 }
 
-uint task_memory_alloc(task_t* this, uint count)
+uint task_memory_alloc(task_t *this, uint count)
 {
     uint addr = memory_alloc(this->pdir, count, 1);
     return addr;
 }
 
-void task_memory_free(task_t* this, uint addr, uint count)
+void task_memory_free(task_t *this, uint addr, uint count)
 {
     return memory_free(this->pdir, addr, count, 1);
 }
 
 /* --- File descriptor allocation and locking ------------------------------- */
 
-void task_filedescriptor_close_all(task_t* this)
+void task_filedescriptor_close_all(task_t *this)
 {
     for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
@@ -527,10 +526,9 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
     return -ERR_BAD_FILE_DESCRIPTOR;
 }
 
-
 /* --- task file operations ----------------------------------------------- */
 
-int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags)
+int task_open_file(task_t *this, const char *file_path, iostream_flag_t flags)
 {
     path_t *p = task_cwd_resolve(this, file_path);
 
@@ -557,7 +555,7 @@ int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags)
     return fd;
 }
 
-int task_close_file(task_t* this, int fd)
+int task_close_file(task_t *this, int fd)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -776,7 +774,7 @@ int task_exec(const char *executable_path, const char **argv)
     // Create the process and load the executable.
     atomic_begin();
 
-    task_t * new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
+    task_t *new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
     int new_task_id = new_task->id;
 
     elf_program_t program;
@@ -799,7 +797,7 @@ int task_exec(const char *executable_path, const char **argv)
 
 /* --- Current working directory -------------------------------------------- */
 
-path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
+path_t *task_cwd_resolve(task_t *this, const char *path_to_resolve)
 {
     path_t *p = path(path_to_resolve);
 
@@ -820,9 +818,9 @@ path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve)
 }
 
 int task_set_cwd(task_t *this, const char *new_path)
-{    
+{
     path_t *work_path = task_cwd_resolve(this, new_path);
-    
+
     lock_acquire(this->cwd_lock);
 
     fsnode_t *new_cwd = filesystem_acquire(NULL, work_path, false);
@@ -939,7 +937,7 @@ void message_delete(message_t *msg)
 {
     if (msg->payload)
         free(msg->payload);
-        
+
     free(msg);
 }
 
@@ -961,9 +959,9 @@ void messaging_setup(void)
     channels = list();
 }
 
-int messaging_send_internal(task_t* from, task_t*  to, int id, const char *name, void *payload, uint size, uint flags)
+int messaging_send_internal(task_t *from, task_t *to, int id, const char *name, void *payload, uint size, uint flags)
 {
-    if (to == NULL)
+    if (from == NULL || to == NULL)
     {
         return 0;
     }
@@ -990,7 +988,7 @@ int messaging_send_internal(task_t* from, task_t*  to, int id, const char *name,
     return id;
 }
 
-int messaging_send(task_t* to, const char *name, void *payload, uint size, uint flags)
+int messaging_send(task_t *to, const char *name, void *payload, uint size, uint flags)
 {
     int id = 0;
 
@@ -1138,7 +1136,7 @@ void collect_and_free_task(void)
     // Cleanup all of those dead tasks.
     list_foreach(i, task_to_free)
     {
-        task_delete((task_t*)i->value);
+        task_delete((task_t *)i->value);
     }
 
     list_delete(task_to_free, LIST_KEEP_VALUES);
@@ -1158,7 +1156,7 @@ void garbage_colector()
 /* -------------------------------------------------------------------------- */
 
 static bool sheduler_context_switch = false;
-#define SHEDULER_RECORD_COUNT 1024
+#define SHEDULER_RECORD_COUNT 128
 static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
 
 void timer_set_frequency(int hz)
@@ -1203,8 +1201,6 @@ void wakeup_sleeping_tasks(void)
 
 #include <hjert/dev/vga.h>
 
-static const char *animation = "|/-\\|/-\\";
-
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     UNUSED(context);
@@ -1214,7 +1210,9 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     running->sp = sp;
 
     // Update the system ticks
+    sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
     ticks++;
+
     wakeup_sleeping_tasks();
 
     // Get the next task
@@ -1224,9 +1222,17 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
         running = idle_task;
     }
 
-    sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
+    // Display cpu usage
+    
+    int idle_usage = sheduler_get_usage(idle_task->id);
+    char buffer[32];
 
-    vga_cell(VGA_SCREEN_WIDTH - 1, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(animation[(ticks / 100) % sizeof(animation)], VGACOLOR_WHITE, (running == idle_task) ? VGACOLOR_BLACK : VGACOLOR_GREEN));
+    snprintf(buffer, 32, "CPU: %3d%%", 100 - ((idle_usage * 100) / SHEDULER_RECORD_COUNT));
+
+    for (int i = 0; buffer[i]; i++)
+    {
+        vga_cell(VGA_SCREEN_WIDTH - 16 + i, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(buffer[i], VGACOLOR_WHITE, (running == idle_task) ? VGACOLOR_BLACK : VGACOLOR_RED));
+    }
 
     // Restore the context
     // TODO: set_kernel_stack(...);
@@ -1287,6 +1293,6 @@ int sheduler_get_usage(int task_id)
         }
     }
     atomic_end();
-    
+
     return count;
 }

@@ -245,3 +245,5 @@ void sheduler_yield(void);
 task_t* sheduler_running(void);
 
 int sheduler_running_id(void);
+
+int sheduler_get_usage(int task_id);

@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/cstring.h>
 #include <skift/error.h>
 #include <skift/logger.h>
 #include <skift/iostream.h>
@@ -29,22 +30,25 @@ static cmdline_option_t options[] = {
 static cmdline_t cmdline = CMDLINE(usages, options, "List files and directories in the current working directory by default.", "Options can be combined.");
 
 const char *file_type_name[] = {
-    "unk  ",
-    "file ",
-    "dev  ",
-    "dir  ",
-    "fifo ",
+    "-", // None
+    "-", // File
+    "c", // Char devoce
+    "d", // Directory
+    "p", // Pipe
 };
 
 void ls_print_entry(iostream_direntry_t *entry)
 {
+    iostream_stat_t* stat = &entry->stat;
+
     if (option_list)
     {
-        printf(file_type_name[entry->type]);
+        printf("%srwxrwxrwx %5d ", file_type_name[stat->type], stat->size);
+
     }
 
     if (option_all || entry->name[0] != '.')
-        printf((entry->type == IOSTREAM_TYPE_DIRECTORY && option_color) ? "\e[1m%s  \e[0m" : "%s  ", entry->name);
+        printf((stat->type == IOSTREAM_TYPE_DIRECTORY && option_color) ? "\e[1;34m%s\e[0m/ " : "%s  ", entry->name);
 
     if (option_list)
     {
@@ -52,9 +56,9 @@ void ls_print_entry(iostream_direntry_t *entry)
     }
 }
 
-int ls(const char *path)
+int ls(const char *target_path)
 {
-    iostream_t* dir = iostream_open(path, IOSTREAM_READ);
+    iostream_t* dir = iostream_open(target_path, IOSTREAM_READ);
 
     if (dir != NULL)
     {
@@ -72,10 +76,18 @@ int ls(const char *path)
         }
         else
         {
-            printf(path);
+            iostream_direntry_t entry;
+            entry.stat = state;
+            path_t* p = path(target_path);
+            strlcpy(entry.name, path_filename(p), PATH_LENGHT);
+            ls_print_entry(&entry);
+            path_delete(p);
         }
 
-        printf("\n");
+        if (!option_list)
+        {
+            printf("\n");
+        }
 
         iostream_close(dir);
 

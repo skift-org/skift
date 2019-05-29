@@ -111,6 +111,15 @@ void vtconsole_append(vtconsole_t *vtc, char c)
     {
         vtconsole_newline(vtc);
     }
+    else if (c == '\r')
+    {
+        vtc->cursor.x = 0;
+        
+        if (vtc->on_move)
+        {
+            vtc->on_move(vtc, &vtc->cursor);
+        }
+    }
     else if (c == '\t')
     {
         int n = 8 - (vtc->cursor.x % 8);

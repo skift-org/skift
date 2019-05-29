@@ -230,12 +230,14 @@ void file_stat(fsnode_t *node, iostream_stat_t *stat)
 
 /* --- Fifo ----------------------------------------------------------------- */
 
+//FIXME: this is kind of naive
+
 int fifo_read(stream_t *stream, void *buffer, uint size)
 {
     fifo_t* fifo = &stream->node->fifo;
 
     lock_acquire(fifo->buffer_lock);
-    
+
     int result = ringbuffer_read(fifo->buffer, buffer, size);
         
     lock_release(fifo->buffer_lock);
@@ -675,6 +677,10 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
             case FSNODE_FIFO:
             {
                 result = fifo_read(s, buffer, size);
+                while (result == 0)
+                {
+                    result = fifo_read(s, buffer, size);
+                }
 
                 break;
             }
@@ -726,7 +732,10 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
             case FSNODE_FIFO:
             {
                 result = fifo_write(s, buffer, size);
-
+                while (result == 0)
+                {
+                    result = fifo_write(s, buffer, size);
+                }
                 break;
             }
 

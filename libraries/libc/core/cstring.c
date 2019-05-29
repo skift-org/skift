@@ -19,7 +19,7 @@ void string_printf_append(printf_info_t *info, char c)
     }
     else
     {
-        strnapd((char *)info->p, c, info->lenght);
+        strnapd((char *)info->p, c, info->max_n);
     }
 }
 

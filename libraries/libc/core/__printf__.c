@@ -5,50 +5,50 @@
 #include <skift/cstring.h>
 #include <skift/__printf__.h>
 
-int __printf_formate_binary(printf_info_t* info, va_list *va)
+int __printf_formate_binary(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
     itos(v, buffer, 2);
-    
+
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
-    for(int i = 0; buffer[i]; i++)
+    for (int i = 0; buffer[i]; i++)
     {
         PRINTF_APPEND(buffer[i]);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
-    
+
     return info->n;
 }
 
-int __printf_formate_octal(printf_info_t* info, va_list *va)
+int __printf_formate_octal(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
     itos(v, buffer, 8);
-    
+
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
-    for(int i = 0; buffer[i]; i++)
+    for (int i = 0; buffer[i]; i++)
     {
         PRINTF_APPEND(buffer[i]);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
-    
+
     return info->n;
 }
 
-int __printf_formate_decimal(printf_info_t* info, va_list *va)
+int __printf_formate_decimal(printf_info_t *info, va_list *va)
 {
     int v = va_arg(*va, int);
 
     char buffer[33] = {0};
-    
+
     if (v < 0)
     {
         v = 0 - v;
@@ -62,65 +62,68 @@ int __printf_formate_decimal(printf_info_t* info, va_list *va)
     {
         itos(v, buffer, 10);
     }
-    
+
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
-    for(int i = 0; buffer[i]; i++)
+    for (int i = 0; buffer[i]; i++)
     {
         PRINTF_APPEND(buffer[i]);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
-    
+
     return info->n;
 }
 
-int __printf_formate_hexadecimal(printf_info_t* info, va_list *va)
+int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
     itos(v, buffer, 16);
-    
+
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
-    for(int i = 0; buffer[i]; i++)
+    for (int i = 0; buffer[i]; i++)
     {
         PRINTF_APPEND(buffer[i]);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
-    
+
     return info->n;
 }
 
-int __printf_formate_char(printf_info_t* info, va_list *va)
+int __printf_formate_char(printf_info_t *info, va_list *va)
 {
     char v = va_arg(*va, int);
 
     char buffer[2] = {v, 0};
-    
+
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
-    for(int i = 0; buffer[i]; i++)
+    for (int i = 0; buffer[i]; i++)
     {
         PRINTF_APPEND(buffer[i]);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
-    
+
     return info->n;
 }
 
 int __printf_formate_string(printf_info_t *info, va_list *va)
 {
-    const char* v = va_arg(*va, char*);
+    const char *v = va_arg(*va, char *);
 
-    if (v == NULL) { v = "(null)"; }
+    if (v == NULL)
+    {
+        v = "(null)";
+    }
 
     PRINTF_PADDING(v, PFALIGN_RIGHT);
 
-    for(int i = 0; v[i]; i++)
+    for (int i = 0; v[i]; i++)
     {
         PRINTF_APPEND(v[i]);
     }
@@ -138,7 +141,7 @@ static printf_formatter_t formaters[] =
         /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
 
         /* Float         */ {'f', NULL},
-        
+
         /* Char          */ {'c', __printf_formate_char},
         /* String        */ {'s', __printf_formate_string},
 
@@ -146,9 +149,9 @@ static printf_formatter_t formaters[] =
 
 void __printf_formate(printf_info_t *info, char c, va_list *va)
 {
-    for(int i = 0; formaters[i].c; i++)
+    for (int i = 0; formaters[i].c; i++)
     {
-        if (formaters[i].c == c && formaters[i].impl != NULL) 
+        if (formaters[i].c == c && formaters[i].impl != NULL)
         {
             formaters[i].impl(info, va);
             return;
@@ -173,7 +176,7 @@ int __printf(printf_info_t *info, va_list va)
 
     if (info->format == NULL)
     {
-        for (int i = 0; "(null)"[i];i++)
+        for (int i = 0; "(null)"[i]; i++)
         {
             PRINTF_APPEND("(null)"[i]);
         }
@@ -208,6 +211,12 @@ int __printf(printf_info_t *info, va_list va)
             else if (info->c == '-')
             {
                 info->align = PFALIGN_LEFT;
+                PRINTF_PEEK();
+            }
+            else if (info->c == '%')
+            {
+                info->state = PFSTATE_ESC;
+                PRINTF_APPEND('%');
                 PRINTF_PEEK();
             }
             else if (isdigit(info->c))

@@ -63,15 +63,15 @@ typedef struct
         info->n++;                                       \
     }
 
-#define PRINTF_PADDING(__buffer, __a)                                  \
-    {                                                                  \
-        if (info->align == __a && strlen(__buffer) < info->lenght)     \
-        {                                                              \
-            for (uint i = 0; i < info->lenght - strlen(__buffer); i++) \
-            {                                                          \
-                PRINTF_APPEND(info->padding);                          \
-            }                                                          \
-        }                                                              \
+#define PRINTF_PADDING(__buffer, __a)                                    \
+    {                                                                    \
+        if (info->align == (__a) && strlen(__buffer) < info->lenght)     \
+        {                                                                \
+            for (uint i = 0; i < (info->lenght - strlen(__buffer)); i++) \
+            {                                                            \
+                PRINTF_APPEND(info->padding);                            \
+            }                                                            \
+        }                                                                \
     }
 
 int __printf(printf_info_t *info, va_list va);

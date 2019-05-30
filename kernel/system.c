@@ -4,10 +4,10 @@
 
 #include <skift/atomic.h>
 
-#include <hjert/cpu/cpuid.h>
-#include <hjert/system.h>
-#include <hjert/tasking.h>
-#include <hjert/memory.h>
+#include "kernel/cpu/cpuid.h"
+#include "kernel/system.h"
+#include "kernel/tasking.h"
+#include "kernel/memory.h"
 
 /* --- Version info --------------------------------------------------------- */
 

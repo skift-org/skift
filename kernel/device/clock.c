@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
-#include <hjert/clock.h>
+#include "kernel/clock.h"
 
 /* --- CMOS/RTC ------------------------------------------------------------- */
 

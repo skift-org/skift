@@ -5,9 +5,9 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
-#include <hjert/dev/atapio.h>
+#include "kernel/dev/atapio.h"
 
 int atapio_common(u8 drive, u32 numblock, u8 count)
 {

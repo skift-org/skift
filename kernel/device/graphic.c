@@ -1,5 +1,5 @@
-#include <hjert/graphic.h>
-#include <hjert/filesystem.h>
+#include "kernel/graphic.h"
+#include "kernel/filesystem.h"
 
 #if 0
 int graphic_device_ioctl(int op, void* arg)

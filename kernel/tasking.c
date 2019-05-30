@@ -9,8 +9,8 @@
 #include <skift/math.h>
 #include <skift/error.h>
 
-#include <hjert/cpu/irq.h>
-#include <hjert/tasking.h>
+#include "kernel/cpu/irq.h"
+#include "kernel/tasking.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */
@@ -1199,7 +1199,7 @@ void wakeup_sleeping_tasks(void)
     }
 }
 
-#include <hjert/dev/vga.h>
+#include "kernel/dev/vga.h"
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {

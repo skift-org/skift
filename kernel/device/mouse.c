@@ -5,14 +5,14 @@
 #include <skift/cstring.h>
 #include <skift/atomic.h>
 
-#include <hjert/dev/mouse.h>
-#include <hjert/shared/message.h>
+#include <hjert/devices/mouse.h>
+#include <hjert/message.h>
 
-#include <hjert/cpu/irq.h>
-#include <hjert/processor.h>
-#include <hjert/tasking.h>
+#include "kernel/cpu/irq.h"
+#include "kernel/processor.h"
+#include "kernel/tasking.h"
 
-#include <hjert/mouse.h>
+#include "kernel/mouse.h"
 
 static mouse_state_t oldmouse = {0};
 

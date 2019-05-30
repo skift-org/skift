@@ -13,9 +13,9 @@
 #include <skift/cstring.h>
 #include <skift/logger.h>
 
-#include <hjert/multiboot.h>
+#include "kernel/multiboot.h"
 
-#include <hjert/modules.h>
+#include "kernel/modules.h"
 
 void load_module(multiboot_module_t *module)
 {

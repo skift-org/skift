@@ -6,7 +6,7 @@
 #include <skift/cstring.h>
 #include <skift/iostream.h>
 
-#include <hjert/dev/keyboard.h>
+#include <hjert/devices/keyboard.h>
 
 #include "shell.h"
 

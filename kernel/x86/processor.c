@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/iostream.h>
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
 /* --- Public functions ----------------------------------------------------- */
 

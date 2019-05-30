@@ -7,11 +7,11 @@
 #include <skift/runtime.h>
 #include <skift/list.h>
 
-#include <hjert/shared/message.h>
-#include <hjert/shared/task.h>
+#include <hjert/message.h>
+#include <hjert/task.h>
 
-#include <hjert/memory.h>
-#include <hjert/filesystem.h>
+#include "kernel/memory.h"
+#include "kernel/filesystem.h"
 
 /* --- Task data structure -------------------------------------------------- */
 

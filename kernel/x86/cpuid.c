@@ -5,7 +5,7 @@
 #include <skift/cstring.h>
 #include <skift/iostream.h>
 
-#include <hjert/cpu/cpuid.h>
+#include "kernel/cpu/cpuid.h"
 
 static inline int cpuid_string(int code, int where[4]) 
 {

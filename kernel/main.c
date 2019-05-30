@@ -25,26 +25,26 @@
 #include <skift/math.h>
 #include <skift/error.h>
 
-#include <hjert/cpu/gdt.h>
-#include <hjert/cpu/idt.h>
-#include <hjert/cpu/irq.h>
-#include <hjert/cpu/isr.h>
+#include "kernel/cpu/gdt.h"
+#include "kernel/cpu/idt.h"
+#include "kernel/cpu/irq.h"
+#include "kernel/cpu/isr.h"
 
-#include <hjert/dev/null.h>
-#include <hjert/dev/random.h>
-#include <hjert/dev/zero.h>
+#include "kernel/dev/null.h"
+#include "kernel/dev/random.h"
+#include "kernel/dev/zero.h"
 
-#include <hjert/console.h>
-#include <hjert/filesystem.h>
-#include <hjert/keyboard.h>
-#include <hjert/memory.h>
-#include <hjert/modules.h>
-#include <hjert/mouse.h>
-#include <hjert/multiboot.h>
-#include <hjert/paging.h>
-#include <hjert/serial.h>
-#include <hjert/system.h>
-#include <hjert/tasking.h>
+#include "kernel/console.h"
+#include "kernel/filesystem.h"
+#include "kernel/keyboard.h"
+#include "kernel/memory.h"
+#include "kernel/modules.h"
+#include "kernel/mouse.h"
+#include "kernel/multiboot.h"
+#include "kernel/paging.h"
+#include "kernel/serial.h"
+#include "kernel/system.h"
+#include "kernel/tasking.h"
 
 multiboot_info_t mbootinfo;
 

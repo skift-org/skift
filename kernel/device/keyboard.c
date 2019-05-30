@@ -9,20 +9,20 @@
 #include <skift/ringbuffer.h>
 #include <skift/atomic.h>
 
-#include <hjert/shared/message.h>
-#include <hjert/dev/keyboard.h>
+#include <hjert/devices/keyboard.h>
+#include <hjert/message.h>
 
-#include <hjert/cpu/irq.h>
-#include <hjert/filesystem.h>
-#include <hjert/tasking.h>
-#include <hjert/keyboard.h>
+#include "kernel/cpu/irq.h"
+#include "kernel/filesystem.h"
+#include "kernel/tasking.h"
+#include "kernel/keyboard.h"
 
 /*
  * TODO:
  * - Send messages to subscribers
  */
 
-ringbuffer_t* keyboard_buffer;
+stream_t* keyboard_fifo;
 
 char keymap_FRBE[128][3] = 
 {
@@ -234,7 +234,8 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
         if (c!='\0')
         {
-            ringbuffer_putc(keyboard_buffer, keyboard_getchar(scancode));
+            char chr = keyboard_getchar(scancode);
+            filesystem_write(keyboard_fifo, &chr, 1);
         }
         messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYTYPED, &keyevent, sizeof(keyevent), 0);
     }    
@@ -289,27 +290,12 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 /* --- Public functions ----------------------------------------------------- */
 
-int keyboard_device_read(stream_t *s, void *buffer, uint size)
-{
-    UNUSED(s);
-
-    atomic_begin();
-    int result = ringbuffer_read(keyboard_buffer, buffer, size);
-    atomic_end();
-
-    return result;
-}
-
 void keyboard_setup()
 {
     irq_register(1, keyboard_irq);
 
-    keyboard_buffer = ringbuffer(512);
-
-    device_t keyboard_device = 
-    {
-        .read = keyboard_device_read,
-    };
-
-    FILESYSTEM_MKDEV("keyboard", keyboard_device);
+    path_t* kbpath = path("/dev/kbd");
+    filesystem_mkfifo(NULL, kbpath);
+    keyboard_fifo = filesystem_open(NULL, kbpath, IOSTREAM_WRITE);
+    path_delete(kbpath);
 }

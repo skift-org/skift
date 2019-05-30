@@ -4,9 +4,9 @@
 #include <skift/atomic.h>
 #include <skift/assert.h>
 
-#include <hjert/tasking.h>
-#include <hjert/memory.h>
-#include <hjert/serial.h>
+#include "kernel/tasking.h"
+#include "kernel/memory.h"
+#include "kernel/serial.h"
 
 /* --- Framework initialization --------------------------------------------- */ 
 

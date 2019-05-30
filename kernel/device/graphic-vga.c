@@ -4,9 +4,9 @@
 
 /* vga.c: legacy vga textmode graphic.                                        */
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
-#include <hjert/dev/vga.h>
+#include "kernel/dev/vga.h"
 
 static u16 *buffer = (u16 *)VGA_FRAME_BUFFER;
 

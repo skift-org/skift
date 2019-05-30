@@ -2,8 +2,8 @@
 
 #include <skift/runtime.h>
 
-#include <hjert/shared/syscalls.h>
-#include <hjert/shared/message.h>
+#include <hjert/syscalls.h>
+#include <hjert/message.h>
 
 DECL_SYSCALL5(messaging_send, int to, const char *name, void *payload, unsigned int size, unsigned int flags);
 DECL_SYSCALL5(messaging_broadcast, const char *channel, const char *name, void *payload, unsigned int size, unsigned int flags);

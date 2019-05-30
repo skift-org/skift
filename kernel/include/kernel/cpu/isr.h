@@ -6,7 +6,7 @@
 
 #include <skift/runtime.h>
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
 typedef void (*isr_handler_t)(processor_context_t *);
 

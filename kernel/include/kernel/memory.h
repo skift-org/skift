@@ -6,7 +6,7 @@
 
 #include <skift/runtime.h>
 
-#include <hjert/paging.h>
+#include "kernel/paging.h"
 
 extern uint TOTAL_MEMORY;
 extern uint USED_MEMORY;

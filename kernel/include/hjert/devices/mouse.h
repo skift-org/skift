@@ -1,11 +1,10 @@
 #pragma once
 
 #define MOUSE_CHANNEL    "#dev:mouse"
-
-#define MOUSE_MOVE       "dev:mouse.move"
-#define MOUSE_SCROLL     "dev:mouse.scroll"
-#define MOUSE_BUTTONDOWN "dev:mouse.buttonpressed"
-#define MOUSE_BUTTONUP   "dev:mouse.buttonreleased"
+#define MOUSE_MOVE       "devmouse.move"
+#define MOUSE_SCROLL     "devmouse.scroll"
+#define MOUSE_BUTTONDOWN "devmouse.buttonpressed"
+#define MOUSE_BUTTONUP   "devmouse.buttonreleased"
 
 typedef enum
 {

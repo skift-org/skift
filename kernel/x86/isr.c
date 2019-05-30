@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <hjert/cpu/idt.h>
-#include <hjert/cpu/isr.h>
+#include "kernel/cpu/idt.h"
+#include "kernel/cpu/isr.h"
 
-#include <hjert/syscalls.h>
-#include <hjert/system.h>
+#include "kernel/syscalls.h"
+#include "kernel/system.h"
 
 static const char *exception_messages[32] = 
 {

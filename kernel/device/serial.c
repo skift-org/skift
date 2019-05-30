@@ -5,11 +5,11 @@
 #include <skift/runtime.h>
 #include <skift/atomic.h>
 
-#include <hjert/system.h>
-#include <hjert/processor.h>
-#include <hjert/filesystem.h>
+#include "kernel/system.h"
+#include "kernel/processor.h"
+#include "kernel/filesystem.h"
 
-#include <hjert/serial.h>
+#include "kernel/serial.h"
 
 #define PORT_COM1 0x3f8
 

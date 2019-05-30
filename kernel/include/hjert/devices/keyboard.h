@@ -99,12 +99,12 @@ typedef enum
     KPENTER,
     RCONTROL,
     RALT,
-    
+
     SUPER,
 
     INSERT,
     DELETE,
-    HOME, 
+    HOME,
     END,
     PAGE_UP,
     PAGE_DOWN,
@@ -112,11 +112,11 @@ typedef enum
     KEYBOAD_KEY_END
 } keyboard_key_t;
 
-#define KEYBOARD_CHANNEL  "#dev:keyboard"
+#define KEYBOARD_CHANNEL "#dev:keyboard"
 
-#define KEYBOARD_KEYPRESSED  "dev:keyboard.keypressed"
+#define KEYBOARD_KEYPRESSED "dev:keyboard.keypressed"
 #define KEYBOARD_KEYRELEASED "dev:keyboard.keyreleased"
-#define KEYBOARD_KEYTYPED    "dev:keyboard.keytyped"
+#define KEYBOARD_KEYTYPED "dev:keyboard.keytyped"
 
 typedef struct
 {

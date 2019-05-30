@@ -18,9 +18,9 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
-#include <hjert/system.h>
-#include <hjert/paging.h>
-#include <hjert/memory.h>
+#include "kernel/system.h"
+#include "kernel/paging.h"
+#include "kernel/memory.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

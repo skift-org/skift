@@ -5,7 +5,7 @@
 #include <skift/cstring.h>
 #include <skift/iostream.h>
 
-#include <hjert/cpu/gdt.h>
+#include "kernel/cpu/gdt.h"
 
 gdt_t gdt;
 

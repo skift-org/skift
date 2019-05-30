@@ -6,8 +6,8 @@
 
 #include <skift/logger.h>
 
-#include <hjert/processor.h>
-#include <hjert/dev/bga.h>
+#include "kernel/processor.h"
+#include "kernel/dev/bga.h"
 
 void bga_write_register(u16 IndexValue, u16 DataValue)
 {

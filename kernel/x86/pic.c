@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <hjert/cpu/idt.h>
+#include "kernel/cpu/idt.h"
 
 #define PIC_WAIT()                    \
 	do                                \

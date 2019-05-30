@@ -16,13 +16,13 @@
 #include <skift/logger.h>
 #include <skift/system.h>
 
-#include <hjert/shared/syscalls.h>
-
-#include <hjert/filesystem.h>
-#include <hjert/memory.h>
-#include <hjert/serial.h>
 #include <hjert/syscalls.h>
-#include <hjert/tasking.h>
+
+#include "kernel/filesystem.h"
+#include "kernel/memory.h"
+#include "kernel/serial.h"
+#include "kernel/syscalls.h"
+#include "kernel/tasking.h"
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
 

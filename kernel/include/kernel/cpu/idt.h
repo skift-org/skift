@@ -6,7 +6,7 @@
 
 #include <skift/runtime.h>
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
 // Gate call protection. 
 // Specifies which privilege Level the calling Descriptor minimum should have. 

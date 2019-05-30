@@ -4,7 +4,7 @@
 
 #include <skift/cstring.h>
 
-#include <hjert/cpu/idt.h>
+#include "kernel/cpu/idt.h"
 
 idt_t idt;
 

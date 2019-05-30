@@ -4,8 +4,8 @@
 
 #include <skift/cstring.h>
 
-#include <hjert/system.h>
-#include <hjert/filesystem.h>
+#include "kernel/system.h"
+#include "kernel/filesystem.h"
 
 static int state = 1411743402;
 

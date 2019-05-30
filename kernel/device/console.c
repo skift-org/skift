@@ -8,9 +8,9 @@
 #include <skift/atomic.h>
 #include <vtconsole.h>
 
-#include <hjert/dev/vga.h>
-#include <hjert/filesystem.h>
-#include <hjert/console.h>
+#include "kernel/dev/vga.h"
+#include "kernel/filesystem.h"
+#include "kernel/console.h"
 
 static vtconsole_t *vtc;
 

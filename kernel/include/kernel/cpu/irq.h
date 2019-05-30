@@ -5,7 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
 typedef reg32_t (*irq_handler_t)(reg32_t, processor_context_t *);
 

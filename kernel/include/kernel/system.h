@@ -7,7 +7,7 @@
 #include <skift/runtime.h>
 #include <skift/logger.h>
 
-#include <hjert/processor.h>
+#include "kernel/processor.h"
 
 void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...);
 

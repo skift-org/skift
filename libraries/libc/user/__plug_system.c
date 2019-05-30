@@ -1,5 +1,5 @@
 #include <skift/__plugs__.h>
-#include <hjert/shared/syscalls.h>
+#include <hjert/syscalls.h>
 
 void __plug_system_get_info(system_info_t* info)
 {

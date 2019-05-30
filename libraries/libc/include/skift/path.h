@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <hjert/shared/filesystem.h>
+#include <hjert/filesystem.h>
 
 #include <skift/runtime.h>
 #include <skift/list.h>

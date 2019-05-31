@@ -138,11 +138,6 @@ int sys_messaging_receive(message_t *msg, int wait)
     return messaging_receive(msg, wait && true);
 }
 
-int sys_messaging_payload(void *buffer, uint size)
-{
-    return messaging_payload(buffer, size);
-}
-
 int sys_messaging_subscribe(const char *channel)
 {
     return messaging_subscribe(channel);
@@ -200,6 +195,17 @@ int sys_filesystem_mkdir(const char *dir_path)
     path_t *p = task_cwd_resolve(sheduler_running(), dir_path);
 
     int result = filesystem_mkdir(ROOT, p);
+    
+    path_delete(p);
+    
+    return result;
+}
+
+int sys_filesystem_mkfifo(const char* fifo_path)
+{
+    path_t *p = task_cwd_resolve(sheduler_running(), fifo_path);
+
+    int result = filesystem_mkfifo(ROOT, p);
     
     path_delete(p);
     
@@ -298,7 +304,6 @@ static int (*syscalls[])() =
         [SYS_MSG_SEND] = sys_messaging_send,
         [SYS_MSG_BROADCAST] = sys_messaging_broadcast,
         [SYS_MSG_RECEIVE] = sys_messaging_receive,
-        [SYS_MSG_PAYLOAD] = sys_messaging_payload,
         [SYS_MSG_SUBSCRIBE] = sys_messaging_subscribe,
         [SYS_MSG_UNSUBSCRIBE] = sys_messaging_unsubscribe,
 
@@ -313,6 +318,7 @@ static int (*syscalls[])() =
         [SYS_FILESYSTEM_FSTAT] = sys_filesystem_fstat,
 
         [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
+        [SYS_FILESYSTEM_MKFIFO] = sys_filesystem_mkfifo,
         [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
         [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
         [SYS_FILESYSTEM_RENAME] = sys_filesystem_rename,

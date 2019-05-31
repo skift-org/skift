@@ -25,17 +25,16 @@ int shell_readline(shell_t* this)
         message_t msg;
         messaging_receive(&msg, 1);
 
-        if (strcmp(msg.label, KEYBOARD_KEYTYPED) == 0)
+        if (message_is(msg, KEYBOARD_KEYTYPED))
         {
-            keyboard_event_t event;
-            messaging_payload(&event, sizeof(keyboard_event_t));
+            keyboard_event_t* event = message_payload_as(msg, keyboard_event_t);
 
-            if (event.c == '\n')
+            if (event->c == '\n')
             {
                 printf("\n");
                 break;
             }
-            else if (event.c == '\b')
+            else if (event->c == '\b')
             {
                 if (strlen(this->command_string) > 0)
                 {
@@ -43,12 +42,12 @@ int shell_readline(shell_t* this)
                     printf("\b\033[K");
                 }
             }
-            else if (!(event.c == '\0' || event.c == '\t'))
+            else if (!(event->c == '\0' || event->c == '\t'))
             {
                 if (strlen(this->command_string) < MAX_COMMAND_LENGHT - 1)
                 {
-                    strnapd(this->command_string, event.c, MAX_COMMAND_LENGHT);
-                    printf("%c", event.c);
+                    strnapd(this->command_string, event->c, MAX_COMMAND_LENGHT);
+                    printf("%c", event->c);
                 }
             }
         }

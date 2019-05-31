@@ -131,6 +131,10 @@ task_t *task(task_t *parent, const char *name, bool user)
         this->pdir = memory_kpdir();
     }
 
+    // setup the stack
+    memset(this->stack, 0, TASK_STACKSIZE);
+    this->sp = (reg32_t)(&this->stack[0] + TASK_STACKSIZE - 1);
+
     return this;
 }
 
@@ -269,9 +273,6 @@ void task_setentry(task_t *t, task_entry_t entry, bool user)
 {
     t->entry = entry;
     t->user = user;
-    // setup the stack
-    memset(t->stack, 0, TASK_STACKSIZE);
-    t->sp = (reg32_t)(&t->stack[0] + TASK_STACKSIZE - 1);
 }
 
 uint task_stack_push(task_t *t, const void *value, uint size)
@@ -913,31 +914,25 @@ channel_t *channel_get(const char *channel_name)
 message_t *message(int id, const char *label, void *payload, uint size, uint flags)
 {
     message_t *message = MALLOC(message_t);
+    message_header_t* header = &message->header;
 
+    header->id = id;
+    header->flags = flags;
+    header->size = 0;
+
+    strlcpy(header->label, label, MSGLABEL_SIZE);
+    
     if (payload != NULL && size > 0)
     {
-        message->size = min(MSGPAYLOAD_SIZE, size);
-        message->payload = malloc(message->size);
+        header->size = min(MSGPAYLOAD_SIZE, size);
         memcpy(message->payload, payload, size);
     }
-    else
-    {
-        message->size = 0;
-        message->payload = NULL;
-    }
-
-    message->id = id;
-    message->flags = flags;
-    strlcpy(message->label, label, MSGLABEL_SIZE);
 
     return message;
 }
 
 void message_delete(message_t *msg)
 {
-    if (msg->payload)
-        free(msg->payload);
-
     free(msg);
 }
 
@@ -963,19 +958,19 @@ int messaging_send_internal(task_t *from, task_t *to, int id, const char *name, 
 {
     if (from == NULL || to == NULL)
     {
-        return 0;
+        return -ERR_NO_SUCH_PROCESS;
     }
 
     if (to->inbox->count > 1024)
     {
         logger_log(LOG_WARNING, "PROC=%d inbox is full!", to);
-        return 0;
+        return -ERR_INBOX_FULL;
     }
 
     message_t *msg = message(id, name, payload, size, flags);
 
-    msg->from = from->id;
-    msg->to = to->id;
+    msg->header.to = to->id;
+    msg->header.from = from->id;
 
     list_pushback(to->inbox, (void *)msg);
 
@@ -1035,8 +1030,14 @@ message_t *messaging_receive_internal(task_t *task)
             message_delete(task->wait.message.message);
         }
 
-        list_pop(task->inbox, (void **)&msg);
-        task->wait.message.message = msg;
+        if (list_pop(task->inbox, (void **)&msg))
+        {
+            task->wait.message.message = msg;
+        }
+        else
+        {
+            task->wait.message.message = NULL;
+        }
     }
 
     atomic_end();
@@ -1065,19 +1066,6 @@ bool messaging_receive(message_t *msg, bool wait)
     }
 
     return false;
-}
-
-int messaging_payload(void *buffer, uint size)
-{
-    message_t *incoming = sheduler_running()->wait.message.message;
-
-    if (incoming != NULL && incoming->size > 0 && incoming->payload != NULL)
-    {
-        memcpy(buffer, incoming->payload, min(size, incoming->size));
-        return 0;
-    }
-
-    return 1;
 }
 
 int messaging_subscribe(const char *channel_name)

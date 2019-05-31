@@ -2,6 +2,7 @@
 
 #define ERROR_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                    \
     __ENTRY_WITH_VALUE(ERR_SUCESS, 0)                              \
+    __ENTRY(ERR_INBOX_FULL)                                        \
     __ENTRY(ERR_BAD_FILE_DESCRIPTOR)                               \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)                         \
     __ENTRY(ERR_FILE_EXISTS)                                       \

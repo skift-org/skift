@@ -208,8 +208,6 @@ message_t *messaging_receive_internal(task_t *task);
 
 bool messaging_receive(message_t *msg, bool wait);
 
-int messaging_payload(void *buffer, uint size);
-
 int messaging_subscribe(const char *channel_name);
 
 int messaging_unsubscribe(const char *channel_name);

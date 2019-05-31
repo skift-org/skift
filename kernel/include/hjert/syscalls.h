@@ -35,7 +35,6 @@ typedef enum
     SYS_MSG_SEND,
     SYS_MSG_BROADCAST,
     SYS_MSG_RECEIVE,
-    SYS_MSG_PAYLOAD,
 
     SYS_MSG_SUBSCRIBE,
     SYS_MSG_UNSUBSCRIBE,
@@ -56,8 +55,10 @@ typedef enum
     
     SYS_FILESYSTEM_LINK,
     SYS_FILESYSTEM_UNLINK,
-    SYS_FILESYSTEM_MKDIR,
     SYS_FILESYSTEM_RENAME,
+    
+    SYS_FILESYSTEM_MKFIFO,
+    SYS_FILESYSTEM_MKDIR,
 
 // System ------------------------------------------------------------------- //
 

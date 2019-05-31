@@ -95,7 +95,7 @@ int ls(const char *target_path)
     }
     else
     {
-        iostream_printf(err_stream, "ls: cannot access '%s'", path);
+        iostream_printf(err_stream, "ls: cannot access '%s'", target_path);
         error_print("");
         return -1;
     }

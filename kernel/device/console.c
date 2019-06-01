@@ -3,9 +3,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/cstring.h>
+#include <skift/lock.h>
 
-#include <skift/logger.h>
-#include <skift/atomic.h>
 #include <vtconsole.h>
 
 #include "kernel/dev/vga.h"
@@ -13,6 +12,7 @@
 #include "kernel/console.h"
 
 static vtconsole_t *vtc;
+static lock_t vtc_lock;
 
 static byte colors[] =
 {
@@ -74,8 +74,12 @@ static int console_device_write(stream_t* stream, const void* buffer, uint size)
 {
     UNUSED(stream);
 
+    lock_acquire(vtc_lock);
+
     vtconsole_write(vtc, buffer, size);
     
+    lock_release(vtc_lock);
+
     return size;
 }
 
@@ -89,31 +93,8 @@ void console_setup(void)
         .write = console_device_write,
     };
 
+    lock_init(vtc_lock);
     vtc = vtconsole(VGA_SCREEN_WIDTH, VGA_SCREEN_HEIGHT, paint_callback, cursor_move_callback);
     
     FILESYSTEM_MKDEV("console", console_device);
-}
-
-void console_print(const char *s)
-{
-    atomic_begin();
-
-    if (vtc != NULL)
-    {
-        vtconsole_write(vtc, s, strlen(s));
-    }
-
-    atomic_end();
-}
-
-void console_putchar(char c)
-{
-    atomic_begin();
-
-    if (vtc != NULL)
-    {
-        vtconsole_putchar(vtc, c);
-    }
-
-    atomic_end();
 }

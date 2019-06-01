@@ -71,10 +71,4 @@ typedef struct
     console_color_t bg;
 } console_t;
 
-void console_setup();
-
-void console_print(const char *s);
-void console_putchar(char c);
-
-void console_read(const char *s, uint size);
-void console_getchar(char c);
+void console_setup(void);

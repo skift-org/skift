@@ -1,6 +1,9 @@
 /* dstart.c: start a process as a daemon                                      */
 
 #include <skift/process.h>
+#include <skift/error.h>
+#include <skift/iostream.h>
+
 #include <hjert/task.h>
 
 int main(int argc, char const *argv[])
@@ -14,8 +17,18 @@ int main(int argc, char const *argv[])
             deamon_argv[i] = argv[i+1];
         }
 
-        process_exec(argv[1], deamon_argv);
+        if (process_exec(argv[1], deamon_argv) < 0)
+        {
+            error_print("Failled to start deamon");
+            return -1;
+        }
+        else
+        {
+            return 0;
+        }
     }
-
-    return 0;
+    else
+    {
+        printf("No executable specified!\n");
+    }
 }

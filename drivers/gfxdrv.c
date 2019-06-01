@@ -1,4 +1,5 @@
 #include <skift/logger.h>
+#include <hjert/devices/graphic.h>
 
 int main(int argc, char **argv)
 {

@@ -13,6 +13,8 @@
 #define true 1
 #define false 0
 
+#define let __auto_type
+
 typedef void s0;
 typedef char s8;
 typedef short s16;
@@ -60,10 +62,6 @@ typedef unsigned long uintptr_t;
 
 #ifndef __PACKAGE__
 #define __PACKAGE__ "(NULL)"
-#endif
-
-#ifndef __COMMIT__
-#define __COMMIT__ "(NULL)"
 #endif
 
 /* --- Raw memory allocation ------------------------------------------------ */

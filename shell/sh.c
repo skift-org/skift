@@ -10,14 +10,12 @@
 
 int main(int argc, char **argv)
 {
+    UNUSED(argc);
+    UNUSED(argv);
+    
     logger_setlevel(LOG_ALL);
 
-    // HACK: Disable line buffering
-    out_stream->write_buffer = 0;
-    out_stream->write_buffer = NULL;
-
-    (void)argc;
-    (void)argv;
+    iostream_set_write_buffer_mode(out_stream, IOSTREAM_BUFFERED_NONE);
 
     shell_t *this = &(shell_t){
         .do_continue = true,

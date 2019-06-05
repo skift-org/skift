@@ -4,6 +4,7 @@ __assets.h
 __assets.s
 
 .gdbinit
+.ycm_extra_conf.py
 
 *.asm
 

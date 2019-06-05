@@ -7,8 +7,12 @@
 #define HUGE_VAL (1.0/0.0)
 
 #define PI (3.141592654)
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
+
+#define clamp(__v, __lower, __upper) max(min((__v), (__upper)), (__lower))
+
+#define min(__x, __y) ((__x) < (__y) ? (__x) : (__y))
+
+#define max(__x, __y) ((__x) > (__y) ? (__x) : (__y))
 
 #define NAN (0.0 / 0.0)
 #define INFINITY (1.0 / 0.0)
@@ -16,7 +20,6 @@
 #define INF (1.0 / 0.0)
 #define POS_INF (1.0 / 0.0)
 #define NEG_INF (-1.0 / 0.0)
-
 
 double floor(double value);
 double ceil(double x);

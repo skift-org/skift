@@ -17,7 +17,6 @@
  */
 
 #include <skift/__plugs__.h>
-
 #include <skift/atomic.h>
 #include <skift/cstring.h>
 #include <skift/iostream.h>
@@ -34,7 +33,6 @@
 #include "kernel/dev/random.h"
 #include "kernel/dev/zero.h"
 
-#include "kernel/console.h"
 #include "kernel/filesystem.h"
 #include "kernel/keyboard.h"
 #include "kernel/memory.h"
@@ -45,6 +43,7 @@
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
+#include "kernel/textmode.h"
 
 multiboot_info_t mbootinfo;
 
@@ -93,7 +92,7 @@ void kmain(multiboot_info_t *info, s32 magic)
 
     /* --- Devices ---------------------------------------------------------- */
     logger_log(LOG_INFO, "Mounting devices...");
-    setup(console);
+    setup(textmode)
     setup(serial);
     setup(mouse);
     setup(keyboard);
@@ -125,3 +124,4 @@ void kmain(multiboot_info_t *info, s32 magic)
         PANIC("Init has return with code %d!", exitvalue);
     }
 }
+

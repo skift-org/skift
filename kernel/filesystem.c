@@ -16,6 +16,7 @@
 #include <skift/error.h>
 #include <skift/logger.h>
 
+#include "kernel/tasking.h"
 #include "kernel/filesystem.h"
 
 static fsnode_t *root = NULL;
@@ -679,6 +680,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
                 result = fifo_read(s, buffer, size);
                 while (result == 0)
                 {
+                    task_sleep(10);
                     result = fifo_read(s, buffer, size);
                 }
 
@@ -721,7 +723,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
             {
                 device_t *dev = &s->node->device;
 
-                if (dev->read != NULL)
+                if (dev->write != NULL)
                 {
                     result = dev->write(s, buffer, size);
                 }
@@ -734,6 +736,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
                 result = fifo_write(s, buffer, size);
                 while (result == 0)
                 {
+                    task_sleep(10);
                     result = fifo_write(s, buffer, size);
                 }
                 break;

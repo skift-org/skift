@@ -13,7 +13,8 @@
 #define true 1
 #define false 0
 
-#define let __auto_type
+#define let __auto_type const 
+#define var __auto_type
 
 typedef void s0;
 typedef char s8;

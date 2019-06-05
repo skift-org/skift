@@ -8,6 +8,7 @@
 #include <skift/logger.h>
 #include <skift/process.h>
 #include <skift/messaging.h>
+#include <skift/filesystem.h>
 
 int init_exec(const char* filename)
 {
@@ -35,6 +36,8 @@ int main(int argc, char **argv)
     printf("Welcome to \033[1;34mskiftOS\033[0m!\n");
     iostream_flush(out_stream);
 
+    filesystem_mkfifo("/dev/console");
+    init_exec("/bin/conhost");
     int shell = init_exec("/bin/sh");
     
     process_wait(shell, NULL);

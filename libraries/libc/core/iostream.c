@@ -265,8 +265,6 @@ int iostream_flush(iostream_t *stream)
 
 static int iostream_write_linebuffered(iostream_t *stream, const void *buffer, uint size)
 {
-    assert(stream->write_buffer != NULL);
-
     for (uint i = 0; i < size; i++)
     {
         char c = ((char *)buffer)[i];
@@ -287,8 +285,6 @@ static int iostream_write_linebuffered(iostream_t *stream, const void *buffer, u
 
 static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint size)
 {
-    assert(stream->write_buffer != NULL);
-
     int data_left = size;
 
     char *data_to_write = (char *)buffer;
@@ -319,24 +315,21 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
-        if (stream->write_mode != IOSTREAM_BUFFERED_NONE && stream->write_buffer != NULL)
+        if (stream->write_mode == IOSTREAM_BUFFERED_NONE ||stream->write_buffer == NULL)
         {
-            if (stream->write_mode == IOSTREAM_BUFFERED_LINE)
-            {
-                return iostream_write_linebuffered(stream, buffer, size);
-            }
-            else if (stream->write_mode == IOSTREAM_BUFFERED_BLOCK)
-            {
-                return iostream_write_buffered(stream, buffer, size);
-            }
-            else
-            {
-                return iostream_write_no_buffered(stream, buffer, size);
-            }
+            return iostream_write_no_buffered(stream, buffer, size);
+        }
+        else if (stream->write_mode == IOSTREAM_BUFFERED_LINE)
+        {
+            return iostream_write_linebuffered(stream, buffer, size);
+        }
+        else if (stream->write_mode == IOSTREAM_BUFFERED_BLOCK)
+        {
+            return iostream_write_buffered(stream, buffer, size);
         }
         else
         {
-            return iostream_write_no_buffered(stream, buffer, size);
+            return -1;
         }
     }
     else

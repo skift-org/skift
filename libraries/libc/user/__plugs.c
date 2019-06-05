@@ -27,7 +27,7 @@ void __plug_init(void)
     in_stream = NULL; // FIXME: no stdin,
     out_stream = iostream_open("/dev/console", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     err_stream = iostream_open("/dev/console", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
-    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
+    log_stream = iostream_open("/dev/serial",  IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
 }
 
 void __plug_fini(int exit_code)

@@ -12,6 +12,7 @@
 #include <skift/lock.h>
 
 void __plug_init(void);
+
 void __plug_fini(int exit_code);
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);

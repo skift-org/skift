@@ -40,6 +40,7 @@ void __lock_release(lock_t *lock)
     assert(lock->holder == process_this());
 
     __sync_synchronize();
+
     lock->holder = 0;
     lock->locked = 0;
 }

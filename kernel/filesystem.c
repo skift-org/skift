@@ -71,7 +71,10 @@ fsnode_t *fsnode(fsnode_type_t type)
     case FSNODE_FIFO:
     {
         fifo_t *fifo = &node->fifo;
+
+        lock_init(fifo->buffer_lock);
         fifo->buffer = ringbuffer(4096);
+
         break;
     }
     default:

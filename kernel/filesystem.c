@@ -646,6 +646,8 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     IS_FS_READY;
 
+    if (size == 0) return 0;
+
     int result = -1;
     if (s != NULL)
     {
@@ -706,6 +708,8 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 int filesystem_write(stream_t *s, const void *buffer, uint size)
 {
     IS_FS_READY;
+
+    if (size == 0) return 0;
 
     int result = -1;
 

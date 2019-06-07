@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 /* conhost.h: console host process                                            */
 
 #include <skift/iostream.h>
@@ -57,58 +61,6 @@ void cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
     textmode_info.cursor_y = cur->y;
 }
 
-void hexDump(iostream_t *stream, char *desc, void *addr, int len)
-{
-    int i;
-    unsigned char buff[17];
-    unsigned char *pc = (unsigned char *)addr;
-
-    // Output description if given.
-    if (desc != NULL)
-        iostream_printf(stream, "%s:\n", desc);
-
-    // Process every byte in the data.
-    for (i = 0; i < len; i++)
-    {
-        // Multiple of 16 means new line (with line offset).
-
-        if ((i % 16) == 0)
-        {
-            // Just don't print ASCII for the zeroth line.
-            if (i != 0)
-                iostream_printf(stream, "  %s\n", buff);
-
-            // Output the offset.
-            iostream_printf(stream, "  %04x ", i);
-        }
-
-        // Now the hex code for the specific character.
-        iostream_printf(stream, " %02x", pc[i]);
-
-        // And store a printable ASCII character for later.
-        if ((pc[i] < 0x20) || (pc[i] > 0x7e))
-        {
-            buff[i % 16] = '.';
-        }
-        else
-        {
-            buff[i % 16] = pc[i];
-        }
-
-        buff[(i % 16) + 1] = '\0';
-    }
-
-    // Pad out last line if not exactly 16 characters.
-    while ((i % 16) != 0)
-    {
-        iostream_printf(stream, "   ");
-        i++;
-    }
-
-    // And print the final ASCII bit.
-    iostream_printf(stream, "  %s\n", buff);
-}
-
 int main(int argc, char const *argv[])
 {
     UNUSED(argc);
@@ -147,11 +99,9 @@ int main(int argc, char const *argv[])
 
     do
     {
-        char buffer[512];
-        var size = iostream_read(console_fifo, buffer, 512);
-
-        logger_log(LOG_DEBUG, "Readded %d", size);
-        hexDump(log_stream, "What got readed: ", buffer, size);
+        #define READ_BUFFER_SIZE 512
+        char buffer[READ_BUFFER_SIZE];
+        var size = iostream_read(console_fifo, buffer, READ_BUFFER_SIZE);
 
         vtconsole_write(vtc, buffer, size);
 

@@ -15,6 +15,6 @@ install: $(DRIVERS)
 $(DRIVERS) : % : %.c
 
 conhost: conhost.c
-	$(CC) $(CFLAGS) conhost.c -lvtc -o conhost
+	$(CC) $(CFLAGS) $^ -lvtc -o $@
 
 .PHONY: all clean list install

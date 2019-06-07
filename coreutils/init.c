@@ -21,7 +21,7 @@ int init_exec(const char* filename)
     }
     else
     {
-        logger_log(LOG_FINE, "'%s' started!", filename);
+        logger_log(LOG_FINE, "'%s' started with pid=%d !", filename, process);
     }
 
     return process;

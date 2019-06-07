@@ -55,14 +55,14 @@ int ringbuffer_write(ringbuffer_t *rb, const void *buffer, uint size)
     assert(rb);
     assert(buffer);
 
-    int chr;
+    int chr = 0;
     uint offset = 0;
 
-    do
+    while (chr != -1 && offset < size)
     {
         chr = ringbuffer_putc(rb, ((char *)buffer)[offset]);
         offset++;
-    } while (chr != -1 && offset < size);
+    }
 
     return offset;
 }

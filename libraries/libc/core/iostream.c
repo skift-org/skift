@@ -10,7 +10,7 @@
 #include <skift/iostream.h>
 #include <skift/math.h>
 
-// IO Stream constructor and destructor ------------------------------------- //
+/* --- IO Stream constructor and destructor --------------------------------- */
 
 iostream_t *iostream(iostream_flag_t flags)
 {
@@ -29,6 +29,11 @@ iostream_t *iostream(iostream_flag_t flags)
     stream->fd = -1;
     stream->p = NULL;
 
+    // Setup unget buffer
+    stream->unget_char = 0;
+    stream->has_unget = false;
+
+    // Setup write buffer
     if (flags & IOSTREAM_BUFFERED_WRITE)
     {
         stream->write_mode = IOSTREAM_BUFFERED_LINE;
@@ -40,6 +45,7 @@ iostream_t *iostream(iostream_flag_t flags)
         stream->write_buffer = NULL;
     }
 
+    // Setup read buffer
     stream->write_used = 0;
 
     if (flags & IOSTREAM_BUFFERED_READ)
@@ -67,6 +73,8 @@ void iostream_delete(iostream_t *stream)
 
     free(stream);
 }
+
+/* --- iostream open/close -------------------------------------------------- */
 
 iostream_t *iostream_open(const char *path, iostream_flag_t flags)
 {
@@ -108,6 +116,8 @@ void iostream_close(iostream_t *stream)
         }
     }
 }
+
+/* --- Iostream buffering mode ---------------------------------------------- */
 
 void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
 {
@@ -153,7 +163,7 @@ void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mod
     this->write_mode = mode;
 }
 
-// IO Stream generic io operation ------------------------------------------- //
+/* --- IO Stream generic io operation --------------------------------------- */
 
 int iostream_read_no_buffered(iostream_t *stream, void *buffer, uint size)
 {
@@ -215,6 +225,14 @@ int iostream_read(iostream_t *stream, void *buffer, uint size)
 {
     if (stream != NULL)
     {
+        if (stream->has_unget && size >= 1)
+        {
+            ((char*)buffer)[0] = stream->unget_char;
+            stream->has_unget = false; 
+            buffer = &((char*)buffer)[1];
+            size--;
+        }
+
         if (stream->write_mode == IOSTREAM_BUFFERED_NONE)
         {
             return iostream_read_no_buffered(stream, buffer, size);
@@ -437,6 +455,21 @@ int iostream_getchar(iostream_t *stream)
     }
 }
 
+int iostream_ungetchar(iostream_t* stream, char c)
+{
+    if (stream->has_unget)
+    {
+        return -1;
+    }
+    else
+    {
+        stream->has_unget = true;
+        stream->unget_char = c;
+
+        return 0;
+    }
+}
+
 int iostream_puts(iostream_t *stream, const char *string)
 {
     return iostream_write(stream, string, strlen(string));
@@ -505,5 +538,5 @@ int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
 
 // TODO: int iostream_scanf(iostream_t *stream, const char *fmt, ...)
 //       {
-//
+//       
 //       }

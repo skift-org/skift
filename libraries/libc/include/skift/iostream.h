@@ -91,6 +91,9 @@ typedef struct s_iostream
     int read_used;
     int read_head;
 
+    bool has_unget;
+    int unget_char;
+
     int fd;
     void *p;
 } iostream_t;
@@ -135,6 +138,8 @@ char *iostream_gets(iostream_t *stream, char *string, int n);
 int iostream_putchar(iostream_t *stream, int c);
 
 int iostream_getchar(iostream_t *stream);
+
+int iostream_ungetchar(iostream_t* stream, char c);
 
 int iostream_printf(iostream_t *stream, const char *fmt, ...);
 

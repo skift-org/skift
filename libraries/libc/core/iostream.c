@@ -33,27 +33,27 @@ iostream_t *iostream(iostream_flag_t flags)
     {
         stream->write_mode = IOSTREAM_BUFFERED_LINE;
         stream->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
-        stream->write_used = 0;
     }
     else
     {
         stream->write_mode = IOSTREAM_BUFFERED_NONE;
         stream->write_buffer = NULL;
-        stream->write_used = 0;
     }
+
+    stream->write_used = 0;
 
     if (flags & IOSTREAM_BUFFERED_READ)
     {
         stream->read_mode = IOSTREAM_BUFFERED_BLOCK;
         stream->read_buffer = malloc(IOSTREAM_BUFFER_SIZE);
-        stream->read_used = 0;
     }
     else
     {
         stream->read_mode = IOSTREAM_BUFFERED_NONE;
         stream->read_buffer = NULL;
-        stream->read_used = 0;
     }
+
+    stream->read_used = 0;
 
     return stream;
 }
@@ -175,6 +175,7 @@ int iostream_fill(iostream_t *stream)
 {
     stream->read_used = iostream_read_no_buffered(stream, stream->read_buffer, IOSTREAM_BUFFER_SIZE);
     stream->read_head = 0;
+
     return stream->read_used;
 }
 
@@ -249,7 +250,7 @@ int iostream_flush(iostream_t *stream)
 {
     if (stream != NULL)
     {
-        if (stream->write_buffer != NULL)
+        if (stream->write_buffer != NULL && stream->write_used > 0)
         {
             iostream_write_no_buffered(stream, stream->write_buffer, stream->write_used);
             stream->write_used = 0;
@@ -315,7 +316,7 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
-        if (stream->write_mode == IOSTREAM_BUFFERED_NONE ||stream->write_buffer == NULL)
+        if (stream->write_mode == IOSTREAM_BUFFERED_NONE || stream->write_buffer == NULL)
         {
             return iostream_write_no_buffered(stream, buffer, size);
         }

@@ -36,8 +36,8 @@ int main(int argc, char **argv)
     printf("Welcome to \033[1;34mskiftOS\033[0m!\n");
     iostream_flush(out_stream);
 
-    filesystem_mkfifo("/dev/console");
-    init_exec("/bin/conhost");
+    filesystem_mkfifo("/dev/term");
+    init_exec("/bin/terminal");
     int shell = init_exec("/bin/sh");
     
     process_wait(shell, NULL);

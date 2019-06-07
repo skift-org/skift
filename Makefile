@@ -34,12 +34,16 @@ clean:
 	make -C kernel clean
 	make -C shell clean
 	make -C tests clean
+	make -C tests applications
 
 libraries: $(SYSROOT)
 	make -C libraries install
 
 coreutils: $(SYSROOT) libraries
 	make -C coreutils install
+
+applications: $(SYSROOT) libraries
+	make -C applications install
 
 drivers: $(SYSROOT) libraries
 	make -C drivers install
@@ -56,14 +60,17 @@ shell: $(SYSROOT) libraries
 sync:
 	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
 
-.PHONY: all clean libraries coreutils kernel shell tests sync
+.PHONY: all clean libraries coreutils kernel shell tests sync applications
 
 $(SYSROOT):
 	mkdir -p $(SYSROOT)
 	mkdir -p $(SYSROOT)/bin
 	mkdir -p $(SYSROOT)/dev
 	mkdir -p $(SYSROOT)/lib
-	mkdir -p $(SYSROOT)/lib/
+	mkdir -p $(SYSROOT)/me
+	mkdir -p $(SYSROOT)/me/share
+	mkdir -p $(SYSROOT)/me/anon
+	mkdir -p $(SYSROOT)/me/root
 	cp -ua $(INCLUDES) $(SYSROOT)/lib/
 
 $(BOOTROOT):
@@ -72,7 +79,7 @@ $(BOOTROOT):
 	mkdir -p $(BOOTROOT)/boot/grub
 	cp grub.cfg $(BOOTROOT)/boot/grub/
 
-build/ramdisk.tar: $(SYSROOT) shell kernel drivers coreutils tests
+build/ramdisk.tar: $(SYSROOT) shell kernel drivers coreutils applications tests
 	cd $(SYSROOT); tar -cf ../../$@ *
 	
 build/bootdisk.iso: $(BOOTROOT) build/ramdisk.tar

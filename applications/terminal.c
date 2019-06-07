@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* conhost.h: console host process                                            */
+/* terminal: terminal host process                                            */
 
 #include <skift/iostream.h>
 #include <skift/error.h>
@@ -13,7 +13,7 @@
 #include <vtconsole.h>
 
 static iostream_t *textmode_device;
-static iostream_t *console_fifo;
+static iostream_t *terminal_fifo;
 static textmode_info_t textmode_info;
 static ushort *textmode_buffer;
 
@@ -82,15 +82,15 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    console_fifo = iostream_open("/dev/console", IOSTREAM_READ);
+    terminal_fifo = iostream_open("/dev/term", IOSTREAM_READ);
 
-    if (console_fifo == NULL)
+    if (terminal_fifo == NULL)
     {
-        error_print("Failled to open console fifo file");
+        error_print("Failled to open terminal fifo file");
         return -1;
     }
 
-    iostream_set_read_buffer_mode(console_fifo, IOSTREAM_BUFFERED_NONE);
+    iostream_set_read_buffer_mode(terminal_fifo, IOSTREAM_BUFFERED_NONE);
 
     vtconsole_t *vtc = vtconsole(80, 25, paint_callback, cursor_move_callback);
     textmode_buffer = malloc(textmode_info.width * textmode_info.height * sizeof(ushort));
@@ -101,7 +101,7 @@ int main(int argc, char const *argv[])
     {
         #define READ_BUFFER_SIZE 512
         char buffer[READ_BUFFER_SIZE];
-        var size = iostream_read(console_fifo, buffer, READ_BUFFER_SIZE);
+        var size = iostream_read(terminal_fifo, buffer, READ_BUFFER_SIZE);
 
         vtconsole_write(vtc, buffer, size);
 

@@ -15,7 +15,7 @@ install: $(INSTALL)
 %.out : %.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-include *.mk
+-include *.mk
 
 %.install: %.out
 	cp $^ $(SYSROOT)/bin/$(patsubst %.out,%,$^)

@@ -15,6 +15,12 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
+TARGETS=libraries userspace kernel shell usertests
+
+TARGETS_BUILD=${TARGETS:=.build}
+TARGETS_INSTALL=${TARGETS:=.install}
+TARGETS_CLEAN=${TARGETS:=.clean}
+
 INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*")
 
 all: build/bootdisk.iso
@@ -22,45 +28,27 @@ all: build/bootdisk.iso
 run: all
 	qemu-system-i386 -cdrom build/bootdisk.iso  -m 256M -enable-kvm -serial mon:stdio
 
-clean:
+clean: $(TARGETS_CLEAN)
 	rm -rf $(SYSROOT)
 	rm -rf $(BOOTROOT)
 	rm -rf build/ramdisk.tar
 	rm -rf build/bootdisk.iso
 
-	make -C libraries clean
-	make -C coreutils clean
-	make -C drivers clean
-	make -C kernel clean
-	make -C shell clean
-	make -C tests clean
-	make -C tests applications
-
-libraries: $(SYSROOT)
-	make -C libraries install
-
-coreutils: $(SYSROOT) libraries
-	make -C coreutils install
-
-applications: $(SYSROOT) libraries
-	make -C applications install
-
-drivers: $(SYSROOT) libraries
-	make -C drivers install
-
-tests: $(SYSROOT) libraries
-	make -C tests install
-
-kernel: $(BOOTROOT) libraries
-	make -C kernel install
-
-shell: $(SYSROOT) libraries
-	make -C shell install
+list:
+	@echo $(TARGETS)
+	@echo $(TARGETS_INSTALL)
+	@echo $(TARGETS_CLEAN)
 
 sync:
 	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
 
-.PHONY: all clean libraries coreutils kernel shell tests sync applications
+%.install: %
+	make -C $^ install
+
+%.clean: %
+	make -C $^ clean
+
+.PHONY: all run clean sync
 
 $(SYSROOT):
 	mkdir -p $(SYSROOT)
@@ -79,7 +67,7 @@ $(BOOTROOT):
 	mkdir -p $(BOOTROOT)/boot/grub
 	cp grub.cfg $(BOOTROOT)/boot/grub/
 
-build/ramdisk.tar: $(SYSROOT) shell kernel drivers coreutils applications tests
+build/ramdisk.tar: $(SYSROOT) $(TARGETS_INSTALL)
 	cd $(SYSROOT); tar -cf ../../$@ *
 	
 build/bootdisk.iso: $(BOOTROOT) build/ramdisk.tar

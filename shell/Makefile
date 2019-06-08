@@ -1,10 +1,10 @@
 SOURCES = $(wildcard *.c)
 
-sh: $(SOURCES)
+sh.out: $(SOURCES)
 	$(CC) $^ -o $@
 
 clean:
-	rm -f sh
+	rm -f sh.out
 
-install: sh
-	cp sh $(SYSROOT)/bin/
+install: sh.out
+	cp sh.out $(SYSROOT)/bin/sh

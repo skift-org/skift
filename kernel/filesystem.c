@@ -234,8 +234,6 @@ int file_write(stream_t *stream, const void *buffer, uint size)
 
 /* --- Fifo ----------------------------------------------------------------- */
 
-//FIXME: this is kind of naive
-
 int fifo_read(stream_t *stream, void *buffer, uint size)
 {
     fifo_t* fifo = &stream->node->fifo;
@@ -267,6 +265,8 @@ int fifo_write(stream_t *stream, const void *buffer, uint size)
 // only call this method if you hold the directory lock.
 fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 {
+    lock_assert(dir->lock);
+
     list_foreach(i, dir->directory.childs)
     {
         fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
@@ -685,7 +685,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
                 result = fifo_read(s, buffer, size);
                 while (result == 0)
                 {
-                    task_sleep(10);
+                    task_sleep(sheduler_running(), 10);
                     result = fifo_read(s, buffer, size);
                 }
 
@@ -743,7 +743,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
                 result = fifo_write(s, buffer, size);
                 while (result == 0)
                 {
-                    task_sleep(10);
+                    task_sleep(sheduler_running(), 10);
                     result = fifo_write(s, buffer, size);
                 }
                 break;

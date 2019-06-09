@@ -95,8 +95,7 @@ int sys_process_set_cwd(const char* path)
 
 int sys_process_sleep(int time)
 {
-    task_sleep(time);
-    return 0;
+    return task_sleep(sheduler_running(), time);
 }
 
 int sys_process_wakeup(int tid)

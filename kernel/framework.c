@@ -213,9 +213,8 @@ int __plug_process_set_cwd(const char* cwd)
 }
 
 int __plug_process_sleep(int time)
-{
-    task_sleep(time);
-    return 0;
+{    
+    return task_sleep(sheduler_running(), time);
 }
 
 int __plug_process_wakeup(int pid)

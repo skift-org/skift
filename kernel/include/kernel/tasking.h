@@ -27,6 +27,7 @@ typedef struct
 typedef struct
 {
     uint wakeuptick;
+    bool gotwakeup;
 } task_wait_time_t;
 
 typedef struct
@@ -108,7 +109,13 @@ uint task_stack_push(task_t *t, const void *value, uint size);
 
 void task_go(task_t *t);
 
-void task_sleep(int time);
+typedef enum
+{
+    TASK_SLEEP_RESULT_WAKEUP,
+    TASk_SLEEP_RESULT_TIMEOUT,
+} task_sleep_result_t;
+
+task_sleep_result_t task_sleep(task_t* this, int timeout);
 
 int task_wakeup(task_t* task);
 

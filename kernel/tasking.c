@@ -305,23 +305,38 @@ void task_go(task_t *t)
 
 /* --- Task wait state ---------------------------------------------------- */
 
-void task_sleep(int time)
+task_sleep_result_t task_sleep(task_t* this, int timeout)
 {
     ATOMIC({
-        running->wait.time.wakeuptick = ticks + time;
-        task_setstate(running, TASK_STATE_WAIT_TIME);
+        this->wait.time.wakeuptick = ticks + timeout;
+        this->wait.time.gotwakeup = false;
+
+        task_setstate(this, TASK_STATE_WAIT_TIME);
     });
 
     sheduler_yield();
+
+    if (this->wait.time.gotwakeup)
+    {
+        return TASK_SLEEP_RESULT_WAKEUP;
+    }
+    else
+    {
+        return TASk_SLEEP_RESULT_TIMEOUT;
+    }
 }
 
-int task_wakeup(task_t *task)
+int task_wakeup(task_t *this)
 {
     ASSERT_ATOMIC;
 
-    if (task != NULL && task->state == TASK_STATE_WAIT_TIME)
+    if (this != NULL && this->state == TASK_STATE_WAIT_TIME)
     {
-        task_setstate(running, TASK_STATE_RUNNING);
+        this->wait.time.gotwakeup = true;
+        this->wait.time.wakeuptick = 0;
+
+        task_setstate(this, TASK_STATE_RUNNING);
+        
         return 0;
     }
 
@@ -1134,7 +1149,7 @@ void garbage_colector()
 {
     while (true)
     {
-        task_sleep(100); // We don't do this really often.
+        task_sleep(sheduler_running(), 100); // We don't do this really often.
         collect_and_free_task();
     }
 }

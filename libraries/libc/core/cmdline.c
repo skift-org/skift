@@ -36,18 +36,22 @@ void do_option(cmdline_t *cmdline, cmdline_option_t *option, int i, int argc, ch
     case CMDLINE_BOOLEAN:
     {
         if (option->value != NULL)
+        {
             *((bool *)option->value) = true;
+        }
 
         break;
     }
     case CMDLINE_STRING:
     {
         if (option->value != NULL)
+        {
             if (i + 1 < argc && argv[i + 1] != NULL)
             {
                 *((char **)option->value) = argv[i + 1];
                 argv[i + 1] = NULL;
             }
+        }
 
         break;
     }
@@ -157,7 +161,8 @@ int cmdline_parse(cmdline_t *cmdline, int argc, char **argv)
                 }
                 else
                 {
-                    printf("Unknow option '%s'!\n", arg + 2);
+                    iostream_printf(err_stream, "Unknow option '%s'!\n", arg + 2);
+                    process_exit(-1);
                 }
             }
             else
@@ -172,7 +177,8 @@ int cmdline_parse(cmdline_t *cmdline, int argc, char **argv)
                     }
                     else
                     {
-                        printf("Unknow option '%c'!\n", arg[1 + j]);
+                        iostream_printf(err_stream, "Unknow option '%c'!\n", arg[1 + j]);
+                        process_exit(-1);
                     }
                 }
             }

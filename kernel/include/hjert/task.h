@@ -27,8 +27,8 @@ typedef struct
     int id;
     task_state_t state;
     
-    const char name[TASK_NAMESIZE];
-    const char cwd[PATH_LENGHT];
+    char name[TASK_NAMESIZE];
+    char cwd[PATH_LENGHT];
 
     int usage_cpu;
     int usage_virtual_memory;

@@ -167,6 +167,11 @@ void task_delete(task_t *this)
     free(this);
 }
 
+list_t* task_all(void)
+{
+    return tasks;
+}
+
 list_t *task_bystate(task_state_t state)
 {
     return tasks_bystates[state];
@@ -183,6 +188,19 @@ task_t *task_getbyid(int id)
     }
 
     return NULL;
+}
+
+void task_get_info(task_t* this, task_info_t* info)
+{
+    assert(this);
+
+    info->id = this->id;
+    info->state = this->state;
+    
+    strlcpy(info->name, this->name, TASK_NAMESIZE);
+    path_to_cstring(this->cwd_path, info->cwd, PATH_LENGHT); 
+
+    info->usage_cpu = (sheduler_get_usage(this->id) * 100) / SHEDULER_RECORD_COUNT;
 }
 
 int task_count(void)
@@ -1159,7 +1177,6 @@ void garbage_colector()
 /* -------------------------------------------------------------------------- */
 
 static bool sheduler_context_switch = false;
-#define SHEDULER_RECORD_COUNT 128
 static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
 
 void timer_set_frequency(int hz)

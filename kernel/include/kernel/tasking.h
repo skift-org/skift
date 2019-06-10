@@ -91,9 +91,13 @@ task_t *task(task_t* parent, const char* name, bool user);
 
 void task_delete(task_t *task);
 
+list_t* task_all(void);
+
 list_t* task_bystate(task_state_t state);
 
 task_t *task_getbyid(int id);
+
+void task_get_info(task_t* this, task_info_t* info);
 
 int task_count(void);
 
@@ -232,6 +236,8 @@ void garbage_colector();
 /* -------------------------------------------------------------------------- */
 /*   SHEDULER                                                                 */      
 /* -------------------------------------------------------------------------- */
+
+#define SHEDULER_RECORD_COUNT 128
 
 void timer_set_frequency(int hz);
 

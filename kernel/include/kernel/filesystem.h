@@ -48,7 +48,7 @@
 struct s_fsnode;
 struct s_stream;
 
-typedef int (*fsop_open_t)(struct s_stream *s, path_t *path);
+typedef int (*fsop_open_t)(struct s_stream *s);
 typedef int (*fsop_close_t)(struct s_stream *s);
 typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct s_stream *s, const void *buffer, uint size);
@@ -64,6 +64,9 @@ typedef struct
 
 typedef struct
 {
+    fsop_open_t open;
+    fsop_close_t close;
+
     fsop_read_t read;
     fsop_write_t write;
     fsop_ioctl_t ioctl;
@@ -119,6 +122,14 @@ typedef struct
     iostream_direntry_t *entries;
 } directory_entries_t;
 
+typedef struct 
+{
+    void*p;
+    int count;
+ 
+    int current;
+} stream_attached_info_t;
+
 typedef struct s_stream
 {
     fsnode_t *node;
@@ -127,6 +138,7 @@ typedef struct s_stream
 
     union {
         directory_entries_t direntries;
+        stream_attached_info_t attached;
     };
 } stream_t;
 

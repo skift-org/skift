@@ -607,6 +607,10 @@ stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags)
         {
             s->direntries = directory_entries(node);
         }
+        else if (node->type == FSNODE_DEVICE && node->device.open != NULL)
+        {
+            node->device.open(s);
+        }
 
         return s;
     }
@@ -625,6 +629,10 @@ void filesystem_close(stream_t *s)
         if (type == FSNODE_DIRECTORY)
         {
             free(s->direntries.entries);
+        }
+        else if (type == FSNODE_DEVICE && s->node->device.close != NULL)
+        {
+            s->node->device.close(s);
         }
 
         stream_delete(s);

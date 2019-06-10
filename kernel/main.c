@@ -29,10 +29,7 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/cpu/isr.h"
 
-#include "kernel/dev/null.h"
-#include "kernel/dev/random.h"
-#include "kernel/dev/zero.h"
-
+#include "kernel/devices.h"
 #include "kernel/filesystem.h"
 #include "kernel/keyboard.h"
 #include "kernel/memory.h"
@@ -97,6 +94,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(mouse);
     setup(keyboard);
 
+    setup(proc);
     setup(null);
     setup(zero);
     setup(random);
@@ -124,4 +122,3 @@ void kmain(multiboot_info_t *info, s32 magic)
         PANIC("Init has return with code %d!", exitvalue);
     }
 }
-

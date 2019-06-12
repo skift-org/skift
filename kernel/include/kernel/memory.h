@@ -6,6 +6,7 @@
 
 #include <skift/runtime.h>
 
+#include "kernel/multiboot.h"
 #include "kernel/paging.h"
 
 extern uint TOTAL_MEMORY;
@@ -23,7 +24,7 @@ void virtual_free(page_directorie_t *pdir, uint vaddr, uint count);
 
 /* --- Logical Memory ------------------------------------------------------- */
 
-void memory_setup(uint used, uint total);
+void memory_setup(multiboot_info_t* mbootinfo);
 
 page_directorie_t *memory_kpdir();
 

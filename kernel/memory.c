@@ -17,10 +17,12 @@
 #include <skift/runtime.h>
 #include <skift/atomic.h>
 #include <skift/logger.h>
+#include <skift/math.h>
 
-#include "kernel/system.h"
-#include "kernel/paging.h"
 #include "kernel/memory.h"
+#include "kernel/modules.h"
+#include "kernel/paging.h"
+#include "kernel/system.h"
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -253,11 +255,48 @@ void virtual_free(page_directorie_t *pdir, uint vaddr, uint count)
 /* --- Public functions ----------------------------------------------------- */
 bool is_memory_initialized = false;
 
-void memory_setup(uint used, uint total)
+extern int __end;
+uint get_kernel_end(multiboot_info_t *minfo)
 {
-    is_memory_initialized = true;
-    TOTAL_MEMORY = total;
+    return max((uint)&__end, modules_get_end(minfo));
+}
 
+void memory_load_mmap(multiboot_info_t* mbootinfo)
+{
+    // Setup memory map
+    TOTAL_MEMORY = 0;
+
+    for (multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)mbootinfo->mmap_addr; (u32)mmap < mbootinfo->mmap_addr + mbootinfo->mmap_length; mmap = (multiboot_memory_map_t*)((u32)mmap + mmap->size + sizeof(mmap->size)))
+    {
+        logger_log(LOG_INFO, "Mmap: base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x",
+            (u32)(mmap->addr >> 32),
+            (u32)(mmap->addr & 0xffffffff),
+            (u32)(mmap->len >> 32),
+            (u32)(mmap->len & 0xffffffff),
+            (u32)mmap->type);
+
+        if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
+        {
+            TOTAL_MEMORY += mmap->len;
+        }
+        else
+        {
+            // Mark memory as used so we don't allocate here.
+            for (u64 addr = mmap->addr; addr < mmap->len; addr+=PAGE_SIZE)
+            {
+                PHYSICAL_SET_USED(addr);
+            }
+        }
+    }
+
+    USED_MEMORY = PAGE_ALIGN(get_kernel_end(mbootinfo));
+
+    logger_log(LOG_INFO, "%dKib of memory detected", TOTAL_MEMORY / 1024);
+    logger_log(LOG_INFO, "%dKib of memory are used by the kernel", USED_MEMORY / 1024);
+}
+
+void memory_setup(multiboot_info_t* mbootinfo)
+{
     memset(&MEMORY, 0, sizeof(MEMORY));
 
     // Setup the kernel pagedirectorie.
@@ -271,7 +310,10 @@ void memory_setup(uint used, uint total)
     }
 
     // Map the kernel memory
-    memory_identity_map(&kpdir, 0, PAGE_ALIGN(used) / PAGE_SIZE + 1);
+    memory_load_mmap(mbootinfo);
+    memory_identity_map(&kpdir, 0, PAGE_ALIGN(USED_MEMORY) / PAGE_SIZE + 1);
+
+    is_memory_initialized = true;
 
     paging_load_directorie(&kpdir);
     paging_enable();

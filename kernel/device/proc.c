@@ -7,6 +7,7 @@
 #include <skift/atomic.h>
 #include <skift/math.h>
 
+#include "kernel/devices.h"
 #include "kernel/filesystem.h"
 #include "kernel/tasking.h"
 
@@ -46,8 +47,6 @@ int proc_device_close(stream_t *stream)
 
 int proc_device_read(stream_t *s, void *buffer, uint size)
 {
-    UNUSED(s);
-
     if (s->attached.current < s->attached.count)
     {
         task_info_t *info = &((task_info_t *)s->attached.p)[s->attached.current];

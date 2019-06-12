@@ -80,6 +80,7 @@ iostream_t *iostream_open(const char *path, iostream_flag_t flags)
 {
     int fd = __plug_iostream_open(path, flags);
 
+    // FIXME: maybe we should handle stream error differently :/
     if (fd < 0)
     {
         error_set(-fd);
@@ -422,7 +423,16 @@ int iostream_ioctl(iostream_t *stream, int request, void *arg)
 
         if (stream->fd != -1)
         {
-            return __plug_iostream_ioctl(stream->fd, request, arg);
+            // FIXME: maybe we should handle stream error differently :/
+            int result = __plug_iostream_ioctl(stream->fd, request, arg);
+
+            if (result < 0)
+            {
+                error_set(-result);
+                return -1;
+            }
+
+            return result;
         }
     }
 

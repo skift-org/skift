@@ -17,34 +17,34 @@
 
 // struct fsnode;
 // struct stream;
-// 
+//
 // // Resole a path to a fsnode, this is used by synthetic file system.
 // typedef struct s_fsnode* (*fsop_resolve_t)(void* this, path_t *path);
-// 
+//
 // // Call when a new stream is open
 // typedef void (*fsop_open_t)(void* this, struct s_stream *s);
-// 
+//
 // // Call when the stream is close
 // typedef void (*fsop_close_t)(void* this, struct s_stream *s);
-// 
+//
 // // Call when we read from the fsnode
 // typedef int (*fsop_read_t)(void* this, struct s_stream *s, void *buffer, uint size);
-// 
+//
 // // Call when we write to the fsnode
 // typedef int (*fsop_write_t)(void* this, struct s_stream *s, const void *buffer, uint size);
-// 
+//
 // // Call when an ioctl request is made
 // typedef int (*fsop_ioctl_t)(void* this, struct s_stream *s, int request, void *args);
-// 
+//
 // // Call when a fstat is called
 // typedef int (*fsop_fstat_t)(void* this, struct s_stream *s, iostream_stat_t *stat);
-// 
+//
 // // Call when a new fsnode_t is create
 // typedef void (*fsop_init_t)(void* this);
-// 
+//
 // // Call when the fsnode_t is free
 // typedef void (*fsop_delete_t)(void* this);
-// 
+//
 struct s_fsnode;
 struct s_stream;
 
@@ -122,11 +122,11 @@ typedef struct
     iostream_direntry_t *entries;
 } directory_entries_t;
 
-typedef struct 
+typedef struct
 {
-    void*p;
+    void *p;
     int count;
- 
+
     int current;
 } stream_attached_info_t;
 
@@ -161,7 +161,7 @@ stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags);
 
 void filesystem_close(stream_t *s);
 
-stream_t* filesystem_dup(stream_t* s);
+stream_t *filesystem_dup(stream_t *s);
 
 int filesystem_read(stream_t *s, void *buffer, uint size);
 
@@ -191,16 +191,16 @@ int filesystem_unlink(fsnode_t *at, path_t *p);
 
 int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath, path_t *newpath);
 
-bool filesystem_exist(fsnode_t* at, path_t* p);
+bool filesystem_exist(fsnode_t *at, path_t *p);
 
 // *filesystem_mkdev* with error checking.
-#define FILESYSTEM_MKDEV(__name, __object)                               \
-    {                                                                    \
-        path_t *__dev_path = path("/dev/" __name);                       \
+#define FILESYSTEM_MKDEV(__name, __object)                                  \
+    {                                                                       \
+        path_t *__dev_path = path(__name);                                  \
         logger_log(LOG_INFO, "Creating device " __name " at /dev/" __name); \
-        if (filesystem_mkdev(NULL, __dev_path, (__object)))              \
-        {                                                                \
-            PANIC("Failled to create the '" __name "' device.");         \
-        }                                                                \
-        path_delete(__dev_path);\
+        if (filesystem_mkdev(NULL, __dev_path, (__object)))                 \
+        {                                                                   \
+            PANIC("Failled to create the '" __name "' device.");            \
+        }                                                                   \
+        path_delete(__dev_path);                                            \
     }

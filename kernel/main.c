@@ -31,7 +31,6 @@
 
 #include "kernel/devices.h"
 #include "kernel/filesystem.h"
-#include "kernel/keyboard.h"
 #include "kernel/memory.h"
 #include "kernel/modules.h"
 #include "kernel/mouse.h"
@@ -40,7 +39,6 @@
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/textmode.h"
 
 multiboot_info_t mbootinfo;
 
@@ -83,7 +81,8 @@ void kmain(multiboot_info_t *info, s32 magic)
 
     /* --- Devices ---------------------------------------------------------- */
     logger_log(LOG_INFO, "Mounting devices...");
-    setup(textmode)
+    setup(textmode);
+    setup(framebuffer);
     setup(serial);
     setup(mouse);
     setup(keyboard);

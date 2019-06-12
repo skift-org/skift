@@ -32,5 +32,5 @@ void null_setup(void)
         .write = null_device_write
     };
 
-    FILESYSTEM_MKDEV("null", null_device);
+    FILESYSTEM_MKDEV("/dev/null", null_device);
 }

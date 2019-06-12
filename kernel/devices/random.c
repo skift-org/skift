@@ -44,5 +44,5 @@ void random_setup(void)
         .write = random_device_write,
     };
 
-    FILESYSTEM_MKDEV("random", random_device);
+    FILESYSTEM_MKDEV("/dev/random", random_device);
 }

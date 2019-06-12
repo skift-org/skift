@@ -32,5 +32,5 @@ void zero_setup(void)
         .write = zero_device_write
     };
 
-    FILESYSTEM_MKDEV("zero", zero_device);
+    FILESYSTEM_MKDEV("/dev/zero", zero_device);
 }

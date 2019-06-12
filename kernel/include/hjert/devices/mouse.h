@@ -1,6 +1,9 @@
 #pragma once
 
+#define MOUSE_DEVICE     "/dev/mice"
+
 #define MOUSE_CHANNEL    "#dev:mouse"
+
 #define MOUSE_MOVE       "devmouse.move"
 #define MOUSE_SCROLL     "devmouse.scroll"
 #define MOUSE_BUTTONDOWN "devmouse.buttonpressed"

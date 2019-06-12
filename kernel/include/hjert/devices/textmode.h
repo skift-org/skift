@@ -1,5 +1,7 @@
 #pragma once
 
+#define TEXTMODE_DEVICE "/dev/txt"
+
 #define TEXTMODE_IOCTL_GET_INFO 0
 #define TEXTMODE_IOCTL_SET_INFO 1
 #define TEXTMODE_IOCTL_SET_CELL 2

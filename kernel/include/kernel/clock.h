@@ -16,7 +16,7 @@ typedef enum
     T_YEAR   = 0x9,
 } time_selector_t;
 
-typedef struct 
+typedef struct
 {
     uint second;
     uint minute;

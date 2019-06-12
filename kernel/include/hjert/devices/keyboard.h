@@ -112,6 +112,8 @@ typedef enum
     KEYBOAD_KEY_END
 } keyboard_key_t;
 
+#define KEYBOARD_DEVICE "/dev/kbd"
+
 #define KEYBOARD_CHANNEL "#dev:keyboard"
 
 #define KEYBOARD_KEYPRESSED "dev:keyboard.keypressed"

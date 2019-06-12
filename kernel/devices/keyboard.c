@@ -15,12 +15,6 @@
 #include "kernel/cpu/irq.h"
 #include "kernel/filesystem.h"
 #include "kernel/tasking.h"
-#include "kernel/keyboard.h"
-
-/*
- * TODO:
- * - Send messages to subscribers
- */
 
 stream_t* keyboard_fifo;
 

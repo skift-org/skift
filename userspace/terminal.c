@@ -66,7 +66,7 @@ int main(int argc, char const *argv[])
     UNUSED(argc);
     UNUSED(argv);
 
-    textmode_device = iostream_open("/dev/textmode", IOSTREAM_WRITE);
+    textmode_device = iostream_open(TEXTMODE_DEVICE, IOSTREAM_WRITE);
 
     if (textmode_device == NULL)
     {

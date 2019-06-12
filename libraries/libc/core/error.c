@@ -5,7 +5,7 @@
 #define ERROR_ENUM_ENTRY_STRING(__entry) #__entry,
 #define ERROR_ENUM_ENTRY_STRING_WITH_VALUE(__entry, __value) #__entry,
 
-static error_t error_value = ERR_SUCESS;
+static error_t error_value = ERR_SUCCESS;
 
 const char *ERROR_NAMES[] = {ERROR_ENUM(ERROR_ENUM_ENTRY_STRING, ERROR_ENUM_ENTRY_STRING_WITH_VALUE)};
 
@@ -31,7 +31,7 @@ void error_print(const char* message)
  
 void if_error_throw_and_catch_fire(const char* message)
 {
-    if (error_value != ERR_SUCESS)
+    if (error_value != ERR_SUCCESS)
     {
         error_print(message);
         process_exit(-1);

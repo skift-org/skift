@@ -62,7 +62,7 @@ void serial_setup()
             .write = serial_device_write,
         };
 
-    FILESYSTEM_MKDEV("serial", serial_device);
+    FILESYSTEM_MKDEV("/dev/serial", serial_device);
 }
 
 char serial_getc()

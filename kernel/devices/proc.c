@@ -80,5 +80,5 @@ void proc_setup(void)
         .read = proc_device_read,
         .write = proc_device_write};
 
-    FILESYSTEM_MKDEV("proc", zero_device);
+    FILESYSTEM_MKDEV("/dev/proc", zero_device);
 }

@@ -1219,8 +1219,6 @@ void wakeup_sleeping_tasks(void)
     }
 }
 
-#include "kernel/dev/vga.h"
-
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     UNUSED(context);
@@ -1240,18 +1238,6 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     {
         // Or the idle task if there are no running tasks.
         running = idle_task;
-    }
-
-    // Display cpu usage
-    
-    int idle_usage = sheduler_get_usage(idle_task->id);
-    char buffer[32];
-
-    snprintf(buffer, 32, "CPU: %3d%%", 100 - ((idle_usage * 100) / SHEDULER_RECORD_COUNT));
-
-    for (int i = 0; buffer[i]; i++)
-    {
-        vga_cell(VGA_SCREEN_WIDTH - 16 + i, VGA_SCREEN_HEIGHT - 1, VGA_ENTRY(buffer[i], VGACOLOR_WHITE, (running == idle_task) ? VGACOLOR_BLACK : VGACOLOR_RED));
     }
 
     // Restore the context

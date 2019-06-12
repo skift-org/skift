@@ -9,8 +9,7 @@
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    UNUSED(argc); UNUSED(argv);
 
     for (int i = 0; i < LOOP_MAX; i++)
     {

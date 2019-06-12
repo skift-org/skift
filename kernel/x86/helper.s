@@ -11,6 +11,13 @@ paging_enable:
     mov cr0, eax
     ret
 
+global paging_disable
+paging_disable:
+    mov eax, cr0
+    and eax, 0x7fffffff
+    mov cr0, eax
+    ret
+
 global paging_load_directorie
 paging_load_directorie:
     mov eax, [esp + 4]
@@ -22,6 +29,7 @@ paging_invalidate_tlb:
     mov eax, cr3
     mov cr3, eax
     ret
+
 # --- CPU tables ------------------------------------------------------------- #
 
 global gdt_flush

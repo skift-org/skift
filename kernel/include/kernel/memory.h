@@ -14,7 +14,12 @@ extern uint USED_MEMORY;
 
 /* --- Physical Memory ------------------------------------------------------ */
 
+void physical_set_used(uint addr, uint count);
+
+void physical_set_free(uint addr, uint count);
+
 uint physical_alloc(uint count);
+
 void physical_free(uint addr, uint count);
 
 /* --- Virtual Memory ------------------------------------------------------- */

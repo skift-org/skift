@@ -24,9 +24,9 @@ static const char *usages[] = {
 static cmdline_option_t options[] = {
     CMDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "list all available graphics modes.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("get", 'g', option_get, "get the current graphic mode.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_STRING("set", 's', option_set, "set graphic mode.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("list", 'l', option_list, "List all available graphics modes.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("get", 'g', option_get, "Get the current graphic mode.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_STRING("set", 's', option_set, "Set graphic mode.", CMDLINE_NO_CALLBACK),
 
     CMDLINE_OPT_END,
 };
@@ -46,7 +46,8 @@ typedef struct
 } supported_gfxmode_t;
 
 supported_gfxmode_t gfxmodes[] = {
-    {"textmode", {false}},
+    // FIXME: the kernel does't support this mode
+    // {"textmode", {false}}, 
     {"640x360",  {true, 640,  360}},
     {"800x600",  {true, 800,  600}},
     {"1024x768", {true, 1024, 768}},

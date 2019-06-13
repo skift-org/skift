@@ -20,6 +20,7 @@ typedef enum
     CMDLINE_INTEGER,
     CMDLINE_ACTION,
     CMDLINE_SECTION,
+    CMDLINE_SEPARATOR,
     CMDLINE_END
 } cmdline_option_type_t;
 
@@ -38,7 +39,7 @@ typedef struct s_cmdline_option
 
 typedef struct s_cmdline
 {
-    const char *name; 
+    const char *name;
     const char *const *usages;
     const char *prologue;
     cmdline_option_t *options;
@@ -47,19 +48,29 @@ typedef struct s_cmdline
 
 #define CMDLINE_NEWLINE "\n\t"
 
-#define CMDLINE_NO_LONG_NAME  NULL
+#define CMDLINE_NO_LONG_NAME NULL
 #define CMDLINE_NO_SHORT_NAME '\0'
-#define CMDLINE_NO_CALLBACK   NULL
-#define CMDLINE_NO_VALUE      NULL
+#define CMDLINE_NO_CALLBACK NULL
+#define CMDLINE_NO_VALUE NULL
 
-#define CMDLINE_OPT_SECTION(__name, __description) \
-    {                                              \
-        .type = CMDLINE_SECTION,                   \
-        .value = CMDLINE_NO_VALUE,                 \
-        .long_name = __long_name,                  \
-        .short_name = CMDLINE_NO_SHORT_NAME,       \
-        .callback = CMDLINE_NO_CALLBACK,           \
-        .help = __description,                     \
+#define CMDLINE_OPT_SECTION(__name)          \
+    {                                        \
+        .type = CMDLINE_SECTION,             \
+        .value = CMDLINE_NO_VALUE,           \
+        .long_name = __name,                 \
+        .short_name = CMDLINE_NO_SHORT_NAME, \
+        .callback = CMDLINE_NO_CALLBACK,     \
+        .help = NULL,                        \
+    }
+
+#define CMDLINE_OPT_SEPARATOR              \
+    {                                        \
+        .type = CMDLINE_SEPARATOR,             \
+        .value = CMDLINE_NO_VALUE,           \
+        .long_name = NULL,                   \
+        .short_name = CMDLINE_NO_SHORT_NAME, \
+        .callback = CMDLINE_NO_CALLBACK,     \
+        .help = NULL,                        \
     }
 
 #define CMDLINE_OPT_BOOL(__long_name, __short_name, __value, __help, __callback) \

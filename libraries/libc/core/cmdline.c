@@ -103,24 +103,52 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
     for (int i = 0; cmdline->options[i].type != CMDLINE_END; i++)
     {
         cmdline_option_t *opt = &cmdline->options[i];
-        if (opt->short_name != '\0')
+        if (opt->type == CMDLINE_SEPARATOR)
         {
-            printf(" -%c, ", opt->short_name);
+            //printf("\n");
+        }
+        else if (opt->type == CMDLINE_SECTION)
+        {
+            printf("\e[1m%s:\e[0m", opt->long_name);
         }
         else
         {
-            printf("      ");
-        }
 
-        if (opt->long_name != NULL)
-        {
-            printf("--%s ", opt->long_name);
-        }
-        printf("\t");
+            if (opt->short_name != '\0')
+            {
+                printf(" -%c", opt->short_name);
+            }
+            else
+            {
+                printf("    ");
+            }
 
-        if (opt->help != NULL)
-        {
-            printf("%s", opt->help);
+            if (opt->long_name != NULL)
+            {
+                printf(", --%s ", opt->long_name);
+            }
+            else
+            {
+                printf("  ");
+            }
+
+            if (opt->type == CMDLINE_STRING ||
+                opt->type == CMDLINE_INTEGER)
+            {
+                printf("[value] ");
+            }
+
+            if (opt->long_name == NULL)
+            {
+                printf("  ");
+            }
+
+            printf("\t");
+
+            if (opt->help != NULL)
+            {
+                printf("%s", opt->help);
+            }
         }
 
         printf("\n\t");
@@ -130,7 +158,7 @@ void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
     if (cmdline->epiloge)
     {
         printf(cmdline->epiloge);
-        printf("\n\n");
+        printf("\n");
     }
 
     process_exit(0);

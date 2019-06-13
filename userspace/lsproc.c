@@ -21,7 +21,8 @@ static const char *usages[] = {
 
 void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 {
-    UNUSED(cmdline); UNUSED(opt);
+    UNUSED(cmdline);
+    UNUSED(opt);
 
     option_cpu_usage = true;
     option_human = true;
@@ -33,7 +34,8 @@ void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 
 void full_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 {
-    UNUSED(cmdline); UNUSED(opt);
+    UNUSED(cmdline);
+    UNUSED(opt);
 
     option_cpu_usage = true;
     option_human = false;
@@ -46,15 +48,17 @@ void full_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 static cmdline_option_t options[] = {
     CMDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("cwd", 'w', option_show_cwd, "display the cwd", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("human", 'v', option_human, "display in a human readable way", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "display in a list", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("name", 'n', option_name, "display the name of the process", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("state", 's', option_state, "display the state of the process", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("usage", 'u', option_cpu_usage, "display cpu usage in %", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("cwd", 'w', option_show_cwd, "Display the cwd.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("human", 'v', option_human, "Display in a human readable way.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("list", 'l', option_list, "Display in a list.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("name", 'n', option_name, "Display the name of the process.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("state", 's', option_state, "Display the state of the process.", CMDLINE_NO_CALLBACK),
+    CMDLINE_OPT_BOOL("usage", 'u', option_cpu_usage, "Display cpu usage in %.", CMDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_BOOL("all", 'a', option_all, "display all the above options", all_cmdline_callback),
-    CMDLINE_OPT_BOOL("full", 'f', option_all, "display all the above options exept v", full_cmdline_callback),
+    CMDLINE_OPT_SEPARATOR,
+
+    CMDLINE_OPT_BOOL("all", 'a', option_all, "Display all the above options.", all_cmdline_callback),
+    CMDLINE_OPT_BOOL("full", 'f', option_all, "Display all the above options exept -v.", full_cmdline_callback),
 
     CMDLINE_OPT_END,
 };
@@ -85,7 +89,10 @@ int lsproc(task_info_t *info)
         printf("id:");
     }
     printf("%d ", info->id);
-    if (option_human){ printf("\n"); }
+    if (option_human)
+    {
+        printf("\n");
+    }
 
     // Process state
     if (option_state)
@@ -94,10 +101,13 @@ int lsproc(task_info_t *info)
         {
             printf("\tstate:");
         }
-        
+
         printf("%s ", task_state_string[info->state]);
 
-        if (option_human){ printf("\n"); }
+        if (option_human)
+        {
+            printf("\n");
+        }
     }
 
     // Process name
@@ -120,10 +130,13 @@ int lsproc(task_info_t *info)
         {
             printf("\tname:");
         }
-        
+
         printf("'%s' ", info->name);
 
-        if (option_human){ printf("\n"); }
+        if (option_human)
+        {
+            printf("\n");
+        }
     }
 
     // Process current working directory
@@ -136,7 +149,10 @@ int lsproc(task_info_t *info)
 
         printf("'%s' ", info->cwd);
 
-        if (option_human){ printf("\n"); }
+        if (option_human)
+        {
+            printf("\n");
+        }
     }
 
     if (option_list & !option_human)

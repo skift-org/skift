@@ -850,7 +850,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
             break;
         }
 
-        return s->offset;
+        return -ERR_SUCCESS;
     }
     else
     {

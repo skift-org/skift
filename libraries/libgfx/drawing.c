@@ -1,185 +1,264 @@
-/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
+#include <skift/assert.h>
+#include <skift/drawing.h>
 
-#include <skift/math.h>
-#include <gfx/drawing.h>
-#include <gfx/vgafont.h>
-
-#define BMP_SIZE_MEM(bmp) (bmp->width * bmp->height * sizeof(uint))
-#define BMP_SIZE(bmp) (uint)(bmp->width * bmp->height)
-
-static inline void bitmap_set_pixel(bitmap_t *bmp, int x, int y, uint color)
-{
-    if ((x >= 0 && x < bmp->width) && (y >= 0 && y < bmp->height))
-        bmp->buffer[x + y * bmp->width] = color;
-}
-
-static inline uint bitmap_get_pixel(bitmap_t *bmp, int x, int y)
-{
-    if ((x >= 0 && x < bmp->width) && (y >= 0 && y < bmp->height))
-        return bmp->buffer[x + y * bmp->width];
-
-    return 0x0;
-}
+#include "lodepng.h"
+#include "vgafont.h"
 
 /* --- Bitmap --------------------------------------------------------------- */
 
-bitmap_t *bitmap(uint width, uint height)
+bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
 {
-    bitmap_t *bmp = MALLOC(bitmap_t);
-    bmp->buffer = (uint *)malloc(width * height * sizeof(uint));
+    bitmap_t *bitmap = MALLOC(bitmap_t);
 
-    bmp->shared = 0;
-    bmp->width = width;
-    bmp->height = height;
+    bitmap->width = width;
+    bitmap->height = height;
+    bitmap->buffer = buffer;
+    bitmap->shared = true;
 
-    return bmp;
+    return bitmap;
 }
 
-bitmap_t *bitmap_from_buffer(uint width, uint height, uint *buffer)
+bitmap_t *bitmap(uint width, uint height)
 {
-    bitmap_t *bmp = MALLOC(bitmap_t);
-    bmp->buffer = buffer;
+    bitmap_t *bitmap = bitmap_from_buffer(width, height, (color_t*)malloc(sizeof(color_t) * width * height));
 
-    bmp->shared = 1;
-    bmp->width = width;
-    bmp->height = height;
+    bitmap->shared = false;
 
-    return bmp;
+    return bitmap;
 }
 
 void bitmap_delete(bitmap_t *bmp)
 {
     if (!bmp->shared)
         free(bmp->buffer);
+
     free(bmp);
 }
 
-void bitmap_copy(bitmap_t *src, int sx, int sy, bitmap_t *dest, int dx, int dy, uint w, uint h)
+void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)
 {
-    for(uint x = 0; x < w; x++)
+    if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
+        bmp->buffer[p.X + p.Y * bmp->width] = color;
+}
+
+color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
+{
+    if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
     {
-        for(uint y = 0; y < h; y++)
-        {
-            bitmap_set_pixel(dest, dx + x, dy + y, bitmap_get_pixel(src, sx + x, sy + y));
-        }   
+        return bmp->buffer[p.X + p.Y * bmp->width];
+    }
+    else
+    {
+        return (color_t){{255, 0, 255, 0}};
     }
 }
 
-/* --- Graphic -------------------------------------------------------------- */
-
-void drawing_pixel(bitmap_t *bmp, int x, int y, uint color)
+rectangle_t bitmap_bound(bitmap_t *bmp)
 {
-    if (x >= 0 && x < bmp->width && y >= 0 && y < bmp->height)
-        bmp->buffer[x + y * bmp->width] = color;
+    return (rectangle_t){{0, 0, bmp->width, bmp->height}};
 }
 
-void drawing_clear(bitmap_t *bmp, uint color)
+void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color)
 {
-    for (size_t i = 0; i < BMP_SIZE(bmp); i++)
-        bmp->buffer[i] = color;
+    color_t bg = bitmap_get_pixel(bmp, p);
+    bitmap_set_pixel(bmp, p, color_blend(color, bg));
 }
 
-void drawing_line(bitmap_t *bmp, int x0, int y0, int x1, int y1, uint color)
+#include <skift/logger.h>
+
+bitmap_t *bitmap_load_from(const char *path)
 {
-    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    uchar *buffer;
+    uint width = 0, height = 0;
+    int error = 0;
+
+    if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
+    {
+        return bitmap_from_buffer(width, height, (color_t*)buffer);
+    }
+    else
+    {
+        logger_log(LOG_ERROR, "lodepng: failled to load %s: %s", path, lodepng_error_text(error));
+        return NULL;
+    }
+}
+
+int bitmap_save_to(bitmap_t *bmp, const char *path)
+{
+    return lodepng_encode32_file(path, (const uchar*)bmp->buffer, bmp->width, bmp->height);
+}
+
+/* --- Painter -------------------------------------------------------------- */
+
+painter_t *painter(bitmap_t *bmp)
+{
+    painter_t *paint = MALLOC(painter_t);
+
+    paint->bitmap = bmp;
+    paint->cliprect = bitmap_bound(bmp);
+    paint->cliprect_stack_top = 0;
+
+    return paint;
+}
+
+void painter_delete(painter_t *paint)
+{
+    free(paint);
+}
+
+void painter_push_cliprect(painter_t *paint, rectangle_t cliprect)
+{
+    assert(paint->cliprect_stack_top < 32);
+
+    paint->cliprect_stack[paint->cliprect_stack_top] = paint->cliprect;
+    paint->cliprect_stack_top++;
+
+    paint->cliprect = rectangle_child(paint->cliprect, cliprect);
+}
+
+void painter_pop_cliprect(painter_t *paint)
+{
+    assert(paint->cliprect_stack_top > 0);
+
+    paint->cliprect_stack_top--;
+    paint->cliprect = paint->cliprect_stack[paint->cliprect_stack_top];
+}
+
+void painter_plot_pixel(painter_t *painter, point_t position, color_t color)
+{
+    point_t point_absolue = {painter->cliprect.X + position.X, painter->cliprect.Y + position.Y};
+
+    if (rectangle_containe_position(painter->cliprect, point_absolue))
+    {
+        bitmap_blend_pixel(painter->bitmap, point_absolue, color);
+    }
+}
+
+void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+{
+    for (int x = 0; x < src_rect.width; x++)
+    {
+        for (int y = 0; y < src_rect.height; y++)
+        {
+            color_t pix = bitmap_get_pixel(src, point_add(src_rect.position, (point_t){x, y}));
+            painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
+        }
+    }
+}
+
+void painter_fill_rect(painter_t *paint, rectangle_t rect, color_t color)
+{
+    rectangle_t rect_absolue = rectangle_child(paint->cliprect, rect);
+
+    for (int xx = 0; xx < rect_absolue.width; xx++)
+    {
+        for (int yy = 0; yy < rect_absolue.height; yy++)
+        {
+            bitmap_blend_pixel(
+                paint->bitmap,
+                (point_t){rect_absolue.X + xx, rect_absolue.Y + yy},
+                color);
+        }
+    }
+}
+
+// TODO: void painter_fill_circle(painter_t* paint, ...);
+
+// TODO: void painter_fill_triangle(painter_t* paint, ...);
+
+void painter_draw_line_x_aligned(painter_t *paint, int x, int start, int end, color_t color)
+{
+    for (int i = start; i < end; i++)
+    {
+        painter_plot_pixel(paint, (point_t){x, i}, color);
+    }
+}
+
+void painter_draw_line_y_aligned(painter_t *paint, int y, int start, int end, color_t color)
+{
+    for (int i = start; i < end; i++)
+    {
+        painter_plot_pixel(paint, (point_t){i, y}, color);
+    }
+}
+
+void painter_draw_line_not_aligned(painter_t *paint, point_t a, point_t b, color_t color)
+{
+    int dx = abs(b.X - a.X), sx = a.X < b.X ? 1 : -1;
+    int dy = abs(b.Y - a.Y), sy = a.Y < b.Y ? 1 : -1;
     int err = (dx > dy ? dx : -dy) / 2, e2;
 
     for (;;)
     {
-        bitmap_set_pixel(bmp, x0, y0, color);
+        painter_plot_pixel(paint, a, color);
 
-        if (x0 == x1 && y0 == y1)
+        if (a.X == b.X && a.Y == b.Y)
             break;
 
         e2 = err;
         if (e2 > -dx)
         {
             err -= dy;
-            x0 += sx;
+            a.X += sx;
         }
         if (e2 < dy)
         {
             err += dx;
-            y0 += sy;
+            a.Y += sy;
         }
     }
 }
 
-void drawing_rect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
+void painter_draw_line(painter_t *paint, point_t a, point_t b, color_t color)
 {
-
-    // + A +
-    // B   D
-    // + C +
-
-    drawing_line(bmp, x, y, x + w  - 1, y, color); // A
-    drawing_line(bmp, x, y, x, y + h  - 1, color); // B
-
-    drawing_line(bmp, x + w - 1, y, x + w - 1, y + h - 1, color); // D
-    drawing_line(bmp, x, y + h - 1, x + w - 1, y + h - 1, color); // C
-}
-
-void drawing_fillrect(bitmap_t *bmp, int x, int y, int w, int h, uint color)
-{
-    for (int xx = 0; xx < w; xx++)
-        for (int yy = 0; yy < h; yy++)
-            bitmap_set_pixel(bmp, x + xx, y + yy, color);
-}
-
-void drawing_filltri(bitmap_t *bmp, int x0, int y0, int x1, int y1, int x2, int y2, uint color)
-{
-    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = (dx > dy ? dx : -dy) / 2, e2;
-
-    for (;;)
+    if (a.X == b.X)
     {
-        drawing_line(bmp, x2, y2, x0, y0, color);
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
-        e2 = err;
-        if (e2 > -dx)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dy)
-        {
-            err += dx;
-            y0 += sy;
-        }
+        painter_draw_line_x_aligned(paint, a.X, min(a.Y, b.Y), max(a.Y, b.Y), color);
+    }
+    else if (a.Y == b.Y)
+    {
+        painter_draw_line_y_aligned(paint, a.Y, min(a.X, b.X), max(a.X, b.X), color);
+    }
+    else
+    {
+        painter_draw_line_not_aligned(paint, a, b, color);
     }
 }
 
-int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
-
-void drawing_char(bitmap_t *bmp, char c, int x, int y, uint color)
+void painter_draw_rect(painter_t *paint, rectangle_t rect, color_t color)
 {
-    uchar *gylph = vgafont16 + (int)c * 16;
+    painter_draw_line(paint, rect.position, point_add(rect.position, point_x(rect.size)), color);
+    painter_draw_line(paint, rect.position, point_add(rect.position, point_y(rect.size)), color);
+    painter_draw_line(paint, point_add(rect.position, point_x(rect.size)), point_add(rect.position, rect.size), color);
+    painter_draw_line(paint, point_add(rect.position, point_y(rect.size)), point_add(rect.position, rect.size), color);
+}
+
+// TODO: void painter_draw_circle(painter_t* paint, ...);
+
+// TODO: void painter_draw_triangle(painter_t* paint, ...);
+
+static const int glyph_mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+
+void painter_draw_glyph(painter_t *paint, int chr, point_t position, color_t color)
+{
+    uchar *gylph = vgafont16 + chr * 16;
 
     for (int cy = 0; cy < 16; cy++)
     {
         for (int cx = 0; cx < 8; cx++)
         {
-            if (gylph[cy] & mask[cx])
+            if (gylph[cy] & glyph_mask[cx])
             {
-                bitmap_set_pixel(bmp, x + cx, y + cy, color);
+                painter_plot_pixel(paint, point_add(position, (point_t){cx, cy}), color);
             }
         }
     }
 }
 
-void drawing_text(bitmap_t *bmp, const char *str, int x, int y, uint color)
+void painter_draw_text(painter_t *paint, const char *text, point_t position, color_t color)
 {
-    char c;
-
-    for (size_t i = 0; (c = str[i]); i++)
+    for (size_t i = 0; text[i]; i++)
     {
-        drawing_char(bmp, c, x + i * 9, y, color);
+        painter_draw_glyph(paint, text[i], point_add(position, (point_t){i*9, 0}), color);
     }
 }

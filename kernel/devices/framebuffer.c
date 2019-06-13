@@ -6,6 +6,7 @@
 #include "kernel/filesystem.h"
 #include "kernel/devices.h"
 #include "kernel/paging.h"
+#include "kernel/memory.h"
 
 /* --- Bochs VBE Extensions driver ------------------------------------------ */
 
@@ -121,7 +122,8 @@ void bga_mode(u32 width, u32 height)
 
 static bool is_graphic_mode = false;
 
-static void *framebuffer_addr = NULL;
+static void *framebuffer_physical_addr = NULL;
+static void *framebuffer_virtual_addr = NULL;
 static int framebuffer_height = -1;
 static int framebuffer_width = -1;
 
@@ -141,19 +143,43 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     {
         framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
 
+
         if (mode_info->enable)
         {
+            logger_log(LOG_INFO, "Setting mode to %dx%d...", mode_info->width, mode_info->height);
+            
             if (mode_info->width > 0 &&
-                mode_info->width >= VBE_DISPI_MAX_XRES &&
+                mode_info->width <= VBE_DISPI_MAX_XRES &&
                 mode_info->height > 0 &&
-                mode_info->height >= VBE_DISPI_MAX_YRES)
+                mode_info->height <= VBE_DISPI_MAX_YRES)
             {
                 bga_mode(mode_info->width, mode_info->height);
 
-                if (framebuffer_addr == NULL)
+                if (framebuffer_physical_addr == NULL)
                 {
-                    framebuffer_addr = bga_get_framebuffer();
-                    logger_log(LOG_INFO, "BGA: framebuffer found at 0x%08x", framebuffer_addr);
+                    framebuffer_physical_addr = bga_get_framebuffer();
+
+                    if (framebuffer_physical_addr != NULL)
+                    {
+                        uint page_count = PAGE_ALIGN(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
+                        
+                        physical_set_used((uint)framebuffer_physical_addr, page_count);
+
+                        framebuffer_virtual_addr = (void*)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
+                        if (framebuffer_virtual_addr == NULL)
+                        {
+                            return -ERR_CANNOT_ALLOCATE_MEMORY;
+                        }
+
+                        logger_log(LOG_INFO, "BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
+                    }
+                    else
+                    {
+                        logger_log(LOG_ERROR, "BGA: no framebuffer found!");
+
+                        // FIXME: maybe this is note
+                        return -ERR_NO_SUCH_DEVICE_OR_ADDRESS;
+                    }
                 }
 
                 framebuffer_width = mode_info->width;
@@ -170,10 +196,12 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
         }
         else
         {
-            bga_disable();
-            is_graphic_mode = false;
+            // FIXME: switch back to textmode
+            // bga_disable();
+            // is_graphic_mode = false;
+            // return -ERR_SUCCESS;
 
-            return -ERR_SUCCESS;
+            return -ERR_OPERATION_NOT_SUPPORTED;
         }
     }
     else if (request == FRAMEBUFFER_IOCTL_BLIT)

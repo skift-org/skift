@@ -14,8 +14,8 @@ typedef struct
 {
     bool enable;
 
-    int height;
     int width;
+    int height;
 } framebuffer_mode_info_t;
 
 typedef struct

@@ -84,7 +84,7 @@ int textmode_device_ioctl(stream_t *stream, int request, void* args)
     }
     else
     {
-        return -ERR_INVALID_REQUEST_CODE;
+        return -ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE;
     }
 
 }

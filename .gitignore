@@ -14,7 +14,6 @@ build/
 toolchain/build/
 toolchain/tarballs/
 toolchain/local/
-sysroot/
 .vscode
 
 # Python

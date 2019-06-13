@@ -1,5 +1,6 @@
 #include <skift/atomic.h>
 #include <skift/error.h>
+#include <skift/cstring.h>
 
 #include <hjert/devices/framebuffer.h>
 
@@ -138,6 +139,8 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
         mode_info->enable = is_graphic_mode;
         mode_info->width = framebuffer_width;
         mode_info->height = framebuffer_height;
+
+        return -ERR_SUCCESS;
     }
     else if (request == FRAMEBUFFER_IOCTL_SET_MODE)
     {
@@ -206,15 +209,14 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_IOCTL_BLIT)
     {
-        framebuffer_blit_info_t *blit_info = (framebuffer_blit_info_t *)args;
-    
-        // FIXME: FRAMEBUFFER_IOCTL_BLIT
-        UNUSED(blit_info);
-
-        return -ERR_FUNCTION_NOT_IMPLEMENTED;
+        memcpy(framebuffer_virtual_addr, args, framebuffer_width * framebuffer_height * sizeof(uint));
+        
+        return -ERR_SUCCESS;
     }
-
-    return -ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE;
+    else
+    {
+        return -ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE;
+    }
 }
 
 void framebuffer_setup(void)

@@ -209,8 +209,15 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_IOCTL_BLIT)
     {
-        memcpy(framebuffer_virtual_addr, args, framebuffer_width * framebuffer_height * sizeof(uint));
-        
+        uint* data_to_blit = (uint*)args;
+
+        for (int i = 0; i < framebuffer_width * framebuffer_height; i++)
+        {
+            ((uint*)framebuffer_virtual_addr)[i] = ((data_to_blit[i] >> 16) & 0x000000ff) |
+                                                   (data_to_blit[i] & 0xff00ff00) |
+                                                   ((data_to_blit[i] << 16) & 0x00ff0000) ;
+        }
+
         return -ERR_SUCCESS;
     }
     else

@@ -39,6 +39,7 @@
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
+#include "kernel/platform.h"
 
 multiboot_info_t mbootinfo;
 
@@ -70,6 +71,7 @@ void kmain(multiboot_info_t *info, s32 magic)
     setup(idt);
     setup(isr);
     setup(irq);
+    setup(platform);
 
     /* --- System context --------------------------------------------------- */
     logger_log(LOG_INFO, "Initializing system...");

@@ -11,6 +11,7 @@
 
 #include "kernel/cpu/irq.h"
 #include "kernel/tasking.h"
+#include "kernel/platform.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */
@@ -134,6 +135,7 @@ task_t *task(task_t *parent, const char *name, bool user)
     // setup the stack
     memset(this->stack, 0, TASK_STACKSIZE);
     this->sp = (reg32_t)(&this->stack[0] + TASK_STACKSIZE - 1);
+    platform_fpu_save_context(this);
 
     return this;
 }
@@ -1226,6 +1228,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     // Save the old context
     running->sp = sp;
+    platform_save_context(running);
 
     // Update the system ticks
     sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
@@ -1247,6 +1250,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
 
     sheduler_context_switch = false;
 
+    platform_load_context(running);
     return running->sp;
 }
 

@@ -52,6 +52,7 @@ typedef struct task
     uint sp;
     byte stack[TASK_STACKSIZE]; // Kernel stack
     task_entry_t entry; // Our entry point
+    char fpu_registers[512];
 
     struct
     {

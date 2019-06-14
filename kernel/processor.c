@@ -3,14 +3,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/iostream.h>
+
 #include "kernel/processor.h"
-
-/* --- Public functions ----------------------------------------------------- */
-
-void processor_setup()
-{
-    // setup the gdt and idt
-}
 
 void processor_dump_context(processor_context_t *context)
 {

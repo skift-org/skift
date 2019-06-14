@@ -49,8 +49,18 @@ color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
     }
     else
     {
-        return (color_t){{255, 0, 255, 0}};
+        return (color_t){{255, 0, 255, 255}};
     }
+}
+
+color_t bitmap_sample(bitmap_t* bmp, rectangle_t src_rect, float x, float y)
+{
+    int xx = (int)(src_rect.width  * x) % src_rect.width;
+    int yy = (int)(src_rect.height * y) % src_rect.height;
+
+    // FIXME: maybe do some kind of filtering here ?
+
+    return bitmap_get_pixel(bmp, (point_t){src_rect.X + xx, src_rect.Y + yy});
 }
 
 rectangle_t bitmap_bound(bitmap_t *bmp)
@@ -74,7 +84,9 @@ bitmap_t *bitmap_load_from(const char *path)
 
     if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
     {
-        return bitmap_from_buffer(width, height, (color_t*)buffer);
+        bitmap_t* bmp = bitmap_from_buffer(width, height, (color_t*)buffer);
+        bmp->shared = false;
+        return bmp;
     }
     else
     {
@@ -136,9 +148,9 @@ void painter_plot_pixel(painter_t *painter, point_t position, color_t color)
 
 void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
-    for (int x = 0; x < src_rect.width; x++)
+    for (int x = 0; x < dst_rect.width; x++)
     {
-        for (int y = 0; y < src_rect.height; y++)
+        for (int y = 0; y < dst_rect.height; y++)
         {
             color_t pix = bitmap_get_pixel(src, point_add(src_rect.position, (point_t){x, y}));
             painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);

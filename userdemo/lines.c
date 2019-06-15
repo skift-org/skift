@@ -13,6 +13,14 @@
 
 framebuffer_mode_info_t mode_info = {true, 800,  600};
 
+typedef struct
+{   
+    point_t start;
+    point_t finish;
+    color_t color;
+} a_line_t;
+
+
 int main(int argc, char **argv)
 {
     UNUSED(argc); UNUSED(argv);
@@ -40,36 +48,24 @@ int main(int argc, char **argv)
     }
 
     bitmap_t* fb = bitmap(800, 600);
-    bitmap_t* test = bitmap_load_from("/res/test.png");
 
-    assert(test);
-    logger_log(LOG_INFO, "Image loaded %dx%d", test->width, test->height);
+    assert(fb);
 
     painter_t* paint = painter(fb);
 
-    int frame = 0;
+    assert(paint);
 
     do
     {
-        for (int x = 0; x < fb->width; x++)
-        {
-            for (int y = 0; y < fb->height; y++)
-            {
-                painter_plot_pixel(paint, (point_t){x, y}, (color_t){{x^y, x^y, x^y, 255}});
-            }
-        }
-        
-        painter_blit_bitmap(paint, test, bitmap_bound(test), ((rectangle_t){{400 - (frame % 800) / 2, 300 - (frame % 600) / 2, frame % 800, frame % 600}}));  
-        
-        painter_draw_rect(paint, (rectangle_t){{75, 75, 100, 100}}, (color_t){{255, 255, 255, 255}});
-        painter_fill_rect(paint, (rectangle_t){{100, 100, 100, 100}}, (color_t){{255, 0, 0, 125}});
-        painter_fill_rect(paint, (rectangle_t){{125, 125, 100, 100}}, (color_t){{0, 255, 0, 125}});
-        painter_fill_rect(paint, (rectangle_t){{150, 150, 100, 100}}, (color_t){{0, 0, 255, 125}});
+        a_line_t line;
+        iostream_read(random_device, &line, sizeof(line));
 
-        char message[128];
-        snprintf(message, 128, "%d frames", frame++);
-        painter_draw_text(paint, message, (point_t){17, 17}, (color_t){{0, 0, 0, 255}});
-        painter_draw_text(paint, message, (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
+        line.start.X = abs(line.start.X % 800);
+        line.start.Y = abs(line.start.Y % 600);
+        line.finish.X = abs(line.finish.X % 800);
+        line.finish.Y = abs(line.finish.Y % 600);
+
+        painter_draw_line(paint, line.start, line.finish, line.color);
         
         iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
     } while(true);

@@ -15,7 +15,7 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
-TARGETS=libraries userspace kernel shell usertests
+TARGETS=libraries userspace kernel shell usertests userdemo
 
 TARGETS_BUILD=${TARGETS:=.build}
 TARGETS_INSTALL=${TARGETS:=.install}

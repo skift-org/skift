@@ -14,6 +14,7 @@ clean:
 	make -C libc clean
 	make -C libgfx clean
 	make -C libvtc clean
+	make -C libui clean
 
 $(LIBRARIES) : % : %/Makefile
 	make -C $@ install

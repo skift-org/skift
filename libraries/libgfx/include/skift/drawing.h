@@ -77,20 +77,9 @@ typedef union {
     uint packed;
 } color_t;
 
-static inline color_t color_blend(color_t fg, color_t bg)
-{
-    color_t result;
+color_t color_from_hsv(float H, float S, float V);
 
-    uint inv_alpha = fg.A;
-    uint alpha = 256 - fg.A;
-
-    result.R = (ubyte)((inv_alpha * fg.R + alpha * bg.R) / 256);
-    result.G = (ubyte)((inv_alpha * fg.G + alpha * bg.G) / 256);
-    result.B = (ubyte)((inv_alpha * fg.B + alpha * bg.B) / 256);
-    result.A = 0;
-
-    return result;
-}
+color_t color_blend(color_t fg, color_t bg);
 
 /* --- Bitmap object -------------------------------------------------------- */
 

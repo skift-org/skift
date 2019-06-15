@@ -4,6 +4,98 @@
 #include "lodepng.h"
 #include "vgafont.h"
 
+/* --- Color ---------------------------------------------------------------- */
+
+color_t color_from_hsv(float H, float S, float V)
+{
+    double r = 0, g = 0, b = 0;
+
+    if (S == 0)
+    {
+        r = V;
+        g = V;
+        b = V;
+    }
+    else
+    {
+        int i;
+        double f, p, q, t;
+
+        if (H == 360)
+            H = 0;
+        else
+            H = H / 60;
+
+        i = (int)H;
+        f = H - i;
+
+        p = V * (1.0 - S);
+        q = V * (1.0 - (S * f));
+        t = V * (1.0 - (S * (1.0 - f)));
+
+        switch (i)
+        {
+        case 0:
+            r = V;
+            g = t;
+            b = p;
+            break;
+
+        case 1:
+            r = q;
+            g = V;
+            b = p;
+            break;
+
+        case 2:
+            r = p;
+            g = V;
+            b = t;
+            break;
+
+        case 3:
+            r = p;
+            g = q;
+            b = V;
+            break;
+
+        case 4:
+            r = t;
+            g = p;
+            b = V;
+            break;
+
+        default:
+            r = V;
+            g = p;
+            b = q;
+            break;
+        }
+    }
+
+    color_t rgb = {0};
+    rgb.R = r * 255;
+    rgb.G = g * 255;
+    rgb.B = b * 255;
+
+    return rgb;
+}
+
+color_t color_blend(color_t fg, color_t bg)
+{
+    color_t result;
+
+    uint inv_alpha = fg.A;
+    uint alpha = 256 - fg.A;
+
+    result.R = (ubyte)((inv_alpha * fg.R + alpha * bg.R) / 256);
+    result.G = (ubyte)((inv_alpha * fg.G + alpha * bg.G) / 256);
+    result.B = (ubyte)((inv_alpha * fg.B + alpha * bg.B) / 256);
+    result.A = 0;
+
+    return result;
+}
+
 /* --- Bitmap --------------------------------------------------------------- */
 
 bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
@@ -20,7 +112,7 @@ bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
 
 bitmap_t *bitmap(uint width, uint height)
 {
-    bitmap_t *bitmap = bitmap_from_buffer(width, height, (color_t*)malloc(sizeof(color_t) * width * height));
+    bitmap_t *bitmap = bitmap_from_buffer(width, height, (color_t *)malloc(sizeof(color_t) * width * height));
 
     bitmap->shared = false;
 
@@ -53,9 +145,9 @@ color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
     }
 }
 
-color_t bitmap_sample(bitmap_t* bmp, rectangle_t src_rect, float x, float y)
+color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
 {
-    int xx = (int)(src_rect.width  * x) % src_rect.width;
+    int xx = (int)(src_rect.width * x) % src_rect.width;
     int yy = (int)(src_rect.height * y) % src_rect.height;
 
     // FIXME: maybe do some kind of filtering here ?
@@ -84,7 +176,7 @@ bitmap_t *bitmap_load_from(const char *path)
 
     if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
     {
-        bitmap_t* bmp = bitmap_from_buffer(width, height, (color_t*)buffer);
+        bitmap_t *bmp = bitmap_from_buffer(width, height, (color_t *)buffer);
         bmp->shared = false;
         return bmp;
     }
@@ -97,7 +189,7 @@ bitmap_t *bitmap_load_from(const char *path)
 
 int bitmap_save_to(bitmap_t *bmp, const char *path)
 {
-    return lodepng_encode32_file(path, (const uchar*)bmp->buffer, bmp->width, bmp->height);
+    return lodepng_encode32_file(path, (const uchar *)bmp->buffer, bmp->width, bmp->height);
 }
 
 /* --- Painter -------------------------------------------------------------- */
@@ -152,7 +244,10 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
     {
         for (int y = 0; y < dst_rect.height; y++)
         {
-            color_t pix = bitmap_get_pixel(src, point_add(src_rect.position, (point_t){x, y}));
+            float xx = x / (float)dst_rect.width;
+            float yy = y / (float)dst_rect.height;
+
+            color_t pix = bitmap_sample(src, src_rect, xx, yy);
             painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
         }
     }
@@ -271,6 +366,6 @@ void painter_draw_text(painter_t *paint, const char *text, point_t position, col
 {
     for (size_t i = 0; text[i]; i++)
     {
-        painter_draw_glyph(paint, text[i], point_add(position, (point_t){i*9, 0}), color);
+        painter_draw_glyph(paint, text[i], point_add(position, (point_t){i * 9, 0}), color);
     }
 }

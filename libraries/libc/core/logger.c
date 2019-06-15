@@ -20,7 +20,7 @@ struct
     { LOG_FATAL,   "\033[41;1m[ fatal  ]" },
     { LOG_SEVERE,  "\033[41;1m[ severe ]" },
     { LOG_ERROR,   "\033[41m[ error ]"    },
-    { LOG_WARNING, "\033[43m[ warn ]"     },
+    { LOG_WARNING, "\033[33m[ warn ]"     },
     { LOG_INFO,    "\033[37m[ info ]"     },
     { LOG_CONFIG,  "\033[30;1m[ conf ]"   },
     { LOG_DEBUG,   "\033[30;1m[ debug ]"  },

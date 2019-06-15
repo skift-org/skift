@@ -6,6 +6,7 @@
 #define FRAMEBUFFER_IOCTL_SET_MODE 0
 #define FRAMEBUFFER_IOCTL_GET_MODE 1
 #define FRAMEBUFFER_IOCTL_BLIT 2
+#define FRAMEBUFFER_IOCTL_BLITREGION 3
 
 #define FRAMEBUFFER_CHANNEL     "#dev:framebuffer"
 #define FRAMEBUFFER_MODE_CHANGE "framebuffer.modechange"

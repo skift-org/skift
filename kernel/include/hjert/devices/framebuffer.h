@@ -1,6 +1,7 @@
 #pragma once
 
 #include <skift/runtime.h>
+#include <skift/drawing.h>
 
 #define FRAMEBUFFER_DEVICE "/dev/fb"
 #define FRAMEBUFFER_IOCTL_SET_MODE 0
@@ -22,10 +23,5 @@ typedef struct
 typedef struct
 {
     void* src;
-    
-    int src_height;
-    int src_width;
-
-    int dest_x;
-    int dest_y;
-} framebuffer_blit_info_t;
+    rectangle_t bound;
+} framebuffer_region_t;

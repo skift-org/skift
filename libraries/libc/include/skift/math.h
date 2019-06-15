@@ -14,6 +14,8 @@
 
 #define max(__x, __y) ((__x) > (__y) ? (__x) : (__y))
 
+#define clamp(__x, __min, __max) min((__max), max((__min), (__x)))
+
 #define NAN (0.0 / 0.0)
 #define INFINITY (1.0 / 0.0)
 

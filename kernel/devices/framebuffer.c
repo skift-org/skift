@@ -146,11 +146,10 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     {
         framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
 
-
         if (mode_info->enable)
         {
             logger_log(LOG_INFO, "Setting mode to %dx%d...", mode_info->width, mode_info->height);
-            
+
             if (mode_info->width > 0 &&
                 mode_info->width <= VBE_DISPI_MAX_XRES &&
                 mode_info->height > 0 &&
@@ -165,10 +164,10 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
                     if (framebuffer_physical_addr != NULL)
                     {
                         uint page_count = PAGE_ALIGN(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
-                        
+
                         physical_set_used((uint)framebuffer_physical_addr, page_count);
 
-                        framebuffer_virtual_addr = (void*)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
+                        framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
                         if (framebuffer_virtual_addr == NULL)
                         {
                             return -ERR_CANNOT_ALLOCATE_MEMORY;
@@ -209,13 +208,36 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_IOCTL_BLIT)
     {
-        uint* data_to_blit = (uint*)args;
+        uint *data_to_blit = (uint *)args;
 
         for (int i = 0; i < framebuffer_width * framebuffer_height; i++)
         {
-            ((uint*)framebuffer_virtual_addr)[i] = ((data_to_blit[i] >> 16) & 0x000000ff) |
-                                                   (data_to_blit[i] & 0xff00ff00) |
-                                                   ((data_to_blit[i] << 16) & 0x00ff0000) ;
+            ((uint *)framebuffer_virtual_addr)[i] = ((data_to_blit[i] >> 16) & 0x000000ff) |
+                                                    (data_to_blit[i] & 0xff00ff00) |
+                                                    ((data_to_blit[i] << 16) & 0x00ff0000);
+        }
+
+        return -ERR_SUCCESS;
+    }
+    else if (request == FRAMEBUFFER_IOCTL_BLITREGION)
+    {
+        framebuffer_region_t *region = (framebuffer_region_t *)args;
+
+        for (int y = 0; y < region->bound.height; y++)
+        {
+            for (int x = 0; x < region->bound.width; x++)
+            {
+                int xx = clamp(x + region->bound.X, 0, framebuffer_width - 1);
+                int yy = clamp(y + region->bound.Y, 0, framebuffer_height - 1);
+
+                int i = yy * framebuffer_width + xx;
+
+                uint pixel = ((uint *)region->src)[i];
+
+                ((uint *)framebuffer_virtual_addr)[i] = ((pixel >> 16) & 0x000000ff) |
+                                                        (pixel & 0xff00ff00) |
+                                                        ((pixel << 16) & 0x00ff0000);
+            }
         }
 
         return -ERR_SUCCESS;

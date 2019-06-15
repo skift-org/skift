@@ -85,13 +85,13 @@ color_t color_blend(color_t fg, color_t bg)
 {
     color_t result;
 
-    uint alpha = 256 - fg.A + 1;
-    uint inv_alpha = fg.A;
+    uint alpha = fg.A + 1;
+    uint inv_alpha = 256 - fg.A;
 
-    result.R = (ubyte)((inv_alpha * fg.R + alpha * bg.R) / 256);
-    result.G = (ubyte)((inv_alpha * fg.G + alpha * bg.G) / 256);
-    result.B = (ubyte)((inv_alpha * fg.B + alpha * bg.B) / 256);
-    result.A = 0;
+    result.R = (ubyte)((alpha * fg.R + inv_alpha * bg.R) / 256);
+    result.G = (ubyte)((alpha * fg.G + inv_alpha * bg.G) / 256);
+    result.B = (ubyte)((alpha * fg.B + inv_alpha * bg.B) / 256);
+    result.A = 255;
 
     return result;
 }
@@ -266,7 +266,7 @@ void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_r
     {
         for (int y = 0; y < dst_rect.height; y++)
         {
-            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.Y + x,  src_rect.Y + y});
+            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.X + x,  src_rect.Y + y});
             painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
         }
     }

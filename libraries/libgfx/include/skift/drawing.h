@@ -9,7 +9,15 @@ typedef struct
     int Y;
 } point_t;
 
-#define point_t(__x, __y) (point_t){(__x), (__y)}
+#define point_zero ((point_t){0, 0})
+
+static inline point_t point_clamp(point_t p, point_t pmin, point_t pmax)
+{
+    p.X = max(pmin.X, min(pmax.X, p.X));
+    p.Y = max(pmin.Y, min(pmax.Y, p.Y));
+
+    return p;
+}
 
 static inline point_t point_add(point_t a, point_t b)
 {

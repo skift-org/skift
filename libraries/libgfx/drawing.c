@@ -85,8 +85,8 @@ color_t color_blend(color_t fg, color_t bg)
 {
     color_t result;
 
+    uint alpha = 256 - fg.A + 1;
     uint inv_alpha = fg.A;
-    uint alpha = 256 - fg.A;
 
     result.R = (ubyte)((inv_alpha * fg.R + alpha * bg.R) / 256);
     result.G = (ubyte)((inv_alpha * fg.G + alpha * bg.G) / 256);
@@ -168,6 +168,13 @@ void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color)
 
 #include <skift/logger.h>
 
+static color_t placeholder_buffer[] = {
+    (color_t){{255, 0, 255, 255}},
+    (color_t){{0, 0, 0, 255}},
+    (color_t){{0, 0, 0, 255}},
+    (color_t){{255, 0, 255, 255}},
+};
+
 bitmap_t *bitmap_load_from(const char *path)
 {
     uchar *buffer;
@@ -183,7 +190,7 @@ bitmap_t *bitmap_load_from(const char *path)
     else
     {
         logger_log(LOG_ERROR, "lodepng: failled to load %s: %s", path, lodepng_error_text(error));
-        return NULL;
+        return bitmap_from_buffer(2,2, (color_t*)&placeholder_buffer);
     }
 }
 
@@ -238,7 +245,7 @@ void painter_plot_pixel(painter_t *painter, point_t position, color_t color)
     }
 }
 
-void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+void painter_blit_bitmap_scaled(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
@@ -250,6 +257,30 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
             color_t pix = bitmap_sample(src, src_rect, xx, yy);
             painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
         }
+    }
+}
+
+void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+{
+    for (int x = 0; x < dst_rect.width; x++)
+    {
+        for (int y = 0; y < dst_rect.height; y++)
+        {
+            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.Y + x,  src_rect.Y + y});
+            painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
+        }
+    }
+}
+
+void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+{
+    if (src_rect.width == dst_rect.width && src_rect.height == dst_rect.height)
+    {
+        painter_blit_bitmap_fast(paint, src, src_rect, dst_rect);
+    }
+    else
+    {
+        painter_blit_bitmap_scaled(paint, src, src_rect, dst_rect);
     }
 }
 

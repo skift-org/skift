@@ -2,6 +2,7 @@
 
 #include <skift/list.h>
 #include <skift/math.h>
+#include <skift/colors.h>
 
 typedef struct
 {
@@ -71,23 +72,6 @@ static inline bool rectangle_containe_position(rectangle_t rectange, point_t pos
     return (rectange.X <= position.X && (rectange.X + rectange.width)  > position.X) &&
            (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);
 }
-
-/* --- Color struct and blending -------------------------------------------- */
-
-typedef union {
-    struct
-    {
-        ubyte R;
-        ubyte G;
-        ubyte B;
-        ubyte A;
-    };
-    uint packed;
-} color_t;
-
-color_t color_from_hsv(float H, float S, float V);
-
-color_t color_blend(color_t fg, color_t bg);
 
 /* --- Bitmap object -------------------------------------------------------- */
 

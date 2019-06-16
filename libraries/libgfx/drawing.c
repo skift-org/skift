@@ -4,98 +4,6 @@
 #include "lodepng.h"
 #include "vgafont.h"
 
-/* --- Color ---------------------------------------------------------------- */
-
-color_t color_from_hsv(float H, float S, float V)
-{
-    double r = 0, g = 0, b = 0;
-
-    if (S == 0)
-    {
-        r = V;
-        g = V;
-        b = V;
-    }
-    else
-    {
-        int i;
-        double f, p, q, t;
-
-        if (H == 360)
-            H = 0;
-        else
-            H = H / 60;
-
-        i = (int)H;
-        f = H - i;
-
-        p = V * (1.0 - S);
-        q = V * (1.0 - (S * f));
-        t = V * (1.0 - (S * (1.0 - f)));
-
-        switch (i)
-        {
-        case 0:
-            r = V;
-            g = t;
-            b = p;
-            break;
-
-        case 1:
-            r = q;
-            g = V;
-            b = p;
-            break;
-
-        case 2:
-            r = p;
-            g = V;
-            b = t;
-            break;
-
-        case 3:
-            r = p;
-            g = q;
-            b = V;
-            break;
-
-        case 4:
-            r = t;
-            g = p;
-            b = V;
-            break;
-
-        default:
-            r = V;
-            g = p;
-            b = q;
-            break;
-        }
-    }
-
-    color_t rgb = {0};
-    rgb.R = r * 255;
-    rgb.G = g * 255;
-    rgb.B = b * 255;
-
-    return rgb;
-}
-
-color_t color_blend(color_t fg, color_t bg)
-{
-    color_t result;
-
-    uint alpha = fg.A + 1;
-    uint inv_alpha = 256 - fg.A;
-
-    result.R = (ubyte)((alpha * fg.R + inv_alpha * bg.R) / 256);
-    result.G = (ubyte)((alpha * fg.G + inv_alpha * bg.G) / 256);
-    result.B = (ubyte)((alpha * fg.B + inv_alpha * bg.B) / 256);
-    result.A = 255;
-
-    return result;
-}
-
 /* --- Bitmap --------------------------------------------------------------- */
 
 bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
@@ -141,7 +49,7 @@ color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
     }
     else
     {
-        return (color_t){{255, 0, 255, 255}};
+        return RGB(1.0, 0.0, 1.0);
     }
 }
 
@@ -190,7 +98,7 @@ bitmap_t *bitmap_load_from(const char *path)
     else
     {
         logger_log(LOG_ERROR, "lodepng: failled to load %s: %s", path, lodepng_error_text(error));
-        return bitmap_from_buffer(2,2, (color_t*)&placeholder_buffer);
+        return bitmap_from_buffer(2, 2, (color_t *)&placeholder_buffer);
     }
 }
 
@@ -266,7 +174,7 @@ void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_r
     {
         for (int y = 0; y < dst_rect.height; y++)
         {
-            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.X + x,  src_rect.Y + y});
+            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.X + x, src_rect.Y + y});
             painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
         }
     }

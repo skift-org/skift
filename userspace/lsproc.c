@@ -78,6 +78,7 @@ const char *task_state_string[] = {
     "sleep",
     "wait",
     "wait_message",
+    "wait_respond",
     "canceled",
 };
 

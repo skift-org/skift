@@ -16,7 +16,7 @@
 #include "kernel/filesystem.h"
 #include "kernel/tasking.h"
 
-stream_t* keyboard_fifo;
+stream_t *keyboard_fifo;
 
 char keymap_FRBE[128][3] = 
 {
@@ -222,16 +222,20 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
         if (!ispressed[scancode])
         {
-            messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYPRESSED, &keyevent, sizeof(keyevent), 0);
-            ispressed[scancode] = true;
+            message_t keypressed_event = message(KEYBOARD_KEYPRESSED, -1);
+            message_set_payload(keypressed_event, keyevent);
+            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
         }
 
-        if (c!='\0')
+        if (c != '\0')
         {
             char chr = keyboard_getchar(scancode);
             filesystem_write(keyboard_fifo, &chr, 1);
         }
-        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYTYPED, &keyevent, sizeof(keyevent), 0);
+
+        message_t keytyped_event = message(KEYBOARD_KEYTYPED, -1);
+        message_set_payload(keytyped_event, keyevent);
+        task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keytyped_event);
     }    
     else if (scancode == 224)
     {
@@ -270,12 +274,12 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
             scancode -= 128;
         }
 
+        keyboard_event_t keyevent = {'\0', scancode};
+        message_t keyreleased_event = message(KEYBOARD_KEYRELEASED, -1);
+        message_set_payload(keyreleased_event, keyevent);
 
-        keyboard_event_t keyevent = {
-            .c = '\0',
-            .key = scancode};
+        task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keyreleased_event);
 
-        messaging_broadcast(KEYBOARD_CHANNEL, KEYBOARD_KEYRELEASED, &keyevent, sizeof(keyevent), 0);
         ispressed[scancode] = false;
     }
 
@@ -288,7 +292,7 @@ void keyboard_setup()
 {
     irq_register(1, keyboard_irq);
 
-    path_t* kbpath = path("/dev/kbd");
+    path_t *kbpath = path("/dev/kbd");
     filesystem_mkfifo(NULL, kbpath);
     keyboard_fifo = filesystem_open(NULL, kbpath, IOSTREAM_WRITE);
     path_delete(kbpath);

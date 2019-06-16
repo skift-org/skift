@@ -77,7 +77,6 @@ void kmain(multiboot_info_t *info, s32 magic)
     logger_log(LOG_INFO, "Initializing system...");
     setup(memory, &mbootinfo);
     setup(tasking);
-    setup(messaging);
     setup(filesystem);
     setup(modules, &mbootinfo);
 

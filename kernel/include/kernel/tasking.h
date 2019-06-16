@@ -38,8 +38,10 @@ typedef struct
 
 typedef struct
 {
-    message_t *message;
-} task_wait_message_t;
+    bool has_result;
+    message_t result;
+    int timeout;
+} task_wait_respond_t;
 
 typedef struct task
 {
@@ -58,11 +60,11 @@ typedef struct task
     {
         task_wait_time_t time;
         task_wait_task_t task;
-        task_wait_message_t message;
+        task_wait_respond_t respond;
     } wait;
 
-    lock_t inbox_lock;
-    list_t *inbox;  // process main message queu
+    list_t *inbox;  // process main message queue
+    list_t *subscription;
 
     lock_t fds_lock;
     filedescriptor_t fds[TASK_FILDES_COUNT];
@@ -81,6 +83,7 @@ typedef struct task
 /* -------------------------------------------------------------------------- */
 
 void tasking_setup(void);
+task_t* task_kernel(void);
 
 /* -------------------------------------------------------------------------- */
 /*   TASKS                                                                    */      
@@ -190,39 +193,19 @@ int task_exec(const char *executable_path, const char **argv);
 /*   MESSAGING                                                                */      
 /* -------------------------------------------------------------------------- */
 
-#define CHANNAME_SIZE 128
+int task_messaging_send(task_t* this, message_t* event);
 
-typedef struct
-{
-    char name[CHANNAME_SIZE];
-    list_t *subscribers;
-} channel_t;
+int task_messaging_broadcast(task_t* this, const char *channel, message_t* event);
 
-void messaging_setup(void);
+int task_messaging_request(task_t* this, message_t* request, message_t* respond, int timeout);
 
-channel_t *channel(const char *name);
+int task_messaging_receive(task_t* this, message_t* message, bool wait);
 
-void channel_delete(channel_t *channel);
+int task_messaging_respond(task_t* this, message_t* request, message_t* respond);
 
-channel_t *channel_get(const char *channel_name);
+int task_messaging_subscribe(task_t* this, const char* channel);
 
-message_t *message(int id, const char *label, void *payload, uint size, uint flags);
-
-void message_delete(message_t *msg);
-
-int messaging_send_internal(task_t*  from, task_t*  to, int id, const char *name, void *payload, uint size, uint flags);
-
-int messaging_send(task_t* to, const char *name, void *payload, uint size, uint flags);
-
-int messaging_broadcast(const char *channel_name, const char *name, void *payload, uint size, uint flags);
-
-message_t *messaging_receive_internal(task_t *task);
-
-bool messaging_receive(message_t *msg, bool wait);
-
-int messaging_subscribe(const char *channel_name);
-
-int messaging_unsubscribe(const char *channel_name);
+int task_messaging_unsubscribe(task_t* this, const char* channel);
 
 /* -------------------------------------------------------------------------- */
 /*   GARBAGE COLECTOR                                                         */      

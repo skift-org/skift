@@ -56,6 +56,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/bin
 	mkdir -p $(SYSROOT)/dev
 	mkdir -p $(SYSROOT)/lib
+	mkdir -p $(SYSROOT)/run
 	mkdir -p $(SYSROOT)/me
 	mkdir -p $(SYSROOT)/me/share
 	mkdir -p $(SYSROOT)/me/anon

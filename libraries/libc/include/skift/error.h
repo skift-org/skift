@@ -1,7 +1,7 @@
 #pragma once
 
 #define ERROR_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                    \
-    __ENTRY_WITH_VALUE(ERR_SUCCESS, 0)                              \
+    __ENTRY_WITH_VALUE(ERR_SUCCESS, 0)                             \
     __ENTRY(ERR_INBOX_FULL)                                        \
     __ENTRY(ERR_BAD_FILE_DESCRIPTOR)                               \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)                         \
@@ -71,6 +71,7 @@
     __ENTRY(ERR_MULTIHOP_ATTEMPTED)                                \
     __ENTRY(ERR_RFS_SPECIFIC_ERROR)                                \
     __ENTRY(ERR_BAD_MESSAGE)                                       \
+    __ENTRY(ERR_NO_MESSAGE)                                        \
     __ENTRY(ERR_VALUE_TOO_LARGE_FOR_DEFINED_DATA_TYPE)             \
     __ENTRY(ERR_NAME_NOT_UNIQUE_ON_NETWORK)                        \
     __ENTRY(ERR_FILE_DESCRIPTOR_IN_BAD_STATE)                      \
@@ -127,7 +128,8 @@
     __ENTRY(ERR_OWNER_DIED)                                        \
     __ENTRY(ERR_STATE_NOT_RECOVERABLE)                             \
     __ENTRY(ERR_MEMORY_PAGE_HAS_HARDWARE_ERROR)                    \
-    __ENTRY(ERR_OPERATION_NOT_SUPPORTED)
+    __ENTRY(ERR_OPERATION_NOT_SUPPORTED)                           \
+    __ENTRY(ERR_REQUEST_TIMEOUT)
 
 #define ERROR_ENUM_ENTRY(__entry) __entry,
 #define ERROR_ENUM_ENTRY_WITH_VALUE(__entry, __value) __entry = __value,

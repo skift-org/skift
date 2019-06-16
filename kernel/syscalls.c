@@ -15,6 +15,7 @@
 #include <skift/cstring.h>
 #include <skift/logger.h>
 #include <skift/system.h>
+#include <skift/error.h>
 
 #include <hjert/syscalls.h>
 
@@ -29,7 +30,7 @@ typedef int (*syscall_handler_t)(int, int, int, int, int);
 int sys_not_implemented()
 {
     logger_log(LOG_WARNING, "Not implemented syscall!");
-    return 0;
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 /* --- Process -------------------------------------------------------------- */
@@ -53,7 +54,7 @@ int sys_process_exit(int code)
 int sys_process_cancel(int pid)
 {
     int result;
-    
+
     ATOMIC({
         result = task_cancel(task_getbyid(pid), -1);
     });
@@ -82,13 +83,13 @@ int sys_process_free(uint addr, uint count)
     return 0;
 }
 
-int sys_process_get_cwd(char* buffer, uint size)
+int sys_process_get_cwd(char *buffer, uint size)
 {
     task_get_cwd(sheduler_running(), buffer, size);
     return 0;
 }
 
-int sys_process_set_cwd(const char* path)
+int sys_process_set_cwd(const char *path)
 {
     return task_set_cwd(sheduler_running(), path);
 }
@@ -101,12 +102,12 @@ int sys_process_sleep(int time)
 int sys_process_wakeup(int tid)
 {
     int result;
-    
+
     ATOMIC({
         result = task_wakeup(task_getbyid(tid));
     });
 
-    return result; 
+    return result;
 }
 
 int sys_process_wait(int tid, int *exitvalue)
@@ -115,36 +116,40 @@ int sys_process_wait(int tid, int *exitvalue)
 }
 
 /* --- Messaging ------------------------------------------------------------ */
-int sys_messaging_send(int destination_tid, const char *name, void *payload, uint size, uint flags)
-{
-    int result;
-    
-    ATOMIC({
-        result = messaging_send(task_getbyid(destination_tid), name, payload, size, flags);
-    });
 
-    return result; 
+int sys_messaging_send(message_t* event)
+{
+    return task_messaging_send(sheduler_running(), event);
 }
 
-int sys_messaging_broadcast(const char *channel, const char *name, void *payload, uint size, uint flags)
+int sys_messaging_broadcast(const char *channel, message_t* event)
 {
-    return messaging_broadcast(channel, name, payload, size, flags);
+    return task_messaging_broadcast(sheduler_running(), channel, event);
 }
 
-int sys_messaging_receive(message_t *msg, int wait)
+int sys_messaging_request(message_t* request, message_t* result, int timeout)
 {
-    // FIXME: why "&& true" !?
-    return messaging_receive(msg, wait && true);
+    return task_messaging_request(sheduler_running(), request, result, timeout);
 }
 
-int sys_messaging_subscribe(const char *channel)
+int sys_messaging_receive(message_t* message, int wait)
 {
-    return messaging_subscribe(channel);
+    return task_messaging_receive(sheduler_running(), message, wait);
 }
 
-int sys_messaging_unsubscribe(const char *channel)
+int sys_messaging_respond(message_t* request, message_t* result)
 {
-    return messaging_unsubscribe(channel);
+    return task_messaging_respond(sheduler_running(), request, result);
+}
+
+int sys_messaging_subscribe(const char* channel)
+{
+    return task_messaging_subscribe(sheduler_running(), channel);
+}
+
+int sys_messaging_unsubscribe(const char* channel)
+{
+    return task_messaging_unsubscribe(sheduler_running(), channel);
 }
 
 /* --- Filesystem and IO ---------------------------------------------------- */
@@ -194,51 +199,51 @@ int sys_filesystem_mkdir(const char *dir_path)
     path_t *p = task_cwd_resolve(sheduler_running(), dir_path);
 
     int result = filesystem_mkdir(ROOT, p);
-    
+
     path_delete(p);
-    
+
     return result;
 }
 
-int sys_filesystem_mkfifo(const char* fifo_path)
+int sys_filesystem_mkfifo(const char *fifo_path)
 {
     path_t *p = task_cwd_resolve(sheduler_running(), fifo_path);
 
     int result = filesystem_mkfifo(ROOT, p);
-    
+
     path_delete(p);
-    
+
     return result;
 }
 
-int sys_filesystem_link(const char* old_path, const char* new_path)
+int sys_filesystem_link(const char *old_path, const char *new_path)
 {
     path_t *oldp = task_cwd_resolve(sheduler_running(), old_path);
     path_t *newp = task_cwd_resolve(sheduler_running(), new_path);
-    
+
     int result = filesystem_link(ROOT, oldp, ROOT, newp);
 
     path_delete(oldp);
     path_delete(newp);
-    
+
     return result;
 }
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    path_t *p = task_cwd_resolve(sheduler_running(),link_path);
-    
+    path_t *p = task_cwd_resolve(sheduler_running(), link_path);
+
     int result = filesystem_unlink(ROOT, p);
-    
+
     path_delete(p);
-    
+
     return result;
 }
 
-int sys_filesystem_rename(const char *old_path, const char* new_path)
+int sys_filesystem_rename(const char *old_path, const char *new_path)
 {
-    path_t* oldp = task_cwd_resolve(sheduler_running(), old_path);
-    path_t* newp = task_cwd_resolve(sheduler_running(), new_path);
+    path_t *oldp = task_cwd_resolve(sheduler_running(), old_path);
+    path_t *newp = task_cwd_resolve(sheduler_running(), new_path);
 
     int result = filesystem_rename(NULL, oldp, NULL, newp);
 
@@ -250,18 +255,18 @@ int sys_filesystem_rename(const char *old_path, const char* new_path)
 
 /* --- Sytem info getter ---------------------------------------------------- */
 
-int sys_system_get_info(system_info_t* info)
+int sys_system_get_info(system_info_t *info)
 {
     strlcpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
-    
-    snprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE, 
-            __kernel_version_format, 
-            
-            __kernel_version_major, 
-            __kernel_version_minor, 
-            __kernel_version_patch, 
-            __kernel_version_codename);
-    
+
+    snprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE,
+             __kernel_version_format,
+
+             __kernel_version_major,
+             __kernel_version_minor,
+             __kernel_version_patch,
+             __kernel_version_codename);
+
     strlcpy(info->system_name, "skift", SYSTEM_INFO_FIELD_SIZE);
 
     // FIXME: this should not be hard coded.
@@ -270,7 +275,7 @@ int sys_system_get_info(system_info_t* info)
     return 0;
 }
 
-int sys_system_get_status(system_status_t* status)
+int sys_system_get_status(system_status_t *status)
 {
     // FIXME: get a real uptime value;
     status->uptime = 0;
@@ -300,11 +305,13 @@ static int (*syscalls[])() =
         [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
         [SYS_PROCESS_WAIT] = sys_process_wait,
 
-        [SYS_MSG_SEND] = sys_messaging_send,
-        [SYS_MSG_BROADCAST] = sys_messaging_broadcast,
-        [SYS_MSG_RECEIVE] = sys_messaging_receive,
-        [SYS_MSG_SUBSCRIBE] = sys_messaging_subscribe,
-        [SYS_MSG_UNSUBSCRIBE] = sys_messaging_unsubscribe,
+        [SYS_MESSAGING_SEND] = sys_messaging_send,
+        [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,
+        [SYS_MESSAGING_REQUEST] = sys_messaging_request,
+        [SYS_MESSAGING_RECEIVE] = sys_messaging_receive,
+        [SYS_MESSAGING_RESPOND] = sys_messaging_respond,
+        [SYS_MESSAGING_SUBSCRIBE] = sys_messaging_subscribe,
+        [SYS_MESSAGING_UNSUBSCRIBE] = sys_messaging_unsubscribe,
 
         [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
         [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,

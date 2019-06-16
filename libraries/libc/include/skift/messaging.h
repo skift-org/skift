@@ -5,10 +5,23 @@
 #include <hjert/syscalls.h>
 #include <hjert/message.h>
 
-DECL_SYSCALL5(messaging_send, int to, const char *name, void *payload, unsigned int size, unsigned int flags);
-DECL_SYSCALL5(messaging_broadcast, const char *channel, const char *name, void *payload, unsigned int size, unsigned int flags);
+// Send an event message to a process.
+int messaging_send(message_t* event);
 
-DECL_SYSCALL2(messaging_receive, message_t *msg, int wait);
+// Send an event message to all subscriber of a channel.
+int messaging_broadcast(const char *channel, message_t* event);
 
-DECL_SYSCALL1(messaging_subscribe, const char *channel);
-DECL_SYSCALL1(messaging_unsubscribe, const char *channel);
+// Send an request message to a process.
+int messaging_request(message_t* request, message_t* result, int timeout);
+
+// Receive a message.
+int messaging_receive(message_t* message, bool wait);
+
+// Respond to a request.
+int messaging_respond(message_t* request, message_t* result);
+
+// Subscribe to a channel.
+int messaging_subscribe(const char* channel);
+
+// Unsubscribe from a channel.
+int messaging_unsubscribe(const char* channel);

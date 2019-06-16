@@ -21,6 +21,8 @@ static uint ticks = 0;
 static task_t *running = NULL;
 
 static task_t *kernel_task;
+task_t* task_kernel(void){ return kernel_task;}
+
 static task_t *garbage_task;
 static task_t *idle_task;
 
@@ -93,8 +95,8 @@ task_t *task(task_t *parent, const char *name, bool user)
     list_pushback(tasks, this);
 
     // Setup inbox
-    lock_init(this->inbox_lock);
     this->inbox = list();
+    this->subscription = list();
 
     // Setup current working directory.
     lock_init(this->cwd_lock);
@@ -149,11 +151,8 @@ void task_delete(task_t *this)
     list_remove(tasks, this);
     atomic_end();
 
-    list_foreach(i, this->inbox)
-    {
-        message_delete(i->value);
-    }
-    list_delete(this->inbox, LIST_KEEP_VALUES);
+    list_delete(this->inbox, LIST_FREE_VALUES);
+    list_delete(this->subscription, LIST_FREE_VALUES);
 
     task_filedescriptor_close_all(this);
 
@@ -169,7 +168,7 @@ void task_delete(task_t *this)
     free(this);
 }
 
-list_t* task_all(void)
+list_t *task_all(void)
 {
     return tasks;
 }
@@ -192,15 +191,15 @@ task_t *task_getbyid(int id)
     return NULL;
 }
 
-void task_get_info(task_t* this, task_info_t* info)
+void task_get_info(task_t *this, task_info_t *info)
 {
     assert(this);
 
     info->id = this->id;
     info->state = this->state;
-    
+
     strlcpy(info->name, this->name, TASK_NAMESIZE);
-    path_to_cstring(this->cwd_path, info->cwd, PATH_LENGHT); 
+    path_to_cstring(this->cwd_path, info->cwd, PATH_LENGHT);
 
     info->usage_cpu = (sheduler_get_usage(this->id) * 100) / SHEDULER_RECORD_COUNT;
 }
@@ -325,7 +324,7 @@ void task_go(task_t *t)
 
 /* --- Task wait state ---------------------------------------------------- */
 
-task_sleep_result_t task_sleep(task_t* this, int timeout)
+task_sleep_result_t task_sleep(task_t *this, int timeout)
 {
     ATOMIC({
         this->wait.time.wakeuptick = ticks + timeout;
@@ -356,7 +355,7 @@ int task_wakeup(task_t *this)
         this->wait.time.wakeuptick = 0;
 
         task_setstate(this, TASK_STATE_RUNNING);
-        
+
         return 0;
     }
 
@@ -713,6 +712,7 @@ static char *TASK_STATES[] =
         "SLEEP",
         "WAIT",
         "WAIT_FOR_MESSAGE",
+        "WAIT_FOR_RESPOND",
         "CANCELED",
 };
 
@@ -910,232 +910,252 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
 /*   MESSAGING                                                                */
 /* -------------------------------------------------------------------------- */
 
-static int MID = 1;
-static list_t *channels;
+static int MID = 0;
 
-/* --- Channel -------------------------------------------------------------- */
+/* --- Channels ------------------------------------------------------------- */
 
-channel_t *channel(const char *name)
+bool task_messaging_has_subscribe(task_t *this, const char *channel)
 {
-    channel_t *channel = MALLOC(channel_t);
-
-    channel->subscribers = list();
-    strlcpy(channel->name, name, CHANNAME_SIZE);
-
-    return channel;
-}
-
-void channel_delete(channel_t *channel)
-{
-    list_delete(channel->subscribers, LIST_KEEP_VALUES);
-    free(channel);
-}
-
-channel_t *channel_get(const char *channel_name)
-{
-    list_foreach(i, channels)
-    {
-        channel_t *c = (channel_t *)i->value;
-
-        if (strcmp(channel_name, c->name) == 0)
-            return c;
-    }
-
-    return NULL;
-}
-
-/* --- Message -------------------------------------------------------------- */
-
-message_t *message(int id, const char *label, void *payload, uint size, uint flags)
-{
-    message_t *message = MALLOC(message_t);
-    message_header_t* header = &message->header;
-
-    header->id = id;
-    header->flags = flags;
-    header->size = 0;
-
-    strlcpy(header->label, label, MSGLABEL_SIZE);
-    
-    if (payload != NULL && size > 0)
-    {
-        header->size = min(MSGPAYLOAD_SIZE, size);
-        memcpy(message->payload, payload, size);
-    }
-
-    return message;
-}
-
-void message_delete(message_t *msg)
-{
-    free(msg);
-}
-
-uint messaging_id()
-{
-    uint id;
-
-    ATOMIC({
-        id = MID++;
-    });
-
-    return id;
-}
-
-/* --- Messaging API -------------------------------------------------------- */
-
-void messaging_setup(void)
-{
-    channels = list();
-}
-
-int messaging_send_internal(task_t *from, task_t *to, int id, const char *name, void *payload, uint size, uint flags)
-{
-    if (from == NULL || to == NULL)
-    {
-        return -ERR_NO_SUCH_PROCESS;
-    }
-
-    if (to->inbox->count > 1024)
-    {
-        logger_log(LOG_WARNING, "PROC=%d inbox is full!", to);
-        return -ERR_INBOX_FULL;
-    }
-
-    message_t *msg = message(id, name, payload, size, flags);
-
-    msg->header.to = to->id;
-    msg->header.from = from->id;
-
-    list_pushback(to->inbox, (void *)msg);
-
-    if (to->state == TASK_STATE_WAIT_MESSAGE)
-    {
-        messaging_receive_internal(to);
-        task_setstate(to, TASK_STATE_RUNNING);
-    }
-
-    return id;
-}
-
-int messaging_send(task_t *to, const char *name, void *payload, uint size, uint flags)
-{
-    int id = 0;
-
-    ATOMIC({
-        id = messaging_send_internal(sheduler_running(), to, messaging_id(), name, payload, size, flags);
-    });
-
-    return id;
-}
-
-int messaging_broadcast(const char *channel_name, const char *name, void *payload, uint size, uint flags)
-{
-    int id = 0;
-
     atomic_begin();
 
-    channel_t *c = channel_get(channel_name);
-
-    if (c != NULL)
+    list_foreach(i, this->subscription)
     {
-        id = messaging_id();
+        const char *subscription = (char *)i->value;
 
-        list_foreach(p, c->subscribers)
+        if (strcmp(channel, subscription) == 0)
         {
-            messaging_send_internal(sheduler_running(), ((task_t *)p->value), id, name, payload, size, flags);
+            atomic_end();
+
+            return true;
         }
     }
 
     atomic_end();
-
-    return id;
-}
-
-message_t *messaging_receive_internal(task_t *task)
-{
-    message_t *msg = NULL;
-
-    atomic_begin();
-
-    if (task->inbox->count > 0)
-    {
-        if (task->wait.message.message != NULL)
-        {
-            message_delete(task->wait.message.message);
-        }
-
-        if (list_pop(task->inbox, (void **)&msg))
-        {
-            task->wait.message.message = msg;
-        }
-        else
-        {
-            task->wait.message.message = NULL;
-        }
-    }
-
-    atomic_end();
-    return msg;
-}
-
-bool messaging_receive(message_t *msg, bool wait)
-{
-    message_t *incoming = messaging_receive_internal(sheduler_running());
-
-    if (incoming == NULL && wait)
-    {
-        atomic_begin();
-        task_setstate(sheduler_running(), TASK_STATE_WAIT_MESSAGE);
-        atomic_end();
-
-        sheduler_yield(); // Wait until we get a message.
-
-        incoming = sheduler_running()->wait.message.message;
-    }
-
-    if (incoming != NULL)
-    {
-        memcpy(msg, incoming, sizeof(message_t));
-        return true;
-    }
 
     return false;
 }
 
-int messaging_subscribe(const char *channel_name)
+int task_messaging_subscribe(task_t *this, const char *channel)
 {
-    atomic_begin();
-
-    channel_t *c = channel_get(channel_name);
-
-    if (c == NULL)
+    if (task_messaging_has_subscribe(this, channel))
     {
-        c = channel(channel_name);
-        list_pushback(channels, c);
+        return -ERR_SUCCESS;
+    }
+    else
+    {
+        atomic_begin();
+
+        list_pushback(this->subscription, strdup(channel));
+
+        atomic_end();
     }
 
-    list_pushback(c->subscribers, sheduler_running());
-
-    atomic_end();
-
-    return 0;
+    return -ERR_SUCCESS;
 }
 
-int messaging_unsubscribe(const char *channel_name)
+int task_messaging_unsubscribe(task_t *this, const char *channel)
+{
+    if (task_messaging_has_subscribe(this, channel))
+    {
+        return -ERR_SUCCESS;
+    }
+    else
+    {
+        atomic_begin();
+
+        list_foreach(i, this->subscription)
+        {
+            char *subscription = (char *)i->value;
+
+            if (strcmp(channel, subscription) == 0)
+            {
+                list_remove(this->subscription, subscription);
+                break;
+            }
+        }
+
+        atomic_end();
+    }
+
+    return -ERR_SUCCESS;
+}
+
+/* --- Messages ------------------------------------------------------------- */
+
+int task_messaging_send_internal(task_t *this, task_t *destination, message_t *event)
+{
+    ASSERT_ATOMIC;
+
+    if (!(list_count(destination->inbox) < 1024))
+    {
+        return -ERR_INBOX_FULL;
+    }
+
+    message_t *event_copy = MALLOC(message_t);
+    *event_copy = *event;
+
+    event_copy->header.from = this->id;
+    event_copy->header.to = destination->id;
+
+    list_pushback(destination->inbox, event_copy);
+
+    if (destination->state == TASK_STATE_WAIT_MESSAGE)
+    {
+        task_setstate(destination, TASK_STATE_RUNNING);
+    }
+
+    return -ERR_SUCCESS;
+}
+
+int task_messaging_send(task_t *this, message_t *event)
 {
     atomic_begin();
 
-    channel_t *c = channel_get(channel_name);
+    event->header.id = MID++;
+    event->header.type = MESSAGE_TYPE_EVENT;
 
-    if (c != NULL)
+    task_t *destination = task_getbyid(event->header.to);
+
+    if (destination == NULL)
     {
-        list_remove(c->subscribers, sheduler_running());
+        atomic_end();
+        return -ERR_NO_SUCH_PROCESS;
+    }
+
+    int result = task_messaging_send_internal(this, destination, event);
+
+    atomic_end();
+
+    return result;
+}
+
+int task_messaging_broadcast(task_t *this, const char *channel, message_t *event)
+{
+    atomic_begin();
+
+    event->header.id = MID++;
+    event->header.type = MESSAGE_TYPE_EVENT;
+
+    list_foreach(i, task_all())
+    {
+        task_t *destination = (task_t *)i->value;
+
+        if (destination != this && task_messaging_has_subscribe(destination, channel))
+        {
+            task_messaging_send_internal(this, destination, event);
+        }
     }
 
     atomic_end();
 
-    return 0;
+    return -ERR_SUCCESS;
+}
+
+int task_messaging_request(task_t *this, message_t *request, message_t *respond, int timeout)
+{
+    atomic_begin();
+    {
+        request->header.id = MID++;
+        request->header.type = MESSAGE_TYPE_REQUEST;
+
+        task_t *destination = task_getbyid(request->header.to);
+
+        if (destination == NULL)
+        {
+            atomic_end();
+            return -ERR_NO_SUCH_PROCESS;
+        }
+
+        this->wait.respond = (task_wait_respond_t){
+            .has_result = false,
+            .result = {},
+            .timeout = timeout,
+        };
+
+        task_messaging_send_internal(this, destination, request);
+
+        task_setstate(this, TASK_STATE_WAIT_RESPOND);
+    }
+    atomic_end();
+
+    sheduler_yield();
+
+    if (this->wait.respond.has_result)
+    {
+        *respond = this->wait.respond.result;
+
+        return -ERR_SUCCESS;
+    }
+    else
+    {
+        *respond = (message_t){0};
+        return -ERR_REQUEST_TIMEOUT;
+    }
+}
+
+int task_messaging_respond(task_t *this, message_t *request, message_t *result)
+{
+    atomic_begin();
+
+    task_t *destination = task_getbyid(request->header.to);
+    if (destination == NULL || destination->state != TASK_STATE_WAIT_RESPOND)
+    {
+        atomic_end();
+        return -ERR_NO_SUCH_PROCESS;
+    }
+
+    // FIXME: this is a lot of dot operator...
+    destination->wait.respond.has_result = true;
+    destination->wait.respond.result = *result;
+
+    destination->wait.respond.result.header.from = this->id;
+    destination->wait.respond.result.header.to = destination->id;
+
+    task_setstate(destination, TASK_STATE_RUNNING);
+
+    atomic_end();
+
+    return -ERR_SUCCESS;
+}
+
+int task_messaging_receive(task_t *this, message_t *message, bool wait)
+{
+    message_t *received = NULL;
+
+    atomic_begin();
+
+    if (list_pop(this->inbox, (void**)&received))
+    {
+        *message = *received;
+    }
+
+    if (received == NULL && wait)
+    {
+        task_setstate(this, TASK_STATE_WAIT_MESSAGE);
+
+        atomic_end();
+
+        sheduler_yield();
+
+        atomic_begin();
+
+        if (list_pop(this->inbox, (void**)&received))
+        {
+            *message = *received;
+        }
+    }
+
+    atomic_end();
+
+    if (received == NULL)
+    {
+        return -ERR_NO_MESSAGE;
+    }
+    else
+    {
+        free(received);
+        return -ERR_SUCCESS;
+    }
 }
 
 /* -------------------------------------------------------------------------- */

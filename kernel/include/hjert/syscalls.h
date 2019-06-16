@@ -32,12 +32,13 @@ typedef enum
     SYS_PROCESS_WAIT,
 
     // Messaging
-    SYS_MSG_SEND,
-    SYS_MSG_BROADCAST,
-    SYS_MSG_RECEIVE,
-
-    SYS_MSG_SUBSCRIBE,
-    SYS_MSG_UNSUBSCRIBE,
+    SYS_MESSAGING_SEND,
+    SYS_MESSAGING_BROADCAST,
+    SYS_MESSAGING_REQUEST,
+    SYS_MESSAGING_RECEIVE,
+    SYS_MESSAGING_RESPOND,
+    SYS_MESSAGING_SUBSCRIBE,
+    SYS_MESSAGING_UNSUBSCRIBE,
 
 /* --- Filesystem ----------------------------------------------------------- */
 

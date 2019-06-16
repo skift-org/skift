@@ -18,6 +18,24 @@ static mouse_state_t oldmouse = {0};
 
 /* --- Private functions ---------------------------------------------------- */
 
+static void mouse_send_button_event(mouse_button_t btn, bool up)
+{
+    mouse_button_event_t event = (mouse_button_event_t){.button = btn};
+    message_t msg;
+    
+    if (up)
+    {
+        msg = message(MOUSE_BUTTONUP, -1);
+    }
+    else
+    {
+        msg = message(MOUSE_BUTTONDOWN , -1);
+    }
+
+    message_set_payload(msg, event);
+    task_messaging_broadcast(task_kernel(), MOUSE_CHANNEL, &msg);
+}
+
 static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
 {
     //TODO: Scroll whell not suported yet
@@ -51,55 +69,32 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
     {
         // The mouse move
         mouse_move_event_t event = {.offx = newmouse.x, .offy = newmouse.y};
-        messaging_broadcast(MOUSE_CHANNEL, MOUSE_MOVE, &event, sizeof(mouse_move_event_t), 0);
+        message_t move_event = message(MOUSE_MOVE, -1);
+        message_set_payload(move_event, event);
+        task_messaging_broadcast(task_kernel(), MOUSE_CHANNEL, &move_event);
     }
 
     if (newmouse.scroll != 0)
     {
         mouse_scroll_event_t event = {.off = newmouse.scroll};
-        messaging_broadcast(MOUSE_CHANNEL, MOUSE_SCROLL, &event, sizeof(mouse_scroll_event_t), 0);
+        message_t scroll_event = message(MOUSE_MOVE, -1);
+        message_set_payload(scroll_event, event);
+        task_messaging_broadcast(task_kernel(), MOUSE_SCROLL, &scroll_event);
     }
 
     if (oldmouse.left != newmouse.left)
     {
-        if (oldmouse.left == false)
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
-        }
-        else
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_LEFT};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
-        }
+        mouse_send_button_event(MOUSE_BUTTON_LEFT, oldmouse.left);
     }
 
     if (oldmouse.right != newmouse.right)
     {
-        if (oldmouse.right == false)
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
-        }
-        else
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_RIGHT};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
-        }
+        mouse_send_button_event(MOUSE_BUTTON_RIGHT, oldmouse.right);
     }
 
     if (oldmouse.middle != newmouse.middle)
     {
-        if (oldmouse.middle == false)
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONDOWN, &event, sizeof(mouse_button_event_t), 0);
-        }
-        else
-        {
-            mouse_button_event_t event = {.button = MOUSE_BUTTON_MIDDLE};
-            messaging_broadcast(MOUSE_CHANNEL, MOUSE_BUTTONUP, &event, sizeof(mouse_button_event_t), 0);
-        }
+        mouse_send_button_event(MOUSE_BUTTON_MIDDLE, oldmouse.middle);
     }
 
     oldmouse = newmouse;

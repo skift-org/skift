@@ -19,11 +19,16 @@ typedef struct
     bitmap_t *mask;
 } wmmouse_t;
 
+#define WMANAGER_MAX_DAMAGES 16
+
 typedef struct
 {
     bool exited;
     bitmap_t *framebuffer;
     painter_t *paint;
+
+    int damage_index;
+    rectangle_t damages[WMANAGER_MAX_DAMAGES];
 
     iostream_t *device;
     wmmouse_t mouse;
@@ -51,33 +56,48 @@ void wmanager_load_assets(wmanager_t *wm)
     logger_log(LOG_FINE, "Loading assets");
 }
 
-void wmanager_open_display(wmanager_t *wm)
+bool wmanager_open_display(wmanager_t *wm)
 {
     wm->device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
 
     if (wm->device == NULL)
     {
         error_print("Failled to open " FRAMEBUFFER_DEVICE);
-        wm->exited = true;
+        return false;
     }
 
     framebuffer_mode_info_t mode_info = {true, 800, 600};
 
     if (iostream_ioctl(wm->device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
     {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
-        wm->exited = true;
+        error_print("Failled to set device " FRAMEBUFFER_DEVICE " mode");
+        iostream_close(wm->device);
+        return false;
     }
 
     wm->framebuffer = bitmap(800, 600);
     wm->paint = painter(wm->framebuffer);
+
+    return true;
 }
 
-void wmanager_damage_region(wmanager_t* wm, rectangle_t region)
+void wmanager_damage_region(wmanager_t *wm, rectangle_t region)
 {
-    framebuffer_region_t damaged_region = (framebuffer_region_t){.src = wm->framebuffer->buffer, .bound = region};
-    iostream_ioctl(wm->device, FRAMEBUFFER_IOCTL_BLITREGION, &damaged_region);
+    wm->damages[wm->damage_index++] = region;
 }
+
+void wmanager_blit_regions(wmanager_t *wm)
+{
+    for (int i = 0; i < wm->damage_index; i++)
+    {
+        framebuffer_region_t damaged_region = (framebuffer_region_t){.src = wm->framebuffer->buffer, .bound = wm->damages[i]};
+        iostream_ioctl(wm->device, FRAMEBUFFER_IOCTL_BLITREGION, &damaged_region);
+    }
+
+    wm->damage_index = 0;
+}
+
+/* --- Mouse event handler -------------------------------------------------- */
 
 rectangle_t wmanager_mouse_bound(wmmouse_t *mouse)
 {
@@ -85,8 +105,53 @@ rectangle_t wmanager_mouse_bound(wmmouse_t *mouse)
 
     damage.position = point_add(mouse->position, (point_t){-28, -28});
     damage.size = (point_t){56, 56};
-    
+
     return damage;
+}
+
+void wmanager_mouse_repaint(wmanager_t *wm)
+{
+    wmmouse_t *mouse = &wm->mouse;
+
+    // Cleanup the backbuffer
+    if (mouse->has_mask)
+    {
+        painter_blit_bitmap(wm->paint, mouse->mask, bitmap_bound(mouse->mask), wmanager_mouse_bound(mouse));
+        wmanager_damage_region(wm, wmanager_mouse_bound(mouse));
+    }
+
+    // Save the backbuffer
+    painter_blit_bitmap(mouse->paint, wm->framebuffer, wmanager_mouse_bound(mouse), bitmap_bound(mouse->mask));
+    mouse->has_mask = true;
+
+    // Draw the mouse cursor to the backbuffer
+    point_t offset;
+    if (mouse->state == MOUSE_CURSOR_STATE_TEXT)
+    {
+        offset = (point_t){-14, 0};
+    }
+    else if (
+        mouse->state == MOUSE_CURSOR_STATE_BUSY ||
+        mouse->state == MOUSE_CURSOR_STATE_MOVE ||
+        mouse->state == MOUSE_CURSOR_STATE_RESIZEH ||
+        mouse->state == MOUSE_CURSOR_STATE_RESIZEV ||
+        mouse->state == MOUSE_CURSOR_STATE_RESIZEHV ||
+        mouse->state == MOUSE_CURSOR_STATE_RESIZEVH)
+    {
+        offset = (point_t){-14, -14};
+    }
+    else
+    {
+        offset = point_zero;
+    }
+
+    painter_blit_bitmap(
+        wm->paint,
+        wm->cursors[mouse->state],
+        bitmap_bound(wm->cursors[mouse->state]),
+        (rectangle_t){.position = point_add(wm->mouse.position, offset), .size = bitmap_bound(wm->cursors[mouse->state]).size});
+
+    wmanager_damage_region(wm, wmanager_mouse_bound(mouse));
 }
 
 void wmanager_handle_mouse_move_event(wmanager_t *wm, mouse_move_event_t *event)
@@ -102,7 +167,7 @@ void wmanager_handle_mouse_move_event(wmanager_t *wm, mouse_move_event_t *event)
 
     // Move the mouse
     wm->mouse.position = point_add(wm->mouse.position, (point_t){event->offx, event->offy});
-    wm->mouse.position = point_clamp(wm->mouse.position, point_zero, bitmap_bound(wm->framebuffer).size);
+    wm->mouse.position = point_clamp(wm->mouse.position, point_zero, point_sub(bitmap_bound(wm->framebuffer).size, (point_t){1, 1}));
 
     // Save the backbuffer
     painter_blit_bitmap(mouse->paint, wm->framebuffer, wmanager_mouse_bound(mouse), bitmap_bound(mouse->mask));
@@ -157,7 +222,10 @@ void wmanager_handle_mouse_btndown_event(wmanager_t *wm, mouse_button_event_t *e
     UNUSED(event);
 
     wm->mouse.state = (wm->mouse.state + 1) % MOUSE_CURSOR_STATE_COUNT;
+    wmanager_mouse_repaint(wm);
 }
+
+/* --- Entry point ---------------------------------------------------------- */
 
 int main(int argc, char **argv)
 {
@@ -166,9 +234,14 @@ int main(int argc, char **argv)
 
     wmanager_t wm;
     wm.exited = false;
+    wm.damage_index = 0;
 
     wmanager_load_assets(&wm);
-    wmanager_open_display(&wm);
+
+    if (!wmanager_open_display(&wm))
+    {
+        return -1;
+    }
 
     wm.mouse.position = (point_t){wm.framebuffer->width / 2, wm.framebuffer->height / 2};
     wm.mouse.state = MOUSE_CURSOR_STATE_DEFAULT;
@@ -180,6 +253,12 @@ int main(int argc, char **argv)
     messaging_subscribe(KEYBOARD_CHANNEL);
 
     painter_blit_bitmap(wm.paint, wm.wallpaper, bitmap_bound(wm.wallpaper), bitmap_bound(wm.framebuffer));
+    painter_draw_text(wm.paint, "hideo window manager", (point_t){17, 17}, (color_t){{0, 0, 0, 100}});
+    painter_draw_text(wm.paint, "hideo window manager", (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
+
+    wmanager_mouse_repaint(&wm);
+    wmanager_damage_region(&wm, bitmap_bound(wm.wallpaper));
+    wmanager_blit_regions(&wm);
 
     while (!wm.exited)
     {
@@ -206,6 +285,8 @@ int main(int argc, char **argv)
         {
             logger_log(LOG_WARNING, "Unknow message %s!", message_label(message));
         }
+
+        wmanager_blit_regions(&wm);
     }
 
     return 0;

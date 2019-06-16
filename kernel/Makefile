@@ -16,7 +16,7 @@ install: all
 	cp $(KERNEL) $(BOOTROOT)/boot/$(KERNEL)
 
 $(KERNEL): $(OBJECTS)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $(OBJECTS) O$(SYSROOT)/lib/libk.a
+	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $(OBJECTS) $(SYSROOT)/lib/libk.a
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $^

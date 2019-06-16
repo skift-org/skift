@@ -11,19 +11,19 @@
 
 #include <hjert/devices/framebuffer.h>
 
-framebuffer_mode_info_t mode_info = {true, 800,  600};
+framebuffer_mode_info_t mode_info = {true, 800, 600};
 
 typedef struct
-{   
+{
     point_t start;
     point_t finish;
     color_t color;
 } a_line_t;
 
-
 int main(int argc, char **argv)
 {
-    UNUSED(argc); UNUSED(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
 
@@ -47,11 +47,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    bitmap_t* fb = bitmap(800, 600);
+    bitmap_t *fb = bitmap(800, 600);
 
     assert(fb);
 
-    painter_t* paint = painter(fb);
+    painter_t *paint = painter(fb);
 
     assert(paint);
 
@@ -63,14 +63,14 @@ int main(int argc, char **argv)
         {
             for (int y = 0; y < fb->height; y++)
             {
-                painter_plot_pixel(paint, (point_t){x, y}, color_from_hsv(x / (float)fb->width, y / (float)fb->height, time));
+                painter_plot_pixel(paint, (point_t){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
             }
         }
-        
-        time += 0.1;
+
+        time += 0.001;
 
         iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
-    } while(true);
+    } while (true);
 
     return 0;
 }

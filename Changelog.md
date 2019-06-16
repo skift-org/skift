@@ -16,10 +16,21 @@ s
  - `skift/iostream.h` a stdio like library, with support for buffered I/O
  - `skift/launchpad.h` a process creation API inspired by the fushia project (wip)
  - `cd`, `exit`, `mv` command to the shell
-
+ - Devices files: `/dev/framebuffer`, `/dev/textmode`, `/dev/proc`
+ - `lsproc` utility for listing running processes
+ - `gfxctl` utility for getting, setting and listing graphics modes
+ - Some graphic demos `lines`, `colors`, `gfxtest`
+ - Mouse cursors and wallpapers in `/res`
+ - Support for FPU
+ - Support for FIFO/NAMED_PIPES
+ - Support for errno
 
 ## Changes
  - Task and processes are now the same thing
+ - libgfx now support alpha blending
+ - Messages can now be sended synchronously
+ - moved out of the kernel the terminal rendering code to `/bin/terminal`
+ - Moved the toolchain from i686-elf to i686-pc-skift
 
 ## Fixed
  - `\t` does't behaves as espected in the terminal

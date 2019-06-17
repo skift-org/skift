@@ -982,7 +982,7 @@ int task_messaging_unsubscribe(task_t *this, const char *channel)
 
 /* --- Messages ------------------------------------------------------------- */
 
-int task_messaging_send_internal(task_t *this, task_t *destination, message_t *event)
+int task_messaging_send_internal(task_t *this, task_t *destination, message_t *event, message_type_t message_type)
 {
     ASSERT_ATOMIC;
 
@@ -996,6 +996,7 @@ int task_messaging_send_internal(task_t *this, task_t *destination, message_t *e
 
     event_copy->header.from = this->id;
     event_copy->header.to = destination->id;
+    event_copy->header.type = message_type;
 
     list_pushback(destination->inbox, event_copy);
 
@@ -1012,7 +1013,6 @@ int task_messaging_send(task_t *this, message_t *event)
     atomic_begin();
 
     event->header.id = MID++;
-    event->header.type = MESSAGE_TYPE_EVENT;
 
     task_t *destination = task_getbyid(event->header.to);
 
@@ -1022,7 +1022,7 @@ int task_messaging_send(task_t *this, message_t *event)
         return -ERR_NO_SUCH_PROCESS;
     }
 
-    int result = task_messaging_send_internal(this, destination, event);
+    int result = task_messaging_send_internal(this, destination, event, MESSAGE_TYPE_EVENT);
 
     atomic_end();
 
@@ -1034,7 +1034,6 @@ int task_messaging_broadcast(task_t *this, const char *channel, message_t *event
     atomic_begin();
 
     event->header.id = MID++;
-    event->header.type = MESSAGE_TYPE_EVENT;
 
     list_foreach(i, task_all())
     {
@@ -1042,7 +1041,7 @@ int task_messaging_broadcast(task_t *this, const char *channel, message_t *event
 
         if (destination != this && task_messaging_has_subscribe(destination, channel))
         {
-            task_messaging_send_internal(this, destination, event);
+            task_messaging_send_internal(this, destination, event, MESSAGE_TYPE_EVENT);
         }
     }
 
@@ -1056,7 +1055,6 @@ int task_messaging_request(task_t *this, message_t *request, message_t *respond,
     atomic_begin();
     {
         request->header.id = MID++;
-        request->header.type = MESSAGE_TYPE_REQUEST;
 
         task_t *destination = task_getbyid(request->header.to);
 
@@ -1072,7 +1070,7 @@ int task_messaging_request(task_t *this, message_t *request, message_t *respond,
             .timeout = timeout,
         };
 
-        task_messaging_send_internal(this, destination, request);
+        task_messaging_send_internal(this, destination, request, MESSAGE_TYPE_REQUEST);
 
         task_setstate(this, TASK_STATE_WAIT_RESPOND);
     }
@@ -1097,7 +1095,7 @@ int task_messaging_respond(task_t *this, message_t *request, message_t *result)
 {
     atomic_begin();
 
-    task_t *destination = task_getbyid(request->header.to);
+    task_t *destination = task_getbyid(request->header.from);
     if (destination == NULL || destination->state != TASK_STATE_WAIT_RESPOND)
     {
         atomic_end();

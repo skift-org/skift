@@ -3,12 +3,17 @@
 #include <skift/messaging.h>
 #include <skift/drawing.h>
 #include <skift/error.h>
-
 #include <skift/widgets.h>
 
 #include <hjert/devices/keyboard.h>
 #include <hjert/devices/mouse.h>
 #include <hjert/devices/framebuffer.h>
+
+#include <hideo/client.h>
+#include <hideo/server.h>
+
+#include "compositor/client.h"
+#include "compositor/window.h"
 
 typedef struct
 {

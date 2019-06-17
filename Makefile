@@ -15,7 +15,7 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
-TARGETS=libraries userspace kernel shell usertests userdemo
+TARGETS=libraries userspace kernel shell usertests userdemo compositor
 
 TARGETS_BUILD=${TARGETS:=.build}
 TARGETS_INSTALL=${TARGETS:=.install}
@@ -75,4 +75,4 @@ build/ramdisk.tar: $(SYSROOT) $(TARGETS_INSTALL)
 	
 build/bootdisk.iso: $(BOOTROOT) build/ramdisk.tar
 	cp build/ramdisk.tar $(BOOTROOT)/boot/
-	grub-mkrescue -o $@ $(BOOTROOT)
+	grub-mkrescue -o $@ $(BOOTROOT) || grub2-mkrescue -o $@ $(BOOTROOT)

@@ -1,5 +1,10 @@
 export REPOROOT = $(shell pwd)
-export PATH = $(shell toolchain/use-it!.sh)
+
+export PATH := $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
+
+test:
+	echo $(PATH)
+
 export BUILDROOT = $(REPOROOT)/build
 export SYSROOT = $(BUILDROOT)/sysroot
 export BOOTROOT = $(BUILDROOT)/bootroot
@@ -15,7 +20,7 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
-TARGETS=libraries userspace kernel shell usertests userdemo compositor
+TARGETS=libraries userspace kernel shell usertests userdemo compositor ressources
 
 TARGETS_BUILD=${TARGETS:=.build}
 TARGETS_INSTALL=${TARGETS:=.install}
@@ -61,7 +66,6 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/me/share
 	mkdir -p $(SYSROOT)/me/anon
 	mkdir -p $(SYSROOT)/me/root
-	cp -a sysroot/* $(SYSROOT)
 	cp -ua $(INCLUDES) $(SYSROOT)/lib/
 
 $(BOOTROOT):

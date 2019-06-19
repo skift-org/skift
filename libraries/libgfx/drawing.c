@@ -16,6 +16,8 @@ bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
     bitmap->buffer = buffer;
     bitmap->shared = true;
 
+    bitmap->filtering = BITMAP_FILTERING_NEAREST;
+
     return bitmap;
 }
 
@@ -44,24 +46,37 @@ void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)
 
 color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
 {
-    if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
-    {
-        return bmp->buffer[p.X + p.Y * bmp->width];
-    }
-    else
-    {
-        return RGB(1.0, 0.0, 1.0);
-    }
+    p.X = p.X % bmp->width;
+    p.Y = p.Y % bmp->height;
+
+    return bmp->buffer[p.X + p.Y * bmp->width];
 }
 
 color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
 {
-    int xx = (int)(src_rect.width * x) % src_rect.width;
-    int yy = (int)(src_rect.height * y) % src_rect.height;
+    color_t result;
 
-    // FIXME: maybe do some kind of filtering here ?
+    float xx = src_rect.width * x;
+    float yy = src_rect.height * y;
 
-    return bitmap_get_pixel(bmp, (point_t){src_rect.X + xx, src_rect.Y + yy});
+    int xxi = (int)xx;
+    int yyi = (int)yy;
+
+    if (bmp->filtering == BITMAP_FILTERING_NEAREST)
+    {
+        result = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi, src_rect.Y + yyi});
+    }
+    else
+    {
+        color_t c00 = bitmap_get_pixel(bmp, (point_t){xxi,     yyi    });
+        color_t c10 = bitmap_get_pixel(bmp, (point_t){xxi + 1, yyi    });
+        color_t c01 = bitmap_get_pixel(bmp, (point_t){xxi,     yyi + 1});
+        color_t c11 = bitmap_get_pixel(bmp, (point_t){xxi + 1, yyi + 1});
+
+        result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
+    }
+
+    return result;
 }
 
 rectangle_t bitmap_bound(bitmap_t *bmp)
@@ -166,7 +181,7 @@ void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_r
     }
 }
 
-void painter_blit_bitmap_nearest(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+void painter_blit_bitmap_scaled(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
@@ -181,29 +196,6 @@ void painter_blit_bitmap_nearest(painter_t *paint, bitmap_t *src, rectangle_t sr
     }
 }
 
-void painter_blit_bitmap_linear(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
-{
-    for (int x = 0; x < dst_rect.width; x++)
-    {
-        for (int y = 0; y < dst_rect.height; y++)
-        {
-            float gx = x / (float)(dst_rect.width) * (src_rect.width - 1);
-            float gy = y / (float)(dst_rect.height) * (src_rect.height - 1);
-            int gxi = (int)gx;
-            int gyi = (int)gy;
-
-            color_t c00 = bitmap_get_pixel(src, (point_t){gxi, gyi});
-            color_t c10 = bitmap_get_pixel(src, (point_t){gxi + 1, gyi});
-            color_t c01 = bitmap_get_pixel(src, (point_t){gxi, gyi + 1});
-            color_t c11 = bitmap_get_pixel(src, (point_t){gxi + 1, gyi + 1});
-
-            color_t result = color_blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
-
-            painter_plot_pixel(paint, (point_t){dst_rect.X + x, dst_rect.Y + y}, result);
-        }
-    }
-}
-
 void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
     if (src_rect.width == dst_rect.width && src_rect.height == dst_rect.height)
@@ -212,7 +204,7 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
     }
     else
     {
-        painter_blit_bitmap_linear(paint, src, src_rect, dst_rect);
+        painter_blit_bitmap_scaled(paint, src, src_rect, dst_rect);
     }
 }
 

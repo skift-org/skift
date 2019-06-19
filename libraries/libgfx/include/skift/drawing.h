@@ -105,6 +105,8 @@ void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color);
 
 color_t bitmap_get_pixel(bitmap_t *bmp, point_t p);
 
+color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y);
+
 void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color);
 
 rectangle_t bitmap_bound(bitmap_t *bmp);

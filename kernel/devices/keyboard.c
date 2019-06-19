@@ -183,7 +183,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 {
     UNUSED(context);
 
-    uchar scancode = inb(0x60);
+    uchar scancode = in8(0x60);
 
     if (scancode < 128)
     {

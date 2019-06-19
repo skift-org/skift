@@ -15,14 +15,14 @@
 
 static void wait_read()
 {
-    while ((inb(PORT_COM1 + 5) & 1) == 0)
+    while ((in8(PORT_COM1 + 5) & 1) == 0)
     { /* do nothing */
     }
 }
 
 static void wait_write()
 {
-    while ((inb(PORT_COM1 + 5) & 0x20) == 0)
+    while ((in8(PORT_COM1 + 5) & 0x20) == 0)
     { /* do nothing */
     }
 }
@@ -68,7 +68,7 @@ void serial_setup()
 char serial_getc()
 {
     wait_read();
-    return inb(PORT_COM1);
+    return in8(PORT_COM1);
 }
 
 void serial_putc(char c)

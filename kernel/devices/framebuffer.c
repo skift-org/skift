@@ -45,7 +45,7 @@ void bga_write_register(u16 IndexValue, u16 DataValue)
 u16 bga_read_register(u16 IndexValue)
 {
     outw(VBE_DISPI_IOPORT_INDEX, IndexValue);
-    return inw(VBE_DISPI_IOPORT_DATA);
+    return in16(VBE_DISPI_IOPORT_DATA);
 }
 
 void bga_set_bank(u16 bank_number)
@@ -70,7 +70,7 @@ bool bga_is_available(void)
 }
 
 void *bga_get_framebuffer()
-{
+{               
     atomic_begin();
     paging_disable();
 
@@ -159,7 +159,8 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
 
                 if (framebuffer_physical_addr == NULL)
                 {
-                    framebuffer_physical_addr = bga_get_framebuffer();
+                    framebuffer_physical_addr = bga_get_framebuffer();            
+
 
                     if (framebuffer_physical_addr != NULL)
                     {
@@ -193,6 +194,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
             }
             else
             {
+                logger_log(LOG_WARNING, "Failled to create framebuffer !");
                 return -ERR_INVALID_ARGUMENT;
             }
         }

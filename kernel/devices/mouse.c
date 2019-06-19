@@ -110,18 +110,18 @@ reg32_t mouse_irq(reg32_t esp, processor_context_t *context)
     switch (cycle)
     {
     case 0:
-        packet[0] = inb(0x60);
+        packet[0] = in8(0x60);
         if (packet[0] & 8)
         {
             cycle++;
         }
         break;
     case 1:
-        packet[1] = inb(0x60);
+        packet[1] = in8(0x60);
         cycle++;
         break;
     case 2:
-        packet[2] = inb(0x60);
+        packet[2] = in8(0x60);
 
         mouse_handle_packet(packet[0], packet[1], packet[2], packet[3]);
         cycle = 0;
@@ -138,7 +138,7 @@ static inline void mouse_wait(uchar a_type) //unsigned char
     {
         while (time_out--)
         {
-            if ((inb(0x64) & 1) == 1)
+            if ((in8(0x64) & 1) == 1)
             {
                 return;
             }
@@ -149,7 +149,7 @@ static inline void mouse_wait(uchar a_type) //unsigned char
     {
         while (time_out--)
         {
-            if ((inb(0x64) & 2) == 0)
+            if ((in8(0x64) & 2) == 0)
             {
                 return;
             }
@@ -174,7 +174,7 @@ static inline uchar mouse_read(void)
 {
     //Get's response from mouse
     mouse_wait(0);
-    return inb(0x60);
+    return in8(0x60);
 }
 
 /* --- Public functions ----------------------------------------------------- */
@@ -191,7 +191,7 @@ void mouse_setup(void)
     mouse_wait(1);
     outb(0x64, 0x20);
     mouse_wait(0);
-    _status = (inb(0x60) | 3);
+    _status = (in8(0x60) | 3);
     mouse_wait(1);
     outb(0x64, 0x60);
     mouse_wait(1);

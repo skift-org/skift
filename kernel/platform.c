@@ -1,5 +1,7 @@
 #include "kernel/platform.h"
 
+/* --- FPU ------------------------------------------------------------------ */
+
 void platform_fpu_enable(void)
 {
     asm volatile("clts");
@@ -43,7 +45,6 @@ void platform_setup(void)
     logger_log(LOG_INFO, "Enabling fpu...");
     platform_fpu_enable();
 }
-
 
 void platform_save_context(task_t* t)
 {

@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#define HUGE_VAL (1.0/0.0)
+#define HUGE_VAL (1.0 / 0.0)
 
 #define PI (3.141592654)
 
@@ -15,6 +15,13 @@
 #define max(__x, __y) ((__x) > (__y) ? (__x) : (__y))
 
 #define clamp(__x, __min, __max) min((__max), max((__min), (__x)))
+
+// Linear interpolation
+#define lerp(__start, __end, __transition) ((__start) + ((__end) - (__start)) * (__transition))
+
+// Bilinear interpolation
+#define blerp(__p00, __p10, __p01, __p11, __tx, __ty) \
+    lerp(lerp((__p00), (__p10), (__tx)), lerp((__p01), (__p11), (__tx)), (__ty))
 
 #define NAN (0.0 / 0.0)
 #define INFINITY (1.0 / 0.0)

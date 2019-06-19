@@ -75,12 +75,20 @@ static inline bool rectangle_containe_position(rectangle_t rectange, point_t pos
 
 /* --- Bitmap object -------------------------------------------------------- */
 
+typedef enum
+{
+    BITMAP_FILTERING_NEAREST,
+    BITMAP_FILTERING_LINEAR,
+} bitmap_filtering_t;
+
 typedef struct
 {
     bool shared;
 
     int width;
     int height;
+
+    bitmap_filtering_t filtering;
 
     color_t *buffer;
 } bitmap_t;

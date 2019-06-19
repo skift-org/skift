@@ -1,5 +1,6 @@
 #include <skift/assert.h>
 #include <skift/drawing.h>
+#include <skift/math.h>
 
 #include "lodepng.h"
 #include "vgafont.h"
@@ -153,7 +154,19 @@ void painter_plot_pixel(painter_t *painter, point_t position, color_t color)
     }
 }
 
-void painter_blit_bitmap_scaled(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+{
+    for (int x = 0; x < dst_rect.width; x++)
+    {
+        for (int y = 0; y < dst_rect.height; y++)
+        {
+            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.X + x, src_rect.Y + y});
+            painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
+        }
+    }
+}
+
+void painter_blit_bitmap_nearest(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
@@ -168,14 +181,25 @@ void painter_blit_bitmap_scaled(painter_t *paint, bitmap_t *src, rectangle_t src
     }
 }
 
-void painter_blit_bitmap_fast(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
+void painter_blit_bitmap_linear(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
         for (int y = 0; y < dst_rect.height; y++)
         {
-            color_t pix = bitmap_get_pixel(src, (point_t){src_rect.X + x, src_rect.Y + y});
-            painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), pix);
+            float gx = x / (float)(dst_rect.width) * (src_rect.width - 1);
+            float gy = y / (float)(dst_rect.height) * (src_rect.height - 1);
+            int gxi = (int)gx;
+            int gyi = (int)gy;
+
+            color_t c00 = bitmap_get_pixel(src, (point_t){gxi, gyi});
+            color_t c10 = bitmap_get_pixel(src, (point_t){gxi + 1, gyi});
+            color_t c01 = bitmap_get_pixel(src, (point_t){gxi, gyi + 1});
+            color_t c11 = bitmap_get_pixel(src, (point_t){gxi + 1, gyi + 1});
+
+            color_t result = color_blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
+
+            painter_plot_pixel(paint, (point_t){dst_rect.X + x, dst_rect.Y + y}, result);
         }
     }
 }
@@ -188,7 +212,7 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
     }
     else
     {
-        painter_blit_bitmap_scaled(paint, src, src_rect, dst_rect);
+        painter_blit_bitmap_linear(paint, src, src_rect, dst_rect);
     }
 }
 

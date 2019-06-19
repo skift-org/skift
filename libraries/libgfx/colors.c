@@ -1,4 +1,5 @@
 #include <skift/colors.h>
+#include <skift/math.h>
 
 color_t RGB(float R, float G, float B)
 {
@@ -7,14 +8,7 @@ color_t RGB(float R, float G, float B)
 
 color_t RGBA(float R, float G, float B, float A)
 {
-    color_t rgb;
-
-    rgb.R = (int)(R * 255.0);
-    rgb.G = (int)(G * 255.0);
-    rgb.B = (int)(B * 255.0);
-    rgb.A = (int)(A * 255.0);
-
-    return rgb;
+    return (color_t){{(int)(R * 255.0), (int)(G * 255.0), (int)(B * 255.0), (int)(A * 255.0)}};
 }
 
 color_t HSV(float H, float S, float V)
@@ -28,9 +22,7 @@ color_t HSVA(float H, float S, float V, float A)
 
     if (S == 0)
     {
-        r = V;
-        g = V;
-        b = V;
+        r = V; g = V; b = V;
     }
     else
     {
@@ -112,3 +104,29 @@ color_t color_blend(color_t fg, color_t bg)
 
     return result;
 }
+
+color_t color_lerp(color_t a, color_t b, float transition)
+{
+    color_t result;
+
+    result.R = lerp(a.R, b.R, transition);
+    result.G = lerp(a.G, b.G, transition);
+    result.B = lerp(a.B, b.B, transition);
+    result.A = lerp(a.A, b.A, transition);
+
+    return result;
+}
+
+color_t color_blerp(color_t c00, color_t c10, color_t c01, color_t c11, float transitionx, float transitiony)
+{
+    return color_lerp(color_lerp(c00, c10, transitionx), color_lerp(c01, c11, transitionx), transitiony);
+}
+
+// TODO: color form name
+// color_t color_from_name(const char *name)
+// {
+// }
+// 
+// void color_get_name(color_t color, char *name, int size)
+// {
+// }

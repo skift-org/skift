@@ -1,11 +1,14 @@
 #pragma once
 
 #include <skift/list.h>
+#include <skift/messaging.h>
+
+#include "compositor/server.h"
 
 typedef struct
 {
     int pid;
-    list_t *window;
+    list_t *windows;
 } hideo_client_t;
 
 hideo_client_t *hideo_client(int pid);
@@ -13,3 +16,7 @@ hideo_client_t *hideo_client(int pid);
 void hideo_client_delete(hideo_client_t *this);
 
 void hideo_client_handle_request(hideo_client_t* this, message_t* request);
+
+void hideo_client_respond(hideo_client_t* client, const char* label, void* payload, int payload_size);
+
+void hideo_client_notify(hideo_client_t* client, const char* label, void* payload, int payload_size);

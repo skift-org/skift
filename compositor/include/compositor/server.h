@@ -1,10 +1,12 @@
 #pragma once
 
 #include <skift/list.h>
+#include <skift/messaging.h>
 
 typedef struct
 {
     list_t* clients;
+    list_t* windows;
 } hideo_server_t;
 
 hideo_server_t* hideo_server(void);

@@ -14,7 +14,7 @@
 
 #define max(__x, __y) ((__x) > (__y) ? (__x) : (__y))
 
-#define clamp(__x, __min, __max) min((__max), max((__min), (__x)))
+#define clamp(__x, __min, __max) (min((__max), max((__min), (__x))))
 
 // Linear interpolation
 #define lerp(__start, __end, __transition) ((__start) + ((__end) - (__start)) * (__transition))
@@ -33,8 +33,7 @@
 double floor(double value);
 double ceil(double x);
 
-int abs(int value);
-double fabs(double value);
+#define abs(__value) ((__value) < 0 ? -(__value) : (__value))
 
 double fmod(double x, double y);
 

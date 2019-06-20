@@ -1,129 +1,7 @@
 #include <skift/assert.h>
-#include <skift/drawing.h>
+#include <skift/painter.h>
+#include <skift/font.h>
 #include <skift/math.h>
-
-#include "lodepng.h"
-#include "vgafont.h"
-
-/* --- Bitmap --------------------------------------------------------------- */
-
-bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
-{
-    bitmap_t *bitmap = MALLOC(bitmap_t);
-
-    bitmap->width = width;
-    bitmap->height = height;
-    bitmap->buffer = buffer;
-    bitmap->shared = true;
-
-    bitmap->filtering = BITMAP_FILTERING_NEAREST;
-
-    return bitmap;
-}
-
-bitmap_t *bitmap(uint width, uint height)
-{
-    bitmap_t *bitmap = bitmap_from_buffer(width, height, (color_t *)malloc(sizeof(color_t) * width * height));
-
-    bitmap->shared = false;
-
-    return bitmap;
-}
-
-void bitmap_delete(bitmap_t *bmp)
-{
-    if (!bmp->shared)
-        free(bmp->buffer);
-
-    free(bmp);
-}
-
-void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)
-{
-    if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
-        bmp->buffer[p.X + p.Y * bmp->width] = color;
-}
-
-color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
-{
-    p.X = p.X % bmp->width;
-    p.Y = p.Y % bmp->height;
-
-    return bmp->buffer[p.X + p.Y * bmp->width];
-}
-
-color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
-{
-    color_t result;
-
-    float xx = src_rect.width * x;
-    float yy = src_rect.height * y;
-
-    int xxi = (int)xx;
-    int yyi = (int)yy;
-
-    if (bmp->filtering == BITMAP_FILTERING_NEAREST)
-    {
-        result = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi, src_rect.Y + yyi});
-    }
-    else
-    {
-        color_t c00 = bitmap_get_pixel(bmp, (point_t){xxi,     yyi    });
-        color_t c10 = bitmap_get_pixel(bmp, (point_t){xxi + 1, yyi    });
-        color_t c01 = bitmap_get_pixel(bmp, (point_t){xxi,     yyi + 1});
-        color_t c11 = bitmap_get_pixel(bmp, (point_t){xxi + 1, yyi + 1});
-
-        result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
-    }
-
-    return result;
-}
-
-rectangle_t bitmap_bound(bitmap_t *bmp)
-{
-    return (rectangle_t){{0, 0, bmp->width, bmp->height}};
-}
-
-void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color)
-{
-    color_t bg = bitmap_get_pixel(bmp, p);
-    bitmap_set_pixel(bmp, p, color_blend(color, bg));
-}
-
-#include <skift/logger.h>
-
-static color_t placeholder_buffer[] = {
-    (color_t){{255, 0, 255, 255}},
-    (color_t){{0, 0, 0, 255}},
-    (color_t){{0, 0, 0, 255}},
-    (color_t){{255, 0, 255, 255}},
-};
-
-bitmap_t *bitmap_load_from(const char *path)
-{
-    uchar *buffer;
-    uint width = 0, height = 0;
-    int error = 0;
-
-    if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
-    {
-        bitmap_t *bmp = bitmap_from_buffer(width, height, (color_t *)buffer);
-        bmp->shared = false;
-        return bmp;
-    }
-    else
-    {
-        logger_log(LOG_ERROR, "lodepng: failled to load %s: %s", path, lodepng_error_text(error));
-        return bitmap_from_buffer(2, 2, (color_t *)&placeholder_buffer);
-    }
-}
-
-int bitmap_save_to(bitmap_t *bmp, const char *path)
-{
-    return lodepng_encode32_file(path, (const uchar *)bmp->buffer, bmp->width, bmp->height);
-}
-
-/* --- Painter -------------------------------------------------------------- */
 
 painter_t *painter(bitmap_t *bmp)
 {
@@ -295,32 +173,59 @@ void painter_draw_rect(painter_t *paint, rectangle_t rect, color_t color)
     painter_draw_line(paint, point_add(rect.position, point_y(rect.size)), point_add(rect.position, rect.size), color);
 }
 
-// TODO: void painter_draw_circle(painter_t* paint, ...);
+const int FONT_SIZE = 16;
 
-// TODO: void painter_draw_triangle(painter_t* paint, ...);
-
-static const int glyph_mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
-
-void painter_draw_glyph(painter_t *paint, int chr, point_t position, color_t color)
+void painter_blit_bitmap_sdf(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect, float size, color_t color)
 {
-    uchar *gylph = vgafont16 + chr * 16;
+    const double FONT_GAMMA = 1.7;
+    const double FONT_BUFFER = 0.80;
 
-    for (int cy = 0; cy < 16; cy++)
+    for (int x = 0; x < dst_rect.width; x++)
     {
-        for (int cx = 0; cx < 8; cx++)
+        for (int y = 0; y < dst_rect.height; y++)
         {
-            if (gylph[cy] & glyph_mask[cx])
-            {
-                painter_plot_pixel(paint, point_add(position, (point_t){cx, cy}), color);
-            }
+            double xx = x / (double)dst_rect.width;
+            double yy = y / (double)dst_rect.height;
+
+            color_t sample = bitmap_sample(src, src_rect, xx, yy);
+
+            double distance = (sample.R / 150.0);
+            double edge0 = FONT_BUFFER - FONT_GAMMA * 1.4142 / size;
+			double edge1 = FONT_BUFFER + FONT_GAMMA * 1.4142 / size;
+
+            double a = (distance - edge0) / (edge1 - edge0);
+			if (a < 0.0) a = 0.0;
+			if (a > 1.0) a = 1.0;
+			a = a * a * (3 - 2 * a);
+
+
+            color_t final = color;
+            final.A = a * 255;
+
+            painter_plot_pixel(paint, point_add(dst_rect.position, (point_t){x, y}), final);
         }
     }
 }
 
-void painter_draw_text(painter_t *paint, const char *text, point_t position, color_t color)
+void painter_draw_glyph(painter_t *paint, font_t *font, glyph_t *glyph, point_t position, float size, color_t color)
 {
-    for (size_t i = 0; text[i]; i++)
+    rectangle_t dest;
+    dest.position = point_sub(position, point_scale(glyph->origin, size / FONT_SIZE));
+    dest.size = point_scale(glyph->bound.size, size / FONT_SIZE);
+
+    painter_blit_bitmap_sdf(paint, font->bitmap, glyph->bound, dest, size, color);
+}
+
+void painter_draw_text(painter_t *paint, font_t *font, const char *text, point_t position, float size, color_t color)
+{
+    point_t current = position;
+
+    for (int i = 0; text[i]; i++)
     {
-        painter_draw_glyph(paint, text[i], point_add(position, (point_t){i * 9, 0}), color);
+        glyph_t *glyph = font_glyph(font, text[i]);
+
+        painter_draw_glyph(paint, font, glyph, current, size, color);
+
+        current = point_add(current, (point_t){glyph->advance * (size / FONT_SIZE), 0});
     }
 }

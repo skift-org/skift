@@ -369,11 +369,6 @@ static double sin_table[] =
     0.0
 };
 
-int abs(int value)
-{
-    return value < 0 ? -value : value;
-}
-
 double floor(double x)
 {
     if (x > -1.0 && x < 1.0)
@@ -389,11 +384,6 @@ double floor(double x)
 
     int x_i = x;
     return (double)x_i;
-}
-
-double fabs(double value)
-{
-    return __builtin_fabs(value);
 }
 
 double fmod(double left, double right)

@@ -7,6 +7,7 @@ __assets.s
 .ycm_extra_conf.py
 
 *.asm
+*.glyph
 
 bin/
 obj/

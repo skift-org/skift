@@ -61,9 +61,7 @@ int main(int argc, char **argv)
 
         char message[128];
         snprintf(message, 128, "%d frames", frame++);
-        // painter_draw_text(paint, message, (point_t){17, 17}, (color_t){{0, 0, 0, 255}});
-        // painter_draw_text(paint, message, (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
-        
+
         iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
     } while(true);
 

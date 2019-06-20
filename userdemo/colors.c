@@ -14,13 +14,6 @@
 
 framebuffer_mode_info_t mode_info = {true, 800, 600};
 
-typedef struct
-{
-    point_t start;
-    point_t finish;
-    color_t color;
-} a_line_t;
-
 int main(int argc, char **argv)
 {
     UNUSED(argc);
@@ -37,14 +30,6 @@ int main(int argc, char **argv)
     if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
-        return -1;
-    }
-
-    iostream_t *random_device = iostream_open("/dev/random", IOSTREAM_READ);
-
-    if (random_device == NULL)
-    {
-        error_print("Failled to open random");
         return -1;
     }
 

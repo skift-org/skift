@@ -14,13 +14,6 @@
 
 framebuffer_mode_info_t mode_info = {true, 800, 600};
 
-typedef struct
-{
-    point_t start;
-    point_t finish;
-    color_t color;
-} a_line_t;
-
 int main(int argc, char **argv)
 {
     UNUSED(argc);

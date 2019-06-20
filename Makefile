@@ -43,9 +43,10 @@ list:
 	@echo $(TARGETS)
 	@echo $(TARGETS_INSTALL)
 	@echo $(TARGETS_CLEAN)
+	@echo $(INCLUDES)
 
 sync:
-	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
+	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/
 
 %.install: %
 	make -C $^ install
@@ -65,7 +66,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/me/share
 	mkdir -p $(SYSROOT)/me/anon
 	mkdir -p $(SYSROOT)/me/root
-	cp -a $(INCLUDES) $(SYSROOT)/lib/
+	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)

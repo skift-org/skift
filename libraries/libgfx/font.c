@@ -89,7 +89,7 @@ void font_delete(font_t *this)
     free(this);
 }
 
-glyph_t* font_glyph(font_t *this, int codepoint)
+glyph_t *font_glyph(font_t *this, int codepoint)
 {
     for (int i = 0; this->glyph[i].codepoint != 0; i++)
     {
@@ -102,14 +102,14 @@ glyph_t* font_glyph(font_t *this, int codepoint)
     return &this->default_glyph;
 }
 
-int font_measure_width(font_t* this, const char* str, int size)
+int font_measure_width(font_t *this, float font_size, const char *str, int str_size)
 {
     int width = 0;
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < str_size; i++)
     {
         glyph_t *g = font_glyph(this, str[i]);
-        width += g->advance;
+        width += g->advance * (font_size / 16.0);
     }
 
     return width;

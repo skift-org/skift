@@ -1,0 +1,1173 @@
+<!-- This content is licenced under CC0: https://creativecommons.org/publicdomain/zero/1.0/ -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Font Texture Generator Online</title>
+    <style>
+      body, input, textarea {
+        font: 14px/20px sans-serif;
+        background: white;
+        color: black;
+      }
+
+      body {
+        margin: 50px auto;
+        padding: 0 50px;
+        max-width: 800px;
+        cursor: default;
+        -moz-user-select: -moz-none;
+        -webkit-user-select: none;
+      }
+
+      h1 {
+        line-height: 30px;
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      th {
+        text-align: left;
+        vertical-align: top;
+        white-space: pre;
+      }
+
+      td {
+        vertical-align: top;
+      }
+
+      input[type=text] {
+        margin: -2px 0;
+        padding: 0 3px;
+        margin: 0;
+        line-height: 20px;
+        border: 1px solid #CCC;
+      }
+
+      input.invalid {
+        color: red;
+      }
+
+      input[disabled] {
+        color: rgba(0, 0, 0, 0.5);
+        -moz-user-select: -moz-none;
+        -webkit-user-select: none;
+      }
+
+      canvas {
+        display: block;
+        background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PHBhdGggZD0ibTAsMGg4djE2aDhWOEgwIiBmaWxsPSIjRUVFIi8+PC9zdmc+);
+        margin: 30px 0;
+      }
+
+      textarea {
+        width: 100%;
+        height: 300px;
+        padding: 0 3px;
+        resize: vertical;
+        border: 1px solid #CCC;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Font Texture Generator Online</h1>
+    <p>
+      This is a simple utility for generating font textures.
+      See <a href="example-webgl/">this example</a> for one way of using the generated font texture.
+      This code is licensed under the <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a> license and lives at <a href="https://github.com/evanw/font-texture-generator">https://github.com/evanw/font-texture-generator</a>.
+      Distance fields are computed using jump flooding for speed with 2x supersampling for quality.
+      The generator is unicode-aware and even <a href="javascript:loadEmojiDemo()">supports emoji</a>.
+    </p>
+    <table>
+      <tr>
+        <th>Font name: &nbsp;</th>
+        <td>
+          <input type="text" id="fontName" value="noto sans" autofocus>
+          &nbsp;
+          <label>
+            <input type="checkbox" id="fontBold">
+            Bold &nbsp;
+          </label>
+          <label>
+            <input type="checkbox" id="fontItalic">
+            Italic &nbsp;
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <th>Font size: &nbsp;</th>
+        <td><input type="text" id="fontSize" value="32"></td>
+      </tr>
+      <tr>
+        <th>Resolution: &nbsp;</th>
+        <td>
+          <label>
+            <input type="radio" name="resolution" id="resolutionSmallest" checked>
+            Smallest &nbsp;
+          </label>
+          <label>
+            <input type="radio" name="resolution" id="resolutionPowerOf2">
+            Power of 2
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <th>Data format: &nbsp;</th>
+        <td>
+          <label>
+            <input type="radio" name="dataFormat" id="dataFormatJSON" checked>
+            JSON &nbsp;
+          </label>
+          <label>
+            <input type="radio" name="dataFormat" id="dataFormatXML">
+            XML &nbsp;
+          </label>
+          <label>
+            <input type="radio" name="dataFormat" id="dataFormatC">
+            C
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <th>Characters: &nbsp;</th>
+        <td>
+          <label>
+            <input type="radio" name="characters" id="charactersASCII" checked>
+            ASCII &nbsp;
+          </label>
+          <label>
+            <input type="radio" name="characters" id="charactersCustom">
+            Custom:
+          </label>
+          <input type="text" id="customCharacters" value=" !&quot;#$%&amp;'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~" disabled>
+        </td>
+      </tr>
+      <tr>
+        <th>Display type: &nbsp;</th>
+        <td>
+          <label>
+            <input type="radio" name="displayType" id="displayTypeNormal">
+            Normal &nbsp;
+          </label>
+          <label>
+            <input type="radio" name="displayType" id="displayTypeDistanceField" checked>
+            Distance field
+          </label>
+          <div id="displayTypeNormalOptions">
+            &nbsp;<br>
+            <table>
+              <tr>
+                <th>Text color: &nbsp;</th>
+                <td><input type="text" id="fillColor" value="#FFF"></td>
+              </tr>
+              <tr>
+                <th>Background color: &nbsp;</th>
+                <td><input type="text" id="backgroundColor" value="#000"></td>
+              </tr>
+              <tr>
+                <th>Stroke color: &nbsp;</th>
+                <td><input type="text" id="strokeColor" value="none"></td>
+              </tr>
+              <tr>
+                <th>Stroke thickness: &nbsp;</th>
+                <td><input type="text" id="strokeThickness" value="0"></td>
+              </tr>
+              <tr>
+                <th>Stroke join: &nbsp;</th>
+                <td>
+                  <label>
+                    <input type="radio" name="strokeJoin" id="strokeJoinRound" checked>
+                    Round
+                  </label>
+                  <label>
+                    <input type="radio" name="strokeJoin" id="strokeJoinMiter">
+                    Miter
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <th>Shortcuts: &nbsp;</th>
+                <td>
+                  <a href="javascript:whiteOnBlack()">White on black</a>
+                  &nbsp;
+                  <a href="javascript:whiteWithBlackStroke()">White with black stroke</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div id="displayTypeDistanceFieldOptions">
+            &nbsp;<br>
+            <b>Falloff:</b>
+            <input type="text" id="distanceFieldFalloff" value="5">
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p>
+      <button id="generate" disabled>Generate font texture</button>
+      &nbsp;
+      <button id="download" disabled>Download font texture</button>
+    </p>
+    <noscript>You currently have JavaScript disabled. Please enable JavaScript to use this app.</noscript>
+    <script>
+
+(function() {
+  var buttonDownload = document.getElementById('download');
+  var buttonGenerate = document.getElementById('generate');
+  var canvas = document.createElement('canvas');
+  var checkboxCharactersASCII = document.getElementById('charactersASCII');
+  var checkboxCharactersCustom = document.getElementById('charactersCustom');
+  var checkboxDataFormatC = document.getElementById('dataFormatC');
+  var checkboxDataFormatJSON = document.getElementById('dataFormatJSON');
+  var checkboxDataFormatXML = document.getElementById('dataFormatXML');
+  var checkboxDisplayTypeDistanceField = document.getElementById('displayTypeDistanceField');
+  var checkboxDisplayTypeNormal = document.getElementById('displayTypeNormal');
+  var checkboxFontBold = document.getElementById('fontBold');
+  var checkboxFontItalic = document.getElementById('fontItalic');
+  var checkboxResolutionPowerOf2 = document.getElementById('resolutionPowerOf2');
+  var checkboxResolutionSmallest = document.getElementById('resolutionSmallest');
+  var checkboxStrokeJoinMiter = document.getElementById('strokeJoinMiter');
+  var checkboxStrokeJoinRound = document.getElementById('strokeJoinRound');
+  var optionsDisplayTypeDistanceField = document.getElementById('displayTypeDistanceFieldOptions');
+  var optionsDisplayTypeNormal = document.getElementById('displayTypeNormalOptions');
+  var textarea = document.createElement('textarea');
+  var textboxBackgroundColor = document.getElementById('backgroundColor');
+  var textboxCustomCharacters = document.getElementById('customCharacters');
+  var textboxDistanceFieldFalloff = document.getElementById('distanceFieldFalloff');
+  var textboxFillColor = document.getElementById('fillColor');
+  var textboxFontName = document.getElementById('fontName');
+  var textboxFontSize = document.getElementById('fontSize');
+  var textboxStrokeColor = document.getElementById('strokeColor');
+  var textboxStrokeThickness = document.getElementById('strokeThickness');
+
+  try { var context = canvas.getContext('2d'); } catch (e) {}
+  if (!context) {
+    document.write('Your browser doesn\'t support the HTML5 2D canvas API. Please use a modern browser.');
+    return;
+  }
+  textarea.spellcheck = false;
+  document.body.appendChild(canvas);
+  document.body.appendChild(textarea);
+
+  var width = 0;
+  var height = 0;
+  var fontSize = 0;
+  var fillColor = null;
+  var strokeColor = null;
+  var strokeThickness = 0;
+  var backgroundColor = null;
+  var distanceFieldFalloff = 0;
+  var isStarting = true;
+  var padding = 1;
+
+  var autocompleteList = [
+    'American Typewriter',
+    'Andale Mono',
+    'AquaKana',
+    'Arial Black',
+    'Arial Unicode MS',
+    'Arial',
+    'Arvo',
+    'Baskerville',
+    'Big Caslon',
+    'Cambria',
+    'Casual',
+    'Century Gothic',
+    'Chalkboard',
+    'Chalkduster',
+    'Comic Sans MS',
+    'Consolas',
+    'Copperplate',
+    'Courier New',
+    'Courier',
+    'Didot',
+    'Droid Sans',
+    'Droid Serif',
+    'Fira Sans',
+    'Futura',
+    'Geneva',
+    'Georgia',
+    'Gill Sans',
+    'Gotham Book',
+    'Gotham',
+    'HeadlineA',
+    'Helvetica Neue',
+    'Helvetica',
+    'Herculanum',
+    'Hoefler Text',
+    'Impact',
+    'Inconsolata',
+    'Lato',
+    'LiHei Pro',
+    'LiSong Pro',
+    'Lucida Grande',
+    'Marker Felt',
+    'Menlo',
+    'Monaco',
+    'Montserrat',
+    'Open Sans',
+    'Optima',
+    'Osaka',
+    'Oswald',
+    'Papyrus',
+    'Plantagenet Cherokee',
+    'Roboto',
+    'San Francisco',
+    'Sathu',
+    'Segoe UI',
+    'Silom',
+    'Skia',
+    'Slabo',
+    'Source Sans Pro',
+    'STFangSong',
+    'STHeiti',
+    'STKaiti',
+    'STSong',
+    'Tahoma',
+    'Thonburi',
+    'Times New Roman',
+    'Times',
+    'Trebuchet MS',
+    'Ubuntu',
+    'Verdana',
+    'Zapfino',
+  ];
+
+  function isValidFontName(name) {
+    var sampleText = generateCodePoints().map(codePointToString).join('');
+    context.font = '100px ' + JSON.stringify(name) + ', monospace';
+    var monospace = context.measureText(sampleText).width;
+    context.font = '100px ' + JSON.stringify(name) + ', sans-serif';
+    var sansSerif = context.measureText(sampleText).width;
+    return monospace === sansSerif;
+  }
+
+  function parseColor(text) {
+    var match = /^\s*#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\s*$/.exec(text);
+    if (match) return {
+      r: ('0x' + match[1] | 0) * 0x11,
+      g: ('0x' + match[2] | 0) * 0x11,
+      b: ('0x' + match[3] | 0) * 0x11,
+      a: 255,
+    };
+
+    var match = /^\s*#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})\s*$/.exec(text);
+    if (match) return {
+      r: '0x' + match[1] | 0,
+      g: '0x' + match[2] | 0,
+      b: '0x' + match[3] | 0,
+      a: 255,
+    };
+
+    var match = /^\s*rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/.exec(text);
+    if (match) {
+      var r = match[1] | 0;
+      var g = match[2] | 0;
+      var b = match[3] | 0;
+      if (0 <= r && r <= 255 && 0 <= g && g <= 255 && 0 <= b && b <= 255) {
+        return { r: r, g: g, b: b, a: 255 };
+      }
+    }
+
+    var match = /^\s*rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+(?:\.\d+)?|\.\d+)\s*\)\s*$/.exec(text);
+    if (match) {
+      var r = match[1] | 0;
+      var g = match[2] | 0;
+      var b = match[3] | 0;
+      var a = +match[4];
+      if (0 <= r && r <= 255 && 0 <= g && g <= 255 && 0 <= b && b <= 255 && 0 <= a && a <= 1) {
+        return { r: r, g: g, b: b, a: Math.round(a * 255) };
+      }
+    }
+
+    if (text === 'none' || text === 'transparent') return {
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 0,
+    };
+
+    return null;
+  }
+
+  loadEmojiDemo = function() {
+    checkboxCharactersCustom.checked = true;
+    checkboxDisplayTypeNormal.checked = true;
+    textboxBackgroundColor.value = 'none';
+    textboxCustomCharacters.value = '😄😱👏👍👎🎉💤';
+    textboxFillColor.value = '#000';
+    textboxStrokeColor.value = 'none';
+    textboxStrokeThickness.value = 0;
+    checkBackgroundColor();
+    checkFillColor();
+    checkStrokeColor();
+    checkStrokeThickness();
+    updateCharacters();
+    updateDisplayType();
+    generate();
+  };
+
+  whiteOnBlack = function() {
+    textboxBackgroundColor.value = '#000';
+    textboxFillColor.value = '#FFF';
+    textboxStrokeColor.value = 'none';
+    textboxStrokeThickness.value = 0;
+    checkBackgroundColor();
+    checkFillColor();
+    checkStrokeColor();
+    checkStrokeThickness();
+    generate();
+  };
+
+  whiteWithBlackStroke = function() {
+    textboxBackgroundColor.value = 'none';
+    textboxFillColor.value = '#FFF';
+    textboxStrokeColor.value = '#000';
+    textboxStrokeThickness.value = strokeThickness || Math.ceil(fontSize / 9);
+    checkBackgroundColor();
+    checkFillColor();
+    checkStrokeColor();
+    checkStrokeThickness();
+    generate();
+  };
+
+  function colorToCSS(color) {
+    return 'rgba(' + color.r + ', ' + color.g + ', ' + color.b + ', ' + color.a / 255 + ')';
+  }
+
+  function updateGenerate() {
+    buttonGenerate.disabled =
+      fillColor === null ||
+      strokeColor === null ||
+      backgroundColor === null ||
+      textboxFontName.className === 'invalid' ||
+      textboxFontSize.className === 'invalid' ||
+      textboxStrokeThickness.className === 'invalid';
+  }
+
+  function checkFontSize() {
+    var match = /^(\d+)$/.exec(textboxFontSize.value);
+    fontSize = match ? match[1] | 0 : 0;
+    textboxFontSize.className = 0 < fontSize && fontSize <= 256 ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function checkDistanceFieldFalloff() {
+    var match = /^(\d+)$/.exec(textboxDistanceFieldFalloff.value);
+    distanceFieldFalloff = match ? match[1] | 0 : 0;
+    textboxDistanceFieldFalloff.className = 0 < distanceFieldFalloff && distanceFieldFalloff <= 32 ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function checkFontName() {
+    fontName = textboxFontName.value;
+    textboxFontName.className = isValidFontName(fontName) ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function autocompleteFontName(e) {
+    if (typeof e.key === 'string' && e.target.selectionEnd === e.target.value.length) {
+      var value = (e.target.value.slice(0, e.target.selectionStart) + e.key).toLowerCase();
+      var candidate = null;
+
+      for (var i = 0; i < autocompleteList.length; i++) {
+        var name = autocompleteList[i];
+
+        if (name.slice(0, value.length).toLowerCase() === value && (candidate === null || name.length < candidate.length) && isValidFontName(name)) {
+          candidate = name;
+        }
+      }
+
+      if (candidate !== null) {
+        e.target.value = candidate;
+        e.target.selectionStart = value.length;
+        e.target.selectionEnd = candidate.length;
+        e.preventDefault();
+        checkFontName();
+      }
+    }
+  }
+
+  function checkStrokeThickness() {
+    var match = /^(\d+(?:\.\d+)?|\.\d+)$/.exec(textboxStrokeThickness.value);
+    strokeThickness = match ? +match[1] : NaN;
+    textboxStrokeThickness.className = 0 <= strokeThickness && strokeThickness <= 256 ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function checkFillColor() {
+    fillColor = parseColor(textboxFillColor.value);
+    textboxFillColor.className = fillColor !== null ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function checkStrokeColor() {
+    strokeColor = parseColor(textboxStrokeColor.value);
+    textboxStrokeColor.className = strokeColor !== null ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function checkBackgroundColor() {
+    backgroundColor = parseColor(textboxBackgroundColor.value);
+    textboxBackgroundColor.className = backgroundColor !== null ? '' : 'invalid';
+    updateGenerate();
+  }
+
+  function handleArrowKeys(e) {
+    if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.which === 38 || e.which === 40) && /^\d+$/.test(e.target.value)) {
+      var value = e.target.value | 0;
+      value += (e.which === 38 ? 1 : -1) * (e.shiftKey ? 10 : 1);
+      e.preventDefault();
+      e.target.value = Math.max(0, value);
+      e.target.select();
+      e.target.oninput();
+    } else {
+      generateOnEnter(e);
+    }
+  }
+
+  function updateCharacters() {
+    textboxCustomCharacters.disabled = checkboxCharactersASCII.checked;
+    generate();
+  }
+
+  function updateDisplayType() {
+    optionsDisplayTypeNormal.style.display = displayTypeNormal.checked ? 'block' : 'none';
+    optionsDisplayTypeDistanceField.style.display = displayTypeDistanceField.checked ? 'block' : 'none';
+    generate();
+  }
+
+  function codePointToString(codePoint) {
+    return codePoint <= 0xFFFF
+      ? String.fromCharCode(codePoint)
+      : String.fromCharCode((codePoint - 0x10000 >> 10) + 0xD800, (codePoint - 0x10000 & 0x3FF) + 0xDC00);
+  }
+
+  function renderCodePoint(codePoint, multiplier) {
+    var distanceFieldScaleFactor = checkboxDisplayTypeDistanceField.checked ? 2 : 1; // Sample distance field at 2x for anti-aliasing
+    var size = fontSize * distanceFieldScaleFactor;
+    var originX = Math.round(fontSize * (multiplier - 1) / 2) * distanceFieldScaleFactor;
+    var originY = Math.round(fontSize * (multiplier + 1) / 2) * distanceFieldScaleFactor;
+    var character = codePointToString(codePoint);
+    var width = canvas.width = size * multiplier;
+    var height = canvas.height = size * multiplier;
+    var bg = checkboxDisplayTypeDistanceField.checked ? {r: 0, g: 0, b: 0, a: 0} : backgroundColor;
+
+    context.font =
+      (checkboxFontBold.checked ? 'bold ' : '') +
+      (checkboxFontItalic.checked ? 'italic ' : '') +
+      size + 'px ' + JSON.stringify(fontName);
+    context.textAlign = 'left';
+    context.textBaseline = 'alphabetic';
+    context.lineWidth = strokeThickness * 2;
+    context.lineCap = 'round';
+    context.lineJoin = checkboxStrokeJoinMiter.checked ? 'miter' : 'round';
+    context.miterLimit = 4;
+
+    if (checkboxDisplayTypeNormal.checked) {
+      context.fillStyle = colorToCSS(bg);
+      context.fillRect(0, 0, width, height);
+
+      // Stroke
+      if (strokeThickness > 0) {
+        context.strokeStyle = colorToCSS(strokeColor);
+        context.strokeText(character, originX, originY);
+      }
+
+      // Fill
+      context.fillStyle = colorToCSS(fillColor);
+      context.fillText(character, originX, originY);
+    }
+
+    else {
+      context.fillStyle = '#000';
+      context.fillText(character, originX, originY);
+    }
+
+    var imageData = context.getImageData(0, 0, width, height);
+    var data = imageData.data;
+
+    var xmin = 0;
+    var ymin = 0;
+    var xmax = width;
+    var ymax = height;
+
+    outer: while (xmin + 1 < xmax) {
+      for (var y = 0; y < height; y++) {
+        if (!isSameColor(bg, xmin, y, width, data)) {
+          break outer;
+        }
+      }
+      xmin++;
+    }
+
+    outer: while (ymin + 1 < ymax) {
+      for (var x = 0; x < width; x++) {
+        if (!isSameColor(bg, x, ymin, width, data)) {
+          break outer;
+        }
+      }
+      ymin++;
+    }
+
+    outer: while (xmax - 1 > xmin) {
+      for (var y = 0; y < height; y++) {
+        if (!isSameColor(bg, xmax - 1, y, width, data)) {
+          break outer;
+        }
+      }
+      xmax--;
+    }
+
+    outer: while (ymax - 1 > ymin) {
+      for (var x = 0; x < width; x++) {
+        if (!isSameColor(bg, x, ymax - 1, width, data)) {
+          break outer;
+        }
+      }
+      ymax--;
+    }
+
+    // Attempt to handle fonts with unusually large glyphs (Zapfino for example)
+    if ((xmin === 0 || ymin === 0 || xmax === width || ymax === height) && multiplier < 5) {
+      return renderCodePoint(codePoint, multiplier + 1);
+    }
+
+    var trimmedWidth = xmax - xmin;
+    var trimmedHeight = ymax - ymin;
+    var trimmedData = new Uint8Array(trimmedWidth * trimmedHeight << 2);
+
+    for (var y = 0; y < trimmedHeight; y++) {
+      var start = xmin + (y + ymin) * width << 2;
+      trimmedData.set(data.subarray(start, start + (trimmedWidth << 2)), y * trimmedWidth << 2);
+    }
+
+    // Empty glyphs shouldn't have offsets
+    if (trimmedWidth === 1 && trimmedHeight === 1 && isSameColor(bg, xmin, ymin, width, data)) {
+      originX = xmin;
+      originY = ymin;
+    }
+
+    var image = {
+      width: trimmedWidth,
+      height: trimmedHeight,
+      data: trimmedData,
+      originX: originX - xmin,
+      originY: originY - ymin,
+      advance: Math.round(context.measureText(character).width),
+    };
+
+    if (checkboxDisplayTypeDistanceField.checked) {
+      image = convertToDistanceField(image, distanceFieldFalloff * distanceFieldScaleFactor);
+      image = downsampleLuminanceBy2(image); // Anti-aliasing
+    }
+
+    return image;
+  }
+
+  function downsampleLuminanceBy2(image) {
+    var oldWidth = image.width;
+    var oldHeight = image.height;
+    var newWidth = oldWidth >> 1;
+    var newHeight = oldHeight >> 1;
+    var oldData = image.data;
+    var newData = new Uint8Array(newWidth * newHeight << 2);
+    var oldStride = oldWidth << 2;
+
+    for (var y = 0; y < newHeight; y++) {
+      var from = (y << 1) * oldStride;
+      var to = y * newWidth << 2;
+
+      for (var x = 0; x < newWidth; x++) {
+        newData[to] = newData[to + 1] = newData[to + 2] = (
+          oldData[from] +
+          oldData[from + 4] +
+          oldData[from + oldStride] +
+          oldData[from + oldStride + 4]
+        ) >> 2;
+        newData[to + 3] = 255;
+        from += 8;
+        to += 4;
+      }
+    }
+
+    return {
+      width: newWidth,
+      height: newHeight,
+      data: newData,
+      originX: image.originX >> 1,
+      originY: image.originY >> 1,
+      advance: image.advance >> 1,
+    };
+  }
+
+  function isSameColor(color, x, y, width, data) {
+    var i = x + y * width << 2;
+    return (
+      Math.abs(data[i] - color.r) < 2 &&
+      Math.abs(data[i + 1] - color.g) < 2 &&
+      Math.abs(data[i + 2] - color.b) < 2 &&
+      Math.abs(data[i + 3] - color.a) < 2);
+  }
+
+  function generateCodePoints() {
+    return checkboxCharactersASCII.checked ? generateCodePointsASCII() : generateCodePointsText(textboxCustomCharacters.value);
+  }
+
+  function generateCodePointsASCII() {
+    var codePoints = [];
+
+    for (var i = 0x20; i < 0x7F; i++) {
+      codePoints.push(i);
+    }
+
+    return codePoints;
+  }
+
+  function generateCodePointsText(text) {
+    var codePoints = [];
+
+    for (var i = 0; i < text.length; i++) {
+      var code = text.charCodeAt(i);
+
+      if (code >= 0xD800 && code <= 0xDBFF && i + 1 < text.length) {
+        var next = text.charCodeAt(i + 1);
+
+        if (next >= 0xDC00 && next <= 0xDFFF) {
+          codePoints.push((code - 0xD800) * 0x400 + next - 0xDC00 + 0x10000);
+          i++;
+          continue;
+        }
+      }
+
+      codePoints.push(code);
+    }
+
+    // Remove duplicates
+    for (var i = 0; i < codePoints.length; i++) {
+      if (codePoints.indexOf(codePoints[i]) < i) {
+        codePoints.splice(i--, 1);
+      }
+    }
+
+    return codePoints;
+  }
+
+  function nextPowerOf2(target) {
+    var value = 2;
+    while (value < target) {
+      value *= 2;
+    }
+    return value;
+  }
+
+  function pack(images) {
+    var maxWidth = 0;
+    var totalArea = 0;
+    var coordinates = [];
+
+    for (var i = 0; i < images.length; i++) {
+      var image = images[i];
+      maxWidth = Math.max(maxWidth, image.width);
+      totalArea += image.width * image.height;
+      coordinates.push(null);
+    }
+
+    var sorted = images.map(function(image, i) {
+      return {
+        index: i,
+        width: image.width + 2 * padding,
+        height: image.height + 2 * padding,
+      };
+    }).sort(function(a, b) {
+      return b.height - a.height || b.width - a.width;
+    });
+
+    var width = Math.max(maxWidth, Math.ceil(Math.sqrt(totalArea) * 2));
+
+    if (width > 4096) {
+      width = Math.max(maxWidth, Math.ceil(Math.sqrt(totalArea) * 1.25));
+    }
+
+    if (checkboxResolutionPowerOf2.checked) {
+      width = nextPowerOf2(width);
+    }
+
+    var currentX = 0;
+    var currentY = 0;
+    var rowWidth = 0;
+    var rowHeight = 0;
+
+    for (var i = 0; i < sorted.length; i++) {
+      var image = sorted[i];
+      if (currentX + image.width > width) {
+        currentX = 0;
+        currentY += rowHeight;
+        rowHeight = 0;
+      }
+      coordinates[image.index] = {
+        x: currentX + padding,
+        y: currentY + padding,
+      };
+      currentX += image.width;
+      rowWidth = Math.max(rowWidth, currentX);
+      rowHeight = Math.max(rowHeight, image.height);
+    }
+
+    var height = currentY + rowHeight;
+
+    if (checkboxResolutionPowerOf2.checked) {
+      height = nextPowerOf2(height);
+    }
+
+    return {
+      width: checkboxResolutionPowerOf2.checked ? width : rowWidth,
+      height: height,
+      coordinates: coordinates.slice(),
+    };
+  }
+
+  function generateOnEnter(e) {
+    if (e.which === 13 && !buttonGenerate.disabled) {
+      e.target.select();
+      e.preventDefault();
+      generate();
+    }
+  }
+
+  function convertToDistanceField(image, falloff) {
+    var oldWidth = image.width;
+    var oldHeight = image.height;
+    var data = image.data;
+    var newWidth = oldWidth + 2 * falloff;
+    var newHeight = oldHeight + 2 * falloff;
+    var ping = new Float32Array(newWidth * newHeight << 2);
+    var pong = new Float32Array(newWidth * newHeight << 2);
+
+    for (var y = 0, i = 0; y < newHeight; y++) {
+      for (var x = 0; x < newWidth; x++, i += 4) {
+        if (falloff <= x && x < falloff + oldWidth &&
+            falloff <= y && y < falloff + oldHeight &&
+            data[((x - falloff) + (y - falloff) * oldWidth << 2) + 3] > 127) {
+          ping[i] = x;
+          ping[i + 1] = y;
+          ping[i + 2] = NaN;
+          ping[i + 3] = NaN;
+        }
+
+        else {
+          ping[i] = NaN;
+          ping[i + 1] = NaN;
+          ping[i + 2] = x;
+          ping[i + 3] = y;
+        }
+      }
+    }
+
+    var step = 1;
+    while (step < newWidth || step < newHeight) {
+      step <<= 1;
+    }
+
+    // Use jump flooding to compute the distance transform quickly. This
+    // actually computes two distance transforms to get the signed distance,
+    // one for the negative distances and one for the positive distances.
+    while (step > 0) {
+      for (var y = 0, i = 0; y < newHeight; y++) {
+        for (var x = 0; x < newWidth; x++, i += 4) {
+          var bestFirstDistance = Infinity;
+          var bestFirstX = NaN;
+          var bestFirstY = NaN;
+
+          var bestSecondDistance = Infinity;
+          var bestSecondX = NaN;
+          var bestSecondY = NaN;
+
+          for (var neighbor = 0; neighbor < 9; neighbor++) {
+            var nx = x + (neighbor % 3 - 1) * step;
+            var ny = y + ((neighbor / 3 | 0) - 1) * step;
+
+            if (0 <= nx && nx < newWidth && 0 <= ny && ny < newHeight) {
+              var j = nx + ny * newWidth << 2;
+              var oldBestFirstX = ping[j];
+              var oldBestFirstY = ping[j + 1];
+              var oldBestSecondX = ping[j + 2];
+              var oldBestSecondY = ping[j + 3];
+
+              if (oldBestFirstX === oldBestFirstX && oldBestFirstY === oldBestFirstY) {
+                var dx = x - oldBestFirstX;
+                var dy = y - oldBestFirstY;
+                var d = dx * dx + dy * dy;
+
+                if (d < bestFirstDistance) {
+                  bestFirstX = oldBestFirstX;
+                  bestFirstY = oldBestFirstY;
+                  bestFirstDistance = d;
+                }
+              }
+
+              if (oldBestSecondX === oldBestSecondX && oldBestSecondY === oldBestSecondY) {
+                var dx = x - oldBestSecondX;
+                var dy = y - oldBestSecondY;
+                var d = dx * dx + dy * dy;
+
+                if (d < bestSecondDistance) {
+                  bestSecondX = oldBestSecondX;
+                  bestSecondY = oldBestSecondY;
+                  bestSecondDistance = d;
+                }
+              }
+            }
+          }
+
+          pong[i] = bestFirstX;
+          pong[i + 1] = bestFirstY;
+          pong[i + 2] = bestSecondX;
+          pong[i + 3] = bestSecondY;
+        }
+      }
+
+      var swap = ping;
+      ping = pong;
+      pong = swap;
+      step >>= 1;
+    }
+
+    var bytes = new Uint8Array(newWidth * newHeight << 2);
+
+    // Merge the two distance transforms together to get an RGBA signed distance field
+    for (var y = 0, i = 0; y < newHeight; y++) {
+      for (var x = 0; x < newWidth; x++, i += 4) {
+        var firstX = ping[i] - x;
+        var firstY = ping[i + 1] - y;
+        var firstD = Math.sqrt(firstX * firstX + firstY * firstY);
+
+        var secondX = ping[i + 2] - x;
+        var secondY = ping[i + 3] - y;
+        var secondD = Math.sqrt(secondX * secondX + secondY * secondY);
+
+        bytes[i] = bytes[i + 1] = bytes[i + 2] = firstD !== firstD ? 0 : firstD > secondD
+          ? Math.max(0, Math.round(255 * (0.5 - 0.5 * (firstD - 0.5) / (falloff + 0.5))))
+          : Math.min(255, Math.round(255 * (0.5 + 0.5 * (secondD - 0.5) / (falloff + 0.5))));
+        bytes[i + 3] = 255;
+      }
+    }
+
+    return {
+      width: newWidth,
+      height: newHeight,
+      data: bytes,
+      originX: image.originX + falloff,
+      originY: image.originY + falloff,
+      advance: image.advance,
+    };
+  }
+
+  function generate() {
+    if (isStarting) {
+      return;
+    }
+
+    var codePoints = generateCodePoints();
+    var images = [];
+
+    for (var i = 0; i < codePoints.length; i++) {
+      images.push(renderCodePoint(codePoints[i], 2));
+    }
+
+    var packed = pack(images);
+    var imageData = context.createImageData(packed.width, packed.height);
+    var data = imageData.data;
+
+    if (checkboxDisplayTypeDistanceField.checked) {
+      for (var i = 0; i < data.length; i += 4) {
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
+        data[i + 3] = 255;
+      }
+    }
+
+    else {
+      for (var i = 0; i < data.length; i += 4) {
+        data[i] = backgroundColor.r;
+        data[i + 1] = backgroundColor.g;
+        data[i + 2] = backgroundColor.b;
+        data[i + 3] = backgroundColor.a;
+      }
+    }
+
+    for (var i = 0; i < codePoints.length; i++) {
+      var image = images[i];
+      var coordinates = packed.coordinates[i];
+
+      for (var y = 0; y < image.height; y++) {
+        var start = y * image.width << 2;
+        data.set(image.data.subarray(start, start + (image.width << 2)), coordinates.x + (coordinates.y + y) * packed.width << 2);
+      }
+    }
+
+    canvas.width = packed.width;
+    canvas.height = packed.height;
+    context.putImageData(imageData, 0, 0);
+
+    var json = {
+      name: fontName,
+      size: fontSize,
+      bold: checkboxFontBold.checked,
+      italic: checkboxFontItalic.checked,
+      width: packed.width,
+      height: packed.height,
+    };
+
+    var characters = codePoints.map(function(codePoint, i) {
+      var image = images[i];
+      return {
+        text: codePointToString(codePoint),
+        x: packed.coordinates[i].x - padding,
+        y: packed.coordinates[i].y - padding,
+        width: image.width + 2 * padding,
+        height: image.height + 2 * padding,
+        originX: image.originX + padding,
+        originY: image.originY + padding,
+        advance: image.advance,
+      };
+    });
+
+    if (checkboxDataFormatJSON.checked) {
+      var map = {};
+      characters.forEach(function(character) {
+        var text = character.text;
+        delete character.text;
+        map[text] = character;
+      });
+      json.characters = null;
+      textarea.value = JSON.stringify(json, null, 2).replace('null',
+        JSON.stringify(map).replace(/^\{(.*)\}$/, '{\n    $1\n  }').replace(/},"/g, '},\n    "'));
+    }
+
+    else if (checkboxDataFormatXML.checked) {
+      var xml = document.createElement('font');
+      for (var key in json) {
+        xml.setAttribute(xmlAttribute(key), json[key]);
+      }
+      characters.forEach(function(character) {
+        var element = document.createElement('character');
+        for (var key in character) {
+          element.setAttribute(xmlAttribute(key), character[key]);
+        }
+        xml.appendChild(document.createTextNode('\n  '));
+        xml.appendChild(element);
+      });
+      xml.appendChild(document.createTextNode('\n'));
+      textarea.value = new XMLSerializer().serializeToString(xml).replace(/><\/character/g, '/');
+    }
+
+    else if (checkboxDataFormatC.checked) {
+      var name = json.name.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/, '_').replace(/(?:^_|_$)/, '');
+      textarea.value = [].concat([
+        'typedef struct Character {',
+        '  int codePoint, x, y, width, height, originX, originY;',
+        '} Character;',
+        '',
+        'typedef struct Font {',
+        '  const char *name;',
+        '  int size, bold, italic, width, height, characterCount;',
+        '  Character *characters;',
+        '} Font;',
+        '',
+        'static Character characters_' + name + '[] = {'],
+        characters.map(function(character) {
+          var codePoint = generateCodePointsText(character.text)[0];
+          return '  {' + (
+              character.text === "'" ? "'\\''" :
+              character.text === '\\' ? "'\\\\'" :
+              codePoint >= 0x20 && codePoint <= 0x7E ? "'" + character.text + "'" :
+              codePoint) +
+            ', ' + character.x + ', ' + character.y +
+            ', ' + character.width + ', ' + character.height +
+            ', ' + character.originX + ', ' + character.originY +
+          '},';
+        }),
+        ['};',
+        '',
+        'static Font font_' + name + ' = {' + JSON.stringify(json.name) + ', ' + json.size + ', ' +
+          (json.bold | 0) + ', ' + (json.italic | 0) + ', ' + json.width + ', ' + json.height + ', ' +
+          characters.length + ', characters_' + name + '};',
+      ]).join('\n');
+    }
+
+    var png = canvas.toDataURL();
+    buttonDownload.disabled = false;
+    buttonDownload.onclick = function() {
+      var link = document.createElement('a');
+      link.download = 'font.png';
+      link.href = png;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+  }
+
+  function xmlAttribute(name) {
+    return name.replace(/([a-z])([A-Z])/g, function(x) {
+      return x[0] + '-' + x[1].toLowerCase();
+    });
+  }
+
+  buttonGenerate.onclick = generate;
+
+  checkboxCharactersASCII.onchange = updateCharacters;
+  checkboxCharactersCustom.onchange = updateCharacters;
+  checkboxDataFormatC.onchange = generate;
+  checkboxDataFormatJSON.onchange = generate;
+  checkboxDataFormatXML.onchange = generate;
+  checkboxDisplayTypeDistanceField.onchange = updateDisplayType;
+  checkboxDisplayTypeNormal.onchange = updateDisplayType;
+  checkboxFontBold.onchange = generate;
+  checkboxFontItalic.onchange = generate;
+  checkboxResolutionPowerOf2.onchange = generate;
+  checkboxResolutionSmallest.onchange = generate;
+  checkboxStrokeJoinMiter.onchange = generate;
+  checkboxStrokeJoinRound.onchange = generate;
+
+  textboxBackgroundColor.oninput = checkBackgroundColor;
+  textboxDistanceFieldFalloff.oninput = checkDistanceFieldFalloff;
+  textboxFillColor.oninput = checkFillColor;
+  textboxFontName.oninput = checkFontName;
+  textboxFontSize.oninput = checkFontSize;
+  textboxStrokeColor.oninput = checkStrokeColor;
+  textboxStrokeThickness.oninput = checkStrokeThickness;
+
+  textboxBackgroundColor.onkeydown = generateOnEnter;
+  textboxCustomCharacters.onkeydown = generateOnEnter;
+  textboxDistanceFieldFalloff.onkeydown = handleArrowKeys;
+  textboxFillColor.onkeydown = generateOnEnter;
+  textboxFontName.onkeydown = generateOnEnter;
+  textboxFontName.onkeypress = autocompleteFontName;
+  textboxFontSize.onkeydown = handleArrowKeys;
+  textboxStrokeColor.onkeydown = generateOnEnter;
+  textboxStrokeThickness.onkeydown = handleArrowKeys;
+
+  checkBackgroundColor();
+  checkDistanceFieldFalloff();
+  checkFillColor();
+  checkFontName();
+  checkFontSize();
+  checkStrokeColor();
+  checkStrokeThickness();
+  updateCharacters();
+  updateDisplayType();
+
+  isStarting = false;
+  generate();
+})();
+
+    </script>
+  </body>
+</html>

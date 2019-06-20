@@ -5,7 +5,8 @@
 #include <skift/iostream.h>
 #include <skift/cstring.h>
 #include <skift/error.h>
-#include <skift/drawing.h>
+#include <skift/bitmap.h>
+#include <skift/painter.h>
 #include <skift/logger.h>
 #include <skift/assert.h>
 

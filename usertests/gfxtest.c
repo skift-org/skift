@@ -5,7 +5,8 @@
 #include <skift/iostream.h>
 #include <skift/cstring.h>
 #include <skift/error.h>
-#include <skift/drawing.h>
+#include <skift/bitmap.h>
+#include <skift/painter.h>
 #include <skift/logger.h>
 #include <skift/assert.h>
 
@@ -31,16 +32,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    iostream_t *random_device = iostream_open("/dev/random", IOSTREAM_READ);
-
-    if (random_device == NULL)
-    {
-        error_print("Failled to open random");
-        return -1;
-    }
-
     bitmap_t* fb = bitmap(800, 600);
-    bitmap_t* test = bitmap_load_from("/res/test.png");
+    bitmap_t* test = bitmap_load_from("/res/font/mono.png");
 
     assert(test);
     logger_log(LOG_INFO, "Image loaded %dx%d", test->width, test->height);
@@ -68,8 +61,8 @@ int main(int argc, char **argv)
 
         char message[128];
         snprintf(message, 128, "%d frames", frame++);
-        painter_draw_text(paint, message, (point_t){17, 17}, (color_t){{0, 0, 0, 255}});
-        painter_draw_text(paint, message, (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
+        // painter_draw_text(paint, message, (point_t){17, 17}, (color_t){{0, 0, 0, 255}});
+        // painter_draw_text(paint, message, (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
         
         iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
     } while(true);

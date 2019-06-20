@@ -5,7 +5,8 @@
 #include <skift/iostream.h>
 #include <skift/cstring.h>
 #include <skift/error.h>
-#include <skift/drawing.h>
+#include <skift/bitmap.h>
+#include <skift/painter.h>
 #include <skift/logger.h>
 #include <skift/assert.h>
 
@@ -60,10 +61,10 @@ int main(int argc, char **argv)
         a_line_t line;
         iostream_read(random_device, &line, sizeof(line));
 
-        line.start.X = abs(line.start.X % 800);
-        line.start.Y = abs(line.start.Y % 600);
-        line.finish.X = abs(line.finish.X % 800);
-        line.finish.Y = abs(line.finish.Y % 600);
+        line.start.X  = abs((int)line.start.X % 800);
+        line.start.Y  = abs((int)line.start.Y % 600);
+        line.finish.X = abs((int)line.finish.X % 800);
+        line.finish.Y = abs((int)line.finish.Y % 600);
 
         painter_draw_line(paint, line.start, line.finish, line.color);
         

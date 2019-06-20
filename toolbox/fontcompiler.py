@@ -14,9 +14,8 @@ infp.close()
 outfp = open(out_filename, 'wb')
 
 for chr in data["characters"]:
-    glypth = data["characters"][chr]
-    outfp.write(struct.pack("I", ord(chr)))
-    outfp.write(struct.pack("IIIIIIII", ord(chr), glypth["x"], glypth["y"], glypth["width"], glypth["height"], glypth["originX"], glypth["originY"], glypth["advance"]))
+    glyph = data["characters"][chr]
+    outfp.write(struct.pack("IIIIIIII", ord(chr), glyph["x"], glyph["y"], glyph["width"], glyph["height"], glyph["originX"], glyph["originY"], glyph["advance"]))
 
 outfp.write(struct.pack("IIIIIIII", 0, 0, 0, 0, 0, 0, 0, 0))
 

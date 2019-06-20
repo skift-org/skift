@@ -101,7 +101,7 @@
       </tr>
       <tr>
         <th>Font size: &nbsp;</th>
-        <td><input type="text" id="fontSize" value="32"></td>
+        <td><input type="text" id="fontSize" value="16"></td>
       </tr>
       <tr>
         <th>Resolution: &nbsp;</th>
@@ -1106,7 +1106,7 @@
     buttonDownload.disabled = false;
     buttonDownload.onclick = function() {
       var link = document.createElement('a');
-      link.download = 'font.png';
+      link.download = textboxFontName.value.toLowerCase().replace(' ', '_') + '.png';
       link.href = png;
       document.body.appendChild(link);
       link.click();

@@ -15,6 +15,7 @@
 
 #include "compositor/client.h"
 #include "compositor/window.h"
+#include "compositor/assets.h"
 
 typedef struct
 {
@@ -39,28 +40,8 @@ typedef struct
     iostream_t *device;
     wmmouse_t mouse;
 
-    bitmap_t *cursors[MOUSE_CURSOR_STATE_COUNT];
     bitmap_t *wallpaper;
 } wmanager_t;
-
-void wmanager_load_assets(wmanager_t *wm)
-{
-    logger_log(LOG_INFO, "Loading assets...");
-
-    wm->cursors[MOUSE_CURSOR_STATE_DEFAULT] = bitmap_load_from("/res/mouse/default.png");
-    wm->cursors[MOUSE_CURSOR_STATE_DISABLED] = bitmap_load_from("/res/mouse/disabled.png");
-    wm->cursors[MOUSE_CURSOR_STATE_BUSY] = bitmap_load_from("/res/mouse/busy.png");
-    wm->cursors[MOUSE_CURSOR_STATE_TEXT] = bitmap_load_from("/res/mouse/text.png");
-    wm->cursors[MOUSE_CURSOR_STATE_MOVE] = bitmap_load_from("/res/mouse/move.png");
-    wm->cursors[MOUSE_CURSOR_STATE_RESIZEH] = bitmap_load_from("/res/mouse/resizeh.png");
-    wm->cursors[MOUSE_CURSOR_STATE_RESIZEV] = bitmap_load_from("/res/mouse/resizev.png");
-    wm->cursors[MOUSE_CURSOR_STATE_RESIZEHV] = bitmap_load_from("/res/mouse/resizehv.png");
-    wm->cursors[MOUSE_CURSOR_STATE_RESIZEVH] = bitmap_load_from("/res/mouse/resizevh.png");
-
-    wm->wallpaper = bitmap_load_from("/res/wallpaper/brand.png");
-
-    logger_log(LOG_FINE, "Loading assets");
-}
 
 bool wmanager_open_display(wmanager_t *wm)
 {
@@ -153,9 +134,9 @@ void wmanager_mouse_repaint(wmanager_t *wm)
 
     painter_blit_bitmap(
         wm->paint,
-        wm->cursors[mouse->state],
-        bitmap_bound(wm->cursors[mouse->state]),
-        (rectangle_t){.position = point_add(wm->mouse.position, offset), .size = bitmap_bound(wm->cursors[mouse->state]).size});
+        hideo_assets_get_mouse(mouse->state),
+        bitmap_bound(hideo_assets_get_mouse(mouse->state)),
+        (rectangle_t){.position = point_add(wm->mouse.position, offset), .size = bitmap_bound(hideo_assets_get_mouse(mouse->state)).size});
 
     wmanager_damage_region(wm, wmanager_mouse_bound(mouse));
 }
@@ -203,9 +184,9 @@ void wmanager_handle_mouse_move_event(wmanager_t *wm, mouse_move_event_t *event)
 
     painter_blit_bitmap(
         wm->paint,
-        wm->cursors[mouse->state],
-        bitmap_bound(wm->cursors[mouse->state]),
-        (rectangle_t){.position = point_add(wm->mouse.position, offset), .size = bitmap_bound(wm->cursors[mouse->state]).size});
+        hideo_assets_get_mouse(mouse->state),
+        bitmap_bound(hideo_assets_get_mouse(mouse->state)),
+        (rectangle_t){.position = point_add(wm->mouse.position, offset), .size = bitmap_bound(hideo_assets_get_mouse(mouse->state)).size});
 
     wmanager_damage_region(wm, wmanager_mouse_bound(mouse));
 }
@@ -242,7 +223,9 @@ int main(int argc, char **argv)
     wm.exited = false;
     wm.damage_index = 0;
 
-    wmanager_load_assets(&wm);
+    hideo_assets_load();
+
+    wm.wallpaper = bitmap_load_from("/res/wallpaper/brand.png");
 
     if (!wmanager_open_display(&wm))
     {
@@ -258,9 +241,11 @@ int main(int argc, char **argv)
     messaging_subscribe(MOUSE_CHANNEL);
     messaging_subscribe(KEYBOARD_CHANNEL);
 
+    font_t* fnt = font("sans");
+
     painter_blit_bitmap(wm.paint, wm.wallpaper, bitmap_bound(wm.wallpaper), bitmap_bound(wm.framebuffer));
-    // painter_draw_text(wm.paint, "hideo window manager", (point_t){17, 17}, (color_t){{0, 0, 0, 100}});
-    // painter_draw_text(wm.paint, "hideo window manager", (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
+ 
+    window_paint_decoration(wm.paint, (rectangle_t){{250, 200, 300, 200}}, "File manager");
 
     wmanager_mouse_repaint(&wm);
     wmanager_damage_region(&wm, bitmap_bound(wm.wallpaper));

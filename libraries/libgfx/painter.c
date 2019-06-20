@@ -86,6 +86,22 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
     }
 }
 
+void painter_clear_rect(painter_t *paint, rectangle_t rect, color_t color)
+{
+    rectangle_t rect_absolue = rectangle_child(paint->cliprect, rect);
+
+    for (int xx = 0; xx < rect_absolue.width; xx++)
+    {
+        for (int yy = 0; yy < rect_absolue.height; yy++)
+        {
+            bitmap_set_pixel(
+                paint->bitmap,
+                (point_t){rect_absolue.X + xx, rect_absolue.Y + yy},
+                color);
+        }
+    }
+}
+
 void painter_fill_rect(painter_t *paint, rectangle_t rect, color_t color)
 {
     rectangle_t rect_absolue = rectangle_child(paint->cliprect, rect);
@@ -191,13 +207,14 @@ void painter_blit_bitmap_sdf(painter_t *paint, bitmap_t *src, rectangle_t src_re
 
             double distance = (sample.R / 150.0);
             double edge0 = FONT_BUFFER - FONT_GAMMA * 1.4142 / size;
-			double edge1 = FONT_BUFFER + FONT_GAMMA * 1.4142 / size;
+            double edge1 = FONT_BUFFER + FONT_GAMMA * 1.4142 / size;
 
             double a = (distance - edge0) / (edge1 - edge0);
-			if (a < 0.0) a = 0.0;
-			if (a > 1.0) a = 1.0;
-			a = a * a * (3 - 2 * a);
-
+            if (a < 0.0)
+                a = 0.0;
+            if (a > 1.0)
+                a = 1.0;
+            a = a * a * (3 - 2 * a);
 
             color_t final = color;
             final.A = a * 255;
@@ -216,16 +233,23 @@ void painter_draw_glyph(painter_t *paint, font_t *font, glyph_t *glyph, point_t 
     painter_blit_bitmap_sdf(paint, font->bitmap, glyph->bound, dest, size, color);
 }
 
-void painter_draw_text(painter_t *paint, font_t *font, const char *text, point_t position, float size, color_t color)
+void painter_draw_text(
+    painter_t *paint,
+    font_t *font,
+    const char *text,
+    int text_size,
+    point_t position,
+    float font_size,
+    color_t color)
 {
     point_t current = position;
 
-    for (int i = 0; text[i]; i++)
+    for (int i = 0; i < text_size; i++)
     {
         glyph_t *glyph = font_glyph(font, text[i]);
 
-        painter_draw_glyph(paint, font, glyph, current, size, color);
+        painter_draw_glyph(paint, font, glyph, current, font_size, color);
 
-        current = point_add(current, (point_t){glyph->advance * (size / FONT_SIZE), 0});
+        current = point_add(current, (point_t){glyph->advance * (font_size / FONT_SIZE), 0});
     }
 }

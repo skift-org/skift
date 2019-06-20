@@ -4,7 +4,8 @@ typedef PACKED(struct)
 {
     int X;
     int Y;
-} point_t;
+}
+point_t;
 
 #define point_zero ((point_t){0, 0})
 
@@ -41,7 +42,17 @@ static inline point_t point_y(point_t p)
     return (point_t){.X = 0, .Y = p.Y};
 }
 
-typedef PACKED(union) {
+typedef PACKED(struct)
+{
+    int top;
+    int bottom;
+    int left;
+    int right;
+}
+spacing_t;
+
+typedef PACKED(union)
+{
     struct
     {
         int X;
@@ -55,7 +66,8 @@ typedef PACKED(union) {
         point_t position;
         point_t size;
     };
-} rectangle_t;
+}
+rectangle_t;
 
 static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t child_rectangle)
 {
@@ -70,6 +82,30 @@ static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t chi
 
 static inline bool rectangle_containe_position(rectangle_t rectange, point_t position)
 {
-    return (rectange.X <= position.X && (rectange.X + rectange.width)  > position.X) &&
+    return (rectange.X <= position.X && (rectange.X + rectange.width) > position.X) &&
            (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);
+}
+
+static inline rectangle_t rectangle_shrink(rectangle_t rect, spacing_t spacing)
+{
+    rectangle_t result;
+
+    result.X      = rect.X + spacing.left;
+    result.Y      = rect.Y + spacing.top;
+    result.width  = rect.width  - spacing.left - spacing.right;
+    result.height = rect.height - spacing.top  - spacing.bottom;
+
+    return result;
+}
+
+static inline rectangle_t rectangle_expand(rectangle_t rect, spacing_t spacing)
+{
+    rectangle_t result;
+
+    result.X      = rect.X - spacing.left;
+    result.Y      = rect.Y - spacing.top;
+    result.width  = rect.width  + spacing.left + spacing.right;
+    result.height = rect.height + spacing.top  + spacing.bottom;
+
+    return result;
 }

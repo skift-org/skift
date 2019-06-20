@@ -11,8 +11,6 @@
 
 #define PATH_SEPARATOR '/'
 
-// Lenght of a path element including the \0
-
 typedef struct
 {
     list_t* elements;    

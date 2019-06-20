@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skift/drawing.h>
+#include <skift/shape.h>
 
 #include "compositor/client.h"
 #include "compositor/server.h"

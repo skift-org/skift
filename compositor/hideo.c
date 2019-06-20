@@ -1,7 +1,8 @@
 #include <skift/logger.h>
 #include <skift/iostream.h>
 #include <skift/messaging.h>
-#include <skift/drawing.h>
+#include <skift/bitmap.h>
+#include <skift/painter.h>
 #include <skift/error.h>
 #include <skift/widgets.h>
 
@@ -258,8 +259,8 @@ int main(int argc, char **argv)
     messaging_subscribe(KEYBOARD_CHANNEL);
 
     painter_blit_bitmap(wm.paint, wm.wallpaper, bitmap_bound(wm.wallpaper), bitmap_bound(wm.framebuffer));
-    painter_draw_text(wm.paint, "hideo window manager", (point_t){17, 17}, (color_t){{0, 0, 0, 100}});
-    painter_draw_text(wm.paint, "hideo window manager", (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
+    // painter_draw_text(wm.paint, "hideo window manager", (point_t){17, 17}, (color_t){{0, 0, 0, 100}});
+    // painter_draw_text(wm.paint, "hideo window manager", (point_t){16, 16}, (color_t){{255, 255, 255, 255}});
 
     wmanager_mouse_repaint(&wm);
     wmanager_damage_region(&wm, bitmap_bound(wm.wallpaper));

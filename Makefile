@@ -45,7 +45,6 @@ list:
 	@echo $(TARGETS_CLEAN)
 
 sync:
-	cp -a sysroot/* $(SYSROOT)
 	cp -a $(INCLUDES) $(SYSROOT)/lib/include/
 
 %.install: %
@@ -66,7 +65,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/me/share
 	mkdir -p $(SYSROOT)/me/anon
 	mkdir -p $(SYSROOT)/me/root
-	cp -ua $(INCLUDES) $(SYSROOT)/lib/
+	cp -a $(INCLUDES) $(SYSROOT)/lib/
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)

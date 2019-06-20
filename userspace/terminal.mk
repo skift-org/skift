@@ -1,2 +1,2 @@
 terminal.out: terminal.c
-	$(CC) $(CFLAGS) $^ -lvtc -o $@
+	$(CC) $(CFLAGS) $^ -lvtc -lgfx -o $@

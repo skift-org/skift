@@ -108,7 +108,7 @@ int font_measure_width(font_t* this, const char* str, int size)
 
     for (int i = 0; i < size; i++)
     {
-        glyph_t *g = font_glyph(font, str[i]);
+        glyph_t *g = font_glyph(this, str[i]);
         width += g->advance;
     }
 

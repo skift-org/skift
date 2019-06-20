@@ -1,4 +1,4 @@
-#include <skift/colors.h>
+#include <skift/color.h>
 #include <skift/math.h>
 
 color_t RGB(float R, float G, float B)

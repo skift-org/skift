@@ -1,7 +1,7 @@
 #pragma once
 
 #include <skift/math.h>
-#include <skift/colors.h>
+#include <skift/color.h>
 #include <skift/shape.h>
 
 typedef enum

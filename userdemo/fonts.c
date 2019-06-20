@@ -36,9 +36,21 @@ int main(int argc, char **argv)
 
     assert(fb);
 
-    font_t *mono = font("mono");
-
-    assert(mono);
+    font_t *fonts[] = {
+        font("mono"),
+        font("mono-italic"),
+        font("mono-bold"),
+        font("mono-bold-italic"),
+        font("sans"),
+        font("sans-italic"),
+        font("sans-bold"),
+        font("sans-bold-italic"),
+        font("serif"),
+        font("serif-italic"),
+        font("serif-bold"),
+        font("serif-bold-italic"),
+        NULL,
+    };
 
     painter_t *paint = painter(fb);
 
@@ -47,7 +59,13 @@ int main(int argc, char **argv)
     painter_fill_rect(paint, bitmap_bound(fb), COLOR_BLACK);
     painter_fill_rect(paint, (rectangle_t){{16, 16, 16, 16}}, COLOR_RED);
 
-    painter_draw_text(paint, mono, "The quick brown fox jumps over the lazy dog.", (point_t){16, 16}, 16, COLOR_WHITE);
+    const char* text = "The quick brown fox jumps over the lazy dog.";
+
+    for (int i = 0; fonts[i] != NULL; i++)
+    {
+        painter_draw_text(paint, fonts[i], text, (point_t){16, 32 + 32 * i}, 16, COLOR_WHITE);
+    }
+    
 
     iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
 

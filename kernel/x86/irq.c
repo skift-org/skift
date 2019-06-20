@@ -46,10 +46,10 @@ reg32_t irq_handler(reg32_t esp, processor_context_t context)
 
     if (context.int_no >= 8)
     {
-        outb(0xA0, 0x20);
+        out8(0xA0, 0x20);
     }
 
-    outb(0x20, 0x20);
+    out8(0x20, 0x20);
 
     atomic_enable();
 

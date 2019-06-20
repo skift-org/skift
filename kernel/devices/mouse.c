@@ -163,11 +163,11 @@ static inline void mouse_write(uchar a_write) //unsigned char
     //Wait to be able to send a command
     mouse_wait(1);
     //Tell the mouse we are sending a command
-    outb(0x64, 0xD4);
+    out8(0x64, 0xD4);
     //Wait for the final part
     mouse_wait(1);
     //Finally write
-    outb(0x60, a_write);
+    out8(0x60, a_write);
 }
 
 static inline uchar mouse_read(void)
@@ -185,17 +185,17 @@ void mouse_setup(void)
 
     // Enable the auxiliary mouse device
     mouse_wait(1);
-    outb(0x64, 0xA8);
+    out8(0x64, 0xA8);
 
     // Enable the interrupts
     mouse_wait(1);
-    outb(0x64, 0x20);
+    out8(0x64, 0x20);
     mouse_wait(0);
     _status = (in8(0x60) | 3);
     mouse_wait(1);
-    outb(0x64, 0x60);
+    out8(0x64, 0x60);
     mouse_wait(1);
-    outb(0x60, _status);
+    out8(0x60, _status);
 
     // Tell the mouse to use default settings
     mouse_write(0xF6);

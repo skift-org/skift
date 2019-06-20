@@ -48,13 +48,13 @@ static int serial_device_read(stream_t *s, void *buffer, uint size)
 void serial_setup()
 {
     // See: https://wiki.osdev.org/Serial_Ports
-    outb(PORT_COM1 + 1, 0x00);
-    outb(PORT_COM1 + 3, 0x80);
-    outb(PORT_COM1 + 0, 0x03);
-    outb(PORT_COM1 + 1, 0x00);
-    outb(PORT_COM1 + 3, 0x03);
-    outb(PORT_COM1 + 2, 0xC7);
-    outb(PORT_COM1 + 4, 0x0B);
+    out8(PORT_COM1 + 1, 0x00);
+    out8(PORT_COM1 + 3, 0x80);
+    out8(PORT_COM1 + 0, 0x03);
+    out8(PORT_COM1 + 1, 0x00);
+    out8(PORT_COM1 + 3, 0x03);
+    out8(PORT_COM1 + 2, 0xC7);
+    out8(PORT_COM1 + 4, 0x0B);
 
     device_t serial_device =
         {
@@ -74,7 +74,7 @@ char serial_getc()
 void serial_putc(char c)
 {
     wait_write();
-    outb(PORT_COM1, c);
+    out8(PORT_COM1, c);
 }
 
 int serial_read(char *buffer, uint size)

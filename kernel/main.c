@@ -43,9 +43,9 @@
 
 multiboot_info_t mbootinfo;
 
-void kmain(multiboot_info_t *info, s32 magic)
+void kmain(multiboot_info_t *info, uint magic)
 {
-    __plug_init(); // init skift.karm.core glue code.
+    __plug_init();
 
     logger_setlevel(LOG_ALL);
 

@@ -1,9 +1,11 @@
 #include <skift/atomic.h>
 #include <skift/error.h>
 #include <skift/cstring.h>
+#include <skift/math.h>
 
 #include <hjert/devices/framebuffer.h>
 
+#include "kernel/cpu/pci.h"
 #include "kernel/filesystem.h"
 #include "kernel/devices.h"
 #include "kernel/paging.h"
@@ -38,13 +40,13 @@
 
 void bga_write_register(u16 IndexValue, u16 DataValue)
 {
-    outw(VBE_DISPI_IOPORT_INDEX, IndexValue);
-    outw(VBE_DISPI_IOPORT_DATA, DataValue);
+    out16(VBE_DISPI_IOPORT_INDEX, IndexValue);
+    out16(VBE_DISPI_IOPORT_DATA, DataValue);
 }
 
 u16 bga_read_register(u16 IndexValue)
 {
-    outw(VBE_DISPI_IOPORT_INDEX, IndexValue);
+    out16(VBE_DISPI_IOPORT_INDEX, IndexValue);
     return in16(VBE_DISPI_IOPORT_DATA);
 }
 
@@ -69,40 +71,23 @@ bool bga_is_available(void)
     return found;
 }
 
+static void framebuffer_pci_get_framebuffer(uint32_t device, uint16_t vendor_id, uint16_t device_id, void *extra)
+{
+    if (vendor_id == 0x1234 && device_id == 0x1111)
+    {
+        *((u32*)extra) = pci_read_field(device, PCI_BAR0, 4);
+    }
+}
+
+
 void *bga_get_framebuffer()
 {               
-    atomic_begin();
-    paging_disable();
+    u32 lfb_addr = 0;
 
-    // FIXME: we should be getting that from PCI
+    pci_scan(framebuffer_pci_get_framebuffer, -1, &lfb_addr);
+    logger_log(LOG_INFO, "Framebuffer found at %08x", lfb_addr);
 
-    bga_set_bank(0);
-    u32 *lfb = 0;
-    u32 *text_vid_mem = (u32 *)0xA0000;
-    text_vid_mem[0] = 0xA5ADFACE;
-    text_vid_mem[1] = 0x12345678;
-    text_vid_mem[2] = 0xABCDEF00;
-
-    for (u32 fb_offset = 0xE0000000; fb_offset < 0xFF000000; fb_offset += 0x01000000)
-    {
-        /* Go find it */
-        for (u32 x = fb_offset; x < fb_offset + 0xFF0000; x += 0x1000)
-        {
-            u32 *maybe_framebuffer = (u32 *)x;
-
-            if (maybe_framebuffer[0] == 0xA5ADFACE &&
-                maybe_framebuffer[1] == 0x12345678 &&
-                maybe_framebuffer[2] == 0xABCDEF00)
-            {
-                lfb = (u32 *)x;
-            }
-        }
-    }
-
-    paging_enable();
-    atomic_end();
-
-    return (void *)lfb;
+    return (void *)lfb_addr;
 }
 
 void bga_disable(void)

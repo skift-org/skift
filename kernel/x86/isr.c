@@ -94,5 +94,5 @@ void isr_handler(processor_context_t context)
 		}
 	}
 
-	outb(0x20, 0x20);
+	out8(0x20, 0x20);
 }

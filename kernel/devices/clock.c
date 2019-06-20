@@ -17,13 +17,13 @@
 
 bool is_cmos_update()
 {
-    outb(CMOS_ADDRESS, 0x0A);
+    out8(CMOS_ADDRESS, 0x0A);
     return (in8(CMOS_DATA) & 0x80);
 }
 
 char get_realtime_reg(int reg)
 {
-    outb(CMOS_ADDRESS, reg);
+    out8(CMOS_ADDRESS, reg);
     return in8(CMOS_DATA);
 }
 

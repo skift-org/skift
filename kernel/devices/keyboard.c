@@ -236,6 +236,8 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
         message_t keytyped_event = message(KEYBOARD_KEYTYPED, -1);
         message_set_payload(keytyped_event, keyevent);
         task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keytyped_event);
+    
+        ispressed[scancode] = true;
     }    
     else if (scancode == 224)
     {

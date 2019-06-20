@@ -1202,9 +1202,9 @@ static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
 void timer_set_frequency(int hz)
 {
     u32 divisor = 1193180 / hz;
-    outb(0x43, 0x36);
-    outb(0x40, divisor & 0xFF);
-    outb(0x40, (divisor >> 8) & 0xFF);
+    out8(0x43, 0x36);
+    out8(0x40, divisor & 0xFF);
+    out8(0x40, (divisor >> 8) & 0xFF);
 
     logger_log(LOG_INFO, "Timer frequency is %dhz.", hz);
 }

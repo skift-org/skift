@@ -1,7 +1,7 @@
 #pragma once
 
 #include <skift/runtime.h>
-#include <skift/drawing.h>
+#include <skift/shape.h>
 
 #define FRAMEBUFFER_DEVICE "/dev/fb"
 #define FRAMEBUFFER_IOCTL_SET_MODE 0

@@ -179,9 +179,11 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 
     paint = painter(framebuffer);
 
+    painter_clear_rect(paint, bitmap_bound(framebuffer), framebuffer_colors[VTCOLOR_BLACK]);
+
     mono_font = font("mono");
 
-    return vtconsole(80, 25, framebuffer_paint_callback, framebuffer_cursor_move_callback);
+    return vtconsole(mode_info.width / char_size.X, mode_info.height / char_size.Y, framebuffer_paint_callback, framebuffer_cursor_move_callback);
 }
 
 /* --- Terminal read/write loop --------------------------------------------- */

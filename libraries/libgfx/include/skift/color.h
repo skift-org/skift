@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/runtime.h>
 
 typedef union {
@@ -22,9 +26,9 @@ color_t HSV(float H, float S, float V);
 
 color_t HSVA(float H, float S, float V, float A);
 
-color_t color_from_name(const char* name);
+color_t color_from_name(const char *name);
 
-void color_get_name(color_t color, char* name, int size);
+void color_get_name(color_t color, char *name, int size);
 
 color_t color_lerp(color_t a, color_t b, float transition);
 
@@ -32,7 +36,7 @@ color_t color_blerp(color_t c00, color_t c10, color_t c01, color_t c11, float tr
 
 color_t color_blend(color_t fg, color_t bg);
 
-#define COLOR(__value) ((color_t){{ (uchar)((__value)>>16), (uchar)((__value)>>8), (uchar)((__value)), 255}})
+#define COLOR(__value) ((color_t){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
 
 #define COLOR_ENUM(__ENTRY)                                               \
     __ENTRY(ALICEBLUE, AliceBlue, 0xF0, 0xF8, 0xFF)                       \

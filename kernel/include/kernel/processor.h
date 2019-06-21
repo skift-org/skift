@@ -8,7 +8,7 @@
 
 typedef u32 reg32_t;
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     reg32_t gs, fs, es, ds;
     reg32_t edi, esi, ebp, USELESS, ebx, edx, ecx, eax;
@@ -16,42 +16,47 @@ typedef PACKED(struct)
     reg32_t eip, cs, eflags;
 } processor_context_t;
 
-void processor_dump_context(processor_context_t* context);
+void processor_dump_context(processor_context_t *context);
 
 /* --- Static functions ----------------------------------------------------- */
 
 static inline reg32_t CR0()
 {
     u32 r;
-    asm volatile("mov %%cr0, %0": "=r"(r));
+    asm volatile("mov %%cr0, %0"
+                 : "=r"(r));
     return r;
 }
 
 static inline reg32_t CR1()
 {
     u32 r;
-    asm volatile("mov %%cr1, %0": "=r"(r));
+    asm volatile("mov %%cr1, %0"
+                 : "=r"(r));
     return r;
 }
 
 static inline reg32_t CR2()
 {
     u32 r;
-    asm volatile("mov %%cr2, %0": "=r"(r));
+    asm volatile("mov %%cr2, %0"
+                 : "=r"(r));
     return r;
 }
 
 static inline reg32_t CR3()
 {
     u32 r;
-    asm volatile("mov %%cr3, %0": "=r"(r));
+    asm volatile("mov %%cr3, %0"
+                 : "=r"(r));
     return r;
 }
 
 static inline reg32_t CR4()
 {
     u32 r;
-    asm volatile("mov %%cr4, %0": "=r"(r));
+    asm volatile("mov %%cr4, %0"
+                 : "=r"(r));
     return r;
 }
 

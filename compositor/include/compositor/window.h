@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/shape.h>
 #include <skift/painter.h>
 
@@ -15,10 +19,10 @@ typedef struct
     hideo_client_t *client;
 } hideo_window_t;
 
-hideo_window_t* hideo_window(hideo_server_t* server, hideo_client_t* client, rectangle_t bound);
+hideo_window_t *hideo_window(hideo_server_t *server, hideo_client_t *client, rectangle_t bound);
 
-void hideo_window_delete(hideo_window_t* this);
+void hideo_window_delete(hideo_window_t *this);
 
-void hideo_window_handle_request(hideo_window_t* this, message_t* request);
+void hideo_window_handle_request(hideo_window_t *this, message_t *request);
 
-void window_paint_decoration(painter_t *paint, rectangle_t bound, const char* title);
+void window_paint_decoration(painter_t *paint, rectangle_t bound, const char *title);

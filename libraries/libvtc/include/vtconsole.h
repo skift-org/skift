@@ -1,10 +1,15 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/runtime.h>
 
 #define VTC_DEFAULT_FOREGROUND VTCOLOR_GREY
 #define VTC_DEFAULT_BACKGROUND VTCOLOR_BLACK
-#define VTC_DEFAULT_ATTR (vtattr_t){ false, VTC_DEFAULT_FOREGROUND, VTC_DEFAULT_BACKGROUND }
+#define VTC_DEFAULT_ATTR \
+    (vtattr_t) { false, VTC_DEFAULT_FOREGROUND, VTC_DEFAULT_BACKGROUND }
 #define VTC_ANSI_PARSER_STACK_SIZE 8
 
 struct vtconsole;
@@ -29,7 +34,7 @@ typedef enum
     VTSTATE_ENDVAL,
 } vtansi_parser_state_t;
 
-typedef struct 
+typedef struct
 {
     int value;
     bool empty;
@@ -61,8 +66,8 @@ typedef struct
     int y;
 } vtcursor_t;
 
-typedef void  (*vtc_paint_handler_t)(struct vtconsole* vtc, vtcell_t* cell, int x, int y);
-typedef void (*vtc_cursor_handler_t)(struct vtconsole* vtc, vtcursor_t* cur);
+typedef void (*vtc_paint_handler_t)(struct vtconsole *vtc, vtcell_t *cell, int x, int y);
+typedef void (*vtc_cursor_handler_t)(struct vtconsole *vtc, vtcursor_t *cur);
 
 typedef struct vtconsole
 {
@@ -80,7 +85,7 @@ typedef struct vtconsole
     vtc_cursor_handler_t on_move;
 } vtconsole_t;
 
-vtconsole_t* vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move);
+vtconsole_t *vtconsole(int width, int height, vtc_paint_handler_t on_paint, vtc_cursor_handler_t on_move);
 void vtconsole_delete(vtconsole_t *c);
 
 void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy);

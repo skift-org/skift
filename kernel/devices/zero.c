@@ -12,7 +12,7 @@ int zero_device_read(stream_t *s, void *buffer, uint size)
     UNUSED(s);
 
     memset(buffer, 0, size);
-    
+
     return size;
 }
 
@@ -23,13 +23,11 @@ int zero_device_write(stream_t *s, const void *buffer, uint size)
     return size;
 }
 
-
 void zero_setup(void)
 {
-    device_t zero_device = 
-    {
+    device_t zero_device = {
         .read = zero_device_read,
-        .write = zero_device_write
+        .write = zero_device_write,
     };
 
     FILESYSTEM_MKDEV("/dev/zero", zero_device);

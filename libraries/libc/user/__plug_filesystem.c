@@ -1,5 +1,8 @@
-#include <skift/__plugs__.h>
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
+#include <skift/__plugs__.h>
 #include <skift/filesystem.h>
 #include <hjert/syscalls.h>
 
@@ -23,7 +26,7 @@ int filesystem_mkfifo(const char *path)
     return __syscall(SYS_FILESYSTEM_MKFIFO, (int)path, 0, 0, 0, 0);
 }
 
-int filesystem_rename(const char* old_path, const char* new_path)
+int filesystem_rename(const char *old_path, const char *new_path)
 {
     return __syscall(SYS_FILESYSTEM_RENAME, (int)old_path, (int)new_path, 0, 0, 0);
 }

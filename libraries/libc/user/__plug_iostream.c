@@ -1,5 +1,8 @@
-#include <skift/__plugs__.h>
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
+#include <skift/__plugs__.h>
 #include <skift/iostream.h>
 #include <hjert/syscalls.h>
 

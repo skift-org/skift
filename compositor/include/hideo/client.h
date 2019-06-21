@@ -1,12 +1,16 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <hideo/common.h>
 
 /* --- Client connection to the server -------------------------------------- */
 
 #define HIDEO_CLIENT_HELLO "hideo:client.hello"
 
-typedef struct 
+typedef struct
 {
     char name[128];
 } hideo_client_hello_t;

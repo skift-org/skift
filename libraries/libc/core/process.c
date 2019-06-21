@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/__plugs__.h>
 #include <skift/error.h>
 #include <skift/process.h>
@@ -46,12 +50,12 @@ int process_free(uint addr, uint count)
     return __plug_process_free(addr, count);
 }
 
-int process_get_cwd(char* buffer, uint size)
+int process_get_cwd(char *buffer, uint size)
 {
     return __plug_process_get_cwd(buffer, size);
 }
 
-int process_set_cwd(const char* cwd)
+int process_set_cwd(const char *cwd)
 {
     int result = __plug_process_set_cwd(cwd);
     RETURN_AND_SET_ERROR(result, result, -1);
@@ -67,7 +71,7 @@ int process_wakeup(int pid)
     return __plug_process_wakeup(pid);
 }
 
-int process_wait(int pid, int* exit_value)
+int process_wait(int pid, int *exit_value)
 {
     return __plug_process_wait(pid, exit_value);
 }

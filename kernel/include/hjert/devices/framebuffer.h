@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/runtime.h>
 #include <skift/shape.h>
 
@@ -9,7 +13,7 @@
 #define FRAMEBUFFER_IOCTL_BLIT 2
 #define FRAMEBUFFER_IOCTL_BLITREGION 3
 
-#define FRAMEBUFFER_CHANNEL     "#dev:framebuffer"
+#define FRAMEBUFFER_CHANNEL "#dev:framebuffer"
 #define FRAMEBUFFER_MODE_CHANGE "framebuffer.modechange"
 
 typedef struct
@@ -22,6 +26,6 @@ typedef struct
 
 typedef struct
 {
-    void* src;
+    void *src;
     rectangle_t bound;
 } framebuffer_region_t;

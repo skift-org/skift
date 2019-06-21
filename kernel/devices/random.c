@@ -13,9 +13,9 @@ int random_device_read(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
 
-    byte* b = buffer;
-    
-    for(uint i = 0; i < size; i++)
+    byte *b = buffer;
+
+    for (uint i = 0; i < size; i++)
     {
         uint x = state;
         x ^= x << 13;
@@ -25,14 +25,15 @@ int random_device_read(stream_t *s, void *buffer, uint size)
 
         b[i] = (byte)x;
     }
-    
-    
+
     return size;
 }
 
 int random_device_write(stream_t *s, const void *buffer, uint size)
 {
-    UNUSED(s); UNUSED(buffer); UNUSED(size);
+    UNUSED(s);
+    UNUSED(buffer);
+    UNUSED(size);
 
     return 0;
 }

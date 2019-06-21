@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/atomic.h>
 #include <skift/error.h>
 #include <skift/cstring.h>
@@ -75,13 +79,12 @@ static void framebuffer_pci_get_framebuffer(uint32_t device, uint16_t vendor_id,
 {
     if (vendor_id == 0x1234 && device_id == 0x1111)
     {
-        *((u32*)extra) = pci_read_field(device, PCI_BAR0, 4);
+        *((u32 *)extra) = pci_read_field(device, PCI_BAR0, 4);
     }
 }
 
-
 void *bga_get_framebuffer()
-{               
+{
     u32 lfb_addr = 0;
 
     pci_scan(framebuffer_pci_get_framebuffer, -1, &lfb_addr);
@@ -144,8 +147,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
 
                 if (framebuffer_physical_addr == NULL)
                 {
-                    framebuffer_physical_addr = bga_get_framebuffer();            
-
+                    framebuffer_physical_addr = bga_get_framebuffer();
 
                     if (framebuffer_physical_addr != NULL)
                     {

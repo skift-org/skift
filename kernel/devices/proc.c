@@ -19,7 +19,7 @@ int proc_device_open(stream_t *stream)
     task_info_t *infos = malloc(sizeof(task_info_t) * list_count(tasks));
 
     int index = 0;
-    
+
     list_foreach(i, tasks)
     {
         task_t *task = i->value;
@@ -78,7 +78,8 @@ void proc_setup(void)
         .open = proc_device_open,
         .close = proc_device_close,
         .read = proc_device_read,
-        .write = proc_device_write};
+        .write = proc_device_write,
+    };
 
     FILESYSTEM_MKDEV("/dev/proc", zero_device);
 }

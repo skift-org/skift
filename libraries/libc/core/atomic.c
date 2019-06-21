@@ -29,7 +29,6 @@ void atomic_begin()
     {
         asm volatile("cli");
         atomic_depth++;
-        
     }
 }
 

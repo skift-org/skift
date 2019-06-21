@@ -7,7 +7,7 @@
 #include <skift/cstring.h>
 #include <skift/tar.h>
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     char name[100];     /*   0 */
     char mode[8];       /* 100 */

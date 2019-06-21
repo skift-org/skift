@@ -21,6 +21,7 @@ typedef enum
 } log_level_t;
 
 void logger_setlevel(log_level_t level);
-void __logger_log(log_level_t level, const char * file, uint line, const char * function, const char * fmt, ...);
 
-#define logger_log(level,va...) __logger_log(level, __FILE__, __LINE__, __FUNCTION__, va)
+void __logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...);
+
+#define logger_log(level, va...) __logger_log(level, __FILE__, __LINE__, __FUNCTION__, va)

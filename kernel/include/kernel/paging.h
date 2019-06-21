@@ -12,14 +12,14 @@
 #define PAGE_SIZE 0x1000
 #define PAGE_ALIGN(__x) ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
 
-#define PAGE_ALIGN_UP(__x)   ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
+#define PAGE_ALIGN_UP(__x) ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
 #define PAGE_ALIGN_DOWN(__x) ((__x) - ((__x) % PAGE_SIZE))
 
 #define IS_PAGE_ALIGN(__x) (__x % PAGE_SIZE == 0)
 
-typedef PACKED(union) // page table entry
+typedef union attr_packed // page table entry
 {
-    PACKED(struct)
+    struct attr_packed
     {
         bool Present : 1;
         bool Write : 1;
@@ -34,18 +34,15 @@ typedef PACKED(union) // page table entry
     };
 
     u32 as_uint;
-}
-page_t;
+} page_t;
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     page_t pages[PAGE_TABLE_ENTRY_COUNT];
-}
-page_table_t;
+} page_table_t;
 
-typedef PACKED(union) // page directorie entry
-{
-    PACKED(struct)
+typedef union attr_packed {
+    struct attr_packed
     {
         bool Present : 1;
         bool Write : 1;
@@ -59,14 +56,12 @@ typedef PACKED(union) // page directorie entry
         u32 PageFrameNumber : 20;
     };
     u32 as_uint;
-}
-page_directorie_entry_t;
+} page_directorie_entry_t;
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     page_directorie_entry_t entries[PAGE_DIRECTORIE_ENTRY_COUNT];
-}
-page_directorie_t;
+} page_directorie_t;
 
 extern void paging_enable(void);
 extern void paging_disable(void);

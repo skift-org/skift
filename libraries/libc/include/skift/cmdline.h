@@ -63,9 +63,9 @@ typedef struct s_cmdline
         .help = NULL,                        \
     }
 
-#define CMDLINE_OPT_SEPARATOR              \
+#define CMDLINE_OPT_SEPARATOR                \
     {                                        \
-        .type = CMDLINE_SEPARATOR,             \
+        .type = CMDLINE_SEPARATOR,           \
         .value = CMDLINE_NO_VALUE,           \
         .long_name = NULL,                   \
         .short_name = CMDLINE_NO_SHORT_NAME, \

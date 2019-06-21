@@ -26,10 +26,9 @@ int null_device_write(stream_t *s, const void *buffer, uint size)
 
 void null_setup(void)
 {
-    device_t null_device = 
-    {
+    device_t null_device = {
         .read = null_device_read,
-        .write = null_device_write
+        .write = null_device_write,
     };
 
     FILESYSTEM_MKDEV("/dev/null", null_device);

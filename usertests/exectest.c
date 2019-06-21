@@ -9,15 +9,16 @@
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc); UNUSED(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     for (int i = 0; i < LOOP_MAX; i++)
     {
         printf("\n%d out %d...", i, LOOP_MAX);
-        int pid = process_exec("/bin/sysfetch", (const char*[]){"sysfetch", NULL});
+        int pid = process_exec("/bin/sysfetch", (const char *[]){"sysfetch", NULL});
         process_wait(pid, NULL);
     }
-    
+
     printf("\nPASS");
 
     return 0;

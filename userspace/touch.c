@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++)
     {
-        iostream_t* stream = iostream_open(argv[i], IOSTREAM_CREATE);
+        iostream_t *stream = iostream_open(argv[i], IOSTREAM_CREATE);
         iostream_close(stream);
     }
 

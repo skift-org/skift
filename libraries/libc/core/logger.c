@@ -15,16 +15,15 @@ struct
 {
     uint level;
     const char *name;
-} level_names[] =
-{
-    { LOG_FATAL,   "\033[41;1m[ fatal  ]" },
-    { LOG_SEVERE,  "\033[41;1m[ severe ]" },
-    { LOG_ERROR,   "\033[41m[ error ]"    },
-    { LOG_WARNING, "\033[33m[ warn ]"     },
-    { LOG_INFO,    "\033[37m[ info ]"     },
-    { LOG_CONFIG,  "\033[30;1m[ conf ]"   },
-    { LOG_DEBUG,   "\033[30;1m[ debug ]"  },
-    { LOG_FINE,    "\033[30;1m[ fine ]"   }
+} level_names[] = {
+    {LOG_FATAL, "\033[41;1m[ fatal  ]"},
+    {LOG_SEVERE, "\033[41;1m[ severe ]"},
+    {LOG_ERROR, "\033[41m[ error ]"},
+    {LOG_WARNING, "\033[33m[ warn ]"},
+    {LOG_INFO, "\033[37m[ info ]"},
+    {LOG_CONFIG, "\033[30;1m[ conf ]"},
+    {LOG_DEBUG, "\033[30;1m[ debug ]"},
+    {LOG_FINE, "\033[30;1m[ fine ]"},
 };
 
 const char *log_describe(log_level_t level)

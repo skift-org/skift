@@ -1,10 +1,14 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/assert.h>
 #include <skift/lock.h>
 
 #define OBJECT_MAGIC 0xBADF00CA
-#define GET_OBJECT_HEADER(__object) (((object_header_t*)(__object)) - 1) 
+#define GET_OBJECT_HEADER(__object) (((object_header_t *)(__object)) - 1)
 
-typedef struct 
+typedef struct
 {
     uint magic;
     lock_t lock;
@@ -15,7 +19,7 @@ typedef struct
 
 object_t *object(uint size, object_dtor_t dtor)
 {
-    object_header_t* header = malloc(sizeof(object_header_t) + size);
+    object_header_t *header = malloc(sizeof(object_header_t) + size);
 
     header->magic = OBJECT_MAGIC;
     header->refcount = 1;
@@ -23,14 +27,14 @@ object_t *object(uint size, object_dtor_t dtor)
     header->size = size;
     lock_init(header->lock);
 
-    return (object_t*)(header + 1);
+    return (object_t *)(header + 1);
 }
 
 void object_lock(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
@@ -41,7 +45,7 @@ bool object_trylock(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
@@ -52,7 +56,7 @@ void object_unlock(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
@@ -63,12 +67,12 @@ object_t *object_retain(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
     object_lock(this);
-    
+
     header->refcount++;
 
     object_unlock(this);
@@ -78,14 +82,15 @@ object_t *object_retain(object_t *this)
 
 void object_release(object_t *this)
 {
-    if (this != NULL) return;
+    if (this != NULL)
+        return;
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
     object_lock(this);
-    
+
     header->refcount--;
 
     if (header->refcount == 0)
@@ -108,12 +113,12 @@ int object_refcount(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
     object_lock(this);
-    
+
     int refcount = header->refcount;
 
     object_unlock(this);
@@ -121,16 +126,16 @@ int object_refcount(object_t *this)
     return refcount;
 }
 
-int object_size(object_t* this)
+int object_size(object_t *this)
 {
     assert(this != NULL);
 
-    object_header_t* header = GET_OBJECT_HEADER(this);
+    object_header_t *header = GET_OBJECT_HEADER(this);
 
     assert(header->magic == OBJECT_MAGIC);
 
     object_lock(this);
-    
+
     int size = header->size;
 
     object_unlock(this);

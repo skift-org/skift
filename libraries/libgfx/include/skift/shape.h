@@ -1,11 +1,16 @@
 #pragma once
 
-typedef PACKED(struct)
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <skift/math.h>
+
+typedef struct attr_packed
 {
     int X;
     int Y;
-}
-point_t;
+} point_t;
 
 #define point_zero ((point_t){0, 0})
 
@@ -42,17 +47,15 @@ static inline point_t point_y(point_t p)
     return (point_t){.X = 0, .Y = p.Y};
 }
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     int top;
     int bottom;
     int left;
     int right;
-}
-spacing_t;
+} spacing_t;
 
-typedef PACKED(union)
-{
+typedef union attr_packed {
     struct
     {
         int X;
@@ -66,8 +69,7 @@ typedef PACKED(union)
         point_t position;
         point_t size;
     };
-}
-rectangle_t;
+} rectangle_t;
 
 static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t child_rectangle)
 {
@@ -90,10 +92,10 @@ static inline rectangle_t rectangle_shrink(rectangle_t rect, spacing_t spacing)
 {
     rectangle_t result;
 
-    result.X      = rect.X + spacing.left;
-    result.Y      = rect.Y + spacing.top;
-    result.width  = rect.width  - spacing.left - spacing.right;
-    result.height = rect.height - spacing.top  - spacing.bottom;
+    result.X = rect.X + spacing.left;
+    result.Y = rect.Y + spacing.top;
+    result.width = rect.width - spacing.left - spacing.right;
+    result.height = rect.height - spacing.top - spacing.bottom;
 
     return result;
 }
@@ -102,10 +104,10 @@ static inline rectangle_t rectangle_expand(rectangle_t rect, spacing_t spacing)
 {
     rectangle_t result;
 
-    result.X      = rect.X - spacing.left;
-    result.Y      = rect.Y - spacing.top;
-    result.width  = rect.width  + spacing.left + spacing.right;
-    result.height = rect.height + spacing.top  + spacing.bottom;
+    result.X = rect.X - spacing.left;
+    result.Y = rect.Y - spacing.top;
+    result.width = rect.width + spacing.left + spacing.right;
+    result.height = rect.height + spacing.top + spacing.bottom;
 
     return result;
 }

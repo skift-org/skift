@@ -22,14 +22,14 @@ static void mouse_send_button_event(mouse_button_t btn, bool up)
 {
     mouse_button_event_t event = (mouse_button_event_t){.button = btn};
     message_t msg;
-    
+
     if (up)
     {
         msg = message(MOUSE_BUTTONUP, -1);
     }
     else
     {
-        msg = message(MOUSE_BUTTONDOWN , -1);
+        msg = message(MOUSE_BUTTONDOWN, -1);
     }
 
     message_set_payload(msg, event);

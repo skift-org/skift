@@ -27,7 +27,7 @@ void __plug_init(void)
     in_stream = NULL; // FIXME: no stdin,
     out_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     err_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
-    log_stream = iostream_open("/dev/serial",  IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
+    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
 }
 
 void __plug_fini(int exit_code)
@@ -45,7 +45,7 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
     process_exit(-1);
 }
 
-void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line)
+void __plug_lock_assert_failed(lock_t *lock, const char *file, const char *function, int line)
 {
     logger_log(LOG_FATAL, "Lock assert failed: %s hold by %d in %s:%s() ln%d!", lock->name, lock->holder, file, function, line);
     process_exit(-1);

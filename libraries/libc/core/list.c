@@ -2,7 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-
 #include <skift/list.h>
 
 list_t *list()

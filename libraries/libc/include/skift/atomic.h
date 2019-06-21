@@ -14,10 +14,10 @@ bool is_atomic(void);
 
 #define ASSERT_ATOMIC assert(is_atomic())
 
-#define ATOMIC(code)       \
-    do                     \
-    {                      \
+#define ATOMIC(code)    \
+    do                  \
+    {                   \
         atomic_begin(); \
-        code;              \
+        code;           \
         atomic_end();   \
     } while (0);

@@ -4,9 +4,8 @@
 
 #include <skift/math.h>
 
-static double sin_table[] = 
-{
-	0,
+static double sin_table[] = {
+    0,
     0.01745240644,
     0.03489949671,
     0.05233595625,
@@ -366,7 +365,7 @@ static double sin_table[] =
     -0.05233595543,
     -0.03489949589,
     -0.01745240562,
-    0.0
+    0.0,
 };
 
 double floor(double x)

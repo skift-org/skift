@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/runtime.h>
 
 #define SYSTEM_INFO_FIELD_SIZE 65
@@ -19,10 +23,10 @@ typedef struct
 
     uint total_ram;
     uint used_ram;
-    
+
     int running_tasks;
 } system_status_t;
 
 // Retrived system information like kernel name and system release.
 void system_get_info(system_info_t *info);
-void system_get_status(system_status_t * status);
+void system_get_status(system_status_t *status);

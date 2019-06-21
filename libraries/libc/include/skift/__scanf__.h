@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/runtime.h>
 
 struct scanf_info;
@@ -27,7 +31,7 @@ typedef struct scanf_info
     // Scanner
     uint lenght;
 
-    void* p;
+    void *p;
     int n;
     int max_n;
 } scanf_info_t;

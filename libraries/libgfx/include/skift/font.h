@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/bitmap.h>
 
 typedef struct
@@ -12,16 +16,16 @@ typedef struct
 
 typedef struct
 {
-    bitmap_t* bitmap;
+    bitmap_t *bitmap;
 
     glyph_t default_glyph;
-    glyph_t* glyph;
+    glyph_t *glyph;
 } font_t;
 
-font_t* font(const char* name);
+font_t *font(const char *name);
 
-void font_delete(font_t* this);
+void font_delete(font_t *this);
 
-glyph_t* font_glyph(font_t *this, int codepoint);
+glyph_t *font_glyph(font_t *this, int codepoint);
 
-int font_measure_width(font_t* this, float font_size, const char* str, int str_size);
+int font_measure_width(font_t *this, float font_size, const char *str, int str_size);

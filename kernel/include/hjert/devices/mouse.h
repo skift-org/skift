@@ -1,13 +1,17 @@
 #pragma once
 
-#define MOUSE_DEVICE     "/dev/mice"
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
-#define MOUSE_CHANNEL    "#dev:mouse"
+#define MOUSE_DEVICE "/dev/mice"
 
-#define MOUSE_MOVE       "devmouse.move"
-#define MOUSE_SCROLL     "devmouse.scroll"
+#define MOUSE_CHANNEL "#dev:mouse"
+
+#define MOUSE_MOVE "devmouse.move"
+#define MOUSE_SCROLL "devmouse.scroll"
 #define MOUSE_BUTTONDOWN "devmouse.buttonpressed"
-#define MOUSE_BUTTONUP   "devmouse.buttonreleased"
+#define MOUSE_BUTTONUP "devmouse.buttonreleased"
 
 typedef enum
 {

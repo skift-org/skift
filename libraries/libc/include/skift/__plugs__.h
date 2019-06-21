@@ -17,7 +17,7 @@ void __plug_fini(int exit_code);
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 
-void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line);
+void __plug_lock_assert_failed(lock_t *lock, const char *file, const char *function, int line);
 
 // Logger ------------------------------------------------------------------- //
 
@@ -55,42 +55,42 @@ int __plug_iostream_fstat(int fd, iostream_stat_t *stat);
 
 /* --- File system ---------------------------------------------------------- */
 
-int __plug_filesystem_link(const char* oldpath, const char* newpath);
+int __plug_filesystem_link(const char *oldpath, const char *newpath);
 
-int __plug_filesystem_unlink(const char* path);
+int __plug_filesystem_unlink(const char *path);
 
-int __plug_filesystem_mkdir(const char* path);
+int __plug_filesystem_mkdir(const char *path);
 
 /* --- System --------------------------------------------------------------- */
 
-void __plug_system_get_info(system_info_t* info);
+void __plug_system_get_info(system_info_t *info);
 
-void __plug_system_get_status(system_status_t* status);
+void __plug_system_get_status(system_status_t *status);
 
 /* --- Processes ------------------------------------------------------------ */
 
-int  __plug_process_this(void);
+int __plug_process_this(void);
 
-int  __plug_process_exec(const char *file_name, const char **argv);
+int __plug_process_exec(const char *file_name, const char **argv);
 
-int  __plug_process_exit(int code);
+int __plug_process_exit(int code);
 
-int  __plug_process_cancel(int pid);
+int __plug_process_cancel(int pid);
 
-int  __plug_process_map(uint addr, uint count);
+int __plug_process_map(uint addr, uint count);
 
-int  __plug_process_unmap(uint addr, uint count);
+int __plug_process_unmap(uint addr, uint count);
 
 uint __plug_process_alloc(uint count);
 
-int  __plug_process_free(uint addr, uint count);
+int __plug_process_free(uint addr, uint count);
 
-int  __plug_process_get_cwd(char* buffer, uint size);
+int __plug_process_get_cwd(char *buffer, uint size);
 
-int  __plug_process_set_cwd(const char* cwd);
+int __plug_process_set_cwd(const char *cwd);
 
-int  __plug_process_sleep(int time);
+int __plug_process_sleep(int time);
 
-int  __plug_process_wakeup(int pid);
+int __plug_process_wakeup(int pid);
 
-int  __plug_process_wait(int pid, int* exit_value);
+int __plug_process_wait(int pid, int *exit_value);

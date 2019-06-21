@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #define ERROR_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                    \
     __ENTRY_WITH_VALUE(ERR_SUCCESS, 0)                             \
     __ENTRY(ERR_INBOX_FULL)                                        \
@@ -151,7 +155,11 @@ typedef enum
     }
 
 const char *error_to_string(error_t error);
+
 error_t error_get(void);
+
 void error_set(error_t error);
+
 void error_print(const char *message);
+
 void if_error_throw_and_catch_fire(const char *message);

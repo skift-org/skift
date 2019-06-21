@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/color.h>
 #include <skift/math.h>
 
@@ -22,7 +26,9 @@ color_t HSVA(float H, float S, float V, float A)
 
     if (S == 0)
     {
-        r = V; g = V; b = V;
+        r = V;
+        g = V;
+        b = V;
     }
     else
     {
@@ -126,7 +132,7 @@ color_t color_blerp(color_t c00, color_t c10, color_t c01, color_t c11, float tr
 // color_t color_from_name(const char *name)
 // {
 // }
-// 
+//
 // void color_get_name(color_t color, char *name, int size)
 // {
 // }

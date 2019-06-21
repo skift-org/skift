@@ -1,9 +1,12 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 /* dstart.c: start a process as a daemon                                      */
 
 #include <skift/process.h>
 #include <skift/error.h>
 #include <skift/iostream.h>
-
 #include <hjert/task.h>
 
 int main(int argc, char const *argv[])

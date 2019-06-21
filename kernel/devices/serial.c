@@ -39,7 +39,7 @@ static int serial_device_write(stream_t *s, const void *buffer, uint size)
 static int serial_device_read(stream_t *s, void *buffer, uint size)
 {
     UNUSED(s);
-    
+
     return serial_read(buffer, size);
 }
 
@@ -56,11 +56,10 @@ void serial_setup()
     out8(PORT_COM1 + 2, 0xC7);
     out8(PORT_COM1 + 4, 0x0B);
 
-    device_t serial_device =
-        {
-            .read = serial_device_read,
-            .write = serial_device_write,
-        };
+    device_t serial_device = {
+        .read = serial_device_read,
+        .write = serial_device_write,
+    };
 
     FILESYSTEM_MKDEV("/dev/serial", serial_device);
 }
@@ -95,10 +94,13 @@ int serial_read(char *buffer, uint size)
 int serial_write(const char *buffer, uint size)
 {
     atomic_begin();
+    
     for (uint i = 0; i < size; i++)
     {
         serial_putc(buffer[i]);
     }
+
     atomic_end();
+    
     return size;
 }

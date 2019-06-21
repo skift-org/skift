@@ -8,30 +8,21 @@ typedef enum
 {
     SYS_DEBUG = 0,
 
-/* --- Process and Tasks ---------------------------------------------------- */
-
-    // Process
     SYS_PROCESS_SELF,
-
     SYS_PROCESS_EXEC,
     SYS_PROCESS_SPAWN,
     SYS_PROCESS_EXIT,
     SYS_PROCESS_CANCEL,
-
-    // Process memory managment
     SYS_PROCESS_MAP,
     SYS_PROCESS_UNMAP,
     SYS_PROCESS_ALLOC,
     SYS_PROCESS_FREE,
-    
     SYS_PROCESS_GET_CWD,
     SYS_PROCESS_SET_CWD,
-
     SYS_PROCESS_SLEEP,
     SYS_PROCESS_WAKEUP,
     SYS_PROCESS_WAIT,
 
-    // Messaging
     SYS_MESSAGING_SEND,
     SYS_MESSAGING_BROADCAST,
     SYS_MESSAGING_REQUEST,
@@ -40,33 +31,22 @@ typedef enum
     SYS_MESSAGING_SUBSCRIBE,
     SYS_MESSAGING_UNSUBSCRIBE,
 
-/* --- Filesystem ----------------------------------------------------------- */
-
     SYS_FILESYSTEM_OPEN,
     SYS_FILESYSTEM_CLOSE,
-
     SYS_FILESYSTEM_READ,
     SYS_FILESYSTEM_WRITE,
-   
     SYS_FILESYSTEM_IOCTL,
     SYS_FILESYSTEM_SEEK,
     SYS_FILESYSTEM_TELL,
-    
     SYS_FILESYSTEM_FSTAT,
-    
     SYS_FILESYSTEM_LINK,
     SYS_FILESYSTEM_UNLINK,
     SYS_FILESYSTEM_RENAME,
-    
     SYS_FILESYSTEM_MKFIFO,
     SYS_FILESYSTEM_MKDIR,
 
-// System ------------------------------------------------------------------- //
-
     SYS_SYSTEM_GET_INFO,
     SYS_SYSTEM_GET_STATUS,
-
-////////////////////////////////////////////////////////////////////////////////
 
     SYSCALL_COUNT
 } syscall_t;

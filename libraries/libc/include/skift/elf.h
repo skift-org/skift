@@ -20,7 +20,7 @@ typedef enum
     ELF_EXEC = 2  // Executable File
 } elf_type_t;
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     u8 ident[ELF_NIDENT];
     u16 type;
@@ -36,8 +36,7 @@ typedef PACKED(struct)
     u16 shentsize;
     u16 shnum;
     u16 shstrndx;
-}
-elf_header_t;
+} elf_header_t;
 
 typedef enum
 {
@@ -50,7 +49,7 @@ typedef enum
     ELFS_REL = 9,      // Relocation (no addend)
 } elf_section_type_t;
 
-typedef PACKED(struct)
+typedef struct attr_packed
 {
     uint name;
     uint type;
@@ -62,13 +61,12 @@ typedef PACKED(struct)
     uint info;
     uint addralign;
     uint entsize;
-}
-elf_section_t;
+} elf_section_t;
 
 typedef struct
 {
     u32 type;
-    u32  offset;
+    u32 offset;
     u32 vaddr;
     u32 paddr;
     u32 filesz;

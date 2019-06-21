@@ -1,6 +1,9 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/__plugs__.h>
 #include <skift/assert.h>
-
 #include <hjert/syscalls.h>
 
 int __plug_process_this(void)
@@ -45,12 +48,12 @@ int __plug_process_free(uint addr, uint count)
     return __syscall(SYS_PROCESS_FREE, addr, count, 0, 0, 0);
 }
 
-int __plug_process_get_cwd(char* buffer, uint size)
+int __plug_process_get_cwd(char *buffer, uint size)
 {
     return __syscall(SYS_PROCESS_GET_CWD, (int)buffer, size, 0, 0, 0);
 }
 
-int __plug_process_set_cwd(const char* cwd)
+int __plug_process_set_cwd(const char *cwd)
 {
     return __syscall(SYS_PROCESS_SET_CWD, (int)cwd, 0, 0, 0, 0);
 }
@@ -65,7 +68,7 @@ int __plug_process_wakeup(int pid)
     return __syscall(SYS_PROCESS_WAKEUP, pid, 0, 0, 0, 0);
 }
 
-int __plug_process_wait(int pid, int* exit_value)
+int __plug_process_wait(int pid, int *exit_value)
 {
     return __syscall(SYS_PROCESS_WAIT, pid, (int)exit_value, 0, 0, 0);
 }

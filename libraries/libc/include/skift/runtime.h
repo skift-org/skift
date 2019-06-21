@@ -13,7 +13,7 @@
 #define true 1
 #define false 0
 
-#define let __auto_type const 
+#define let __auto_type const
 #define var __auto_type
 
 typedef void s0;
@@ -48,7 +48,7 @@ typedef unsigned long long uint64_t;
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 
-#define PACKED(x) x __attribute__((packed))
+#define attr_packed __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))
 
 #define UNUSED(x) (void)(x)
@@ -87,4 +87,4 @@ void object_unlock(object_t *this);
 object_t *object_retain(object_t *this);
 void object_release(object_t *this);
 int object_refcount(object_t *this);
-int object_size(object_t* this);
+int object_size(object_t *this);

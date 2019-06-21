@@ -556,21 +556,21 @@ void PREFIX(free)(void *ptr)
 		{
 			l_possibleOverruns += 1;
 			logger_log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
-				min->magic,
-				LIBALLOC_MAGIC);
+					   min->magic,
+					   LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
 			logger_log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.",
-				ptr,
-				__builtin_return_address(0));
+					   ptr,
+					   __builtin_return_address(0));
 		}
 		else
 		{
 			logger_log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x",
-				ptr,
-				__builtin_return_address(0));
+					   ptr,
+					   __builtin_return_address(0));
 		}
 
 		// being lied to...

@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 
 #pragma once
 
-#include <string.h> /*for size_t*/
+#include <skift/cstring.h>
 
 extern const char* LODEPNG_VERSION_STRING;
 

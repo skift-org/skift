@@ -10,10 +10,10 @@ typedef struct
 {
     int locked;
     int holder;
-    const char* name;
+    const char *name;
 } lock_t;
 
-void __lock_init(lock_t *lock, const char* name);
+void __lock_init(lock_t *lock, const char *name);
 
 void __lock_acquire(lock_t *lock);
 
@@ -21,12 +21,16 @@ void __lock_release(lock_t *lock);
 
 bool __lock_try_acquire(lock_t *lock);
 
-void __lock_assert(lock_t *lock, const char* file, const char* function, int line);
+void __lock_assert(lock_t *lock, const char *file, const char *function, int line);
 
 #define lock_init(lock) __lock_init(&lock, #lock)
+
 #define lock_acquire(lock) __lock_acquire(&lock)
+
 #define lock_try_acquire(lock) __lock_try_acquire(&lock)
+
 #define lock_release(lock) __lock_release(&lock)
+
 #define lock_assert(lock) __lock_assert(&lock, __FILE__, __FUNCTION__, __LINE__)
 
 #define LOCK(lock, code)       \

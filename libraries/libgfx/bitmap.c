@@ -1,3 +1,7 @@
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <skift/bitmap.h>
 #include <skift/logger.h>
 
@@ -66,8 +70,8 @@ color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
     {
         color_t c00 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi, src_rect.Y + yyi});
         color_t c10 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi + 1, src_rect.Y + yyi});
-        color_t c01 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi, src_rect.Y +yyi + 1});
-        color_t c11 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi + 1, src_rect.Y +yyi + 1});
+        color_t c01 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi, src_rect.Y + yyi + 1});
+        color_t c11 = bitmap_get_pixel(bmp, (point_t){src_rect.X + xxi + 1, src_rect.Y + yyi + 1});
 
         result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
     }

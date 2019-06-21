@@ -6,7 +6,8 @@
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc); UNUSED(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
     printf("\033[m");
 
@@ -20,7 +21,6 @@ int main(int argc, char **argv)
     }
 
     printf("\n");
-
 
     for (int i = 0; i < 8; i++)
     {

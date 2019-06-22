@@ -78,6 +78,8 @@ typedef void (*object_dtor_t)(void *object);
 
 typedef void object_t;
 
+#define OBJECT(__type) (__type##_t*)object(sizeof(__type##_t), (object_dtor_t)(__type##_delete));
+
 object_t *object(uint size, object_dtor_t dtor);
 
 void object_lock(object_t *this);

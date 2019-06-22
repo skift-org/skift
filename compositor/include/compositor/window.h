@@ -4,25 +4,36 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/shape.h>
 #include <skift/painter.h>
 
-#include "compositor/client.h"
-#include "compositor/server.h"
+#include "compositor/renderer.h"
+#include "compositor/assets.h"
+
+#define HIDEO_WINDOW_TITLE_SIZE 64
 
 typedef struct
 {
-    int wid;
-    char tite[64];
+    char title[64];
     rectangle_t bound;
-
-    hideo_client_t *client;
+    bool is_focused;
 } hideo_window_t;
 
-hideo_window_t *hideo_window(hideo_server_t *server, hideo_client_t *client, rectangle_t bound);
+hideo_window_t *hideo_window(const char *title, rectangle_t bound);
 
 void hideo_window_delete(hideo_window_t *this);
 
-void hideo_window_handle_request(hideo_window_t *this, message_t *request);
+void hideo_window_move(hideo_window_t *this, point_t offset);
 
-void window_paint_decoration(painter_t *paint, rectangle_t bound, const char *title);
+void hideo_window_set_size(hideo_window_t *this, point_t size);
+
+void hideo_window_set_position(hideo_window_t *this, point_t pos);
+
+rectangle_t hideo_window_get_client_area(hideo_window_t *this);
+
+rectangle_t hideo_window_get_header_area(hideo_window_t *this);
+
+bool hideo_window_get_focused(hideo_window_t *this);
+
+void hideo_window_set_focused(hideo_window_t *this, bool focused);
+
+void hideo_window_repaint(hideo_window_t *this, hideo_renderer_t *render, hideo_assets_t *assets);

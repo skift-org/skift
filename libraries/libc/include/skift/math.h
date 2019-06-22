@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <skift/runtime.h>
+
 #define HUGE_VAL (1.0 / 0.0)
 
 #define PI (3.141592654)

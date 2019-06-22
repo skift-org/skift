@@ -8,8 +8,12 @@
 #include <skift/widgets.h>
 #include <skift/font.h>
 
-void hideo_assets_load(void);
+typedef struct
+{
+    font_t* font_sans;
+    bitmap_t *mouse_cursors[MOUSE_CURSOR_STATE_COUNT];
+} hideo_assets_t;
 
-bitmap_t *hideo_assets_get_mouse(mouse_cursor_state_t state);
+hideo_assets_t* hideo_assets(void);
 
-font_t *hideo_assets_get_font(void);
+void hideo_assets_delete(hideo_assets_t* this);

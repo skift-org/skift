@@ -74,9 +74,6 @@ hideo_window_t *hideo_stack_window_get_focus(hideo_stack_t *this)
 
 void hideo_stack_window_set_focus(hideo_stack_t *this, hideo_window_t *win)
 {
-    if (this->focused == win)
-        return;
-
     if (this->focused != NULL)
     {
         hideo_window_set_focused(this->focused, false);

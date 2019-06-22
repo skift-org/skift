@@ -1,7 +1,7 @@
 SOURCES = $(wildcard *.c)
 
 hideo.out: $(SOURCES)
-	$(CC) $^ -lgfx -o $@
+	$(CC) $(CFLAGS) $^ -lgfx -o $@
 
 clean:
 	rm -f hideo.out

@@ -12,41 +12,6 @@ typedef struct attr_packed
     int Y;
 } point_t;
 
-#define point_zero ((point_t){0, 0})
-
-static inline point_t point_clamp(point_t p, point_t pmin, point_t pmax)
-{
-    p.X = max(pmin.X, min(pmax.X, p.X));
-    p.Y = max(pmin.Y, min(pmax.Y, p.Y));
-
-    return p;
-}
-
-static inline point_t point_add(point_t a, point_t b)
-{
-    return (point_t){a.X + b.X, a.Y + b.Y};
-}
-
-static inline point_t point_sub(point_t a, point_t b)
-{
-    return (point_t){a.X - b.X, a.Y - b.Y};
-}
-
-static inline point_t point_scale(point_t a, double scale)
-{
-    return (point_t){a.X * scale, a.Y * scale};
-}
-
-static inline point_t point_x(point_t p)
-{
-    return (point_t){.X = p.X, .Y = 0};
-}
-
-static inline point_t point_y(point_t p)
-{
-    return (point_t){.X = 0, .Y = p.Y};
-}
-
 typedef struct attr_packed
 {
     int top;
@@ -70,6 +35,88 @@ typedef union attr_packed {
         point_t size;
     };
 } rectangle_t;
+
+#define point_zero ((point_t){0, 0})
+
+static inline point_t point_add(point_t a, point_t b)
+{
+    return (point_t){a.X + b.X, a.Y + b.Y};
+}
+
+static inline point_t point_sub(point_t a, point_t b)
+{
+    return (point_t){a.X - b.X, a.Y - b.Y};
+}
+
+static inline point_t point_div(point_t a, int value)
+{
+    return (point_t){a.X / value, a.Y / value};
+}
+
+static inline point_t point_scale(point_t a, double scale)
+{
+    return (point_t){a.X * scale, a.Y * scale};
+}
+
+static inline point_t point_x(point_t p)
+{
+    return (point_t){.X = p.X, .Y = 0};
+}
+
+static inline point_t point_y(point_t p)
+{
+    return (point_t){.X = 0, .Y = p.Y};
+}
+
+static inline point_t point_clamp(point_t p, point_t pmin, point_t pmax)
+{
+    p.X = max(pmin.X, min(pmax.X, p.X));
+    p.Y = max(pmin.Y, min(pmax.Y, p.Y));
+
+    return p;
+}
+
+static inline point_t point_clamp_to_rect(point_t p, rectangle_t rect)
+{
+    return point_clamp(p, rect.position, point_add(rect.position, rect.size));
+}
+
+static inline rectangle_t rectangle_min_size(rectangle_t rectangle, point_t size)
+{
+    rectangle.width = min(size.X, rectangle.width);
+    rectangle.width = min(size.Y, rectangle.height);
+
+    return rectangle;
+}
+
+static inline rectangle_t rectangle_max_size(rectangle_t rectangle, point_t size)
+{
+    rectangle.width = max(size.X, rectangle.width);
+    rectangle.width = max(size.Y, rectangle.height);
+
+    return rectangle;
+}
+
+static inline bool rectange_colide(rectangle_t a, rectangle_t b)
+{
+    return a.X < b.X + b.width &&
+           a.X + a.width > b.Y &&
+           a.Y < b.Y + b.height &&
+           a.height + a.Y > b.Y;
+}
+
+static inline rectangle_t rectangle_merge(rectangle_t a, rectangle_t b)
+{
+    point_t topleft;
+    topleft.X = min(a.X, b.X);
+    topleft.Y = min(a.Y, b.Y);
+
+    point_t bottomright;
+    bottomright.X = max(a.X + a.width, b.X + b.width);
+    bottomright.Y = max(a.Y + a.height, b.Y + b.height);
+
+    return (rectangle_t){.position = topleft, .size = point_sub(bottomright, topleft)};
+}
 
 static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t child_rectangle)
 {

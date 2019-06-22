@@ -187,10 +187,10 @@ void painter_draw_line(painter_t *paint, point_t a, point_t b, color_t color)
 
 void painter_draw_rect(painter_t *paint, rectangle_t rect, color_t color)
 {
-    painter_draw_line(paint, rect.position, point_add(rect.position, point_x(rect.size)), color);
-    painter_draw_line(paint, rect.position, point_add(rect.position, point_y(rect.size)), color);
-    painter_draw_line(paint, point_add(rect.position, point_x(rect.size)), point_add(rect.position, rect.size), color);
-    painter_draw_line(paint, point_add(rect.position, point_y(rect.size)), point_add(rect.position, rect.size), color);
+    painter_draw_line(paint, rect.position, point_sub(point_add(rect.position, point_x(rect.size)), (point_t){1, 0}), color);
+    painter_draw_line(paint, rect.position, point_sub(point_add(rect.position, point_y(rect.size)), (point_t){0, 1}), color);
+    painter_draw_line(paint, point_sub(point_add(rect.position, point_x(rect.size)), (point_t){1, 0}), point_sub(point_add(rect.position, rect.size), (point_t){1, 0}), color);
+    painter_draw_line(paint, point_sub(point_add(rect.position, point_y(rect.size)), (point_t){0, 1}), point_sub(point_add(rect.position, rect.size), (point_t){0, 1}), color);
 }
 
 const int FONT_SIZE = 16;

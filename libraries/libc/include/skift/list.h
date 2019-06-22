@@ -35,17 +35,20 @@ typedef bool (*list_comparator_t)(void *left, void *right);
 // Create a new list object in memory.
 list_t *list();
 
-#define LIST_KEEP_VALUES false
-
-#define LIST_FREE_VALUES true
+typedef enum
+{
+    LIST_KEEP_VALUES,
+    LIST_FREE_VALUES,
+    LIST_RELEASE_VALUES,
+} list_delete_action_t;
 
 // Free the memory used by the list
-void list_delete(list_t *l, bool free_items);
+void list_delete(list_t *l, list_delete_action_t free_items);
 
 /* --- List operation ------------------------------------------------------- */
 
 // Clear all the item in the list.
-void list_clear(list_t *list, bool free_items);
+void list_clear(list_t *list, list_delete_action_t free_items);
 
 // Insert a list item sorted.
 void list_insert_sorted(list_t *list, void *value, list_comparator_t comparator);

@@ -15,13 +15,13 @@ list_t *list()
     return l;
 }
 
-void list_delete(list_t *l, bool free_items)
+void list_delete(list_t *l, list_delete_action_t free_items)
 {
     list_clear(l, free_items);
     free(l);
 }
 
-void list_clear(list_t *list, bool free_items)
+void list_clear(list_t *list, list_delete_action_t free_items)
 {
     list_item_t *current = list->head;
 
@@ -29,9 +29,13 @@ void list_clear(list_t *list, bool free_items)
     {
         list_item_t *next = current->next;
         
-        if (free_items) 
+        if (free_items == LIST_FREE_VALUES) 
         {
             free(current->value);
+        }
+        else if (free_items == LIST_RELEASE_VALUES) 
+        {
+            object_release(current->value);
         }
 
         free(current);

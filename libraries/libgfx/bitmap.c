@@ -46,8 +46,8 @@ void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)
 
 color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
 {
-    int xi = (int)p.X % bmp->width;
-    int yi = (int)p.Y % bmp->height;
+    int xi = abs((int)p.X % bmp->width);
+    int yi = abs((int)p.Y % bmp->height);
 
     return bmp->buffer[xi + yi * bmp->width];
 }

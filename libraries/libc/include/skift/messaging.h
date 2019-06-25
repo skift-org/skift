@@ -5,8 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-
-#include <hjert/syscalls.h>
 #include <hjert/message.h>
 
 // Send an event message to a process.

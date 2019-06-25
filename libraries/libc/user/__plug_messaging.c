@@ -3,6 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/messaging.h>
+#include <hjert/syscalls.h>
 #include <skift/error.h>
 
 int messaging_send(message_t *event)

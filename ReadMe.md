@@ -18,9 +18,9 @@ A simple, handmade, operating system for intel x86 cpu.
 
 # About skiftOS
 <p align="center">
-<img src="manual/screenshots/2019-04-30-145016_720x400_scrot.png" height=400 />
+<img src="manual/screenshots/desktop.png" height=400 />
 <br/>
-skiftOS 0.2.0 running on QEMU 3.0.0
+skiftOS 0.2.0 running the hideo desktop on QEMU 3.0.0
 </p>
 
 **skiftOS** is a simple, handmade, operating system for intel x86 cpu. Aiming for clean and pretty API while keeping the spirite of UNIX.

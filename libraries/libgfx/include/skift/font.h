@@ -24,8 +24,6 @@ typedef struct
 
 font_t *font(const char *name);
 
-void font_delete(font_t *this);
-
 glyph_t *font_glyph(font_t *this, int codepoint);
 
 int font_measure_width(font_t *this, float font_size, const char *str, int str_size);

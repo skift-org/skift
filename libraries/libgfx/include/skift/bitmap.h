@@ -28,8 +28,6 @@ typedef struct bitmap_s
 
 bitmap_t *bitmap(uint width, uint height);
 
-void bitmap_delete(bitmap_t *bmp);
-
 bitmap_t *bitmap_load_from(const char *path);
 
 int bitmap_save_to(bitmap_t *bmp, const char *path);

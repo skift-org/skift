@@ -7,20 +7,22 @@
 #include <skift/font.h>
 #include <skift/math.h>
 
+void painter_delete(painter_t *);
+
 painter_t *painter(bitmap_t *bmp)
 {
-    painter_t *paint = MALLOC(painter_t);
+    painter_t *paint = OBJECT(painter);
 
-    paint->bitmap = bmp;
+    paint->bitmap = object_retain(bmp);
     paint->cliprect = bitmap_bound(bmp);
     paint->cliprect_stack_top = 0;
 
     return paint;
 }
 
-void painter_delete(painter_t *paint)
+void painter_delete(painter_t *this)
 {
-    free(paint);
+    object_release(this->bitmap);
 }
 
 void painter_push_cliprect(painter_t *paint, rectangle_t cliprect)

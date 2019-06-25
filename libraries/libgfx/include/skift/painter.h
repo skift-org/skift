@@ -18,8 +18,6 @@ typedef struct
 
 painter_t *painter(bitmap_t *bmp);
 
-void painter_delete(painter_t *paint);
-
 void painter_push_cliprect(painter_t *paint, rectangle_t cliprect);
 
 void painter_pop_cliprect(painter_t *paint);

@@ -7,9 +7,11 @@
 
 #include "lodepng.h"
 
+void bitmap_delete(bitmap_t *bmp);
+
 bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
 {
-    bitmap_t *bitmap = MALLOC(bitmap_t);
+    bitmap_t *bitmap = OBJECT(bitmap);
 
     bitmap->width = width;
     bitmap->height = height;
@@ -34,8 +36,6 @@ void bitmap_delete(bitmap_t *bmp)
 {
     if (!bmp->shared)
         free(bmp->buffer);
-
-    free(bmp);
 }
 
 void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)

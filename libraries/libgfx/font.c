@@ -9,6 +9,8 @@
 #include <skift/logger.h>
 #include <skift/error.h>
 
+void font_delete(font_t *this);
+
 glyph_t *font_load_glyph(const char *name)
 {
     char glyph_path[PATH_LENGHT];
@@ -77,7 +79,7 @@ font_t *font(const char *name)
         return NULL;
     }
 
-    font_t *this = MALLOC(font_t);
+    font_t *this = OBJECT(font);
 
     this->bitmap = bmp;
     this->glyph = glyph;
@@ -89,8 +91,7 @@ font_t *font(const char *name)
 void font_delete(font_t *this)
 {
     free(this->glyph);
-    bitmap_delete(this->bitmap);
-    free(this);
+    object_release(this->bitmap);
 }
 
 glyph_t *font_glyph(font_t *this, int codepoint)

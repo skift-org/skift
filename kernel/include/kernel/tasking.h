@@ -66,6 +66,8 @@ typedef struct task
     list_t *inbox;  // process main message queue
     list_t *subscription;
 
+    list_t *shms;
+
     lock_t fds_lock;
     filedescriptor_t fds[TASK_FILDES_COUNT];
 
@@ -188,6 +190,34 @@ int task_fstat_file(task_t* this, int fd, iostream_stat_t *stat);
 /* -------------------------------------------------------------------------- */
 
 int task_exec(const char *executable_path, const char **argv);
+
+/* -------------------------------------------------------------------------- */
+/*   SHARED MEMORY                                                            */      
+/* -------------------------------------------------------------------------- */
+
+typedef struct 
+{
+    int ID;
+    uint paddr;
+    int pagecount;
+} shm_physical_region_t;
+
+typedef struct
+{
+    shm_physical_region_t* region;
+    uint vaddr;
+} shm_virtual_region_t;
+
+void task_shared_memory_setup(void);
+
+shm_physical_region_t* task_physical_region_get_by_id(int id);
+shm_virtual_region_t* task_virtual_region_get_by_id(task_t* this, int id);
+
+int task_shared_memory_alloc(task_t *this, int pagecount);
+
+int task_shared_memory_acquire(task_t *this, int shm, uint *addr);
+
+int task_shared_memory_release(task_t *this, int shm);
 
 /* -------------------------------------------------------------------------- */
 /*   MESSAGING                                                                */      

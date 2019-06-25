@@ -115,6 +115,23 @@ int sys_process_wait(int tid, int *exitvalue)
     return task_wait(tid, exitvalue);
 }
 
+/* --- Shared memory -------------------------------------------------------- */
+
+int sys_shared_memory_alloc(int pagecount)
+{
+    return task_shared_memory_alloc(sheduler_running(), pagecount);
+}
+
+int sys_shared_memory_acquire(int shm, uint *addr)
+{
+    return task_shared_memory_acquire(sheduler_running(), shm, addr);
+}
+
+int sys_shared_memory_release(int shm)
+{
+    return task_shared_memory_release(sheduler_running(), shm);
+}
+
 /* --- Messaging ------------------------------------------------------------ */
 
 int sys_messaging_send(message_t* event)
@@ -295,15 +312,19 @@ static int (*syscalls[])() =
         [SYS_PROCESS_SPAWN] = sys_not_implemented,
         [SYS_PROCESS_EXIT] = sys_process_exit,
         [SYS_PROCESS_CANCEL] = sys_process_cancel,
+        [SYS_PROCESS_SLEEP] = sys_process_sleep,
+        [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
+        [SYS_PROCESS_WAIT] = sys_process_wait,
+        [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
+        [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
         [SYS_PROCESS_MAP] = sys_process_map,
         [SYS_PROCESS_UNMAP] = sys_process_unmap,
         [SYS_PROCESS_ALLOC] = sys_process_alloc,
         [SYS_PROCESS_FREE] = sys_process_free,
-        [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
-        [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
-        [SYS_PROCESS_SLEEP] = sys_process_sleep,
-        [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
-        [SYS_PROCESS_WAIT] = sys_process_wait,
+
+        [SYS_SHARED_MEMORY_ALLOC] = sys_shared_memory_alloc,
+        [SYS_SHARED_MEMORY_ACQUIRE] = sys_shared_memory_acquire,
+        [SYS_SHARED_MEMORY_RELEASE] = sys_shared_memory_release,
 
         [SYS_MESSAGING_SEND] = sys_messaging_send,
         [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,

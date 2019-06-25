@@ -21,7 +21,7 @@ static uint ticks = 0;
 static task_t *running = NULL;
 
 static task_t *kernel_task;
-task_t* task_kernel(void){ return kernel_task;}
+task_t *task_kernel(void) { return kernel_task; }
 
 static task_t *garbage_task;
 static task_t *idle_task;
@@ -98,6 +98,9 @@ task_t *task(task_t *parent, const char *name, bool user)
     this->inbox = list();
     this->subscription = list();
 
+    // Setup shms
+    this->shms = list();
+
     // Setup current working directory.
     lock_init(this->cwd_lock);
 
@@ -153,6 +156,7 @@ void task_delete(task_t *this)
 
     list_delete(this->inbox, LIST_FREE_VALUES);
     list_delete(this->subscription, LIST_FREE_VALUES);
+    list_delete(this->shms, LIST_RELEASE_VALUES);
 
     task_filedescriptor_close_all(this);
 
@@ -704,16 +708,15 @@ int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
 
 /* --- Task dump ---------------------------------------------------------- */
 
-static char *TASK_STATES[] =
-    {
-        "HANG",
-        "LAUNCHPAD",
-        "RUNNING",
-        "SLEEP",
-        "WAIT",
-        "WAIT_FOR_MESSAGE",
-        "WAIT_FOR_RESPOND",
-        "CANCELED",
+static char *TASK_STATES[] = {
+    "HANG",
+    "LAUNCHPAD",
+    "RUNNING",
+    "SLEEP",
+    "WAIT",
+    "WAIT_FOR_MESSAGE",
+    "WAIT_FOR_RESPOND",
+    "CANCELED",
 };
 
 void task_dump(task_t *t)
@@ -904,6 +907,192 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
     path_to_cstring(this->cwd_path, buffer, size);
 
     lock_release(this->cwd_lock);
+}
+
+/* -------------------------------------------------------------------------- */
+/*   SHARED MEMORY                                                            */      
+/* -------------------------------------------------------------------------- */
+
+static int SHMID = 0;
+static lock_t shms_lock; 
+static list_t* shms;
+
+void task_shared_memory_setup(void)
+{
+    shms = list();
+    lock_init(shms_lock);
+}
+
+/* --- Shared phycical region ----------------------------------------------- */
+
+shm_physical_region_t *shm_physical_region(int pagecount)
+{
+    shm_physical_region_t *this = OBJECT(shm_physical_region);
+
+    this->ID = SHMID++;
+    this->paddr = physical_alloc(pagecount);
+    this->pagecount = pagecount;
+
+    if (this->paddr)
+    {
+        list_pushback(shms, this);
+
+        return this;
+    }
+    else
+    {
+        object_release(this);
+
+        return NULL;
+    }
+}
+
+void shm_physical_region_delete(shm_physical_region_t* this)
+{
+    list_remove(shms, this);
+    physical_free(this->paddr, this->pagecount);
+}
+
+shm_physical_region_t *task_physical_region_get_by_id(int id)
+{
+    if (id < SHMID)
+        return NULL;
+
+    list_foreach(i, shms)
+    {
+        shm_physical_region_t *shm = (shm_physical_region_t *)i->value;
+
+        if (shm->ID == id)
+            return shm;
+    }
+
+    return NULL;
+}
+
+/* --- Shared virtual region ------------------------------------------------ */
+
+shm_virtual_region_t* shm_virtual_region(task_t* task, shm_physical_region_t *physr)
+{
+    uint vaddr = virtual_alloc(task->pdir, physr->paddr, physr->pagecount, 1);
+
+    if (vaddr == NULL)
+    {
+        return NULL;
+    }
+
+    shm_virtual_region_t* virtr = MALLOC(shm_physical_region_t);
+    virtr->region = object_retain(physr);
+    virtr->vaddr = vaddr;
+
+    return virtr;
+}
+
+void shm_virtual_region_delete(shm_virtual_region_t* this)
+{
+    object_release(this->region);
+
+    if (object_refcount(this->region) == 1)
+    {
+        // We were the last task to have a ref to this shm
+        // The last ref is the shm list, so we can release that too
+
+        object_release(this->region);
+    }
+}
+
+shm_virtual_region_t* task_virtual_region_get_by_id(task_t* this, int id)
+{
+    if (id < SHMID)
+        return NULL;
+
+    list_foreach(i, this->shms)
+    {
+        shm_virtual_region_t *shm = (shm_virtual_region_t *)i->value;
+
+        if (shm->region->ID == id)
+            return shm;
+    }
+
+    return NULL;
+}
+
+
+/* --- User facing API ------------------------------------------------------ */
+
+int task_shared_memory_alloc(task_t *this, int pagecount)
+{
+    lock_acquire(shms_lock);
+
+    shm_physical_region_t* physr = shm_physical_region(pagecount);
+
+    if (physr == NULL)
+    {
+        return -ERR_CANNOT_ALLOCATE_MEMORY;
+    }
+
+    shm_virtual_region_t* virtr = shm_virtual_region(this, physr);
+
+    if (virtr == NULL)
+    {
+        lock_release(shms_lock);
+        return -ERR_CANNOT_ALLOCATE_MEMORY;
+    }
+
+    lock_release(shms_lock);
+    return physr->ID;
+}
+
+int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
+{
+    lock_acquire(shms_lock);
+
+    shm_virtual_region_t* virtr = task_virtual_region_get_by_id(this, shm);
+
+    if (virtr != NULL)
+    {
+        *addr = virtr->vaddr;
+        lock_release(shms_lock);
+        return -ERR_SUCCESS;
+    }
+
+    shm_physical_region_t* physr = task_physical_region_get_by_id(shm);
+
+    if (physr == NULL)
+    {
+        lock_release(shms_lock);
+        return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
+    }
+
+    shm_virtual_region_t* virtr = shm_virtual_region(this, physr);
+
+    if (virtr == NULL)
+    {
+        lock_release(shms_lock);
+        return -ERR_CANNOT_ALLOCATE_MEMORY;
+    }
+
+    *addr = virtr->vaddr;
+    lock_release(shms_lock);
+    return -ERR_SUCCESS;
+}
+
+int task_shared_memory_release(task_t *this, int shm)
+{
+    lock_acquire(shms_lock);
+
+    shm_virtual_region_t* virtr = task_virtual_region_get_by_id(this, shm);
+
+    if(virtr == NULL)
+    {
+        lock_release(shms_lock);
+        return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
+    }
+    else
+    {      
+        object_release(virtr);
+        lock_release(shms_lock);
+        return -ERR_SUCCESS;
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1122,7 +1311,7 @@ int task_messaging_receive(task_t *this, message_t *message, bool wait)
 
     atomic_begin();
 
-    if (list_pop(this->inbox, (void**)&received))
+    if (list_pop(this->inbox, (void **)&received))
     {
         *message = *received;
     }
@@ -1137,7 +1326,7 @@ int task_messaging_receive(task_t *this, message_t *message, bool wait)
 
         atomic_begin();
 
-        if (list_pop(this->inbox, (void**)&received))
+        if (list_pop(this->inbox, (void **)&received))
         {
             *message = *received;
         }

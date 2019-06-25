@@ -925,6 +925,7 @@ void task_shared_memory_setup(void)
 
 /* --- Shared phycical region ----------------------------------------------- */
 
+void shm_physical_region_delete(shm_physical_region_t* this);
 shm_physical_region_t *shm_physical_region(int pagecount)
 {
     shm_physical_region_t *this = OBJECT(shm_physical_region);
@@ -970,17 +971,17 @@ shm_physical_region_t *task_physical_region_get_by_id(int id)
 }
 
 /* --- Shared virtual region ------------------------------------------------ */
-
+void shm_virtual_region_delete(shm_virtual_region_t* this);
 shm_virtual_region_t* shm_virtual_region(task_t* task, shm_physical_region_t *physr)
 {
     uint vaddr = virtual_alloc(task->pdir, physr->paddr, physr->pagecount, 1);
 
-    if (vaddr == NULL)
+    if (vaddr == 0)
     {
         return NULL;
     }
 
-    shm_virtual_region_t* virtr = MALLOC(shm_physical_region_t);
+    shm_virtual_region_t* virtr = OBJECT(shm_virtual_region);
     virtr->region = object_retain(physr);
     virtr->vaddr = vaddr;
 
@@ -1063,7 +1064,7 @@ int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
         return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
     }
 
-    shm_virtual_region_t* virtr = shm_virtual_region(this, physr);
+    /* shm_virtual_region_t* */ virtr = shm_virtual_region(this, physr);
 
     if (virtr == NULL)
     {

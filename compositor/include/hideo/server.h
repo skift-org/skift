@@ -6,9 +6,11 @@
 
 #include <hideo/common.h>
 
-#define HIDEO_SERVER_RESULT "hideo:server.result"
+#define HIDEO_SERVER_CLASS "server"
 
 typedef struct
 {
     int value;
 } hideo_server_result_t;
+
+#define HIDEO_SERVER_RESULT "hideo:server.result"

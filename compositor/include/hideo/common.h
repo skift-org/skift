@@ -5,10 +5,15 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
+#include <skift/messaging.h>
+#include <skift/error.h>
+
+#define HIDEO_PROTOCOL "hideo"
 
 typedef enum
 {
-    HIDEO_WFLAG_COUNT,
+    // The window cannot be moved
+    HIDEO_WFLAG_STATIC = FLAG(0),
 } hideo_window_flags_t;
 
 typedef int hideo_window_handle_t;

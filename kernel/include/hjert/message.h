@@ -10,6 +10,7 @@
 
 #define MSGLABEL_SIZE 64
 #define MSGPAYLOAD_SIZE (MSG_SIZE - sizeof(message_header_t))
+#define MSGLABEL(__proto, __class, __type) (__proto ":" __class "." __type)
 
 typedef enum
 {
@@ -46,6 +47,12 @@ typedef struct
     {                                                                  \
         (__message).header.size = sizeof(__payload);                   \
         memcpy(&(__message).payload, &(__payload), sizeof(__payload)); \
+    }
+
+#define message_set_payload_ptr(__message, __payload, __payload_size) \
+    {                                                                 \
+        (__message).header.size = (__payload_size);                   \
+        memcpy(&(__message).payload, (__payload), (__payload_size));  \
     }
 
 #define message_payload(__message) ((__message).payload)

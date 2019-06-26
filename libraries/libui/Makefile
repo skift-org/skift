@@ -1,3 +1,3 @@
-export LIBRARY = libui
+export LIBRARY = libgui
 
 -include ../Library.mk

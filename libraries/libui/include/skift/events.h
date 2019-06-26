@@ -8,11 +8,9 @@
 
 typedef struct
 {
-    point_t position;
-    mouse_button_t button;
-
     point_t offset;
     point_t position;
+    mouse_button_t button;
 } mouse_eventarg_t;
 
 typedef void event_on_mouse_up(object_t *sender, mouse_eventarg_t *e);

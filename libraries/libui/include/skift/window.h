@@ -26,9 +26,9 @@ window_t *window(void);
 
 void window_show(window_t *this);
 
-void window_event(event_t event);
-
 void window_hide(window_t *this);
+
+void window_close(window_t *this);
 
 /* --- Getters and Setters -------------------------------------------------- */
 

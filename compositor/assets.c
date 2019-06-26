@@ -41,8 +41,8 @@ void hideo_assets_delete(hideo_assets_t* this)
 {
     for (int i = 0; i < MOUSE_CURSOR_STATE_COUNT; i++)
     {
-        bitmap_delete(this->mouse_cursors[i]);
+        object_release(this->mouse_cursors[i]);
     }
     
-    font_delete(this->font_sans);
+    object_release(this->font_sans);
 }

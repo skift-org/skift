@@ -42,8 +42,8 @@ hideo_renderer_t *hideo_renderer(point_t prefered_resolution)
 void hideo_renderer_delete(hideo_renderer_t *this)
 {
     iostream_close(this->device);
-    painter_delete(this->painter);
-    bitmap_delete(this->backbuffer);
+    object_release(this->painter);
+    object_release(this->backbuffer);
 }
 
 rectangle_t hideo_renderer_screen_bound(hideo_renderer_t* this)

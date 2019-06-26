@@ -29,8 +29,8 @@ hideo_mouse_t *hideo_mouse(void)
 void hideo_mouse_delete(hideo_mouse_t *this)
 {
     object_release(this->selected_window);
-    painter_delete(this->painter);
-    bitmap_delete(this->mask);
+    object_release(this->painter);
+    object_release(this->mask);
 }
 
 rectangle_t hideo_mouse_bound(hideo_mouse_t *this)

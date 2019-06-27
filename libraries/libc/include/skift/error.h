@@ -162,4 +162,6 @@ void error_set(error_t error);
 
 void error_print(const char *message);
 
+#define error_log(__message) logger_log("%s: %s\n", __message, error_to_string(error_value));
+
 void if_error_throw_and_catch_fire(const char *message);

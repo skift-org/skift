@@ -4,6 +4,8 @@
 
 #include <skift/messaging.h>
 #include <skift/logger.h>
+#include <skift/process.h>
+
 #include "compositor/server.h"
 
 int main(int argc, char **argv)
@@ -26,6 +28,11 @@ int main(int argc, char **argv)
 
     messaging_subscribe(MOUSE_CHANNEL);
     messaging_subscribe(KEYBOARD_CHANNEL);
+
+    // Write the pid to a file for client to connect to:
+    iostream_t* fpid = iostream_open("/run/hideo_pid", IOSTREAM_WRITE | IOSTREAM_CREATE);
+    iostream_printf(fpid, "%d", process_this());
+    iostream_close(fpid);
 
     while (hideo_server_running(server))
     {

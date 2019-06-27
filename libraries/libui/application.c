@@ -25,6 +25,18 @@ void application_init(int argc, char **argv, const char *title)
     assert(!application_initialized);
     assert(!application_running);
 
+    // Get the pid of the server
+    // iostream_t* fpid = iostream_open("/run/hideo_pid", IOSTREAM_READ);
+    // if (fpid)
+    // {
+    //     // FIXME: we need scanf
+    // }
+    // else
+    // {
+    //     logger_log(LOG_ERROR, "Failled to open /run")
+    // }
+
+    // Connect to the server
     if (application_send_request(HIDEO_CLIENT_HELLO, title, strnlen(title, MSGPAYLOAD_SIZE)) == 0)
     {
         application_windows = list();
@@ -80,7 +92,7 @@ int application_get_server_pid(void)
 int application_send_request(const char *request, const void *payload, int payload_size)
 {
     message_t client_request;
-    client_request.header.to = application_server_pid;
+    client_request.header.to = application_get_server_pid();
     strlcpy(client_request.header.label, request, MSGLABEL_SIZE);
 
     message_t server_respond;

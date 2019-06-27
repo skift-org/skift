@@ -8,14 +8,15 @@
 
 struct scanf_info;
 
-typedef char (*scanf_get_t)(struct scanf_info *info);
+typedef void (*scanf_append_t)(struct printf_info *info, char c);
+typedef int (*scanf_getc_t)(struct scanf_info *info);
 
 typedef enum
 {
-    SCANF_STATE_ESC,
-    SCANF_STATE_PARSE,
-    SCANF_STATE_FORMAT_LENGHT,
-    SCANF_STATE_FINALIZE
+    SFSTATE_ESC,
+    SFSTATE_PARSE,
+    SFSTATE_FORMAT_LENGHT,
+    SFSTATE_FINALIZE
 } scanf_state_t;
 
 typedef struct scanf_info
@@ -23,7 +24,8 @@ typedef struct scanf_info
     char c;
 
     scanf_state_t state;
-    scanf_get_t get;
+    scanf_getc_t getc;
+    scanf_append_t append;
 
     const char *format;
     int format_offset;

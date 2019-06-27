@@ -136,19 +136,19 @@ int __printf_formate_string(printf_info_t *info, va_list *va)
     return info->n;
 }
 
-static printf_formatter_t formaters[] =
-    {
-        /* Binary        */ {'b', __printf_formate_binary},
-        /* Octal         */ {'o', __printf_formate_octal},
-        /* Decimal       */ {'d', __printf_formate_decimal},
-        /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
+static printf_formatter_t formaters[] = {
+    /* Binary        */ {'b', __printf_formate_binary},
+    /* Octal         */ {'o', __printf_formate_octal},
+    /* Decimal       */ {'d', __printf_formate_decimal},
+    /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
 
-        /* Float         */ {'f', NULL},
+    /* Float         */ {'f', NULL},
 
-        /* Char          */ {'c', __printf_formate_char},
-        /* String        */ {'s', __printf_formate_string},
+    /* Char          */ {'c', __printf_formate_char},
+    /* String        */ {'s', __printf_formate_string},
 
-        /* End of the list */ {'\0', NULL}};
+    /* End of the list */ {'\0', NULL},
+};
 
 void __printf_formate(printf_info_t *info, char c, va_list *va)
 {

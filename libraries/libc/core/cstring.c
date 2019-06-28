@@ -13,13 +13,13 @@
 
 void string_printf_append(printf_info_t *info, char c)
 {
-    if (info->n < 0)
+    if (info->allocated == -1)
     {
-        strapd(info->p, c);
+        strapd(info->output, c);
     }
     else
     {
-        strnapd((char *)info->p, c, info->max_n);
+        strnapd((char *)info->output, c, info->allocated);
     }
 }
 
@@ -44,8 +44,8 @@ int vsnprintf(char *s, int n, const char *fmt, va_list va)
     printf_info_t info = (printf_info_t){
         .format = fmt,
         .append = string_printf_append,
-        .p = (char *)s,
-        .max_n = n,
+        .output = (char *)s,
+        .allocated = n,
     };
 
     // We need it to start with a 0 because we use strapd.

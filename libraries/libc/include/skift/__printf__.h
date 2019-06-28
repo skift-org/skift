@@ -38,9 +38,9 @@ typedef struct printf_info
     printf_align_t align;
     uint lenght;
 
-    void *p;
-    int n;
-    int max_n;
+    void *output;
+    int written;
+    int allocated;
 } printf_info_t;
 
 typedef int (*printf_formatter_impl_t)(printf_info_t *info, va_list *va);
@@ -55,16 +55,16 @@ typedef struct
     {                                                  \
         info->c = info->format[info->format_offset++]; \
         if (info->c == '\0')                           \
-            return info->n;                            \
+            return info->written;                      \
     }
 
-#define PRINTF_APPEND(__c)                               \
-    {                                                    \
-        if (info->max_n != -1 && info->n >= info->max_n) \
-            return info->n;                              \
-                                                         \
-        info->append(info, __c);                         \
-        info->n++;                                       \
+#define PRINTF_APPEND(__c)                                     \
+    {                                                          \
+        if (info->allocated != -1 && info->written >= info->allocated) \
+            return info->written;                              \
+                                                               \
+        info->append(info, __c);                               \
+        info->written++;                                       \
     }
 
 #define PRINTF_PADDING(__buffer, __a)                                    \

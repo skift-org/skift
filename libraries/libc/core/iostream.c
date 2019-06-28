@@ -517,7 +517,7 @@ char *iostream_gets(iostream_t *stream, char *string, int n)
 
 void iostream_printf_append(printf_info_t *info, char c)
 {
-    iostream_t *stream = info->p;
+    iostream_t *stream = info->output;
     iostream_write(stream, &c, 1);
 }
 
@@ -539,8 +539,8 @@ int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
     printf_info_t info = (printf_info_t){
         .format = fmt,
         .append = iostream_printf_append,
-        .p = (void *)stream,
-        .max_n = -1,
+        .output = (void *)stream,
+        .allocated = -1,
     };
 
     return __printf(&info, va);

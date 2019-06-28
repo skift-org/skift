@@ -4,7 +4,7 @@
 
 /* scanf.c: scanf and sscanf internals                                        */
 
-#include <skift/ctype.h>
+/* #include <skift/ctype.h>
 #include <skift/cstring.h>
 #include <skift/__scanf__.h>
 
@@ -151,7 +151,7 @@ int __scanf(scanf_info_t *info, va_list va)
         case SFSTATE_FINALIZE:
             __scanf_scan(info, info->c, &va);
 
-            if (info->n == info->max_n)
+            if (info->n == info->allocated)
             {
                 return info->n;
             }
@@ -170,4 +170,4 @@ int __scanf(scanf_info_t *info, va_list va)
             break;
         }
     }
-}
+}*/

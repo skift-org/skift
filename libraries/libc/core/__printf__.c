@@ -24,7 +24,7 @@ int __printf_formate_binary(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 int __printf_formate_octal(printf_info_t *info, va_list *va)
@@ -43,7 +43,7 @@ int __printf_formate_octal(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 int __printf_formate_decimal(printf_info_t *info, va_list *va)
@@ -75,7 +75,7 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
@@ -94,7 +94,7 @@ int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 int __printf_formate_char(printf_info_t *info, va_list *va)
@@ -112,7 +112,7 @@ int __printf_formate_char(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(buffer, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 int __printf_formate_string(printf_info_t *info, va_list *va)
@@ -133,7 +133,7 @@ int __printf_formate_string(printf_info_t *info, va_list *va)
 
     PRINTF_PADDING(v, PFALIGN_LEFT);
 
-    return info->n;
+    return info->written;
 }
 
 static printf_formatter_t formaters[] = {
@@ -170,7 +170,7 @@ void __printf_formate(printf_info_t *info, char c, va_list *va)
 
 int __printf(printf_info_t *info, va_list va)
 {
-    info->n = 0;
+    info->written = 0;
     info->format_offset = 0;
     info->state = PFSTATE_ESC;
     info->align = PFALIGN_RIGHT;
@@ -257,9 +257,9 @@ int __printf(printf_info_t *info, va_list va)
         case PFSTATE_FINALIZE:
             __printf_formate(info, info->c, &va);
 
-            if (info->n == info->max_n)
+            if (info->written == info->allocated)
             {
-                return info->n;
+                return info->written;
             }
             else
             {

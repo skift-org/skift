@@ -1,0 +1,32 @@
+sudo: require
+dist: xenial
+
+language: cpp
+
+compiler:
+- gcc
+
+cache:
+  directories:
+  - /var/cache/apt/archives/*.deb
+  - ./toolchain/local
+
+before_install:
+- sudo apt-get update
+- sudo apt-get install -y libmpfr-dev libmpc-dev libgmp-dev
+- sudo apt-get install -y e2fsprogs qemu-system-i386 qemu-utils
+- sudo apt-get install -y mtools grub-pc-bin nasm python3
+
+script:
+- ./toolchain/build-it!.sh
+- source ./toolbox/use-it!.sh
+- source ./toolchain/use-it!.sh
+- make all
+
+deploy:
+  provider: releases
+  api_key: "03e50367a3b36dc4f3d825eebf0cd9be5d23f75d"
+  file: "./build/bootdisk.iso"
+  skip_cleanup: true
+  on:
+    tags: true

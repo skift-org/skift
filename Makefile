@@ -1,9 +1,6 @@
 export REPOROOT = $(shell pwd)
 
-export PATH := $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
-
-test:
-	echo $(PATH)
+export PATH = $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
 
 export BUILDROOT = $(REPOROOT)/build
 export SYSROOT = $(BUILDROOT)/sysroot
@@ -28,6 +25,7 @@ TARGETS_CLEAN=${TARGETS:=.clean}
 
 INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*")
 
+
 all: build/bootdisk.iso
 
 run: all
@@ -49,6 +47,7 @@ sync:
 	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/
 
 %.install: %
+	@echo "Path: $(PATH)"
 	make -C $^ install
 
 %.clean: %

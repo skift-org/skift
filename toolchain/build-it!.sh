@@ -7,6 +7,11 @@ TARGET=i686-pc-skift
 PREFIX="$DIR/local"
 SYSROOT="$DIR/../build/sysroot"
 
+if [ -e "$PREFIX/build-ok" ]; then
+    echo "The toolchain is build and ready :)"
+    exit 0
+fi
+
 cd "$DIR"
 
 mkdir -p tarballs
@@ -83,3 +88,5 @@ pushd "$DIR/build/"
         make install-gcc install-target-libgcc || exit 1
     popd
 popd
+
+touch $PREFIX/build-ok

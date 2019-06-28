@@ -8,6 +8,7 @@
 #include <skift/iostream.h>
 #include <skift/cmdline.h>
 #include <skift/process.h>
+#include <skift/convert.h>
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -60,7 +61,7 @@ void do_option(cmdline_t *cmdline, cmdline_option_t *option, int i, int argc, ch
         if (option->value != NULL)
             if (i + 1 < argc && argv[i + 1] != NULL)
             {
-                *((int *)option->value) = stoi(argv[i + 1], 10);
+                *((int *)option->value) = convert_string_to_uint(argv[i + 1], strnlen(argv[i + 1], 33), 10);
                 argv[i + 1] = NULL;
             }
 

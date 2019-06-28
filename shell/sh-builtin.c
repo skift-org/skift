@@ -2,6 +2,7 @@
 #include <skift/process.h>
 #include <skift/iostream.h>
 #include <skift/error.h>
+#include <skift/convert.h>
 
 #include "shell.h"
 
@@ -47,7 +48,7 @@ int shell_builtin_exit(shell_t *shell, int argc, const char **argv)
     shell->do_continue = false;
     if (argc == 2)
     {
-        return stoi(argv[1], 10);
+        return convert_string_to_uint(argv[1], strnlen(argv[1], 32), 10);
     }
     else
     {

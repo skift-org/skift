@@ -6,6 +6,7 @@
 
 #include <skift/ctype.h>
 #include <skift/cstring.h>
+#include <skift/convert.h>
 #include <skift/__printf__.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
@@ -13,7 +14,7 @@ int __printf_formate_binary(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
-    itos(v, buffer, 2);
+    convert_uint_to_string(v, buffer, 33, 2);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -32,7 +33,7 @@ int __printf_formate_octal(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
-    itos(v, buffer, 8);
+    convert_uint_to_string(v, buffer, 33, 8);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -59,11 +60,11 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
         buffer[0] = '-';
         buffer[1] = '\0';
 
-        itos(v, buffer + 1, 10);
+        convert_uint_to_string(v, buffer + 1, 33, 10);
     }
     else
     {
-        itos(v, buffer, 10);
+        convert_uint_to_string(v, buffer, 32, 10);
     }
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
@@ -83,7 +84,7 @@ int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {0};
-    itos(v, buffer, 16);
+    convert_uint_to_string(v, buffer, 32, 16);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -101,6 +102,7 @@ int __printf_formate_char(printf_info_t *info, va_list *va)
 {
     char v = va_arg(*va, int);
 
+    // FIXME: support unicode
     char buffer[2] = {v, 0};
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);

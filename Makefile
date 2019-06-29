@@ -1,6 +1,6 @@
 export REPOROOT = $(shell pwd)
 
-export PATH = $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
+export PATH := $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
 
 export BUILDROOT = $(REPOROOT)/build
 export SYSROOT = $(BUILDROOT)/sysroot
@@ -43,8 +43,7 @@ list:
 	@echo $(TARGETS_CLEAN)
 	@echo $(INCLUDES)
 
-sync:
-	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/
+sync: $(SYSROOT) $(TARGETS_INSTALL)
 
 %.install: %
 	@echo "Path: $(PATH)"

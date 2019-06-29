@@ -4,79 +4,174 @@
 
 #include <skift/cstring.h>
 #include <skift/map.h>
+#include <skift/assert.h>
 
-/*
-map_t* map(void)
+/* --- Key-Value pair ------------------------------------------------------- */
+
+void map_keyvalue_pair_delete(map_keyvalue_pair_t *this);
+
+map_keyvalue_pair_t *map_keyvalue_pair(void)
 {
-    map_t* map = MALLOC(map_t);
+    map_keyvalue_pair_t *this = OBJECT(map_keyvalue_pair);
 
-    map->keys = list();
-    map->values = list();
+    this->key = NULL;
+    this->value = NULL;
 
-    return map;
+    return this;
 }
 
-void map_delete(map_t* map)
+void map_keyvalue_pair_delete(map_keyvalue_pair_t *this)
 {
-    list_destroy(map->keys);
-    list_delete(map->values);
-    free(map);
+    free(this->key);
+    object_release(this->value);
 }
 
-void map_destroy(map_t* map)
+const char *map_keyvalue_pair_get_key(map_keyvalue_pair_t *this)
 {
-    list_destroy(map->keys);
-    list_destroy(map->values);
-    free(map);
+    assert(this);
+
+    return this->key;
 }
 
-void map_put(map_t* map, const char * key, void * value)
+void map_keyvalue_pair_set_key(map_keyvalue_pair_t *this, const char *key)
 {
+    assert(this);
+    assert(key);
 
+    if (this->key)
+    {
+        free(this->key);
+    }
+
+    this->key = strdup(key);
 }
 
-void map_puti(map_t* map, const char * key, int value)
+object_t *map_keyvalue_pair_get_value(map_keyvalue_pair_t *this)
 {
+    assert(this);
+
+    return this->value;
+}
+
+void map_keyvalue_pair_set_value(map_keyvalue_pair_t *this, object_t *value)
+{
+    if (this->value)
+    {
+        object_release(this->value);
+    }
+
+    this->value = object_retain(value);
+}
+
+/* --- Map ------------------------------------------------------------------ */
+
+void map_delete(map_t *);
+
+map_t *map(void)
+{
+    map_t *this = OBJECT(map);
+    this->keyvalue_pairs = list();
+
+    return this;
+}
+
+void map_delete(map_t *this)
+{
+    list_delete(this->keyvalue_pairs, LIST_RELEASE_VALUES);
+}
+
+map_keyvalue_pair_t *map_get_pair(map_t *this, const char *key)
+{
+    assert(this);
+    assert(key);
+
+    list_foreach(i, this->keyvalue_pairs)
+    {
+        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
+        if (strcmp(key, pair->value))
+        {
+            return pair;
+        }
+    }
+
+    return NULL;
+}
+
+bool map_get(map_t *this, const char *key, void **value)
+{
+    assert(this);
+    assert(key);
+    assert(value);
+
+    list_foreach(i, this->keyvalue_pairs)
+    {
+        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
+        if (strcmp(key, pair->value))
+        {
+            *value = pair->value;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void map_set(map_t *this, const char *key, void *value)
+{
+    assert(this);
+    assert(key);
+
+    map_keyvalue_pair_t *pair = map_get_pair(this, key);
+
+    if (pair)
+    {
+        map_keyvalue_pair_set_value(pair, value);
+    }
+    else
+    {
+        pair = map_keyvalue_pair();
+        map_keyvalue_pair_set_key(pair, key);
+        map_keyvalue_pair_set_value(pair, value);
+
+        list_pushback(this->keyvalue_pairs, pair);
+    }
+}
+
+void map_remove(map_t *this, const char *key)
+{
+    assert(this);
+    assert(key);
+
+    map_keyvalue_pair_t *pair = map_get_pair(this, key);
+
+    list_remove(this->keyvalue_pairs, pair);
+    object_release(pair);
+}
+
+bool map_exist(map_t *this, const char *key)
+{
+    assert(this);
+    assert(key);
+
+    return map_get_pair(this, key) != NULL;
+}
+
+void *map_foreach(map_t *this, map_foreach_callback_t *callback, void *arg)
+{
+    assert(this);
+    assert(callback);
+
+    void *ret = NULL;
     
-}
-
-void * map_get(map_t* map, const char * key)
-{
-
-}
-
-int map_geti(map_t* map, const char * key, int default_)
-{
-    return default_;
-}
-
-bool map_exist(map_t* map, const char * key)
-{
-    list_foreach(k, map->keys)
+    list_foreach(i, this->keyvalue_pairs)
     {
-        if (!strcmp(k->value, key)) return true;
+        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
+
+        if (callback(pair, arg, &ret) == ITERATION_STOP)
+        {
+            return ret;
+        }
     }
 
-    return false;
+    return ret;
 }
-
-bool map_containe(map_t* map, const void* value)
-{
-    list_foreach(v, map->values)
-    {
-        if (v->value == value) return true;
-    }
-
-    return false;
-}
-
-bool map_containei(map_t* map, int value)
-{
-    list_foreach(v, map->values)
-    {
-        if ((int)v->value == value) return true;
-    }
-
-    return false;
-}
-*/

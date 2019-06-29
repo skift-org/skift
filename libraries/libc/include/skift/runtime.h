@@ -90,3 +90,11 @@ object_t *object_retain(object_t *this);
 void object_release(object_t *this);
 int object_refcount(object_t *this);
 int object_size(object_t *this);
+
+/* --- Loops ---------------------------------------------------------------- */
+
+typedef enum 
+{
+    ITERATION_CONTINUE,
+    ITERATION_STOP,
+} iteration_decision_t;

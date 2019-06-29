@@ -9,26 +9,25 @@
 
 typedef struct
 {
-    list_t *keys;
-    list_t *values;
+    char *key;
+    object_t *value;
+} map_keyvalue_pair_t;
+
+typedef struct
+{
+    list_t *keyvalue_pairs;
 } map_t;
+
+typedef iteration_decision_t map_foreach_callback_t(map_keyvalue_pair_t *kv, void *arg, void **ret);
 
 map_t *map(void);
 
-void map_delete(map_t *map);
+bool map_get(map_t *this, const char *key, void **value);
 
-void map_destroy(map_t *map);
+void map_set(map_t *this, const char *key, object_t *value);
 
-void map_put(map_t *map, const char *key, void *value);
+void map_remove(map_t* this, const char* key);
 
-void map_puti(map_t *map, const char *key, int value);
+bool map_exist(map_t *this, const char *key);
 
-void *map_get(map_t *map, const char *key);
-
-int map_geti(map_t *map, const char *key, int default_);
-
-bool map_exist(map_t *map, const char *key);
-
-bool map_containe(map_t *map, const void *value);
-
-bool map_containei(map_t *map, int value);
+void *map_foreach(map_t *this, map_foreach_callback_t *callback, void *arg);

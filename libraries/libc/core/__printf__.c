@@ -142,6 +142,7 @@ static printf_formatter_t formaters[] = {
     /* Binary        */ {'b', __printf_formate_binary},
     /* Octal         */ {'o', __printf_formate_octal},
     /* Decimal       */ {'d', __printf_formate_decimal},
+    /* Decimal       */ {'i', __printf_formate_decimal},
     /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
 
     /* Float         */ {'f', NULL},

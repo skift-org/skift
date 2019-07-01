@@ -17,7 +17,7 @@ export ASFLAGS=-f elf32
 
 export AR=i686-pc-skift-ar
 
-TARGETS=libraries userspace kernel shell usertests userdemo compositor ressources
+TARGETS=libraries userspace kernel usertests userdemo compositor ressources
 
 TARGETS_BUILD=${TARGETS:=.build}
 TARGETS_INSTALL=${TARGETS:=.install}
@@ -25,11 +25,10 @@ TARGETS_CLEAN=${TARGETS:=.clean}
 
 INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*")
 
-
 all: build/bootdisk.iso
 
 run: all
-	qemu-system-i386 -cdrom build/bootdisk.iso  -m 256M -enable-kvm -serial mon:stdio
+	qemu-system-i386 -cdrom build/bootdisk.iso -m 256M -enable-kvm -serial mon:stdio
 
 clean: $(TARGETS_CLEAN)
 	rm -rf $(SYSROOT)

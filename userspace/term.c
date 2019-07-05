@@ -203,7 +203,7 @@ int main(int argc, char const *argv[])
 
     iostream_set_read_buffer_mode(terminal_fifo, IOSTREAM_BUFFERED_NONE);
 
-    vtconsole_t *vtc;
+    vtconsole_t *vtc = NULL;
     bool is_framebuffer = true;
     vtc = terminal_create_framebuffer_console();
 

@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     iostream_flush(out_stream);
 
     filesystem_mkfifo("/dev/term");
-    init_exec("/bin/terminal");
+    init_exec("/bin/term");
     int shell = init_exec("/bin/sh");
     
     process_wait(shell, NULL);

@@ -18,7 +18,7 @@ And for testing et debuging
 
 ```sh
 # On Ubuntu
-apt install nasm gcc make binutils python3 grub-pc-bin qemu-system-x86
+apt install nasm gcc make binutils python3 grub-pc-bin qemu-system-x86 xorriso mtools
 ```
 
 ## Setting up the toolchain

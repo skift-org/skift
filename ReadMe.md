@@ -10,11 +10,11 @@ A simple, handmade, operating system for intel x86 cpu.
 <a href="https://discord.gg/gamGsfg">Discord</a> -
 <a href="https://skiftOS.github.io/">Website</a> -
 <a href="https://github.com/skiftOS/skift/release">Releases</a> -
-<a href="manual/readme.md">Manual</a>
+<a href="manual/readme.md">Manual</a> -
+<a href="https://travis-ci.com/skiftOS/skift"><img src="https://travis-ci.com/skiftOS/skift.svg?branch=master" height=16 /></a>
 <br>
 <br>
 </p>
-
 
 # About skiftOS
 <p align="center">

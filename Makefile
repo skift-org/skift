@@ -1,7 +1,6 @@
-export REPOROOT = $(shell pwd)
-
 export PATH := $(shell toolchain/use-it!.sh):$(shell toolbox/use-it!.sh):$(PATH)
 
+export REPOROOT = $(shell pwd)
 export BUILDROOT = $(REPOROOT)/build
 export SYSROOT = $(BUILDROOT)/sysroot
 export BOOTROOT = $(BUILDROOT)/bootroot
@@ -28,7 +27,8 @@ INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./b
 all: build/bootdisk.iso
 
 run: all
-	qemu-system-i386 -cdrom build/bootdisk.iso -m 256M -enable-kvm -serial mon:stdio
+	qemu-system-i386 -cdrom build/bootdisk.iso -m 256M -enable-kvm -serial mon:stdio || \
+	qemu-system-i386 -cdrom build/bootdisk.iso -m 256M -serial mon:stdio
 
 clean: $(TARGETS_CLEAN)
 	rm -rf $(SYSROOT)

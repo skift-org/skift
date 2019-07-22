@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     UNUSED(argc);
     UNUSED(argv);
 
-    logger_setlevel(LOG_OFF);
+    logger_setlevel(LOG_ALL);
 
     hideo_server_t* server = hideo_server();
 

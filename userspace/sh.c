@@ -123,7 +123,7 @@ int shell_split(shell_t *this)
 
     int token_index = 0;
 
-    char **tokens = calloc(TASK_ARGV_COUNT, sizeof(char *));
+    char **tokens = malloc(TASK_ARGV_COUNT * sizeof(char *));
     char *start = &this->command_string[0];
 
     for (size_t i = 0; i < strlen(this->command_string) + 1; i++)

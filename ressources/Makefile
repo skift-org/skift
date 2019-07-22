@@ -19,6 +19,9 @@ install: all
 
 	# install wallpapers
 	cp -a wallpaper/ $(SYSROOT)/res
+	
+	# install test files
+	cp -a test/ $(SYSROOT)/res
 
 .PHONY: all clean install
 

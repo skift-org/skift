@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/logger.h>
-#include "compositor/assets.h"
+#include "assets.h"
 
 hideo_assets_t* hideo_assets(void)
 {

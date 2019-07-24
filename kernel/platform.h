@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/tasking.h"
-#include "kernel/processor.h"
+#include "tasking.h"
+#include "processor.h"
 
 /* --- Processor's FPU ------------------------------------------------------ */
 

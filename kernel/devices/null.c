@@ -4,8 +4,8 @@
 
 #include <skift/cstring.h>
 
-#include "kernel/system.h"
-#include "kernel/filesystem.h"
+#include "system.h"
+#include "filesystem.h"
 
 int null_device_read(stream_t *s, void *buffer, uint size)
 {

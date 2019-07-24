@@ -7,9 +7,9 @@
 #include <skift/widgets.h>
 #include <skift/painter.h>
 
-#include "compositor/renderer.h"
-#include "compositor/assets.h"
-#include "compositor/window.h"
+#include "renderer.h"
+#include "assets.h"
+#include "window.h"
 
 typedef struct
 {

@@ -22,7 +22,7 @@ TARGETS_BUILD=${TARGETS:=.build}
 TARGETS_INSTALL=${TARGETS:=.install}
 TARGETS_CLEAN=${TARGETS:=.clean}
 
-INCLUDES=$(shell find -type d -name include ! -path "./toolchain/*" ! -path "./build/*")
+INCLUDES=./include/
 
 all: build/bootdisk.iso
 
@@ -63,7 +63,7 @@ $(SYSROOT):
 	mkdir -p $(SYSROOT)/me/share
 	mkdir -p $(SYSROOT)/me/anon
 	mkdir -p $(SYSROOT)/me/root
-	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/
+	rsync --progress -r -u $(INCLUDES) $(SYSROOT)/lib/include
 
 $(BOOTROOT):
 	mkdir -p $(BOOTROOT)

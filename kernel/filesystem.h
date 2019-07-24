@@ -11,7 +11,7 @@
 #include <skift/ringbuffer.h>
 #include <skift/iostream.h>
 
-#include "kernel/system.h"
+#include "system.h"
 
 #define ROOT NULL
 

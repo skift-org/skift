@@ -8,9 +8,9 @@
 #include <skift/atomic.h>
 #include <skift/assert.h>
 
-#include "kernel/tasking.h"
-#include "kernel/memory.h"
-#include "kernel/serial.h"
+#include "tasking.h"
+#include "memory.h"
+#include "serial.h"
 
 /* --- Framework initialization --------------------------------------------- */ 
 

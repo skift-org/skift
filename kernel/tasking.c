@@ -9,9 +9,9 @@
 #include <skift/math.h>
 #include <skift/error.h>
 
-#include "kernel/cpu/irq.h"
-#include "kernel/tasking.h"
-#include "kernel/platform.h"
+#include "cpu/irq.h"
+#include "tasking.h"
+#include "platform.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */

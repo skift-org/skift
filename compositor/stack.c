@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "compositor/stack.h"
+#include "stack.h"
 
 hideo_stack_t *hideo_stack(void)
 {

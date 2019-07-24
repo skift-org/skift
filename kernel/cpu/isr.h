@@ -5,6 +5,10 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-#include "kernel/processor.h"
 
-void syscall_dispatcher(processor_context_t *context);
+#include "processor.h"
+
+typedef void (*isr_handler_t)(processor_context_t *);
+
+void isr_setup();
+isr_handler_t isr_register(int index, isr_handler_t handler);

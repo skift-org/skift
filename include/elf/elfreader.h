@@ -19,7 +19,7 @@ typedef struct
     list_t* sym;
 } elfreader_t;
 
-elfreader_t *elfreader(const char *path);
+elfreader_t *elfreader(iostream_t* elffile);
 
 void elfreader_delete(elfreader_t *this);
 

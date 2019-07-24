@@ -7,7 +7,7 @@
 #include <skift/list.h>
 #include <skift/messaging.h>
 
-#include "compositor/server.h"
+#include "server.h"
 
 typedef struct
 {

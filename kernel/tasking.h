@@ -10,8 +10,8 @@
 #include <hjert/message.h>
 #include <hjert/task.h>
 
-#include "kernel/memory.h"
-#include "kernel/filesystem.h"
+#include "memory.h"
+#include "filesystem.h"
 
 /* --- Task data structure -------------------------------------------------- */
 

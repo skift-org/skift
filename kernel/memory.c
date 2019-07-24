@@ -19,10 +19,10 @@
 #include <skift/logger.h>
 #include <skift/math.h>
 
-#include "kernel/memory.h"
-#include "kernel/modules.h"
-#include "kernel/paging.h"
-#include "kernel/system.h"
+#include "memory.h"
+#include "modules.h"
+#include "paging.h"
+#include "system.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

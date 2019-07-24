@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "compositor/server.h"
-#include "compositor/window.h"
+#include "server.h"
+#include "window.h"
 
 #define server_painter this->renderer->painter
 

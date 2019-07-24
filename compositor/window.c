@@ -6,7 +6,7 @@
 #include <skift/cstring.h>
 #include <skift/logger.h>
 
-#include "compositor/window.h"
+#include "window.h"
 
 static const spacing_t window_decoration_spacing = (spacing_t){32, 1, 1, 1};
 static const point_t window_min_size = (point_t){128, 33};

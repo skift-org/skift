@@ -2,4 +2,4 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "compositor/client.h"
+#include "client.h"

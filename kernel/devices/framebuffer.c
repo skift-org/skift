@@ -9,11 +9,11 @@
 
 #include <hjert/devices/framebuffer.h>
 
-#include "kernel/cpu/pci.h"
-#include "kernel/filesystem.h"
-#include "kernel/devices.h"
-#include "kernel/paging.h"
-#include "kernel/memory.h"
+#include "cpu/pci.h"
+#include "filesystem.h"
+#include "devices.h"
+#include "paging.h"
+#include "memory.h"
 
 /* --- Bochs VBE Extensions driver ------------------------------------------ */
 

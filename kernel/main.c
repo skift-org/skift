@@ -24,22 +24,22 @@
 #include <skift/math.h>
 #include <skift/error.h>
 
-#include "kernel/cpu/gdt.h"
-#include "kernel/cpu/idt.h"
-#include "kernel/cpu/irq.h"
-#include "kernel/cpu/isr.h"
+#include "cpu/gdt.h"
+#include "cpu/idt.h"
+#include "cpu/irq.h"
+#include "cpu/isr.h"
 
-#include "kernel/devices.h"
-#include "kernel/filesystem.h"
-#include "kernel/memory.h"
-#include "kernel/modules.h"
-#include "kernel/mouse.h"
-#include "kernel/multiboot.h"
-#include "kernel/paging.h"
-#include "kernel/serial.h"
-#include "kernel/system.h"
-#include "kernel/tasking.h"
-#include "kernel/platform.h"
+#include "devices.h"
+#include "filesystem.h"
+#include "memory.h"
+#include "modules.h"
+#include "mouse.h"
+#include "multiboot.h"
+#include "paging.h"
+#include "serial.h"
+#include "system.h"
+#include "tasking.h"
+#include "platform.h"
 
 multiboot_info_t mbootinfo;
 

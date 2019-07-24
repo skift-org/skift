@@ -6,7 +6,7 @@
 
 #include <skift/runtime.h>
 
-#include "kernel/multiboot.h"
+#include "multiboot.h"
 
 void modules_setup(multiboot_info_t *minfo);
 uint modules_get_end(multiboot_info_t *minfo);

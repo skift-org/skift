@@ -4,11 +4,16 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/runtime.h>
+void framebuffer_setup(void);
 
-#include "kernel/processor.h"
+void keyboard_setup(void);
 
-typedef void (*isr_handler_t)(processor_context_t *);
+void null_setup(void);
 
-void isr_setup();
-isr_handler_t isr_register(int index, isr_handler_t handler);
+void proc_setup(void);
+
+void random_setup(void);
+
+void textmode_setup(void);
+
+void zero_setup(void);

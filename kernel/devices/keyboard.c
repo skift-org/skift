@@ -12,9 +12,9 @@
 #include <hjert/devices/keyboard.h>
 #include <hjert/message.h>
 
-#include "kernel/cpu/irq.h"
-#include "kernel/filesystem.h"
-#include "kernel/tasking.h"
+#include "cpu/irq.h"
+#include "filesystem.h"
+#include "tasking.h"
 
 stream_t *keyboard_fifo;
 

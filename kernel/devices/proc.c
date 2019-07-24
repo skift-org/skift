@@ -7,9 +7,9 @@
 #include <skift/atomic.h>
 #include <skift/math.h>
 
-#include "kernel/devices.h"
-#include "kernel/filesystem.h"
-#include "kernel/tasking.h"
+#include "devices.h"
+#include "filesystem.h"
+#include "tasking.h"
 
 int proc_device_open(stream_t *stream)
 {

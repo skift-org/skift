@@ -6,8 +6,8 @@
 
 #include <skift/painter.h>
 
-#include "compositor/renderer.h"
-#include "compositor/assets.h"
+#include "renderer.h"
+#include "assets.h"
 
 #define HIDEO_WINDOW_TITLE_SIZE 64
 

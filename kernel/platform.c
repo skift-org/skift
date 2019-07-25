@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/platform.h"
+#include "platform.h"
 
 /* --- FPU ------------------------------------------------------------------ */
 

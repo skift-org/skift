@@ -1,8 +1,8 @@
 #include <skift/logger.h>
 #include <skift/cstring.h>
 
-#include "kernel/cpu/pci.h"
-#include "kernel/processor.h"
+#include "cpu/pci.h"
+#include "processor.h"
 
 void pci_write_field(uint32_t device, int field, int size, uint32_t value)
 {

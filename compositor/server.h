@@ -9,8 +9,8 @@
 #include <hjert/devices/mouse.h>
 #include <hjert/devices/keyboard.h>
 
-#include "compositor/mouse.h"
-#include "compositor/stack.h"
+#include "mouse.h"
+#include "stack.h"
 
 typedef struct
 {

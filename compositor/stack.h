@@ -6,7 +6,7 @@
 
 #include <skift/list.h>
 
-#include "compositor/window.h"
+#include "window.h"
 
 typedef struct
 {

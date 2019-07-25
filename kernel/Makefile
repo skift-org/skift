@@ -4,7 +4,7 @@ CSOURCES=$(wildcard *.c) $(wildcard */*.c)
 SSOURCES=$(wildcard *.s) $(wildcard */*.s)
 OBJECTS= ${CSOURCES:.c=.o} ${SSOURCES:.s=.o}
 
-CFLAGS += -ffreestanding -nostdlib
+CFLAGS += -ffreestanding -nostdlib -I.
 
 all: $(KERNEL)
 

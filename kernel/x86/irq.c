@@ -5,8 +5,8 @@
 #include <skift/atomic.h>
 #include <skift/logger.h>
 
-#include "kernel/cpu/irq.h"
-#include "kernel/cpu/idt.h"
+#include "cpu/irq.h"
+#include "cpu/idt.h"
 
 extern u32 irq_vector[];
 extern bool console_bypass_lock;

@@ -80,6 +80,22 @@ typedef void object_t;
 
 #define OBJECT(__type) (__type##_t*)object(sizeof(__type##_t), (object_dtor_t)(__type##_delete));
 
+#define class(__type) typedef struct __type
+
+#define new (__type, __arguments...) __type##_ctor(object(sizeof(__type##_t), (object_dtor_t)(__type##_dtor)), __arguments);
+
+#define constructor(__type, __arguments...) \
+    __type##_t *__type##_ctor(__type##_t *this, __arguments)
+
+#define destructor(__type) \
+    void __type##_dtor(__type##_t *this)
+
+#define methode(__ret, __type, __name, __arguments...) \
+    __ret __type##_##__name(__type##_t *this, __arguments)
+
+#define methode_no_arg(__ret, __type, __name) \
+    __ret __type##_##__name(__type##_t *this)
+
 object_t *object(uint size, object_dtor_t dtor);
 
 void object_lock(object_t *this);

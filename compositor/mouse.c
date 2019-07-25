@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "compositor/mouse.h"
+#include "mouse.h"
 
 const point_t mouse_bound = {56, 56};
 

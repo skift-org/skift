@@ -19,11 +19,11 @@
 
 #include <hjert/syscalls.h>
 
-#include "kernel/filesystem.h"
-#include "kernel/memory.h"
-#include "kernel/serial.h"
-#include "kernel/syscalls.h"
-#include "kernel/tasking.h"
+#include "filesystem.h"
+#include "memory.h"
+#include "serial.h"
+#include "syscalls.h"
+#include "tasking.h"
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
 

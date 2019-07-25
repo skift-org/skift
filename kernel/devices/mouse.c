@@ -8,11 +8,11 @@
 #include <hjert/devices/mouse.h>
 #include <hjert/message.h>
 
-#include "kernel/cpu/irq.h"
-#include "kernel/processor.h"
-#include "kernel/tasking.h"
+#include "cpu/irq.h"
+#include "processor.h"
+#include "tasking.h"
 
-#include "kernel/mouse.h"
+#include "mouse.h"
 
 static mouse_state_t oldmouse = {0};
 

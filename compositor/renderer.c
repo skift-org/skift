@@ -8,7 +8,7 @@
 
 #include <hjert/devices/framebuffer.h>
 
-#include "compositor/renderer.h"
+#include "renderer.h"
 
 hideo_renderer_t *hideo_renderer(point_t prefered_resolution)
 {

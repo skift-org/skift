@@ -7,8 +7,8 @@
 #include <skift/tar.h>
 #include <skift/logger.h>
 
-#include "kernel/filesystem.h"
-#include "kernel/multiboot.h"
+#include "filesystem.h"
+#include "multiboot.h"
 
 void ramdiload(multiboot_module_t *module)
 {

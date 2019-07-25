@@ -5,9 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <skift/runtime.h>
-#include "kernel/processor.h"
+#include "processor.h"
 
-typedef reg32_t (*irq_handler_t)(reg32_t, processor_context_t *);
-
-void irq_setup();
-irq_handler_t irq_register(int index, irq_handler_t handler);
+void syscall_dispatcher(processor_context_t *context);

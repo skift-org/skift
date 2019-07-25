@@ -6,14 +6,14 @@
 #include <skift/logger.h>
 #include <skift/process.h>
 
-#include "compositor/server.h"
+#include "server.h"
 
 int main(int argc, char **argv)
 {
     UNUSED(argc);
     UNUSED(argv);
 
-    logger_setlevel(LOG_ALL);
+    logger_setlevel(LOG_OFF);
 
     hideo_server_t* server = hideo_server();
 

@@ -462,12 +462,12 @@ void strtrailtrim(char *str, char c)
 char *strdup(const char *s)
 {
     int lenght = strlen(s) + 1;
-    char *new = malloc(lenght);
+    char * allocated_string = malloc(lenght);
 
-    if (new != NULL)
+    if (allocated_string != NULL)
     {
-        memcpy(new, s, lenght);
+        memcpy(allocated_string, s, lenght);
     }
 
-    return new;
+    return allocated_string;
 }

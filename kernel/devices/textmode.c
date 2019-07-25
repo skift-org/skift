@@ -5,8 +5,8 @@
 
 #include <hjert/devices/textmode.h>
 
-#include "kernel/filesystem.h"
-#include "kernel/devices.h"
+#include "filesystem.h"
+#include "devices.h"
 
 /* ---VGA textmode driver --------------------------------------------------- */
 

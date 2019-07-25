@@ -4,7 +4,7 @@
 
 #include <skift/iostream.h>
 
-#include "kernel/processor.h"
+#include "processor.h"
 
 void processor_dump_context(processor_context_t *context)
 {

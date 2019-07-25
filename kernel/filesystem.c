@@ -16,8 +16,8 @@
 #include <skift/error.h>
 #include <skift/logger.h>
 
-#include "kernel/tasking.h"
-#include "kernel/filesystem.h"
+#include "tasking.h"
+#include "filesystem.h"
 
 static fsnode_t *root = NULL;
 static lock_t fslock;

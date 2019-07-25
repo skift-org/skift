@@ -6,8 +6,8 @@
 
 #include <skift/runtime.h>
 
-#include "kernel/multiboot.h"
-#include "kernel/paging.h"
+#include "multiboot.h"
+#include "paging.h"
 
 extern uint TOTAL_MEMORY;
 extern uint USED_MEMORY;

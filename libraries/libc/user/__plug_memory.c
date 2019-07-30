@@ -6,7 +6,7 @@
 #include <hjert/syscalls.h>
 #include <skift/error.h>
 
-int shared_memory_alloc(int pagecount)
+int shared_memory_alloc(uint pagecount)
 {
     int r = __syscall(SYS_SHARED_MEMORY_ALLOC, pagecount, 0, 0, 0, 0);
     RETURN_AND_SET_ERROR(r, r, -1);

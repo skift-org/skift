@@ -17,27 +17,15 @@
 
 /* --- wm_client object ----------------------------------------------------- */
 
-class(wm_client)
+typedef struct
 {
     int pid;
     list_t *windows;
 } wm_client_t;
 
-constructor(wm_client, int pid)
-{
-}
-
-destructor(wm_client)
-{
-}
-
-methode(void, wm_client, respond, int value)
-{
-}
-
 /* --- wm_window object ----------------------------------------------------- */
 
-class(wm_window)
+typedef struct
 {
     int id;
 
@@ -47,20 +35,6 @@ class(wm_window)
     int shm;
     bitmap_t* framebuffer;
 } wm_window_t;
-
-constructor(wm_window, wm_client_t *owner)
-{
-    static int wid = 0;
-
-    this->id = wid++;
-
-    return this;
-}
-
-destructor(wm_window)
-{
-    object_release(this->framebuffer);
-}
 
 /* --- The server logic ----------------------------------------------------- */
 

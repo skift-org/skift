@@ -2,9 +2,11 @@
 #include <skift/math.h>
 #include <skift/error.h>
 #include <skift/logger.h>
+#include <skift/atomic.h>
 
 #include <hjert/devices/textmode.h>
 
+#include "processor.h"
 #include "filesystem.h"
 #include "devices.h"
 
@@ -28,14 +30,29 @@ void vga_cell(u32 x, u32 y, ushort entry)
     }
 }
 
-void vga_cursor(s32 x, s32 y)
+void vga_cursor_enable(u8 cursor_start, u8 cursor_end)
 {
-    s16 cursorLocation = y * VGA_SCREEN_WIDTH + x;
+	out8(0x3D4, 0x0A);
+	out8(0x3D5, (in8(0x3D5) & 0xC0) | cursor_start);
+ 
+	out8(0x3D4, 0x0B);
+	out8(0x3D5, (in8(0x3D5) & 0xE0) | cursor_end);
+}
+
+void vga_cursor_disable()
+{
+    out8(0x3D4, 0x0A);
+	out8(0x3D5, 0x20);
+}
+
+void vga_cursor_position(s32 x, s32 y)
+{
+    u16 cursorLocation = y * VGA_SCREEN_WIDTH + x;
 
     out8(0x3D4, 14);                        // Tell the VGA board we are setting the high cursor byte.
-    out8(0x3D5, (u8)(cursorLocation >> 8)); // Send the high cursor byte.
-    out8(0x3D4, 15);                        // Tell the VGA board we are setting the low cursor byte.
     out8(0x3D5, (u8)(cursorLocation));      // Send the low cursor byte.
+    out8(0x3D4, 15);                        // Tell the VGA board we are setting the low cursor byte.
+    out8(0x3D5, (u8)(cursorLocation >> 8)); // Send the high cursor byte.
 }
 
 /* --- Textmode abstract driver --------------------------------------------- */
@@ -71,7 +88,7 @@ int textmode_device_ioctl(stream_t *stream, int request, void *args)
     {
         textmode_info_t *info = (textmode_info_t *)args;
 
-        vga_cursor(info->cursor_x, info->cursor_y);
+        vga_cursor_position(info->cursor_x, info->cursor_y);
         return -ERR_SUCCESS;
     }
     else if (request == TEXTMODE_IOCTL_SET_CELL)

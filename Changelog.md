@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `lsproc` utility for listing running processes
  - `gfxctl` utility for getting, setting and listing graphics modes
  - Some graphic demos `lines`, `colors`, `gfxtest`
- - Mouse cursors and wallpapers in `/res`
+ - Mouse cursors, fonts and wallpapers in `/res`
  - Support for FPU
  - Support for FIFO/NAMED_PIPES
  - Support for errno
@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Task and processes are now the same thing
  - libgfx now support alpha blending
  - Messages can now be sended synchronously
- - moved out of the kernel the terminal rendering code to `/bin/terminal`
+ - moved out of the kernel the terminal rendering code to `/bin/term`
  - Moved the toolchain from i686-elf to i686-pc-skift
 
 ## Fixed

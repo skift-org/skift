@@ -7,6 +7,7 @@
 #include <skift/__plugs__.h>
 #include <skift/iostream.h>
 #include <skift/logger.h>
+#include <skift/process.h>
 
 log_level_t log_level = LOG_ALL;
 bool show_file_name = true;
@@ -55,11 +56,11 @@ void __logger_log(log_level_t level, const char *file, uint line, const char *fu
 
         if (show_file_name)
         {
-            iostream_printf(log_stream, "%s %s:%s() ln%d ", log_describe(level), file, function, line);
+            iostream_printf(log_stream, "[ %d ] %s %s:%s() ln%d ", process_this(), log_describe(level), file, function, line);
         }
         else
         {
-            iostream_printf(log_stream, "%s %s() ", log_describe(level), function);
+            iostream_printf(log_stream, "[ %d ] %s %s() ", process_this(), log_describe(level), function);
         }
 
         iostream_vprintf(log_stream, fmt, va);

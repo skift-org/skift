@@ -157,7 +157,7 @@ int shell_split(shell_t *this)
 
 void shell_cleanup(shell_t *this)
 {
-    for (int i = 0; i < TASK_ARGV_COUNT; i++)
+    for (int i = 0; i < this->command_argc; i++)
     {
         free(this->command_argv[i]);
     }

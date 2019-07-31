@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* alloc.c : based on durand's Amazing Super Duper Memory functions.          */
+/* __alloc__.c : based on durand's Amazing Super Duper Memory functions.      */
 
 #include <skift/__plugs__.h>
 
@@ -26,6 +26,8 @@
 #define USE_CASE3
 #define USE_CASE4
 #define USE_CASE5
+
+#define INFO
 
 /** This macro will conveniently align our pointer upwards */
 #define ALIGN(ptr)                                       \
@@ -98,7 +100,7 @@ static long long l_possibleOverruns = 0; ///< Number of possible overruns
 
 // ***********   HELPER FUNCTIONS  *******************************
 
-#if defined DEBUG || defined INFO
+#if defined DEBUG
 static void liballoc_dump()
 {
 #ifdef DEBUG
@@ -106,27 +108,27 @@ static void liballoc_dump()
 	struct liballoc_minor *min = NULL;
 #endif
 
-	iostream_printf(log_stream,"liballoc: ------ Memory data ---------------\n");
-	iostream_printf(log_stream,"liballoc: System memory allocated: %i bytes\n", l_allocated);
-	iostream_printf(log_stream,"liballoc: Memory in used (malloc'ed): %i bytes\n", l_inuse);
-	iostream_printf(log_stream,"liballoc: Warning count: %i\n", l_warningCount);
-	iostream_printf(log_stream,"liballoc: Error count: %i\n", l_errorCount);
-	iostream_printf(log_stream,"liballoc: Possible overruns: %i\n", l_possibleOverruns);
+	iostream_printf(log_stream, "liballoc: ------ Memory data ---------------\n");
+	iostream_printf(log_stream, "liballoc: System memory allocated: %i bytes\n", l_allocated);
+	iostream_printf(log_stream, "liballoc: Memory in used (malloc'ed): %i bytes\n", l_inuse);
+	iostream_printf(log_stream, "liballoc: Warning count: %i\n", l_warningCount);
+	iostream_printf(log_stream, "liballoc: Error count: %i\n", l_errorCount);
+	iostream_printf(log_stream, "liballoc: Possible overruns: %i\n", l_possibleOverruns);
 
 #ifdef DEBUG
 	while (maj != NULL)
 	{
-		iostream_printf(log_stream,"liballoc: 0x%x: total = %i, used = %i\n",
-			   maj,
-			   maj->size,
-			   maj->usage);
+		iostream_printf(log_stream, "liballoc: 0x%x: total = %i, used = %i\n",
+						maj,
+						maj->size,
+						maj->usage);
 
 		min = maj->first;
 		while (min != NULL)
 		{
-			iostream_printf(log_stream,"liballoc:    0x%x: %i bytes\n",
-				   min,
-				   min->size);
+			iostream_printf(log_stream, "liballoc:    0x%x: %i bytes\n",
+							min,
+							min->size);
 			min = min->next;
 		}
 
@@ -166,8 +168,7 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 	{
 		l_warningCount += 1;
 #if defined DEBUG || defined INFO
-		iostream_printf(log_stream,"liballoc: WARNING: __plug_memalloc_alloc( %i ) return NULL\n", st);
-		FLUSH();
+		logger_log(LOG_WARNING, "__plug_memalloc_alloc( %i ) return NULL", st);
 #endif
 		return NULL; // uh oh, we ran out of memory.
 	}
@@ -182,9 +183,9 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 	l_allocated += maj->size;
 
 #ifdef DEBUG
-	iostream_printf(log_stream,"liballoc: Resource allocated 0x%x of %i pages (%i bytes) for %i size.\n", maj, st, maj->size, size);
+	iostream_printf(log_stream, "liballoc: Resource allocated 0x%x of %i pages (%i bytes) for %i size.\n", maj, st, maj->size, size);
 
-	iostream_printf(log_stream,"liballoc: Total memory usage = %i KB\n", (int)((l_allocated / (1024))));
+	iostream_printf(log_stream, "liballoc: Total memory usage = %i KB\n", (int)((l_allocated / (1024))));
 	FLUSH();
 #endif
 
@@ -217,7 +218,7 @@ void *PREFIX(malloc)(size_t req_size)
 	{
 		l_warningCount += 1;
 
-		logger_log(LOG_WARNING, "alloc( 0 ) called from 0x%x\n", __builtin_return_address(0));
+		logger_log(LOG_WARNING, "alloc( 0 ) called from 0x%x", __builtin_return_address(0));
 		__plug_memalloc_unlock();
 
 		return PREFIX(malloc)(1);
@@ -227,7 +228,7 @@ void *PREFIX(malloc)(size_t req_size)
 	{
 #if defined DEBUG || defined INFO
 #ifdef DEBUG
-		iostream_printf(log_stream,"liballoc: initialization of liballoc " VERSION "\n");
+		iostream_printf(log_stream, "liballoc: initialization of liballoc " VERSION "\n");
 #endif
 		FLUSH();
 #endif
@@ -238,22 +239,22 @@ void *PREFIX(malloc)(size_t req_size)
 		{
 			__plug_memalloc_unlock();
 #ifdef DEBUG
-			iostream_printf(log_stream,"liballoc: initial l_memRoot initialization failed\n", p);
+			iostream_printf(log_stream, "liballoc: initial l_memRoot initialization failed\n", p);
 			FLUSH();
 #endif
 			return NULL;
 		}
 
 #ifdef DEBUG
-		iostream_printf(log_stream,"liballoc: set up first memory major 0x%x\n", l_memRoot);
+		iostream_printf(log_stream, "liballoc: set up first memory major 0x%x\n", l_memRoot);
 		FLUSH();
 #endif
 	}
 
 #ifdef DEBUG
-	iostream_printf(log_stream,"liballoc: 0x%x PREFIX(malloc)( %i ): ",
-		   __builtin_return_address(0),
-		   size);
+	iostream_printf(log_stream, "liballoc: 0x%x PREFIX(malloc)( %i ): ",
+					__builtin_return_address(0),
+					size);
 	FLUSH();
 #endif
 
@@ -292,7 +293,7 @@ void *PREFIX(malloc)(size_t req_size)
 		if (diff < (size + sizeof(struct liballoc_minor)))
 		{
 #ifdef DEBUG
-			iostream_printf(log_stream,"CASE 1: Insufficient space in block 0x%x\n", maj);
+			iostream_printf(log_stream, "CASE 1: Insufficient space in block 0x%x\n", maj);
 			FLUSH();
 #endif
 
@@ -344,7 +345,7 @@ void *PREFIX(malloc)(size_t req_size)
 			ALIGN(p);
 
 #ifdef DEBUG
-			iostream_printf(log_stream,"CASE 2: returning 0x%x\n", p);
+			iostream_printf(log_stream, "CASE 2: returning 0x%x\n", p);
 			FLUSH();
 #endif
 			__plug_memalloc_unlock(); // release the lock
@@ -380,7 +381,7 @@ void *PREFIX(malloc)(size_t req_size)
 			ALIGN(p);
 
 #ifdef DEBUG
-			iostream_printf(log_stream,"CASE 3: returning 0x%x\n", p);
+			iostream_printf(log_stream, "CASE 3: returning 0x%x\n", p);
 			FLUSH();
 #endif
 			__plug_memalloc_unlock(); // release the lock
@@ -426,7 +427,7 @@ void *PREFIX(malloc)(size_t req_size)
 					ALIGN(p);
 
 #ifdef DEBUG
-					iostream_printf(log_stream,"CASE 4.1: returning 0x%x\n", p);
+					iostream_printf(log_stream, "CASE 4.1: returning 0x%x\n", p);
 					FLUSH();
 #endif
 					__plug_memalloc_unlock(); // release the lock
@@ -465,7 +466,7 @@ void *PREFIX(malloc)(size_t req_size)
 					ALIGN(p);
 
 #ifdef DEBUG
-					iostream_printf(log_stream,"CASE 4.2: returning 0x%x\n", p);
+					iostream_printf(log_stream, "CASE 4.2: returning 0x%x\n", p);
 					FLUSH();
 #endif
 
@@ -485,7 +486,7 @@ void *PREFIX(malloc)(size_t req_size)
 		if (maj->next == NULL)
 		{
 #ifdef DEBUG
-			iostream_printf(log_stream,"CASE 5: block full\n");
+			iostream_printf(log_stream, "CASE 5: block full\n");
 			FLUSH();
 #endif
 
@@ -510,15 +511,8 @@ void *PREFIX(malloc)(size_t req_size)
 
 	__plug_memalloc_unlock(); // release the lock
 
-#ifdef DEBUG
-	iostream_printf(log_stream,"All cases exhausted. No memory available.\n");
-	FLUSH();
-#endif
-#if defined DEBUG || defined INFO
-	iostream_printf(log_stream,"liballoc: WARNING: PREFIX(malloc)( %i ) returning NULL.\n", size);
-	liballoc_dump();
-	FLUSH();
-#endif
+	logger_log(LOG_WARNING, "All cases exhausted. No memory available.");
+
 	return NULL;
 }
 
@@ -531,8 +525,8 @@ void PREFIX(free)(void *ptr)
 	{
 		l_warningCount += 1;
 #if defined DEBUG || defined INFO
-		iostream_printf(log_stream,"liballoc: WARNING: PREFIX(free)( NULL ) called from 0x%x\n",
-			   __builtin_return_address(0));
+		logger_log(LOG_WARNING, "PREFIX(free)( NULL ) called from 0x%x",
+						__builtin_return_address(0));
 		FLUSH();
 #endif
 		return;
@@ -549,28 +543,27 @@ void PREFIX(free)(void *ptr)
 		l_errorCount += 1;
 
 		// Check for overrun errors. For all bytes of LIBALLOC_MAGIC
-		if (
-			((min->magic & 0xFFFFFF) == (LIBALLOC_MAGIC & 0xFFFFFF)) ||
+		if (((min->magic & 0xFFFFFF) == (LIBALLOC_MAGIC & 0xFFFFFF)) ||
 			((min->magic & 0xFFFF) == (LIBALLOC_MAGIC & 0xFFFF)) ||
 			((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
 		{
 			l_possibleOverruns += 1;
 			logger_log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
-					   min->magic,
-					   LIBALLOC_MAGIC);
+							min->magic,
+							LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
-			logger_log(LOG_ERROR, "multiple free() attempt on 0x%x from 0x%x.",
-					   ptr,
-					   __builtin_return_address(0));
+			logger_log(LOG_ERROR, "Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
+							ptr,
+							__builtin_return_address(0));
 		}
 		else
 		{
-			logger_log(LOG_ERROR, " Bad free( 0x%x ) called from 0x%x",
-					   ptr,
-					   __builtin_return_address(0));
+			logger_log(LOG_ERROR, "Bad PREFIX(free)( 0x%x ) called from 0x%x",
+							ptr,
+							__builtin_return_address(0));
 		}
 
 		// being lied to...
@@ -579,9 +572,9 @@ void PREFIX(free)(void *ptr)
 	}
 
 #ifdef DEBUG
-	iostream_printf(log_stream,"liballoc: 0x%x PREFIX(free)( 0x%x ): ",
-		   __builtin_return_address(0),
-		   ptr);
+	iostream_printf(log_stream, "liballoc: 0x%x PREFIX(free)( 0x%x ): ",
+					__builtin_return_address(0),
+					ptr);
 	FLUSH();
 #endif
 
@@ -631,7 +624,7 @@ void PREFIX(free)(void *ptr)
 	}
 
 #ifdef DEBUG
-	iostream_printf(log_stream,"OK\n");
+	iostream_printf(log_stream, "OK\n");
 	FLUSH();
 #endif
 
@@ -660,8 +653,7 @@ void *PREFIX(realloc)(void *p, size_t size)
 	// Honour the case of size == 0 => free old and return NULL
 	if (size == 0)
 	{
-		PREFIX(free)
-		(p);
+		PREFIX(free)(p);
 		return NULL;
 	}
 
@@ -689,31 +681,22 @@ void *PREFIX(realloc)(void *p, size_t size)
 			((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
 		{
 			l_possibleOverruns += 1;
-#if defined DEBUG || defined INFO
-			iostream_printf(log_stream,"liballoc: ERROR: Possible 1-3 byte overrun for magic 0x%x != 0x%x\n",
-				   min->magic,
-				   LIBALLOC_MAGIC);
-			FLUSH();
-#endif
+			logger_log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
+							min->magic,
+							LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
-#if defined DEBUG || defined INFO
-			iostream_printf(log_stream,"liballoc: ERROR: multiple PREFIX(free)() attempt on 0x%x from 0x%x.\n",
-				   ptr,
-				   __builtin_return_address(0));
-			FLUSH();
-#endif
+			logger_log(LOG_ERROR, "Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
+							ptr,
+							__builtin_return_address(0));
 		}
 		else
 		{
-#if defined DEBUG || defined INFO
-			iostream_printf(log_stream,"liballoc: ERROR: Bad PREFIX(free)( 0x%x ) called from 0x%x\n",
-				   ptr,
-				   __builtin_return_address(0));
-			FLUSH();
-#endif
+			logger_log(LOG_ERROR, "Bad PREFIX(free)( 0x%x ) called from 0x%x",
+							ptr,
+							__builtin_return_address(0));
 		}
 
 		// being lied to...
@@ -737,8 +720,7 @@ void *PREFIX(realloc)(void *p, size_t size)
 	// If we got here then we're reallocating to a block bigger than us.
 	ptr = PREFIX(malloc)(size); // We need to allocate new memory
 	memcpy(ptr, p, real_size);
-	PREFIX(free)
-	(p);
+	PREFIX(free)(p);
 
 	return ptr;
 }

@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/__plugs__.h>
+#include <libsystem/__plugs__.h>
 
-#include <skift/iostream.h>
-#include <skift/atomic.h>
-#include <skift/assert.h>
+#include <libsystem/iostream.h>
+#include <libsystem/atomic.h>
+#include <libsystem/assert.h>
 
 #include "tasking.h"
 #include "memory.h"

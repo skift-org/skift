@@ -31,7 +31,7 @@ diff -Nru gcc-8.2.0_clean/gcc/config/skift.h gcc-8.2.0/gcc/config/skift.h
 +/* Default arguments you want when running your
 +   i686-skift-gcc/x86_64-skift-gcc toolchain */
 +#undef LIB_SPEC
-+#define LIB_SPEC "-lc" /* link against C standard library */
++#define LIB_SPEC "-lsystem" /* link against system library */
 + 
 +/* Files that are linked before user code.
 +   The %s tells GCC to look for these files in the library directory. */

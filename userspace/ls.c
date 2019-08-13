@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
-#include <skift/error.h>
-#include <skift/logger.h>
-#include <skift/iostream.h>
-#include <skift/cmdline.h>
+#include <libsystem/cstring.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
+#include <libsystem/iostream.h>
+#include <libsystem/cmdline.h>
 
 static bool option_all = false;
 static bool option_list = false;

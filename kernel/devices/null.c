@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
+#include <libsystem/cstring.h>
 
 #include "system.h"
 #include "filesystem.h"

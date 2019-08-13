@@ -11,13 +11,13 @@
  * - Shared memory syscalls.
  */
 
-#include <skift/atomic.h>
-#include <skift/cstring.h>
-#include <skift/logger.h>
-#include <skift/system.h>
-#include <skift/error.h>
+#include <libsystem/atomic.h>
+#include <libsystem/cstring.h>
+#include <libsystem/logger.h>
+#include <libsystem/system.h>
+#include <libsystem/error.h>
 
-#include <hjert/syscalls.h>
+#include <libkernel/syscalls.h>
 
 #include "filesystem.h"
 #include "memory.h"

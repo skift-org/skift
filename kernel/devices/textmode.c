@@ -1,10 +1,10 @@
-#include <skift/cstring.h>
-#include <skift/math.h>
-#include <skift/error.h>
-#include <skift/logger.h>
-#include <skift/atomic.h>
+#include <libsystem/cstring.h>
+#include <libmath/math.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
+#include <libsystem/atomic.h>
 
-#include <hjert/devices/textmode.h>
+#include <libdevice/textmode.h>
 
 #include "processor.h"
 #include "filesystem.h"

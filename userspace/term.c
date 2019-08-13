@@ -4,15 +4,15 @@
 
 /* terminal: terminal host process                                            */
 
-#include <skift/iostream.h>
-#include <skift/error.h>
-#include <skift/logger.h>
-#include <skift/painter.h>
+#include <libsystem/iostream.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
+#include <libgraphic/painter.h>
 
-#include <hjert/devices/textmode.h>
-#include <hjert/devices/framebuffer.h>
+#include <libdevice/textmode.h>
+#include <libdevice/framebuffer.h>
 
-#include <vtconsole.h>
+#include <libconsole/vtconsole.h>
 
 static iostream_t *terminal_fifo = NULL;
 

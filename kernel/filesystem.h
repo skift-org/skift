@@ -4,12 +4,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/runtime.h>
-#include <skift/path.h>
-#include <skift/list.h>
-#include <skift/lock.h>
-#include <skift/ringbuffer.h>
-#include <skift/iostream.h>
+#include <libsystem/runtime.h>
+#include <libsystem/path.h>
+#include <libsystem/list.h>
+#include <libsystem/lock.h>
+#include <libsystem/ringbuffer.h>
+#include <libsystem/iostream.h>
 
 #include "system.h"
 

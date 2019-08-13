@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/filesystem.h>
+#include <libsystem/filesystem.h>
 
 int mkdir(const char *path)
 {

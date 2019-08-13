@@ -1,7 +1,7 @@
-#include <skift/logger.h>
-#include <skift/cstring.h>
+#include <libsystem/logger.h>
+#include <libsystem/cstring.h>
 
-#include "cpu/pci.h"
+#include "x86/pci.h"
 #include "processor.h"
 
 void pci_write_field(uint32_t device, int field, int size, uint32_t value)
@@ -128,7 +128,7 @@ static uint8_t pci_remaps[4] = {0};
 void pci_remap(void)
 {
     pci_scan(&find_isa_bridge, -1, &pci_isa);
-    
+
     if (pci_isa)
     {
         for (int i = 0; i < 4; ++i)
@@ -160,7 +160,7 @@ int pci_get_interrupt(uint32_t device)
         int int_line = pci_read_field(device, PCI_INTERRUPT_LINE, 1);
 
         logger_log(LOG_ERROR, "slot is %d, irq pin is %d, so pirq is %d and that maps to %d? int_line=%d", pci_extract_slot(device), irq_pin, pirq, pci_remaps[pirq], int_line);
-        
+
         for (int i = 0; i < 4; ++i)
         {
             logger_log(LOG_ERROR, "  irq[%d] = %d", i, pci_remaps[i]);

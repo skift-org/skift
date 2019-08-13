@@ -2,16 +2,16 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
-#include <skift/iostream.h>
-#include <skift/logger.h>
-#include <skift/messaging.h>
-#include <skift/error.h>
-#include <skift/process.h>
-#include <skift/convert.h>
+#include <libsystem/cstring.h>
+#include <libsystem/iostream.h>
+#include <libsystem/logger.h>
+#include <libsystem/messaging.h>
+#include <libsystem/error.h>
+#include <libsystem/process.h>
+#include <libsystem/convert.h>
 
-#include <hjert/task.h>
-#include <hjert/devices/keyboard.h>
+#include <libkernel/task.h>
+#include <libdevice/keyboard.h>
 
 #define MAX_COMMAND_LENGHT 128
 

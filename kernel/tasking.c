@@ -2,14 +2,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/assert.h>
-#include <skift/cstring.h>
-#include <skift/atomic.h>
-#include <skift/elf.h>
-#include <skift/math.h>
-#include <skift/error.h>
+#include <libsystem/assert.h>
+#include <libsystem/cstring.h>
+#include <libsystem/atomic.h>
+#include <libsystem/error.h>
+#include <libfile/elf.h>
+#include <libmath/math.h>
 
-#include "cpu/irq.h"
+#include "x86/irq.h"
 #include "tasking.h"
 #include "platform.h"
 
@@ -910,12 +910,12 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
 }
 
 /* -------------------------------------------------------------------------- */
-/*   SHARED MEMORY                                                            */      
+/*   SHARED MEMORY                                                            */
 /* -------------------------------------------------------------------------- */
 
 static int SHMID = 0;
-static lock_t shms_lock; 
-static list_t* shms;
+static lock_t shms_lock;
+static list_t *shms;
 
 void task_shared_memory_setup(void)
 {
@@ -925,7 +925,7 @@ void task_shared_memory_setup(void)
 
 /* --- Shared phycical region ----------------------------------------------- */
 
-void shm_physical_region_delete(shm_physical_region_t* this);
+void shm_physical_region_delete(shm_physical_region_t *this);
 shm_physical_region_t *shm_physical_region(int pagecount)
 {
     shm_physical_region_t *this = OBJECT(shm_physical_region);
@@ -948,7 +948,7 @@ shm_physical_region_t *shm_physical_region(int pagecount)
     }
 }
 
-void shm_physical_region_delete(shm_physical_region_t* this)
+void shm_physical_region_delete(shm_physical_region_t *this)
 {
     list_remove(shms, this);
     physical_free(this->paddr, this->pagecount);
@@ -971,8 +971,8 @@ shm_physical_region_t *task_physical_region_get_by_id(int id)
 }
 
 /* --- Shared virtual region ------------------------------------------------ */
-void shm_virtual_region_delete(shm_virtual_region_t* this);
-shm_virtual_region_t* shm_virtual_region(task_t* task, shm_physical_region_t *physr)
+void shm_virtual_region_delete(shm_virtual_region_t *this);
+shm_virtual_region_t *shm_virtual_region(task_t *task, shm_physical_region_t *physr)
 {
     uint vaddr = virtual_alloc(task->pdir, physr->paddr, physr->pagecount, 1);
 
@@ -981,14 +981,14 @@ shm_virtual_region_t* shm_virtual_region(task_t* task, shm_physical_region_t *ph
         return NULL;
     }
 
-    shm_virtual_region_t* virtr = OBJECT(shm_virtual_region);
+    shm_virtual_region_t *virtr = OBJECT(shm_virtual_region);
     virtr->region = object_retain(physr);
     virtr->vaddr = vaddr;
 
     return virtr;
 }
 
-void shm_virtual_region_delete(shm_virtual_region_t* this)
+void shm_virtual_region_delete(shm_virtual_region_t *this)
 {
     object_release(this->region);
 
@@ -1001,7 +1001,7 @@ void shm_virtual_region_delete(shm_virtual_region_t* this)
     }
 }
 
-shm_virtual_region_t* task_virtual_region_get_by_id(task_t* this, int id)
+shm_virtual_region_t *task_virtual_region_get_by_id(task_t *this, int id)
 {
     if (id < SHMID)
         return NULL;
@@ -1017,21 +1017,20 @@ shm_virtual_region_t* task_virtual_region_get_by_id(task_t* this, int id)
     return NULL;
 }
 
-
 /* --- User facing API ------------------------------------------------------ */
 
 int task_shared_memory_alloc(task_t *this, int pagecount)
 {
     lock_acquire(shms_lock);
 
-    shm_physical_region_t* physr = shm_physical_region(pagecount);
+    shm_physical_region_t *physr = shm_physical_region(pagecount);
 
     if (physr == NULL)
     {
         return -ERR_CANNOT_ALLOCATE_MEMORY;
     }
 
-    shm_virtual_region_t* virtr = shm_virtual_region(this, physr);
+    shm_virtual_region_t *virtr = shm_virtual_region(this, physr);
 
     if (virtr == NULL)
     {
@@ -1047,7 +1046,7 @@ int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
 {
     lock_acquire(shms_lock);
 
-    shm_virtual_region_t* virtr = task_virtual_region_get_by_id(this, shm);
+    shm_virtual_region_t *virtr = task_virtual_region_get_by_id(this, shm);
 
     if (virtr != NULL)
     {
@@ -1056,7 +1055,7 @@ int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
         return -ERR_SUCCESS;
     }
 
-    shm_physical_region_t* physr = task_physical_region_get_by_id(shm);
+    shm_physical_region_t *physr = task_physical_region_get_by_id(shm);
 
     if (physr == NULL)
     {
@@ -1081,15 +1080,15 @@ int task_shared_memory_release(task_t *this, int shm)
 {
     lock_acquire(shms_lock);
 
-    shm_virtual_region_t* virtr = task_virtual_region_get_by_id(this, shm);
+    shm_virtual_region_t *virtr = task_virtual_region_get_by_id(this, shm);
 
-    if(virtr == NULL)
+    if (virtr == NULL)
     {
         lock_release(shms_lock);
         return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
     }
     else
-    {      
+    {
         object_release(virtr);
         lock_release(shms_lock);
         return -ERR_SUCCESS;

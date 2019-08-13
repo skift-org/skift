@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/runtime.h>
+#include <libsystem/runtime.h>
 
 typedef u32 reg32_t;
 

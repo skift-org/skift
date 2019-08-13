@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/runtime.h>
-#include <skift/atomic.h>
+#include <libsystem/runtime.h>
+#include <libsystem/atomic.h>
 
 #include "system.h"
 #include "processor.h"

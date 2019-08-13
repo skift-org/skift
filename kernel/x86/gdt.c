@@ -2,10 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
-#include <skift/iostream.h>
+#include <libsystem/cstring.h>
+#include <libsystem/iostream.h>
 
-#include "cpu/gdt.h"
+#include "x86/gdt.h"
 
 gdt_t gdt;
 
@@ -14,8 +14,8 @@ extern void gdt_flush(u32);
 void gdt_setup()
 {
     // null segment
-    gdt_entry(0,0,0,0,0, "NULL"); 
-    
+    gdt_entry(0, 0, 0, 0, 0, "NULL");
+
     // kernel code segment
     gdt_entry(1, 0, 0xffffffff, PRESENT | EXECUTABLE | READWRITE, FLAGS, "KCODE");
 
@@ -23,10 +23,10 @@ void gdt_setup()
     gdt_entry(2, 0, 0xffffffff, PRESENT | READWRITE, FLAGS, "KDATA");
 
     // user code segment
-    gdt_entry(3, 0, 0xffffffff, PRESENT | EXECUTABLE | READWRITE | USER, FLAGS, "UCODE"); 
+    gdt_entry(3, 0, 0xffffffff, PRESENT | EXECUTABLE | READWRITE | USER, FLAGS, "UCODE");
 
     // user data segment
-    gdt_entry(4, 0, 0xffffffff, PRESENT | READWRITE | USER, FLAGS, "UDATA"); 
+    gdt_entry(4, 0, 0xffffffff, PRESENT | READWRITE | USER, FLAGS, "UDATA");
 
     // tss segment
     gdt_tss_entry(5, 0x10, 0x0);
@@ -44,11 +44,11 @@ void set_kernel_stack(u32 stack)
 
 /* --- gdt entry setup ------------------------------------------------------ */
 
-void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, const char* hint)
+void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, const char *hint)
 {
     UNUSED(hint);
-    
-    gdt_entry_t * entry = &gdt.entries[index];
+
+    gdt_entry_t *entry = &gdt.entries[index];
     entry->acces = access;
     entry->flags = flags;
 
@@ -65,15 +65,15 @@ void gdt_tss_entry(int index, u16 ss0, u32 esp0)
     gdt_entry(index, (u32)&gdt.tss, sizeof(tss_t), PRESENT | EXECUTABLE | ACCESSED, TSS_FLAGS, "TSS");
     memset(&gdt.tss, 0, sizeof(tss_t));
 
-    tss_t* tss = &gdt.tss;
+    tss_t *tss = &gdt.tss;
 
     tss->ss0 = ss0;
     tss->esp0 = esp0;
 
     tss->cs = 0x0b;
-	tss->ss = 0x13;
-	tss->ds = 0x13;
-	tss->es = 0x13;
-	tss->fs = 0x13;
-	tss->gs = 0x13;
+    tss->ss = 0x13;
+    tss->ds = 0x13;
+    tss->es = 0x13;
+    tss->fs = 0x13;
+    tss->gs = 0x13;
 }

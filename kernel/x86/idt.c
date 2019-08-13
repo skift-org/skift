@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
+#include <libsystem/cstring.h>
 
-#include "cpu/idt.h"
+#include "x86/idt.h"
 
 idt_t idt;
 

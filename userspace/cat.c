@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/error.h>
-#include <skift/iostream.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
 
 int cat(const char *path)
 {

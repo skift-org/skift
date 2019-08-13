@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/iostream.h>
-#include <skift/filesystem.h>
+#include <libsystem/iostream.h>
+#include <libsystem/filesystem.h>
 
 int main(int argc, char **argv)
 {

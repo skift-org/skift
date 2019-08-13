@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/atomic.h>
+#include <libsystem/atomic.h>
 
-#include "cpu/cpuid.h"
+#include "x86/cpuid.h"
 #include "system.h"
 #include "tasking.h"
 #include "memory.h"
@@ -25,31 +25,31 @@ char *__kernel_uname_format = "%s %d.%d.%d-%s @ " __COMMIT__;
 /* --- Panic screen --------------------------------------------------------- */
 
 const char *const witty_comments[] =
-{
-    "Witty comment unavailable :(",
-    "Surprise! Haha. Well, this is awkward.",
-    "Oh - I know what I did wrong!",
-    "Uh... Did I do that?",
-    "Oops.",
-    "On the bright side, I bought you a teddy bear!",
-    "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can get error while you get error",
-    "Excuse me Sir, \n\t// Do you have a moment to talk about TempleOS?",
-    "DON'T PANIC!",
-    "...",
-    "Greenpeace free'd the mallocs \\o/",
-    "Typo in the code.",
-    "System consumed all the paper for paging!",
-    "Suspicious pointer corrupted the machine.",
-    "I'm tired of this ;_;",
-    "PC LOAD LETTER",
-    "Abort, Retry, Fail?",
-    "Bad command or file name",
+    {
+        "Witty comment unavailable :(",
+        "Surprise! Haha. Well, this is awkward.",
+        "Oh - I know what I did wrong!",
+        "Uh... Did I do that?",
+        "Oops.",
+        "On the bright side, I bought you a teddy bear!",
+        "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can get error while you get error",
+        "Excuse me Sir, \n\t// Do you have a moment to talk about TempleOS?",
+        "DON'T PANIC!",
+        "...",
+        "Greenpeace free'd the mallocs \\o/",
+        "Typo in the code.",
+        "System consumed all the paper for paging!",
+        "Suspicious pointer corrupted the machine.",
+        "I'm tired of this ;_;",
+        "PC LOAD LETTER",
+        "Abort, Retry, Fail?",
+        "Bad command or file name",
 };
 
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...)
+void __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...)
 {
     atomic_begin();
 
@@ -68,12 +68,12 @@ void __panic(const char* package, const char* file, const char* function, const 
         printf("\n\tNESTED");
     }
 
-    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments)/sizeof(char*))]);
+    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
 
     has_panic = true;
 
     vprintf(message, va);
-    printf("\033[0m\n\tthrow by %s::%s %s() ln%d",package, file, function, line);
+    printf("\033[0m\n\tthrow by %s::%s %s() ln%d", package, file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");

@@ -2,49 +2,48 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "cpu/idt.h"
-#include "cpu/isr.h"
+#include "x86/idt.h"
+#include "x86/isr.h"
 
 #include "syscalls.h"
 #include "system.h"
 
-static const char *exception_messages[32] = 
-{
-	"Division by zero",
-	"Debug",
-	"Non-maskable interrupt",
-	"Breakpoint",
-	"Detected overflow",
-	"Out-of-bounds",
-	"Invalid opcode",
-	"No coprocessor",
-	"Double fault",
-	"Coprocessor segment overrun",
-	"Bad TSS",
-	"Segment not present",
-	"Stack fault",
-	"General protection fault",
-	"Page fault",
-	"Unknown interrupt",
-	"Coprocessor fault",
-	"Alignment check",
-	"Machine check",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved"
-};
+static const char *exception_messages[32] =
+	{
+		"Division by zero",
+		"Debug",
+		"Non-maskable interrupt",
+		"Breakpoint",
+		"Detected overflow",
+		"Out-of-bounds",
+		"Invalid opcode",
+		"No coprocessor",
+		"Double fault",
+		"Coprocessor segment overrun",
+		"Bad TSS",
+		"Segment not present",
+		"Stack fault",
+		"General protection fault",
+		"Page fault",
+		"Unknown interrupt",
+		"Coprocessor fault",
+		"Alignment check",
+		"Machine check",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"Reserved"};
 
-void page_fault(processor_context_t* context)
+void page_fault(processor_context_t *context)
 {
 	CPANIC(context, "PAGE FAULT at %08x", CR2());
 }

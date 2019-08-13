@@ -2,13 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
-#include <skift/atomic.h>
+#include <libsystem/cstring.h>
+#include <libsystem/atomic.h>
 
-#include <hjert/devices/mouse.h>
-#include <hjert/message.h>
+#include <libdevice/mouse.h>
+#include <libkernel/message.h>
 
-#include "cpu/irq.h"
+#include "x86/irq.h"
 #include "processor.h"
 #include "tasking.h"
 

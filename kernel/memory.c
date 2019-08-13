@@ -12,12 +12,12 @@
  * - MAYBE ADD: support for copy on write
  */
 
-#include <skift/cstring.h>
-#include <skift/iostream.h>
-#include <skift/runtime.h>
-#include <skift/atomic.h>
-#include <skift/logger.h>
-#include <skift/math.h>
+#include <libsystem/cstring.h>
+#include <libsystem/iostream.h>
+#include <libsystem/runtime.h>
+#include <libsystem/atomic.h>
+#include <libsystem/logger.h>
+#include <libmath/math.h>
 
 #include "memory.h"
 #include "modules.h"

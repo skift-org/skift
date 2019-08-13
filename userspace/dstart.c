@@ -4,20 +4,20 @@
 
 /* dstart.c: start a process as a daemon                                      */
 
-#include <skift/process.h>
-#include <skift/error.h>
-#include <skift/iostream.h>
-#include <hjert/task.h>
+#include <libsystem/process.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
+#include <libkernel/task.h>
 
 int main(int argc, char const *argv[])
 {
     if (argc >= 2)
     {
-        const char* deamon_argv[TASK_ARGV_COUNT];
+        const char *deamon_argv[TASK_ARGV_COUNT];
 
         for (int i = 0; i < TASK_ARGV_COUNT - 1; i++)
         {
-            deamon_argv[i] = argv[i+1];
+            deamon_argv[i] = argv[i + 1];
         }
 
         if (process_exec(argv[1], deamon_argv) < 0)
@@ -33,5 +33,6 @@ int main(int argc, char const *argv[])
     else
     {
         printf("No executable specified!\n");
+        return -1;
     }
 }

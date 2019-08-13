@@ -2,12 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <hjert/devices/framebuffer.h>
+#include <libdevice/framebuffer.h>
 
-#include <skift/iostream.h>
-#include <skift/error.h>
-#include <skift/cmdline.h>
-#include <skift/cstring.h>
+#include <libsystem/iostream.h>
+#include <libsystem/error.h>
+#include <libsystem/cmdline.h>
+#include <libsystem/cstring.h>
 
 static bool option_list = false;
 static bool option_get = false;

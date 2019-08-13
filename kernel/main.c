@@ -16,18 +16,18 @@
  * - ADD support for kernel command line options.
  */
 
-#include <skift/__plugs__.h>
-#include <skift/atomic.h>
-#include <skift/cstring.h>
-#include <skift/iostream.h>
-#include <skift/logger.h>
-#include <skift/math.h>
-#include <skift/error.h>
+#include <libsystem/__plugs__.h>
+#include <libsystem/atomic.h>
+#include <libsystem/cstring.h>
+#include <libsystem/iostream.h>
+#include <libsystem/logger.h>
+#include <libmath/math.h>
+#include <libsystem/error.h>
 
-#include "cpu/gdt.h"
-#include "cpu/idt.h"
-#include "cpu/irq.h"
-#include "cpu/isr.h"
+#include "x86/gdt.h"
+#include "x86/idt.h"
+#include "x86/irq.h"
+#include "x86/isr.h"
 
 #include "devices.h"
 #include "filesystem.h"

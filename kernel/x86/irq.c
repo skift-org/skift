@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/atomic.h>
-#include <skift/logger.h>
+#include <libsystem/atomic.h>
+#include <libsystem/logger.h>
 
-#include "cpu/irq.h"
-#include "cpu/idt.h"
+#include "x86/irq.h"
+#include "x86/idt.h"
 
 extern u32 irq_vector[];
 extern bool console_bypass_lock;
@@ -41,7 +41,7 @@ reg32_t irq_handler(reg32_t esp, processor_context_t context)
     }
     else
     {
-        logger_log(LOG_WARNING,  "Unhandeled IRQ %d!", context.int_no);
+        logger_log(LOG_WARNING, "Unhandeled IRQ %d!", context.int_no);
     }
 
     if (context.int_no >= 8)

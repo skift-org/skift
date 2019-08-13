@@ -11,10 +11,10 @@
  *  - Add support for .. and .
  */
 
-#include <skift/math.h>
-#include <skift/cstring.h>
-#include <skift/error.h>
-#include <skift/logger.h>
+#include <libmath/math.h>
+#include <libsystem/cstring.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
 
 #include "tasking.h"
 #include "filesystem.h"

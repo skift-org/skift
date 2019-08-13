@@ -2,14 +2,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/atomic.h>
-#include <skift/error.h>
-#include <skift/cstring.h>
-#include <skift/math.h>
+#include <libsystem/atomic.h>
+#include <libsystem/error.h>
+#include <libsystem/cstring.h>
+#include <libmath/math.h>
 
-#include <hjert/devices/framebuffer.h>
+#include <libdevice/framebuffer.h>
 
-#include "cpu/pci.h"
+#include "x86/pci.h"
 #include "filesystem.h"
 #include "devices.h"
 #include "paging.h"

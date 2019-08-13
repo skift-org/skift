@@ -4,15 +4,15 @@
 
 /* keyboard.c: keyboard driver                                                */
 
-#include <skift/logger.h>
-#include <skift/ascii.h>
-#include <skift/ringbuffer.h>
-#include <skift/atomic.h>
+#include <libsystem/logger.h>
+#include <libsystem/ringbuffer.h>
+#include <libsystem/atomic.h>
+#include <libfile/ascii.h>
 
-#include <hjert/devices/keyboard.h>
-#include <hjert/message.h>
+#include <libdevice/keyboard.h>
+#include <libkernel/message.h>
 
-#include "cpu/irq.h"
+#include "x86/irq.h"
 #include "filesystem.h"
 #include "tasking.h"
 

@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/runtime.h>
-#include <skift/logger.h>
+#include <libsystem/runtime.h>
+#include <libsystem/logger.h>
 
 #include "processor.h"
 

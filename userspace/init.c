@@ -2,13 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/cstring.h>
-#include <skift/iostream.h>
+#include <libsystem/cstring.h>
+#include <libsystem/iostream.h>
 
-#include <skift/logger.h>
-#include <skift/process.h>
-#include <skift/messaging.h>
-#include <skift/filesystem.h>
+#include <libsystem/logger.h>
+#include <libsystem/process.h>
+#include <libsystem/messaging.h>
+#include <libsystem/filesystem.h>
 
 int init_exec(const char* filename)
 {

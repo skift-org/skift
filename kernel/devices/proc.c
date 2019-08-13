@@ -4,8 +4,8 @@
 
 /* proc.c : process list device                                               */
 
-#include <skift/atomic.h>
-#include <skift/math.h>
+#include <libsystem/atomic.h>
+#include <libmath/math.h>
 
 #include "devices.h"
 #include "filesystem.h"

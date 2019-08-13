@@ -2,10 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/math.h>
-#include <skift/cstring.h>
-#include <skift/tar.h>
-#include <skift/logger.h>
+#include <libmath/math.h>
+#include <libsystem/cstring.h>
+#include <libsystem/logger.h>
+#include <libfile/tar.h>
 
 #include "filesystem.h"
 #include "multiboot.h"
@@ -21,7 +21,7 @@ void ramdiload(multiboot_module_t *module)
     tar_block_t block;
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
     {
-        path_t* file_path = path(block.name);
+        path_t *file_path = path(block.name);
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
@@ -33,7 +33,7 @@ void ramdiload(multiboot_module_t *module)
         else
         {
             stream_t *s = filesystem_open(ROOT, file_path, IOSTREAM_WRITE | IOSTREAM_CREATE | IOSTREAM_TRUNC);
-            
+
             if (s != NULL)
             {
                 filesystem_write(s, block.data, block.size);

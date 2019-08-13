@@ -2,18 +2,18 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <skift/iostream.h>
-#include <skift/cstring.h>
-#include <skift/error.h>
-#include <skift/bitmap.h>
-#include <skift/painter.h>
-#include <skift/logger.h>
-#include <skift/assert.h>
-#include <skift/messaging.h>
+#include <libsystem/iostream.h>
+#include <libsystem/cstring.h>
+#include <libsystem/error.h>
+#include <libgraphic/bitmap.h>
+#include <libgraphic/painter.h>
+#include <libsystem/logger.h>
+#include <libsystem/assert.h>
+#include <libsystem/messaging.h>
 
-#include <hideo/server.h>
-#include <hideo/client.h>
-#include <hjert/devices/framebuffer.h>
+#include <libdevice/framebuffer.h>
+#include <libform/wm/server.h>
+#include <libform/wm/client.h>
 
 /* --- wm_client object ----------------------------------------------------- */
 
@@ -33,7 +33,7 @@ typedef struct
     point_t size;
 
     int shm;
-    bitmap_t* framebuffer;
+    bitmap_t *framebuffer;
 } wm_window_t;
 
 /* --- The server logic ----------------------------------------------------- */

@@ -33,7 +33,7 @@ void application_init(int argc, char **argv, const char *title)
     // }
     // else
     // {
-    //     logger_log(LOG_ERROR, "Failled to open /run")
+    //     logger_error("Failled to open /run")
     // }
 
     // Connect to the server
@@ -42,11 +42,11 @@ void application_init(int argc, char **argv, const char *title)
         application_windows = list();
         application_initialized = true;
 
-        logger_log(LOG_INFO, "Application '%s' initialized!");
+        logger_info("Application '%s' initialized!");
     }
     else
     {
-        logger_log(LOG_ERROR, "Failled to say hello to the hideo server!");
+        logger_error("Failled to say hello to the hideo server!");
     }
 }
 
@@ -57,7 +57,7 @@ int application_run(void)
 
     application_running = true;
 
-    logger_log(LOG_INFO, "Entering event loop...");
+    logger_info("Entering event loop...");
 
     do
     {
@@ -66,7 +66,7 @@ int application_run(void)
         // Is
     } while (application_running);
 
-    logger_log(LOG_INFO, "Event loop exited!");
+    logger_info("Event loop exited!");
 
     return application_exit_value;
 }
@@ -79,7 +79,7 @@ void application_quit(int exit_value)
     application_running = false;
     application_exit_value = exit_value;
 
-    logger_log(LOG_INFO, "Application quit!");
+    logger_info("Application quit!");
 }
 
 int application_get_server_pid(void)
@@ -104,7 +104,7 @@ int application_send_request(const char *request, const void *payload, int paylo
 
     if (messaging_request(&client_request, &server_respond, 100) == 0)
     {
-        logger_log(LOG_DEBUG, "Server respond %s", server_respond.header.label);
+        logger_debug("Server respond %s", server_respond.header.label);
 
         assert(message_is(server_respond, HIDEO_SERVER_RESULT));
 
@@ -113,7 +113,7 @@ int application_send_request(const char *request, const void *payload, int paylo
     }
     else
     {
-        logger_log(LOG_WARNING, "Request '%s' failled: %s", request, error_to_string(error_get()));
+        logger_warn("Request '%s' failled: %s", request, error_to_string(error_get()));
 
         return -1;
     }

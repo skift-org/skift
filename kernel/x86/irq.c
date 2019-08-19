@@ -41,7 +41,7 @@ reg32_t irq_handler(reg32_t esp, processor_context_t context)
     }
     else
     {
-        logger_log(LOG_WARNING, "Unhandeled IRQ %d!", context.int_no);
+        logger_warn("Unhandeled IRQ %d!", context.int_no);
     }
 
     if (context.int_no >= 8)

@@ -47,7 +47,7 @@ void kmain(multiboot_info_t *info, uint magic)
 {
     __plug_init();
 
-    logger_setlevel(LOG_ALL);
+    logger_level(LOGGER_TRACE);
 
     /* --- Early operation -------------------------------------------------- */
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
@@ -63,7 +63,9 @@ void kmain(multiboot_info_t *info, uint magic)
         PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
     }
 
-    logger_log(LOG_INFO, "Booting from '%s' using command lines options '%s'.", info->boot_loader_name, info->cmdline);
+    logger_info(KERNEL_UNAME);
+    logger_info("Bootloader: %s using command lines options '%s'.", info->boot_loader_name);
+    logger_info("Command lines: %s", info->cmdline);
 
     /* --- Setup cpu context ------------------------------------------------ */
     setup(gdt);
@@ -74,14 +76,14 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(platform);
 
     /* --- System context --------------------------------------------------- */
-    logger_log(LOG_INFO, "Initializing system...");
+    logger_info("Initializing system...");
     setup(memory, &mbootinfo);
     setup(tasking);
     setup(filesystem);
     setup(modules, &mbootinfo);
 
     /* --- Devices ---------------------------------------------------------- */
-    logger_log(LOG_INFO, "Mounting devices...");
+    logger_info("Mounting devices...");
     setup(textmode);
     setup(framebuffer);
     setup(serial);
@@ -94,12 +96,9 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(random);
 
     /* --- Finalizing System ------------------------------------------------ */
-    logger_log(LOG_INFO, "Starting the userspace...");
+    logger_info("Starting the userspace...");
     atomic_enable();
     sti();
-
-    printf(KERNEL_UNAME);
-    printf("\n");
 
     /* --- Entering userspace ----------------------------------------------- */
     int init = task_exec("/bin/init", (const char *[]){"/bin/init", NULL});

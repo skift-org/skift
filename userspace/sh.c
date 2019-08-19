@@ -202,7 +202,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 int shell_builtin_exit(shell_t *shell, int argc, const char **argv)
 {
     shell->do_continue = false;
- 
+
     if (argc == 2)
     {
         return convert_string_to_uint(argv[1], strnlen(argv[1], 32), 10);
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
     UNUSED(argc);
     UNUSED(argv);
 
-    logger_setlevel(LOG_ALL);
+    logger_level(LOGGER_TRACE);
 
     iostream_set_write_buffer_mode(out_stream, IOSTREAM_BUFFERED_NONE);
 

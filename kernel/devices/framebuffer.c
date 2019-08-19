@@ -67,7 +67,7 @@ bool bga_is_available(void)
     {
         if (bga_read_register(VBE_DISPI_INDEX_ID) == 0xB0C0 + i)
         {
-            logger_log(LOG_INFO, "BGA framebuffer device detected (version 0x%04x).", 0xB0C0 + i);
+            logger_info("BGA framebuffer device detected (version 0x%04x).", 0xB0C0 + i);
             found = true;
         }
     }
@@ -88,7 +88,7 @@ void *bga_get_framebuffer()
     u32 lfb_addr = 0;
 
     pci_scan(framebuffer_pci_get_framebuffer, -1, &lfb_addr);
-    logger_log(LOG_INFO, "Framebuffer found at %08x", lfb_addr);
+    logger_info("Framebuffer found at %08x", lfb_addr);
 
     return (void *)lfb_addr;
 }
@@ -136,7 +136,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
 
         if (mode_info->enable)
         {
-            logger_log(LOG_INFO, "Setting mode to %dx%d...", mode_info->width, mode_info->height);
+            logger_info("Setting mode to %dx%d...", mode_info->width, mode_info->height);
 
             if (mode_info->width > 0 &&
                 mode_info->width <= VBE_DISPI_MAX_XRES &&
@@ -161,11 +161,11 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
                             return -ERR_CANNOT_ALLOCATE_MEMORY;
                         }
 
-                        logger_log(LOG_INFO, "BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
+                        logger_info("BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
                     }
                     else
                     {
-                        logger_log(LOG_ERROR, "BGA: no framebuffer found!");
+                        logger_error("BGA: no framebuffer found!");
 
                         // FIXME: maybe this is note
                         return -ERR_NO_SUCH_DEVICE_OR_ADDRESS;
@@ -181,7 +181,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
             }
             else
             {
-                logger_log(LOG_WARNING, "Failled to create framebuffer !");
+                logger_warn("Failled to create framebuffer !");
                 return -ERR_INVALID_ARGUMENT;
             }
         }
@@ -250,6 +250,6 @@ void framebuffer_setup(void)
     }
     else
     {
-        logger_log(LOG_WARNING, "No framebuffer device found!");
+        logger_warn("No framebuffer device found!");
     }
 }

@@ -9,17 +9,33 @@
 
 #include "processor.h"
 
-void __panic(const char* package, const char* file, const char* function, const int line, processor_context_t * context, const char* message, ...);
+void __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
 
-#define HANG while(1){ hlt(); }
-#define STOP while(1){ cli(); hlt(); }
+#define HANG   \
+    while (1)  \
+    {          \
+        hlt(); \
+    }
+
+#define STOP   \
+    while (1)  \
+    {          \
+        cli(); \
+        hlt(); \
+    }
+
 #define PANIC(x...) __panic(__PACKAGE__, __FILE__, __FUNCTION__, __LINE__, NULL, x)
+
 #define CPANIC(ctx, x...) __panic(__PACKAGE__, __FILE__, __FUNCTION__, __LINE__, ctx, x)
-#define setup(x, arg...) { logger_log(LOG_INFO, "Setting up " #x "..."); x##_setup(arg); }
 
-
+#define setup(x, arg...)                     \
+    {                                        \
+        logger_info("Setting up " #x "..."); \
+        x##_setup(arg);                      \
+    }
 
 #define KERNEL_VERSION __kernel_version_format, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
+
 #define KERNEL_UNAME __kernel_uname_format, __kernel_name, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
 
 extern char *__kernel_name;

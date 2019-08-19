@@ -8,20 +8,30 @@
 
 typedef enum
 {
-    LOG_OFF = 9,
-    LOG_FATAL = 8,
-    LOG_SEVERE = 7,
-    LOG_ERROR = 6,
-    LOG_WARNING = 5,
-    LOG_INFO = 4,
-    LOG_CONFIG = 3,
-    LOG_DEBUG = 2,
-    LOG_FINE = 1,
-    LOG_ALL = 0
+    LOGGER_TRACE,
+    LOGGER_DEBUG,
+    LOGGER_INFO,
+    LOGGER_WARN,
+    LOGGER_ERROR,
+    LOGGER_FATAL,
 } log_level_t;
 
-void logger_setlevel(log_level_t level);
+void logger_level(log_level_t log_level);
 
-void __logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...);
+void logger_colors(bool use_colors);
 
-#define logger_log(level, va...) __logger_log(level, __FILE__, __LINE__, __FUNCTION__, va)
+void logger_quiet(bool quiet);
+
+void logger_log(log_level_t level, const char *file, uint line, const char *fmt, ...);
+
+#define logger_trace(__args...) logger_log(LOGGER_TRACE, __FILE__, __LINE__, __args)
+
+#define logger_debug(__args...) logger_log(LOGGER_DEBUG, __FILE__, __LINE__, __args)
+
+#define logger_info(__args...) logger_log(LOGGER_INFO, __FILE__, __LINE__, __args)
+
+#define logger_warn(__args...) logger_log(LOGGER_WARN, __FILE__, __LINE__, __args)
+
+#define logger_error(__args...) logger_log(LOGGER_ERROR, __FILE__, __LINE__, __args)
+
+#define logger_fatal(__args...) logger_log(LOGGER_FATAL, __FILE__, __LINE__, __args)

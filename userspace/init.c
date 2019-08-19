@@ -10,18 +10,18 @@
 #include <libsystem/messaging.h>
 #include <libsystem/filesystem.h>
 
-int init_exec(const char* filename)
+int init_exec(const char *filename)
 {
-    logger_log(LOG_INFO, "Starting '%s'", filename);
-    int process = process_exec(filename, (const char*[]){filename, NULL});
+    logger_info("Starting '%s'", filename);
+    int process = process_exec(filename, (const char *[]){filename, NULL});
 
     if (process < 0)
     {
-        logger_log(LOG_WARNING, "Failed to start process: '%s'!", filename);
+        logger_warn("Failed to start process: '%s'!", filename);
     }
     else
     {
-        logger_log(LOG_FINE, "'%s' started with pid=%d !", filename, process);
+        logger_info("'%s' started with pid=%d !", filename, process);
     }
 
     return process;
@@ -29,9 +29,10 @@ int init_exec(const char* filename)
 
 int main(int argc, char **argv)
 {
-    (void)argc; (void)argv;
+    (void)argc;
+    (void)argv;
 
-    logger_setlevel(LOG_ALL);
+    logger_level(LOGGER_TRACE);
 
     printf("Welcome to \033[1;34mskiftOS\033[0m!\n");
     iostream_flush(out_stream);
@@ -39,7 +40,7 @@ int main(int argc, char **argv)
     filesystem_mkfifo("/dev/term");
     init_exec("/bin/term");
     int shell = init_exec("/bin/sh");
-    
+
     process_wait(shell, NULL);
 
     printf("\n\e[1;34mGoodbye!");

@@ -242,7 +242,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
         }
     }
 
-    logger_log(LOG_ERROR, "Out of virtual memory!");
+    logger_error("Out of virtual memory!");
     return 0;
 }
 
@@ -261,19 +261,19 @@ uint get_kernel_end(multiboot_info_t *minfo)
     return max((uint)&__end, modules_get_end(minfo));
 }
 
-void memory_load_mmap(multiboot_info_t* mbootinfo)
+void memory_load_mmap(multiboot_info_t *mbootinfo)
 {
     // Setup memory map
     TOTAL_MEMORY = 0;
 
-    for (multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)mbootinfo->mmap_addr; (u32)mmap < mbootinfo->mmap_addr + mbootinfo->mmap_length; mmap = (multiboot_memory_map_t*)((u32)mmap + mmap->size + sizeof(mmap->size)))
+    for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)mbootinfo->mmap_addr; (u32)mmap < mbootinfo->mmap_addr + mbootinfo->mmap_length; mmap = (multiboot_memory_map_t *)((u32)mmap + mmap->size + sizeof(mmap->size)))
     {
-        logger_log(LOG_INFO, "Mmap: base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x",
-            (u32)(mmap->addr >> 32),
-            (u32)(mmap->addr & 0xffffffff),
-            (u32)(mmap->len >> 32),
-            (u32)(mmap->len & 0xffffffff),
-            (u32)mmap->type);
+        logger_info("Mmap: base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x",
+                    (u32)(mmap->addr >> 32),
+                    (u32)(mmap->addr & 0xffffffff),
+                    (u32)(mmap->len >> 32),
+                    (u32)(mmap->len & 0xffffffff),
+                    (u32)mmap->type);
 
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
         {
@@ -282,7 +282,7 @@ void memory_load_mmap(multiboot_info_t* mbootinfo)
         else
         {
             // Mark memory as used so we don't allocate here.
-            for (u64 addr = mmap->addr; addr < mmap->len; addr+=PAGE_SIZE)
+            for (u64 addr = mmap->addr; addr < mmap->len; addr += PAGE_SIZE)
             {
                 PHYSICAL_SET_USED(addr);
             }
@@ -291,11 +291,11 @@ void memory_load_mmap(multiboot_info_t* mbootinfo)
 
     USED_MEMORY = PAGE_ALIGN(get_kernel_end(mbootinfo));
 
-    logger_log(LOG_INFO, "%dKib of memory detected", TOTAL_MEMORY / 1024);
-    logger_log(LOG_INFO, "%dKib of memory are used by the kernel", USED_MEMORY / 1024);
+    logger_info("%dKib of memory detected", TOTAL_MEMORY / 1024);
+    logger_info("%dKib of memory are used by the kernel", USED_MEMORY / 1024);
 }
 
-void memory_setup(multiboot_info_t* mbootinfo)
+void memory_setup(multiboot_info_t *mbootinfo)
 {
     memset(&MEMORY, 0, sizeof(MEMORY));
 
@@ -416,7 +416,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
     atomic_end();
 
-    logger_log(LOG_WARNING, "alloc failed!");
+    logger_warn("alloc failed!");
     return 0;
 }
 
@@ -444,7 +444,7 @@ page_directorie_t *memory_alloc_pdir()
 
     if (pdir == NULL)
     {
-        logger_log(LOG_ERROR, "Page directory allocation failled!");
+        logger_error("Page directory allocation failled!");
         return NULL;
     }
 

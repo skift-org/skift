@@ -525,7 +525,7 @@ stream_t *task_filedescriptor_acquire(task_t *this, int fd_index)
         }
     }
 
-    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return NULL;
 }
@@ -541,7 +541,7 @@ int task_filedescriptor_release(task_t *this, int fd_index)
         return 0;
     }
 
-    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -ERR_BAD_FILE_DESCRIPTOR;
 }
@@ -560,7 +560,7 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
         return 0;
     }
 
-    logger_log(LOG_WARNING, "Got a bad file descriptor %d from task %d", fd_index, this->id);
+    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
 
     return -ERR_BAD_FILE_DESCRIPTOR;
 }
@@ -772,7 +772,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
     }
     else
     {
-        logger_log(LOG_WARNING, "Elf segment ignored, not in user memory!");
+        logger_warn("Elf segment ignored, not in user memory!");
     }
 }
 
@@ -783,7 +783,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (s == NULL)
     {
-        logger_log(LOG_WARNING, "'%s' file not found, exec failed!", executable_path);
+        logger_warn("'%s' file not found, exec failed!", executable_path);
         return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -793,7 +793,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
-        logger_log(LOG_WARNING, "'%s' is not a file, exec failed!", executable_path);
+        logger_warn("'%s' is not a file, exec failed!", executable_path);
         iostream_close(s);
         return -ERR_IS_A_DIRECTORY;
     }
@@ -805,7 +805,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     if (!elf_valid(&elf_header))
     {
-        logger_log(LOG_WARNING, "Invalid elf program!", executable_path);
+        logger_warn("Invalid elf program!", executable_path);
         iostream_close(s);
         return -ERR_EXEC_FORMAT_ERROR;
     }
@@ -1395,7 +1395,7 @@ void timer_set_frequency(int hz)
     out8(0x40, divisor & 0xFF);
     out8(0x40, (divisor >> 8) & 0xFF);
 
-    logger_log(LOG_INFO, "Timer frequency is %dhz.", hz);
+    logger_info("Timer frequency is %dhz.", hz);
 }
 
 void sheduler_setup(task_t *main_kernel_task)

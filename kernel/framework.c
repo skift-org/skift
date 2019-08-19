@@ -12,16 +12,16 @@
 #include "memory.h"
 #include "serial.h"
 
-/* --- Framework initialization --------------------------------------------- */ 
+/* --- Framework initialization --------------------------------------------- */
 
-iostream_t *in_stream ;
+iostream_t *in_stream;
 iostream_t *out_stream;
 iostream_t *err_stream;
 iostream_t *log_stream;
 
 iostream_t internal_log_stream = {0};
 
-int log_stream_write(iostream_t* stream, const void* buffer, uint size)
+int log_stream_write(iostream_t *stream, const void *buffer, uint size)
 {
     UNUSED(stream);
     return serial_write(buffer, size);
@@ -31,7 +31,7 @@ void __plug_init(void)
 {
     internal_log_stream.write = log_stream_write;
 
-    in_stream  = NULL;
+    in_stream = NULL;
     out_stream = &internal_log_stream;
     err_stream = &internal_log_stream;
     log_stream = &internal_log_stream;
@@ -39,26 +39,26 @@ void __plug_init(void)
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
-    logger_log(LOG_FATAL, "Kernel assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
+    logger_fatal("Assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
     PANIC("Kernel assert failed (see logs).");
 }
 
-void __plug_lock_assert_failed(lock_t* lock, const char *file, const char *function, int line)
+void __plug_lock_assert_failed(lock_t *lock, const char *file, const char *function, int line)
 {
-    logger_log(LOG_FATAL, "Kernel lock assert failed: %s in %s:%s() ln%d!", (char *)lock->name, (char *)file, (char *)function, line);
-    PANIC("Kernel lock assert failed (see logs)."); 
+    logger_fatal("Lock assert failed: %s in %s:%s() ln%d!", (char *)lock->name, (char *)file, (char *)function, line);
+    PANIC("Kernel lock assert failed (see logs).");
 }
 
 /* --- Systeme API ---------------------------------------------------------- */
 
 // We are the system so we doesn't need that ;)
-void __plug_system_get_info(system_info_t* info)
+void __plug_system_get_info(system_info_t *info)
 {
     UNUSED(info);
     assert(false);
 }
 
-void __plug_system_get_status(system_status_t * status)
+void __plug_system_get_status(system_status_t *status)
 {
     UNUSED(status);
     assert(false);
@@ -166,13 +166,13 @@ int __plug_process_exit(int code)
 
     PANIC("Task exit failled!");
 
-    return 0; 
+    return 0;
 }
 
 int __plug_process_cancel(int pid)
 {
     int result;
-    
+
     ATOMIC({
         result = task_cancel(task_getbyid(pid), -1);
     });
@@ -201,34 +201,34 @@ int __plug_process_free(uint addr, uint count)
     return 0;
 }
 
-int __plug_process_get_cwd(char* buffer, uint size)
+int __plug_process_get_cwd(char *buffer, uint size)
 {
     task_get_cwd(sheduler_running(), buffer, size);
     return 0;
 }
 
-int __plug_process_set_cwd(const char* cwd)
+int __plug_process_set_cwd(const char *cwd)
 {
     return task_set_cwd(sheduler_running(), cwd);
 }
 
 int __plug_process_sleep(int time)
-{    
+{
     return task_sleep(sheduler_running(), time);
 }
 
 int __plug_process_wakeup(int pid)
 {
     int result;
-    
+
     ATOMIC({
         result = task_wakeup(task_getbyid(pid));
     });
 
-    return result; 
+    return result;
 }
 
-int __plug_process_wait(int pid, int* exit_value)
+int __plug_process_wait(int pid, int *exit_value)
 {
     return task_wait(pid, exit_value);
 }

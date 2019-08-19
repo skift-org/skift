@@ -25,7 +25,7 @@ void load_module(multiboot_module_t *module)
     }
     else
     {
-        logger_log(LOG_WARNING, "Unknow module '%s'!", module->cmdline);
+        logger_warn("Unknow module '%s'!", module->cmdline);
     }
 }
 

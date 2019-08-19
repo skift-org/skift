@@ -151,7 +151,7 @@ void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 
 vtconsole_t *terminal_create_framebuffer_console(void)
 {
-    logger_log(LOG_INFO, "Creating graphic context...");
+    logger_info("Creating graphic context...");
 
     framebuffer_mode_info_t mode_info = {true, 800, 600};
 
@@ -164,7 +164,7 @@ vtconsole_t *terminal_create_framebuffer_console(void)
         return NULL;
     }
 
-    logger_log(LOG_INFO, "Framebuffer opened");
+    logger_info("Framebuffer opened");
 
     if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
     {
@@ -173,7 +173,7 @@ vtconsole_t *terminal_create_framebuffer_console(void)
         return NULL;
     }
 
-    logger_log(LOG_INFO, "Framebuffer mode set");
+    logger_info("Framebuffer mode set");
 
     framebuffer = bitmap(800, 600);
 

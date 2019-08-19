@@ -29,7 +29,7 @@ typedef int (*syscall_handler_t)(int, int, int, int, int);
 
 int sys_not_implemented()
 {
-    logger_log(LOG_WARNING, "Not implemented syscall!");
+    logger_warn("Not implemented syscall!");
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
@@ -134,37 +134,37 @@ int sys_shared_memory_release(int shm)
 
 /* --- Messaging ------------------------------------------------------------ */
 
-int sys_messaging_send(message_t* event)
+int sys_messaging_send(message_t *event)
 {
     return task_messaging_send(sheduler_running(), event);
 }
 
-int sys_messaging_broadcast(const char *channel, message_t* event)
+int sys_messaging_broadcast(const char *channel, message_t *event)
 {
     return task_messaging_broadcast(sheduler_running(), channel, event);
 }
 
-int sys_messaging_request(message_t* request, message_t* result, int timeout)
+int sys_messaging_request(message_t *request, message_t *result, int timeout)
 {
     return task_messaging_request(sheduler_running(), request, result, timeout);
 }
 
-int sys_messaging_receive(message_t* message, int wait)
+int sys_messaging_receive(message_t *message, int wait)
 {
     return task_messaging_receive(sheduler_running(), message, wait);
 }
 
-int sys_messaging_respond(message_t* request, message_t* result)
+int sys_messaging_respond(message_t *request, message_t *result)
 {
     return task_messaging_respond(sheduler_running(), request, result);
 }
 
-int sys_messaging_subscribe(const char* channel)
+int sys_messaging_subscribe(const char *channel)
 {
     return task_messaging_subscribe(sheduler_running(), channel);
 }
 
-int sys_messaging_unsubscribe(const char* channel)
+int sys_messaging_unsubscribe(const char *channel)
 {
     return task_messaging_unsubscribe(sheduler_running(), channel);
 }
@@ -364,8 +364,8 @@ void syscall_dispatcher(processor_context_t *context)
     }
     else
     {
-        logger_log(LOG_SEVERE, "Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
-        logger_log(LOG_INFO, "EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
+        logger_info("EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = 0;
     }
 }

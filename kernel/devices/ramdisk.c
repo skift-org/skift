@@ -14,7 +14,7 @@ void ramdiload(multiboot_module_t *module)
 {
     // Extract the ramdisk tar archive.
 
-    logger_log(LOG_INFO, "Loading ramdisk at 0x%x...", module->mod_start);
+    logger_info("Loading ramdisk at 0x%x...", module->mod_start);
 
     void *ramdisk = (void *)module->mod_start;
 
@@ -27,7 +27,7 @@ void ramdiload(multiboot_module_t *module)
         {
             if (filesystem_mkdir(ROOT, file_path) != 0)
             {
-                logger_log(LOG_WARNING, "Failed to create directory %s...", block.name);
+                logger_warn("Failed to create directory %s...", block.name);
             }
         }
         else
@@ -41,12 +41,12 @@ void ramdiload(multiboot_module_t *module)
             }
             else
             {
-                logger_log(LOG_WARNING, "Failed to open file %s!", block.name);
+                logger_warn("Failed to open file %s!", block.name);
             }
         }
 
         path_delete(file_path);
     }
 
-    logger_log(LOG_FINE, "Loading ramdisk succeeded.");
+    logger_info("Loading ramdisk succeeded.");
 }

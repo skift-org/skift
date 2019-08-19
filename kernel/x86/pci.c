@@ -152,28 +152,28 @@ int pci_get_interrupt(uint32_t device)
         uint32_t irq_pin = pci_read_field(device, 0x3D, 1);
         if (irq_pin == 0)
         {
-            logger_log(LOG_ERROR, "PCI device does not specific interrupt line");
+            logger_error("PCI device does not specific interrupt line");
             return pci_read_field(device, PCI_INTERRUPT_LINE, 1);
         }
 
         int pirq = (irq_pin + pci_extract_slot(device) - 2) % 4;
         int int_line = pci_read_field(device, PCI_INTERRUPT_LINE, 1);
 
-        logger_log(LOG_ERROR, "slot is %d, irq pin is %d, so pirq is %d and that maps to %d? int_line=%d", pci_extract_slot(device), irq_pin, pirq, pci_remaps[pirq], int_line);
+        logger_error("slot is %d, irq pin is %d, so pirq is %d and that maps to %d? int_line=%d", pci_extract_slot(device), irq_pin, pirq, pci_remaps[pirq], int_line);
 
         for (int i = 0; i < 4; ++i)
         {
-            logger_log(LOG_ERROR, "  irq[%d] = %d", i, pci_remaps[i]);
+            logger_error("  irq[%d] = %d", i, pci_remaps[i]);
         }
 
         if (pci_remaps[pirq] >= 0x80)
         {
-            logger_log(LOG_ERROR, "not mapped, remapping?");
+            logger_error("not mapped, remapping?");
             if (int_line == 0xFF)
             {
                 int_line = 10;
                 pci_write_field(device, PCI_INTERRUPT_LINE, 1, int_line);
-                logger_log(LOG_ERROR, "? Just going in blind here.\n");
+                logger_error("? Just going in blind here.\n");
             }
             pci_remaps[pirq] = int_line;
             uint32_t out = 0;

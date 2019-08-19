@@ -168,7 +168,7 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 	{
 		l_warningCount += 1;
 #if defined DEBUG || defined INFO
-		logger_log(LOG_WARNING, "__plug_memalloc_alloc( %i ) return NULL", st);
+		logger_warn("__plug_memalloc_alloc( %i ) return NULL", st);
 #endif
 		return NULL; // uh oh, we ran out of memory.
 	}
@@ -218,7 +218,7 @@ void *PREFIX(malloc)(size_t req_size)
 	{
 		l_warningCount += 1;
 
-		logger_log(LOG_WARNING, "alloc( 0 ) called from 0x%x", __builtin_return_address(0));
+		logger_warn("alloc( 0 ) called from 0x%x", __builtin_return_address(0));
 		__plug_memalloc_unlock();
 
 		return PREFIX(malloc)(1);
@@ -511,7 +511,7 @@ void *PREFIX(malloc)(size_t req_size)
 
 	__plug_memalloc_unlock(); // release the lock
 
-	logger_log(LOG_WARNING, "All cases exhausted. No memory available.");
+	logger_warn("All cases exhausted. No memory available.");
 
 	return NULL;
 }
@@ -525,7 +525,7 @@ void PREFIX(free)(void *ptr)
 	{
 		l_warningCount += 1;
 #if defined DEBUG || defined INFO
-		logger_log(LOG_WARNING, "PREFIX(free)( NULL ) called from 0x%x",
+		logger_warn("PREFIX(free)( NULL ) called from 0x%x",
 						__builtin_return_address(0));
 		FLUSH();
 #endif
@@ -548,22 +548,22 @@ void PREFIX(free)(void *ptr)
 			((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
 		{
 			l_possibleOverruns += 1;
-			logger_log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
-							min->magic,
-							LIBALLOC_MAGIC);
+			logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x",
+						 min->magic,
+						 LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
-			logger_log(LOG_ERROR, "Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
-							ptr,
-							__builtin_return_address(0));
+			logger_error("Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
+						 ptr,
+						 __builtin_return_address(0));
 		}
 		else
 		{
-			logger_log(LOG_ERROR, "Bad PREFIX(free)( 0x%x ) called from 0x%x",
-							ptr,
-							__builtin_return_address(0));
+			logger_error("Bad PREFIX(free)( 0x%x ) called from 0x%x",
+						 ptr,
+						 __builtin_return_address(0));
 		}
 
 		// being lied to...
@@ -653,7 +653,8 @@ void *PREFIX(realloc)(void *p, size_t size)
 	// Honour the case of size == 0 => free old and return NULL
 	if (size == 0)
 	{
-		PREFIX(free)(p);
+		PREFIX(free)
+		(p);
 		return NULL;
 	}
 
@@ -681,22 +682,22 @@ void *PREFIX(realloc)(void *p, size_t size)
 			((min->magic & 0xFF) == (LIBALLOC_MAGIC & 0xFF)))
 		{
 			l_possibleOverruns += 1;
-			logger_log(LOG_ERROR, "Possible 1-3 byte overrun for magic 0x%x != 0x%x",
-							min->magic,
-							LIBALLOC_MAGIC);
+			logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x",
+						 min->magic,
+						 LIBALLOC_MAGIC);
 		}
 
 		if (min->magic == LIBALLOC_DEAD)
 		{
-			logger_log(LOG_ERROR, "Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
-							ptr,
-							__builtin_return_address(0));
+			logger_error("Multiple PREFIX(free)() attempt on 0x%x from 0x%x.",
+						 ptr,
+						 __builtin_return_address(0));
 		}
 		else
 		{
-			logger_log(LOG_ERROR, "Bad PREFIX(free)( 0x%x ) called from 0x%x",
-							ptr,
-							__builtin_return_address(0));
+			logger_error("Bad PREFIX(free)( 0x%x ) called from 0x%x",
+						 ptr,
+						 __builtin_return_address(0));
 		}
 
 		// being lied to...
@@ -720,7 +721,8 @@ void *PREFIX(realloc)(void *p, size_t size)
 	// If we got here then we're reallocating to a block bigger than us.
 	ptr = PREFIX(malloc)(size); // We need to allocate new memory
 	memcpy(ptr, p, real_size);
-	PREFIX(free)(p);
+	PREFIX(free)
+	(p);
 
 	return ptr;
 }

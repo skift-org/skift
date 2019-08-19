@@ -9,58 +9,47 @@
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
 
-log_level_t log_level = LOG_ALL;
-bool show_file_name = true;
+static bool logger_log_level = LOGGER_TRACE;
 
-struct
+static bool logger_use_colors = true;
+static bool logger_is_quiet = false;
+
+static const char *logger_level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+static const char *logger_level_colors[] = {"\e[34m", "\e[36m", "\e[32m", "\e[22m", "\e[31m", "\e[35m"};
+
+void logger_level(log_level_t log_level)
 {
-    uint level;
-    const char *name;
-} level_names[] = {
-    {LOG_FATAL, "\033[41;1m[ fatal  ]"},
-    {LOG_SEVERE, "\033[41;1m[ severe ]"},
-    {LOG_ERROR, "\033[41m[ error ]"},
-    {LOG_WARNING, "\033[33m[ warn ]"},
-    {LOG_INFO, "\033[37m[ info ]"},
-    {LOG_CONFIG, "\033[30;1m[ conf ]"},
-    {LOG_DEBUG, "\033[30;1m[ debug ]"},
-    {LOG_FINE, "\033[30;1m[ fine ]"},
-};
-
-const char *log_describe(log_level_t level)
-{
-    for (uint i = 0; i < ARRAY_SIZE(level_names); i++)
-    {
-        if (level >= level_names[i].level)
-        {
-            return level_names[i].name;
-        }
-    }
-
-    return "all";
+    logger_log_level = log_level;
 }
 
-void logger_setlevel(log_level_t level)
+void logger_colors(bool use_colors)
 {
-    log_level = level;
+    logger_use_colors = use_colors;
 }
 
-void __logger_log(log_level_t level, const char *file, uint line, const char *function, const char *fmt, ...)
+void logger_quiet(bool quiet)
 {
-    if (level >= log_level)
+    logger_is_quiet = quiet;
+}
+
+void logger_log(log_level_t level, const char *file, uint line, const char *fmt, ...)
+{
+    if (level >= logger_log_level)
     {
         __plug_logger_lock();
 
         va_list va;
         va_start(va, fmt);
 
-        if (show_file_name)
+        // TODO: print the timestamp
+
+        if (logger_use_colors)
         {
-            iostream_printf(log_stream, "[ %d ] %s %s:%s() ln%d ", process_this(), log_describe(level), file, function, line);
+            iostream_printf(log_stream, "%s%s \e[37m%s:%d: \e[0m", logger_level_colors[level], logger_level_names[level], file, line);
         }
         else
         {
-            iostream_printf(log_stream, "[ %d ] %s %s() ", process_this(), log_describe(level), function);
+            iostream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
         }
 
         iostream_vprintf(log_stream, fmt, va);

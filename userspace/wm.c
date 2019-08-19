@@ -89,7 +89,7 @@ bool wm_open_framebuffer(framebuffer_mode_info_t prefered_mode)
     framebuffer = bitmap(framebuffer_mode.width, framebuffer_mode.height);
     framebuffer_painter = painter(framebuffer);
 
-    logger_log(LOG_FINE, "Frame buffer created");
+    logger_info("Frame buffer created");
 
     return true;
 }
@@ -100,7 +100,7 @@ bool wm_handle_message()
 
     messaging_receive(&incoming, true);
 
-    logger_log(LOG_DEBUG, "Incoming %s", message_label(incoming));
+    logger_debug("Incoming %s", message_label(incoming));
 
     if (message_is(incoming, HIDEO_CLIENT_HELLO))
     {

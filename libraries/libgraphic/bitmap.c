@@ -111,7 +111,7 @@ bitmap_t *bitmap_load_from(const char *path)
     }
     else
     {
-        logger_log(LOG_ERROR, "lodepng: failled to load %s: %s", path, lodepng_error_text(error));
+        logger_error("lodepng: failled to load %s: %s", path, lodepng_error_text(error));
         return bitmap_from_buffer(2, 2, (color_t *)&placeholder_buffer);
     }
 }

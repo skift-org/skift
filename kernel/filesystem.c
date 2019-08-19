@@ -35,10 +35,14 @@ iostream_type_t fsnode_to_iostream_type(fsnode_type_t type)
 {
     switch (type)
     {
-        case FSNODE_DIRECTORY: return IOSTREAM_TYPE_DIRECTORY;
-        case FSNODE_FIFO: return IOSTREAM_TYPE_FIFO;
-        case FSNODE_DEVICE: return IOSTREAM_TYPE_DEVICE;
-        default: return IOSTREAM_TYPE_REGULAR;
+    case FSNODE_DIRECTORY:
+        return IOSTREAM_TYPE_DIRECTORY;
+    case FSNODE_FIFO:
+        return IOSTREAM_TYPE_FIFO;
+    case FSNODE_DEVICE:
+        return IOSTREAM_TYPE_DEVICE;
+    default:
+        return IOSTREAM_TYPE_REGULAR;
     }
 }
 
@@ -86,7 +90,7 @@ fsnode_t *fsnode(fsnode_type_t type)
 
 void fsnode_delete(fsnode_t *node)
 {
-    logger_log(LOG_INFO, "Fsnode free: %08x", node);
+    logger_info("Fsnode free: %08x", node);
 
     switch (node->type)
     {
@@ -135,14 +139,13 @@ int fsnode_size(fsnode_t *node)
     return 0;
 }
 
-int fsnode_stat(fsnode_t *node, iostream_stat_t* stat)
+int fsnode_stat(fsnode_t *node, iostream_stat_t *stat)
 {
     stat->type = fsnode_to_iostream_type(node->type);
     stat->size = fsnode_size(node);
 
     return 0;
 }
-
 
 /* --- Streams -------------------------------------------------------------- */
 
@@ -236,12 +239,12 @@ int file_write(stream_t *stream, const void *buffer, uint size)
 
 int fifo_read(stream_t *stream, void *buffer, uint size)
 {
-    fifo_t* fifo = &stream->node->fifo;
+    fifo_t *fifo = &stream->node->fifo;
 
     lock_acquire(fifo->buffer_lock);
 
     int result = ringbuffer_read(fifo->buffer, buffer, size);
-        
+
     lock_release(fifo->buffer_lock);
 
     return result;
@@ -249,12 +252,12 @@ int fifo_read(stream_t *stream, void *buffer, uint size)
 
 int fifo_write(stream_t *stream, const void *buffer, uint size)
 {
-    fifo_t* fifo = &stream->node->fifo;
+    fifo_t *fifo = &stream->node->fifo;
 
     lock_acquire(fifo->buffer_lock);
-    
+
     int result = ringbuffer_write(fifo->buffer, buffer, size);
-        
+
     lock_release(fifo->buffer_lock);
 
     return result;
@@ -387,7 +390,7 @@ int directory_read(stream_t *stream, void *buffer, uint size)
     }
     else
     {
-        logger_log(LOG_WARNING, "Directory read fail!");
+        logger_warn("Directory read fail!");
         return -1;
     }
 }
@@ -455,7 +458,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
     if (parent_node == NULL || parent_node->type != FSNODE_DIRECTORY)
     {
-        logger_log(LOG_WARNING, "Failed to create new node, parent not found!");
+        logger_warn("Failed to create new node, parent not found!");
         return NULL;
     }
 
@@ -463,7 +466,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
     if (child_name == NULL || directory_has_entry(parent_node, child_name))
     {
-        logger_log(LOG_WARNING, "Failed to create new node, the file exist!");
+        logger_warn("Failed to create new node, the file exist!");
         return NULL;
     }
 
@@ -471,7 +474,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
     if (!directory_link(parent_node, child_node, child_name))
     {
-        logger_log(LOG_WARNING, "Failed to create new node, link() failed!");
+        logger_warn("Failed to create new node, link() failed!");
         fsnode_delete(child_node);
         return NULL;
     }
@@ -639,14 +642,14 @@ void filesystem_close(stream_t *s)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
     }
 }
 
- stream_t* filesystem_dup(stream_t* s)
+stream_t *filesystem_dup(stream_t *s)
 {
     s->node->refcount++;
-    stream_t* dup = stream(s->node, s->flags);
+    stream_t *dup = stream(s->node, s->flags);
     return dup;
 }
 
@@ -654,7 +657,8 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
 {
     IS_FS_READY;
 
-    if (size == 0) return 0;
+    if (size == 0)
+        return 0;
 
     int result = -1;
     if (s != NULL)
@@ -707,7 +711,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
     }
 
     return result;
@@ -717,7 +721,8 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
 {
     IS_FS_READY;
 
-    if (size == 0) return 0;
+    if (size == 0)
+        return 0;
 
     int result = -1;
 
@@ -764,7 +769,7 @@ int filesystem_write(stream_t *s, const void *buffer, uint size)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
     }
 
     return result;
@@ -790,7 +795,7 @@ int filesystem_ioctl(stream_t *s, int request, void *args)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
     }
 
     return result;
@@ -806,7 +811,7 @@ int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
         return 1;
     }
 }
@@ -854,7 +859,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
         return -1;
     }
 }
@@ -888,7 +893,7 @@ int filesystem_tell(stream_t *s, iostream_whence_t whence)
     }
     else
     {
-        logger_log(LOG_WARNING, "Null stream passed");
+        logger_warn("Null stream passed");
         return -1;
     }
 }
@@ -1021,7 +1026,7 @@ int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath,
 
     lock_acquire(fslock);
     {
-        fsnode_t* node = filesystem_resolve(atoldpath, oldpath);
+        fsnode_t *node = filesystem_resolve(atoldpath, oldpath);
         if (node != NULL)
         {
             fsnode_t *parent = filesystem_resolve_parent(atnewpath, newpath);
@@ -1041,10 +1046,10 @@ int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath,
     return result;
 }
 
-bool filesystem_exist(fsnode_t* at, path_t* p)
+bool filesystem_exist(fsnode_t *at, path_t *p)
 {
-    fsnode_t* node = filesystem_acquire(at, p, false);
-    
+    fsnode_t *node = filesystem_acquire(at, p, false);
+
     if (node != NULL)
     {
         filesystem_release(node);

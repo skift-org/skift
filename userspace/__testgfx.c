@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     bitmap_t *test = bitmap_load_from("/res/font/mono.png");
 
     assert(test);
-    logger_log(LOG_INFO, "Image loaded %dx%d", test->width, test->height);
+    logger_info("Image loaded %dx%d", test->width, test->height);
 
     painter_t *paint = painter(fb);
 

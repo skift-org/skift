@@ -194,13 +194,13 @@ int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath,
 bool filesystem_exist(fsnode_t *at, path_t *p);
 
 // *filesystem_mkdev* with error checking.
-#define FILESYSTEM_MKDEV(__name, __object)                                  \
-    {                                                                       \
-        path_t *__dev_path = path(__name);                                  \
-        logger_log(LOG_INFO, "Creating device " __name " at " __name); \
-        if (filesystem_mkdev(NULL, __dev_path, (__object)))                 \
-        {                                                                   \
-            PANIC("Failled to create the '" __name "' device.");            \
-        }                                                                   \
-        path_delete(__dev_path);                                            \
+#define FILESYSTEM_MKDEV(__name, __object)                       \
+    {                                                            \
+        path_t *__dev_path = path(__name);                       \
+        logger_info("Creating device " __name " at " __name);    \
+        if (filesystem_mkdev(NULL, __dev_path, (__object)))      \
+        {                                                        \
+            PANIC("Failled to create the '" __name "' device."); \
+        }                                                        \
+        path_delete(__dev_path);                                 \
     }

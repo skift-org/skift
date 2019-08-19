@@ -20,7 +20,7 @@ glyph_t *font_load_glyph(const char *name)
 
     if (glyph_path == NULL)
     {
-        logger_log(LOG_ERROR, "Failled to load glyph from %s: %s", glyph_path, error_to_string(error_get()));
+        logger_error("Failled to load glyph from %s: %s", glyph_path, error_to_string(error_get()));
 
         return NULL;
     }
@@ -29,7 +29,7 @@ glyph_t *font_load_glyph(const char *name)
     iostream_fstat(glyph_file, &stat);
     if (stat.type == IOSTREAM_TYPE_REGULAR && stat.size == 0)
     {
-        logger_log(LOG_ERROR, "Failled to load font glyph from %s: The glyph file isn't a regular file!", glyph_path);
+        logger_error("Failled to load font glyph from %s: The glyph file isn't a regular file!", glyph_path);
 
         iostream_close(glyph_file);
         return NULL;
@@ -52,7 +52,7 @@ bitmap_t *font_load_bitmap(const char *name)
 
     if (bmp == NULL)
     {
-        logger_log(LOG_ERROR, "Failled to load font bitmap from %s: %s", bitmap_path, error_to_string(error_get()));
+        logger_error("Failled to load font bitmap from %s: %s", bitmap_path, error_to_string(error_get()));
         return NULL;
     }
     else

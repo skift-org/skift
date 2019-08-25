@@ -62,5 +62,10 @@ int main(int argc, char **argv)
 
     iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
 
+    for (int i = 0; fonts[i] != NULL; i++)
+    {
+        object_release(fonts[i]);
+    }
+
     return 0;
 }

@@ -15,36 +15,6 @@
 
 #define ROOT NULL
 
-// struct fsnode;
-// struct stream;
-//
-// // Resole a path to a fsnode, this is used by synthetic file system.
-// typedef struct s_fsnode* (*fsop_resolve_t)(void* this, path_t *path);
-//
-// // Call when a new stream is open
-// typedef void (*fsop_open_t)(void* this, struct s_stream *s);
-//
-// // Call when the stream is close
-// typedef void (*fsop_close_t)(void* this, struct s_stream *s);
-//
-// // Call when we read from the fsnode
-// typedef int (*fsop_read_t)(void* this, struct s_stream *s, void *buffer, uint size);
-//
-// // Call when we write to the fsnode
-// typedef int (*fsop_write_t)(void* this, struct s_stream *s, const void *buffer, uint size);
-//
-// // Call when an ioctl request is made
-// typedef int (*fsop_ioctl_t)(void* this, struct s_stream *s, int request, void *args);
-//
-// // Call when a fstat is called
-// typedef int (*fsop_fstat_t)(void* this, struct s_stream *s, iostream_stat_t *stat);
-//
-// // Call when a new fsnode_t is create
-// typedef void (*fsop_init_t)(void* this);
-//
-// // Call when the fsnode_t is free
-// typedef void (*fsop_delete_t)(void* this);
-//
 struct s_fsnode;
 struct s_stream;
 
@@ -53,7 +23,7 @@ typedef int (*fsop_close_t)(struct s_stream *s);
 typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct s_stream *s, const void *buffer, uint size);
 typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void *args);
-typedef int (*fsop_fstat_t)(struct s_stream *s, iostream_stat_t *stat);
+typedef int (*fsop_stat_t)(struct s_stream *s, iostream_stat_t *stat);
 
 typedef struct
 {
@@ -173,7 +143,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine);
 
 int filesystem_tell(stream_t *s, iostream_whence_t whence);
 
-int filesystem_fstat(stream_t *s, iostream_stat_t *stat);
+int filesystem_stat(stream_t *s, iostream_stat_t *stat);
 
 /* --- File system operation ------------------------------------------------ */
 

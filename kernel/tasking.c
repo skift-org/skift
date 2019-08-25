@@ -690,7 +690,7 @@ int task_tell_file(task_t *this, int fd, iostream_whence_t whence)
     return result;
 }
 
-int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
+int task_stat_file(task_t *this, int fd, iostream_stat_t *stat)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -699,7 +699,7 @@ int task_fstat_file(task_t *this, int fd, iostream_stat_t *stat)
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = filesystem_fstat(stream, stat);
+    int result = filesystem_stat(stream, stat);
 
     task_filedescriptor_release(this, fd);
 
@@ -789,7 +789,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     // Check if the file isn't a directory.
     iostream_stat_t stat;
-    iostream_fstat(s, &stat);
+    iostream_stat(s, &stat);
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {

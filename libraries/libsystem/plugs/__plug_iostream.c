@@ -41,7 +41,7 @@ int __plug_iostream_tell(int fd, iostream_whence_t whence)
     return __syscall(SYS_FILESYSTEM_TELL, fd, whence, 0, 0, 0);
 }
 
-int __plug_iostream_fstat(int fd, iostream_stat_t *stat)
+int __plug_iostream_stat(int fd, iostream_stat_t *stat)
 {
-    return __syscall(SYS_FILESYSTEM_FSTAT, fd, (int)stat, 0, 0, 0);
+    return __syscall(SYS_FILESYSTEM_STAT, fd, (int)stat, 0, 0, 0);
 }

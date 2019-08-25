@@ -305,7 +305,7 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value) {
 
 #ifdef LODEPNG_COMPILE_DISK
 
-/* returns negative value on error. This should be pure C compatible, so no fstat. */
+/* returns negative value on error. This should be pure C compatible, so no stat. */
 static long lodepng_filesize(const char* filename) {
   iostream_t* file;
   long size;

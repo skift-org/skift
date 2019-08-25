@@ -60,19 +60,13 @@ typedef struct
     iostream_stat_t stat;
 } iostream_direntry_t;
 
-typedef int iostream_read_t(struct s_iostream *stream, void *buffer, uint size);
-
-typedef int iostream_write_t(struct s_iostream *stream, const void *buffer, uint size);
-
-typedef int iostream_tell_t(struct s_iostream *stream, iostream_whence_t whence);
-
-typedef int iostream_seek_t(struct s_iostream *stream, int offset, iostream_whence_t whence);
-
-typedef int iostream_fstat_t(struct s_iostream *stream, iostream_stat_t *stat);
-
-typedef int iostream_ioctl_t(struct s_iostream *stream, int request, void *arg);
-
-typedef int iostream_close_t(struct s_iostream *stream);
+typedef int iostream_operation_read_t(struct s_iostream *stream, void *buffer, uint size);
+typedef int iostream_operation_write_t(struct s_iostream *stream, const void *buffer, uint size);
+typedef int iostream_operation_tell_t(struct s_iostream *stream, iostream_whence_t whence);
+typedef int iostream_operation_seek_t(struct s_iostream *stream, int offset, iostream_whence_t whence);
+typedef int iostream_operation_stat_t(struct s_iostream *stream, iostream_stat_t *stat);
+typedef int iostream_operation_ioctl_t(struct s_iostream *stream, int request, void *arg);
+typedef int iostream_operation_close_t(struct s_iostream *stream);
 
 #define IOSTREAM_BUFFER_SIZE 512
 
@@ -80,13 +74,13 @@ typedef struct s_iostream
 {
     iostream_flag_t flags;
 
-    iostream_read_t *read;
-    iostream_write_t *write;
-    iostream_tell_t *tell;
-    iostream_seek_t *seek;
-    iostream_fstat_t *fstat;
-    iostream_ioctl_t *ioctl;
-    iostream_close_t *close;
+    iostream_operation_read_t *read;
+    iostream_operation_write_t *write;
+    iostream_operation_tell_t *tell;
+    iostream_operation_seek_t *seek;
+    iostream_operation_stat_t *stat;
+    iostream_operation_ioctl_t *ioctl;
+    iostream_operation_close_t *close;
 
     iostream_buffer_mode_t read_mode;
     void *write_buffer;
@@ -113,13 +107,13 @@ iostream_t *iostream(iostream_flag_t flags);
 
 void iostream_delete(iostream_t *stream);
 
-iostream_t *iostream_open(const char *path, iostream_flag_t flags);
-
-void iostream_close(iostream_t *stream);
-
 void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode);
 
 void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode);
+
+iostream_t *iostream_open(const char *path, iostream_flag_t flags);
+
+void iostream_close(iostream_t *stream);
 
 int iostream_read(iostream_t *stream, void *buffer, uint size);
 
@@ -133,7 +127,7 @@ int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence);
 
 int iostream_tell(iostream_t *stream, iostream_whence_t whence);
 
-int iostream_fstat(iostream_t *stream, iostream_stat_t *stat);
+int iostream_stat(iostream_t *stream, iostream_stat_t *stat);
 
 int iostream_puts(iostream_t *stream, const char *string);
 

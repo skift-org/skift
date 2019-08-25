@@ -141,9 +141,9 @@ int __plug_iostream_tell(int fd, iostream_whence_t whence)
     return task_tell_file(sheduler_running(), fd, whence);
 }
 
-int __plug_iostream_fstat(int fd, iostream_stat_t *stat)
+int __plug_iostream_stat(int fd, iostream_stat_t *stat)
 {
-    return task_fstat_file(sheduler_running(), fd, stat);
+    return task_stat_file(sheduler_running(), fd, stat);
 }
 
 /* --- Processes ------------------------------------------------------------ */

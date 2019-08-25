@@ -801,7 +801,7 @@ int filesystem_ioctl(stream_t *s, int request, void *args)
     return result;
 }
 
-int filesystem_fstat(stream_t *s, iostream_stat_t *stat)
+int filesystem_stat(stream_t *s, iostream_stat_t *stat)
 {
     IS_FS_READY;
 

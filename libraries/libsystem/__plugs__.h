@@ -51,7 +51,7 @@ int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence);
 
 int __plug_iostream_tell(int fd, iostream_whence_t whence);
 
-int __plug_iostream_fstat(int fd, iostream_stat_t *stat);
+int __plug_iostream_stat(int fd, iostream_stat_t *stat);
 
 /* --- File system ---------------------------------------------------------- */
 

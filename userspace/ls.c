@@ -62,10 +62,10 @@ int ls(const char *target_path)
 
     if (dir != NULL)
     {
-        iostream_stat_t state = {0};
-        iostream_fstat(dir, &state);
+        iostream_stat_t stat = {0};
+        iostream_stat(dir, &stat);
 
-        if (state.type == IOSTREAM_TYPE_DIRECTORY)
+        if (stat.type == IOSTREAM_TYPE_DIRECTORY)
         {
             iostream_direntry_t entry;
 
@@ -77,7 +77,7 @@ int ls(const char *target_path)
         else
         {
             iostream_direntry_t entry;
-            entry.stat = state;
+            entry.stat = stat;
             path_t* p = path(target_path);
             strlcpy(entry.name, path_filename(p), PATH_LENGHT);
             ls_print_entry(&entry);

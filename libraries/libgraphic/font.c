@@ -29,7 +29,7 @@ glyph_t *font_load_glyph(const char *name)
     }
 
     iostream_stat_t stat;
-    iostream_fstat(glyph_file, &stat);
+    iostream_stat(glyph_file, &stat);
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {
         logger_error("Failled to load font glyph from %s: The glyph file isn't a regular file!", glyph_path);

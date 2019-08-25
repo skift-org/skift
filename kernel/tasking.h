@@ -183,7 +183,7 @@ int task_seek_file(task_t* this, int fd, int offset, iostream_whence_t whence);
 
 int task_tell_file(task_t* this, int fd, iostream_whence_t whence);
 
-int task_fstat_file(task_t* this, int fd, iostream_stat_t *stat);
+int task_stat_file(task_t* this, int fd, iostream_stat_t *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */      

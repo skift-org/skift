@@ -12,7 +12,7 @@ int cat(const char *path)
     if (stream != NULL)
     {
         iostream_stat_t stat = {0};
-        iostream_fstat(stream, &stat);
+        iostream_stat(stream, &stat);
 
         if (stat.type == IOSTREAM_TYPE_DIRECTORY)
         {

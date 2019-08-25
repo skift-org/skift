@@ -206,9 +206,9 @@ int sys_filesystem_tell(int fd, iostream_whence_t whence)
     return task_tell_file(sheduler_running(), fd, whence);
 }
 
-int sys_filesystem_fstat(int fd, iostream_stat_t *stat)
+int sys_filesystem_stat(int fd, iostream_stat_t *stat)
 {
-    return task_fstat_file(sheduler_running(), fd, stat);
+    return task_stat_file(sheduler_running(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)
@@ -342,7 +342,7 @@ static int (*syscalls[])() =
         [SYS_FILESYSTEM_IOCTL] = sys_filesystem_ioctl,
         [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
         [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
-        [SYS_FILESYSTEM_FSTAT] = sys_filesystem_fstat,
+        [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,
 
         [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
         [SYS_FILESYSTEM_MKFIFO] = sys_filesystem_mkfifo,

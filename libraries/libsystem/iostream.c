@@ -22,7 +22,7 @@ iostream_t *iostream(iostream_flag_t flags)
     stream->write = NULL;
     stream->tell = NULL;
     stream->seek = NULL;
-    stream->fstat = NULL;
+    stream->stat = NULL;
     stream->ioctl = NULL;
     stream->close = NULL;
 
@@ -228,9 +228,9 @@ int iostream_read(iostream_t *stream, void *buffer, uint size)
     {
         if (stream->has_unget && size >= 1)
         {
-            ((char*)buffer)[0] = stream->unget_char;
-            stream->has_unget = false; 
-            buffer = &((char*)buffer)[1];
+            ((char *)buffer)[0] = stream->unget_char;
+            stream->has_unget = false;
+            buffer = &((char *)buffer)[1];
             size--;
         }
 
@@ -394,18 +394,20 @@ int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence)
     return 0;
 }
 
-int iostream_fstat(iostream_t *stream, iostream_stat_t *stat)
+int iostream_stat(iostream_t *stream, iostream_stat_t *stat)
 {
-    if (stream != NULL)
+    if (stream != NULL && stat != NULL)
     {
-        if (stream->fstat != NULL)
+        *stat = (iostream_stat_t){0};
+
+        if (stream->stat != NULL)
         {
-            return stream->fstat(stream, stat);
+            return stream->stat(stream, stat);
         }
 
         if (stream->fd != -1)
         {
-            return __plug_iostream_fstat(stream->fd, stat);
+            return __plug_iostream_stat(stream->fd, stat);
         }
     }
 
@@ -465,7 +467,7 @@ int iostream_getchar(iostream_t *stream)
     }
 }
 
-int iostream_ungetchar(iostream_t* stream, char c)
+int iostream_ungetchar(iostream_t *stream, char c)
 {
     if (stream->has_unget)
     {
@@ -548,5 +550,5 @@ int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
 
 // TODO: int iostream_scanf(iostream_t *stream, const char *fmt, ...)
 //       {
-//       
+//
 //       }

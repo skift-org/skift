@@ -343,7 +343,7 @@ $(SYSROOT):
 			 $(SYSROOT)/usr
 
 $(RAMDISK): $(SYSROOT) $(USERSPACE) $(RESSOURCES)
-	cd $(SYSROOT); tar -cf $@ *
+	cd $(SYSROOT); tar -cvf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #
 
@@ -352,6 +352,7 @@ $(BOOTROOT): grub.cfg $(KERNEL) $(RAMDISK)
 	cp grub.cfg $(BOOTROOT)/boot/grub/
 	cp $(KERNEL) $(BOOTROOT)/boot
 	cp $(RAMDISK) $(BOOTROOT)/boot
+	touch $(BOOTROOT)
 
 $(BOOTDISK): $(BOOTROOT)
 	grub-mkrescue -o $@ $(BOOTROOT) || grub2-mkrescue -o $@ $(BOOTROOT)

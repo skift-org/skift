@@ -45,11 +45,11 @@ void logger_log(log_level_t level, const char *file, uint line, const char *fmt,
 
         if (logger_use_colors)
         {
-            iostream_printf(log_stream, "%s%s \e[37m%s:%d: \e[0m", logger_level_colors[level], logger_level_names[level], file, line);
+            iostream_printf(log_stream, "%d: %s%s \e[0m%s:%d: \e[37;1m", process_this(), logger_level_colors[level], logger_level_names[level], file, line);
         }
         else
         {
-            iostream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
+            iostream_printf(log_stream, "%d: %s%s %s:%d: ", process_this(), logger_level_names[level], file, line);
         }
 
         iostream_vprintf(log_stream, fmt, va);

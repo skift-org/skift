@@ -310,7 +310,7 @@ $(KERNEL): $(KERNEL_OBJECT)
 # --- Ressources ------------------------------------------------------------- #
 
 WALLPAPERS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/wallpaper/*.png}}
-FONTS_GLYPHS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/font/*.glyph}}
+FONTS_GLYPHS = ${patsubst ressources/%.json,$(SYSROOT)/res/%.glyph,${wildcard ressources/font/*.json}}
 FONTS_PNGS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/font/*.png}}
 RESSOURCES = $(WALLPAPERS) $(FONTS_GLYPHS) $(FONTS_PNGS)
 

@@ -24,14 +24,9 @@
 #include "serial.h"
 #include "syscalls.h"
 #include "tasking.h"
+#include "clock.h"
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
-
-int sys_not_implemented()
-{
-    logger_warn("Not implemented syscall!");
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
 
 /* --- Process -------------------------------------------------------------- */
 
@@ -289,7 +284,7 @@ int sys_system_get_info(system_info_t *info)
     // FIXME: this should not be hard coded.
     strlcpy(info->machine, "machine", SYSTEM_INFO_FIELD_SIZE);
 
-    return 0;
+    return ERR_SUCCESS;
 }
 
 int sys_system_get_status(system_status_t *status)
@@ -302,70 +297,92 @@ int sys_system_get_status(system_status_t *status)
 
     status->running_tasks = task_count();
 
-    return 0;
+    return ERR_SUCCESS;
 }
 
-static int (*syscalls[])() =
-    {
-        [SYS_PROCESS_SELF] = sys_process_this,
-        [SYS_PROCESS_EXEC] = sys_process_exec,
-        [SYS_PROCESS_SPAWN] = sys_not_implemented,
-        [SYS_PROCESS_EXIT] = sys_process_exit,
-        [SYS_PROCESS_CANCEL] = sys_process_cancel,
-        [SYS_PROCESS_SLEEP] = sys_process_sleep,
-        [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
-        [SYS_PROCESS_WAIT] = sys_process_wait,
-        [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
-        [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
-        [SYS_PROCESS_MAP] = sys_process_map,
-        [SYS_PROCESS_UNMAP] = sys_process_unmap,
-        [SYS_PROCESS_ALLOC] = sys_process_alloc,
-        [SYS_PROCESS_FREE] = sys_process_free,
+int sys_system_get_time(timestamp_t *timestamp)
+{
+    *timestamp = clock_now();
+    return ERR_SUCCESS;
+}
 
-        [SYS_SHARED_MEMORY_ALLOC] = sys_shared_memory_alloc,
-        [SYS_SHARED_MEMORY_ACQUIRE] = sys_shared_memory_acquire,
-        [SYS_SHARED_MEMORY_RELEASE] = sys_shared_memory_release,
+static int (*syscalls[SYSCALL_COUNT])() = {
+    [SYS_PROCESS_SELF] = sys_process_this,
+    [SYS_PROCESS_EXEC] = sys_process_exec,
+    [SYS_PROCESS_EXIT] = sys_process_exit,
+    [SYS_PROCESS_CANCEL] = sys_process_cancel,
+    [SYS_PROCESS_SLEEP] = sys_process_sleep,
+    [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
+    [SYS_PROCESS_WAIT] = sys_process_wait,
+    [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
+    [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
+    [SYS_PROCESS_MAP] = sys_process_map,
+    [SYS_PROCESS_UNMAP] = sys_process_unmap,
+    [SYS_PROCESS_ALLOC] = sys_process_alloc,
+    [SYS_PROCESS_FREE] = sys_process_free,
 
-        [SYS_MESSAGING_SEND] = sys_messaging_send,
-        [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,
-        [SYS_MESSAGING_REQUEST] = sys_messaging_request,
-        [SYS_MESSAGING_RECEIVE] = sys_messaging_receive,
-        [SYS_MESSAGING_RESPOND] = sys_messaging_respond,
-        [SYS_MESSAGING_SUBSCRIBE] = sys_messaging_subscribe,
-        [SYS_MESSAGING_UNSUBSCRIBE] = sys_messaging_unsubscribe,
+    [SYS_SHARED_MEMORY_ALLOC] = sys_shared_memory_alloc,
+    [SYS_SHARED_MEMORY_ACQUIRE] = sys_shared_memory_acquire,
+    [SYS_SHARED_MEMORY_RELEASE] = sys_shared_memory_release,
 
-        [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
-        [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,
+    [SYS_MESSAGING_SEND] = sys_messaging_send,
+    [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,
+    [SYS_MESSAGING_REQUEST] = sys_messaging_request,
+    [SYS_MESSAGING_RECEIVE] = sys_messaging_receive,
+    [SYS_MESSAGING_RESPOND] = sys_messaging_respond,
+    [SYS_MESSAGING_SUBSCRIBE] = sys_messaging_subscribe,
+    [SYS_MESSAGING_UNSUBSCRIBE] = sys_messaging_unsubscribe,
 
-        [SYS_FILESYSTEM_READ] = sys_filesystem_read,
-        [SYS_FILESYSTEM_WRITE] = sys_filesystem_write,
-        [SYS_FILESYSTEM_IOCTL] = sys_filesystem_ioctl,
-        [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
-        [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
-        [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,
+    [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
+    [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,
 
-        [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
-        [SYS_FILESYSTEM_MKFIFO] = sys_filesystem_mkfifo,
-        [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
-        [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
-        [SYS_FILESYSTEM_RENAME] = sys_filesystem_rename,
+    [SYS_FILESYSTEM_READ] = sys_filesystem_read,
+    [SYS_FILESYSTEM_WRITE] = sys_filesystem_write,
+    [SYS_FILESYSTEM_IOCTL] = sys_filesystem_ioctl,
+    [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
+    [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
+    [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,
 
-        [SYS_SYSTEM_GET_INFO] = sys_system_get_info,
-        [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,
+    [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
+    [SYS_FILESYSTEM_MKFIFO] = sys_filesystem_mkfifo,
+    [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
+    [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
+    [SYS_FILESYSTEM_RENAME] = sys_filesystem_rename,
+
+    [SYS_SYSTEM_GET_INFO] = sys_system_get_info,
+    [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,
+    [SYS_SYSTEM_GET_TIME] = sys_system_get_time,
 };
 
-void syscall_dispatcher(processor_context_t *context)
+syscall_handler_t syscall_get_handler(syscall_t syscall)
 {
-    syscall_t syscall = context->eax;
     if (syscall >= 0 && syscall < SYSCALL_COUNT)
     {
-        syscall_handler_t syscall_handler = (syscall_handler_t)syscalls[syscall];
-        context->eax = syscall_handler(context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        if ((syscall_handler_t)syscalls[syscall] == NULL)
+        {
+            logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
+        }
+
+        return (syscall_handler_t)syscalls[syscall];
     }
     else
     {
         logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
-        logger_info("EBX=%d, ECX=%d, EDX=%d, ESI=%d, EDI=%d", context->eax, context->ebx, context->ecx, context->edx, context->esi, context->edi);
-        context->eax = 0;
+        return NULL;
+    }
+}
+
+void syscall_dispatcher(processor_context_t *context)
+{
+    syscall_handler_t handler = syscall_get_handler((syscall_t)context->eax);
+
+    if (handler != NULL)
+    {
+        context->eax = handler(context->ebx, context->ecx, context->edx, context->esi, context->edi);
+    }
+    else
+    {
+        logger_info("context: EBX=%08x, ECX=%08x, EDX=%08x, ESI=%08x, EDI=%08x", context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        context->eax = -ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 }

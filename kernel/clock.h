@@ -5,26 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/runtime.h>
+#include <libsystem/time.h>
 
-typedef enum
-{
-    T_SECOND = 0x0,
-    T_MINUTE = 0x2,
-    T_HOUR   = 0x4,
-    T_DAY    = 0x7,
-    T_MONTH  = 0x8,
-    T_YEAR   = 0x9,
-} time_selector_t;
-
-typedef struct
-{
-    uint second;
-    uint minute;
-    uint hour;
-    uint day;
-    uint month;
-    uint year;
-} time_t;
-
-void clock_time(time_t *time);
-uint clock_read(time_selector_t selector);
+timestamp_t clock_now(void);

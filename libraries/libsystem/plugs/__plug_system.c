@@ -14,3 +14,10 @@ void __plug_system_get_status(system_status_t *status)
 {
     __syscall(SYS_SYSTEM_GET_STATUS, (int)status, 0, 0, 0, 0);
 }
+
+timestamp_t __plug_system_get_time(void)
+{
+    timestamp_t time = 0;
+    __syscall(SYS_SYSTEM_GET_TIME, (int)&time, 0,0,0,0);
+    return time;
+}

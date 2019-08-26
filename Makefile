@@ -94,6 +94,7 @@ USERSPACE=$(SYSROOT)/bin/__democolors \
 		  $(SYSROOT)/bin/lsproc \
 		  $(SYSROOT)/bin/mkdir \
 		  $(SYSROOT)/bin/mv \
+		  $(SYSROOT)/bin/now \
 		  $(SYSROOT)/bin/panic \
 		  $(SYSROOT)/bin/sh \
 		  $(SYSROOT)/bin/sysfetch \
@@ -264,6 +265,10 @@ $(SYSROOT)/bin/mkdir: userspace/mkdir.c $(LIBSYSTEM) $(CRTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/mv: userspace/mv.c $(LIBSYSTEM) $(CRTS)
+	mkdir -p $(SYSROOT)/bin
+	$(CC) $(CFLAGS) $< -o $@
+
+$(SYSROOT)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@
 

@@ -10,6 +10,7 @@
 #include <libsystem/iostream.h>
 #include <libsystem/system.h>
 #include <libsystem/lock.h>
+#include <libsystem/time.h>
 
 void __plug_init(void);
 
@@ -66,6 +67,8 @@ int __plug_filesystem_mkdir(const char *path);
 void __plug_system_get_info(system_info_t *info);
 
 void __plug_system_get_status(system_status_t *status);
+
+timestamp_t __plug_system_get_time(void);
 
 /* --- Processes ------------------------------------------------------------ */
 

@@ -11,6 +11,7 @@
 #include "tasking.h"
 #include "memory.h"
 #include "serial.h"
+#include "clock.h"
 
 /* --- Framework initialization --------------------------------------------- */
 
@@ -62,6 +63,11 @@ void __plug_system_get_status(system_status_t *status)
 {
     UNUSED(status);
     assert(false);
+}
+
+timestamp_t __plug_system_get_time(void)
+{
+    return clock_now();
 }
 
 /* --- Memory allocator plugs ----------------------------------------------- */

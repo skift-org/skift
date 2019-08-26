@@ -51,6 +51,7 @@ typedef enum
 
     SYS_SYSTEM_GET_INFO,
     SYS_SYSTEM_GET_STATUS,
+    SYS_SYSTEM_GET_TIME,
 
     SYSCALL_COUNT
 } syscall_t;

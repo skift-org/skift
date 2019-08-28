@@ -297,13 +297,14 @@ int sys_system_get_status(system_status_t *status)
 
     status->running_tasks = task_count();
 
-    return ERR_SUCCESS;
+    return -ERR_SUCCESS;
 }
 
 int sys_system_get_time(timestamp_t *timestamp)
 {
     *timestamp = clock_now();
-    return ERR_SUCCESS;
+
+    return -ERR_SUCCESS;
 }
 
 static int (*syscalls[SYSCALL_COUNT])() = {

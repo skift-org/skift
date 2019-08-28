@@ -17,7 +17,7 @@ void __plug_system_get_status(system_status_t *status)
 
 timestamp_t __plug_system_get_time(void)
 {
-    timestamp_t time = 0;
-    __syscall(SYS_SYSTEM_GET_TIME, (int)&time, 0,0,0,0);
-    return time;
+    volatile timestamp_t timestamp = 0;
+    __syscall(SYS_SYSTEM_GET_TIME, (int)&timestamp, 0,0,0,0);
+    return timestamp;
 }

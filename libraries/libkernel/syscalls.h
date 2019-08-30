@@ -61,7 +61,8 @@ static inline int __syscall(syscall_t syscall, int p1, int p2, int p3, int p4, i
     int __ret;
     __asm__ __volatile__("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx"
                          : "=a"(__ret)
-                         : "0"(syscall), "r"((int)(p1)), "c"((int)(p2)), "d"((int)(p3)), "S"((int)(p4)), "D"((int)(p5)));
+                         : "0"(syscall), "r"((int)(p1)), "c"((int)(p2)), "d"((int)(p3)), "S"((int)(p4)), "D"((int)(p5))
+                         : "memory");
     return __ret;
 }
 

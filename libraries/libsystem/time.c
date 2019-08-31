@@ -11,26 +11,33 @@ time_t timestamp_to_time(timestamp_t timestamp)
     return (time_t){
         .second = timestamp % 60,
         .minute = (timestamp / SECONDS_PER_MINUTE) % 60,
-        .hour = (timestamp / SECONDS_PER_HOURS) % 24};
+        .hour = (timestamp / SECONDS_PER_HOURS) % 24,
+    };
 }
 
 date_t timestamp_to_date(timestamp_t timestamp)
 {
     date_t date = {0};
 
-    // Years
+    int days = timestamp / SECONDS_PER_DAY;
 
-    int days_since_epoch = timestamp / SECONDS_PER_DAY;
     date.year = EPOCH_YEAR;
-
-    for (int current_day = 0; current_day < days_since_epoch; current_day += DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)])
+    while (days - DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)] > 0)
     {
         date.year++;
+        days -= DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)];
     }
 
-    // Month
-    // Day
-    
+    date.month = 0;
+    while (days - DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month] > 0)
+    {
+        date.month++;
+        days -= DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month];
+    }
+
+    date.month++;
+
+    date.day = days + 1;
 
     return date;
 }

@@ -126,6 +126,12 @@ run: $(BOOTDISK)
 	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
 	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio
 
+debug: $(BOOTDISK)
+	qemu-system-i386 -s -S -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
+	qemu-system-i386 -s -S -cdrom $^ -m 256M -serial mon:stdio &
+
+	gdb -x gdbinit
+
 list:
 	@echo ""
 	@echo "$(LIBRARIES)"

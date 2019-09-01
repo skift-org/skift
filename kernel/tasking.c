@@ -323,7 +323,9 @@ void task_go(task_t *t)
 
     task_stack_push(t, &ctx, sizeof(ctx));
 
+    atomic_begin();
     task_setstate(t, TASK_STATE_RUNNING);
+    atomic_end();
 }
 
 /* --- Task wait state ---------------------------------------------------- */
@@ -408,6 +410,28 @@ bool task_wait(int task_id, int *exitvalue)
     }
 }
 
+bool task_wait_stream(task_t *this, stream_t *stream, task_wait_stream_condition_t condition)
+{
+    atomic_begin();
+
+    if (!lock_is_acquire(stream->node->lock) && condition(stream))
+    {
+        lock_acquire(stream->node->lock);
+    }
+    else
+    {
+        task_setstate(this, TASK_STATE_WAIT_STREAM);
+        this->wait.stream.stream = stream;
+        this->wait.stream.condition = condition;
+    }
+
+    atomic_end();
+
+    sheduler_yield();
+
+    return true;
+}
+
 /* --- Task stopping and canceling ---------------------------------------- */
 
 bool task_cancel(task_t *task, int exitvalue)
@@ -452,6 +476,16 @@ void task_exit(int exitvalue)
 }
 
 /* --- Task Memory managment ---------------------------------------------- */
+
+page_directorie_t *task_switch_pdir(task_t *task, page_directorie_t *pdir)
+{
+    page_directorie_t *oldpdir = task->pdir;
+
+    task->pdir = pdir;
+    paging_load_directorie(pdir);
+
+    return oldpdir;
+}
 
 int task_memory_map(task_t *this, uint addr, uint count)
 {
@@ -716,16 +750,19 @@ static char *TASK_STATES[] = {
     "WAIT",
     "WAIT_FOR_MESSAGE",
     "WAIT_FOR_RESPOND",
+    "WAIT_FOR_STREAM",
     "CANCELED",
 };
 
 void task_dump(task_t *t)
 {
     atomic_begin();
-    printf("\n\t . Task %d %s", t->id, t->name);
+    printf("\n\t - Task %d %s", t->id, t->name);
     printf("\n\t   State: %s", TASK_STATES[t->state]);
     printf("\n\t   User memory: ");
     memory_layout_dump(t->pdir, true);
+    printf("\n\t   Page directory: %08x", t->pdir);
+
     printf("\n");
     atomic_end();
 }
@@ -734,7 +771,6 @@ void task_panic_dump(void)
 {
     atomic_begin();
 
-    printf("\n");
     printf("\n\tRunning task %d: '%s'", sheduler_running_id(), sheduler_running()->name);
     printf("\n");
     printf("\n\tTasks:");
@@ -754,10 +790,8 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
-        atomic_begin();
-
         // To avoid pagefault we need to switch page directorie.
-        page_directorie_t *pdir = running->pdir;
+        page_directorie_t *oldpdir = task_switch_pdir(sheduler_running(), this->pdir);
 
         paging_load_directorie(this->pdir);
         task_memory_map(this, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
@@ -766,9 +800,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
         iostream_read(s, (void *)program->vaddr, program->filesz);
 
-        paging_load_directorie(pdir);
-
-        atomic_end();
+        task_switch_pdir(sheduler_running(), oldpdir);
     }
     else
     {
@@ -811,8 +843,6 @@ int task_exec(const char *executable_path, const char **argv)
     }
 
     // Create the process and load the executable.
-    atomic_begin();
-
     task_t *new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
     int new_task_id = new_task->id;
 
@@ -827,8 +857,6 @@ int task_exec(const char *executable_path, const char **argv)
     }
 
     task_go(new_task);
-
-    atomic_end();
 
     iostream_close(s);
     return new_task_id;
@@ -1428,6 +1456,35 @@ void wakeup_sleeping_tasks(void)
     }
 }
 
+void wakeup_stream_waiting_task(void)
+{
+    if (!list_empty(task_bystate(TASK_STATE_WAIT_TIME)))
+    {
+        list_t *task_to_wakeup = list();
+
+        list_foreach(t, task_bystate(TASK_STATE_WAIT_STREAM))
+        {
+            task_t *task = t->value;
+            stream_t *stream = task->wait.stream.stream;
+
+            if (!lock_is_acquire(stream->node->lock) &&
+                task->wait.stream.condition(stream))
+            {
+                lock_acquire_by(stream->node->lock, task->id);
+                list_pushback(task_to_wakeup, task);
+            }
+        }
+
+        list_foreach(t, task_to_wakeup)
+        {
+            task_t *task = t->value;
+            task_setstate(task, TASK_STATE_RUNNING);
+        }
+
+        list_delete(task_to_wakeup, LIST_KEEP_VALUES);
+    }
+}
+
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
     UNUSED(context);
@@ -1442,6 +1499,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     ticks++;
 
     wakeup_sleeping_tasks();
+    wakeup_stream_waiting_task();
 
     // Get the next task
     if (!list_peek_and_pushback(task_bystate(TASK_STATE_RUNNING), (void **)&running))

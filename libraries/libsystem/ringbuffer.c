@@ -28,6 +28,16 @@ void ringbuffer_delete(ringbuffer_t *rb)
     free(rb);
 }
 
+int ringbuffer_is_empty(ringbuffer_t *this)
+{
+    return this->tail == this->head;
+}
+
+int ringbuffer_is_full(ringbuffer_t *this)
+{
+    return ((this->head + 1) % this->size) == this->tail;
+}
+
 int ringbuffer_read(ringbuffer_t *rb, void *buffer, uint size)
 {
     assert(rb);
@@ -71,7 +81,7 @@ int ringbuffer_putc(ringbuffer_t *rb, int c)
 {
     assert(rb);
 
-    if (rb->head + 1 != rb->tail)
+    if (!ringbuffer_is_full(rb))
     {
         rb->buffer[rb->head] = (uchar)c;
         rb->head = (rb->head + 1) % rb->size;
@@ -88,7 +98,7 @@ int ringbuffer_getc(ringbuffer_t *rb)
 {
     assert(rb);
 
-    if (rb->tail != rb->head)
+    if (!ringbuffer_is_empty(rb))
     {
         int c = rb->buffer[rb->tail];
         rb->tail = (rb->tail + 1) % rb->size;

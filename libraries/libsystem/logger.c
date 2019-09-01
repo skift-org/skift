@@ -38,6 +38,8 @@ void logger_log(log_level_t level, const char *file, uint line, const char *fmt,
     {
         __plug_logger_lock();
 
+        iostream_printf(log_stream, "%d: ", process_this());
+
         datetime_t datetime = datetime_now();
         iostream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
 

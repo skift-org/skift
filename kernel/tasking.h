@@ -15,6 +15,8 @@
 
 /* --- Task data structure -------------------------------------------------- */
 
+struct task;
+
 typedef void (*task_entry_t)();
 
 typedef struct
@@ -43,6 +45,14 @@ typedef struct
     int timeout;
 } task_wait_respond_t;
 
+typedef bool (*task_wait_stream_condition_t)(stream_t*);
+
+typedef struct 
+{
+    stream_t* stream;
+    task_wait_stream_condition_t condition;
+} task_wait_stream_t;
+
 typedef struct task
 {
     int id;
@@ -61,6 +71,7 @@ typedef struct task
         task_wait_time_t time;
         task_wait_task_t task;
         task_wait_respond_t respond;
+        task_wait_stream_t stream;
     } wait;
 
     list_t *inbox;  // process main message queue
@@ -131,6 +142,8 @@ int task_wakeup(task_t* task);
 
 bool task_wait(int task_id, int *exitvalue);
 
+bool task_wait_stream(task_t* task, stream_t* stream, task_wait_stream_condition_t condition);
+
 bool task_cancel(task_t* task, int exitvalue);
 
 void task_exit(int exitvalue);
@@ -140,6 +153,8 @@ void task_dump(task_t *t);
 void task_panic_dump(void);
 
 /* --- Task memory management ----------------------------------------------- */
+
+page_directorie_t* task_switch_pdir(task_t* task, page_directorie_t* pdir);
 
 int task_memory_map(task_t* this, uint addr, uint count);
 

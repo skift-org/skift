@@ -57,7 +57,6 @@ typedef struct
 
 typedef struct
 {
-    lock_t buffer_lock;
     ringbuffer_t *buffer;
 } fifo_t;
 
@@ -66,7 +65,6 @@ typedef enum
     FSNODE_FILE,
     FSNODE_DEVICE,
     FSNODE_FIFO,
-
     FSNODE_DIRECTORY
 } fsnode_type_t;
 
@@ -136,6 +134,10 @@ stream_t *filesystem_dup(stream_t *s);
 int filesystem_read(stream_t *s, void *buffer, uint size);
 
 int filesystem_write(stream_t *s, const void *buffer, uint size);
+
+bool filesystem_can_read(stream_t * s);
+
+bool filesystem_can_write(stream_t *s);
 
 int filesystem_ioctl(stream_t *s, int request, void *args);
 

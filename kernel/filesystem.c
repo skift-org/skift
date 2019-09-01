@@ -15,6 +15,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
+#include <libsystem/assert.h>
 
 #include "tasking.h"
 #include "filesystem.h"
@@ -75,8 +76,6 @@ fsnode_t *fsnode(fsnode_type_t type)
     case FSNODE_FIFO:
     {
         fifo_t *fifo = &node->fifo;
-
-        lock_init(fifo->buffer_lock);
         fifo->buffer = ringbuffer(4096);
 
         break;
@@ -187,8 +186,6 @@ int file_read(stream_t *stream, void *buffer, uint size)
 {
     int result = 0;
 
-    lock_acquire(stream->node->lock);
-
     file_t *file = &stream->node->file;
 
     if (stream->offset <= file->size)
@@ -200,16 +197,12 @@ int file_read(stream_t *stream, void *buffer, uint size)
         stream->offset += readedsize;
     }
 
-    lock_release(stream->node->lock);
-
     return result;
 }
 
 int file_write(stream_t *stream, const void *buffer, uint size)
 {
     int result = 0;
-
-    lock_acquire(stream->node->lock);
 
     file_t *file = &stream->node->file;
 
@@ -230,8 +223,6 @@ int file_write(stream_t *stream, const void *buffer, uint size)
     result = size;
     stream->offset += size;
 
-    lock_release(stream->node->lock);
-
     return result;
 }
 
@@ -240,26 +231,14 @@ int file_write(stream_t *stream, const void *buffer, uint size)
 int fifo_read(stream_t *stream, void *buffer, uint size)
 {
     fifo_t *fifo = &stream->node->fifo;
-
-    lock_acquire(fifo->buffer_lock);
-
     int result = ringbuffer_read(fifo->buffer, buffer, size);
-
-    lock_release(fifo->buffer_lock);
-
     return result;
 }
 
 int fifo_write(stream_t *stream, const void *buffer, uint size)
 {
     fifo_t *fifo = &stream->node->fifo;
-
-    lock_acquire(fifo->buffer_lock);
-
     int result = ringbuffer_write(fifo->buffer, buffer, size);
-
-    lock_release(fifo->buffer_lock);
-
     return result;
 }
 
@@ -653,126 +632,145 @@ stream_t *filesystem_dup(stream_t *s)
     return dup;
 }
 
-int filesystem_read(stream_t *s, void *buffer, uint size)
+int filesystem_read(stream_t *stream, void *buffer, uint size)
 {
     IS_FS_READY;
 
-    if (size == 0)
-        return 0;
+    assert(stream);
 
-    int result = -1;
-    if (s != NULL)
+    if (buffer == NULL || size == 0)
     {
-        if (s->flags & IOSTREAM_READ)
+        return 0;
+    }
+
+    int result = -ERR_OPERATION_NOT_SUPPORTED;
+
+    if (stream->flags & IOSTREAM_READ)
+    {
+        task_wait_stream(sheduler_running(), stream, filesystem_can_read);
+        fsnode_t *node = stream->node;
+
+        if (node->type == FSNODE_FILE)
         {
-            switch (s->node->type)
+            result = file_read(stream, buffer, size);
+        }
+        else if (node->type == FSNODE_DEVICE)
+        {
+            device_t *dev = &node->device;
+
+            if (dev->read != NULL)
             {
-            case FSNODE_FILE:
-            {
-                result = file_read(s, buffer, size);
-                break;
-            }
-
-            case FSNODE_DEVICE:
-            {
-                device_t *dev = &s->node->device;
-
-                if (dev->read != NULL)
-                {
-                    result = dev->read(s, buffer, size);
-                }
-
-                break;
-            }
-
-            case FSNODE_DIRECTORY:
-            {
-                result = directory_read(s, buffer, size);
-
-                break;
-            }
-
-            case FSNODE_FIFO:
-            {
-                result = fifo_read(s, buffer, size);
-                while (result == 0)
-                {
-                    task_sleep(sheduler_running(), 10);
-                    result = fifo_read(s, buffer, size);
-                }
-
-                break;
-            }
-
-            default:
-                break;
+                result = dev->read(stream, buffer, size);
             }
         }
+        else if (node->type == FSNODE_FIFO)
+        {
+            result = fifo_read(stream, buffer, size);
+        }
+        else if (node->type == FSNODE_DIRECTORY)
+        {
+            result = directory_read(stream, buffer, size);
+        }
+
+        lock_release(node->lock);
     }
     else
     {
-        logger_warn("Null stream passed");
+        result = -ERR_OPERATION_NOT_PERMITTED;
+    }
+
+    if (result < 0)
+    {
+        logger_error(error_to_string(-result));
     }
 
     return result;
 }
 
-int filesystem_write(stream_t *s, const void *buffer, uint size)
+int filesystem_write(stream_t *stream, const void *buffer, uint size)
 {
     IS_FS_READY;
 
-    if (size == 0)
-        return 0;
+    assert(stream);
 
-    int result = -1;
-
-    if (s != NULL)
+    if (buffer == NULL || size == 0)
     {
-        if (s->flags & IOSTREAM_WRITE)
+        return 0;
+    }
+
+    int result = -ERR_OPERATION_NOT_SUPPORTED;
+
+    if (stream->flags & IOSTREAM_WRITE)
+    {
+        task_wait_stream(sheduler_running(), stream, filesystem_can_write);
+        fsnode_t *node = stream->node;
+
+        if (node->type == FSNODE_FILE)
         {
-            switch (s->node->type)
+            result = file_write(stream, buffer, size);
+        }
+        else if (node->type == FSNODE_DEVICE)
+        {
+            device_t *dev = &node->device;
+
+            if (dev->write != NULL)
             {
-            case FSNODE_FILE:
-            {
-                result = file_write(s, buffer, size);
-
-                break;
-            }
-
-            case FSNODE_DEVICE:
-            {
-                device_t *dev = &s->node->device;
-
-                if (dev->write != NULL)
-                {
-                    result = dev->write(s, buffer, size);
-                }
-
-                break;
-            }
-
-            case FSNODE_FIFO:
-            {
-                result = fifo_write(s, buffer, size);
-                while (result == 0)
-                {
-                    task_sleep(sheduler_running(), 10);
-                    result = fifo_write(s, buffer, size);
-                }
-                break;
-            }
-
-            default:
-                break;
+                result = dev->write(stream, buffer, size);
             }
         }
+        else if (node->type == FSNODE_FIFO)
+        {
+            result = fifo_write(stream, buffer, size);
+        }
+
+        lock_release(node->lock);
     }
     else
     {
-        logger_warn("Null stream passed");
+        result = -ERR_OPERATION_NOT_PERMITTED;
+    }
+
+    if (result < 0)
+    {
+        logger_error(error_to_string(-result));
     }
 
     return result;
+}
+
+bool filesystem_can_read(stream_t *stream)
+{
+    assert(stream);
+
+    fsnode_t *node = stream->node;
+
+    if (node->type == FSNODE_FILE)
+    {
+        file_t *file = &node->file;
+        return stream->offset <= file->size;
+    }
+    else if (node->type == FSNODE_FIFO)
+    {
+        fifo_t *fifo = &node->fifo;
+        return !ringbuffer_is_empty(fifo->buffer);
+    }
+
+    return true;
+}
+
+bool filesystem_can_write(stream_t *stream)
+{
+    assert(stream);
+
+    fsnode_t *node = stream->node;
+
+    if (node->type == FSNODE_FIFO)
+    {
+        fifo_t *fifo = &node->fifo;
+        return !ringbuffer_is_full(fifo->buffer);
+    }
+
+    return true;
 }
 
 int filesystem_ioctl(stream_t *s, int request, void *args)

@@ -80,9 +80,14 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(memory, &mbootinfo);
     setup(tasking);
     setup(filesystem);
-    setup(modules, &mbootinfo);
+    
+    /* --- Finalizing System ------------------------------------------------ */
+    atomic_enable();
+    sti();
 
     /* --- Devices ---------------------------------------------------------- */
+    setup(modules, &mbootinfo);
+
     logger_info("Mounting devices...");
     setup(textmode);
     setup(framebuffer);
@@ -95,10 +100,7 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(zero);
     setup(random);
 
-    /* --- Finalizing System ------------------------------------------------ */
     logger_info("Starting the userspace...");
-    atomic_enable();
-    sti();
 
     /* --- Entering userspace ----------------------------------------------- */
     int init = task_exec("/bin/init", (const char *[]){"/bin/init", NULL});

@@ -83,6 +83,7 @@ const char *task_state_string[] = {
     "wait",
     "wait_message",
     "wait_respond",
+    "wait_stream",
     "canceled",
 };
 

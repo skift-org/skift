@@ -38,19 +38,20 @@ void logger_log(log_level_t level, const char *file, uint line, const char *fmt,
     {
         __plug_logger_lock();
 
-        va_list va;
-        va_start(va, fmt);
-
-        // TODO: print the timestamp
+        datetime_t datetime = datetime_now();
+        iostream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
 
         if (logger_use_colors)
         {
-            iostream_printf(log_stream, "%d: %s%s \e[0m%s:%d: \e[37;1m", process_this(), logger_level_colors[level], logger_level_names[level], file, line);
+            iostream_printf(log_stream, "%s%s \e[0m%s:%d: \e[37;1m", logger_level_colors[level], logger_level_names[level], file, line);
         }
         else
         {
-            iostream_printf(log_stream, "%d: %s%s %s:%d: ", process_this(), logger_level_names[level], file, line);
+            iostream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
         }
+
+        va_list va;
+        va_start(va, fmt);
 
         iostream_vprintf(log_stream, fmt, va);
         iostream_printf(log_stream, "\033[0m\n");

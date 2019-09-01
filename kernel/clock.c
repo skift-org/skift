@@ -42,23 +42,18 @@ char get_realtime_reg(int reg)
 
 timestamp_t clock_now(void)
 {
-    datetime_t datetime;
-
     CMOS_WAIT;
 
-    logger_trace("Read time from rtc...");
-
-    logger_trace("Second %d", datetime.second = from_bcd(get_realtime_reg(T_SECOND)));
-    logger_trace("Minute %d", datetime.minute = from_bcd(get_realtime_reg(T_MINUTE)));
-    logger_trace("Hour %d", datetime.hour = from_bcd(get_realtime_reg(T_HOUR)));
-    logger_trace("Day %d", datetime.day = from_bcd(get_realtime_reg(T_DAY)));
-    logger_trace("Month %d", datetime.month = from_bcd(get_realtime_reg(T_MONTH)));
-
+    datetime_t datetime;
+    datetime.second = from_bcd(get_realtime_reg(T_SECOND));
+    datetime.minute = from_bcd(get_realtime_reg(T_MINUTE));
+    datetime.hour = from_bcd(get_realtime_reg(T_HOUR));
+    datetime.day = from_bcd(get_realtime_reg(T_DAY));
+    datetime.month = from_bcd(get_realtime_reg(T_MONTH));
     // FIXME: maybe in 2100 we should update this...
-    logger_trace("Year %d", datetime.year = from_bcd(get_realtime_reg(T_YEAR)) + 2000) ;
+    datetime.year = from_bcd(get_realtime_reg(T_YEAR)) + 2000;
 
     timestamp_t timestamp = datetime_to_timestamp(datetime);
-    logger_trace("Timestamp %d", timestamp);
 
     return timestamp;
 }

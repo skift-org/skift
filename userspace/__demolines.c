@@ -68,7 +68,14 @@ int main(int argc, char **argv)
 
         painter_draw_line(paint, line.start, line.finish, line.color);
         
-        iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
+        framebuffer_region_t reg;
+        reg.src = fb->buffer;
+        reg.bound.X = min(line.start.X, line.finish.X);
+        reg.bound.Y = min(line.start.Y, line.finish.Y);
+        reg.bound.width = max(line.start.X, line.finish.X) - reg.bound.X;
+        reg.bound.height = max(line.start.Y, line.finish.Y) - reg.bound.Y;
+
+        iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLITREGION, &reg);
     } while(true);
 
     return 0;

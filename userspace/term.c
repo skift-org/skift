@@ -123,24 +123,6 @@ static color_t framebuffer_brightcolors[] = {
     [VTCOLOR_GREY] = COLOR(0xeceff1),
 };
 
-void framebuffer_paint_callback(vtconsole_t *vtc, vtcell_t *vtc_cell, int x, int y)
-{
-    UNUSED(vtc);
-
-    color_t fgc = vtc_cell->attr.bright
-                      ? framebuffer_brightcolors[vtc_cell->attr.fg]
-                      : framebuffer_colors[vtc_cell->attr.fg];
-
-    point_t pos = (point_t){x * char_size.X, y * (int)(char_size.Y)};
-    point_t siz = (point_t){char_size.X, (char_size.Y)};
-
-    rectangle_t rect;
-    rect.position = pos;
-    rect.size = siz;
-
-    painter_clear_rect(paint, rect, framebuffer_colors[vtc_cell->attr.bg]);
-    painter_draw_glyph(paint, mono_font, font_glyph(mono_font, vtc_cell->c), point_add(pos, (point_t){0, 16}), 16, fgc);
-}
 
 void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
@@ -183,7 +165,64 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 
     mono_font = font("mono");
 
-    return vtconsole(mode_info.width / char_size.X, mode_info.height / char_size.Y, framebuffer_paint_callback, framebuffer_cursor_move_callback);
+    return vtconsole(mode_info.width / char_size.X, mode_info.height / char_size.Y, NULL, framebuffer_cursor_move_callback);
+}
+
+void paint_repaint_dirty(vtconsole_t *console, painter_t* paint)
+{
+    int repainted_cell = 0;
+    bool has_bound = false;
+    rectangle_t repaint_bound = {0};
+
+    for (int y = 0; y < console->height; y++)
+    {
+        for (int x = 0; x < console->width; x++)
+        {
+            vtcell_t *cell = vtconsole_cell(console, x, y);
+
+            if (cell->is_dirty == true)
+            {
+                repainted_cell++;
+
+                color_t fgc = cell->attr.bright
+                                ? framebuffer_brightcolors[cell->attr.fg]
+                                : framebuffer_colors[cell->attr.fg];
+
+                point_t pos = (point_t){x * char_size.X, y * (int)(char_size.Y)};
+                point_t siz = (point_t){char_size.X, (char_size.Y)};
+
+                rectangle_t rect;
+                rect.position = pos;
+                rect.size = siz;
+
+                painter_clear_rect(paint, rect, framebuffer_colors[cell->attr.bg]);
+                if (cell->c != ' ')
+                {
+                    painter_draw_glyph(paint, mono_font, font_glyph(mono_font, cell->c), point_add(pos, (point_t){0, 16}), 16, fgc);
+                }
+                
+                cell->is_dirty = false;
+
+                if (!has_bound)
+                {
+                    has_bound = true;
+                    repaint_bound = rect;
+                }
+                else
+                {
+                    repaint_bound = rectangle_merge(repaint_bound, rect);
+                }
+            }
+        }
+    }
+
+    // painter_draw_rect(paint, repaint_bound, COLOR_RED);
+    // logger_info("Repainted %dcells %dx%d", repainted_cell, repaint_bound.X, repaint_bound.Y);
+
+    framebuffer_region_t reg;
+    reg.bound = repaint_bound;
+    reg.src = framebuffer->buffer;
+    iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLITREGION, &reg);
 }
 
 /* --- Terminal read/write loop --------------------------------------------- */
@@ -240,8 +279,7 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            framebuffer_region_t damaged_region = (framebuffer_region_t){.src = framebuffer->buffer, .bound = bitmap_bound(framebuffer)};
-            iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLITREGION, &damaged_region);
+            paint_repaint_dirty(vtc, paint);
         }
     } while (!do_exit);
 

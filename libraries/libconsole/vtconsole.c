@@ -42,15 +42,7 @@ void vtconsole_clear(vtconsole_t *vtc, int fromx, int fromy, int tox, int toy)
 {
     for (int i = fromx + fromy * vtc->width; i < tox + toy * vtc->width; i++)
     {
-        vtcell_t *cell = &vtc->buffer[i];
-
-        cell->attr = VTC_DEFAULT_ATTR;
-        cell->c = ' ';
-
-        if (vtc->on_paint)
-        {
-            vtc->on_paint(vtc, cell, i % vtc->width, i / vtc->width);
-        }
+        vtconsole_update_cell(vtc, i % vtc->width, i / vtc->width, ' ', VTC_DEFAULT_ATTR);
     }
 }
 
@@ -59,25 +51,13 @@ void vtconsole_scroll(vtconsole_t *vtc)
     // Scroll the screen.
     for (int i = 0; i < ((vtc->width * vtc->height) - vtc->width); i++)
     {
-        vtc->buffer[i] = vtc->buffer[i + vtc->width];
-
-        if (vtc->on_paint)
-        {
-            vtc->on_paint(vtc, &vtc->buffer[i], i % vtc->width, i / vtc->width);
-        }
+        vtconcole_update_cell_with_cell(vtc, i % vtc->width, i / vtc->width, vtc->buffer[i + vtc->width]);
     }
 
     // Clear the last line.
     for (int i = ((vtc->width * vtc->height) - vtc->width); i < vtc->width * vtc->height; i++)
     {
-        vtcell_t *cell = &vtc->buffer[i];
-        cell->attr = VTC_DEFAULT_ATTR;
-        cell->c = ' ';
-
-        if (vtc->on_paint)
-        {
-            vtc->on_paint(vtc, &vtc->buffer[i], i % vtc->width, i / vtc->width);
-        }
+        vtconcole_update_cell_with_cell(vtc, i % vtc->width, i / vtc->width, vtc->buffer[i + vtc->width]);
     }
 
     // Move the cursor up a line.
@@ -154,14 +134,8 @@ void vtconsole_append(vtconsole_t *vtc, char c)
         if (vtc->cursor.x >= vtc->width)
             vtconsole_newline(vtc);
 
-        vtcell_t *cell = &vtc->buffer[vtc->cursor.x + vtc->cursor.y * vtc->width];
-        cell->c = c;
-        cell->attr = vtc->attr;
 
-        if (vtc->on_paint)
-        {
-            vtc->on_paint(vtc, cell, vtc->cursor.x, vtc->cursor.y);
-        }
+        vtconsole_update_cell(vtc, vtc->cursor.x, vtc->cursor.y, c, vtc->attr);
 
         vtc->cursor.x++;
 
@@ -170,6 +144,40 @@ void vtconsole_append(vtconsole_t *vtc, char c)
             vtc->on_move(vtc, &vtc->cursor);
         }
     }
+}
+
+void vtconsole_update_cell(vtconsole_t *vtc, int x, int y, char c, vtattr_t attr)
+{
+    vtcell_t *new_cell = &(vtcell_t){
+        .c = c,
+        .attr = attr,
+        .is_dirty = true,
+    };
+
+    vtcell_t *old_cell = vtconsole_cell(vtc, x, y);
+
+    if (old_cell->c != new_cell->c ||
+        old_cell->attr.bg != new_cell->attr.bg ||
+        old_cell->attr.fg != new_cell->attr.fg ||
+        old_cell->attr.bright != new_cell->attr.bright)
+    {
+        *old_cell = *new_cell; 
+
+        if (vtc->on_paint)
+        {
+            vtc->on_paint(vtc, old_cell, vtc->cursor.x, vtc->cursor.y);
+        }
+    }
+}
+
+void vtconcole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell)
+{
+    vtconsole_update_cell(vtc, x, y, cell.c, cell.attr);
+}
+
+vtcell_t *vtconsole_cell(vtconsole_t *vtc, int x, int y)
+{
+    return &vtc->buffer[x + y * vtc->width];
 }
 
 // Moves the cursor to row n, column m. The values are 1-based,

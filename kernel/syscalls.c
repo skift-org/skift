@@ -186,9 +186,9 @@ int sys_filesystem_write(int fd, void *buffer, uint size)
     return task_write_file(sheduler_running(), fd, buffer, size);
 }
 
-int sys_filesystem_ioctl(int fd, int request, void *args)
+int sys_filesystem_call(int fd, int request, void *args)
 {
-    return task_ioctl_file(sheduler_running(), fd, request, args);
+    return task_call_file(sheduler_running(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, iostream_whence_t whence)
@@ -339,7 +339,7 @@ static int (*syscalls[SYSCALL_COUNT])() = {
 
     [SYS_FILESYSTEM_READ] = sys_filesystem_read,
     [SYS_FILESYSTEM_WRITE] = sys_filesystem_write,
-    [SYS_FILESYSTEM_IOCTL] = sys_filesystem_ioctl,
+    [SYS_FILESYSTEM_CALL] = sys_filesystem_call,
     [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
     [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
     [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,

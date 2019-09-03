@@ -132,9 +132,9 @@ int __plug_iostream_write(int fd, const void *buffer, uint size)
     return task_write_file(sheduler_running(), fd, buffer, size);
 }
 
-int __plug_iostream_ioctl(int fd, int request, void *args)
+int __plug_iostream_call(int fd, int request, void *args)
 {
-    return task_ioctl_file(sheduler_running(), fd, request, args);
+    return task_call_file(sheduler_running(), fd, request, args);
 }
 
 int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence)

@@ -34,7 +34,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
+    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return -1;
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
         reg.bound.width = max(line.start.X, line.finish.X) - reg.bound.X;
         reg.bound.height = max(line.start.Y, line.finish.Y) - reg.bound.Y;
 
-        iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLITREGION, &reg);
+        iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLITREGION, &reg);
     } while(true);
 
     return 0;

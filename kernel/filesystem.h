@@ -22,7 +22,7 @@ typedef int (*fsop_open_t)(struct s_stream *s);
 typedef int (*fsop_close_t)(struct s_stream *s);
 typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct s_stream *s, const void *buffer, uint size);
-typedef int (*fsop_ioctl_t)(struct s_stream *s, int request, void *args);
+typedef int (*fsop_call_t)(struct s_stream *s, int request, void *args);
 typedef int (*fsop_stat_t)(struct s_stream *s, iostream_stat_t *stat);
 
 typedef struct
@@ -39,7 +39,7 @@ typedef struct
 
     fsop_read_t read;
     fsop_write_t write;
-    fsop_ioctl_t ioctl;
+    fsop_call_t call;
 
     void *p;
 } device_t;
@@ -139,7 +139,7 @@ bool filesystem_can_read(stream_t * s);
 
 bool filesystem_can_write(stream_t *s);
 
-int filesystem_ioctl(stream_t *s, int request, void *args);
+int filesystem_call(stream_t *s, int request, void *args);
 
 int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine);
 

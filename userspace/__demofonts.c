@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
     assert(framebuffer_device);
 
-    assert(iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) >= 0);
+    assert(iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) >= 0);
 
     bitmap_t *fb = bitmap(800, 600);
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     }
     
 
-    iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
+    iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLIT, fb->buffer);
 
     for (int i = 0; fonts[i] != NULL; i++)
     {

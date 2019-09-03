@@ -68,11 +68,11 @@ int textmode_device_write(stream_t *stream, const void *buffer, uint size)
     return tocopy;
 }
 
-int textmode_device_ioctl(stream_t *stream, int request, void *args)
+int textmode_device_call(stream_t *stream, int request, void *args)
 {
     UNUSED(stream);
 
-    if (request == TEXTMODE_IOCTL_GET_INFO)
+    if (request == TEXTMODE_CALL_GET_INFO)
     {
         textmode_info_t *info = (textmode_info_t *)args;
 
@@ -84,14 +84,14 @@ int textmode_device_ioctl(stream_t *stream, int request, void *args)
 
         return -ERR_SUCCESS;
     }
-    else if (request == TEXTMODE_IOCTL_SET_INFO)
+    else if (request == TEXTMODE_CALL_SET_INFO)
     {
         textmode_info_t *info = (textmode_info_t *)args;
 
         vga_cursor_position(info->cursor_x, info->cursor_y);
         return -ERR_SUCCESS;
     }
-    else if (request == TEXTMODE_IOCTL_SET_CELL)
+    else if (request == TEXTMODE_CALL_SET_CELL)
     {
         textmode_cell_info_t *cell = (textmode_cell_info_t *)args;
 
@@ -101,7 +101,7 @@ int textmode_device_ioctl(stream_t *stream, int request, void *args)
     }
     else
     {
-        return -ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE;
+        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
 
@@ -109,7 +109,7 @@ void textmode_setup(void)
 {
     device_t textmode_device = {
         .write = textmode_device_write,
-        .ioctl = textmode_device_ioctl,
+        .call = textmode_device_call,
     };
 
     FILESYSTEM_MKDEV(TEXTMODE_DEVICE, textmode_device);

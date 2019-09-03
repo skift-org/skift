@@ -73,7 +73,7 @@ int gfxmode_get(iostream_t *framebuffer_device)
 {
     framebuffer_mode_info_t framebuffer_info;
 
-    if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_GET_MODE, &framebuffer_info) < 0)
+    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &framebuffer_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return -1;
@@ -93,7 +93,7 @@ int gfxmode_set(iostream_t *framebuffer_device, const char* mode_name)
 
     if (framebuffer_info != NULL)
     {
-        if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, framebuffer_info) < 0)
+        if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, framebuffer_info) < 0)
         {
             error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
             return -1;

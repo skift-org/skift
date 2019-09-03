@@ -6,7 +6,7 @@
 
 #include <libform/layout.h>
 #include <libform/style.h>
-#include <libform/event.h>
+#include <libform/events.h>
 
 typedef struct 
 {

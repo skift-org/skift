@@ -23,7 +23,7 @@ iostream_t *iostream(iostream_flag_t flags)
     stream->tell = NULL;
     stream->seek = NULL;
     stream->stat = NULL;
-    stream->ioctl = NULL;
+    stream->call = NULL;
     stream->close = NULL;
 
     stream->fd = -1;
@@ -414,19 +414,19 @@ int iostream_stat(iostream_t *stream, iostream_stat_t *stat)
     return -1;
 }
 
-int iostream_ioctl(iostream_t *stream, int request, void *arg)
+int iostream_call(iostream_t *stream, int request, void *arg)
 {
     if (stream != NULL)
     {
-        if (stream->ioctl != NULL)
+        if (stream->call != NULL)
         {
-            return stream->ioctl(stream, request, arg);
+            return stream->call(stream, request, arg);
         }
 
         if (stream->fd != -1)
         {
             // FIXME: maybe we should handle stream error differently :/
-            int result = __plug_iostream_ioctl(stream->fd, request, arg);
+            int result = __plug_iostream_call(stream->fd, request, arg);
 
             if (result < 0)
             {

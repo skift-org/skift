@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Command line argument parser module to framework
  - Path manipulation and parsing module to framework
  - Command line option to some coreutils
- - `ioctl`, `link`, `unlink`, `rename` syscalls
+ - `call`, `link`, `unlink`, `rename` syscalls
  - `skift/iostream.h` a stdio like library, with support for buffered I/O
  - `skift/launchpad.h` a process creation API inspired by the fushia project (wip)
  - `cd`, `exit`, `mv` command to the shell

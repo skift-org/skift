@@ -65,7 +65,7 @@ typedef int iostream_operation_write_t(struct s_iostream *stream, const void *bu
 typedef int iostream_operation_tell_t(struct s_iostream *stream, iostream_whence_t whence);
 typedef int iostream_operation_seek_t(struct s_iostream *stream, int offset, iostream_whence_t whence);
 typedef int iostream_operation_stat_t(struct s_iostream *stream, iostream_stat_t *stat);
-typedef int iostream_operation_ioctl_t(struct s_iostream *stream, int request, void *arg);
+typedef int iostream_operation_call_t(struct s_iostream *stream, int request, void *arg);
 typedef int iostream_operation_close_t(struct s_iostream *stream);
 
 #define IOSTREAM_BUFFER_SIZE 512
@@ -79,7 +79,7 @@ typedef struct s_iostream
     iostream_operation_tell_t *tell;
     iostream_operation_seek_t *seek;
     iostream_operation_stat_t *stat;
-    iostream_operation_ioctl_t *ioctl;
+    iostream_operation_call_t *call;
     iostream_operation_close_t *close;
 
     iostream_buffer_mode_t read_mode;
@@ -125,7 +125,7 @@ int iostream_recv(iostream_t* stream);
 
 int iostream_flush(iostream_t *stream);
 
-int iostream_ioctl(iostream_t *stream, int request, void *arg);
+int iostream_call(iostream_t *stream, int request, void *arg);
 
 int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence);
 

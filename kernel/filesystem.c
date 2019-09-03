@@ -773,7 +773,7 @@ bool filesystem_can_write(stream_t *stream)
     return true;
 }
 
-int filesystem_ioctl(stream_t *s, int request, void *args)
+int filesystem_call(stream_t *s, int request, void *args)
 {
     IS_FS_READY;
 
@@ -785,9 +785,9 @@ int filesystem_ioctl(stream_t *s, int request, void *args)
         {
             device_t *device = &s->node->device;
 
-            if (device->ioctl != NULL)
+            if (device->call != NULL)
             {
-                result = device->ioctl(s, request, args);
+                result = device->call(s, request, args);
             }
         }
     }

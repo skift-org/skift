@@ -31,7 +31,7 @@
     __ENTRY(ERR_INVALID_ARGUMENT)                                  \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES_IN_SYSTEM)                     \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES)                               \
-    __ENTRY(ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE)                    \
+    __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE)                    \
     __ENTRY(ERR_TEXT_FILE_BUSY)                                    \
     __ENTRY(ERR_FILE_TOO_LARGE)                                    \
     __ENTRY(ERR_NO_SPACE_LEFT_ON_DEVICE)                           \

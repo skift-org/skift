@@ -116,11 +116,11 @@ static void *framebuffer_virtual_addr = NULL;
 static int framebuffer_height = -1;
 static int framebuffer_width = -1;
 
-int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
+int framebuffer_device_call(stream_t *stream, int request, void *args)
 {
     UNUSED(stream);
 
-    if (request == FRAMEBUFFER_IOCTL_GET_MODE)
+    if (request == FRAMEBUFFER_CALL_GET_MODE)
     {
         framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
 
@@ -130,7 +130,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
 
         return -ERR_SUCCESS;
     }
-    else if (request == FRAMEBUFFER_IOCTL_SET_MODE)
+    else if (request == FRAMEBUFFER_CALL_SET_MODE)
     {
         framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
 
@@ -195,7 +195,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
             return -ERR_OPERATION_NOT_SUPPORTED;
         }
     }
-    else if (request == FRAMEBUFFER_IOCTL_BLIT)
+    else if (request == FRAMEBUFFER_CALL_BLIT)
     {
         uint *data_to_blit = (uint *)args;
 
@@ -208,7 +208,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
 
         return -ERR_SUCCESS;
     }
-    else if (request == FRAMEBUFFER_IOCTL_BLITREGION)
+    else if (request == FRAMEBUFFER_CALL_BLITREGION)
     {
         framebuffer_region_t *region = (framebuffer_region_t *)args;
 
@@ -233,7 +233,7 @@ int framebuffer_device_ioctl(stream_t *stream, int request, void *args)
     }
     else
     {
-        return -ERR_INAPPROPRIATE_IOCTL_FOR_DEVICE;
+        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
 
@@ -243,7 +243,7 @@ void framebuffer_setup(void)
     {
         device_t framebuffer_device =
             {
-                .ioctl = framebuffer_device_ioctl,
+                .call = framebuffer_device_call,
             };
 
         FILESYSTEM_MKDEV(FRAMEBUFFER_DEVICE, framebuffer_device);

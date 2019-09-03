@@ -676,7 +676,7 @@ int task_write_file(task_t *this, int fd, const void *buffer, uint size)
     return result;
 }
 
-int task_ioctl_file(task_t *this, int fd, int request, void *args)
+int task_call_file(task_t *this, int fd, int request, void *args)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -685,7 +685,7 @@ int task_ioctl_file(task_t *this, int fd, int request, void *args)
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = filesystem_ioctl(stream, request, args);
+    int result = filesystem_call(stream, request, args);
 
     task_filedescriptor_release(this, fd);
 

@@ -192,7 +192,7 @@ int task_read_file(task_t* this, int fd, void *buffer, uint size);
 
 int task_write_file(task_t* this, int fd, const void *buffer, uint size);
 
-int task_ioctl_file(task_t* this, int fd, int request, void *args);
+int task_call_file(task_t* this, int fd, int request, void *args);
 
 int task_seek_file(task_t* this, int fd, int offset, iostream_whence_t whence);
 

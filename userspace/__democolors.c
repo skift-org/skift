@@ -27,7 +27,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
+    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return -1;
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
         time += 0.001;
 
-        iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLIT, fb->buffer);
+        iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLIT, fb->buffer);
     } while (true);
 
     return 0;

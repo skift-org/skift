@@ -46,7 +46,7 @@ int __plug_iostream_read(int fd, void *buffer, uint size);
 
 int __plug_iostream_write(int fd, const void *buffer, uint size);
 
-int __plug_iostream_ioctl(int fd, int request, void *args);
+int __plug_iostream_call(int fd, int request, void *args);
 
 int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence);
 

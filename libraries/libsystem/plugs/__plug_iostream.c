@@ -26,9 +26,9 @@ int __plug_iostream_write(int fd, const void *buffer, uint size)
     return __syscall(SYS_FILESYSTEM_WRITE, fd, (int)buffer, size, 0, 0);
 }
 
-int __plug_iostream_ioctl(int fd, int request, void *args)
+int __plug_iostream_call(int fd, int request, void *args)
 {
-    return __syscall(SYS_FILESYSTEM_IOCTL, fd, request, (int)args, 0, 0);
+    return __syscall(SYS_FILESYSTEM_CALL, fd, request, (int)args, 0, 0);
 }
 
 int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence)

@@ -78,7 +78,7 @@ vtconsole_t *terminal_create_textmode_console(void)
 
     iostream_set_write_buffer_mode(textmode_device, IOSTREAM_BUFFERED_NONE);
 
-    if (iostream_ioctl(textmode_device, TEXTMODE_IOCTL_GET_INFO, &textmode_info))
+    if (iostream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info))
     {
         error_print("Failled to get textmode info");
         return NULL;
@@ -148,7 +148,7 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 
     logger_info("Framebuffer opened");
 
-    if (iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_SET_MODE, &mode_info) < 0)
+    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
 
@@ -222,7 +222,7 @@ void paint_repaint_dirty(vtconsole_t *console, painter_t* paint)
     framebuffer_region_t reg;
     reg.bound = repaint_bound;
     reg.src = framebuffer->buffer;
-    iostream_ioctl(framebuffer_device, FRAMEBUFFER_IOCTL_BLITREGION, &reg);
+    iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLITREGION, &reg);
 }
 
 /* --- Terminal read/write loop --------------------------------------------- */
@@ -274,7 +274,7 @@ int main(int argc, char const *argv[])
 
         if (!is_framebuffer)
         {
-            iostream_ioctl(textmode_device, TEXTMODE_IOCTL_SET_INFO, &textmode_info);
+            iostream_call(textmode_device, TEXTMODE_CALL_SET_INFO, &textmode_info);
             iostream_write(textmode_device, textmode_buffer, textmode_info.width * textmode_info.height * sizeof(ushort));
         }
         else

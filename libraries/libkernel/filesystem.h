@@ -4,7 +4,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#define PATH_LENGHT (512)
 #define PATH_ELEMENT_LENGHT (255)
 #define PATH_MAX_DEPTH (16)
-
-#define PATH_LENGHT (512)

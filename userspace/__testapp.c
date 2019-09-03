@@ -1,9 +1,13 @@
-#include <libform/application.h>
-#include <libform/form.h>
+/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <libsystem/iostream.h>
 
 int main(int argc, char **argv)
 {
-    application_init(argc, argv, "Test Application");
+    UNUSED(argc);
+    UNUSED(argv);
 
-    return application_run();
+    return 0;
 }

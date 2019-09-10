@@ -307,6 +307,11 @@ int sys_system_get_time(timestamp_t *timestamp)
     return -ERR_SUCCESS;
 }
 
+int sys_system_get_ticks()
+{
+    return sheduler_get_ticks();
+}
+
 static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_PROCESS_SELF] = sys_process_this,
     [SYS_PROCESS_EXEC] = sys_process_exec,
@@ -353,6 +358,7 @@ static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_SYSTEM_GET_INFO] = sys_system_get_info,
     [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,
     [SYS_SYSTEM_GET_TIME] = sys_system_get_time,
+    [SYS_SYSTEM_GET_TICKS] = sys_system_get_ticks,
 };
 
 syscall_handler_t syscall_get_handler(syscall_t syscall)

@@ -70,6 +70,11 @@ timestamp_t __plug_system_get_time(void)
     return clock_now();
 }
 
+uint __plug_system_get_ticks()
+{
+    return sheduler_get_ticks();
+}
+
 /* --- Memory allocator plugs ----------------------------------------------- */
 
 int __plug_memalloc_lock()
@@ -166,13 +171,11 @@ int __plug_process_exec(const char *file_name, const char **argv)
 
 // TODO: void __plug_process_spawn();
 
-int __plug_process_exit(int code)
+void __plug_process_exit(int code)
 {
     task_exit(code);
 
     PANIC("Task exit failled!");
-
-    return 0;
 }
 
 int __plug_process_cancel(int pid)

@@ -18,6 +18,11 @@ void __plug_system_get_status(system_status_t *status)
 timestamp_t __plug_system_get_time(void)
 {
     timestamp_t timestamp = 0;
-    __syscall(SYS_SYSTEM_GET_TIME, (int)&timestamp, 0,0,0,0);
+    __syscall(SYS_SYSTEM_GET_TIME, (int)&timestamp, 0, 0, 0, 0);
     return timestamp;
+}
+
+uint __plug_system_get_ticks()
+{
+    return __syscall(SYS_SYSTEM_GET_TICKS, 0, 0, 0, 0, 0);
 }

@@ -15,3 +15,8 @@ void system_get_status(system_status_t *status)
 {
     __plug_system_get_status(status);
 }
+
+uint system_get_ticks()
+{
+    return __plug_system_get_ticks();
+}

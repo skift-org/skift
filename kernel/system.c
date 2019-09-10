@@ -87,6 +87,7 @@ void __panic(const char *package, const char *file, const char *function, const 
     printf("\n");
     printf("\n\tDiagnostic:");
     printf("\n\tThe system was running for %d tick.", sheduler_get_ticks());
+    printf("\n\tThe running process is %d: %s", sheduler_get_ticks(), sheduler_running()->name);
 
     if (sheduler_is_context_switch())
     {

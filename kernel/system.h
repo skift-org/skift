@@ -9,7 +9,7 @@
 
 #include "processor.h"
 
-void __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
+void __attribute__((noreturn)) __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
 
 #define HANG   \
     while (1)  \

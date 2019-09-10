@@ -7,110 +7,12 @@
 #include <libsystem/runtime.h>
 #include <libsystem/path.h>
 #include <libsystem/list.h>
-#include <libsystem/lock.h>
-#include <libsystem/ringbuffer.h>
-#include <libsystem/iostream.h>
 
 #include "system.h"
+#include "fsnode.h"
+#include "stream.h"
 
 #define ROOT NULL
-
-struct s_fsnode;
-struct s_stream;
-
-typedef int (*fsop_open_t)(struct s_stream *s);
-typedef int (*fsop_close_t)(struct s_stream *s);
-typedef int (*fsop_read_t)(struct s_stream *s, void *buffer, uint size);
-typedef int (*fsop_write_t)(struct s_stream *s, const void *buffer, uint size);
-typedef int (*fsop_call_t)(struct s_stream *s, int request, void *args);
-typedef int (*fsop_stat_t)(struct s_stream *s, iostream_stat_t *stat);
-
-typedef struct
-{
-    byte *buffer;
-    uint realsize;
-    uint size;
-} file_t;
-
-typedef struct
-{
-    fsop_open_t open;
-    fsop_close_t close;
-
-    fsop_read_t read;
-    fsop_write_t write;
-    fsop_call_t call;
-
-    void *p;
-} device_t;
-
-typedef struct
-{
-    char name[PATH_ELEMENT_LENGHT];
-    struct s_fsnode *node;
-} fsdirectory_entry_t;
-
-typedef struct
-{
-    list_t *childs;
-} directory_t;
-
-typedef struct
-{
-    ringbuffer_t *buffer;
-} fifo_t;
-
-typedef enum
-{
-    FSNODE_FILE,
-    FSNODE_DEVICE,
-    FSNODE_FIFO,
-    FSNODE_DIRECTORY
-} fsnode_type_t;
-
-typedef struct s_fsnode
-{
-    char name[PATH_ELEMENT_LENGHT];
-    fsnode_type_t type;
-    lock_t lock;
-
-    union {
-        file_t file;
-        directory_t directory;
-        device_t device;
-        fifo_t fifo;
-    };
-
-    int refcount;
-} fsnode_t;
-
-typedef struct
-{
-    int count;
-    iostream_direntry_t *entries;
-} directory_entries_t;
-
-typedef struct
-{
-    void *p;
-    int count;
-
-    int current;
-} stream_attached_info_t;
-
-typedef struct s_stream
-{
-    fsnode_t *node;
-    uint offset;
-    iostream_flag_t flags;
-
-    union {
-        directory_entries_t direntries;
-        stream_attached_info_t attached;
-    };
-} stream_t;
-
-iostream_type_t fsnode_to_iostream_type(fsnode_type_t type);
 
 void filesystem_setup(void);
 void filesystem_panic_dump(void);

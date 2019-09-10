@@ -894,7 +894,7 @@ int task_set_cwd(task_t *this, const char *new_path)
 
     if (new_cwd != NULL)
     {
-        if (fsnode_to_iostream_type(new_cwd->type) == IOSTREAM_TYPE_DIRECTORY)
+        if (fsnode_type(new_cwd) == IOSTREAM_TYPE_DIRECTORY)
         {
             // Cleanup the old path
             path_delete(this->cwd_path);

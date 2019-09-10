@@ -35,3 +35,7 @@ void logger_log(log_level_t level, const char *file, uint line, const char *fmt,
 #define logger_error(__args...) logger_log(LOGGER_ERROR, __FILE__, __LINE__, __args)
 
 #define logger_fatal(__args...) logger_log(LOGGER_FATAL, __FILE__, __LINE__, __args)
+
+#define TRACE_FUNCTION_BEGIN logger_trace("begin %s from %08x", __FUNCTION__, __builtin_return_address(0))
+
+#define TRACE_FUNCTION_END logger_trace("end %s", __FUNCTION__)

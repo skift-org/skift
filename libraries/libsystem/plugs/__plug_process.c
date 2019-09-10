@@ -18,9 +18,10 @@ int __plug_process_exec(const char *file_name, const char **argv)
 
 // TODO: void __plug_process_spawn();
 
-int __plug_process_exit(int code)
+void __plug_process_exit(int code)
 {
-    return __syscall(SYS_PROCESS_EXIT, code, 0, 0, 0, 0);
+    __syscall(SYS_PROCESS_EXIT, code, 0, 0, 0, 0);
+    while(1){};
 }
 
 int __plug_process_cancel(int pid)

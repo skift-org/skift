@@ -18,6 +18,9 @@ iostream_t *out_stream;
 iostream_t *err_stream;
 iostream_t *log_stream;
 
+extern void _init();
+extern void _fini();
+
 void __plug_init(void)
 {
     lock_init(memlock);
@@ -28,10 +31,14 @@ void __plug_init(void)
     out_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     err_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
     log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
+
+    _init();
 }
 
 void __plug_fini(int exit_code)
 {
+    _fini();
+
     iostream_flush(out_stream);
     iostream_flush(err_stream);
     iostream_flush(log_stream);

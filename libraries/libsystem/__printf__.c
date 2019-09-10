@@ -144,6 +144,7 @@ static printf_formatter_t formaters[] = {
     /* Decimal       */ {'d', __printf_formate_decimal},
     /* Decimal       */ {'i', __printf_formate_decimal},
     /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
+    /* Hexadecimal   */ {'p', __printf_formate_hexadecimal},
 
     /* Float         */ {'f', NULL},
 

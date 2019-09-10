@@ -12,7 +12,7 @@ int process_exec(const char *file_name, const char **argv);
 
 // TODO: void process_spawn();
 
-int process_exit(int code);
+void __attribute__((noreturn)) process_exit(int code);
 
 int process_cancel(int pid);
 

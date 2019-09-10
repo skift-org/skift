@@ -7,7 +7,7 @@ TARGET_TRIPLET=i686-pc-skift
 
 CC=$(TARGET_TRIPLET)-gcc
 CFLAGS_WARN=-Wall -Wextra -Werror
-CFLAGS=-std=gnu11 -O2 $(CFLAGS_WARN) -Ilibraries -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
+CFLAGS=-std=gnu11 -O2 $(CFLAGS_WARN) -Ilibraries -Ilibraries/libposix -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
 ASFLAGS=-f elf32
@@ -27,7 +27,8 @@ SYSROOT=$(BUILDROOT)/sysroot
 
 BOOTROOT=$(BUILDROOT)/bootroot
 
-INCLUDES=$(patsubst libraries/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/ -name *.h))
+INCLUDES=$(patsubst libraries/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/ -path libraries/libposix -prune -o -name *.h))
+INCLUDES+=$(patsubst libraries/libposix/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/libposix -name *.h))
 
 LIBCONSOLE=$(SYSROOT)/lib/libconsole.a
 LIBCONSOLE_SRC=$(wildcard libraries/libconsole/*.c)
@@ -57,6 +58,10 @@ LIBMATH=$(SYSROOT)/lib/libmath.a
 LIBMATH_SRC=$(wildcard libraries/libmath/*.c)
 LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
 
+LIBPOSIX=$(SYSROOT)/lib/libposix.a
+LIBPOSIX_SRC=$(wildcard libraries/libposix/*.c)
+LIBPOSIX_OBJ=$(patsubst %.c,%.o,$(LIBPOSIX_SRC))
+
 LIBSYSTEM=$(SYSROOT)/lib/libsystem.a
 LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/plugs/*.c)
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
@@ -72,6 +77,7 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBGRAPHIC) \
 		  $(LIBKERNEL) \
 		  $(LIBMATH) \
+		  $(LIBPOSIX) \
 		  $(LIBSYSTEM)
 
 USERSPACE=$(SYSROOT)/bin/__democolors \
@@ -186,6 +192,10 @@ $(LIBKERNEL): $(LIBKERNEL_OBJ)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBMATH): $(LIBMATH_OBJ)
+	mkdir -p $(SYSROOT)/lib/
+	$(AR) $(ARFLAGS) $@ $^
+
+$(LIBPOSIX): $(LIBPOSIX_OBJ)
 	mkdir -p $(SYSROOT)/lib/
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -345,8 +355,12 @@ $(SYSROOT)/res/wallpaper/%.png: ressources/wallpaper/%.png
 # --- Ramdisk ---------------------------------------------------------------- #
 
 $(SYSROOT)/lib/include/%.h: libraries/%.h
-	mkdir -p $(SYSROOT)/lib/include
-	cp $^ $(SYSROOT)/lib/include
+	mkdir -p $(dir $@)
+	cp $^ $@
+
+$(SYSROOT)/lib/include/%.h: libraries/libposix/%.h
+	mkdir -p $(dir $@)
+	cp $^ $@
 
 $(SYSROOT):
 	mkdir -p $(SYSROOT)
@@ -358,8 +372,8 @@ $(SYSROOT):
 			 $(SYSROOT)/run \
 			 $(SYSROOT)/usr
 
-$(RAMDISK): $(SYSROOT) $(USERSPACE) $(RESSOURCES)
-	cd $(SYSROOT); tar -cvf $@ *
+$(RAMDISK): $(SYSROOT) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(RESSOURCES)
+	cd $(SYSROOT); tar -cf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #
 

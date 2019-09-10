@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/runtime.h>
+
 int filesystem_link(const char* oldpath, const char* newpath);
 
 int filesystem_unlink(const char* path);

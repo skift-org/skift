@@ -77,6 +77,7 @@ LIBRARIES=$(LIBCONSOLE) \
 USERSPACE=$(SYSROOT)/bin/__democolors \
 		  $(SYSROOT)/bin/__demofonts \
 		  $(SYSROOT)/bin/__demolines \
+		  $(SYSROOT)/bin/__test3d \
 		  $(SYSROOT)/bin/__testapp \
 		  $(SYSROOT)/bin/__testargs \
 		  $(SYSROOT)/bin/__testexec \
@@ -205,6 +206,10 @@ $(SYSROOT)/bin/__demofonts: userspace/__demofonts.c $(LIBSYSTEM) $(LIBGRAPHIC) $
 $(SYSROOT)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
+
+$(SYSROOT)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
+	mkdir -p $(SYSROOT)/bin
+	$(CC) $(CFLAGS) $< -o $@ -lgraphic -lmath
 
 $(SYSROOT)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBFORM) $(LIBGRAPHIC) $(CRTS)
 	mkdir -p $(SYSROOT)/bin

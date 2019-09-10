@@ -385,6 +385,10 @@ double floor(double x)
     return (double)x_i;
 }
 
+double sqrt(double x) {
+	return __builtin_sqrt(x);
+}
+
 double fmod(double left, double right)
 {
     if (left >= 0.0)
@@ -402,21 +406,38 @@ double fmod(double left, double right)
     }
 }
 
-double sin(double value)
-{
-    if (value < 0.0)
-    {
-        value += PI * 2.0 * 100.0;
-    }
+double sin(double x) {
+	if (x < 0.0) {
+		x += 3.141592654 * 2.0 * 100.0;
+	}
+	int i = x * 360.0 / (3.141592654 * 2.0);
+	double z = x * 360.0 / (3.141592654 * 2.0);
+	z -= i;
 
-    double z = fmod(value, PI * 2.0);
+	i = i % 360;
 
-    int i = z * 360.0 / (PI * 2.0);
+	double a = sin_table[i];
+	double b = sin_table[(i+1)%360];
 
-    return sin_table[i];
+	return a * (1.0-z) + b * (z);
 }
+
 
 double cos(double value)
 {
     return sin(value + PI / 2.0);
+}
+
+double tan(double x) {
+	float out;
+	float _x = x;
+	float one;
+	asm volatile (
+		"fld %2\n"
+		"fptan\n"
+		"fstp %1\n"
+		"fstp %0\n"
+		: "=m"(out), "=m"(one) : "m"(_x)
+	);
+	return out;
 }

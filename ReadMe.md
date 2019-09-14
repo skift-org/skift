@@ -4,7 +4,7 @@
 <img src="manual/assets/skift_dark.svg" height=64 />
 <br>
 <br>
-A simple, handmade, operating system for intel x86 cpu.
+A simple, handmade, operating system for the intel x86 cpu.
 <br>
 <br>
 <a href="https://discord.gg/gamGsfg">Discord</a> -
@@ -23,7 +23,7 @@ A simple, handmade, operating system for intel x86 cpu.
 skiftOS 0.2.0 running the hideo desktop on QEMU 3.0.0
 </p>
 
-**skiftOS** is a simple, handmade, operating system for intel x86 cpu. Aiming for clean and pretty API while keeping the spirite of UNIX.
+**skiftOS** is a simple, handmade, operating system for the intel x86 cpu. Aiming for clean and pretty API while keeping the spirit of UNIX.
 
 # Disclaimers
 
@@ -31,11 +31,11 @@ skiftOS 0.2.0 running the hideo desktop on QEMU 3.0.0
   
 # Getting started
 
-SkiftOS is pretty easy to build from source juste follow the [build guide](manual/building.md)
+SkiftOS is pretty easy to build from source, just follow the [build guide](manual/building.md)
 
 # Getting involved
 
-We welcome all contributions, just pick a task in the todo list and open an pullrequest to let us know you are working on that.
+We welcome all contributions, just pick a task in the todo list and open a pull request to let us know you are working on that.
 
 # Cool pieces
 

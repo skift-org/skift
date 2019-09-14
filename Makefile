@@ -6,8 +6,16 @@ PATH := $(shell toolbox/use-it!.sh):$(PATH)
 TARGET_TRIPLET=i686-pc-skift
 
 CC=$(TARGET_TRIPLET)-gcc
-CFLAGS_WARN=-Wall -Wextra -Werror
-CFLAGS=-std=gnu11 -O2 $(CFLAGS_WARN) -Ilibraries -Ilibraries/libposix -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
+
+COPT_FLAGS=-O2 -pipe
+
+CDIALECT_FLAGS=-std=gnu11
+
+CWARN_FLAGS=-Wall \
+		    -Wextra \
+			-Werror 
+
+CFLAGS= $(CDIALECT_FLAGS) $(COPT_FLAGS) $(CWARN_FLAGS) -Ilibraries -Ilibraries/libposix -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
 ASFLAGS=-f elf32
@@ -88,6 +96,7 @@ USERSPACE=$(SYSROOT)/bin/__democolors \
 		  $(SYSROOT)/bin/__testargs \
 		  $(SYSROOT)/bin/__testexec \
 		  $(SYSROOT)/bin/__testgfx \
+		  $(SYSROOT)/bin/__testposix \
 		  $(SYSROOT)/bin/__testterm \
 		  $(SYSROOT)/bin/cat \
 		  $(SYSROOT)/bin/clear \
@@ -236,6 +245,10 @@ $(SYSROOT)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
 $(SYSROOT)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
+
+$(SYSROOT)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBPOSIX) $(CRTS)
+	mkdir -p $(SYSROOT)/bin
+	$(CC) $(CFLAGS) $< -o $@ -lposix
 
 $(SYSROOT)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin

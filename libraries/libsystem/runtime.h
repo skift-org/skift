@@ -51,6 +51,13 @@ typedef unsigned long uintptr_t;
 #define attr_packed __attribute__((packed))
 #define ALIGNED(x, align) x __attribute__((aligned(align)))
 
+#define SWAP(x, y)          \
+    {                       \
+        typeof(x) SWAP = x; \
+        x = y;              \
+        y = SWAP;           \
+    }
+
 #define UNUSED(x) (void)(x)
 #define MALLOC(type) ((type *)malloc(sizeof(type)))
 
@@ -76,7 +83,7 @@ typedef void (*object_dtor_t)(void *object);
 
 typedef void object_t;
 
-#define OBJECT(__type) (__type##_t*)object(sizeof(__type##_t), (object_dtor_t)(__type##_delete));
+#define OBJECT(__type) (__type##_t *)object(sizeof(__type##_t), (object_dtor_t)(__type##_delete));
 
 object_t *object(uint size, object_dtor_t dtor);
 
@@ -91,7 +98,7 @@ int object_size(object_t *this);
 
 /* --- Loops ---------------------------------------------------------------- */
 
-typedef enum 
+typedef enum
 {
     ITERATION_CONTINUE,
     ITERATION_STOP,

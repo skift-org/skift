@@ -11,7 +11,7 @@ FILE *stdin = NULL;
 FILE *stdout = NULL;
 FILE *stderr = NULL;
 
-void stdio_initialize(void)
+__attribute__((constructor)) void stdio_initialize(void)
 {
     TRACE_FUNCTION_BEGIN;
 

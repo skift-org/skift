@@ -80,12 +80,12 @@ int shell_readline(shell_t *this)
         {
             keyboard_event_t *event = message_payload_as(msg, keyboard_event_t);
 
-            if (event->c == '\n')
+            if (event->codepoint == '\n')
             {
                 printf("\n");
                 break;
             }
-            else if (event->c == '\b')
+            else if (event->codepoint == '\b')
             {
                 if (strlen(this->command_string) > 0)
                 {
@@ -93,12 +93,12 @@ int shell_readline(shell_t *this)
                     printf("\b\033[K");
                 }
             }
-            else if (!(event->c == '\0' || event->c == '\t'))
+            else if (!(event->codepoint == '\0' || event->codepoint == '\t'))
             {
                 if (strlen(this->command_string) < MAX_COMMAND_LENGHT - 1)
                 {
-                    strnapd(this->command_string, event->c, MAX_COMMAND_LENGHT);
-                    printf("%c", event->c);
+                    strnapd(this->command_string, event->codepoint, MAX_COMMAND_LENGHT);
+                    printf("%c", event->codepoint);
                 }
             }
         }

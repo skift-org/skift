@@ -7,174 +7,87 @@
 #include <libsystem/logger.h>
 #include <libsystem/ringbuffer.h>
 #include <libsystem/atomic.h>
-#include <libfile/ascii.h>
+#include <libsystem/error.h>
 
 #include <libdevice/keyboard.h>
+#include <libdevice/keys.h>
+#include <libdevice/keys.c>
+#include <libdevice/keymap.h>
+#include <libdevice/keymap.c>
 #include <libkernel/message.h>
 
 #include "x86/irq.h"
 #include "filesystem.h"
 #include "tasking.h"
 
-stream_t *keyboard_fifo;
-
-char keymap_FRBE[128][3] = {
-    //   REG   MAJ   ALT
-    {'\0', '\0', '\0'}, //  0 ERROR
-    {'\0', '\0', '\0'}, //  1 esc
-    {'&', '1', '|'},    //  2 NUM 1
-    {'\0', '2', '@'},   //  3 NUM 2
-    {'"', '3', '#'},    //  4 NUM 3
-    {'\'', '4', '{'},   //  5 NUM 4
-    {'(', '5', '['},    //  6 NUM 5
-    {'\0', '6', '^'},   //  7 NUM 6
-    {'\0', '7', '\0'},  //  8 NUM 7
-    {'!', '8', '\0'},   //  9 NUM 8
-    {'\0', '9', '{'},   // 10 NUM 9
-    {'\0', '0', '}'},   // 11 NUM 0
-    {')', '\0', ')'},   // 12 MINUX
-    {'-', '_', '-'},    // 13 EQUAL
-    {'\b', '\b', '\b'}, // 14 BACKSPACE
-    {'\t', '\t', '\t'}, // 15 TAB
-
-    {'a', 'A', '\0'}, // 16 A
-    {'z', 'Z', '\0'}, // 17 Z
-    {'e', 'E', '\0'}, // 18 E
-    {'r', 'R', '\0'}, // 19 R
-    {'t', 'T', '\0'}, // 20 T
-    {'y', 'Y', '\0'}, // 21 Y
-    {'u', 'U', '\0'}, // 22 U
-    {'i', 'I', '\0'}, // 23 I
-    {'o', 'O', '\0'}, // 24 O
-    {'p', 'P', '\0'}, // 25 P
-    {'^', '\0', '['}, // 26 [
-    {'$', '*', ']'},  // 27 ]
-
-    {'\n', '\n', '\n'}, // 28 ENTER
-    {'\0', '\0', '\0'}, // 29 LCTRL
-
-    {'q', 'Q', '\0'},             // 30 Q
-    {'s', 'S', '\0'},             // 31 S
-    {'d', 'D', '\0'},             // 32 D
-    {'f', 'F', '\0'},             // 33 F
-    {'g', 'G', '\0'},             // 34 G
-    {'h', 'H', '\0'},             // 35 H
-    {'j', 'J', '\0'},             // 36J
-    {'k', 'K', '\0'},             // 37 K
-    {'l', 'L', '\0'},             // 38 L
-    {'m', 'M', '\0'},             // 39 M
-    {'\0', '%', '\0'},            // 40 ù
-    {'\0', '\0', '\0'},           // 41 ² ³
-    {'\0', '\0', '\0'},           // 42 LSHIFT
-    {'\0', '\0', ASCII_BACKTICK}, // 53 µ £ `
-    {'w', 'W', '\0'},             // 44 w
-    {'x', 'X', '\0'},             // 45 x
-    {'c', 'C', '\0'},             // 46 c
-    {'v', 'V', '\0'},             // 47 v
-    {'b', 'B', '\0'},             // 48 b
-    {'n', 'N', '\0'},             // 49 n
-    {',', '?', '\0'},             // 50
-    {';', '.', '\0'},             // 51
-    {':', '/', '\0'},             // 52
-    {'/', '/', '\0'},             // 53 KPDIV
-    {'\0', '\0', '\0'},           // 54 RSHIFT
-    {'*', '*', '\0'},             // 55 KPMULT
-    {'\0', '\0', '\0'},           // 56 LALT
-    {' ', ' ', ' '},              // 57 SPACE
-    {'\0', '\0', '\0'},           // 58 CAPSLOCK
-    {'\0', '\0', '\0'},           // 59 F1
-    {'\0', '\0', '\0'},           // 60 F2
-    {'\0', '\0', '\0'},           // 61 F3
-    {'\0', '\0', '\0'},           // 62 F4
-    {'\0', '\0', '\0'},           // 63 F5
-    {'\0', '\0', '\0'},           // 64 F6
-    {'\0', '\0', '\0'},           // 65 F7
-    {'\0', '\0', '\0'},           // 66 F8
-    {'\0', '\0', '\0'},           // 67 F9
-    {'\0', '\0', '\0'},           // 68 F10
-    {'\0', '\0', '\0'},           // 69 NUM_LOCK
-    {'\0', '\0', '\0'},           // 70 SCROLL_LOCK
-    {'7', '\0', '\0'},            // 71 KP7
-    {'8', '\0', '\0'},            // 72 KP8
-    {'9', '\0', '\0'},            // 73 KP9
-    {'-', '-', '\0'},             // 74 KP_MINUS
-    {'4', '\0', '\0'},            // 75 KP4
-    {'5', '\0', '\0'},            // 76 KP5
-    {'6', '\0', '\0'},            // 77 KP6
-    {'+', '+', '\0'},             // 78 KP_PLUS
-    {'1', '\0', '\0'},            // 79 KP1
-    {'2', '\0', '\0'},            // 80 KP2
-    {'3', '\0', '\0'},            // KP3
-    {'0', '\0', '\0'},            // KP0
-    {'.', '.', '\0'},             // KP_POINT
-    {'\0', '\0', '\0'},           // F11
-    {'\0', '\0', '\0'},           // F12
-    {'<', '>', '\\'},             // ANGLE_BRACKET
-
-    // SPECIAl KEY
-    {'\0', '\0', '\0'}, // UP
-    {'\0', '\0', '\0'}, // DOWN
-    {'\0', '\0', '\0'}, // LEFT
-    {'\0', '\0', '\0'}, // RIGHT
-
-    {'\n', '\n', '\n'}, // KP_ENTER
-
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-    {'\0', '\0', '\0'}, //
-};
-
 /* --- Private functions ---------------------------------------------------- */
 
-bool extended = false;
-bool ispressed[256];
+#define PS2KBD_ESCAPE 0xE0
 
-char keyboard_getchar(uchar scancode)
+typedef enum
 {
-    if (ispressed[LSHIFT] || ispressed[RSHIFT])
+    PS2KBD_STATE_NORMAL,
+    PS2KBD_STATE_NORMAL_ESCAPED,
+} ps2_keyboard_state_t;
+
+static ps2_keyboard_state_t keyboard_state = PS2KBD_STATE_NORMAL;
+static key_motion_t keyboard_keystate[__KEY_COUNT] = {0};
+static keymap_t *keyboard_keymap = NULL;
+
+int keyboad_get_codepoint(key_t key)
+{
+    keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
+
+    if (binding == NULL)
     {
-        return keymap_FRBE[scancode][1];
-    }
-    else if (ispressed[RALT])
-    {
-        return keymap_FRBE[scancode][2];
+        return 0;
     }
     else
     {
-        return keymap_FRBE[scancode][0];
+        if (keyboard_keystate[KEY_LSHIFT] == KEY_MOTION_DOWN ||
+            keyboard_keystate[KEY_RSHIFT] == KEY_MOTION_DOWN)
+        {
+            return binding->shift_codepoint;
+        }
+        else if (keyboard_keystate[KEY_RALT] == KEY_MOTION_DOWN)
+        {
+            return binding->alt_codepoint;
+        }
+        else
+        {
+            return binding->regular_codepoint;
+        }
+    }
+}
+
+void keyboard_handle_key(key_t key, key_motion_t motion)
+{
+    if (key_is_valid(key))
+    {
+        keyboard_keystate[key] = motion;
+        // keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
+
+        // if (binding != NULL)
+        // {
+        //     logger_debug("scancode %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
+        // }
+        // else
+        // {
+        //     logger_debug("scancode %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
+        // }
+
+        if (motion == KEY_MOTION_DOWN)
+        {
+            keyboard_event_t keyevent = {'\0', keyboad_get_codepoint(key)};
+            message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);
+            message_set_payload(keypressed_event, keyevent);
+
+            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+        }
+    }
+    else
+    {
+        logger_warn("Invalide scancode %d", key);
     }
 }
 
@@ -182,162 +95,26 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 {
     UNUSED(context);
 
-    uchar scancode = in8(0x60);
+    int byte = in8(0x60);
 
-    if (scancode < 128)
+    if (keyboard_state == PS2KBD_STATE_NORMAL)
     {
-        if (extended)
+        if (byte == PS2KBD_ESCAPE)
         {
-            switch (scancode)
-            {
-
-            case 28:
-                scancode = KPENTER;
-                break;
-            case 29:
-                scancode = RCONTROL;
-                break;
-            case 56:
-                scancode = RALT;
-                break;
-            case 71:
-                scancode = HOME;
-                break;
-            case 72:
-                scancode = UP;
-                break;
-            case 73:
-                scancode = PAGE_UP;
-                break;
-            case 75:
-                scancode = LEFT;
-                break;
-            case 77:
-                scancode = RIGHT;
-                break;
-            case 79:
-                scancode = END;
-                break;
-            case 80:
-                scancode = DOWN;
-                break;
-            case 81:
-                scancode = PAGE_DOWN;
-                break;
-            case 82:
-                scancode = INSERT;
-                break;
-            case 83:
-                scancode = DELETE;
-                break;
-            case 91:
-                scancode = SUPER;
-                break;
-
-            default:
-                break;
-            }
-
-            extended = false;
-        }
-
-        char c = keyboard_getchar(scancode);
-
-        keyboard_event_t keyevent = {
-            .c = c,
-            .key = scancode};
-
-        if (!ispressed[scancode])
-        {
-            message_t keypressed_event = message(KEYBOARD_KEYPRESSED, -1);
-            message_set_payload(keypressed_event, keyevent);
-            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
-        }
-
-        if (c != '\0')
-        {
-            char chr = keyboard_getchar(scancode);
-            filesystem_write(keyboard_fifo, &chr, 1);
-        }
-
-        message_t keytyped_event = message(KEYBOARD_KEYTYPED, -1);
-        message_set_payload(keytyped_event, keyevent);
-        task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keytyped_event);
-
-        ispressed[scancode] = true;
-    }
-    else if (scancode == 224)
-    {
-        extended = true;
-    }
-    else
-    {
-        if (extended)
-        {
-
-            switch (scancode)
-            {
-            case 156:
-                scancode = KPENTER;
-                break;
-            case 157:
-                scancode = RCONTROL;
-                break;
-            case 184:
-                scancode = RALT;
-                break;
-            case 199:
-                scancode = HOME;
-                break;
-            case 200:
-                scancode = UP;
-                break;
-            case 201:
-                scancode = PAGE_UP;
-                break;
-            case 203:
-                scancode = LEFT;
-                break;
-            case 205:
-                scancode = RIGHT;
-                break;
-            case 207:
-                scancode = END;
-                break;
-            case 208:
-                scancode = DOWN;
-                break;
-            case 209:
-                scancode = PAGE_DOWN;
-                break;
-            case 210:
-                scancode = INSERT;
-                break;
-            case 211:
-                scancode = DELETE;
-                break;
-            case 216:
-                scancode = SUPER;
-                break;
-
-            default:
-                break;
-            }
-
-            extended = false;
+            keyboard_state = PS2KBD_STATE_NORMAL_ESCAPED;
         }
         else
         {
-            scancode -= 128;
+            key_t key = byte & 0x7F;
+            keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
+    }
+    else if (keyboard_state == PS2KBD_STATE_NORMAL_ESCAPED)
+    {
+        keyboard_state = PS2KBD_STATE_NORMAL;
 
-        keyboard_event_t keyevent = {'\0', scancode};
-        message_t keyreleased_event = message(KEYBOARD_KEYRELEASED, -1);
-        message_set_payload(keyreleased_event, keyevent);
-
-        task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keyreleased_event);
-
-        ispressed[scancode] = false;
+        key_t key = (byte & 0x7F) + 0x80;
+        keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 
     return esp;
@@ -345,12 +122,77 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 /* --- Public functions ----------------------------------------------------- */
 
+keymap_t *keyboard_load_keymap(const char *path)
+{
+    iostream_t *kmfile = iostream_open(path, IOSTREAM_READ);
+
+    if (kmfile == NULL)
+    {
+        return NULL;
+    }
+
+    iostream_stat_t stat;
+    iostream_stat(kmfile, &stat);
+
+    logger_info("Allocating keymap of size %dkio", stat.size / 1024);
+    keymap_t *keymap = malloc(stat.size);
+
+    iostream_read(kmfile, keymap, stat.size);
+
+    iostream_close(kmfile);
+
+    return keymap;
+}
+
+int keyboard_device_call(stream_t *stream, int request, void *args)
+{
+    UNUSED(stream);
+
+    if (request == FRAMEBUFFER_CALL_SET_KEYMAP)
+    {
+        keyboard_set_keymap_args_t *size_and_keymap = args;
+        keymap_t *new_keymap = size_and_keymap->keymap;
+
+        atomic_begin();
+
+        if (keyboard_keymap != NULL)
+        {
+            free(keyboard_keymap);
+        }
+
+        keyboard_keymap = malloc(size_and_keymap->size);
+        memcpy(keyboard_keymap, new_keymap, size_and_keymap->size);
+
+        atomic_end();
+
+        return -ERR_SUCCESS;
+    }
+    else if (request == FRAMEBUFFER_CALL_GET_KEYMAP)
+    {
+        if (keyboard_keymap != NULL)
+        {
+            memcpy(args, keyboard_keymap, sizeof(keymap_t));
+
+            return -ERR_SUCCESS;
+        }
+        else
+        {
+            // FIXME: Maybe add another ERR_* for this error...
+            return -ERR_INPUTOUTPUT_ERROR;
+        }
+    }
+    else
+    {
+        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+    }
+}
+
 void keyboard_setup()
 {
+    keyboard_keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
+
     irq_register(1, keyboard_irq);
 
-    path_t *kbpath = path("/dev/kbd");
-    filesystem_mkfifo(NULL, kbpath);
-    keyboard_fifo = filesystem_open(NULL, kbpath, IOSTREAM_WRITE);
-    path_delete(kbpath);
+    device_t keyboard_device = {.call = keyboard_device_call};
+    FILESYSTEM_MKDEV(KEYBOARD_DEVICE, keyboard_device);
 }

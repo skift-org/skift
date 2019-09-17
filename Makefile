@@ -106,6 +106,7 @@ USERSPACE=$(SYSROOT)/bin/__democolors \
 		  $(SYSROOT)/bin/grep \
 		  $(SYSROOT)/bin/init \
 		  $(SYSROOT)/bin/kill \
+		  $(SYSROOT)/bin/loadkeys \
 		  $(SYSROOT)/bin/ls \
 		  $(SYSROOT)/bin/lsproc \
 		  $(SYSROOT)/bin/mkdir \
@@ -286,6 +287,10 @@ $(SYSROOT)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@
 
+$(SYSROOT)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
+	mkdir -p $(SYSROOT)/bin
+	$(CC) $(CFLAGS) $< -o $@
+	
 $(SYSROOT)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@
@@ -349,13 +354,17 @@ $(KERNEL): $(KERNEL_OBJECT)
 # --- Ressources ------------------------------------------------------------- #
 
 WALLPAPERS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/wallpaper/*.png}}
+
 FONTS_GLYPHS = ${patsubst ressources/%.json,$(SYSROOT)/res/%.glyph,${wildcard ressources/font/*.json}}
 FONTS_PNGS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/font/*.png}}
-RESSOURCES = $(WALLPAPERS) $(FONTS_GLYPHS) $(FONTS_PNGS)
+
+KEYBOARD = ${patsubst ressources/%.json,$(SYSROOT)/res/%.kmap,${wildcard ressources/keyboard/*.json}}
+
+RESSOURCES = $(WALLPAPERS) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
 
 $(SYSROOT)/res/font/%.glyph: ressources/font/%.json
 	mkdir -p $(SYSROOT)/res/font
-	fontcompiler.py $^ $@
+	font-compiler.py $^ $@
 
 $(SYSROOT)/res/font/%.png: ressources/font/%.png
 	mkdir -p $(SYSROOT)/res/font
@@ -364,6 +373,10 @@ $(SYSROOT)/res/font/%.png: ressources/font/%.png
 $(SYSROOT)/res/wallpaper/%.png: ressources/wallpaper/%.png
 	mkdir -p $(SYSROOT)/res/wallpaper
 	cp $^ $@
+
+$(SYSROOT)/res/keyboard/%.kmap: ressources/keyboard/%.json
+	mkdir -p $(SYSROOT)/res/keyboard
+	kmap-compiler.py $^ $@
 
 # --- Ramdisk ---------------------------------------------------------------- #
 

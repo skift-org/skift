@@ -7,6 +7,7 @@
 #include <libsystem/iostream.h>
 #include <libsystem/atomic.h>
 #include <libsystem/assert.h>
+#include <libsystem/error.h>
 
 #include "tasking.h"
 #include "memory.h"
@@ -240,4 +241,59 @@ int __plug_process_wakeup(int pid)
 int __plug_process_wait(int pid, int *exit_value)
 {
     return task_wait(pid, exit_value);
+}
+
+/* --- Messaging plugs ------------------------------------------------------ */
+
+int messaging_send(message_t *event)
+{
+    UNUSED(event);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_broadcast(const char *channel, message_t *event)
+{
+    UNUSED(channel); UNUSED(event);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_request(message_t *request, message_t *result, int timeout)
+{
+    UNUSED(request);
+    UNUSED(result);
+    UNUSED(timeout);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_receive(message_t *message, bool wait)
+{
+    UNUSED(message);
+    UNUSED(wait);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_respond(message_t *request, message_t *result)
+{
+    UNUSED(request);
+    UNUSED(result);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_subscribe(const char *channel)
+{
+    UNUSED(channel);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+int messaging_unsubscribe(const char *channel)
+{
+    UNUSED(channel);
+
+    return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }

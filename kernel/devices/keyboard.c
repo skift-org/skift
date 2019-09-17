@@ -64,7 +64,6 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 {
     if (key_is_valid(key))
     {
-        keyboard_keystate[key] = motion;
         // keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
 
         // if (binding != NULL)
@@ -78,12 +77,31 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
         if (motion == KEY_MOTION_DOWN)
         {
-            keyboard_event_t keyevent = {'\0', keyboad_get_codepoint(key)};
+            if (keyboard_keystate[key] == KEY_MOTION_UP)
+            {
+                keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
+                message_t keypressed_event = message(KEYBOARD_KEYPRESSED, -1);
+                message_set_payload(keypressed_event, keyevent);
+
+                task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+            }
+
+            keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
             message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);
             message_set_payload(keypressed_event, keyevent);
 
             task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
         }
+        else if (motion == KEY_MOTION_UP)
+        {
+            keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
+            message_t keypressed_event = message(KEYBOARD_KEYRELEASED, -1);
+            message_set_payload(keypressed_event, keyevent);
+
+            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+        }
+        
+        keyboard_keystate[key] = motion;
     }
     else
     {

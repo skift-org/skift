@@ -127,3 +127,7 @@ typedef enum
     __KEY_COUNT,
 } key_t;
 
+const char *key_to_string(key_t key);
+
+bool key_is_valid(key_t key);
+

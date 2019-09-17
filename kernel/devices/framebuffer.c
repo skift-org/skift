@@ -241,10 +241,9 @@ void framebuffer_setup(void)
 {
     if (bga_is_available())
     {
-        device_t framebuffer_device =
-            {
-                .call = framebuffer_device_call,
-            };
+        device_t framebuffer_device = {
+            .call = framebuffer_device_call,
+        };
 
         FILESYSTEM_MKDEV(FRAMEBUFFER_DEVICE, framebuffer_device);
     }

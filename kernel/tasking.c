@@ -794,7 +794,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
         page_directorie_t *oldpdir = task_switch_pdir(sheduler_running(), this->pdir);
 
         paging_load_directorie(this->pdir);
-        task_memory_map(this, program->vaddr, PAGE_ALIGN(program->memsz) / PAGE_SIZE + PAGE_SIZE);
+        task_memory_map(this, program->vaddr, PAGE_ALIGN_UP(program->memsz) / PAGE_SIZE);
         memset((void *)program->vaddr, 0, program->memsz);
 
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
@@ -811,7 +811,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 int task_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    iostream_t *s = iostream_open(executable_path, IOSTREAM_READ);
+    iostream_t *s = iostream_open(executable_path, IOSTREAM_READ | IOSTREAM_BUFFERED_NONE);
 
     if (s == NULL)
     {
@@ -829,6 +829,8 @@ int task_exec(const char *executable_path, const char **argv)
         iostream_close(s);
         return -ERR_IS_A_DIRECTORY;
     }
+
+    logger_info("Loading elf file %s...", executable_path);
 
     // Decode the elf file header.
     elf_header_t elf_header = {0};
@@ -851,7 +853,11 @@ int task_exec(const char *executable_path, const char **argv)
     for (int i = 0; i < elf_header.phnum; i++)
     {
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
-        iostream_read(s, &program, sizeof(elf_program_t));
+        
+        int readed_bytes = iostream_read(s, &program, sizeof(elf_program_t));
+        logger_trace("Readed %08x bytes from the elf file.", readed_bytes);
+
+        logger_trace("Loading elf program section at offset %d and size %d", program.offset, program.filesz);
 
         load_elfseg(new_task, s, &program);
     }

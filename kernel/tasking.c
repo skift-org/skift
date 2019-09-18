@@ -1464,7 +1464,7 @@ void wakeup_sleeping_tasks(void)
 
 void wakeup_stream_waiting_task(void)
 {
-    if (!list_empty(task_bystate(TASK_STATE_WAIT_TIME)))
+    if (!list_empty(task_bystate(TASK_STATE_WAIT_STREAM)))
     {
         list_t *task_to_wakeup = list();
 

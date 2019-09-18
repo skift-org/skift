@@ -133,15 +133,14 @@ outfp.write(struct.pack("I", len(data["bindings"])))
 
 for key in data["bindings"]:
     bind = data["bindings"][key]
-    print(key)
 
     if len(bind) == 4:
-        print(bind)
-        outfp.write(struct.pack("IIIII", KEYS[key], 0 if len(bind[0]) == 0 else ord(bind[0]), 0 if len(bind[1]) == 0 else ord(
-            bind[1]), 0 if len(bind[2]) == 0 else ord(bind[2]), 0 if len(bind[3]) == 0 else ord(bind[3])))
-        print(KEYS[key], 0 if len(bind[0]) == 0 else ord(bind[0]), 0 if len(bind[1]) == 0 else ord(
-            bind[1]), 0 if len(bind[2]) == 0 else ord(bind[2]), 0 if len(bind[3]) == 0 else ord(bind[3]))
+        codepoint_regular = 0 if len(bind[0]) == 0 else ord(bind[0])
+        codepoint_shift = 0 if len(bind[1]) == 0 else ord(bind[1])
+        codepoint_alt = 0 if len(bind[2]) == 0 else ord(bind[2])
+        codepoint_shift_alt = 0 if len(bind[3]) == 0 else ord(bind[3])
 
+        outfp.write(struct.pack("IIIII", KEYS[key], codepoint_regular, codepoint_shift, codepoint_alt, codepoint_shift_alt))
     else:
         print("Warning invalid binding for key " + key)
 

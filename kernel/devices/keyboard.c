@@ -31,7 +31,7 @@ typedef enum
 } ps2_keyboard_state_t;
 
 static ps2_keyboard_state_t keyboard_state = PS2KBD_STATE_NORMAL;
-static key_motion_t keyboard_keystate[__KEY_COUNT] = {0};
+static key_motion_t keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
 static keymap_t *keyboard_keymap = NULL;
 
 int keyboad_get_codepoint(key_t key)

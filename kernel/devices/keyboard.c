@@ -207,7 +207,7 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
 
 void keyboard_setup()
 {
-    keyboard_keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
+    keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
 
     irq_register(1, keyboard_irq);
 

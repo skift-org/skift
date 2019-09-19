@@ -51,13 +51,13 @@ void vtconsole_scroll(vtconsole_t *vtc)
     // Scroll the screen.
     for (int i = 0; i < ((vtc->width * vtc->height) - vtc->width); i++)
     {
-        vtconcole_update_cell_with_cell(vtc, i % vtc->width, i / vtc->width, vtc->buffer[i + vtc->width]);
+        vtconsole_update_cell_with_cell(vtc, i % vtc->width, i / vtc->width, vtc->buffer[i + vtc->width]);
     }
 
     // Clear the last line.
     for (int i = ((vtc->width * vtc->height) - vtc->width); i < vtc->width * vtc->height; i++)
     {
-        vtconcole_update_cell_with_cell(vtc, i % vtc->width, i / vtc->width, vtc->buffer[i + vtc->width]);
+        vtconsole_update_cell(vtc, i % vtc->width, i / vtc->width, ' ', VTC_DEFAULT_ATTR);
     }
 
     // Move the cursor up a line.
@@ -170,7 +170,7 @@ void vtconsole_update_cell(vtconsole_t *vtc, int x, int y, char c, vtattr_t attr
     }
 }
 
-void vtconcole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell)
+void vtconsole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell)
 {
     vtconsole_update_cell(vtc, x, y, cell.c, cell.attr);
 }

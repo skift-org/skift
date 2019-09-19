@@ -99,4 +99,4 @@ void vtconsole_write(vtconsole_t *vtc, const char *buffer, uint size);
 vtcell_t* vtconsole_cell(vtconsole_t *vtc, int x, int y);
 
 void vtconsole_update_cell(vtconsole_t *vtc, int x, int y, char c, vtattr_t attr);
-void vtconcole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell);
+void vtconsole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell);

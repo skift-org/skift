@@ -21,6 +21,18 @@ void list_delete(list_t *l, list_delete_action_t free_items)
     free(l);
 }
 
+list_t* list_clone(list_t* list_to_copy)
+{
+    list_t* copy = list();
+
+    list_foreach(i, list_to_copy)
+    {
+        list_pushback(copy, i->value);
+    }
+
+    return copy;
+}
+
 void list_clear(list_t *list, list_delete_action_t free_items)
 {
     list_item_t *current = list->head;

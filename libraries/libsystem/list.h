@@ -45,6 +45,9 @@ typedef enum
 // Free the memory used by the list
 void list_delete(list_t *l, list_delete_action_t free_items);
 
+// Create a copy of the list.
+list_t* list_clone(list_t* list);
+
 /* --- List operation ------------------------------------------------------- */
 
 // Clear all the item in the list.

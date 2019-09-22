@@ -5,7 +5,7 @@
 
 framebuffer_t *framebuffer_open(void)
 {
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ | IOSTREAM_WRITE);
 
     if (framebuffer_device == NULL)
     {

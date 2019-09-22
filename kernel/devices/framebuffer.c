@@ -248,57 +248,63 @@ error_t framebuffer_set_mode(point_t res)
 
 int framebuffer_device_open(stream_t *stream)
 {
-    lock_acquire(backbuffer_stack_lock);
-
-    if (framebuffer_owner != NULL)
+    if (stream->flags & IOSTREAM_WRITE)
     {
-        // Push the old owner to the framebuffer stack.
-        framebuffer_backbuffer_t *backbuffer = MALLOC(framebuffer_backbuffer_t);
+        lock_acquire(backbuffer_stack_lock);
 
-        backbuffer->owner = framebuffer_owner;
-        backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
-        memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+        if (framebuffer_owner != NULL)
+        {
+            // Push the old owner to the framebuffer stack.
+            framebuffer_backbuffer_t *backbuffer = MALLOC(framebuffer_backbuffer_t);
 
-        list_pushback(backbuffer_stack, backbuffer);
+            backbuffer->owner = framebuffer_owner;
+            backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+            memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+            list_pushback(backbuffer_stack, backbuffer);
+        }
+
+        // Make stream the new owner of the framebuffer.
+        framebuffer_owner = stream;
+        memset(framebuffer_virtual_addr, 0, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+        lock_release(backbuffer_stack_lock);
     }
-
-    // Make stream the new owner of the framebuffer.
-    framebuffer_owner = stream;
-    memset(framebuffer_virtual_addr, 0, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
-
-    lock_release(backbuffer_stack_lock);
 
     return 0;
 }
 
 int framebuffer_device_close(stream_t *stream)
 {
-    lock_acquire(backbuffer_stack_lock);
-
-    if (framebuffer_owner == stream)
+    if (stream->flags & IOSTREAM_WRITE)
     {
-        // If stream is the owner, pop from the backbuffer stack.
-        framebuffer_backbuffer_t *backbuffer = NULL;
-        if (list_popback(backbuffer_stack, (void **)&backbuffer))
-        {
-            // Switch to the new backbuffer
-            framebuffer_owner = backbuffer->owner;
-            memcpy(framebuffer_virtual_addr, backbuffer->buffer, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+        lock_acquire(backbuffer_stack_lock);
 
+        if (framebuffer_owner == stream)
+        {
+            // If stream is the owner, pop from the backbuffer stack.
+            framebuffer_backbuffer_t *backbuffer = NULL;
+            if (list_popback(backbuffer_stack, (void **)&backbuffer))
+            {
+                // Switch to the new backbuffer
+                framebuffer_owner = backbuffer->owner;
+                memcpy(framebuffer_virtual_addr, backbuffer->buffer, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+                free(backbuffer->buffer);
+                free(backbuffer);
+            }
+        }
+        else
+        {
+            // Else remove stream from the backbuffer stack.
+            framebuffer_backbuffer_t *backbuffer = framebuffer_get_backbuffer(stream);
+            list_remove(backbuffer_stack, backbuffer);
             free(backbuffer->buffer);
             free(backbuffer);
         }
-    }
-    else
-    {
-        // Else remove stream from the backbuffer stack.
-        framebuffer_backbuffer_t *backbuffer = framebuffer_get_backbuffer(stream);
-        list_remove(backbuffer_stack, backbuffer);
-        free(backbuffer->buffer);
-        free(backbuffer);
-    }
 
-    lock_release(backbuffer_stack_lock);
+        lock_release(backbuffer_stack_lock);
+    }
 
     return 0;
 }
@@ -333,50 +339,67 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_CALL_BLIT)
     {
-        framebuffer_blit_args_t *blitargs = args;
-
-        for (int y = 0; y < blitargs->size.Y; y++)
+        if (stream->flags & IOSTREAM_WRITE)
         {
-            for (int x = 0; x < blitargs->size.X; x++)
+            framebuffer_blit_args_t *blitargs = args;
+
+            for (int y = 0; y < blitargs->size.Y; y++)
             {
-                uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (point_t){x, y});
+                for (int x = 0; x < blitargs->size.X; x++)
+                {
+                    uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (point_t){x, y});
 
-                uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
-                                            ((source_pixel_data)&0xff00ff00) |
-                                            ((source_pixel_data << 16) & 0x00ff0000);
+                    uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
+                                                ((source_pixel_data)&0xff00ff00) |
+                                                ((source_pixel_data << 16) & 0x00ff0000);
 
-                framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){x, y}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){x, y}, converted_pixel_data);
+                }
             }
+            lock_release(backbuffer_stack_lock);
+
+            return -ERR_SUCCESS;
         }
+        else
+        {
+            lock_release(backbuffer_stack_lock);
 
-        lock_release(backbuffer_stack_lock);
-
-        return -ERR_SUCCESS;
+            return -ERR_READ_ONLY_STREAM;
+        }
     }
     else if (request == FRAMEBUFFER_CALL_BLITREGION)
     {
-        framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
-
-        for (int y = 0; y < region->region_to_blit.height; y++)
+        if (stream->flags & IOSTREAM_WRITE)
         {
-            for (int x = 0; x < region->region_to_blit.width; x++)
+            framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
+
+            for (int y = 0; y < region->region_to_blit.height; y++)
             {
-                int xx = x + region->region_to_blit.X;
-                int yy = y + region->region_to_blit.Y;
+                for (int x = 0; x < region->region_to_blit.width; x++)
+                {
+                    int xx = x + region->region_to_blit.X;
+                    int yy = y + region->region_to_blit.Y;
 
-                uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (point_t){xx, yy});
+                    uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (point_t){xx, yy});
 
-                uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
-                                            ((source_pixel_data)&0xff00ff00) |
-                                            ((source_pixel_data << 16) & 0x00ff0000);
+                    uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
+                                                ((source_pixel_data)&0xff00ff00) |
+                                                ((source_pixel_data << 16) & 0x00ff0000);
 
-                framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){xx, yy}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){xx, yy}, converted_pixel_data);
+                }
             }
+
+            lock_release(backbuffer_stack_lock);
+
+            return -ERR_SUCCESS;
         }
+        else
+        {
+            lock_release(backbuffer_stack_lock);
 
-        lock_release(backbuffer_stack_lock);
-
-        return -ERR_SUCCESS;
+            return -ERR_READ_ONLY_STREAM;
+        }
     }
     else
     {

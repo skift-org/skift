@@ -31,12 +31,14 @@
     __ENTRY(ERR_INVALID_ARGUMENT)                                  \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES_IN_SYSTEM)                     \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES)                               \
-    __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE)                    \
+    __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE)                     \
     __ENTRY(ERR_TEXT_FILE_BUSY)                                    \
     __ENTRY(ERR_FILE_TOO_LARGE)                                    \
     __ENTRY(ERR_NO_SPACE_LEFT_ON_DEVICE)                           \
     __ENTRY(ERR_ILLEGAL_SEEK)                                      \
     __ENTRY(ERR_READ_ONLY_FILE_SYSTEM)                             \
+    __ENTRY(ERR_READ_ONLY_STREAM)                                  \
+    __ENTRY(ERR_WRITE_ONLY_STREAM)                                 \
     __ENTRY(ERR_TOO_MANY_LINKS)                                    \
     __ENTRY(ERR_BROKEN_PIPE)                                       \
     __ENTRY(ERR_NUMERICAL_ARGUMENT_OUT_OF_DOMAIN)                  \

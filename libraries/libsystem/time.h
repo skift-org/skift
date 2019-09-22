@@ -20,6 +20,8 @@ static const int DAYS_PER_YEAR[2] = {365, 366};
 #define IS_LEAP_YEAR(__year) \
     ((!((__year) % 4) && (__year) % 100) || !((__year) % 400))
 
+typedef u32 elapsedtime_t;
+
 typedef u32 timestamp_t;
 
 typedef struct

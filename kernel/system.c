@@ -65,8 +65,14 @@ void __panic(const char *package, const char *file, const char *function, const 
     va_list va;
     va_start(va, message);
 
+    if (nested_panic)
+    {
+        STOP;
+    }
+
     if (!has_panic)
     {
+        has_panic = true;
         printf("\n\033[0;33m--- \033[0;31m!!!\033[0;33m ------------------------------------------------------------------------\033[0m\n");
         printf("\n\tKERNEL");
     }
@@ -78,8 +84,6 @@ void __panic(const char *package, const char *file, const char *function, const 
     }
 
     printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
-
-    has_panic = true;
 
     vprintf(message, va);
     printf("\033[0m\n\tthrow by %s::%s %s() ln%d", package, file, function, line);

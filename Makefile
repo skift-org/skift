@@ -15,7 +15,11 @@ CWARN_FLAGS=-Wall \
 		    -Wextra \
 			-Werror 
 
-CFLAGS= $(CDIALECT_FLAGS) $(COPT_FLAGS) $(CWARN_FLAGS) -Ilibraries -Ilibraries/libposix -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
+CFLAGS=$(CDIALECT_FLAGS) \
+	   $(COPT_FLAGS) \
+	   $(CWARN_FLAGS) \
+	   -Ilibraries -Ilibraries/libposix \
+	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
 ASFLAGS=-f elf32
@@ -411,4 +415,5 @@ $(BOOTROOT): grub.cfg $(KERNEL) $(RAMDISK)
 	touch $(BOOTROOT)
 
 $(BOOTDISK): $(BOOTROOT)
-	grub-mkrescue -o $@ $(BOOTROOT) || grub2-mkrescue -o $@ $(BOOTROOT)
+	grub-mkrescue -o $@ $(BOOTROOT) || \
+	grub2-mkrescue -o $@ $(BOOTROOT)

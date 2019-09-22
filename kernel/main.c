@@ -40,12 +40,21 @@
 #include "system.h"
 #include "tasking.h"
 #include "platform.h"
+#include "clock.h"
 
-multiboot_info_t mbootinfo;
+static multiboot_info_t mbootinfo = {0};
+static timestamp_t boot_timestamp = 0;
+
+elapsedtime_t system_get_uptime(void)
+{
+    return clock_now() - boot_timestamp;
+}
 
 void kmain(multiboot_info_t *info, uint magic)
 {
     __plug_init();
+
+    boot_timestamp = clock_now();
 
     logger_level(LOGGER_TRACE);
 

@@ -16,7 +16,8 @@ static const char *usages[] = {
     "",
     "FILES...",
     "OPTION... FILES...",
-    NULL};
+    NULL,
+};
 
 static cmdline_option_t options[] = {
     CMDLINE_OPT_HELP,
@@ -39,12 +40,11 @@ const char *file_type_name[] = {
 
 void ls_print_entry(iostream_direntry_t *entry)
 {
-    iostream_stat_t* stat = &entry->stat;
+    iostream_stat_t *stat = &entry->stat;
 
     if (option_list)
     {
         printf("%srwxrwxrwx %5d ", file_type_name[stat->type], stat->size);
-
     }
 
     if (option_all || entry->name[0] != '.')
@@ -58,7 +58,7 @@ void ls_print_entry(iostream_direntry_t *entry)
 
 int ls(const char *target_path)
 {
-    iostream_t* dir = iostream_open(target_path, IOSTREAM_READ);
+    iostream_t *dir = iostream_open(target_path, IOSTREAM_READ);
 
     if (dir != NULL)
     {
@@ -78,7 +78,7 @@ int ls(const char *target_path)
         {
             iostream_direntry_t entry;
             entry.stat = stat;
-            path_t* p = path(target_path);
+            path_t *p = path(target_path);
             strlcpy(entry.name, path_filename(p), PATH_LENGHT);
             ls_print_entry(&entry);
             path_delete(p);

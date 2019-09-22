@@ -2,32 +2,26 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libgraphic/bitmap.h>
-#include <libgraphic/painter.h>
-#include <libsystem/logger.h>
-#include <libsystem/assert.h>
+#include <libsystem/iostream.h>
 
-#include <libdevice/framebuffer.h>
+#include <libgraphic/framebuffer.h>
 
-framebuffer_mode_info_t mode_info = {true, 800, 600};
+#define TEXT "The quick brown fox jumps over the lazy dog."
 
 int main(int argc, char **argv)
 {
     UNUSED(argc);
     UNUSED(argv);
 
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    framebuffer_t *fb = framebuffer_open();
 
-    assert(framebuffer_device);
-
-    assert(iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) >= 0);
-
-    bitmap_t *fb = bitmap(800, 600);
-
-    assert(fb);
+    if (fb == NULL)
+    {
+        error_print("Failled to open the framebuffer.");
+        return -1;
+    }
 
     font_t *fonts[] = {
         font("mono"),
@@ -45,22 +39,14 @@ int main(int argc, char **argv)
         NULL,
     };
 
-    painter_t *paint = painter(fb);
-
-    assert(paint);
-
-    painter_fill_rect(paint, bitmap_bound(fb), COLOR_BLACK);
-    painter_fill_rect(paint, (rectangle_t){{16, 16, 16, 16}}, COLOR_RED);
-
-    const char* text = "The quick brown fox jumps over the lazy dog.";
+    painter_clear(fb->painter, COLOR_BLACK);
 
     for (int i = 0; fonts[i] != NULL; i++)
     {
-        painter_draw_text(paint, fonts[i], text, strlen(text), (point_t){16, 32 + 32 * i}, 16, COLOR_WHITE);
+        painter_draw_text(fb->painter, fonts[i], TEXT, strlen(TEXT), (point_t){16, 32 + 32 * i}, 16, COLOR_WHITE);
     }
-    
 
-    iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLIT, fb->buffer);
+    framebuffer_blit(fb);
 
     for (int i = 0; fonts[i] != NULL; i++)
     {

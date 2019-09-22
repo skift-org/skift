@@ -1,8 +1,8 @@
 #pragma once
 
-//#include <libsystem/runtime.h>
+#include <libsystem/runtime.h>
 
-typedef enum 
+typedef enum
 {
     KEY_MOTION_UP,
     KEY_MOTION_DOWN
@@ -124,10 +124,9 @@ typedef enum
 typedef enum
 {
     KEY_LIST(KEY_ENUM_ENTRY)
-    __KEY_COUNT,
+        __KEY_COUNT,
 } key_t;
 
 const char *key_to_string(key_t key);
 
 bool key_is_valid(key_t key);
-

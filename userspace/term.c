@@ -7,12 +7,9 @@
 #include <libsystem/iostream.h>
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
-#include <libgraphic/painter.h>
-
 #include <libdevice/textmode.h>
-#include <libdevice/framebuffer.h>
-
 #include <libconsole/vtconsole.h>
+#include <libgraphic/framebuffer.h>
 
 static iostream_t *terminal_fifo = NULL;
 
@@ -95,11 +92,9 @@ vtconsole_t *terminal_create_textmode_console(void)
 point_t char_size = (point_t){9, 24};
 
 static font_t *mono_font = NULL;
-static iostream_t *framebuffer_device = NULL;
-static point_t framebuffer_cursor = point_zero;
 
-static bitmap_t *framebuffer = NULL;
-static painter_t *paint = NULL;
+static framebuffer_t *framebuffer;
+static point_t framebuffer_cursor = point_zero;
 
 static color_t framebuffer_colors[] = {
     [VTCOLOR_BLACK] = COLOR(0x212121),
@@ -123,7 +118,6 @@ static color_t framebuffer_brightcolors[] = {
     [VTCOLOR_GREY] = COLOR(0xeceff1),
 };
 
-
 void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
     UNUSED(vtc);
@@ -135,44 +129,27 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 {
     logger_info("Creating graphic context...");
 
-    framebuffer_mode_info_t mode_info = {true, 800, 600};
+    framebuffer = framebuffer_open();
 
-    framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
-
-    if (framebuffer_device == NULL)
+    if (framebuffer == NULL)
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
+        logger_error("Failled to open the framebuffer.");
 
         return NULL;
     }
 
-    logger_info("Framebuffer opened");
+    painter_clear(framebuffer->painter, framebuffer_colors[VTC_DEFAULT_BACKGROUND]);
 
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
-    {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
-
-        return NULL;
-    }
-
-    logger_info("Framebuffer mode set");
-
-    framebuffer = bitmap(800, 600);
-
-    paint = painter(framebuffer);
-
-    painter_clear_rect(paint, bitmap_bound(framebuffer), framebuffer_colors[VTCOLOR_BLACK]);
+    framebuffer_blit(framebuffer);
 
     mono_font = font("mono");
 
-    return vtconsole(mode_info.width / char_size.X, mode_info.height / char_size.Y, NULL, framebuffer_cursor_move_callback);
+    return vtconsole(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, NULL, framebuffer_cursor_move_callback);
 }
 
-void paint_repaint_dirty(vtconsole_t *console, painter_t* paint)
+void paint_repaint_dirty(vtconsole_t *console, painter_t *paint)
 {
     int repainted_cell = 0;
-    bool has_bound = false;
-    rectangle_t repaint_bound = {0};
 
     for (int y = 0; y < console->height; y++)
     {
@@ -185,44 +162,31 @@ void paint_repaint_dirty(vtconsole_t *console, painter_t* paint)
                 repainted_cell++;
 
                 color_t fgc = cell->attr.bright
-                                ? framebuffer_brightcolors[cell->attr.fg]
-                                : framebuffer_colors[cell->attr.fg];
+                                  ? framebuffer_brightcolors[cell->attr.fg]
+                                  : framebuffer_colors[cell->attr.fg];
 
                 point_t pos = (point_t){x * char_size.X, y * (int)(char_size.Y)};
                 point_t siz = (point_t){char_size.X, (char_size.Y)};
 
-                rectangle_t rect;
-                rect.position = pos;
-                rect.size = siz;
+                rectangle_t cell_bound;
+                cell_bound.position = pos;
+                cell_bound.size = siz;
 
-                painter_clear_rect(paint, rect, framebuffer_colors[cell->attr.bg]);
+                painter_clear_rect(paint, cell_bound, framebuffer_colors[cell->attr.bg]);
+
                 if (cell->c != ' ')
                 {
                     painter_draw_glyph(paint, mono_font, font_glyph(mono_font, cell->c), point_add(pos, (point_t){0, 16}), 16, fgc);
                 }
-                
-                cell->is_dirty = false;
 
-                if (!has_bound)
-                {
-                    has_bound = true;
-                    repaint_bound = rect;
-                }
-                else
-                {
-                    repaint_bound = rectangle_merge(repaint_bound, rect);
-                }
+                framebuffer_mark_dirty(framebuffer, cell_bound);
+
+                cell->is_dirty = false;
             }
         }
     }
 
-    // painter_draw_rect(paint, repaint_bound, COLOR_RED);
-    // logger_info("Repainted %dcells %dx%d", repainted_cell, repaint_bound.X, repaint_bound.Y);
-
-    framebuffer_region_t reg;
-    reg.bound = repaint_bound;
-    reg.src = framebuffer->buffer;
-    iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLITREGION, &reg);
+    framebuffer_blit_dirty(framebuffer);
 }
 
 /* --- Terminal read/write loop --------------------------------------------- */
@@ -279,7 +243,7 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            paint_repaint_dirty(vtc, paint);
+            paint_repaint_dirty(vtc, framebuffer->painter);
         }
     } while (!do_exit);
 

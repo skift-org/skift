@@ -47,7 +47,7 @@ void painter_plot_pixel(painter_t *painter, point_t position, color_t color)
 {
     point_t point_absolue = {painter->cliprect.X + position.X, painter->cliprect.Y + position.Y};
 
-    if (rectangle_containe_position(painter->cliprect, point_absolue))
+    if (rectangle_containe_point(painter->cliprect, point_absolue))
     {
         bitmap_blend_pixel(painter->bitmap, point_absolue, color);
     }
@@ -90,6 +90,11 @@ void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, 
     {
         painter_blit_bitmap_scaled(paint, src, src_rect, dst_rect);
     }
+}
+
+void painter_clear(painter_t *paint, color_t color)
+{
+    painter_clear_rect(paint, bitmap_bound(paint->bitmap), color);
 }
 
 void painter_clear_rect(painter_t *paint, rectangle_t rect, color_t color)

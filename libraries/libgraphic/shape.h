@@ -129,7 +129,7 @@ static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t chi
     return (rectangle_t){{x, y, width, height}};
 }
 
-static inline bool rectangle_containe_position(rectangle_t rectange, point_t position)
+static inline bool rectangle_containe_point(rectangle_t rectange, point_t position)
 {
     return (rectange.X <= position.X && (rectange.X + rectange.width) > position.X) &&
            (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);

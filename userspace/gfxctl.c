@@ -42,20 +42,18 @@ static cmdline_t cmdline = CMDLINE(
 typedef struct
 {
     const char *name;
-    framebuffer_mode_info_t info;
+    framebuffer_mode_arg_t info;
 } supported_gfxmode_t;
 
 supported_gfxmode_t gfxmodes[] = {
-    // FIXME: the kernel does't support this mode
-    // {"textmode", {false}}, 
-    {"640x360",  {true, 640,  360}},
-    {"800x600",  {true, 800,  600}},
-    {"1024x768", {true, 1024, 768}},
-    {"1280x768", {true, 1280, 768}},
-    {NULL, {0}},
+    {"640x360", {{640, 360}}},
+    {"800x600", {{800, 600}}},
+    {"1024x768", {{1024, 768}}},
+    {"1280x768", {{1280, 768}}},
+    {NULL, {{0, 0}}},
 };
 
-framebuffer_mode_info_t* gfxmode_by_name(const char* name)
+framebuffer_mode_arg_t *gfxmode_by_name(const char *name)
 {
     for (int i = 0; gfxmodes[i].name; i++)
     {
@@ -65,13 +63,12 @@ framebuffer_mode_info_t* gfxmode_by_name(const char* name)
         }
     }
 
-    return NULL;   
+    return NULL;
 }
-
 
 int gfxmode_get(iostream_t *framebuffer_device)
 {
-    framebuffer_mode_info_t framebuffer_info;
+    framebuffer_mode_arg_t framebuffer_info;
 
     if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &framebuffer_info) < 0)
     {
@@ -79,17 +76,16 @@ int gfxmode_get(iostream_t *framebuffer_device)
         return -1;
     }
 
-    printf("Enabled: %s\nHeight: %d\nWidth: %d\n",
-           framebuffer_info.enable ? "true" : "false",
-           framebuffer_info.width,
-           framebuffer_info.height);
+    printf("Height: %d\nWidth: %d\n",
+           framebuffer_info.size.X,
+           framebuffer_info.size.Y);
 
     return 0;
 }
 
-int gfxmode_set(iostream_t *framebuffer_device, const char* mode_name)
+int gfxmode_set(iostream_t *framebuffer_device, const char *mode_name)
 {
-    framebuffer_mode_info_t *framebuffer_info = gfxmode_by_name(mode_name);
+    framebuffer_mode_arg_t *framebuffer_info = gfxmode_by_name(mode_name);
 
     if (framebuffer_info != NULL)
     {

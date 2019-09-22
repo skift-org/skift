@@ -8,10 +8,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/assert.h>
 
-#include <libdevice/framebuffer.h>
-
-#include <libgraphic/bitmap.h>
-#include <libgraphic/painter.h>
+#include <libgraphic/framebuffer.h>
 #include <libgraphic/matrix.h>
 
 typedef struct
@@ -91,8 +88,6 @@ static const face_t cude_mesh[] = {
     {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
     {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 };
-
-framebuffer_mode_info_t mode_info = {true, 800, 600};
 
 vector3_t matrix_apply_tranform(vector3_t position, matrix_t transform)
 {
@@ -210,24 +205,15 @@ int main(int argc, char **argv)
     UNUSED(argc);
     UNUSED(argv);
 
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    framebuffer_t *fb = framebuffer_open();
 
-    if (framebuffer_device == NULL)
+    if (fb == NULL)
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
+        error_print("Failled to open the framebuffer.");
         return -1;
     }
 
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
-    {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
-        return -1;
-    }
-
-    bitmap_t *framebuffer = bitmap(800, 600);
-    painter_t *paint = painter(framebuffer);
-
-    matrix_t projection = matrix_create_projection(0.1, 1000.0f, 45.0f, framebuffer->height / (double)framebuffer->width);
+    matrix_t projection = matrix_create_projection(0.1, 1000.0f, 45.0f, fb->height / (double)fb->width);
 
     vector3_t camera_position = {0, 0, 0};
 
@@ -242,7 +228,7 @@ int main(int argc, char **argv)
 
         color_t background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 1, 1);
 
-        painter_clear_rect(paint, bitmap_bound(framebuffer), background_color);
+        painter_clear(fb->painter, background_color);
 
         for (int i = 0; i < 12; i++)
         {
@@ -288,20 +274,20 @@ int main(int argc, char **argv)
                 triProjected.c.X += 1.0;
                 triProjected.c.Y += 1.0;
 
-                triProjected.a.X *= 0.5 * framebuffer->width;
-                triProjected.a.Y *= 0.5 * framebuffer->height;
-                triProjected.b.X *= 0.5 * framebuffer->width;
-                triProjected.b.Y *= 0.5 * framebuffer->height;
-                triProjected.c.X *= 0.5 * framebuffer->width;
-                triProjected.c.Y *= 0.5 * framebuffer->height;
+                triProjected.a.X *= 0.5 * fb->width;
+                triProjected.a.Y *= 0.5 * fb->height;
+                triProjected.b.X *= 0.5 * fb->width;
+                triProjected.b.Y *= 0.5 * fb->height;
+                triProjected.c.X *= 0.5 * fb->width;
+                triProjected.c.Y *= 0.5 * fb->height;
 
                 color_t color = HSV(abs(sin(theta / 10)) * 360, 0.5, light_force);
-                painter3D_fill_face(paint, triProjected, color);
-                painter3D_draw_face(paint, triProjected, COLOR_BLACK);
+                painter3D_fill_face(fb->painter, triProjected, color);
+                painter3D_draw_face(fb->painter, triProjected, COLOR_BLACK);
             }
         }
 
-        iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLIT, framebuffer->buffer);
+        framebuffer_blit(fb);
     } while (true);
 
     return 0;

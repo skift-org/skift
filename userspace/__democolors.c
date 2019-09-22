@@ -3,45 +3,21 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/iostream.h>
-#include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libgraphic/bitmap.h>
-#include <libgraphic/painter.h>
-#include <libsystem/logger.h>
-#include <libsystem/assert.h>
-
-#include <libdevice/framebuffer.h>
-
-framebuffer_mode_info_t mode_info = {true, 800, 600};
+#include <libgraphic/framebuffer.h>
 
 int main(int argc, char **argv)
 {
     UNUSED(argc);
     UNUSED(argv);
 
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    framebuffer_t *fb = framebuffer_open();
 
-    if (framebuffer_device == NULL)
+    if (fb == NULL)
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
+        error_print("Failled to open the framebuffer.");
         return -1;
     }
-
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
-    {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
-        return -1;
-    }
-
-    bitmap_t *fb = bitmap(800, 600);
-
-    assert(fb);
-
-    painter_t *paint = painter(fb);
-
-    assert(paint);
-
-    float time = 0.0;
 
     do
     {
@@ -49,13 +25,11 @@ int main(int argc, char **argv)
         {
             for (int y = 0; y < fb->height; y++)
             {
-                painter_plot_pixel(paint, (point_t){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
+                painter_plot_pixel(fb->painter, (point_t){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
             }
         }
 
-        time += 0.001;
-
-        iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLIT, fb->buffer);
+        framebuffer_blit(fb);
     } while (true);
 
     return 0;

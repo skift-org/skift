@@ -3,40 +3,39 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/iostream.h>
-#include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libgraphic/bitmap.h>
-#include <libgraphic/painter.h>
-#include <libsystem/logger.h>
-#include <libsystem/assert.h>
 
-#include <libdevice/framebuffer.h>
-
-framebuffer_mode_info_t mode_info = {true, 800,  600};
+#include <libgraphic/framebuffer.h>
 
 typedef struct
-{   
+{
     point_t start;
     point_t finish;
     color_t color;
-} a_line_t;
+} line_t;
 
+rectangle_t line_bound(line_t line)
+{
+    rectangle_t bound;
+
+    bound.X = min(line.start.X, line.finish.X);
+    bound.Y = min(line.start.Y, line.finish.Y);
+    bound.width = max(line.start.X, line.finish.X) - bound.X;
+    bound.height = max(line.start.Y, line.finish.Y) - bound.Y;
+
+    return bound;
+}
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc); UNUSED(argv);
+    UNUSED(argc);
+    UNUSED(argv);
 
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    framebuffer_t *fb = framebuffer_open();
 
-    if (framebuffer_device == NULL)
+    if (fb == NULL)
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
-        return -1;
-    }
-
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) < 0)
-    {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
+        error_print("Failled to open the framebuffer.");
         return -1;
     }
 
@@ -48,35 +47,21 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    bitmap_t* fb = bitmap(800, 600);
-
-    assert(fb);
-
-    painter_t* paint = painter(fb);
-
-    assert(paint);
-
     do
     {
-        a_line_t line;
+        line_t line;
         iostream_read(random_device, &line, sizeof(line));
 
-        line.start.X  = abs((int)line.start.X % 800);
-        line.start.Y  = abs((int)line.start.Y % 600);
+        line.start.X = abs((int)line.start.X % 800);
+        line.start.Y = abs((int)line.start.Y % 600);
         line.finish.X = abs((int)line.finish.X % 800);
         line.finish.Y = abs((int)line.finish.Y % 600);
 
-        painter_draw_line(paint, line.start, line.finish, line.color);
-        
-        framebuffer_region_t reg;
-        reg.src = fb->buffer;
-        reg.bound.X = min(line.start.X, line.finish.X);
-        reg.bound.Y = min(line.start.Y, line.finish.Y);
-        reg.bound.width = max(line.start.X, line.finish.X) - reg.bound.X;
-        reg.bound.height = max(line.start.Y, line.finish.Y) - reg.bound.Y;
+        painter_draw_line(fb->painter, line.start, line.finish, line.color);
 
-        iostream_call(framebuffer_device, FRAMEBUFFER_CALL_BLITREGION, &reg);
-    } while(true);
+        framebuffer_mark_dirty(fb, line_bound(line));
+        framebuffer_blit_dirty(fb);
+    } while (true);
 
     return 0;
 }

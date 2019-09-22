@@ -26,6 +26,8 @@ void painter_plot_pixel(painter_t *painter, point_t position, color_t color);
 
 void painter_blit_bitmap(painter_t *paint, bitmap_t *src, rectangle_t src_rect, rectangle_t dst_rect);
 
+void painter_clear(painter_t *paint, color_t color);
+
 void painter_clear_rect(painter_t *paint, rectangle_t rect, color_t color);
 
 void painter_fill_rect(painter_t *paint, rectangle_t rect, color_t color);

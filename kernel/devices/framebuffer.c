@@ -2,12 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/atomic.h>
-#include <libsystem/error.h>
-#include <libsystem/cstring.h>
-#include <libmath/math.h>
-
 #include <libdevice/framebuffer.h>
+#include <libmath/math.h>
+#include <libsystem/assert.h>
+#include <libsystem/atomic.h>
+#include <libsystem/cstring.h>
+#include <libsystem/error.h>
+#include <libsystem/lock.h>
 
 #include "x86/pci.h"
 #include "filesystem.h"
@@ -109,130 +110,278 @@ void bga_mode(u32 width, u32 height)
 
 /* --- Framebuffer driver --------------------------------------------------- */
 
-static bool is_graphic_mode = false;
-
 static void *framebuffer_physical_addr = NULL;
 static void *framebuffer_virtual_addr = NULL;
-static int framebuffer_height = -1;
-static int framebuffer_width = -1;
+static stream_t *framebuffer_owner = NULL;
+static point_t framebuffer_size = {-1, -1};
 
-int framebuffer_device_call(stream_t *stream, int request, void *args)
+typedef struct
 {
-    UNUSED(stream);
+    stream_t *owner;
+    void *buffer;
+} framebuffer_backbuffer_t;
 
-    if (request == FRAMEBUFFER_CALL_GET_MODE)
+static lock_t backbuffer_stack_lock;
+static list_t *backbuffer_stack = NULL;
+
+void *framebuffer_get_buffer(stream_t *owner)
+{
+    if (framebuffer_owner == owner)
     {
-        framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
-
-        mode_info->enable = is_graphic_mode;
-        mode_info->width = framebuffer_width;
-        mode_info->height = framebuffer_height;
-
-        return -ERR_SUCCESS;
+        return framebuffer_virtual_addr;
     }
-    else if (request == FRAMEBUFFER_CALL_SET_MODE)
+
+    list_foreach(i, backbuffer_stack)
     {
-        framebuffer_mode_info_t *mode_info = (framebuffer_mode_info_t *)args;
+        framebuffer_backbuffer_t *backbuffer = i->value;
 
-        if (mode_info->enable)
+        if (backbuffer->owner == owner)
         {
-            logger_info("Setting mode to %dx%d...", mode_info->width, mode_info->height);
+            return backbuffer->buffer;
+        }
+    }
 
-            if (mode_info->width > 0 &&
-                mode_info->width <= VBE_DISPI_MAX_XRES &&
-                mode_info->height > 0 &&
-                mode_info->height <= VBE_DISPI_MAX_YRES)
+    return NULL;
+}
+
+framebuffer_backbuffer_t *framebuffer_get_backbuffer(stream_t *owner)
+{
+    list_foreach(i, backbuffer_stack)
+    {
+        framebuffer_backbuffer_t *backbuffer = i->value;
+
+        if (backbuffer->owner == owner)
+        {
+            return backbuffer;
+        }
+    }
+
+    return NULL;
+}
+
+inline void framebuffer_set_pixel(uint *framebuffer, point_t size, point_t p, uint value)
+{
+    if ((p.X >= 0 && p.X < size.X) && (p.Y >= 0 && p.Y < size.Y))
+        framebuffer[p.X + p.Y * size.X] = value;
+}
+
+inline uint framebuffer_get_pixel(uint *framebuffer, point_t size, point_t p)
+{
+    int xi = abs((int)p.X % size.X);
+    int yi = abs((int)p.Y % size.Y);
+
+    return framebuffer[xi + yi * size.X];
+}
+
+void *framebuffer_resize(uint *buffer, point_t old_size, point_t new_size)
+{
+    void *resized_framebuffer = malloc((new_size.X * new_size.Y) * sizeof(uint));
+
+    for (int x = 0; x < new_size.X; x++)
+    {
+        for (int y = 0; y < new_size.Y; y++)
+        {
+            point_t p = (point_t){x, y};
+            uint pixel_data = framebuffer_get_pixel(buffer, old_size, p);
+            framebuffer_set_pixel(resized_framebuffer, new_size, p, pixel_data);
+        }
+    }
+
+    free(buffer);
+
+    return resized_framebuffer;
+}
+
+error_t framebuffer_set_mode(point_t res)
+{
+    if (res.X > 0 &&
+        res.X <= VBE_DISPI_MAX_XRES &&
+        res.Y > 0 &&
+        res.Y <= VBE_DISPI_MAX_YRES)
+    {
+        bga_mode(res.X, res.Y);
+
+        if (framebuffer_physical_addr == NULL)
+        {
+            framebuffer_physical_addr = bga_get_framebuffer();
+
+            if (framebuffer_physical_addr != NULL)
             {
-                bga_mode(mode_info->width, mode_info->height);
+                uint page_count = PAGE_ALIGN(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
 
-                if (framebuffer_physical_addr == NULL)
+                physical_set_used((uint)framebuffer_physical_addr, page_count);
+
+                framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
+                if (framebuffer_virtual_addr == NULL)
                 {
-                    framebuffer_physical_addr = bga_get_framebuffer();
-
-                    if (framebuffer_physical_addr != NULL)
-                    {
-                        uint page_count = PAGE_ALIGN(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
-
-                        physical_set_used((uint)framebuffer_physical_addr, page_count);
-
-                        framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
-                        if (framebuffer_virtual_addr == NULL)
-                        {
-                            return -ERR_CANNOT_ALLOCATE_MEMORY;
-                        }
-
-                        logger_info("BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
-                    }
-                    else
-                    {
-                        logger_error("BGA: no framebuffer found!");
-
-                        // FIXME: maybe this is note
-                        return -ERR_NO_SUCH_DEVICE_OR_ADDRESS;
-                    }
+                    return -ERR_CANNOT_ALLOCATE_MEMORY;
                 }
 
-                framebuffer_width = mode_info->width;
-                framebuffer_height = mode_info->height;
-
-                is_graphic_mode = true;
-
-                return -ERR_SUCCESS;
+                logger_info("BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
             }
             else
             {
-                logger_warn("Failled to create framebuffer !");
-                return -ERR_INVALID_ARGUMENT;
+                logger_error("BGA: no framebuffer found!");
+
+                // FIXME: maybe this is note the right error code
+                return -ERR_NO_SUCH_DEVICE_OR_ADDRESS;
             }
         }
-        else
-        {
-            // FIXME: switch back to textmode
-            // bga_disable();
-            // is_graphic_mode = false;
-            // return -ERR_SUCCESS;
 
-            return -ERR_OPERATION_NOT_SUPPORTED;
-        }
-    }
-    else if (request == FRAMEBUFFER_CALL_BLIT)
-    {
-        uint *data_to_blit = (uint *)args;
-
-        for (int i = 0; i < framebuffer_width * framebuffer_height; i++)
+        list_foreach(i, backbuffer_stack)
         {
-            ((uint *)framebuffer_virtual_addr)[i] = ((data_to_blit[i] >> 16) & 0x000000ff) |
-                                                    (data_to_blit[i] & 0xff00ff00) |
-                                                    ((data_to_blit[i] << 16) & 0x00ff0000);
+            framebuffer_backbuffer_t *backbuffer = i->value;
+
+            backbuffer->buffer = framebuffer_resize(backbuffer->buffer, framebuffer_size, res);
         }
 
-        return -ERR_SUCCESS;
-    }
-    else if (request == FRAMEBUFFER_CALL_BLITREGION)
-    {
-        framebuffer_region_t *region = (framebuffer_region_t *)args;
-
-        for (int y = 0; y < region->bound.height; y++)
-        {
-            for (int x = 0; x < region->bound.width; x++)
-            {
-                int xx = clamp(x + region->bound.X, 0, framebuffer_width - 1);
-                int yy = clamp(y + region->bound.Y, 0, framebuffer_height - 1);
-
-                int i = yy * framebuffer_width + xx;
-
-                uint pixel = ((uint *)region->src)[i];
-
-                ((uint *)framebuffer_virtual_addr)[i] = ((pixel >> 16) & 0x000000ff) |
-                                                        (pixel & 0xff00ff00) |
-                                                        ((pixel << 16) & 0x00ff0000);
-            }
-        }
+        framebuffer_size = res;
 
         return -ERR_SUCCESS;
     }
     else
     {
+        logger_warn("Failled to create framebuffer !");
+        return -ERR_INVALID_ARGUMENT;
+    }
+}
+
+int framebuffer_device_open(stream_t *stream)
+{
+    lock_acquire(backbuffer_stack_lock);
+
+    if (framebuffer_owner != NULL)
+    {
+        // Push the old owner to the framebuffer stack.
+        framebuffer_backbuffer_t *backbuffer = MALLOC(framebuffer_backbuffer_t);
+
+        backbuffer->owner = framebuffer_owner;
+        backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+        memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+        list_pushback(backbuffer_stack, backbuffer);
+    }
+
+    // Make stream the new owner of the framebuffer.
+    framebuffer_owner = stream;
+    memset(framebuffer_virtual_addr, 0, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+    lock_release(backbuffer_stack_lock);
+
+    return 0;
+}
+
+int framebuffer_device_close(stream_t *stream)
+{
+    lock_acquire(backbuffer_stack_lock);
+
+    if (framebuffer_owner == stream)
+    {
+        // If stream is the owner, pop from the backbuffer stack.
+        framebuffer_backbuffer_t *backbuffer = NULL;
+        if (list_popback(backbuffer_stack, (void **)&backbuffer))
+        {
+            // Switch to the new backbuffer
+            framebuffer_owner = backbuffer->owner;
+            memcpy(framebuffer_virtual_addr, backbuffer->buffer, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+
+            free(backbuffer->buffer);
+            free(backbuffer);
+        }
+    }
+    else
+    {
+        // Else remove stream from the backbuffer stack.
+        framebuffer_backbuffer_t *backbuffer = framebuffer_get_backbuffer(stream);
+        list_remove(backbuffer_stack, backbuffer);
+        free(backbuffer->buffer);
+        free(backbuffer);
+    }
+
+    lock_release(backbuffer_stack_lock);
+
+    return 0;
+}
+
+int framebuffer_device_call(stream_t *stream, int request, void *args)
+{
+    UNUSED(stream);
+
+    lock_acquire(backbuffer_stack_lock);
+
+    if (request == FRAMEBUFFER_CALL_GET_MODE)
+    {
+        framebuffer_mode_arg_t *mode_info = (framebuffer_mode_arg_t *)args;
+
+        mode_info->size = framebuffer_size;
+
+        lock_release(backbuffer_stack_lock);
+
+        return -ERR_SUCCESS;
+    }
+    else if (request == FRAMEBUFFER_CALL_SET_MODE)
+    {
+        framebuffer_mode_arg_t *mode_info = (framebuffer_mode_arg_t *)args;
+
+        logger_info("Setting mode to %dx%d...", mode_info->size.X, mode_info->size.Y);
+
+        int result = framebuffer_set_mode(mode_info->size);
+
+        lock_release(backbuffer_stack_lock);
+
+        return result;
+    }
+    else if (request == FRAMEBUFFER_CALL_BLIT)
+    {
+        framebuffer_blit_args_t *blitargs = args;
+
+        for (int y = 0; y < blitargs->size.Y; y++)
+        {
+            for (int x = 0; x < blitargs->size.X; x++)
+            {
+                uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (point_t){x, y});
+
+                uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
+                                            ((source_pixel_data)&0xff00ff00) |
+                                            ((source_pixel_data << 16) & 0x00ff0000);
+
+                framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){x, y}, converted_pixel_data);
+            }
+        }
+
+        lock_release(backbuffer_stack_lock);
+
+        return -ERR_SUCCESS;
+    }
+    else if (request == FRAMEBUFFER_CALL_BLITREGION)
+    {
+        framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
+
+        for (int y = 0; y < region->region_to_blit.height; y++)
+        {
+            for (int x = 0; x < region->region_to_blit.width; x++)
+            {
+                int xx = x + region->region_to_blit.X;
+                int yy = y + region->region_to_blit.Y;
+
+                uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (point_t){xx, yy});
+
+                uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
+                                            ((source_pixel_data)&0xff00ff00) |
+                                            ((source_pixel_data << 16) & 0x00ff0000);
+
+                framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){xx, yy}, converted_pixel_data);
+            }
+        }
+
+        lock_release(backbuffer_stack_lock);
+
+        return -ERR_SUCCESS;
+    }
+    else
+    {
+        lock_release(backbuffer_stack_lock);
+
         return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
@@ -241,7 +390,14 @@ void framebuffer_setup(void)
 {
     if (bga_is_available())
     {
+        lock_init(backbuffer_stack_lock);
+        backbuffer_stack = list();
+
+        framebuffer_set_mode((point_t){800, 600});
+
         device_t framebuffer_device = {
+            .open = framebuffer_device_open,
+            .close = framebuffer_device_close,
             .call = framebuffer_device_call,
         };
 

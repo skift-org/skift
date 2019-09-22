@@ -8,24 +8,32 @@
 #include <libgraphic/shape.h>
 
 #define FRAMEBUFFER_DEVICE "/dev/fb"
+
 #define FRAMEBUFFER_CALL_SET_MODE 0
+
 #define FRAMEBUFFER_CALL_GET_MODE 1
+
+typedef struct
+{
+    point_t size;
+} framebuffer_mode_arg_t;
+
+// Blit a RGBA buffer to the screen.
 #define FRAMEBUFFER_CALL_BLIT 2
+typedef struct
+{
+    point_t size;
+    void *buffer;
+} framebuffer_blit_args_t;
+
+// Blit a region of an RGBA buffer to the screen.
 #define FRAMEBUFFER_CALL_BLITREGION 3
+typedef struct
+{
+    point_t size;
+    rectangle_t region_to_blit;
+    void *buffer;
+} framebuffer_blitregion_args_t;
 
 #define FRAMEBUFFER_CHANNEL "#dev:framebuffer"
 #define FRAMEBUFFER_MODE_CHANGE "framebuffer.modechange"
-
-typedef struct
-{
-    bool enable;
-
-    int width;
-    int height;
-} framebuffer_mode_info_t;
-
-typedef struct
-{
-    void *src;
-    rectangle_t bound;
-} framebuffer_region_t;

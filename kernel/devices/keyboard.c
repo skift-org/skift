@@ -100,7 +100,7 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
             task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
         }
-        
+
         keyboard_keystate[key] = motion;
     }
     else
@@ -166,7 +166,7 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
 {
     UNUSED(stream);
 
-    if (request == FRAMEBUFFER_CALL_SET_KEYMAP)
+    if (request == KEYBOARD_CALL_SET_KEYMAP)
     {
         keyboard_set_keymap_args_t *size_and_keymap = args;
         keymap_t *new_keymap = size_and_keymap->keymap;
@@ -185,7 +185,7 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
 
         return -ERR_SUCCESS;
     }
-    else if (request == FRAMEBUFFER_CALL_GET_KEYMAP)
+    else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
         if (keyboard_keymap != NULL)
         {

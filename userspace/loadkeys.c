@@ -34,7 +34,7 @@ static cmdline_t cmdline = CMDLINE(usages, options, "Get or set the current keyb
 
 int loadkey_list_keymap()
 {
-    iostream_t* dir = iostream_open("/res/keyboard", IOSTREAM_READ);
+    iostream_t *dir = iostream_open("/res/keyboard", IOSTREAM_READ);
 
     iostream_direntry_t entry = {0};
     while (iostream_read(dir, &entry, sizeof(entry)) > 0)
@@ -78,7 +78,7 @@ int loadkey_set_keymap(iostream_t *keyboard_device, const char *keymap_path)
             new_keymap->magic[3] == 'p')
         {
             keyboard_set_keymap_args_t args = {.size = stat.size, .keymap = new_keymap};
-            iostream_call(keyboard_device, FRAMEBUFFER_CALL_SET_KEYMAP, &args);
+            iostream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
 
             printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
 
@@ -107,7 +107,7 @@ int loadkey_get_keymap(iostream_t *keyboard_device)
 {
     keymap_t keymap;
 
-    if (iostream_call(keyboard_device, FRAMEBUFFER_CALL_GET_KEYMAP, &keymap) == 0)
+    if (iostream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) == 0)
     {
         printf("Current keymap is %s(%s)\n", keymap.language, keymap.region);
 

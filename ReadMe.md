@@ -33,16 +33,6 @@ skiftOS 0.2.0 running the hideo desktop on QEMU 3.0.0
 
 SkiftOS is pretty easy to build from source, just follow the [build guide](manual/building.md)
 
-# Getting involved
-
-We welcome all contributions, just pick a task in the todo list and open a pull request to let us know you are working on that.
-
-# Cool pieces
-
-Some skiftOS's pieces can usefull for your own projects see:
- - [list.c](https://github.com/skiftOS/skift/blob/master/packages/skift.karm/core/sources/skift/list.c) and [list.h](https://github.com/skiftOS/skift/blob/master/packages/skift.karm/core/includes/skift/list.h) : a double linked list implementation
- - [vtconsole](https://github.com/skiftOS/vtconsole): an ansi escape sequence parser and renderer
-
 # License
 The skift operating system and its core components are licensed under the **MIT License**.              
 See: [LICENSE.md](LICENSE.md)

@@ -75,7 +75,7 @@ void framebuffer_mark_dirty(framebuffer_t *this, rectangle_t bound)
 {
     if (rectange_colide(bitmap_bound(this->backbuffer), bound))
     {
-        bound = rectangle_child(bitmap_bound(this->backbuffer), bound);
+        bound = rectangle_clip(bitmap_bound(this->backbuffer), bound);
 
         if (this->is_dirty)
         {
@@ -84,7 +84,7 @@ void framebuffer_mark_dirty(framebuffer_t *this, rectangle_t bound)
         else
         {
             this->is_dirty = true;
-            this->dirty_bound = rectangle_child(bitmap_bound(this->backbuffer), bound);
+            this->dirty_bound = rectangle_clip(bitmap_bound(this->backbuffer), bound);
         }
     }
 }

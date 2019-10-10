@@ -32,7 +32,7 @@ void painter_push_cliprect(painter_t *paint, rectangle_t cliprect)
     paint->cliprect_stack[paint->cliprect_stack_top] = paint->cliprect;
     paint->cliprect_stack_top++;
 
-    paint->cliprect = rectangle_child(paint->cliprect, cliprect);
+    paint->cliprect = rectangle_clip(paint->cliprect, cliprect);
 }
 
 void painter_pop_cliprect(painter_t *paint)
@@ -99,7 +99,7 @@ void painter_clear(painter_t *paint, color_t color)
 
 void painter_clear_rect(painter_t *paint, rectangle_t rect, color_t color)
 {
-    rectangle_t rect_absolue = rectangle_child(paint->cliprect, rect);
+    rectangle_t rect_absolue = rectangle_clip(paint->cliprect, rect);
 
     for (int xx = 0; xx < rect_absolue.width; xx++)
     {
@@ -115,7 +115,7 @@ void painter_clear_rect(painter_t *paint, rectangle_t rect, color_t color)
 
 void painter_fill_rect(painter_t *paint, rectangle_t rect, color_t color)
 {
-    rectangle_t rect_absolue = rectangle_child(paint->cliprect, rect);
+    rectangle_t rect_absolue = rectangle_clip(paint->cliprect, rect);
 
     for (int xx = 0; xx < rect_absolue.width; xx++)
     {

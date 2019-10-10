@@ -8,7 +8,6 @@ Building skiftOS required
 - nasm
 - gcc
 - binutils
-- python 3.7
 - grub
 
 And for testing et debuging
@@ -18,7 +17,7 @@ And for testing et debuging
 
 ```sh
 # On Ubuntu
-apt install nasm gcc make binutils python3 grub-pc-bin qemu-system-x86 xorriso mtools
+apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
 ```
 
 ## Setting up the toolchain

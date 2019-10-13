@@ -786,7 +786,7 @@ void task_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
+static void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
@@ -853,11 +853,8 @@ int task_exec(const char *executable_path, const char **argv)
     for (int i = 0; i < elf_header.phnum; i++)
     {
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
-        
-        int readed_bytes = iostream_read(s, &program, sizeof(elf_program_t));
-        logger_trace("Readed %08x bytes from the elf file.", readed_bytes);
 
-        logger_trace("Loading elf program section at offset %d and size %d", program.offset, program.filesz);
+        iostream_read(s, &program, sizeof(elf_program_t));
 
         load_elfseg(new_task, s, &program);
     }

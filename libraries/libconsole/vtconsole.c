@@ -134,7 +134,6 @@ void vtconsole_append(vtconsole_t *vtc, char c)
         if (vtc->cursor.x >= vtc->width)
             vtconsole_newline(vtc);
 
-
         vtconsole_update_cell(vtc, vtc->cursor.x, vtc->cursor.y, c, vtc->attr);
 
         vtc->cursor.x++;
@@ -161,11 +160,11 @@ void vtconsole_update_cell(vtconsole_t *vtc, int x, int y, char c, vtattr_t attr
         old_cell->attr.fg != new_cell->attr.fg ||
         old_cell->attr.bright != new_cell->attr.bright)
     {
-        *old_cell = *new_cell; 
+        *old_cell = *new_cell;
 
         if (vtc->on_paint)
         {
-            vtc->on_paint(vtc, old_cell, vtc->cursor.x, vtc->cursor.y);
+            vtc->on_paint(vtc, old_cell, x, y);
         }
     }
 }

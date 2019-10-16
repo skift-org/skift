@@ -2,7 +2,7 @@
 
 ## Supported environment
 
-Building skiftOS required
+Building skiftOS requires
 
 - A good linux distro
 - nasm

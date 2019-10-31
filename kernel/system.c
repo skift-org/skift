@@ -91,7 +91,11 @@ void __panic(const char *package, const char *file, const char *function, const 
     printf("\n");
     printf("\n\tDiagnostic:");
     printf("\n\tThe system was running for %d tick.", sheduler_get_ticks());
-    printf("\n\tThe running process is %d: %s", sheduler_running_id(), sheduler_running()->name);
+
+    if (sheduler_running_id() != -1)
+    {
+        printf("\n\tThe running process is %d: %s", sheduler_running_id(), sheduler_running()->name);
+    }
 
     if (sheduler_is_context_switch())
     {
@@ -110,18 +114,20 @@ void __panic(const char *package, const char *file, const char *function, const 
 
     memory_dump();
 
+    printf("\n");
+
     if (!nested_panic)
     {
-        // filesystem_panic_dump();
-        // task_panic_dump();
-        // cpuid_dump();
+        filesystem_panic_dump();
+        task_panic_dump();
+        cpuid_dump();
     }
 
     printf("\n");
 
     puts("\n\tSystem halted!\n");
 
-    printf("\n\033[0;33m--------------------------------------------------------------------------------");
+    printf("\n\033[0;33m--------------------------------------------------------------------------------\n\n");
 
     STOP;
 }

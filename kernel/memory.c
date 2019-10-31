@@ -312,6 +312,7 @@ void memory_setup(multiboot_info_t *mbootinfo)
     // Map the kernel memory
     memory_load_mmap(mbootinfo);
     memory_identity_map(&kpdir, 0, PAGE_ALIGN(USED_MEMORY) / PAGE_SIZE + 1);
+    virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
 
     is_memory_initialized = true;
 

@@ -64,16 +64,16 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 {
     if (key_is_valid(key))
     {
-        // keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
+        keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
 
-        // if (binding != NULL)
-        // {
-        //     logger_debug("scancode %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
-        // }
-        // else
-        // {
-        //     logger_debug("scancode %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
-        // }
+        if (binding != NULL)
+        {
+            logger_debug("key %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
+        }
+        else
+        {
+            logger_debug("key %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
+        }
 
         if (motion == KEY_MOTION_DOWN)
         {
@@ -107,6 +107,8 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
     {
         logger_warn("Invalide scancode %d", key);
     }
+
+    logger_debug("Done handeling scancode...");
 }
 
 reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)

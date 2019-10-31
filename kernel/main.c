@@ -118,8 +118,8 @@ void kmain(multiboot_info_t *info, uint magic)
     /* --- System context --------------------------------------------------- */
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
-    setup(tasking);
     setup(filesystem);
+    setup(tasking);
 
     /* --- Finalizing System ------------------------------------------------ */
     atomic_enable();

@@ -1,4 +1,8 @@
 <p align="center">
+<a href="https://github.com/skift/skift-cpp">This project is currently being ported to c++</a>
+</p>
+
+<p align="center">
 <br>
 <br>
 <img src="manual/assets/skift_dark.svg" height=64 />

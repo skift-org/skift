@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://github.com/skift/skift-cpp">This project is currently being ported to c++</a>
+<a href="https://github.com/skiftOS/skift-cpp">This project is currently being ported to c++</a>
 </p>
 
 <p align="center">

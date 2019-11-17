@@ -114,8 +114,8 @@ task_t *task(task_t *parent, const char *name, bool user)
     else
     {
         path_t *p = path("/");
-        assert(this->cwd_path);
         this->cwd_path = p;
+        assert(this->cwd_path);
 
         this->cwd_node = filesystem_acquire(NULL, p, false);
         assert(this->cwd_node);

@@ -281,18 +281,13 @@ void memory_load_mmap(multiboot_info_t *mbootinfo)
         }
         else
         {
-            // Mark memory as used so we don't allocate here.
+            // Mark memory as used so we don't allocate there.
             for (u64 addr = mmap->addr; addr < mmap->len; addr += PAGE_SIZE)
             {
                 PHYSICAL_SET_USED(addr);
             }
         }
     }
-
-    USED_MEMORY = PAGE_ALIGN(get_kernel_end(mbootinfo));
-
-    logger_info("%dKib of memory detected", TOTAL_MEMORY / 1024);
-    logger_info("%dKib of memory are used by the kernel", USED_MEMORY / 1024);
 }
 
 void memory_setup(multiboot_info_t *mbootinfo)
@@ -311,8 +306,11 @@ void memory_setup(multiboot_info_t *mbootinfo)
 
     // Map the kernel memory
     memory_load_mmap(mbootinfo);
-    memory_identity_map(&kpdir, 0, PAGE_ALIGN(USED_MEMORY) / PAGE_SIZE + 1);
+    memory_identity_map(&kpdir, 0, PAGE_ALIGN(get_kernel_end(mbootinfo)) / PAGE_SIZE + 1);
     virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
+
+    logger_info("%dKib of memory detected", TOTAL_MEMORY / 1024);
+    logger_info("%dKib of memory are used by the kernel", USED_MEMORY / 1024);
 
     is_memory_initialized = true;
 

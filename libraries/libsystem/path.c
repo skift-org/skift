@@ -6,9 +6,9 @@
 #include <libsystem/iostream.h>
 #include <libsystem/path.h>
 
-path_t *path(const char *raw_path)
+Path *path(const char *raw_path)
 {
-    path_t *p = MALLOC(path_t);
+    Path *p = MALLOC(Path);
     p->elements = list_create();
 
     const char *begin = raw_path;
@@ -36,13 +36,13 @@ path_t *path(const char *raw_path)
     return p;
 }
 
-void path_delete(path_t *path)
+void path_delete(Path *path)
 {
     list_destroy(path->elements, LIST_FREE_VALUES);
     free(path);
 }
 
-const char *path_filename(path_t *p)
+const char *path_filename(Path *p)
 {
     const char *element;
 
@@ -56,7 +56,7 @@ const char *path_filename(path_t *p)
     }
 }
 
-const char *path_element(path_t *p, int index)
+const char *path_element(Path *p, int index)
 {
     const char *element;
 
@@ -70,22 +70,22 @@ const char *path_element(path_t *p, int index)
     }
 }
 
-bool path_is_absolue(path_t *p)
+bool path_is_absolue(Path *p)
 {
     return p->is_absolue;
 }
 
-bool path_is_relative(path_t *p)
+bool path_is_relative(Path *p)
 {
     return !p->is_absolue;
 }
 
-int path_length(path_t *p)
+int path_length(Path *p)
 {
     return list_count(p->elements);
 }
 
-void path_normalize(path_t *p)
+void path_normalize(Path *p)
 {
     List *stack = list_create();
 
@@ -114,7 +114,7 @@ void path_normalize(path_t *p)
     p->elements = stack;
 }
 
-void path_push(path_t *p, const char *e)
+void path_push(Path *p, const char *e)
 {
     int lenght = strlen(e);
 
@@ -124,16 +124,16 @@ void path_push(path_t *p, const char *e)
     }
 }
 
-const char *path_pop(path_t *p)
+const char *path_pop(Path *p)
 {
     const char *element = NULL;
     list_popback(p->elements, (void **)&element);
     return element;
 }
 
-path_t *path_combine(path_t *left, path_t *right)
+Path *path_combine(Path *left, Path *right)
 {
-    path_t *p = MALLOC(path_t);
+    Path *p = MALLOC(Path);
     p->elements = list_create();
 
     // Check if the resulting path is absolue
@@ -173,9 +173,9 @@ path_t *path_combine(path_t *left, path_t *right)
     return p;
 }
 
-path_t *path_split_at(path_t *path, int index)
+Path *path_split_at(Path *path, int index)
 {
-    path_t *p = MALLOC(path_t);
+    Path *p = MALLOC(Path);
     p->elements = list_create();
     p->is_absolue = false;
 
@@ -193,9 +193,9 @@ path_t *path_split_at(path_t *path, int index)
     return p;
 }
 
-path_t *path_dup(path_t *path)
+Path *path_dup(Path *path)
 {
-    path_t *p = MALLOC(path_t);
+    Path *p = MALLOC(Path);
     p->elements = list_create();
     p->is_absolue = path->is_absolue;
 
@@ -207,7 +207,7 @@ path_t *path_dup(path_t *path)
     return p;
 }
 
-void path_to_cstring(path_t *this, char *buffer, uint size)
+void Patho_cstring(Path *this, char *buffer, uint size)
 {
     buffer[0] = '\0';
 
@@ -226,7 +226,7 @@ void path_to_cstring(path_t *this, char *buffer, uint size)
     }
 }
 
-void path_dump(path_t *p)
+void path_dump(Path *p)
 {
     for (int i = 0; i < path_length(p); i++)
     {

@@ -20,14 +20,14 @@ void filesystem_panic_dump(void);
 /* --- fsnode --------------------------------------------------------------- */
 
 // Resolve and acquire a fsnode.
-fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create);
+fsnode_t *filesystem_acquire(fsnode_t *at, Path *p, bool create);
 
 // Release the fsnode.
 void filesystem_release(fsnode_t *node);
 
 /* --- File IO -------------------------------------------------------------- */
 
-stream_t *filesystem_open(fsnode_t *at, path_t *p, IOStreamFlag flags);
+stream_t *filesystem_open(fsnode_t *at, Path *p, IOStreamFlag flags);
 
 void filesystem_close(stream_t *s);
 
@@ -51,26 +51,26 @@ int filesystem_stat(stream_t *s, IOStreamState *stat);
 
 /* --- File system operation ------------------------------------------------ */
 
-int filesystem_mkfile(fsnode_t *at, path_t *p);
+int filesystem_mkfile(fsnode_t *at, Path *p);
 
-int filesystem_mkfifo(fsnode_t *at, path_t *p); /* TODO */
+int filesystem_mkfifo(fsnode_t *at, Path *p); /* TODO */
 
-int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev);
+int filesystem_mkdev(fsnode_t *at, Path *p, device_t dev);
 
-int filesystem_mkdir(fsnode_t *at, path_t *p);
+int filesystem_mkdir(fsnode_t *at, Path *p);
 
-int filesystem_link(fsnode_t *atfile, path_t *file, fsnode_t *atlink, path_t *link);
+int filesystem_link(fsnode_t *atfile, Path *file, fsnode_t *atlink, Path *link);
 
-int filesystem_unlink(fsnode_t *at, path_t *p);
+int filesystem_unlink(fsnode_t *at, Path *p);
 
-int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath, path_t *newpath);
+int filesystem_rename(fsnode_t *atoldpath, Path *oldpath, fsnode_t *atnewpath, Path *newpath);
 
-bool filesystem_exist(fsnode_t *at, path_t *p);
+bool filesystem_exist(fsnode_t *at, Path *p);
 
 // *filesystem_mkdev* with error checking.
 #define FILESYSTEM_MKDEV(__name, __object)                       \
     {                                                            \
-        path_t *__dev_path = path(__name);                       \
+        Path *__dev_path = path(__name);                       \
         logger_info("Creating device " __name " at " __name);    \
         if (filesystem_mkdev(NULL, __dev_path, (__object)))      \
         {                                                        \

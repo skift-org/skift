@@ -208,7 +208,7 @@ int sys_filesystem_stat(int fd, IOStreamState *stat)
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
-    path_t *p = task_cwd_resolve(sheduler_running(), dir_path);
+    Path *p = task_cwd_resolve(sheduler_running(), dir_path);
 
     int result = filesystem_mkdir(ROOT, p);
 
@@ -219,7 +219,7 @@ int sys_filesystem_mkdir(const char *dir_path)
 
 int sys_filesystem_mkfifo(const char *fifo_path)
 {
-    path_t *p = task_cwd_resolve(sheduler_running(), fifo_path);
+    Path *p = task_cwd_resolve(sheduler_running(), fifo_path);
 
     int result = filesystem_mkfifo(ROOT, p);
 
@@ -230,8 +230,8 @@ int sys_filesystem_mkfifo(const char *fifo_path)
 
 int sys_filesystem_link(const char *old_path, const char *new_path)
 {
-    path_t *oldp = task_cwd_resolve(sheduler_running(), old_path);
-    path_t *newp = task_cwd_resolve(sheduler_running(), new_path);
+    Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
+    Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
     int result = filesystem_link(ROOT, oldp, ROOT, newp);
 
@@ -243,7 +243,7 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    path_t *p = task_cwd_resolve(sheduler_running(), link_path);
+    Path *p = task_cwd_resolve(sheduler_running(), link_path);
 
     int result = filesystem_unlink(ROOT, p);
 
@@ -254,8 +254,8 @@ int sys_filesystem_unlink(const char *link_path)
 
 int sys_filesystem_rename(const char *old_path, const char *new_path)
 {
-    path_t *oldp = task_cwd_resolve(sheduler_running(), old_path);
-    path_t *newp = task_cwd_resolve(sheduler_running(), new_path);
+    Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
+    Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
     int result = filesystem_rename(NULL, oldp, NULL, newp);
 

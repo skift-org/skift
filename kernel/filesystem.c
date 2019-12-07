@@ -35,7 +35,7 @@ void filesystem_setup()
     filesystem_ready = true;
 }
 
-fsnode_t *filesystem_resolve(fsnode_t *at, path_t *p)
+fsnode_t *filesystem_resolve(fsnode_t *at, Path *p)
 {
     fsnode_t *current = (at == NULL) ? root : at;
 
@@ -69,7 +69,7 @@ fsnode_t *filesystem_resolve(fsnode_t *at, path_t *p)
     return current;
 }
 
-fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t *p)
+fsnode_t *filesystem_resolve_parent(fsnode_t *at, Path *p)
 {
     const char *child_name = path_pop(p);
     fsnode_t *child = filesystem_resolve(at, p);
@@ -78,7 +78,7 @@ fsnode_t *filesystem_resolve_parent(fsnode_t *at, path_t *p)
     return child;
 }
 
-fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
+fsnode_t *filesystem_mknode(fsnode_t *at, Path *node_path, fsnode_type_t type)
 {
     IS_FS_READY;
 
@@ -110,7 +110,7 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
     return child_node;
 }
 
-fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create)
+fsnode_t *filesystem_acquire(fsnode_t *at, Path *p, bool create)
 {
     IS_FS_READY;
 
@@ -217,7 +217,7 @@ void filesystem_panic_dump(void)
 /* --- Filesystem Operations ------------------------------------------------ */
 
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
-stream_t *filesystem_open(fsnode_t *at, path_t *p, IOStreamFlag flags)
+stream_t *filesystem_open(fsnode_t *at, Path *p, IOStreamFlag flags)
 {
     IS_FS_READY;
 
@@ -547,7 +547,7 @@ int filesystem_tell(stream_t *s, IOStreamWhence whence)
     }
 }
 
-int filesystem_mkdir(fsnode_t *at, path_t *p)
+int filesystem_mkdir(fsnode_t *at, Path *p)
 {
     IS_FS_READY;
     lock_acquire(fslock);
@@ -564,7 +564,7 @@ int filesystem_mkdir(fsnode_t *at, path_t *p)
     }
 }
 
-int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev)
+int filesystem_mkdev(fsnode_t *at, Path *p, device_t dev)
 {
     IS_FS_READY;
     lock_acquire(fslock);
@@ -584,7 +584,7 @@ int filesystem_mkdev(fsnode_t *at, path_t *p, device_t dev)
     }
 }
 
-int filesystem_mkfile(fsnode_t *at, path_t *p)
+int filesystem_mkfile(fsnode_t *at, Path *p)
 {
     IS_FS_READY;
     lock_acquire(fslock);
@@ -600,7 +600,7 @@ int filesystem_mkfile(fsnode_t *at, path_t *p)
     }
 }
 
-int filesystem_mkfifo(fsnode_t *at, path_t *p)
+int filesystem_mkfifo(fsnode_t *at, Path *p)
 {
     IS_FS_READY;
     lock_acquire(fslock);
@@ -616,7 +616,7 @@ int filesystem_mkfifo(fsnode_t *at, path_t *p)
     }
 }
 
-int filesystem_link(fsnode_t *file_at, path_t *file_path, fsnode_t *link_at, path_t *link_path)
+int filesystem_link(fsnode_t *file_at, Path *file_path, fsnode_t *link_at, Path *link_path)
 {
     IS_FS_READY;
 
@@ -644,7 +644,7 @@ int filesystem_link(fsnode_t *file_at, path_t *file_path, fsnode_t *link_at, pat
     return result;
 }
 
-int filesystem_unlink(fsnode_t *at, path_t *link_path)
+int filesystem_unlink(fsnode_t *at, Path *link_path)
 {
     IS_FS_READY;
 
@@ -667,7 +667,7 @@ int filesystem_unlink(fsnode_t *at, path_t *link_path)
     return result;
 }
 
-int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath, path_t *newpath)
+int filesystem_rename(fsnode_t *atoldpath, Path *oldpath, fsnode_t *atnewpath, Path *newpath)
 {
     IS_FS_READY;
 
@@ -695,7 +695,7 @@ int filesystem_rename(fsnode_t *atoldpath, path_t *oldpath, fsnode_t *atnewpath,
     return result;
 }
 
-bool filesystem_exist(fsnode_t *at, path_t *p)
+bool filesystem_exist(fsnode_t *at, Path *p)
 {
     fsnode_t *node = filesystem_acquire(at, p, false);
 

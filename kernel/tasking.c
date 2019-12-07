@@ -113,7 +113,7 @@ task_t *task(task_t *parent, const char *name, bool user)
     }
     else
     {
-        path_t *p = path("/");
+        Path *p = path("/");
         this->cwd_path = p;
         assert(this->cwd_path);
 
@@ -207,7 +207,7 @@ void task_get_info(task_t *this, task_info_t *info)
     info->state = this->state;
 
     strlcpy(info->name, this->name, TASK_NAMESIZE);
-    path_to_cstring(this->cwd_path, info->cwd, PATH_LENGHT);
+    Patho_cstring(this->cwd_path, info->cwd, PATH_LENGHT);
 
     info->usage_cpu = (sheduler_get_usage(this->id) * 100) / SHEDULER_RECORD_COUNT;
 }
@@ -607,7 +607,7 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
 
 int task_open_file(task_t *this, const char *file_path, IOStreamFlag flags)
 {
-    path_t *p = task_cwd_resolve(this, file_path);
+    Path *p = task_cwd_resolve(this, file_path);
 
     stream_t *stream = filesystem_open(NULL, p, flags);
 
@@ -874,15 +874,15 @@ int task_exec(const char *executable_path, const char **argv)
 
 /* --- Current working directory -------------------------------------------- */
 
-path_t *task_cwd_resolve(task_t *this, const char *path_to_resolve)
+Path *task_cwd_resolve(task_t *this, const char *Patho_resolve)
 {
-    path_t *p = path(path_to_resolve);
+    Path *p = path(Patho_resolve);
 
     if (path_is_relative(p))
     {
         lock_acquire(this->cwd_lock);
 
-        path_t *combined = path_combine(this->cwd_path, p);
+        Path *combined = path_combine(this->cwd_path, p);
         path_delete(p);
         p = combined;
 
@@ -896,7 +896,7 @@ path_t *task_cwd_resolve(task_t *this, const char *path_to_resolve)
 
 int task_set_cwd(task_t *this, const char *new_path)
 {
-    path_t *work_path = task_cwd_resolve(this, new_path);
+    Path *work_path = task_cwd_resolve(this, new_path);
 
     lock_acquire(this->cwd_lock);
 
@@ -942,7 +942,7 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
 {
     lock_acquire(this->cwd_lock);
 
-    path_to_cstring(this->cwd_path, buffer, size);
+    Patho_cstring(this->cwd_path, buffer, size);
 
     lock_release(this->cwd_lock);
 }

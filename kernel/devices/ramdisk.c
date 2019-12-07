@@ -21,7 +21,7 @@ void ramdiload(multiboot_module_t *module)
     tar_block_t block;
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
     {
-        path_t *file_path = path(block.name);
+        Path *file_path = path(block.name);
 
         if (block.name[strlen(block.name) - 1] == '/')
         {

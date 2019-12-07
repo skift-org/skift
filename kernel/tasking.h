@@ -84,7 +84,7 @@ typedef struct task
 
     Lock cwd_lock;
     fsnode_t* cwd_node;
-    path_t* cwd_path;
+    Path* cwd_path;
 
     page_directorie_t *pdir; // Page directorie
 
@@ -166,7 +166,7 @@ void task_memory_free(task_t* this, uint addr, uint count);
 
 /* --- Task current working directory --------------------------------------- */
 
-path_t* task_cwd_resolve(task_t* this, const char* path_to_resolve);
+Path* task_cwd_resolve(task_t* this, const char* Patho_resolve);
 
 int task_set_cwd(task_t* this, const char* new_wd);
 

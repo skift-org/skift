@@ -78,7 +78,7 @@ int ls(const char *target_path)
         {
             IOStreamDirentry entry;
             entry.stat = stat;
-            path_t *p = path(target_path);
+            Path *p = path(target_path);
             strlcpy(entry.name, path_filename(p), PATH_LENGHT);
             ls_print_entry(&entry);
             path_delete(p);

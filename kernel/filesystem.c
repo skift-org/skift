@@ -215,7 +215,7 @@ void filesystem_panic_dump(void)
 /* --- Filesystem Operations ------------------------------------------------ */
 
 #define OPEN_OPTION(__opt) ((flags & __opt) && 1)
-stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags)
+stream_t *filesystem_open(fsnode_t *at, path_t *p, IOStreamFlag flags)
 {
     IS_FS_READY;
 
@@ -448,7 +448,7 @@ int filesystem_call(stream_t *s, int request, void *args)
     return result;
 }
 
-int filesystem_stat(stream_t *s, iostream_stat_t *stat)
+int filesystem_stat(stream_t *s, IOStreamState *stat)
 {
     IS_FS_READY;
 
@@ -463,7 +463,7 @@ int filesystem_stat(stream_t *s, iostream_stat_t *stat)
     }
 }
 
-int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
+int filesystem_seek(stream_t *s, int offset, IOStreamWhence origine)
 {
     IS_FS_READY;
 
@@ -488,7 +488,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
             }
             else if (s->node->type == FSNODE_DIRECTORY)
             {
-                s->offset = s->direntries.count * sizeof(iostream_direntry_t) + offset;
+                s->offset = s->direntries.count * sizeof(IOStreamDirentry) + offset;
             }
             else
             {
@@ -511,7 +511,7 @@ int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine)
     }
 }
 
-int filesystem_tell(stream_t *s, iostream_whence_t whence)
+int filesystem_tell(stream_t *s, IOStreamWhence whence)
 {
     IS_FS_READY;
 

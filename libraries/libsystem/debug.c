@@ -5,7 +5,7 @@
 #include <libsystem/debug.h>
 #include <libsystem/process.h>
 
-void debug_hexdump(iostream_t *stream, char *desc, const void *addr, int len)
+void debug_hexdump(IOStream *stream, char *desc, const void *addr, int len)
 {
     int i;
     unsigned char buff[17];

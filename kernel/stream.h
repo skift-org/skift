@@ -7,7 +7,7 @@ struct fsnode;
 typedef struct
 {
     int count;
-    iostream_direntry_t *entries;
+    IOStreamDirentry *entries;
 } directory_entries_t;
 
 typedef struct
@@ -22,7 +22,7 @@ typedef struct stream
 {
     struct fsnode *node;
     uint offset;
-    iostream_flag_t flags;
+    IOStreamFlag flags;
 
     union {
         directory_entries_t direntries;
@@ -30,6 +30,6 @@ typedef struct stream
     };
 } stream_t;
 
-stream_t *stream(struct fsnode *node, iostream_flag_t flags);
+stream_t *stream(struct fsnode *node, IOStreamFlag flags);
 
 void stream_delete(stream_t *s);

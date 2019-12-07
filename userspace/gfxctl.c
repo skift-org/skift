@@ -66,7 +66,7 @@ framebuffer_mode_arg_t *gfxmode_by_name(const char *name)
     return NULL;
 }
 
-int gfxmode_get(iostream_t *framebuffer_device)
+int gfxmode_get(IOStream *framebuffer_device)
 {
     framebuffer_mode_arg_t framebuffer_info;
 
@@ -83,7 +83,7 @@ int gfxmode_get(iostream_t *framebuffer_device)
     return 0;
 }
 
-int gfxmode_set(iostream_t *framebuffer_device, const char *mode_name)
+int gfxmode_set(IOStream *framebuffer_device, const char *mode_name)
 {
     framebuffer_mode_arg_t *framebuffer_info = gfxmode_by_name(mode_name);
 
@@ -106,7 +106,7 @@ int gfxmode_set(iostream_t *framebuffer_device, const char *mode_name)
     }
 }
 
-int gfxmode_list(iostream_t *framebuffer_device)
+int gfxmode_list(IOStream *framebuffer_device)
 {
     // FIXME: check if the framebuffer device support the followings graphics modes.
 
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    iostream_t *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
 
     if (framebuffer_device == NULL)
     {

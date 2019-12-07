@@ -12,9 +12,9 @@
 
 /* --- IO Stream constructor and destructor --------------------------------- */
 
-iostream_t *iostream(iostream_flag_t flags)
+IOStream *iostream_create(IOStreamFlag flags)
 {
-    iostream_t *stream = MALLOC(iostream_t);
+    IOStream *stream = MALLOC(IOStream);
 
     stream->flags = flags;
 
@@ -64,7 +64,7 @@ iostream_t *iostream(iostream_flag_t flags)
     return stream;
 }
 
-void iostream_delete(iostream_t *stream)
+void iostream_destroy(IOStream *stream)
 {
     if (stream->close != NULL)
     {
@@ -76,7 +76,7 @@ void iostream_delete(iostream_t *stream)
 
 /* --- iostream open/close -------------------------------------------------- */
 
-iostream_t *iostream_open(const char *path, iostream_flag_t flags)
+IOStream *iostream_open(const char *path, IOStreamFlag flags)
 {
     int fd = __plug_iostream_open(path, flags);
 
@@ -87,7 +87,7 @@ iostream_t *iostream_open(const char *path, iostream_flag_t flags)
         return NULL;
     }
 
-    iostream_t *stream = iostream(flags);
+    IOStream *stream = iostream_create(flags);
     if (stream == NULL)
     {
         __plug_iostream_close(fd);
@@ -98,7 +98,7 @@ iostream_t *iostream_open(const char *path, iostream_flag_t flags)
     return stream;
 }
 
-void iostream_close(iostream_t *stream)
+void iostream_close(IOStream *stream)
 {
     if (stream != NULL)
     {
@@ -120,7 +120,7 @@ void iostream_close(iostream_t *stream)
 
 /* --- Iostream buffering mode ---------------------------------------------- */
 
-void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
+void iostream_set_read_buffer_mode(IOStream *this, IOStreamBufferMode mode)
 {
     iostream_flush(this);
 
@@ -142,7 +142,7 @@ void iostream_set_read_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode
     this->read_mode = mode;
 }
 
-void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mode)
+void iostream_set_write_buffer_mode(IOStream *this, IOStreamBufferMode mode)
 {
     iostream_flush(this);
 
@@ -166,7 +166,7 @@ void iostream_set_write_buffer_mode(iostream_t *this, iostream_buffer_mode_t mod
 
 /* --- IO Stream generic io operation --------------------------------------- */
 
-int iostream_read_no_buffered(iostream_t *stream, void *buffer, uint size)
+int iostream_read_no_buffered(IOStream *stream, void *buffer, uint size)
 {
     if (stream->read != NULL)
     {
@@ -182,7 +182,7 @@ int iostream_read_no_buffered(iostream_t *stream, void *buffer, uint size)
     }
 }
 
-int iostream_fill(iostream_t *stream)
+int iostream_fill(IOStream *stream)
 {
     stream->read_used = iostream_read_no_buffered(stream, stream->read_buffer, IOSTREAM_BUFFER_SIZE);
     stream->read_head = 0;
@@ -190,7 +190,7 @@ int iostream_fill(iostream_t *stream)
     return stream->read_used;
 }
 
-int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
+int iostream_read_buffered(IOStream *stream, void *buffer, uint size)
 {
     uint data_left = size;
     char *data_to_read = (char *)buffer;
@@ -222,7 +222,7 @@ int iostream_read_buffered(iostream_t *stream, void *buffer, uint size)
     return size - data_left;
 }
 
-int iostream_read(iostream_t *stream, void *buffer, uint size)
+int iostream_read(IOStream *stream, void *buffer, uint size)
 {
     if (stream != NULL)
     {
@@ -249,7 +249,7 @@ int iostream_read(iostream_t *stream, void *buffer, uint size)
     }
 }
 
-static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, int size)
+static int iostream_write_no_buffered(IOStream *stream, const void *buffer, int size)
 {
     if (stream->write != NULL)
     {
@@ -265,7 +265,7 @@ static int iostream_write_no_buffered(iostream_t *stream, const void *buffer, in
     }
 }
 
-int iostream_flush(iostream_t *stream)
+int iostream_flush(IOStream *stream)
 {
     if (stream != NULL)
     {
@@ -283,7 +283,7 @@ int iostream_flush(iostream_t *stream)
     }
 }
 
-static int iostream_write_linebuffered(iostream_t *stream, const void *buffer, uint size)
+static int iostream_write_linebuffered(IOStream *stream, const void *buffer, uint size)
 {
     for (uint i = 0; i < size; i++)
     {
@@ -303,7 +303,7 @@ static int iostream_write_linebuffered(iostream_t *stream, const void *buffer, u
     return size;
 }
 
-static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint size)
+static int iostream_write_buffered(IOStream *stream, const void *buffer, uint size)
 {
     int data_left = size;
 
@@ -331,7 +331,7 @@ static int iostream_write_buffered(iostream_t *stream, const void *buffer, uint 
     return size;
 }
 
-int iostream_write(iostream_t *stream, const void *buffer, uint size)
+int iostream_write(IOStream *stream, const void *buffer, uint size)
 {
     if (stream != NULL)
     {
@@ -358,7 +358,7 @@ int iostream_write(iostream_t *stream, const void *buffer, uint size)
     }
 }
 
-int iostream_tell(iostream_t *stream, iostream_whence_t whence)
+int iostream_tell(IOStream *stream, IOStreamWhence whence)
 {
     if (stream != NULL)
     {
@@ -376,7 +376,7 @@ int iostream_tell(iostream_t *stream, iostream_whence_t whence)
     return 0;
 }
 
-int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence)
+int iostream_seek(IOStream *stream, int offset, IOStreamWhence whence)
 {
     if (stream != NULL)
     {
@@ -394,11 +394,11 @@ int iostream_seek(iostream_t *stream, int offset, iostream_whence_t whence)
     return 0;
 }
 
-int iostream_stat(iostream_t *stream, iostream_stat_t *stat)
+int iostream_stat(IOStream *stream, IOStreamState *stat)
 {
     if (stream != NULL && stat != NULL)
     {
-        *stat = (iostream_stat_t){0};
+        *stat = (IOStreamState){0};
 
         if (stream->stat != NULL)
         {
@@ -414,7 +414,7 @@ int iostream_stat(iostream_t *stream, iostream_stat_t *stat)
     return -1;
 }
 
-int iostream_call(iostream_t *stream, int request, void *arg)
+int iostream_call(IOStream *stream, int request, void *arg)
 {
     if (stream != NULL)
     {
@@ -441,7 +441,7 @@ int iostream_call(iostream_t *stream, int request, void *arg)
     return -1;
 }
 
-int iostream_putchar(iostream_t *stream, int c)
+int iostream_putchar(IOStream *stream, int c)
 {
     if (iostream_write(stream, &c, 1) == 1)
     {
@@ -453,7 +453,7 @@ int iostream_putchar(iostream_t *stream, int c)
     }
 }
 
-int iostream_getchar(iostream_t *stream)
+int iostream_getchar(IOStream *stream)
 {
     uchar c;
 
@@ -467,7 +467,7 @@ int iostream_getchar(iostream_t *stream)
     }
 }
 
-int iostream_ungetchar(iostream_t *stream, char c)
+int iostream_ungetchar(IOStream *stream, char c)
 {
     if (stream->has_unget)
     {
@@ -482,12 +482,12 @@ int iostream_ungetchar(iostream_t *stream, char c)
     }
 }
 
-int iostream_puts(iostream_t *stream, const char *string)
+int iostream_puts(IOStream *stream, const char *string)
 {
     return iostream_write(stream, string, strlen(string));
 }
 
-char *iostream_gets(iostream_t *stream, char *string, int n)
+char *iostream_gets(IOStream *stream, char *string, int n)
 {
     if (stream != NULL && string != NULL)
     {
@@ -519,11 +519,11 @@ char *iostream_gets(iostream_t *stream, char *string, int n)
 
 void iostream_printf_append(printf_info_t *info, char c)
 {
-    iostream_t *stream = info->output;
+    IOStream *stream = info->output;
     iostream_write(stream, &c, 1);
 }
 
-int iostream_printf(iostream_t *stream, const char *fmt, ...)
+int iostream_printf(IOStream *stream, const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -535,7 +535,7 @@ int iostream_printf(iostream_t *stream, const char *fmt, ...)
     return result;
 }
 
-int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
+int iostream_vprintf(IOStream *stream, const char *fmt, va_list va)
 {
 
     printf_info_t info = (printf_info_t){
@@ -548,7 +548,7 @@ int iostream_vprintf(iostream_t *stream, const char *fmt, va_list va)
     return __printf(&info, va);
 }
 
-// TODO: int iostream_scanf(iostream_t *stream, const char *fmt, ...)
+// TODO: int iostream_scanf(IOStream *stream, const char *fmt, ...)
 //       {
 //
 //       }

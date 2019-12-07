@@ -13,10 +13,10 @@
 Lock memlock;
 Lock loglock;
 
-iostream_t *in_stream;
-iostream_t *out_stream;
-iostream_t *err_stream;
-iostream_t *log_stream;
+IOStream *in_stream;
+IOStream *out_stream;
+IOStream *err_stream;
+IOStream *log_stream;
 
 extern void _init();
 extern void _fini();

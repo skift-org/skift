@@ -27,7 +27,7 @@ void filesystem_release(fsnode_t *node);
 
 /* --- File IO -------------------------------------------------------------- */
 
-stream_t *filesystem_open(fsnode_t *at, path_t *p, iostream_flag_t flags);
+stream_t *filesystem_open(fsnode_t *at, path_t *p, IOStreamFlag flags);
 
 void filesystem_close(stream_t *s);
 
@@ -43,11 +43,11 @@ bool filesystem_can_write(stream_t *s);
 
 int filesystem_call(stream_t *s, int request, void *args);
 
-int filesystem_seek(stream_t *s, int offset, iostream_whence_t origine);
+int filesystem_seek(stream_t *s, int offset, IOStreamWhence origine);
 
-int filesystem_tell(stream_t *s, iostream_whence_t whence);
+int filesystem_tell(stream_t *s, IOStreamWhence whence);
 
-int filesystem_stat(stream_t *s, iostream_stat_t *stat);
+int filesystem_stat(stream_t *s, IOStreamState *stat);
 
 /* --- File system operation ------------------------------------------------ */
 

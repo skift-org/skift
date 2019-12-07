@@ -1,6 +1,6 @@
 #include "stream.h"
 
-stream_t *stream(struct fsnode *node, iostream_flag_t flags)
+stream_t *stream(struct fsnode *node, IOStreamFlag flags)
 {
     if (node == NULL)
         return NULL;

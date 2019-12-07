@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    iostream_t *random_device = iostream_open("/dev/random", IOSTREAM_READ);
+    IOStream *random_device = iostream_open("/dev/random", IOSTREAM_READ);
 
     if (random_device == NULL)
     {

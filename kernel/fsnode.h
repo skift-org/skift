@@ -18,7 +18,7 @@ typedef int (*fsop_close_t)(struct stream *s);
 typedef int (*fsop_read_t)(struct stream *s, void *buffer, uint size);
 typedef int (*fsop_write_t)(struct stream *s, const void *buffer, uint size);
 typedef int (*fsop_call_t)(struct stream *s, int request, void *args);
-typedef int (*fsop_stat_t)(struct stream *s, iostream_stat_t *stat);
+typedef int (*fsop_stat_t)(struct stream *s, IOStreamState *stat);
 
 typedef struct
 {
@@ -87,9 +87,9 @@ void fsnode_delete(fsnode_t *node);
 
 int fsnode_size(fsnode_t *node);
 
-iostream_type_t fsnode_type(fsnode_t *this);
+IOStreamType fsnode_type(fsnode_t *this);
 
-int fsnode_stat(fsnode_t *node, iostream_stat_t *stat);
+int fsnode_stat(fsnode_t *node, IOStreamState *stat);
 
 /* --- Files ---------------------------------------------------------------- */
 

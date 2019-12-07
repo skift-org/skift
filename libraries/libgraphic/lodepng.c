@@ -307,7 +307,7 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value) {
 
 /* returns negative value on error. This should be pure C compatible, so no stat. */
 static long lodepng_filesize(const char* filename) {
-  iostream_t* file;
+  IOStream* file;
   long size;
   file = iostream_open(filename, IOSTREAM_READ);
   if(!file) return -1;
@@ -327,7 +327,7 @@ static long lodepng_filesize(const char* filename) {
 
 /* load file into buffer that already has the correct allocated size. Returns error code.*/
 static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename) {
-  iostream_t* file;
+  IOStream* file;
   size_t readsize;
   file = iostream_open(filename, IOSTREAM_READ);
   if(!file) return 78;
@@ -352,7 +352,7 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
-  iostream_t* file;
+  IOStream* file;
   file = iostream_open(filename, IOSTREAM_WRITE);
   if(!file) return 79;
   iostream_write(file, buffer, buffersize);

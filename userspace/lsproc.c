@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    iostream_t *proc_device = iostream_open("/dev/proc", IOSTREAM_READ);
+    IOStream *proc_device = iostream_open("/dev/proc", IOSTREAM_READ);
 
     task_info_t info;
 

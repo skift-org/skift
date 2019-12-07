@@ -16,14 +16,14 @@
 
 /* --- Framework initialization --------------------------------------------- */
 
-iostream_t *in_stream;
-iostream_t *out_stream;
-iostream_t *err_stream;
-iostream_t *log_stream;
+IOStream *in_stream;
+IOStream *out_stream;
+IOStream *err_stream;
+IOStream *log_stream;
 
-iostream_t internal_log_stream = {0};
+IOStream internal_log_stream = {0};
 
-int log_stream_write(iostream_t *stream, const void *buffer, uint size)
+int log_stream_write(IOStream *stream, const void *buffer, uint size)
 {
     UNUSED(stream);
     return serial_write(buffer, size);
@@ -118,7 +118,7 @@ int __plug_logger_unlock()
 
 /* --- Iostream plugs ------------------------------------------------------- */
 
-int __plug_iostream_open(const char *file_path, iostream_flag_t flags)
+int __plug_iostream_open(const char *file_path, IOStreamFlag flags)
 {
     return task_open_file(sheduler_running(), file_path, flags);
 }
@@ -143,17 +143,17 @@ int __plug_iostream_call(int fd, int request, void *args)
     return task_call_file(sheduler_running(), fd, request, args);
 }
 
-int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence)
+int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence)
 {
     return task_seek_file(sheduler_running(), fd, offset, whence);
 }
 
-int __plug_iostream_tell(int fd, iostream_whence_t whence)
+int __plug_iostream_tell(int fd, IOStreamWhence whence)
 {
     return task_tell_file(sheduler_running(), fd, whence);
 }
 
-int __plug_iostream_stat(int fd, iostream_stat_t *stat)
+int __plug_iostream_stat(int fd, IOStreamState *stat)
 {
     return task_stat_file(sheduler_running(), fd, stat);
 }

@@ -7,11 +7,11 @@
 
 int cat(const char *path)
 {
-    iostream_t *stream = iostream_open(path, IOSTREAM_READ);
+    IOStream *stream = iostream_open(path, IOSTREAM_READ);
 
     if (stream != NULL)
     {
-        iostream_stat_t stat = {0};
+        IOStreamState stat = {0};
         iostream_stat(stream, &stat);
 
         if (stat.type == IOSTREAM_TYPE_DIRECTORY)

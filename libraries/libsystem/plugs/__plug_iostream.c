@@ -6,7 +6,7 @@
 #include <libsystem/iostream.h>
 #include <libkernel/syscalls.h>
 
-int __plug_iostream_open(const char *path, iostream_flag_t flags)
+int __plug_iostream_open(const char *path, IOStreamFlag flags)
 {
     return __syscall(SYS_FILESYSTEM_OPEN, (int)path, flags, 0, 0, 0);
 }
@@ -31,17 +31,17 @@ int __plug_iostream_call(int fd, int request, void *args)
     return __syscall(SYS_FILESYSTEM_CALL, fd, request, (int)args, 0, 0);
 }
 
-int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence)
+int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence)
 {
     return __syscall(SYS_FILESYSTEM_SEEK, fd, offset, whence, 0, 0);
 }
 
-int __plug_iostream_tell(int fd, iostream_whence_t whence)
+int __plug_iostream_tell(int fd, IOStreamWhence whence)
 {
     return __syscall(SYS_FILESYSTEM_TELL, fd, whence, 0, 0, 0);
 }
 
-int __plug_iostream_stat(int fd, iostream_stat_t *stat)
+int __plug_iostream_stat(int fd, IOStreamState *stat)
 {
     return __syscall(SYS_FILESYSTEM_STAT, fd, (int)stat, 0, 0, 0);
 }

@@ -601,7 +601,7 @@ int task_filedescriptor_free_and_release(task_t *this, int fd_index)
 
 /* --- task file operations ----------------------------------------------- */
 
-int task_open_file(task_t *this, const char *file_path, iostream_flag_t flags)
+int task_open_file(task_t *this, const char *file_path, IOStreamFlag flags)
 {
     path_t *p = task_cwd_resolve(this, file_path);
 
@@ -692,7 +692,7 @@ int task_call_file(task_t *this, int fd, int request, void *args)
     return result;
 }
 
-int task_seek_file(task_t *this, int fd, int offset, iostream_whence_t whence)
+int task_seek_file(task_t *this, int fd, int offset, IOStreamWhence whence)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -708,7 +708,7 @@ int task_seek_file(task_t *this, int fd, int offset, iostream_whence_t whence)
     return result;
 }
 
-int task_tell_file(task_t *this, int fd, iostream_whence_t whence)
+int task_tell_file(task_t *this, int fd, IOStreamWhence whence)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -724,7 +724,7 @@ int task_tell_file(task_t *this, int fd, iostream_whence_t whence)
     return result;
 }
 
-int task_stat_file(task_t *this, int fd, iostream_stat_t *stat)
+int task_stat_file(task_t *this, int fd, IOStreamState *stat)
 {
     stream_t *stream = task_filedescriptor_acquire(this, fd);
 
@@ -786,7 +786,7 @@ void task_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
+void load_elfseg(task_t *this, IOStream *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
@@ -811,7 +811,7 @@ void load_elfseg(task_t *this, iostream_t *s, elf_program_t *program)
 int task_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    iostream_t *s = iostream_open(executable_path, IOSTREAM_READ | IOSTREAM_BUFFERED_NONE);
+    IOStream *s = iostream_open(executable_path, IOSTREAM_READ | IOSTREAM_BUFFERED_NONE);
 
     if (s == NULL)
     {
@@ -820,7 +820,7 @@ int task_exec(const char *executable_path, const char **argv)
     }
 
     // Check if the file isn't a directory.
-    iostream_stat_t stat;
+    IOStreamState stat;
     iostream_stat(s, &stat);
 
     if (stat.type != IOSTREAM_TYPE_REGULAR)

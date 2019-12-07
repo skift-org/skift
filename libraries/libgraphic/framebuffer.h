@@ -7,7 +7,7 @@
 typedef struct
 {
 
-    iostream_t *device;
+    IOStream *device;
     bitmap_t *backbuffer;
     painter_t *painter;
 

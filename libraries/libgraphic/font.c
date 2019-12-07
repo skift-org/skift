@@ -19,7 +19,7 @@ glyph_t *font_load_glyph(const char *name)
     snprintf(glyph_path, PATH_LENGHT, "/res/font/%s.glyph", name);
     logger_trace("Loading fonts glyph of %s from %s", name, glyph_path);
 
-    iostream_t *glyph_file = iostream_open(glyph_path, IOSTREAM_READ);
+    IOStream *glyph_file = iostream_open(glyph_path, IOSTREAM_READ);
 
     if (glyph_file == NULL)
     {
@@ -28,7 +28,7 @@ glyph_t *font_load_glyph(const char *name)
         return NULL;
     }
 
-    iostream_stat_t stat;
+    IOStreamState stat;
     iostream_stat(glyph_file, &stat);
     if (stat.type != IOSTREAM_TYPE_REGULAR)
     {

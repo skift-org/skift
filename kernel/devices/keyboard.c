@@ -142,14 +142,14 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 keymap_t *keyboard_load_keymap(const char *path)
 {
-    iostream_t *kmfile = iostream_open(path, IOSTREAM_READ);
+    IOStream *kmfile = iostream_open(path, IOSTREAM_READ);
 
     if (kmfile == NULL)
     {
         return NULL;
     }
 
-    iostream_stat_t stat;
+    IOStreamState stat;
     iostream_stat(kmfile, &stat);
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);

@@ -251,7 +251,7 @@ bool shell_eval(shell_t *this)
     }
 
     // Or exec a real command
-    iostream_t *s = iostream_open(this->command_argv[0], IOSTREAM_READ);
+    IOStream *s = iostream_open(this->command_argv[0], IOSTREAM_READ);
 
     int process = 0;
 

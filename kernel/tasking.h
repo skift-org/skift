@@ -184,7 +184,7 @@ int task_filedescriptor_release(task_t *this, int fd_index);
 
 int task_filedescriptor_free_and_release(task_t *this, int fd_index);
 
-int task_open_file(task_t* this, const char *file_path, iostream_flag_t flags);
+int task_open_file(task_t* this, const char *file_path, IOStreamFlag flags);
 
 int task_close_file(task_t* this, int fd);
 
@@ -194,11 +194,11 @@ int task_write_file(task_t* this, int fd, const void *buffer, uint size);
 
 int task_call_file(task_t* this, int fd, int request, void *args);
 
-int task_seek_file(task_t* this, int fd, int offset, iostream_whence_t whence);
+int task_seek_file(task_t* this, int fd, int offset, IOStreamWhence whence);
 
-int task_tell_file(task_t* this, int fd, iostream_whence_t whence);
+int task_tell_file(task_t* this, int fd, IOStreamWhence whence);
 
-int task_stat_file(task_t* this, int fd, iostream_stat_t *stat);
+int task_stat_file(task_t* this, int fd, IOStreamState *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */      

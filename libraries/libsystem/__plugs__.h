@@ -38,7 +38,7 @@ int __plug_memalloc_free(void *memory, uint size);
 
 // IO stream ---------------------------------------------------------------- //
 
-int __plug_iostream_open(const char *path, iostream_flag_t flags);
+int __plug_iostream_open(const char *path, IOStreamFlag flags);
 
 int __plug_iostream_close(int fd);
 
@@ -48,11 +48,11 @@ int __plug_iostream_write(int fd, const void *buffer, uint size);
 
 int __plug_iostream_call(int fd, int request, void *args);
 
-int __plug_iostream_seek(int fd, int offset, iostream_whence_t whence);
+int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence);
 
-int __plug_iostream_tell(int fd, iostream_whence_t whence);
+int __plug_iostream_tell(int fd, IOStreamWhence whence);
 
-int __plug_iostream_stat(int fd, iostream_stat_t *stat);
+int __plug_iostream_stat(int fd, IOStreamState *stat);
 
 /* --- File system ---------------------------------------------------------- */
 

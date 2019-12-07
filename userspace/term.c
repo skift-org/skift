@@ -11,11 +11,11 @@
 #include <libconsole/vtconsole.h>
 #include <libgraphic/framebuffer.h>
 
-static iostream_t *terminal_fifo = NULL;
+static IOStream *terminal_fifo = NULL;
 
 /* --- Textmode terminal ---------------------------------------------------- */
 
-static iostream_t *textmode_device = NULL;
+static IOStream *textmode_device = NULL;
 static textmode_info_t textmode_info;
 static ushort *textmode_buffer = NULL;
 

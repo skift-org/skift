@@ -38,9 +38,9 @@ const char *file_type_name[] = {
     "p", // Pipe
 };
 
-void ls_print_entry(iostream_direntry_t *entry)
+void ls_print_entry(IOStreamDirentry *entry)
 {
-    iostream_stat_t *stat = &entry->stat;
+    IOStreamState *stat = &entry->stat;
 
     if (option_list)
     {
@@ -58,16 +58,16 @@ void ls_print_entry(iostream_direntry_t *entry)
 
 int ls(const char *target_path)
 {
-    iostream_t *dir = iostream_open(target_path, IOSTREAM_READ);
+    IOStream *dir = iostream_open(target_path, IOSTREAM_READ);
 
     if (dir != NULL)
     {
-        iostream_stat_t stat = {0};
+        IOStreamState stat = {0};
         iostream_stat(dir, &stat);
 
         if (stat.type == IOSTREAM_TYPE_DIRECTORY)
         {
-            iostream_direntry_t entry;
+            IOStreamDirentry entry;
 
             while (iostream_read(dir, &entry, sizeof(entry)) > 0)
             {
@@ -76,7 +76,7 @@ int ls(const char *target_path)
         }
         else
         {
-            iostream_direntry_t entry;
+            IOStreamDirentry entry;
             entry.stat = stat;
             path_t *p = path(target_path);
             strlcpy(entry.name, path_filename(p), PATH_LENGHT);

@@ -101,7 +101,7 @@ int fsnode_size(fsnode_t *node)
     return 0;
 }
 
-iostream_type_t fsnode_type(fsnode_t *this)
+IOStreamType fsnode_type(fsnode_t *this)
 {
     switch (this->type)
     {
@@ -116,7 +116,7 @@ iostream_type_t fsnode_type(fsnode_t *this)
     }
 }
 
-int fsnode_stat(fsnode_t *node, iostream_stat_t *stat)
+int fsnode_stat(fsnode_t *node, IOStreamState *stat)
 {
     stat->type = fsnode_type(node);
     stat->size = fsnode_size(node);
@@ -233,8 +233,8 @@ directory_entries_t directory_entries(fsnode_t *dir)
     lock_acquire(dir->lock);
 
     int entries_count = dir->directory.childs->count;
-    iostream_direntry_t *entries = malloc(sizeof(iostream_direntry_t) * entries_count);
-    iostream_direntry_t *current = &entries[0];
+    IOStreamDirentry *entries = malloc(sizeof(IOStreamDirentry) * entries_count);
+    IOStreamDirentry *current = &entries[0];
 
     list_foreach(i, dir->directory.childs)
     {
@@ -306,13 +306,13 @@ bool directory_unlink(fsnode_t *dir, const char *name)
 
 int directory_read(stream_t *stream, void *buffer, uint size)
 {
-    int index = stream->offset / sizeof(iostream_direntry_t);
+    int index = stream->offset / sizeof(IOStreamDirentry);
 
-    if (size == sizeof(iostream_direntry_t))
+    if (size == sizeof(IOStreamDirentry))
     {
         if (index < stream->direntries.count)
         {
-            int entrysize = sizeof(iostream_direntry_t);
+            int entrysize = sizeof(IOStreamDirentry);
 
             memcpy(buffer, &stream->direntries.entries[index], entrysize);
             stream->offset += entrysize;

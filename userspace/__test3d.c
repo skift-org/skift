@@ -123,19 +123,19 @@ vector3_t matrix_apply_tranform(vector3_t position, matrix_t transform)
     return out;
 }
 
-void painter3D_draw_line(painter_t *paint, vector3_t va, vector3_t vb, color_t color)
+void painter3D_draw_line(Painter *paint, vector3_t va, vector3_t vb, color_t color)
 {
     painter_draw_line(paint, (point_t){va.X, va.Y}, (point_t){vb.X, vb.Y}, color);
 }
 
-void painter3D_draw_face(painter_t *paint, face_t face, color_t color)
+void painter3D_draw_face(Painter *paint, face_t face, color_t color)
 {
     painter3D_draw_line(paint, face.a, face.b, color);
     painter3D_draw_line(paint, face.b, face.c, color);
     painter3D_draw_line(paint, face.c, face.a, color);
 }
 
-void painter3D_fill_face(painter_t *paint, face_t face, color_t color)
+void painter3D_fill_face(Painter *paint, face_t face, color_t color)
 {
     vector3_t a = face.a;
     vector3_t b = face.b;

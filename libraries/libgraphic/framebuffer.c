@@ -23,9 +23,9 @@ framebuffer_t *framebuffer_open(void)
 
     logger_info("Framebuffer create with graphic mode %dx%d.", mode_info.size.X, mode_info.size.Y);
 
-    bitmap_t *framebuffer_backbuffer = bitmap(mode_info.size.X, mode_info.size.Y);
+    Bitmap *framebuffer_backbuffer = bitmap_create(mode_info.size.X, mode_info.size.Y);
 
-    painter_t *framebuffer_painter = painter(framebuffer_backbuffer);
+    Painter *framebuffer_painter = painter_create(framebuffer_backbuffer);
 
     framebuffer_t *this = __malloc(framebuffer_t);
 
@@ -52,11 +52,11 @@ bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
         return false;
     }
 
-    object_release(this->backbuffer);
-    object_release(this->painter);
+    painter_destroy(this->painter);
+    bitmap_destroy(this->backbuffer);
 
-    this->backbuffer = bitmap(resx, resy);
-    this->painter = painter(this->backbuffer);
+    this->backbuffer = bitmap_create(resx, resy);
+    this->painter = painter_create(this->backbuffer);
 
     this->width = mode_info.size.X;
     this->height = mode_info.size.Y;
@@ -101,7 +101,7 @@ void framebuffer_blit_dirty(framebuffer_t *this)
     {
         framebuffer_blitregion_args_t args;
 
-        args.buffer = this->backbuffer->buffer;
+        args.buffer = this->backbuffer->pixels;
         args.size = bitmap_bound(this->backbuffer).size;
         args.region_to_blit = this->dirty_bound;
 
@@ -118,7 +118,7 @@ void framebuffer_blit(framebuffer_t *this)
 {
     framebuffer_blit_args_t args;
 
-    args.buffer = this->backbuffer->buffer;
+    args.buffer = this->backbuffer->pixels;
     args.size = bitmap_bound(this->backbuffer).size;
 
     if (iostream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != 0)
@@ -132,8 +132,8 @@ void framebuffer_blit(framebuffer_t *this)
 void framebuffer_close(framebuffer_t *this)
 {
     iostream_close(this->device);
-    object_release(this->backbuffer);
-    object_release(this->painter);
+    painter_destroy(this->painter);
+    bitmap_destroy(this->backbuffer);
 
     free(this);
 }

@@ -12,32 +12,31 @@ typedef enum
 {
     BITMAP_FILTERING_NEAREST,
     BITMAP_FILTERING_LINEAR,
-} bitmap_filtering_t;
+} BitmapFiltering;
 
-typedef struct bitmap_s
+typedef struct
 {
-    bool shared;
-
     int width;
     int height;
+    BitmapFiltering filtering;
 
-    bitmap_filtering_t filtering;
+    color_t pixels[];
+} Bitmap;
 
-    color_t *buffer;
-} bitmap_t;
+Bitmap *bitmap_create(uint width, uint height);
 
-bitmap_t *bitmap(uint width, uint height);
+void bitmap_destroy(Bitmap *this);
 
-bitmap_t *bitmap_load_from(const char *path);
+Bitmap *bitmap_load_from(const char *path);
 
-int bitmap_save_to(bitmap_t *bmp, const char *path);
+int bitmap_save_to(Bitmap *bmp, const char *path);
 
-void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color);
+void bitmap_set_pixel(Bitmap *bmp, point_t p, color_t color);
 
-color_t bitmap_get_pixel(bitmap_t *bmp, point_t p);
+color_t bitmap_get_pixel(Bitmap *bmp, point_t p);
 
-color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y);
+color_t bitmap_sample(Bitmap *bmp, rectangle_t src_rect, float x, float y);
 
-void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color);
+void bitmap_blend_pixel(Bitmap *bmp, point_t p, color_t color);
 
-rectangle_t bitmap_bound(bitmap_t *bmp);
+rectangle_t bitmap_bound(Bitmap *bmp);

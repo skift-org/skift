@@ -6,10 +6,9 @@
 
 typedef struct
 {
-
     IOStream *device;
-    bitmap_t *backbuffer;
-    painter_t *painter;
+    Bitmap *backbuffer;
+    Painter *painter;
 
     int width;
     int height;

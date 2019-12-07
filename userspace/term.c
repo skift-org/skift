@@ -147,7 +147,7 @@ vtconsole_t *terminal_create_framebuffer_console(void)
     return vtconsole(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, NULL, framebuffer_cursor_move_callback);
 }
 
-void paint_repaint_dirty(vtconsole_t *console, painter_t *paint)
+void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
 {
     int repainted_cell = 0;
 

@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct
 {
-    bitmap_t *bitmap;
+    Bitmap *bitmap;
 
     glyph_t default_glyph;
     glyph_t *glyph;

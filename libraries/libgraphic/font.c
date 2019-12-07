@@ -46,13 +46,13 @@ glyph_t *font_load_glyph(const char *name)
     return glyph;
 }
 
-bitmap_t *font_load_bitmap(const char *name)
+Bitmap *font_load_bitmap_create(const char *name)
 {
     char bitmap_path[PATH_LENGHT];
     snprintf(bitmap_path, PATH_LENGHT, "/res/font/%s.png", name);
     logger_trace("Loading fonts bitmap of %s from %s", name, bitmap_path);
 
-    bitmap_t *bmp = bitmap_load_from(bitmap_path);
+    Bitmap *bmp = bitmap_load_from(bitmap_path);
 
     if (bmp == NULL)
     {
@@ -78,7 +78,7 @@ font_t *font(const char *name)
         return NULL;
     }
 
-    bitmap_t *bmp = font_load_bitmap(name);
+    Bitmap *bmp = font_load_bitmap_create(name);
 
     if (bmp == NULL)
     {
@@ -104,7 +104,7 @@ void font_delete(font_t *this)
     assert(this);
 
     free(this->glyph);
-    object_release(this->bitmap);
+    bitmap_destroy(this->bitmap);
 }
 
 glyph_t *font_glyph(font_t *this, int codepoint)

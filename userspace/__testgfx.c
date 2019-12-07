@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    bitmap_t *test = bitmap_load_from("/res/font/mono.png");
+    Bitmap *test = bitmap_load_from("/res/font/mono.png");
 
     assert(test);
     logger_info("Image loaded %dx%d", test->width, test->height);

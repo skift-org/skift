@@ -7,52 +7,37 @@
 
 #include "lodepng.h"
 
-void bitmap_delete(bitmap_t *bmp);
-
-bitmap_t *bitmap_from_buffer(uint width, uint height, color_t *buffer)
+Bitmap *bitmap_create(uint width, uint height)
 {
-    bitmap_t *bitmap = OBJECT(bitmap);
+    Bitmap *this = malloc(sizeof(Bitmap) + width * height * sizeof(color_t));
 
-    bitmap->width = width;
-    bitmap->height = height;
-    bitmap->buffer = buffer;
-    bitmap->shared = true;
+    this->width = width;
+    this->height = height;
+    this->filtering = BITMAP_FILTERING_NEAREST;
 
-    bitmap->filtering = BITMAP_FILTERING_NEAREST;
-
-    return bitmap;
+    return this;
 }
 
-bitmap_t *bitmap(uint width, uint height)
+void bitmap_destroy(Bitmap *this)
 {
-    bitmap_t *bitmap = bitmap_from_buffer(width, height, (color_t *)malloc(sizeof(color_t) * width * height));
-
-    bitmap->shared = false;
-
-    return bitmap;
+    free(this);
 }
 
-void bitmap_delete(bitmap_t *bmp)
-{
-    if (!bmp->shared)
-        free(bmp->buffer);
-}
-
-void bitmap_set_pixel(bitmap_t *bmp, point_t p, color_t color)
+void bitmap_set_pixel(Bitmap *bmp, point_t p, color_t color)
 {
     if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
-        bmp->buffer[(int)(p.X + p.Y * bmp->width)] = color;
+        bmp->pixels[(int)(p.X + p.Y * bmp->width)] = color;
 }
 
-color_t bitmap_get_pixel(bitmap_t *bmp, point_t p)
+color_t bitmap_get_pixel(Bitmap *bmp, point_t p)
 {
     int xi = abs((int)p.X % bmp->width);
     int yi = abs((int)p.Y % bmp->height);
 
-    return bmp->buffer[xi + yi * bmp->width];
+    return bmp->pixels[xi + yi * bmp->width];
 }
 
-color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
+color_t bitmap_sample(Bitmap *bmp, rectangle_t src_rect, float x, float y)
 {
     color_t result;
 
@@ -79,12 +64,12 @@ color_t bitmap_sample(bitmap_t *bmp, rectangle_t src_rect, float x, float y)
     return result;
 }
 
-rectangle_t bitmap_bound(bitmap_t *bmp)
+rectangle_t bitmap_bound(Bitmap *bmp)
 {
     return (rectangle_t){{0, 0, bmp->width, bmp->height}};
 }
 
-void bitmap_blend_pixel(bitmap_t *bmp, point_t p, color_t color)
+void bitmap_blend_pixel(Bitmap *bmp, point_t p, color_t color)
 {
     color_t bg = bitmap_get_pixel(bmp, p);
     bitmap_set_pixel(bmp, p, color_blend(color, bg));
@@ -97,7 +82,7 @@ static color_t placeholder_buffer[] = {
     (color_t){{255, 0, 255, 255}},
 };
 
-bitmap_t *bitmap_load_from(const char *path)
+Bitmap *bitmap_load_from(const char *path)
 {
     uchar *buffer;
     uint width = 0, height = 0;
@@ -105,18 +90,24 @@ bitmap_t *bitmap_load_from(const char *path)
 
     if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
     {
-        bitmap_t *bmp = bitmap_from_buffer(width, height, (color_t *)buffer);
-        bmp->shared = false;
-        return bmp;
+        Bitmap *this = bitmap_create(width, height);
+
+        memcpy(this->pixels, buffer, width * height * sizeof(color_t));
+        free(buffer);
+
+        return this;
     }
     else
     {
         logger_error("Failled to load from %s: %s", path, lodepng_error_text(error));
-        return bitmap_from_buffer(2, 2, (color_t *)&placeholder_buffer);
+
+        Bitmap *this = bitmap_create(width, height);
+        memcpy(this->pixels, placeholder_buffer, 2 * 2 * sizeof(color_t));
+        return this;
     }
 }
 
-int bitmap_save_to(bitmap_t *bmp, const char *path)
+int bitmap_save_to(Bitmap *bmp, const char *path)
 {
-    return lodepng_encode32_file(path, (const uchar *)bmp->buffer, bmp->width, bmp->height);
+    return lodepng_encode32_file(path, (const uchar *)bmp->pixels, bmp->width, bmp->height);
 }

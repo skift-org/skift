@@ -10,7 +10,7 @@
 #include "filesystem.h"
 #include "multiboot.h"
 
-void ramdiload(multiboot_module_t *module)
+void ramdisk_load(multiboot_module_t *module)
 {
     // Extract the ramdisk tar archive.
 

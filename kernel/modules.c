@@ -21,7 +21,7 @@ void load_module(multiboot_module_t *module)
 {
     if (strcmp("ramdisk", (char *)module->cmdline) == 0)
     {
-        ramdiload(module);
+        ramdisk_load(module);
     }
     else
     {

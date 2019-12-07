@@ -14,15 +14,15 @@ typedef enum
     LOGGER_WARN,
     LOGGER_ERROR,
     LOGGER_FATAL,
-} log_level_t;
+} LogLevel;
 
-void logger_level(log_level_t log_level);
+void logger_level(LogLevel log_level);
 
 void logger_colors(bool use_colors);
 
 void logger_quiet(bool quiet);
 
-void logger_log(log_level_t level, const char *file, uint line, const char *fmt, ...);
+void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ...);
 
 #define logger_trace(__args...) logger_log(LOGGER_TRACE, __FILE__, __LINE__, __args)
 

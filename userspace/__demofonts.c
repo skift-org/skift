@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; fonts[i] != NULL; i++)
     {
-        painter_draw_text(fb->painter, fonts[i], TEXT, strlen(TEXT), (point_t){16, 32 + 32 * i}, 16, COLOR_WHITE);
+        painter_draw_text(fb->painter, fonts[i], TEXT, strlen(TEXT), (Point){16, 32 + 32 * i}, 16, COLOR_WHITE);
     }
 
     framebuffer_blit(fb);

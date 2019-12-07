@@ -43,7 +43,7 @@ framebuffer_t *framebuffer_open(void)
 bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
 {
     framebuffer_mode_arg_t mode_info = (framebuffer_mode_arg_t){
-        .size = (point_t){resx, resy},
+        .size = (Point){resx, resy},
     };
 
     if (iostream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != 0)
@@ -66,12 +66,12 @@ bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
     return true;
 }
 
-rectangle_t framebuffer_bound(framebuffer_t *this)
+Rectangle framebuffer_bound(framebuffer_t *this)
 {
-    return (rectangle_t){{0, 0, this->width, this->height}};
+    return (Rectangle){{0, 0, this->width, this->height}};
 }
 
-void framebuffer_mark_dirty(framebuffer_t *this, rectangle_t bound)
+void framebuffer_mark_dirty(framebuffer_t *this, Rectangle bound)
 {
     if (rectange_colide(bitmap_bound(this->backbuffer), bound))
     {

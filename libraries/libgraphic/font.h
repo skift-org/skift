@@ -9,8 +9,8 @@
 typedef struct
 {
     int codepoint;
-    rectangle_t bound;
-    point_t origin;
+    Rectangle bound;
+    Point origin;
     int advance;
 } glyph_t;
 

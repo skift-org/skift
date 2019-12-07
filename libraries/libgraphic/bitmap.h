@@ -31,12 +31,12 @@ Bitmap *bitmap_load_from(const char *path);
 
 int bitmap_save_to(Bitmap *bmp, const char *path);
 
-void bitmap_set_pixel(Bitmap *bmp, point_t p, color_t color);
+void bitmap_set_pixel(Bitmap *bmp, Point p, color_t color);
 
-color_t bitmap_get_pixel(Bitmap *bmp, point_t p);
+color_t bitmap_get_pixel(Bitmap *bmp, Point p);
 
-color_t bitmap_sample(Bitmap *bmp, rectangle_t src_rect, float x, float y);
+color_t bitmap_sample(Bitmap *bmp, Rectangle src_rect, float x, float y);
 
-void bitmap_blend_pixel(Bitmap *bmp, point_t p, color_t color);
+void bitmap_blend_pixel(Bitmap *bmp, Point p, color_t color);
 
-rectangle_t bitmap_bound(Bitmap *bmp);
+Rectangle bitmap_bound(Bitmap *bmp);

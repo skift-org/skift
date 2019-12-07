@@ -114,7 +114,7 @@ void bga_mode(u32 width, u32 height)
 static void *framebuffer_physical_addr = NULL;
 static void *framebuffer_virtual_addr = NULL;
 static stream_t *framebuffer_owner = NULL;
-static point_t framebuffer_size = {-1, -1};
+static Point framebuffer_size = {-1, -1};
 
 typedef struct
 {
@@ -160,13 +160,13 @@ framebuffer_backbuffer_t *framebuffer_get_backbuffer(stream_t *owner)
     return NULL;
 }
 
-inline void framebuffer_set_pixel(uint *framebuffer, point_t size, point_t p, uint value)
+inline void framebuffer_set_pixel(uint *framebuffer, Point size, Point p, uint value)
 {
     if ((p.X >= 0 && p.X < size.X) && (p.Y >= 0 && p.Y < size.Y))
         framebuffer[p.X + p.Y * size.X] = value;
 }
 
-inline uint framebuffer_get_pixel(uint *framebuffer, point_t size, point_t p)
+inline uint framebuffer_get_pixel(uint *framebuffer, Point size, Point p)
 {
     int xi = abs((int)p.X % size.X);
     int yi = abs((int)p.Y % size.Y);
@@ -174,7 +174,7 @@ inline uint framebuffer_get_pixel(uint *framebuffer, point_t size, point_t p)
     return framebuffer[xi + yi * size.X];
 }
 
-void *framebuffer_resize(uint *buffer, point_t old_size, point_t new_size)
+void *framebuffer_resize(uint *buffer, Point old_size, Point new_size)
 {
     void *resized_framebuffer = malloc((new_size.X * new_size.Y) * sizeof(uint));
 
@@ -182,7 +182,7 @@ void *framebuffer_resize(uint *buffer, point_t old_size, point_t new_size)
     {
         for (int y = 0; y < new_size.Y; y++)
         {
-            point_t p = (point_t){x, y};
+            Point p = (Point){x, y};
             uint pixel_data = framebuffer_get_pixel(buffer, old_size, p);
             framebuffer_set_pixel(resized_framebuffer, new_size, p, pixel_data);
         }
@@ -200,12 +200,12 @@ error_t framebuffer_set_mode_mboot(multiboot_info_t *mboot)
     framebuffer_physical_addr = (void *)(uintptr_t)mboot->framebuffer_addr;
     uint page_count = PAGE_ALIGN_UP(mboot->framebuffer_width * mboot->framebuffer_height * (mboot->framebuffer_bpp / 8)) / PAGE_SIZE;
     framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
-    framebuffer_size = (point_t){mboot->framebuffer_width, mboot->framebuffer_height};
+    framebuffer_size = (Point){mboot->framebuffer_width, mboot->framebuffer_height};
 
     return -ERR_SUCCESS;
 }
 
-error_t framebuffer_set_mode_bga(point_t res)
+error_t framebuffer_set_mode_bga(Point res)
 {
     logger_info("Using framebuffer from BGA device.");
 
@@ -362,13 +362,13 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
             {
                 for (int x = 0; x < blitargs->size.X; x++)
                 {
-                    uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (point_t){x, y});
+                    uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (Point){x, y});
 
                     uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
                                                 ((source_pixel_data)&0xff00ff00) |
                                                 ((source_pixel_data << 16) & 0x00ff0000);
 
-                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){x, y}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (Point){x, y}, converted_pixel_data);
                 }
             }
             lock_release(backbuffer_stack_lock);
@@ -395,13 +395,13 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
                     int xx = x + region->region_to_blit.X;
                     int yy = y + region->region_to_blit.Y;
 
-                    uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (point_t){xx, yy});
+                    uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (Point){xx, yy});
 
                     uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
                                                 ((source_pixel_data)&0xff00ff00) |
                                                 ((source_pixel_data << 16) & 0x00ff0000);
 
-                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (point_t){xx, yy}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (Point){xx, yy}, converted_pixel_data);
                 }
             }
 
@@ -437,7 +437,7 @@ void framebuffer_setup(multiboot_info_t *mboot)
         }
         else
         {
-            framebuffer_set_mode_bga((point_t){800, 600});
+            framebuffer_set_mode_bga((Point){800, 600});
         }
 
         device_t framebuffer_device = {

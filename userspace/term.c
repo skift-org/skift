@@ -89,12 +89,12 @@ vtconsole_t *terminal_create_textmode_console(void)
 
 /* --- Framebuffer terminal ------------------------------------------------- */
 
-point_t char_size = (point_t){9, 24};
+Point char_size = (Point){9, 24};
 
 static font_t *mono_font = NULL;
 
 static framebuffer_t *framebuffer;
-static point_t framebuffer_cursor = point_zero;
+static Point framebuffer_cursor = point_zero;
 
 static color_t framebuffer_colors[] = {
     [VTCOLOR_BLACK] = COLOR(0x212121),
@@ -122,7 +122,7 @@ void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
     __unused(vtc);
 
-    framebuffer_cursor = (point_t){cur->x, cur->y};
+    framebuffer_cursor = (Point){cur->x, cur->y};
 }
 
 vtconsole_t *terminal_create_framebuffer_console(void)
@@ -165,10 +165,10 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
                                   ? framebuffer_brightcolors[cell->attr.fg]
                                   : framebuffer_colors[cell->attr.fg];
 
-                point_t pos = (point_t){x * char_size.X, y * (int)(char_size.Y)};
-                point_t siz = (point_t){char_size.X, (char_size.Y)};
+                Point pos = (Point){x * char_size.X, y * (int)(char_size.Y)};
+                Point siz = (Point){char_size.X, (char_size.Y)};
 
-                rectangle_t cell_bound;
+                Rectangle cell_bound;
                 cell_bound.position = pos;
                 cell_bound.size = siz;
 
@@ -176,7 +176,7 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
 
                 if (cell->c != ' ')
                 {
-                    painter_draw_glyph(paint, mono_font, font_glyph(mono_font, cell->c), point_add(pos, (point_t){0, 16}), 16, fgc);
+                    painter_draw_glyph(paint, mono_font, font_glyph(mono_font, cell->c), point_add(pos, (Point){0, 16}), 16, fgc);
                 }
 
                 framebuffer_mark_dirty(framebuffer, cell_bound);

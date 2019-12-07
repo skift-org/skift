@@ -25,7 +25,7 @@ int main(int argc, char **argv)
         {
             for (int y = 0; y < fb->height; y++)
             {
-                painter_plot_pixel(fb->painter, (point_t){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
+                painter_plot_pixel(fb->painter, (Point){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
             }
         }
 

@@ -15,14 +15,14 @@
 
 typedef struct
 {
-    point_t size;
+    Point size;
 } framebuffer_mode_arg_t;
 
 // Blit a RGBA buffer to the screen.
 #define FRAMEBUFFER_CALL_BLIT 2
 typedef struct
 {
-    point_t size;
+    Point size;
     void *buffer;
 } framebuffer_blit_args_t;
 
@@ -30,8 +30,8 @@ typedef struct
 #define FRAMEBUFFER_CALL_BLITREGION 3
 typedef struct
 {
-    point_t size;
-    rectangle_t region_to_blit;
+    Point size;
+    Rectangle region_to_blit;
     void *buffer;
 } framebuffer_blitregion_args_t;
 

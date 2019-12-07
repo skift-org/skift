@@ -9,14 +9,14 @@
 
 typedef struct
 {
-    point_t start;
-    point_t finish;
+    Point start;
+    Point finish;
     color_t color;
 } line_t;
 
-rectangle_t line_bound(line_t line)
+Rectangle line_bound(line_t line)
 {
-    rectangle_t bound;
+    Rectangle bound;
 
     bound.X = min(line.start.X, line.finish.X);
     bound.Y = min(line.start.Y, line.finish.Y);

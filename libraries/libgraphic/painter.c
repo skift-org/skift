@@ -43,7 +43,7 @@ void painter_pop_cliprect(Painter *paint)
     paint->cliprect = paint->cliprect_stack[paint->cliprect_stack_top];
 }
 
-void painter_plot_pixel(Painter *painter, Point position, color_t color)
+void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
     Point point_absolue = {painter->cliprect.X + position.X, painter->cliprect.Y + position.Y};
 
@@ -59,7 +59,7 @@ void painter_blit_bitmap_fast(Painter *paint, Bitmap *src, Rectangle src_rect, R
     {
         for (int y = 0; y < dst_rect.height; y++)
         {
-            color_t pix = bitmap_get_pixel(src, (Point){src_rect.X + x, src_rect.Y + y});
+            Color pix = bitmap_get_pixel(src, (Point){src_rect.X + x, src_rect.Y + y});
             painter_plot_pixel(paint, point_add(dst_rect.position, (Point){x, y}), pix);
         }
     }
@@ -74,7 +74,7 @@ void painter_blit_bitmap_scaled(Painter *paint, Bitmap *src, Rectangle src_rect,
             float xx = x / (float)dst_rect.width;
             float yy = y / (float)dst_rect.height;
 
-            color_t pix = bitmap_sample(src, src_rect, xx, yy);
+            Color pix = bitmap_sample(src, src_rect, xx, yy);
             painter_plot_pixel(paint, point_add(dst_rect.position, (Point){x, y}), pix);
         }
     }
@@ -92,12 +92,12 @@ void painter_blit_bitmap(Painter *paint, Bitmap *src, Rectangle src_rect, Rectan
     }
 }
 
-void painter_clear(Painter *paint, color_t color)
+void painter_clear(Painter *paint, Color color)
 {
     painter_clear_rect(paint, bitmap_bound(paint->bitmap), color);
 }
 
-void painter_clear_rect(Painter *paint, Rectangle rect, color_t color)
+void painter_clear_rect(Painter *paint, Rectangle rect, Color color)
 {
     Rectangle rect_absolue = rectangle_clip(paint->cliprect, rect);
 
@@ -113,7 +113,7 @@ void painter_clear_rect(Painter *paint, Rectangle rect, color_t color)
     }
 }
 
-void painter_fill_rect(Painter *paint, Rectangle rect, color_t color)
+void painter_fill_rect(Painter *paint, Rectangle rect, Color color)
 {
     Rectangle rect_absolue = rectangle_clip(paint->cliprect, rect);
 
@@ -133,7 +133,7 @@ void painter_fill_rect(Painter *paint, Rectangle rect, color_t color)
 
 // TODO: void painter_fill_triangle(Painter* paint, ...);
 
-void painter_draw_line_x_aligned(Painter *paint, int x, int start, int end, color_t color)
+void painter_draw_line_x_aligned(Painter *paint, int x, int start, int end, Color color)
 {
     for (int i = start; i < end; i++)
     {
@@ -141,7 +141,7 @@ void painter_draw_line_x_aligned(Painter *paint, int x, int start, int end, colo
     }
 }
 
-void painter_draw_line_y_aligned(Painter *paint, int y, int start, int end, color_t color)
+void painter_draw_line_y_aligned(Painter *paint, int y, int start, int end, Color color)
 {
     for (int i = start; i < end; i++)
     {
@@ -149,7 +149,7 @@ void painter_draw_line_y_aligned(Painter *paint, int y, int start, int end, colo
     }
 }
 
-void painter_draw_line_not_aligned(Painter *paint, Point a, Point b, color_t color)
+void painter_draw_line_not_aligned(Painter *paint, Point a, Point b, Color color)
 {
     int dx = abs(b.X - a.X), sx = a.X < b.X ? 1 : -1;
     int dy = abs(b.Y - a.Y), sy = a.Y < b.Y ? 1 : -1;
@@ -176,7 +176,7 @@ void painter_draw_line_not_aligned(Painter *paint, Point a, Point b, color_t col
     }
 }
 
-void painter_draw_line(Painter *paint, Point a, Point b, color_t color)
+void painter_draw_line(Painter *paint, Point a, Point b, Color color)
 {
     if (a.X == b.X)
     {
@@ -192,7 +192,7 @@ void painter_draw_line(Painter *paint, Point a, Point b, color_t color)
     }
 }
 
-void painter_draw_rect(Painter *paint, Rectangle rect, color_t color)
+void painter_draw_rect(Painter *paint, Rectangle rect, Color color)
 {
     painter_draw_line(paint, rect.position, point_sub(point_add(rect.position, point_x(rect.size)), (Point){1, 0}), color);
     painter_draw_line(paint, rect.position, point_sub(point_add(rect.position, point_y(rect.size)), (Point){0, 1}), color);
@@ -202,7 +202,7 @@ void painter_draw_rect(Painter *paint, Rectangle rect, color_t color)
 
 const int FONT_SIZE = 16;
 
-void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, float size, color_t color)
+void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, float size, Color color)
 {
     const double FONT_GAMMA = 1.7;
     const double FONT_BUFFER = 0.80;
@@ -214,7 +214,7 @@ void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Re
             double xx = x / (double)dst_rect.width;
             double yy = y / (double)dst_rect.height;
 
-            color_t sample = bitmap_sample(src, src_rect, xx, yy);
+            Color sample = bitmap_sample(src, src_rect, xx, yy);
 
             double distance = (sample.R / 150.0);
             double edge0 = FONT_BUFFER - FONT_GAMMA * 1.4142 / size;
@@ -227,7 +227,7 @@ void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Re
                 a = 1.0;
             a = a * a * (3 - 2 * a);
 
-            color_t final = color;
+            Color final = color;
             final.A = a * 255;
 
             painter_plot_pixel(paint, point_add(dst_rect.position, (Point){x, y}), final);
@@ -235,7 +235,7 @@ void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Re
     }
 }
 
-void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, color_t color)
+void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, Color color)
 {
     Rectangle dest;
     dest.position = point_sub(position, point_scale(glyph->origin, size / FONT_SIZE));
@@ -251,7 +251,7 @@ void painter_draw_text(
     int text_size,
     Point position,
     float font_size,
-    color_t color)
+    Color color)
 {
     Point current = position;
 

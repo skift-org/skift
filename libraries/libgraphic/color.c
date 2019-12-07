@@ -5,22 +5,22 @@
 #include <libgraphic/color.h>
 #include <libmath/math.h>
 
-color_t RGB(float R, float G, float B)
+Color RGB(float R, float G, float B)
 {
     return RGBA(R, G, B, 1.0);
 }
 
-color_t RGBA(float R, float G, float B, float A)
+Color RGBA(float R, float G, float B, float A)
 {
-    return (color_t){{(int)(R * 255.0), (int)(G * 255.0), (int)(B * 255.0), (int)(A * 255.0)}};
+    return (Color){{(int)(R * 255.0), (int)(G * 255.0), (int)(B * 255.0), (int)(A * 255.0)}};
 }
 
-color_t HSV(float H, float S, float V)
+Color HSV(float H, float S, float V)
 {
     return HSVA(H, S, V, 1.0);
 }
 
-color_t HSVA(float H, float S, float V, float A)
+Color HSVA(float H, float S, float V, float A)
 {
     float r = 0, g = 0, b = 0;
 
@@ -87,7 +87,7 @@ color_t HSVA(float H, float S, float V, float A)
         }
     }
 
-    color_t rgb;
+    Color rgb;
     rgb.R = (int)(r * 255.0);
     rgb.G = (int)(g * 255.0);
     rgb.B = (int)(b * 255.0);
@@ -96,9 +96,9 @@ color_t HSVA(float H, float S, float V, float A)
     return rgb;
 }
 
-color_t color_blend(color_t fg, color_t bg)
+Color color_blend(Color fg, Color bg)
 {
-    color_t result;
+    Color result;
 
     uint alpha = fg.A + 1;
     uint inv_alpha = 256 - fg.A;
@@ -111,9 +111,9 @@ color_t color_blend(color_t fg, color_t bg)
     return result;
 }
 
-color_t color_lerp(color_t a, color_t b, float transition)
+Color color_lerp(Color a, Color b, float transition)
 {
-    color_t result;
+    Color result;
 
     result.R = lerp(a.R, b.R, transition);
     result.G = lerp(a.G, b.G, transition);
@@ -123,16 +123,16 @@ color_t color_lerp(color_t a, color_t b, float transition)
     return result;
 }
 
-color_t color_blerp(color_t c00, color_t c10, color_t c01, color_t c11, float transitionx, float transitiony)
+Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony)
 {
     return color_lerp(color_lerp(c00, c10, transitionx), color_lerp(c01, c11, transitionx), transitiony);
 }
 
 // TODO: color form name
-// color_t color_from_name(const char *name)
+// Color color_from_name(const char *name)
 // {
 // }
 //
-// void color_get_name(color_t color, char *name, int size)
+// void color_get_name(Color color, char *name, int size)
 // {
 // }

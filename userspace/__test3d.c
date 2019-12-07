@@ -123,19 +123,19 @@ vector3_t matrix_apply_tranform(vector3_t position, matrix_t transform)
     return out;
 }
 
-void painter3D_draw_line(Painter *paint, vector3_t va, vector3_t vb, color_t color)
+void painter3D_draw_line(Painter *paint, vector3_t va, vector3_t vb, Color color)
 {
     painter_draw_line(paint, (Point){va.X, va.Y}, (Point){vb.X, vb.Y}, color);
 }
 
-void painter3D_draw_face(Painter *paint, face_t face, color_t color)
+void painter3D_draw_face(Painter *paint, face_t face, Color color)
 {
     painter3D_draw_line(paint, face.a, face.b, color);
     painter3D_draw_line(paint, face.b, face.c, color);
     painter3D_draw_line(paint, face.c, face.a, color);
 }
 
-void painter3D_fill_face(Painter *paint, face_t face, color_t color)
+void painter3D_fill_face(Painter *paint, face_t face, Color color)
 {
     vector3_t a = face.a;
     vector3_t b = face.b;
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
         matrix_t matRotZ = matrix_create_rotationX(theta);
         matrix_t matRotX = matrix_create_rotationZ(theta);
 
-        color_t background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 1, 1);
+        Color background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 1, 1);
 
         painter_clear(fb->painter, background_color);
 
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
                 triProjected.c.X *= 0.5 * fb->width;
                 triProjected.c.Y *= 0.5 * fb->height;
 
-                color_t color = HSV(abs(sin(theta / 10)) * 360, 0.5, light_force);
+                Color color = HSV(abs(sin(theta / 10)) * 360, 0.5, light_force);
                 painter3D_fill_face(fb->painter, triProjected, color);
                 painter3D_draw_face(fb->painter, triProjected, COLOR_BLACK);
             }

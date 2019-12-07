@@ -16,27 +16,27 @@ typedef union {
     };
 
     uint packed;
-} color_t;
+} Color;
 
-color_t RGB(float R, float G, float B);
+Color RGB(float R, float G, float B);
 
-color_t RGBA(float R, float G, float B, float A);
+Color RGBA(float R, float G, float B, float A);
 
-color_t HSV(float H, float S, float V);
+Color HSV(float H, float S, float V);
 
-color_t HSVA(float H, float S, float V, float A);
+Color HSVA(float H, float S, float V, float A);
 
-color_t color_from_name(const char *name);
+Color color_from_name(const char *name);
 
-void color_get_name(color_t color, char *name, int size);
+void color_get_name(Color color, char *name, int size);
 
-color_t color_lerp(color_t a, color_t b, float transition);
+Color color_lerp(Color a, Color b, float transition);
 
-color_t color_blerp(color_t c00, color_t c10, color_t c01, color_t c11, float transitionx, float transitiony);
+Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony);
 
-color_t color_blend(color_t fg, color_t bg);
+Color color_blend(Color fg, Color bg);
 
-#define COLOR(__value) ((color_t){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
+#define COLOR(__value) ((Color){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
 
 #define COLOR_ENUM(__ENTRY)                                               \
     __ENTRY(ALICEBLUE, AliceBlue, 0xF0, 0xF8, 0xFF)                       \
@@ -188,5 +188,5 @@ color_t color_blend(color_t fg, color_t bg);
     __ENTRY(YELLOW, Yellow, 0xFF, 0xFF, 0x00)                             \
     __ENTRY(YELLOWGREEN, YellowGreen, 0x9A, 0xCD, 0x32)
 
-#define COLOR_ENUM_ENTRY(__name_maj, __name_lower, __r, __g, __b) static const color_t COLOR_##__name_maj = (color_t){{__r, __g, __b, 255}};
+#define COLOR_ENUM_ENTRY(__name_maj, __name_lower, __r, __g, __b) static const Color COLOR_##__name_maj = (Color){{__r, __g, __b, 255}};
 COLOR_ENUM(COLOR_ENUM_ENTRY)

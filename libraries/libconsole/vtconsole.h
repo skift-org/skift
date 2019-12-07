@@ -24,7 +24,7 @@ typedef enum
     VTCOLOR_MAGENTA,
     VTCOLOR_CYAN,
     VTCOLOR_GREY,
-} vtcolor_t;
+} VTColor;
 
 typedef enum
 {
@@ -50,8 +50,8 @@ typedef struct
 typedef struct
 {
     bool bright;
-    vtcolor_t fg;
-    vtcolor_t bg;
+    VTColor fg;
+    VTColor bg;
 } vtattr_t;
 
 typedef struct
@@ -96,7 +96,7 @@ void vtconsole_newline(vtconsole_t *vtc);
 
 void vtconsole_putchar(vtconsole_t *vtc, char c);
 void vtconsole_write(vtconsole_t *vtc, const char *buffer, uint size);
-vtcell_t* vtconsole_cell(vtconsole_t *vtc, int x, int y);
+vtcell_t *vtconsole_cell(vtconsole_t *vtc, int x, int y);
 
 void vtconsole_update_cell(vtconsole_t *vtc, int x, int y, char c, vtattr_t attr);
 void vtconsole_update_cell_with_cell(vtconsole_t *vtc, int x, int y, vtcell_t cell);

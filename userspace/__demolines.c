@@ -11,7 +11,7 @@ typedef struct
 {
     Point start;
     Point finish;
-    color_t color;
+    Color color;
 } line_t;
 
 Rectangle line_bound(line_t line)

@@ -24,31 +24,31 @@ void painter_push_cliprect(Painter *paint, Rectangle cliprect);
 
 void painter_pop_cliprect(Painter *paint);
 
-void painter_plot_pixel(Painter *painter, Point position, color_t color);
+void painter_plot_pixel(Painter *painter, Point position, Color color);
 
 void painter_blit_bitmap(Painter *paint, Bitmap *src, Rectangle src_rect, Rectangle dst_rect);
 
-void painter_clear(Painter *paint, color_t color);
+void painter_clear(Painter *paint, Color color);
 
-void painter_clear_rect(Painter *paint, Rectangle rect, color_t color);
+void painter_clear_rect(Painter *paint, Rectangle rect, Color color);
 
-void painter_fill_rect(Painter *paint, Rectangle rect, color_t color);
+void painter_fill_rect(Painter *paint, Rectangle rect, Color color);
 
 // TODO: void painter_fill_circle(Painter* paint, ...);
 
 // TODO: void painter_fill_triangle(Painter* paint, ...);
 
-void painter_draw_line(Painter *paint, Point a, Point b, color_t color);
+void painter_draw_line(Painter *paint, Point a, Point b, Color color);
 
-void painter_draw_rect(Painter *paint, Rectangle rect, color_t color);
+void painter_draw_rect(Painter *paint, Rectangle rect, Color color);
 
 // TODO: void painter_draw_circle(Painter* paint, ...);
 
 // TODO: void painter_draw_triangle(Painter* paint, ...);
 
-// void painter_draw_text(Painter *paint, const char *text, Point position, color_t color);
+// void painter_draw_text(Painter *paint, const char *text, Point position, Color color);
 
-void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, color_t color);
+void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, Color color);
 
 void painter_draw_text(
     Painter *paint,
@@ -57,4 +57,4 @@ void painter_draw_text(
     int text_size,
     Point position,
     float font_size,
-    color_t color);
+    Color color);

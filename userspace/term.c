@@ -96,7 +96,7 @@ static font_t *mono_font = NULL;
 static framebuffer_t *framebuffer;
 static Point framebuffer_cursor = point_zero;
 
-static color_t framebuffer_colors[] = {
+static Color framebuffer_colors[] = {
     [VTCOLOR_BLACK] = COLOR(0x212121),
     [VTCOLOR_RED] = COLOR(0xb71c1c),
     [VTCOLOR_GREEN] = COLOR(0x1b5e20),
@@ -107,7 +107,7 @@ static color_t framebuffer_colors[] = {
     [VTCOLOR_GREY] = COLOR(0x607d8b),
 };
 
-static color_t framebuffer_brightcolors[] = {
+static Color framebuffer_brightcolors[] = {
     [VTCOLOR_BLACK] = COLOR(0x9e9e9e),
     [VTCOLOR_RED] = COLOR(0xf44336),
     [VTCOLOR_GREEN] = COLOR(0x4caf50),
@@ -161,7 +161,7 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
             {
                 repainted_cell++;
 
-                color_t fgc = cell->attr.bright
+                Color fgc = cell->attr.bright
                                   ? framebuffer_brightcolors[cell->attr.fg]
                                   : framebuffer_colors[cell->attr.fg];
 

@@ -118,7 +118,7 @@ static inline rectangle_t rectangle_merge(rectangle_t a, rectangle_t b)
     return (rectangle_t){.position = topleft, .size = point_sub(bottomright, topleft)};
 }
 
-static inline rectangle_t rectangle_child(rectangle_t rectangle, rectangle_t child_rectangle)
+static inline rectangle_t rectangle_clip(rectangle_t rectangle, rectangle_t child_rectangle)
 {
     int x = max(rectangle.X + child_rectangle.X, rectangle.X);
     int y = max(rectangle.Y + child_rectangle.Y, rectangle.Y);

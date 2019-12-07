@@ -4,7 +4,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-void framebuffer_setup(void);
+#include "multiboot.h"
+
+void framebuffer_setup(multiboot_info_t *mboot);
 
 void keyboard_setup(void);
 

@@ -4,29 +4,29 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/messaging.h>
 #include <libdevice/keys.h>
 
 #define KEYBOARD_DEVICE "/dev/kbd"
 
 #define KEYBOARD_CHANNEL "#dev:keyboard"
 
-#define KEYBOARD_KEYPRESSED "dev:keyboard.keypressed"
-#define KEYBOARD_KEYRELEASED "dev:keyboard.keyreleased"
-#define KEYBOARD_KEYTYPED "dev:keyboard.keytyped"
+#define KEYBOARD_KEYPRESSED MSGLABEL("keyboard", "key", "pressed")
+#define KEYBOARD_KEYRELEASED MSGLABEL("keyboard", "key", "released")
+#define KEYBOARD_KEYTYPED MSGLABEL("keyboard", "key", "typed")
 
-#define FRAMEBUFFER_CALL_SET_KEYMAP 0
+#define KEYBOARD_CALL_SET_KEYMAP 0
 
-typedef struct 
+typedef struct
 {
     uint size;
-    void* keymap;
+    void *keymap;
 } keyboard_set_keymap_args_t;
 
-#define FRAMEBUFFER_CALL_GET_KEYMAP 1
+#define KEYBOARD_CALL_GET_KEYMAP 1
 
 typedef struct
 {
     key_t key;
     int codepoint;
 } keyboard_event_t;
-

@@ -15,6 +15,7 @@
 #include "devices.h"
 #include "paging.h"
 #include "memory.h"
+#include "multiboot.h"
 
 /* --- Bochs VBE Extensions driver ------------------------------------------ */
 
@@ -192,8 +193,22 @@ void *framebuffer_resize(uint *buffer, point_t old_size, point_t new_size)
     return resized_framebuffer;
 }
 
-error_t framebuffer_set_mode(point_t res)
+error_t framebuffer_set_mode_mboot(multiboot_info_t *mboot)
 {
+    logger_info("Using framebuffer from mboot header.");
+    // FIXME: this shoul be ok i guess
+    framebuffer_physical_addr = (void *)(uintptr_t)mboot->framebuffer_addr;
+    uint page_count = PAGE_ALIGN_UP(mboot->framebuffer_width * mboot->framebuffer_height * (mboot->framebuffer_bpp / 8)) / PAGE_SIZE;
+    framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
+    framebuffer_size = (point_t){mboot->framebuffer_width, mboot->framebuffer_height};
+
+    return -ERR_SUCCESS;
+}
+
+error_t framebuffer_set_mode_bga(point_t res)
+{
+    logger_info("Using framebuffer from BGA device.");
+
     if (res.X > 0 &&
         res.X <= VBE_DISPI_MAX_XRES &&
         res.Y > 0 &&
@@ -207,7 +222,7 @@ error_t framebuffer_set_mode(point_t res)
 
             if (framebuffer_physical_addr != NULL)
             {
-                uint page_count = PAGE_ALIGN(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
+                uint page_count = PAGE_ALIGN_UP(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_YRES * sizeof(uint)) / PAGE_SIZE;
 
                 physical_set_used((uint)framebuffer_physical_addr, page_count);
 
@@ -331,7 +346,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
 
         logger_info("Setting mode to %dx%d...", mode_info->size.X, mode_info->size.Y);
 
-        int result = framebuffer_set_mode(mode_info->size);
+        int result = framebuffer_set_mode_bga(mode_info->size);
 
         lock_release(backbuffer_stack_lock);
 
@@ -409,14 +424,21 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
     }
 }
 
-void framebuffer_setup(void)
+void framebuffer_setup(multiboot_info_t *mboot)
 {
-    if (bga_is_available())
+    if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB || bga_is_available())
     {
         lock_init(backbuffer_stack_lock);
         backbuffer_stack = list_create();
 
-        framebuffer_set_mode((point_t){800, 600});
+        if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB)
+        {
+            framebuffer_set_mode_mboot(mboot);
+        }
+        else
+        {
+            framebuffer_set_mode_bga((point_t){800, 600});
+        }
 
         device_t framebuffer_device = {
             .open = framebuffer_device_open,

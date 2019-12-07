@@ -107,14 +107,18 @@ task_t *task(task_t *parent, const char *name, bool user)
     if (parent != NULL)
     {
         parent->cwd_node->refcount++;
+
         this->cwd_node = parent->cwd_node;
         this->cwd_path = path_dup(parent->cwd_path);
     }
     else
     {
         path_t *p = path("/");
-        this->cwd_node = filesystem_acquire(NULL, p, false);
         this->cwd_path = p;
+        assert(this->cwd_path);
+
+        this->cwd_node = filesystem_acquire(NULL, p, false);
+        assert(this->cwd_node);
     }
 
     // Setup fildes
@@ -769,6 +773,9 @@ void task_dump(task_t *t)
 
 void task_panic_dump(void)
 {
+    if (running == NULL)
+        return;
+
     atomic_begin();
 
     printf("\n\tRunning task %d: '%s'", sheduler_running_id(), sheduler_running()->name);
@@ -786,7 +793,7 @@ void task_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-void load_elfseg(task_t *this, IOStream *s, elf_program_t *program)
+static void load_elfseg(task_t *this, IOStream *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
@@ -854,10 +861,7 @@ int task_exec(const char *executable_path, const char **argv)
     {
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
 
-        int readed_bytes = iostream_read(s, &program, sizeof(elf_program_t));
-        logger_trace("Readed %08x bytes from the elf file.", readed_bytes);
-
-        logger_trace("Loading elf program section at offset %d and size %d", program.offset, program.filesz);
+        iostream_read(s, &program, sizeof(elf_program_t));
 
         load_elfseg(new_task, s, &program);
     }

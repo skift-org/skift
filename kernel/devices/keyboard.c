@@ -68,11 +68,11 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
         // if (binding != NULL)
         // {
-        //     logger_debug("scancode %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
+        //     logger_debug("key %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
         // }
         // else
         // {
-        //     logger_debug("scancode %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
+        //     logger_debug("key %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
         // }
 
         if (motion == KEY_MOTION_DOWN)
@@ -100,13 +100,15 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
             task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
         }
-        
+
         keyboard_keystate[key] = motion;
     }
     else
     {
         logger_warn("Invalide scancode %d", key);
     }
+
+    // logger_debug("Done handeling scancode...");
 }
 
 reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
@@ -166,7 +168,7 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
 {
     UNUSED(stream);
 
-    if (request == FRAMEBUFFER_CALL_SET_KEYMAP)
+    if (request == KEYBOARD_CALL_SET_KEYMAP)
     {
         keyboard_set_keymap_args_t *size_and_keymap = args;
         keymap_t *new_keymap = size_and_keymap->keymap;
@@ -185,7 +187,7 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
 
         return -ERR_SUCCESS;
     }
-    else if (request == FRAMEBUFFER_CALL_GET_KEYMAP)
+    else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
         if (keyboard_keymap != NULL)
         {

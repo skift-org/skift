@@ -8,7 +8,7 @@
 
 int __plug_process_this(void)
 {
-    return __syscall(SYS_PROCESS_SELF, 0, 0, 0, 0, 0);
+    return __syscall(SYS_PROCESS_THIS, 0, 0, 0, 0, 0);
 }
 
 int __plug_process_exec(const char *file_name, const char **argv)
@@ -21,7 +21,9 @@ int __plug_process_exec(const char *file_name, const char **argv)
 void __plug_process_exit(int code)
 {
     __syscall(SYS_PROCESS_EXIT, code, 0, 0, 0, 0);
-    while(1){};
+    while (1)
+    {
+    };
 }
 
 int __plug_process_cancel(int pid)

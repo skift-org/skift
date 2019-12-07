@@ -73,8 +73,39 @@ void kmain(multiboot_info_t *info, uint magic)
     }
 
     logger_info(KERNEL_UNAME);
-    logger_info("Bootloader: %s using command lines options '%s'.", info->boot_loader_name);
+    logger_info("Bootloader: %s", info->boot_loader_name);
     logger_info("Command lines: %s", info->cmdline);
+
+    switch (info->framebuffer_type)
+    {
+    case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
+        logger_info("Framebuffer type: EGA_TEXT");
+        break;
+    case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
+        logger_info("Framebuffer type: INDEXED");
+        break;
+    case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
+        logger_info("Framebuffer type: RGB");
+
+        logger_info("Framebuffer adress: 0x%08x", info->framebuffer_addr);
+
+        logger_info("Framebuffer pixel format: %d:%dR %d:%dG %d:%dB",
+                    info->framebuffer_red_masize,
+                    info->framebuffer_red_field_position,
+
+                    info->framebuffer_green_masize,
+                    info->framebuffer_green_field_position,
+
+                    info->framebuffer_blue_masize,
+                    info->framebuffer_blue_field_position);
+        break;
+
+    default:
+        logger_error("Framebuffer type: INVALID");
+        break;
+    }
+
+    logger_info("Framebuffer: %dx%dx%d", info->framebuffer_width, info->framebuffer_height, info->framebuffer_bpp);
 
     /* --- Setup cpu context ------------------------------------------------ */
     setup(gdt);
@@ -87,9 +118,9 @@ void kmain(multiboot_info_t *info, uint magic)
     /* --- System context --------------------------------------------------- */
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
-    setup(tasking);
     setup(filesystem);
-    
+    setup(tasking);
+
     /* --- Finalizing System ------------------------------------------------ */
     atomic_enable();
     sti();
@@ -99,7 +130,7 @@ void kmain(multiboot_info_t *info, uint magic)
 
     logger_info("Mounting devices...");
     setup(textmode);
-    setup(framebuffer);
+    setup(framebuffer, info);
     setup(serial);
     setup(mouse);
     setup(keyboard);

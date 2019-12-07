@@ -313,7 +313,7 @@ int sys_system_get_ticks()
 }
 
 static int (*syscalls[SYSCALL_COUNT])() = {
-    [SYS_PROCESS_SELF] = sys_process_this,
+    [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_EXEC] = sys_process_exec,
     [SYS_PROCESS_EXIT] = sys_process_exit,
     [SYS_PROCESS_CANCEL] = sys_process_cancel,

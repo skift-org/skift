@@ -8,13 +8,13 @@
 
 #define GDT_ENTRY_COUNT 6
 
-#define PRESENT 0b10010000	// Present bit. This must be 1 for all valid selectors.
-#define USER 0b01100000		  // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
-#define EXECUTABLE 0b00001000 // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
-#define READWRITE 0b00000010  // Readable bit for code selectors //Writable bit for data selectors
-#define ACCESSED 0b00000001
+#define GDT_PRESENT 0b10010000	// Present bit. This must be 1 for all valid selectors.
+#define GDT_USER 0b01100000		  // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
+#define GDT_EXECUTABLE 0b00001000 // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
+#define GDT_READWRITE 0b00000010  // Readable bit for code selectors //Writable bit for data selectors
+#define GDT_ACCESSED 0b00000001
 
-#define FLAGS 0b1100
+#define GDT_FLAGS 0b1100
 #define TSS_FLAGS 0
 
 typedef struct attr_packed
@@ -65,15 +65,5 @@ typedef struct attr_packed
 	u8 base24_31;
 } gdt_entry_t;
 
-typedef struct
-{
-	gdt_entry_t entries[GDT_ENTRY_COUNT];
-	gdt_descriptor_t descriptor;
-	tss_t tss;
-} gdt_t;
-
 void gdt_setup();
-void gdt_entry(int index, u32 base, u32 limit, u8 access, u8 flags, const char *hint);
-void gdt_tss_entry(int index, u16 ss0, u32 esp0);
-
 void set_kernel_stack(u32 stack);

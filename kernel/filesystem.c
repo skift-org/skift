@@ -112,6 +112,8 @@ fsnode_t *filesystem_mknode(fsnode_t *at, path_t *node_path, fsnode_type_t type)
 
 fsnode_t *filesystem_acquire(fsnode_t *at, path_t *p, bool create)
 {
+    IS_FS_READY;
+
     lock_acquire(fslock);
 
     fsnode_t *node = filesystem_resolve(at, p);
@@ -205,11 +207,11 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
 
 void filesystem_panic_dump(void)
 {
-    if (filesystem_ready)
-    {
-        printf("\n\tFile system:\n");
-        filesystem_dump_internal(root, 0);
-    }
+    if (!filesystem_ready)
+        return;
+
+    printf("\n\tFile system:\n");
+    filesystem_dump_internal(root, 0);
 }
 
 /* --- Filesystem Operations ------------------------------------------------ */

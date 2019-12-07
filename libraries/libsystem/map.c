@@ -70,14 +70,14 @@ void map_delete(map_t *);
 map_t *map(void)
 {
     map_t *this = OBJECT(map);
-    this->keyvalue_pairs = list();
+    this->keyvalue_pairs = list_create();
 
     return this;
 }
 
 void map_delete(map_t *this)
 {
-    list_delete(this->keyvalue_pairs, LIST_RELEASE_VALUES);
+    list_destroy(this->keyvalue_pairs, LIST_RELEASE_VALUES);
 }
 
 map_keyvalue_pair_t *map_get_pair(map_t *this, const char *key)

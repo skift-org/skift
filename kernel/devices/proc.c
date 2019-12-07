@@ -15,7 +15,7 @@ int proc_device_open(stream_t *stream)
 {
     atomic_begin();
 
-    list_t *tasks = task_all();
+    List *tasks = task_all();
     task_info_t *infos = malloc(sizeof(task_info_t) * list_count(tasks));
 
     int index = 0;

@@ -9,12 +9,12 @@ void messageloop_init(int argc, char** argv)
     UNUSED(argc); UNUSED(argv);
 
     the_messageloop.loop_continue = false;
-    the_messageloop.message_handlers = list();
+    the_messageloop.message_handlers = list_create();
 }
 
 void messageloop_fini(void)
 {
-    list_delete(the_messageloop.message_handlers, LIST_FREE_VALUES);
+    list_destroy(the_messageloop.message_handlers, LIST_FREE_VALUES);
 }
 
 void messageloop_register_handler(const char* message_type, messageloop_message_handler_t handler_function)

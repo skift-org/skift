@@ -122,7 +122,7 @@ typedef struct
 } framebuffer_backbuffer_t;
 
 static lock_t backbuffer_stack_lock;
-static list_t *backbuffer_stack = NULL;
+static List *backbuffer_stack = NULL;
 
 void *framebuffer_get_buffer(stream_t *owner)
 {
@@ -414,7 +414,7 @@ void framebuffer_setup(void)
     if (bga_is_available())
     {
         lock_init(backbuffer_stack_lock);
-        backbuffer_stack = list();
+        backbuffer_stack = list_create();
 
         framebuffer_set_mode((point_t){800, 600});
 

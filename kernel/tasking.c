@@ -52,12 +52,12 @@ void tasking_setup()
 /* -------------------------------------------------------------------------- */
 
 static int TID = 1;
-static list_t *tasks;
-static list_t *tasks_bystates[TASK_STATE_COUNT];
+static List *tasks;
+static List *tasks_bystates[TASK_STATE_COUNT];
 
 void task_setup(void)
 {
-    tasks = list();
+    tasks = list_create();
 
     if (tasks == NULL)
     {
@@ -66,7 +66,7 @@ void task_setup(void)
 
     for (int i = 0; i < TASK_STATE_COUNT; i++)
     {
-        tasks_bystates[i] = list();
+        tasks_bystates[i] = list_create();
 
         if (tasks_bystates[i] == NULL)
         {
@@ -95,11 +95,11 @@ task_t *task(task_t *parent, const char *name, bool user)
     list_pushback(tasks, this);
 
     // Setup inbox
-    this->inbox = list();
-    this->subscription = list();
+    this->inbox = list_create();
+    this->subscription = list_create();
 
     // Setup shms
-    this->shms = list();
+    this->shms = list_create();
 
     // Setup current working directory.
     lock_init(this->cwd_lock);
@@ -154,9 +154,9 @@ void task_delete(task_t *this)
     list_remove(tasks, this);
     atomic_end();
 
-    list_delete(this->inbox, LIST_FREE_VALUES);
-    list_delete(this->subscription, LIST_FREE_VALUES);
-    list_delete(this->shms, LIST_RELEASE_VALUES);
+    list_destroy(this->inbox, LIST_FREE_VALUES);
+    list_destroy(this->subscription, LIST_FREE_VALUES);
+    list_destroy(this->shms, LIST_RELEASE_VALUES);
 
     task_filedescriptor_close_all(this);
 
@@ -172,12 +172,12 @@ void task_delete(task_t *this)
     free(this);
 }
 
-list_t *task_all(void)
+List *task_all(void)
 {
     return tasks;
 }
 
-list_t *task_bystate(task_state_t state)
+List *task_bystate(task_state_t state)
 {
     return tasks_bystates[state];
 }
@@ -853,7 +853,7 @@ int task_exec(const char *executable_path, const char **argv)
     for (int i = 0; i < elf_header.phnum; i++)
     {
         iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
-        
+
         int readed_bytes = iostream_read(s, &program, sizeof(elf_program_t));
         logger_trace("Readed %08x bytes from the elf file.", readed_bytes);
 
@@ -949,11 +949,11 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
 
 static int SHMID = 0;
 static lock_t shms_lock;
-static list_t *shms;
+static List *shms;
 
 void task_shared_memory_setup(void)
 {
-    shms = list();
+    shms = list_create();
     lock_init(shms_lock);
 }
 
@@ -1385,7 +1385,7 @@ int task_messaging_receive(task_t *this, message_t *message, bool wait)
 
 void collect_and_free_task(void)
 {
-    list_t *task_to_free = list();
+    List *task_to_free = list_create();
 
     atomic_begin();
     // Get canceled tasks
@@ -1403,7 +1403,7 @@ void collect_and_free_task(void)
         task_delete((task_t *)i->value);
     }
 
-    list_delete(task_to_free, LIST_KEEP_VALUES);
+    list_destroy(task_to_free, LIST_KEEP_VALUES);
 }
 
 void garbage_colector()
@@ -1466,7 +1466,7 @@ void wakeup_stream_waiting_task(void)
 {
     if (!list_empty(task_bystate(TASK_STATE_WAIT_STREAM)))
     {
-        list_t *task_to_wakeup = list();
+        List *task_to_wakeup = list_create();
 
         list_foreach(t, task_bystate(TASK_STATE_WAIT_STREAM))
         {
@@ -1487,7 +1487,7 @@ void wakeup_stream_waiting_task(void)
             task_setstate(task, TASK_STATE_RUNNING);
         }
 
-        list_delete(task_to_wakeup, LIST_KEEP_VALUES);
+        list_destroy(task_to_wakeup, LIST_KEEP_VALUES);
     }
 }
 

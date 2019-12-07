@@ -33,7 +33,7 @@ fsnode_t *fsnode(fsnode_type_t type)
     {
         directory_t *dir = &node->directory;
 
-        dir->childs = list();
+        dir->childs = list_create();
         break;
     }
     case FSNODE_FIFO:
@@ -76,7 +76,7 @@ void fsnode_delete(fsnode_t *node)
             }
         }
 
-        list_delete(node->directory.childs, LIST_FREE_VALUES);
+        list_destroy(node->directory.childs, LIST_FREE_VALUES);
         break;
     }
     case FSNODE_FIFO:

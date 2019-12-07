@@ -15,7 +15,7 @@ typedef struct
 
 typedef struct
 {
-    list_t *keyvalue_pairs;
+    List *keyvalue_pairs;
 } map_t;
 
 typedef iteration_decision_t map_foreach_callback_t(map_keyvalue_pair_t *kv, void *arg, void **ret);

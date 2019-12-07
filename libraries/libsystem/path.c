@@ -9,7 +9,7 @@
 path_t *path(const char *raw_path)
 {
     path_t *p = MALLOC(path_t);
-    p->elements = list();
+    p->elements = list_create();
 
     const char *begin = raw_path;
 
@@ -38,7 +38,7 @@ path_t *path(const char *raw_path)
 
 void path_delete(path_t *path)
 {
-    list_delete(path->elements, LIST_FREE_VALUES);
+    list_destroy(path->elements, LIST_FREE_VALUES);
     free(path);
 }
 
@@ -87,7 +87,7 @@ int path_length(path_t *p)
 
 void path_normalize(path_t *p)
 {
-    list_t *stack = list();
+    List *stack = list_create();
 
     int depth = 0;
 
@@ -109,7 +109,7 @@ void path_normalize(path_t *p)
         }
     }
 
-    list_delete(p->elements, LIST_FREE_VALUES);
+    list_destroy(p->elements, LIST_FREE_VALUES);
 
     p->elements = stack;
 }
@@ -134,7 +134,7 @@ const char *path_pop(path_t *p)
 path_t *path_combine(path_t *left, path_t *right)
 {
     path_t *p = MALLOC(path_t);
-    p->elements = list();
+    p->elements = list_create();
 
     // Check if the resulting path is absolue
     if (left != NULL)
@@ -176,7 +176,7 @@ path_t *path_combine(path_t *left, path_t *right)
 path_t *path_split_at(path_t *path, int index)
 {
     path_t *p = MALLOC(path_t);
-    p->elements = list();
+    p->elements = list_create();
     p->is_absolue = false;
 
     int current_element_index = 0;
@@ -196,7 +196,7 @@ path_t *path_split_at(path_t *path, int index)
 path_t *path_dup(path_t *path)
 {
     path_t *p = MALLOC(path_t);
-    p->elements = list();
+    p->elements = list_create();
     p->is_absolue = path->is_absolue;
 
     list_foreach(i, path->elements)

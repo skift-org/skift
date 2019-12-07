@@ -13,7 +13,7 @@
 
 typedef struct
 {
-    list_t* elements;    
+    List* elements;    
     bool is_absolue;
 } path_t;
 

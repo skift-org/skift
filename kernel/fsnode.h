@@ -47,7 +47,7 @@ typedef struct
 
 typedef struct
 {
-    list_t *childs;
+    List *childs;
 } directory_t;
 
 typedef struct

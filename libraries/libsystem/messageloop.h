@@ -9,7 +9,7 @@
 
 typedef struct 
 {
-    list_t* message_handlers;
+    List* message_handlers;
     bool loop_continue;
 } messageloop_t;
 

@@ -74,10 +74,10 @@ typedef struct task
         task_wait_stream_t stream;
     } wait;
 
-    list_t *inbox;  // process main message queue
-    list_t *subscription;
+    List *inbox;  // process main message queue
+    List *subscription;
 
-    list_t *shms;
+    List *shms;
 
     lock_t fds_lock;
     filedescriptor_t fds[TASK_FILDES_COUNT];
@@ -108,9 +108,9 @@ task_t *task(task_t* parent, const char* name, bool user);
 
 void task_delete(task_t *task);
 
-list_t* task_all(void);
+List* task_all(void);
 
-list_t* task_bystate(task_state_t state);
+List* task_bystate(task_state_t state);
 
 task_t *task_getbyid(int id);
 

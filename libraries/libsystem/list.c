@@ -4,9 +4,9 @@
 
 #include <libsystem/list.h>
 
-list_t *list()
+List *list_create()
 {
-    list_t *l = MALLOC(list_t);
+    List *l = MALLOC(List);
 
     l->count = 0;
     l->head = NULL;
@@ -15,17 +15,17 @@ list_t *list()
     return l;
 }
 
-void list_delete(list_t *l, list_delete_action_t free_items)
+void list_destroy(List *l, list_delete_action_t free_items)
 {
     list_clear(l, free_items);
     free(l);
 }
 
-list_t* list_clone(list_t* list_to_copy)
+List *list_clone(List *Listo_copy)
 {
-    list_t* copy = list();
+    List *copy = list_create();
 
-    list_foreach(i, list_to_copy)
+    list_foreach(i, Listo_copy)
     {
         list_pushback(copy, i->value);
     }
@@ -33,19 +33,19 @@ list_t* list_clone(list_t* list_to_copy)
     return copy;
 }
 
-void list_clear(list_t *list, list_delete_action_t free_items)
+void list_clear(List *list, list_delete_action_t free_items)
 {
-    list_item_t *current = list->head;
+    ListItem *current = list->head;
 
     while (current)
     {
-        list_item_t *next = current->next;
-        
-        if (free_items == LIST_FREE_VALUES) 
+        ListItem *next = current->next;
+
+        if (free_items == LIST_FREE_VALUES)
         {
             free(current->value);
         }
-        else if (free_items == LIST_RELEASE_VALUES) 
+        else if (free_items == LIST_RELEASE_VALUES)
         {
             object_release(current->value);
         }
@@ -59,7 +59,7 @@ void list_clear(list_t *list, list_delete_action_t free_items)
     list->tail = NULL;
 }
 
-void list_insert_sorted(list_t *list, void *value, list_comparator_t comparator)
+void list_insert_sorted(List *list, void *value, ListComparator comparator)
 {
     if (list->head == NULL || comparator(value, list->head->value))
     {
@@ -67,14 +67,14 @@ void list_insert_sorted(list_t *list, void *value, list_comparator_t comparator)
     }
     else
     {
-        list_item_t *current = list->head;
+        ListItem *current = list->head;
 
         while (current->next != NULL && comparator(current->next->value, value))
         {
             current = current->next;
         }
 
-        list_item_t *item = MALLOC(list_item_t);
+        ListItem *item = MALLOC(ListItem);
 
         item->prev = current;
         item->next = current->next;
@@ -95,7 +95,7 @@ void list_insert_sorted(list_t *list, void *value, list_comparator_t comparator)
     }
 }
 
-bool list_peek(list_t *list, void **value)
+bool list_peek(List *list, void **value)
 {
     if (list->head != NULL)
     {
@@ -109,11 +109,11 @@ bool list_peek(list_t *list, void **value)
     }
 }
 
-bool list_peek_and_pushback(list_t* l, void** value)
+bool list_peek_and_pushback(List *l, void **value)
 {
     if (list_peek(l, value))
     {
-        list_item_t *item = l->head;
+        ListItem *item = l->head;
 
         // Pop
         if (l->count == 1)
@@ -156,7 +156,7 @@ bool list_peek_and_pushback(list_t* l, void** value)
     }
 }
 
-bool list_peekback(list_t *list, void **value)
+bool list_peekback(List *list, void **value)
 {
     if (list->tail != NULL)
     {
@@ -169,17 +169,17 @@ bool list_peekback(list_t *list, void **value)
     }
 }
 
-bool list_peekat(list_t *list, int index, void **value)
+bool list_peekat(List *list, int index, void **value)
 {
     if (index < list->count)
     {
-        list_item_t* current = list->head;
+        ListItem *current = list->head;
 
-        for(int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++)
         {
             current = current->next;
         }
-        
+
         *value = current->value;
 
         return true;
@@ -190,9 +190,9 @@ bool list_peekat(list_t *list, int index, void **value)
     }
 }
 
-void list_push(list_t *l, void *value)
+void list_push(List *l, void *value)
 {
-    list_item_t *item = MALLOC(list_item_t);
+    ListItem *item = MALLOC(ListItem);
 
     item->prev = NULL;
     item->next = NULL;
@@ -213,9 +213,9 @@ void list_push(list_t *l, void *value)
     }
 }
 
-bool list_pop(list_t *l, void **value)
+bool list_pop(List *l, void **value)
 {
-    list_item_t *item = l->head;
+    ListItem *item = l->head;
 
     if (l->count == 0)
     {
@@ -243,9 +243,9 @@ bool list_pop(list_t *l, void **value)
     return true;
 }
 
-void list_pushback(list_t *l, void *value)
+void list_pushback(List *l, void *value)
 {
-    list_item_t *item = MALLOC(list_item_t);
+    ListItem *item = MALLOC(ListItem);
 
     item->prev = NULL;
     item->next = NULL;
@@ -266,9 +266,9 @@ void list_pushback(list_t *l, void *value)
     }
 }
 
-bool list_popback(list_t *l, void **value)
+bool list_popback(List *l, void **value)
 {
-    list_item_t *item = l->tail;
+    ListItem *item = l->tail;
 
     if (l->count == 0)
     {
@@ -290,13 +290,13 @@ bool list_popback(list_t *l, void **value)
 
     if (value != NULL)
         *(value) = item->value;
-        
+
     free(item);
 
     return true;
 }
 
-bool list_remove(list_t *l, void *value)
+bool list_remove(List *l, void *value)
 {
     list_foreach(item, l)
     {
@@ -330,7 +330,7 @@ bool list_remove(list_t *l, void *value)
     return false;
 }
 
-bool list_containe(list_t *l, void *value)
+bool list_containe(List *l, void *value)
 {
     list_foreach(item, l)
     {

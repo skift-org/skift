@@ -6,8 +6,8 @@
 
 int sscanf(const char *str, const char *format, ...)
 {
-    UNUSED(str);
-    UNUSED(format);
+    __unused(str);
+    __unused(format);
 
     logger_trace("sscanf(\"%s\", ...)", format);
     

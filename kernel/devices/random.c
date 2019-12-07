@@ -11,7 +11,7 @@ static int state = 1411743402;
 
 int random_device_read(stream_t *s, void *buffer, uint size)
 {
-    UNUSED(s);
+    __unused(s);
 
     byte *b = buffer;
 
@@ -31,9 +31,9 @@ int random_device_read(stream_t *s, void *buffer, uint size)
 
 int random_device_write(stream_t *s, const void *buffer, uint size)
 {
-    UNUSED(s);
-    UNUSED(buffer);
-    UNUSED(size);
+    __unused(s);
+    __unused(buffer);
+    __unused(size);
 
     return 0;
 }

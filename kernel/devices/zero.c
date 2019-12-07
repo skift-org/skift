@@ -9,7 +9,7 @@
 
 int zero_device_read(stream_t *s, void *buffer, uint size)
 {
-    UNUSED(s);
+    __unused(s);
 
     memset(buffer, 0, size);
 
@@ -18,8 +18,8 @@ int zero_device_read(stream_t *s, void *buffer, uint size)
 
 int zero_device_write(stream_t *s, const void *buffer, uint size)
 {
-    UNUSED(s);
-    UNUSED(buffer);
+    __unused(s);
+    __unused(buffer);
     return size;
 }
 

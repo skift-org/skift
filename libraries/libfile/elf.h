@@ -20,7 +20,7 @@ typedef enum
     ELF_EXEC = 2  // Executable File
 } elf_type_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     u8 ident[ELF_NIDENT];
     u16 type;
@@ -49,7 +49,7 @@ typedef enum
     ELFS_REL = 9,      // Relocation (no addend)
 } elf_section_type_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     uint name;
     uint type;

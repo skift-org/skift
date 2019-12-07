@@ -9,17 +9,17 @@
 
 int null_device_read(stream_t *s, void *buffer, uint size)
 {
-    UNUSED(s);
-    UNUSED(size);
-    UNUSED(buffer);
+    __unused(s);
+    __unused(size);
+    __unused(buffer);
 
     return 0;
 }
 
 int null_device_write(stream_t *s, const void *buffer, uint size)
 {
-    UNUSED(s);
-    UNUSED(buffer);
+    __unused(s);
+    __unused(buffer);
 
     return size;
 }

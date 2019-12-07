@@ -80,7 +80,7 @@ void do_option(cmdline_t *cmdline, cmdline_option_t *option, int i, int argc, ch
 
 void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option)
 {
-    UNUSED(option);
+    __unused(option);
 
     if (cmdline->prologue)
     {

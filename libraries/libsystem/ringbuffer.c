@@ -9,7 +9,7 @@
 
 ringbuffer_t *ringbuffer(uint size)
 {
-    ringbuffer_t *rb = MALLOC(ringbuffer_t);
+    ringbuffer_t *rb = __malloc(ringbuffer_t);
 
     rb->size = size;
     rb->head = 0;

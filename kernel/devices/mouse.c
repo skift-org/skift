@@ -39,7 +39,7 @@ static void mouse_send_button_event(mouse_button_t btn, bool up)
 static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
 {
     //TODO: Scroll whell not suported yet
-    UNUSED(packet3);
+    __unused(packet3);
 
     int offx = packet1;
 
@@ -105,7 +105,7 @@ static ubyte packet[4];
 
 reg32_t mouse_irq(reg32_t esp, processor_context_t *context)
 {
-    UNUSED(context);
+    __unused(context);
 
     switch (cycle)
     {

@@ -38,11 +38,3 @@ void __lock_assert(Lock *lock, const char *file, const char *function, int line)
 #define lock_assert(lock) __lock_assert(&lock, __FILE__, __FUNCTION__, __LINE__)
 
 #define lock_is_acquire(__lock) ((&__lock)->locked)
-
-#define LOCK(lock, code)       \
-    do                         \
-    {                          \
-        __lock_acquire(&lock); \
-        code;                  \
-        __lock_release(&lock); \
-    } while (0);

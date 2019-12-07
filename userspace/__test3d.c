@@ -202,8 +202,8 @@ void painter3D_fill_face(painter_t *paint, face_t face, color_t color)
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     framebuffer_t *fb = framebuffer_open();
 

@@ -17,9 +17,9 @@
 
 #define IS_PAGE_ALIGN(__x) (__x % PAGE_SIZE == 0)
 
-typedef union attr_packed // page table entry
+typedef union __packed // page table entry
 {
-    struct attr_packed
+    struct __packed
     {
         bool Present : 1;
         bool Write : 1;
@@ -36,13 +36,13 @@ typedef union attr_packed // page table entry
     u32 as_uint;
 } page_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     page_t pages[PAGE_TABLE_ENTRY_COUNT];
 } page_table_t;
 
-typedef union attr_packed {
-    struct attr_packed
+typedef union __packed {
+    struct __packed
     {
         bool Present : 1;
         bool Write : 1;
@@ -58,7 +58,7 @@ typedef union attr_packed {
     u32 as_uint;
 } page_directorie_entry_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     page_directorie_entry_t entries[PAGE_DIRECTORIE_ENTRY_COUNT];
 } page_directorie_t;

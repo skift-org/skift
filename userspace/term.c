@@ -43,7 +43,7 @@ static byte textmode_brightcolors[] = {
 
 void textmode_paint_callback(vtconsole_t *vtc, vtcell_t *vtc_cell, int x, int y)
 {
-    UNUSED(vtc);
+    __unused(vtc);
 
     if (vtc_cell->attr.bright)
     {
@@ -57,7 +57,7 @@ void textmode_paint_callback(vtconsole_t *vtc, vtcell_t *vtc_cell, int x, int y)
 
 void textmode_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
-    UNUSED(vtc);
+    __unused(vtc);
 
     textmode_info.cursor_x = cur->x;
     textmode_info.cursor_y = cur->y;
@@ -120,7 +120,7 @@ static color_t framebuffer_brightcolors[] = {
 
 void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 {
-    UNUSED(vtc);
+    __unused(vtc);
 
     framebuffer_cursor = (point_t){cur->x, cur->y};
 }
@@ -193,8 +193,8 @@ void paint_repaint_dirty(vtconsole_t *console, painter_t *paint)
 
 int main(int argc, char const *argv[])
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     terminal_fifo = iostream_open("/dev/term", IOSTREAM_READ);
 

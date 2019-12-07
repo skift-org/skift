@@ -59,7 +59,7 @@ void vga_cursor_position(s32 x, s32 y)
 
 int textmode_device_write(stream_t *stream, const void *buffer, uint size)
 {
-    UNUSED(stream);
+    __unused(stream);
 
     int tocopy = min(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
 
@@ -70,7 +70,7 @@ int textmode_device_write(stream_t *stream, const void *buffer, uint size)
 
 int textmode_device_call(stream_t *stream, int request, void *args)
 {
-    UNUSED(stream);
+    __unused(stream);
 
     if (request == TEXTMODE_CALL_GET_INFO)
     {

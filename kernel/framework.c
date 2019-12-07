@@ -25,7 +25,7 @@ IOStream internal_log_stream = {0};
 
 int log_stream_write(IOStream *stream, const void *buffer, uint size)
 {
-    UNUSED(stream);
+    __unused(stream);
     return serial_write(buffer, size);
 }
 
@@ -56,13 +56,13 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
 // We are the system so we doesn't need that ;)
 void __plug_system_get_info(system_info_t *info)
 {
-    UNUSED(info);
+    __unused(info);
     assert(false);
 }
 
 void __plug_system_get_status(system_status_t *status)
 {
-    UNUSED(status);
+    __unused(status);
     assert(false);
 }
 
@@ -247,54 +247,54 @@ int __plug_process_wait(int pid, int *exit_value)
 
 int messaging_send(message_t *event)
 {
-    UNUSED(event);
+    __unused(event);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_broadcast(const char *channel, message_t *event)
 {
-    UNUSED(channel);
-    UNUSED(event);
+    __unused(channel);
+    __unused(event);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_request(message_t *request, message_t *result, int timeout)
 {
-    UNUSED(request);
-    UNUSED(result);
-    UNUSED(timeout);
+    __unused(request);
+    __unused(result);
+    __unused(timeout);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_receive(message_t *message, bool wait)
 {
-    UNUSED(message);
-    UNUSED(wait);
+    __unused(message);
+    __unused(wait);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_respond(message_t *request, message_t *result)
 {
-    UNUSED(request);
-    UNUSED(result);
+    __unused(request);
+    __unused(result);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_subscribe(const char *channel)
 {
-    UNUSED(channel);
+    __unused(channel);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
 int messaging_unsubscribe(const char *channel)
 {
-    UNUSED(channel);
+    __unused(channel);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }

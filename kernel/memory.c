@@ -102,8 +102,8 @@ void physical_free(uint addr, uint count)
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-page_directorie_t ALIGNED(kpdir, PAGE_SIZE) = {0};
-page_table_t ALIGNED(kptable[256], PAGE_SIZE) = {0};
+page_directorie_t kpdir __aligned(PAGE_SIZE) = {0};
+page_table_t kptable[256] __aligned(PAGE_SIZE) = {0};
 
 int page_present(page_directorie_t *pdir, uint vaddr)
 {
@@ -421,7 +421,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
 
 void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 {
-    UNUSED(user);
+    __unused(user);
 
     atomic_begin();
 

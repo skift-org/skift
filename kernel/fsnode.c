@@ -12,7 +12,7 @@
 
 fsnode_t *fsnode(fsnode_type_t type)
 {
-    fsnode_t *node = MALLOC(fsnode_t);
+    fsnode_t *node = __malloc(fsnode_t);
 
     node->type = type;
     node->refcount = 0;
@@ -257,7 +257,7 @@ bool directory_link(fsnode_t *dir, fsnode_t *child, const char *name)
 
     if (directory_entry(dir, name) == NULL)
     {
-        fsdirectory_entry_t *entry = MALLOC(fsdirectory_entry_t);
+        fsdirectory_entry_t *entry = __malloc(fsdirectory_entry_t);
 
         strlcpy(entry->name, name, PATH_ELEMENT_LENGHT);
         child->refcount++;

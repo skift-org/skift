@@ -48,8 +48,13 @@ typedef unsigned long long uint64_t;
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 
-#define attr_packed __attribute__((packed))
-#define ALIGNED(x, align) x __attribute__((aligned(align)))
+#define __packed __attribute__((packed))
+
+#define __aligned(__align) __attribute__((aligned(__align)))
+
+#define __unused(__stuff) (void)(__stuff)
+
+#define __malloc(__type) ((__type *)malloc(sizeof(__type)))
 
 #define SWAP(x, y)          \
     {                       \
@@ -58,17 +63,8 @@ typedef unsigned long uintptr_t;
         y = SWAP;           \
     }
 
-#define UNUSED(x) (void)(x)
-#define MALLOC(type) ((type *)malloc(sizeof(type)))
-
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 #define FLAG(__i) (1 << (__i))
-
-/* --- Automagicaly variables filler ---------------------------------------- */
-
-#ifndef __PACKAGE__
-#define __PACKAGE__ "(NULL)"
-#endif
 
 /* --- Raw memory allocation ------------------------------------------------ */
 

@@ -58,7 +58,7 @@ const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...)
+void __panic(const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...)
 {
     atomic_begin();
 
@@ -86,7 +86,7 @@ void __panic(const char *package, const char *file, const char *function, const 
     printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
 
     vprintf(message, va);
-    printf("\033[0m\n\tthrow by %s::%s %s() ln%d", package, file, function, line);
+    printf("\033[0m\n\tthrow by %s %s() ln%d", file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");

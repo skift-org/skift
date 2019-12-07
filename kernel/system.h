@@ -9,7 +9,7 @@
 
 #include "processor.h"
 
-void __attribute__((noreturn)) __panic(const char *package, const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
+void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
 
 #define HANG   \
     while (1)  \
@@ -24,9 +24,9 @@ void __attribute__((noreturn)) __panic(const char *package, const char *file, co
         hlt(); \
     }
 
-#define PANIC(x...) __panic(__PACKAGE__, __FILE__, __FUNCTION__, __LINE__, NULL, x)
+#define PANIC(x...) __panic(__FILE__, __FUNCTION__, __LINE__, NULL, x)
 
-#define CPANIC(ctx, x...) __panic(__PACKAGE__, __FILE__, __FUNCTION__, __LINE__, ctx, x)
+#define CPANIC(ctx, x...) __panic(__FILE__, __FUNCTION__, __LINE__, ctx, x)
 
 #define setup(x, arg...)                     \
     {                                        \

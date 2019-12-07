@@ -79,7 +79,7 @@ task_t *task(task_t *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
-    task_t *this = MALLOC(task_t);
+    task_t *this = __malloc(task_t);
 
     if (this == NULL)
     {
@@ -1218,7 +1218,7 @@ int task_messaging_send_internal(task_t *this, task_t *destination, message_t *e
         return -ERR_INBOX_FULL;
     }
 
-    message_t *event_copy = MALLOC(message_t);
+    message_t *event_copy = __malloc(message_t);
     *event_copy = *event;
 
     event_copy->header.from = this->id;
@@ -1497,7 +1497,7 @@ void wakeup_stream_waiting_task(void)
 
 reg32_t shedule(reg32_t sp, processor_context_t *context)
 {
-    UNUSED(context);
+    __unused(context);
     sheduler_context_switch = true;
 
     // Save the old context

@@ -25,8 +25,8 @@ static const char *usages[] = {
 
 void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 {
-    UNUSED(cmdline);
-    UNUSED(opt);
+    __unused(cmdline);
+    __unused(opt);
 
     option_cpu_usage = true;
     option_human = true;
@@ -38,8 +38,8 @@ void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 
 void full_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
 {
-    UNUSED(cmdline);
-    UNUSED(opt);
+    __unused(cmdline);
+    __unused(opt);
 
     option_cpu_usage = true;
     option_human = false;

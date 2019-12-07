@@ -217,7 +217,7 @@ void vtconsole_csi_cup(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 // Clears part of the screen.
 void vtconsole_csi_ed(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 {
-    UNUSED(count);
+    __unused(count);
 
     vtcursor_t cursor = vtc->cursor;
 
@@ -241,7 +241,7 @@ void vtconsole_csi_ed(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 // Erases part of the line.
 void vtconsole_csi_el(vtconsole_t *vtc, vtansi_arg_t *stack, int count)
 {
-    UNUSED(count);
+    __unused(count);
 
     vtcursor_t cursor = vtc->cursor;
 

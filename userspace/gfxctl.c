@@ -110,7 +110,7 @@ int gfxmode_list(IOStream *framebuffer_device)
 {
     // FIXME: check if the framebuffer device support the followings graphics modes.
 
-    UNUSED(framebuffer_device);
+    __unused(framebuffer_device);
 
     for (int i = 0; gfxmodes[i].name; i++)
     {

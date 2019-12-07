@@ -6,13 +6,13 @@
 
 #include <libmath/math.h>
 
-typedef struct attr_packed
+typedef struct __packed
 {
     int X;
     int Y;
 } point_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     int top;
     int bottom;
@@ -20,7 +20,7 @@ typedef struct attr_packed
     int right;
 } spacing_t;
 
-typedef union attr_packed {
+typedef union __packed {
     struct
     {
         int X;

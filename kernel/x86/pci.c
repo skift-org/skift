@@ -6,7 +6,7 @@
 
 void pci_write_field(uint32_t device, int field, int size, uint32_t value)
 {
-    UNUSED(size);
+    __unused(size);
 
     out32(PCI_ADDRESS_PORT, pci_get_addr(device, field));
     out32(PCI_VALUE_PORT, value);

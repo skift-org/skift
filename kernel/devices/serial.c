@@ -31,14 +31,14 @@ static void wait_write()
 
 static int serial_device_write(stream_t *s, const void *buffer, uint size)
 {
-    UNUSED(s);
+    __unused(s);
 
     return serial_write(buffer, size);
 }
 
 static int serial_device_read(stream_t *s, void *buffer, uint size)
 {
-    UNUSED(s);
+    __unused(s);
 
     return serial_read(buffer, size);
 }

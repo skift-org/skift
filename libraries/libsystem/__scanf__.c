@@ -59,7 +59,7 @@ void __scanf_scan(scanf_info_t *info, char c, va_list *va)
 
     // For unknown format string juste put into the output.
     const int trash = va_arg(*va, int);
-    UNUSED(trash);
+    __unused(trash);
     info->append(info, '%');
     info->append(info, c);
 }

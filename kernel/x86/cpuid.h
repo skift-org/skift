@@ -67,11 +67,11 @@ enum
     CPUID_FEAT_EDX_PBE = 1 << 31
 };
 
-typedef struct attr_packed
+typedef struct __packed
 {
     char vendorid[16];
-    union attr_packed {
-        struct attr_packed
+    union __packed {
+        struct __packed
         {
             bool SSE3 : 1;
             bool PCLMUL : 1;
@@ -103,8 +103,8 @@ typedef struct attr_packed
         u32 RAW_ECX;
     };
 
-    union attr_packed {
-        struct attr_packed
+    union __packed {
+        struct __packed
         {
             bool FPU : 1;
             bool VME : 1;

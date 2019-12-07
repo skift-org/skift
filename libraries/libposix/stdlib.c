@@ -17,7 +17,7 @@ void __attribute__((noreturn)) exit(int status)
 
 int system(const char * command)
 {
-    UNUSED(command);
+    __unused(command);
 
     TRACE_FUNCTION_BEGIN;
     TRACE_FUNCTION_END;

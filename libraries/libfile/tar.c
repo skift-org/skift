@@ -7,7 +7,7 @@
 #include <libsystem/cstring.h>
 #include <libfile/tar.h>
 
-typedef struct attr_packed
+typedef struct __packed
 {
     char name[100];     /*   0 */
     char mode[8];       /* 100 */

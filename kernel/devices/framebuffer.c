@@ -270,7 +270,7 @@ int framebuffer_device_open(stream_t *stream)
         if (framebuffer_owner != NULL)
         {
             // Push the old owner to the framebuffer stack.
-            framebuffer_backbuffer_t *backbuffer = MALLOC(framebuffer_backbuffer_t);
+            framebuffer_backbuffer_t *backbuffer = __malloc(framebuffer_backbuffer_t);
 
             backbuffer->owner = framebuffer_owner;
             backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
@@ -326,7 +326,7 @@ int framebuffer_device_close(stream_t *stream)
 
 int framebuffer_device_call(stream_t *stream, int request, void *args)
 {
-    UNUSED(stream);
+    __unused(stream);
 
     lock_acquire(backbuffer_stack_lock);
 

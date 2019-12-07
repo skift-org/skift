@@ -9,8 +9,8 @@
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     for (int i = 0; i < LOOP_MAX; i++)
     {

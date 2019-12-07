@@ -14,7 +14,7 @@
 
 IOStream *iostream_create(IOStreamFlag flags)
 {
-    IOStream *stream = MALLOC(IOStream);
+    IOStream *stream = __malloc(IOStream);
 
     stream->flags = flags;
 

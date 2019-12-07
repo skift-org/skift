@@ -25,7 +25,7 @@ void platform_fpu_enable(void)
     asm volatile("fninit");
 }
 
-char fpu_registers[512] __attribute__((aligned(16)));
+char fpu_registers[512] __aligned(16);
 
 void platform_fpu_save_context(task_t *t)
 {

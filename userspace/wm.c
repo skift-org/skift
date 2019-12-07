@@ -18,24 +18,24 @@ static framebuffer_t *server_framebuffer = NULL;
 
 void server_keypressed_handler(messageloop_t *messageloop, message_t *message, keyboard_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("KEYBOARD_KEYPRESSED: key: %s(%d) codepoint: %d", key_to_string(payload->key), payload->key, payload->codepoint);
 }
 
 void server_keyreleased_handler(messageloop_t *messageloop, message_t *message, keyboard_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("KEYBOARD_KEYRELEASED: key: %s(%d) codepoint: %d", key_to_string(payload->key), payload->key, payload->codepoint);
 }
 
 void server_keytyped_handler(messageloop_t *messageloop, message_t *message, keyboard_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("KEYBOARD_KEYTYPED: key: %s(%d) codepoint: %d", key_to_string(payload->key), payload->key, payload->codepoint);
 }
@@ -44,32 +44,32 @@ void server_keytyped_handler(messageloop_t *messageloop, message_t *message, key
 
 void server_mousemove_handler(messageloop_t *messageloop, message_t *message, mouse_move_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("MOUSE_MOVE: offx=%d offy=%d", payload->offx, payload->offy);
 }
 
 void server_mousescroll_handler(messageloop_t *messageloop, message_t *message, mouse_scroll_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("MOUSE_SCROLL: off=%d", payload->off);
 }
 
 void server_mousepressed_handler(messageloop_t *messageloop, message_t *message, mouse_button_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("MOUSE_DOWN: button%d", payload->button);
 }
 
 void server_mousereleased_handler(messageloop_t *messageloop, message_t *message, mouse_button_event_t *payload)
 {
-    UNUSED(messageloop);
-    UNUSED(message);
+    __unused(messageloop);
+    __unused(message);
 
     logger_trace("MOUSE_PRESS: button%d", payload->button);
 }
@@ -78,8 +78,8 @@ void server_mousereleased_handler(messageloop_t *messageloop, message_t *message
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     server_framebuffer = framebuffer_open();
 

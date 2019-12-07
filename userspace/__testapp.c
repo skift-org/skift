@@ -6,8 +6,8 @@
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     return 0;
 }

@@ -113,7 +113,7 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
 reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 {
-    UNUSED(context);
+    __unused(context);
 
     int byte = in8(0x60);
 
@@ -166,7 +166,7 @@ keymap_t *keyboard_load_keymap(const char *path)
 
 int keyboard_device_call(stream_t *stream, int request, void *args)
 {
-    UNUSED(stream);
+    __unused(stream);
 
     if (request == KEYBOARD_CALL_SET_KEYMAP)
     {

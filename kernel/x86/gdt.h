@@ -17,7 +17,7 @@
 #define GDT_FLAGS 0b1100
 #define TSS_FLAGS 0
 
-typedef struct attr_packed
+typedef struct __packed
 {
 	u32 prev_tss;
 	u32 esp0;
@@ -48,13 +48,13 @@ typedef struct attr_packed
 	u16 iomap_base;
 } tss_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
 	u16 size;
 	u32 offset;
 } gdt_descriptor_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
 	u16 limit0_15;
 	u16 base0_15;

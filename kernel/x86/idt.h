@@ -19,13 +19,13 @@
 
 typedef void (*int_handler_t)(processor_context_t *states);
 
-typedef struct attr_packed
+typedef struct __packed
 {
     u16 size;
     u32 offset;
 } idt_descriptor_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     u16 offset0_15; // offset bits 0..15
     u16 selector;   // a code segment selector in GDT or LDT
@@ -34,7 +34,7 @@ typedef struct attr_packed
     u16 offset16_31; // offset bits 16..31
 } idt_entry_t;
 
-typedef struct attr_packed
+typedef struct __packed
 {
     idt_entry_t entries[IDT_ENTRY_COUNT];
     idt_descriptor_t descriptor;

@@ -12,8 +12,8 @@
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     framebuffer_t *fb = framebuffer_open();
 

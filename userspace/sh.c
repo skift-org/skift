@@ -169,7 +169,7 @@ void shell_cleanup(shell_t *this)
 
 int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 {
-    UNUSED(shell);
+    __unused(shell);
 
     if (argc == 2)
     {
@@ -287,8 +287,8 @@ bool shell_eval(shell_t *this)
 
 int main(int argc, char **argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    __unused(argc);
+    __unused(argv);
 
     logger_level(LOGGER_TRACE);
 

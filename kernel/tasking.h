@@ -21,7 +21,7 @@ typedef void (*task_entry_t)();
 
 typedef struct
 {
-    lock_t lock;
+    Lock lock;
     stream_t *stream;
     bool free;
 } filedescriptor_t;
@@ -79,10 +79,10 @@ typedef struct task
 
     List *shms;
 
-    lock_t fds_lock;
+    Lock fds_lock;
     filedescriptor_t fds[TASK_FILDES_COUNT];
 
-    lock_t cwd_lock;
+    Lock cwd_lock;
     fsnode_t* cwd_node;
     path_t* cwd_path;
 

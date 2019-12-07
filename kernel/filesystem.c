@@ -14,7 +14,7 @@
 #include "filesystem.h"
 
 static fsnode_t *root = NULL;
-static lock_t fslock;
+static Lock fslock;
 static bool filesystem_ready = false;
 
 #define IS_FS_READY                                                   \

@@ -119,9 +119,9 @@ int iostream_read(iostream_t *stream, void *buffer, uint size);
 
 int iostream_write(iostream_t *stream, const void *buffer, uint size);
 
-int iostream_send(iostream_t* stream);
+int iostream_send(iostream_t *stream);
 
-int iostream_recv(iostream_t* stream);
+int iostream_recv(iostream_t *stream);
 
 int iostream_flush(iostream_t *stream);
 

@@ -948,7 +948,7 @@ void task_get_cwd(task_t *this, char *buffer, uint size)
 /* -------------------------------------------------------------------------- */
 
 static int SHMID = 0;
-static lock_t shms_lock;
+static Lock shms_lock;
 static List *shms;
 
 void task_shared_memory_setup(void)

@@ -8,14 +8,14 @@
 #include <libsystem/process.h>
 #include <libsystem/logger.h>
 
-void __lock_init(lock_t *lock, const char *name)
+void __lock_init(Lock *lock, const char *name)
 {
     lock->locked = 0;
     lock->name = name;
     lock->holder = 939393;
 }
 
-void __lock_acquire(lock_t *lock)
+void __lock_acquire(Lock *lock)
 {
     while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
         asm("hlt"); // Don't burn the CPU ;)
@@ -25,7 +25,7 @@ void __lock_acquire(lock_t *lock)
     lock->holder = process_this();
 }
 
-void __lock_acquire_by(lock_t *lock, int holder)
+void __lock_acquire_by(Lock *lock, int holder)
 {
     while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
         asm("hlt"); // Don't burn the CPU ;)
@@ -35,7 +35,7 @@ void __lock_acquire_by(lock_t *lock, int holder)
     lock->holder = holder;
 }
 
-bool __lock_try_acquire(lock_t *lock)
+bool __lock_try_acquire(Lock *lock)
 {
     while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
         return false;
@@ -47,7 +47,7 @@ bool __lock_try_acquire(lock_t *lock)
     return true;
 }
 
-void __lock_release(lock_t *lock, const char *file, const char *function, int line)
+void __lock_release(Lock *lock, const char *file, const char *function, int line)
 {
     __lock_assert(lock, file, function, line);
 
@@ -57,7 +57,7 @@ void __lock_release(lock_t *lock, const char *file, const char *function, int li
     lock->locked = 0;
 }
 
-void __lock_assert(lock_t *lock, const char *file, const char *function, int line)
+void __lock_assert(Lock *lock, const char *file, const char *function, int line)
 {
     if (lock->holder != process_this() && !lock->locked)
     {

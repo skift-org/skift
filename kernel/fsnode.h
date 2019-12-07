@@ -67,7 +67,7 @@ typedef struct fsnode
 {
     char name[PATH_ELEMENT_LENGHT];
     fsnode_type_t type;
-    lock_t lock;
+    Lock lock;
 
     union {
         file_t file;

@@ -18,7 +18,7 @@ void __plug_fini(int exit_code);
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 
-void __plug_lock_assert_failed(lock_t *lock, const char *file, const char *function, int line);
+void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line);
 
 // Logger ------------------------------------------------------------------- //
 

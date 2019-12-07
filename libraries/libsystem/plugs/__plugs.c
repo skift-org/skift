@@ -10,8 +10,8 @@
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
 
-lock_t memlock;
-lock_t loglock;
+Lock memlock;
+Lock loglock;
 
 iostream_t *in_stream;
 iostream_t *out_stream;
@@ -52,7 +52,7 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
     process_exit(-1);
 }
 
-void __plug_lock_assert_failed(lock_t *lock, const char *file, const char *function, int line)
+void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line)
 {
     logger_fatal("Lock assert failed: %s hold by %d in %s:%s() ln%d!", lock->name, lock->holder, file, function, line);
     process_exit(-1);

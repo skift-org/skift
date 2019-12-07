@@ -11,7 +11,7 @@
 typedef struct
 {
     uint magic;
-    lock_t lock;
+    Lock lock;
     int refcount;
     uint size;
     object_dtor_t dtor;

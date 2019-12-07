@@ -121,7 +121,7 @@ typedef struct
     void *buffer;
 } framebuffer_backbuffer_t;
 
-static lock_t backbuffer_stack_lock;
+static Lock backbuffer_stack_lock;
 static List *backbuffer_stack = NULL;
 
 void *framebuffer_get_buffer(stream_t *owner)

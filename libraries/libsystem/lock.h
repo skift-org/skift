@@ -11,19 +11,19 @@ typedef struct
     bool locked;
     int holder;
     const char *name;
-} lock_t;
+} Lock;
 
-void __lock_init(lock_t *lock, const char *name);
+void __lock_init(Lock *lock, const char *name);
 
-void __lock_acquire(lock_t *lock);
+void __lock_acquire(Lock *lock);
 
-void __lock_acquire_by(lock_t *lock, int holder);
+void __lock_acquire_by(Lock *lock, int holder);
 
-void __lock_release(lock_t *lock, const char *file, const char *function, int line);
+void __lock_release(Lock *lock, const char *file, const char *function, int line);
 
-bool __lock_try_acquire(lock_t *lock);
+bool __lock_try_acquire(Lock *lock);
 
-void __lock_assert(lock_t *lock, const char *file, const char *function, int line);
+void __lock_assert(Lock *lock, const char *file, const char *function, int line);
 
 #define lock_init(lock) __lock_init(&lock, #lock)
 

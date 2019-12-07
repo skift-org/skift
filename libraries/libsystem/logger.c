@@ -40,7 +40,7 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
 
         iostream_printf(log_stream, "%d: ", process_this());
 
-        datetime_t datetime = datetime_now();
+        DateTime datetime = datetime_now();
         iostream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
 
         if (logger_use_colors)

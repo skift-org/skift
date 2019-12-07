@@ -66,7 +66,7 @@ void __plug_system_get_status(system_status_t *status)
     assert(false);
 }
 
-timestamp_t __plug_system_get_time(void)
+TimeStamp __plug_system_get_time(void)
 {
     return clock_now();
 }
@@ -254,7 +254,8 @@ int messaging_send(message_t *event)
 
 int messaging_broadcast(const char *channel, message_t *event)
 {
-    UNUSED(channel); UNUSED(event);
+    UNUSED(channel);
+    UNUSED(event);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
 }

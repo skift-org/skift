@@ -9,7 +9,6 @@
 #define SECONDS_PER_DAY (SECONDS_PER_HOURS * 24)
 #define MONTH_PER_YEAR 12
 
-
 static const int DAYS_PER_MONTH[2][MONTH_PER_YEAR] = {
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
@@ -20,29 +19,29 @@ static const int DAYS_PER_YEAR[2] = {365, 366};
 #define IS_LEAP_YEAR(__year) \
     ((!((__year) % 4) && (__year) % 100) || !((__year) % 400))
 
-typedef u32 elapsedtime_t;
+typedef u32 ElapsedTime;
 
-typedef u32 timestamp_t;
+typedef u32 TimeStamp;
 
 typedef struct
 {
     int second;
     int minute;
     int hour;
-} time_t;
+} Time;
 
 typedef struct
 {
     int day;
     int month;
     int year;
-} date_t;
+} Date;
 
 typedef union {
     struct
     {
-        time_t time;
-        date_t date;
+        Time time;
+        Date date;
     };
 
     struct
@@ -54,16 +53,16 @@ typedef union {
         int month;
         int year;
     };
-} datetime_t;
+} DateTime;
 
-timestamp_t timestamp_now(void);
+TimeStamp timestamp_now(void);
 
-time_t timestamp_to_time(timestamp_t timestamp);
+Time timestamp_to_time(TimeStamp timestamp);
 
-date_t timestamp_to_date(timestamp_t timestamp);
+Date timestamp_to_date(TimeStamp timestamp);
 
-datetime_t timestamp_to_datetime(timestamp_t timestamp);
+DateTime timestamp_to_datetime(TimeStamp timestamp);
 
-timestamp_t datetime_to_timestamp(datetime_t datetime);
+TimeStamp datetime_to_timestamp(DateTime datetime);
 
-datetime_t datetime_now(void);
+DateTime datetime_now(void);

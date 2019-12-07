@@ -40,11 +40,11 @@ char get_realtime_reg(int reg)
 
 /* --- Clock ---------------------------------------------------------------- */
 
-timestamp_t clock_now(void)
+TimeStamp clock_now(void)
 {
     CMOS_WAIT;
 
-    datetime_t datetime;
+    DateTime datetime;
     datetime.second = from_bcd(get_realtime_reg(T_SECOND));
     datetime.minute = from_bcd(get_realtime_reg(T_MINUTE));
     datetime.hour = from_bcd(get_realtime_reg(T_HOUR));
@@ -53,7 +53,7 @@ timestamp_t clock_now(void)
     // FIXME: maybe in 2100 we should update this...
     datetime.year = from_bcd(get_realtime_reg(T_YEAR)) + 2000;
 
-    timestamp_t timestamp = datetime_to_timestamp(datetime);
+    TimeStamp timestamp = datetime_to_timestamp(datetime);
 
     return timestamp;
 }

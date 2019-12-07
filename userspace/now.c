@@ -34,8 +34,8 @@ int main(int argc, char **argv)
         option_epoch = false;
     }
 
-    timestamp_t timestamp = timestamp_now();
-    datetime_t datetime = timestamp_to_datetime(timestamp);
+    TimeStamp timestamp = timestamp_now();
+    DateTime datetime = timestamp_to_datetime(timestamp);
 
     if (option_time)
     {

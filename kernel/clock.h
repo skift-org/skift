@@ -7,4 +7,4 @@
 #include <libsystem/runtime.h>
 #include <libsystem/time.h>
 
-timestamp_t clock_now(void);
+TimeStamp clock_now(void);

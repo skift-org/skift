@@ -1,23 +1,23 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/time.h>
 
-timestamp_t timestamp_now(void)
+TimeStamp timestamp_now(void)
 {
     return __plug_system_get_time();
 }
 
-time_t timestamp_to_time(timestamp_t timestamp)
+Time timestamp_to_time(TimeStamp timestamp)
 {
-    return (time_t){
+    return (Time){
         .second = timestamp % 60,
         .minute = (timestamp / SECONDS_PER_MINUTE) % 60,
         .hour = (timestamp / SECONDS_PER_HOURS) % 24,
     };
 }
 
-date_t timestamp_to_date(timestamp_t timestamp)
+Date timestamp_to_date(TimeStamp timestamp)
 {
-    date_t date = {0};
+    Date date = {0};
 
     int days = timestamp / SECONDS_PER_DAY;
 
@@ -42,17 +42,17 @@ date_t timestamp_to_date(timestamp_t timestamp)
     return date;
 }
 
-datetime_t timestamp_to_datetime(timestamp_t timestamp)
+DateTime timestamp_to_datetime(TimeStamp timestamp)
 {
-    return (datetime_t){
+    return (DateTime){
         .time = timestamp_to_time(timestamp),
         .date = timestamp_to_date(timestamp),
     };
 }
 
-timestamp_t datetime_to_timestamp(datetime_t datetime)
+TimeStamp datetime_to_timestamp(DateTime datetime)
 {
-    timestamp_t timestamp = 0;
+    TimeStamp timestamp = 0;
 
     for (int year = EPOCH_YEAR; year < datetime.year; year++)
     {
@@ -73,7 +73,7 @@ timestamp_t datetime_to_timestamp(datetime_t datetime)
     return timestamp;
 }
 
-datetime_t datetime_now(void)
+DateTime datetime_now(void)
 {
     return timestamp_to_datetime(timestamp_now());
 }

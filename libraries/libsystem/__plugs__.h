@@ -68,7 +68,7 @@ void __plug_system_get_info(system_info_t *info);
 
 void __plug_system_get_status(system_status_t *status);
 
-timestamp_t __plug_system_get_time(void);
+TimeStamp __plug_system_get_time(void);
 
 uint __plug_system_get_ticks();
 

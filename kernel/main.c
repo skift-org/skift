@@ -43,9 +43,9 @@
 #include "clock.h"
 
 static multiboot_info_t mbootinfo = {0};
-static timestamp_t boot_timestamp = 0;
+static TimeStamp boot_timestamp = 0;
 
-elapsedtime_t system_get_uptime(void)
+ElapsedTime system_get_uptime(void)
 {
     return clock_now() - boot_timestamp;
 }

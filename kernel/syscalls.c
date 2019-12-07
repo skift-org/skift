@@ -300,7 +300,7 @@ int sys_system_get_status(system_status_t *status)
     return -ERR_SUCCESS;
 }
 
-int sys_system_get_time(timestamp_t *timestamp)
+int sys_system_get_time(TimeStamp *timestamp)
 {
     *timestamp = clock_now();
 

@@ -25,9 +25,9 @@ List *list_clone(List *Listo_copy)
 {
     List *copy = list_create();
 
-    list_foreach(i, Listo_copy)
+    list_foreach(void, value, Listo_copy)
     {
-        list_pushback(copy, i->value);
+        list_pushback(copy, value);
     }
 
     return copy;
@@ -296,9 +296,9 @@ bool list_popback(List *l, void **value)
     return true;
 }
 
-bool list_remove(List *l, void *value)
+bool list_remove(List *this, void *value)
 {
-    list_foreach(item, l)
+    for (ListItem *item = this->head; item != NULL; item = item->next)
     {
         if (item->value == value)
         {
@@ -308,7 +308,7 @@ bool list_remove(List *l, void *value)
             }
             else
             {
-                l->head = item->next;
+                this->head = item->next;
             }
 
             if (item->next != NULL)
@@ -317,10 +317,10 @@ bool list_remove(List *l, void *value)
             }
             else
             {
-                l->tail = item->prev;
+                this->tail = item->prev;
             }
 
-            l->count--;
+            this->count--;
             free(item);
 
             return true;
@@ -332,9 +332,9 @@ bool list_remove(List *l, void *value)
 
 bool list_containe(List *l, void *value)
 {
-    list_foreach(item, l)
+    list_foreach(void, item, l)
     {
-        if (item->value == value)
+        if (item == value)
         {
             return true;
         }

@@ -4,6 +4,11 @@
 
 #include "platform.h"
 
+size_t platform_page_size(void)
+{
+    return 4096;
+}
+
 /* --- FPU ------------------------------------------------------------------ */
 
 void platform_fpu_enable(void)

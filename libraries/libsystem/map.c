@@ -85,9 +85,8 @@ map_keyvalue_pair_t *map_get_pair(map_t *this, const char *key)
     assert(this);
     assert(key);
 
-    list_foreach(i, this->keyvalue_pairs)
+    list_foreach(map_keyvalue_pair_t, pair, this->keyvalue_pairs)
     {
-        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
         if (strcmp(key, pair->value))
         {
             return pair;
@@ -103,9 +102,8 @@ bool map_get(map_t *this, const char *key, void **value)
     assert(key);
     assert(value);
 
-    list_foreach(i, this->keyvalue_pairs)
+    list_foreach(map_keyvalue_pair_t, pair, this->keyvalue_pairs)
     {
-        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
         if (strcmp(key, pair->value))
         {
             *value = pair->value;
@@ -162,10 +160,9 @@ void *map_foreach(map_t *this, map_foreach_callback_t *callback, void *arg)
     assert(callback);
 
     void *ret = NULL;
-    
-    list_foreach(i, this->keyvalue_pairs)
+
+    list_foreach(map_keyvalue_pair_t, pair, this->keyvalue_pairs)
     {
-        map_keyvalue_pair_t *pair = (map_keyvalue_pair_t *)i->value;
 
         if (callback(pair, arg, &ret) == ITERATION_STOP)
         {

@@ -91,10 +91,8 @@ void path_normalize(Path *p)
 
     int depth = 0;
 
-    list_foreach(i, p->elements)
+    list_foreach(const char, element, p->elements)
     {
-        const char *element = i->value;
-
         if ((strcmp(element, "..") == 0) && (depth > 0))
         {
             char *value;
@@ -155,18 +153,18 @@ Path *path_combine(Path *left, Path *right)
     {
         p->is_absolue = left->is_absolue;
 
-        list_foreach(i, left->elements)
+        list_foreach(const char, i, left->elements)
         {
-            path_push(p, strdup(i->value));
+            path_push(p, strdup(i));
         }
     }
 
     // Append the rigt parte of the path
     if (right != NULL)
     {
-        list_foreach(i, right->elements)
+        list_foreach(const char, i, right->elements)
         {
-            path_push(p, strdup(i->value));
+            path_push(p, strdup(i));
         }
     }
 
@@ -180,11 +178,12 @@ Path *path_split_at(Path *path, int index)
     p->is_absolue = false;
 
     int current_element_index = 0;
-    list_foreach(i, path->elements)
+
+    list_foreach(const char, i, path->elements)
     {
         if (current_element_index >= index)
         {
-            path_push(p, strdup(i->value));
+            path_push(p, strdup(i));
         }
 
         current_element_index++;
@@ -199,9 +198,9 @@ Path *path_dup(Path *path)
     p->elements = list_create();
     p->is_absolue = path->is_absolue;
 
-    list_foreach(i, path->elements)
+    list_foreach(const char, i, path->elements)
     {
-        path_push(p, strdup(i->value));
+        path_push(p, strdup(i));
     }
 
     return p;
@@ -217,9 +216,9 @@ void Patho_cstring(Path *this, char *buffer, uint size)
     }
     else
     {
-        list_foreach(i, this->elements)
+        list_foreach(const char, i, this->elements)
         {
-            const char *element = (const char *)i->value;
+            const char *element = (const char *)i;
             strnapd(buffer, '/', size);
             strncat(buffer, element, size);
         }

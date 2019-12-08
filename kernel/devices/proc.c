@@ -20,10 +20,8 @@ int proc_device_open(stream_t *stream)
 
     int index = 0;
 
-    list_foreach(i, tasks)
+    list_foreach(task_t, task, tasks)
     {
-        task_t *task = i->value;
-
         task_get_info(task, &infos[index]);
 
         index++;

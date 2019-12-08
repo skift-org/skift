@@ -132,10 +132,8 @@ void *framebuffer_get_buffer(stream_t *owner)
         return framebuffer_virtual_addr;
     }
 
-    list_foreach(i, backbuffer_stack)
+    list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
     {
-        framebuffer_backbuffer_t *backbuffer = i->value;
-
         if (backbuffer->owner == owner)
         {
             return backbuffer->buffer;
@@ -147,10 +145,8 @@ void *framebuffer_get_buffer(stream_t *owner)
 
 framebuffer_backbuffer_t *framebuffer_get_backbuffer(stream_t *owner)
 {
-    list_foreach(i, backbuffer_stack)
+    list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
     {
-        framebuffer_backbuffer_t *backbuffer = i->value;
-
         if (backbuffer->owner == owner)
         {
             return backbuffer;
@@ -243,10 +239,8 @@ error_t framebuffer_set_mode_bga(Point res)
             }
         }
 
-        list_foreach(i, backbuffer_stack)
+        list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
         {
-            framebuffer_backbuffer_t *backbuffer = i->value;
-
             backbuffer->buffer = framebuffer_resize(backbuffer->buffer, framebuffer_size, res);
         }
 

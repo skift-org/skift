@@ -63,9 +63,8 @@ void fsnode_delete(fsnode_t *node)
     }
     case FSNODE_DIRECTORY:
     {
-        list_foreach(item, node->directory.childs)
+        list_foreach(fsdirectory_entry_t, entry, node->directory.childs)
         {
-            fsdirectory_entry_t *entry = item->value;
             fsnode_t *n = entry->node;
 
             n->refcount--;
@@ -206,10 +205,8 @@ fsdirectory_entry_t *directory_entry(fsnode_t *dir, const char *child)
 {
     lock_assert(dir->lock);
 
-    list_foreach(i, dir->directory.childs)
+    list_foreach(fsdirectory_entry_t, entry, dir->directory.childs)
     {
-        fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
-
         if (strcmp(child, entry->name) == 0)
         {
             return entry;
@@ -236,10 +233,8 @@ directory_entries_t directory_entries(fsnode_t *dir)
     IOStreamDirentry *entries = malloc(sizeof(IOStreamDirentry) * entries_count);
     IOStreamDirentry *current = &entries[0];
 
-    list_foreach(i, dir->directory.childs)
+    list_foreach(fsdirectory_entry_t, entry, dir->directory.childs)
     {
-        fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
-
         strlcpy(current->name, entry->name, PATH_ELEMENT_LENGHT);
         fsnode_stat(entry->node, &current->stat);
 

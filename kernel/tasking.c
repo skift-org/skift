@@ -188,10 +188,8 @@ List *task_bystate(task_state_t state)
 
 task_t *task_getbyid(int id)
 {
-    list_foreach(i, tasks)
+    list_foreach(task_t, task, tasks)
     {
-        task_t *task = i->value;
-
         if (task->id == id)
             return task;
     }
@@ -449,10 +447,8 @@ bool task_cancel(task_t *task, int exitvalue)
         task_setstate(task, TASK_STATE_CANCELED);
 
         // Wake up waiting tasks
-        list_foreach(i, task_bystate(TASK_STATE_WAIT_TASK))
+        list_foreach(task_t, waittask, task_bystate(TASK_STATE_WAIT_TASK))
         {
-            task_t *waittask = i->value;
-
             if (waittask->wait.task.task_handle == task->id)
             {
                 waittask->wait.task.exitvalue = exitvalue;
@@ -782,9 +778,8 @@ void task_panic_dump(void)
     printf("\n");
     printf("\n\tTasks:");
 
-    list_foreach(i, tasks)
+    list_foreach(task_t, t, tasks)
     {
-        task_t *t = i->value;
         task_dump(t);
     }
 
@@ -997,10 +992,8 @@ shm_physical_region_t *task_physical_region_get_by_id(int id)
     if (id < SHMID)
         return NULL;
 
-    list_foreach(i, shms)
+    list_foreach(shm_physical_region_t, shm, shms)
     {
-        shm_physical_region_t *shm = (shm_physical_region_t *)i->value;
-
         if (shm->ID == id)
             return shm;
     }
@@ -1044,10 +1037,8 @@ shm_virtual_region_t *task_virtual_region_get_by_id(task_t *this, int id)
     if (id < SHMID)
         return NULL;
 
-    list_foreach(i, this->shms)
+    list_foreach(shm_virtual_region_t, shm, this->shms)
     {
-        shm_virtual_region_t *shm = (shm_virtual_region_t *)i->value;
-
         if (shm->region->ID == id)
             return shm;
     }
@@ -1145,10 +1136,8 @@ bool task_messaging_has_subscribe(task_t *this, const char *channel)
 {
     atomic_begin();
 
-    list_foreach(i, this->subscription)
+    list_foreach(const char, subscription, this->subscription)
     {
-        const char *subscription = (char *)i->value;
-
         if (strcmp(channel, subscription) == 0)
         {
             atomic_end();
@@ -1190,10 +1179,8 @@ int task_messaging_unsubscribe(task_t *this, const char *channel)
     {
         atomic_begin();
 
-        list_foreach(i, this->subscription)
+        list_foreach(char, subscription, this->subscription)
         {
-            char *subscription = (char *)i->value;
-
             if (strcmp(channel, subscription) == 0)
             {
                 list_remove(this->subscription, subscription);
@@ -1262,10 +1249,8 @@ int task_messaging_broadcast(task_t *this, const char *channel, message_t *event
 
     event->header.id = MID++;
 
-    list_foreach(i, task_all())
+    list_foreach(task_t, destination, task_all())
     {
-        task_t *destination = (task_t *)i->value;
-
         if (destination != this && task_messaging_has_subscribe(destination, channel))
         {
             task_messaging_send_internal(this, destination, event, MESSAGE_TYPE_EVENT);
@@ -1393,18 +1378,17 @@ void collect_and_free_task(void)
 
     atomic_begin();
     // Get canceled tasks
-    list_foreach(i, task_bystate(TASK_STATE_CANCELED))
+    list_foreach(task_t, canceled_tasks, task_bystate(TASK_STATE_CANCELED))
     {
-        task_t *task = i->value;
-        list_pushback(task_to_free, task);
+        list_pushback(task_to_free, canceled_tasks);
     }
 
     atomic_end();
 
     // Cleanup all of those dead tasks.
-    list_foreach(i, task_to_free)
+    list_foreach(task_t, task_to_cleanup, task_to_free)
     {
-        task_delete((task_t *)i->value);
+        task_delete(task_to_cleanup);
     }
 
     list_destroy(task_to_free, LIST_KEEP_VALUES);
@@ -1472,9 +1456,8 @@ void wakeup_stream_waiting_task(void)
     {
         List *task_to_wakeup = list_create();
 
-        list_foreach(t, task_bystate(TASK_STATE_WAIT_STREAM))
+        list_foreach(task_t, task, task_bystate(TASK_STATE_WAIT_STREAM))
         {
-            task_t *task = t->value;
             stream_t *stream = task->wait.stream.stream;
 
             if (!lock_is_acquire(stream->node->lock) &&
@@ -1485,9 +1468,8 @@ void wakeup_stream_waiting_task(void)
             }
         }
 
-        list_foreach(t, task_to_wakeup)
+        list_foreach(task_t, task, task_to_wakeup)
         {
-            task_t *task = t->value;
             task_setstate(task, TASK_STATE_RUNNING);
         }
 

@@ -34,10 +34,8 @@ void messageloop_pump(bool blocking)
     {
         bool message_handled = false;
 
-        list_foreach(i, the_messageloop.message_handlers)
+        list_foreach(messageloop_handler_t, handler, the_messageloop.message_handlers)
         {
-            messageloop_handler_t *handler = (messageloop_handler_t *)i->value;
-
             if (strncmp(message_label(message), handler->message_type, MSGLABEL_SIZE) == 0)
             {
                 handler->handler(&the_messageloop, &message, message_payload(message));

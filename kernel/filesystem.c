@@ -149,9 +149,8 @@ void filesystem_release(fsnode_t *node)
 
 void filesystem_dump_internal(fsnode_t *node, int depth)
 {
-    list_foreach(i, node->directory.childs)
+    list_foreach(fsdirectory_entry_t, entry, node->directory.childs)
     {
-        fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
 
         if (node->type != FSNODE_DIRECTORY)
@@ -173,9 +172,8 @@ void filesystem_dump_internal(fsnode_t *node, int depth)
         }
     }
 
-    list_foreach(i, node->directory.childs)
+    list_foreach(fsdirectory_entry_t, entry, node->directory.childs)
     {
-        fsdirectory_entry_t *entry = (fsdirectory_entry_t *)i->value;
         fsnode_t *node = entry->node;
 
         if (node->type == FSNODE_DIRECTORY)

@@ -1,4 +1,4 @@
-#include "stream.h"
+#include "filesystem/stream.h"
 
 stream_t *stream(struct fsnode *node, IOStreamFlag flags)
 {

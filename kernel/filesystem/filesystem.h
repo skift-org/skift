@@ -4,13 +4,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
-#include <libsystem/path.h>
 #include <libsystem/list.h>
+#include <libsystem/path.h>
+#include <libsystem/runtime.h>
 
+#include "filesystem/fsnode.h"
+#include "filesystem/stream.h"
 #include "system.h"
-#include "fsnode.h"
-#include "stream.h"
 
 #define ROOT NULL
 
@@ -37,7 +37,7 @@ int filesystem_read(stream_t *s, void *buffer, uint size);
 
 int filesystem_write(stream_t *s, const void *buffer, uint size);
 
-bool filesystem_can_read(stream_t * s);
+bool filesystem_can_read(stream_t *s);
 
 bool filesystem_can_write(stream_t *s);
 
@@ -70,7 +70,7 @@ bool filesystem_exist(fsnode_t *at, Path *p);
 // *filesystem_mkdev* with error checking.
 #define FILESYSTEM_MKDEV(__name, __object)                       \
     {                                                            \
-        Path *__dev_path = path(__name);                       \
+        Path *__dev_path = path(__name);                         \
         logger_info("Creating device " __name " at " __name);    \
         if (filesystem_mkdev(NULL, __dev_path, (__object)))      \
         {                                                        \

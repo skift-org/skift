@@ -16,31 +16,31 @@
  * - ADD support for kernel command line options.
  */
 
+#include <libmath/math.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
-#include <libmath/math.h>
-#include <libsystem/error.h>
 
 #include "x86/gdt.h"
 #include "x86/idt.h"
 #include "x86/irq.h"
 #include "x86/isr.h"
 
+#include "clock.h"
 #include "devices.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "memory.h"
 #include "modules.h"
 #include "mouse.h"
 #include "multiboot.h"
 #include "paging.h"
+#include "platform.h"
 #include "serial.h"
 #include "system.h"
 #include "tasking.h"
-#include "platform.h"
-#include "clock.h"
 
 static multiboot_info_t mbootinfo = {0};
 static TimeStamp boot_timestamp = 0;

@@ -8,7 +8,7 @@
 #include <libmath/math.h>
 
 #include "devices.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "tasking.h"
 
 int proc_device_open(stream_t *stream)

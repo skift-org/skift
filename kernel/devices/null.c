@@ -5,7 +5,7 @@
 #include <libsystem/cstring.h>
 
 #include "system.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 
 int null_device_read(stream_t *s, void *buffer, uint size)
 {

@@ -17,7 +17,7 @@
 #include <libkernel/message.h>
 
 #include "x86/irq.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "tasking.h"
 
 /* --- Private functions ---------------------------------------------------- */

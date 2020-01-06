@@ -11,7 +11,7 @@
 #include <libkernel/task.h>
 
 #include "memory.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 
 /* --- Task data structure -------------------------------------------------- */
 

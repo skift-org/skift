@@ -19,7 +19,7 @@
 
 #include <libkernel/syscalls.h>
 
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "memory.h"
 #include "serial.h"
 #include "syscalls.h"

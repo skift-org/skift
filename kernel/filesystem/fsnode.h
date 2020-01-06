@@ -8,7 +8,7 @@
 #include <libsystem/iostream.h>
 #include <libsystem/lock.h>
 
-#include "stream.h"
+#include "filesystem/stream.h"
 
 struct fsnode;
 struct stream;

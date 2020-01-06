@@ -7,7 +7,7 @@
 #include <libdevice/textmode.h>
 
 #include "processor.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "devices.h"
 
 /* ---VGA textmode driver --------------------------------------------------- */

@@ -5,13 +5,13 @@
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
 #include <libmath/math.h>
+#include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
-#include <libsystem/assert.h>
 
+#include "filesystem/filesystem.h"
 #include "tasking.h"
-#include "filesystem.h"
 
 static fsnode_t *root = NULL;
 static Lock fslock;

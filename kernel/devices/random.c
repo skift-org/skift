@@ -5,7 +5,7 @@
 #include <libsystem/cstring.h>
 
 #include "system.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 
 static int state = 1411743402;
 

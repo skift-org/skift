@@ -11,7 +11,7 @@
 #include <libsystem/lock.h>
 
 #include "x86/pci.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "devices.h"
 #include "paging.h"
 #include "memory.h"

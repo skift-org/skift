@@ -7,7 +7,7 @@
 #include <libsystem/logger.h>
 #include <libfile/tar.h>
 
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "multiboot.h"
 
 void ramdisk_load(multiboot_module_t *module)

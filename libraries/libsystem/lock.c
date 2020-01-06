@@ -3,16 +3,16 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/__plugs__.h>
-#include <libsystem/lock.h>
 #include <libsystem/assert.h>
-#include <libsystem/process.h>
+#include <libsystem/lock.h>
 #include <libsystem/logger.h>
+#include <libsystem/process.h>
 
 void __lock_init(Lock *lock, const char *name)
 {
     lock->locked = 0;
     lock->name = name;
-    lock->holder = 939393;
+    lock->holder = 0x939393;
 }
 
 void __lock_acquire(Lock *lock)

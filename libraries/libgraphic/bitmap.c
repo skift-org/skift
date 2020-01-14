@@ -101,7 +101,7 @@ Bitmap *bitmap_load_from(const char *path)
     {
         logger_error("Failled to load from %s: %s", path, lodepng_error_text(error));
 
-        Bitmap *this = bitmap_create(width, height);
+        Bitmap *this = bitmap_create(2, 2);
         memcpy(this->pixels, placeholder_buffer, 2 * 2 * sizeof(Color));
         return this;
     }

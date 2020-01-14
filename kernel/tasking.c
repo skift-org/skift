@@ -2,16 +2,17 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
-#include <libsystem/atomic.h>
-#include <libsystem/error.h>
 #include <libfile/elf.h>
 #include <libmath/math.h>
+#include <libsystem/assert.h>
+#include <libsystem/atomic.h>
+#include <libsystem/cstring.h>
+#include <libsystem/debug.h>
+#include <libsystem/error.h>
 
-#include "x86/irq.h"
-#include "tasking.h"
 #include "platform.h"
+#include "tasking.h"
+#include "x86/irq.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */
@@ -79,7 +80,7 @@ task_t *task(task_t *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
-    task_t *this = __malloc(task_t);
+    task_t *this = __create(task_t);
 
     if (this == NULL)
     {
@@ -106,9 +107,6 @@ task_t *task(task_t *parent, const char *name, bool user)
 
     if (parent != NULL)
     {
-        parent->cwd_node->refcount++;
-
-        this->cwd_node = parent->cwd_node;
         this->cwd_path = path_dup(parent->cwd_path);
     }
     else
@@ -116,20 +114,32 @@ task_t *task(task_t *parent, const char *name, bool user)
         Path *p = path("/");
         this->cwd_path = p;
         assert(this->cwd_path);
-
-        this->cwd_node = filesystem_acquire(NULL, p, false);
-        assert(this->cwd_node);
     }
 
     // Setup fildes
-    lock_init(this->fds_lock);
+    lock_init(this->handles_lock);
     for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
-        filedescriptor_t *fd = &this->fds[i];
-        fd->stream = NULL;
-        fd->free = true;
-        lock_init(fd->lock);
+        this->handles[i] = NULL;
     }
+
+    // FIXME: Passing handles arround.
+    // if (parent != NULL)
+    // {
+    //     lock_acquire(parent->handles_lock);
+    //
+    //     for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    //     {
+    //         if (parent->handles[i])
+    //         {
+    //             handle_acquire_lock(parent->handles[i], sheduler_running_id());
+    //             this->handles[i] = handle_clone(parent->handles[i]);
+    //             handle_release_lock(parent->handles[i], sheduler_running_id());
+    //         }
+    //     }
+    //
+    //     lock_release(parent->handles_lock);
+    // }
 
     // Setup memory space
     if (user)
@@ -162,11 +172,10 @@ void task_delete(task_t *this)
     list_destroy(this->subscription, LIST_FREE_VALUES);
     list_destroy(this->shms, LIST_RELEASE_VALUES);
 
-    task_filedescriptor_close_all(this);
+    task_handle_close_all(this);
 
     lock_acquire(this->cwd_lock);
     path_delete(this->cwd_path);
-    filesystem_release(this->cwd_node);
 
     if (this->pdir != memory_kpdir())
     {
@@ -412,26 +421,16 @@ bool task_wait(int task_id, int *exitvalue)
     }
 }
 
-bool task_wait_stream(task_t *this, stream_t *stream, task_wait_stream_condition_t condition)
+void task_block(task_t *task, TaskBlocker *blocker)
 {
+    assert(!task->blocker);
+
     atomic_begin();
-
-    if (!lock_is_acquire(stream->node->lock) && condition(stream))
-    {
-        lock_acquire(stream->node->lock);
-    }
-    else
-    {
-        task_setstate(this, TASK_STATE_WAIT_STREAM);
-        this->wait.stream.stream = stream;
-        this->wait.stream.condition = condition;
-    }
-
+    task->blocker = blocker;
+    task_setstate(task, TASK_STATE_BLOCKED);
     atomic_end();
 
     sheduler_yield();
-
-    return true;
 }
 
 /* --- Task stopping and canceling ---------------------------------------- */
@@ -510,232 +509,231 @@ void task_memory_free(task_t *this, uint addr, uint count)
 
 /* --- File descriptor allocation and locking ------------------------------- */
 
-void task_filedescriptor_close_all(task_t *this)
+int task_handle_add(task_t *task, Handle *handle)
 {
-    for (int i = 0; i < TASK_FILDES_COUNT; i++)
-    {
-        if (this->fds[i].stream != NULL)
-        {
-            task_close_file(this, i);
-        }
-    }
-}
+    int result = -ERR_TOO_MANY_OPEN_FILES;
 
-int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream)
-{
-    lock_acquire(this->fds_lock);
+    lock_acquire(task->handles_lock);
 
     for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
-        filedescriptor_t *fd = &this->fds[i];
-
-        if (fd->free)
+        if (task->handles[i] == NULL)
         {
-            fd->free = false;
-            fd->stream = stream;
-            lock_acquire(fd->lock);
-
-            lock_release(this->fds_lock);
-
-            return i;
+            task->handles[i] = handle;
+            result = i;
+            break;
         }
     }
 
-    lock_release(this->fds_lock);
+    lock_release(task->handles_lock);
 
-    return -ERR_TOO_MANY_OPEN_FILES;
+    return result;
 }
 
-stream_t *task_filedescriptor_acquire(task_t *this, int fd_index)
+int task_handle_remove(task_t *task, int handle_index)
 {
-    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
-    {
-        filedescriptor_t *fd = &this->fds[fd_index];
-        lock_acquire(fd->lock);
+    int result = -ERR_BAD_FILE_DESCRIPTOR;
 
-        if (!fd->free)
+    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
+    {
+        lock_acquire(task->handles_lock);
+
+        if (task->handles[handle_index] != NULL)
         {
-            return fd->stream;
+            handle_destroy(task->handles[handle_index]);
+            task->handles[handle_index] = NULL;
+
+            result = -ERR_SUCCESS;
         }
+
+        lock_release(task->handles_lock);
+    }
+    else
+    {
+        logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
     }
 
-    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
-
-    return NULL;
+    return result;
 }
 
-int task_filedescriptor_release(task_t *this, int fd_index)
+Handle *task_handle_acquire(task_t *task, int handle_index)
 {
-    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
+    Handle *result = NULL;
+
+    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
     {
-        filedescriptor_t *fd = &this->fds[fd_index];
+        lock_acquire(task->handles_lock);
 
-        lock_release(fd->lock);
+        if (task->handles[handle_index] != NULL)
+        {
+            handle_acquire_lock(task->handles[handle_index], task->id);
+            result = task->handles[handle_index];
+        }
 
-        return 0;
+        lock_release(task->handles_lock);
+    }
+    else
+    {
+        logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
     }
 
-    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
-
-    return -ERR_BAD_FILE_DESCRIPTOR;
+    return result;
 }
 
-int task_filedescriptor_free_and_release(task_t *this, int fd_index)
+int task_handle_release(task_t *task, int handle_index)
 {
-    if (fd_index >= 0 && fd_index < TASK_FILDES_COUNT)
+    int result = -ERR_BAD_FILE_DESCRIPTOR;
+
+    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
     {
-        filedescriptor_t *fd = &this->fds[fd_index];
+        lock_acquire(task->handles_lock);
 
-        lock_release(fd->lock);
+        if (task->handles[handle_index] != NULL)
+        {
+            handle_release_lock(task->handles[handle_index], task->id);
+            result = -ERR_SUCCESS;
+        }
 
-        fd->free = true;
-        fd->stream = NULL;
-
-        return 0;
+        lock_release(task->handles_lock);
+    }
+    else
+    {
+        logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
     }
 
-    logger_warn("Got a bad file descriptor %d from task %d", fd_index, this->id);
-
-    return -ERR_BAD_FILE_DESCRIPTOR;
+    return result;
 }
 
 /* --- task file operations ----------------------------------------------- */
 
-int task_open_file(task_t *this, const char *file_path, IOStreamFlag flags)
+int task_handle_open(task_t *task, const char *file_path, IOStreamFlag flags)
 {
-    Path *p = task_cwd_resolve(this, file_path);
+    Path *p = task_cwd_resolve(task, file_path);
 
-    stream_t *stream = filesystem_open(NULL, p, flags);
+    Handle *handle = filesystem_open(p, flags);
 
     path_delete(p);
 
-    if (stream == NULL)
+    if (handle == NULL)
     {
         return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    int fd = task_filedescriptor_alloc_and_acquire(this, stream);
+    int handle_index = task_handle_add(task, handle);
 
-    if (fd >= 0)
+    if (handle_index < 0)
     {
-        task_filedescriptor_release(this, fd);
-    }
-    else
-    {
-        filesystem_close(stream);
+        handle_destroy(handle);
     }
 
-    return fd;
+    return handle_index;
 }
 
-int task_close_file(task_t *this, int fd)
+void task_handle_close_all(task_t *this)
 {
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
+    for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    {
+        task_handle_close(this, i);
+    }
+}
 
-    if (stream == NULL)
+int task_handle_close(task_t *task, int handle_index)
+{
+    return task_handle_remove(task, handle_index);
+}
+
+int task_handle_read(task_t *task, int handle_index, void *buffer, uint size)
+{
+    Handle *handle = task_handle_acquire(task, handle_index);
+
+    if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    filesystem_close(stream);
+    int result = handle_read(handle, buffer, size);
 
-    task_filedescriptor_free_and_release(this, fd);
-
-    return 0;
-}
-
-int task_read_file(task_t *this, int fd, void *buffer, uint size)
-{
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return -ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    int result = filesystem_read(stream, buffer, size);
-
-    task_filedescriptor_release(this, fd);
+    task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_write_file(task_t *this, int fd, const void *buffer, uint size)
+int task_handle_write(task_t *task, int handle_index, const void *buffer, uint size)
 {
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
+    Handle *handle = task_handle_acquire(task, handle_index);
 
-    if (stream == NULL)
-    {
-        return 0;
-    }
-
-    int result = filesystem_write(stream, buffer, size);
-
-    task_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int task_call_file(task_t *this, int fd, int request, void *args)
-{
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
+    if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = filesystem_call(stream, request, args);
+    int result = handle_write(handle, buffer, size);
 
-    task_filedescriptor_release(this, fd);
-
-    return result;
-}
-
-int task_seek_file(task_t *this, int fd, int offset, IOStreamWhence whence)
-{
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
-
-    if (stream == NULL)
-    {
-        return -ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    int result = filesystem_seek(stream, offset, whence);
-
-    task_filedescriptor_release(this, fd);
+    task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_tell_file(task_t *this, int fd, IOStreamWhence whence)
+int task_handle_call(task_t *task, int handle_index, int request, void *args)
 {
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
+    Handle *handle = task_handle_acquire(task, handle_index);
 
-    if (stream == NULL)
+    if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = filesystem_tell(stream, whence);
+    int result = handle_call(handle, request, args);
 
-    task_filedescriptor_release(this, fd);
+    task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_stat_file(task_t *this, int fd, IOStreamState *stat)
+int task_handle_seek(task_t *task, int handle_index, IOStreamWhence whence, off_t offset)
 {
-    stream_t *stream = task_filedescriptor_acquire(this, fd);
+    Handle *handle = task_handle_acquire(task, handle_index);
 
-    if (stream == NULL)
+    if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = filesystem_stat(stream, stat);
+    int result = handle_seek(handle, whence, offset);
 
-    task_filedescriptor_release(this, fd);
+    task_handle_release(task, handle_index);
+
+    return result;
+}
+
+int task_handle_tell(task_t *task, int handle_index, IOStreamWhence whence)
+{
+    Handle *handle = task_handle_acquire(task, handle_index);
+
+    if (handle == NULL)
+    {
+        return -ERR_BAD_FILE_DESCRIPTOR;
+    }
+
+    int result = handle_tell(handle, whence);
+
+    task_handle_release(task, handle_index);
+
+    return result;
+}
+
+int task_handle_stat(task_t *task, int handle_index, IOStreamState *stat)
+{
+    Handle *handle = task_handle_acquire(task, handle_index);
+
+    if (handle == NULL)
+    {
+        return -ERR_BAD_FILE_DESCRIPTOR;
+    }
+
+    int result = handle_stat(handle, stat);
+
+    task_handle_release(task, handle_index);
 
     return result;
 }
@@ -746,11 +744,11 @@ static char *TASK_STATES[] = {
     "HANG",
     "LAUNCHPAD",
     "RUNNING",
-    "SLEEP",
-    "WAIT",
-    "WAIT_FOR_MESSAGE",
-    "WAIT_FOR_RESPOND",
-    "WAIT_FOR_STREAM",
+    "BLOCKED",
+    "WAIT_TIME",
+    "WAIT_TASK",
+    "WAIT_MESSAGE",
+    "WAIT_RESPOND",
     "CANCELED",
 };
 
@@ -800,7 +798,12 @@ static void load_elfseg(task_t *this, IOStream *s, elf_program_t *program)
         memset((void *)program->vaddr, 0, program->memsz);
 
         iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
-        iostream_read(s, (void *)program->vaddr, program->filesz);
+        int result = iostream_read(s, (void *)program->vaddr, program->filesz);
+
+        if (result < 0)
+        {
+            logger_error("Error while loading the elf binary %s", error_to_string(-result));
+        }
 
         task_switch_pdir(sheduler_running(), oldpdir);
     }
@@ -837,17 +840,20 @@ int task_exec(const char *executable_path, const char **argv)
     // Decode the elf file header.
     elf_header_t elf_header = {0};
     iostream_seek(s, 0, IOSTREAM_WHENCE_START);
+
     iostream_read(s, &elf_header, sizeof(elf_header_t));
 
     if (!elf_valid(&elf_header))
     {
         logger_warn("Invalid elf program!", executable_path);
+
         iostream_close(s);
         return -ERR_EXEC_FORMAT_ERROR;
     }
 
     // Create the process and load the executable.
     task_t *new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
+
     int new_task_id = new_task->id;
 
     elf_program_t program;
@@ -864,6 +870,7 @@ int task_exec(const char *executable_path, const char **argv)
     task_go(new_task);
 
     iostream_close(s);
+
     return new_task_id;
 }
 
@@ -891,46 +898,39 @@ Path *task_cwd_resolve(task_t *this, const char *Patho_resolve)
 
 int task_set_cwd(task_t *this, const char *new_path)
 {
+    int result = -ERR_SUCCESS;
+
     Path *work_path = task_cwd_resolve(this, new_path);
+    FsNode *new_cwd = filesystem_find_and_ref(work_path);
+
+    if (new_cwd == NULL)
+    {
+        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        goto cleanup_and_return;
+    }
+
+    if (new_cwd->type != FSNODE_DIRECTORY)
+    {
+        result = -ERR_NOT_A_DIRECTORY;
+        goto cleanup_and_return;
+    }
 
     lock_acquire(this->cwd_lock);
 
-    fsnode_t *new_cwd = filesystem_acquire(NULL, work_path, false);
+    path_delete(this->cwd_path);
+    this->cwd_path = work_path;
+    work_path = NULL;
 
-    if (new_cwd != NULL)
-    {
-        if (fsnode_type(new_cwd) == IOSTREAM_TYPE_DIRECTORY)
-        {
-            // Cleanup the old path
-            path_delete(this->cwd_path);
-            filesystem_release(this->cwd_node);
+    lock_release(this->cwd_lock);
 
-            // Set the new path
-            this->cwd_node = new_cwd;
-            this->cwd_path = work_path;
+cleanup_and_return:
+    if (new_cwd)
+        fsnode_deref(new_cwd);
 
-            lock_release(this->cwd_lock);
-
-            return 0;
-        }
-        else
-        {
-            lock_release(this->cwd_lock);
-            return -ERR_NOT_A_DIRECTORY;
-        }
-    }
-    else
-    {
-        if (new_cwd != NULL)
-        {
-            filesystem_release(new_cwd);
-        }
-
+    if (work_path)
         path_delete(work_path);
-        lock_release(this->cwd_lock);
 
-        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
+    return result;
 }
 
 void task_get_cwd(task_t *this, char *buffer, uint size)
@@ -1205,7 +1205,7 @@ int task_messaging_send_internal(task_t *this, task_t *destination, message_t *e
         return -ERR_INBOX_FULL;
     }
 
-    message_t *event_copy = __malloc(message_t);
+    message_t *event_copy = __create(message_t);
     *event_copy = *event;
 
     event_copy->header.from = this->id;
@@ -1450,20 +1450,23 @@ void wakeup_sleeping_tasks(void)
     }
 }
 
-void wakeup_stream_waiting_task(void)
+void wakeup_blocked_task(void)
 {
-    if (!list_empty(task_bystate(TASK_STATE_WAIT_STREAM)))
+    if (list_any(task_bystate(TASK_STATE_BLOCKED)))
     {
         List *task_to_wakeup = list_create();
 
-        list_foreach(task_t, task, task_bystate(TASK_STATE_WAIT_STREAM))
+        list_foreach(task_t, task, task_bystate(TASK_STATE_BLOCKED))
         {
-            stream_t *stream = task->wait.stream.stream;
+            TaskBlocker *blocker = task->blocker;
 
-            if (!lock_is_acquire(stream->node->lock) &&
-                task->wait.stream.condition(stream))
+            if (blocker->can_unblock(blocker, task))
             {
-                lock_acquire_by(stream->node->lock, task->id);
+                blocker->unblock(blocker, task);
+
+                free(task->blocker);
+                task->blocker = NULL;
+
                 list_pushback(task_to_wakeup, task);
             }
         }
@@ -1491,7 +1494,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     ticks++;
 
     wakeup_sleeping_tasks();
-    wakeup_stream_waiting_task();
+    wakeup_blocked_task();
 
     // Get the next task
     if (!list_peek_and_pushback(task_bystate(TASK_STATE_RUNNING), (void **)&running))

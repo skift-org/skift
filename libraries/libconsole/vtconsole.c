@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/ctype.h>
-#include <libmath/math.h>
 #include <libconsole/vtconsole.h>
+#include <libmath/math.h>
+#include <libsystem/ctype.h>
 
 /* --- Constructor/Destructor ----------------------------------------------- */
 
@@ -299,7 +299,7 @@ void vtconsole_process(vtconsole_t *vtc, char c)
     switch (parser->state)
     {
     case VTSTATE_ESC:
-        if (c == '\033')
+        if (c == '\e')
         {
             parser->state = VTSTATE_BRACKET;
 

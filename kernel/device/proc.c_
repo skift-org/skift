@@ -4,11 +4,11 @@
 
 /* proc.c : process list device                                               */
 
-#include <libsystem/atomic.h>
 #include <libmath/math.h>
+#include <libsystem/atomic.h>
 
 #include "devices.h"
-#include "filesystem/filesystem.h"
+#include "filesystem/Filesystem.h"
 #include "tasking.h"
 
 int proc_device_open(stream_t *stream)
@@ -70,7 +70,7 @@ int proc_device_write(stream_t *s, const void *buffer, uint size)
     return 0;
 }
 
-void proc_setup(void)
+void proc_initialize(void)
 {
     device_t zero_device = {
         .open = proc_device_open,

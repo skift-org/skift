@@ -13,18 +13,18 @@
 
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/logger.h>
 #include <libsystem/system.h>
-#include <libsystem/error.h>
 
 #include <libkernel/syscalls.h>
 
-#include "filesystem/filesystem.h"
+#include "clock.h"
+#include "filesystem/Filesystem.h"
 #include "memory.h"
 #include "serial.h"
 #include "syscalls.h"
 #include "tasking.h"
-#include "clock.h"
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
 
@@ -168,62 +168,62 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_filesystem_open(const char *path, IOStreamFlag flags)
 {
-    return task_open_file(sheduler_running(), path, flags);
+    return task_handle_open(sheduler_running(), path, flags);
 }
 
 int sys_filesystem_close(int fd)
 {
-    return task_close_file(sheduler_running(), fd);
+    return task_handle_close(sheduler_running(), fd);
 }
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
 {
-    return task_read_file(sheduler_running(), fd, buffer, size);
+    return task_handle_read(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_write(int fd, void *buffer, uint size)
 {
-    return task_write_file(sheduler_running(), fd, buffer, size);
+    return task_handle_write(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_call(int fd, int request, void *args)
 {
-    return task_call_file(sheduler_running(), fd, request, args);
+    return task_handle_call(sheduler_running(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, IOStreamWhence whence)
 {
-    return task_seek_file(sheduler_running(), fd, offset, whence);
+    return task_handle_seek(sheduler_running(), fd, whence, offset);
 }
 
 int sys_filesystem_tell(int fd, IOStreamWhence whence)
 {
-    return task_tell_file(sheduler_running(), fd, whence);
+    return task_handle_tell(sheduler_running(), fd, whence);
 }
 
 int sys_filesystem_stat(int fd, IOStreamState *stat)
 {
-    return task_stat_file(sheduler_running(), fd, stat);
+    return task_handle_stat(sheduler_running(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
-    Path *p = task_cwd_resolve(sheduler_running(), dir_path);
+    Path *path = task_cwd_resolve(sheduler_running(), dir_path);
 
-    int result = filesystem_mkdir(ROOT, p);
+    int result = filesystem_mkdir(path);
 
-    path_delete(p);
+    path_delete(path);
 
     return result;
 }
 
-int sys_filesystem_mkfifo(const char *fifo_path)
+int sys_filesystem_mkpipe(const char *fifo_path)
 {
-    Path *p = task_cwd_resolve(sheduler_running(), fifo_path);
+    Path *path = task_cwd_resolve(sheduler_running(), fifo_path);
 
-    int result = filesystem_mkfifo(ROOT, p);
+    int result = filesystem_mkpipe(path);
 
-    path_delete(p);
+    path_delete(path);
 
     return result;
 }
@@ -233,7 +233,7 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
     Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
     Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
-    int result = filesystem_link(ROOT, oldp, ROOT, newp);
+    int result = filesystem_mklink(oldp, newp);
 
     path_delete(oldp);
     path_delete(newp);
@@ -243,11 +243,11 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    Path *p = task_cwd_resolve(sheduler_running(), link_path);
+    Path *path = task_cwd_resolve(sheduler_running(), link_path);
 
-    int result = filesystem_unlink(ROOT, p);
+    int result = filesystem_unlink(path);
 
-    path_delete(p);
+    path_delete(path);
 
     return result;
 }
@@ -257,7 +257,7 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
     Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
     Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
-    int result = filesystem_rename(NULL, oldp, NULL, newp);
+    int result = filesystem_rename(oldp, newp);
 
     path_delete(oldp);
     path_delete(newp);
@@ -350,7 +350,7 @@ static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,
 
     [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
-    [SYS_FILESYSTEM_MKFIFO] = sys_filesystem_mkfifo,
+    [SYS_FILESYSTEM_MKPIPE] = sys_filesystem_mkpipe,
     [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
     [SYS_FILESYSTEM_UNLINK] = sys_filesystem_unlink,
     [SYS_FILESYSTEM_RENAME] = sys_filesystem_rename,

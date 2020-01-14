@@ -6,4 +6,4 @@
 
 #include <libsystem/iostream.h>
 
-void debug_hexdump(IOStream *stream, char *desc, const void *addr, int len);
+void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len);

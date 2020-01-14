@@ -39,6 +39,8 @@
     __ENTRY(ERR_READ_ONLY_FILE_SYSTEM)                             \
     __ENTRY(ERR_READ_ONLY_STREAM)                                  \
     __ENTRY(ERR_WRITE_ONLY_STREAM)                                 \
+    __ENTRY(ERR_NOT_READABLE)                                      \
+    __ENTRY(ERR_NOT_WRITABLE)                                      \
     __ENTRY(ERR_TOO_MANY_LINKS)                                    \
     __ENTRY(ERR_BROKEN_PIPE)                                       \
     __ENTRY(ERR_NUMERICAL_ARGUMENT_OUT_OF_DOMAIN)                  \

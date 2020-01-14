@@ -11,20 +11,14 @@
 #include <libkernel/task.h>
 
 #include "memory.h"
-#include "filesystem/filesystem.h"
+#include "filesystem/Filesystem.h"
+#include "sheduling/TaskBlocker.h"
 
 /* --- Task data structure -------------------------------------------------- */
 
 struct task;
 
 typedef void (*task_entry_t)();
-
-typedef struct
-{
-    Lock lock;
-    stream_t *stream;
-    bool free;
-} filedescriptor_t;
 
 typedef struct
 {
@@ -45,14 +39,6 @@ typedef struct
     int timeout;
 } task_wait_respond_t;
 
-typedef bool (*task_wait_stream_condition_t)(stream_t *);
-
-typedef struct
-{
-    stream_t *stream;
-    task_wait_stream_condition_t condition;
-} task_wait_stream_t;
-
 typedef struct task
 {
     int id;
@@ -71,19 +57,19 @@ typedef struct task
         task_wait_time_t time;
         task_wait_task_t task;
         task_wait_respond_t respond;
-        task_wait_stream_t stream;
     } wait;
+
+    TaskBlocker *blocker;
 
     List *inbox; // process main message queue
     List *subscription;
 
     List *shms;
 
-    Lock fds_lock;
-    filedescriptor_t fds[TASK_FILDES_COUNT];
+    Lock handles_lock;
+    Handle *handles[TASK_FILDES_COUNT];
 
     Lock cwd_lock;
-    fsnode_t *cwd_node;
     Path *cwd_path;
 
     page_directorie_t *pdir; // Page directorie
@@ -142,7 +128,7 @@ int task_wakeup(task_t *task);
 
 bool task_wait(int task_id, int *exitvalue);
 
-bool task_wait_stream(task_t *task, stream_t *stream, task_wait_stream_condition_t condition);
+void task_block(task_t *task, TaskBlocker *blocker);
 
 bool task_cancel(task_t *task, int exitvalue);
 
@@ -174,31 +160,33 @@ void task_get_cwd(task_t *this, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
-void task_filedescriptor_close_all(task_t *this);
+int task_handle_add(task_t *task, Handle *handle);
 
-int task_filedescriptor_alloc_and_acquire(task_t *this, stream_t *stream);
+int task_handle_remove(task_t *task, int handle_index);
 
-stream_t *task_filedescriptor_acquire(task_t *this, int fd_index);
+Handle *task_handle_acquire(task_t *task, int handle_index);
 
-int task_filedescriptor_release(task_t *this, int fd_index);
+int task_handle_release(task_t *task, int handle_index);
 
-int task_filedescriptor_free_and_release(task_t *this, int fd_index);
+/* --- Task handle operations ----------------------------------------------- */
 
-int task_open_file(task_t *this, const char *file_path, IOStreamFlag flags);
+int task_handle_open(task_t *this, const char *file_path, IOStreamFlag flags);
 
-int task_close_file(task_t *this, int fd);
+int task_handle_close(task_t *this, int handle_index);
 
-int task_read_file(task_t *this, int fd, void *buffer, uint size);
+void task_handle_close_all(task_t *this);
 
-int task_write_file(task_t *this, int fd, const void *buffer, uint size);
+int task_handle_read(task_t *this, int handle_index, void *buffer, uint size);
 
-int task_call_file(task_t *this, int fd, int request, void *args);
+int task_handle_write(task_t *this, int handle_index, const void *buffer, uint size);
 
-int task_seek_file(task_t *this, int fd, int offset, IOStreamWhence whence);
+int task_handle_call(task_t *this, int handle_index, int request, void *args);
 
-int task_tell_file(task_t *this, int fd, IOStreamWhence whence);
+int task_handle_seek(task_t *this, int handle_index, IOStreamWhence whence, off_t offset);
 
-int task_stat_file(task_t *this, int fd, IOStreamState *stat);
+int task_handle_tell(task_t *this, int handle_index, IOStreamWhence whence);
+
+int task_handle_stat(task_t *this, int handle_index, IOStreamState *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */

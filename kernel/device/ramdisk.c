@@ -2,12 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libfile/tar.h>
 #include <libmath/math.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/logger.h>
-#include <libfile/tar.h>
 
-#include "filesystem/filesystem.h"
+#include "filesystem/Filesystem.h"
 #include "multiboot.h"
 
 void ramdisk_load(multiboot_module_t *module)
@@ -25,19 +26,27 @@ void ramdisk_load(multiboot_module_t *module)
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            if (filesystem_mkdir(ROOT, file_path) != 0)
+            int result = filesystem_mkdir(file_path);
+
+            if (result < 0)
             {
-                logger_warn("Failed to create directory %s...", block.name);
+                logger_warn("Failed to create directory %s: %s", block.name, error_to_string(-result));
             }
         }
         else
         {
-            stream_t *s = filesystem_open(ROOT, file_path, IOSTREAM_WRITE | IOSTREAM_CREATE | IOSTREAM_TRUNC);
+            Handle *handle = filesystem_open(file_path, IOSTREAM_WRITE | IOSTREAM_CREATE);
 
-            if (s != NULL)
+            if (handle != NULL)
             {
-                filesystem_write(s, block.data, block.size);
-                filesystem_close(s);
+                int result = handle_write(handle, block.data, block.size);
+
+                if (result < 0)
+                {
+                    logger_error("Failled to write file: %s", error_to_string(-result));
+                }
+
+                handle_destroy(handle);
             }
             else
             {

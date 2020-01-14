@@ -4,21 +4,22 @@
 
 /* keyboard.c: keyboard driver                                                */
 
-#include <libsystem/logger.h>
-#include <libsystem/ringbuffer.h>
+#include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 #include <libsystem/error.h>
+#include <libsystem/logger.h>
+#include <libsystem/ringbuffer.h>
 
 #include <libdevice/keyboard.h>
-#include <libdevice/keys.h>
-#include <libdevice/keys.c>
-#include <libdevice/keymap.h>
 #include <libdevice/keymap.c>
+#include <libdevice/keymap.h>
+#include <libdevice/keys.c>
+#include <libdevice/keys.h>
 #include <libkernel/message.h>
 
-#include "x86/irq.h"
-#include "filesystem/filesystem.h"
+#include "filesystem/Filesystem.h"
 #include "tasking.h"
+#include "x86/irq.h"
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -28,9 +29,9 @@ typedef enum
 {
     PS2KBD_STATE_NORMAL,
     PS2KBD_STATE_NORMAL_ESCAPED,
-} ps2_keyboard_state_t;
+} PS2KeyboardState;
 
-static ps2_keyboard_state_t keyboard_state = PS2KBD_STATE_NORMAL;
+static PS2KeyboardState keyboard_state = PS2KBD_STATE_NORMAL;
 static key_motion_t keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
 static keymap_t *keyboard_keymap = NULL;
 
@@ -64,17 +65,6 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 {
     if (key_is_valid(key))
     {
-        // keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
-
-        // if (binding != NULL)
-        // {
-        //     logger_debug("key %s %d: %s '%c'", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key), binding->regular_codepoint);
-        // }
-        // else
-        // {
-        //     logger_debug("key %s %d: %s", motion == KEY_MOTION_UP ? "up" : "down", key, key_to_string(key));
-        // }
-
         if (motion == KEY_MOTION_DOWN)
         {
             if (keyboard_keystate[key] == KEY_MOTION_UP)
@@ -107,8 +97,6 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
     {
         logger_warn("Invalide scancode %d", key);
     }
-
-    // logger_debug("Done handeling scancode...");
 }
 
 reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
@@ -154,6 +142,8 @@ keymap_t *keyboard_load_keymap(const char *path)
     IOStreamState stat;
     iostream_stat(kmfile, &stat);
 
+    assert(stat.type == IOSTREAM_TYPE_REGULAR);
+
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
     keymap_t *keymap = malloc(stat.size);
 
@@ -164,9 +154,10 @@ keymap_t *keyboard_load_keymap(const char *path)
     return keymap;
 }
 
-int keyboard_device_call(stream_t *stream, int request, void *args)
+int keyboard_FsOperationCall(FsNode *node, Handle *handle, int request, void *args)
 {
-    __unused(stream);
+    __unused(node);
+    __unused(handle);
 
     if (request == KEYBOARD_CALL_SET_KEYMAP)
     {
@@ -207,12 +198,23 @@ int keyboard_device_call(stream_t *stream, int request, void *args)
     }
 }
 
-void keyboard_setup()
+void keyboard_initialize()
 {
+    logger_info("Initializing keyboad...");
+
     keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
 
     irq_register(1, keyboard_irq);
 
-    device_t keyboard_device = {.call = keyboard_device_call};
-    FILESYSTEM_MKDEV(KEYBOARD_DEVICE, keyboard_device);
+    FsNode *keyboard_device = __create(FsNode);
+
+    fsnode_init(keyboard_device, FSNODE_DEVICE);
+
+    FSNODE(keyboard_device)->call = (FsOperationCall)keyboard_FsOperationCall;
+
+    Path *keyboard_device_path = path(KEYBOARD_DEVICE);
+    filesystem_link_and_take_ref(keyboard_device_path, keyboard_device);
+    path_delete(keyboard_device_path);
+
+    logger_info("Done");
 }

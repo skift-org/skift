@@ -6,7 +6,7 @@
 
 #include <libsystem/runtime.h>
 
-void serial_setup();
+
 
 char serial_getc();
 void serial_putc(char c);

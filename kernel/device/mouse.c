@@ -179,7 +179,7 @@ static inline uchar mouse_read(void)
 
 /* --- Public functions ----------------------------------------------------- */
 
-void mouse_setup(void)
+void mouse_initialize(void)
 {
     uchar _status;
 

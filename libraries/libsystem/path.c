@@ -8,7 +8,7 @@
 
 Path *path(const char *raw_path)
 {
-    Path *p = __malloc(Path);
+    Path *p = __create(Path);
     p->elements = list_create();
 
     const char *begin = raw_path;
@@ -131,7 +131,7 @@ const char *path_pop(Path *p)
 
 Path *path_combine(Path *left, Path *right)
 {
-    Path *p = __malloc(Path);
+    Path *p = __create(Path);
     p->elements = list_create();
 
     // Check if the resulting path is absolue
@@ -173,7 +173,7 @@ Path *path_combine(Path *left, Path *right)
 
 Path *path_split_at(Path *path, int index)
 {
-    Path *p = __malloc(Path);
+    Path *p = __create(Path);
     p->elements = list_create();
     p->is_absolue = false;
 
@@ -194,7 +194,7 @@ Path *path_split_at(Path *path, int index)
 
 Path *path_dup(Path *path)
 {
-    Path *p = __malloc(Path);
+    Path *p = __create(Path);
     p->elements = list_create();
     p->is_absolue = path->is_absolue;
 

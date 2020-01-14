@@ -39,12 +39,12 @@ typedef struct shell
 
 /* --- Prompt --------------------------------------------------------------- */
 
-#define PROMPT "\033[0;1;34m $ \033[0;1m"
+#define PROMPT "\e[0;1;34m $ \e[0;1m"
 
 void shell_prompt(shell_t *this)
 {
     // Reset the terminal
-    printf("\n\033[0m ");
+    printf("\n\e[0m ");
 
     // Last command exit value
     if (this->command_exit_value != 0)
@@ -90,7 +90,7 @@ int shell_readline(shell_t *this)
                 if (strlen(this->command_string) > 0)
                 {
                     strbs(this->command_string);
-                    printf("\b\033[K");
+                    printf("\b\e[K");
                 }
             }
             else if (!(event->codepoint == '\0' || event->codepoint == '\t'))
@@ -106,7 +106,7 @@ int shell_readline(shell_t *this)
 
     messaging_unsubscribe(KEYBOARD_CHANNEL);
 
-    printf("\033[0m");
+    printf("\e[0m");
 
     return strlen(this->command_string);
 }

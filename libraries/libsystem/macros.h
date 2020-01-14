@@ -6,4 +6,4 @@
 
 #define __unused(__stuff) (void)(__stuff)
 
-#define __malloc(__type) ((__type *)malloc(sizeof(__type)))
+#define __create(__type) ((__type *)malloc(sizeof(__type)))

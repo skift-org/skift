@@ -14,20 +14,11 @@
 
 IOStream *iostream_create(IOStreamFlag flags)
 {
-    IOStream *stream = __malloc(IOStream);
+    IOStream *stream = __create(IOStream);
 
     stream->flags = flags;
 
-    stream->read = NULL;
-    stream->write = NULL;
-    stream->tell = NULL;
-    stream->seek = NULL;
-    stream->stat = NULL;
-    stream->call = NULL;
-    stream->close = NULL;
-
     stream->fd = -1;
-    stream->p = NULL;
 
     // Setup unget buffer
     stream->unget_char = 0;

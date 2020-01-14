@@ -2,9 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
-#include <libsystem/cmdline.h>
 #include <libkernel/task.h>
+#include <libsystem/cmdline.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
 
 static bool option_cpu_usage = false;
 static bool option_human = false;
@@ -80,10 +81,10 @@ const char *task_state_string[] = {
     "launchpad",
     "running",
     "sleep",
+    "blocked",
     "wait",
     "wait_message",
     "wait_respond",
-    "wait_stream",
     "canceled",
 };
 
@@ -176,6 +177,12 @@ int main(int argc, char **argv)
     argc = cmdline_parse(&cmdline, argc, argv);
 
     IOStream *proc_device = iostream_open("/dev/proc", IOSTREAM_READ);
+
+    if (proc_device == NULL)
+    {
+        error_print("Failled to open /dev/proc");
+        return -1;
+    }
 
     task_info_t info;
 

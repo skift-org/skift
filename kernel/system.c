@@ -32,7 +32,7 @@ const char *const witty_comments[] = {
     "Oops.",
     "On the bright side, I bought you a teddy bear!",
     "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can get error while you get error",
-    "Excuse me Sir, \n\t// Do you have a moment to talk aboucrash reports, originally exclusively fot TempleOS?",
+    "Excuse me Sir, \n\t// Do you have a moment to talk about TempleOS?",
     "DON'T PANIC!",
     "...",
     "Greenpeace free'd the mallocs \\o/",
@@ -73,20 +73,20 @@ void __panic(const char *file, const char *function, const int line, processor_c
     if (!has_panic)
     {
         has_panic = true;
-        printf("\n\033[0;33m--- \033[0;31m!!!\033[0;33m ------------------------------------------------------------------------\033[0m\n");
+        printf("\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
         printf("\n\tKERNEL");
     }
     else
     {
         nested_panic = true;
-        printf("\n\n\033[0;33m- - \033[0;31mNESTED\033[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\033[0m\n");
+        printf("\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
         printf("\n\tNESTED");
     }
 
-    printf(" PANIC\n\t// %s\n\n\t\033[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
+    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
 
     vprintf(message, va);
-    printf("\033[0m\n\tthrow by %s %s() ln%d", file, function, line);
+    printf("\e[0m\n\tthrow by %s %s() ln%d", file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");
@@ -118,7 +118,6 @@ void __panic(const char *file, const char *function, const int line, processor_c
 
     if (!nested_panic)
     {
-        filesystem_panic_dump();
         task_panic_dump();
         cpuid_dump();
     }
@@ -127,7 +126,7 @@ void __panic(const char *file, const char *function, const int line, processor_c
 
     puts("\n\tSystem halted!\n");
 
-    printf("\n\033[0;33m--------------------------------------------------------------------------------\n\n");
+    printf("\n\e[0;33m--------------------------------------------------------------------------------\n\n");
 
     STOP;
 }

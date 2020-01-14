@@ -30,8 +30,8 @@
 #include "x86/isr.h"
 
 #include "clock.h"
-#include "devices.h"
-#include "filesystem/filesystem.h"
+#include "device/Device.h"
+#include "filesystem/Filesystem.h"
 #include "memory.h"
 #include "modules.h"
 #include "mouse.h"
@@ -118,7 +118,7 @@ void kmain(multiboot_info_t *info, uint magic)
     /* --- System context --------------------------------------------------- */
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
-    setup(filesystem);
+    filesystem_initialize();
     setup(tasking);
 
     /* --- Finalizing System ------------------------------------------------ */
@@ -129,16 +129,18 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(modules, &mbootinfo);
 
     logger_info("Mounting devices...");
-    setup(textmode);
-    setup(framebuffer, info);
-    setup(serial);
-    setup(mouse);
-    setup(keyboard);
 
-    setup(proc);
-    setup(null);
-    setup(zero);
-    setup(random);
+    null_initialize();
+    zero_initialize();
+    random_initialize();
+
+    textmode_initialize();
+    framebuffer_initialize(info);
+
+    serial_initialize();
+
+    mouse_initialize();
+    keyboard_initialize();
 
     logger_info("Starting the userspace...");
 

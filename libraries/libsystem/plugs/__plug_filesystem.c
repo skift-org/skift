@@ -21,9 +21,9 @@ int filesystem_mkdir(const char *path)
     return __syscall(SYS_FILESYSTEM_MKDIR, (int)path, 0, 0, 0, 0);
 }
 
-int filesystem_mkfifo(const char *path)
+int filesystem_mkpipe(const char *path)
 {
-    return __syscall(SYS_FILESYSTEM_MKFIFO, (int)path, 0, 0, 0, 0);
+    return __syscall(SYS_FILESYSTEM_MKPIPE, (int)path, 0, 0, 0, 0);
 }
 
 int filesystem_rename(const char *old_path, const char *new_path)

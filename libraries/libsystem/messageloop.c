@@ -19,7 +19,7 @@ void messageloop_fini(void)
 
 void messageloop_register_handler(const char *message_type, messageloop_message_handler_t handler_function)
 {
-    messageloop_handler_t *handler = __malloc(messageloop_handler_t);
+    messageloop_handler_t *handler = __create(messageloop_handler_t);
 
     handler->message_type = message_type;
     handler->handler = handler_function;

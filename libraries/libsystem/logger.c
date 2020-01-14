@@ -56,7 +56,7 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
         va_start(va, fmt);
 
         iostream_vprintf(log_stream, fmt, va);
-        iostream_printf(log_stream, "\033[0m\n");
+        iostream_printf(log_stream, "\e[0m\n");
         iostream_flush(log_stream);
 
         va_end(va);

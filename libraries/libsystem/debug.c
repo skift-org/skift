@@ -5,9 +5,9 @@
 #include <libsystem/debug.h>
 #include <libsystem/process.h>
 
-void debug_hexdump(IOStream *stream, char *desc, const void *addr, int len)
+void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len)
 {
-    int i;
+    size_t i;
     unsigned char buff[17];
     unsigned char *pc = (unsigned char *)addr;
 
@@ -17,7 +17,8 @@ void debug_hexdump(IOStream *stream, char *desc, const void *addr, int len)
     if (desc != NULL)
         iostream_printf(stream, "%s:\n", desc);
 
-    if (len == 0) return;
+    if (len == 0)
+        return;
 
     // Process every byte in the data.
     for (i = 0; i < len; i++)

@@ -11,7 +11,7 @@ void painter_delete(Painter *);
 
 Painter *painter_create(Bitmap *bmp)
 {
-    Painter *paint = __malloc(Painter);
+    Painter *paint = __create(Painter);
 
     paint->bitmap = bmp;
     paint->cliprect = bitmap_bound(bmp);

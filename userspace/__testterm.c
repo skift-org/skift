@@ -9,27 +9,27 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    printf("\033[m");
+    printf("\e[m");
 
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            printf("\033[%d;%dm##", 30 + i, 40 + j);
+            printf("\e[%d;%dm##", 30 + i, 40 + j);
         }
-        printf("\033[0m\n");
+        printf("\e[0m\n");
     }
 
     printf("\n");
 
     for (int i = 0; i < 8; i++)
     {
-        printf("\033[1m");
+        printf("\e[1m");
         for (int j = 0; j < 8; j++)
         {
-            printf("\033[%d;%dm##", 30 + i, 40 + j);
+            printf("\e[%d;%dm##", 30 + i, 40 + j);
         }
-        printf("\033[0m\n");
+        printf("\e[0m\n");
     }
 
     return 0;

@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stddef.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 #define NULL ((void *)0)
 
@@ -45,6 +45,7 @@ typedef unsigned short uint16_t;
 typedef unsigned long uint32_t;
 typedef unsigned long long uint64_t;
 
+typedef long off_t;
 typedef long intptr_t;
 typedef unsigned long uintptr_t;
 
@@ -54,7 +55,9 @@ typedef unsigned long uintptr_t;
 
 #define __unused(__stuff) (void)(__stuff)
 
-#define __malloc(__type) ((__type *)malloc(sizeof(__type)))
+#define __create(__type) ((__type *)calloc(1, sizeof(__type)))
+
+#define __malloc __attribute__((malloc))
 
 #define SWAP(x, y)          \
     {                       \
@@ -68,9 +71,11 @@ typedef unsigned long uintptr_t;
 
 /* --- Raw memory allocation ------------------------------------------------ */
 
-void *malloc(size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(1))) void *malloc(size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(1, 2))) void *calloc(size_t, size_t);
+
 void *realloc(void *p, size_t size);
-void *calloc(size_t, size_t);
+
 void free(void *);
 
 /* --- Refcounted object runtime -------------------------------------------- */

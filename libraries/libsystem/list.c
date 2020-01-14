@@ -6,7 +6,7 @@
 
 List *list_create()
 {
-    List *l = __malloc(List);
+    List *l = __create(List);
 
     l->count = 0;
     l->head = NULL;
@@ -74,7 +74,7 @@ void list_insert_sorted(List *list, void *value, ListComparator comparator)
             current = current->next;
         }
 
-        ListItem *item = __malloc(ListItem);
+        ListItem *item = __create(ListItem);
 
         item->prev = current;
         item->next = current->next;
@@ -192,7 +192,7 @@ bool list_peekat(List *list, int index, void **value)
 
 void list_push(List *l, void *value)
 {
-    ListItem *item = __malloc(ListItem);
+    ListItem *item = __create(ListItem);
 
     item->prev = NULL;
     item->next = NULL;
@@ -245,7 +245,7 @@ bool list_pop(List *l, void **value)
 
 void list_pushback(List *l, void *value)
 {
-    ListItem *item = __malloc(ListItem);
+    ListItem *item = __create(ListItem);
 
     item->prev = NULL;
     item->next = NULL;

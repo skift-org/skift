@@ -10,12 +10,12 @@
 #include <libsystem/error.h>
 #include <libsystem/lock.h>
 
-#include "x86/pci.h"
-#include "filesystem/filesystem.h"
-#include "devices.h"
-#include "paging.h"
+#include "device/Device.h"
+#include "filesystem/Filesystem.h"
 #include "memory.h"
 #include "multiboot.h"
+#include "paging.h"
+#include "x86/pci.h"
 
 /* --- Bochs VBE Extensions driver ------------------------------------------ */
 
@@ -113,19 +113,19 @@ void bga_mode(u32 width, u32 height)
 
 static void *framebuffer_physical_addr = NULL;
 static void *framebuffer_virtual_addr = NULL;
-static stream_t *framebuffer_owner = NULL;
+static Handle *framebuffer_owner = NULL;
 static Point framebuffer_size = {-1, -1};
 
 typedef struct
 {
-    stream_t *owner;
+    Handle *owner;
     void *buffer;
 } framebuffer_backbuffer_t;
 
 static Lock backbuffer_stack_lock;
 static List *backbuffer_stack = NULL;
 
-void *framebuffer_get_buffer(stream_t *owner)
+void *framebuffer_get_buffer(Handle *owner)
 {
     if (framebuffer_owner == owner)
     {
@@ -143,7 +143,7 @@ void *framebuffer_get_buffer(stream_t *owner)
     return NULL;
 }
 
-framebuffer_backbuffer_t *framebuffer_get_backbuffer(stream_t *owner)
+framebuffer_backbuffer_t *framebuffer_get_backbuffer(Handle *owner)
 {
     list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
     {
@@ -255,16 +255,18 @@ error_t framebuffer_set_mode_bga(Point res)
     }
 }
 
-int framebuffer_device_open(stream_t *stream)
+int framebuffer_FsOperationOpen(FsNode *node, Handle *handle)
 {
-    if (stream->flags & IOSTREAM_WRITE)
+    __unused(node);
+
+    if (handle->flags & IOSTREAM_WRITE)
     {
         lock_acquire(backbuffer_stack_lock);
 
         if (framebuffer_owner != NULL)
         {
             // Push the old owner to the framebuffer stack.
-            framebuffer_backbuffer_t *backbuffer = __malloc(framebuffer_backbuffer_t);
+            framebuffer_backbuffer_t *backbuffer = __create(framebuffer_backbuffer_t);
 
             backbuffer->owner = framebuffer_owner;
             backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
@@ -274,24 +276,26 @@ int framebuffer_device_open(stream_t *stream)
         }
 
         // Make stream the new owner of the framebuffer.
-        framebuffer_owner = stream;
+        framebuffer_owner = handle;
         memset(framebuffer_virtual_addr, 0, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
 
         lock_release(backbuffer_stack_lock);
     }
 
-    return 0;
+    return -ERR_SUCCESS;
 }
 
-int framebuffer_device_close(stream_t *stream)
+void framebuffer_FsOperationClose(FsNode *node, Handle *handle)
 {
-    if (stream->flags & IOSTREAM_WRITE)
+    __unused(node);
+
+    if (handle->flags & IOSTREAM_WRITE)
     {
         lock_acquire(backbuffer_stack_lock);
 
-        if (framebuffer_owner == stream)
+        if (framebuffer_owner == handle)
         {
-            // If stream is the owner, pop from the backbuffer stack.
+            // If handle is the owner, pop from the backbuffer stack.
             framebuffer_backbuffer_t *backbuffer = NULL;
             if (list_popback(backbuffer_stack, (void **)&backbuffer))
             {
@@ -306,7 +310,7 @@ int framebuffer_device_close(stream_t *stream)
         else
         {
             // Else remove stream from the backbuffer stack.
-            framebuffer_backbuffer_t *backbuffer = framebuffer_get_backbuffer(stream);
+            framebuffer_backbuffer_t *backbuffer = framebuffer_get_backbuffer(handle);
             list_remove(backbuffer_stack, backbuffer);
             free(backbuffer->buffer);
             free(backbuffer);
@@ -314,13 +318,11 @@ int framebuffer_device_close(stream_t *stream)
 
         lock_release(backbuffer_stack_lock);
     }
-
-    return 0;
 }
 
-int framebuffer_device_call(stream_t *stream, int request, void *args)
+int framebuffer_FsOperationCall(FsNode *node, Handle *handle, int request, void *args)
 {
-    __unused(stream);
+    __unused(node);
 
     lock_acquire(backbuffer_stack_lock);
 
@@ -348,7 +350,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_CALL_BLIT)
     {
-        if (stream->flags & IOSTREAM_WRITE)
+        if (handle->flags & IOSTREAM_WRITE)
         {
             framebuffer_blit_args_t *blitargs = args;
 
@@ -362,7 +364,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
                                                 ((source_pixel_data)&0xff00ff00) |
                                                 ((source_pixel_data << 16) & 0x00ff0000);
 
-                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (Point){x, y}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(handle), framebuffer_size, (Point){x, y}, converted_pixel_data);
                 }
             }
             lock_release(backbuffer_stack_lock);
@@ -378,7 +380,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
     }
     else if (request == FRAMEBUFFER_CALL_BLITREGION)
     {
-        if (stream->flags & IOSTREAM_WRITE)
+        if (handle->flags & IOSTREAM_WRITE)
         {
             framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
 
@@ -395,7 +397,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
                                                 ((source_pixel_data)&0xff00ff00) |
                                                 ((source_pixel_data << 16) & 0x00ff0000);
 
-                    framebuffer_set_pixel(framebuffer_get_buffer(stream), framebuffer_size, (Point){xx, yy}, converted_pixel_data);
+                    framebuffer_set_pixel(framebuffer_get_buffer(handle), framebuffer_size, (Point){xx, yy}, converted_pixel_data);
                 }
             }
 
@@ -418,7 +420,7 @@ int framebuffer_device_call(stream_t *stream, int request, void *args)
     }
 }
 
-void framebuffer_setup(multiboot_info_t *mboot)
+void framebuffer_initialize(multiboot_info_t *mboot)
 {
     if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB || bga_is_available())
     {
@@ -434,13 +436,16 @@ void framebuffer_setup(multiboot_info_t *mboot)
             framebuffer_set_mode_bga((Point){800, 600});
         }
 
-        device_t framebuffer_device = {
-            .open = framebuffer_device_open,
-            .close = framebuffer_device_close,
-            .call = framebuffer_device_call,
-        };
+        FsNode *framebuffer_device = __create(FsNode);
+        fsnode_init(framebuffer_device, FSNODE_DEVICE);
 
-        FILESYSTEM_MKDEV(FRAMEBUFFER_DEVICE, framebuffer_device);
+        FSNODE(framebuffer_device)->open = (FsOperationOpen)framebuffer_FsOperationOpen;
+        FSNODE(framebuffer_device)->close = (FsOperationClose)framebuffer_FsOperationClose;
+        FSNODE(framebuffer_device)->call = (FsOperationCall)framebuffer_FsOperationCall;
+
+        Path *framebuffer_device_path = path(FRAMEBUFFER_DEVICE);
+        filesystem_link_and_take_ref(framebuffer_device_path, framebuffer_device);
+        path_delete(framebuffer_device_path);
     }
     else
     {

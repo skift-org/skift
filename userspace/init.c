@@ -5,10 +5,10 @@
 #include <libsystem/cstring.h>
 #include <libsystem/iostream.h>
 
-#include <libsystem/logger.h>
-#include <libsystem/process.h>
-#include <libsystem/messaging.h>
 #include <libsystem/filesystem.h>
+#include <libsystem/logger.h>
+#include <libsystem/messaging.h>
+#include <libsystem/process.h>
 
 int init_exec(const char *filename)
 {
@@ -34,10 +34,10 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    printf("Welcome to \033[1;34mskiftOS\033[0m!\n");
+    printf("Welcome to \e[1;34mskiftOS\e[0m!\n");
     iostream_flush(out_stream);
 
-    filesystem_mkfifo("/dev/term");
+    filesystem_mkpipe("/dev/term");
     init_exec("/bin/term");
     int shell = init_exec("/bin/sh");
 

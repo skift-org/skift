@@ -7,9 +7,9 @@
 #include <libsystem/__plugs__.h>
 
 #include <libsystem/cstring.h>
-#include <libsystem/runtime.h>
-#include <libsystem/logger.h>
 #include <libsystem/iostream.h>
+#include <libsystem/logger.h>
+#include <libsystem/runtime.h>
 
 #define VERSION "1.1"
 #define ALIGNMENT 16ul
@@ -526,7 +526,7 @@ void PREFIX(free)(void *ptr)
 		l_warningCount += 1;
 #if defined DEBUG || defined INFO
 		logger_warn("PREFIX(free)( NULL ) called from 0x%x",
-						__builtin_return_address(0));
+					__builtin_return_address(0));
 		FLUSH();
 #endif
 		return;
@@ -633,12 +633,8 @@ void PREFIX(free)(void *ptr)
 
 void *PREFIX(calloc)(size_t nobj, size_t size)
 {
-	size_t real_size;
-	void *p;
-
-	real_size = nobj * size;
-
-	p = PREFIX(malloc)(real_size);
+	size_t real_size = nobj * size;
+	void *p = PREFIX(malloc)(real_size);
 	memset(p, 0, real_size);
 
 	return p;

@@ -27,7 +27,7 @@ framebuffer_t *framebuffer_open(void)
 
     Painter *framebuffer_painter = painter_create(framebuffer_backbuffer);
 
-    framebuffer_t *this = __malloc(framebuffer_t);
+    framebuffer_t *this = __create(framebuffer_t);
 
     this->device = framebuffer_device;
     this->backbuffer = framebuffer_backbuffer;

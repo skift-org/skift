@@ -13,11 +13,14 @@ CDIALECT_FLAGS=-std=gnu11
 
 CWARN_FLAGS=-Wall \
 		    -Wextra \
-			-Werror 
+			-Werror
 
+
+#FIXME: get ride of -ffreestanding but calloc breack without it :/
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
+	   -ffreestanding \
 	   -Ilibraries -Ilibraries/libposix \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
@@ -123,7 +126,7 @@ USERSPACE=$(SYSROOT)/bin/__democolors \
 		  $(SYSROOT)/bin/touch \
 		  $(SYSROOT)/bin/unlink \
 		  $(SYSROOT)/bin/wm
-			
+
 KERNEL=$(BUILDROOT)/kernel.bin
 KERNEL_CSOURCES=$(wildcard kernel/*.c) $(wildcard kernel/*/*.c) $(wildcard libraries/libsystem/*.c) $(wildcard libraries/libfile/*.c)
 KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
@@ -146,6 +149,10 @@ clean:
 run: $(BOOTDISK)
 	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
 	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio
+
+run-headless: $(BOOTDISK)
+	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -nographic -enable-kvm  || \
+	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -nographic
 
 debug: $(BOOTDISK)
 	qemu-system-i386 -s -S -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
@@ -294,7 +301,7 @@ $(SYSROOT)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
 $(SYSROOT)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@
-	
+
 $(SYSROOT)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
 	$(CC) $(CFLAGS) $< -o $@

@@ -4,15 +4,15 @@
 
 #include <libsystem/__plugs__.h>
 
-#include <libsystem/iostream.h>
-#include <libsystem/atomic.h>
 #include <libsystem/assert.h>
+#include <libsystem/atomic.h>
 #include <libsystem/error.h>
+#include <libsystem/iostream.h>
 
-#include "tasking.h"
+#include "clock.h"
 #include "memory.h"
 #include "serial.h"
-#include "clock.h"
+#include "tasking.h"
 
 /* --- Framework initialization --------------------------------------------- */
 
@@ -120,42 +120,42 @@ int __plug_logger_unlock()
 
 int __plug_iostream_open(const char *file_path, IOStreamFlag flags)
 {
-    return task_open_file(sheduler_running(), file_path, flags);
+    return task_handle_open(sheduler_running(), file_path, flags);
 }
 
 int __plug_iostream_close(int fd)
 {
-    return task_close_file(sheduler_running(), fd);
+    return task_handle_close(sheduler_running(), fd);
 }
 
 int __plug_iostream_read(int fd, void *buffer, uint size)
 {
-    return task_read_file(sheduler_running(), fd, buffer, size);
+    return task_handle_read(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_write(int fd, const void *buffer, uint size)
 {
-    return task_write_file(sheduler_running(), fd, buffer, size);
+    return task_handle_write(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_call(int fd, int request, void *args)
 {
-    return task_call_file(sheduler_running(), fd, request, args);
+    return task_handle_call(sheduler_running(), fd, request, args);
 }
 
 int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence)
 {
-    return task_seek_file(sheduler_running(), fd, offset, whence);
+    return task_handle_seek(sheduler_running(), fd, whence, offset);
 }
 
 int __plug_iostream_tell(int fd, IOStreamWhence whence)
 {
-    return task_tell_file(sheduler_running(), fd, whence);
+    return task_handle_tell(sheduler_running(), fd, whence);
 }
 
 int __plug_iostream_stat(int fd, IOStreamState *stat)
 {
-    return task_stat_file(sheduler_running(), fd, stat);
+    return task_handle_stat(sheduler_running(), fd, stat);
 }
 
 /* --- Processes ------------------------------------------------------------ */

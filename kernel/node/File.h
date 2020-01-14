@@ -1,15 +1,18 @@
+#pragma once
+
 /* Copyright © 2018-2019 N. Van Bossuyt.                                      */
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
+#include "node/Node.h"
 
-int main(int argc, char **argv)
+typedef struct
 {
-    (void)argc;
-    (void)argv;
+    FsNode node;
 
-    printf("\e[H\e[2J");
+    byte *buffer;
+    size_t realsize;
+    size_t size;
+} FsFile;
 
-    return 0;
-}
+FsNode *file_create(void);

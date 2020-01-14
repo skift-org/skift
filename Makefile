@@ -16,11 +16,9 @@ CWARN_FLAGS=-Wall \
 			-Werror
 
 
-#FIXME: get ride of -ffreestanding but calloc breack without it :/
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
-	   -ffreestanding \
 	   -Ilibraries -Ilibraries/libposix \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 

@@ -4,42 +4,42 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
 #include <libsystem/list.h>
+#include <libsystem/runtime.h>
 
 #include <libkernel/message.h>
 #include <libkernel/task.h>
 
-#include "memory.h"
 #include "filesystem/Filesystem.h"
+#include "memory.h"
 #include "sheduling/TaskBlocker.h"
 
 /* --- Task data structure -------------------------------------------------- */
 
-struct task;
+struct Task;
 
-typedef void (*task_entry_t)();
+typedef void (*TaskEntry)();
 
 typedef struct
 {
     uint wakeuptick;
     bool gotwakeup;
-} task_wait_time_t;
+} TaskWaitTimeInfo;
 
 typedef struct
 {
     int task_handle;
     int exitvalue;
-} task_wait_task_t;
+} TaskWaitTaskInfo;
 
 typedef struct
 {
     bool has_result;
     message_t result;
     int timeout;
-} task_wait_respond_t;
+} TaskWaitRespondInfo;
 
-typedef struct task
+typedef struct Task
 {
     int id;
     char name[TASK_NAMESIZE]; // Frendly name of the process
@@ -49,14 +49,14 @@ typedef struct task
 
     uint sp;
     byte stack[TASK_STACKSIZE]; // Kernel stack
-    task_entry_t entry;         // Our entry point
+    TaskEntry entry;            // Our entry point
     char fpu_registers[512];
 
     struct
     {
-        task_wait_time_t time;
-        task_wait_task_t task;
-        task_wait_respond_t respond;
+        TaskWaitTimeInfo time;
+        TaskWaitTaskInfo task;
+        TaskWaitRespondInfo respond;
     } wait;
 
     TaskBlocker *blocker;
@@ -75,14 +75,15 @@ typedef struct task
     page_directorie_t *pdir; // Page directorie
 
     int exitvalue;
-} task_t;
+} Task;
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */
 /* -------------------------------------------------------------------------- */
 
 void tasking_setup(void);
-task_t *task_kernel(void);
+
+Task *task_kernel(void);
 
 /* -------------------------------------------------------------------------- */
 /*   TASKS                                                                    */
@@ -90,31 +91,31 @@ task_t *task_kernel(void);
 
 void task_setup(void);
 
-task_t *task(task_t *parent, const char *name, bool user);
+Task *task_create(Task *parent, const char *name, bool user);
 
-void task_delete(task_t *task);
+void task_destroy(Task *task);
 
 List *task_all(void);
 
 List *task_bystate(task_state_t state);
 
-task_t *task_getbyid(int id);
+Task *task_getbyid(int id);
 
-void task_get_info(task_t *this, task_info_t *info);
+void task_get_info(Task *task, task_info_t *info);
 
 int task_count(void);
 
-task_t *task_spawn(task_t *parent, const char *name, task_entry_t entry, void *arg, bool user);
+Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user);
 
-task_t *task_spawn_with_argv(task_t *parent, const char *name, task_entry_t entry, const char **argv, bool user);
+Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user);
 
-void task_setstate(task_t *task, task_state_t state);
+void task_setstate(Task *task, task_state_t state);
 
-void task_setentry(task_t *t, task_entry_t entry, bool user);
+void task_setentry(Task *task, TaskEntry entry, bool user);
 
-uint task_stack_push(task_t *t, const void *value, uint size);
+uint task_stack_push(Task *task, const void *value, uint size);
 
-void task_go(task_t *t);
+void task_go(Task *t);
 
 typedef enum
 {
@@ -122,71 +123,71 @@ typedef enum
     TASk_SLEEP_RESULT_TIMEOUT,
 } task_sleep_result_t;
 
-task_sleep_result_t task_sleep(task_t *this, int timeout);
+task_sleep_result_t task_sleep(Task *this, int timeout);
 
-int task_wakeup(task_t *task);
+int task_wakeup(Task *task);
 
 bool task_wait(int task_id, int *exitvalue);
 
-void task_block(task_t *task, TaskBlocker *blocker);
+void task_block(Task *task, TaskBlocker *blocker);
 
-bool task_cancel(task_t *task, int exitvalue);
+bool task_cancel(Task *task, int exitvalue);
 
 void task_exit(int exitvalue);
 
-void task_dump(task_t *t);
+void task_dump(Task *t);
 
 void task_panic_dump(void);
 
 /* --- Task memory management ----------------------------------------------- */
 
-page_directorie_t *task_switch_pdir(task_t *task, page_directorie_t *pdir);
+page_directorie_t *task_switch_pdir(Task *task, page_directorie_t *pdir);
 
-int task_memory_map(task_t *this, uint addr, uint count);
+int task_memory_map(Task *this, uint addr, uint count);
 
-int task_memory_unmap(task_t *this, uint addr, uint count);
+int task_memory_unmap(Task *this, uint addr, uint count);
 
-uint task_memory_alloc(task_t *this, uint count);
+uint task_memory_alloc(Task *this, uint count);
 
-void task_memory_free(task_t *this, uint addr, uint count);
+void task_memory_free(Task *this, uint addr, uint count);
 
 /* --- Task current working directory --------------------------------------- */
 
-Path *task_cwd_resolve(task_t *this, const char *Patho_resolve);
+Path *task_cwd_resolve(Task *this, const char *Patho_resolve);
 
-int task_set_cwd(task_t *this, const char *new_wd);
+int task_set_cwd(Task *this, const char *new_wd);
 
-void task_get_cwd(task_t *this, char *buffer, uint size);
+void task_get_cwd(Task *this, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
-int task_handle_add(task_t *task, Handle *handle);
+int task_handle_add(Task *task, Handle *handle);
 
-int task_handle_remove(task_t *task, int handle_index);
+int task_handle_remove(Task *task, int handle_index);
 
-Handle *task_handle_acquire(task_t *task, int handle_index);
+Handle *task_handle_acquire(Task *task, int handle_index);
 
-int task_handle_release(task_t *task, int handle_index);
+int task_handle_release(Task *task, int handle_index);
 
 /* --- Task handle operations ----------------------------------------------- */
 
-int task_handle_open(task_t *this, const char *file_path, IOStreamFlag flags);
+int task_handle_open(Task *this, const char *file_path, IOStreamFlag flags);
 
-int task_handle_close(task_t *this, int handle_index);
+int task_handle_close(Task *this, int handle_index);
 
-void task_handle_close_all(task_t *this);
+void task_handle_close_all(Task *this);
 
-int task_handle_read(task_t *this, int handle_index, void *buffer, uint size);
+int task_handle_read(Task *this, int handle_index, void *buffer, uint size);
 
-int task_handle_write(task_t *this, int handle_index, const void *buffer, uint size);
+int task_handle_write(Task *this, int handle_index, const void *buffer, uint size);
 
-int task_handle_call(task_t *this, int handle_index, int request, void *args);
+int task_handle_call(Task *this, int handle_index, int request, void *args);
 
-int task_handle_seek(task_t *this, int handle_index, IOStreamWhence whence, off_t offset);
+int task_handle_seek(Task *this, int handle_index, IOStreamWhence whence, off_t offset);
 
-int task_handle_tell(task_t *this, int handle_index, IOStreamWhence whence);
+int task_handle_tell(Task *this, int handle_index, IOStreamWhence whence);
 
-int task_handle_stat(task_t *this, int handle_index, IOStreamState *stat);
+int task_handle_stat(Task *this, int handle_index, IOStreamState *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */
@@ -214,31 +215,31 @@ typedef struct
 void task_shared_memory_setup(void);
 
 shm_physical_region_t *task_physical_region_get_by_id(int id);
-shm_virtual_region_t *task_virtual_region_get_by_id(task_t *this, int id);
+shm_virtual_region_t *task_virtual_region_get_by_id(Task *this, int id);
 
-int task_shared_memory_alloc(task_t *this, int pagecount);
+int task_shared_memory_alloc(Task *this, int pagecount);
 
-int task_shared_memory_acquire(task_t *this, int shm, uint *addr);
+int task_shared_memory_acquire(Task *this, int shm, uint *addr);
 
-int task_shared_memory_release(task_t *this, int shm);
+int task_shared_memory_release(Task *this, int shm);
 
 /* -------------------------------------------------------------------------- */
 /*   MESSAGING                                                                */
 /* -------------------------------------------------------------------------- */
 
-int task_messaging_send(task_t *this, message_t *event);
+int task_messaging_send(Task *this, message_t *event);
 
-int task_messaging_broadcast(task_t *this, const char *channel, message_t *event);
+int task_messaging_broadcast(Task *this, const char *channel, message_t *event);
 
-int task_messaging_request(task_t *this, message_t *request, message_t *respond, int timeout);
+int task_messaging_request(Task *this, message_t *request, message_t *respond, int timeout);
 
-int task_messaging_receive(task_t *this, message_t *message, bool wait);
+int task_messaging_receive(Task *this, message_t *message, bool wait);
 
-int task_messaging_respond(task_t *this, message_t *request, message_t *respond);
+int task_messaging_respond(Task *this, message_t *request, message_t *respond);
 
-int task_messaging_subscribe(task_t *this, const char *channel);
+int task_messaging_subscribe(Task *this, const char *channel);
 
-int task_messaging_unsubscribe(task_t *this, const char *channel);
+int task_messaging_unsubscribe(Task *this, const char *channel);
 
 /* -------------------------------------------------------------------------- */
 /*   GARBAGE COLECTOR                                                         */
@@ -258,7 +259,7 @@ void garbage_colector();
 
 void timer_set_frequency(int hz);
 
-void sheduler_setup(task_t *main_kernel_task);
+void sheduler_setup(Task *main_kernel_task);
 
 void wakeup_sleeping_tasks(void);
 
@@ -270,7 +271,7 @@ bool sheduler_is_context_switch(void);
 
 void sheduler_yield(void);
 
-task_t *sheduler_running(void);
+Task *sheduler_running(void);
 
 int sheduler_running_id(void);
 

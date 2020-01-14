@@ -4,9 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "tasking.h"
 #include "processor.h"
-
+#include "tasking.h"
 
 size_t platform_page_size(void);
 
@@ -14,14 +13,14 @@ size_t platform_page_size(void);
 
 void platform_fpu_enable(void);
 
-void platform_fpu_save_context(task_t *t);
+void platform_fpu_save_context(Task *task);
 
-void platform_fpu_load_context(task_t *t);
+void platform_fpu_load_context(Task *task);
 
 /* --- Processor ------------------------------------------------------------ */
 
 void platform_setup(void);
 
-void platform_save_context(task_t *t);
+void platform_save_context(Task *task);
 
-void platform_load_context(task_t *t);
+void platform_load_context(Task *task);

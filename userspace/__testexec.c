@@ -12,14 +12,16 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
+    printf("\n");
+
     for (int i = 0; i < LOOP_MAX; i++)
     {
-        printf("\n%d out %d...", i, LOOP_MAX);
-        int pid = process_exec("/bin/sysfetch", (const char *[]){"sysfetch", NULL});
+        printf("\r%d out %d... ", i + 1, LOOP_MAX);
+        int pid = process_exec("/bin/__testapp", (const char *[]){"__testapp", NULL});
         process_wait(pid, NULL);
     }
 
-    printf("\nPASS");
+    printf("PASS\n");
 
     return 0;
 }

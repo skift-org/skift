@@ -19,13 +19,13 @@
 /* -------------------------------------------------------------------------- */
 
 static uint ticks = 0;
-static task_t *running = NULL;
+static Task *running = NULL;
 
-static task_t *kernel_task;
-task_t *task_kernel(void) { return kernel_task; }
+static Task *kernel_task;
+Task *task_kernel(void) { return kernel_task; }
 
-static task_t *garbage_task;
-static task_t *idle_task;
+static Task *garbage_task;
+static Task *idle_task;
 
 void idle_code() { HANG; }
 
@@ -76,18 +76,18 @@ void task_setup(void)
     }
 }
 
-task_t *task(task_t *parent, const char *name, bool user)
+Task *task_create(Task *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
-    task_t *this = __create(task_t);
+    Task *this = __create(Task);
 
     if (this == NULL)
     {
         PANIC("Failed to allocated a new task.");
     }
 
-    memset(this, 0, sizeof(task_t));
+    memset(this, 0, sizeof(Task));
 
     this->id = TID++;
     strlcpy(this->name, name, TASK_NAMESIZE);
@@ -159,7 +159,7 @@ task_t *task(task_t *parent, const char *name, bool user)
     return this;
 }
 
-void task_delete(task_t *this)
+void task_destroy(Task *this)
 {
     atomic_begin();
     if (this->state != TASK_STATE_NONE)
@@ -195,9 +195,9 @@ List *task_bystate(task_state_t state)
     return tasks_bystates[state];
 }
 
-task_t *task_getbyid(int id)
+Task *task_getbyid(int id)
 {
-    list_foreach(task_t, task, tasks)
+    list_foreach(Task, task, tasks)
     {
         if (task->id == id)
             return task;
@@ -206,7 +206,7 @@ task_t *task_getbyid(int id)
     return NULL;
 }
 
-void task_get_info(task_t *this, task_info_t *info)
+void task_get_info(Task *this, task_info_t *info)
 {
     assert(this);
 
@@ -228,11 +228,11 @@ int task_count(void)
     return result;
 }
 
-task_t *task_spawn(task_t *parent, const char *name, task_entry_t entry, void *arg, bool user)
+Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user)
 {
     ASSERT_ATOMIC;
 
-    task_t *t = task(parent, name, user);
+    Task *t = task_create(parent, name, user);
 
     task_setentry(t, entry, user);
     task_stack_push(t, &arg, sizeof(arg));
@@ -240,11 +240,11 @@ task_t *task_spawn(task_t *parent, const char *name, task_entry_t entry, void *a
     return t;
 }
 
-task_t *task_spawn_with_argv(task_t *parent, const char *name, task_entry_t entry, const char **argv, bool user)
+Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user)
 {
     atomic_begin();
 
-    task_t *t = task(parent, name, user);
+    Task *t = task_create(parent, name, user);
 
     task_setentry(t, entry, true);
 
@@ -270,10 +270,10 @@ task_t *task_spawn_with_argv(task_t *parent, const char *name, task_entry_t entr
 
 bool shortest_sleep_first(void *left, void *right)
 {
-    return ((task_t *)left)->wait.time.wakeuptick < ((task_t *)right)->wait.time.wakeuptick;
+    return ((Task *)left)->wait.time.wakeuptick < ((Task *)right)->wait.time.wakeuptick;
 }
 
-void task_setstate(task_t *task, task_state_t state)
+void task_setstate(Task *task, task_state_t state)
 {
     ASSERT_ATOMIC;
 
@@ -303,13 +303,13 @@ void task_setstate(task_t *task, task_state_t state)
     }
 }
 
-void task_setentry(task_t *t, task_entry_t entry, bool user)
+void task_setentry(Task *t, TaskEntry entry, bool user)
 {
     t->entry = entry;
     t->user = user;
 }
 
-uint task_stack_push(task_t *t, const void *value, uint size)
+uint task_stack_push(Task *t, const void *value, uint size)
 {
     t->sp -= size;
     memcpy((void *)t->sp, value, size);
@@ -317,7 +317,7 @@ uint task_stack_push(task_t *t, const void *value, uint size)
     return t->sp;
 }
 
-void task_go(task_t *t)
+void task_go(Task *t)
 {
     processor_context_t ctx;
 
@@ -341,7 +341,7 @@ void task_go(task_t *t)
 
 /* --- Task wait state ---------------------------------------------------- */
 
-task_sleep_result_t task_sleep(task_t *this, int timeout)
+task_sleep_result_t task_sleep(Task *this, int timeout)
 {
     ATOMIC({
         this->wait.time.wakeuptick = ticks + timeout;
@@ -362,7 +362,7 @@ task_sleep_result_t task_sleep(task_t *this, int timeout)
     }
 }
 
-int task_wakeup(task_t *this)
+int task_wakeup(Task *this)
 {
     ASSERT_ATOMIC;
 
@@ -383,7 +383,7 @@ bool task_wait(int task_id, int *exitvalue)
 {
     atomic_begin();
 
-    task_t *task = task_getbyid(task_id);
+    Task *task = task_getbyid(task_id);
 
     if (task != NULL)
     {
@@ -421,7 +421,7 @@ bool task_wait(int task_id, int *exitvalue)
     }
 }
 
-void task_block(task_t *task, TaskBlocker *blocker)
+void task_block(Task *task, TaskBlocker *blocker)
 {
     assert(!task->blocker);
 
@@ -435,7 +435,7 @@ void task_block(task_t *task, TaskBlocker *blocker)
 
 /* --- Task stopping and canceling ---------------------------------------- */
 
-bool task_cancel(task_t *task, int exitvalue)
+bool task_cancel(Task *task, int exitvalue)
 {
     atomic_begin();
 
@@ -446,7 +446,7 @@ bool task_cancel(task_t *task, int exitvalue)
         task_setstate(task, TASK_STATE_CANCELED);
 
         // Wake up waiting tasks
-        list_foreach(task_t, waittask, task_bystate(TASK_STATE_WAIT_TASK))
+        list_foreach(Task, waittask, task_bystate(TASK_STATE_WAIT_TASK))
         {
             if (waittask->wait.task.task_handle == task->id)
             {
@@ -476,7 +476,7 @@ void task_exit(int exitvalue)
 
 /* --- Task Memory managment ---------------------------------------------- */
 
-page_directorie_t *task_switch_pdir(task_t *task, page_directorie_t *pdir)
+page_directorie_t *task_switch_pdir(Task *task, page_directorie_t *pdir)
 {
     page_directorie_t *oldpdir = task->pdir;
 
@@ -486,30 +486,30 @@ page_directorie_t *task_switch_pdir(task_t *task, page_directorie_t *pdir)
     return oldpdir;
 }
 
-int task_memory_map(task_t *this, uint addr, uint count)
+int task_memory_map(Task *this, uint addr, uint count)
 {
     return memory_map(this->pdir, addr, count, 1);
 }
 
-int task_memory_unmap(task_t *this, uint addr, uint count)
+int task_memory_unmap(Task *this, uint addr, uint count)
 {
     return memory_unmap(this->pdir, addr, count);
 }
 
-uint task_memory_alloc(task_t *this, uint count)
+uint task_memory_alloc(Task *this, uint count)
 {
     uint addr = memory_alloc(this->pdir, count, 1);
     return addr;
 }
 
-void task_memory_free(task_t *this, uint addr, uint count)
+void task_memory_free(Task *this, uint addr, uint count)
 {
     return memory_free(this->pdir, addr, count, 1);
 }
 
 /* --- File descriptor allocation and locking ------------------------------- */
 
-int task_handle_add(task_t *task, Handle *handle)
+int task_handle_add(Task *task, Handle *handle)
 {
     int result = -ERR_TOO_MANY_OPEN_FILES;
 
@@ -530,7 +530,7 @@ int task_handle_add(task_t *task, Handle *handle)
     return result;
 }
 
-int task_handle_remove(task_t *task, int handle_index)
+int task_handle_remove(Task *task, int handle_index)
 {
     int result = -ERR_BAD_FILE_DESCRIPTOR;
 
@@ -556,7 +556,7 @@ int task_handle_remove(task_t *task, int handle_index)
     return result;
 }
 
-Handle *task_handle_acquire(task_t *task, int handle_index)
+Handle *task_handle_acquire(Task *task, int handle_index)
 {
     Handle *result = NULL;
 
@@ -580,7 +580,7 @@ Handle *task_handle_acquire(task_t *task, int handle_index)
     return result;
 }
 
-int task_handle_release(task_t *task, int handle_index)
+int task_handle_release(Task *task, int handle_index)
 {
     int result = -ERR_BAD_FILE_DESCRIPTOR;
 
@@ -606,7 +606,7 @@ int task_handle_release(task_t *task, int handle_index)
 
 /* --- task file operations ----------------------------------------------- */
 
-int task_handle_open(task_t *task, const char *file_path, IOStreamFlag flags)
+int task_handle_open(Task *task, const char *file_path, IOStreamFlag flags)
 {
     Path *p = task_cwd_resolve(task, file_path);
 
@@ -629,7 +629,7 @@ int task_handle_open(task_t *task, const char *file_path, IOStreamFlag flags)
     return handle_index;
 }
 
-void task_handle_close_all(task_t *this)
+void task_handle_close_all(Task *this)
 {
     for (int i = 0; i < TASK_FILDES_COUNT; i++)
     {
@@ -637,12 +637,12 @@ void task_handle_close_all(task_t *this)
     }
 }
 
-int task_handle_close(task_t *task, int handle_index)
+int task_handle_close(Task *task, int handle_index)
 {
     return task_handle_remove(task, handle_index);
 }
 
-int task_handle_read(task_t *task, int handle_index, void *buffer, uint size)
+int task_handle_read(Task *task, int handle_index, void *buffer, uint size)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -658,7 +658,7 @@ int task_handle_read(task_t *task, int handle_index, void *buffer, uint size)
     return result;
 }
 
-int task_handle_write(task_t *task, int handle_index, const void *buffer, uint size)
+int task_handle_write(Task *task, int handle_index, const void *buffer, uint size)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -674,7 +674,7 @@ int task_handle_write(task_t *task, int handle_index, const void *buffer, uint s
     return result;
 }
 
-int task_handle_call(task_t *task, int handle_index, int request, void *args)
+int task_handle_call(Task *task, int handle_index, int request, void *args)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -690,7 +690,7 @@ int task_handle_call(task_t *task, int handle_index, int request, void *args)
     return result;
 }
 
-int task_handle_seek(task_t *task, int handle_index, IOStreamWhence whence, off_t offset)
+int task_handle_seek(Task *task, int handle_index, IOStreamWhence whence, off_t offset)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -706,7 +706,7 @@ int task_handle_seek(task_t *task, int handle_index, IOStreamWhence whence, off_
     return result;
 }
 
-int task_handle_tell(task_t *task, int handle_index, IOStreamWhence whence)
+int task_handle_tell(Task *task, int handle_index, IOStreamWhence whence)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -722,7 +722,7 @@ int task_handle_tell(task_t *task, int handle_index, IOStreamWhence whence)
     return result;
 }
 
-int task_handle_stat(task_t *task, int handle_index, IOStreamState *stat)
+int task_handle_stat(Task *task, int handle_index, IOStreamState *stat)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -752,7 +752,7 @@ static char *TASK_STATES[] = {
     "CANCELED",
 };
 
-void task_dump(task_t *t)
+void task_dump(Task *t)
 {
     atomic_begin();
     printf("\n\t - Task %d %s", t->id, t->name);
@@ -776,7 +776,7 @@ void task_panic_dump(void)
     printf("\n");
     printf("\n\tTasks:");
 
-    list_foreach(task_t, t, tasks)
+    list_foreach(Task, t, tasks)
     {
         task_dump(t);
     }
@@ -786,7 +786,7 @@ void task_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-static void load_elfseg(task_t *this, IOStream *s, elf_program_t *program)
+static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
@@ -852,7 +852,7 @@ int task_exec(const char *executable_path, const char **argv)
     }
 
     // Create the process and load the executable.
-    task_t *new_task = task_spawn_with_argv(sheduler_running(), executable_path, (task_entry_t)elf_header.entry, argv, true);
+    Task *new_task = task_spawn_with_argv(sheduler_running(), executable_path, (TaskEntry)elf_header.entry, argv, true);
 
     int new_task_id = new_task->id;
 
@@ -876,7 +876,7 @@ int task_exec(const char *executable_path, const char **argv)
 
 /* --- Current working directory -------------------------------------------- */
 
-Path *task_cwd_resolve(task_t *this, const char *Patho_resolve)
+Path *task_cwd_resolve(Task *this, const char *Patho_resolve)
 {
     Path *p = path(Patho_resolve);
 
@@ -896,7 +896,7 @@ Path *task_cwd_resolve(task_t *this, const char *Patho_resolve)
     return p;
 }
 
-int task_set_cwd(task_t *this, const char *new_path)
+int task_set_cwd(Task *this, const char *new_path)
 {
     int result = -ERR_SUCCESS;
 
@@ -933,7 +933,7 @@ cleanup_and_return:
     return result;
 }
 
-void task_get_cwd(task_t *this, char *buffer, uint size)
+void task_get_cwd(Task *this, char *buffer, uint size)
 {
     lock_acquire(this->cwd_lock);
 
@@ -1003,7 +1003,7 @@ shm_physical_region_t *task_physical_region_get_by_id(int id)
 
 /* --- Shared virtual region ------------------------------------------------ */
 void shm_virtual_region_delete(shm_virtual_region_t *this);
-shm_virtual_region_t *shm_virtual_region(task_t *task, shm_physical_region_t *physr)
+shm_virtual_region_t *shm_virtual_region(Task *task, shm_physical_region_t *physr)
 {
     uint vaddr = virtual_alloc(task->pdir, physr->paddr, physr->pagecount, 1);
 
@@ -1032,7 +1032,7 @@ void shm_virtual_region_delete(shm_virtual_region_t *this)
     }
 }
 
-shm_virtual_region_t *task_virtual_region_get_by_id(task_t *this, int id)
+shm_virtual_region_t *task_virtual_region_get_by_id(Task *this, int id)
 {
     if (id < SHMID)
         return NULL;
@@ -1048,7 +1048,7 @@ shm_virtual_region_t *task_virtual_region_get_by_id(task_t *this, int id)
 
 /* --- User facing API ------------------------------------------------------ */
 
-int task_shared_memory_alloc(task_t *this, int pagecount)
+int task_shared_memory_alloc(Task *this, int pagecount)
 {
     lock_acquire(shms_lock);
 
@@ -1071,7 +1071,7 @@ int task_shared_memory_alloc(task_t *this, int pagecount)
     return physr->ID;
 }
 
-int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
+int task_shared_memory_acquire(Task *this, int shm, uint *addr)
 {
     lock_acquire(shms_lock);
 
@@ -1105,7 +1105,7 @@ int task_shared_memory_acquire(task_t *this, int shm, uint *addr)
     return -ERR_SUCCESS;
 }
 
-int task_shared_memory_release(task_t *this, int shm)
+int task_shared_memory_release(Task *this, int shm)
 {
     lock_acquire(shms_lock);
 
@@ -1132,7 +1132,7 @@ static int MID = 0;
 
 /* --- Channels ------------------------------------------------------------- */
 
-bool task_messaging_has_subscribe(task_t *this, const char *channel)
+bool task_messaging_has_subscribe(Task *this, const char *channel)
 {
     atomic_begin();
 
@@ -1151,7 +1151,7 @@ bool task_messaging_has_subscribe(task_t *this, const char *channel)
     return false;
 }
 
-int task_messaging_subscribe(task_t *this, const char *channel)
+int task_messaging_subscribe(Task *this, const char *channel)
 {
     if (task_messaging_has_subscribe(this, channel))
     {
@@ -1169,7 +1169,7 @@ int task_messaging_subscribe(task_t *this, const char *channel)
     return -ERR_SUCCESS;
 }
 
-int task_messaging_unsubscribe(task_t *this, const char *channel)
+int task_messaging_unsubscribe(Task *this, const char *channel)
 {
     if (task_messaging_has_subscribe(this, channel))
     {
@@ -1196,7 +1196,7 @@ int task_messaging_unsubscribe(task_t *this, const char *channel)
 
 /* --- Messages ------------------------------------------------------------- */
 
-int task_messaging_send_internal(task_t *this, task_t *destination, message_t *event, message_type_t message_type)
+int task_messaging_send_internal(Task *this, Task *destination, message_t *event, message_type_t message_type)
 {
     ASSERT_ATOMIC;
 
@@ -1222,13 +1222,13 @@ int task_messaging_send_internal(task_t *this, task_t *destination, message_t *e
     return -ERR_SUCCESS;
 }
 
-int task_messaging_send(task_t *this, message_t *event)
+int task_messaging_send(Task *this, message_t *event)
 {
     atomic_begin();
 
     event->header.id = MID++;
 
-    task_t *destination = task_getbyid(event->header.to);
+    Task *destination = task_getbyid(event->header.to);
 
     if (destination == NULL)
     {
@@ -1243,13 +1243,13 @@ int task_messaging_send(task_t *this, message_t *event)
     return result;
 }
 
-int task_messaging_broadcast(task_t *this, const char *channel, message_t *event)
+int task_messaging_broadcast(Task *this, const char *channel, message_t *event)
 {
     atomic_begin();
 
     event->header.id = MID++;
 
-    list_foreach(task_t, destination, task_all())
+    list_foreach(Task, destination, task_all())
     {
         if (destination != this && task_messaging_has_subscribe(destination, channel))
         {
@@ -1262,13 +1262,13 @@ int task_messaging_broadcast(task_t *this, const char *channel, message_t *event
     return -ERR_SUCCESS;
 }
 
-int task_messaging_request(task_t *this, message_t *request, message_t *respond, int timeout)
+int task_messaging_request(Task *this, message_t *request, message_t *respond, int timeout)
 {
     atomic_begin();
     {
         request->header.id = MID++;
 
-        task_t *destination = task_getbyid(request->header.to);
+        Task *destination = task_getbyid(request->header.to);
 
         if (destination == NULL)
         {
@@ -1276,7 +1276,7 @@ int task_messaging_request(task_t *this, message_t *request, message_t *respond,
             return -ERR_NO_SUCH_PROCESS;
         }
 
-        this->wait.respond = (task_wait_respond_t){
+        this->wait.respond = (TaskWaitRespondInfo){
             .has_result = false,
             .result = {},
             .timeout = timeout,
@@ -1303,11 +1303,11 @@ int task_messaging_request(task_t *this, message_t *request, message_t *respond,
     }
 }
 
-int task_messaging_respond(task_t *this, message_t *request, message_t *result)
+int task_messaging_respond(Task *this, message_t *request, message_t *result)
 {
     atomic_begin();
 
-    task_t *destination = task_getbyid(request->header.from);
+    Task *destination = task_getbyid(request->header.from);
     if (destination == NULL || destination->state != TASK_STATE_WAIT_RESPOND)
     {
         atomic_end();
@@ -1328,7 +1328,7 @@ int task_messaging_respond(task_t *this, message_t *request, message_t *result)
     return -ERR_SUCCESS;
 }
 
-int task_messaging_receive(task_t *this, message_t *message, bool wait)
+int task_messaging_receive(Task *this, message_t *message, bool wait)
 {
     message_t *received = NULL;
 
@@ -1378,7 +1378,7 @@ void collect_and_free_task(void)
 
     atomic_begin();
     // Get canceled tasks
-    list_foreach(task_t, canceled_tasks, task_bystate(TASK_STATE_CANCELED))
+    list_foreach(Task, canceled_tasks, task_bystate(TASK_STATE_CANCELED))
     {
         list_pushback(task_to_free, canceled_tasks);
     }
@@ -1386,9 +1386,9 @@ void collect_and_free_task(void)
     atomic_end();
 
     // Cleanup all of those dead tasks.
-    list_foreach(task_t, task_to_cleanup, task_to_free)
+    list_foreach(Task, task_to_cleanup, task_to_free)
     {
-        task_delete(task_to_cleanup);
+        task_destroy(task_to_cleanup);
     }
 
     list_destroy(task_to_free, LIST_KEEP_VALUES);
@@ -1420,7 +1420,7 @@ void timer_set_frequency(int hz)
     logger_info("Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(task_t *main_kernel_task)
+void sheduler_setup(Task *main_kernel_task)
 {
     running = main_kernel_task;
 
@@ -1434,7 +1434,7 @@ void wakeup_sleeping_tasks(void)
 {
     if (!list_empty(task_bystate(TASK_STATE_WAIT_TIME)))
     {
-        task_t *t;
+        Task *t;
 
         do
         {
@@ -1456,7 +1456,7 @@ void wakeup_blocked_task(void)
     {
         List *task_to_wakeup = list_create();
 
-        list_foreach(task_t, task, task_bystate(TASK_STATE_BLOCKED))
+        list_foreach(Task, task, task_bystate(TASK_STATE_BLOCKED))
         {
             TaskBlocker *blocker = task->blocker;
 
@@ -1471,7 +1471,7 @@ void wakeup_blocked_task(void)
             }
         }
 
-        list_foreach(task_t, task, task_to_wakeup)
+        list_foreach(Task, task, task_to_wakeup)
         {
             task_setstate(task, TASK_STATE_RUNNING);
         }
@@ -1533,7 +1533,7 @@ void sheduler_yield()
 
 /* --- Running task info -------------------------------------------------- */
 
-task_t *sheduler_running(void)
+Task *sheduler_running(void)
 {
     return running;
 }

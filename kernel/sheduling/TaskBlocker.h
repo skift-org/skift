@@ -1,10 +1,10 @@
 #pragma once
 
-struct task;
+struct Task;
 struct TaskBlocker;
 
-typedef bool (*TaskBlockerCanUnblock)(struct TaskBlocker *blocker, struct task *task);
-typedef void (*TaskBlockerUnblock)(struct TaskBlocker *blocker, struct task *task);
+typedef bool (*TaskBlockerCanUnblock)(struct TaskBlocker *blocker, struct Task *task);
+typedef void (*TaskBlockerUnblock)(struct TaskBlocker *blocker, struct Task *task);
 
 typedef struct TaskBlocker
 {

@@ -9,7 +9,7 @@
 typedef struct
 {
     size_t count;
-    IOStreamDirentry entries[];
+    DirectoryEntry entries[];
 } DirectoryListing;
 
 typedef struct

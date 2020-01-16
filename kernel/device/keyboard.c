@@ -132,17 +132,17 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 keymap_t *keyboard_load_keymap(const char *path)
 {
-    IOStream *kmfile = iostream_open(path, IOSTREAM_READ);
+    IOStream *kmfile = iostream_open(path, OPEN_READ);
 
     if (kmfile == NULL)
     {
         return NULL;
     }
 
-    IOStreamState stat;
+    FileState stat;
     iostream_stat(kmfile, &stat);
 
-    assert(stat.type == IOSTREAM_TYPE_REGULAR);
+    assert(stat.type == FILE_TYPE_REGULAR);
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
     keymap_t *keymap = malloc(stat.size);

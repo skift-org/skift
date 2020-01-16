@@ -118,7 +118,7 @@ int __plug_logger_unlock()
 
 /* --- Iostream plugs ------------------------------------------------------- */
 
-int __plug_iostream_open(const char *file_path, IOStreamFlag flags)
+int __plug_iostream_open(const char *file_path, OpenFlag flags)
 {
     return task_handle_open(sheduler_running(), file_path, flags);
 }
@@ -143,17 +143,17 @@ int __plug_iostream_call(int fd, int request, void *args)
     return task_handle_call(sheduler_running(), fd, request, args);
 }
 
-int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence)
+int __plug_iostream_seek(int fd, int offset, Whence whence)
 {
     return task_handle_seek(sheduler_running(), fd, whence, offset);
 }
 
-int __plug_iostream_tell(int fd, IOStreamWhence whence)
+int __plug_iostream_tell(int fd, Whence whence)
 {
     return task_handle_tell(sheduler_running(), fd, whence);
 }
 
-int __plug_iostream_stat(int fd, IOStreamState *stat)
+int __plug_iostream_stat(int fd, FileState *stat)
 {
     return task_handle_stat(sheduler_running(), fd, stat);
 }

@@ -251,7 +251,7 @@ bool shell_eval(shell_t *this)
     }
 
     // Or exec a real command
-    IOStream *s = iostream_open(this->command_argv[0], IOSTREAM_READ);
+    IOStream *s = iostream_open(this->command_argv[0], OPEN_READ);
 
     int process = 0;
 
@@ -265,7 +265,7 @@ bool shell_eval(shell_t *this)
         char pathbuffer[144];
         snprintf(pathbuffer, 144, "/bin/%s", this->command_argv[0]);
 
-        s = iostream_open(pathbuffer, IOSTREAM_READ);
+        s = iostream_open(pathbuffer, OPEN_READ);
 
         if (s != NULL)
         {

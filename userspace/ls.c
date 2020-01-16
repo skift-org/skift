@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/logger.h>
 #include <libsystem/iostream.h>
-#include <libsystem/cmdline.h>
+#include <libsystem/logger.h>
 
 static bool option_all = false;
 static bool option_list = false;
@@ -38,9 +38,9 @@ const char *file_type_name[] = {
     "p", // Pipe
 };
 
-void ls_print_entry(IOStreamDirentry *entry)
+void ls_print_entry(DirectoryEntry *entry)
 {
-    IOStreamState *stat = &entry->stat;
+    FileState *stat = &entry->stat;
 
     if (option_list)
     {
@@ -48,7 +48,7 @@ void ls_print_entry(IOStreamDirentry *entry)
     }
 
     if (option_all || entry->name[0] != '.')
-        printf((stat->type == IOSTREAM_TYPE_DIRECTORY && option_color) ? "\e[1;34m%s\e[0m/ " : "%s  ", entry->name);
+        printf((stat->type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m%s\e[0m/ " : "%s  ", entry->name);
 
     if (option_list)
     {
@@ -58,16 +58,16 @@ void ls_print_entry(IOStreamDirentry *entry)
 
 int ls(const char *target_path)
 {
-    IOStream *dir = iostream_open(target_path, IOSTREAM_READ);
+    IOStream *dir = iostream_open(target_path, OPEN_READ);
 
     if (dir != NULL)
     {
-        IOStreamState stat = {0};
+        FileState stat = {0};
         iostream_stat(dir, &stat);
 
-        if (stat.type == IOSTREAM_TYPE_DIRECTORY)
+        if (stat.type == FILE_TYPE_DIRECTORY)
         {
-            IOStreamDirentry entry;
+            DirectoryEntry entry;
 
             while (iostream_read(dir, &entry, sizeof(entry)) > 0)
             {
@@ -76,7 +76,7 @@ int ls(const char *target_path)
         }
         else
         {
-            IOStreamDirentry entry;
+            DirectoryEntry entry;
             entry.stat = stat;
             Path *p = path(target_path);
             strlcpy(entry.name, path_filename(p), PATH_LENGHT);

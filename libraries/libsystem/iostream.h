@@ -6,40 +6,12 @@
 
 /* iostream.h: generic io interface                                           */
 
-#include <libsystem/runtime.h>
 #include <libsystem/path.h>
+#include <libsystem/runtime.h>
+
+#include "abi/filesystem.h"
 
 struct IOStream;
-
-typedef enum
-{
-    IOSTREAM_WHENCE_START,
-    IOSTREAM_WHENCE_HERE,
-    IOSTREAM_WHENCE_END,
-} IOStreamWhence;
-
-typedef enum
-{
-    IOSTREAM_TYPE_UNKNOWN,
-
-    IOSTREAM_TYPE_REGULAR,
-    IOSTREAM_TYPE_DEVICE,
-    IOSTREAM_TYPE_DIRECTORY,
-    IOSTREAM_TYPE_FIFO,
-} IOStreamType;
-
-typedef enum
-{
-    IOSTREAM_READ = FLAG(0),
-    IOSTREAM_WRITE = FLAG(1),
-
-    IOSTREAM_CREATE = FLAG(2),
-    IOSTREAM_APPEND = FLAG(3),
-    IOSTREAM_TRUNC = FLAG(4),
-
-    IOSTREAM_BUFFERED_READ = FLAG(5),
-    IOSTREAM_BUFFERED_WRITE = FLAG(6)
-} IOStreamFlag;
 
 typedef enum
 {
@@ -48,23 +20,11 @@ typedef enum
     IOSTREAM_BUFFERED_NONE,
 } IOStreamBufferMode;
 
-typedef struct
-{
-    uint size;
-    IOStreamType type;
-} IOStreamState;
-
-typedef struct
-{
-    char name[PATH_ELEMENT_LENGHT];
-    IOStreamState stat;
-} IOStreamDirentry;
-
 typedef int IOStreamRead(struct IOStream *stream, void *buffer, uint size);
 typedef int IOStreamWrite(struct IOStream *stream, const void *buffer, uint size);
-typedef int IOStreamTell(struct IOStream *stream, IOStreamWhence whence);
-typedef int IOStreamSeek(struct IOStream *stream, int offset, IOStreamWhence whence);
-typedef int IOStreamStat(struct IOStream *stream, IOStreamState *stat);
+typedef int IOStreamTell(struct IOStream *stream, Whence whence);
+typedef int IOStreamSeek(struct IOStream *stream, int offset, Whence whence);
+typedef int IOStreamStat(struct IOStream *stream, FileState *stat);
 typedef int IOStreamCall(struct IOStream *stream, int request, void *arg);
 typedef int IOStreamClose(struct IOStream *stream);
 
@@ -72,7 +32,7 @@ typedef int IOStreamClose(struct IOStream *stream);
 
 typedef struct IOStream
 {
-    IOStreamFlag flags;
+    OpenFlag flags;
 
     IOStreamRead *read;
     IOStreamWrite *write;
@@ -103,7 +63,7 @@ extern IOStream *out_stream;
 extern IOStream *err_stream;
 extern IOStream *log_stream;
 
-IOStream *iostream_create(IOStreamFlag flags);
+IOStream *iostream_create(OpenFlag flags);
 
 void iostream_destroy(IOStream *stream);
 
@@ -111,7 +71,7 @@ void iostream_set_read_buffer_mode(IOStream *this, IOStreamBufferMode mode);
 
 void iostream_set_write_buffer_mode(IOStream *this, IOStreamBufferMode mode);
 
-IOStream *iostream_open(const char *path, IOStreamFlag flags);
+IOStream *iostream_open(const char *path, OpenFlag flags);
 
 void iostream_close(IOStream *stream);
 
@@ -127,11 +87,11 @@ int iostream_flush(IOStream *stream);
 
 int iostream_call(IOStream *stream, int request, void *arg);
 
-int iostream_seek(IOStream *stream, int offset, IOStreamWhence whence);
+int iostream_seek(IOStream *stream, int offset, Whence whence);
 
-int iostream_tell(IOStream *stream, IOStreamWhence whence);
+int iostream_tell(IOStream *stream, Whence whence);
 
-int iostream_stat(IOStream *stream, IOStreamState *stat);
+int iostream_stat(IOStream *stream, FileState *stat);
 
 int iostream_puts(IOStream *stream, const char *string);
 

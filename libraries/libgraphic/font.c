@@ -2,12 +2,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/path.h>
+#include <libsystem/assert.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
-#include <libsystem/error.h>
-#include <libsystem/assert.h>
+#include <libsystem/path.h>
 
 #include <libgraphic/font.h>
 
@@ -19,7 +19,7 @@ glyph_t *font_load_glyph(const char *name)
     snprintf(glyph_path, PATH_LENGHT, "/res/font/%s.glyph", name);
     logger_trace("Loading fonts glyph of %s from %s", name, glyph_path);
 
-    IOStream *glyph_file = iostream_open(glyph_path, IOSTREAM_READ);
+    IOStream *glyph_file = iostream_open(glyph_path, OPEN_READ);
 
     if (glyph_file == NULL)
     {
@@ -28,9 +28,9 @@ glyph_t *font_load_glyph(const char *name)
         return NULL;
     }
 
-    IOStreamState stat;
+    FileState stat;
     iostream_stat(glyph_file, &stat);
-    if (stat.type != IOSTREAM_TYPE_REGULAR)
+    if (stat.type != FILE_TYPE_REGULAR)
     {
         logger_error("Failled to load font glyph from %s: The glyph file isn't a regular file!", glyph_path);
 

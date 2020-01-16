@@ -2,17 +2,17 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libmath/math.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/__printf__.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
 #include <libsystem/iostream.h>
-#include <libmath/math.h>
 
 /* --- IO Stream constructor and destructor --------------------------------- */
 
-IOStream *iostream_create(IOStreamFlag flags)
+IOStream *iostream_create(OpenFlag flags)
 {
     IOStream *stream = __create(IOStream);
 
@@ -25,7 +25,7 @@ IOStream *iostream_create(IOStreamFlag flags)
     stream->has_unget = false;
 
     // Setup write buffer
-    if (flags & IOSTREAM_BUFFERED_WRITE)
+    if ((flags & OPEN_BUFFERED) && (flags & OPEN_WRITE))
     {
         stream->write_mode = IOSTREAM_BUFFERED_LINE;
         stream->write_buffer = malloc(IOSTREAM_BUFFER_SIZE);
@@ -39,7 +39,7 @@ IOStream *iostream_create(IOStreamFlag flags)
     // Setup read buffer
     stream->write_used = 0;
 
-    if (flags & IOSTREAM_BUFFERED_READ)
+    if ((flags & OPEN_BUFFERED) && (flags & OPEN_READ))
     {
         stream->read_mode = IOSTREAM_BUFFERED_BLOCK;
         stream->read_buffer = malloc(IOSTREAM_BUFFER_SIZE);
@@ -67,7 +67,7 @@ void iostream_destroy(IOStream *stream)
 
 /* --- iostream open/close -------------------------------------------------- */
 
-IOStream *iostream_open(const char *path, IOStreamFlag flags)
+IOStream *iostream_open(const char *path, OpenFlag flags)
 {
     int fd = __plug_iostream_open(path, flags);
 
@@ -349,7 +349,7 @@ int iostream_write(IOStream *stream, const void *buffer, uint size)
     }
 }
 
-int iostream_tell(IOStream *stream, IOStreamWhence whence)
+int iostream_tell(IOStream *stream, Whence whence)
 {
     if (stream != NULL)
     {
@@ -367,7 +367,7 @@ int iostream_tell(IOStream *stream, IOStreamWhence whence)
     return 0;
 }
 
-int iostream_seek(IOStream *stream, int offset, IOStreamWhence whence)
+int iostream_seek(IOStream *stream, int offset, Whence whence)
 {
     if (stream != NULL)
     {
@@ -385,11 +385,11 @@ int iostream_seek(IOStream *stream, int offset, IOStreamWhence whence)
     return 0;
 }
 
-int iostream_stat(IOStream *stream, IOStreamState *stat)
+int iostream_stat(IOStream *stream, FileState *stat)
 {
     if (stream != NULL && stat != NULL)
     {
-        *stat = (IOStreamState){0};
+        *stat = (FileState){0};
 
         if (stream->stat != NULL)
         {

@@ -1,11 +1,11 @@
-#include <libsystem/error.h>
-#include <libsystem/logger.h>
 #include <libdevice/framebuffer.h>
 #include <libgraphic/framebuffer.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
 
 framebuffer_t *framebuffer_open(void)
 {
-    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ | IOSTREAM_WRITE);
+    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, OPEN_READ | OPEN_WRITE);
 
     if (framebuffer_device == NULL)
     {

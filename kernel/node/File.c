@@ -12,7 +12,7 @@
 
 int file_FsOperationOpen(FsFile *node, Handle *handle)
 {
-    if (handle_has_flag(handle, IOSTREAM_TRUNC))
+    if (handle_has_flag(handle, OPEN_TRUNC))
     {
         free(node->buffer);
         node->buffer = malloc(512);

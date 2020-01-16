@@ -7,14 +7,14 @@
 
 int cat(const char *path)
 {
-    IOStream *stream = iostream_open(path, IOSTREAM_READ);
+    IOStream *stream = iostream_open(path, OPEN_READ);
 
     if (stream != NULL)
     {
-        IOStreamState stat = {0};
+        FileState stat = {0};
         iostream_stat(stream, &stat);
 
-        if (stat.type == IOSTREAM_TYPE_DIRECTORY)
+        if (stat.type == FILE_TYPE_DIRECTORY)
         {
             printf("%s: is a directory\n", path);
             return -1;

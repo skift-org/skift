@@ -606,7 +606,7 @@ int task_handle_release(Task *task, int handle_index)
 
 /* --- task file operations ----------------------------------------------- */
 
-int task_handle_open(Task *task, const char *file_path, IOStreamFlag flags)
+int task_handle_open(Task *task, const char *file_path, OpenFlag flags)
 {
     Path *p = task_cwd_resolve(task, file_path);
 
@@ -690,7 +690,7 @@ int task_handle_call(Task *task, int handle_index, int request, void *args)
     return result;
 }
 
-int task_handle_seek(Task *task, int handle_index, IOStreamWhence whence, off_t offset)
+int task_handle_seek(Task *task, int handle_index, Whence whence, off_t offset)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -706,7 +706,7 @@ int task_handle_seek(Task *task, int handle_index, IOStreamWhence whence, off_t 
     return result;
 }
 
-int task_handle_tell(Task *task, int handle_index, IOStreamWhence whence)
+int task_handle_tell(Task *task, int handle_index, Whence whence)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -722,7 +722,7 @@ int task_handle_tell(Task *task, int handle_index, IOStreamWhence whence)
     return result;
 }
 
-int task_handle_stat(Task *task, int handle_index, IOStreamState *stat)
+int task_handle_stat(Task *task, int handle_index, FileState *stat)
 {
     Handle *handle = task_handle_acquire(task, handle_index);
 
@@ -797,7 +797,7 @@ static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
         task_memory_map(this, program->vaddr, PAGE_ALIGN_UP(program->memsz) / PAGE_SIZE);
         memset((void *)program->vaddr, 0, program->memsz);
 
-        iostream_seek(s, program->offset, IOSTREAM_WHENCE_START);
+        iostream_seek(s, program->offset, WHENCE_START);
         int result = iostream_read(s, (void *)program->vaddr, program->filesz);
 
         if (result < 0)
@@ -816,7 +816,7 @@ static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
 int task_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    IOStream *s = iostream_open(executable_path, IOSTREAM_READ | IOSTREAM_BUFFERED_NONE);
+    IOStream *s = iostream_open(executable_path, OPEN_READ | IOSTREAM_BUFFERED_NONE);
 
     if (s == NULL)
     {
@@ -825,10 +825,10 @@ int task_exec(const char *executable_path, const char **argv)
     }
 
     // Check if the file isn't a directory.
-    IOStreamState stat;
+    FileState stat;
     iostream_stat(s, &stat);
 
-    if (stat.type != IOSTREAM_TYPE_REGULAR)
+    if (stat.type != FILE_TYPE_REGULAR)
     {
         logger_warn("'%s' is not a file, exec failed!", executable_path);
         iostream_close(s);
@@ -839,7 +839,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     // Decode the elf file header.
     elf_header_t elf_header = {0};
-    iostream_seek(s, 0, IOSTREAM_WHENCE_START);
+    iostream_seek(s, 0, WHENCE_START);
 
     iostream_read(s, &elf_header, sizeof(elf_header_t));
 
@@ -860,7 +860,7 @@ int task_exec(const char *executable_path, const char **argv)
 
     for (int i = 0; i < elf_header.phnum; i++)
     {
-        iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), IOSTREAM_WHENCE_START);
+        iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), WHENCE_START);
 
         iostream_read(s, &program, sizeof(elf_program_t));
 

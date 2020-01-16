@@ -259,7 +259,7 @@ int framebuffer_FsOperationOpen(FsNode *node, Handle *handle)
 {
     __unused(node);
 
-    if (handle->flags & IOSTREAM_WRITE)
+    if (handle->flags & OPEN_WRITE)
     {
         lock_acquire(backbuffer_stack_lock);
 
@@ -289,7 +289,7 @@ void framebuffer_FsOperationClose(FsNode *node, Handle *handle)
 {
     __unused(node);
 
-    if (handle->flags & IOSTREAM_WRITE)
+    if (handle->flags & OPEN_WRITE)
     {
         lock_acquire(backbuffer_stack_lock);
 
@@ -350,7 +350,7 @@ int framebuffer_FsOperationCall(FsNode *node, Handle *handle, int request, void 
     }
     else if (request == FRAMEBUFFER_CALL_BLIT)
     {
-        if (handle->flags & IOSTREAM_WRITE)
+        if (handle->flags & OPEN_WRITE)
         {
             framebuffer_blit_args_t *blitargs = args;
 
@@ -380,7 +380,7 @@ int framebuffer_FsOperationCall(FsNode *node, Handle *handle, int request, void 
     }
     else if (request == FRAMEBUFFER_CALL_BLITREGION)
     {
-        if (handle->flags & IOSTREAM_WRITE)
+        if (handle->flags & OPEN_WRITE)
         {
             framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
 

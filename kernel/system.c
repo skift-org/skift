@@ -4,10 +4,10 @@
 
 #include <libsystem/atomic.h>
 
-#include "x86/cpuid.h"
+#include "memory.h"
 #include "system.h"
 #include "tasking.h"
-#include "memory.h"
+#include "x86/cpuid.h"
 
 /* --- Version info --------------------------------------------------------- */
 
@@ -26,13 +26,19 @@ char *__kernel_uname_format = "%s %d.%d.%d-%s @ " __COMMIT__;
 
 const char *const witty_comments[] = {
     "Witty comment unavailable :(",
+
+    "Yo DAWG, I heard you like errors, \n\t"
+    "// so I put an error in your error handler\n\t"
+    "// so you can get error while you get error",
+
+    "Excuse me Sir, \n\t"
+    "// Do you have a moment to talk about TempleOS?",
+
     "Surprise! Haha. Well, this is awkward.",
     "Oh - I know what I did wrong!",
     "Uh... Did I do that?",
     "Oops.",
     "On the bright side, I bought you a teddy bear!",
-    "Yo DAWG, I heard you like errors,\n\t// so i put an error in your error handler\n\t// so you can get error while you get error",
-    "Excuse me Sir, \n\t// Do you have a moment to talk about TempleOS?",
     "DON'T PANIC!",
     "...",
     "Greenpeace free'd the mallocs \\o/",
@@ -53,7 +59,8 @@ const char *const witty_comments[] = {
     "This doesn't make any sense!",
     "It's not a good surprise...",
     "Don't do that.",
-    "Get the f*** outa my room, I'm playing minecraft"};
+    "Get the f*** outa my room, I'm playing minecraft",
+};
 
 static bool has_panic = false;
 static bool nested_panic = false;

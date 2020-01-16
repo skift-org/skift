@@ -3,11 +3,11 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/cmdline.h>
+#include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
-#include <libsystem/error.h>
-#include <libsystem/cstring.h>
 
 #include <libdevice/keyboard.h>
 #include <libdevice/keymap.h>
@@ -34,9 +34,9 @@ static cmdline_t cmdline = CMDLINE(usages, options, "Get or set the current keyb
 
 int loadkey_list_keymap()
 {
-    IOStream *dir = iostream_open("/res/keyboard", IOSTREAM_READ);
+    IOStream *dir = iostream_open("/res/keyboard", OPEN_READ);
 
-    IOStreamDirentry entry = {0};
+    DirectoryEntry entry = {0};
     while (iostream_read(dir, &entry, sizeof(entry)) > 0)
     {
         // FIXME: maybe show some info about the kmap file
@@ -51,11 +51,11 @@ int loadkey_list_keymap()
 int loadkey_set_keymap(IOStream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
-    IOStream *keymap_file = iostream_open(keymap_path, IOSTREAM_READ);
+    IOStream *keymap_file = iostream_open(keymap_path, OPEN_READ);
 
     if (keymap_file != NULL)
     {
-        IOStreamState stat;
+        FileState stat;
         iostream_stat(keymap_file, &stat);
 
         logger_info("Allocating keymap of size %dkio", stat.size / 1024);
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    IOStream *keyboard_device = iostream_open(KEYBOARD_DEVICE, IOSTREAM_READ);
+    IOStream *keyboard_device = iostream_open(KEYBOARD_DEVICE, OPEN_READ);
 
     if (keyboard_device == NULL)
     {

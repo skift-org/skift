@@ -171,7 +171,7 @@ int task_handle_release(Task *task, int handle_index);
 
 /* --- Task handle operations ----------------------------------------------- */
 
-int task_handle_open(Task *this, const char *file_path, IOStreamFlag flags);
+int task_handle_open(Task *this, const char *file_path, OpenFlag flags);
 
 int task_handle_close(Task *this, int handle_index);
 
@@ -183,11 +183,11 @@ int task_handle_write(Task *this, int handle_index, const void *buffer, uint siz
 
 int task_handle_call(Task *this, int handle_index, int request, void *args);
 
-int task_handle_seek(Task *this, int handle_index, IOStreamWhence whence, off_t offset);
+int task_handle_seek(Task *this, int handle_index, Whence whence, off_t offset);
 
-int task_handle_tell(Task *this, int handle_index, IOStreamWhence whence);
+int task_handle_tell(Task *this, int handle_index, Whence whence);
 
-int task_handle_stat(Task *this, int handle_index, IOStreamState *stat);
+int task_handle_stat(Task *this, int handle_index, FileState *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */

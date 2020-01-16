@@ -309,15 +309,15 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value) {
 static long lodepng_filesize(const char* filename) {
   IOStream* file;
   long size;
-  file = iostream_open(filename, IOSTREAM_READ);
+  file = iostream_open(filename, OPEN_READ);
   if(!file) return -1;
 
-  if(iostream_seek(file, 0, IOSTREAM_WHENCE_END) != 0) {
+  if(iostream_seek(file, 0, WHENCE_END) != 0) {
     iostream_close(file);
     return -1;
   }
 
-  size = iostream_tell(file, IOSTREAM_WHENCE_START);
+  size = iostream_tell(file, WHENCE_START);
   /* It may give LONG_MAX as directory size, this is invalid for us. */
   if(size == LONG_MAX) size = -1;
 
@@ -329,7 +329,7 @@ static long lodepng_filesize(const char* filename) {
 static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename) {
   IOStream* file;
   size_t readsize;
-  file = iostream_open(filename, IOSTREAM_READ);
+  file = iostream_open(filename, OPEN_READ);
   if(!file) return 78;
 
   readsize = iostream_read(file, out, size);
@@ -353,7 +353,7 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
   IOStream* file;
-  file = iostream_open(filename, IOSTREAM_WRITE);
+  file = iostream_open(filename, OPEN_WRITE);
   if(!file) return 79;
   iostream_write(file, buffer, buffersize);
   iostream_close(file);

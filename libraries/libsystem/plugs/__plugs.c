@@ -28,9 +28,9 @@ void __plug_init(void)
 
     // Open io stream
     in_stream = NULL; // FIXME: no stdin,
-    out_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
-    err_stream = iostream_open("/dev/term", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
-    log_stream = iostream_open("/dev/serial", IOSTREAM_WRITE | IOSTREAM_BUFFERED_WRITE);
+    out_stream = iostream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
+    err_stream = iostream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
+    log_stream = iostream_open("/dev/serial", OPEN_WRITE | OPEN_BUFFERED);
 
     _init();
 }

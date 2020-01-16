@@ -6,10 +6,10 @@
 
 // this header list all "plugs" function between the library and the syscalls or the kernel
 
-#include <libsystem/runtime.h>
 #include <libsystem/iostream.h>
-#include <libsystem/system.h>
 #include <libsystem/lock.h>
+#include <libsystem/runtime.h>
+#include <libsystem/system.h>
 #include <libsystem/time.h>
 
 void __plug_init(void);
@@ -38,7 +38,7 @@ int __plug_memalloc_free(void *memory, uint size);
 
 // IO stream ---------------------------------------------------------------- //
 
-int __plug_iostream_open(const char *path, IOStreamFlag flags);
+int __plug_iostream_open(const char *path, OpenFlag flags);
 
 int __plug_iostream_close(int fd);
 
@@ -48,11 +48,11 @@ int __plug_iostream_write(int fd, const void *buffer, uint size);
 
 int __plug_iostream_call(int fd, int request, void *args);
 
-int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence);
+int __plug_iostream_seek(int fd, int offset, Whence whence);
 
-int __plug_iostream_tell(int fd, IOStreamWhence whence);
+int __plug_iostream_tell(int fd, Whence whence);
 
-int __plug_iostream_stat(int fd, IOStreamState *stat);
+int __plug_iostream_stat(int fd, FileState *stat);
 
 /* --- File system ---------------------------------------------------------- */
 

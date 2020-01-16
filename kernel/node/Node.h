@@ -25,7 +25,7 @@ typedef int (*FsOperationLink)(struct FsNode *node, const char *name, struct FsN
 typedef int (*FsOperationUnlink)(struct FsNode *node, const char *name);
 
 typedef int (*FsOperationCall)(struct FsNode *node, struct Handle *handle, int request, void *args);
-typedef int (*FsOperationStat)(struct FsNode *node, struct Handle *handle, IOStreamState *stat);
+typedef int (*FsOperationStat)(struct FsNode *node, struct Handle *handle, FileState *stat);
 
 typedef size_t (*FsOperationSize)(struct FsNode *node, struct Handle *handle);
 

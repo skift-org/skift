@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, IOSTREAM_READ);
+    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, OPEN_READ);
 
     if (framebuffer_device == NULL)
     {

@@ -35,7 +35,7 @@ void ramdisk_load(multiboot_module_t *module)
         }
         else
         {
-            Handle *handle = filesystem_open(file_path, IOSTREAM_WRITE | IOSTREAM_CREATE);
+            Handle *handle = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE);
 
             if (handle != NULL)
             {

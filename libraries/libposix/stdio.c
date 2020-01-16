@@ -1,8 +1,8 @@
 #include <stdio.h>
 
+#include <libsystem/filesystem.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
-#include <libsystem/filesystem.h>
 
 #undef printf
 #undef puts
@@ -22,9 +22,9 @@ __attribute__((constructor)) void stdio_initialize(void)
     TRACE_FUNCTION_END;
 }
 
-IOStreamFlag stdio_parse_mode(const char *mode)
+OpenFlag stdio_parse_mode(const char *mode)
 {
-    IOStreamFlag flags = 0;
+    OpenFlag flags = 0;
 
     for (int i = 0; mode[i]; i++)
     {
@@ -32,23 +32,23 @@ IOStreamFlag stdio_parse_mode(const char *mode)
 
         if (c == 'r')
         {
-            flags |= IOSTREAM_READ;
+            flags |= OPEN_READ;
         }
         else if (c == 'w')
         {
-            flags |= IOSTREAM_WRITE;
-            flags |= IOSTREAM_CREATE;
-            flags |= IOSTREAM_TRUNC;
+            flags |= OPEN_WRITE;
+            flags |= OPEN_CREATE;
+            flags |= OPEN_TRUNC;
         }
         else if (c == 'a')
         {
-            flags |= IOSTREAM_WRITE;
-            flags |= IOSTREAM_CREATE;
-            flags |= IOSTREAM_APPEND;
+            flags |= OPEN_WRITE;
+            flags |= OPEN_CREATE;
+            flags |= OPEN_APPEND;
         }
         else if (c == '+')
         {
-            flags |= IOSTREAM_READ;
+            flags |= OPEN_READ;
         }
     }
 
@@ -118,15 +118,15 @@ int fseek(FILE *stream, long offset, int whence)
 
     if (whence == SEEK_SET)
     {
-        r = iostream_seek((IOStream *)stream, offset, IOSTREAM_WHENCE_START);
+        r = iostream_seek((IOStream *)stream, offset, WHENCE_START);
     }
     else if (whence == SEEK_CUR)
     {
-        r = iostream_seek((IOStream *)stream, offset, IOSTREAM_WHENCE_HERE);
+        r = iostream_seek((IOStream *)stream, offset, WHENCE_HERE);
     }
     else if (whence == SEEK_END)
     {
-        r = iostream_seek((IOStream *)stream, offset, IOSTREAM_WHENCE_END);
+        r = iostream_seek((IOStream *)stream, offset, WHENCE_END);
     }
 
     TRACE_FUNCTION_END;
@@ -138,7 +138,7 @@ long ftell(FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    long r = iostream_tell((IOStream *)stream, IOSTREAM_WHENCE_START);
+    long r = iostream_tell((IOStream *)stream, WHENCE_START);
 
     TRACE_FUNCTION_END;
 

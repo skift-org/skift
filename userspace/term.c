@@ -4,12 +4,12 @@
 
 /* terminal: terminal host process                                            */
 
-#include <libsystem/iostream.h>
-#include <libsystem/error.h>
-#include <libsystem/logger.h>
-#include <libdevice/textmode.h>
 #include <libconsole/vtconsole.h>
+#include <libdevice/textmode.h>
 #include <libgraphic/framebuffer.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
+#include <libsystem/logger.h>
 
 static IOStream *terminal_fifo = NULL;
 
@@ -65,15 +65,13 @@ void textmode_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
 
 vtconsole_t *terminal_create_textmode_console(void)
 {
-    textmode_device = iostream_open(TEXTMODE_DEVICE, IOSTREAM_WRITE);
+    textmode_device = iostream_open(TEXTMODE_DEVICE, OPEN_WRITE);
 
     if (textmode_device == NULL)
     {
         error_print("Failled to open textmode device file");
         return NULL;
     }
-
-    iostream_set_write_buffer_mode(textmode_device, IOSTREAM_BUFFERED_NONE);
 
     if (iostream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info))
     {
@@ -162,8 +160,8 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
                 repainted_cell++;
 
                 Color fgc = cell->attr.bright
-                                  ? framebuffer_brightcolors[cell->attr.fg]
-                                  : framebuffer_colors[cell->attr.fg];
+                                ? framebuffer_brightcolors[cell->attr.fg]
+                                : framebuffer_colors[cell->attr.fg];
 
                 Point pos = (Point){x * char_size.X, y * (int)(char_size.Y)};
                 Point siz = (Point){char_size.X, (char_size.Y)};
@@ -196,7 +194,7 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    terminal_fifo = iostream_open("/dev/term", IOSTREAM_READ);
+    terminal_fifo = iostream_open("/dev/term", OPEN_READ);
 
     if (terminal_fifo == NULL)
     {

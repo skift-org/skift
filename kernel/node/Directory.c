@@ -11,7 +11,7 @@
 
 int directory_FsOperationOpen(FsDirectory *node, Handle *handle)
 {
-    DirectoryListing *listing = malloc(sizeof(DirectoryListing) + sizeof(IOStreamDirentry) * list_count(node->childs));
+    DirectoryListing *listing = malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
 
     listing->count = list_count(node->childs);
 
@@ -19,7 +19,7 @@ int directory_FsOperationOpen(FsDirectory *node, Handle *handle)
 
     list_foreach(FsDirectoryEntry, entry, node->childs)
     {
-        IOStreamDirentry *record = &listing->entries[current_index];
+        DirectoryEntry *record = &listing->entries[current_index];
 
         strcpy(record->name, entry->name);
         record->stat.type = entry->node->type;
@@ -44,17 +44,17 @@ int directory_FsOperationRead(FsDirectory *node, Handle *handle, void *buffer, u
     __unused(node);
     // FIXME: directories should no be read using read().
 
-    if (size == sizeof(IOStreamDirentry))
+    if (size == sizeof(DirectoryEntry))
     {
-        size_t index = handle->offset / sizeof(IOStreamDirentry);
+        size_t index = handle->offset / sizeof(DirectoryEntry);
 
         DirectoryListing *listing = (DirectoryListing *)handle->attached;
 
         if (index < listing->count)
         {
-            *((IOStreamDirentry *)buffer) = listing->entries[index];
+            *((DirectoryEntry *)buffer) = listing->entries[index];
 
-            return sizeof(IOStreamDirentry);
+            return sizeof(DirectoryEntry);
         }
         else
         {

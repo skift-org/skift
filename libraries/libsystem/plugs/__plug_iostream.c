@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libkernel/syscalls.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/iostream.h>
-#include <libkernel/syscalls.h>
 
-int __plug_iostream_open(const char *path, IOStreamFlag flags)
+int __plug_iostream_open(const char *path, OpenFlag flags)
 {
     return __syscall(SYS_FILESYSTEM_OPEN, (int)path, flags, 0, 0, 0);
 }
@@ -31,17 +31,17 @@ int __plug_iostream_call(int fd, int request, void *args)
     return __syscall(SYS_FILESYSTEM_CALL, fd, request, (int)args, 0, 0);
 }
 
-int __plug_iostream_seek(int fd, int offset, IOStreamWhence whence)
+int __plug_iostream_seek(int fd, int offset, Whence whence)
 {
     return __syscall(SYS_FILESYSTEM_SEEK, fd, offset, whence, 0, 0);
 }
 
-int __plug_iostream_tell(int fd, IOStreamWhence whence)
+int __plug_iostream_tell(int fd, Whence whence)
 {
     return __syscall(SYS_FILESYSTEM_TELL, fd, whence, 0, 0, 0);
 }
 
-int __plug_iostream_stat(int fd, IOStreamState *stat)
+int __plug_iostream_stat(int fd, FileState *stat)
 {
     return __syscall(SYS_FILESYSTEM_STAT, fd, (int)stat, 0, 0, 0);
 }

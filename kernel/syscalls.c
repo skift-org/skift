@@ -166,7 +166,7 @@ int sys_messaging_unsubscribe(const char *channel)
 
 /* --- Filesystem and IO ---------------------------------------------------- */
 
-int sys_filesystem_open(const char *path, IOStreamFlag flags)
+int sys_filesystem_open(const char *path, OpenFlag flags)
 {
     return task_handle_open(sheduler_running(), path, flags);
 }
@@ -191,17 +191,17 @@ int sys_filesystem_call(int fd, int request, void *args)
     return task_handle_call(sheduler_running(), fd, request, args);
 }
 
-int sys_filesystem_seek(int fd, int offset, IOStreamWhence whence)
+int sys_filesystem_seek(int fd, int offset, Whence whence)
 {
     return task_handle_seek(sheduler_running(), fd, whence, offset);
 }
 
-int sys_filesystem_tell(int fd, IOStreamWhence whence)
+int sys_filesystem_tell(int fd, Whence whence)
 {
     return task_handle_tell(sheduler_running(), fd, whence);
 }
 
-int sys_filesystem_stat(int fd, IOStreamState *stat)
+int sys_filesystem_stat(int fd, FileState *stat)
 {
     return task_handle_stat(sheduler_running(), fd, stat);
 }

@@ -11,7 +11,7 @@
 #include "sheduling/TaskBlockerWrite.h"
 #include "tasking.h"
 
-Handle *handle_create(FsNode *node, IOStreamFlag flags)
+Handle *handle_create(FsNode *node, OpenFlag flags)
 {
     Handle *handle = __create(Handle);
 
@@ -52,7 +52,7 @@ Handle *handle_clone(Handle *handle)
     return clone;
 }
 
-bool handle_has_flag(Handle *handle, IOStreamFlag flag)
+bool handle_has_flag(Handle *handle, OpenFlag flag)
 {
     return (handle->flags & flag) == flag;
 }
@@ -89,7 +89,7 @@ void handle_release_lock(Handle *handle, int who_release)
 
 int handle_read(Handle *handle, void *buffer, size_t size)
 {
-    if (handle_has_flag(handle, IOSTREAM_READ))
+    if (handle_has_flag(handle, OPEN_READ))
     {
         FsNode *node = handle->node;
 
@@ -121,7 +121,7 @@ int handle_read(Handle *handle, void *buffer, size_t size)
 
 int handle_write(Handle *handle, const void *buffer, size_t size)
 {
-    if (handle_has_flag(handle, IOSTREAM_WRITE))
+    if (handle_has_flag(handle, OPEN_WRITE))
     {
         FsNode *node = handle->node;
 
@@ -129,7 +129,7 @@ int handle_write(Handle *handle, const void *buffer, size_t size)
         {
             task_block(sheduler_running(), blocker_write_create(node));
 
-            if (handle_has_flag(handle, IOSTREAM_APPEND))
+            if (handle_has_flag(handle, OPEN_APPEND))
             {
                 if (node->size)
                 {
@@ -159,7 +159,7 @@ int handle_write(Handle *handle, const void *buffer, size_t size)
     }
 }
 
-off_t handle_seek(Handle *handle, IOStreamWhence whence, off_t where)
+off_t handle_seek(Handle *handle, Whence whence, off_t where)
 {
     FsNode *node = handle->node;
 
@@ -174,15 +174,15 @@ off_t handle_seek(Handle *handle, IOStreamWhence whence, off_t where)
 
     switch (whence)
     {
-    case IOSTREAM_WHENCE_START:
+    case WHENCE_START:
         handle->offset = max(0, where);
         break;
 
-    case IOSTREAM_WHENCE_HERE:
+    case WHENCE_HERE:
         handle->offset = handle->offset + where;
         break;
 
-    case IOSTREAM_WHENCE_END:
+    case WHENCE_END:
         if (where < 0)
         {
             if ((size_t)-where <= size)
@@ -208,7 +208,7 @@ off_t handle_seek(Handle *handle, IOStreamWhence whence, off_t where)
     return -ERR_SUCCESS;
 }
 
-off_t handle_tell(Handle *handle, IOStreamWhence whence)
+off_t handle_tell(Handle *handle, Whence whence)
 {
     FsNode *node = handle->node;
 
@@ -223,11 +223,11 @@ off_t handle_tell(Handle *handle, IOStreamWhence whence)
 
     switch (whence)
     {
-    case IOSTREAM_WHENCE_START:
-    case IOSTREAM_WHENCE_HERE:
+    case WHENCE_START:
+    case WHENCE_HERE:
         return handle->offset;
 
-    case IOSTREAM_WHENCE_END:
+    case WHENCE_END:
         return handle->offset - size;
     default:
         assert_not_reached();
@@ -250,7 +250,7 @@ int handle_call(Handle *handle, int request, void *args)
     return result;
 }
 
-int handle_stat(Handle *handle, IOStreamState *stat)
+int handle_stat(Handle *handle, FileState *stat)
 {
     int result = -ERR_SUCCESS;
 

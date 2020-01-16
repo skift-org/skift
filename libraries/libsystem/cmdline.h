@@ -6,126 +6,123 @@
 
 #include <libsystem/runtime.h>
 
-struct s_cmdline;
-struct s_cmdline_option;
+struct CommandLine;
+struct CommandLineOption;
 
-typedef void cmdline_callback_t(
-    struct s_cmdline *cmdline,
-    struct s_cmdline_option *opt);
+typedef void CommandLineCallback(struct CommandLine *cmdline, struct CommandLineOption *opt);
 
 typedef enum
 {
-    CMDLINE_BOOLEAN,
-    CMDLINE_STRING,
-    CMDLINE_INTEGER,
-    CMDLINE_ACTION,
-    CMDLINE_SECTION,
-    CMDLINE_SEPARATOR,
-    CMDLINE_END
-} cmdline_option_type_t;
+    COMMANDLINE_BOOLEAN,
+    COMMANDLINE_STRING,
+    COMMANDLINE_INTEGER,
+    COMMANDLINE_ACTION,
+    COMMANDLINE_SECTION,
+    COMMANDLINE_SEPARATOR,
+    COMMANDLINE_END
+} CommandLineOptionType;
 
-typedef struct s_cmdline_option
+typedef struct CommandLineOption
 {
-    cmdline_option_type_t type;
+    CommandLineOptionType type;
+
+    const char short_name;
+    const char *long_name;
+    const char *description;
 
     void *value;
-    const char *long_name;
-    const char short_name;
+    CommandLineCallback *callback;
+} CommandLineOption;
 
-    cmdline_callback_t *callback;
-
-    const char *help;
-} cmdline_option_t;
-
-typedef struct s_cmdline
+typedef struct CommandLine
 {
     const char *name;
     const char *const *usages;
     const char *prologue;
-    cmdline_option_t *options;
+    CommandLineOption *options;
     const char *epiloge;
-} cmdline_t;
+} CommandLine;
 
-#define CMDLINE_NEWLINE "\n\t"
+#define COMMANDLINE_NEWLINE "\n\t"
 
-#define CMDLINE_NO_LONG_NAME NULL
-#define CMDLINE_NO_SHORT_NAME '\0'
-#define CMDLINE_NO_CALLBACK NULL
-#define CMDLINE_NO_VALUE NULL
+#define COMMANDLINE_NO_LONG_NAME NULL
+#define COMMANDLINE_NO_SHORT_NAME '\0'
+#define COMMANDLINE_NO_CALLBACK NULL
+#define COMMANDLINE_NO_VALUE NULL
 
-#define CMDLINE_OPT_SECTION(__name)          \
-    {                                        \
-        .type = CMDLINE_SECTION,             \
-        .value = CMDLINE_NO_VALUE,           \
-        .long_name = __name,                 \
-        .short_name = CMDLINE_NO_SHORT_NAME, \
-        .callback = CMDLINE_NO_CALLBACK,     \
-        .help = NULL,                        \
+#define COMMANDLINE_OPT_SECTION(__name)          \
+    {                                            \
+        .type = COMMANDLINE_SECTION,             \
+        .value = COMMANDLINE_NO_VALUE,           \
+        .long_name = __name,                     \
+        .short_name = COMMANDLINE_NO_SHORT_NAME, \
+        .callback = COMMANDLINE_NO_CALLBACK,     \
+        .description = NULL,                     \
     }
 
-#define CMDLINE_OPT_SEPARATOR                \
-    {                                        \
-        .type = CMDLINE_SEPARATOR,           \
-        .value = CMDLINE_NO_VALUE,           \
-        .long_name = NULL,                   \
-        .short_name = CMDLINE_NO_SHORT_NAME, \
-        .callback = CMDLINE_NO_CALLBACK,     \
-        .help = NULL,                        \
+#define COMMANDLINE_OPT_SEPARATOR                \
+    {                                            \
+        .type = COMMANDLINE_SEPARATOR,           \
+        .value = COMMANDLINE_NO_VALUE,           \
+        .long_name = NULL,                       \
+        .short_name = COMMANDLINE_NO_SHORT_NAME, \
+        .callback = COMMANDLINE_NO_CALLBACK,     \
+        .description = NULL,                     \
     }
 
-#define CMDLINE_OPT_BOOL(__long_name, __short_name, __value, __help, __callback) \
-    {                                                                            \
-        .type = CMDLINE_BOOLEAN,                                                 \
-        .value = &(__value),                                                     \
-        .long_name = __long_name,                                                \
-        .short_name = __short_name,                                              \
-        .callback = __callback,                                                  \
-        .help = __help,                                                          \
+#define COMMANDLINE_OPT_BOOL(__long_name, __short_name, __value, __description, __callback) \
+    {                                                                                       \
+        .type = COMMANDLINE_BOOLEAN,                                                        \
+        .value = &(__value),                                                                \
+        .long_name = __long_name,                                                           \
+        .short_name = __short_name,                                                         \
+        .callback = __callback,                                                             \
+        .description = __description,                                                       \
     }
 
-#define CMDLINE_OPT_STRING(__long_name, __short_name, __value, __help, __callback) \
-    {                                                                              \
-        .type = CMDLINE_STRING,                                                    \
-        .value = &(__value),                                                       \
-        .long_name = __long_name,                                                  \
-        .short_name = __short_name,                                                \
-        .callback = __callback,                                                    \
-        .help = __help,                                                            \
+#define COMMANDLINE_OPT_STRING(__long_name, __short_name, __value, __description, __callback) \
+    {                                                                                         \
+        .type = COMMANDLINE_STRING,                                                           \
+        .value = &(__value),                                                                  \
+        .long_name = __long_name,                                                             \
+        .short_name = __short_name,                                                           \
+        .callback = __callback,                                                               \
+        .description = __description,                                                         \
     }
 
-#define CMDLINE_OPT_INT(__long_name, __short_name, __value, __help, __callback) \
-    {                                                                           \
-        .type = CMDLINE_INTEGER,                                                \
-        .value = &(__value),                                                    \
-        .long_name = __long_name,                                               \
-        .short_name = __short_name,                                             \
-        .callback = __callback,                                                 \
-        .help = __help,                                                         \
+#define COMMANDLINE_OPT_INT(__long_name, __short_name, __value, __description, __callback) \
+    {                                                                                      \
+        .type = COMMANDLINE_INTEGER,                                                       \
+        .value = &(__value),                                                               \
+        .long_name = __long_name,                                                          \
+        .short_name = __short_name,                                                        \
+        .callback = __callback,                                                            \
+        .description = __description,                                                      \
     }
 
-#define CMDLINE_OPT_ACTION(__long_name, __short_name, __help, __callback) \
-    {                                                                     \
-        .type = CMDLINE_ACTION,                                           \
-        .value = CMDLINE_NO_VALUE,                                        \
-        .long_name = __long_name,                                         \
-        .short_name = __short_name,                                       \
-        .callback = __callback,                                           \
-        .help = __help,                                                   \
+#define COMMANDLINE_OPT_ACTION(__long_name, __short_name, __description, __callback) \
+    {                                                                                \
+        .type = COMMANDLINE_ACTION,                                                  \
+        .value = COMMANDLINE_NO_VALUE,                                               \
+        .long_name = __long_name,                                                    \
+        .short_name = __short_name,                                                  \
+        .callback = __callback,                                                      \
+        .description = __description,                                                \
     }
 
-#define CMDLINE_OPT_HELP                            \
-    {                                               \
-        .type = CMDLINE_BOOLEAN,                    \
-        .value = NULL,                              \
-        .long_name = "help",                        \
-        .short_name = 'h',                          \
-        .callback = cmdline_callback_help,          \
-        .help = "Show this help message and exit.", \
+#define COMMANDLINE_OPT_HELP                               \
+    {                                                      \
+        .type = COMMANDLINE_BOOLEAN,                       \
+        .value = NULL,                                     \
+        .long_name = "help",                               \
+        .short_name = 'h',                                 \
+        .callback = cmdline_callback_help,                 \
+        .description = "Show this help message and exit.", \
     }
 
-#define CMDLINE_OPT_END      \
-    {                        \
-        .type = CMDLINE_END, \
+#define COMMANDLINE_OPT_END      \
+    {                            \
+        .type = COMMANDLINE_END, \
     }
 
 #define CMDLINE(__usages, __options, __prologue, __epiloge) \
@@ -136,5 +133,5 @@ typedef struct s_cmdline
         .epiloge = __epiloge                                \
     }
 
-void cmdline_callback_help(cmdline_t *cmdline, cmdline_option_t *option);
-int cmdline_parse(cmdline_t *cmdline, int argc, char **argv);
+void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option);
+int cmdline_parse(CommandLine *cmdline, int argc, char **argv);

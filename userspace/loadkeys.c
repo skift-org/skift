@@ -21,16 +21,20 @@ static const char *usages[] = {
     NULL,
 };
 
-static cmdline_option_t options[] = {
-    CMDLINE_OPT_HELP,
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("get", 'g', option_get, "Get the current keyboard keymap.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "List all installed keymap on this system", CMDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("get", 'g', option_get, "Get the current keyboard keymap.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("list", 'l', option_list, "List all installed keymap on this system", COMMANDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_END,
+    COMMANDLINE_OPT_END,
 };
 
-static cmdline_t cmdline = CMDLINE(usages, options, "Get or set the current keyboard keymap", "Options can be combined.");
+static CommandLine cmdline = CMDLINE(
+    usages,
+    options,
+    "Get or set the current keyboard keymap",
+    "Options can be combined.");
 
 int loadkey_list_keymap()
 {

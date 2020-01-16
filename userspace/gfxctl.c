@@ -4,10 +4,10 @@
 
 #include <libdevice/framebuffer.h>
 
-#include <libsystem/iostream.h>
-#include <libsystem/error.h>
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
 
 static bool option_list = false;
 static bool option_get = false;
@@ -21,17 +21,17 @@ static const char *usages[] = {
     NULL,
 };
 
-static cmdline_option_t options[] = {
-    CMDLINE_OPT_HELP,
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "List all available graphics modes.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("get", 'g', option_get, "Get the current graphic mode.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_STRING("set", 's', option_set, "Set graphic mode.", CMDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("list", 'l', option_list, "List all available graphics modes.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("get", 'g', option_get, "Get the current graphic mode.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_STRING("set", 's', option_set, "Set graphic mode.", COMMANDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_END,
+    COMMANDLINE_OPT_END,
 };
 
-static cmdline_t cmdline = CMDLINE(
+static CommandLine cmdline = CMDLINE(
     usages,
     options,
     "Get or set graphics modes.",

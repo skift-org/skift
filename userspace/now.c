@@ -1,6 +1,6 @@
+#include <libsystem/cmdline.h>
 #include <libsystem/iostream.h>
 #include <libsystem/time.h>
-#include <libsystem/cmdline.h>
 
 static bool option_time = false;
 static bool option_date = false;
@@ -11,17 +11,21 @@ static const char *usages[] = {
     "OPTION...",
     NULL};
 
-static cmdline_option_t options[] = {
-    CMDLINE_OPT_HELP,
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("time", 't', option_time, "Display the time of the day.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("date", 'd', option_date, "Display today date.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("epoch", 'e', option_epoch, "Display the current epoch.", CMDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("time", 't', option_time, "Display the time of the day.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("date", 'd', option_date, "Display today date.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("epoch", 'e', option_epoch, "Display the current epoch.", COMMANDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_END,
+    COMMANDLINE_OPT_END,
 };
 
-static cmdline_t cmdline = CMDLINE(usages, options, "Get the time of the day.", "Options can be combined.");
+static CommandLine cmdline = CMDLINE(
+    usages,
+    options,
+    "Get the time of the day.",
+    "Options can be combined.");
 
 int main(int argc, char **argv)
 {

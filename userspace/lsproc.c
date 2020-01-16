@@ -24,7 +24,7 @@ static const char *usages[] = {
     NULL,
 };
 
-void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
+void all_cmdline_callback(CommandLine *cmdline, CommandLineOption *opt)
 {
     __unused(cmdline);
     __unused(opt);
@@ -37,7 +37,7 @@ void all_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
     option_list = true;
 }
 
-void full_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
+void full_cmdline_callback(CommandLine *cmdline, CommandLineOption *opt)
 {
     __unused(cmdline);
     __unused(opt);
@@ -50,25 +50,25 @@ void full_cmdline_callback(cmdline_t *cmdline, cmdline_option_t *opt)
     option_list = true;
 }
 
-static cmdline_option_t options[] = {
-    CMDLINE_OPT_HELP,
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("cwd", 'w', option_show_cwd, "Display the cwd.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("human", 'v', option_human, "Display in a human readable way.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "Display in a list.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("name", 'n', option_name, "Display the name of the process.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("state", 's', option_state, "Display the state of the process.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("usage", 'u', option_cpu_usage, "Display cpu usage in %.", CMDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("cwd", 'w', option_show_cwd, "Display the cwd.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("human", 'v', option_human, "Display in a human readable way.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("list", 'l', option_list, "Display in a list.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("name", 'n', option_name, "Display the name of the process.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("state", 's', option_state, "Display the state of the process.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("usage", 'u', option_cpu_usage, "Display cpu usage in %.", COMMANDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_SEPARATOR,
+    COMMANDLINE_OPT_SEPARATOR,
 
-    CMDLINE_OPT_BOOL("all", 'a', option_all, "Display all the above options.", all_cmdline_callback),
-    CMDLINE_OPT_BOOL("full", 'f', option_all, "Display all the above options exept -v.", full_cmdline_callback),
+    COMMANDLINE_OPT_BOOL("all", 'a', option_all, "Display all the above options.", all_cmdline_callback),
+    COMMANDLINE_OPT_BOOL("full", 'f', option_all, "Display all the above options exept -v.", full_cmdline_callback),
 
-    CMDLINE_OPT_END,
+    COMMANDLINE_OPT_END,
 };
 
-static cmdline_t cmdline = CMDLINE(
+static CommandLine cmdline = CMDLINE(
     usages,
     options,
     "Display a snapshot of all running processes.",

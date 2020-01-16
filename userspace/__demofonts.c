@@ -15,9 +15,9 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    framebuffer_t *fb = framebuffer_open();
+    framebuffer_t *framebuffer = framebuffer_open();
 
-    if (fb == NULL)
+    if (framebuffer == NULL)
     {
         error_print("Failled to open the framebuffer.");
         return -1;
@@ -39,14 +39,14 @@ int main(int argc, char **argv)
         NULL,
     };
 
-    painter_clear(fb->painter, COLOR_BLACK);
+    painter_clear(framebuffer->painter, COLOR_BLACK);
 
     for (int i = 0; fonts[i] != NULL; i++)
     {
-        painter_draw_text(fb->painter, fonts[i], TEXT, strlen(TEXT), (Point){16, 32 + 32 * i}, 16, COLOR_WHITE);
+        painter_draw_text(framebuffer->painter, fonts[i], TEXT, strlen(TEXT), (Point){16, 32 + 32 * i}, 16, COLOR_WHITE);
     }
 
-    framebuffer_blit(fb);
+    framebuffer_blit(framebuffer);
 
     for (int i = 0; fonts[i] != NULL; i++)
     {

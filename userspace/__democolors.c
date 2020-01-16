@@ -2,18 +2,18 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
-#include <libsystem/error.h>
 #include <libgraphic/framebuffer.h>
+#include <libsystem/error.h>
+#include <libsystem/iostream.h>
 
 int main(int argc, char **argv)
 {
     __unused(argc);
     __unused(argv);
 
-    framebuffer_t *fb = framebuffer_open();
+    framebuffer_t *framebuffer = framebuffer_open();
 
-    if (fb == NULL)
+    if (framebuffer == NULL)
     {
         error_print("Failled to open the framebuffer.");
         return -1;
@@ -21,15 +21,16 @@ int main(int argc, char **argv)
 
     do
     {
-        for (int x = 0; x < fb->width; x++)
+        for (int x = 0; x < framebuffer->width; x++)
         {
-            for (int y = 0; y < fb->height; y++)
+            for (int y = 0; y < framebuffer->height; y++)
             {
-                painter_plot_pixel(fb->painter, (Point){x, y}, HSV(((float)x / (float)fb->width) * 360.0, ((float)y / (float)fb->height) * 1.0, 1.0));
+                Color color = HSV((x / (float)framebuffer->width) * 360.0, (y / (float)framebuffer->height), 1.0);
+                painter_plot_pixel(framebuffer->painter, (Point){x, y}, color);
             }
         }
 
-        framebuffer_blit(fb);
+        framebuffer_blit(framebuffer);
     } while (true);
 
     return 0;

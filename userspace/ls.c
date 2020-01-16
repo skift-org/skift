@@ -19,16 +19,20 @@ static const char *usages[] = {
     NULL,
 };
 
-static cmdline_option_t options[] = {
-    CMDLINE_OPT_HELP,
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
 
-    CMDLINE_OPT_BOOL("all", 'a', option_all, "Do not ignore entries starting with '.'.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("list", 'l', option_list, "Long listing mode.", CMDLINE_NO_CALLBACK),
-    CMDLINE_OPT_BOOL("color", 'c', option_color, "Enable colored output.", CMDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("all", 'a', option_all, "Do not ignore entries starting with '.'.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("list", 'l', option_list, "Long listing mode.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("color", 'c', option_color, "Enable colored output.", COMMANDLINE_NO_CALLBACK),
 
-    CMDLINE_OPT_END};
+    COMMANDLINE_OPT_END};
 
-static cmdline_t cmdline = CMDLINE(usages, options, "List files and directories in the current working directory by default.", "Options can be combined.");
+static CommandLine cmdline = CMDLINE(
+    usages,
+    options,
+    "List files and directories in the current working directory by default.",
+    "Options can be combined.");
 
 const char *file_type_name[] = {
     "-", // None

@@ -6,6 +6,8 @@
 
 #include "multiboot.h"
 
+#include <libsystem/runtime.h>
+
 bool framebuffer_initialize(multiboot_info_t *mboot);
 
 void keyboard_initialize(void);

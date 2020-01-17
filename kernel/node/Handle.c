@@ -202,7 +202,7 @@ off_t handle_seek(Handle *handle, Whence whence, off_t where)
         break;
     default:
         logger_error("Invalide whence %d", whence);
-        assert_not_reached();
+        ASSERT_NOT_REACHED();
     }
 
     return -ERR_SUCCESS;
@@ -230,7 +230,7 @@ off_t handle_tell(Handle *handle, Whence whence)
     case WHENCE_END:
         return handle->offset - size;
     default:
-        assert_not_reached();
+        ASSERT_NOT_REACHED();
     }
 }
 

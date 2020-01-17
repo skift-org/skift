@@ -5,13 +5,11 @@
 /* See: LICENSE.md                                                            */
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define NULL ((void *)0)
-
-#define bool _Bool
-#define true 1
-#define false 0
 
 #define let __auto_type const
 #define var __auto_type
@@ -23,10 +21,10 @@ typedef long s32;
 typedef long long s64;
 
 typedef void u0;
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned long u32;
-typedef unsigned long long u64;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 typedef char byte;
 typedef unsigned char ubyte;
@@ -35,19 +33,7 @@ typedef unsigned short wchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 
-typedef signed char int8_t;
-typedef short int16_t;
-typedef long int32_t;
-typedef long long int64_t;
-
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned long uint32_t;
-typedef unsigned long long uint64_t;
-
 typedef long off_t;
-typedef long intptr_t;
-typedef unsigned long uintptr_t;
 
 #define __packed __attribute__((packed))
 
@@ -57,17 +43,12 @@ typedef unsigned long uintptr_t;
 
 #define __create(__type) ((__type *)calloc(1, sizeof(__type)))
 
-#define __malloc __attribute__((malloc))
-
 #define SWAP(x, y)          \
-    {                       \
+    ({                      \
         typeof(x) SWAP = x; \
         x = y;              \
         y = SWAP;           \
-    }
-
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-#define FLAG(__i) (1 << (__i))
+    })
 
 /* --- Raw memory allocation ------------------------------------------------ */
 
@@ -103,4 +84,4 @@ typedef enum
 {
     ITERATION_CONTINUE,
     ITERATION_STOP,
-} iteration_decision_t;
+} IterationDecision;

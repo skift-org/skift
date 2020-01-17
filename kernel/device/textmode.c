@@ -30,13 +30,13 @@ void vga_cell(u32 x, u32 y, ushort entry)
     }
 }
 
-void vga_cursor_enable(u8 cursor_start, u8 cursor_end)
+void vga_cursor_enable()
 {
     out8(0x3D4, 0x0A);
-    out8(0x3D5, (in8(0x3D5) & 0xC0) | cursor_start);
+    out8(0x3D5, (in8(0x3D5) & 0xC0) | 0);
 
     out8(0x3D4, 0x0B);
-    out8(0x3D5, (in8(0x3D5) & 0xE0) | cursor_end);
+    out8(0x3D5, (in8(0x3D5) & 0xE0) | 15);
 }
 
 void vga_cursor_disable()
@@ -49,10 +49,10 @@ void vga_cursor_position(s32 x, s32 y)
 {
     u16 cursorLocation = y * VGA_SCREEN_WIDTH + x;
 
-    out8(0x3D4, 14);                        // Tell the VGA board we are setting the high cursor byte.
-    out8(0x3D5, (u8)(cursorLocation));      // Send the low cursor byte.
-    out8(0x3D4, 15);                        // Tell the VGA board we are setting the low cursor byte.
-    out8(0x3D5, (u8)(cursorLocation >> 8)); // Send the high cursor byte.
+    out8(0x3D4, 0x0F);
+    out8(0x3D5, (uint8_t)(cursorLocation & 0xFF));
+    out8(0x3D4, 0x0E);
+    out8(0x3D5, (uint8_t)((cursorLocation >> 8) & 0xFF));
 }
 
 /* --- Textmode abstract driver --------------------------------------------- */
@@ -91,6 +91,8 @@ int textmode_FsOperationCall(FsNode *node, Handle *handle, int request, void *ar
         textmode_info_t *info = (textmode_info_t *)args;
 
         vga_cursor_position(info->cursor_x, info->cursor_y);
+        vga_cursor_enable();
+
         return -ERR_SUCCESS;
     }
     else if (request == TEXTMODE_CALL_SET_CELL)
@@ -109,6 +111,8 @@ int textmode_FsOperationCall(FsNode *node, Handle *handle, int request, void *ar
 
 void textmode_initialize(void)
 {
+    logger_info("Initializing textmode graphic");
+
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FSNODE_DEVICE);
 

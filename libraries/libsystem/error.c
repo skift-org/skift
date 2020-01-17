@@ -4,6 +4,7 @@
 
 #include <libsystem/error.h>
 #include <libsystem/iostream.h>
+#include <libsystem/logger.h>
 #include <libsystem/process.h>
 
 #define ERROR_ENUM_ENTRY_STRING(__entry) #__entry,
@@ -28,12 +29,13 @@ void error_set(error_t error)
     error_value = error;
 }
 
-void error_print(const char* message)
+void error_print(const char *message)
 {
+    logger_error("%s: %s\n", message, error_to_string(error_value));
     iostream_printf(err_stream, "%s: %s\n", message, error_to_string(error_value));
 }
- 
-void if_error_throw_and_catch_fire(const char* message)
+
+void if_error_throw_and_catch_fire(const char *message)
 {
     if (error_value != ERR_SUCCESS)
     {

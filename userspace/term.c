@@ -79,8 +79,8 @@ vtconsole_t *terminal_create_textmode_console(void)
         return NULL;
     }
 
-    vtconsole_t *vtc = vtconsole(80, 25, textmode_paint_callback, textmode_cursor_move_callback);
     textmode_buffer = malloc(textmode_info.width * textmode_info.height * sizeof(ushort));
+    vtconsole_t *vtc = vtconsole(80, 25, textmode_paint_callback, textmode_cursor_move_callback);
 
     return vtc;
 }
@@ -201,8 +201,6 @@ int main(int argc, char const *argv[])
         error_print("Failled to open terminal fifo file");
         return -1;
     }
-
-    iostream_set_read_buffer_mode(terminal_fifo, IOSTREAM_BUFFERED_NONE);
 
     vtconsole_t *vtc = NULL;
     bool is_framebuffer = true;

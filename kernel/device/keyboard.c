@@ -8,7 +8,6 @@
 #include <libsystem/atomic.h>
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
-#include <libsystem/ringbuffer.h>
 
 #include <libdevice/keyboard.h>
 #include <libdevice/keymap.c>
@@ -215,6 +214,4 @@ void keyboard_initialize()
     Path *keyboard_device_path = path(KEYBOARD_DEVICE);
     filesystem_link_and_take_ref(keyboard_device_path, keyboard_device);
     path_delete(keyboard_device_path);
-
-    logger_info("Done");
 }

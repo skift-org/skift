@@ -43,7 +43,7 @@ size_t pipe_FsOperationSize(FsPipe *node, Handle *handle)
 
 void pipe_FsOperationDestroy(FsPipe *node)
 {
-    ringbuffer_delete(node->buffer);
+    ringbuffer_destroy(node->buffer);
 }
 
 FsNode *pipe_create(void)
@@ -59,7 +59,7 @@ FsNode *pipe_create(void)
     FSNODE(pipe)->size = (FsOperationSize)pipe_FsOperationSize;
     FSNODE(pipe)->destroy = (FsOperationDestroy)pipe_FsOperationDestroy;
 
-    pipe->buffer = ringbuffer(512);
+    pipe->buffer = ringbuffer_create(512);
 
     return (FsNode *)pipe;
 }

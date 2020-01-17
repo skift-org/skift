@@ -9,7 +9,7 @@
 typedef struct
 {
     FsNode node;
-    ringbuffer_t *buffer;
+    RingBuffer *buffer;
 } FsPipe;
 
 FsNode *pipe_create(void);

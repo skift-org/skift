@@ -134,8 +134,10 @@ void kmain(multiboot_info_t *info, uint magic)
     zero_initialize();
     random_initialize();
 
-    textmode_initialize();
-    framebuffer_initialize(info);
+    if (!framebuffer_initialize(info))
+    {
+        textmode_initialize();
+    }
 
     serial_initialize();
 

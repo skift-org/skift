@@ -6,7 +6,7 @@
 
 #include <libsystem/iostream.h>
 #include <libsystem/lock.h>
-#include <libsystem/ringbuffer.h>
+#include <libsystem/RingBuffer.h>
 
 struct FsNode;
 struct Handle;

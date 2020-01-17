@@ -420,7 +420,7 @@ int framebuffer_FsOperationCall(FsNode *node, Handle *handle, int request, void 
     }
 }
 
-void framebuffer_initialize(multiboot_info_t *mboot)
+bool framebuffer_initialize(multiboot_info_t *mboot)
 {
     if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB || bga_is_available())
     {
@@ -444,11 +444,15 @@ void framebuffer_initialize(multiboot_info_t *mboot)
         FSNODE(framebuffer_device)->call = (FsOperationCall)framebuffer_FsOperationCall;
 
         Path *framebuffer_device_path = path(FRAMEBUFFER_DEVICE);
-        filesystem_link_and_take_ref(framebuffer_device_path, framebuffer_device);
+        filesystem_link(framebuffer_device_path, framebuffer_device);
         path_delete(framebuffer_device_path);
+
+        return true;
     }
     else
     {
         logger_warn("No framebuffer device found!");
+
+        return false;
     }
 }

@@ -4,12 +4,12 @@
 
 /* ringbuffer.c: a fifo buffer.                                               */
 
+#include <libsystem/RingBuffer.h>
 #include <libsystem/assert.h>
-#include <libsystem/ringbuffer.h>
 
-ringbuffer_t *ringbuffer(uint size)
+RingBuffer *ringbuffer_create(size_t size)
 {
-    ringbuffer_t *rb = __create(ringbuffer_t);
+    RingBuffer *rb = __create(RingBuffer);
 
     rb->size = size;
     rb->head = 0;
@@ -20,7 +20,7 @@ ringbuffer_t *ringbuffer(uint size)
     return rb;
 }
 
-void ringbuffer_delete(ringbuffer_t *rb)
+void ringbuffer_destroy(RingBuffer *rb)
 {
     assert(rb);
 
@@ -28,23 +28,23 @@ void ringbuffer_delete(ringbuffer_t *rb)
     free(rb);
 }
 
-int ringbuffer_is_empty(ringbuffer_t *this)
+bool ringbuffer_is_empty(RingBuffer *this)
 {
     return this->tail == this->head;
 }
 
-int ringbuffer_is_full(ringbuffer_t *this)
+bool ringbuffer_is_full(RingBuffer *this)
 {
     return ((this->head + 1) % this->size) == this->tail;
 }
 
-int ringbuffer_read(ringbuffer_t *rb, void *buffer, uint size)
+size_t ringbuffer_read(RingBuffer *rb, void *buffer, size_t size)
 {
     assert(rb);
     assert(buffer);
 
     int chr;
-    uint offset = 0;
+    size_t offset = 0;
 
     do
     {
@@ -60,13 +60,13 @@ int ringbuffer_read(ringbuffer_t *rb, void *buffer, uint size)
     return offset;
 }
 
-int ringbuffer_write(ringbuffer_t *rb, const void *buffer, uint size)
+size_t ringbuffer_write(RingBuffer *rb, const void *buffer, size_t size)
 {
     assert(rb);
     assert(buffer);
 
     int chr = 0;
-    uint offset = 0;
+    size_t offset = 0;
 
     while (chr != -1 && offset < size)
     {
@@ -77,7 +77,7 @@ int ringbuffer_write(ringbuffer_t *rb, const void *buffer, uint size)
     return offset;
 }
 
-int ringbuffer_putc(ringbuffer_t *rb, int c)
+int ringbuffer_putc(RingBuffer *rb, int c)
 {
     assert(rb);
 
@@ -94,7 +94,7 @@ int ringbuffer_putc(ringbuffer_t *rb, int c)
     }
 }
 
-int ringbuffer_getc(ringbuffer_t *rb)
+int ringbuffer_getc(RingBuffer *rb)
 {
     assert(rb);
 

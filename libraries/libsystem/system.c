@@ -6,17 +6,21 @@
 #include <libsystem/cstring.h>
 #include <libsystem/system.h>
 
-void system_get_info(system_info_t *info)
+SystemInfo system_get_info(void)
 {
-    __plug_system_get_info(info);
+    SystemInfo info;
+    __plug_system_get_info(&info);
+    return info;
 }
 
-void system_get_status(system_status_t *status)
+SystemStatus system_get_status(void)
 {
-    __plug_system_get_status(status);
+    SystemStatus status;
+    __plug_system_get_status(&status);
+    return status;
 }
 
-uint system_get_ticks()
+uint system_get_ticks(void)
 {
     return __plug_system_get_ticks();
 }

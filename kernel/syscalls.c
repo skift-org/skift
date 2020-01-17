@@ -267,7 +267,7 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
 
 /* --- Sytem info getter ---------------------------------------------------- */
 
-int sys_system_get_info(system_info_t *info)
+int sys_system_get_info(SystemInfo *info)
 {
     strlcpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
 
@@ -287,7 +287,7 @@ int sys_system_get_info(system_info_t *info)
     return ERR_SUCCESS;
 }
 
-int sys_system_get_status(system_status_t *status)
+int sys_system_get_status(SystemStatus *status)
 {
     // FIXME: get a real uptime value;
     status->uptime = 0;

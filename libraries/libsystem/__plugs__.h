@@ -64,9 +64,9 @@ int __plug_filesystem_mkdir(const char *path);
 
 /* --- System --------------------------------------------------------------- */
 
-void __plug_system_get_info(system_info_t *info);
+void __plug_system_get_info(SystemInfo *info);
 
-void __plug_system_get_status(system_status_t *status);
+void __plug_system_get_status(SystemStatus *status);
 
 TimeStamp __plug_system_get_time(void);
 

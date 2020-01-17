@@ -54,13 +54,13 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
 /* --- Systeme API ---------------------------------------------------------- */
 
 // We are the system so we doesn't need that ;)
-void __plug_system_get_info(system_info_t *info)
+void __plug_system_get_info(SystemInfo *info)
 {
     __unused(info);
     assert(false);
 }
 
-void __plug_system_get_status(system_status_t *status)
+void __plug_system_get_status(SystemStatus *status)
 {
     __unused(status);
     assert(false);

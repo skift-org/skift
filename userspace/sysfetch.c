@@ -7,17 +7,14 @@
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    __unused(argc);
+    __unused(argv);
 
     // FIXME: - get the uptime from the kernel.
     //        - get user and the machine name from the system
 
-    system_info_t info;
-    system_status_t status;
-
-    system_get_info(&info);
-    system_get_status(&status);
+    SystemInfo info = system_get_info();
+    SystemStatus status = system_get_status();
 
     printf("\e[1;34m    _____   \e[1;34muser\e[1;37m@\e[1;34m%s\n", info.machine);
     printf("\e[1;34m   / ____|  \e[1;37mOS:       \e[0;37m%s\n", info.system_name);

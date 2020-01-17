@@ -16,9 +16,9 @@ typedef struct
     Rectangle cliprect_stack[32];
 } Painter;
 
-Painter *painter_create(Bitmap *bmp);
+Painter *painter_create(Bitmap *bitmap);
 
-void painter_destroy(Painter *this);
+void painter_destroy(Painter *painter);
 
 void painter_push_cliprect(Painter *paint, Rectangle cliprect);
 
@@ -44,15 +44,15 @@ void painter_draw_rect(Painter *paint, Rectangle rect, Color color);
 
 // TODO: void painter_draw_circle(Painter* paint, ...);
 
-// TODO: void painter_draw_triangle(Painter* paint, ...);
+// TODO: void painter_draw_triangle(Painter* paint, Point a, Point b, Point c, Color color);
 
 // void painter_draw_text(Painter *paint, const char *text, Point position, Color color);
 
-void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, Color color);
+void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, float size, Color color);
 
 void painter_draw_text(
     Painter *paint,
-    font_t *font,
+    Font *font,
     const char *text,
     int text_size,
     Point position,

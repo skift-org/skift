@@ -11,9 +11,7 @@
 
 #include <libgraphic/font.h>
 
-void font_delete(font_t *this);
-
-glyph_t *font_load_glyph(const char *name)
+Glyph *font_load_glyph(const char *name)
 {
     char glyph_path[PATH_LENGHT];
     snprintf(glyph_path, PATH_LENGHT, "/res/font/%s.glyph", name);
@@ -21,7 +19,7 @@ glyph_t *font_load_glyph(const char *name)
 
     IOStream *glyph_file = iostream_open(glyph_path, OPEN_READ);
 
-    if (glyph_file == NULL)
+    if (!glyph_file)
     {
         logger_error("Failled to load glyph from %s: %s", glyph_path, error_to_string(error_get()));
 
@@ -38,7 +36,7 @@ glyph_t *font_load_glyph(const char *name)
         return NULL;
     }
 
-    glyph_t *glyph = malloc(stat.size);
+    Glyph *glyph = malloc(stat.size);
     iostream_read(glyph_file, glyph, stat.size);
 
     iostream_close(glyph_file);
@@ -57,20 +55,20 @@ Bitmap *font_load_bitmap_create(const char *name)
     if (bmp == NULL)
     {
         logger_error("Failled to load font bitmap from %s: %s", bitmap_path, error_to_string(error_get()));
-        return NULL;
     }
     else
     {
         bmp->filtering = BITMAP_FILTERING_LINEAR;
-        return bmp;
     }
+
+    return bmp;
 }
 
-font_t *font(const char *name)
+Font *font_create(const char *name)
 {
     logger_trace("Loading font %s...", name);
 
-    glyph_t *glyph = font_load_glyph(name);
+    Glyph *glyph = font_load_glyph(name);
 
     if (glyph == NULL)
     {
@@ -88,7 +86,7 @@ font_t *font(const char *name)
         return NULL;
     }
 
-    font_t *this = OBJECT(font);
+    Font *this = __create(Font);
 
     this->bitmap = bmp;
     this->glyph = glyph;
@@ -99,15 +97,16 @@ font_t *font(const char *name)
     return this;
 }
 
-void font_delete(font_t *this)
+void font_destroy(Font *this)
 {
     assert(this);
 
     free(this->glyph);
     bitmap_destroy(this->bitmap);
+    free(this);
 }
 
-glyph_t *font_glyph(font_t *this, int codepoint)
+Glyph *font_glyph(Font *this, int codepoint)
 {
     assert(this);
 
@@ -122,7 +121,7 @@ glyph_t *font_glyph(font_t *this, int codepoint)
     return &this->default_glyph;
 }
 
-int font_measure_width(font_t *this, float font_size, const char *str, int str_size)
+int font_measure_width(Font *this, float font_size, const char *str, int str_size)
 {
     assert(this);
 
@@ -130,7 +129,7 @@ int font_measure_width(font_t *this, float font_size, const char *str, int str_s
 
     for (int i = 0; i < str_size; i++)
     {
-        glyph_t *g = font_glyph(this, str[i]);
+        Glyph *g = font_glyph(this, str[i]);
         width += g->advance * (font_size / 16.0);
     }
 

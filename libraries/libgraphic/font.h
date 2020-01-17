@@ -12,18 +12,22 @@ typedef struct
     Rectangle bound;
     Point origin;
     int advance;
-} glyph_t;
+} Glyph;
 
 typedef struct
 {
     Bitmap *bitmap;
 
-    glyph_t default_glyph;
-    glyph_t *glyph;
-} font_t;
+    Glyph default_glyph;
+    Glyph *glyph;
+} Font;
 
-font_t *font(const char *name);
+Font *font_create(const char *name);
 
-glyph_t *font_glyph(font_t *this, int codepoint);
+void font_destroy(Font *this);
 
-int font_measure_width(font_t *this, float font_size, const char *str, int str_size);
+bool font_has_glyph(Font *font, int codepoint);
+
+Glyph *font_glyph(Font *this, int codepoint);
+
+int font_measure_width(Font *this, float font_size, const char *str, int str_size);

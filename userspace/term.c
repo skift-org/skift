@@ -89,7 +89,7 @@ vtconsole_t *terminal_create_textmode_console(void)
 
 Point char_size = (Point){9, 24};
 
-static font_t *mono_font = NULL;
+static Font *mono_font = NULL;
 
 static framebuffer_t *framebuffer;
 static Point framebuffer_cursor = point_zero;
@@ -140,7 +140,7 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 
     framebuffer_blit(framebuffer);
 
-    mono_font = font("mono");
+    mono_font = font_create("mono");
 
     return vtconsole(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, NULL, framebuffer_cursor_move_callback);
 }
@@ -243,7 +243,15 @@ int main(int argc, char const *argv[])
         }
     } while (!do_exit);
 
-    vtconsole_delete(vtc);
+    if (vtc)
+    {
+        vtconsole_delete(vtc);
+    }
+
+    if (mono_font)
+    {
+        font_destroy(mono_font);
+    }
 
     return 0;
 }

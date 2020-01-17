@@ -23,19 +23,19 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    font_t *fonts[] = {
-        font("mono"),
-        font("mono-italic"),
-        font("mono-bold"),
-        font("mono-bold-italic"),
-        font("sans"),
-        font("sans-italic"),
-        font("sans-bold"),
-        font("sans-bold-italic"),
-        font("serif"),
-        font("serif-italic"),
-        font("serif-bold"),
-        font("serif-bold-italic"),
+    Font *fonts[] = {
+        font_create("mono"),
+        font_create("mono-italic"),
+        font_create("mono-bold"),
+        font_create("mono-bold-italic"),
+        font_create("sans"),
+        font_create("sans-italic"),
+        font_create("sans-bold"),
+        font_create("sans-bold-italic"),
+        font_create("serif"),
+        font_create("serif-italic"),
+        font_create("serif-bold"),
+        font_create("serif-bold-italic"),
         NULL,
     };
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; fonts[i] != NULL; i++)
     {
-        object_release(fonts[i]);
+        font_destroy(fonts[i]);
     }
 
     return 0;

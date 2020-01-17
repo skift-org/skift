@@ -2,10 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/assert.h>
-#include <libgraphic/painter.h>
 #include <libgraphic/font.h>
+#include <libgraphic/painter.h>
 #include <libmath/math.h>
+#include <libsystem/assert.h>
 
 void painter_delete(Painter *);
 
@@ -235,7 +235,7 @@ void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Re
     }
 }
 
-void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point position, float size, Color color)
+void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, float size, Color color)
 {
     Rectangle dest;
     dest.position = point_sub(position, point_scale(glyph->origin, size / FONT_SIZE));
@@ -246,7 +246,7 @@ void painter_draw_glyph(Painter *paint, font_t *font, glyph_t *glyph, Point posi
 
 void painter_draw_text(
     Painter *paint,
-    font_t *font,
+    Font *font,
     const char *text,
     int text_size,
     Point position,
@@ -257,7 +257,7 @@ void painter_draw_text(
 
     for (int i = 0; i < text_size; i++)
     {
-        glyph_t *glyph = font_glyph(font, text[i]);
+        Glyph *glyph = font_glyph(font, text[i]);
 
         painter_draw_glyph(paint, font, glyph, current, font_size, color);
 

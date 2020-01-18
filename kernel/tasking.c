@@ -471,7 +471,7 @@ void task_exit(int exitvalue)
 
     sheduler_yield();
 
-    PANIC("sheduler_yield return but the task is canceled!");
+    ASSERT_NOT_REACHED();
 }
 
 /* --- Task Memory managment ---------------------------------------------- */
@@ -481,6 +481,7 @@ page_directorie_t *task_switch_pdir(Task *task, page_directorie_t *pdir)
     page_directorie_t *oldpdir = task->pdir;
 
     task->pdir = pdir;
+
     paging_load_directorie(pdir);
 
     return oldpdir;
@@ -498,8 +499,7 @@ int task_memory_unmap(Task *this, uint addr, uint count)
 
 uint task_memory_alloc(Task *this, uint count)
 {
-    uint addr = memory_alloc(this->pdir, count, 1);
-    return addr;
+    return memory_alloc(this->pdir, count, 1);
 }
 
 void task_memory_free(Task *this, uint addr, uint count)

@@ -13,9 +13,7 @@ typedef struct
 typedef struct
 {
     uint64_t uptime;
-
     uint total_ram;
     uint used_ram;
-
     int running_tasks;
 } SystemStatus;

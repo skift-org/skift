@@ -1,6 +1,6 @@
 # skiftOS system libraries
 
-- libconsole : vt100 renderer
+- libterminal : vt100 renderer
 - libdevice : device APIs
 - libfile : file format codecs
 - libform : GUI library

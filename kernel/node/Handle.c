@@ -89,74 +89,79 @@ void handle_release_lock(Handle *handle, int who_release)
 
 int handle_read(Handle *handle, void *buffer, size_t size)
 {
-    if (handle_has_flag(handle, OPEN_READ))
-    {
-        FsNode *node = handle->node;
-
-        if (node->read)
-        {
-            task_block(sheduler_running(), blocker_read_create(node));
-
-            int readded = node->read(node, handle, buffer, size);
-
-            if (readded > 0)
-            {
-                handle->offset += readded;
-            }
-
-            fsnode_release_lock(node, sheduler_running_id());
-
-            return readded;
-        }
-        else
-        {
-            return -ERR_NOT_READABLE;
-        }
-    }
-    else
+    if (!handle_has_flag(handle, OPEN_READ))
     {
         return -ERR_WRITE_ONLY_STREAM;
     }
+
+    FsNode *node = handle->node;
+
+    if (!node->read)
+    {
+        return -ERR_NOT_READABLE;
+    }
+
+    task_block(sheduler_running(), blocker_read_create(node));
+
+    int readded = node->read(node, handle, buffer, size);
+
+    if (readded > 0)
+    {
+        handle->offset += readded;
+    }
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    return readded;
 }
 
 int handle_write(Handle *handle, const void *buffer, size_t size)
 {
-    if (handle_has_flag(handle, OPEN_WRITE))
-    {
-        FsNode *node = handle->node;
-
-        if (node->write)
-        {
-            task_block(sheduler_running(), blocker_write_create(node));
-
-            if (handle_has_flag(handle, OPEN_APPEND))
-            {
-                if (node->size)
-                {
-                    handle->offset = node->size(node, handle);
-                }
-            }
-
-            int written = node->write(node, handle, buffer, size);
-
-            if (written > 0)
-            {
-                handle->offset += written;
-            }
-
-            fsnode_release_lock(node, sheduler_running_id());
-
-            return written;
-        }
-        else
-        {
-            return -ERR_NOT_WRITABLE;
-        }
-    }
-    else
+    if (!handle_has_flag(handle, OPEN_WRITE))
     {
         return ERR_READ_ONLY_STREAM;
     }
+
+    FsNode *node = handle->node;
+
+    if (!node->write)
+    {
+        return -ERR_NOT_WRITABLE;
+    }
+
+    int written = 0;
+    int remaining = size;
+
+    while (remaining > 0)
+    {
+        task_block(sheduler_running(), blocker_write_create(node));
+
+        if (handle_has_flag(handle, OPEN_APPEND))
+        {
+            if (node->size)
+            {
+                handle->offset = node->size(node, handle);
+            }
+        }
+
+        int result = node->write(node, handle, (void *)((uintptr_t)buffer + written), remaining);
+
+        if (result <= 0)
+        {
+            remaining = 0;
+            written = result;
+        }
+        else
+        {
+            written += result;
+            remaining -= result;
+            handle->offset += result;
+        }
+
+        fsnode_release_lock(node, sheduler_running_id());
+    }
+
+    return written;
 }
 
 off_t handle_seek(Handle *handle, Whence whence, off_t where)

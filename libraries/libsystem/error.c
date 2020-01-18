@@ -31,7 +31,7 @@ void error_set(error_t error)
 
 void error_print(const char *message)
 {
-    logger_error("%s: %s\n", message, error_to_string(error_value));
+    logger_error("%s: %s", message, error_to_string(error_value));
     iostream_printf(err_stream, "%s: %s\n", message, error_to_string(error_value));
 }
 

@@ -9,7 +9,6 @@ framebuffer_t *framebuffer_open(void)
 
     if (framebuffer_device == NULL)
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
         return NULL;
     }
 

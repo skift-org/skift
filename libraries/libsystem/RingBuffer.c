@@ -9,104 +9,70 @@
 
 RingBuffer *ringbuffer_create(size_t size)
 {
-    RingBuffer *rb = __create(RingBuffer);
+    RingBuffer *ringbuffer = calloc(1, sizeof(RingBuffer) + size);
 
-    rb->size = size;
-    rb->head = 0;
-    rb->tail = 0;
+    ringbuffer->buffer_allocated = size;
 
-    rb->buffer = malloc(size);
-
-    return rb;
+    return ringbuffer;
 }
 
-void ringbuffer_destroy(RingBuffer *rb)
+void ringbuffer_destroy(RingBuffer *ringbuffer)
 {
-    assert(rb);
-
-    free(rb->buffer);
-    free(rb);
+    free(ringbuffer);
 }
 
-bool ringbuffer_is_empty(RingBuffer *this)
+bool ringbuffer_is_empty(RingBuffer *ringbuffer)
 {
-    return this->tail == this->head;
+    return ringbuffer->buffer_used == 0;
 }
 
-bool ringbuffer_is_full(RingBuffer *this)
+bool ringbuffer_is_full(RingBuffer *ringbuffer)
 {
-    return ((this->head + 1) % this->size) == this->tail;
+    return ringbuffer->buffer_used == ringbuffer->buffer_allocated;
 }
 
-size_t ringbuffer_read(RingBuffer *rb, void *buffer, size_t size)
+void ringbuffer_putc(RingBuffer *ringbuffer, char c)
 {
-    assert(rb);
-    assert(buffer);
+    assert(!ringbuffer_is_full(ringbuffer));
 
-    int chr;
-    size_t offset = 0;
+    ringbuffer->buffer[ringbuffer->head] = c;
+    ringbuffer->head = (ringbuffer->head + 1) % (ringbuffer->buffer_allocated);
+    ringbuffer->buffer_used++;
+}
 
-    do
+char ringbuffer_getc(RingBuffer *ringbuffer)
+{
+    assert(!ringbuffer_is_empty(ringbuffer));
+
+    char c = ringbuffer->buffer[ringbuffer->tail];
+    ringbuffer->tail = (ringbuffer->tail + 1) % (ringbuffer->buffer_allocated);
+    ringbuffer->buffer_used--;
+
+    return c;
+}
+
+size_t ringbuffer_read(RingBuffer *ringbuffer, char *buffer, size_t size)
+{
+    size_t readed = 0;
+
+    while (!ringbuffer_is_empty(ringbuffer) && readed < size)
     {
-        chr = ringbuffer_getc(rb);
-
-        if (chr != -1)
-        {
-            ((char *)buffer)[offset] = (char)chr;
-            offset++;
-        }
-    } while (chr != -1 && offset < size);
-
-    return offset;
-}
-
-size_t ringbuffer_write(RingBuffer *rb, const void *buffer, size_t size)
-{
-    assert(rb);
-    assert(buffer);
-
-    int chr = 0;
-    size_t offset = 0;
-
-    while (chr != -1 && offset < size)
-    {
-        chr = ringbuffer_putc(rb, ((char *)buffer)[offset]);
-        offset++;
+        buffer[readed] = ringbuffer_getc(ringbuffer);
+        readed++;
     }
 
-    return offset;
+    return readed;
 }
 
-int ringbuffer_putc(RingBuffer *rb, int c)
+size_t ringbuffer_write(RingBuffer *ringbuffer, const char *buffer, size_t size)
 {
-    assert(rb);
+    size_t written = 0;
 
-    if (!ringbuffer_is_full(rb))
+    while (!ringbuffer_is_full(ringbuffer) && written < size)
     {
-        rb->buffer[rb->head] = (uchar)c;
-        rb->head = (rb->head + 1) % rb->size;
-
-        return (uchar)c;
+        ringbuffer_putc(ringbuffer, buffer[written]);
+        written++;
     }
-    else
-    {
-        return -1;
-    }
-}
 
-int ringbuffer_getc(RingBuffer *rb)
-{
-    assert(rb);
-
-    if (!ringbuffer_is_empty(rb))
-    {
-        int c = rb->buffer[rb->tail];
-        rb->tail = (rb->tail + 1) % rb->size;
-
-        return c;
-    }
-    else
-    {
-        return -1;
-    }
+    return written;
 }

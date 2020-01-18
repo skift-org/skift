@@ -4,12 +4,13 @@
 
 /* terminal: terminal host process                                            */
 
-#include <libconsole/vtconsole.h>
 #include <libdevice/textmode.h>
 #include <libgraphic/framebuffer.h>
+#include <libsystem/debug.h>
 #include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
+#include <libterminal/Terminal.h>
 
 static IOStream *terminal_fifo = NULL;
 
@@ -20,56 +21,47 @@ static textmode_info_t textmode_info;
 static ushort *textmode_buffer = NULL;
 
 static byte textmode_colors[] = {
-    [VTCOLOR_BLACK] = TEXTMODE_COLOR_BLACK,
-    [VTCOLOR_RED] = TEXTMODE_COLOR_RED,
-    [VTCOLOR_GREEN] = TEXTMODE_COLOR_GREEN,
-    [VTCOLOR_YELLOW] = TEXTMODE_COLOR_BROWN,
-    [VTCOLOR_BLUE] = TEXTMODE_COLOR_BLUE,
-    [VTCOLOR_MAGENTA] = TEXTMODE_COLOR_MAGENTA,
-    [VTCOLOR_CYAN] = TEXTMODE_COLOR_CYAN,
-    [VTCOLOR_GREY] = TEXTMODE_COLOR_LIGHT_GRAY,
+    [TERMINAL_COLOR_BLACK] = TEXTMODE_COLOR_BLACK,
+    [TERMINAL_COLOR_RED] = TEXTMODE_COLOR_RED,
+    [TERMINAL_COLOR_GREEN] = TEXTMODE_COLOR_GREEN,
+    [TERMINAL_COLOR_YELLOW] = TEXTMODE_COLOR_BROWN,
+    [TERMINAL_COLOR_BLUE] = TEXTMODE_COLOR_BLUE,
+    [TERMINAL_COLOR_MAGENTA] = TEXTMODE_COLOR_MAGENTA,
+    [TERMINAL_COLOR_CYAN] = TEXTMODE_COLOR_CYAN,
+    [TERMINAL_COLOR_GREY] = TEXTMODE_COLOR_LIGHT_GRAY,
+
+    [TERMINAL_COLOR_BRIGHT_BLACK] = TEXTMODE_COLOR_GRAY,
+    [TERMINAL_COLOR_BRIGHT_RED] = TEXTMODE_COLOR_LIGHT_RED,
+    [TERMINAL_COLOR_BRIGHT_GREEN] = TEXTMODE_COLOR_LIGHT_GREEN,
+    [TERMINAL_COLOR_BRIGHT_YELLOW] = TEXTMODE_COLOR_LIGHT_YELLOW,
+    [TERMINAL_COLOR_BRIGHT_BLUE] = TEXTMODE_COLOR_LIGHT_BLUE,
+    [TERMINAL_COLOR_BRIGHT_MAGENTA] = TEXTMODE_COLOR_LIGHT_MAGENTA,
+    [TERMINAL_COLOR_BRIGHT_CYAN] = TEXTMODE_COLOR_LIGHT_CYAN,
+    [TERMINAL_COLOR_BRIGHT_GREY] = TEXTMODE_COLOR_WHITE,
 };
 
-static byte textmode_brightcolors[] = {
-    [VTCOLOR_BLACK] = TEXTMODE_COLOR_GRAY,
-    [VTCOLOR_RED] = TEXTMODE_COLOR_LIGHT_RED,
-    [VTCOLOR_GREEN] = TEXTMODE_COLOR_LIGHT_GREEN,
-    [VTCOLOR_YELLOW] = TEXTMODE_COLOR_LIGHT_YELLOW,
-    [VTCOLOR_BLUE] = TEXTMODE_COLOR_LIGHT_BLUE,
-    [VTCOLOR_MAGENTA] = TEXTMODE_COLOR_LIGHT_MAGENTA,
-    [VTCOLOR_CYAN] = TEXTMODE_COLOR_LIGHT_CYAN,
-    [VTCOLOR_GREY] = TEXTMODE_COLOR_WHITE,
-};
-
-void textmode_paint_callback(vtconsole_t *vtc, vtcell_t *vtc_cell, int x, int y)
+void textmode_TerminalPaintCallback(Terminal *terminal, int x, int y, TerminalCell cell)
 {
-    __unused(vtc);
-
-    if (vtc_cell->attr.bright)
-    {
-        textmode_buffer[x + y * textmode_info.width] = TEXTMODE_ENTRY(vtc_cell->c, textmode_brightcolors[vtc_cell->attr.fg], textmode_colors[vtc_cell->attr.bg]);
-    }
-    else
-    {
-        textmode_buffer[x + y * textmode_info.width] = TEXTMODE_ENTRY(vtc_cell->c, textmode_colors[vtc_cell->attr.fg], textmode_colors[vtc_cell->attr.bg]);
-    }
+    textmode_buffer[x + y * terminal->width] = TEXTMODE_ENTRY(
+        codepoint_to_cp437(cell.codepoint),
+        textmode_colors[cell.attributes.foreground],
+        textmode_colors[cell.attributes.background]);
 }
 
-void textmode_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
+void textmode_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
 {
-    __unused(vtc);
+    __unused(terminal);
 
-    textmode_info.cursor_x = cur->x;
-    textmode_info.cursor_y = cur->y;
+    textmode_info.cursor_x = cursor.x;
+    textmode_info.cursor_y = cursor.y;
 }
 
-vtconsole_t *terminal_create_textmode_console(void)
+Terminal *terminal_create_textmode_console(void)
 {
     textmode_device = iostream_open(TEXTMODE_DEVICE, OPEN_WRITE);
 
     if (textmode_device == NULL)
     {
-        error_print("Failled to open textmode device file");
         return NULL;
     }
 
@@ -80,9 +72,9 @@ vtconsole_t *terminal_create_textmode_console(void)
     }
 
     textmode_buffer = malloc(textmode_info.width * textmode_info.height * sizeof(ushort));
-    vtconsole_t *vtc = vtconsole(80, 25, textmode_paint_callback, textmode_cursor_move_callback);
+    Terminal *terminal = terminal_create(80, 25, textmode_TerminalPaintCallback, textmode_TerminalCursorCallback);
 
-    return vtc;
+    return terminal;
 }
 
 /* --- Framebuffer terminal ------------------------------------------------- */
@@ -95,35 +87,33 @@ static framebuffer_t *framebuffer;
 static Point framebuffer_cursor = point_zero;
 
 static Color framebuffer_colors[] = {
-    [VTCOLOR_BLACK] = COLOR(0x212121),
-    [VTCOLOR_RED] = COLOR(0xb71c1c),
-    [VTCOLOR_GREEN] = COLOR(0x1b5e20),
-    [VTCOLOR_YELLOW] = COLOR(0xf57f17),
-    [VTCOLOR_BLUE] = COLOR(0x0d47a1),
-    [VTCOLOR_MAGENTA] = COLOR(0x880e4f),
-    [VTCOLOR_CYAN] = COLOR(0x006064),
-    [VTCOLOR_GREY] = COLOR(0x607d8b),
+    [TERMINAL_COLOR_BLACK] = COLOR(0x212121),
+    [TERMINAL_COLOR_RED] = COLOR(0xb71c1c),
+    [TERMINAL_COLOR_GREEN] = COLOR(0x1b5e20),
+    [TERMINAL_COLOR_YELLOW] = COLOR(0xf57f17),
+    [TERMINAL_COLOR_BLUE] = COLOR(0x0d47a1),
+    [TERMINAL_COLOR_MAGENTA] = COLOR(0x880e4f),
+    [TERMINAL_COLOR_CYAN] = COLOR(0x006064),
+    [TERMINAL_COLOR_GREY] = COLOR(0x607d8b),
+
+    [TERMINAL_COLOR_BRIGHT_BLACK] = COLOR(0x9e9e9e),
+    [TERMINAL_COLOR_BRIGHT_RED] = COLOR(0xf44336),
+    [TERMINAL_COLOR_BRIGHT_GREEN] = COLOR(0x4caf50),
+    [TERMINAL_COLOR_BRIGHT_YELLOW] = COLOR(0xffeb3b),
+    [TERMINAL_COLOR_BRIGHT_BLUE] = COLOR(0x2196f3),
+    [TERMINAL_COLOR_BRIGHT_MAGENTA] = COLOR(0xe91e63),
+    [TERMINAL_COLOR_BRIGHT_CYAN] = COLOR(0x00bcd4),
+    [TERMINAL_COLOR_BRIGHT_GREY] = COLOR(0xeceff1),
 };
 
-static Color framebuffer_brightcolors[] = {
-    [VTCOLOR_BLACK] = COLOR(0x9e9e9e),
-    [VTCOLOR_RED] = COLOR(0xf44336),
-    [VTCOLOR_GREEN] = COLOR(0x4caf50),
-    [VTCOLOR_YELLOW] = COLOR(0xffeb3b),
-    [VTCOLOR_BLUE] = COLOR(0x2196f3),
-    [VTCOLOR_MAGENTA] = COLOR(0xe91e63),
-    [VTCOLOR_CYAN] = COLOR(0x00bcd4),
-    [VTCOLOR_GREY] = COLOR(0xeceff1),
-};
-
-void framebuffer_cursor_move_callback(vtconsole_t *vtc, vtcursor_t *cur)
+void framebuffer_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
 {
-    __unused(vtc);
+    __unused(terminal);
 
-    framebuffer_cursor = (Point){cur->x, cur->y};
+    framebuffer_cursor = (Point){cursor.x, cursor.y};
 }
 
-vtconsole_t *terminal_create_framebuffer_console(void)
+Terminal *terminal_create_framebuffer_console(void)
 {
     logger_info("Creating graphic context...");
 
@@ -131,21 +121,19 @@ vtconsole_t *terminal_create_framebuffer_console(void)
 
     if (framebuffer == NULL)
     {
-        logger_error("Failled to open the framebuffer.");
-
         return NULL;
     }
 
-    painter_clear(framebuffer->painter, framebuffer_colors[VTC_DEFAULT_BACKGROUND]);
+    painter_clear(framebuffer->painter, framebuffer_colors[TERMINAL_COLOR_BLACK]);
 
     framebuffer_blit(framebuffer);
 
     mono_font = font_create("mono");
 
-    return vtconsole(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, NULL, framebuffer_cursor_move_callback);
+    return terminal_create(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, NULL, framebuffer_TerminalCursorCallback);
 }
 
-void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
+void paint_repaint_dirty(Terminal *console, Painter *paint)
 {
     int repainted_cell = 0;
 
@@ -153,15 +141,14 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
     {
         for (int x = 0; x < console->width; x++)
         {
-            vtcell_t *cell = vtconsole_cell(console, x, y);
+            TerminalCell cell = terminal_cell_at(console, x, y);
 
-            if (cell->is_dirty == true)
+            if (cell.dirty)
             {
                 repainted_cell++;
 
-                Color fgc = cell->attr.bright
-                                ? framebuffer_brightcolors[cell->attr.fg]
-                                : framebuffer_colors[cell->attr.fg];
+                Color background_color = framebuffer_colors[cell.attributes.background];
+                Color foreground_color = framebuffer_colors[cell.attributes.foreground];
 
                 Point pos = (Point){x * char_size.X, y * (int)(char_size.Y)};
                 Point siz = (Point){char_size.X, (char_size.Y)};
@@ -170,16 +157,22 @@ void paint_repaint_dirty(vtconsole_t *console, Painter *paint)
                 cell_bound.position = pos;
                 cell_bound.size = siz;
 
-                painter_clear_rect(paint, cell_bound, framebuffer_colors[cell->attr.bg]);
+                painter_clear_rect(paint, cell_bound, background_color);
 
-                if (cell->c != ' ')
+                if (cell.codepoint != U' ')
                 {
-                    painter_draw_glyph(paint, mono_font, font_glyph(mono_font, cell->c), point_add(pos, (Point){0, 16}), 16, fgc);
+                    painter_draw_glyph(
+                        paint,
+                        mono_font,
+                        font_glyph(mono_font, cell.codepoint),
+                        point_add(pos, (Point){0, 16}),
+                        16,
+                        foreground_color);
                 }
 
                 framebuffer_mark_dirty(framebuffer, cell_bound);
 
-                cell->is_dirty = false;
+                terminal_cell_undirty(console, x, y);
             }
         }
     }
@@ -202,15 +195,15 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    vtconsole_t *vtc = NULL;
+    Terminal *terminal = NULL;
     bool is_framebuffer = true;
-    vtc = terminal_create_framebuffer_console();
+    terminal = terminal_create_framebuffer_console();
 
-    if (vtc == NULL)
+    if (terminal == NULL)
     {
-        vtc = terminal_create_textmode_console();
+        terminal = terminal_create_textmode_console();
 
-        if (vtc == NULL)
+        if (terminal == NULL)
         {
             iostream_close(terminal_fifo);
 
@@ -230,7 +223,7 @@ int main(int argc, char const *argv[])
         char buffer[READ_BUFFER_SIZE];
         int size = iostream_read(terminal_fifo, buffer, READ_BUFFER_SIZE);
 
-        vtconsole_write(vtc, buffer, size);
+        terminal_write(terminal, buffer, size);
 
         if (!is_framebuffer)
         {
@@ -239,13 +232,13 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            paint_repaint_dirty(vtc, framebuffer->painter);
+            paint_repaint_dirty(terminal, framebuffer->painter);
         }
     } while (!do_exit);
 
-    if (vtc)
+    if (terminal)
     {
-        vtconsole_delete(vtc);
+        terminal_destroy(terminal);
     }
 
     if (mono_font)

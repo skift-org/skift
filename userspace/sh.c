@@ -2,16 +2,15 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libdevice/keyboard.h>
+#include <libkernel/task.h>
+#include <libsystem/convert.h>
 #include <libsystem/cstring.h>
+#include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
-#include <libsystem/error.h>
 #include <libsystem/process.h>
-#include <libsystem/convert.h>
-
-#include <libkernel/task.h>
-#include <libdevice/keyboard.h>
 
 #define MAX_COMMAND_LENGHT 128
 
@@ -39,7 +38,7 @@ typedef struct shell
 
 /* --- Prompt --------------------------------------------------------------- */
 
-#define PROMPT "\e[0;1;34m $ \e[0;1m"
+#define PROMPT u8"\e[0;94m µ \e[m"
 
 void shell_prompt(shell_t *this)
 {

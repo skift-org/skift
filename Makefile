@@ -43,8 +43,8 @@ BOOTROOT=$(BUILDROOT)/bootroot
 INCLUDES=$(patsubst libraries/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/ -path libraries/libposix -prune -o -name *.h))
 INCLUDES+=$(patsubst libraries/libposix/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/libposix -name *.h))
 
-LIBCONSOLE=$(SYSROOT)/lib/libconsole.a
-LIBCONSOLE_SRC=$(wildcard libraries/libconsole/*.c)
+LIBCONSOLE=$(SYSROOT)/lib/libterminal.a
+LIBCONSOLE_SRC=$(wildcard libraries/libterminal/*.c)
 LIBCONSOLE_OBJ=$(patsubst %.c,%.o,$(LIBCONSOLE_SRC))
 
 LIBDEVICE=$(SYSROOT)/lib/libdevice.a
@@ -76,7 +76,7 @@ LIBPOSIX_SRC=$(wildcard libraries/libposix/*.c)
 LIBPOSIX_OBJ=$(patsubst %.c,%.o,$(LIBPOSIX_SRC))
 
 LIBSYSTEM=$(SYSROOT)/lib/libsystem.a
-LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/plugs/*.c)
+LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/plugs/*.c) $(wildcard libraries/libsystem/unicode/*.c)
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 
 CRTS=$(SYSROOT)/lib/crt0.o \
@@ -334,7 +334,7 @@ $(SYSROOT)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
 
 $(SYSROOT)/bin/term: userspace/term.c $(LIBSYSTEM) $(LIBCONSOLE) $(LIBGRAPHIC) $(CRTS)
 	mkdir -p $(SYSROOT)/bin
-	$(CC) $(CFLAGS) $< -o $@ -lconsole -lgraphic
+	$(CC) $(CFLAGS) $< -o $@ -lterminal -lgraphic
 
 $(SYSROOT)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
 	mkdir -p $(SYSROOT)/bin

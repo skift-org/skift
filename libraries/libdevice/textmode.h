@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/runtime.h>
+
 #define TEXTMODE_DEVICE "/dev/txt"
 
 #define TEXTMODE_CALL_GET_INFO 0
@@ -42,7 +44,7 @@ typedef struct
 {
     int x;
     int y;
-    byte fg;
-    byte bg;
+    uint8_t fg;
+    uint8_t bg;
     int c;
 } textmode_cell_info_t;

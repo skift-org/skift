@@ -8,25 +8,27 @@
 
 typedef struct
 {
-    size_t size;
+    size_t buffer_allocated;
+    size_t buffer_used;
+
     size_t head;
     size_t tail;
 
-    uchar *buffer;
+    char buffer[];
 } RingBuffer;
 
 RingBuffer *ringbuffer_create(size_t size);
 
-void ringbuffer_destroy(RingBuffer *rb);
+void ringbuffer_destroy(RingBuffer *ringbuffer);
 
-bool ringbuffer_is_empty(RingBuffer *this);
+bool ringbuffer_is_empty(RingBuffer *ringbuffer);
 
-bool ringbuffer_is_full(RingBuffer *this);
+bool ringbuffer_is_full(RingBuffer *ringbuffer);
 
-size_t ringbuffer_read(RingBuffer *rb, void *buffer, size_t size);
+void ringbuffer_putc(RingBuffer *ringbuffer, char c);
 
-size_t ringbuffer_write(RingBuffer *rb, const void *buffer, size_t size);
+char ringbuffer_getc(RingBuffer *ringbuffer);
 
-int ringbuffer_putc(RingBuffer *rb, int c);
+size_t ringbuffer_read(RingBuffer *ringbuffer, char *buffer, size_t size);
 
-int ringbuffer_getc(RingBuffer *rb);
+size_t ringbuffer_write(RingBuffer *ringbuffer, const char *buffer, size_t size);

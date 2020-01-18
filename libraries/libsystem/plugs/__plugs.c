@@ -39,9 +39,20 @@ void __plug_fini(int exit_code)
 {
     _fini();
 
-    iostream_flush(out_stream);
-    iostream_flush(err_stream);
-    iostream_flush(log_stream);
+    if (out_stream)
+    {
+        iostream_flush(out_stream);
+    }
+
+    if (err_stream)
+    {
+        iostream_flush(err_stream);
+    }
+
+    if (log_stream)
+    {
+        iostream_flush(log_stream);
+    }
 
     process_exit(exit_code);
 }

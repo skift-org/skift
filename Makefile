@@ -3,6 +3,8 @@
 PATH := $(shell toolchain/use-it!.sh):$(PATH)
 PATH := $(shell toolbox/use-it!.sh):$(PATH)
 
+DIRECTORY_GUARD=@mkdir -p $(@D)
+
 TARGET_TRIPLET=i686-pc-skift
 
 CC=$(TARGET_TRIPLET)-gcc
@@ -175,177 +177,177 @@ list:
 # --- Libaries --------------------------------------------------------------- #
 
 $(SYSROOT)/lib/crt0.o: libraries/crt0.s
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
 $(SYSROOT)/lib/crti.o: libraries/crti.s
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
 $(SYSROOT)/lib/crtn.o: libraries/crtn.s
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
 $(LIBCONSOLE): $(LIBCONSOLE_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBDEVICE): $(LIBCONSOLE_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBFILE): $(LIBFILE_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBFORM): $(LIBFORM_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBGRAPHIC): $(LIBGRAPHIC_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBKERNEL): $(LIBKERNEL_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBMATH): $(LIBMATH_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBPOSIX): $(LIBPOSIX_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
-	mkdir -p $(SYSROOT)/lib/
+	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
 # --- Userspace -------------------------------------------------------------- #
 
 $(SYSROOT)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 $(SYSROOT)/bin/__demofonts: userspace/__demofonts.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 $(SYSROOT)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 $(SYSROOT)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic -lmath
 
 $(SYSROOT)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBFORM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lform -lgraphic
 
 $(SYSROOT)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 $(SYSROOT)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBPOSIX) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lposix
 
 $(SYSROOT)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/cat: userspace/cat.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/clear: userspace/clear.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/dstart: userspace/dstart.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/echo: userspace/echo.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/gfxctl: userspace/gfxctl.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/grep: userspace/grep.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/init: userspace/init.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/lsproc: userspace/lsproc.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/mkdir: userspace/mkdir.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/mv: userspace/mv.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/panic: userspace/panic.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/sh: userspace/sh.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/term: userspace/term.c $(LIBSYSTEM) $(LIBCONSOLE) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lterminal -lgraphic
 
 $(SYSROOT)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(SYSROOT)/bin/wm: userspace/wm.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	mkdir -p $(SYSROOT)/bin
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 # --- Kernel ----------------------------------------------------------------- #
@@ -357,7 +359,7 @@ $(SYSROOT)/bin/wm: userspace/wm.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(AS) $(ASFLAGS) $^ -o $@
 
 $(KERNEL): $(KERNEL_OBJECT)
-	mkdir -p $(BUILDROOT)
+	$(DIRECTORY_GUARD)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $(KERNEL_OBJECT)
 
 # --- Ressources ------------------------------------------------------------- #
@@ -372,33 +374,32 @@ KEYBOARD = ${patsubst ressources/%.json,$(SYSROOT)/res/%.kmap,${wildcard ressour
 RESSOURCES = $(WALLPAPERS) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
 
 $(SYSROOT)/res/font/%.glyph: ressources/font/%.json
-	mkdir -p $(SYSROOT)/res/font
+	$(DIRECTORY_GUARD)
 	font-compiler.py $^ $@
 
 $(SYSROOT)/res/font/%.png: ressources/font/%.png
-	mkdir -p $(SYSROOT)/res/font
+	$(DIRECTORY_GUARD)
 	cp $^ $@
 
 $(SYSROOT)/res/wallpaper/%.png: ressources/wallpaper/%.png
-	mkdir -p $(SYSROOT)/res/wallpaper
+	$(DIRECTORY_GUARD)
 	cp $^ $@
 
 $(SYSROOT)/res/keyboard/%.kmap: ressources/keyboard/%.json
-	mkdir -p $(SYSROOT)/res/keyboard
+	$(DIRECTORY_GUARD)
 	kmap-compiler.py $^ $@
 
 # --- Ramdisk ---------------------------------------------------------------- #
 
 $(SYSROOT)/lib/include/%.h: libraries/%.h
-	mkdir -p $(dir $@)
+	$(DIRECTORY_GUARD)
 	cp $^ $@
 
 $(SYSROOT)/lib/include/%.h: libraries/libposix/%.h
-	mkdir -p $(dir $@)
+	$(DIRECTORY_GUARD)
 	cp $^ $@
 
 $(SYSROOT):
-	mkdir -p $(SYSROOT)
 	mkdir -p $(SYSROOT)/bin \
 			 $(SYSROOT)/dev \
 			 $(SYSROOT)/etc \

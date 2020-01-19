@@ -35,55 +35,52 @@ LDFLAGS=-flto
 
 # --- Objects ---------------------------------------------------------------- #
 
-REPOROOT=$(shell pwd)
-BUILDROOT=$(REPOROOT)/build
+BUILD_DIRECTORY=$(shell pwd)/build
+ROOT_DIRECTORY=$(BUILD_DIRECTORY)/sysroot
+BOOT_DIRECTORY=$(BUILD_DIRECTORY)/bootroot
 
-SYSROOT=$(BUILDROOT)/sysroot
+INCLUDES=$(patsubst libraries/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/ -path libraries/libposix -prune -o -name *.h))
+INCLUDES+=$(patsubst libraries/libposix/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/libposix -name *.h))
 
-BOOTROOT=$(BUILDROOT)/bootroot
-
-INCLUDES=$(patsubst libraries/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/ -path libraries/libposix -prune -o -name *.h))
-INCLUDES+=$(patsubst libraries/libposix/%.h,$(SYSROOT)/lib/include/%.h,$(shell find libraries/libposix -name *.h))
-
-LIBCONSOLE=$(SYSROOT)/lib/libterminal.a
+LIBCONSOLE=$(ROOT_DIRECTORY)/lib/libterminal.a
 LIBCONSOLE_SRC=$(wildcard libraries/libterminal/*.c)
 LIBCONSOLE_OBJ=$(patsubst %.c,%.o,$(LIBCONSOLE_SRC))
 
-LIBDEVICE=$(SYSROOT)/lib/libdevice.a
+LIBDEVICE=$(ROOT_DIRECTORY)/lib/libdevice.a
 LIBDEVICE_SRC=$(wildcard libraries/libdevice/*.c)
 LIBCONSOLE_OBJ=$(patsubst %.c,%.o,$(LIBCONSOLE_SRC))
 
-LIBFILE=$(SYSROOT)/lib/libfile.a
+LIBFILE=$(ROOT_DIRECTORY)/lib/libfile.a
 LIBFILE_SRC=$(wildcard libraries/libfile/*.c)
 LIBFILE_OBJ=$(patsubst %.c,%.o,$(LIBFILE_SRC))
 
-LIBFORM=$(SYSROOT)/lib/libform.a
+LIBFORM=$(ROOT_DIRECTORY)/lib/libform.a
 LIBFORM_SRC=$(wildcard libraries/libform/*.c)
 LIBFORM_OBJ=$(patsubst %.c,%.o,$(LIBFORM_SRC))
 
-LIBGRAPHIC=$(SYSROOT)/lib/libgraphic.a
+LIBGRAPHIC=$(ROOT_DIRECTORY)/lib/libgraphic.a
 LIBGRAPHIC_SRC=$(wildcard libraries/libgraphic/*.c)
 LIBGRAPHIC_OBJ=$(patsubst %.c,%.o,$(LIBGRAPHIC_SRC))
 
-LIBKERNEL=$(SYSROOT)/lib/libkernel.a
+LIBKERNEL=$(ROOT_DIRECTORY)/lib/libkernel.a
 LIBKERNEL_SRC=$(wildcard libraries/libkernel/*.c)
 LIBKERNEL_OBJ=$(patsubst %.c,%.o,$(LIBKERNEL_SRC))
 
-LIBMATH=$(SYSROOT)/lib/libmath.a
+LIBMATH=$(ROOT_DIRECTORY)/lib/libmath.a
 LIBMATH_SRC=$(wildcard libraries/libmath/*.c)
 LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
 
-LIBPOSIX=$(SYSROOT)/lib/libposix.a
+LIBPOSIX=$(ROOT_DIRECTORY)/lib/libposix.a
 LIBPOSIX_SRC=$(wildcard libraries/libposix/*.c)
 LIBPOSIX_OBJ=$(patsubst %.c,%.o,$(LIBPOSIX_SRC))
 
-LIBSYSTEM=$(SYSROOT)/lib/libsystem.a
+LIBSYSTEM=$(ROOT_DIRECTORY)/lib/libsystem.a
 LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/plugs/*.c) $(wildcard libraries/libsystem/unicode/*.c)
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 
-CRTS=$(SYSROOT)/lib/crt0.o \
-	 $(SYSROOT)/lib/crti.o \
-	 $(SYSROOT)/lib/crtn.o
+CRTS=$(ROOT_DIRECTORY)/lib/crt0.o \
+	 $(ROOT_DIRECTORY)/lib/crti.o \
+	 $(ROOT_DIRECTORY)/lib/crtn.o
 
 LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBDEVICE) \
@@ -95,53 +92,52 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBPOSIX) \
 		  $(LIBSYSTEM)
 
-USERSPACE=$(SYSROOT)/bin/__democolors \
-		  $(SYSROOT)/bin/__demofonts \
-		  $(SYSROOT)/bin/__demolines \
-		  $(SYSROOT)/bin/__test3d \
-		  $(SYSROOT)/bin/__testapp \
-		  $(SYSROOT)/bin/__testargs \
-		  $(SYSROOT)/bin/__testexec \
-		  $(SYSROOT)/bin/__testgfx \
-		  $(SYSROOT)/bin/__testposix \
-		  $(SYSROOT)/bin/__testterm \
-		  $(SYSROOT)/bin/cat \
-		  $(SYSROOT)/bin/clear \
-		  $(SYSROOT)/bin/dstart \
-		  $(SYSROOT)/bin/echo \
-		  $(SYSROOT)/bin/gfxctl \
-		  $(SYSROOT)/bin/grep \
-		  $(SYSROOT)/bin/init \
-		  $(SYSROOT)/bin/kill \
-		  $(SYSROOT)/bin/loadkeys \
-		  $(SYSROOT)/bin/ls \
-		  $(SYSROOT)/bin/lsproc \
-		  $(SYSROOT)/bin/mkdir \
-		  $(SYSROOT)/bin/mv \
-		  $(SYSROOT)/bin/now \
-		  $(SYSROOT)/bin/panic \
-		  $(SYSROOT)/bin/sh \
-		  $(SYSROOT)/bin/sysfetch \
-		  $(SYSROOT)/bin/term \
-		  $(SYSROOT)/bin/touch \
-		  $(SYSROOT)/bin/unlink \
-		  $(SYSROOT)/bin/wm
+USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
+		  $(ROOT_DIRECTORY)/bin/__demolines \
+		  $(ROOT_DIRECTORY)/bin/__test3d \
+		  $(ROOT_DIRECTORY)/bin/__testapp \
+		  $(ROOT_DIRECTORY)/bin/__testargs \
+		  $(ROOT_DIRECTORY)/bin/__testexec \
+		  $(ROOT_DIRECTORY)/bin/__testgfx \
+		  $(ROOT_DIRECTORY)/bin/__testposix \
+		  $(ROOT_DIRECTORY)/bin/__testterm \
+		  $(ROOT_DIRECTORY)/bin/cat \
+		  $(ROOT_DIRECTORY)/bin/clear \
+		  $(ROOT_DIRECTORY)/bin/dstart \
+		  $(ROOT_DIRECTORY)/bin/echo \
+		  $(ROOT_DIRECTORY)/bin/gfxctl \
+		  $(ROOT_DIRECTORY)/bin/grep \
+		  $(ROOT_DIRECTORY)/bin/init \
+		  $(ROOT_DIRECTORY)/bin/kill \
+		  $(ROOT_DIRECTORY)/bin/loadkeys \
+		  $(ROOT_DIRECTORY)/bin/ls \
+		  $(ROOT_DIRECTORY)/bin/lsproc \
+		  $(ROOT_DIRECTORY)/bin/mkdir \
+		  $(ROOT_DIRECTORY)/bin/mv \
+		  $(ROOT_DIRECTORY)/bin/now \
+		  $(ROOT_DIRECTORY)/bin/panic \
+		  $(ROOT_DIRECTORY)/bin/sh \
+		  $(ROOT_DIRECTORY)/bin/sysfetch \
+		  $(ROOT_DIRECTORY)/bin/term \
+		  $(ROOT_DIRECTORY)/bin/touch \
+		  $(ROOT_DIRECTORY)/bin/unlink \
+		  $(ROOT_DIRECTORY)/bin/wm
 
-KERNEL=$(BUILDROOT)/kernel.bin
+KERNEL=$(BUILD_DIRECTORY)/kernel.bin
 KERNEL_CSOURCES=$(wildcard kernel/*.c) $(wildcard kernel/*/*.c) $(wildcard libraries/libsystem/*.c) $(wildcard libraries/libfile/*.c)
 KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
 KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.kernel.o} ${KERNEL_SSOURCES:.s=.kernel.o}
 
-RAMDISK=$(BUILDROOT)/ramdisk.tar
+RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar
 
-BOOTDISK=$(BUILDROOT)/bootdisk.iso
+BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.iso
 
 # --- Tagets ----------------------------------------------------------------- #
 
 all: $(BOOTDISK)
 
 clean:
-	rm -rf $(BUILDROOT)
+	rm -rf $(BUILD_DIRECTORY)
 	find userspace/ -name "*.o" -delete
 	find libraries/ -name "*.o" -delete
 	find kernel/ -name "*.o" -delete
@@ -176,15 +172,15 @@ list:
 
 # --- Libaries --------------------------------------------------------------- #
 
-$(SYSROOT)/lib/crt0.o: libraries/crt0.s
+$(ROOT_DIRECTORY)/lib/crt0.o: libraries/crt0.s
 	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
-$(SYSROOT)/lib/crti.o: libraries/crti.s
+$(ROOT_DIRECTORY)/lib/crti.o: libraries/crti.s
 	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
-$(SYSROOT)/lib/crtn.o: libraries/crtn.s
+$(ROOT_DIRECTORY)/lib/crtn.o: libraries/crtn.s
 	$(DIRECTORY_GUARD)
 	$(AS) $(ASFLAGS) -o $@ $^
 
@@ -226,127 +222,127 @@ $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
 
 # --- Userspace -------------------------------------------------------------- #
 
-$(SYSROOT)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(SYSROOT)/bin/__demofonts: userspace/__demofonts.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__demofonts: userspace/__demofonts.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(SYSROOT)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(SYSROOT)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic -lmath
 
-$(SYSROOT)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBFORM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBFORM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lform -lgraphic
 
-$(SYSROOT)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(SYSROOT)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBPOSIX) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBPOSIX) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lposix
 
-$(SYSROOT)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/cat: userspace/cat.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/cat: userspace/cat.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/clear: userspace/clear.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/clear: userspace/clear.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/dstart: userspace/dstart.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/dstart: userspace/dstart.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/echo: userspace/echo.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/echo: userspace/echo.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/gfxctl: userspace/gfxctl.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/gfxctl: userspace/gfxctl.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/grep: userspace/grep.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/grep: userspace/grep.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/init: userspace/init.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/init: userspace/init.c $(LIBGRAPHIC) $(LIBSYSTEM) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $< -o $@ -lgraphic
+
+$(ROOT_DIRECTORY)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/lsproc: userspace/lsproc.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/lsproc: userspace/lsproc.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/mkdir: userspace/mkdir.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/mkdir: userspace/mkdir.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/mv: userspace/mv.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/mv: userspace/mv.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/panic: userspace/panic.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/panic: userspace/panic.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/sh: userspace/sh.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/sh: userspace/sh.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(SYSROOT)/bin/term: userspace/term.c $(LIBSYSTEM) $(LIBCONSOLE) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/term: userspace/term.c $(LIBSYSTEM) $(LIBCONSOLE) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lterminal -lgraphic
 
-$(SYSROOT)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(SYSROOT)/bin/wm: userspace/wm.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/wm: userspace/wm.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
@@ -364,62 +360,62 @@ $(KERNEL): $(KERNEL_OBJECT)
 
 # --- Ressources ------------------------------------------------------------- #
 
-WALLPAPERS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/wallpaper/*.png}}
+WALLPAPERS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/wallpaper/*.png}}
 
-FONTS_GLYPHS = ${patsubst ressources/%.json,$(SYSROOT)/res/%.glyph,${wildcard ressources/font/*.json}}
-FONTS_PNGS = ${patsubst ressources/%,$(SYSROOT)/res/%,${wildcard ressources/font/*.png}}
+FONTS_GLYPHS = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard ressources/font/*.json}}
+FONTS_PNGS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/font/*.png}}
 
-KEYBOARD = ${patsubst ressources/%.json,$(SYSROOT)/res/%.kmap,${wildcard ressources/keyboard/*.json}}
+KEYBOARD = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard ressources/keyboard/*.json}}
 
 RESSOURCES = $(WALLPAPERS) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
 
-$(SYSROOT)/res/font/%.glyph: ressources/font/%.json
+$(ROOT_DIRECTORY)/res/font/%.glyph: ressources/font/%.json
 	$(DIRECTORY_GUARD)
 	font-compiler.py $^ $@
 
-$(SYSROOT)/res/font/%.png: ressources/font/%.png
+$(ROOT_DIRECTORY)/res/font/%.png: ressources/font/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(SYSROOT)/res/wallpaper/%.png: ressources/wallpaper/%.png
+$(ROOT_DIRECTORY)/res/wallpaper/%.png: ressources/wallpaper/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(SYSROOT)/res/keyboard/%.kmap: ressources/keyboard/%.json
+$(ROOT_DIRECTORY)/res/keyboard/%.kmap: ressources/keyboard/%.json
 	$(DIRECTORY_GUARD)
 	kmap-compiler.py $^ $@
 
 # --- Ramdisk ---------------------------------------------------------------- #
 
-$(SYSROOT)/lib/include/%.h: libraries/%.h
+$(ROOT_DIRECTORY)/lib/include/%.h: libraries/%.h
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(SYSROOT)/lib/include/%.h: libraries/libposix/%.h
+$(ROOT_DIRECTORY)/lib/include/%.h: libraries/libposix/%.h
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(SYSROOT):
-	mkdir -p $(SYSROOT)/bin \
-			 $(SYSROOT)/dev \
-			 $(SYSROOT)/etc \
-			 $(SYSROOT)/lib \
-			 $(SYSROOT)/res \
-			 $(SYSROOT)/run \
-			 $(SYSROOT)/usr
+$(ROOT_DIRECTORY):
+	mkdir -p $(ROOT_DIRECTORY)/bin \
+			 $(ROOT_DIRECTORY)/dev \
+			 $(ROOT_DIRECTORY)/etc \
+			 $(ROOT_DIRECTORY)/lib \
+			 $(ROOT_DIRECTORY)/res \
+			 $(ROOT_DIRECTORY)/run \
+			 $(ROOT_DIRECTORY)/usr
 
-$(RAMDISK): $(SYSROOT) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(RESSOURCES)
-	cd $(SYSROOT); tar -cf $@ *
+$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(RESSOURCES)
+	cd $(ROOT_DIRECTORY); tar -cf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #
 
-$(BOOTROOT): grub.cfg $(KERNEL) $(RAMDISK)
-	mkdir -p $(BOOTROOT)/boot/grub
-	cp grub.cfg $(BOOTROOT)/boot/grub/
-	cp $(KERNEL) $(BOOTROOT)/boot
-	cp $(RAMDISK) $(BOOTROOT)/boot
-	touch $(BOOTROOT)
+$(BOOT_DIRECTORY): grub.cfg $(KERNEL) $(RAMDISK)
+	mkdir -p $(BOOT_DIRECTORY)/boot/grub
+	cp grub.cfg $(BOOT_DIRECTORY)/boot/grub/
+	cp $(KERNEL) $(BOOT_DIRECTORY)/boot
+	cp $(RAMDISK) $(BOOT_DIRECTORY)/boot
+	touch $(BOOT_DIRECTORY)
 
-$(BOOTDISK): $(BOOTROOT)
-	grub-mkrescue -o $@ $(BOOTROOT) || \
-	grub2-mkrescue -o $@ $(BOOTROOT)
+$(BOOTDISK): $(BOOT_DIRECTORY)
+	grub-mkrescue -o $@ $(BOOT_DIRECTORY) || \
+	grub2-mkrescue -o $@ $(BOOT_DIRECTORY)

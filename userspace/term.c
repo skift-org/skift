@@ -79,7 +79,7 @@ Terminal *terminal_create_textmode_console(void)
 
 /* --- Framebuffer terminal ------------------------------------------------- */
 
-Point char_size = (Point){9, 24};
+Point char_size = (Point){7, 16};
 
 static Font *mono_font = NULL;
 
@@ -87,23 +87,22 @@ static framebuffer_t *framebuffer;
 static Point framebuffer_cursor = point_zero;
 
 static Color framebuffer_colors[] = {
-    [TERMINAL_COLOR_BLACK] = COLOR(0x212121),
-    [TERMINAL_COLOR_RED] = COLOR(0xb71c1c),
-    [TERMINAL_COLOR_GREEN] = COLOR(0x1b5e20),
-    [TERMINAL_COLOR_YELLOW] = COLOR(0xf57f17),
-    [TERMINAL_COLOR_BLUE] = COLOR(0x0d47a1),
-    [TERMINAL_COLOR_MAGENTA] = COLOR(0x880e4f),
-    [TERMINAL_COLOR_CYAN] = COLOR(0x006064),
-    [TERMINAL_COLOR_GREY] = COLOR(0x607d8b),
-
-    [TERMINAL_COLOR_BRIGHT_BLACK] = COLOR(0x9e9e9e),
-    [TERMINAL_COLOR_BRIGHT_RED] = COLOR(0xf44336),
-    [TERMINAL_COLOR_BRIGHT_GREEN] = COLOR(0x4caf50),
-    [TERMINAL_COLOR_BRIGHT_YELLOW] = COLOR(0xffeb3b),
-    [TERMINAL_COLOR_BRIGHT_BLUE] = COLOR(0x2196f3),
-    [TERMINAL_COLOR_BRIGHT_MAGENTA] = COLOR(0xe91e63),
-    [TERMINAL_COLOR_BRIGHT_CYAN] = COLOR(0x00bcd4),
-    [TERMINAL_COLOR_BRIGHT_GREY] = COLOR(0xeceff1),
+    [TERMINAL_COLOR_BLACK] = COLOR(0x0A0E14),
+    [TERMINAL_COLOR_RED] = COLOR(0xff3333),
+    [TERMINAL_COLOR_GREEN] = COLOR(0xb8cc52),
+    [TERMINAL_COLOR_YELLOW] = COLOR(0xe6c446),
+    [TERMINAL_COLOR_BLUE] = COLOR(0x36a3d9),
+    [TERMINAL_COLOR_MAGENTA] = COLOR(0xf07078),
+    [TERMINAL_COLOR_CYAN] = COLOR(0x95e5cb),
+    [TERMINAL_COLOR_GREY] = COLOR(0xffffff),
+    [TERMINAL_COLOR_BRIGHT_BLACK] = COLOR(0x323232),
+    [TERMINAL_COLOR_BRIGHT_RED] = COLOR(0xff6565),
+    [TERMINAL_COLOR_BRIGHT_GREEN] = COLOR(0xe9fe83),
+    [TERMINAL_COLOR_BRIGHT_YELLOW] = COLOR(0xfff778),
+    [TERMINAL_COLOR_BRIGHT_BLUE] = COLOR(0x68d4ff),
+    [TERMINAL_COLOR_BRIGHT_MAGENTA] = COLOR(0xffa3aa),
+    [TERMINAL_COLOR_BRIGHT_CYAN] = COLOR(0xc7fffc),
+    [TERMINAL_COLOR_BRIGHT_GREY] = COLOR(0xffffff),
 };
 
 void framebuffer_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
@@ -161,13 +160,36 @@ void paint_repaint_dirty(Terminal *console, Painter *paint)
 
                 if (cell.codepoint != U' ')
                 {
-                    painter_draw_glyph(
-                        paint,
-                        mono_font,
-                        font_glyph(mono_font, cell.codepoint),
-                        point_add(pos, (Point){0, 16}),
-                        16,
-                        foreground_color);
+                    Glyph *glyph = font_glyph(mono_font, cell.codepoint);
+
+                    if (glyph != NULL)
+                    {
+                        painter_draw_glyph(
+                            paint,
+                            mono_font,
+                            glyph,
+                            point_add(pos, (Point){0, 12}),
+                            foreground_color);
+
+                        if (cell.attributes.bold)
+                        {
+                            painter_draw_glyph(
+                                paint,
+                                mono_font,
+                                glyph,
+                                point_add(pos, (Point){1, 12}),
+                                foreground_color);
+                        }
+
+                        if (cell.attributes.underline)
+                        {
+                            painter_draw_line(paint, point_add(pos, (Point){0, 13}), point_add(pos, (Point){cell_bound.width, 13}), foreground_color);
+                        }
+                    }
+                    else
+                    {
+                        painter_draw_rect(paint, cell_bound, foreground_color);
+                    }
                 }
 
                 framebuffer_mark_dirty(framebuffer, cell_bound);

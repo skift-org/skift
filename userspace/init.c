@@ -5,6 +5,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/iostream.h>
 
+#include <libgraphic/framebuffer.h>
 #include <libsystem/filesystem.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
@@ -29,12 +30,11 @@ int init_exec(const char *filename)
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    __unused(argc);
+    __unused(argv);
 
     logger_level(LOGGER_TRACE);
 
-    printf("Welcome to \e[1;34mskiftOS\e[0m!\n");
     iostream_flush(out_stream);
 
     filesystem_mkpipe("/dev/term");

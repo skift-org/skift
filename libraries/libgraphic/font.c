@@ -106,7 +106,7 @@ void font_destroy(Font *this)
     free(this);
 }
 
-Glyph *font_glyph(Font *this, int codepoint)
+Glyph *font_glyph(Font *this, Codepoint codepoint)
 {
     assert(this);
 
@@ -118,7 +118,7 @@ Glyph *font_glyph(Font *this, int codepoint)
         }
     }
 
-    return &this->default_glyph;
+    return NULL;
 }
 
 int font_measure_width(Font *this, float font_size, const char *str, int str_size)

@@ -5,10 +5,11 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/bitmap.h>
+#include <libsystem/unicode/Codepoint.h>
 
 typedef struct
 {
-    int codepoint;
+    Codepoint codepoint;
     Rectangle bound;
     Point origin;
     int advance;
@@ -26,8 +27,6 @@ Font *font_create(const char *name);
 
 void font_destroy(Font *this);
 
-bool font_has_glyph(Font *font, int codepoint);
+bool font_has_glyph(Font *font, Codepoint codepoint);
 
-Glyph *font_glyph(Font *this, int codepoint);
-
-int font_measure_width(Font *this, float font_size, const char *str, int str_size);
+Glyph *font_glyph(Font *this, Codepoint codepoint);

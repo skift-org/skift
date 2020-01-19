@@ -202,11 +202,8 @@ void painter_draw_rect(Painter *paint, Rectangle rect, Color color)
 
 const int FONT_SIZE = 16;
 
-void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, float size, Color color)
+void painter_blit_bitmap_colored(Painter *paint, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
 {
-    const double FONT_GAMMA = 1.7;
-    const double FONT_BUFFER = 0.80;
-
     for (int x = 0; x < dst_rect.width; x++)
     {
         for (int y = 0; y < dst_rect.height; y++)
@@ -216,51 +213,19 @@ void painter_blit_bitmap_sdf(Painter *paint, Bitmap *src, Rectangle src_rect, Re
 
             Color sample = bitmap_sample(src, src_rect, xx, yy);
 
-            double distance = (sample.R / 150.0);
-            double edge0 = FONT_BUFFER - FONT_GAMMA * 1.4142 / size;
-            double edge1 = FONT_BUFFER + FONT_GAMMA * 1.4142 / size;
-
-            double a = (distance - edge0) / (edge1 - edge0);
-            if (a < 0.0)
-                a = 0.0;
-            if (a > 1.0)
-                a = 1.0;
-            a = a * a * (3 - 2 * a);
-
             Color final = color;
-            final.A = a * 255;
+            final.A = sample.R;
 
             painter_plot_pixel(paint, point_add(dst_rect.position, (Point){x, y}), final);
         }
     }
 }
 
-void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, float size, Color color)
+void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, Color color)
 {
     Rectangle dest;
-    dest.position = point_sub(position, point_scale(glyph->origin, size / FONT_SIZE));
-    dest.size = point_scale(glyph->bound.size, size / FONT_SIZE);
+    dest.position = point_sub(position, glyph->origin);
+    dest.size = glyph->bound.size;
 
-    painter_blit_bitmap_sdf(paint, font->bitmap, glyph->bound, dest, size, color);
-}
-
-void painter_draw_text(
-    Painter *paint,
-    Font *font,
-    const char *text,
-    int text_size,
-    Point position,
-    float font_size,
-    Color color)
-{
-    Point current = position;
-
-    for (int i = 0; i < text_size; i++)
-    {
-        Glyph *glyph = font_glyph(font, text[i]);
-
-        painter_draw_glyph(paint, font, glyph, current, font_size, color);
-
-        current = point_add(current, (Point){glyph->advance * (font_size / FONT_SIZE), 0});
-    }
+    painter_blit_bitmap_colored(paint, font->bitmap, glyph->bound, dest, color);
 }

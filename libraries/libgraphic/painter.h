@@ -48,13 +48,4 @@ void painter_draw_rect(Painter *paint, Rectangle rect, Color color);
 
 // void painter_draw_text(Painter *paint, const char *text, Point position, Color color);
 
-void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, float size, Color color);
-
-void painter_draw_text(
-    Painter *paint,
-    Font *font,
-    const char *text,
-    int text_size,
-    Point position,
-    float font_size,
-    Color color);
+void painter_draw_glyph(Painter *paint, Font *font, Glyph *glyph, Point position, Color color);

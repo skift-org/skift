@@ -9,28 +9,26 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    printf("\e[m");
+    printf("\e[mColors:");
 
     for (int i = 0; i < 8; i++)
     {
-        for (int j = 0; j < 8; j++)
-        {
-            printf("\e[%d;%dm##", 30 + i, 40 + j);
-        }
-        printf("\e[0m\n");
+        printf("\e[%dm ", 40 + i);
     }
-
-    printf("\n");
 
     for (int i = 0; i < 8; i++)
     {
-        printf("\e[1m");
-        for (int j = 0; j < 8; j++)
-        {
-            printf("\e[%d;%dm##", 90 + i, 100 + j);
-        }
-        printf("\e[0m\n");
+        printf("\e[%dm ", 100 + i);
     }
+
+    printf("\ec\n");
+
+    printf("Styles:");
+    printf(" regular");
+    printf("\e[4m underline\ec");
+    printf("\e[1m bold\ec\n");
+
+    printf("Unicode: ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■☺☻♥♦♣♠•◘○◙♂♀♪♫☼⌂►◄↕‼¶§▬↨↑↓→←∟↔▲▼");
 
     return 0;
 }

@@ -140,7 +140,8 @@ for key in data["bindings"]:
         codepoint_alt = 0 if len(bind[2]) == 0 else ord(bind[2])
         codepoint_shift_alt = 0 if len(bind[3]) == 0 else ord(bind[3])
 
-        outfp.write(struct.pack("IIIII", KEYS[key], codepoint_regular, codepoint_shift, codepoint_alt, codepoint_shift_alt))
+        outfp.write(struct.pack(
+            "IIIII", KEYS[key], codepoint_regular, codepoint_shift, codepoint_alt, codepoint_shift_alt))
     else:
         print("Warning invalid binding for key " + key)
 

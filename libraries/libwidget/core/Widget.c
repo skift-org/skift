@@ -2,10 +2,15 @@
 #include <libsystem/logger.h>
 #include <libwidget/core/Widget.h>
 
-void widget_initialize(const char *classname, Widget *widget, Widget *parent)
+void widget_initialize(
+    Widget *widget,
+    const char *classname,
+    Widget *parent,
+    Rectangle bound)
 {
     widget->classname = classname;
     widget->childs = list_create();
+    widget->bound = bound;
 
     if (parent != NULL)
     {
@@ -61,7 +66,13 @@ void widget_dump_iternal(Widget *widget, int depth)
         printf("\t");
     }
 
-    printf("%s(0x%08x)\n", widget->classname, widget);
+    printf("%s(0x%08x) (%d, %d) %dx%d\n",
+           widget->classname,
+           widget,
+           widget->bound.X,
+           widget->bound.Y,
+           widget->bound.width,
+           widget->bound.height);
 
     list_foreach(Widget, child, widget->childs)
     {

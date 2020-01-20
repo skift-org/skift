@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libgraphic/shape.h>
 #include <libsystem/list.h>
 
 struct Widget;
@@ -9,16 +10,20 @@ typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef struct Widget
 {
     const char *classname;
+    WidgetDestroyCallback destroy;
 
+    Rectangle bound;
     struct Widget *parent;
     List *childs;
-
-    WidgetDestroyCallback destroy;
 } Widget;
 
 #define WIDGET(__subclass) ((Widget *)(__subclass))
 
-void widget_initialize(const char *classname, Widget *widget, Widget *parent);
+void widget_initialize(
+    Widget *widget,
+    const char *classname,
+    Widget *parent,
+    Rectangle bound);
 
 void widget_destroy(Widget *widget);
 

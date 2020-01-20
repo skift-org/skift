@@ -10,6 +10,6 @@ typedef struct
     int handle;
 } Window;
 
-Widget *window_create(void);
+Widget *window_create(Rectangle bound);
 
 void window_destroy(Widget *window);

@@ -36,6 +36,10 @@ typedef union __packed {
     };
 } Rectangle;
 
+#define RECTANGLE_EMPTY() ((Rectangle){})
+#define RECTANGLE_SIZE(__width, __height) ((Rectangle){{0, 0, (__width), (__height)}})
+#define RECTANGLE(__x, __y, __width, __height) ((Rectangle){{(__x), (__y), (__width), (__height)}})
+
 #define point_zero ((Point){0, 0})
 
 static inline Point point_add(Point a, Point b)

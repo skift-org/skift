@@ -54,9 +54,9 @@ LIBFILE=$(ROOT_DIRECTORY)/lib/libfile.a
 LIBFILE_SRC=$(wildcard libraries/libfile/*.c)
 LIBFILE_OBJ=$(patsubst %.c,%.o,$(LIBFILE_SRC))
 
-LIBFORM=$(ROOT_DIRECTORY)/lib/libform.a
-LIBFORM_SRC=$(wildcard libraries/libform/*.c)
-LIBFORM_OBJ=$(patsubst %.c,%.o,$(LIBFORM_SRC))
+LIBWIDGET=$(ROOT_DIRECTORY)/lib/libwidget.a
+LIBWIDGET_SRC=$(wildcard libraries/libwidget/*.c) $(wildcard libraries/libwidget/**/*.c)
+LIBWIDGET_OBJ=$(patsubst %.c,%.o,$(LIBWIDGET_SRC))
 
 LIBGRAPHIC=$(ROOT_DIRECTORY)/lib/libgraphic.a
 LIBGRAPHIC_SRC=$(wildcard libraries/libgraphic/*.c)
@@ -85,7 +85,7 @@ CRTS=$(ROOT_DIRECTORY)/lib/crt0.o \
 LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBDEVICE) \
 		  $(LIBFILE)  \
-		  $(LIBFORM) \
+		  $(LIBWIDGET) \
 		  $(LIBGRAPHIC) \
 		  $(LIBKERNEL) \
 		  $(LIBMATH) \
@@ -196,7 +196,7 @@ $(LIBFILE): $(LIBFILE_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(LIBFORM): $(LIBFORM_OBJ)
+$(LIBWIDGET): $(LIBWIDGET_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -238,9 +238,9 @@ $(ROOT_DIRECTORY)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) 
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic -lmath
 
-$(ROOT_DIRECTORY)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBFORM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lform -lgraphic
+	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
 $(ROOT_DIRECTORY)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)

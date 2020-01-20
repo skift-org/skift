@@ -9,25 +9,25 @@
 #include <libsystem/RingBuffer.h>
 
 struct FsNode;
-struct Handle;
+struct FsHandle;
 
-typedef int (*FsOperationOpen)(struct FsNode *node, struct Handle *handle);
-typedef void (*FsOperationClose)(struct FsNode *node, struct Handle *handle);
+typedef int (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
+typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
 
 typedef bool (*FsOperationCanRead)(struct FsNode *node);
 typedef bool (*FsOperationCanWrite)(struct FsNode *node);
 
-typedef int (*FsOperationRead)(struct FsNode *node, struct Handle *handle, void *buffer, size_t size);
-typedef int (*FsOperationWrite)(struct FsNode *node, struct Handle *handle, const void *buffer, size_t size);
+typedef int (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size);
+typedef int (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size);
 
 typedef struct FsNode *(*FsOperationFind)(struct FsNode *node, const char *name);
 typedef int (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
 typedef int (*FsOperationUnlink)(struct FsNode *node, const char *name);
 
-typedef int (*FsOperationCall)(struct FsNode *node, struct Handle *handle, int request, void *args);
-typedef int (*FsOperationStat)(struct FsNode *node, struct Handle *handle, FileState *stat);
+typedef int (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
+typedef int (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
-typedef size_t (*FsOperationSize)(struct FsNode *node, struct Handle *handle);
+typedef size_t (*FsOperationSize)(struct FsNode *node, struct FsHandle *handle);
 
 typedef void (*FsOperationDestroy)(struct FsNode *node);
 

@@ -67,7 +67,7 @@ typedef struct Task
     List *shms;
 
     Lock handles_lock;
-    Handle *handles[TASK_FILDES_COUNT];
+    FsHandle *handles[TASK_FILDES_COUNT];
 
     Lock cwd_lock;
     Path *cwd_path;
@@ -161,11 +161,11 @@ void task_get_cwd(Task *this, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
-int task_handle_add(Task *task, Handle *handle);
+int task_handle_add(Task *task, FsHandle *handle);
 
 int task_handle_remove(Task *task, int handle_index);
 
-Handle *task_handle_acquire(Task *task, int handle_index);
+FsHandle *task_handle_acquire(Task *task, int handle_index);
 
 int task_handle_release(Task *task, int handle_index);
 
@@ -177,17 +177,17 @@ int task_handle_close(Task *this, int handle_index);
 
 void task_handle_close_all(Task *this);
 
-int task_handle_read(Task *this, int handle_index, void *buffer, uint size);
+int task_fshandle_read(Task *this, int handle_index, void *buffer, uint size);
 
-int task_handle_write(Task *this, int handle_index, const void *buffer, uint size);
+int task_fshandle_write(Task *this, int handle_index, const void *buffer, uint size);
 
-int task_handle_call(Task *this, int handle_index, int request, void *args);
+int task_fshandle_call(Task *this, int handle_index, int request, void *args);
 
-int task_handle_seek(Task *this, int handle_index, Whence whence, off_t offset);
+int task_fshandle_seek(Task *this, int handle_index, Whence whence, off_t offset);
 
-int task_handle_tell(Task *this, int handle_index, Whence whence);
+int task_fshandle_tell(Task *this, int handle_index, Whence whence);
 
-int task_handle_stat(Task *this, int handle_index, FileState *stat);
+int task_fshandle_stat(Task *this, int handle_index, FileState *stat);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */

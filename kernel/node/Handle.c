@@ -11,9 +11,9 @@
 #include "sheduling/TaskBlockerWrite.h"
 #include "tasking.h"
 
-Handle *handle_create(FsNode *node, OpenFlag flags)
+FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 {
-    Handle *handle = __create(Handle);
+    FsHandle *handle = __create(FsHandle);
 
     lock_init(handle->lock);
 
@@ -31,9 +31,9 @@ Handle *handle_create(FsNode *node, OpenFlag flags)
     return handle;
 }
 
-Handle *handle_clone(Handle *handle)
+FsHandle *fshandle_clone(FsHandle *handle)
 {
-    Handle *clone = __create(Handle);
+    FsHandle *clone = __create(FsHandle);
     FsNode *node = handle->node;
 
     lock_init(clone->lock);
@@ -52,12 +52,12 @@ Handle *handle_clone(Handle *handle)
     return clone;
 }
 
-bool handle_has_flag(Handle *handle, OpenFlag flag)
+bool fshandle_has_flag(FsHandle *handle, OpenFlag flag)
 {
     return (handle->flags & flag) == flag;
 }
 
-void handle_destroy(Handle *handle)
+void fshandle_destroy(FsHandle *handle)
 {
     FsNode *node = handle->node;
 
@@ -72,24 +72,24 @@ void handle_destroy(Handle *handle)
     free(handle);
 }
 
-bool handle_is_locked(Handle *handle)
+bool fshandle_is_locked(FsHandle *handle)
 {
     return lock_is_acquire(handle->lock);
 }
 
-void handle_acquire_lock(Handle *handle, int who_acquire)
+void fshandle_acquire_lock(FsHandle *handle, int who_acquire)
 {
     lock_acquire_by(handle->lock, who_acquire);
 }
 
-void handle_release_lock(Handle *handle, int who_release)
+void fshandle_release_lock(FsHandle *handle, int who_release)
 {
     lock_release_by(handle->lock, who_release);
 }
 
-int handle_read(Handle *handle, void *buffer, size_t size)
+int fshandle_read(FsHandle *handle, void *buffer, size_t size)
 {
-    if (!handle_has_flag(handle, OPEN_READ))
+    if (!fshandle_has_flag(handle, OPEN_READ))
     {
         return -ERR_WRITE_ONLY_STREAM;
     }
@@ -115,9 +115,9 @@ int handle_read(Handle *handle, void *buffer, size_t size)
     return readded;
 }
 
-int handle_write(Handle *handle, const void *buffer, size_t size)
+int fshandle_write(FsHandle *handle, const void *buffer, size_t size)
 {
-    if (!handle_has_flag(handle, OPEN_WRITE))
+    if (!fshandle_has_flag(handle, OPEN_WRITE))
     {
         return ERR_READ_ONLY_STREAM;
     }
@@ -136,7 +136,7 @@ int handle_write(Handle *handle, const void *buffer, size_t size)
     {
         task_block(sheduler_running(), blocker_write_create(node));
 
-        if (handle_has_flag(handle, OPEN_APPEND))
+        if (fshandle_has_flag(handle, OPEN_APPEND))
         {
             if (node->size)
             {
@@ -164,7 +164,7 @@ int handle_write(Handle *handle, const void *buffer, size_t size)
     return written;
 }
 
-off_t handle_seek(Handle *handle, Whence whence, off_t where)
+off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where)
 {
     FsNode *node = handle->node;
 
@@ -213,7 +213,7 @@ off_t handle_seek(Handle *handle, Whence whence, off_t where)
     return -ERR_SUCCESS;
 }
 
-off_t handle_tell(Handle *handle, Whence whence)
+off_t fshandle_tell(FsHandle *handle, Whence whence)
 {
     FsNode *node = handle->node;
 
@@ -239,7 +239,7 @@ off_t handle_tell(Handle *handle, Whence whence)
     }
 }
 
-int handle_call(Handle *handle, int request, void *args)
+int fshandle_call(FsHandle *handle, int request, void *args)
 {
     int result = -ERR_OPERATION_NOT_SUPPORTED;
 
@@ -255,7 +255,7 @@ int handle_call(Handle *handle, int request, void *args)
     return result;
 }
 
-int handle_stat(Handle *handle, FileState *stat)
+int fshandle_stat(FsHandle *handle, FileState *stat)
 {
     int result = -ERR_SUCCESS;
 

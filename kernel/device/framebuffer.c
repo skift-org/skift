@@ -113,19 +113,19 @@ void bga_mode(u32 width, u32 height)
 
 static void *framebuffer_physical_addr = NULL;
 static void *framebuffer_virtual_addr = NULL;
-static Handle *framebuffer_owner = NULL;
+static FsHandle *framebuffer_owner = NULL;
 static Point framebuffer_size = {-1, -1};
 
 typedef struct
 {
-    Handle *owner;
+    FsHandle *owner;
     void *buffer;
 } framebuffer_backbuffer_t;
 
 static Lock backbuffer_stack_lock;
 static List *backbuffer_stack = NULL;
 
-void *framebuffer_get_buffer(Handle *owner)
+void *framebuffer_get_buffer(FsHandle *owner)
 {
     if (framebuffer_owner == owner)
     {
@@ -143,7 +143,7 @@ void *framebuffer_get_buffer(Handle *owner)
     return NULL;
 }
 
-framebuffer_backbuffer_t *framebuffer_get_backbuffer(Handle *owner)
+framebuffer_backbuffer_t *framebuffer_get_backbuffer(FsHandle *owner)
 {
     list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
     {
@@ -255,7 +255,7 @@ error_t framebuffer_set_mode_bga(Point res)
     }
 }
 
-int framebuffer_FsOperationOpen(FsNode *node, Handle *handle)
+int framebuffer_FsOperationOpen(FsNode *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -285,7 +285,7 @@ int framebuffer_FsOperationOpen(FsNode *node, Handle *handle)
     return -ERR_SUCCESS;
 }
 
-void framebuffer_FsOperationClose(FsNode *node, Handle *handle)
+void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -320,7 +320,7 @@ void framebuffer_FsOperationClose(FsNode *node, Handle *handle)
     }
 }
 
-int framebuffer_FsOperationCall(FsNode *node, Handle *handle, int request, void *args)
+int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
 

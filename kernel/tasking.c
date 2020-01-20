@@ -132,9 +132,9 @@ Task *task_create(Task *parent, const char *name, bool user)
     //     {
     //         if (parent->handles[i])
     //         {
-    //             handle_acquire_lock(parent->handles[i], sheduler_running_id());
-    //             this->handles[i] = handle_clone(parent->handles[i]);
-    //             handle_release_lock(parent->handles[i], sheduler_running_id());
+    //             fshandle_acquire_lock(parent->handles[i], sheduler_running_id());
+    //             this->handles[i] = fshandle_clone(parent->handles[i]);
+    //             fshandle_release_lock(parent->handles[i], sheduler_running_id());
     //         }
     //     }
     //
@@ -509,7 +509,7 @@ void task_memory_free(Task *this, uint addr, uint count)
 
 /* --- File descriptor allocation and locking ------------------------------- */
 
-int task_handle_add(Task *task, Handle *handle)
+int task_handle_add(Task *task, FsHandle *handle)
 {
     int result = -ERR_TOO_MANY_OPEN_FILES;
 
@@ -540,7 +540,7 @@ int task_handle_remove(Task *task, int handle_index)
 
         if (task->handles[handle_index] != NULL)
         {
-            handle_destroy(task->handles[handle_index]);
+            fshandle_destroy(task->handles[handle_index]);
             task->handles[handle_index] = NULL;
 
             result = -ERR_SUCCESS;
@@ -556,9 +556,9 @@ int task_handle_remove(Task *task, int handle_index)
     return result;
 }
 
-Handle *task_handle_acquire(Task *task, int handle_index)
+FsHandle *task_handle_acquire(Task *task, int handle_index)
 {
-    Handle *result = NULL;
+    FsHandle *result = NULL;
 
     if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
     {
@@ -566,7 +566,7 @@ Handle *task_handle_acquire(Task *task, int handle_index)
 
         if (task->handles[handle_index] != NULL)
         {
-            handle_acquire_lock(task->handles[handle_index], task->id);
+            fshandle_acquire_lock(task->handles[handle_index], task->id);
             result = task->handles[handle_index];
         }
 
@@ -590,7 +590,7 @@ int task_handle_release(Task *task, int handle_index)
 
         if (task->handles[handle_index] != NULL)
         {
-            handle_release_lock(task->handles[handle_index], task->id);
+            fshandle_release_lock(task->handles[handle_index], task->id);
             result = -ERR_SUCCESS;
         }
 
@@ -610,7 +610,7 @@ int task_handle_open(Task *task, const char *file_path, OpenFlag flags)
 {
     Path *p = task_cwd_resolve(task, file_path);
 
-    Handle *handle = filesystem_open(p, flags);
+    FsHandle *handle = filesystem_open(p, flags);
 
     path_delete(p);
 
@@ -623,7 +623,7 @@ int task_handle_open(Task *task, const char *file_path, OpenFlag flags)
 
     if (handle_index < 0)
     {
-        handle_destroy(handle);
+        fshandle_destroy(handle);
     }
 
     return handle_index;
@@ -642,96 +642,96 @@ int task_handle_close(Task *task, int handle_index)
     return task_handle_remove(task, handle_index);
 }
 
-int task_handle_read(Task *task, int handle_index, void *buffer, uint size)
+int task_fshandle_read(Task *task, int handle_index, void *buffer, uint size)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_read(handle, buffer, size);
+    int result = fshandle_read(handle, buffer, size);
 
     task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_handle_write(Task *task, int handle_index, const void *buffer, uint size)
+int task_fshandle_write(Task *task, int handle_index, const void *buffer, uint size)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_write(handle, buffer, size);
+    int result = fshandle_write(handle, buffer, size);
 
     task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_handle_call(Task *task, int handle_index, int request, void *args)
+int task_fshandle_call(Task *task, int handle_index, int request, void *args)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_call(handle, request, args);
+    int result = fshandle_call(handle, request, args);
 
     task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_handle_seek(Task *task, int handle_index, Whence whence, off_t offset)
+int task_fshandle_seek(Task *task, int handle_index, Whence whence, off_t offset)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_seek(handle, whence, offset);
+    int result = fshandle_seek(handle, whence, offset);
 
     task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_handle_tell(Task *task, int handle_index, Whence whence)
+int task_fshandle_tell(Task *task, int handle_index, Whence whence)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_tell(handle, whence);
+    int result = fshandle_tell(handle, whence);
 
     task_handle_release(task, handle_index);
 
     return result;
 }
 
-int task_handle_stat(Task *task, int handle_index, FileState *stat)
+int task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 {
-    Handle *handle = task_handle_acquire(task, handle_index);
+    FsHandle *handle = task_handle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
         return -ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = handle_stat(handle, stat);
+    int result = fshandle_stat(handle, stat);
 
     task_handle_release(task, handle_index);
 

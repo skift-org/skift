@@ -75,7 +75,7 @@ FsNode *filesystem_find_parent_and_ref(Path *path)
     return parent;
 }
 
-Handle *filesystem_open(Path *path, OpenFlag flags)
+FsHandle *filesystem_open(Path *path, OpenFlag flags)
 {
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
@@ -105,7 +105,7 @@ Handle *filesystem_open(Path *path, OpenFlag flags)
         return NULL;
     }
 
-    Handle *handle = handle_create(node, flags);
+    FsHandle *handle = fshandle_create(node, flags);
 
     fsnode_deref(node);
 

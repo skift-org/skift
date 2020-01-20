@@ -6,7 +6,7 @@
 
 #include "filesystem/Filesystem.h"
 
-static int null_FsOperationRead(FsNode *node, Handle *handle, void *buffer, uint size)
+static int null_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, uint size)
 {
     __unused(node);
     __unused(handle);
@@ -16,7 +16,7 @@ static int null_FsOperationRead(FsNode *node, Handle *handle, void *buffer, uint
     return 0;
 }
 
-static int null_FsOperationWrite(FsNode *node, Handle *handle, const void *buffer, uint size)
+static int null_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size)
 {
     __unused(node);
     __unused(handle);

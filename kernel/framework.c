@@ -130,32 +130,32 @@ int __plug_iostream_close(int fd)
 
 int __plug_iostream_read(int fd, void *buffer, uint size)
 {
-    return task_handle_read(sheduler_running(), fd, buffer, size);
+    return task_fshandle_read(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_write(int fd, const void *buffer, uint size)
 {
-    return task_handle_write(sheduler_running(), fd, buffer, size);
+    return task_fshandle_write(sheduler_running(), fd, buffer, size);
 }
 
 int __plug_iostream_call(int fd, int request, void *args)
 {
-    return task_handle_call(sheduler_running(), fd, request, args);
+    return task_fshandle_call(sheduler_running(), fd, request, args);
 }
 
 int __plug_iostream_seek(int fd, int offset, Whence whence)
 {
-    return task_handle_seek(sheduler_running(), fd, whence, offset);
+    return task_fshandle_seek(sheduler_running(), fd, whence, offset);
 }
 
 int __plug_iostream_tell(int fd, Whence whence)
 {
-    return task_handle_tell(sheduler_running(), fd, whence);
+    return task_fshandle_tell(sheduler_running(), fd, whence);
 }
 
 int __plug_iostream_stat(int fd, FileState *stat)
 {
-    return task_handle_stat(sheduler_running(), fd, stat);
+    return task_fshandle_stat(sheduler_running(), fd, stat);
 }
 
 /* --- Processes ------------------------------------------------------------ */
@@ -297,4 +297,68 @@ int messaging_unsubscribe(const char *channel)
     __unused(channel);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
+{
+    __unused(handle);
+    __unused(path);
+    __unused(flags);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_close(Handle *handle)
+{
+    __unused(handle);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_send(Handle *handle, Message *message)
+{
+    __unused(handle);
+    __unused(message);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_receive(Handle *handle, Message *message)
+{
+    __unused(handle);
+    __unused(message);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_request(Handle *handle, Message *request, Message *respond)
+{
+    __unused(handle);
+    __unused(request);
+    __unused(respond);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_payload(Handle *handle, Message *message)
+{
+    __unused(handle);
+    __unused(message);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_discard(Handle *handle)
+{
+    __unused(handle);
+
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_respond(Handle *handle, Message *message)
+{
+    __unused(handle);
+    __unused(message);
+
+    ASSERT_NOT_REACHED();
 }

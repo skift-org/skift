@@ -18,7 +18,7 @@ FsNode *filesystem_find_and_ref(Path *path);
 
 FsNode *filesystem_find_parent_and_ref(Path *path);
 
-Handle *filesystem_open(Path *path, OpenFlag flags);
+FsHandle *filesystem_open(Path *path, OpenFlag flags);
 
 int filesystem_mkdir(Path *path);
 

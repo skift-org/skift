@@ -178,32 +178,32 @@ int sys_filesystem_close(int fd)
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
 {
-    return task_handle_read(sheduler_running(), fd, buffer, size);
+    return task_fshandle_read(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_write(int fd, void *buffer, uint size)
 {
-    return task_handle_write(sheduler_running(), fd, buffer, size);
+    return task_fshandle_write(sheduler_running(), fd, buffer, size);
 }
 
 int sys_filesystem_call(int fd, int request, void *args)
 {
-    return task_handle_call(sheduler_running(), fd, request, args);
+    return task_fshandle_call(sheduler_running(), fd, request, args);
 }
 
 int sys_filesystem_seek(int fd, int offset, Whence whence)
 {
-    return task_handle_seek(sheduler_running(), fd, whence, offset);
+    return task_fshandle_seek(sheduler_running(), fd, whence, offset);
 }
 
 int sys_filesystem_tell(int fd, Whence whence)
 {
-    return task_handle_tell(sheduler_running(), fd, whence);
+    return task_fshandle_tell(sheduler_running(), fd, whence);
 }
 
 int sys_filesystem_stat(int fd, FileState *stat)
 {
-    return task_handle_stat(sheduler_running(), fd, stat);
+    return task_fshandle_stat(sheduler_running(), fd, stat);
 }
 
 int sys_filesystem_mkdir(const char *dir_path)

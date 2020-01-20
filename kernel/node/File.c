@@ -10,9 +10,9 @@
 #include "node/File.h"
 #include "node/Handle.h"
 
-int file_FsOperationOpen(FsFile *node, Handle *handle)
+int file_FsOperationOpen(FsFile *node, FsHandle *handle)
 {
-    if (handle_has_flag(handle, OPEN_TRUNC))
+    if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
         free(node->buffer);
         node->buffer = malloc(512);
@@ -23,7 +23,7 @@ int file_FsOperationOpen(FsFile *node, Handle *handle)
     return -ERR_SUCCESS;
 }
 
-int file_FsOperationRead(FsFile *node, Handle *handle, void *buffer, size_t size)
+int file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size)
 {
     size_t result = 0;
 
@@ -38,7 +38,7 @@ int file_FsOperationRead(FsFile *node, Handle *handle, void *buffer, size_t size
     return result;
 }
 
-int file_FsOperationWrite(FsFile *node, Handle *handle, const void *buffer, size_t size)
+int file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size)
 {
     int result = 0;
 
@@ -56,7 +56,7 @@ int file_FsOperationWrite(FsFile *node, Handle *handle, const void *buffer, size
     return result;
 }
 
-size_t file_FsOperationSize(FsFile *node, Handle *handle)
+size_t file_FsOperationSize(FsFile *node, FsHandle *handle)
 {
     __unused(handle);
 

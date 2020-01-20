@@ -6,7 +6,7 @@
 
 #include "node/Node.h"
 
-typedef struct Handle
+typedef struct FsHandle
 {
     Lock lock;
     FsNode *node;
@@ -15,23 +15,23 @@ typedef struct Handle
 
     void *attached;
     size_t attached_size;
-} Handle;
+} FsHandle;
 
-bool handle_has_flag(Handle *handle, OpenFlag flag);
+bool fshandle_has_flag(FsHandle *handle, OpenFlag flag);
 
-Handle *handle_create(FsNode *node, OpenFlag flags);
-void handle_destroy(Handle *handle);
-Handle *handle_clone(Handle *handle);
+FsHandle *fshandle_create(FsNode *node, OpenFlag flags);
+void fshandle_destroy(FsHandle *handle);
+FsHandle *fshandle_clone(FsHandle *handle);
 
-bool handle_is_locked(Handle *handle);
-void handle_acquire_lock(Handle *handle, int who_acquire);
-void handle_release_lock(Handle *handle, int who_release);
+bool fshandle_is_locked(FsHandle *handle);
+void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
+void fshandle_release_lock(FsHandle *handle, int who_release);
 
-int handle_read(Handle *handle, void *buffer, size_t size);
-int handle_write(Handle *handle, const void *buffer, size_t size);
+int fshandle_read(FsHandle *handle, void *buffer, size_t size);
+int fshandle_write(FsHandle *handle, const void *buffer, size_t size);
 
-off_t handle_seek(Handle *handle, Whence whence, off_t where);
-off_t handle_tell(Handle *handle, Whence whence);
+off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where);
+off_t fshandle_tell(FsHandle *handle, Whence whence);
 
-int handle_call(Handle *handle, int request, void *args);
-int handle_stat(Handle *handle, FileState *stat);
+int fshandle_call(FsHandle *handle, int request, void *args);
+int fshandle_stat(FsHandle *handle, FileState *stat);

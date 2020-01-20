@@ -153,7 +153,7 @@ keymap_t *keyboard_load_keymap(const char *path)
     return keymap;
 }
 
-int keyboard_FsOperationCall(FsNode *node, Handle *handle, int request, void *args)
+int keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);

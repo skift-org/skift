@@ -9,7 +9,7 @@
 #include "node/Directory.h"
 #include "node/Handle.h"
 
-int directory_FsOperationOpen(FsDirectory *node, Handle *handle)
+int directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
 {
     DirectoryListing *listing = malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
 
@@ -42,14 +42,14 @@ int directory_FsOperationOpen(FsDirectory *node, Handle *handle)
     return -ERR_SUCCESS;
 }
 
-void directory_FsOperationClose(FsDirectory *node, Handle *handle)
+void directory_FsOperationClose(FsDirectory *node, FsHandle *handle)
 {
     __unused(node);
 
     free(handle->attached);
 }
 
-int directory_FsOperationRead(FsDirectory *node, Handle *handle, void *buffer, uint size)
+int directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buffer, uint size)
 {
     __unused(node);
     // FIXME: directories should no be read using read().

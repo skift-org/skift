@@ -20,9 +20,19 @@ int directory_FsOperationOpen(FsDirectory *node, Handle *handle)
     list_foreach(FsDirectoryEntry, entry, node->childs)
     {
         DirectoryEntry *record = &listing->entries[current_index];
+        FsNode *node = entry->node;
 
         strcpy(record->name, entry->name);
-        record->stat.type = entry->node->type;
+        record->stat.type = node->type;
+
+        if (node->size)
+        {
+            record->stat.size = node->size(entry->node, NULL);
+        }
+        else
+        {
+            record->stat.size = 0;
+        }
 
         current_index++;
     };

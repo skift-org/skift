@@ -30,6 +30,10 @@ typedef enum
     OPEN_APPEND = 1 << 3,
     OPEN_TRUNC = 1 << 4,
     OPEN_BUFFERED = 1 << 5,
+
+    OPEN_STREAM = 1 << 6,
+    OPEN_DIRECTORY = 1 << 7,
+    OPEN_SOCKET = 1 << 8,
 } OpenFlag;
 
 typedef struct

@@ -12,6 +12,9 @@
 #include <libsystem/system.h>
 #include <libsystem/time.h>
 
+#include <abi/Handle.h>
+#include <abi/Message.h>
+
 void __plug_init(void);
 
 void __plug_fini(int exit_code);
@@ -99,3 +102,21 @@ int __plug_process_sleep(int time);
 int __plug_process_wakeup(int pid);
 
 int __plug_process_wait(int pid, int *exit_value);
+
+/* --- new handle api ------------------------------------------------------- */
+
+void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
+
+void __plug_handle_close(Handle *handle);
+
+void __plug_handle_send(Handle *handle, Message *message);
+
+void __plug_handle_receive(Handle *handle, Message *message);
+
+void __plug_handle_request(Handle *handle, Message *request, Message *respond);
+
+void __plug_handle_payload(Handle *handle, Message *request);
+
+void __plug_handle_discard(Handle *handle);
+
+void __plug_handle_respond(Handle *handle, Message *message);

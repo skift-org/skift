@@ -20,6 +20,8 @@ FsNode *filesystem_find_parent_and_ref(Path *path);
 
 FsHandle *filesystem_open(Path *path, OpenFlag flags);
 
+error_t filesystem_connect(Path *path, FsHandle **connection_handle);
+
 int filesystem_mkdir(Path *path);
 
 int filesystem_mkfile(Path *path);

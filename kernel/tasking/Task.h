@@ -19,7 +19,7 @@ typedef struct
     Stack *supervisor_stack;
 
     Lock handles_lock;
-    Handle *handles[TASK_MAX_HANDLES];
+    FsHandle *handles[TASK_MAX_HANDLES];
 } Task;
 
 Task *task_create(Task *parent);

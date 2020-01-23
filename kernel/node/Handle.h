@@ -13,13 +13,18 @@ typedef struct FsHandle
     size_t offset;
     OpenFlag flags;
 
-    void *attached;
+    union {
+        void *attached;
+        Message *message;
+    };
+
     size_t attached_size;
 } FsHandle;
 
 bool fshandle_has_flag(FsHandle *handle, OpenFlag flag);
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags);
+
 void fshandle_destroy(FsHandle *handle);
 FsHandle *fshandle_clone(FsHandle *handle);
 
@@ -35,3 +40,10 @@ off_t fshandle_tell(FsHandle *handle, Whence whence);
 
 int fshandle_call(FsHandle *handle, int request, void *args);
 int fshandle_stat(FsHandle *handle, FileState *stat);
+
+error_t fshandle_connect(FsNode *node, FsHandle **connection_handle);
+error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle);
+error_t fshandle_send(FsHandle *handle, Message *message);
+error_t fshandle_receive(FsHandle *handle, Message *message);
+error_t fshandle_payload(FsHandle *handle, Message *message);
+error_t fshandle_discard(FsHandle *handle);

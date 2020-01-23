@@ -9,6 +9,7 @@
 
 #include <libkernel/message.h>
 #include <libkernel/task.h>
+#include <libsystem/error.h>
 
 #include "filesystem/Filesystem.h"
 #include "memory.h"
@@ -161,21 +162,21 @@ void task_get_cwd(Task *this, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
-int task_handle_add(Task *task, FsHandle *handle);
+error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle);
 
-int task_handle_remove(Task *task, int handle_index);
+error_t task_fshandle_remove(Task *task, int handle_index);
 
-FsHandle *task_handle_acquire(Task *task, int handle_index);
+FsHandle *task_fshandle_acquire(Task *task, int handle_index);
 
-int task_handle_release(Task *task, int handle_index);
+error_t task_fshandle_release(Task *task, int handle_index);
 
 /* --- Task handle operations ----------------------------------------------- */
 
-int task_handle_open(Task *this, const char *file_path, OpenFlag flags);
+error_t task_fshandle_open(Task *this, int *handle_index, const char *path, OpenFlag flags);
 
-int task_handle_close(Task *this, int handle_index);
+error_t task_fshandle_close(Task *this, int handle_index);
 
-void task_handle_close_all(Task *this);
+void task_fshandle_close_all(Task *this);
 
 int task_fshandle_read(Task *this, int handle_index, void *buffer, uint size);
 
@@ -188,6 +189,18 @@ int task_fshandle_seek(Task *this, int handle_index, Whence whence, off_t offset
 int task_fshandle_tell(Task *this, int handle_index, Whence whence);
 
 int task_fshandle_stat(Task *this, int handle_index, FileState *stat);
+
+error_t task_fshandle_connect(Task *this, int *handle_index, const char *path);
+
+error_t task_fshandle_accept(Task *task, int handle_index, int *connection_handle_index);
+
+error_t task_fshandle_send(Task *this, int handle_index, Message *message);
+
+error_t task_fshandle_receive(Task *this, int handle_index, Message *message);
+
+error_t task_fshandle_payload(Task *this, int handle_index, Message *message);
+
+error_t task_fshandle_discard(Task *this, int handle_index);
 
 /* -------------------------------------------------------------------------- */
 /*   PROCESSES                                                                */

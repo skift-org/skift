@@ -34,6 +34,9 @@ typedef enum
     OPEN_STREAM = 1 << 6,
     OPEN_DIRECTORY = 1 << 7,
     OPEN_SOCKET = 1 << 8,
+
+    OPEN_CLIENT = 1 << 9,
+    OPEN_SERVER = 1 << 10,
 } OpenFlag;
 
 typedef struct

@@ -168,12 +168,23 @@ int sys_messaging_unsubscribe(const char *channel)
 
 int sys_filesystem_open(const char *path, OpenFlag flags)
 {
-    return task_handle_open(sheduler_running(), path, flags);
+    int fd;
+
+    int err = task_fshandle_open(sheduler_running(), &fd, path, flags);
+
+    if (err)
+    {
+        return -err;
+    }
+    else
+    {
+        return fd;
+    }
 }
 
 int sys_filesystem_close(int fd)
 {
-    return task_handle_close(sheduler_running(), fd);
+    return -task_fshandle_close(sheduler_running(), fd);
 }
 
 int sys_filesystem_read(int fd, void *buffer, uint size)
@@ -312,6 +323,48 @@ int sys_system_get_ticks()
     return sheduler_get_ticks();
 }
 
+/* --- Handles -------------------------------------------------------------- */
+
+int sys_handle_open(int *handle, const char *path, OpenFlag flags)
+{
+    return task_fshandle_open(sheduler_running(), handle, path, flags);
+}
+
+int sys_handle_close(int handle)
+{
+    return task_fshandle_close(sheduler_running(), handle);
+}
+
+int sys_handle_connect(int *handle, const char *path)
+{
+    return task_fshandle_connect(sheduler_running(), handle, path);
+}
+
+int sys_handle_accept(int handle, int *connection_handle)
+{
+    return task_fshandle_accept(sheduler_running(), handle, connection_handle);
+}
+
+int sys_handle_send(int handle, Message *message)
+{
+    return task_fshandle_send(sheduler_running(), handle, message);
+}
+
+int sys_handle_receive(int handle, Message *message)
+{
+    return task_fshandle_receive(sheduler_running(), handle, message);
+}
+
+int sys_handle_payload(int handle, Message *message)
+{
+    return task_fshandle_payload(sheduler_running(), handle, message);
+}
+
+int sys_handle_discard(int handle)
+{
+    return task_fshandle_discard(sheduler_running(), handle);
+}
+
 static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_EXEC] = sys_process_exec,
@@ -359,6 +412,15 @@ static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_SYSTEM_GET_STATUS] = sys_system_get_status,
     [SYS_SYSTEM_GET_TIME] = sys_system_get_time,
     [SYS_SYSTEM_GET_TICKS] = sys_system_get_ticks,
+
+    [SYS_HANDLE_OPEN] = sys_handle_open,
+    [SYS_HANDLE_CLOSE] = sys_handle_close,
+    [SYS_HANDLE_CONNECT] = sys_handle_connect,
+    [SYS_HANDLE_ACCEPT] = sys_handle_accept,
+    [SYS_HANDLE_SEND] = sys_handle_send,
+    [SYS_HANDLE_RECEIVE] = sys_handle_receive,
+    [SYS_HANDLE_PAYLOAD] = sys_handle_payload,
+    [SYS_HANDLE_DISCARD] = sys_handle_discard,
 };
 
 syscall_handler_t syscall_get_handler(syscall_t syscall)

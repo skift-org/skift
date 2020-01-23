@@ -120,12 +120,22 @@ int __plug_logger_unlock()
 
 int __plug_iostream_open(const char *file_path, OpenFlag flags)
 {
-    return task_handle_open(sheduler_running(), file_path, flags);
+    int handle_index;
+    error_t error = task_fshandle_open(sheduler_running(), &handle_index, file_path, flags);
+
+    if (error != ERR_SUCCESS)
+    {
+        return -error;
+    }
+    else
+    {
+        return handle_index;
+    }
 }
 
 int __plug_iostream_close(int fd)
 {
-    return task_handle_close(sheduler_running(), fd);
+    return task_fshandle_close(sheduler_running(), fd);
 }
 
 int __plug_iostream_read(int fd, void *buffer, uint size)
@@ -297,68 +307,4 @@ int messaging_unsubscribe(const char *channel)
     __unused(channel);
 
     return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
-{
-    __unused(handle);
-    __unused(path);
-    __unused(flags);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_close(Handle *handle)
-{
-    __unused(handle);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_send(Handle *handle, Message *message)
-{
-    __unused(handle);
-    __unused(message);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_receive(Handle *handle, Message *message)
-{
-    __unused(handle);
-    __unused(message);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_request(Handle *handle, Message *request, Message *respond)
-{
-    __unused(handle);
-    __unused(request);
-    __unused(respond);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_payload(Handle *handle, Message *message)
-{
-    __unused(handle);
-    __unused(message);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_discard(Handle *handle)
-{
-    __unused(handle);
-
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_handle_respond(Handle *handle, Message *message)
-{
-    __unused(handle);
-    __unused(message);
-
-    ASSERT_NOT_REACHED();
 }

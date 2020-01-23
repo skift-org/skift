@@ -62,6 +62,42 @@ bool fsnode_can_write(FsNode *node)
     }
 }
 
+bool fsnode_can_receive(FsNode *node, FsHandle *handle)
+{
+    if (node->can_receive)
+    {
+        return node->can_receive(node, handle);
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool fsnode_can_accept(FsNode *node)
+{
+    if (node->is_accepted)
+    {
+        return node->can_accept_connection(node);
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool fsnode_is_accepted(FsNode *node)
+{
+    if (node->is_accepted)
+    {
+        return node->is_accepted(node);
+    }
+    else
+    {
+        return true;
+    }
+}
+
 bool fsnode_is_acquire(FsNode *node)
 {
     return lock_is_acquire(node->lock);

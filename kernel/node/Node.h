@@ -4,9 +4,12 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/RingBuffer.h>
+#include <libsystem/error.h>
 #include <libsystem/iostream.h>
 #include <libsystem/lock.h>
-#include <libsystem/RingBuffer.h>
+
+#include "abi/Message.h"
 
 struct FsNode;
 struct FsHandle;
@@ -29,6 +32,19 @@ typedef int (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, Fil
 
 typedef size_t (*FsOperationSize)(struct FsNode *node, struct FsHandle *handle);
 
+typedef struct FsNode *(*FsOperationOpenConnection)(struct FsNode *node);
+
+typedef void (*FsOperationAccept)(struct FsNode *node);
+typedef bool (*FsOperationIsAccepted)(struct FsNode *node);
+
+typedef bool (*FsOperationCanAcceptConnection)(struct FsNode *node);
+typedef struct FsNode *(*FsOperationAcceptConnection)(struct FsNode *node);
+
+typedef error_t (*FsOperationSend)(struct FsNode *node, struct FsHandle *handle, Message *message);
+
+typedef bool (*FsOperationCanReceive)(struct FsNode *node, struct FsHandle *handle);
+typedef error_t (*FsOperationReceive)(struct FsNode *node, struct FsHandle *handle, Message **message);
+
 typedef void (*FsOperationDestroy)(struct FsNode *node);
 
 typedef enum
@@ -39,6 +55,8 @@ typedef enum
     FSNODE_DEVICE,
     FSNODE_DIRECTORY,
     FSNODE_PIPE,
+    FSNODE_SOCKET,
+    FSNODE_CONNECTION
 } FsNodeType;
 
 typedef struct FsNode
@@ -61,6 +79,19 @@ typedef struct FsNode
     FsOperationCall call;
     FsOperationStat stat;
     FsOperationSize size;
+
+    FsOperationOpenConnection open_connection;
+
+    FsOperationCanAcceptConnection can_accept_connection;
+    FsOperationAcceptConnection accept_connection;
+
+    FsOperationAccept accept;
+    FsOperationIsAccepted is_accepted;
+
+    FsOperationSend send;
+    FsOperationCanReceive can_receive;
+    FsOperationReceive receive;
+
     FsOperationDestroy destroy;
 } FsNode;
 
@@ -75,6 +106,12 @@ void fsnode_deref(FsNode *this);
 bool fsnode_can_read(FsNode *node);
 
 bool fsnode_can_write(FsNode *node);
+
+bool fsnode_can_accept(FsNode *node);
+
+bool fsnode_can_receive(FsNode *node, struct FsHandle *handle);
+
+bool fsnode_is_accepted(FsNode *node);
 
 bool fsnode_is_acquire(FsNode *node);
 

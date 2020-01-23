@@ -106,17 +106,12 @@ int __plug_process_wait(int pid, int *exit_value);
 /* --- new handle api ------------------------------------------------------- */
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
-
 void __plug_handle_close(Handle *handle);
 
+void __plug_handle_connect(Handle *handle, const char *path);
+void __plug_handle_accept(Handle *handle, Handle *connection_handle);
+
 void __plug_handle_send(Handle *handle, Message *message);
-
 void __plug_handle_receive(Handle *handle, Message *message);
-
-void __plug_handle_request(Handle *handle, Message *request, Message *respond);
-
-void __plug_handle_payload(Handle *handle, Message *request);
-
+void __plug_handle_payload(Handle *handle, Message *message);
 void __plug_handle_discard(Handle *handle);
-
-void __plug_handle_respond(Handle *handle, Message *message);

@@ -7,8 +7,12 @@
 #include <libsystem/error.h>
 
 #include "node/Handle.h"
+#include "node/Connection.h"
 #include "sheduling/TaskBlockerRead.h"
+#include "sheduling/TaskBlockerReceive.h"
 #include "sheduling/TaskBlockerWrite.h"
+#include "sheduling/TaskBlockerAccept.h"
+#include "sheduling/TaskBlockerConnect.h"
 #include "tasking.h"
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
@@ -282,4 +286,132 @@ int fshandle_stat(FsHandle *handle, FileState *stat)
     }
 
     return result;
+}
+
+error_t fshandle_connect(FsNode *node, FsHandle **connection_handle)
+{
+    if (!node->open_connection)
+    {
+        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
+    }
+
+    fsnode_acquire_lock(node, sheduler_running_id());
+
+    FsNode *connection = node->open_connection(node);
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    if (connection == NULL)
+    {
+        return ERR_CONNECTION_REFUSED;
+    }
+
+    task_block(sheduler_running(), blocker_connect_create(connection));
+
+    *connection_handle = fshandle_create(connection, OPEN_CLIENT);
+    fsnode_deref(connection);
+
+    return ERR_SUCCESS;
+}
+
+error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
+{
+    FsNode *node = handle->node;
+
+    if (!node->accept_connection)
+    {
+        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
+    }
+
+    task_block(sheduler_running(), blocker_accept_create(node));
+
+    FsNode *connection = node->accept_connection(node);
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    *connection_handle = fshandle_create(connection, OPEN_SERVER);
+
+    fsnode_deref(connection);
+
+    return ERR_SUCCESS;
+}
+
+error_t fshandle_send(FsHandle *handle, Message *message)
+{
+    if (!fshandle_has_flag(handle, OPEN_WRITE))
+    {
+        return ERR_READ_ONLY_STREAM;
+    }
+
+    FsNode *node = handle->node;
+
+    if (!node->write)
+    {
+        return ERR_NOT_WRITABLE;
+    }
+
+    fsnode_acquire_lock(node, sheduler_running_id());
+
+    error_t result = node->send(node, handle, message);
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    return result;
+}
+
+error_t fshandle_receive(FsHandle *handle, Message *message)
+{
+    if (!fshandle_has_flag(handle, OPEN_READ))
+    {
+        return ERR_WRITE_ONLY_STREAM;
+    }
+
+    FsNode *node = handle->node;
+
+    if (!node->read)
+    {
+        return ERR_NOT_READABLE;
+    }
+
+    task_block(sheduler_running(), blocker_receive_create(handle));
+
+    if (handle->message != NULL)
+    {
+        free(handle->message);
+        handle->message = NULL;
+    }
+
+    error_t result = node->receive(node, handle, &handle->message);
+
+    if (handle->message != NULL)
+    {
+        memcpy(message, handle->message, sizeof(Message));
+    }
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    return result;
+}
+
+error_t fshandle_payload(FsHandle *handle, Message *message)
+{
+    if (handle->message == NULL)
+    {
+        return ERR_NO_MESSAGE;
+    }
+
+    memcpy(message, handle->message, handle->message->size);
+
+    return ERR_SUCCESS;
+}
+
+error_t fshandle_discard(FsHandle *handle)
+{
+    if (handle->message != NULL)
+    {
+        free(handle->message);
+        handle->message = NULL;
+    }
+
+    return ERR_SUCCESS;
 }

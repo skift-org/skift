@@ -112,6 +112,28 @@ FsHandle *filesystem_open(Path *path, OpenFlag flags)
     return handle;
 }
 
+error_t filesystem_connect(Path *path, FsHandle **connection_handle)
+{
+    FsNode *node = filesystem_find_and_ref(path);
+
+    if (node == NULL)
+    {
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
+
+    if (node->type == FSNODE_SOCKET)
+    {
+        fsnode_deref(node);
+        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
+    }
+
+    int result = fshandle_connect(node, connection_handle);
+
+    fsnode_deref(node);
+
+    return result;
+}
+
 int filesystem_mkdir(Path *path)
 {
     FsNode *directory = directory_create();

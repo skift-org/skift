@@ -6,13 +6,13 @@
 #include <libsystem/assert.h>
 #include <libsystem/error.h>
 
-#include "node/Handle.h"
 #include "node/Connection.h"
+#include "node/Handle.h"
+#include "sheduling/TaskBlockerAccept.h"
+#include "sheduling/TaskBlockerConnect.h"
 #include "sheduling/TaskBlockerRead.h"
 #include "sheduling/TaskBlockerReceive.h"
 #include "sheduling/TaskBlockerWrite.h"
-#include "sheduling/TaskBlockerAccept.h"
-#include "sheduling/TaskBlockerConnect.h"
 #include "tasking.h"
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
@@ -91,84 +91,92 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
     lock_release_by(handle->lock, who_release);
 }
 
-int fshandle_read(FsHandle *handle, void *buffer, size_t size)
+error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     if (!fshandle_has_flag(handle, OPEN_READ))
     {
-        return -ERR_WRITE_ONLY_STREAM;
+        return ERR_WRITE_ONLY_STREAM;
     }
 
     FsNode *node = handle->node;
 
     if (!node->read)
     {
-        return -ERR_NOT_READABLE;
+        return ERR_NOT_READABLE;
     }
 
     task_block(sheduler_running(), blocker_read_create(node));
 
-    int readded = node->read(node, handle, buffer, size);
+    *readed = 0;
 
-    if (readded > 0)
-    {
-        handle->offset += readded;
-    }
+    error_t result = node->read(node, handle, buffer, size, readed);
+
+    handle->offset += *readed;
 
     fsnode_release_lock(node, sheduler_running_id());
 
-    return readded;
+    return result;
 }
 
-int fshandle_write(FsHandle *handle, const void *buffer, size_t size)
+static error_t fshandle_write_interal(FsHandle *handle, const char *buffer, size_t size, size_t *written)
 {
+    FsNode *node = handle->node;
+
+    task_block(sheduler_running(), blocker_write_create(node));
+
+    if (fshandle_has_flag(handle, OPEN_APPEND))
+    {
+        if (node->size)
+        {
+            handle->offset = node->size(node, handle);
+        }
+    }
+
+    *written = 0;
+
+    error_t result = node->write(node, handle, buffer, size, written);
+
+    handle->offset += *written;
+
+    fsnode_release_lock(node, sheduler_running_id());
+
+    return result;
+}
+
+error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written)
+{
+    int remaining = size;
+    error_t result = ERR_SUCCESS;
+    size_t written_this_time = 0;
+
+    *written = 0;
+
     if (!fshandle_has_flag(handle, OPEN_WRITE))
     {
         return ERR_READ_ONLY_STREAM;
     }
 
-    FsNode *node = handle->node;
-
-    if (!node->write)
+    if (!handle->node->write)
     {
-        return -ERR_NOT_WRITABLE;
+        return ERR_NOT_WRITABLE;
     }
 
-    int written = 0;
-    int remaining = size;
-
-    while (remaining > 0)
+    while (remaining > 0 && result == ERR_SUCCESS)
     {
-        task_block(sheduler_running(), blocker_write_create(node));
+        result = fshandle_write_interal(
+            handle,
+            (void *)((uintptr_t)buffer + (size - remaining)),
+            remaining,
+            &written_this_time);
 
-        if (fshandle_has_flag(handle, OPEN_APPEND))
-        {
-            if (node->size)
-            {
-                handle->offset = node->size(node, handle);
-            }
-        }
-
-        int result = node->write(node, handle, (void *)((uintptr_t)buffer + written), remaining);
-
-        if (result <= 0)
-        {
-            remaining = 0;
-            written = result;
-        }
-        else
-        {
-            written += result;
-            remaining -= result;
-            handle->offset += result;
-        }
-
-        fsnode_release_lock(node, sheduler_running_id());
+        remaining -= written_this_time;
     }
 
-    return written;
+    *written = size - remaining;
+    return result;
 }
 
-off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where)
+error_t fshandle_seek(FsHandle *handle, int offset, Whence whence)
 {
     FsNode *node = handle->node;
 
@@ -184,19 +192,19 @@ off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where)
     switch (whence)
     {
     case WHENCE_START:
-        handle->offset = max(0, where);
+        handle->offset = max(0, offset);
         break;
 
     case WHENCE_HERE:
-        handle->offset = handle->offset + where;
+        handle->offset = handle->offset + offset;
         break;
 
     case WHENCE_END:
-        if (where < 0)
+        if (offset < 0)
         {
-            if ((size_t)-where <= size)
+            if ((size_t)-offset <= size)
             {
-                handle->offset = size + where;
+                handle->offset = size + offset;
             }
             else
             {
@@ -205,7 +213,7 @@ off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where)
         }
         else
         {
-            handle->offset = size + where;
+            handle->offset = size + offset;
         }
 
         break;
@@ -217,7 +225,7 @@ off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where)
     return -ERR_SUCCESS;
 }
 
-off_t fshandle_tell(FsHandle *handle, Whence whence)
+error_t fshandle_tell(FsHandle *handle, Whence whence, int *offset)
 {
     FsNode *node = handle->node;
 
@@ -234,18 +242,22 @@ off_t fshandle_tell(FsHandle *handle, Whence whence)
     {
     case WHENCE_START:
     case WHENCE_HERE:
-        return handle->offset;
+        *offset = handle->offset;
+        break;
 
     case WHENCE_END:
-        return handle->offset - size;
+        *offset = handle->offset - size;
+        break;
     default:
         ASSERT_NOT_REACHED();
     }
+
+    return ERR_SUCCESS;
 }
 
-int fshandle_call(FsHandle *handle, int request, void *args)
+error_t fshandle_call(FsHandle *handle, int request, void *args)
 {
-    int result = -ERR_OPERATION_NOT_SUPPORTED;
+    error_t result = ERR_OPERATION_NOT_SUPPORTED;
 
     FsNode *node = handle->node;
 
@@ -259,9 +271,9 @@ int fshandle_call(FsHandle *handle, int request, void *args)
     return result;
 }
 
-int fshandle_stat(FsHandle *handle, FileState *stat)
+error_t fshandle_stat(FsHandle *handle, FileState *stat)
 {
-    int result = -ERR_SUCCESS;
+    int result = ERR_SUCCESS;
 
     FsNode *node = handle->node;
 

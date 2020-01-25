@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
 
@@ -32,7 +32,7 @@ void error_set(error_t error)
 void error_print(const char *message)
 {
     logger_error("%s: %s", message, error_to_string(error_value));
-    iostream_printf(err_stream, "%s: %s\n", message, error_to_string(error_value));
+    stream_printf(err_stream, "%s: %s\n", message, error_to_string(error_value));
 }
 
 void if_error_throw_and_catch_fire(const char *message)

@@ -1,7 +1,7 @@
 #include <libsystem/__plugs__.h>
 
-#include <libsystem/network/Connection.h>
-#include <libsystem/network/Socket.h>
+#include <libsystem/io/Connection.h>
+#include <libsystem/io/Socket.h>
 
 Socket *socket_open(const char *path, OpenFlag flags)
 {
@@ -12,7 +12,7 @@ Socket *socket_open(const char *path, OpenFlag flags)
     return socket;
 }
 
-Socket *socket_close(Socket *socket)
+void socket_close(Socket *socket)
 {
     Connection *connection;
     while (list_peek(socket->connections, (void **)&connection))

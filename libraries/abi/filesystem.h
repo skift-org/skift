@@ -16,10 +16,13 @@ typedef enum
 typedef enum
 {
     FILE_TYPE_UNKNOWN,
+
     FILE_TYPE_REGULAR,
     FILE_TYPE_DEVICE,
     FILE_TYPE_DIRECTORY,
-    FILE_TYPE_FIFO,
+    FILE_TYPE_PIPE,
+    FILE_TYPE_SOCKET,
+    FILE_TYPE_CONNECTION,
 } FileType;
 
 typedef enum

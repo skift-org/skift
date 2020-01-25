@@ -26,7 +26,7 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 
 #include <limits.h> /* LONG_MAX */
 #include <libsystem/runtime.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libmath/math.h>
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1310) /*Visual Studio: A few warning types are not desired here.*/
@@ -307,33 +307,33 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value) {
 
 /* returns negative value on error. This should be pure C compatible, so no stat. */
 static long lodepng_filesize(const char* filename) {
-  IOStream* file;
+  Stream* file;
   long size;
-  file = iostream_open(filename, OPEN_READ);
+  file = stream_open(filename, OPEN_READ);
   if(!file) return -1;
 
-  if(iostream_seek(file, 0, WHENCE_END) != 0) {
-    iostream_close(file);
+  if(stream_seek(file, 0, WHENCE_END) != 0) {
+    stream_close(file);
     return -1;
   }
 
-  size = iostream_tell(file, WHENCE_START);
+  size = stream_tell(file, WHENCE_START);
   /* It may give LONG_MAX as directory size, this is invalid for us. */
   if(size == LONG_MAX) size = -1;
 
-  iostream_close(file);
+  stream_close(file);
   return size;
 }
 
 /* load file into buffer that already has the correct allocated size. Returns error code.*/
 static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename) {
-  IOStream* file;
+  Stream* file;
   size_t readsize;
-  file = iostream_open(filename, OPEN_READ);
+  file = stream_open(filename, OPEN_READ);
   if(!file) return 78;
 
-  readsize = iostream_read(file, out, size);
-  iostream_close(file);
+  readsize = stream_read(file, out, size);
+  stream_close(file);
 
   if (readsize != size) return 78;
   return 0;
@@ -352,11 +352,11 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
 
 /*write given buffer to the file, overwriting the file, it doesn't append to it.*/
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename) {
-  IOStream* file;
-  file = iostream_open(filename, OPEN_WRITE);
+  Stream* file;
+  file = stream_open(filename, OPEN_WRITE);
   if(!file) return 79;
-  iostream_write(file, buffer, buffersize);
-  iostream_close(file);
+  stream_write(file, buffer, buffersize);
+  stream_close(file);
   return 0;
 }
 

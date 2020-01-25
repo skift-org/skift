@@ -8,15 +8,15 @@
 #include <libgraphic/framebuffer.h>
 #include <libsystem/debug.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libterminal/Terminal.h>
 
-static IOStream *terminal_fifo = NULL;
+static Stream *terminal_fifo = NULL;
 
 /* --- Textmode terminal ---------------------------------------------------- */
 
-static IOStream *textmode_device = NULL;
+static Stream *textmode_device = NULL;
 static textmode_info_t textmode_info;
 static ushort *textmode_buffer = NULL;
 
@@ -58,14 +58,14 @@ void textmode_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
 
 Terminal *terminal_create_textmode_console(void)
 {
-    textmode_device = iostream_open(TEXTMODE_DEVICE, OPEN_WRITE);
+    textmode_device = stream_open(TEXTMODE_DEVICE, OPEN_WRITE);
 
     if (textmode_device == NULL)
     {
         return NULL;
     }
 
-    if (iostream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info))
+    if (stream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info))
     {
         error_print("Failled to get textmode info");
         return NULL;
@@ -209,7 +209,7 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    terminal_fifo = iostream_open("/dev/term", OPEN_READ);
+    terminal_fifo = stream_open("/dev/term", OPEN_READ);
 
     if (terminal_fifo == NULL)
     {
@@ -227,7 +227,7 @@ int main(int argc, char const *argv[])
 
         if (terminal == NULL)
         {
-            iostream_close(terminal_fifo);
+            stream_close(terminal_fifo);
 
             return -1;
         }
@@ -243,14 +243,14 @@ int main(int argc, char const *argv[])
     {
 #define READ_BUFFER_SIZE 512
         char buffer[READ_BUFFER_SIZE];
-        int size = iostream_read(terminal_fifo, buffer, READ_BUFFER_SIZE);
+        int size = stream_read(terminal_fifo, buffer, READ_BUFFER_SIZE);
 
         terminal_write(terminal, buffer, size);
 
         if (!is_framebuffer)
         {
-            iostream_call(textmode_device, TEXTMODE_CALL_SET_INFO, &textmode_info);
-            iostream_write(textmode_device, textmode_buffer, textmode_info.width * textmode_info.height * sizeof(ushort));
+            stream_call(textmode_device, TEXTMODE_CALL_SET_INFO, &textmode_info);
+            stream_write(textmode_device, textmode_buffer, textmode_info.width * textmode_info.height * sizeof(ushort));
         }
         else
         {

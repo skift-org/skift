@@ -5,7 +5,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
 static bool option_all = false;
@@ -62,18 +62,18 @@ void ls_print_entry(DirectoryEntry *entry)
 
 int ls(const char *target_path)
 {
-    IOStream *dir = iostream_open(target_path, OPEN_READ);
+    Stream *dir = stream_open(target_path, OPEN_READ);
 
     if (dir != NULL)
     {
         FileState stat = {0};
-        iostream_stat(dir, &stat);
+        stream_stat(dir, &stat);
 
         if (stat.type == FILE_TYPE_DIRECTORY)
         {
             DirectoryEntry entry;
 
-            while (iostream_read(dir, &entry, sizeof(entry)) > 0)
+            while (stream_read(dir, &entry, sizeof(entry)) > 0)
             {
                 ls_print_entry(&entry);
             }
@@ -93,13 +93,13 @@ int ls(const char *target_path)
             printf("\n");
         }
 
-        iostream_close(dir);
+        stream_close(dir);
 
         return 0;
     }
     else
     {
-        iostream_printf(err_stream, "ls: cannot access '%s'", target_path);
+        stream_printf(err_stream, "ls: cannot access '%s'", target_path);
         error_print("");
         return -1;
     }

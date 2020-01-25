@@ -2,11 +2,11 @@
 
 #include <libgraphic/bitmap.h>
 #include <libgraphic/painter.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 typedef struct
 {
-    IOStream *device;
+    Stream *device;
     Bitmap *backbuffer;
     Painter *painter;
 

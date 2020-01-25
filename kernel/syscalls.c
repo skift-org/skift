@@ -17,7 +17,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/system.h>
 
-#include <libkernel/syscalls.h>
+#include <abi/Syscalls.h>
 
 #include "clock.h"
 #include "filesystem/Filesystem.h"
@@ -164,58 +164,7 @@ int sys_messaging_unsubscribe(const char *channel)
     return task_messaging_unsubscribe(sheduler_running(), channel);
 }
 
-/* --- Filesystem and IO ---------------------------------------------------- */
-
-int sys_filesystem_open(const char *path, OpenFlag flags)
-{
-    int fd;
-
-    int err = task_fshandle_open(sheduler_running(), &fd, path, flags);
-
-    if (err)
-    {
-        return -err;
-    }
-    else
-    {
-        return fd;
-    }
-}
-
-int sys_filesystem_close(int fd)
-{
-    return -task_fshandle_close(sheduler_running(), fd);
-}
-
-int sys_filesystem_read(int fd, void *buffer, uint size)
-{
-    return task_fshandle_read(sheduler_running(), fd, buffer, size);
-}
-
-int sys_filesystem_write(int fd, void *buffer, uint size)
-{
-    return task_fshandle_write(sheduler_running(), fd, buffer, size);
-}
-
-int sys_filesystem_call(int fd, int request, void *args)
-{
-    return task_fshandle_call(sheduler_running(), fd, request, args);
-}
-
-int sys_filesystem_seek(int fd, int offset, Whence whence)
-{
-    return task_fshandle_seek(sheduler_running(), fd, whence, offset);
-}
-
-int sys_filesystem_tell(int fd, Whence whence)
-{
-    return task_fshandle_tell(sheduler_running(), fd, whence);
-}
-
-int sys_filesystem_stat(int fd, FileState *stat)
-{
-    return task_fshandle_stat(sheduler_running(), fd, stat);
-}
+/* --- Filesystem ----------------------------------------------------------- */
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
@@ -335,6 +284,36 @@ int sys_handle_close(int handle)
     return task_fshandle_close(sheduler_running(), handle);
 }
 
+int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)
+{
+    return task_fshandle_read(sheduler_running(), handle, buffer, size, readed);
+}
+
+int sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
+{
+    return task_fshandle_write(sheduler_running(), handle, buffer, size, written);
+}
+
+int sys_handle_call(int handle, int request, void *args)
+{
+    return task_fshandle_call(sheduler_running(), handle, request, args);
+}
+
+int sys_handle_seek(int handle, int offset, Whence whence)
+{
+    return task_fshandle_seek(sheduler_running(), handle, offset, whence);
+}
+
+int sys_handle_tell(int handle, Whence whence, int *offset)
+{
+    return task_fshandle_tell(sheduler_running(), handle, whence, offset);
+}
+
+int sys_handle_stat(int handle, FileState *state)
+{
+    return task_fshandle_stat(sheduler_running(), handle, state);
+}
+
 int sys_handle_connect(int *handle, const char *path)
 {
     return task_fshandle_connect(sheduler_running(), handle, path);
@@ -365,7 +344,7 @@ int sys_handle_discard(int handle)
     return task_fshandle_discard(sheduler_running(), handle);
 }
 
-static int (*syscalls[SYSCALL_COUNT])() = {
+static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_EXEC] = sys_process_exec,
     [SYS_PROCESS_EXIT] = sys_process_exit,
@@ -392,16 +371,6 @@ static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_MESSAGING_SUBSCRIBE] = sys_messaging_subscribe,
     [SYS_MESSAGING_UNSUBSCRIBE] = sys_messaging_unsubscribe,
 
-    [SYS_FILESYSTEM_OPEN] = sys_filesystem_open,
-    [SYS_FILESYSTEM_CLOSE] = sys_filesystem_close,
-
-    [SYS_FILESYSTEM_READ] = sys_filesystem_read,
-    [SYS_FILESYSTEM_WRITE] = sys_filesystem_write,
-    [SYS_FILESYSTEM_CALL] = sys_filesystem_call,
-    [SYS_FILESYSTEM_SEEK] = sys_filesystem_seek,
-    [SYS_FILESYSTEM_TELL] = sys_filesystem_tell,
-    [SYS_FILESYSTEM_STAT] = sys_filesystem_stat,
-
     [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
     [SYS_FILESYSTEM_MKPIPE] = sys_filesystem_mkpipe,
     [SYS_FILESYSTEM_LINK] = sys_filesystem_link,
@@ -415,6 +384,12 @@ static int (*syscalls[SYSCALL_COUNT])() = {
 
     [SYS_HANDLE_OPEN] = sys_handle_open,
     [SYS_HANDLE_CLOSE] = sys_handle_close,
+    [SYS_HANDLE_READ] = sys_handle_read,
+    [SYS_HANDLE_WRITE] = sys_handle_write,
+    [SYS_HANDLE_CALL] = sys_handle_call,
+    [SYS_HANDLE_SEEK] = sys_handle_seek,
+    [SYS_HANDLE_TELL] = sys_handle_tell,
+    [SYS_HANDLE_STAT] = sys_handle_stat,
     [SYS_HANDLE_CONNECT] = sys_handle_connect,
     [SYS_HANDLE_ACCEPT] = sys_handle_accept,
     [SYS_HANDLE_SEND] = sys_handle_send,
@@ -423,9 +398,9 @@ static int (*syscalls[SYSCALL_COUNT])() = {
     [SYS_HANDLE_DISCARD] = sys_handle_discard,
 };
 
-syscall_handler_t syscall_get_handler(syscall_t syscall)
+syscall_handler_t syscall_get_handler(Syscall syscall)
 {
-    if (syscall >= 0 && syscall < SYSCALL_COUNT)
+    if (syscall >= 0 && syscall < __SYSCALL_COUNT)
     {
         if ((syscall_handler_t)syscalls[syscall] == NULL)
         {
@@ -441,9 +416,14 @@ syscall_handler_t syscall_get_handler(syscall_t syscall)
     }
 }
 
+#define SYSCALL_NAMES_ENTRY(__entry) #__entry,
+
+static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
+
 void syscall_dispatcher(processor_context_t *context)
 {
-    syscall_handler_t handler = syscall_get_handler((syscall_t)context->eax);
+    Syscall syscall = (Syscall)context->eax;
+    syscall_handler_t handler = syscall_get_handler(syscall);
 
     if (handler != NULL)
     {
@@ -453,5 +433,15 @@ void syscall_dispatcher(processor_context_t *context)
     {
         logger_info("context: EBX=%08x, ECX=%08x, EDX=%08x, ESI=%08x, EDI=%08x", context->ebx, context->ecx, context->edx, context->esi, context->edi);
         context->eax = -ERR_FUNCTION_NOT_IMPLEMENTED;
+    }
+
+    if (syscall >= SYS_HANDLE_OPEN && context->eax != ERR_SUCCESS)
+    {
+        logger_info("Syscall %s(0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) returned %s", syscall_names[syscall], context->ebx, context->ecx, context->edx, context->esi, context->edi, error_to_string(context->eax));
+    }
+
+    if (syscall < SYS_HANDLE_OPEN && (int)context->eax < 0)
+    {
+        logger_info("Syscall %s(0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) returned %s", syscall_names[syscall], context->ebx, context->ecx, context->edx, context->esi, context->edi, error_to_string(-context->eax));
     }
 }

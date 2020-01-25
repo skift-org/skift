@@ -6,23 +6,27 @@
 
 #include "filesystem/Filesystem.h"
 
-static int zero_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, uint size)
+static error_t zero_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
 
     memset(buffer, 0, size);
 
-    return size;
+    *readed = size;
+
+    return ERR_SUCCESS;
 }
 
-static int zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size)
+static error_t zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
     __unused(buffer);
 
-    return size;
+    *writen = size;
+
+    return ERR_SUCCESS;
 }
 
 void zero_initialize(void)

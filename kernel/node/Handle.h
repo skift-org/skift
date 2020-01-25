@@ -32,14 +32,14 @@ bool fshandle_is_locked(FsHandle *handle);
 void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
 void fshandle_release_lock(FsHandle *handle, int who_release);
 
-int fshandle_read(FsHandle *handle, void *buffer, size_t size);
-int fshandle_write(FsHandle *handle, const void *buffer, size_t size);
+error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed);
+error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
-off_t fshandle_seek(FsHandle *handle, Whence whence, off_t where);
-off_t fshandle_tell(FsHandle *handle, Whence whence);
+error_t fshandle_seek(FsHandle *handle, int offset, Whence whence);
+error_t fshandle_tell(FsHandle *handle, Whence whence, int *offset);
 
-int fshandle_call(FsHandle *handle, int request, void *args);
-int fshandle_stat(FsHandle *handle, FileState *stat);
+error_t fshandle_call(FsHandle *handle, int request, void *args);
+error_t fshandle_stat(FsHandle *handle, FileState *stat);
 
 error_t fshandle_connect(FsNode *node, FsHandle **connection_handle);
 error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle);

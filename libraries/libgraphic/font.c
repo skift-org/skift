@@ -5,7 +5,7 @@
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/path.h>
 
@@ -17,7 +17,7 @@ Glyph *font_load_glyph(const char *name)
     snprintf(glyph_path, PATH_LENGHT, "/res/font/%s.glyph", name);
     logger_trace("Loading fonts glyph of %s from %s", name, glyph_path);
 
-    IOStream *glyph_file = iostream_open(glyph_path, OPEN_READ);
+    Stream *glyph_file = stream_open(glyph_path, OPEN_READ);
 
     if (!glyph_file)
     {
@@ -27,19 +27,19 @@ Glyph *font_load_glyph(const char *name)
     }
 
     FileState stat;
-    iostream_stat(glyph_file, &stat);
+    stream_stat(glyph_file, &stat);
     if (stat.type != FILE_TYPE_REGULAR)
     {
-        logger_error("Failled to load font glyph from %s: The glyph file isn't a regular file!", glyph_path);
+        logger_error("Failled to load font glyph from %s: The glyph file isn't a regular file but %d!", glyph_path, stat.type);
 
-        iostream_close(glyph_file);
+        stream_close(glyph_file);
         return NULL;
     }
 
     Glyph *glyph = malloc(stat.size);
-    iostream_read(glyph_file, glyph, stat.size);
+    stream_read(glyph_file, glyph, stat.size);
 
-    iostream_close(glyph_file);
+    stream_close(glyph_file);
 
     return glyph;
 }

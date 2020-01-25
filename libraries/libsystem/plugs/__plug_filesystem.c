@@ -4,7 +4,7 @@
 
 #include <libsystem/__plugs__.h>
 #include <libsystem/filesystem.h>
-#include <libkernel/syscalls.h>
+#include <abi/Syscalls.h>
 
 int filesystem_link(const char *oldpath, const char *newpath)
 {

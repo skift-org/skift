@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/messaging.h>
-#include <libkernel/syscalls.h>
+#include <abi/Syscalls.h>
 #include <libsystem/error.h>
 
 int messaging_send(message_t *event)

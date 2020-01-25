@@ -178,17 +178,17 @@ error_t task_fshandle_close(Task *this, int handle_index);
 
 void task_fshandle_close_all(Task *this);
 
-int task_fshandle_read(Task *this, int handle_index, void *buffer, uint size);
+error_t task_fshandle_read(Task *this, int handle_index, void *buffer, size_t size, size_t *readed);
 
-int task_fshandle_write(Task *this, int handle_index, const void *buffer, uint size);
+error_t task_fshandle_write(Task *this, int handle_index, const void *buffer, size_t size, size_t *written);
 
-int task_fshandle_call(Task *this, int handle_index, int request, void *args);
+error_t task_fshandle_seek(Task *this, int handle_index, int offset, Whence whence);
 
-int task_fshandle_seek(Task *this, int handle_index, Whence whence, off_t offset);
+error_t task_fshandle_tell(Task *this, int handle_index, Whence whence, int *offset);
 
-int task_fshandle_tell(Task *this, int handle_index, Whence whence);
+error_t task_fshandle_call(Task *this, int handle_index, int request, void *args);
 
-int task_fshandle_stat(Task *this, int handle_index, FileState *stat);
+error_t task_fshandle_stat(Task *this, int handle_index, FileState *stat);
 
 error_t task_fshandle_connect(Task *this, int *handle_index, const char *path);
 

@@ -5,7 +5,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
 
@@ -38,43 +38,43 @@ static CommandLine cmdline = CMDLINE(
 
 int loadkey_list_keymap()
 {
-    IOStream *dir = iostream_open("/res/keyboard", OPEN_READ);
+    Stream *dir = stream_open("/res/keyboard", OPEN_READ);
 
     DirectoryEntry entry = {0};
-    while (iostream_read(dir, &entry, sizeof(entry)) > 0)
+    while (stream_read(dir, &entry, sizeof(entry)) > 0)
     {
         // FIXME: maybe show some info about the kmap file
         printf("- %s\n", entry.name);
     }
 
-    iostream_close(dir);
+    stream_close(dir);
 
     return 0;
 }
 
-int loadkey_set_keymap(IOStream *keyboard_device, const char *keymap_path)
+int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
-    IOStream *keymap_file = iostream_open(keymap_path, OPEN_READ);
+    Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
     if (keymap_file != NULL)
     {
         FileState stat;
-        iostream_stat(keymap_file, &stat);
+        stream_stat(keymap_file, &stat);
 
         logger_info("Allocating keymap of size %dkio", stat.size / 1024);
 
         if (stat.size < sizeof(keymap_t))
         {
-            iostream_printf(err_stream, "Invalid keymap file format!\n");
+            stream_printf(err_stream, "Invalid keymap file format!\n");
             return -1;
         }
 
         keymap_t *new_keymap = malloc(stat.size);
 
-        iostream_read(keymap_file, new_keymap, stat.size);
+        stream_read(keymap_file, new_keymap, stat.size);
 
-        iostream_close(keymap_file);
+        stream_close(keymap_file);
 
         if (new_keymap->magic[0] == 'k' &&
             new_keymap->magic[1] == 'm' &&
@@ -82,7 +82,7 @@ int loadkey_set_keymap(IOStream *keyboard_device, const char *keymap_path)
             new_keymap->magic[3] == 'p')
         {
             keyboard_set_keymap_args_t args = {.size = stat.size, .keymap = new_keymap};
-            iostream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
+            stream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
 
             printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
 
@@ -94,7 +94,7 @@ int loadkey_set_keymap(IOStream *keyboard_device, const char *keymap_path)
         {
             free(new_keymap);
 
-            iostream_printf(err_stream, "Invalid keymap file format!\n");
+            stream_printf(err_stream, "Invalid keymap file format!\n");
 
             return -1;
         }
@@ -107,11 +107,11 @@ int loadkey_set_keymap(IOStream *keyboard_device, const char *keymap_path)
     }
 }
 
-int loadkey_get_keymap(IOStream *keyboard_device)
+int loadkey_get_keymap(Stream *keyboard_device)
 {
     keymap_t keymap;
 
-    if (iostream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) == 0)
+    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) == 0)
     {
         printf("Current keymap is %s(%s)\n", keymap.language, keymap.region);
 
@@ -119,7 +119,7 @@ int loadkey_get_keymap(IOStream *keyboard_device)
     }
     else
     {
-        iostream_printf(err_stream, "Failled to retrived the current keymap!\n");
+        stream_printf(err_stream, "Failled to retrived the current keymap!\n");
 
         return -1;
     }
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    IOStream *keyboard_device = iostream_open(KEYBOARD_DEVICE, OPEN_READ);
+    Stream *keyboard_device = stream_open(KEYBOARD_DEVICE, OPEN_READ);
 
     if (keyboard_device == NULL)
     {
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
         return loadkey_set_keymap(keyboard_device, font_path);
     }
 
-    iostream_close(keyboard_device);
+    stream_close(keyboard_device);
 
     return 0;
 }

@@ -6,7 +6,7 @@
 
 #include <libsystem/process.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libkernel/task.h>
 
 int main(int argc, char const *argv[])

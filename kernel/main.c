@@ -21,7 +21,7 @@
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
 #include "x86/gdt.h"

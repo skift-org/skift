@@ -69,20 +69,24 @@ int serial_write(const char *buffer, uint size)
 
 /* --- Serial device  node -------------------------------------------------- */
 
-static int serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, uint size)
+static error_t serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
 
-    return serial_read(buffer, size);
+    *readed = serial_read(buffer, size);
+
+    return ERR_SUCCESS;
 }
 
-static int serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size)
+static error_t serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
 
-    return serial_write(buffer, size);
+    *writen = serial_write(buffer, size);
+
+    return ERR_SUCCESS;
 }
 
 void serial_initialize(void)

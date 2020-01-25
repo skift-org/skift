@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/cstring.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 #include "x86/cpuid.h"
 
@@ -35,227 +35,227 @@ void cpuid_dump()
 
     if (cid.PCLMUL)
     {
-        puts(" PCLMUL");
+        printf(" PCLMUL");
     }
     if (cid.DTES64)
     {
-        puts(" DTES64");
+        printf(" DTES64");
     }
     if (cid.MONITOR)
     {
-        puts(" MONITOR");
+        printf(" MONITOR");
     }
     if (cid.DS_CPL)
     {
-        puts(" DS_CPL");
+        printf(" DS_CPL");
     }
     if (cid.VMX)
     {
-        puts(" VMX");
+        printf(" VMX");
     }
     if (cid.SMX)
     {
-        puts(" SMX");
+        printf(" SMX");
     }
     if (cid.EST)
     {
-        puts(" EST");
+        printf(" EST");
     }
     if (cid.TM2)
     {
-        puts(" TM2");
+        printf(" TM2");
     }
     if (cid.SSSE3)
     {
-        puts(" SSSE3");
+        printf(" SSSE3");
     }
     if (cid.CID)
     {
-        puts(" CID");
+        printf(" CID");
     }
     if (cid.FMA)
     {
-        puts(" FMA");
+        printf(" FMA");
     }
     if (cid.CX16)
     {
-        puts(" CX16");
+        printf(" CX16");
     }
     if (cid.ETPRD)
     {
-        puts(" ETPRD");
+        printf(" ETPRD");
     }
     if (cid.PDCM)
     {
-        puts(" PDCM");
+        printf(" PDCM");
     }
     if (cid.PCIDE)
     {
-        puts(" PCIDE");
+        printf(" PCIDE");
     }
     if (cid.DCA)
     {
-        puts(" DCA");
+        printf(" DCA");
     }
     if (cid.SSE4_1)
     {
-        puts(" SSE4_1");
+        printf(" SSE4_1");
     }
     if (cid.SSE4_2)
     {
-        puts(" SSE4_2");
+        printf(" SSE4_2");
     }
     if (cid.x2APIC)
     {
-        puts(" x2APIC");
+        printf(" x2APIC");
     }
     if (cid.MOVBE)
     {
-        puts(" MOVBE");
+        printf(" MOVBE");
     }
     if (cid.POPCNT)
     {
-        puts(" POPCNT");
+        printf(" POPCNT");
     }
     if (cid.AES)
     {
-        puts(" AES");
+        printf(" AES");
     }
     if (cid.XSAVE)
     {
-        puts(" XSAVE");
+        printf(" XSAVE");
     }
     if (cid.OSXSAVE)
     {
-        puts(" OSXSAVE");
+        printf(" OSXSAVE");
     }
     if (cid.AVX)
     {
-        puts(" AVX");
+        printf(" AVX");
     }
     if (cid.FPU)
     {
-        puts(" FPU");
+        printf(" FPU");
     }
     if (cid.VME)
     {
-        puts(" VME");
+        printf(" VME");
     }
     if (cid.DE)
     {
-        puts(" DE");
+        printf(" DE");
     }
     if (cid.PSE)
     {
-        puts(" PSE");
+        printf(" PSE");
     }
     if (cid.TSC)
     {
-        puts(" TSC");
+        printf(" TSC");
     }
     if (cid.MSR)
     {
-        puts(" MSR");
+        printf(" MSR");
     }
     if (cid.PAE)
     {
-        puts(" PAE");
+        printf(" PAE");
     }
     if (cid.MCE)
     {
-        puts(" MCE");
+        printf(" MCE");
     }
     if (cid.CX8)
     {
-        puts(" CX8");
+        printf(" CX8");
     }
     if (cid.APIC)
     {
-        puts(" APIC");
+        printf(" APIC");
     }
     if (cid.SEP)
     {
-        puts(" SEP");
+        printf(" SEP");
     }
     if (cid.MTRR)
     {
-        puts(" MTRR");
+        printf(" MTRR");
     }
     if (cid.PGE)
     {
-        puts(" PGE");
+        printf(" PGE");
     }
     if (cid.MCA)
     {
-        puts(" MCA");
+        printf(" MCA");
     }
     if (cid.CMOV)
     {
-        puts(" CMOV");
+        printf(" CMOV");
     }
     if (cid.PAT)
     {
-        puts(" PAT");
+        printf(" PAT");
     }
     if (cid.PSE36)
     {
-        puts(" PSE36");
+        printf(" PSE36");
     }
     if (cid.PSN)
     {
-        puts(" PSN");
+        printf(" PSN");
     }
     if (cid.CLF)
     {
-        puts(" CLF");
+        printf(" CLF");
     }
     if (cid.DTES)
     {
-        puts(" DTES");
+        printf(" DTES");
     }
     if (cid.ACPI)
     {
-        puts(" ACPI");
+        printf(" ACPI");
     }
     if (cid.MMX)
     {
-        puts(" MMX");
+        printf(" MMX");
     }
     if (cid.FXSR)
     {
-        puts(" FXSR");
+        printf(" FXSR");
     }
     if (cid.SSE)
     {
-        puts(" SSE");
+        printf(" SSE");
     }
     if (cid.SSE2)
     {
-        puts(" SSE2");
+        printf(" SSE2");
     }
     if (cid.SSE3)
     {
-        puts(" SSE3");
+        printf(" SSE3");
     }
     if (cid.SS)
     {
-        puts(" SS");
+        printf(" SS");
     }
     if (cid.HTT)
     {
-        puts(" HTT");
+        printf(" HTT");
     }
     if (cid.TM1)
     {
-        puts(" TM1");
+        printf(" TM1");
     }
     if (cid.IA64)
     {
-        puts(" IA64");
+        printf(" IA64");
     }
     if (cid.PBE)
     {
-        puts(" PBE");
+        printf(" PBE");
     }
-    puts("\n");
+    printf("\n");
 }

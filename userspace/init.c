@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/cstring.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 #include <libgraphic/framebuffer.h>
 #include <libsystem/filesystem.h>
@@ -34,8 +34,6 @@ int main(int argc, char **argv)
     __unused(argv);
 
     logger_level(LOGGER_TRACE);
-
-    iostream_flush(out_stream);
 
     filesystem_mkpipe("/dev/term");
     init_exec("/bin/term");

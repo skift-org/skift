@@ -75,7 +75,11 @@ LIBPOSIX_SRC=$(wildcard libraries/libposix/*.c)
 LIBPOSIX_OBJ=$(patsubst %.c,%.o,$(LIBPOSIX_SRC))
 
 LIBSYSTEM=$(ROOT_DIRECTORY)/lib/libsystem.a
-LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/plugs/*.c) $(wildcard libraries/libsystem/unicode/*.c)
+LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
+			  $(wildcard libraries/libsystem/plugs/*.c) \
+			  $(wildcard libraries/libsystem/unicode/*.c) \
+			  $(wildcard libraries/libsystem/io/*.c)
+
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 
 CRTS=$(ROOT_DIRECTORY)/lib/crt0.o \
@@ -124,7 +128,7 @@ USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/wm
 
 KERNEL=$(BUILD_DIRECTORY)/kernel.bin
-KERNEL_CSOURCES=$(wildcard kernel/*.c) $(wildcard kernel/*/*.c) $(wildcard libraries/libsystem/*.c) $(wildcard libraries/libfile/*.c)
+KERNEL_CSOURCES=$(wildcard kernel/*.c) $(wildcard kernel/*/*.c) $(wildcard libraries/libsystem/*.c) $(wildcard libraries/libsystem/io/*.c) $(wildcard libraries/libfile/*.c)
 KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
 KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.kernel.o} ${KERNEL_SSOURCES:.s=.kernel.o}
 

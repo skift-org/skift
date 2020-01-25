@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 #include <libwidget/Widgets.h>
 #include <libwidget/core/Application.h>

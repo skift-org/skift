@@ -6,14 +6,14 @@
 
 // this header list all "plugs" function between the library and the syscalls or the kernel
 
-#include <libsystem/iostream.h>
 #include <libsystem/lock.h>
 #include <libsystem/runtime.h>
 #include <libsystem/system.h>
 #include <libsystem/time.h>
 
-#include <abi/Handle.h>
-#include <abi/Message.h>
+#include "abi/Handle.h"
+#include "abi/Message.h"
+#include "abi/filesystem.h"
 
 void __plug_init(void);
 
@@ -38,24 +38,6 @@ int __plug_memalloc_unlock(void);
 void *__plug_memalloc_alloc(uint size);
 
 int __plug_memalloc_free(void *memory, uint size);
-
-// IO stream ---------------------------------------------------------------- //
-
-int __plug_iostream_open(const char *path, OpenFlag flags);
-
-int __plug_iostream_close(int fd);
-
-int __plug_iostream_read(int fd, void *buffer, uint size);
-
-int __plug_iostream_write(int fd, const void *buffer, uint size);
-
-int __plug_iostream_call(int fd, int request, void *args);
-
-int __plug_iostream_seek(int fd, int offset, Whence whence);
-
-int __plug_iostream_tell(int fd, Whence whence);
-
-int __plug_iostream_stat(int fd, FileState *stat);
 
 /* --- File system ---------------------------------------------------------- */
 
@@ -107,6 +89,15 @@ int __plug_process_wait(int pid, int *exit_value);
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
 void __plug_handle_close(Handle *handle);
+
+size_t __plug_handle_read(Handle *handle, void *buffer, size_t size);
+size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size);
+
+error_t __plug_handle_call(Handle *handle, int request, void *args);
+int __plug_handle_seek(Handle *handle, int offset, Whence whence);
+
+int __plug_handle_tell(Handle *handle, Whence whence);
+int __plug_handle_stat(Handle *handle, FileState *stat);
 
 void __plug_handle_connect(Handle *handle, const char *path);
 void __plug_handle_accept(Handle *handle, Handle *connection_handle);

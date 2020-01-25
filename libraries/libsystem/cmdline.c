@@ -7,7 +7,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/convert.h>
 #include <libsystem/cstring.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/process.h>
 
 /* --- Private functions ---------------------------------------------------- */
@@ -175,7 +175,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
 
             if (option == NULL)
             {
-                iostream_printf(err_stream, "Unknow option '%s'!\n", current_argument + 2);
+                stream_printf(err_stream, "Unknow option '%s'!\n", current_argument + 2);
                 process_exit(-1);
             }
 
@@ -189,7 +189,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
 
                 if (option == NULL)
                 {
-                    iostream_printf(err_stream, "Unknow option '%c'!\n", current_argument[1 + j]);
+                    stream_printf(err_stream, "Unknow option '%c'!\n", current_argument[1 + j]);
                     process_exit(-1);
                 }
 

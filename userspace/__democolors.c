@@ -4,7 +4,7 @@
 
 #include <libgraphic/framebuffer.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
 {

@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/error.h>
 
 #include <libgraphic/framebuffer.h>
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    IOStream *random_device = iostream_open("/dev/random", OPEN_READ);
+    Stream *random_device = stream_open("/dev/random", OPEN_READ);
 
     if (random_device == NULL)
     {
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     do
     {
         line_t line;
-        iostream_read(random_device, &line, sizeof(line));
+        stream_read(random_device, &line, sizeof(line));
 
         line.start.X = abs((int)line.start.X % 800);
         line.start.Y = abs((int)line.start.Y % 600);

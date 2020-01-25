@@ -39,9 +39,10 @@ void ramdisk_load(multiboot_module_t *module)
 
             if (handle != NULL)
             {
-                int result = fshandle_write(handle, block.data, block.size);
+                size_t writen = 0;
+                error_t result = fshandle_write(handle, block.data, block.size, &writen);
 
-                if (result < 0)
+                if (result != ERR_SUCCESS)
                 {
                     logger_error("Failled to write file: %s", error_to_string(-result));
                 }

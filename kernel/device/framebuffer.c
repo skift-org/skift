@@ -198,7 +198,7 @@ error_t framebuffer_set_mode_mboot(multiboot_info_t *mboot)
     framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
     framebuffer_size = (Point){mboot->framebuffer_width, mboot->framebuffer_height};
 
-    return -ERR_SUCCESS;
+    return ERR_SUCCESS;
 }
 
 error_t framebuffer_set_mode_bga(Point res)
@@ -225,7 +225,7 @@ error_t framebuffer_set_mode_bga(Point res)
                 framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
                 if (framebuffer_virtual_addr == NULL)
                 {
-                    return -ERR_CANNOT_ALLOCATE_MEMORY;
+                    return ERR_CANNOT_ALLOCATE_MEMORY;
                 }
 
                 logger_info("BGA: framebuffer found at 0x%08x", framebuffer_physical_addr);
@@ -235,7 +235,7 @@ error_t framebuffer_set_mode_bga(Point res)
                 logger_error("BGA: no framebuffer found!");
 
                 // FIXME: maybe this is note the right error code
-                return -ERR_NO_SUCH_DEVICE_OR_ADDRESS;
+                return ERR_NO_SUCH_DEVICE_OR_ADDRESS;
             }
         }
 
@@ -246,12 +246,12 @@ error_t framebuffer_set_mode_bga(Point res)
 
         framebuffer_size = res;
 
-        return -ERR_SUCCESS;
+        return ERR_SUCCESS;
     }
     else
     {
         logger_warn("Failled to create framebuffer !");
-        return -ERR_INVALID_ARGUMENT;
+        return ERR_INVALID_ARGUMENT;
     }
 }
 
@@ -282,7 +282,7 @@ int framebuffer_FsOperationOpen(FsNode *node, FsHandle *handle)
         lock_release(backbuffer_stack_lock);
     }
 
-    return -ERR_SUCCESS;
+    return ERR_SUCCESS;
 }
 
 void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
@@ -320,7 +320,7 @@ void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
     }
 }
 
-int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
 
@@ -334,7 +334,7 @@ int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 
         lock_release(backbuffer_stack_lock);
 
-        return -ERR_SUCCESS;
+        return ERR_SUCCESS;
     }
     else if (request == FRAMEBUFFER_CALL_SET_MODE)
     {
@@ -342,7 +342,7 @@ int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 
         logger_info("Setting mode to %dx%d...", mode_info->size.X, mode_info->size.Y);
 
-        int result = framebuffer_set_mode_bga(mode_info->size);
+        error_t result = framebuffer_set_mode_bga(mode_info->size);
 
         lock_release(backbuffer_stack_lock);
 
@@ -350,7 +350,7 @@ int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
     }
     else if (request == FRAMEBUFFER_CALL_BLIT)
     {
-        if (handle->flags & OPEN_WRITE)
+        if (fshandle_has_flag(handle, OPEN_WRITE))
         {
             framebuffer_blit_args_t *blitargs = args;
 
@@ -369,13 +369,13 @@ int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
             }
             lock_release(backbuffer_stack_lock);
 
-            return -ERR_SUCCESS;
+            return ERR_SUCCESS;
         }
         else
         {
             lock_release(backbuffer_stack_lock);
 
-            return -ERR_READ_ONLY_STREAM;
+            return ERR_READ_ONLY_STREAM;
         }
     }
     else if (request == FRAMEBUFFER_CALL_BLITREGION)
@@ -403,20 +403,20 @@ int framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 
             lock_release(backbuffer_stack_lock);
 
-            return -ERR_SUCCESS;
+            return ERR_SUCCESS;
         }
         else
         {
             lock_release(backbuffer_stack_lock);
 
-            return -ERR_READ_ONLY_STREAM;
+            return ERR_READ_ONLY_STREAM;
         }
     }
     else
     {
         lock_release(backbuffer_stack_lock);
 
-        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
 

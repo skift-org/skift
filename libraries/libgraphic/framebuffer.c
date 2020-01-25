@@ -5,7 +5,7 @@
 
 framebuffer_t *framebuffer_open(void)
 {
-    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, OPEN_READ | OPEN_WRITE);
+    Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE, OPEN_READ | OPEN_WRITE);
 
     if (framebuffer_device == NULL)
     {
@@ -14,7 +14,7 @@ framebuffer_t *framebuffer_open(void)
 
     framebuffer_mode_arg_t mode_info;
 
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &mode_info) < 0)
+    if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &mode_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return NULL;
@@ -45,7 +45,7 @@ bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
         .size = (Point){resx, resy},
     };
 
-    if (iostream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != 0)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return false;
@@ -104,7 +104,7 @@ void framebuffer_blit_dirty(framebuffer_t *this)
         args.size = bitmap_bound(this->backbuffer).size;
         args.region_to_blit = this->dirty_bound;
 
-        if (iostream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != 0)
+        if (stream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != 0)
         {
             error_print("Failled to blit to the framebuffer");
         }
@@ -120,7 +120,7 @@ void framebuffer_blit(framebuffer_t *this)
     args.buffer = this->backbuffer->pixels;
     args.size = bitmap_bound(this->backbuffer).size;
 
-    if (iostream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != 0)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != 0)
     {
         error_print("Failled to blit to the framebuffer");
     }
@@ -130,7 +130,7 @@ void framebuffer_blit(framebuffer_t *this)
 
 void framebuffer_close(framebuffer_t *this)
 {
-    iostream_close(this->device);
+    stream_close(this->device);
     painter_destroy(this->painter);
     bitmap_destroy(this->backbuffer);
 

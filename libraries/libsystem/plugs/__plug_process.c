@@ -4,7 +4,7 @@
 
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
-#include <libkernel/syscalls.h>
+#include <abi/Syscalls.h>
 
 int __plug_process_this(void)
 {

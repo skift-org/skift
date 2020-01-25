@@ -1,7 +1,7 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
-#include <libsystem/network/Connection.h>
-#include <libsystem/network/Socket.h>
+#include <libsystem/io/Connection.h>
+#include <libsystem/io/Socket.h>
 
 void connection_close(Connection *connection)
 {
@@ -40,7 +40,7 @@ void connection_payload(Connection *connection, Message *message)
     __plug_handle_payload(HANDLE(connection), message);
 }
 
-bool connection_discard(Connection *connection)
+void connection_discard(Connection *connection)
 {
     assert(connection != NULL);
 

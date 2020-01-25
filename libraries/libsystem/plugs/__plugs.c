@@ -6,6 +6,7 @@
 
 #include <libsystem/__plugs__.h>
 #include <libsystem/cstring.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/lock.h>
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
@@ -13,10 +14,10 @@
 Lock memlock;
 Lock loglock;
 
-IOStream *in_stream;
-IOStream *out_stream;
-IOStream *err_stream;
-IOStream *log_stream;
+Stream *in_stream;
+Stream *out_stream;
+Stream *err_stream;
+Stream *log_stream;
 
 extern void _init();
 extern void _fini();
@@ -28,9 +29,9 @@ void __plug_init(void)
 
     // Open io stream
     in_stream = NULL; // FIXME: no stdin,
-    out_stream = iostream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
-    err_stream = iostream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
-    log_stream = iostream_open("/dev/serial", OPEN_WRITE | OPEN_BUFFERED);
+    out_stream = stream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
+    err_stream = stream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
+    log_stream = stream_open("/dev/serial", OPEN_WRITE | OPEN_BUFFERED);
 
     _init();
 }
@@ -41,17 +42,17 @@ void __plug_fini(int exit_code)
 
     if (out_stream)
     {
-        iostream_flush(out_stream);
+        stream_flush(out_stream);
     }
 
     if (err_stream)
     {
-        iostream_flush(err_stream);
+        stream_flush(err_stream);
     }
 
     if (log_stream)
     {
-        iostream_flush(log_stream);
+        stream_flush(log_stream);
     }
 
     process_exit(exit_code);

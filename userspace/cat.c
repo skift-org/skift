@@ -3,16 +3,16 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 int cat(const char *path)
 {
-    IOStream *stream = iostream_open(path, OPEN_READ);
+    Stream *stream = stream_open(path, OPEN_READ);
 
     if (stream != NULL)
     {
         FileState stat = {0};
-        iostream_stat(stream, &stat);
+        stream_stat(stream, &stat);
 
         if (stat.type == FILE_TYPE_DIRECTORY)
         {
@@ -24,20 +24,20 @@ int cat(const char *path)
             int size;
             byte buffer[1024];
 
-            while ((size = iostream_read(stream, &buffer, 1024)) > 0)
+            while ((size = stream_read(stream, &buffer, 1024)) > 0)
             {
-                iostream_write(out_stream, buffer, size);
+                stream_write(out_stream, buffer, size);
             }
         }
 
-        iostream_close(stream);
-        iostream_flush(out_stream);
+        stream_close(stream);
+        stream_flush(out_stream);
 
         return 0;
     }
     else
     {
-        iostream_printf(err_stream, "cat: cannot access '%s'", path);
+        stream_printf(err_stream, "cat: cannot access '%s'", path);
         error_print("");
         return -1;
     }

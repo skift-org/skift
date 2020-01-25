@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/cstring.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 #include "x86/gdt.h"
 

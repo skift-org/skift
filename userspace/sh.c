@@ -7,7 +7,7 @@
 #include <libsystem/convert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
 #include <libsystem/process.h>
@@ -176,7 +176,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
         if (result < 0)
         {
-            iostream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            stream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
             error_print("");
             return -1;
         }
@@ -189,7 +189,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
         if (result < 0)
         {
-            iostream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            stream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
             error_print("");
             return -1;
         }
@@ -250,27 +250,14 @@ bool shell_eval(shell_t *this)
     }
 
     // Or exec a real command
-    IOStream *s = iostream_open(this->command_argv[0], OPEN_READ);
+    int process = process_exec(this->command_argv[0], (const char **)this->command_argv);
 
-    int process = 0;
-
-    if (s != NULL)
-    {
-        iostream_close(s);
-        process = process_exec(this->command_argv[0], (const char **)this->command_argv);
-    }
-    else
+    if (process < 0)
     {
         char pathbuffer[144];
         snprintf(pathbuffer, 144, "/bin/%s", this->command_argv[0]);
 
-        s = iostream_open(pathbuffer, OPEN_READ);
-
-        if (s != NULL)
-        {
-            iostream_close(s);
-            process = process_exec(pathbuffer, (const char **)this->command_argv);
-        }
+        process = process_exec(pathbuffer, (const char **)this->command_argv);
     }
 
     if (process > 0)
@@ -291,7 +278,7 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    iostream_set_write_buffer_mode(out_stream, IOSTREAM_BUFFERED_NONE);
+    stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
 
     shell_t this = {
         .do_continue = true,

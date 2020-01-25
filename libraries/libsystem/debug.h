@@ -4,6 +4,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
-void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len);
+void debug_hexdump(Stream *stream, char *desc, const void *addr, size_t len);

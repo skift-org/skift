@@ -1,0 +1,18 @@
+ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■☺☻♥♦♣♠•◘○◙♂♀♪♫☼⌂►◄↕‼¶§▬↨↑↓→←∟↔▲▼
+
+color0 #000000
+color1 #ff3333
+color2 #b8cc52
+color3 #e6c446
+color4 #36a3d9
+color5 #f07078
+color6 #95e5cb
+color7 #ffffff
+color8 #323232
+color9 #ff6565
+color10 #e9fe83
+color11 #fff778
+color12 #68d4ff
+color13 #ffa3aa
+color14 #c7fffc
+color15 #ffffff

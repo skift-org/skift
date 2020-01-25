@@ -7,7 +7,7 @@
 #include <libmath/math.h>
 #include <libsystem/cstring.h>
 #include <libsystem/runtime.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 /* --- snprintf ------------------------------------------------------------- */
 

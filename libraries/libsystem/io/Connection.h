@@ -19,4 +19,4 @@ void connection_receive(Connection *connection, Message *message);
 
 void connection_payload(Connection *connection, Message *message);
 
-bool connection_discard(Connection *connection);
+void connection_discard(Connection *connection);

@@ -6,7 +6,7 @@
 
 #include <libsystem/RingBuffer.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/lock.h>
 
 #include "abi/Message.h"
@@ -14,21 +14,21 @@
 struct FsNode;
 struct FsHandle;
 
-typedef int (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
+typedef error_t (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
 typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
 
 typedef bool (*FsOperationCanRead)(struct FsNode *node);
 typedef bool (*FsOperationCanWrite)(struct FsNode *node);
 
-typedef int (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size);
-typedef int (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size);
+typedef error_t (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *readed);
+typedef error_t (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *writen);
 
 typedef struct FsNode *(*FsOperationFind)(struct FsNode *node, const char *name);
-typedef int (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
-typedef int (*FsOperationUnlink)(struct FsNode *node, const char *name);
+typedef error_t (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
+typedef error_t (*FsOperationUnlink)(struct FsNode *node, const char *name);
 
-typedef int (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
-typedef int (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
+typedef error_t (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
+typedef error_t (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
 typedef size_t (*FsOperationSize)(struct FsNode *node, struct FsHandle *handle);
 

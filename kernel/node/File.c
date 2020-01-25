@@ -10,7 +10,7 @@
 #include "node/File.h"
 #include "node/Handle.h"
 
-int file_FsOperationOpen(FsFile *node, FsHandle *handle)
+error_t file_FsOperationOpen(FsFile *node, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
@@ -20,28 +20,22 @@ int file_FsOperationOpen(FsFile *node, FsHandle *handle)
         node->size = 0;
     }
 
-    return -ERR_SUCCESS;
+    return ERR_SUCCESS;
 }
 
-int file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size)
+error_t file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
-    size_t result = 0;
-
     if (handle->offset <= node->size)
     {
-        int readedsize = min(node->size - handle->offset, size);
-        memcpy(buffer, (byte *)node->buffer + handle->offset, readedsize);
-
-        result = readedsize;
+        *readed = min(node->size - handle->offset, size);
+        memcpy(buffer, (byte *)node->buffer + handle->offset, *readed);
     }
 
-    return result;
+    return ERR_SUCCESS;
 }
 
-int file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size)
+error_t file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
-    int result = 0;
-
     if ((handle->offset + size) > node->realsize)
     {
         node->buffer = realloc(node->buffer, handle->offset + size);
@@ -51,9 +45,9 @@ int file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, si
     node->size = max(handle->offset + size, node->size);
     memcpy((byte *)(node->buffer) + handle->offset, buffer, size);
 
-    result = size;
+    *writen = size;
 
-    return result;
+    return ERR_SUCCESS;
 }
 
 size_t file_FsOperationSize(FsFile *node, FsHandle *handle)

@@ -8,7 +8,7 @@
 #include <libform/protocol.h>
 #include <libsystem/error.h>
 #include <libsystem/messageloop.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libgraphic/framebuffer.h>
 

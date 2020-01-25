@@ -19,18 +19,22 @@ bool pipe_FsOperationCanWrite(FsPipe *node)
     return !ringbuffer_is_full(node->buffer);
 }
 
-int pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, uint size)
+error_t pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(handle);
 
-    return ringbuffer_read(node->buffer, buffer, size);
+    *readed = ringbuffer_read(node->buffer, buffer, size);
+
+    return ERR_SUCCESS;
 }
 
-int pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer, uint size)
+error_t pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(handle);
 
-    return ringbuffer_write(node->buffer, buffer, size);
+    *writen = ringbuffer_write(node->buffer, buffer, size);
+
+    return ERR_SUCCESS;
 }
 
 size_t pipe_FsOperationSize(FsPipe *node, FsHandle *handle)

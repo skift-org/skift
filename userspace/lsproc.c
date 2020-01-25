@@ -5,7 +5,7 @@
 #include <libkernel/task.h>
 #include <libsystem/cmdline.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 static bool option_cpu_usage = false;
 static bool option_human = false;
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    IOStream *proc_device = iostream_open("/dev/proc", OPEN_READ);
+    Stream *proc_device = stream_open("/dev/proc", OPEN_READ);
 
     if (proc_device == NULL)
     {
@@ -186,12 +186,12 @@ int main(int argc, char **argv)
 
     task_info_t info;
 
-    while (iostream_read(proc_device, &info, sizeof(info)))
+    while (stream_read(proc_device, &info, sizeof(info)))
     {
         lsproc(&info);
     }
 
-    iostream_close(proc_device);
+    stream_close(proc_device);
 
     return 0;
 }

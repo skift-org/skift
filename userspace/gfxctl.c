@@ -7,7 +7,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 static bool option_list = false;
 static bool option_get = false;
@@ -66,11 +66,11 @@ framebuffer_mode_arg_t *gfxmode_by_name(const char *name)
     return NULL;
 }
 
-int gfxmode_get(IOStream *framebuffer_device)
+int gfxmode_get(Stream *framebuffer_device)
 {
     framebuffer_mode_arg_t framebuffer_info;
 
-    if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &framebuffer_info) < 0)
+    if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &framebuffer_info) < 0)
     {
         error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
         return -1;
@@ -83,13 +83,13 @@ int gfxmode_get(IOStream *framebuffer_device)
     return 0;
 }
 
-int gfxmode_set(IOStream *framebuffer_device, const char *mode_name)
+int gfxmode_set(Stream *framebuffer_device, const char *mode_name)
 {
     framebuffer_mode_arg_t *framebuffer_info = gfxmode_by_name(mode_name);
 
     if (framebuffer_info != NULL)
     {
-        if (iostream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, framebuffer_info) < 0)
+        if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, framebuffer_info) < 0)
         {
             error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
             return -1;
@@ -106,7 +106,7 @@ int gfxmode_set(IOStream *framebuffer_device, const char *mode_name)
     }
 }
 
-int gfxmode_list(IOStream *framebuffer_device)
+int gfxmode_list(Stream *framebuffer_device)
 {
     // FIXME: check if the framebuffer device support the followings graphics modes.
 
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    IOStream *framebuffer_device = iostream_open(FRAMEBUFFER_DEVICE, OPEN_READ);
+    Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE, OPEN_READ);
 
     if (framebuffer_device == NULL)
     {

@@ -19,4 +19,4 @@ struct Connection *socket_connect(const char *path);
 
 struct Connection *socket_accept(Socket *socket);
 
-Socket *socket_close(Socket *socket);
+void socket_close(Socket *socket);

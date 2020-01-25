@@ -507,8 +507,6 @@ void task_memory_free(Task *this, uint addr, uint count)
     return memory_free(this->pdir, addr, count, 1);
 }
 
-
-
 /* --- Task dump ---------------------------------------------------------- */
 
 static char *TASK_STATES[] = {
@@ -557,7 +555,7 @@ void task_panic_dump(void)
 
 /* --- Process elf file loading --------------------------------------------- */
 
-static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
+static void load_elfseg(Task *this, Stream *s, elf_program_t *program)
 {
     if (program->vaddr >= 0x100000)
     {
@@ -568,8 +566,8 @@ static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
         task_memory_map(this, program->vaddr, PAGE_ALIGN_UP(program->memsz) / PAGE_SIZE);
         memset((void *)program->vaddr, 0, program->memsz);
 
-        iostream_seek(s, program->offset, WHENCE_START);
-        int result = iostream_read(s, (void *)program->vaddr, program->filesz);
+        stream_seek(s, program->offset, WHENCE_START);
+        int result = stream_read(s, (void *)program->vaddr, program->filesz);
 
         if (result < 0)
         {
@@ -587,22 +585,23 @@ static void load_elfseg(Task *this, IOStream *s, elf_program_t *program)
 int task_exec(const char *executable_path, const char **argv)
 {
     // Check if the file existe and open the file.
-    IOStream *s = iostream_open(executable_path, OPEN_READ | IOSTREAM_BUFFERED_NONE);
+    Stream *s = stream_open(executable_path, OPEN_READ);
 
-    if (s == NULL)
+    if (handle_has_error(s))
     {
         logger_warn("'%s' file not found, exec failed!", executable_path);
-        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        stream_close(s);
+        return -handle_get_error(s);
     }
 
     // Check if the file isn't a directory.
     FileState stat;
-    iostream_stat(s, &stat);
+    stream_stat(s, &stat);
 
     if (stat.type != FILE_TYPE_REGULAR)
     {
         logger_warn("'%s' is not a file, exec failed!", executable_path);
-        iostream_close(s);
+        stream_close(s);
         return -ERR_IS_A_DIRECTORY;
     }
 
@@ -610,15 +609,15 @@ int task_exec(const char *executable_path, const char **argv)
 
     // Decode the elf file header.
     elf_header_t elf_header = {0};
-    iostream_seek(s, 0, WHENCE_START);
+    stream_seek(s, 0, WHENCE_START);
 
-    iostream_read(s, &elf_header, sizeof(elf_header_t));
+    stream_read(s, &elf_header, sizeof(elf_header_t));
 
     if (!elf_valid(&elf_header))
     {
         logger_warn("Invalid elf program!", executable_path);
 
-        iostream_close(s);
+        stream_close(s);
         return -ERR_EXEC_FORMAT_ERROR;
     }
 
@@ -631,16 +630,16 @@ int task_exec(const char *executable_path, const char **argv)
 
     for (int i = 0; i < elf_header.phnum; i++)
     {
-        iostream_seek(s, elf_header.phoff + (elf_header.phentsize * i), WHENCE_START);
+        stream_seek(s, elf_header.phoff + (elf_header.phentsize * i), WHENCE_START);
 
-        iostream_read(s, &program, sizeof(elf_program_t));
+        stream_read(s, &program, sizeof(elf_program_t));
 
         load_elfseg(new_task, s, &program);
     }
 
     task_go(new_task);
 
-    iostream_close(s);
+    stream_close(s);
 
     return new_task_id;
 }

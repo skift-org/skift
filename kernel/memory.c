@@ -13,7 +13,7 @@
  */
 
 #include <libsystem/cstring.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/runtime.h>
 #include <libsystem/atomic.h>
 #include <libsystem/logger.h>

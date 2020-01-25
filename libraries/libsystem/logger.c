@@ -5,7 +5,7 @@
 #include <libsystem/cstring.h>
 
 #include <libsystem/__plugs__.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process.h>
 
@@ -38,26 +38,26 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
     {
         __plug_logger_lock();
 
-        iostream_printf(log_stream, "%d: ", process_this());
+        stream_printf(log_stream, "%d: ", process_this());
 
         DateTime datetime = datetime_now();
-        iostream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
+        stream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
 
         if (logger_use_colors)
         {
-            iostream_printf(log_stream, "%s%s \e[0m%s:%d: \e[37;1m", logger_level_colors[level], logger_level_names[level], file, line);
+            stream_printf(log_stream, "%s%s \e[0m%s:%d: \e[37;1m", logger_level_colors[level], logger_level_names[level], file, line);
         }
         else
         {
-            iostream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
+            stream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
         }
 
         va_list va;
         va_start(va, fmt);
 
-        iostream_vprintf(log_stream, fmt, va);
-        iostream_printf(log_stream, "\e[0m\n");
-        iostream_flush(log_stream);
+        stream_vprintf(log_stream, fmt, va);
+        stream_printf(log_stream, "\e[0m\n");
+        stream_flush(log_stream);
 
         va_end(va);
 

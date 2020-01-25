@@ -131,7 +131,7 @@ void __panic(const char *file, const char *function, const int line, processor_c
 
     printf("\n");
 
-    puts("\n\tSystem halted!\n");
+    printf("\n\tSystem halted!\n");
 
     printf("\n\e[0;33m--------------------------------------------------------------------------------\n\n");
 

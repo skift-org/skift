@@ -131,7 +131,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 keymap_t *keyboard_load_keymap(const char *path)
 {
-    IOStream *kmfile = iostream_open(path, OPEN_READ);
+    Stream *kmfile = stream_open(path, OPEN_READ);
 
     if (kmfile == NULL)
     {
@@ -139,21 +139,21 @@ keymap_t *keyboard_load_keymap(const char *path)
     }
 
     FileState stat;
-    iostream_stat(kmfile, &stat);
+    stream_stat(kmfile, &stat);
 
     assert(stat.type == FILE_TYPE_REGULAR);
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
     keymap_t *keymap = malloc(stat.size);
 
-    iostream_read(kmfile, keymap, stat.size);
+    stream_read(kmfile, keymap, stat.size);
 
-    iostream_close(kmfile);
+    stream_close(kmfile);
 
     return keymap;
 }
 
-int keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -175,7 +175,7 @@ int keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *
 
         atomic_end();
 
-        return -ERR_SUCCESS;
+        return ERR_SUCCESS;
     }
     else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
@@ -183,17 +183,17 @@ int keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *
         {
             memcpy(args, keyboard_keymap, sizeof(keymap_t));
 
-            return -ERR_SUCCESS;
+            return ERR_SUCCESS;
         }
         else
         {
             // FIXME: Maybe add another ERR_* for this error...
-            return -ERR_INPUTOUTPUT_ERROR;
+            return ERR_INPUTOUTPUT_ERROR;
         }
     }
     else
     {
-        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
 

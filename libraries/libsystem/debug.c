@@ -5,17 +5,17 @@
 #include <libsystem/debug.h>
 #include <libsystem/process.h>
 
-void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len)
+void debug_hexdump(Stream *stream, char *desc, const void *addr, size_t len)
 {
     size_t i;
     unsigned char buff[17];
     unsigned char *pc = (unsigned char *)addr;
 
-    iostream_printf(stream, "Hexdump from %d at %08x of %d bites\n", process_this(), addr, len);
+    stream_printf(stream, "Hexdump from %d at %08x of %d bites\n", process_this(), addr, len);
 
     // Output description if given.
     if (desc != NULL)
-        iostream_printf(stream, "%s:\n", desc);
+        stream_printf(stream, "%s:\n", desc);
 
     if (len == 0)
         return;
@@ -29,14 +29,14 @@ void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len)
         {
             // Just don't print ASCII for the zeroth line.
             if (i != 0)
-                iostream_printf(stream, "  %s\n", buff);
+                stream_printf(stream, "  %s\n", buff);
 
             // Output the offset.
-            iostream_printf(stream, "  %04x ", i);
+            stream_printf(stream, "  %04x ", i);
         }
 
         // Now the hex code for the specific character.
-        iostream_printf(stream, " %02x", pc[i]);
+        stream_printf(stream, " %02x", pc[i]);
 
         // And store a printable ASCII character for later.
         if ((pc[i] < 0x20) || (pc[i] > 0x7e))
@@ -54,10 +54,10 @@ void debug_hexdump(IOStream *stream, char *desc, const void *addr, size_t len)
     // Pad out last line if not exactly 16 characters.
     while ((i % 16) != 0)
     {
-        iostream_printf(stream, "   ");
+        stream_printf(stream, "   ");
         i++;
     }
 
     // And print the final ASCII bit.
-    iostream_printf(stream, "  %s\n", buff);
+    stream_printf(stream, "  %s\n", buff);
 }

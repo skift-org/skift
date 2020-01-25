@@ -2,13 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 
 #include "processor.h"
 
 void processor_dump_context(processor_context_t *context)
 {
-    printf("\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", context->cs,  context->ds,  context->es,  context->fs, context->gs);
+    printf("\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", context->cs, context->ds, context->es, context->fs, context->gs);
     printf("\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", context->eax, context->ebx, context->ecx, context->edx);
     printf("\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", context->edi, context->esi, context->ebp, context->USELESS);
     printf("\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", context->int_no, context->errcode, context->eip, context->eflags);

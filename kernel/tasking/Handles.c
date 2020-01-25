@@ -107,6 +107,7 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
 
     if (handle == NULL)
     {
+        *handle_index = HANDLE_INVALID_ID;
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -114,6 +115,7 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
 
     if (result != ERR_SUCCESS)
     {
+        *handle_index = HANDLE_INVALID_ID;
         fshandle_destroy(handle);
     }
 
@@ -133,96 +135,96 @@ error_t task_fshandle_close(Task *task, int handle_index)
     return task_fshandle_remove(task, handle_index);
 }
 
-int task_fshandle_read(Task *task, int handle_index, void *buffer, uint size)
+error_t task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_read(handle, buffer, size);
+    error_t result = fshandle_read(handle, buffer, size, readed);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-int task_fshandle_write(Task *task, int handle_index, const void *buffer, uint size)
+error_t task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_write(handle, buffer, size);
+    error_t result = fshandle_write(handle, buffer, size, written);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-int task_fshandle_call(Task *task, int handle_index, int request, void *args)
+error_t task_fshandle_call(Task *task, int handle_index, int request, void *args)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_call(handle, request, args);
+    error_t result = fshandle_call(handle, request, args);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-int task_fshandle_seek(Task *task, int handle_index, Whence whence, off_t offset)
+error_t task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_seek(handle, whence, offset);
+    error_t result = fshandle_seek(handle, offset, whence);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-int task_fshandle_tell(Task *task, int handle_index, Whence whence)
+error_t task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_tell(handle, whence);
+    error_t result = fshandle_tell(handle, whence, offset);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-int task_fshandle_stat(Task *task, int handle_index, FileState *stat)
+error_t task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        return -ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    int result = fshandle_stat(handle, stat);
+    error_t result = fshandle_stat(handle, stat);
 
     task_fshandle_release(task, handle_index);
 

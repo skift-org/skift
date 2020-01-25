@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <libsystem/filesystem.h>
-#include <libsystem/iostream.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
 #undef printf
@@ -59,7 +59,7 @@ FILE *fopen(const char *path, const char *mode)
 {
     TRACE_FUNCTION_BEGIN;
 
-    FILE *fp = (FILE *)iostream_open(path, stdio_parse_mode(mode));
+    FILE *fp = (FILE *)stream_open(path, stdio_parse_mode(mode));
 
     TRACE_FUNCTION_END;
 
@@ -70,7 +70,7 @@ int fclose(FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    iostream_close((IOStream *)stream);
+    stream_close((Stream *)stream);
 
     TRACE_FUNCTION_END;
 
@@ -81,18 +81,18 @@ int fflush(FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    int r = iostream_flush((IOStream *)stream);
+    stream_flush((Stream *)stream);
 
     TRACE_FUNCTION_END;
 
-    return r;
+    return 0;
 }
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    size_t r = iostream_read((IOStream *)stream, ptr, size * nmemb);
+    size_t r = stream_read((Stream *)stream, ptr, size * nmemb);
 
     TRACE_FUNCTION_END;
 
@@ -103,7 +103,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    size_t r = iostream_write((IOStream *)stream, ptr, size * nmemb);
+    size_t r = stream_write((Stream *)stream, ptr, size * nmemb);
 
     TRACE_FUNCTION_END;
 
@@ -118,15 +118,15 @@ int fseek(FILE *stream, long offset, int whence)
 
     if (whence == SEEK_SET)
     {
-        r = iostream_seek((IOStream *)stream, offset, WHENCE_START);
+        r = stream_seek((Stream *)stream, offset, WHENCE_START);
     }
     else if (whence == SEEK_CUR)
     {
-        r = iostream_seek((IOStream *)stream, offset, WHENCE_HERE);
+        r = stream_seek((Stream *)stream, offset, WHENCE_HERE);
     }
     else if (whence == SEEK_END)
     {
-        r = iostream_seek((IOStream *)stream, offset, WHENCE_END);
+        r = stream_seek((Stream *)stream, offset, WHENCE_END);
     }
 
     TRACE_FUNCTION_END;
@@ -138,7 +138,7 @@ long ftell(FILE *stream)
 {
     TRACE_FUNCTION_BEGIN;
 
-    long r = iostream_tell((IOStream *)stream, WHENCE_START);
+    long r = stream_tell((Stream *)stream, WHENCE_START);
 
     TRACE_FUNCTION_END;
 
@@ -149,7 +149,13 @@ int puts(const char *s)
 {
     TRACE_FUNCTION_BEGIN;
 
-    int r = iostream_puts(out_stream, s);
+    size_t lenght = 0;
+
+    for (lenght = 0; s[lenght]; lenght++)
+    {
+    }
+
+    int r = stream_write(out_stream, s, lenght);
 
     TRACE_FUNCTION_END;
 
@@ -160,27 +166,11 @@ int putchar(int c)
 {
     TRACE_FUNCTION_BEGIN;
 
-    int r = iostream_putchar(out_stream, c);
+    int r = stream_putchar(out_stream, c);
 
     TRACE_FUNCTION_END;
 
     return r;
-}
-
-int printf(const char *fmt, ...)
-{
-    TRACE_FUNCTION_BEGIN;
-
-    va_list va;
-    va_start(va, fmt);
-
-    int result = iostream_vprintf(out_stream, fmt, va);
-
-    va_end(va);
-
-    TRACE_FUNCTION_END;
-
-    return result;
 }
 
 int fprintf(FILE *stream, const char *fmt, ...)
@@ -190,7 +180,7 @@ int fprintf(FILE *stream, const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    int result = iostream_vprintf((IOStream *)stream, fmt, va);
+    int result = stream_vprintf((Stream *)stream, fmt, va);
 
     va_end(va);
 
@@ -203,7 +193,7 @@ int vfprintf(FILE *stream, const char *fmt, va_list va)
 {
     TRACE_FUNCTION_BEGIN;
 
-    int r = iostream_vprintf((IOStream *)stream, fmt, va);
+    int r = stream_vprintf((Stream *)stream, fmt, va);
 
     TRACE_FUNCTION_END;
 

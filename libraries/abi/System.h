@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/runtime.h>
+
 #define SYSTEM_INFO_FIELD_SIZE 65
 
 typedef struct
@@ -13,7 +15,7 @@ typedef struct
 typedef struct
 {
     uint64_t uptime;
-    uint total_ram;
-    uint used_ram;
+    size_t total_ram;
+    size_t used_ram;
     int running_tasks;
 } SystemStatus;

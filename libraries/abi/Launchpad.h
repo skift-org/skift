@@ -1,16 +1,13 @@
 #pragma once
 
-typedef enum
-{
-
-} LaunchpadFlag;
+#include "abi/Filesystem.h"
+#include "abi/Process.h"
 
 typedef struct
 {
-    char name[];
-    char executable[];
-    char *arguments[];
-    int handles[];
+    char name[PROCESS_NAME_SIZE];
+    char executable[PATH_LENGHT];
 
-    LaunchpadFlag flags;
-} LaunchPad;
+    char *argv[PROCESS_ARG_COUNT];
+    int argc;
+} Launchpad;

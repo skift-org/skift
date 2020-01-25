@@ -2,7 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libkernel/task.h>
+#include <abi/Task.h>
+
 #include <libsystem/cmdline.h>
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
@@ -88,7 +89,7 @@ const char *task_state_string[] = {
     "canceled",
 };
 
-int lsproc(task_info_t *info)
+int lsproc(TaskInfo *info)
 {
     // process id
     if (option_human)
@@ -184,7 +185,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    task_info_t info;
+    TaskInfo info;
 
     while (stream_read(proc_device, &info, sizeof(info)))
     {

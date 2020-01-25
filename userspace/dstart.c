@@ -4,18 +4,19 @@
 
 /* dstart.c: start a process as a daemon                                      */
 
-#include <libsystem/process.h>
+#include <abi/Process.h>
+
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
-#include <libkernel/task.h>
+#include <libsystem/process.h>
 
 int main(int argc, char const *argv[])
 {
     if (argc >= 2)
     {
-        const char *deamon_argv[TASK_ARGV_COUNT];
+        const char *deamon_argv[PROCESS_ARG_COUNT];
 
-        for (int i = 0; i < TASK_ARGV_COUNT - 1; i++)
+        for (int i = 0; i < PROCESS_ARG_COUNT - 1; i++)
         {
             deamon_argv[i] = argv[i + 1];
         }

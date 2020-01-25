@@ -7,8 +7,9 @@
 #include <libsystem/list.h>
 #include <libsystem/runtime.h>
 
+#include <abi/Process.h>
+#include <abi/Task.h>
 #include <libkernel/message.h>
-#include <libkernel/task.h>
 #include <libsystem/error.h>
 
 #include "filesystem/Filesystem.h"
@@ -43,14 +44,14 @@ typedef struct
 typedef struct Task
 {
     int id;
-    char name[TASK_NAMESIZE]; // Frendly name of the process
-    task_state_t state;
+    char name[PROCESS_NAME_SIZE]; // Frendly name of the process
+    TaskState state;
 
     bool user;
 
     uint sp;
-    byte stack[TASK_STACKSIZE]; // Kernel stack
-    TaskEntry entry;            // Our entry point
+    byte stack[PROCESS_STACK_SIZE]; // Kernel stack
+    TaskEntry entry;                // Our entry point
     char fpu_registers[512];
 
     struct
@@ -68,7 +69,7 @@ typedef struct Task
     List *shms;
 
     Lock handles_lock;
-    FsHandle *handles[TASK_FILDES_COUNT];
+    FsHandle *handles[PROCESS_HANDLE_COUNT];
 
     Lock cwd_lock;
     Path *cwd_path;
@@ -98,11 +99,11 @@ void task_destroy(Task *task);
 
 List *task_all(void);
 
-List *task_bystate(task_state_t state);
+List *task_bystate(TaskState state);
 
 Task *task_getbyid(int id);
 
-void task_get_info(Task *task, task_info_t *info);
+void task_get_info(Task *task, TaskInfo *info);
 
 int task_count(void);
 
@@ -110,7 +111,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user);
 
-void task_setstate(Task *task, task_state_t state);
+void task_setstate(Task *task, TaskState state);
 
 void task_setentry(Task *task, TaskEntry entry, bool user);
 

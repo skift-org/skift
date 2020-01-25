@@ -4,12 +4,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libkernel/filesystem.h>
+#include <abi/Filesystem.h>
 
-#include <libsystem/runtime.h>
 #include <libsystem/list.h>
-
-#define PATH_SEPARATOR '/'
+#include <libsystem/runtime.h>
 
 typedef struct
 {

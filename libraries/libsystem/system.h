@@ -6,7 +6,7 @@
 
 #include <libsystem/runtime.h>
 
-#include "abi/system.h"
+#include <abi/System.h>
 
 SystemInfo system_get_info(void);
 

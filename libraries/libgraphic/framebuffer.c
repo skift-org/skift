@@ -7,8 +7,9 @@ framebuffer_t *framebuffer_open(void)
 {
     Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE, OPEN_READ | OPEN_WRITE);
 
-    if (framebuffer_device == NULL)
+    if (handle_has_error(framebuffer_device))
     {
+        stream_close(framebuffer_device);
         return NULL;
     }
 

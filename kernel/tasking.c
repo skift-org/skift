@@ -90,7 +90,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     memset(this, 0, sizeof(Task));
 
     this->id = TID++;
-    strlcpy(this->name, name, TASK_NAMESIZE);
+    strlcpy(this->name, name, PROCESS_NAME_SIZE);
     this->state = TASK_STATE_NONE;
 
     list_pushback(tasks, this);
@@ -118,7 +118,7 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     // Setup fildes
     lock_init(this->handles_lock);
-    for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         this->handles[i] = NULL;
     }
@@ -128,7 +128,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     // {
     //     lock_acquire(parent->handles_lock);
     //
-    //     for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    //     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     //     {
     //         if (parent->handles[i])
     //         {
@@ -152,8 +152,8 @@ Task *task_create(Task *parent, const char *name, bool user)
     }
 
     // setup the stack
-    memset(this->stack, 0, TASK_STACKSIZE);
-    this->sp = (reg32_t)(&this->stack[0] + TASK_STACKSIZE - 1);
+    memset(this->stack, 0, PROCESS_STACK_SIZE);
+    this->sp = (reg32_t)(&this->stack[0] + PROCESS_STACK_SIZE - 1);
     platform_fpu_save_context(this);
 
     return this;
@@ -190,7 +190,7 @@ List *task_all(void)
     return tasks;
 }
 
-List *task_bystate(task_state_t state)
+List *task_bystate(TaskState state)
 {
     return tasks_bystates[state];
 }
@@ -206,14 +206,14 @@ Task *task_getbyid(int id)
     return NULL;
 }
 
-void task_get_info(Task *this, task_info_t *info)
+void task_get_info(Task *this, TaskInfo *info)
 {
     assert(this);
 
     info->id = this->id;
     info->state = this->state;
 
-    strlcpy(info->name, this->name, TASK_NAMESIZE);
+    strlcpy(info->name, this->name, PROCESS_NAME_SIZE);
     Patho_cstring(this->cwd_path, info->cwd, PATH_LENGHT);
 
     info->usage_cpu = (sheduler_get_usage(this->id) * 100) / SHEDULER_RECORD_COUNT;
@@ -248,10 +248,10 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
     task_setentry(t, entry, true);
 
-    uint argv_list[TASK_ARGV_COUNT] = {0};
+    uint argv_list[PROCESS_ARG_COUNT] = {0};
 
     int argc;
-    for (argc = 0; argv[argc] && argc < TASK_ARGV_COUNT; argc++)
+    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
     {
         argv_list[argc] = task_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
     }
@@ -273,7 +273,7 @@ bool shortest_sleep_first(void *left, void *right)
     return ((Task *)left)->wait.time.wakeuptick < ((Task *)right)->wait.time.wakeuptick;
 }
 
-void task_setstate(Task *task, task_state_t state)
+void task_setstate(Task *task, TaskState state)
 {
     ASSERT_ATOMIC;
 
@@ -323,7 +323,7 @@ void task_go(Task *t)
 
     ctx.eflags = 0x202;
     ctx.eip = (reg32_t)t->entry;
-    ctx.ebp = ((reg32_t)t->stack + TASK_STACKSIZE);
+    ctx.ebp = ((reg32_t)t->stack + PROCESS_STACK_SIZE);
 
     // TODO: userspace task
     ctx.cs = 0x08;

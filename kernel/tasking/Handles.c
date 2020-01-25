@@ -6,7 +6,7 @@ error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 
     lock_acquire(task->handles_lock);
 
-    for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         if (task->handles[i] == NULL)
         {
@@ -27,7 +27,7 @@ error_t task_fshandle_remove(Task *task, int handle_index)
 {
     error_t result = ERR_BAD_FILE_DESCRIPTOR;
 
-    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
+    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
         lock_acquire(task->handles_lock);
 
@@ -53,7 +53,7 @@ FsHandle *task_fshandle_acquire(Task *task, int handle_index)
 {
     FsHandle *result = NULL;
 
-    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
+    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
         lock_acquire(task->handles_lock);
 
@@ -77,7 +77,7 @@ error_t task_fshandle_release(Task *task, int handle_index)
 {
     error_t result = ERR_BAD_FILE_DESCRIPTOR;
 
-    if (handle_index >= 0 && handle_index < TASK_FILDES_COUNT)
+    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
         lock_acquire(task->handles_lock);
 
@@ -124,7 +124,7 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
 
 void task_fshandle_close_all(Task *task)
 {
-    for (int i = 0; i < TASK_FILDES_COUNT; i++)
+    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         task_fshandle_close(task, i);
     }

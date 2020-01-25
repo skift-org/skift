@@ -16,7 +16,7 @@ int proc_device_open(stream_t *stream)
     atomic_begin();
 
     List *tasks = task_all();
-    task_info_t *infos = malloc(sizeof(task_info_t) * list_count(tasks));
+    TaskInfo *infos = malloc(sizeof(TaskInfo) * list_count(tasks));
 
     int index = 0;
 
@@ -47,9 +47,9 @@ int proc_device_read(stream_t *s, void *buffer, uint size)
 {
     if (s->attached.current < s->attached.count)
     {
-        task_info_t *info = &((task_info_t *)s->attached.p)[s->attached.current];
+        TaskInfo *info = &((TaskInfo *)s->attached.p)[s->attached.current];
 
-        memcpy(buffer, info, min(size, sizeof(task_info_t)));
+        memcpy(buffer, info, min(size, sizeof(TaskInfo)));
 
         s->attached.current++;
 

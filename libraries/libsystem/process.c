@@ -3,9 +3,9 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/__plugs__.h>
+#include <libsystem/assert.h>
 #include <libsystem/error.h>
 #include <libsystem/process.h>
-#include <libsystem/assert.h>
 
 int process_this(void)
 {
@@ -23,6 +23,8 @@ int process_exec(const char *file_name, const char **argv)
 void __attribute__((noreturn)) process_exit(int code)
 {
     __plug_process_exit(code);
+
+    ASSERT_NOT_REACHED();
 }
 
 int process_cancel(int pid)

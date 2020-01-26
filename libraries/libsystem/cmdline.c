@@ -4,6 +4,7 @@
 
 /* cmdline.c: skiftOS command line application utils                          */
 
+#include <libsystem/assert.h>
 #include <libsystem/cmdline.h>
 #include <libsystem/convert.h>
 #include <libsystem/cstring.h>
@@ -57,7 +58,7 @@ void do_option(CommandLine *cmdline, CommandLineOption *option, int i, int argc,
             break;
 
         default:
-            break;
+            ASSERT_NOT_REACHED();
         }
     }
 
@@ -163,6 +164,11 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
     for (int i = 1; i < argc; i++)
     {
         char *current_argument = argv[i];
+
+        if (current_argument == NULL)
+        {
+            continue;
+        }
 
         if (current_argument[0] != '-')
         {

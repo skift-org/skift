@@ -9,7 +9,7 @@
 #include <libsystem/convert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 
 /* --- Private functions ---------------------------------------------------- */
 

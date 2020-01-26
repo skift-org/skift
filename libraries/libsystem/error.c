@@ -5,7 +5,7 @@
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 
 #define ERROR_ENUM_ENTRY_STRING(__entry) #__entry,
 #define ERROR_ENUM_ENTRY_STRING_WITH_VALUE(__entry, __value) #__entry,

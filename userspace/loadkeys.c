@@ -7,7 +7,7 @@
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 
 #include <libdevice/keyboard.h>
 #include <libdevice/keymap.h>

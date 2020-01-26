@@ -8,7 +8,6 @@
     __ENTRY(SYS_DEBUG)                 \
                                        \
     __ENTRY(SYS_PROCESS_THIS)          \
-    __ENTRY(SYS_PROCESS_EXEC)          \
     __ENTRY(SYS_PROCESS_LAUNCH)        \
     __ENTRY(SYS_PROCESS_EXIT)          \
     __ENTRY(SYS_PROCESS_CANCEL)        \

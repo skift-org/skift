@@ -3,7 +3,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/__plugs__.h>
-#include <libsystem/cstring.h>
 #include <libsystem/system.h>
 
 SystemInfo system_get_info(void)

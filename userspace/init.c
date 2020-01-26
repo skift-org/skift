@@ -9,12 +9,16 @@
 #include <libsystem/filesystem.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 
 int init_exec(const char *filename)
 {
-    logger_info("Starting '%s'", filename);
-    int process = process_exec(filename, (const char *[]){filename, NULL});
+    logger_info("Starting '%s'...", filename);
+
+    Launchpad *launchpad = launchpad_create(filename, filename);
+
+    int process = launchpad_launch(launchpad);
 
     if (process < 0)
     {

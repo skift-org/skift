@@ -11,7 +11,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 #include <libsystem/process/Launchpad.h>
 
 #define MAX_COMMAND_LENGHT 128

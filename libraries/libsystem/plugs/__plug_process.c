@@ -11,11 +11,6 @@ int __plug_process_this(void)
     return __syscall(SYS_PROCESS_THIS, 0, 0, 0, 0, 0);
 }
 
-int __plug_process_exec(const char *file_name, const char **argv)
-{
-    return __syscall(SYS_PROCESS_EXEC, (int)file_name, (int)argv, 0, 0, 0);
-}
-
 int __plug_process_launch(Launchpad *launchpad)
 {
     return __syscall(SYS_PROCESS_LAUNCH, (int)launchpad, 0, 0, 0, 0);

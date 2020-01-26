@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/debug.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 
 void debug_hexdump(Stream *stream, char *desc, const void *addr, size_t len)
 {

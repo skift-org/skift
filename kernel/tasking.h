@@ -207,12 +207,6 @@ error_t task_fshandle_payload(Task *this, int handle_index, Message *message);
 error_t task_fshandle_discard(Task *this, int handle_index);
 
 /* -------------------------------------------------------------------------- */
-/*   PROCESSES                                                                */
-/* -------------------------------------------------------------------------- */
-
-int task_exec(const char *executable_path, const char **argv);
-
-/* -------------------------------------------------------------------------- */
 /*   SHARED MEMORY                                                            */
 /* -------------------------------------------------------------------------- */
 

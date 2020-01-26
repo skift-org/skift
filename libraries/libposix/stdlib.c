@@ -3,7 +3,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 #include <libsystem/logger.h>
 
 void __attribute__((noreturn)) exit(int status)

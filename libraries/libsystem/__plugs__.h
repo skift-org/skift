@@ -62,8 +62,6 @@ uint __plug_system_get_ticks();
 
 int __plug_process_this(void);
 
-int __plug_process_exec(const char *file_name, const char **argv);
-
 int __plug_process_launch(Launchpad *launchpad);
 
 void __attribute__((noreturn)) __plug_process_exit(int code);

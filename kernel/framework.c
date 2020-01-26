@@ -117,12 +117,10 @@ int __plug_process_this(void)
     return sheduler_running_id();
 }
 
-int __plug_process_exec(const char *file_name, const char **argv)
+int __plug_process_launch(Launchpad *launchpad)
 {
-    return task_exec(file_name, argv);
+    return task_launch(sheduler_running(), launchpad);
 }
-
-// TODO: void __plug_process_spawn();
 
 void __plug_process_exit(int code)
 {

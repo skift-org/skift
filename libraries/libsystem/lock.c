@@ -6,7 +6,7 @@
 #include <libsystem/assert.h>
 #include <libsystem/lock.h>
 #include <libsystem/logger.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Process.h>
 
 void __lock_init(Lock *lock, const char *name)
 {

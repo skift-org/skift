@@ -1,24 +1,22 @@
-/* Copyright © 2018-2019 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
 #include <libsystem/error.h>
-#include <libsystem/process.h>
+#include <libsystem/process/Launchpad.h>
 
 int process_this(void)
 {
     return __plug_process_this();
 }
 
-int process_exec(const char *file_name, const char **argv)
+int process_run(const char *command)
 {
-    int result = __plug_process_exec(file_name, argv);
-    RETURN_AND_SET_ERROR(result, result, -1);
-}
+    Launchpad *launchpad = launchpad_create("/bin/sh", "/bin/sh");
 
-// TODO: void process_spawn();
+    launchpad_argument(launchpad, "-c");
+    launchpad_argument(launchpad, command);
+
+    return launchpad_launch(launchpad);
+}
 
 void __attribute__((noreturn)) process_exit(int code)
 {
@@ -32,27 +30,27 @@ int process_cancel(int pid)
     return __plug_process_cancel(pid);
 }
 
-int process_map(uint addr, uint count)
+int process_map(uintptr_t addr, size_t count)
 {
     return __plug_process_map(addr, count);
 }
 
-int process_unmap(uint addr, uint count)
+int process_unmap(uintptr_t addr, size_t count)
 {
     return __plug_process_map(addr, count);
 }
 
-uint process_alloc(uint count)
+uint process_alloc(size_t count)
 {
     return __plug_process_alloc(count);
 }
 
-int process_free(uint addr, uint count)
+int process_free(uintptr_t addr, size_t count)
 {
     return __plug_process_free(addr, count);
 }
 
-int process_get_cwd(char *buffer, uint size)
+int process_get_cwd(char *buffer, size_t size)
 {
     return __plug_process_get_cwd(buffer, size);
 }

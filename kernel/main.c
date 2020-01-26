@@ -23,6 +23,7 @@
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Launchpad.h>
 
 #include "x86/gdt.h"
 #include "x86/idt.h"
@@ -59,9 +60,11 @@ void kmain(multiboot_info_t *info, uint magic)
     logger_level(LOGGER_TRACE);
 
     /* --- Early operation -------------------------------------------------- */
+
     memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
 
     /* --- System check ----------------------------------------------------- */
+
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
         PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
@@ -108,6 +111,7 @@ void kmain(multiboot_info_t *info, uint magic)
     logger_info("Framebuffer: %dx%dx%d", info->framebuffer_width, info->framebuffer_height, info->framebuffer_bpp);
 
     /* --- Setup cpu context ------------------------------------------------ */
+
     setup(gdt);
     setup(pic);
     setup(idt);
@@ -116,48 +120,50 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(platform);
 
     /* --- System context --------------------------------------------------- */
+
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
     filesystem_initialize();
     setup(tasking);
 
     /* --- Finalizing System ------------------------------------------------ */
+
     atomic_enable();
     sti();
 
     /* --- Devices ---------------------------------------------------------- */
-    setup(modules, &mbootinfo);
 
     logger_info("Mounting devices...");
+
+    setup(modules, &mbootinfo);
 
     null_initialize();
     zero_initialize();
     random_initialize();
+    serial_initialize();
+    mouse_initialize();
+    keyboard_initialize();
 
     if (!framebuffer_initialize(info))
     {
         textmode_initialize();
     }
 
-    serial_initialize();
-
-    mouse_initialize();
-    keyboard_initialize();
+    /* --- Entering userspace ----------------------------------------------- */
 
     logger_info("Starting the userspace...");
 
-    /* --- Entering userspace ----------------------------------------------- */
-    int init = task_exec("/bin/init", (const char *[]){"/bin/init", NULL});
+    Launchpad *init_lauchpad = launchpad_create("init", "/bin/init");
 
-    if (init < 0)
-    {
-        PANIC("Failled to start init : %s", error_to_string(-init));
-    }
-    else
-    {
-        int exitvalue = 0;
-        task_wait(init, &exitvalue);
+    int init_process = launchpad_launch(init_lauchpad);
 
-        PANIC("Init has return with code %d!", exitvalue);
+    if (init_process < 0)
+    {
+        PANIC("Failled to start init : %s", error_to_string(-init_process));
     }
+
+    int init_exitvalue = 0;
+    task_wait(init_process, &init_exitvalue);
+
+    PANIC("Init has return with code %d!", init_exitvalue);
 }

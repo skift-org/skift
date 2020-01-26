@@ -60,14 +60,17 @@ Terminal *terminal_create_textmode_console(void)
 {
     textmode_device = stream_open(TEXTMODE_DEVICE, OPEN_WRITE);
 
-    if (textmode_device == NULL)
+    if (handle_has_error(textmode_device))
     {
+        stream_close(textmode_device);
+        textmode_device = NULL;
         return NULL;
     }
 
-    if (stream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info))
+    if (stream_call(textmode_device, TEXTMODE_CALL_GET_INFO, &textmode_info) != ERR_SUCCESS)
     {
-        error_print("Failled to get textmode info");
+        stream_close(textmode_device);
+        textmode_device = NULL;
         return NULL;
     }
 

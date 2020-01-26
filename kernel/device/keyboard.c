@@ -129,26 +129,45 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 /* --- Public functions ----------------------------------------------------- */
 
-keymap_t *keyboard_load_keymap(const char *path)
+keymap_t *keyboard_load_keymap(const char *keymap_path)
 {
-    Stream *kmfile = stream_open(path, OPEN_READ);
+    Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
-    if (kmfile == NULL)
+    if (handle_has_error(keymap_file))
     {
+        logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        stream_close(keymap_file);
+
         return NULL;
     }
 
     FileState stat;
-    stream_stat(kmfile, &stat);
+    stream_stat(keymap_file, &stat);
 
-    assert(stat.type == FILE_TYPE_REGULAR);
+    if (stat.type != FILE_TYPE_REGULAR)
+    {
+        logger_info("Failled to load keymap from %s: This is not a regular file", keymap_path);
+        stream_close(keymap_file);
+
+        return NULL;
+    }
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
     keymap_t *keymap = malloc(stat.size);
 
-    stream_read(kmfile, keymap, stat.size);
+    size_t readed = stream_read(keymap_file, keymap, stat.size);
 
-    stream_close(kmfile);
+    if (readed != stat.size)
+    {
+        logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        stream_close(keymap_file);
+
+        free(keymap);
+
+        return NULL;
+    }
+
+    stream_close(keymap_file);
 
     return keymap;
 }

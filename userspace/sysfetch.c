@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", status.used_ram / (1024 * 1024), status.total_ram / (1024 * 1024));
 
     printf("\n");
-    printf("\e[16C \e[40m  \e[41m  \e[42m  \e[43m  \e[44m  \e[45m  \e[46m  \e[47m  \e[m\n");
+    printf("\e[16C \e[40m░░\e[41m  \e[42m  \e[43m  \e[44m  \e[45m  \e[46m  \e[47m  \e[m\n");
     printf("\n");
 
     return 0;

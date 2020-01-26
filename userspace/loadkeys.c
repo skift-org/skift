@@ -38,16 +38,24 @@ static CommandLine cmdline = CMDLINE(
 
 int loadkey_list_keymap()
 {
-    Stream *dir = stream_open("/res/keyboard", OPEN_READ);
+    Stream *keymap_directory = stream_open("/res/keyboard", OPEN_READ);
+
+    if (handle_has_error(keymap_directory))
+    {
+        handle_printf_error(keymap_directory, "loadkeys: Failled to query keymaps from /res/keyboard!");
+        stream_close(keymap_directory);
+
+        return -1;
+    }
 
     DirectoryEntry entry = {0};
-    while (stream_read(dir, &entry, sizeof(entry)) > 0)
+    while (stream_read(keymap_directory, &entry, sizeof(entry)) > 0)
     {
         // FIXME: maybe show some info about the kmap file
         printf("- %s\n", entry.name);
     }
 
-    stream_close(dir);
+    stream_close(keymap_directory);
 
     return 0;
 }
@@ -55,74 +63,70 @@ int loadkey_list_keymap()
 int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
+
     Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
-    if (keymap_file != NULL)
+    if (handle_has_error(keymap_file))
     {
-        FileState stat;
-        stream_stat(keymap_file, &stat);
-
-        logger_info("Allocating keymap of size %dkio", stat.size / 1024);
-
-        if (stat.size < sizeof(keymap_t))
-        {
-            stream_printf(err_stream, "Invalid keymap file format!\n");
-            return -1;
-        }
-
-        keymap_t *new_keymap = malloc(stat.size);
-
-        stream_read(keymap_file, new_keymap, stat.size);
-
+        handle_printf_error(keyboard_device, "loadkeys: Failled to open the keymap file");
         stream_close(keymap_file);
-
-        if (new_keymap->magic[0] == 'k' &&
-            new_keymap->magic[1] == 'm' &&
-            new_keymap->magic[2] == 'a' &&
-            new_keymap->magic[3] == 'p')
-        {
-            keyboard_set_keymap_args_t args = {.size = stat.size, .keymap = new_keymap};
-            stream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
-
-            printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
-
-            free(new_keymap);
-
-            return 0;
-        }
-        else
-        {
-            free(new_keymap);
-
-            stream_printf(err_stream, "Invalid keymap file format!\n");
-
-            return -1;
-        }
-    }
-    else
-    {
-        error_print("Failled to open the keymap file");
 
         return -1;
     }
+
+    FileState stat;
+    stream_stat(keymap_file, &stat);
+
+    logger_info("Allocating keymap of size %dkio", stat.size / 1024);
+
+    if (stat.size < sizeof(keymap_t))
+    {
+        stream_printf(err_stream, "loadkeys: Invalid keymap file format!\n");
+        stream_close(keymap_file);
+
+        return -1;
+    }
+
+    keymap_t *new_keymap = malloc(stat.size);
+
+    stream_read(keymap_file, new_keymap, stat.size);
+
+    stream_close(keymap_file);
+
+    if (new_keymap->magic[0] != 'k' ||
+        new_keymap->magic[1] != 'm' ||
+        new_keymap->magic[2] != 'a' ||
+        new_keymap->magic[3] != 'p')
+    {
+        stream_printf(err_stream, "loadkeys: Invalid keymap file format!\n");
+        stream_close(keymap_file);
+        free(new_keymap);
+
+        return -1;
+    }
+
+    keyboard_set_keymap_args_t args = {.size = stat.size, .keymap = new_keymap};
+    stream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
+
+    printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
+
+    free(new_keymap);
+
+    return 0;
 }
 
 int loadkey_get_keymap(Stream *keyboard_device)
 {
     keymap_t keymap;
 
-    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) == 0)
+    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != ERR_SUCCESS)
     {
-        printf("Current keymap is %s(%s)\n", keymap.language, keymap.region);
-
-        return 0;
-    }
-    else
-    {
-        stream_printf(err_stream, "Failled to retrived the current keymap!\n");
-
+        handle_printf_error(keyboard_device, "loadkeys: Failled to retrived the current keymap");
         return -1;
     }
+
+    printf("Current keymap is %s(%s)\n", keymap.language, keymap.region);
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -131,9 +135,10 @@ int main(int argc, char **argv)
 
     Stream *keyboard_device = stream_open(KEYBOARD_DEVICE, OPEN_READ);
 
-    if (keyboard_device == NULL)
+    if (handle_has_error(keyboard_device))
     {
-        error_print("Failled to open the keyboard device");
+        handle_printf_error(keyboard_device, "loadkeys: Failled to open the keyboard device");
+        stream_close(keyboard_device);
 
         return -1;
     }
@@ -157,6 +162,7 @@ int main(int argc, char **argv)
     {
         char font_path[PATH_LENGHT] = {0};
         snprintf(font_path, PATH_LENGHT, "/res/keyboard/%s.kmap", argv[1]);
+
         return loadkey_set_keymap(keyboard_device, font_path);
     }
 

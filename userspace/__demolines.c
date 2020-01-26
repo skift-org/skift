@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/io/Stream.h>
 #include <libsystem/error.h>
+#include <libsystem/io/Stream.h>
 
 #include <libgraphic/framebuffer.h>
 
@@ -41,10 +41,10 @@ int main(int argc, char **argv)
 
     Stream *random_device = stream_open("/dev/random", OPEN_READ);
 
-    if (random_device == NULL)
+    if (handle_has_error(random_device))
     {
-        error_print("Failled to open random");
-        return -1;
+        handle_printf_error(random_device, "Failled to open /dev/random");
+        stream_close(random_device);
     }
 
     do

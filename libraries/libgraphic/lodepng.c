@@ -310,7 +310,12 @@ static long lodepng_filesize(const char* filename) {
   Stream* file;
   long size;
   file = stream_open(filename, OPEN_READ);
-  if(!file) return -1;
+
+  if (handle_has_error(file))
+  {
+    stream_close(file);
+    return 78;
+  }
 
   if(stream_seek(file, 0, WHENCE_END) != 0) {
     stream_close(file);
@@ -330,7 +335,12 @@ static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char*
   Stream* file;
   size_t readsize;
   file = stream_open(filename, OPEN_READ);
-  if(!file) return 78;
+
+  if (handle_has_error(file))
+  {
+    stream_close(file);
+    return 78;
+  }
 
   readsize = stream_read(file, out, size);
   stream_close(file);

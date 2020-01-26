@@ -17,7 +17,7 @@ framebuffer_t *framebuffer_open(void)
 
     if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &mode_info) < 0)
     {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
+        handle_printf_error(framebuffer_device, "Failled to iocall" FRAMEBUFFER_DEVICE);
         return NULL;
     }
 
@@ -46,9 +46,9 @@ bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
         .size = (Point){resx, resy},
     };
 
-    if (stream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != 0)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != ERR_SUCCESS)
     {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
+        handle_printf_error(this->device, "Failled to iocall device %s", FRAMEBUFFER_DEVICE);
         return false;
     }
 
@@ -105,9 +105,9 @@ void framebuffer_blit_dirty(framebuffer_t *this)
         args.size = bitmap_bound(this->backbuffer).size;
         args.region_to_blit = this->dirty_bound;
 
-        if (stream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != 0)
+        if (stream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != ERR_SUCCESS)
         {
-            error_print("Failled to blit to the framebuffer");
+            handle_printf_error(this->device, "Failled to iocall device %s: %s", FRAMEBUFFER_DEVICE);
         }
 
         this->is_dirty = false;
@@ -121,9 +121,9 @@ void framebuffer_blit(framebuffer_t *this)
     args.buffer = this->backbuffer->pixels;
     args.size = bitmap_bound(this->backbuffer).size;
 
-    if (stream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != 0)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != ERR_SUCCESS)
     {
-        error_print("Failled to blit to the framebuffer");
+        handle_printf_error(this->device, "Failled to iocall device %s:", FRAMEBUFFER_DEVICE);
     }
 
     this->is_dirty = false;

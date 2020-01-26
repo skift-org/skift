@@ -60,49 +60,52 @@ void ls_print_entry(DirectoryEntry *entry)
     }
 }
 
-int ls(const char *target_path)
+int ls(const char *target_path, bool with_prefix)
 {
-    Stream *dir = stream_open(target_path, OPEN_READ);
+    Stream *directory = stream_open(target_path, OPEN_READ);
 
-    if (dir != NULL)
+    if (handle_has_error(directory))
     {
-        FileState stat = {0};
-        stream_stat(dir, &stat);
+        handle_printf_error(directory, "ls: cannot access '%s'", target_path);
+        stream_close(directory);
+        return -1;
+    }
 
-        if (stat.type == FILE_TYPE_DIRECTORY)
-        {
-            DirectoryEntry entry;
+    if (with_prefix)
+    {
+        printf("%s:\n", target_path);
+    }
 
-            while (stream_read(dir, &entry, sizeof(entry)) > 0)
-            {
-                ls_print_entry(&entry);
-            }
-        }
-        else
+    FileState stat = {0};
+    stream_stat(directory, &stat);
+
+    if (stat.type == FILE_TYPE_DIRECTORY)
+    {
+        DirectoryEntry entry;
+
+        while (stream_read(directory, &entry, sizeof(entry)) > 0)
         {
-            DirectoryEntry entry;
-            entry.stat = stat;
-            Path *p = path(target_path);
-            strlcpy(entry.name, path_filename(p), PATH_LENGHT);
             ls_print_entry(&entry);
-            path_delete(p);
         }
-
-        if (!option_list)
-        {
-            printf("\n");
-        }
-
-        stream_close(dir);
-
-        return 0;
     }
     else
     {
-        stream_printf(err_stream, "ls: cannot access '%s'", target_path);
-        error_print("");
-        return -1;
+        DirectoryEntry entry;
+        entry.stat = stat;
+        Path *p = path(target_path);
+        strlcpy(entry.name, path_filename(p), PATH_LENGHT);
+        ls_print_entry(&entry);
+        path_delete(p);
     }
+
+    if (!option_list)
+    {
+        printf("\n");
+    }
+
+    stream_close(directory);
+
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -111,20 +114,19 @@ int main(int argc, char **argv)
 
     if (argc == 2)
     {
-        return ls(argv[1]);
+        return ls(argv[1], false);
     }
     else if (argc > 2)
     {
         for (int i = 1; i < argc; i++)
         {
-            printf("%s:\n", argv[i]);
-            ls(argv[i]);
+            ls(argv[i], true);
         }
 
         return 0;
     }
     else
     {
-        return ls(".");
+        return ls(".", false);
     }
 }

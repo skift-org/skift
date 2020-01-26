@@ -6,10 +6,10 @@
 
 /* stream.h: generic io interface                                           */
 
+#include <libsystem/io/Handle.h>
 #include <libsystem/path.h>
 #include <libsystem/runtime.h>
 
-#include "abi/Handle.h"
 #include "abi/Filesystem.h"
 
 typedef enum

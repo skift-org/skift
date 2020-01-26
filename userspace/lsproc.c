@@ -179,9 +179,11 @@ int main(int argc, char **argv)
 
     Stream *proc_device = stream_open("/dev/proc", OPEN_READ);
 
-    if (proc_device == NULL)
+    if (handle_has_error(proc_device))
     {
-        error_print("Failled to open /dev/proc");
+        handle_printf_error(proc_device, "lproc: Failled to open /dev/proc");
+        stream_close(proc_device);
+
         return -1;
     }
 

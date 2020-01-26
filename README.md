@@ -1,7 +1,3 @@
-<p align="center">	
-<a href="https://github.com/skiftOS/skift-cpp">This project is archived and is currently being ported to c++</a>	
-</p>
-
 <p align="center">
 <br>
 <br>

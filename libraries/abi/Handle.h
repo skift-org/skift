@@ -17,6 +17,8 @@ typedef struct
 
 #define handle_has_error(__handle) (HANDLE(__handle)->error != ERR_SUCCESS)
 
+#define handle_error_string(__handle) error_to_string(HANDLE(__handle)->error)
+
 #define handle_get_error(__handle) (HANDLE(__handle)->error)
 
 #define handle_clear_error(__handle) (HANDLE(__handle)->error = ERR_SUCCESS)

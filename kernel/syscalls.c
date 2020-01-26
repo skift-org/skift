@@ -40,6 +40,11 @@ int sys_process_exec(const char *file_name, const char **argv)
     return task_exec(file_name, argv);
 }
 
+int sys_process_launch(Launchpad *launchpad)
+{
+    return task_launch(sheduler_running(), launchpad);
+}
+
 int sys_process_exit(int code)
 {
     task_exit(code);
@@ -347,6 +352,7 @@ int sys_handle_discard(int handle)
 static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_EXEC] = sys_process_exec,
+    [SYS_PROCESS_LAUNCH] = sys_process_launch,
     [SYS_PROCESS_EXIT] = sys_process_exit,
     [SYS_PROCESS_CANCEL] = sys_process_cancel,
     [SYS_PROCESS_SLEEP] = sys_process_sleep,

@@ -8,6 +8,6 @@ typedef struct
     char name[PROCESS_NAME_SIZE];
     char executable[PATH_LENGHT];
 
-    char *argv[PROCESS_ARG_COUNT];
+    char *argv[PROCESS_ARG_COUNT + 1];
     int argc;
 } Launchpad;

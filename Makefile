@@ -78,7 +78,8 @@ LIBSYSTEM=$(ROOT_DIRECTORY)/lib/libsystem.a
 LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
 			  $(wildcard libraries/libsystem/plugs/*.c) \
 			  $(wildcard libraries/libsystem/unicode/*.c) \
-			  $(wildcard libraries/libsystem/io/*.c)
+			  $(wildcard libraries/libsystem/io/*.c) \
+			  $(wildcard libraries/libsystem/process/*.c)
 
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 

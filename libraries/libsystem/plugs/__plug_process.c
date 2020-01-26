@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <abi/Syscalls.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
-#include <abi/Syscalls.h>
 
 int __plug_process_this(void)
 {
@@ -16,7 +16,10 @@ int __plug_process_exec(const char *file_name, const char **argv)
     return __syscall(SYS_PROCESS_EXEC, (int)file_name, (int)argv, 0, 0, 0);
 }
 
-// TODO: void __plug_process_spawn();
+int __plug_process_launch(Launchpad *launchpad)
+{
+    return __syscall(SYS_PROCESS_LAUNCH, (int)launchpad, 0, 0, 0, 0);
+}
 
 void __plug_process_exit(int code)
 {

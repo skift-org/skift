@@ -4,13 +4,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libkernel/message.h>
+#include <libsystem/error.h>
 #include <libsystem/list.h>
 #include <libsystem/runtime.h>
 
+#include <abi/Launchpad.h>
 #include <abi/Process.h>
 #include <abi/Task.h>
-#include <libkernel/message.h>
-#include <libsystem/error.h>
 
 #include "filesystem/Filesystem.h"
 #include "memory.h"
@@ -110,6 +111,8 @@ int task_count(void);
 Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user);
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user);
+
+int task_launch(Task *task, Launchpad *Launchpad);
 
 void task_setstate(Task *task, TaskState state);
 

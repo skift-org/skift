@@ -6,9 +6,10 @@
 
 #define SYSCALL_LIST(__ENTRY)          \
     __ENTRY(SYS_DEBUG)                 \
+                                       \
     __ENTRY(SYS_PROCESS_THIS)          \
     __ENTRY(SYS_PROCESS_EXEC)          \
-    __ENTRY(SYS_PROCESS_SPAWN)         \
+    __ENTRY(SYS_PROCESS_LAUNCH)        \
     __ENTRY(SYS_PROCESS_EXIT)          \
     __ENTRY(SYS_PROCESS_CANCEL)        \
     __ENTRY(SYS_PROCESS_SLEEP)         \
@@ -20,9 +21,11 @@
     __ENTRY(SYS_PROCESS_UNMAP)         \
     __ENTRY(SYS_PROCESS_ALLOC)         \
     __ENTRY(SYS_PROCESS_FREE)          \
+                                       \
     __ENTRY(SYS_SHARED_MEMORY_ALLOC)   \
     __ENTRY(SYS_SHARED_MEMORY_ACQUIRE) \
     __ENTRY(SYS_SHARED_MEMORY_RELEASE) \
+                                       \
     __ENTRY(SYS_MESSAGING_SEND)        \
     __ENTRY(SYS_MESSAGING_BROADCAST)   \
     __ENTRY(SYS_MESSAGING_REQUEST)     \
@@ -30,15 +33,18 @@
     __ENTRY(SYS_MESSAGING_RESPOND)     \
     __ENTRY(SYS_MESSAGING_SUBSCRIBE)   \
     __ENTRY(SYS_MESSAGING_UNSUBSCRIBE) \
+                                       \
     __ENTRY(SYS_FILESYSTEM_LINK)       \
     __ENTRY(SYS_FILESYSTEM_UNLINK)     \
     __ENTRY(SYS_FILESYSTEM_RENAME)     \
     __ENTRY(SYS_FILESYSTEM_MKPIPE)     \
     __ENTRY(SYS_FILESYSTEM_MKDIR)      \
+                                       \
     __ENTRY(SYS_SYSTEM_GET_INFO)       \
     __ENTRY(SYS_SYSTEM_GET_STATUS)     \
     __ENTRY(SYS_SYSTEM_GET_TIME)       \
     __ENTRY(SYS_SYSTEM_GET_TICKS)      \
+                                       \
     __ENTRY(SYS_HANDLE_OPEN)           \
     __ENTRY(SYS_HANDLE_CLOSE)          \
     __ENTRY(SYS_HANDLE_READ)           \

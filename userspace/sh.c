@@ -2,8 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <abi/Process.h>
+
 #include <libdevice/keyboard.h>
-#include <libkernel/task.h>
 #include <libsystem/convert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
@@ -11,6 +12,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
 #include <libsystem/process.h>
+#include <libsystem/process/Launchpad.h>
 
 #define MAX_COMMAND_LENGHT 128
 
@@ -122,7 +124,7 @@ int shell_split(shell_t *this)
 
     int token_index = 0;
 
-    char **tokens = malloc(TASK_ARGV_COUNT * sizeof(char *));
+    char **tokens = malloc(PROCESS_ARG_COUNT * sizeof(char *));
     char *start = &this->command_string[0];
 
     for (size_t i = 0; i < strlen(this->command_string) + 1; i++)
@@ -238,35 +240,38 @@ shell_builtin_handler_t shell_get_builtin(const char *name)
 
 /* --- Eval ----------------------------------------------------------------- */
 
-bool shell_eval(shell_t *this)
+void shell_eval(shell_t *this)
 {
-    // Try to exect a builtin
     shell_builtin_handler_t builtin = shell_get_builtin(this->command_argv[0]);
 
     if (builtin != NULL)
     {
         this->command_exit_value = builtin(this, this->command_argc, (const char **)this->command_argv);
-        return true;
+
+        return;
     }
 
-    // Or exec a real command
-    int process = process_exec(this->command_argv[0], (const char **)this->command_argv);
+    char executable[PATH_LENGHT];
+    snprintf(executable, PATH_LENGHT, "/bin/%s", this->command_argv[0]);
+
+    Launchpad *launchpad = launchpad_create(this->command_argv[0], executable);
+
+    for (int i = 0; i < this->command_argc; i++)
+    {
+        launchpad_argument(launchpad, this->command_argv[i]);
+    }
+
+    int process = launchpad_launch(launchpad);
 
     if (process < 0)
     {
-        char pathbuffer[144];
-        snprintf(pathbuffer, 144, "/bin/%s", this->command_argv[0]);
-
-        process = process_exec(pathbuffer, (const char **)this->command_argv);
+        printf("%s: Command not found! \e[90m%s\e[m\n", this->command_argv[0], error_to_string(-process));
+        this->command_exit_value = -1;
     }
-
-    if (process > 0)
+    else
     {
         process_wait(process, &this->command_exit_value);
-        return true;
     }
-
-    return false;
 }
 
 /* --- Entry point ---------------------------------------------------------- */
@@ -307,10 +312,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        if (!shell_eval(&this))
-        {
-            printf("Command not found!\n");
-        }
+        shell_eval(&this);
 
         shell_cleanup(&this);
     }

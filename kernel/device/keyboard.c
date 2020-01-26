@@ -33,6 +33,7 @@ typedef enum
 static PS2KeyboardState keyboard_state = PS2KBD_STATE_NORMAL;
 static key_motion_t keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
 static keymap_t *keyboard_keymap = NULL;
+static RingBuffer *keyboard_buffer = NULL;
 
 int keyboad_get_codepoint(key_t key)
 {
@@ -74,6 +75,10 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
 
                 task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
             }
+
+            uint8_t utf8[5];
+            int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
+            ringbuffer_write(keyboard_buffer, (char *)utf8, lenght);
 
             keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
             message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);
@@ -172,6 +177,27 @@ keymap_t *keyboard_load_keymap(const char *keymap_path)
     return keymap;
 }
 
+bool keyboard_FsOperationCanRead(FsNode *node)
+{
+    __unused(node);
+
+    // FIXME: make this atomic or something...
+    return !ringbuffer_is_empty(keyboard_buffer);
+}
+
+static error_t keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: use locks
+    atomic_begin();
+    *readed = ringbuffer_read(keyboard_buffer, buffer, size);
+    atomic_end();
+
+    return ERR_SUCCESS;
+}
+
 error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
@@ -221,6 +247,7 @@ void keyboard_initialize()
     logger_info("Initializing keyboad...");
 
     keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
+    keyboard_buffer = ringbuffer_create(1024);
 
     irq_register(1, keyboard_irq);
 
@@ -229,6 +256,8 @@ void keyboard_initialize()
     fsnode_init(keyboard_device, FSNODE_DEVICE);
 
     FSNODE(keyboard_device)->call = (FsOperationCall)keyboard_FsOperationCall;
+    FSNODE(keyboard_device)->read = (FsOperationRead)keyboard_FsOperationRead;
+    FSNODE(keyboard_device)->can_read = (FsOperationCanRead)keyboard_FsOperationCanRead;
 
     Path *keyboard_device_path = path(KEYBOARD_DEVICE);
     filesystem_link_and_take_ref(keyboard_device_path, keyboard_device);

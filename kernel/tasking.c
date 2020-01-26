@@ -123,24 +123,6 @@ Task *task_create(Task *parent, const char *name, bool user)
         this->handles[i] = NULL;
     }
 
-    // FIXME: Passing handles arround.
-    // if (parent != NULL)
-    // {
-    //     lock_acquire(parent->handles_lock);
-    //
-    //     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
-    //     {
-    //         if (parent->handles[i])
-    //         {
-    //             fshandle_acquire_lock(parent->handles[i], sheduler_running_id());
-    //             this->handles[i] = fshandle_clone(parent->handles[i]);
-    //             fshandle_release_lock(parent->handles[i], sheduler_running_id());
-    //         }
-    //     }
-    //
-    //     lock_release(parent->handles_lock);
-    // }
-
     // Setup memory space
     if (user)
     {

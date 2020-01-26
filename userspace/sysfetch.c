@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     printf("    \\:\\/:/  /   \n");
     printf("     \\::/  /    \n");
     printf("      \\/__/     \n");
-    printf("\ec");
+    printf("\e[m");
 
     printf("\e[11A");
     printf("\e[16C user@%s\n", info.machine);

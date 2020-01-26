@@ -10,6 +10,7 @@
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Launchpad.h>
 #include <libterminal/Terminal.h>
 
 static Stream *terminal_fifo = NULL;
@@ -212,7 +213,7 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    terminal_fifo = stream_open("/dev/term", OPEN_READ);
+    terminal_fifo = stream_open("/dev/term", OPEN_READ | OPEN_WRITE);
 
     if (terminal_fifo == NULL)
     {
@@ -239,6 +240,11 @@ int main(int argc, char const *argv[])
             is_framebuffer = false;
         }
     }
+
+    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/sh");
+    launchpad_handle(shell_launchpad, HANDLE(terminal_fifo), 1);
+    launchpad_handle(shell_launchpad, HANDLE(terminal_fifo), 2);
+    launchpad_launch(shell_launchpad);
 
     bool do_exit = false;
 

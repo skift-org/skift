@@ -10,6 +10,16 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     strcpy(launchpad->name, name);
     strcpy(launchpad->executable, executable);
 
+    for (size_t i = 0; i < PROCESS_HANDLE_COUNT; i++)
+    {
+        launchpad->handles[i] = HANDLE_INVALID_ID;
+    }
+
+    launchpad->handles[0] = 0;
+    launchpad->handles[1] = 1;
+    launchpad->handles[2] = 2;
+    launchpad->handles[3] = 3;
+
     return launchpad;
 }
 
@@ -31,6 +41,13 @@ void launchpad_argument(Launchpad *launchpad, const char *argument)
     launchpad->argv[launchpad->argc + 1] = NULL;
 
     launchpad->argc++;
+}
+
+void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destination)
+{
+    assert(destination >= 0 && destination < PROCESS_ARG_COUNT);
+
+    launchpad->handles[destination] = handle_to_pass->id;
 }
 
 int launchpad_launch(Launchpad *launchpad)

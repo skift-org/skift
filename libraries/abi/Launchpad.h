@@ -10,4 +10,6 @@ typedef struct
 
     char *argv[PROCESS_ARG_COUNT + 1];
     int argc;
+
+    int handles[PROCESS_HANDLE_COUNT];
 } Launchpad;

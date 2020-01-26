@@ -28,10 +28,10 @@ void __plug_init(void)
     lock_init(loglock);
 
     // Open io stream
-    in_stream = NULL; // FIXME: no stdin,
-    out_stream = stream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
-    err_stream = stream_open("/dev/term", OPEN_WRITE | OPEN_BUFFERED);
-    log_stream = stream_open("/dev/serial", OPEN_WRITE | OPEN_BUFFERED);
+    in_stream = stream_open_handle(0, OPEN_READ);
+    out_stream = stream_open_handle(1, OPEN_WRITE | OPEN_BUFFERED);
+    err_stream = stream_open_handle(2, OPEN_WRITE | OPEN_BUFFERED);
+    log_stream = stream_open_handle(3, OPEN_WRITE | OPEN_BUFFERED);
 
     _init();
 }
@@ -39,6 +39,11 @@ void __plug_init(void)
 void __plug_fini(int exit_code)
 {
     _fini();
+
+    if (in_stream)
+    {
+        stream_flush(out_stream);
+    }
 
     if (out_stream)
     {

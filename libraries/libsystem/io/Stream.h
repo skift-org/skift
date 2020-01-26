@@ -45,6 +45,8 @@ extern Stream *log_stream;
 
 Stream *stream_open(const char *path, OpenFlag flags);
 
+Stream *stream_open_handle(int handle_id, OpenFlag flags);
+
 void stream_close(Stream *stream);
 
 void stream_set_read_buffer_mode(Stream *this, StreamBufferMode mode);

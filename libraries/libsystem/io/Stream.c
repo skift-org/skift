@@ -7,12 +7,8 @@
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 
-Stream *stream_open(const char *path, OpenFlag flags)
+static void stream_initialize(Stream *stream)
 {
-    Stream *stream = __create(Stream);
-
-    __plug_handle_open(HANDLE(stream), path, flags | OPEN_STREAM);
-
     if (handle_has_flags(stream, OPEN_BUFFERED | OPEN_WRITE))
     {
         stream->write_mode = STREAM_BUFFERED_LINE;
@@ -24,13 +20,34 @@ Stream *stream_open(const char *path, OpenFlag flags)
         stream->read_mode = STREAM_BUFFERED_BLOCK;
         stream->read_buffer = malloc(STREAM_BUFFER_SIZE);
     }
+}
+
+Stream *stream_open(const char *path, OpenFlag flags)
+{
+    Stream *stream = __create(Stream);
+
+    __plug_handle_open(HANDLE(stream), path, flags | OPEN_STREAM);
+
+    stream_initialize(stream);
+
+    return stream;
+}
+
+Stream *stream_open_handle(int handle_id, OpenFlag flags)
+{
+    Stream *stream = __create(Stream);
+
+    HANDLE(stream)->id = handle_id;
+    HANDLE(stream)->flags = flags | OPEN_STREAM;
+    HANDLE(stream)->error = ERR_SUCCESS;
+
+    stream_initialize(stream);
 
     return stream;
 }
 
 void stream_close(Stream *stream)
 {
-
     stream_flush(stream);
 
     if (stream->write_buffer)
@@ -50,7 +67,6 @@ void stream_close(Stream *stream)
 
 void stream_set_read_buffer_mode(Stream *stream, StreamBufferMode mode)
 {
-
     if (mode == STREAM_BUFFERED_NONE)
     {
         if (stream->read_buffer)

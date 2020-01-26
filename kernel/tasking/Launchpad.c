@@ -36,6 +36,28 @@ error_t task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fi
     }
 }
 
+void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *launchpad)
+{
+    lock_acquire(parent_task->handles_lock);
+
+    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
+    {
+        int child_handle_id = i;
+        int parent_handle_id = launchpad->handles[i];
+
+        if (parent_handle_id >= 0 &&
+            parent_handle_id < PROCESS_HANDLE_COUNT &&
+            parent_task->handles[parent_handle_id] != NULL)
+        {
+            fshandle_acquire_lock(parent_task->handles[parent_handle_id], sheduler_running_id());
+            child_task->handles[child_handle_id] = fshandle_clone(parent_task->handles[parent_handle_id]);
+            fshandle_release_lock(parent_task->handles[parent_handle_id], sheduler_running_id());
+        }
+    }
+
+    lock_release(parent_task->handles_lock);
+}
+
 int task_launch(Task *parent_task, Launchpad *launchpad)
 {
     assert(parent_task == sheduler_running());
@@ -88,6 +110,8 @@ int task_launch(Task *parent_task, Launchpad *launchpad)
             goto cleanup_and_return;
         }
     }
+
+    task_launch_passhandle(parent_task, child_task, launchpad);
 
     result = child_task->id;
     task_go(child_task);

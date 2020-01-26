@@ -11,8 +11,8 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/messaging.h>
-#include <libsystem/process/Process.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 
 #define MAX_COMMAND_LENGHT 128
 
@@ -66,46 +66,36 @@ void shell_prompt(shell_t *this)
 
 int shell_readline(shell_t *this)
 {
-    // FIXME: All user input should come from in_stream
-    messaging_subscribe(KEYBOARD_CHANNEL);
 
     int i = 0;
     this->command_string[i] = '\0';
 
     while (true)
     {
-        message_t msg;
-        messaging_receive(&msg, 1);
+        char chr = stream_getchar(in_stream);
 
-        if (message_is(msg, KEYBOARD_KEYTYPED))
+        if (chr == '\n')
         {
-            keyboard_event_t *event = message_payload_as(msg, keyboard_event_t);
-
-            if (event->codepoint == '\n')
+            printf("\n");
+            break;
+        }
+        else if (chr == '\b')
+        {
+            if (strlen(this->command_string) > 0)
             {
-                printf("\n");
-                break;
+                strbs(this->command_string);
+                printf("\b\e[K");
             }
-            else if (event->codepoint == '\b')
+        }
+        else if (chr != '\t')
+        {
+            if (strlen(this->command_string) < MAX_COMMAND_LENGHT - 1)
             {
-                if (strlen(this->command_string) > 0)
-                {
-                    strbs(this->command_string);
-                    printf("\b\e[K");
-                }
-            }
-            else if (!(event->codepoint == '\0' || event->codepoint == '\t'))
-            {
-                if (strlen(this->command_string) < MAX_COMMAND_LENGHT - 1)
-                {
-                    strnapd(this->command_string, event->codepoint, MAX_COMMAND_LENGHT);
-                    printf("%c", event->codepoint);
-                }
+                strnapd(this->command_string, chr, MAX_COMMAND_LENGHT);
+                printf("%c", chr);
             }
         }
     }
-
-    messaging_unsubscribe(KEYBOARD_CHANNEL);
 
     printf("\e[0m");
 

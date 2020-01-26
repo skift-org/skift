@@ -40,10 +40,9 @@ int main(int argc, char **argv)
     logger_level(LOGGER_TRACE);
 
     filesystem_mkpipe("/dev/term");
-    init_exec("/bin/term");
-    int shell = init_exec("/bin/sh");
+    int term = init_exec("/bin/term");
 
-    process_wait(shell, NULL);
+    process_wait(term, NULL);
 
     printf("\n\e[1;34mGoodbye!");
 

@@ -32,6 +32,7 @@ int main(int argc, char **argv)
     __unused(argv);
 
     framebuffer_t *fb = framebuffer_open();
+    Rectangle fb_bound = framebuffer_bound(fb);
 
     if (fb == NULL)
     {
@@ -49,17 +50,22 @@ int main(int argc, char **argv)
 
     do
     {
-        line_t line;
-        stream_read(random_device, &line, sizeof(line));
+        for (int i = 0; i < 100; i++)
+        {
+            /* code */
 
-        line.start.X = abs((int)line.start.X % 800);
-        line.start.Y = abs((int)line.start.Y % 600);
-        line.finish.X = abs((int)line.finish.X % 800);
-        line.finish.Y = abs((int)line.finish.Y % 600);
+            line_t line;
+            stream_read(random_device, &line, sizeof(line));
 
-        painter_draw_line(fb->painter, line.start, line.finish, line.color);
+            line.start.X = abs((int)line.start.X % fb_bound.width);
+            line.start.Y = abs((int)line.start.Y % fb_bound.height);
+            line.finish.X = abs((int)line.finish.X % fb_bound.width);
+            line.finish.Y = abs((int)line.finish.Y % fb_bound.height);
 
-        framebuffer_mark_dirty(fb, line_bound(line));
+            painter_draw_line(fb->painter, line.start, line.finish, line.color);
+
+            framebuffer_mark_dirty(fb, line_bound(line));
+        }
         framebuffer_blit_dirty(fb);
     } while (true);
 

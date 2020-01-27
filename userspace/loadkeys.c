@@ -5,6 +5,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
+#include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
@@ -36,26 +37,26 @@ static CommandLine cmdline = CMDLINE(
     "Get or set the current keyboard keymap",
     "Options can be combined.");
 
-int loadkey_list_keymap()
+int loadkey_list_keymap(void)
 {
-    Stream *keymap_directory = stream_open("/res/keyboard", OPEN_READ);
+    Directory *keymap_directory = directory_open("/res/keyboard", OPEN_READ);
 
     if (handle_has_error(keymap_directory))
     {
-        handle_printf_error(keymap_directory, "loadkeys: Failled to query keymaps from /res/keyboard!");
-        stream_close(keymap_directory);
+        handle_printf_error(keymap_directory, "loadkeys: Failled to query keymaps from /res/keyboard");
+        directory_close(keymap_directory);
 
         return -1;
     }
 
     DirectoryEntry entry = {0};
-    while (stream_read(keymap_directory, &entry, sizeof(entry)) > 0)
+    while (directory_read(keymap_directory, &entry) > 0)
     {
         // FIXME: maybe show some info about the kmap file
         printf("- %s\n", entry.name);
     }
 
-    stream_close(keymap_directory);
+    directory_close(keymap_directory);
 
     return 0;
 }

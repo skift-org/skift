@@ -5,6 +5,7 @@
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
+#include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
@@ -62,12 +63,12 @@ void ls_print_entry(DirectoryEntry *entry)
 
 int ls(const char *target_path, bool with_prefix)
 {
-    Stream *directory = stream_open(target_path, OPEN_READ);
+    Directory *directory = directory_open(target_path, OPEN_READ);
 
     if (handle_has_error(directory))
     {
         handle_printf_error(directory, "ls: cannot access '%s'", target_path);
-        stream_close(directory);
+        directory_close(directory);
         return -1;
     }
 
@@ -76,26 +77,11 @@ int ls(const char *target_path, bool with_prefix)
         printf("%s:\n", target_path);
     }
 
-    FileState stat = {0};
-    stream_stat(directory, &stat);
+    DirectoryEntry entry;
 
-    if (stat.type == FILE_TYPE_DIRECTORY)
+    while (directory_read(directory, &entry) > 0)
     {
-        DirectoryEntry entry;
-
-        while (stream_read(directory, &entry, sizeof(entry)) > 0)
-        {
-            ls_print_entry(&entry);
-        }
-    }
-    else
-    {
-        DirectoryEntry entry;
-        entry.stat = stat;
-        Path *p = path(target_path);
-        strlcpy(entry.name, path_filename(p), PATH_LENGHT);
         ls_print_entry(&entry);
-        path_delete(p);
     }
 
     if (!option_list)
@@ -103,7 +89,7 @@ int ls(const char *target_path, bool with_prefix)
         printf("\n");
     }
 
-    stream_close(directory);
+    directory_close(directory);
 
     return 0;
 }

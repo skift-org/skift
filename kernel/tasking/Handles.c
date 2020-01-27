@@ -101,17 +101,18 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
 {
     Path *p = task_cwd_resolve(task, file_path);
 
-    FsHandle *handle = filesystem_open(p, flags);
+    FsHandle *handle = NULL;
+    error_t result = filesystem_open(p, flags, &handle);
 
     path_delete(p);
 
     if (handle == NULL)
     {
         *handle_index = HANDLE_INVALID_ID;
-        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        return result;
     }
 
-    error_t result = task_fshandle_add(task, handle_index, handle);
+    result = task_fshandle_add(task, handle_index, handle);
 
     if (result != ERR_SUCCESS)
     {

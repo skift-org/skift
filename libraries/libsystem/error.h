@@ -27,6 +27,8 @@
     __ENTRY(ERR_INVALID_CROSS_DEVICE_LINK)                         \
     __ENTRY(ERR_NO_SUCH_DEVICE)                                    \
     __ENTRY(ERR_NOT_A_DIRECTORY)                                   \
+    __ENTRY(ERR_NOT_A_STREAM)                                      \
+    __ENTRY(ERR_NOT_A_SOCKET)                                      \
     __ENTRY(ERR_IS_A_DIRECTORY)                                    \
     __ENTRY(ERR_INVALID_ARGUMENT)                                  \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES_IN_SYSTEM)                     \

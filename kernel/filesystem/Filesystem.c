@@ -75,8 +75,9 @@ FsNode *filesystem_find_parent_and_ref(Path *path)
     return parent;
 }
 
-FsHandle *filesystem_open(Path *path, OpenFlag flags)
+error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 {
+    *handle = NULL;
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
     FsNode *node = filesystem_find_and_ref(path);
@@ -102,14 +103,35 @@ FsHandle *filesystem_open(Path *path, OpenFlag flags)
 
     if (node == NULL)
     {
-        return NULL;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    FsHandle *handle = fshandle_create(node, flags);
+    if ((flags & OPEN_DIRECTORY) && node->type != FSNODE_DIRECTORY)
+    {
+        fsnode_deref(node);
+
+        return ERR_NOT_A_DIRECTORY;
+    }
+
+    if ((flags & OPEN_SOCKET) && node->type != FSNODE_SOCKET)
+    {
+        fsnode_deref(node);
+
+        return ERR_NOT_A_SOCKET;
+    }
+
+    if ((flags & OPEN_STREAM) && !(node->type == FSNODE_PIPE || node->type == FSNODE_FILE || node->type == FSNODE_DEVICE))
+    {
+        fsnode_deref(node);
+
+        return ERR_NOT_A_STREAM;
+    }
+
+    *handle = fshandle_create(node, flags);
 
     fsnode_deref(node);
 
-    return handle;
+    return ERR_SUCCESS;
 }
 
 error_t filesystem_connect(Path *path, FsHandle **connection_handle)

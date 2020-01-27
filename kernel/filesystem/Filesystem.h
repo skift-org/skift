@@ -18,7 +18,7 @@ FsNode *filesystem_find_and_ref(Path *path);
 
 FsNode *filesystem_find_parent_and_ref(Path *path);
 
-FsHandle *filesystem_open(Path *path, OpenFlag flags);
+error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle);
 
 error_t filesystem_connect(Path *path, FsHandle **connection_handle);
 

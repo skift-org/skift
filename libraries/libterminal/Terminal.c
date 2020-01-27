@@ -457,7 +457,7 @@ void terminal_do_ansi(Terminal *terminal, Codepoint codepoint)
                 }
                 else if (attr == 3)
                 {
-                    terminal->current_attributes = terminal_attributes_italic(terminal->current_attributes);
+                    terminal->current_attributes = terminal_attributes_inverted(terminal->current_attributes);
                 }
                 else if (attr == 4)
                 {
@@ -528,8 +528,10 @@ void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint)
         else if (codepoint == U'c')
         {
             terminal->current_attributes = terminal->default_attributes;
-
             terminal->state = TERMINAL_STATE_WAIT_ESC;
+
+            terminal_cursor_set(terminal, 0, 0);
+            terminal_clear_all(terminal);
         }
         else
         {

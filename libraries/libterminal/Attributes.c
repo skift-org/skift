@@ -11,9 +11,9 @@ TerminalAttributes terminal_attributes_bold(TerminalAttributes attributes)
     return attributes;
 }
 
-TerminalAttributes terminal_attributes_italic(TerminalAttributes attributes)
+TerminalAttributes terminal_attributes_inverted(TerminalAttributes attributes)
 {
-    attributes.italic = true;
+    attributes.inverted = true;
 
     return attributes;
 }
@@ -28,7 +28,7 @@ TerminalAttributes terminal_attributes_underline(TerminalAttributes attributes)
 TerminalAttributes terminal_attributes_regular(TerminalAttributes attributes)
 {
     attributes.bold = false;
-    attributes.italic = false;
+    attributes.inverted = false;
     attributes.underline = false;
 
     return attributes;
@@ -53,6 +53,6 @@ bool terminal_attributes_equals(TerminalAttributes left, TerminalAttributes righ
     return left.foreground == right.foreground &&
            left.background == right.background &&
            left.bold == right.bold &&
-           left.italic == right.italic &&
+           left.inverted == right.inverted &&
            left.underline == right.underline;
 }

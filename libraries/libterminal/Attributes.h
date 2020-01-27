@@ -13,13 +13,13 @@ typedef struct
     TerminalColor background;
 
     bool bold;
-    bool italic;
+    bool inverted;
     bool underline;
 } TerminalAttributes;
 
 TerminalAttributes terminal_attributes_bold(TerminalAttributes attributes);
 
-TerminalAttributes terminal_attributes_italic(TerminalAttributes attributes);
+TerminalAttributes terminal_attributes_inverted(TerminalAttributes attributes);
 
 TerminalAttributes terminal_attributes_underline(TerminalAttributes attributes);
 

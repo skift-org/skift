@@ -43,10 +43,20 @@ static byte textmode_colors[] = {
 
 void textmode_TerminalPaintCallback(Terminal *terminal, int x, int y, TerminalCell cell)
 {
-    textmode_buffer[x + y * terminal->width] = TEXTMODE_ENTRY(
-        codepoint_to_cp437(cell.codepoint),
-        textmode_colors[cell.attributes.foreground],
-        textmode_colors[cell.attributes.background]);
+    if (cell.attributes.inverted)
+    {
+        textmode_buffer[x + y * terminal->width] = TEXTMODE_ENTRY(
+            codepoint_to_cp437(cell.codepoint),
+            textmode_colors[cell.attributes.background],
+            textmode_colors[cell.attributes.foreground]);
+    }
+    else
+    {
+        textmode_buffer[x + y * terminal->width] = TEXTMODE_ENTRY(
+            codepoint_to_cp437(cell.codepoint),
+            textmode_colors[cell.attributes.foreground],
+            textmode_colors[cell.attributes.background]);
+    }
 }
 
 void textmode_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
@@ -152,6 +162,12 @@ void paint_repaint_dirty(Terminal *console, Painter *paint)
 
                 Color background_color = framebuffer_colors[cell.attributes.background];
                 Color foreground_color = framebuffer_colors[cell.attributes.foreground];
+
+                if (cell.attributes.inverted)
+                {
+                    background_color = framebuffer_colors[cell.attributes.foreground];
+                    foreground_color = framebuffer_colors[cell.attributes.background];
+                }
 
                 Point pos = (Point){x * char_size.X, y * (int)(char_size.Y)};
                 Point siz = (Point){char_size.X, (char_size.Y)};

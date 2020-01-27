@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    printf("\e[mColors:");
+    printf("\e[mColors: ");
 
     for (int i = 0; i < 8; i++)
     {
@@ -21,14 +21,15 @@ int main(int argc, char **argv)
         printf("\e[%dm ", 100 + i);
     }
 
-    printf("\ec\n");
+    printf("\n");
 
-    printf("Styles:");
+    printf("\e[mStyles:");
     printf(" regular");
-    printf("\e[4m underline\ec");
-    printf("\e[1m bold\ec\n");
+    printf(" \e[;4munderline");
+    printf(" \e[;1mbold");
+    printf(" \e[;3minverted\n");
 
-    printf("Unicode: ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■☺☻♥♦♣♠•◘○◙♂♀♪♫☼⌂►◄↕‼¶§▬↨↑↓→←∟↔▲▼");
+    printf("\e[mUnicode: ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■☺☻♥♦♣♠•◘○◙♂♀♪♫☼⌂►◄↕‼¶§▬↨↑↓→←∟↔▲▼");
 
     return 0;
 }

@@ -44,7 +44,7 @@ void widget_add_child(Widget *widget, Widget *child)
 {
     assert(child->parent == NULL);
 
-    logger_info("Adding child %s(0x%08x)", child->classname, child);
+    logger_info("Adding child %s(0x%08x) to %s(0x%08x)", child->classname, child, widget->classname, widget);
 
     child->parent = widget;
     list_pushback(widget->childs, child);
@@ -54,7 +54,7 @@ void widget_remove_child(Widget *widget, Widget *child)
 {
     assert(child->parent == widget);
 
-    logger_info("Removing child %s(0x%08x)", child->classname, child);
+    logger_info("Removing child %s(0x%08x) from %s(0x%08x)", child->classname, child, widget->classname, widget);
 
     child->parent = NULL;
     list_remove(widget->childs, child);

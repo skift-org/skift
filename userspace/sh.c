@@ -13,6 +13,7 @@
 #include <libsystem/messaging.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/readline/ReadLine.h>
 
 #define MAX_COMMAND_LENGHT 128
 
@@ -31,7 +32,7 @@ typedef struct shell
     bool do_continue;
     shell_builtin_command_t *builtins;
 
-    char *command_string;
+    ReadLine *readline;
     int command_argc;
     char **command_argv;
 
@@ -62,68 +63,28 @@ void shell_prompt(shell_t *this)
     printf(PROMPT);
 }
 
-/* --- Readline ------------------------------------------------------------- */
-
-int shell_readline(shell_t *this)
-{
-
-    int i = 0;
-    this->command_string[i] = '\0';
-
-    while (true)
-    {
-        char chr = stream_getchar(in_stream);
-
-        if (chr == '\n')
-        {
-            printf("\n");
-            break;
-        }
-        else if (chr == '\b')
-        {
-            if (strlen(this->command_string) > 0)
-            {
-                strbs(this->command_string);
-                printf("\b\e[K");
-            }
-        }
-        else if (chr != '\t')
-        {
-            if (strlen(this->command_string) < MAX_COMMAND_LENGHT - 1)
-            {
-                strnapd(this->command_string, chr, MAX_COMMAND_LENGHT);
-                printf("%c", chr);
-            }
-        }
-    }
-
-    printf("\e[0m");
-
-    return strlen(this->command_string);
-}
-
 /* --- Tokenizer ------------------------------------------------------------ */
 
-int shell_split(shell_t *this)
+int shell_split(shell_t *this, char *command)
 {
-    strleadtrim(this->command_string, ' ');
-    strtrailtrim(this->command_string, ' ');
+    strleadtrim(command, ' ');
+    strtrailtrim(command, ' ');
 
-    if (strlen(this->command_string) == 0)
+    if (strlen(command) == 0)
         return 0;
 
     int token_index = 0;
 
     char **tokens = malloc(PROCESS_ARG_COUNT * sizeof(char *));
-    char *start = &this->command_string[0];
+    char *start = &command[0];
 
-    for (size_t i = 0; i < strlen(this->command_string) + 1; i++)
+    for (size_t i = 0; i < strlen(command) + 1; i++)
     {
-        char c = this->command_string[i];
+        char c = command[i];
 
         if (c == ' ' || c == '\0')
         {
-            int buffer_len = &this->command_string[i] - start + 1;
+            int buffer_len = &command[i] - start + 1;
 
             if (buffer_len > 1)
             {
@@ -134,7 +95,7 @@ int shell_split(shell_t *this)
                 tokens[token_index++] = buffer;
             }
 
-            start = &this->command_string[i] + 1;
+            start = &command[i] + 1;
         }
     }
 
@@ -168,7 +129,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
         if (result < 0)
         {
-            stream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            stream_printf(err_stream, "cd: Cannot access '%s'", argv[1]);
             error_print("");
             return -1;
         }
@@ -181,7 +142,7 @@ int shell_builtin_cd(shell_t *shell, int argc, const char **argv)
 
         if (result < 0)
         {
-            stream_printf(err_stream, "cd: cannot access '%s'", argv[1]);
+            stream_printf(err_stream, "cd: Cannot access '%s'", "/");
             error_print("");
             return -1;
         }
@@ -279,14 +240,18 @@ int main(int argc, char **argv)
         .do_continue = true,
         .builtins = shell_get_builtins(),
         .command_exit_value = 0,
-        .command_string = malloc(MAX_COMMAND_LENGHT),
+        .readline = readline_create(),
     };
 
     while (this.do_continue)
     {
         shell_prompt(&this);
 
-        if (shell_readline(&this) == 0)
+        char *command = readline_readline(this.readline);
+        strleadtrim(command, ' ');
+        strtrailtrim(command, ' ');
+
+        if (strlen(command) == 0)
         {
             printf("Empty command!\n");
 
@@ -294,7 +259,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-        if (shell_split(&this) == 0)
+        if (shell_split(&this, command) == 0)
         {
             printf("Empty command!\n");
 
@@ -305,7 +270,9 @@ int main(int argc, char **argv)
         shell_eval(&this);
 
         shell_cleanup(&this);
+        free(command);
     }
 
+    stream_printf(err_stream, "\n[ sh exited %d ]\n", this.command_exit_value);
     return this.command_exit_value;
 }

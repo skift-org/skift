@@ -48,7 +48,7 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
         }
 
         DateTime datetime = datetime_now();
-        stream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
+        stream_printf(log_stream, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
 
         if (logger_use_colors)
         {
@@ -56,7 +56,7 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
         }
         else
         {
-            stream_printf(log_stream, "%s%s %s:%d: ", logger_level_names[level], file, line);
+            stream_printf(log_stream, "%s %s:%d: ", logger_level_names[level], file, line);
         }
 
         va_list va;

@@ -15,7 +15,7 @@ static bool logger_use_colors = true;
 static bool logger_is_quiet = false;
 
 static const char *logger_level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
-static const char *logger_level_colors[] = {"\e[34m", "\e[36m", "\e[32m", "\e[22m", "\e[31m", "\e[35m"};
+static const char *logger_level_colors[] = {"\e[34m", "\e[36m", "\e[32m", "\e[33m", "\e[31m", "\e[35m"};
 
 void logger_level(LogLevel log_level)
 {
@@ -38,7 +38,14 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
     {
         __plug_logger_lock();
 
-        stream_printf(log_stream, "%d: ", process_this());
+        if (process_this() >= 0)
+        {
+            stream_printf(log_stream, "%3d: ", process_this());
+        }
+        else
+        {
+            stream_printf(log_stream, "     ", process_this());
+        }
 
         DateTime datetime = datetime_now();
         stream_printf(log_stream, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);

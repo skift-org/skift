@@ -76,9 +76,12 @@ void keyboard_handle_key(key_t key, key_motion_t motion)
                 task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
             }
 
-            uint8_t utf8[5];
-            int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
-            ringbuffer_write(keyboard_buffer, (char *)utf8, lenght);
+            if (keyboad_get_codepoint(key) != 0)
+            {
+                uint8_t utf8[5];
+                int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
+                ringbuffer_write(keyboard_buffer, (char *)utf8, lenght);
+            }
 
             keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
             message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);

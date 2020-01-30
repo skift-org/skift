@@ -4,7 +4,7 @@
 
     "//": "unmodified shift altgr* shift+altgr",
 
-    "bindings" : {
+    "mappings" : {
         "KEY_NUM1": ["&","1","|",""],
         "KEY_NUM2": ["é","2","@",""],
         "KEY_NUM3": ["\"","3","#",""],

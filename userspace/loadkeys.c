@@ -80,7 +80,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
 
-    if (stat.size < sizeof(keymap_t))
+    if (stat.size < sizeof(KeyMap))
     {
         stream_printf(err_stream, "loadkeys: Invalid keymap file format!\n");
         stream_close(keymap_file);
@@ -88,7 +88,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         return -1;
     }
 
-    keymap_t *new_keymap = malloc(stat.size);
+    KeyMap *new_keymap = malloc(stat.size);
 
     stream_read(keymap_file, new_keymap, stat.size);
 
@@ -118,7 +118,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
 int loadkey_get_keymap(Stream *keyboard_device)
 {
-    keymap_t keymap;
+    KeyMap keymap;
 
     if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != ERR_SUCCESS)
     {

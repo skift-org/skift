@@ -129,10 +129,10 @@ outfp.write(struct.pack("4s", b"kmap"))
 outfp.write(struct.pack("16s", data["language"].encode("utf-8")))
 outfp.write(struct.pack("16s", data["region"].encode("utf-8")))
 
-outfp.write(struct.pack("I", len(data["bindings"])))
+outfp.write(struct.pack("I", len(data["mappings"])))
 
-for key in data["bindings"]:
-    bind = data["bindings"][key]
+for key in data["mappings"]:
+    bind = data["mappings"][key]
 
     if len(bind) == 4:
         codepoint_regular = 0 if len(bind[0]) == 0 else ord(bind[0])
@@ -143,7 +143,7 @@ for key in data["bindings"]:
         outfp.write(struct.pack(
             "IIIII", KEYS[key], codepoint_regular, codepoint_shift, codepoint_alt, codepoint_shift_alt))
     else:
-        print("Warning invalid binding for key " + key)
+        print("Warning invalid mapping for key " + key)
 
 
 outfp.close()

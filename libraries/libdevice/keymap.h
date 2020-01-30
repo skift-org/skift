@@ -5,13 +5,13 @@
 
 typedef struct
 {
-    key_t key;
+    Key key;
 
     Codepoint regular_codepoint;
     Codepoint shift_codepoint;
     Codepoint alt_codepoint;
     Codepoint shift_alt_codepoint;
-} keymap_keybing_t;
+} KeyMapping;
 
 #define KEYMAP_LANGUAGE_SIZE 16
 #define KEYMAP_REGION_SIZE 16
@@ -22,6 +22,6 @@ typedef struct
     char language[KEYMAP_LANGUAGE_SIZE];
     char region[KEYMAP_REGION_SIZE];
 
-    int bindings_count;
-    keymap_keybing_t bindings[];
-} keymap_t;
+    int mappings_count;
+    KeyMapping mappings[];
+} KeyMap;

@@ -4,7 +4,7 @@
 
 static const char *KEYS_NAMES[] = {KEY_LIST(KEY_NAMES_ENTRY)};
 
-const char *key_to_string(key_t key)
+const char *key_to_string(Key key)
 {
     if (key < __KEY_COUNT)
     {
@@ -16,7 +16,7 @@ const char *key_to_string(key_t key)
     }
 }
 
-bool key_is_valid(key_t key)
+bool key_is_valid(Key key)
 {
     return key > 0 && key < __KEY_COUNT;
 }

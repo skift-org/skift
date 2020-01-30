@@ -1,14 +1,14 @@
 #include <libdevice/keymap.h>
 
-static keymap_keybing_t* keymap_lookup(keymap_t* this, key_t key)
+static KeyMapping *keymap_lookup(KeyMap *this, Key key)
 {
-    for (int i = 0; i < this->bindings_count; i++)
+    for (int i = 0; i < this->mappings_count; i++)
     {
-        if( this->bindings[i].key == key)
+        if (this->mappings[i].key == key)
         {
-            return &this->bindings[i];
+            return &this->mappings[i];
         }
     }
-    
+
     return NULL;
 }

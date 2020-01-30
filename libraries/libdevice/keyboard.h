@@ -28,6 +28,6 @@ typedef struct
 
 typedef struct
 {
-    key_t key;
+    Key key;
     Codepoint codepoint;
 } keyboard_event_t;

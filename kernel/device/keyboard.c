@@ -27,19 +27,19 @@
 typedef enum
 {
     PS2KBD_STATE_NORMAL,
-    PS2KBD_STATE_NORMAL_ESCAPED,
+    PS2KBD_STATE_ESCAPED,
 } PS2KeyboardState;
 
 static PS2KeyboardState keyboard_state = PS2KBD_STATE_NORMAL;
-static key_motion_t keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
-static keymap_t *keyboard_keymap = NULL;
+static KeyMotion keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
+static KeyMap *keyboard_keymap = NULL;
 static RingBuffer *keyboard_buffer = NULL;
 
-int keyboad_get_codepoint(key_t key)
+int keyboad_get_codepoint(Key key)
 {
-    keymap_keybing_t *binding = keymap_lookup(keyboard_keymap, key);
+    KeyMapping *mapping = keymap_lookup(keyboard_keymap, key);
 
-    if (binding == NULL)
+    if (mapping == NULL)
     {
         return 0;
     }
@@ -48,20 +48,20 @@ int keyboad_get_codepoint(key_t key)
         if (keyboard_keystate[KEY_LSHIFT] == KEY_MOTION_DOWN ||
             keyboard_keystate[KEY_RSHIFT] == KEY_MOTION_DOWN)
         {
-            return binding->shift_codepoint;
+            return mapping->shift_codepoint;
         }
         else if (keyboard_keystate[KEY_RALT] == KEY_MOTION_DOWN)
         {
-            return binding->alt_codepoint;
+            return mapping->alt_codepoint;
         }
         else
         {
-            return binding->regular_codepoint;
+            return mapping->regular_codepoint;
         }
     }
 }
 
-void keyboard_handle_key(key_t key, key_motion_t motion)
+void keyboard_handle_key(Key key, KeyMotion motion)
 {
     if (key_is_valid(key))
     {
@@ -116,19 +116,19 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
     {
         if (byte == PS2KBD_ESCAPE)
         {
-            keyboard_state = PS2KBD_STATE_NORMAL_ESCAPED;
+            keyboard_state = PS2KBD_STATE_ESCAPED;
         }
         else
         {
-            key_t key = byte & 0x7F;
+            Key key = byte & 0x7F;
             keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
     }
-    else if (keyboard_state == PS2KBD_STATE_NORMAL_ESCAPED)
+    else if (keyboard_state == PS2KBD_STATE_ESCAPED)
     {
         keyboard_state = PS2KBD_STATE_NORMAL;
 
-        key_t key = (byte & 0x7F) + 0x80;
+        Key key = (byte & 0x7F) + 0x80;
         keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 
@@ -137,7 +137,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
 
 /* --- Public functions ----------------------------------------------------- */
 
-keymap_t *keyboard_load_keymap(const char *keymap_path)
+KeyMap *keyboard_load_keymap(const char *keymap_path)
 {
     Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
@@ -161,7 +161,7 @@ keymap_t *keyboard_load_keymap(const char *keymap_path)
     }
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
-    keymap_t *keymap = malloc(stat.size);
+    KeyMap *keymap = malloc(stat.size);
 
     size_t readed = stream_read(keymap_file, keymap, stat.size);
 
@@ -209,7 +209,7 @@ error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
     if (request == KEYBOARD_CALL_SET_KEYMAP)
     {
         keyboard_set_keymap_args_t *size_and_keymap = args;
-        keymap_t *new_keymap = size_and_keymap->keymap;
+        KeyMap *new_keymap = size_and_keymap->keymap;
 
         atomic_begin();
 
@@ -229,7 +229,7 @@ error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
     {
         if (keyboard_keymap != NULL)
         {
-            memcpy(args, keyboard_keymap, sizeof(keymap_t));
+            memcpy(args, keyboard_keymap, sizeof(KeyMap));
 
             return ERR_SUCCESS;
         }

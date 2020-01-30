@@ -79,7 +79,8 @@ LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
 			  $(wildcard libraries/libsystem/plugs/*.c) \
 			  $(wildcard libraries/libsystem/unicode/*.c) \
 			  $(wildcard libraries/libsystem/io/*.c) \
-			  $(wildcard libraries/libsystem/process/*.c)
+			  $(wildcard libraries/libsystem/process/*.c) \
+			  $(wildcard libraries/libsystem/readline/*.c)
 
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 

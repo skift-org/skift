@@ -128,26 +128,34 @@ int main(int argc, char **argv)
 
     Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE, OPEN_READ);
 
-    if (framebuffer_device == NULL)
+    if (handle_has_error(HANDLE(framebuffer_device)))
     {
-        error_print("Failled to open " FRAMEBUFFER_DEVICE);
+        handle_printf_error(framebuffer_device, "gfxctl: Failled to open " FRAMEBUFFER_DEVICE);
+        stream_close(framebuffer_device);
+
         return -1;
     }
 
+    int result = -1;
+
     if (option_get)
     {
-        return gfxmode_get(framebuffer_device);
+        result = gfxmode_get(framebuffer_device);
     }
     else if (option_list)
     {
-        return gfxmode_list(framebuffer_device);
+        result = gfxmode_list(framebuffer_device);
     }
     else if (option_set != NULL)
     {
-        return gfxmode_set(framebuffer_device, option_set);
+        result = gfxmode_set(framebuffer_device, option_set);
     }
     else
     {
-        return gfxmode_get(framebuffer_device);
+        result = gfxmode_get(framebuffer_device);
     }
+
+    stream_close(framebuffer_device);
+
+    return result;
 }

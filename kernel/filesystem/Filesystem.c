@@ -41,7 +41,7 @@ FsNode *filesystem_find_and_ref(Path *path)
 
     for (int i = 0; i < path_length(path); i++)
     {
-        if (current != NULL && current->type == FSNODE_DIRECTORY)
+        if (current && current->type == FSNODE_DIRECTORY)
         {
             const char *element = path_element(path, i);
 
@@ -82,11 +82,11 @@ error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
     FsNode *node = filesystem_find_and_ref(path);
 
-    if (node == NULL && should_create_if_not_present)
+    if (!node && should_create_if_not_present)
     {
         FsNode *parent = filesystem_find_parent_and_ref(path);
 
-        if (parent != NULL)
+        if (parent)
         {
             if (parent->link)
             {
@@ -101,7 +101,7 @@ error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
         }
     }
 
-    if (node == NULL)
+    if (!node)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
@@ -138,7 +138,7 @@ error_t filesystem_connect(Path *path, FsHandle **connection_handle)
 {
     FsNode *node = filesystem_find_and_ref(path);
 
-    if (node == NULL)
+    if (!node)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
@@ -213,7 +213,7 @@ int filesystem_link(Path *path, FsNode *node)
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
-    if (parent == NULL)
+    if (!parent)
     {
         result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
@@ -255,7 +255,7 @@ int filesystem_unlink(Path *path)
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
-    if (parent != NULL)
+    if (!parent)
     {
         result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
@@ -294,7 +294,7 @@ int filesystem_rename(Path *old_path, Path *new_path)
     FsNode *old_parent = filesystem_find_parent_and_ref(old_path);
     FsNode *new_parent = filesystem_find_parent_and_ref(new_path);
 
-    if (old_parent == NULL || new_parent == NULL)
+    if (!old_parent || !new_parent)
     {
         result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
@@ -323,12 +323,20 @@ int filesystem_rename(Path *old_path, Path *new_path)
 
     child = old_parent->find(old_parent, path_filename(old_path));
 
+    if (!child)
+    {
+        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        goto unlock_cleanup_and_return;
+    }
+
     result = new_parent->link(child, path_filename(new_path), child);
 
     if (result == -ERR_SUCCESS)
     {
         result = old_parent->unlink(old_parent, path_filename(old_path));
     }
+
+unlock_cleanup_and_return:
 
     if (old_parent != new_parent)
     {

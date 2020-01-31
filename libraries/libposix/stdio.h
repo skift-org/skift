@@ -1,16 +1,20 @@
 #pragma once
 
-#include <stddef.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 typedef void FILE;
 #define __DEFINED_FILE
 
 #define BUFSIZ 8192
 
-extern FILE *stdin;
-extern FILE *stdout;
-extern FILE *stderr;
+FILE *__stdio_get_stdin(void);
+FILE *__stdio_get_stdout(void);
+FILE *__stdio_get_stderr(void);
+
+#define stdin (__stdio_get_stdin())
+#define stdout (__stdio_get_stdout())
+#define stderr (__stdio_get_stderr())
 
 #define EOF (-1)
 

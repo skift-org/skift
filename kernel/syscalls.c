@@ -284,6 +284,11 @@ int sys_handle_close(int handle)
     return task_fshandle_close(sheduler_running(), handle);
 }
 
+int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *selected)
+{
+    return task_fshandle_select(sheduler_running(), handles, events, count, selected);
+}
+
 int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)
 {
     return task_fshandle_read(sheduler_running(), handle, buffer, size, readed);
@@ -384,6 +389,7 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
 
     [SYS_HANDLE_OPEN] = sys_handle_open,
     [SYS_HANDLE_CLOSE] = sys_handle_close,
+    [SYS_HANDLE_SELECT] = sys_handle_select,
     [SYS_HANDLE_READ] = sys_handle_read,
     [SYS_HANDLE_WRITE] = sys_handle_write,
     [SYS_HANDLE_CALL] = sys_handle_call,

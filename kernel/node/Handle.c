@@ -76,6 +76,39 @@ void fshandle_destroy(FsHandle *handle)
     free(handle);
 }
 
+bool fshandle_can_select(FsHandle *handle, SelectEvent events)
+{
+    FsNode *node = handle->node;
+
+    if (events & SELECT_READ)
+    {
+        return fsnode_can_read(node);
+    }
+    else if (events & SELECT_WRITE)
+    {
+        return fsnode_can_write(node);
+    }
+    else if (events & SELECT_SEND)
+    {
+        // FIXME: check if the message buffer is not full
+        return true;
+    }
+    else if (events & SELECT_RECEIVE)
+    {
+        return fsnode_can_receive(node, handle);
+    }
+    else if (events & SELECT_CONNECT)
+    {
+        return fsnode_is_accepted(node);
+    }
+    else if (events & SELECT_ACCEPT)
+    {
+        return fsnode_can_accept(node);
+    }
+
+    return false;
+}
+
 bool fshandle_is_locked(FsHandle *handle)
 {
     return lock_is_acquire(handle->lock);

@@ -182,6 +182,8 @@ error_t task_fshandle_close(Task *this, int handle_index);
 
 void task_fshandle_close_all(Task *this);
 
+error_t task_fshandle_select(Task *this, int *handle_indices, SelectEvent *events, size_t count, int *selected_index);
+
 error_t task_fshandle_read(Task *this, int handle_index, void *buffer, size_t size, size_t *readed);
 
 error_t task_fshandle_write(Task *this, int handle_index, const void *buffer, size_t size, size_t *written);

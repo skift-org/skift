@@ -1,3 +1,4 @@
+#include "sheduling/TaskBlockerSelect.h"
 #include "tasking.h"
 
 error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
@@ -148,6 +149,58 @@ error_t task_fshandle_read(Task *task, int handle_index, void *buffer, size_t si
     error_t result = fshandle_read(handle, buffer, size, readed);
 
     task_fshandle_release(task, handle_index);
+
+    return result;
+}
+
+error_t task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index)
+{
+    error_t result = ERR_SUCCESS;
+
+    FsHandle *selected_handle = NULL;
+    FsHandle **handles = calloc(count, sizeof(FsHandle *));
+
+    for (size_t i = 0; i < count; i++)
+    {
+        handles[i] = task_fshandle_acquire(task, handle_indices[i]);
+
+        if (handles[i] == NULL)
+        {
+            result = ERR_BAD_FILE_DESCRIPTOR;
+
+            goto cleanup_and_return;
+        }
+    }
+
+    task_block(task, blocker_select_create(handles, events, count, &selected_handle));
+
+    if (selected_handle)
+    {
+        for (size_t i = 0; i < count; i++)
+        {
+            if (handles[i] == selected_handle)
+            {
+                *selected_index = handle_indices[i];
+
+                goto cleanup_and_return;
+            }
+        }
+    }
+
+cleanup_and_return:
+
+    if (handles)
+    {
+        for (size_t i = 0; i < count; i++)
+        {
+            if (handles[i])
+            {
+                task_fshandle_release(task, handle_indices[i]);
+            }
+        }
+
+        free(handles);
+    }
 
     return result;
 }

@@ -4,6 +4,16 @@
 
 #include "abi/Filesystem.h"
 
+typedef enum
+{
+    SELECT_READ = 1 << 0,
+    SELECT_WRITE = 1 << 1,
+    SELECT_SEND = 1 << 2,
+    SELECT_RECEIVE = 1 << 3,
+    SELECT_CONNECT = 1 << 4,
+    SELECT_ACCEPT = 1 << 5,
+} SelectEvent;
+
 typedef struct
 {
     int id;

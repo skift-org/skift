@@ -28,6 +28,13 @@
 
 typedef int (*syscall_handler_t)(int, int, int, int, int);
 
+bool syscall_validate_ptr(uintptr_t ptr, size_t size)
+{
+    return ptr >= 0x100000 &&
+           ptr + size >= 0x100000 &&
+           ptr + size >= ptr;
+}
+
 /* --- Process -------------------------------------------------------------- */
 
 int sys_process_this(void)
@@ -37,6 +44,11 @@ int sys_process_this(void)
 
 int sys_process_launch(Launchpad *launchpad)
 {
+    if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)))
+    {
+        return -ERR_BAD_ADDRESS;
+    }
+
     return task_launch(sheduler_running(), launchpad);
 }
 
@@ -276,6 +288,11 @@ int sys_system_get_ticks()
 
 int sys_handle_open(int *handle, const char *path, OpenFlag flags)
 {
+    if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_open(sheduler_running(), handle, path, flags);
 }
 
@@ -286,16 +303,35 @@ int sys_handle_close(int handle)
 
 int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *selected)
 {
+    if (!syscall_validate_ptr((uintptr_t)handles, sizeof(int) * count) ||
+        !syscall_validate_ptr((uintptr_t)events, sizeof(SelectEvent) * count) ||
+        !syscall_validate_ptr((uintptr_t)selected, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_select(sheduler_running(), handles, events, count, selected);
 }
 
 int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)
 {
+    if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
+        !syscall_validate_ptr((uintptr_t)readed, sizeof(size_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_read(sheduler_running(), handle, buffer, size, readed);
 }
 
 int sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
 {
+    if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
+        !syscall_validate_ptr((uintptr_t)written, sizeof(size_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_write(sheduler_running(), handle, buffer, size, written);
 }
 
@@ -311,11 +347,21 @@ int sys_handle_seek(int handle, int offset, Whence whence)
 
 int sys_handle_tell(int handle, Whence whence, int *offset)
 {
+    if (!syscall_validate_ptr((uintptr_t)offset, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_tell(sheduler_running(), handle, whence, offset);
 }
 
 int sys_handle_stat(int handle, FileState *state)
 {
+    if (!syscall_validate_ptr((uintptr_t)state, sizeof(FileState)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     return task_fshandle_stat(sheduler_running(), handle, state);
 }
 

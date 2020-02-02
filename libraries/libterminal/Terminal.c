@@ -151,13 +151,11 @@ void terminal_cursor_hide(Terminal *terminal)
 
 void terminal_cursor_move(Terminal *terminal, int offx, int offy)
 {
-    // FIXME: this code look silly...
-
     if (terminal->cursor.x + offx < 0)
     {
         int old_cursor_x = terminal->cursor.x;
         terminal->cursor.x = terminal->width + ((old_cursor_x + offx) % terminal->width);
-        terminal_cursor_move(terminal, 0, offy - (old_cursor_x + offx) / terminal->width - 1);
+        terminal_cursor_move(terminal, 0, offy + ((old_cursor_x + offx) / terminal->width - 1));
     }
     else if (terminal->cursor.x + offx >= terminal->width)
     {

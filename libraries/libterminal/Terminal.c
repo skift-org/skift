@@ -24,8 +24,8 @@ Terminal *terminal_create(int width, int height, TerminalPaintCallback paint_cal
     terminal->cursor = (TerminalCursor){0, 0, true};
     terminal->saved_cursor = (TerminalCursor){0, 0, true};
 
-    terminal->current_attributes = (TerminalAttributes){TERMINAL_COLOR_GREY, TERMINAL_COLOR_BLACK, false, false, false};
-    terminal->default_attributes = (TerminalAttributes){TERMINAL_COLOR_GREY, TERMINAL_COLOR_BLACK, false, false, false};
+    terminal->current_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
+    terminal->default_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
 
     terminal->parameters_top = 0;
 

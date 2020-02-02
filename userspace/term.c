@@ -21,7 +21,7 @@ static Stream *textmode_device = NULL;
 static textmode_info_t textmode_info;
 static ushort *textmode_buffer = NULL;
 
-static byte textmode_colors[] = {
+static byte textmode_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = TEXTMODE_COLOR_BLACK,
     [TERMINAL_COLOR_RED] = TEXTMODE_COLOR_RED,
     [TERMINAL_COLOR_GREEN] = TEXTMODE_COLOR_GREEN,
@@ -39,6 +39,9 @@ static byte textmode_colors[] = {
     [TERMINAL_COLOR_BRIGHT_MAGENTA] = TEXTMODE_COLOR_LIGHT_MAGENTA,
     [TERMINAL_COLOR_BRIGHT_CYAN] = TEXTMODE_COLOR_LIGHT_CYAN,
     [TERMINAL_COLOR_BRIGHT_GREY] = TEXTMODE_COLOR_WHITE,
+
+    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = TEXTMODE_COLOR_LIGHT_GRAY,
+    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = TEXTMODE_COLOR_BLACK,
 };
 
 void textmode_TerminalPaintCallback(Terminal *terminal, int x, int y, TerminalCell cell)
@@ -100,15 +103,16 @@ static Font *mono_font = NULL;
 static framebuffer_t *framebuffer;
 static Point framebuffer_cursor = point_zero;
 
-static Color framebuffer_colors[] = {
-    [TERMINAL_COLOR_BLACK] = COLOR(0x0A0E14),
+static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
+    [TERMINAL_COLOR_BLACK] = COLOR(0x000000),
     [TERMINAL_COLOR_RED] = COLOR(0xff3333),
     [TERMINAL_COLOR_GREEN] = COLOR(0xb8cc52),
     [TERMINAL_COLOR_YELLOW] = COLOR(0xe6c446),
     [TERMINAL_COLOR_BLUE] = COLOR(0x36a3d9),
     [TERMINAL_COLOR_MAGENTA] = COLOR(0xf07078),
     [TERMINAL_COLOR_CYAN] = COLOR(0x95e5cb),
-    [TERMINAL_COLOR_GREY] = COLOR(0xffffff),
+    [TERMINAL_COLOR_GREY] = COLOR(0xb3b1ad),
+
     [TERMINAL_COLOR_BRIGHT_BLACK] = COLOR(0x323232),
     [TERMINAL_COLOR_BRIGHT_RED] = COLOR(0xff6565),
     [TERMINAL_COLOR_BRIGHT_GREEN] = COLOR(0xe9fe83),
@@ -117,6 +121,9 @@ static Color framebuffer_colors[] = {
     [TERMINAL_COLOR_BRIGHT_MAGENTA] = COLOR(0xffa3aa),
     [TERMINAL_COLOR_BRIGHT_CYAN] = COLOR(0xc7fffc),
     [TERMINAL_COLOR_BRIGHT_GREY] = COLOR(0xffffff),
+
+    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = COLOR(0xb3b1ad),
+    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = COLOR(0x0A0E14),
 };
 
 void framebuffer_TerminalCursorCallback(Terminal *terminal, TerminalCursor cursor)
@@ -137,7 +144,7 @@ Terminal *terminal_create_framebuffer_console(void)
         return NULL;
     }
 
-    painter_clear(framebuffer->painter, framebuffer_colors[TERMINAL_COLOR_BLACK]);
+    painter_clear(framebuffer->painter, framebuffer_colors[TERMINAL_COLOR_DEFAULT_BACKGROUND]);
 
     framebuffer_blit(framebuffer);
 

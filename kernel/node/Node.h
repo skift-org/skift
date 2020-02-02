@@ -17,8 +17,8 @@ struct FsHandle;
 typedef error_t (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
 typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
 
-typedef bool (*FsOperationCanRead)(struct FsNode *node);
-typedef bool (*FsOperationCanWrite)(struct FsNode *node);
+typedef bool (*FsOperationCanRead)(struct FsNode *node, struct FsHandle *handle);
+typedef bool (*FsOperationCanWrite)(struct FsNode *node, struct FsHandle *handle);
 
 typedef error_t (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *readed);
 typedef error_t (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *writen);
@@ -56,7 +56,8 @@ typedef enum
     FSNODE_DIRECTORY,
     FSNODE_PIPE,
     FSNODE_SOCKET,
-    FSNODE_CONNECTION
+    FSNODE_CONNECTION,
+    FSNODE_TERMINAL,
 } FsNodeType;
 
 typedef struct FsNode
@@ -103,9 +104,9 @@ FsNode *fsnode_ref(FsNode *this);
 
 void fsnode_deref(FsNode *this);
 
-bool fsnode_can_read(FsNode *node);
+bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 
-bool fsnode_can_write(FsNode *node);
+bool fsnode_can_write(FsNode *node, struct FsHandle *handle);
 
 bool fsnode_can_accept(FsNode *node);
 

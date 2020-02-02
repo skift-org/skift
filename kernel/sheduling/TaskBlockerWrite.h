@@ -1,12 +1,12 @@
 #pragma once
 
+#include "node/Handle.h"
 #include "sheduling/TaskBlocker.h"
-#include "node/Node.h"
 
 typedef struct
 {
     TaskBlocker blocker;
-    FsNode *node;
+    FsHandle *handle;
 } TaskBlockerWrite;
 
-TaskBlocker *blocker_write_create(FsNode *node);
+TaskBlocker *blocker_write_create(FsHandle *handle);

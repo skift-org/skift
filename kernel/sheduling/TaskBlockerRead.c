@@ -1,19 +1,19 @@
-#include "tasking.h"
 #include "sheduling/TaskBlockerRead.h"
+#include "tasking.h"
 
 bool blocker_read_can_unblock(TaskBlockerRead *blocker, Task *task)
 {
     __unused(task);
 
-    return !fsnode_is_acquire(blocker->node) && fsnode_can_read(blocker->node);
+    return !fsnode_is_acquire(blocker->handle->node) && fsnode_can_read(blocker->handle->node, blocker->handle);
 }
 
 void blocker_read_unblock(TaskBlockerRead *blocker, Task *task)
 {
-    fsnode_acquire_lock(blocker->node, task->id);
+    fsnode_acquire_lock(blocker->handle->node, task->id);
 }
 
-TaskBlocker *blocker_read_create(FsNode *node)
+TaskBlocker *blocker_read_create(FsHandle *handle)
 {
     TaskBlockerRead *read_blocker = __create(TaskBlockerRead);
 
@@ -22,7 +22,7 @@ TaskBlocker *blocker_read_create(FsNode *node)
         (TaskBlockerUnblock)blocker_read_unblock,
     };
 
-    read_blocker->node = node;
+    read_blocker->handle = handle;
 
     return (TaskBlocker *)read_blocker;
 }

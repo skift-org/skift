@@ -82,11 +82,11 @@ bool fshandle_can_select(FsHandle *handle, SelectEvent events)
 
     if (events & SELECT_READ)
     {
-        return fsnode_can_read(node);
+        return fsnode_can_read(node, handle);
     }
     else if (events & SELECT_WRITE)
     {
-        return fsnode_can_write(node);
+        return fsnode_can_write(node, handle);
     }
     else if (events & SELECT_SEND)
     {
@@ -138,7 +138,7 @@ error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *reade
         return ERR_NOT_READABLE;
     }
 
-    task_block(sheduler_running(), blocker_read_create(node));
+    task_block(sheduler_running(), blocker_read_create(handle));
 
     *readed = 0;
 
@@ -155,7 +155,7 @@ static error_t fshandle_write_interal(FsHandle *handle, const char *buffer, size
 {
     FsNode *node = handle->node;
 
-    task_block(sheduler_running(), blocker_write_create(node));
+    task_block(sheduler_running(), blocker_write_create(handle));
 
     if (fshandle_has_flag(handle, OPEN_APPEND))
     {

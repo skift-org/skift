@@ -7,14 +7,20 @@
 #include "node/Handle.h"
 #include "node/Pipe.h"
 
-bool pipe_FsOperationCanRead(FsPipe *node)
+#define PIPE_BUFFER_SIZE 4096
+
+bool pipe_FsOperationCanRead(FsPipe *node, FsHandle *handle)
 {
+    __unused(handle);
+
     // FIXME: make this atomic or something...
     return !ringbuffer_is_empty(node->buffer);
 }
 
-bool pipe_FsOperationCanWrite(FsPipe *node)
+bool pipe_FsOperationCanWrite(FsPipe *node, FsHandle *handle)
 {
+    __unused(handle);
+
     // FIXME: make this atomic or something...
     return !ringbuffer_is_full(node->buffer);
 }
@@ -42,7 +48,7 @@ size_t pipe_FsOperationSize(FsPipe *node, FsHandle *handle)
     __unused(node);
     __unused(handle);
 
-    return 512;
+    return PIPE_BUFFER_SIZE;
 }
 
 void pipe_FsOperationDestroy(FsPipe *node)
@@ -63,7 +69,7 @@ FsNode *pipe_create(void)
     FSNODE(pipe)->size = (FsOperationSize)pipe_FsOperationSize;
     FSNODE(pipe)->destroy = (FsOperationDestroy)pipe_FsOperationDestroy;
 
-    pipe->buffer = ringbuffer_create(512);
+    pipe->buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
 
     return (FsNode *)pipe;
 }

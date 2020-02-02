@@ -180,9 +180,10 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     return keymap;
 }
 
-bool keyboard_FsOperationCanRead(FsNode *node)
+bool keyboard_FsOperationCanRead(FsNode *node, FsHandle *handle)
 {
     __unused(node);
+    __unused(handle);
 
     // FIXME: make this atomic or something...
     return !ringbuffer_is_empty(keyboard_buffer);

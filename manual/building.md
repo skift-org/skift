@@ -17,7 +17,7 @@ And for testing et debuging
 
 ```sh
 # On Ubuntu
-apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
+$ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
 ```
 
 ## Setting up the toolchain
@@ -35,14 +35,14 @@ First make sure you have all GCC and binutils dependancies:
 
 Install the dependancies on ubuntu:
 ```sh
-apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+$ apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 ```
 
 Then from the root of this repo do:
 
 ```sh
 ## Build the tool chain
-toolchain/build-it!.sh
+$ toolchain/build-it!.sh
 
 ## Then wait for completion
 ```
@@ -54,7 +54,7 @@ toolchain/build-it!.sh
 From the root of this repo do:
 
 ```sh
-make all
+$ make all
 ```
 
 ## Testing
@@ -62,5 +62,5 @@ make all
 From the root of this repo do:
 
 ```sh
-make run
+$ make run
 ```

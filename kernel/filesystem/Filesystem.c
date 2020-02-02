@@ -120,7 +120,12 @@ error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
         return ERR_NOT_A_SOCKET;
     }
 
-    if ((flags & OPEN_STREAM) && !(node->type == FSNODE_PIPE || node->type == FSNODE_FILE || node->type == FSNODE_DEVICE))
+    bool is_node_stream = node->type == FSNODE_PIPE ||
+                          node->type == FSNODE_FILE ||
+                          node->type == FSNODE_DEVICE ||
+                          node->type == FSNODE_TERMINAL;
+
+    if ((flags & OPEN_STREAM) && !(is_node_stream))
     {
         fsnode_deref(node);
 

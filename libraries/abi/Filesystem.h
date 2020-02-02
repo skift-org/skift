@@ -24,6 +24,7 @@ typedef enum
     FILE_TYPE_PIPE,
     FILE_TYPE_SOCKET,
     FILE_TYPE_CONNECTION,
+    FILE_TYPE_TERMINAL,
 } FileType;
 
 typedef enum
@@ -41,6 +42,8 @@ typedef enum
 
     OPEN_CLIENT = 1 << 9,
     OPEN_SERVER = 1 << 10,
+
+    OPEN_MASTER = 1 << 11,
 } OpenFlag;
 
 typedef struct

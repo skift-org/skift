@@ -47,6 +47,10 @@ Stream *stream_open(const char *path, OpenFlag flags);
 
 Stream *stream_open_handle(int handle_id, OpenFlag flags);
 
+error_t stream_create_pipe(Stream **reader, Stream **writer);
+
+error_t stream_create_term(Stream **master, Stream **slave);
+
 void stream_close(Stream *stream);
 
 void stream_set_read_buffer_mode(Stream *this, StreamBufferMode mode);

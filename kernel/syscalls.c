@@ -457,6 +457,9 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_SYSTEM_GET_TIME] = sys_system_get_time,
     [SYS_SYSTEM_GET_TICKS] = sys_system_get_ticks,
 
+    [SYS_CREATE_PIPE] = sys_create_pipe,
+    [SYS_CREATE_TERM] = sys_create_term,
+
     [SYS_HANDLE_OPEN] = sys_handle_open,
     [SYS_HANDLE_CLOSE] = sys_handle_close,
     [SYS_HANDLE_SELECT] = sys_handle_select,

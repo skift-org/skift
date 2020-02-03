@@ -97,3 +97,13 @@ void __plug_handle_discard(Handle *handle)
 {
     handle->error = __syscall(SYS_HANDLE_RECEIVE, handle->id, 0, 0, 0, 0);
 }
+
+error_t __plug_create_pipe(int *reader_handle, int *writer_handle)
+{
+    return __syscall(SYS_CREATE_PIPE, (int)reader_handle, (int)writer_handle, 0, 0, 0);
+}
+
+error_t __plug_create_term(int *master_handle, int *slave_handle)
+{
+    return __syscall(SYS_CREATE_TERM, (int)master_handle, (int)slave_handle, 0, 0, 0);
+}

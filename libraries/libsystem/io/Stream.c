@@ -46,6 +46,44 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
     return stream;
 }
 
+error_t stream_create_pipe(Stream **reader, Stream **writer)
+{
+    *reader = NULL;
+    *writer = NULL;
+
+    int reader_handle = HANDLE_INVALID_ID;
+    int writer_handle = HANDLE_INVALID_ID;
+
+    error_t result = __plug_create_pipe(&reader_handle, &writer_handle);
+
+    if (result == ERR_SUCCESS)
+    {
+        *reader = stream_open_handle(reader_handle, OPEN_READ);
+        *writer = stream_open_handle(writer_handle, OPEN_WRITE);
+    }
+
+    return result;
+}
+
+error_t stream_create_term(Stream **master, Stream **slave)
+{
+    *master = NULL;
+    *slave = NULL;
+
+    int master_handle = HANDLE_INVALID_ID;
+    int slave_handle = HANDLE_INVALID_ID;
+
+    error_t result = __plug_create_term(&master_handle, &slave_handle);
+
+    if (result == ERR_SUCCESS)
+    {
+        *master = stream_open_handle(master_handle, OPEN_READ | OPEN_WRITE);
+        *slave = stream_open_handle(slave_handle, OPEN_READ | OPEN_WRITE);
+    }
+
+    return result;
+}
+
 void stream_close(Stream *stream)
 {
     stream_flush(stream);

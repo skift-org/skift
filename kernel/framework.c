@@ -377,3 +377,13 @@ void __plug_handle_discard(Handle *handle)
 
     handle->error = task_fshandle_discard(sheduler_running(), handle->id);
 }
+
+error_t __plug_create_pipe(int *reader_handle, int *writer_handle)
+{
+    return task_create_pipe(sheduler_running(), reader_handle, writer_handle);
+}
+
+error_t __plug_create_term(int *master_handle, int *slave_handle)
+{
+    return task_create_term(sheduler_running(), master_handle, slave_handle);
+}

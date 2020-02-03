@@ -109,3 +109,6 @@ void __plug_handle_send(Handle *handle, Message *message);
 void __plug_handle_receive(Handle *handle, Message *message);
 void __plug_handle_payload(Handle *handle, Message *message);
 void __plug_handle_discard(Handle *handle);
+
+error_t __plug_create_pipe(int *reader_handle, int *writer_handle);
+error_t __plug_create_term(int *master_handle, int *slave_handle);

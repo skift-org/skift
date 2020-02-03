@@ -14,6 +14,11 @@ void __plug_handle_close(Handle *handle)
     }
 }
 
+error_t __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected)
+{
+    return __syscall(SYS_HANDLE_SELECT, (int)handles, (int)events, count, (int)selected, 0);
+}
+
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {
     size_t readed;

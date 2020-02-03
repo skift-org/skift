@@ -1,3 +1,5 @@
+#include "node/Pipe.h"
+#include "node/Terminal.h"
 #include "sheduling/TaskBlockerSelect.h"
 #include "tasking.h"
 
@@ -402,6 +404,106 @@ error_t task_fshandle_discard(Task *task, int handle_index)
     error_t result = fshandle_discard(handle);
 
     task_fshandle_release(task, handle_index);
+
+    return result;
+}
+
+error_t task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index)
+{
+    *reader_handle_index = HANDLE_INVALID_ID;
+    *writer_handle_index = HANDLE_INVALID_ID;
+
+    error_t result = ERR_SUCCESS;
+
+    FsNode *pipe = pipe_create();
+
+    FsHandle *reader_handle = fshandle_create(pipe, OPEN_READ);
+    FsHandle *writer_handle = fshandle_create(pipe, OPEN_WRITE);
+
+    result = task_fshandle_add(task, reader_handle_index, reader_handle);
+
+    if (result != ERR_SUCCESS)
+    {
+        goto cleanup_and_return;
+    }
+
+    result = task_fshandle_add(task, writer_handle_index, writer_handle);
+
+    if (result != ERR_SUCCESS)
+    {
+        goto cleanup_and_return;
+    }
+
+cleanup_and_return:
+    if (result != ERR_SUCCESS)
+    {
+        if (*reader_handle_index != HANDLE_INVALID_ID)
+        {
+            task_fshandle_remove(task, *reader_handle_index);
+            *reader_handle_index = HANDLE_INVALID_ID;
+        }
+
+        if (*writer_handle_index != HANDLE_INVALID_ID)
+        {
+            task_fshandle_remove(task, *writer_handle_index);
+            *writer_handle_index = HANDLE_INVALID_ID;
+        }
+
+        fshandle_destroy(reader_handle);
+        fshandle_destroy(writer_handle);
+    }
+
+    fsnode_deref(pipe);
+
+    return result;
+}
+
+error_t task_create_term(Task *task, int *master_handle_index, int *slave_handle_index)
+{
+    *master_handle_index = HANDLE_INVALID_ID;
+    *slave_handle_index = HANDLE_INVALID_ID;
+
+    error_t result = ERR_SUCCESS;
+
+    FsNode *terminal = terminal_create();
+
+    FsHandle *master_handle = fshandle_create(terminal, OPEN_MASTER | OPEN_READ | OPEN_WRITE);
+    FsHandle *slave_handle = fshandle_create(terminal, OPEN_READ | OPEN_WRITE);
+
+    result = task_fshandle_add(task, master_handle_index, master_handle);
+
+    if (result != ERR_SUCCESS)
+    {
+        goto cleanup_and_return;
+    }
+
+    result = task_fshandle_add(task, slave_handle_index, slave_handle);
+
+    if (result != ERR_SUCCESS)
+    {
+        goto cleanup_and_return;
+    }
+
+cleanup_and_return:
+    if (result != ERR_SUCCESS)
+    {
+        if (*master_handle_index != HANDLE_INVALID_ID)
+        {
+            task_fshandle_remove(task, *master_handle_index);
+            *master_handle_index = HANDLE_INVALID_ID;
+        }
+
+        if (*slave_handle_index != HANDLE_INVALID_ID)
+        {
+            task_fshandle_remove(task, *slave_handle_index);
+            *slave_handle_index = HANDLE_INVALID_ID;
+        }
+
+        fshandle_destroy(master_handle);
+        fshandle_destroy(slave_handle);
+    }
+
+    fsnode_deref(terminal);
 
     return result;
 }

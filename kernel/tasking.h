@@ -208,6 +208,10 @@ error_t task_fshandle_payload(Task *this, int handle_index, Message *message);
 
 error_t task_fshandle_discard(Task *this, int handle_index);
 
+error_t task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index);
+
+error_t task_create_term(Task *task, int *master_handle_index, int *slave_handle_index);
+
 /* -------------------------------------------------------------------------- */
 /*   SHARED MEMORY                                                            */
 /* -------------------------------------------------------------------------- */

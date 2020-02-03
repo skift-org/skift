@@ -284,6 +284,30 @@ int sys_system_get_ticks()
     return sheduler_get_ticks();
 }
 
+/* --- Create --------------------------------------------------------------- */
+
+int sys_create_pipe(int *reader_handle, int *writer_handle)
+{
+    if (!syscall_validate_ptr((uintptr_t)reader_handle, sizeof(int)) ||
+        !syscall_validate_ptr((uintptr_t)writer_handle, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_create_pipe(sheduler_running(), reader_handle, writer_handle);
+}
+
+int sys_create_term(int *master_handle, int *slave_handle)
+{
+    if (!syscall_validate_ptr((uintptr_t)master_handle, sizeof(int)) ||
+        !syscall_validate_ptr((uintptr_t)slave_handle, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_create_term(sheduler_running(), master_handle, slave_handle);
+}
+
 /* --- Handles -------------------------------------------------------------- */
 
 int sys_handle_open(int *handle, const char *path, OpenFlag flags)

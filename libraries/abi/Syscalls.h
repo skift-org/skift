@@ -58,7 +58,10 @@
     __ENTRY(SYS_HANDLE_SEND)           \
     __ENTRY(SYS_HANDLE_RECEIVE)        \
     __ENTRY(SYS_HANDLE_PAYLOAD)        \
-    __ENTRY(SYS_HANDLE_DISCARD)
+    __ENTRY(SYS_HANDLE_DISCARD)        \
+                                       \
+    __ENTRY(SYS_CREATE_PIPE)           \
+    __ENTRY(SYS_CREATE_TERM)
 
 #define SYSCALL_ENUM_ENTRY(__entry) __entry,
 

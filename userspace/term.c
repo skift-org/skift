@@ -13,8 +13,6 @@
 #include <libsystem/process/Launchpad.h>
 #include <libterminal/Terminal.h>
 
-static Stream *terminal_fifo = NULL;
-
 /* --- Textmode terminal ---------------------------------------------------- */
 
 static Stream *textmode_device = NULL;
@@ -236,11 +234,26 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    terminal_fifo = stream_open("/dev/term", OPEN_READ | OPEN_WRITE);
+    Stream *terminal_master;
+    Stream *terminal_slave;
 
-    if (terminal_fifo == NULL)
+    error_t result = stream_create_term(&terminal_master, &terminal_slave);
+
+    if (result != ERR_SUCCESS)
     {
-        error_print("Failled to open terminal fifo file");
+        logger_error("Failled to create the terminal device: %s", error_to_string(result));
+        return -1;
+    }
+
+    Stream *keyboard_device = stream_open("/dev/kbd", OPEN_READ);
+
+    if (handle_has_error(keyboard_device))
+    {
+        handle_printf_error(keyboard_device, "Failled to open /dev/kbd");
+
+        stream_close(terminal_master);
+        stream_close(terminal_slave);
+
         return -1;
     }
 
@@ -254,7 +267,8 @@ int main(int argc, char const *argv[])
 
         if (terminal == NULL)
         {
-            stream_close(terminal_fifo);
+            stream_close(terminal_master);
+            stream_close(terminal_slave);
 
             return -1;
         }
@@ -265,29 +279,57 @@ int main(int argc, char const *argv[])
     }
 
     Launchpad *shell_launchpad = launchpad_create("sh", "/bin/sh");
-    launchpad_handle(shell_launchpad, HANDLE(terminal_fifo), 1);
-    launchpad_handle(shell_launchpad, HANDLE(terminal_fifo), 2);
+    launchpad_handle(shell_launchpad, HANDLE(terminal_slave), 0);
+    launchpad_handle(shell_launchpad, HANDLE(terminal_slave), 1);
+    launchpad_handle(shell_launchpad, HANDLE(terminal_slave), 2);
     launchpad_launch(shell_launchpad);
 
     bool do_exit = false;
 
     do
     {
-#define READ_BUFFER_SIZE 512
-        char buffer[READ_BUFFER_SIZE];
-        int size = stream_read(terminal_fifo, buffer, READ_BUFFER_SIZE);
+        Handle *selected = NULL;
+        Handle *stream_set[] = {HANDLE(terminal_master), HANDLE(keyboard_device)};
+        SelectEvent events[] = {SELECT_READ, SELECT_READ};
+        handle_select(stream_set, events, 2, &selected);
 
-        terminal_write(terminal, buffer, size);
-
-        if (!is_framebuffer)
+        if (selected == (Handle *)keyboard_device)
         {
-            stream_call(textmode_device, TEXTMODE_CALL_SET_INFO, &textmode_info);
-            stream_write(textmode_device, textmode_buffer, textmode_info.width * textmode_info.height * sizeof(ushort));
+#define KEYBOARD_BUFFER_SIZE 512
+            char buffer[KEYBOARD_BUFFER_SIZE];
+            size_t size = stream_read(keyboard_device, buffer, KEYBOARD_BUFFER_SIZE);
+
+            stream_write(terminal_master, buffer, size);
+        }
+        else if (selected == (Handle *)terminal_master)
+        {
+#define READ_BUFFER_SIZE 512
+            char buffer[READ_BUFFER_SIZE];
+            size_t size = stream_read(terminal_master, buffer, READ_BUFFER_SIZE);
+
+            if (handle_has_error(terminal_master))
+            {
+                handle_printf_error(terminal_master, "Terminal: read from master failled");
+                return -1;
+            }
+
+            terminal_write(terminal, buffer, size);
+
+            if (!is_framebuffer)
+            {
+                stream_call(textmode_device, TEXTMODE_CALL_SET_INFO, &textmode_info);
+                stream_write(textmode_device, textmode_buffer, textmode_info.width * textmode_info.height * sizeof(ushort));
+            }
+            else
+            {
+                paint_repaint_dirty(terminal, framebuffer->painter);
+            }
         }
         else
         {
-            paint_repaint_dirty(terminal, framebuffer->painter);
+            return -1;
         }
+
     } while (!do_exit);
 
     if (terminal)

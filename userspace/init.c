@@ -35,7 +35,6 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    filesystem_mkpipe("/dev/term");
     int term = init_exec("/bin/term");
 
     process_wait(term, NULL);

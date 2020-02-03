@@ -1,4 +1,4 @@
-;; Copyright © 2018-2019 N. Van Bossuyt.                                      ;;
+;; Copyright © 2018-2020 N. Van Bossuyt.                                      ;;
 ;; This code is licensed under the MIT License.                               ;;
 ;; See: LICENSE.md                                                            ;;
 
@@ -26,7 +26,7 @@ irq_common:
     push ds
     push es
     push fs
-    push gs 
+    push gs
 
     mov ax, 0x10
 
@@ -48,21 +48,21 @@ irq_common:
     pop ds
 
     popad
-    
+
     add esp, 8 ; pop errcode and int number
 
     iret
 
-IRQ 0 
-IRQ 1 
-IRQ 2 
-IRQ 3 
-IRQ 4 
-IRQ 5 
-IRQ 6 
-IRQ 7 
-IRQ 8 
-IRQ 9 
+IRQ 0
+IRQ 1
+IRQ 2
+IRQ 3
+IRQ 4
+IRQ 5
+IRQ 6
+IRQ 7
+IRQ 8
+IRQ 9
 IRQ 10
 IRQ 11
 IRQ 12
@@ -100,7 +100,7 @@ dd __isr%1
 %macro ISR_ERR 1
 __isr%1:
     cli
-    
+
     push %1
     jmp isr_common
 %endmacro
@@ -129,7 +129,7 @@ isr_common:
     push ds
     push es
     push fs
-    push gs 
+    push gs
 
     mov ax, 0x10
 
@@ -146,9 +146,9 @@ isr_common:
     pop ds
 
     popad
-    
+
     add esp, 8 ; pop errcode and int number
-    
+
     iret
 
 ISR_NOERR 0
@@ -221,5 +221,5 @@ isr_vector:
     ISR_NAME 29
     ISR_NAME 30
     ISR_NAME 31
-    
+
     ISR_NAME 128

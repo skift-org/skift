@@ -1,4 +1,4 @@
-;; Copyright © 2018-2019 N. Van Bossuyt.                                      ;;
+;; Copyright © 2018-2020 N. Van Bossuyt.                                      ;;
 ;; This code is licensed under the MIT License.                               ;;
 ;; See: LICENSE.md                                                            ;;
 
@@ -44,7 +44,7 @@ gdt_flush:
     mov ss, ax
     mov gs, ax
     jmp 0x08:._gdt_flush
-    
+
 ._gdt_flush:
     ret
 

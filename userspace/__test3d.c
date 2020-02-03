@@ -2,11 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/io/Stream.h>
+#include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
-#include <libsystem/assert.h>
 
 #include <libgraphic/framebuffer.h>
 #include <libgraphic/matrix.h>
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
         matrix_t matRotZ = matrix_create_rotationX(theta);
         matrix_t matRotX = matrix_create_rotationZ(theta);
 
-        Color background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 1, 1);
+        Color background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 0.5, 0.75);
 
         painter_clear(fb->painter, background_color);
 

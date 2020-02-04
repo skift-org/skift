@@ -67,6 +67,36 @@ error_t terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const 
     return ERR_SUCCESS;
 }
 
+error_t terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
+{
+    __unused(handle);
+
+    IOCallTerminalSizeArgs *size_args = args;
+
+    switch (request)
+    {
+    case IOCALL_TERMINAL_GET_SIZE:
+        size_args->width = terminal->width;
+        size_args->height = terminal->height;
+
+        return ERR_SUCCESS;
+
+    case IOCALL_TERMINAL_SET_SIZE:
+        if (size_args->width < 0 || size_args->height < 0)
+        {
+            return ERR_INVALID_ARGUMENT;
+        }
+
+        terminal->width = size_args->width;
+        terminal->height = size_args->height;
+
+        return ERR_SUCCESS;
+
+    default:
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+    }
+}
+
 size_t terminal_FsOperationSize(FsTerminal *terminal, FsHandle *handle)
 {
     __unused(handle);
@@ -91,8 +121,12 @@ FsNode *terminal_create(void)
     FSNODE(terminal)->can_write = (FsOperationCanWrite)terminal_FsOperationCanWrite;
     FSNODE(terminal)->read = (FsOperationRead)terminal_FsOperationRead;
     FSNODE(terminal)->write = (FsOperationWrite)terminal_FsOperationWrite;
+    FSNODE(terminal)->call = (FsOperationCall)terminal_FsOperationCall;
     FSNODE(terminal)->size = (FsOperationSize)terminal_FsOperationSize;
     FSNODE(terminal)->destroy = (FsOperationDestroy)terminal_FsOperationDestroy;
+
+    terminal->width = 80;
+    terminal->width = 25;
 
     terminal->master_to_slave_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
     terminal->slave_to_master_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);

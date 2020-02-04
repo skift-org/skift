@@ -1,7 +1,7 @@
 <p align="center">
 <br>
 <br>
-<img src="manual/assets/skift_dark.svg" height=64 />
+<img src="manual/logo.svg" height=64 />
 <br>
 <br>
 A simple, handmade, operating system for the intel x86 cpu.

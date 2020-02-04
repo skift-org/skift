@@ -1,7 +1,7 @@
 # Contributing
 
 When contributing to this repository, please first discuss the change you wish to make via issue,
-discord, or any other method with the owners of this repository before making a change. 
+discord, or any other method with the owners of this repository before making a change.
 
 If you want your change merge by us here are some good do's and don'ts to try to stick to:
 - Conform to the projet coding style. Please use `clang-format` with the `clang-format.txt` included with the project.

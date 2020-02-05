@@ -25,9 +25,10 @@ int main(int argc, char **argv)
 
     printf("\e[mStyles:");
     printf(" regular");
-    printf(" \e[;4munderline");
-    printf(" \e[;1mbold");
-    printf(" \e[;3minverted\n");
+    printf(" \e[4munderline\e[m");
+    printf(" \e[1mbold\e[m");
+    printf(" \e[3minverted\e[m");
+    printf(" \e[1;3;4mall at the same time\n\e[m");
 
     printf("\e[mUnicode: ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■☺☻♥♦♣♠•◘○◙♂♀♪♫☼⌂►◄↕‼¶§▬↨↑↓→←∟↔▲▼");
 

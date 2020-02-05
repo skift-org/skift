@@ -91,7 +91,7 @@ int __plug_process_wait(int pid, int *exit_value);
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
 void __plug_handle_close(Handle *handle);
 
-error_t __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected);
+error_t __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events);
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size);
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size);

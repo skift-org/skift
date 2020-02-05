@@ -76,37 +76,44 @@ void fshandle_destroy(FsHandle *handle)
     free(handle);
 }
 
-bool fshandle_can_select(FsHandle *handle, SelectEvent events)
+SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
 {
     FsNode *node = handle->node;
+    SelectEvent selected_events = 0;
 
-    if (events & SELECT_READ)
+    if ((events & SELECT_READ) && fsnode_can_read(node, handle))
     {
-        return fsnode_can_read(node, handle);
+        selected_events |= SELECT_READ;
     }
-    else if (events & SELECT_WRITE)
+
+    if ((events & SELECT_WRITE) && fsnode_can_write(node, handle))
     {
-        return fsnode_can_write(node, handle);
+        selected_events |= SELECT_WRITE;
     }
-    else if (events & SELECT_SEND)
+
+    if ((events & SELECT_SEND))
     {
         // FIXME: check if the message buffer is not full
-        return true;
-    }
-    else if (events & SELECT_RECEIVE)
-    {
-        return fsnode_can_receive(node, handle);
-    }
-    else if (events & SELECT_CONNECT)
-    {
-        return fsnode_is_accepted(node);
-    }
-    else if (events & SELECT_ACCEPT)
-    {
-        return fsnode_can_accept(node);
+
+        selected_events |= SELECT_SEND;
     }
 
-    return false;
+    if ((events & SELECT_RECEIVE) && fsnode_can_receive(node, handle))
+    {
+        selected_events |= SELECT_RECEIVE;
+    }
+
+    if ((events & SELECT_CONNECT) && fsnode_is_accepted(node))
+    {
+        selected_events |= SELECT_CONNECT;
+    }
+
+    if ((events & SELECT_ACCEPT) && fsnode_can_accept(node))
+    {
+        selected_events |= SELECT_ACCEPT;
+    }
+
+    return selected_events;
 }
 
 bool fshandle_is_locked(FsHandle *handle)

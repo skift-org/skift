@@ -289,9 +289,10 @@ int main(int argc, char const *argv[])
     do
     {
         Handle *selected = NULL;
+        SelectEvent selected_event = 0;
         Handle *stream_set[] = {HANDLE(terminal_master), HANDLE(keyboard_device)};
         SelectEvent events[] = {SELECT_READ, SELECT_READ};
-        handle_select(stream_set, events, 2, &selected);
+        handle_select(stream_set, events, 2, &selected, &selected_event);
 
         if (selected == (Handle *)keyboard_device)
         {

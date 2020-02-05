@@ -155,7 +155,7 @@ error_t task_fshandle_read(Task *task, int handle_index, void *buffer, size_t si
     return result;
 }
 
-error_t task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index)
+error_t task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events)
 {
     error_t result = ERR_SUCCESS;
 
@@ -174,7 +174,7 @@ error_t task_fshandle_select(Task *task, int *handle_indices, SelectEvent *event
         }
     }
 
-    task_block(task, blocker_select_create(handles, events, count, &selected_handle));
+    task_block(task, blocker_select_create(handles, events, count, &selected_handle, selected_events));
 
     if (selected_handle)
     {

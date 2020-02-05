@@ -6,4 +6,4 @@
 
 int __handle_printf_error(Handle *handle, const char *fmt, ...);
 
-error_t handle_select(Handle **handles, SelectEvent *events, size_t count, Handle **selected);
+error_t handle_select(Handle **handles, SelectEvent *events, size_t count, Handle **selected, SelectEvent *selected_events);

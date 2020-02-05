@@ -325,16 +325,17 @@ int sys_handle_close(int handle)
     return task_fshandle_close(sheduler_running(), handle);
 }
 
-int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *selected)
+int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
 {
     if (!syscall_validate_ptr((uintptr_t)handles, sizeof(int) * count) ||
         !syscall_validate_ptr((uintptr_t)events, sizeof(SelectEvent) * count) ||
-        !syscall_validate_ptr((uintptr_t)selected, sizeof(int)))
+        !syscall_validate_ptr((uintptr_t)selected, sizeof(int)) ||
+        !syscall_validate_ptr((uintptr_t)selected_events, sizeof(SelectEvent)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_select(sheduler_running(), handles, events, count, selected);
+    return task_fshandle_select(sheduler_running(), handles, events, count, selected, selected_events);
 }
 
 int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)

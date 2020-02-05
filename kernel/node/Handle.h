@@ -27,8 +27,8 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags);
 
 void fshandle_destroy(FsHandle *handle);
 FsHandle *fshandle_clone(FsHandle *handle);
+SelectEvent fshandle_select(FsHandle *handle, SelectEvent events);
 
-bool fshandle_can_select(FsHandle *handle, SelectEvent events);
 bool fshandle_is_locked(FsHandle *handle);
 void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
 void fshandle_release_lock(FsHandle *handle, int who_release);

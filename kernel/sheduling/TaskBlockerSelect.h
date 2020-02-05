@@ -14,6 +14,7 @@ typedef struct
     size_t count;
 
     FsHandle **selected;
+    SelectEvent *selected_events;
 } TaskBlockerSelect;
 
-TaskBlocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected);
+TaskBlocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events);

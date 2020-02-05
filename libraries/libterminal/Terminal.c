@@ -11,7 +11,7 @@ static void terminal_decoder_callback(Codepoint codepoint, Terminal *terminal)
     terminal_write_codepoint(terminal, codepoint);
 }
 
-Terminal *terminal_create(int width, int height, TerminalPaintCallback paint_callback, TerminalCursorCallback cursor_callback)
+Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
 {
     Terminal *terminal = __create(Terminal);
 
@@ -20,6 +20,7 @@ Terminal *terminal_create(int width, int height, TerminalPaintCallback paint_cal
     terminal->buffer = calloc(width * height, sizeof(TerminalCell));
 
     terminal->decoder = utf8decoder_create((UTF8DecoderCallback)terminal_decoder_callback, terminal);
+    terminal->renderer = renderer;
 
     terminal->cursor = (TerminalCursor){0, 0, true};
     terminal->saved_cursor = (TerminalCursor){0, 0, true};
@@ -35,9 +36,6 @@ Terminal *terminal_create(int width, int height, TerminalPaintCallback paint_cal
         terminal->parameters[i].value = 0;
     }
 
-    terminal->paint_callback = paint_callback;
-    terminal->cursor_callback = cursor_callback;
-
     terminal_clear_all(terminal);
 
     return terminal;
@@ -46,6 +44,7 @@ Terminal *terminal_create(int width, int height, TerminalPaintCallback paint_cal
 void terminal_destroy(Terminal *terminal)
 {
     utf8decoder_destroy(terminal->decoder);
+    terminal_renderer_destroy(terminal->renderer);
     free(terminal->buffer);
     free(terminal);
 }
@@ -115,10 +114,7 @@ void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell)
             terminal->buffer[y * terminal->width + x] = cell;
             terminal->buffer[y * terminal->width + x].dirty = true;
 
-            if (terminal->paint_callback)
-            {
-                terminal->paint_callback(terminal, x, y, cell);
-            }
+            terminal_on_paint(terminal, x, y, cell);
         }
     }
 }
@@ -129,10 +125,7 @@ void terminal_cursor_show(Terminal *terminal)
     {
         terminal->cursor.visible = true;
 
-        if (terminal->cursor_callback)
-        {
-            terminal->cursor_callback(terminal, terminal->cursor);
-        }
+        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -142,10 +135,7 @@ void terminal_cursor_hide(Terminal *terminal)
     {
         terminal->cursor.visible = false;
 
-        if (terminal->cursor_callback)
-        {
-            terminal->cursor_callback(terminal, terminal->cursor);
-        }
+        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -185,10 +175,7 @@ void terminal_cursor_move(Terminal *terminal, int offx, int offy)
         assert(terminal->cursor.x >= 0 && terminal->cursor.x < terminal->width);
         assert(terminal->cursor.y >= 0 && terminal->cursor.y < terminal->height);
 
-        if (terminal->cursor_callback)
-        {
-            terminal->cursor_callback(terminal, terminal->cursor);
-        }
+        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -197,10 +184,7 @@ void terminal_cursor_set(Terminal *terminal, int x, int y)
     terminal->cursor.x = clamp(x, 0, terminal->width);
     terminal->cursor.y = clamp(y, 0, terminal->height);
 
-    if (terminal->cursor_callback)
-    {
-        terminal->cursor_callback(terminal, terminal->cursor);
-    }
+    terminal_on_cursor(terminal, terminal->cursor);
 }
 
 void terminal_scroll(Terminal *terminal, int how_many_line)
@@ -576,5 +560,29 @@ void terminal_write(Terminal *terminal, const char *buffer, size_t size)
     for (size_t i = 0; i < size; i++)
     {
         terminal_write_char(terminal, buffer[i]);
+    }
+}
+
+void terminal_on_paint(Terminal *terminal, int x, int y, TerminalCell cell)
+{
+    if (terminal->renderer->on_paint)
+    {
+        terminal->renderer->on_paint(terminal, terminal->renderer, x, y, cell);
+    }
+}
+
+void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor)
+{
+    if (terminal->renderer->on_cursor)
+    {
+        terminal->renderer->on_cursor(terminal, terminal->renderer, cursor);
+    }
+}
+
+void terminal_repaint(Terminal *terminal)
+{
+    if (terminal->renderer->repaint)
+    {
+        terminal->renderer->repaint(terminal, terminal->renderer);
     }
 }

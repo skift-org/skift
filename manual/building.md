@@ -1,6 +1,6 @@
 # Building
 
-## Supported environment
+## 0. Supported environment
 
 Building skiftOS requires
 
@@ -17,47 +17,55 @@ And for testing et debuging
 
 ```sh
 # On Ubuntu
-apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
+$ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
 ```
 
-## Setting up the toolchain
+## 1. Setting up
 
-Building the toolchain is pretty straight-forward.
-First make sure you have all GCC and binutils dependancies:
+Building the toolchain is pretty straight-forward,
+first make sure you have all GCC and binutils dependancies:
+ - build-essential
+ - bison
+ - flex
+ - libgmp3-dev
+ - libmpc-dev
+ - libmpfr-dev
+ - texinfo
 
-- build-essential
-- bison
-- flex
-- libgmp3-dev
-- libmpc-dev
-- libmpfr-dev
-- texinfo
-
-Install the dependancies on ubuntu:
+You can run the following command on ubuntu:
 ```sh
-apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+$ apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 ```
 
-Then from the root of this repo do:
+Then for building the toolchain run the `build-it!.sh` script
 
 ```sh
 ## Build the tool chain
-toolchain/build-it!.sh
+$ toolchain/build-it!.sh
 
 ## Then wait for completion
 ```
 
-### More info
-  - [Cross-Compiler](https://wiki.osdev.org/GCC_Cross-Compiler) - OSDEV.org
+The script will do the following operation without installing anything to the host system nor requiering root access:
+ - Download `gcc` and `binutils` from the GNU project
+ - Patch them using binutils.patch and gcc.patch located in the toolchain directory.
+ - Then configure and build
 
-## Building skiftOS
+
+
+## 2. Building
+
 From the root of this repo do:
 
 ```sh
 make all
 ```
 
-## Testing
+This command will build the all the component of the project and generate a bootable ISO bootable on QEMU or VirtualBox
+
+> The compatibility with virtual box is not garentie, has we use primarly QEMU for debuging and testing the system
+
+## 3. Running in qemu
 
 From the root of this repo do:
 

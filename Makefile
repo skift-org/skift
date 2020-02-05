@@ -21,7 +21,7 @@ CWARN_FLAGS=-Wall \
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
-	   -Ilibraries -Ilibraries/libposix \
+	   -Iapplication -Ilibraries -Ilibraries/libposix \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
@@ -80,6 +80,7 @@ LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
 			  $(wildcard libraries/libsystem/unicode/*.c) \
 			  $(wildcard libraries/libsystem/io/*.c) \
 			  $(wildcard libraries/libsystem/process/*.c) \
+			  $(wildcard libraries/libsystem/eventloop/*.c) \
 			  $(wildcard libraries/libsystem/readline/*.c)
 
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
@@ -97,6 +98,8 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBMATH) \
 		  $(LIBPOSIX) \
 		  $(LIBSYSTEM)
+
+APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -124,7 +127,6 @@ USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/panic \
 		  $(ROOT_DIRECTORY)/bin/sh \
 		  $(ROOT_DIRECTORY)/bin/sysfetch \
-		  $(ROOT_DIRECTORY)/bin/term \
 		  $(ROOT_DIRECTORY)/bin/touch \
 		  $(ROOT_DIRECTORY)/bin/unlink \
 		  $(ROOT_DIRECTORY)/bin/wm
@@ -232,6 +234,12 @@ $(LIBPOSIX): $(LIBPOSIX_OBJ)
 $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
+
+# --- Application ------------------------------------------------------------ #
+
+$(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMINAL) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lgraphic
 
 # --- Userspace -------------------------------------------------------------- #
 
@@ -343,10 +351,6 @@ $(ROOT_DIRECTORY)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/term: userspace/term.c $(LIBSYSTEM) $(LIBCONSOLE) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lterminal -lgraphic
-
 $(ROOT_DIRECTORY)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
@@ -417,7 +421,7 @@ $(ROOT_DIRECTORY):
 			 $(ROOT_DIRECTORY)/run \
 			 $(ROOT_DIRECTORY)/usr
 
-$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(RESSOURCES)
+$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(APPLICATION) $(RESSOURCES)
 	cd $(ROOT_DIRECTORY); tar -cf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #

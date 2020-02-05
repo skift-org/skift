@@ -6,6 +6,9 @@
 
 #include <libsystem/unicode/UTF8Decoder.h>
 #include <libterminal/Attributes.h>
+#include <libterminal/Cell.h>
+#include <libterminal/Cursor.h>
+#include <libterminal/Renderer.h>
 
 struct Terminal;
 
@@ -22,30 +25,13 @@ typedef struct
     bool empty;
 } TerminalParameter;
 
-typedef struct
-{
-    Codepoint codepoint;
-    TerminalAttributes attributes;
-    bool dirty;
-} TerminalCell;
-
-typedef struct
-{
-    int x;
-    int y;
-
-    bool visible;
-} TerminalCursor;
-
-typedef void (*TerminalPaintCallback)(struct Terminal *terminal, int x, int y, TerminalCell cell);
-typedef void (*TerminalCursorCallback)(struct Terminal *terminal, TerminalCursor cursor);
-
 typedef struct Terminal
 {
     int height;
     int width;
     TerminalCell *buffer;
     UTF8Decoder *decoder;
+    TerminalRenderer *renderer;
 
     TerminalState state;
     TerminalCursor saved_cursor;
@@ -57,12 +43,9 @@ typedef struct Terminal
 #define TERMINAL_MAX_PARAMETERS 8
     int parameters_top;
     TerminalParameter parameters[TERMINAL_MAX_PARAMETERS];
-
-    TerminalPaintCallback paint_callback;
-    TerminalCursorCallback cursor_callback;
 } Terminal;
 
-Terminal *terminal_create(int width, int height, TerminalPaintCallback on_paint, TerminalCursorCallback on_move);
+Terminal *terminal_create(int width, int height, TerminalRenderer *renderer);
 void terminal_destroy(Terminal *terminal);
 
 void terminal_clear(Terminal *terminal, int fromx, int fromy, int tox, int toy);
@@ -88,3 +71,7 @@ void terminal_do_ansi(Terminal *terminal, Codepoint codepoint);
 void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint);
 void terminal_write_char(Terminal *terminal, char c);
 void terminal_write(Terminal *terminal, const char *buffer, size_t size);
+
+void terminal_on_paint(Terminal *terminal, int x, int y, TerminalCell cell);
+void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor);
+void terminal_repaint(Terminal *terminal);

@@ -35,11 +35,11 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    int term = init_exec("/bin/term");
+    int term = init_exec("/bin/Terminal");
 
     process_wait(term, NULL);
 
-    printf("\n\e[1;34mGoodbye!");
+    printf("\n\n\t\e[1;34mGoodbye!\e[m - n°1\n\n");
 
     return 0;
 }

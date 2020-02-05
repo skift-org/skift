@@ -94,7 +94,6 @@ SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
     if ((events & SELECT_SEND))
     {
         // FIXME: check if the message buffer is not full
-
         selected_events |= SELECT_SEND;
     }
 

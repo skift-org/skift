@@ -335,7 +335,32 @@ int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *sele
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_select(sheduler_running(), handles, events, count, selected, selected_events);
+    if (count > PROCESS_HANDLE_COUNT)
+    {
+        return ERR_TOO_MANY_OPEN_FILES;
+    }
+
+    // FIXME: We need to copy these because this syscall uses task_fshandle_select
+    //        who block the current thread using a blocker which does a context switch.
+
+    int *handles_copy = calloc(count, sizeof(int));
+    memcpy(handles_copy, handles, count * sizeof(int));
+
+    SelectEvent *events_copy = calloc(count, sizeof(SelectEvent));
+    memcpy(events_copy, events, count * sizeof(SelectEvent));
+
+    int selected_copy;
+    SelectEvent selected_event_copy;
+
+    error_t result = task_fshandle_select(sheduler_running(), handles_copy, events_copy, count, &selected_copy, &selected_event_copy);
+
+    *selected = selected_copy;
+    *selected_events = selected_event_copy;
+
+    free(handles_copy);
+    free(events_copy);
+
+    return result;
 }
 
 int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)

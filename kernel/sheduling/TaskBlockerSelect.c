@@ -23,12 +23,12 @@ void blocker_select_unblock(TaskBlockerSelect *blocker, Task *task)
 
     for (size_t i = 0; i < blocker->count; i++)
     {
-        SelectEvent event = fshandle_select(blocker->handles[i], blocker->events[i]);
+        SelectEvent events = fshandle_select(blocker->handles[i], blocker->events[i]);
 
-        if (event != 0)
+        if (events != 0)
         {
             *blocker->selected = blocker->handles[i];
-            *blocker->selected_events = event;
+            *blocker->selected_events = events;
 
             return;
         }

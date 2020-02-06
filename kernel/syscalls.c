@@ -22,7 +22,6 @@
 #include "clock.h"
 #include "filesystem/Filesystem.h"
 #include "memory.h"
-#include "serial.h"
 #include "syscalls.h"
 #include "tasking.h"
 

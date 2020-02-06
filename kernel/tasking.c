@@ -1071,9 +1071,10 @@ void garbage_colector()
 static bool sheduler_context_switch = false;
 static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
 
-void timer_set_frequency(int hz)
+void timer_set_frequency(u16 hz)
 {
-    u32 divisor = 1193180 / hz;
+    u32 divisor = 1193182 / hz;
+
     out8(0x43, 0x36);
     out8(0x40, divisor & 0xFF);
     out8(0x40, (divisor >> 8) & 0xFF);
@@ -1085,7 +1086,7 @@ void sheduler_setup(Task *main_kernel_task)
 {
     running = main_kernel_task;
 
-    timer_set_frequency(100);
+    timer_set_frequency(1000);
     irq_register(0, (irq_handler_t)&shedule);
 }
 
@@ -1189,6 +1190,9 @@ bool sheduler_is_context_switch(void)
 
 void sheduler_yield()
 {
+    // FIXME: simple hack for system ticks.
+
+    ticks--;
     asm("int $32");
 }
 

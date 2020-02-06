@@ -274,7 +274,7 @@ void garbage_colector();
 
 #define SHEDULER_RECORD_COUNT 128
 
-void timer_set_frequency(int hz);
+void timer_set_frequency(u16 hz);
 
 void sheduler_setup(Task *main_kernel_task);
 

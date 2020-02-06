@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
 
     logger_trace("Starting the shell application...");
 
-    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/sh");
+    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/Shell");
     launchpad_handle(shell_launchpad, HANDLE(slave), 0);
     launchpad_handle(shell_launchpad, HANDLE(slave), 1);
     launchpad_handle(shell_launchpad, HANDLE(slave), 2);

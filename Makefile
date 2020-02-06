@@ -99,7 +99,8 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBPOSIX) \
 		  $(LIBSYSTEM)
 
-APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal
+APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
+			$(ROOT_DIRECTORY)/bin/Shell
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -125,7 +126,6 @@ USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/mv \
 		  $(ROOT_DIRECTORY)/bin/now \
 		  $(ROOT_DIRECTORY)/bin/panic \
-		  $(ROOT_DIRECTORY)/bin/sh \
 		  $(ROOT_DIRECTORY)/bin/sysfetch \
 		  $(ROOT_DIRECTORY)/bin/touch \
 		  $(ROOT_DIRECTORY)/bin/unlink
@@ -240,6 +240,11 @@ $(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMIN
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lgraphic
 
+
+$(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard application/Shell/*.c) -o $@
+
 # --- Userspace -------------------------------------------------------------- #
 
 $(ROOT_DIRECTORY)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
@@ -339,10 +344,6 @@ $(ROOT_DIRECTORY)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(ROOT_DIRECTORY)/bin/panic: userspace/panic.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/sh: userspace/sh.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 

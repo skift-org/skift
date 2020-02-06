@@ -10,7 +10,7 @@ int process_this(void)
 
 int process_run(const char *command)
 {
-    Launchpad *launchpad = launchpad_create("/bin/sh", "/bin/sh");
+    Launchpad *launchpad = launchpad_create("/bin/Shell", "/bin/Shell");
 
     launchpad_argument(launchpad, "-c");
     launchpad_argument(launchpad, command);

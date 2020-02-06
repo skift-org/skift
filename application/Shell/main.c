@@ -15,8 +15,6 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/readline/ReadLine.h>
 
-#define MAX_COMMAND_LENGHT 128
-
 struct shell;
 
 typedef int (*shell_builtin_handler_t)(struct shell *shell, int argc, const char **argv);
@@ -41,17 +39,16 @@ typedef struct shell
 
 /* --- Prompt --------------------------------------------------------------- */
 
-#define PROMPT u8"\e[0;94m µ \e[m"
+#define PROMPT u8"\e[;1;94m µ \e[m"
 
 void shell_prompt(shell_t *this)
 {
-    // Reset the terminal
-    printf("\n\e[0m ");
+    printf("\n\e[m ");
 
     // Last command exit value
     if (this->command_exit_value != 0)
     {
-        printf("\e[0;1;31m%d\e[0m ", this->command_exit_value);
+        printf("(\e[;1;31m%d\e[m) ", this->command_exit_value);
     }
 
     // Current directory

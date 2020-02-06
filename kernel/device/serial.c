@@ -9,15 +9,9 @@
 #include "system.h"
 
 #include "serial.h"
+#include "x86/irq.h"
 
 #define PORT_COM1 0x3f8
-
-static void wait_read()
-{
-    while ((in8(PORT_COM1 + 5) & 1) == 0)
-    { /* do nothing */
-    }
-}
 
 static void wait_write()
 {
@@ -26,31 +20,10 @@ static void wait_write()
     }
 }
 
-char serial_getc()
-{
-    wait_read();
-    return in8(PORT_COM1);
-}
-
 void serial_putc(char c)
 {
     wait_write();
     out8(PORT_COM1, c);
-}
-
-int serial_read(char *buffer, uint size)
-{
-    for (uint i = 0; i < size; i++)
-    {
-        buffer[i] = serial_getc();
-
-        if (buffer[i] == '\n')
-        {
-            return i + 1;
-        }
-    }
-
-    return size;
 }
 
 int serial_write(const char *buffer, uint size)
@@ -69,12 +42,37 @@ int serial_write(const char *buffer, uint size)
 
 /* --- Serial device  node -------------------------------------------------- */
 
+static RingBuffer *serial_buffer;
+
+reg32_t serial_irq(reg32_t esp, processor_context_t *context)
+{
+    __unused(context);
+
+    char byte = in8(PORT_COM1);
+
+    ringbuffer_write(serial_buffer, &byte, sizeof(byte));
+
+    return esp;
+}
+
+bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: make this atomic or something...
+    return !ringbuffer_is_empty(serial_buffer);
+}
+
 static error_t serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
 
-    *readed = serial_read(buffer, size);
+    // FIXME: use locks
+    atomic_begin();
+    *readed = ringbuffer_read(serial_buffer, buffer, size);
+    atomic_end();
 
     return ERR_SUCCESS;
 }
@@ -91,18 +89,22 @@ static error_t serial_FsOperationWrite(FsNode *node, FsHandle *handle, const voi
 
 void serial_initialize(void)
 {
-    // See: https://wiki.osdev.org/Serial_Ports
-    out8(PORT_COM1 + 1, 0x00);
+    out8(PORT_COM1 + 2, 0);
     out8(PORT_COM1 + 3, 0x80);
-    out8(PORT_COM1 + 0, 0x03);
-    out8(PORT_COM1 + 1, 0x00);
+    out8(PORT_COM1 + 0, 115200 / 9600);
+    out8(PORT_COM1 + 1, 0);
     out8(PORT_COM1 + 3, 0x03);
-    out8(PORT_COM1 + 2, 0xC7);
-    out8(PORT_COM1 + 4, 0x0B);
+    out8(PORT_COM1 + 4, 0);
+    out8(PORT_COM1 + 1, 0x01);
+
+    serial_buffer = ringbuffer_create(1024);
+
+    irq_register(4, serial_irq);
 
     FsNode *serial_device = __create(FsNode);
     fsnode_init(serial_device, FSNODE_DEVICE);
 
+    FSNODE(serial_device)->can_read = (FsOperationCanRead)serial_FsOperationCanRead;
     FSNODE(serial_device)->read = (FsOperationRead)serial_FsOperationRead;
     FSNODE(serial_device)->write = (FsOperationWrite)serial_FsOperationWrite;
 

@@ -1,20 +1,23 @@
 #include <libsystem/assert.h>
+#include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/logger.h>
-#include <libsystem/messageloop.h>
+
 #include <libwidget/core/Application.h>
 
 static bool _initialized = false;
 static bool _running = false;
-static int _exit_value = 0;
 static List *_windows;
 
 void application_initialize(int argc, char **argv)
 {
+    __unused(argc);
+    __unused(argv);
+
     assert(!_initialized);
 
     _windows = list_create();
 
-    messageloop_init(argc, argv);
+    eventloop_initilize();
 
     _initialized = true;
 }
@@ -24,15 +27,7 @@ int application_run(void)
     assert(_initialized);
     assert(!_running);
 
-    _running = true;
-    while (_running)
-    {
-        messageloop_pump(true);
-    }
-
-    messageloop_fini();
-
-    return _exit_value;
+    return eventloop_run();
 }
 
 void application_exit(int exit_value)
@@ -40,8 +35,7 @@ void application_exit(int exit_value)
     assert(_initialized);
     assert(_running);
 
-    _exit_value = exit_value;
-    _running = false;
+    eventloop_exit(exit_value);
 }
 
 void application_dump(void)

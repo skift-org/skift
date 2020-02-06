@@ -128,8 +128,7 @@ USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/sh \
 		  $(ROOT_DIRECTORY)/bin/sysfetch \
 		  $(ROOT_DIRECTORY)/bin/touch \
-		  $(ROOT_DIRECTORY)/bin/unlink \
-		  $(ROOT_DIRECTORY)/bin/wm
+		  $(ROOT_DIRECTORY)/bin/unlink
 
 KERNEL=$(BUILD_DIRECTORY)/kernel.bin
 KERNEL_CSOURCES=$(wildcard kernel/*.c) \
@@ -358,10 +357,6 @@ $(ROOT_DIRECTORY)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
 $(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/wm: userspace/wm.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 # --- Kernel ----------------------------------------------------------------- #
 

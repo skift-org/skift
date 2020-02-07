@@ -23,7 +23,7 @@ typedef struct __packed
 {
     u16 size;
     u32 offset;
-} idt_descriptor_t;
+} IDTDescriptor;
 
 typedef struct __packed
 {
@@ -32,15 +32,9 @@ typedef struct __packed
     u8 zero;
     u8 type_attr;    // type and attributes
     u16 offset16_31; // offset bits 16..31
-} idt_entry_t;
+} IDTEntry;
 
-typedef struct __packed
-{
-    idt_entry_t entries[IDT_ENTRY_COUNT];
-    idt_descriptor_t descriptor;
-    int_handler_t handlers[IDT_ENTRY_COUNT];
-} idt_t;
-
-void pic_setup();
-void idt_setup();
-void idt_entry(u8 index, u32 offset, u16 selector, u16 type);
+void pic_remap(void);
+void idt_setup(void);
+void idt_entry(int index, uintptr_t offset, u16 selector, u16 type);
+void idt_flush(u32);

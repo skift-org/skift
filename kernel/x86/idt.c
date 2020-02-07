@@ -2,36 +2,24 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/cstring.h>
-
 #include "x86/idt.h"
 
-idt_t idt;
+IDTEntry idt_entries[IDT_ENTRY_COUNT];
 
-// define in interupts.S
-extern u32 int_handlers[];
-extern void load_idt(u32);
+IDTDescriptor idt_descriptor = {
+    .offset = (u32)&idt_entries[0],
+    .size = sizeof(IDTEntry) * IDT_ENTRY_COUNT,
+};
 
-void idt_setup()
+void idt_setup(void)
 {
-    pic_setup();
-
-    // cleanup the idt.
-    memset(&idt, 0, sizeof(idt_t));
-
-    // setup the descriptor.
-    idt.descriptor.offset = (u32)&idt.entries;
-    idt.descriptor.size = sizeof(idt_entry_t) * IDT_ENTRY_COUNT;
-
-    // load the idt
-    load_idt((u32)&idt.descriptor);
+    pic_remap();
+    idt_flush((u32)&idt_descriptor);
 }
 
-void idt_entry(u8 index, u32 offset, u16 selector, u16 type)
+void idt_entry(int index, uintptr_t offset, u16 selector, u16 type)
 {
-    // printf("IDT[%d]: OFFSET=0x%x SELECTOR=0x%x TYPE=%b\n", index, offset, selector, type);
-
-    idt_entry_t *entry = &idt.entries[index];
+    IDTEntry *entry = &idt_entries[index];
 
     entry->offset0_15 = offset & 0xffff;
     entry->offset16_31 = (offset >> 16) & 0xffff;

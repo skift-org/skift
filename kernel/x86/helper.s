@@ -48,8 +48,8 @@ gdt_flush:
 ._gdt_flush:
     ret
 
-global load_idt
-load_idt:
+global idt_flush
+idt_flush:
     mov eax, [esp + 4]
     lidt [eax]
     ret

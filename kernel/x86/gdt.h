@@ -8,7 +8,7 @@
 
 #define GDT_ENTRY_COUNT 6
 
-#define GDT_PRESENT 0b10010000	// Present bit. This must be 1 for all valid selectors.
+#define GDT_PRESENT 0b10010000	  // Present bit. This must be 1 for all valid selectors.
 #define GDT_USER 0b01100000		  // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
 #define GDT_EXECUTABLE 0b00001000 // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
 #define GDT_READWRITE 0b00000010  // Readable bit for code selectors //Writable bit for data selectors
@@ -46,13 +46,13 @@ typedef struct __packed
 	u32 ldt;
 	u16 trap;
 	u16 iomap_base;
-} tss_t;
+} TSS;
 
 typedef struct __packed
 {
 	u16 size;
 	u32 offset;
-} gdt_descriptor_t;
+} GDTDescriptor;
 
 typedef struct __packed
 {
@@ -63,7 +63,22 @@ typedef struct __packed
 	u8 limit16_19 : 4;
 	u8 flags : 4;
 	u8 base24_31;
-} gdt_entry_t;
+} GDTEntry;
 
-void gdt_setup();
+#define GDT_ENTRY(__base, __limit, __access, __flags) \
+	(GDTEntry)                                        \
+	{                                                 \
+		.acces = (__access),                          \
+		.flags = (__flags),                           \
+		.base0_15 = (__base)&0xffff,                  \
+		.base16_23 = ((__base) >> 16) & 0xff,         \
+		.base24_31 = ((__base) >> 24) & 0xff,         \
+		.limit0_15 = (__limit)&0xffff,                \
+		.limit16_19 = ((__limit) >> 16) & 0x0f,       \
+	}
+
+void gdt_setup(void);
+
+extern void gdt_flush(u32);
+
 void set_kernel_stack(u32 stack);

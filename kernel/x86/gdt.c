@@ -2,8 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/cstring.h>
-#include <libsystem/io/Stream.h>
 
 #include "x86/gdt.h"
 

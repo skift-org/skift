@@ -6,8 +6,6 @@
 
 #include <libsystem/runtime.h>
 
-#include "processor.h"
-
 // Gate call protection.
 // Specifies which privilege Level the calling Descriptor minimum should have.
 #define DPL_KERNEL 0b00000000 // ring 0
@@ -16,8 +14,6 @@
 #define INTGATE 0x8E
 #define TRAPGATE 0x8F
 #define IDT_ENTRY_COUNT 256
-
-typedef void (*int_handler_t)(processor_context_t *states);
 
 typedef struct __packed
 {
@@ -34,7 +30,14 @@ typedef struct __packed
     u16 offset16_31; // offset bits 16..31
 } IDTEntry;
 
-void pic_remap(void);
-void idt_setup(void);
-void idt_entry(int index, uintptr_t offset, u16 selector, u16 type);
+#define IDT_ENTRY(__offset, __selector, __type)     \
+    (IDTEntry)                                      \
+    {                                               \
+        .offset0_15 = (__offset)&0xffff,            \
+        .offset16_31 = ((__offset) >> 16) & 0xffff, \
+        .zero = 0,                                  \
+        .selector = (__selector),                   \
+        .type_attr = (__type),                      \
+    }
+
 void idt_flush(u32);

@@ -4,12 +4,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
 #include <libsystem/logger.h>
+#include <libsystem/runtime.h>
 
-#include "processor.h"
+#include "x86/Interrupts.h"
+#include "x86/x86.h"
 
-void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...);
+void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
 
 #define HANG   \
     while (1)  \

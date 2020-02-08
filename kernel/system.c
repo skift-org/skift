@@ -65,7 +65,7 @@ const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void __panic(const char *file, const char *function, const int line, processor_context_t *context, const char *message, ...)
+void __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...)
 {
     atomic_begin();
 
@@ -113,10 +113,10 @@ void __panic(const char *file, const char *function, const int line, processor_c
         printf("\n");
     }
 
-    if (context != NULL)
+    if (stackframe)
     {
         printf("\n\tContext:\n");
-        processor_dump_context(context);
+        interrupts_dump_stackframe(stackframe);
     }
 
     memory_dump();

@@ -50,9 +50,10 @@ typedef struct Task
 
     bool user;
 
-    uint sp;
+    uintptr_t stack_pointer;
     byte stack[PROCESS_STACK_SIZE]; // Kernel stack
-    TaskEntry entry;                // Our entry point
+
+    TaskEntry entry; // Our entry point
     char fpu_registers[512];
 
     struct
@@ -118,7 +119,7 @@ void task_setstate(Task *task, TaskState state);
 
 void task_setentry(Task *task, TaskEntry entry, bool user);
 
-uint task_stack_push(Task *task, const void *value, uint size);
+uintptr_t task_stack_push(Task *task, const void *value, uint size);
 
 void task_go(Task *t);
 
@@ -280,7 +281,7 @@ void sheduler_setup(Task *main_kernel_task);
 
 void wakeup_sleeping_tasks(void);
 
-reg32_t shedule(reg32_t sp, processor_context_t *context);
+uintptr_t shedule(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe);
 
 uint sheduler_get_ticks(void);
 

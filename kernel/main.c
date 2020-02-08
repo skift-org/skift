@@ -11,11 +11,6 @@
 
 /* main.c : the entry point of the kernel.                                    */
 
-/*
- * TODO:
- * - ADD support for kernel command line options.
- */
-
 #include <libmath/math.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/atomic.h>
@@ -25,10 +20,8 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 
+#include "x86/Interrupts.h"
 #include "x86/gdt.h"
-#include "x86/idt.h"
-#include "x86/irq.h"
-#include "x86/isr.h"
 
 #include "clock.h"
 #include "device/Device.h"
@@ -113,17 +106,13 @@ void kmain(multiboot_info_t *info, uint magic)
     /* --- Setup cpu context ------------------------------------------------ */
 
     setup(gdt);
-    setup(pic);
-    setup(idt);
-    setup(isr);
-    setup(irq);
+    interrupts_initialize();
     setup(platform);
 
     /* --- System context --------------------------------------------------- */
 
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
-    filesystem_initialize();
     setup(tasking);
 
     /* --- Finalizing System ------------------------------------------------ */
@@ -135,8 +124,9 @@ void kmain(multiboot_info_t *info, uint magic)
 
     logger_info("Mounting devices...");
 
-    setup(modules, &mbootinfo);
+    filesystem_initialize();
 
+    setup(modules, &mbootinfo);
     null_initialize();
     zero_initialize();
     random_initialize();

@@ -17,15 +17,13 @@
 #include <libsystem/logger.h>
 #include <libsystem/system.h>
 
-#include <abi/Syscalls.h>
-
 #include "clock.h"
 #include "filesystem/Filesystem.h"
 #include "memory.h"
-#include "syscalls.h"
 #include "tasking.h"
+#include "tasking/Syscalls.h"
 
-typedef int (*syscall_handler_t)(int, int, int, int, int);
+typedef int (*SyscallHandler)(int, int, int, int, int);
 
 bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 {
@@ -502,16 +500,16 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_HANDLE_DISCARD] = sys_handle_discard,
 };
 
-syscall_handler_t syscall_get_handler(Syscall syscall)
+SyscallHandler syscall_get_handler(Syscall syscall)
 {
     if (syscall >= 0 && syscall < __SYSCALL_COUNT)
     {
-        if ((syscall_handler_t)syscalls[syscall] == NULL)
+        if ((SyscallHandler)syscalls[syscall] == NULL)
         {
             logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
         }
 
-        return (syscall_handler_t)syscalls[syscall];
+        return (SyscallHandler)syscalls[syscall];
     }
     else
     {
@@ -524,28 +522,31 @@ syscall_handler_t syscall_get_handler(Syscall syscall)
 
 static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
-void syscall_dispatcher(processor_context_t *context)
+int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
-    Syscall syscall = (Syscall)context->eax;
-    syscall_handler_t handler = syscall_get_handler(syscall);
+    SyscallHandler handler = syscall_get_handler(syscall);
+
+    int result = 0;
 
     if (handler != NULL)
     {
-        context->eax = handler(context->ebx, context->ecx, context->edx, context->esi, context->edi);
+        result = handler(arg0, arg1, arg2, arg3, arg4);
     }
     else
     {
-        logger_info("context: EBX=%08x, ECX=%08x, EDX=%08x, ESI=%08x, EDI=%08x", context->ebx, context->ecx, context->edx, context->esi, context->edi);
-        context->eax = -ERR_FUNCTION_NOT_IMPLEMENTED;
+        logger_error("Invalid syscall: (%08x, %08x, %08x, %08x, %08x)", arg0, arg1, arg2, arg3, arg4);
+        result = -ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    if (syscall >= SYS_HANDLE_OPEN && context->eax != ERR_SUCCESS)
+    if (syscall >= SYS_HANDLE_OPEN && result != ERR_SUCCESS)
     {
-        logger_info("Syscall %s(0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) returned %s", syscall_names[syscall], context->ebx, context->ecx, context->edx, context->esi, context->edi, error_to_string(context->eax));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, error_to_string(result));
     }
 
-    if (syscall < SYS_HANDLE_OPEN && (int)context->eax < 0)
+    if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
     {
-        logger_info("Syscall %s(0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) returned %s", syscall_names[syscall], context->ebx, context->ecx, context->edx, context->esi, context->edi, error_to_string(-context->eax));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, error_to_string(-result));
     }
+
+    return result;
 }

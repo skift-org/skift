@@ -12,7 +12,6 @@
 
 #include "platform.h"
 #include "tasking.h"
-#include "x86/irq.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */
@@ -135,7 +134,8 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     // setup the stack
     memset(this->stack, 0, PROCESS_STACK_SIZE);
-    this->sp = (reg32_t)(&this->stack[0] + PROCESS_STACK_SIZE - 1);
+    this->stack_pointer = (uintptr_t)(&this->stack[0] + PROCESS_STACK_SIZE - 1);
+
     platform_fpu_save_context(this);
 
     return this;
@@ -291,33 +291,33 @@ void task_setentry(Task *t, TaskEntry entry, bool user)
     t->user = user;
 }
 
-uint task_stack_push(Task *t, const void *value, uint size)
+uintptr_t task_stack_push(Task *task, const void *value, uint size)
 {
-    t->sp -= size;
-    memcpy((void *)t->sp, value, size);
+    task->stack_pointer -= size;
+    memcpy((void *)task->stack_pointer, value, size);
 
-    return t->sp;
+    return task->stack_pointer;
 }
 
-void task_go(Task *t)
+void task_go(Task *task)
 {
-    processor_context_t ctx;
+    InterruptStackFrame stackframe;
 
-    ctx.eflags = 0x202;
-    ctx.eip = (reg32_t)t->entry;
-    ctx.ebp = ((reg32_t)t->stack + PROCESS_STACK_SIZE);
+    stackframe.eflags = 0x202;
+    stackframe.eip = (uintptr_t)task->entry;
+    stackframe.ebp = ((uintptr_t)task->stack + PROCESS_STACK_SIZE);
 
     // TODO: userspace task
-    ctx.cs = 0x08;
-    ctx.ds = 0x10;
-    ctx.es = 0x10;
-    ctx.fs = 0x10;
-    ctx.gs = 0x10;
+    stackframe.cs = 0x08;
+    stackframe.ds = 0x10;
+    stackframe.es = 0x10;
+    stackframe.fs = 0x10;
+    stackframe.gs = 0x10;
 
-    task_stack_push(t, &ctx, sizeof(ctx));
+    task_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
 
     atomic_begin();
-    task_setstate(t, TASK_STATE_RUNNING);
+    task_setstate(task, TASK_STATE_RUNNING);
     atomic_end();
 }
 
@@ -1087,7 +1087,7 @@ void sheduler_setup(Task *main_kernel_task)
     running = main_kernel_task;
 
     timer_set_frequency(1000);
-    irq_register(0, (irq_handler_t)&shedule);
+    interrupts_register_irq(0, (IRQHandler)shedule);
 }
 
 /* --- Sheduling ------------------------------------------------------------ */
@@ -1142,13 +1142,14 @@ void wakeup_blocked_task(void)
     }
 }
 
-reg32_t shedule(reg32_t sp, processor_context_t *context)
+uintptr_t shedule(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
 {
-    __unused(context);
+    __unused(stackframe);
+
     sheduler_context_switch = true;
 
     // Save the old context
-    running->sp = sp;
+    running->stack_pointer = current_stack_pointer;
     platform_save_context(running);
 
     // Update the system ticks
@@ -1173,7 +1174,7 @@ reg32_t shedule(reg32_t sp, processor_context_t *context)
     sheduler_context_switch = false;
 
     platform_load_context(running);
-    return running->sp;
+    return running->stack_pointer;
 }
 
 /* --- Sheduler info -------------------------------------------------------- */

@@ -1,26 +1,8 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 #include <libsystem/runtime.h>
 
-typedef u32 reg32_t;
-
-typedef struct __packed
-{
-    reg32_t gs, fs, es, ds;
-    reg32_t edi, esi, ebp, USELESS, ebx, edx, ecx, eax;
-    reg32_t int_no, errcode;
-    reg32_t eip, cs, eflags;
-} processor_context_t;
-
-void processor_dump_context(processor_context_t *context);
-
-/* --- Static functions ----------------------------------------------------- */
-
-static inline reg32_t CR0()
+static inline u32 CR0()
 {
     u32 r;
     asm volatile("mov %%cr0, %0"
@@ -28,7 +10,7 @@ static inline reg32_t CR0()
     return r;
 }
 
-static inline reg32_t CR1()
+static inline u32 CR1()
 {
     u32 r;
     asm volatile("mov %%cr1, %0"
@@ -36,7 +18,7 @@ static inline reg32_t CR1()
     return r;
 }
 
-static inline reg32_t CR2()
+static inline u32 CR2()
 {
     u32 r;
     asm volatile("mov %%cr2, %0"
@@ -44,7 +26,7 @@ static inline reg32_t CR2()
     return r;
 }
 
-static inline reg32_t CR3()
+static inline u32 CR3()
 {
     u32 r;
     asm volatile("mov %%cr3, %0"
@@ -52,7 +34,7 @@ static inline reg32_t CR3()
     return r;
 }
 
-static inline reg32_t CR4()
+static inline u32 CR4()
 {
     u32 r;
     asm volatile("mov %%cr4, %0"

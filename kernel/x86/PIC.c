@@ -2,7 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "x86/idt.h"
+#include "x86/PIC.h"
+#include "x86/x86.h"
 
 #define PIC_WAIT()                    \
 	do                                \
@@ -56,4 +57,14 @@ void pic_remap(void)
 	PIC_WAIT();
 	out8(PIC2_DATA, 0x00);
 	PIC_WAIT();
+}
+
+void pic_ack(int intno)
+{
+	if (intno >= 40)
+	{
+		out8(0xA0, 0x20);
+	}
+
+	out8(0x20, 0x20);
 }

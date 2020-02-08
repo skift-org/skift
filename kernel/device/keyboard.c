@@ -18,7 +18,6 @@
 
 #include "filesystem/Filesystem.h"
 #include "tasking.h"
-#include "x86/irq.h"
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -106,9 +105,9 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     }
 }
 
-reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
+uintptr_t keyboard_interrupt_handler(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
 {
-    __unused(context);
+    __unused(stackframe);
 
     int byte = in8(0x60);
 
@@ -132,7 +131,7 @@ reg32_t keyboard_irq(reg32_t esp, processor_context_t *context)
         keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 
-    return esp;
+    return current_stack_pointer;
 }
 
 /* --- Public functions ----------------------------------------------------- */
@@ -253,7 +252,7 @@ void keyboard_initialize()
     keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
     keyboard_buffer = ringbuffer_create(1024);
 
-    irq_register(1, keyboard_irq);
+    interrupts_register_irq(1, keyboard_interrupt_handler);
 
     FsNode *keyboard_device = __create(FsNode);
 

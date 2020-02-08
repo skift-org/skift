@@ -4,7 +4,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "processor.h"
 #include "tasking.h"
 
 size_t platform_page_size(void);

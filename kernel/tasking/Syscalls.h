@@ -4,11 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <abi/Syscalls.h>
+
 #include <libsystem/runtime.h>
 
-#include "processor.h"
-
-typedef void (*isr_handler_t)(processor_context_t *);
-
-void isr_setup();
-isr_handler_t isr_register(int index, isr_handler_t handler);
+int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4);

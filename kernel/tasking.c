@@ -1124,7 +1124,10 @@ void wakeup_blocked_task(void)
 
             if (blocker->can_unblock(blocker, task))
             {
-                blocker->unblock(blocker, task);
+                if (blocker->unblock)
+                {
+                    blocker->unblock(blocker, task);
+                }
 
                 free(task->blocker);
                 task->blocker = NULL;

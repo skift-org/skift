@@ -7,12 +7,10 @@
 #include <libsystem/runtime.h>
 
 // Gate call protection.
-// Specifies which privilege Level the calling Descriptor minimum should have.
-#define DPL_KERNEL 0b00000000 // ring 0
-#define DPL_USER 0b01100000   // ring 1
 
-#define INTGATE 0x8E
-#define TRAPGATE 0x8F
+#define INTGATE 0x8e
+#define TRAPGATE 0xeF
+
 #define IDT_ENTRY_COUNT 256
 
 typedef struct __packed

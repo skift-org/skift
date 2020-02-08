@@ -34,7 +34,7 @@ void interrupts_initialize(void)
 
     for (int i = 32; i < 48; i++)
     {
-        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, TRAPGATE);
+        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
     }
 
     idt[128] = IDT_ENTRY(__interrupt_vector[48], 0x08, TRAPGATE);

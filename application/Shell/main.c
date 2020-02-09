@@ -28,16 +28,16 @@ void shell_prompt(int last_command_exit_value)
     printf(PROMPT);
 }
 
-void shell_split(char *command, int *argc, char **argv)
+int shell_split(char *command, char **argv)
 {
-    *argc = 0;
+    int argc = 0;
 
     strleadtrim(command, ' ');
     strtrailtrim(command, ' ');
 
     if (strlen(command) == 0)
     {
-        return;
+        return 0;
     }
 
     char *start = &command[0];
@@ -56,14 +56,16 @@ void shell_split(char *command, int *argc, char **argv)
                 memcpy(buffer, start, buffer_len);
                 buffer[buffer_len - 1] = '\0';
 
-                argv[(*argc)++] = buffer;
+                argv[argc++] = buffer;
             }
 
             start = &command[i] + 1;
         }
     }
 
-    argv[*argc] = NULL;
+    argv[argc] = NULL;
+
+    return argc;
 }
 
 int main(int argc, char **argv)
@@ -82,10 +84,8 @@ int main(int argc, char **argv)
         shell_prompt(command_exit_value);
         char *command = readline_readline(readline);
 
-        int command_argc = 0;
         char *command_argv[PROCESS_ARG_COUNT] = {0};
-
-        shell_split(command, &command_argc, command_argv);
+        int command_argc = shell_split(command, command_argv);
 
         if (command_argc == 0)
         {

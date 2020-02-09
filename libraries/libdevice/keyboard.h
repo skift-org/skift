@@ -8,7 +8,7 @@
 #include <libsystem/messaging.h>
 #include <libsystem/unicode/Codepoint.h>
 
-#define KEYBOARD_DEVICE "/dev/kbd"
+#define KEYBOARD_DEVICE "/dev/keyboard"
 
 #define KEYBOARD_CHANNEL "#dev:keyboard"
 

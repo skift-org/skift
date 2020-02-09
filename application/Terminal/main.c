@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
 
     eventloop_initilize();
 
-    Stream *keyboard = stream_open("/dev/kbd", OPEN_READ);
+    Stream *keyboard = stream_open("/dev/keyboard", OPEN_READ);
 
     if (handle_has_error(keyboard))
     {

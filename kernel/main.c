@@ -106,7 +106,6 @@ void kmain(multiboot_info_t *info, uint magic)
     /* --- Setup cpu context ------------------------------------------------ */
 
     setup(gdt);
-    interrupts_initialize();
     setup(platform);
 
     /* --- System context --------------------------------------------------- */
@@ -115,10 +114,7 @@ void kmain(multiboot_info_t *info, uint magic)
     setup(memory, &mbootinfo);
     setup(tasking);
 
-    /* --- Finalizing System ------------------------------------------------ */
-
-    atomic_enable();
-    sti();
+    interrupts_initialize();
 
     /* --- Devices ---------------------------------------------------------- */
 

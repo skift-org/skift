@@ -14,6 +14,4 @@ typedef uintptr_t (*IRQHandler)(uintptr_t current_stack_pointer, InterruptStackF
 
 void interrupts_dump_stackframe(InterruptStackFrame *stackframe);
 
-void interrupts_register_irq(int irq, IRQHandler handler);
-
 void interrupts_initialize(void);

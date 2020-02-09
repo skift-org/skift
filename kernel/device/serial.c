@@ -5,9 +5,9 @@
 #include <libsystem/atomic.h>
 
 #include "filesystem/Filesystem.h"
+#include "interrupts/Dispatcher.h"
 #include "serial.h"
 #include "system.h"
-#include "x86/Interrupts.h"
 
 #define PORT_COM1 0x3f8
 
@@ -42,15 +42,11 @@ int serial_write(const char *buffer, uint size)
 
 static RingBuffer *serial_buffer;
 
-uintptr_t serial_interrupt_handler(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
+void serial_interrupt_handler(void)
 {
-    __unused(stackframe);
-
     char byte = in8(PORT_COM1);
 
     ringbuffer_write(serial_buffer, &byte, sizeof(byte));
-
-    return current_stack_pointer;
 }
 
 bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
@@ -97,7 +93,7 @@ void serial_initialize(void)
 
     serial_buffer = ringbuffer_create(1024);
 
-    interrupts_register_irq(4, serial_interrupt_handler);
+    dispatcher_register_handler(4, serial_interrupt_handler);
 
     FsNode *serial_device = __create(FsNode);
     fsnode_init(serial_device, FSNODE_DEVICE);

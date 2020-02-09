@@ -68,6 +68,7 @@ static bool nested_panic = false;
 void __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...)
 {
     atomic_begin();
+    atomic_disable();
 
     va_list va;
     va_start(va, message);

@@ -1087,7 +1087,6 @@ void sheduler_setup(Task *main_kernel_task)
     running = main_kernel_task;
 
     timer_set_frequency(1000);
-    interrupts_register_irq(0, (IRQHandler)shedule);
 }
 
 /* --- Sheduling ------------------------------------------------------------ */
@@ -1145,10 +1144,8 @@ void wakeup_blocked_task(void)
     }
 }
 
-uintptr_t shedule(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
+uintptr_t shedule(uintptr_t current_stack_pointer)
 {
-    __unused(stackframe);
-
     sheduler_context_switch = true;
 
     // Save the old context

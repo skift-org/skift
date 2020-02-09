@@ -3,8 +3,9 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
-#include "services/Dispatcher.h"
+#include "interrupts/Dispatcher.h"
 #include "system.h"
+#include "tasking.h"
 #include "tasking/Syscalls.h"
 #include "x86/IDT.h"
 #include "x86/Interrupts.h"
@@ -41,6 +42,11 @@ void interrupts_initialize(void)
 
     logger_info("Flushing the IDT...");
     idt_flush((u32)&idt_descriptor);
+
+    dispatcher_initialize();
+
+    atomic_enable();
+    sti();
 }
 
 static const char *_exception_messages[32] = {
@@ -88,15 +94,6 @@ void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
     printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }
 
-static IRQHandler _irq_handlers[16] = {};
-
-void interrupts_register_irq(int irq, IRQHandler handler)
-{
-    assert(irq >= 0 && irq < 16);
-
-    _irq_handlers[irq] = handler;
-}
-
 uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
     if (stackframe.intno < 32)
@@ -113,13 +110,13 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 
         int irq = stackframe.intno - 32;
 
-        if (_irq_handlers[irq])
+        if (irq == 0)
         {
-            esp = _irq_handlers[irq](esp, &stackframe);
+            esp = shedule(esp);
         }
         else
         {
-            logger_warn("Unhandeled IRQ %d!", irq);
+            dispatcher_dispatch(irq);
         }
 
         atomic_enable();
@@ -127,10 +124,6 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
     else if (stackframe.intno == 128)
     {
         stackframe.eax = task_do_syscall(stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
-    }
-    else
-    {
-        logger_error("Unknown interrupt %d!", stackframe.intno);
     }
 
     pic_ack(stackframe.intno);

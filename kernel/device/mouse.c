@@ -8,10 +8,9 @@
 #include <libdevice/mouse.h>
 #include <libkernel/message.h>
 
-#include "tasking.h"
-#include "x86/Interrupts.h"
-
+#include "interrupts/Dispatcher.h"
 #include "mouse.h"
+#include "tasking.h"
 
 static mouse_state_t oldmouse = {0};
 
@@ -102,10 +101,8 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
 static uchar cycle = 0;
 static ubyte packet[4];
 
-uintptr_t mouse_interrupt_handler(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
+void mouse_interrupt_handler(void)
 {
-    __unused(stackframe);
-
     switch (cycle)
     {
     case 0:
@@ -126,8 +123,6 @@ uintptr_t mouse_interrupt_handler(uintptr_t current_stack_pointer, InterruptStac
         cycle = 0;
         break;
     }
-
-    return current_stack_pointer;
 }
 
 static inline void mouse_wait(uchar a_type) //unsigned char
@@ -208,5 +203,5 @@ void mouse_initialize(void)
     // TODO
 
     // Setup the mouse handler
-    interrupts_register_irq(12, mouse_interrupt_handler);
+    dispatcher_register_handler(12, mouse_interrupt_handler);
 }

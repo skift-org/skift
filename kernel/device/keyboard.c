@@ -17,6 +17,7 @@
 #include <libkernel/message.h>
 
 #include "filesystem/Filesystem.h"
+#include "interrupts/Dispatcher.h"
 #include "tasking.h"
 
 /* --- Private functions ---------------------------------------------------- */
@@ -105,10 +106,8 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     }
 }
 
-uintptr_t keyboard_interrupt_handler(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe)
+void keyboard_interrupt_handler(void)
 {
-    __unused(stackframe);
-
     int byte = in8(0x60);
 
     if (keyboard_state == PS2KBD_STATE_NORMAL)
@@ -130,8 +129,6 @@ uintptr_t keyboard_interrupt_handler(uintptr_t current_stack_pointer, InterruptS
         Key key = (byte & 0x7F) + 0x80;
         keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
-
-    return current_stack_pointer;
 }
 
 /* --- Public functions ----------------------------------------------------- */
@@ -252,7 +249,7 @@ void keyboard_initialize()
     keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
     keyboard_buffer = ringbuffer_create(1024);
 
-    interrupts_register_irq(1, keyboard_interrupt_handler);
+    dispatcher_register_handler(1, keyboard_interrupt_handler);
 
     FsNode *keyboard_device = __create(FsNode);
 

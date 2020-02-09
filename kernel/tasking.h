@@ -281,7 +281,7 @@ void sheduler_setup(Task *main_kernel_task);
 
 void wakeup_sleeping_tasks(void);
 
-uintptr_t shedule(uintptr_t current_stack_pointer, InterruptStackFrame *stackframe);
+uintptr_t shedule(uintptr_t current_stack_pointer);
 
 uint sheduler_get_ticks(void);
 

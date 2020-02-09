@@ -28,7 +28,6 @@
 #include "filesystem/Filesystem.h"
 #include "memory.h"
 #include "modules.h"
-#include "mouse.h"
 #include "multiboot.h"
 #include "paging.h"
 #include "platform.h"
@@ -141,7 +140,7 @@ void kmain(multiboot_info_t *info, uint magic)
 
     Launchpad *init_lauchpad = launchpad_create("init", "/bin/init");
 
-    Stream *keyboard_device = stream_open("/dev/kbd", OPEN_READ);
+    Stream *keyboard_device = stream_open("/dev/keyboard", OPEN_READ);
     Stream *serial_device = stream_open("/dev/serial", OPEN_WRITE);
 
     launchpad_handle(init_lauchpad, HANDLE(keyboard_device), 0);

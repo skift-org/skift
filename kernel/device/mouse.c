@@ -2,37 +2,16 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libdevice/Mouse.h>
+#include <libsystem/RingBuffer.h>
 #include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
-
-#include <libdevice/mouse.h>
-#include <libkernel/message.h>
 
 #include "interrupts/Dispatcher.h"
-#include "mouse.h"
 #include "tasking.h"
 
-static mouse_state_t oldmouse = {0};
-
-/* --- Private functions ---------------------------------------------------- */
-
-static void mouse_send_button_event(mouse_button_t btn, bool up)
-{
-    mouse_button_event_t event = (mouse_button_event_t){.button = btn};
-    message_t msg;
-
-    if (up)
-    {
-        msg = message(MOUSE_BUTTONUP, -1);
-    }
-    else
-    {
-        msg = message(MOUSE_BUTTONDOWN, -1);
-    }
-
-    message_set_payload(msg, event);
-    task_messaging_broadcast(task_kernel(), MOUSE_CHANNEL, &msg);
-}
+static RingBuffer *_mouse_buffer;
+static uchar _mouse_cycle = 0;
+static ubyte _mouse_packet[4];
 
 static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
 {
@@ -54,78 +33,43 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
     }
 
     // decode the new mouse packet
-    mouse_state_t newmouse;
+    MousePacket event;
 
-    newmouse.x = offx;
-    newmouse.y = -offy;
-    newmouse.scroll = 0;
-    newmouse.middle = (packet0 >> 2) & 1;
-    newmouse.right = (packet0 >> 1) & 1;
-    newmouse.left = (packet0)&1;
+    event.offx = offx;
+    event.offy = -offy;
+    event.scroll = 0;
+    event.middle = (packet0 >> 2) & 1;
+    event.right = (packet0 >> 1) & 1;
+    event.left = (packet0)&1;
 
-    if (newmouse.x != 0 || newmouse.y != 0)
-    {
-        // The mouse move
-        mouse_move_event_t event = {.offx = newmouse.x, .offy = newmouse.y};
-        message_t move_event = message(MOUSE_MOVE, -1);
-        message_set_payload(move_event, event);
-        task_messaging_broadcast(task_kernel(), MOUSE_CHANNEL, &move_event);
-    }
-
-    if (newmouse.scroll != 0)
-    {
-        mouse_scroll_event_t event = {.off = newmouse.scroll};
-        message_t scroll_event = message(MOUSE_MOVE, -1);
-        message_set_payload(scroll_event, event);
-        task_messaging_broadcast(task_kernel(), MOUSE_SCROLL, &scroll_event);
-    }
-
-    if (oldmouse.left != newmouse.left)
-    {
-        mouse_send_button_event(MOUSE_BUTTON_LEFT, oldmouse.left);
-    }
-
-    if (oldmouse.right != newmouse.right)
-    {
-        mouse_send_button_event(MOUSE_BUTTON_RIGHT, oldmouse.right);
-    }
-
-    if (oldmouse.middle != newmouse.middle)
-    {
-        mouse_send_button_event(MOUSE_BUTTON_MIDDLE, oldmouse.middle);
-    }
-
-    oldmouse = newmouse;
+    ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket));
 }
-
-static uchar cycle = 0;
-static ubyte packet[4];
 
 void mouse_interrupt_handler(void)
 {
-    switch (cycle)
+    switch (_mouse_cycle)
     {
     case 0:
-        packet[0] = in8(0x60);
-        if (packet[0] & 8)
+        _mouse_packet[0] = in8(0x60);
+        if (_mouse_packet[0] & 8)
         {
-            cycle++;
+            _mouse_cycle++;
         }
         break;
     case 1:
-        packet[1] = in8(0x60);
-        cycle++;
+        _mouse_packet[1] = in8(0x60);
+        _mouse_cycle++;
         break;
     case 2:
-        packet[2] = in8(0x60);
+        _mouse_packet[2] = in8(0x60);
 
-        mouse_handle_packet(packet[0], packet[1], packet[2], packet[3]);
-        cycle = 0;
+        mouse_handle_packet(_mouse_packet[0], _mouse_packet[1], _mouse_packet[2], _mouse_packet[3]);
+        _mouse_cycle = 0;
         break;
     }
 }
 
-static inline void mouse_wait(uchar a_type) //unsigned char
+static inline void mouse_wait(uchar a_type)
 {
     uint time_out = 100000;
     if (a_type == 0)
@@ -152,26 +96,41 @@ static inline void mouse_wait(uchar a_type) //unsigned char
     }
 }
 
-static inline void mouse_write(uchar a_write) //unsigned char
+static inline void mouse_write(uchar a_write)
 {
-    //Wait to be able to send a command
     mouse_wait(1);
-    //Tell the mouse we are sending a command
     out8(0x64, 0xD4);
-    //Wait for the final part
     mouse_wait(1);
-    //Finally write
     out8(0x60, a_write);
 }
 
 static inline uchar mouse_read(void)
 {
-    //Get's response from mouse
     mouse_wait(0);
     return in8(0x60);
 }
 
-/* --- Public functions ----------------------------------------------------- */
+bool mouse_FsOperationCanRead(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: make this atomic or something...
+    return !ringbuffer_is_empty(_mouse_buffer);
+}
+
+static error_t mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: use locks
+    atomic_begin();
+    *readed = ringbuffer_read(_mouse_buffer, buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
+    atomic_end();
+
+    return ERR_SUCCESS;
+}
 
 void mouse_initialize(void)
 {
@@ -203,5 +162,17 @@ void mouse_initialize(void)
     // TODO
 
     // Setup the mouse handler
+    _mouse_buffer = ringbuffer_create(sizeof(MousePacket) * 128);
     dispatcher_register_handler(12, mouse_interrupt_handler);
+
+    FsNode *mouse_device = __create(FsNode);
+
+    fsnode_init(mouse_device, FSNODE_DEVICE);
+
+    FSNODE(mouse_device)->read = (FsOperationRead)mouse_FsOperationRead;
+    FSNODE(mouse_device)->can_read = (FsOperationCanRead)mouse_FsOperationCanRead;
+
+    Path *mouse_device_path = path(MOUSE_DEVICE);
+    filesystem_link_and_take_ref(mouse_device_path, mouse_device);
+    path_delete(mouse_device_path);
 }

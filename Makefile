@@ -100,7 +100,8 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBSYSTEM)
 
 APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
-			$(ROOT_DIRECTORY)/bin/Shell
+			$(ROOT_DIRECTORY)/bin/Shell \
+			$(ROOT_DIRECTORY)/bin/Compositor
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -140,7 +141,7 @@ KERNEL_CSOURCES=$(wildcard kernel/*.c) \
 				$(wildcard libraries/libsystem/process/*.c)
 
 KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
-KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.kernel.o} ${KERNEL_SSOURCES:.s=.kernel.o}
+KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.c.kernel.o} ${KERNEL_SSOURCES:.s=.s.kernel.o}
 
 RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar
 
@@ -171,18 +172,7 @@ debug: $(BOOTDISK)
 	gdb -x gdbinit
 
 list:
-	@echo ""
-	@echo "$(LIBRARIES)"
-	@echo ""
-	@echo "$(USERSPACE)"
-	@echo ""
-	@echo "$(RAMDISK)"
-	@echo ""
-	@echo "$(BOOTDISK)"
-	@echo ""
-	@echo "$(INCLUDES)"
-	@echo ""
-	@echo "$(RESSOURCES)"
+	@echo "$(KERNEL_SSOURCES)"
 
 # --- Libaries --------------------------------------------------------------- #
 
@@ -241,9 +231,13 @@ $(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMIN
 	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lgraphic
 
 
-$(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/Shell/*.c) -o $@
+
+$(ROOT_DIRECTORY)/bin/Compositor: $(wildcard application/Compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard application/Compositor/*.c) -o $@ -lgraphic
 
 # --- Userspace -------------------------------------------------------------- #
 
@@ -361,10 +355,10 @@ $(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
 
 # --- Kernel ----------------------------------------------------------------- #
 
-%.kernel.o: %.c
+%.c.kernel.o: %.c
 	$(CC) $(CFLAGS) -ffreestanding -nostdlib -Ikernel/ -c -o $@ $^
 
-%.kernel.o: %.s
+%.s.kernel.o: %.s
 	$(AS) $(ASFLAGS) $^ -o $@
 
 $(KERNEL): $(KERNEL_OBJECT)
@@ -374,13 +368,14 @@ $(KERNEL): $(KERNEL_OBJECT)
 # --- Ressources ------------------------------------------------------------- #
 
 WALLPAPERS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/wallpaper/*.png}}
+CURSOR = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/mouse/*.png}}
 
 FONTS_GLYPHS = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard ressources/font/*.json}}
 FONTS_PNGS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/font/*.png}}
 
 KEYBOARD = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard ressources/keyboard/*.json}}
 
-RESSOURCES = $(WALLPAPERS) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
+RESSOURCES = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
 
 $(ROOT_DIRECTORY)/res/font/%.glyph: ressources/font/%.json
 	$(DIRECTORY_GUARD)
@@ -391,6 +386,10 @@ $(ROOT_DIRECTORY)/res/font/%.png: ressources/font/%.png
 	cp $^ $@
 
 $(ROOT_DIRECTORY)/res/wallpaper/%.png: ressources/wallpaper/%.png
+	$(DIRECTORY_GUARD)
+	cp $^ $@
+
+$(ROOT_DIRECTORY)/res/mouse/%.png: ressources/mouse/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 

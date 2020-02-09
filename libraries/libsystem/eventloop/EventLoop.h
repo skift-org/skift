@@ -4,7 +4,7 @@
 
 struct Notifier;
 
-void eventloop_initilize(void);
+void eventloop_initialize(void);
 
 int eventloop_run(void);
 

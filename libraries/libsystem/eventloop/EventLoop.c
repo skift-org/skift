@@ -14,7 +14,7 @@ static bool _eventloop_is_running = false;
 static bool _eventloop_is_initialize = false;
 static int _eventloop_exit_value = 0;
 
-void eventloop_initilize(void)
+void eventloop_initialize(void)
 {
     assert(!_eventloop_is_initialize);
 

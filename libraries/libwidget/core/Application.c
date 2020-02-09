@@ -17,7 +17,7 @@ void application_initialize(int argc, char **argv)
 
     _windows = list_create();
 
-    eventloop_initilize();
+    eventloop_initialize();
 
     _initialized = true;
 }

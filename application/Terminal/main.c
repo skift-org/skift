@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    eventloop_initilize();
+    eventloop_initialize();
 
     Stream *keyboard = stream_open("/dev/keyboard", OPEN_READ);
 

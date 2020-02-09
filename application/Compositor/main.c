@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     __unused(argc);
     __unused(argv);
 
-    eventloop_initilize();
+    eventloop_initialize();
 
     Stream *keyboard_stream = stream_open("/dev/keyboard", OPEN_READ);
     Notifier *keyboard_notifier = notifier_create(HANDLE(keyboard_stream), SELECT_READ);

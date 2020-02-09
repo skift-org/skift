@@ -1,13 +1,13 @@
 #include <libsystem/assert.h>
 
-#include "node/Socket.h"
 #include "node/Connection.h"
+#include "node/Socket.h"
 
 FsNode *socket_FsOperationOpenConnection(FsSocket *socket)
 {
     FsNode *connection = connection_create();
 
-    list_pushback(socket->pending, LIST_KEEP_VALUES);
+    list_pushback(socket->pending, connection);
 
     return connection;
 }
@@ -43,6 +43,9 @@ FsNode *socket_create(void)
 
     fsnode_init(FSNODE(socket), FSNODE_SOCKET);
 
+    FSNODE(socket)->open_connection = (FsOperationOpenConnection)socket_FsOperationOpenConnection;
+    FSNODE(socket)->can_accept_connection = (FsOperationCanAcceptConnection)socket_FsOperationCanAcceptConnection;
+    FSNODE(socket)->accept_connection = (FsOperationAcceptConnection)socket_FsOperationAcceptConnection;
     FSNODE(socket)->destroy = (FsOperationDestroy)socket_FsOperationDestroy;
 
     socket->pending = list_create();

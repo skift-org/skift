@@ -76,7 +76,7 @@ bool fsnode_can_receive(FsNode *node, FsHandle *handle)
 
 bool fsnode_can_accept(FsNode *node)
 {
-    if (node->is_accepted)
+    if (node->can_accept_connection)
     {
         return node->can_accept_connection(node);
     }

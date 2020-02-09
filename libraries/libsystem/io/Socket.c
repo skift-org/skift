@@ -9,6 +9,8 @@ Socket *socket_open(const char *path, OpenFlag flags)
 
     __plug_handle_open(HANDLE(socket), path, flags | OPEN_SOCKET);
 
+    socket->connections = list_create();
+
     return socket;
 }
 
@@ -19,7 +21,7 @@ void socket_close(Socket *socket)
     {
         connection_close(connection);
     }
-
+  
     __plug_handle_close(HANDLE(socket));
 
     list_destroy(socket->connections, LIST_KEEP_VALUES);

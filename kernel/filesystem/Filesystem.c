@@ -14,6 +14,7 @@
 #include "node/Directory.h"
 #include "node/File.h"
 #include "node/Pipe.h"
+#include "node/Socket.h"
 #include "tasking.h"
 
 static FsNode *_filesystem_root = NULL;
@@ -90,7 +91,14 @@ error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
         {
             if (parent->link)
             {
-                node = file_create();
+                if (flags & OPEN_SOCKET)
+                {
+                    node = socket_create();
+                }
+                else
+                {
+                    node = file_create();
+                }
 
                 fsnode_acquire_lock(parent, sheduler_running_id());
                 parent->link(parent, path_filename(path), node);
@@ -148,7 +156,7 @@ error_t filesystem_connect(Path *path, FsHandle **connection_handle)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (node->type == FSNODE_SOCKET)
+    if (node->type != FSNODE_SOCKET)
     {
         fsnode_deref(node);
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;

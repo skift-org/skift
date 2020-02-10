@@ -389,16 +389,11 @@ error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
 error_t fshandle_send(FsHandle *handle, Message *message)
 {
-    if (!fshandle_has_flag(handle, OPEN_WRITE))
-    {
-        return ERR_READ_ONLY_STREAM;
-    }
-
     FsNode *node = handle->node;
 
-    if (!node->write)
+    if (!node->send)
     {
-        return ERR_NOT_WRITABLE;
+        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
     fsnode_acquire_lock(node, sheduler_running_id());
@@ -412,16 +407,11 @@ error_t fshandle_send(FsHandle *handle, Message *message)
 
 error_t fshandle_receive(FsHandle *handle, Message *message)
 {
-    if (!fshandle_has_flag(handle, OPEN_READ))
-    {
-        return ERR_WRITE_ONLY_STREAM;
-    }
-
     FsNode *node = handle->node;
 
-    if (!node->read)
+    if (!node->receive)
     {
-        return ERR_NOT_READABLE;
+        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
     task_block(sheduler_running(), blocker_receive_create(handle));

@@ -57,11 +57,11 @@ error_t connection_FsOperationReceive(FsConnection *connection, FsHandle *handle
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
-        inbox = connection->message_to_server;
+        inbox = connection->message_to_client;
     }
     else
     {
-        inbox = connection->message_to_client;
+        inbox = connection->message_to_server;
     }
 
     if (list_count(inbox) > 64)

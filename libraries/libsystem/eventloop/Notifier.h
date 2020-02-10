@@ -20,6 +20,12 @@ typedef struct Notifier
     NotifierHandler on_ready_to_accept;
 } Notifier;
 
+#define NOTIFIER(__subclass) ((Notifier*)(__subclass))
+
+void notifier_initialize(Notifier *notifier, Handle *handle, SelectEvent events);
+
+void notifier_uninitialize(Notifier *notifier);
+
 Notifier *notifier_create(Handle *handle, SelectEvent events);
 
 void notifier_destroy(Notifier *notifier);

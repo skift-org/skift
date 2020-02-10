@@ -1,17 +1,34 @@
 #include <libsystem/assert.h>
 #include <libsystem/eventloop/EventLoop.h>
+#include <libsystem/io/Connection.h>
+#include <libsystem/io/Socket.h>
 #include <libsystem/logger.h>
 
 #include <libwidget/core/Application.h>
 
+#include "Compositor/Protocol.h"
+
 static bool _initialized = false;
 static bool _running = false;
 static List *_windows;
+static Connection *_connection;
 
 void application_initialize(int argc, char **argv)
 {
     __unused(argc);
     __unused(argv);
+
+    logger_trace("Connecting to compositor...");
+    _connection = socket_connect("/srv/compositor.ipc");
+
+    if (handle_has_error(_connection))
+    {
+        logger_error("Failled to connect to the compositor: %s", handle_error_string(_connection));
+    }
+    else
+    {
+        logger_trace("Connected to compositor!");
+    }
 
     assert(!_initialized);
 
@@ -53,6 +70,10 @@ void application_add_window(Window *window)
     assert(_initialized);
 
     logger_info("Adding %s(0x%08x)", WIDGET(window)->classname, window);
+
+    CompositorCreateWindowMessage message = {.bound = WIDGET(window)->bound};
+
+    connection_send(_connection, (Message *)&message, sizeof(message));
 
     list_pushback(_windows, window);
 }

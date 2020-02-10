@@ -1,8 +1,11 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
+#include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Launchpad.h>
 
+#include "Compositor/Client.h"
 #include "Compositor/Cursor.h"
 #include "Compositor/Manager.h"
 #include "Compositor/Renderer.h"
@@ -39,6 +42,16 @@ void mouse_callback(Notifier *notifier, Stream *mouse_stream)
     }
 }
 
+void accept_callback(Notifier *notifier, Socket *socket)
+{
+    __unused(notifier);
+    __unused(socket);
+
+    Connection *incoming_connection = socket_accept(socket);
+
+    client_create(incoming_connection);
+}
+
 int main(int argc, char const *argv[])
 {
     __unused(argc);
@@ -54,9 +67,16 @@ int main(int argc, char const *argv[])
     Notifier *mouse_notifier = notifier_create(HANDLE(mouse_stream), SELECT_READ);
     mouse_notifier->on_ready_to_read = (NotifierHandler)mouse_callback;
 
+    Socket *socket = socket_open("/srv/compositor.ipc", OPEN_CREATE);
+    Notifier *socket_notifier = notifier_create(HANDLE(socket), SELECT_ACCEPT);
+    socket_notifier->on_ready_to_accept = (NotifierHandler)accept_callback;
+
     manager_initialize();
     cursor_initialize();
     renderer_initialize();
+
+    Launchpad *launchpad = launchpad_create("__testapp", "/bin/__testapp");
+    launchpad_launch(launchpad);
 
     return eventloop_run();
 }

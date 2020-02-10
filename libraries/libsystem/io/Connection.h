@@ -13,7 +13,7 @@ typedef struct Connection
 
 void connection_close(Connection *connection);
 
-void connection_send(Connection *connection, Message *message);
+void connection_send(Connection *connection, Message *message, size_t size);
 
 void connection_receive(Connection *connection, Message *message);
 

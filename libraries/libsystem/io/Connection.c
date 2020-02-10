@@ -16,10 +16,12 @@ void connection_close(Connection *connection)
     __plug_handle_close(HANDLE(connection));
 }
 
-void connection_send(Connection *connection, Message *message)
+void connection_send(Connection *connection, Message *message, size_t size)
 {
     assert(connection != NULL);
     assert(message != NULL);
+
+    message->size = size;
 
     __plug_handle_send(HANDLE(connection), message);
 }

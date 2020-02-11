@@ -15,35 +15,32 @@ typedef struct
     bool is_absolue;
 } Path;
 
-Path *path(const char *raw_path);
+Path *path_create(const char *raw_path);
 
-void path_delete(Path *p);
+void path_destroy(Path *path);
 
-const char *path_filename(Path *p);
+const char *path_filename(Path *path);
 
-const char *path_element(Path *p, int index);
+const char *path_peek_at(Path *path, int index);
 
-bool path_is_absolue(Path *p);
+bool path_is_absolue(Path *path);
 
-bool path_is_relative(Path *p);
+bool path_is_relative(Path *path);
 
-int path_length(Path *p);
+size_t path_lenght(Path *path);
 
-void path_normalize(Path *p);
+size_t path_element_count(Path *path);
 
-void path_push(Path *p, const char *element);
+void path_normalize(Path *path);
 
-const char *path_pop(Path *p);
+void path_push(Path *path, const char *element);
 
-// Combine two path into a new one.
+const char *path_pop(Path *path);
+
 Path *path_combine(Path *left, Path *right);
 
-// Split the path a the index (inclusif)
-Path *path_split_at(Path *path, int index);
+Path *path_clone(Path *path);
 
-// Duplicate a path
-Path *path_dup(Path *path);
+void path_to_cstring(Path *path, char *buffer, uint size);
 
-void Patho_cstring(Path *this, char *buffer, uint size);
-
-void path_dump(Path *p);
+void path_dump(Path *path);

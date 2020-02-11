@@ -102,7 +102,7 @@ void serial_initialize(void)
     FSNODE(serial_device)->read = (FsOperationRead)serial_FsOperationRead;
     FSNODE(serial_device)->write = (FsOperationWrite)serial_FsOperationWrite;
 
-    Path *serial_device_path = path("/dev/serial");
+    Path *serial_device_path = path_create("/dev/serial");
     filesystem_link_and_take_ref(serial_device_path, serial_device);
-    path_delete(serial_device_path);
+    path_destroy(serial_device_path);
 }

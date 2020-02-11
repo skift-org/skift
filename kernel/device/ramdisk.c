@@ -22,7 +22,7 @@ void ramdisk_load(multiboot_module_t *module)
     tar_block_t block;
     for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
     {
-        Path *file_path = path(block.name);
+        Path *file_path = path_create(block.name);
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
@@ -55,7 +55,7 @@ void ramdisk_load(multiboot_module_t *module)
             fshandle_destroy(handle);
         }
 
-        path_delete(file_path);
+        path_destroy(file_path);
     }
 
     logger_info("Loading ramdisk succeeded.");

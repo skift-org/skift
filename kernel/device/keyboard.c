@@ -259,7 +259,7 @@ void keyboard_initialize()
     FSNODE(keyboard_device)->read = (FsOperationRead)keyboard_FsOperationRead;
     FSNODE(keyboard_device)->can_read = (FsOperationCanRead)keyboard_FsOperationCanRead;
 
-    Path *keyboard_device_path = path(KEYBOARD_DEVICE);
+    Path *keyboard_device_path = path_create(KEYBOARD_DEVICE);
     filesystem_link_and_take_ref(keyboard_device_path, keyboard_device);
-    path_delete(keyboard_device_path);
+    path_destroy(keyboard_device_path);
 }

@@ -181,7 +181,7 @@ int sys_filesystem_mkdir(const char *dir_path)
 
     int result = filesystem_mkdir(path);
 
-    path_delete(path);
+    path_destroy(path);
 
     return result;
 }
@@ -192,7 +192,7 @@ int sys_filesystem_mkpipe(const char *fifo_path)
 
     int result = filesystem_mkpipe(path);
 
-    path_delete(path);
+    path_destroy(path);
 
     return result;
 }
@@ -204,8 +204,8 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
 
     int result = filesystem_mklink(oldp, newp);
 
-    path_delete(oldp);
-    path_delete(newp);
+    path_destroy(oldp);
+    path_destroy(newp);
 
     return result;
 }
@@ -216,7 +216,7 @@ int sys_filesystem_unlink(const char *link_path)
 
     int result = filesystem_unlink(path);
 
-    path_delete(path);
+    path_destroy(path);
 
     return result;
 }
@@ -228,8 +228,8 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
 
     int result = filesystem_rename(oldp, newp);
 
-    path_delete(oldp);
-    path_delete(newp);
+    path_destroy(oldp);
+    path_destroy(newp);
 
     return result;
 }

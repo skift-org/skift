@@ -107,7 +107,7 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
     FsHandle *handle = NULL;
     error_t result = filesystem_open(p, flags, &handle);
 
-    path_delete(p);
+    path_destroy(p);
 
     if (handle == NULL)
     {
@@ -327,7 +327,7 @@ error_t task_fshandle_connect(Task *task, int *connection_handle_index, const ch
     FsHandle *connection_handle;
     int result = filesystem_connect(resolved_path, &connection_handle);
 
-    path_delete(resolved_path);
+    path_destroy(resolved_path);
 
     if (result != ERR_SUCCESS)
     {

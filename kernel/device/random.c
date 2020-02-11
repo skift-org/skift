@@ -49,7 +49,7 @@ void random_initialize(void)
     FSNODE(random_device)->read = (FsOperationRead)random_FsOperationRead;
     FSNODE(random_device)->write = (FsOperationWrite)random_FsOperationWrite;
 
-    Path *random_device_path = path("/dev/random");
+    Path *random_device_path = path_create("/dev/random");
     filesystem_link_and_take_ref(random_device_path, random_device);
-    path_delete(random_device_path);
+    path_destroy(random_device_path);
 }

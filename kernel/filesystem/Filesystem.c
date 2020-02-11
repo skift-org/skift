@@ -40,11 +40,11 @@ FsNode *filesystem_find_and_ref(Path *path)
 
     FsNode *current = fsnode_ref(_filesystem_root);
 
-    for (int i = 0; i < path_length(path); i++)
+    for (size_t i = 0; i < path_element_count(path); i++)
     {
         if (current && current->type == FSNODE_DIRECTORY)
         {
-            const char *element = path_element(path, i);
+            const char *element = path_peek_at(path, i);
 
             FsNode *found = NULL;
 

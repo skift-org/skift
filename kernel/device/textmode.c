@@ -9,7 +9,6 @@
 #include "device/Device.h"
 #include "filesystem/Filesystem.h"
 
-
 /* ---VGA textmode driver --------------------------------------------------- */
 
 #define VGA_FRAME_BUFFER 0XB8000
@@ -121,7 +120,7 @@ void textmode_initialize(void)
     FSNODE(textmode_device)->write = (FsOperationWrite)textmode_FsOperationWrite;
     FSNODE(textmode_device)->call = (FsOperationCall)textmode_FsOperationCall;
 
-    Path *textmode_device_path = path(TEXTMODE_DEVICE);
+    Path *textmode_device_path = path_create(TEXTMODE_DEVICE);
     filesystem_link_and_take_ref(textmode_device_path, textmode_device);
-    path_delete(textmode_device_path);
+    path_destroy(textmode_device_path);
 }

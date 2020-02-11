@@ -443,9 +443,9 @@ bool framebuffer_initialize(multiboot_info_t *mboot)
         FSNODE(framebuffer_device)->close = (FsOperationClose)framebuffer_FsOperationClose;
         FSNODE(framebuffer_device)->call = (FsOperationCall)framebuffer_FsOperationCall;
 
-        Path *framebuffer_device_path = path(FRAMEBUFFER_DEVICE);
+        Path *framebuffer_device_path = path_create(FRAMEBUFFER_DEVICE);
         filesystem_link(framebuffer_device_path, framebuffer_device);
-        path_delete(framebuffer_device_path);
+        path_destroy(framebuffer_device_path);
 
         return true;
     }

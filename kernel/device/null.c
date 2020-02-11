@@ -38,7 +38,7 @@ void null_initialize(void)
     FSNODE(null_device)->read = (FsOperationRead)null_FsOperationRead;
     FSNODE(null_device)->write = (FsOperationWrite)null_FsOperationWrite;
 
-    Path *null_device_path = path("/dev/null");
+    Path *null_device_path = path_create("/dev/null");
     filesystem_link_and_take_ref(null_device_path, null_device);
-    path_delete(null_device_path);
+    path_destroy(null_device_path);
 }

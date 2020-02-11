@@ -172,7 +172,7 @@ void mouse_initialize(void)
     FSNODE(mouse_device)->read = (FsOperationRead)mouse_FsOperationRead;
     FSNODE(mouse_device)->can_read = (FsOperationCanRead)mouse_FsOperationCanRead;
 
-    Path *mouse_device_path = path(MOUSE_DEVICE);
+    Path *mouse_device_path = path_create(MOUSE_DEVICE);
     filesystem_link_and_take_ref(mouse_device_path, mouse_device);
-    path_delete(mouse_device_path);
+    path_destroy(mouse_device_path);
 }

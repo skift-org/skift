@@ -37,7 +37,7 @@ void zero_initialize(void)
     FSNODE(zero_device)->read = (FsOperationRead)zero_FsOperationRead;
     FSNODE(zero_device)->write = (FsOperationWrite)zero_FsOperationWrite;
 
-    Path *zero_device_path = path("/dev/zero");
+    Path *zero_device_path = path_create("/dev/zero");
     filesystem_link_and_take_ref(zero_device_path, zero_device);
-    path_delete(zero_device_path);
+    path_destroy(zero_device_path);
 }

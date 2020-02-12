@@ -17,8 +17,6 @@
 #include "memory.h"
 #include "sheduling/TaskBlocker.h"
 
-/* --- Task data structure -------------------------------------------------- */
-
 struct Task;
 
 typedef void (*TaskEntry)();
@@ -81,19 +79,7 @@ typedef struct Task
     int exitvalue;
 } Task;
 
-/* -------------------------------------------------------------------------- */
-/*   TASKING                                                                  */
-/* -------------------------------------------------------------------------- */
-
-void tasking_setup(void);
-
-Task *task_kernel(void);
-
-/* -------------------------------------------------------------------------- */
-/*   TASKS                                                                    */
-/* -------------------------------------------------------------------------- */
-
-void task_setup(void);
+void tasking_initialize(void);
 
 Task *task_create(Task *parent, const char *name, bool user);
 
@@ -101,9 +87,9 @@ void task_destroy(Task *task);
 
 List *task_all(void);
 
-List *task_bystate(TaskState state);
+List *task_by_state(TaskState state);
 
-Task *task_getbyid(int id);
+Task *task_by_id(int id);
 
 void task_get_info(Task *task, TaskInfo *info);
 
@@ -115,9 +101,9 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
 int task_launch(Task *task, Launchpad *Launchpad);
 
-void task_setstate(Task *task, TaskState state);
+void task_set_state(Task *task, TaskState state);
 
-void task_setentry(Task *task, TaskEntry entry, bool user);
+void task_set_entry(Task *task, TaskEntry entry, bool user);
 
 uintptr_t task_stack_push(Task *task, const void *value, uint size);
 
@@ -159,9 +145,9 @@ void task_memory_free(Task *this, uint addr, uint count);
 
 /* --- Task current working directory --------------------------------------- */
 
-Path *task_cwd_resolve(Task *this, const char *Patho_resolve);
+Path *task_cwd_resolve(Task *this, const char *buffer);
 
-int task_set_cwd(Task *this, const char *new_wd);
+error_t task_set_cwd(Task *this, const char *buffer);
 
 void task_get_cwd(Task *this, char *buffer, uint size);
 
@@ -176,42 +162,6 @@ FsHandle *task_fshandle_acquire(Task *task, int handle_index);
 error_t task_fshandle_release(Task *task, int handle_index);
 
 /* --- Task handle operations ----------------------------------------------- */
-
-error_t task_fshandle_open(Task *this, int *handle_index, const char *path, OpenFlag flags);
-
-error_t task_fshandle_close(Task *this, int handle_index);
-
-void task_fshandle_close_all(Task *this);
-
-error_t task_fshandle_select(Task *this, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events);
-
-error_t task_fshandle_read(Task *this, int handle_index, void *buffer, size_t size, size_t *readed);
-
-error_t task_fshandle_write(Task *this, int handle_index, const void *buffer, size_t size, size_t *written);
-
-error_t task_fshandle_seek(Task *this, int handle_index, int offset, Whence whence);
-
-error_t task_fshandle_tell(Task *this, int handle_index, Whence whence, int *offset);
-
-error_t task_fshandle_call(Task *this, int handle_index, int request, void *args);
-
-error_t task_fshandle_stat(Task *this, int handle_index, FileState *stat);
-
-error_t task_fshandle_connect(Task *this, int *handle_index, const char *path);
-
-error_t task_fshandle_accept(Task *task, int handle_index, int *connection_handle_index);
-
-error_t task_fshandle_send(Task *this, int handle_index, Message *message);
-
-error_t task_fshandle_receive(Task *this, int handle_index, Message *message);
-
-error_t task_fshandle_payload(Task *this, int handle_index, Message *message);
-
-error_t task_fshandle_discard(Task *this, int handle_index);
-
-error_t task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index);
-
-error_t task_create_term(Task *task, int *master_handle_index, int *slave_handle_index);
 
 /* -------------------------------------------------------------------------- */
 /*   SHARED MEMORY                                                            */

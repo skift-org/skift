@@ -21,6 +21,7 @@
 #include "filesystem/Filesystem.h"
 #include "memory.h"
 #include "tasking.h"
+#include "tasking/Handles.h"
 #include "tasking/Syscalls.h"
 
 typedef int (*SyscallHandler)(int, int, int, int, int);
@@ -60,7 +61,7 @@ int sys_process_cancel(int pid)
     int result;
 
     ATOMIC({
-        result = task_cancel(task_getbyid(pid), -1);
+        result = task_cancel(task_by_id(pid), -1);
     });
 
     return result;
@@ -108,7 +109,7 @@ int sys_process_wakeup(int tid)
     int result;
 
     ATOMIC({
-        result = task_wakeup(task_getbyid(tid));
+        result = task_wakeup(task_by_id(tid));
     });
 
     return result;

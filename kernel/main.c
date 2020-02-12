@@ -111,7 +111,7 @@ void kmain(multiboot_info_t *info, uint magic)
 
     logger_info("Initializing system...");
     setup(memory, &mbootinfo);
-    setup(tasking);
+    tasking_initialize();
 
     interrupts_initialize();
 

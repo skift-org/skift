@@ -73,7 +73,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
                 message_t keypressed_event = message(KEYBOARD_KEYPRESSED, -1);
                 message_set_payload(keypressed_event, keyevent);
 
-                task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+                task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
             }
 
             if (keyboad_get_codepoint(key) != 0)
@@ -87,7 +87,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
             message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);
             message_set_payload(keypressed_event, keyevent);
 
-            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+            task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
         }
         else if (motion == KEY_MOTION_UP)
         {
@@ -95,7 +95,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
             message_t keypressed_event = message(KEYBOARD_KEYRELEASED, -1);
             message_set_payload(keypressed_event, keyevent);
 
-            task_messaging_broadcast(task_kernel(), KEYBOARD_CHANNEL, &keypressed_event);
+            task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
         }
 
         keyboard_keystate[key] = motion;

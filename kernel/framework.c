@@ -13,6 +13,7 @@
 #include "memory.h"
 #include "serial.h"
 #include "tasking.h"
+#include "tasking/Handles.h"
 
 /* --- Framework initialization --------------------------------------------- */
 
@@ -134,7 +135,7 @@ int __plug_process_cancel(int pid)
     int result;
 
     ATOMIC({
-        result = task_cancel(task_getbyid(pid), -1);
+        result = task_cancel(task_by_id(pid), -1);
     });
 
     return result;
@@ -182,7 +183,7 @@ int __plug_process_wakeup(int pid)
     int result;
 
     ATOMIC({
-        result = task_wakeup(task_getbyid(pid));
+        result = task_wakeup(task_by_id(pid));
     });
 
     return result;

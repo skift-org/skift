@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#define ERROR_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                    \
-    __ENTRY_WITH_VALUE(ERR_SUCCESS, 0)                             \
+#define RESULT_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                   \
+    __ENTRY_WITH_VALUE(SUCCESS, 0)                                 \
     __ENTRY(ERR_INBOX_FULL)                                        \
     __ENTRY(ERR_BAD_FILE_DESCRIPTOR)                               \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)                         \
@@ -141,13 +141,13 @@
     __ENTRY(ERR_OPERATION_NOT_SUPPORTED)                           \
     __ENTRY(ERR_REQUEST_TIMEOUT)
 
-#define ERROR_ENUM_ENTRY(__entry) __entry,
-#define ERROR_ENUM_ENTRY_WITH_VALUE(__entry, __value) __entry = __value,
+#define RESULT_ENUM_ENTRY(__entry) __entry,
+#define RESULT_ENUM_ENTRY_WITH_VALUE(__entry, __value) __entry = __value,
 
 typedef enum
 {
-    ERROR_ENUM(ERROR_ENUM_ENTRY, ERROR_ENUM_ENTRY_WITH_VALUE)
-} error_t;
+    RESULT_ENUM(RESULT_ENUM_ENTRY, RESULT_ENUM_ENTRY_WITH_VALUE)
+} Result;
 
 #define RETURN_AND_SET_ERROR(__value, __good_return, __on_error_return) \
     if ((__value) < 0)                                                  \
@@ -160,14 +160,12 @@ typedef enum
         return (__good_return);                                         \
     }
 
-const char *error_to_string(error_t error);
+const char *result_to_string(Result error);
 
-error_t error_get(void);
+Result error_get(void);
 
-void error_set(error_t error);
+void error_set(Result error);
 
 void error_print(const char *message);
 
-#define error_log(__message) logger_log("%s: %s\n", __message, error_to_string(error_value));
-
-void if_error_throw_and_catch_fire(const char *message);
+#define error_log(__message) logger_log("%s: %s\n", __message, result_to_string(error_value));

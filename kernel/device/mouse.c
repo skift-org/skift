@@ -119,7 +119,7 @@ bool mouse_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(_mouse_buffer);
 }
 
-static error_t mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
@@ -129,7 +129,7 @@ static error_t mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
     *readed = ringbuffer_read(_mouse_buffer, buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
     atomic_end();
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void mouse_initialize(void)

@@ -2,14 +2,14 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 
 #include "kernel/node/Directory.h"
 #include "kernel/node/Handle.h"
 
-error_t directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
+Result directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
 {
     DirectoryListing *listing = malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
 
@@ -39,7 +39,7 @@ error_t directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
 
     handle->attached = listing;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void directory_FsOperationClose(FsDirectory *node, FsHandle *handle)
@@ -49,7 +49,7 @@ void directory_FsOperationClose(FsDirectory *node, FsHandle *handle)
     free(handle->attached);
 }
 
-error_t directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buffer, uint size, size_t *readed)
+Result directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buffer, uint size, size_t *readed)
 {
     __unused(node);
     // FIXME: directories should no be read using read().
@@ -68,7 +68,7 @@ error_t directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buf
         }
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 FsNode *directory_FsOperationFind(FsDirectory *node, const char *name)
@@ -84,13 +84,13 @@ FsNode *directory_FsOperationFind(FsDirectory *node, const char *name)
     return NULL;
 }
 
-int directory_FsOperationLink(FsDirectory *node, const char *name, FsNode *child)
+Result directory_FsOperationLink(FsDirectory *node, const char *name, FsNode *child)
 {
     list_foreach(FsDirectoryEntry, entry, node->childs)
     {
         if (strcmp(entry->name, name) == 0)
         {
-            return -ERR_FILE_EXISTS;
+            return ERR_FILE_EXISTS;
         }
     };
 
@@ -101,10 +101,10 @@ int directory_FsOperationLink(FsDirectory *node, const char *name, FsNode *child
 
     list_pushback(node->childs, new_entry);
 
-    return -ERR_SUCCESS;
+    return SUCCESS;
 }
 
-int directory_FsOperationUnlink(FsDirectory *node, const char *name)
+Result directory_FsOperationUnlink(FsDirectory *node, const char *name)
 {
     list_foreach(FsDirectoryEntry, entry, node->childs)
     {
@@ -113,11 +113,11 @@ int directory_FsOperationUnlink(FsDirectory *node, const char *name)
             fsnode_deref(entry->node);
             free(entry);
 
-            return -ERR_SUCCESS;
+            return SUCCESS;
         }
     };
 
-    return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    return ERR_NO_SUCH_FILE_OR_DIRECTORY;
 }
 
 void directory_FsOperationDestroy(FsDirectory *node)

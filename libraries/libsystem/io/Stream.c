@@ -42,14 +42,14 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
 
     HANDLE(stream)->id = handle_id;
     HANDLE(stream)->flags = flags | OPEN_STREAM;
-    HANDLE(stream)->error = ERR_SUCCESS;
+    HANDLE(stream)->result = SUCCESS;
 
     stream_initialize(stream);
 
     return stream;
 }
 
-error_t stream_create_pipe(Stream **reader, Stream **writer)
+Result stream_create_pipe(Stream **reader, Stream **writer)
 {
     *reader = NULL;
     *writer = NULL;
@@ -57,9 +57,9 @@ error_t stream_create_pipe(Stream **reader, Stream **writer)
     int reader_handle = HANDLE_INVALID_ID;
     int writer_handle = HANDLE_INVALID_ID;
 
-    error_t result = __plug_create_pipe(&reader_handle, &writer_handle);
+    Result result = __plug_create_pipe(&reader_handle, &writer_handle);
 
-    if (result == ERR_SUCCESS)
+    if (result == SUCCESS)
     {
         *reader = stream_open_handle(reader_handle, OPEN_READ);
         *writer = stream_open_handle(writer_handle, OPEN_WRITE);
@@ -68,7 +68,7 @@ error_t stream_create_pipe(Stream **reader, Stream **writer)
     return result;
 }
 
-error_t stream_create_term(Stream **master, Stream **slave)
+Result stream_create_term(Stream **master, Stream **slave)
 {
     *master = NULL;
     *slave = NULL;
@@ -76,9 +76,9 @@ error_t stream_create_term(Stream **master, Stream **slave)
     int master_handle = HANDLE_INVALID_ID;
     int slave_handle = HANDLE_INVALID_ID;
 
-    error_t result = __plug_create_term(&master_handle, &slave_handle);
+    Result result = __plug_create_term(&master_handle, &slave_handle);
 
-    if (result == ERR_SUCCESS)
+    if (result == SUCCESS)
     {
         *master = stream_open_handle(master_handle, OPEN_READ | OPEN_WRITE);
         *slave = stream_open_handle(slave_handle, OPEN_READ | OPEN_WRITE);
@@ -295,7 +295,7 @@ void stream_flush(Stream *stream)
     }
 }
 
-error_t stream_call(Stream *stream, int request, void *arg)
+Result stream_call(Stream *stream, int request, void *arg)
 {
     return __plug_handle_call(HANDLE(stream), request, arg);
 }

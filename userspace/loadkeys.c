@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
@@ -120,7 +120,7 @@ int loadkey_get_keymap(Stream *keyboard_device)
 {
     KeyMap keymap;
 
-    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != ERR_SUCCESS)
+    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != SUCCESS)
     {
         handle_printf_error(keyboard_device, "loadkeys: Failled to retrived the current keymap");
         return -1;

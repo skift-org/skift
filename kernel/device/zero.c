@@ -6,7 +6,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 
-static error_t zero_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result zero_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
@@ -15,10 +15,10 @@ static error_t zero_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer
 
     *readed = size;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-static error_t zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+static Result zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
@@ -26,7 +26,7 @@ static error_t zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void 
 
     *writen = size;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void zero_initialize(void)

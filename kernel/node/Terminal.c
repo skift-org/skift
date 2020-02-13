@@ -38,7 +38,7 @@ bool terminal_FsOperationCanWrite(FsTerminal *terminal, FsHandle *handle)
     }
 }
 
-error_t terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(handle);
 
@@ -51,10 +51,10 @@ error_t terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *b
         *readed = ringbuffer_read(terminal->master_to_slave_buffer, buffer, size);
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(handle);
 
@@ -67,10 +67,10 @@ error_t terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const 
         *writen = ringbuffer_write(terminal->slave_to_master_buffer, buffer, size);
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
+Result terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
 {
     __unused(handle);
 
@@ -82,7 +82,7 @@ error_t terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int req
         size_args->width = terminal->width;
         size_args->height = terminal->height;
 
-        return ERR_SUCCESS;
+        return SUCCESS;
 
     case IOCALL_TERMINAL_SET_SIZE:
         if (size_args->width < 0 || size_args->height < 0)
@@ -93,7 +93,7 @@ error_t terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int req
         terminal->width = size_args->width;
         terminal->height = size_args->height;
 
-        return ERR_SUCCESS;
+        return SUCCESS;
 
     default:
         return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;

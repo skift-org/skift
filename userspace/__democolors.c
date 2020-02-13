@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/framebuffer.h>
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)

@@ -3,8 +3,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
-#include <libsystem/error.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
@@ -130,7 +130,7 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
     lock_release_by(handle->lock, who_release);
 }
 
-error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     if (!fshandle_has_flag(handle, OPEN_READ))
     {
@@ -148,7 +148,7 @@ error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *reade
 
     *readed = 0;
 
-    error_t result = node->read(node, handle, buffer, size, readed);
+    Result result = node->read(node, handle, buffer, size, readed);
 
     handle->offset += *readed;
 
@@ -157,7 +157,7 @@ error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *reade
     return result;
 }
 
-static error_t fshandle_write_interal(FsHandle *handle, const char *buffer, size_t size, size_t *written)
+static Result fshandle_write_interal(FsHandle *handle, const char *buffer, size_t size, size_t *written)
 {
     FsNode *node = handle->node;
 
@@ -173,7 +173,7 @@ static error_t fshandle_write_interal(FsHandle *handle, const char *buffer, size
 
     *written = 0;
 
-    error_t result = node->write(node, handle, buffer, size, written);
+    Result result = node->write(node, handle, buffer, size, written);
 
     handle->offset += *written;
 
@@ -182,10 +182,10 @@ static error_t fshandle_write_interal(FsHandle *handle, const char *buffer, size
     return result;
 }
 
-error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written)
+Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     int remaining = size;
-    error_t result = ERR_SUCCESS;
+    Result result = SUCCESS;
     size_t written_this_time = 0;
 
     *written = 0;
@@ -200,7 +200,7 @@ error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t
         return ERR_NOT_WRITABLE;
     }
 
-    while (remaining > 0 && result == ERR_SUCCESS)
+    while (remaining > 0 && result == SUCCESS)
     {
         result = fshandle_write_interal(
             handle,
@@ -215,7 +215,7 @@ error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t
     return result;
 }
 
-error_t fshandle_seek(FsHandle *handle, int offset, Whence whence)
+Result fshandle_seek(FsHandle *handle, int offset, Whence whence)
 {
     FsNode *node = handle->node;
 
@@ -261,10 +261,10 @@ error_t fshandle_seek(FsHandle *handle, int offset, Whence whence)
         ASSERT_NOT_REACHED();
     }
 
-    return -ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t fshandle_tell(FsHandle *handle, Whence whence, int *offset)
+Result fshandle_tell(FsHandle *handle, Whence whence, int *offset)
 {
     FsNode *node = handle->node;
 
@@ -291,12 +291,12 @@ error_t fshandle_tell(FsHandle *handle, Whence whence, int *offset)
         ASSERT_NOT_REACHED();
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t fshandle_call(FsHandle *handle, int request, void *args)
+Result fshandle_call(FsHandle *handle, int request, void *args)
 {
-    error_t result = ERR_OPERATION_NOT_SUPPORTED;
+    Result result = ERR_OPERATION_NOT_SUPPORTED;
 
     FsNode *node = handle->node;
 
@@ -310,9 +310,9 @@ error_t fshandle_call(FsHandle *handle, int request, void *args)
     return result;
 }
 
-error_t fshandle_stat(FsHandle *handle, FileState *stat)
+Result fshandle_stat(FsHandle *handle, FileState *stat)
 {
-    int result = ERR_SUCCESS;
+    int result = SUCCESS;
 
     FsNode *node = handle->node;
 
@@ -339,7 +339,7 @@ error_t fshandle_stat(FsHandle *handle, FileState *stat)
     return result;
 }
 
-error_t fshandle_connect(FsNode *node, FsHandle **connection_handle)
+Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 {
     if (!node->open_connection)
     {
@@ -362,10 +362,10 @@ error_t fshandle_connect(FsNode *node, FsHandle **connection_handle)
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
     fsnode_deref(connection);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
+Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 {
     FsNode *node = handle->node;
 
@@ -384,10 +384,10 @@ error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     fsnode_deref(connection);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t fshandle_send(FsHandle *handle, Message *message)
+Result fshandle_send(FsHandle *handle, Message *message)
 {
     FsNode *node = handle->node;
 
@@ -398,14 +398,14 @@ error_t fshandle_send(FsHandle *handle, Message *message)
 
     fsnode_acquire_lock(node, sheduler_running_id());
 
-    error_t result = node->send(node, handle, message);
+    Result result = node->send(node, handle, message);
 
     fsnode_release_lock(node, sheduler_running_id());
 
     return result;
 }
 
-error_t fshandle_receive(FsHandle *handle, Message *message)
+Result fshandle_receive(FsHandle *handle, Message *message)
 {
     FsNode *node = handle->node;
 
@@ -422,7 +422,7 @@ error_t fshandle_receive(FsHandle *handle, Message *message)
         handle->message = NULL;
     }
 
-    error_t result = node->receive(node, handle, &handle->message);
+    Result result = node->receive(node, handle, &handle->message);
 
     if (handle->message != NULL)
     {
@@ -434,7 +434,7 @@ error_t fshandle_receive(FsHandle *handle, Message *message)
     return result;
 }
 
-error_t fshandle_payload(FsHandle *handle, Message *message)
+Result fshandle_payload(FsHandle *handle, Message *message)
 {
     if (handle->message == NULL)
     {
@@ -443,10 +443,10 @@ error_t fshandle_payload(FsHandle *handle, Message *message)
 
     memcpy(message, handle->message, handle->message->size);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t fshandle_discard(FsHandle *handle)
+Result fshandle_discard(FsHandle *handle)
 {
     if (handle->message != NULL)
     {
@@ -454,5 +454,5 @@ error_t fshandle_discard(FsHandle *handle)
         handle->message = NULL;
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }

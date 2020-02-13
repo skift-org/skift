@@ -9,7 +9,7 @@
 #include <abi/Task.h>
 
 #include <libkernel/message.h>
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/list.h>
 #include <libsystem/runtime.h>
 
@@ -147,19 +147,19 @@ void task_memory_free(Task *this, uint addr, uint count);
 
 Path *task_cwd_resolve(Task *this, const char *buffer);
 
-error_t task_set_cwd(Task *this, const char *buffer);
+Result task_set_cwd(Task *this, const char *buffer);
 
 void task_get_cwd(Task *this, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
-error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle);
+Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle);
 
-error_t task_fshandle_remove(Task *task, int handle_index);
+Result task_fshandle_remove(Task *task, int handle_index);
 
 FsHandle *task_fshandle_acquire(Task *task, int handle_index);
 
-error_t task_fshandle_release(Task *task, int handle_index);
+Result task_fshandle_release(Task *task, int handle_index);
 
 /* --- Task handle operations ----------------------------------------------- */
 

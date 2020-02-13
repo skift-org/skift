@@ -7,7 +7,7 @@
 
 #include "kernel/tasking.h"
 
-error_t task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, elf_program_t *program_header)
+Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, elf_program_t *program_header)
 {
     if (program_header->vaddr <= 0x100000)
     {
@@ -36,7 +36,7 @@ error_t task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fi
     {
         task_switch_pdir(parent_task, parent_page_directory);
 
-        return ERR_SUCCESS;
+        return SUCCESS;
     }
 }
 
@@ -104,9 +104,9 @@ int task_launch(Task *parent_task, Launchpad *launchpad)
             goto cleanup_and_return;
         }
 
-        error_t load_result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
+        Result load_result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
 
-        if (load_result != ERR_SUCCESS)
+        if (load_result != SUCCESS)
         {
             result = -ERR_EXEC_FORMAT_ERROR;
             task_destroy(child_task);

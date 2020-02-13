@@ -252,7 +252,7 @@ unsigned encode(const std::string& filename,
 
 #ifdef LODEPNG_COMPILE_ERROR_TEXT
 /*Returns an English description of the numerical error code.*/
-const char* lodepng_error_text(unsigned code);
+const char* lodepng_Resultext(unsigned code);
 #endif /*LODEPNG_COMPILE_ERROR_TEXT*/
 
 #ifdef LODEPNG_COMPILE_DECODER

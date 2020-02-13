@@ -1,5 +1,5 @@
+#include <libsystem/Result.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
@@ -32,7 +32,7 @@ int shell_eval_command(int argc, const char **argv)
 
     if (process < 0)
     {
-        printf("%s: Command not found! \e[90m%s\e[m\n", argv[0], error_to_string(-process));
+        printf("%s: Command not found! \e[90m%s\e[m\n", argv[0], result_to_string(-process));
 
         command_result = -1;
         goto cleanup_and_return;

@@ -48,9 +48,9 @@ Stream *stream_open(const char *path, OpenFlag flags);
 
 Stream *stream_open_handle(int handle_id, OpenFlag flags);
 
-error_t stream_create_pipe(Stream **reader, Stream **writer);
+Result stream_create_pipe(Stream **reader, Stream **writer);
 
-error_t stream_create_term(Stream **master, Stream **slave);
+Result stream_create_term(Stream **master, Stream **slave);
 
 void stream_close(Stream *stream);
 
@@ -64,7 +64,7 @@ size_t stream_write(Stream *stream, const void *buffer, size_t size);
 
 void stream_flush(Stream *stream);
 
-error_t stream_call(Stream *stream, int request, void *arg);
+Result stream_call(Stream *stream, int request, void *arg);
 
 int stream_seek(Stream *stream, int offset, Whence whence);
 

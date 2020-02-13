@@ -4,11 +4,11 @@
 
 #include <libfile/elf.h>
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/debug.h>
-#include <libsystem/error.h>
 
 #include "kernel/platform.h"
 #include "kernel/tasking.h"
@@ -533,9 +533,9 @@ Path *task_cwd_resolve(Task *task, const char *buffer)
     return path;
 }
 
-error_t task_set_cwd(Task *task, const char *buffer)
+Result task_set_cwd(Task *task, const char *buffer)
 {
-    error_t result = ERR_SUCCESS;
+    Result result = SUCCESS;
 
     Path *path = task_cwd_resolve(task, buffer);
     FsNode *node = filesystem_find_and_ref(path);
@@ -718,7 +718,7 @@ int task_shared_memory_acquire(Task *task, int shm, uint *addr)
     {
         *addr = virtr->vaddr;
         lock_release(shms_lock);
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
 
     shm_physical_region_t *physr = task_physical_region_get_by_id(shm);
@@ -739,7 +739,7 @@ int task_shared_memory_acquire(Task *task, int shm, uint *addr)
 
     *addr = virtr->vaddr;
     lock_release(shms_lock);
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 int task_shared_memory_release(Task *task, int shm)
@@ -757,7 +757,7 @@ int task_shared_memory_release(Task *task, int shm)
     {
         object_release(virtr);
         lock_release(shms_lock);
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
 }
 
@@ -792,7 +792,7 @@ int task_messaging_subscribe(Task *task, const char *channel)
 {
     if (task_messaging_has_subscribe(task, channel))
     {
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
     else
     {
@@ -803,14 +803,14 @@ int task_messaging_subscribe(Task *task, const char *channel)
         atomic_end();
     }
 
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 int task_messaging_unsubscribe(Task *task, const char *channel)
 {
     if (task_messaging_has_subscribe(task, channel))
     {
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
     else
     {
@@ -828,7 +828,7 @@ int task_messaging_unsubscribe(Task *task, const char *channel)
         atomic_end();
     }
 
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 /* --- Messages ------------------------------------------------------------- */
@@ -856,7 +856,7 @@ int task_messaging_send_internal(Task *task, Task *destination, message_t *event
         task_set_state(destination, TASK_STATE_RUNNING);
     }
 
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 int task_messaging_send(Task *task, message_t *event)
@@ -896,7 +896,7 @@ int task_messaging_broadcast(Task *task, const char *channel, message_t *event)
 
     atomic_end();
 
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 int task_messaging_request(Task *task, message_t *request, message_t *respond, int timeout)
@@ -931,7 +931,7 @@ int task_messaging_request(Task *task, message_t *request, message_t *respond, i
     {
         *respond = task->wait.respond.result;
 
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
     else
     {
@@ -962,7 +962,7 @@ int task_messaging_respond(Task *task, message_t *request, message_t *result)
 
     atomic_end();
 
-    return -ERR_SUCCESS;
+    return -SUCCESS;
 }
 
 int task_messaging_receive(Task *task, message_t *message, bool wait)
@@ -1001,7 +1001,7 @@ int task_messaging_receive(Task *task, message_t *message, bool wait)
     else
     {
         free(received);
-        return -ERR_SUCCESS;
+        return -SUCCESS;
     }
 }
 

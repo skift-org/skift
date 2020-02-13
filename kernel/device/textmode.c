@@ -4,9 +4,9 @@
 
 #include <libdevice/textmode.h>
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 
 #include "kernel/device/Device.h"
@@ -59,7 +59,7 @@ void vga_cursor_position(s32 x, s32 y)
 
 /* --- Textmode abstract driver --------------------------------------------- */
 
-error_t textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
@@ -70,10 +70,10 @@ error_t textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *bu
 
     *writen = tocopy;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+Result textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -88,7 +88,7 @@ error_t textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
         info->width = 80;
         info->height = 25;
 
-        return -ERR_SUCCESS;
+        return SUCCESS;
     }
     else if (request == TEXTMODE_CALL_SET_INFO)
     {
@@ -97,7 +97,7 @@ error_t textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
         vga_cursor_position(info->cursor_x, info->cursor_y);
         vga_cursor_enable();
 
-        return -ERR_SUCCESS;
+        return SUCCESS;
     }
     else if (request == TEXTMODE_CALL_SET_CELL)
     {
@@ -105,11 +105,11 @@ error_t textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
 
         vga_cell(cell->x, cell->y, VGA_ENTRY(cell->c, cell->fg, cell->bg));
 
-        return -ERR_SUCCESS;
+        return SUCCESS;
     }
     else
     {
-        return -ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }
 

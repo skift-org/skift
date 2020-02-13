@@ -520,7 +520,7 @@ static unsigned HuffmanTree_make2DTree(HuffmanTree* tree) {
   for(n = 0; n < tree->numcodes; ++n) /*the codes*/ {
     for(i = 0; i != tree->lengths[n]; ++i) /*the bits for this code*/ {
       unsigned char bit = (unsigned char)((tree->tree1d[n] >> (tree->lengths[n] - i - 1)) & 1);
-      /*oversubscribed, see comment in lodepng_error_text*/
+      /*oversubscribed, see comment in lodepng_Resultext*/
       if(treepos > 2147483647 || treepos + 2 > tree->numcodes) return 55;
       if(tree->tree2d[2 * treepos + bit] == 32767) /*not yet filled in*/ {
         if(i + 1 == tree->lengths[n]) /*last bit*/ {
@@ -5681,7 +5681,7 @@ void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings) {
 This returns the description of a numerical error code in English. This is also
 the documentation of all the error codes.
 */
-const char* lodepng_error_text(unsigned code) {
+const char* lodepng_Resultext(unsigned code) {
   switch(code) {
     case 0: return "no error, everything went ok";
     case 1: return "nothing done yet"; /*the Encoder/Decoder has done nothing yet, error checking makes no sense yet*/

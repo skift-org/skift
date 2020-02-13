@@ -33,18 +33,18 @@ bool fshandle_is_locked(FsHandle *handle);
 void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
 void fshandle_release_lock(FsHandle *handle, int who_release);
 
-error_t fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed);
-error_t fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written);
+Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed);
+Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
-error_t fshandle_seek(FsHandle *handle, int offset, Whence whence);
-error_t fshandle_tell(FsHandle *handle, Whence whence, int *offset);
+Result fshandle_seek(FsHandle *handle, int offset, Whence whence);
+Result fshandle_tell(FsHandle *handle, Whence whence, int *offset);
 
-error_t fshandle_call(FsHandle *handle, int request, void *args);
-error_t fshandle_stat(FsHandle *handle, FileState *stat);
+Result fshandle_call(FsHandle *handle, int request, void *args);
+Result fshandle_stat(FsHandle *handle, FileState *stat);
 
-error_t fshandle_connect(FsNode *node, FsHandle **connection_handle);
-error_t fshandle_accept(FsHandle *handle, FsHandle **connection_handle);
-error_t fshandle_send(FsHandle *handle, Message *message);
-error_t fshandle_receive(FsHandle *handle, Message *message);
-error_t fshandle_payload(FsHandle *handle, Message *message);
-error_t fshandle_discard(FsHandle *handle);
+Result fshandle_connect(FsNode *node, FsHandle **connection_handle);
+Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle);
+Result fshandle_send(FsHandle *handle, Message *message);
+Result fshandle_receive(FsHandle *handle, Message *message);
+Result fshandle_payload(FsHandle *handle, Message *message);
+Result fshandle_discard(FsHandle *handle);

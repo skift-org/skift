@@ -7,9 +7,9 @@
 #include "kernel/node/Terminal.h"
 #include "kernel/sheduling/TaskBlockerSelect.h"
 
-error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
+Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 {
-    error_t result = ERR_TOO_MANY_OPEN_FILES;
+    Result result = ERR_TOO_MANY_OPEN_FILES;
 
     lock_acquire(task->handles_lock);
 
@@ -20,7 +20,7 @@ error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
             task->handles[i] = handle;
             *handle_index = i;
 
-            result = ERR_SUCCESS;
+            result = SUCCESS;
             break;
         }
     }
@@ -30,9 +30,9 @@ error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
     return result;
 }
 
-error_t task_fshandle_remove(Task *task, int handle_index)
+Result task_fshandle_remove(Task *task, int handle_index)
 {
-    error_t result = ERR_BAD_FILE_DESCRIPTOR;
+    Result result = ERR_BAD_FILE_DESCRIPTOR;
 
     if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
@@ -43,7 +43,7 @@ error_t task_fshandle_remove(Task *task, int handle_index)
             fshandle_destroy(task->handles[handle_index]);
             task->handles[handle_index] = NULL;
 
-            result = ERR_SUCCESS;
+            result = SUCCESS;
         }
 
         lock_release(task->handles_lock);
@@ -80,9 +80,9 @@ FsHandle *task_fshandle_acquire(Task *task, int handle_index)
     return result;
 }
 
-error_t task_fshandle_release(Task *task, int handle_index)
+Result task_fshandle_release(Task *task, int handle_index)
 {
-    error_t result = ERR_BAD_FILE_DESCRIPTOR;
+    Result result = ERR_BAD_FILE_DESCRIPTOR;
 
     if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
@@ -91,7 +91,7 @@ error_t task_fshandle_release(Task *task, int handle_index)
         if (task->handles[handle_index] != NULL)
         {
             fshandle_release_lock(task->handles[handle_index], task->id);
-            result = ERR_SUCCESS;
+            result = SUCCESS;
         }
 
         lock_release(task->handles_lock);
@@ -104,12 +104,12 @@ error_t task_fshandle_release(Task *task, int handle_index)
     return result;
 }
 
-error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path, OpenFlag flags)
+Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, OpenFlag flags)
 {
     Path *p = task_cwd_resolve(task, file_path);
 
     FsHandle *handle = NULL;
-    error_t result = filesystem_open(p, flags, &handle);
+    Result result = filesystem_open(p, flags, &handle);
 
     path_destroy(p);
 
@@ -121,7 +121,7 @@ error_t task_fshandle_open(Task *task, int *handle_index, const char *file_path,
 
     result = task_fshandle_add(task, handle_index, handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         *handle_index = HANDLE_INVALID_ID;
         fshandle_destroy(handle);
@@ -138,12 +138,12 @@ void task_fshandle_close_all(Task *task)
     }
 }
 
-error_t task_fshandle_close(Task *task, int handle_index)
+Result task_fshandle_close(Task *task, int handle_index)
 {
     return task_fshandle_remove(task, handle_index);
 }
 
-error_t task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed)
+Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -152,16 +152,16 @@ error_t task_fshandle_read(Task *task, int handle_index, void *buffer, size_t si
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_read(handle, buffer, size, readed);
+    Result result = fshandle_read(handle, buffer, size, readed);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events)
+Result task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events)
 {
-    error_t result = ERR_SUCCESS;
+    Result result = SUCCESS;
 
     FsHandle *selected_handle = NULL;
     FsHandle **handles = calloc(count, sizeof(FsHandle *));
@@ -211,7 +211,7 @@ cleanup_and_return:
     return result;
 }
 
-error_t task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written)
+Result task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -220,14 +220,14 @@ error_t task_fshandle_write(Task *task, int handle_index, const void *buffer, si
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_write(handle, buffer, size, written);
+    Result result = fshandle_write(handle, buffer, size, written);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_call(Task *task, int handle_index, int request, void *args)
+Result task_fshandle_call(Task *task, int handle_index, int request, void *args)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -236,14 +236,14 @@ error_t task_fshandle_call(Task *task, int handle_index, int request, void *args
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_call(handle, request, args);
+    Result result = fshandle_call(handle, request, args);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
+Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -252,14 +252,14 @@ error_t task_fshandle_seek(Task *task, int handle_index, int offset, Whence when
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_seek(handle, offset, whence);
+    Result result = fshandle_seek(handle, offset, whence);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset)
+Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -268,14 +268,14 @@ error_t task_fshandle_tell(Task *task, int handle_index, Whence whence, int *off
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_tell(handle, whence, offset);
+    Result result = fshandle_tell(handle, whence, offset);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_stat(Task *task, int handle_index, FileState *stat)
+Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -284,14 +284,14 @@ error_t task_fshandle_stat(Task *task, int handle_index, FileState *stat)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_stat(handle, stat);
+    Result result = fshandle_stat(handle, stat);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_send(Task *task, int handle_index, Message *message)
+Result task_fshandle_send(Task *task, int handle_index, Message *message)
 {
 
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
@@ -301,14 +301,14 @@ error_t task_fshandle_send(Task *task, int handle_index, Message *message)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_send(handle, message);
+    Result result = fshandle_send(handle, message);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_receive(Task *task, int handle_index, Message *message)
+Result task_fshandle_receive(Task *task, int handle_index, Message *message)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -317,14 +317,14 @@ error_t task_fshandle_receive(Task *task, int handle_index, Message *message)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_receive(handle, message);
+    Result result = fshandle_receive(handle, message);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_connect(Task *task, int *connection_handle_index, const char *socket_path)
+Result task_fshandle_connect(Task *task, int *connection_handle_index, const char *socket_path)
 {
     Path *resolved_path = task_cwd_resolve(task, socket_path);
 
@@ -333,14 +333,14 @@ error_t task_fshandle_connect(Task *task, int *connection_handle_index, const ch
 
     path_destroy(resolved_path);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         return result;
     }
 
     result = task_fshandle_add(task, connection_handle_index, connection_handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         fshandle_destroy(connection_handle);
     }
@@ -348,7 +348,7 @@ error_t task_fshandle_connect(Task *task, int *connection_handle_index, const ch
     return result;
 }
 
-error_t task_fshandle_accept(Task *task, int socket_handle_index, int *connection_handle_index)
+Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection_handle_index)
 {
     FsHandle *socket_handle = task_fshandle_acquire(task, socket_handle_index);
 
@@ -358,17 +358,17 @@ error_t task_fshandle_accept(Task *task, int socket_handle_index, int *connectio
     }
 
     FsHandle *connection_handle;
-    error_t result = fshandle_accept(socket_handle, &connection_handle);
+    Result result = fshandle_accept(socket_handle, &connection_handle);
 
-    if (result == ERR_SUCCESS)
+    if (result == SUCCESS)
     {
         result = task_fshandle_add(task, connection_handle_index, connection_handle);
 
-        if (result == ERR_SUCCESS)
+        if (result == SUCCESS)
         {
             result = task_fshandle_add(task, connection_handle_index, connection_handle);
 
-            if (result != ERR_SUCCESS)
+            if (result != SUCCESS)
             {
                 fshandle_destroy(connection_handle);
             }
@@ -380,7 +380,7 @@ error_t task_fshandle_accept(Task *task, int socket_handle_index, int *connectio
     return result;
 }
 
-error_t task_fshandle_payload(Task *task, int handle_index, Message *message)
+Result task_fshandle_payload(Task *task, int handle_index, Message *message)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -389,14 +389,14 @@ error_t task_fshandle_payload(Task *task, int handle_index, Message *message)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_payload(handle, message);
+    Result result = fshandle_payload(handle, message);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_fshandle_discard(Task *task, int handle_index)
+Result task_fshandle_discard(Task *task, int handle_index)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
@@ -405,19 +405,19 @@ error_t task_fshandle_discard(Task *task, int handle_index)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    error_t result = fshandle_discard(handle);
+    Result result = fshandle_discard(handle);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-error_t task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index)
+Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index)
 {
     *reader_handle_index = HANDLE_INVALID_ID;
     *writer_handle_index = HANDLE_INVALID_ID;
 
-    error_t result = ERR_SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *pipe = pipe_create();
 
@@ -426,20 +426,20 @@ error_t task_create_pipe(Task *task, int *reader_handle_index, int *writer_handl
 
     result = task_fshandle_add(task, reader_handle_index, reader_handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         goto cleanup_and_return;
     }
 
     result = task_fshandle_add(task, writer_handle_index, writer_handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         goto cleanup_and_return;
     }
 
 cleanup_and_return:
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         if (*reader_handle_index != HANDLE_INVALID_ID)
         {
@@ -462,12 +462,12 @@ cleanup_and_return:
     return result;
 }
 
-error_t task_create_term(Task *task, int *master_handle_index, int *slave_handle_index)
+Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_index)
 {
     *master_handle_index = HANDLE_INVALID_ID;
     *slave_handle_index = HANDLE_INVALID_ID;
 
-    error_t result = ERR_SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *terminal = terminal_create();
 
@@ -476,20 +476,20 @@ error_t task_create_term(Task *task, int *master_handle_index, int *slave_handle
 
     result = task_fshandle_add(task, master_handle_index, master_handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         goto cleanup_and_return;
     }
 
     result = task_fshandle_add(task, slave_handle_index, slave_handle);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         goto cleanup_and_return;
     }
 
 cleanup_and_return:
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
         if (*master_handle_index != HANDLE_INVALID_ID)
         {

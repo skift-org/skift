@@ -3,14 +3,14 @@
 /* See: LICENSE.md                                                            */
 
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"
 
-error_t file_FsOperationOpen(FsFile *node, FsHandle *handle)
+Result file_FsOperationOpen(FsFile *node, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
@@ -20,10 +20,10 @@ error_t file_FsOperationOpen(FsFile *node, FsHandle *handle)
         node->size = 0;
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     if (handle->offset <= node->size)
     {
@@ -31,10 +31,10 @@ error_t file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_
         memcpy(buffer, (byte *)node->buffer + handle->offset, *readed);
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     if ((handle->offset + size) > node->realsize)
     {
@@ -47,7 +47,7 @@ error_t file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer
 
     *writen = size;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 size_t file_FsOperationSize(FsFile *node, FsHandle *handle)

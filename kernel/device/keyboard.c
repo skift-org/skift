@@ -10,9 +10,9 @@
 #include <libdevice/keys.c>
 #include <libdevice/keys.h>
 #include <libkernel/message.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -184,7 +184,7 @@ bool keyboard_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(keyboard_buffer);
 }
 
-static error_t keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
@@ -194,10 +194,10 @@ static error_t keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *bu
     *readed = ringbuffer_read(keyboard_buffer, buffer, size);
     atomic_end();
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -219,7 +219,7 @@ error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
 
         atomic_end();
 
-        return ERR_SUCCESS;
+        return SUCCESS;
     }
     else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
@@ -227,7 +227,7 @@ error_t keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, vo
         {
             memcpy(args, keyboard_keymap, sizeof(KeyMap));
 
-            return ERR_SUCCESS;
+            return SUCCESS;
         }
         else
         {

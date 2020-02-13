@@ -4,7 +4,7 @@
 
 #include <libdevice/framebuffer.h>
 #include <libgraphic/framebuffer.h>
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/logger.h>
 
 framebuffer_t *framebuffer_open(void)
@@ -50,7 +50,7 @@ bool framebuffer_set_mode(framebuffer_t *this, int resx, int resy)
         .size = (Point){resx, resy},
     };
 
-    if (stream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != ERR_SUCCESS)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_SET_MODE, &mode_info) != SUCCESS)
     {
         handle_printf_error(this->device, "Failled to iocall device %s", FRAMEBUFFER_DEVICE);
         return false;
@@ -109,7 +109,7 @@ void framebuffer_blit_dirty(framebuffer_t *this)
         args.size = bitmap_bound(this->backbuffer).size;
         args.region_to_blit = this->dirty_bound;
 
-        if (stream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != ERR_SUCCESS)
+        if (stream_call(this->device, FRAMEBUFFER_CALL_BLITREGION, &args) != SUCCESS)
         {
             handle_printf_error(this->device, "Failled to iocall device %s: %s", FRAMEBUFFER_DEVICE);
         }
@@ -125,7 +125,7 @@ void framebuffer_blit(framebuffer_t *this)
     args.buffer = this->backbuffer->pixels;
     args.size = bitmap_bound(this->backbuffer).size;
 
-    if (stream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != ERR_SUCCESS)
+    if (stream_call(this->device, FRAMEBUFFER_CALL_BLIT, &args) != SUCCESS)
     {
         handle_printf_error(this->device, "Failled to iocall device %s:", FRAMEBUFFER_DEVICE);
     }

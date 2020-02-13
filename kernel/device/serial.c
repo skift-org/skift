@@ -6,8 +6,8 @@
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/system.h"
 #include "kernel/serial.h"
+#include "kernel/system.h"
 
 #define PORT_COM1 0x3f8
 
@@ -58,7 +58,7 @@ bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(serial_buffer);
 }
 
-static error_t serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
@@ -68,17 +68,17 @@ static error_t serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buff
     *readed = ringbuffer_read(serial_buffer, buffer, size);
     atomic_end();
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-static error_t serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+static Result serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
 
     *writen = serial_write(buffer, size);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void serial_initialize(void)

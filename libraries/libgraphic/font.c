@@ -3,9 +3,9 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/font.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/path.h>
@@ -63,7 +63,7 @@ Bitmap *font_load_bitmap_create(const char *name)
 
     if (bmp == NULL)
     {
-        logger_error("Failled to load font bitmap from %s: %s", bitmap_path, error_to_string(error_get()));
+        logger_error("Failled to load font bitmap from %s: %s", bitmap_path, result_to_string(error_get()));
     }
     else
     {

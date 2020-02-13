@@ -4,9 +4,9 @@
 
 /* syscalls.c syscalls handeling code                                         */
 
+#include <libsystem/Result.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 #include <libsystem/system.h>
 
@@ -247,7 +247,7 @@ int sys_system_get_info(SystemInfo *info)
     // FIXME: this should not be hard coded.
     strlcpy(info->machine, "machine", SYSTEM_INFO_FIELD_SIZE);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 int sys_system_get_status(SystemStatus *status)
@@ -260,14 +260,14 @@ int sys_system_get_status(SystemStatus *status)
 
     status->running_tasks = task_count();
 
-    return -ERR_SUCCESS;
+    return SUCCESS;
 }
 
 int sys_system_get_time(TimeStamp *timestamp)
 {
     *timestamp = clock_now();
 
-    return -ERR_SUCCESS;
+    return SUCCESS;
 }
 
 int sys_system_get_ticks()
@@ -343,7 +343,7 @@ int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *sele
     int selected_copy;
     SelectEvent selected_event_copy;
 
-    error_t result = task_fshandle_select(sheduler_running(), handles_copy, events_copy, count, &selected_copy, &selected_event_copy);
+    Result result = task_fshandle_select(sheduler_running(), handles_copy, events_copy, count, &selected_copy, &selected_event_copy);
 
     *selected = selected_copy;
     *selected_events = selected_event_copy;
@@ -532,14 +532,14 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
         result = -ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    if (syscall >= SYS_HANDLE_OPEN && result != ERR_SUCCESS)
+    if (syscall >= SYS_HANDLE_OPEN && result != SUCCESS)
     {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, error_to_string(result));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
     }
 
     if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
     {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, error_to_string(-result));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
     }
 
     return result;

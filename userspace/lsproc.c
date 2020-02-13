@@ -5,7 +5,7 @@
 #include <abi/Task.h>
 
 #include <libsystem/cmdline.h>
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
 static bool option_cpu_usage = false;

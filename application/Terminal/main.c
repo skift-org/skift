@@ -54,11 +54,11 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    error_t result = stream_create_term(&master, &slave);
+    Result result = stream_create_term(&master, &slave);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
-        logger_error("Failled to create the terminal device: %s", error_to_string(result));
+        logger_error("Failled to create the terminal device: %s", result_to_string(result));
         return -1;
     }
 

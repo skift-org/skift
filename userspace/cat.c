@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
 int cat(const char *path)

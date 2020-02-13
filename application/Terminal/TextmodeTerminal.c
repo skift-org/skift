@@ -72,7 +72,7 @@ Terminal *textmode_terminal_create(void)
         return NULL;
     }
 
-    if (stream_call(device, TEXTMODE_CALL_GET_INFO, &info) != ERR_SUCCESS)
+    if (stream_call(device, TEXTMODE_CALL_GET_INFO, &info) != SUCCESS)
     {
         stream_close(device);
 

@@ -4,7 +4,7 @@
 
 #include <libsystem/list.h>
 
-List *list_create()
+List *list_create(void)
 {
     List *l = __create(List);
 

@@ -6,7 +6,7 @@
 
 static int random_state = 1411743402;
 
-static error_t random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(node);
     __unused(handle);
@@ -26,10 +26,10 @@ static error_t random_FsOperationRead(FsNode *node, FsHandle *handle, void *buff
 
     *readed = size;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-static error_t random_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *writen)
+static Result random_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *writen)
 {
     __unused(node);
     __unused(handle);
@@ -37,7 +37,7 @@ static error_t random_FsOperationWrite(FsNode *node, FsHandle *handle, const voi
 
     *writen = size;
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void random_initialize(void)

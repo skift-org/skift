@@ -61,11 +61,11 @@ void eventloop_pump(void)
     Handle *selected = NULL;
     SelectEvent selected_events = 0;
 
-    error_t result = handle_select(&_eventloop_handles[0], &_eventloop_events[0], _eventloop_handles_count, &selected, &selected_events);
+    Result result = handle_select(&_eventloop_handles[0], &_eventloop_events[0], _eventloop_handles_count, &selected, &selected_events);
 
-    if (result != ERR_SUCCESS)
+    if (result != SUCCESS)
     {
-        logger_error("Failled to select : %s", error_to_string(result));
+        logger_error("Failled to select : %s", result_to_string(result));
         return;
     }
 

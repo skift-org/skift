@@ -4,10 +4,10 @@
 
 #include <libdevice/framebuffer.h>
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/lock.h>
 
 #include <thirdparty/multiboot/Multiboot.h>
@@ -190,7 +190,7 @@ void *framebuffer_resize(uint *buffer, Point old_size, Point new_size)
     return resized_framebuffer;
 }
 
-error_t framebuffer_set_mode_mboot(multiboot_info_t *mboot)
+Result framebuffer_set_mode_mboot(multiboot_info_t *mboot)
 {
     logger_info("Using framebuffer from mboot header.");
     // FIXME: this shoul be ok i guess
@@ -199,10 +199,10 @@ error_t framebuffer_set_mode_mboot(multiboot_info_t *mboot)
     framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
     framebuffer_size = (Point){mboot->framebuffer_width, mboot->framebuffer_height};
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t framebuffer_set_mode_bga(Point res)
+Result framebuffer_set_mode_bga(Point res)
 {
     logger_info("Using framebuffer from BGA device.");
 
@@ -247,7 +247,7 @@ error_t framebuffer_set_mode_bga(Point res)
 
         framebuffer_size = res;
 
-        return ERR_SUCCESS;
+        return SUCCESS;
     }
     else
     {
@@ -283,7 +283,7 @@ int framebuffer_FsOperationOpen(FsNode *node, FsHandle *handle)
         lock_release(backbuffer_stack_lock);
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
@@ -321,7 +321,7 @@ void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
     }
 }
 
-error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+Result framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
 
@@ -335,7 +335,7 @@ error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request,
 
         lock_release(backbuffer_stack_lock);
 
-        return ERR_SUCCESS;
+        return SUCCESS;
     }
     else if (request == FRAMEBUFFER_CALL_SET_MODE)
     {
@@ -343,7 +343,7 @@ error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request,
 
         logger_info("Setting mode to %dx%d...", mode_info->size.X, mode_info->size.Y);
 
-        error_t result = framebuffer_set_mode_bga(mode_info->size);
+        Result result = framebuffer_set_mode_bga(mode_info->size);
 
         lock_release(backbuffer_stack_lock);
 
@@ -370,7 +370,7 @@ error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request,
             }
             lock_release(backbuffer_stack_lock);
 
-            return ERR_SUCCESS;
+            return SUCCESS;
         }
         else
         {
@@ -404,7 +404,7 @@ error_t framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request,
 
             lock_release(backbuffer_stack_lock);
 
-            return ERR_SUCCESS;
+            return SUCCESS;
         }
         else
         {

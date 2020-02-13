@@ -33,7 +33,7 @@ typedef bool (*ListComparator)(void *left, void *right);
 /* --- List object constructor and destructor ------------------------------- */
 
 // Create a new list object in memory.
-List *list_create();
+List *list_create(void);
 
 typedef enum
 {

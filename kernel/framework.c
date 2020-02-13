@@ -4,9 +4,9 @@
 
 #include <libsystem/__plugs__.h>
 
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 
 #include "kernel/clock.h"
@@ -254,7 +254,7 @@ int messaging_unsubscribe(const char *channel)
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
 {
-    handle->error = task_fshandle_open(sheduler_running(), &handle->id, path, flags);
+    handle->result = task_fshandle_open(sheduler_running(), &handle->id, path, flags);
 }
 
 void __plug_handle_close(Handle *handle)
@@ -265,7 +265,7 @@ void __plug_handle_close(Handle *handle)
     }
 }
 
-error_t __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
+Result __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
 {
     return task_fshandle_select(sheduler_running(), handles, events, count, selected, selected_events);
 }
@@ -276,7 +276,7 @@ size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 
     size_t readed = 0;
 
-    handle->error = task_fshandle_read(sheduler_running(), handle->id, buffer, size, &readed);
+    handle->result = task_fshandle_read(sheduler_running(), handle->id, buffer, size, &readed);
 
     return readed;
 }
@@ -285,7 +285,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
 {
     if (handle->id == INTERNAL_LOG_STREAM_HANDLE)
     {
-        handle->error = ERR_SUCCESS;
+        handle->result = SUCCESS;
 
         return serial_write(buffer, size);
     }
@@ -293,26 +293,26 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     {
         size_t written = 0;
 
-        handle->error = task_fshandle_write(sheduler_running(), handle->id, buffer, size, &written);
+        handle->result = task_fshandle_write(sheduler_running(), handle->id, buffer, size, &written);
 
         return written;
     }
 }
 
-error_t __plug_handle_call(Handle *handle, int request, void *args)
+Result __plug_handle_call(Handle *handle, int request, void *args)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_call(sheduler_running(), handle->id, request, args);
+    handle->result = task_fshandle_call(sheduler_running(), handle->id, request, args);
 
-    return handle->error;
+    return handle->result;
 }
 
 int __plug_handle_seek(Handle *handle, int offset, Whence whence)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_seek(sheduler_running(), handle->id, offset, whence);
+    handle->result = task_fshandle_seek(sheduler_running(), handle->id, offset, whence);
 
     return 0;
 }
@@ -323,7 +323,7 @@ int __plug_handle_tell(Handle *handle, Whence whence)
 
     int offset = 0;
 
-    handle->error = task_fshandle_tell(sheduler_running(), handle->id, whence, &offset);
+    handle->result = task_fshandle_tell(sheduler_running(), handle->id, whence, &offset);
 
     return offset;
 }
@@ -332,7 +332,7 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_stat(sheduler_running(), handle->id, stat);
+    handle->result = task_fshandle_stat(sheduler_running(), handle->id, stat);
 
     return 0;
 }
@@ -341,50 +341,50 @@ void __plug_handle_connect(Handle *handle, const char *path)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_connect(sheduler_running(), &handle->id, path);
+    handle->result = task_fshandle_connect(sheduler_running(), &handle->id, path);
 }
 
 void __plug_handle_accept(Handle *handle, Handle *connection_handle)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_accept(sheduler_running(), handle->id, &connection_handle->id);
+    handle->result = task_fshandle_accept(sheduler_running(), handle->id, &connection_handle->id);
 }
 
 void __plug_handle_send(Handle *handle, Message *message)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_send(sheduler_running(), handle->id, message);
+    handle->result = task_fshandle_send(sheduler_running(), handle->id, message);
 }
 
 void __plug_handle_receive(Handle *handle, Message *message)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_receive(sheduler_running(), handle->id, message);
+    handle->result = task_fshandle_receive(sheduler_running(), handle->id, message);
 }
 
 void __plug_handle_payload(Handle *handle, Message *message)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_payload(sheduler_running(), handle->id, message);
+    handle->result = task_fshandle_payload(sheduler_running(), handle->id, message);
 }
 
 void __plug_handle_discard(Handle *handle)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->error = task_fshandle_discard(sheduler_running(), handle->id);
+    handle->result = task_fshandle_discard(sheduler_running(), handle->id);
 }
 
-error_t __plug_create_pipe(int *reader_handle, int *writer_handle)
+Result __plug_create_pipe(int *reader_handle, int *writer_handle)
 {
     return task_create_pipe(sheduler_running(), reader_handle, writer_handle);
 }
 
-error_t __plug_create_term(int *master_handle, int *slave_handle)
+Result __plug_create_term(int *master_handle, int *slave_handle)
 {
     return task_create_term(sheduler_running(), master_handle, slave_handle);
 }

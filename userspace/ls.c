@@ -4,7 +4,7 @@
 
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>

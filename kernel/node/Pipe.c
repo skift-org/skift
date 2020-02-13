@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/Pipe.h"
@@ -25,22 +25,22 @@ bool pipe_FsOperationCanWrite(FsPipe *node, FsHandle *handle)
     return !ringbuffer_is_full(node->buffer);
 }
 
-error_t pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
     __unused(handle);
 
     *readed = ringbuffer_read(node->buffer, buffer, size);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
 {
     __unused(handle);
 
     *writen = ringbuffer_write(node->buffer, buffer, size);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 size_t pipe_FsOperationSize(FsPipe *node, FsHandle *handle)

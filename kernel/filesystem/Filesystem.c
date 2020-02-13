@@ -5,9 +5,9 @@
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -76,7 +76,7 @@ FsNode *filesystem_find_parent_and_ref(Path *path)
     return parent;
 }
 
-error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
+Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 {
     *handle = NULL;
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
@@ -144,10 +144,10 @@ error_t filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
     fsnode_deref(node);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
-error_t filesystem_connect(Path *path, FsHandle **connection_handle)
+Result filesystem_connect(Path *path, FsHandle **connection_handle)
 {
     FsNode *node = filesystem_find_and_ref(path);
 
@@ -169,78 +169,78 @@ error_t filesystem_connect(Path *path, FsHandle **connection_handle)
     return result;
 }
 
-int filesystem_mkdir(Path *path)
+Result filesystem_mkdir(Path *path)
 {
     FsNode *directory = directory_create();
 
-    int result = filesystem_link(path, directory);
+    Result result = filesystem_link(path, directory);
 
     fsnode_deref(directory);
 
     return result;
 }
 
-int filesystem_mkfile(Path *path)
+Result filesystem_mkfile(Path *path)
 {
     FsNode *file = file_create();
 
-    int result = filesystem_link(path, file);
+    Result result = filesystem_link(path, file);
 
     fsnode_deref(file);
 
     return result;
 }
 
-int filesystem_mkpipe(Path *path)
+Result filesystem_mkpipe(Path *path)
 {
     FsNode *pipe = pipe_create();
 
-    int result = filesystem_link(path, pipe);
+    Result result = filesystem_link(path, pipe);
 
     fsnode_deref(pipe);
 
     return result;
 }
 
-int filesystem_mklink(Path *old_path, Path *new_path)
+Result filesystem_mklink(Path *old_path, Path *new_path)
 {
     FsNode *child = filesystem_find_and_ref(old_path);
 
     if (child == NULL)
     {
-        return -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     if (child->type == FSNODE_DIRECTORY)
     {
         fsnode_deref(child);
-        return -ERR_IS_A_DIRECTORY;
+        return ERR_IS_A_DIRECTORY;
     }
 
     return filesystem_link_and_take_ref(new_path, child);
 }
 
-int filesystem_link(Path *path, FsNode *node)
+Result filesystem_link(Path *path, FsNode *node)
 {
-    int result = -ERR_SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
     if (!parent)
     {
-        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
     }
 
     if (parent->type != FSNODE_DIRECTORY)
     {
-        result = -ERR_NOT_A_DIRECTORY;
+        result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
     }
 
     if (!parent->link)
     {
-        result = -ERR_OPERATION_NOT_SUPPORTED;
+        result = ERR_OPERATION_NOT_SUPPORTED;
         goto cleanup_and_return;
     }
 
@@ -255,34 +255,34 @@ cleanup_and_return:
     return result;
 }
 
-int filesystem_link_and_take_ref(Path *path, FsNode *node)
+Result filesystem_link_and_take_ref(Path *path, FsNode *node)
 {
     int result = filesystem_link(path, node);
     fsnode_deref(node);
     return result;
 }
 
-int filesystem_unlink(Path *path)
+Result filesystem_unlink(Path *path)
 {
-    int result = -ERR_SUCCESS;
+    int result = SUCCESS;
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
     if (!parent)
     {
-        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
     }
 
     if (parent->type != FSNODE_DIRECTORY)
     {
-        result = -ERR_NOT_A_DIRECTORY;
+        result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
     }
 
     if (!parent->unlink)
     {
-        result = -ERR_OPERATION_NOT_SUPPORTED;
+        result = ERR_OPERATION_NOT_SUPPORTED;
         goto cleanup_and_return;
     }
 
@@ -297,11 +297,11 @@ cleanup_and_return:
     return result;
 }
 
-int filesystem_rename(Path *old_path, Path *new_path)
+Result filesystem_rename(Path *old_path, Path *new_path)
 {
     // FIXME: check for loops when renaming directory
 
-    int result = -ERR_SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *child = NULL;
     FsNode *old_parent = filesystem_find_parent_and_ref(old_path);
@@ -309,13 +309,13 @@ int filesystem_rename(Path *old_path, Path *new_path)
 
     if (!old_parent || !new_parent)
     {
-        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
     }
 
     if (old_parent->type != FSNODE_DIRECTORY || new_parent->type != FSNODE_DIRECTORY)
     {
-        result = -ERR_NOT_A_DIRECTORY;
+        result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
     }
 
@@ -323,7 +323,7 @@ int filesystem_rename(Path *old_path, Path *new_path)
         !old_parent->find ||
         !new_parent->link)
     {
-        result = -ERR_OPERATION_NOT_SUPPORTED;
+        result = ERR_OPERATION_NOT_SUPPORTED;
         goto cleanup_and_return;
     }
 
@@ -338,13 +338,13 @@ int filesystem_rename(Path *old_path, Path *new_path)
 
     if (!child)
     {
-        result = -ERR_NO_SUCH_FILE_OR_DIRECTORY;
+        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto unlock_cleanup_and_return;
     }
 
     result = new_parent->link(child, path_filename(new_path), child);
 
-    if (result == -ERR_SUCCESS)
+    if (result == SUCCESS)
     {
         result = old_parent->unlink(old_parent, path_filename(old_path));
     }

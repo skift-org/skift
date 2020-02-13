@@ -4,7 +4,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/messaging.h>
 
 int messaging_send(message_t *event)

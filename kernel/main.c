@@ -12,10 +12,10 @@
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libmath/math.h>
+#include <libsystem/Result.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
@@ -155,7 +155,7 @@ void kmain(multiboot_info_t *info, uint magic)
 
     if (init_process < 0)
     {
-        PANIC("Failled to start init : %s", error_to_string(-init_process));
+        PANIC("Failled to start init : %s", result_to_string(-init_process));
     }
 
     int init_exitvalue = 0;

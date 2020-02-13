@@ -91,12 +91,12 @@ int __plug_process_wait(int pid, int *exit_value);
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
 void __plug_handle_close(Handle *handle);
 
-error_t __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events);
+Result __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events);
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size);
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size);
 
-error_t __plug_handle_call(Handle *handle, int request, void *args);
+Result __plug_handle_call(Handle *handle, int request, void *args);
 int __plug_handle_seek(Handle *handle, int offset, Whence whence);
 
 int __plug_handle_tell(Handle *handle, Whence whence);
@@ -110,5 +110,5 @@ void __plug_handle_receive(Handle *handle, Message *message);
 void __plug_handle_payload(Handle *handle, Message *message);
 void __plug_handle_discard(Handle *handle);
 
-error_t __plug_create_pipe(int *reader_handle, int *writer_handle);
-error_t __plug_create_term(int *master_handle, int *slave_handle);
+Result __plug_create_pipe(int *reader_handle, int *writer_handle);
+Result __plug_create_term(int *master_handle, int *slave_handle);

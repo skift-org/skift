@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/RingBuffer.h>
-#include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/lock.h>
 
@@ -14,21 +14,21 @@
 struct FsNode;
 struct FsHandle;
 
-typedef error_t (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
+typedef Result (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
 typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
 
 typedef bool (*FsOperationCanRead)(struct FsNode *node, struct FsHandle *handle);
 typedef bool (*FsOperationCanWrite)(struct FsNode *node, struct FsHandle *handle);
 
-typedef error_t (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *readed);
-typedef error_t (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *writen);
+typedef Result (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *readed);
+typedef Result (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *writen);
 
 typedef struct FsNode *(*FsOperationFind)(struct FsNode *node, const char *name);
-typedef error_t (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
-typedef error_t (*FsOperationUnlink)(struct FsNode *node, const char *name);
+typedef Result (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
+typedef Result (*FsOperationUnlink)(struct FsNode *node, const char *name);
 
-typedef error_t (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
-typedef error_t (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
+typedef Result (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
+typedef Result (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
 typedef size_t (*FsOperationSize)(struct FsNode *node, struct FsHandle *handle);
 
@@ -40,10 +40,10 @@ typedef bool (*FsOperationIsAccepted)(struct FsNode *node);
 typedef bool (*FsOperationCanAcceptConnection)(struct FsNode *node);
 typedef struct FsNode *(*FsOperationAcceptConnection)(struct FsNode *node);
 
-typedef error_t (*FsOperationSend)(struct FsNode *node, struct FsHandle *handle, Message *message);
+typedef Result (*FsOperationSend)(struct FsNode *node, struct FsHandle *handle, Message *message);
 
 typedef bool (*FsOperationCanReceive)(struct FsNode *node, struct FsHandle *handle);
-typedef error_t (*FsOperationReceive)(struct FsNode *node, struct FsHandle *handle, Message **message);
+typedef Result (*FsOperationReceive)(struct FsNode *node, struct FsHandle *handle, Message **message);
 
 typedef void (*FsOperationDestroy)(struct FsNode *node);
 

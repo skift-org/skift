@@ -17,7 +17,7 @@ bool connection_FsOperationIsAccepted(FsConnection *connection)
     return connection->accepted;
 }
 
-error_t connection_FsOperationSend(FsConnection *connection, FsHandle *handle, Message *message)
+Result connection_FsOperationSend(FsConnection *connection, FsHandle *handle, Message *message)
 {
     List *inbox;
 
@@ -40,7 +40,7 @@ error_t connection_FsOperationSend(FsConnection *connection, FsHandle *handle, M
 
     list_pushback(inbox, message_copy);
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 bool connection_FsOperationCanReceive(FsConnection *connection, FsHandle *handle)
@@ -55,7 +55,7 @@ bool connection_FsOperationCanReceive(FsConnection *connection, FsHandle *handle
     }
 }
 
-error_t connection_FsOperationReceive(FsConnection *connection, FsHandle *handle, Message **message)
+Result connection_FsOperationReceive(FsConnection *connection, FsHandle *handle, Message **message)
 {
     List *inbox;
 
@@ -78,7 +78,7 @@ error_t connection_FsOperationReceive(FsConnection *connection, FsHandle *handle
         return ERR_NO_MESSAGE;
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 void connection_FsOperationDestroy(FsConnection *connection)

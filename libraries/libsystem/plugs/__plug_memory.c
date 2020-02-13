@@ -4,7 +4,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/error.h>
+#include <libsystem/Result.h>
 #include <libsystem/memory.h>
 
 int shared_memory_alloc(uint pagecount)

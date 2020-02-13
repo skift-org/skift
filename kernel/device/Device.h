@@ -4,9 +4,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "kernel/multiboot.h"
-
 #include <libsystem/runtime.h>
+
+#include <thirdparty/multiboot/Multiboot.h>
 
 bool framebuffer_initialize(multiboot_info_t *mboot);
 

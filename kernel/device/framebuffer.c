@@ -10,10 +10,11 @@
 #include <libsystem/error.h>
 #include <libsystem/lock.h>
 
+#include <thirdparty/multiboot/Multiboot.h>
+
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory.h"
-#include "kernel/multiboot.h"
 #include "kernel/paging.h"
 #include "kernel/x86/pci.h"
 

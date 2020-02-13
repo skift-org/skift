@@ -20,9 +20,9 @@
 #include <libsystem/runtime.h>
 
 #include "kernel/memory.h"
+#include "kernel/modules.h"
 #include "kernel/paging.h"
 #include "kernel/system.h"
-#include "modules.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

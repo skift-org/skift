@@ -20,20 +20,20 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 
-#include "kernel/x86/Interrupts.h"
-#include "kernel/x86/gdt.h"
+#include <thirdparty/multiboot/Multiboot.h>
 
 #include "kernel/clock.h"
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory.h"
-#include "modules.h"
-#include "kernel/multiboot.h"
+#include "kernel/modules.h"
 #include "kernel/paging.h"
-#include "platform.h"
+#include "kernel/platform.h"
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
+#include "kernel/x86/Interrupts.h"
+#include "kernel/x86/gdt.h"
 
 static multiboot_info_t mbootinfo = {0};
 static TimeStamp boot_timestamp = 0;

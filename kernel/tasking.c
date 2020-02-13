@@ -10,7 +10,7 @@
 #include <libsystem/debug.h>
 #include <libsystem/error.h>
 
-#include "platform.h"
+#include "kernel/platform.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 

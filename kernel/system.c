@@ -4,10 +4,10 @@
 
 #include <libsystem/atomic.h>
 
+#include "kernel/memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/x86/cpuid.h"
-#include "memory.h"
 
 /* --- Version info --------------------------------------------------------- */
 

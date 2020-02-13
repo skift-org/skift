@@ -8,8 +8,9 @@
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
 
+#include <thirdparty/multiboot/Multiboot.h>
+
 #include "kernel/filesystem/Filesystem.h"
-#include "kernel/multiboot.h"
 
 void ramdisk_load(multiboot_module_t *module)
 {

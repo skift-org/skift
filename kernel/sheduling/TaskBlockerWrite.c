@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerWrite.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerWrite.h"
+#include "kernel/tasking.h"
 
 bool blocker_write_can_unblock(TaskBlockerWrite *blocker, Task *task)
 {

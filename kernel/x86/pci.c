@@ -1,8 +1,8 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include "x86/pci.h"
-#include "x86/x86.h"
+#include "kernel/x86/pci.h"
+#include "kernel/x86/x86.h"
 
 void pci_write_field(uint32_t device, int field, int size, uint32_t value)
 {

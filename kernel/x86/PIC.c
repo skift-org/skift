@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "x86/PIC.h"
-#include "x86/x86.h"
+#include "kernel/x86/PIC.h"
+#include "kernel/x86/x86.h"
 
 #define PIC_WAIT()                    \
 	do                                \

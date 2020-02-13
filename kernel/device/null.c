@@ -4,7 +4,7 @@
 
 #include <libsystem/cstring.h>
 
-#include "filesystem/Filesystem.h"
+#include "kernel/filesystem/Filesystem.h"
 
 static error_t null_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {

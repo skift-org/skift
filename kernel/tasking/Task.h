@@ -2,9 +2,9 @@
 
 #include <libsystem/lock.h>
 
-#include "node/Handle.h"
+#include "kernel/node/Handle.h"
 #include "platform/PlatformContext.h"
-#include "tasking/Stack.h"
+#include "kernel/tasking/Stack.h"
 
 #define TASK_MAX_HANDLES 32
 

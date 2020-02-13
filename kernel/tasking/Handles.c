@@ -1,7 +1,7 @@
-#include "tasking/Handles.h"
-#include "node/Pipe.h"
-#include "node/Terminal.h"
-#include "sheduling/TaskBlockerSelect.h"
+#include "kernel/tasking/Handles.h"
+#include "kernel/node/Pipe.h"
+#include "kernel/node/Terminal.h"
+#include "kernel/sheduling/TaskBlockerSelect.h"
 
 error_t task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 {

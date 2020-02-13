@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "node/Node.h"
+#include "kernel/node/Node.h"
 
 typedef struct
 {

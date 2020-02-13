@@ -4,8 +4,8 @@
 
 #include <libsystem/logger.h>
 
-#include "clock.h"
-#include "x86/x86.h"
+#include "kernel/clock.h"
+#include "kernel/x86/x86.h"
 
 /* --- CMOS/RTC ------------------------------------------------------------- */
 

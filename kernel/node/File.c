@@ -7,8 +7,8 @@
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
 
-#include "node/File.h"
-#include "node/Handle.h"
+#include "kernel/node/File.h"
+#include "kernel/node/Handle.h"
 
 error_t file_FsOperationOpen(FsFile *node, FsHandle *handle)
 {

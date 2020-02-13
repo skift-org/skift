@@ -11,8 +11,8 @@
 #include <libsystem/error.h>
 
 #include "platform.h"
-#include "tasking.h"
-#include "tasking/Handles.h"
+#include "kernel/tasking.h"
+#include "kernel/tasking/Handles.h"
 
 /* -------------------------------------------------------------------------- */
 /*   TASKING                                                                  */

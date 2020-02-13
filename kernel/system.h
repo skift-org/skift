@@ -7,8 +7,8 @@
 #include <libsystem/logger.h>
 #include <libsystem/runtime.h>
 
-#include "x86/Interrupts.h"
-#include "x86/x86.h"
+#include "kernel/x86/Interrupts.h"
+#include "kernel/x86/x86.h"
 
 void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
 

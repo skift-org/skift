@@ -6,8 +6,8 @@
 #include <libsystem/RingBuffer.h>
 #include <libsystem/atomic.h>
 
-#include "interrupts/Dispatcher.h"
-#include "tasking.h"
+#include "kernel/interrupts/Dispatcher.h"
+#include "kernel/tasking.h"
 
 static RingBuffer *_mouse_buffer;
 static uchar _mouse_cycle = 0;

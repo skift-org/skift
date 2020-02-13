@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerAccept.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerAccept.h"
+#include "kernel/tasking.h"
 
 bool blocker_accept_can_unblock(TaskBlockerAccept *blocker, Task *task)
 {

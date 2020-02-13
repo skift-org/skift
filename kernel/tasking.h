@@ -13,9 +13,9 @@
 #include <abi/Process.h>
 #include <abi/Task.h>
 
-#include "filesystem/Filesystem.h"
-#include "memory.h"
-#include "sheduling/TaskBlocker.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/memory.h"
+#include "kernel/sheduling/TaskBlocker.h"
 
 struct Task;
 

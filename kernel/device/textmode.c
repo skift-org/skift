@@ -6,8 +6,8 @@
 
 #include <libdevice/textmode.h>
 
-#include "device/Device.h"
-#include "filesystem/Filesystem.h"
+#include "kernel/device/Device.h"
+#include "kernel/filesystem/Filesystem.h"
 
 /* ---VGA textmode driver --------------------------------------------------- */
 

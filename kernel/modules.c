@@ -13,7 +13,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include "multiboot.h"
+#include "kernel/multiboot.h"
 
 #include "modules.h"
 

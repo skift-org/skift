@@ -4,8 +4,8 @@
 
 #include <libsystem/error.h>
 
-#include "node/Handle.h"
-#include "node/Pipe.h"
+#include "kernel/node/Handle.h"
+#include "kernel/node/Pipe.h"
 
 #define PIPE_BUFFER_SIZE 4096
 

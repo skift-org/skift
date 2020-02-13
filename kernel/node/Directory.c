@@ -6,8 +6,8 @@
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
 
-#include "node/Directory.h"
-#include "node/Handle.h"
+#include "kernel/node/Directory.h"
+#include "kernel/node/Handle.h"
 
 error_t directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
 {

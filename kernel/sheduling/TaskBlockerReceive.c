@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerReceive.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerReceive.h"
+#include "kernel/tasking.h"
 
 bool blocker_receive_can_unblock(TaskBlockerReceive *blocker, Task *task)
 {

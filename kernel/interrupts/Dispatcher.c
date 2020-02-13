@@ -2,9 +2,9 @@
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 
-#include "interrupts/Dispatcher.h"
-#include "sheduling/TaskBlocker.h"
-#include "tasking.h"
+#include "kernel/interrupts/Dispatcher.h"
+#include "kernel/sheduling/TaskBlocker.h"
+#include "kernel/tasking.h"
 
 static RingBuffer *_interupts_to_dispatch = NULL;
 static DispatcherInteruptHandler _interupts_to_handlers[255] = {};

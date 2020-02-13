@@ -19,10 +19,10 @@
 #include <libsystem/logger.h>
 #include <libsystem/runtime.h>
 
-#include "memory.h"
+#include "kernel/memory.h"
+#include "kernel/paging.h"
+#include "kernel/system.h"
 #include "modules.h"
-#include "paging.h"
-#include "system.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

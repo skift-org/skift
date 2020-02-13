@@ -17,12 +17,12 @@
 #include <libsystem/logger.h>
 #include <libsystem/system.h>
 
-#include "clock.h"
-#include "filesystem/Filesystem.h"
-#include "memory.h"
-#include "tasking.h"
-#include "tasking/Handles.h"
-#include "tasking/Syscalls.h"
+#include "kernel/clock.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/memory.h"
+#include "kernel/tasking.h"
+#include "kernel/tasking/Handles.h"
+#include "kernel/tasking/Syscalls.h"
 
 typedef int (*SyscallHandler)(int, int, int, int, int);
 

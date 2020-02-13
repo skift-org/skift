@@ -16,9 +16,9 @@
 #include <libdevice/keys.h>
 #include <libkernel/message.h>
 
-#include "filesystem/Filesystem.h"
-#include "interrupts/Dispatcher.h"
-#include "tasking.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Dispatcher.h"
+#include "kernel/tasking.h"
 
 /* --- Private functions ---------------------------------------------------- */
 

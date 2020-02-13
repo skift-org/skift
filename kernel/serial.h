@@ -6,8 +6,6 @@
 
 #include <libsystem/runtime.h>
 
-
-
 char serial_getc();
 void serial_putc(char c);
 

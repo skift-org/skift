@@ -1,7 +1,7 @@
 #pragma once
 
-#include "node/Connection.h"
-#include "sheduling/TaskBlocker.h"
+#include "kernel/node/Connection.h"
+#include "kernel/sheduling/TaskBlocker.h"
 
 typedef struct
 {

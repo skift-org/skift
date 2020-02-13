@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "node/Handle.h"
-#include "sheduling/TaskBlocker.h"
+#include "kernel/node/Handle.h"
+#include "kernel/sheduling/TaskBlocker.h"
 
 typedef struct
 {

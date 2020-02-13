@@ -1,7 +1,7 @@
 #include <libsystem/assert.h>
 
-#include "node/Connection.h"
-#include "node/Socket.h"
+#include "kernel/node/Connection.h"
+#include "kernel/node/Socket.h"
 
 FsNode *socket_FsOperationOpenConnection(FsSocket *socket)
 {

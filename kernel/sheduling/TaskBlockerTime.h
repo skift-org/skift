@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sheduling/TaskBlocker.h"
+#include "kernel/sheduling/TaskBlocker.h"
 
 typedef struct
 {

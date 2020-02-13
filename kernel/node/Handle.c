@@ -6,14 +6,14 @@
 #include <libsystem/assert.h>
 #include <libsystem/error.h>
 
-#include "node/Connection.h"
-#include "node/Handle.h"
-#include "sheduling/TaskBlockerAccept.h"
-#include "sheduling/TaskBlockerConnect.h"
-#include "sheduling/TaskBlockerRead.h"
-#include "sheduling/TaskBlockerReceive.h"
-#include "sheduling/TaskBlockerWrite.h"
-#include "tasking.h"
+#include "kernel/node/Connection.h"
+#include "kernel/node/Handle.h"
+#include "kernel/sheduling/TaskBlockerAccept.h"
+#include "kernel/sheduling/TaskBlockerConnect.h"
+#include "kernel/sheduling/TaskBlockerRead.h"
+#include "kernel/sheduling/TaskBlockerReceive.h"
+#include "kernel/sheduling/TaskBlockerWrite.h"
+#include "kernel/tasking.h"
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 {

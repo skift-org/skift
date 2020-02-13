@@ -8,9 +8,9 @@
 #include <libsystem/path.h>
 #include <libsystem/runtime.h>
 
-#include "node/Handle.h"
-#include "node/Node.h"
-#include "system.h"
+#include "kernel/node/Handle.h"
+#include "kernel/node/Node.h"
+#include "kernel/system.h"
 
 void filesystem_initialize(void);
 

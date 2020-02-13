@@ -4,10 +4,10 @@
 
 #include <libsystem/atomic.h>
 
-#include "filesystem/Filesystem.h"
-#include "interrupts/Dispatcher.h"
-#include "serial.h"
-#include "system.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Dispatcher.h"
+#include "kernel/system.h"
+#include "kernel/serial.h"
 
 #define PORT_COM1 0x3f8
 

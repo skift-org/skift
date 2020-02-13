@@ -7,9 +7,9 @@
 #include <libmath/math.h>
 #include <libsystem/atomic.h>
 
-#include "devices.h"
-#include "filesystem/Filesystem.h"
-#include "tasking.h"
+#include "kernel/devices.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/tasking.h"
 
 int proc_device_open(stream_t *stream)
 {

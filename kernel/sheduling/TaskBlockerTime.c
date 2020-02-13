@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerTime.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerTime.h"
+#include "kernel/tasking.h"
 
 bool blocker_time_can_unblock(TaskBlockerTime *blocker, Task *task)
 {

@@ -6,8 +6,8 @@
 
 #include <libsystem/runtime.h>
 
-#include "multiboot.h"
-#include "paging.h"
+#include "kernel/multiboot.h"
+#include "kernel/paging.h"
 
 extern uint TOTAL_MEMORY;
 

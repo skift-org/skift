@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerSelect.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerSelect.h"
+#include "kernel/tasking.h"
 
 bool blocker_select_can_unblock(TaskBlockerSelect *blocker, Task *task)
 {

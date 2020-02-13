@@ -21,7 +21,7 @@ CWARN_FLAGS=-Wall \
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
-	   -Iapplication -Ilibraries -Ilibraries/libposix \
+	   -I. -Iapplication -Ilibraries -Ilibraries/libposix \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
@@ -356,7 +356,7 @@ $(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
 # --- Kernel ----------------------------------------------------------------- #
 
 %.c.kernel.o: %.c
-	$(CC) $(CFLAGS) -ffreestanding -nostdlib -Ikernel/ -c -o $@ $^
+	$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $^
 
 %.s.kernel.o: %.s
 	$(AS) $(ASFLAGS) $^ -o $@

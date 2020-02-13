@@ -9,11 +9,11 @@
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 
-#include "clock.h"
-#include "memory.h"
-#include "serial.h"
-#include "tasking.h"
-#include "tasking/Handles.h"
+#include "kernel/clock.h"
+#include "kernel/memory.h"
+#include "kernel/serial.h"
+#include "kernel/tasking.h"
+#include "kernel/tasking/Handles.h"
 
 /* --- Framework initialization --------------------------------------------- */
 

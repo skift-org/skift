@@ -1,5 +1,5 @@
-#include "sheduling/TaskBlockerConnect.h"
-#include "tasking.h"
+#include "kernel/sheduling/TaskBlockerConnect.h"
+#include "kernel/tasking.h"
 
 bool blocker_connect_can_unblock(TaskBlockerConnect *blocker, Task *task)
 {

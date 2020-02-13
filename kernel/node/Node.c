@@ -8,7 +8,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include "filesystem/Filesystem.h"
+#include "kernel/filesystem/Filesystem.h"
 
 void fsnode_init(FsNode *node, FsNodeType type)
 {

@@ -2,7 +2,7 @@
 
 #include <libsystem/list.h>
 
-#include "node/Node.h"
+#include "kernel/node/Node.h"
 
 typedef struct
 {

@@ -10,12 +10,12 @@
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
 
-#include "filesystem/Filesystem.h"
-#include "node/Directory.h"
-#include "node/File.h"
-#include "node/Pipe.h"
-#include "node/Socket.h"
-#include "tasking.h"
+#include "kernel/filesystem/Filesystem.h"
+#include "kernel/node/Directory.h"
+#include "kernel/node/File.h"
+#include "kernel/node/Pipe.h"
+#include "kernel/node/Socket.h"
+#include "kernel/tasking.h"
 
 static FsNode *_filesystem_root = NULL;
 

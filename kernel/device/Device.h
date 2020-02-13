@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "multiboot.h"
+#include "kernel/multiboot.h"
 
 #include <libsystem/runtime.h>
 

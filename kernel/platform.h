@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "tasking.h"
+#include "kernel/tasking.h"
 
 size_t platform_page_size(void);
 

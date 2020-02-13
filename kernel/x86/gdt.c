@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 
-#include "x86/gdt.h"
+#include "kernel/x86/gdt.h"
 
 static TSS tss = {
     .ss0 = 0x10,

@@ -1,7 +1,7 @@
 #include <libsystem/assert.h>
 
-#include "node/Handle.h"
-#include "node/Terminal.h"
+#include "kernel/node/Handle.h"
+#include "kernel/node/Terminal.h"
 
 #include <libsystem/logger.h>
 

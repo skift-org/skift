@@ -2,4 +2,4 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "device/Device.h"
+#include "kernel/device/Device.h"

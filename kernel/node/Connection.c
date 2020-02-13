@@ -1,7 +1,7 @@
 #include <libsystem/cstring.h>
 
-#include "node/Connection.h"
-#include "node/Handle.h"
+#include "kernel/node/Connection.h"
+#include "kernel/node/Handle.h"
 
 void connection_FsOperationAccept(FsConnection *connection)
 {

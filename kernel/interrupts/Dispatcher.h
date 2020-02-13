@@ -1,6 +1,6 @@
 #pragma once
 
-#include "node/Node.h"
+#include "kernel/node/Node.h"
 
 typedef void (*DispatcherInteruptHandler)(void);
 

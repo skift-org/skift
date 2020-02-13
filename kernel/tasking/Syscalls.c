@@ -4,13 +4,6 @@
 
 /* syscalls.c syscalls handeling code                                         */
 
-/*
- * TODO:
- * - Check pointers from user space.
- * - File system syscalls.
- * - Shared memory syscalls.
- */
-
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>

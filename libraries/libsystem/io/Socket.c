@@ -1,5 +1,8 @@
-#include <libsystem/__plugs__.h>
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
 
+#include <libsystem/__plugs__.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 
@@ -21,7 +24,7 @@ void socket_close(Socket *socket)
     {
         connection_close(connection);
     }
-  
+
     __plug_handle_close(HANDLE(socket));
 
     list_destroy(socket->connections, LIST_KEEP_VALUES);

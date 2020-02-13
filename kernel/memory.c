@@ -4,14 +4,6 @@
 
 /* memory.c: Physical, virtual and logical memory managment                   */
 
-/*
- * TODO:
- * - ADD: improve the allocator to prevent starving of identity mapped pages.
- * - ADD: support for shared memory objects
- * - IMPROVE: the memory allocator (faster and smarter)
- * - MAYBE ADD: support for copy on write
- */
-
 #include <libmath/math.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>

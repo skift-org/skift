@@ -6,8 +6,6 @@
 
 #include <libsystem/runtime.h>
 
-// Gate call protection.
-
 #define INTGATE 0x8e
 #define TRAPGATE 0xeF
 

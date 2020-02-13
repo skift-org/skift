@@ -14,8 +14,6 @@
 
 void ramdisk_load(multiboot_module_t *module)
 {
-    // Extract the ramdisk tar archive.
-
     logger_info("Loading ramdisk at 0x%x...", module->mod_start);
 
     void *ramdisk = (void *)module->mod_start;

@@ -2,8 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-/* plugs.c: Plugs functions for using the skift Framework in the userspace.   */
-
 #include <libsystem/__plugs__.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>

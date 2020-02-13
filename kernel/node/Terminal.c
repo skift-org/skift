@@ -1,9 +1,12 @@
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <libsystem/assert.h>
+#include <libsystem/logger.h>
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/Terminal.h"
-
-#include <libsystem/logger.h>
 
 #define TERMINAL_RINGBUFFER_SIZE 1024
 

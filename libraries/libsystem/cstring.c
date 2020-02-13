@@ -2,12 +2,11 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/__printf__.h>
-
 #include <libmath/math.h>
+#include <libsystem/__printf__.h>
 #include <libsystem/cstring.h>
-#include <libsystem/runtime.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/runtime.h>
 
 /* --- snprintf ------------------------------------------------------------- */
 
@@ -278,7 +277,7 @@ size_t strlcpy(char *dst, const char *src, size_t maxlen)
         memcpy(dst, src, maxlen - 1);
         dst[maxlen - 1] = '\0';
     }
-    
+
     return srclen;
 }
 
@@ -462,7 +461,7 @@ void strtrailtrim(char *str, char c)
 char *strdup(const char *s)
 {
     int lenght = strlen(s) + 1;
-    char * allocated_string = malloc(lenght);
+    char *allocated_string = malloc(lenght);
 
     if (allocated_string != NULL)
     {

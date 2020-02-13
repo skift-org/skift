@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include "kernel/tasking.h"
 
 error_t task_fshandle_open(Task *task, int *handle_index, const char *path, OpenFlag flags);

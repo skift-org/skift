@@ -2,7 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-
 #include "kernel/x86/gdt.h"
 
 static TSS tss = {

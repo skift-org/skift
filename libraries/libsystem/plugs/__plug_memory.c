@@ -2,9 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/memory.h>
 #include <abi/Syscalls.h>
+
 #include <libsystem/error.h>
+#include <libsystem/memory.h>
 
 int shared_memory_alloc(uint pagecount)
 {

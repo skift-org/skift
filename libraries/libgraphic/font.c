@@ -2,14 +2,13 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libgraphic/font.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/path.h>
-
-#include <libgraphic/font.h>
 
 Glyph *font_load_glyph(const char *name)
 {

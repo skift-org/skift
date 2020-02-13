@@ -1,7 +1,11 @@
 #pragma once
 
-#include "abi/Handle.h"
-#include "abi/Message.h"
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <abi/Handle.h>
+#include <abi/Message.h>
 
 struct Socket;
 

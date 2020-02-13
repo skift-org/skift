@@ -1,10 +1,14 @@
 #pragma once
 
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <libsystem/lock.h>
 
 #include "kernel/node/Handle.h"
-#include "platform/PlatformContext.h"
 #include "kernel/tasking/Stack.h"
+#include "platform/PlatformContext.h"
 
 #define TASK_MAX_HANDLES 32
 

@@ -4,17 +4,16 @@
 
 /* keyboard.c: keyboard driver                                                */
 
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
-#include <libsystem/error.h>
-#include <libsystem/logger.h>
-
 #include <libdevice/keyboard.h>
 #include <libdevice/keymap.c>
 #include <libdevice/keymap.h>
 #include <libdevice/keys.c>
 #include <libdevice/keys.h>
 #include <libkernel/message.h>
+#include <libsystem/assert.h>
+#include <libsystem/atomic.h>
+#include <libsystem/error.h>
+#include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"

@@ -1,6 +1,10 @@
 #pragma once
 
-#include "abi/Launchpad.h"
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <abi/Launchpad.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable);
 

@@ -3,6 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <abi/Syscalls.h>
+
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
 
@@ -19,9 +20,8 @@ int __plug_process_launch(Launchpad *launchpad)
 void __plug_process_exit(int code)
 {
     __syscall(SYS_PROCESS_EXIT, code, 0, 0, 0, 0);
-    while (1)
-    {
-    };
+
+    ASSERT_NOT_REACHED();
 }
 
 int __plug_process_cancel(int pid)

@@ -2,8 +2,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <stdatomic.h>
-
 #include <libmath/math.h>
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>

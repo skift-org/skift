@@ -1,10 +1,13 @@
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
+#include <libdevice/textmode.h>
 #include <libmath/math.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/error.h>
 #include <libsystem/logger.h>
-
-#include <libdevice/textmode.h>
 
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"

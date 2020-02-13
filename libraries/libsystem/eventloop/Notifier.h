@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <libsystem/io/Handle.h>
 
 struct Notifier;
@@ -20,7 +24,7 @@ typedef struct Notifier
     NotifierHandler on_ready_to_accept;
 } Notifier;
 
-#define NOTIFIER(__subclass) ((Notifier*)(__subclass))
+#define NOTIFIER(__subclass) ((Notifier *)(__subclass))
 
 void notifier_initialize(Notifier *notifier, Handle *handle, SelectEvent events);
 

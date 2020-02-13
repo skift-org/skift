@@ -1,6 +1,9 @@
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
-
 #include <libsystem/logger.h>
 
 void notifier_initialize(Notifier *notifier, Handle *handle, SelectEvent events)

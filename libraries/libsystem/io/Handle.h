@@ -1,5 +1,9 @@
 #pragma once
 
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <abi/Handle.h>
 
 #define handle_printf_error(__handle, __args...) __handle_printf_error(HANDLE(__handle), __args)

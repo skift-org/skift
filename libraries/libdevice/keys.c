@@ -1,3 +1,7 @@
+/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
+/* This code is licensed under the MIT License.                               */
+/* See: LICENSE.md                                                            */
+
 #include <libdevice/keys.h>
 
 #define KEY_NAMES_ENTRY(__key_name, __key_number) [__key_number] = #__key_name,

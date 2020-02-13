@@ -2,9 +2,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/messaging.h>
 #include <abi/Syscalls.h>
+
 #include <libsystem/error.h>
+#include <libsystem/messaging.h>
 
 int messaging_send(message_t *event)
 {

@@ -12,12 +12,12 @@
  * - MAYBE ADD: support for copy on write
  */
 
+#include <libmath/math.h>
+#include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/runtime.h>
-#include <libsystem/atomic.h>
 #include <libsystem/logger.h>
-#include <libmath/math.h>
+#include <libsystem/runtime.h>
 
 #include "memory.h"
 #include "modules.h"
@@ -102,23 +102,23 @@ void physical_free(uint addr, uint count)
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-page_directorie_t kpdir __aligned(PAGE_SIZE) = {0};
-page_table_t kptable[256] __aligned(PAGE_SIZE) = {0};
+PageDirectory kpdir __aligned(PAGE_SIZE) = {0};
+PageTable kptable[256] __aligned(PAGE_SIZE) = {0};
 
-int page_present(page_directorie_t *pdir, uint vaddr)
+int page_present(PageDirectory *pdir, uint vaddr)
 {
     uint pdi = PD_INDEX(vaddr);
     uint pti = PT_INDEX(vaddr);
 
-    page_directorie_entry_t *pde = &pdir->entries[pdi];
+    PageDirectoryEntry *pde = &pdir->entries[pdi];
 
     if (!pde->Present)
     {
         return 0;
     }
 
-    page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-    page_t *p = &ptable->pages[pti];
+    PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
+    PageTableEntry *p = &ptable->entries[pti];
 
     if (!p->Present)
     {
@@ -128,7 +128,7 @@ int page_present(page_directorie_t *pdir, uint vaddr)
     return 1;
 }
 
-int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
+int virtual_present(PageDirectory *pdir, uint vaddr, uint count)
 {
     for (uint i = 0; i < count; i++)
     {
@@ -143,19 +143,19 @@ int virtual_present(page_directorie_t *pdir, uint vaddr, uint count)
     return 1;
 }
 
-uint virtual2physical(page_directorie_t *pdir, uint vaddr)
+uint virtual2physical(PageDirectory *pdir, uint vaddr)
 {
     uint pdi = PD_INDEX(vaddr);
     uint pti = PT_INDEX(vaddr);
 
-    page_directorie_entry_t *pde = &pdir->entries[pdi];
-    page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-    page_t *p = &ptable->pages[pti];
+    PageDirectoryEntry *pde = &pdir->entries[pdi];
+    PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
+    PageTableEntry *p = &ptable->entries[pti];
 
     return (p->PageFrameNumber * PAGE_SIZE) + (vaddr & 0xfff);
 }
 
-int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, bool user)
+int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool user)
 {
     for (uint i = 0; i < count; i++)
     {
@@ -164,12 +164,12 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
         uint pdi = PD_INDEX(vaddr + offset);
         uint pti = PT_INDEX(vaddr + offset);
 
-        page_directorie_entry_t *pde = &pdir->entries[pdi];
-        page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+        PageDirectoryEntry *pde = &pdir->entries[pdi];
+        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
 
         if (!pde->Present)
         {
-            ptable = (page_table_t *)memory_alloc_identity(pdir, 1, 0);
+            ptable = (PageTable *)memory_alloc_identity(pdir, 1, 0);
 
             pde->Present = 1;
             pde->Write = 1;
@@ -177,7 +177,7 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
             pde->PageFrameNumber = (u32)(ptable) >> 12;
         }
 
-        page_t *p = &ptable->pages[pti];
+        PageTableEntry *p = &ptable->entries[pti];
         p->Present = 1;
         p->Write = 1;
         p->User = user;
@@ -189,7 +189,7 @@ int virtual_map(page_directorie_t *pdir, uint vaddr, uint paddr, uint count, boo
     return 0;
 }
 
-void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
+void virtual_unmap(PageDirectory *pdir, uint vaddr, uint count)
 {
     for (uint i = 0; i < count; i++)
     {
@@ -198,9 +198,9 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
         uint pdi = PD_INDEX(vaddr + offset);
         uint pti = PT_INDEX(vaddr + offset);
 
-        page_directorie_entry_t *pde = &pdir->entries[pdi];
-        page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
-        page_t *p = &ptable->pages[pti];
+        PageDirectoryEntry *pde = &pdir->entries[pdi];
+        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
+        PageTableEntry *p = &ptable->entries[pti];
 
         if (pde->Present)
             p->as_uint = 0;
@@ -209,7 +209,7 @@ void virtual_unmap(page_directorie_t *pdir, uint vaddr, uint count)
     paging_invalidate_tlb();
 }
 
-uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
+uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
 {
     if (count == 0)
         return 0;
@@ -246,7 +246,7 @@ uint virtual_alloc(page_directorie_t *pdir, uint paddr, uint count, int user)
     return 0;
 }
 
-void virtual_free(page_directorie_t *pdir, uint vaddr, uint count)
+void virtual_free(PageDirectory *pdir, uint vaddr, uint count)
 {
     // TODO: Check if the memory was allocated with ´virtual_alloc´.
     virtual_unmap(pdir, vaddr, count);
@@ -297,7 +297,7 @@ void memory_setup(multiboot_info_t *mbootinfo)
     // Setup the kernel pagedirectorie.
     for (uint i = 0; i < 256; i++)
     {
-        page_directorie_entry_t *e = &kpdir.entries[i];
+        PageDirectoryEntry *e = &kpdir.entries[i];
         e->User = 0;
         e->Write = 1;
         e->Present = 1;
@@ -318,12 +318,12 @@ void memory_setup(multiboot_info_t *mbootinfo)
     paging_enable();
 }
 
-page_directorie_t *memory_kpdir()
+PageDirectory *memory_kpdir()
 {
     return &kpdir;
 }
 
-uint memory_alloc(page_directorie_t *pdir, uint count, int user)
+uint memory_alloc(PageDirectory *pdir, uint count, int user)
 {
     if (count == 0)
         return 0;
@@ -355,7 +355,7 @@ uint memory_alloc(page_directorie_t *pdir, uint count, int user)
     return vaddr;
 }
 
-uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
+uint memory_alloc_at(PageDirectory *pdir, uint count, uint paddr, int user)
 {
     if (count == 0)
         return 0;
@@ -372,7 +372,7 @@ uint memory_alloc_at(page_directorie_t *pdir, uint count, uint paddr, int user)
 }
 
 // Alloc a identity mapped memory region, usefull for pagging data structurs
-uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
+uint memory_alloc_identity(PageDirectory *pdir, uint count, int user)
 {
     if (count == 0)
         return 0;
@@ -419,7 +419,7 @@ uint memory_alloc_identity(page_directorie_t *pdir, uint count, int user)
     return 0;
 }
 
-void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
+void memory_free(PageDirectory *pdir, uint addr, uint count, int user)
 {
     __unused(user);
 
@@ -435,11 +435,11 @@ void memory_free(page_directorie_t *pdir, uint addr, uint count, int user)
 }
 
 // Alloc a pdir for a process
-page_directorie_t *memory_alloc_pdir()
+PageDirectory *memory_alloc_pdir()
 {
     atomic_begin();
 
-    page_directorie_t *pdir = (page_directorie_t *)memory_alloc_identity(&kpdir, 1, 0);
+    PageDirectory *pdir = (PageDirectory *)memory_alloc_identity(&kpdir, 1, 0);
 
     if (pdir == NULL)
     {
@@ -447,12 +447,12 @@ page_directorie_t *memory_alloc_pdir()
         return NULL;
     }
 
-    memset(pdir, 0, sizeof(page_directorie_t));
+    memset(pdir, 0, sizeof(PageDirectory));
 
     // Copy first gigs of virtual memory (kernel space);
     for (uint i = 0; i < 256; i++)
     {
-        page_directorie_entry_t *e = &pdir->entries[i];
+        PageDirectoryEntry *e = &pdir->entries[i];
         e->User = 0;
         e->Write = 1;
         e->Present = 1;
@@ -465,21 +465,21 @@ page_directorie_t *memory_alloc_pdir()
 }
 
 // Free the pdir of a dying process
-void memory_free_pdir(page_directorie_t *pdir)
+void memory_free_pdir(PageDirectory *pdir)
 {
     atomic_begin();
 
     for (size_t i = 256; i < 1024; i++)
     {
-        page_directorie_entry_t *e = &pdir->entries[i];
+        PageDirectoryEntry *e = &pdir->entries[i];
 
         if (e->Present)
         {
-            page_table_t *pt = (page_table_t *)(e->PageFrameNumber * PAGE_SIZE);
+            PageTable *pt = (PageTable *)(e->PageFrameNumber * PAGE_SIZE);
 
             for (size_t i = 0; i < 1024; i++)
             {
-                page_t *p = &pt->pages[i];
+                PageTableEntry *p = &pt->entries[i];
 
                 if (p->Present)
                 {
@@ -495,7 +495,7 @@ void memory_free_pdir(page_directorie_t *pdir)
     atomic_end();
 }
 
-int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
+int memory_map(PageDirectory *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
 
@@ -515,7 +515,7 @@ int memory_map(page_directorie_t *pdir, uint addr, uint count, int user)
     return 0;
 }
 
-int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
+int memory_unmap(PageDirectory *pdir, uint addr, uint count)
 {
     atomic_begin();
 
@@ -535,7 +535,7 @@ int memory_unmap(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
+int memory_identity_map(PageDirectory *pdir, uint addr, uint count)
 {
     atomic_begin();
     physical_set_used(addr, count);
@@ -545,7 +545,7 @@ int memory_identity_map(page_directorie_t *pdir, uint addr, uint count)
     return 0;
 }
 
-int memory_identity_unmap(page_directorie_t *pdir, uint addr, uint count)
+int memory_identity_unmap(PageDirectory *pdir, uint addr, uint count)
 {
     atomic_begin();
     physical_set_free(addr, count);
@@ -576,7 +576,7 @@ void memory_dump(void)
         printf("%08x] %08x", virtual2physical(__pdir, __addr), (__addr)); \
     }
 
-void memory_layout_dump(page_directorie_t *pdir, bool user)
+void memory_layout_dump(PageDirectory *pdir, bool user)
 {
     if (!is_memory_initialized)
         return;
@@ -587,14 +587,14 @@ void memory_layout_dump(page_directorie_t *pdir, bool user)
 
     for (int i = user ? 256 : 0; i < 1024; i++)
     {
-        page_directorie_entry_t *pde = &pdir->entries[i];
+        PageDirectoryEntry *pde = &pdir->entries[i];
         if (pde->Present)
         {
-            page_table_t *ptable = (page_table_t *)(pde->PageFrameNumber * PAGE_SIZE);
+            PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
 
             for (int j = 0; j < 1024; j++)
             {
-                page_t *p = &ptable->pages[j];
+                PageTableEntry *p = &ptable->entries[j];
 
                 if (p->Present && !memory_used)
                 {

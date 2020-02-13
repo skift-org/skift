@@ -74,7 +74,7 @@ typedef struct Task
     Lock cwd_lock;
     Path *cwd_path;
 
-    page_directorie_t *pdir; // Page directorie
+    PageDirectory *pdir; // Page directorie
 
     int exitvalue;
 } Task;
@@ -133,7 +133,7 @@ void task_panic_dump(void);
 
 /* --- Task memory management ----------------------------------------------- */
 
-page_directorie_t *task_switch_pdir(Task *task, page_directorie_t *pdir);
+PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
 
 int task_memory_map(Task *this, uint addr, uint count);
 

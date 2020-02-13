@@ -34,12 +34,12 @@ typedef union __packed // page table entry
     };
 
     u32 as_uint;
-} page_t;
+} PageTableEntry;
 
 typedef struct __packed
 {
-    page_t pages[PAGE_TABLE_ENTRY_COUNT];
-} page_table_t;
+    PageTableEntry entries[PAGE_TABLE_ENTRY_COUNT];
+} PageTable;
 
 typedef union __packed {
     struct __packed
@@ -56,14 +56,17 @@ typedef union __packed {
         u32 PageFrameNumber : 20;
     };
     u32 as_uint;
-} page_directorie_entry_t;
+} PageDirectoryEntry;
 
 typedef struct __packed
 {
-    page_directorie_entry_t entries[PAGE_DIRECTORIE_ENTRY_COUNT];
-} page_directorie_t;
+    PageDirectoryEntry entries[PAGE_DIRECTORIE_ENTRY_COUNT];
+} PageDirectory;
 
 extern void paging_enable(void);
+
 extern void paging_disable(void);
-extern void paging_load_directorie(page_directorie_t *directorie);
+
+extern void paging_load_directorie(PageDirectory *directorie);
+
 extern void paging_invalidate_tlb();

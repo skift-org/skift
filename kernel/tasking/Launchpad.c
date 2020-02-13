@@ -11,7 +11,7 @@ error_t task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fi
         return ERR_EXEC_FORMAT_ERROR;
     }
 
-    page_directorie_t *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
+    PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
     paging_load_directorie(child_task->pdir);
 
     task_memory_map(child_task, program_header->vaddr, PAGE_ALIGN_UP(program_header->memsz) / PAGE_SIZE);

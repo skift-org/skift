@@ -434,9 +434,9 @@ void task_exit(int exitvalue)
 
 /* --- Task Memory managment ---------------------------------------------- */
 
-page_directorie_t *task_switch_pdir(Task *task, page_directorie_t *pdir)
+PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 {
-    page_directorie_t *oldpdir = task->pdir;
+    PageDirectory *oldpdir = task->pdir;
 
     task->pdir = pdir;
 

@@ -579,6 +579,19 @@ void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor)
     }
 }
 
+void terminal_on_blink(Terminal *terminal)
+{
+    if (terminal->renderer->on_blink)
+    {
+        terminal->renderer->on_blink(terminal, terminal->renderer);
+    }
+}
+
+void terminal_blink(Terminal *terminal)
+{
+    terminal_on_blink(terminal);
+}
+
 void terminal_repaint(Terminal *terminal)
 {
     if (terminal->renderer->repaint)

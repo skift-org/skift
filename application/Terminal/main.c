@@ -1,12 +1,13 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
+#include <libsystem/eventloop/Timer.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 
 #include "Terminal/FramebufferTerminal.h"
 #include "Terminal/TextmodeTerminal.h"
 
-#define TERMINAL_IO_BUFFER_SIZE 512
+#define TERMINAL_IO_BUFFER_SIZE 4096
 
 Terminal *terminal = NULL;
 Stream *master = NULL, *slave = NULL;
@@ -37,6 +38,13 @@ void master_callback(Notifier *notifier, Stream *master)
     terminal_write(terminal, buffer, size);
 
     terminal_repaint(terminal);
+}
+
+void cursor_callback(Timer *timer)
+{
+    __unused(timer);
+
+    terminal_blink(terminal);
 }
 
 int main(int argc, char const *argv[])
@@ -82,6 +90,9 @@ int main(int argc, char const *argv[])
     Notifier *master_notifier = notifier_create(HANDLE(master), SELECT_READ);
 
     master_notifier->on_ready_to_read = (NotifierHandler)master_callback;
+
+    Timer *cursor_blink = timer_create(250, cursor_callback);
+    timer_start(cursor_blink);
 
     logger_trace("Starting the shell application...");
 

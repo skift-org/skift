@@ -74,4 +74,7 @@ void terminal_write(Terminal *terminal, const char *buffer, size_t size);
 
 void terminal_on_paint(Terminal *terminal, int x, int y, TerminalCell cell);
 void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor);
+void terminal_on_blink(Terminal *terminal);
+
 void terminal_repaint(Terminal *terminal);
+void terminal_blink(Terminal *terminal);

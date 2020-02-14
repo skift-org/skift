@@ -10,6 +10,7 @@ typedef struct
     Font *mono_font;
     Point framebuffer_cursor;
     framebuffer_t *framebuffer;
+    bool cursor_blink;
 } FramebufferTerminalRenderer;
 
 Terminal *framebuffer_terminal_create(void);

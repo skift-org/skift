@@ -25,13 +25,6 @@ static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_DEFAULT_BACKGROUND] = COLOR(0x0A0E14),
 };
 
-void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, TerminalCursor cursor)
-{
-    __unused(terminal);
-
-    renderer->framebuffer_cursor = (Point){cursor.x, cursor.y};
-}
-
 Rectangle framebuffer_terminal_cell_bound(int x, int y)
 {
     Rectangle bound;
@@ -125,6 +118,46 @@ void framebuffer_terminal_repaint(Terminal *terminal, FramebufferTerminalRendere
     framebuffer_blit_dirty(renderer->framebuffer);
 }
 
+void framebuffer_terminal_render_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, int x, int y, bool visible)
+{
+    Painter *painter = renderer->framebuffer->painter;
+
+    TerminalCell cell = terminal_cell_at(terminal, x, y);
+
+    if (visible)
+    {
+        cell.attributes.inverted = true;
+        cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+    }
+
+    framebuffer_terminal_render_cell(painter, renderer->mono_font, x, y, cell);
+
+    framebuffer_mark_dirty(renderer->framebuffer, framebuffer_terminal_cell_bound(x, y));
+}
+
+void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, TerminalCursor cursor)
+{
+    __unused(terminal);
+
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, false);
+
+    renderer->framebuffer_cursor = (Point){cursor.x, cursor.y};
+
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, true);
+    renderer->cursor_blink = false;
+
+    framebuffer_blit_dirty(renderer->framebuffer);
+}
+
+void framebuffer_terminal_on_blink(Terminal *terminal, FramebufferTerminalRenderer *renderer)
+{
+    renderer->cursor_blink = !renderer->cursor_blink;
+
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, renderer->cursor_blink);
+
+    framebuffer_blit_dirty(renderer->framebuffer);
+}
+
 void framebuffer_terminal_destroy(FramebufferTerminalRenderer *renderer)
 {
     framebuffer_close(renderer->framebuffer);
@@ -148,6 +181,7 @@ Terminal *framebuffer_terminal_create(void)
     TERMINAL_RENDERER(renderer)->on_cursor = (TerminalOnCursorCallback)framebuffer_terminal_on_cursor;
     TERMINAL_RENDERER(renderer)->repaint = (TerminalRepaintCallback)framebuffer_terminal_repaint;
     TERMINAL_RENDERER(renderer)->destroy = (TerminalRendererDestroy)framebuffer_terminal_destroy;
+    TERMINAL_RENDERER(renderer)->on_blink = (TerminalOnBlinkCallback)framebuffer_terminal_on_blink;
 
     renderer->framebuffer = framebuffer;
     renderer->mono_font = font_create("mono");

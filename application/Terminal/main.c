@@ -36,6 +36,11 @@ void master_callback(Notifier *notifier, Stream *master)
     }
 
     terminal_write(terminal, buffer, size);
+}
+
+void repaint_callback(Timer *timer)
+{
+    __unused(timer);
 
     terminal_repaint(terminal);
 }
@@ -93,6 +98,9 @@ int main(int argc, char const *argv[])
 
     Timer *cursor_blink = timer_create(250, cursor_callback);
     timer_start(cursor_blink);
+
+    Timer *repaint_timer = timer_create(16, repaint_callback);
+    timer_start(repaint_timer);
 
     logger_trace("Starting the shell application...");
 

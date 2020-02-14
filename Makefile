@@ -21,7 +21,7 @@ CWARN_FLAGS=-Wall \
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
-	   -I. -Iapplication -Ilibraries -Ilibraries/libposix \
+	   -I. -Iapplication -Ilibraries -Ilibraries/libcompat \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 AS=nasm
@@ -39,8 +39,8 @@ BUILD_DIRECTORY=$(shell pwd)/build
 ROOT_DIRECTORY=$(BUILD_DIRECTORY)/sysroot
 BOOT_DIRECTORY=$(BUILD_DIRECTORY)/bootroot
 
-INCLUDES=$(patsubst libraries/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/ -path libraries/libposix -prune -o -name *.h))
-INCLUDES+=$(patsubst libraries/libposix/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/libposix -name *.h))
+INCLUDES=$(patsubst libraries/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/ -path libraries/libcompat -prune -o -name *.h))
+INCLUDES+=$(patsubst libraries/libcompat/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/libcompat -name *.h))
 
 LIBCONSOLE=$(ROOT_DIRECTORY)/lib/libterminal.a
 LIBCONSOLE_SRC=$(wildcard libraries/libterminal/*.c)
@@ -70,9 +70,9 @@ LIBMATH=$(ROOT_DIRECTORY)/lib/libmath.a
 LIBMATH_SRC=$(wildcard libraries/libmath/*.c)
 LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
 
-LIBPOSIX=$(ROOT_DIRECTORY)/lib/libposix.a
-LIBPOSIX_SRC=$(wildcard libraries/libposix/*.c)
-LIBPOSIX_OBJ=$(patsubst %.c,%.o,$(LIBPOSIX_SRC))
+LIBCOMPAT=$(ROOT_DIRECTORY)/lib/libcompat.a
+LIBCOMPAT_SRC=$(wildcard libraries/libcompat/*.c)
+LIBCOMPAT_OBJ=$(patsubst %.c,%.o,$(LIBCOMPAT_SRC))
 
 LIBSYSTEM=$(ROOT_DIRECTORY)/lib/libsystem.a
 LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
@@ -96,7 +96,7 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBGRAPHIC) \
 		  $(LIBKERNEL) \
 		  $(LIBMATH) \
-		  $(LIBPOSIX) \
+		  $(LIBCOMPAT) \
 		  $(LIBSYSTEM)
 
 APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
@@ -216,7 +216,7 @@ $(LIBMATH): $(LIBMATH_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(LIBPOSIX): $(LIBPOSIX_OBJ)
+$(LIBCOMPAT): $(LIBCOMPAT_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
@@ -273,9 +273,9 @@ $(ROOT_DIRECTORY)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBPOSIX) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBCOMPAT) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lposix
+	$(CC) $(CFLAGS) $< -o $@ -lcompat
 
 $(ROOT_DIRECTORY)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
@@ -403,7 +403,7 @@ $(ROOT_DIRECTORY)/lib/include/%.h: libraries/%.h
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(ROOT_DIRECTORY)/lib/include/%.h: libraries/libposix/%.h
+$(ROOT_DIRECTORY)/lib/include/%.h: libraries/libcompat/%.h
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 

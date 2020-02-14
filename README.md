@@ -35,7 +35,7 @@ A simple, handmade, operating system for the intel x86 cpu.
  - 2D and 3D graphic library (libgraphic)
  - PNG support throught lodepng
  - Graphical user interface library (libwidget)
- - Posix and libc compatibility layer library (libposix)
+ - Posix and libc compatibility layer library (libcompat)
  - A terminal emulator which support unicode and vt100 escape sequence (term.c)
  - It can run 🔥 DOOM 🔥
 

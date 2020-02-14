@@ -145,8 +145,6 @@ void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRende
 
     framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, true);
     renderer->cursor_blink = false;
-
-    framebuffer_blit_dirty(renderer->framebuffer);
 }
 
 void framebuffer_terminal_on_blink(Terminal *terminal, FramebufferTerminalRenderer *renderer)

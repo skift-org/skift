@@ -245,7 +245,7 @@ void keyboard_initialize()
 {
     logger_info("Initializing keyboad...");
 
-    keyboard_keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
+    keyboard_keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
     keyboard_buffer = ringbuffer_create(1024);
 
     dispatcher_register_handler(1, keyboard_interrupt_handler);

@@ -265,9 +265,13 @@ void __plug_handle_close(Handle *handle)
     }
 }
 
-Result __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
+Result __plug_handle_select(
+    HandleSet *handles,
+    int *selected,
+    SelectEvent *selected_events,
+    Timeout timeout)
 {
-    return task_fshandle_select(sheduler_running(), handles, events, count, selected, selected_events);
+    return task_fshandle_select(sheduler_running(), handles, selected, selected_events, timeout);
 }
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)

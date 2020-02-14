@@ -6,6 +6,7 @@
 
 #define RESULT_ENUM(__ENTRY, __ENTRY_WITH_VALUE)                   \
     __ENTRY_WITH_VALUE(SUCCESS, 0)                                 \
+    __ENTRY(ERR_TIMEOUT)                                           \
     __ENTRY(ERR_INBOX_FULL)                                        \
     __ENTRY(ERR_BAD_FILE_DESCRIPTOR)                               \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)                         \

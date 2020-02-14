@@ -159,16 +159,21 @@ Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t siz
     return result;
 }
 
-Result task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events)
+Result task_fshandle_select(
+    Task *task,
+    HandleSet *handles_set,
+    int *selected_index,
+    SelectEvent *selected_events,
+    Timeout timeout)
 {
     Result result = SUCCESS;
 
     FsHandle *selected_handle = NULL;
-    FsHandle **handles = calloc(count, sizeof(FsHandle *));
+    FsHandle **handles = calloc(handles_set->count, sizeof(FsHandle *));
 
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < handles_set->count; i++)
     {
-        handles[i] = task_fshandle_acquire(task, handle_indices[i]);
+        handles[i] = task_fshandle_acquire(task, handles_set->handles[i]);
 
         if (handles[i] == NULL)
         {
@@ -178,15 +183,21 @@ Result task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events
         }
     }
 
-    task_block(task, blocker_select_create(handles, events, count, &selected_handle, selected_events), 0);
+    TaskBlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
+
+    if (blocker_result == BLOCKER_TIMEOUT)
+    {
+        result = ERR_TIMEOUT;
+        goto cleanup_and_return;
+    }
 
     if (selected_handle)
     {
-        for (size_t i = 0; i < count; i++)
+        for (size_t i = 0; i < handles_set->count; i++)
         {
             if (handles[i] == selected_handle)
             {
-                *selected_index = handle_indices[i];
+                *selected_index = handles_set->handles[i];
 
                 goto cleanup_and_return;
             }
@@ -197,11 +208,11 @@ cleanup_and_return:
 
     if (handles)
     {
-        for (size_t i = 0; i < count; i++)
+        for (size_t i = 0; i < handles_set->count; i++)
         {
             if (handles[i])
             {
-                task_fshandle_release(task, handle_indices[i]);
+                task_fshandle_release(task, handles_set->handles[i]);
             }
         }
 

@@ -19,7 +19,13 @@ int __handle_printf_error(Handle *handle, const char *fmt, ...)
     return result;
 }
 
-Result handle_select(Handle **handles, SelectEvent *events, size_t count, Handle **selected, SelectEvent *selected_events)
+Result handle_select(
+    Handle **handles,
+    SelectEvent *events,
+    size_t count,
+    Handle **selected,
+    SelectEvent *selected_events,
+    Timeout timeout)
 {
     int *handles_index = calloc(count, sizeof(int));
 
@@ -29,7 +35,11 @@ Result handle_select(Handle **handles, SelectEvent *events, size_t count, Handle
     }
 
     int selected_index = HANDLE_INVALID_ID;
-    Result result = __plug_handle_select(handles_index, events, count, &selected_index, selected_events);
+    Result result = __plug_handle_select(
+        &(HandleSet){handles_index, events, count},
+        &selected_index,
+        selected_events,
+        timeout);
 
     free(handles_index);
 

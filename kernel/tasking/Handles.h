@@ -12,7 +12,12 @@ Result task_fshandle_close(Task *task, int handle_index);
 
 void task_fshandle_close_all(Task *task);
 
-Result task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events, size_t count, int *selected_index, SelectEvent *selected_events);
+Result task_fshandle_select(
+    Task *task,
+    HandleSet *handles_set,
+    int *selected_index,
+    SelectEvent *selected_events,
+    Timeout timeout);
 
 Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed);
 

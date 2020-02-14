@@ -6,15 +6,15 @@
 
 // this header list all "plugs" function between the library and the syscalls or the kernel
 
+#include <abi/Filesystem.h>
+#include <abi/Handle.h>
+#include <abi/Launchpad.h>
+#include <abi/Message.h>
+
 #include <libsystem/lock.h>
 #include <libsystem/runtime.h>
 #include <libsystem/system.h>
 #include <libsystem/time.h>
-
-#include "abi/Filesystem.h"
-#include "abi/Handle.h"
-#include "abi/Launchpad.h"
-#include "abi/Message.h"
 
 void __plug_init(void);
 
@@ -91,7 +91,11 @@ int __plug_process_wait(int pid, int *exit_value);
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags);
 void __plug_handle_close(Handle *handle);
 
-Result __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events);
+Result __plug_handle_select(
+    HandleSet *handles,
+    int *selected,
+    SelectEvent *selected_events,
+    Timeout timeout);
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size);
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size);

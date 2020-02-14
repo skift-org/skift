@@ -316,17 +316,22 @@ int sys_handle_close(int handle)
     return task_fshandle_close(sheduler_running(), handle);
 }
 
-int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
+int sys_handle_select(
+    HandleSet *handles_set,
+    int *selected,
+    SelectEvent *selected_events,
+    Timeout timeout)
 {
-    if (!syscall_validate_ptr((uintptr_t)handles, sizeof(int) * count) ||
-        !syscall_validate_ptr((uintptr_t)events, sizeof(SelectEvent) * count) ||
+    if (!syscall_validate_ptr((uintptr_t)handles_set, sizeof(HandleSet)) ||
+        !syscall_validate_ptr((uintptr_t)handles_set->handles, sizeof(int) * handles_set->count) ||
+        !syscall_validate_ptr((uintptr_t)handles_set->events, sizeof(SelectEvent) * handles_set->count) ||
         !syscall_validate_ptr((uintptr_t)selected, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)selected_events, sizeof(SelectEvent)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    if (count > PROCESS_HANDLE_COUNT)
+    if (handles_set->count > PROCESS_HANDLE_COUNT)
     {
         return ERR_TOO_MANY_OPEN_FILES;
     }
@@ -334,16 +339,21 @@ int sys_handle_select(int *handles, SelectEvent *events, size_t count, int *sele
     // FIXME: We need to copy these because this syscall uses task_fshandle_select
     //        who block the current thread using a blocker which does a context switch.
 
-    int *handles_copy = calloc(count, sizeof(int));
-    memcpy(handles_copy, handles, count * sizeof(int));
+    int *handles_copy = calloc(handles_set->count, sizeof(int));
+    memcpy(handles_copy, handles_set->handles, handles_set->count * sizeof(int));
 
-    SelectEvent *events_copy = calloc(count, sizeof(SelectEvent));
-    memcpy(events_copy, events, count * sizeof(SelectEvent));
+    SelectEvent *events_copy = calloc(handles_set->count, sizeof(SelectEvent));
+    memcpy(events_copy, handles_set->events, handles_set->count * sizeof(SelectEvent));
 
     int selected_copy;
     SelectEvent selected_event_copy;
 
-    Result result = task_fshandle_select(sheduler_running(), handles_copy, events_copy, count, &selected_copy, &selected_event_copy);
+    Result result = task_fshandle_select(
+        sheduler_running(),
+        &(HandleSet){handles_copy, events_copy, handles_set->count},
+        &selected_copy,
+        &selected_event_copy,
+        timeout);
 
     *selected = selected_copy;
     *selected_events = selected_event_copy;

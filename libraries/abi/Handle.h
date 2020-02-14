@@ -25,6 +25,13 @@ typedef struct
     Result result;
 } Handle;
 
+typedef struct
+{
+    int *handles;
+    SelectEvent *events;
+    size_t count;
+} HandleSet;
+
 #define HANDLE_INVALID_ID (-1)
 
 #define HANDLE(__subclass) ((Handle *)(__subclass))

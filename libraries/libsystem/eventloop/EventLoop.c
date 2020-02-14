@@ -61,7 +61,7 @@ void eventloop_pump(void)
     Handle *selected = NULL;
     SelectEvent selected_events = 0;
 
-    Result result = handle_select(&_eventloop_handles[0], &_eventloop_events[0], _eventloop_handles_count, &selected, &selected_events);
+    Result result = handle_select(&_eventloop_handles[0], &_eventloop_events[0], _eventloop_handles_count, &selected, &selected_events, 0);
 
     if (result != SUCCESS)
     {

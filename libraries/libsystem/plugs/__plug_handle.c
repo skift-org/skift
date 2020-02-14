@@ -19,9 +19,9 @@ void __plug_handle_close(Handle *handle)
     }
 }
 
-Result __plug_handle_select(int *handles, SelectEvent *events, size_t count, int *selected, SelectEvent *selected_events)
+Result __plug_handle_select(HandleSet *handles, int *selected, SelectEvent *selected_events, Timeout timeout)
 {
-    return __syscall(SYS_HANDLE_SELECT, (int)handles, (int)events, count, (int)selected, (int)selected_events);
+    return __syscall(SYS_HANDLE_SELECT, (int)handles, (int)selected, (int)selected_events, timeout, 0);
 }
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)

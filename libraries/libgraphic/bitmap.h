@@ -4,9 +4,10 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libmath/math.h>
 #include <libgraphic/color.h>
 #include <libgraphic/shape.h>
+#include <libmath/math.h>
+#include <libsystem/Result.h>
 
 typedef enum
 {
@@ -29,7 +30,7 @@ void bitmap_destroy(Bitmap *this);
 
 Bitmap *bitmap_load_from(const char *path);
 
-int bitmap_save_to(Bitmap *bmp, const char *path);
+Result bitmap_save_to(Bitmap *bmp, const char *path);
 
 void bitmap_set_pixel(Bitmap *bmp, Point p, Color color);
 

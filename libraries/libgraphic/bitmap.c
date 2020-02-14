@@ -3,9 +3,16 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/bitmap.h>
+#include <libsystem/assert.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
-#include "lodepng.h"
+#define LODEPNG_NO_COMPILE_DISK
+#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+
+#include <thirdparty/lodepng/lodepng.h>
+
+#include <thirdparty/lodepng/lodepng.cpp>
 
 Bitmap *bitmap_create(uint width, uint height)
 {
@@ -84,30 +91,101 @@ static Color placeholder_buffer[] = {
 
 Bitmap *bitmap_load_from(const char *path)
 {
-    uchar *buffer;
-    uint width = 0, height = 0;
-    int error = 0;
+    logger_trace("Loading the bitmap from %s", path);
 
-    if ((error = lodepng_decode32_file(&buffer, &width, &height, path)) == 0)
+    uint width = 0;
+    uint height = 0;
+    void *rawdata = NULL;
+    void *outdata = NULL;
+
+    Stream *file = stream_open(path, OPEN_READ);
+    Bitmap *bitmap = NULL;
+
+    if (handle_has_error(file))
     {
-        Bitmap *this = bitmap_create(width, height);
-
-        memcpy(this->pixels, buffer, width * height * sizeof(Color));
-        free(buffer);
-
-        return this;
+        logger_error("Failled to load bitmap from %s: %s", path, handle_error_string(file));
+        goto cleanup_and_return;
     }
-    else
+
+    FileState state;
+    stream_stat(file, &state);
+
+    rawdata = malloc(state.size);
+    assert(stream_read(file, rawdata, state.size) == state.size);
+
+    int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, rawdata, state.size);
+
+    if (decode_result != 0)
     {
-        logger_error("Failled to load from %s: %s", path, lodepng_Resultext(error));
-
-        Bitmap *this = bitmap_create(2, 2);
-        memcpy(this->pixels, placeholder_buffer, 2 * 2 * sizeof(Color));
-        return this;
+        logger_error("Failled to load bitmap from %s: %s", path, lodepng_error_text(decode_result));
+        goto cleanup_and_return;
     }
+
+    bitmap = bitmap_create(width, height);
+    memcpy(bitmap->pixels, outdata, width * height * sizeof(Color));
+
+cleanup_and_return:
+    if (rawdata)
+    {
+        free(rawdata);
+    }
+
+    if (outdata)
+    {
+        free(outdata);
+    }
+
+    stream_close(file);
+
+    if (bitmap == NULL)
+    {
+        bitmap = bitmap_create(2, 2);
+        memcpy(bitmap->pixels, placeholder_buffer, 2 * 2 * sizeof(Color));
+    }
+
+    return bitmap;
 }
 
-int bitmap_save_to(Bitmap *bmp, const char *path)
+Result bitmap_save_to(Bitmap *bmp, const char *path)
 {
-    return lodepng_encode32_file(path, (const uchar *)bmp->pixels, bmp->width, bmp->height);
+    Result result = SUCCESS;
+    Stream *file = stream_open(path, OPEN_WRITE);
+
+    if (handle_has_error(file))
+    {
+        result = handle_get_error(file);
+        goto cleanup_and_return;
+    }
+
+    void *outbuffer = NULL;
+    size_t outbuffer_size = 0;
+
+    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (void *)bmp->pixels, bmp->width, bmp->height, LCT_RGBA, 8);
+
+    if (err != 0)
+    {
+        result = ERR_BAD_IMAGE_FILE_FORMAT;
+        goto cleanup_and_return;
+    }
+
+    stream_write(file, outbuffer, outbuffer_size);
+
+    if (handle_has_error(file))
+    {
+        result = handle_get_error(file);
+        goto cleanup_and_return;
+    }
+
+cleanup_and_return:
+    if (file)
+    {
+        stream_close(file);
+    }
+
+    if (outbuffer)
+    {
+        free(outbuffer);
+    }
+
+    return result;
 }

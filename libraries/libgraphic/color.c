@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/color.h>
-#include <libmath/math.h>
+#include <libmath/Lerp.h>
 
 Color RGB(float R, float G, float B)
 {

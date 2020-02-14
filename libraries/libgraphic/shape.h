@@ -4,7 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
+#include <libsystem/runtime.h>
 
 typedef struct __packed
 {

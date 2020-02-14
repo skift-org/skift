@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
 #include <libsystem/assert.h>
 #include <libterminal/Terminal.h>
 

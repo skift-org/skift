@@ -66,6 +66,7 @@
     __ENTRY(ERR_INVALID_REQUEST_CODE)                              \
     __ENTRY(ERR_INVALID_SLOT)                                      \
     __ENTRY(ERR_BAD_FONT_FILE_FORMAT)                              \
+    __ENTRY(ERR_BAD_IMAGE_FILE_FORMAT)                             \
     __ENTRY(ERR_DEVICE_NOT_A_STREAM)                               \
     __ENTRY(ERR_NO_DATA_AVAILABLE)                                 \
     __ENTRY(ERR_TIMER_EXPIRED)                                     \

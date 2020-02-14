@@ -3,7 +3,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libdevice/textmode.h>
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>

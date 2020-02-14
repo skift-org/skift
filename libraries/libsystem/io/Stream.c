@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/__printf__.h>
 #include <libsystem/assert.h>

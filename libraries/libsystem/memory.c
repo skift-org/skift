@@ -2,8 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libmath/MinMax.h>
 #include <libsystem/memory.h>
-#include <libmath/math.h>
 
 void memory_zero(void *where, uint how_many)
 {

@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
 #include <libsystem/Result.h>
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>

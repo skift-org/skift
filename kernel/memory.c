@@ -4,7 +4,7 @@
 
 /* memory.c: Physical, virtual and logical memory managment                   */
 
-#include <libmath/math.h>
+#include <libmath/MinMax.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>

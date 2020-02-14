@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    int term = init_exec("/bin/Terminal");
+    int term = init_exec("/bin/Compositor");
 
     process_wait(term, NULL);
 

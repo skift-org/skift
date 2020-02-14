@@ -1,7 +1,9 @@
 #include <libgraphic/framebuffer.h>
 
 #include "Compositor/Cursor.h"
+#include "Compositor/Manager.h"
 #include "Compositor/Renderer.h"
+#include "Compositor/Window.h"
 
 static framebuffer_t *_framebuffer;
 static Painter *_painter;
@@ -17,11 +19,24 @@ void renderer_initialize(void)
 
 void renderer_region(Rectangle region)
 {
-    painter_fill_rect(_painter, region, COLOR_DIMGRAY);
+    painter_fill_rect(_painter, region, COLOR_CORNFLOWERBLUE);
 
-    painter_draw_rect(_painter, region, COLOR_MAGENTA);
+    list_foreach(Window, window, manager_get_windows())
+    {
+        if (rectange_colide(window_bound(window), region))
+        {
+            Rectangle cliped = rectangle_clip(window_bound(window), region);
+
+            painter_fill_rect(_painter, cliped, COLOR_WHITE);
+        }
+    }
 
     framebuffer_mark_dirty(_framebuffer, region);
+}
+
+Rectangle renderer_bound(void)
+{
+    return framebuffer_bound(_framebuffer);
 }
 
 void renderer_blit(void)

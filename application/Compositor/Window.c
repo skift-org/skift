@@ -21,3 +21,8 @@ void window_destroy(Window *window)
 
     free(window);
 }
+
+Rectangle window_bound(Window *window)
+{
+    return window->bound;
+}

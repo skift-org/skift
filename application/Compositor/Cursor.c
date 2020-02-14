@@ -3,8 +3,7 @@
 #include "Compositor/Cursor.h"
 #include "Compositor/Renderer.h"
 
-static int _mouse_x;
-static int _mouse_y;
+static Point _mouse_position;
 static Bitmap *_cursor;
 
 void cursor_initialize(void)
@@ -16,8 +15,8 @@ void cursor_handle_packet(MousePacket packet)
 {
     renderer_region(cursor_bound());
 
-    _mouse_x += packet.offx;
-    _mouse_y += packet.offy;
+    _mouse_position = point_add(_mouse_position, (Point){packet.offx, packet.offy});
+    _mouse_position = point_clamp_to_rect(_mouse_position, renderer_bound());
 }
 
 void cursor_render(Painter *painter)
@@ -27,5 +26,10 @@ void cursor_render(Painter *painter)
 
 Rectangle cursor_bound(void)
 {
-    return (Rectangle){{_mouse_x, _mouse_y, bitmap_bound(_cursor).width, bitmap_bound(_cursor).height}};
+    Rectangle bound;
+
+    bound.position = point_add(_mouse_position, (Point){-2, -2});
+    bound.size = bitmap_bound(_cursor).size;
+
+    return bound;
 }

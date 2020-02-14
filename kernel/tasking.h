@@ -121,7 +121,7 @@ int task_wakeup(Task *task);
 
 bool task_wait(int task_id, int *exitvalue);
 
-void task_block(Task *task, TaskBlocker *blocker);
+TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout);
 
 bool task_cancel(Task *task, int exitvalue);
 

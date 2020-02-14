@@ -27,6 +27,8 @@ typedef u32 ElapsedTime;
 
 typedef u32 TimeStamp;
 
+typedef u32 Timeout;
+
 typedef struct
 {
     int second;

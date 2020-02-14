@@ -26,7 +26,7 @@ void dispatcher_dispatch(int interrupt)
     ringbuffer_putc(_interupts_to_dispatch, interrupt);
 }
 
-bool dispatcher_can_unblock(TaskBlocker *blocker, struct Task *task)
+bool dispatcher_can_unblock(TaskBlocker *blocker, Task *task)
 {
     __unused(blocker);
     __unused(task);
@@ -47,8 +47,8 @@ void dispatcher_service(void)
         if (should_block)
         {
             TaskBlocker *blocker = __create(TaskBlocker);
-            blocker->can_unblock = (TaskBlockerCanUnblock)dispatcher_can_unblock;
-            task_block(sheduler_running(), blocker);
+            blocker->can_unblock = (TaskBlockerCanUnblockCallback)dispatcher_can_unblock;
+            task_block(sheduler_running(), blocker, 0);
         }
 
         atomic_begin();

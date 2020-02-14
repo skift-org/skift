@@ -22,10 +22,8 @@ TaskBlocker *blocker_time_create(uint wakeup_tick)
 {
     TaskBlockerTime *time_blocker = __create(TaskBlockerTime);
 
-    time_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_time_can_unblock,
-        (TaskBlockerUnblock)blocker_time_unblock,
-    };
+    TASK_BLOCKER(time_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_time_can_unblock;
+    TASK_BLOCKER(time_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_time_unblock;
 
     time_blocker->wakeup_tick = wakeup_tick;
 

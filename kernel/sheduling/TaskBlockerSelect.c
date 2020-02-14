@@ -43,10 +43,8 @@ TaskBlocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size
 {
     TaskBlockerSelect *select_blocker = __create(TaskBlockerSelect);
 
-    select_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_select_can_unblock,
-        (TaskBlockerUnblock)blocker_select_unblock,
-    };
+    TASK_BLOCKER(select_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_select_can_unblock;
+    TASK_BLOCKER(select_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_select_unblock;
 
     select_blocker->handles = handles;
     select_blocker->events = events;

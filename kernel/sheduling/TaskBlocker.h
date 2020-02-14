@@ -5,15 +5,29 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/runtime.h>
+#include <libsystem/time.h>
 
 struct Task;
 struct TaskBlocker;
 
-typedef bool (*TaskBlockerCanUnblock)(struct TaskBlocker *blocker, struct Task *task);
-typedef void (*TaskBlockerUnblock)(struct TaskBlocker *blocker, struct Task *task);
+typedef bool (*TaskBlockerCanUnblockCallback)(struct TaskBlocker *blocker, struct Task *task);
+typedef void (*TaskBlockerUnblockCallback)(struct TaskBlocker *blocker, struct Task *task);
+typedef void (*TaskBlockerTimeoutCallback)(struct TaskBlocker *blocker, struct Task *task);
+
+typedef enum
+{
+    BLOCKER_UNBLOCKED,
+    BLOCKER_TIMEOUT,
+} TaskBlockerResult;
 
 typedef struct TaskBlocker
 {
-    TaskBlockerCanUnblock can_unblock;
-    TaskBlockerUnblock unblock;
+    TaskBlockerResult result;
+    TimeStamp timeout;
+
+    TaskBlockerCanUnblockCallback can_unblock;
+    TaskBlockerUnblockCallback on_unblock;
+    TaskBlockerTimeoutCallback on_timeout;
 } TaskBlocker;
+
+#define TASK_BLOCKER(__subclass) ((TaskBlocker *)(__subclass))

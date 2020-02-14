@@ -21,10 +21,8 @@ TaskBlocker *blocker_write_create(FsHandle *handle)
 {
     TaskBlockerWrite *write_blocker = __create(TaskBlockerWrite);
 
-    write_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_write_can_unblock,
-        (TaskBlockerUnblock)blocker_write_unblock,
-    };
+    TASK_BLOCKER(write_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_write_can_unblock;
+    TASK_BLOCKER(write_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_write_unblock;
 
     write_blocker->handle = handle;
 

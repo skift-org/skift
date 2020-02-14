@@ -21,10 +21,8 @@ TaskBlocker *blocker_read_create(FsHandle *handle)
 {
     TaskBlockerRead *read_blocker = __create(TaskBlockerRead);
 
-    read_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_read_can_unblock,
-        (TaskBlockerUnblock)blocker_read_unblock,
-    };
+    TASK_BLOCKER(read_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_read_can_unblock;
+    TASK_BLOCKER(read_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_read_unblock;
 
     read_blocker->handle = handle;
 

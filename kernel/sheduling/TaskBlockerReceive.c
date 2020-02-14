@@ -21,10 +21,8 @@ TaskBlocker *blocker_receive_create(FsHandle *handle)
 {
     TaskBlockerReceive *receive_blocker = __create(TaskBlockerReceive);
 
-    receive_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_receive_can_unblock,
-        (TaskBlockerUnblock)blocker_receive_unblock,
-    };
+    TASK_BLOCKER(receive_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_receive_can_unblock;
+    TASK_BLOCKER(receive_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_receive_unblock;
 
     receive_blocker->handle = handle;
 

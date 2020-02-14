@@ -178,7 +178,7 @@ Result task_fshandle_select(Task *task, int *handle_indices, SelectEvent *events
         }
     }
 
-    task_block(task, blocker_select_create(handles, events, count, &selected_handle, selected_events));
+    task_block(task, blocker_select_create(handles, events, count, &selected_handle, selected_events), 0);
 
     if (selected_handle)
     {

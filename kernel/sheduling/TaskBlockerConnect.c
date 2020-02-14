@@ -22,10 +22,8 @@ TaskBlocker *blocker_connect_create(FsNode *connection)
 {
     TaskBlockerConnect *connect_blocker = __create(TaskBlockerConnect);
 
-    connect_blocker->blocker = (TaskBlocker){
-        (TaskBlockerCanUnblock)blocker_connect_can_unblock,
-        (TaskBlockerUnblock)blocker_connect_unblock,
-    };
+    TASK_BLOCKER(connect_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_connect_can_unblock;
+    TASK_BLOCKER(connect_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_connect_unblock;
 
     connect_blocker->connection = connection;
 

@@ -144,7 +144,7 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed
         return ERR_NOT_READABLE;
     }
 
-    task_block(sheduler_running(), blocker_read_create(handle));
+    task_block(sheduler_running(), blocker_read_create(handle), 0);
 
     *readed = 0;
 
@@ -161,7 +161,7 @@ static Result fshandle_write_interal(FsHandle *handle, const char *buffer, size_
 {
     FsNode *node = handle->node;
 
-    task_block(sheduler_running(), blocker_write_create(handle));
+    task_block(sheduler_running(), blocker_write_create(handle), 0);
 
     if (fshandle_has_flag(handle, OPEN_APPEND))
     {
@@ -357,7 +357,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
         return ERR_CONNECTION_REFUSED;
     }
 
-    task_block(sheduler_running(), blocker_connect_create(connection));
+    task_block(sheduler_running(), blocker_connect_create(connection), 0);
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
     fsnode_deref(connection);
@@ -374,7 +374,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    task_block(sheduler_running(), blocker_accept_create(node));
+    task_block(sheduler_running(), blocker_accept_create(node), 0);
 
     FsNode *connection = node->accept_connection(node);
 
@@ -414,7 +414,7 @@ Result fshandle_receive(FsHandle *handle, Message *message)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    task_block(sheduler_running(), blocker_receive_create(handle));
+    task_block(sheduler_running(), blocker_receive_create(handle), 0);
 
     if (handle->message != NULL)
     {

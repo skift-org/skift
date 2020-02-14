@@ -379,16 +379,33 @@ bool task_wait(int task_id, int *exitvalue)
     }
 }
 
-void task_block(Task *task, TaskBlocker *blocker)
+TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
 {
     assert(!task->blocker);
 
     atomic_begin();
+
+    if (timeout == 0 || timeout == INT32_MAX)
+    {
+        blocker->timeout = 0;
+    }
+    else
+    {
+        blocker->timeout = sheduler_get_ticks() + timeout;
+    }
+
     task->blocker = blocker;
     task_set_state(task, TASK_STATE_BLOCKED);
     atomic_end();
 
     sheduler_yield();
+
+    TaskBlockerResult result = blocker->result;
+
+    free(blocker);
+    task->blocker = NULL;
+
+    return result;
 }
 
 /* --- Task stopping and canceling ---------------------------------------- */
@@ -1097,15 +1114,26 @@ void wakeup_blocked_task(void)
         {
             TaskBlocker *blocker = task->blocker;
 
-            if (blocker->can_unblock(blocker, task))
+            if (blocker->timeout != 0 &&
+                blocker->timeout <= sheduler_get_ticks())
             {
-                if (blocker->unblock)
+                if (blocker->on_timeout)
                 {
-                    blocker->unblock(blocker, task);
+                    blocker->on_timeout(blocker, task);
                 }
 
-                free(task->blocker);
-                task->blocker = NULL;
+                blocker->result = BLOCKER_TIMEOUT;
+
+                list_pushback(task_to_wakeup, task);
+            }
+            else if (blocker->can_unblock(blocker, task))
+            {
+                if (blocker->on_unblock)
+                {
+                    blocker->on_unblock(blocker, task);
+                }
+
+                blocker->result = BLOCKER_UNBLOCKED;
 
                 list_pushback(task_to_wakeup, task);
             }

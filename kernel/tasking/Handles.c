@@ -187,7 +187,7 @@ Result task_fshandle_select(
 
     if (blocker_result == BLOCKER_TIMEOUT)
     {
-        result = ERR_TIMEOUT;
+        result = TIMEOUT;
         goto cleanup_and_return;
     }
 

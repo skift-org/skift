@@ -524,7 +524,7 @@ SyscallHandler syscall_get_handler(Syscall syscall)
 
 #define SYSCALL_NAMES_ENTRY(__entry) #__entry,
 
-static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
+//static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
@@ -542,15 +542,15 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
         result = -ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    if (syscall >= SYS_HANDLE_OPEN && result != SUCCESS)
-    {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
-    }
-
-    if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
-    {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
-    }
+    //if (syscall >= SYS_HANDLE_OPEN && result != SUCCESS)
+    //{
+    //    logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
+    //}
+    //
+    //if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
+    //{
+    //    logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
+    //}
 
     return result;
 }

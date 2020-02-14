@@ -385,7 +385,7 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
 
     atomic_begin();
 
-    if (timeout == 0 || timeout == INT32_MAX)
+    if (timeout == 0 || timeout == (Timeout)-1)
     {
         blocker->timeout = 0;
     }

@@ -26,7 +26,6 @@ A simple, handmade, operating system for the intel x86 cpu.
 <img src="manual/screenshots/2020-01-25.png" />
 </p>
 
-
 # Features
  - Pre-emptive multitasking
  - I/O redirection
@@ -35,8 +34,9 @@ A simple, handmade, operating system for the intel x86 cpu.
  - 2D and 3D graphic library (libgraphic)
  - PNG support throught lodepng
  - Graphical user interface library (libwidget)
+ - A compositing window manager (Compositor)
  - Posix and libc compatibility layer library (libcompat)
- - A terminal emulator which support unicode and vt100 escape sequence (term.c)
+ - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
  - It can run 🔥 DOOM 🔥
 
 # License

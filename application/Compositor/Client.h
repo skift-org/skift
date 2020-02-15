@@ -3,7 +3,7 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
 
-typedef struct
+typedef struct Client
 {
     Notifier notifier;
 

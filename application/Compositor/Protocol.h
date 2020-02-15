@@ -19,5 +19,7 @@ typedef struct
 {
     CompositorMessage header;
 
+    int id;
+    int framebuffer;
     Rectangle bound;
 } CompositorCreateWindowMessage;

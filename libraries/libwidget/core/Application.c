@@ -71,7 +71,11 @@ void application_add_window(Window *window)
 
     logger_info("Adding %s(0x%08x)", WIDGET(window)->classname, window);
 
-    CompositorCreateWindowMessage message = {.bound = WIDGET(window)->bound};
+    CompositorCreateWindowMessage message = {
+        .id = window->id,
+        .framebuffer = window->framebuffer_handle,
+        .bound = WIDGET(window)->bound,
+    };
 
     connection_send(_connection, (Message *)&message, sizeof(message));
 

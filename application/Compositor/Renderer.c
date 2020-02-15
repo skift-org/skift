@@ -29,7 +29,7 @@ void renderer_region(Rectangle region)
         {
             Rectangle cliped = rectangle_clip(window_bound(window), region);
 
-            painter_fill_rect(_painter, cliped, COLOR_WHITE);
+            painter_blit_bitmap(_painter, window->framebuffer, cliped, cliped);
         }
     }
 

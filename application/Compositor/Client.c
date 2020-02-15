@@ -1,4 +1,5 @@
 #include <libsystem/logger.h>
+#include <libsystem/memory.h>
 
 #include "Compositor/Client.h"
 #include "Compositor/Protocol.h"
@@ -23,7 +24,10 @@ void client_request_callback(Client *client, Connection *connection)
     case COMPOSITOR_MESSAGE_CREATE_WINDOW:
     {
         CompositorCreateWindowMessage *create_window = (CompositorCreateWindowMessage *)message;
-        window_create(create_window->bound);
+        Bitmap *bitmap = NULL;
+
+        shared_memory_acquire(create_window->id, (uint *)&bitmap);
+        window_create(create_window->id, client, create_window->bound, bitmap);
         break;
     }
 

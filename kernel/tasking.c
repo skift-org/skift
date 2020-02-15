@@ -34,6 +34,8 @@ void tasking_initialize(void)
 {
     tasks = list_create();
 
+    task_shared_memory_setup();
+
     for (int i = 0; i < TASK_STATE_COUNT; i++)
     {
         tasks_bystates[i] = list_create();
@@ -643,7 +645,7 @@ void shm_physical_region_delete(shm_physical_region_t *task)
 
 shm_physical_region_t *task_physical_region_get_by_id(int id)
 {
-    if (id < SHMID)
+    if (id >= SHMID)
         return NULL;
 
     list_foreach(shm_physical_region_t, shm, shms)
@@ -756,6 +758,7 @@ int task_shared_memory_acquire(Task *task, int shm, uint *addr)
 
     *addr = virtr->vaddr;
     lock_release(shms_lock);
+
     return -SUCCESS;
 }
 

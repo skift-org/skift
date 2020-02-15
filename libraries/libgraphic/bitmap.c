@@ -3,9 +3,11 @@
 /* See: LICENSE.md                                                            */
 
 #include <libgraphic/bitmap.h>
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
+#include <libsystem/memory.h>
 
 #define LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
@@ -23,6 +25,23 @@ Bitmap *bitmap_create(uint width, uint height)
     this->filtering = BITMAP_FILTERING_NEAREST;
 
     return this;
+}
+
+void bitmap_create_shared(size_t width, size_t height, Bitmap **bitmap, int *handle)
+{
+    logger_trace("%d %d %x %x", width, height, bitmap, handle);
+
+    *handle = shared_memory_alloc((sizeof(Bitmap) + width * height * sizeof(Color) + 4096) / 4096);
+
+    logger_trace("alloc %s", result_to_string(error_get()));
+
+    shared_memory_acquire(*handle, (uint *)bitmap);
+
+    logger_trace("acquire %s", result_to_string(error_get()));
+
+    (*bitmap)->width = width;
+    (*bitmap)->height = height;
+    (*bitmap)->filtering = BITMAP_FILTERING_NEAREST;
 }
 
 void bitmap_destroy(Bitmap *this)

@@ -26,6 +26,8 @@ typedef struct
 
 Bitmap *bitmap_create(uint width, uint height);
 
+void bitmap_create_shared(size_t width, size_t height, Bitmap **bitmap, int *handle);
+
 void bitmap_destroy(Bitmap *this);
 
 Bitmap *bitmap_load_from(const char *path);

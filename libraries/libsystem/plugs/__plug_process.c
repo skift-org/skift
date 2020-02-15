@@ -7,9 +7,16 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
 
+static int _cached_this = -1;
+
 int __plug_process_this(void)
 {
-    return __syscall(SYS_PROCESS_THIS, 0, 0, 0, 0, 0);
+    if (_cached_this == -1)
+    {
+        _cached_this = __syscall(SYS_PROCESS_THIS, 0, 0, 0, 0, 0);
+    }
+
+    return _cached_this;
 }
 
 int __plug_process_launch(Launchpad *launchpad)

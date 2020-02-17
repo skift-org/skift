@@ -39,7 +39,6 @@ typedef enum
 {
     LIST_KEEP_VALUES,
     LIST_FREE_VALUES,
-    LIST_RELEASE_VALUES,
 } list_delete_action_t;
 
 // Free the memory used by the list

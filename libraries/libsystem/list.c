@@ -45,10 +45,6 @@ void list_clear(List *list, list_delete_action_t free_items)
         {
             free(current->value);
         }
-        else if (free_items == LIST_RELEASE_VALUES)
-        {
-            object_release(current->value);
-        }
 
         free(current);
         current = next;

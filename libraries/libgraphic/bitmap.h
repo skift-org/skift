@@ -24,9 +24,7 @@ typedef struct
     Color pixels[];
 } Bitmap;
 
-Bitmap *bitmap_create(uint width, uint height);
-
-void bitmap_create_shared(size_t width, size_t height, Bitmap **bitmap, int *handle);
+Bitmap *bitmap_create(size_t width, size_t height);
 
 void bitmap_destroy(Bitmap *this);
 

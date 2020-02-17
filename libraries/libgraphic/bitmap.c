@@ -16,37 +16,23 @@
 
 #include <thirdparty/lodepng/lodepng.cpp>
 
-Bitmap *bitmap_create(uint width, uint height)
+Bitmap *bitmap_create(size_t width, size_t height)
 {
-    Bitmap *this = malloc(sizeof(Bitmap) + width * height * sizeof(Color));
+    Bitmap *bitmap = NULL;
 
-    this->width = width;
-    this->height = height;
-    this->filtering = BITMAP_FILTERING_NEAREST;
+    shared_memory_alloc(sizeof(Bitmap) + width * height * sizeof(Color), (uintptr_t *)&bitmap);
+    assert(bitmap);
 
-    return this;
-}
+    bitmap->width = width;
+    bitmap->height = height;
+    bitmap->filtering = BITMAP_FILTERING_NEAREST;
 
-void bitmap_create_shared(size_t width, size_t height, Bitmap **bitmap, int *handle)
-{
-    logger_trace("%d %d %x %x", width, height, bitmap, handle);
-
-    *handle = shared_memory_alloc((sizeof(Bitmap) + width * height * sizeof(Color) + 4096) / 4096);
-
-    logger_trace("alloc %s", result_to_string(error_get()));
-
-    shared_memory_acquire(*handle, (uint *)bitmap);
-
-    logger_trace("acquire %s", result_to_string(error_get()));
-
-    (*bitmap)->width = width;
-    (*bitmap)->height = height;
-    (*bitmap)->filtering = BITMAP_FILTERING_NEAREST;
+    return bitmap;
 }
 
 void bitmap_destroy(Bitmap *this)
 {
-    free(this);
+    shared_memory_free((uintptr_t)this);
 }
 
 void bitmap_set_pixel(Bitmap *bmp, Point p, Color color)
@@ -110,8 +96,6 @@ static Color placeholder_buffer[] = {
 
 Bitmap *bitmap_load_from(const char *path)
 {
-    logger_trace("Loading the bitmap from %s", path);
-
     uint width = 0;
     uint height = 0;
     void *rawdata = NULL;
@@ -136,7 +120,7 @@ Bitmap *bitmap_load_from(const char *path)
 
     if (decode_result != 0)
     {
-        logger_error("Failled to load bitmap from %s: %s", path, lodepng_error_text(decode_result));
+        logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
         goto cleanup_and_return;
     }
 

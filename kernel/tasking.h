@@ -66,7 +66,7 @@ typedef struct Task
     List *inbox; // process main message queue
     List *subscription;
 
-    List *shms;
+    List *memory_mapping;
 
     Lock handles_lock;
     FsHandle *handles[PROCESS_HANDLE_COUNT];
@@ -161,35 +161,52 @@ FsHandle *task_fshandle_acquire(Task *task, int handle_index);
 
 Result task_fshandle_release(Task *task, int handle_index);
 
-/* --- Task handle operations ----------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
 /*   SHARED MEMORY                                                            */
 /* -------------------------------------------------------------------------- */
 
 typedef struct
 {
-    int ID;
-    uint paddr;
-    int pagecount;
-} shm_physical_region_t;
+    int id;
+    uintptr_t address;
+    size_t size;
+
+    _Atomic int refcount;
+} MemoryObject;
 
 typedef struct
 {
-    shm_physical_region_t *region;
-    uint vaddr;
-} shm_virtual_region_t;
+    MemoryObject *object;
+
+    uintptr_t address;
+    size_t size;
+} MemoryMapping;
 
 void task_shared_memory_setup(void);
 
-shm_physical_region_t *task_physical_region_get_by_id(int id);
-shm_virtual_region_t *task_virtual_region_get_by_id(Task *this, int id);
+MemoryObject *memory_object_create(size_t size);
 
-int task_shared_memory_alloc(Task *this, int pagecount);
+void memory_object_destroy(MemoryObject *memory_object);
 
-int task_shared_memory_acquire(Task *this, int shm, uint *addr);
+MemoryObject *memory_object_ref(MemoryObject *memory_object);
 
-int task_shared_memory_release(Task *this, int shm);
+void memory_object_deref(MemoryObject *memory_object);
+
+MemoryObject *memory_object_by_id(int id);
+
+MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object);
+
+void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping);
+
+MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address);
+
+Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address);
+
+Result task_shared_memory_free(Task *task, uintptr_t address);
+
+Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size);
+
+Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
 
 /* -------------------------------------------------------------------------- */
 /*   MESSAGING                                                                */

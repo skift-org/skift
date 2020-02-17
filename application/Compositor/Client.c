@@ -26,7 +26,8 @@ void client_request_callback(Client *client, Connection *connection)
         CompositorCreateWindowMessage *create_window = (CompositorCreateWindowMessage *)message;
         Bitmap *bitmap = NULL;
 
-        shared_memory_acquire(create_window->id, (uint *)&bitmap);
+        size_t size;
+        shared_memory_include(create_window->framebuffer, (uintptr_t *)&bitmap, &size);
         window_create(create_window->id, client, create_window->bound, bitmap);
         break;
     }

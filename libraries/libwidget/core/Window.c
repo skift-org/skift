@@ -1,3 +1,4 @@
+#include <libsystem/memory.h>
 #include <libwidget/core/Application.h>
 #include <libwidget/core/Window.h>
 
@@ -16,7 +17,8 @@ Widget *window_create(Rectangle bound)
 
     window->id = _window_id++;
 
-    bitmap_create_shared(bound.width, bound.height, &window->framebuffer, &window->framebuffer_handle);
+    window->framebuffer = bitmap_create(bound.width, bound.height);
+    shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
     window->painter = painter_create(window->framebuffer);
 
     painter_fill_rect(window->painter, bound, COLOR_BLACK);

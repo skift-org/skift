@@ -115,19 +115,41 @@ int sys_process_wait(int tid, int *exitvalue)
 
 /* --- Shared memory -------------------------------------------------------- */
 
-int sys_shared_memory_alloc(int pagecount)
+int sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
 {
-    return task_shared_memory_alloc(sheduler_running(), pagecount);
+    if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_shared_memory_alloc(sheduler_running(), size, out_address);
 }
 
-int sys_shared_memory_acquire(int shm, uint *addr)
+int sys_shared_memory_free(uintptr_t address)
 {
-    return task_shared_memory_acquire(sheduler_running(), shm, addr);
+
+    return task_shared_memory_free(sheduler_running(), address);
 }
 
-int sys_shared_memory_release(int shm)
+int sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
-    return task_shared_memory_release(sheduler_running(), shm);
+    if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
+        !syscall_validate_ptr((uintptr_t)out_size, sizeof(size_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_shared_memory_include(sheduler_running(), handle, out_address, out_size);
+}
+
+int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
+{
+    if (!syscall_validate_ptr((uintptr_t)out_handle, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_shared_memory_get_handle(sheduler_running(), address, out_handle);
 }
 
 /* --- Messaging ------------------------------------------------------------ */
@@ -462,8 +484,9 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_FREE] = sys_process_free,
 
     [SYS_SHARED_MEMORY_ALLOC] = sys_shared_memory_alloc,
-    [SYS_SHARED_MEMORY_ACQUIRE] = sys_shared_memory_acquire,
-    [SYS_SHARED_MEMORY_RELEASE] = sys_shared_memory_release,
+    [SYS_SHARED_MEMORY_FREE] = sys_shared_memory_free,
+    [SYS_SHARED_MEMORY_INCLUDE] = sys_shared_memory_include,
+    [SYS_SHARED_MEMORY_GET_HANDLE] = sys_shared_memory_get_handle,
 
     [SYS_MESSAGING_SEND] = sys_messaging_send,
     [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,
@@ -524,7 +547,7 @@ SyscallHandler syscall_get_handler(Syscall syscall)
 
 #define SYSCALL_NAMES_ENTRY(__entry) #__entry,
 
-//static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
+static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
@@ -542,15 +565,16 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
         result = -ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    //if (syscall >= SYS_HANDLE_OPEN && result != SUCCESS)
-    //{
-    //    logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
-    //}
-    //
-    //if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
-    //{
-    //    logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
-    //}
+    if (((syscall >= SYS_SHARED_MEMORY_ALLOC && syscall <= SYS_SHARED_MEMORY_GET_HANDLE) ||
+         syscall >= SYS_HANDLE_OPEN) &&
+        result != SUCCESS)
+    {
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
+    }
+    else if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
+    {
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
+    }
 
     return result;
 }

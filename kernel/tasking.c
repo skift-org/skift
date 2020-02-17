@@ -77,7 +77,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     task->subscription = list_create();
 
     // Setup shms
-    task->shms = list_create();
+    task->memory_mapping = list_create();
 
     // Setup current working directory.
     lock_init(task->cwd_lock);
@@ -130,7 +130,8 @@ void task_destroy(Task *task)
 
     list_destroy(task->inbox, LIST_FREE_VALUES);
     list_destroy(task->subscription, LIST_FREE_VALUES);
-    list_destroy(task->shms, LIST_RELEASE_VALUES);
+
+    list_destroy(task->memory_mapping, LIST_RELEASE_VALUES);
 
     task_fshandle_close_all(task);
 
@@ -410,7 +411,7 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
     return result;
 }
 
-/* --- Task stopping and canceling ---------------------------------------- */
+/* --- Task stopping and canceling ------------------------------------------ */
 
 bool task_cancel(Task *task, int exitvalue)
 {
@@ -602,101 +603,112 @@ void task_get_cwd(Task *task, char *buffer, uint size)
 /*   SHARED MEMORY                                                            */
 /* -------------------------------------------------------------------------- */
 
-static int SHMID = 0;
-static Lock shms_lock;
-static List *shms;
+static int _memory_object_id = 0;
+static List *_memory_objects;
+static Lock _memory_objects_lock;
 
 void task_shared_memory_setup(void)
 {
-    shms = list_create();
-    lock_init(shms_lock);
+    lock_init(_memory_objects_lock);
+    _memory_objects = list_create();
 }
 
-/* --- Shared phycical region ----------------------------------------------- */
+/* --- Memory object -------------------------------------------------------- */
 
-void shm_physical_region_delete(shm_physical_region_t *task);
-shm_physical_region_t *shm_physical_region(int pagecount)
+MemoryObject *memory_object_create(size_t size)
 {
-    shm_physical_region_t *task = OBJECT(shm_physical_region);
+    MemoryObject *memory_object = __create(MemoryObject);
 
-    task->ID = SHMID++;
-    task->paddr = physical_alloc(pagecount);
-    task->pagecount = pagecount;
+    memory_object->id = _memory_object_id++;
+    memory_object->refcount = 1;
+    memory_object->address = physical_alloc(PAGE_ALIGN_UP(size) / PAGE_SIZE);
+    memory_object->size = size;
 
-    if (task->paddr)
-    {
-        list_pushback(shms, task);
+    lock_acquire(_memory_objects_lock);
+    list_pushback(_memory_objects, memory_object);
+    lock_release(_memory_objects_lock);
 
-        return task;
-    }
-    else
-    {
-        object_release(task);
-
-        return NULL;
-    }
+    return memory_object;
 }
 
-void shm_physical_region_delete(shm_physical_region_t *task)
+void memory_object_destroy(MemoryObject *memory_object)
 {
-    list_remove(shms, task);
-    physical_free(task->paddr, task->pagecount);
+    list_remove(_memory_objects, memory_object);
+
+    physical_free(memory_object->address, PAGE_ALIGN_UP(memory_object->size) / PAGE_SIZE);
+    free(memory_object);
 }
 
-shm_physical_region_t *task_physical_region_get_by_id(int id)
+MemoryObject *memory_object_ref(MemoryObject *memory_object)
 {
-    if (id >= SHMID)
-        return NULL;
+    memory_object->refcount++;
 
-    list_foreach(shm_physical_region_t, shm, shms)
+    return memory_object;
+}
+
+void memory_object_deref(MemoryObject *memory_object)
+{
+    lock_acquire(_memory_objects_lock);
+
+    memory_object->refcount--;
+
+    if (memory_object->refcount == 0)
     {
-        if (shm->ID == id)
-            return shm;
+        memory_object_destroy(memory_object);
     }
 
+    lock_release(_memory_objects_lock);
+}
+
+MemoryObject *memory_object_by_id(int id)
+{
+    lock_acquire(_memory_objects_lock);
+
+    list_foreach(MemoryObject, memory_object, _memory_objects)
+    {
+        if (memory_object->id == id)
+        {
+            lock_release(_memory_objects_lock);
+
+            return memory_object_ref(memory_object);
+        }
+    }
+
+    lock_release(_memory_objects_lock);
     return NULL;
 }
 
-/* --- Shared virtual region ------------------------------------------------ */
-void shm_virtual_region_delete(shm_virtual_region_t *task);
-shm_virtual_region_t *shm_virtual_region(Task *task, shm_physical_region_t *physr)
+/* --- Memory Mapping ------------------------------------------------------- */
+
+MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object)
 {
-    uint vaddr = virtual_alloc(task->pdir, physr->paddr, physr->pagecount, 1);
+    MemoryMapping *memory_mapping = __create(MemoryMapping);
 
-    if (vaddr == 0)
-    {
-        return NULL;
-    }
+    memory_mapping->object = memory_object_ref(memory_object);
 
-    shm_virtual_region_t *virtr = OBJECT(shm_virtual_region);
-    virtr->region = object_retain(physr);
-    virtr->vaddr = vaddr;
+    memory_mapping->address = virtual_alloc(task->pdir, memory_object->address, PAGE_ALIGN_UP(memory_object->size) / PAGE_SIZE, 1);
+    memory_mapping->size = memory_object->size;
 
-    return virtr;
+    list_pushback(task->memory_mapping, memory_mapping);
+
+    return memory_mapping;
 }
 
-void shm_virtual_region_delete(shm_virtual_region_t *task)
+void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
-    object_release(task->region);
-
-    if (object_refcount(task->region) == 1)
-    {
-        // We were the last task to have a ref to this shm
-        // The last ref is the shm list, so we can release that too
-
-        object_release(task->region);
-    }
+    virtual_free(task->pdir, memory_mapping->address, PAGE_ALIGN_UP(memory_mapping->size) / PAGE_SIZE);
+    memory_object_deref(memory_mapping->object);
+    free(memory_mapping);
 }
 
-shm_virtual_region_t *task_virtual_region_get_by_id(Task *task, int id)
+MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address)
 {
-    if (id < SHMID)
-        return NULL;
-
-    list_foreach(shm_virtual_region_t, shm, task->shms)
+    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
     {
-        if (shm->region->ID == id)
-            return shm;
+        if (memory_mapping->address == address)
+        {
+            return memory_mapping;
+        }
     }
 
     return NULL;
@@ -704,80 +716,62 @@ shm_virtual_region_t *task_virtual_region_get_by_id(Task *task, int id)
 
 /* --- User facing API ------------------------------------------------------ */
 
-int task_shared_memory_alloc(Task *task, int pagecount)
+Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
-    lock_acquire(shms_lock);
+    MemoryObject *memory_object = memory_object_create(size);
 
-    shm_physical_region_t *physr = shm_physical_region(pagecount);
+    MemoryMapping *memory_mapping = task_memory_mapping_create(task, memory_object);
 
-    if (physr == NULL)
-    {
-        return -ERR_CANNOT_ALLOCATE_MEMORY;
-    }
+    memory_object_deref(memory_object);
 
-    shm_virtual_region_t *virtr = shm_virtual_region(task, physr);
+    *out_address = memory_mapping->address;
 
-    if (virtr == NULL)
-    {
-        lock_release(shms_lock);
-        return -ERR_CANNOT_ALLOCATE_MEMORY;
-    }
-
-    lock_release(shms_lock);
-    return physr->ID;
+    return SUCCESS;
 }
 
-int task_shared_memory_acquire(Task *task, int shm, uint *addr)
+Result task_shared_memory_free(Task *task, uintptr_t address)
 {
-    lock_acquire(shms_lock);
+    MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
 
-    shm_virtual_region_t *virtr = task_virtual_region_get_by_id(task, shm);
-
-    if (virtr != NULL)
+    if (memory_mapping)
     {
-        *addr = virtr->vaddr;
-        lock_release(shms_lock);
-        return -SUCCESS;
-    }
+        task_memory_mapping_destroy(task, memory_mapping);
 
-    shm_physical_region_t *physr = task_physical_region_get_by_id(shm);
-
-    if (physr == NULL)
-    {
-        lock_release(shms_lock);
-        return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
-    }
-
-    /* shm_virtual_region_t* */ virtr = shm_virtual_region(task, physr);
-
-    if (virtr == NULL)
-    {
-        lock_release(shms_lock);
-        return -ERR_CANNOT_ALLOCATE_MEMORY;
-    }
-
-    *addr = virtr->vaddr;
-    lock_release(shms_lock);
-
-    return -SUCCESS;
-}
-
-int task_shared_memory_release(Task *task, int shm)
-{
-    lock_acquire(shms_lock);
-
-    shm_virtual_region_t *virtr = task_virtual_region_get_by_id(task, shm);
-
-    if (virtr == NULL)
-    {
-        lock_release(shms_lock);
-        return -ERR_BAD_ADDRESS; // FIXME: create a better error for this
+        return SUCCESS;
     }
     else
     {
-        object_release(virtr);
-        lock_release(shms_lock);
-        return -SUCCESS;
+        return ERR_BAD_ADDRESS;
+    }
+}
+
+Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
+{
+    MemoryObject *memory_object = memory_object_by_id(handle);
+
+    MemoryMapping *memory_mapping = task_memory_mapping_create(task, memory_object);
+
+    memory_object_deref(memory_object);
+
+    *out_address = memory_mapping->address;
+    *out_size = memory_mapping->size;
+
+    return SUCCESS;
+}
+
+Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
+{
+    MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
+
+    if (memory_mapping)
+    {
+        *out_handle = memory_mapping->object->id;
+
+        return SUCCESS;
+    }
+    else
+    {
+        return ERR_BAD_ADDRESS;
     }
 }
 

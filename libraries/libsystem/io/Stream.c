@@ -177,7 +177,7 @@ int stream_read_buffered(Stream *stream, void *buffer, size_t size)
 
         // How many data can we copy from the buffer
         size_t used_space = stream->read_used - stream->read_head;
-        size_t data_added = min(used_space, data_left);
+        size_t data_added = MIN(used_space, data_left);
 
         // Copy the data from the buffer
         memcpy(data_to_read, ((char *)stream->read_buffer) + stream->read_head, data_added);
@@ -244,7 +244,7 @@ static size_t stream_write_buffered(Stream *stream, const void *buffer, size_t s
     {
         // Append the data to the buffer
         int free_space = STREAM_BUFFER_SIZE - stream->write_used;
-        int data_added = min(free_space, data_left);
+        int data_added = MIN(free_space, data_left);
 
         // Copy the data to the buffer
         memcpy(((char *)(stream->write_buffer)) + stream->write_used, data_to_write, data_added);

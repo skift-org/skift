@@ -49,7 +49,7 @@ int proc_device_read(stream_t *s, void *buffer, uint size)
     {
         TaskInfo *info = &((TaskInfo *)s->attached.p)[s->attached.current];
 
-        memcpy(buffer, info, min(size, sizeof(TaskInfo)));
+        memcpy(buffer, info, MIN(size, sizeof(TaskInfo)));
 
         s->attached.current++;
 

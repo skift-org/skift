@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libgraphic/shape.h>
+#include <libgraphic/Shape.h>
 #include <libsystem/list.h>
 
 struct Widget;

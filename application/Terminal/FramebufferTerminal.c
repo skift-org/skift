@@ -51,7 +51,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
         foreground_color = tmp;
     }
 
-    painter_clear_rect(painter, bound, background_color);
+    painter_clear_rectangle(painter, bound, background_color);
 
     if (attributes.underline)
     {
@@ -90,7 +90,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
     }
     else
     {
-        painter_draw_rect(painter, bound, foreground_color);
+        painter_draw_rectangle(painter, bound, foreground_color);
     }
 }
 
@@ -164,7 +164,7 @@ void framebuffer_terminal_destroy(FramebufferTerminalRenderer *renderer)
 
 Terminal *framebuffer_terminal_create(void)
 {
-    framebuffer_t *framebuffer = framebuffer_open();
+    Framebuffer *framebuffer = framebuffer_open();
 
     if (!framebuffer)
     {

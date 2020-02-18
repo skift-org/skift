@@ -37,11 +37,11 @@ typedef union __packed {
     };
 } Rectangle;
 
-#define RECTANGLE_EMPTY() ((Rectangle){})
+#define RECTANGLE_EMPTY ((Rectangle){})
 #define RECTANGLE_SIZE(__width, __height) ((Rectangle){{0, 0, (__width), (__height)}})
 #define RECTANGLE(__x, __y, __width, __height) ((Rectangle){{(__x), (__y), (__width), (__height)}})
 
-#define point_zero ((Point){0, 0})
+#define POINT_ZERO ((Point){0, 0})
 
 static inline Point point_add(Point a, Point b)
 {
@@ -75,8 +75,8 @@ static inline Point point_y(Point p)
 
 static inline Point point_clamp(Point p, Point pmin, Point pmax)
 {
-    p.X = max(pmin.X, min(pmax.X, p.X));
-    p.Y = max(pmin.Y, min(pmax.Y, p.Y));
+    p.X = MAX(pmin.X, MIN(pmax.X, p.X));
+    p.Y = MAX(pmin.Y, MIN(pmax.Y, p.Y));
 
     return p;
 }
@@ -88,16 +88,16 @@ static inline Point point_clamp_to_rect(Point p, Rectangle rect)
 
 static inline Rectangle rectangle_min_size(Rectangle rectangle, Point size)
 {
-    rectangle.width = min(size.X, rectangle.width);
-    rectangle.width = min(size.Y, rectangle.height);
+    rectangle.width = MIN(size.X, rectangle.width);
+    rectangle.width = MIN(size.Y, rectangle.height);
 
     return rectangle;
 }
 
 static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
 {
-    rectangle.width = max(size.X, rectangle.width);
-    rectangle.width = max(size.Y, rectangle.height);
+    rectangle.width = MAX(size.X, rectangle.width);
+    rectangle.width = MAX(size.Y, rectangle.height);
 
     return rectangle;
 }
@@ -113,23 +113,23 @@ static inline bool rectangle_colide(Rectangle a, Rectangle b)
 static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
 {
     Point topleft;
-    topleft.X = min(a.X, b.X);
-    topleft.Y = min(a.Y, b.Y);
+    topleft.X = MIN(a.X, b.X);
+    topleft.Y = MIN(a.Y, b.Y);
 
     Point bottomright;
-    bottomright.X = max(a.X + a.width, b.X + b.width);
-    bottomright.Y = max(a.Y + a.height, b.Y + b.height);
+    bottomright.X = MAX(a.X + a.width, b.X + b.width);
+    bottomright.Y = MAX(a.Y + a.height, b.Y + b.height);
 
     return (Rectangle){.position = topleft, .size = point_sub(bottomright, topleft)};
 }
 
 static inline Rectangle rectangle_clip(Rectangle rectangle, Rectangle child_rectangle)
 {
-    int x = max(rectangle.X + child_rectangle.X, rectangle.X);
-    int y = max(rectangle.Y + child_rectangle.Y, rectangle.Y);
+    int x = MAX(rectangle.X + child_rectangle.X, rectangle.X);
+    int y = MAX(rectangle.Y + child_rectangle.Y, rectangle.Y);
 
-    int width = min(rectangle.X + child_rectangle.X + child_rectangle.width, rectangle.X + rectangle.width) - x;
-    int height = min(rectangle.Y + child_rectangle.Y + child_rectangle.height, rectangle.Y + rectangle.height) - y;
+    int width = MIN(rectangle.X + child_rectangle.X + child_rectangle.width, rectangle.X + rectangle.width) - x;
+    int height = MIN(rectangle.Y + child_rectangle.Y + child_rectangle.height, rectangle.Y + rectangle.height) - y;
 
     return (Rectangle){{x, y, width, height}};
 }

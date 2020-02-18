@@ -396,7 +396,7 @@ size_t strxfrm(char *dest, const char *src, size_t n)
     size_t len;
 
     len = strlen(src);
-    (void)memcpy((void *)dest, (void *)src, min(n, len + 1));
+    (void)memcpy((void *)dest, (void *)src, MIN(n, len + 1));
 
     return len;
 }

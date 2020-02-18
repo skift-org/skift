@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libgraphic/framebuffer.h>
+#include <libgraphic/Framebuffer.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    framebuffer_t *framebuffer = framebuffer_open();
+    Framebuffer *framebuffer = framebuffer_open();
 
     if (framebuffer == NULL)
     {

@@ -5,7 +5,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
-#include <libgraphic/framebuffer.h>
+#include <libgraphic/Framebuffer.h>
 
 typedef struct
 {
@@ -18,10 +18,10 @@ Rectangle line_bound(line_t line)
 {
     Rectangle bound;
 
-    bound.X = min(line.start.X, line.finish.X);
-    bound.Y = min(line.start.Y, line.finish.Y);
-    bound.width = max(line.start.X, line.finish.X) - bound.X;
-    bound.height = max(line.start.Y, line.finish.Y) - bound.Y;
+    bound.X = MIN(line.start.X, line.finish.X);
+    bound.Y = MIN(line.start.Y, line.finish.Y);
+    bound.width = MAX(line.start.X, line.finish.X) - bound.X;
+    bound.height = MAX(line.start.Y, line.finish.Y) - bound.Y;
 
     return bound;
 }
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    framebuffer_t *fb = framebuffer_open();
+    Framebuffer *fb = framebuffer_open();
     Rectangle fb_bound = framebuffer_bound(fb);
 
     if (fb == NULL)

@@ -953,7 +953,7 @@
 
         bytes[i] = bytes[i + 1] = bytes[i + 2] = firstD !== firstD ? 0 : firstD > secondD
           ? Math.max(0, Math.round(255 * (0.5 - 0.5 * (firstD - 0.5) / (falloff + 0.5))))
-          : Math.min(255, Math.round(255 * (0.5 + 0.5 * (secondD - 0.5) / (falloff + 0.5))));
+          : Math.MIN(255, Math.round(255 * (0.5 + 0.5 * (secondD - 0.5) / (falloff + 0.5))));
         bytes[i + 3] = 255;
       }
     }

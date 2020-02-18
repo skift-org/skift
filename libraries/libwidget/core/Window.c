@@ -21,8 +21,8 @@ Widget *window_create(Rectangle bound)
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
     window->painter = painter_create(window->framebuffer);
 
-    painter_fill_rect(window->painter, bound, COLOR_BLACK);
-    painter_draw_rect(window->painter, bound, COLOR_CORNFLOWERBLUE);
+    painter_fill_rectangle(window->painter, bound, COLOR_BLACK);
+    painter_draw_rectangle(window->painter, bound, COLOR_CORNFLOWERBLUE);
 
     widget_initialize(WIDGET(window), "Window", NULL, bound);
     application_add_window(window);

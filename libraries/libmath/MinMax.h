@@ -1,8 +1,7 @@
 #pragma once
 
+#define clamp(__v, __lower, __upper) (MAX(MIN((__v), (__upper)), (__lower)))
 
-#define clamp(__v, __lower, __upper) (max(min((__v), (__upper)), (__lower)))
+#define MIN(__x, __y) ((__x) < (__y) ? (__x) : (__y))
 
-#define min(__x, __y) ((__x) < (__y) ? (__x) : (__y))
-
-#define max(__x, __y) ((__x) > (__y) ? (__x) : (__y))
+#define MAX(__x, __y) ((__x) > (__y) ? (__x) : (__y))

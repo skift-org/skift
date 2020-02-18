@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libgraphic/framebuffer.h>
+#include <libgraphic/Framebuffer.h>
 #include <libterminal/Terminal.h>
 
 typedef struct
@@ -9,7 +9,7 @@ typedef struct
 
     Font *mono_font;
     Point framebuffer_cursor;
-    framebuffer_t *framebuffer;
+    Framebuffer *framebuffer;
     bool cursor_blink;
 } FramebufferTerminalRenderer;
 

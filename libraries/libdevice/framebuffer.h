@@ -5,7 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/runtime.h>
-#include <libgraphic/shape.h>
+#include <libgraphic/Shape.h>
 
 #define FRAMEBUFFER_DEVICE "/dev/fb"
 

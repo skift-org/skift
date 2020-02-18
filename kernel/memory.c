@@ -250,7 +250,7 @@ bool is_memory_initialized = false;
 extern int __end;
 uint get_kernel_end(multiboot_info_t *minfo)
 {
-    return max((uint)&__end, modules_get_end(minfo));
+    return MAX((uint)&__end, modules_get_end(minfo));
 }
 
 void memory_load_mmap(multiboot_info_t *mbootinfo)

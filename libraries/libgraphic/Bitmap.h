@@ -4,8 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libgraphic/color.h>
-#include <libgraphic/shape.h>
+#include <libgraphic/Color.h>
+#include <libgraphic/Shape.h>
 #include <libmath/math.h>
 #include <libsystem/Result.h>
 
@@ -26,18 +26,18 @@ typedef struct
 
 Bitmap *bitmap_create(size_t width, size_t height);
 
-void bitmap_destroy(Bitmap *this);
+void bitmap_destroy(Bitmap *bitmap);
+
+Rectangle bitmap_bound(Bitmap *bitmap);
 
 Bitmap *bitmap_load_from(const char *path);
 
-Result bitmap_save_to(Bitmap* bitmap, const char *path);
+Result bitmap_save_to(Bitmap *bitmap, const char *path);
 
-void bitmap_set_pixel(Bitmap* bitmap, Point p, Color color);
+void bitmap_set_pixel(Bitmap *bitmap, Point position, Color color);
 
-Color bitmap_get_pixel(Bitmap* bitmap, Point p);
+Color bitmap_get_pixel(Bitmap *bitmap, Point position);
 
-Color bitmap_sample(Bitmap* bitmap, Rectangle src_rect, float x, float y);
+Color bitmap_sample(Bitmap *bitmap, Rectangle source, float x, float y);
 
-void bitmap_blend_pixel(Bitmap* bitmap, Point p, Color color);
-
-Rectangle bitmap_bound(Bitmap* bitmap);
+void bitmap_blend_pixel(Bitmap *bitmap, Point position, Color color);

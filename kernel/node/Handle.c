@@ -231,7 +231,7 @@ Result fshandle_seek(FsHandle *handle, int offset, Whence whence)
     switch (whence)
     {
     case WHENCE_START:
-        handle->offset = max(0, offset);
+        handle->offset = MAX(0, offset);
         break;
 
     case WHENCE_HERE:

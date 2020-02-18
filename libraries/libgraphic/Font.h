@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libgraphic/bitmap.h>
+#include <libgraphic/Bitmap.h>
 #include <libsystem/unicode/Codepoint.h>
 
 typedef struct

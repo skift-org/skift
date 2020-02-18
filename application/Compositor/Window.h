@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libgraphic/bitmap.h>
-#include <libgraphic/shape.h>
+#include <libgraphic/Bitmap.h>
+#include <libgraphic/Shape.h>
 
 struct Client;
 

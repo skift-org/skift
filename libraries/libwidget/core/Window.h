@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libgraphic/bitmap.h>
-#include <libgraphic/painter.h>
+#include <libgraphic/Bitmap.h>
+#include <libgraphic/Painter.h>
 #include <libsystem/runtime.h>
 #include <libwidget/core/Widget.h>
 

@@ -2,20 +2,20 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
-#include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 
-#include <libgraphic/framebuffer.h>
+#include <libgraphic/Framebuffer.h>
 
 int main(int argc, char **argv)
 {
     __unused(argc);
     __unused(argv);
 
-    framebuffer_t *fb = framebuffer_open();
+    Framebuffer *fb = framebuffer_open();
 
     if (fb == NULL)
     {
@@ -42,10 +42,10 @@ int main(int argc, char **argv)
 
         painter_blit_bitmap(fb->painter, test, bitmap_bound(test), ((Rectangle){{400 - (frame % 800) / 2, 300 - (frame % 600) / 2, frame % 800, frame % 600}}));
 
-        painter_draw_rect(fb->painter, (Rectangle){{75, 75, 100, 100}}, (Color){{255, 255, 255, 255}});
-        painter_fill_rect(fb->painter, (Rectangle){{100, 100, 100, 100}}, (Color){{255, 0, 0, 125}});
-        painter_fill_rect(fb->painter, (Rectangle){{125, 125, 100, 100}}, (Color){{0, 255, 0, 125}});
-        painter_fill_rect(fb->painter, (Rectangle){{150, 150, 100, 100}}, (Color){{0, 0, 255, 125}});
+        painter_draw_rectangle(fb->painter, (Rectangle){{75, 75, 100, 100}}, (Color){{255, 255, 255, 255}});
+        painter_fill_rectangle(fb->painter, (Rectangle){{100, 100, 100, 100}}, (Color){{255, 0, 0, 125}});
+        painter_fill_rectangle(fb->painter, (Rectangle){{125, 125, 100, 100}}, (Color){{0, 255, 0, 125}});
+        painter_fill_rectangle(fb->painter, (Rectangle){{150, 150, 100, 100}}, (Color){{0, 0, 255, 125}});
 
         char message[128];
         snprintf(message, 128, "%d frames", frame++);

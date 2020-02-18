@@ -1,4 +1,4 @@
-#include <libgraphic/bitmap.h>
+#include <libgraphic/Bitmap.h>
 
 #include "Compositor/Cursor.h"
 #include "Compositor/Renderer.h"

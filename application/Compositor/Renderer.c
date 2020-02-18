@@ -1,11 +1,11 @@
-#include <libgraphic/framebuffer.h>
+#include <libgraphic/Framebuffer.h>
 
 #include "Compositor/Cursor.h"
 #include "Compositor/Manager.h"
 #include "Compositor/Renderer.h"
 #include "Compositor/Window.h"
 
-static framebuffer_t *_framebuffer;
+static Framebuffer *_framebuffer;
 static Painter *_painter;
 static Bitmap *_wallpaper;
 static Rectangle _dirty;
@@ -41,7 +41,7 @@ void renderer_region(Rectangle region)
         {
             Rectangle cliped = rectangle_clip(window_bound(window), region);
 
-            cliped = rectangle_offset(cliped, point_sub(point_zero, window->bound.position));
+            cliped = rectangle_offset(cliped, point_sub(POINT_ZERO, window->bound.position));
 
             painter_blit_bitmap(_painter, window->framebuffer, cliped, cliped);
         }
@@ -68,7 +68,7 @@ void renderer_repaint_dirty(void)
             cursor_render(_painter);
         }
 
-        _dirty = RECTANGLE_EMPTY();
+        _dirty = RECTANGLE_EMPTY;
 
         framebuffer_blit_dirty(_framebuffer);
     }

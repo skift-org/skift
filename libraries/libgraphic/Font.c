@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libgraphic/font.h>
+#include <libgraphic/Font.h>
 #include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>

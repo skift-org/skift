@@ -64,7 +64,7 @@ Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buf
     __unused(node);
     __unused(handle);
 
-    size_t tocopy = min(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
+    size_t tocopy = MIN(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
 
     memcpy((void *)VGA_FRAME_BUFFER, buffer, tocopy);
 

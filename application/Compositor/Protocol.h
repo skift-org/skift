@@ -2,7 +2,7 @@
 
 #include <abi/Message.h>
 
-#include <libgraphic/shape.h>
+#include <libgraphic/Shape.h>
 
 typedef enum
 {

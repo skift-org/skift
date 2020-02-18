@@ -2,7 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libgraphic/color.h>
+#include <libgraphic/Color.h>
 #include <libmath/Lerp.h>
 
 Color RGB(float R, float G, float B)

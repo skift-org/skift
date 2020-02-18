@@ -9,12 +9,12 @@
 
 void painter_delete(Painter *);
 
-Painter *painter_create(Bitmap *bmp)
+Painter *painter_create(Bitmap *bitmap)
 {
     Painter *paint = __create(Painter);
 
-    paint->bitmap = bmp;
-    paint->cliprect = bitmap_bound(bmp);
+    paint->bitmap = bitmap;
+    paint->cliprect = bitmap_bound(bitmap);
     paint->cliprect_stack_top = 0;
 
     return paint;

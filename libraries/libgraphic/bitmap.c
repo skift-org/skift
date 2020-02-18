@@ -30,26 +30,26 @@ Bitmap *bitmap_create(size_t width, size_t height)
     return bitmap;
 }
 
-void bitmap_destroy(Bitmap *this)
+void bitmap_destroy(Bitmap *bitmap)
 {
-    shared_memory_free((uintptr_t)this);
+    shared_memory_free((uintptr_t)bitmap);
 }
 
-void bitmap_set_pixel(Bitmap *bmp, Point p, Color color)
+void bitmap_set_pixel(Bitmap *bitmap, Point p, Color color)
 {
-    if ((p.X >= 0 && p.X < bmp->width) && (p.Y >= 0 && p.Y < bmp->height))
-        bmp->pixels[(int)(p.X + p.Y * bmp->width)] = color;
+    if ((p.X >= 0 && p.X < bitmap->width) && (p.Y >= 0 && p.Y < bitmap->height))
+        bitmap->pixels[(int)(p.X + p.Y * bitmap->width)] = color;
 }
 
-Color bitmap_get_pixel(Bitmap *bmp, Point p)
+Color bitmap_get_pixel(Bitmap *bitmap, Point p)
 {
-    int xi = abs((int)p.X % bmp->width);
-    int yi = abs((int)p.Y % bmp->height);
+    int xi = abs((int)p.X % bitmap->width);
+    int yi = abs((int)p.Y % bitmap->height);
 
-    return bmp->pixels[xi + yi * bmp->width];
+    return bitmap->pixels[xi + yi * bitmap->width];
 }
 
-Color bitmap_sample(Bitmap *bmp, Rectangle src_rect, float x, float y)
+Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, float x, float y)
 {
     Color result;
 
@@ -59,16 +59,16 @@ Color bitmap_sample(Bitmap *bmp, Rectangle src_rect, float x, float y)
     int xxi = (int)xx;
     int yyi = (int)yy;
 
-    if (bmp->filtering == BITMAP_FILTERING_NEAREST)
+    if (bitmap->filtering == BITMAP_FILTERING_NEAREST)
     {
-        result = bitmap_get_pixel(bmp, (Point){src_rect.X + xxi, src_rect.Y + yyi});
+        result = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi});
     }
     else
     {
-        Color c00 = bitmap_get_pixel(bmp, (Point){src_rect.X + xxi, src_rect.Y + yyi});
-        Color c10 = bitmap_get_pixel(bmp, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi});
-        Color c01 = bitmap_get_pixel(bmp, (Point){src_rect.X + xxi, src_rect.Y + yyi + 1});
-        Color c11 = bitmap_get_pixel(bmp, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi + 1});
+        Color c00 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi});
+        Color c10 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi});
+        Color c01 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi + 1});
+        Color c11 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi + 1});
 
         result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
     }
@@ -76,15 +76,15 @@ Color bitmap_sample(Bitmap *bmp, Rectangle src_rect, float x, float y)
     return result;
 }
 
-Rectangle bitmap_bound(Bitmap *bmp)
+Rectangle bitmap_bound(Bitmap *bitmap)
 {
-    return (Rectangle){{0, 0, bmp->width, bmp->height}};
+    return (Rectangle){{0, 0, bitmap->width, bitmap->height}};
 }
 
-void bitmap_blend_pixel(Bitmap *bmp, Point p, Color color)
+void bitmap_blend_pixel(Bitmap *bitmap, Point p, Color color)
 {
-    Color bg = bitmap_get_pixel(bmp, p);
-    bitmap_set_pixel(bmp, p, color_blend(color, bg));
+    Color bg = bitmap_get_pixel(bitmap, p);
+    bitmap_set_pixel(bitmap, p, color_blend(color, bg));
 }
 
 static Color placeholder_buffer[] = {
@@ -149,7 +149,7 @@ cleanup_and_return:
     return bitmap;
 }
 
-Result bitmap_save_to(Bitmap *bmp, const char *path)
+Result bitmap_save_to(Bitmap *bitmap, const char *path)
 {
     Result result = SUCCESS;
     Stream *file = stream_open(path, OPEN_WRITE);
@@ -163,7 +163,7 @@ Result bitmap_save_to(Bitmap *bmp, const char *path)
     void *outbuffer = NULL;
     size_t outbuffer_size = 0;
 
-    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (void *)bmp->pixels, bmp->width, bmp->height, LCT_RGBA, 8);
+    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (void *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
 
     if (err != 0)
     {

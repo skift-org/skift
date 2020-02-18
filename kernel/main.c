@@ -155,7 +155,7 @@ void kmain(multiboot_info_t *info, uint magic)
 
     if (init_process < 0)
     {
-        PANIC("Failled to start init : %s", result_to_string(-init_process));
+        PANIC("Failled to start init : %s", result_to_string((Result)-init_process));
     }
 
     int init_exitvalue = 0;

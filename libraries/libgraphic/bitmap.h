@@ -30,14 +30,14 @@ void bitmap_destroy(Bitmap *this);
 
 Bitmap *bitmap_load_from(const char *path);
 
-Result bitmap_save_to(Bitmap *bmp, const char *path);
+Result bitmap_save_to(Bitmap* bitmap, const char *path);
 
-void bitmap_set_pixel(Bitmap *bmp, Point p, Color color);
+void bitmap_set_pixel(Bitmap* bitmap, Point p, Color color);
 
-Color bitmap_get_pixel(Bitmap *bmp, Point p);
+Color bitmap_get_pixel(Bitmap* bitmap, Point p);
 
-Color bitmap_sample(Bitmap *bmp, Rectangle src_rect, float x, float y);
+Color bitmap_sample(Bitmap* bitmap, Rectangle src_rect, float x, float y);
 
-void bitmap_blend_pixel(Bitmap *bmp, Point p, Color color);
+void bitmap_blend_pixel(Bitmap* bitmap, Point p, Color color);
 
-Rectangle bitmap_bound(Bitmap *bmp);
+Rectangle bitmap_bound(Bitmap* bitmap);

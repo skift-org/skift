@@ -24,13 +24,13 @@ void serial_putc(char c)
     out8(PORT_COM1, c);
 }
 
-int serial_write(const char *buffer, uint size)
+int serial_write(const void *buffer, uint size)
 {
     atomic_begin();
 
     for (uint i = 0; i < size; i++)
     {
-        serial_putc(buffer[i]);
+        serial_putc(((const char *)buffer)[i]);
     }
 
     atomic_end();

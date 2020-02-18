@@ -100,9 +100,9 @@ typedef struct FsNode
 
 void fsnode_init(FsNode *node, FsNodeType type);
 
-FsNode *fsnode_ref(FsNode *this);
+FsNode *fsnode_ref(FsNode *node);
 
-void fsnode_deref(FsNode *this);
+void fsnode_deref(FsNode *node);
 
 bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 

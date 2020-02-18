@@ -6,8 +6,7 @@
 
 #include <libsystem/runtime.h>
 
-char serial_getc();
+char serial_getc(void);
 void serial_putc(char c);
 
-int serial_read(char *buffer, uint size);
-int serial_write(const char *buffer, uint size);
+int serial_write(const void *buffer, uint size);

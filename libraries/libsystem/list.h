@@ -8,7 +8,7 @@
 
 #define list_foreach(__type, __item, __list)                         \
     for (ListItem *__i = __list->head; __i != NULL; __i = __i->next) \
-        for (__type *__item = __i->value, *__loop_once = (__type *)1; __loop_once; __loop_once = 0)
+        for (__type *__item = (__type *)__i->value, *__loop_once = (__type *)1; __loop_once; __loop_once = 0)
 
 typedef struct ListItem
 {

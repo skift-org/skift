@@ -115,7 +115,7 @@ typedef enum
     TASk_SLEEP_RESULT_TIMEOUT,
 } task_sleep_result_t;
 
-task_sleep_result_t task_sleep(Task *this, int timeout);
+task_sleep_result_t task_sleep(Task *task, int timeout);
 
 int task_wakeup(Task *task);
 
@@ -135,21 +135,21 @@ void task_panic_dump(void);
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
 
-int task_memory_map(Task *this, uint addr, uint count);
+int task_memory_map(Task *task, uint addr, uint count);
 
-int task_memory_unmap(Task *this, uint addr, uint count);
+int task_memory_unmap(Task *task, uint addr, uint count);
 
-uint task_memory_alloc(Task *this, uint count);
+uint task_memory_alloc(Task *task, uint count);
 
-void task_memory_free(Task *this, uint addr, uint count);
+void task_memory_free(Task *task, uint addr, uint count);
 
 /* --- Task current working directory --------------------------------------- */
 
-Path *task_cwd_resolve(Task *this, const char *buffer);
+Path *task_cwd_resolve(Task *task, const char *buffer);
 
-Result task_set_cwd(Task *this, const char *buffer);
+Result task_set_cwd(Task *task, const char *buffer);
 
-void task_get_cwd(Task *this, char *buffer, uint size);
+void task_get_cwd(Task *task, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 
@@ -212,19 +212,19 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 /*   MESSAGING                                                                */
 /* -------------------------------------------------------------------------- */
 
-int task_messaging_send(Task *this, message_t *event);
+int task_messaging_send(Task *task, message_t *event);
 
-int task_messaging_broadcast(Task *this, const char *channel, message_t *event);
+int task_messaging_broadcast(Task *task, const char *channel, message_t *event);
 
-int task_messaging_request(Task *this, message_t *request, message_t *respond, int timeout);
+int task_messaging_request(Task *task, message_t *request, message_t *respond, int timeout);
 
-int task_messaging_receive(Task *this, message_t *message, bool wait);
+int task_messaging_receive(Task *task, message_t *message, bool wait);
 
-int task_messaging_respond(Task *this, message_t *request, message_t *respond);
+int task_messaging_respond(Task *task, message_t *request, message_t *respond);
 
-int task_messaging_subscribe(Task *this, const char *channel);
+int task_messaging_subscribe(Task *task, const char *channel);
 
-int task_messaging_unsubscribe(Task *this, const char *channel);
+int task_messaging_unsubscribe(Task *task, const char *channel);
 
 /* -------------------------------------------------------------------------- */
 /*   GARBAGE COLECTOR                                                         */

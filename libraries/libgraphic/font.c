@@ -57,20 +57,12 @@ Bitmap *font_load_bitmap_create(const char *name)
 {
     char bitmap_path[PATH_LENGHT];
     snprintf(bitmap_path, PATH_LENGHT, "/res/font/%s.png", name);
+
     logger_trace("Loading fonts bitmap of %s from %s", name, bitmap_path);
 
-    Bitmap *bmp = bitmap_load_from(bitmap_path);
+    Bitmap *bitmap = bitmap_load_from(bitmap_path);
 
-    if (bmp == NULL)
-    {
-        logger_error("Failled to load font bitmap from %s: %s", bitmap_path, result_to_string(error_get()));
-    }
-    else
-    {
-        bmp->filtering = BITMAP_FILTERING_LINEAR;
-    }
-
-    return bmp;
+    return bitmap;
 }
 
 Font *font_create(const char *name)
@@ -85,9 +77,9 @@ Font *font_create(const char *name)
         return NULL;
     }
 
-    Bitmap *bmp = font_load_bitmap_create(name);
+    Bitmap *bitmap = font_load_bitmap_create(name);
 
-    if (bmp == NULL)
+    if (bitmap == NULL)
     {
         logger_error("Failled to load font %s: missing bitmap", name);
 
@@ -95,13 +87,13 @@ Font *font_create(const char *name)
         return NULL;
     }
 
-    Font *this = __create(Font);
+    Font *font = __create(Font);
 
-    this->bitmap = bmp;
-    this->glyph = glyph;
-    this->default_glyph = *font_glyph(this, '?');
+    font->bitmap = bitmap;
+    font->glyph = glyph;
+    font->default_glyph = *font_glyph(font, '?');
 
-    return this;
+    return font;
 }
 
 void font_destroy(Font *this)

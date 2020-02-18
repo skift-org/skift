@@ -54,9 +54,9 @@ Result stream_create_term(Stream **master, Stream **slave);
 
 void stream_close(Stream *stream);
 
-void stream_set_read_buffer_mode(Stream *this, StreamBufferMode mode);
+void stream_set_read_buffer_mode(Stream* stream, StreamBufferMode mode);
 
-void stream_set_write_buffer_mode(Stream *this, StreamBufferMode mode);
+void stream_set_write_buffer_mode(Stream* stream, StreamBufferMode mode);
 
 size_t stream_read(Stream *stream, void *buffer, size_t size);
 

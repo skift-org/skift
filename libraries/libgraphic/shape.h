@@ -102,10 +102,10 @@ static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
     return rectangle;
 }
 
-static inline bool rectange_colide(Rectangle a, Rectangle b)
+static inline bool rectangle_colide(Rectangle a, Rectangle b)
 {
     return a.X < b.X + b.width &&
-           a.X + a.width > b.Y &&
+           a.X + a.width > b.X &&
            a.Y < b.Y + b.height &&
            a.height + a.Y > b.Y;
 }
@@ -162,4 +162,16 @@ static inline Rectangle rectangle_expand(Rectangle rect, Spacing spacing)
     result.height = rect.height + spacing.top + spacing.bottom;
 
     return result;
+}
+
+static inline Rectangle rectangle_offset(Rectangle rect, Point offset)
+{
+    rect.position = point_add(rect.position, offset);
+
+    return rect;
+}
+
+static inline bool rectangle_is_empty(Rectangle rect)
+{
+    return rect.width == 0 && rect.height == 0;
 }

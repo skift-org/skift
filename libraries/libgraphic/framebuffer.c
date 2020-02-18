@@ -77,7 +77,7 @@ Rectangle framebuffer_bound(framebuffer_t *this)
 
 void framebuffer_mark_dirty(framebuffer_t *this, Rectangle bound)
 {
-    if (rectange_colide(bitmap_bound(this->backbuffer), bound))
+    if (rectangle_colide(bitmap_bound(this->backbuffer), bound))
     {
         bound = rectangle_clip(bitmap_bound(this->backbuffer), bound);
 

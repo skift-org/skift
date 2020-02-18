@@ -567,7 +567,7 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
 
     if (((syscall >= SYS_SHARED_MEMORY_ALLOC && syscall <= SYS_SHARED_MEMORY_GET_HANDLE) ||
          syscall >= SYS_HANDLE_OPEN) &&
-        result != SUCCESS)
+        (result != SUCCESS && result != TIMEOUT))
     {
         logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
     }

@@ -131,7 +131,12 @@ void task_destroy(Task *task)
     list_destroy(task->inbox, LIST_FREE_VALUES);
     list_destroy(task->subscription, LIST_FREE_VALUES);
 
-    list_destroy(task->memory_mapping, LIST_RELEASE_VALUES);
+    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    {
+        task_memory_mapping_destroy(task, memory_mapping);
+    }
+
+    list_destroy(task->memory_mapping, LIST_KEEP_VALUES);
 
     task_fshandle_close_all(task);
 

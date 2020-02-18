@@ -37,8 +37,6 @@ void client_request_callback(Client *client, Connection *connection)
     }
 
     free(message);
-
-    renderer_blit();
 }
 
 Client *client_create(Connection *connection)

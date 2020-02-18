@@ -1,5 +1,6 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
+#include <libsystem/eventloop/Timer.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
@@ -31,10 +32,7 @@ void mouse_callback(Notifier *notifier, Stream *mouse_stream)
 
     if (size == sizeof(MousePacket))
     {
-        //logger_info("MousePacket{offx=%d, offy=%d, scroll=%d, left=%d, right=%d, midlle=%d}", packet.offx, packet.offy, packet.scroll, packet.left, packet.right, packet.middle);
-
         cursor_handle_packet(packet);
-        renderer_blit();
     }
     else
     {
@@ -50,6 +48,13 @@ void accept_callback(Notifier *notifier, Socket *socket)
     Connection *incoming_connection = socket_accept(socket);
 
     client_create(incoming_connection);
+}
+
+void render_callback(Timer *timer)
+{
+    __unused(timer);
+
+    renderer_repaint_dirty();
 }
 
 int main(int argc, char const *argv[])
@@ -70,6 +75,9 @@ int main(int argc, char const *argv[])
     Socket *socket = socket_open("/srv/compositor.ipc", OPEN_CREATE);
     Notifier *socket_notifier = notifier_create(HANDLE(socket), SELECT_ACCEPT);
     socket_notifier->on_ready_to_accept = (NotifierHandler)accept_callback;
+
+    Timer *repaint_timer = timer_create(16, render_callback);
+    timer_start(repaint_timer);
 
     manager_initialize();
     cursor_initialize();

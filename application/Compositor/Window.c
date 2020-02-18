@@ -7,14 +7,14 @@ Window *window_create(int id, Client *client, Rectangle bound, Bitmap *framebuff
 {
     Window *window = __create(Window);
 
-    manager_register_window(window);
-
     window->id = id;
     window->client = client;
     window->bound = bound;
     window->framebuffer = framebuffer;
 
-    renderer_region(window->bound);
+    manager_register_window(window);
+
+    renderer_region_dirty(window->bound);
 
     return window;
 }

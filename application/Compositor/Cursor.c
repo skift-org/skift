@@ -13,7 +13,9 @@ void cursor_initialize(void)
 
 void cursor_handle_packet(MousePacket packet)
 {
-    renderer_region(cursor_bound());
+    //logger_info("MousePacket{offx=%d, offy=%d, scroll=%d, left=%d, right=%d, midlle=%d}", packet.offx, packet.offy, packet.scroll, packet.left, packet.right, packet.middle);
+
+    renderer_region_dirty(cursor_bound());
 
     _mouse_position = point_add(_mouse_position, (Point){packet.offx, packet.offy});
     _mouse_position = point_clamp_to_rect(_mouse_position, renderer_bound());

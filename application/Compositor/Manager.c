@@ -14,6 +14,19 @@ List *manager_get_windows(void)
     return _managed_windows;
 }
 
+Window *manager_get_window(struct Client *client, int id)
+{
+    list_foreach(Window, window, _managed_windows)
+    {
+        if (window->client == client && window->id == id)
+        {
+            return window;
+        }
+    }
+
+    return NULL;
+}
+
 void manager_register_window(Window *window)
 {
     list_pushback(_managed_windows, window);

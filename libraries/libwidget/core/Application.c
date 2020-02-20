@@ -88,5 +88,11 @@ void application_remove_window(Window *window)
 
     logger_info("Removing %s(0x%08x)", WIDGET(window)->classname, window);
 
+    CompositorDestroyWindowMessage message = {
+        .id = window->id,
+    };
+
+    connection_send(_connection, (Message *)&message, sizeof(CompositorDestroyWindowMessage));
+
     list_remove(_windows, window);
 }

@@ -7,6 +7,7 @@
 typedef enum
 {
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
+    COMPOSITOR_MESSAGE_DESTROY_WINDOW,
 } CompositorMessageType;
 
 typedef struct
@@ -23,3 +24,9 @@ typedef struct
     int framebuffer;
     Rectangle bound;
 } CompositorCreateWindowMessage;
+
+typedef struct
+{
+    CompositorMessage header;
+    int id;
+} CompositorDestroyWindowMessage;

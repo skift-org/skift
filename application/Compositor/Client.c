@@ -2,6 +2,7 @@
 #include <libsystem/memory.h>
 
 #include "Compositor/Client.h"
+#include "Compositor/Manager.h"
 #include "Compositor/Protocol.h"
 #include "Compositor/Renderer.h"
 #include "Compositor/Window.h"
@@ -29,6 +30,23 @@ void client_request_callback(Client *client, Connection *connection)
         size_t size;
         shared_memory_include(create_window->framebuffer, (uintptr_t *)&bitmap, &size);
         window_create(create_window->id, client, create_window->bound, bitmap);
+        break;
+    }
+    case COMPOSITOR_MESSAGE_DESTROY_WINDOW:
+    {
+        CompositorDestroyWindowMessage *destroy_window = (CompositorDestroyWindowMessage *)message;
+
+        Window *window = manager_get_window(client, destroy_window->id);
+
+        if (window)
+        {
+            window_destroy(window);
+        }
+        else
+        {
+            logger_warn("Invalid window id %d for client %08x", destroy_window->id, client);
+        }
+
         break;
     }
 

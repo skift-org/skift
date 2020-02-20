@@ -1,7 +1,6 @@
 #include "Compositor/Window.h"
 #include "Compositor/Client.h"
 #include "Compositor/Manager.h"
-#include "Compositor/Renderer.h"
 
 Window *window_create(int id, Client *client, Rectangle bound, Bitmap *framebuffer)
 {
@@ -13,8 +12,6 @@ Window *window_create(int id, Client *client, Rectangle bound, Bitmap *framebuff
     window->framebuffer = framebuffer;
 
     manager_register_window(window);
-
-    renderer_region_dirty(window->bound);
 
     return window;
 }

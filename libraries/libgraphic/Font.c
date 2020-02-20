@@ -62,6 +62,8 @@ Bitmap *font_load_bitmap_create(const char *name)
 
     Bitmap *bitmap = bitmap_load_from(bitmap_path);
 
+    bitmap->filtering = BITMAP_FILTERING_LINEAR;
+
     return bitmap;
 }
 

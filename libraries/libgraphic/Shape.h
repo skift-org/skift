@@ -175,3 +175,17 @@ static inline bool rectangle_is_empty(Rectangle rect)
 {
     return rect.width == 0 && rect.height == 0;
 }
+
+static inline Rectangle rectangle_set_height(Rectangle rect, size_t height)
+{
+    rect.height = height;
+
+    return rect;
+}
+
+static inline Rectangle rectangle_set_width(Rectangle rect, size_t width)
+{
+    rect.width = width;
+
+    return rect;
+}

@@ -4,6 +4,7 @@
 #include <libsystem/list.h>
 
 struct Widget;
+struct Event;
 
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 
@@ -32,3 +33,7 @@ void widget_add_child(Widget *widget, Widget *child);
 void widget_remove_child(Widget *widget, Widget *child);
 
 void widget_dump(Widget *widget);
+
+void widget_raise(Widget *widget, struct Event *event);
+
+void widget_event(Widget *widget, struct Event *event);

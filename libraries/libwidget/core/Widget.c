@@ -1,6 +1,7 @@
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
+#include <libwidget/core/Event.h>
 #include <libwidget/core/Widget.h>
 
 void widget_initialize(
@@ -48,6 +49,8 @@ void widget_add_child(Widget *widget, Widget *child)
 
     child->parent = widget;
     list_pushback(widget->childs, child);
+
+    widget_raise(widget, &(Event){widget, EVENT_CHILD_ADDED, false});
 }
 
 void widget_remove_child(Widget *widget, Widget *child)
@@ -58,6 +61,27 @@ void widget_remove_child(Widget *widget, Widget *child)
 
     child->parent = NULL;
     list_remove(widget->childs, child);
+
+    widget_raise(widget, &(Event){widget, EVENT_CHILD_REMOVED, false});
+}
+
+void widget_raise(Widget *widget, Event *event)
+{
+    if (widget->parent)
+    {
+        widget_event(widget, event);
+
+        if (!event->accepted && widget->parent)
+        {
+            widget_raise(widget->parent, event);
+        }
+    }
+}
+
+void widget_event(Widget *widget, Event *event)
+{
+    __unused(widget);
+    __unused(event);
 }
 
 void widget_dump_iternal(Widget *widget, int depth)

@@ -7,15 +7,13 @@
 #include <libmath/math.h>
 #include <libsystem/assert.h>
 
-void painter_delete(Painter *);
-
 Painter *painter_create(Bitmap *bitmap)
 {
     Painter *painter = __create(Painter);
 
     painter->bitmap = bitmap;
-    painter->cliprect = bitmap_bound(bitmap);
-    painter->cliprect_stack_top = 0;
+    painter->clipstack_top = 0;
+    painter->clipstack[0] = bitmap_bound(bitmap);
 
     return painter;
 }
@@ -25,29 +23,53 @@ void painter_destroy(Painter *painter)
     free(painter);
 }
 
-void painter_push_cliprect(Painter *painter, Rectangle cliprect)
+void painter_push_clip(Painter *painter, Rectangle clip)
 {
-    assert(painter->cliprect_stack_top < 32);
+    assert(painter->clipstack_top < CLIPSTACK_SIZE);
 
-    painter->cliprect_stack[painter->cliprect_stack_top] = painter->cliprect;
-    painter->cliprect_stack_top++;
-
-    painter->cliprect = rectangle_clip(painter->cliprect, cliprect);
+    painter->clipstack_top++;
+    painter->clipstack[painter->clipstack_top] = rectangle_clip(painter->clipstack[painter->clipstack_top - 1], clip);
 }
 
-void painter_pop_cliprect(Painter *painter)
+void painter_pop_clip(Painter *painter)
 {
-    assert(painter->cliprect_stack_top > 0);
+    assert(painter->clipstack_top > 0);
 
-    painter->cliprect_stack_top--;
-    painter->cliprect = painter->cliprect_stack[painter->cliprect_stack_top];
+    painter->clipstack_top--;
+}
+
+void painter_push_origin(Painter *painter, Point origin)
+{
+    assert(painter->originestack_top < ORIGINSTACK_SIZE);
+
+    painter->originestack_top++;
+    painter->originestack[painter->originestack_top] = point_add(painter->originestack[painter->originestack_top - 1], origin);
+}
+
+void painter_pop_origin(Painter *painter)
+{
+    assert(painter->originestack_top > 0);
+
+    painter->originestack_top--;
 }
 
 void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
-    if (rectangle_containe_point(painter->cliprect, position))
+    Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
+
+    if (rectangle_containe_point(painter->clipstack[painter->clipstack_top], transformed))
     {
-        bitmap_blend_pixel(painter->bitmap, position, color);
+        bitmap_blend_pixel(painter->bitmap, transformed, color);
+    }
+}
+
+void painter_clear_pixel(Painter *painter, Point position, Color color)
+{
+    Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
+
+    if (rectangle_containe_point(painter->clipstack[painter->clipstack_top], transformed))
+    {
+        bitmap_set_pixel(painter->bitmap, transformed, color);
     }
 }
 
@@ -110,20 +132,13 @@ void painter_clear(Painter *painter, Color color)
 
 void painter_clear_rectangle(Painter *painter, Rectangle rect, Color color)
 {
-    Rectangle clipped = rectangle_clip(painter->cliprect, rect);
-
-    if (rectangle_is_empty(clipped))
+    for (int x = 0; x < rect.width; x++)
     {
-        return;
-    }
-
-    for (int x = 0; x < clipped.width; x++)
-    {
-        for (int y = 0; y < clipped.height; y++)
+        for (int y = 0; y < rect.height; y++)
         {
-            bitmap_set_pixel(
-                painter->bitmap,
-                (Point){clipped.X + x, clipped.Y + y},
+            painter_clear_pixel(
+                painter,
+                (Point){rect.X + x, rect.Y + y},
                 color);
         }
     }
@@ -131,15 +146,13 @@ void painter_clear_rectangle(Painter *painter, Rectangle rect, Color color)
 
 void painter_fill_rectangle(Painter *painter, Rectangle rect, Color color)
 {
-    Rectangle rect_absolue = rectangle_clip(painter->cliprect, rect);
-
-    for (int xx = 0; xx < rect_absolue.width; xx++)
+    for (int x = 0; x < rect.width; x++)
     {
-        for (int yy = 0; yy < rect_absolue.height; yy++)
+        for (int y = 0; y < rect.height; y++)
         {
-            bitmap_blend_pixel(
-                painter->bitmap,
-                (Point){rect_absolue.X + xx, rect_absolue.Y + yy},
+            painter_plot_pixel(
+                painter,
+                (Point){rect.X + x, rect.Y + y},
                 color);
         }
     }

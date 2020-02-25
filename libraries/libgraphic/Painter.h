@@ -7,22 +7,31 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 
+#define CLIPSTACK_SIZE 32
+#define ORIGINSTACK_SIZE 32
+
 typedef struct Painter
 {
     Bitmap *bitmap;
 
-    Rectangle cliprect;
-    int cliprect_stack_top;
-    Rectangle cliprect_stack[32];
+    int clipstack_top;
+    Rectangle clipstack[CLIPSTACK_SIZE];
+
+    int originestack_top;
+    Point originestack[ORIGINSTACK_SIZE];
 } Painter;
 
 Painter *painter_create(Bitmap *bitmap);
 
 void painter_destroy(Painter *painter);
 
-void painter_push_cliprect(Painter *painter, Rectangle rectangle);
+void painter_push_clip(Painter *painter, Rectangle clip);
 
-void painter_pop_cliprect(Painter *painter);
+void painter_pop_clip(Painter *painter);
+
+void painter_push_origin(Painter *painter, Point origin);
+
+void painter_pop_origin(Painter *painter);
 
 void painter_plot_pixel(Painter *painter, Point position, Color color);
 

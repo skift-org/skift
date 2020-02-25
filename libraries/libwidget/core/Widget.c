@@ -78,17 +78,12 @@ void widget_raise(Widget *widget, Event *event)
 
 void widget_event(Widget *widget, Event *event)
 {
-    logger_trace("event %d %d", event->type, event->accepted);
-
     if (event->type == EVENT_CHILD_ADDED ||
         event->type == EVENT_CHILD_REMOVED)
     {
         event->accepted = true;
 
-        widget_raise(widget, (Event *)&(PaintEvent){{widget,
-                                                     EVENT_PAINT,
-                                                     false},
-                                                    widget->bound});
+        widget_raise(widget, &(Event){widget, EVENT_PAINT, false});
     }
 
     if (widget->event)
@@ -97,25 +92,21 @@ void widget_event(Widget *widget, Event *event)
     }
 }
 
-void widget_paint(Widget *widget, Painter *painter, Rectangle rect)
+void widget_paint(Widget *widget, Painter *painter)
 {
-
-    //if (!rectangle_colide(widget->bound, rect))
-    //{
-    //    return;
-    //}
-
     if (widget->paint)
     {
         widget->paint(widget, painter);
     }
 
+    painter_push_origin(painter, widget->bound.position);
+
     list_foreach(Widget, child, widget->childs)
     {
-        painter_push_cliprect(painter, child->bound);
-        widget_paint(child, painter, rect);
-        painter_pop_cliprect(painter);
+        widget_paint(child, painter);
     }
+
+    painter_pop_origin(painter);
 }
 
 void widget_dump_iternal(Widget *widget, int depth)

@@ -44,4 +44,4 @@ void widget_raise(Widget *widget, struct Event *event);
 
 void widget_event(Widget *widget, struct Event *event);
 
-void widget_paint(Widget *widget, struct Painter *painter, Rectangle rect);
+void widget_paint(Widget *widget, struct Painter *painter);

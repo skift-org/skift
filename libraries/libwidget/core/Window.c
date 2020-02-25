@@ -20,12 +20,10 @@ void window_paint(Window *window, Painter *painter)
 
 void window_event(Window *window, Event *event)
 {
-    logger_trace("Window event");
-
     switch (event->type)
     {
     case EVENT_PAINT:
-        widget_paint(WIDGET(window), window->painter, ((PaintEvent *)event)->rect);
+        widget_paint(WIDGET(window), window->painter);
         application_blit_window(window, WIDGET(window)->bound);
         break;
 
@@ -40,11 +38,11 @@ Widget *window_create(Rectangle bound)
 {
     Window *window = __create(Window);
 
-    widget_initialize(WIDGET(window), "Window", NULL, bound);
-
     WIDGET(window)->destroy = (WidgetDestroyCallback)window_destroy;
     WIDGET(window)->paint = (WidgetPaintCallback)window_paint;
     WIDGET(window)->event = (WidgetEventCallback)window_event;
+
+    widget_initialize(WIDGET(window), "Window", NULL, bound);
 
     window->id = _window_id++;
 
@@ -55,7 +53,7 @@ Widget *window_create(Rectangle bound)
 
     application_add_window(window);
 
-    widget_paint(WIDGET(window), window->painter, WIDGET(window)->bound);
+    widget_paint(WIDGET(window), window->painter);
 
     return WIDGET(window);
 }

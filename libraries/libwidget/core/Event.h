@@ -19,10 +19,3 @@ typedef struct Event
     EventType type;
     bool accepted;
 } Event;
-
-typedef struct
-{
-    Event event;
-
-    Rectangle rect;
-} PaintEvent;

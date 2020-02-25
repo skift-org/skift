@@ -11,8 +11,6 @@ void client_request_callback(Client *client, Connection *connection)
 {
     __unused(client);
 
-    logger_trace("Client request!");
-
     Message header;
     connection_receive(connection, &header);
 
@@ -49,8 +47,26 @@ void client_request_callback(Client *client, Connection *connection)
 
         break;
     }
+    case COMPOSITOR_MESSAGE_BLIT_WINDOW:
+    {
+        CompositorBlitWindowMessage *blit_window = (CompositorBlitWindowMessage *)message;
+
+        Window *window = manager_get_window(client, blit_window->id);
+
+        if (window)
+        {
+            renderer_region_dirty(rectangle_offset(blit_window->bound, window->bound.position));
+        }
+        else
+        {
+            logger_warn("Invalid window id %d for client %08x", blit_window->id, client);
+        }
+
+        break;
+    }
 
     default:
+        logger_warn("Invalide message for client %08x", client);
         break;
     }
 

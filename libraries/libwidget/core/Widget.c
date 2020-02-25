@@ -1,3 +1,4 @@
+#include <libgraphic/Painter.h>
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
@@ -67,21 +68,54 @@ void widget_remove_child(Widget *widget, Widget *child)
 
 void widget_raise(Widget *widget, Event *event)
 {
-    if (widget->parent)
-    {
-        widget_event(widget, event);
+    widget_event(widget, event);
 
-        if (!event->accepted && widget->parent)
-        {
-            widget_raise(widget->parent, event);
-        }
+    if (!event->accepted && widget->parent)
+    {
+        widget_raise(widget->parent, event);
     }
 }
 
 void widget_event(Widget *widget, Event *event)
 {
-    __unused(widget);
-    __unused(event);
+    logger_trace("event %d %d", event->type, event->accepted);
+
+    if (event->type == EVENT_CHILD_ADDED ||
+        event->type == EVENT_CHILD_REMOVED)
+    {
+        event->accepted = true;
+
+        widget_raise(widget, (Event *)&(PaintEvent){{widget,
+                                                     EVENT_PAINT,
+                                                     false},
+                                                    widget->bound});
+    }
+
+    if (widget->event)
+    {
+        widget->event(widget, event);
+    }
+}
+
+void widget_paint(Widget *widget, Painter *painter, Rectangle rect)
+{
+
+    //if (!rectangle_colide(widget->bound, rect))
+    //{
+    //    return;
+    //}
+
+    if (widget->paint)
+    {
+        widget->paint(widget, painter);
+    }
+
+    list_foreach(Widget, child, widget->childs)
+    {
+        painter_push_cliprect(painter, child->bound);
+        widget_paint(child, painter, rect);
+        painter_pop_cliprect(painter);
+    }
 }
 
 void widget_dump_iternal(Widget *widget, int depth)

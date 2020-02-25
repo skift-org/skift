@@ -17,5 +17,3 @@ typedef struct
 } Window;
 
 Widget *window_create(Rectangle bound);
-
-void window_destroy(Widget *window);

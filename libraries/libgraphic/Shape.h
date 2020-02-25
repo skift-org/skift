@@ -123,13 +123,13 @@ static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
     return (Rectangle){.position = topleft, .size = point_sub(bottomright, topleft)};
 }
 
-static inline Rectangle rectangle_clip(Rectangle rectangle, Rectangle child_rectangle)
+static inline Rectangle rectangle_clip(Rectangle left, Rectangle right)
 {
-    int x = MAX(rectangle.X + child_rectangle.X, rectangle.X);
-    int y = MAX(rectangle.Y + child_rectangle.Y, rectangle.Y);
+    int x = MAX(left.X, right.X);
+    int y = MAX(left.Y, right.Y);
 
-    int width = MIN(rectangle.X + child_rectangle.X + child_rectangle.width, rectangle.X + rectangle.width) - x;
-    int height = MIN(rectangle.Y + child_rectangle.Y + child_rectangle.height, rectangle.Y + rectangle.height) - y;
+    int width = MIN(left.X + left.width, right.X + right.width) - x;
+    int height = MIN(left.Y + left.height, right.Y + right.height) - y;
 
     return (Rectangle){{x, y, width, height}};
 }

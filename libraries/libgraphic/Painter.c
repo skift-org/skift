@@ -45,11 +45,9 @@ void painter_pop_cliprect(Painter *painter)
 
 void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
-    Point point_absolue = {painter->cliprect.X + position.X, painter->cliprect.Y + position.Y};
-
-    if (rectangle_containe_point(painter->cliprect, point_absolue))
+    if (rectangle_containe_point(painter->cliprect, position))
     {
-        bitmap_blend_pixel(painter->bitmap, point_absolue, color);
+        bitmap_blend_pixel(painter->bitmap, position, color);
     }
 }
 
@@ -112,15 +110,20 @@ void painter_clear(Painter *painter, Color color)
 
 void painter_clear_rectangle(Painter *painter, Rectangle rect, Color color)
 {
-    Rectangle rect_absolue = rectangle_clip(painter->cliprect, rect);
+    Rectangle clipped = rectangle_clip(painter->cliprect, rect);
 
-    for (int xx = 0; xx < rect_absolue.width; xx++)
+    if (rectangle_is_empty(clipped))
     {
-        for (int yy = 0; yy < rect_absolue.height; yy++)
+        return;
+    }
+
+    for (int x = 0; x < clipped.width; x++)
+    {
+        for (int y = 0; y < clipped.height; y++)
         {
             bitmap_set_pixel(
                 painter->bitmap,
-                (Point){rect_absolue.X + xx, rect_absolue.Y + yy},
+                (Point){clipped.X + x, clipped.Y + y},
                 color);
         }
     }

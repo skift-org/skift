@@ -77,6 +77,8 @@ void application_add_window(Window *window)
         .bound = WIDGET(window)->bound,
     };
 
+    message.header.type = COMPOSITOR_MESSAGE_CREATE_WINDOW;
+
     connection_send(_connection, (Message *)&message, sizeof(message));
 
     list_pushback(_windows, window);
@@ -92,7 +94,25 @@ void application_remove_window(Window *window)
         .id = window->id,
     };
 
+    message.header.type = COMPOSITOR_MESSAGE_DESTROY_WINDOW;
+
     connection_send(_connection, (Message *)&message, sizeof(CompositorDestroyWindowMessage));
 
     list_remove(_windows, window);
+}
+
+void application_blit_window(Window *window, Rectangle bound)
+{
+    assert(_initialized);
+
+    logger_info("Blitting %s(0x%08x)", WIDGET(window)->classname, window);
+
+    CompositorBlitWindowMessage message = {
+        .id = window->id,
+        .bound = bound,
+    };
+
+    message.header.type = COMPOSITOR_MESSAGE_BLIT_WINDOW;
+
+    connection_send(_connection, (Message *)&message, sizeof(CompositorBlitWindowMessage));
 }

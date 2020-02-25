@@ -7,7 +7,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 
-typedef struct
+typedef struct Painter
 {
     Bitmap *bitmap;
 

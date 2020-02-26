@@ -2,6 +2,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/cstring.h>
+
 #include "kernel/platform.h"
 
 size_t platform_page_size(void)

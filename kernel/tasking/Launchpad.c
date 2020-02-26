@@ -4,6 +4,7 @@
 
 #include <libfile/elf.h>
 #include <libsystem/assert.h>
+#include <libsystem/cstring.h>
 
 #include "kernel/tasking.h"
 

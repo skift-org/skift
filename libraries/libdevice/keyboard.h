@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <libdevice/keys.h>
-#include <libsystem/messaging.h>
 #include <libsystem/unicode/Codepoint.h>
 
 #define KEYBOARD_DEVICE "/dev/keyboard"

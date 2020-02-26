@@ -152,43 +152,6 @@ int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
     return task_shared_memory_get_handle(sheduler_running(), address, out_handle);
 }
 
-/* --- Messaging ------------------------------------------------------------ */
-
-int sys_messaging_send(message_t *event)
-{
-    return task_messaging_send(sheduler_running(), event);
-}
-
-int sys_messaging_broadcast(const char *channel, message_t *event)
-{
-    return task_messaging_broadcast(sheduler_running(), channel, event);
-}
-
-int sys_messaging_request(message_t *request, message_t *result, int timeout)
-{
-    return task_messaging_request(sheduler_running(), request, result, timeout);
-}
-
-int sys_messaging_receive(message_t *message, int wait)
-{
-    return task_messaging_receive(sheduler_running(), message, wait);
-}
-
-int sys_messaging_respond(message_t *request, message_t *result)
-{
-    return task_messaging_respond(sheduler_running(), request, result);
-}
-
-int sys_messaging_subscribe(const char *channel)
-{
-    return task_messaging_subscribe(sheduler_running(), channel);
-}
-
-int sys_messaging_unsubscribe(const char *channel)
-{
-    return task_messaging_unsubscribe(sheduler_running(), channel);
-}
-
 /* --- Filesystem ----------------------------------------------------------- */
 
 int sys_filesystem_mkdir(const char *dir_path)
@@ -487,14 +450,6 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_SHARED_MEMORY_FREE] = sys_shared_memory_free,
     [SYS_SHARED_MEMORY_INCLUDE] = sys_shared_memory_include,
     [SYS_SHARED_MEMORY_GET_HANDLE] = sys_shared_memory_get_handle,
-
-    [SYS_MESSAGING_SEND] = sys_messaging_send,
-    [SYS_MESSAGING_BROADCAST] = sys_messaging_broadcast,
-    [SYS_MESSAGING_REQUEST] = sys_messaging_request,
-    [SYS_MESSAGING_RECEIVE] = sys_messaging_receive,
-    [SYS_MESSAGING_RESPOND] = sys_messaging_respond,
-    [SYS_MESSAGING_SUBSCRIBE] = sys_messaging_subscribe,
-    [SYS_MESSAGING_UNSUBSCRIBE] = sys_messaging_unsubscribe,
 
     [SYS_FILESYSTEM_MKDIR] = sys_filesystem_mkdir,
     [SYS_FILESYSTEM_MKPIPE] = sys_filesystem_mkpipe,

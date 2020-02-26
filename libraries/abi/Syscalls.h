@@ -26,14 +26,6 @@
     __ENTRY(SYS_SHARED_MEMORY_INCLUDE)    \
     __ENTRY(SYS_SHARED_MEMORY_GET_HANDLE) \
                                           \
-    __ENTRY(SYS_MESSAGING_SEND)           \
-    __ENTRY(SYS_MESSAGING_BROADCAST)      \
-    __ENTRY(SYS_MESSAGING_REQUEST)        \
-    __ENTRY(SYS_MESSAGING_RECEIVE)        \
-    __ENTRY(SYS_MESSAGING_RESPOND)        \
-    __ENTRY(SYS_MESSAGING_SUBSCRIBE)      \
-    __ENTRY(SYS_MESSAGING_UNSUBSCRIBE)    \
-                                          \
     __ENTRY(SYS_FILESYSTEM_LINK)          \
     __ENTRY(SYS_FILESYSTEM_UNLINK)        \
     __ENTRY(SYS_FILESYSTEM_RENAME)        \

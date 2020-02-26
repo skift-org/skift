@@ -8,7 +8,6 @@
 #include <abi/Process.h>
 #include <abi/Task.h>
 
-#include <libkernel/message.h>
 #include <libsystem/Result.h>
 #include <libsystem/list.h>
 #include <libsystem/runtime.h>
@@ -33,13 +32,6 @@ typedef struct
     int exitvalue;
 } TaskWaitTaskInfo;
 
-typedef struct
-{
-    bool has_result;
-    message_t result;
-    int timeout;
-} TaskWaitRespondInfo;
-
 typedef struct Task
 {
     int id;
@@ -58,13 +50,9 @@ typedef struct Task
     {
         TaskWaitTimeInfo time;
         TaskWaitTaskInfo task;
-        TaskWaitRespondInfo respond;
     } wait;
 
     TaskBlocker *blocker;
-
-    List *inbox; // process main message queue
-    List *subscription;
 
     List *memory_mapping;
 
@@ -207,24 +195,6 @@ Result task_shared_memory_free(Task *task, uintptr_t address);
 Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size);
 
 Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
-
-/* -------------------------------------------------------------------------- */
-/*   MESSAGING                                                                */
-/* -------------------------------------------------------------------------- */
-
-int task_messaging_send(Task *task, message_t *event);
-
-int task_messaging_broadcast(Task *task, const char *channel, message_t *event);
-
-int task_messaging_request(Task *task, message_t *request, message_t *respond, int timeout);
-
-int task_messaging_receive(Task *task, message_t *message, bool wait);
-
-int task_messaging_respond(Task *task, message_t *request, message_t *respond);
-
-int task_messaging_subscribe(Task *task, const char *channel);
-
-int task_messaging_unsubscribe(Task *task, const char *channel);
 
 /* -------------------------------------------------------------------------- */
 /*   GARBAGE COLECTOR                                                         */

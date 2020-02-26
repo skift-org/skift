@@ -9,15 +9,14 @@
 #include <libdevice/keymap.h>
 #include <libdevice/keys.c>
 #include <libdevice/keys.h>
-#include <libkernel/message.h>
 #include <libsystem/Result.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
+#include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/tasking.h"
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -66,35 +65,12 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     {
         if (motion == KEY_MOTION_DOWN)
         {
-            if (keyboard_keystate[key] == KEY_MOTION_UP)
-            {
-                keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
-                message_t keypressed_event = message(KEYBOARD_KEYPRESSED, -1);
-                message_set_payload(keypressed_event, keyevent);
-
-                task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
-            }
-
             if (keyboad_get_codepoint(key) != 0)
             {
                 uint8_t utf8[5];
                 int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
                 ringbuffer_write(keyboard_buffer, (char *)utf8, lenght);
             }
-
-            keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
-            message_t keypressed_event = message(KEYBOARD_KEYTYPED, -1);
-            message_set_payload(keypressed_event, keyevent);
-
-            task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
-        }
-        else if (motion == KEY_MOTION_UP)
-        {
-            keyboard_event_t keyevent = {key, keyboad_get_codepoint(key)};
-            message_t keypressed_event = message(KEYBOARD_KEYRELEASED, -1);
-            message_set_payload(keypressed_event, keyevent);
-
-            task_messaging_broadcast(sheduler_running(), KEYBOARD_CHANNEL, &keypressed_event);
         }
 
         keyboard_keystate[key] = motion;

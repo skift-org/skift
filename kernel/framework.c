@@ -194,62 +194,6 @@ int __plug_process_wait(int pid, int *exit_value)
     return task_wait(pid, exit_value);
 }
 
-/* --- Messaging plugs ------------------------------------------------------ */
-
-int messaging_send(message_t *event)
-{
-    __unused(event);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_broadcast(const char *channel, message_t *event)
-{
-    __unused(channel);
-    __unused(event);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_request(message_t *request, message_t *result, int timeout)
-{
-    __unused(request);
-    __unused(result);
-    __unused(timeout);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_receive(message_t *message, bool wait)
-{
-    __unused(message);
-    __unused(wait);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_respond(message_t *request, message_t *result)
-{
-    __unused(request);
-    __unused(result);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_subscribe(const char *channel)
-{
-    __unused(channel);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-int messaging_unsubscribe(const char *channel)
-{
-    __unused(channel);
-
-    return -ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
 /* ---Handles plugs --------------------------------------------------------- */
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)

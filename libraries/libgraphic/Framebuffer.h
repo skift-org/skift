@@ -6,11 +6,12 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io/Handle.h>
 
 typedef struct
 {
-    Stream *device;
+    Handle handle;
+
     Bitmap *backbuffer;
     Painter *painter;
 
@@ -23,7 +24,7 @@ typedef struct
 
 Framebuffer *framebuffer_open(void);
 
-bool framebuffer_set_mode(Framebuffer *framebuffer, int resx, int resy);
+Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height);
 
 Rectangle framebuffer_bound(Framebuffer *framebuffer);
 

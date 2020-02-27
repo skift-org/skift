@@ -116,11 +116,11 @@ USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/clear \
 		  $(ROOT_DIRECTORY)/bin/dstart \
 		  $(ROOT_DIRECTORY)/bin/echo \
-		  $(ROOT_DIRECTORY)/bin/gfxctl \
+		  $(ROOT_DIRECTORY)/bin/displayctl \
 		  $(ROOT_DIRECTORY)/bin/grep \
 		  $(ROOT_DIRECTORY)/bin/init \
 		  $(ROOT_DIRECTORY)/bin/kill \
-		  $(ROOT_DIRECTORY)/bin/loadkeys \
+		  $(ROOT_DIRECTORY)/bin/keyboardctl \
 		  $(ROOT_DIRECTORY)/bin/ls \
 		  $(ROOT_DIRECTORY)/bin/lsproc \
 		  $(ROOT_DIRECTORY)/bin/mkdir \
@@ -297,7 +297,7 @@ $(ROOT_DIRECTORY)/bin/echo: userspace/echo.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/gfxctl: userspace/gfxctl.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/displayctl: userspace/displayctl.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -313,7 +313,7 @@ $(ROOT_DIRECTORY)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/loadkeys: userspace/loadkeys.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/keyboardctl: userspace/keyboardctl.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 

@@ -13,9 +13,11 @@ int main(int argc, char **argv)
 
     Framebuffer *framebuffer = framebuffer_open();
 
-    if (framebuffer == NULL)
+    if (handle_has_error(framebuffer))
     {
-        error_print("Failled to open the framebuffer.");
+        handle_printf_error(framebuffer, "failled to open /dev/framebuffer");
+        framebuffer_close(framebuffer);
+
         return -1;
     }
 

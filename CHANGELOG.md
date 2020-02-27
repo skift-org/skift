@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `cd`, `exit`, `mv` command to the shell
  - Devices files: `/dev/framebuffer`, `/dev/textmode`, `/dev/proc`
  - `lsproc` utility for listing running processes
- - `gfxctl` utility for getting, setting and listing graphics modes
+ - `displayctl` utility for getting, setting and listing graphics modes
  - Some graphic demos `lines`, `colors`, `gfxtest`
  - Mouse cursors, fonts and wallpapers in `/res`
  - Support for FPU

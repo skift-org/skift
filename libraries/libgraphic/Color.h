@@ -26,6 +26,8 @@ Color HSV(float H, float S, float V);
 
 Color HSVA(float H, float S, float V, float A);
 
+Color ALPHA(Color color, float alpha);
+
 Color color_from_name(const char *name);
 
 void color_get_name(Color color, char *name, int size);

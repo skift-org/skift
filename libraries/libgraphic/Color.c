@@ -96,6 +96,13 @@ Color HSVA(float H, float S, float V, float A)
     return rgb;
 }
 
+Color ALPHA(Color color, float alpha)
+{
+    color.A = alpha * 255.0;
+
+    return color;
+}
+
 Color color_blend(Color fg, Color bg)
 {
     Color result;

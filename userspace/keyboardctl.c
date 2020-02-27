@@ -43,7 +43,7 @@ int loadkey_list_keymap(void)
 
     if (handle_has_error(keymap_directory))
     {
-        handle_printf_error(keymap_directory, "loadkeys: Failled to query keymaps from /res/keyboard");
+        handle_printf_error(keymap_directory, "keyboardctl: Failled to query keymaps from /res/keyboard");
         directory_close(keymap_directory);
 
         return -1;
@@ -69,7 +69,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     if (handle_has_error(keymap_file))
     {
-        handle_printf_error(keyboard_device, "loadkeys: Failled to open the keymap file");
+        handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keymap file");
         stream_close(keymap_file);
 
         return -1;
@@ -82,7 +82,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     if (stat.size < sizeof(KeyMap))
     {
-        stream_printf(err_stream, "loadkeys: Invalid keymap file format!\n");
+        stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
         stream_close(keymap_file);
 
         return -1;
@@ -99,7 +99,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         new_keymap->magic[2] != 'a' ||
         new_keymap->magic[3] != 'p')
     {
-        stream_printf(err_stream, "loadkeys: Invalid keymap file format!\n");
+        stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
         stream_close(keymap_file);
         free(new_keymap);
 
@@ -122,7 +122,7 @@ int loadkey_get_keymap(Stream *keyboard_device)
 
     if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != SUCCESS)
     {
-        handle_printf_error(keyboard_device, "loadkeys: Failled to retrived the current keymap");
+        handle_printf_error(keyboard_device, "keyboardctl: Failled to retrived the current keymap");
         return -1;
     }
 
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 
     if (handle_has_error(keyboard_device))
     {
-        handle_printf_error(keyboard_device, "loadkeys: Failled to open the keyboard device");
+        handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keyboard device");
         stream_close(keyboard_device);
 
         return -1;

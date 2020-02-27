@@ -166,8 +166,10 @@ Terminal *framebuffer_terminal_create(void)
 {
     Framebuffer *framebuffer = framebuffer_open();
 
-    if (!framebuffer)
+    if (handle_has_error(framebuffer))
     {
+        framebuffer_close(framebuffer);
+
         return NULL;
     }
 

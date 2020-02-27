@@ -15,11 +15,13 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    Framebuffer *fb = framebuffer_open();
+    Framebuffer *framebuffer = framebuffer_open();
 
-    if (fb == NULL)
+    if (handle_has_error(framebuffer))
     {
-        error_print("Failled to open the framebuffer.");
+        handle_printf_error(framebuffer, "failled to open /dev/framebuffer");
+        framebuffer_close(framebuffer);
+
         return -1;
     }
 
@@ -32,25 +34,25 @@ int main(int argc, char **argv)
 
     do
     {
-        for (int x = 0; x < fb->width; x++)
+        for (int x = 0; x < framebuffer->width; x++)
         {
-            for (int y = 0; y < fb->height; y++)
+            for (int y = 0; y < framebuffer->height; y++)
             {
-                painter_plot_pixel(fb->painter, (Point){x, y}, (Color){{x ^ y, x ^ y, x ^ y, 255}});
+                painter_plot_pixel(framebuffer->painter, (Point){x, y}, (Color){{x ^ y, x ^ y, x ^ y, 255}});
             }
         }
 
-        painter_blit_bitmap(fb->painter, test, bitmap_bound(test), ((Rectangle){{400 - (frame % 800) / 2, 300 - (frame % 600) / 2, frame % 800, frame % 600}}));
+        painter_blit_bitmap(framebuffer->painter, test, bitmap_bound(test), ((Rectangle){{400 - (frame % 800) / 2, 300 - (frame % 600) / 2, frame % 800, frame % 600}}));
 
-        painter_draw_rectangle(fb->painter, (Rectangle){{75, 75, 100, 100}}, (Color){{255, 255, 255, 255}});
-        painter_fill_rectangle(fb->painter, (Rectangle){{100, 100, 100, 100}}, (Color){{255, 0, 0, 125}});
-        painter_fill_rectangle(fb->painter, (Rectangle){{125, 125, 100, 100}}, (Color){{0, 255, 0, 125}});
-        painter_fill_rectangle(fb->painter, (Rectangle){{150, 150, 100, 100}}, (Color){{0, 0, 255, 125}});
+        painter_draw_rectangle(framebuffer->painter, (Rectangle){{75, 75, 100, 100}}, COLOR_BLACK);
+        painter_fill_rectangle(framebuffer->painter, (Rectangle){{100, 100, 100, 100}}, ALPHA(COLOR_RED, 0.5));
+        painter_fill_rectangle(framebuffer->painter, (Rectangle){{125, 125, 100, 100}}, ALPHA(COLOR_GREEN, 0.5));
+        painter_fill_rectangle(framebuffer->painter, (Rectangle){{150, 150, 100, 100}}, ALPHA(COLOR_BLUE, 0.5));
 
         char message[128];
         snprintf(message, 128, "%d frames", frame++);
 
-        framebuffer_blit(fb);
+        framebuffer_blit(framebuffer);
     } while (true);
 
     return 0;

@@ -2,11 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libdevice/framebuffer.h>
-
+#include <libsystem/Result.h>
 #include <libsystem/cmdline.h>
 #include <libsystem/cstring.h>
-#include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
 static bool option_list = false;
@@ -42,18 +40,18 @@ static CommandLine cmdline = CMDLINE(
 typedef struct
 {
     const char *name;
-    framebuffer_mode_arg_t info;
-} supported_gfxmode_t;
+    IOCallDisplayModeArgs info;
+} SupportedMode;
 
-supported_gfxmode_t gfxmodes[] = {
-    {"640x360", {{640, 360}}},
-    {"800x600", {{800, 600}}},
-    {"1024x768", {{1024, 768}}},
-    {"1280x768", {{1280, 768}}},
-    {NULL, {{0, 0}}},
+SupportedMode gfxmodes[] = {
+    {"640x360", {640, 360}},
+    {"800x600", {800, 600}},
+    {"1024x768", {1024, 768}},
+    {"1280x768", {1280, 768}},
+    {NULL, {0, 0}},
 };
 
-framebuffer_mode_arg_t *gfxmode_by_name(const char *name)
+IOCallDisplayModeArgs *gfxmode_by_name(const char *name)
 {
     for (int i = 0; gfxmodes[i].name; i++)
     {
@@ -68,30 +66,30 @@ framebuffer_mode_arg_t *gfxmode_by_name(const char *name)
 
 int gfxmode_get(Stream *framebuffer_device)
 {
-    framebuffer_mode_arg_t framebuffer_info;
+    IOCallDisplayModeArgs framebuffer_info;
 
-    if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_GET_MODE, &framebuffer_info) < 0)
+    if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
-        error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
+        error_print("Ioctl to /dev/framebuffer failled");
         return -1;
     }
 
     printf("Height: %d\nWidth: %d\n",
-           framebuffer_info.size.X,
-           framebuffer_info.size.Y);
+           framebuffer_info.width,
+           framebuffer_info.height);
 
     return 0;
 }
 
 int gfxmode_set(Stream *framebuffer_device, const char *mode_name)
 {
-    framebuffer_mode_arg_t *framebuffer_info = gfxmode_by_name(mode_name);
+    IOCallDisplayModeArgs *framebuffer_info = gfxmode_by_name(mode_name);
 
     if (framebuffer_info != NULL)
     {
-        if (stream_call(framebuffer_device, FRAMEBUFFER_CALL_SET_MODE, framebuffer_info) < 0)
+        if (stream_call(framebuffer_device, IOCALL_DISPLAY_SET_MODE, framebuffer_info) < 0)
         {
-            error_print("Ioctl to " FRAMEBUFFER_DEVICE " failled");
+            error_print("Ioctl to /dev/framebuffer failled");
             return -1;
         }
 
@@ -126,11 +124,11 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE, OPEN_READ);
+    Stream *framebuffer_device = stream_open("/dev/framebuffer", OPEN_READ);
 
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
-        handle_printf_error(framebuffer_device, "gfxctl: Failled to open " FRAMEBUFFER_DEVICE);
+        handle_printf_error(framebuffer_device, "displayctl: Failled to open /dev/framebuffer");
         stream_close(framebuffer_device);
 
         return -1;

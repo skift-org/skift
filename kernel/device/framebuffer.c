@@ -2,11 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libdevice/framebuffer.h>
 #include <libmath/math.h>
 #include <libsystem/Result.h>
 #include <libsystem/assert.h>
-#include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/lock.h>
 
@@ -115,7 +113,8 @@ void bga_mode(u32 width, u32 height)
 static void *framebuffer_physical_addr = NULL;
 static void *framebuffer_virtual_addr = NULL;
 static FsHandle *framebuffer_owner = NULL;
-static Point framebuffer_size = {-1, -1};
+static int framebuffer_width;
+static int framebuffer_height;
 
 typedef struct
 {
@@ -157,31 +156,30 @@ framebuffer_backbuffer_t *framebuffer_get_backbuffer(FsHandle *owner)
     return NULL;
 }
 
-inline void framebuffer_set_pixel(uint *framebuffer, Point size, Point p, uint value)
+inline void framebuffer_set_pixel(uint *framebuffer, int width, int height, int x, int y, uint32_t value)
 {
-    if ((p.X >= 0 && p.X < size.X) && (p.Y >= 0 && p.Y < size.Y))
-        framebuffer[p.X + p.Y * size.X] = value;
+    if ((x >= 0 && x < width) && (y >= 0 && y < height))
+        framebuffer[x + y * width] = value;
 }
 
-inline uint framebuffer_get_pixel(uint *framebuffer, Point size, Point p)
+inline uint32_t framebuffer_get_pixel(uint *framebuffer, int width, int height, int x, int y)
 {
-    int xi = abs((int)p.X % size.X);
-    int yi = abs((int)p.Y % size.Y);
+    int xi = abs((int)x % width);
+    int yi = abs((int)y % height);
 
-    return framebuffer[xi + yi * size.X];
+    return framebuffer[xi + yi * width];
 }
 
-void *framebuffer_resize(uint *buffer, Point old_size, Point new_size)
+void *framebuffer_resize(uint *buffer, int old_width, int old_height, int new_width, int new_height)
 {
-    void *resized_framebuffer = malloc((new_size.X * new_size.Y) * sizeof(uint));
+    void *resized_framebuffer = malloc((new_width * new_height) * sizeof(uint));
 
-    for (int x = 0; x < new_size.X; x++)
+    for (int x = 0; x < new_width; x++)
     {
-        for (int y = 0; y < new_size.Y; y++)
+        for (int y = 0; y < new_height; y++)
         {
-            Point p = (Point){x, y};
-            uint pixel_data = framebuffer_get_pixel(buffer, old_size, p);
-            framebuffer_set_pixel(resized_framebuffer, new_size, p, pixel_data);
+            uint pixel_data = framebuffer_get_pixel(buffer, old_width, old_height, x, y);
+            framebuffer_set_pixel(resized_framebuffer, new_width, new_height, x, y, pixel_data);
         }
     }
 
@@ -197,21 +195,22 @@ Result framebuffer_set_mode_mboot(multiboot_info_t *mboot)
     framebuffer_physical_addr = (void *)(uintptr_t)mboot->framebuffer_addr;
     uint page_count = PAGE_ALIGN_UP(mboot->framebuffer_width * mboot->framebuffer_height * (mboot->framebuffer_bpp / 8)) / PAGE_SIZE;
     framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
-    framebuffer_size = (Point){mboot->framebuffer_width, mboot->framebuffer_height};
+    framebuffer_width = mboot->framebuffer_width;
+    framebuffer_height = mboot->framebuffer_height;
 
     return SUCCESS;
 }
 
-Result framebuffer_set_mode_bga(Point res)
+Result framebuffer_set_mode_bga(int width, int height)
 {
     logger_info("Using framebuffer from BGA device.");
 
-    if (res.X > 0 &&
-        res.X <= VBE_DISPI_MAX_XRES &&
-        res.Y > 0 &&
-        res.Y <= VBE_DISPI_MAX_YRES)
+    if (width > 0 &&
+        width <= VBE_DISPI_MAX_XRES &&
+        height > 0 &&
+        height <= VBE_DISPI_MAX_YRES)
     {
-        bga_mode(res.X, res.Y);
+        bga_mode(width, height);
 
         if (framebuffer_physical_addr == NULL)
         {
@@ -242,10 +241,11 @@ Result framebuffer_set_mode_bga(Point res)
 
         list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
         {
-            backbuffer->buffer = framebuffer_resize(backbuffer->buffer, framebuffer_size, res);
+            backbuffer->buffer = framebuffer_resize(backbuffer->buffer, framebuffer_width, framebuffer_height, width, height);
         }
 
-        framebuffer_size = res;
+        framebuffer_width = width;
+        framebuffer_height = height;
 
         return SUCCESS;
     }
@@ -270,15 +270,15 @@ int framebuffer_FsOperationOpen(FsNode *node, FsHandle *handle)
             framebuffer_backbuffer_t *backbuffer = __create(framebuffer_backbuffer_t);
 
             backbuffer->owner = framebuffer_owner;
-            backbuffer->buffer = malloc(framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
-            memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+            backbuffer->buffer = malloc(framebuffer_width * framebuffer_height * sizeof(uint));
+            memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_width * framebuffer_height * sizeof(uint));
 
             list_pushback(backbuffer_stack, backbuffer);
         }
 
         // Make stream the new owner of the framebuffer.
         framebuffer_owner = handle;
-        memset(framebuffer_virtual_addr, 0, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+        memset(framebuffer_virtual_addr, 0, framebuffer_width * framebuffer_height * sizeof(uint));
 
         lock_release(backbuffer_stack_lock);
     }
@@ -302,7 +302,7 @@ void framebuffer_FsOperationClose(FsNode *node, FsHandle *handle)
             {
                 // Switch to the new backbuffer
                 framebuffer_owner = backbuffer->owner;
-                memcpy(framebuffer_virtual_addr, backbuffer->buffer, framebuffer_size.X * framebuffer_size.Y * sizeof(uint));
+                memcpy(framebuffer_virtual_addr, backbuffer->buffer, framebuffer_width * framebuffer_height * sizeof(uint));
 
                 free(backbuffer->buffer);
                 free(backbuffer);
@@ -327,98 +327,66 @@ Result framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, 
 
     lock_acquire(backbuffer_stack_lock);
 
-    if (request == FRAMEBUFFER_CALL_GET_MODE)
+    Result result = SUCCESS;
+
+    if (request == IOCALL_DISPLAY_GET_MODE)
     {
-        framebuffer_mode_arg_t *mode_info = (framebuffer_mode_arg_t *)args;
+        IOCallDisplayModeArgs *mode_info = (IOCallDisplayModeArgs *)args;
 
-        mode_info->size = framebuffer_size;
-
-        lock_release(backbuffer_stack_lock);
-
-        return SUCCESS;
+        mode_info->width = framebuffer_width;
+        mode_info->height = framebuffer_height;
     }
-    else if (request == FRAMEBUFFER_CALL_SET_MODE)
+    else if (request == IOCALL_DISPLAY_SET_MODE)
     {
-        framebuffer_mode_arg_t *mode_info = (framebuffer_mode_arg_t *)args;
+        IOCallDisplayModeArgs *mode_info = (IOCallDisplayModeArgs *)args;
 
-        logger_info("Setting mode to %dx%d...", mode_info->size.X, mode_info->size.Y);
-
-        Result result = framebuffer_set_mode_bga(mode_info->size);
-
-        lock_release(backbuffer_stack_lock);
-
-        return result;
+        result = framebuffer_set_mode_bga(mode_info->width, mode_info->height);
     }
-    else if (request == FRAMEBUFFER_CALL_BLIT)
+    else if (request == IOCALL_DISPLAY_BLIT)
     {
-        if (fshandle_has_flag(handle, OPEN_WRITE))
+        if (!handle_has_flags(handle, OPEN_WRITE))
         {
-            framebuffer_blit_args_t *blitargs = args;
+            result = ERR_READ_ONLY_STREAM;
+            goto cleanup_and_return;
+        }
 
-            for (int y = 0; y < blitargs->size.Y; y++)
+        IOCallDisplayBlitArgs *region = (IOCallDisplayBlitArgs *)args;
+
+        for (int y = 0; y < region->blit_height; y++)
+        {
+            for (int x = 0; x < region->blit_width; x++)
             {
-                for (int x = 0; x < blitargs->size.X; x++)
-                {
-                    uint source_pixel_data = framebuffer_get_pixel(blitargs->buffer, blitargs->size, (Point){x, y});
+                int xx = x + region->blit_x;
+                int yy = y + region->blit_y;
 
-                    uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
+                uint32_t source_pixel_data = framebuffer_get_pixel(
+                    region->buffer,
+                    region->buffer_width,
+                    region->buffer_height,
+                    xx, yy);
+
+                uint32_t converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
                                                 ((source_pixel_data)&0xff00ff00) |
                                                 ((source_pixel_data << 16) & 0x00ff0000);
 
-                    framebuffer_set_pixel(framebuffer_get_buffer(handle), framebuffer_size, (Point){x, y}, converted_pixel_data);
-                }
+                framebuffer_set_pixel(
+                    framebuffer_get_buffer(handle),
+                    framebuffer_width,
+                    framebuffer_height,
+                    xx, yy,
+                    converted_pixel_data);
             }
-            lock_release(backbuffer_stack_lock);
-
-            return SUCCESS;
-        }
-        else
-        {
-            lock_release(backbuffer_stack_lock);
-
-            return ERR_READ_ONLY_STREAM;
-        }
-    }
-    else if (request == FRAMEBUFFER_CALL_BLITREGION)
-    {
-        if (handle->flags & OPEN_WRITE)
-        {
-            framebuffer_blitregion_args_t *region = (framebuffer_blitregion_args_t *)args;
-
-            for (int y = 0; y < region->region_to_blit.height; y++)
-            {
-                for (int x = 0; x < region->region_to_blit.width; x++)
-                {
-                    int xx = x + region->region_to_blit.X;
-                    int yy = y + region->region_to_blit.Y;
-
-                    uint source_pixel_data = framebuffer_get_pixel(region->buffer, region->size, (Point){xx, yy});
-
-                    uint converted_pixel_data = ((source_pixel_data >> 16) & 0x000000ff) |
-                                                ((source_pixel_data)&0xff00ff00) |
-                                                ((source_pixel_data << 16) & 0x00ff0000);
-
-                    framebuffer_set_pixel(framebuffer_get_buffer(handle), framebuffer_size, (Point){xx, yy}, converted_pixel_data);
-                }
-            }
-
-            lock_release(backbuffer_stack_lock);
-
-            return SUCCESS;
-        }
-        else
-        {
-            lock_release(backbuffer_stack_lock);
-
-            return ERR_READ_ONLY_STREAM;
         }
     }
     else
     {
-        lock_release(backbuffer_stack_lock);
-
-        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+        result = ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
+
+cleanup_and_return:
+    lock_release(backbuffer_stack_lock);
+
+    return result;
 }
 
 bool framebuffer_initialize(multiboot_info_t *mboot)
@@ -434,7 +402,7 @@ bool framebuffer_initialize(multiboot_info_t *mboot)
         }
         else
         {
-            framebuffer_set_mode_bga((Point){800, 600});
+            framebuffer_set_mode_bga(800, 600);
         }
 
         FsNode *framebuffer_device = __create(FsNode);
@@ -444,7 +412,7 @@ bool framebuffer_initialize(multiboot_info_t *mboot)
         FSNODE(framebuffer_device)->close = (FsOperationClose)framebuffer_FsOperationClose;
         FSNODE(framebuffer_device)->call = (FsOperationCall)framebuffer_FsOperationCall;
 
-        Path *framebuffer_device_path = path_create(FRAMEBUFFER_DEVICE);
+        Path *framebuffer_device_path = path_create("/dev/framebuffer");
         filesystem_link(framebuffer_device_path, framebuffer_device);
         path_destroy(framebuffer_device_path);
 

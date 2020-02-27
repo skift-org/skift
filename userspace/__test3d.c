@@ -205,15 +205,17 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    Framebuffer *fb = framebuffer_open();
+    Framebuffer *framebuffer = framebuffer_open();
 
-    if (fb == NULL)
+    if (handle_has_error(framebuffer))
     {
-        error_print("Failled to open the framebuffer.");
+        handle_printf_error(framebuffer, "failled to open /dev/framebuffer");
+        framebuffer_close(framebuffer);
+
         return -1;
     }
 
-    Matrix4 projection = matrix_create_projection(0.1, 1000.0f, 45.0f, fb->height / (double)fb->width);
+    Matrix4 projection = matrix_create_projection(0.1, 1000.0f, 45.0f, framebuffer->height / (double)framebuffer->width);
 
     vector3_t camera_position = {0, 0, 0};
 
@@ -228,7 +230,7 @@ int main(int argc, char **argv)
 
         Color background_color = HSV(abs(sin(theta / 10 + PI / 2)) * 360, 0.5, 0.75);
 
-        painter_clear(fb->painter, background_color);
+        painter_clear(framebuffer->painter, background_color);
 
         for (int i = 0; i < 12; i++)
         {
@@ -274,20 +276,20 @@ int main(int argc, char **argv)
                 triProjected.c.X += 1.0;
                 triProjected.c.Y += 1.0;
 
-                triProjected.a.X *= 0.5 * fb->width;
-                triProjected.a.Y *= 0.5 * fb->height;
-                triProjected.b.X *= 0.5 * fb->width;
-                triProjected.b.Y *= 0.5 * fb->height;
-                triProjected.c.X *= 0.5 * fb->width;
-                triProjected.c.Y *= 0.5 * fb->height;
+                triProjected.a.X *= 0.5 * framebuffer->width;
+                triProjected.a.Y *= 0.5 * framebuffer->height;
+                triProjected.b.X *= 0.5 * framebuffer->width;
+                triProjected.b.Y *= 0.5 * framebuffer->height;
+                triProjected.c.X *= 0.5 * framebuffer->width;
+                triProjected.c.Y *= 0.5 * framebuffer->height;
 
                 Color color = HSV(abs(sin(theta / 10)) * 360, 0.5, light_force);
-                painter3D_fill_face(fb->painter, triProjected, color);
-                painter3D_draw_face(fb->painter, triProjected, COLOR_BLACK);
+                painter3D_fill_face(framebuffer->painter, triProjected, color);
+                painter3D_draw_face(framebuffer->painter, triProjected, COLOR_BLACK);
             }
         }
 
-        framebuffer_blit(fb);
+        framebuffer_blit(framebuffer);
     } while (true);
 
     return 0;

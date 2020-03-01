@@ -51,8 +51,6 @@ The script will do the following operation without installing anything to the ho
  - Patch them using binutils.patch and gcc.patch located in the toolchain directory.
  - Then configure and build
 
-
-
 ## 2. Building
 
 From the root of this repo do:
@@ -61,7 +59,7 @@ From the root of this repo do:
 make all
 ```
 
-This command will build the all the component of the project and generate a bootable ISO bootable on QEMU or VirtualBox
+This command will build all the component of the project and generate an ISO bootable on QEMU or VirtualBox
 
 > The compatibility with virtual box is not garentie, has we use primarly QEMU for debuging and testing the system
 

@@ -83,8 +83,8 @@ Result connection_FsOperationReceive(FsConnection *connection, FsHandle *handle,
 
 void connection_FsOperationDestroy(FsConnection *connection)
 {
-    list_destroy(connection->message_to_client, LIST_FREE_VALUES);
-    list_destroy(connection->message_to_server, LIST_FREE_VALUES);
+    list_destroy_with_callback(connection->message_to_client, (ListDestroyElementCallback)free);
+    list_destroy_with_callback(connection->message_to_server, (ListDestroyElementCallback)free);
 }
 
 FsNode *connection_create(void)

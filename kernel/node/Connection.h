@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/list.h>
+#include <libsystem/utils/List.h>
 
 #include "kernel/node/Node.h"
 

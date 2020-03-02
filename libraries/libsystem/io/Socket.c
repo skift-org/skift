@@ -19,15 +19,8 @@ Socket *socket_open(const char *path, OpenFlag flags)
 
 void socket_close(Socket *socket)
 {
-    Connection *connection;
-    while (list_peek(socket->connections, (void **)&connection))
-    {
-        connection_close(connection);
-    }
-
+    list_destroy_with_callback(socket->connections, (ListDestroyElementCallback)connection_close);
     __plug_handle_close(HANDLE(socket));
-
-    list_destroy(socket->connections, LIST_KEEP_VALUES);
     free(socket);
 }
 

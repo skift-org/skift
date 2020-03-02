@@ -38,7 +38,7 @@ Path *path_create(const char *raw_path)
 
 void path_destroy(Path *path)
 {
-    list_destroy(path->elements, LIST_FREE_VALUES);
+    list_destroy_with_callback(path->elements, (ListDestroyElementCallback)free);
     free(path);
 }
 
@@ -107,8 +107,7 @@ void path_normalize(Path *path)
         }
     }
 
-    list_destroy(path->elements, LIST_FREE_VALUES);
-
+    list_destroy_with_callback(path->elements, (ListDestroyElementCallback)free);
     path->elements = stack;
 }
 

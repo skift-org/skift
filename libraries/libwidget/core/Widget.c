@@ -37,7 +37,7 @@ void widget_destroy(Widget *widget)
         widget_destroy(child);
     }
 
-    list_destroy(widget->childs, LIST_KEEP_VALUES);
+    list_destroy(widget->childs);
 
     free(widget);
 }

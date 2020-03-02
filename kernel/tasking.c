@@ -129,7 +129,7 @@ void task_destroy(Task *task)
         task_memory_mapping_destroy(task, memory_mapping);
     }
 
-    list_destroy(task->memory_mapping, LIST_KEEP_VALUES);
+    list_destroy(task->memory_mapping);
 
     task_fshandle_close_all(task);
 
@@ -791,12 +791,7 @@ void collect_and_free_task(void)
     atomic_end();
 
     // Cleanup all of those dead tasks.
-    list_foreach(Task, task_to_cleanup, task_to_free)
-    {
-        task_destroy(task_to_cleanup);
-    }
-
-    list_destroy(task_to_free, LIST_KEEP_VALUES);
+    list_destroy_with_callback(task_to_free, (ListDestroyElementCallback)task_destroy);
 }
 
 void garbage_colector()
@@ -895,7 +890,7 @@ void wakeup_blocked_task(void)
             task_set_state(task, TASK_STATE_RUNNING);
         }
 
-        list_destroy(task_to_wakeup, LIST_KEEP_VALUES);
+        list_destroy(task_to_wakeup);
     }
 }
 

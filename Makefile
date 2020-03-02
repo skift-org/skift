@@ -81,7 +81,8 @@ LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
 			  $(wildcard libraries/libsystem/io/*.c) \
 			  $(wildcard libraries/libsystem/process/*.c) \
 			  $(wildcard libraries/libsystem/eventloop/*.c) \
-			  $(wildcard libraries/libsystem/readline/*.c)
+			  $(wildcard libraries/libsystem/readline/*.c) \
+			  $(wildcard libraries/libsystem/utils/*.c)
 
 LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
 
@@ -138,7 +139,9 @@ KERNEL_CSOURCES=$(wildcard kernel/*.c) \
 				$(wildcard libraries/libsystem/*.c) \
 				$(wildcard libraries/libsystem/io/*.c) \
 				$(wildcard libraries/libsystem/unicode/*.c) \
-				$(wildcard libraries/libsystem/process/*.c)
+				$(wildcard libraries/libsystem/process/*.c) \
+				$(wildcard libraries/libsystem/utils/*.c)
+
 
 KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
 KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.c.kernel.o} ${KERNEL_SSOURCES:.s=.s.kernel.o}

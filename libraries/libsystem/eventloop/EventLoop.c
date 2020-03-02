@@ -6,8 +6,8 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/list.h>
 #include <libsystem/logger.h>
+#include <libsystem/utils/List.h>
 
 static List *_eventloop_notifiers = NULL;
 static List *_eventloop_timers = NULL;
@@ -35,8 +35,8 @@ void eventloop_uninitialize(void)
     assert(_eventloop_is_initialize);
     assert(!_eventloop_is_running);
 
-    list_destroy(_eventloop_notifiers, LIST_KEEP_VALUES);
-    list_destroy(_eventloop_timers, LIST_KEEP_VALUES);
+    list_destroy(_eventloop_notifiers);
+    list_destroy(_eventloop_timers);
 
     _eventloop_is_initialize = false;
 }

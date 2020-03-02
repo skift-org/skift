@@ -122,12 +122,7 @@ Result directory_FsOperationUnlink(FsDirectory *node, const char *name)
 
 void directory_FsOperationDestroy(FsDirectory *node)
 {
-    list_foreach(FsDirectoryEntry, entry, node->childs)
-    {
-        fsnode_deref(entry->node);
-    }
-
-    list_destroy(node->childs, LIST_FREE_VALUES);
+    list_destroy_with_callback(node->childs, (ListDestroyElementCallback)fsnode_deref);
 }
 
 FsNode *directory_create(void)

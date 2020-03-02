@@ -9,7 +9,7 @@
 #include <abi/Task.h>
 
 #include <libsystem/Result.h>
-#include <libsystem/list.h>
+#include <libsystem/utils/List.h>
 #include <libsystem/runtime.h>
 
 #include "kernel/filesystem/Filesystem.h"

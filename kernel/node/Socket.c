@@ -11,7 +11,7 @@ FsNode *socket_FsOperationOpenConnection(FsSocket *socket)
 {
     FsNode *connection = connection_create();
 
-    list_pushback(socket->pending, connection);
+    list_pushback(socket->pending, fsnode_ref(connection));
 
     return connection;
 }
@@ -38,7 +38,7 @@ FsNode *socket_FsOperationAcceptConnection(FsSocket *socket)
 
 void socket_FsOperationDestroy(FsSocket *socket)
 {
-    list_destroy(socket->pending, LIST_KEEP_VALUES);
+    list_destroy_with_callback(socket->pending, (ListDestroyElementCallback)fsnode_deref);
 }
 
 FsNode *socket_create(void)

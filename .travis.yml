@@ -1,4 +1,4 @@
-sudo: require
+os: linux
 dist: xenial
 
 language: cpp
@@ -22,11 +22,3 @@ script:
 - source ./toolbox/use-it!.sh
 - source ./toolchain/use-it!.sh
 - make all
-
-deploy:
-  provider: releases
-  api_key: "03e50367a3b36dc4f3d825eebf0cd9be5d23f75d"
-  file: "./build/bootdisk.iso"
-  skip_cleanup: true
-  on:
-    tags: true

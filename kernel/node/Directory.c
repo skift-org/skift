@@ -110,12 +110,13 @@ Result directory_FsOperationUnlink(FsDirectory *node, const char *name)
     {
         if (strcmp(entry->name, name) == 0)
         {
+            list_remove(node->childs, entry);
             fsnode_deref(entry->node);
             free(entry);
 
             return SUCCESS;
         }
-    };
+    }
 
     return ERR_NO_SUCH_FILE_OR_DIRECTORY;
 }

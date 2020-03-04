@@ -37,7 +37,7 @@ A simple, handmade, operating system for the intel x86 cpu.
  - A compositing window manager (Compositor)
  - Posix and libc compatibility layer library (libcompat)
  - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
- - It can run 🔥 DOOM 🔥
+ - It can run DOOM :rage3:
 
 # License
 

@@ -24,6 +24,8 @@ CFLAGS=$(CDIALECT_FLAGS) \
 	   -I. -Iapplication -Ilibraries -Ilibraries/libcompat \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
+QEMU=qemu-system-x86_64
+
 AS=nasm
 ASFLAGS=-f elf32
 
@@ -161,16 +163,16 @@ clean:
 	find kernel/ -name "*.o" -delete
 
 run: $(BOOTDISK)
-	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
-	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio
+	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
+	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio
 
 run-headless: $(BOOTDISK)
-	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -nographic -enable-kvm  || \
-	qemu-system-i386 -cdrom $^ -m 256M -serial mon:stdio -nographic
+	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -nographic -enable-kvm  || \
+	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -nographic
 
 debug: $(BOOTDISK)
-	qemu-system-i386 -s -S -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
-	qemu-system-i386 -s -S -cdrom $^ -m 256M -serial mon:stdio &
+	$(QEMU) -s -S -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
+	$(QEMU) -s -S -cdrom $^ -m 256M -serial mon:stdio &
 
 	gdb -x gdbinit
 

@@ -344,7 +344,7 @@ Result framebuffer_FsOperationCall(FsNode *node, FsHandle *handle, int request, 
     }
     else if (request == IOCALL_DISPLAY_BLIT)
     {
-        if (!handle_has_flags(handle, OPEN_WRITE))
+        if (!fshandle_has_flag(handle, OPEN_WRITE))
         {
             result = ERR_READ_ONLY_STREAM;
             goto cleanup_and_return;

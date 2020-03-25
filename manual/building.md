@@ -37,11 +37,11 @@ You can run the following command on ubuntu:
 $ apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 ```
 
-Then for building the toolchain run the `build-it!.sh` script
+Then for building the toolchain run the `build-it.sh` script
 
 ```sh
 ## Build the tool chain
-$ toolchain/build-it!.sh
+$ toolchain/build-it.sh
 
 ## Then wait for completion
 ```

@@ -16,7 +16,7 @@ cd "$DIR"
 
 mkdir -p tarballs
 
-source "$DIR/use-it!.sh"
+source "$DIR/use-it.sh"
 
 pushd tarballs
     if [ ! -e "binutils-2.31.tar.gz" ]; then

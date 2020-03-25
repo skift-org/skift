@@ -1,7 +1,7 @@
 .SECONDARY:
 
-PATH := $(shell toolchain/use-it!.sh):$(PATH)
-PATH := $(shell toolbox/use-it!.sh):$(PATH)
+PATH := $(shell toolchain/use-it.sh):$(PATH)
+PATH := $(shell toolbox/use-it.sh):$(PATH)
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
@@ -368,7 +368,7 @@ $(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
 
 $(KERNEL): $(KERNEL_OBJECT)
 	$(DIRECTORY_GUARD)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $@ $(KERNEL_OBJECT)
+	$(LD) $(LDFLAGS) -T kernel/link.ld -o $@ $(KERNEL_OBJECT)
 
 # --- Ressources ------------------------------------------------------------- #
 

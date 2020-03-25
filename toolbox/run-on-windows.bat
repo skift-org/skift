@@ -1,1 +1,0 @@
-"C:\Program Files\qemu\qemu-system-i386.exe" -cdrom ../build/bootdisk.iso -m 256M -serial mon:stdio -accel hax

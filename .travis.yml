@@ -18,7 +18,7 @@ before_install:
 - sudo apt-get install -y mtools grub-pc-bin nasm python3
 
 script:
-- ./toolchain/build-it!.sh
-- source ./toolbox/use-it!.sh
-- source ./toolchain/use-it!.sh
+- ./toolchain/build-it.sh
+- source ./toolbox/use-it.sh
+- source ./toolchain/use-it.sh
 - make all

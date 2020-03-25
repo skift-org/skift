@@ -27,6 +27,7 @@ A simple, handmade, operating system for the intel x86 cpu.
 </p>
 
 # Features
+
  - Pre-emptive multitasking
  - I/O redirection
  - IPC sockets

@@ -20,35 +20,18 @@ void connection_close(Connection *connection)
     __plug_handle_close(HANDLE(connection));
 }
 
-void connection_send(Connection *connection, Message *message, size_t size)
+size_t connection_send(Connection *connection, const void *buffer, size_t size)
 {
     assert(connection != NULL);
-    assert(message != NULL);
+    assert(buffer != NULL);
 
-    message->size = size;
-
-    __plug_handle_send(HANDLE(connection), message);
+    return __plug_handle_write(HANDLE(connection), buffer, size);
 }
 
-void connection_receive(Connection *connection, Message *message)
+size_t connection_receive(Connection *connection, void *buffer, size_t size)
 {
     assert(connection != NULL);
-    assert(message != NULL);
+    assert(buffer != NULL);
 
-    __plug_handle_receive(HANDLE(connection), message);
-}
-
-void connection_payload(Connection *connection, Message *message)
-{
-    assert(connection != NULL);
-    assert(message != NULL);
-
-    __plug_handle_payload(HANDLE(connection), message);
-}
-
-void connection_discard(Connection *connection)
-{
-    assert(connection != NULL);
-
-    __plug_handle_discard(HANDLE(connection));
+    return __plug_handle_read(HANDLE(connection), buffer, size);
 }

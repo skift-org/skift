@@ -302,39 +302,6 @@ Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
     return result;
 }
 
-Result task_fshandle_send(Task *task, int handle_index, Message *message)
-{
-
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == NULL)
-    {
-        return ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    Result result = fshandle_send(handle, message);
-
-    task_fshandle_release(task, handle_index);
-
-    return result;
-}
-
-Result task_fshandle_receive(Task *task, int handle_index, Message *message)
-{
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == NULL)
-    {
-        return ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    Result result = fshandle_receive(handle, message);
-
-    task_fshandle_release(task, handle_index);
-
-    return result;
-}
-
 Result task_fshandle_connect(Task *task, int *connection_handle_index, const char *socket_path)
 {
     Path *resolved_path = task_cwd_resolve(task, socket_path);
@@ -387,38 +354,6 @@ Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection
     }
 
     task_fshandle_release(task, socket_handle_index);
-
-    return result;
-}
-
-Result task_fshandle_payload(Task *task, int handle_index, Message *message)
-{
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == NULL)
-    {
-        return ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    Result result = fshandle_payload(handle, message);
-
-    task_fshandle_release(task, handle_index);
-
-    return result;
-}
-
-Result task_fshandle_discard(Task *task, int handle_index)
-{
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == NULL)
-    {
-        return ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    Result result = fshandle_discard(handle);
-
-    task_fshandle_release(task, handle_index);
 
     return result;
 }

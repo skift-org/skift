@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <abi/Handle.h>
-#include <abi/Message.h>
 
 struct Socket;
 
@@ -17,10 +16,6 @@ typedef struct Connection
 
 void connection_close(Connection *connection);
 
-void connection_send(Connection *connection, Message *message, size_t size);
+size_t connection_send(Connection *connection, const void *buffer, size_t size);
 
-void connection_receive(Connection *connection, Message *message);
-
-void connection_payload(Connection *connection, Message *message);
-
-void connection_discard(Connection *connection);
+size_t connection_receive(Connection *connection, void *buffer, size_t size);

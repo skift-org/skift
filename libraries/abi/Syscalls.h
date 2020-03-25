@@ -48,10 +48,6 @@
     __ENTRY(SYS_HANDLE_STAT)              \
     __ENTRY(SYS_HANDLE_CONNECT)           \
     __ENTRY(SYS_HANDLE_ACCEPT)            \
-    __ENTRY(SYS_HANDLE_SEND)              \
-    __ENTRY(SYS_HANDLE_RECEIVE)           \
-    __ENTRY(SYS_HANDLE_PAYLOAD)           \
-    __ENTRY(SYS_HANDLE_DISCARD)           \
                                           \
     __ENTRY(SYS_CREATE_PIPE)              \
     __ENTRY(SYS_CREATE_TERM)

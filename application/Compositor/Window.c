@@ -28,16 +28,7 @@ void window_destroy(Window *window)
 
 void window_send_event(Window *window, Event *event, size_t size)
 {
-    size_t message_size = sizeof(CompositorWindowEvent) + size;
-    CompositorWindowEvent *message = malloc(message_size);
-
-    message->id = window->id;
-    message->header.type = COMPOSITOR_MESSAGE_WINDOW_EVENT;
-    memcpy(&message->event[0], event, size);
-
-    client_send_message(window->client, (Message *)message, message_size);
-
-    free(message);
+    client_send_message(window->client, COMPOSITOR_MESSAGE_WINDOW_EVENT, event, size);
 }
 
 Rectangle window_bound(Window *window)

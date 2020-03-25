@@ -7,84 +7,76 @@
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
 
-void connection_FsOperationAccept(FsConnection *connection)
+#define CONNECTION_BUFFER_SIZE 4096
+
+void connection_accept(FsConnection *connection)
 {
     connection->accepted = true;
 }
 
-bool connection_FsOperationIsAccepted(FsConnection *connection)
+bool connection_is_accepted(FsConnection *connection)
 {
     return connection->accepted;
 }
 
-Result connection_FsOperationSend(FsConnection *connection, FsHandle *handle, Message *message)
+bool connection_can_read(FsConnection *connection, FsHandle *handle)
 {
-    List *inbox;
+    if (fshandle_has_flag(handle, OPEN_CLIENT))
+        return !ringbuffer_is_empty(connection->data_to_client);
+    else
+        return !ringbuffer_is_empty(connection->data_to_server);
+}
+
+Result connection_read(
+    FsConnection *connection,
+    FsHandle *handle,
+    void *buffer,
+    size_t size,
+    size_t *readed)
+{
+    RingBuffer *data = NULL;
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
-        inbox = connection->message_to_server;
+        data = connection->data_to_client;
     }
     else
     {
-        inbox = connection->message_to_client;
+        data = connection->data_to_server;
     }
 
-    if (list_count(inbox) > 64)
-    {
-        return ERR_NO_BUFFER_SPACE_AVAILABLE;
-    }
-
-    Message *message_copy = malloc(message->size);
-    memcpy(message_copy, message, message->size);
-
-    list_pushback(inbox, message_copy);
+    *readed = ringbuffer_read(data, buffer, size);
 
     return SUCCESS;
 }
 
-bool connection_FsOperationCanReceive(FsConnection *connection, FsHandle *handle)
+Result connection_write(
+    FsConnection *connection,
+    FsHandle *handle,
+    const void *buffer,
+    size_t size,
+    size_t *writen)
 {
-    if (fshandle_has_flag(handle, OPEN_CLIENT))
-    {
-        return list_any(connection->message_to_client);
-    }
-    else
-    {
-        return list_any(connection->message_to_server);
-    }
-}
-
-Result connection_FsOperationReceive(FsConnection *connection, FsHandle *handle, Message **message)
-{
-    List *inbox;
+    RingBuffer *data = NULL;
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
-        inbox = connection->message_to_client;
+        data = connection->data_to_server;
     }
     else
     {
-        inbox = connection->message_to_server;
+        data = connection->data_to_client;
     }
 
-    if (list_count(inbox) > 64)
-    {
-        return ERR_NO_BUFFER_SPACE_AVAILABLE;
-    }
-
-    if (!list_pop(inbox, (void **)message))
-    {
-        return ERR_NO_MESSAGE;
-    }
+    *writen = ringbuffer_write(data, buffer, size);
 
     return SUCCESS;
 }
 
 void connection_FsOperationDestroy(FsConnection *connection)
 {
-    list_destroy_with_callback(connection->message_to_client, (ListDestroyElementCallback)free);
-    list_destroy_with_callback(connection->message_to_server, (ListDestroyElementCallback)free);
+    ringbuffer_destroy(connection->data_to_client);
+    ringbuffer_destroy(connection->data_to_server);
 }
 
 FsNode *connection_create(void)
@@ -93,15 +85,15 @@ FsNode *connection_create(void)
 
     fsnode_init(FSNODE(connection), FSNODE_CONNECTION);
 
-    FSNODE(connection)->accept = (FsOperationAccept)connection_FsOperationAccept;
-    FSNODE(connection)->is_accepted = (FsOperationIsAccepted)connection_FsOperationIsAccepted;
-    FSNODE(connection)->send = (FsOperationSend)connection_FsOperationSend;
-    FSNODE(connection)->can_receive = (FsOperationCanReceive)connection_FsOperationCanReceive;
-    FSNODE(connection)->receive = (FsOperationReceive)connection_FsOperationReceive;
+    FSNODE(connection)->accept = (FsOperationAccept)connection_accept;
+    FSNODE(connection)->is_accepted = (FsOperationIsAccepted)connection_is_accepted;
+    FSNODE(connection)->can_read = (FsOperationCanRead)connection_can_read;
+    FSNODE(connection)->read = (FsOperationRead)connection_read;
+    FSNODE(connection)->write = (FsOperationWrite)connection_write;
     FSNODE(connection)->destroy = (FsOperationDestroy)connection_FsOperationDestroy;
 
-    connection->message_to_client = list_create();
-    connection->message_to_server = list_create();
+    connection->data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
+    connection->data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
 
     return FSNODE(connection);
 }

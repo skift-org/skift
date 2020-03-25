@@ -18,8 +18,6 @@ typedef struct Notifier
 
     NotifierHandler on_ready_to_read;
     NotifierHandler on_ready_to_write;
-    NotifierHandler on_ready_to_send;
-    NotifierHandler on_ready_to_receive;
     NotifierHandler on_ready_to_connect;
     NotifierHandler on_ready_to_accept;
 } Notifier;

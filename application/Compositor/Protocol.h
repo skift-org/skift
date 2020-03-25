@@ -1,7 +1,5 @@
 #pragma once
 
-#include <abi/Message.h>
-
 #include <libgraphic/Shape.h>
 #include <libwidget/core/Event.h>
 
@@ -16,14 +14,12 @@ typedef enum
 
 typedef struct
 {
-    Message header;
     CompositorMessageType type;
+    size_t size;
 } CompositorMessage;
 
 typedef struct
 {
-    CompositorMessage header;
-
     int id;
     int framebuffer;
     Rectangle bound;
@@ -31,20 +27,17 @@ typedef struct
 
 typedef struct
 {
-    CompositorMessage header;
     int id;
 } CompositorDestroyWindowMessage;
 
 typedef struct
 {
-    CompositorMessage header;
     int id;
     Rectangle bound;
 } CompositorBlitWindowMessage;
 
 typedef struct
 {
-    CompositorMessage header;
     int id;
     Event event[];
 } CompositorWindowEvent;

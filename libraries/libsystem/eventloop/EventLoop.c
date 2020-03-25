@@ -130,18 +130,6 @@ void eventloop_pump(void)
                     notifier->on_ready_to_write(notifier, notifier->handle);
                 }
 
-                if ((selected_events & SELECT_SEND) &&
-                    (notifier->on_ready_to_send != NULL))
-                {
-                    notifier->on_ready_to_send(notifier, notifier->handle);
-                }
-
-                if ((selected_events & SELECT_RECEIVE) &&
-                    (notifier->on_ready_to_receive != NULL))
-                {
-                    notifier->on_ready_to_receive(notifier, notifier->handle);
-                }
-
                 if ((selected_events & SELECT_CONNECT) &&
                     (notifier->on_ready_to_connect != NULL))
                 {

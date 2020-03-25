@@ -411,26 +411,6 @@ int sys_handle_accept(int handle, int *connection_handle)
     return task_fshandle_accept(sheduler_running(), handle, connection_handle);
 }
 
-int sys_handle_send(int handle, Message *message)
-{
-    return task_fshandle_send(sheduler_running(), handle, message);
-}
-
-int sys_handle_receive(int handle, Message *message)
-{
-    return task_fshandle_receive(sheduler_running(), handle, message);
-}
-
-int sys_handle_payload(int handle, Message *message)
-{
-    return task_fshandle_payload(sheduler_running(), handle, message);
-}
-
-int sys_handle_discard(int handle)
-{
-    return task_fshandle_discard(sheduler_running(), handle);
-}
-
 static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_LAUNCH] = sys_process_launch,
@@ -476,10 +456,6 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_HANDLE_STAT] = sys_handle_stat,
     [SYS_HANDLE_CONNECT] = sys_handle_connect,
     [SYS_HANDLE_ACCEPT] = sys_handle_accept,
-    [SYS_HANDLE_SEND] = sys_handle_send,
-    [SYS_HANDLE_RECEIVE] = sys_handle_receive,
-    [SYS_HANDLE_PAYLOAD] = sys_handle_payload,
-    [SYS_HANDLE_DISCARD] = sys_handle_discard,
 };
 
 SyscallHandler syscall_get_handler(Syscall syscall)

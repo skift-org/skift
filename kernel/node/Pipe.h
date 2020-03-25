@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/RingBuffer.h>
+
 #include "kernel/node/Node.h"
 
 typedef struct

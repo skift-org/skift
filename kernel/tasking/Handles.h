@@ -35,13 +35,9 @@ Result task_fshandle_connect(Task *task, int *handle_index, const char *path);
 
 Result task_fshandle_accept(Task *task, int handle_index, int *connection_handle_index);
 
-Result task_fshandle_send(Task *task, int handle_index, Message *message);
+Result task_fshandle_send(Task *task, int handle_index, const void *buffer, size_t size, size_t *sended);
 
-Result task_fshandle_receive(Task *task, int handle_index, Message *message);
-
-Result task_fshandle_payload(Task *task, int handle_index, Message *message);
-
-Result task_fshandle_discard(Task *task, int handle_index);
+Result task_fshandle_receive(Task *task, int handle_index, void *buffer, size_t size, size_t *received);
 
 Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index);
 

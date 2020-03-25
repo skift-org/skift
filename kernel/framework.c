@@ -299,34 +299,6 @@ void __plug_handle_accept(Handle *handle, Handle *connection_handle)
     handle->result = task_fshandle_accept(sheduler_running(), handle->id, &connection_handle->id);
 }
 
-void __plug_handle_send(Handle *handle, Message *message)
-{
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
-    handle->result = task_fshandle_send(sheduler_running(), handle->id, message);
-}
-
-void __plug_handle_receive(Handle *handle, Message *message)
-{
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
-    handle->result = task_fshandle_receive(sheduler_running(), handle->id, message);
-}
-
-void __plug_handle_payload(Handle *handle, Message *message)
-{
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
-    handle->result = task_fshandle_payload(sheduler_running(), handle->id, message);
-}
-
-void __plug_handle_discard(Handle *handle)
-{
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
-    handle->result = task_fshandle_discard(sheduler_running(), handle->id);
-}
-
 Result __plug_create_pipe(int *reader_handle, int *writer_handle)
 {
     return task_create_pipe(sheduler_running(), reader_handle, writer_handle);

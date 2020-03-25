@@ -9,7 +9,6 @@
 #include <abi/Filesystem.h>
 #include <abi/Handle.h>
 #include <abi/Launchpad.h>
-#include <abi/Message.h>
 
 #include <libsystem/lock.h>
 #include <libsystem/runtime.h>
@@ -108,11 +107,6 @@ int __plug_handle_stat(Handle *handle, FileState *stat);
 
 void __plug_handle_connect(Handle *handle, const char *path);
 void __plug_handle_accept(Handle *handle, Handle *connection_handle);
-
-void __plug_handle_send(Handle *handle, Message *message);
-void __plug_handle_receive(Handle *handle, Message *message);
-void __plug_handle_payload(Handle *handle, Message *message);
-void __plug_handle_discard(Handle *handle);
 
 Result __plug_create_pipe(int *reader_handle, int *writer_handle);
 Result __plug_create_term(int *master_handle, int *slave_handle);

@@ -12,7 +12,6 @@
 #include "kernel/sheduling/TaskBlockerAccept.h"
 #include "kernel/sheduling/TaskBlockerConnect.h"
 #include "kernel/sheduling/TaskBlockerRead.h"
-#include "kernel/sheduling/TaskBlockerReceive.h"
 #include "kernel/sheduling/TaskBlockerWrite.h"
 #include "kernel/tasking.h"
 
@@ -96,11 +95,6 @@ SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
     {
         // FIXME: check if the message buffer is not full
         selected_events |= SELECT_SEND;
-    }
-
-    if ((events & SELECT_RECEIVE) && fsnode_can_receive(node, handle))
-    {
-        selected_events |= SELECT_RECEIVE;
     }
 
     if ((events & SELECT_CONNECT) && fsnode_is_accepted(node))
@@ -360,7 +354,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     task_block(sheduler_running(), blocker_connect_create(connection), 0);
 
-    *connection_handle = fshandle_create(connection, OPEN_CLIENT);
+    *connection_handle = fshandle_create(connection, OPEN_CLIENT | OPEN_READ | OPEN_WRITE);
     fsnode_deref(connection);
 
     return SUCCESS;
@@ -381,79 +375,9 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     fsnode_release_lock(node, sheduler_running_id());
 
-    *connection_handle = fshandle_create(connection, OPEN_SERVER);
+    *connection_handle = fshandle_create(connection, OPEN_SERVER | OPEN_READ | OPEN_WRITE);
 
     fsnode_deref(connection);
-
-    return SUCCESS;
-}
-
-Result fshandle_send(FsHandle *handle, Message *message)
-{
-    FsNode *node = handle->node;
-
-    if (!node->send)
-    {
-        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
-    }
-
-    fsnode_acquire_lock(node, sheduler_running_id());
-
-    Result result = node->send(node, handle, message);
-
-    fsnode_release_lock(node, sheduler_running_id());
-
-    return result;
-}
-
-Result fshandle_receive(FsHandle *handle, Message *message)
-{
-    FsNode *node = handle->node;
-
-    if (!node->receive)
-    {
-        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
-    }
-
-    task_block(sheduler_running(), blocker_receive_create(handle), 0);
-
-    if (handle->message != NULL)
-    {
-        free(handle->message);
-        handle->message = NULL;
-    }
-
-    Result result = node->receive(node, handle, &handle->message);
-
-    if (handle->message != NULL)
-    {
-        memcpy(message, handle->message, sizeof(Message));
-    }
-
-    fsnode_release_lock(node, sheduler_running_id());
-
-    return result;
-}
-
-Result fshandle_payload(FsHandle *handle, Message *message)
-{
-    if (handle->message == NULL)
-    {
-        return ERR_NO_MESSAGE;
-    }
-
-    memcpy(message, handle->message, handle->message->size);
-
-    return SUCCESS;
-}
-
-Result fshandle_discard(FsHandle *handle)
-{
-    if (handle->message != NULL)
-    {
-        free(handle->message);
-        handle->message = NULL;
-    }
 
     return SUCCESS;
 }

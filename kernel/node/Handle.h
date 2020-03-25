@@ -13,10 +13,7 @@ typedef struct FsHandle
     size_t offset;
     OpenFlag flags;
 
-    union {
-        void *attached;
-        Message *message;
-    };
+    void *attached;
 
     size_t attached_size;
 } FsHandle;
@@ -44,7 +41,3 @@ Result fshandle_stat(FsHandle *handle, FileState *stat);
 
 Result fshandle_connect(FsNode *node, FsHandle **connection_handle);
 Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle);
-Result fshandle_send(FsHandle *handle, Message *message);
-Result fshandle_receive(FsHandle *handle, Message *message);
-Result fshandle_payload(FsHandle *handle, Message *message);
-Result fshandle_discard(FsHandle *handle);

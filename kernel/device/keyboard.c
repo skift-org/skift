@@ -10,6 +10,7 @@
 #include <libdevice/keys.c>
 #include <libdevice/keys.h>
 #include <libsystem/Result.h>
+#include <libsystem/RingBuffer.h>
 #include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>

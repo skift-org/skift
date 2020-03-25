@@ -5,11 +5,8 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/Result.h>
-#include <libsystem/RingBuffer.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/lock.h>
-
-#include "abi/Message.h"
 
 struct FsNode;
 struct FsHandle;
@@ -39,11 +36,6 @@ typedef bool (*FsOperationIsAccepted)(struct FsNode *node);
 
 typedef bool (*FsOperationCanAcceptConnection)(struct FsNode *node);
 typedef struct FsNode *(*FsOperationAcceptConnection)(struct FsNode *node);
-
-typedef Result (*FsOperationSend)(struct FsNode *node, struct FsHandle *handle, Message *message);
-
-typedef bool (*FsOperationCanReceive)(struct FsNode *node, struct FsHandle *handle);
-typedef Result (*FsOperationReceive)(struct FsNode *node, struct FsHandle *handle, Message **message);
 
 typedef void (*FsOperationDestroy)(struct FsNode *node);
 
@@ -82,16 +74,11 @@ typedef struct FsNode
     FsOperationSize size;
 
     FsOperationOpenConnection open_connection;
-
-    FsOperationCanAcceptConnection can_accept_connection;
     FsOperationAcceptConnection accept_connection;
+    FsOperationCanAcceptConnection can_accept_connection;
 
     FsOperationAccept accept;
     FsOperationIsAccepted is_accepted;
-
-    FsOperationSend send;
-    FsOperationCanReceive can_receive;
-    FsOperationReceive receive;
 
     FsOperationDestroy destroy;
 } FsNode;
@@ -109,8 +96,6 @@ bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 bool fsnode_can_write(FsNode *node, struct FsHandle *handle);
 
 bool fsnode_can_accept(FsNode *node);
-
-bool fsnode_can_receive(FsNode *node, struct FsHandle *handle);
 
 bool fsnode_is_accepted(FsNode *node);
 

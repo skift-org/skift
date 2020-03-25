@@ -83,26 +83,6 @@ void __plug_handle_accept(Handle *handle, Handle *connection_handle)
     handle->result = __syscall(SYS_HANDLE_ACCEPT, handle->id, (int)&connection_handle->id, 0, 0, 0);
 }
 
-void __plug_handle_send(Handle *handle, Message *message)
-{
-    handle->result = __syscall(SYS_HANDLE_SEND, handle->id, (int)message, 0, 0, 0);
-}
-
-void __plug_handle_receive(Handle *handle, Message *message)
-{
-    handle->result = __syscall(SYS_HANDLE_RECEIVE, handle->id, (int)message, 0, 0, 0);
-}
-
-void __plug_handle_payload(Handle *handle, Message *message)
-{
-    handle->result = __syscall(SYS_HANDLE_PAYLOAD, handle->id, (int)message, 0, 0, 0);
-}
-
-void __plug_handle_discard(Handle *handle)
-{
-    handle->result = __syscall(SYS_HANDLE_RECEIVE, handle->id, 0, 0, 0, 0);
-}
-
 Result __plug_create_pipe(int *reader_handle, int *writer_handle)
 {
     return __syscall(SYS_CREATE_PIPE, (int)reader_handle, (int)writer_handle, 0, 0, 0);

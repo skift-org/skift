@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/RingBuffer.h>
 #include <libsystem/atomic.h>
 
 #include "kernel/filesystem/Filesystem.h"

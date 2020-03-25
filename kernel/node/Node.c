@@ -60,18 +60,6 @@ bool fsnode_can_write(FsNode *node, FsHandle *handle)
     }
 }
 
-bool fsnode_can_receive(FsNode *node, FsHandle *handle)
-{
-    if (node->can_receive)
-    {
-        return node->can_receive(node, handle);
-    }
-    else
-    {
-        return true;
-    }
-}
-
 bool fsnode_can_accept(FsNode *node)
 {
     if (node->can_accept_connection)

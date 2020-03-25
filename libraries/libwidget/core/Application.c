@@ -20,21 +20,22 @@ void application_request_callback(Notifier *notifier, Connection *connection)
 {
     __unused(notifier);
 
-    Message header;
-    connection_receive(connection, &header);
+    CompositorMessage header = {};
+    connection_receive(connection, &header, sizeof(CompositorMessage));
 
-    CompositorMessage *message = malloc(header.size);
-    connection_payload(connection, (Message *)message);
-
-    if (message->type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
+    if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
     {
+        Event *event = malloc(header.size);
+        connection_receive(connection, event, header.size);
+
+        // TODO: Handle the event.
+
+        free(event);
     }
     else
     {
         logger_warn("Got an invalid message from compositor!");
     }
-
-    free(message);
 }
 
 void application_initialize(int argc, char **argv)
@@ -61,8 +62,8 @@ void application_initialize(int argc, char **argv)
 
     eventloop_initialize();
 
-    _connection_notifier = notifier_create(HANDLE(_connection), SELECT_RECEIVE);
-    _connection_notifier->on_ready_to_receive = (NotifierHandler)application_request_callback;
+    _connection_notifier = notifier_create(HANDLE(_connection), SELECT_READ);
+    _connection_notifier->on_ready_to_read = (NotifierHandler)application_request_callback;
 
     _initialized = true;
 }
@@ -93,6 +94,16 @@ void application_dump(void)
     }
 }
 
+void application_send_message(CompositorMessageType type, const void *buffer, size_t size)
+{
+    CompositorMessage header = {};
+    header.type = type;
+    header.size = size;
+
+    connection_send(_connection, &header, sizeof(CompositorMessage));
+    connection_send(_connection, buffer, size);
+}
+
 void application_add_window(Window *window)
 {
     assert(_initialized);
@@ -105,9 +116,7 @@ void application_add_window(Window *window)
         .bound = WIDGET(window)->bound,
     };
 
-    message.header.type = COMPOSITOR_MESSAGE_CREATE_WINDOW;
-
-    connection_send(_connection, (Message *)&message, sizeof(message));
+    application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));
 
     list_pushback(_windows, window);
 }
@@ -122,9 +131,7 @@ void application_remove_window(Window *window)
         .id = window->id,
     };
 
-    message.header.type = COMPOSITOR_MESSAGE_DESTROY_WINDOW;
-
-    connection_send(_connection, (Message *)&message, sizeof(CompositorDestroyWindowMessage));
+    application_send_message(COMPOSITOR_MESSAGE_DESTROY_WINDOW, &message, sizeof(CompositorDestroyWindowMessage));
 
     list_remove(_windows, window);
 }
@@ -140,7 +147,5 @@ void application_blit_window(Window *window, Rectangle bound)
         .bound = bound,
     };
 
-    message.header.type = COMPOSITOR_MESSAGE_BLIT_WINDOW;
-
-    connection_send(_connection, (Message *)&message, sizeof(CompositorBlitWindowMessage));
+    application_send_message(COMPOSITOR_MESSAGE_BLIT_WINDOW, &message, sizeof(CompositorBlitWindowMessage));
 }

@@ -13,3 +13,5 @@ typedef struct Client
 Client *client_create(Connection *connection);
 
 void client_destroy(Client *client);
+
+void client_send_message(Client *client, Message *message, size_t size);

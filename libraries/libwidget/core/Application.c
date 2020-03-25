@@ -1,8 +1,10 @@
 #include <libsystem/assert.h>
 #include <libsystem/eventloop/EventLoop.h>
+#include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Process.h>
 
 #include <libwidget/core/Application.h>
 
@@ -12,6 +14,28 @@ static bool _initialized = false;
 static bool _running = false;
 static List *_windows;
 static Connection *_connection;
+static Notifier *_connection_notifier;
+
+void application_request_callback(Notifier *notifier, Connection *connection)
+{
+    __unused(notifier);
+
+    Message header;
+    connection_receive(connection, &header);
+
+    CompositorMessage *message = malloc(header.size);
+    connection_payload(connection, (Message *)message);
+
+    if (message->type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
+    {
+    }
+    else
+    {
+        logger_warn("Got an invalid message from compositor!");
+    }
+
+    free(message);
+}
 
 void application_initialize(int argc, char **argv)
 {
@@ -24,6 +48,7 @@ void application_initialize(int argc, char **argv)
     if (handle_has_error(_connection))
     {
         logger_error("Failled to connect to the compositor: %s", handle_error_string(_connection));
+        process_exit(-1);
     }
     else
     {
@@ -35,6 +60,9 @@ void application_initialize(int argc, char **argv)
     _windows = list_create();
 
     eventloop_initialize();
+
+    _connection_notifier = notifier_create(HANDLE(_connection), SELECT_RECEIVE);
+    _connection_notifier->on_ready_to_receive = (NotifierHandler)application_request_callback;
 
     _initialized = true;
 }

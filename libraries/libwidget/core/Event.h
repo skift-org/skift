@@ -1,8 +1,7 @@
 #pragma once
 
+#include <libdevice/keys.h>
 #include <libgraphic/Shape.h>
-
-struct Widget;
 
 typedef enum
 {
@@ -10,12 +9,33 @@ typedef enum
     EVENT_CHILD_REMOVED,
     EVENT_PAINT,
 
+    EVENT_MOUSE_MOVE,
+    EVENT_MOUSE_BUTTON_PRESS,
+    EVENT_MOUSE_BUTTON_RELEASE,
+
     __EVENT_TYPE_COUNT,
 } EventType;
 
 typedef struct Event
 {
-    struct Widget *sender;
     EventType type;
     bool accepted;
 } Event;
+
+typedef enum
+{
+    MOUSE_NO_BUTTON = 0,
+    MOUSE_BUTTON_LEFT = 1 << 1,
+    MOUSE_BUTTON_RIGHT = 1 << 2,
+    MOUSE_BUTTON_MIDDLE = 1 << 3,
+} MouseButton;
+
+typedef struct
+{
+    Event event;
+    Point position;
+    Point old_position;
+
+    MouseButton button;
+    MouseButton buttons;
+} MouseEvent;

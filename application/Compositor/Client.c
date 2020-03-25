@@ -84,6 +84,11 @@ Client *client_create(Connection *connection)
     return client;
 }
 
+void client_send_message(Client *client, Message *message, size_t size)
+{
+    connection_send(client->connection, message, size);
+}
+
 void client_destroy(Client *client)
 {
     notifier_uninitialize((Notifier *)client);

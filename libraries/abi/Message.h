@@ -8,8 +8,8 @@
 
 typedef enum
 {
-    MessageYPE_EVENT,
-    MessageYPE_REQUEST,
+    MESSAGE_TYPE_EVENT,
+    MESSAGE_TYPE_REQUEST,
 } MessageType;
 
 typedef struct

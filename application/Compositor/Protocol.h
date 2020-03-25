@@ -3,6 +3,7 @@
 #include <abi/Message.h>
 
 #include <libgraphic/Shape.h>
+#include <libwidget/core/Event.h>
 
 typedef enum
 {
@@ -10,6 +11,7 @@ typedef enum
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
     COMPOSITOR_MESSAGE_BLIT_WINDOW,
+    COMPOSITOR_MESSAGE_WINDOW_EVENT,
 } CompositorMessageType;
 
 typedef struct
@@ -39,3 +41,10 @@ typedef struct
     int id;
     Rectangle bound;
 } CompositorBlitWindowMessage;
+
+typedef struct
+{
+    CompositorMessage header;
+    int id;
+    Event event[];
+} CompositorWindowEvent;

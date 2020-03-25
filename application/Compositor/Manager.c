@@ -28,6 +28,19 @@ Window *manager_get_window(struct Client *client, int id)
     return NULL;
 }
 
+Window *manager_get_window_at(Point position)
+{
+    list_foreach(Window, window, _managed_windows)
+    {
+        if (rectangle_containe_point(window_bound(window), position))
+        {
+            return window;
+        }
+    }
+
+    return NULL;
+}
+
 void manager_register_window(Window *window)
 {
     list_pushback(_managed_windows, window);

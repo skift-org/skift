@@ -51,7 +51,7 @@ void widget_add_child(Widget *widget, Widget *child)
     child->parent = widget;
     list_pushback(widget->childs, child);
 
-    widget_raise(widget, &(Event){widget, EVENT_CHILD_ADDED, false});
+    widget_raise(widget, &(Event){EVENT_CHILD_ADDED, false});
 }
 
 void widget_remove_child(Widget *widget, Widget *child)
@@ -63,7 +63,7 @@ void widget_remove_child(Widget *widget, Widget *child)
     child->parent = NULL;
     list_remove(widget->childs, child);
 
-    widget_raise(widget, &(Event){widget, EVENT_CHILD_REMOVED, false});
+    widget_raise(widget, &(Event){EVENT_CHILD_REMOVED, false});
 }
 
 void widget_raise(Widget *widget, Event *event)
@@ -83,7 +83,7 @@ void widget_event(Widget *widget, Event *event)
     {
         event->accepted = true;
 
-        widget_raise(widget, &(Event){widget, EVENT_PAINT, false});
+        widget_raise(widget, &(Event){EVENT_PAINT, false});
     }
 
     if (widget->event)

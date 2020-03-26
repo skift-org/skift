@@ -30,7 +30,7 @@ void application_request_callback(Notifier *notifier, Connection *connection)
         connection_receive(connection, &windowEvent, sizeof(CompositorWindowEvent));
 
         Event *event = malloc(header.size);
-        connection_receive(connection, event, header.size);
+        connection_receive(connection, event, header.size - sizeof(CompositorWindowEvent));
 
         Window *window = application_get_window_by_id(windowEvent.id);
 

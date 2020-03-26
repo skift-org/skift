@@ -38,10 +38,10 @@ void widget_add_child(Widget *widget, Widget *child);
 
 void widget_remove_child(Widget *widget, Widget *child);
 
-void widget_dump(Widget *widget);
+void widget_dump(Widget *widget, int depth);
 
-void widget_raise(Widget *widget, struct Event *event);
+void widget_dispatch_event(Widget *widget, struct Event *event);
 
-void widget_event(Widget *widget, struct Event *event);
+void widget_handle_event(Widget *widget, struct Event *event);
 
 void widget_paint(Widget *widget, struct Painter *painter);

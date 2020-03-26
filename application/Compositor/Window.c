@@ -28,7 +28,15 @@ void window_destroy(Window *window)
 
 void window_send_event(Window *window, Event *event, size_t size)
 {
-    client_send_message(window->client, COMPOSITOR_MESSAGE_WINDOW_EVENT, event, size);
+    // FIXME: remove the need for malloc.
+
+    CompositorWindowEvent *message = malloc(sizeof(CompositorWindowEvent) + size);
+    message->id = window->id;
+
+    memcpy(&message->event, event, size);
+
+    client_send_message(window->client, COMPOSITOR_MESSAGE_WINDOW_EVENT, message, sizeof(CompositorWindowEvent) + size);
+    free(message);
 }
 
 Rectangle window_bound(Window *window)

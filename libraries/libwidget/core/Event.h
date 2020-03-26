@@ -3,6 +3,9 @@
 #include <libdevice/keys.h>
 #include <libgraphic/Shape.h>
 
+#define EVENT_LIST(__EVENT) \
+    __EVENT(CHILD_ADDED)
+
 typedef enum
 {
     EVENT_CHILD_ADDED,
@@ -10,6 +13,8 @@ typedef enum
     EVENT_PAINT,
 
     EVENT_MOUSE_MOVE,
+    EVENT_MOUSE_ENTER,
+    EVENT_MOUSE_LEAVE,
     EVENT_MOUSE_BUTTON_PRESS,
     EVENT_MOUSE_BUTTON_RELEASE,
 

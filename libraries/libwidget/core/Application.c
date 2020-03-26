@@ -25,10 +25,19 @@ void application_request_callback(Notifier *notifier, Connection *connection)
 
     if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
     {
+        CompositorWindowEvent windowEvent = {};
+
+        connection_receive(connection, &windowEvent, sizeof(CompositorWindowEvent));
+
         Event *event = malloc(header.size);
         connection_receive(connection, event, header.size);
 
-        // TODO: Handle the event.
+        Window *window = application_get_window_by_id(windowEvent.id);
+
+        if (window)
+        {
+            window_handle_event(window, event);
+        }
 
         free(event);
     }
@@ -88,9 +97,9 @@ void application_dump(void)
 {
     assert(_initialized);
 
-    list_foreach(Widget, window, _windows)
+    list_foreach(Window, window, _windows)
     {
-        widget_dump(window);
+        window_dump(window);
     }
 }
 
@@ -108,12 +117,12 @@ void application_add_window(Window *window)
 {
     assert(_initialized);
 
-    logger_info("Adding %s(0x%08x)", WIDGET(window)->classname, window);
+    logger_info("Adding Window(0x%08x)", window);
 
     CompositorCreateWindowMessage message = {
         .id = window->id,
         .framebuffer = window->framebuffer_handle,
-        .bound = WIDGET(window)->bound,
+        .bound = window->bound,
     };
 
     application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));
@@ -125,7 +134,7 @@ void application_remove_window(Window *window)
 {
     assert(_initialized);
 
-    logger_info("Removing %s(0x%08x)", WIDGET(window)->classname, window);
+    logger_info("Removing Window(0x%08x)", window);
 
     CompositorDestroyWindowMessage message = {
         .id = window->id,
@@ -136,11 +145,24 @@ void application_remove_window(Window *window)
     list_remove(_windows, window);
 }
 
+Window *application_get_window_by_id(int id)
+{
+    list_foreach(Window, window, _windows)
+    {
+        if (window->id == id)
+        {
+            return window;
+        }
+    }
+
+    return NULL;
+}
+
 void application_blit_window(Window *window, Rectangle bound)
 {
     assert(_initialized);
 
-    logger_info("Blitting %s(0x%08x)", WIDGET(window)->classname, window);
+    logger_info("Blitting Window(0x%08x)", window);
 
     CompositorBlitWindowMessage message = {
         .id = window->id,

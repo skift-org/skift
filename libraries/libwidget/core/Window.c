@@ -1,3 +1,4 @@
+#include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
 #include <libwidget/core/Application.h>
@@ -5,26 +6,51 @@
 #include <libwidget/core/Theme.h>
 #include <libwidget/core/Window.h>
 
-void window_destroy(Window *window)
+static int _window_id = 0;
+
+void window_set_main_widget(Window *window, Widget *widget)
 {
-    application_remove_window(window);
+    window->main_widget = widget;
 }
 
-void window_paint(Window *window, Painter *painter)
+void window_paint(Window *window)
 {
-    painter_fill_rectangle(painter, WIDGET(window)->bound, THEME_BACKGROUND);
-    painter_fill_rectangle(painter, rectangle_set_height(WIDGET(window)->bound, 32), THEME_ALT_BACKGROUND);
-    painter_draw_rectangle(painter, rectangle_set_height(WIDGET(window)->bound, 32), THEME_BORDER);
-    painter_draw_rectangle(painter, WIDGET(window)->bound, THEME_ACCENT);
+    painter_fill_rectangle(window->painter, window->bound, THEME_BACKGROUND);
+    painter_fill_rectangle(window->painter, rectangle_set_height(window->bound, 32), THEME_ALT_BACKGROUND);
+    painter_draw_rectangle(window->painter, rectangle_set_height(window->bound, 32), THEME_BORDER);
+    painter_draw_rectangle(window->painter, window->bound, THEME_ACCENT);
 }
 
-void window_event(Window *window, Event *event)
+void window_dump(Window *window)
+{
+    printf("Window(0x%p) (%d, %d) %dx%d\n",
+           window,
+           window->bound.X,
+           window->bound.Y,
+           window->bound.width,
+           window->bound.height);
+
+    widget_dump(window->main_widget, 1);
+}
+
+void window_handle_event(Window *window, Event *event)
 {
     switch (event->type)
     {
     case EVENT_PAINT:
-        widget_paint(WIDGET(window), window->painter);
-        application_blit_window(window, WIDGET(window)->bound);
+        window_paint(window);
+        application_blit_window(window, window->bound);
+        break;
+    case EVENT_MOUSE_MOVE:
+        logger_info("Mouse moved ");
+        break;
+
+    case EVENT_MOUSE_ENTER:
+        logger_info("Mouse enter ");
+        break;
+
+    case EVENT_MOUSE_LEAVE:
+        logger_info("Mouse leave ");
         break;
 
     default:
@@ -32,28 +58,25 @@ void window_event(Window *window, Event *event)
     }
 }
 
-static int _window_id = 0;
-
-Widget *window_create(Rectangle bound)
+Window *window_create(Rectangle bound)
 {
     Window *window = __create(Window);
-
-    WIDGET(window)->destroy = (WidgetDestroyCallback)window_destroy;
-    WIDGET(window)->paint = (WidgetPaintCallback)window_paint;
-    WIDGET(window)->event = (WidgetEventCallback)window_event;
-
-    widget_initialize(WIDGET(window), "Window", NULL, bound);
 
     window->id = _window_id++;
 
     window->framebuffer = bitmap_create(bound.width, bound.height);
     window->painter = painter_create(window->framebuffer);
+    window->bound = bound;
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
+    window_paint(window);
     application_add_window(window);
 
-    widget_paint(WIDGET(window), window->painter);
+    return window;
+}
 
-    return WIDGET(window);
+void window_destroy(Window *window)
+{
+    application_remove_window(window);
 }

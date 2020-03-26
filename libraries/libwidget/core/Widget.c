@@ -51,7 +51,7 @@ void widget_add_child(Widget *widget, Widget *child)
     child->parent = widget;
     list_pushback(widget->childs, child);
 
-    widget_raise(widget, &(Event){EVENT_CHILD_ADDED, false});
+    widget_dispatch_event(widget, &(Event){EVENT_CHILD_ADDED, false});
 }
 
 void widget_remove_child(Widget *widget, Widget *child)
@@ -63,27 +63,27 @@ void widget_remove_child(Widget *widget, Widget *child)
     child->parent = NULL;
     list_remove(widget->childs, child);
 
-    widget_raise(widget, &(Event){EVENT_CHILD_REMOVED, false});
+    widget_dispatch_event(widget, &(Event){EVENT_CHILD_REMOVED, false});
 }
 
-void widget_raise(Widget *widget, Event *event)
+void widget_dispatch_event(Widget *widget, Event *event)
 {
-    widget_event(widget, event);
+    widget_handle_event(widget, event);
 
     if (!event->accepted && widget->parent)
     {
-        widget_raise(widget->parent, event);
+        widget_dispatch_event(widget->parent, event);
     }
 }
 
-void widget_event(Widget *widget, Event *event)
+void widget_handle_event(Widget *widget, Event *event)
 {
     if (event->type == EVENT_CHILD_ADDED ||
         event->type == EVENT_CHILD_REMOVED)
     {
         event->accepted = true;
 
-        widget_raise(widget, &(Event){EVENT_PAINT, false});
+        widget_dispatch_event(widget, &(Event){EVENT_PAINT, false});
     }
 
     if (widget->event)
@@ -109,7 +109,7 @@ void widget_paint(Widget *widget, Painter *painter)
     painter_pop_origin(painter);
 }
 
-void widget_dump_iternal(Widget *widget, int depth)
+void widget_dump(Widget *widget, int depth)
 {
     for (int i = 0; i < depth; i++)
     {
@@ -126,11 +126,6 @@ void widget_dump_iternal(Widget *widget, int depth)
 
     list_foreach(Widget, child, widget->childs)
     {
-        widget_dump_iternal(child, depth + 1);
+        widget_dump(child, depth + 1);
     }
-}
-
-void widget_dump(Widget *widget)
-{
-    widget_dump_iternal(widget, 0);
 }

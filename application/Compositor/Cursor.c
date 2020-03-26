@@ -27,7 +27,21 @@ void cursor_handle_packet(MousePacket packet)
 
     renderer_region_dirty(cursor_bound());
 
+    Window *old_window = manager_get_window_at(_mouse_old_position);
     Window *window = manager_get_window_at(_mouse_position);
+
+    if (old_window != window)
+    {
+        if (old_window)
+        {
+            window_send_event(old_window, (Event *)&(MouseEvent){{EVENT_MOUSE_LEAVE, false}, _mouse_position, _mouse_old_position, MOUSE_NO_BUTTON, MOUSE_NO_BUTTON}, sizeof(MouseEvent));
+        }
+
+        if (window)
+        {
+            window_send_event(window, (Event *)&(MouseEvent){{EVENT_MOUSE_ENTER, false}, _mouse_position, _mouse_old_position, MOUSE_NO_BUTTON, MOUSE_NO_BUTTON}, sizeof(MouseEvent));
+        }
+    }
 
     if (window != NULL)
     {

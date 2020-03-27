@@ -17,3 +17,5 @@ struct Window *manager_get_window_at(Point position);
 void manager_register_window(struct Window *window);
 
 void manager_unregister_window(struct Window *window);
+
+void manager_focus_window(struct Window *window);

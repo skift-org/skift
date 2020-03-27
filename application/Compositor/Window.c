@@ -140,3 +140,9 @@ void window_handle_mouse_buttons(
     window_handle_mouse_button(window, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
     window_handle_mouse_button(window, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
 }
+
+void window_focus(Window *window)
+{
+    manager_focus_window(window);
+    renderer_region_dirty(window_bound(window));
+}

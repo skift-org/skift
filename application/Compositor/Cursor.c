@@ -70,7 +70,10 @@ void cursor_handle_packet(MousePacket packet)
     if (_mouse_old_buttons != _mouse_buttons)
     {
         if (_mouse_window)
+        {
+            window_focus(_mouse_window);
             window_handle_mouse_buttons(_mouse_window, _mouse_old_buttons, _mouse_buttons, _mouse_position);
+        }
     }
 }
 

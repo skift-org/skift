@@ -28,3 +28,5 @@ void window_send_event(Window *window, Event *event, size_t size);
 void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons);
 
 void window_handle_mouse_buttons(Window *window, MouseButton old_buttons, MouseButton buttons, Point position);
+
+void window_focus(Window *window);

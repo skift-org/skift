@@ -257,7 +257,7 @@ void task_set_state(Task *task, TaskState state)
         }
         else
         {
-            list_push(tasks_bystates[task->state], task);
+            list_pushback(tasks_bystates[task->state], task);
         }
     }
 }

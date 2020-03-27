@@ -52,3 +52,9 @@ void manager_unregister_window(Window *window)
     renderer_region_dirty(window_bound(window));
     list_remove(_managed_windows, window);
 }
+
+void manager_focus_window(Window *window)
+{
+    list_remove(_managed_windows, window);
+    list_push(_managed_windows, window);
+}

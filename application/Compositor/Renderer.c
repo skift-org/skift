@@ -14,7 +14,7 @@ void renderer_initialize(void)
 {
     _framebuffer = framebuffer_open();
     _painter = _framebuffer->painter;
-    _wallpaper = bitmap_load_from("/res/wallpaper/paint.png");
+    _wallpaper = bitmap_load_from("/res/wallpaper/brand.png");
 
     renderer_region_dirty(framebuffer_bound(_framebuffer));
 }
@@ -35,7 +35,7 @@ void renderer_region(Rectangle region)
 {
     painter_blit_bitmap(_painter, _wallpaper, region, region);
 
-    list_foreach(Window, window, manager_get_windows())
+    list_foreach_reversed(Window, window, manager_get_windows())
     {
         if (rectangle_colide(window_bound(window), region))
         {

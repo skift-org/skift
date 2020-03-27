@@ -65,6 +65,24 @@ void client_request_callback(Client *client, Connection *connection)
 
         break;
     }
+    case COMPOSITOR_MESSAGE_WINDOW_MOVE:
+    {
+        CompositorWindowMove move_window = {};
+        connection_receive(connection, &move_window, sizeof(CompositorWindowMove));
+
+        Window *window = manager_get_window(client, move_window.id);
+
+        if (window)
+        {
+            window_move(window, move_window.position);
+        }
+        else
+        {
+            logger_warn("Invalid window id %d for client %08x", move_window.id, client);
+        }
+
+        break;
+    }
 
     default:
         logger_warn("Invalide message for client %08x", client);

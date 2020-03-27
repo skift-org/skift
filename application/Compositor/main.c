@@ -76,7 +76,7 @@ int main(int argc, char const *argv[])
     Notifier *socket_notifier = notifier_create(HANDLE(socket), SELECT_ACCEPT);
     socket_notifier->on_ready_to_accept = (NotifierHandler)accept_callback;
 
-    Timer *repaint_timer = timer_create(16, render_callback);
+    Timer *repaint_timer = timer_create(1000 / 60, render_callback);
     timer_start(repaint_timer);
 
     manager_initialize();
@@ -85,6 +85,9 @@ int main(int argc, char const *argv[])
 
     Launchpad *launchpad = launchpad_create("__testapp", "/bin/__testapp");
     launchpad_launch(launchpad);
+
+    Launchpad *launchpad2 = launchpad_create("__testapp", "/bin/__testapp");
+    launchpad_launch(launchpad2);
 
     return eventloop_run();
 }

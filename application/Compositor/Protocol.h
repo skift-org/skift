@@ -10,6 +10,7 @@ typedef enum
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
     COMPOSITOR_MESSAGE_BLIT_WINDOW,
     COMPOSITOR_MESSAGE_WINDOW_EVENT,
+    COMPOSITOR_MESSAGE_WINDOW_MOVE,
 } CompositorMessageType;
 
 typedef struct
@@ -24,6 +25,12 @@ typedef struct
     int framebuffer;
     Rectangle bound;
 } CompositorCreateWindowMessage;
+
+typedef struct
+{
+    int id;
+    Point position;
+} CompositorWindowMove;
 
 typedef struct
 {

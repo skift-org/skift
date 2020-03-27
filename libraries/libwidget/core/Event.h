@@ -27,6 +27,16 @@ typedef struct Event
     bool accepted;
 } Event;
 
+#define EVENT(__type, __event_type, __args...) \
+    (Event *)&(__type)                         \
+    {                                          \
+        {                                      \
+            __event_type,                      \
+            false,                             \
+        },                                     \
+            __args                             \
+    }
+
 typedef enum
 {
     MOUSE_NO_BUTTON = 0,

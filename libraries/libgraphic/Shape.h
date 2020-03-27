@@ -58,6 +58,11 @@ static inline Point point_div(Point a, int value)
     return (Point){a.X / value, a.Y / value};
 }
 
+static inline bool point_equ(Point lhs, Point rhs)
+{
+    return lhs.X == rhs.X && lhs.Y == rhs.Y;
+}
+
 static inline Point point_scale(Point a, double scale)
 {
     return (Point){a.X * scale, a.Y * scale};

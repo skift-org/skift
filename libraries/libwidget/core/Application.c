@@ -162,12 +162,22 @@ void application_blit_window(Window *window, Rectangle bound)
 {
     assert(_initialized);
 
-    logger_info("Blitting Window(0x%08x)", window);
-
     CompositorBlitWindowMessage message = {
         .id = window->id,
         .bound = bound,
     };
 
     application_send_message(COMPOSITOR_MESSAGE_BLIT_WINDOW, &message, sizeof(CompositorBlitWindowMessage));
+}
+
+void application_move_window(Window *window, Point position)
+{
+    assert(_initialized);
+
+    CompositorWindowMove message = {
+        .id = window->id,
+        .position = position,
+    };
+
+    application_send_message(COMPOSITOR_MESSAGE_WINDOW_MOVE, &message, sizeof(CompositorWindowMove));
 }

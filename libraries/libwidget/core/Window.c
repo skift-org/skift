@@ -42,8 +42,18 @@ void window_handle_event(Window *window, Event *event)
         application_blit_window(window, window->bound);
         break;
     case EVENT_MOUSE_MOVE:
-        logger_info("Mouse moved ");
+    {
+        MouseEvent *mouse_event = (MouseEvent *)event;
+
+        if (mouse_event->buttons & MOUSE_BUTTON_LEFT)
+        {
+            Point offset = point_sub(mouse_event->position, mouse_event->old_position);
+            window->bound = rectangle_offset(window->bound, offset);
+            application_move_window(window, window->bound.position);
+        }
+
         break;
+    }
 
     case EVENT_MOUSE_ENTER:
         logger_info("Mouse enter ");
@@ -51,6 +61,16 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_LEAVE:
         logger_info("Mouse leave ");
+        break;
+
+    case EVENT_MOUSE_BUTTON_RELEASE:
+        logger_info("Mouse release ");
+
+        break;
+
+    case EVENT_MOUSE_BUTTON_PRESS:
+        logger_info("Mouse press ");
+
         break;
 
     default:

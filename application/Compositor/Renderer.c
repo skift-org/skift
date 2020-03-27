@@ -41,9 +41,9 @@ void renderer_region(Rectangle region)
         {
             Rectangle cliped = rectangle_clip(window_bound(window), region);
 
-            cliped = rectangle_offset(cliped, point_sub(POINT_ZERO, window->bound.position));
+            Rectangle source = rectangle_offset(cliped, point_sub(POINT_ZERO, window->bound.position));
 
-            painter_blit_bitmap(_painter, window->framebuffer, cliped, cliped);
+            painter_blit_bitmap(_painter, window->framebuffer, source, cliped);
         }
     }
 

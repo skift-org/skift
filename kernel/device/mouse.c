@@ -42,7 +42,10 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
     event.right = (packet0 >> 1) & 1;
     event.left = (packet0)&1;
 
-    ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket));
+    if (ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
+    {
+        logger_warn("Mouse buffer overflow!");
+    }
 }
 
 void mouse_interrupt_handler(void)
@@ -162,7 +165,7 @@ void mouse_initialize(void)
     // TODO
 
     // Setup the mouse handler
-    _mouse_buffer = ringbuffer_create(sizeof(MousePacket) * 128);
+    _mouse_buffer = ringbuffer_create(sizeof(MousePacket) * 256);
     dispatcher_register_handler(12, mouse_interrupt_handler);
 
     FsNode *mouse_device = __create(FsNode);

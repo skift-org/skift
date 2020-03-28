@@ -149,6 +149,7 @@
 typedef enum
 {
     RESULT_ENUM(RESULT_ENUM_ENTRY, RESULT_ENUM_ENTRY_WITH_VALUE)
+        __RESULT_COUNT,
 } Result;
 
 #define RETURN_AND_SET_ERROR(__value, __good_return, __on_error_return) \

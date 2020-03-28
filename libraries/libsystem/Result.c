@@ -16,7 +16,14 @@ const char *ERROR_NAMES[] = {RESULT_ENUM(RESULT_ENUM_ENTRY_STRING, RESULT_ENUM_E
 
 const char *result_to_string(Result error)
 {
-    return ERROR_NAMES[error];
+    if (error < __RESULT_COUNT && error >= 0)
+    {
+        return ERROR_NAMES[error];
+    }
+    else
+    {
+        return "INVALID_RESULT_CODE";
+    }
 }
 
 Result error_get(void)

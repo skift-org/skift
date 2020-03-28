@@ -53,7 +53,7 @@ void painter_pop_origin(Painter *painter)
     painter->originestack_top--;
 }
 
-void painter_plot_pixel(Painter *painter, Point position, Color color)
+inline void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
     Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
 
@@ -73,7 +73,7 @@ void painter_clear_pixel(Painter *painter, Point position, Color color)
     }
 }
 
-void painter_blit_bitmap_fast(
+__attribute__((optimize("O3"))) void painter_blit_bitmap_fast(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,

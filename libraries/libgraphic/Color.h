@@ -36,7 +36,20 @@ Color color_lerp(Color a, Color b, float transition);
 
 Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony);
 
-Color color_blend(Color fg, Color bg);
+static inline Color color_blend(Color fg, Color bg)
+{
+    Color result;
+
+    uint alpha = fg.A + 1;
+    uint inv_alpha = 256 - fg.A;
+
+    result.R = (ubyte)((alpha * fg.R + inv_alpha * bg.R) / 256);
+    result.G = (ubyte)((alpha * fg.G + inv_alpha * bg.G) / 256);
+    result.B = (ubyte)((alpha * fg.B + inv_alpha * bg.B) / 256);
+    result.A = 255;
+
+    return result;
+}
 
 #define COLOR(__value) ((Color){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
 

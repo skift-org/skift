@@ -103,21 +103,6 @@ Color ALPHA(Color color, float alpha)
     return color;
 }
 
-Color color_blend(Color fg, Color bg)
-{
-    Color result;
-
-    uint alpha = fg.A + 1;
-    uint inv_alpha = 256 - fg.A;
-
-    result.R = (ubyte)((alpha * fg.R + inv_alpha * bg.R) / 256);
-    result.G = (ubyte)((alpha * fg.G + inv_alpha * bg.G) / 256);
-    result.B = (ubyte)((alpha * fg.B + inv_alpha * bg.B) / 256);
-    result.A = 255;
-
-    return result;
-}
-
 Color color_lerp(Color a, Color b, float transition)
 {
     Color result;

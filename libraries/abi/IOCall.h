@@ -4,6 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/runtime.h>
+
 typedef struct
 {
     int width;
@@ -18,7 +20,7 @@ typedef struct
 
 typedef struct
 {
-    void *buffer;
+    uint32_t *buffer;
     int buffer_width;
     int buffer_height;
 

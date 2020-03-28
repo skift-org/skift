@@ -69,7 +69,7 @@ Bitmap *bitmap_load_from(const char *path)
     rawdata = malloc(state.size);
     assert(stream_read(file, rawdata, state.size) == state.size);
 
-    int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, rawdata, state.size);
+    int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, (const unsigned char *)rawdata, state.size);
 
     if (decode_result != 0)
     {
@@ -116,7 +116,7 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
     void *outbuffer = NULL;
     size_t outbuffer_size = 0;
 
-    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (void *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
+    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
 
     if (err != 0)
     {

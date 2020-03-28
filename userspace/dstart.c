@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
 
     if (result < 0)
     {
-        stream_printf(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string(-result));
+        stream_printf(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string((Result)-result));
         return -1;
     }
 

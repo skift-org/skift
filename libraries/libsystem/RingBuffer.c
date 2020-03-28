@@ -7,7 +7,7 @@
 
 RingBuffer *ringbuffer_create(size_t size)
 {
-    RingBuffer *ringbuffer = calloc(1, sizeof(RingBuffer) + size);
+    RingBuffer *ringbuffer = (RingBuffer *)calloc(1, sizeof(RingBuffer) + size);
 
     ringbuffer->buffer_allocated = size;
 

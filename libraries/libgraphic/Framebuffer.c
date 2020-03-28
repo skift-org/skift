@@ -69,7 +69,7 @@ Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
 
     framebuffer_mark_dirty(framebuffer, bitmap_bound(framebuffer->backbuffer));
 
-    return true;
+    return SUCCESS;
 }
 
 Rectangle framebuffer_bound(Framebuffer *framebuffer)
@@ -110,7 +110,7 @@ void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
 
     IOCallDisplayBlitArgs args;
 
-    args.buffer = framebuffer->backbuffer->pixels;
+    args.buffer = (uint32_t *)framebuffer->backbuffer->pixels;
     args.buffer_width = bitmap_bound(framebuffer->backbuffer).size.X;
     args.buffer_height = bitmap_bound(framebuffer->backbuffer).size.Y;
 

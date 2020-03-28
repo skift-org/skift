@@ -45,7 +45,7 @@ FsNode *socket_create(void)
 {
     FsSocket *socket = __create(FsSocket);
 
-    fsnode_init(FSNODE(socket), FSNODE_SOCKET);
+    fsnode_init(FSNODE(socket), FILE_TYPE_SOCKET);
 
     FSNODE(socket)->open_connection = (FsOperationOpenConnection)socket_FsOperationOpenConnection;
     FSNODE(socket)->can_accept_connection = (FsOperationCanAcceptConnection)socket_FsOperationCanAcceptConnection;

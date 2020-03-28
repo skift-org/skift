@@ -47,13 +47,12 @@ typedef struct Event
             false,                  \
     }
 
-typedef enum
-{
-    MOUSE_NO_BUTTON = 0,
-    MOUSE_BUTTON_LEFT = 1 << 1,
-    MOUSE_BUTTON_RIGHT = 1 << 2,
-    MOUSE_BUTTON_MIDDLE = 1 << 3,
-} MouseButton;
+#define MOUSE_NO_BUTTON (0)
+#define MOUSE_BUTTON_LEFT (1 << 1)
+#define MOUSE_BUTTON_RIGHT (1 << 2)
+#define MOUSE_BUTTON_MIDDLE (1 << 3)
+
+typedef unsigned int MouseButton;
 
 typedef struct
 {

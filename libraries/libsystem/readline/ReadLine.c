@@ -37,7 +37,7 @@ void readline_repaint(ReadLine *readline)
 
 char *readline_readline(ReadLine *readline)
 {
-    readline->buffer = calloc(1, READLINE_ALLOCATED + 1);
+    readline->buffer = (char *)calloc(1, READLINE_ALLOCATED + 1);
     readline->allocated = READLINE_ALLOCATED;
     readline->buffer[0] = '\0';
     readline->cursor = 0;
@@ -70,7 +70,7 @@ char *readline_readline(ReadLine *readline)
             if (readline->used + 1 >= readline->allocated)
             {
                 readline->allocated *= 1.25;
-                readline->buffer = realloc(readline->buffer, readline->allocated);
+                readline->buffer = (char *)realloc(readline->buffer, readline->allocated);
             }
 
             memcpy(readline->buffer + readline->cursor + 1,

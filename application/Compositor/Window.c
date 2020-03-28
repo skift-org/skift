@@ -31,7 +31,7 @@ void window_send_event(Window *window, Event *event, size_t size)
 {
     // FIXME: remove the need for malloc.
 
-    CompositorWindowEvent *message = malloc(sizeof(CompositorWindowEvent) + size);
+    CompositorWindowEvent *message = (CompositorWindowEvent *)malloc(sizeof(CompositorWindowEvent) + size);
     message->id = window->id;
 
     memcpy(&message->event, event, size);

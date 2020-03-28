@@ -25,11 +25,11 @@ void ramdisk_load(multiboot_module_t *module)
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
-            int result = filesystem_mkdir(file_path);
+            Result result = filesystem_mkdir(file_path);
 
             if (result < 0)
             {
-                logger_warn("Failed to create directory %s: %s", block.name, result_to_string(-result));
+                logger_warn("Failed to create directory %s: %s", block.name, result_to_string(result));
             }
         }
         else

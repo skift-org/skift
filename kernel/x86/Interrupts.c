@@ -127,7 +127,7 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
     }
     else if (stackframe.intno == 128)
     {
-        stackframe.eax = task_do_syscall(stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
+        stackframe.eax = task_do_syscall((Syscall)stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
     }
 
     pic_ack(stackframe.intno);

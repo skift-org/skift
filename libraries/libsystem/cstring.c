@@ -14,7 +14,7 @@ void string_printf_append(printf_info_t *info, char c)
 {
     if (info->allocated == -1)
     {
-        strapd(info->output, c);
+        strapd((char *)info->output, c);
     }
     else
     {
@@ -71,8 +71,8 @@ void *memchr(const void *str, int c, size_t n)
 
 int memcmp(const void *str1, const void *str2, size_t n)
 {
-    const unsigned char *s1 = str1;
-    const unsigned char *s2 = str2;
+    const unsigned char *s1 = (const unsigned char *)str1;
+    const unsigned char *s2 = (const unsigned char *)str2;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -88,8 +88,8 @@ int memcmp(const void *str1, const void *str2, size_t n)
 void *memmove(void *dest, const void *src, size_t n)
 {
     size_t i;
-    const unsigned char *usrc = src;
-    unsigned char *udest = dest;
+    const unsigned char *usrc = (const unsigned char *)src;
+    unsigned char *udest = (unsigned char *)dest;
 
     if (udest < usrc)
     {
@@ -132,7 +132,7 @@ void *memcpy(void *s1, const void *s2, size_t n)
 
 void *memset(void *str, int c, size_t n)
 {
-    char *s = str;
+    char *s = (char *)str;
 
     for (size_t i = 0; i < n; i++)
     {
@@ -261,7 +261,7 @@ char *strncpy(char *s1, const char *s2, size_t n)
     size_t size = strnlen(s2, n);
     if (size != n)
         memset(s1 + size, '\0', n - size);
-    return memcpy(s1, s2, size);
+    return (char *)memcpy(s1, s2, size);
 }
 
 size_t strlcpy(char *dst, const char *src, size_t maxlen)
@@ -461,7 +461,7 @@ void strtrailtrim(char *str, char c)
 char *strdup(const char *s)
 {
     int lenght = strlen(s) + 1;
-    char *allocated_string = malloc(lenght);
+    char *allocated_string = (char *)malloc(lenght);
 
     if (allocated_string != NULL)
     {

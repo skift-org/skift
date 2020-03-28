@@ -42,7 +42,7 @@ FsNode *filesystem_find_and_ref(Path *path)
 
     for (size_t i = 0; i < path_element_count(path); i++)
     {
-        if (current && current->type == FSNODE_DIRECTORY)
+        if (current && current->type == FILE_TYPE_DIRECTORY)
         {
             const char *element = path_peek_at(path, i);
 
@@ -114,24 +114,24 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if ((flags & OPEN_DIRECTORY) && node->type != FSNODE_DIRECTORY)
+    if ((flags & OPEN_DIRECTORY) && node->type != FILE_TYPE_DIRECTORY)
     {
         fsnode_deref(node);
 
         return ERR_NOT_A_DIRECTORY;
     }
 
-    if ((flags & OPEN_SOCKET) && node->type != FSNODE_SOCKET)
+    if ((flags & OPEN_SOCKET) && node->type != FILE_TYPE_SOCKET)
     {
         fsnode_deref(node);
 
         return ERR_NOT_A_SOCKET;
     }
 
-    bool is_node_stream = node->type == FSNODE_PIPE ||
-                          node->type == FSNODE_FILE ||
-                          node->type == FSNODE_DEVICE ||
-                          node->type == FSNODE_TERMINAL;
+    bool is_node_stream = node->type == FILE_TYPE_PIPE ||
+                          node->type == FILE_TYPE_REGULAR ||
+                          node->type == FILE_TYPE_DEVICE ||
+                          node->type == FILE_TYPE_TERMINAL;
 
     if ((flags & OPEN_STREAM) && !(is_node_stream))
     {
@@ -156,13 +156,13 @@ Result filesystem_connect(Path *path, FsHandle **connection_handle)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (node->type != FSNODE_SOCKET)
+    if (node->type != FILE_TYPE_SOCKET)
     {
         fsnode_deref(node);
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    int result = fshandle_connect(node, connection_handle);
+    Result result = fshandle_connect(node, connection_handle);
 
     fsnode_deref(node);
 
@@ -211,7 +211,7 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (child->type == FSNODE_DIRECTORY)
+    if (child->type == FILE_TYPE_DIRECTORY)
     {
         fsnode_deref(child);
         return ERR_IS_A_DIRECTORY;
@@ -232,7 +232,7 @@ Result filesystem_link(Path *path, FsNode *node)
         goto cleanup_and_return;
     }
 
-    if (parent->type != FSNODE_DIRECTORY)
+    if (parent->type != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
@@ -257,14 +257,14 @@ cleanup_and_return:
 
 Result filesystem_link_and_take_ref(Path *path, FsNode *node)
 {
-    int result = filesystem_link(path, node);
+    Result result = filesystem_link(path, node);
     fsnode_deref(node);
     return result;
 }
 
 Result filesystem_unlink(Path *path)
 {
-    int result = SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
@@ -274,7 +274,7 @@ Result filesystem_unlink(Path *path)
         goto cleanup_and_return;
     }
 
-    if (parent->type != FSNODE_DIRECTORY)
+    if (parent->type != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
@@ -313,7 +313,7 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto cleanup_and_return;
     }
 
-    if (old_parent->type != FSNODE_DIRECTORY || new_parent->type != FSNODE_DIRECTORY)
+    if (old_parent->type != FILE_TYPE_DIRECTORY || new_parent->type != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;

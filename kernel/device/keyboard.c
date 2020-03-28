@@ -70,7 +70,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
             {
                 uint8_t utf8[5];
                 int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
-                ringbuffer_write(keyboard_buffer, (char *)utf8, lenght);
+                ringbuffer_write(keyboard_buffer, (const char *)utf8, lenght);
             }
         }
 
@@ -94,7 +94,7 @@ void keyboard_interrupt_handler(void)
         }
         else
         {
-            Key key = byte & 0x7F;
+            Key key = (Key)(byte & 0x7F);
             keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
     }
@@ -102,7 +102,7 @@ void keyboard_interrupt_handler(void)
     {
         keyboard_state = PS2KBD_STATE_NORMAL;
 
-        Key key = (byte & 0x7F) + 0x80;
+        Key key = (Key)((byte & 0x7F) + 0x80);
         keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 }
@@ -133,7 +133,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     }
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
-    KeyMap *keymap = malloc(stat.size);
+    KeyMap *keymap = (KeyMap *)malloc(stat.size);
 
     size_t readed = stream_read(keymap_file, keymap, stat.size);
 
@@ -168,7 +168,7 @@ static Result keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *buf
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(keyboard_buffer, buffer, size);
+    *readed = ringbuffer_read(keyboard_buffer, (char *)buffer, size);
     atomic_end();
 
     return SUCCESS;
@@ -181,8 +181,8 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 
     if (request == KEYBOARD_CALL_SET_KEYMAP)
     {
-        keyboard_set_keymap_args_t *size_and_keymap = args;
-        KeyMap *new_keymap = size_and_keymap->keymap;
+        keyboard_set_keymap_args_t *size_and_keymap = (keyboard_set_keymap_args_t *)args;
+        KeyMap *new_keymap = (KeyMap *)size_and_keymap->keymap;
 
         atomic_begin();
 
@@ -191,7 +191,7 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
             free(keyboard_keymap);
         }
 
-        keyboard_keymap = malloc(size_and_keymap->size);
+        keyboard_keymap = (KeyMap *)malloc(size_and_keymap->size);
         memcpy(keyboard_keymap, new_keymap, size_and_keymap->size);
 
         atomic_end();
@@ -229,7 +229,7 @@ void keyboard_initialize()
 
     FsNode *keyboard_device = __create(FsNode);
 
-    fsnode_init(keyboard_device, FSNODE_DEVICE);
+    fsnode_init(keyboard_device, FILE_TYPE_DEVICE);
 
     FSNODE(keyboard_device)->call = (FsOperationCall)keyboard_FsOperationCall;
     FSNODE(keyboard_device)->read = (FsOperationRead)keyboard_FsOperationRead;

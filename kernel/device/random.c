@@ -11,7 +11,7 @@ static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
     __unused(node);
     __unused(handle);
 
-    byte *b = buffer;
+    byte *b = (byte *)buffer;
 
     for (uint i = 0; i < size; i++)
     {
@@ -44,7 +44,7 @@ void random_initialize(void)
 {
     FsNode *random_device = __create(FsNode);
 
-    fsnode_init(random_device, FSNODE_DEVICE);
+    fsnode_init(random_device, FILE_TYPE_DEVICE);
 
     FSNODE(random_device)->read = (FsOperationRead)random_FsOperationRead;
     FSNODE(random_device)->write = (FsOperationWrite)random_FsOperationWrite;

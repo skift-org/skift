@@ -39,22 +39,9 @@ typedef struct FsNode *(*FsOperationAcceptConnection)(struct FsNode *node);
 
 typedef void (*FsOperationDestroy)(struct FsNode *node);
 
-typedef enum
-{
-    FSNODE_UNKNOWN,
-
-    FSNODE_FILE,
-    FSNODE_DEVICE,
-    FSNODE_DIRECTORY,
-    FSNODE_PIPE,
-    FSNODE_SOCKET,
-    FSNODE_CONNECTION,
-    FSNODE_TERMINAL,
-} FsNodeType;
-
 typedef struct FsNode
 {
-    FsNodeType type;
+    FileType type;
     Lock lock;
 
     // FIXME: is this the right way to do that ?
@@ -85,7 +72,7 @@ typedef struct FsNode
 
 #define FSNODE(__subclass) ((FsNode *)(__subclass))
 
-void fsnode_init(FsNode *node, FsNodeType type);
+void fsnode_init(FsNode *node, FileType type);
 
 FsNode *fsnode_ref(FsNode *node);
 

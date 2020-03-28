@@ -8,7 +8,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 
-void fsnode_init(FsNode *node, FsNodeType type)
+void fsnode_init(FsNode *node, FileType type)
 {
     lock_init(node->lock);
     node->refcount = 1;

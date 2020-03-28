@@ -29,7 +29,7 @@ Result pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t
 {
     __unused(handle);
 
-    *readed = ringbuffer_read(node->buffer, buffer, size);
+    *readed = ringbuffer_read(node->buffer, (char *)buffer, size);
 
     return SUCCESS;
 }
@@ -38,7 +38,7 @@ Result pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer,
 {
     __unused(handle);
 
-    *writen = ringbuffer_write(node->buffer, buffer, size);
+    *writen = ringbuffer_write(node->buffer, (const char *)buffer, size);
 
     return SUCCESS;
 }
@@ -60,7 +60,7 @@ FsNode *pipe_create(void)
 {
     FsPipe *pipe = __create(FsPipe);
 
-    fsnode_init(FSNODE(pipe), FSNODE_PIPE);
+    fsnode_init(FSNODE(pipe), FILE_TYPE_PIPE);
 
     FSNODE(pipe)->can_read = (FsOperationCanRead)pipe_FsOperationCanRead;
     FSNODE(pipe)->can_write = (FsOperationCanWrite)pipe_FsOperationCanWrite;

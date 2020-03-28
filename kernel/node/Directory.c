@@ -11,7 +11,7 @@
 
 Result directory_FsOperationOpen(FsDirectory *node, FsHandle *handle)
 {
-    DirectoryListing *listing = malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
+    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
 
     listing->count = list_count(node->childs);
 
@@ -130,7 +130,7 @@ FsNode *directory_create(void)
 {
     FsDirectory *directory = __create(FsDirectory);
 
-    fsnode_init(FSNODE(directory), FSNODE_DIRECTORY);
+    fsnode_init(FSNODE(directory), FILE_TYPE_DIRECTORY);
 
     FSNODE(directory)->open = (FsOperationOpen)directory_FsOperationOpen;
     FSNODE(directory)->close = (FsOperationClose)directory_FsOperationClose;

@@ -15,7 +15,7 @@ Result file_FsOperationOpen(FsFile *node, FsHandle *handle)
     if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
         free(node->buffer);
-        node->buffer = malloc(512);
+        node->buffer = (char *)malloc(512);
         node->realsize = 512;
         node->size = 0;
     }
@@ -38,7 +38,7 @@ Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer,
 {
     if ((handle->offset + size) > node->realsize)
     {
-        node->buffer = realloc(node->buffer, handle->offset + size);
+        node->buffer = (char *)realloc(node->buffer, handle->offset + size);
         node->realsize = handle->offset + size;
     }
 
@@ -66,7 +66,7 @@ FsNode *file_create(void)
 {
     FsFile *file = __create(FsFile);
 
-    fsnode_init(FSNODE(file), FSNODE_FILE);
+    fsnode_init(FSNODE(file), FILE_TYPE_REGULAR);
 
     FSNODE(file)->open = (FsOperationOpen)file_FsOperationOpen;
     FSNODE(file)->read = (FsOperationRead)file_FsOperationRead;
@@ -74,7 +74,7 @@ FsNode *file_create(void)
     FSNODE(file)->size = (FsOperationSize)file_FsOperationSize;
     FSNODE(file)->destroy = (FsOperationDestroy)file_FsOperationDestroy;
 
-    file->buffer = malloc(512);
+    file->buffer = (char *)malloc(512);
     file->realsize = 512;
     file->size = 0;
 

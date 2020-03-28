@@ -35,7 +35,7 @@ Glyph *font_load_glyph(const char *name)
         return NULL;
     }
 
-    Glyph *glyph = malloc(stat.size);
+    Glyph *glyph = (Glyph *)malloc(stat.size);
     size_t readed = stream_read(glyph_file, glyph, stat.size);
 
     if (readed != stat.size)
@@ -98,39 +98,39 @@ Font *font_create(const char *name)
     return font;
 }
 
-void font_destroy(Font *this)
+void font_destroy(Font *font)
 {
-    assert(this);
+    assert(font);
 
-    free(this->glyph);
-    bitmap_destroy(this->bitmap);
-    free(this);
+    free(font->glyph);
+    bitmap_destroy(font->bitmap);
+    free(font);
 }
 
-Glyph *font_glyph(Font *this, Codepoint codepoint)
+Glyph *font_glyph(Font *font, Codepoint codepoint)
 {
-    assert(this);
+    assert(font);
 
-    for (int i = 0; this->glyph[i].codepoint != 0; i++)
+    for (int i = 0; font->glyph[i].codepoint != 0; i++)
     {
-        if (this->glyph[i].codepoint == codepoint)
+        if (font->glyph[i].codepoint == codepoint)
         {
-            return &this->glyph[i];
+            return &font->glyph[i];
         }
     }
 
     return NULL;
 }
 
-int font_measure_width(Font *this, float font_size, const char *str, int str_size)
+int font_measure_width(Font *font, float font_size, const char *str, int str_size)
 {
-    assert(this);
+    assert(font);
 
     int width = 0;
 
     for (int i = 0; i < str_size; i++)
     {
-        Glyph *g = font_glyph(this, str[i]);
+        Glyph *g = font_glyph(font, str[i]);
         width += g->advance * (font_size / 16.0);
     }
 

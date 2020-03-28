@@ -118,7 +118,7 @@ void textmode_initialize(void)
     logger_info("Initializing textmode graphic");
 
     FsNode *textmode_device = __create(FsNode);
-    fsnode_init(textmode_device, FSNODE_DEVICE);
+    fsnode_init(textmode_device, FILE_TYPE_DEVICE);
 
     FSNODE(textmode_device)->write = (FsOperationWrite)textmode_FsOperationWrite;
     FSNODE(textmode_device)->call = (FsOperationCall)textmode_FsOperationCall;

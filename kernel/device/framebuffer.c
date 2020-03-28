@@ -119,17 +119,17 @@ static int framebuffer_height;
 typedef struct
 {
     FsHandle *owner;
-    void *buffer;
+    uint32_t *buffer;
 } framebuffer_backbuffer_t;
 
 static Lock backbuffer_stack_lock;
 static List *backbuffer_stack = NULL;
 
-void *framebuffer_get_buffer(FsHandle *owner)
+uint32_t *framebuffer_get_buffer(FsHandle *owner)
 {
     if (framebuffer_owner == owner)
     {
-        return framebuffer_virtual_addr;
+        return (uint32_t *)framebuffer_virtual_addr;
     }
 
     list_foreach(framebuffer_backbuffer_t, backbuffer, backbuffer_stack)
@@ -156,13 +156,13 @@ framebuffer_backbuffer_t *framebuffer_get_backbuffer(FsHandle *owner)
     return NULL;
 }
 
-inline void framebuffer_set_pixel(uint *framebuffer, int width, int height, int x, int y, uint32_t value)
+inline void framebuffer_set_pixel(uint32_t *framebuffer, int width, int height, int x, int y, uint32_t value)
 {
     if ((x >= 0 && x < width) && (y >= 0 && y < height))
         framebuffer[x + y * width] = value;
 }
 
-inline uint32_t framebuffer_get_pixel(uint *framebuffer, int width, int height, int x, int y)
+inline uint32_t framebuffer_get_pixel(uint32_t *framebuffer, int width, int height, int x, int y)
 {
     int xi = abs((int)x % width);
     int yi = abs((int)y % height);
@@ -170,15 +170,15 @@ inline uint32_t framebuffer_get_pixel(uint *framebuffer, int width, int height, 
     return framebuffer[xi + yi * width];
 }
 
-void *framebuffer_resize(uint *buffer, int old_width, int old_height, int new_width, int new_height)
+uint32_t *framebuffer_resize(uint32_t *buffer, int old_width, int old_height, int new_width, int new_height)
 {
-    void *resized_framebuffer = malloc((new_width * new_height) * sizeof(uint));
+    uint32_t *resized_framebuffer = (uint32_t *)malloc((new_width * new_height) * sizeof(uint32_t));
 
     for (int x = 0; x < new_width; x++)
     {
         for (int y = 0; y < new_height; y++)
         {
-            uint pixel_data = framebuffer_get_pixel(buffer, old_width, old_height, x, y);
+            uint32_t pixel_data = framebuffer_get_pixel(buffer, old_width, old_height, x, y);
             framebuffer_set_pixel(resized_framebuffer, new_width, new_height, x, y, pixel_data);
         }
     }
@@ -270,15 +270,15 @@ int framebuffer_FsOperationOpen(FsNode *node, FsHandle *handle)
             framebuffer_backbuffer_t *backbuffer = __create(framebuffer_backbuffer_t);
 
             backbuffer->owner = framebuffer_owner;
-            backbuffer->buffer = malloc(framebuffer_width * framebuffer_height * sizeof(uint));
-            memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_width * framebuffer_height * sizeof(uint));
+            backbuffer->buffer = (uint32_t *)malloc(framebuffer_width * framebuffer_height * sizeof(uint32_t));
+            memcpy(backbuffer->buffer, framebuffer_virtual_addr, framebuffer_width * framebuffer_height * sizeof(uint32_t));
 
             list_pushback(backbuffer_stack, backbuffer);
         }
 
         // Make stream the new owner of the framebuffer.
         framebuffer_owner = handle;
-        memset(framebuffer_virtual_addr, 0, framebuffer_width * framebuffer_height * sizeof(uint));
+        memset(framebuffer_virtual_addr, 0, framebuffer_width * framebuffer_height * sizeof(uint32_t));
 
         lock_release(backbuffer_stack_lock);
     }
@@ -406,7 +406,7 @@ bool framebuffer_initialize(multiboot_info_t *mboot)
         }
 
         FsNode *framebuffer_device = __create(FsNode);
-        fsnode_init(framebuffer_device, FSNODE_DEVICE);
+        fsnode_init(framebuffer_device, FILE_TYPE_DEVICE);
 
         FSNODE(framebuffer_device)->open = (FsOperationOpen)framebuffer_FsOperationOpen;
         FSNODE(framebuffer_device)->close = (FsOperationClose)framebuffer_FsOperationClose;

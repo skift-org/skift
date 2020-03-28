@@ -32,7 +32,7 @@ static Result zero_FsOperationWrite(FsNode *node, FsHandle *handle, const void *
 void zero_initialize(void)
 {
     FsNode *zero_device = __create(FsNode);
-    fsnode_init(zero_device, FSNODE_DEVICE);
+    fsnode_init(zero_device, FILE_TYPE_DEVICE);
 
     FSNODE(zero_device)->read = (FsOperationRead)zero_FsOperationRead;
     FSNODE(zero_device)->write = (FsOperationWrite)zero_FsOperationWrite;

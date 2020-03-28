@@ -324,10 +324,10 @@ int sys_handle_select(
     // FIXME: We need to copy these because this syscall uses task_fshandle_select
     //        who block the current thread using a blocker which does a context switch.
 
-    int *handles_copy = calloc(handles_set->count, sizeof(int));
+    int *handles_copy = (int *)calloc(handles_set->count, sizeof(int));
     memcpy(handles_copy, handles_set->handles, handles_set->count * sizeof(int));
 
-    SelectEvent *events_copy = calloc(handles_set->count, sizeof(SelectEvent));
+    SelectEvent *events_copy = (SelectEvent *)calloc(handles_set->count, sizeof(SelectEvent));
     memcpy(events_copy, handles_set->events, handles_set->count * sizeof(SelectEvent));
 
     int selected_copy;
@@ -500,11 +500,11 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
          syscall >= SYS_HANDLE_OPEN) &&
         (result != SUCCESS && result != TIMEOUT))
     {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(result));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
     }
     else if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
     {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string(-result));
+        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)-result));
     }
 
     return result;

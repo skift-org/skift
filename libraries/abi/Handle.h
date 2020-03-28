@@ -8,14 +8,13 @@
 
 #include <libsystem/Result.h>
 
-typedef enum
-{
-    SELECT_READ = 1 << 0,
-    SELECT_WRITE = 1 << 1,
-    SELECT_SEND = 1 << 2,
-    SELECT_CONNECT = 1 << 3,
-    SELECT_ACCEPT = 1 << 4,
-} SelectEvent;
+#define SELECT_READ (1 << 0)
+#define SELECT_WRITE (1 << 1)
+#define SELECT_SEND (1 << 2)
+#define SELECT_CONNECT (1 << 3)
+#define SELECT_ACCEPT (1 << 4)
+
+typedef unsigned int SelectEvent;
 
 typedef struct
 {

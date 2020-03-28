@@ -10,7 +10,7 @@ typedef struct
 {
     FsNode node;
 
-    byte *buffer;
+    char *buffer;
     size_t realsize;
     size_t size;
 } FsFile;

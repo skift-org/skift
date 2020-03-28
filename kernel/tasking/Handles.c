@@ -169,7 +169,7 @@ Result task_fshandle_select(
     Result result = SUCCESS;
 
     FsHandle *selected_handle = NULL;
-    FsHandle **handles = calloc(handles_set->count, sizeof(FsHandle *));
+    FsHandle **handles = (FsHandle **)calloc(handles_set->count, sizeof(FsHandle *));
 
     for (size_t i = 0; i < handles_set->count; i++)
     {
@@ -307,7 +307,7 @@ Result task_fshandle_connect(Task *task, int *connection_handle_index, const cha
     Path *resolved_path = task_cwd_resolve(task, socket_path);
 
     FsHandle *connection_handle;
-    int result = filesystem_connect(resolved_path, &connection_handle);
+    Result result = filesystem_connect(resolved_path, &connection_handle);
 
     path_destroy(resolved_path);
 

@@ -27,7 +27,7 @@ Result handle_select(
     SelectEvent *selected_events,
     Timeout timeout)
 {
-    int *handles_index = calloc(count, sizeof(int));
+    int *handles_index = (int *)calloc(count, sizeof(int));
 
     for (size_t i = 0; i < count; i++)
     {

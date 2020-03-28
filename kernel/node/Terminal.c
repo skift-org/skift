@@ -44,11 +44,11 @@ Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *bu
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        *readed = ringbuffer_read(terminal->slave_to_master_buffer, buffer, size);
+        *readed = ringbuffer_read(terminal->slave_to_master_buffer, (char *)buffer, size);
     }
     else
     {
-        *readed = ringbuffer_read(terminal->master_to_slave_buffer, buffer, size);
+        *readed = ringbuffer_read(terminal->master_to_slave_buffer, (char *)buffer, size);
     }
 
     return SUCCESS;
@@ -60,11 +60,11 @@ Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const v
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        *writen = ringbuffer_write(terminal->master_to_slave_buffer, buffer, size);
+        *writen = ringbuffer_write(terminal->master_to_slave_buffer, (const char *)buffer, size);
     }
     else
     {
-        *writen = ringbuffer_write(terminal->slave_to_master_buffer, buffer, size);
+        *writen = ringbuffer_write(terminal->slave_to_master_buffer, (const char *)buffer, size);
     }
 
     return SUCCESS;
@@ -74,7 +74,7 @@ Result terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int requ
 {
     __unused(handle);
 
-    IOCallTerminalSizeArgs *size_args = args;
+    IOCallTerminalSizeArgs *size_args = (IOCallTerminalSizeArgs *)args;
 
     switch (request)
     {
@@ -118,7 +118,7 @@ FsNode *terminal_create(void)
 {
     FsTerminal *terminal = __create(FsTerminal);
 
-    fsnode_init(FSNODE(terminal), FSNODE_TERMINAL);
+    fsnode_init(FSNODE(terminal), FILE_TYPE_TERMINAL);
 
     FSNODE(terminal)->can_read = (FsOperationCanRead)terminal_FsOperationCanRead;
     FSNODE(terminal)->can_write = (FsOperationCanWrite)terminal_FsOperationCanWrite;

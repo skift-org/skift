@@ -52,7 +52,7 @@ int shell_split(char *command, char **argv)
 
             if (buffer_len > 1)
             {
-                char *buffer = malloc(buffer_len);
+                char *buffer = (char *)malloc(buffer_len);
                 memcpy(buffer, start, buffer_len);
                 buffer[buffer_len - 1] = '\0';
 

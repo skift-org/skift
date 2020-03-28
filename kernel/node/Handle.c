@@ -152,7 +152,7 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed
     return result;
 }
 
-static Result fshandle_write_interal(FsHandle *handle, const char *buffer, size_t size, size_t *written)
+static Result fshandle_write_interal(FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     FsNode *node = handle->node;
 
@@ -307,7 +307,7 @@ Result fshandle_call(FsHandle *handle, int request, void *args)
 
 Result fshandle_stat(FsHandle *handle, FileState *stat)
 {
-    int result = SUCCESS;
+    Result result = SUCCESS;
 
     FsNode *node = handle->node;
 

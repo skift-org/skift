@@ -23,7 +23,7 @@ Path *path_create(const char *raw_path)
 
             if (lenght > 1) // 1 for the null terminator
             {
-                char *element = malloc(lenght);
+                char *element = (char *)malloc(lenght);
                 strlcpy(element, begin, lenght);
                 list_pushback(path->elements, element);
             }
@@ -184,17 +184,17 @@ Path *path_clone(Path *path)
     return clone;
 }
 
-void path_to_cstring(Path *this, char *buffer, uint size)
+void path_to_cstring(Path *path, char *buffer, uint size)
 {
     buffer[0] = '\0';
 
-    if (path_element_count(this) == 0)
+    if (path_element_count(path) == 0)
     {
         strnapd(buffer, PATH_SEPARATOR, size);
     }
     else
     {
-        list_foreach(const char, i, this->elements)
+        list_foreach(const char, i, path->elements)
         {
             const char *element = (const char *)i;
             strnapd(buffer, PATH_SEPARATOR, size);
@@ -203,10 +203,10 @@ void path_to_cstring(Path *this, char *buffer, uint size)
     }
 }
 
-void path_dump(Path *p)
+void path_dump(Path *path)
 {
-    for (size_t i = 0; i < path_element_count(p); i++)
+    for (size_t i = 0; i < path_element_count(path); i++)
     {
-        printf("/%s", path_peek_at(p, i));
+        printf("/%s", path_peek_at(path, i));
     }
 }

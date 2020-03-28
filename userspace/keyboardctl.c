@@ -88,7 +88,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         return -1;
     }
 
-    KeyMap *new_keymap = malloc(stat.size);
+    KeyMap *new_keymap = (KeyMap *)malloc(stat.size);
 
     stream_read(keymap_file, new_keymap, stat.size);
 

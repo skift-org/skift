@@ -155,7 +155,7 @@ typedef enum
 #define RETURN_AND_SET_ERROR(__value, __good_return, __on_error_return) \
     if ((__value) < 0)                                                  \
     {                                                                   \
-        error_set(-(__value));                                          \
+        error_set((Result) - (__value));                                \
         return (__on_error_return);                                     \
     }                                                                   \
     else                                                                \

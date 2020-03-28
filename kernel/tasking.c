@@ -564,7 +564,7 @@ Result task_set_cwd(Task *task, const char *buffer)
         goto cleanup_and_return;
     }
 
-    if (node->type != FSNODE_DIRECTORY)
+    if (node->type != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;

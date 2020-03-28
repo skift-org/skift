@@ -25,8 +25,8 @@ typedef struct
 
 Font *font_create(const char *name);
 
-void font_destroy(Font *this);
+void font_destroy(Font *font);
 
 bool font_has_glyph(Font *font, Codepoint codepoint);
 
-Glyph *font_glyph(Font *this, Codepoint codepoint);
+Glyph *font_glyph(Font *font, Codepoint codepoint);

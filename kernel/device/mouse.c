@@ -38,9 +38,9 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
     event.offx = offx;
     event.offy = -offy;
     event.scroll = 0;
-    event.middle = (packet0 >> 2) & 1;
-    event.right = (packet0 >> 1) & 1;
-    event.left = (packet0)&1;
+    event.middle = (MouseButtonState)((packet0 >> 2) & 1);
+    event.right = (MouseButtonState)((packet0 >> 1) & 1);
+    event.left = (MouseButtonState)((packet0)&1);
 
     if (ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
     {
@@ -129,7 +129,7 @@ static Result mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(_mouse_buffer, buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
+    *readed = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
     atomic_end();
 
     return SUCCESS;
@@ -170,7 +170,7 @@ void mouse_initialize(void)
 
     FsNode *mouse_device = __create(FsNode);
 
-    fsnode_init(mouse_device, FSNODE_DEVICE);
+    fsnode_init(mouse_device, FILE_TYPE_DEVICE);
 
     FSNODE(mouse_device)->read = (FsOperationRead)mouse_FsOperationRead;
     FSNODE(mouse_device)->can_read = (FsOperationCanRead)mouse_FsOperationCanRead;

@@ -87,7 +87,7 @@ Terminal *textmode_terminal_create(void)
     TERMINAL_RENDERER(renderer)->destroy = (TerminalRendererDestroy)textmode_terminal_destroy;
 
     renderer->device = device;
-    renderer->buffer = calloc(info.width * info.height, sizeof(ushort));
+    renderer->buffer = (ushort *)calloc(info.width * info.height, sizeof(ushort));
     renderer->info = info;
 
     return terminal_create(info.width, info.height, TERMINAL_RENDERER(renderer));

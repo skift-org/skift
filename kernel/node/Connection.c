@@ -45,7 +45,7 @@ Result connection_read(
         data = connection->data_to_server;
     }
 
-    *readed = ringbuffer_read(data, buffer, size);
+    *readed = ringbuffer_read(data, (char *)buffer, size);
 
     return SUCCESS;
 }
@@ -68,7 +68,7 @@ Result connection_write(
         data = connection->data_to_client;
     }
 
-    *writen = ringbuffer_write(data, buffer, size);
+    *writen = ringbuffer_write(data, (const char *)buffer, size);
 
     return SUCCESS;
 }
@@ -83,7 +83,7 @@ FsNode *connection_create(void)
 {
     FsConnection *connection = __create(FsConnection);
 
-    fsnode_init(FSNODE(connection), FSNODE_CONNECTION);
+    fsnode_init(FSNODE(connection), FILE_TYPE_CONNECTION);
 
     FSNODE(connection)->accept = (FsOperationAccept)connection_accept;
     FSNODE(connection)->is_accepted = (FsOperationIsAccepted)connection_is_accepted;

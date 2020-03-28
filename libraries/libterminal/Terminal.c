@@ -17,7 +17,7 @@ Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
 
     terminal->width = width;
     terminal->height = height;
-    terminal->buffer = calloc(width * height, sizeof(TerminalCell));
+    terminal->buffer = (TerminalCell *)calloc(width * height, sizeof(TerminalCell));
 
     terminal->decoder = utf8decoder_create((UTF8DecoderCallback)terminal_decoder_callback, terminal);
     terminal->renderer = renderer;
@@ -447,19 +447,19 @@ void terminal_do_ansi(Terminal *terminal, Codepoint codepoint)
                 }
                 else if (attr >= 30 && attr <= 37)
                 {
-                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, attr - 30);
+                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, (TerminalColor)(attr - 30));
                 }
                 else if (attr >= 90 && attr <= 97)
                 {
-                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, attr - 90 + 8);
+                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, (TerminalColor)(attr - 90 + 8));
                 }
                 else if (attr >= 40 && attr <= 47)
                 {
-                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, attr - 40);
+                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, (TerminalColor)(attr - 40));
                 }
                 else if (attr >= 100 && attr <= 107)
                 {
-                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, attr - 100 + 8);
+                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, (TerminalColor)(attr - 100 + 8));
                 }
             }
         }

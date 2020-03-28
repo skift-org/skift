@@ -26,14 +26,14 @@ static Result null_FsOperationWrite(FsNode *node, FsHandle *handle, const void *
 
     *writen = size;
 
-    return 0;
+    return SUCCESS;
 }
 
 void null_initialize(void)
 {
     FsNode *null_device = __create(FsNode);
 
-    fsnode_init(null_device, FSNODE_DEVICE);
+    fsnode_init(null_device, FILE_TYPE_DEVICE);
 
     FSNODE(null_device)->read = (FsOperationRead)null_FsOperationRead;
     FSNODE(null_device)->write = (FsOperationWrite)null_FsOperationWrite;

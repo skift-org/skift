@@ -31,24 +31,20 @@ typedef enum
     FILE_TYPE_TERMINAL,
 } FileType;
 
-typedef enum
-{
-    OPEN_READ = 1 << 0,
-    OPEN_WRITE = 1 << 1,
-    OPEN_CREATE = 1 << 2,
-    OPEN_APPEND = 1 << 3,
-    OPEN_TRUNC = 1 << 4,
-    OPEN_BUFFERED = 1 << 5,
+#define OPEN_READ (1 << 0)
+#define OPEN_WRITE (1 << 1)
+#define OPEN_CREATE (1 << 2)
+#define OPEN_APPEND (1 << 3)
+#define OPEN_TRUNC (1 << 4)
+#define OPEN_BUFFERED (1 << 5)
+#define OPEN_STREAM (1 << 6)
+#define OPEN_DIRECTORY (1 << 7)
+#define OPEN_SOCKET (1 << 8)
+#define OPEN_CLIENT (1 << 9)
+#define OPEN_SERVER (1 << 10)
+#define OPEN_MASTER (1 << 11)
 
-    OPEN_STREAM = 1 << 6,
-    OPEN_DIRECTORY = 1 << 7,
-    OPEN_SOCKET = 1 << 8,
-
-    OPEN_CLIENT = 1 << 9,
-    OPEN_SERVER = 1 << 10,
-
-    OPEN_MASTER = 1 << 11,
-} OpenFlag;
+typedef unsigned int OpenFlag;
 
 typedef struct
 {

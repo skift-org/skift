@@ -47,7 +47,7 @@ void serial_interrupt_handler(void)
 {
     char byte = in8(PORT_COM1);
 
-    ringbuffer_write(serial_buffer, &byte, sizeof(byte));
+    ringbuffer_write(serial_buffer, (const char *)&byte, sizeof(byte));
 }
 
 bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
@@ -66,7 +66,7 @@ static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(serial_buffer, buffer, size);
+    *readed = ringbuffer_read(serial_buffer, (char *)buffer, size);
     atomic_end();
 
     return SUCCESS;
@@ -97,7 +97,7 @@ void serial_initialize(void)
     dispatcher_register_handler(4, serial_interrupt_handler);
 
     FsNode *serial_device = __create(FsNode);
-    fsnode_init(serial_device, FSNODE_DEVICE);
+    fsnode_init(serial_device, FILE_TYPE_DEVICE);
 
     FSNODE(serial_device)->can_read = (FsOperationCanRead)serial_FsOperationCanRead;
     FSNODE(serial_device)->read = (FsOperationRead)serial_FsOperationRead;

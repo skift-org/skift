@@ -14,7 +14,7 @@ typedef struct
 Matrix4 matrix_create_projection(double near, double far, double fov, double aspect_ratio)
 {
     double fov_rad = 1.0 / tan(fov * 0.5 / 180.0 * PI);
-    Matrix4 projection = {0};
+    Matrix4 projection = {};
 
     projection.m[0][0] = aspect_ratio * fov_rad;
     projection.m[1][1] = fov_rad;
@@ -28,7 +28,7 @@ Matrix4 matrix_create_projection(double near, double far, double fov, double asp
 
 Matrix4 matrix_create_rotationX(double theta)
 {
-    Matrix4 mat = {0};
+    Matrix4 mat = {};
 
     mat.m[0][0] = 1;
     mat.m[1][1] = cos(theta * 0.5);
@@ -47,7 +47,7 @@ Matrix4 matrix_create_rotationX(double theta)
 
 Matrix4 matrix_create_rotationZ(double theta)
 {
-    Matrix4 mat = {0};
+    Matrix4 mat = {};
 
     mat.m[0][0] = cos(theta);
     mat.m[0][1] = sin(theta);

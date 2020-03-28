@@ -91,7 +91,7 @@ static const face_t cude_mesh[] = {
 
 vector3_t matrix_apply_tranform(vector3_t position, Matrix4 transform)
 {
-    vector3_t out = {0};
+    vector3_t out = {};
 
     out.X = position.X * transform.m[0][0] +
             position.Y * transform.m[1][0] +

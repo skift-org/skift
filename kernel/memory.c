@@ -22,7 +22,7 @@ uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
 
 uint FREE_MEMORY_SHORTCUT = 0;
-uchar MEMORY[1024 * 1024 / 8] = {0};
+uchar MEMORY[1024 * 1024 / 8] = {};
 
 #define PHYSICAL_IS_USED(__addr) \
     (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] & (1 << ((uint)(__addr) / PAGE_SIZE % 8)))
@@ -94,8 +94,8 @@ void physical_free(uint addr, uint count)
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-PageDirectory kpdir __aligned(PAGE_SIZE) = {0};
-PageTable kptable[256] __aligned(PAGE_SIZE) = {0};
+PageDirectory kpdir __aligned(PAGE_SIZE) = {};
+PageTable kptable[256] __aligned(PAGE_SIZE) = {};
 
 int page_present(PageDirectory *pdir, uint vaddr)
 {

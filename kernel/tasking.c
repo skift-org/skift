@@ -207,7 +207,7 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
     task_set_entry(t, entry, true);
 
-    uint argv_list[PROCESS_ARG_COUNT] = {0};
+    uint argv_list[PROCESS_ARG_COUNT] = {};
 
     int argc;
     for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
@@ -485,7 +485,7 @@ void task_memory_free(Task *task, uint addr, uint count)
 
 /* --- Task dump ---------------------------------------------------------- */
 
-static char *TASK_STATES[] = {
+static const char *TASK_STATES[] = {
     "HANG",
     "LAUNCHPAD",
     "RUNNING",
@@ -806,7 +806,7 @@ void garbage_colector()
 /* -------------------------------------------------------------------------- */
 
 static bool sheduler_context_switch = false;
-static int sheduler_record[SHEDULER_RECORD_COUNT] = {0};
+static int sheduler_record[SHEDULER_RECORD_COUNT] = {};
 
 void timer_set_frequency(u16 hz)
 {

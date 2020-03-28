@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         shell_prompt(command_exit_value);
         char *command = readline_readline(readline);
 
-        char *command_argv[PROCESS_ARG_COUNT] = {0};
+        char *command_argv[PROCESS_ARG_COUNT] = {};
         int command_argc = shell_split(command, command_argv);
 
         if (command_argc == 0)

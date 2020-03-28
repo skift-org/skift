@@ -20,7 +20,7 @@ Framebuffer *framebuffer_open(void)
         return framebuffer;
     }
 
-    IOCallDisplayModeArgs mode_info = {0};
+    IOCallDisplayModeArgs mode_info = {};
 
     __plug_handle_call(&framebuffer->handle, IOCALL_DISPLAY_GET_MODE, &mode_info);
 

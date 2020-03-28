@@ -13,7 +13,7 @@ int __printf_formate_binary(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
-    char buffer[33] = {0};
+    char buffer[33] = {};
     convert_uint_to_string(v, buffer, 33, 2);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
@@ -32,7 +32,7 @@ int __printf_formate_octal(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
-    char buffer[33] = {0};
+    char buffer[33] = {};
     convert_uint_to_string(v, buffer, 33, 8);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
@@ -51,7 +51,7 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
 {
     int v = va_arg(*va, int);
 
-    char buffer[33] = {0};
+    char buffer[33] = {};
 
     if (v < 0)
     {
@@ -83,7 +83,7 @@ int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
-    char buffer[33] = {0};
+    char buffer[33] = {};
     convert_uint_to_string(v, buffer, 32, 16);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);

@@ -49,7 +49,7 @@ int loadkey_list_keymap(void)
         return -1;
     }
 
-    DirectoryEntry entry = {0};
+    DirectoryEntry entry = {};
     while (directory_read(keymap_directory, &entry) > 0)
     {
         // FIXME: maybe show some info about the kmap file
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 
     if (!option_get && !option_list && argc == 2)
     {
-        char font_path[PATH_LENGHT] = {0};
+        char font_path[PATH_LENGHT] = {};
         snprintf(font_path, PATH_LENGHT, "/res/keyboard/%s.kmap", argv[1]);
 
         return loadkey_set_keymap(keyboard_device, font_path);

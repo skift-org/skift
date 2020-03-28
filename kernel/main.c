@@ -35,7 +35,7 @@
 #include "kernel/x86/Interrupts.h"
 #include "kernel/x86/gdt.h"
 
-static multiboot_info_t mbootinfo = {0};
+static multiboot_info_t mbootinfo = {};
 static TimeStamp boot_timestamp = 0;
 
 ElapsedTime system_get_uptime(void)

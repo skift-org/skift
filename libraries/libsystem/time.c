@@ -21,7 +21,7 @@ Time timestamp_to_time(TimeStamp timestamp)
 
 Date timestamp_to_date(TimeStamp timestamp)
 {
-    Date date = {0};
+    Date date = {};
 
     int days = timestamp / SECONDS_PER_DAY;
 

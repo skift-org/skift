@@ -127,7 +127,7 @@ static void find_isa_bridge(uint32_t device, uint16_t vendorid, uint16_t devicei
 }
 
 static uint32_t pci_isa = 0;
-static uint8_t pci_remaps[4] = {0};
+static uint8_t pci_remaps[4] = {};
 
 void pci_remap(void)
 {

@@ -16,7 +16,7 @@ int cat(const char *path)
         return -1;
     }
 
-    FileState stat = {0};
+    FileState stat = {};
     stream_stat(stream, &stat);
 
     size_t readed;

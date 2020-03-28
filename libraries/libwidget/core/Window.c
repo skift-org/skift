@@ -32,7 +32,7 @@ void window_paint(Window *window)
         painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
     }
 
-    painter_draw_rectangle(window->painter, window_header_bound(window), THEME_BORDER);
+    painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_BORDER);
 
     if (window->focused)
     {

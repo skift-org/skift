@@ -194,3 +194,8 @@ static inline Rectangle rectangle_set_width(Rectangle rect, size_t width)
 
     return rect;
 }
+
+static inline Rectangle rectangle_bottom(Rectangle rect, int size)
+{
+    return (Rectangle){{rect.X, rect.Y + rect.height - size, rect.width, size}};
+}

@@ -2,6 +2,7 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Shape.h>
+#include <libwidget/core/Cursor.h>
 #include <libwidget/core/Event.h>
 
 struct Client;
@@ -11,6 +12,7 @@ typedef struct Window
     int id;
     struct Client *client;
     Rectangle bound;
+    CursorState cursor_state;
 
     Bitmap *framebuffer;
 } Window;

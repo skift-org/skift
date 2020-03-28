@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libgraphic/Shape.h>
+#include <libwidget/core/Cursor.h>
 #include <libwidget/core/Event.h>
 
 typedef enum
@@ -11,6 +12,7 @@ typedef enum
     COMPOSITOR_MESSAGE_BLIT_WINDOW,
     COMPOSITOR_MESSAGE_WINDOW_EVENT,
     COMPOSITOR_MESSAGE_WINDOW_MOVE,
+    COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE,
 } CompositorMessageType;
 
 typedef struct
@@ -48,3 +50,9 @@ typedef struct
     int id;
     Event event[];
 } CompositorWindowEvent;
+
+typedef struct
+{
+    int id;
+    CursorState state;
+} CompositorCursorStateChange;

@@ -181,3 +181,15 @@ void application_move_window(Window *window, Point position)
 
     application_send_message(COMPOSITOR_MESSAGE_WINDOW_MOVE, &message, sizeof(CompositorWindowMove));
 }
+
+void application_window_change_cursor(Window *window, CursorState state)
+{
+    assert(_initialized);
+
+    CompositorCursorStateChange message = {
+        .id = window->id,
+        .state = state,
+    };
+
+    application_send_message(COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE, &message, sizeof(CompositorCursorStateChange));
+}

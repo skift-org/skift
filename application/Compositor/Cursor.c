@@ -12,11 +12,26 @@ static MouseButton _mouse_buttons;
 static Point _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
-static Bitmap *_cursor;
+static const char *_cursor_paths[] = {
+    [CURSOR_BUSY] = "/res/mouse/busy.png",
+    [CURSOR_DEFAULT] = "/res/mouse/default.png",
+    [CURSOR_DISABLED] = "/res/mouse/disabled.png",
+    [CURSOR_MOVE] = "/res/mouse/move.png",
+    [CURSOR_RESIZEH] = "/res/mouse/resizeh.png",
+    [CURSOR_RESIZEHV] = "/res/mouse/resizehv.png",
+    [CURSOR_RESIZEV] = "/res/mouse/resizev.png",
+    [CURSOR_RESIZEVH] = "/res/mouse/resizevh.png",
+    [CURSOR_TEXT] = "/res/mouse/text.png",
+};
+
+static Bitmap *_cursor_bitmaps[__CURSOR_COUNT] = {};
 
 void cursor_initialize(void)
 {
-    _cursor = bitmap_load_from("/res/mouse/default.png");
+    for (size_t i = 0; i < __CURSOR_COUNT; i++)
+    {
+        _cursor_bitmaps[i] = bitmap_load_from(_cursor_paths[i]);
+    }
 }
 
 MouseButton cursor_pack_mouse_buttons(MousePacket packet)
@@ -57,8 +72,8 @@ void cursor_handle_packet(MousePacket packet)
 
     if (!point_equ(_mouse_old_position, _mouse_position))
     {
-        renderer_region_dirty(cursor_bound_from_position(_mouse_old_position));
-        renderer_region_dirty(cursor_bound_from_position(_mouse_position));
+        renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_old_position));
+        renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_position));
 
         if (window_on_focus)
             window_handle_mouse_move(window_on_focus, _mouse_old_position, _mouse_position, _mouse_buttons);
@@ -79,17 +94,47 @@ void cursor_handle_packet(MousePacket packet)
     }
 }
 
+CursorState cursor_get_state(void)
+{
+    Window *window = manager_get_window_at(_mouse_position);
+
+    if (window)
+    {
+        return window->cursor_state;
+    }
+    else
+    {
+        return CURSOR_DEFAULT;
+    }
+}
+
 void cursor_render(Painter *painter)
 {
-    painter_blit_bitmap(painter, _cursor, bitmap_bound(_cursor), cursor_bound());
+    Bitmap *cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
+
+    painter_blit_bitmap(painter, cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
 }
 
 Rectangle cursor_bound_from_position(Point position)
 {
+    CursorState state = cursor_get_state();
+
     Rectangle bound;
 
-    bound.position = point_add(position, (Point){-2, -2});
-    bound.size = (Point){24, 24};
+    if (state == CURSOR_MOVE ||
+        state == CURSOR_RESIZEH ||
+        state == CURSOR_RESIZEV ||
+        state == CURSOR_RESIZEHV ||
+        state == CURSOR_RESIZEVH)
+    {
+        bound.position = point_add(position, (Point){-14, -14});
+    }
+    else
+    {
+        bound.position = point_add(position, (Point){-2, -2});
+    }
+
+    bound.size = (Point){28, 28};
 
     return bound;
 }
@@ -97,4 +142,15 @@ Rectangle cursor_bound_from_position(Point position)
 Rectangle cursor_bound(void)
 {
     return cursor_bound_from_position(_mouse_position);
+}
+
+Rectangle cursor_dirty_bound_from_position(Point position)
+{
+    Rectangle bound;
+
+    bound.position = point_add(position, (Point){-28, -28});
+
+    bound.size = (Point){56, 56};
+
+    return bound;
 }

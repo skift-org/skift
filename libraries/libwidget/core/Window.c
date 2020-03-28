@@ -13,11 +13,26 @@ void window_set_main_widget(Window *window, Widget *widget)
     window->main_widget = widget;
 }
 
+Rectangle window_header_bound(Window *window)
+{
+    return rectangle_set_height(window_bound(window), 32);
+}
+
+Rectangle window_header_bound_on_screen(Window *window)
+{
+    return rectangle_set_height(window_bound_on_screen(window), 32);
+}
+
 void window_paint(Window *window)
 {
     painter_fill_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
-    painter_fill_rectangle(window->painter, rectangle_set_height(window_bound(window), 32), THEME_ALT_BACKGROUND);
-    painter_draw_rectangle(window->painter, rectangle_set_height(window_bound(window), 32), THEME_BORDER);
+
+    if (window->focused)
+    {
+        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+    }
+
+    painter_draw_rectangle(window->painter, window_header_bound(window), THEME_BORDER);
 
     if (window->focused)
     {
@@ -64,7 +79,7 @@ void window_handle_event(Window *window, Event *event)
     {
         MouseEvent *mouse_event = (MouseEvent *)event;
 
-        if (mouse_event->buttons & MOUSE_BUTTON_LEFT)
+        if (window->is_dragging)
         {
             Point offset = point_sub(mouse_event->position, mouse_event->old_position);
             window->bound = rectangle_offset(window->bound, offset);
@@ -82,15 +97,36 @@ void window_handle_event(Window *window, Event *event)
         logger_info("Mouse leave ");
         break;
 
-    case EVENT_MOUSE_BUTTON_RELEASE:
-        logger_info("Mouse release ");
-
-        break;
-
     case EVENT_MOUSE_BUTTON_PRESS:
+    {
         logger_info("Mouse press ");
+        MouseEvent *mouse_event = (MouseEvent *)event;
+
+        if (!window->is_dragging &&
+            mouse_event->button == MOUSE_BUTTON_LEFT &&
+            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position))
+        {
+            window->is_dragging = true;
+            window_set_cursor(window, CURSOR_MOVE);
+        }
 
         break;
+    }
+
+    case EVENT_MOUSE_BUTTON_RELEASE:
+    {
+        logger_info("Mouse release ");
+        MouseEvent *mouse_event = (MouseEvent *)event;
+
+        if (window->is_dragging &&
+            mouse_event->button == MOUSE_BUTTON_LEFT)
+        {
+            window->is_dragging = false;
+            window_set_cursor(window, CURSOR_DEFAULT);
+        }
+
+        break;
+    }
 
     default:
         break;
@@ -103,6 +139,7 @@ Window *window_create(Rectangle bound)
 
     window->id = _window_id++;
     window->focused = false;
+    window->cursor_state = CURSOR_DEFAULT;
 
     window->framebuffer = bitmap_create(bound.width, bound.height);
     window->painter = painter_create(window->framebuffer);
@@ -133,4 +170,13 @@ Rectangle window_bound(Window *window)
     bound.size = window->bound.size;
 
     return bound;
+}
+
+void window_set_cursor(Window *window, CursorState state)
+{
+    if (window->cursor_state != state)
+    {
+        application_window_change_cursor(window, state);
+        window->cursor_state = state;
+    }
 }

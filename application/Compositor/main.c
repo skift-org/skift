@@ -89,5 +89,14 @@ int main(int argc, char const *argv[])
     Launchpad *launchpad2 = launchpad_create("__testapp", "/bin/__testapp");
     launchpad_launch(launchpad2);
 
+    Launchpad *launchpad3 = launchpad_create("__testapp", "/bin/__testapp");
+    launchpad_launch(launchpad3);
+
+    Launchpad *launchpad4 = launchpad_create("__testapp", "/bin/__testapp");
+    launchpad_launch(launchpad4);
+
+    Launchpad *launchpad5 = launchpad_create("__testapp", "/bin/__testapp");
+    launchpad_launch(launchpad5);
+
     return eventloop_run();
 }

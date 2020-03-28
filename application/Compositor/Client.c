@@ -2,6 +2,7 @@
 #include <libsystem/memory.h>
 
 #include "Compositor/Client.h"
+#include "Compositor/Cursor.h"
 #include "Compositor/Manager.h"
 #include "Compositor/Protocol.h"
 #include "Compositor/Renderer.h"
@@ -80,6 +81,28 @@ void client_request_callback(Client *client, Connection *connection)
         {
             logger_warn("Invalid window id %d for client %08x", move_window.id, client);
         }
+
+        break;
+    }
+    case COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE:
+    {
+        CompositorCursorStateChange cursor = {};
+        connection_receive(connection, &cursor, sizeof(CompositorCursorStateChange));
+
+        Window *window = manager_get_window(client, cursor.id);
+
+        renderer_region_dirty(cursor_bound());
+
+        if (window)
+        {
+            window->cursor_state = cursor.state;
+        }
+        else
+        {
+            logger_warn("Invalid window id %d for client %08x", cursor.id, client);
+        }
+
+        renderer_region_dirty(cursor_bound());
 
         break;
     }

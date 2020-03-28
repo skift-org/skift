@@ -15,10 +15,18 @@ void window_set_main_widget(Window *window, Widget *widget)
 
 void window_paint(Window *window)
 {
-    painter_fill_rectangle(window->painter, window->bound, THEME_BACKGROUND);
-    painter_fill_rectangle(window->painter, rectangle_set_height(window->bound, 32), THEME_ALT_BACKGROUND);
-    painter_draw_rectangle(window->painter, rectangle_set_height(window->bound, 32), THEME_BORDER);
-    painter_draw_rectangle(window->painter, window->bound, THEME_ACCENT);
+    painter_fill_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
+    painter_fill_rectangle(window->painter, rectangle_set_height(window_bound(window), 32), THEME_ALT_BACKGROUND);
+    painter_draw_rectangle(window->painter, rectangle_set_height(window_bound(window), 32), THEME_BORDER);
+
+    if (window->focused)
+    {
+        painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
+    }
+    else
+    {
+        painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
+    }
 }
 
 void window_dump(Window *window)
@@ -41,6 +49,17 @@ void window_handle_event(Window *window, Event *event)
         window_paint(window);
         application_blit_window(window, window->bound);
         break;
+
+    case EVENT_GOT_FOCUS:
+        window->focused = true;
+        window_handle_event(window, EVENT_NO_ARGS(EVENT_PAINT));
+        break;
+
+    case EVENT_LOST_FOCUS:
+        window->focused = false;
+        window_handle_event(window, EVENT_NO_ARGS(EVENT_PAINT));
+        break;
+
     case EVENT_MOUSE_MOVE:
     {
         MouseEvent *mouse_event = (MouseEvent *)event;
@@ -83,6 +102,7 @@ Window *window_create(Rectangle bound)
     Window *window = __create(Window);
 
     window->id = _window_id++;
+    window->focused = false;
 
     window->framebuffer = bitmap_create(bound.width, bound.height);
     window->painter = painter_create(window->framebuffer);
@@ -99,4 +119,18 @@ Window *window_create(Rectangle bound)
 void window_destroy(Window *window)
 {
     application_remove_window(window);
+}
+
+Rectangle window_bound_on_screen(Window *window)
+{
+    return window->bound;
+}
+
+Rectangle window_bound(Window *window)
+{
+    Rectangle bound = {};
+
+    bound.size = window->bound.size;
+
+    return bound;
 }

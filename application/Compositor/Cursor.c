@@ -52,28 +52,30 @@ void cursor_handle_packet(MousePacket packet)
     _mouse_old_buttons = _mouse_buttons;
     _mouse_buttons = cursor_pack_mouse_buttons(packet);
 
-    Window *_mouse_old_window = manager_get_window_at(_mouse_old_position);
-    Window *_mouse_window = manager_get_window_at(_mouse_position);
+    Window *window_under = manager_get_window_at(_mouse_position);
+    Window *window_on_focus = manager_focus_window();
 
     if (!point_equ(_mouse_old_position, _mouse_position))
     {
         renderer_region_dirty(cursor_bound_from_position(_mouse_old_position));
         renderer_region_dirty(cursor_bound_from_position(_mouse_position));
 
-        if (_mouse_window != _mouse_old_window && _mouse_old_window != NULL)
-            window_handle_mouse_move(_mouse_old_window, _mouse_old_position, _mouse_position, _mouse_buttons);
-
-        if (_mouse_window)
-            window_handle_mouse_move(_mouse_window, _mouse_old_position, _mouse_position, _mouse_buttons);
+        if (window_on_focus)
+            window_handle_mouse_move(window_on_focus, _mouse_old_position, _mouse_position, _mouse_buttons);
     }
 
     if (_mouse_old_buttons != _mouse_buttons)
     {
-        if (_mouse_window)
+        if (window_under)
         {
-            window_focus(_mouse_window);
-            window_handle_mouse_buttons(_mouse_window, _mouse_old_buttons, _mouse_buttons, _mouse_position);
+            if (window_under != window_on_focus)
+            {
+                manager_set_focus_window(window_under);
+                window_on_focus = window_under;
+            }
         }
+
+        window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
     }
 }
 

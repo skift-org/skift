@@ -84,18 +84,15 @@ void window_handle_mouse_move(Window *window, Point old_position, Point position
                           sizeof(MouseEvent));
     }
 
-    if (mouse_is_in_window)
-    {
-        window_send_event(window,
-                          EVENT(
-                              MouseEvent,
-                              EVENT_MOUSE_MOVE,
-                              position,
-                              old_position,
-                              MOUSE_NO_BUTTON,
-                              buttons),
-                          sizeof(MouseEvent));
-    }
+    window_send_event(window,
+                      EVENT(
+                          MouseEvent,
+                          EVENT_MOUSE_MOVE,
+                          position,
+                          old_position,
+                          MOUSE_NO_BUTTON,
+                          buttons),
+                      sizeof(MouseEvent));
 }
 
 void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Point position)
@@ -141,8 +138,14 @@ void window_handle_mouse_buttons(
     window_handle_mouse_button(window, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
 }
 
-void window_focus(Window *window)
+void window_get_focus(Window *window)
 {
-    manager_focus_window(window);
     renderer_region_dirty(window_bound(window));
+    window_send_event(window, EVENT_NO_ARGS(EVENT_GOT_FOCUS), sizeof(Event));
+}
+
+void window_lost_focus(Window *window)
+{
+    renderer_region_dirty(window_bound(window));
+    window_send_event(window, EVENT_NO_ARGS(EVENT_LOST_FOCUS), sizeof(Event));
 }

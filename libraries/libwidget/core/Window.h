@@ -9,6 +9,7 @@ typedef struct
 {
     int id;
 
+    bool focused;
     Rectangle bound;
     Widget *main_widget;
 
@@ -26,3 +27,7 @@ void window_dump(Window *window);
 void window_handle_event(Window *window, Event *event);
 
 void window_set_main_widget(Window *window, Widget *widget);
+
+Rectangle window_bound_on_screen(Window *window);
+
+Rectangle window_bound(Window *window);

@@ -29,4 +29,6 @@ void window_handle_mouse_move(Window *window, Point old_position, Point position
 
 void window_handle_mouse_buttons(Window *window, MouseButton old_buttons, MouseButton buttons, Point position);
 
-void window_focus(Window *window);
+void window_get_focus(Window *window);
+
+void window_lost_focus(Window *window);

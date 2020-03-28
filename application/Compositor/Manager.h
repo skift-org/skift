@@ -18,4 +18,6 @@ void manager_register_window(struct Window *window);
 
 void manager_unregister_window(struct Window *window);
 
-void manager_focus_window(struct Window *window);
+void manager_set_focus_window(struct Window *window);
+
+struct Window *manager_focus_window(void);

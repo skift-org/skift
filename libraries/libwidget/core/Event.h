@@ -12,6 +12,9 @@ typedef enum
     EVENT_CHILD_REMOVED,
     EVENT_PAINT,
 
+    EVENT_GOT_FOCUS,
+    EVENT_LOST_FOCUS,
+
     EVENT_MOUSE_MOVE,
     EVENT_MOUSE_ENTER,
     EVENT_MOUSE_LEAVE,
@@ -35,6 +38,13 @@ typedef struct Event
             false,                             \
         },                                     \
             __args                             \
+    }
+
+#define EVENT_NO_ARGS(__event_type) \
+    &(Event)                        \
+    {                               \
+        __event_type,               \
+            false,                  \
     }
 
 typedef enum

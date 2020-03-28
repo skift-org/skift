@@ -44,8 +44,7 @@ typedef struct FsNode
     FileType type;
     Lock lock;
 
-    // FIXME: is this the right way to do that ?
-    _Atomic int refcount;
+    int refcount;
 
     FsOperationOpen open;
     FsOperationClose close;

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define NULL ((void *)0)
+//#define NULL ((void *)0)
 
 #define let __auto_type const
 #define var __auto_type

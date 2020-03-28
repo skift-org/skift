@@ -639,7 +639,7 @@ void memory_object_destroy(MemoryObject *memory_object)
 
 MemoryObject *memory_object_ref(MemoryObject *memory_object)
 {
-    memory_object->refcount++;
+    __atomic_add_fetch(&memory_object->refcount, 1, __ATOMIC_SEQ_CST);
 
     return memory_object;
 }
@@ -648,9 +648,7 @@ void memory_object_deref(MemoryObject *memory_object)
 {
     lock_acquire(_memory_objects_lock);
 
-    memory_object->refcount--;
-
-    if (memory_object->refcount == 0)
+    if (__atomic_sub_fetch(&memory_object->refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
         memory_object_destroy(memory_object);
     }

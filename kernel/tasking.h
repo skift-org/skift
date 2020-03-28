@@ -9,8 +9,8 @@
 #include <abi/Task.h>
 
 #include <libsystem/Result.h>
-#include <libsystem/utils/List.h>
 #include <libsystem/runtime.h>
+#include <libsystem/utils/List.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory.h"
@@ -159,7 +159,7 @@ typedef struct
     uintptr_t address;
     size_t size;
 
-    _Atomic int refcount;
+    int refcount;
 } MemoryObject;
 
 typedef struct

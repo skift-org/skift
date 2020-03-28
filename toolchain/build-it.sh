@@ -82,7 +82,7 @@ pushd "$DIR/build/"
                                           --disable-nls \
                                           --with-newlib \
                                           --with-sysroot=$SYSROOT \
-                                          --enable-languages=c|| exit 1
+                                          --enable-languages=c,c++|| exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1

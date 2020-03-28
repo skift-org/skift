@@ -14,7 +14,7 @@ COPT_FLAGS=-O2 -pipe
 CDIALECT_FLAGS=-std=gnu11
 
 CWARN_FLAGS=-Wall \
-		    -Wextra \
+		    -Wextra  \
 			-Wc++-compat \
 			-Werror
 

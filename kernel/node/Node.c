@@ -17,15 +17,14 @@ void fsnode_init(FsNode *node, FileType type)
 
 FsNode *fsnode_ref(FsNode *node)
 {
-    node->refcount++;
+    __atomic_add_fetch(&node->refcount, 1, __ATOMIC_SEQ_CST);
+
     return node;
 }
 
 void fsnode_deref(FsNode *node)
 {
-    node->refcount--;
-
-    if (node->refcount == 0)
+    if (__atomic_sub_fetch(&node->refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
         if (node->destroy)
         {

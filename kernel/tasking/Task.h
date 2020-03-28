@@ -15,7 +15,7 @@
 typedef struct
 {
     int id;
-    _Atomic int refcount;
+    int refcount;
 
     PlatformContext *context;
 

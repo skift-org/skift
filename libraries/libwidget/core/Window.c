@@ -36,6 +36,7 @@ void window_paint(Window *window)
 
     if (window->focused)
     {
+        painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
         painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
     }
     else

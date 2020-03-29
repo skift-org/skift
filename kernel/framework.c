@@ -118,9 +118,9 @@ int __plug_process_this(void)
     return sheduler_running_id();
 }
 
-int __plug_process_launch(Launchpad *launchpad)
+Result __plug_process_launch(Launchpad *launchpad, int *pid)
 {
-    return task_launch(sheduler_running(), launchpad);
+    return task_launch(sheduler_running(), launchpad, pid);
 }
 
 void __plug_process_exit(int code)

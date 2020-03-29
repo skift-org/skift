@@ -6,11 +6,12 @@
 
 #include <abi/Process.h>
 
+#include <libsystem/Result.h>
 #include <libsystem/runtime.h>
 
 int process_this(void);
 
-int process_run(const char *command);
+Result process_run(const char *command, int *pid);
 
 void __attribute__((noreturn)) process_exit(int code);
 

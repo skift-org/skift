@@ -22,11 +22,12 @@ int main(int argc, char const *argv[])
         launchpad_argument(launchpad, argv[i + 1]);
     }
 
-    int result = launchpad_launch(launchpad);
+    int pid = -1;
+    Result result = launchpad_launch(launchpad, &pid);
 
     if (result < 0)
     {
-        stream_printf(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string((Result)-result));
+        stream_printf(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string(result));
         return -1;
     }
 

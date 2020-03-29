@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
     renderer_initialize();
 
     Launchpad *launchpad = launchpad_create("__testapp", "/bin/__testapp");
-    launchpad_launch(launchpad);
+    launchpad_launch(launchpad, NULL);
 
     return eventloop_run();
 }

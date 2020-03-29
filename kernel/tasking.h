@@ -87,7 +87,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user);
 
-int task_launch(Task *task, Launchpad *Launchpad);
+Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid);
 
 void task_set_state(Task *task, TaskState state);
 

@@ -19,9 +19,9 @@ int __plug_process_this(void)
     return _cached_this;
 }
 
-int __plug_process_launch(Launchpad *launchpad)
+Result __plug_process_launch(Launchpad *launchpad, int *pid)
 {
-    return __syscall(SYS_PROCESS_LAUNCH, (int)launchpad, 0, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_LAUNCH, (int)launchpad, (int)pid, 0, 0, 0);
 }
 
 void __plug_process_exit(int code)

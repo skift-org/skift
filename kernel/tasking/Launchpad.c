@@ -63,18 +63,20 @@ void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *laun
     lock_release(parent_task->handles_lock);
 }
 
-int task_launch(Task *parent_task, Launchpad *launchpad)
+Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 {
     assert(parent_task == sheduler_running());
 
-    int result = -ERR_FUNCTION_NOT_IMPLEMENTED;
+    *pid = -1;
+
+    Result result = SUCCESS;
 
     Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
 
     if (handle_has_error(elf_file))
     {
         logger_error("Failled to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
-        result = -handle_get_error(elf_file);
+        result = handle_get_error(elf_file);
 
         goto cleanup_and_return;
     }
@@ -85,7 +87,7 @@ int task_launch(Task *parent_task, Launchpad *launchpad)
     if (elf_header_size != sizeof(elf_header_t) || !elf_valid(&elf_header))
     {
         logger_error("Failled to load ELF file %s: bad exec format!", launchpad->executable);
-        result = -ERR_EXEC_FORMAT_ERROR;
+        result = ERR_EXEC_FORMAT_ERROR;
 
         goto cleanup_and_return;
     }
@@ -99,17 +101,16 @@ int task_launch(Task *parent_task, Launchpad *launchpad)
 
         if (stream_read(elf_file, &elf_program_header, sizeof(elf_program_t)) != sizeof(elf_program_t))
         {
-            result = -ERR_EXEC_FORMAT_ERROR;
+            result = ERR_EXEC_FORMAT_ERROR;
             task_destroy(child_task);
 
             goto cleanup_and_return;
         }
 
-        Result load_result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
+        result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
 
-        if (load_result != SUCCESS)
+        if (result != SUCCESS)
         {
-            result = -ERR_EXEC_FORMAT_ERROR;
             task_destroy(child_task);
 
             goto cleanup_and_return;
@@ -118,7 +119,7 @@ int task_launch(Task *parent_task, Launchpad *launchpad)
 
     task_launch_passhandle(parent_task, child_task, launchpad);
 
-    result = child_task->id;
+    *pid = child_task->id;
     task_go(child_task);
 
 cleanup_and_return:

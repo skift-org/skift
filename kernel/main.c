@@ -148,12 +148,13 @@ void kmain(multiboot_info_t *info, uint magic)
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 2);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 3);
 
-    int init_process = launchpad_launch(init_lauchpad);
+    int init_process = -1;
+    Result result = launchpad_launch(init_lauchpad, &init_process);
 
     stream_close(keyboard_device);
     stream_close(serial_device);
 
-    if (init_process < 0)
+    if (result != SUCCESS)
     {
         PANIC("Failled to start init : %s", result_to_string((Result)-init_process));
     }

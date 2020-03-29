@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/assert.h>
-#include <libsystem/Result.h>
 #include <libsystem/process/Launchpad.h>
 
 int process_this(void)
@@ -12,14 +12,14 @@ int process_this(void)
     return __plug_process_this();
 }
 
-int process_run(const char *command)
+Result process_run(const char *command, int *pid)
 {
     Launchpad *launchpad = launchpad_create("/bin/Shell", "/bin/Shell");
 
     launchpad_argument(launchpad, "-c");
     launchpad_argument(launchpad, command);
 
-    return launchpad_launch(launchpad);
+    return launchpad_launch(launchpad, pid);
 }
 
 void __attribute__((noreturn)) process_exit(int code)

@@ -108,7 +108,7 @@ int main(int argc, char const *argv[])
     launchpad_handle(shell_launchpad, HANDLE(slave), 0);
     launchpad_handle(shell_launchpad, HANDLE(slave), 1);
     launchpad_handle(shell_launchpad, HANDLE(slave), 2);
-    launchpad_launch(shell_launchpad);
+    launchpad_launch(shell_launchpad, NULL);
 
     logger_trace("Shell application started");
 

@@ -19,11 +19,12 @@ int main(int argc, char **argv)
     {
         printf("\r%d out %d... ", i + 1, LOOP_MAX);
 
-        int process_id = process_run("sysfetch");
+        int pid = -1;
+        Result result = process_run("sysfetch", &pid);
 
-        assert(process_id > 0);
+        assert(result == SUCCESS);
 
-        process_wait(process_id, NULL);
+        process_wait(pid, NULL);
     }
 
     printf("PASS\n");

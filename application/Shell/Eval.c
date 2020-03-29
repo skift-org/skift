@@ -9,38 +9,38 @@
 
 int shell_eval_command(int argc, const char **argv)
 {
-    int command_result = 0;
     ShellBuiltinCallback builtin = shell_get_builtin(argv[0]);
 
     if (builtin)
     {
-        command_result = builtin(argc, argv);
-        goto cleanup_and_return;
+        return builtin(argc, argv);
     }
-
-    char executable[PATH_LENGHT];
-    snprintf(executable, PATH_LENGHT, "/bin/%s", argv[0]);
-
-    Launchpad *launchpad = launchpad_create(argv[0], executable);
-
-    for (int i = 0; i < argc; i++)
+    else
     {
-        launchpad_argument(launchpad, argv[i]);
+        char executable[PATH_LENGHT];
+        snprintf(executable, PATH_LENGHT, "/bin/%s", argv[0]);
+
+        Launchpad *launchpad = launchpad_create(argv[0], executable);
+
+        for (int i = 0; i < argc; i++)
+        {
+            launchpad_argument(launchpad, argv[i]);
+        }
+
+        int pid = -1;
+        Result result = launchpad_launch(launchpad, &pid);
+
+        if (result != SUCCESS)
+        {
+            printf("%s: Command not found! \e[90m%s\e[m\n", argv[0], result_to_string(result));
+
+            return -1;
+        }
+        else
+        {
+            int command_result = -1;
+            process_wait(pid, &command_result);
+            return command_result;
+        }
     }
-
-    int process = launchpad_launch(launchpad);
-
-    if (process < 0)
-    {
-        printf("%s: Command not found! \e[90m%s\e[m\n", argv[0], result_to_string((Result)-process));
-
-        command_result = -1;
-        goto cleanup_and_return;
-    }
-
-    process_wait(process, &command_result);
-
-cleanup_and_return:
-
-    return command_result;
 }

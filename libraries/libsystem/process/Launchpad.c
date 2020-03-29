@@ -54,11 +54,18 @@ void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destinat
     launchpad->handles[destination] = handle_to_pass->id;
 }
 
-int launchpad_launch(Launchpad *launchpad)
+Result launchpad_launch(Launchpad *launchpad, int *pid)
 {
-    int process_handle = __plug_process_launch(launchpad);
+    int discard;
+
+    if (pid == NULL)
+    {
+        pid = &discard;
+    }
+
+    Result result = __plug_process_launch(launchpad, pid);
 
     launchpad_destroy(launchpad);
 
-    return process_handle;
+    return result;
 }

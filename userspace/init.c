@@ -14,18 +14,19 @@ int init_exec(const char *filename)
 
     Launchpad *launchpad = launchpad_create(filename, filename);
 
-    int process = launchpad_launch(launchpad);
+    int pid = -1;
+    Result result = launchpad_launch(launchpad, &pid);
 
-    if (process < 0)
+    if (result != SUCCESS)
     {
         logger_warn("Failed to start process: '%s'!", filename);
     }
     else
     {
-        logger_info("'%s' started with pid=%d !", filename, process);
+        logger_info("'%s' started with pid=%d !", filename, pid);
     }
 
-    return process;
+    return pid;
 }
 
 int main(int argc, char **argv)

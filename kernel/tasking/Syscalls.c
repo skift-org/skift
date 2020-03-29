@@ -33,14 +33,15 @@ int sys_process_this(void)
     return sheduler_running_id();
 }
 
-int sys_process_launch(Launchpad *launchpad)
+int sys_process_launch(Launchpad *launchpad, int *pid)
 {
-    if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)))
+    if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
+        !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
     {
         return -ERR_BAD_ADDRESS;
     }
 
-    return task_launch(sheduler_running(), launchpad);
+    return task_launch(sheduler_running(), launchpad, pid);
 }
 
 int sys_process_exit(int code)

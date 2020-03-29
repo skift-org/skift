@@ -694,6 +694,8 @@ void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
     virtual_free(task->pdir, memory_mapping->address, PAGE_ALIGN_UP(memory_mapping->size) / PAGE_SIZE);
     memory_object_deref(memory_mapping->object);
+
+    list_remove(task->memory_mapping, memory_mapping);
     free(memory_mapping);
 }
 

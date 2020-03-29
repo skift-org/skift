@@ -342,14 +342,9 @@ Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection
     {
         result = task_fshandle_add(task, connection_handle_index, connection_handle);
 
-        if (result == SUCCESS)
+        if (result != SUCCESS)
         {
-            result = task_fshandle_add(task, connection_handle_index, connection_handle);
-
-            if (result != SUCCESS)
-            {
-                fshandle_destroy(connection_handle);
-            }
+            fshandle_destroy(connection_handle);
         }
     }
 

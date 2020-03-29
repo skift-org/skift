@@ -90,7 +90,8 @@ void cursor_handle_packet(MousePacket packet)
             }
         }
 
-        window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
+        if (window_on_focus)
+            window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
     }
 }
 

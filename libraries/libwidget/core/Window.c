@@ -23,6 +23,11 @@ Rectangle window_header_bound_on_screen(Window *window)
     return rectangle_set_height(window_bound_on_screen(window), 32);
 }
 
+Rectangle window_drag_bound_on_screen(Window *window)
+{
+    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){8, 8, 8, 8}));
+}
+
 void window_paint(Window *window)
 {
     painter_fill_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
@@ -105,7 +110,7 @@ void window_handle_event(Window *window, Event *event)
 
         if (!window->is_dragging &&
             mouse_event->button == MOUSE_BUTTON_LEFT &&
-            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position))
+            rectangle_containe_point(window_drag_bound_on_screen(window), mouse_event->position))
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);

@@ -20,6 +20,11 @@ void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
 
     char buffer[521];
     stream_read(keyboard_stream, buffer, 521);
+
+    if (buffer[0] == 'q')
+    {
+        eventloop_exit(0);
+    }
 }
 
 void mouse_callback(Notifier *notifier, Stream *mouse_stream)

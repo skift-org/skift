@@ -82,6 +82,17 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     }
 }
 
+Key keyboard_scancode_to_key(int scancode)
+{
+#define SCAN_CODE_TO_KEY_ENTRY(__key_name, __key_number) \
+    if (scancode == (__key_number))                      \
+        return __key_name;
+
+    KEY_LIST(SCAN_CODE_TO_KEY_ENTRY);
+
+    return KEY_INVALID;
+}
+
 void keyboard_interrupt_handler(void)
 {
     int byte = in8(0x60);
@@ -94,7 +105,7 @@ void keyboard_interrupt_handler(void)
         }
         else
         {
-            Key key = (Key)(byte & 0x7F);
+            Key key = keyboard_scancode_to_key(byte & 0x7F);
             keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
     }
@@ -102,7 +113,7 @@ void keyboard_interrupt_handler(void)
     {
         keyboard_state = PS2KBD_STATE_NORMAL;
 
-        Key key = (Key)((byte & 0x7F) + 0x80);
+        Key key = keyboard_scancode_to_key((byte & 0x7F) + 0x80);
         keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 }

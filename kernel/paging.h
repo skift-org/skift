@@ -63,10 +63,14 @@ typedef struct __packed
     PageDirectoryEntry entries[PAGE_DIRECTORIE_ENTRY_COUNT];
 } PageDirectory;
 
+#ifdef __cplusplus
+extern "C" void paging_enable(void);
+extern "C" void paging_disable(void);
+extern "C" void paging_load_directorie(PageDirectory *directorie);
+extern "C" void paging_invalidate_tlb(void);
+#else
 extern void paging_enable(void);
-
 extern void paging_disable(void);
-
 extern void paging_load_directorie(PageDirectory *directorie);
-
-extern void paging_invalidate_tlb();
+extern void paging_invalidate_tlb(void);
+#endif

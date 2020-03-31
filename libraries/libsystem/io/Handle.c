@@ -35,8 +35,11 @@ Result handle_select(
     }
 
     int selected_index = HANDLE_INVALID_ID;
+
+    HandleSet handleset = (HandleSet){handles_index, events, count};
+
     Result result = __plug_handle_select(
-        &(HandleSet){handles_index, events, count},
+        &handleset,
         &selected_index,
         selected_events,
         timeout);

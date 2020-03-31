@@ -4,7 +4,7 @@
 
 #include <libdevice/keys.h>
 
-#define KEY_NAMES_ENTRY(__key_name, __key_number) [__key_number] = #__key_name,
+#define KEY_NAMES_ENTRY(__key_name, __key_number) #__key_name,
 
 static const char *KEYS_NAMES[] = {KEY_LIST(KEY_NAMES_ENTRY)};
 

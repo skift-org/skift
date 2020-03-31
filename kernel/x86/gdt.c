@@ -4,16 +4,7 @@
 
 #include "kernel/x86/gdt.h"
 
-static TSS tss = {
-    .ss0 = 0x10,
-    .esp0 = 0,
-    .cs = 0x0b,
-    .ss = 0x13,
-    .ds = 0x13,
-    .es = 0x13,
-    .fs = 0x13,
-    .gs = 0x13,
-};
+static TSS tss = {};
 
 static GDTEntry gdt_entries[GDT_ENTRY_COUNT];
 
@@ -24,6 +15,15 @@ static GDTDescriptor gdt_descriptor = {
 
 void gdt_setup()
 {
+    tss.ss0 = 0x10;
+    tss.esp0 = 0;
+    tss.cs = 0x0b;
+    tss.ss = 0x13;
+    tss.ds = 0x13;
+    tss.es = 0x13;
+    tss.fs = 0x13;
+    tss.gs = 0x13;
+
     gdt_entries[0] = GDT_ENTRY(0, 0, 0, 0);
 
     gdt_entries[1] = GDT_ENTRY(0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_FLAGS);

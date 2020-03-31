@@ -13,6 +13,7 @@ typedef enum
 } KeyMotion;
 
 #define KEY_LIST(__ENTRY)                     \
+    __ENTRY(KEY_INVALID, 0x0)                 \
     __ENTRY(KEY_ESC, 0x01)                    \
     __ENTRY(KEY_NUM1, 0x02)                   \
     __ENTRY(KEY_NUM2, 0x03)                   \
@@ -123,7 +124,7 @@ typedef enum
     __ENTRY(KEY_RSUPER, (0x80 + 0x5C))        \
     __ENTRY(KEY_MENU, (0x80 + 0x5D))
 
-#define KEY_ENUM_ENTRY(__key_name, __key_number) __key_name = __key_number,
+#define KEY_ENUM_ENTRY(__key_name, __key_number) __key_name,
 
 typedef enum
 {

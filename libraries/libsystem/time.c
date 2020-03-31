@@ -13,9 +13,9 @@ TimeStamp timestamp_now(void)
 Time timestamp_to_time(TimeStamp timestamp)
 {
     return (Time){
-        .second = timestamp % 60,
-        .minute = (timestamp / SECONDS_PER_MINUTE) % 60,
-        .hour = (timestamp / SECONDS_PER_HOURS) % 24,
+        .second = (int)(timestamp % 60),
+        .minute = (int)((timestamp / SECONDS_PER_MINUTE) % 60),
+        .hour = (int)((timestamp / SECONDS_PER_HOURS) % 24),
     };
 }
 
@@ -48,10 +48,12 @@ Date timestamp_to_date(TimeStamp timestamp)
 
 DateTime timestamp_to_datetime(TimeStamp timestamp)
 {
-    return (DateTime){
-        .time = timestamp_to_time(timestamp),
-        .date = timestamp_to_date(timestamp),
-    };
+    DateTime datetime = {};
+
+    datetime.time = timestamp_to_time(timestamp);
+    datetime.date = timestamp_to_date(timestamp);
+
+    return datetime;
 }
 
 TimeStamp datetime_to_timestamp(DateTime datetime)

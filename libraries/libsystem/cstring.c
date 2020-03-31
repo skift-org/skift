@@ -40,12 +40,12 @@ int vsnprintf(char *s, int n, const char *fmt, va_list va)
     if (n == 0)
         return 0;
 
-    printf_info_t info = (printf_info_t){
-        .format = fmt,
-        .append = string_printf_append,
-        .output = (char *)s,
-        .allocated = n,
-    };
+    printf_info_t info = {};
+
+    info.format = fmt;
+    info.append = string_printf_append;
+    info.output = (char *)s;
+    info.allocated = n;
 
     // We need it to start with a 0 because we use strapd.
     s[0] = '\0';
@@ -224,7 +224,7 @@ int strcmp(const char *stra, const char *strb)
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
-    register unsigned char u1, u2;
+    unsigned char u1, u2;
 
     while (n-- > 0)
     {
@@ -283,7 +283,7 @@ size_t strlcpy(char *dst, const char *src, size_t maxlen)
 
 size_t strcspn(const char *string, const char *chars)
 {
-    register char c, *p, *s;
+    char c, *p, *s;
 
     for (s = (char *)string, c = *s; c != 0; s++, c = *s)
     {
@@ -298,7 +298,7 @@ size_t strcspn(const char *string, const char *chars)
     return s - string;
 }
 
-char *strerror(int errnum)
+const char *strerror(int errnum)
 {
     (void)(errnum);
     return "Error";
@@ -375,7 +375,7 @@ char *strstr(const char *s1, const char *s2)
 
 char *strtok(char *s, char **state, const char *delim)
 {
-    register int ch;
+    int ch;
 
     if (s == 0)
         s = *state;

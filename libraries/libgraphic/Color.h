@@ -9,13 +9,13 @@
 typedef union {
     struct
     {
-        ubyte R;
-        ubyte G;
-        ubyte B;
-        ubyte A;
+        uint8_t R;
+        uint8_t G;
+        uint8_t B;
+        uint8_t A;
     };
 
-    uint packed;
+    uint32_t packed;
 } Color;
 
 Color RGB(float R, float G, float B);

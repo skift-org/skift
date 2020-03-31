@@ -72,14 +72,20 @@ void window_handle_event(Window *window, Event *event)
         break;
 
     case EVENT_GOT_FOCUS:
+    {
         window->focused = true;
-        window_handle_event(window, EVENT_NO_ARGS(EVENT_PAINT));
-        break;
+        Event paint_event = {EVENT_PAINT, false};
+        window_handle_event(window, &paint_event);
+    }
+    break;
 
     case EVENT_LOST_FOCUS:
+    {
         window->focused = false;
-        window_handle_event(window, EVENT_NO_ARGS(EVENT_PAINT));
-        break;
+        Event paint_event = {EVENT_PAINT, false};
+        window_handle_event(window, &paint_event);
+    }
+    break;
 
     case EVENT_MOUSE_MOVE:
     {

@@ -13,12 +13,11 @@
 #define ELFMAG2 'L'
 #define ELFMAG3 'F'
 
-typedef enum
-{
-    ELF_NONE = 0, // Unkown Type
-    ELF_REL = 1,  // Relocatable File
-    ELF_EXEC = 2  // Executable File
-} elf_type_t;
+#define ELF_NONE 0
+#define ELF_REL 1
+#define ELF_EXEC 2
+
+typedef unsigned int elf_type_t;
 
 typedef struct __packed
 {

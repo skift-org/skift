@@ -11,6 +11,7 @@
 
 #define LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+#define LODEPNG_NO_COMPILE_CPP
 
 #include <thirdparty/lodepng/lodepng.h>
 
@@ -72,17 +73,19 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
     rawdata = malloc(state.size);
     assert(stream_read(file, rawdata, state.size) == state.size);
 
-    int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, (const unsigned char *)rawdata, state.size);
+    {
+        int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, (const unsigned char *)rawdata, state.size);
 
-    if (decode_result != 0)
-    {
-        logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
-        result = ERR_BAD_IMAGE_FILE_FORMAT;
-    }
-    else
-    {
-        *bitmap = bitmap_create(width, height);
-        memcpy((*bitmap)->pixels, outdata, width * height * sizeof(Color));
+        if (decode_result != 0)
+        {
+            logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
+            result = ERR_BAD_IMAGE_FILE_FORMAT;
+        }
+        else
+        {
+            *bitmap = bitmap_create(width, height);
+            memcpy((*bitmap)->pixels, outdata, width * height * sizeof(Color));
+        }
     }
 
 cleanup_and_return:
@@ -117,6 +120,7 @@ Bitmap *bitmap_load_from(const char *path)
 
 Result bitmap_save_to(Bitmap *bitmap, const char *path)
 {
+    void *outbuffer = NULL;
     Result result = SUCCESS;
     Stream *file = stream_open(path, OPEN_WRITE);
 
@@ -126,18 +130,18 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
         goto cleanup_and_return;
     }
 
-    void *outbuffer = NULL;
-    size_t outbuffer_size = 0;
-
-    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
-
-    if (err != 0)
     {
-        result = ERR_BAD_IMAGE_FILE_FORMAT;
-        goto cleanup_and_return;
-    }
+        size_t outbuffer_size = 0;
+        int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
 
-    stream_write(file, outbuffer, outbuffer_size);
+        if (err != 0)
+        {
+            result = ERR_BAD_IMAGE_FILE_FORMAT;
+            goto cleanup_and_return;
+        }
+
+        stream_write(file, outbuffer, outbuffer_size);
+    }
 
     if (handle_has_error(file))
     {

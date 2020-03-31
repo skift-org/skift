@@ -82,45 +82,49 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
     }
 
     elf_header_t elf_header;
-    size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(elf_header_t));
-
-    if (elf_header_size != sizeof(elf_header_t) || !elf_valid(&elf_header))
     {
-        logger_error("Failled to load ELF file %s: bad exec format!", launchpad->executable);
-        result = ERR_EXEC_FORMAT_ERROR;
+        size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(elf_header_t));
 
-        goto cleanup_and_return;
-    }
-
-    Task *child_task = task_spawn_with_argv(parent_task, launchpad->name, (TaskEntry)elf_header.entry, (const char **)launchpad->argv, true);
-
-    for (int i = 0; i < elf_header.phnum; i++)
-    {
-        elf_program_t elf_program_header;
-        stream_seek(elf_file, elf_header.phoff + (elf_header.phentsize) * i, WHENCE_START);
-
-        if (stream_read(elf_file, &elf_program_header, sizeof(elf_program_t)) != sizeof(elf_program_t))
+        if (elf_header_size != sizeof(elf_header_t) || !elf_valid(&elf_header))
         {
+            logger_error("Failled to load ELF file %s: bad exec format!", launchpad->executable);
             result = ERR_EXEC_FORMAT_ERROR;
-            task_destroy(child_task);
-
-            goto cleanup_and_return;
-        }
-
-        result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
-
-        if (result != SUCCESS)
-        {
-            task_destroy(child_task);
 
             goto cleanup_and_return;
         }
     }
 
-    task_launch_passhandle(parent_task, child_task, launchpad);
+    {
+        Task *child_task = task_spawn_with_argv(parent_task, launchpad->name, (TaskEntry)elf_header.entry, (const char **)launchpad->argv, true);
 
-    *pid = child_task->id;
-    task_go(child_task);
+        for (int i = 0; i < elf_header.phnum; i++)
+        {
+            elf_program_t elf_program_header;
+            stream_seek(elf_file, elf_header.phoff + (elf_header.phentsize) * i, WHENCE_START);
+
+            if (stream_read(elf_file, &elf_program_header, sizeof(elf_program_t)) != sizeof(elf_program_t))
+            {
+                result = ERR_EXEC_FORMAT_ERROR;
+                task_destroy(child_task);
+
+                goto cleanup_and_return;
+            }
+
+            result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
+
+            if (result != SUCCESS)
+            {
+                task_destroy(child_task);
+
+                goto cleanup_and_return;
+            }
+        }
+
+        task_launch_passhandle(parent_task, child_task, launchpad);
+
+        *pid = child_task->id;
+        task_go(child_task);
+    }
 
 cleanup_and_return:
     if (elf_file)

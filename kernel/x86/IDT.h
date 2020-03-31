@@ -26,14 +26,18 @@ typedef struct __packed
     u16 offset16_31; // offset bits 16..31
 } IDTEntry;
 
-#define IDT_ENTRY(__offset, __selector, __type)     \
-    (IDTEntry)                                      \
-    {                                               \
-        .offset0_15 = (__offset)&0xffff,            \
-        .offset16_31 = ((__offset) >> 16) & 0xffff, \
-        .zero = 0,                                  \
-        .selector = (__selector),                   \
-        .type_attr = (__type),                      \
+#define IDT_ENTRY(__offset, __selector, __type)            \
+    (IDTEntry)                                             \
+    {                                                      \
+        .offset0_15 = (u16)((__offset)&0xffff),            \
+        .selector = (__selector),                          \
+        .zero = 0,                                         \
+        .type_attr = (__type),                             \
+        .offset16_31 = (u16)(((__offset) >> 16) & 0xffff), \
     }
 
-void idt_flush(u32);
+#ifdef __cplusplus
+extern "C" void idt_flush(u32);
+#else
+extern void idt_flush(u32);
+#endif

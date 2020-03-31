@@ -12,7 +12,7 @@ Color RGB(float R, float G, float B)
 
 Color RGBA(float R, float G, float B, float A)
 {
-    return (Color){{(int)(R * 255.0), (int)(G * 255.0), (int)(B * 255.0), (int)(A * 255.0)}};
+    return (Color){{(uint8_t)(R * 255.0), (uint8_t)(G * 255.0), (uint8_t)(B * 255.0), (uint8_t)(A * 255.0)}};
 }
 
 Color HSV(float H, float S, float V)

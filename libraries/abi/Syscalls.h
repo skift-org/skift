@@ -5,8 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #define SYSCALL_LIST(__ENTRY)             \
-    __ENTRY(SYS_DEBUG)                    \
-                                          \
     __ENTRY(SYS_PROCESS_THIS)             \
     __ENTRY(SYS_PROCESS_LAUNCH)           \
     __ENTRY(SYS_PROCESS_EXIT)             \

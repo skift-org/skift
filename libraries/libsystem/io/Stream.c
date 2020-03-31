@@ -369,12 +369,12 @@ int stream_printf(Stream *stream, const char *fmt, ...)
 
 int stream_vprintf(Stream *stream, const char *fmt, va_list va)
 {
-    printf_info_t info = (printf_info_t){
-        .format = fmt,
-        .append = stream_printf_append,
-        .output = (void *)stream,
-        .allocated = -1,
-    };
+    printf_info_t info = {};
+
+    info.format = fmt;
+    info.append = stream_printf_append;
+    info.output = (void *)stream;
+    info.allocated = -1;
 
     return __printf(&info, va);
 }

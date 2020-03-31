@@ -23,10 +23,11 @@ Stream *err_stream = NULL;
 Stream *log_stream = NULL;
 
 #define INTERNAL_LOG_STREAM_HANDLE HANDLE_INVALID_ID
-static Stream internal_log_stream = {.handle = {.id = INTERNAL_LOG_STREAM_HANDLE}};
+static Stream internal_log_stream = {};
 
 void __plug_init(void)
 {
+    internal_log_stream.handle.id = INTERNAL_LOG_STREAM_HANDLE;
 
     in_stream = NULL;
     out_stream = &internal_log_stream;

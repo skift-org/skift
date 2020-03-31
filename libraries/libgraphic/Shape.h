@@ -65,17 +65,17 @@ static inline bool point_equ(Point lhs, Point rhs)
 
 static inline Point point_scale(Point a, double scale)
 {
-    return (Point){a.X * scale, a.Y * scale};
+    return (Point){(int)(a.X * scale), (int)(a.Y * scale)};
 }
 
 static inline Point point_x(Point p)
 {
-    return (Point){.X = p.X, .Y = 0};
+    return (Point){p.X, 0};
 }
 
 static inline Point point_y(Point p)
 {
-    return (Point){.X = 0, .Y = p.Y};
+    return (Point){0, p.Y};
 }
 
 static inline Point point_clamp(Point p, Point pmin, Point pmax)
@@ -125,7 +125,12 @@ static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
     bottomright.X = MAX(a.X + a.width, b.X + b.width);
     bottomright.Y = MAX(a.Y + a.height, b.Y + b.height);
 
-    return (Rectangle){.position = topleft, .size = point_sub(bottomright, topleft)};
+    Rectangle rectangle = {};
+
+    rectangle.position = topleft;
+    rectangle.size = point_sub(bottomright, topleft);
+
+    return rectangle;
 }
 
 static inline Rectangle rectangle_clip(Rectangle left, Rectangle right)

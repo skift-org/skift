@@ -68,17 +68,21 @@ typedef struct __packed
 #define GDT_ENTRY(__base, __limit, __access, __flags) \
 	(GDTEntry)                                        \
 	{                                                 \
+		.limit0_15 = (u16)((__limit)&0xffff),         \
+		.base0_15 = (u16)((__base)&0xffff),           \
+		.base16_23 = (u8)(((__base) >> 16) & 0xff),   \
 		.acces = (__access),                          \
-		.flags = (__flags),                           \
-		.base0_15 = (__base)&0xffff,                  \
-		.base16_23 = ((__base) >> 16) & 0xff,         \
-		.base24_31 = ((__base) >> 24) & 0xff,         \
-		.limit0_15 = (__limit)&0xffff,                \
 		.limit16_19 = ((__limit) >> 16) & 0x0f,       \
+		.flags = (__flags),                           \
+		.base24_31 = (u8)(((__base) >> 24) & 0xff),   \
 	}
 
 void gdt_setup(void);
 
+#ifdef __cplusplus
+extern "C" void gdt_flush(u32);
+#else
 extern void gdt_flush(u32);
+#endif
 
 void set_kernel_stack(u32 stack);

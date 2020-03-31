@@ -43,7 +43,11 @@ ElapsedTime system_get_uptime(void)
     return clock_now() - boot_timestamp;
 }
 
+#ifdef __cplusplus
+extern "C" void kmain(multiboot_info_t *info, uint magic)
+#else
 void kmain(multiboot_info_t *info, uint magic)
+#endif
 {
     __plug_init();
 

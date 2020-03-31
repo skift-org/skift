@@ -41,7 +41,7 @@ char *strdup(const char *s);
 char *strchr(const char *str, int c);
 int strcoll(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);
-char *strerror(int errnum);
+const char *strerror(int errnum);
 char *strpbrk(const char *str1, const char *str2);
 char *strrchr(const char *str, int c);
 size_t strspn(const char *str1, const char *str2);

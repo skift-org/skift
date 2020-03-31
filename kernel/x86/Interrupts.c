@@ -20,8 +20,8 @@ extern uintptr_t __interrupt_vector[];
 IDTEntry idt[IDT_ENTRY_COUNT];
 
 IDTDescriptor idt_descriptor = {
-    .offset = (u32)&idt[0],
     .size = sizeof(IDTEntry) * IDT_ENTRY_COUNT,
+    .offset = (u32)&idt[0],
 };
 
 void interrupts_initialize(void)
@@ -98,7 +98,11 @@ void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
     printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }
 
+#ifdef __cplusplus
+extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
+#else
 uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
+#endif
 {
     if (stackframe.intno < 32)
     {

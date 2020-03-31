@@ -183,23 +183,25 @@ Result task_fshandle_select(
         }
     }
 
-    TaskBlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
-
-    if (blocker_result == BLOCKER_TIMEOUT)
     {
-        result = TIMEOUT;
-        goto cleanup_and_return;
-    }
+        TaskBlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
 
-    if (selected_handle)
-    {
-        for (size_t i = 0; i < handles_set->count; i++)
+        if (blocker_result == BLOCKER_TIMEOUT)
         {
-            if (handles[i] == selected_handle)
-            {
-                *selected_index = handles_set->handles[i];
+            result = TIMEOUT;
+            goto cleanup_and_return;
+        }
 
-                goto cleanup_and_return;
+        if (selected_handle)
+        {
+            for (size_t i = 0; i < handles_set->count; i++)
+            {
+                if (handles[i] == selected_handle)
+                {
+                    *selected_index = handles_set->handles[i];
+
+                    goto cleanup_and_return;
+                }
             }
         }
     }

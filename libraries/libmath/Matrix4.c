@@ -1,15 +1,5 @@
-#pragma once
-
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
+#include <libmath/Matrix4.h>
 #include <libmath/math.h>
-
-typedef struct
-{
-    double m[4][4];
-} Matrix4;
 
 Matrix4 matrix_create_projection(double near, double far, double fov, double aspect_ratio)
 {
@@ -57,4 +47,38 @@ Matrix4 matrix_create_rotationZ(double theta)
     mat.m[3][3] = 1;
 
     return mat;
+}
+
+Vector3 matrix_apply_tranform(Matrix4 matrix, Vector3 vector)
+{
+    Vector3 result = {};
+
+    result.X = vector.X * matrix.m[0][0] +
+               vector.Y * matrix.m[1][0] +
+               vector.Z * matrix.m[2][0] +
+               matrix.m[3][0];
+
+    result.Y = vector.X * matrix.m[0][1] +
+               vector.Y * matrix.m[1][1] +
+               vector.Z * matrix.m[2][1] +
+               matrix.m[3][1];
+
+    result.Z = vector.X * matrix.m[0][2] +
+               vector.Y * matrix.m[1][2] +
+               vector.Z * matrix.m[2][2] +
+               matrix.m[3][2];
+
+    double w = vector.X * matrix.m[0][3] +
+               vector.Y * matrix.m[1][3] +
+               vector.Z * matrix.m[2][3] +
+               matrix.m[3][3];
+
+    if (w != 0.0f)
+    {
+        result.X /= w;
+        result.Y /= w;
+        result.Z /= w;
+    }
+
+    return result;
 }

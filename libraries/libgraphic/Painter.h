@@ -43,8 +43,14 @@ void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
 
 void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color);
 
-void painter_draw_rectangle(Painter *painter, Rectangle rectangle, Color color);
+void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color);
 
 void painter_draw_line(Painter *painter, Point from, Point to, Color color);
+
+void painter_draw_rectangle(Painter *painter, Rectangle rectangle, Color color);
+
+void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color);
+
+void painter_draw_line(Painter *painter, Point a, Point b, Color color);
 
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Point position, Color color);

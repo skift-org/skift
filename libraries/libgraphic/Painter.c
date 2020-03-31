@@ -53,7 +53,7 @@ void painter_pop_origin(Painter *painter)
     painter->originestack_top--;
 }
 
-inline void painter_plot_pixel(Painter *painter, Point position, Color color)
+void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
     Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
 
@@ -158,6 +158,71 @@ void painter_fill_rectangle(Painter *painter, Rectangle rect, Color color)
     }
 }
 
+void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
+{
+    PointF a = {p0.X, p0.Y};
+    PointF b = {p1.X, p1.Y};
+    PointF c = {p2.X, p2.Y};
+
+    if (a.Y > b.Y)
+        __swap(PointF, a, b);
+    if (a.Y > c.Y)
+        __swap(PointF, a, c);
+    if (b.Y > c.Y)
+        __swap(PointF, b, c);
+
+    PointF s = a;
+    PointF e = a;
+
+    double dx1 = 0;
+    double dx2 = 0;
+    double dx3 = 0;
+
+    if (b.Y - a.Y > 0)
+    {
+        dx1 = (b.X - a.X) / (double)(b.Y - a.Y);
+    }
+
+    if (c.Y - a.Y > 0)
+    {
+        dx2 = (c.X - a.X) / (double)(c.Y - a.Y);
+    }
+
+    if (c.Y - b.Y > 0)
+    {
+        dx3 = (c.X - b.X) / (double)(c.Y - b.Y);
+    }
+
+    if (dx1 > dx2)
+    {
+        for (; s.Y <= b.Y; s.Y++, e.Y++, s.X += dx2, e.X += dx1)
+        {
+            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+        }
+
+        e = b;
+
+        for (; s.Y <= c.Y; s.Y++, e.Y++, s.X += dx2, e.X += dx3)
+        {
+            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+        }
+    }
+    else
+    {
+        for (; s.Y <= b.Y; s.Y++, e.Y++, s.X += dx1, e.X += dx2)
+        {
+            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+        }
+
+        s = b;
+
+        for (; s.Y <= c.Y; s.Y++, e.Y++, s.X += dx3, e.X += dx2)
+        {
+            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+        }
+    }
+}
+
 void painter_draw_line_x_aligned(Painter *painter, int x, int start, int end, Color color)
 {
     for (int i = start; i < end; i++)
@@ -223,6 +288,13 @@ void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
     painter_draw_line(painter, rect.position, point_sub(point_add(rect.position, point_y(rect.size)), (Point){0, 1}), color);
     painter_draw_line(painter, point_sub(point_add(rect.position, point_x(rect.size)), (Point){1, 0}), point_sub(point_add(rect.position, rect.size), (Point){1, 0}), color);
     painter_draw_line(painter, point_sub(point_add(rect.position, point_y(rect.size)), (Point){0, 1}), point_sub(point_add(rect.position, rect.size), (Point){0, 1}), color);
+}
+
+void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
+{
+    painter_draw_line(painter, p0, p1, color);
+    painter_draw_line(painter, p1, p2, color);
+    painter_draw_line(painter, p2, p0, color);
 }
 
 const int FONT_SIZE = 16;

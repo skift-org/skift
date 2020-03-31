@@ -43,11 +43,11 @@ typedef long off_t;
 
 #define __create(__type) ((__type *)calloc(1, sizeof(__type)))
 
-#define SWAP(x, y)          \
-    ({                      \
-        typeof(x) SWAP = x; \
-        x = y;              \
-        y = SWAP;           \
+#define __swap(__type, __x, __y) \
+    ({                           \
+        __type __tmp = __x;      \
+        __x = __y;               \
+        __y = __tmp;             \
     })
 
 /* --- Raw memory allocation ------------------------------------------------ */

@@ -15,6 +15,12 @@ typedef struct __packed
 
 typedef struct __packed
 {
+    double X;
+    double Y;
+} PointF;
+
+typedef struct __packed
+{
     int top;
     int bottom;
     int left;

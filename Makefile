@@ -105,7 +105,8 @@ LIBRARIES=$(LIBCONSOLE) \
 
 APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
 			$(ROOT_DIRECTORY)/bin/Shell \
-			$(ROOT_DIRECTORY)/bin/Compositor
+			$(ROOT_DIRECTORY)/bin/Compositor \
+			$(ROOT_DIRECTORY)/bin/ImageViewer
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -236,7 +237,6 @@ $(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMIN
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lgraphic
 
-
 $(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/Shell/*.c) -o $@
@@ -244,6 +244,10 @@ $(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(CR
 $(ROOT_DIRECTORY)/bin/Compositor: $(wildcard application/Compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/Compositor/*.c) -o $@ -lgraphic
+
+$(ROOT_DIRECTORY)/bin/ImageViewer: $(wildcard application/ImageViewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard application/ImageViewer/*.c) -o $@ -lgraphic
 
 # --- Userspace -------------------------------------------------------------- #
 

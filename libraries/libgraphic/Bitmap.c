@@ -47,19 +47,22 @@ static Color placeholder_buffer[] = {
     (Color){{255, 0, 255, 255}},
 };
 
-Bitmap *bitmap_load_from(const char *path)
+Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 {
+    Result result = SUCCESS;
+
     uint width = 0;
     uint height = 0;
     void *rawdata = NULL;
     void *outdata = NULL;
 
     Stream *file = stream_open(path, OPEN_READ);
-    Bitmap *bitmap = NULL;
 
     if (handle_has_error(file))
     {
         logger_error("Failled to load bitmap from %s: %s", path, handle_error_string(file));
+        result = handle_get_error(file);
+
         goto cleanup_and_return;
     }
 
@@ -74,11 +77,13 @@ Bitmap *bitmap_load_from(const char *path)
     if (decode_result != 0)
     {
         logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
-        goto cleanup_and_return;
+        result = ERR_BAD_IMAGE_FILE_FORMAT;
     }
-
-    bitmap = bitmap_create(width, height);
-    memcpy(bitmap->pixels, outdata, width * height * sizeof(Color));
+    else
+    {
+        *bitmap = bitmap_create(width, height);
+        memcpy((*bitmap)->pixels, outdata, width * height * sizeof(Color));
+    }
 
 cleanup_and_return:
     if (rawdata)
@@ -93,7 +98,15 @@ cleanup_and_return:
 
     stream_close(file);
 
-    if (bitmap == NULL)
+    return result;
+}
+
+Bitmap *bitmap_load_from(const char *path)
+{
+    Bitmap *bitmap = NULL;
+    Result result = bitmap_load_from_can_fail(path, &bitmap);
+
+    if (result != SUCCESS)
     {
         bitmap = bitmap_create(2, 2);
         memcpy(bitmap->pixels, placeholder_buffer, 2 * 2 * sizeof(Color));

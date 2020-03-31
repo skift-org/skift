@@ -32,6 +32,8 @@ Rectangle bitmap_bound(Bitmap *bitmap);
 
 Bitmap *bitmap_load_from(const char *path);
 
+Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap);
+
 Result bitmap_save_to(Bitmap *bitmap, const char *path);
 
 static inline void bitmap_set_pixel(Bitmap *bitmap, Point p, Color color)

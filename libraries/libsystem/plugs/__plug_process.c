@@ -56,14 +56,14 @@ int __plug_process_free(uint addr, uint count)
     return __syscall(SYS_PROCESS_FREE, addr, count, 0, 0, 0);
 }
 
-int __plug_process_get_cwd(char *buffer, uint size)
+Result __plug_process_get_cwd(char *buffer, uint size)
 {
-    return __syscall(SYS_PROCESS_GET_CWD, (int)buffer, size, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_GET_CWD, (int)buffer, size, 0, 0, 0);
 }
 
-int __plug_process_set_cwd(const char *cwd)
+Result __plug_process_set_cwd(const char *cwd)
 {
-    return __syscall(SYS_PROCESS_SET_CWD, (int)cwd, 0, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_SET_CWD, (int)cwd, 0, 0, 0, 0);
 }
 
 int __plug_process_sleep(int time)

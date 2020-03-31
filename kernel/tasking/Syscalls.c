@@ -85,7 +85,7 @@ int sys_process_free(uint addr, uint count)
 int sys_process_get_cwd(char *buffer, uint size)
 {
     task_get_cwd(sheduler_running(), buffer, size);
-    return 0;
+    return SUCCESS;
 }
 
 int sys_process_set_cwd(const char *path)
@@ -159,7 +159,7 @@ int sys_filesystem_mkdir(const char *dir_path)
 {
     Path *path = task_cwd_resolve(sheduler_running(), dir_path);
 
-    int result = filesystem_mkdir(path);
+    Result result = filesystem_mkdir(path);
 
     path_destroy(path);
 
@@ -170,7 +170,7 @@ int sys_filesystem_mkpipe(const char *fifo_path)
 {
     Path *path = task_cwd_resolve(sheduler_running(), fifo_path);
 
-    int result = filesystem_mkpipe(path);
+    Result result = filesystem_mkpipe(path);
 
     path_destroy(path);
 
@@ -182,7 +182,7 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
     Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
     Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
-    int result = filesystem_mklink(oldp, newp);
+    Result result = filesystem_mklink(oldp, newp);
 
     path_destroy(oldp);
     path_destroy(newp);
@@ -194,7 +194,7 @@ int sys_filesystem_unlink(const char *link_path)
 {
     Path *path = task_cwd_resolve(sheduler_running(), link_path);
 
-    int result = filesystem_unlink(path);
+    Result result = filesystem_unlink(path);
 
     path_destroy(path);
 
@@ -206,7 +206,7 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
     Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
     Path *newp = task_cwd_resolve(sheduler_running(), new_path);
 
-    int result = filesystem_rename(oldp, newp);
+    Result result = filesystem_rename(oldp, newp);
 
     path_destroy(oldp);
     path_destroy(newp);

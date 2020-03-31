@@ -162,13 +162,13 @@ int __plug_process_free(uint addr, uint count)
     return 0;
 }
 
-int __plug_process_get_cwd(char *buffer, uint size)
+Result __plug_process_get_cwd(char *buffer, uint size)
 {
     task_get_cwd(sheduler_running(), buffer, size);
-    return 0;
+    return SUCCESS;
 }
 
-int __plug_process_set_cwd(const char *cwd)
+Result __plug_process_set_cwd(const char *cwd)
 {
     return task_set_cwd(sheduler_running(), cwd);
 }

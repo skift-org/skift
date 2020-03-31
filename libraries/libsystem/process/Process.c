@@ -54,15 +54,14 @@ int process_free(uintptr_t addr, size_t count)
     return __plug_process_free(addr, count);
 }
 
-int process_get_cwd(char *buffer, size_t size)
+Result process_get_cwd(char *buffer, size_t size)
 {
     return __plug_process_get_cwd(buffer, size);
 }
 
-int process_set_cwd(const char *cwd)
+Result process_set_cwd(const char *cwd)
 {
-    int result = __plug_process_set_cwd(cwd);
-    RETURN_AND_SET_ERROR(result, result, -1);
+    return __plug_process_set_cwd(cwd);
 }
 
 int process_sleep(int time)

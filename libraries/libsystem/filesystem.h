@@ -4,14 +4,15 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/Result.h>
 #include <libsystem/runtime.h>
 
-int filesystem_link(const char* oldpath, const char* newpath);
+Result filesystem_link(const char *oldpath, const char *newpath);
 
-int filesystem_unlink(const char* path);
+Result filesystem_unlink(const char *path);
 
-int filesystem_mkdir(const char* path);
+Result filesystem_mkdir(const char *path);
 
-int filesystem_mkpipe(const char* path);
+Result filesystem_mkpipe(const char *path);
 
-int filesystem_rename(const char* old_path, const char* new_path);
+Result filesystem_rename(const char *old_path, const char *new_path);

@@ -25,9 +25,9 @@ uint process_alloc(size_t count);
 
 int process_free(size_t addr, size_t count);
 
-int process_get_cwd(char *buffer, size_t size);
+Result process_get_cwd(char *buffer, size_t size);
 
-int process_set_cwd(const char *cwd);
+Result process_set_cwd(const char *cwd);
 
 int process_sleep(int time);
 

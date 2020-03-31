@@ -8,32 +8,22 @@
 
 int shell_builtin_cd(int argc, const char **argv)
 {
+    const char *new_cwd = "/";
+
     if (argc == 2)
     {
-        int result = process_set_cwd(argv[1]);
-
-        if (result < 0)
-        {
-            stream_printf(err_stream, "cd: Cannot access '%s'", argv[1]);
-            error_print("");
-            return -1;
-        }
-
-        return 0;
+        new_cwd = argv[1];
     }
-    else
+
+    Result result = process_set_cwd(new_cwd);
+
+    if (result != SUCCESS)
     {
-        int result = process_set_cwd("/");
-
-        if (result < 0)
-        {
-            stream_printf(err_stream, "cd: Cannot access '%s'", "/");
-            error_print("");
-            return -1;
-        }
-
-        return 0;
+        stream_printf(err_stream, "cd: Cannot access '%s': %s\n", new_cwd, result_to_string(result));
+        return -1;
     }
+
+    return 0;
 }
 
 int shell_builtin_exit(int argc, const char **argv)

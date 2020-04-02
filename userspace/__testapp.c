@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     panel_create(panel0, RECTANGLE(50, 0, 50, 100));
     panel_create(panel0, RECTANGLE(0, 100, 100, 50));
 
-    main_window = window_create(RECTANGLE_SIZE(250, 150));
+    main_window = window_create("Test Application", RECTANGLE_SIZE(500, 400));
     window_set_main_widget(main_window, panel0);
 
     application_dump();

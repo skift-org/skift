@@ -25,7 +25,18 @@ typedef struct __packed
     int bottom;
     int left;
     int right;
-} Spacing;
+} Insets;
+
+#define __INSETS1(__tblr) ((Insets){.top = __tblr, .bottom = __tblr, .left = __tblr, .right = __tblr})
+#define __INSETS2(__tb, __lr) ((Insets){.top = __tb, .bottom = __tb, .left = __lr, .right = __lr})
+#define __INSETS3(__t, __b, __lr) ((Insets){.top = __t, .bottom = __b, .left = __lr, .right = __lr})
+#define __INSETS4(__t, __b, __l, __r) ((Insets){__t, __b, __l, __r})
+
+#define __INSETS(_1, _2, _3, _4, NAME, ...) NAME
+
+#define INSETS(...)                                                   \
+    __INSETS(__VA_ARGS__, __INSETS4, __INSETS3, __INSETS2, __INSETS1) \
+    (__VA_ARGS__)
 
 typedef union __packed {
     struct
@@ -156,7 +167,7 @@ static inline bool rectangle_containe_point(Rectangle rectange, Point position)
            (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);
 }
 
-static inline Rectangle rectangle_shrink(Rectangle rect, Spacing spacing)
+static inline Rectangle rectangle_shrink(Rectangle rect, Insets spacing)
 {
     Rectangle result;
 
@@ -168,7 +179,7 @@ static inline Rectangle rectangle_shrink(Rectangle rect, Spacing spacing)
     return result;
 }
 
-static inline Rectangle rectangle_expand(Rectangle rect, Spacing spacing)
+static inline Rectangle rectangle_expand(Rectangle rect, Insets spacing)
 {
     Rectangle result;
 
@@ -233,7 +244,7 @@ static inline Rectangle rectangle_right(Rectangle rect, int size)
 
 typedef unsigned RectangeBorder;
 
-static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Spacing spacing, Point position)
+static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Insets spacing, Point position)
 {
     RectangeBorder borders = 0;
 

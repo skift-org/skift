@@ -1,3 +1,4 @@
+#include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
@@ -8,9 +9,20 @@
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 32
-#define WINDOW_CONTENT_PADDING 4
+#define WINDOW_CONTENT_PADDING 8
 
 static int _window_id = 0;
+
+static Font *_title_font = NULL;
+Font *window_title_font(void)
+{
+    if (_title_font == NULL)
+    {
+        _title_font = font_create("sans");
+    }
+
+    return _title_font;
+}
 
 void window_set_main_widget(Window *window, Widget *widget)
 {
@@ -29,12 +41,12 @@ Rectangle window_header_bound_on_screen(Window *window)
 
 Rectangle window_content_bound(Window *window)
 {
-    return rectangle_shrink(window_bound(window), (Spacing){WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING});
+    return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
 }
 
 void window_paint(Window *window)
 {
-    painter_fill_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
+    painter_clear_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
 
     if (window->focused)
     {
@@ -47,10 +59,12 @@ void window_paint(Window *window)
     {
         painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
         painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
+        painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
     }
     else
     {
         painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
+        painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_BORDER);
     }
 }
 
@@ -106,8 +120,8 @@ void window_handle_event(Window *window, Event *event)
             RectangeBorder borders = rectangle_inset_containe_point(
                 rectangle_expand(
                     window_bound_on_screen(window),
-                    (Spacing){WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA}),
-                (Spacing){WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA},
+                    INSETS(WINDOW_RESIZE_AREA)),
+                INSETS(WINDOW_RESIZE_AREA),
                 mouse_event->position);
 
             if (borders)
@@ -187,11 +201,12 @@ void window_handle_event(Window *window, Event *event)
     }
 }
 
-Window *window_create(Rectangle bound)
+Window *window_create(const char *title, Rectangle bound)
 {
     Window *window = __create(Window);
 
     window->id = _window_id++;
+    window->title = strdup(title);
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
@@ -209,6 +224,8 @@ Window *window_create(Rectangle bound)
 
 void window_destroy(Window *window)
 {
+    free(window->title);
+    painter_destroy(window->painter);
     application_remove_window(window);
 }
 

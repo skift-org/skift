@@ -311,7 +311,7 @@ void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_re
             Color sample = bitmap_sample(src, src_rect, xx, yy);
 
             Color final = color;
-            final.A = sample.R;
+            final.A = (sample.R * color.A) / 255;
 
             painter_plot_pixel(painter, point_add(dst_rect.position, (Point){x, y}), final);
         }
@@ -325,4 +325,15 @@ void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Point positi
     dest.size = glyph->bound.size;
 
     painter_blit_bitmap_colored(painter, font->bitmap, glyph->bound, dest, color);
+}
+
+void painter_draw_string(Painter *painter, Font *font, const char *str, Point position, Color color)
+{
+    for (size_t i = 0; str[i]; i++)
+    {
+        Glyph *glyph = font_glyph(font, str[i]);
+
+        painter_draw_glyph(painter, font, glyph, position, color);
+        position = point_add(position, (Point){glyph->advance, 0});
+    }
 }

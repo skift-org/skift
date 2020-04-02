@@ -54,3 +54,5 @@ void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color
 void painter_draw_line(Painter *painter, Point a, Point b, Color color);
 
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Point position, Color color);
+
+void painter_draw_string(Painter *painter, Font *font, const char *str, Point position, Color color);

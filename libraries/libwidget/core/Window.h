@@ -9,6 +9,7 @@
 typedef struct
 {
     int id;
+    char *title;
 
     bool focused;
     bool is_dragging;
@@ -22,7 +23,7 @@ typedef struct
     Painter *painter;
 } Window;
 
-Window *window_create(Rectangle bound);
+Window *window_create(const char *title, Rectangle bound);
 
 void window_destroy(Window *window);
 

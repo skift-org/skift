@@ -56,34 +56,6 @@ void window_move(Window *window, Point position)
 
 void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons)
 {
-    bool mouse_was_in_window = rectangle_containe_point(window_bound(window), old_position);
-    bool mouse_is_in_window = rectangle_containe_point(window_bound(window), position);
-
-    if (mouse_is_in_window && !mouse_was_in_window)
-    {
-        window_send_event(window,
-                          EVENT(
-                              MouseEvent,
-                              EVENT_MOUSE_ENTER,
-                              position,
-                              old_position,
-                              MOUSE_NO_BUTTON,
-                              buttons),
-                          sizeof(MouseEvent));
-    }
-    else if (mouse_was_in_window && !mouse_is_in_window)
-    {
-        window_send_event(window,
-                          EVENT(
-                              MouseEvent,
-                              EVENT_MOUSE_LEAVE,
-                              position,
-                              old_position,
-                              MOUSE_NO_BUTTON,
-                              buttons),
-                          sizeof(MouseEvent));
-    }
-
     window_send_event(window,
                       EVENT(
                           MouseEvent,

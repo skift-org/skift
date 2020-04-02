@@ -12,25 +12,25 @@ static MouseButton _mouse_buttons;
 static Point _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
-static const char *_cursor_paths[] = {
-    [CURSOR_BUSY] = "/res/mouse/busy.png",
-    [CURSOR_DEFAULT] = "/res/mouse/default.png",
-    [CURSOR_DISABLED] = "/res/mouse/disabled.png",
-    [CURSOR_MOVE] = "/res/mouse/move.png",
-    [CURSOR_RESIZEH] = "/res/mouse/resizeh.png",
-    [CURSOR_RESIZEHV] = "/res/mouse/resizehv.png",
-    [CURSOR_RESIZEV] = "/res/mouse/resizev.png",
-    [CURSOR_RESIZEVH] = "/res/mouse/resizevh.png",
-    [CURSOR_TEXT] = "/res/mouse/text.png",
-};
-
 static Bitmap *_cursor_bitmaps[__CURSOR_COUNT] = {};
 
 void cursor_initialize(void)
 {
+    const char *cursor_paths[] = {
+        [CURSOR_BUSY] = "/res/mouse/busy.png",
+        [CURSOR_DEFAULT] = "/res/mouse/default.png",
+        [CURSOR_DISABLED] = "/res/mouse/disabled.png",
+        [CURSOR_MOVE] = "/res/mouse/move.png",
+        [CURSOR_RESIZEH] = "/res/mouse/resizeh.png",
+        [CURSOR_RESIZEHV] = "/res/mouse/resizehv.png",
+        [CURSOR_RESIZEV] = "/res/mouse/resizev.png",
+        [CURSOR_RESIZEVH] = "/res/mouse/resizevh.png",
+        [CURSOR_TEXT] = "/res/mouse/text.png",
+    };
+
     for (size_t i = 0; i < __CURSOR_COUNT; i++)
     {
-        _cursor_bitmaps[i] = bitmap_load_from(_cursor_paths[i]);
+        _cursor_bitmaps[i] = bitmap_load_from(cursor_paths[i]);
     }
 }
 
@@ -97,7 +97,7 @@ void cursor_handle_packet(MousePacket packet)
 
 CursorState cursor_get_state(void)
 {
-    Window *window = manager_get_window_at(_mouse_position);
+    Window *window = manager_focus_window();
 
     if (window)
     {

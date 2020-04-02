@@ -6,6 +6,10 @@
 #include <libwidget/core/Theme.h>
 #include <libwidget/core/Window.h>
 
+#define WINDOW_RESIZE_AREA 16
+#define WINDOW_HEADER_AREA 32
+#define WINDOW_CONTENT_PADDING 4
+
 static int _window_id = 0;
 
 void window_set_main_widget(Window *window, Widget *widget)
@@ -15,22 +19,17 @@ void window_set_main_widget(Window *window, Widget *widget)
 
 Rectangle window_header_bound(Window *window)
 {
-    return rectangle_set_height(window_bound(window), 32);
+    return rectangle_set_height(window_bound(window), WINDOW_HEADER_AREA);
 }
 
 Rectangle window_header_bound_on_screen(Window *window)
 {
-    return rectangle_set_height(window_bound_on_screen(window), 32);
-}
-
-Rectangle window_drag_bound_on_screen(Window *window)
-{
-    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){8, 8, 8, 8}));
+    return rectangle_set_height(window_bound_on_screen(window), WINDOW_HEADER_AREA);
 }
 
 Rectangle window_content_bound(Window *window)
 {
-    return rectangle_shrink(window_bound(window), (Spacing){32, 8, 8, 8});
+    return rectangle_shrink(window_bound(window), (Spacing){WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING});
 }
 
 void window_paint(Window *window)
@@ -105,8 +104,10 @@ void window_handle_event(Window *window, Event *event)
         else
         {
             RectangeBorder borders = rectangle_inset_containe_point(
-                window_bound_on_screen(window),
-                (Spacing){8, 8, 8, 8},
+                rectangle_expand(
+                    window_bound_on_screen(window),
+                    (Spacing){WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA}),
+                (Spacing){WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA, WINDOW_RESIZE_AREA},
                 mouse_event->position);
 
             if (borders)
@@ -121,22 +122,22 @@ void window_handle_event(Window *window, Event *event)
                     window_set_cursor(window, CURSOR_RESIZEH);
                 }
 
-                if ((borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_LEFT)) == (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_LEFT))
+                if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
                 {
                     window_set_cursor(window, CURSOR_RESIZEHV);
                 }
 
-                if ((borders & (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_RIGHT)) == (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_RIGHT))
+                if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_RIGHT))
                 {
                     window_set_cursor(window, CURSOR_RESIZEHV);
                 }
 
-                if ((borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_RIGHT)) == (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_RIGHT))
+                if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_RIGHT))
                 {
                     window_set_cursor(window, CURSOR_RESIZEVH);
                 }
 
-                if ((borders & (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_LEFT)) == (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_LEFT))
+                if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_LEFT))
                 {
                     window_set_cursor(window, CURSOR_RESIZEVH);
                 }
@@ -150,14 +151,6 @@ void window_handle_event(Window *window, Event *event)
         break;
     }
 
-    case EVENT_MOUSE_ENTER:
-        logger_info("Mouse enter ");
-        break;
-
-    case EVENT_MOUSE_LEAVE:
-        logger_info("Mouse leave ");
-        break;
-
     case EVENT_MOUSE_BUTTON_PRESS:
     {
         logger_info("Mouse press ");
@@ -165,7 +158,7 @@ void window_handle_event(Window *window, Event *event)
 
         if (!window->is_dragging &&
             mouse_event->button == MOUSE_BUTTON_LEFT &&
-            rectangle_containe_point(window_drag_bound_on_screen(window), mouse_event->position))
+            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position))
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);

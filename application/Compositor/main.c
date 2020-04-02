@@ -15,9 +15,6 @@
 void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
 {
     __unused(notifier);
-    __unused(keyboard_stream);
-
-    logger_info("Keyboard event!");
 
     char c;
     stream_read(keyboard_stream, &c, sizeof(char));
@@ -39,7 +36,6 @@ void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
 void mouse_callback(Notifier *notifier, Stream *mouse_stream)
 {
     __unused(notifier);
-    __unused(mouse_stream);
 
     MousePacket packet;
     size_t size = stream_read(mouse_stream, &packet, sizeof(MousePacket));
@@ -97,8 +93,11 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    Launchpad *launchpad = launchpad_create("__testapp", "/bin/__testapp");
-    launchpad_launch(launchpad, NULL);
+    for (size_t i = 0; i < 3; i++)
+    {
+        Launchpad *launchpad = launchpad_create("__testapp", "/bin/__testapp");
+        launchpad_launch(launchpad, NULL);
+    }
 
     return eventloop_run();
 }

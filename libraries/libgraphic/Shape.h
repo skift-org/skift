@@ -206,7 +206,56 @@ static inline Rectangle rectangle_set_width(Rectangle rect, size_t width)
     return rect;
 }
 
+static inline Rectangle rectangle_top(Rectangle rect, int size)
+{
+    return (Rectangle){{rect.X, rect.Y, rect.width, size}};
+}
+
 static inline Rectangle rectangle_bottom(Rectangle rect, int size)
 {
     return (Rectangle){{rect.X, rect.Y + rect.height - size, rect.width, size}};
+}
+
+static inline Rectangle rectangle_left(Rectangle rect, int size)
+{
+    return (Rectangle){{rect.X, rect.Y, size, rect.height}};
+}
+
+static inline Rectangle rectangle_right(Rectangle rect, int size)
+{
+    return (Rectangle){{rect.X + rect.width - size, rect.Y, size, rect.height}};
+}
+
+#define RECTANGLE_BORDER_TOP (1 << 0)
+#define RECTANGLE_BORDER_BOTTOM (1 << 1)
+#define RECTANGLE_BORDER_LEFT (1 << 2)
+#define RECTANGLE_BORDER_RIGHT (1 << 3)
+
+typedef unsigned RectangeBorder;
+
+static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Spacing spacing, Point position)
+{
+    RectangeBorder borders = 0;
+
+    if (rectangle_containe_point(rectangle_top(rect, spacing.top), position))
+    {
+        borders |= RECTANGLE_BORDER_TOP;
+    }
+
+    if (rectangle_containe_point(rectangle_bottom(rect, spacing.bottom), position))
+    {
+        borders |= RECTANGLE_BORDER_BOTTOM;
+    }
+
+    if (rectangle_containe_point(rectangle_left(rect, spacing.left), position))
+    {
+        borders |= RECTANGLE_BORDER_LEFT;
+    }
+
+    if (rectangle_containe_point(rectangle_right(rect, spacing.right), position))
+    {
+        borders |= RECTANGLE_BORDER_RIGHT;
+    }
+
+    return borders;
 }

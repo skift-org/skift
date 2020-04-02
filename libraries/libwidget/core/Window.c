@@ -25,12 +25,12 @@ Rectangle window_header_bound_on_screen(Window *window)
 
 Rectangle window_drag_bound_on_screen(Window *window)
 {
-    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){4, 4, 4, 4}));
+    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){8, 8, 8, 8}));
 }
 
 Rectangle window_content_bound(Window *window)
 {
-    return rectangle_shrink(window_bound(window), (Spacing){32, 4, 4, 4});
+    return rectangle_shrink(window_bound(window), (Spacing){32, 8, 8, 8});
 }
 
 void window_paint(Window *window)
@@ -101,6 +101,50 @@ void window_handle_event(Window *window, Event *event)
             Point offset = point_sub(mouse_event->position, mouse_event->old_position);
             window->bound = rectangle_offset(window->bound, offset);
             application_move_window(window, window->bound.position);
+        }
+        else
+        {
+            RectangeBorder borders = rectangle_inset_containe_point(
+                window_bound_on_screen(window),
+                (Spacing){8, 8, 8, 8},
+                mouse_event->position);
+
+            if (borders)
+            {
+                if (borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEV);
+                }
+
+                if (borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEH);
+                }
+
+                if ((borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_LEFT)) == (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_LEFT))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEHV);
+                }
+
+                if ((borders & (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_RIGHT)) == (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_RIGHT))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEHV);
+                }
+
+                if ((borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_RIGHT)) == (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_RIGHT))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEVH);
+                }
+
+                if ((borders & (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_LEFT)) == (RECTANGLE_BORDER_BOTTOM | RECTANGLE_BORDER_LEFT))
+                {
+                    window_set_cursor(window, CURSOR_RESIZEVH);
+                }
+            }
+            else
+            {
+                window_set_cursor(window, CURSOR_DEFAULT);
+            }
         }
 
         break;

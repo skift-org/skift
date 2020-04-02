@@ -2,6 +2,7 @@
 
 #include <libdevice/keys.h>
 #include <libgraphic/Shape.h>
+#include <libsystem/unicode/Codepoint.h>
 
 #define EVENT_LIST(__EVENT) \
     __EVENT(CHILD_ADDED)
@@ -20,6 +21,8 @@ typedef enum
     EVENT_MOUSE_LEAVE,
     EVENT_MOUSE_BUTTON_PRESS,
     EVENT_MOUSE_BUTTON_RELEASE,
+
+    EVENT_KEYBOARD_KEY_TYPED,
 
     __EVENT_TYPE_COUNT,
 } EventType;
@@ -63,3 +66,9 @@ typedef struct
     MouseButton button;
     MouseButton buttons;
 } MouseEvent;
+
+typedef struct
+{
+    Event event;
+    Codepoint codepoint;
+} KeyboardEvent;

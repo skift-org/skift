@@ -10,6 +10,7 @@
 #include "Compositor/Cursor.h"
 #include "Compositor/Manager.h"
 #include "Compositor/Renderer.h"
+#include "Compositor/Window.h"
 
 void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
 {
@@ -18,10 +19,18 @@ void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
 
     logger_info("Keyboard event!");
 
-    char buffer[521];
-    stream_read(keyboard_stream, buffer, 521);
+    char c;
+    stream_read(keyboard_stream, &c, sizeof(char));
 
-    if (buffer[0] == 'q')
+    Window *window = manager_focus_window();
+
+    if (window != NULL)
+    {
+        KeyboardEvent event = (KeyboardEvent){{EVENT_KEYBOARD_KEY_TYPED, false}, c};
+        window_send_event(window, (Event *)&event, sizeof(KeyboardEvent));
+    }
+
+    if (c == 'q')
     {
         eventloop_exit(0);
     }

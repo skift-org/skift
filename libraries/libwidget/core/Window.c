@@ -25,7 +25,12 @@ Rectangle window_header_bound_on_screen(Window *window)
 
 Rectangle window_drag_bound_on_screen(Window *window)
 {
-    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){8, 8, 8, 8}));
+    return rectangle_clip(window_header_bound_on_screen(window), rectangle_shrink(window_bound_on_screen(window), (Spacing){4, 4, 4, 4}));
+}
+
+Rectangle window_content_bound(Window *window)
+{
+    return rectangle_shrink(window_bound(window), (Spacing){32, 4, 4, 4});
 }
 
 void window_paint(Window *window)

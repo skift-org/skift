@@ -36,4 +36,6 @@ Rectangle window_bound_on_screen(Window *window);
 
 Rectangle window_bound(Window *window);
 
+Rectangle window_content_bound(Window *window);
+
 void window_set_cursor(Window *window, CursorState state);

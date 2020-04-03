@@ -119,6 +119,12 @@ void widget_dump(Widget *widget, int depth)
         printf("\t");
     }
 
+    if (widget == NULL)
+    {
+        printf("<null>\n");
+        return;
+    }
+
     printf("%s(0x%08x) (%d, %d) %dx%d\n",
            widget->classname,
            widget,

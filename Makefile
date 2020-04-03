@@ -110,11 +110,10 @@ APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
-		  $(ROOT_DIRECTORY)/bin/__test3d \
-		  $(ROOT_DIRECTORY)/bin/__testapp \
+		  $(ROOT_DIRECTORY)/bin/__democube \
 		  $(ROOT_DIRECTORY)/bin/__testargs \
 		  $(ROOT_DIRECTORY)/bin/__testexec \
-		  $(ROOT_DIRECTORY)/bin/__testgfx \
+		  $(ROOT_DIRECTORY)/bin/__demogfx \
 		  $(ROOT_DIRECTORY)/bin/__testposix \
 		  $(ROOT_DIRECTORY)/bin/__testterm \
 		  $(ROOT_DIRECTORY)/bin/cat \
@@ -253,21 +252,17 @@ $(ROOT_DIRECTORY)/bin/ImageViewer: $(wildcard application/ImageViewer/*.c) $(LIB
 
 $(ROOT_DIRECTORY)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
-
-$(ROOT_DIRECTORY)/bin/__demofonts: userspace/__demofonts.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
+	$(CC) $(CFLAGS) $< -o $@ -lwidget  -lgraphic
 
 $(ROOT_DIRECTORY)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
+	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/__test3d: userspace/__test3d.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__democube: userspace/__democube.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBWIDGET) $(LIBMATH) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic -lmath
+	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic -lmath
 
-$(ROOT_DIRECTORY)/bin/__testapp: userspace/__testapp.c $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__demogfx: userspace/__demogfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
@@ -278,10 +273,6 @@ $(ROOT_DIRECTORY)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
 $(ROOT_DIRECTORY)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/__testgfx: userspace/__testgfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
 $(ROOT_DIRECTORY)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBCOMPAT) $(CRTS)
 	$(DIRECTORY_GUARD)

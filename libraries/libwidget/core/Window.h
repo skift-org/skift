@@ -14,24 +14,23 @@ typedef struct
     bool focused;
     bool is_dragging;
 
-    Rectangle bound;
-    Widget *main_widget;
+    Rectangle on_screen_bound;
     CursorState cursor_state;
 
     int framebuffer_handle;
     Bitmap *framebuffer;
     Painter *painter;
+
+    Widget *root_container;
 } Window;
 
-Window *window_create(const char *title, Rectangle bound);
+Window *window_create(const char *title, int width, int height);
 
 void window_destroy(Window *window);
 
 void window_dump(Window *window);
 
 void window_handle_event(Window *window, Event *event);
-
-void window_set_main_widget(Window *window, Widget *widget);
 
 Rectangle window_bound_on_screen(Window *window);
 
@@ -40,3 +39,5 @@ Rectangle window_bound(Window *window);
 Rectangle window_content_bound(Window *window);
 
 void window_set_cursor(Window *window, CursorState state);
+
+#define window_root(__window) ((__window)->root_container)

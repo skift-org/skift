@@ -24,11 +24,6 @@ Font *window_title_font(void)
     return _title_font;
 }
 
-void window_set_main_widget(Window *window, Widget *widget)
-{
-    window->main_widget = widget;
-}
-
 Rectangle window_header_bound(Window *window)
 {
     return rectangle_set_height(window_bound(window), WINDOW_HEADER_AREA);
@@ -72,12 +67,12 @@ void window_dump(Window *window)
 {
     printf("Window(0x%p) (%d, %d) %dx%d\n",
            window,
-           window->bound.X,
-           window->bound.Y,
-           window->bound.width,
-           window->bound.height);
+           window->on_screen_bound.X,
+           window->on_screen_bound.Y,
+           window->on_screen_bound.width,
+           window->on_screen_bound.height);
 
-    widget_dump(window->main_widget, 1);
+    widget_dump(window->root_container, 1);
 }
 
 void window_handle_event(Window *window, Event *event)
@@ -86,7 +81,7 @@ void window_handle_event(Window *window, Event *event)
     {
     case EVENT_PAINT:
         window_paint(window);
-        application_blit_window(window, window->bound);
+        application_blit_window(window, window->on_screen_bound);
         break;
 
     case EVENT_GOT_FOCUS:
@@ -112,8 +107,8 @@ void window_handle_event(Window *window, Event *event)
         if (window->is_dragging)
         {
             Point offset = point_sub(mouse_event->position, mouse_event->old_position);
-            window->bound = rectangle_offset(window->bound, offset);
-            application_move_window(window, window->bound.position);
+            window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
+            application_move_window(window, window->on_screen_bound.position);
         }
         else
         {
@@ -201,7 +196,7 @@ void window_handle_event(Window *window, Event *event)
     }
 }
 
-Window *window_create(const char *title, Rectangle bound)
+Window *window_create(const char *title, int width, int height)
 {
     Window *window = __create(Window);
 
@@ -210,9 +205,9 @@ Window *window_create(const char *title, Rectangle bound)
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
-    window->framebuffer = bitmap_create(bound.width, bound.height);
+    window->framebuffer = bitmap_create(width, height);
     window->painter = painter_create(window->framebuffer);
-    window->bound = bound;
+    window->on_screen_bound = RECTANGLE_SIZE(width, height);
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
@@ -227,18 +222,19 @@ void window_destroy(Window *window)
     free(window->title);
     painter_destroy(window->painter);
     application_remove_window(window);
+    free(window);
 }
 
 Rectangle window_bound_on_screen(Window *window)
 {
-    return window->bound;
+    return window->on_screen_bound;
 }
 
 Rectangle window_bound(Window *window)
 {
     Rectangle bound = {};
 
-    bound.size = window->bound.size;
+    bound.size = window->on_screen_bound.size;
 
     return bound;
 }

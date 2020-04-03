@@ -4,7 +4,7 @@
 
 #include <libwidget/core/Window.h>
 
-void application_initialize(int argc, char **argv);
+Result application_initialize(int argc, char **argv);
 
 int application_run(void);
 

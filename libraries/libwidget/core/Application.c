@@ -47,8 +47,10 @@ void application_request_callback(Notifier *notifier, Connection *connection)
     }
 }
 
-void application_initialize(int argc, char **argv)
+Result application_initialize(int argc, char **argv)
 {
+    assert(!_initialized);
+
     __unused(argc);
     __unused(argv);
 
@@ -58,14 +60,15 @@ void application_initialize(int argc, char **argv)
     if (handle_has_error(_connection))
     {
         logger_error("Failled to connect to the compositor: %s", handle_error_string(_connection));
-        process_exit(-1);
+        Result result = handle_get_error(_connection);
+        connection_close(_connection);
+        _connection = NULL;
+        return result;
     }
     else
     {
         logger_trace("Connected to compositor!");
     }
-
-    assert(!_initialized);
 
     _windows = list_create();
 
@@ -75,6 +78,8 @@ void application_initialize(int argc, char **argv)
     _connection_notifier->on_ready_to_read = (NotifierHandler)application_request_callback;
 
     _initialized = true;
+
+    return SUCCESS;
 }
 
 int application_run(void)
@@ -122,7 +127,7 @@ void application_add_window(Window *window)
     CompositorCreateWindowMessage message = {
         .id = window->id,
         .framebuffer = window->framebuffer_handle,
-        .bound = window->bound,
+        .bound = window->on_screen_bound,
     };
 
     application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));

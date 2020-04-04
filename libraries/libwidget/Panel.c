@@ -13,7 +13,6 @@ Widget *panel_create(Widget *parent, Rectangle bound)
 {
     Panel *panel = __create(Panel);
 
-    WIDGET(panel)->destroy = NULL;
     WIDGET(panel)->paint = (WidgetPaintCallback)panel_paint;
 
     widget_initialize(WIDGET(panel), "Panel", parent, bound);

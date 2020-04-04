@@ -42,9 +42,13 @@ Rectangle window_content_bound(Window *window)
 
 void window_paint(Window *window)
 {
-    painter_clear_rectangle(window->painter, window_bound(window), THEME_BACKGROUND);
+    painter_clear_rectangle(window->painter, window_bound(window), window->background);
 
     if (window->focused)
+    {
+        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+    }
+    else
     {
         painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
     }
@@ -223,6 +227,8 @@ Window *window_create(const char *title, int width, int height)
     window_paint(window);
     application_add_window(window);
 
+    window->background = THEME_BACKGROUND;
+
     return window;
 }
 
@@ -256,4 +262,9 @@ void window_set_cursor(Window *window, CursorState state)
         application_window_change_cursor(window, state);
         window->cursor_state = state;
     }
+}
+
+void window_set_background(Window *window, Color background)
+{
+    window->background = background;
 }

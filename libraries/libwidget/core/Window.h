@@ -22,6 +22,8 @@ typedef struct Window
     Painter *painter;
 
     Widget *root_container;
+
+    Color background;
 } Window;
 
 Window *window_create(const char *title, int width, int height);
@@ -39,5 +41,7 @@ Rectangle window_bound(Window *window);
 Rectangle window_content_bound(Window *window);
 
 void window_set_cursor(Window *window, CursorState state);
+
+void window_set_background(Window *window, Color background);
 
 #define window_root(__window) ((__window)->root_container)

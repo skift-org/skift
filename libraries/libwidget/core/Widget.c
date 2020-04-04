@@ -17,6 +17,7 @@ void widget_initialize(
 
     if (parent != NULL)
     {
+        widget->window = parent->window;
         widget_add_child(parent, widget);
     }
 }

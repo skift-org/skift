@@ -6,7 +6,7 @@
 #include <libwidget/core/Event.h>
 #include <libwidget/core/Widget.h>
 
-typedef struct
+typedef struct Window
 {
     int id;
     char *title;

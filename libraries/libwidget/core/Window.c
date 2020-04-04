@@ -6,6 +6,7 @@
 #include <libwidget/core/Event.h>
 #include <libwidget/core/Theme.h>
 #include <libwidget/core/Window.h>
+#include <libwidget/widgets/Container.h>
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 32
@@ -209,6 +210,9 @@ Window *window_create(const char *title, int width, int height)
     window->painter = painter_create(window->framebuffer);
     window->on_screen_bound = RECTANGLE_SIZE(width, height);
 
+    window->root_container = container_create(NULL, window_content_bound(window));
+    window->root_container->window = window;
+
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
     window_paint(window);
@@ -219,6 +223,7 @@ Window *window_create(const char *title, int width, int height)
 
 void window_destroy(Window *window)
 {
+    widget_destroy(window->root_container);
     free(window->title);
     painter_destroy(window->painter);
     application_remove_window(window);

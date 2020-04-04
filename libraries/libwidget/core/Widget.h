@@ -6,6 +6,7 @@
 struct Widget;
 struct Event;
 struct Painter;
+struct Window;
 
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter);
@@ -21,6 +22,7 @@ typedef struct Widget
 
     Rectangle bound;
     struct Widget *parent;
+    struct Window *window;
     List *childs;
 } Widget;
 

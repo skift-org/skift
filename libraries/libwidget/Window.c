@@ -2,11 +2,11 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
-#include <libwidget/core/Application.h>
-#include <libwidget/core/Event.h>
-#include <libwidget/core/Theme.h>
-#include <libwidget/core/Window.h>
-#include <libwidget/widgets/Container.h>
+#include <libwidget/Application.h>
+#include <libwidget/Container.h>
+#include <libwidget/Event.h>
+#include <libwidget/Theme.h>
+#include <libwidget/Window.h>
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 32

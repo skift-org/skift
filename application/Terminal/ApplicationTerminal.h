@@ -2,7 +2,7 @@
 
 #include <libgraphic/Font.h>
 #include <libterminal/Terminal.h>
-#include <libwidget/core/Widget.h>
+#include <libwidget/Widget.h>
 
 struct TerminalWidget;
 

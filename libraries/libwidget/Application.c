@@ -6,7 +6,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
-#include <libwidget/core/Application.h>
+#include <libwidget/Application.h>
 
 #include "Compositor/Protocol.h"
 

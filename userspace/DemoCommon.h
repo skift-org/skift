@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libsystem/eventloop/Timer.h>
-#include <libwidget/core/Application.h>
+#include <libwidget/Application.h>
 
 typedef void (*DrawDemoCallback)(Painter *painter, Rectangle screen, double time);
 

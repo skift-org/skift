@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libwidget/core/Widget.h>
+#include <libwidget/Widget.h>
 
 typedef struct
 {

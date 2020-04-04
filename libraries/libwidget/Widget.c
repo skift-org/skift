@@ -2,8 +2,8 @@
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
-#include <libwidget/core/Event.h>
-#include <libwidget/core/Widget.h>
+#include <libwidget/Event.h>
+#include <libwidget/Widget.h>
 
 void widget_initialize(
     Widget *widget,

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libgraphic/Shape.h>
-#include <libwidget/core/Cursor.h>
-#include <libwidget/core/Event.h>
+#include <libwidget/Cursor.h>
+#include <libwidget/Event.h>
 
 typedef enum
 {

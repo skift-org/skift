@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
-#include <libwidget/core/Theme.h>
-#include <libwidget/widgets/Panel.h>
+#include <libwidget/Panel.h>
+#include <libwidget/Theme.h>
 
 void panel_paint(Panel *panel, Painter *painter)
 {

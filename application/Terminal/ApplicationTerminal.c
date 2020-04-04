@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
-#include <libwidget/core/Theme.h>
+#include <libwidget/Theme.h>
 
 #include "Terminal/ApplicationTerminal.h"
 

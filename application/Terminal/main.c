@@ -3,7 +3,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
-#include <libwidget/core/Application.h>
+#include <libwidget/Application.h>
 
 #include "Terminal/ApplicationTerminal.h"
 #include "Terminal/FramebufferTerminal.h"

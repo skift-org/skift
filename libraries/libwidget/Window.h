@@ -2,9 +2,9 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libwidget/core/Cursor.h>
-#include <libwidget/core/Event.h>
-#include <libwidget/core/Widget.h>
+#include <libwidget/Cursor.h>
+#include <libwidget/Event.h>
+#include <libwidget/Widget.h>
 
 typedef struct Window
 {

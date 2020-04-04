@@ -50,6 +50,7 @@ void widget_add_child(Widget *widget, Widget *child)
     logger_info("Adding child %s(0x%08x) to %s(0x%08x)", child->classname, child, widget->classname, widget);
 
     child->parent = widget;
+    child->window = widget->window;
     list_pushback(widget->childs, child);
 
     Event event = {EVENT_CHILD_ADDED, false};
@@ -63,6 +64,7 @@ void widget_remove_child(Widget *widget, Widget *child)
     logger_info("Removing child %s(0x%08x) from %s(0x%08x)", child->classname, child, widget->classname, widget);
 
     child->parent = NULL;
+    child->window = NULL;
     list_remove(widget->childs, child);
 
     Event event = {EVENT_CHILD_REMOVED, false};
@@ -86,6 +88,8 @@ void widget_handle_event(Widget *widget, Event *event)
     {
         event->accepted = true;
 
+        widget_layout(widget);
+
         Event event = {EVENT_PAINT, false};
         widget_dispatch_event(widget, &event);
     }
@@ -98,19 +102,31 @@ void widget_handle_event(Widget *widget, Event *event)
 
 void widget_paint(Widget *widget, Painter *painter)
 {
+    painter_push_clip(painter, widget_bound(widget));
+
+    logger_info("Paint");
+
     if (widget->paint)
     {
         widget->paint(widget, painter);
     }
-
-    painter_push_origin(painter, widget->bound.position);
 
     list_foreach(Widget, child, widget->childs)
     {
         widget_paint(child, painter);
     }
 
-    painter_pop_origin(painter);
+    painter_pop_clip(painter);
+}
+
+void widget_layout(Widget *widget)
+{
+    logger_info("Layout");
+
+    list_foreach(Widget, child, widget->childs)
+    {
+        child->bound = widget->bound;
+    }
 }
 
 void widget_dump(Widget *widget, int depth)

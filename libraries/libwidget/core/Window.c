@@ -51,6 +51,11 @@ void window_paint(Window *window)
 
     painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_BORDER);
 
+    if (window_root(window))
+    {
+        widget_paint(window_root(window), window->painter);
+    }
+
     if (window->focused)
     {
         painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);

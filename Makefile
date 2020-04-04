@@ -232,9 +232,9 @@ $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
 
 # --- Application ------------------------------------------------------------ #
 
-$(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMINAL) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
 
 $(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)

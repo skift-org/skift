@@ -96,6 +96,7 @@ int main(int argc, char const *argv[])
     Launchpad *demoLines = launchpad_create("__demolines", "/bin/__demolines");
     launchpad_launch(demoLines, NULL);
 
+    /*
     Launchpad *demo3D = launchpad_create("__democube", "/bin/__democube");
     launchpad_launch(demo3D, NULL);
 
@@ -104,6 +105,10 @@ int main(int argc, char const *argv[])
 
     Launchpad *demogfx = launchpad_create("__demogfx", "/bin/__demogfx");
     launchpad_launch(demogfx, NULL);
+    */
+
+    Launchpad *terminal = launchpad_create("Terminal", "/bin/Terminal");
+    launchpad_launch(terminal, NULL);
 
     return eventloop_run();
 }

@@ -3,7 +3,9 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
+#include <libwidget/core/Application.h>
 
+#include "Terminal/ApplicationTerminal.h"
 #include "Terminal/FramebufferTerminal.h"
 #include "Terminal/TextmodeTerminal.h"
 
@@ -52,65 +54,79 @@ void cursor_callback(Timer *timer)
     terminal_blink(terminal);
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char **argv)
 {
     __unused(argc);
     __unused(argv);
 
-    eventloop_initialize();
-
-    Stream *keyboard = stream_open("/dev/keyboard", OPEN_READ);
-
-    if (handle_has_error(keyboard))
+    if (application_initialize(argc, argv) == SUCCESS)
     {
-        logger_error("Failled to open the keyboard device: %s", handle_get_error(keyboard));
-        return -1;
+        Window *window = window_create("Terminal", 500, 400);
+        window_set_background(window, COLOR(0x0A0E14));
+
+        terminal_widget_create(window_root(window));
+
+        application_dump();
+
+        return application_run();
     }
-
-    Result result = stream_create_term(&master, &slave);
-
-    if (result != SUCCESS)
+    else
     {
-        logger_error("Failled to create the terminal device: %s", result_to_string(result));
-        return -1;
-    }
+        Result result = stream_create_term(&master, &slave);
 
-    terminal = framebuffer_terminal_create();
+        if (result != SUCCESS)
+        {
+            logger_error("Failled to create the terminal device: %s", result_to_string(result));
+            return -1;
+        }
 
-    if (!terminal)
-    {
-        terminal = textmode_terminal_create();
+        Stream *keyboard = stream_open("/dev/keyboard", OPEN_READ);
+
+        if (handle_has_error(keyboard))
+        {
+            logger_error("Failled to open the keyboard device: %s", handle_get_error(keyboard));
+            return -1;
+        }
+
+        terminal = framebuffer_terminal_create();
 
         if (!terminal)
         {
-            logger_error("Failled to open a device to display the terminal in!");
-            return -1;
+            terminal = textmode_terminal_create();
+
+            if (!terminal)
+            {
+                logger_error("Failled to open a device to display the terminal in!");
+                return -1;
+            }
         }
+
+        eventloop_initialize();
+
+        Notifier *keyboard_notifier = notifier_create(HANDLE(keyboard), SELECT_READ);
+
+        keyboard_notifier->on_ready_to_read = (NotifierHandler)keyboard_callback;
+
+        Notifier *master_notifier = notifier_create(HANDLE(master), SELECT_READ);
+
+        master_notifier->on_ready_to_read = (NotifierHandler)master_callback;
+
+        Timer *cursor_blink = timer_create(250, cursor_callback);
+        timer_start(cursor_blink);
+
+        Timer *repaint_timer = timer_create(16, repaint_callback);
+        timer_start(repaint_timer);
+
+        logger_trace("Starting the shell application...");
+
+        Launchpad *shell_launchpad = launchpad_create("sh", "/bin/Shell");
+        launchpad_handle(shell_launchpad, HANDLE(slave), 0);
+        launchpad_handle(shell_launchpad, HANDLE(slave), 1);
+        launchpad_handle(shell_launchpad, HANDLE(slave), 2);
+        launchpad_launch(shell_launchpad, NULL);
+
+        logger_trace("Shell application started");
+
+        return eventloop_run();
     }
-
-    Notifier *keyboard_notifier = notifier_create(HANDLE(keyboard), SELECT_READ);
-
-    keyboard_notifier->on_ready_to_read = (NotifierHandler)keyboard_callback;
-
-    Notifier *master_notifier = notifier_create(HANDLE(master), SELECT_READ);
-
-    master_notifier->on_ready_to_read = (NotifierHandler)master_callback;
-
-    Timer *cursor_blink = timer_create(250, cursor_callback);
-    timer_start(cursor_blink);
-
-    Timer *repaint_timer = timer_create(16, repaint_callback);
-    timer_start(repaint_timer);
-
-    logger_trace("Starting the shell application...");
-
-    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/Shell");
-    launchpad_handle(shell_launchpad, HANDLE(slave), 0);
-    launchpad_handle(shell_launchpad, HANDLE(slave), 1);
-    launchpad_handle(shell_launchpad, HANDLE(slave), 2);
-    launchpad_launch(shell_launchpad, NULL);
-
-    logger_trace("Shell application started");
-
-    return eventloop_run();
 }

@@ -65,10 +65,6 @@ LIBGRAPHIC=$(ROOT_DIRECTORY)/lib/libgraphic.a
 LIBGRAPHIC_SRC=$(wildcard libraries/libgraphic/*.c)
 LIBGRAPHIC_OBJ=$(patsubst %.c,%.o,$(LIBGRAPHIC_SRC))
 
-LIBKERNEL=$(ROOT_DIRECTORY)/lib/libkernel.a
-LIBKERNEL_SRC=$(wildcard libraries/libkernel/*.c)
-LIBKERNEL_OBJ=$(patsubst %.c,%.o,$(LIBKERNEL_SRC))
-
 LIBMATH=$(ROOT_DIRECTORY)/lib/libmath.a
 LIBMATH_SRC=$(wildcard libraries/libmath/*.c)
 LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
@@ -98,7 +94,6 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBFILE)  \
 		  $(LIBWIDGET) \
 		  $(LIBGRAPHIC) \
-		  $(LIBKERNEL) \
 		  $(LIBMATH) \
 		  $(LIBCOMPAT) \
 		  $(LIBSYSTEM)
@@ -212,10 +207,6 @@ $(LIBWIDGET): $(LIBWIDGET_OBJ)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(LIBGRAPHIC): $(LIBGRAPHIC_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBKERNEL): $(LIBKERNEL_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 

@@ -4,6 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <abi/Handle.h>
 #include <abi/Launchpad.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable);

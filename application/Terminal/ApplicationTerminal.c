@@ -1,5 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Launchpad.h>
 #include <libwidget/Theme.h>
 
 #include "Terminal/ApplicationTerminal.h"
@@ -133,6 +134,24 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
     painter_pop_origin(painter);
 }
 
+#define TERMINAL_IO_BUFFER_SIZE 4096
+
+void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, SelectEvent events)
+{
+    __unused(events);
+
+    char buffer[TERMINAL_IO_BUFFER_SIZE];
+    size_t size = stream_read(master, buffer, TERMINAL_IO_BUFFER_SIZE);
+
+    if (handle_has_error(master))
+    {
+        handle_printf_error(master, "Terminal: read from master failled");
+        return;
+    }
+
+    terminal_write(widget->terminal, buffer, size);
+}
+
 void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 {
     TerminalWidgetRenderer *terminal_renderer = __create(TerminalWidgetRenderer);
@@ -147,19 +166,38 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 void terminal_widget_destroy(TerminalWidget *terminal_widget)
 {
     terminal_destroy(terminal_widget->terminal);
+
+    notifier_destroy(terminal_widget->master_notifier);
+
+    stream_close(terminal_widget->master_stream);
+    stream_close(terminal_widget->slave_stream);
 }
 
 Widget *terminal_widget_create(Widget *parent)
 {
-    TerminalWidget *terminal_widget = __create(TerminalWidget);
+    TerminalWidget *widget = __create(TerminalWidget);
 
-    widget_initialize(WIDGET(terminal_widget), "Terminal", parent, (Rectangle){});
+    widget_initialize(WIDGET(widget), "Terminal", parent, (Rectangle){});
 
-    WIDGET(terminal_widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
+    WIDGET(widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
 
-    terminal_widget_renderer_create(terminal_widget);
+    terminal_widget_renderer_create(widget);
 
-    terminal_write(terminal_widget->terminal, "Hello, world!\n", 14);
+    stream_create_term(
+        &widget->master_stream,
+        &widget->slave_stream);
 
-    return WIDGET(terminal_widget);
+    widget->master_notifier = notifier_create(
+        widget, 
+        HANDLE(widget->master_stream), 
+        SELECT_READ, 
+        (NotifierCallback)terminal_widget_master_callback);
+
+    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/__testterm");
+    launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 0);
+    launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 1);
+    launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);
+    launchpad_launch(shell_launchpad, NULL);
+
+    return WIDGET(widget);
 }

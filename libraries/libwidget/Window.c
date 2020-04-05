@@ -12,7 +12,26 @@
 #define WINDOW_HEADER_AREA 32
 #define WINDOW_CONTENT_PADDING 8
 
-static int _window_id = 0;
+struct Window
+{
+    int handle;
+    char *title;
+
+    bool focused;
+    bool is_dragging;
+
+    Rectangle on_screen_bound;
+    CursorState cursor_state;
+
+    int framebuffer_handle;
+    Bitmap *framebuffer;
+    Painter *painter;
+
+    Widget *root_container;
+    Widget *focused_widget;
+
+    Color background;
+};
 
 static Font *_title_font = NULL;
 Font *window_title_font(void)
@@ -219,7 +238,8 @@ Window *window_create(const char *title, int width, int height)
 {
     Window *window = __create(Window);
 
-    window->id = _window_id++;
+    static int window_handle_counter = 0;
+    window->handle = window_handle_counter++;
     window->title = strdup(title);
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
@@ -247,6 +267,7 @@ void window_destroy(Window *window)
     widget_destroy(window->root_container);
     free(window->title);
     painter_destroy(window->painter);
+    bitmap_destroy(window->framebuffer);
     application_remove_window(window);
     free(window);
 }
@@ -277,4 +298,24 @@ void window_set_cursor(Window *window, CursorState state)
 void window_set_background(Window *window, Color background)
 {
     window->background = background;
+}
+
+void window_set_focused_widget(Window *window, Widget *widget)
+{
+    window->focused_widget = widget;
+}
+
+int window_handle(Window *window)
+{
+    return window->handle;
+}
+
+int window_framebuffer_handle(Window *window)
+{
+    return window->framebuffer_handle;
+}
+
+Widget *window_root(Window *window)
+{
+    return window->root_container;
 }

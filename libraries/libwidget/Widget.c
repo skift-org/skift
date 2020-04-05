@@ -169,7 +169,7 @@ void widget_focus(Widget *widget)
 {
     if (widget->window)
     {
-        widget->window->focused_widget = widget;
+        window_set_focused_widget(widget->window, widget);
     }
 }
 

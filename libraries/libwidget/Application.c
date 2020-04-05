@@ -132,9 +132,9 @@ void application_add_window(Window *window)
     logger_info("Adding Window(0x%08x)", window);
 
     CompositorCreateWindowMessage message = {
-        .id = window->id,
-        .framebuffer = window->framebuffer_handle,
-        .bound = window->on_screen_bound,
+        .id = window_handle(window),
+        .framebuffer = window_framebuffer_handle(window),
+        .bound = window_bound_on_screen(window),
     };
 
     application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));
@@ -149,7 +149,7 @@ void application_remove_window(Window *window)
     logger_info("Removing Window(0x%08x)", window);
 
     CompositorDestroyWindowMessage message = {
-        .id = window->id,
+        .id = window_handle(window),
     };
 
     application_send_message(COMPOSITOR_MESSAGE_DESTROY_WINDOW, &message, sizeof(CompositorDestroyWindowMessage));
@@ -161,7 +161,7 @@ Window *application_get_window_by_id(int id)
 {
     list_foreach(Window, window, _windows)
     {
-        if (window->id == id)
+        if (window_handle(window) == id)
         {
             return window;
         }
@@ -175,7 +175,7 @@ void application_blit_window(Window *window, Rectangle bound)
     assert(_initialized);
 
     CompositorBlitWindowMessage message = {
-        .id = window->id,
+        .id = window_handle(window),
         .bound = bound,
     };
 
@@ -187,7 +187,7 @@ void application_move_window(Window *window, Point position)
     assert(_initialized);
 
     CompositorWindowMove message = {
-        .id = window->id,
+        .id = window_handle(window),
         .position = position,
     };
 
@@ -199,7 +199,7 @@ void application_window_change_cursor(Window *window, CursorState state)
     assert(_initialized);
 
     CompositorCursorStateChange message = {
-        .id = window->id,
+        .id = window_handle(window),
         .state = state,
     };
 

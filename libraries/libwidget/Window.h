@@ -22,6 +22,7 @@ typedef struct Window
     Painter *painter;
 
     Widget *root_container;
+    Widget *focused_widget;
 
     Color background;
 } Window;

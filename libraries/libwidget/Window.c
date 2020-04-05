@@ -201,6 +201,15 @@ void window_handle_event(Window *window, Event *event)
         break;
     }
 
+    case EVENT_KEYBOARD_KEY_TYPED:
+    {
+        if (window->focused_widget)
+        {
+            widget_dispatch_event(window->focused_widget, event);
+        }
+        break;
+    }
+
     default:
         break;
     }
@@ -221,6 +230,7 @@ Window *window_create(const char *title, int width, int height)
 
     window->root_container = container_create(NULL, window_content_bound(window));
     window->root_container->window = window;
+    window->focused_widget = window->root_container;
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 

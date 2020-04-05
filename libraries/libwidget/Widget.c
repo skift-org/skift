@@ -4,6 +4,7 @@
 #include <libsystem/logger.h>
 #include <libwidget/Event.h>
 #include <libwidget/Widget.h>
+#include <libwidget/Window.h>
 
 void widget_initialize(
     Widget *widget,
@@ -161,6 +162,14 @@ void widget_layout(Widget *widget)
 
     default:
         break;
+    }
+}
+
+void widget_focus(Widget *widget)
+{
+    if (widget->window)
+    {
+        widget->window->focused_widget = widget;
     }
 }
 

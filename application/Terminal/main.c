@@ -60,7 +60,8 @@ int main(int argc, char **argv)
         Window *window = window_create("Terminal", 500, 400);
         window_set_background(window, COLOR(0x0A0E14));
 
-        terminal_widget_create(window_root(window));
+        Widget *widget = terminal_widget_create(window_root(window));
+        widget_focus(widget);
 
         application_dump();
 

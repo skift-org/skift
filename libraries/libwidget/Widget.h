@@ -58,4 +58,6 @@ void widget_paint(Widget *widget, struct Painter *painter);
 
 void widget_layout(Widget *widget);
 
+void widget_focus(Widget *widget);
+
 #define widget_bound(__widget) WIDGET(__widget)->bound

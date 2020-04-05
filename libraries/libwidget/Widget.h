@@ -12,6 +12,13 @@ typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
 
+typedef enum
+{
+    LAYOUT_STACK,
+    LAYOUT_VFLOW,
+    LAYOUT_HFLOW,
+} Layout;
+
 typedef struct Widget
 {
     const char *classname;
@@ -23,6 +30,7 @@ typedef struct Widget
     Rectangle bound;
     struct Widget *parent;
     struct Window *window;
+    Layout layout; // FIXME: this shoul be a separeted object
     List *childs;
 } Widget;
 

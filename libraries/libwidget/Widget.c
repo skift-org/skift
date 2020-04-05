@@ -90,6 +90,11 @@ void widget_handle_event(Widget *widget, Event *event)
 
         widget_layout(widget);
 
+        list_foreach(Widget, child, widget->childs)
+        {
+            widget_layout(child);
+        }
+
         Event event = {EVENT_PAINT, false};
         widget_dispatch_event(widget, &event);
     }
@@ -103,8 +108,6 @@ void widget_handle_event(Widget *widget, Event *event)
 void widget_paint(Widget *widget, Painter *painter)
 {
     painter_push_clip(painter, widget_bound(widget));
-
-    logger_info("Paint");
 
     if (widget->paint)
     {
@@ -121,11 +124,43 @@ void widget_paint(Widget *widget, Painter *painter)
 
 void widget_layout(Widget *widget)
 {
-    logger_info("Layout");
-
-    list_foreach(Widget, child, widget->childs)
+    switch (widget->layout)
     {
-        child->bound = widget->bound;
+    case LAYOUT_STACK:
+        list_foreach(Widget, child, widget->childs)
+        {
+            child->bound = widget->bound;
+        }
+        break;
+
+    case LAYOUT_HFLOW:
+    {
+        int current = widget_bound(widget).X;
+        int child_width = widget_bound(widget).width / list_count(widget->childs);
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            child->bound = RECTANGLE(current, widget_bound(widget).position.Y, child_width, widget_bound(widget).height);
+            current += child_width;
+        }
+    }
+    break;
+
+    case LAYOUT_VFLOW:
+    {
+        int current = widget_bound(widget).Y;
+        int child_height = widget_bound(widget).height / list_count(widget->childs);
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            child->bound = RECTANGLE(widget_bound(widget).position.X, current, widget_bound(widget).width, child_height);
+            current += child_height;
+        }
+    }
+    break;
+
+    default:
+        break;
     }
 }
 

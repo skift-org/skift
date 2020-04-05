@@ -8,9 +8,9 @@
 #include "Compositor/Renderer.h"
 #include "Compositor/Window.h"
 
-void client_request_callback(Client *client, Connection *connection)
+void client_request_callback(Client *client, Connection *connection, SelectEvent events)
 {
-    __unused(client);
+    __unused(events);
 
     CompositorMessage header = {};
 
@@ -118,8 +118,11 @@ Client *client_create(Connection *connection)
     Client *client = __create(Client);
 
     client->connection = connection;
-    notifier_initialize((Notifier *)client, HANDLE(connection), SELECT_READ);
-    NOTIFIER(client)->on_ready_to_read = (NotifierHandler)client_request_callback;
+    client->notifier = notifier_create(
+        client,
+        HANDLE(connection),
+        SELECT_READ,
+        (NotifierCallback)client_request_callback);
 
     return client;
 }
@@ -133,7 +136,7 @@ void client_send_message(Client *client, CompositorMessageType type, const void 
 
 void client_destroy(Client *client)
 {
-    notifier_uninitialize((Notifier *)client);
+    notifier_destroy(client->notifier);
     connection_close(client->connection);
     free(client);
 }

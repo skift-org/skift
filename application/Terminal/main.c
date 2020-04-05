@@ -11,12 +11,12 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-Terminal *terminal = NULL;
 Stream *master = NULL, *slave = NULL;
 
-void keyboard_callback(Notifier *notifier, Stream *keyboard)
+void keyboard_callback(void *target, Stream *keyboard, SelectEvent events)
 {
-    __unused(notifier);
+    __unused(target);
+    __unused(events);
 
     char buffer[TERMINAL_IO_BUFFER_SIZE];
     size_t size = stream_read(keyboard, buffer, TERMINAL_IO_BUFFER_SIZE);
@@ -24,9 +24,9 @@ void keyboard_callback(Notifier *notifier, Stream *keyboard)
     stream_write(master, buffer, size);
 }
 
-void master_callback(Notifier *notifier, Stream *master)
+void master_callback(Terminal *terminal, Stream *master, SelectEvent events)
 {
-    __unused(notifier);
+    __unused(events);
 
     char buffer[TERMINAL_IO_BUFFER_SIZE];
     size_t size = stream_read(master, buffer, TERMINAL_IO_BUFFER_SIZE);
@@ -40,17 +40,13 @@ void master_callback(Notifier *notifier, Stream *master)
     terminal_write(terminal, buffer, size);
 }
 
-void repaint_callback(Timer *timer)
+void repaint_callback(Terminal *terminal)
 {
-    __unused(timer);
-
     terminal_repaint(terminal);
 }
 
-void cursor_callback(Timer *timer)
+void cursor_callback(Terminal *terminal)
 {
-    __unused(timer);
-
     terminal_blink(terminal);
 }
 
@@ -88,7 +84,7 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        terminal = framebuffer_terminal_create();
+        Terminal *terminal = framebuffer_terminal_create();
 
         if (!terminal)
         {
@@ -103,19 +99,11 @@ int main(int argc, char **argv)
 
         eventloop_initialize();
 
-        Notifier *keyboard_notifier = notifier_create(HANDLE(keyboard), SELECT_READ);
+        notifier_create(terminal, HANDLE(keyboard), SELECT_READ, (NotifierCallback)keyboard_callback);
+        notifier_create(terminal, HANDLE(master), SELECT_READ, (NotifierCallback)master_callback);
 
-        keyboard_notifier->on_ready_to_read = (NotifierHandler)keyboard_callback;
-
-        Notifier *master_notifier = notifier_create(HANDLE(master), SELECT_READ);
-
-        master_notifier->on_ready_to_read = (NotifierHandler)master_callback;
-
-        Timer *cursor_blink = timer_create(250, cursor_callback);
-        timer_start(cursor_blink);
-
-        Timer *repaint_timer = timer_create(16, repaint_callback);
-        timer_start(repaint_timer);
+        timer_start(timer_create(terminal, 250, (TimerCallback)cursor_callback));
+        timer_start(timer_create(terminal, 16, (TimerCallback)repaint_callback));
 
         logger_trace("Starting the shell application...");
 

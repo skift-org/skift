@@ -104,7 +104,7 @@ void eventloop_pump(void)
         {
             if (timer->callback)
             {
-                timer->callback(timer);
+                timer->callback(timer->target);
             }
 
             timer->elapsed = 0;
@@ -113,34 +113,11 @@ void eventloop_pump(void)
 
     if (result == SUCCESS)
     {
-
         list_foreach(Notifier, notifier, _eventloop_notifiers)
         {
             if (notifier->handle == selected)
             {
-                if ((selected_events & SELECT_READ) &&
-                    (notifier->on_ready_to_read != NULL))
-                {
-                    notifier->on_ready_to_read(notifier, notifier->handle);
-                }
-
-                if ((selected_events & SELECT_WRITE) &&
-                    (notifier->on_ready_to_write != NULL))
-                {
-                    notifier->on_ready_to_write(notifier, notifier->handle);
-                }
-
-                if ((selected_events & SELECT_CONNECT) &&
-                    (notifier->on_ready_to_connect != NULL))
-                {
-                    notifier->on_ready_to_connect(notifier, notifier->handle);
-                }
-
-                if ((selected_events & SELECT_ACCEPT) &&
-                    (notifier->on_ready_to_accept != NULL))
-                {
-                    notifier->on_ready_to_accept(notifier, notifier->handle);
-                }
+                notifier->callback(notifier->target, notifier->handle, selected_events);
             }
         }
     }

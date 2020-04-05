@@ -7,8 +7,7 @@
 
 typedef struct Client
 {
-    Notifier notifier;
-
+    Notifier *notifier;
     Connection *connection;
 } Client;
 

@@ -8,26 +8,20 @@
 
 struct Notifier;
 
-typedef void (*NotifierHandler)(struct Notifier *notifier, Handle *handle);
+typedef void (*NotifierCallback)(void *target, Handle *handle, SelectEvent events);
 
 typedef struct Notifier
 {
+    void *target;
     Handle *handle;
-
     SelectEvent events;
-
-    NotifierHandler on_ready_to_read;
-    NotifierHandler on_ready_to_write;
-    NotifierHandler on_ready_to_connect;
-    NotifierHandler on_ready_to_accept;
+    NotifierCallback callback;
 } Notifier;
 
-#define NOTIFIER(__subclass) ((Notifier *)(__subclass))
-
-void notifier_initialize(Notifier *notifier, Handle *handle, SelectEvent events);
-
-void notifier_uninitialize(Notifier *notifier);
-
-Notifier *notifier_create(Handle *handle, SelectEvent events);
+Notifier *notifier_create(
+    void *target,
+    Handle *handle,
+    SelectEvent events,
+    NotifierCallback callback);
 
 void notifier_destroy(Notifier *notifier);

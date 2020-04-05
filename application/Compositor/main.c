@@ -12,9 +12,10 @@
 #include "Compositor/Renderer.h"
 #include "Compositor/Window.h"
 
-void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
+void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events)
 {
-    __unused(notifier);
+    __unused(target);
+    __unused(events);
 
     char c;
     stream_read(keyboard_stream, &c, sizeof(char));
@@ -33,9 +34,10 @@ void keyboard_callback(Notifier *notifier, Stream *keyboard_stream)
     }
 }
 
-void mouse_callback(Notifier *notifier, Stream *mouse_stream)
+void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
 {
-    __unused(notifier);
+    __unused(target);
+    __unused(events);
 
     MousePacket packet;
     size_t size = stream_read(mouse_stream, &packet, sizeof(MousePacket));
@@ -50,19 +52,19 @@ void mouse_callback(Notifier *notifier, Stream *mouse_stream)
     }
 }
 
-void accept_callback(Notifier *notifier, Socket *socket)
+void accept_callback(void *target, Socket *socket, SelectEvent events)
 {
-    __unused(notifier);
-    __unused(socket);
+    __unused(target);
+    __unused(events);
 
     Connection *incoming_connection = socket_accept(socket);
 
     client_create(incoming_connection);
 }
 
-void render_callback(Timer *timer)
+void render_callback(void *target)
 {
-    __unused(timer);
+    __unused(target);
 
     renderer_repaint_dirty();
 }
@@ -75,18 +77,14 @@ int main(int argc, char const *argv[])
     eventloop_initialize();
 
     Stream *keyboard_stream = stream_open("/dev/keyboard", OPEN_READ);
-    Notifier *keyboard_notifier = notifier_create(HANDLE(keyboard_stream), SELECT_READ);
-    keyboard_notifier->on_ready_to_read = (NotifierHandler)keyboard_callback;
-
     Stream *mouse_stream = stream_open("/dev/mouse", OPEN_READ);
-    Notifier *mouse_notifier = notifier_create(HANDLE(mouse_stream), SELECT_READ);
-    mouse_notifier->on_ready_to_read = (NotifierHandler)mouse_callback;
-
     Socket *socket = socket_open("/srv/compositor.ipc", OPEN_CREATE);
-    Notifier *socket_notifier = notifier_create(HANDLE(socket), SELECT_ACCEPT);
-    socket_notifier->on_ready_to_accept = (NotifierHandler)accept_callback;
 
-    Timer *repaint_timer = timer_create(1000 / 60, render_callback);
+    notifier_create(NULL, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
+    notifier_create(NULL, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
+    notifier_create(NULL, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
+
+    Timer *repaint_timer = timer_create(NULL, 1000 / 60, render_callback);
     timer_start(repaint_timer);
 
     manager_initialize();

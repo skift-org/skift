@@ -6,31 +6,26 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/logger.h>
 
-void notifier_initialize(Notifier *notifier, Handle *handle, SelectEvent events)
-{
-    notifier->handle = handle;
-    notifier->events = events;
-
-    eventloop_register_notifier(notifier);
-}
-
-void notifier_uninitialize(Notifier *notifier)
-{
-    eventloop_unregister_notifier(notifier);
-}
-
-Notifier *notifier_create(Handle *handle, SelectEvent events)
+Notifier *notifier_create(
+    void *target,
+    Handle *handle,
+    SelectEvent events,
+    NotifierCallback callback)
 {
     Notifier *notifier = __create(Notifier);
 
-    notifier_initialize(notifier, handle, events);
+    notifier->target = target;
+    notifier->handle = handle;
+    notifier->events = events;
+    notifier->callback = callback;
+
+    eventloop_register_notifier(notifier);
 
     return notifier;
 }
 
 void notifier_destroy(Notifier *notifier)
 {
-    notifier_uninitialize(notifier);
-
+    eventloop_unregister_notifier(notifier);
     free(notifier);
 }

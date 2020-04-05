@@ -1,14 +1,16 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Timer.h>
 
-Timer *timer_create(Timeout interval, TimerCallback callback)
+Timer *timer_create(void *target, Timeout interval, TimerCallback callback)
 {
     Timer *timer = __create(Timer);
 
-    timer->started = false;
-    timer->elapsed = 0;
+    timer->target = target;
     timer->interval = interval;
     timer->callback = callback;
+
+    timer->started = false;
+    timer->elapsed = 0;
 
     eventloop_register_timer(timer);
 

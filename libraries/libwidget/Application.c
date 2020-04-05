@@ -16,9 +16,13 @@ static List *_windows;
 static Connection *_connection;
 static Notifier *_connection_notifier;
 
-void application_request_callback(Notifier *notifier, Connection *connection)
+void application_request_callback(
+    void *target,
+    Connection *connection,
+    SelectEvent events)
 {
-    __unused(notifier);
+    __unused(target);
+    __unused(events);
 
     CompositorMessage header = {};
     connection_receive(connection, &header, sizeof(CompositorMessage));
@@ -74,8 +78,11 @@ Result application_initialize(int argc, char **argv)
 
     eventloop_initialize();
 
-    _connection_notifier = notifier_create(HANDLE(_connection), SELECT_READ);
-    _connection_notifier->on_ready_to_read = (NotifierHandler)application_request_callback;
+    _connection_notifier = notifier_create(
+        NULL,
+        HANDLE(_connection),
+        SELECT_READ,
+        (NotifierCallback)application_request_callback);
 
     _initialized = true;
 

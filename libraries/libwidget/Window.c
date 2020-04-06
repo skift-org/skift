@@ -163,7 +163,7 @@ void window_handle_event(Window *window, Event *event)
     {
     case EVENT_PAINT:
         window_paint(window, window_bound(window));
-        application_blit_window(window, window->on_screen_bound);
+        application_blit_window(window, window_bound(window));
         break;
 
     case EVENT_GOT_FOCUS:
@@ -341,7 +341,7 @@ void window_update_callback(Window *window)
         window_paint(window, *rectangle);
     }
     list_clear_with_callback(window->dirty_rect, free);
-    application_blit_window(window, window->on_screen_bound);
+    application_blit_window(window, window_bound(window));
 }
 
 void window_update(Window *window, Rectangle rectangle)

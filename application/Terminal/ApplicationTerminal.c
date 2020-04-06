@@ -1,6 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
+#include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 
 #include "Terminal/ApplicationTerminal.h"
@@ -114,8 +115,6 @@ void terminal_widget_render_cell(Painter *painter, Font *font, int x, int y, Ter
 
 void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
 {
-    logger_trace("Terminal repaint!");
-
     painter_push_origin(painter, widget_bound(terminal_widget).position);
 
     Terminal *terminal = terminal_widget->terminal;
@@ -130,6 +129,21 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
             terminal_cell_undirty(terminal, x, y);
         }
     }
+
+    TerminalCell cell = terminal_cell_at(terminal, terminal->cursor.x, terminal->cursor.y);
+
+    int cx = terminal->cursor.x;
+    int cy = terminal->cursor.y;
+
+    if (terminal_widget->cursor_blink)
+    {
+        cell.attributes.inverted = true;
+        cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+    }
+
+    terminal_widget->cursor_blink = !terminal_widget->cursor_blink;
+
+    terminal_widget_render_cell(painter, get_terminal_font(), cx, cy, cell);
 
     painter_pop_origin(painter);
 }
@@ -150,6 +164,13 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     }
 
     terminal_write(widget->terminal, buffer, size);
+    widget_update(WIDGET(widget));
+}
+
+void terminal_widget_cursor_callback(TerminalWidget *widget)
+{
+    // FIXME: don't update the whole widget juste to repaint the cursor.
+    widget_update(WIDGET(widget));
 }
 
 void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
@@ -163,11 +184,23 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
     terminal_widget->terminal = terminal;
 }
 
+void terminal_widget_event_callback(TerminalWidget *terminal_widget, Event *event)
+{
+    if (event->type == EVENT_KEYBOARD_KEY_TYPED)
+    {
+        KeyboardEvent *key_event = (KeyboardEvent *)event;
+        stream_write(terminal_widget->master_stream, &key_event->codepoint, sizeof(char));
+
+        event->accepted = true;
+    }
+}
+
 void terminal_widget_destroy(TerminalWidget *terminal_widget)
 {
     terminal_destroy(terminal_widget->terminal);
 
     notifier_destroy(terminal_widget->master_notifier);
+    timer_destroy(terminal_widget->cursor_blink_timer);
 
     stream_close(terminal_widget->master_stream);
     stream_close(terminal_widget->slave_stream);
@@ -180,6 +213,7 @@ Widget *terminal_widget_create(Widget *parent)
     widget_initialize(WIDGET(widget), "Terminal", parent, (Rectangle){});
 
     WIDGET(widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
+    WIDGET(widget)->event = (WidgetEventCallback)terminal_widget_event_callback;
 
     terminal_widget_renderer_create(widget);
 
@@ -188,12 +222,15 @@ Widget *terminal_widget_create(Widget *parent)
         &widget->slave_stream);
 
     widget->master_notifier = notifier_create(
-        widget, 
-        HANDLE(widget->master_stream), 
-        SELECT_READ, 
+        widget,
+        HANDLE(widget->master_stream),
+        SELECT_READ,
         (NotifierCallback)terminal_widget_master_callback);
 
-    Launchpad *shell_launchpad = launchpad_create("sh", "/bin/__testterm");
+    widget->cursor_blink_timer = timer_create(widget, 250, (TimerCallback)terminal_widget_cursor_callback);
+    timer_start(widget->cursor_blink_timer);
+
+    Launchpad *shell_launchpad = launchpad_create("Shell", "/bin/Shell");
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 0);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 1);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);

@@ -244,7 +244,6 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_PRESS:
     {
-        logger_info("Mouse press ");
         MouseEvent *mouse_event = (MouseEvent *)event;
 
         if (!window->is_dragging &&
@@ -260,7 +259,6 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_RELEASE:
     {
-        logger_info("Mouse release ");
         MouseEvent *mouse_event = (MouseEvent *)event;
 
         if (window->is_dragging &&

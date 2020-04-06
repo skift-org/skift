@@ -27,11 +27,6 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
         KeyboardEvent event = (KeyboardEvent){{EVENT_KEYBOARD_KEY_TYPED, false}, c};
         window_send_event(window, (Event *)&event, sizeof(KeyboardEvent));
     }
-
-    if (c == 'q')
-    {
-        eventloop_exit(0);
-    }
 }
 
 void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
@@ -108,8 +103,8 @@ int main(int argc, char const *argv[])
     Launchpad *terminal = launchpad_create("Terminal", "/bin/Terminal");
     launchpad_launch(terminal, NULL);
 
-    Launchpad *widgets = launchpad_create("WidgetFactory", "/bin/WidgetFactory");
-    launchpad_launch(widgets, NULL);
+    // Launchpad *widgets = launchpad_create("WidgetFactory", "/bin/WidgetFactory");
+    // launchpad_launch(widgets, NULL);
 
     return eventloop_run();
 }

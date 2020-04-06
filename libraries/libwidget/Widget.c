@@ -199,3 +199,8 @@ void widget_dump(Widget *widget, int depth)
         widget_dump(child, depth + 1);
     }
 }
+
+void widget_update(Widget *widget)
+{
+    window_update(widget->window, widget->bound);
+}

@@ -1,4 +1,5 @@
 #include <libsystem/cstring.h>
+#include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
@@ -26,12 +27,53 @@ struct Window
     int framebuffer_handle;
     Bitmap *framebuffer;
     Painter *painter;
+    List *dirty_rect;
 
     Widget *root_container;
     Widget *focused_widget;
 
     Color background;
 };
+
+Window *window_create(const char *title, int width, int height)
+{
+    Window *window = __create(Window);
+
+    static int window_handle_counter = 0;
+    window->handle = window_handle_counter++;
+    window->title = strdup(title);
+    window->focused = false;
+    window->cursor_state = CURSOR_DEFAULT;
+
+    window->framebuffer = bitmap_create(width, height);
+    window->painter = painter_create(window->framebuffer);
+    window->on_screen_bound = RECTANGLE_SIZE(width, height);
+    window->dirty_rect = list_create();
+
+    window->root_container = container_create(NULL, window_content_bound(window));
+    window->root_container->window = window;
+    window->focused_widget = window->root_container;
+
+    shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
+
+    window_paint(window, window_bound(window));
+    application_add_window(window);
+
+    window->background = THEME_BACKGROUND;
+
+    return window;
+}
+
+void window_destroy(Window *window)
+{
+    widget_destroy(window->root_container);
+    free(window->title);
+    painter_destroy(window->painter);
+    bitmap_destroy(window->framebuffer);
+    application_remove_window(window);
+    list_destroy_with_callback(window->dirty_rect, free);
+    free(window);
+}
 
 static Font *_title_font = NULL;
 Font *window_title_font(void)
@@ -59,36 +101,47 @@ Rectangle window_content_bound(Window *window)
     return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
 }
 
-void window_paint(Window *window)
+void window_paint(Window *window, Rectangle rectangle)
 {
-    painter_clear_rectangle(window->painter, window_bound(window), window->background);
-
-    if (window->focused)
+    if (rectangle_container_rectangle(window_content_bound(window), rectangle))
     {
-        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+        if (window_root(window))
+        {
+            widget_paint(window_root(window), window->painter);
+        }
     }
     else
     {
-        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
-    }
 
-    painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_BORDER);
+        painter_clear_rectangle(window->painter, window_bound(window), window->background);
 
-    if (window_root(window))
-    {
-        widget_paint(window_root(window), window->painter);
-    }
+        if (window->focused)
+        {
+            painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+        }
+        else
+        {
+            painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+        }
 
-    if (window->focused)
-    {
-        painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
-        painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
-        painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
-    }
-    else
-    {
-        painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
-        painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_BORDER);
+        painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_BORDER);
+
+        if (window_root(window))
+        {
+            widget_paint(window_root(window), window->painter);
+        }
+
+        if (window->focused)
+        {
+            painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
+            painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
+            painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
+        }
+        else
+        {
+            painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
+            painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_BORDER);
+        }
     }
 }
 
@@ -109,7 +162,7 @@ void window_handle_event(Window *window, Event *event)
     switch (event->type)
     {
     case EVENT_PAINT:
-        window_paint(window);
+        window_paint(window, window_bound(window));
         application_blit_window(window, window->on_screen_bound);
         break;
 
@@ -234,44 +287,6 @@ void window_handle_event(Window *window, Event *event)
     }
 }
 
-Window *window_create(const char *title, int width, int height)
-{
-    Window *window = __create(Window);
-
-    static int window_handle_counter = 0;
-    window->handle = window_handle_counter++;
-    window->title = strdup(title);
-    window->focused = false;
-    window->cursor_state = CURSOR_DEFAULT;
-
-    window->framebuffer = bitmap_create(width, height);
-    window->painter = painter_create(window->framebuffer);
-    window->on_screen_bound = RECTANGLE_SIZE(width, height);
-
-    window->root_container = container_create(NULL, window_content_bound(window));
-    window->root_container->window = window;
-    window->focused_widget = window->root_container;
-
-    shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
-
-    window_paint(window);
-    application_add_window(window);
-
-    window->background = THEME_BACKGROUND;
-
-    return window;
-}
-
-void window_destroy(Window *window)
-{
-    widget_destroy(window->root_container);
-    free(window->title);
-    painter_destroy(window->painter);
-    bitmap_destroy(window->framebuffer);
-    application_remove_window(window);
-    free(window);
-}
-
 Rectangle window_bound_on_screen(Window *window)
 {
     return window->on_screen_bound;
@@ -318,4 +333,41 @@ int window_framebuffer_handle(Window *window)
 Widget *window_root(Window *window)
 {
     return window->root_container;
+}
+
+void window_update_callback(Window *window)
+{
+    // FIXME: do something better than this
+    list_foreach(Rectangle, rectangle, window->dirty_rect)
+    {
+        window_paint(window, *rectangle);
+    }
+    list_clear_with_callback(window->dirty_rect, free);
+    application_blit_window(window, window->on_screen_bound);
+}
+
+void window_update(Window *window, Rectangle rectangle)
+{
+    if (list_count(window->dirty_rect) == 0)
+    {
+        eventloop_run_later((RunLaterCallback)window_update_callback, window);
+    }
+
+    list_foreach(Rectangle, dirty_rect, window->dirty_rect)
+    {
+        if (rectangle_colide(*dirty_rect, rectangle))
+        {
+            *dirty_rect = rectangle_merge(*dirty_rect, rectangle);
+            goto merged;
+        }
+    }
+
+    Rectangle *dirty_rect = __create(Rectangle);
+
+    *dirty_rect = rectangle;
+
+    list_pushback(window->dirty_rect, dirty_rect);
+
+merged:
+    return;
 }

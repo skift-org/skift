@@ -167,6 +167,12 @@ static inline bool rectangle_containe_point(Rectangle rectange, Point position)
            (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);
 }
 
+static inline bool rectangle_container_rectangle(Rectangle rectange, Rectangle contained)
+{
+    return (rectange.X <= contained.X && (contained.X + contained.width) >= contained.X) &&
+           (rectange.Y <= contained.Y && (contained.Y + contained.height) >= contained.Y);
+}
+
 static inline Rectangle rectangle_shrink(Rectangle rect, Insets spacing)
 {
     Rectangle result;

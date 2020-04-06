@@ -61,3 +61,5 @@ void widget_layout(Widget *widget);
 void widget_focus(Widget *widget);
 
 #define widget_bound(__widget) WIDGET(__widget)->bound
+
+void widget_update(Widget *widget);

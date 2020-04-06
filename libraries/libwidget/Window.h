@@ -12,6 +12,8 @@ Window *window_create(const char *title, int width, int height);
 
 void window_destroy(Window *window);
 
+void window_paint(Window *window, Rectangle rectangle);
+
 void window_dump(Window *window);
 
 void window_handle_event(Window *window, Event *event);
@@ -33,3 +35,5 @@ int window_handle(Window *window);
 int window_framebuffer_handle(Window *window);
 
 Widget *window_root(Window *window);
+
+void window_update(Window *window, Rectangle rectangle);

@@ -9,8 +9,15 @@
 #include <libsystem/logger.h>
 #include <libsystem/utils/List.h>
 
+typedef struct
+{
+    RunLaterCallback callback;
+    void *target;
+} RunLater;
+
 static List *_eventloop_notifiers = NULL;
 static List *_eventloop_timers = NULL;
+static List *_eventloop_run_later = NULL;
 
 static size_t _eventloop_handles_count;
 static Handle *_eventloop_handles[PROCESS_HANDLE_COUNT];
@@ -26,6 +33,7 @@ void eventloop_initialize(void)
 
     _eventloop_notifiers = list_create();
     _eventloop_timers = list_create();
+    _eventloop_run_later = list_create();
 
     _eventloop_is_initialize = true;
 }
@@ -37,6 +45,7 @@ void eventloop_uninitialize(void)
 
     list_destroy(_eventloop_notifiers);
     list_destroy(_eventloop_timers);
+    list_destroy_with_callback(_eventloop_run_later, free);
 
     _eventloop_is_initialize = false;
 }
@@ -79,6 +88,13 @@ void eventloop_pump(void)
             }
         }
     }
+
+    list_foreach(RunLater, run_later, _eventloop_run_later)
+    {
+        run_later->callback(run_later->target);
+    }
+
+    list_clear_with_callback(_eventloop_run_later, free);
 
     TimeStamp start = system_get_ticks();
 
@@ -183,4 +199,14 @@ void eventloop_unregister_timer(struct Timer *timer)
     assert(_eventloop_is_initialize);
 
     list_remove(_eventloop_timers, timer);
+}
+
+void eventloop_run_later(RunLaterCallback callback, void *target)
+{
+    RunLater *run_later = __create(RunLater);
+
+    run_later->callback = callback;
+    run_later->target = target;
+
+    list_pushback(_eventloop_run_later, run_later);
 }

@@ -25,3 +25,7 @@ void eventloop_unregister_notifier(struct Notifier *notifier);
 void eventloop_register_timer(struct Timer *timer);
 
 void eventloop_unregister_timer(struct Timer *timer);
+
+typedef void (*RunLaterCallback)(void *target);
+
+void eventloop_run_later(RunLaterCallback callback, void *target);

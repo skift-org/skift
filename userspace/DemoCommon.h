@@ -12,22 +12,47 @@ typedef struct
 
     double time;
     DrawDemoCallback demo;
+    Bitmap *bitmap;
+    Painter *painter;
     Timer *timer;
 } DemoWidget;
 
 void demo_widget_paint(DemoWidget *widget, Painter *painter)
 {
-    widget->demo(painter, widget_bound(widget), widget->time);
+    if (widget->bitmap == NULL)
+    {
+        widget->bitmap = bitmap_create(widget_bound(widget).width, widget_bound(widget).height);
+        widget->painter = painter_create(widget->bitmap);
+        painter_clear(widget->painter, COLOR_BLACK);
+    }
+
+    if (widget_bound(widget).width != bitmap_bound(widget->bitmap).width ||
+        widget_bound(widget).width != bitmap_bound(widget->bitmap).width)
+    {
+        painter_destroy(widget->painter);
+        bitmap_destroy(widget->bitmap);
+
+        widget->bitmap = bitmap_create(widget_bound(widget).width, widget_bound(widget).height);
+        widget->painter = painter_create(widget->bitmap);
+        painter_clear(widget->painter, COLOR_BLACK);
+    }
+
+    widget->demo(widget->painter, bitmap_bound(widget->bitmap), widget->time);
+
+    painter_blit_bitmap(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_bound(widget));
 }
 
 void demo_widget_on_timer_tick(DemoWidget *widget)
 {
     widget->time += 1.0 / 60;
+    widget_update(WIDGET(widget));
 }
 
 void demo_widget_destroy(DemoWidget *widget)
 {
     timer_destroy(widget->timer);
+    painter_destroy(widget->painter);
+    bitmap_destroy(widget->bitmap);
 }
 
 Widget *demo_widget_create(Widget *parent, DrawDemoCallback demo)
@@ -40,7 +65,7 @@ Widget *demo_widget_create(Widget *parent, DrawDemoCallback demo)
     WIDGET(widget)->paint = (WidgetPaintCallback)demo_widget_paint;
 
     widget->demo = demo;
-    widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
+    widget->timer = timer_create(widget, 1000 / 30, (TimerCallback)demo_widget_on_timer_tick);
     timer_start(widget->timer);
 
     return WIDGET(widget);

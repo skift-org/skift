@@ -27,6 +27,8 @@ void draw(Painter *painter, Rectangle screen, double time)
     line.finish.X = screen.X + abs((int)line.finish.X % screen.width);
     line.finish.Y = screen.Y + abs((int)line.finish.Y % screen.height);
 
+    line.color.A = 255;
+
     painter_draw_line(painter, line.start, line.finish, line.color);
 }
 

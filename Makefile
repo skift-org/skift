@@ -362,35 +362,35 @@ $(KERNEL): $(KERNEL_OBJECT)
 	$(DIRECTORY_GUARD)
 	$(LD) $(LDFLAGS) -T kernel/link.ld -o $@ $(KERNEL_OBJECT)
 
-# --- Ressources ------------------------------------------------------------- #
+# --- resources ------------------------------------------------------------- #
 
-WALLPAPERS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/wallpaper/*.png}}
-CURSOR = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/mouse/*.png}}
+WALLPAPERS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/wallpaper/*.png}}
+CURSOR = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/mouse/*.png}}
 
-FONTS_GLYPHS = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard ressources/font/*.json}}
-FONTS_PNGS = ${patsubst ressources/%,$(ROOT_DIRECTORY)/res/%,${wildcard ressources/font/*.png}}
+FONTS_GLYPHS = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard resources/font/*.json}}
+FONTS_PNGS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/font/*.png}}
 
-KEYBOARD = ${patsubst ressources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard ressources/keyboard/*.json}}
+KEYBOARD = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard resources/keyboard/*.json}}
 
-RESSOURCES = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
+resources = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
 
-$(ROOT_DIRECTORY)/res/font/%.glyph: ressources/font/%.json
+$(ROOT_DIRECTORY)/res/font/%.glyph: resources/font/%.json
 	$(DIRECTORY_GUARD)
 	font-compiler.py $^ $@
 
-$(ROOT_DIRECTORY)/res/font/%.png: ressources/font/%.png
+$(ROOT_DIRECTORY)/res/font/%.png: resources/font/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(ROOT_DIRECTORY)/res/wallpaper/%.png: ressources/wallpaper/%.png
+$(ROOT_DIRECTORY)/res/wallpaper/%.png: resources/wallpaper/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(ROOT_DIRECTORY)/res/mouse/%.png: ressources/mouse/%.png
+$(ROOT_DIRECTORY)/res/mouse/%.png: resources/mouse/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
 
-$(ROOT_DIRECTORY)/res/keyboard/%.kmap: ressources/keyboard/%.json
+$(ROOT_DIRECTORY)/res/keyboard/%.kmap: resources/keyboard/%.json
 	$(DIRECTORY_GUARD)
 	kmap-compiler.py $^ $@
 
@@ -414,7 +414,7 @@ $(ROOT_DIRECTORY):
 			 $(ROOT_DIRECTORY)/srv \
 			 $(ROOT_DIRECTORY)/usr
 
-$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(APPLICATION) $(RESSOURCES)
+$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(APPLICATION) $(resources)
 	cd $(ROOT_DIRECTORY); tar -cf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #

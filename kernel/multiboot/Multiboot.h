@@ -50,5 +50,8 @@ Multiboot *multiboot_initialize(void *header, uint32_t magic);
 
 bool is_multiboot1(uint32_t magic);
 
+bool is_multiboot2(uint32_t magic);
+
 void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr);
 
+void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr);

@@ -8,7 +8,7 @@ static Multiboot _multiboot;
 
 void multiboot_assert(uint32_t magic)
 {
-    if (!(is_multiboot1(magic)))
+    if (!(is_multiboot1(magic) || is_multiboot2(magic)))
     {
         PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x!", magic);
     }
@@ -19,6 +19,11 @@ int multiboot_version(uint32_t magic)
     if (is_multiboot1(magic))
     {
         return 1;
+    }
+
+    if (is_multiboot2(magic))
+    {
+        return 2;
     }
 
     ASSERT_NOT_REACHED();
@@ -71,6 +76,10 @@ Multiboot *multiboot_initialize(void *header, uint32_t magic)
     if (is_multiboot1(magic))
     {
         multiboot1_parse_header(&_multiboot, header);
+    }
+    else if (is_multiboot2(magic))
+    {
+        multiboot2_parse_header(&_multiboot, header);
     }
     else
     {

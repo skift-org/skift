@@ -6,7 +6,7 @@
 
 #include <libsystem/unicode/Codepoint.h>
 
-typedef void (*UTF8DecoderCallback)(Codepoint codepoint, void *args);
+typedef void (*UTF8DecoderCallback)(void *target, Codepoint codepoint);
 
 typedef struct
 {
@@ -14,11 +14,11 @@ typedef struct
     Codepoint current_decoding;
     int width_decoding;
 
-    void *callback_args;
+    void *target;
     UTF8DecoderCallback callback;
 } UTF8Decoder;
 
-UTF8Decoder *utf8decoder_create(UTF8DecoderCallback callback, void *args);
+UTF8Decoder *utf8decoder_create(void *target, UTF8DecoderCallback callback);
 
 void utf8decoder_destroy(UTF8Decoder *decoder);
 

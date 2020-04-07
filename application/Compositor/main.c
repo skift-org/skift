@@ -5,12 +5,28 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/unicode/UTF8Decoder.h>
 
 #include "Compositor/Client.h"
 #include "Compositor/Cursor.h"
 #include "Compositor/Manager.h"
 #include "Compositor/Renderer.h"
 #include "Compositor/Window.h"
+
+static UTF8Decoder *_keyboard_decoder = NULL;
+
+void keyboard_callback_decoded(void *target, Codepoint codepoint)
+{
+    __unused(target);
+
+    Window *window = manager_focus_window();
+
+    if (window != NULL)
+    {
+        KeyboardEvent event = (KeyboardEvent){{EVENT_KEYBOARD_KEY_TYPED, false}, codepoint};
+        window_send_event(window, (Event *)&event, sizeof(KeyboardEvent));
+    }
+}
 
 void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events)
 {
@@ -19,14 +35,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
 
     char c;
     stream_read(keyboard_stream, &c, sizeof(char));
-
-    Window *window = manager_focus_window();
-
-    if (window != NULL)
-    {
-        KeyboardEvent event = (KeyboardEvent){{EVENT_KEYBOARD_KEY_TYPED, false}, c};
-        window_send_event(window, (Event *)&event, sizeof(KeyboardEvent));
-    }
+    utf8decoder_write(_keyboard_decoder, c);
 }
 
 void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
@@ -78,6 +87,8 @@ int main(int argc, char const *argv[])
     notifier_create(NULL, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
     notifier_create(NULL, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
     notifier_create(NULL, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
+
+    _keyboard_decoder = utf8decoder_create(NULL, keyboard_callback_decoded);
 
     Timer *repaint_timer = timer_create(NULL, 1000 / 60, render_callback);
     timer_start(repaint_timer);

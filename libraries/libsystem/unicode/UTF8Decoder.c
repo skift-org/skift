@@ -5,7 +5,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 
-UTF8Decoder *utf8decoder_create(UTF8DecoderCallback callback, void *args)
+UTF8Decoder *utf8decoder_create(void *target, UTF8DecoderCallback callback)
 {
     UTF8Decoder *decoder = __create(UTF8Decoder);
 
@@ -13,8 +13,8 @@ UTF8Decoder *utf8decoder_create(UTF8DecoderCallback callback, void *args)
     decoder->current_decoding = 0;
     decoder->width_decoding = 0;
 
+    decoder->target = target;
     decoder->callback = callback;
-    decoder->callback_args = args;
 
     return decoder;
 }
@@ -68,7 +68,7 @@ void utf8decoder_write(UTF8Decoder *decoder, uint8_t byte)
         {
             // FIXME: maybe have a special callback for this case.
             decoder->is_decoding = false;
-            decoder->callback(U'?', decoder->callback_args);
+            decoder->callback(decoder->target, U'?');
 
             return;
         }
@@ -77,7 +77,7 @@ void utf8decoder_write(UTF8Decoder *decoder, uint8_t byte)
     if (decoder->is_decoding && decoder->width_decoding == 0)
     {
         decoder->is_decoding = false;
-        decoder->callback(decoder->current_decoding, decoder->callback_args);
+        decoder->callback(decoder->target, decoder->current_decoding);
 
         return;
     }

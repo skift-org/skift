@@ -6,11 +6,6 @@
 #include <libsystem/assert.h>
 #include <libterminal/Terminal.h>
 
-static void terminal_decoder_callback(Codepoint codepoint, Terminal *terminal)
-{
-    terminal_write_codepoint(terminal, codepoint);
-}
-
 Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
 {
     Terminal *terminal = __create(Terminal);
@@ -19,7 +14,7 @@ Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
     terminal->height = height;
     terminal->buffer = (TerminalCell *)calloc(width * height, sizeof(TerminalCell));
 
-    terminal->decoder = utf8decoder_create((UTF8DecoderCallback)terminal_decoder_callback, terminal);
+    terminal->decoder = utf8decoder_create(terminal, (UTF8DecoderCallback)terminal_write_codepoint);
     terminal->renderer = renderer;
 
     terminal->cursor = (TerminalCursor){0, 0, true};

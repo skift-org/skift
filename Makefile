@@ -365,6 +365,9 @@ $(KERNEL): $(KERNEL_OBJECT)
 # --- resources ------------------------------------------------------------- #
 
 WALLPAPERS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/wallpaper/*.png}}
+
+ICONS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/icon/*.png}}
+
 CURSOR = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/mouse/*.png}}
 
 FONTS_GLYPHS = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard resources/font/*.json}}
@@ -372,7 +375,7 @@ FONTS_PNGS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources
 
 KEYBOARD = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard resources/keyboard/*.json}}
 
-resources = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS)
+resources = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS) $(ICONS)
 
 $(ROOT_DIRECTORY)/res/font/%.glyph: resources/font/%.json
 	$(DIRECTORY_GUARD)
@@ -385,6 +388,11 @@ $(ROOT_DIRECTORY)/res/font/%.png: resources/font/%.png
 $(ROOT_DIRECTORY)/res/wallpaper/%.png: resources/wallpaper/%.png
 	$(DIRECTORY_GUARD)
 	cp $^ $@
+
+$(ROOT_DIRECTORY)/res/icon/%.png: resources/icon/%.png
+	$(DIRECTORY_GUARD)
+	cp $^ $@
+
 
 $(ROOT_DIRECTORY)/res/mouse/%.png: resources/mouse/%.png
 	$(DIRECTORY_GUARD)

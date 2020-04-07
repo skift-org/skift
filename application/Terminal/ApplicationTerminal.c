@@ -217,8 +217,6 @@ Widget *terminal_widget_create(Widget *parent)
 {
     TerminalWidget *widget = __create(TerminalWidget);
 
-    widget_initialize(WIDGET(widget), "Terminal", parent);
-
     WIDGET(widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
     WIDGET(widget)->event = (WidgetEventCallback)terminal_widget_event_callback;
 
@@ -242,6 +240,8 @@ Widget *terminal_widget_create(Widget *parent)
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 1);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);
     launchpad_launch(shell_launchpad, NULL);
+
+    widget_initialize(WIDGET(widget), "Terminal", parent);
 
     return WIDGET(widget);
 }

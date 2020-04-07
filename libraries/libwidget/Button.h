@@ -1,8 +1,11 @@
 #pragma once
 
-#include "libwidget/core/Widget.h"
+#include <libwidget/Widget.h>
 
 typedef struct
 {
     Widget widget;
+    char *text;
 } Button;
+
+Widget *button_create(Widget *parent, const char *text);

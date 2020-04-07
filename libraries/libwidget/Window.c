@@ -78,17 +78,6 @@ void window_destroy(Window *window)
     free(window);
 }
 
-static Font *_title_font = NULL;
-Font *window_title_font(void)
-{
-    if (_title_font == NULL)
-    {
-        _title_font = font_create("sans");
-    }
-
-    return _title_font;
-}
-
 Rectangle window_header_bound(Window *window)
 {
     return rectangle_set_height(window_bound(window), WINDOW_HEADER_AREA);
@@ -138,12 +127,12 @@ void window_paint(Window *window, Rectangle rectangle)
         {
             painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
             painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
-            painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
+            painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
         }
         else
         {
             painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
-            painter_draw_string(window->painter, window_title_font(), window->title, (Point){16, 20}, THEME_BORDER);
+            painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_BORDER);
         }
     }
 }

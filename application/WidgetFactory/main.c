@@ -1,4 +1,5 @@
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
 #include <libwidget/Panel.h>
 
 int main(int argc, char **argv)
@@ -19,7 +20,7 @@ int main(int argc, char **argv)
     panel_create(panel);
     panel_create(panel);
     panel_create(panel);
-    panel_create(panel);
+    button_create(panel, "Hello, world!");
 
     panel_create(window_root(window));
 

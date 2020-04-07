@@ -6,6 +6,17 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+static Font *_widget_font = NULL;
+Font *widget_font(void)
+{
+    if (_widget_font == NULL)
+    {
+        _widget_font = font_create("sans");
+    }
+
+    return _widget_font;
+}
+
 void widget_initialize(
     Widget *widget,
     const char *classname,

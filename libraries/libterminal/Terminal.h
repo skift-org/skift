@@ -52,6 +52,8 @@ void terminal_clear(Terminal *terminal, int fromx, int fromy, int tox, int toy);
 void terminal_clear_all(Terminal *terminal);
 void terminal_clear_line(Terminal *terminal, int line);
 
+void terminal_resize(Terminal *terminal, int width, int height);
+
 TerminalCell terminal_cell_at(Terminal *terminal, int x, int y);
 void terminal_cell_undirty(Terminal *terminal, int x, int y);
 void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell);

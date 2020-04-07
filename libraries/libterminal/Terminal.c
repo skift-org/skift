@@ -81,6 +81,17 @@ void terminal_clear_line(Terminal *terminal, int line)
     }
 }
 
+void terminal_resize(Terminal *terminal, int width, int height)
+{
+    TerminalCell *new_buffer = (TerminalCell *)malloc(sizeof(TerminalCell) * width * height);
+
+    free(terminal->buffer);
+
+    terminal->buffer = new_buffer;
+    terminal->width = width;
+    terminal->height = height;
+}
+
 TerminalCell terminal_cell_at(Terminal *terminal, int x, int y)
 {
     if (x >= 0 && x < terminal->width &&

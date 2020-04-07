@@ -4,10 +4,10 @@
 
 // printf.c : printf and snprintf internals
 
-#include <libsystem/ctype.h>
-#include <libsystem/cstring.h>
-#include <libsystem/convert.h>
 #include <libsystem/__printf__.h>
+#include <libsystem/convert.h>
+#include <libsystem/cstring.h>
+#include <libsystem/ctype.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
 {
@@ -66,6 +66,25 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
     {
         convert_uint_to_string(v, buffer, 32, 10);
     }
+
+    PRINTF_PADDING(buffer, PFALIGN_RIGHT);
+
+    for (int i = 0; buffer[i]; i++)
+    {
+        PRINTF_APPEND(buffer[i]);
+    }
+
+    PRINTF_PADDING(buffer, PFALIGN_LEFT);
+
+    return info->written;
+}
+
+int __printf_formate_decimal_unsigned(printf_info_t *info, va_list *va)
+{
+    uint v = va_arg(*va, uint);
+
+    char buffer[33] = {};
+    convert_uint_to_string(v, buffer, 32, 10);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -143,6 +162,7 @@ static printf_formatter_t formaters[] = {
     /* Octal         */ {'o', __printf_formate_octal},
     /* Decimal       */ {'d', __printf_formate_decimal},
     /* Decimal       */ {'i', __printf_formate_decimal},
+    /* Decimal       */ {'u', __printf_formate_decimal_unsigned},
     /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
     /* Hexadecimal   */ {'p', __printf_formate_hexadecimal},
 

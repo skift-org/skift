@@ -20,13 +20,12 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 
-#include <thirdparty/multiboot/Multiboot.h>
-
 #include "kernel/clock.h"
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory.h"
-#include "kernel/modules.h"
+#include "kernel/modules/Modules.h"
+#include "kernel/multiboot/Multiboot.h"
 #include "kernel/paging.h"
 #include "kernel/platform.h"
 #include "kernel/serial.h"
@@ -35,7 +34,6 @@
 #include "kernel/x86/Interrupts.h"
 #include "kernel/x86/gdt.h"
 
-static multiboot_info_t mbootinfo = {};
 static TimeStamp boot_timestamp = 0;
 
 ElapsedTime system_get_uptime(void)
@@ -43,103 +41,8 @@ ElapsedTime system_get_uptime(void)
     return clock_now() - boot_timestamp;
 }
 
-#ifdef __cplusplus
-extern "C" void kmain(multiboot_info_t *info, uint magic)
-#else
-void kmain(multiboot_info_t *info, uint magic)
-#endif
+void userspace_initialize(void)
 {
-    __plug_init();
-
-    boot_timestamp = clock_now();
-
-    logger_level(LOGGER_TRACE);
-
-    /* --- Early operation -------------------------------------------------- */
-
-    memcpy(&mbootinfo, info, sizeof(multiboot_info_t));
-
-    /* --- System check ----------------------------------------------------- */
-
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-    {
-        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x != 0x%08x !", magic, MULTIBOOT_BOOTLOADER_MAGIC);
-    }
-
-    if ((info->mem_lower + info->mem_upper) < 255 * 1024)
-    {
-        PANIC("No enought memory (%dkib)!", info->mem_lower + info->mem_upper);
-    }
-
-    logger_info(KERNEL_UNAME);
-    logger_info("Bootloader: %s", info->boot_loader_name);
-    logger_info("Command lines: %s", info->cmdline);
-
-    switch (info->framebuffer_type)
-    {
-    case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
-        logger_info("Framebuffer type: EGA_TEXT");
-        break;
-    case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
-        logger_info("Framebuffer type: INDEXED");
-        break;
-    case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
-        logger_info("Framebuffer type: RGB");
-
-        logger_info("Framebuffer adress: 0x%08x", info->framebuffer_addr);
-
-        logger_info("Framebuffer pixel format: %d:%dR %d:%dG %d:%dB",
-                    info->framebuffer_red_masize,
-                    info->framebuffer_red_field_position,
-
-                    info->framebuffer_green_masize,
-                    info->framebuffer_green_field_position,
-
-                    info->framebuffer_blue_masize,
-                    info->framebuffer_blue_field_position);
-        break;
-
-    default:
-        logger_error("Framebuffer type: INVALID");
-        break;
-    }
-
-    logger_info("Framebuffer: %dx%dx%d", info->framebuffer_width, info->framebuffer_height, info->framebuffer_bpp);
-
-    /* --- Setup cpu context ------------------------------------------------ */
-
-    setup(gdt);
-    setup(platform);
-
-    /* --- System context --------------------------------------------------- */
-
-    logger_info("Initializing system...");
-    setup(memory, &mbootinfo);
-    tasking_initialize();
-
-    interrupts_initialize();
-
-    /* --- Devices ---------------------------------------------------------- */
-
-    logger_info("Mounting devices...");
-
-    filesystem_initialize();
-
-    setup(modules, &mbootinfo);
-    null_initialize();
-    zero_initialize();
-    random_initialize();
-    serial_initialize();
-    mouse_initialize();
-    keyboard_initialize();
-
-    if (!framebuffer_initialize(info))
-    {
-        textmode_initialize();
-    }
-
-    /* --- Entering userspace ----------------------------------------------- */
-
     logger_info("Starting the userspace...");
 
     Launchpad *init_lauchpad = launchpad_create("init", "/bin/init");
@@ -160,11 +63,57 @@ void kmain(multiboot_info_t *info, uint magic)
 
     if (result != SUCCESS)
     {
-        PANIC("Failled to start init : %s", result_to_string((Result)-init_process));
+        PANIC("Failled to start init : %s", result_to_string(result));
     }
 
     int init_exitvalue = 0;
     task_wait(init_process, &init_exitvalue);
 
     PANIC("Init has return with code %d!", init_exitvalue);
+}
+
+#ifdef __cplusplus
+extern "C" void kmain(void *info, uint magic)
+#else
+void kmain(void *info, uint magic)
+#endif
+{
+    __plug_init();
+    boot_timestamp = clock_now();
+    logger_level(LOGGER_TRACE);
+    logger_info(KERNEL_UNAME);
+
+    Multiboot *multiboot = multiboot_initialize(info, magic);
+
+    if (multiboot->memory_usable < 255 * 1024)
+    {
+        PANIC("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
+    }
+
+    logger_info("Initializing system...");
+    setup(gdt);
+    setup(platform);
+    memory_initialize(multiboot);
+    tasking_initialize();
+    interrupts_initialize();
+
+    /* --- Devices ---------------------------------------------------------- */
+
+    filesystem_initialize();
+    modules_initialize(multiboot);
+
+    logger_info("Mounting devices...");
+    null_initialize();
+    zero_initialize();
+    random_initialize();
+    serial_initialize();
+    mouse_initialize();
+    keyboard_initialize();
+
+    if (!framebuffer_initialize())
+    {
+        textmode_initialize();
+    }
+
+    userspace_initialize();
 }

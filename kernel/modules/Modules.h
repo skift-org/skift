@@ -4,10 +4,8 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include "kernel/multiboot/Multiboot.h"
 
-#include <thirdparty/multiboot/Multiboot.h>
+void modules_initialize(Multiboot *multiboot);
 
-void modules_setup(multiboot_info_t *minfo);
-uint modules_get_end(multiboot_info_t *minfo);
-void ramdisk_load(multiboot_module_t *module);
+void ramdisk_load(Module *module);

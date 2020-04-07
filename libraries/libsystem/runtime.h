@@ -50,6 +50,18 @@ typedef long off_t;
         __y = __tmp;             \
     })
 
+// Align the nearest _lower_ aligned address
+// ex: 8 with align = 8 -> 8
+// ex: 9 with align = 8 -> 16
+// ex: 7 with align = 8 -> 0
+#define __align_down(__addr, __align) ((__addr) & ~((__align)-1))
+
+// Align the nearest _upper_ aligned address
+// ex: 8 with align = 8 -> 8
+// ex: 9 with align = 8 -> 16
+// ex: 7 with align = 8 -> 8
+#define __align_up(__addr, __align) (((__addr) + (__align)-1) & ~((__align)-1))
+
 /* --- Raw memory allocation ------------------------------------------------ */
 
 __attribute__((malloc)) __attribute__((alloc_size(1))) void *malloc(size_t size);

@@ -8,8 +8,6 @@
 #include <libsystem/cstring.h>
 #include <libsystem/lock.h>
 
-#include <thirdparty/multiboot/Multiboot.h>
-
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory.h"
@@ -156,13 +154,13 @@ framebuffer_backbuffer_t *framebuffer_get_backbuffer(FsHandle *owner)
     return NULL;
 }
 
-inline void framebuffer_set_pixel(uint32_t *framebuffer, int width, int height, int x, int y, uint32_t value)
+static inline void framebuffer_set_pixel(uint32_t *framebuffer, int width, int height, int x, int y, uint32_t value)
 {
     if ((x >= 0 && x < width) && (y >= 0 && y < height))
         framebuffer[x + y * width] = value;
 }
 
-inline uint32_t framebuffer_get_pixel(uint32_t *framebuffer, int width, int height, int x, int y)
+static inline uint32_t framebuffer_get_pixel(uint32_t *framebuffer, int width, int height, int x, int y)
 {
     int xi = abs((int)x % width);
     int yi = abs((int)y % height);
@@ -186,19 +184,6 @@ uint32_t *framebuffer_resize(uint32_t *buffer, int old_width, int old_height, in
     free(buffer);
 
     return resized_framebuffer;
-}
-
-Result framebuffer_set_mode_mboot(multiboot_info_t *mboot)
-{
-    logger_info("Using framebuffer from mboot header.");
-    // FIXME: this shoul be ok i guess
-    framebuffer_physical_addr = (void *)(uintptr_t)mboot->framebuffer_addr;
-    uint page_count = PAGE_ALIGN_UP(mboot->framebuffer_width * mboot->framebuffer_height * (mboot->framebuffer_bpp / 8)) / PAGE_SIZE;
-    framebuffer_virtual_addr = (void *)virtual_alloc(memory_kpdir(), (uint)framebuffer_physical_addr, page_count, 0);
-    framebuffer_width = mboot->framebuffer_width;
-    framebuffer_height = mboot->framebuffer_height;
-
-    return SUCCESS;
 }
 
 Result framebuffer_set_mode_bga(int width, int height)
@@ -389,21 +374,16 @@ cleanup_and_return:
     return result;
 }
 
-bool framebuffer_initialize(multiboot_info_t *mboot)
+bool framebuffer_initialize(void)
 {
-    if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB || bga_is_available())
+    logger_info("Initializing framebuffer...");
+
+    if (bga_is_available())
     {
         lock_init(backbuffer_stack_lock);
         backbuffer_stack = list_create();
 
-        if (mboot->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB)
-        {
-            framebuffer_set_mode_mboot(mboot);
-        }
-        else
-        {
-            framebuffer_set_mode_bga(800, 600);
-        }
+        framebuffer_set_mode_bga(800, 600);
 
         FsNode *framebuffer_device = __create(FsNode);
         fsnode_init(framebuffer_device, FILE_TYPE_DEVICE);

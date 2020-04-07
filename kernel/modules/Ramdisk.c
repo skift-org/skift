@@ -8,18 +8,14 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include <thirdparty/multiboot/Multiboot.h>
-
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/memory.h"
+#include "kernel/modules/Modules.h"
 
-void ramdisk_load(multiboot_module_t *module)
+void ramdisk_load(Module *module)
 {
-    logger_info("Loading ramdisk at 0x%x...", module->mod_start);
-
-    void *ramdisk = (void *)module->mod_start;
-
     tar_block_t block;
-    for (size_t i = 0; tar_read(ramdisk, &block, i); i++)
+    for (size_t i = 0; tar_read((void *)module->range.base, &block, i); i++)
     {
         Path *file_path = path_create(block.name);
 
@@ -56,6 +52,8 @@ void ramdisk_load(multiboot_module_t *module)
 
         path_destroy(file_path);
     }
+
+    memory_free(memory_kpdir(), module->range.base, module->range.size / PAGE_SIZE, false);
 
     logger_info("Loading ramdisk succeeded.");
 }

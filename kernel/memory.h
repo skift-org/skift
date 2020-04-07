@@ -6,8 +6,7 @@
 
 #include <libsystem/runtime.h>
 
-#include <thirdparty/multiboot/Multiboot.h>
-
+#include "kernel/multiboot/Multiboot.h"
 #include "kernel/paging.h"
 
 extern uint TOTAL_MEMORY;
@@ -30,7 +29,7 @@ void virtual_free(PageDirectory *pdir, uint vaddr, uint count);
 
 /* --- Logical Memory ------------------------------------------------------- */
 
-void memory_setup(multiboot_info_t *mbootinfo);
+void memory_initialize(Multiboot *multiboot);
 
 PageDirectory *memory_kpdir(void);
 
@@ -49,6 +48,8 @@ void memory_free_pdir(PageDirectory *pdir);
 int memory_map(PageDirectory *pdir, uint addr, uint count, int user);
 
 int memory_unmap(PageDirectory *pdir, uint addr, uint count);
+
+void memory_identity_map_range(PageDirectory *pdir, MemoryRange range);
 
 int memory_identity_map(PageDirectory *pdir, uint addr, uint count);
 

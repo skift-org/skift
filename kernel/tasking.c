@@ -32,6 +32,8 @@ void idle_code() { HANG; }
 
 void tasking_initialize(void)
 {
+    logger_info("Initializing tasking...");
+
     tasks = list_create();
 
     task_shared_memory_setup();
@@ -40,6 +42,8 @@ void tasking_initialize(void)
     {
         tasks_bystates[i] = list_create();
     }
+
+    logger_info("Spawing system services...");
 
     running = NULL;
 
@@ -503,7 +507,7 @@ void task_dump(Task *t)
     printf("\n\t - Task %d %s", t->id, t->name);
     printf("\n\t   State: %s", TASK_STATES[t->state]);
     printf("\n\t   User memory: ");
-    memory_layout_dump(t->pdir, true);
+    memory_layout_dump(t->pdir, false);
     printf("\n\t   Page directory: %08x", t->pdir);
 
     printf("\n");

@@ -12,7 +12,6 @@
 #include <libsystem/runtime.h>
 
 #include "kernel/memory.h"
-#include "kernel/modules.h"
 #include "kernel/paging.h"
 #include "kernel/system.h"
 
@@ -209,7 +208,8 @@ uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
     uint current_size = 0;
     uint startaddr = 0;
 
-    for (size_t i = (user ? 256 : 0) * 1024; i < (user ? 1024 : 256) * 1024; i++)
+    // we skip the first page to make null deref trigger a page fault
+    for (size_t i = (user ? 256 : 1) * 1024; i < (user ? 1024 : 256) * 1024; i++)
     {
         int vaddr = i * PAGE_SIZE;
 
@@ -245,46 +245,24 @@ void virtual_free(PageDirectory *pdir, uint vaddr, uint count)
 }
 
 /* --- Public functions ----------------------------------------------------- */
-bool is_memory_initialized = false;
+static bool _memory_initialized = false;
 
+extern int __start;
 extern int __end;
-uint get_kernel_end(multiboot_info_t *minfo)
+
+MemoryRange kernel_memory_range(void)
 {
-    return MAX((uint)&__end, modules_get_end(minfo));
+    return memory_range_around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
 }
 
-void memory_load_mmap(multiboot_info_t *mbootinfo)
+void memory_initialize(Multiboot *multiboot)
 {
-    // Setup memory map
-    TOTAL_MEMORY = 0;
+    logger_info("Initializing memory managment...");
 
-    for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)mbootinfo->mmap_addr; (u32)mmap < mbootinfo->mmap_addr + mbootinfo->mmap_length; mmap = (multiboot_memory_map_t *)((u32)mmap + mmap->size + sizeof(mmap->size)))
+    for (size_t i = 0; i < 1024 * 1024 / 8; i++)
     {
-        logger_info("Mmap: base_addr = 0x%x%08x, length = 0x%x%08x, type = 0x%x",
-                    (u32)(mmap->addr >> 32),
-                    (u32)(mmap->addr & 0xffffffff),
-                    (u32)(mmap->len >> 32),
-                    (u32)(mmap->len & 0xffffffff),
-                    (u32)mmap->type);
-
-        if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
-        {
-            TOTAL_MEMORY += mmap->len;
-        }
-        else
-        {
-            // Mark memory as used so we don't allocate there.
-            for (u64 addr = mmap->addr; addr < mmap->len; addr += PAGE_SIZE)
-            {
-                PHYSICAL_SET_USED(addr);
-            }
-        }
+        MEMORY[i] = 0xff;
     }
-}
-
-void memory_setup(multiboot_info_t *mbootinfo)
-{
-    memset(&MEMORY, 0, sizeof(MEMORY));
 
     // Setup the kernel pagedirectorie.
     for (uint i = 0; i < 256; i++)
@@ -296,18 +274,40 @@ void memory_setup(multiboot_info_t *mbootinfo)
         e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
-    // Map the kernel memory
-    memory_load_mmap(mbootinfo);
-    memory_identity_map(&kpdir, 0, PAGE_ALIGN(get_kernel_end(mbootinfo)) / PAGE_SIZE + 1);
+    for (size_t i = 0; i < multiboot->memory_map_size; i++)
+    {
+        MemoryMapEntry *entry = &multiboot->memory_map[i];
+
+        if (entry->type == MEMORY_MAP_ENTRY_AVAILABLE)
+        {
+            physical_set_free(entry->range.base, entry->range.size / PAGE_SIZE);
+        }
+    }
+
+    USED_MEMORY = 0;
+    TOTAL_MEMORY = multiboot->memory_usable;
+
+    logger_info("Mapping kernel...");
+    memory_identity_map_range(&kpdir, kernel_memory_range());
+
+    logger_info("Mapping modules...");
+    for (size_t i = 0; i < multiboot->modules_size; i++)
+    {
+        memory_identity_map_range(&kpdir, multiboot->modules[i].range);
+    }
+
     virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
-
-    logger_info("%dKib of memory detected", TOTAL_MEMORY / 1024);
-    logger_info("%dKib of memory are used by the kernel", USED_MEMORY / 1024);
-
-    is_memory_initialized = true;
+    physical_set_used(0, 1);
 
     paging_load_directorie(&kpdir);
     paging_enable();
+
+    logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);
+    logger_info("%uKio of memory is used by the kernel", USED_MEMORY / 1024);
+
+    logger_info("Paging enabled!");
+
+    _memory_initialized = true;
 }
 
 PageDirectory *memory_kpdir()
@@ -327,6 +327,9 @@ uint memory_alloc(PageDirectory *pdir, uint count, int user)
     if (paddr == 0)
     {
         atomic_end();
+
+        logger_error("Failled no enough physical memory!");
+
         return 0;
     }
 
@@ -336,6 +339,8 @@ uint memory_alloc(PageDirectory *pdir, uint count, int user)
     {
         physical_free(paddr, count);
         atomic_end();
+
+        logger_error("Failled no enough virtual memory!");
 
         return 0;
     }
@@ -374,7 +379,7 @@ uint memory_alloc_identity(PageDirectory *pdir, uint count, int user)
     uint current_size = 0;
     uint startaddr = 0;
 
-    for (size_t i = (user ? 256 : 0); i < (user ? 1024 : 256) * 1024; i++)
+    for (size_t i = (user ? 256 : 1); i < (user ? 1024 : 256) * 1024; i++)
     {
         int addr = i * PAGE_SIZE;
 
@@ -527,6 +532,11 @@ int memory_unmap(PageDirectory *pdir, uint addr, uint count)
     return 0;
 }
 
+void memory_identity_map_range(PageDirectory *pdir, MemoryRange range)
+{
+    memory_identity_map(pdir, range.base, PAGE_ALIGN_UP(range.size) / PAGE_SIZE);
+}
+
 int memory_identity_map(PageDirectory *pdir, uint addr, uint count)
 {
     atomic_begin();
@@ -554,12 +564,12 @@ void memory_dump(void)
     printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
 
-#define MEMORY_DUMP_REGION_START(__pdir, __addr)             \
-    {                                                        \
-        memory_used = true;                                  \
-        memory_empty = false;                                \
-        current_physical = virtual2physical(__pdir, __addr); \
-        printf("%8x [%08x:", (__addr), current_physical);    \
+#define MEMORY_DUMP_REGION_START(__pdir, __addr)               \
+    {                                                          \
+        memory_used = true;                                    \
+        memory_empty = false;                                  \
+        current_physical = virtual2physical(__pdir, __addr);   \
+        printf("\n\t %8x [%08x:", (__addr), current_physical); \
     }
 
 #define MEMORY_DUMP_REGION_END(__pdir, __addr)                            \
@@ -570,7 +580,7 @@ void memory_dump(void)
 
 void memory_layout_dump(PageDirectory *pdir, bool user)
 {
-    if (!is_memory_initialized)
+    if (!_memory_initialized)
         return;
 
     bool memory_used = false;

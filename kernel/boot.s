@@ -4,7 +4,7 @@
 
 ;; boots.s: the HJERT kernel entry point from the bootloader.                 ;;
 
-;; --- multiboot header. ---------------------------------------------------- ;;
+;; --- multiboot-1 header. -------------------------------------------------- ;;
 
 MULTIBOOT_PAGE_ALIGN  equ  1 << 0            ; align loaded modules on page boundaries
 MULTIBOOT_MEMORY_INFO  equ  1 << 1            ; provide memory map

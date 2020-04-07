@@ -7,4 +7,4 @@ typedef struct
     Widget widget;
 } Container;
 
-Widget *container_create(Widget *parent, Rectangle bound);
+Widget *container_create(Widget *parent);

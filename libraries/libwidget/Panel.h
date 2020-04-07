@@ -7,4 +7,4 @@ typedef struct
     Widget widget;
 } Panel;
 
-Widget *panel_create(Widget *parent, Rectangle bound);
+Widget *panel_create(Widget *parent);

@@ -27,7 +27,9 @@ struct Window
     int framebuffer_handle;
     Bitmap *framebuffer;
     Painter *painter;
+
     List *dirty_rect;
+    bool dirty_layout;
 
     Widget *root_container;
     Widget *focused_widget;
@@ -50,13 +52,14 @@ Window *window_create(const char *title, int width, int height)
     window->on_screen_bound = RECTANGLE_SIZE(width, height);
     window->dirty_rect = list_create();
 
-    window->root_container = container_create(NULL, window_content_bound(window));
+    window->root_container = container_create(NULL);
     window->root_container->window = window;
     window->focused_widget = window->root_container;
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
-    window_paint(window, window_bound(window));
+    window_layout(window);
+    window_update(window, window_bound(window));
     application_add_window(window);
 
     window->background = THEME_BACKGROUND;
@@ -368,4 +371,20 @@ void window_update(Window *window, Rectangle rectangle)
 
 merged:
     return;
+}
+
+void window_layout_callback(Window *window)
+{
+    window_root(window)->bound = window_content_bound(window);
+    widget_layout(window_root(window));
+}
+
+void window_layout(Window *window)
+{
+    if (window->dirty_layout)
+        return;
+
+    window->dirty_layout = true;
+
+    eventloop_run_later((RunLaterCallback)window_layout_callback, window);
 }

@@ -210,7 +210,7 @@ Widget *terminal_widget_create(Widget *parent)
 {
     TerminalWidget *widget = __create(TerminalWidget);
 
-    widget_initialize(WIDGET(widget), "Terminal", parent, (Rectangle){});
+    widget_initialize(WIDGET(widget), "Terminal", parent);
 
     WIDGET(widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
     WIDGET(widget)->event = (WidgetEventCallback)terminal_widget_event_callback;

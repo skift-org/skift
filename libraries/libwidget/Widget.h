@@ -39,8 +39,7 @@ typedef struct Widget
 void widget_initialize(
     Widget *widget,
     const char *classname,
-    Widget *parent,
-    Rectangle bound);
+    Widget *parent);
 
 void widget_destroy(Widget *widget);
 

@@ -103,8 +103,8 @@ int main(int argc, char const *argv[])
     Launchpad *terminal = launchpad_create("Terminal", "/bin/Terminal");
     launchpad_launch(terminal, NULL);
 
-    // Launchpad *widgets = launchpad_create("WidgetFactory", "/bin/WidgetFactory");
-    // launchpad_launch(widgets, NULL);
+    Launchpad *widgets = launchpad_create("WidgetFactory", "/bin/WidgetFactory");
+    launchpad_launch(widgets, NULL);
 
     return eventloop_run();
 }

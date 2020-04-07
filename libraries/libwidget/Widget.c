@@ -9,12 +9,11 @@
 void widget_initialize(
     Widget *widget,
     const char *classname,
-    Widget *parent,
-    Rectangle bound)
+    Widget *parent)
 {
     widget->classname = classname;
     widget->childs = list_create();
-    widget->bound = bound;
+    widget->bound = RECTANGLE_SIZE(100, 100);
 
     if (parent != NULL)
     {
@@ -54,6 +53,8 @@ void widget_add_child(Widget *widget, Widget *child)
     child->window = widget->window;
     list_pushback(widget->childs, child);
 
+    window_layout(widget->window);
+
     Event event = {EVENT_CHILD_ADDED, false};
     widget_dispatch_event(widget, &event);
 }
@@ -67,6 +68,8 @@ void widget_remove_child(Widget *widget, Widget *child)
     child->parent = NULL;
     child->window = NULL;
     list_remove(widget->childs, child);
+
+    window_layout(widget->window);
 
     Event event = {EVENT_CHILD_REMOVED, false};
     widget_dispatch_event(widget, &event);
@@ -84,22 +87,6 @@ void widget_dispatch_event(Widget *widget, Event *event)
 
 void widget_handle_event(Widget *widget, Event *event)
 {
-    if (event->type == EVENT_CHILD_ADDED ||
-        event->type == EVENT_CHILD_REMOVED)
-    {
-        event->accepted = true;
-
-        widget_layout(widget);
-
-        list_foreach(Widget, child, widget->childs)
-        {
-            widget_layout(child);
-        }
-
-        Event event = {EVENT_PAINT, false};
-        widget_dispatch_event(widget, &event);
-    }
-
     if (widget->event)
     {
         widget->event(widget, event);
@@ -162,6 +149,11 @@ void widget_layout(Widget *widget)
 
     default:
         break;
+    }
+
+    list_foreach(Widget, child, widget->childs)
+    {
+        widget_layout(child);
     }
 }
 

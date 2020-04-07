@@ -9,19 +9,19 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = LAYOUT_VFLOW;
 
-    panel_create(window_root(window), (Rectangle){});
-    panel_create(window_root(window), (Rectangle){});
+    panel_create(window_root(window));
+    panel_create(window_root(window));
 
-    Widget *panel = panel_create(window_root(window), (Rectangle){});
+    Widget *panel = panel_create(window_root(window));
 
     panel->layout = LAYOUT_HFLOW;
 
-    panel_create(panel, (Rectangle){});
-    panel_create(panel, (Rectangle){});
-    panel_create(panel, (Rectangle){});
-    panel_create(panel, (Rectangle){});
+    panel_create(panel);
+    panel_create(panel);
+    panel_create(panel);
+    panel_create(panel);
 
-    panel_create(window_root(window), (Rectangle){});
+    panel_create(window_root(window));
 
     return application_run();
 }

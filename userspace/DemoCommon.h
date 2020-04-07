@@ -59,7 +59,7 @@ Widget *demo_widget_create(Widget *parent, DrawDemoCallback demo)
 {
     DemoWidget *widget = __create(DemoWidget);
 
-    widget_initialize(WIDGET(widget), "Demo", parent, RECTANGLE_SIZE(16, 16));
+    widget_initialize(WIDGET(widget), "Demo", parent);
 
     WIDGET(widget)->destroy = (WidgetDestroyCallback)demo_widget_destroy;
     WIDGET(widget)->paint = (WidgetPaintCallback)demo_widget_paint;

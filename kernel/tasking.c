@@ -10,6 +10,8 @@
 #include <libsystem/cstring.h>
 #include <libsystem/debug.h>
 
+#include "kernel/memory/Physical.h"
+#include "kernel/memory/Virtual.h"
 #include "kernel/platform.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"

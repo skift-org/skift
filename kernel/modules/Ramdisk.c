@@ -9,7 +9,7 @@
 #include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
-#include "kernel/memory.h"
+#include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"
 
 void ramdisk_load(Module *module)

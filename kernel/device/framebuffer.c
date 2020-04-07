@@ -10,8 +10,9 @@
 
 #include "kernel/device/Device.h"
 #include "kernel/filesystem/Filesystem.h"
-#include "kernel/memory.h"
-#include "kernel/paging.h"
+#include "kernel/memory/Memory.h"
+#include "kernel/memory/Physical.h"
+#include "kernel/memory/Virtual.h"
 #include "kernel/x86/pci.h"
 
 /* --- Bochs VBE Extensions driver ------------------------------------------ */

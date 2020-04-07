@@ -12,7 +12,6 @@
 
 #include "kernel/clock.h"
 #include "kernel/filesystem/Filesystem.h"
-#include "kernel/memory.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 #include "kernel/tasking/Syscalls.h"

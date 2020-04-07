@@ -12,8 +12,8 @@
 #include <libsystem/runtime.h>
 #include <libsystem/utils/List.h>
 
+#include "kernel/memory/Memory.h"
 #include "kernel/filesystem/Filesystem.h"
-#include "kernel/memory.h"
 #include "kernel/sheduling/TaskBlocker.h"
 
 struct Task;

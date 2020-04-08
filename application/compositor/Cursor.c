@@ -1,10 +1,10 @@
 #include <libgraphic/Bitmap.h>
 #include <libsystem/logger.h>
 
-#include "Compositor/Cursor.h"
-#include "Compositor/Manager.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Cursor.h"
+#include "compositor/Manager.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 static Point _mouse_position;
 static MouseButton _mouse_buttons;

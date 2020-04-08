@@ -7,8 +7,8 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/readline/ReadLine.h>
 
-#include "Shell/Builtin.h"
-#include "Shell/Eval.h"
+#include "shell/Builtin.h"
+#include "shell/Eval.h"
 
 #define PROMPT u8"\e[;1;94m µ \e[m"
 

@@ -8,7 +8,7 @@
 
 #include <libwidget/Application.h>
 
-#include "Compositor/Protocol.h"
+#include "compositor/Protocol.h"
 
 static bool _initialized = false;
 static bool _running = false;

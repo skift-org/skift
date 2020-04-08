@@ -1,4 +1,4 @@
-#include "Shell/Lexer.h"
+#include "shell/Lexer.h"
 
 Lexer *lexer_create(Source *source)
 {

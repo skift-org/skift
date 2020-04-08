@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Shell/Source.h"
-#include "Shell/Token.h"
+#include "shell/Source.h"
+#include "shell/Token.h"
 
 typedef struct
 {

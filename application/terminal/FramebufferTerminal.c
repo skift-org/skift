@@ -1,4 +1,4 @@
-#include "Terminal/FramebufferTerminal.h"
+#include "terminal/FramebufferTerminal.h"
 
 static Point char_size = (Point){7, 16};
 

@@ -1,9 +1,9 @@
 #include <libgraphic/Framebuffer.h>
 
-#include "Compositor/Cursor.h"
-#include "Compositor/Manager.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Cursor.h"
+#include "compositor/Manager.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 static Framebuffer *_framebuffer;
 static Painter *_painter;

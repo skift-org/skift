@@ -4,7 +4,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 
-#include "Shell/Builtin.h"
+#include "shell/Builtin.h"
 
 int shell_builtin_cd(int argc, const char **argv)
 {

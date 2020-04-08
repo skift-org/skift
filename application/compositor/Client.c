@@ -1,12 +1,12 @@
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
 
-#include "Compositor/Client.h"
-#include "Compositor/Cursor.h"
-#include "Compositor/Manager.h"
-#include "Compositor/Protocol.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Client.h"
+#include "compositor/Cursor.h"
+#include "compositor/Manager.h"
+#include "compositor/Protocol.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 void client_request_callback(Client *client, Connection *connection, SelectEvent events)
 {

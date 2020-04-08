@@ -37,8 +37,8 @@ int main(int argc, char **argv)
     printf("\e[16C KERNEL: %s\n", info.kernel_name);
     printf("\e[16C VERSION: %s\n", info.kernel_release);
     printf("\e[16C UPTIME: 00:00\n");
-    printf("\e[16C SHELL: /bin/Shell\n");
-    printf("\e[16C TERMINAL: /bin/term\n");
+    printf("\e[16C SHELL: /bin/shell\n");
+    printf("\e[16C TERMINAL: /bin/terminal\n");
     printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", status.used_ram / (1024 * 1024), status.total_ram / (1024 * 1024));
 
     printf("\n");

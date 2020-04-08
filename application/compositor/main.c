@@ -7,11 +7,11 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 
-#include "Compositor/Client.h"
-#include "Compositor/Cursor.h"
-#include "Compositor/Manager.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Client.h"
+#include "compositor/Cursor.h"
+#include "compositor/Manager.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 static UTF8Decoder *_keyboard_decoder = NULL;
 
@@ -111,10 +111,10 @@ int main(int argc, char const *argv[])
     launchpad_launch(demogfx, NULL);
     ***/
 
-    Launchpad *terminal = launchpad_create("Terminal", "/bin/Terminal");
+    Launchpad *terminal = launchpad_create("terminal", "/bin/terminal");
     launchpad_launch(terminal, NULL);
 
-    Launchpad *widgets = launchpad_create("WidgetFactory", "/bin/WidgetFactory");
+    Launchpad *widgets = launchpad_create("widget-factory", "/bin/widget-factory");
     launchpad_launch(widgets, NULL);
 
     return eventloop_run();

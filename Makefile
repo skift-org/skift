@@ -18,7 +18,6 @@ CWARN_FLAGS=-Wall \
 			-Wc++-compat \
 			-Werror
 
-
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
@@ -98,12 +97,12 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBCOMPAT) \
 		  $(LIBSYSTEM)
 
-APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
-			$(ROOT_DIRECTORY)/bin/Shell \
-			$(ROOT_DIRECTORY)/bin/Compositor \
-			$(ROOT_DIRECTORY)/bin/ImageViewer \
-			$(ROOT_DIRECTORY)/bin/WidgetFactory \
-			$(ROOT_DIRECTORY)/bin/Panel
+APPLICATION=$(ROOT_DIRECTORY)/bin/terminal \
+			$(ROOT_DIRECTORY)/bin/shell \
+			$(ROOT_DIRECTORY)/bin/compositor \
+			$(ROOT_DIRECTORY)/bin/image-viewer \
+			$(ROOT_DIRECTORY)/bin/widget-factory \
+			$(ROOT_DIRECTORY)/bin/panel
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -225,29 +224,29 @@ $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
 
 # --- Application ------------------------------------------------------------ #
 
-$(ROOT_DIRECTORY)/bin/Terminal: $(wildcard application/Terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/terminal: $(wildcard application/terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/Terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/Shell: $(wildcard application/Shell/*.c) $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/shell: $(wildcard application/shell/*.c) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/Shell/*.c) -o $@
+	$(CC) $(CFLAGS) $(wildcard application/shell/*.c) -o $@
 
-$(ROOT_DIRECTORY)/bin/Compositor: $(wildcard application/Compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/compositor: $(wildcard application/compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/Compositor/*.c) -o $@ -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/compositor/*.c) -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/ImageViewer: $(wildcard application/ImageViewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/image-viewer: $(wildcard application/image-viewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/ImageViewer/*.c) -o $@ -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/image-viewer/*.c) -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/WidgetFactory: $(wildcard application/WidgetFactory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/widget-factory: $(wildcard application/widget-factory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/WidgetFactory/*.c) -o $@ -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/widget-factory/*.c) -o $@ -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/Panel: $(wildcard application/Panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/panel: $(wildcard application/panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/Panel/*.c) -o $@ -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard application/panel/*.c) -o $@ -lwidget -lgraphic
 
 # --- Userspace -------------------------------------------------------------- #
 

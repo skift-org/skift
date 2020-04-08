@@ -1,4 +1,4 @@
-#include "Terminal/TextmodeTerminal.h"
+#include "terminal/TextmodeTerminal.h"
 
 static byte textmode_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = TEXTMODE_COLOR_BLACK,

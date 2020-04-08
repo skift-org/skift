@@ -1,8 +1,8 @@
 #include <libsystem/logger.h>
 
-#include "Compositor/Manager.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Manager.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 static List *_managed_windows;
 

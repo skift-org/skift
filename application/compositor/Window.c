@@ -1,10 +1,10 @@
 #include <libsystem/cstring.h>
 
-#include "Compositor/Client.h"
-#include "Compositor/Manager.h"
-#include "Compositor/Protocol.h"
-#include "Compositor/Renderer.h"
-#include "Compositor/Window.h"
+#include "compositor/Client.h"
+#include "compositor/Manager.h"
+#include "compositor/Protocol.h"
+#include "compositor/Renderer.h"
+#include "compositor/Window.h"
 
 Window *window_create(int id, Client *client, Rectangle bound, Bitmap *framebuffer)
 {

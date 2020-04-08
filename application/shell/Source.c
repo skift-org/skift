@@ -1,6 +1,6 @@
 #include <libsystem/assert.h>
 
-#include "Shell/Source.h"
+#include "shell/Source.h"
 
 Source *source_create_from_stream(Stream *stream)
 {

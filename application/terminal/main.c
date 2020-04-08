@@ -5,9 +5,9 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 
-#include "Terminal/ApplicationTerminal.h"
-#include "Terminal/FramebufferTerminal.h"
-#include "Terminal/TextmodeTerminal.h"
+#include "terminal/ApplicationTerminal.h"
+#include "terminal/FramebufferTerminal.h"
+#include "terminal/TextmodeTerminal.h"
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 
         logger_trace("Starting the shell application...");
 
-        Launchpad *shell_launchpad = launchpad_create("sh", "/bin/Shell");
+        Launchpad *shell_launchpad = launchpad_create("shell", "/bin/shell");
         launchpad_handle(shell_launchpad, HANDLE(slave), 0);
         launchpad_handle(shell_launchpad, HANDLE(slave), 1);
         launchpad_handle(shell_launchpad, HANDLE(slave), 2);

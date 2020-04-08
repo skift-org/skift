@@ -102,7 +102,8 @@ APPLICATION=$(ROOT_DIRECTORY)/bin/Terminal \
 			$(ROOT_DIRECTORY)/bin/Shell \
 			$(ROOT_DIRECTORY)/bin/Compositor \
 			$(ROOT_DIRECTORY)/bin/ImageViewer \
-			$(ROOT_DIRECTORY)/bin/WidgetFactory
+			$(ROOT_DIRECTORY)/bin/WidgetFactory \
+			$(ROOT_DIRECTORY)/bin/Panel
 
 USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
@@ -243,6 +244,10 @@ $(ROOT_DIRECTORY)/bin/ImageViewer: $(wildcard application/ImageViewer/*.c) $(LIB
 $(ROOT_DIRECTORY)/bin/WidgetFactory: $(wildcard application/WidgetFactory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard application/WidgetFactory/*.c) -o $@ -lwidget -lgraphic
+
+$(ROOT_DIRECTORY)/bin/Panel: $(wildcard application/Panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard application/Panel/*.c) -o $@ -lwidget -lgraphic
 
 # --- Userspace -------------------------------------------------------------- #
 

@@ -104,19 +104,11 @@ void window_paint(Window *window, Rectangle rectangle)
     }
     else
     {
-
         painter_clear_rectangle(window->painter, window_bound(window), window->background);
 
-        if (window->focused)
-        {
-            painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
-        }
-        else
-        {
-            painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
-        }
-
-        painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_BORDER);
+        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+        painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_ALT_BORDER);
+        painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, -1}), THEME_BORDER);
 
         if (window_root(window))
         {
@@ -125,7 +117,6 @@ void window_paint(Window *window, Rectangle rectangle)
 
         if (window->focused)
         {
-            painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, 1}), THEME_ALT_BORDER);
             painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
             painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
         }

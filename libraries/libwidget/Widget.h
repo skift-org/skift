@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libgraphic/Font.h>
 #include <libgraphic/Shape.h>
 #include <libsystem/utils/List.h>
 

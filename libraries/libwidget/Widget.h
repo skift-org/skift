@@ -24,11 +24,13 @@ typedef struct Widget
 {
     const char *classname;
 
+    Rectangle bound;
+    Insets insets;
+
     WidgetDestroyCallback destroy;
     WidgetPaintCallback paint;
     WidgetEventCallback event;
 
-    Rectangle bound;
     struct Widget *parent;
     struct Window *window;
     Layout layout; // FIXME: this shoul be a separeted object
@@ -62,6 +64,10 @@ void widget_layout(Widget *widget);
 
 void widget_focus(Widget *widget);
 
-#define widget_bound(__widget) WIDGET(__widget)->bound
+Rectangle __widget_bound(Widget *widget);
+#define widget_bound(__widget) __widget_bound(WIDGET(__widget))
+
+Rectangle __widget_content_bound(Widget *widget);
+#define widget_content_bound(__widget) __widget_content_bound(WIDGET(__widget))
 
 void widget_update(Widget *widget);

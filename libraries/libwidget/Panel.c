@@ -5,8 +5,8 @@
 
 void panel_paint(Panel *panel, Painter *painter)
 {
-    painter_clear_rectangle(painter, WIDGET(panel)->bound, THEME_BACKGROUND);
-    painter_draw_rectangle(painter, WIDGET(panel)->bound, THEME_ALT_BACKGROUND);
+    painter_clear_rectangle(painter, widget_bound(panel), THEME_BACKGROUND);
+    painter_draw_rectangle(painter, widget_bound(panel), THEME_ALT_BACKGROUND);
 }
 
 Widget *panel_create(Widget *parent)

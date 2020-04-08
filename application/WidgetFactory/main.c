@@ -14,13 +14,16 @@ int main(int argc, char **argv)
     panel_create(window_root(window));
 
     Widget *panel = panel_create(window_root(window));
+    {
+        panel->insets = INSETS(16);
+        panel->layout = LAYOUT_HFLOW;
 
-    panel->layout = LAYOUT_HFLOW;
+        panel_create(panel);
+        panel_create(panel);
+        panel_create(panel);
 
-    panel_create(panel);
-    panel_create(panel);
-    panel_create(panel);
-    button_create(panel, "Hello, world!");
+        button_create(panel, "Hello, world!");
+    }
 
     panel_create(window_root(window));
 

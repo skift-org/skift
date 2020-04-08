@@ -6,8 +6,9 @@
 
 void button_paint(Button *button, Painter *painter)
 {
-    painter_fill_rectangle(painter, WIDGET(button)->bound, THEME_ALT_BACKGROUND);
-    painter_draw_rectangle(painter, WIDGET(button)->bound, THEME_BORDER);
+
+    painter_fill_rectangle(painter, widget_bound(button), THEME_ALT_BACKGROUND);
+    painter_draw_rectangle(painter, widget_bound(button), THEME_BORDER);
 }
 
 void button_destroy(Button *button)

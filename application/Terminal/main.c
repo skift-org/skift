@@ -63,8 +63,6 @@ int main(int argc, char **argv)
         Widget *widget = terminal_widget_create(window_root(window));
         widget_focus(widget);
 
-        application_dump();
-
         return application_run();
     }
     else

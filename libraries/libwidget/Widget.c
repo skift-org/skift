@@ -128,18 +128,18 @@ void widget_layout(Widget *widget)
     case LAYOUT_STACK:
         list_foreach(Widget, child, widget->childs)
         {
-            child->bound = widget->bound;
+            child->bound = widget_content_bound(widget);
         }
         break;
 
     case LAYOUT_HFLOW:
     {
-        int current = widget_bound(widget).X;
-        int child_width = widget_bound(widget).width / list_count(widget->childs);
+        int current = widget_content_bound(widget).X;
+        int child_width = widget_content_bound(widget).width / list_count(widget->childs);
 
         list_foreach(Widget, child, widget->childs)
         {
-            child->bound = RECTANGLE(current, widget_bound(widget).position.Y, child_width, widget_bound(widget).height);
+            child->bound = RECTANGLE(current, widget_content_bound(widget).position.Y, child_width, widget_content_bound(widget).height);
             current += child_width;
         }
     }
@@ -147,12 +147,12 @@ void widget_layout(Widget *widget)
 
     case LAYOUT_VFLOW:
     {
-        int current = widget_bound(widget).Y;
-        int child_height = widget_bound(widget).height / list_count(widget->childs);
+        int current = widget_content_bound(widget).Y;
+        int child_height = widget_content_bound(widget).height / list_count(widget->childs);
 
         list_foreach(Widget, child, widget->childs)
         {
-            child->bound = RECTANGLE(widget_bound(widget).position.X, current, widget_bound(widget).width, child_height);
+            child->bound = RECTANGLE(widget_content_bound(widget).position.X, current, widget_content_bound(widget).width, child_height);
             current += child_height;
         }
     }
@@ -209,4 +209,14 @@ void widget_dump(Widget *widget, int depth)
 void widget_update(Widget *widget)
 {
     window_update(widget->window, widget->bound);
+}
+
+Rectangle __widget_bound(Widget *widget)
+{
+    return widget->bound;
+}
+
+Rectangle __widget_content_bound(Widget *widget)
+{
+    return rectangle_shrink(__widget_bound(widget), widget->insets);
 }

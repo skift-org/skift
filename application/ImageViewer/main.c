@@ -37,6 +37,23 @@ int main(int argc, char **argv)
         return -1;
     }
 
+#define ALPHA_PATTERN_SIZE (8)
+ 
+    for (int x = 0; x < framebuffer->width; x++)
+    {
+        for (int y = 0; y < framebuffer->height; y++)
+        {
+            if (((y / ALPHA_PATTERN_SIZE) * framebuffer->width + (x / ALPHA_PATTERN_SIZE) + (y / ALPHA_PATTERN_SIZE) % 2) % 2 == 0)
+            {
+                painter_plot_pixel(framebuffer->painter, (Point){x, y}, COLOR_LIGHTGREY);
+            }
+            else
+            {
+                painter_plot_pixel(framebuffer->painter, (Point){x, y}, COLOR_WHITE);
+            }
+        }
+    }
+
     painter_blit_bitmap(framebuffer->painter, image, bitmap_bound(image), framebuffer_bound(framebuffer));
     framebuffer_blit(framebuffer);
 

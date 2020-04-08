@@ -50,7 +50,7 @@ Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
 {
     IOCallDisplayModeArgs mode_info = (IOCallDisplayModeArgs){width, height};
 
-    __plug_handle_call(&framebuffer->handle, IOCALL_DISPLAY_GET_MODE, &mode_info);
+    __plug_handle_call(&framebuffer->handle, IOCALL_DISPLAY_SET_MODE, &mode_info);
 
     if (handle_has_error(framebuffer))
     {

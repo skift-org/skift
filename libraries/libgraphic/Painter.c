@@ -337,3 +337,19 @@ void painter_draw_string(Painter *painter, Font *font, const char *str, Point po
         position = point_add(position, (Point){glyph->advance, 0});
     }
 }
+
+int painter_mesure_string(Painter *painter, Font *font, const char *str)
+{
+    __unused(painter);
+    
+
+    int width = 0;
+
+    for (size_t i = 0; str[i]; i++)
+    {
+        Glyph *glyph = font_glyph(font, str[i]);
+        width += glyph->advance;
+    }
+
+    return width;
+}

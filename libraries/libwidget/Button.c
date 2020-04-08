@@ -3,12 +3,27 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Theme.h>
+#include <libwidget/Window.h>
 
 void button_paint(Button *button, Painter *painter)
 {
-
-    painter_fill_rectangle(painter, widget_bound(button), THEME_ALT_BACKGROUND);
+    if (window_is_focused(WIDGET(button)->window))
+    {
+        painter_fill_rectangle(painter, widget_bound(button), THEME_ALT_BACKGROUND);
+    }
     painter_draw_rectangle(painter, widget_bound(button), THEME_BORDER);
+
+    int text_width = painter_mesure_string(painter, widget_font(), button->text);
+
+    painter_draw_string(
+        painter,
+        widget_font(),
+        button->text,
+        (Point){
+            widget_bound(button).X + widget_bound(button).width / 2 - text_width / 2,
+            widget_bound(button).Y + widget_bound(button).height / 2 + 4,
+        },
+        THEME_FOREGROUND);
 }
 
 void button_destroy(Button *button)

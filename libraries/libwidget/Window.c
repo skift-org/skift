@@ -368,3 +368,8 @@ void window_layout(Window *window)
 
     eventloop_run_later((RunLaterCallback)window_layout_callback, window);
 }
+
+bool window_is_focused(Window *window)
+{
+    return window->focused;
+}

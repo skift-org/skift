@@ -39,3 +39,5 @@ Widget *window_root(Window *window);
 void window_update(Window *window, Rectangle rectangle);
 
 void window_layout(Window *window);
+
+bool window_is_focused(Window *window);

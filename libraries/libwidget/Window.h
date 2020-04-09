@@ -6,6 +6,13 @@
 #include <libwidget/Event.h>
 #include <libwidget/Widget.h>
 
+typedef enum
+{
+    WINDOW_BORDER_NONE,
+    WINDOW_BORDER_FIXED,
+    WINDOW_BORDER_SIZABLE,
+} WindowBorderStyle;
+
 typedef struct Window Window;
 
 Window *window_create(const char *title, int width, int height);
@@ -27,6 +34,8 @@ Rectangle window_content_bound(Window *window);
 void window_set_cursor(Window *window, CursorState state);
 
 void window_set_background(Window *window, Color background);
+
+void window_set_border_style(Window *window, WindowBorderStyle border_style);
 
 void window_set_focused_widget(Window *window, Widget *widget);
 

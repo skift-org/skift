@@ -35,6 +35,8 @@ struct Window
     Widget *focused_widget;
 
     Color background;
+
+    WindowBorderStyle border;
 };
 
 Window *window_create(const char *title, int width, int height)
@@ -63,6 +65,7 @@ Window *window_create(const char *title, int width, int height)
     application_add_window(window);
 
     window->background = THEME_BACKGROUND;
+    window->border = WINDOW_BORDER_SIZABLE;
 
     return window;
 }
@@ -90,11 +93,20 @@ Rectangle window_header_bound_on_screen(Window *window)
 
 Rectangle window_content_bound(Window *window)
 {
-    return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+    if (window->border == WINDOW_BORDER_NONE)
+    {
+        return window_bound(window);
+    }
+    else
+    {
+        return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+    }
 }
 
 void window_paint(Window *window, Rectangle rectangle)
 {
+    painter_clear_rectangle(window->painter, rectangle, window->background);
+
     if (rectangle_container_rectangle(window_content_bound(window), rectangle))
     {
         if (window_root(window))
@@ -104,26 +116,36 @@ void window_paint(Window *window, Rectangle rectangle)
     }
     else
     {
-        painter_clear_rectangle(window->painter, window_bound(window), window->background);
-
-        painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
-        painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_ALT_BORDER);
-        painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, -1}), THEME_BORDER);
 
         if (window_root(window))
         {
             widget_paint(window_root(window), window->painter);
         }
 
-        if (window->focused)
+        if (window->border != WINDOW_BORDER_NONE)
         {
-            painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
-            painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
-        }
-        else
-        {
-            painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
-            painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_BORDER);
+            if (window->focused)
+            {
+                painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
+            }
+            else
+            {
+                painter_fill_rectangle(window->painter, window_header_bound(window), THEME_BACKGROUND);
+            }
+
+            painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_ALT_BORDER);
+            painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, -1}), THEME_BORDER);
+
+            if (window->focused)
+            {
+                painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
+                painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
+            }
+            else
+            {
+                painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_BORDER);
+                painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
+            }
         }
     }
 }
@@ -231,7 +253,8 @@ void window_handle_event(Window *window, Event *event)
 
         if (!window->is_dragging &&
             mouse_event->button == MOUSE_BUTTON_LEFT &&
-            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position))
+            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position) &&
+            window->border != WINDOW_BORDER_NONE)
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);
@@ -294,6 +317,11 @@ void window_set_cursor(Window *window, CursorState state)
 void window_set_background(Window *window, Color background)
 {
     window->background = background;
+}
+
+void window_set_border_style(Window *window, WindowBorderStyle border_style)
+{
+    window->border = border_style;
 }
 
 void window_set_focused_widget(Window *window, Widget *widget)

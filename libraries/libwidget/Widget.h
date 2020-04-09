@@ -18,6 +18,14 @@ typedef enum
     LAYOUT_STACK,
     LAYOUT_VFLOW,
     LAYOUT_HFLOW,
+} LayoutType;
+
+typedef struct
+{
+    LayoutType type;
+
+    int hspacing;
+    int vspacing;
 } Layout;
 
 typedef struct Widget

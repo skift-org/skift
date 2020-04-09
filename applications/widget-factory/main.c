@@ -1,5 +1,6 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
+#include <libwidget/Container.h>
 #include <libwidget/Panel.h>
 
 int main(int argc, char **argv)
@@ -8,15 +9,14 @@ int main(int argc, char **argv)
 
     Window *window = window_create("Widget Factory", 500, 400);
 
-    window_root(window)->layout = LAYOUT_VFLOW;
+    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 8};
 
     panel_create(window_root(window));
     panel_create(window_root(window));
 
-    Widget *panel = panel_create(window_root(window));
+    Widget *panel = container_create(window_root(window));
     {
-        panel->insets = INSETS(16);
-        panel->layout = LAYOUT_HFLOW;
+        panel->layout = (Layout){LAYOUT_HFLOW, 8, 0};
 
         panel_create(panel);
         panel_create(panel);

@@ -123,7 +123,9 @@ void widget_paint(Widget *widget, Painter *painter)
 
 void widget_layout(Widget *widget)
 {
-    switch (widget->layout)
+    Layout layout = widget->layout;
+
+    switch (layout.type)
     {
     case LAYOUT_STACK:
         list_foreach(Widget, child, widget->childs)
@@ -135,12 +137,12 @@ void widget_layout(Widget *widget)
     case LAYOUT_HFLOW:
     {
         int current = widget_content_bound(widget).X;
-        int child_width = widget_content_bound(widget).width / list_count(widget->childs);
+        int child_width = (widget_content_bound(widget).width - (layout.hspacing * (list_count(widget->childs) - 1))) / list_count(widget->childs);
 
         list_foreach(Widget, child, widget->childs)
         {
             child->bound = RECTANGLE(current, widget_content_bound(widget).position.Y, child_width, widget_content_bound(widget).height);
-            current += child_width;
+            current += child_width + layout.hspacing;
         }
     }
     break;
@@ -148,12 +150,12 @@ void widget_layout(Widget *widget)
     case LAYOUT_VFLOW:
     {
         int current = widget_content_bound(widget).Y;
-        int child_height = widget_content_bound(widget).height / list_count(widget->childs);
+        int child_height = (widget_content_bound(widget).height - (layout.vspacing * (list_count(widget->childs) - 1))) / list_count(widget->childs);
 
         list_foreach(Widget, child, widget->childs)
         {
             child->bound = RECTANGLE(widget_content_bound(widget).position.X, current, widget_content_bound(widget).width, child_height);
-            current += child_height;
+            current += child_height + layout.vspacing;
         }
     }
     break;

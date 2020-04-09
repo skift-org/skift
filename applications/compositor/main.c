@@ -111,6 +111,9 @@ int main(int argc, char const *argv[])
     launchpad_launch(demogfx, NULL);
     ***/
 
+    Launchpad *demogfx = launchpad_create("panel", "/bin/panel");
+    launchpad_launch(demogfx, NULL);
+
     Launchpad *terminal = launchpad_create("terminal", "/bin/terminal");
     launchpad_launch(terminal, NULL);
 

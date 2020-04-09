@@ -76,3 +76,7 @@ bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallba
 #define list_any(__list) ((__list)->count != 0)
 
 #define list_count(__list) ((__list)->count)
+
+typedef IterationDecision (*ListIterationCallback)(void *target, void *value);
+
+bool list_iterate(List *list, void *target, ListIterationCallback callback);

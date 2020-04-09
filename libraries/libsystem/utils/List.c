@@ -390,3 +390,16 @@ bool list_contains(List *list, void *value)
 
     return false;
 }
+
+bool list_iterate(List *list, void *target, ListIterationCallback callback)
+{
+    list_foreach(void, item, list)
+    {
+        if (callback(target, item) == ITERATION_STOP)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

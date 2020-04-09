@@ -21,7 +21,7 @@ CWARN_FLAGS=-Wall \
 CFLAGS=$(CDIALECT_FLAGS) \
 	   $(COPT_FLAGS) \
 	   $(CWARN_FLAGS) \
-	   -I. -Iapplication -Ilibraries -Ilibraries/libcompat \
+	   -I. -Iapplications -Ilibraries -Ilibraries/libcompat \
 	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
 
 QEMU=qemu-system-x86_64
@@ -97,14 +97,14 @@ LIBRARIES=$(LIBCONSOLE) \
 		  $(LIBCOMPAT) \
 		  $(LIBSYSTEM)
 
-APPLICATION=$(ROOT_DIRECTORY)/bin/terminal \
+APPLICATIONS=$(ROOT_DIRECTORY)/bin/terminal \
 			$(ROOT_DIRECTORY)/bin/shell \
 			$(ROOT_DIRECTORY)/bin/compositor \
 			$(ROOT_DIRECTORY)/bin/image-viewer \
 			$(ROOT_DIRECTORY)/bin/widget-factory \
 			$(ROOT_DIRECTORY)/bin/panel
 
-USERSPACE=$(ROOT_DIRECTORY)/bin/__democolors \
+COREUTILS=$(ROOT_DIRECTORY)/bin/__democolors \
 		  $(ROOT_DIRECTORY)/bin/__demolines \
 		  $(ROOT_DIRECTORY)/bin/__democube \
 		  $(ROOT_DIRECTORY)/bin/__testargs \
@@ -155,7 +155,7 @@ all: $(BOOTDISK)
 
 clean:
 	rm -rf $(BUILD_DIRECTORY)
-	find userspace/ -name "*.o" -delete
+	find coreutils/ -name "*.o" -delete
 	find libraries/ -name "*.o" -delete
 	find kernel/ -name "*.o" -delete
 
@@ -222,135 +222,135 @@ $(LIBSYSTEM): $(LIBSYSTEM_OBJ)
 	$(DIRECTORY_GUARD)
 	$(AR) $(ARFLAGS) $@ $^
 
-# --- Application ------------------------------------------------------------ #
+# --- Applications ------------------------------------------------------------ #
 
-$(ROOT_DIRECTORY)/bin/terminal: $(wildcard application/terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/terminal: $(wildcard applications/terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard applications/terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/shell: $(wildcard application/shell/*.c) $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/shell: $(wildcard applications/shell/*.c) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/shell/*.c) -o $@
+	$(CC) $(CFLAGS) $(wildcard applications/shell/*.c) -o $@
 
-$(ROOT_DIRECTORY)/bin/compositor: $(wildcard application/compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/compositor: $(wildcard applications/compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/compositor/*.c) -o $@ -lgraphic
+	$(CC) $(CFLAGS) $(wildcard applications/compositor/*.c) -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/image-viewer: $(wildcard application/image-viewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/image-viewer: $(wildcard applications/image-viewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/image-viewer/*.c) -o $@ -lgraphic
+	$(CC) $(CFLAGS) $(wildcard applications/image-viewer/*.c) -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/widget-factory: $(wildcard application/widget-factory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/widget-factory: $(wildcard applications/widget-factory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/widget-factory/*.c) -o $@ -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard applications/widget-factory/*.c) -o $@ -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/panel: $(wildcard application/panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/panel: $(wildcard applications/panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard application/panel/*.c) -o $@ -lwidget -lgraphic
+	$(CC) $(CFLAGS) $(wildcard applications/panel/*.c) -o $@ -lwidget -lgraphic
 
-# --- Userspace -------------------------------------------------------------- #
+# --- Coreutils -------------------------------------------------------------- #
 
-$(ROOT_DIRECTORY)/bin/__democolors: userspace/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__democolors: coreutils/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lwidget  -lgraphic
 
-$(ROOT_DIRECTORY)/bin/__demolines: userspace/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__demolines: coreutils/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/__democube: userspace/__democube.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBWIDGET) $(LIBMATH) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__democube: coreutils/__democube.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBWIDGET) $(LIBMATH) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic -lmath
 
-$(ROOT_DIRECTORY)/bin/__demogfx: userspace/__demogfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__demogfx: coreutils/__demogfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
-$(ROOT_DIRECTORY)/bin/__testargs: userspace/__testargs.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testargs: coreutils/__testargs.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/__testexec: userspace/__testexec.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testexec: coreutils/__testexec.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/__testposix: userspace/__testposix.c $(LIBSYSTEM) $(LIBCOMPAT) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testposix: coreutils/__testposix.c $(LIBSYSTEM) $(LIBCOMPAT) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lcompat
 
-$(ROOT_DIRECTORY)/bin/__testterm: userspace/__testterm.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/__testterm: coreutils/__testterm.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/cat: userspace/cat.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/cat: coreutils/cat.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/clear: userspace/clear.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/clear: coreutils/clear.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/dstart: userspace/dstart.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/dstart: coreutils/dstart.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/echo: userspace/echo.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/echo: coreutils/echo.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/displayctl: userspace/displayctl.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/displayctl: coreutils/displayctl.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/grep: userspace/grep.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/grep: coreutils/grep.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/init: userspace/init.c $(LIBGRAPHIC) $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/init: coreutils/init.c $(LIBGRAPHIC) $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@ -lgraphic
 
-$(ROOT_DIRECTORY)/bin/kill: userspace/kill.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/kill: coreutils/kill.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/keyboardctl: userspace/keyboardctl.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/keyboardctl: coreutils/keyboardctl.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/ls: userspace/ls.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/ls: coreutils/ls.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/lsproc: userspace/lsproc.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/lsproc: coreutils/lsproc.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/mkdir: userspace/mkdir.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/mkdir: coreutils/mkdir.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/mv: userspace/mv.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/mv: coreutils/mv.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/now: userspace/now.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/now: coreutils/now.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/panic: userspace/panic.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/panic: coreutils/panic.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/sysfetch: userspace/sysfetch.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/sysfetch: coreutils/sysfetch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/touch: userspace/touch.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/touch: coreutils/touch.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(ROOT_DIRECTORY)/bin/unlink: userspace/unlink.c $(LIBSYSTEM) $(CRTS)
+$(ROOT_DIRECTORY)/bin/unlink: coreutils/unlink.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -426,7 +426,7 @@ $(ROOT_DIRECTORY):
 			 $(ROOT_DIRECTORY)/srv \
 			 $(ROOT_DIRECTORY)/usr
 
-$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(USERSPACE) $(APPLICATION) $(resources)
+$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(COREUTILS) $(APPLICATIONS) $(resources)
 	cd $(ROOT_DIRECTORY); tar -cf $@ *
 
 # --- Bootdisk --------------------------------------------------------------- #

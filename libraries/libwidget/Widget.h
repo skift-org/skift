@@ -16,9 +16,18 @@ typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
 typedef enum
 {
     LAYOUT_STACK,
+    LAYOUT_VGRID,
+    LAYOUT_HGRID,
     LAYOUT_VFLOW,
     LAYOUT_HFLOW,
 } LayoutType;
+
+typedef enum
+{
+    CONTENT_LEFT,
+    CONTENT_CENTER,
+    CONTENT_RIGHT,
+} ContentAlign;
 
 typedef struct
 {

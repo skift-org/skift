@@ -134,7 +134,7 @@ void widget_layout(Widget *widget)
         }
         break;
 
-    case LAYOUT_HFLOW:
+    case LAYOUT_HGRID:
     {
         int current = widget_content_bound(widget).X;
         int child_width = (widget_content_bound(widget).width - (layout.hspacing * (list_count(widget->childs) - 1))) / list_count(widget->childs);
@@ -147,7 +147,7 @@ void widget_layout(Widget *widget)
     }
     break;
 
-    case LAYOUT_VFLOW:
+    case LAYOUT_VGRID:
     {
         int current = widget_content_bound(widget).Y;
         int child_height = (widget_content_bound(widget).height - (layout.vspacing * (list_count(widget->childs) - 1))) / list_count(widget->childs);
@@ -156,6 +156,30 @@ void widget_layout(Widget *widget)
         {
             child->bound = RECTANGLE(widget_content_bound(widget).position.X, current, widget_content_bound(widget).width, child_height);
             current += child_height + layout.vspacing;
+        }
+    }
+    break;
+
+    case LAYOUT_HFLOW:
+    {
+        int current = widget_content_bound(widget).X;
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            child->bound = RECTANGLE(current, widget_content_bound(widget).position.Y, child->bound.width, widget_content_bound(widget).height);
+            current += child->bound.width + layout.hspacing;
+        }
+    }
+    break;
+
+    case LAYOUT_VFLOW:
+    {
+        int current = widget_content_bound(widget).Y;
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            child->bound = RECTANGLE(widget_content_bound(widget).position.X, current, widget_content_bound(widget).width, child->bound.height);
+            current += child->bound.height + layout.vspacing;
         }
     }
     break;

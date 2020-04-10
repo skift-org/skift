@@ -57,6 +57,8 @@ bool list_peekat(List *list, int index, void **value);
 
 int list_indexof(List *list, void *value);
 
+void list_insert(List *list, int index, void *value);
+
 void list_push(List *list, void *value);
 
 void list_pushback(List *list, void *value);
@@ -70,6 +72,10 @@ bool list_contains(List *list, void *value);
 bool list_remove(List *list, void *value);
 
 bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallback callback);
+
+bool list_remove_at(List *list, int index);
+
+bool list_remove_at_with_callback(List *list, int index, ListDestroyElementCallback callback);
 
 #define list_empty(__list) ((__list)->count == 0)
 

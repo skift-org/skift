@@ -177,7 +177,10 @@ static void list_peekat_from_head(List *list, int index, void **value)
 
     for (int i = 0; i < index; i++)
     {
-        current = current->next;
+        if (current->next)
+        {
+            current = current->next;
+        }
     }
 
     *value = current->value;
@@ -189,7 +192,10 @@ static void list_peekat_from_back(List *list, int index, void **value)
 
     for (int i = 0; i < (list->count - index - 1); i++)
     {
-        current = current->prev;
+        if (current->prev)
+        {
+            current = current->prev;
+        }
     }
 
     *value = current->value;
@@ -231,6 +237,45 @@ int list_indexof(List *list, void *value)
     }
 
     return -1;
+}
+
+void list_insert(List *list, int index, void *value)
+{
+    if (list_count(list) == 0)
+    {
+        list_pushback(list, value);
+        return;
+    }
+
+    if (index == 0)
+    {
+        list_push(list, value);
+    }
+
+    ListItem *current = list->tail;
+
+    for (int i = 0; i < (list->count - index - 1); i++)
+    {
+        if (current->prev)
+        {
+            current = current->prev;
+        }
+    }
+
+    ListItem *item = __create(ListItem);
+
+    item->prev = current;
+    item->next = current->next;
+    item->value = value;
+
+    list->count++;
+
+    current->next = item;
+
+    if (list->tail == current)
+    {
+        list->tail = current;
+    }
 }
 
 void list_push(List *list, void *value)
@@ -376,6 +421,18 @@ bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallba
     }
 
     return false;
+}
+
+bool list_remove_at(List *list, int index)
+{
+    return list_remove_at_with_callback(list, index, NULL);
+}
+
+bool list_remove_at_with_callback(List *list, int index, ListDestroyElementCallback callback)
+{
+    void *value = NULL;
+    list_peekat(list, index, &value);
+    return list_remove_with_callback(list, value, callback);
 }
 
 bool list_contains(List *list, void *value)

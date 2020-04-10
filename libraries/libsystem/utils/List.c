@@ -254,11 +254,11 @@ void list_insert(List *list, int index, void *value)
 
     ListItem *current = list->tail;
 
-    for (int i = 0; i < (list->count - index - 1); i++)
+    for (int i = 0; i < index - 1; i++)
     {
-        if (current->prev)
+        if (current->next)
         {
-            current = current->prev;
+            current = current->next;
         }
     }
 
@@ -268,14 +268,14 @@ void list_insert(List *list, int index, void *value)
     item->next = current->next;
     item->value = value;
 
-    list->count++;
-
     current->next = item;
 
     if (list->tail == current)
     {
         list->tail = current;
     }
+
+    list->count++;
 }
 
 void list_push(List *list, void *value)

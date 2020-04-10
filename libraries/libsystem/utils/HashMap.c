@@ -1,12 +1,12 @@
 #include <libsystem/cstring.h>
 #include <libsystem/utils/HashMap.h>
 
-static char *hashmap_string_copy(char *string)
+static char *hashmap_string_copy(const char *string)
 {
     return strdup(string);
 }
 
-static uint32_t hashmap_string_hash(char *string)
+static uint32_t hashmap_string_hash(const char *string)
 {
     uint32_t hash = 5381;
     int c;
@@ -17,7 +17,7 @@ static uint32_t hashmap_string_hash(char *string)
     return hash;
 }
 
-static int hashmap_string_compare(char *left, char *right)
+static int hashmap_string_compare(const char *left, const char *right)
 {
     return strcmp(left, right);
 }
@@ -102,7 +102,7 @@ void hashmap_clear_with_callback(
     }
 }
 
-static HashMapItem *hashmap_find_item(HashMap *hashmap, void *key)
+static HashMapItem *hashmap_find_item(HashMap *hashmap, const void *key)
 {
     uint32_t hash = hashmap->hash_key(key);
 
@@ -120,7 +120,7 @@ static HashMapItem *hashmap_find_item(HashMap *hashmap, void *key)
     return NULL;
 }
 
-bool hashmap_put(HashMap *hashmap, void *key, void *value)
+bool hashmap_put(HashMap *hashmap, const void *key, void *value)
 {
     if (hashmap_has(hashmap, key))
     {
@@ -140,24 +140,24 @@ bool hashmap_put(HashMap *hashmap, void *key, void *value)
     return true;
 }
 
-void *hashmap_get(HashMap *hashmap, void *key)
+void *hashmap_get(HashMap *hashmap, const void *key)
 {
     return hashmap_find_item(hashmap, key);
 }
 
-bool hashmap_has(HashMap *hashmap, void *key)
+bool hashmap_has(HashMap *hashmap, const void *key)
 {
     return hashmap_find_item(hashmap, key) != NULL;
 }
 
-bool hashmap_remove(HashMap *hashmap, void *key)
+bool hashmap_remove(HashMap *hashmap, const void *key)
 {
     return hashmap_remove_with_callback(hashmap, key, NULL);
 }
 
 bool hashmap_remove_with_callback(
     HashMap *hashmap,
-    void *key,
+    const void *key,
     HashMapDestroyValueCallback callback)
 {
     HashMapItem *item = hashmap_find_item(hashmap, key);

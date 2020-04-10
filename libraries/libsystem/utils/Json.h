@@ -16,18 +16,7 @@ typedef enum
     __JSON_TYPE_COUNT,
 } JsonType;
 
-typedef struct
-{
-    JsonType type;
-
-    union {
-        char *storage_string;
-        int storage_integer;
-        double storage_double;
-        HashMap *storage_object;
-        List *storage_array;
-    };
-} JsonValue;
+typedef struct JsonValue JsonValue;
 
 JsonValue *json_create_string(char *string);
 
@@ -46,3 +35,29 @@ JsonValue *json_create_false(void);
 JsonValue *json_create_null(void);
 
 void json_destroy(JsonValue *value);
+
+bool json_is(JsonValue *value, JsonType type);
+
+const char *json_string_value(JsonValue *value);
+
+int json_integer_value(JsonValue *value);
+
+double json_double_value(JsonValue *value);
+
+bool json_object_has(JsonValue *object, const char *key);
+
+JsonValue *json_object_get(JsonValue *object, const char *key);
+
+void json_object_put(JsonValue *object, const char *key, JsonValue *value);
+
+void json_object_remove(JsonValue *object, const char *key);
+
+size_t json_array_lenght(JsonValue *array);
+
+JsonValue *json_array_get(JsonValue *array, size_t index);
+
+void json_array_put(JsonValue *array, size_t index, JsonValue *value);
+
+void json_array_remove(JsonValue *array, size_t index);
+
+char *json_stringify(JsonValue *value);

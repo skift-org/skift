@@ -6,7 +6,7 @@
 #include <libmath/Face.h>
 #include <libmath/Matrix4.h>
 
-#include "DemoCommon.h"
+#include "demo/Demos.h"
 
 static const Face cude_mesh[] = {
     {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
@@ -25,7 +25,7 @@ static const Face cude_mesh[] = {
 
 static Vector3 camera = {0, 0, 0};
 
-void draw(Painter *painter, Rectangle screen, double time)
+void cube_draw(Painter *painter, Rectangle screen, double time)
 {
     Matrix4 projection = matrix_create_projection(0.1, 1000.0f, 45.0f, screen.height / (double)screen.width);
 
@@ -101,9 +101,4 @@ void draw(Painter *painter, Rectangle screen, double time)
             painter3D_draw_face(painter, triProjected, COLOR_BLACK);
         }
     }
-}
-
-int main(int argc, char **argv)
-{
-    return demo_start(argc, argv, "Cube", draw);
 }

@@ -4,14 +4,19 @@
 
 #include <libsystem/assert.h>
 
-#include "DemoCommon.h"
+#include "demo/Demos.h"
 
 static Bitmap *_test_image = NULL;
 static int _frame = 0;
 
-void draw(Painter *painter, Rectangle screen, double time)
+void graphics_draw(Painter *painter, Rectangle screen, double time)
 {
     __unused(time);
+
+    if (_test_image == NULL)
+    {
+        _test_image = bitmap_load_from("/res/font/mono.png");
+    }
 
     for (int x = 0; x < screen.width; x++)
     {
@@ -37,12 +42,4 @@ void draw(Painter *painter, Rectangle screen, double time)
     painter_fill_rectangle(painter, (Rectangle){{150, 150, 100, 100}}, ALPHA(COLOR_BLUE, 0.5));
 
     _frame++;
-}
-
-int main(int argc, char **argv)
-{
-    _test_image = bitmap_load_from("/res/font/mono.png");
-    assert(_test_image);
-
-    return demo_start(argc, argv, "Graphics", draw);
 }

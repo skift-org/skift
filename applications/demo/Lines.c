@@ -4,7 +4,7 @@
 
 #include <libsystem/io/Stream.h>
 
-#include "DemoCommon.h"
+#include "demo/Demos.h"
 
 static Stream *random_device = NULL;
 
@@ -15,9 +15,14 @@ typedef struct
     Color color;
 } Line;
 
-void draw(Painter *painter, Rectangle screen, double time)
+void lines_draw(Painter *painter, Rectangle screen, double time)
 {
     __unused(time);
+
+    if (random_device == NULL)
+    {
+        random_device = stream_open("/dev/random", OPEN_READ);
+    }
 
     Line line = {};
     stream_read(random_device, &line, sizeof(Line));
@@ -30,11 +35,4 @@ void draw(Painter *painter, Rectangle screen, double time)
     line.color.A = 255;
 
     painter_draw_line(painter, line.start, line.finish, line.color);
-}
-
-int main(int argc, char **argv)
-{
-    random_device = stream_open("/dev/random", OPEN_READ);
-
-    return demo_start(argc, argv, "Lines", draw);
 }

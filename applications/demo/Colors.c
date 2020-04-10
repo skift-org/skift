@@ -2,9 +2,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include "DemoCommon.h"
+#include "demo/Demos.h"
 
-void draw(Painter *painter, Rectangle screen, double time)
+void colors_draw(Painter *painter, Rectangle screen, double time)
 {
     for (int x = 0; x < screen.width; x++)
     {
@@ -14,9 +14,4 @@ void draw(Painter *painter, Rectangle screen, double time)
             painter_plot_pixel(painter, (Point){screen.X + x, screen.Y + y}, color);
         }
     }
-}
-
-int main(int argc, char **argv)
-{
-    return demo_start(argc, argv, "Colors", draw);
 }

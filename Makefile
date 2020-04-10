@@ -102,14 +102,11 @@ APPLICATIONS=$(ROOT_DIRECTORY)/bin/terminal \
 			$(ROOT_DIRECTORY)/bin/compositor \
 			$(ROOT_DIRECTORY)/bin/image-viewer \
 			$(ROOT_DIRECTORY)/bin/widget-factory \
-			$(ROOT_DIRECTORY)/bin/panel
+			$(ROOT_DIRECTORY)/bin/panel \
+			$(ROOT_DIRECTORY)/bin/demo
 
-COREUTILS=$(ROOT_DIRECTORY)/bin/__democolors \
-		  $(ROOT_DIRECTORY)/bin/__demolines \
-		  $(ROOT_DIRECTORY)/bin/__democube \
-		  $(ROOT_DIRECTORY)/bin/__testargs \
+COREUTILS=$(ROOT_DIRECTORY)/bin/__testargs \
 		  $(ROOT_DIRECTORY)/bin/__testexec \
-		  $(ROOT_DIRECTORY)/bin/__demogfx \
 		  $(ROOT_DIRECTORY)/bin/__testposix \
 		  $(ROOT_DIRECTORY)/bin/__testterm \
 		  $(ROOT_DIRECTORY)/bin/cat \
@@ -248,23 +245,11 @@ $(ROOT_DIRECTORY)/bin/panel: $(wildcard applications/panel/*.c) $(LIBSYSTEM) $(L
 	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) $(wildcard applications/panel/*.c) -o $@ -lwidget -lgraphic
 
+$(ROOT_DIRECTORY)/bin/demo: $(wildcard applications/demo/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
+	$(DIRECTORY_GUARD)
+	$(CC) $(CFLAGS) $(wildcard applications/demo/*.c) -o $@ -lwidget -lgraphic -lmath
+
 # --- Coreutils -------------------------------------------------------------- #
-
-$(ROOT_DIRECTORY)/bin/__democolors: coreutils/__democolors.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lwidget  -lgraphic
-
-$(ROOT_DIRECTORY)/bin/__demolines: coreutils/__demolines.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
-
-$(ROOT_DIRECTORY)/bin/__democube: coreutils/__democube.c $(LIBSYSTEM) $(LIBGRAPHIC) $(LIBWIDGET) $(LIBMATH) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic -lmath
-
-$(ROOT_DIRECTORY)/bin/__demogfx: coreutils/__demogfx.c $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lwidget -lgraphic
 
 $(ROOT_DIRECTORY)/bin/__testargs: coreutils/__testargs.c $(LIBSYSTEM) $(CRTS)
 	$(DIRECTORY_GUARD)

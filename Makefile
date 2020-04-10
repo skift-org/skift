@@ -65,7 +65,7 @@ LIBGRAPHIC_SRC=$(wildcard libraries/libgraphic/*.c)
 LIBGRAPHIC_OBJ=$(patsubst %.c,%.o,$(LIBGRAPHIC_SRC))
 
 LIBMATH=$(ROOT_DIRECTORY)/lib/libmath.a
-LIBMATH_SRC=$(wildcard libraries/libmath/*.c)
+LIBMATH_SRC=$(wildcard libraries/libmath/*.c) $(wildcard libraries/libmath/**/*.c)
 LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
 
 LIBCOMPAT=$(ROOT_DIRECTORY)/lib/libcompat.a

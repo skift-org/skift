@@ -58,8 +58,6 @@ Bitmap *font_load_bitmap_create(const char *name)
     char bitmap_path[PATH_LENGHT];
     snprintf(bitmap_path, PATH_LENGHT, "/res/font/%s.png", name);
 
-    logger_trace("Loading fonts bitmap of %s from %s", name, bitmap_path);
-
     Bitmap *bitmap = bitmap_load_from(bitmap_path);
 
     bitmap->filtering = BITMAP_FILTERING_LINEAR;
@@ -69,8 +67,6 @@ Bitmap *font_load_bitmap_create(const char *name)
 
 Font *font_create(const char *name)
 {
-    logger_trace("Loading font %s...", name);
-
     Glyph *glyph = font_load_glyph(name);
 
     if (glyph == NULL)

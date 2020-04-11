@@ -10,6 +10,6 @@ int sscanf(const char *str, const char *format, ...)
     __unused(format);
 
     logger_trace("sscanf(\"%s\", ...)", format);
-    
+
     return 0;
 }

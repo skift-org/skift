@@ -58,7 +58,6 @@ Result application_initialize(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    logger_trace("Connecting to compositor...");
     _connection = socket_connect("/srv/compositor.ipc");
 
     if (handle_has_error(_connection))
@@ -68,10 +67,6 @@ Result application_initialize(int argc, char **argv)
         connection_close(_connection);
         _connection = NULL;
         return result;
-    }
-    else
-    {
-        logger_trace("Connected to compositor!");
     }
 
     _windows = list_create();
@@ -129,8 +124,6 @@ void application_add_window(Window *window)
 {
     assert(_initialized);
 
-    logger_info("Adding Window(0x%08x)", window);
-
     CompositorCreateWindowMessage message = {
         .id = window_handle(window),
         .framebuffer = window_framebuffer_handle(window),
@@ -145,8 +138,6 @@ void application_add_window(Window *window)
 void application_remove_window(Window *window)
 {
     assert(_initialized);
-
-    logger_info("Removing Window(0x%08x)", window);
 
     CompositorDestroyWindowMessage message = {
         .id = window_handle(window),

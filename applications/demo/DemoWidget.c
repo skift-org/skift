@@ -26,8 +26,9 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter)
     if (widget->demo)
     {
         widget->demo->callback(widget->painter, bitmap_bound(widget->bitmap), widget->time);
-        painter_draw_string(painter, widget_font(), widget->demo->name, (Point){33, 33}, COLOR_BLACK);
-        painter_draw_string(painter, widget_font(), widget->demo->name, (Point){32, 32}, COLOR_WHITE);
+
+        painter_draw_string(widget->painter, widget_font(), widget->demo->name, (Point){9, 17}, COLOR_BLACK);
+        painter_draw_string(widget->painter, widget_font(), widget->demo->name, (Point){8, 16}, COLOR_WHITE);
     }
 
     painter_blit_bitmap(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_bound(widget));

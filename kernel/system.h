@@ -10,8 +10,6 @@
 #include "kernel/x86/Interrupts.h"
 #include "kernel/x86/x86.h"
 
-void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
-
 #define HANG   \
     while (1)  \
     {          \
@@ -25,25 +23,8 @@ void __attribute__((noreturn)) __panic(const char *file, const char *function, c
         hlt(); \
     }
 
+void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
+
 #define PANIC(x...) __panic(__FILE__, __FUNCTION__, __LINE__, NULL, x)
 
 #define CPANIC(ctx, x...) __panic(__FILE__, __FUNCTION__, __LINE__, ctx, x)
-
-#define setup(x, arg...)                     \
-    {                                        \
-        logger_info("Setting up " #x "..."); \
-        x##_setup(arg);                      \
-    }
-
-#define KERNEL_VERSION __kernel_version_format, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
-
-#define KERNEL_UNAME __kernel_uname_format, __kernel_name, __kernel_version_major, __kernel_version_minor, __kernel_version_patch, __kernel_version_codename
-
-extern const char *__kernel_name;
-extern int __kernel_version_major;
-extern int __kernel_version_minor;
-extern int __kernel_version_patch;
-extern const char *__kernel_version_codename;
-
-extern const char *__kernel_version_format;
-extern const char *__kernel_uname_format;

@@ -4,6 +4,7 @@
 
 /* syscalls.c syscalls handeling code                                         */
 
+#include <libsystem/BuildInfo.h>
 #include <libsystem/Result.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
@@ -217,15 +218,9 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
 
 int sys_system_get_info(SystemInfo *info)
 {
-    strlcpy(info->kernel_name, __kernel_name, SYSTEM_INFO_FIELD_SIZE);
+    strncpy(info->kernel_name, "hjert", SYSTEM_INFO_FIELD_SIZE);
 
-    snprintf(info->kernel_release, SYSTEM_INFO_FIELD_SIZE,
-             __kernel_version_format,
-
-             __kernel_version_major,
-             __kernel_version_minor,
-             __kernel_version_patch,
-             __kernel_version_codename);
+    strncpy(info->kernel_release, __BUILD_GITREF__, SYSTEM_INFO_FIELD_SIZE);
 
     strlcpy(info->system_name, "skift", SYSTEM_INFO_FIELD_SIZE);
 

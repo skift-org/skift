@@ -48,7 +48,7 @@ void platform_fpu_load_context(Task *t)
 
 /* --- Public functions ----------------------------------------------------- */
 
-void platform_setup(void)
+void platform_initialize(void)
 {
     // setup the gdt and idt
 

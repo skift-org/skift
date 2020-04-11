@@ -13,7 +13,7 @@ static GDTDescriptor gdt_descriptor = {
     .offset = (u32)&gdt_entries[0],
 };
 
-void gdt_setup()
+void gdt_initialize()
 {
     tss.ss0 = 0x10;
     tss.esp0 = 0;

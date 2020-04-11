@@ -18,7 +18,7 @@ void platform_fpu_load_context(Task *task);
 
 /* --- Processor ------------------------------------------------------------ */
 
-void platform_setup(void);
+void platform_initialize(void);
 
 void platform_save_context(Task *task);
 

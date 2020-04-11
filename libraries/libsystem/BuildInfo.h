@@ -16,6 +16,10 @@
 #define __BUILD_TARGET__ "unknown"
 #endif
 
+#ifndef __BUILD_GITREF__
+#define __BUILD_GITREF__ "unknown"
+#endif
+
 #ifndef __BUILD_UNAME__
 #define __BUILD_UNAME__ "unknown"
 #endif

@@ -12,6 +12,7 @@
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libmath/math.h>
+#include <libsystem/BuildInfo.h>
 #include <libsystem/Result.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/atomic.h>
@@ -80,7 +81,8 @@ void kmain(void *info, uint magic)
     __plug_init();
     boot_timestamp = clock_now();
     logger_level(LOGGER_TRACE);
-    logger_info(KERNEL_UNAME);
+
+    logger_info("hjert " __BUILD_GITREF__);
 
     Multiboot *multiboot = multiboot_initialize(info, magic);
 
@@ -90,8 +92,8 @@ void kmain(void *info, uint magic)
     }
 
     logger_info("Initializing system...");
-    setup(gdt);
-    setup(platform);
+    gdt_initialize();
+    platform_initialize();
     memory_initialize(multiboot);
     tasking_initialize();
     interrupts_initialize();

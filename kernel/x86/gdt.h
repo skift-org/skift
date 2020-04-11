@@ -77,7 +77,7 @@ typedef struct __packed
 		.base24_31 = (u8)(((__base) >> 24) & 0xff),   \
 	}
 
-void gdt_setup(void);
+void gdt_initialize(void);
 
 #ifdef __cplusplus
 extern "C" void gdt_flush(u32);

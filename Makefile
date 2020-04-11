@@ -10,7 +10,7 @@ BUILD_CONFIG?=debug
 BUILD_SYSTEM?=skift
 
 BUILD_TARGET=$(BUILD_CONFIG)-$(BUILD_ARCH)-$(BUILD_SYSTEM)
-BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)/$(shell git rev-parse --short HEAD || echo unknown)
+BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)@$(shell git rev-parse --short HEAD || echo unknown)
 BUILD_UNAME=$(shell uname -s -o -m -r)
 BUILD_DIRECTORY=$(shell pwd)/build
 

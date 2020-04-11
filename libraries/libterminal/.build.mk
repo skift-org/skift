@@ -1,0 +1,3 @@
+LIBS += TERMINAL
+
+TERMINAL_NAME = terminal

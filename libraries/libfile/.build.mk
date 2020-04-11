@@ -1,0 +1,3 @@
+LIBS += FILE
+
+FILE_NAME = file

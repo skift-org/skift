@@ -1,0 +1,3 @@
+LIBS += WIDGET
+
+WIDGET_NAME = widget

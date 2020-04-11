@@ -1,428 +1,264 @@
-.SECONDARY:
+.SUFFIXES:
 
 PATH := $(shell toolchain/use-it.sh):$(PATH)
 PATH := $(shell toolbox/use-it.sh):$(PATH)
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
-TARGET_TRIPLET=i686-pc-skift
+BUILD_ARCH?=i686
+BUILD_CONFIG?=debug
+BUILD_SYSTEM?=skift
 
-CC=$(TARGET_TRIPLET)-gcc
+BUILD_TARGET=$(BUILD_CONFIG)-$(BUILD_ARCH)-$(BUILD_SYSTEM)
+BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)/$(shell git rev-parse --short HEAD || echo unknown)
+BUILD_UNAME=$(shell uname -s -o -m -r)
+BUILD_DIRECTORY=$(shell pwd)/build
 
-COPT_FLAGS=-O2 -pipe
+SYSROOT=$(BUILD_DIRECTORY)/sysroot
+BOOTROOT=$(BUILD_DIRECTORY)/bootroot
 
-CDIALECT_FLAGS=-std=gnu11
+BUILD_DIRECTORY_LIBS=$(SYSROOT)/lib
+BUILD_DIRECTORY_APPS=$(SYSROOT)/bin
+BUILD_DIRECTORY_UTILS=$(SYSROOT)/bin
 
-CWARN_FLAGS=-Wall \
-		    -Wextra  \
-			-Wc++-compat \
-			-Werror
-
-CFLAGS=$(CDIALECT_FLAGS) \
-	   $(COPT_FLAGS) \
-	   $(CWARN_FLAGS) \
-	   -I. -Iapplications -Ilibraries -Ilibraries/libcompat \
-	   -D__COMMIT__=\"$(shell git log --pretty=format:'%h' -n 1)\"
+# --- Configs -------------------------------------------- #
 
 QEMU=qemu-system-x86_64
+
+CC:=i686-pc-skift-gcc
+CFLAGS:= \
+	-O2 \
+	-std=gnu11 \
+	-MD \
+	\
+	-Wall \
+	-Wextra  \
+	-Wc++-compat \
+	-Werror \
+	\
+	-I. \
+	-Iapplications \
+	-Ilibraries \
+	-Ilibraries/libcompat \
+	\
+	-D__BUILD_ARCH__=\""$(BUILD_ARCH)"\" \
+	-D__BUILD_CONFIG__=\""$(BUILD_CONFIG)"\" \
+	-D__BUILD_SYSTEM__=\""$(BUILD_SYSTEM)"\" \
+	-D__BUILD_TARGET__=\""$(BUILD_TARGET)"\" \
+	-D__BUILD_GITREF__=\""$(BUILD_GITREF)"\" \
+	-D__BUILD_UNAME__=\""$(BUILD_UNAME)"\"
+
+LD:=i686-pc-skift-ld
+LDFLAGS:=
+
+AR:=i686-pc-skift-ar
+ARFLAGS:=rcs
 
 AS=nasm
 ASFLAGS=-f elf32
 
-AR=$(TARGET_TRIPLET)-ar
-ARFLAGS=rcs
+# --- Kernel --------------------------------------------- #
 
-LD=$(TARGET_TRIPLET)-ld
-LDFLAGS=-flto
+KERNEL_SOURCES = \
+	$(wildcard kernel/*.c) \
+	$(wildcard kernel/*/*.c)
 
-# --- Objects ---------------------------------------------------------------- #
+KERNEL_ASSEMBLY_SOURCES = \
+	$(wildcard kernel/*.s) \
+	$(wildcard kernel/*/*.s)
 
-BUILD_DIRECTORY=$(shell pwd)/build
-ROOT_DIRECTORY=$(BUILD_DIRECTORY)/sysroot
-BOOT_DIRECTORY=$(BUILD_DIRECTORY)/bootroot
+KERNEL_LIBRARIES_SOURCES = \
+	$(wildcard libraries/libfile/*.c) \
+	$(wildcard libraries/libsystem/*.c) \
+	$(wildcard libraries/libsystem/io/*.c) \
+	$(wildcard libraries/libsystem/unicode/*.c) \
+	$(wildcard libraries/libsystem/process/*.c) \
+	$(wildcard libraries/libsystem/utils/*.c)
 
-INCLUDES=$(patsubst libraries/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/ -path libraries/libcompat -prune -o -name *.h))
-INCLUDES+=$(patsubst libraries/libcompat/%.h,$(ROOT_DIRECTORY)/lib/include/%.h,$(shell find libraries/libcompat -name *.h))
+KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 
-LIBCONSOLE=$(ROOT_DIRECTORY)/lib/libterminal.a
-LIBCONSOLE_SRC=$(wildcard libraries/libterminal/*.c)
-LIBCONSOLE_OBJ=$(patsubst %.c,%.o,$(LIBCONSOLE_SRC))
+KERNEL_OBJECTS = \
+	$(patsubst %.c, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
+	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
+	$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
-LIBDEVICE=$(ROOT_DIRECTORY)/lib/libdevice.a
-LIBDEVICE_SRC=$(wildcard libraries/libdevice/*.c)
-LIBCONSOLE_OBJ=$(patsubst %.c,%.o,$(LIBCONSOLE_SRC))
+OBJECTS += $(KERNEL_OBJECTS)
 
-LIBFILE=$(ROOT_DIRECTORY)/lib/libfile.a
-LIBFILE_SRC=$(wildcard libraries/libfile/*.c)
-LIBFILE_OBJ=$(patsubst %.c,%.o,$(LIBFILE_SRC))
+$(BUILD_DIRECTORY)/kernel/%.o: libraries/%.c
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [CC] $<
+	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-LIBWIDGET=$(ROOT_DIRECTORY)/lib/libwidget.a
-LIBWIDGET_SRC=$(wildcard libraries/libwidget/*.c) $(wildcard libraries/libwidget/**/*.c)
-LIBWIDGET_OBJ=$(patsubst %.c,%.o,$(LIBWIDGET_SRC))
+$(BUILD_DIRECTORY)/kernel/%.o: kernel/%.c
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [CC] $<
+	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-LIBGRAPHIC=$(ROOT_DIRECTORY)/lib/libgraphic.a
-LIBGRAPHIC_SRC=$(wildcard libraries/libgraphic/*.c)
-LIBGRAPHIC_OBJ=$(patsubst %.c,%.o,$(LIBGRAPHIC_SRC))
+$(BUILD_DIRECTORY)/kernel/%.s.o: kernel/%.s
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [AS] $<
+	@$(AS) $(ASFLAGS) $^ -o $@
 
-LIBMATH=$(ROOT_DIRECTORY)/lib/libmath.a
-LIBMATH_SRC=$(wildcard libraries/libmath/*.c) $(wildcard libraries/libmath/**/*.c)
-LIBMATH_OBJ=$(patsubst %.c,%.o,$(LIBMATH_SRC))
+$(KERNEL_BINARY): $(KERNEL_OBJECTS)
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [LD] $(KERNEL_BINARY)
+	@$(LD) $(LDFLAGS) -T kernel/link.ld -o $@ $^
 
-LIBCOMPAT=$(ROOT_DIRECTORY)/lib/libcompat.a
-LIBCOMPAT_SRC=$(wildcard libraries/libcompat/*.c)
-LIBCOMPAT_OBJ=$(patsubst %.c,%.o,$(LIBCOMPAT_SRC))
+# --- CRTs ----------------------------------------------- #
 
-LIBSYSTEM=$(ROOT_DIRECTORY)/lib/libsystem.a
-LIBSYSTEM_SRC=$(wildcard libraries/libsystem/*.c) \
-			  $(wildcard libraries/libsystem/plugs/*.c) \
-			  $(wildcard libraries/libsystem/unicode/*.c) \
-			  $(wildcard libraries/libsystem/io/*.c) \
-			  $(wildcard libraries/libsystem/process/*.c) \
-			  $(wildcard libraries/libsystem/eventloop/*.c) \
-			  $(wildcard libraries/libsystem/readline/*.c) \
-			  $(wildcard libraries/libsystem/utils/*.c)
+CRTS= \
+	$(BUILD_DIRECTORY_LIBS)/crt0.o \
+	$(BUILD_DIRECTORY_LIBS)/crti.o \
+	$(BUILD_DIRECTORY_LIBS)/crtn.o
 
-LIBSYSTEM_OBJ=$(patsubst %.c,%.o,$(LIBSYSTEM_SRC))
+$(BUILD_DIRECTORY_LIBS)/crt0.o: libraries/crt0.s
+	$(DIRECTORY_GUARD)
+	@echo [AS] $^
+	@$(AS) $(ASFLAGS) -o $@ $^
 
-CRTS=$(ROOT_DIRECTORY)/lib/crt0.o \
-	 $(ROOT_DIRECTORY)/lib/crti.o \
-	 $(ROOT_DIRECTORY)/lib/crtn.o
+$(BUILD_DIRECTORY_LIBS)/crti.o: libraries/crti.s
+	$(DIRECTORY_GUARD)
+	@echo [AS] $^
+	@$(AS) $(ASFLAGS) -o $@ $^
 
-LIBRARIES=$(LIBCONSOLE) \
-		  $(LIBDEVICE) \
-		  $(LIBFILE)  \
-		  $(LIBWIDGET) \
-		  $(LIBGRAPHIC) \
-		  $(LIBMATH) \
-		  $(LIBCOMPAT) \
-		  $(LIBSYSTEM)
+$(BUILD_DIRECTORY_LIBS)/crtn.o: libraries/crtn.s
+	$(DIRECTORY_GUARD)
+	@echo [AS] $^
+	@$(AS) $(ASFLAGS) -o $@ $^
 
-APPLICATIONS=$(ROOT_DIRECTORY)/bin/terminal \
-			$(ROOT_DIRECTORY)/bin/shell \
-			$(ROOT_DIRECTORY)/bin/compositor \
-			$(ROOT_DIRECTORY)/bin/image-viewer \
-			$(ROOT_DIRECTORY)/bin/widget-factory \
-			$(ROOT_DIRECTORY)/bin/panel \
-			$(ROOT_DIRECTORY)/bin/demo
+# --- Libraries ------------------------------------------ #
 
-COREUTILS=$(ROOT_DIRECTORY)/bin/__testargs \
-		  $(ROOT_DIRECTORY)/bin/__testexec \
-		  $(ROOT_DIRECTORY)/bin/__testposix \
-		  $(ROOT_DIRECTORY)/bin/__testterm \
-		  $(ROOT_DIRECTORY)/bin/cat \
-		  $(ROOT_DIRECTORY)/bin/clear \
-		  $(ROOT_DIRECTORY)/bin/dstart \
-		  $(ROOT_DIRECTORY)/bin/echo \
-		  $(ROOT_DIRECTORY)/bin/displayctl \
-		  $(ROOT_DIRECTORY)/bin/grep \
-		  $(ROOT_DIRECTORY)/bin/init \
-		  $(ROOT_DIRECTORY)/bin/kill \
-		  $(ROOT_DIRECTORY)/bin/keyboardctl \
-		  $(ROOT_DIRECTORY)/bin/ls \
-		  $(ROOT_DIRECTORY)/bin/lsproc \
-		  $(ROOT_DIRECTORY)/bin/mkdir \
-		  $(ROOT_DIRECTORY)/bin/mv \
-		  $(ROOT_DIRECTORY)/bin/now \
-		  $(ROOT_DIRECTORY)/bin/panic \
-		  $(ROOT_DIRECTORY)/bin/sysfetch \
-		  $(ROOT_DIRECTORY)/bin/touch \
-		  $(ROOT_DIRECTORY)/bin/unlink
+define LIB_TEMPLATE =
 
-KERNEL=$(BUILD_DIRECTORY)/kernel.bin
-KERNEL_CSOURCES=$(wildcard kernel/*.c) \
-				$(wildcard kernel/*/*.c) \
-				$(wildcard libraries/libfile/*.c) \
-				$(wildcard libraries/libsystem/*.c) \
-				$(wildcard libraries/libsystem/io/*.c) \
-				$(wildcard libraries/libsystem/unicode/*.c) \
-				$(wildcard libraries/libsystem/process/*.c) \
-				$(wildcard libraries/libsystem/utils/*.c)
+$(1)_ARCHIVE = $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
+$(1)_SOURCES = \
+	$$(wildcard libraries/lib$($(1)_NAME)/*.c) \
+	$$(wildcard libraries/lib$($(1)_NAME)/*/*.c)
 
+$(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
 
-KERNEL_SSOURCES=$(wildcard kernel/*.s) $(wildcard kernel/*/*.s)
-KERNEL_OBJECT= ${KERNEL_CSOURCES:.c=.c.kernel.o} ${KERNEL_SSOURCES:.s=.s.kernel.o}
+OBJECTS += $$($(1)_OBJECTS)
 
-RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar
+$$($(1)_ARCHIVE): $$($(1)_OBJECTS)
+	$$(DIRECTORY_GUARD)
+	@echo [LIB$(1)] [AR] $$@
+	@$(AR) $(ARFLAGS) $$@ $$^
+
+LIBS_OBJECTS  += $$($(1)_OBJECTS)
+LIBS_ARCHIVES += $$($(1)_ARCHIVE)
+
+$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.c
+	$$(DIRECTORY_GUARD)
+	@echo [LIB$(1)] [CC] $$<
+	@$(CC) $(CFLAGS) -c -o $$@ $$<
+
+endef
+
+-include libraries/*/.build.mk
+$(foreach lib, $(LIBS), $(eval $(call LIB_TEMPLATE,$(lib))))
+
+# --- Coreutils ------------------------------------------ #
+
+define UTIL_TEMPLATE =
+
+$(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
+$(1)_SOURCE  = coreutils/$($(1)_NAME).c
+$(1)_OBJECT  = $$(patsubst coreutils/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCE))
+
+UTILS_BINARIES += $$($(1)_BINARY)
+
+OBJECTS += $$($(1)_OBJECT)
+
+$$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [LD] $($(1)_NAME)
+	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
+
+$$($(1)_OBJECT): $$($(1)_SOURCE)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [CC] $$<
+	@$(CC) $(CFLAGS) -c -o $$@ $$<
+
+endef
+
+-include coreutils/.build.mk
+$(foreach util, $(UTILS), $(eval $(call UTIL_TEMPLATE,$(util))))
+
+# --- Applications --------------------------------------- #
+
+define APP_TEMPLATE =
+
+$(1)_BINARY  = $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)
+$(1)_SOURCES = $$(wildcard applications/$($(1)_NAME)/*.c) \
+			   $$(wildcard applications/$($(1)_NAME)/*/*.c)
+
+$(1)_OBJECTS = $$(patsubst applications/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
+
+OBJECTS += $$($(1)_OBJECTS)
+
+$$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [LD] $($(1)_NAME)
+	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
+
+APPS_OBJECTS  += $$($(1)_OBJECTS)
+APPS_BINARIES += $$($(1)_BINARY)
+
+$$(BUILD_DIRECTORY)/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.c
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [CC] $$<
+	@$(CC) $(CFLAGS) -c -o $$@ $$<
+
+endef
+
+-include applications/*/.build.mk
+$(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))
+
+# --- Ramdisk -------------------------------------------- #
+
+RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
+
+RESSOURCES=$(wildcard ressources/*/*)
+
+$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(RESSOURCES)
+	$(DIRECTORY_GUARD)
+
+	@echo [TAR] $@
+
+	@mkdir -p \
+		$(SYSROOT)/dev \
+		$(SYSROOT)/res \
+		$(SYSROOT)/srv
+
+	@cp -r resources/* $(SYSROOT)/res
+
+	@cd $(SYSROOT); tar -cf $@ *
+
+# --- Bootdisk ------------------------------------------- #
 
 BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.iso
 
-# --- Tagets ----------------------------------------------------------------- #
+$(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) grub.cfg
+	$(DIRECTORY_GUARD)
+	@echo [GRUB-MKRESCUE] $@
 
+	@mkdir -p $(BOOTROOT)/boot/grub
+	@cp grub.cfg $(BOOTROOT)/boot/grub/
+
+	@grub-mkrescue -o $@ $(BOOTROOT) || grub2-mkrescue -o $@ $(BOOTROOT)
+
+# --- Phony ---------------------------------------------- #
+
+.PHONY: all
 all: $(BOOTDISK)
 
+.PHONY: run
+run: $(BOOTDISK)
+	@echo [QEMU] $^
+	@$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || $(QEMU) -cdrom $^ -m 256M -serial mon:stdio
+
+.PHONY: clean
 clean:
 	rm -rf $(BUILD_DIRECTORY)
-	find coreutils/ -name "*.o" -delete
-	find libraries/ -name "*.o" -delete
-	find kernel/ -name "*.o" -delete
 
-run: $(BOOTDISK)
-	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
-	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio
-
-run-headless: $(BOOTDISK)
-	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -nographic -enable-kvm  || \
-	$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -nographic
-
-debug: $(BOOTDISK)
-	$(QEMU) -s -S -cdrom $^ -m 256M -serial mon:stdio -enable-kvm  || \
-	$(QEMU) -s -S -cdrom $^ -m 256M -serial mon:stdio &
-
-	gdb -x gdbinit
-
-list:
-	@echo "$(KERNEL_SSOURCES)"
-
-# --- Libaries --------------------------------------------------------------- #
-
-$(ROOT_DIRECTORY)/lib/crt0.o: libraries/crt0.s
-	$(DIRECTORY_GUARD)
-	$(AS) $(ASFLAGS) -o $@ $^
-
-$(ROOT_DIRECTORY)/lib/crti.o: libraries/crti.s
-	$(DIRECTORY_GUARD)
-	$(AS) $(ASFLAGS) -o $@ $^
-
-$(ROOT_DIRECTORY)/lib/crtn.o: libraries/crtn.s
-	$(DIRECTORY_GUARD)
-	$(AS) $(ASFLAGS) -o $@ $^
-
-$(LIBCONSOLE): $(LIBCONSOLE_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBDEVICE): $(LIBCONSOLE_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBFILE): $(LIBFILE_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBWIDGET): $(LIBWIDGET_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBGRAPHIC): $(LIBGRAPHIC_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBMATH): $(LIBMATH_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBCOMPAT): $(LIBCOMPAT_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-$(LIBSYSTEM): $(LIBSYSTEM_OBJ)
-	$(DIRECTORY_GUARD)
-	$(AR) $(ARFLAGS) $@ $^
-
-# --- Applications ------------------------------------------------------------ #
-
-$(ROOT_DIRECTORY)/bin/terminal: $(wildcard applications/terminal/*.c) $(LIBTERMINAL) $(LIBWIDGET) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/terminal/*.c) -o $@ -lterminal -lwidget -lgraphic
-
-$(ROOT_DIRECTORY)/bin/shell: $(wildcard applications/shell/*.c) $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/shell/*.c) -o $@
-
-$(ROOT_DIRECTORY)/bin/compositor: $(wildcard applications/compositor/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/compositor/*.c) -o $@ -lgraphic
-
-$(ROOT_DIRECTORY)/bin/image-viewer: $(wildcard applications/image-viewer/*.c) $(LIBSYSTEM) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/image-viewer/*.c) -o $@ -lgraphic
-
-$(ROOT_DIRECTORY)/bin/widget-factory: $(wildcard applications/widget-factory/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/widget-factory/*.c) -o $@ -lwidget -lgraphic
-
-$(ROOT_DIRECTORY)/bin/panel: $(wildcard applications/panel/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/panel/*.c) -o $@ -lwidget -lgraphic
-
-$(ROOT_DIRECTORY)/bin/demo: $(wildcard applications/demo/*.c) $(LIBSYSTEM) $(LIBWIDGET) $(LIBGRAPHIC) $(LIBMATH) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $(wildcard applications/demo/*.c) -o $@ -lwidget -lgraphic -lmath
-
-# --- Coreutils -------------------------------------------------------------- #
-
-$(ROOT_DIRECTORY)/bin/__testargs: coreutils/__testargs.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/__testexec: coreutils/__testexec.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/__testposix: coreutils/__testposix.c $(LIBSYSTEM) $(LIBCOMPAT) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lcompat
-
-$(ROOT_DIRECTORY)/bin/__testterm: coreutils/__testterm.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/cat: coreutils/cat.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/clear: coreutils/clear.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/dstart: coreutils/dstart.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/echo: coreutils/echo.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/displayctl: coreutils/displayctl.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/grep: coreutils/grep.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/init: coreutils/init.c $(LIBGRAPHIC) $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@ -lgraphic
-
-$(ROOT_DIRECTORY)/bin/kill: coreutils/kill.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/keyboardctl: coreutils/keyboardctl.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/ls: coreutils/ls.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/lsproc: coreutils/lsproc.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/mkdir: coreutils/mkdir.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/mv: coreutils/mv.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/now: coreutils/now.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/panic: coreutils/panic.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/sysfetch: coreutils/sysfetch.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/touch: coreutils/touch.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(ROOT_DIRECTORY)/bin/unlink: coreutils/unlink.c $(LIBSYSTEM) $(CRTS)
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) $< -o $@
-
-# --- Kernel ----------------------------------------------------------------- #
-
-%.c.kernel.o: %.c
-	$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $^
-
-%.s.kernel.o: %.s
-	$(AS) $(ASFLAGS) $^ -o $@
-
-$(KERNEL): $(KERNEL_OBJECT)
-	$(DIRECTORY_GUARD)
-	$(LD) $(LDFLAGS) -T kernel/link.ld -o $@ $(KERNEL_OBJECT)
-
-# --- resources ------------------------------------------------------------- #
-
-WALLPAPERS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/wallpaper/*.png}}
-
-ICONS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/icon/*.png}}
-
-CURSOR = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/mouse/*.png}}
-
-FONTS_GLYPHS = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.glyph,${wildcard resources/font/*.json}}
-FONTS_PNGS = ${patsubst resources/%,$(ROOT_DIRECTORY)/res/%,${wildcard resources/font/*.png}}
-
-KEYBOARD = ${patsubst resources/%.json,$(ROOT_DIRECTORY)/res/%.kmap,${wildcard resources/keyboard/*.json}}
-
-resources = $(WALLPAPERS) $(CURSOR) $(KEYBOARD) $(FONTS_GLYPHS) $(FONTS_PNGS) $(ICONS)
-
-$(ROOT_DIRECTORY)/res/font/%.glyph: resources/font/%.json
-	$(DIRECTORY_GUARD)
-	font-compiler.py $^ $@
-
-$(ROOT_DIRECTORY)/res/font/%.png: resources/font/%.png
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-$(ROOT_DIRECTORY)/res/wallpaper/%.png: resources/wallpaper/%.png
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-$(ROOT_DIRECTORY)/res/icon/%.png: resources/icon/%.png
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-
-$(ROOT_DIRECTORY)/res/mouse/%.png: resources/mouse/%.png
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-$(ROOT_DIRECTORY)/res/keyboard/%.kmap: resources/keyboard/%.json
-	$(DIRECTORY_GUARD)
-	kmap-compiler.py $^ $@
-
-# --- Ramdisk ---------------------------------------------------------------- #
-
-$(ROOT_DIRECTORY)/lib/include/%.h: libraries/%.h
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-$(ROOT_DIRECTORY)/lib/include/%.h: libraries/libcompat/%.h
-	$(DIRECTORY_GUARD)
-	cp $^ $@
-
-$(ROOT_DIRECTORY):
-	mkdir -p $(ROOT_DIRECTORY)/bin \
-			 $(ROOT_DIRECTORY)/dev \
-			 $(ROOT_DIRECTORY)/etc \
-			 $(ROOT_DIRECTORY)/lib \
-			 $(ROOT_DIRECTORY)/res \
-			 $(ROOT_DIRECTORY)/run \
-			 $(ROOT_DIRECTORY)/srv \
-			 $(ROOT_DIRECTORY)/usr
-
-$(RAMDISK): $(ROOT_DIRECTORY) $(INCLUDES) $(LIBRARIES) $(COREUTILS) $(APPLICATIONS) $(resources)
-	cd $(ROOT_DIRECTORY); tar -cf $@ *
-
-# --- Bootdisk --------------------------------------------------------------- #
-
-$(BOOT_DIRECTORY): grub.cfg $(KERNEL) $(RAMDISK)
-	mkdir -p $(BOOT_DIRECTORY)/boot/grub
-	cp grub.cfg $(BOOT_DIRECTORY)/boot/grub/
-	cp $(KERNEL) $(BOOT_DIRECTORY)/boot
-	cp $(RAMDISK) $(BOOT_DIRECTORY)/boot
-	touch $(BOOT_DIRECTORY)
-
-$(BOOTDISK): $(BOOT_DIRECTORY)
-	grub-mkrescue -o $@ $(BOOT_DIRECTORY) || \
-	grub2-mkrescue -o $@ $(BOOT_DIRECTORY)
+-include $(OBJECTS:.o=.d)

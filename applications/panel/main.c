@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("skiftOS - " __COMMIT__, 800, 32);
+    Window *window = window_create("Panel", 800, 32);
 
     window_set_border_style(window, WINDOW_BORDER_NONE);
 

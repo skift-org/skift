@@ -1,0 +1,3 @@
+LIBS += SYSTEM
+
+SYSTEM_NAME = system

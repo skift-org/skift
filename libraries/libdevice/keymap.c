@@ -4,7 +4,7 @@
 
 #include <libdevice/keymap.h>
 
-static KeyMapping *keymap_lookup(KeyMap *keymap, Key key)
+KeyMapping *keymap_lookup(KeyMap *keymap, Key key)
 {
     for (int i = 0; i < keymap->mappings_count; i++)
     {

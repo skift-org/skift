@@ -19,8 +19,8 @@ int __kernel_version_patch = 0;
 const char *__kernel_version_codename = "wheat";
 
 /* kernel version format major.minor.patch-codename */
-const char *__kernel_version_format = "%d.%d.%d-%s @ " __COMMIT__;
-const char *__kernel_uname_format = "%s %d.%d.%d-%s @ " __COMMIT__;
+const char *__kernel_version_format = "%d.%d.%d-%s";
+const char *__kernel_uname_format = "%s %d.%d.%d-%s";
 
 /* --- Panic screen --------------------------------------------------------- */
 

@@ -1,4 +1,5 @@
 .SUFFIXES:
+.DEFAULT_GOAL := all
 
 PATH := $(shell toolchain/use-it.sh):$(PATH)
 PATH := $(shell toolbox/use-it.sh):$(PATH)

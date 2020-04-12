@@ -9,6 +9,7 @@ struct Event;
 struct Painter;
 struct Window;
 
+typedef Point (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
@@ -21,6 +22,11 @@ typedef enum
     LAYOUT_VFLOW,
     LAYOUT_HFLOW,
 } LayoutType;
+
+typedef enum
+{
+    LAYOUT_FILL = 1 << 0,
+} LayoutAttributes;
 
 typedef enum
 {
@@ -47,10 +53,12 @@ typedef struct Widget
     WidgetDestroyCallback destroy;
     WidgetPaintCallback paint;
     WidgetEventCallback event;
+    WidgetComputeSizeCallback size;
 
     struct Widget *parent;
     struct Window *window;
     Layout layout; // FIXME: this shoul be a separeted object
+    LayoutAttributes layout_attributes;
     List *childs;
 } Widget;
 
@@ -80,6 +88,8 @@ void widget_paint(Widget *widget, struct Painter *painter);
 void widget_layout(Widget *widget);
 
 void widget_focus(Widget *widget);
+
+Point widget_compute_size(Widget *widget);
 
 Rectangle __widget_bound(Widget *widget);
 #define widget_bound(__widget) __widget_bound(WIDGET(__widget))

@@ -14,15 +14,26 @@ int main(int argc, char **argv)
     panel_create(window_root(window));
     panel_create(window_root(window));
 
-    Widget *panel = container_create(window_root(window));
+    Widget *panel_hflow = container_create(window_root(window));
     {
-        panel->layout = (Layout){LAYOUT_HGRID, 8, 0};
+        panel_hflow->layout = (Layout){LAYOUT_HFLOW, 8, 0};
 
-        panel_create(panel);
-        panel_create(panel);
-        panel_create(panel);
+        panel_create(panel_hflow);
+        button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
+        button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
+        button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow);
+    }
 
-        button_create(panel, "Hello, world!");
+    Widget *panel_hgrid = container_create(window_root(window));
+    {
+        panel_hgrid->layout = (Layout){LAYOUT_HGRID, 8, 0};
+
+        panel_create(panel_hgrid);
+        panel_create(panel_hgrid);
+        panel_create(panel_hgrid);
+
+        button_create(panel_hgrid, "Hello, world!");
     }
 
     panel_create(window_root(window));

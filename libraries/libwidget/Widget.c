@@ -1,4 +1,5 @@
 #include <libgraphic/Painter.h>
+#include <libmath/MinMax.h>
 #include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
@@ -24,7 +25,7 @@ void widget_initialize(
 {
     widget->classname = classname;
     widget->childs = list_create();
-    widget->bound = RECTANGLE_SIZE(100, 100);
+    widget->bound = RECTANGLE_SIZE(32, 32);
 
     if (parent != NULL)
     {
@@ -80,6 +81,33 @@ void widget_remove_child(Widget *widget, Widget *child)
 
     Event event = {EVENT_CHILD_REMOVED, false};
     widget_dispatch_event(widget, &event);
+}
+
+void widget_dump(Widget *widget, int depth)
+{
+    for (int i = 0; i < depth; i++)
+    {
+        printf("\t");
+    }
+
+    if (widget == NULL)
+    {
+        printf("<null>\n");
+        return;
+    }
+
+    printf("%s(0x%08x) (%d, %d) %dx%d\n",
+           widget->classname,
+           widget,
+           widget->bound.X,
+           widget->bound.Y,
+           widget->bound.width,
+           widget->bound.height);
+
+    list_foreach(Widget, child, widget->childs)
+    {
+        widget_dump(child, depth + 1);
+    }
 }
 
 void widget_dispatch_event(Widget *widget, Event *event)
@@ -158,24 +186,112 @@ void widget_layout(Widget *widget)
 
     case LAYOUT_HFLOW:
     {
+        int fixed_child_count = 0;
+        int fixed_child_total_width = 0;
+
+        int fill_child_count = 0;
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            if (child->layout_attributes & LAYOUT_FILL)
+            {
+                fill_child_count++;
+            }
+            else
+            {
+                fixed_child_count++;
+                fixed_child_total_width += widget_compute_size(child).X;
+            }
+        }
+
+        int usable_space =
+            widget_content_bound(widget).width -
+            layout.hspacing * (list_count(widget->childs) - 1);
+
+        int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
+
+        int fill_child_width = (fill_child_total_width) / MAX(1, fill_child_count);
+
         int current = widget_content_bound(widget).X;
 
         list_foreach(Widget, child, widget->childs)
         {
-            child->bound = RECTANGLE(current, widget_content_bound(widget).position.Y, child->bound.width, widget_content_bound(widget).height);
-            current += child->bound.width + layout.hspacing;
+            if (child->layout_attributes & LAYOUT_FILL)
+            {
+                child->bound = RECTANGLE(
+                    current,
+                    widget_content_bound(widget).position.Y,
+                    fill_child_width,
+                    widget_content_bound(widget).height);
+
+                current += fill_child_width + layout.hspacing;
+            }
+            else
+            {
+                child->bound = RECTANGLE(
+                    current,
+                    widget_content_bound(widget).position.Y,
+                    widget_compute_size(child).X,
+                    widget_content_bound(widget).height);
+
+                current += widget_compute_size(child).X + layout.hspacing;
+            }
         }
     }
     break;
 
     case LAYOUT_VFLOW:
     {
+        int fixed_child_count = 0;
+        int fixed_child_total_height = 0;
+
+        int fill_child_count = 0;
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            if (child->layout_attributes & LAYOUT_FILL)
+            {
+                fill_child_count++;
+            }
+            else
+            {
+                fixed_child_count++;
+                fixed_child_total_height += widget_compute_size(child).Y;
+            }
+        }
+
+        int usable_space =
+            widget_content_bound(widget).height -
+            layout.vspacing * (list_count(widget->childs) - 1);
+
+        int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
+
+        int fill_child_height = (fill_child_total_height) / MAX(1, fill_child_count);
+
         int current = widget_content_bound(widget).Y;
 
         list_foreach(Widget, child, widget->childs)
         {
-            child->bound = RECTANGLE(widget_content_bound(widget).position.X, current, widget_content_bound(widget).width, child->bound.height);
-            current += child->bound.height + layout.vspacing;
+            if (child->layout_attributes & LAYOUT_FILL)
+            {
+                child->bound = RECTANGLE(
+                    widget_content_bound(widget).position.X,
+                    current,
+                    widget_content_bound(widget).width,
+                    fill_child_height);
+
+                current += fill_child_height + layout.vspacing;
+            }
+            else
+            {
+                child->bound = RECTANGLE(
+                    widget_content_bound(widget).position.X,
+                    current,
+                    widget_content_bound(widget).width,
+                    widget_compute_size(child).Y);
+
+                current += widget_compute_size(child).Y + layout.vspacing;
+            }
         }
     }
     break;
@@ -201,30 +317,15 @@ void widget_focus(Widget *widget)
     }
 }
 
-void widget_dump(Widget *widget, int depth)
+Point widget_compute_size(Widget *widget)
 {
-    for (int i = 0; i < depth; i++)
+    if (widget->size)
     {
-        printf("\t");
+        return widget->size(widget);
     }
-
-    if (widget == NULL)
+    else
     {
-        printf("<null>\n");
-        return;
-    }
-
-    printf("%s(0x%08x) (%d, %d) %dx%d\n",
-           widget->classname,
-           widget,
-           widget->bound.X,
-           widget->bound.Y,
-           widget->bound.width,
-           widget->bound.height);
-
-    list_foreach(Widget, child, widget->childs)
-    {
-        widget_dump(child, depth + 1);
+        return (Point){widget->bound.width, widget->bound.height};
     }
 }
 

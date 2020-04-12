@@ -20,6 +20,19 @@ void label_paint(Label *label, Painter *painter)
         THEME_FOREGROUND);
 }
 
+Point label_size(Label *label)
+{
+    return (Point){painter_mesure_string(NULL, widget_font(), label->text), 16};
+}
+
+void label_set_text(Widget *label, const char *text)
+{
+    free(((Label *)label)->text);
+    ((Label *)label)->text = strdup(text);
+
+    widget_update(label);
+}
+
 void label_destroy(Label *label)
 {
     free(label->text);
@@ -33,6 +46,7 @@ Widget *label_create(Widget *parent, const char *text)
 
     WIDGET(label)->paint = (WidgetPaintCallback)label_paint;
     WIDGET(label)->destroy = (WidgetDestroyCallback)label_destroy;
+    WIDGET(label)->size = (WidgetComputeSizeCallback)label_size;
 
     widget_initialize(WIDGET(label), "Label", parent);
 

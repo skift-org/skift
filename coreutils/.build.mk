@@ -10,6 +10,7 @@ UTILS = \
 	ECHO \
 	GREP \
 	INIT \
+	JSON \
 	KEYBOARDCTL \
 	KILL \
 	LS \
@@ -54,6 +55,9 @@ GREP_LIBS =
 
 INIT_NAME = init
 INIT_LIBS =
+
+JSON_NAME = json
+JSON_LIBS = json math
 
 KEYBOARDCTL_NAME = keyboardctl
 KEYBOARDCTL_LIBS =

@@ -218,9 +218,9 @@ $(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))
 
 RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
-RESSOURCES=$(wildcard ressources/*/*)
+RESOURCES=$(wildcard resources/*) $(wildcard resources/*/*)
 
-$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(RESSOURCES)
+$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(RESOURCES)
 	$(DIRECTORY_GUARD)
 
 	@echo [TAR] $@

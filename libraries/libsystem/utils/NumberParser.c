@@ -8,7 +8,7 @@ bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int 
     if (size == 0)
     {
         *result = 0;
-        return true;
+        return false;
     }
 
     unsigned int value = 0;
@@ -23,6 +23,10 @@ bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int 
             {
                 value += j;
             }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -35,7 +39,7 @@ bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
     if (size == 0)
     {
         *result = 0;
-        return true;
+        return false;
     }
 
     bool is_negative = str[0] == '-';

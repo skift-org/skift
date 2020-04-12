@@ -151,7 +151,7 @@ LIBS_ARCHIVES += $$($(1)_ARCHIVE)
 $(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.c
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CC] $$<
-	@$(CC) $(CFLAGS) -c -o $$@ $$<
+	@$(CC) $(CFLAGS) $($(1)_CFLAGS) -c -o $$@ $$<
 
 endef
 

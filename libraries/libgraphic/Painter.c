@@ -73,12 +73,13 @@ void painter_clear_pixel(Painter *painter, Point position, Color color)
     }
 }
 
-__attribute__((optimize("O3"))) void painter_blit_bitmap_fast(
+void painter_blit_bitmap_fast(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,
     Rectangle destination)
 {
+#pragma omp simd
     for (int x = 0; x < destination.width; x++)
     {
         for (int y = 0; y < destination.height; y++)

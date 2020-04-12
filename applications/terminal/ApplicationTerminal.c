@@ -141,8 +141,6 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
         cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
     }
 
-    terminal_widget->cursor_blink = !terminal_widget->cursor_blink;
-
     terminal_widget_render_cell(painter, get_terminal_font(), cx, cy, cell);
 
     painter_pop_origin(painter);
@@ -170,6 +168,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
 void terminal_widget_cursor_callback(TerminalWidget *widget)
 {
     // FIXME: don't update the whole widget juste to repaint the cursor.
+    widget->cursor_blink = !widget->cursor_blink;
     widget_update(WIDGET(widget));
 }
 

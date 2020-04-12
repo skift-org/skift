@@ -45,6 +45,8 @@ int window_framebuffer_handle(Window *window);
 
 Widget *window_root(Window *window);
 
+Widget *window_header(Window *window);
+
 void window_update(Window *window, Rectangle rectangle);
 
 void window_layout(Window *window);

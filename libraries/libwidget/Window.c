@@ -4,8 +4,11 @@
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Event.h>
+#include <libwidget/Label.h>
+#include <libwidget/Panel.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
@@ -16,7 +19,6 @@
 struct Window
 {
     int handle;
-    char *title;
 
     bool focused;
     bool is_dragging;
@@ -31,6 +33,7 @@ struct Window
     List *dirty_rect;
     bool dirty_layout;
 
+    Widget *header_container;
     Widget *root_container;
     Widget *focused_widget;
 
@@ -45,7 +48,6 @@ Window *window_create(const char *title, int width, int height)
 
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
-    window->title = strdup(title);
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
@@ -54,8 +56,23 @@ Window *window_create(const char *title, int width, int height)
     window->on_screen_bound = RECTANGLE_SIZE(width, height);
     window->dirty_rect = list_create();
 
+    window->header_container = container_create(NULL);
+    window->header_container->window = window;
+
+    window_header(window)->layout = (Layout){LAYOUT_HFLOW, 4, 0};
+    window_header(window)->insets = INSETS(0, 2, 8);
+
+    label_create(window_header(window), title);
+
+    container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
+
+    button_create(window_header(window), "-");
+    button_create(window_header(window), "+");
+    button_create(window_header(window), "x");
+
     window->root_container = container_create(NULL);
     window->root_container->window = window;
+
     window->focused_widget = window->root_container;
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
@@ -73,7 +90,6 @@ Window *window_create(const char *title, int width, int height)
 void window_destroy(Window *window)
 {
     widget_destroy(window->root_container);
-    free(window->title);
     painter_destroy(window->painter);
     bitmap_destroy(window->framebuffer);
     application_remove_window(window);
@@ -136,14 +152,17 @@ void window_paint(Window *window, Rectangle rectangle)
             painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_ALT_BORDER);
             painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, -1}), THEME_BORDER);
 
+            if (window_header(window))
+            {
+                widget_paint(window_header(window), window->painter);
+            }
+
             if (window->focused)
             {
-                painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_FOREGROUND);
                 painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
             }
             else
             {
-                painter_draw_string(window->painter, widget_font(), window->title, (Point){16, 20}, THEME_BORDER);
                 painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
             }
         }
@@ -339,6 +358,11 @@ int window_framebuffer_handle(Window *window)
     return window->framebuffer_handle;
 }
 
+Widget *window_header(Window *window)
+{
+    return window->header_container;
+}
+
 Widget *window_root(Window *window)
 {
     return window->root_container;
@@ -383,6 +407,9 @@ merged:
 
 void window_layout_callback(Window *window)
 {
+    window_header(window)->bound = window_header_bound(window);
+    widget_layout(window_header(window));
+
     window_root(window)->bound = window_content_bound(window);
     widget_layout(window_root(window));
 }

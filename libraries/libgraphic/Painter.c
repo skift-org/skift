@@ -225,7 +225,7 @@ void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color
 
 void painter_draw_line_x_aligned(Painter *painter, int x, int start, int end, Color color)
 {
-    for (int i = start; i < end; i++)
+    for (int i = start; i <= end; i++)
     {
         painter_plot_pixel(painter, (Point){x, i}, color);
     }
@@ -233,7 +233,7 @@ void painter_draw_line_x_aligned(Painter *painter, int x, int start, int end, Co
 
 void painter_draw_line_y_aligned(Painter *painter, int y, int start, int end, Color color)
 {
-    for (int i = start; i < end; i++)
+    for (int i = start; i <= end; i++)
     {
         painter_plot_pixel(painter, (Point){i, y}, color);
     }
@@ -284,10 +284,21 @@ void painter_draw_line(Painter *painter, Point a, Point b, Color color)
 
 void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
 {
-    painter_draw_line(painter, rect.position, point_sub(point_add(rect.position, point_x(rect.size)), (Point){1, 0}), color);
-    painter_draw_line(painter, rect.position, point_sub(point_add(rect.position, point_y(rect.size)), (Point){0, 1}), color);
-    painter_draw_line(painter, point_sub(point_add(rect.position, point_x(rect.size)), (Point){1, 0}), point_sub(point_add(rect.position, rect.size), (Point){1, 0}), color);
-    painter_draw_line(painter, point_sub(point_add(rect.position, point_y(rect.size)), (Point){0, 1}), point_sub(point_add(rect.position, rect.size), (Point){0, 1}), color);
+    Point topleft = rect.position;
+    Point topright = point_add(rect.position, point_x(rect.size));
+    topright = point_sub(topright, (Point){1, 0});
+
+    Point bottomleft = point_add(rect.position, point_y(rect.size));
+    bottomleft = point_sub(bottomleft, (Point){0, 1});
+
+    Point bottomright = point_add(rect.position, rect.size);
+    bottomright = point_sub(bottomright, (Point){1, 1});
+
+    painter_draw_line(painter, topleft, topright, color);
+    painter_draw_line(painter, bottomleft, bottomright, color);
+
+    painter_draw_line(painter, point_add(topleft, (Point){0, 1}), point_sub(bottomleft, (Point){0, 1}), color);
+    painter_draw_line(painter, point_add(topright, (Point){0, 1}), point_sub(bottomright, (Point){0, 1}), color);
 }
 
 void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
@@ -341,7 +352,6 @@ void painter_draw_string(Painter *painter, Font *font, const char *str, Point po
 int painter_mesure_string(Painter *painter, Font *font, const char *str)
 {
     __unused(painter);
-    
 
     int width = 0;
 

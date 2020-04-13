@@ -11,7 +11,7 @@ struct Window;
 
 typedef Point (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
-typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter);
+typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
 
 typedef enum
@@ -83,7 +83,7 @@ void widget_dispatch_event(Widget *widget, struct Event *event);
 
 void widget_handle_event(Widget *widget, struct Event *event);
 
-void widget_paint(Widget *widget, struct Painter *painter);
+void widget_paint(Widget *widget, struct Painter *painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
 
@@ -98,3 +98,4 @@ Rectangle __widget_content_bound(Widget *widget);
 #define widget_content_bound(__widget) __widget_content_bound(WIDGET(__widget))
 
 void widget_update(Widget *widget);
+void widget_update_region(Widget *widget, Rectangle region);

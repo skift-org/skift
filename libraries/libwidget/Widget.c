@@ -128,18 +128,21 @@ void widget_handle_event(Widget *widget, Event *event)
     }
 }
 
-void widget_paint(Widget *widget, Painter *painter)
+void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 {
     painter_push_clip(painter, widget_bound(widget));
 
     if (widget->paint)
     {
-        widget->paint(widget, painter);
+        widget->paint(widget, painter, rectangle);
     }
 
     list_foreach(Widget, child, widget->childs)
     {
-        widget_paint(child, painter);
+        if (rectangle_colide(rectangle, child->bound))
+        {
+            widget_paint(child, painter, rectangle);
+        }
     }
 
     painter_pop_clip(painter);
@@ -331,7 +334,18 @@ Point widget_compute_size(Widget *widget)
 
 void widget_update(Widget *widget)
 {
-    window_update(widget->window, widget->bound);
+    if (widget->window)
+    {
+        window_update(widget->window, widget->bound);
+    }
+}
+
+void widget_update_region(Widget *widget, Rectangle bound)
+{
+    if (widget->window)
+    {
+        window_update(widget->window, bound);
+    }
 }
 
 Rectangle __widget_bound(Widget *widget)

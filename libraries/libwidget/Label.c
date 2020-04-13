@@ -5,8 +5,9 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
-void label_paint(Label *label, Painter *painter)
+void label_paint(Label *label, Painter *painter, Rectangle rectangle)
 {
+    __unused(rectangle);
     int text_width = painter_mesure_string(painter, widget_font(), label->text);
 
     painter_draw_string(

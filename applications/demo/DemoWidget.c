@@ -3,8 +3,10 @@
 
 #include "demo/DemoWidget.h"
 
-void demo_widget_paint(DemoWidget *widget, Painter *painter)
+void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle)
 {
+    __unused(rectangle);
+
     if (widget->bitmap == NULL)
     {
         widget->bitmap = bitmap_create(widget_bound(widget).width, widget_bound(widget).height);

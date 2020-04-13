@@ -5,8 +5,10 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
-void button_paint(Button *button, Painter *painter)
+void button_paint(Button *button, Painter *painter, Rectangle rectangle)
 {
+    __unused(rectangle);
+
     if (window_is_focused(WIDGET(button)->window))
     {
         painter_fill_rectangle(painter, widget_bound(button), THEME_ALT_BACKGROUND);

@@ -43,19 +43,19 @@ Font *get_terminal_font(void)
     return font;
 }
 
-Rectangle terminal_widget_cell_bound(int x, int y)
+Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
 {
     Rectangle bound = {};
 
-    bound.position = (Point){x * _cell_size.X, y * (int)(_cell_size.Y)};
+    bound.position = (Point){widget_bound(widget).X + x * _cell_size.X, widget_bound(widget).Y + y * (int)(_cell_size.Y)};
     bound.size = (Point){_cell_size.X, (_cell_size.Y)};
 
     return bound;
 }
 
-void terminal_widget_render_cell(Painter *painter, Font *font, int x, int y, TerminalCell cell)
+void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, Font *font, int x, int y, TerminalCell cell)
 {
-    Rectangle bound = terminal_widget_cell_bound(x, y);
+    Rectangle bound = terminal_widget_cell_bound(widget, x, y);
 
     Codepoint codepoint = cell.codepoint;
 
@@ -113,9 +113,9 @@ void terminal_widget_render_cell(Painter *painter, Font *font, int x, int y, Ter
     }
 }
 
-void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
+void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Rectangle rectangle)
 {
-    painter_push_origin(painter, widget_bound(terminal_widget).position);
+    __unused(rectangle);
 
     Terminal *terminal = terminal_widget->terminal;
 
@@ -125,25 +125,25 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter)
         {
             TerminalCell cell = terminal_cell_at(terminal, x, y);
 
-            terminal_widget_render_cell(painter, get_terminal_font(), x, y, cell);
+            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), x, y, cell);
             terminal_cell_undirty(terminal, x, y);
         }
     }
 
-    TerminalCell cell = terminal_cell_at(terminal, terminal->cursor.x, terminal->cursor.y);
-
     int cx = terminal->cursor.x;
     int cy = terminal->cursor.y;
-
-    if (terminal_widget->cursor_blink)
+    if (rectangle_colide(terminal_widget_cell_bound(terminal_widget, cx, cy), rectangle))
     {
-        cell.attributes.inverted = true;
-        cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+        TerminalCell cell = terminal_cell_at(terminal, cx, cy);
+
+        if (terminal_widget->cursor_blink)
+        {
+            cell.attributes.inverted = true;
+            cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+        }
+
+        terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
     }
-
-    terminal_widget_render_cell(painter, get_terminal_font(), cx, cy, cell);
-
-    painter_pop_origin(painter);
 }
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
@@ -169,7 +169,10 @@ void terminal_widget_cursor_callback(TerminalWidget *widget)
 {
     // FIXME: don't update the whole widget juste to repaint the cursor.
     widget->cursor_blink = !widget->cursor_blink;
-    widget_update(WIDGET(widget));
+
+    int cx = widget->terminal->cursor.x;
+    int cy = widget->terminal->cursor.y;
+    widget_update_region(WIDGET(widget), terminal_widget_cell_bound(widget, cx, cy));
 }
 
 void terminal_widget_renderer_create(TerminalWidget *terminal_widget)

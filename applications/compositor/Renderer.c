@@ -8,26 +8,38 @@
 static Framebuffer *_framebuffer;
 static Painter *_painter;
 static Bitmap *_wallpaper;
-static Rectangle _dirty;
+
+static List *_dirty_regions = NULL;
 
 void renderer_initialize(void)
 {
     _framebuffer = framebuffer_open();
     _painter = _framebuffer->painter;
     _wallpaper = bitmap_load_from("/res/wallpaper/paint.png");
+    _dirty_regions = list_create();
 
     renderer_region_dirty(framebuffer_bound(_framebuffer));
 }
 
-void renderer_region_dirty(Rectangle region)
+void renderer_region_dirty(Rectangle new_region)
 {
-    if (rectangle_is_empty(_dirty))
+    bool merged = false;
+
+    list_foreach(Rectangle, region, _dirty_regions)
     {
-        _dirty = region;
+        if (rectangle_colide(*region, new_region))
+        {
+            *region = rectangle_merge(*region, new_region);
+            merged = true;
+        }
     }
-    else
+
+    if (!merged)
     {
-        _dirty = rectangle_merge(_dirty, region);
+        Rectangle *r = __create(Rectangle);
+        *r = new_region;
+
+        list_pushback(_dirty_regions, r);
     }
 }
 
@@ -47,6 +59,8 @@ void renderer_region(Rectangle region)
         }
     }
 
+    //painter_draw_rectangle(_painter, region, COLOR_RED);
+
     framebuffer_mark_dirty(_framebuffer, region);
 }
 
@@ -57,19 +71,18 @@ Rectangle renderer_bound(void)
 
 void renderer_repaint_dirty(void)
 {
-    if (!rectangle_is_empty(_dirty))
+    list_foreach(Rectangle, region, _dirty_regions)
     {
-        renderer_region(_dirty);
+        renderer_region(*region);
 
-        if (rectangle_colide(_dirty, cursor_bound()))
+        if (rectangle_colide(*region, cursor_bound()))
         {
             renderer_region(cursor_bound());
 
             cursor_render(_painter);
         }
-
-        _dirty = RECTANGLE_EMPTY;
-
-        framebuffer_blit_dirty(_framebuffer);
     }
+
+    framebuffer_blit_dirty(_framebuffer);
+    list_clear_with_callback(_dirty_regions, free);
 }

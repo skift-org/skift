@@ -127,7 +127,7 @@ void window_paint(Window *window, Rectangle rectangle)
     {
         if (window_root(window))
         {
-            widget_paint(window_root(window), window->painter);
+            widget_paint(window_root(window), window->painter, rectangle);
         }
     }
     else
@@ -135,7 +135,7 @@ void window_paint(Window *window, Rectangle rectangle)
 
         if (window_root(window))
         {
-            widget_paint(window_root(window), window->painter);
+            widget_paint(window_root(window), window->painter, rectangle);
         }
 
         if (window->border != WINDOW_BORDER_NONE)
@@ -154,7 +154,7 @@ void window_paint(Window *window, Rectangle rectangle)
 
             if (window_header(window))
             {
-                widget_paint(window_header(window), window->painter);
+                widget_paint(window_header(window), window->painter, rectangle);
             }
 
             if (window->focused)

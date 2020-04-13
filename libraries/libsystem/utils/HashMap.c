@@ -142,7 +142,7 @@ bool hashmap_put(HashMap *hashmap, const void *key, void *value)
 
 void *hashmap_get(HashMap *hashmap, const void *key)
 {
-    return hashmap_find_item(hashmap, key);
+    return hashmap_find_item(hashmap, key)->value;
 }
 
 bool hashmap_has(HashMap *hashmap, const void *key)

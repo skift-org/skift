@@ -31,7 +31,7 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter)
         painter_draw_string(widget->painter, widget_font(), widget->demo->name, (Point){8, 16}, COLOR_WHITE);
     }
 
-    painter_blit_bitmap(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_bound(widget));
+    painter_blit_bitmap_no_alpha(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_bound(widget));
 }
 
 void demo_widget_on_timer_tick(DemoWidget *widget)
@@ -62,7 +62,7 @@ Widget *demo_widget_create(Widget *parent)
     WIDGET(widget)->paint = (WidgetPaintCallback)demo_widget_paint;
 
     widget->demo = NULL;
-    widget->timer = timer_create(widget, 1000 / 30, (TimerCallback)demo_widget_on_timer_tick);
+    widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
     timer_start(widget->timer);
 
     return WIDGET(widget);

@@ -42,12 +42,22 @@ static inline void bitmap_set_pixel(Bitmap *bitmap, Point p, Color color)
         bitmap->pixels[(int)(p.X + p.Y * bitmap->width)] = color;
 }
 
+static inline void bitmap_set_pixel_no_check(Bitmap *bitmap, Point position, Color color)
+{
+    bitmap->pixels[(int)(position.X + position.Y * bitmap->width)] = color;
+}
+
 static inline Color bitmap_get_pixel(Bitmap *bitmap, Point p)
 {
     int xi = abs((int)p.X % bitmap->width);
     int yi = abs((int)p.Y % bitmap->height);
 
     return bitmap->pixels[xi + yi * bitmap->width];
+}
+
+static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Point position)
+{
+    return bitmap->pixels[position.X + position.Y * bitmap->width];
 }
 
 static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, float x, float y)
@@ -81,4 +91,10 @@ static inline void bitmap_blend_pixel(Bitmap *bitmap, Point p, Color color)
 {
     Color bg = bitmap_get_pixel(bitmap, p);
     bitmap_set_pixel(bitmap, p, color_blend(color, bg));
+}
+
+static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Point p, Color color)
+{
+    Color bg = bitmap_get_pixel_no_check(bitmap, p);
+    bitmap_set_pixel_no_check(bitmap, p, color_blend(color, bg));
 }

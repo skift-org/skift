@@ -53,6 +53,26 @@ void painter_pop_origin(Painter *painter)
     painter->originestack_top--;
 }
 
+Rectangle painter_apply_clip(Painter *painter, Rectangle rectangle)
+{
+    if (rectangle_colide(painter->clipstack[painter->clipstack_top], rectangle))
+    {
+        rectangle = rectangle_clip(painter->clipstack[painter->clipstack_top], rectangle);
+        rectangle = rectangle_clip(bitmap_bound(painter->bitmap), rectangle);
+
+        return rectangle;
+    }
+    else
+    {
+        return RECTANGLE_EMPTY;
+    }
+}
+
+Rectangle painter_apply_transform(Painter *painter, Rectangle rectangle)
+{
+    return rectangle_offset(rectangle, painter->originestack[painter->originestack_top]);
+}
+
 void painter_plot_pixel(Painter *painter, Point position, Color color)
 {
     Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
@@ -79,13 +99,23 @@ void painter_blit_bitmap_fast(
     Rectangle source,
     Rectangle destination)
 {
-#pragma omp simd
-    for (int x = 0; x < destination.width; x++)
+    Rectangle clipped_destination = painter_apply_transform(painter, destination);
+    clipped_destination = painter_apply_clip(painter, clipped_destination);
+
+    Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
+    clipped_source.position = point_add(source.position, point_sub(clipped_destination.position, destination.position));
+
+    if (rectangle_is_empty(destination))
     {
-        for (int y = 0; y < destination.height; y++)
+        return;
+    }
+
+    for (int x = 0; x < clipped_destination.width; x++)
+    {
+        for (int y = 0; y < clipped_destination.height; y++)
         {
-            Color sample = bitmap_get_pixel(bitmap, (Point){source.X + x, source.Y + y});
-            painter_plot_pixel(painter, point_add(destination.position, (Point){x, y}), sample);
+            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.X + x, clipped_source.Y + y});
+            bitmap_blend_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
         }
     }
 }
@@ -126,35 +156,109 @@ void painter_blit_bitmap(
     }
 }
 
+void painter_blit_bitmap_fast_no_alpha(
+    Painter *painter,
+    Bitmap *bitmap,
+    Rectangle source,
+    Rectangle destination)
+{
+    Rectangle clipped_destination = painter_apply_transform(painter, destination);
+    clipped_destination = painter_apply_clip(painter, clipped_destination);
+
+    Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
+    clipped_source.position = point_add(source.position, point_sub(clipped_destination.position, destination.position));
+
+    if (rectangle_is_empty(destination))
+    {
+        return;
+    }
+
+    for (int x = 0; x < clipped_destination.width; x++)
+    {
+        for (int y = 0; y < clipped_destination.height; y++)
+        {
+            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.X + x, clipped_source.Y + y});
+            bitmap_blend_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
+        }
+    }
+}
+
+void painter_blit_bitmap_scaled_no_alpha(
+    Painter *painter,
+    Bitmap *bitmap,
+    Rectangle source,
+    Rectangle destination)
+{
+    for (int x = 0; x < destination.width; x++)
+    {
+        for (int y = 0; y < destination.height; y++)
+        {
+            float xx = x / (float)destination.width;
+            float yy = y / (float)destination.height;
+
+            Color sample = bitmap_sample(bitmap, source, xx, yy);
+            painter_plot_pixel(painter, point_add(destination.position, (Point){x, y}), sample);
+        }
+    }
+}
+
+void painter_blit_bitmap_no_alpha(
+    Painter *painter,
+    Bitmap *bitmap,
+    Rectangle source,
+    Rectangle destination)
+{
+    if (source.width == destination.width &&
+        source.height == destination.height)
+    {
+        painter_blit_bitmap_fast_no_alpha(painter, bitmap, source, destination);
+    }
+    else
+    {
+        painter_blit_bitmap_scaled_no_alpha(painter, bitmap, source, destination);
+    }
+}
+
 void painter_clear(Painter *painter, Color color)
 {
     painter_clear_rectangle(painter, bitmap_bound(painter->bitmap), color);
 }
 
-void painter_clear_rectangle(Painter *painter, Rectangle rect, Color color)
+void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
-    for (int x = 0; x < rect.width; x++)
+    rectangle = painter_apply_transform(painter, rectangle);
+    rectangle = painter_apply_clip(painter, rectangle);
+
+    if (rectangle_is_empty(rectangle))
     {
-        for (int y = 0; y < rect.height; y++)
+        return;
+    }
+
+    for (int x = 0; x < rectangle.width; x++)
+    {
+        for (int y = 0; y < rectangle.height; y++)
         {
-            painter_clear_pixel(
-                painter,
-                (Point){rect.X + x, rect.Y + y},
-                color);
+            bitmap_set_pixel_no_check(painter->bitmap, (Point){rectangle.X + x, rectangle.Y + y}, color);
         }
     }
 }
 
-void painter_fill_rectangle(Painter *painter, Rectangle rect, Color color)
+void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
-    for (int x = 0; x < rect.width; x++)
+    rectangle = painter_apply_transform(painter, rectangle);
+    rectangle = painter_apply_clip(painter, rectangle);
+
+    if (rectangle_is_empty(rectangle))
     {
-        for (int y = 0; y < rect.height; y++)
+        return;
+    }
+
+    for (int x = 0; x < rectangle.width; x++)
+    {
+        for (int y = 0; y < rectangle.height; y++)
         {
-            painter_plot_pixel(
-                painter,
-                (Point){rect.X + x, rect.Y + y},
-                color);
+            bitmap_blend_pixel_no_check(painter->bitmap, (Point){rectangle.X + x, rectangle.Y + y},
+                                        color);
         }
     }
 }

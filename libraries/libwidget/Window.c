@@ -374,9 +374,10 @@ void window_update_callback(Window *window)
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
         window_paint(window, *rectangle);
+        application_blit_window(window, *rectangle);
     }
+
     list_clear_with_callback(window->dirty_rect, free);
-    application_blit_window(window, window_bound(window));
 }
 
 void window_update(Window *window, Rectangle rectangle)

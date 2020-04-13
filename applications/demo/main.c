@@ -3,7 +3,7 @@
 
 #include "demo/DemoWidget.h"
 
-static int _current_demo = 0;
+static int _current_demo = 3;
 
 static Demo _demos[] = {
     {"Colors", colors_draw},

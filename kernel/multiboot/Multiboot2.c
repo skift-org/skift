@@ -44,6 +44,12 @@ void multiboot2_parse_memory_map(Multiboot *multiboot, struct multiboot_tag_mmap
     {
         assert(multiboot->memory_map_size < MULTIBOOT_MEMORY_MAP_SIZE);
 
+        if ((mmap->addr > UINT32_MAX) ||
+            (mmap->addr + mmap->len > UINT32_MAX))
+        {
+            continue;
+        }
+
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
         {
             multiboot->memory_usable += mmap->len;

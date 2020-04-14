@@ -34,6 +34,12 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
     {
         assert(multiboot->memory_map_size < MULTIBOOT_MEMORY_MAP_SIZE);
 
+        if ((mmap->addr > UINT32_MAX) ||
+            (mmap->addr + mmap->len > UINT32_MAX))
+        {
+            continue;
+        }
+
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
         {
             multiboot->memory_usable += mmap->len;

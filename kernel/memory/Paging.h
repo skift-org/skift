@@ -12,7 +12,11 @@
 #define PAGE_SIZE 0x1000
 #define PAGE_ALIGN(__x) ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
 
-#define PAGE_ALIGN_UP(__x) ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
+#define PAGE_ALIGN_UP(__x)  \
+    ((__x % PAGE_SIZE == 0) \
+         ? (__x)            \
+         : (__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
+
 #define PAGE_ALIGN_DOWN(__x) ((__x) - ((__x) % PAGE_SIZE))
 
 #define IS_PAGE_ALIGN(__x) (__x % PAGE_SIZE == 0)

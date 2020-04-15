@@ -22,4 +22,5 @@ typedef struct
     size_t total_ram;
     size_t used_ram;
     int running_tasks;
+    int cpu_usage;
 } SystemStatus;

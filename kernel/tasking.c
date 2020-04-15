@@ -986,5 +986,5 @@ int sheduler_get_usage(int task_id)
     }
     atomic_end();
 
-    return count;
+    return (count * 100) / SHEDULER_RECORD_COUNT;
 }

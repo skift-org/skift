@@ -1,8 +1,11 @@
 #include <libsystem/cstring.h>
 #include <libsystem/eventloop/Timer.h>
+#include <libsystem/system.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
 #include <libwidget/Label.h>
+
+#include "panel/GraphWidget.h"
 
 void widget_date_and_time_update(Widget *widget)
 {
@@ -11,9 +14,23 @@ void widget_date_and_time_update(Widget *widget)
 
     char buffer[256];
 
-    snprintf(buffer, 256, "%d:%d:%d ", datetime.hour, datetime.minute, datetime.second);
+    snprintf(buffer, 256, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
 
     label_set_text(widget, buffer);
+}
+
+void widget_ram_update(GraphWidget *widget)
+{
+    SystemStatus status = system_get_status();
+
+    graph_widget_record(widget, status.used_ram / (double)status.total_ram);
+}
+
+void widget_cpu_update(GraphWidget *widget)
+{
+    SystemStatus status = system_get_status();
+
+    graph_widget_record(widget, status.cpu_usage / 100.0);
 }
 
 int main(int argc, char **argv)
@@ -30,9 +47,21 @@ int main(int argc, char **argv)
     label_create(window_root(window), "skiftOS");
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
+
+    Widget *graph_container = container_create(window_root(window));
+    graph_container->layout = (Layout){LAYOUT_VGRID, 0, 1};
+
+    Widget *ram_graph = graph_widget_create(graph_container, COLOR_ROYALBLUE);
+    label_create(ram_graph, "RAM");
+
+    Widget *cpu_graph = graph_widget_create(graph_container, COLOR_SEAGREEN);
+    label_create(cpu_graph, "CPU");
+
     label_create(window_root(window), "user");
 
     timer_start(timer_create(widget_date_and_time, 500, (TimerCallback)widget_date_and_time_update));
+    timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
+    timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
     return application_run();
 }

@@ -328,7 +328,19 @@ Point widget_compute_size(Widget *widget)
     }
     else
     {
-        return (Point){widget->bound.width, widget->bound.height};
+
+        int width = widget->bound.width;
+        int height = widget->bound.height;
+
+        list_foreach(Widget, child, widget->childs)
+        {
+            Point child_size = widget_compute_size(child);
+
+            width = MAX(width, child_size.X);
+            height = MAX(height, child_size.Y);
+        }
+
+        return (Point){width, height};
     }
 }
 

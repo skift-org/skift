@@ -97,28 +97,8 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    /***
-    Launchpad *demoLines = launchpad_create("__demolines", "/bin/__demolines");
-    launchpad_launch(demoLines, NULL);
-
-    Launchpad *demo3D = launchpad_create("__democube", "/bin/__democube");
-    launchpad_launch(demo3D, NULL);
-
-    Launchpad *democolors = launchpad_create("__democolors", "/bin/__democolors");
-    launchpad_launch(democolors, NULL);
-
-    Launchpad *demogfx = launchpad_create("__demogfx", "/bin/__demogfx");
-    launchpad_launch(demogfx, NULL);
-    ***/
-
     Launchpad *demogfx = launchpad_create("panel", "/bin/panel");
     launchpad_launch(demogfx, NULL);
-
-    Launchpad *terminal = launchpad_create("terminal", "/bin/terminal");
-    launchpad_launch(terminal, NULL);
-
-    Launchpad *widgets = launchpad_create("widget-factory", "/bin/widget-factory");
-    launchpad_launch(widgets, NULL);
 
     return eventloop_run();
 }

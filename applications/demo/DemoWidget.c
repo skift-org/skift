@@ -44,6 +44,11 @@ void demo_widget_on_timer_tick(DemoWidget *widget)
 
 void demo_widget_set_demo(Widget *widget, Demo *demo)
 {
+    if (((DemoWidget *)widget)->painter)
+    {
+        painter_clear(((DemoWidget *)widget)->painter, COLOR_BLACK);
+    }
+    
     ((DemoWidget *)widget)->demo = demo;
 }
 

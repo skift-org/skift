@@ -3,14 +3,23 @@
 
 #include "demo/DemoWidget.h"
 
-static int _current_demo = 3;
-
 static Demo _demos[] = {
     {"Colors", colors_draw},
     {"Cube", cube_draw},
     {"Graphics", graphics_draw},
     {"Lines", lines_draw},
-    {NULL, NULL}};
+    {NULL, NULL},
+};
+
+Widget *_demo_widget = NULL;
+
+void set_current_demo_callback(Demo *demo, Widget *sender, Event *event)
+{
+    __unused(sender);
+    __unused(event);
+
+    demo_widget_set_demo(_demo_widget, demo);
+}
 
 int main(int argc, char **argv)
 {
@@ -31,15 +40,16 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        button_create(side_bar, _demos[i].name);
+        Widget *demo_button = button_create(side_bar, _demos[i].name);
+        widget_set_event_handler(demo_button, EVENT_MOUSE_BUTTON_PRESS, &_demos[i], (WidgetEventHandlerCallback)set_current_demo_callback);
     }
 
     side_bar->bound.width = 128;
 
-    Widget *demo_widget = demo_widget_create(window_root(main_window));
-    demo_widget->layout_attributes = LAYOUT_FILL;
+    _demo_widget = demo_widget_create(window_root(main_window));
+    _demo_widget->layout_attributes = LAYOUT_FILL;
 
-    demo_widget_set_demo(demo_widget, &_demos[_current_demo]);
+    demo_widget_set_demo(_demo_widget, &_demos[0]);
 
     return application_run();
 }

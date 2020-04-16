@@ -7,6 +7,7 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+
 static Font *_widget_font = NULL;
 Font *widget_font(void)
 {
@@ -112,19 +113,20 @@ void widget_dump(Widget *widget, int depth)
 
 void widget_dispatch_event(Widget *widget, Event *event)
 {
-    widget_handle_event(widget, event);
+    if (widget->event)
+    {
+        widget->event(widget, event);
+    }
+
+    if (!event->accepted && widget->event_handles[event->type].callback != NULL)
+    {
+        event->accepted = true;
+        widget->event_handles[event->type].callback(widget->event_handles[event->type].target, widget, event);
+    }
 
     if (!event->accepted && widget->parent)
     {
         widget_dispatch_event(widget->parent, event);
-    }
-}
-
-void widget_handle_event(Widget *widget, Event *event)
-{
-    if (widget->event)
-    {
-        widget->event(widget, event);
     }
 }
 
@@ -381,4 +383,20 @@ Widget *widget_child_at(Widget *parent, Point position)
     }
 
     return parent;
+}
+
+void widget_set_event_handler(Widget *widget, EventType event, void *target, WidgetEventHandlerCallback callback)
+{
+    assert(event < __EVENT_TYPE_COUNT);
+
+    widget->event_handles[event].target = target;
+    widget->event_handles[event].callback = callback;
+}
+
+void widget_clear_event_handler(Widget *widget, EventType event)
+{
+    assert(event < __EVENT_TYPE_COUNT);
+
+    widget->event_handles[event].target = NULL;
+    widget->event_handles[event].callback = NULL;
 }

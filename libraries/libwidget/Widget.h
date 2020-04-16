@@ -3,6 +3,7 @@
 #include <libgraphic/Font.h>
 #include <libgraphic/Shape.h>
 #include <libsystem/utils/List.h>
+#include <libwidget/Event.h>
 
 struct Widget;
 struct Event;
@@ -13,6 +14,14 @@ typedef Point (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
+
+typedef void (*WidgetEventHandlerCallback)(void *target, struct Widget *sender, struct Event *event);
+
+typedef struct
+{
+    void *target;
+    WidgetEventHandlerCallback callback;
+} WidgetEventHandler;
 
 typedef enum
 {
@@ -55,6 +64,8 @@ typedef struct Widget
     WidgetEventCallback event;
     WidgetComputeSizeCallback size;
 
+    WidgetEventHandler event_handles[__EVENT_TYPE_COUNT];
+
     struct Widget *parent;
     struct Window *window;
     Layout layout; // FIXME: this shoul be a separeted object
@@ -81,13 +92,15 @@ void widget_dump(Widget *widget, int depth);
 
 void widget_dispatch_event(Widget *widget, struct Event *event);
 
-void widget_handle_event(Widget *widget, struct Event *event);
-
 void widget_paint(Widget *widget, struct Painter *painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
 
 void widget_focus(Widget *widget);
+
+void widget_set_event_handler(Widget *widget, EventType event, void *target, WidgetEventHandlerCallback callback);
+
+void widget_clear_event_handler(Widget *widget, EventType event);
 
 Point widget_compute_size(Widget *widget);
 
@@ -100,4 +113,4 @@ Rectangle __widget_content_bound(Widget *widget);
 void widget_update(Widget *widget);
 void widget_update_region(Widget *widget, Rectangle region);
 
-Widget *widget_child_at(Widget* parent, Point position);
+Widget *widget_child_at(Widget *parent, Point position);

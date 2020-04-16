@@ -276,3 +276,14 @@ static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Inse
 
     return borders;
 }
+
+static inline Rectangle rectangle_center_within(Rectangle rectangle, Rectangle container)
+{
+    return (Rectangle){{
+        container.X + container.width / 2 - rectangle.width / 2,
+        container.Y + container.height / 2 - rectangle.height / 2,
+
+        rectangle.width,
+        rectangle.height,
+    }};
+}

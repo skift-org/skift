@@ -7,6 +7,7 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Event.h>
+#include <libwidget/Image.h>
 #include <libwidget/Label.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Theme.h>
@@ -66,9 +67,9 @@ Window *window_create(const char *title, int width, int height)
 
     container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
 
-    button_create(window_header(window), "-");
-    button_create(window_header(window), "+");
-    button_create(window_header(window), "x");
+    image_create(window_header(window), "/res/icon/window-minimize.png");
+    image_create(window_header(window), "/res/icon/window-maximize.png");
+    image_create(window_header(window), "/res/icon/window-close.png");
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;

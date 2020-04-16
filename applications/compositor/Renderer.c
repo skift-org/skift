@@ -15,7 +15,7 @@ void renderer_initialize(void)
 {
     _framebuffer = framebuffer_open();
     _painter = _framebuffer->painter;
-    _wallpaper = bitmap_load_from("/res/wallpaper/paint.png");
+    _wallpaper = bitmap_load_from("/res/wallpaper/mountains.png");
     _dirty_regions = list_create();
 
     renderer_region_dirty(framebuffer_bound(_framebuffer));

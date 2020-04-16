@@ -1,4 +1,6 @@
+#include <libsystem/assert.h>
 #include <libsystem/cstring.h>
+#include <libsystem/logger.h>
 
 #include "compositor/Client.h"
 #include "compositor/Manager.h"
@@ -29,15 +31,15 @@ void window_destroy(Window *window)
 
 void window_send_event(Window *window, Event *event, size_t size)
 {
-    // FIXME: remove the need for malloc.
+    assert(size < 128);
+    char buffer[sizeof(CompositorWindowEvent) + size]; // don't hit me
 
-    CompositorWindowEvent *message = (CompositorWindowEvent *)malloc(sizeof(CompositorWindowEvent) + size);
+    CompositorWindowEvent *message = (CompositorWindowEvent *)buffer;
     message->id = window->id;
 
     memcpy(&message->event, event, size);
 
     client_send_message(window->client, COMPOSITOR_MESSAGE_WINDOW_EVENT, message, sizeof(CompositorWindowEvent) + size);
-    free(message);
 }
 
 Rectangle window_bound(Window *window)
@@ -56,6 +58,9 @@ void window_move(Window *window, Point position)
 
 void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons)
 {
+    position = point_sub(position, window_bound(window).position);
+    old_position = point_sub(old_position, window_bound(window).position);
+
     window_send_event(window,
                       EVENT(
                           MouseEvent,
@@ -105,6 +110,8 @@ void window_handle_mouse_buttons(
     MouseButton buttons,
     Point position)
 {
+    position = point_sub(position, window_bound(window).position);
+
     window_handle_mouse_button(window, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
     window_handle_mouse_button(window, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
     window_handle_mouse_button(window, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);

@@ -99,3 +99,5 @@ Rectangle __widget_content_bound(Widget *widget);
 
 void widget_update(Widget *widget);
 void widget_update_region(Widget *widget, Rectangle region);
+
+Widget *widget_child_at(Widget* parent, Point position);

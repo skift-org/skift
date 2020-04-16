@@ -369,3 +369,16 @@ Rectangle __widget_content_bound(Widget *widget)
 {
     return rectangle_shrink(__widget_bound(widget), widget->insets);
 }
+
+Widget *widget_child_at(Widget *parent, Point position)
+{
+    list_foreach(Widget, child, parent->childs)
+    {
+        if (rectangle_containe_point(widget_bound(child), position))
+        {
+            return widget_child_at(child, position);
+        }
+    }
+
+    return parent;
+}

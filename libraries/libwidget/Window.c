@@ -220,7 +220,7 @@ void window_handle_event(Window *window, Event *event)
         {
             RectangeBorder borders = rectangle_inset_containe_point(
                 rectangle_expand(
-                    window_bound_on_screen(window),
+                    window_bound(window),
                     INSETS(WINDOW_RESIZE_AREA)),
                 INSETS(WINDOW_RESIZE_AREA),
                 mouse_event->position);
@@ -270,10 +270,19 @@ void window_handle_event(Window *window, Event *event)
     {
         MouseEvent *mouse_event = (MouseEvent *)event;
 
-        if (!window->is_dragging &&
-            mouse_event->button == MOUSE_BUTTON_LEFT &&
-            rectangle_containe_point(window_header_bound_on_screen(window), mouse_event->position) &&
-            window->border != WINDOW_BORDER_NONE)
+        if (rectangle_containe_point(widget_bound(window_root(window)), mouse_event->position))
+        {
+            Widget *widget = widget_child_at(window_root(window), mouse_event->position);
+
+            if (widget)
+            {
+                widget_dispatch_event(widget, event);
+            }
+        }
+        else if (!window->is_dragging &&
+                 mouse_event->button == MOUSE_BUTTON_LEFT &&
+                 rectangle_containe_point(window_header_bound(window), mouse_event->position) &&
+                 window->border != WINDOW_BORDER_NONE)
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);

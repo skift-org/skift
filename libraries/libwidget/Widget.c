@@ -36,8 +36,6 @@ void widget_initialize(
 
 void widget_destroy(Widget *widget)
 {
-    logger_info("Destroying %s(%08x)", widget->classname, widget);
-
     if (widget->destroy)
     {
         widget->destroy(widget);

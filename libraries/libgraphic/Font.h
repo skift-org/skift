@@ -30,3 +30,5 @@ void font_destroy(Font *font);
 bool font_has_glyph(Font *font, Codepoint codepoint);
 
 Glyph *font_glyph(Font *font, Codepoint codepoint);
+
+int font_mesure_string(Font *font, const char *str);

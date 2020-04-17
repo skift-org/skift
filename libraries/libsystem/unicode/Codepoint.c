@@ -28,6 +28,42 @@ int codepoint_numeric_value(Codepoint codepoint)
     }
 }
 
+int utf8_to_codepoint(const uint8_t *buffer, Codepoint *codepoint)
+{
+    if ((buffer[0] & 0xf8) == 0xf0)
+    {
+        *codepoint = ((0x07 & buffer[0]) << 18) |
+                     ((0x3f & buffer[1]) << 12) |
+                     ((0x3f & buffer[2]) << 6) |
+                     ((0x3f & buffer[3]));
+
+        return 4;
+    }
+    else if ((buffer[0] & 0xf0) == 0xe0)
+    {
+        *codepoint = ((0x0f & buffer[0]) << 12) |
+                     ((0x3f & buffer[1]) << 6) |
+                     ((0x3f & buffer[2]));
+
+        return 3;
+    }
+    else if ((buffer[0] & 0xe0) == 0xc0)
+    {
+        *codepoint = ((0x1f & buffer[0]) << 6) |
+                     ((0x3f & buffer[1]));
+
+        return 2;
+    }
+    else
+    {
+        *codepoint = buffer[0];
+
+        return 1;
+    }
+
+    return 0;
+}
+
 int codepoint_to_utf8(Codepoint codepoint, uint8_t *buffer)
 {
     if (codepoint <= 0x7F)

@@ -15,7 +15,7 @@ void button_paint(Button *button, Painter *painter, Rectangle rectangle)
     }
     painter_draw_rectangle(painter, widget_bound(button), THEME_BORDER);
 
-    int text_width = painter_mesure_string(painter, widget_font(), button->text);
+    int text_width = font_mesure_string(widget_font(), button->text);
 
     painter_draw_string(
         painter,

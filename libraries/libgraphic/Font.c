@@ -115,7 +115,7 @@ Glyph *font_glyph(Font *font, Codepoint codepoint)
         }
     }
 
-    return NULL;
+    return &font->default_glyph;
 }
 
 int font_measure_width(Font *font, float font_size, const char *str, int str_size)
@@ -128,6 +128,19 @@ int font_measure_width(Font *font, float font_size, const char *str, int str_siz
     {
         Glyph *g = font_glyph(font, str[i]);
         width += g->advance * (font_size / 16.0);
+    }
+
+    return width;
+}
+
+int font_mesure_string(Font *font, const char *str)
+{
+    int width = 0;
+
+    for (size_t i = 0; str[i]; i++)
+    {
+        Glyph *glyph = font_glyph(font, str[i]);
+        width += glyph->advance;
     }
 
     return width;

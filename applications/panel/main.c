@@ -45,9 +45,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(NULL, "Panel", 800, 32);
-
-    window_set_border_style(window, WINDOW_BORDER_NONE);
+    Window *window = window_create(NULL, "Panel", 800, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_root(window)->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     window_root(window)->insets = INSETS(0, 8);

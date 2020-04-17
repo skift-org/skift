@@ -40,10 +40,15 @@ struct Window
 
     Color background;
 
-    WindowBorderStyle border;
+    WindowFlag flags;
 };
 
-Window *window_create(const char *icon, const char *title, int width, int height)
+Window *window_create(
+    const char *icon,
+    const char *title,
+    int width,
+    int height,
+    WindowFlag flags)
 {
     Window *window = __create(Window);
 
@@ -68,8 +73,12 @@ Window *window_create(const char *icon, const char *title, int width, int height
 
     container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
 
-    icon_create(window_header(window), "/res/icon/window-minimize.png");
-    icon_create(window_header(window), "/res/icon/window-maximize.png");
+    if (flags & WINDOW_RESIZABLE)
+    {
+        icon_create(window_header(window), "/res/icon/window-minimize.png");
+        icon_create(window_header(window), "/res/icon/window-maximize.png");
+    }
+
     icon_create(window_header(window), "/res/icon/window-close.png");
 
     window->root_container = container_create(NULL);
@@ -84,7 +93,7 @@ Window *window_create(const char *icon, const char *title, int width, int height
     application_add_window(window);
 
     window->background = THEME_BACKGROUND;
-    window->border = WINDOW_BORDER_SIZABLE;
+    window->flags = flags;
 
     return window;
 }
@@ -111,7 +120,7 @@ Rectangle window_header_bound_on_screen(Window *window)
 
 Rectangle window_content_bound(Window *window)
 {
-    if (window->border == WINDOW_BORDER_NONE)
+    if (window->flags & WINDOW_BORDERLESS)
     {
         return window_bound(window);
     }
@@ -140,7 +149,7 @@ void window_paint(Window *window, Rectangle rectangle)
             widget_paint(window_root(window), window->painter, rectangle);
         }
 
-        if (window->border != WINDOW_BORDER_NONE)
+        if (!(window->flags & WINDOW_BORDERLESS))
         {
             if (window_header(window))
             {
@@ -206,7 +215,7 @@ void window_handle_event(Window *window, Event *event)
             window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
             application_move_window(window, window->on_screen_bound.position);
         }
-        else
+        else if (window->flags & WINDOW_RESIZABLE)
         {
             RectangeBorder borders = rectangle_inset_containe_point(
                 rectangle_expand(
@@ -272,7 +281,7 @@ void window_handle_event(Window *window, Event *event)
         else if (!window->is_dragging &&
                  mouse_event->button == MOUSE_BUTTON_LEFT &&
                  rectangle_containe_point(window_header_bound(window), mouse_event->position) &&
-                 window->border != WINDOW_BORDER_NONE)
+                 !(window->flags & WINDOW_BORDERLESS))
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);
@@ -335,11 +344,6 @@ void window_set_cursor(Window *window, CursorState state)
 void window_set_background(Window *window, Color background)
 {
     window->background = background;
-}
-
-void window_set_border_style(Window *window, WindowBorderStyle border_style)
-{
-    window->border = border_style;
 }
 
 void window_set_focused_widget(Window *window, Widget *widget)
@@ -426,5 +430,12 @@ void window_layout(Window *window)
 
 bool window_is_focused(Window *window)
 {
-    return window->focused;
+    if (window->flags & WINDOW_ALWAYS_FOCUSED)
+    {
+        return true;
+    }
+    else
+    {
+        return window->focused;
+    }
 }

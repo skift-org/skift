@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *main_window = window_create(NULL, "Demos", 500, 400);
+    Window *main_window = window_create(NULL, "Demos", 500, 400, WINDOW_NONE);
 
     window_root(main_window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 

@@ -1,0 +1,23 @@
+{
+    "name": "ayu-dark",
+    "colors": {
+        "background": "#0a0e14",
+        "foreground": "#b3b1ad",
+        "black": "#01060e",
+        "red": "#ea6c73",
+        "green": "#91b362",
+        "yellow": "#f9af4f",
+        "blue": "#53bdfa",
+        "magenta": "#fae994",
+        "cyan": "#90e1c6",
+        "white": "#c7c7c7",
+        "bright_black": "#686868",
+        "bright_red": "#f07178",
+        "bright_green": "#c2d94c",
+        "bright_yellow": "#ffb454",
+        "bright_blue": "#59c2ff",
+        "bright_magenta": "#ffee99",
+        "bright_cyan": "#95e6cb",
+        "bright_white": "#ffffff"
+    }
+}

@@ -5,6 +5,7 @@
 #include "compositor/Window.h"
 
 static List *_managed_windows;
+static Window *_focused_window = NULL;
 
 void manager_initialize(void)
 {
@@ -63,24 +64,23 @@ void manager_unregister_window(Window *window)
 
 void manager_set_focus_window(Window *window)
 {
-    Window *old_focus = manager_focus_window();
-
-    if (old_focus)
+    if (_focused_window)
     {
-        window_lost_focus(old_focus);
+        window_lost_focus(_focused_window);
     }
 
-    list_remove(_managed_windows, window);
-    list_push(_managed_windows, window);
+    _focused_window = window;
 
-    window_get_focus(window);
+    if (_focused_window)
+    {
+        list_remove(_managed_windows, window);
+        list_push(_managed_windows, window);
+
+        window_get_focus(window);
+    }
 }
 
 struct Window *manager_focus_window(void)
 {
-    Window *result = NULL;
-
-    list_peek(_managed_windows, (void **)&result);
-
-    return result;
+    return _focused_window;
 }

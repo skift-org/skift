@@ -79,20 +79,17 @@ void cursor_handle_packet(MousePacket packet)
             window_handle_mouse_move(window_on_focus, _mouse_old_position, _mouse_position, _mouse_buttons);
     }
 
-    if (_mouse_old_buttons != _mouse_buttons)
+    if (_mouse_old_buttons < _mouse_buttons)
     {
-        if (window_under)
+        if (window_under != window_on_focus)
         {
-            if (window_under != window_on_focus)
-            {
-                manager_set_focus_window(window_under);
-                window_on_focus = window_under;
-            }
+            manager_set_focus_window(window_under);
+            window_on_focus = window_under;
         }
-
-        if (window_on_focus)
-            window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
     }
+
+    if (window_on_focus)
+        window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
 }
 
 CursorState cursor_get_state(void)

@@ -322,24 +322,26 @@ void window_handle_event(Window *window, Event *event)
             }
         }
 
-        if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), mouse_event->position))
+        if (!(window->flags & WINDOW_BORDERLESS))
         {
-            Widget *widget = widget_child_at(window_header(window), mouse_event->position);
-
-            if (widget)
+            if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), mouse_event->position))
             {
-                widget_dispatch_event(widget, event);
-            }
-        }
+                Widget *widget = widget_child_at(window_header(window), mouse_event->position);
 
-        if (!event->accepted &&
-            !window->is_dragging &&
-            mouse_event->button == MOUSE_BUTTON_LEFT &&
-            rectangle_containe_point(window_header_bound(window), mouse_event->position) &&
-            !(window->flags & WINDOW_BORDERLESS))
-        {
-            window->is_dragging = true;
-            window_set_cursor(window, CURSOR_MOVE);
+                if (widget)
+                {
+                    widget_dispatch_event(widget, event);
+                }
+            }
+
+            if (!event->accepted &&
+                !window->is_dragging &&
+                mouse_event->button == MOUSE_BUTTON_LEFT &&
+                rectangle_containe_point(window_header_bound(window), mouse_event->position))
+            {
+                window->is_dragging = true;
+                window_set_cursor(window, CURSOR_MOVE);
+            }
         }
 
         break;

@@ -3,6 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
+#include <libwidget/Window.h>
 
 #include "terminal/ApplicationTerminal.h"
 
@@ -136,13 +137,21 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
     {
         TerminalCell cell = terminal_cell_at(terminal, cx, cy);
 
-        if (terminal_widget->cursor_blink)
+        if (window_is_focused(WIDGET(terminal_widget)->window))
         {
-            cell.attributes.inverted = true;
-            cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
-        }
+            if (terminal_widget->cursor_blink)
+            {
+                cell.attributes.inverted = true;
+                cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+            }
 
-        terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
+            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
+        }
+        else
+        {
+            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
+            painter_draw_rectangle(painter, terminal_widget_cell_bound(terminal_widget, cx, cy), COLOR(0xe6c446));
+        }
     }
 }
 

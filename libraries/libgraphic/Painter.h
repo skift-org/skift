@@ -39,6 +39,8 @@ void painter_blit_bitmap(Painter *painter, Bitmap *bitmap, Rectangle source, Rec
 
 void painter_blit_bitmap_no_alpha(Painter *painter, Bitmap *bitmap, Rectangle source, Rectangle destination);
 
+void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color);
+
 void painter_clear(Painter *painter, Color color);
 
 void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color);

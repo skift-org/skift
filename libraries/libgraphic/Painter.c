@@ -413,7 +413,24 @@ void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color
     painter_draw_line(painter, p2, p0, color);
 }
 
-const int FONT_SIZE = 16;
+void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color)
+{
+    for (int x = 0; x < destination.width; x++)
+    {
+        for (int y = 0; y < destination.height; y++)
+        {
+            double xx = x / (double)destination.width;
+            double yy = y / (double)destination.height;
+
+            Color sample = bitmap_sample(icon, bitmap_bound(icon), xx, yy);
+
+            Color final = color;
+            final.A = sample.A;
+
+            painter_plot_pixel(painter, point_add(destination.position, (Point){x, y}), final);
+        }
+    }
+}
 
 void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
 {

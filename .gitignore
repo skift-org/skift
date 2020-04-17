@@ -3,3 +3,5 @@ build/
 toolchain/build/
 toolchain/tarballs/
 toolchain/local/
+
+*.ignored

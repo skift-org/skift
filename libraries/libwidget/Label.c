@@ -10,15 +10,30 @@ void label_paint(Label *label, Painter *painter, Rectangle rectangle)
     __unused(rectangle);
     int text_width = painter_mesure_string(painter, widget_font(), label->text);
 
-    painter_draw_string(
-        painter,
-        widget_font(),
-        label->text,
-        (Point){
-            widget_bound(label).X + widget_bound(label).width / 2 - text_width / 2,
-            widget_bound(label).Y + widget_bound(label).height / 2 + 4,
-        },
-        THEME_FOREGROUND);
+    if (window_is_focused(WIDGET(label)->window))
+    {
+        painter_draw_string(
+            painter,
+            widget_font(),
+            label->text,
+            (Point){
+                widget_bound(label).X + widget_bound(label).width / 2 - text_width / 2,
+                widget_bound(label).Y + widget_bound(label).height / 2 + 4,
+            },
+            THEME_FOREGROUND);
+    }
+    else
+    {
+        painter_draw_string(
+            painter,
+            widget_font(),
+            label->text,
+            (Point){
+                widget_bound(label).X + widget_bound(label).width / 2 - text_width / 2,
+                widget_bound(label).Y + widget_bound(label).height / 2 + 4,
+            },
+            THEME_FOREGROUND_INACTIVE);
+    }
 }
 
 Point label_size(Label *label)

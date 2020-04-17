@@ -4,6 +4,7 @@
 #include <libsystem/system.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
+#include <libwidget/Icon.h>
 #include <libwidget/Label.h>
 
 #include "panel/GraphWidget.h"
@@ -44,15 +45,17 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("Panel", 800, 32);
+    Window *window = window_create(NULL, "Panel", 800, 32);
 
     window_set_border_style(window, WINDOW_BORDER_NONE);
 
     window_root(window)->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     window_root(window)->insets = INSETS(0, 8);
 
-    Widget *brand = label_create(window_root(window), "skiftOS");
-    widget_set_event_handler(brand, EVENT_MOUSE_BUTTON_PRESS, NULL, show_terminal);
+    Widget *menu = icon_create(window_root(window), "/res/icon/menu.png");
+    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_PRESS, NULL, show_terminal);
+
+    label_create(window_root(window), "skiftOS");
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;

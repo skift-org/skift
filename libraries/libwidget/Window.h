@@ -15,7 +15,7 @@ typedef enum
 
 typedef struct Window Window;
 
-Window *window_create(const char *title, int width, int height);
+Window *window_create(const char *icon, const char *title, int width, int height);
 
 void window_destroy(Window *window);
 

@@ -7,7 +7,7 @@
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Event.h>
-#include <libwidget/Image.h>
+#include <libwidget/Icon.h>
 #include <libwidget/Label.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Theme.h>
@@ -43,7 +43,7 @@ struct Window
     WindowBorderStyle border;
 };
 
-Window *window_create(const char *title, int width, int height)
+Window *window_create(const char *icon, const char *title, int width, int height)
 {
     Window *window = __create(Window);
 
@@ -63,13 +63,14 @@ Window *window_create(const char *title, int width, int height)
     window_header(window)->layout = (Layout){LAYOUT_HFLOW, 4, 0};
     window_header(window)->insets = INSETS(0, 2, 8);
 
+    icon_create(window_header(window), icon ? icon : "/res/icon/window.png");
     label_create(window_header(window), title);
 
     container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
 
-    image_create(window_header(window), "/res/icon/window-minimize.png");
-    image_create(window_header(window), "/res/icon/window-maximize.png");
-    image_create(window_header(window), "/res/icon/window-close.png");
+    icon_create(window_header(window), "/res/icon/window-minimize.png");
+    icon_create(window_header(window), "/res/icon/window-maximize.png");
+    icon_create(window_header(window), "/res/icon/window-close.png");
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;

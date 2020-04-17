@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("About - skiftOS", 250, 250);
+    Window *window = window_create("/res/icon/info.png", "About", 250, 250);
 
     window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
 

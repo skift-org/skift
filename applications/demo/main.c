@@ -30,11 +30,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *main_window = window_create(NULL, "Demos", 500, 400, WINDOW_NONE);
+    Window *window = window_create(NULL, "Demos", 500, 400, WINDOW_NONE);
 
-    window_root(main_window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
-    Widget *side_bar = container_create(window_root(main_window));
+    Widget *side_bar = container_create(window_root(window));
     side_bar->insets = INSETS(4, 0);
     side_bar->layout = (Layout){LAYOUT_HGRID, 4, 0};
 
@@ -46,10 +46,12 @@ int main(int argc, char **argv)
 
     side_bar->bound.width = 128;
 
-    _demo_widget = demo_widget_create(window_root(main_window));
+    _demo_widget = demo_widget_create(window_root(window));
     _demo_widget->layout_attributes = LAYOUT_FILL;
 
     demo_widget_set_demo(_demo_widget, &_demos[0]);
+
+    window_show(window);
 
     return application_run();
 }

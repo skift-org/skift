@@ -89,6 +89,8 @@ int application_run(void)
     assert(_initialized);
     assert(!_running);
 
+    _running = true;
+
     return eventloop_run();
 }
 
@@ -96,6 +98,13 @@ void application_exit(int exit_value)
 {
     assert(_initialized);
     assert(_running);
+
+    Window *window = NULL;
+
+    while (list_peek(_windows, (void **)&window))
+    {
+        window_destroy(window);
+    }
 
     eventloop_exit(exit_value);
 }
@@ -124,6 +133,14 @@ void application_add_window(Window *window)
 {
     assert(_initialized);
 
+    list_pushback(_windows, window);
+}
+
+void application_show_window(Window *window)
+{
+    assert(_initialized);
+    assert(list_contains(_windows, window));
+
     CompositorCreateWindowMessage message = {
         .id = window_handle(window),
         .framebuffer = window_framebuffer_handle(window),
@@ -131,19 +148,35 @@ void application_add_window(Window *window)
     };
 
     application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));
-
-    list_pushback(_windows, window);
 }
 
-void application_remove_window(Window *window)
+void application_hide_window(Window *window)
 {
     assert(_initialized);
+    assert(list_contains(_windows, window));
 
     CompositorDestroyWindowMessage message = {
         .id = window_handle(window),
     };
 
     application_send_message(COMPOSITOR_MESSAGE_DESTROY_WINDOW, &message, sizeof(CompositorDestroyWindowMessage));
+
+    bool should_application_close = false;
+
+    list_foreach(Window, window, _windows)
+    {
+        should_application_close |= !window_is_visible(window);
+    }
+
+    if (should_application_close)
+    {
+        application_exit(0);
+    }
+}
+
+void application_remove_window(Window *window)
+{
+    assert(_initialized);
 
     list_remove(_windows, window);
 }

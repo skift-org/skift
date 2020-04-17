@@ -24,6 +24,12 @@ Window *window_create(
 
 void window_destroy(Window *window);
 
+void window_show(Window *window);
+
+void window_hide(Window *window);
+
+bool window_is_visible(Window *window);
+
 void window_paint(Window *window, Rectangle rectangle);
 
 void window_dump(Window *window);

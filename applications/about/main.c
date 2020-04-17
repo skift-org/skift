@@ -5,6 +5,14 @@
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
 
+void ok_button_pressed(void *target, Widget *sender, Event *event)
+{
+    __unused(target);
+    __unused(event);
+
+    window_hide(sender->window);
+}
+
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
@@ -20,9 +28,13 @@ int main(int argc, char **argv)
 
     label_create(button_and_text, "The skift operating system.");
     label_create(button_and_text, __BUILD_GITREF__ "/" __BUILD_CONFIG__);
-    label_create(button_and_text, "Copyright (c) 2018-2020 N. Van Bossuyt.");
+    label_create(button_and_text, "Copyright © 2018-2020 N. Van Bossuyt.");
 
-    button_create(button_and_text, "Ok");
+    Widget *ok_buton = button_create(button_and_text, "Ok");
+
+    widget_set_event_handler(ok_buton, EVENT_MOUSE_BUTTON_PRESS, NULL, ok_button_pressed);
+
+    window_show(window);
 
     return application_run();
 }

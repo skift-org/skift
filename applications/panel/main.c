@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(NULL, "Panel", 800, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = window_create(NULL, "Panel", 1024, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_root(window)->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     window_root(window)->insets = INSETS(0, 8);
@@ -72,6 +72,8 @@ int main(int argc, char **argv)
     timer_start(timer_create(widget_date_and_time, 500, (TimerCallback)widget_date_and_time_update));
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
+
+    window_show(window);
 
     return application_run();
 }

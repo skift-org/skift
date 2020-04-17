@@ -39,6 +39,8 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         if (window)
         {
+            shared_memory_free((uintptr_t)window->framebuffer);
+            window->framebuffer = NULL;
             window_destroy(window);
         }
         else

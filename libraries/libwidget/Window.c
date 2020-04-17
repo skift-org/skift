@@ -23,6 +23,7 @@ struct Window
 
     bool focused;
     bool is_dragging;
+    bool visible;
 
     Rectangle on_screen_bound;
     CursorState cursor_state;
@@ -42,6 +43,14 @@ struct Window
 
     WindowFlag flags;
 };
+
+void close_button_click(void *target, struct Widget *sender, struct Event *event)
+{
+    __unused(target);
+    __unused(event);
+
+    window_hide(sender->window);
+}
 
 Window *window_create(
     const char *icon,
@@ -79,7 +88,8 @@ Window *window_create(
         icon_create(window_header(window), "/res/icon/window-maximize.png");
     }
 
-    icon_create(window_header(window), "/res/icon/window-close.png");
+    Widget *close_button = icon_create(window_header(window), "/res/icon/window-close.png");
+    widget_set_event_handler(close_button, EVENT_MOUSE_BUTTON_PRESS, NULL, close_button_click);
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;
@@ -88,24 +98,58 @@ Window *window_create(
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
-    window_layout(window);
-    window_update(window, window_bound(window));
-    application_add_window(window);
-
     window->background = THEME_BACKGROUND;
     window->flags = flags;
+
+    application_add_window(window);
 
     return window;
 }
 
 void window_destroy(Window *window)
 {
+    if (window->visible)
+    {
+        window_hide(window);
+    }
+
+    application_remove_window(window);
+
     widget_destroy(window->root_container);
+    widget_destroy(window->header_container);
+
     painter_destroy(window->painter);
     bitmap_destroy(window->framebuffer);
-    application_remove_window(window);
+
     list_destroy_with_callback(window->dirty_rect, free);
+
     free(window);
+}
+
+bool window_is_visible(Window *window)
+{
+    return window->visible;
+}
+
+void window_show(Window *window)
+{
+    if (window->visible)
+        return;
+
+    window->visible = true;
+
+    window_layout(window);
+    window_update(window, window_bound(window));
+    application_show_window(window);
+}
+
+void window_hide(Window *window)
+{
+    if (!window->visible)
+        return;
+
+    window->visible = false;
+    application_hide_window(window);
 }
 
 Rectangle window_header_bound(Window *window)
@@ -143,7 +187,6 @@ void window_paint(Window *window, Rectangle rectangle)
     }
     else
     {
-
         if (window_root(window))
         {
             widget_paint(window_root(window), window->painter, rectangle);
@@ -278,10 +321,22 @@ void window_handle_event(Window *window, Event *event)
                 widget_dispatch_event(widget, event);
             }
         }
-        else if (!window->is_dragging &&
-                 mouse_event->button == MOUSE_BUTTON_LEFT &&
-                 rectangle_containe_point(window_header_bound(window), mouse_event->position) &&
-                 !(window->flags & WINDOW_BORDERLESS))
+
+        if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), mouse_event->position))
+        {
+            Widget *widget = widget_child_at(window_header(window), mouse_event->position);
+
+            if (widget)
+            {
+                widget_dispatch_event(widget, event);
+            }
+        }
+
+        if (!event->accepted &&
+            !window->is_dragging &&
+            mouse_event->button == MOUSE_BUTTON_LEFT &&
+            rectangle_containe_point(window_header_bound(window), mouse_event->position) &&
+            !(window->flags & WINDOW_BORDERLESS))
         {
             window->is_dragging = true;
             window_set_cursor(window, CURSOR_MOVE);
@@ -385,6 +440,9 @@ void window_update_callback(Window *window)
 
 void window_update(Window *window, Rectangle rectangle)
 {
+    if (!window->visible)
+        return;
+
     if (list_count(window->dirty_rect) == 0)
     {
         eventloop_run_later((RunLaterCallback)window_update_callback, window);
@@ -420,7 +478,7 @@ void window_layout_callback(Window *window)
 
 void window_layout(Window *window)
 {
-    if (window->dirty_layout)
+    if (window->dirty_layout || !window->visible)
         return;
 
     window->dirty_layout = true;

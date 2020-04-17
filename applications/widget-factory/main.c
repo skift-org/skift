@@ -38,5 +38,7 @@ int main(int argc, char **argv)
 
     panel_create(window_root(window));
 
+    window_show(window);
+
     return application_run();
 }

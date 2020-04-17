@@ -384,7 +384,7 @@ bool framebuffer_initialize(void)
         lock_init(backbuffer_stack_lock);
         backbuffer_stack = list_create();
 
-        framebuffer_set_mode_bga(800, 600);
+        framebuffer_set_mode_bga(1024, 768);
 
         FsNode *framebuffer_device = __create(FsNode);
         fsnode_init(framebuffer_device, FILE_TYPE_DEVICE);

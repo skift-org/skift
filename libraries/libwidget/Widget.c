@@ -7,7 +7,6 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
-
 static Font *_widget_font = NULL;
 Font *widget_font(void)
 {
@@ -56,6 +55,14 @@ void widget_destroy(Widget *widget)
     free(widget);
 }
 
+void widget_invalidate_layout(Widget *widget)
+{
+    if (widget->window)
+    {
+        window_layout(widget->window);
+    }
+}
+
 void widget_add_child(Widget *widget, Widget *child)
 {
     assert(child->parent == NULL);
@@ -64,7 +71,7 @@ void widget_add_child(Widget *widget, Widget *child)
     child->window = widget->window;
     list_pushback(widget->childs, child);
 
-    window_layout(widget->window);
+    widget_invalidate_layout(widget);
 
     Event event = {EVENT_CHILD_ADDED, false};
     widget_dispatch_event(widget, &event);
@@ -78,7 +85,7 @@ void widget_remove_child(Widget *widget, Widget *child)
     child->window = NULL;
     list_remove(widget->childs, child);
 
-    window_layout(widget->window);
+    widget_invalidate_layout(widget);
 
     Event event = {EVENT_CHILD_REMOVED, false};
     widget_dispatch_event(widget, &event);

@@ -142,18 +142,6 @@ void window_paint(Window *window, Rectangle rectangle)
 
         if (window->border != WINDOW_BORDER_NONE)
         {
-            if (window->focused)
-            {
-                painter_fill_rectangle(window->painter, window_header_bound(window), THEME_ALT_BACKGROUND);
-            }
-            else
-            {
-                painter_fill_rectangle(window->painter, window_header_bound(window), THEME_BACKGROUND);
-            }
-
-            painter_fill_rectangle(window->painter, rectangle_bottom(window_header_bound(window), 1), THEME_ALT_BORDER);
-            painter_fill_rectangle(window->painter, rectangle_offset(rectangle_bottom(window_header_bound(window), 1), (Point){0, -1}), THEME_BORDER);
-
             if (window_header(window))
             {
                 widget_paint(window_header(window), window->painter, rectangle);

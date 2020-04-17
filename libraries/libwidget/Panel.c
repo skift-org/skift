@@ -3,11 +3,11 @@
 #include <libwidget/Panel.h>
 #include <libwidget/Theme.h>
 
-void panel_paint(Panel *panel, Painter *painter, Rectangle rectangle)
+void panel_paint(Panel *widget, Painter *painter, Rectangle rectangle)
 {
+    __unused(widget);
     __unused(rectangle);
-    painter_clear_rectangle(painter, widget_bound(panel), THEME_BACKGROUND);
-    painter_draw_rectangle(painter, widget_bound(panel), THEME_ALT_BACKGROUND);
+    painter_clear_rectangle(painter, rectangle, THEME_ALT_BACKGROUND);
 }
 
 Widget *panel_create(Widget *parent)

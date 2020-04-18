@@ -1,0 +1,6 @@
+{
+    "name": "About",
+    "comment": "About the skift operating system.",
+    "icon": "info",
+    "command": "/bin/about"
+}

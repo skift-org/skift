@@ -91,6 +91,11 @@ JsonValue *json_create_null(void)
 
 void json_destroy(JsonValue *value)
 {
+    if (!value)
+    {
+        return;
+    }
+
     switch (value->type)
     {
     case JSON_STRING:
@@ -113,6 +118,11 @@ void json_destroy(JsonValue *value)
 
 bool json_is(JsonValue *value, JsonType type)
 {
+    if (value == NULL)
+    {
+        return false;
+    }
+
     return value->type == type;
 }
 

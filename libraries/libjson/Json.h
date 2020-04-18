@@ -78,3 +78,5 @@ char *json_stringify(JsonValue *value);
 char *json_prettify(JsonValue *value);
 
 JsonValue *json_parse(const char *str, size_t size);
+
+JsonValue *json_parse_file(const char *path);

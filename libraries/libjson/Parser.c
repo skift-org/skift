@@ -1,6 +1,7 @@
 #include <libjson/Json.h>
 #include <libmath/math.h>
 #include <libsystem/cstring.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberParser.h>
@@ -355,4 +356,36 @@ JsonValue *json_parse(const char *str, size_t size)
     JsonParser parser = {str, size, 0};
 
     return value(&parser);
+}
+
+JsonValue *json_parse_file(const char *path)
+{
+    Stream *json_file = stream_open(path, OPEN_READ);
+
+    if (handle_has_error(json_file))
+    {
+        stream_close(json_file);
+        return NULL;
+    }
+
+    FileState json_state = {};
+    stream_stat(json_file, &json_state);
+
+    if (handle_has_error(json_file))
+    {
+        stream_close(json_file);
+        return NULL;
+    }
+
+    char *buffer = (char *)malloc(json_state.size);
+    stream_read(json_file, buffer, json_state.size);
+
+    if (handle_has_error(json_file))
+    {
+        free(buffer);
+        stream_close(json_file);
+        return NULL;
+    }
+
+    return json_parse(buffer, json_state.size);
 }

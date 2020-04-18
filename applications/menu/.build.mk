@@ -1,4 +1,4 @@
 APPS += MENU
 
 MENU_NAME = menu
-MENU_LIBS = widget graphic
+MENU_LIBS = json math widget graphic

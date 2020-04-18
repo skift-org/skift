@@ -37,7 +37,7 @@ void widget_cpu_update(GraphWidget *widget)
 
 void show_terminal()
 {
-    Launchpad *terminal = launchpad_create("terminal", "/bin/terminal");
+    Launchpad *terminal = launchpad_create("menu", "/bin/menu");
     launchpad_launch(terminal, NULL);
 }
 

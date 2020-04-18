@@ -1,0 +1,6 @@
+{
+    "name": "Terminal",
+    "comment": "An ansi capable terminal emulator.",
+    "icon": "window",
+    "command": "/bin/terminal"
+}

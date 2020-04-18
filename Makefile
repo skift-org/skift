@@ -219,7 +219,7 @@ $(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))
 
 RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
-SYSROOT_CONTENT=$(wildcard sysroot/*) $(wildcard sysroot/*/*)
+SYSROOT_CONTENT=$(wildcard sysroot/*) $(wildcard sysroot/*/*) $(wildcard sysroot/*/*/*)
 
 $(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT)
 	$(DIRECTORY_GUARD)

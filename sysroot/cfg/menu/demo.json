@@ -1,6 +1,6 @@
 {
     "name": "Demos",
     "comment": "A collection of graphical demos.",
-    "icon": "window",
+    "icon": "toys",
     "command": "/bin/demo"
 }

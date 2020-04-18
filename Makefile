@@ -219,9 +219,9 @@ $(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))
 
 RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
-RESOURCES=$(wildcard resources/*) $(wildcard resources/*/*)
+SYSROOT_CONTENT=$(wildcard sysroot/*) $(wildcard sysroot/*/*)
 
-$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(RESOURCES)
+$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT)
 	$(DIRECTORY_GUARD)
 
 	@echo [TAR] $@
@@ -231,7 +231,7 @@ $(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(RESOUR
 		$(SYSROOT)/res \
 		$(SYSROOT)/srv
 
-	@cp -r resources/* $(SYSROOT)/res
+	@cp -r sysroot/* $(SYSROOT)/
 
 	@cd $(SYSROOT); tar -cf $@ *
 

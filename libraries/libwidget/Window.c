@@ -493,8 +493,6 @@ bool window_is_focused(Window *window)
     }
 }
 
-static bool _is_light_theme = false;
-
 Color window_get_color(Window *window, ThemeColorRole role)
 {
     Color light_active[__THEME_COLOR_COUNT] = {
@@ -533,18 +531,7 @@ Color window_get_color(Window *window, ThemeColorRole role)
         [THEME_ACCENT] = THEME_DARK_ACCENT_INACTIVE,
     };
 
-    if (_is_light_theme)
-    {
-        if (window_is_focused(window))
-        {
-            return light_active[role];
-        }
-        else
-        {
-            return light_inactive[role];
-        }
-    }
-    else
+    if (application_is_dark_mode())
     {
         if (window_is_focused(window))
         {
@@ -553,6 +540,17 @@ Color window_get_color(Window *window, ThemeColorRole role)
         else
         {
             return dark_inactive[role];
+        }
+    }
+    else
+    {
+        if (window_is_focused(window))
+        {
+            return light_active[role];
+        }
+        else
+        {
+            return light_inactive[role];
         }
     }
 }

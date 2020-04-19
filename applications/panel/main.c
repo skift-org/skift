@@ -44,6 +44,7 @@ void show_terminal()
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
+    application_set_dark_mode(true);
 
     Window *window = window_create(NULL, "Panel", 1024, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 

@@ -57,6 +57,8 @@ int main(int argc, char **argv)
 
     if (application_initialize(argc, argv) == SUCCESS)
     {
+        application_set_dark_mode(true);
+
         Window *window = window_create(NULL, "Terminal", 500, 400, WINDOW_NONE);
         window_set_background(window, COLOR(0x0A0E14));
 

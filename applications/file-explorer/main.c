@@ -4,8 +4,10 @@
 #include <libwidget/Icon.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Separator.h>
+#include <libwidget/Table.h>
 
 #include "file-explorer/Breadcrumb.h"
+#include "file-explorer/FileSystemModel.h"
 
 void file_manager_create_navbar(Widget *parent)
 {
@@ -30,9 +32,12 @@ int main(int argc, char **argv)
 
     Window *window = window_create("/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_NONE);
 
-    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 8};
+    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
     file_manager_create_navbar(window_root(window));
+    Widget *table = table_create(window_root(window), filesystem_model_create());
+    table->layout_attributes = LAYOUT_FILL;
+    table->insets = INSETS(8, 8);
 
     window_show(window);
 

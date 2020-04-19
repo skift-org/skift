@@ -26,8 +26,6 @@ bool path_is_absolue(Path *path);
 
 bool path_is_relative(Path *path);
 
-size_t path_lenght(Path *path);
-
 size_t path_element_count(Path *path);
 
 void path_normalize(Path *path);

@@ -15,7 +15,7 @@
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 32
-#define WINDOW_CONTENT_PADDING 8
+#define WINDOW_CONTENT_PADDING 1
 
 struct Window
 {

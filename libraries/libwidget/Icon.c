@@ -26,7 +26,7 @@ Point icon_size(Icon *widget)
 {
     if (widget->bitmap)
     {
-        return bitmap_bound(widget->bitmap).size;
+        return rectangle_expand(bitmap_bound(widget->bitmap), WIDGET(widget)->insets).size;
     }
     else
     {

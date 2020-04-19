@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
-#include <libwidget/Theme.h>
 
 #include "panel/GraphWidget.h"
 
@@ -18,7 +17,7 @@ void graph_widget_paint(GraphWidget *widget, Painter *painter, Rectangle rectang
 {
     __unused(rectangle);
 
-    painter_fill_rectangle(painter, widget_bound(widget), THEME_ALT_BACKGROUND);
+    painter_fill_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
 
     for (size_t i = 0; i < widget->data_size; i++)
     {
@@ -42,7 +41,7 @@ void graph_widget_paint(GraphWidget *widget, Painter *painter, Rectangle rectang
         widget_bound(widget).height,
     }};
 
-    painter_fill_rectangle(painter, cursor, THEME_BORDER);
+    painter_fill_rectangle(painter, cursor, widget_get_color(widget, THEME_BORDER));
 }
 
 Point graph_widget_size(GraphWidget *widget)

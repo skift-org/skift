@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_NONE);
+    Window *window = window_create("/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_RESIZABLE);
 
     window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 

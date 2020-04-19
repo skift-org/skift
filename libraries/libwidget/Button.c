@@ -1,48 +1,46 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/cstring.h>
-
 #include <libwidget/Button.h>
-#include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
-void button_paint(Button *button, Painter *painter, Rectangle rectangle)
+void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (window_is_focused(WIDGET(button)->window))
+    if (window_is_focused(WIDGET(widget)->window))
     {
-        painter_fill_rectangle(painter, widget_bound(button), THEME_ALT_BACKGROUND);
+        painter_fill_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     }
-    painter_draw_rectangle(painter, widget_bound(button), THEME_BORDER);
+    painter_draw_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_BORDER));
 
-    int text_width = font_mesure_string(widget_font(), button->text);
+    int text_width = font_mesure_string(widget_font(), widget->text);
 
     painter_draw_string(
         painter,
         widget_font(),
-        button->text,
+        widget->text,
         (Point){
-            widget_bound(button).X + widget_bound(button).width / 2 - text_width / 2,
-            widget_bound(button).Y + widget_bound(button).height / 2 + 4,
+            widget_bound(widget).X + widget_bound(widget).width / 2 - text_width / 2,
+            widget_bound(widget).Y + widget_bound(widget).height / 2 + 4,
         },
-        THEME_FOREGROUND);
+        widget_get_color(widget, THEME_FOREGROUND));
 }
 
-void button_destroy(Button *button)
+void button_destroy(Button *widget)
 {
-    free(button->text);
+    free(widget->text);
 }
 
 Widget *button_create(Widget *parent, const char *text)
 {
-    Button *button = __create(Button);
+    Button *widget = __create(Button);
 
-    button->text = strdup(text);
+    widget->text = strdup(text);
 
-    WIDGET(button)->paint = (WidgetPaintCallback)button_paint;
-    WIDGET(button)->destroy = (WidgetDestroyCallback)button_destroy;
+    WIDGET(widget)->paint = (WidgetPaintCallback)button_paint;
+    WIDGET(widget)->destroy = (WidgetDestroyCallback)button_destroy;
 
-    widget_initialize(WIDGET(button), "Button", parent);
+    widget_initialize(WIDGET(widget), "Button", parent);
 
-    return WIDGET(button);
+    return WIDGET(widget);
 }

@@ -2,7 +2,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
-#include <libwidget/Image.h>
+#include <libwidget/Icon.h>
 #include <libwidget/Label.h>
 
 void ok_button_pressed(void *target, Widget *sender, Event *event)
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
 
-    image_create(window_root(window), "/res/skift.png");
+    icon_create(window_root(window), "/res/skift.png");
 
     Widget *button_and_text = container_create(window_root(window));
     button_and_text->layout = (Layout){LAYOUT_VGRID, 0, 2};

@@ -61,3 +61,5 @@ void window_update(Window *window, Rectangle rectangle);
 void window_layout(Window *window);
 
 bool window_is_focused(Window *window);
+
+Color window_get_color(Window *window, ThemeColorRole role);

@@ -2,7 +2,6 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Event.h>
-#include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
 #include "terminal/ApplicationTerminal.h"

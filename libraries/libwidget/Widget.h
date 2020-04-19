@@ -4,6 +4,7 @@
 #include <libgraphic/Shape.h>
 #include <libsystem/utils/List.h>
 #include <libwidget/Event.h>
+#include <libwidget/Theme.h>
 
 struct Widget;
 struct Event;
@@ -114,3 +115,7 @@ void widget_update(Widget *widget);
 void widget_update_region(Widget *widget, Rectangle region);
 
 Widget *widget_child_at(Widget *parent, Point position);
+
+Color __widget_get_color(Widget *widget, ThemeColorRole role);
+
+#define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))

@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Icon.h>
-#include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
 void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
@@ -9,16 +8,9 @@ void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
 
     if (widget->bitmap)
     {
-        Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_bound(widget));
+        Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_content_bound(widget));
 
-        if (window_is_focused(WIDGET(widget)->window))
-        {
-            painter_blit_icon(painter, widget->bitmap, destination, THEME_ICON);
-        }
-        else
-        {
-            painter_blit_icon(painter, widget->bitmap, destination, THEME_ICON_INACTIVE);
-        }
+        painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND));
     }
 }
 
@@ -47,6 +39,7 @@ Widget *icon_create(Widget *parent, const char *path)
     Icon *icon = __create(Icon);
 
     icon->bitmap = bitmap_load_from(path);
+    icon->bitmap->filtering = BITMAP_FILTERING_LINEAR;
 
     WIDGET(icon)->paint = (WidgetPaintCallback)icon_paint;
     WIDGET(icon)->size = (WidgetComputeSizeCallback)icon_size;

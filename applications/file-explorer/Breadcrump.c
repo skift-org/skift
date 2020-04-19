@@ -1,5 +1,4 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
 #include "file-explorer/Breadcrumb.h"
@@ -24,7 +23,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
         rectangle_center_within(
             bitmap_bound(widget->icon_computer),
             computer_icon_bound),
-        window_is_focused(WIDGET(widget)->window) ? THEME_ICON : THEME_ICON_INACTIVE);
+        widget_get_color(widget, THEME_FOREGROUND));
 
     current += computer_icon_bound.width;
 
@@ -43,7 +42,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             rectangle_center_within(
                 bitmap_bound(widget->icon_expand),
                 expand_icon_bound),
-            window_is_focused(WIDGET(widget)->window) ? THEME_ICON : THEME_ICON_INACTIVE);
+            widget_get_color(widget, THEME_FOREGROUND));
 
         current += expand_icon_bound.width;
     }
@@ -66,7 +65,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             widget_font(),
             element,
             point_add(element_bound.position, (Point){0, 20}),
-            window_is_focused(WIDGET(widget)->window) ? THEME_FOREGROUND : THEME_FOREGROUND_INACTIVE);
+            widget_get_color(widget, THEME_FOREGROUND));
 
         current += text_width;
 
@@ -85,7 +84,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
                 rectangle_center_within(
                     bitmap_bound(widget->icon_expand),
                     expand_icon_bound),
-                window_is_focused(WIDGET(widget)->window) ? THEME_ICON : THEME_ICON_INACTIVE);
+                widget_get_color(widget, THEME_FOREGROUND));
 
             current += expand_icon_bound.width;
         }

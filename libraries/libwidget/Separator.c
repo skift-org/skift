@@ -1,13 +1,10 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
 #include <libwidget/Separator.h>
-#include <libwidget/Theme.h>
 
 void separator_paint(Separator *widget, Painter *painter, Rectangle rectangle)
 {
-    __unused(widget);
-    __unused(rectangle);
-    painter_fill_rectangle(painter, widget_bound(widget), THEME_BORDER);
+    painter_fill_rectangle(painter, rectangle, widget_get_color(widget, THEME_BORDER));
 }
 
 Point separtor_size(Separator *widget)

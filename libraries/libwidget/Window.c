@@ -98,7 +98,7 @@ Window *window_create(
 
     shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
 
-    window->background = THEME_BACKGROUND;
+    window->background = window_get_color(window, THEME_BACKGROUND);
     window->flags = flags;
 
     application_add_window(window);
@@ -199,14 +199,7 @@ void window_paint(Window *window, Rectangle rectangle)
                 widget_paint(window_header(window), window->painter, rectangle);
             }
 
-            if (window->focused)
-            {
-                painter_draw_rectangle(window->painter, window_bound(window), THEME_ACCENT);
-            }
-            else
-            {
-                painter_draw_rectangle(window->painter, window_bound(window), THEME_BORDER);
-            }
+            painter_draw_rectangle(window->painter, window_bound(window), window_get_color(window, THEME_ACCENT));
         }
     }
 }
@@ -497,5 +490,69 @@ bool window_is_focused(Window *window)
     else
     {
         return window->focused;
+    }
+}
+
+static bool _is_light_theme = false;
+
+Color window_get_color(Window *window, ThemeColorRole role)
+{
+    Color light_active[__THEME_COLOR_COUNT] = {
+        [THEME_BORDER] = THEME_LIGHT_BORDER,
+        [THEME_BACKGROUND] = THEME_LIGHT_BACKGROUND,
+        [THEME_MIDDLEGROUND] = THEME_LIGHT_MIDDLEGROUND,
+        [THEME_FOREGROUND] = THEME_LIGHT_FOREGROUND,
+        [THEME_SELECTED] = THEME_LIGHT_SELECTION,
+        [THEME_ACCENT] = THEME_LIGHT_ACCENT,
+    };
+
+    Color light_inactive[__THEME_COLOR_COUNT] = {
+        [THEME_BORDER] = THEME_LIGHT_BORDER,
+        [THEME_BACKGROUND] = THEME_LIGHT_BACKGROUND,
+        [THEME_MIDDLEGROUND] = THEME_LIGHT_MIDDLEGROUND,
+        [THEME_FOREGROUND] = THEME_LIGHT_FOREGROUND_INACTIVE,
+        [THEME_SELECTED] = THEME_LIGHT_SELECTION_INACTIVE,
+        [THEME_ACCENT] = THEME_LIGHT_ACCENT_INACTIVE,
+    };
+
+    Color dark_active[__THEME_COLOR_COUNT] = {
+        [THEME_BORDER] = THEME_DARK_BORDER,
+        [THEME_BACKGROUND] = THEME_DARK_BACKGROUND,
+        [THEME_MIDDLEGROUND] = THEME_DARK_MIDDLEGROUND,
+        [THEME_FOREGROUND] = THEME_DARK_FOREGROUND,
+        [THEME_SELECTED] = THEME_DARK_SELECTION,
+        [THEME_ACCENT] = THEME_DARK_ACCENT,
+    };
+
+    Color dark_inactive[__THEME_COLOR_COUNT] = {
+        [THEME_BORDER] = THEME_DARK_BORDER,
+        [THEME_BACKGROUND] = THEME_DARK_BACKGROUND,
+        [THEME_MIDDLEGROUND] = THEME_DARK_MIDDLEGROUND,
+        [THEME_FOREGROUND] = THEME_DARK_FOREGROUND_INACTIVE,
+        [THEME_SELECTED] = THEME_DARK_SELECTION_INACTIVE,
+        [THEME_ACCENT] = THEME_DARK_ACCENT_INACTIVE,
+    };
+
+    if (_is_light_theme)
+    {
+        if (window_is_focused(window))
+        {
+            return light_active[role];
+        }
+        else
+        {
+            return light_inactive[role];
+        }
+    }
+    else
+    {
+        if (window_is_focused(window))
+        {
+            return dark_active[role];
+        }
+        else
+        {
+            return dark_inactive[role];
+        }
     }
 }

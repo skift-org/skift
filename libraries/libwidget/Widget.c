@@ -4,6 +4,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
 #include <libwidget/Event.h>
+#include <libwidget/Theme.h>
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
@@ -404,4 +405,9 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 
     widget->event_handles[event].target = NULL;
     widget->event_handles[event].callback = NULL;
+}
+
+Color __widget_get_color(Widget *widget, ThemeColorRole role)
+{
+    return window_get_color(widget->window, role);
 }

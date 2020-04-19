@@ -26,12 +26,11 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
         widget_font(),
         "Some data",
         (Point){cell_bound.X + 4, cell_bound.Y + 16},
-        window_is_focused(WIDGET(widget)->window) ? THEME_FOREGROUND : THEME_FOREGROUND_INACTIVE);
+        widget_get_color(widget, THEME_FOREGROUND));
 }
 
 void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 {
-    __unused(widget);
     __unused(rectangle);
 
     int column_count = widget->model.column_count();
@@ -46,12 +45,12 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
             TABLE_ROW_HEIGHT,
         }};
 
-        painter_fill_rectangle(painter, header_bound, THEME_BACKGROUND);
-        painter_fill_rectangle(painter, rectangle_right(header_bound, 1), THEME_BORDER);
-        painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), THEME_BORDER);
+        painter_fill_rectangle(painter, header_bound, widget_get_color(widget, THEME_BACKGROUND));
+        painter_fill_rectangle(painter, rectangle_right(header_bound, 1), widget_get_color(widget, THEME_BORDER));
+        painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4, header_bound.Y + 16}, window_is_focused(WIDGET(widget)->window) ? THEME_FOREGROUND : THEME_FOREGROUND_INACTIVE);
-        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, window_is_focused(WIDGET(widget)->window) ? THEME_FOREGROUND : THEME_FOREGROUND_INACTIVE);
+        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
     }
 
     for (int row = 0; row < (widget_content_bound(widget).height / TABLE_ROW_HEIGHT) - 1; row++)
@@ -65,8 +64,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 
         if (widget->selected == row)
         {
-            painter_fill_rectangle(painter, row_bound, window_is_focused(WIDGET(widget)->window) ? THEME_SELECTION : THEME_SELECTION_INACTIVE);
-            painter_draw_rectangle(painter, row_bound, window_is_focused(WIDGET(widget)->window) ? THEME_SELECTION : THEME_SELECTION_INACTIVE);
+            painter_fill_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTED));
+            painter_draw_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTED));
         }
 
         for (int column = 0; column < column_count; column++)
@@ -75,7 +74,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    painter_draw_rectangle(painter, widget_content_bound(widget), THEME_BORDER);
+    painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
 }
 
 Widget *table_create(Widget *parent, Model model)

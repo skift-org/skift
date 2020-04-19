@@ -1,13 +1,10 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
 #include <libwidget/Panel.h>
-#include <libwidget/Theme.h>
 
 void panel_paint(Panel *widget, Painter *painter, Rectangle rectangle)
 {
-    __unused(widget);
-    __unused(rectangle);
-    painter_clear_rectangle(painter, rectangle, THEME_ALT_BACKGROUND);
+    painter_clear_rectangle(painter, rectangle, widget_get_color(widget, THEME_MIDDLEGROUND));
 }
 
 Widget *panel_create(Widget *parent)

@@ -1,4 +1,5 @@
 #include <libsystem/assert.h>
+#include <libsystem/cstring.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
@@ -55,8 +56,17 @@ Result application_initialize(int argc, char **argv)
 {
     assert(!_initialized);
 
-    __unused(argc);
-    __unused(argv);
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--light") == 0)
+        {
+            application_set_dark_mode(false);
+        }
+        else if (strcmp(argv[i], "--dark") == 0)
+        {
+            application_set_dark_mode(true);
+        }
+    }
 
     _connection = socket_connect("/srv/compositor.ipc");
 

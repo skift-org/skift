@@ -109,6 +109,18 @@ static const char *filesystem_model_column_name(int column)
         ASSERT_NOT_REACHED();
     }
 }
+void filesystem_model_navigate(FileSystemModel *model, const char *path)
+{
+    if (model->current_path)
+    {
+        free(model->current_path);
+        model->current_path = NULL;
+    }
+
+    model->current_path = strdup(path);
+
+    model_update((Model *)model);
+}
 
 static void filesystem_model_destroy(FileSystemModel *model)
 {

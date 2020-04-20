@@ -114,3 +114,13 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
 
     return WIDGET(widget);
 }
+
+void breadcrumb_navigate(Widget *widget, const char *path)
+{
+    Breadcrumb *breadcrumb = (Breadcrumb *)widget;
+
+    path_destroy(breadcrumb->path);
+    breadcrumb->path = path_create(path);
+
+    widget_update(widget);
+}

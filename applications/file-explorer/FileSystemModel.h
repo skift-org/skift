@@ -12,3 +12,5 @@ typedef struct
 } FileSystemModel;
 
 FileSystemModel *filesystem_model_create(const char *current_path);
+
+void filesystem_model_navigate(FileSystemModel *model, const char *path);

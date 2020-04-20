@@ -17,33 +17,6 @@
 #define WINDOW_HEADER_AREA 32
 #define WINDOW_CONTENT_PADDING 1
 
-struct Window
-{
-    int handle;
-
-    bool focused;
-    bool is_dragging;
-    bool visible;
-
-    Rectangle on_screen_bound;
-    CursorState cursor_state;
-
-    int framebuffer_handle;
-    Bitmap *framebuffer;
-    Painter *painter;
-
-    List *dirty_rect;
-    bool dirty_layout;
-
-    Widget *header_container;
-    Widget *root_container;
-    Widget *focused_widget;
-
-    Color background;
-
-    WindowFlag flags;
-};
-
 void close_button_click(void *target, struct Widget *sender, struct Event *event)
 {
     __unused(target);
@@ -61,6 +34,19 @@ Window *window_create(
 {
     Window *window = __create(Window);
 
+    window_initialize(window, icon, title, width, height, flags);
+
+    return window;
+}
+
+void window_initialize(
+    Window *window,
+    const char *icon,
+    const char *title,
+    int width,
+    int height,
+    WindowFlag flags)
+{
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
     window->focused = false;
@@ -102,8 +88,6 @@ Window *window_create(
     window->flags = flags;
 
     application_add_window(window);
-
-    return window;
 }
 
 void window_destroy(Window *window)
@@ -122,6 +106,11 @@ void window_destroy(Window *window)
     bitmap_destroy(window->framebuffer);
 
     list_destroy_with_callback(window->dirty_rect, free);
+
+    if (window->destroy)
+    {
+        window->destroy(window);
+    }
 
     free(window);
 }

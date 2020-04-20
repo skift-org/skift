@@ -13,9 +13,46 @@
 
 typedef unsigned int WindowFlag;
 
-typedef struct Window Window;
+typedef void (*WindowDestroyCallback)(struct Window *window);
+
+typedef struct Window
+{
+    int handle;
+
+    bool focused;
+    bool is_dragging;
+    bool visible;
+
+    WindowDestroyCallback destroy;
+
+    Rectangle on_screen_bound;
+    CursorState cursor_state;
+
+    int framebuffer_handle;
+    Bitmap *framebuffer;
+    Painter *painter;
+
+    List *dirty_rect;
+    bool dirty_layout;
+
+    Widget *header_container;
+    Widget *root_container;
+    Widget *focused_widget;
+
+    Color background;
+
+    WindowFlag flags;
+} Window;
 
 Window *window_create(
+    const char *icon,
+    const char *title,
+    int width,
+    int height,
+    WindowFlag flags);
+
+void window_initialize(
+    Window *window,
     const char *icon,
     const char *title,
     int width,

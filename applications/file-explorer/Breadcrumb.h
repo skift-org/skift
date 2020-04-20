@@ -13,4 +13,4 @@ typedef struct
     Bitmap *icon_expand;
 } Breadcrumb;
 
-Widget *breadcrumb_create(Widget *parent);
+Widget *breadcrumb_create(Widget *parent, const char *current_path);

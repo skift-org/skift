@@ -99,14 +99,14 @@ void breadcrumb_destroy(Breadcrumb *widget)
     path_destroy(widget->path);
 }
 
-Widget *breadcrumb_create(Widget *parent)
+Widget *breadcrumb_create(Widget *parent, const char *current_path)
 {
     Breadcrumb *widget = __create(Breadcrumb);
 
     WIDGET(widget)->paint = (WidgetPaintCallback)breadcrumb_paint;
     WIDGET(widget)->destroy = (WidgetDestroyCallback)breadcrumb_destroy;
 
-    widget->path = path_create("/home/anon/images/2020/03/");
+    widget->path = path_create(current_path);
     widget->icon_computer = bitmap_load_from("/res/icon/computer.png");
     widget->icon_expand = bitmap_load_from("/res/icon/expand_forward.png");
 

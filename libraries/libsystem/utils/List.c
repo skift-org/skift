@@ -2,6 +2,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
+#include <libsystem/cstring.h>
 #include <libsystem/utils/List.h>
 
 List *list_create(void)
@@ -350,6 +351,13 @@ void list_pushback(List *list, void *value)
         item->prev = list->tail;
         list->tail = item;
     }
+}
+
+void list_pushback_copy(List *list, void *value, size_t size)
+{
+    void *copy = malloc(size);
+    memcpy(copy, value, size);
+    list_pushback(list, copy);
 }
 
 bool list_popback(List *list, void **value)

@@ -63,6 +63,8 @@ void list_push(List *list, void *value);
 
 void list_pushback(List *list, void *value);
 
+void list_pushback_copy(List *list, void *value, size_t size);
+
 bool list_pop(List *list, void **value);
 
 bool list_popback(List *list, void **value);

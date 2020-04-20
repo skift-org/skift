@@ -9,9 +9,30 @@
 #include "file-explorer/Breadcrumb.h"
 #include "file-explorer/FileSystemModel.h"
 
-void file_manager_create_navbar(Widget *parent)
+typedef struct
 {
-    Widget *navbar = panel_create(parent);
+    Window window;
+
+    Widget *Breadcrumb;
+    Widget *table;
+    FileSystemModel *model;
+} FileExplorerWindow;
+
+void file_explorer_window_destroy(FileExplorerWindow *window)
+{
+    model_destroy((Model *)window->model);
+}
+
+FileExplorerWindow *file_explorer_window_create(const char *current_path)
+{
+    FileExplorerWindow *window = __create(FileExplorerWindow);
+
+    window_initialize((Window *)window, "/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_RESIZABLE);
+    Widget *root = window_root((Window *)window);
+    root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+
+    /// --- Navigation bar --- ///
+    Widget *navbar = panel_create(root);
 
     navbar->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     navbar->insets = INSETS(0, 8);
@@ -19,26 +40,31 @@ void file_manager_create_navbar(Widget *parent)
     icon_create(navbar, "/res/icon/arrow_backward.png");
     icon_create(navbar, "/res/icon/arrow_forward.png");
     icon_create(navbar, "/res/icon/arrow_upward.png");
+    icon_create(navbar, "/res/icon/home.png");
 
     separator_create(navbar);
 
-    Widget *breadcrumb = breadcrumb_create(navbar);
-    WIDGET(breadcrumb)->layout_attributes = LAYOUT_FILL;
+    window->Breadcrumb = breadcrumb_create(navbar, current_path);
+    WIDGET(window->Breadcrumb)->layout_attributes = LAYOUT_FILL;
+
+    separator_create(navbar);
+
+    icon_create(navbar, "/res/icon/refresh.png");
+
+    /// --- Table view --- ///
+    window->model = filesystem_model_create(current_path);
+    Widget *table = table_create(root, (Model *)window->model);
+    table->layout_attributes = LAYOUT_FILL;
+    table->insets = INSETS(8, 8);
+
+    return window;
 }
 
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_RESIZABLE);
-
-    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
-
-    file_manager_create_navbar(window_root(window));
-    Widget *table = table_create(window_root(window), (Model *)filesystem_model_create("/dev"));
-    table->layout_attributes = LAYOUT_FILL;
-    table->insets = INSETS(8, 8);
-
+    Window *window = (Window *)file_explorer_window_create("/bin");
     window_show(window);
 
     return application_run();

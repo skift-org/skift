@@ -2,14 +2,14 @@
 #include <libsystem/cstring.h>
 #include <libwidget/Variant.h>
 
-Variant vint(long int value)
+Variant vint(int value)
 {
     Variant v = (Variant){
         .type = VARIANT_INT,
         .as_int = value,
     };
 
-    snprintf(v.as_string, VARIANT_STRING_SIZE, "%ld", value);
+    snprintf(v.as_string, VARIANT_STRING_SIZE, "%d", value);
 
     return v;
 }

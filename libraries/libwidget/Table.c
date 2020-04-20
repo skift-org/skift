@@ -7,7 +7,7 @@
 
 Rectangle table_cell_bound(Table *widget, int row, int column)
 {
-    int column_count = widget->model.column_count();
+    int column_count = model_column_count(widget->model);
     int column_width = widget_content_bound(widget).width / column_count;
 
     return (Rectangle){{
@@ -24,7 +24,7 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
     painter_draw_string(
         painter,
         widget_font(),
-        "Some data",
+        model_data(widget->model, row, column).as_string,
         (Point){cell_bound.X + 4, cell_bound.Y + 16},
         widget_get_color(widget, THEME_FOREGROUND));
 }
@@ -33,7 +33,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    int column_count = widget->model.column_count();
+    int column_count = model_column_count(widget->model);
     int column_width = widget_content_bound(widget).width / column_count;
 
     for (int column = 0; column < column_count; column++)
@@ -49,11 +49,11 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         painter_fill_rectangle(painter, rectangle_right(header_bound, 1), widget_get_color(widget, THEME_BORDER));
         painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
-        painter_draw_string(painter, widget_font(), widget->model.column_name(column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    for (int row = 0; row < (widget_content_bound(widget).height / TABLE_ROW_HEIGHT) - 1; row++)
+    for (int row = 0; row < MIN(model_row_count(widget->model), (widget_content_bound(widget).height / TABLE_ROW_HEIGHT) - 1); row++)
     {
         Rectangle row_bound = (Rectangle){{
             widget_content_bound(widget).X,
@@ -77,7 +77,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
     painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
 }
 
-Widget *table_create(Widget *parent, Model model)
+Widget *table_create(Widget *parent, Model *model)
 {
     Table *table = __create(Table);
 

@@ -6,8 +6,8 @@
 typedef struct
 {
     Widget widget;
-    Model model;
+    Model *model;
     int selected;
 } Table;
 
-Widget *table_create(Widget *parent, Model model);
+Widget *table_create(Widget *parent, Model *model);

@@ -14,14 +14,14 @@ typedef struct
     VarianType type;
 
     union {
-        long int as_int;
+        int as_int;
         float as_float;
     };
 
     char as_string[VARIANT_STRING_SIZE];
 } Variant;
 
-Variant vint(long int value);
+Variant vint(int value);
 
 Variant vfloat(float value);
 

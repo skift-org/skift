@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
     file_manager_create_navbar(window_root(window));
-    Widget *table = table_create(window_root(window), filesystem_model_create());
+    Widget *table = table_create(window_root(window), (Model *)filesystem_model_create("/dev"));
     table->layout_attributes = LAYOUT_FILL;
     table->insets = INSETS(8, 8);
 

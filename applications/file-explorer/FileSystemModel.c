@@ -1,4 +1,7 @@
 #include <libsystem/assert.h>
+#include <libsystem/cstring.h>
+#include <libsystem/io/Directory.h>
+#include <libsystem/logger.h>
 
 #include "file-explorer/FileSystemModel.h"
 
@@ -12,12 +15,84 @@ typedef enum
     __COLUMN_COUNT,
 } Column;
 
-static int filesystem_column_count(void)
+static void filesystem_model_update(FileSystemModel *model)
+{
+    if (model->files)
+    {
+        list_clear_with_callback(model->files, free);
+    }
+    else
+    {
+        model->files = list_create();
+    }
+
+    Directory *directory = directory_open(model->current_path, OPEN_READ);
+
+    if (handle_has_error(directory))
+    {
+        handle_printf_error("Failled to open directory '%s'", model->current_path);
+        directory_close(directory);
+    }
+
+    DirectoryEntry entry;
+    while (directory_read(directory, &entry) > 0)
+    {
+        list_pushback_copy(model->files, &entry, sizeof(entry));
+    }
+
+    directory_close(directory);
+}
+
+static Variant filesystem_model_data(FileSystemModel *model, int row, int column)
+{
+    DirectoryEntry *entry = NULL;
+    assert(list_peekat(model->files, row, (void **)&entry));
+
+    switch (column)
+    {
+    case COLUMN_ICON:
+        return vstring("<icon>");
+
+    case COLUMN_NAME:
+        return vstring(entry->name);
+
+    case COLUMN_TYPE:
+        switch (entry->stat.type)
+        {
+        case FILE_TYPE_REGULAR:
+            return vstring("Regular file");
+
+        case FILE_TYPE_DIRECTORY:
+            return vstring("Directory");
+
+        case FILE_TYPE_DEVICE:
+            return vstring("Device");
+
+        default:
+            return vstring("Special file");
+        }
+
+    case COLUMN_SIZE:
+        return vint(entry->stat.size);
+
+    default:
+        ASSERT_NOT_REACHED();
+    }
+
+    return vstring("Some data");
+}
+
+static int filesystem_model_column_count(void)
 {
     return __COLUMN_COUNT;
 }
 
-static const char *filesystem_column_name(Column column)
+static int filesystem_model_row_count(FileSystemModel *model)
+{
+    return list_count(model->files);
+}
+
+static const char *filesystem_model_column_name(int column)
 {
     switch (column)
     {
@@ -35,40 +110,25 @@ static const char *filesystem_column_name(Column column)
     }
 }
 
-static int filesystem_get_lenght(void *data)
+static void filesystem_model_destroy(FileSystemModel *model)
 {
-    __unused(data);
-
-    return 10;
+    free(model->current_path);
 }
 
-static Variant filesystem_get_data(void *data, int row, Column column)
+FileSystemModel *filesystem_model_create(const char *current_path)
 {
-    __unused(data);
-    __unused(row);
-    __unused(column);
+    FileSystemModel *model = __create(FileSystemModel);
 
-    return vint(424242);
-}
+    model->current_path = strdup(current_path);
 
-static CellStyle filesystem_get_style(void *data, int row, Column column)
-{
-    __unused(data);
-    __unused(row);
-    __unused(column);
+    model->model_update = (ModelUpdateCallback)filesystem_model_update;
+    model->model_data = (ModelDataCallback)filesystem_model_data;
+    model->model_row_count = (ModelRowCountCallback)filesystem_model_row_count;
+    model->model_column_count = (ModelColumnCountCallback)filesystem_model_column_count;
+    model->model_column_name = (ModelColumnNameCallback)filesystem_model_column_name;
+    model->model_destroy = (ModelDestroyCallback)filesystem_model_destroy;
 
-    return DEFAULT_STYLE;
-}
-
-Model filesystem_model_create(void)
-{
-    Model model = {};
-
-    model.column_count = (ModelColumnCount)filesystem_column_count;
-    model.column_name = (ModelColumnName)filesystem_column_name;
-    model.get_lenght = (ModelGetLenght)filesystem_get_lenght;
-    model.get_data = (ModelGetData)filesystem_get_data;
-    model.get_style = (ModelGetStyle)filesystem_get_style;
+    model_initialize((Model *)model);
 
     return model;
 }

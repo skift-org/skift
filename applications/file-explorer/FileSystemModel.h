@@ -1,5 +1,14 @@
 #pragma once
 
+#include <libsystem/path.h>
+#include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
+typedef struct
+{
+    MODEL_FIELDS
 
-Model filesystem_model_create(void);
+    char *current_path;
+    List *files;
+} FileSystemModel;
+
+FileSystemModel *filesystem_model_create(const char *current_path);

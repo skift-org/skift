@@ -211,17 +211,8 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
     }
     else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
-        if (keyboard_keymap != NULL)
-        {
-            memcpy(args, keyboard_keymap, sizeof(KeyMap));
-
-            return SUCCESS;
-        }
-        else
-        {
-            // FIXME: Maybe add another ERR_* for this error...
-            return ERR_INPUTOUTPUT_ERROR;
-        }
+        memcpy(args, keyboard_keymap, sizeof(KeyMap));
+        return SUCCESS;
     }
     else
     {

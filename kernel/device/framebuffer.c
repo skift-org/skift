@@ -221,7 +221,7 @@ Result framebuffer_set_mode_bga(int width, int height)
                 logger_error("BGA: no framebuffer found!");
 
                 // FIXME: maybe this is note the right error code
-                return ERR_NO_SUCH_DEVICE_OR_ADDRESS;
+                return ERR_NO_SUCH_DEVICE;
             }
         }
 

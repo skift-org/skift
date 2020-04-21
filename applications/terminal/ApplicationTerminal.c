@@ -8,27 +8,25 @@
 
 static Point _cell_size = (Point){7, 16};
 
-static Color _colors[__TERMINAL_COLOR_COUNT] = {
-    [TERMINAL_COLOR_BLACK] = COLOR(0x000000),
-    [TERMINAL_COLOR_RED] = COLOR(0xff3333),
-    [TERMINAL_COLOR_GREEN] = COLOR(0xb8cc52),
-    [TERMINAL_COLOR_YELLOW] = COLOR(0xe6c446),
-    [TERMINAL_COLOR_BLUE] = COLOR(0x36a3d9),
-    [TERMINAL_COLOR_MAGENTA] = COLOR(0xf07078),
-    [TERMINAL_COLOR_CYAN] = COLOR(0x95e5cb),
-    [TERMINAL_COLOR_GREY] = COLOR(0xb3b1ad),
-
-    [TERMINAL_COLOR_BRIGHT_BLACK] = COLOR(0x323232),
-    [TERMINAL_COLOR_BRIGHT_RED] = COLOR(0xff6565),
-    [TERMINAL_COLOR_BRIGHT_GREEN] = COLOR(0xe9fe83),
-    [TERMINAL_COLOR_BRIGHT_YELLOW] = COLOR(0xfff778),
-    [TERMINAL_COLOR_BRIGHT_BLUE] = COLOR(0x68d4ff),
-    [TERMINAL_COLOR_BRIGHT_MAGENTA] = COLOR(0xffa3aa),
-    [TERMINAL_COLOR_BRIGHT_CYAN] = COLOR(0xc7fffc),
-    [TERMINAL_COLOR_BRIGHT_GREY] = COLOR(0xffffff),
-
-    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = COLOR(0xb3b1ad),
-    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = COLOR(0x0A0E14),
+static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
+    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = THEME_ANSI_FOREGROUND,
+    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = THEME_ANSI_BACKGROUND,
+    [TERMINAL_COLOR_BLACK] = THEME_ANSI_BLACK,
+    [TERMINAL_COLOR_RED] = THEME_ANSI_RED,
+    [TERMINAL_COLOR_GREEN] = THEME_ANSI_GREEN,
+    [TERMINAL_COLOR_YELLOW] = THEME_ANSI_YELLOW,
+    [TERMINAL_COLOR_BLUE] = THEME_ANSI_BLUE,
+    [TERMINAL_COLOR_MAGENTA] = THEME_ANSI_MAGENTA,
+    [TERMINAL_COLOR_CYAN] = THEME_ANSI_CYAN,
+    [TERMINAL_COLOR_GREY] = THEME_ANSI_WHITE,
+    [TERMINAL_COLOR_BRIGHT_BLACK] = THEME_ANSI_BRIGHT_BLACK,
+    [TERMINAL_COLOR_BRIGHT_RED] = THEME_ANSI_BRIGHT_RED,
+    [TERMINAL_COLOR_BRIGHT_GREEN] = THEME_ANSI_BRIGHT_GREEN,
+    [TERMINAL_COLOR_BRIGHT_YELLOW] = THEME_ANSI_BRIGHT_YELLOW,
+    [TERMINAL_COLOR_BRIGHT_BLUE] = THEME_ANSI_BRIGHT_BLUE,
+    [TERMINAL_COLOR_BRIGHT_MAGENTA] = THEME_ANSI_BRIGHT_MAGENTA,
+    [TERMINAL_COLOR_BRIGHT_CYAN] = THEME_ANSI_BRIGHT_CYAN,
+    [TERMINAL_COLOR_BRIGHT_GREY] = THEME_ANSI_BRIGHT_WHITE,
 };
 
 Font *get_terminal_font(void)
@@ -53,24 +51,18 @@ Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
     return bound;
 }
 
-void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, Font *font, int x, int y, TerminalCell cell)
+void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *painter, int x, int y, Codepoint codepoint, Color foreground, Color background, TerminalAttributes attributes)
 {
     Rectangle bound = terminal_widget_cell_bound(widget, x, y);
 
-    Codepoint codepoint = cell.codepoint;
-
-    Color background_color = _colors[cell.attributes.background];
-    Color foreground_color = _colors[cell.attributes.foreground];
-    TerminalAttributes attributes = cell.attributes;
-
     if (attributes.inverted)
     {
-        Color tmp = background_color;
-        background_color = foreground_color;
-        foreground_color = tmp;
+        Color tmp = background;
+        background = foreground;
+        foreground = tmp;
     }
 
-    painter_clear_rectangle(painter, bound, background_color);
+    painter_clear_rectangle(painter, bound, background);
 
     if (attributes.underline)
     {
@@ -78,7 +70,7 @@ void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, Font 
             painter,
             point_add(bound.position, (Point){0, 13}),
             point_add(bound.position, (Point){bound.width, 13}),
-            foreground_color);
+            foreground);
     }
 
     if (codepoint == U' ')
@@ -86,31 +78,39 @@ void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, Font 
         return;
     }
 
-    Glyph *glyph = font_glyph(font, cell.codepoint);
+    Glyph *glyph = font_glyph(get_terminal_font(), codepoint);
 
     if (glyph != NULL)
     {
         painter_draw_glyph(
             painter,
-            font,
+            get_terminal_font(),
             glyph,
             point_add(bound.position, (Point){0, 12}),
-            foreground_color);
+            foreground);
 
         if (attributes.bold)
         {
             painter_draw_glyph(
                 painter,
-                font,
+                get_terminal_font(),
                 glyph,
                 point_add(bound.position, (Point){1, 12}),
-                foreground_color);
+                foreground);
         }
     }
     else
     {
-        painter_draw_rectangle(painter, bound, foreground_color);
+        painter_draw_rectangle(painter, bound, foreground);
     }
+}
+
+void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, int x, int y, TerminalCell cell)
+{
+    Color background_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.background]);
+    Color foreground_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.foreground]);
+
+    terminal_widget_render_cell_extended(widget, painter, x, y, cell.codepoint, foreground_color, background_color, cell.attributes);
 }
 
 void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Rectangle rectangle)
@@ -125,7 +125,7 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
         {
             TerminalCell cell = terminal_cell_at(terminal, x, y);
 
-            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), x, y, cell);
+            terminal_widget_render_cell(terminal_widget, painter, x, y, cell);
             terminal_cell_undirty(terminal, x, y);
         }
     }
@@ -140,16 +140,24 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
         {
             if (terminal_widget->cursor_blink)
             {
-                cell.attributes.inverted = true;
-                cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
+                terminal_widget_render_cell_extended(
+                    terminal_widget,
+                    painter,
+                    cx,
+                    cy,
+                    cell.codepoint,
+                    widget_get_color(WIDGET(terminal_widget), THEME_ANSI_FOREGROUND),
+                    widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR), cell.attributes);
             }
-
-            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
+            else
+            {
+                terminal_widget_render_cell(terminal_widget, painter, cx, cy, cell);
+            }
         }
         else
         {
-            terminal_widget_render_cell(terminal_widget, painter, get_terminal_font(), cx, cy, cell);
-            painter_draw_rectangle(painter, terminal_widget_cell_bound(terminal_widget, cx, cy), COLOR(0xe6c446));
+            terminal_widget_render_cell(terminal_widget, painter, cx, cy, cell);
+            painter_draw_rectangle(painter, terminal_widget_cell_bound(terminal_widget, cx, cy), widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR));
         }
     }
 }

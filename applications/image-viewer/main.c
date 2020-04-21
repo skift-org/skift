@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     }
 
 #define ALPHA_PATTERN_SIZE (8)
- 
+
     for (int x = 0; x < framebuffer->width; x++)
     {
         for (int y = 0; y < framebuffer->height; y++)

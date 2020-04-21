@@ -25,7 +25,3 @@ void application_move_window(Window *window, Point position);
 void application_window_change_cursor(Window *window, CursorState state);
 
 Window *application_get_window_by_id(int id);
-
-bool application_is_dark_mode(void);
-
-void application_set_dark_mode(bool dark_mode);

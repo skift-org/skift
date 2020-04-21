@@ -23,10 +23,6 @@ bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int 
             {
                 value += j;
             }
-            else
-            {
-                return false;
-            }
         }
     }
 

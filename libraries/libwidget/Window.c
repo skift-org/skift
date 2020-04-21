@@ -501,66 +501,24 @@ bool window_is_focused(Window *window)
 
 Color window_get_color(Window *window, ThemeColorRole role)
 {
-    Color light_active[__THEME_COLOR_COUNT] = {
-        [THEME_BORDER] = THEME_LIGHT_BORDER,
-        [THEME_BACKGROUND] = THEME_LIGHT_BACKGROUND,
-        [THEME_MIDDLEGROUND] = THEME_LIGHT_MIDDLEGROUND,
-        [THEME_FOREGROUND_DISABLED] = THEME_LIGHT_FOREGROUND_INACTIVE,
-        [THEME_FOREGROUND] = THEME_LIGHT_FOREGROUND,
-        [THEME_SELECTED] = THEME_LIGHT_SELECTION,
-        [THEME_ACCENT] = THEME_LIGHT_ACCENT,
-    };
 
-    Color light_inactive[__THEME_COLOR_COUNT] = {
-        [THEME_BORDER] = THEME_LIGHT_BORDER,
-        [THEME_BACKGROUND] = THEME_LIGHT_BACKGROUND,
-        [THEME_MIDDLEGROUND] = THEME_LIGHT_MIDDLEGROUND,
-        [THEME_FOREGROUND_DISABLED] = THEME_LIGHT_FOREGROUND_INACTIVE,
-        [THEME_FOREGROUND] = THEME_LIGHT_FOREGROUND_INACTIVE,
-        [THEME_SELECTED] = THEME_LIGHT_SELECTION_INACTIVE,
-        [THEME_ACCENT] = THEME_LIGHT_ACCENT_INACTIVE,
-    };
-
-    Color dark_active[__THEME_COLOR_COUNT] = {
-        [THEME_BORDER] = THEME_DARK_BORDER,
-        [THEME_BACKGROUND] = THEME_DARK_BACKGROUND,
-        [THEME_MIDDLEGROUND] = THEME_DARK_MIDDLEGROUND,
-        [THEME_FOREGROUND_DISABLED] = THEME_DARK_FOREGROUND_INACTIVE,
-        [THEME_FOREGROUND] = THEME_DARK_FOREGROUND,
-        [THEME_SELECTED] = THEME_DARK_SELECTION,
-        [THEME_ACCENT] = THEME_DARK_ACCENT,
-    };
-
-    Color dark_inactive[__THEME_COLOR_COUNT] = {
-        [THEME_BORDER] = THEME_DARK_BORDER,
-        [THEME_BACKGROUND] = THEME_DARK_BACKGROUND,
-        [THEME_MIDDLEGROUND] = THEME_DARK_MIDDLEGROUND,
-        [THEME_FOREGROUND_DISABLED] = THEME_DARK_FOREGROUND_INACTIVE,
-        [THEME_FOREGROUND] = THEME_DARK_FOREGROUND_INACTIVE,
-        [THEME_SELECTED] = THEME_DARK_SELECTION_INACTIVE,
-        [THEME_ACCENT] = THEME_DARK_ACCENT_INACTIVE,
-    };
-
-    if (application_is_dark_mode())
+    if (!window_is_focused(window))
     {
-        if (window_is_focused(window))
+        if (role == THEME_FOREGROUND)
         {
-            return dark_active[role];
+            role = THEME_FOREGROUND_INACTIVE;
         }
-        else
+
+        if (role == THEME_SELECTION)
         {
-            return dark_inactive[role];
+            role = THEME_SELECTION_INACTIVE;
+        }
+
+        if (role == THEME_ACCENT)
+        {
+            role = THEME_ACCENT_INACTIVE;
         }
     }
-    else
-    {
-        if (window_is_focused(window))
-        {
-            return light_active[role];
-        }
-        else
-        {
-            return light_inactive[role];
-        }
-    }
+
+    return theme_get_color(role);
 }

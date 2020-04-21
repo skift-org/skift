@@ -58,13 +58,11 @@ Result application_initialize(int argc, char **argv)
 
     for (int i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "--light") == 0)
+        if (strcmp(argv[i], "--theme") == 0 && i + 1 < argc)
         {
-            application_set_dark_mode(false);
-        }
-        else if (strcmp(argv[i], "--dark") == 0)
-        {
-            application_set_dark_mode(true);
+            char buffer[256];
+            snprintf(buffer, 256, "/res/theme/%s.json", argv[i + 1]);
+            theme_load(buffer);
         }
     }
 
@@ -238,16 +236,4 @@ void application_window_change_cursor(Window *window, CursorState state)
     };
 
     application_send_message(COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE, &message, sizeof(CompositorCursorStateChange));
-}
-
-static bool _is_dark_mode = false;
-
-bool application_is_dark_mode(void)
-{
-    return _is_dark_mode;
-}
-
-void application_set_dark_mode(bool dark_mode)
-{
-    _is_dark_mode = dark_mode;
 }

@@ -80,7 +80,10 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }};
 
         painter_fill_rectangle(painter, header_bound, widget_get_color(widget, THEME_BACKGROUND));
-        painter_fill_rectangle(painter, rectangle_right(header_bound, 1), widget_get_color(widget, THEME_BORDER));
+        if (column < column_count - 1)
+        {
+            painter_fill_rectangle(painter, rectangle_right(header_bound, 1), widget_get_color(widget, THEME_BORDER));
+        }
         painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
         painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
@@ -98,8 +101,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 
         if (widget->selected == row)
         {
-            painter_fill_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTED));
-            painter_draw_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTED));
+            painter_fill_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTION));
+            painter_draw_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTION));
         }
 
         for (int column = 0; column < column_count; column++)
@@ -108,7 +111,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
+    //painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
 }
 
 void table_event(Table *widget, Event *event)

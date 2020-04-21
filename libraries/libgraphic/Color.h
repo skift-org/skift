@@ -6,7 +6,8 @@
 
 #include <libsystem/runtime.h>
 
-typedef union {
+typedef union
+{
     struct
     {
         uint8_t R;
@@ -52,6 +53,8 @@ static inline Color color_blend(Color fg, Color bg)
 }
 
 #define COLOR(__value) ((Color){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
+
+#define COLOR_RGBA(__R, __G, __B, __A) ((Color){{(__R), (__G), (__B), (__A)}})
 
 #define COLOR_ENUM(__ENTRY)                                               \
     __ENTRY(ALICEBLUE, AliceBlue, 0xF0, 0xF8, 0xFF)                       \

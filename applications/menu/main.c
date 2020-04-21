@@ -139,7 +139,6 @@ void menu_create_list(Widget *parent, List *menu)
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
-    application_set_dark_mode(true);
 
     List *menu = load_menu();
 

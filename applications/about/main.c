@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
 
-    if (application_is_dark_mode())
+    if (theme_is_dark())
     {
         image_create(window_root(window), "/res/skift-white.png");
     }

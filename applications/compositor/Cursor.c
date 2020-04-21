@@ -1,5 +1,6 @@
 #include <libgraphic/Bitmap.h>
 #include <libsystem/logger.h>
+#include <libsystem/system.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"
@@ -13,6 +14,8 @@ static Point _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
 static Bitmap *_cursor_bitmaps[__CURSOR_COUNT] = {};
+
+static uint _last_click = 0;
 
 void cursor_initialize(void)
 {
@@ -86,6 +89,31 @@ void cursor_handle_packet(MousePacket packet)
             manager_set_focus_window(window_under);
             window_on_focus = window_under;
         }
+    }
+
+    if (!(_mouse_old_buttons & MOUSE_BUTTON_LEFT) &&
+        (_mouse_buttons & MOUSE_BUTTON_LEFT))
+    {
+        uint current = system_get_ticks();
+
+        if (current - _last_click < 250)
+        {
+
+            Point position = point_sub(_mouse_position, window_bound(window_on_focus).position);
+
+            if (window_on_focus)
+                window_send_event(window_on_focus,
+                                  EVENT(
+                                      MouseEvent,
+                                      EVENT_MOUSE_DOUBLE_CLICK,
+                                      position,
+                                      position,
+                                      MOUSE_BUTTON_LEFT,
+                                      MOUSE_BUTTON_LEFT),
+                                  sizeof(MouseEvent));
+        }
+
+        _last_click = current;
     }
 
     if (window_on_focus)

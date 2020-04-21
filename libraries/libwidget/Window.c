@@ -329,6 +329,23 @@ void window_handle_event(Window *window, Event *event)
         break;
     }
 
+    case EVENT_MOUSE_DOUBLE_CLICK:
+    {
+        MouseEvent *mouse_event = (MouseEvent *)event;
+
+        if (rectangle_containe_point(widget_bound(window_root(window)), mouse_event->position))
+        {
+            Widget *widget = widget_child_at(window_root(window), mouse_event->position);
+
+            if (widget)
+            {
+                widget_dispatch_event(widget, event);
+            }
+        }
+
+        break;
+    }
+
     case EVENT_MOUSE_BUTTON_RELEASE:
     {
         MouseEvent *mouse_event = (MouseEvent *)event;

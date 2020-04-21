@@ -5,6 +5,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/path.h>
+#include <libsystem/utils/BufferBuilder.h>
 
 Path *path_create(const char *raw_path)
 {
@@ -38,7 +39,7 @@ Path *path_create(const char *raw_path)
 
 void path_destroy(Path *path)
 {
-    list_destroy_with_callback(path->elements, (ListDestroyElementCallback)free);
+    list_destroy_with_callback(path->elements, free);
     free(path);
 }
 
@@ -121,9 +122,9 @@ void path_push(Path *path, const char *element)
     }
 }
 
-const char *path_pop(Path *path)
+char *path_pop(Path *path)
 {
-    const char *element = NULL;
+    char *element = NULL;
     list_popback(path->elements, (void **)&element);
     return element;
 }
@@ -176,9 +177,9 @@ Path *path_clone(Path *path)
     clone->elements = list_create();
     clone->is_absolue = path->is_absolue;
 
-    list_foreach(const char, i, path->elements)
+    list_foreach(const char, element, path->elements)
     {
-        path_push(clone, strdup(i));
+        path_push(clone, strdup(element));
     }
 
     return clone;
@@ -201,6 +202,26 @@ void path_to_cstring(Path *path, char *buffer, uint size)
             strncat(buffer, element, size);
         }
     }
+}
+
+char *path_as_string(Path *path)
+{
+    BufferBuilder *builder = buffer_builder_create(16);
+
+    if (path_element_count(path) == 0)
+    {
+        buffer_builder_append_chr(builder, PATH_SEPARATOR);
+    }
+    else
+    {
+        list_foreach(const char, element, path->elements)
+        {
+            buffer_builder_append_chr(builder, PATH_SEPARATOR);
+            buffer_builder_append_str(builder, element);
+        }
+    }
+
+    return buffer_builder_finalize(builder);
 }
 
 void path_dump(Path *path)

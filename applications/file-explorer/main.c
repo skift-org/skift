@@ -1,3 +1,5 @@
+#include <libsystem/cstring.h>
+#include <libsystem/logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
@@ -16,10 +18,20 @@ typedef struct
     Widget *Breadcrumb;
     Widget *table;
     FileSystemModel *model;
+    Path *current_path;
 } FileExplorerWindow;
 
-void file_explorer_window_navigate(FileExplorerWindow *window, const char *path)
+void file_explorer_window_navigate(FileExplorerWindow *window, Path *path)
 {
+    ((Table *)window->table)->selected = -1;
+
+    if (window->current_path)
+    {
+        path_destroy(window->current_path);
+    }
+
+    window->current_path = path;
+
     breadcrumb_navigate(window->Breadcrumb, path);
     filesystem_model_navigate(window->model, path);
     widget_update(window->table);
@@ -27,7 +39,28 @@ void file_explorer_window_navigate(FileExplorerWindow *window, const char *path)
 
 void file_explorer_go_home(FileExplorerWindow *window, ...)
 {
-    file_explorer_window_navigate(window, "/home");
+    file_explorer_window_navigate(window, path_create("/"));
+}
+
+void file_explorer_go_up(FileExplorerWindow *window, ...)
+{
+    Path *new_path = path_clone(window->current_path);
+    char *poped_element = path_pop(new_path);
+    if (poped_element)
+    {
+        free(poped_element);
+        file_explorer_window_navigate(window, new_path);
+    }
+}
+
+void file_explorer_table_open(FileExplorerWindow *window, ...)
+{
+    if (((Table *)window->table)->selected >= 0)
+    {
+        Path *new_path = path_clone(window->current_path);
+        path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected)));
+        file_explorer_window_navigate(window, new_path);
+    }
 }
 
 void file_explorer_window_destroy(FileExplorerWindow *window)
@@ -43,6 +76,8 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     Widget *root = window_root((Window *)window);
     root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
+    window->current_path = path_create(current_path);
+
     /// --- Navigation bar --- ///
     Widget *navbar = panel_create(root);
 
@@ -51,7 +86,9 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
 
     icon_create(navbar, "/res/icon/arrow_backward.png");
     icon_create(navbar, "/res/icon/arrow_forward.png");
-    icon_create(navbar, "/res/icon/arrow_upward.png");
+
+    Widget *up_button = icon_create(navbar, "/res/icon/arrow_upward.png");
+    widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)file_explorer_go_up);
 
     Widget *home_button = icon_create(navbar, "/res/icon/home.png");
     widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)file_explorer_go_home);
@@ -70,6 +107,8 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     window->table = table_create(root, (Model *)window->model);
     window->table->layout_attributes = LAYOUT_FILL;
     window->table->insets = INSETS(8, 8);
+
+    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, window, (WidgetEventHandlerCallback)file_explorer_table_open);
 
     return window;
 }

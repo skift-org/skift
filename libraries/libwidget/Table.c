@@ -29,6 +29,20 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
         widget_get_color(widget, THEME_FOREGROUND));
 }
 
+int table_row_at(Table *widget, Point position)
+{
+    position = point_sub(position, widget_content_bound(widget).position);
+
+    int row = position.Y / TABLE_ROW_HEIGHT - 1; // skip the first row wich is the header.
+
+    if (row < 0 || row >= model_row_count(widget->model))
+    {
+        row = -1;
+    }
+
+    return row;
+}
+
 void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
@@ -77,13 +91,24 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
     painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
 }
 
+void table_event(Table *widget, Event *event)
+{
+    if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    {
+        widget->selected = table_row_at(widget, ((MouseEvent *)event)->position);
+        widget_update(WIDGET(widget));
+    }
+}
+
 Widget *table_create(Widget *parent, Model *model)
 {
     Table *table = __create(Table);
 
     WIDGET(table)->paint = (WidgetPaintCallback)table_paint;
+    WIDGET(table)->event = (WidgetEventCallback)table_event;
+
     table->model = model;
-    table->selected = 3;
+    table->selected = -1;
 
     widget_initialize(WIDGET(table), "Table", parent);
 

@@ -32,12 +32,14 @@ void path_normalize(Path *path);
 
 void path_push(Path *path, const char *element);
 
-const char *path_pop(Path *path);
+char *path_pop(Path *path);
 
 Path *path_combine(Path *left, Path *right);
 
 Path *path_clone(Path *path);
 
 void path_to_cstring(Path *path, char *buffer, uint size);
+
+char *path_as_string(Path *path);
 
 void path_dump(Path *path);

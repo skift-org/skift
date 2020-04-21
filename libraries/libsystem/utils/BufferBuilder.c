@@ -46,6 +46,21 @@ void buffer_builder_append_str(BufferBuilder *buffer, const char *str)
     }
 }
 
+void buffer_builder_append_str_size(BufferBuilder *buffer, const char *str, size_t size)
+{
+    if (str)
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            buffer_builder_append_chr(buffer, str[i]);
+        }
+    }
+    else
+    {
+        buffer_builder_append_str(buffer, "<null>");
+    }
+}
+
 void buffer_builder_append_chr(BufferBuilder *buffer, char chr)
 {
     if (buffer->used + 1 == buffer->size)

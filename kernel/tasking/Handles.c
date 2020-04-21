@@ -149,6 +149,7 @@ Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t siz
 
     if (handle == NULL)
     {
+        *readed = 0;
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 

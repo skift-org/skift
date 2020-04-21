@@ -32,6 +32,7 @@ static void filesystem_model_update(FileSystemModel *model)
     {
         handle_printf_error("Failled to open directory '%s'", model->current_path);
         directory_close(directory);
+        return;
     }
 
     DirectoryEntry entry;
@@ -109,17 +110,30 @@ static const char *filesystem_model_column_name(int column)
         ASSERT_NOT_REACHED();
     }
 }
-void filesystem_model_navigate(FileSystemModel *model, const char *path)
+
+void filesystem_model_navigate(FileSystemModel *model, Path *path)
 {
     if (model->current_path)
     {
         free(model->current_path);
-        model->current_path = NULL;
     }
 
-    model->current_path = strdup(path);
+    model->current_path = path_as_string(path);
 
     model_update((Model *)model);
+}
+
+const char *filesystem_model_filename_by_index(FileSystemModel *model, int index)
+{
+    if (index >= 0 && index < list_count(model->files))
+    {
+        DirectoryEntry *entry = NULL;
+        assert(list_peekat(model->files, index, (void **)&entry));
+
+        return entry->name;
+    }
+
+    return NULL;
 }
 
 static void filesystem_model_destroy(FileSystemModel *model)

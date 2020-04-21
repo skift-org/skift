@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libgraphic/Bitmap.h>
+
 #define VARIANT_STRING_SIZE 128
 
 typedef enum
@@ -13,7 +15,10 @@ typedef struct
 {
     VarianType type;
 
-    union {
+    Bitmap *icon;
+
+    union
+    {
         int as_int;
         float as_float;
     };
@@ -28,5 +33,7 @@ Variant vfloat(float value);
 Variant vstring(const char *value);
 
 Variant vstringf(const char *fmt, ...);
+
+Variant variant_with_icon(Variant variant, const char *icon);
 
 int variant_cmp(Variant left, Variant right);

@@ -7,7 +7,6 @@
 
 typedef enum
 {
-    COLUMN_ICON,
     COLUMN_NAME,
     COLUMN_TYPE,
     COLUMN_SIZE,
@@ -51,9 +50,6 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
 
     switch (column)
     {
-    case COLUMN_ICON:
-        return vstring("<icon>");
-
     case COLUMN_NAME:
         return vstring(entry->name);
 
@@ -97,8 +93,6 @@ static const char *filesystem_model_column_name(int column)
 {
     switch (column)
     {
-    case COLUMN_ICON:
-        return "Icon";
     case COLUMN_NAME:
         return "Name";
     case COLUMN_TYPE:

@@ -21,10 +21,21 @@ Rectangle table_cell_bound(Table *widget, int row, int column)
 void table_render_cell(Table *widget, Painter *painter, int row, int column)
 {
     Rectangle cell_bound = table_cell_bound(widget, row, column);
+    Variant data = model_data(widget->model, row, column);
+
+    if (data.icon)
+    {
+        painter_blit_icon(
+            painter,
+            data.icon,
+            (Rectangle){{cell_bound.X + 4, cell_bound.Y + 16, 16, 16}},
+            widget_get_color(widget, THEME_FOREGROUND));
+    }
+
     painter_draw_string(
         painter,
         widget_font(),
-        model_data(widget->model, row, column).as_string,
+        data.as_string,
         (Point){cell_bound.X + 4, cell_bound.Y + 16},
         widget_get_color(widget, THEME_FOREGROUND));
 }

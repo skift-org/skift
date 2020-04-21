@@ -10,4 +10,4 @@ typedef struct
     Bitmap *bitmap;
 } Icon;
 
-Widget *icon_create(Widget *parent, const char *path);
+Widget *icon_create(Widget *parent, const char *name);

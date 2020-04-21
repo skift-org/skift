@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     window_root(window)->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     window_root(window)->insets = INSETS(0, 8);
 
-    Widget *menu = icon_create(window_root(window), "/res/icon/menu.png");
+    Widget *menu = icon_create(window_root(window), "menu");
     widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_PRESS, NULL, show_terminal);
 
     label_create(window_root(window), "skiftOS");

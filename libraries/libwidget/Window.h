@@ -93,9 +93,9 @@ Widget *window_root(Window *window);
 
 Widget *window_header(Window *window);
 
-void window_update(Window *window, Rectangle rectangle);
+void window_schedule_update(Window *window, Rectangle rectangle);
 
-void window_layout(Window *window);
+void window_schedule_layout(Window *window);
 
 bool window_is_focused(Window *window);
 

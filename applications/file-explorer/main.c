@@ -140,7 +140,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
 {
     FileExplorerWindow *window = __create(FileExplorerWindow);
 
-    window_initialize((Window *)window, "/res/icon/folder.png", "File Explorer", 500, 400, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, "folder", "File Explorer", 500, 400, WINDOW_RESIZABLE);
     Widget *root = window_root((Window *)window);
     root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
@@ -154,19 +154,19 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     navbar->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     navbar->insets = INSETS(0, 8);
 
-    Widget *backward_button = icon_create(navbar, "/res/icon/arrow_backward.png");
+    Widget *backward_button = icon_create(navbar, "arrow-backward");
     widget_set_event_handler(backward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_backward);
     window->go_backward = backward_button;
 
-    Widget *foreward_button = icon_create(navbar, "/res/icon/arrow_forward.png");
+    Widget *foreward_button = icon_create(navbar, "arrow-forward");
     widget_set_event_handler(foreward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_foreward);
     window->go_foreward = foreward_button;
 
-    Widget *up_button = icon_create(navbar, "/res/icon/arrow_upward.png");
+    Widget *up_button = icon_create(navbar, "arrow-upward");
     widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_up);
     window->go_up = up_button;
 
-    Widget *home_button = icon_create(navbar, "/res/icon/home.png");
+    Widget *home_button = icon_create(navbar, "home");
     widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_home);
     window->go_home = home_button;
 
@@ -177,7 +177,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
 
     separator_create(navbar);
 
-    icon_create(navbar, "/res/icon/refresh.png");
+    icon_create(navbar, "refresh");
 
     update_navigation_bar(window);
 

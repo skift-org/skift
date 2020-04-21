@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("/res/icon/info.png", "About", 250, 250, WINDOW_NONE);
+    Window *window = window_create("info", "About", 250, 250, WINDOW_NONE);
 
     window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
 

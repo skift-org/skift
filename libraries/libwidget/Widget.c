@@ -59,7 +59,7 @@ void widget_invalidate_layout(Widget *widget)
 {
     if (widget->window)
     {
-        window_layout(widget->window);
+        window_schedule_layout(widget->window);
     }
 }
 
@@ -357,7 +357,7 @@ void widget_update(Widget *widget)
 {
     if (widget->window)
     {
-        window_update(widget->window, widget->bound);
+        window_schedule_update(widget->window, widget->bound);
     }
 }
 
@@ -365,7 +365,7 @@ void widget_update_region(Widget *widget, Rectangle bound)
 {
     if (widget->window)
     {
-        window_update(widget->window, bound);
+        window_schedule_update(widget->window, bound);
     }
 }
 

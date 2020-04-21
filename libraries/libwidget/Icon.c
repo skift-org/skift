@@ -1,5 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Icon.h>
+#include <libwidget/IconCache.h>
 #include <libwidget/Window.h>
 
 void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
@@ -33,24 +34,15 @@ Point icon_size(Icon *widget)
     }
 }
 
-void icon_destroy(Icon *widget)
-{
-    if (widget->bitmap)
-    {
-        bitmap_destroy(widget->bitmap);
-    }
-}
-
-Widget *icon_create(Widget *parent, const char *path)
+Widget *icon_create(Widget *parent, const char *name)
 {
     Icon *icon = __create(Icon);
 
-    icon->bitmap = bitmap_load_from(path);
+    icon->bitmap = icon_cache_get_icon(name);
     icon->bitmap->filtering = BITMAP_FILTERING_LINEAR;
 
     WIDGET(icon)->paint = (WidgetPaintCallback)icon_paint;
     WIDGET(icon)->size = (WidgetComputeSizeCallback)icon_size;
-    WIDGET(icon)->destroy = (WidgetDestroyCallback)icon_destroy;
 
     widget_initialize(WIDGET(icon), "Icon", parent);
 

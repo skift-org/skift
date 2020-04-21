@@ -108,7 +108,7 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
 
     widget->path = path_create(current_path);
     widget->icon_computer = bitmap_load_from("/res/icon/computer.png");
-    widget->icon_expand = bitmap_load_from("/res/icon/expand_forward.png");
+    widget->icon_expand = bitmap_load_from("/res/icon/expand-forward.png");
 
     widget_initialize(WIDGET(widget), "Breadcrumb", parent);
 

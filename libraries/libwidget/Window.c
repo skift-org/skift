@@ -63,18 +63,18 @@ void window_initialize(
     window_header(window)->layout = (Layout){LAYOUT_HFLOW, 4, 0};
     window_header(window)->insets = INSETS(0, 2, 8);
 
-    icon_create(window_header(window), icon ? icon : "/res/icon/window.png");
+    icon_create(window_header(window), icon ? icon : "window");
     label_create(window_header(window), title);
 
     container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
 
     if (flags & WINDOW_RESIZABLE)
     {
-        icon_create(window_header(window), "/res/icon/window-minimize.png");
-        icon_create(window_header(window), "/res/icon/window-maximize.png");
+        icon_create(window_header(window), "window-minimize");
+        icon_create(window_header(window), "window-maximize");
     }
 
-    Widget *close_button = icon_create(window_header(window), "/res/icon/window-close.png");
+    Widget *close_button = icon_create(window_header(window), "window-close");
     widget_set_event_handler(close_button, EVENT_MOUSE_BUTTON_PRESS, NULL, close_button_click);
 
     window->root_container = container_create(NULL);
@@ -127,8 +127,8 @@ void window_show(Window *window)
 
     window->visible = true;
 
-    window_layout(window);
-    window_update(window, window_bound(window));
+    window_schedule_layout(window);
+    window_schedule_update(window, window_bound(window));
     application_show_window(window);
 }
 
@@ -427,7 +427,7 @@ Widget *window_root(Window *window)
     return window->root_container;
 }
 
-void window_update_callback(Window *window)
+void window_update(Window *window)
 {
     // FIXME: do something better than this
     list_foreach(Rectangle, rectangle, window->dirty_rect)
@@ -439,14 +439,14 @@ void window_update_callback(Window *window)
     list_clear_with_callback(window->dirty_rect, free);
 }
 
-void window_update(Window *window, Rectangle rectangle)
+void window_schedule_update(Window *window, Rectangle rectangle)
 {
     if (!window->visible)
         return;
 
     if (list_count(window->dirty_rect) == 0)
     {
-        eventloop_run_later((RunLaterCallback)window_update_callback, window);
+        eventloop_run_later((RunLaterCallback)window_update, window);
     }
 
     list_foreach(Rectangle, dirty_rect, window->dirty_rect)
@@ -468,7 +468,7 @@ merged:
     return;
 }
 
-void window_layout_callback(Window *window)
+void window_layout(Window *window)
 {
     window_header(window)->bound = window_header_bound(window);
     widget_layout(window_header(window));
@@ -477,14 +477,14 @@ void window_layout_callback(Window *window)
     widget_layout(window_root(window));
 }
 
-void window_layout(Window *window)
+void window_schedule_layout(Window *window)
 {
     if (window->dirty_layout || !window->visible)
         return;
 
     window->dirty_layout = true;
 
-    eventloop_run_later((RunLaterCallback)window_layout_callback, window);
+    eventloop_run_later((RunLaterCallback)window_layout, window);
 }
 
 bool window_is_focused(Window *window)

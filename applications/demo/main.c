@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *window = window_create("/res/icon/toys.png", "Demos", 500, 400, WINDOW_NONE);
+    Window *window = window_create("toys", "Demos", 500, 400, WINDOW_NONE);
 
     window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 

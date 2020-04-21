@@ -131,10 +131,7 @@ void menu_create_list(Widget *parent, List *menu)
 
         widget_set_event_handler(item, EVENT_MOUSE_BUTTON_PRESS, entry, (WidgetEventHandlerCallback)menu_item_click);
 
-        char icon_path[256];
-        snprintf(icon_path, 256, "/res/icon/%s.png", entry->icon);
-        icon_create(item, icon_path);
-
+        icon_create(item, entry->icon);
         label_create(item, entry->name);
     }
 }

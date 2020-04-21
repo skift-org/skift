@@ -28,14 +28,14 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
         painter_blit_icon(
             painter,
             data.icon,
-            (Rectangle){{cell_bound.X + 4, cell_bound.Y + 4, 16, 16}},
+            (Rectangle){{cell_bound.X + 4, cell_bound.Y + 3, 18, 18}},
             widget_get_color(widget, THEME_FOREGROUND));
 
         painter_draw_string(
             painter,
             widget_font(),
             data.as_string,
-            (Point){cell_bound.X + 4 + 16 + 4, cell_bound.Y + 16},
+            (Point){cell_bound.X + 4 + 18 + 4, cell_bound.Y + 16},
             widget_get_color(widget, THEME_FOREGROUND));
     }
     else

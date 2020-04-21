@@ -57,6 +57,7 @@ typedef struct Widget
 {
     const char *classname;
 
+    bool enabled;
     Rectangle bound;
     Insets insets;
 
@@ -119,3 +120,7 @@ Widget *widget_child_at(Widget *parent, Point position);
 Color __widget_get_color(Widget *widget, ThemeColorRole role);
 
 #define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))
+
+void widget_set_enable(Widget *widget, bool enable);
+
+bool widget_is_enable(Widget *widget);

@@ -24,6 +24,7 @@ void widget_initialize(
     const char *classname,
     Widget *parent)
 {
+    widget->enabled = true;
     widget->classname = classname;
     widget->childs = list_create();
     widget->bound = RECTANGLE_SIZE(32, 32);
@@ -410,4 +411,18 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 Color __widget_get_color(Widget *widget, ThemeColorRole role)
 {
     return window_get_color(widget->window, role);
+}
+
+void widget_set_enable(Widget *widget, bool enable)
+{
+    if (widget->enabled != enable)
+    {
+        widget->enabled = enable;
+        widget_update(widget);
+    }
+}
+
+bool widget_is_enable(Widget *widget)
+{
+    return widget->enabled;
 }

@@ -11,55 +11,123 @@
 #include "file-explorer/Breadcrumb.h"
 #include "file-explorer/FileSystemModel.h"
 
+typedef enum
+{
+    RECORD_BACKWARD,
+    RECORD_FOREWARD,
+} RecordHistory;
+
 typedef struct
 {
     Window window;
 
-    Widget *Breadcrumb;
+    /// --- Navigation bar --- ///
+    Widget *go_backward;
+    Widget *go_foreward;
+    Widget *go_up;
+    Widget *go_home;
+    Widget *breadcrumb;
+
+    /// --- Table view --- ///
     Widget *table;
     FileSystemModel *model;
+
+    /// --- Navigation --- //
+    List *backward_history;
+    List *foreward_history;
     Path *current_path;
 } FileExplorerWindow;
 
-void file_explorer_window_navigate(FileExplorerWindow *window, Path *path)
+static void update_navigation_bar(FileExplorerWindow *window)
+{
+    widget_set_enable(window->go_backward, list_any(window->backward_history));
+    widget_set_enable(window->go_foreward, list_any(window->foreward_history));
+    widget_set_enable(window->go_up, path_element_count(window->current_path) > 0);
+}
+
+static void navigate(FileExplorerWindow *window, Path *path, RecordHistory record_history)
 {
     ((Table *)window->table)->selected = -1;
 
-    if (window->current_path)
+    if (record_history == RECORD_BACKWARD)
     {
-        path_destroy(window->current_path);
+        if (window->current_path)
+        {
+            list_pushback(window->backward_history, window->current_path);
+        }
+    }
+    else if (record_history == RECORD_FOREWARD)
+    {
+        if (window->current_path)
+        {
+            list_pushback(window->foreward_history, window->current_path);
+        }
     }
 
     window->current_path = path;
 
-    breadcrumb_navigate(window->Breadcrumb, path);
+    breadcrumb_navigate(window->breadcrumb, path);
     filesystem_model_navigate(window->model, path);
     widget_update(window->table);
+    update_navigation_bar(window);
 }
 
-void file_explorer_go_home(FileExplorerWindow *window, ...)
+static void clear_foreward_history(FileExplorerWindow *window)
 {
-    file_explorer_window_navigate(window, path_create("/"));
+    list_clear_with_callback(window->foreward_history, (ListDestroyElementCallback)path_destroy);
 }
 
-void file_explorer_go_up(FileExplorerWindow *window, ...)
-{
-    Path *new_path = path_clone(window->current_path);
-    char *poped_element = path_pop(new_path);
-    if (poped_element)
-    {
-        free(poped_element);
-        file_explorer_window_navigate(window, new_path);
-    }
-}
-
-void file_explorer_table_open(FileExplorerWindow *window, ...)
+static void open(FileExplorerWindow *window, ...)
 {
     if (((Table *)window->table)->selected >= 0)
     {
         Path *new_path = path_clone(window->current_path);
         path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected)));
-        file_explorer_window_navigate(window, new_path);
+
+        clear_foreward_history(window);
+        navigate(window, new_path, RECORD_BACKWARD);
+    }
+}
+
+static void go_home(FileExplorerWindow *window, ...)
+{
+    clear_foreward_history(window);
+    navigate(window, path_create("/"), RECORD_BACKWARD);
+}
+
+static void go_up(FileExplorerWindow *window, ...)
+{
+    Path *new_path = path_clone(window->current_path);
+    char *poped_element = path_pop(new_path);
+
+    if (poped_element)
+    {
+        free(poped_element);
+
+        clear_foreward_history(window);
+        navigate(window, new_path, RECORD_BACKWARD);
+    }
+}
+
+static void go_backward(FileExplorerWindow *window, ...)
+{
+    if (list_any(window->backward_history))
+    {
+        Path *path = NULL;
+        list_popback(window->backward_history, (void **)&path);
+
+        navigate(window, path, RECORD_FOREWARD);
+    }
+}
+
+static void go_foreward(FileExplorerWindow *window, ...)
+{
+    if (list_any(window->foreward_history))
+    {
+        Path *path = NULL;
+        list_popback(window->foreward_history, (void **)&path);
+
+        navigate(window, path, RECORD_BACKWARD);
     }
 }
 
@@ -77,6 +145,8 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
 
     window->current_path = path_create(current_path);
+    window->backward_history = list_create();
+    window->foreward_history = list_create();
 
     /// --- Navigation bar --- ///
     Widget *navbar = panel_create(root);
@@ -84,23 +154,32 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     navbar->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     navbar->insets = INSETS(0, 8);
 
-    icon_create(navbar, "/res/icon/arrow_backward.png");
-    icon_create(navbar, "/res/icon/arrow_forward.png");
+    Widget *backward_button = icon_create(navbar, "/res/icon/arrow_backward.png");
+    widget_set_event_handler(backward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_backward);
+    window->go_backward = backward_button;
+
+    Widget *foreward_button = icon_create(navbar, "/res/icon/arrow_forward.png");
+    widget_set_event_handler(foreward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_foreward);
+    window->go_foreward = foreward_button;
 
     Widget *up_button = icon_create(navbar, "/res/icon/arrow_upward.png");
-    widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)file_explorer_go_up);
+    widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_up);
+    window->go_up = up_button;
 
     Widget *home_button = icon_create(navbar, "/res/icon/home.png");
-    widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)file_explorer_go_home);
+    widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_home);
+    window->go_home = home_button;
 
     separator_create(navbar);
 
-    window->Breadcrumb = breadcrumb_create(navbar, current_path);
-    WIDGET(window->Breadcrumb)->layout_attributes = LAYOUT_FILL;
+    window->breadcrumb = breadcrumb_create(navbar, current_path);
+    WIDGET(window->breadcrumb)->layout_attributes = LAYOUT_FILL;
 
     separator_create(navbar);
 
     icon_create(navbar, "/res/icon/refresh.png");
+
+    update_navigation_bar(window);
 
     /// --- Table view --- ///
     window->model = filesystem_model_create(current_path);
@@ -108,7 +187,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     window->table->layout_attributes = LAYOUT_FILL;
     window->table->insets = INSETS(8, 8);
 
-    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, window, (WidgetEventHandlerCallback)file_explorer_table_open);
+    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, window, (WidgetEventHandlerCallback)open);
 
     return window;
 }

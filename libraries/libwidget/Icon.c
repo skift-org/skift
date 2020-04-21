@@ -10,7 +10,14 @@ void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
     {
         Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_content_bound(widget));
 
-        painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND));
+        if (widget_is_enable(WIDGET(widget)))
+        {
+            painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND));
+        }
+        else
+        {
+            painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND_DISABLED));
+        }
     }
 }
 

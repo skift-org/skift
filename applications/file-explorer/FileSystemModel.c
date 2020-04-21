@@ -51,7 +51,15 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
     switch (column)
     {
     case COLUMN_NAME:
-        return vstring(entry->name);
+
+        if (entry->stat.type == FILE_TYPE_DIRECTORY)
+        {
+            return variant_with_icon(vstring(entry->name), "folder");
+        }
+        else
+        {
+            return variant_with_icon(vstring(entry->name), "file");
+        }
 
     case COLUMN_TYPE:
         switch (entry->stat.type)
@@ -75,8 +83,6 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
     default:
         ASSERT_NOT_REACHED();
     }
-
-    return vstring("Some data");
 }
 
 static int filesystem_model_column_count(void)

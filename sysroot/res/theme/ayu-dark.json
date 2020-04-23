@@ -1,6 +1,6 @@
 {
-    "name": "Skift Dark",
-    "comment": "The default look of skiftOS.",
+    "name": "Ayu Dark",
+    "comment": "Simple, bright, and elegant theme for skiftOS.",
     "dark": true,
     "colors": {
         "border": "#3d424d",
@@ -9,9 +9,9 @@
         "foreground": "#b3b1ad",
         "foreground-inactive": "#888888",
         "foreground-disabled": "#888888",
-        "selection": "#273747",
-        "selection-inactive": "#1F2C39",
-        "accent": "#59c2ff",
+        "selection": "#01060e",
+        "selection-inactive": "#01060e",
+        "accent": "#ffb454",
         "accent-inactive": "#3d424d",
         "ansi-cursor": "#ffb454",
         "ansi-background": "#0a0e14",

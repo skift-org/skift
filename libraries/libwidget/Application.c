@@ -56,6 +56,8 @@ Result application_initialize(int argc, char **argv)
 {
     assert(!_initialized);
 
+    bool theme_changed = false;
+
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i], "--theme") == 0 && i + 1 < argc)
@@ -63,8 +65,12 @@ Result application_initialize(int argc, char **argv)
             char buffer[256];
             snprintf(buffer, 256, "/res/theme/%s.json", argv[i + 1]);
             theme_load(buffer);
+            theme_changed = true;
         }
     }
+
+    if (!theme_changed)
+        theme_load("/res/theme/skift-dark.json");
 
     _connection = socket_connect("/srv/compositor.ipc");
 

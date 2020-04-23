@@ -185,7 +185,6 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     window->model = filesystem_model_create(current_path);
     window->table = table_create(root, (Model *)window->model);
     window->table->layout_attributes = LAYOUT_FILL;
-    window->table->insets = INSETS(8, 8);
 
     widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, window, (WidgetEventHandlerCallback)open);
 

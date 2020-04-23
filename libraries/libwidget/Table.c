@@ -67,6 +67,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
+    painter_push_clip(painter, widget_bound(widget));
+
     int column_count = model_column_count(widget->model);
     int column_width = widget_content_bound(widget).width / column_count;
 
@@ -90,7 +92,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    for (int row = 0; row < MIN(model_row_count(widget->model), (widget_content_bound(widget).height / TABLE_ROW_HEIGHT) - 1); row++)
+    for (int row = 0; row < MIN(model_row_count(widget->model), (widget_content_bound(widget).height / TABLE_ROW_HEIGHT)); row++)
     {
         Rectangle row_bound = (Rectangle){{
             widget_content_bound(widget).X,
@@ -111,7 +113,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    //painter_draw_rectangle(painter, widget_content_bound(widget), widget_get_color(widget, THEME_BORDER));
+    painter_pop_clip(painter);
 }
 
 void table_event(Table *widget, Event *event)

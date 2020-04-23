@@ -70,7 +70,8 @@ enum
 typedef struct __packed
 {
     char vendorid[16];
-    union __packed {
+    union __packed
+    {
         struct __packed
         {
             bool SSE3 : 1;
@@ -103,7 +104,8 @@ typedef struct __packed
         u32 RAW_ECX;
     };
 
-    union __packed {
+    union __packed
+    {
         struct __packed
         {
             bool FPU : 1;
@@ -139,9 +141,9 @@ typedef struct __packed
         };
         u32 RAW_EDX;
     };
-} cpuid_t;
+} CPUID;
 
-cpuid_t cpuid();
+CPUID cpuid();
 
 char *cpuid_get_vendorid();
 

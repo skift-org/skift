@@ -16,9 +16,9 @@ static inline int cpuid_string(int code, int where[4])
     return (int)where[0];
 }
 
-cpuid_t cpuid()
+CPUID cpuid(void)
 {
-    cpuid_t cid;
+    CPUID cid;
     memset(&cid.vendorid, 0, 16);
     cpuid_string(0, (int *)&cid.vendorid[0]);
     cid.RAW_ECX = cpuid_get_feature_ECX();
@@ -29,7 +29,7 @@ cpuid_t cpuid()
 
 void cpuid_dump()
 {
-    cpuid_t cid = cpuid();
+    CPUID cid = cpuid();
 
     printf("\n\n\tCPUID dump:\n\t - Vendorid: %s\n\t - Features:", cid.vendorid);
 

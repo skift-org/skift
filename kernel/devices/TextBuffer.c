@@ -9,7 +9,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include "kernel/device/Device.h"
+#include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
 
 /* ---VGA textmode driver --------------------------------------------------- */

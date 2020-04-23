@@ -5,7 +5,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include "kernel/x86/pci.h"
+#include "kernel/bus/PCI.h"
 #include "kernel/x86/x86.h"
 
 void pci_write_field(uint32_t device, int field, int size, uint32_t value)
@@ -38,92 +38,129 @@ uint32_t pci_read_field(uint32_t device, int field, int size)
     return 0xFFFF;
 }
 
-uint16_t pci_find_type(uint32_t dev)
+uint16_t pci_read_type(uint32_t dev)
 {
     return (pci_read_field(dev, PCI_CLASS, 1) << 8) | pci_read_field(dev, PCI_SUBCLASS, 1);
 }
 
-void pci_scan_hit(pci_func_t f, uint32_t dev, void *extra)
+IterationDecision pci_device_iterate_hit(
+    void *target,
+    DeviceIterateCallback callback,
+    uint32_t device)
 {
-    int dev_vend = (int)pci_read_field(dev, PCI_VENDOR_ID, 2);
-    int dev_dvid = (int)pci_read_field(dev, PCI_DEVICE_ID, 2);
+    int vendor_id = (int)pci_read_field(device, PCI_VENDOR_ID, 2);
+    int device_id = (int)pci_read_field(device, PCI_DEVICE_ID, 2);
 
-    f(dev, dev_vend, dev_dvid, extra);
+    return callback(
+        target,
+        (DeviceInfo){
+            .bus = BUS_PCI,
+            .device = device,
+            .vendor_id = vendor_id,
+            .device_id = device_id,
+        });
 }
 
-void pci_scan_func(pci_func_t f, int type, int bus, int slot, int func, void *extra)
+IterationDecision pci_device_iterate_func(
+    void *target,
+    DeviceIterateCallback callback,
+    int bus,
+    int slot,
+    int func)
 {
-    uint32_t dev = pci_box_device(bus, slot, func);
-    if (type == -1 || type == pci_find_type(dev))
+    uint32_t device = pci_box_device(bus, slot, func);
+    if (pci_device_iterate_hit(target, callback, device) == ITERATION_STOP)
     {
-        pci_scan_hit(f, dev, extra);
+        return ITERATION_STOP;
     }
 
-    if (pci_find_type(dev) == PCI_TYPE_BRIDGE)
+    if (pci_read_type(device) == PCI_TYPE_BRIDGE)
     {
-        pci_scan_bus(f, type, pci_read_field(dev, PCI_SECONDARY_BUS, 1), extra);
+        return pci_device_iterate_bus(
+            target,
+            callback,
+            pci_read_field(device, PCI_SECONDARY_BUS, 1));
+    }
+    else
+    {
+        return ITERATION_CONTINUE;
     }
 }
 
-void pci_scan_slot(pci_func_t f, int type, int bus, int slot, void *extra)
+IterationDecision pci_device_iterate_slot(
+    void *target,
+    DeviceIterateCallback callback,
+    int bus,
+    int slot)
 {
     uint32_t dev = pci_box_device(bus, slot, 0);
     if (pci_read_field(dev, PCI_VENDOR_ID, 2) == PCI_NONE)
-    {
-        return;
-    }
-    pci_scan_func(f, type, bus, slot, 0, extra);
+        return ITERATION_CONTINUE;
+
+    if (pci_device_iterate_func(target, callback, bus, slot, 0) == ITERATION_STOP)
+        return ITERATION_STOP;
+
     if (!pci_read_field(dev, PCI_HEADER_TYPE, 1))
-    {
-        return;
-    }
+        return ITERATION_CONTINUE;
+
     for (int func = 1; func < 8; func++)
     {
         uint32_t dev = pci_box_device(bus, slot, func);
+
         if (pci_read_field(dev, PCI_VENDOR_ID, 2) != PCI_NONE)
-        {
-            pci_scan_func(f, type, bus, slot, func, extra);
-        }
+            if (pci_device_iterate_func(target, callback, bus, slot, func) == ITERATION_STOP)
+                return ITERATION_STOP;
     }
+
+    return ITERATION_CONTINUE;
 }
 
-void pci_scan_bus(pci_func_t f, int type, int bus, void *extra)
+IterationDecision pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus)
 {
     for (int slot = 0; slot < 32; ++slot)
-    {
-        pci_scan_slot(f, type, bus, slot, extra);
-    }
+        if (pci_device_iterate_slot(target, callback, bus, slot) == ITERATION_STOP)
+            return ITERATION_STOP;
+
+    return ITERATION_CONTINUE;
 }
 
-void pci_scan(pci_func_t f, int type, void *extra)
+IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callback)
 {
     if ((pci_read_field(0, PCI_HEADER_TYPE, 1) & 0x80) == 0)
     {
-        pci_scan_bus(f, type, 0, extra);
-        return;
+        return pci_device_iterate_bus(target, callback, 0);
     }
 
     for (int func = 0; func < 8; ++func)
     {
         uint32_t dev = pci_box_device(0, 0, func);
 
-        if (pci_read_field(dev, PCI_VENDOR_ID, 2) != PCI_NONE)
+        if (pci_read_field(dev, PCI_VENDOR_ID, 2) == PCI_NONE)
         {
-            pci_scan_bus(f, type, func, extra);
+            return ITERATION_CONTINUE;
         }
-        else
+
+        if (pci_device_iterate_bus(target, callback, func) == ITERATION_STOP)
         {
-            break;
+            return ITERATION_STOP;
         }
     }
+
+    return ITERATION_CONTINUE;
 }
 
-static void find_isa_bridge(uint32_t device, uint16_t vendorid, uint16_t deviceid, void *extra)
+static IterationDecision find_isa_bridge(uint32_t *pci_isa, DeviceInfo info)
 {
-    if (vendorid == 0x8086 && (deviceid == 0x7000 || deviceid == 0x7110))
-    {
-        *((uint32_t *)extra) = device;
-    }
+    if (info.vendor_id != 0x8086)
+        return ITERATION_CONTINUE;
+
+    if (info.device_id != 0x7000 ||
+        info.device_id != 0x7110)
+        return ITERATION_CONTINUE;
+
+    *pci_isa = info.device;
+
+    return ITERATION_STOP;
 }
 
 static uint32_t pci_isa = 0;
@@ -131,7 +168,7 @@ static uint8_t pci_remaps[4] = {};
 
 void pci_remap(void)
 {
-    pci_scan(&find_isa_bridge, -1, &pci_isa);
+    pci_device_iterate(&pci_isa, (DeviceIterateCallback)find_isa_bridge);
 
     if (pci_isa)
     {

@@ -22,7 +22,7 @@
 #include <libsystem/process/Launchpad.h>
 
 #include "kernel/clock.h"
-#include "kernel/device/Device.h"
+#include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"
@@ -102,6 +102,7 @@ void kmain(void *info, uint magic)
 
     filesystem_initialize();
     modules_initialize(multiboot);
+    device_initialize();
 
     logger_info("Mounting devices...");
     null_initialize();
@@ -110,11 +111,7 @@ void kmain(void *info, uint magic)
     serial_initialize();
     mouse_initialize();
     keyboard_initialize();
-
-    if (!framebuffer_initialize())
-    {
-        textmode_initialize();
-    }
+    // textmode_initialize();
 
     userspace_initialize();
 }

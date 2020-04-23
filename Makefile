@@ -256,8 +256,8 @@ all: $(BOOTDISK)
 .PHONY: run
 run: $(BOOTDISK)
 	@echo [QEMU] $^
-	@$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -enable-kvm || \
-	 $(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime
+	@$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci -enable-kvm || \
+	 $(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
 
 .PHONY: clean
 clean:

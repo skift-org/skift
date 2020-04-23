@@ -95,6 +95,11 @@ Result bga_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
     }
 }
 
+bool bga_match(DeviceInfo info)
+{
+    return info.vendor_id == 0x1234 && info.device_id == 0x1111;
+}
+
 void bga_initialize(DeviceInfo info)
 {
     bga_set_mode(VBE_DISPI_MAX_XRES, VBE_DISPI_MAX_YRES);
@@ -113,6 +118,7 @@ void bga_initialize(DeviceInfo info)
 
     FsNode *file = __create(FsNode);
     file->call = (FsOperationCall)bga_iocall;
+    fsnode_init(file, FILE_TYPE_DEVICE);
 
     Path *path = path_create("/dev/framebuffer");
     filesystem_link(path, file);

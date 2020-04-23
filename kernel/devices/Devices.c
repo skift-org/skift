@@ -1,10 +1,12 @@
 #include <libsystem/logger.h>
 
 #include "kernel/bus/PCI.h"
+#include "kernel/virtio/Virtio.h"
 
 static DeviceDriver drivers[] = {
-    {"BOCHS/QEMU Graphics Adaptor", BUS_PCI, 0x1234, 0x1111, bga_initialize},
-    {NULL, BUS_NONE, 0, 0, NULL},
+    {"BOCHS/QEMU Graphics Adaptor", BUS_PCI, bga_match, bga_initialize},
+    {"VirtIO Network Adaptor", BUS_PCI, virtio_net_match, virtio_net_initialize},
+    {NULL, BUS_NONE, NULL, NULL},
 };
 
 IterationDecision
@@ -12,13 +14,11 @@ print_device_info(void *target, DeviceInfo info)
 {
     __unused(target);
 
-    for (size_t i = 0; drivers[i].initialize; i++)
+    for (size_t i = 0; drivers[i].match; i++)
     {
         DeviceDriver *driver = &drivers[i];
 
-        if (driver->bus == info.bus &&
-            driver->vendor_id == info.vendor_id &&
-            driver->device_id == info.device_id)
+        if (driver->bus == info.bus && driver->match(info))
         {
             logger_info("Found '%s' PCI:%06x:%4x:%4x", drivers[i].description, info.device, info.vendor_id, info.device_id);
 

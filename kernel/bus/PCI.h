@@ -13,6 +13,7 @@
 #define PCI_COMMAND 0x04
 #define PCI_STATUS 0x06
 #define PCI_REVISION_ID 0x08
+#define PCI_SUBSYSTEM_ID 0x2E
 
 #define PCI_PROG_IF 0x09
 #define PCI_SUBCLASS 0x0a

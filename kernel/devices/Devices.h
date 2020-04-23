@@ -18,6 +18,7 @@ typedef struct
     int device_id;
 } DeviceInfo;
 
+typedef bool (*DeviceDriverMatch)(DeviceInfo info);
 typedef void (*DeviceDriverInitialize)(DeviceInfo info);
 
 typedef struct
@@ -25,9 +26,7 @@ typedef struct
     const char *description;
 
     Bus bus;
-    int vendor_id;
-    int device_id;
-
+    DeviceDriverMatch match;
     DeviceDriverInitialize initialize;
 } DeviceDriver;
 
@@ -39,6 +38,7 @@ void device_iterate(void *target, DeviceIterateCallback callback);
 
 /* --- Devices -------------------------------------------------------------- */
 
+bool bga_match(DeviceInfo info);
 void bga_initialize(DeviceInfo info);
 
 void keyboard_initialize(void);

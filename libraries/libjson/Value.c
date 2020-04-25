@@ -2,7 +2,7 @@
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
 
-JsonValue *json_create_string(char *string)
+JsonValue *json_create_string(const char *string)
 {
     JsonValue *value = __create(JsonValue);
 
@@ -40,6 +40,18 @@ JsonValue *json_create_double(double double_)
     value->storage_double = double_;
 
     return value;
+}
+
+JsonValue *json_create_boolean(bool value)
+{
+    if (value)
+    {
+        return json_create_true();
+    }
+    else
+    {
+        return json_create_false();
+    }
 }
 
 JsonValue *json_create_object(void)

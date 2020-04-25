@@ -13,6 +13,18 @@
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/tasking.h"
 
+static const char *TASK_STATES[] = {
+    "hang",
+    "launchpad",
+    "running",
+    "blocked",
+    "wait_time",
+    "wait_task",
+    "wait_message",
+    "wait_respond",
+    "canceled",
+};
+
 Result info_FsOperationOpen(FsInfo *node, FsHandle *handle)
 {
     __unused(node);
@@ -27,8 +39,10 @@ Result info_FsOperationOpen(FsInfo *node, FsHandle *handle)
 
         json_object_put(task_object, "id", json_create_integer(task->id));
         json_object_put(task_object, "name", json_create_string(task->name));
+        json_object_put(task_object, "state", json_create_string(TASK_STATES[task->state]));
         json_object_put(task_object, "cwd", json_create_string_adopt(path_as_string(task->cwd_path)));
         json_object_put(task_object, "cpu", json_create_integer(sheduler_get_usage(task->id)));
+        json_object_put(task_object, "user", json_create_boolean(task->user));
 
         json_array_append(root, task_object);
     }

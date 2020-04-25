@@ -9,7 +9,9 @@ typedef enum
 {
     COLUMN_ID,
     COLUMN_NAME,
+    COLUMN_STATE,
     COLUMN_CPU,
+    COLUMN_CWD,
 
     __COLUMN_COUNT,
 } Column;
@@ -31,11 +33,30 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     switch (column)
     {
     case COLUMN_ID:
-        return vint(json_integer_value(json_object_get(task, "id")));
+    {
+        Variant value = vint(json_integer_value(json_object_get(task, "id")));
+
+        if (json_is(json_object_get(task, "user"), JSON_TRUE))
+        {
+            return variant_with_icon(value, "user");
+        }
+        else
+        {
+            return variant_with_icon(value, "gear");
+        }
+    }
+
     case COLUMN_NAME:
         return vstring(json_string_value(json_object_get(task, "name")));
+
+    case COLUMN_STATE:
+        return vstring(json_string_value(json_object_get(task, "state")));
+
     case COLUMN_CPU:
         return vstringf("%2d%%", json_integer_value(json_object_get(task, "cpu")));
+
+    case COLUMN_CWD:
+        return vstring(json_string_value(json_object_get(task, "cwd")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -58,10 +79,18 @@ static const char *task_model_column_name(int column)
     {
     case COLUMN_ID:
         return "ID";
+
     case COLUMN_NAME:
         return "Name";
+
+    case COLUMN_STATE:
+        return "State";
+
     case COLUMN_CPU:
         return "CPU%";
+
+    case COLUMN_CWD:
+        return "Directory";
 
     default:
         ASSERT_NOT_REACHED();

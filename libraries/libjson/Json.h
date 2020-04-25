@@ -30,13 +30,15 @@ typedef struct JsonValue
     };
 } JsonValue;
 
-JsonValue *json_create_string(char *string);
+JsonValue *json_create_string(const char *string);
 
 JsonValue *json_create_string_adopt(char *string);
 
 JsonValue *json_create_integer(int integer);
 
 JsonValue *json_create_double(double double_);
+
+JsonValue *json_create_boolean(bool value);
 
 JsonValue *json_create_object(void);
 

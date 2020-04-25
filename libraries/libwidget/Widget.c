@@ -159,6 +159,9 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 
 void widget_layout(Widget *widget)
 {
+    if (list_count(widget->childs) == 0)
+        return;
+
     Layout layout = widget->layout;
 
     switch (layout.type)

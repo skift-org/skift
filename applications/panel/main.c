@@ -4,10 +4,9 @@
 #include <libsystem/system.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
+#include <libwidget/Graph.h>
 #include <libwidget/Icon.h>
 #include <libwidget/Label.h>
-
-#include "panel/GraphWidget.h"
 
 void widget_date_and_time_update(Widget *widget)
 {
@@ -21,18 +20,18 @@ void widget_date_and_time_update(Widget *widget)
     label_set_text(widget, buffer);
 }
 
-void widget_ram_update(GraphWidget *widget)
+void widget_ram_update(Graph *widget)
 {
     SystemStatus status = system_get_status();
 
-    graph_widget_record(widget, status.used_ram / (double)status.total_ram);
+    graph_record(widget, status.used_ram / (double)status.total_ram);
 }
 
-void widget_cpu_update(GraphWidget *widget)
+void widget_cpu_update(Graph *widget)
 {
     SystemStatus status = system_get_status();
 
-    graph_widget_record(widget, status.cpu_usage / 100.0);
+    graph_record(widget, status.cpu_usage / 100.0);
 }
 
 void show_terminal()
@@ -61,10 +60,10 @@ int main(int argc, char **argv)
     Widget *graph_container = container_create(window_root(window));
     graph_container->layout = (Layout){LAYOUT_VGRID, 0, 1};
 
-    Widget *ram_graph = graph_widget_create(graph_container, COLOR_ROYALBLUE);
+    Widget *ram_graph = graph_create(graph_container, 50, COLOR_ROYALBLUE);
     label_create(ram_graph, "RAM");
 
-    Widget *cpu_graph = graph_widget_create(graph_container, COLOR_SEAGREEN);
+    Widget *cpu_graph = graph_create(graph_container, 50, COLOR_SEAGREEN);
     label_create(cpu_graph, "CPU");
 
     label_create(window_root(window), "user");

@@ -11,8 +11,8 @@ typedef struct
     double *data;
     size_t data_size;
     size_t current;
-} GraphWidget;
+} Graph;
 
-void graph_widget_record(GraphWidget *widget, double data);
+void graph_record(Graph *widget, double data);
 
-Widget *graph_widget_create(Widget *parent, Color color);
+Widget *graph_create(Widget *parent, size_t data_size, Color color);

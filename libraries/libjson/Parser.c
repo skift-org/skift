@@ -387,5 +387,7 @@ JsonValue *json_parse_file(const char *path)
         return NULL;
     }
 
+    stream_close(json_file);
+
     return json_parse(buffer, json_state.size);
 }

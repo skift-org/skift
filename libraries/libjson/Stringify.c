@@ -54,11 +54,13 @@ void json_stringify_internal(BufferBuilder *builder, JsonValue *value)
     case JSON_OBJECT:
         buffer_builder_append_str(builder, "{");
         hashmap_iterate(value->storage_object, builder, (HashMapIterationCallback)json_stringify_object);
+        buffer_builder_rewind(builder, 2); // remove the last ", "
         buffer_builder_append_str(builder, "}");
         break;
     case JSON_ARRAY:
         buffer_builder_append_str(builder, "[");
         list_iterate(value->storage_array, builder, (ListIterationCallback)json_stringify_array);
+        buffer_builder_rewind(builder, 2); // remove the last ", "
         buffer_builder_append_str(builder, "]");
         break;
     case JSON_TRUE:

@@ -95,6 +95,7 @@ void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)
 
         state->depth++;
         hashmap_iterate(value->storage_object, state, (HashMapIterationCallback)json_prettify_object);
+        buffer_builder_rewind(state->builder, 1); // remove the last ","
         state->depth--;
 
         json_prettify_ident(state);
@@ -105,6 +106,7 @@ void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)
 
         state->depth++;
         list_iterate(value->storage_array, state, (ListIterationCallback)json_prettify_array);
+        buffer_builder_rewind(state->builder, 1); // remove the last ","
         state->depth--;
 
         json_prettify_ident(state);

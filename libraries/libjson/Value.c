@@ -208,7 +208,7 @@ JsonValue *json_array_get(JsonValue *array, size_t index)
 
     JsonValue *value = NULL;
 
-    list_peekat(array->storage_array, index, (void **)&value);
+    assert(list_peekat(array->storage_array, index, (void **)&value));
 
     return value;
 }
@@ -218,6 +218,13 @@ void json_array_put(JsonValue *array, size_t index, JsonValue *value)
     assert(json_is(array, JSON_ARRAY));
 
     list_insert(array->storage_array, index, value);
+}
+
+void json_array_append(JsonValue *array, JsonValue *value)
+{
+    assert(json_is(array, JSON_ARRAY));
+
+    list_pushback(array->storage_array, value);
 }
 
 void json_array_remove(JsonValue *array, size_t index)

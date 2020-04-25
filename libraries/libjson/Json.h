@@ -20,7 +20,8 @@ typedef struct JsonValue
 {
     JsonType type;
 
-    union {
+    union
+    {
         char *storage_string;
         int storage_integer;
         double storage_double;
@@ -70,6 +71,8 @@ size_t json_array_lenght(JsonValue *array);
 JsonValue *json_array_get(JsonValue *array, size_t index);
 
 void json_array_put(JsonValue *array, size_t index, JsonValue *value);
+
+void json_array_append(JsonValue *array, JsonValue *value);
 
 void json_array_remove(JsonValue *array, size_t index);
 

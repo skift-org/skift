@@ -1,3 +1,4 @@
+#include <libsystem/assert.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 BufferBuilder *buffer_builder_create(size_t preallocated)
@@ -72,4 +73,12 @@ void buffer_builder_append_chr(BufferBuilder *buffer, char chr)
     buffer->buffer[buffer->used] = chr;
     buffer->buffer[buffer->used + 1] = '\0';
     buffer->used++;
+}
+
+void buffer_builder_rewind(BufferBuilder *buffer, size_t how_many)
+{
+    assert(buffer->used >= how_many);
+
+    buffer->used -= how_many;
+    buffer->buffer[buffer->used] = '\0';
 }

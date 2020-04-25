@@ -20,3 +20,5 @@ void buffer_builder_append_str(BufferBuilder *buffer, const char *str);
 void buffer_builder_append_str_size(BufferBuilder *buffer, const char *str, size_t size);
 
 void buffer_builder_append_chr(BufferBuilder *buffer, char chr);
+
+void buffer_builder_rewind(BufferBuilder *buffer, size_t how_many);

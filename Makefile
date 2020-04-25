@@ -70,6 +70,9 @@ KERNEL_ASSEMBLY_SOURCES = \
 
 KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libfile/*.c) \
+	$(wildcard libraries/libjson/*.c) \
+	$(wildcard libraries/libmath/*.c) \
+	$(wildcard libraries/libmath/*/*.c) \
 	$(wildcard libraries/libsystem/*.c) \
 	$(wildcard libraries/libsystem/io/*.c) \
 	$(wildcard libraries/libsystem/unicode/*.c) \
@@ -229,7 +232,8 @@ $(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROO
 	@mkdir -p \
 		$(SYSROOT)/dev \
 		$(SYSROOT)/res \
-		$(SYSROOT)/srv
+		$(SYSROOT)/srv \
+		$(SYSROOT)/sys
 
 	@cp -r sysroot/* $(SYSROOT)/
 
@@ -258,6 +262,10 @@ run: $(BOOTDISK)
 	@echo [QEMU] $^
 	@$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci -enable-kvm || \
 	 $(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
+
+sync:
+	rm $(BOOTDISK) $(RAMDISK)
+	make $(BOOTDISK)
 
 .PHONY: clean
 clean:

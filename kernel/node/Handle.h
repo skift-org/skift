@@ -14,7 +14,6 @@ typedef struct FsHandle
     OpenFlag flags;
 
     void *attached;
-
     size_t attached_size;
 } FsHandle;
 

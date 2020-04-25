@@ -27,6 +27,7 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/multiboot/Multiboot.h"
+#include "kernel/node/ProcessInfo.h"
 #include "kernel/platform.h"
 #include "kernel/serial.h"
 #include "kernel/system.h"
@@ -111,6 +112,7 @@ void kmain(void *info, uint magic)
     serial_initialize();
     mouse_initialize();
     keyboard_initialize();
+    info_initialize();
     // textmode_initialize();
 
     userspace_initialize();

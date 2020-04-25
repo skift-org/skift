@@ -204,6 +204,8 @@ static void list_peekat_from_back(List *list, int index, void **value)
 
 bool list_peekat(List *list, int index, void **value)
 {
+    *value = NULL;
+
     if (list->count >= 1 && index >= 0 && index < list->count)
     {
         if (index < list->count / 2)
@@ -253,7 +255,7 @@ void list_insert(List *list, int index, void *value)
         list_push(list, value);
     }
 
-    ListItem *current = list->tail;
+    ListItem *current = list->head;
 
     for (int i = 0; i < index - 1; i++)
     {
@@ -273,7 +275,7 @@ void list_insert(List *list, int index, void *value)
 
     if (list->tail == current)
     {
-        list->tail = current;
+        list->tail = item;
     }
 
     list->count++;

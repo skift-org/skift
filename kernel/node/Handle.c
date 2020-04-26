@@ -358,9 +358,13 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
         return ERR_CONNECTION_REFUSED;
     }
 
-    task_block(sheduler_running(), blocker_connect_create(connection), 0);
+    // We need to create the fshandle before releasing the lock
+    // Because this will increment FsNode::clients
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
+
+    task_block(sheduler_running(), blocker_connect_create(connection), 0);
+
     fsnode_deref(connection);
 
     return SUCCESS;
@@ -379,9 +383,12 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     FsNode *connection = node->accept_connection(node);
 
-    fsnode_release_lock(node, sheduler_running_id());
+    // We need to create the fshandle before releasing the lock
+    // Because this will increment FsNode::servers
 
     *connection_handle = fshandle_create(connection, OPEN_SERVER);
+
+    fsnode_release_lock(node, sheduler_running_id());
 
     fsnode_deref(connection);
 

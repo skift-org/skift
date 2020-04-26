@@ -392,6 +392,22 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
 
     atomic_begin();
 
+    task->blocker = blocker;
+    if (blocker->can_unblock(blocker, task))
+    {
+
+        if (blocker->on_unblock)
+        {
+            blocker->on_unblock(blocker, task);
+        }
+
+        task->blocker = NULL;
+        free(blocker);
+        atomic_end();
+
+        return BLOCKER_UNBLOCKED;
+    }
+
     if (timeout == 0 || timeout == (Timeout)-1)
     {
         blocker->timeout = 0;
@@ -401,7 +417,6 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
         blocker->timeout = sheduler_get_ticks() + timeout;
     }
 
-    task->blocker = blocker;
     task_set_state(task, TASK_STATE_BLOCKED);
     atomic_end();
 

@@ -34,7 +34,7 @@ Window *manager_get_window_at(Point position)
 {
     list_foreach(Window, window, _managed_windows)
     {
-        if (rectangle_containe_point(window_bound(window), position))
+        if (rectangle_containe_point(window_cursor_capture_bound(window), position))
         {
             return window;
         }

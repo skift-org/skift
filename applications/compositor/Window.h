@@ -23,14 +23,18 @@ void window_destroy(Window *window);
 
 Rectangle window_bound(Window *window);
 
-void window_move(Window *window, Point position);
+Rectangle window_cursor_capture_bound(Window *window);
 
-void window_send_event(Window *window, Event *event, size_t size);
+void window_move(Window *window, Point position);
 
 void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons);
 
 void window_handle_mouse_buttons(Window *window, MouseButton old_buttons, MouseButton buttons, Point position);
 
+void window_handle_double_click(Window *window, Point position);
+
 void window_get_focus(Window *window);
 
 void window_lost_focus(Window *window);
+
+void window_send_event(Window *window, Event *event, size_t size);

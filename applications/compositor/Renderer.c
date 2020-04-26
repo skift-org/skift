@@ -86,3 +86,4 @@ void renderer_repaint_dirty(void)
     framebuffer_blit_dirty(_framebuffer);
     list_clear_with_callback(_dirty_regions, free);
 }
+

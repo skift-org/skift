@@ -16,12 +16,26 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
     connection_receive(connection, &header, sizeof(CompositorMessage));
 
+    if (handle_has_error(connection))
+    {
+        client->disconnected = true;
+        client_close_disconnected_clients();
+        return;
+    }
+
     switch (header.type)
     {
     case COMPOSITOR_MESSAGE_CREATE_WINDOW:
     {
         CompositorCreateWindowMessage create_window = {};
         connection_receive(connection, &create_window, sizeof(CompositorCreateWindowMessage));
+
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+            return;
+        }
 
         Bitmap *bitmap = NULL;
 
@@ -34,6 +48,13 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     {
         CompositorDestroyWindowMessage destroy_window = {};
         connection_receive(connection, &destroy_window, sizeof(CompositorDestroyWindowMessage));
+
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+            return;
+        }
 
         Window *window = manager_get_window(client, destroy_window.id);
 
@@ -55,6 +76,14 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
         CompositorBlitWindowMessage blit_window = {};
         connection_receive(connection, &blit_window, sizeof(CompositorBlitWindowMessage));
 
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+
+            return;
+        }
+
         Window *window = manager_get_window(client, blit_window.id);
 
         if (window)
@@ -73,6 +102,14 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
         CompositorWindowMove move_window = {};
         connection_receive(connection, &move_window, sizeof(CompositorWindowMove));
 
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+
+            return;
+        }
+
         Window *window = manager_get_window(client, move_window.id);
 
         if (window)
@@ -90,6 +127,14 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     {
         CompositorCursorStateChange cursor = {};
         connection_receive(connection, &cursor, sizeof(CompositorCursorStateChange));
+
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+
+            return;
+        }
 
         Window *window = manager_get_window(client, cursor.id);
 
@@ -119,7 +164,7 @@ static List *_connected_client = NULL;
 
 Client *client_create(Connection *connection)
 {
-    if (_connected_client == NULL)
+    if (!_connected_client)
     {
         _connected_client = list_create();
     }
@@ -133,45 +178,84 @@ Client *client_create(Connection *connection)
         SELECT_READ,
         (NotifierCallback)client_request_callback);
 
+    list_pushback(_connected_client, client);
+
+    logger_info("Client %08x connected", client);
+
     return client;
+}
+
+IterationDecision destroy_window_if_client_match(Client *client, Window *window)
+{
+    if (window->client == client)
+    {
+        window_destroy(window);
+    }
+
+    return ITERATION_CONTINUE;
+}
+
+void client_close_all_windows(Client *client)
+{
+    list_iterate(manager_get_windows(), client, (ListIterationCallback)destroy_window_if_client_match);
 }
 
 void client_destroy(Client *client)
 {
+    logger_info("Disconnecting client %08x", client);
+
+    client_close_all_windows(client);
+    list_remove(_connected_client, client);
     notifier_destroy(client->notifier);
     connection_close(client->connection);
     free(client);
 }
 
-void client_destroy_if_disconnected(Client *client)
+Result client_send_message(Client *client, CompositorMessageType type, const void *message, size_t size)
 {
+    if (client->disconnected)
+    {
+        return ERR_STREAM_CLOSED;
+    }
+
+    CompositorMessage header = {type, size};
+    connection_send(client->connection, &header, sizeof(header));
+
+    if (handle_has_error(client->connection))
+    {
+        logger_trace("Failled to send header to %08x", client);
+        client->disconnected = true;
+        return handle_get_error(client->connection);
+    }
+
+    if (!message)
+        return SUCCESS;
+
+    connection_send(client->connection, message, size);
+
+    if (handle_has_error(client->connection))
+    {
+        logger_trace("Failled to send message to %08x", client);
+        client->disconnected = true;
+        return handle_get_error(client->connection);
+    }
+
+    return SUCCESS;
+}
+
+IterationDecision client_destroy_if_disconnected(void *target, Client *client)
+{
+    __unused(target);
+
     if (client->disconnected)
     {
         client_destroy(client);
     }
-}
 
-Result client_send_message(Client *client, CompositorMessageType type, const void *message, size_t size)
-{
-    CompositorMessage header = {type, size};
-    connection_send(client->connection, &header, sizeof(header));
-
-    if (handle_get_error(client->connection) == ERR_STREAM_CLOSED)
-    {
-        client->disconnected = true;
-        return true;
-    }
-
-    connection_send(client->connection, message, size);
-
-    if (handle_get_error(client->connection) == ERR_STREAM_CLOSED)
-    {
-        client->disconnected = true;
-        return true;
-    }
+    return ITERATION_CONTINUE;
 }
 
 void client_close_disconnected_clients(void)
 {
-    list
+    list_iterate(_connected_client, NULL, (ListIterationCallback)client_destroy_if_disconnected);
 }

@@ -96,21 +96,9 @@ void cursor_handle_packet(MousePacket packet)
     {
         uint current = system_get_ticks();
 
-        if (current - _last_click < 250)
+        if (current - _last_click < 250 && window_on_focus)
         {
-
-            Point position = point_sub(_mouse_position, window_bound(window_on_focus).position);
-
-            if (window_on_focus)
-                window_send_event(window_on_focus,
-                                  EVENT(
-                                      MouseEvent,
-                                      EVENT_MOUSE_DOUBLE_CLICK,
-                                      position,
-                                      position,
-                                      MOUSE_BUTTON_LEFT,
-                                      MOUSE_BUTTON_LEFT),
-                                  sizeof(MouseEvent));
+            window_handle_double_click(window_on_focus, _mouse_position);
         }
 
         _last_click = current;

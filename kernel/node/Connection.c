@@ -22,9 +22,9 @@ bool connection_is_accepted(FsConnection *connection)
 bool connection_can_read(FsConnection *connection, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_CLIENT))
-        return !ringbuffer_is_empty(connection->data_to_client);
+        return !ringbuffer_is_empty(connection->data_to_client) || !connection->node.server;
     else
-        return !ringbuffer_is_empty(connection->data_to_server);
+        return !ringbuffer_is_empty(connection->data_to_server) || !connection->node.clients;
 }
 
 Result connection_read(
@@ -38,10 +38,20 @@ Result connection_read(
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
+        if (!connection->node.server)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         data = connection->data_to_client;
     }
     else
     {
+        if (!connection->node.clients)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         data = connection->data_to_server;
     }
 
@@ -61,10 +71,20 @@ Result connection_write(
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
+        if (!connection->node.server)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         data = connection->data_to_server;
     }
     else
     {
+        if (!connection->node.clients)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         data = connection->data_to_client;
     }
 

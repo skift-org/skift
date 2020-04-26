@@ -127,7 +127,10 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
 
 Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
-    if (!fshandle_has_flag(handle, OPEN_READ) && !fshandle_has_flag(handle, OPEN_MASTER))
+    if (!fshandle_has_flag(handle, OPEN_READ) &&
+        !fshandle_has_flag(handle, OPEN_MASTER) &&
+        !fshandle_has_flag(handle, OPEN_SERVER) &&
+        !fshandle_has_flag(handle, OPEN_CLIENT))
     {
         return ERR_WRITE_ONLY_STREAM;
     }
@@ -185,7 +188,10 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
 
     *written = 0;
 
-    if (!fshandle_has_flag(handle, OPEN_WRITE) && !fshandle_has_flag(handle, OPEN_MASTER))
+    if (!fshandle_has_flag(handle, OPEN_WRITE) &&
+        !fshandle_has_flag(handle, OPEN_MASTER) &&
+        !fshandle_has_flag(handle, OPEN_SERVER) &&
+        !fshandle_has_flag(handle, OPEN_CLIENT))
     {
         return ERR_READ_ONLY_STREAM;
     }
@@ -354,7 +360,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     task_block(sheduler_running(), blocker_connect_create(connection), 0);
 
-    *connection_handle = fshandle_create(connection, OPEN_CLIENT | OPEN_READ | OPEN_WRITE);
+    *connection_handle = fshandle_create(connection, OPEN_CLIENT);
     fsnode_deref(connection);
 
     return SUCCESS;
@@ -375,7 +381,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     fsnode_release_lock(node, sheduler_running_id());
 
-    *connection_handle = fshandle_create(connection, OPEN_SERVER | OPEN_READ | OPEN_WRITE);
+    *connection_handle = fshandle_create(connection, OPEN_SERVER);
 
     fsnode_deref(connection);
 

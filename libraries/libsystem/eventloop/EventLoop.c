@@ -15,8 +15,10 @@ typedef struct
     void *target;
 } RunLater;
 
-static List *_eventloop_notifiers = NULL;
 static List *_eventloop_timers = NULL;
+static TimeStamp _eventloop_timer_last_fire = 0;
+
+static List *_eventloop_notifiers = NULL;
 static List *_eventloop_run_later = NULL;
 
 static size_t _eventloop_handles_count;
@@ -31,8 +33,10 @@ void eventloop_initialize(void)
 {
     assert(!_eventloop_is_initialize);
 
-    _eventloop_notifiers = list_create();
     _eventloop_timers = list_create();
+    _eventloop_timer_last_fire = system_get_ticks();
+
+    _eventloop_notifiers = list_create();
     _eventloop_run_later = list_create();
 
     _eventloop_is_initialize = true;
@@ -96,8 +100,6 @@ void eventloop_pump(void)
 
     list_clear_with_callback(_eventloop_run_later, free);
 
-    TimeStamp start = system_get_ticks();
-
     Result result = handle_select(
         &_eventloop_handles[0],
         &_eventloop_events[0],
@@ -105,27 +107,7 @@ void eventloop_pump(void)
         &selected, &selected_events,
         timeout);
 
-    ElapsedTime elapsed = system_get_ticks() - start;
-
-    list_foreach(Timer, timer, _eventloop_timers)
-    {
-        if (!timer->started)
-        {
-            continue;
-        }
-
-        timer->elapsed += elapsed;
-
-        if (timer->elapsed >= timer->interval)
-        {
-            if (timer->callback)
-            {
-                timer->callback(timer->target);
-            }
-
-            timer->elapsed = 0;
-        }
-    }
+    eventloop_update_timers();
 
     if (result == SUCCESS)
     {
@@ -155,6 +137,38 @@ void eventloop_exit(int exit_value)
 
     _eventloop_is_running = false;
     _eventloop_exit_value = exit_value;
+}
+
+void eventloop_update_timers(void)
+{
+    assert(_eventloop_is_initialize);
+    assert(_eventloop_is_running);
+
+    TimeStamp current_fire = system_get_ticks();
+
+    ElapsedTime elapsed = current_fire - _eventloop_timer_last_fire;
+
+    list_foreach(Timer, timer, _eventloop_timers)
+    {
+        if (!timer->started)
+        {
+            continue;
+        }
+
+        timer->elapsed += elapsed;
+
+        if (timer->elapsed >= timer->interval)
+        {
+            if (timer->callback)
+            {
+                timer->callback(timer->target);
+            }
+
+            timer->elapsed = 0;
+        }
+    }
+
+    _eventloop_timer_last_fire = current_fire;
 }
 
 void eventloop_update_notifier(void)

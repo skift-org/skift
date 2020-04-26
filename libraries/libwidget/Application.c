@@ -28,6 +28,13 @@ void application_request_callback(
     CompositorMessage header = {};
     connection_receive(connection, &header, sizeof(CompositorMessage));
 
+    if (handle_get_error(connection) == ERR_STREAM_CLOSED)
+    {
+        logger_error("Connection to the compositor closed!");
+        application_exit(-1);
+        return;
+    }
+
     if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
     {
         CompositorWindowEvent windowEvent = {};

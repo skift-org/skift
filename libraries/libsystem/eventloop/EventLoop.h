@@ -29,3 +29,5 @@ void eventloop_unregister_timer(struct Timer *timer);
 typedef void (*RunLaterCallback)(void *target);
 
 void eventloop_run_later(RunLaterCallback callback, void *target);
+
+void eventloop_update_timers(void);

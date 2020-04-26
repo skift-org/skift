@@ -460,12 +460,16 @@ bool list_contains(List *list, void *value)
 
 bool list_iterate(List *list, void *target, ListIterationCallback callback)
 {
-    list_foreach(void, item, list)
+    ListItem *current = list->head;
+
+    while (current)
     {
-        if (callback(target, item) == ITERATION_STOP)
+        ListItem *next = current->next;
+        if (callback(target, current->value) == ITERATION_STOP)
         {
             return false;
         }
+        current = next;
     }
 
     return true;

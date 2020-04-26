@@ -257,5 +257,8 @@ IterationDecision client_destroy_if_disconnected(void *target, Client *client)
 
 void client_close_disconnected_clients(void)
 {
-    list_iterate(_connected_client, NULL, (ListIterationCallback)client_destroy_if_disconnected);
+    if (_connected_client)
+    {
+        list_iterate(_connected_client, NULL, (ListIterationCallback)client_destroy_if_disconnected);
+    }
 }

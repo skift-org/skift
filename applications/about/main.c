@@ -9,8 +9,9 @@ void ok_button_pressed(void *target, Widget *sender, Event *event)
 {
     __unused(target);
     __unused(event);
+    __unused(sender);
 
-    window_hide(sender->window);
+    application_exit(-1);
 }
 
 int main(int argc, char **argv)

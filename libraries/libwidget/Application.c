@@ -11,8 +11,16 @@
 
 #include "compositor/Protocol.h"
 
-static bool _initialized = false;
-static bool _running = false;
+typedef enum
+{
+    APPLICATION_NONE,
+
+    APPLICATION_INITALIZED,
+    APPLICATION_RUNNING,
+    APPLICATION_EXITING,
+} ApplicationState;
+
+static ApplicationState _state = APPLICATION_NONE;
 static List *_windows;
 static Connection *_connection;
 static Notifier *_connection_notifier;
@@ -61,7 +69,7 @@ void application_request_callback(
 
 Result application_initialize(int argc, char **argv)
 {
-    assert(!_initialized);
+    assert(_state == APPLICATION_NONE);
 
     bool theme_changed = false;
 
@@ -100,26 +108,25 @@ Result application_initialize(int argc, char **argv)
         SELECT_READ,
         (NotifierCallback)application_request_callback);
 
-    _initialized = true;
+    _state = APPLICATION_INITALIZED;
 
     return SUCCESS;
 }
 
 int application_run(void)
 {
-    assert(_initialized);
-    assert(!_running);
-
-    _running = true;
+    assert(_state == APPLICATION_INITALIZED);
+    _state = APPLICATION_RUNNING;
 
     return eventloop_run();
 }
 
 void application_exit(int exit_value)
 {
-    assert(_initialized);
-    assert(_running);
+    logger_debug("Exiting application...");
 
+    assert(_state == APPLICATION_RUNNING);
+    _state = APPLICATION_EXITING;
     Window *window = NULL;
 
     while (list_peek(_windows, (void **)&window))
@@ -128,11 +135,13 @@ void application_exit(int exit_value)
     }
 
     eventloop_exit(exit_value);
+
+    _state = APPLICATION_NONE;
 }
 
 void application_dump(void)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     list_foreach(Window, window, _windows)
     {
@@ -152,14 +161,14 @@ void application_send_message(CompositorMessageType type, const void *buffer, si
 
 void application_add_window(Window *window)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     list_pushback(_windows, window);
 }
 
 void application_show_window(Window *window)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorCreateWindowMessage message = {
@@ -173,7 +182,7 @@ void application_show_window(Window *window)
 
 void application_hide_window(Window *window)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorDestroyWindowMessage message = {
@@ -181,6 +190,11 @@ void application_hide_window(Window *window)
     };
 
     application_send_message(COMPOSITOR_MESSAGE_DESTROY_WINDOW, &message, sizeof(CompositorDestroyWindowMessage));
+
+    if (_state == APPLICATION_EXITING)
+    {
+        return;
+    }
 
     bool should_application_close = false;
 
@@ -197,13 +211,15 @@ void application_hide_window(Window *window)
 
 void application_remove_window(Window *window)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     list_remove(_windows, window);
 }
 
 Window *application_get_window_by_id(int id)
 {
+    assert(_state >= APPLICATION_INITALIZED);
+
     list_foreach(Window, window, _windows)
     {
         if (window_handle(window) == id)
@@ -217,7 +233,7 @@ Window *application_get_window_by_id(int id)
 
 void application_blit_window(Window *window, Rectangle bound)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     CompositorBlitWindowMessage message = {
         .id = window_handle(window),
@@ -229,7 +245,7 @@ void application_blit_window(Window *window, Rectangle bound)
 
 void application_move_window(Window *window, Point position)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     CompositorWindowMove message = {
         .id = window_handle(window),
@@ -241,7 +257,7 @@ void application_move_window(Window *window, Point position)
 
 void application_window_change_cursor(Window *window, CursorState state)
 {
-    assert(_initialized);
+    assert(_state >= APPLICATION_INITALIZED);
 
     CompositorCursorStateChange message = {
         .id = window_handle(window),

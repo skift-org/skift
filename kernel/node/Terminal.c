@@ -16,11 +16,11 @@ bool terminal_FsOperationCanRead(FsTerminal *terminal, FsHandle *handle)
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        return !ringbuffer_is_empty(terminal->slave_to_master_buffer);
+        return !ringbuffer_is_empty(terminal->slave_to_master_buffer) || !terminal->node.writers;
     }
     else
     {
-        return !ringbuffer_is_empty(terminal->master_to_slave_buffer);
+        return !ringbuffer_is_empty(terminal->master_to_slave_buffer) || !terminal->node.master;
     }
 }
 
@@ -30,11 +30,11 @@ bool terminal_FsOperationCanWrite(FsTerminal *terminal, FsHandle *handle)
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        return !ringbuffer_is_full(terminal->master_to_slave_buffer);
+        return !ringbuffer_is_full(terminal->master_to_slave_buffer) || !terminal->node.readers;
     }
     else
     {
-        return !ringbuffer_is_full(terminal->slave_to_master_buffer);
+        return !ringbuffer_is_full(terminal->slave_to_master_buffer) || !terminal->node.master;
     }
 }
 
@@ -44,10 +44,20 @@ Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *bu
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
+        if (!terminal->node.writers)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         *readed = ringbuffer_read(terminal->slave_to_master_buffer, (char *)buffer, size);
     }
     else
     {
+        if (!terminal->node.master)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         *readed = ringbuffer_read(terminal->master_to_slave_buffer, (char *)buffer, size);
     }
 
@@ -60,10 +70,20 @@ Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const v
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
+        if (!terminal->node.readers)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         *writen = ringbuffer_write(terminal->master_to_slave_buffer, (const char *)buffer, size);
     }
     else
     {
+        if (!terminal->node.master)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
         *writen = ringbuffer_write(terminal->slave_to_master_buffer, (const char *)buffer, size);
     }
 

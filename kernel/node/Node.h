@@ -43,8 +43,13 @@ typedef struct FsNode
 {
     FileType type;
     Lock lock;
+    uint refcount;
 
-    int refcount;
+    uint readers;
+    uint writers;
+    uint clients;
+    uint server;
+    uint master;
 
     FsOperationOpen open;
     FsOperationClose close;
@@ -76,6 +81,10 @@ void fsnode_init(FsNode *node, FileType type);
 FsNode *fsnode_ref(FsNode *node);
 
 void fsnode_deref(FsNode *node);
+
+FsNode *fsnode_ref_handle(FsNode *node, OpenFlag flags);
+
+void fsnode_deref_handle(FsNode *node, OpenFlag flags);
 
 bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 

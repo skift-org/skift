@@ -35,7 +35,7 @@ void readline_repaint(ReadLine *readline)
     readline->old_cursor = readline->used;
 }
 
-char *readline_readline(ReadLine *readline)
+Result readline_readline(ReadLine *readline, char **line)
 {
     readline->buffer = (char *)calloc(1, READLINE_ALLOCATED + 1);
     readline->allocated = READLINE_ALLOCATED;
@@ -47,6 +47,12 @@ char *readline_readline(ReadLine *readline)
     while (true)
     {
         char chr = stream_getchar(in_stream);
+
+        if (handle_has_error(in_stream))
+        {
+            *line = readline->buffer;
+            return handle_get_error(in_stream);
+        }
 
         if (chr == '\n')
         {
@@ -90,5 +96,6 @@ char *readline_readline(ReadLine *readline)
 
     readline->buffer[readline->used] = '\0';
 
-    return readline->buffer;
+    *line = readline->buffer;
+    return SUCCESS;
 }

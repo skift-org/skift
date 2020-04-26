@@ -115,8 +115,15 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     }
 }
 
+static List *_connected_client = NULL;
+
 Client *client_create(Connection *connection)
 {
+    if (_connected_client == NULL)
+    {
+        _connected_client = list_create();
+    }
+
     Client *client = __create(Client);
 
     client->connection = connection;
@@ -129,16 +136,42 @@ Client *client_create(Connection *connection)
     return client;
 }
 
-void client_send_message(Client *client, CompositorMessageType type, const void *message, size_t size)
-{
-    CompositorMessage header = {type, size};
-    connection_send(client->connection, &header, sizeof(header));
-    connection_send(client->connection, message, size);
-}
-
 void client_destroy(Client *client)
 {
     notifier_destroy(client->notifier);
     connection_close(client->connection);
     free(client);
+}
+
+void client_destroy_if_disconnected(Client *client)
+{
+    if (client->disconnected)
+    {
+        client_destroy(client);
+    }
+}
+
+Result client_send_message(Client *client, CompositorMessageType type, const void *message, size_t size)
+{
+    CompositorMessage header = {type, size};
+    connection_send(client->connection, &header, sizeof(header));
+
+    if (handle_get_error(client->connection) == ERR_STREAM_CLOSED)
+    {
+        client->disconnected = true;
+        return true;
+    }
+
+    connection_send(client->connection, message, size);
+
+    if (handle_get_error(client->connection) == ERR_STREAM_CLOSED)
+    {
+        client->disconnected = true;
+        return true;
+    }
+}
+
+void client_close_disconnected_clients(void)
+{
+    list
 }

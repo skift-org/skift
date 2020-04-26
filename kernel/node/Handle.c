@@ -21,7 +21,7 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 
     lock_init(handle->lock);
 
-    handle->node = fsnode_ref(node);
+    handle->node = fsnode_ref_handle(node, flags);
     handle->offset = 0;
     handle->flags = flags;
 
@@ -42,7 +42,7 @@ FsHandle *fshandle_clone(FsHandle *handle)
 
     lock_init(clone->lock);
 
-    clone->node = fsnode_ref(node);
+    clone->node = fsnode_ref_handle(node, handle->flags);
     clone->offset = handle->offset;
     clone->flags = handle->flags;
 
@@ -72,7 +72,7 @@ void fshandle_destroy(FsHandle *handle)
         fsnode_release_lock(node, sheduler_running_id());
     }
 
-    fsnode_deref(node);
+    fsnode_deref_handle(node, handle->flags);
     free(handle);
 }
 
@@ -127,7 +127,7 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
 
 Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
 {
-    if (!fshandle_has_flag(handle, OPEN_READ))
+    if (!fshandle_has_flag(handle, OPEN_READ) && !fshandle_has_flag(handle, OPEN_MASTER))
     {
         return ERR_WRITE_ONLY_STREAM;
     }
@@ -185,7 +185,7 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
 
     *written = 0;
 
-    if (!fshandle_has_flag(handle, OPEN_WRITE))
+    if (!fshandle_has_flag(handle, OPEN_WRITE) && !fshandle_has_flag(handle, OPEN_MASTER))
     {
         return ERR_READ_ONLY_STREAM;
     }

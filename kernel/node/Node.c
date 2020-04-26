@@ -35,6 +35,46 @@ void fsnode_deref(FsNode *node)
     }
 }
 
+FsNode *fsnode_ref_handle(FsNode *node, OpenFlag flags)
+{
+    if (flags & OPEN_READ)
+        __atomic_add_fetch(&node->readers, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_WRITE)
+        __atomic_add_fetch(&node->writers, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_CLIENT)
+        __atomic_add_fetch(&node->clients, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_SERVER)
+        __atomic_add_fetch(&node->server, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_MASTER)
+        __atomic_add_fetch(&node->master, 1, __ATOMIC_SEQ_CST);
+
+    return fsnode_ref(node);
+}
+
+void fsnode_deref_handle(FsNode *node, OpenFlag flags)
+{
+    if (flags & OPEN_READ)
+        __atomic_sub_fetch(&node->readers, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_WRITE)
+        __atomic_sub_fetch(&node->writers, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_CLIENT)
+        __atomic_sub_fetch(&node->clients, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_SERVER)
+        __atomic_sub_fetch(&node->server, 1, __ATOMIC_SEQ_CST);
+
+    if (flags & OPEN_MASTER)
+        __atomic_sub_fetch(&node->master, 1, __ATOMIC_SEQ_CST);
+
+    fsnode_deref(node);
+}
+
 bool fsnode_can_read(FsNode *node, FsHandle *handle)
 {
     if (node->can_read)

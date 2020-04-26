@@ -82,7 +82,13 @@ int main(int argc, char **argv)
     while (true)
     {
         shell_prompt(command_exit_value);
-        char *command = readline_readline(readline);
+        char *command = NULL;
+        if (readline_readline(readline, &command) != SUCCESS)
+        {
+            if (command)
+                free(command);
+            return -1;
+        }
 
         char *command_argv[PROCESS_ARG_COUNT] = {};
         int command_argc = shell_split(command, command_argv);

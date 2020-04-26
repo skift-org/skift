@@ -20,4 +20,4 @@ ReadLine *readline_create(void);
 
 void readline_destroy(ReadLine *readline);
 
-char *readline_readline(ReadLine *readline);
+Result readline_readline(ReadLine *readline, char **line);

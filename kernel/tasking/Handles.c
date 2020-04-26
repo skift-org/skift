@@ -415,7 +415,7 @@ Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_
 
     FsNode *terminal = terminal_create();
 
-    FsHandle *master_handle = fshandle_create(terminal, OPEN_MASTER | OPEN_READ | OPEN_WRITE);
+    FsHandle *master_handle = fshandle_create(terminal, OPEN_MASTER);
     FsHandle *slave_handle = fshandle_create(terminal, OPEN_READ | OPEN_WRITE);
 
     result = task_fshandle_add(task, master_handle_index, master_handle);

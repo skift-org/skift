@@ -29,6 +29,7 @@
     __ENTRY(ERR_OPERATION_NOT_SUPPORTED)         \
     __ENTRY(ERR_READ_ONLY_STREAM)                \
     __ENTRY(ERR_SOCKET_OPERATION_ON_NON_SOCKET)  \
+    __ENTRY(ERR_STREAM_CLOSED)                   \
     __ENTRY(ERR_TOO_MANY_OPEN_FILES)             \
     __ENTRY(ERR_WRITE_ONLY_STREAM)
 

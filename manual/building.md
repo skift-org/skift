@@ -20,7 +20,17 @@ And for testing et debuging
 $ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
 ```
 
-## 1. Setting up
+## 1. Get the source code
+
+Clone the repository with all its submodules.
+
+```sh
+$ git clone --recursive https://github.com/skiftOS/skift
+
+$ cd skift
+```
+
+## 2. Setting up
 
 Building the toolchain is pretty straight-forward,
 first make sure you have all GCC and binutils dependancies:
@@ -51,30 +61,26 @@ The script will do the following operation without installing anything to the ho
  - Patch them using binutils.patch and gcc.patch located in the toolchain directory.
  - Then configure and build
 
-## 2. Building
+## 3. Building
 
 From the root of this repo do:
 
-
 ```sh
-git submodule init
-git submodule update
+$ make all
 ```
 
-these commands brings the dependencies of the third-party libraries like lodepng
-
-```sh
-make all
-```
-
-This command will build all the component of the project and generate an ISO bootable on QEMU or VirtualBox
+This command will build all the component of the project and generate an ISO bootable in QEMU or VirtualBox.
 
 > The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debuging and testing the system
 
-## 3. Running in qemu
+## 4. Running in a virtual machine
 
-From the root of this repo do:
+The build system allows you to create and start a virtual machine of skiftOS by using one of the following commands:
 
 ```sh
-make run
+$ make run-qemu # for QEMU
+# or
+$ make run-vbox # for Virtual Box
 ```
+
+> If you made any modification to the source code or the content of the sysroot/ directory, the build system should be able to rebuild the project from step 3 automagically :^)

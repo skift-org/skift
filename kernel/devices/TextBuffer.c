@@ -11,10 +11,13 @@
 
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/memory/Virtual.h"
 
 /* ---VGA textmode driver --------------------------------------------------- */
 
 #define VGA_FRAME_BUFFER 0XB8000
+
+static uint16_t *_text_buffer = NULL;
 
 #define VGA_SCREEN_WIDTH 80
 #define VGA_SCREEN_HEIGHT 25
@@ -27,7 +30,7 @@ void vga_cell(u32 x, u32 y, ushort entry)
     {
         if (y < VGA_SCREEN_HEIGHT)
         {
-            ((u16 *)VGA_FRAME_BUFFER)[y * VGA_SCREEN_WIDTH + x] = (u16)entry;
+            ((u16 *)_text_buffer)[y * VGA_SCREEN_WIDTH + x] = (u16)entry;
         }
     }
 }
@@ -66,7 +69,7 @@ Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buf
 
     size_t tocopy = MIN(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
 
-    memcpy((void *)VGA_FRAME_BUFFER, buffer, tocopy);
+    memcpy((void *)_text_buffer, buffer, tocopy);
 
     *writen = tocopy;
 
@@ -116,6 +119,8 @@ Result textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 void textmode_initialize(void)
 {
     logger_info("Initializing textmode graphic");
+
+    _text_buffer = (uint16_t *)virtual_alloc(&kpdir, VGA_FRAME_BUFFER, PAGE_ALIGN_UP(VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(uint16_t)) / PAGE_SIZE, false);
 
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FILE_TYPE_DEVICE);

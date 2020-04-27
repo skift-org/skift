@@ -25,6 +25,7 @@ BUILD_DIRECTORY_UTILS=$(SYSROOT)/bin
 # --- Configs -------------------------------------------- #
 
 QEMU=qemu-system-x86_64
+QEMUFLAGS=-m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
 
 CC:=i686-pc-skift-gcc
 CFLAGS:= \
@@ -260,8 +261,11 @@ all: $(BOOTDISK)
 .PHONY: run
 run: $(BOOTDISK)
 	@echo [QEMU] $^
-	@$(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci -enable-kvm || \
-	 $(QEMU) -cdrom $^ -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
+	@$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk -enable-kvm || \
+	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl -enable-kvm || \
+	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk || \
+	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl || \
+	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
 
 sync:
 	rm $(BOOTDISK) $(RAMDISK)

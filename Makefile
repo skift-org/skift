@@ -258,14 +258,43 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) grub.cfg
 .PHONY: all
 all: $(BOOTDISK)
 
-.PHONY: run
-run: $(BOOTDISK)
+.PHONY: run-qemu
+run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
 	@$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk -enable-kvm || \
 	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl -enable-kvm || \
 	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk || \
 	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl || \
 	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
+
+.PHONY: run-vbox
+run-vbox: $(BOOTDISK)
+	VBoxManage unregistervm --delete "skiftOS-dev" || echo "Look like it's the fist time you are running this command, this is fine"
+	VBoxManage createvm \
+		--name skiftOS-dev \
+		--ostype Other \
+		--register \
+		--basefolder $(shell pwd)/vm
+
+	VBoxManage modifyvm \
+		skiftOS-dev \
+		--memory 512
+
+	VBoxManage storagectl \
+		skiftOS-dev \
+		--name IDE \
+		--add ide \
+
+	VBoxManage storageattach \
+		skiftOS-dev \
+		--storagectl IDE \
+		--port 0 \
+		--device 0 \
+		--type dvddrive \
+		--medium $(BOOTDISK)
+
+
+	VBoxManage startvm skiftOS-dev --type gui
 
 sync:
 	rm $(BOOTDISK) $(RAMDISK)

@@ -3,5 +3,6 @@ build/
 toolchain/build/
 toolchain/tarballs/
 toolchain/local/
+vm/
 
 *.ignored

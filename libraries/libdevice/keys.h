@@ -6,12 +6,6 @@
 
 #include <libsystem/runtime.h>
 
-typedef enum
-{
-    KEY_MOTION_UP,
-    KEY_MOTION_DOWN
-} KeyMotion;
-
 #define KEY_LIST(__ENTRY)                     \
     __ENTRY(KEY_INVALID, 0x0)                 \
     __ENTRY(KEY_ESC, 0x01)                    \
@@ -131,6 +125,18 @@ typedef enum
     KEY_LIST(KEY_ENUM_ENTRY)
         __KEY_COUNT,
 } Key;
+
+typedef enum
+{
+    KEY_MOTION_UP,
+    KEY_MOTION_DOWN
+} KeyMotion;
+
+typedef struct
+{
+    Key key;
+    KeyMotion motion;
+} KeyboradPacket;
 
 const char *key_to_string(Key key);
 

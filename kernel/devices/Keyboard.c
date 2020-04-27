@@ -29,14 +29,19 @@ typedef enum
     PS2KBD_STATE_ESCAPED,
 } PS2KeyboardState;
 
-static PS2KeyboardState keyboard_state = PS2KBD_STATE_NORMAL;
-static KeyMotion keyboard_keystate[__KEY_COUNT] = {KEY_MOTION_UP};
-static KeyMap *keyboard_keymap = NULL;
-static RingBuffer *keyboard_buffer = NULL;
+static PS2KeyboardState _state = PS2KBD_STATE_NORMAL;
+static KeyMotion _keystate[__KEY_COUNT] = {KEY_MOTION_UP};
+static KeyMap *_keymap = NULL;
 
-int keyboad_get_codepoint(Key key)
+static FsNode *_characters_node = NULL;
+static RingBuffer *_characters_buffer = NULL;
+
+static FsNode *_events_node = NULL;
+static RingBuffer *_events_buffer = NULL;
+
+Codepoint keyboad_get_codepoint(Key key)
 {
-    KeyMapping *mapping = keymap_lookup(keyboard_keymap, key);
+    KeyMapping *mapping = keymap_lookup(_keymap, key);
 
     if (mapping == NULL)
     {
@@ -44,12 +49,12 @@ int keyboad_get_codepoint(Key key)
     }
     else
     {
-        if (keyboard_keystate[KEY_LSHIFT] == KEY_MOTION_DOWN ||
-            keyboard_keystate[KEY_RSHIFT] == KEY_MOTION_DOWN)
+        if (_keystate[KEY_LSHIFT] == KEY_MOTION_DOWN ||
+            _keystate[KEY_RSHIFT] == KEY_MOTION_DOWN)
         {
             return mapping->shift_codepoint;
         }
-        else if (keyboard_keystate[KEY_RALT] == KEY_MOTION_DOWN)
+        else if (_keystate[KEY_RALT] == KEY_MOTION_DOWN)
         {
             return mapping->alt_codepoint;
         }
@@ -70,11 +75,16 @@ void keyboard_handle_key(Key key, KeyMotion motion)
             {
                 uint8_t utf8[5];
                 int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
-                ringbuffer_write(keyboard_buffer, (const char *)utf8, lenght);
+
+                if (_characters_node->readers)
+                    ringbuffer_write(_characters_buffer, (const char *)utf8, lenght);
             }
         }
 
-        keyboard_keystate[key] = motion;
+        if (_events_node->readers)
+            ringbuffer_write(_events_buffer, (char *)&(KeyboradPacket){key, motion}, sizeof(KeyboradPacket));
+
+        _keystate[key] = motion;
     }
     else
     {
@@ -95,26 +105,26 @@ Key keyboard_scancode_to_key(int scancode)
 
 void keyboard_interrupt_handler(void)
 {
-    int byte = in8(0x60);
+    uint8_t scancode = in8(0x60);
 
-    if (keyboard_state == PS2KBD_STATE_NORMAL)
+    if (_state == PS2KBD_STATE_NORMAL)
     {
-        if (byte == PS2KBD_ESCAPE)
+        if (scancode == PS2KBD_ESCAPE)
         {
-            keyboard_state = PS2KBD_STATE_ESCAPED;
+            _state = PS2KBD_STATE_ESCAPED;
         }
         else
         {
-            Key key = keyboard_scancode_to_key(byte & 0x7F);
-            keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
+            Key key = keyboard_scancode_to_key(scancode & 0x7F);
+            keyboard_handle_key(key, scancode & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
     }
-    else if (keyboard_state == PS2KBD_STATE_ESCAPED)
+    else if (_state == PS2KBD_STATE_ESCAPED)
     {
-        keyboard_state = PS2KBD_STATE_NORMAL;
+        _state = PS2KBD_STATE_NORMAL;
 
-        Key key = keyboard_scancode_to_key((byte & 0x7F) + 0x80);
-        keyboard_handle_key(key, byte & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
+        Key key = keyboard_scancode_to_key((scancode & 0x7F) + 0x80);
+        keyboard_handle_key(key, scancode & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
     }
 }
 
@@ -163,29 +173,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     return keymap;
 }
 
-bool keyboard_FsOperationCanRead(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(keyboard_buffer);
-}
-
-static Result keyboard_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: use locks
-    atomic_begin();
-    *readed = ringbuffer_read(keyboard_buffer, (char *)buffer, size);
-    atomic_end();
-
-    return SUCCESS;
-}
-
-Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+static Result keyboard_iocall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -197,13 +185,13 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
 
         atomic_begin();
 
-        if (keyboard_keymap != NULL)
+        if (_keymap != NULL)
         {
-            free(keyboard_keymap);
+            free(_keymap);
         }
 
-        keyboard_keymap = (KeyMap *)malloc(size_and_keymap->size);
-        memcpy(keyboard_keymap, new_keymap, size_and_keymap->size);
+        _keymap = (KeyMap *)malloc(size_and_keymap->size);
+        memcpy(_keymap, new_keymap, size_and_keymap->size);
 
         atomic_end();
 
@@ -211,7 +199,7 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
     }
     else if (request == KEYBOARD_CALL_GET_KEYMAP)
     {
-        memcpy(args, keyboard_keymap, sizeof(KeyMap));
+        memcpy(args, _keymap, sizeof(KeyMap));
         return SUCCESS;
     }
     else
@@ -220,24 +208,77 @@ Result keyboard_FsOperationCall(FsNode *node, FsHandle *handle, int request, voi
     }
 }
 
-void keyboard_initialize()
+static bool characters_can_read(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: make this atomic or something...
+    return !ringbuffer_is_empty(_characters_buffer);
+}
+
+static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: use locks
+    atomic_begin();
+    *readed = ringbuffer_read(_characters_buffer, (char *)buffer, size);
+    atomic_end();
+
+    return SUCCESS;
+}
+
+static bool events_can_read(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: make this atomic or something...
+    return !ringbuffer_is_empty(_events_buffer);
+}
+
+static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+{
+    __unused(node);
+    __unused(handle);
+
+    // FIXME: use locks
+    atomic_begin();
+    *readed = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboradPacket)) * sizeof(KeyboradPacket));
+    atomic_end();
+
+    return SUCCESS;
+}
+
+void keyboard_initialize(void)
 {
     logger_info("Initializing keyboad...");
 
-    keyboard_keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
-    keyboard_buffer = ringbuffer_create(1024);
+    _keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
+
+    _characters_buffer = ringbuffer_create(1024);
+    _characters_node = __create(FsNode);
+
+    fsnode_init(_characters_node, FILE_TYPE_DEVICE);
+
+    FSNODE(_characters_node)->call = (FsOperationCall)keyboard_iocall;
+    FSNODE(_characters_node)->can_read = (FsOperationCanRead)characters_can_read;
+    FSNODE(_characters_node)->read = (FsOperationRead)characters_read;
+
+    filesystem_link_cstring("/dev/keyboard", _characters_node);
+
+    _events_buffer = ringbuffer_create(1024);
+    _events_node = __create(FsNode);
+
+    fsnode_init(_events_node, FILE_TYPE_DEVICE);
+
+    FSNODE(_events_node)->call = (FsOperationCall)keyboard_iocall;
+    FSNODE(_events_node)->can_read = (FsOperationCanRead)events_can_read;
+    FSNODE(_events_node)->read = (FsOperationRead)events_read;
+
+    filesystem_link_cstring("/dev/keyboard-events", _events_node);
 
     dispatcher_register_handler(1, keyboard_interrupt_handler);
-
-    FsNode *keyboard_device = __create(FsNode);
-
-    fsnode_init(keyboard_device, FILE_TYPE_DEVICE);
-
-    FSNODE(keyboard_device)->call = (FsOperationCall)keyboard_FsOperationCall;
-    FSNODE(keyboard_device)->read = (FsOperationRead)keyboard_FsOperationRead;
-    FSNODE(keyboard_device)->can_read = (FsOperationCanRead)keyboard_FsOperationCanRead;
-
-    Path *keyboard_device_path = path_create(KEYBOARD_DEVICE);
-    filesystem_link_and_take_ref(keyboard_device_path, keyboard_device);
-    path_destroy(keyboard_device_path);
 }

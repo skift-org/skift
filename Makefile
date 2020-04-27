@@ -261,11 +261,8 @@ all: $(BOOTDISK)
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
-	@$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk -enable-kvm || \
-	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl -enable-kvm || \
-	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display gtk || \
-	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -display sdl || \
-	 $(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
+	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -enable-kvm || \
+	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
 
 .PHONY: run-vbox
 run-vbox: $(BOOTDISK)

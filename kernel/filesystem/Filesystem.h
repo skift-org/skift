@@ -4,9 +4,9 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/utils/List.h>
 #include <libsystem/path.h>
 #include <libsystem/runtime.h>
+#include <libsystem/utils/List.h>
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/Node.h"
@@ -30,7 +30,11 @@ Result filesystem_mkpipe(Path *path);
 
 Result filesystem_mklink(Path *old_path, Path *new_path);
 
+Result filesystem_link_cstring(const char *path, FsNode *node);
+
 Result filesystem_link(Path *path, FsNode *node);
+
+Result filesystem_link_and_take_ref_cstring(const char *path, FsNode *node);
 
 Result filesystem_link_and_take_ref(Path *path, FsNode *node);
 

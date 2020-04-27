@@ -220,6 +220,15 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
     return filesystem_link_and_take_ref(new_path, child);
 }
 
+Result filesystem_link_cstring(const char *path, FsNode *node)
+{
+    Path *path_object = path_create(path);
+    Result result = filesystem_link(path_object, node);
+    path_destroy(path_object);
+
+    return result;
+}
+
 Result filesystem_link(Path *path, FsNode *node)
 {
     Result result = SUCCESS;
@@ -252,6 +261,17 @@ cleanup_and_return:
     if (parent != NULL)
         fsnode_deref(parent);
 
+    return result;
+}
+
+Result filesystem_link_and_take_ref_cstring(const char *path, FsNode *node)
+{
+    Path *path_object = path_create(path);
+
+    Result result = filesystem_link(path_object, node);
+    fsnode_deref(node);
+
+    path_destroy(path_object);
     return result;
 }
 

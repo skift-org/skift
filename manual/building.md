@@ -55,6 +55,14 @@ The script will do the following operation without installing anything to the ho
 
 From the root of this repo do:
 
+
+```sh
+git submodule init
+git submodule update
+```
+
+these commands brings the dependencies of the third-party libraries like lodepng
+
 ```sh
 make all
 ```

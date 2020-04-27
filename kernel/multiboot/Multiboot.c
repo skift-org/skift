@@ -6,6 +6,14 @@
 
 static Multiboot _multiboot;
 
+const char *entry_type_to_string[] = {
+    "AVAILABLE",
+    "RESERVED",
+    "ACPI",
+    "NVS",
+    "BADRAM",
+};
+
 void multiboot_assert(uint32_t magic)
 {
     if (!(is_multiboot1(magic) || is_multiboot2(magic)))
@@ -38,15 +46,7 @@ void multiboot_dump(void)
     for (size_t i = 0; i < _multiboot.memory_map_size; i++)
     {
         MemoryMapEntry *entry = &_multiboot.memory_map[i];
-
-        const char *entry_type_to_string[] = {
-            "AVAILABLE",
-            "RESERVED",
-            "ACPI",
-            "NVS",
-            "BADRAM",
-        };
-
+        
         logger_info("\t%d: %08p-%08p: %s",
                     i,
                     entry->range.base,

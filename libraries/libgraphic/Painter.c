@@ -83,7 +83,7 @@ void painter_plot_pixel(Painter *painter, Point position, Color color)
     }
 }
 
-void painter_clear_pixel(Painter *painter, Point position, Color color)
+__attribute__((flatten))  void painter_clear_pixel(Painter *painter, Point position, Color color)
 {
     Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
 
@@ -139,7 +139,7 @@ void painter_blit_bitmap_scaled(
     }
 }
 
-void painter_blit_bitmap(
+__attribute__((flatten)) void painter_blit_bitmap(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,
@@ -202,7 +202,7 @@ void painter_blit_bitmap_scaled_no_alpha(
     }
 }
 
-void painter_blit_bitmap_no_alpha(
+__attribute__((flatten)) void painter_blit_bitmap_no_alpha(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,
@@ -219,12 +219,12 @@ void painter_blit_bitmap_no_alpha(
     }
 }
 
-void painter_clear(Painter *painter, Color color)
+__attribute__((flatten)) void painter_clear(Painter *painter, Color color)
 {
     painter_clear_rectangle(painter, bitmap_bound(painter->bitmap), color);
 }
 
-void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
+__attribute__((flatten)) void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
@@ -243,7 +243,7 @@ void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
     }
 }
 
-void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
+__attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
@@ -263,7 +263,7 @@ void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
     }
 }
 
-void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
+__attribute__((flatten)) void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
 {
     PointF a = {p0.X, p0.Y};
     PointF b = {p1.X, p1.Y};
@@ -371,7 +371,7 @@ void painter_draw_line_not_aligned(Painter *painter, Point a, Point b, Color col
     }
 }
 
-void painter_draw_line(Painter *painter, Point a, Point b, Color color)
+__attribute__((flatten)) void painter_draw_line(Painter *painter, Point a, Point b, Color color)
 {
     if (a.X == b.X)
     {
@@ -387,7 +387,7 @@ void painter_draw_line(Painter *painter, Point a, Point b, Color color)
     }
 }
 
-void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
+__attribute__((flatten)) void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
 {
     Point topleft = rect.position;
     Point topright = point_add(rect.position, point_x(rect.size));
@@ -406,14 +406,14 @@ void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
     painter_draw_line(painter, point_add(topright, (Point){0, 1}), point_sub(bottomright, (Point){0, 1}), color);
 }
 
-void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
+__attribute__((flatten)) void painter_draw_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
 {
     painter_draw_line(painter, p0, p1, color);
     painter_draw_line(painter, p1, p2, color);
     painter_draw_line(painter, p2, p0, color);
 }
 
-void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color)
+__attribute__((flatten)) void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color)
 {
     for (int x = 0; x < destination.width; x++)
     {
@@ -432,7 +432,7 @@ void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Co
     }
 }
 
-void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
+__attribute__((flatten)) void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
@@ -460,7 +460,7 @@ void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Point positi
     painter_blit_bitmap_colored(painter, font->bitmap, glyph->bound, dest, color);
 }
 
-void painter_draw_string(Painter *painter, Font *font, const char *str, Point position, Color color)
+__attribute__((flatten)) void painter_draw_string(Painter *painter, Font *font, const char *str, Point position, Color color)
 {
     for (size_t i = 0; str[i]; i++)
     {

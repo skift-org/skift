@@ -237,6 +237,7 @@ void application_blit_window(Window *window, Rectangle bound)
 
     CompositorBlitWindowMessage message = {
         .id = window_handle(window),
+        .framebuffer = window_framebuffer_handle(window),
         .bound = bound,
     };
 
@@ -253,6 +254,18 @@ void application_move_window(Window *window, Point position)
     };
 
     application_send_message(COMPOSITOR_MESSAGE_WINDOW_MOVE, &message, sizeof(CompositorWindowMove));
+}
+
+void application_resize_window(Window *window, Rectangle bound)
+{
+    assert(_state >= APPLICATION_INITALIZED);
+
+    CompositorWindowResize message = {
+        .id = window_handle(window),
+        .bound = bound,
+    };
+
+    application_send_message(COMPOSITOR_MESSAGE_WINDOW_RESIZE, &message, sizeof(CompositorWindowResize));
 }
 
 void application_window_change_cursor(Window *window, CursorState state)

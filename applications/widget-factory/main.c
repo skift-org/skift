@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("widgets", "Widget Factory", 500, 400, WINDOW_NONE);
+    Window *window = window_create("widgets", "Widget Factory", 500, 400, WINDOW_RESIZABLE);
 
     window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
 

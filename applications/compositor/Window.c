@@ -48,6 +48,15 @@ void window_move(Window *window, Point position)
     renderer_region_dirty(window_bound(window));
 }
 
+void window_resize(Window *window, Rectangle bound)
+{
+    renderer_region_dirty(window_bound(window));
+
+    window->bound = bound;
+
+    renderer_region_dirty(window_bound(window));
+}
+
 Point window_screen_window_position(Window *window, Point position)
 {
     return point_sub(position, window_bound(window).position);

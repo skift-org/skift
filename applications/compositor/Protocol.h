@@ -11,8 +11,9 @@ typedef enum
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
     COMPOSITOR_MESSAGE_BLIT_WINDOW,
-    COMPOSITOR_MESSAGE_WINDOW_MOVE,
     COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE,
+    COMPOSITOR_MESSAGE_WINDOW_MOVE,
+    COMPOSITOR_MESSAGE_WINDOW_RESIZE,
 
     COMPOSITOR_MESSAGE_CLIENT_PING,
 
@@ -41,11 +42,18 @@ typedef struct
 typedef struct
 {
     int id;
+    Rectangle bound;
+} CompositorWindowResize;
+
+typedef struct
+{
+    int id;
 } CompositorDestroyWindowMessage;
 
 typedef struct
 {
     int id;
+    int framebuffer;
     Rectangle bound;
 } CompositorBlitWindowMessage;
 

@@ -51,15 +51,21 @@ void renderer_region(Rectangle region)
     {
         if (rectangle_colide(window_bound(window), region))
         {
-            Rectangle cliped = rectangle_clip(window_bound(window), region);
+            Rectangle destination = rectangle_clip(window_bound(window), region);
 
-            Rectangle source = rectangle_offset(cliped, point_sub(POINT_ZERO, window->bound.position));
+            double x_scale = (double)bitmap_bound(window->framebuffer).width / window_bound(window).width;
+            double y_scale = (double)bitmap_bound(window->framebuffer).height / window_bound(window).height;
 
-            painter_blit_bitmap(_painter, window->framebuffer, source, cliped);
+            Rectangle source = {{
+                (destination.X - window_bound(window).X) * x_scale,
+                (destination.Y - window_bound(window).Y) * y_scale,
+                destination.width * x_scale,
+                destination.height * y_scale,
+            }};
+
+            painter_blit_bitmap(_painter, window->framebuffer, source, destination);
         }
     }
-
-    //painter_draw_rectangle(_painter, region, COLOR_RED);
 
     framebuffer_mark_dirty(_framebuffer, region);
 }
@@ -86,4 +92,3 @@ void renderer_repaint_dirty(void)
     framebuffer_blit_dirty(_framebuffer);
     list_clear_with_callback(_dirty_regions, free);
 }
-

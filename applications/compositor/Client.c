@@ -86,6 +86,18 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         Window *window = manager_get_window(client, blit_window.id);
 
+        int old_framebuffer_handle = 0;
+        shared_memory_get_handle((uintptr_t)window->framebuffer, &old_framebuffer_handle);
+
+        if (old_framebuffer_handle != blit_window.framebuffer)
+        {
+            logger_info("Flipping window framebuffer");
+            shared_memory_free((uintptr_t)window->framebuffer);
+
+            size_t size;
+            shared_memory_include(blit_window.framebuffer, (uintptr_t *)&window->framebuffer, &size);
+        }
+
         if (window)
         {
             renderer_region_dirty(rectangle_offset(blit_window.bound, window->bound.position));
@@ -119,6 +131,32 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
         else
         {
             logger_warn("Invalid window id %d for client %08x", move_window.id, client);
+        }
+
+        break;
+    }
+    case COMPOSITOR_MESSAGE_WINDOW_RESIZE:
+    {
+        CompositorWindowResize resize_window = {};
+        connection_receive(connection, &resize_window, sizeof(CompositorWindowResize));
+
+        if (handle_has_error(connection))
+        {
+            client->disconnected = true;
+            client_close_disconnected_clients();
+
+            return;
+        }
+
+        Window *window = manager_get_window(client, resize_window.id);
+
+        if (window)
+        {
+            window_resize(window, resize_window.bound);
+        }
+        else
+        {
+            logger_warn("Invalid window id %d for client %08x", resize_window.id, client);
         }
 
         break;

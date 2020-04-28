@@ -20,8 +20,13 @@ typedef struct Window
     int handle;
 
     bool focused;
-    bool is_dragging;
     bool visible;
+    bool is_dragging;
+
+    bool is_resizing;
+    bool resize_vertical;
+    bool resize_horizontal;
+    Point resize_begin;
 
     WindowDestroyCallback destroy;
 
@@ -74,6 +79,8 @@ void window_dump(Window *window);
 void window_handle_event(Window *window, Event *event);
 
 Rectangle window_bound_on_screen(Window *window);
+
+void window_set_on_screen_bound(Window *window, Rectangle new_bound);
 
 Rectangle window_bound(Window *window);
 

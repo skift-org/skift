@@ -163,6 +163,22 @@ Rectangle window_content_bound(Window *window)
     }
 }
 
+void window_change_framebuffer_if_needed(Window *window)
+{
+    if (window_bound(window).width != bitmap_bound(window->framebuffer).width ||
+        window_bound(window).height != bitmap_bound(window->framebuffer).height)
+    {
+        logger_info("Changing framebuffer");
+
+        painter_destroy(window->painter);
+        bitmap_destroy(window->framebuffer);
+
+        window->framebuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->painter = painter_create(window->framebuffer);
+        shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
+    }
+}
+
 void window_paint(Window *window, Rectangle rectangle)
 {
     painter_clear_rectangle(window->painter, rectangle, window->background);
@@ -205,6 +221,83 @@ void window_dump(Window *window)
     widget_dump(window->root_container, 1);
 }
 
+RectangeBorder window_resize_bound_containe(Window *window, Point position)
+{
+    Rectangle resize_bound = rectangle_expand(
+        window_bound(window),
+        INSETS(WINDOW_RESIZE_AREA));
+
+    return rectangle_inset_containe_point(
+        resize_bound,
+        INSETS(WINDOW_RESIZE_AREA),
+        position);
+}
+
+void window_begin_resize(Window *window, Point mouse_position)
+{
+    logger_info("Window begin resize");
+    window->is_resizing = true;
+
+    RectangeBorder borders = window_resize_bound_containe(window, mouse_position);
+
+    window->resize_horizontal = borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT);
+    window->resize_vertical = borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM);
+
+    Point resize_region_begin = {};
+
+    if (borders & RECTANGLE_BORDER_TOP)
+    {
+        resize_region_begin.Y = window_bound_on_screen(window).Y + window_bound_on_screen(window).height;
+    }
+
+    if (borders & RECTANGLE_BORDER_BOTTOM)
+    {
+        resize_region_begin.Y = window_bound_on_screen(window).Y;
+    }
+
+    if (borders & RECTANGLE_BORDER_LEFT)
+    {
+        resize_region_begin.X = window_bound_on_screen(window).X + window_bound_on_screen(window).width;
+    }
+
+    if (borders & RECTANGLE_BORDER_RIGHT)
+    {
+        resize_region_begin.X = window_bound_on_screen(window).X;
+    }
+
+    window->resize_begin = resize_region_begin;
+}
+
+void window_do_resize(Window *window, Point mouse_position)
+{
+
+    Rectangle new_bound = rectangle_from_two_point(window->resize_begin, point_add(window_bound_on_screen(window).position, mouse_position));
+
+    if (!window->resize_horizontal)
+    {
+        new_bound.X = window_bound_on_screen(window).X;
+        new_bound.width = window_bound_on_screen(window).width;
+    }
+
+    if (!window->resize_vertical)
+    {
+        new_bound.Y = window_bound_on_screen(window).Y;
+        new_bound.height = window_bound_on_screen(window).height;
+    }
+
+    window_set_on_screen_bound(window, new_bound);
+}
+
+void window_end_resize(Window *window)
+{
+    logger_info("Window end resize");
+    window->is_resizing = false;
+
+    window_change_framebuffer_if_needed(window);
+    window_schedule_layout(window);
+    window_schedule_update(window, window_bound(window));
+}
+
 void window_handle_event(Window *window, Event *event)
 {
     switch (event->type)
@@ -242,12 +335,7 @@ void window_handle_event(Window *window, Event *event)
         }
         else if (window->flags & WINDOW_RESIZABLE)
         {
-            RectangeBorder borders = rectangle_inset_containe_point(
-                rectangle_expand(
-                    window_bound(window),
-                    INSETS(WINDOW_RESIZE_AREA)),
-                INSETS(WINDOW_RESIZE_AREA),
-                mouse_event->position);
+            RectangeBorder borders = window_resize_bound_containe(window, mouse_event->position);
 
             if (borders)
             {
@@ -284,6 +372,11 @@ void window_handle_event(Window *window, Event *event)
             else
             {
                 window_set_cursor(window, CURSOR_DEFAULT);
+            }
+
+            if (window->is_resizing)
+            {
+                window_do_resize(window, mouse_event->position);
             }
         }
 
@@ -324,6 +417,32 @@ void window_handle_event(Window *window, Event *event)
                 window->is_dragging = true;
                 window_set_cursor(window, CURSOR_MOVE);
             }
+
+            if (!event->accepted &&
+                !window->is_resizing &&
+                window_resize_bound_containe(window, mouse_event->position))
+            {
+                window_begin_resize(window, mouse_event->position);
+            }
+        }
+
+        break;
+    }
+
+    case EVENT_MOUSE_BUTTON_RELEASE:
+    {
+        MouseEvent *mouse_event = (MouseEvent *)event;
+
+        if (window->is_dragging &&
+            mouse_event->button == MOUSE_BUTTON_LEFT)
+        {
+            window->is_dragging = false;
+            window_set_cursor(window, CURSOR_DEFAULT);
+        }
+
+        if (window->is_resizing)
+        {
+            window_end_resize(window);
         }
 
         break;
@@ -341,20 +460,6 @@ void window_handle_event(Window *window, Event *event)
             {
                 widget_dispatch_event(widget, event);
             }
-        }
-
-        break;
-    }
-
-    case EVENT_MOUSE_BUTTON_RELEASE:
-    {
-        MouseEvent *mouse_event = (MouseEvent *)event;
-
-        if (window->is_dragging &&
-            mouse_event->button == MOUSE_BUTTON_LEFT)
-        {
-            window->is_dragging = false;
-            window_set_cursor(window, CURSOR_DEFAULT);
         }
 
         break;
@@ -379,6 +484,16 @@ Rectangle window_bound_on_screen(Window *window)
     return window->on_screen_bound;
 }
 
+void window_set_on_screen_bound(Window *window, Rectangle new_bound)
+{
+    window->on_screen_bound = new_bound;
+
+    if (!window->visible)
+        return;
+
+    application_resize_window(window, new_bound);
+}
+
 Rectangle window_bound(Window *window)
 {
     Rectangle bound = {};
@@ -390,6 +505,9 @@ Rectangle window_bound(Window *window)
 
 void window_set_cursor(Window *window, CursorState state)
 {
+    if (window->is_resizing)
+        return;
+
     if (window->cursor_state != state)
     {
         application_window_change_cursor(window, state);
@@ -475,6 +593,8 @@ void window_layout(Window *window)
 
     window_root(window)->bound = window_content_bound(window);
     widget_layout(window_root(window));
+
+    window->dirty_layout = false;
 }
 
 void window_schedule_layout(Window *window)

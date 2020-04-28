@@ -5,6 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libmath/MinMax.h>
+#include <libmath/math.h>
 #include <libsystem/runtime.h>
 
 typedef struct __packed
@@ -122,6 +123,16 @@ static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
     rectangle.width = MAX(size.Y, rectangle.height);
 
     return rectangle;
+}
+
+static inline Rectangle rectangle_from_two_point(Point a, Point b)
+{
+    return (Rectangle){{
+        MIN(a.X, b.X),
+        MIN(a.Y, b.Y),
+        abs(a.X - b.X),
+        abs(a.Y - b.Y),
+    }};
 }
 
 static inline bool rectangle_colide(Rectangle a, Rectangle b)

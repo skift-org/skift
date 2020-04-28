@@ -105,8 +105,11 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    Launchpad *demogfx = launchpad_create("panel", "/bin/panel");
-    launchpad_launch(demogfx, NULL);
+    Launchpad *panel = launchpad_create("panel", "/bin/panel");
+    launchpad_launch(panel, NULL);
+
+    Launchpad *file_explorer = launchpad_create("file-explorer", "/bin/file-explorer");
+    launchpad_launch(file_explorer, NULL);
 
     return eventloop_run();
 }

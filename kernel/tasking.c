@@ -685,9 +685,11 @@ MemoryObject *memory_object_by_id(int id)
     {
         if (memory_object->id == id)
         {
+            memory_object_ref(memory_object);
+
             lock_release(_memory_objects_lock);
 
-            return memory_object_ref(memory_object);
+            return memory_object;
         }
     }
 
@@ -752,21 +754,24 @@ Result task_shared_memory_free(Task *task, uintptr_t address)
 {
     MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
 
-    if (memory_mapping)
-    {
-        task_memory_mapping_destroy(task, memory_mapping);
-
-        return SUCCESS;
-    }
-    else
+    if (!memory_mapping)
     {
         return ERR_BAD_ADDRESS;
     }
+
+    task_memory_mapping_destroy(task, memory_mapping);
+
+    return SUCCESS;
 }
 
 Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
 {
     MemoryObject *memory_object = memory_object_by_id(handle);
+
+    if (!memory_object)
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
     MemoryMapping *memory_mapping = task_memory_mapping_create(task, memory_object);
 
@@ -782,16 +787,13 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 {
     MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
 
-    if (memory_mapping)
-    {
-        *out_handle = memory_mapping->object->id;
-
-        return SUCCESS;
-    }
-    else
+    if (!memory_mapping)
     {
         return ERR_BAD_ADDRESS;
     }
+
+    *out_handle = memory_mapping->object->id;
+    return SUCCESS;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -53,7 +53,7 @@ void __lock_release(Lock *lock, const char *file, const char *function, int line
 
     __sync_synchronize();
 
-    lock->holder = 0;
+    lock->holder = -1;
     lock->locked = 0;
 }
 

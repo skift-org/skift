@@ -337,37 +337,29 @@ void window_handle_event(Window *window, Event *event)
         {
             RectangeBorder borders = window_resize_bound_containe(window, mouse_event->position);
 
-            if (borders)
+            if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
             {
-                if (borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEV);
-                }
-
-                if (borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEH);
-                }
-
-                if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEHV);
-                }
-
-                if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_RIGHT))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEHV);
-                }
-
-                if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_RIGHT))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEVH);
-                }
-
-                if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_LEFT))
-                {
-                    window_set_cursor(window, CURSOR_RESIZEVH);
-                }
+                window_set_cursor(window, CURSOR_RESIZEHV);
+            }
+            else if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_RIGHT))
+            {
+                window_set_cursor(window, CURSOR_RESIZEHV);
+            }
+            else if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_RIGHT))
+            {
+                window_set_cursor(window, CURSOR_RESIZEVH);
+            }
+            else if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_LEFT))
+            {
+                window_set_cursor(window, CURSOR_RESIZEVH);
+            }
+            else if (borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM))
+            {
+                window_set_cursor(window, CURSOR_RESIZEV);
+            }
+            else if (borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT))
+            {
+                window_set_cursor(window, CURSOR_RESIZEH);
             }
             else
             {

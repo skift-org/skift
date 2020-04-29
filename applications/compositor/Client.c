@@ -91,11 +91,23 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         if (old_framebuffer_handle != blit_window.framebuffer)
         {
-            logger_info("Flipping window framebuffer");
-            shared_memory_free((uintptr_t)window->framebuffer);
+            Bitmap *new_framebuffer = NULL;
 
             size_t size;
-            shared_memory_include(blit_window.framebuffer, (uintptr_t *)&window->framebuffer, &size);
+            if (shared_memory_include(
+                    blit_window.framebuffer,
+                    (uintptr_t *)&new_framebuffer,
+                    &size) == SUCCESS)
+            {
+                logger_info("Flipping window framebuffer");
+                shared_memory_free((uintptr_t)window->framebuffer);
+
+                window->framebuffer = new_framebuffer;
+            }
+            else
+            {
+                logger_error("Client application gave us a jankie shared memory object id");
+            }
         }
 
         if (window)

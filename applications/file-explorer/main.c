@@ -151,7 +151,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     /// --- Navigation bar --- ///
     Widget *navbar = panel_create(root);
 
-    navbar->layout = (Layout){LAYOUT_HFLOW, 8, 0};
+    navbar->layout = (Layout){LAYOUT_HFLOW, 12, 0};
     navbar->insets = INSETS(0, 8);
 
     Widget *backward_button = icon_create(navbar, "arrow-left");

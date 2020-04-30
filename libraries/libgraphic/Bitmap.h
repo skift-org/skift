@@ -60,12 +60,12 @@ static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Point position)
     return bitmap->pixels[position.X + position.Y * bitmap->width];
 }
 
-static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, float x, float y)
+static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, double y)
 {
     Color result;
 
-    float xx = src_rect.width * x;
-    float yy = src_rect.height * y;
+    double xx = src_rect.width * x;
+    double yy = src_rect.height * y;
 
     int xxi = (int)xx;
     int yyi = (int)yy;

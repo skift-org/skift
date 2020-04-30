@@ -1,3 +1,6 @@
 [submodule "thirdparty/lodepng"]
 	path = thirdparty/lodepng
 	url = https://github.com/skiftOS/lodepng
+[submodule "thirdparty/icons"]
+	path = thirdparty/icons
+	url = https://github.com/skiftOS/icons

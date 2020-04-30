@@ -108,7 +108,7 @@ int main(int argc, char const *argv[])
     Launchpad *panel = launchpad_create("panel", "/bin/panel");
     launchpad_launch(panel, NULL);
 
-    Launchpad *file_explorer = launchpad_create("file-explorer", "/bin/file-explorer");
+    Launchpad *file_explorer = launchpad_create("paint", "/bin/paint");
     launchpad_launch(file_explorer, NULL);
 
     return eventloop_run();

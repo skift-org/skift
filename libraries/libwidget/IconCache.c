@@ -15,7 +15,7 @@ Bitmap *icon_cache_get_icon(const char *name)
     {
         char path[512];
 
-        snprintf(path, 512, "/res/icon/%s.png", name);
+        snprintf(path, 512, "/res/icons/%s.png", name);
 
         hashmap_put(_icons, name, bitmap_load_from(path));
     }

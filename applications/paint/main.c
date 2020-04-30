@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("paint", "Paint", 500, 400, WINDOW_RESIZABLE);
+    Window *window = window_create("brush", "Paint", 500, 400, WINDOW_RESIZABLE);
 
     window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 8};
 

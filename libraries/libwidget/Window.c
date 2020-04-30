@@ -63,7 +63,7 @@ void window_initialize(
     window_header(window)->layout = (Layout){LAYOUT_HFLOW, 4, 0};
     window_header(window)->insets = INSETS(0, 2, 8);
 
-    icon_create(window_header(window), icon ? icon : "window");
+    icon_create(window_header(window), icon ? icon : "application");
     label_create(window_header(window), title);
 
     container_create(window_header(window))->layout_attributes = LAYOUT_FILL;

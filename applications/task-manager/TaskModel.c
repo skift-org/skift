@@ -38,11 +38,11 @@ static Variant task_model_data(TaskModel *model, int row, int column)
 
         if (json_is(json_object_get(task, "user"), JSON_TRUE))
         {
-            return variant_with_icon(value, "user");
+            return variant_with_icon(value, "account");
         }
         else
         {
-            return variant_with_icon(value, "gear");
+            return variant_with_icon(value, "cog");
         }
     }
 

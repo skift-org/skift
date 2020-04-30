@@ -1,4 +1,5 @@
 #include <libgraphic/Painter.h>
+#include <libwidget/IconCache.h>
 #include <libwidget/Window.h>
 
 #include "file-explorer/Breadcrumb.h"
@@ -93,9 +94,6 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
 
 void breadcrumb_destroy(Breadcrumb *widget)
 {
-    bitmap_destroy(widget->icon_computer);
-    bitmap_destroy(widget->icon_expand);
-
     path_destroy(widget->path);
 }
 
@@ -107,8 +105,8 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
     WIDGET(widget)->destroy = (WidgetDestroyCallback)breadcrumb_destroy;
 
     widget->path = path_create(current_path);
-    widget->icon_computer = bitmap_load_from("/res/icon/computer.png");
-    widget->icon_expand = bitmap_load_from("/res/icon/expand-forward.png");
+    widget->icon_computer = icon_cache_get_icon("laptop");
+    widget->icon_expand = icon_cache_get_icon("chevron-right");
 
     widget_initialize(WIDGET(widget), "Breadcrumb", parent);
 

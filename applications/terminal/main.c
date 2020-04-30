@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     if (application_initialize(argc, argv) == SUCCESS)
     {
-        Window *window = window_create(NULL, "Terminal", 500, 400, WINDOW_RESIZABLE);
+        Window *window = window_create("console-line", "Terminal", 500, 400, WINDOW_RESIZABLE);
         window_set_background(window, window_get_color(window, THEME_ANSI_BACKGROUND));
 
         Widget *widget = terminal_widget_create(window_root(window));

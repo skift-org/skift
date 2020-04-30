@@ -154,15 +154,15 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     navbar->layout = (Layout){LAYOUT_HFLOW, 8, 0};
     navbar->insets = INSETS(0, 8);
 
-    Widget *backward_button = icon_create(navbar, "arrow-backward");
+    Widget *backward_button = icon_create(navbar, "arrow-left");
     widget_set_event_handler(backward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_backward);
     window->go_backward = backward_button;
 
-    Widget *foreward_button = icon_create(navbar, "arrow-forward");
+    Widget *foreward_button = icon_create(navbar, "arrow-right");
     widget_set_event_handler(foreward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_foreward);
     window->go_foreward = foreward_button;
 
-    Widget *up_button = icon_create(navbar, "arrow-upward");
+    Widget *up_button = icon_create(navbar, "arrow-up");
     widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_up);
     window->go_up = up_button;
 

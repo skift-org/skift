@@ -1,6 +1,6 @@
 {
     "name": "Paint",
     "comment": "Drawing application.",
-    "icon": "paint",
+    "icon": "brush",
     "command": "/bin/paint"
 }

@@ -200,6 +200,7 @@ $(1)_SOURCES = $$(wildcard applications/$($(1)_NAME)/*.c) \
 $(1)_OBJECTS = $$(patsubst applications/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
 
 OBJECTS += $$($(1)_OBJECTS)
+ICONS += $$($(1)_ICONS)
 
 $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
 	$$(DIRECTORY_GUARD)
@@ -219,13 +220,26 @@ endef
 -include applications/*/.build.mk
 $(foreach app, $(APPS), $(eval $(call APP_TEMPLATE,$(app))))
 
+# --- Icons ---------------------------------------------- #
+
+ICONS_SVGs = $(patsubst %, thirdparty/icons/svg/%.svg, $(ICONS))
+ICONS_PNGs = $(patsubst thirdparty/icons/svg/%.svg, $(SYSROOT)/res/icons/%.png, $(ICONS_SVGs))
+
+list_icon:
+	@echo $(ICONS_PNGs)
+
+$(SYSROOT)/res/icons/%.png: thirdparty/icons/svg/%.svg
+	$(DIRECTORY_GUARD)
+	@echo [ICON] $(notdir $@)
+	@inkscape --export-png $@ -w 18 -h 18 $<
+
 # --- Ramdisk -------------------------------------------- #
 
 RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
 SYSROOT_CONTENT=$(wildcard sysroot/*) $(wildcard sysroot/*/*) $(wildcard sysroot/*/*/*)
 
-$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT)
+$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT) $(ICONS_PNGs)
 	$(DIRECTORY_GUARD)
 
 	@echo [TAR] $@
@@ -257,6 +271,9 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) grub.cfg
 
 .PHONY: all
 all: $(BOOTDISK)
+
+.PHONY: run
+run: run-qemu
 
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)

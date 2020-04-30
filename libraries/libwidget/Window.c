@@ -372,6 +372,11 @@ void window_handle_event(Window *window, Event *event)
             }
         }
 
+        if (window->mouse_focused_widget)
+        {
+            widget_dispatch_event(window->mouse_focused_widget, event);
+        }
+
         break;
     }
 
@@ -385,6 +390,7 @@ void window_handle_event(Window *window, Event *event)
 
             if (widget)
             {
+                window->mouse_focused_widget = widget;
                 widget_dispatch_event(widget, event);
             }
         }

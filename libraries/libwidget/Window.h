@@ -43,6 +43,7 @@ typedef struct Window
     Widget *header_container;
     Widget *root_container;
     Widget *focused_widget;
+    Widget *mouse_focused_widget;
 
     Color background;
 

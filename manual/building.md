@@ -9,6 +9,7 @@ Building skiftOS requires
 - gcc
 - binutils
 - grub
+- inkscape
 
 And for testing et debuging
 - qemu-system-i386

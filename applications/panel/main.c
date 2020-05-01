@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     Window *window = window_create(NULL, "Panel", 1024, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
-    window_root(window)->layout = (Layout){LAYOUT_HFLOW, 8, 0};
+    window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = INSETS(0, 8);
 
     Widget *menu = icon_create(window_root(window), "menu");
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
 
     Widget *graph_container = container_create(window_root(window));
-    graph_container->layout = (Layout){LAYOUT_VGRID, 0, 1};
+    graph_container->layout = VGRID(1);
 
     Widget *ram_graph = graph_create(graph_container, 50, COLOR_ROYALBLUE);
     label_create(ram_graph, "RAM");

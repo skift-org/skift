@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     Window *window = window_create("information", "About", 250, 250, WINDOW_NONE);
 
-    window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
+    window_root(window)->layout = VGRID(8);
 
     if (theme_is_dark())
     {
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     }
 
     Widget *button_and_text = container_create(window_root(window));
-    button_and_text->layout = (Layout){LAYOUT_VGRID, 0, 2};
+    button_and_text->layout = VGRID(2);
 
     label_create(button_and_text, "The skift operating system.");
     label_create(button_and_text, __BUILD_GITREF__ "/" __BUILD_CONFIG__);

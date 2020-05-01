@@ -60,7 +60,7 @@ void window_initialize(
     window->header_container = container_create(NULL);
     window->header_container->window = window;
 
-    window_header(window)->layout = (Layout){LAYOUT_HFLOW, 4, 0};
+    window_header(window)->layout = HFLOW(4);
     window_header(window)->insets = INSETS(0, 2, 8);
 
     icon_create(window_header(window), icon ? icon : "application");

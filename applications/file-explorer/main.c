@@ -142,7 +142,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
 
     window_initialize((Window *)window, "folder", "File Explorer", 500, 400, WINDOW_RESIZABLE);
     Widget *root = window_root((Window *)window);
-    root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+    root->layout = VFLOW(0);
 
     window->current_path = path_create(current_path);
     window->backward_history = list_create();
@@ -151,7 +151,7 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
     /// --- Navigation bar --- ///
     Widget *navbar = panel_create(root);
 
-    navbar->layout = (Layout){LAYOUT_HFLOW, 12, 0};
+    navbar->layout = HFLOW(12);
     navbar->insets = INSETS(0, 8);
 
     Widget *backward_button = icon_create(navbar, "arrow-left");

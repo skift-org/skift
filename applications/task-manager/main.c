@@ -54,11 +54,11 @@ int main(int argc, char **argv)
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
     window_initialize((Window *)window, "memory", "Task Manager", 500, 400, WINDOW_RESIZABLE);
-    window_root((Window *)window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+    window_root((Window *)window)->layout = VFLOW(0);
 
     /// --- Graphs --- ///
     Widget *graphs_container = container_create(window_root((Window *)window));
-    graphs_container->layout = (Layout){LAYOUT_HGRID, 8, 0};
+    graphs_container->layout = HGRID(8);
 
     window->ram_graph = graph_create(graphs_container, 100, COLOR_ROYALBLUE);
     window->ram_timer = timer_create(window->ram_graph, 500, (TimerCallback)widget_ram_update);

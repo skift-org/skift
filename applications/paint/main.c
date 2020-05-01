@@ -12,11 +12,11 @@ int main(int argc, char **argv)
     Window *window = window_create("brush", "Paint", 500, 400, WINDOW_RESIZABLE);
 
     Widget *root = window_root((Window *)window);
-    root->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+    root->layout = VFLOW(0);
 
     Widget *toolbar = panel_create(window_root(window));
 
-    toolbar->layout = (Layout){LAYOUT_HFLOW, 12, 0};
+    toolbar->layout = HFLOW(12);
     toolbar->insets = INSETS(8, 8);
 
     icon_create(toolbar, "pencil");

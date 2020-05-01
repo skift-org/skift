@@ -27,6 +27,7 @@ typedef struct
 typedef enum
 {
     LAYOUT_STACK,
+    LAYOUT_GRID,
     LAYOUT_VGRID,
     LAYOUT_HGRID,
     LAYOUT_VFLOW,
@@ -49,9 +50,29 @@ typedef struct
 {
     LayoutType type;
 
+    int hcell;
+    int vcell;
     int hspacing;
     int vspacing;
 } Layout;
+
+#define STACK() \
+    ((Layout){LAYOUT_STACK, 0, 0, 0, 0})
+
+#define GRID(_hcell, _vcell, _hspacing, _vspacing) \
+    ((Layout){LAYOUT_GRID, (_hcell), (_vcell), (_hspacing), (_vspacing)})
+
+#define VGRID(_vspacing) \
+    ((Layout){LAYOUT_VGRID, 0, 0, 0, (_vspacing)})
+
+#define HGRID(_hspacing) \
+    ((Layout){LAYOUT_HGRID, 0, 0, (_hspacing), 0})
+
+#define VFLOW(_vspacing) \
+    ((Layout){LAYOUT_VFLOW, 0, 0, 0, (_vspacing)})
+
+#define HFLOW(_hspacing) \
+    ((Layout){LAYOUT_HFLOW, 0, 0, (_hspacing), 0})
 
 typedef struct Widget
 {

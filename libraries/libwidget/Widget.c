@@ -172,6 +172,30 @@ void widget_layout(Widget *widget)
             child->bound = widget_content_bound(widget);
         }
         break;
+    case LAYOUT_GRID:
+    {
+        int originX = widget_content_bound(widget).X;
+        int originY = widget_content_bound(widget).Y;
+
+        int child_width = (widget_content_bound(widget).width - (layout.hspacing * (layout.hcell - 1))) / layout.hcell;
+        int child_height = (widget_content_bound(widget).height - (layout.vspacing * (layout.vcell - 1))) / layout.vcell;
+
+        int index = 0;
+        list_foreach(Widget, child, widget->childs)
+        {
+            int x = index % layout.hcell;
+            int y = index / layout.hcell;
+
+            child->bound = RECTANGLE(
+                originX + x * (child_width + layout.hspacing),
+                originY + y * (child_height + layout.vspacing),
+                child_width,
+                child_height);
+
+            index++;
+        }
+    }
+    break;
 
     case LAYOUT_HGRID:
     {

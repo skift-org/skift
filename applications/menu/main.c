@@ -120,14 +120,14 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 void menu_create_list(Widget *parent, List *menu)
 {
     Widget *list = container_create(parent);
-    list->layout = (Layout){LAYOUT_VFLOW, 0, 4};
+    list->layout = VFLOW(4);
     list->layout_attributes = LAYOUT_FILL;
     list->insets = INSETS(0, 8);
 
     list_foreach(MenuEntry, entry, menu)
     {
         Widget *item = container_create(list);
-        item->layout = (Layout){LAYOUT_HFLOW, 8, 0};
+        item->layout = HFLOW(8);
 
         widget_set_event_handler(item, EVENT_MOUSE_BUTTON_PRESS, entry, (WidgetEventHandlerCallback)menu_item_click);
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 
     Window *window = window_create(NULL, "Panel", 320, 768, WINDOW_BORDERLESS);
 
-    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 8, 0};
+    window_root(window)->layout = VFLOW(8);
 
     panel_create(window_root(window));
     menu_create_list(window_root(window), menu);

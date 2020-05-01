@@ -9,14 +9,14 @@ int main(int argc, char **argv)
 
     Window *window = window_create("widgets", "Widget Factory", 500, 400, WINDOW_RESIZABLE);
 
-    window_root(window)->layout = (Layout){LAYOUT_VGRID, 0, 8};
+    window_root(window)->layout = VGRID(8);
 
     panel_create(window_root(window));
     panel_create(window_root(window));
 
     Widget *panel_hflow = container_create(window_root(window));
     {
-        panel_hflow->layout = (Layout){LAYOUT_HFLOW, 8, 0};
+        panel_hflow->layout = HFLOW(8);
 
         panel_create(panel_hflow);
         button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
@@ -27,13 +27,30 @@ int main(int argc, char **argv)
 
     Widget *panel_hgrid = container_create(window_root(window));
     {
-        panel_hgrid->layout = (Layout){LAYOUT_HGRID, 8, 0};
+        panel_hgrid->layout = HGRID(8);
 
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
 
         button_create(panel_hgrid, "Hello, world!");
+    }
+
+    Widget *panel_grid = container_create(window_root(window));
+    {
+        panel_grid->layout = GRID(3, 3, 2, 4);
+
+        panel_create(panel_grid);
+        panel_create(panel_grid);
+        panel_create(panel_grid);
+        panel_create(panel_grid);
+
+        button_create(panel_hgrid, "Grid layout!");
+
+        panel_create(panel_grid);
+        panel_create(panel_grid);
+        panel_create(panel_grid);
+        panel_create(panel_grid);
     }
 
     panel_create(window_root(window));

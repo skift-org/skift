@@ -32,11 +32,11 @@ int main(int argc, char **argv)
 
     Window *window = window_create("duck", "Demos", 500, 400, WINDOW_NONE);
 
-    window_root(window)->layout = (Layout){LAYOUT_VFLOW, 0, 0};
+    window_root(window)->layout = VFLOW(0);
 
     Widget *side_bar = container_create(window_root(window));
     side_bar->insets = INSETS(4, 0);
-    side_bar->layout = (Layout){LAYOUT_HGRID, 4, 0};
+    side_bar->layout = HGRID(4);
 
     for (size_t i = 0; _demos[i].name; i++)
     {

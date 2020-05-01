@@ -136,7 +136,7 @@ void file_explorer_window_destroy(FileExplorerWindow *window)
     model_destroy((Model *)window->model);
 }
 
-FileExplorerWindow *file_explorer_window_create(const char *current_path)
+Window *file_explorer_window_create(const char *current_path)
 {
     FileExplorerWindow *window = __create(FileExplorerWindow);
 
@@ -188,14 +188,14 @@ FileExplorerWindow *file_explorer_window_create(const char *current_path)
 
     widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, window, (WidgetEventHandlerCallback)open);
 
-    return window;
+    return (Window *)window;
 }
 
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = (Window *)file_explorer_window_create("/");
+    Window *window = file_explorer_window_create("/");
     window_show(window);
 
     return application_run();

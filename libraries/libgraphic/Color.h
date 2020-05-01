@@ -6,8 +6,7 @@
 
 #include <libsystem/runtime.h>
 
-typedef union
-{
+typedef union {
     struct
     {
         uint8_t R;
@@ -208,3 +207,8 @@ static inline Color color_blend(Color fg, Color bg)
 
 #define COLOR_ENUM_ENTRY(__name_maj, __name_lower, __r, __g, __b) static const Color COLOR_##__name_maj = (Color){{__r, __g, __b, 255}};
 COLOR_ENUM(COLOR_ENUM_ENTRY)
+
+static inline int color_equals(Color left, Color right)
+{
+    return left.packed == right.packed;
+}

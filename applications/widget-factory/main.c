@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         panel_create(panel_grid);
         panel_create(panel_grid);
 
-        button_create(panel_hgrid, "Grid layout!");
+        button_create(panel_grid, "Grid layout!");
 
         panel_create(panel_grid);
         panel_create(panel_grid);

@@ -74,6 +74,12 @@ typedef struct
 #define HFLOW(_hspacing) \
     ((Layout){LAYOUT_HFLOW, 0, 0, (_hspacing), 0})
 
+typedef struct
+{
+    bool overwritten;
+    Color color;
+} WidgetColorOverwrite;
+
 typedef struct Widget
 {
     const char *classname;
@@ -81,6 +87,7 @@ typedef struct Widget
     bool enabled;
     Rectangle bound;
     Insets insets;
+    WidgetColorOverwrite color_overwrite[__THEME_COLOR_COUNT];
 
     WidgetDestroyCallback destroy;
     WidgetPaintCallback paint;
@@ -141,6 +148,9 @@ Widget *widget_child_at(Widget *parent, Point position);
 Color __widget_get_color(Widget *widget, ThemeColorRole role);
 
 #define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))
+
+void __widget_overwrite_color(Widget *widget, ThemeColorRole role, Color color);
+#define widget_overwrite_color(__widget, __role, __color) __widget_overwrite_color(WIDGET(__widget), (__role), (__color))
 
 void widget_set_enable(Widget *widget, bool enable);
 

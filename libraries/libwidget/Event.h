@@ -35,6 +35,14 @@ typedef struct Event
     bool accepted;
 } Event;
 
+#define is_mouse_event(__event)                                  \
+    (((Event *)(__event))->type == EVENT_MOUSE_MOVE ||           \
+     ((Event *)(__event))->type == EVENT_MOUSE_ENTER ||          \
+     ((Event *)(__event))->type == EVENT_MOUSE_LEAVE ||          \
+     ((Event *)(__event))->type == EVENT_MOUSE_BUTTON_PRESS ||   \
+     ((Event *)(__event))->type == EVENT_MOUSE_BUTTON_RELEASE || \
+     ((Event *)(__event))->type == EVENT_MOUSE_DOUBLE_CLICK)
+
 #define EVENT(__type, __event_type, __args...) \
     (Event *)&(__type)                         \
     {                                          \

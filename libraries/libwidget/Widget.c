@@ -437,7 +437,20 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 
 Color __widget_get_color(Widget *widget, ThemeColorRole role)
 {
+    if (widget->color_overwrite[role].overwritten)
+    {
+        return widget->color_overwrite[role].color;
+    }
+
     return window_get_color(widget->window, role);
+}
+
+void __widget_overwrite_color(Widget *widget, ThemeColorRole role, Color color)
+{
+    widget->color_overwrite[role].overwritten = true;
+    widget->color_overwrite[role].color = color;
+
+    widget_update(widget);
 }
 
 void widget_set_enable(Widget *widget, bool enable)

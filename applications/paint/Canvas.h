@@ -2,12 +2,12 @@
 
 #include <libwidget/Widget.h>
 
+#include "paint/PaintDocument.h"
+
 typedef struct
 {
     Widget widget;
-
-    Bitmap *bitmap;
-    Painter *painter;
+    PaintDocument *document;
 } Canvas;
 
-Widget *canvas_create(Widget *parent, int width, int height);
+Widget *canvas_create(Widget *parent, PaintDocument *document);

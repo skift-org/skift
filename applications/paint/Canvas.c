@@ -1,6 +1,7 @@
 #include <libgraphic/Painter.h>
 
 #include "paint/Canvas.h"
+#include "paint/PaintTool.h"
 
 #define CHECKER_SIZE 8
 
@@ -30,7 +31,8 @@ static void checker_board(Painter *painter, Rectangle rectangle)
 
 Rectangle canvas_bound(Canvas *widget)
 {
-    Rectangle bound = bitmap_bound(widget->bitmap);
+
+    Rectangle bound = bitmap_bound(widget->document->bitmap);
 
     bound = rectangle_offset(bound, widget_bound(widget).position);
 
@@ -50,39 +52,38 @@ void canvas_paint(Canvas *widget, Painter *painter, Rectangle rectangle)
 
     painter_blit_bitmap(
         painter,
-        widget->bitmap,
-        bitmap_bound(widget->bitmap), destination);
+        widget->document->bitmap,
+        bitmap_bound(widget->document->bitmap), destination);
 }
 
 void canvas_event(Canvas *widget, Event *event)
 {
-    if (event->type == EVENT_MOUSE_MOVE)
+    if (is_mouse_event(event))
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
+        MouseEvent mouse_event = *(MouseEvent *)event;
 
-        if (mouse_event->buttons & MOUSE_BUTTON_LEFT)
+        mouse_event.old_position = point_sub(mouse_event.old_position, canvas_bound(widget).position);
+        mouse_event.position = point_sub(mouse_event.position, canvas_bound(widget).position);
+
+        if (widget->document->tool->on_mouse_event)
+            widget->document->tool->on_mouse_event(widget->document->tool, widget->document, mouse_event);
+
+        if (widget->document->dirty)
         {
-            Point from = point_sub(mouse_event->old_position, canvas_bound(widget).position);
-            Point to = point_sub(mouse_event->position, canvas_bound(widget).position);
-
-            painter_draw_line(widget->painter, from, to, COLOR_RED);
-
             widget_update(WIDGET(widget));
+            widget->document->dirty = false;
         }
     }
 }
 
-Widget *canvas_create(Widget *parent, int width, int height)
+Widget *canvas_create(Widget *parent, PaintDocument *document)
 {
     Canvas *canvas = __create(Canvas);
 
-    canvas->bitmap = bitmap_create(width, height);
-    canvas->painter = painter_create(canvas->bitmap);
-
-    painter_clear(canvas->painter, COLOR_RGBA(0, 0, 0, 0));
-
     WIDGET(canvas)->paint = (WidgetPaintCallback)canvas_paint;
     WIDGET(canvas)->event = (WidgetEventCallback)canvas_event;
+
+    canvas->document = document;
 
     widget_initialize(WIDGET(canvas), "Canvas", parent);
 

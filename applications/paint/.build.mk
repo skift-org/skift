@@ -11,4 +11,7 @@ PAINT_ICONS = \
 	format-text-variant \
 	rectangle-outline \
 	circle-outline \
-	vector-line
+	vector-line \
+	folder-open \
+	content-save \
+	image-plus

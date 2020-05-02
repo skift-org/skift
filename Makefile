@@ -143,6 +143,7 @@ $(1)_SOURCES = \
 $(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
 
 OBJECTS += $$($(1)_OBJECTS)
+ICONS += $$($(1)_ICONS)
 
 $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	$$(DIRECTORY_GUARD)

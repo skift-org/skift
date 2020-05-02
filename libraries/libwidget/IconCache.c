@@ -17,7 +17,11 @@ Bitmap *icon_cache_get_icon(const char *name)
 
         snprintf(path, 512, "/res/icons/%s.png", name);
 
-        hashmap_put(_icons, name, bitmap_load_from(path));
+        Bitmap *loaded_icon = bitmap_load_from(path);
+
+        loaded_icon->filtering = BITMAP_FILTERING_LINEAR;
+
+        hashmap_put(_icons, name, loaded_icon);
     }
 
     return (Bitmap *)hashmap_get(_icons, name);

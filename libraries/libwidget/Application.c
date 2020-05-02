@@ -196,11 +196,14 @@ void application_hide_window(Window *window)
         return;
     }
 
-    bool should_application_close = false;
+    bool should_application_close = true;
 
     list_foreach(Window, window, _windows)
     {
-        should_application_close |= !window_is_visible(window);
+        if (window_is_visible(window))
+        {
+            should_application_close = false;
+        }
     }
 
     if (should_application_close)

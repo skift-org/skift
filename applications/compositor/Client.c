@@ -86,32 +86,32 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         Window *window = manager_get_window(client, blit_window.id);
 
-        int old_framebuffer_handle = 0;
-        shared_memory_get_handle((uintptr_t)window->framebuffer, &old_framebuffer_handle);
-
-        if (old_framebuffer_handle != blit_window.framebuffer)
-        {
-            Bitmap *new_framebuffer = NULL;
-
-            size_t size;
-            if (shared_memory_include(
-                    blit_window.framebuffer,
-                    (uintptr_t *)&new_framebuffer,
-                    &size) == SUCCESS)
-            {
-                logger_info("Flipping window framebuffer");
-                shared_memory_free((uintptr_t)window->framebuffer);
-
-                window->framebuffer = new_framebuffer;
-            }
-            else
-            {
-                logger_error("Client application gave us a jankie shared memory object id");
-            }
-        }
-
         if (window)
         {
+            int old_framebuffer_handle = 0;
+            shared_memory_get_handle((uintptr_t)window->framebuffer, &old_framebuffer_handle);
+
+            if (old_framebuffer_handle != blit_window.framebuffer)
+            {
+                Bitmap *new_framebuffer = NULL;
+
+                size_t size;
+                if (shared_memory_include(
+                        blit_window.framebuffer,
+                        (uintptr_t *)&new_framebuffer,
+                        &size) == SUCCESS)
+                {
+                    logger_info("Flipping window framebuffer");
+                    shared_memory_free((uintptr_t)window->framebuffer);
+
+                    window->framebuffer = new_framebuffer;
+                }
+                else
+                {
+                    logger_error("Client application gave us a jankie shared memory object id");
+                }
+            }
+
             renderer_region_dirty(rectangle_offset(blit_window.bound, window->bound.position));
         }
         else

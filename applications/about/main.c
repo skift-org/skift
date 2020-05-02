@@ -14,24 +14,22 @@ void ok_button_pressed(void *target, Widget *sender, Event *event)
     application_exit(-1);
 }
 
-int main(int argc, char **argv)
+Window *about_dialog_create(void)
 {
-    application_initialize(argc, argv);
+    Window *dialog = window_create("information", "About", 250, 250, WINDOW_NONE);
 
-    Window *window = window_create("information", "About", 250, 250, WINDOW_NONE);
-
-    window_root(window)->layout = VGRID(8);
+    window_root(dialog)->layout = VGRID(8);
 
     if (theme_is_dark())
     {
-        image_create(window_root(window), "/res/skift-white.png");
+        image_create(window_root(dialog), "/res/skift-white.png");
     }
     else
     {
-        image_create(window_root(window), "/res/skift-black.png");
+        image_create(window_root(dialog), "/res/skift-black.png");
     }
 
-    Widget *button_and_text = container_create(window_root(window));
+    Widget *button_and_text = container_create(window_root(dialog));
     button_and_text->layout = VGRID(2);
 
     label_create(button_and_text, "The skift operating system.");
@@ -39,10 +37,16 @@ int main(int argc, char **argv)
     label_create(button_and_text, "Copyright © 2018-2020 N. Van Bossuyt.");
 
     Widget *ok_buton = button_create(button_and_text, "Ok");
-
     widget_set_event_handler(ok_buton, EVENT_MOUSE_BUTTON_PRESS, NULL, ok_button_pressed);
 
-    window_show(window);
+    return dialog;
+}
+
+int main(int argc, char **argv)
+{
+    application_initialize(argc, argv);
+
+    window_show(about_dialog_create());
 
     return application_run();
 }

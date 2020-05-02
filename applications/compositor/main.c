@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 
     _keyboard_decoder = utf8decoder_create(NULL, keyboard_callback_decoded);
 
-    Timer *repaint_timer = timer_create(NULL, 1000 / 144, render_callback);
+    Timer *repaint_timer = timer_create(NULL, 1000 / 60, render_callback);
     timer_start(repaint_timer);
 
     manager_initialize();
@@ -107,9 +107,6 @@ int main(int argc, char const *argv[])
 
     Launchpad *panel = launchpad_create("panel", "/bin/panel");
     launchpad_launch(panel, NULL);
-
-    Launchpad *file_explorer = launchpad_create("paint", "/bin/paint");
-    launchpad_launch(file_explorer, NULL);
 
     return eventloop_run();
 }

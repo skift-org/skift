@@ -15,6 +15,7 @@ typedef Point (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
+typedef void (*WidgetLayoutCallback)(struct Widget *widget);
 
 typedef void (*WidgetEventHandlerCallback)(void *target, struct Widget *sender, struct Event *event);
 
@@ -93,6 +94,7 @@ typedef struct Widget
     WidgetPaintCallback paint;
     WidgetEventCallback event;
     WidgetComputeSizeCallback size;
+    WidgetLayoutCallback do_layout;
 
     WidgetEventHandler event_handles[__EVENT_TYPE_COUNT];
 

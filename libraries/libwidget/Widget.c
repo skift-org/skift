@@ -162,6 +162,12 @@ void widget_layout(Widget *widget)
     if (list_count(widget->childs) == 0)
         return;
 
+    if (widget->do_layout)
+    {
+        widget->do_layout(widget);
+        return;
+    }
+
     Layout layout = widget->layout;
 
     switch (layout.type)

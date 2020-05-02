@@ -69,6 +69,7 @@ static void navigate(FileExplorerWindow *window, Path *path, RecordHistory recor
     breadcrumb_navigate(window->breadcrumb, path);
     filesystem_model_navigate(window->model, path);
     widget_update(window->table);
+    widget_layout(window->table);
     update_navigation_bar(window);
 }
 

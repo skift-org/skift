@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    MODEL_FIELDS
+    Model __super;
 
     JsonValue *data;
 } TaskModel;

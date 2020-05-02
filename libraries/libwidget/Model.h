@@ -38,19 +38,18 @@ typedef int (*ModelRowCountCallback)(struct Model *model);
 typedef const char *(*ModelColumnNameCallback)(int column);
 typedef void (*ModelDestroyCallback)(struct Model *model);
 
-#define MODEL_FIELDS                             \
-    ModelUpdateCallback model_update;            \
-    ModelDataCallback model_data;                \
-    ModelStyleCallback model_style;              \
-    ModelRowCountCallback model_row_count;       \
-    ModelColumnCountCallback model_column_count; \
-    ModelColumnNameCallback model_column_name;   \
-    ModelDestroyCallback model_destroy;
-
 typedef struct Model
 {
-    MODEL_FIELDS
+    ModelUpdateCallback model_update;
+    ModelDataCallback model_data;
+    ModelStyleCallback model_style;
+    ModelRowCountCallback model_row_count;
+    ModelColumnCountCallback model_column_count;
+    ModelColumnNameCallback model_column_name;
+    ModelDestroyCallback model_destroy;
 } Model;
+
+#define MODEL(__subclass) ((Model *)__subclass)
 
 void model_initialize(Model *model);
 

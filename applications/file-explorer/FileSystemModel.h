@@ -5,7 +5,7 @@
 #include <libwidget/Model.h>
 typedef struct
 {
-    MODEL_FIELDS
+    Model __super;
 
     char *current_path;
     List *files;

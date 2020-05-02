@@ -147,12 +147,12 @@ FileSystemModel *filesystem_model_create(const char *current_path)
 
     model->current_path = strdup(current_path);
 
-    model->model_update = (ModelUpdateCallback)filesystem_model_update;
-    model->model_data = (ModelDataCallback)filesystem_model_data;
-    model->model_row_count = (ModelRowCountCallback)filesystem_model_row_count;
-    model->model_column_count = (ModelColumnCountCallback)filesystem_model_column_count;
-    model->model_column_name = (ModelColumnNameCallback)filesystem_model_column_name;
-    model->model_destroy = (ModelDestroyCallback)filesystem_model_destroy;
+    MODEL(model)->model_update = (ModelUpdateCallback)filesystem_model_update;
+    MODEL(model)->model_data = (ModelDataCallback)filesystem_model_data;
+    MODEL(model)->model_row_count = (ModelRowCountCallback)filesystem_model_row_count;
+    MODEL(model)->model_column_count = (ModelColumnCountCallback)filesystem_model_column_count;
+    MODEL(model)->model_column_name = (ModelColumnNameCallback)filesystem_model_column_name;
+    MODEL(model)->model_destroy = (ModelDestroyCallback)filesystem_model_destroy;
 
     model_initialize((Model *)model);
 

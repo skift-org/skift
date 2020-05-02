@@ -41,6 +41,7 @@ void widget_table_update(TaskManagerWindow *window)
 {
     model_update((Model *)window->table_model);
     widget_update(window->table);
+    widget_layout(window->table);
 }
 
 void task_manager_window_destroy(TaskManagerWindow *window)

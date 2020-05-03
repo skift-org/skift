@@ -4,7 +4,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
 #include <libsystem/time.h>
 
 struct Task;

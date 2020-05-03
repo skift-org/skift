@@ -6,7 +6,6 @@
 
 #include <libmath/MinMax.h>
 #include <libmath/math.h>
-#include <libsystem/runtime.h>
 
 typedef struct __packed
 {
@@ -39,7 +38,8 @@ typedef struct __packed
     __INSETS(__VA_ARGS__, __INSETS4, __INSETS3, __INSETS2, __INSETS1) \
     (__VA_ARGS__)
 
-typedef union __packed {
+typedef union __packed
+{
     struct
     {
         int X;

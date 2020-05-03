@@ -6,8 +6,8 @@
 
 #include <abi/Process.h>
 
+#include <libsystem/Common.h>
 #include <libsystem/Result.h>
-#include <libsystem/runtime.h>
 
 int process_this(void);
 

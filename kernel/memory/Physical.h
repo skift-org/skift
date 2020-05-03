@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 extern uint TOTAL_MEMORY;
 extern uint USED_MEMORY;

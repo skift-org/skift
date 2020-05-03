@@ -5,7 +5,7 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/Result.h>
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 void memory_zero(void *where, uint how_many);
 

@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/Result.h>
-#include <libsystem/runtime.h>
 
 Result filesystem_link(const char *oldpath, const char *newpath);
 

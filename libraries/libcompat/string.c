@@ -1,7 +1,6 @@
-#include <string.h>
 #include <math.h>
+#include <string.h>
 
-#include <libsystem/runtime.h>
 #include <libsystem/logger.h>
 
 int sscanf(const char *str, const char *format, ...)

@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 #define SYSTEM_INFO_FIELD_SIZE 65
 

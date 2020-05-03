@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 #define FILE_NAME_LENGTH (64)
 #define PATH_LENGTH (512)

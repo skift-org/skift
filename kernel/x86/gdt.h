@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 #define GDT_ENTRY_COUNT 6
 

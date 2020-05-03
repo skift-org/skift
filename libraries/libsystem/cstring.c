@@ -6,7 +6,7 @@
 #include <libsystem/__printf__.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 /* --- snprintf ------------------------------------------------------------- */
 

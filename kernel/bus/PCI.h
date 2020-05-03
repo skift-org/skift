@@ -4,8 +4,6 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
-
 #include "kernel/devices/Devices.h"
 
 #define PCI_VENDOR_ID 0x00

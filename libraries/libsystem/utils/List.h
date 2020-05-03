@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 #define list_foreach(__type, __item, __list)                         \
     for (ListItem *__i = __list->head; __i != NULL; __i = __i->next) \

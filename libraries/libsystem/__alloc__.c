@@ -10,7 +10,6 @@
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/logger.h>
-#include <libsystem/runtime.h>
 
 #define VERSION "1.1"
 #define ALIGNMENT 16ul

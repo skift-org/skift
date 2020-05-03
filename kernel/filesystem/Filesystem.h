@@ -5,7 +5,6 @@
 /* See: LICENSE.md                                                            */
 
 #include <libsystem/path.h>
-#include <libsystem/runtime.h>
 #include <libsystem/utils/List.h>
 
 #include "kernel/node/Handle.h"

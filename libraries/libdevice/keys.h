@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libsystem/runtime.h>
+#include <libsystem/Common.h>
 
 #define KEY_LIST(__ENTRY)                     \
     __ENTRY(KEY_INVALID, 0x0)                 \

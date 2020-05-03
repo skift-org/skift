@@ -8,7 +8,6 @@
 
 #include <libsystem/io/Handle.h>
 #include <libsystem/path.h>
-#include <libsystem/runtime.h>
 
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>

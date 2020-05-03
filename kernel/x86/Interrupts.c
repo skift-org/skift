@@ -120,7 +120,7 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 
         if (irq == 0)
         {
-            esp = shedule(esp);
+            esp = schedule(esp);
         }
         else
         {

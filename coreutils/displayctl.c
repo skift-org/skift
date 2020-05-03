@@ -124,12 +124,11 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    Stream *framebuffer_device = stream_open("/dev/framebuffer", OPEN_READ);
+    __cleanup(stream_cleanup) Stream *framebuffer_device = stream_open("/dev/framebuffer", OPEN_READ);
 
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
         handle_printf_error(framebuffer_device, "displayctl: Failled to open /dev/framebuffer");
-        stream_close(framebuffer_device);
 
         return -1;
     }
@@ -152,8 +151,6 @@ int main(int argc, char **argv)
     {
         result = gfxmode_get(framebuffer_device);
     }
-
-    stream_close(framebuffer_device);
 
     return result;
 }

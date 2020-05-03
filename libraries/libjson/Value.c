@@ -42,18 +42,6 @@ JsonValue *json_create_double(double double_)
     return value;
 }
 
-JsonValue *json_create_boolean(bool value)
-{
-    if (value)
-    {
-        return json_create_true();
-    }
-    else
-    {
-        return json_create_false();
-    }
-}
-
 JsonValue *json_create_object(void)
 {
     JsonValue *value = __create(JsonValue);
@@ -74,20 +62,18 @@ JsonValue *json_create_array(void)
     return value;
 }
 
-JsonValue *json_create_true(void)
+JsonValue *json_create_boolean(bool boolean)
 {
     JsonValue *value = __create(JsonValue);
 
-    value->type = JSON_TRUE;
-
-    return value;
-}
-
-JsonValue *json_create_false(void)
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_FALSE;
+    if (boolean)
+    {
+        value->type = JSON_TRUE;
+    }
+    else
+    {
+        value->type = JSON_FALSE;
+    }
 
     return value;
 }
@@ -207,7 +193,7 @@ void json_object_remove(JsonValue *object, const char *key)
     hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyKeyCallback)json_destroy);
 }
 
-size_t json_array_lenght(JsonValue *array)
+size_t json_array_length(JsonValue *array)
 {
     assert(json_is(array, JSON_ARRAY));
 

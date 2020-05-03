@@ -23,18 +23,18 @@ Result file_FsOperationOpen(FsFile *node, FsHandle *handle)
     return SUCCESS;
 }
 
-Result file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     if (handle->offset <= node->size)
     {
-        *readed = MIN(node->size - handle->offset, size);
-        memcpy(buffer, (byte *)node->buffer + handle->offset, *readed);
+        *read = MIN(node->size - handle->offset, size);
+        memcpy(buffer, (byte *)node->buffer + handle->offset, *read);
     }
 
     return SUCCESS;
 }
 
-Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     if ((handle->offset + size) > node->realsize)
     {
@@ -45,7 +45,7 @@ Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer,
     node->size = MAX(handle->offset + size, node->size);
     memcpy((byte *)(node->buffer) + handle->offset, buffer, size);
 
-    *writen = size;
+    *written = size;
 
     return SUCCESS;
 }

@@ -9,7 +9,7 @@ bool blocker_time_can_unblock(TaskBlockerTime *blocker, Task *task)
 {
     __unused(task);
 
-    return sheduler_get_ticks() >= blocker->wakeup_tick;
+    return scheduler_get_ticks() >= blocker->wakeup_tick;
 }
 
 void blocker_time_unblock(TaskBlockerTime *blocker, Task *task)

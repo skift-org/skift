@@ -122,14 +122,14 @@ bool mouse_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(_mouse_buffer);
 }
 
-static Result mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result mouse_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
+    *read = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
     atomic_end();
 
     return SUCCESS;

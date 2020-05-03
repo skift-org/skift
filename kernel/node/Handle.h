@@ -29,7 +29,7 @@ bool fshandle_is_locked(FsHandle *handle);
 void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
 void fshandle_release_lock(FsHandle *handle, int who_release);
 
-Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed);
+Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read);
 Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
 Result fshandle_seek(FsHandle *handle, int offset, Whence whence);

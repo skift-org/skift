@@ -39,7 +39,7 @@ static RingBuffer *_characters_buffer = NULL;
 static FsNode *_events_node = NULL;
 static RingBuffer *_events_buffer = NULL;
 
-Codepoint keyboad_get_codepoint(Key key)
+Codepoint keyboard_get_codepoint(Key key)
 {
     KeyMapping *mapping = keymap_lookup(_keymap, key);
 
@@ -71,24 +71,24 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     {
         if (motion == KEY_MOTION_DOWN)
         {
-            if (keyboad_get_codepoint(key) != 0)
+            if (keyboard_get_codepoint(key) != 0)
             {
                 uint8_t utf8[5];
-                int lenght = codepoint_to_utf8(keyboad_get_codepoint(key), utf8);
+                int length = codepoint_to_utf8(keyboard_get_codepoint(key), utf8);
 
                 if (_characters_node->readers)
-                    ringbuffer_write(_characters_buffer, (const char *)utf8, lenght);
+                    ringbuffer_write(_characters_buffer, (const char *)utf8, length);
             }
         }
 
         if (_events_node->readers)
-            ringbuffer_write(_events_buffer, (char *)&(KeyboradPacket){key, motion}, sizeof(KeyboradPacket));
+            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, motion}, sizeof(KeyboardPacket));
 
         _keystate[key] = motion;
     }
     else
     {
-        logger_warn("Invalide scancode %d", key);
+        logger_warn("Invalid scancode %d", key);
     }
 }
 
@@ -132,12 +132,11 @@ void keyboard_interrupt_handler(void)
 
 KeyMap *keyboard_load_keymap(const char *keymap_path)
 {
-    Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
     if (handle_has_error(keymap_file))
     {
         logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
-        stream_close(keymap_file);
 
         return NULL;
     }
@@ -148,7 +147,6 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     if (stat.type != FILE_TYPE_REGULAR)
     {
         logger_info("Failled to load keymap from %s: This is not a regular file", keymap_path);
-        stream_close(keymap_file);
 
         return NULL;
     }
@@ -156,19 +154,16 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
     KeyMap *keymap = (KeyMap *)malloc(stat.size);
 
-    size_t readed = stream_read(keymap_file, keymap, stat.size);
+    size_t read = stream_read(keymap_file, keymap, stat.size);
 
-    if (readed != stat.size)
+    if (read != stat.size)
     {
         logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
-        stream_close(keymap_file);
 
         free(keymap);
 
         return NULL;
     }
-
-    stream_close(keymap_file);
 
     return keymap;
 }
@@ -217,14 +212,14 @@ static bool characters_can_read(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(_characters_buffer);
 }
 
-static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(_characters_buffer, (char *)buffer, size);
+    *read = ringbuffer_read(_characters_buffer, (char *)buffer, size);
     atomic_end();
 
     return SUCCESS;
@@ -239,14 +234,14 @@ static bool events_can_read(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(_events_buffer);
 }
 
-static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboradPacket)) * sizeof(KeyboradPacket));
+    *read = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
     atomic_end();
 
     return SUCCESS;
@@ -254,7 +249,7 @@ static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t s
 
 void keyboard_initialize(void)
 {
-    logger_info("Initializing keyboad...");
+    logger_info("Initializing keyboard...");
 
     _keymap = keyboard_load_keymap("/res/keyboard/fr_fr.kmap");
 

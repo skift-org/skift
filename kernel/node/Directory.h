@@ -14,7 +14,7 @@ typedef struct
 
 typedef struct
 {
-    char name[FILE_NAME_LENGHT];
+    char name[FILE_NAME_LENGTH];
     FsNode *node;
 } FsDirectoryEntry;
 

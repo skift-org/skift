@@ -21,8 +21,8 @@ void shell_prompt(int last_command_exit_value)
         printf("(\e[;1;31m%d\e[m) ", last_command_exit_value);
     }
 
-    char buffer[PATH_LENGHT];
-    process_get_cwd(buffer, PATH_LENGHT);
+    char buffer[PATH_LENGTH];
+    process_get_cwd(buffer, PATH_LENGTH);
     printf("%s", buffer);
 
     printf(PROMPT);

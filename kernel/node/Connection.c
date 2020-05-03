@@ -32,7 +32,7 @@ Result connection_read(
     FsHandle *handle,
     void *buffer,
     size_t size,
-    size_t *readed)
+    size_t *read)
 {
     RingBuffer *data = NULL;
 
@@ -55,7 +55,7 @@ Result connection_read(
         data = connection->data_to_server;
     }
 
-    *readed = ringbuffer_read(data, (char *)buffer, size);
+    *read = ringbuffer_read(data, (char *)buffer, size);
 
     return SUCCESS;
 }
@@ -65,7 +65,7 @@ Result connection_write(
     FsHandle *handle,
     const void *buffer,
     size_t size,
-    size_t *writen)
+    size_t *written)
 {
     RingBuffer *data = NULL;
 
@@ -88,7 +88,7 @@ Result connection_write(
         data = connection->data_to_client;
     }
 
-    *writen = ringbuffer_write(data, (const char *)buffer, size);
+    *written = ringbuffer_write(data, (const char *)buffer, size);
 
     return SUCCESS;
 }

@@ -50,6 +50,9 @@ typedef long off_t;
         __y = __tmp;             \
     })
 
+#define __cleanup(__function) __attribute__((__cleanup__(__function)))
+#define __cleanup_malloc __attribute__((__cleanup__(malloc_cleanup)))
+
 // Align the nearest _lower_ aligned address
 // ex: 8 with align = 8 -> 8
 // ex: 9 with align = 8 -> 16
@@ -70,6 +73,8 @@ __attribute__((malloc)) __attribute__((alloc_size(1, 2))) void *calloc(size_t, s
 void *realloc(void *p, size_t size);
 
 void free(void *);
+
+void malloc_cleanup(void *buffer);
 
 /* --- Loops ---------------------------------------------------------------- */
 

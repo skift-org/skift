@@ -131,13 +131,13 @@ long ftell(FILE *stream)
 int puts(const char *s)
 {
 
-    size_t lenght = 0;
+    size_t length = 0;
 
-    for (lenght = 0; s[lenght]; lenght++)
+    for (length = 0; s[length]; length++)
     {
     }
 
-    int r = stream_write(out_stream, s, lenght);
+    int r = stream_write(out_stream, s, length);
     r += stream_write(out_stream, "\n", 1);
 
     return r;

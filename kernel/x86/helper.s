@@ -18,8 +18,8 @@ paging_disable:
     mov cr0, eax
     ret
 
-global paging_load_directorie
-paging_load_directorie:
+global paging_load_directory
+paging_load_directory:
     mov eax, [esp + 4]
     mov cr3, eax
     ret

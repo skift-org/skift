@@ -49,7 +49,7 @@ void directory_FsOperationClose(FsDirectory *node, FsHandle *handle)
     free(handle->attached);
 }
 
-Result directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buffer, uint size, size_t *readed)
+Result directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buffer, uint size, size_t *read)
 {
     __unused(node);
     // FIXME: directories should no be read using read().
@@ -64,7 +64,7 @@ Result directory_FsOperationRead(FsDirectory *node, FsHandle *handle, void *buff
         {
             *((DirectoryEntry *)buffer) = listing->entries[index];
 
-            *readed = sizeof(DirectoryEntry);
+            *read = sizeof(DirectoryEntry);
         }
     }
 

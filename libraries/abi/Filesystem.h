@@ -6,8 +6,8 @@
 
 #include <libsystem/runtime.h>
 
-#define FILE_NAME_LENGHT (64)
-#define PATH_LENGHT (512)
+#define FILE_NAME_LENGTH (64)
+#define PATH_LENGTH (512)
 #define PATH_DEPTH (16)
 #define PATH_SEPARATOR '/'
 
@@ -54,6 +54,6 @@ typedef struct
 
 typedef struct
 {
-    char name[FILE_NAME_LENGHT];
+    char name[FILE_NAME_LENGTH];
     FileState stat;
 } DirectoryEntry;

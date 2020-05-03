@@ -6,7 +6,7 @@
 void label_paint(Label *label, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
-    int text_width = font_mesure_string(widget_font(), label->text);
+    int text_width = font_measure_string(widget_font(), label->text);
 
     painter_draw_string(
         painter,
@@ -21,7 +21,7 @@ void label_paint(Label *label, Painter *painter, Rectangle rectangle)
 
 Point label_size(Label *label)
 {
-    return (Point){font_mesure_string(widget_font(), label->text), 16};
+    return (Point){font_measure_string(widget_font(), label->text), 16};
 }
 
 void label_set_text(Widget *label, const char *text)

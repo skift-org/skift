@@ -27,9 +27,9 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 
     if (node->open)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         node->open(node, handle);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     return handle;
@@ -48,9 +48,9 @@ FsHandle *fshandle_clone(FsHandle *handle)
 
     if (node->open)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         node->open(node, clone);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     return clone;
@@ -67,9 +67,9 @@ void fshandle_destroy(FsHandle *handle)
 
     if (node->close)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         node->close(node, handle);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     fsnode_deref_handle(node, handle->flags);
@@ -125,7 +125,7 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
     lock_release_by(handle->lock, who_release);
 }
 
-Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     if (!fshandle_has_flag(handle, OPEN_READ) &&
         !fshandle_has_flag(handle, OPEN_MASTER) &&
@@ -142,24 +142,24 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *readed
         return ERR_NOT_READABLE;
     }
 
-    task_block(sheduler_running(), blocker_read_create(handle), 0);
+    task_block(scheduler_running(), blocker_read_create(handle), 0);
 
-    *readed = 0;
+    *read = 0;
 
-    Result result = node->read(node, handle, buffer, size, readed);
+    Result result = node->read(node, handle, buffer, size, read);
 
-    handle->offset += *readed;
+    handle->offset += *read;
 
-    fsnode_release_lock(node, sheduler_running_id());
+    fsnode_release_lock(node, scheduler_running_id());
 
     return result;
 }
 
-static Result fshandle_write_interal(FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     FsNode *node = handle->node;
 
-    task_block(sheduler_running(), blocker_write_create(handle), 0);
+    task_block(scheduler_running(), blocker_write_create(handle), 0);
 
     if (fshandle_has_flag(handle, OPEN_APPEND))
     {
@@ -175,7 +175,7 @@ static Result fshandle_write_interal(FsHandle *handle, const void *buffer, size_
 
     handle->offset += *written;
 
-    fsnode_release_lock(node, sheduler_running_id());
+    fsnode_release_lock(node, scheduler_running_id());
 
     return result;
 }
@@ -203,7 +203,7 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
 
     while (remaining > 0 && result == SUCCESS)
     {
-        result = fshandle_write_interal(
+        result = fshandle_write_internal(
             handle,
             (void *)((uintptr_t)buffer + (size - remaining)),
             remaining,
@@ -224,9 +224,9 @@ Result fshandle_seek(FsHandle *handle, int offset, Whence whence)
 
     if (node->size)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         size = node->size(node, handle);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     switch (whence)
@@ -258,7 +258,7 @@ Result fshandle_seek(FsHandle *handle, int offset, Whence whence)
 
         break;
     default:
-        logger_error("Invalide whence %d", whence);
+        logger_error("Invalid whence %d", whence);
         ASSERT_NOT_REACHED();
     }
 
@@ -273,9 +273,9 @@ Result fshandle_tell(FsHandle *handle, Whence whence, int *offset)
 
     if (node->size)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         size = node->size(node, handle);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     switch (whence)
@@ -303,9 +303,9 @@ Result fshandle_call(FsHandle *handle, int request, void *args)
 
     if (node->call)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         result = node->call(node, handle, request, args);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     return result;
@@ -319,9 +319,9 @@ Result fshandle_stat(FsHandle *handle, FileState *stat)
 
     if (node->size)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         stat->size = node->size(node, handle);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
     else
     {
@@ -332,9 +332,9 @@ Result fshandle_stat(FsHandle *handle, FileState *stat)
 
     if (node->stat)
     {
-        fsnode_acquire_lock(node, sheduler_running_id());
+        fsnode_acquire_lock(node, scheduler_running_id());
         result = node->stat(node, handle, stat);
-        fsnode_release_lock(node, sheduler_running_id());
+        fsnode_release_lock(node, scheduler_running_id());
     }
 
     return result;
@@ -347,11 +347,11 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    fsnode_acquire_lock(node, sheduler_running_id());
+    fsnode_acquire_lock(node, scheduler_running_id());
 
     FsNode *connection = node->open_connection(node);
 
-    fsnode_release_lock(node, sheduler_running_id());
+    fsnode_release_lock(node, scheduler_running_id());
 
     if (connection == NULL)
     {
@@ -363,7 +363,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
 
-    task_block(sheduler_running(), blocker_connect_create(connection), 0);
+    task_block(scheduler_running(), blocker_connect_create(connection), 0);
 
     fsnode_deref(connection);
 
@@ -379,7 +379,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    task_block(sheduler_running(), blocker_accept_create(node), 0);
+    task_block(scheduler_running(), blocker_accept_create(node), 0);
 
     FsNode *connection = node->accept_connection(node);
 
@@ -388,7 +388,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     *connection_handle = fshandle_create(connection, OPEN_SERVER);
 
-    fsnode_release_lock(node, sheduler_running_id());
+    fsnode_release_lock(node, scheduler_running_id());
 
     fsnode_deref(connection);
 

@@ -23,14 +23,14 @@ MemoryRange kernel_memory_range(void)
 
 void memory_initialize(Multiboot *multiboot)
 {
-    logger_info("Initializing memory managment...");
+    logger_info("Initializing memory management...");
 
     for (size_t i = 0; i < 1024 * 1024 / 8; i++)
     {
         MEMORY[i] = 0xff;
     }
 
-    // Setup the kernel pagedirectorie.
+    // Setup the kernel pagedirectory.
     for (uint i = 0; i < 256; i++)
     {
         PageDirectoryEntry *e = &kpdir.entries[i];
@@ -65,7 +65,7 @@ void memory_initialize(Multiboot *multiboot)
     virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
     physical_set_used(0, 1);
 
-    paging_load_directorie(&kpdir);
+    paging_load_directory(&kpdir);
     paging_enable();
 
     logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);
@@ -134,7 +134,7 @@ uint memory_alloc_at(PageDirectory *pdir, uint count, uint paddr, int user)
     return vaddr;
 }
 
-// Alloc a identity mapped memory region, usefull for pagging data structurs
+// Alloc a identity mapped memory region, usefull for paging data structures
 uint memory_alloc_identity(PageDirectory *pdir, uint count, int user)
 {
     if (count == 0)

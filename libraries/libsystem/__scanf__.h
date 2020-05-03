@@ -15,7 +15,7 @@ typedef enum
 {
     SFSTATE_ESC,
     SFSTATE_PARSE,
-    SFSTATE_FORMAT_LENGHT,
+    SFSTATE_FORMAT_LENGTH,
     SFSTATE_FINALIZE
 } scanf_state_t;
 
@@ -31,7 +31,7 @@ typedef struct scanf_info
     int format_offset;
 
     // Scanner
-    uint lenght;
+    uint length;
 
     void *p;
     int n;

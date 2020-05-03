@@ -7,43 +7,39 @@
 
 int cat(const char *path)
 {
-    Stream *stream = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
 
     if (handle_has_error(stream))
     {
         handle_printf_error(stream, "cat: Cannot access %s", path);
-        stream_close(stream);
         return -1;
     }
 
     FileState stat = {};
     stream_stat(stream, &stat);
 
-    size_t readed;
+    size_t read;
     byte buffer[1024];
 
-    while ((readed = stream_read(stream, &buffer, 1024)) != 0)
+    while ((read = stream_read(stream, &buffer, 1024)) != 0)
     {
         if (handle_has_error(stream))
         {
             handle_printf_error(stream, "cat: Failled to read from %s", path);
-            stream_close(stream);
 
             return -1;
         }
 
-        stream_write(out_stream, buffer, readed);
+        stream_write(out_stream, buffer, read);
 
         if (handle_has_error(out_stream))
         {
             handle_printf_error(out_stream, "cat: Failled to write to stdout");
-            stream_close(stream);
 
             return -1;
         }
     }
 
-    stream_close(stream);
     stream_flush(out_stream);
 
     return 0;

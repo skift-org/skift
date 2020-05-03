@@ -50,58 +50,44 @@ static Color placeholder_buffer[] = {
 
 Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 {
-    Result result = SUCCESS;
-
-    uint width = 0;
-    uint height = 0;
-    void *rawdata = NULL;
-    void *outdata = NULL;
-
-    Stream *file = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *file = stream_open(path, OPEN_READ);
 
     if (handle_has_error(file))
     {
         logger_error("Failled to load bitmap from %s: %s", path, handle_error_string(file));
-        result = handle_get_error(file);
-
-        goto cleanup_and_return;
+        return handle_get_error(file);
     }
 
     FileState state;
     stream_stat(file, &state);
 
-    rawdata = malloc(state.size);
+    void *rawdata __cleanup_malloc = malloc(state.size);
     assert(stream_read(file, rawdata, state.size) == state.size);
 
-    {
-        int decode_result = lodepng_decode32((unsigned char **)&outdata, &width, &height, (const unsigned char *)rawdata, state.size);
+    uint decoded_width = 0;
+    uint decoded_height = 0;
+    void *decoded_data __cleanup_malloc = NULL;
 
-        if (decode_result != 0)
-        {
-            logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
-            result = ERR_BAD_IMAGE_FILE_FORMAT;
-        }
-        else
-        {
-            *bitmap = bitmap_create(width, height);
-            memcpy((*bitmap)->pixels, outdata, width * height * sizeof(Color));
-        }
+    int decode_result = lodepng_decode32(
+        (unsigned char **)&decoded_data,
+        &decoded_width,
+        &decoded_height,
+        (const unsigned char *)rawdata,
+        state.size);
+
+    if (decode_result != 0)
+    {
+        logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
+        return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-cleanup_and_return:
-    if (rawdata)
-    {
-        free(rawdata);
-    }
+    size_t decoded_size = decoded_width * decoded_height * sizeof(Color);
 
-    if (outdata)
-    {
-        free(outdata);
-    }
+    *bitmap = bitmap_create(decoded_width, decoded_height);
 
-    stream_close(file);
+    memcpy((*bitmap)->pixels, decoded_data, decoded_size);
 
-    return result;
+    return SUCCESS;
 }
 
 Bitmap *bitmap_load_from(const char *path)
@@ -120,45 +106,28 @@ Bitmap *bitmap_load_from(const char *path)
 
 Result bitmap_save_to(Bitmap *bitmap, const char *path)
 {
-    void *outbuffer = NULL;
-    Result result = SUCCESS;
-    Stream *file = stream_open(path, OPEN_WRITE);
+    void *outbuffer __cleanup_malloc = NULL;
+    Stream *file __cleanup(stream_cleanup) = stream_open(path, OPEN_WRITE);
 
     if (handle_has_error(file))
     {
-        result = handle_get_error(file);
-        goto cleanup_and_return;
+        return handle_get_error(file);
     }
 
+    size_t outbuffer_size = 0;
+    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
+
+    if (err != 0)
     {
-        size_t outbuffer_size = 0;
-        int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
-
-        if (err != 0)
-        {
-            result = ERR_BAD_IMAGE_FILE_FORMAT;
-            goto cleanup_and_return;
-        }
-
-        stream_write(file, outbuffer, outbuffer_size);
+        return ERR_BAD_IMAGE_FILE_FORMAT;
     }
+
+    stream_write(file, outbuffer, outbuffer_size);
 
     if (handle_has_error(file))
     {
-        result = handle_get_error(file);
-        goto cleanup_and_return;
+        return handle_get_error(file);
     }
 
-cleanup_and_return:
-    if (file)
-    {
-        stream_close(file);
-    }
-
-    if (outbuffer)
-    {
-        free(outbuffer);
-    }
-
-    return result;
+    return SUCCESS;
 }

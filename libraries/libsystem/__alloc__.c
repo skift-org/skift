@@ -79,7 +79,7 @@ struct liballoc_major
  */
 struct liballoc_minor
 {
-	unsigned int magic;			  ///< A magic number to idenfity correctness.
+	unsigned int magic;			  ///< A magic number to identify correctness.
 	unsigned int size;			  ///< The size of the memory allocated. Could be 1 byte or more.
 	unsigned int req_size;		  ///< The size of memory requested.
 	struct liballoc_minor *prev;  ///< Linked list information.
@@ -90,10 +90,10 @@ struct liballoc_minor
 static struct liballoc_major *l_memRoot = NULL; ///< The root memory block acquired from the system.
 static struct liballoc_major *l_bestBet = NULL; ///< The major with the most free memory.
 
-static unsigned int l_pageSize = 4096;	 ///< The size of an individual page. Set up in liballoc_init.
-static unsigned int l_pageCount = 16;	  ///< The number of pages to request per chunk. Set up in liballoc_init.
+static unsigned int l_pageSize = 4096;	   ///< The size of an individual page. Set up in liballoc_init.
+static unsigned int l_pageCount = 16;	   ///< The number of pages to request per chunk. Set up in liballoc_init.
 static unsigned long long l_allocated = 0; ///< Running total of allocated memory.
-static unsigned long long l_inuse = 0;	 ///< Running total of used memory.
+static unsigned long long l_inuse = 0;	   ///< Running total of used memory.
 
 static long long l_warningCount = 0;	 ///< Number of warnings encountered
 static long long l_errorCount = 0;		 ///< Number of actual errors
@@ -120,16 +120,16 @@ static void liballoc_dump()
 	while (maj != NULL)
 	{
 		stream_printf(log_stream, "liballoc: 0x%x: total = %i, used = %i\n",
-						maj,
-						maj->size,
-						maj->usage);
+					  maj,
+					  maj->size,
+					  maj->usage);
 
 		min = maj->first;
 		while (min != NULL)
 		{
 			stream_printf(log_stream, "liballoc:    0x%x: %i bytes\n",
-							min,
-							min->size);
+						  min,
+						  min->size);
 			min = min->next;
 		}
 
@@ -254,8 +254,8 @@ void *malloc(size_t req_size)
 
 #ifdef DEBUG
 	stream_printf(log_stream, "liballoc: 0x%x malloc( %i ): ",
-					__builtin_return_address(0),
-					size);
+				  __builtin_return_address(0),
+				  size);
 	FLUSH();
 #endif
 
@@ -574,8 +574,8 @@ void free(void *ptr)
 
 #ifdef DEBUG
 	stream_printf(log_stream, "liballoc: 0x%x free( 0x%x ): ",
-					__builtin_return_address(0),
-					ptr);
+				  __builtin_return_address(0),
+				  ptr);
 	FLUSH();
 #endif
 
@@ -630,6 +630,15 @@ void free(void *ptr)
 #endif
 
 	__plug_memalloc_unlock(); // release the lock
+}
+
+void malloc_cleanup(void *buffer)
+{
+	if (*(void **)buffer)
+	{
+		free(*(void **)buffer);
+		*(void **)buffer = NULL;
+	}
 }
 
 __attribute__((optimize("O0"))) void *calloc(size_t nobj, size_t size)

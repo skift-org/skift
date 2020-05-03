@@ -106,6 +106,15 @@ void stream_close(Stream *stream)
     free(stream);
 }
 
+void stream_cleanup(Stream **stream)
+{
+    if (*stream)
+    {
+        stream_close(*stream);
+        *stream = NULL;
+    }
+}
+
 void stream_set_read_buffer_mode(Stream *stream, StreamBufferMode mode)
 {
     if (mode == STREAM_BUFFERED_NONE)
@@ -182,7 +191,7 @@ int stream_read_buffered(Stream *stream, void *buffer, size_t size)
         // Copy the data from the buffer
         memcpy(data_to_read, ((char *)stream->read_buffer) + stream->read_head, data_added);
 
-        // Update the amount readed
+        // Update the amount read
         data_left -= data_added;
         stream->read_head += data_added;
     }

@@ -39,8 +39,8 @@ void ramdisk_load(Module *module)
                 continue;
             }
 
-            size_t writen = 0;
-            result = fshandle_write(handle, block.data, block.size, &writen);
+            size_t written = 0;
+            result = fshandle_write(handle, block.data, block.size, &written);
 
             if (result != SUCCESS)
             {

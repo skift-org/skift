@@ -11,7 +11,7 @@
 typedef struct
 {
     List *elements;
-    bool is_absolue;
+    bool is_absolute;
 } Path;
 
 Path *path_create(const char *raw_path);
@@ -22,7 +22,7 @@ const char *path_filename(Path *path);
 
 const char *path_peek_at(Path *path, int index);
 
-bool path_is_absolue(Path *path);
+bool path_is_absolute(Path *path);
 
 bool path_is_relative(Path *path);
 

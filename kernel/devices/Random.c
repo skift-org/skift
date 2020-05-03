@@ -8,7 +8,7 @@
 
 static Random _random;
 
-static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
@@ -20,18 +20,18 @@ static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
         b[i] = random_uint32_max(&_random, 255);
     }
 
-    *readed = size;
+    *read = size;
 
     return SUCCESS;
 }
 
-static Result random_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *writen)
+static Result random_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *written)
 {
     __unused(node);
     __unused(handle);
     __unused(buffer);
 
-    *writen = size;
+    *written = size;
 
     return SUCCESS;
 }

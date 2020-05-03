@@ -10,7 +10,7 @@
 typedef struct
 {
     char name[PROCESS_NAME_SIZE];
-    char executable[PATH_LENGHT];
+    char executable[PATH_LENGTH];
 
     char *argv[PROCESS_ARG_COUNT + 1];
     int argc;

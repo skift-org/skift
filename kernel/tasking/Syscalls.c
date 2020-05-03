@@ -30,7 +30,7 @@ bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 
 int sys_process_this(void)
 {
-    return sheduler_running_id();
+    return scheduler_running_id();
 }
 
 int sys_process_launch(Launchpad *launchpad, int *pid)
@@ -41,7 +41,7 @@ int sys_process_launch(Launchpad *launchpad, int *pid)
         return -ERR_BAD_ADDRESS;
     }
 
-    return task_launch(sheduler_running(), launchpad, pid);
+    return task_launch(scheduler_running(), launchpad, pid);
 }
 
 int sys_process_exit(int code)
@@ -63,39 +63,39 @@ int sys_process_cancel(int pid)
 
 int sys_process_map(uint addr, uint count)
 {
-    return task_memory_map(sheduler_running(), addr, count);
+    return task_memory_map(scheduler_running(), addr, count);
 }
 
 int sys_process_unmap(uint addr, uint count)
 {
-    return task_memory_unmap(sheduler_running(), addr, count);
+    return task_memory_unmap(scheduler_running(), addr, count);
 }
 
 int sys_process_alloc(uint count)
 {
-    return task_memory_alloc(sheduler_running(), count);
+    return task_memory_alloc(scheduler_running(), count);
 }
 
 int sys_process_free(uint addr, uint count)
 {
-    task_memory_free(sheduler_running(), addr, count);
+    task_memory_free(scheduler_running(), addr, count);
     return 0;
 }
 
 int sys_process_get_cwd(char *buffer, uint size)
 {
-    task_get_cwd(sheduler_running(), buffer, size);
+    task_get_cwd(scheduler_running(), buffer, size);
     return SUCCESS;
 }
 
 int sys_process_set_cwd(const char *path)
 {
-    return task_set_cwd(sheduler_running(), path);
+    return task_set_cwd(scheduler_running(), path);
 }
 
 int sys_process_sleep(int time)
 {
-    return task_sleep(sheduler_running(), time);
+    return task_sleep(scheduler_running(), time);
 }
 
 int sys_process_wakeup(int tid)
@@ -123,13 +123,13 @@ int sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_alloc(sheduler_running(), size, out_address);
+    return task_shared_memory_alloc(scheduler_running(), size, out_address);
 }
 
 int sys_shared_memory_free(uintptr_t address)
 {
 
-    return task_shared_memory_free(sheduler_running(), address);
+    return task_shared_memory_free(scheduler_running(), address);
 }
 
 int sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
@@ -140,7 +140,7 @@ int sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_si
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_include(sheduler_running(), handle, out_address, out_size);
+    return task_shared_memory_include(scheduler_running(), handle, out_address, out_size);
 }
 
 int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
@@ -150,14 +150,14 @@ int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_get_handle(sheduler_running(), address, out_handle);
+    return task_shared_memory_get_handle(scheduler_running(), address, out_handle);
 }
 
 /* --- Filesystem ----------------------------------------------------------- */
 
 int sys_filesystem_mkdir(const char *dir_path)
 {
-    Path *path = task_cwd_resolve(sheduler_running(), dir_path);
+    Path *path = task_cwd_resolve(scheduler_running(), dir_path);
 
     Result result = filesystem_mkdir(path);
 
@@ -168,7 +168,7 @@ int sys_filesystem_mkdir(const char *dir_path)
 
 int sys_filesystem_mkpipe(const char *fifo_path)
 {
-    Path *path = task_cwd_resolve(sheduler_running(), fifo_path);
+    Path *path = task_cwd_resolve(scheduler_running(), fifo_path);
 
     Result result = filesystem_mkpipe(path);
 
@@ -179,8 +179,8 @@ int sys_filesystem_mkpipe(const char *fifo_path)
 
 int sys_filesystem_link(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
-    Path *newp = task_cwd_resolve(sheduler_running(), new_path);
+    Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
+    Path *newp = task_cwd_resolve(scheduler_running(), new_path);
 
     Result result = filesystem_mklink(oldp, newp);
 
@@ -192,7 +192,7 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
 
 int sys_filesystem_unlink(const char *link_path)
 {
-    Path *path = task_cwd_resolve(sheduler_running(), link_path);
+    Path *path = task_cwd_resolve(scheduler_running(), link_path);
 
     Result result = filesystem_unlink(path);
 
@@ -203,8 +203,8 @@ int sys_filesystem_unlink(const char *link_path)
 
 int sys_filesystem_rename(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_cwd_resolve(sheduler_running(), old_path);
-    Path *newp = task_cwd_resolve(sheduler_running(), new_path);
+    Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
+    Path *newp = task_cwd_resolve(scheduler_running(), new_path);
 
     Result result = filesystem_rename(oldp, newp);
 
@@ -214,7 +214,7 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
     return result;
 }
 
-/* --- Sytem info getter ---------------------------------------------------- */
+/* --- System info getter --------------------------------------------------- */
 
 int sys_system_get_info(SystemInfo *info)
 {
@@ -239,7 +239,7 @@ int sys_system_get_status(SystemStatus *status)
     status->used_ram = memory_get_used();
 
     status->running_tasks = task_count();
-    status->cpu_usage = 100 - sheduler_get_usage(3);
+    status->cpu_usage = 100 - scheduler_get_usage(3);
 
     return SUCCESS;
 }
@@ -253,7 +253,7 @@ int sys_system_get_time(TimeStamp *timestamp)
 
 int sys_system_get_ticks()
 {
-    return sheduler_get_ticks();
+    return scheduler_get_ticks();
 }
 
 /* --- Create --------------------------------------------------------------- */
@@ -266,7 +266,7 @@ int sys_create_pipe(int *reader_handle, int *writer_handle)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_create_pipe(sheduler_running(), reader_handle, writer_handle);
+    return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
 }
 
 int sys_create_term(int *master_handle, int *slave_handle)
@@ -277,7 +277,7 @@ int sys_create_term(int *master_handle, int *slave_handle)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_create_term(sheduler_running(), master_handle, slave_handle);
+    return task_create_term(scheduler_running(), master_handle, slave_handle);
 }
 
 /* --- Handles -------------------------------------------------------------- */
@@ -289,12 +289,12 @@ int sys_handle_open(int *handle, const char *path, OpenFlag flags)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_open(sheduler_running(), handle, path, flags);
+    return task_fshandle_open(scheduler_running(), handle, path, flags);
 }
 
 int sys_handle_close(int handle)
 {
-    return task_fshandle_close(sheduler_running(), handle);
+    return task_fshandle_close(scheduler_running(), handle);
 }
 
 int sys_handle_select(
@@ -332,7 +332,7 @@ int sys_handle_select(
     HandleSet handle_set = (HandleSet){handles_copy, events_copy, handles_set->count};
 
     Result result = task_fshandle_select(
-        sheduler_running(),
+        scheduler_running(),
         &handle_set,
         &selected_copy,
         &selected_event_copy,
@@ -347,15 +347,15 @@ int sys_handle_select(
     return result;
 }
 
-int sys_handle_read(int handle, char *buffer, size_t size, size_t *readed)
+int sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
-        !syscall_validate_ptr((uintptr_t)readed, sizeof(size_t)))
+        !syscall_validate_ptr((uintptr_t)read, sizeof(size_t)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_read(sheduler_running(), handle, buffer, size, readed);
+    return task_fshandle_read(scheduler_running(), handle, buffer, size, read);
 }
 
 int sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
@@ -366,17 +366,17 @@ int sys_handle_write(int handle, const char *buffer, size_t size, size_t *writte
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_write(sheduler_running(), handle, buffer, size, written);
+    return task_fshandle_write(scheduler_running(), handle, buffer, size, written);
 }
 
 int sys_handle_call(int handle, int request, void *args)
 {
-    return task_fshandle_call(sheduler_running(), handle, request, args);
+    return task_fshandle_call(scheduler_running(), handle, request, args);
 }
 
 int sys_handle_seek(int handle, int offset, Whence whence)
 {
-    return task_fshandle_seek(sheduler_running(), handle, offset, whence);
+    return task_fshandle_seek(scheduler_running(), handle, offset, whence);
 }
 
 int sys_handle_tell(int handle, Whence whence, int *offset)
@@ -386,7 +386,7 @@ int sys_handle_tell(int handle, Whence whence, int *offset)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_tell(sheduler_running(), handle, whence, offset);
+    return task_fshandle_tell(scheduler_running(), handle, whence, offset);
 }
 
 int sys_handle_stat(int handle, FileState *state)
@@ -396,17 +396,17 @@ int sys_handle_stat(int handle, FileState *state)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_stat(sheduler_running(), handle, state);
+    return task_fshandle_stat(scheduler_running(), handle, state);
 }
 
 int sys_handle_connect(int *handle, const char *path)
 {
-    return task_fshandle_connect(sheduler_running(), handle, path);
+    return task_fshandle_connect(scheduler_running(), handle, path);
 }
 
 int sys_handle_accept(int handle, int *connection_handle)
 {
-    return task_fshandle_accept(sheduler_running(), handle, connection_handle);
+    return task_fshandle_accept(scheduler_running(), handle, connection_handle);
 }
 
 #ifdef __cplusplus
@@ -510,14 +510,14 @@ SyscallHandler syscall_get_handler(Syscall syscall)
     {
         if ((SyscallHandler)syscalls[syscall] == NULL)
         {
-            logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
+            logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
         }
 
         return (SyscallHandler)syscalls[syscall];
     }
     else
     {
-        logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, sheduler_running_id());
+        logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
         return NULL;
     }
 }

@@ -205,7 +205,7 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     }
 
     default:
-        logger_warn("Invalide message for client %08x", client);
+        logger_warn("Invalid message for client %08x", client);
         break;
     }
 }

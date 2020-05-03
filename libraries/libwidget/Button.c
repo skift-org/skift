@@ -13,7 +13,7 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
     }
     painter_draw_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_BORDER));
 
-    int text_width = font_mesure_string(widget_font(), widget->text);
+    int text_width = font_measure_string(widget_font(), widget->text);
 
     painter_draw_string(
         painter,

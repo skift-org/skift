@@ -69,7 +69,7 @@ TimeStamp __plug_system_get_time(void)
 
 uint __plug_system_get_ticks()
 {
-    return sheduler_get_ticks();
+    return scheduler_get_ticks();
 }
 
 /* --- Memory allocator plugs ----------------------------------------------- */
@@ -116,12 +116,12 @@ int __plug_logger_unlock()
 
 int __plug_process_this(void)
 {
-    return sheduler_running_id();
+    return scheduler_running_id();
 }
 
 Result __plug_process_launch(Launchpad *launchpad, int *pid)
 {
-    return task_launch(sheduler_running(), launchpad, pid);
+    return task_launch(scheduler_running(), launchpad, pid);
 }
 
 void __plug_process_exit(int code)
@@ -144,39 +144,39 @@ int __plug_process_cancel(int pid)
 
 int __plug_process_map(uint addr, uint count)
 {
-    return task_memory_map(sheduler_running(), addr, count);
+    return task_memory_map(scheduler_running(), addr, count);
 }
 
 int __plug_process_unmap(uint addr, uint count)
 {
-    return task_memory_unmap(sheduler_running(), addr, count);
+    return task_memory_unmap(scheduler_running(), addr, count);
 }
 
 uint __plug_process_alloc(uint count)
 {
-    return task_memory_alloc(sheduler_running(), count);
+    return task_memory_alloc(scheduler_running(), count);
 }
 
 int __plug_process_free(uint addr, uint count)
 {
-    task_memory_free(sheduler_running(), addr, count);
+    task_memory_free(scheduler_running(), addr, count);
     return 0;
 }
 
 Result __plug_process_get_cwd(char *buffer, uint size)
 {
-    task_get_cwd(sheduler_running(), buffer, size);
+    task_get_cwd(scheduler_running(), buffer, size);
     return SUCCESS;
 }
 
 Result __plug_process_set_cwd(const char *cwd)
 {
-    return task_set_cwd(sheduler_running(), cwd);
+    return task_set_cwd(scheduler_running(), cwd);
 }
 
 int __plug_process_sleep(int time)
 {
-    return task_sleep(sheduler_running(), time);
+    return task_sleep(scheduler_running(), time);
 }
 
 int __plug_process_wakeup(int pid)
@@ -199,14 +199,14 @@ int __plug_process_wait(int pid, int *exit_value)
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
 {
-    handle->result = task_fshandle_open(sheduler_running(), &handle->id, path, flags);
+    handle->result = task_fshandle_open(scheduler_running(), &handle->id, path, flags);
 }
 
 void __plug_handle_close(Handle *handle)
 {
     if (handle->id != HANDLE_INVALID_ID)
     {
-        task_fshandle_close(sheduler_running(), handle->id);
+        task_fshandle_close(scheduler_running(), handle->id);
     }
 }
 
@@ -216,18 +216,18 @@ Result __plug_handle_select(
     SelectEvent *selected_events,
     Timeout timeout)
 {
-    return task_fshandle_select(sheduler_running(), handles, selected, selected_events, timeout);
+    return task_fshandle_select(scheduler_running(), handles, selected, selected_events, timeout);
 }
 
 size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    size_t readed = 0;
+    size_t read = 0;
 
-    handle->result = task_fshandle_read(sheduler_running(), handle->id, buffer, size, &readed);
+    handle->result = task_fshandle_read(scheduler_running(), handle->id, buffer, size, &read);
 
-    return readed;
+    return read;
 }
 
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
@@ -242,7 +242,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     {
         size_t written = 0;
 
-        handle->result = task_fshandle_write(sheduler_running(), handle->id, buffer, size, &written);
+        handle->result = task_fshandle_write(scheduler_running(), handle->id, buffer, size, &written);
 
         return written;
     }
@@ -252,7 +252,7 @@ Result __plug_handle_call(Handle *handle, int request, void *args)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_call(sheduler_running(), handle->id, request, args);
+    handle->result = task_fshandle_call(scheduler_running(), handle->id, request, args);
 
     return handle->result;
 }
@@ -261,7 +261,7 @@ int __plug_handle_seek(Handle *handle, int offset, Whence whence)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_seek(sheduler_running(), handle->id, offset, whence);
+    handle->result = task_fshandle_seek(scheduler_running(), handle->id, offset, whence);
 
     return 0;
 }
@@ -272,7 +272,7 @@ int __plug_handle_tell(Handle *handle, Whence whence)
 
     int offset = 0;
 
-    handle->result = task_fshandle_tell(sheduler_running(), handle->id, whence, &offset);
+    handle->result = task_fshandle_tell(scheduler_running(), handle->id, whence, &offset);
 
     return offset;
 }
@@ -281,7 +281,7 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_stat(sheduler_running(), handle->id, stat);
+    handle->result = task_fshandle_stat(scheduler_running(), handle->id, stat);
 
     return 0;
 }
@@ -290,22 +290,22 @@ void __plug_handle_connect(Handle *handle, const char *path)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_connect(sheduler_running(), &handle->id, path);
+    handle->result = task_fshandle_connect(scheduler_running(), &handle->id, path);
 }
 
 void __plug_handle_accept(Handle *handle, Handle *connection_handle)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    handle->result = task_fshandle_accept(sheduler_running(), handle->id, &connection_handle->id);
+    handle->result = task_fshandle_accept(scheduler_running(), handle->id, &connection_handle->id);
 }
 
 Result __plug_create_pipe(int *reader_handle, int *writer_handle)
 {
-    return task_create_pipe(sheduler_running(), reader_handle, writer_handle);
+    return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
 }
 
 Result __plug_create_term(int *master_handle, int *slave_handle)
 {
-    return task_create_term(sheduler_running(), master_handle, slave_handle);
+    return task_create_term(scheduler_running(), master_handle, slave_handle);
 }

@@ -3,13 +3,13 @@
 
 Vector3 vector3_norm(Vector3 vector)
 {
-    double lenght = sqrt(vector.X * vector.X +
+    double length = sqrt(vector.X * vector.X +
                          vector.Y * vector.Y +
                          vector.Z * vector.Z);
 
-    vector.X /= lenght;
-    vector.Y /= lenght;
-    vector.Z /= lenght;
+    vector.X /= length;
+    vector.Y /= length;
+    vector.Z /= length;
 
     return vector;
 }

@@ -30,7 +30,7 @@ typedef struct
     TaskState state;
 
     char name[PROCESS_NAME_SIZE];
-    char cwd[PATH_LENGHT];
+    char cwd[PATH_LENGTH];
 
     int usage_cpu;
     int usage_virtual_memory;

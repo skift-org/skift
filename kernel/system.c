@@ -91,23 +91,23 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
         printf("\n\tNESTED");
     }
 
-    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[sheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
+    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[scheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
 
     vprintf(message, va);
     printf("\e[0m\n\tthrow by %s %s() ln%d", file, function, line);
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", sheduler_get_ticks());
+    printf("\n\tThe system was running for %d tick.", scheduler_get_ticks());
 
-    if (sheduler_running_id() != -1)
+    if (scheduler_running_id() != -1)
     {
-        printf("\n\tThe running process is %d: %s", sheduler_running_id(), sheduler_running()->name);
+        printf("\n\tThe running process is %d: %s", scheduler_running_id(), scheduler_running()->name);
     }
 
-    if (sheduler_is_context_switch())
+    if (scheduler_is_context_switch())
     {
-        printf("\n\tWe are context switching\n", sheduler_get_ticks());
+        printf("\n\tWe are context switching\n", scheduler_get_ticks());
     }
     else
     {

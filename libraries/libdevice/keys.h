@@ -136,7 +136,7 @@ typedef struct
 {
     Key key;
     KeyMotion motion;
-} KeyboradPacket;
+} KeyboardPacket;
 
 const char *key_to_string(Key key);
 

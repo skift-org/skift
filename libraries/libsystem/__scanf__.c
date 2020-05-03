@@ -5,8 +5,8 @@
 /* scanf.c: scanf and sscanf internals                                        */
 
 /* #include <libsystem/ctype.h>
-#include <libsystem/cstring.h>
 #include <libsystem/__scanf__.h>
+#include <libsystem/cstring.h>
 
 int __scanf_scan_binary(scanf_info_t *info, va_list *va)
 {
@@ -69,7 +69,7 @@ int __scanf(scanf_info_t *info, va_list va)
     info->n = 0;
     info->format_offset = 0;
     info->state = SFSTATE_ESC;
-    info->lenght = 0;
+    info->length = 0;
 
     if (info->format == NULL)
     {
@@ -118,7 +118,7 @@ int __scanf(scanf_info_t *info, va_list va)
             }
             else if (isdigit(info->c))
             {
-                info->state = SFSTATE_FORMAT_LENGHT;
+                info->state = SFSTATE_FORMAT_LENGTH;
             }
             else if (isalpha(info->c))
             {
@@ -130,11 +130,11 @@ int __scanf(scanf_info_t *info, va_list va)
             }
             break;
 
-        case SFSTATE_FORMAT_LENGHT:
+        case SFSTATE_FORMAT_LENGTH:
             if (isdigit(info->c))
             {
-                info->lenght *= 10;
-                info->lenght += info->c - '0';
+                info->length *= 10;
+                info->length += info->c - '0';
 
                 SCANF_PEEK();
             }
@@ -157,7 +157,7 @@ int __scanf(scanf_info_t *info, va_list va)
             }
             else
             {
-                info->lenght = 0;
+                info->length = 0;
                 info->state = SFSTATE_ESC;
                 info->padding = ' ';
                 info->align = PFALIGN_RIGHT;

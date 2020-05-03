@@ -12,15 +12,14 @@
 
 Glyph *font_load_glyph(const char *name)
 {
-    char glyph_path[PATH_LENGHT];
-    snprintf(glyph_path, PATH_LENGHT, "/res/font/%s.glyph", name);
+    char glyph_path[PATH_LENGTH];
+    snprintf(glyph_path, PATH_LENGTH, "/res/font/%s.glyph", name);
 
-    Stream *glyph_file = stream_open(glyph_path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *glyph_file = stream_open(glyph_path, OPEN_READ);
 
     if (handle_has_error(glyph_file))
     {
         logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(glyph_file));
-        stream_close(glyph_file);
 
         return NULL;
     }
@@ -30,33 +29,28 @@ Glyph *font_load_glyph(const char *name)
     if (stat.type != FILE_TYPE_REGULAR)
     {
         logger_error("Failled to load  glyph from %s: The glyph file isn't a regular file but %d!", glyph_path, stat.type);
-        stream_close(glyph_file);
 
         return NULL;
     }
 
     Glyph *glyph = (Glyph *)malloc(stat.size);
-    size_t readed = stream_read(glyph_file, glyph, stat.size);
+    size_t read = stream_read(glyph_file, glyph, stat.size);
 
-    if (readed != stat.size)
+    if (read != stat.size)
     {
         logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(glyph_file));
-        stream_close(glyph_file);
-
         free(glyph);
 
         return NULL;
     }
-
-    stream_close(glyph_file);
 
     return glyph;
 }
 
 Bitmap *font_load_bitmap_create(const char *name)
 {
-    char bitmap_path[PATH_LENGHT];
-    snprintf(bitmap_path, PATH_LENGHT, "/res/font/%s.png", name);
+    char bitmap_path[PATH_LENGTH];
+    snprintf(bitmap_path, PATH_LENGTH, "/res/font/%s.png", name);
 
     Bitmap *bitmap = bitmap_load_from(bitmap_path);
 
@@ -133,7 +127,7 @@ int font_measure_width(Font *font, float font_size, const char *str, int str_siz
     return width;
 }
 
-int font_mesure_string(Font *font, const char *str)
+int font_measure_string(Font *font, const char *str)
 {
     int width = 0;
 

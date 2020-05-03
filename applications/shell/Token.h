@@ -1,6 +1,6 @@
 #pragma once
 
-#define TOKEN_LITERAL_MAX_LENGHT 256
+#define TOKEN_LITERAL_MAX_LENGTH 256
 
 typedef enum
 {
@@ -15,7 +15,7 @@ typedef enum
 typedef struct
 {
     TokenType type;
-    char literal[TOKEN_LITERAL_MAX_LENGHT];
+    char literal[TOKEN_LITERAL_MAX_LENGTH];
 
     int ln, col;
 } Token;

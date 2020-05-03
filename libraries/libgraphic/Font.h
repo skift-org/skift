@@ -31,4 +31,4 @@ bool font_has_glyph(Font *font, Codepoint codepoint);
 
 Glyph *font_glyph(Font *font, Codepoint codepoint);
 
-int font_mesure_string(Font *font, const char *str);
+int font_measure_string(Font *font, const char *str);

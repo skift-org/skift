@@ -17,8 +17,8 @@ int shell_eval_command(int argc, const char **argv)
     }
     else
     {
-        char executable[PATH_LENGHT];
-        snprintf(executable, PATH_LENGHT, "/bin/%s", argv[0]);
+        char executable[PATH_LENGTH];
+        snprintf(executable, PATH_LENGTH, "/bin/%s", argv[0]);
 
         Launchpad *launchpad = launchpad_create(argv[0], executable);
 

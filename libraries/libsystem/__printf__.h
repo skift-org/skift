@@ -14,7 +14,7 @@ typedef enum
 {
     PFSTATE_ESC,
     PFSTATE_PARSE,
-    PFSTATE_FORMAT_LENGHT,
+    PFSTATE_FORMAT_LENGTH,
     PFSTATE_FINALIZE
 } printf_state_t;
 
@@ -36,7 +36,7 @@ typedef struct printf_info
     // Formating
     char padding;
     printf_align_t align;
-    uint lenght;
+    uint length;
 
     void *output;
     int written;
@@ -58,20 +58,20 @@ typedef struct
             return info->written;                      \
     }
 
-#define PRINTF_APPEND(__c)                                     \
-    {                                                          \
+#define PRINTF_APPEND(__c)                                             \
+    {                                                                  \
         if (info->allocated != -1 && info->written >= info->allocated) \
-            return info->written;                              \
-                                                               \
-        info->append(info, __c);                               \
-        info->written++;                                       \
+            return info->written;                                      \
+                                                                       \
+        info->append(info, __c);                                       \
+        info->written++;                                               \
     }
 
 #define PRINTF_PADDING(__buffer, __a)                                    \
     {                                                                    \
-        if (info->align == (__a) && strlen(__buffer) < info->lenght)     \
+        if (info->align == (__a) && strlen(__buffer) < info->length)     \
         {                                                                \
-            for (uint i = 0; i < (info->lenght - strlen(__buffer)); i++) \
+            for (uint i = 0; i < (info->length - strlen(__buffer)); i++) \
             {                                                            \
                 PRINTF_APPEND(info->padding);                            \
             }                                                            \

@@ -52,14 +52,14 @@ void tasking_initialize(void)
     kernel_task = task_spawn(NULL, "System", NULL, NULL, 0);
     task_go(kernel_task);
 
-    garbage_task = task_spawn(kernel_task, "GarbageColector", garbage_colector, NULL, false);
+    garbage_task = task_spawn(kernel_task, "GarbageCollector", garbage_collector, NULL, false);
     task_go(garbage_task);
 
     idle_task = task_spawn(kernel_task, "Idle", idle_code, NULL, false);
     task_go(idle_task);
     task_set_state(idle_task, TASK_STATE_HANG);
 
-    sheduler_setup(kernel_task);
+    scheduler_setup(kernel_task);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -179,9 +179,9 @@ void task_get_info(Task *task, TaskInfo *info)
     info->state = task->state;
 
     strlcpy(info->name, task->name, PROCESS_NAME_SIZE);
-    path_to_cstring(task->cwd_path, info->cwd, PATH_LENGHT);
+    path_to_cstring(task->cwd_path, info->cwd, PATH_LENGTH);
 
-    info->usage_cpu = (sheduler_get_usage(task->id) * 100) / SHEDULER_RECORD_COUNT;
+    info->usage_cpu = (scheduler_get_usage(task->id) * 100) / SCHEDULER_RECORD_COUNT;
 }
 
 int task_count(void)
@@ -315,7 +315,7 @@ task_sleep_result_t task_sleep(Task *task, int timeout)
         task_set_state(task, TASK_STATE_WAIT_TIME);
     });
 
-    sheduler_yield();
+    scheduler_yield();
 
     if (task->wait.time.gotwakeup)
     {
@@ -368,7 +368,7 @@ bool task_wait(int task_id, int *exitvalue)
 
             atomic_end();
 
-            sheduler_yield();
+            scheduler_yield();
 
             if (exitvalue != NULL)
             {
@@ -414,13 +414,13 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
     }
     else
     {
-        blocker->timeout = sheduler_get_ticks() + timeout;
+        blocker->timeout = scheduler_get_ticks() + timeout;
     }
 
     task_set_state(task, TASK_STATE_BLOCKED);
     atomic_end();
 
-    sheduler_yield();
+    scheduler_yield();
 
     TaskBlockerResult result = blocker->result;
 
@@ -466,12 +466,12 @@ void task_exit(int exitvalue)
 {
     task_cancel(running, exitvalue);
 
-    sheduler_yield();
+    scheduler_yield();
 
     ASSERT_NOT_REACHED();
 }
 
-/* --- Task Memory managment ---------------------------------------------- */
+/* --- Task Memory management --------------------------------------------- */
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 {
@@ -479,7 +479,7 @@ PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 
     task->pdir = pdir;
 
-    paging_load_directorie(pdir);
+    paging_load_directory(pdir);
 
     return oldpdir;
 }
@@ -538,7 +538,7 @@ void task_panic_dump(void)
 
     atomic_begin();
 
-    printf("\n\tRunning task %d: '%s'", sheduler_running_id(), sheduler_running()->name);
+    printf("\n\tRunning task %d: '%s'", scheduler_running_id(), scheduler_running()->name);
     printf("\n");
     printf("\n\tTasks:");
 
@@ -797,7 +797,7 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 }
 
 /* -------------------------------------------------------------------------- */
-/*   GARBAGE COLECTOR                                                         */
+/*   GARBAGE COLLECTOR                                                         */
 /* -------------------------------------------------------------------------- */
 
 void collect_and_free_task(void)
@@ -817,21 +817,21 @@ void collect_and_free_task(void)
     list_destroy_with_callback(task_to_free, (ListDestroyElementCallback)task_destroy);
 }
 
-void garbage_colector()
+void garbage_collector()
 {
     while (true)
     {
-        task_sleep(sheduler_running(), 100); // We don't do this really often.
+        task_sleep(scheduler_running(), 100); // We don't do this really often.
         collect_and_free_task();
     }
 }
 
 /* -------------------------------------------------------------------------- */
-/*   SHEDULER                                                                 */
+/*   SCHEDULER                                                                 */
 /* -------------------------------------------------------------------------- */
 
-static bool sheduler_context_switch = false;
-static int sheduler_record[SHEDULER_RECORD_COUNT] = {};
+static bool scheduler_context_switch = false;
+static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
 
 void timer_set_frequency(u16 hz)
 {
@@ -844,14 +844,14 @@ void timer_set_frequency(u16 hz)
     logger_info("Timer frequency is %dhz.", hz);
 }
 
-void sheduler_setup(Task *main_kernel_task)
+void scheduler_setup(Task *main_kernel_task)
 {
     running = main_kernel_task;
 
     timer_set_frequency(1000);
 }
 
-/* --- Sheduling ------------------------------------------------------------ */
+/* --- Scheduling ----------------------------------------------------------- */
 
 void wakeup_sleeping_tasks(void)
 {
@@ -884,7 +884,7 @@ void wakeup_blocked_task(void)
             TaskBlocker *blocker = task->blocker;
 
             if (blocker->timeout != 0 &&
-                blocker->timeout <= sheduler_get_ticks())
+                blocker->timeout <= scheduler_get_ticks())
             {
                 if (blocker->on_timeout)
                 {
@@ -917,16 +917,16 @@ void wakeup_blocked_task(void)
     }
 }
 
-uintptr_t shedule(uintptr_t current_stack_pointer)
+uintptr_t schedule(uintptr_t current_stack_pointer)
 {
-    sheduler_context_switch = true;
+    scheduler_context_switch = true;
 
     // Save the old context
     running->stack_pointer = current_stack_pointer;
     platform_save_context(running);
 
     // Update the system ticks
-    sheduler_record[ticks % SHEDULER_RECORD_COUNT] = running->id;
+    scheduler_record[ticks % SCHEDULER_RECORD_COUNT] = running->id;
     ticks++;
 
     wakeup_sleeping_tasks();
@@ -941,28 +941,28 @@ uintptr_t shedule(uintptr_t current_stack_pointer)
 
     // Restore the context
     // TODO: set_kernel_stack(...);
-    paging_load_directorie(running->pdir);
+    paging_load_directory(running->pdir);
     paging_invalidate_tlb();
 
-    sheduler_context_switch = false;
+    scheduler_context_switch = false;
 
     platform_load_context(running);
     return running->stack_pointer;
 }
 
-/* --- Sheduler info -------------------------------------------------------- */
+/* --- Scheduler info -------------------------------------------------------- */
 
-uint sheduler_get_ticks(void)
+uint scheduler_get_ticks(void)
 {
     return ticks;
 }
 
-bool sheduler_is_context_switch(void)
+bool scheduler_is_context_switch(void)
 {
-    return sheduler_context_switch;
+    return scheduler_context_switch;
 }
 
-void sheduler_yield()
+void scheduler_yield()
 {
     // FIXME: simple hack for system ticks.
 
@@ -972,12 +972,12 @@ void sheduler_yield()
 
 /* --- Running task info -------------------------------------------------- */
 
-Task *sheduler_running(void)
+Task *scheduler_running(void)
 {
     return running;
 }
 
-int sheduler_running_id(void)
+int scheduler_running_id(void)
 {
     if (running != NULL)
     {
@@ -989,19 +989,19 @@ int sheduler_running_id(void)
     }
 }
 
-int sheduler_get_usage(int task_id)
+int scheduler_get_usage(int task_id)
 {
     int count = 0;
 
     atomic_begin();
-    for (int i = 0; i < SHEDULER_RECORD_COUNT; i++)
+    for (int i = 0; i < SCHEDULER_RECORD_COUNT; i++)
     {
-        if (sheduler_record[i] == task_id)
+        if (scheduler_record[i] == task_id)
         {
             count++;
         }
     }
     atomic_end();
 
-    return (count * 100) / SHEDULER_RECORD_COUNT;
+    return (count * 100) / SCHEDULER_RECORD_COUNT;
 }

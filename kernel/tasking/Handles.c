@@ -143,17 +143,17 @@ Result task_fshandle_close(Task *task, int handle_index)
     return task_fshandle_remove(task, handle_index);
 }
 
-Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed)
+Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *read)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == NULL)
     {
-        *readed = 0;
+        *read = 0;
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_read(handle, buffer, size, readed);
+    Result result = fshandle_read(handle, buffer, size, read);
 
     task_fshandle_release(task, handle_index);
 

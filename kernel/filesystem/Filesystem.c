@@ -50,9 +50,9 @@ FsNode *filesystem_find_and_ref(Path *path)
 
             if (current->find)
             {
-                fsnode_acquire_lock(current, sheduler_running_id());
+                fsnode_acquire_lock(current, scheduler_running_id());
                 found = current->find(current, element);
-                fsnode_release_lock(current, sheduler_running_id());
+                fsnode_release_lock(current, scheduler_running_id());
             }
 
             fsnode_deref(current);
@@ -100,9 +100,9 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
                     node = file_create();
                 }
 
-                fsnode_acquire_lock(parent, sheduler_running_id());
+                fsnode_acquire_lock(parent, scheduler_running_id());
                 parent->link(parent, path_filename(path), node);
-                fsnode_release_lock(parent, sheduler_running_id());
+                fsnode_release_lock(parent, scheduler_running_id());
             }
 
             fsnode_deref(parent);
@@ -253,9 +253,9 @@ Result filesystem_link(Path *path, FsNode *node)
         goto cleanup_and_return;
     }
 
-    fsnode_acquire_lock(parent, sheduler_running_id());
+    fsnode_acquire_lock(parent, scheduler_running_id());
     result = parent->link(parent, path_filename(path), node);
-    fsnode_release_lock(parent, sheduler_running_id());
+    fsnode_release_lock(parent, scheduler_running_id());
 
 cleanup_and_return:
     if (parent != NULL)
@@ -306,9 +306,9 @@ Result filesystem_unlink(Path *path)
         goto cleanup_and_return;
     }
 
-    fsnode_acquire_lock(parent, sheduler_running_id());
+    fsnode_acquire_lock(parent, scheduler_running_id());
     result = parent->unlink(parent, path_filename(path));
-    fsnode_release_lock(parent, sheduler_running_id());
+    fsnode_release_lock(parent, scheduler_running_id());
 
 cleanup_and_return:
     if (parent != NULL)
@@ -347,11 +347,11 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto cleanup_and_return;
     }
 
-    fsnode_acquire_lock(new_parent, sheduler_running_id());
+    fsnode_acquire_lock(new_parent, scheduler_running_id());
 
     if (old_parent != new_parent)
     {
-        fsnode_acquire_lock(old_parent, sheduler_running_id());
+        fsnode_acquire_lock(old_parent, scheduler_running_id());
     }
 
     child = old_parent->find(old_parent, path_filename(old_path));
@@ -373,10 +373,10 @@ unlock_cleanup_and_return:
 
     if (old_parent != new_parent)
     {
-        fsnode_release_lock(old_parent, sheduler_running_id());
+        fsnode_release_lock(old_parent, scheduler_running_id());
     }
 
-    fsnode_release_lock(new_parent, sheduler_running_id());
+    fsnode_release_lock(new_parent, scheduler_running_id());
 
 cleanup_and_return:
     if (child)

@@ -306,10 +306,10 @@ const char *strerror(int errnum)
 
 size_t strlen(const char *str)
 {
-    size_t lenght = 0;
-    while (str[lenght])
-        lenght++;
-    return lenght;
+    size_t length = 0;
+    while (str[length])
+        length++;
+    return length;
 }
 
 size_t strnlen(const char *s, size_t maxlen)
@@ -460,12 +460,12 @@ void strtrailtrim(char *str, char c)
 
 char *strdup(const char *s)
 {
-    int lenght = strlen(s) + 1;
-    char *allocated_string = (char *)malloc(lenght);
+    int length = strlen(s) + 1;
+    char *allocated_string = (char *)malloc(length);
 
     if (allocated_string != NULL)
     {
-        memcpy(allocated_string, s, lenght);
+        memcpy(allocated_string, s, length);
     }
 
     return allocated_string;

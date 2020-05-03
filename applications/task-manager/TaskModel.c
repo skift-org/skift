@@ -70,7 +70,7 @@ static int task_model_column_count(void)
 
 static int task_model_row_count(TaskModel *model)
 {
-    return json_array_lenght(model->data);
+    return json_array_length(model->data);
 }
 
 static const char *task_model_column_name(int column)

@@ -12,8 +12,8 @@
 #include <libsystem/runtime.h>
 #include <libsystem/utils/List.h>
 
-#include "kernel/memory/Memory.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/memory/Memory.h"
 #include "kernel/sheduling/TaskBlocker.h"
 
 struct Task;
@@ -35,7 +35,7 @@ typedef struct
 typedef struct Task
 {
     int id;
-    char name[PROCESS_NAME_SIZE]; // Frendly name of the process
+    char name[PROCESS_NAME_SIZE]; // Friendly name of the process
     TaskState state;
 
     bool user;
@@ -62,7 +62,7 @@ typedef struct Task
     Lock cwd_lock;
     Path *cwd_path;
 
-    PageDirectory *pdir; // Page directorie
+    PageDirectory *pdir; // Page directory
 
     int exitvalue;
 } Task;
@@ -197,37 +197,37 @@ Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address
 Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
 
 /* -------------------------------------------------------------------------- */
-/*   GARBAGE COLECTOR                                                         */
+/*   GARBAGE COLLECTOR                                                        */
 /* -------------------------------------------------------------------------- */
 
 void collect_and_free_task(void);
 
 void collect_and_free_process(void);
 
-void garbage_colector();
+void garbage_collector();
 
 /* -------------------------------------------------------------------------- */
-/*   SHEDULER                                                                 */
+/*   SCHEDULER                                                                */
 /* -------------------------------------------------------------------------- */
 
-#define SHEDULER_RECORD_COUNT 128
+#define SCHEDULER_RECORD_COUNT 128
 
 void timer_set_frequency(u16 hz);
 
-void sheduler_setup(Task *main_kernel_task);
+void scheduler_setup(Task *main_kernel_task);
 
 void wakeup_sleeping_tasks(void);
 
-uintptr_t shedule(uintptr_t current_stack_pointer);
+uintptr_t schedule(uintptr_t current_stack_pointer);
 
-uint sheduler_get_ticks(void);
+uint scheduler_get_ticks(void);
 
-bool sheduler_is_context_switch(void);
+bool scheduler_is_context_switch(void);
 
-void sheduler_yield(void);
+void scheduler_yield(void);
 
-Task *sheduler_running(void);
+Task *scheduler_running(void);
 
-int sheduler_running_id(void);
+int scheduler_running_id(void);
 
-int sheduler_get_usage(int task_id);
+int scheduler_get_usage(int task_id);

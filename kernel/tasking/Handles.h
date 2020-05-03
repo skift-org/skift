@@ -19,7 +19,7 @@ Result task_fshandle_select(
     SelectEvent *selected_events,
     Timeout timeout);
 
-Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *readed);
+Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *read);
 
 Result task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written);
 

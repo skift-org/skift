@@ -41,7 +41,7 @@ Result info_FsOperationOpen(FsInfo *node, FsHandle *handle)
         json_object_put(task_object, "name", json_create_string(task->name));
         json_object_put(task_object, "state", json_create_string(TASK_STATES[task->state]));
         json_object_put(task_object, "cwd", json_create_string_adopt(path_as_string(task->cwd_path)));
-        json_object_put(task_object, "cpu", json_create_integer(sheduler_get_usage(task->id)));
+        json_object_put(task_object, "cpu", json_create_integer(scheduler_get_usage(task->id)));
         json_object_put(task_object, "user", json_create_boolean(task->user));
 
         json_array_append(root, task_object);
@@ -67,14 +67,14 @@ void info_FsOperationClose(FsInfo *node, FsHandle *handle)
     }
 }
 
-Result info_FsOperationRead(FsInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result info_FsOperationRead(FsInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
 
     if (handle->offset <= handle->attached_size)
     {
-        *readed = MIN(handle->attached_size - handle->offset, size);
-        memcpy(buffer, (byte *)handle->attached + handle->offset, *readed);
+        *read = MIN(handle->attached_size - handle->offset, size);
+        memcpy(buffer, (byte *)handle->attached + handle->offset, *read);
     }
 
     return SUCCESS;

@@ -185,7 +185,7 @@ void __printf_formate(printf_info_t *info, char c, va_list *va)
         }
     }
 
-    // For unknown format string juste put into the output.
+    // For unknown format string just put into the output.
     const int trash = va_arg(*va, int);
     __unused(trash);
     info->append(info, '%');
@@ -199,7 +199,7 @@ int __printf(printf_info_t *info, va_list va)
     info->state = PFSTATE_ESC;
     info->align = PFALIGN_RIGHT;
     info->padding = ' ';
-    info->lenght = 0;
+    info->length = 0;
 
     if (info->format == NULL)
     {
@@ -248,7 +248,7 @@ int __printf(printf_info_t *info, va_list va)
             }
             else if (isdigit(info->c))
             {
-                info->state = PFSTATE_FORMAT_LENGHT;
+                info->state = PFSTATE_FORMAT_LENGTH;
             }
             else if (isalpha(info->c))
             {
@@ -260,11 +260,11 @@ int __printf(printf_info_t *info, va_list va)
             }
             break;
 
-        case PFSTATE_FORMAT_LENGHT:
+        case PFSTATE_FORMAT_LENGTH:
             if (isdigit(info->c))
             {
-                info->lenght *= 10;
-                info->lenght += info->c - '0';
+                info->length *= 10;
+                info->length += info->c - '0';
 
                 PRINTF_PEEK();
             }
@@ -287,7 +287,7 @@ int __printf(printf_info_t *info, va_list va)
             }
             else
             {
-                info->lenght = 0;
+                info->length = 0;
                 info->state = PFSTATE_ESC;
                 info->padding = ' ';
                 info->align = PFALIGN_RIGHT;

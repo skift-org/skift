@@ -264,7 +264,7 @@ static JsonValue *object(JsonParser *parser)
     whitespace(parser);
     while (current(parser) != '}')
     {
-        char *k = string(parser);
+        char *k __cleanup_malloc = string(parser);
         whitespace(parser);
 
         if (current(parser) == ':')
@@ -275,12 +275,12 @@ static JsonValue *object(JsonParser *parser)
         JsonValue *v = value(parser);
 
         json_object_put(object, k, v);
-        free(k);
 
         if (current(parser) == ',')
         {
             next(parser);
         }
+
         whitespace(parser);
     }
 
@@ -300,21 +300,18 @@ static JsonValue *keyword(JsonParser *parser)
         next(parser);
     }
 
-    char *keyword = buffer_builder_finalize(builder);
+    __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
 
     if (strcmp(keyword, "true") == 0)
     {
-        free(keyword);
-        return json_create_true();
+        return json_create_boolean(true);
     }
     else if (strcmp(keyword, "false") == 0)
     {
-        free(keyword);
-        return json_create_false();
+        return json_create_boolean(false);
     }
     else
     {
-        free(keyword);
         return json_create_null();
     }
 }
@@ -360,11 +357,10 @@ JsonValue *json_parse(const char *str, size_t size)
 
 JsonValue *json_parse_file(const char *path)
 {
-    Stream *json_file = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
 
     if (handle_has_error(json_file))
     {
-        stream_close(json_file);
         return NULL;
     }
 
@@ -373,21 +369,17 @@ JsonValue *json_parse_file(const char *path)
 
     if (handle_has_error(json_file))
     {
-        stream_close(json_file);
         return NULL;
     }
 
-    char *buffer = (char *)malloc(json_state.size);
+    __cleanup_malloc char *buffer = (char *)malloc(json_state.size);
+
     stream_read(json_file, buffer, json_state.size);
 
     if (handle_has_error(json_file))
     {
-        free(buffer);
-        stream_close(json_file);
         return NULL;
     }
-
-    stream_close(json_file);
 
     return json_parse(buffer, json_state.size);
 }

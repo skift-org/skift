@@ -17,17 +17,17 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
     }
 
     PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
-    paging_load_directorie(child_task->pdir);
+    paging_load_directory(child_task->pdir);
 
     task_memory_map(child_task, program_header->vaddr, PAGE_ALIGN_UP(program_header->memsz) / PAGE_SIZE);
     memset((void *)program_header->vaddr, 0, program_header->memsz);
 
     stream_seek(elf_file, program_header->offset, WHENCE_START);
-    size_t readed = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);
+    size_t read = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);
 
-    if (readed != program_header->filesz)
+    if (read != program_header->filesz)
     {
-        logger_error("Didn't readed the right ammout from the ELF file!");
+        logger_error("Didn't read the right amount from the ELF file!");
 
         task_switch_pdir(parent_task, parent_page_directory);
 
@@ -54,9 +54,9 @@ void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *laun
             parent_handle_id < PROCESS_HANDLE_COUNT &&
             parent_task->handles[parent_handle_id] != NULL)
         {
-            fshandle_acquire_lock(parent_task->handles[parent_handle_id], sheduler_running_id());
+            fshandle_acquire_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
             child_task->handles[child_handle_id] = fshandle_clone(parent_task->handles[parent_handle_id]);
-            fshandle_release_lock(parent_task->handles[parent_handle_id], sheduler_running_id());
+            fshandle_release_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
         }
     }
 
@@ -65,20 +65,16 @@ void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *laun
 
 Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 {
-    assert(parent_task == sheduler_running());
+    assert(parent_task == scheduler_running());
 
     *pid = -1;
 
-    Result result = SUCCESS;
-
-    Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
 
     if (handle_has_error(elf_file))
     {
         logger_error("Failled to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
-        result = handle_get_error(elf_file);
-
-        goto cleanup_and_return;
+        return handle_get_error(elf_file);
     }
 
     elf_header_t elf_header;
@@ -88,9 +84,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         if (elf_header_size != sizeof(elf_header_t) || !elf_valid(&elf_header))
         {
             logger_error("Failled to load ELF file %s: bad exec format!", launchpad->executable);
-            result = ERR_EXEC_FORMAT_ERROR;
-
-            goto cleanup_and_return;
+            return ERR_EXEC_FORMAT_ERROR;
         }
     }
 
@@ -104,19 +98,16 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
             if (stream_read(elf_file, &elf_program_header, sizeof(elf_program_t)) != sizeof(elf_program_t))
             {
-                result = ERR_EXEC_FORMAT_ERROR;
                 task_destroy(child_task);
-
-                goto cleanup_and_return;
+                return ERR_EXEC_FORMAT_ERROR;
             }
 
-            result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
+            Result result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
 
             if (result != SUCCESS)
             {
                 task_destroy(child_task);
-
-                goto cleanup_and_return;
+                return result;
             }
         }
 
@@ -126,11 +117,5 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         task_go(child_task);
     }
 
-cleanup_and_return:
-    if (elf_file)
-    {
-        stream_close(elf_file);
-    }
-
-    return result;
+    return SUCCESS;
 }

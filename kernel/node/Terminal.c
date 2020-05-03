@@ -38,7 +38,7 @@ bool terminal_FsOperationCanWrite(FsTerminal *terminal, FsHandle *handle)
     }
 }
 
-Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(handle);
 
@@ -49,7 +49,7 @@ Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *bu
             return ERR_STREAM_CLOSED;
         }
 
-        *readed = ringbuffer_read(terminal->slave_to_master_buffer, (char *)buffer, size);
+        *read = ringbuffer_read(terminal->slave_to_master_buffer, (char *)buffer, size);
     }
     else
     {
@@ -58,13 +58,13 @@ Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *bu
             return ERR_STREAM_CLOSED;
         }
 
-        *readed = ringbuffer_read(terminal->master_to_slave_buffer, (char *)buffer, size);
+        *read = ringbuffer_read(terminal->master_to_slave_buffer, (char *)buffer, size);
     }
 
     return SUCCESS;
 }
 
-Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(handle);
 
@@ -75,7 +75,7 @@ Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const v
             return ERR_STREAM_CLOSED;
         }
 
-        *writen = ringbuffer_write(terminal->master_to_slave_buffer, (const char *)buffer, size);
+        *written = ringbuffer_write(terminal->master_to_slave_buffer, (const char *)buffer, size);
     }
     else
     {
@@ -84,7 +84,7 @@ Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const v
             return ERR_STREAM_CLOSED;
         }
 
-        *writen = ringbuffer_write(terminal->slave_to_master_buffer, (const char *)buffer, size);
+        *written = ringbuffer_write(terminal->slave_to_master_buffer, (const char *)buffer, size);
     }
 
     return SUCCESS;

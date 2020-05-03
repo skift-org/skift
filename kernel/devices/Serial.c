@@ -59,25 +59,25 @@ bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(serial_buffer);
 }
 
-static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *readed)
+static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
 
     // FIXME: use locks
     atomic_begin();
-    *readed = ringbuffer_read(serial_buffer, (char *)buffer, size);
+    *read = ringbuffer_read(serial_buffer, (char *)buffer, size);
     atomic_end();
 
     return SUCCESS;
 }
 
-static Result serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+static Result serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
 
-    *writen = serial_write(buffer, size);
+    *written = serial_write(buffer, size);
 
     return SUCCESS;
 }

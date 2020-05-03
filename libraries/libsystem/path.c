@@ -14,18 +14,18 @@ Path *path_create(const char *raw_path)
 
     const char *begin = raw_path;
 
-    path->is_absolue = (raw_path[0] == PATH_SEPARATOR);
+    path->is_absolute = (raw_path[0] == PATH_SEPARATOR);
 
     for (size_t i = 0; i <= strlen(raw_path); i++)
     {
         if (raw_path[i] == PATH_SEPARATOR || raw_path[i] == '\0')
         {
-            int lenght = (&raw_path[i] - begin) + 1;
+            int length = (&raw_path[i] - begin) + 1;
 
-            if (lenght > 1) // 1 for the null terminator
+            if (length > 1) // 1 for the null terminator
             {
-                char *element = (char *)malloc(lenght);
-                strlcpy(element, begin, lenght);
+                char *element = (char *)malloc(length);
+                strlcpy(element, begin, length);
                 list_pushback(path->elements, element);
             }
 
@@ -71,14 +71,14 @@ const char *path_peek_at(Path *path, int index)
     }
 }
 
-bool path_is_absolue(Path *path)
+bool path_is_absolute(Path *path)
 {
-    return path->is_absolue;
+    return path->is_absolute;
 }
 
 bool path_is_relative(Path *path)
 {
-    return !path->is_absolue;
+    return !path->is_absolute;
 }
 
 size_t path_element_count(Path *path)
@@ -114,9 +114,9 @@ void path_normalize(Path *path)
 
 void path_push(Path *path, const char *element)
 {
-    int lenght = strlen(element);
+    int length = strlen(element);
 
-    if (lenght > 0)
+    if (length > 0)
     {
         list_pushback(path->elements, (char *)element);
     }
@@ -134,24 +134,24 @@ Path *path_combine(Path *left, Path *right)
     Path *p = __create(Path);
     p->elements = list_create();
 
-    // Check if the resulting path is absolue
+    // Check if the resulting path is absolute
     if (left != NULL)
     {
-        p->is_absolue = left->is_absolue;
+        p->is_absolute = left->is_absolute;
     }
     else if (right != NULL)
     {
-        p->is_absolue = right->is_absolue;
+        p->is_absolute = right->is_absolute;
     }
     else
     {
-        p->is_absolue = false;
+        p->is_absolute = false;
     }
 
     // Append the left part of the path
     if (left != NULL)
     {
-        p->is_absolue = left->is_absolue;
+        p->is_absolute = left->is_absolute;
 
         list_foreach(const char, i, left->elements)
         {
@@ -159,7 +159,7 @@ Path *path_combine(Path *left, Path *right)
         }
     }
 
-    // Append the rigt parte of the path
+    // Append the right parte of the path
     if (right != NULL)
     {
         list_foreach(const char, i, right->elements)
@@ -175,7 +175,7 @@ Path *path_clone(Path *path)
 {
     Path *clone = __create(Path);
     clone->elements = list_create();
-    clone->is_absolue = path->is_absolue;
+    clone->is_absolute = path->is_absolute;
 
     list_foreach(const char, element, path->elements)
     {

@@ -65,12 +65,11 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
 
-    Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
 
     if (handle_has_error(keymap_file))
     {
         handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keymap file");
-        stream_close(keymap_file);
 
         return -1;
     }
@@ -83,16 +82,12 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
     if (stat.size < sizeof(KeyMap))
     {
         stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
-        stream_close(keymap_file);
-
         return -1;
     }
 
-    KeyMap *new_keymap = (KeyMap *)malloc(stat.size);
+    __cleanup_malloc KeyMap *new_keymap = (KeyMap *)malloc(stat.size);
 
     stream_read(keymap_file, new_keymap, stat.size);
-
-    stream_close(keymap_file);
 
     if (new_keymap->magic[0] != 'k' ||
         new_keymap->magic[1] != 'm' ||
@@ -100,9 +95,6 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         new_keymap->magic[3] != 'p')
     {
         stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
-        stream_close(keymap_file);
-        free(new_keymap);
-
         return -1;
     }
 
@@ -110,8 +102,6 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
     stream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
 
     printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
-
-    free(new_keymap);
 
     return 0;
 }
@@ -134,12 +124,11 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    Stream *keyboard_device = stream_open(KEYBOARD_DEVICE, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *keyboard_device = stream_open(KEYBOARD_DEVICE, OPEN_READ);
 
     if (handle_has_error(keyboard_device))
     {
         handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keyboard device");
-        stream_close(keyboard_device);
 
         return -1;
     }
@@ -161,13 +150,11 @@ int main(int argc, char **argv)
 
     if (!option_get && !option_list && argc == 2)
     {
-        char font_path[PATH_LENGHT] = {};
-        snprintf(font_path, PATH_LENGHT, "/res/keyboard/%s.kmap", argv[1]);
+        char font_path[PATH_LENGTH] = {};
+        snprintf(font_path, PATH_LENGTH, "/res/keyboard/%s.kmap", argv[1]);
 
         return loadkey_set_keymap(keyboard_device, font_path);
     }
-
-    stream_close(keyboard_device);
 
     return 0;
 }

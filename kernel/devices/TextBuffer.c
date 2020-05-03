@@ -62,7 +62,7 @@ void vga_cursor_position(s32 x, s32 y)
 
 /* --- Textmode abstract driver --------------------------------------------- */
 
-Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *writen)
+Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
@@ -71,7 +71,7 @@ Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buf
 
     memcpy((void *)_text_buffer, buffer, tocopy);
 
-    *writen = tocopy;
+    *written = tocopy;
 
     return SUCCESS;
 }

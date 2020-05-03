@@ -17,8 +17,8 @@ typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
 typedef bool (*FsOperationCanRead)(struct FsNode *node, struct FsHandle *handle);
 typedef bool (*FsOperationCanWrite)(struct FsNode *node, struct FsHandle *handle);
 
-typedef Result (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *readed);
-typedef Result (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *writen);
+typedef Result (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *read);
+typedef Result (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
 typedef struct FsNode *(*FsOperationFind)(struct FsNode *node, const char *name);
 typedef Result (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);

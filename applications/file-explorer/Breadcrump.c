@@ -52,7 +52,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
     {
         const char *element = path_peek_at(widget->path, i);
 
-        int text_width = font_mesure_string(widget_font(), element);
+        int text_width = font_measure_string(widget_font(), element);
 
         Rectangle element_bound = (Rectangle){{
             widget_bound(widget).X + current,

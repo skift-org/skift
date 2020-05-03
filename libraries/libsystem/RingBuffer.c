@@ -51,15 +51,15 @@ char ringbuffer_getc(RingBuffer *ringbuffer)
 
 size_t ringbuffer_read(RingBuffer *ringbuffer, char *buffer, size_t size)
 {
-    size_t readed = 0;
+    size_t read = 0;
 
-    while (!ringbuffer_is_empty(ringbuffer) && readed < size)
+    while (!ringbuffer_is_empty(ringbuffer) && read < size)
     {
-        buffer[readed] = ringbuffer_getc(ringbuffer);
-        readed++;
+        buffer[read] = ringbuffer_getc(ringbuffer);
+        read++;
     }
 
-    return readed;
+    return read;
 }
 
 size_t ringbuffer_write(RingBuffer *ringbuffer, const char *buffer, size_t size)

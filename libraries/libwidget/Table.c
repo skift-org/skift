@@ -5,7 +5,7 @@
 
 #define TABLE_ROW_HEIGHT 24
 
-Rectangle table_body_bound(Table *widget)
+Rectangle table_bound(Table *widget)
 {
     return rectangle_shrink(widget_content_bound(widget), INSETS(0, 0, 0, 16));
 }
@@ -15,11 +15,21 @@ Rectangle table_scrollbar_bound(Table *widget)
     return rectangle_right(widget_content_bound(widget), 16);
 }
 
+Rectangle table_header_bound(Table *widget)
+{
+    return rectangle_top(table_bound(widget), TABLE_ROW_HEIGHT);
+}
+
+Rectangle table_body_bound(Table *widget)
+{
+    return rectangle_shrink(table_bound(widget), INSETS(TABLE_ROW_HEIGHT, 0, 0));
+}
+
 Rectangle table_row_bound(Table *widget, int row)
 {
     return (Rectangle){{
         table_body_bound(widget).X,
-        table_body_bound(widget).Y + row * TABLE_ROW_HEIGHT + TABLE_ROW_HEIGHT - widget->scroll_offset,
+        table_body_bound(widget).Y + row * TABLE_ROW_HEIGHT - widget->scroll_offset,
         table_body_bound(widget).width,
         TABLE_ROW_HEIGHT,
     }};
@@ -74,7 +84,7 @@ int table_row_at(Table *widget, Point position)
 {
     position = point_sub(position, table_body_bound(widget).position);
 
-    int row = (position.Y + widget->scroll_offset) / TABLE_ROW_HEIGHT - 1; // skip the first row wich is the header.
+    int row = (position.Y + widget->scroll_offset) / TABLE_ROW_HEIGHT;
 
     if (row < 0 || row >= model_row_count(widget->model))
     {
@@ -91,9 +101,11 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
     painter_push_clip(painter, widget_bound(widget));
 
     int column_count = model_column_count(widget->model);
-    int column_width = table_body_bound(widget).width / column_count;
+    int column_width = table_bound(widget).width / column_count;
 
-    for (int row = widget->scroll_offset / TABLE_ROW_HEIGHT; row < MIN(model_row_count(widget->model), ((widget->scroll_offset + table_body_bound(widget).height) / TABLE_ROW_HEIGHT)); row++)
+    for (int row = MAX(0, widget->scroll_offset / TABLE_ROW_HEIGHT - 1);
+         row < MIN(model_row_count(widget->model), ((widget->scroll_offset + table_body_bound(widget).height) / TABLE_ROW_HEIGHT) + 1);
+         row++)
     {
         Rectangle row_bound = table_row_bound(widget, row);
 
@@ -109,16 +121,17 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
+    painter_fill_rectangle(painter, table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.95));
+
     for (int column = 0; column < column_count; column++)
     {
         Rectangle header_bound = (Rectangle){{
-            table_body_bound(widget).X + column * column_width,
-            table_body_bound(widget).Y,
+            table_header_bound(widget).X + column * column_width,
+            table_header_bound(widget).Y,
             column_width,
             TABLE_ROW_HEIGHT,
         }};
 
-        painter_fill_rectangle(painter, header_bound, widget_get_color(widget, THEME_BACKGROUND));
         if (column < column_count - 1)
         {
             painter_fill_rectangle(painter, rectangle_right(header_bound, 1), widget_get_color(widget, THEME_BORDER));
@@ -145,7 +158,7 @@ void table_layout(Table *widget)
 {
     widget->scrollbar->bound = table_scrollbar_bound(widget);
 
-    ((ScrollBar *)widget->scrollbar)->track = TABLE_ROW_HEIGHT * model_row_count(widget->model) + 1;
+    ((ScrollBar *)widget->scrollbar)->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
     ((ScrollBar *)widget->scrollbar)->thumb = table_body_bound(widget).height;
     ((ScrollBar *)widget->scrollbar)->value = 0;
 }

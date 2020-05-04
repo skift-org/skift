@@ -22,7 +22,7 @@ static Rectangle scrollbar_thumb(ScrollBar *widget)
 {
     Rectangle track = scrollbar_track(widget);
 
-    int thumb_height = track.height * (widget->thumb / (double)widget->track);
+    int thumb_height = MIN(track.height * (widget->thumb / (double)widget->track), track.height);
     int thump_position = track.height * (widget->value / (double)widget->track);
 
     return (Rectangle){{

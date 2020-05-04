@@ -211,13 +211,6 @@ void terminal_widget_event_callback(TerminalWidget *terminal_widget, Event *even
 
         event->accepted = true;
     }
-    else if (event->type == EVENT_LAYOUT)
-    {
-        terminal_resize(
-            terminal_widget->terminal,
-            WIDGET(terminal_widget)->bound.width / _cell_size.X,
-            WIDGET(terminal_widget)->bound.height / _cell_size.Y);
-    }
 }
 
 void terminal_widget_destroy(TerminalWidget *terminal_widget)

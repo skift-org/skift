@@ -159,6 +159,38 @@ void application_send_message(CompositorMessageType type, const void *buffer, si
     connection_send(_connection, buffer, size);
 }
 
+void application_wait_for_ack(void)
+{
+    List *pending_events = list_create();
+
+    CompositorMessage header = {};
+    connection_receive(_connection, &header, sizeof(CompositorMessage));
+
+    while (header.type != COMPOSITOR_MESSAGE_ACK)
+    {
+        if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
+        {
+            CompositorWindowEvent *window_event = (CompositorWindowEvent *)malloc(header.size);
+            connection_receive(_connection, window_event, header.size);
+            list_pushback(pending_events, window_event);
+        }
+
+        connection_receive(_connection, &header, sizeof(CompositorMessage));
+    }
+
+    list_foreach(CompositorWindowEvent, event, pending_events)
+    {
+        Window *window = application_get_window_by_id(event->id);
+
+        if (window)
+        {
+            window_handle_event(window, event->event);
+        }
+    }
+
+    list_destroy_with_callback(pending_events, free);
+}
+
 void application_add_window(Window *window)
 {
     assert(_state >= APPLICATION_INITALIZED);
@@ -245,6 +277,7 @@ void application_blit_window(Window *window, Rectangle bound)
     };
 
     application_send_message(COMPOSITOR_MESSAGE_BLIT_WINDOW, &message, sizeof(CompositorBlitWindowMessage));
+    application_wait_for_ack();
 }
 
 void application_move_window(Window *window, Point position)

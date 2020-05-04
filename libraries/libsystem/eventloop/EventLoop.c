@@ -93,13 +93,6 @@ void eventloop_pump(void)
         }
     }
 
-    list_foreach(RunLater, run_later, _eventloop_run_later)
-    {
-        run_later->callback(run_later->target);
-    }
-
-    list_clear_with_callback(_eventloop_run_later, free);
-
     Result result = handle_select(
         &_eventloop_handles[0],
         &_eventloop_events[0],
@@ -126,8 +119,13 @@ void eventloop_pump(void)
     else
     {
         logger_error("Failled to select : %s", result_to_string(result));
-        return;
     }
+
+    list_foreach(RunLater, run_later, _eventloop_run_later)
+    {
+        run_later->callback(run_later->target);
+    }
+    list_clear_with_callback(_eventloop_run_later, free);
 }
 
 void eventloop_exit(int exit_value)

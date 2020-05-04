@@ -168,7 +168,6 @@ void window_change_framebuffer_if_needed(Window *window)
     if (window_bound(window).width != bitmap_bound(window->framebuffer).width ||
         window_bound(window).height != bitmap_bound(window->framebuffer).height)
     {
-        logger_info("Changing framebuffer");
 
         painter_destroy(window->painter);
         bitmap_destroy(window->framebuffer);
@@ -302,24 +301,17 @@ void window_handle_event(Window *window, Event *event)
 {
     switch (event->type)
     {
-    case EVENT_PAINT:
-        window_paint(window, window_bound(window));
-        application_blit_window(window, window_bound(window));
-        break;
-
     case EVENT_GOT_FOCUS:
     {
         window->focused = true;
-        Event paint_event = {EVENT_PAINT, false};
-        window_handle_event(window, &paint_event);
+        window_schedule_update(window, window_bound(window));
     }
     break;
 
     case EVENT_LOST_FOCUS:
     {
         window->focused = false;
-        Event paint_event = {EVENT_PAINT, false};
-        window_handle_event(window, &paint_event);
+        window_schedule_update(window, window_bound(window));
     }
     break;
 

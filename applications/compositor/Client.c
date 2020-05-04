@@ -1,3 +1,4 @@
+#include <libsystem/assert.h>
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
 
@@ -101,7 +102,6 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
                         (uintptr_t *)&new_framebuffer,
                         &size) == SUCCESS)
                 {
-                    logger_info("Flipping window framebuffer");
                     shared_memory_free((uintptr_t)window->framebuffer);
 
                     window->framebuffer = new_framebuffer;
@@ -113,6 +113,7 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
             }
 
             renderer_region_dirty(rectangle_offset(blit_window.bound, window->bound.position));
+            client_send_message(client, COMPOSITOR_MESSAGE_ACK, NULL, 0);
         }
         else
         {

@@ -60,6 +60,10 @@ void manager_unregister_window(Window *window)
     {
         manager_set_focus_window(top_window);
     }
+    else
+    {
+        manager_set_focus_window(NULL);
+    }
 }
 
 void manager_set_focus_window(Window *window)

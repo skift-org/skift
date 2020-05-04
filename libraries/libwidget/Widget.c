@@ -345,9 +345,6 @@ void widget_layout(Widget *widget)
         break;
     }
 
-    Event event = {EVENT_LAYOUT, true};
-    widget_dispatch_event(widget, &event);
-
     list_foreach(Widget, child, widget->childs)
     {
         widget_layout(child);

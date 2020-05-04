@@ -13,10 +13,10 @@ typedef void (*TimerCallback)(void *target);
 typedef struct Timer
 {
     void *target;
-    Timeout interval;
     TimerCallback callback;
 
     bool started;
+    Timeout interval;
     Timeout elapsed;
 } Timer;
 

@@ -48,7 +48,7 @@ void dispatcher_service(void)
         {
             TaskBlocker *blocker = __create(TaskBlocker);
             blocker->can_unblock = (TaskBlockerCanUnblockCallback)dispatcher_can_unblock;
-            task_block(scheduler_running(), blocker, 0);
+            task_block(scheduler_running(), blocker, -1);
         }
 
         atomic_begin();

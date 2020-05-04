@@ -239,7 +239,7 @@ int sys_system_get_status(SystemStatus *status)
     status->used_ram = memory_get_used();
 
     status->running_tasks = task_count();
-    status->cpu_usage = 100 - scheduler_get_usage(3);
+    status->cpu_usage = 100 - scheduler_get_usage(0);
 
     return SUCCESS;
 }

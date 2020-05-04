@@ -142,7 +142,7 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
         return ERR_NOT_READABLE;
     }
 
-    task_block(scheduler_running(), blocker_read_create(handle), 0);
+    task_block(scheduler_running(), blocker_read_create(handle), -1);
 
     *read = 0;
 
@@ -159,7 +159,7 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
 {
     FsNode *node = handle->node;
 
-    task_block(scheduler_running(), blocker_write_create(handle), 0);
+    task_block(scheduler_running(), blocker_write_create(handle), -1);
 
     if (fshandle_has_flag(handle, OPEN_APPEND))
     {
@@ -363,7 +363,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
 
-    task_block(scheduler_running(), blocker_connect_create(connection), 0);
+    task_block(scheduler_running(), blocker_connect_create(connection), -1);
 
     fsnode_deref(connection);
 
@@ -379,7 +379,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    task_block(scheduler_running(), blocker_accept_create(node), 0);
+    task_block(scheduler_running(), blocker_accept_create(node), -1);
 
     FsNode *connection = node->accept_connection(node);
 

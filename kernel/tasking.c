@@ -20,7 +20,7 @@
 /*   TASKING                                                                  */
 /* -------------------------------------------------------------------------- */
 
-static int TID = 1;
+static int TID = 0;
 static List *tasks;
 static List *tasks_bystates[TASK_STATE_COUNT];
 static uint ticks = 0;
@@ -49,15 +49,15 @@ void tasking_initialize(void)
 
     running = NULL;
 
-    kernel_task = task_spawn(NULL, "System", NULL, NULL, 0);
-    task_go(kernel_task);
+    idle_task = task_spawn(kernel_task, "Idle", idle_code, NULL, false);
+    task_go(idle_task);
+    task_set_state(idle_task, TASK_STATE_HANG);
 
     garbage_task = task_spawn(kernel_task, "GarbageCollector", garbage_collector, NULL, false);
     task_go(garbage_task);
 
-    idle_task = task_spawn(kernel_task, "Idle", idle_code, NULL, false);
-    task_go(idle_task);
-    task_set_state(idle_task, TASK_STATE_HANG);
+    kernel_task = task_spawn(NULL, "System", NULL, NULL, 0);
+    task_go(kernel_task);
 
     scheduler_setup(kernel_task);
 }
@@ -408,9 +408,9 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
         return BLOCKER_UNBLOCKED;
     }
 
-    if (timeout == 0 || timeout == (Timeout)-1)
+    if (timeout == (Timeout)-1)
     {
-        blocker->timeout = 0;
+        blocker->timeout = (Timeout)-1;
     }
     else
     {
@@ -883,19 +883,7 @@ void wakeup_blocked_task(void)
         {
             TaskBlocker *blocker = task->blocker;
 
-            if (blocker->timeout != 0 &&
-                blocker->timeout <= scheduler_get_ticks())
-            {
-                if (blocker->on_timeout)
-                {
-                    blocker->on_timeout(blocker, task);
-                }
-
-                blocker->result = BLOCKER_TIMEOUT;
-
-                list_pushback(task_to_wakeup, task);
-            }
-            else if (blocker->can_unblock(blocker, task))
+            if (blocker->can_unblock(blocker, task))
             {
                 if (blocker->on_unblock)
                 {
@@ -903,6 +891,18 @@ void wakeup_blocked_task(void)
                 }
 
                 blocker->result = BLOCKER_UNBLOCKED;
+
+                list_pushback(task_to_wakeup, task);
+            }
+            else if (blocker->timeout != (Timeout)-1 &&
+                     blocker->timeout <= scheduler_get_ticks())
+            {
+                if (blocker->on_timeout)
+                {
+                    blocker->on_timeout(blocker, task);
+                }
+
+                blocker->result = BLOCKER_TIMEOUT;
 
                 list_pushback(task_to_wakeup, task);
             }

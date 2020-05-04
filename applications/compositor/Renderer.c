@@ -53,8 +53,8 @@ void renderer_region(Rectangle region)
         {
             Rectangle destination = rectangle_clip(window_bound(window), region);
 
-            double x_scale = (double)bitmap_bound(window->framebuffer).width / window_bound(window).width;
-            double y_scale = (double)bitmap_bound(window->framebuffer).height / window_bound(window).height;
+            double x_scale = (double)bitmap_bound(window->frontbuffer).width / window_bound(window).width;
+            double y_scale = (double)bitmap_bound(window->frontbuffer).height / window_bound(window).height;
 
             Rectangle source = {{
                 (destination.X - window_bound(window).X) * x_scale,
@@ -63,7 +63,7 @@ void renderer_region(Rectangle region)
                 destination.height * y_scale,
             }};
 
-            painter_blit_bitmap(_painter, window->framebuffer, source, destination);
+            painter_blit_bitmap(_painter, window->frontbuffer, source, destination);
         }
     }
 

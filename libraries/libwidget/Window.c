@@ -52,8 +52,14 @@ void window_initialize(
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
-    window->framebuffer = bitmap_create(width, height);
-    window->painter = painter_create(window->framebuffer);
+    window->frontbuffer = bitmap_create(width, height);
+    window->frontbuffer_painter = painter_create(window->frontbuffer);
+    shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
+
+    window->backbuffer = bitmap_create(width, height);
+    window->backbuffer_painter = painter_create(window->backbuffer);
+    shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
+
     window->on_screen_bound = RECTANGLE_SIZE(width, height);
     window->dirty_rect = list_create();
 
@@ -82,8 +88,6 @@ void window_initialize(
 
     window->focused_widget = window->root_container;
 
-    shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
-
     window->background = window_get_color(window, THEME_BACKGROUND);
     window->flags = flags;
 
@@ -102,8 +106,11 @@ void window_destroy(Window *window)
     widget_destroy(window->root_container);
     widget_destroy(window->header_container);
 
-    painter_destroy(window->painter);
-    bitmap_destroy(window->framebuffer);
+    painter_destroy(window->frontbuffer_painter);
+    bitmap_destroy(window->frontbuffer);
+
+    painter_destroy(window->backbuffer_painter);
+    bitmap_destroy(window->backbuffer);
 
     list_destroy_with_callback(window->dirty_rect, free);
 
@@ -165,45 +172,51 @@ Rectangle window_content_bound(Window *window)
 
 void window_change_framebuffer_if_needed(Window *window)
 {
-    if (window_bound(window).width != bitmap_bound(window->framebuffer).width ||
-        window_bound(window).height != bitmap_bound(window->framebuffer).height)
+    if (window_bound(window).width != bitmap_bound(window->frontbuffer).width ||
+        window_bound(window).height != bitmap_bound(window->frontbuffer).height)
     {
+        painter_destroy(window->frontbuffer_painter);
+        bitmap_destroy(window->frontbuffer);
 
-        painter_destroy(window->painter);
-        bitmap_destroy(window->framebuffer);
+        painter_destroy(window->backbuffer_painter);
+        bitmap_destroy(window->backbuffer);
 
-        window->framebuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
-        window->painter = painter_create(window->framebuffer);
-        shared_memory_get_handle((uintptr_t)window->framebuffer, &window->framebuffer_handle);
+        window->frontbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->frontbuffer_painter = painter_create(window->frontbuffer);
+        shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
+
+        window->backbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->backbuffer_painter = painter_create(window->backbuffer);
+        shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
     }
 }
 
-void window_paint(Window *window, Rectangle rectangle)
+void window_paint(Window *window, Painter *painter, Rectangle rectangle)
 {
-    painter_clear_rectangle(window->painter, rectangle, window->background);
+    painter_clear_rectangle(painter, rectangle, window->background);
 
     if (rectangle_container_rectangle(window_content_bound(window), rectangle))
     {
         if (window_root(window))
         {
-            widget_paint(window_root(window), window->painter, rectangle);
+            widget_paint(window_root(window), painter, rectangle);
         }
     }
     else
     {
         if (window_root(window))
         {
-            widget_paint(window_root(window), window->painter, rectangle);
+            widget_paint(window_root(window), painter, rectangle);
         }
 
         if (!(window->flags & WINDOW_BORDERLESS))
         {
             if (window_header(window))
             {
-                widget_paint(window_header(window), window->painter, rectangle);
+                widget_paint(window_header(window), painter, rectangle);
             }
 
-            painter_draw_rectangle(window->painter, window_bound(window), window_get_color(window, THEME_ACCENT));
+            painter_draw_rectangle(painter, window_bound(window), window_get_color(window, THEME_ACCENT));
         }
     }
 }
@@ -234,7 +247,6 @@ RectangeBorder window_resize_bound_containe(Window *window, Point position)
 
 void window_begin_resize(Window *window, Point mouse_position)
 {
-    logger_info("Window begin resize");
     window->is_resizing = true;
 
     RectangeBorder borders = window_resize_bound_containe(window, mouse_position);
@@ -285,11 +297,14 @@ void window_do_resize(Window *window, Point mouse_position)
     }
 
     window_set_on_screen_bound(window, new_bound);
+
+    window_change_framebuffer_if_needed(window);
+    window_schedule_layout(window);
+    window_schedule_update(window, window_bound(window));
 }
 
 void window_end_resize(Window *window)
 {
-    logger_info("Window end resize");
     window->is_resizing = false;
 
     window_change_framebuffer_if_needed(window);
@@ -520,9 +535,14 @@ int window_handle(Window *window)
     return window->handle;
 }
 
-int window_framebuffer_handle(Window *window)
+int window_frontbuffer_handle(Window *window)
 {
-    return window->framebuffer_handle;
+    return window->frontbuffer_handle;
+}
+
+int window_backbuffer_handle(Window *window)
+{
+    return window->backbuffer_handle;
 }
 
 Widget *window_header(Window *window)
@@ -537,14 +557,22 @@ Widget *window_root(Window *window)
 
 void window_update(Window *window)
 {
-    // FIXME: do something better than this
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
-        window_paint(window, *rectangle);
-        application_blit_window(window, *rectangle);
+        window_paint(window, window->backbuffer_painter, *rectangle);
     }
 
     list_clear_with_callback(window->dirty_rect, free);
+
+    memcpy(window->frontbuffer->pixels,
+           window->backbuffer->pixels,
+           window->backbuffer->width * window->backbuffer->height * sizeof(Color));
+
+    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
+    __swap(Painter *, window->frontbuffer_painter, window->backbuffer_painter);
+    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
+
+    application_flip_window(window, window_bound(window));
 }
 
 void window_schedule_update(Window *window, Rectangle rectangle)

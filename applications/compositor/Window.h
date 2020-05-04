@@ -14,10 +14,21 @@ typedef struct Window
     Rectangle bound;
     CursorState cursor_state;
 
-    Bitmap *framebuffer;
+    Bitmap *frontbuffer;
+    int frontbuffer_handle;
+
+    Bitmap *backbuffer;
+    int backbuffer_handle;
 } Window;
 
-Window *window_create(int id, struct Client *client, Rectangle bound, Bitmap *framebuffer);
+Window *window_create(
+    int id,
+    struct Client *client,
+    Rectangle bound,
+    Bitmap *frontbuffer,
+    int frontbuffer_handle,
+    Bitmap *backbuffer,
+    int backbuffer_handle);
 
 void window_destroy(Window *window);
 

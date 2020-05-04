@@ -8,14 +8,26 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-Window *window_create(int id, Client *client, Rectangle bound, Bitmap *framebuffer)
+Window *window_create(
+    int id,
+    struct Client *client,
+    Rectangle bound,
+    Bitmap *frontbuffer,
+    int frontbuffer_handle,
+    Bitmap *backbuffer,
+    int backbuffer_handle)
 {
     Window *window = __create(Window);
 
     window->id = id;
     window->client = client;
     window->bound = bound;
-    window->framebuffer = framebuffer;
+
+    window->frontbuffer = frontbuffer;
+    window->frontbuffer_handle = frontbuffer_handle;
+
+    window->backbuffer = backbuffer;
+    window->backbuffer_handle = backbuffer_handle;
 
     manager_register_window(window);
 

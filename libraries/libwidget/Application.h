@@ -20,7 +20,7 @@ void application_show_window(Window *window);
 
 void application_hide_window(Window *window);
 
-void application_blit_window(Window *window, Rectangle bound);
+void application_flip_window(Window *window, Rectangle bound);
 
 void application_move_window(Window *window, Point position);
 

@@ -38,11 +38,26 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
             return;
         }
 
-        Bitmap *bitmap = NULL;
-
         size_t size;
-        shared_memory_include(create_window.framebuffer, (uintptr_t *)&bitmap, &size);
-        window_create(create_window.id, client, create_window.bound, bitmap);
+        Bitmap *frontbuffer = NULL;
+        int frontbuffer_handle = create_window.frontbuffer;
+        shared_memory_include(frontbuffer_handle, (uintptr_t *)&frontbuffer, &size);
+
+        Bitmap *backbuffer = NULL;
+        int backbuffer_handle = create_window.backbuffer;
+        shared_memory_include(backbuffer_handle, (uintptr_t *)&backbuffer, &size);
+
+        window_create(
+            create_window.id,
+            client,
+            create_window.bound,
+
+            frontbuffer,
+            frontbuffer_handle,
+
+            backbuffer,
+            backbuffer_handle);
+
         break;
     }
     case COMPOSITOR_MESSAGE_DESTROY_WINDOW:
@@ -61,8 +76,11 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         if (window)
         {
-            shared_memory_free((uintptr_t)window->framebuffer);
-            window->framebuffer = NULL;
+            shared_memory_free((uintptr_t)window->frontbuffer);
+            window->frontbuffer = NULL;
+            shared_memory_free((uintptr_t)window->backbuffer);
+            window->backbuffer = NULL;
+
             window_destroy(window);
         }
         else
@@ -72,10 +90,10 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
         break;
     }
-    case COMPOSITOR_MESSAGE_BLIT_WINDOW:
+    case COMPOSITOR_MESSAGE_FLIP_WINDOW:
     {
-        CompositorBlitWindowMessage blit_window = {};
-        connection_receive(connection, &blit_window, sizeof(CompositorBlitWindowMessage));
+        CompositorFlipWindowMessage flip_window = {};
+        connection_receive(connection, &flip_window, sizeof(CompositorFlipWindowMessage));
 
         if (handle_has_error(connection))
         {
@@ -85,26 +103,27 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
             return;
         }
 
-        Window *window = manager_get_window(client, blit_window.id);
+        Window *window = manager_get_window(client, flip_window.id);
 
         if (window)
         {
-            int old_framebuffer_handle = 0;
-            shared_memory_get_handle((uintptr_t)window->framebuffer, &old_framebuffer_handle);
+            __swap(Bitmap *, window->frontbuffer, window->backbuffer);
+            __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
 
-            if (old_framebuffer_handle != blit_window.framebuffer)
+            if (window->frontbuffer_handle != flip_window.frontbuffer)
             {
-                Bitmap *new_framebuffer = NULL;
+                Bitmap *new_frontbuffer = NULL;
 
                 size_t size;
                 if (shared_memory_include(
-                        blit_window.framebuffer,
-                        (uintptr_t *)&new_framebuffer,
+                        flip_window.frontbuffer,
+                        (uintptr_t *)&new_frontbuffer,
                         &size) == SUCCESS)
                 {
-                    shared_memory_free((uintptr_t)window->framebuffer);
+                    shared_memory_free((uintptr_t)window->frontbuffer);
 
-                    window->framebuffer = new_framebuffer;
+                    window->frontbuffer = new_frontbuffer;
+                    window->frontbuffer_handle = flip_window.frontbuffer;
                 }
                 else
                 {
@@ -112,12 +131,33 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
                 }
             }
 
-            renderer_region_dirty(rectangle_offset(blit_window.bound, window->bound.position));
+            if (window->backbuffer_handle != flip_window.backbuffer)
+            {
+                Bitmap *new_backbuffer = NULL;
+
+                size_t size;
+                if (shared_memory_include(
+                        flip_window.backbuffer,
+                        (uintptr_t *)&new_backbuffer,
+                        &size) == SUCCESS)
+                {
+                    shared_memory_free((uintptr_t)window->backbuffer);
+
+                    window->backbuffer = new_backbuffer;
+                    window->backbuffer_handle = flip_window.backbuffer;
+                }
+                else
+                {
+                    logger_error("Client application gave us a jankie shared memory object id");
+                }
+            }
+
+            renderer_region_dirty(rectangle_offset(flip_window.bound, window->bound.position));
             client_send_message(client, COMPOSITOR_MESSAGE_ACK, NULL, 0);
         }
         else
         {
-            logger_warn("Invalid window id %d for client %08x", blit_window.id, client);
+            logger_warn("Invalid window id %d for client %08x", flip_window.id, client);
         }
 
         break;

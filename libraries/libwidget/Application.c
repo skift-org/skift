@@ -205,7 +205,8 @@ void application_show_window(Window *window)
 
     CompositorCreateWindowMessage message = {
         .id = window_handle(window),
-        .framebuffer = window_framebuffer_handle(window),
+        .frontbuffer = window_frontbuffer_handle(window),
+        .backbuffer = window_backbuffer_handle(window),
         .bound = window_bound_on_screen(window),
     };
 
@@ -266,17 +267,18 @@ Window *application_get_window_by_id(int id)
     return NULL;
 }
 
-void application_blit_window(Window *window, Rectangle bound)
+void application_flip_window(Window *window, Rectangle bound)
 {
     assert(_state >= APPLICATION_INITALIZED);
 
-    CompositorBlitWindowMessage message = {
+    CompositorFlipWindowMessage message = {
         .id = window_handle(window),
-        .framebuffer = window_framebuffer_handle(window),
+        .frontbuffer = window_frontbuffer_handle(window),
+        .backbuffer = window_backbuffer_handle(window),
         .bound = bound,
     };
 
-    application_send_message(COMPOSITOR_MESSAGE_BLIT_WINDOW, &message, sizeof(CompositorBlitWindowMessage));
+    application_send_message(COMPOSITOR_MESSAGE_FLIP_WINDOW, &message, sizeof(CompositorFlipWindowMessage));
     application_wait_for_ack();
 }
 

@@ -33,9 +33,13 @@ typedef struct Window
     Rectangle on_screen_bound;
     CursorState cursor_state;
 
-    int framebuffer_handle;
-    Bitmap *framebuffer;
-    Painter *painter;
+    Bitmap *frontbuffer;
+    Painter *frontbuffer_painter;
+    int frontbuffer_handle;
+
+    Bitmap *backbuffer;
+    Painter *backbuffer_painter;
+    int backbuffer_handle;
 
     List *dirty_rect;
     bool dirty_layout;
@@ -73,7 +77,7 @@ void window_hide(Window *window);
 
 bool window_is_visible(Window *window);
 
-void window_paint(Window *window, Rectangle rectangle);
+void window_paint(Window *window, Painter *painter, Rectangle rectangle);
 
 void window_dump(Window *window);
 
@@ -95,7 +99,9 @@ void window_set_focused_widget(Window *window, Widget *widget);
 
 int window_handle(Window *window);
 
-int window_framebuffer_handle(Window *window);
+int window_frontbuffer_handle(Window *window);
+
+int window_backbuffer_handle(Window *window);
 
 Widget *window_root(Window *window);
 

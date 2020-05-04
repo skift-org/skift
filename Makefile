@@ -1,8 +1,12 @@
 .SUFFIXES:
 .DEFAULT_GOAL := all
 
-PATH := $(shell toolchain/use-it.sh):$(PATH)
-PATH := $(shell toolbox/use-it.sh):$(PATH)
+export PATH := $(shell toolchain/use-it.sh):$(PATH)
+export PATH := $(shell toolbox/use-it.sh):$(PATH)
+
+ifeq (, $(shell which inkscape))
+$(error "No inkscape in PATH, consider installing it")
+endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 

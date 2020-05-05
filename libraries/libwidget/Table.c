@@ -54,6 +54,8 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
     Rectangle cell_bound = table_cell_bound(widget, row, column);
     Variant data = model_data(widget->model, row, column);
 
+    painter_push_clip(painter, cell_bound);
+
     if (data.icon)
     {
         painter_blit_icon(
@@ -78,6 +80,8 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             (Point){cell_bound.X + 4, cell_bound.Y + 16},
             widget_get_color(widget, THEME_FOREGROUND));
     }
+
+    painter_pop_clip(painter);
 }
 
 int table_row_at(Table *widget, Point position)

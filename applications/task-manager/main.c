@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     Widget *graphs_container = container_create(window_root((Window *)window));
     graphs_container->layout = HGRID(1);
 
-    window->cpu_graph = graph_create(graphs_container, 100, COLOR_SEAGREEN);
+    window->cpu_graph = graph_create(graphs_container, 256, COLOR_SEAGREEN);
     window->cpu_graph->layout = VFLOW(8);
     window->cpu_graph->insets = INSETS(0, 8);
 
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);
 
-    window->ram_graph = graph_create(graphs_container, 100, COLOR_ROYALBLUE);
+    window->ram_graph = graph_create(graphs_container, 256, COLOR_ROYALBLUE);
     window->ram_graph->layout = VFLOW(8);
     window->ram_graph->insets = INSETS(0, 8);
 

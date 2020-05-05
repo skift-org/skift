@@ -54,7 +54,7 @@ void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
     }
     else
     {
-        logger_warn("Invalid mouse packet!");
+        logger_warn("Invalid mouse packet %d !", size);
     }
 
     client_close_disconnected_clients();

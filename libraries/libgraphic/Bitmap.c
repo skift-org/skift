@@ -131,3 +131,22 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
 
     return SUCCESS;
 }
+
+__attribute__((flatten)) void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
+{
+    region = rectangle_clip(region, bitmap_bound(source));
+    region = rectangle_clip(region, bitmap_bound(destination));
+
+    if (rectangle_is_empty(region))
+    {
+        return;
+    }
+
+    for (int y = region.Y; y < region.Y + region.height; y++)
+    {
+        for (int x = region.X; x < region.X + region.width; x++)
+        {
+            bitmap_set_pixel_no_check(destination, (Point){x, y}, bitmap_get_pixel_no_check(source, (Point){x, y}));
+        }
+    }
+}

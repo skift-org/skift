@@ -557,22 +557,31 @@ Widget *window_root(Window *window)
 
 void window_update(Window *window)
 {
+    Rectangle repaited_regions = RECTANGLE_EMPTY;
+
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
         window_paint(window, window->backbuffer_painter, *rectangle);
+
+        if (rectangle_is_empty(repaited_regions))
+        {
+            repaited_regions = *rectangle;
+        }
+        else
+        {
+            repaited_regions = rectangle_merge(*rectangle, repaited_regions);
+        }
     }
 
     list_clear_with_callback(window->dirty_rect, free);
 
-    memcpy(window->frontbuffer->pixels,
-           window->backbuffer->pixels,
-           window->backbuffer->width * window->backbuffer->height * sizeof(Color));
+    bitmap_copy(window->backbuffer, window->frontbuffer, repaited_regions);
 
     __swap(Bitmap *, window->frontbuffer, window->backbuffer);
     __swap(Painter *, window->frontbuffer_painter, window->backbuffer_painter);
     __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
 
-    application_flip_window(window, window_bound(window));
+    application_flip_window(window, repaited_regions);
 }
 
 void window_schedule_update(Window *window, Rectangle rectangle)

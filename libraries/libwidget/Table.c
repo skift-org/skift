@@ -56,6 +56,11 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
 
     painter_push_clip(painter, cell_bound);
 
+    if (row % 2 == 0)
+    {
+        painter_fill_rectangle(painter, cell_bound, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
+    }
+
     if (data.icon)
     {
         painter_blit_icon(

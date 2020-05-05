@@ -98,3 +98,5 @@ static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Point p, Color co
     Color bg = bitmap_get_pixel_no_check(bitmap, p);
     bitmap_set_pixel_no_check(bitmap, p, color_blend(color, bg));
 }
+
+void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region);

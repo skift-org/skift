@@ -123,8 +123,6 @@ int application_run(void)
 
 void application_exit(int exit_value)
 {
-    logger_debug("Exiting application...");
-
     assert(_state == APPLICATION_RUNNING);
     _state = APPLICATION_EXITING;
     Window *window = NULL;

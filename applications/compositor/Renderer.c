@@ -27,7 +27,11 @@ void renderer_region_dirty(Rectangle new_region)
 
     list_foreach(Rectangle, region, _dirty_regions)
     {
-        if (rectangle_colide(*region, new_region))
+        int region_area = rectangle_area(*region);
+        int new_region_area = rectangle_area(new_region);
+        int merge_area = rectangle_area(rectangle_merge(*region, new_region));
+
+        if (rectangle_colide(*region, new_region) && (region_area + new_region_area > merge_area))
         {
             *region = rectangle_merge(*region, new_region);
             merged = true;
@@ -53,17 +57,14 @@ void renderer_region(Rectangle region)
         {
             Rectangle destination = rectangle_clip(window_bound(window), region);
 
-            double x_scale = (double)bitmap_bound(window->frontbuffer).width / window_bound(window).width;
-            double y_scale = (double)bitmap_bound(window->frontbuffer).height / window_bound(window).height;
-
             Rectangle source = {{
-                (destination.X - window_bound(window).X) * x_scale,
-                (destination.Y - window_bound(window).Y) * y_scale,
-                destination.width * x_scale,
-                destination.height * y_scale,
+                (destination.X - window_bound(window).X),
+                (destination.Y - window_bound(window).Y),
+                destination.width,
+                destination.height,
             }};
 
-            painter_blit_bitmap(_painter, window->frontbuffer, source, destination);
+            painter_blit_bitmap_no_alpha(_painter, window->frontbuffer, source, destination);
         }
     }
 

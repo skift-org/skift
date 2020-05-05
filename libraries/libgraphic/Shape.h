@@ -143,6 +143,11 @@ static inline bool rectangle_colide(Rectangle a, Rectangle b)
            a.height + a.Y > b.Y;
 }
 
+static inline int rectangle_area(Rectangle rectangle)
+{
+    return rectangle.width * rectangle.height;
+}
+
 static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
 {
     Point topleft;

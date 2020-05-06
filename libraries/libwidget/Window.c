@@ -141,6 +141,8 @@ void window_show(Window *window)
 
 void window_hide(Window *window)
 {
+    event_cancel_run_later_for(window);
+
     if (!window->visible)
         return;
 

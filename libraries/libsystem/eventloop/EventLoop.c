@@ -222,3 +222,18 @@ void eventloop_run_later(RunLaterCallback callback, void *target)
 
     list_pushback(_eventloop_run_later, run_later);
 }
+
+static IterationDecision cancel_run_later(void *target, RunLater *run_later)
+{
+    if (run_later->target == target)
+    {
+        list_remove(_eventloop_run_later, run_later);
+    }
+
+    return ITERATION_CONTINUE;
+}
+
+void event_cancel_run_later_for(void *target)
+{
+    list_iterate(_eventloop_run_later, target, (ListIterationCallback)cancel_run_later);
+}

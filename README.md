@@ -23,7 +23,7 @@ A simple, handmade, operating system for the intel x86 cpu.
 # Screenshot
 
 <p align="center">
-<img src="manual/screenshots/2020-04-30.png" />
+<img src="manual/screenshots/2020-05-07.png" />
 </p>
 
 # Features

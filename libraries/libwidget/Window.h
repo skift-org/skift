@@ -49,8 +49,6 @@ typedef struct Window
     Widget *focused_widget;
     Widget *mouse_focused_widget;
 
-    Color background;
-
     WindowFlag flags;
 } Window;
 
@@ -92,8 +90,6 @@ Rectangle window_bound(Window *window);
 Rectangle window_content_bound(Window *window);
 
 void window_set_cursor(Window *window, CursorState state);
-
-void window_set_background(Window *window, Color background);
 
 void window_set_focused_widget(Window *window, Widget *widget);
 

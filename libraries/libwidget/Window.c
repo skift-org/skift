@@ -17,26 +17,12 @@
 #define WINDOW_HEADER_AREA 32
 #define WINDOW_CONTENT_PADDING 1
 
-void close_button_click(void *target, struct Widget *sender, struct Event *event)
+static void close_button_click(void *target, struct Widget *sender, struct Event *event)
 {
     __unused(target);
     __unused(event);
 
     window_hide(sender->window);
-}
-
-Window *window_create(
-    const char *icon,
-    const char *title,
-    int width,
-    int height,
-    WindowFlag flags)
-{
-    Window *window = __create(Window);
-
-    window_initialize(window, icon, title, width, height, flags);
-
-    return window;
 }
 
 void window_initialize(
@@ -88,10 +74,23 @@ void window_initialize(
 
     window->focused_widget = window->root_container;
 
-    window->background = window_get_color(window, THEME_BACKGROUND);
     window->flags = flags;
 
     application_add_window(window);
+}
+
+Window *window_create(
+    const char *icon,
+    const char *title,
+    int width,
+    int height,
+    WindowFlag flags)
+{
+    Window *window = __create(Window);
+
+    window_initialize(window, icon, title, width, height, flags);
+
+    return window;
 }
 
 void window_destroy(Window *window)
@@ -195,7 +194,7 @@ void window_change_framebuffer_if_needed(Window *window)
 
 void window_paint(Window *window, Painter *painter, Rectangle rectangle)
 {
-    painter_clear_rectangle(painter, rectangle, window->background);
+    painter_clear_rectangle(painter, rectangle, window_get_color(window, THEME_BACKGROUND));
 
     if (rectangle_container_rectangle(window_content_bound(window), rectangle))
     {
@@ -522,11 +521,6 @@ void window_set_cursor(Window *window, CursorState state)
     }
 }
 
-void window_set_background(Window *window, Color background)
-{
-    window->background = background;
-}
-
 void window_set_focused_widget(Window *window, Widget *widget)
 {
     window->focused_widget = widget;
@@ -650,7 +644,6 @@ bool window_is_focused(Window *window)
 
 Color window_get_color(Window *window, ThemeColorRole role)
 {
-
     if (!window_is_focused(window))
     {
         if (role == THEME_FOREGROUND)

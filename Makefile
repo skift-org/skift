@@ -236,7 +236,8 @@ list_icon:
 $(SYSROOT)/res/icons/%.png: thirdparty/icons/svg/%.svg
 	$(DIRECTORY_GUARD)
 	@echo [ICON] $(notdir $@)
-	@inkscape --export-filename=$@ -w 18 -h 18 $< 1>/dev/null
+	@inkscape --export-filename=$@ -w 18 -h 18 $< || \
+	 inkscape --export-png $@ -w 18 -h 18 $< 1>/dev/null
 
 # --- Ramdisk -------------------------------------------- #
 

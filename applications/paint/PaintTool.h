@@ -5,7 +5,7 @@
 struct PaintTool;
 struct PaintDocument;
 
-typedef void (*PaintToolMouseEventCallback)(struct PaintTool *tool, struct PaintDocument *document, MouseEvent event);
+typedef void (*PaintToolMouseEventCallback)(struct PaintTool *tool, struct PaintDocument *document, Event event);
 
 typedef void (*PaintToolDestroyCallback)(struct PaintTool *tool);
 

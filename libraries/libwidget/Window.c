@@ -333,17 +333,15 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_MOVE:
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
-
         if (window->is_dragging)
         {
-            Point offset = point_sub(mouse_event->position, mouse_event->old_position);
+            Point offset = point_sub(event->mouse.position, event->mouse.old_position);
             window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
             application_move_window(window, window->on_screen_bound.position);
         }
         else if (window->flags & WINDOW_RESIZABLE)
         {
-            RectangeBorder borders = window_resize_bound_containe(window, mouse_event->position);
+            RectangeBorder borders = window_resize_bound_containe(window, event->mouse.position);
 
             if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
             {
@@ -376,7 +374,7 @@ void window_handle_event(Window *window, Event *event)
 
             if (window->is_resizing)
             {
-                window_do_resize(window, mouse_event->position);
+                window_do_resize(window, event->mouse.position);
             }
         }
 
@@ -390,11 +388,9 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_PRESS:
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
-
-        if (rectangle_containe_point(widget_bound(window_root(window)), mouse_event->position))
+        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
         {
-            Widget *widget = widget_child_at(window_root(window), mouse_event->position);
+            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
 
             if (widget)
             {
@@ -405,9 +401,9 @@ void window_handle_event(Window *window, Event *event)
 
         if (!(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), mouse_event->position))
+            if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), event->mouse.position))
             {
-                Widget *widget = widget_child_at(window_header(window), mouse_event->position);
+                Widget *widget = widget_child_at(window_header(window), event->mouse.position);
 
                 if (widget)
                 {
@@ -417,8 +413,8 @@ void window_handle_event(Window *window, Event *event)
 
             if (!event->accepted &&
                 !window->is_dragging &&
-                mouse_event->button == MOUSE_BUTTON_LEFT &&
-                rectangle_containe_point(window_header_bound(window), mouse_event->position))
+                event->mouse.button == MOUSE_BUTTON_LEFT &&
+                rectangle_containe_point(window_header_bound(window), event->mouse.position))
             {
                 window->is_dragging = true;
                 window_set_cursor(window, CURSOR_MOVE);
@@ -426,9 +422,9 @@ void window_handle_event(Window *window, Event *event)
 
             if (!event->accepted &&
                 !window->is_resizing &&
-                window_resize_bound_containe(window, mouse_event->position))
+                window_resize_bound_containe(window, event->mouse.position))
             {
-                window_begin_resize(window, mouse_event->position);
+                window_begin_resize(window, event->mouse.position);
             }
         }
 
@@ -437,10 +433,8 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_RELEASE:
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
-
         if (window->is_dragging &&
-            mouse_event->button == MOUSE_BUTTON_LEFT)
+            event->mouse.button == MOUSE_BUTTON_LEFT)
         {
             window->is_dragging = false;
             window_set_cursor(window, CURSOR_DEFAULT);
@@ -456,11 +450,9 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_DOUBLE_CLICK:
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
-
-        if (rectangle_containe_point(widget_bound(window_root(window)), mouse_event->position))
+        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
         {
-            Widget *widget = widget_child_at(window_root(window), mouse_event->position);
+            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
 
             if (widget)
             {

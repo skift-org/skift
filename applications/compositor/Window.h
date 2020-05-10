@@ -50,4 +50,4 @@ void window_get_focus(Window *window);
 
 void window_lost_focus(Window *window);
 
-void window_send_event(Window *window, Event *event, size_t size);
+void window_send_event(Window *window, Event event);

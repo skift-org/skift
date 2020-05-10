@@ -49,7 +49,7 @@ void renderer_region_dirty(Rectangle new_region)
 
 void renderer_region(Rectangle region)
 {
-    painter_blit_bitmap(_painter, _wallpaper, region, region);
+    painter_blit_bitmap_no_alpha(_painter, _wallpaper, region, region);
 
     list_foreach_reversed(Window, window, manager_get_windows())
     {

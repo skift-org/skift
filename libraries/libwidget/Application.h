@@ -16,6 +16,8 @@ void application_add_window(Window *window);
 
 void application_remove_window(Window *window);
 
+Window *application_get_window(int id);
+
 void application_show_window(Window *window);
 
 void application_hide_window(Window *window);
@@ -27,5 +29,3 @@ void application_move_window(Window *window, Point position);
 void application_resize_window(Window *window, Rectangle bound);
 
 void application_window_change_cursor(Window *window, CursorState state);
-
-Window *application_get_window_by_id(int id);

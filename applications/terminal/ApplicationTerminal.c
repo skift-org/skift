@@ -206,9 +206,7 @@ void terminal_widget_event_callback(TerminalWidget *terminal_widget, Event *even
 {
     if (event->type == EVENT_KEYBOARD_KEY_TYPED)
     {
-        KeyboardEvent *key_event = (KeyboardEvent *)event;
-        stream_write(terminal_widget->master_stream, &key_event->codepoint, sizeof(char));
-
+        stream_write(terminal_widget->master_stream, &event->keyboard.codepoint, sizeof(char));
         event->accepted = true;
     }
 }

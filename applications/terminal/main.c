@@ -52,9 +52,6 @@ void cursor_callback(Terminal *terminal)
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
-
     if (application_initialize(argc, argv) == SUCCESS)
     {
         Window *window = window_create("console-line", "Terminal", 500, 400, WINDOW_RESIZABLE);

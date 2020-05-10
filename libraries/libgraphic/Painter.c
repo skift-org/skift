@@ -83,7 +83,7 @@ void painter_plot_pixel(Painter *painter, Point position, Color color)
     }
 }
 
-__attribute__((flatten))  void painter_clear_pixel(Painter *painter, Point position, Color color)
+__attribute__((flatten)) void painter_clear_pixel(Painter *painter, Point position, Color color)
 {
     Point transformed = point_add(position, painter->originestack[painter->originestack_top]);
 
@@ -168,7 +168,7 @@ void painter_blit_bitmap_fast_no_alpha(
     Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
     clipped_source.position = point_add(source.position, point_sub(clipped_destination.position, destination.position));
 
-    if (rectangle_is_empty(destination))
+    if (rectangle_is_empty(clipped_destination))
     {
         return;
     }
@@ -178,7 +178,7 @@ void painter_blit_bitmap_fast_no_alpha(
         for (int y = 0; y < clipped_destination.height; y++)
         {
             Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.X + x, clipped_source.Y + y});
-            bitmap_blend_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
+            bitmap_set_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
         }
     }
 }

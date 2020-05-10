@@ -25,6 +25,50 @@ static List *_windows;
 static Connection *_connection;
 static Notifier *_connection_notifier;
 
+void application_do_message(CompositorMessage *message)
+{
+    if (message->type == COMPOSITOR_MESSAGE_EVENT_WINDOW)
+    {
+        Window *window = application_get_window(message->event_window.id);
+
+        if (window)
+        {
+            window_handle_event(window, &message->event_window.event);
+        }
+    }
+    else
+    {
+        logger_warn("Got an invalid message from compositor!");
+    }
+}
+
+void application_send_message(CompositorMessage message)
+{
+    connection_send(_connection, &message, sizeof(CompositorMessage));
+}
+
+void application_wait_for_ack(void)
+{
+    List *pending_messages = list_create();
+
+    __cleanup_malloc CompositorMessage *message = __create(CompositorMessage);
+    connection_receive(_connection, message, sizeof(CompositorMessage));
+
+    while (message->type != COMPOSITOR_MESSAGE_ACK)
+    {
+        list_pushback(pending_messages, message);
+        message = __create(CompositorMessage);
+        connection_receive(_connection, message, sizeof(CompositorMessage));
+    }
+
+    list_foreach(CompositorMessage, message, pending_messages)
+    {
+        application_do_message(message);
+    }
+
+    list_destroy_with_callback(pending_messages, free);
+}
+
 void application_request_callback(
     void *target,
     Connection *connection,
@@ -33,8 +77,8 @@ void application_request_callback(
     __unused(target);
     __unused(events);
 
-    CompositorMessage header = {};
-    connection_receive(connection, &header, sizeof(CompositorMessage));
+    CompositorMessage message = {};
+    connection_receive(connection, &message, sizeof(CompositorMessage));
 
     if (handle_get_error(connection) == ERR_STREAM_CLOSED)
     {
@@ -43,28 +87,7 @@ void application_request_callback(
         return;
     }
 
-    if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
-    {
-        CompositorWindowEvent windowEvent = {};
-
-        connection_receive(connection, &windowEvent, sizeof(CompositorWindowEvent));
-
-        Event *event = (Event *)malloc(header.size);
-        connection_receive(connection, event, header.size - sizeof(CompositorWindowEvent));
-
-        Window *window = application_get_window_by_id(windowEvent.id);
-
-        if (window)
-        {
-            window_handle_event(window, event);
-        }
-
-        free(event);
-    }
-    else
-    {
-        logger_warn("Got an invalid message from compositor!");
-    }
+    application_do_message(&message);
 }
 
 Result application_initialize(int argc, char **argv)
@@ -137,91 +160,8 @@ void application_exit(int exit_value)
     _state = APPLICATION_NONE;
 }
 
-void application_dump(void)
+void application_exit_if_all_windows_are_closed(void)
 {
-    assert(_state >= APPLICATION_INITALIZED);
-
-    list_foreach(Window, window, _windows)
-    {
-        window_dump(window);
-    }
-}
-
-void application_send_message(CompositorMessageType type, const void *buffer, size_t size)
-{
-    CompositorMessage header = {};
-    header.type = type;
-    header.size = size;
-
-    connection_send(_connection, &header, sizeof(CompositorMessage));
-    connection_send(_connection, buffer, size);
-}
-
-void application_wait_for_ack(void)
-{
-    List *pending_events = list_create();
-
-    CompositorMessage header = {};
-    connection_receive(_connection, &header, sizeof(CompositorMessage));
-
-    while (header.type != COMPOSITOR_MESSAGE_ACK)
-    {
-        if (header.type == COMPOSITOR_MESSAGE_WINDOW_EVENT)
-        {
-            CompositorWindowEvent *window_event = (CompositorWindowEvent *)malloc(header.size);
-            connection_receive(_connection, window_event, header.size);
-            list_pushback(pending_events, window_event);
-        }
-
-        connection_receive(_connection, &header, sizeof(CompositorMessage));
-    }
-
-    list_foreach(CompositorWindowEvent, event, pending_events)
-    {
-        Window *window = application_get_window_by_id(event->id);
-
-        if (window)
-        {
-            window_handle_event(window, event->event);
-        }
-    }
-
-    list_destroy_with_callback(pending_events, free);
-}
-
-void application_add_window(Window *window)
-{
-    assert(_state >= APPLICATION_INITALIZED);
-
-    list_pushback(_windows, window);
-}
-
-void application_show_window(Window *window)
-{
-    assert(_state >= APPLICATION_INITALIZED);
-    assert(list_contains(_windows, window));
-
-    CompositorCreateWindowMessage message = {
-        .id = window_handle(window),
-        .frontbuffer = window_frontbuffer_handle(window),
-        .backbuffer = window_backbuffer_handle(window),
-        .bound = window_bound_on_screen(window),
-    };
-
-    application_send_message(COMPOSITOR_MESSAGE_CREATE_WINDOW, &message, sizeof(CompositorCreateWindowMessage));
-}
-
-void application_hide_window(Window *window)
-{
-    assert(_state >= APPLICATION_INITALIZED);
-    assert(list_contains(_windows, window));
-
-    CompositorDestroyWindowMessage message = {
-        .id = window_handle(window),
-    };
-
-    application_send_message(COMPOSITOR_MESSAGE_DESTROY_WINDOW, &message, sizeof(CompositorDestroyWindowMessage));
-
     if (_state == APPLICATION_EXITING)
     {
         return;
@@ -243,6 +183,23 @@ void application_hide_window(Window *window)
     }
 }
 
+void application_dump(void)
+{
+    assert(_state >= APPLICATION_INITALIZED);
+
+    list_foreach(Window, window, _windows)
+    {
+        window_dump(window);
+    }
+}
+
+void application_add_window(Window *window)
+{
+    assert(_state >= APPLICATION_INITALIZED);
+
+    list_pushback(_windows, window);
+}
+
 void application_remove_window(Window *window)
 {
     assert(_state >= APPLICATION_INITALIZED);
@@ -250,7 +207,7 @@ void application_remove_window(Window *window)
     list_remove(_windows, window);
 }
 
-Window *application_get_window_by_id(int id)
+Window *application_get_window(int id)
 {
     assert(_state >= APPLICATION_INITALIZED);
 
@@ -265,53 +222,103 @@ Window *application_get_window_by_id(int id)
     return NULL;
 }
 
+void application_show_window(Window *window)
+{
+    assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
+
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_CREATE_WINDOW,
+        .create_window = {
+            .id = window_handle(window),
+            .frontbuffer = window_frontbuffer_handle(window),
+            .backbuffer = window_backbuffer_handle(window),
+            .bound = window_bound_on_screen(window),
+        },
+    };
+
+    application_send_message(message);
+}
+
+void application_hide_window(Window *window)
+{
+    assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
+
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_DESTROY_WINDOW,
+        .destroy_window = {
+            .id = window_handle(window),
+        },
+    };
+
+    application_send_message(message);
+    application_exit_if_all_windows_are_closed();
+}
+
 void application_flip_window(Window *window, Rectangle bound)
 {
     assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
 
-    CompositorFlipWindowMessage message = {
-        .id = window_handle(window),
-        .frontbuffer = window_frontbuffer_handle(window),
-        .backbuffer = window_backbuffer_handle(window),
-        .bound = bound,
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_FLIP_WINDOW,
+        .flip_window = {
+            .id = window_handle(window),
+            .frontbuffer = window_frontbuffer_handle(window),
+            .backbuffer = window_backbuffer_handle(window),
+            .bound = bound,
+        },
     };
 
-    application_send_message(COMPOSITOR_MESSAGE_FLIP_WINDOW, &message, sizeof(CompositorFlipWindowMessage));
+    application_send_message(message);
     application_wait_for_ack();
 }
 
 void application_move_window(Window *window, Point position)
 {
     assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
 
-    CompositorWindowMove message = {
-        .id = window_handle(window),
-        .position = position,
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_MOVE_WINDOW,
+        .move_window = {
+            .id = window_handle(window),
+            .position = position,
+        },
     };
 
-    application_send_message(COMPOSITOR_MESSAGE_WINDOW_MOVE, &message, sizeof(CompositorWindowMove));
+    application_send_message(message);
 }
 
 void application_resize_window(Window *window, Rectangle bound)
 {
     assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
 
-    CompositorWindowResize message = {
-        .id = window_handle(window),
-        .bound = bound,
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_RESIZE_WINDOW,
+        .resize_window = {
+            .id = window_handle(window),
+            .bound = bound,
+        },
     };
 
-    application_send_message(COMPOSITOR_MESSAGE_WINDOW_RESIZE, &message, sizeof(CompositorWindowResize));
+    application_send_message(message);
 }
 
 void application_window_change_cursor(Window *window, CursorState state)
 {
     assert(_state >= APPLICATION_INITALIZED);
+    assert(list_contains(_windows, window));
 
-    CompositorCursorStateChange message = {
-        .id = window_handle(window),
-        .state = state,
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_CURSOR_WINDOW,
+        .cursor_window = {
+            .id = window_handle(window),
+            .state = state,
+        },
     };
 
-    application_send_message(COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE, &message, sizeof(CompositorCursorStateChange));
+    application_send_message(message);
 }

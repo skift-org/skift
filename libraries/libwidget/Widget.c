@@ -72,9 +72,6 @@ void widget_add_child(Widget *widget, Widget *child)
     list_pushback(widget->childs, child);
 
     widget_invalidate_layout(widget);
-
-    Event event = {EVENT_CHILD_ADDED, false};
-    widget_dispatch_event(widget, &event);
 }
 
 void widget_remove_child(Widget *widget, Widget *child)
@@ -86,9 +83,6 @@ void widget_remove_child(Widget *widget, Widget *child)
     list_remove(widget->childs, child);
 
     widget_invalidate_layout(widget);
-
-    Event event = {EVENT_CHILD_REMOVED, false};
-    widget_dispatch_event(widget, &event);
 }
 
 void widget_dump(Widget *widget, int depth)

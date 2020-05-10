@@ -11,62 +11,75 @@ typedef enum
 
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
+    COMPOSITOR_MESSAGE_RESIZE_WINDOW,
+    COMPOSITOR_MESSAGE_MOVE_WINDOW,
     COMPOSITOR_MESSAGE_FLIP_WINDOW,
-    COMPOSITOR_MESSAGE_CURSOR_STATE_CHANGE,
-    COMPOSITOR_MESSAGE_WINDOW_MOVE,
-    COMPOSITOR_MESSAGE_WINDOW_RESIZE,
-
-    COMPOSITOR_MESSAGE_WINDOW_EVENT,
+    COMPOSITOR_MESSAGE_EVENT_WINDOW,
+    COMPOSITOR_MESSAGE_CURSOR_WINDOW,
 } CompositorMessageType;
 
 typedef struct
 {
-    CompositorMessageType type;
-    size_t size;
-} CompositorMessage;
-
-typedef struct
-{
     int id;
+
     int frontbuffer;
     int backbuffer;
     Rectangle bound;
-} CompositorCreateWindowMessage;
+} CompositorCreateWindow;
 
 typedef struct
 {
     int id;
+} CompositorDestroyWindow;
+
+typedef struct
+{
+    int id;
+
+    Rectangle bound;
+} CompositorResizeWindow;
+
+typedef struct
+{
+    int id;
+
     Point position;
-} CompositorWindowMove;
+} CompositorMoveWindow;
 
 typedef struct
 {
     int id;
-    Rectangle bound;
-} CompositorWindowResize;
 
-typedef struct
-{
-    int id;
-} CompositorDestroyWindowMessage;
-
-typedef struct
-{
-    int id;
     int frontbuffer;
     int backbuffer;
-
     Rectangle bound;
-} CompositorFlipWindowMessage;
+} CompositorFlipWindow;
 
 typedef struct
 {
     int id;
-    Event event[];
-} CompositorWindowEvent;
+
+    Event event;
+} CompositorEventWindow;
 
 typedef struct
 {
     int id;
+
     CursorState state;
-} CompositorCursorStateChange;
+} CompositorCursorWindow;
+
+typedef struct
+{
+    CompositorMessageType type;
+
+    union {
+        CompositorCreateWindow create_window;
+        CompositorDestroyWindow destroy_window;
+        CompositorResizeWindow resize_window;
+        CompositorMoveWindow move_window;
+        CompositorFlipWindow flip_window;
+        CompositorEventWindow event_window;
+        CompositorCursorWindow cursor_window;
+    };
+} CompositorMessage;

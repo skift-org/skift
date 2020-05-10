@@ -74,17 +74,32 @@ Point window_screen_window_position(Window *window, Point position)
     return point_sub(position, window_bound(window).position);
 }
 
+void window_send_event(Window *window, Event event)
+{
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_EVENT_WINDOW,
+        .event_window = {
+            .id = window->id,
+            .event = event,
+        },
+    };
+
+    client_send_message(window->client, message);
+}
+
 void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons)
 {
-    window_send_event(window,
-                      EVENT(
-                          MouseEvent,
-                          EVENT_MOUSE_MOVE,
-                          window_screen_window_position(window, position),
-                          window_screen_window_position(window, old_position),
-                          MOUSE_NO_BUTTON,
-                          buttons),
-                      sizeof(MouseEvent));
+    Event event = {
+        .type = EVENT_MOUSE_MOVE,
+        .mouse = {
+            .position = window_screen_window_position(window, position),
+            .old_position = window_screen_window_position(window, old_position),
+            .button = MOUSE_NO_BUTTON,
+            .buttons = buttons,
+        },
+    };
+
+    window_send_event(window, event);
 }
 
 void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Point position)
@@ -94,28 +109,32 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
 
     if (is_button_pressed && !was_button_pressed)
     {
-        window_send_event(window,
-                          EVENT(
-                              MouseEvent,
-                              EVENT_MOUSE_BUTTON_PRESS,
-                              window_screen_window_position(window, position),
-                              window_screen_window_position(window, position),
-                              button,
-                              buttons),
-                          sizeof(MouseEvent));
+        Event event = {
+            .type = EVENT_MOUSE_BUTTON_PRESS,
+            .mouse = {
+                .position = window_screen_window_position(window, position),
+                .old_position = window_screen_window_position(window, position),
+                .button = button,
+                .buttons = buttons,
+            },
+        };
+
+        window_send_event(window, event);
     }
 
     if (was_button_pressed && !is_button_pressed)
     {
-        window_send_event(window,
-                          EVENT(
-                              MouseEvent,
-                              EVENT_MOUSE_BUTTON_RELEASE,
-                              window_screen_window_position(window, position),
-                              window_screen_window_position(window, position),
-                              button,
-                              buttons),
-                          sizeof(MouseEvent));
+        Event event = {
+            .type = EVENT_MOUSE_BUTTON_RELEASE,
+            .mouse = {
+                .position = window_screen_window_position(window, position),
+                .old_position = window_screen_window_position(window, position),
+                .button = button,
+                .buttons = buttons,
+            },
+        };
+
+        window_send_event(window, event);
     }
 }
 
@@ -132,38 +151,27 @@ void window_handle_mouse_buttons(
 
 void window_handle_double_click(Window *window, Point position)
 {
-    window_send_event(window,
-                      EVENT(
-                          MouseEvent,
-                          EVENT_MOUSE_DOUBLE_CLICK,
-                          window_screen_window_position(window, position),
-                          window_screen_window_position(window, position),
-                          MOUSE_BUTTON_LEFT,
-                          MOUSE_BUTTON_LEFT),
-                      sizeof(MouseEvent));
+    Event event = {
+        .type = EVENT_MOUSE_DOUBLE_CLICK,
+        .mouse = {
+            .position = window_screen_window_position(window, position),
+            .old_position = window_screen_window_position(window, position),
+            .button = MOUSE_BUTTON_LEFT,
+            .buttons = MOUSE_BUTTON_LEFT,
+        },
+    };
+
+    window_send_event(window, event);
 }
 
 void window_get_focus(Window *window)
 {
     renderer_region_dirty(window_bound(window));
-    window_send_event(window, EVENT_NO_ARGS(EVENT_GOT_FOCUS), sizeof(Event));
+    window_send_event(window, (Event){.type = EVENT_GOT_FOCUS});
 }
 
 void window_lost_focus(Window *window)
 {
     renderer_region_dirty(window_bound(window));
-    window_send_event(window, EVENT_NO_ARGS(EVENT_LOST_FOCUS), sizeof(Event));
-}
-
-void window_send_event(Window *window, Event *event, size_t size)
-{
-    assert(size < 128);
-    char buffer[sizeof(CompositorWindowEvent) + size]; // don't hit me
-
-    CompositorWindowEvent *message = (CompositorWindowEvent *)buffer;
-    message->id = window->id;
-
-    memcpy(&message->event, event, size);
-
-    client_send_message(window->client, COMPOSITOR_MESSAGE_WINDOW_EVENT, message, sizeof(CompositorWindowEvent) + size);
+    window_send_event(window, (Event){.type = EVENT_LOST_FOCUS});
 }

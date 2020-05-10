@@ -23,8 +23,14 @@ void keyboard_callback_decoded(void *target, Codepoint codepoint)
 
     if (window != NULL)
     {
-        KeyboardEvent event = (KeyboardEvent){{EVENT_KEYBOARD_KEY_TYPED, false}, codepoint};
-        window_send_event(window, (Event *)&event, sizeof(KeyboardEvent));
+        Event event = {
+            .type = EVENT_KEYBOARD_KEY_TYPED,
+            .keyboard = {
+                codepoint = codepoint,
+            },
+        };
+
+        window_send_event(window, event);
     }
 }
 
@@ -37,7 +43,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
     stream_read(keyboard_stream, &c, sizeof(char));
     utf8decoder_write(_keyboard_decoder, c);
 
-    client_close_disconnected_clients();
+    client_destroy_disconnected();
 }
 
 void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
@@ -57,7 +63,7 @@ void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
         logger_warn("Invalid mouse packet %d !", size);
     }
 
-    client_close_disconnected_clients();
+    client_destroy_disconnected();
 }
 
 void accept_callback(void *target, Socket *socket, SelectEvent events)
@@ -69,7 +75,7 @@ void accept_callback(void *target, Socket *socket, SelectEvent events)
 
     client_create(incoming_connection);
 
-    client_close_disconnected_clients();
+    client_destroy_disconnected();
 }
 
 void render_callback(void *target)
@@ -78,7 +84,7 @@ void render_callback(void *target)
 
     renderer_repaint_dirty();
 
-    client_close_disconnected_clients();
+    client_destroy_disconnected();
 }
 
 int main(int argc, char const *argv[])

@@ -60,13 +60,13 @@ void canvas_event(Canvas *widget, Event *event)
 {
     if (is_mouse_event(event))
     {
-        MouseEvent mouse_event = *(MouseEvent *)event;
+        Event event_copy = *event;
 
-        mouse_event.old_position = point_sub(mouse_event.old_position, canvas_bound(widget).position);
-        mouse_event.position = point_sub(mouse_event.position, canvas_bound(widget).position);
+        event_copy.mouse.old_position = point_sub(event_copy.mouse.old_position, canvas_bound(widget).position);
+        event_copy.mouse.position = point_sub(event_copy.mouse.position, canvas_bound(widget).position);
 
         if (widget->document->tool->on_mouse_event)
-            widget->document->tool->on_mouse_event(widget->document->tool, widget->document, mouse_event);
+            widget->document->tool->on_mouse_event(widget->document->tool, widget->document, event_copy);
 
         if (widget->document->dirty)
         {

@@ -52,7 +52,7 @@ static void scrollbar_scroll_to(ScrollBar *widget, Point mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_dispatch_event(WIDGET(widget), EVENT_NO_ARGS(EVENT_VALUE_CHANGE));
+    widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
     widget_update(WIDGET(widget));
 }
 
@@ -65,7 +65,7 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Point mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_dispatch_event(WIDGET(widget), EVENT_NO_ARGS(EVENT_VALUE_CHANGE));
+    widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
     widget_update(WIDGET(widget));
 }
 
@@ -73,20 +73,20 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
 {
     if (is_mouse_event(event))
     {
-        MouseEvent *mouse_event = (MouseEvent *)event;
+        MouseEvent mouse_event = event->mouse;
 
-        if (event->type == EVENT_MOUSE_MOVE && mouse_event->buttons & MOUSE_BUTTON_LEFT)
+        if (event->type == EVENT_MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
-            scrollbar_scroll_thumb(widget, mouse_event->position);
+            scrollbar_scroll_thumb(widget, mouse_event.position);
         }
         else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
         {
-            if (!rectangle_containe_point(scrollbar_thumb(widget), mouse_event->position))
+            if (!rectangle_containe_point(scrollbar_thumb(widget), mouse_event.position))
             {
-                scrollbar_scroll_to(widget, mouse_event->position);
+                scrollbar_scroll_to(widget, mouse_event.position);
             }
 
-            widget->mouse_origine = point_sub(mouse_event->position, scrollbar_thumb(widget).position);
+            widget->mouse_origine = point_sub(mouse_event.position, scrollbar_thumb(widget).position);
         }
 
         event->accepted = true;

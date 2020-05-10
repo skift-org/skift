@@ -158,7 +158,7 @@ void table_event(Table *widget, Event *event)
 {
     if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
-        widget->selected = table_row_at(widget, ((MouseEvent *)event)->position);
+        widget->selected = table_row_at(widget, event->mouse.position);
         widget_update(WIDGET(widget));
     }
 }

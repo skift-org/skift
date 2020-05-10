@@ -539,13 +539,7 @@ void task_panic_dump(void)
     atomic_begin();
 
     printf("\n\tRunning task %d: '%s'", scheduler_running_id(), scheduler_running()->name);
-    printf("\n");
-    printf("\n\tTasks:");
-
-    list_foreach(Task, t, tasks)
-    {
-        task_dump(t);
-    }
+    task_dump(scheduler_running());
 
     atomic_end();
 }

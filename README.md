@@ -11,7 +11,7 @@ A simple, handmade, operating system for the intel x86 cpu.
 <a href="https://skiftOS.github.io/">Website</a> -
 <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
 <a href="manual/readme.md">Manual</a> -
-<a href="https://travis-ci.com/skiftOS/skift"><img src="https://travis-ci.com/skiftOS/skift.svg?branch=master" height=16 /></a>
+<a href="https://travis-ci.org/skiftOS/skift"><img src="https://travis-ci.org/skiftOS/skift.svg?branch=master" height=16 /></a>
 </p>
 
 # What skiftOS is about

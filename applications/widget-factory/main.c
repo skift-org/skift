@@ -18,11 +18,15 @@ int main(int argc, char **argv)
     {
         panel_hflow->layout = HFLOW(8);
 
-        panel_create(panel_hflow);
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
         button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
-        button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
-        button_create(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
-        panel_create(panel_hflow);
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
     }
 
     Widget *panel_hgrid = container_create(window_root(window));
@@ -32,8 +36,12 @@ int main(int argc, char **argv)
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
-
+        panel_create(panel_hgrid);
         button_create(panel_hgrid, "Hello, world!");
+        panel_create(panel_hgrid);
+        panel_create(panel_hgrid);
+        panel_create(panel_hgrid);
+        panel_create(panel_hgrid);
     }
 
     Widget *panel_grid = container_create(window_root(window));

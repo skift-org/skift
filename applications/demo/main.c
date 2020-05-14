@@ -35,8 +35,9 @@ int main(int argc, char **argv)
     window_root(window)->layout = VFLOW(0);
 
     Widget *side_bar = container_create(window_root(window));
-    side_bar->insets = INSETS(4, 0);
+    side_bar->insets = INSETS(4, 4);
     side_bar->layout = HGRID(4);
+    side_bar->bound.height = 32;
 
     for (size_t i = 0; _demos[i].name; i++)
     {

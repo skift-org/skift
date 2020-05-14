@@ -19,6 +19,7 @@ Window *about_dialog_create(void)
     Window *dialog = window_create("information", "About", 250, 250, WINDOW_NONE);
 
     window_root(dialog)->layout = VGRID(8);
+    window_root(dialog)->insets = INSETS(0, 8, 8);
 
     if (theme_is_dark())
     {

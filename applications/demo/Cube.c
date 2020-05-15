@@ -23,7 +23,7 @@ static const Face cude_mesh[] = {
     {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 };
 
-static Vector3 camera = {0, 0, 0};
+static Vec3f camera = {0, 0, 0};
 
 void cube_draw(Painter *painter, Rectangle screen, double time)
 {
@@ -65,11 +65,11 @@ void cube_draw(Painter *painter, Rectangle screen, double time)
         tri.b.Z += 3.0;
         tri.c.Z += 3.0;
 
-        if (vector3_dot(face_normal(tri), vector3_sub(tri.a, camera)) < 0.0)
+        if (vec3f_dot(face_normal(tri), vec3f_sub(tri.a, camera)) < 0.0)
         {
-            Vector3 light_direction = {0.0, 0, -1.0};
-            light_direction = vector3_norm(light_direction);
-            float light_force = abs(vector3_dot(face_normal(tri), light_direction));
+            Vec3f light_direction = {0.0, 0, -1.0};
+            light_direction = vec3f_norm(light_direction);
+            float light_force = abs(vec3f_dot(face_normal(tri), light_direction));
 
             triProjected.a = matrix_apply_tranform(projection, tri.a);
             triProjected.b = matrix_apply_tranform(projection, tri.b);

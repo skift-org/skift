@@ -49,9 +49,9 @@ Matrix4 matrix_create_rotationZ(double theta)
     return mat;
 }
 
-Vector3 matrix_apply_tranform(Matrix4 matrix, Vector3 vector)
+Vec3f matrix_apply_tranform(Matrix4 matrix, Vec3f vector)
 {
-    Vector3 result = {};
+    Vec3f result = {};
 
     result.X = vector.X * matrix.m[0][0] +
                vector.Y * matrix.m[1][0] +

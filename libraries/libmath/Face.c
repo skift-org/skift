@@ -1,8 +1,8 @@
 #include <libmath/Face.h>
 
-Vector3 face_normal(Face face)
+Vec3f face_normal(Face face)
 {
-    Vector3 line1, line2;
+    Vec3f line1, line2;
 
     line1.X = face.b.X - face.a.X;
     line1.Y = face.b.Y - face.a.Y;
@@ -12,5 +12,5 @@ Vector3 face_normal(Face face)
     line2.Y = face.c.Y - face.a.Y;
     line2.Z = face.c.Z - face.a.Z;
 
-    return vector3_cross(line1, line2);
+    return vec3f_cross(line1, line2);
 }

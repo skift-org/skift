@@ -1,12 +1,12 @@
 #pragma once
 
-#include <libmath/Vector3.h>
+#include <libmath/Vectors.h>
 
 typedef struct
 {
-    Vector3 a;
-    Vector3 b;
-    Vector3 c;
+    Vec3f a;
+    Vec3f b;
+    Vec3f c;
 } Face;
 
-Vector3 face_normal(Face face);
+Vec3f face_normal(Face face);

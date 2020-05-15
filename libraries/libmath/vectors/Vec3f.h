@@ -1,7 +1,15 @@
-#include <libmath/Vector3.h>
+#pragma once
+
 #include <libmath/math.h>
 
-Vector3 vector3_norm(Vector3 vector)
+typedef struct
+{
+    double X;
+    double Y;
+    double Z;
+} Vec3f;
+
+static inline Vec3f vec3f_norm(Vec3f vector)
 {
     double length = sqrt(vector.X * vector.X +
                          vector.Y * vector.Y +
@@ -14,25 +22,25 @@ Vector3 vector3_norm(Vector3 vector)
     return vector;
 }
 
-Vector3 vector3_sub(Vector3 left, Vector3 right)
+static inline Vec3f vec3f_sub(Vec3f left, Vec3f right)
 {
-    return (Vector3){left.X - right.X, left.Y - right.Y, left.Z - right.Z};
+    return (Vec3f){left.X - right.X, left.Y - right.Y, left.Z - right.Z};
 }
 
-Vector3 vector3_cross(Vector3 left, Vector3 right)
+static inline Vec3f vec3f_cross(Vec3f left, Vec3f right)
 {
-    Vector3 result = {};
+    Vec3f result = {};
 
     result.X = left.Y * right.Z - left.Z * right.Y;
     result.Y = left.Z * right.X - left.X * right.Z;
     result.Z = left.X * right.Y - left.Y * right.X;
 
-    result = vector3_norm(result);
+    result = vec3f_norm(result);
 
     return result;
 }
 
-double vector3_dot(Vector3 left, Vector3 right)
+static inline double vec3f_dot(Vec3f left, Vec3f right)
 {
     return left.X * right.X +
            left.Y * right.Y +

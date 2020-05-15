@@ -4,7 +4,7 @@
 /* This code is licensed under the MIT License.                               */
 /* See: LICENSE.md                                                            */
 
-#include <libmath/Vector3.h>
+#include <libmath/Vectors.h>
 
 typedef struct
 {
@@ -19,4 +19,4 @@ Matrix4 matrix_create_rotationX(double theta);
 
 Matrix4 matrix_create_rotationZ(double theta);
 
-Vector3 matrix_apply_tranform(Matrix4 matrix, Vector3 vector);
+Vec3f matrix_apply_tranform(Matrix4 matrix, Vec3f vector);

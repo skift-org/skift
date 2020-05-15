@@ -12,8 +12,8 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
     int current = 0;
 
     Rectangle computer_icon_bound = (Rectangle){{
-        widget_bound(widget).X,
-        widget_bound(widget).Y,
+        widget_bound(widget).x,
+        widget_bound(widget).y,
         bitmap_bound(widget->icon_computer).width,
         widget_bound(widget).height,
     }};
@@ -31,8 +31,8 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
     if (path_element_count(widget->path) != 0)
     {
         Rectangle expand_icon_bound = (Rectangle){{
-            widget_bound(widget).X + current,
-            widget_bound(widget).Y,
+            widget_bound(widget).x + current,
+            widget_bound(widget).y,
             bitmap_bound(widget->icon_expand).width,
             widget_bound(widget).height,
         }};
@@ -55,8 +55,8 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
         int text_width = font_measure_string(widget_font(), element);
 
         Rectangle element_bound = (Rectangle){{
-            widget_bound(widget).X + current,
-            widget_bound(widget).Y,
+            widget_bound(widget).x + current,
+            widget_bound(widget).y,
             text_width,
             widget_bound(widget).height,
         }};
@@ -73,8 +73,8 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
         if (i != path_element_count(widget->path) - 1)
         {
             Rectangle expand_icon_bound = (Rectangle){{
-                widget_bound(widget).X + current,
-                widget_bound(widget).Y,
+                widget_bound(widget).x + current,
+                widget_bound(widget).y,
                 bitmap_bound(widget->icon_expand).width,
                 widget_bound(widget).height,
             }};

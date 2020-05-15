@@ -45,8 +45,8 @@ Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
 {
     Rectangle bound = {};
 
-    bound.position = (Point){widget_bound(widget).X + x * _cell_size.X, widget_bound(widget).Y + y * (int)(_cell_size.Y)};
-    bound.size = (Point){_cell_size.X, (_cell_size.Y)};
+    bound.position = (Point){widget_bound(widget).x + x * _cell_size.x, widget_bound(widget).y + y * (int)(_cell_size.y)};
+    bound.size = (Point){_cell_size.x, (_cell_size.y)};
 
     return bound;
 }

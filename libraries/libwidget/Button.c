@@ -20,8 +20,8 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
         widget_font(),
         widget->text,
         (Point){
-            widget_bound(widget).X + widget_bound(widget).width / 2 - text_width / 2,
-            widget_bound(widget).Y + widget_bound(widget).height / 2 + 4,
+            widget_bound(widget).x + widget_bound(widget).width / 2 - text_width / 2,
+            widget_bound(widget).y + widget_bound(widget).height / 2 + 4,
         },
         widget_get_color(widget, THEME_FOREGROUND));
 }

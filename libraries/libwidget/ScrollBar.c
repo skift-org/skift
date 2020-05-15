@@ -26,8 +26,8 @@ static Rectangle scrollbar_thumb(ScrollBar *widget)
     int thump_position = track.height * (widget->value / (double)widget->track);
 
     return (Rectangle){{
-        track.X,
-        track.Y + thump_position,
+        track.x,
+        track.y + thump_position,
         track.width,
         thumb_height,
     }};
@@ -47,7 +47,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
 
 static void scrollbar_scroll_to(ScrollBar *widget, Point mouse_position)
 {
-    int new_value = mouse_position.Y - scrollbar_track(widget).Y;
+    int new_value = mouse_position.y - scrollbar_track(widget).y;
     widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track - widget->thumb / 2;
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
@@ -60,7 +60,7 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Point mouse_position)
 {
     mouse_position = point_sub(mouse_position, widget->mouse_origine);
 
-    int new_value = mouse_position.Y - scrollbar_track(widget).Y;
+    int new_value = mouse_position.y - scrollbar_track(widget).y;
     widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track;
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);

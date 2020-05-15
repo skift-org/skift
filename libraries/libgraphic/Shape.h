@@ -5,19 +5,14 @@
 /* See: LICENSE.md                                                            */
 
 #include <libmath/MinMax.h>
+#include <libmath/Vectors.h>
 #include <libmath/math.h>
 
 typedef struct __packed
 {
-    int X;
-    int Y;
+    int x;
+    int y;
 } Point;
-
-typedef struct __packed
-{
-    double X;
-    double Y;
-} PointF;
 
 typedef struct __packed
 {
@@ -42,8 +37,8 @@ typedef union __packed
 {
     struct
     {
-        int X;
-        int Y;
+        int x;
+        int y;
         int width;
         int height;
     };
@@ -63,43 +58,43 @@ typedef union __packed
 
 static inline Point point_add(Point a, Point b)
 {
-    return (Point){a.X + b.X, a.Y + b.Y};
+    return (Point){a.x + b.x, a.y + b.y};
 }
 
 static inline Point point_sub(Point a, Point b)
 {
-    return (Point){a.X - b.X, a.Y - b.Y};
+    return (Point){a.x - b.x, a.y - b.y};
 }
 
 static inline Point point_div(Point a, int value)
 {
-    return (Point){a.X / value, a.Y / value};
+    return (Point){a.x / value, a.y / value};
 }
 
 static inline bool point_equ(Point lhs, Point rhs)
 {
-    return lhs.X == rhs.X && lhs.Y == rhs.Y;
+    return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
 static inline Point point_scale(Point a, double scale)
 {
-    return (Point){(int)(a.X * scale), (int)(a.Y * scale)};
+    return (Point){(int)(a.x * scale), (int)(a.y * scale)};
 }
 
 static inline Point point_x(Point p)
 {
-    return (Point){p.X, 0};
+    return (Point){p.x, 0};
 }
 
 static inline Point point_y(Point p)
 {
-    return (Point){0, p.Y};
+    return (Point){0, p.y};
 }
 
 static inline Point point_clamp(Point p, Point pmin, Point pmax)
 {
-    p.X = MAX(pmin.X, MIN(pmax.X, p.X));
-    p.Y = MAX(pmin.Y, MIN(pmax.Y, p.Y));
+    p.x = MAX(pmin.x, MIN(pmax.x, p.x));
+    p.y = MAX(pmin.y, MIN(pmax.y, p.y));
 
     return p;
 }
@@ -111,16 +106,16 @@ static inline Point point_clamp_to_rect(Point p, Rectangle rect)
 
 static inline Rectangle rectangle_min_size(Rectangle rectangle, Point size)
 {
-    rectangle.width = MIN(size.X, rectangle.width);
-    rectangle.width = MIN(size.Y, rectangle.height);
+    rectangle.width = MIN(size.x, rectangle.width);
+    rectangle.width = MIN(size.y, rectangle.height);
 
     return rectangle;
 }
 
 static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
 {
-    rectangle.width = MAX(size.X, rectangle.width);
-    rectangle.width = MAX(size.Y, rectangle.height);
+    rectangle.width = MAX(size.x, rectangle.width);
+    rectangle.width = MAX(size.y, rectangle.height);
 
     return rectangle;
 }
@@ -128,19 +123,19 @@ static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
 static inline Rectangle rectangle_from_two_point(Point a, Point b)
 {
     return (Rectangle){{
-        MIN(a.X, b.X),
-        MIN(a.Y, b.Y),
-        abs(a.X - b.X),
-        abs(a.Y - b.Y),
+        MIN(a.x, b.x),
+        MIN(a.y, b.y),
+        abs(a.x - b.x),
+        abs(a.y - b.y),
     }};
 }
 
 static inline bool rectangle_colide(Rectangle a, Rectangle b)
 {
-    return a.X < b.X + b.width &&
-           a.X + a.width > b.X &&
-           a.Y < b.Y + b.height &&
-           a.height + a.Y > b.Y;
+    return a.x < b.x + b.width &&
+           a.x + a.width > b.x &&
+           a.y < b.y + b.height &&
+           a.height + a.y > b.y;
 }
 
 static inline int rectangle_area(Rectangle rectangle)
@@ -151,12 +146,12 @@ static inline int rectangle_area(Rectangle rectangle)
 static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
 {
     Point topleft;
-    topleft.X = MIN(a.X, b.X);
-    topleft.Y = MIN(a.Y, b.Y);
+    topleft.x = MIN(a.x, b.x);
+    topleft.y = MIN(a.y, b.y);
 
     Point bottomright;
-    bottomright.X = MAX(a.X + a.width, b.X + b.width);
-    bottomright.Y = MAX(a.Y + a.height, b.Y + b.height);
+    bottomright.x = MAX(a.x + a.width, b.x + b.width);
+    bottomright.y = MAX(a.y + a.height, b.y + b.height);
 
     Rectangle rectangle = {};
 
@@ -168,33 +163,33 @@ static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
 
 static inline Rectangle rectangle_clip(Rectangle left, Rectangle right)
 {
-    int x = MAX(left.X, right.X);
-    int y = MAX(left.Y, right.Y);
+    int x = MAX(left.x, right.x);
+    int y = MAX(left.y, right.y);
 
-    int width = MIN(left.X + left.width, right.X + right.width) - x;
-    int height = MIN(left.Y + left.height, right.Y + right.height) - y;
+    int width = MIN(left.x + left.width, right.x + right.width) - x;
+    int height = MIN(left.y + left.height, right.y + right.height) - y;
 
     return (Rectangle){{x, y, width, height}};
 }
 
 static inline bool rectangle_containe_point(Rectangle rectange, Point position)
 {
-    return (rectange.X <= position.X && (rectange.X + rectange.width) > position.X) &&
-           (rectange.Y <= position.Y && (rectange.Y + rectange.height) > position.Y);
+    return (rectange.x <= position.x && (rectange.x + rectange.width) > position.x) &&
+           (rectange.y <= position.y && (rectange.y + rectange.height) > position.y);
 }
 
 static inline bool rectangle_container_rectangle(Rectangle rectange, Rectangle contained)
 {
-    return (rectange.X <= contained.X && (contained.X + contained.width) >= contained.X) &&
-           (rectange.Y <= contained.Y && (contained.Y + contained.height) >= contained.Y);
+    return (rectange.x <= contained.x && (contained.x + contained.width) >= contained.x) &&
+           (rectange.y <= contained.y && (contained.y + contained.height) >= contained.y);
 }
 
 static inline Rectangle rectangle_shrink(Rectangle rect, Insets spacing)
 {
     Rectangle result;
 
-    result.X = rect.X + spacing.left;
-    result.Y = rect.Y + spacing.top;
+    result.x = rect.x + spacing.left;
+    result.y = rect.y + spacing.top;
     result.width = rect.width - spacing.left - spacing.right;
     result.height = rect.height - spacing.top - spacing.bottom;
 
@@ -205,8 +200,8 @@ static inline Rectangle rectangle_expand(Rectangle rect, Insets spacing)
 {
     Rectangle result;
 
-    result.X = rect.X - spacing.left;
-    result.Y = rect.Y - spacing.top;
+    result.x = rect.x - spacing.left;
+    result.y = rect.y - spacing.top;
     result.width = rect.width + spacing.left + spacing.right;
     result.height = rect.height + spacing.top + spacing.bottom;
 
@@ -241,22 +236,22 @@ static inline Rectangle rectangle_set_width(Rectangle rect, size_t width)
 
 static inline Rectangle rectangle_top(Rectangle rect, int size)
 {
-    return (Rectangle){{rect.X, rect.Y, rect.width, size}};
+    return (Rectangle){{rect.x, rect.y, rect.width, size}};
 }
 
 static inline Rectangle rectangle_bottom(Rectangle rect, int size)
 {
-    return (Rectangle){{rect.X, rect.Y + rect.height - size, rect.width, size}};
+    return (Rectangle){{rect.x, rect.y + rect.height - size, rect.width, size}};
 }
 
 static inline Rectangle rectangle_left(Rectangle rect, int size)
 {
-    return (Rectangle){{rect.X, rect.Y, size, rect.height}};
+    return (Rectangle){{rect.x, rect.y, size, rect.height}};
 }
 
 static inline Rectangle rectangle_right(Rectangle rect, int size)
 {
-    return (Rectangle){{rect.X + rect.width - size, rect.Y, size, rect.height}};
+    return (Rectangle){{rect.x + rect.width - size, rect.y, size, rect.height}};
 }
 
 #define RECTANGLE_BORDER_TOP (1 << 0)
@@ -296,8 +291,8 @@ static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Inse
 static inline Rectangle rectangle_center_within(Rectangle rectangle, Rectangle container)
 {
     return (Rectangle){{
-        container.X + container.width / 2 - rectangle.width / 2,
-        container.Y + container.height / 2 - rectangle.height / 2,
+        container.x + container.width / 2 - rectangle.width / 2,
+        container.y + container.height / 2 - rectangle.height / 2,
 
         rectangle.width,
         rectangle.height,

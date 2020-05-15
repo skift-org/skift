@@ -114,7 +114,7 @@ void painter_blit_bitmap_fast(
     {
         for (int y = 0; y < clipped_destination.height; y++)
         {
-            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.X + x, clipped_source.Y + y});
+            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.x + x, clipped_source.y + y});
             bitmap_blend_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
         }
     }
@@ -177,7 +177,7 @@ void painter_blit_bitmap_fast_no_alpha(
     {
         for (int y = 0; y < clipped_destination.height; y++)
         {
-            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.X + x, clipped_source.Y + y});
+            Color sample = bitmap_get_pixel(bitmap, (Point){clipped_source.x + x, clipped_source.y + y});
             bitmap_set_pixel_no_check(painter->bitmap, point_add(clipped_destination.position, (Point){x, y}), sample);
         }
     }
@@ -238,7 +238,7 @@ __attribute__((flatten)) void painter_clear_rectangle(Painter *painter, Rectangl
     {
         for (int y = 0; y < rectangle.height; y++)
         {
-            bitmap_set_pixel_no_check(painter->bitmap, (Point){rectangle.X + x, rectangle.Y + y}, color);
+            bitmap_set_pixel_no_check(painter->bitmap, (Point){rectangle.x + x, rectangle.y + y}, color);
         }
     }
 }
@@ -257,7 +257,7 @@ __attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle
     {
         for (int y = 0; y < rectangle.height; y++)
         {
-            bitmap_blend_pixel_no_check(painter->bitmap, (Point){rectangle.X + x, rectangle.Y + y},
+            bitmap_blend_pixel_no_check(painter->bitmap, (Point){rectangle.x + x, rectangle.y + y},
                                         color);
         }
     }
@@ -265,65 +265,65 @@ __attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle
 
 __attribute__((flatten)) void painter_fill_triangle(Painter *painter, Point p0, Point p1, Point p2, Color color)
 {
-    PointF a = {p0.X, p0.Y};
-    PointF b = {p1.X, p1.Y};
-    PointF c = {p2.X, p2.Y};
+    Vec2f a = vec2f(p0.x, p0.y);
+    Vec2f b = vec2f(p1.x, p1.y);
+    Vec2f c = vec2f(p2.x, p2.y);
 
-    if (a.Y > b.Y)
-        __swap(PointF, a, b);
-    if (a.Y > c.Y)
-        __swap(PointF, a, c);
-    if (b.Y > c.Y)
-        __swap(PointF, b, c);
+    if (a.y > b.y)
+        __swap(Vec2f, a, b);
+    if (a.y > c.y)
+        __swap(Vec2f, a, c);
+    if (b.y > c.y)
+        __swap(Vec2f, b, c);
 
-    PointF s = a;
-    PointF e = a;
+    Vec2f s = a;
+    Vec2f e = a;
 
     double dx1 = 0;
     double dx2 = 0;
     double dx3 = 0;
 
-    if (b.Y - a.Y > 0)
+    if (b.y - a.y > 0)
     {
-        dx1 = (b.X - a.X) / (double)(b.Y - a.Y);
+        dx1 = (b.x - a.x) / (double)(b.y - a.y);
     }
 
-    if (c.Y - a.Y > 0)
+    if (c.y - a.y > 0)
     {
-        dx2 = (c.X - a.X) / (double)(c.Y - a.Y);
+        dx2 = (c.x - a.x) / (double)(c.y - a.y);
     }
 
-    if (c.Y - b.Y > 0)
+    if (c.y - b.y > 0)
     {
-        dx3 = (c.X - b.X) / (double)(c.Y - b.Y);
+        dx3 = (c.x - b.x) / (double)(c.y - b.y);
     }
 
     if (dx1 > dx2)
     {
-        for (; s.Y <= b.Y; s.Y++, e.Y++, s.X += dx2, e.X += dx1)
+        for (; s.y <= b.y; s.y++, e.y++, s.x += dx2, e.x += dx1)
         {
-            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+            painter_draw_line(painter, (Point){s.x - 1, s.y}, (Point){e.x + 1, s.y}, color);
         }
 
         e = b;
 
-        for (; s.Y <= c.Y; s.Y++, e.Y++, s.X += dx2, e.X += dx3)
+        for (; s.y <= c.y; s.y++, e.y++, s.x += dx2, e.x += dx3)
         {
-            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+            painter_draw_line(painter, (Point){s.x - 1, s.y}, (Point){e.x + 1, s.y}, color);
         }
     }
     else
     {
-        for (; s.Y <= b.Y; s.Y++, e.Y++, s.X += dx1, e.X += dx2)
+        for (; s.y <= b.y; s.y++, e.y++, s.x += dx1, e.x += dx2)
         {
-            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+            painter_draw_line(painter, (Point){s.x - 1, s.y}, (Point){e.x + 1, s.y}, color);
         }
 
         s = b;
 
-        for (; s.Y <= c.Y; s.Y++, e.Y++, s.X += dx3, e.X += dx2)
+        for (; s.y <= c.y; s.y++, e.y++, s.x += dx3, e.x += dx2)
         {
-            painter_draw_line(painter, (Point){s.X - 1, s.Y}, (Point){e.X + 1, s.Y}, color);
+            painter_draw_line(painter, (Point){s.x - 1, s.y}, (Point){e.x + 1, s.y}, color);
         }
     }
 }
@@ -346,40 +346,40 @@ void painter_draw_line_y_aligned(Painter *painter, int y, int start, int end, Co
 
 void painter_draw_line_not_aligned(Painter *painter, Point a, Point b, Color color)
 {
-    int dx = abs(b.X - a.X), sx = a.X < b.X ? 1 : -1;
-    int dy = abs(b.Y - a.Y), sy = a.Y < b.Y ? 1 : -1;
+    int dx = abs(b.x - a.x), sx = a.x < b.x ? 1 : -1;
+    int dy = abs(b.y - a.y), sy = a.y < b.y ? 1 : -1;
     int err = (dx > dy ? dx : -dy) / 2, e2;
 
     for (;;)
     {
         painter_plot_pixel(painter, a, color);
 
-        if (a.X == b.X && a.Y == b.Y)
+        if (a.x == b.x && a.y == b.y)
             break;
 
         e2 = err;
         if (e2 > -dx)
         {
             err -= dy;
-            a.X += sx;
+            a.x += sx;
         }
         if (e2 < dy)
         {
             err += dx;
-            a.Y += sy;
+            a.y += sy;
         }
     }
 }
 
 __attribute__((flatten)) void painter_draw_line(Painter *painter, Point a, Point b, Color color)
 {
-    if (a.X == b.X)
+    if (a.x == b.x)
     {
-        painter_draw_line_x_aligned(painter, a.X, MIN(a.Y, b.Y), MAX(a.Y, b.Y), color);
+        painter_draw_line_x_aligned(painter, a.x, MIN(a.y, b.y), MAX(a.y, b.y), color);
     }
-    else if (a.Y == b.Y)
+    else if (a.y == b.y)
     {
-        painter_draw_line_y_aligned(painter, a.Y, MIN(a.X, b.X), MAX(a.X, b.X), color);
+        painter_draw_line_y_aligned(painter, a.y, MIN(a.x, b.x), MAX(a.x, b.x), color);
     }
     else
     {

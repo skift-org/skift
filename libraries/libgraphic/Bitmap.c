@@ -142,9 +142,9 @@ __attribute__((flatten)) void bitmap_copy(Bitmap *source, Bitmap *destination, R
         return;
     }
 
-    for (int y = region.Y; y < region.Y + region.height; y++)
+    for (int y = region.y; y < region.y + region.height; y++)
     {
-        for (int x = region.X; x < region.X + region.width; x++)
+        for (int x = region.x; x < region.x + region.width; x++)
         {
             bitmap_set_pixel_no_check(destination, (Point){x, y}, bitmap_get_pixel_no_check(source, (Point){x, y}));
         }

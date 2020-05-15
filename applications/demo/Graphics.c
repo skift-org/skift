@@ -22,14 +22,14 @@ void graphics_draw(Painter *painter, Rectangle screen, double time)
     {
         for (int y = 0; y < screen.height; y++)
         {
-            painter_plot_pixel(painter, (Point){screen.X + x, screen.Y + y}, (Color){{x ^ y, x ^ y, x ^ y, 255}});
+            painter_plot_pixel(painter, (Point){screen.x + x, screen.y + y}, (Color){{x ^ y, x ^ y, x ^ y, 255}});
         }
     }
 
     Rectangle test_image_bound = (Rectangle){
         {
-            screen.X + screen.width / 2 - (_frame % screen.width) / 2,
-            screen.Y + screen.height / 2 - (_frame % screen.height) / 2,
+            screen.x + screen.width / 2 - (_frame % screen.width) / 2,
+            screen.y + screen.height / 2 - (_frame % screen.height) / 2,
             _frame % screen.width,
             _frame % screen.height,
         }};

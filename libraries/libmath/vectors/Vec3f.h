@@ -4,36 +4,36 @@
 
 typedef struct
 {
-    double X;
-    double Y;
-    double Z;
+    double x;
+    double y;
+    double z;
 } Vec3f;
 
 static inline Vec3f vec3f_norm(Vec3f vector)
 {
-    double length = sqrt(vector.X * vector.X +
-                         vector.Y * vector.Y +
-                         vector.Z * vector.Z);
+    double length = sqrt(vector.x * vector.x +
+                         vector.y * vector.y +
+                         vector.z * vector.z);
 
-    vector.X /= length;
-    vector.Y /= length;
-    vector.Z /= length;
+    vector.x /= length;
+    vector.y /= length;
+    vector.z /= length;
 
     return vector;
 }
 
 static inline Vec3f vec3f_sub(Vec3f left, Vec3f right)
 {
-    return (Vec3f){left.X - right.X, left.Y - right.Y, left.Z - right.Z};
+    return (Vec3f){left.x - right.x, left.y - right.y, left.z - right.z};
 }
 
 static inline Vec3f vec3f_cross(Vec3f left, Vec3f right)
 {
     Vec3f result = {};
 
-    result.X = left.Y * right.Z - left.Z * right.Y;
-    result.Y = left.Z * right.X - left.X * right.Z;
-    result.Z = left.X * right.Y - left.Y * right.X;
+    result.x = left.y * right.z - left.z * right.y;
+    result.y = left.z * right.x - left.x * right.z;
+    result.z = left.x * right.y - left.y * right.x;
 
     result = vec3f_norm(result);
 
@@ -42,7 +42,7 @@ static inline Vec3f vec3f_cross(Vec3f left, Vec3f right)
 
 static inline double vec3f_dot(Vec3f left, Vec3f right)
 {
-    return left.X * right.X +
-           left.Y * right.Y +
-           left.Z * right.Z;
+    return left.x * right.x +
+           left.y * right.y +
+           left.z * right.z;
 }

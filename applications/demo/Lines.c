@@ -27,10 +27,10 @@ void lines_draw(Painter *painter, Rectangle screen, double time)
     Line line = {};
     stream_read(random_device, &line, sizeof(Line));
 
-    line.start.X = screen.X + abs((int)line.start.X % screen.width);
-    line.start.Y = screen.Y + abs((int)line.start.Y % screen.height);
-    line.finish.X = screen.X + abs((int)line.finish.X % screen.width);
-    line.finish.Y = screen.Y + abs((int)line.finish.Y % screen.height);
+    line.start.x = screen.x + abs((int)line.start.x % screen.width);
+    line.start.y = screen.y + abs((int)line.start.y % screen.height);
+    line.finish.x = screen.x + abs((int)line.finish.x % screen.width);
+    line.finish.y = screen.y + abs((int)line.finish.y % screen.height);
 
     line.color.A = 255;
 

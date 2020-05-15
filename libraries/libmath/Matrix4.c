@@ -53,31 +53,31 @@ Vec3f matrix_apply_tranform(Matrix4 matrix, Vec3f vector)
 {
     Vec3f result = {};
 
-    result.X = vector.X * matrix.m[0][0] +
-               vector.Y * matrix.m[1][0] +
-               vector.Z * matrix.m[2][0] +
+    result.x = vector.x * matrix.m[0][0] +
+               vector.y * matrix.m[1][0] +
+               vector.z * matrix.m[2][0] +
                matrix.m[3][0];
 
-    result.Y = vector.X * matrix.m[0][1] +
-               vector.Y * matrix.m[1][1] +
-               vector.Z * matrix.m[2][1] +
+    result.y = vector.x * matrix.m[0][1] +
+               vector.y * matrix.m[1][1] +
+               vector.z * matrix.m[2][1] +
                matrix.m[3][1];
 
-    result.Z = vector.X * matrix.m[0][2] +
-               vector.Y * matrix.m[1][2] +
-               vector.Z * matrix.m[2][2] +
+    result.z = vector.x * matrix.m[0][2] +
+               vector.y * matrix.m[1][2] +
+               vector.z * matrix.m[2][2] +
                matrix.m[3][2];
 
-    double w = vector.X * matrix.m[0][3] +
-               vector.Y * matrix.m[1][3] +
-               vector.Z * matrix.m[2][3] +
+    double w = vector.x * matrix.m[0][3] +
+               vector.y * matrix.m[1][3] +
+               vector.z * matrix.m[2][3] +
                matrix.m[3][3];
 
     if (w != 0.0f)
     {
-        result.X /= w;
-        result.Y /= w;
-        result.Z /= w;
+        result.x /= w;
+        result.y /= w;
+        result.z /= w;
     }
 
     return result;

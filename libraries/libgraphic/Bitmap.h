@@ -38,26 +38,26 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path);
 
 static inline void bitmap_set_pixel(Bitmap *bitmap, Point p, Color color)
 {
-    if ((p.X >= 0 && p.X < bitmap->width) && (p.Y >= 0 && p.Y < bitmap->height))
-        bitmap->pixels[(int)(p.X + p.Y * bitmap->width)] = color;
+    if ((p.x >= 0 && p.x < bitmap->width) && (p.y >= 0 && p.y < bitmap->height))
+        bitmap->pixels[(int)(p.x + p.y * bitmap->width)] = color;
 }
 
 static inline void bitmap_set_pixel_no_check(Bitmap *bitmap, Point position, Color color)
 {
-    bitmap->pixels[(int)(position.X + position.Y * bitmap->width)] = color;
+    bitmap->pixels[(int)(position.x + position.y * bitmap->width)] = color;
 }
 
 static inline Color bitmap_get_pixel(Bitmap *bitmap, Point p)
 {
-    int xi = abs((int)p.X % bitmap->width);
-    int yi = abs((int)p.Y % bitmap->height);
+    int xi = abs((int)p.x % bitmap->width);
+    int yi = abs((int)p.y % bitmap->height);
 
     return bitmap->pixels[xi + yi * bitmap->width];
 }
 
 static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Point position)
 {
-    return bitmap->pixels[position.X + position.Y * bitmap->width];
+    return bitmap->pixels[position.x + position.y * bitmap->width];
 }
 
 static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, double y)
@@ -72,14 +72,14 @@ static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, 
 
     if (bitmap->filtering == BITMAP_FILTERING_NEAREST)
     {
-        result = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi});
+        result = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi});
     }
     else
     {
-        Color c00 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi});
-        Color c10 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi});
-        Color c01 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi, src_rect.Y + yyi + 1});
-        Color c11 = bitmap_get_pixel(bitmap, (Point){src_rect.X + xxi + 1, src_rect.Y + yyi + 1});
+        Color c00 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi});
+        Color c10 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi + 1, src_rect.y + yyi});
+        Color c01 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi + 1});
+        Color c11 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi + 1, src_rect.y + yyi + 1});
 
         result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
     }

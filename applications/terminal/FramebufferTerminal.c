@@ -28,8 +28,8 @@ static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
 Rectangle framebuffer_terminal_cell_bound(int x, int y)
 {
     Rectangle bound;
-    bound.position = (Point){x * char_size.X, y * (int)(char_size.Y)};
-    bound.size = (Point){char_size.X, (char_size.Y)};
+    bound.position = (Point){x * char_size.x, y * (int)(char_size.y)};
+    bound.size = (Point){char_size.x, (char_size.y)};
 
     return bound;
 }
@@ -139,11 +139,11 @@ void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRende
 {
     __unused(terminal);
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, false);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, false);
 
     renderer->framebuffer_cursor = (Point){cursor.x, cursor.y};
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, true);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, true);
     renderer->cursor_blink = false;
 }
 
@@ -151,7 +151,7 @@ void framebuffer_terminal_on_blink(Terminal *terminal, FramebufferTerminalRender
 {
     renderer->cursor_blink = !renderer->cursor_blink;
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.X, renderer->framebuffer_cursor.Y, renderer->cursor_blink);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, renderer->cursor_blink);
 
     framebuffer_blit_dirty(renderer->framebuffer);
 }
@@ -186,5 +186,5 @@ Terminal *framebuffer_terminal_create(void)
     renderer->framebuffer = framebuffer;
     renderer->mono_font = font_create("mono");
 
-    return terminal_create(framebuffer->width / char_size.X, framebuffer->height / char_size.Y, TERMINAL_RENDERER(renderer));
+    return terminal_create(framebuffer->width / char_size.x, framebuffer->height / char_size.y, TERMINAL_RENDERER(renderer));
 }

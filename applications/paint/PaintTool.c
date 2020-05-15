@@ -46,8 +46,8 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
             painter_fill_rectangle(
                 document->painter,
                 RECTANGLE(
-                    event.mouse.position.X - 16,
-                    event.mouse.position.Y - 16,
+                    event.mouse.position.x - 16,
+                    event.mouse.position.y - 16,
                     32,
                     32),
                 document->primary_color);
@@ -59,8 +59,8 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
             painter_fill_rectangle(
                 document->painter,
                 RECTANGLE(
-                    event.mouse.position.X - 16,
-                    event.mouse.position.Y - 16,
+                    event.mouse.position.x - 16,
+                    event.mouse.position.y - 16,
                     32,
                     32),
                 document->secondary_color);
@@ -90,8 +90,8 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
             painter_clear_rectangle(
                 document->painter,
                 RECTANGLE(
-                    event.mouse.position.X - 16,
-                    event.mouse.position.Y - 16,
+                    event.mouse.position.x - 16,
+                    event.mouse.position.y - 16,
                     32,
                     32),
                 COLOR_RGBA(0, 0, 0, 0));
@@ -103,8 +103,8 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
             painter_clear_rectangle(
                 document->painter,
                 RECTANGLE(
-                    event.mouse.position.X - 16,
-                    event.mouse.position.Y - 16,
+                    event.mouse.position.x - 16,
+                    event.mouse.position.y - 16,
                     32,
                     32),
                 document->secondary_color);

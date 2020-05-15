@@ -4,13 +4,13 @@ Vec3f face_normal(Face face)
 {
     Vec3f line1, line2;
 
-    line1.X = face.b.X - face.a.X;
-    line1.Y = face.b.Y - face.a.Y;
-    line1.Z = face.b.Z - face.a.Z;
+    line1.x = face.b.x - face.a.x;
+    line1.y = face.b.y - face.a.y;
+    line1.z = face.b.z - face.a.z;
 
-    line2.X = face.c.X - face.a.X;
-    line2.Y = face.c.Y - face.a.Y;
-    line2.Z = face.c.Z - face.a.Z;
+    line2.x = face.c.x - face.a.x;
+    line2.y = face.c.y - face.a.y;
+    line2.z = face.c.z - face.a.z;
 
     return vec3f_cross(line1, line2);
 }

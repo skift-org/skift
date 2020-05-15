@@ -13,8 +13,8 @@ static void checker_board(Painter *painter, Rectangle rectangle)
         {
             Rectangle cell = (Rectangle){
                 {
-                    rectangle.X + x * CHECKER_SIZE,
-                    rectangle.Y + y * CHECKER_SIZE,
+                    rectangle.x + x * CHECKER_SIZE,
+                    rectangle.y + y * CHECKER_SIZE,
                     CHECKER_SIZE,
                     CHECKER_SIZE,
                 }};

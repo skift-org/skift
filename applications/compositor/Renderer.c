@@ -58,8 +58,8 @@ void renderer_region(Rectangle region)
             Rectangle destination = rectangle_clip(window_bound(window), region);
 
             Rectangle source = {{
-                (destination.X - window_bound(window).X),
-                (destination.Y - window_bound(window).Y),
+                (destination.x - window_bound(window).x),
+                (destination.y - window_bound(window).y),
                 destination.width,
                 destination.height,
             }};

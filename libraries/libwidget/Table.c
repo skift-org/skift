@@ -28,8 +28,8 @@ Rectangle table_body_bound(Table *widget)
 Rectangle table_row_bound(Table *widget, int row)
 {
     return (Rectangle){{
-        table_body_bound(widget).X,
-        table_body_bound(widget).Y + row * TABLE_ROW_HEIGHT - widget->scroll_offset,
+        table_body_bound(widget).x,
+        table_body_bound(widget).y + row * TABLE_ROW_HEIGHT - widget->scroll_offset,
         table_body_bound(widget).width,
         TABLE_ROW_HEIGHT,
     }};
@@ -42,8 +42,8 @@ Rectangle table_cell_bound(Table *widget, int row, int column)
     Rectangle row_bound = table_row_bound(widget, row);
 
     return (Rectangle){{
-        row_bound.X + column * column_width,
-        row_bound.Y,
+        row_bound.x + column * column_width,
+        row_bound.y,
         column_width,
         TABLE_ROW_HEIGHT,
     }};
@@ -66,14 +66,14 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
         painter_blit_icon(
             painter,
             data.icon,
-            (Rectangle){{cell_bound.X + 4, cell_bound.Y + 3, 18, 18}},
+            (Rectangle){{cell_bound.x + 4, cell_bound.y + 3, 18, 18}},
             widget_get_color(widget, THEME_FOREGROUND));
 
         painter_draw_string(
             painter,
             widget_font(),
             data.as_string,
-            (Point){cell_bound.X + 4 + 18 + 4, cell_bound.Y + 16},
+            (Point){cell_bound.x + 4 + 18 + 4, cell_bound.y + 16},
             widget_get_color(widget, THEME_FOREGROUND));
     }
     else
@@ -82,7 +82,7 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             painter,
             widget_font(),
             data.as_string,
-            (Point){cell_bound.X + 4, cell_bound.Y + 16},
+            (Point){cell_bound.x + 4, cell_bound.y + 16},
             widget_get_color(widget, THEME_FOREGROUND));
     }
 
@@ -93,7 +93,7 @@ int table_row_at(Table *widget, Point position)
 {
     position = point_sub(position, table_body_bound(widget).position);
 
-    int row = (position.Y + widget->scroll_offset) / TABLE_ROW_HEIGHT;
+    int row = (position.y + widget->scroll_offset) / TABLE_ROW_HEIGHT;
 
     if (row < 0 || row >= model_row_count(widget->model))
     {
@@ -135,8 +135,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
     for (int column = 0; column < column_count; column++)
     {
         Rectangle header_bound = (Rectangle){{
-            table_header_bound(widget).X + column * column_width,
-            table_header_bound(widget).Y,
+            table_header_bound(widget).x + column * column_width,
+            table_header_bound(widget).y,
             column_width,
             TABLE_ROW_HEIGHT,
         }};
@@ -147,8 +147,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
         painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.X + 4 + 1, header_bound.Y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.x + 4, header_bound.y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.x + 4 + 1, header_bound.y + 16}, widget_get_color(widget, THEME_FOREGROUND));
     }
 
     painter_pop_clip(painter);

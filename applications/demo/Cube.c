@@ -41,17 +41,17 @@ void cube_draw(Painter *painter, Rectangle screen, double time)
         Face tri = cude_mesh[i];
         Face triProjected;
 
-        tri.a.X -= 0.5;
-        tri.b.X -= 0.5;
-        tri.c.X -= 0.5;
+        tri.a.x -= 0.5;
+        tri.b.x -= 0.5;
+        tri.c.x -= 0.5;
 
-        tri.a.Y -= 0.5;
-        tri.b.Y -= 0.5;
-        tri.c.Y -= 0.5;
+        tri.a.y -= 0.5;
+        tri.b.y -= 0.5;
+        tri.c.y -= 0.5;
 
-        tri.a.Z -= 0.5;
-        tri.b.Z -= 0.5;
-        tri.c.Z -= 0.5;
+        tri.a.z -= 0.5;
+        tri.b.z -= 0.5;
+        tri.c.z -= 0.5;
 
         tri.a = matrix_apply_tranform(matRotZ, tri.a);
         tri.b = matrix_apply_tranform(matRotZ, tri.b);
@@ -61,9 +61,9 @@ void cube_draw(Painter *painter, Rectangle screen, double time)
         tri.b = matrix_apply_tranform(matRotX, tri.b);
         tri.c = matrix_apply_tranform(matRotX, tri.c);
 
-        tri.a.Z += 3.0;
-        tri.b.Z += 3.0;
-        tri.c.Z += 3.0;
+        tri.a.z += 3.0;
+        tri.b.z += 3.0;
+        tri.c.z += 3.0;
 
         if (vec3f_dot(face_normal(tri), vec3f_sub(tri.a, camera)) < 0.0)
         {
@@ -75,26 +75,26 @@ void cube_draw(Painter *painter, Rectangle screen, double time)
             triProjected.b = matrix_apply_tranform(projection, tri.b);
             triProjected.c = matrix_apply_tranform(projection, tri.c);
 
-            triProjected.a.X += 1;
-            triProjected.a.Y += 1;
-            triProjected.b.X += 1;
-            triProjected.b.Y += 1;
-            triProjected.c.X += 1;
-            triProjected.c.Y += 1;
+            triProjected.a.x += 1;
+            triProjected.a.y += 1;
+            triProjected.b.x += 1;
+            triProjected.b.y += 1;
+            triProjected.c.x += 1;
+            triProjected.c.y += 1;
 
-            triProjected.a.X *= 0.5 * screen.width + screen.X;
-            triProjected.a.Y *= 0.5 * screen.height + screen.Y;
-            triProjected.b.X *= 0.5 * screen.width + screen.X;
-            triProjected.b.Y *= 0.5 * screen.height + screen.Y;
-            triProjected.c.X *= 0.5 * screen.width + screen.X;
-            triProjected.c.Y *= 0.5 * screen.height + screen.Y;
+            triProjected.a.x *= 0.5 * screen.width + screen.x;
+            triProjected.a.y *= 0.5 * screen.height + screen.y;
+            triProjected.b.x *= 0.5 * screen.width + screen.x;
+            triProjected.b.y *= 0.5 * screen.height + screen.y;
+            triProjected.c.x *= 0.5 * screen.width + screen.x;
+            triProjected.c.y *= 0.5 * screen.height + screen.y;
 
-            //triProjected.a.X += screen.X;
-            //triProjected.a.Y += screen.Y;
-            //triProjected.b.X += screen.X;
-            //triProjected.b.Y += screen.Y;
-            //triProjected.c.X += screen.X;
-            //triProjected.c.Y += screen.Y;
+            //triProjected.a.x += screen.x;
+            //triProjected.a.y += screen.y;
+            //triProjected.b.x += screen.x;
+            //triProjected.b.y += screen.y;
+            //triProjected.c.x += screen.x;
+            //triProjected.c.y += screen.y;
 
             Color color = HSV((int)(time / 10 * 360) % 360, 0.5, light_force);
             painter3D_fill_face(painter, triProjected, color);

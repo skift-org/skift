@@ -111,11 +111,11 @@ void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
     IOCallDisplayBlitArgs args;
 
     args.buffer = (uint32_t *)framebuffer->backbuffer->pixels;
-    args.buffer_width = bitmap_bound(framebuffer->backbuffer).size.X;
-    args.buffer_height = bitmap_bound(framebuffer->backbuffer).size.Y;
+    args.buffer_width = bitmap_bound(framebuffer->backbuffer).size.x;
+    args.buffer_height = bitmap_bound(framebuffer->backbuffer).size.y;
 
-    args.blit_x = bound.X;
-    args.blit_y = bound.Y;
+    args.blit_x = bound.x;
+    args.blit_y = bound.y;
     args.blit_width = bound.width;
     args.blit_height = bound.height;
 

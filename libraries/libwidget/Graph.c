@@ -34,8 +34,8 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
         double data = graph_sample(widget, where);
 
         Rectangle bar = (Rectangle){{
-            widget_bound(widget).X + i,
-            widget_bound(widget).Y + widget_bound(widget).height * (1.0 - data),
+            widget_bound(widget).x + i,
+            widget_bound(widget).y + widget_bound(widget).height * (1.0 - data),
             1,
             widget_bound(widget).height,
         }};
@@ -47,8 +47,8 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
     }
 
     Rectangle cursor = (Rectangle){{
-        widget_bound(widget).X + widget_bound(widget).width * cursor_position,
-        widget_bound(widget).Y,
+        widget_bound(widget).x + widget_bound(widget).width * cursor_position,
+        widget_bound(widget).y,
         1,
         widget_bound(widget).height,
     }};

@@ -226,8 +226,8 @@ void window_dump(Window *window)
 {
     printf("Window(0x%p) (%d, %d) %dx%d\n",
            window,
-           window->on_screen_bound.X,
-           window->on_screen_bound.Y,
+           window->on_screen_bound.x,
+           window->on_screen_bound.y,
            window->on_screen_bound.width,
            window->on_screen_bound.height);
 
@@ -259,22 +259,22 @@ void window_begin_resize(Window *window, Point mouse_position)
 
     if (borders & RECTANGLE_BORDER_TOP)
     {
-        resize_region_begin.Y = window_bound_on_screen(window).Y + window_bound_on_screen(window).height;
+        resize_region_begin.y = window_bound_on_screen(window).y + window_bound_on_screen(window).height;
     }
 
     if (borders & RECTANGLE_BORDER_BOTTOM)
     {
-        resize_region_begin.Y = window_bound_on_screen(window).Y;
+        resize_region_begin.y = window_bound_on_screen(window).y;
     }
 
     if (borders & RECTANGLE_BORDER_LEFT)
     {
-        resize_region_begin.X = window_bound_on_screen(window).X + window_bound_on_screen(window).width;
+        resize_region_begin.x = window_bound_on_screen(window).x + window_bound_on_screen(window).width;
     }
 
     if (borders & RECTANGLE_BORDER_RIGHT)
     {
-        resize_region_begin.X = window_bound_on_screen(window).X;
+        resize_region_begin.x = window_bound_on_screen(window).x;
     }
 
     window->resize_begin = resize_region_begin;
@@ -287,13 +287,13 @@ void window_do_resize(Window *window, Point mouse_position)
 
     if (!window->resize_horizontal)
     {
-        new_bound.X = window_bound_on_screen(window).X;
+        new_bound.x = window_bound_on_screen(window).x;
         new_bound.width = window_bound_on_screen(window).width;
     }
 
     if (!window->resize_vertical)
     {
-        new_bound.Y = window_bound_on_screen(window).Y;
+        new_bound.y = window_bound_on_screen(window).y;
         new_bound.height = window_bound_on_screen(window).height;
     }
 

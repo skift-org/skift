@@ -6,7 +6,7 @@ typedef struct
 {
     Widget widget;
 
-    Point mouse_origine;
+    Vec2i mouse_origine;
 
     int track;
     int thumb;

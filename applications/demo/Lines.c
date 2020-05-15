@@ -10,8 +10,8 @@ static Stream *random_device = NULL;
 
 typedef struct
 {
-    Point start;
-    Point finish;
+    Vec2i start;
+    Vec2i finish;
     Color color;
 } Line;
 

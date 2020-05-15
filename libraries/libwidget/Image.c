@@ -18,7 +18,7 @@ void image_paint(Image *widget, Painter *painter, Rectangle rectangle)
     }
 }
 
-Point image_size(Image *widget)
+Vec2i image_size(Image *widget)
 {
     if (widget->bitmap)
     {

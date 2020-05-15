@@ -10,8 +10,8 @@ void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 
     if (event.type == EVENT_MOUSE_MOVE || event.type == EVENT_MOUSE_BUTTON_PRESS)
     {
-        Point from = event.mouse.old_position;
-        Point to = event.mouse.position;
+        Vec2i from = event.mouse.old_position;
+        Vec2i to = event.mouse.position;
 
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
@@ -123,7 +123,7 @@ PaintTool *eraser_tool_create(void)
     return tool;
 }
 
-static void flood_fill(Bitmap *bitmap, Point position, Color target, Color fill)
+static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
 {
     if (!rectangle_containe_point(bitmap_bound(bitmap), position))
     {
@@ -142,10 +142,10 @@ static void flood_fill(Bitmap *bitmap, Point position, Color target, Color fill)
 
     bitmap_set_pixel(bitmap, position, fill);
 
-    flood_fill(bitmap, point_add(position, (Point){1, 0}), target, fill);
-    flood_fill(bitmap, point_add(position, (Point){-1, 0}), target, fill);
-    flood_fill(bitmap, point_add(position, (Point){0, 1}), target, fill);
-    flood_fill(bitmap, point_add(position, (Point){0, -1}), target, fill);
+    flood_fill(bitmap, vec2i_add(position, vec2i(1, 0)), target, fill);
+    flood_fill(bitmap, vec2i_add(position, vec2i(-1, 0)), target, fill);
+    flood_fill(bitmap, vec2i_add(position, vec2i(0, 1)), target, fill);
+    flood_fill(bitmap, vec2i_add(position, vec2i(0, -1)), target, fill);
 }
 
 void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)

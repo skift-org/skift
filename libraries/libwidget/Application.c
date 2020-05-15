@@ -275,7 +275,7 @@ void application_flip_window(Window *window, Rectangle bound)
     application_wait_for_ack();
 }
 
-void application_move_window(Window *window, Point position)
+void application_move_window(Window *window, Vec2i position)
 {
     assert(_state >= APPLICATION_INITALIZED);
     assert(list_contains(_windows, window));

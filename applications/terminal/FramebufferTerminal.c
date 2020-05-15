@@ -1,6 +1,6 @@
 #include "terminal/FramebufferTerminal.h"
 
-static Point char_size = (Point){7, 16};
+static Vec2i char_size = vec2i(7, 16);
 
 static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = COLOR(0x000000),
@@ -28,8 +28,8 @@ static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
 Rectangle framebuffer_terminal_cell_bound(int x, int y)
 {
     Rectangle bound;
-    bound.position = (Point){x * char_size.x, y * (int)(char_size.y)};
-    bound.size = (Point){char_size.x, (char_size.y)};
+    bound.position = vec2i(x * char_size.x, y * (int)(char_size.y));
+    bound.size = vec2i(char_size.x, (char_size.y));
 
     return bound;
 }
@@ -57,8 +57,8 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
     {
         painter_draw_line(
             painter,
-            point_add(bound.position, (Point){0, 13}),
-            point_add(bound.position, (Point){bound.width, 13}),
+            vec2i_add(bound.position, vec2i(0, 13)),
+            vec2i_add(bound.position, vec2i(bound.width, 13)),
             foreground_color);
     }
 
@@ -75,7 +75,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
             painter,
             font,
             glyph,
-            point_add(bound.position, (Point){0, 12}),
+            vec2i_add(bound.position, vec2i(0, 12)),
             foreground_color);
 
         if (attributes.bold)
@@ -84,7 +84,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
                 painter,
                 font,
                 glyph,
-                point_add(bound.position, (Point){1, 12}),
+                vec2i_add(bound.position, vec2i(1, 12)),
                 foreground_color);
         }
     }
@@ -141,7 +141,7 @@ void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRende
 
     framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, false);
 
-    renderer->framebuffer_cursor = (Point){cursor.x, cursor.y};
+    renderer->framebuffer_cursor = vec2i(cursor.x, cursor.y);
 
     framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, true);
     renderer->cursor_blink = false;

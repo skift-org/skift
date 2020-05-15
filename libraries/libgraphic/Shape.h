@@ -10,12 +10,6 @@
 
 typedef struct __packed
 {
-    int x;
-    int y;
-} Point;
-
-typedef struct __packed
-{
     int top;
     int bottom;
     int left;
@@ -45,8 +39,8 @@ typedef union __packed
 
     struct
     {
-        Point position;
-        Point size;
+        Vec2i position;
+        Vec2i size;
     };
 } Rectangle;
 
@@ -54,57 +48,12 @@ typedef union __packed
 #define RECTANGLE_SIZE(__width, __height) ((Rectangle){{0, 0, (__width), (__height)}})
 #define RECTANGLE(__x, __y, __width, __height) ((Rectangle){{(__x), (__y), (__width), (__height)}})
 
-#define POINT_ZERO ((Point){0, 0})
-
-static inline Point point_add(Point a, Point b)
+static inline Vec2i vec2i_clamp_to_rect(Vec2i p, Rectangle rect)
 {
-    return (Point){a.x + b.x, a.y + b.y};
+    return vec2i_clamp(p, rect.position, vec2i_add(rect.position, rect.size));
 }
 
-static inline Point point_sub(Point a, Point b)
-{
-    return (Point){a.x - b.x, a.y - b.y};
-}
-
-static inline Point point_div(Point a, int value)
-{
-    return (Point){a.x / value, a.y / value};
-}
-
-static inline bool point_equ(Point lhs, Point rhs)
-{
-    return lhs.x == rhs.x && lhs.y == rhs.y;
-}
-
-static inline Point point_scale(Point a, double scale)
-{
-    return (Point){(int)(a.x * scale), (int)(a.y * scale)};
-}
-
-static inline Point point_x(Point p)
-{
-    return (Point){p.x, 0};
-}
-
-static inline Point point_y(Point p)
-{
-    return (Point){0, p.y};
-}
-
-static inline Point point_clamp(Point p, Point pmin, Point pmax)
-{
-    p.x = MAX(pmin.x, MIN(pmax.x, p.x));
-    p.y = MAX(pmin.y, MIN(pmax.y, p.y));
-
-    return p;
-}
-
-static inline Point point_clamp_to_rect(Point p, Rectangle rect)
-{
-    return point_clamp(p, rect.position, point_add(rect.position, rect.size));
-}
-
-static inline Rectangle rectangle_min_size(Rectangle rectangle, Point size)
+static inline Rectangle rectangle_min_size(Rectangle rectangle, Vec2i size)
 {
     rectangle.width = MIN(size.x, rectangle.width);
     rectangle.width = MIN(size.y, rectangle.height);
@@ -112,7 +61,7 @@ static inline Rectangle rectangle_min_size(Rectangle rectangle, Point size)
     return rectangle;
 }
 
-static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
+static inline Rectangle rectangle_max_size(Rectangle rectangle, Vec2i size)
 {
     rectangle.width = MAX(size.x, rectangle.width);
     rectangle.width = MAX(size.y, rectangle.height);
@@ -120,7 +69,7 @@ static inline Rectangle rectangle_max_size(Rectangle rectangle, Point size)
     return rectangle;
 }
 
-static inline Rectangle rectangle_from_two_point(Point a, Point b)
+static inline Rectangle rectangle_from_two_point(Vec2i a, Vec2i b)
 {
     return (Rectangle){{
         MIN(a.x, b.x),
@@ -145,18 +94,18 @@ static inline int rectangle_area(Rectangle rectangle)
 
 static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
 {
-    Point topleft;
+    Vec2i topleft;
     topleft.x = MIN(a.x, b.x);
     topleft.y = MIN(a.y, b.y);
 
-    Point bottomright;
+    Vec2i bottomright;
     bottomright.x = MAX(a.x + a.width, b.x + b.width);
     bottomright.y = MAX(a.y + a.height, b.y + b.height);
 
     Rectangle rectangle = {};
 
     rectangle.position = topleft;
-    rectangle.size = point_sub(bottomright, topleft);
+    rectangle.size = vec2i_sub(bottomright, topleft);
 
     return rectangle;
 }
@@ -172,7 +121,7 @@ static inline Rectangle rectangle_clip(Rectangle left, Rectangle right)
     return (Rectangle){{x, y, width, height}};
 }
 
-static inline bool rectangle_containe_point(Rectangle rectange, Point position)
+static inline bool rectangle_containe_point(Rectangle rectange, Vec2i position)
 {
     return (rectange.x <= position.x && (rectange.x + rectange.width) > position.x) &&
            (rectange.y <= position.y && (rectange.y + rectange.height) > position.y);
@@ -208,9 +157,9 @@ static inline Rectangle rectangle_expand(Rectangle rect, Insets spacing)
     return result;
 }
 
-static inline Rectangle rectangle_offset(Rectangle rect, Point offset)
+static inline Rectangle rectangle_offset(Rectangle rect, Vec2i offset)
 {
-    rect.position = point_add(rect.position, offset);
+    rect.position = vec2i_add(rect.position, offset);
 
     return rect;
 }
@@ -261,7 +210,7 @@ static inline Rectangle rectangle_right(Rectangle rect, int size)
 
 typedef unsigned RectangeBorder;
 
-static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Insets spacing, Point position)
+static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Insets spacing, Vec2i position)
 {
     RectangeBorder borders = 0;
 

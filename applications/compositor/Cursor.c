@@ -7,10 +7,10 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static Point _mouse_position;
+static Vec2i _mouse_position;
 static MouseButton _mouse_buttons;
 
-static Point _mouse_old_position;
+static Vec2i _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
 static Bitmap *_cursor_bitmaps[__CURSOR_COUNT] = {};
@@ -53,12 +53,12 @@ MouseButton cursor_pack_mouse_buttons(MousePacket packet)
     return buttons;
 }
 
-Point cursor_pack_mouse_position(MousePacket packet)
+Vec2i cursor_pack_mouse_position(MousePacket packet)
 {
-    return point_clamp_to_rect(
-        point_add(
+    return vec2i_clamp_to_rect(
+        vec2i_add(
             _mouse_position,
-            (Point){packet.offx, packet.offy}),
+            vec2i(packet.offx, packet.offy)),
         renderer_bound());
 }
 
@@ -73,7 +73,7 @@ void cursor_handle_packet(MousePacket packet)
     Window *window_under = manager_get_window_at(_mouse_position);
     Window *window_on_focus = manager_focus_window();
 
-    if (!point_equ(_mouse_old_position, _mouse_position))
+    if (!vec2i_equ(_mouse_old_position, _mouse_position))
     {
         renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_old_position));
         renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_position));
@@ -129,7 +129,7 @@ void cursor_render(Painter *painter)
     painter_blit_bitmap(painter, cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
 }
 
-Rectangle cursor_bound_from_position(Point position)
+Rectangle cursor_bound_from_position(Vec2i position)
 {
     CursorState state = cursor_get_state();
 
@@ -141,14 +141,14 @@ Rectangle cursor_bound_from_position(Point position)
         state == CURSOR_RESIZEHV ||
         state == CURSOR_RESIZEVH)
     {
-        bound.position = point_add(position, (Point){-14, -14});
+        bound.position = vec2i_add(position, vec2i(-14, -14));
     }
     else
     {
-        bound.position = point_add(position, (Point){-2, -2});
+        bound.position = vec2i_add(position, vec2i(-2, -2));
     }
 
-    bound.size = (Point){28, 28};
+    bound.size = vec2i(28, 28);
 
     return bound;
 }
@@ -158,13 +158,13 @@ Rectangle cursor_bound(void)
     return cursor_bound_from_position(_mouse_position);
 }
 
-Rectangle cursor_dirty_bound_from_position(Point position)
+Rectangle cursor_dirty_bound_from_position(Vec2i position)
 {
     Rectangle bound;
 
-    bound.position = point_add(position, (Point){-28, -28});
+    bound.position = vec2i_add(position, vec2i(-28, -28));
 
-    bound.size = (Point){56, 56};
+    bound.size = vec2i(56, 56);
 
     return bound;
 }

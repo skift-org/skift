@@ -11,7 +11,7 @@ typedef struct
 {
     Codepoint codepoint;
     Rectangle bound;
-    Point origin;
+    Vec2i origin;
     int advance;
 } Glyph;
 

@@ -56,9 +56,9 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
     painter_fill_rectangle(painter, cursor, widget_get_color(widget, THEME_BORDER));
 }
 
-Point graph_size(Graph *widget)
+Vec2i graph_size(Graph *widget)
 {
-    return (Point){widget->data_size, 100};
+    return vec2i(widget->data_size, 100);
 }
 
 void graph_record(Graph *widget, double data)

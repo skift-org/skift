@@ -11,7 +11,7 @@ struct Event;
 struct Painter;
 struct Window;
 
-typedef Point (*WidgetComputeSizeCallback)(struct Widget *widget);
+typedef Vec2i (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
@@ -134,7 +134,7 @@ void widget_set_event_handler(Widget *widget, EventType event, void *target, Wid
 
 void widget_clear_event_handler(Widget *widget, EventType event);
 
-Point widget_compute_size(Widget *widget);
+Vec2i widget_compute_size(Widget *widget);
 
 Rectangle __widget_bound(Widget *widget);
 #define widget_bound(__widget) __widget_bound(WIDGET(__widget))
@@ -145,7 +145,7 @@ Rectangle __widget_content_bound(Widget *widget);
 void widget_update(Widget *widget);
 void widget_update_region(Widget *widget, Rectangle region);
 
-Widget *widget_child_at(Widget *parent, Point position);
+Widget *widget_child_at(Widget *parent, Vec2i position);
 
 Color __widget_get_color(Widget *widget, ThemeColorRole role);
 

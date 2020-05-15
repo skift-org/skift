@@ -6,7 +6,7 @@
 
 #include "terminal/ApplicationTerminal.h"
 
-static Point _cell_size = (Point){7, 16};
+static Vec2i _cell_size = vec2i(7, 16);
 
 static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_DEFAULT_FOREGROUND] = THEME_ANSI_FOREGROUND,
@@ -45,8 +45,8 @@ Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
 {
     Rectangle bound = {};
 
-    bound.position = (Point){widget_bound(widget).x + x * _cell_size.x, widget_bound(widget).y + y * (int)(_cell_size.y)};
-    bound.size = (Point){_cell_size.x, (_cell_size.y)};
+    bound.position = vec2i(widget_bound(widget).x + x * _cell_size.x, widget_bound(widget).y + y * (int)(_cell_size.y));
+    bound.size = vec2i(_cell_size.x, (_cell_size.y));
 
     return bound;
 }
@@ -68,8 +68,8 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
     {
         painter_draw_line(
             painter,
-            point_add(bound.position, (Point){0, 13}),
-            point_add(bound.position, (Point){bound.width, 13}),
+            vec2i_add(bound.position, vec2i(0, 13)),
+            vec2i_add(bound.position, vec2i(bound.width, 13)),
             foreground);
     }
 
@@ -86,7 +86,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
             painter,
             get_terminal_font(),
             glyph,
-            point_add(bound.position, (Point){0, 12}),
+            vec2i_add(bound.position, vec2i(0, 12)),
             foreground);
 
         if (attributes.bold)
@@ -95,7 +95,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
                 painter,
                 get_terminal_font(),
                 glyph,
-                point_add(bound.position, (Point){1, 12}),
+                vec2i_add(bound.position, vec2i(1, 12)),
                 foreground);
         }
     }

@@ -65,7 +65,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             painter,
             widget_font(),
             element,
-            point_add(element_bound.position, (Point){0, 20}),
+            vec2i_add(element_bound.position, vec2i(0, 20)),
             widget_get_color(widget, THEME_FOREGROUND));
 
         current += text_width;

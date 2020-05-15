@@ -7,11 +7,11 @@ void separator_paint(Separator *widget, Painter *painter, Rectangle rectangle)
     painter_fill_rectangle(painter, rectangle, widget_get_color(widget, THEME_BORDER));
 }
 
-Point separtor_size(Separator *widget)
+Vec2i separtor_size(Separator *widget)
 {
     __unused(widget);
 
-    return (Point){1, 1};
+    return vec2i(1, 1);
 }
 
 Widget *separator_create(Widget *parent)

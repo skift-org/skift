@@ -43,7 +43,7 @@ typedef struct
 {
     int id;
 
-    Point position;
+    Vec2i position;
 } CompositorMoveWindow;
 
 typedef struct
@@ -73,7 +73,8 @@ typedef struct
 {
     CompositorMessageType type;
 
-    union {
+    union
+    {
         CompositorCreateWindow create_window;
         CompositorDestroyWindow destroy_window;
         CompositorResizeWindow resize_window;

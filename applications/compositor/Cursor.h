@@ -9,7 +9,7 @@ void cursor_handle_packet(MousePacket packet);
 
 void cursor_render(Painter *painter);
 
-Rectangle cursor_bound_from_position(Point position);
-Rectangle cursor_dirty_bound_from_position(Point position);
+Rectangle cursor_bound_from_position(Vec2i position);
+Rectangle cursor_dirty_bound_from_position(Vec2i position);
 
 Rectangle cursor_bound(void);

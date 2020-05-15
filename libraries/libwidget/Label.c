@@ -12,16 +12,15 @@ void label_paint(Label *label, Painter *painter, Rectangle rectangle)
         painter,
         widget_font(),
         label->text,
-        (Point){
+        vec2i(
             widget_bound(label).x + widget_bound(label).width / 2 - text_width / 2,
-            widget_bound(label).y + widget_bound(label).height / 2 + 4,
-        },
+            widget_bound(label).y + widget_bound(label).height / 2 + 4),
         widget_get_color(label, THEME_FOREGROUND));
 }
 
-Point label_size(Label *label)
+Vec2i label_size(Label *label)
 {
-    return (Point){font_measure_string(widget_font(), label->text), 16};
+    return vec2i(font_measure_string(widget_font(), label->text), 16);
 }
 
 void label_set_text(Widget *label, const char *text)

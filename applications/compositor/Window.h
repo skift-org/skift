@@ -36,15 +36,15 @@ Rectangle window_bound(Window *window);
 
 Rectangle window_cursor_capture_bound(Window *window);
 
-void window_move(Window *window, Point position);
+void window_move(Window *window, Vec2i position);
 
 void window_resize(Window *window, Rectangle bound);
 
-void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons);
+void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position, MouseButton buttons);
 
-void window_handle_mouse_buttons(Window *window, MouseButton old_buttons, MouseButton buttons, Point position);
+void window_handle_mouse_buttons(Window *window, MouseButton old_buttons, MouseButton buttons, Vec2i position);
 
-void window_handle_double_click(Window *window, Point position);
+void window_handle_double_click(Window *window, Vec2i position);
 
 void window_get_focus(Window *window);
 

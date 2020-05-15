@@ -51,7 +51,7 @@ Rectangle window_cursor_capture_bound(Window *window)
     return rectangle_expand(window_bound(window), INSETS(16));
 }
 
-void window_move(Window *window, Point position)
+void window_move(Window *window, Vec2i position)
 {
     renderer_region_dirty(window_bound(window));
 
@@ -69,9 +69,9 @@ void window_resize(Window *window, Rectangle bound)
     renderer_region_dirty(window_bound(window));
 }
 
-Point window_screen_window_position(Window *window, Point position)
+Vec2i window_screen_window_position(Window *window, Vec2i position)
 {
-    return point_sub(position, window_bound(window).position);
+    return vec2i_sub(position, window_bound(window).position);
 }
 
 void window_send_event(Window *window, Event event)
@@ -87,7 +87,7 @@ void window_send_event(Window *window, Event event)
     client_send_message(window->client, message);
 }
 
-void window_handle_mouse_move(Window *window, Point old_position, Point position, MouseButton buttons)
+void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position, MouseButton buttons)
 {
     Event event = {
         .type = EVENT_MOUSE_MOVE,
@@ -102,7 +102,7 @@ void window_handle_mouse_move(Window *window, Point old_position, Point position
     window_send_event(window, event);
 }
 
-void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Point position)
+void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Vec2i position)
 {
     bool was_button_pressed = button & old_buttons;
     bool is_button_pressed = button & buttons;
@@ -142,14 +142,14 @@ void window_handle_mouse_buttons(
     Window *window,
     MouseButton old_buttons,
     MouseButton buttons,
-    Point position)
+    Vec2i position)
 {
     window_handle_mouse_button(window, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
     window_handle_mouse_button(window, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
     window_handle_mouse_button(window, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
 }
 
-void window_handle_double_click(Window *window, Point position)
+void window_handle_double_click(Window *window, Vec2i position)
 {
     Event event = {
         .type = EVENT_MOUSE_DOUBLE_CLICK,

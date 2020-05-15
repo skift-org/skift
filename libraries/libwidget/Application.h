@@ -24,7 +24,7 @@ void application_hide_window(Window *window);
 
 void application_flip_window(Window *window, Rectangle bound);
 
-void application_move_window(Window *window, Point position);
+void application_move_window(Window *window, Vec2i position);
 
 void application_resize_window(Window *window, Rectangle bound);
 

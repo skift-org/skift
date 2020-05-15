@@ -234,7 +234,7 @@ void window_dump(Window *window)
     widget_dump(window->root_container, 1);
 }
 
-RectangeBorder window_resize_bound_containe(Window *window, Point position)
+RectangeBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
     Rectangle resize_bound = rectangle_expand(
         window_bound(window),
@@ -246,7 +246,7 @@ RectangeBorder window_resize_bound_containe(Window *window, Point position)
         position);
 }
 
-void window_begin_resize(Window *window, Point mouse_position)
+void window_begin_resize(Window *window, Vec2i mouse_position)
 {
     window->is_resizing = true;
 
@@ -255,7 +255,7 @@ void window_begin_resize(Window *window, Point mouse_position)
     window->resize_horizontal = borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT);
     window->resize_vertical = borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM);
 
-    Point resize_region_begin = {};
+    Vec2i resize_region_begin = {};
 
     if (borders & RECTANGLE_BORDER_TOP)
     {
@@ -280,10 +280,10 @@ void window_begin_resize(Window *window, Point mouse_position)
     window->resize_begin = resize_region_begin;
 }
 
-void window_do_resize(Window *window, Point mouse_position)
+void window_do_resize(Window *window, Vec2i mouse_position)
 {
 
-    Rectangle new_bound = rectangle_from_two_point(window->resize_begin, point_add(window_bound_on_screen(window).position, mouse_position));
+    Rectangle new_bound = rectangle_from_two_point(window->resize_begin, vec2i_add(window_bound_on_screen(window).position, mouse_position));
 
     if (!window->resize_horizontal)
     {
@@ -335,7 +335,7 @@ void window_handle_event(Window *window, Event *event)
     {
         if (window->is_dragging)
         {
-            Point offset = point_sub(event->mouse.position, event->mouse.old_position);
+            Vec2i offset = vec2i_sub(event->mouse.position, event->mouse.old_position);
             window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
             application_move_window(window, window->on_screen_bound.position);
         }

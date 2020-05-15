@@ -22,7 +22,7 @@ void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
     }
 }
 
-Point icon_size(Icon *widget)
+Vec2i icon_size(Icon *widget)
 {
     if (widget->bitmap)
     {

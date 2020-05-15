@@ -26,7 +26,7 @@ typedef struct Window
     bool is_resizing;
     bool resize_vertical;
     bool resize_horizontal;
-    Point resize_begin;
+    Vec2i resize_begin;
 
     WindowDestroyCallback destroy;
 

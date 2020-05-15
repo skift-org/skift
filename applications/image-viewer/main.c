@@ -45,11 +45,11 @@ int main(int argc, char **argv)
         {
             if (((y / ALPHA_PATTERN_SIZE) * framebuffer->width + (x / ALPHA_PATTERN_SIZE) + (y / ALPHA_PATTERN_SIZE) % 2) % 2 == 0)
             {
-                painter_plot_pixel(framebuffer->painter, (Point){x, y}, COLOR_LIGHTGREY);
+                painter_plot_pixel(framebuffer->painter, vec2i(x, y), COLOR_LIGHTGREY);
             }
             else
             {
-                painter_plot_pixel(framebuffer->painter, (Point){x, y}, COLOR_WHITE);
+                painter_plot_pixel(framebuffer->painter, vec2i(x, y), COLOR_WHITE);
             }
         }
     }

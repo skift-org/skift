@@ -62,8 +62,8 @@ void canvas_event(Canvas *widget, Event *event)
     {
         Event event_copy = *event;
 
-        event_copy.mouse.old_position = point_sub(event_copy.mouse.old_position, canvas_bound(widget).position);
-        event_copy.mouse.position = point_sub(event_copy.mouse.position, canvas_bound(widget).position);
+        event_copy.mouse.old_position = vec2i_sub(event_copy.mouse.old_position, canvas_bound(widget).position);
+        event_copy.mouse.position = vec2i_sub(event_copy.mouse.position, canvas_bound(widget).position);
 
         if (widget->document->tool->on_mouse_event)
             widget->document->tool->on_mouse_event(widget->document->tool, widget->document, event_copy);

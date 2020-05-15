@@ -30,7 +30,7 @@ Window *manager_get_window(struct Client *client, int id)
     return NULL;
 }
 
-Window *manager_get_window_at(Point position)
+Window *manager_get_window_at(Vec2i position)
 {
     list_foreach(Window, window, _managed_windows)
     {

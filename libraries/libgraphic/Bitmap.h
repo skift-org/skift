@@ -36,18 +36,18 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap);
 
 Result bitmap_save_to(Bitmap *bitmap, const char *path);
 
-static inline void bitmap_set_pixel(Bitmap *bitmap, Point p, Color color)
+static inline void bitmap_set_pixel(Bitmap *bitmap, Vec2i p, Color color)
 {
     if ((p.x >= 0 && p.x < bitmap->width) && (p.y >= 0 && p.y < bitmap->height))
         bitmap->pixels[(int)(p.x + p.y * bitmap->width)] = color;
 }
 
-static inline void bitmap_set_pixel_no_check(Bitmap *bitmap, Point position, Color color)
+static inline void bitmap_set_pixel_no_check(Bitmap *bitmap, Vec2i position, Color color)
 {
     bitmap->pixels[(int)(position.x + position.y * bitmap->width)] = color;
 }
 
-static inline Color bitmap_get_pixel(Bitmap *bitmap, Point p)
+static inline Color bitmap_get_pixel(Bitmap *bitmap, Vec2i p)
 {
     int xi = abs((int)p.x % bitmap->width);
     int yi = abs((int)p.y % bitmap->height);
@@ -55,7 +55,7 @@ static inline Color bitmap_get_pixel(Bitmap *bitmap, Point p)
     return bitmap->pixels[xi + yi * bitmap->width];
 }
 
-static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Point position)
+static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Vec2i position)
 {
     return bitmap->pixels[position.x + position.y * bitmap->width];
 }
@@ -72,14 +72,14 @@ static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, 
 
     if (bitmap->filtering == BITMAP_FILTERING_NEAREST)
     {
-        result = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi});
+        result = bitmap_get_pixel(bitmap, vec2i(src_rect.x + xxi, src_rect.y + yyi));
     }
     else
     {
-        Color c00 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi});
-        Color c10 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi + 1, src_rect.y + yyi});
-        Color c01 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi, src_rect.y + yyi + 1});
-        Color c11 = bitmap_get_pixel(bitmap, (Point){src_rect.x + xxi + 1, src_rect.y + yyi + 1});
+        Color c00 = bitmap_get_pixel(bitmap, vec2i(src_rect.x + xxi, src_rect.y + yyi));
+        Color c10 = bitmap_get_pixel(bitmap, vec2i(src_rect.x + xxi + 1, src_rect.y + yyi));
+        Color c01 = bitmap_get_pixel(bitmap, vec2i(src_rect.x + xxi, src_rect.y + yyi + 1));
+        Color c11 = bitmap_get_pixel(bitmap, vec2i(src_rect.x + xxi + 1, src_rect.y + yyi + 1));
 
         result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
     }
@@ -87,13 +87,13 @@ static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, 
     return result;
 }
 
-static inline void bitmap_blend_pixel(Bitmap *bitmap, Point p, Color color)
+static inline void bitmap_blend_pixel(Bitmap *bitmap, Vec2i p, Color color)
 {
     Color bg = bitmap_get_pixel(bitmap, p);
     bitmap_set_pixel(bitmap, p, color_blend(color, bg));
 }
 
-static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Point p, Color color)
+static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Vec2i p, Color color)
 {
     Color bg = bitmap_get_pixel_no_check(bitmap, p);
     bitmap_set_pixel_no_check(bitmap, p, color_blend(color, bg));

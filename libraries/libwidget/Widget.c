@@ -379,7 +379,7 @@ void widget_focus(Widget *widget)
     }
 }
 
-Point widget_compute_size(Widget *widget)
+Vec2i widget_compute_size(Widget *widget)
 {
     if (widget->size)
     {
@@ -393,13 +393,13 @@ Point widget_compute_size(Widget *widget)
 
         list_foreach(Widget, child, widget->childs)
         {
-            Point child_size = widget_compute_size(child);
+            Vec2i child_size = widget_compute_size(child);
 
             width = MAX(width, child_size.x);
             height = MAX(height, child_size.y);
         }
 
-        return (Point){width, height};
+        return vec2i(width, height);
     }
 }
 
@@ -429,7 +429,7 @@ Rectangle __widget_content_bound(Widget *widget)
     return rectangle_shrink(__widget_bound(widget), widget->insets);
 }
 
-Widget *widget_child_at(Widget *parent, Point position)
+Widget *widget_child_at(Widget *parent, Vec2i position)
 {
     list_foreach(Widget, child, parent->childs)
     {

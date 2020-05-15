@@ -35,8 +35,8 @@ typedef unsigned int MouseButton;
 
 typedef struct
 {
-    Point position;
-    Point old_position;
+    Vec2i position;
+    Vec2i old_position;
 
     MouseButton button;
     MouseButton buttons;
@@ -52,7 +52,8 @@ typedef struct Event
     EventType type;
     bool accepted;
 
-    union {
+    union
+    {
         MouseEvent mouse;
         KeyboardEvent keyboard;
     };

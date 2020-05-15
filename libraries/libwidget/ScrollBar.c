@@ -45,7 +45,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
     painter_blit_icon(painter, icon_cache_get_icon("chevron-down"), scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
 }
 
-static void scrollbar_scroll_to(ScrollBar *widget, Point mouse_position)
+static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 {
     int new_value = mouse_position.y - scrollbar_track(widget).y;
     widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track - widget->thumb / 2;
@@ -56,9 +56,9 @@ static void scrollbar_scroll_to(ScrollBar *widget, Point mouse_position)
     widget_update(WIDGET(widget));
 }
 
-static void scrollbar_scroll_thumb(ScrollBar *widget, Point mouse_position)
+static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
 {
-    mouse_position = point_sub(mouse_position, widget->mouse_origine);
+    mouse_position = vec2i_sub(mouse_position, widget->mouse_origine);
 
     int new_value = mouse_position.y - scrollbar_track(widget).y;
     widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track;
@@ -86,7 +86,7 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
                 scrollbar_scroll_to(widget, mouse_event.position);
             }
 
-            widget->mouse_origine = point_sub(mouse_event.position, scrollbar_thumb(widget).position);
+            widget->mouse_origine = vec2i_sub(mouse_event.position, scrollbar_thumb(widget).position);
         }
 
         event->accepted = true;

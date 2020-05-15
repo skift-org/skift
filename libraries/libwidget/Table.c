@@ -73,7 +73,7 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             painter,
             widget_font(),
             data.as_string,
-            (Point){cell_bound.x + 4 + 18 + 4, cell_bound.y + 16},
+            vec2i(cell_bound.x + 4 + 18 + 4, cell_bound.y + 16),
             widget_get_color(widget, THEME_FOREGROUND));
     }
     else
@@ -82,16 +82,16 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             painter,
             widget_font(),
             data.as_string,
-            (Point){cell_bound.x + 4, cell_bound.y + 16},
+            vec2i(cell_bound.x + 4, cell_bound.y + 16),
             widget_get_color(widget, THEME_FOREGROUND));
     }
 
     painter_pop_clip(painter);
 }
 
-int table_row_at(Table *widget, Point position)
+int table_row_at(Table *widget, Vec2i position)
 {
-    position = point_sub(position, table_body_bound(widget).position);
+    position = vec2i_sub(position, table_body_bound(widget).position);
 
     int row = (position.y + widget->scroll_offset) / TABLE_ROW_HEIGHT;
 
@@ -147,8 +147,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
         painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.x + 4, header_bound.y + 16}, widget_get_color(widget, THEME_FOREGROUND));
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), (Point){header_bound.x + 4 + 1, header_bound.y + 16}, widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 4, header_bound.y + 16), widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 4 + 1, header_bound.y + 16), widget_get_color(widget, THEME_FOREGROUND));
     }
 
     painter_pop_clip(painter);

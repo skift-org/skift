@@ -151,6 +151,47 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
     painter_pop_clip(painter);
 }
 
+static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim)
+{
+    int current = widget_content_bound(widget).position.components[dim];
+
+    int used_space_without_spacing =
+        widget_content_bound(widget).size.components[dim] -
+        (layout.spacing.components[dim] * (list_count(widget->childs) - 1));
+
+    int child_size = used_space_without_spacing / list_count(widget->childs);
+
+    int used_space_with_spacing =
+        child_size * list_count(widget->childs) +
+        (layout.spacing.components[dim] * (list_count(widget->childs) - 1));
+
+    int correction_space =
+        widget_content_bound(widget).size.components[dim] -
+        used_space_with_spacing;
+
+    list_foreach(Widget, child, widget->childs)
+    {
+        int current_child_size = MAX(1, child_size);
+        if (correction_space > 0)
+        {
+            current_child_size++;
+            correction_space--;
+        }
+
+        child->bound.position.components[dim] = current;
+
+        child->bound.position.components[dimension_invert_xy(dim)] =
+            widget_content_bound(widget).position.components[dimension_invert_xy(dim)];
+
+        child->bound.size.components[dim] = current_child_size;
+
+        child->bound.size.components[dimension_invert_xy(dim)] =
+            widget_content_bound(widget).size.components[dimension_invert_xy(dim)];
+
+        current += current_child_size + layout.spacing.components[dim];
+    }
+}
+
 void widget_layout(Widget *widget)
 {
     if (list_count(widget->childs) == 0)
@@ -177,8 +218,8 @@ void widget_layout(Widget *widget)
         int originX = widget_content_bound(widget).x;
         int originY = widget_content_bound(widget).y;
 
-        int child_width = (widget_content_bound(widget).width - (layout.hspacing * (layout.hcell - 1))) / layout.hcell;
-        int child_height = (widget_content_bound(widget).height - (layout.vspacing * (layout.vcell - 1))) / layout.vcell;
+        int child_width = (widget_content_bound(widget).width - (layout.spacing.components[DIM_X] * (layout.hcell - 1))) / layout.hcell;
+        int child_height = (widget_content_bound(widget).height - (layout.spacing.components[DIM_Y] * (layout.vcell - 1))) / layout.vcell;
 
         int index = 0;
         list_foreach(Widget, child, widget->childs)
@@ -187,8 +228,8 @@ void widget_layout(Widget *widget)
             int y = index / layout.hcell;
 
             child->bound = RECTANGLE(
-                originX + x * (child_width + layout.hspacing),
-                originY + y * (child_height + layout.vspacing),
+                originX + x * (child_width + layout.spacing.components[DIM_X]),
+                originY + y * (child_height + layout.spacing.components[DIM_Y]),
                 child_width,
                 child_height);
 
@@ -198,56 +239,12 @@ void widget_layout(Widget *widget)
     break;
 
     case LAYOUT_HGRID:
-    {
-        int current = widget_content_bound(widget).x;
-        int available_space_without_spacing = widget_content_bound(widget).width - (layout.hspacing * (list_count(widget->childs) - 1));
-        int child_width = available_space_without_spacing / list_count(widget->childs);
-        int used_space_with_spacing = child_width * list_count(widget->childs) + (layout.hspacing * (list_count(widget->childs) - 1));
-        int correction_space = widget_content_bound(widget).width - used_space_with_spacing;
-
-        list_foreach(Widget, child, widget->childs)
-        {
-            if (correction_space > 0)
-            {
-                child->bound = RECTANGLE(current, widget_content_bound(widget).position.y, MAX(1, child_width + 1), widget_content_bound(widget).height);
-                current += MAX(1, child_width + 1) + layout.hspacing;
-
-                correction_space--;
-            }
-            else
-            {
-                child->bound = RECTANGLE(current, widget_content_bound(widget).position.y, MAX(1, child_width), widget_content_bound(widget).height);
-                current += MAX(1, child_width) + layout.hspacing;
-            }
-        }
-    }
-    break;
+        widget_do_vhgrid_layout(widget, layout, DIM_X);
+        break;
 
     case LAYOUT_VGRID:
-    {
-        int current = widget_content_bound(widget).y;
-        int available_space_without_spacing = widget_content_bound(widget).height - (layout.vspacing * (list_count(widget->childs) - 1));
-        int child_height = available_space_without_spacing / list_count(widget->childs);
-        int used_space_with_spacing = child_height * list_count(widget->childs) + (layout.vspacing * (list_count(widget->childs) - 1));
-        int correction_space = widget_content_bound(widget).height - used_space_with_spacing;
-
-        list_foreach(Widget, child, widget->childs)
-        {
-            if (correction_space > 0)
-            {
-                child->bound = RECTANGLE(widget_content_bound(widget).position.x, current, widget_content_bound(widget).width, MAX(1, child_height + 1));
-                current += MAX(1, child_height + 1) + layout.vspacing;
-
-                correction_space--;
-            }
-            else
-            {
-                child->bound = RECTANGLE(widget_content_bound(widget).position.x, current, widget_content_bound(widget).width, MAX(1, child_height));
-                current += MAX(1, child_height) + layout.vspacing;
-            }
-        }
-    }
-    break;
+        widget_do_vhgrid_layout(widget, layout, DIM_Y);
+        break;
 
     case LAYOUT_HFLOW:
     {
@@ -271,7 +268,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_content_bound(widget).width -
-            layout.hspacing * (list_count(widget->childs) - 1);
+            layout.spacing.components[DIM_X] * (list_count(widget->childs) - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
@@ -289,7 +286,7 @@ void widget_layout(Widget *widget)
                     fill_child_width,
                     widget_content_bound(widget).height);
 
-                current += fill_child_width + layout.hspacing;
+                current += fill_child_width + layout.spacing.components[DIM_X];
             }
             else
             {
@@ -299,7 +296,7 @@ void widget_layout(Widget *widget)
                     widget_compute_size(child).x,
                     widget_content_bound(widget).height);
 
-                current += widget_compute_size(child).x + layout.hspacing;
+                current += widget_compute_size(child).x + layout.spacing.components[DIM_X];
             }
         }
     }
@@ -327,7 +324,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_content_bound(widget).height -
-            layout.vspacing * (list_count(widget->childs) - 1);
+            layout.spacing.components[DIM_Y] * (list_count(widget->childs) - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 
@@ -345,7 +342,7 @@ void widget_layout(Widget *widget)
                     widget_content_bound(widget).width,
                     fill_child_height);
 
-                current += fill_child_height + layout.vspacing;
+                current += fill_child_height + layout.spacing.components[DIM_Y];
             }
             else
             {
@@ -355,7 +352,7 @@ void widget_layout(Widget *widget)
                     widget_content_bound(widget).width,
                     widget_compute_size(child).y);
 
-                current += widget_compute_size(child).y + layout.vspacing;
+                current += widget_compute_size(child).y + layout.spacing.components[DIM_Y];
             }
         }
     }

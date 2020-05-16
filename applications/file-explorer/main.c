@@ -141,7 +141,7 @@ Window *file_explorer_window_create(const char *current_path)
 {
     FileExplorerWindow *window = __create(FileExplorerWindow);
 
-    window_initialize((Window *)window, "folder", "File Explorer", 500, 400, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, "folder", "File Explorer", 700, 500, WINDOW_RESIZABLE);
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);
 

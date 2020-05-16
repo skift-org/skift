@@ -122,7 +122,10 @@ void widget_dispatch_event(Widget *widget, Event *event)
     if (!event->accepted && widget->event_handles[event->type].callback != NULL)
     {
         event->accepted = true;
-        widget->event_handles[event->type].callback(widget->event_handles[event->type].target, widget, event);
+        widget->event_handles[event->type].callback(
+            widget->event_handles[event->type].target,
+            widget,
+            event);
     }
 
     if (!event->accepted && widget->parent)
@@ -153,6 +156,8 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 
 static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim)
 {
+    Dimension ivdim = dimension_invert_xy(dim);
+
     int current = widget_content_bound(widget).position.components[dim];
 
     int used_space_without_spacing =
@@ -180,13 +185,13 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
 
         child->bound.position.components[dim] = current;
 
-        child->bound.position.components[dimension_invert_xy(dim)] =
-            widget_content_bound(widget).position.components[dimension_invert_xy(dim)];
+        child->bound.position.components[ivdim] =
+            widget_content_bound(widget).position.components[ivdim];
 
         child->bound.size.components[dim] = current_child_size;
 
-        child->bound.size.components[dimension_invert_xy(dim)] =
-            widget_content_bound(widget).size.components[dimension_invert_xy(dim)];
+        child->bound.size.components[ivdim] =
+            widget_content_bound(widget).size.components[ivdim];
 
         current += current_child_size + layout.spacing.components[dim];
     }

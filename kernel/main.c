@@ -27,6 +27,7 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/multiboot/Multiboot.h"
+#include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/platform.h"
 #include "kernel/serial.h"
@@ -112,7 +113,8 @@ void kmain(void *info, uint magic)
     serial_initialize();
     mouse_initialize();
     keyboard_initialize();
-    info_initialize();
+    process_info_initialize();
+    device_info_initialize();
     // textmode_initialize();
 
     userspace_initialize();

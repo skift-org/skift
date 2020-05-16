@@ -25,7 +25,7 @@ static const char *TASK_STATES[] = {
     "canceled",
 };
 
-Result info_FsOperationOpen(FsInfo *node, FsHandle *handle)
+Result process_info_FsOperationOpen(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -57,7 +57,7 @@ Result info_FsOperationOpen(FsInfo *node, FsHandle *handle)
     return SUCCESS;
 }
 
-void info_FsOperationClose(FsInfo *node, FsHandle *handle)
+void process_info_FsOperationClose(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -67,7 +67,7 @@ void info_FsOperationClose(FsInfo *node, FsHandle *handle)
     }
 }
 
-Result info_FsOperationRead(FsInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+Result process_info_FsOperationRead(FsProcessInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
 
@@ -80,7 +80,7 @@ Result info_FsOperationRead(FsInfo *node, FsHandle *handle, void *buffer, size_t
     return SUCCESS;
 }
 
-size_t info_FsOperationSize(FsInfo *node, FsHandle *handle)
+size_t process_info_FsOperationSize(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -94,22 +94,22 @@ size_t info_FsOperationSize(FsInfo *node, FsHandle *handle)
     }
 }
 
-FsNode *info_create(void)
+FsNode *process_info_create(void)
 {
-    FsInfo *info = __create(FsInfo);
+    FsProcessInfo *info = __create(FsProcessInfo);
 
     fsnode_init(FSNODE(info), FILE_TYPE_DEVICE);
 
-    FSNODE(info)->open = (FsOperationOpen)info_FsOperationOpen;
-    FSNODE(info)->read = (FsOperationRead)info_FsOperationRead;
-    FSNODE(info)->size = (FsOperationSize)info_FsOperationSize;
+    FSNODE(info)->open = (FsOperationOpen)process_info_FsOperationOpen;
+    FSNODE(info)->read = (FsOperationRead)process_info_FsOperationRead;
+    FSNODE(info)->size = (FsOperationSize)process_info_FsOperationSize;
 
     return (FsNode *)info;
 }
 
-void info_initialize(void)
+void process_info_initialize(void)
 {
-    FsNode *info_device = info_create();
+    FsNode *info_device = process_info_create();
 
     Path *info_device_path = path_create("/sys/processes");
     filesystem_link_and_take_ref(info_device_path, info_device);

@@ -18,21 +18,23 @@ typedef struct
     int device_id;
 } DeviceInfo;
 
-typedef bool (*DeviceDriverMatch)(DeviceInfo info);
-typedef void (*DeviceDriverInitialize)(DeviceInfo info);
+typedef bool (*DeviceDriverInfoMatch)(DeviceInfo info);
+typedef void (*DeviceDriverInfoInitialize)(DeviceInfo info);
 
 typedef struct
 {
     const char *description;
 
     Bus bus;
-    DeviceDriverMatch match;
-    DeviceDriverInitialize initialize;
-} DeviceDriver;
+    DeviceDriverInfoMatch match;
+    DeviceDriverInfoInitialize initialize;
+} DeviceDriverInfo;
 
 typedef IterationDecision (*DeviceIterateCallback)(void *target, DeviceInfo device);
 
 void device_initialize(void);
+
+const DeviceDriverInfo *device_get_diver_info(DeviceInfo info);
 
 void device_iterate(void *target, DeviceIterateCallback callback);
 

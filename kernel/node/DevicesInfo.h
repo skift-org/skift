@@ -9,8 +9,8 @@
 typedef struct
 {
     FsNode node;
-} FsProcessInfo;
+} FsDeviceInfo;
 
-FsNode *process_info_create(void);
+FsNode *device_info_create(void);
 
-void process_info_initialize(void);
+void device_info_initialize(void);

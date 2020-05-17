@@ -40,6 +40,12 @@ void show_terminal()
     launchpad_launch(terminal, NULL);
 }
 
+void open_task_manager()
+{
+    Launchpad *terminal = launchpad_create("task-manager", "/bin/task-manager");
+    launchpad_launch(terminal, NULL);
+}
+
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
@@ -71,6 +77,8 @@ int main(int argc, char **argv)
     timer_start(timer_create(widget_date_and_time, 500, (TimerCallback)widget_date_and_time_update));
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
+
+    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, NULL, open_task_manager);
 
     window_show(window);
 

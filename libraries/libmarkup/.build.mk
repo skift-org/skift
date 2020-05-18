@@ -1,0 +1,3 @@
+LIBS += MARKUP
+
+MARKUP_NAME = markup

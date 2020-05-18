@@ -15,6 +15,7 @@ UTILS = \
 	KILL \
 	LS \
 	LSPROC \
+	MARKUP \
 	MKDIR \
 	MV \
 	NOW \
@@ -70,6 +71,9 @@ LS_LIBS =
 
 LSPROC_NAME = lsproc
 LSPROC_LIBS =
+
+MARKUP_NAME = markup
+MARKUP_LIBS = markup
 
 MKDIR_NAME = mkdir
 MKDIR_LIBS =

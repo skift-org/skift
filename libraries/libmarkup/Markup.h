@@ -25,6 +25,10 @@ void markup_node_add_child(MarkupNode *parent, MarkupNode *child);
 
 void markup_node_add_attribute(MarkupNode *node, MarkupAttribute *attribute);
 
+const char *markup_node_get_attribute(MarkupNode *node, const char *name);
+
+const char *markup_node_get_attribute_or_default(MarkupNode *node, const char *name, const char *default_value);
+
 const char *markup_node_type(MarkupNode *node);
 
 MarkupAttribute *markup_attribute_create(const char *name, const char *value);

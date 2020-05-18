@@ -1,0 +1,18 @@
+<Window
+    title="About"
+    icon="information"
+    width="250"
+    height="250">
+
+    <Container layout="vgrid(8)" insets="0 8 8">
+        <Image id="image-system-icon"/>
+
+        <Container layout="vgrid(2)">
+            <Label id="label-system-full-name"/>
+            <Label id="label-system-release"/>
+            <Label id="label-system-copyright"/>
+
+            <Button id="button-ok">
+        </Container>
+    </Container>
+</Window>

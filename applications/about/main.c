@@ -4,6 +4,7 @@
 #include <libwidget/Container.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
+#include <libwidget/Markup.h>
 
 void ok_button_pressed(void *target, Widget *sender, Event *event)
 {
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    window_show(about_dialog_create());
+    window_show(window_create_from_file("/res/layouts/about.markup"));
 
     return application_run();
 }

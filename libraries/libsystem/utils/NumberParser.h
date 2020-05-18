@@ -12,7 +12,11 @@ typedef struct
 #define PARSER_DECIMAL ((NumberParser){10})
 #define PARSER_HEXADECIMAL ((NumberParser){16})
 
+unsigned int parse_uint_inline(NumberParser parser, const char *str, uint default_value);
+
 bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int *result);
+
+int parse_int_inline(NumberParser parser, const char *str, int default_value);
 
 bool parse_int(NumberParser parser, const char *str, size_t size, int *result);
 

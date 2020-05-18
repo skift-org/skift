@@ -35,6 +35,39 @@ void markup_node_add_attribute(MarkupNode *node, MarkupAttribute *attribute)
     list_pushback(node->attributes, attribute);
 }
 
+const char *markup_node_get_attribute(MarkupNode *node, const char *name)
+{
+    list_foreach(MarkupAttribute, attribute, node->childs)
+    {
+        if (strcmp(attribute->name, name) == 0)
+        {
+            return attribute->value;
+        }
+    }
+
+    return NULL;
+}
+
+const char *markup_node_get_attribute_or_default(MarkupNode *node, const char *name, const char *default_value)
+{
+    list_foreach(MarkupAttribute, attribute, node->attributes)
+    {
+        if (strcmp(attribute->name, name) == 0)
+        {
+            if (attribute->value)
+            {
+                return attribute->value;
+            }
+            else
+            {
+                return default_value;
+            }
+        }
+    }
+
+    return default_value;
+}
+
 const char *markup_node_type(MarkupNode *node)
 {
     return node->type;

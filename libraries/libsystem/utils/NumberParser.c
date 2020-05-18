@@ -1,11 +1,23 @@
+#include <libsystem/cstring.h>
 #include <libsystem/utils/NumberParser.h>
 
 static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
 static const char *digits_capitalized = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+unsigned int parse_uint_inline(NumberParser parser, const char *str, uint default_value)
+{
+    uint result = 0;
+    if (parse_uint(parser, str, strlen(str), &result))
+    {
+        return result;
+    }
+
+    return default_value;
+}
+
 bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int *result)
 {
-    if (size == 0)
+    if (str == NULL || size == 0)
     {
         *result = 0;
         return false;
@@ -30,9 +42,25 @@ bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int 
     return true;
 }
 
+int parse_int_inline(NumberParser parser, const char *str, int default_value)
+{
+    if (str == NULL)
+    {
+        return default_value;
+    }
+
+    int result = 0;
+    if (parse_int(parser, str, strlen(str), &result))
+    {
+        return result;
+    }
+
+    return default_value;
+}
+
 bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
 {
-    if (size == 0)
+    if (str == NULL || size == 0)
     {
         *result = 0;
         return false;

@@ -34,16 +34,16 @@ void widget_cpu_update(Graph *widget)
     graph_record(widget, status.cpu_usage / 100.0);
 }
 
-void show_terminal()
+void open_menu()
 {
-    Launchpad *terminal = launchpad_create("menu", "/bin/menu");
-    launchpad_launch(terminal, NULL);
+    Launchpad *menu = launchpad_create("menu", "/bin/menu");
+    launchpad_launch(menu, NULL);
 }
 
 void open_task_manager()
 {
-    Launchpad *terminal = launchpad_create("task-manager", "/bin/task-manager");
-    launchpad_launch(terminal, NULL);
+    Launchpad *task_manager = launchpad_create("task-manager", "/bin/task-manager");
+    launchpad_launch(task_manager, NULL);
 }
 
 int main(int argc, char **argv)
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     window_root(window)->insets = INSETS(0, 8);
 
     Widget *menu = icon_create(window_root(window), "menu");
-    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_PRESS, NULL, show_terminal);
+    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_PRESS, NULL, open_menu);
 
     label_create(window_root(window), "skiftOS");
 

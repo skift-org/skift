@@ -9,7 +9,7 @@ RingBuffer *ringbuffer_create(size_t size)
 {
     RingBuffer *ringbuffer = (RingBuffer *)calloc(1, sizeof(RingBuffer) + size);
 
-    ringbuffer->buffer_allocated = size;
+    ringbuffer->size = size;
 
     return ringbuffer;
 }
@@ -21,12 +21,17 @@ void ringbuffer_destroy(RingBuffer *ringbuffer)
 
 bool ringbuffer_is_empty(RingBuffer *ringbuffer)
 {
-    return ringbuffer->buffer_used == 0;
+    return !ringbuffer_used(ringbuffer);
 }
 
 bool ringbuffer_is_full(RingBuffer *ringbuffer)
 {
-    return ringbuffer->buffer_used == ringbuffer->buffer_allocated;
+    return ringbuffer_used(ringbuffer) == ringbuffer->size;
+}
+
+size_t ringbuffer_used(RingBuffer *ringbuffer)
+{
+    return ringbuffer->used;
 }
 
 void ringbuffer_putc(RingBuffer *ringbuffer, char c)
@@ -34,8 +39,8 @@ void ringbuffer_putc(RingBuffer *ringbuffer, char c)
     assert(!ringbuffer_is_full(ringbuffer));
 
     ringbuffer->buffer[ringbuffer->head] = c;
-    ringbuffer->head = (ringbuffer->head + 1) % (ringbuffer->buffer_allocated);
-    ringbuffer->buffer_used++;
+    ringbuffer->head = (ringbuffer->head + 1) % (ringbuffer->size);
+    ringbuffer->used++;
 }
 
 char ringbuffer_getc(RingBuffer *ringbuffer)
@@ -43,10 +48,17 @@ char ringbuffer_getc(RingBuffer *ringbuffer)
     assert(!ringbuffer_is_empty(ringbuffer));
 
     char c = ringbuffer->buffer[ringbuffer->tail];
-    ringbuffer->tail = (ringbuffer->tail + 1) % (ringbuffer->buffer_allocated);
-    ringbuffer->buffer_used--;
+    ringbuffer->tail = (ringbuffer->tail + 1) % (ringbuffer->size);
+    ringbuffer->used--;
 
     return c;
+}
+
+char ringbuffer_peek(RingBuffer *ringbuffer, size_t peek)
+{
+    int offset = (ringbuffer->tail + peek) % (ringbuffer->size);
+
+    return ringbuffer->buffer[offset];
 }
 
 size_t ringbuffer_read(RingBuffer *ringbuffer, char *buffer, size_t size)

@@ -9,7 +9,7 @@ typedef struct
     bool color;
 } JsonPrettifyState;
 
-const char *depth_color[] = {
+static const char *depth_color[] = {
     "\e[91m",
     "\e[92m",
     "\e[93m",
@@ -18,9 +18,9 @@ const char *depth_color[] = {
     "\e[96m",
 };
 
-void json_prettify_internal(JsonPrettifyState *state, JsonValue *value);
+static void json_prettify_internal(JsonPrettifyState *state, JsonValue *value);
 
-void json_prettify_ident(JsonPrettifyState *state)
+static void json_prettify_ident(JsonPrettifyState *state)
 {
     buffer_builder_append_chr(state->builder, '\n');
     for (int i = 0; i < state->depth; i++)
@@ -29,7 +29,7 @@ void json_prettify_ident(JsonPrettifyState *state)
     }
 }
 
-IterationDecision json_prettify_object(JsonPrettifyState *state, char *key, JsonValue *value)
+static IterationDecision json_prettify_object(JsonPrettifyState *state, char *key, JsonValue *value)
 {
     json_prettify_ident(state);
 
@@ -54,7 +54,7 @@ IterationDecision json_prettify_object(JsonPrettifyState *state, char *key, Json
     return ITERATION_CONTINUE;
 }
 
-IterationDecision json_prettify_array(JsonPrettifyState *state, JsonValue *value)
+static IterationDecision json_prettify_array(JsonPrettifyState *state, JsonValue *value)
 {
     json_prettify_ident(state);
     json_prettify_internal(state, value);
@@ -63,7 +63,7 @@ IterationDecision json_prettify_array(JsonPrettifyState *state, JsonValue *value
     return ITERATION_CONTINUE;
 }
 
-void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)
+static void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)
 {
     switch (value->type)
     {

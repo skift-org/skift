@@ -5,120 +5,82 @@
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberParser.h>
+#include <libsystem/utils/SourceReader.h>
 
-typedef struct
+#define JSON_WHITESPACE " \n\r\t"
+#define JSON_DIGITS "0123456789"
+#define JSON_XDIGITS "0123456789abcdef"
+#define JSON_ALPHA "abcdefghijklmnopqrstuvwxyz"
+
+static JsonValue *value(SourceReader *source);
+
+static void whitespace(SourceReader *source)
 {
-    const char *str;
-    size_t size;
-    size_t offset;
-} JsonParser;
-
-static JsonValue *value(JsonParser *parser);
-
-static void next(JsonParser *parser)
-{
-    if (parser->offset < parser->size)
-    {
-        parser->offset++;
-    }
+    source_eat(source, JSON_WHITESPACE);
 }
 
-static char current(JsonParser *parser)
-{
-    if (parser->offset < parser->size)
-    {
-        return parser->str[parser->offset];
-    }
-    else
-    {
-        return '\0';
-    }
-}
-
-static bool current_is(JsonParser *parser, const char *what)
-{
-    for (size_t i = 0; what[i]; i++)
-    {
-        if (current(parser) == what[i])
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-static void whitespace(JsonParser *parser)
-{
-    while (current_is(parser, " \n\r\t"))
-    {
-        next(parser);
-    }
-}
-
-int digits(JsonParser *parser)
+static int digits(SourceReader *source)
 {
     int digits = 0;
 
-    while (current_is(parser, "0123456789"))
+    while (source_current_is(source, JSON_DIGITS))
     {
         digits *= 10;
-        digits += current(parser) - '0';
-        next(parser);
+        digits += source_current(source) - '0';
+        source_foreward(source);
     }
 
     return digits;
 }
 
-static JsonValue *number(JsonParser *parser)
+static JsonValue *number(SourceReader *source)
 {
     int ipart_sign = 1;
 
-    if (current(parser) == '-')
+    if (source_skip(source, '-'))
     {
         ipart_sign = -1;
-        next(parser);
     }
 
     int ipart = 0;
 
-    if (current_is(parser, "0123456789"))
+    if (source_current_is(source, JSON_DIGITS))
     {
-        ipart = digits(parser);
+        ipart = digits(source);
     }
 
     double fpart = 0;
 
-    if (current(parser) == '.')
+    if (source_current(source) == '.')
     {
-        next(parser);
+        source_foreward(source);
 
         double multiplier = 0.1;
 
-        while (current_is(parser, "0123456789"))
+        while (source_current_is(source, JSON_DIGITS))
         {
-            fpart += multiplier * (current(parser) - '0');
+            fpart += multiplier * (source_current(source) - '0');
             multiplier *= 0.1;
-            next(parser);
+            source_foreward(source);
         }
     }
 
     int exp = 0;
 
-    if (current_is(parser, "eE"))
+    if (source_current_is(source, "eE"))
     {
-        next(parser);
+        source_foreward(source);
         int exp_sign = 1;
 
-        if (current(parser) == '-')
+        if (source_current(source) == '-')
         {
             exp_sign = -1;
         }
 
-        if (current_is(parser, "+-"))
-            next(parser);
+        if (source_current_is(source, "+-"))
+            source_foreward(source);
 
-        exp = digits(parser) * exp_sign;
+        exp = digits(source) * exp_sign;
     }
 
     if (fpart == 0 && exp >= 0)
@@ -131,173 +93,154 @@ static JsonValue *number(JsonParser *parser)
     }
 }
 
-static char *string(JsonParser *parser)
+static const char *escape(SourceReader *source)
 {
-    BufferBuilder *builder = buffer_builder_create(16);
+    source_skip(source, '\\');
+    char chr = source_current(source);
 
-    if (current(parser) == '"')
-        next(parser);
-
-    while (current(parser) != '"')
+    switch (chr)
     {
-        if (current(parser) == '\\')
+    case '"':
+        return "\"";
+
+    case '\\':
+        return "\\";
+
+    case '/':
+        return "/";
+
+    case 'b':
+        return "\b";
+
+    case 'f':
+        return "\f";
+
+    case 'n':
+        return "\n";
+
+    case 'r':
+        return "\r";
+
+    case 't':
+        return "\t";
+
+    case 'u':
+    {
+        char buffer[5];
+        for (size_t i = 0; i < 4 && source_current_is(source, JSON_XDIGITS); i++)
         {
-            next(parser);
-            switch (current(parser))
-            {
-            case '"':
-                buffer_builder_append_chr(builder, '"');
-                next(parser);
+            buffer[i] = source_current(source);
+            source_foreward(source);
+        }
 
-                break;
+        _Static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
 
-            case '\\':
-                buffer_builder_append_chr(builder, '\\');
-                next(parser);
+        Codepoint codepoint = 0;
+        if (parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&codepoint))
+        {
+            static uint8_t utf8[5] = {};
+            codepoint_to_utf8(codepoint, utf8);
 
-                break;
-
-            case '/':
-                buffer_builder_append_chr(builder, '/');
-                next(parser);
-
-                break;
-
-            case 'b':
-                buffer_builder_append_chr(builder, '\b');
-                next(parser);
-
-                break;
-
-            case 'f':
-                buffer_builder_append_chr(builder, '\f');
-                next(parser);
-
-                break;
-
-            case 'n':
-                buffer_builder_append_chr(builder, '\n');
-                next(parser);
-
-                break;
-
-            case 'r':
-                buffer_builder_append_chr(builder, '\r');
-                next(parser);
-
-                break;
-
-            case 't':
-                buffer_builder_append_chr(builder, '\t');
-                next(parser);
-
-                break;
-
-            case 'u':
-            {
-                char buffer[5];
-                next(parser);
-                for (size_t i = 0; i < 4 && current_is(parser, "0123456789abcdef"); i++)
-                {
-                    buffer[i] = current(parser);
-                    next(parser);
-                }
-
-                _Static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
-
-                Codepoint codepoint = 0;
-                if (parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&codepoint))
-                {
-                    uint8_t utf8[5] = {};
-                    codepoint_to_utf8(codepoint, utf8);
-                    buffer_builder_append_str(builder, (char *)utf8);
-                }
-
-                break;
-            }
-
-            default:
-                break;
-            }
+            return (char *)utf8;
         }
         else
         {
-            buffer_builder_append_chr(builder, current(parser));
-            next(parser);
+            return "\\uXXXX";
         }
     }
 
-    if (current(parser) == '"')
-        next(parser);
+    default:
+        break;
+    }
+
+    static char buffer[3] = {'\\', 'x', '\0'};
+    buffer[1] = chr;
+
+    return buffer;
+}
+
+static char *string(SourceReader *source)
+{
+    BufferBuilder *builder = buffer_builder_create(16);
+
+    source_skip(source, '"');
+
+    while (source_current(source) != '"' &&
+           source_do_continue(source))
+    {
+        if (source_current(source) == '\\')
+        {
+            buffer_builder_append_str(builder, escape(source));
+        }
+        else
+        {
+            buffer_builder_append_chr(builder, source_current(source));
+            source_foreward(source);
+        }
+    }
+
+    source_skip(source, '"');
 
     return buffer_builder_finalize(builder);
 }
 
-static JsonValue *array(JsonParser *parser)
+static JsonValue *array(SourceReader *source)
 {
-    next(parser); // skip [
+    source_skip(source, '[');
 
     JsonValue *array = json_create_array();
 
     int index = 0;
     do
     {
-        if (current(parser) == ',')
-            next(parser);
+        source_skip(source, ',');
 
-        json_array_put(array, index, value(parser));
+        json_array_put(array, index, value(source));
         index++;
-    } while (current(parser) == ',');
+    } while (source_current(source) == ',');
 
-    if (current(parser) == ']')
-        next(parser); // skip ]
+    source_skip(source, ']');
 
     return array;
 }
 
-static JsonValue *object(JsonParser *parser)
+static JsonValue *object(SourceReader *source)
 {
-    next(parser); // skip {
+    source_skip(source, '{');
 
     JsonValue *object = json_create_object();
 
-    whitespace(parser);
-    while (current(parser) != '}')
+    whitespace(source);
+    while (source_current(source) != '}')
     {
-        char *k __cleanup_malloc = string(parser);
-        whitespace(parser);
+        char *k __cleanup_malloc = string(source);
+        whitespace(source);
 
-        if (current(parser) == ':')
-        {
-            next(parser);
-        }
+        source_skip(source, ':');
 
-        JsonValue *v = value(parser);
+        JsonValue *v = value(source);
 
         json_object_put(object, k, v);
 
-        if (current(parser) == ',')
-        {
-            next(parser);
-        }
+        source_skip(source, ',');
 
-        whitespace(parser);
+        whitespace(source);
     }
 
-    if (current(parser) == '}')
-        next(parser); // skip }
+    source_skip(source, '}');
 
     return object;
 }
 
-static JsonValue *keyword(JsonParser *parser)
+static JsonValue *keyword(SourceReader *source)
 {
     BufferBuilder *builder = buffer_builder_create(6);
 
-    while (current_is(parser, "abcdefghijklmnopqrstuvwxyz"))
+    while (source_current_is(source, JSON_ALPHA) &&
+           source_do_continue(source))
     {
-        buffer_builder_append_chr(builder, current(parser));
-        next(parser);
+        buffer_builder_append_chr(builder, source_current(source));
+        source_foreward(source);
     }
 
     __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
@@ -316,43 +259,47 @@ static JsonValue *keyword(JsonParser *parser)
     }
 }
 
-static JsonValue *value(JsonParser *parser)
+static JsonValue *value(SourceReader *source)
 {
-    whitespace(parser);
+    whitespace(source);
 
     JsonValue *value = NULL;
 
-    if (current(parser) == '"')
+    if (source_current(source) == '"')
     {
-        value = json_create_string_adopt(string(parser));
+        value = json_create_string_adopt(string(source));
     }
-    else if (current_is(parser, "-0123456789"))
+    else if (source_current_is(source, "-0123456789"))
     {
-        value = number(parser);
+        value = number(source);
     }
-    else if (current(parser) == '{')
+    else if (source_current(source) == '{')
     {
-        value = object(parser);
+        value = object(source);
     }
-    else if (current(parser) == '[')
+    else if (source_current(source) == '[')
     {
-        value = array(parser);
+        value = array(source);
     }
     else
     {
-        value = keyword(parser);
+        value = keyword(source);
     }
 
-    whitespace(parser);
+    whitespace(source);
 
     return value;
 }
 
-JsonValue *json_parse(const char *str, size_t size)
+JsonValue *json_parse(const char *string, size_t size)
 {
-    JsonParser parser = {str, size, 0};
+    SourceReader *source = source_create_from_string(string, size);
 
-    return value(&parser);
+    JsonValue *result = value(source);
+
+    source_destroy(source);
+
+    return result;
 }
 
 JsonValue *json_parse_file(const char *path)
@@ -364,22 +311,11 @@ JsonValue *json_parse_file(const char *path)
         return NULL;
     }
 
-    FileState json_state = {};
-    stream_stat(json_file, &json_state);
+    SourceReader *source = source_create_from_stream(json_file);
 
-    if (handle_has_error(json_file))
-    {
-        return NULL;
-    }
+    JsonValue *result = value(source);
 
-    __cleanup_malloc char *buffer = (char *)malloc(json_state.size);
+    source_destroy(source);
 
-    stream_read(json_file, buffer, json_state.size);
-
-    if (handle_has_error(json_file))
-    {
-        return NULL;
-    }
-
-    return json_parse(buffer, json_state.size);
+    return result;
 }

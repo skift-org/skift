@@ -365,7 +365,6 @@ void stream_printf_append(printf_info_t *info, char c)
 
 int stream_printf(Stream *stream, const char *fmt, ...)
 {
-
     va_list va;
     va_start(va, fmt);
 

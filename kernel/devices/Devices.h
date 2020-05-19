@@ -2,20 +2,36 @@
 
 #include <libsystem/Common.h>
 
+#include "kernel/bus/PCIDevice.h"
+
 typedef enum
 {
     BUS_NONE,
-    BUS_LEGACY,
+    BUS_UNIX,
     BUS_PCI,
 } Bus;
+
+typedef enum
+{
+    UNIX_ZERO,
+    UNIX_NULL,
+    UNIX_RANDOM,
+} UNIXDevice;
+
+typedef struct
+{
+    UNIXDevice device;
+} UNIXDeviceAddress;
 
 typedef struct
 {
     Bus bus;
 
-    int device;
-    int vendor_id;
-    int device_id;
+    union
+    {
+        UNIXDeviceAddress unix_device;
+        PCIDevice pci_device;
+    };
 } DeviceInfo;
 
 typedef bool (*DeviceDriverInfoMatch)(DeviceInfo info);
@@ -35,6 +51,8 @@ typedef IterationDecision (*DeviceIterateCallback)(void *target, DeviceInfo devi
 void device_initialize(void);
 
 const DeviceDriverInfo *device_get_diver_info(DeviceInfo info);
+
+const char *device_to_string(DeviceInfo info);
 
 void device_iterate(void *target, DeviceIterateCallback callback);
 

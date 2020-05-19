@@ -7,11 +7,8 @@
 
 typedef enum
 {
-    COLUMN_DESCRIPTION,
-    COLUMN_BUS,
     COLUMN_DEVICE,
-    COLUMN_VENDOR,
-    COLUMN_ADDRESS,
+    COLUMN_DESCRIPTION,
 
     __COLUMN_COUNT,
 } Column;
@@ -32,20 +29,11 @@ static Variant device_model_data(DeviceModel *model, int row, int column)
 
     switch (column)
     {
+    case COLUMN_DEVICE:
+        return vstring(json_string_value(json_object_get(device, "device")));
+
     case COLUMN_DESCRIPTION:
         return vstring(json_string_value(json_object_get(device, "description")));
-
-    case COLUMN_BUS:
-        return vstring(json_string_value(json_object_get(device, "bus")));
-
-    case COLUMN_DEVICE:
-        return vstringf("%04x", json_integer_value(json_object_get(device, "device")));
-
-    case COLUMN_VENDOR:
-        return vstringf("%04x", json_integer_value(json_object_get(device, "vendor")));
-
-    case COLUMN_ADDRESS:
-        return vstringf("%08x", json_integer_value(json_object_get(device, "address")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -66,16 +54,11 @@ static const char *device_model_column_name(int column)
 {
     switch (column)
     {
-    case COLUMN_DESCRIPTION:
-        return "Description";
-    case COLUMN_BUS:
-        return "Bus";
     case COLUMN_DEVICE:
         return "Device";
-    case COLUMN_VENDOR:
-        return "Vendor";
-    case COLUMN_ADDRESS:
-        return "Address";
+
+    case COLUMN_DESCRIPTION:
+        return "Description";
 
     default:
         ASSERT_NOT_REACHED();

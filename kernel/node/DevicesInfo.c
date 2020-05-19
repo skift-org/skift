@@ -14,20 +14,11 @@
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
 
-static const char *BUS_NAMES[] = {
-    "NONE",
-    "legacy",
-    "PCI",
-};
-
 static IterationDecision append_device_info(JsonValue *root, DeviceInfo device)
 {
     JsonValue *task_object = json_create_object();
 
-    json_object_put(task_object, "bus", json_create_string(BUS_NAMES[device.bus]));
-    json_object_put(task_object, "device", json_create_integer(device.device_id));
-    json_object_put(task_object, "vendor", json_create_integer(device.vendor_id));
-    json_object_put(task_object, "address", json_create_integer(device.device));
+    json_object_put(task_object, "device", json_create_string(device_to_string(device)));
 
     const DeviceDriverInfo *driver = device_get_diver_info(device);
 

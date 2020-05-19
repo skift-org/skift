@@ -251,7 +251,7 @@ void keyboard_initialize(void)
 {
     logger_info("Initializing keyboard...");
 
-    _keymap = keyboard_load_keymap("/res/keyboard/en_us.kmap");
+    _keymap = keyboard_load_keymap("/res/keyboard/fr_be.kmap");
 
     _characters_buffer = ringbuffer_create(1024);
     _characters_node = __create(FsNode);

@@ -1,3 +1,4 @@
+#include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
 #include "kernel/bus/PCI.h"
@@ -26,6 +27,27 @@ const DeviceDriverInfo *device_get_diver_info(DeviceInfo info)
     return NULL;
 }
 
+const char *device_to_string(DeviceInfo info)
+{
+    static char buffer[512];
+
+    switch (info.bus)
+    {
+    case BUS_UNIX:
+        snprintf(buffer, 512, "UNIX: %d", info.unix_device.device);
+        break;
+
+    default:
+        snprintf(buffer, 512, "PCI: %02d:%02d.%d",
+                 info.pci_device.bus,
+                 info.pci_device.slot,
+                 info.pci_device.func);
+        break;
+    }
+
+    return buffer;
+}
+
 static IterationDecision print_device_info(void *target, DeviceInfo info)
 {
     __unused(target);
@@ -34,11 +56,8 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
 
     if (driver)
     {
-        logger_info("Found '%s' PCI:%06x:%4x:%4x",
-                    driver->description,
-                    info.device,
-                    info.vendor_id,
-                    info.device_id);
+
+        logger_info("%s: %s", device_to_string(info), driver->description);
 
         if (driver->initialize)
         {
@@ -47,7 +66,7 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
     }
     else
     {
-        logger_warn("Unknown device: PCI:%06x:%4x:%4x", info.device, info.vendor_id, info.device_id);
+        logger_warn("%s: Unknown device", device_to_string(info));
     }
 
     return ITERATION_CONTINUE;

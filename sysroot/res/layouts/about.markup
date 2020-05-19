@@ -12,7 +12,7 @@
             <Label id="label-system-release"/>
             <Label id="label-system-copyright"/>
 
-            <Button id="button-ok">
+            <Button id="button-ok"/>
         </Container>
     </Container>
 </Window>

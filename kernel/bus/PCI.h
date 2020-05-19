@@ -43,39 +43,10 @@
 
 #define PCI_NONE 0xFFFF
 
-static inline int pci_extract_bus(uint32_t device)
-{
-	return (uint8_t)((device >> 16));
-}
-static inline int pci_extract_slot(uint32_t device)
-{
-	return (uint8_t)((device >> 8));
-}
-static inline int pci_extract_func(uint32_t device)
-{
-	return (uint8_t)(device);
-}
-
-static inline uint32_t pci_get_addr(uint32_t device, int field)
-{
-	return 0x80000000 | (pci_extract_bus(device) << 16) | (pci_extract_slot(device) << 11) | (pci_extract_func(device) << 8) | ((field)&0xFC);
-}
-
-static inline uint32_t pci_box_device(int bus, int slot, int func)
-{
-	return (uint32_t)((bus << 16) | (slot << 8) | func);
-}
-
-uint32_t pci_read_field(uint32_t device, int field, int size);
-
-void pci_write_field(uint32_t device, int field, int size, uint32_t value);
-
 uint16_t pci_read_type(uint32_t dev);
-
-IterationDecision pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus);
 
 IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callback);
 
 void pci_remap(void);
 
-int pci_get_interrupt(uint32_t device);
+int pci_get_interrupt(PCIDevice device);

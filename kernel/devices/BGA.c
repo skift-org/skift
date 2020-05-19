@@ -97,14 +97,14 @@ Result bga_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
 
 bool bga_match(DeviceInfo info)
 {
-    return /* QEMU */ (info.vendor_id == 0x1234 && info.device_id == 0x1111) ||
-           /* VBOX */ (info.vendor_id == 0x80ee && info.device_id == 0xbeef);
+    return /* QEMU */ (info.pci_device.vendor == 0x1234 && info.pci_device.device == 0x1111) ||
+           /* VBOX */ (info.pci_device.vendor == 0x80ee && info.pci_device.device == 0xbeef);
 }
 
 void bga_initialize(DeviceInfo info)
 {
     bga_set_mode(VBE_DISPI_MAX_XRES, VBE_DISPI_MAX_YRES);
-    framebuffer_physical = pci_read_field(info.device, PCI_BAR0, 4);
+    framebuffer_physical = pci_device_read(info.pci_device, PCI_BAR0, 4);
     framebuffer_virtual = virtual_alloc(
         &kpdir,
         framebuffer_physical,

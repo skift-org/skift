@@ -25,6 +25,11 @@ void markup_node_destroy(MarkupNode *node)
     free(node);
 }
 
+bool markup_node_is(MarkupNode *node, const char *type)
+{
+    return strcmp(node->type, type) == 0;
+}
+
 void markup_node_add_child(MarkupNode *parent, MarkupNode *child)
 {
     list_pushback(parent->childs, child);

@@ -21,6 +21,8 @@ MarkupNode *markup_node_create_adopt(char *type);
 
 void markup_node_destroy(MarkupNode *node);
 
+bool markup_node_is(MarkupNode *node, const char *type);
+
 void markup_node_add_child(MarkupNode *parent, MarkupNode *child);
 
 void markup_node_add_attribute(MarkupNode *node, MarkupAttribute *attribute);

@@ -42,7 +42,7 @@ void markup_node_add_attribute(MarkupNode *node, MarkupAttribute *attribute)
 
 const char *markup_node_get_attribute(MarkupNode *node, const char *name)
 {
-    list_foreach(MarkupAttribute, attribute, node->childs)
+    list_foreach(MarkupAttribute, attribute, node->attributes)
     {
         if (strcmp(attribute->name, name) == 0)
         {
@@ -71,6 +71,19 @@ const char *markup_node_get_attribute_or_default(MarkupNode *node, const char *n
     }
 
     return default_value;
+}
+
+bool markup_node_has_attribute(MarkupNode *node, const char *name)
+{
+    list_foreach(MarkupAttribute, attribute, node->attributes)
+    {
+        if (strcmp(attribute->name, name) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 const char *markup_node_type(MarkupNode *node)

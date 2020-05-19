@@ -57,7 +57,7 @@ typedef struct
 } Layout;
 
 #define STACK() \
-    ((Layout){LAYOUT_STACK, 0, 0, 0, 0})
+    ((Layout){LAYOUT_STACK, 0, 0, vec2i_zero})
 
 #define GRID(_hcell, _vcell, _hspacing, _vspacing) \
     ((Layout){LAYOUT_GRID, (_hcell), (_vcell), vec2i((_hspacing), (_vspacing))})

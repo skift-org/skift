@@ -33,6 +33,10 @@ char source_current(SourceReader *source);
 
 bool source_current_is(SourceReader *source, const char *what);
 
+bool source_current_is_word(SourceReader *source, const char *word);
+
 void source_eat(SourceReader *source, const char *what);
 
 bool source_skip(SourceReader *source, char chr);
+
+bool source_skip_word(SourceReader *source, const char *word);

@@ -67,8 +67,11 @@ bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
     }
 
     bool is_negative = str[0] == '-';
-    str++;
-    size--;
+    if (is_negative)
+    {
+        str++;
+        size--;
+    }
 
     unsigned int unsigned_value = 0;
     if (!parse_uint(parser, str, size, &unsigned_value))

@@ -1,4 +1,5 @@
 #include <libsystem/assert.h>
+#include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 #include <libsystem/utils/SourceReader.h>
 
@@ -106,6 +107,19 @@ bool source_current_is(SourceReader *source, const char *what)
     return false;
 }
 
+bool source_current_is_word(SourceReader *source, const char *word)
+{
+    for (size_t i = 0; word[i]; i++)
+    {
+        if (source_peek(source, i) != word[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void source_eat(SourceReader *source, const char *what)
 {
     while (source_current_is(source, what) &&
@@ -120,6 +134,21 @@ bool source_skip(SourceReader *source, char chr)
     if (source_current(source) == chr)
     {
         source_foreward(source);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool source_skip_word(SourceReader *source, const char *word)
+{
+    if (source_current_is_word(source, word))
+    {
+        for (size_t i = 0; i < strlen(word); i++)
+        {
+            source_foreward(source);
+        }
 
         return true;
     }

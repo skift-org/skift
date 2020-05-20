@@ -73,6 +73,7 @@ void window_initialize(
     window->root_container->window = window;
 
     window->focused_widget = window->root_container;
+    window->widget_by_id = hashmap_create_string_to_value();
 
     window->flags = flags;
 
@@ -516,6 +517,43 @@ void window_set_cursor(Window *window, CursorState state)
 void window_set_focused_widget(Window *window, Widget *widget)
 {
     window->focused_widget = widget;
+}
+
+void window_widget_removed(Window *window, Widget *widget)
+{
+    if (window->focused_widget == widget)
+    {
+        window->focused_widget = NULL;
+    }
+
+    if (window->mouse_focused_widget == widget)
+    {
+        window->mouse_focused_widget = NULL;
+    }
+
+    hashmap_remove_value(window->widget_by_id, widget);
+}
+
+void window_register_widget_by_id(Window *window, const char *id, Widget *widget)
+{
+    if (hashmap_has(window->widget_by_id, id))
+    {
+        hashmap_remove(window->widget_by_id, id);
+    }
+
+    hashmap_put(window->widget_by_id, id, widget);
+}
+
+Widget *window_get_widget_by_id(Window *window, const char *id)
+{
+    if (hashmap_has(window->widget_by_id, id))
+    {
+        return (Widget *)hashmap_get(window->widget_by_id, id);
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 int window_handle(Window *window)

@@ -45,6 +45,8 @@ bool hashmap_has(HashMap *hashmap, const void *key);
 
 bool hashmap_remove(HashMap *hashmap, const void *key);
 
+void hashmap_remove_value(HashMap *hashmap, void *value);
+
 bool hashmap_remove_with_callback(
     HashMap *hashmap,
     const void *key,

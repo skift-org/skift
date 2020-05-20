@@ -46,11 +46,20 @@ void widget_destroy(Widget *widget)
     Widget *child = NULL;
     while (list_peek(widget->childs, (void **)&child))
     {
-        widget_remove_child(widget, child);
         widget_destroy(child);
     }
 
     list_destroy(widget->childs);
+
+    if (widget->parent)
+    {
+        widget_remove_child(widget->parent, widget);
+    }
+
+    if (widget->window)
+    {
+        window_widget_removed(widget->window, widget);
+    }
 
     free(widget);
 }

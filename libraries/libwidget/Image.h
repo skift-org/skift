@@ -16,4 +16,6 @@ typedef struct
     Bitmap *bitmap;
 } Image;
 
+void image_set_image(Widget *image, const char *path);
+
 Widget *image_create(Widget *parent, const char *path);

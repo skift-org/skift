@@ -38,6 +38,12 @@ void image_destroy(Image *widget)
     }
 }
 
+void image_set_image(Widget *image, const char *path)
+{
+    bitmap_destroy(((Image *)image)->bitmap);
+    ((Image *)image)->bitmap = bitmap_load_from(path);
+}
+
 Widget *image_create(Widget *parent, const char *path)
 {
     Image *image = __create(Image);

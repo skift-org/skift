@@ -6,13 +6,13 @@
     layout="vgrid(8)"
     padding="insets(0, 8, 8)">
 
-    <Image path="/res/skift-white.png"/>
+    <Image id="system-image"/>
 
     <Container layout="vgrid(2)">
         <Label text="The skift operating system."/>
-        <Label text="Version 1.0"/>
+        <Label id="version-label"/>
         <Label text="Copyright © 2018-2020 N. Van Bossuyt."/>
 
-        <Button text="Ok"/>
+        <Button id="ok-button" text="Ok"/>
     </Container>
 </Window>

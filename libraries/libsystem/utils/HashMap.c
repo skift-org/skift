@@ -120,6 +120,24 @@ static HashMapItem *hashmap_find_item(HashMap *hashmap, const void *key)
     return NULL;
 }
 
+static HashMapItem *hashmap_find_item_by_value(HashMap *hashmap, void *value)
+{
+    for (size_t i = 0; i < hashmap->buckets_count; i++)
+    {
+        List *bucket = hashmap->buckets[i];
+
+        list_foreach(HashMapItem, item, bucket)
+        {
+            if (item->value == value)
+            {
+                return item;
+            }
+        }
+    }
+
+    return NULL;
+}
+
 bool hashmap_put(HashMap *hashmap, const void *key, void *value)
 {
     if (hashmap_has(hashmap, key))
@@ -153,6 +171,16 @@ bool hashmap_has(HashMap *hashmap, const void *key)
 bool hashmap_remove(HashMap *hashmap, const void *key)
 {
     return hashmap_remove_with_callback(hashmap, key, NULL);
+}
+
+void hashmap_remove_value(HashMap *hashmap, void *value)
+{
+    HashMapItem *item = hashmap_find_item_by_value(hashmap, value);
+
+    if (item)
+    {
+        hashmap_remove(hashmap, item->key);
+    }
 }
 
 bool hashmap_remove_with_callback(

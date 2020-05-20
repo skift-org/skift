@@ -2,6 +2,7 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
+#include <libsystem/utils/HashMap.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 #include <libwidget/Widget.h>
@@ -48,6 +49,7 @@ typedef struct Window
     Widget *root_container;
     Widget *focused_widget;
     Widget *mouse_focused_widget;
+    HashMap *widget_by_id;
 
     WindowFlag flags;
 } Window;
@@ -92,6 +94,12 @@ Rectangle window_content_bound(Window *window);
 void window_set_cursor(Window *window, CursorState state);
 
 void window_set_focused_widget(Window *window, Widget *widget);
+
+void window_widget_removed(Window *window, Widget *widget);
+
+void window_register_widget_by_id(Window *window, const char *id, Widget *widget);
+
+Widget *window_get_widget_by_id(Window *window, const char *id);
 
 int window_handle(Window *window);
 

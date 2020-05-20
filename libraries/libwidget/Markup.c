@@ -6,11 +6,18 @@
 
 #include <libwidget/Button.h>
 #include <libwidget/Container.h>
+#include <libwidget/Image.h>
 #include <libwidget/Label.h>
 #include <libwidget/Markup.h>
+#include <libwidget/Panel.h>
 #include <libwidget/Placeholder.h>
 
-static int layout_number(SourceReader *reader)
+static void whitespace(SourceReader *reader)
+{
+    source_eat(reader, " ");
+}
+
+static int number(SourceReader *reader)
 {
     int number = 0;
 
@@ -43,13 +50,34 @@ static Layout layout_parse(const char *string)
     if (source_skip_word(reader, "grid"))
     {
         source_skip(reader, '(');
-        int hcell = layout_number(reader);
+
+        whitespace(reader);
+
+        int hcell = number(reader);
+
+        whitespace(reader);
+
         source_skip(reader, ',');
-        int vcell = layout_number(reader);
+
+        whitespace(reader);
+
+        int vcell = number(reader);
+
+        whitespace(reader);
+
         source_skip(reader, ',');
-        int hspacing = layout_number(reader);
+
+        whitespace(reader);
+
+        int hspacing = number(reader);
+
+        whitespace(reader);
+
         source_skip(reader, ',');
-        int vspacing = layout_number(reader);
+
+        whitespace(reader);
+
+        int vspacing = number(reader);
 
         result = GRID(hcell, vcell, hspacing, vspacing);
     }
@@ -57,29 +85,89 @@ static Layout layout_parse(const char *string)
     if (source_skip_word(reader, "vgrid"))
     {
         source_skip(reader, '(');
-        int spacing = layout_number(reader);
+        whitespace(reader);
+        int spacing = number(reader);
         result = VGRID(spacing);
     }
 
     if (source_skip_word(reader, "hgrid"))
     {
         source_skip(reader, '(');
-        int spacing = layout_number(reader);
+        whitespace(reader);
+        int spacing = number(reader);
         result = HGRID(spacing);
     }
 
     if (source_skip_word(reader, "vflow"))
     {
         source_skip(reader, '(');
-        int spacing = layout_number(reader);
+        whitespace(reader);
+
+        int spacing = number(reader);
         result = VFLOW(spacing);
     }
 
     if (source_skip_word(reader, "hflow"))
     {
         source_skip(reader, '(');
-        int spacing = layout_number(reader);
+        whitespace(reader);
+
+        int spacing = number(reader);
         result = HFLOW(spacing);
+    }
+
+    source_destroy(reader);
+
+    return result;
+}
+
+Insets insets_parse(const char *string)
+{
+    if (!string)
+    {
+        return INSETS(0);
+    }
+
+    SourceReader *reader = source_create_from_string(string, strlen(string));
+
+    if (!source_skip_word(reader, "insets"))
+    {
+        source_destroy(reader);
+
+        return INSETS(0);
+    }
+
+    source_skip(reader, '(');
+    whitespace(reader);
+
+    int count;
+    int args[4];
+
+    for (count = 0; count < 4 && source_current_is(reader, "0123456789"); count++)
+    {
+        args[count] = number(reader);
+        whitespace(reader);
+        source_skip(reader, ',');
+        whitespace(reader);
+    }
+
+    Insets result = INSETS(0);
+
+    if (count == 1)
+    {
+        result = INSETS(args[0]);
+    }
+    else if (count == 2)
+    {
+        result = INSETS(args[0], args[1]);
+    }
+    else if (count == 3)
+    {
+        result = INSETS(args[0], args[1], args[2]);
+    }
+    else if (count == 4)
+    {
+        result = INSETS(args[0], args[1], args[2], args[3]);
     }
 
     source_destroy(reader);
@@ -93,6 +181,11 @@ void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
     {
         widget->layout = layout_parse(markup_node_get_attribute(node, "layout"));
     }
+
+    if (markup_node_has_attribute(node, "padding"))
+    {
+        widget->insets = insets_parse(markup_node_get_attribute(node, "padding"));
+    }
 }
 
 Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
@@ -102,6 +195,11 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
     if (markup_node_is(node, "Container"))
     {
         widget = container_create(parent);
+    }
+
+    if (markup_node_is(node, "Panel"))
+    {
+        widget = panel_create(parent);
     }
 
     if (markup_node_is(node, "Button"))
@@ -116,6 +214,13 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
         widget = label_create(
             parent,
             markup_node_get_attribute_or_default(node, "text", "Label"));
+    }
+
+    if (markup_node_is(node, "Image"))
+    {
+        widget = image_create(
+            parent,
+            markup_node_get_attribute_or_default(node, "path", "null"));
     }
 
     if (widget == NULL)

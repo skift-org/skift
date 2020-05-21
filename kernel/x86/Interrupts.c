@@ -106,11 +106,28 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
     if (stackframe.intno < 32)
     {
-        CPANIC(&stackframe,
-               "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
-               _exception_messages[stackframe.intno],
-               stackframe.intno,
-               stackframe.err);
+        if (stackframe.eip >= 0x40000000)
+        {
+            sti();
+
+            logger_error("Task %d triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
+                         scheduler_running_id(),
+                         _exception_messages[stackframe.intno],
+                         stackframe.intno,
+                         stackframe.err,
+                         stackframe.eip,
+                         CR2());
+
+            task_exit(-1);
+        }
+        else
+        {
+            CPANIC(&stackframe,
+                   "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
+                   _exception_messages[stackframe.intno],
+                   stackframe.intno,
+                   stackframe.err);
+        }
     }
     else if (stackframe.intno < 48)
     {

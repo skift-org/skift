@@ -104,8 +104,8 @@ void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position
 
 void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Vec2i position)
 {
-    bool was_button_pressed = button & old_buttons;
-    bool is_button_pressed = button & buttons;
+    bool was_button_pressed = old_buttons & button;
+    bool is_button_pressed = buttons & button;
 
     if (is_button_pressed && !was_button_pressed)
     {

@@ -147,13 +147,13 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     widget_overwrite_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
-static void on_color_palette_click(PaintWindow *window, Widget *sender, MouseEvent *event)
+static void on_color_palette_click(PaintWindow *window, Widget *sender, Event *event)
 {
-    if (event->button & MOUSE_BUTTON_LEFT)
+    if (event->mouse.button == MOUSE_BUTTON_LEFT)
     {
         window->document->primary_color = widget_get_color(sender, THEME_MIDDLEGROUND);
     }
-    else if (event->button & MOUSE_BUTTON_RIGHT)
+    else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
     {
         window->document->secondary_color = widget_get_color(sender, THEME_MIDDLEGROUND);
     }

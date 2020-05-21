@@ -1,0 +1,14 @@
+<Window
+    title="Exemple"
+    icon="duck"
+    width="250"
+    height="300"
+    layout="vgrid(8)"
+    padding="insets(0, 8, 8)">
+
+    <Panel>
+        <Label text="This is a panel."/>
+    </Panel>
+    <Label text="This is a label."/>
+    <Button text="This is a button."/>
+</Window>

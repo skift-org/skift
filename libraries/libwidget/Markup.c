@@ -194,6 +194,11 @@ void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
     {
         widget->insets = insets_parse(markup_node_get_attribute(node, "padding"));
     }
+
+    if (markup_node_has_attribute(node, "fill"))
+    {
+        widget->layout_attributes = LAYOUT_FILL;
+    }
 }
 
 Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)

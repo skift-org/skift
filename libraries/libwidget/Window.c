@@ -329,21 +329,33 @@ void window_handle_event(Window *window, Event *event)
     {
         window->focused = false;
         window_schedule_update(window, window_bound(window));
+
+        Event mouse_leave = *event;
+        mouse_leave.type = EVENT_MOUSE_LEAVE;
+
+        if (window->mouse_over_widget)
+        {
+            widget_dispatch_event(window->mouse_over_widget, &mouse_leave);
+        }
     }
     break;
 
     case EVENT_MOUSE_MOVE:
     {
+        RectangeBorder borders = window_resize_bound_containe(window, event->mouse.position);
+
         if (window->is_dragging)
         {
             Vec2i offset = vec2i_sub(event->mouse.position, event->mouse.old_position);
             window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
             application_move_window(window, window->on_screen_bound.position);
         }
-        else if (window->flags & WINDOW_RESIZABLE)
+        else if (window->is_resizing)
         {
-            RectangeBorder borders = window_resize_bound_containe(window, event->mouse.position);
-
+            window_do_resize(window, event->mouse.position);
+        }
+        else if (borders && (window->flags & WINDOW_RESIZABLE))
+        {
             if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
             {
                 window_set_cursor(window, CURSOR_RESIZEHV);
@@ -368,20 +380,39 @@ void window_handle_event(Window *window, Event *event)
             {
                 window_set_cursor(window, CURSOR_RESIZEH);
             }
-            else
-            {
-                window_set_cursor(window, CURSOR_DEFAULT);
-            }
-
-            if (window->is_resizing)
-            {
-                window_do_resize(window, event->mouse.position);
-            }
         }
-
-        if (window->mouse_focused_widget)
+        else
         {
-            widget_dispatch_event(window->mouse_focused_widget, event);
+            // FIXME: Set the cursor based on the focused widget.
+            window_set_cursor(window, CURSOR_DEFAULT);
+
+            Widget *mouse_over_widget = widget_child_at(window_root(window), event->mouse.position);
+
+            if (mouse_over_widget != window->mouse_over_widget)
+            {
+                Event mouse_leave = *event;
+                mouse_leave.type = EVENT_MOUSE_LEAVE;
+
+                if (window->mouse_over_widget)
+                {
+                    widget_dispatch_event(window->mouse_over_widget, &mouse_leave);
+                }
+
+                Event mouse_enter = *event;
+                mouse_enter.type = EVENT_MOUSE_ENTER;
+
+                if (mouse_over_widget)
+                {
+                    widget_dispatch_event(mouse_over_widget, &mouse_enter);
+                }
+
+                window->mouse_over_widget = mouse_over_widget;
+            }
+
+            if (window->mouse_focused_widget)
+            {
+                widget_dispatch_event(window->mouse_focused_widget, event);
+            }
         }
 
         break;
@@ -421,7 +452,8 @@ void window_handle_event(Window *window, Event *event)
                 window_set_cursor(window, CURSOR_MOVE);
             }
 
-            if (!event->accepted &&
+            if ((window->flags & WINDOW_RESIZABLE) &&
+                !event->accepted &&
                 !window->is_resizing &&
                 window_resize_bound_containe(window, event->mouse.position))
             {
@@ -434,6 +466,17 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_RELEASE:
     {
+        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
+        {
+            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
+
+            if (widget)
+            {
+                window->mouse_focused_widget = widget;
+                widget_dispatch_event(widget, event);
+            }
+        }
+
         if (window->is_dragging &&
             event->mouse.button == MOUSE_BUTTON_LEFT)
         {
@@ -529,6 +572,11 @@ void window_widget_removed(Window *window, Widget *widget)
     if (window->mouse_focused_widget == widget)
     {
         window->mouse_focused_widget = NULL;
+    }
+
+    if (window->mouse_over_widget == widget)
+    {
+        window->mouse_over_widget = NULL;
     }
 
     hashmap_remove_value(window->widget_by_id, widget);

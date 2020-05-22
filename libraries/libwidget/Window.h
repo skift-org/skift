@@ -49,6 +49,7 @@ typedef struct Window
     Widget *root_container;
     Widget *focused_widget;
     Widget *mouse_focused_widget;
+    Widget *mouse_over_widget;
     HashMap *widget_by_id;
 
     WindowFlag flags;

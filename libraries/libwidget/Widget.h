@@ -119,6 +119,10 @@ void widget_initialize(
 
 void widget_destroy(Widget *widget);
 
+void widget_disable(Widget *widget);
+
+void widget_enable(Widget *widget);
+
 void widget_add_child(Widget *widget, Widget *child);
 
 void widget_remove_child(Widget *widget, Widget *child);

@@ -64,6 +64,24 @@ void widget_destroy(Widget *widget)
     free(widget);
 }
 
+void widget_disable(Widget *widget)
+{
+    if (widget->enabled)
+    {
+        widget->enabled = false;
+        widget_update(widget);
+    }
+}
+
+void widget_enable(Widget *widget)
+{
+    if (!widget->enabled)
+    {
+        widget->enabled = true;
+        widget_update(widget);
+    }
+}
+
 void widget_invalidate_layout(Widget *widget)
 {
     if (widget->window)
@@ -534,6 +552,24 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 
 Color __widget_get_color(Widget *widget, ThemeColorRole role)
 {
+    if (!widget->enabled || (widget->parent && !widget->parent->enabled))
+    {
+        if (role == THEME_FOREGROUND)
+        {
+            role = THEME_FOREGROUND_INACTIVE;
+        }
+
+        if (role == THEME_SELECTION)
+        {
+            role = THEME_SELECTION_INACTIVE;
+        }
+
+        if (role == THEME_ACCENT)
+        {
+            role = THEME_ACCENT_INACTIVE;
+        }
+    }
+
     if (widget->color_overwrite[role].overwritten)
     {
         return widget->color_overwrite[role].color;

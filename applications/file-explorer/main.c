@@ -7,6 +7,7 @@
 #include <libwidget/Panel.h>
 #include <libwidget/Separator.h>
 #include <libwidget/Table.h>
+#include <libwidget/Toolbar.h>
 
 #include "file-explorer/Breadcrumb.h"
 #include "file-explorer/FileSystemModel.h"
@@ -150,35 +151,32 @@ Window *file_explorer_window_create(const char *current_path)
     window->foreward_history = list_create();
 
     /// --- Navigation bar --- ///
-    Widget *navbar = panel_create(root);
+    Widget *toolbar = toolbar_create(root);
 
-    navbar->layout = HFLOW(12);
-    navbar->insets = INSETS(0, 8);
-
-    Widget *backward_button = icon_create(navbar, "arrow-left");
+    Widget *backward_button = toolbar_icon_create(toolbar, "arrow-left");
     widget_set_event_handler(backward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_backward);
     window->go_backward = backward_button;
 
-    Widget *foreward_button = icon_create(navbar, "arrow-right");
+    Widget *foreward_button = toolbar_icon_create(toolbar, "arrow-right");
     widget_set_event_handler(foreward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_foreward);
     window->go_foreward = foreward_button;
 
-    Widget *up_button = icon_create(navbar, "arrow-up");
+    Widget *up_button = toolbar_icon_create(toolbar, "arrow-up");
     widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_up);
     window->go_up = up_button;
 
-    Widget *home_button = icon_create(navbar, "home");
+    Widget *home_button = toolbar_icon_create(toolbar, "home");
     widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_home);
     window->go_home = home_button;
 
-    separator_create(navbar);
+    separator_create(toolbar);
 
-    window->breadcrumb = breadcrumb_create(navbar, current_path);
+    window->breadcrumb = breadcrumb_create(toolbar, current_path);
     WIDGET(window->breadcrumb)->layout_attributes = LAYOUT_FILL;
 
-    separator_create(navbar);
+    separator_create(toolbar);
 
-    icon_create(navbar, "refresh");
+    toolbar_icon_create(toolbar, "refresh");
 
     update_navigation_bar(window);
 

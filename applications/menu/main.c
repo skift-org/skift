@@ -4,6 +4,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Icon.h>
 #include <libwidget/Label.h>
@@ -120,16 +121,17 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 void menu_create_list(Widget *parent, List *menu)
 {
     Widget *list = container_create(parent);
-    list->layout = VFLOW(4);
+    list->layout = VFLOW(0);
     list->layout_attributes = LAYOUT_FILL;
-    list->insets = INSETS(0, 8);
+    list->insets = INSETS(0);
 
     list_foreach(MenuEntry, entry, menu)
     {
-        Widget *item = container_create(list);
+        Widget *item = button_create(list, "");
         item->layout = HFLOW(8);
+        item->insets = INSETS(8, 8);
 
-        widget_set_event_handler(item, EVENT_MOUSE_BUTTON_PRESS, entry, (WidgetEventHandlerCallback)menu_item_click);
+        widget_set_event_handler(item, EVENT_MOUSE_BUTTON_RELEASE, entry, (WidgetEventHandlerCallback)menu_item_click);
 
         icon_create(item, entry->icon);
         label_create(item, entry->name);

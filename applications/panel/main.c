@@ -3,6 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/system.h>
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
 #include <libwidget/Container.h>
 #include <libwidget/Graph.h>
 #include <libwidget/Icon.h>
@@ -53,12 +54,14 @@ int main(int argc, char **argv)
     Window *window = window_create(NULL, "Panel", 1024, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_root(window)->layout = HFLOW(8);
-    window_root(window)->insets = INSETS(0, 8);
+    window_root(window)->insets = INSETS(0, 0, 0, 4);
 
-    Widget *menu = icon_create(window_root(window), "menu");
-    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_PRESS, NULL, open_menu);
-
-    label_create(window_root(window), "skiftOS");
+    Widget *menu = button_create(window_root(window), "");
+    menu->layout = HFLOW(4);
+    menu->insets = INSETS(0, 8);
+    icon_create(menu, "menu");
+    label_create(menu, "skiftOS");
+    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_RELEASE, NULL, open_menu);
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;

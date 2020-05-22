@@ -14,7 +14,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
     Rectangle computer_icon_bound = (Rectangle){{
         widget_bound(widget).x,
         widget_bound(widget).y,
-        bitmap_bound(widget->icon_computer).width,
+        bitmap_bound(widget->icon_computer).width + 16,
         widget_bound(widget).height,
     }};
 

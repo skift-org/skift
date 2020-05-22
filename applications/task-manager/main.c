@@ -7,6 +7,7 @@
 #include <libwidget/Label.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Table.h>
+#include <libwidget/Toolbar.h>
 
 #include "task-manager/TaskModel.h"
 
@@ -62,11 +63,9 @@ int main(int argc, char **argv)
 
     /// --- Toolbar --- ///
 
-    Widget *toolbar = panel_create(window_root((Window *)window));
-    toolbar->layout = HFLOW(12);
-    toolbar->insets = INSETS(0, 8);
-
-    icon_create(toolbar, "close");
+    Widget *toolbar = toolbar_create(window_root((Window *)window));
+    toolbar_icon_with_text_create(toolbar, "plus", "New task");
+    toolbar_icon_with_text_create(toolbar, "close", "Cancel task");
 
     /// --- Table view --- //
     window->table_model = task_model_create();
@@ -82,10 +81,10 @@ int main(int argc, char **argv)
 
     window->cpu_graph = graph_create(graphs_container, 256, COLOR_SEAGREEN);
     window->cpu_graph->layout = VFLOW(8);
-    window->cpu_graph->insets = INSETS(0, 8);
+    window->cpu_graph->insets = INSETS(8);
 
     Widget *cpu_icon_and_text = container_create(window->cpu_graph);
-    cpu_icon_and_text->layout = HFLOW(8);
+    cpu_icon_and_text->layout = HFLOW(4);
     icon_create(cpu_icon_and_text, "memory");
     label_create(cpu_icon_and_text, "Processor");
 
@@ -94,10 +93,10 @@ int main(int argc, char **argv)
 
     window->ram_graph = graph_create(graphs_container, 256, COLOR_ROYALBLUE);
     window->ram_graph->layout = VFLOW(8);
-    window->ram_graph->insets = INSETS(0, 8);
+    window->ram_graph->insets = INSETS(8);
 
     Widget *ram_icon_and_text = container_create(window->ram_graph);
-    ram_icon_and_text->layout = HFLOW(8);
+    ram_icon_and_text->layout = HFLOW(4);
     icon_create(ram_icon_and_text, "chip");
     label_create(ram_icon_and_text, "Memory");
 

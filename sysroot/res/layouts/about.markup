@@ -3,16 +3,18 @@
     icon="information"
     width="250"
     height="250"
-    layout="vgrid(8)"
-    padding="insets(0, 8, 8)">
+    layout="vflow(8)"
+    >
 
-    <Image id="system-image"/>
+    <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
+        <Image id="system-image" fill/>
 
-    <Container layout="vgrid(2)">
         <Label text="The skift operating system."/>
         <Label id="version-label"/>
         <Label text="Copyright © 2018-2020 N. Van Bossuyt."/>
-
-        <Button id="ok-button" text="Ok"/>
     </Container>
+
+    <Panel>
+        <Button id="ok-button" text="Ok"/>
+    </Panel>
 </Window>

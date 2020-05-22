@@ -1,9 +1,9 @@
 #include <libsystem/assert.h>
 #include <libwidget/Application.h>
 #include <libwidget/Container.h>
-#include <libwidget/Icon.h>
 #include <libwidget/Panel.h>
 #include <libwidget/Separator.h>
+#include <libwidget/Toolbar.h>
 
 #include "paint/Canvas.h"
 #include "paint/PaintDocument.h"
@@ -98,50 +98,49 @@ static void select_picker(PaintWindow *window, ...)
 
 static void create_toolbar(PaintWindow *window, Widget *parent)
 {
-    Widget *toolbar = panel_create(parent);
+    Widget *toolbar = toolbar_create(parent);
 
-    toolbar->layout = HFLOW(12);
-    toolbar->insets = INSETS(0, 8);
-
-    window->open_document = icon_create(toolbar, "folder-open");
-    window->save_document = icon_create(toolbar, "content-save");
-    window->new_document = icon_create(toolbar, "image-plus");
+    window->open_document = toolbar_icon_create(toolbar, "folder-open");
+    window->save_document = toolbar_icon_create(toolbar, "content-save");
+    window->new_document = toolbar_icon_create(toolbar, "image-plus");
 
     separator_create(toolbar);
 
-    window->pencil = icon_create(toolbar, "pencil");
+    window->pencil = toolbar_icon_create(toolbar, "pencil");
     widget_set_event_handler(window->pencil, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_pencil);
 
-    window->brush = icon_create(toolbar, "brush");
+    window->brush = toolbar_icon_create(toolbar, "brush");
     widget_set_event_handler(window->brush, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_brush);
 
-    window->eraser = icon_create(toolbar, "eraser");
+    window->eraser = toolbar_icon_create(toolbar, "eraser");
     widget_set_event_handler(window->eraser, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_eraser);
 
-    window->fill = icon_create(toolbar, "format-color-fill");
+    window->fill = toolbar_icon_create(toolbar, "format-color-fill");
     widget_set_event_handler(window->fill, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_fill);
 
-    window->picker = icon_create(toolbar, "eyedropper");
+    window->picker = toolbar_icon_create(toolbar, "eyedropper");
     widget_set_event_handler(window->picker, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_picker);
 
     separator_create(toolbar);
 
     // TODO:
-    // window->insert_text = icon_create(toolbar, "format-text-variant");
-    // window->insert_line = icon_create(toolbar, "vector-line");
-    // window->insert_rectangle = icon_create(toolbar, "rectangle-outline");
-    // window->insert_circle = icon_create(toolbar, "circle-outline");
+    // window->insert_text = toolbar_icon_create(toolbar, "format-text-variant");
+    // window->insert_line = toolbar_icon_create(toolbar,  "vector-line");
+    // window->insert_rectangle = toolbar_icon_create(toolbar, "rectangle-outline");
+    // window->insert_circle = toolbar_icon_create(toolbar,  "circle-outline");
     //
     // separator_create(toolbar);
 
     Widget *primary_color_container = container_create(toolbar);
-    primary_color_container->insets = INSETS(8, 0);
+    primary_color_container->insets = INSETS(4, 4);
+    primary_color_container->max_width = 32;
 
     window->primary_color = panel_create(primary_color_container);
     widget_overwrite_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
 
     Widget *secondary_color_container = container_create(toolbar);
-    secondary_color_container->insets = INSETS(8, 0);
+    secondary_color_container->insets = INSETS(4, 4);
+    secondary_color_container->max_width = 32;
 
     window->secondary_color = panel_create(secondary_color_container);
     widget_overwrite_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);

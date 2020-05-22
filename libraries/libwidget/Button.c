@@ -7,11 +7,18 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (window_is_focused(WIDGET(widget)->window))
+    if (widget_is_enable(WIDGET(widget)))
     {
-        painter_fill_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
+        if (widget->state == BUTTON_OVER)
+        {
+            painter_fill_rectangle(painter, widget_bound(widget), ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.025));
+        }
+
+        if (widget->state == BUTTON_PRESS)
+        {
+            painter_fill_rectangle(painter, widget_bound(widget), ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
+        }
     }
-    painter_draw_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_BORDER));
 
     int text_width = font_measure_string(widget_font(), widget->text);
 
@@ -30,6 +37,28 @@ void button_destroy(Button *widget)
     free(widget->text);
 }
 
+void button_event(Button *widget, Event *event)
+{
+    if (event->type == EVENT_MOUSE_ENTER)
+    {
+        widget->state = BUTTON_OVER;
+    }
+    else if (event->type == EVENT_MOUSE_LEAVE)
+    {
+        widget->state = BUTTON_IDLE;
+    }
+    else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    {
+        widget->state = BUTTON_PRESS;
+    }
+    else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
+    {
+        widget->state = BUTTON_OVER;
+    }
+
+    widget_update(WIDGET(widget));
+}
+
 Widget *button_create(Widget *parent, const char *text)
 {
     Button *widget = __create(Button);
@@ -38,6 +67,7 @@ Widget *button_create(Widget *parent, const char *text)
 
     WIDGET(widget)->paint = (WidgetPaintCallback)button_paint;
     WIDGET(widget)->destroy = (WidgetDestroyCallback)button_destroy;
+    WIDGET(widget)->event = (WidgetEventCallback)button_event;
 
     widget_initialize(WIDGET(widget), "Button", parent);
 

@@ -43,3 +43,5 @@ void path_to_cstring(Path *path, char *buffer, uint size);
 char *path_as_string(Path *path);
 
 void path_dump(Path *path);
+
+bool path_equals(Path *left, Path *right);

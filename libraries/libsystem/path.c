@@ -231,3 +231,32 @@ void path_dump(Path *path)
         printf("/%s", path_peek_at(path, i));
     }
 }
+
+bool path_equals(Path *left, Path *right)
+{
+    if (left->is_absolute != right->is_absolute)
+    {
+        return false;
+    }
+
+    if (list_count(left->elements) != list_count(right->elements))
+    {
+        return false;
+    }
+
+    for (int i = 0; i < list_count(left->elements); i++)
+    {
+        const char *leftstr;
+        list_peekat(left->elements, i, (void **)&leftstr);
+
+        const char *rightstr;
+        list_peekat(right->elements, i, (void **)&rightstr);
+
+        if (strcmp(leftstr, rightstr) != 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

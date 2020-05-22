@@ -48,6 +48,12 @@ static void update_navigation_bar(FileExplorerWindow *window)
 
 static void navigate(FileExplorerWindow *window, Path *path, RecordHistory record_history)
 {
+    if (path_equals(window->current_path, path))
+    {
+        path_destroy(path);
+        return;
+    }
+
     ((Table *)window->table)->selected = -1;
 
     if (record_history == RECORD_BACKWARD)

@@ -86,6 +86,10 @@ typedef struct Widget
 
     bool enabled;
     Rectangle bound;
+    int max_height;
+    int max_width;
+    int min_height;
+    int min_width;
     Insets insets;
     WidgetColorOverwrite color_overwrite[__THEME_COLOR_COUNT];
 

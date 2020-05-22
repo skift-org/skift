@@ -399,15 +399,78 @@ Vec2i widget_compute_size(Widget *widget)
     else
     {
 
-        int width = widget->bound.width;
-        int height = widget->bound.height;
+        int width = 0;
+        int height = 0;
+
+        if (widget->layout.type == LAYOUT_STACK)
+        {
+            width = widget->bound.width;
+            height = widget->bound.height;
+        }
 
         list_foreach(Widget, child, widget->childs)
         {
             Vec2i child_size = widget_compute_size(child);
 
-            width = MAX(width, child_size.x);
-            height = MAX(height, child_size.y);
+            switch (widget->layout.type)
+            {
+            case LAYOUT_HFLOW:
+            case LAYOUT_HGRID:
+                width += child_size.x;
+                height = MAX(height, child_size.y);
+                break;
+
+            case LAYOUT_VFLOW:
+            case LAYOUT_VGRID:
+                width = MAX(width, child_size.x);
+                height += child_size.y;
+                break;
+
+            default:
+                width = MAX(width, child_size.x);
+                height = MAX(height, child_size.y);
+                break;
+            }
+
+            if (widget->layout.type == LAYOUT_STACK)
+            {
+            }
+        }
+
+        width += widget->insets.left;
+        width += widget->insets.right;
+
+        height += widget->insets.top;
+        height += widget->insets.bottom;
+
+        if (widget->layout.type == LAYOUT_HFLOW || widget->layout.type == LAYOUT_HGRID)
+        {
+            width += widget->layout.spacing.x * (list_count(widget->childs) - 1);
+        }
+
+        if (widget->layout.type == LAYOUT_VFLOW || widget->layout.type == LAYOUT_VGRID)
+        {
+            height += widget->layout.spacing.y * (list_count(widget->childs) - 1);
+        }
+
+        if (widget->max_width)
+        {
+            width = MIN(width, widget->max_width);
+        }
+
+        if (widget->max_height)
+        {
+            height = MIN(height, widget->max_height);
+        }
+
+        if (widget->min_width)
+        {
+            width = MAX(width, widget->min_width);
+        }
+
+        if (widget->min_height)
+        {
+            height = MAX(height, widget->min_height);
         }
 
         return vec2i(width, height);

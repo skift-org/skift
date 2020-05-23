@@ -34,9 +34,9 @@ Rectangle canvas_bound(Canvas *widget)
 
     Rectangle bound = bitmap_bound(widget->document->bitmap);
 
-    bound = rectangle_offset(bound, widget_bound(widget).position);
+    bound = rectangle_offset(bound, widget_get_bound(widget).position);
 
-    bound = rectangle_center_within(bound, widget_bound(widget));
+    bound = rectangle_center_within(bound, widget_get_bound(widget));
 
     return bound;
 }

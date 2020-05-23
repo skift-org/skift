@@ -7,12 +7,12 @@
 
 Rectangle table_bound(Table *widget)
 {
-    return rectangle_shrink(widget_content_bound(widget), INSETS(0, 0, 0, 16));
+    return rectangle_shrink(widget_get_content_bound(widget), INSETS(0, 0, 0, 16));
 }
 
 Rectangle table_scrollbar_bound(Table *widget)
 {
-    return rectangle_right(widget_content_bound(widget), 16);
+    return rectangle_right(widget_get_content_bound(widget), 16);
 }
 
 Rectangle table_header_bound(Table *widget)
@@ -107,7 +107,7 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_push_clip(painter, widget_bound(widget));
+    painter_push_clip(painter, widget_get_bound(widget));
 
     int column_count = model_column_count(widget->model);
     int column_width = table_bound(widget).width / column_count;

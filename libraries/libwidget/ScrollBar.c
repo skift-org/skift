@@ -5,17 +5,17 @@
 
 Rectangle scrollbar_button_down(ScrollBar *widget)
 {
-    return rectangle_bottom(widget_bound(widget), widget_bound(widget).width);
+    return rectangle_bottom(widget_get_bound(widget), widget_get_bound(widget).width);
 }
 
 Rectangle scrollbar_button_up(ScrollBar *widget)
 {
-    return rectangle_top(widget_bound(widget), widget_bound(widget).width);
+    return rectangle_top(widget_get_bound(widget), widget_get_bound(widget).width);
 }
 
 static Rectangle scrollbar_track(ScrollBar *widget)
 {
-    return rectangle_shrink(widget_bound(widget), INSETS(widget_bound(widget).width, 0));
+    return rectangle_shrink(widget_get_bound(widget), INSETS(widget_get_bound(widget).width, 0));
 }
 
 static Rectangle scrollbar_thumb(ScrollBar *widget)
@@ -37,7 +37,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
 {
     __unused(rectangle);
 
-    painter_clear_rectangle(painter, widget_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
+    painter_clear_rectangle(painter, widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     painter_clear_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     painter_draw_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_BORDER));
 
@@ -52,7 +52,7 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
+    widget_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
     widget_update(WIDGET(widget));
 }
 
@@ -65,7 +65,7 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
+    widget_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
     widget_update(WIDGET(widget));
 }
 

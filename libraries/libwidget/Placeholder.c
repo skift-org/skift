@@ -7,17 +7,17 @@
 void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
-    painter_draw_rectangle(painter, widget_bound(placeholder), COLOR_RED);
+    painter_draw_rectangle(painter, widget_get_bound(placeholder), COLOR_RED);
 
-    painter_blit_icon(painter, icon_cache_get_icon("alert"), rectangle_offset(RECTANGLE_SIZE(18, 18), vec2i_add(widget_bound(placeholder).position, vec2i(8, 8))), COLOR_RED);
+    painter_blit_icon(painter, icon_cache_get_icon("alert"), rectangle_offset(RECTANGLE_SIZE(18, 18), vec2i_add(widget_get_bound(placeholder).position, vec2i(8, 8))), COLOR_RED);
 
     painter_draw_string(
         painter,
         widget_font(),
         placeholder->text,
         vec2i(
-            widget_bound(placeholder).x + 32,
-            widget_bound(placeholder).y + 20),
+            widget_get_bound(placeholder).x + 32,
+            widget_get_bound(placeholder).y + 20),
         widget_get_color(placeholder, THEME_FOREGROUND));
 }
 

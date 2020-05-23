@@ -45,7 +45,7 @@ Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
 {
     Rectangle bound = {};
 
-    bound.position = vec2i(widget_bound(widget).x + x * _cell_size.x, widget_bound(widget).y + y * (int)(_cell_size.y));
+    bound.position = vec2i(widget_get_bound(widget).x + x * _cell_size.x, widget_get_bound(widget).y + y * (int)(_cell_size.y));
     bound.size = vec2i(_cell_size.x, (_cell_size.y));
 
     return bound;

@@ -15,12 +15,12 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
     {
         if (widget->state == BUTTON_OVER)
         {
-            painter_fill_rounded_rectangle(painter, widget_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
+            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
         }
 
         if (widget->state == BUTTON_PRESS)
         {
-            painter_fill_rounded_rectangle(painter, widget_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
+            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
         }
     }
 }
@@ -51,7 +51,7 @@ void button_event(Button *widget, Event *event)
         widget_update(WIDGET(widget));
         event->accepted = true;
 
-        widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_ACTION});
+        widget_event(WIDGET(widget), &(Event){.type = EVENT_ACTION});
     }
 }
 

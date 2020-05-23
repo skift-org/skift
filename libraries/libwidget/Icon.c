@@ -9,7 +9,7 @@ void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
 
     if (widget->bitmap)
     {
-        Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_content_bound(widget));
+        Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_get_content_bound(widget));
 
         if (widget_is_enable(WIDGET(widget)))
         {
@@ -30,7 +30,7 @@ Vec2i icon_size(Icon *widget)
     }
     else
     {
-        return widget_bound(widget).size;
+        return widget_get_bound(widget).size;
     }
 }
 

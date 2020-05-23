@@ -103,48 +103,52 @@ void widget_initialize(
 
 void widget_destroy(Widget *widget);
 
-void widget_disable(Widget *widget);
-
-void widget_enable(Widget *widget);
-
-void widget_add_child(Widget *widget, Widget *child);
-
-void widget_remove_child(Widget *widget, Widget *child);
-
 void widget_dump(Widget *widget, int depth);
 
-void widget_dispatch_event(Widget *widget, struct Event *event);
+void widget_event(Widget *widget, struct Event *event);
 
 void widget_paint(Widget *widget, struct Painter *painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
 
-void widget_focus(Widget *widget);
+void widget_update(Widget *widget);
+
+void widget_update_region(Widget *widget, Rectangle region);
 
 void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler);
 
 void widget_clear_event_handler(Widget *widget, EventType event);
 
-Vec2i widget_compute_size(Widget *widget);
+/* --- Widget childs ------------------------------------ */
 
-Rectangle __widget_bound(Widget *widget);
-#define widget_bound(__widget) __widget_bound(WIDGET(__widget))
+Widget *widget_get_child_at(Widget *parent, Vec2i position);
 
-Rectangle __widget_content_bound(Widget *widget);
-#define widget_content_bound(__widget) __widget_content_bound(WIDGET(__widget))
+void widget_add_child(Widget *widget, Widget *child);
 
-void widget_update(Widget *widget);
-void widget_update_region(Widget *widget, Rectangle region);
+void widget_remove_child(Widget *widget, Widget *child);
 
-Widget *widget_child_at(Widget *parent, Vec2i position);
+/* --- Widget enable state ------------------------------ */
 
-Color __widget_get_color(Widget *widget, ThemeColorRole role);
+void widget_set_focus(Widget *widget);
 
-#define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))
-
-void __widget_overwrite_color(Widget *widget, ThemeColorRole role, Color color);
-#define widget_overwrite_color(__widget, __role, __color) __widget_overwrite_color(WIDGET(__widget), (__role), (__color))
+bool widget_is_enable(Widget *widget);
 
 void widget_set_enable(Widget *widget, bool enable);
 
-bool widget_is_enable(Widget *widget);
+void widget_disable(Widget *widget);
+
+void widget_enable(Widget *widget);
+
+/* --- Widget Style ------------------------------------- */
+
+Color __widget_get_color(Widget *widget, ThemeColorRole role);
+#define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))
+
+void __widget_set_color(Widget *widget, ThemeColorRole role, Color color);
+#define widget_set_color(__widget, __role, __color) __widget_set_color(WIDGET(__widget), (__role), (__color))
+
+Rectangle __widget_get_bound(Widget *widget);
+#define widget_get_bound(__widget) __widget_get_bound(WIDGET(__widget))
+
+Rectangle __widget_get_content_bound(Widget *widget);
+#define widget_get_content_bound(__widget) __widget_get_content_bound(WIDGET(__widget))

@@ -57,7 +57,7 @@ int main(int argc, char **argv)
         Window *window = window_create("console-line", "Terminal", 500, 400, WINDOW_RESIZABLE);
 
         Widget *widget = terminal_widget_create(window_root(window));
-        widget_focus(widget);
+        widget_set_focus(widget);
 
         window_show(window);
 

@@ -61,8 +61,8 @@ typedef struct
 
 static void update_toolbar(PaintWindow *window)
 {
-    widget_overwrite_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
-    widget_overwrite_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
+    widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
+    widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
 static void select_pencil(PaintWindow *window, ...)
@@ -136,14 +136,14 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     primary_color_container->max_width = 32;
 
     window->primary_color = panel_create(primary_color_container);
-    widget_overwrite_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
+    widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
 
     Widget *secondary_color_container = container_create(toolbar);
     secondary_color_container->insets = INSETS(4, 4);
     secondary_color_container->max_width = 32;
 
     window->secondary_color = panel_create(secondary_color_container);
-    widget_overwrite_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
+    widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
 static void on_color_palette_click(PaintWindow *window, Widget *sender, Event *event)
@@ -170,7 +170,7 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
     for (size_t i = 0; i < 18; i++)
     {
         Widget *color_widget = panel_create(palette);
-        widget_overwrite_color(color_widget, THEME_MIDDLEGROUND, _color_palette[i]);
+        widget_set_color(color_widget, THEME_MIDDLEGROUND, _color_palette[i]);
         widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(window, (EventHandlerCallback)on_color_palette_click));
     }
 }

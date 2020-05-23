@@ -9,18 +9,18 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle
 
     if (widget->bitmap == NULL)
     {
-        widget->bitmap = bitmap_create(widget_bound(widget).width, widget_bound(widget).height);
+        widget->bitmap = bitmap_create(widget_get_bound(widget).width, widget_get_bound(widget).height);
         widget->painter = painter_create(widget->bitmap);
         painter_clear(widget->painter, COLOR_BLACK);
     }
 
-    if (widget_bound(widget).width != bitmap_bound(widget->bitmap).width ||
-        widget_bound(widget).height != bitmap_bound(widget->bitmap).height)
+    if (widget_get_bound(widget).width != bitmap_bound(widget->bitmap).width ||
+        widget_get_bound(widget).height != bitmap_bound(widget->bitmap).height)
     {
         painter_destroy(widget->painter);
         bitmap_destroy(widget->bitmap);
 
-        widget->bitmap = bitmap_create(widget_bound(widget).width, widget_bound(widget).height);
+        widget->bitmap = bitmap_create(widget_get_bound(widget).width, widget_get_bound(widget).height);
         widget->painter = painter_create(widget->bitmap);
         painter_clear(widget->painter, COLOR_BLACK);
     }
@@ -33,7 +33,7 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle
         painter_draw_string(widget->painter, widget_font(), widget->demo->name, vec2i(8, 16), COLOR_WHITE);
     }
 
-    painter_blit_bitmap_no_alpha(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_bound(widget));
+    painter_blit_bitmap_no_alpha(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_get_bound(widget));
 }
 
 void demo_widget_on_timer_tick(DemoWidget *widget)

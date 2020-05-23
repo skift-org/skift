@@ -317,14 +317,14 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (rectangle_containe_point(widget_bound(window_root(window)), position))
+    if (rectangle_containe_point(widget_get_bound(window_root(window)), position))
     {
-        return widget_child_at(window_root(window), position);
+        return widget_get_child_at(window_root(window), position);
     }
 
-    if (rectangle_containe_point(widget_bound(window_header(window)), position))
+    if (rectangle_containe_point(widget_get_bound(window_header(window)), position))
     {
-        return widget_child_at(window_header(window), position);
+        return widget_get_child_at(window_header(window), position);
     }
 
     return NULL;
@@ -351,7 +351,7 @@ void window_handle_event(Window *window, Event *event)
 
         if (window->mouse_over_widget)
         {
-            widget_dispatch_event(window->mouse_over_widget, &mouse_leave);
+            widget_event(window->mouse_over_widget, &mouse_leave);
         }
     }
     break;
@@ -411,7 +411,7 @@ void window_handle_event(Window *window, Event *event)
 
                 if (window->mouse_over_widget)
                 {
-                    widget_dispatch_event(window->mouse_over_widget, &mouse_leave);
+                    widget_event(window->mouse_over_widget, &mouse_leave);
                 }
 
                 Event mouse_enter = *event;
@@ -419,7 +419,7 @@ void window_handle_event(Window *window, Event *event)
 
                 if (mouse_over_widget)
                 {
-                    widget_dispatch_event(mouse_over_widget, &mouse_enter);
+                    widget_event(mouse_over_widget, &mouse_enter);
                 }
 
                 window->mouse_over_widget = mouse_over_widget;
@@ -427,7 +427,7 @@ void window_handle_event(Window *window, Event *event)
 
             if (window->mouse_focused_widget)
             {
-                widget_dispatch_event(window->mouse_focused_widget, event);
+                widget_event(window->mouse_focused_widget, event);
             }
         }
 
@@ -436,26 +436,26 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_PRESS:
     {
-        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
+        if (rectangle_containe_point(widget_get_bound(window_root(window)), event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {
                 window->mouse_focused_widget = widget;
-                widget_dispatch_event(widget, event);
+                widget_event(widget, event);
             }
         }
 
         if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), event->mouse.position))
+            if (!event->accepted && rectangle_containe_point(widget_get_bound(window_header(window)), event->mouse.position))
             {
-                Widget *widget = widget_child_at(window_header(window), event->mouse.position);
+                Widget *widget = widget_get_child_at(window_header(window), event->mouse.position);
 
                 if (widget)
                 {
-                    widget_dispatch_event(widget, event);
+                    widget_event(widget, event);
                 }
             }
 
@@ -487,7 +487,7 @@ void window_handle_event(Window *window, Event *event)
         if (widget)
         {
             window->mouse_focused_widget = widget;
-            widget_dispatch_event(widget, event);
+            widget_event(widget, event);
         }
 
         if (window->is_dragging &&
@@ -507,13 +507,13 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_DOUBLE_CLICK:
     {
-        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
+        if (rectangle_containe_point(widget_get_bound(window_root(window)), event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {
-                widget_dispatch_event(widget, event);
+                widget_event(widget, event);
             }
         }
 
@@ -524,7 +524,7 @@ void window_handle_event(Window *window, Event *event)
     {
         if (window->focused_widget)
         {
-            widget_dispatch_event(window->focused_widget, event);
+            widget_event(window->focused_widget, event);
         }
         break;
     }

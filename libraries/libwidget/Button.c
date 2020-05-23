@@ -1,6 +1,10 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/cstring.h>
+#include <libsystem/logger.h>
+
 #include <libwidget/Button.h>
+#include <libwidget/Icon.h>
+#include <libwidget/Label.h>
 #include <libwidget/Window.h>
 
 void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
@@ -11,30 +15,14 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
     {
         if (widget->state == BUTTON_OVER)
         {
-            painter_fill_rectangle(painter, widget_bound(widget), ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.025));
+            painter_fill_rounded_rectangle(painter, widget_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
         }
 
         if (widget->state == BUTTON_PRESS)
         {
-            painter_fill_rectangle(painter, widget_bound(widget), ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
+            painter_fill_rounded_rectangle(painter, widget_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
         }
     }
-
-    int text_width = font_measure_string(widget_font(), widget->text);
-
-    painter_draw_string(
-        painter,
-        widget_font(),
-        widget->text,
-        vec2i(
-            widget_bound(widget).x + widget_bound(widget).width / 2 - text_width / 2,
-            widget_bound(widget).y + widget_bound(widget).height / 2 + 4),
-        widget_get_color(widget, THEME_FOREGROUND));
-}
-
-void button_destroy(Button *widget)
-{
-    free(widget->text);
 }
 
 void button_event(Button *widget, Event *event)
@@ -42,34 +30,70 @@ void button_event(Button *widget, Event *event)
     if (event->type == EVENT_MOUSE_ENTER)
     {
         widget->state = BUTTON_OVER;
+        widget_update(WIDGET(widget));
+        event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_LEAVE)
     {
         widget->state = BUTTON_IDLE;
+        widget_update(WIDGET(widget));
+        event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
         widget->state = BUTTON_PRESS;
+        widget_update(WIDGET(widget));
+        event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
     {
         widget->state = BUTTON_OVER;
-    }
+        widget_update(WIDGET(widget));
+        event->accepted = true;
 
-    widget_update(WIDGET(widget));
+        widget_dispatch_event(WIDGET(widget), &(Event){.type = EVENT_ACTION});
+    }
 }
 
-Widget *button_create(Widget *parent, const char *text)
+Widget *button_create(Widget *parent)
 {
     Button *widget = __create(Button);
 
-    widget->text = strdup(text);
-
     WIDGET(widget)->paint = (WidgetPaintCallback)button_paint;
-    WIDGET(widget)->destroy = (WidgetDestroyCallback)button_destroy;
     WIDGET(widget)->event = (WidgetEventCallback)button_event;
+
+    WIDGET(widget)->layout = HFLOW(4);
+    WIDGET(widget)->insets = INSETS(0, 4);
 
     widget_initialize(WIDGET(widget), "Button", parent);
 
     return WIDGET(widget);
+}
+
+Widget *button_create_with_text(Widget *parent, const char *text)
+{
+    Widget *button = button_create(parent);
+
+    label_create(button, text)->layout_attributes = LAYOUT_FILL;
+
+    return button;
+}
+
+Widget *button_create_with_icon(Widget *parent, const char *icon)
+{
+    Widget *button = button_create(parent);
+
+    icon_create(button, icon)->layout_attributes = LAYOUT_FILL;
+
+    return button;
+}
+
+Widget *button_create_with_icon_and_text(Widget *parent, const char *icon, const char *text)
+{
+    Widget *button = button_create(parent);
+
+    icon_create(button, icon);
+    label_create(button, text);
+
+    return button;
 }

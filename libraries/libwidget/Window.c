@@ -14,7 +14,7 @@
 #include <libwidget/Window.h>
 
 #define WINDOW_RESIZE_AREA 16
-#define WINDOW_HEADER_AREA 32
+#define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
 
 static void close_button_click(void *target, struct Widget *sender, struct Event *event)
@@ -53,21 +53,22 @@ void window_initialize(
     window->header_container->window = window;
 
     window_header(window)->layout = HFLOW(4);
-    window_header(window)->insets = INSETS(0, 2, 8);
+    window_header(window)->insets = INSETS(6, 6);
 
     icon_create(window_header(window), icon ? icon : "application");
-    label_create(window_header(window), title);
+    button_create_with_text(window_header(window), title);
 
-    container_create(window_header(window))->layout_attributes = LAYOUT_FILL;
+    container_create(window_header(window))
+        ->layout_attributes = LAYOUT_FILL;
 
     if (flags & WINDOW_RESIZABLE)
     {
-        icon_create(window_header(window), "window-minimize");
-        icon_create(window_header(window), "window-maximize");
+        button_create_with_icon(window_header(window), "window-minimize");
+        button_create_with_icon(window_header(window), "window-maximize");
     }
 
-    Widget *close_button = icon_create(window_header(window), "window-close");
-    widget_set_event_handler(close_button, EVENT_MOUSE_BUTTON_PRESS, NULL, close_button_click);
+    Widget *close_button = button_create_with_icon(window_header(window), "window-close");
+    widget_set_event_handler(close_button, EVENT_ACTION, NULL, close_button_click);
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;
@@ -314,6 +315,21 @@ void window_end_resize(Window *window)
     window_schedule_update(window, window_bound(window));
 }
 
+Widget *window_child_at(Window *window, Vec2i position)
+{
+    if (rectangle_containe_point(widget_bound(window_root(window)), position))
+    {
+        return widget_child_at(window_root(window), position);
+    }
+
+    if (rectangle_containe_point(widget_bound(window_header(window)), position))
+    {
+        return widget_child_at(window_header(window), position);
+    }
+
+    return NULL;
+}
+
 void window_handle_event(Window *window, Event *event)
 {
     switch (event->type)
@@ -386,7 +402,7 @@ void window_handle_event(Window *window, Event *event)
             // FIXME: Set the cursor based on the focused widget.
             window_set_cursor(window, CURSOR_DEFAULT);
 
-            Widget *mouse_over_widget = widget_child_at(window_root(window), event->mouse.position);
+            Widget *mouse_over_widget = window_child_at(window, event->mouse.position);
 
             if (mouse_over_widget != window->mouse_over_widget)
             {
@@ -422,7 +438,7 @@ void window_handle_event(Window *window, Event *event)
     {
         if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
         {
-            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
+            Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {
@@ -431,7 +447,7 @@ void window_handle_event(Window *window, Event *event)
             }
         }
 
-        if (!(window->flags & WINDOW_BORDERLESS))
+        if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
             if (!event->accepted && rectangle_containe_point(widget_bound(window_header(window)), event->mouse.position))
             {
@@ -466,15 +482,12 @@ void window_handle_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_RELEASE:
     {
-        if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
-        {
-            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
+        Widget *widget = window_child_at(window, event->mouse.position);
 
-            if (widget)
-            {
-                window->mouse_focused_widget = widget;
-                widget_dispatch_event(widget, event);
-            }
+        if (widget)
+        {
+            window->mouse_focused_widget = widget;
+            widget_dispatch_event(widget, event);
         }
 
         if (window->is_dragging &&
@@ -496,7 +509,7 @@ void window_handle_event(Window *window, Event *event)
     {
         if (rectangle_containe_point(widget_bound(window_root(window)), event->mouse.position))
         {
-            Widget *widget = widget_child_at(window_root(window), event->mouse.position);
+            Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {

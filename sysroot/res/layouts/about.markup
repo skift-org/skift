@@ -14,7 +14,7 @@
         <Label text="Copyright © 2018-2020 N. Van Bossuyt."/>
     </Container>
 
-    <Panel>
+    <Container padding="insets(4)" layout="stack">
         <Button id="ok-button" text="Ok"/>
-    </Panel>
+    </Container>
 </Window>

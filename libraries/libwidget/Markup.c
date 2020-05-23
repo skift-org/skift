@@ -217,9 +217,29 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
     if (markup_node_is(node, "Button"))
     {
-        widget = button_create(
-            parent,
-            markup_node_get_attribute_or_default(node, "text", "Button"));
+        if (markup_node_has_attribute(node, "text") && markup_node_has_attribute(node, "icon"))
+        {
+            widget = button_create_with_icon_and_text(
+                parent,
+                markup_node_get_attribute_or_default(node, "icon", "duck"),
+                markup_node_get_attribute_or_default(node, "text", "Button"));
+        }
+        else if (markup_node_has_attribute(node, "text"))
+        {
+            widget = button_create_with_text(
+                parent,
+                markup_node_get_attribute_or_default(node, "text", "Button"));
+        }
+        else if (markup_node_has_attribute(node, "icon"))
+        {
+            widget = button_create_with_icon(
+                parent,
+                markup_node_get_attribute_or_default(node, "icon", "duck"));
+        }
+        else
+        {
+            widget = button_create(parent);
+        }
     }
 
     if (markup_node_is(node, "Label"))

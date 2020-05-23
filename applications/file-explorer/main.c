@@ -160,19 +160,19 @@ Window *file_explorer_window_create(const char *current_path)
     Widget *toolbar = toolbar_create(root);
 
     Widget *backward_button = toolbar_icon_create(toolbar, "arrow-left");
-    widget_set_event_handler(backward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_backward);
+    widget_set_event_handler(backward_button, EVENT_ACTION, window, (WidgetEventHandlerCallback)go_backward);
     window->go_backward = backward_button;
 
     Widget *foreward_button = toolbar_icon_create(toolbar, "arrow-right");
-    widget_set_event_handler(foreward_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_foreward);
+    widget_set_event_handler(foreward_button, EVENT_ACTION, window, (WidgetEventHandlerCallback)go_foreward);
     window->go_foreward = foreward_button;
 
     Widget *up_button = toolbar_icon_create(toolbar, "arrow-up");
-    widget_set_event_handler(up_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_up);
+    widget_set_event_handler(up_button, EVENT_ACTION, window, (WidgetEventHandlerCallback)go_up);
     window->go_up = up_button;
 
     Widget *home_button = toolbar_icon_create(toolbar, "home");
-    widget_set_event_handler(home_button, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)go_home);
+    widget_set_event_handler(home_button, EVENT_ACTION, window, (WidgetEventHandlerCallback)go_home);
     window->go_home = home_button;
 
     separator_create(toolbar);

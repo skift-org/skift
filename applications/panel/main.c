@@ -51,17 +51,13 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(NULL, "Panel", 1024, 32, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = window_create(NULL, "Panel", 1024, 36, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_root(window)->layout = HFLOW(8);
-    window_root(window)->insets = INSETS(0, 0, 0, 4);
+    window_root(window)->insets = INSETS(4);
 
-    Widget *menu = button_create(window_root(window), "");
-    menu->layout = HFLOW(4);
-    menu->insets = INSETS(0, 8);
-    icon_create(menu, "menu");
-    label_create(menu, "skiftOS");
-    widget_set_event_handler(menu, EVENT_MOUSE_BUTTON_RELEASE, NULL, open_menu);
+    Widget *menu = button_create_with_icon_and_text(window_root(window), "menu", "skiftOS");
+    widget_set_event_handler(menu, EVENT_ACTION, NULL, open_menu);
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;

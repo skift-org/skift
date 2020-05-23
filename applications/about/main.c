@@ -1,7 +1,5 @@
 #include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
 #include <libwidget/Image.h>
 #include <libwidget/Label.h>
 #include <libwidget/Markup.h>
@@ -43,7 +41,7 @@ int main(int argc, char **argv)
     Widget *ok_button;
     if ((ok_button = window_get_widget_by_id(window, "ok-button")))
     {
-        widget_set_event_handler(ok_button, EVENT_MOUSE_BUTTON_PRESS, NULL, ok_button_pressed);
+        widget_set_event_handler(ok_button, EVENT_ACTION, NULL, ok_button_pressed);
     }
 
     window_show(window);

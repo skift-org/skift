@@ -121,20 +121,15 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 void menu_create_list(Widget *parent, List *menu)
 {
     Widget *list = container_create(parent);
-    list->layout = VFLOW(0);
+    list->layout = VFLOW(4);
     list->layout_attributes = LAYOUT_FILL;
-    list->insets = INSETS(0);
+    list->insets = INSETS(4);
 
     list_foreach(MenuEntry, entry, menu)
     {
-        Widget *item = button_create(list, "");
-        item->layout = HFLOW(8);
-        item->insets = INSETS(8, 8);
-
-        widget_set_event_handler(item, EVENT_MOUSE_BUTTON_RELEASE, entry, (WidgetEventHandlerCallback)menu_item_click);
-
-        icon_create(item, entry->icon);
-        label_create(item, entry->name);
+        Widget *item = button_create_with_icon_and_text(list, entry->icon, entry->name);
+        item->insets = INSETS(8);
+        widget_set_event_handler(item, EVENT_ACTION, entry, (WidgetEventHandlerCallback)menu_item_click);
     }
 }
 

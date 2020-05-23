@@ -15,7 +15,7 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle
     }
 
     if (widget_bound(widget).width != bitmap_bound(widget->bitmap).width ||
-        widget_bound(widget).width != bitmap_bound(widget->bitmap).width)
+        widget_bound(widget).height != bitmap_bound(widget->bitmap).height)
     {
         painter_destroy(widget->painter);
         bitmap_destroy(widget->bitmap);

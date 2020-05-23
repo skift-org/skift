@@ -41,8 +41,8 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        Widget *demo_button = button_create(side_bar, _demos[i].name);
-        widget_set_event_handler(demo_button, EVENT_MOUSE_BUTTON_PRESS, &_demos[i], (WidgetEventHandlerCallback)set_current_demo_callback);
+        Widget *demo_button = button_create_with_text(side_bar, _demos[i].name);
+        widget_set_event_handler(demo_button, EVENT_ACTION, &_demos[i], (WidgetEventHandlerCallback)set_current_demo_callback);
     }
 
     side_bar->bound.width = 128;

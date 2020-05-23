@@ -10,6 +10,7 @@
 typedef enum
 {
     EVENT_VALUE_CHANGE,
+    EVENT_ACTION,
 
     EVENT_GOT_FOCUS,
     EVENT_LOST_FOCUS,

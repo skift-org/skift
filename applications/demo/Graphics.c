@@ -39,7 +39,7 @@ void graphics_draw(Painter *painter, Rectangle screen, double time)
     painter_draw_rectangle(painter, (Rectangle){{75, 75, 100, 100}}, COLOR_WHITE);
     painter_fill_rectangle(painter, (Rectangle){{100, 100, 100, 100}}, ALPHA(COLOR_RED, 0.5));
     painter_fill_rectangle(painter, (Rectangle){{125, 125, 100, 100}}, ALPHA(COLOR_GREEN, 0.5));
-    painter_fill_rectangle(painter, (Rectangle){{150, 150, 100, 100}}, ALPHA(COLOR_BLUE, 0.5));
+    painter_fill_rounded_rectangle(painter, (Rectangle){{150, 150, 100, 100}}, 32, ALPHA(COLOR_BLUE, 0.5));
 
     _frame++;
 }

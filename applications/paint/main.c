@@ -107,19 +107,19 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     separator_create(toolbar);
 
     window->pencil = toolbar_icon_create(toolbar, "pencil");
-    widget_set_event_handler(window->pencil, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_pencil);
+    widget_set_event_handler(window->pencil, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_pencil);
 
     window->brush = toolbar_icon_create(toolbar, "brush");
-    widget_set_event_handler(window->brush, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_brush);
+    widget_set_event_handler(window->brush, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_brush);
 
     window->eraser = toolbar_icon_create(toolbar, "eraser");
-    widget_set_event_handler(window->eraser, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_eraser);
+    widget_set_event_handler(window->eraser, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_eraser);
 
     window->fill = toolbar_icon_create(toolbar, "format-color-fill");
-    widget_set_event_handler(window->fill, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_fill);
+    widget_set_event_handler(window->fill, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_fill);
 
     window->picker = toolbar_icon_create(toolbar, "eyedropper");
-    widget_set_event_handler(window->picker, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)select_picker);
+    widget_set_event_handler(window->picker, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_picker);
 
     separator_create(toolbar);
 

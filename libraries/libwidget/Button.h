@@ -12,9 +12,13 @@ typedef enum
 typedef struct
 {
     Widget widget;
-
     ButtonState state;
-    char *text;
 } Button;
 
-Widget *button_create(Widget *parent, const char *text);
+Widget *button_create(Widget *parent);
+
+Widget *button_create_with_text(Widget *parent, const char *text);
+
+Widget *button_create_with_icon(Widget *parent, const char *icon);
+
+Widget *button_create_with_icon_and_text(Widget *parent, const char *icon, const char *text);

@@ -7,7 +7,6 @@
 #include <libwidget/Theme.h>
 
 struct Widget;
-struct Event;
 struct Painter;
 struct Window;
 
@@ -16,14 +15,6 @@ typedef void (*WidgetDestroyCallback)(struct Widget *widget);
 typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
 typedef void (*WidgetLayoutCallback)(struct Widget *widget);
-
-typedef void (*WidgetEventHandlerCallback)(void *target, struct Widget *sender, struct Event *event);
-
-typedef struct
-{
-    void *target;
-    WidgetEventHandlerCallback callback;
-} WidgetEventHandler;
 
 typedef enum
 {
@@ -39,13 +30,6 @@ typedef enum
 {
     LAYOUT_FILL = 1 << 0,
 } LayoutAttributes;
-
-typedef enum
-{
-    CONTENT_LEFT,
-    CONTENT_CENTER,
-    CONTENT_RIGHT,
-} ContentAlign;
 
 typedef struct
 {
@@ -78,7 +62,7 @@ typedef struct
 {
     bool overwritten;
     Color color;
-} WidgetColorOverwrite;
+} WidgetColor;
 
 typedef struct Widget
 {
@@ -91,7 +75,7 @@ typedef struct Widget
     int min_height;
     int min_width;
     Insets insets;
-    WidgetColorOverwrite color_overwrite[__THEME_COLOR_COUNT];
+    WidgetColor colors[__THEME_COLOR_COUNT];
 
     WidgetDestroyCallback destroy;
     WidgetPaintCallback paint;
@@ -99,7 +83,7 @@ typedef struct Widget
     WidgetComputeSizeCallback size;
     WidgetLayoutCallback do_layout;
 
-    WidgetEventHandler event_handles[__EVENT_TYPE_COUNT];
+    EventHandler handlers[__EVENT_TYPE_COUNT];
 
     struct Widget *parent;
     struct Window *window;
@@ -137,7 +121,7 @@ void widget_layout(Widget *widget);
 
 void widget_focus(Widget *widget);
 
-void widget_set_event_handler(Widget *widget, EventType event, void *target, WidgetEventHandlerCallback callback);
+void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler);
 
 void widget_clear_event_handler(Widget *widget, EventType event);
 

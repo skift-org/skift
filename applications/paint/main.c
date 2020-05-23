@@ -107,19 +107,19 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     separator_create(toolbar);
 
     window->pencil = toolbar_icon_create(toolbar, "pencil");
-    widget_set_event_handler(window->pencil, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_pencil);
+    widget_set_event_handler(window->pencil, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_pencil));
 
     window->brush = toolbar_icon_create(toolbar, "brush");
-    widget_set_event_handler(window->brush, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_brush);
+    widget_set_event_handler(window->brush, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_brush));
 
     window->eraser = toolbar_icon_create(toolbar, "eraser");
-    widget_set_event_handler(window->eraser, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_eraser);
+    widget_set_event_handler(window->eraser, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_eraser));
 
     window->fill = toolbar_icon_create(toolbar, "format-color-fill");
-    widget_set_event_handler(window->fill, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_fill);
+    widget_set_event_handler(window->fill, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_fill));
 
     window->picker = toolbar_icon_create(toolbar, "eyedropper");
-    widget_set_event_handler(window->picker, EVENT_ACTION, window, (WidgetEventHandlerCallback)select_picker);
+    widget_set_event_handler(window->picker, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_picker));
 
     separator_create(toolbar);
 
@@ -171,7 +171,7 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
     {
         Widget *color_widget = panel_create(palette);
         widget_overwrite_color(color_widget, THEME_MIDDLEGROUND, _color_palette[i]);
-        widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, window, (WidgetEventHandlerCallback)on_color_palette_click);
+        widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(window, (EventHandlerCallback)on_color_palette_click));
     }
 }
 

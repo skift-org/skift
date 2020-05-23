@@ -146,11 +146,11 @@ void widget_dispatch_event(Widget *widget, Event *event)
         widget->event(widget, event);
     }
 
-    if (!event->accepted && widget->event_handles[event->type].callback != NULL)
+    if (!event->accepted && widget->handlers[event->type].callback != NULL)
     {
         event->accepted = true;
-        widget->event_handles[event->type].callback(
-            widget->event_handles[event->type].target,
+        widget->handlers[event->type].callback(
+            widget->handlers[event->type].target,
             widget,
             event);
     }
@@ -545,20 +545,19 @@ Widget *widget_child_at(Widget *parent, Vec2i position)
     return parent;
 }
 
-void widget_set_event_handler(Widget *widget, EventType event, void *target, WidgetEventHandlerCallback callback)
+void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler)
 {
     assert(event < __EVENT_TYPE_COUNT);
 
-    widget->event_handles[event].target = target;
-    widget->event_handles[event].callback = callback;
+    widget->handlers[event] = handler;
 }
 
 void widget_clear_event_handler(Widget *widget, EventType event)
 {
     assert(event < __EVENT_TYPE_COUNT);
 
-    widget->event_handles[event].target = NULL;
-    widget->event_handles[event].callback = NULL;
+    widget->handlers[event].target = NULL;
+    widget->handlers[event].callback = NULL;
 }
 
 Color __widget_get_color(Widget *widget, ThemeColorRole role)
@@ -581,9 +580,9 @@ Color __widget_get_color(Widget *widget, ThemeColorRole role)
         }
     }
 
-    if (widget->color_overwrite[role].overwritten)
+    if (widget->colors[role].overwritten)
     {
-        return widget->color_overwrite[role].color;
+        return widget->colors[role].color;
     }
 
     return window_get_color(widget->window, role);
@@ -591,8 +590,8 @@ Color __widget_get_color(Widget *widget, ThemeColorRole role)
 
 void __widget_overwrite_color(Widget *widget, ThemeColorRole role, Color color)
 {
-    widget->color_overwrite[role].overwritten = true;
-    widget->color_overwrite[role].color = color;
+    widget->colors[role].overwritten = true;
+    widget->colors[role].color = color;
 
     widget_update(widget);
 }

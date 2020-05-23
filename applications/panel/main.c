@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     window_root(window)->insets = INSETS(4);
 
     Widget *menu = button_create_with_icon_and_text(window_root(window), "menu", "skiftOS");
-    widget_set_event_handler(menu, EVENT_ACTION, NULL, open_menu);
+    widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(NULL, open_menu));
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
-    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, NULL, open_task_manager);
+    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(NULL, open_task_manager));
 
     window_show(window);
 

@@ -129,7 +129,7 @@ void menu_create_list(Widget *parent, List *menu)
     {
         Widget *item = button_create_with_icon_and_text(list, entry->icon, entry->name);
         item->insets = INSETS(8);
-        widget_set_event_handler(item, EVENT_ACTION, entry, (WidgetEventHandlerCallback)menu_item_click);
+        widget_set_event_handler(item, EVENT_ACTION, EVENT_HANDLER(entry, (EventHandlerCallback)menu_item_click));
     }
 }
 

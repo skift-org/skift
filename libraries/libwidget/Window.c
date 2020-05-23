@@ -68,7 +68,7 @@ void window_initialize(
     }
 
     Widget *close_button = button_create_with_icon(window_header(window), "window-close");
-    widget_set_event_handler(close_button, EVENT_ACTION, NULL, close_button_click);
+    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;

@@ -195,7 +195,7 @@ Widget *table_create(Widget *parent, Model *model)
     widget_initialize(WIDGET(table), "Table", parent);
 
     table->scrollbar = scrollbar_create(WIDGET(table));
-    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, table, (WidgetEventHandlerCallback)table_on_scrollbar_scroll);
+    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, EVENT_HANDLER(table, table_on_scrollbar_scroll));
 
     return WIDGET(table);
 }

@@ -74,6 +74,14 @@ void graph_destroy(Graph *widget)
     free(widget->data);
 }
 
+static const WidgetClass graph_class = {
+    .name = "Graph",
+
+    .paint = (WidgetPaintCallback)graph_paint,
+    .size = (WidgetComputeSizeCallback)graph_size,
+    .destroy = (WidgetDestroyCallback)graph_destroy,
+};
+
 Widget *graph_create(Widget *parent, size_t data_size, Color color)
 {
     Graph *widget = __create(Graph);
@@ -83,11 +91,7 @@ Widget *graph_create(Widget *parent, size_t data_size, Color color)
     widget->data_size = data_size;
     widget->current = 0;
 
-    WIDGET(widget)->paint = (WidgetPaintCallback)graph_paint;
-    WIDGET(widget)->size = (WidgetComputeSizeCallback)graph_size;
-    WIDGET(widget)->destroy = (WidgetDestroyCallback)graph_destroy;
-
-    widget_initialize(WIDGET(widget), "Graph", parent);
+    widget_initialize(WIDGET(widget), &graph_class, parent);
 
     return WIDGET(widget);
 }

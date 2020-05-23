@@ -64,31 +64,37 @@ typedef struct
     Color color;
 } WidgetColor;
 
+typedef struct WidgetClass
+{
+    const char *name;
+
+    WidgetDestroyCallback destroy;
+    WidgetPaintCallback paint;
+    WidgetEventCallback event;
+    WidgetComputeSizeCallback size;
+    WidgetLayoutCallback layout;
+} WidgetClass;
+
 typedef struct Widget
 {
-    const char *classname;
+    const WidgetClass *klass;
 
     bool enabled;
     Rectangle bound;
+
     int max_height;
     int max_width;
     int min_height;
     int min_width;
     Insets insets;
     WidgetColor colors[__THEME_COLOR_COUNT];
-
-    WidgetDestroyCallback destroy;
-    WidgetPaintCallback paint;
-    WidgetEventCallback event;
-    WidgetComputeSizeCallback size;
-    WidgetLayoutCallback do_layout;
+    Layout layout; // FIXME: this shoul be a separeted object
+    LayoutAttributes layout_attributes;
 
     EventHandler handlers[__EVENT_TYPE_COUNT];
 
     struct Widget *parent;
     struct Window *window;
-    Layout layout; // FIXME: this shoul be a separeted object
-    LayoutAttributes layout_attributes;
     List *childs;
 } Widget;
 
@@ -98,7 +104,7 @@ Font *widget_font(void);
 
 void widget_initialize(
     Widget *widget,
-    const char *classname,
+    const WidgetClass *klass,
     Widget *parent);
 
 void widget_destroy(Widget *widget);

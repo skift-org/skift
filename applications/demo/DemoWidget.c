@@ -59,14 +59,18 @@ void demo_widget_destroy(DemoWidget *widget)
     bitmap_destroy(widget->bitmap);
 }
 
+static const WidgetClass demo_class = {
+    .name = "Demo",
+
+    .destroy = (WidgetDestroyCallback)demo_widget_destroy,
+    .paint = (WidgetPaintCallback)demo_widget_paint,
+};
+
 Widget *demo_widget_create(Widget *parent)
 {
     DemoWidget *widget = __create(DemoWidget);
 
-    widget_initialize(WIDGET(widget), "Demo", parent);
-
-    WIDGET(widget)->destroy = (WidgetDestroyCallback)demo_widget_destroy;
-    WIDGET(widget)->paint = (WidgetPaintCallback)demo_widget_paint;
+    widget_initialize(WIDGET(widget), &demo_class, parent);
 
     widget->demo = NULL;
     widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);

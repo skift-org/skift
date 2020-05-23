@@ -26,6 +26,13 @@ void placeholder_destroy(Placeholder *placeholder)
     free(placeholder->text);
 }
 
+static const WidgetClass placeholder_class = {
+    .name = "Placeholder",
+
+    .paint = (WidgetPaintCallback)placeholder_paint,
+    .destroy = (WidgetDestroyCallback)placeholder_destroy,
+};
+
 Widget *placeholder_create(Widget *parent, const char *text)
 {
     Placeholder *placeholder = __create(Placeholder);
@@ -35,10 +42,7 @@ Widget *placeholder_create(Widget *parent, const char *text)
 
     placeholder->text = strdup(buffer);
 
-    WIDGET(placeholder)->paint = (WidgetPaintCallback)placeholder_paint;
-    WIDGET(placeholder)->destroy = (WidgetDestroyCallback)placeholder_destroy;
-
-    widget_initialize(WIDGET(placeholder), "Placeholder", parent);
+    widget_initialize(WIDGET(placeholder), &placeholder_class, parent);
 
     return WIDGET(placeholder);
 }

@@ -7,21 +7,25 @@ void separator_paint(Separator *widget, Painter *painter, Rectangle rectangle)
     painter_fill_rectangle(painter, rectangle, widget_get_color(widget, THEME_BORDER));
 }
 
-Vec2i separtor_size(Separator *widget)
+Vec2i separator_size(Separator *widget)
 {
     __unused(widget);
 
     return vec2i(1, 1);
 }
 
+static const WidgetClass separator_class = {
+    .name = "Separator",
+
+    .paint = (WidgetPaintCallback)separator_paint,
+    .size = (WidgetComputeSizeCallback)separator_size,
+};
+
 Widget *separator_create(Widget *parent)
 {
     Separator *separator = __create(Separator);
 
-    WIDGET(separator)->paint = (WidgetPaintCallback)separator_paint;
-    WIDGET(separator)->size = (WidgetComputeSizeCallback)separtor_size;
-
-    widget_initialize(WIDGET(separator), "Separator", parent);
+    widget_initialize(WIDGET(separator), &separator_class, parent);
 
     return WIDGET(separator);
 }

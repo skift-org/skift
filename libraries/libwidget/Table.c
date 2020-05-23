@@ -180,19 +180,23 @@ void table_on_scrollbar_scroll(Table *table, ScrollBar *sender, Event *event)
     widget_update(WIDGET(table));
 }
 
+static const WidgetClass table_class = {
+    .name = "Table",
+
+    .paint = (WidgetPaintCallback)table_paint,
+    .event = (WidgetEventCallback)table_event,
+    .layout = (WidgetLayoutCallback)table_layout,
+};
+
 Widget *table_create(Widget *parent, Model *model)
 {
     Table *table = __create(Table);
-
-    WIDGET(table)->paint = (WidgetPaintCallback)table_paint;
-    WIDGET(table)->event = (WidgetEventCallback)table_event;
-    WIDGET(table)->do_layout = (WidgetLayoutCallback)table_layout;
 
     table->model = model;
     table->selected = -1;
     table->scroll_offset = 0;
 
-    widget_initialize(WIDGET(table), "Table", parent);
+    widget_initialize(WIDGET(table), &table_class, parent);
 
     table->scrollbar = scrollbar_create(WIDGET(table));
     widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, EVENT_HANDLER(table, table_on_scrollbar_scroll));

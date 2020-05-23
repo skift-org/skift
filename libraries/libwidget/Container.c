@@ -1,12 +1,14 @@
 #include <libwidget/Container.h>
 
+static const WidgetClass container_class = {
+    .name = "Container",
+};
+
 Widget *container_create(Widget *parent)
 {
     Container *container = __create(Container);
 
-    WIDGET(container)->destroy = NULL;
-
-    widget_initialize(WIDGET(container), "Container", parent);
+    widget_initialize(WIDGET(container), &container_class, parent);
 
     return WIDGET(container);
 }

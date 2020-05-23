@@ -34,6 +34,13 @@ Vec2i icon_size(Icon *widget)
     }
 }
 
+static const WidgetClass icon_class = {
+    .name = "Icon",
+
+    .paint = (WidgetPaintCallback)icon_paint,
+    .size = (WidgetComputeSizeCallback)icon_size,
+};
+
 Widget *icon_create(Widget *parent, const char *name)
 {
     Icon *icon = __create(Icon);
@@ -41,10 +48,7 @@ Widget *icon_create(Widget *parent, const char *name)
     icon->bitmap = icon_cache_get_icon(name);
     icon->bitmap->filtering = BITMAP_FILTERING_LINEAR;
 
-    WIDGET(icon)->paint = (WidgetPaintCallback)icon_paint;
-    WIDGET(icon)->size = (WidgetComputeSizeCallback)icon_size;
-
-    widget_initialize(WIDGET(icon), "Icon", parent);
+    widget_initialize(WIDGET(icon), &icon_class, parent);
 
     return WIDGET(icon);
 }

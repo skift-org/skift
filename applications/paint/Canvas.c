@@ -31,7 +31,6 @@ static void checker_board(Painter *painter, Rectangle rectangle)
 
 Rectangle canvas_bound(Canvas *widget)
 {
-
     Rectangle bound = bitmap_bound(widget->document->bitmap);
 
     bound = rectangle_offset(bound, widget_get_bound(widget).position);
@@ -76,16 +75,20 @@ void canvas_event(Canvas *widget, Event *event)
     }
 }
 
+static const WidgetClass canvas_class = {
+    .name = "Canvas",
+
+    .paint = (WidgetPaintCallback)canvas_paint,
+    .event = (WidgetEventCallback)canvas_event,
+};
+
 Widget *canvas_create(Widget *parent, PaintDocument *document)
 {
     Canvas *canvas = __create(Canvas);
 
-    WIDGET(canvas)->paint = (WidgetPaintCallback)canvas_paint;
-    WIDGET(canvas)->event = (WidgetEventCallback)canvas_event;
-
     canvas->document = document;
 
-    widget_initialize(WIDGET(canvas), "Canvas", parent);
+    widget_initialize(WIDGET(canvas), &canvas_class, parent);
 
     return WIDGET(canvas);
 }

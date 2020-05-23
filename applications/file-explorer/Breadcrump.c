@@ -97,18 +97,22 @@ void breadcrumb_destroy(Breadcrumb *widget)
     path_destroy(widget->path);
 }
 
+static const WidgetClass breadcrumb_class = {
+    .name = "Breadcrumb",
+
+    .paint = (WidgetPaintCallback)breadcrumb_paint,
+    .destroy = (WidgetDestroyCallback)breadcrumb_destroy,
+};
+
 Widget *breadcrumb_create(Widget *parent, const char *current_path)
 {
     Breadcrumb *widget = __create(Breadcrumb);
-
-    WIDGET(widget)->paint = (WidgetPaintCallback)breadcrumb_paint;
-    WIDGET(widget)->destroy = (WidgetDestroyCallback)breadcrumb_destroy;
 
     widget->path = path_create(current_path);
     widget->icon_computer = icon_cache_get_icon("laptop");
     widget->icon_expand = icon_cache_get_icon("chevron-right");
 
-    widget_initialize(WIDGET(widget), "Breadcrumb", parent);
+    widget_initialize(WIDGET(widget), &breadcrumb_class, parent);
 
     return WIDGET(widget);
 }

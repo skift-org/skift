@@ -55,17 +55,21 @@ void button_event(Button *widget, Event *event)
     }
 }
 
+static const WidgetClass button_class = {
+    .name = "Button",
+
+    .paint = (WidgetPaintCallback)button_paint,
+    .event = (WidgetEventCallback)button_event,
+};
+
 Widget *button_create(Widget *parent)
 {
     Button *widget = __create(Button);
 
-    WIDGET(widget)->paint = (WidgetPaintCallback)button_paint;
-    WIDGET(widget)->event = (WidgetEventCallback)button_event;
-
     WIDGET(widget)->layout = HFLOW(4);
     WIDGET(widget)->insets = INSETS(0, 4);
 
-    widget_initialize(WIDGET(widget), "Button", parent);
+    widget_initialize(WIDGET(widget), &button_class, parent);
 
     return WIDGET(widget);
 }

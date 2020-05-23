@@ -36,17 +36,21 @@ void label_destroy(Label *label)
     free(label->text);
 }
 
+static const WidgetClass label_class = {
+    .name = "Label",
+
+    .paint = (WidgetPaintCallback)label_paint,
+    .destroy = (WidgetDestroyCallback)label_destroy,
+    .size = (WidgetComputeSizeCallback)label_size,
+};
+
 Widget *label_create(Widget *parent, const char *text)
 {
     Label *label = __create(Label);
 
     label->text = strdup(text);
 
-    WIDGET(label)->paint = (WidgetPaintCallback)label_paint;
-    WIDGET(label)->destroy = (WidgetDestroyCallback)label_destroy;
-    WIDGET(label)->size = (WidgetComputeSizeCallback)label_size;
-
-    widget_initialize(WIDGET(label), "Label", parent);
+    widget_initialize(WIDGET(label), &label_class, parent);
 
     return WIDGET(label);
 }

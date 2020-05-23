@@ -222,12 +222,16 @@ void terminal_widget_destroy(TerminalWidget *terminal_widget)
     stream_close(terminal_widget->slave_stream);
 }
 
+static const WidgetClass terminal_class = {
+    .name = "Terminal",
+
+    .paint = (WidgetPaintCallback)terminal_widget_paint,
+    .event = (WidgetEventCallback)terminal_widget_event_callback,
+};
+
 Widget *terminal_widget_create(Widget *parent)
 {
     TerminalWidget *widget = __create(TerminalWidget);
-
-    WIDGET(widget)->paint = (WidgetPaintCallback)terminal_widget_paint;
-    WIDGET(widget)->event = (WidgetEventCallback)terminal_widget_event_callback;
 
     terminal_widget_renderer_create(widget);
 
@@ -250,7 +254,7 @@ Widget *terminal_widget_create(Widget *parent)
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);
     launchpad_launch(shell_launchpad, NULL);
 
-    widget_initialize(WIDGET(widget), "Terminal", parent);
+    widget_initialize(WIDGET(widget), &terminal_class, parent);
 
     return WIDGET(widget);
 }

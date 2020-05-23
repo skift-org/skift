@@ -93,6 +93,13 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
     }
 }
 
+static const WidgetClass scrollbar_class = {
+    .name = "ScrollBar",
+
+    .paint = (WidgetPaintCallback)scrollbar_paint,
+    .event = (WidgetEventCallback)scrollbar_event,
+};
+
 Widget *scrollbar_create(Widget *parent)
 {
     ScrollBar *scrollbar = __create(ScrollBar);
@@ -101,10 +108,7 @@ Widget *scrollbar_create(Widget *parent)
     scrollbar->value = 512;
     scrollbar->thumb = 128;
 
-    WIDGET(scrollbar)->paint = (WidgetPaintCallback)scrollbar_paint;
-    WIDGET(scrollbar)->event = (WidgetEventCallback)scrollbar_event;
-
-    widget_initialize(WIDGET(scrollbar), "ScrollBar", parent);
+    widget_initialize(WIDGET(scrollbar), &scrollbar_class, parent);
 
     return WIDGET(scrollbar);
 }

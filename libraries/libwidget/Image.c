@@ -44,6 +44,14 @@ void image_set_image(Widget *image, const char *path)
     ((Image *)image)->bitmap = bitmap_load_from(path);
 }
 
+static const WidgetClass image_class = {
+    .name = "Image",
+
+    .paint = (WidgetPaintCallback)image_paint,
+    .size = (WidgetComputeSizeCallback)image_size,
+    .destroy = (WidgetDestroyCallback)image_destroy,
+};
+
 Widget *image_create(Widget *parent, const char *path)
 {
     Image *image = __create(Image);
@@ -51,11 +59,7 @@ Widget *image_create(Widget *parent, const char *path)
     image->bitmap = bitmap_load_from(path);
     image->size_mode = IMAGE_CENTER;
 
-    WIDGET(image)->paint = (WidgetPaintCallback)image_paint;
-    WIDGET(image)->size = (WidgetComputeSizeCallback)image_size;
-    WIDGET(image)->destroy = (WidgetDestroyCallback)image_destroy;
-
-    widget_initialize(WIDGET(image), "Image", parent);
+    widget_initialize(WIDGET(image), &image_class, parent);
 
     return WIDGET(image);
 }

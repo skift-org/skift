@@ -21,11 +21,14 @@ Font *widget_font(void)
 
 void widget_initialize(
     Widget *widget,
-    const char *classname,
+    const WidgetClass *klass,
     Widget *parent)
 {
+    assert(widget != NULL);
+    assert(klass != NULL);
+
     widget->enabled = true;
-    widget->classname = classname;
+    widget->klass = klass;
     widget->childs = list_create();
     widget->bound = RECTANGLE_SIZE(32, 32);
 
@@ -38,9 +41,9 @@ void widget_initialize(
 
 void widget_destroy(Widget *widget)
 {
-    if (widget->destroy)
+    if (widget->klass->destroy)
     {
-        widget->destroy(widget);
+        widget->klass->destroy(widget);
     }
 
     Widget *child = NULL;
@@ -108,7 +111,7 @@ void widget_dump(Widget *widget, int depth)
     }
 
     printf("%s(0x%08x) (%d, %d) %dx%d\n",
-           widget->classname,
+           widget->klass->name,
            widget,
            widget->bound.x,
            widget->bound.y,
@@ -123,9 +126,9 @@ void widget_dump(Widget *widget, int depth)
 
 void widget_event(Widget *widget, Event *event)
 {
-    if (widget->event)
+    if (widget->klass->event)
     {
-        widget->event(widget, event);
+        widget->klass->event(widget, event);
     }
 
     if (!event->accepted && widget->handlers[event->type].callback != NULL)
@@ -147,9 +150,9 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 {
     painter_push_clip(painter, widget_get_bound(widget));
 
-    if (widget->paint)
+    if (widget->klass->paint)
     {
-        widget->paint(widget, painter, rectangle);
+        widget->klass->paint(widget, painter, rectangle);
     }
 
     list_foreach(Widget, child, widget->childs)
@@ -170,9 +173,9 @@ static Vec2i widget_compute_size(Widget *widget)
     int width = 0;
     int height = 0;
 
-    if (widget->size)
+    if (widget->klass->size)
     {
-        return widget->size(widget);
+        return widget->klass->size(widget);
     }
     else if (widget->layout.type == LAYOUT_STACK)
     {
@@ -309,9 +312,9 @@ void widget_layout(Widget *widget)
     if (list_count(widget->childs) == 0)
         return;
 
-    if (widget->do_layout)
+    if (widget->klass->layout)
     {
-        widget->do_layout(widget);
+        widget->klass->layout(widget);
         return;
     }
 

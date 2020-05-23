@@ -309,14 +309,14 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
 
 void widget_layout(Widget *widget)
 {
-    if (list_count(widget->childs) == 0)
-        return;
-
     if (widget->klass->layout)
     {
         widget->klass->layout(widget);
         return;
     }
+
+    if (list_count(widget->childs) == 0)
+        return;
 
     Layout layout = widget->layout;
 

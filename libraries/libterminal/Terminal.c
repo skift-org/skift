@@ -82,6 +82,13 @@ void terminal_resize(Terminal *terminal, int width, int height)
 
     terminal->width = width;
     terminal->height = height;
+
+    terminal->cursor.x = 0;
+    terminal->cursor.y = 0;
+
+    terminal_clear_all(terminal);
+
+    terminal_write(terminal, "[TERMINAL RESIZED]\n", 19);
 }
 
 TerminalCell terminal_cell_at(Terminal *terminal, int x, int y)
@@ -92,7 +99,7 @@ TerminalCell terminal_cell_at(Terminal *terminal, int x, int y)
         return terminal->buffer[y * terminal->width + x];
     }
 
-    ASSERT_NOT_REACHED();
+    return (TerminalCell){U' ', terminal->current_attributes, true};
 }
 
 void terminal_cell_undirty(Terminal *terminal, int x, int y)

@@ -202,12 +202,27 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
     terminal_widget->terminal = terminal;
 }
 
-void terminal_widget_event_callback(TerminalWidget *terminal_widget, Event *event)
+void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
     if (event->type == EVENT_KEYBOARD_KEY_TYPED)
     {
         stream_write(terminal_widget->master_stream, &event->keyboard.codepoint, sizeof(char));
         event->accepted = true;
+    }
+}
+
+void terminal_widget_layout(TerminalWidget *widget)
+{
+    int width = widget_get_bound(widget).width / _cell_size.width;
+    int height = widget_get_bound(widget).height / _cell_size.height;
+
+    width = MAX(width, 8);
+    height = MAX(height, 8);
+
+    if (widget->terminal->width != width ||
+        widget->terminal->height != height)
+    {
+        terminal_resize(widget->terminal, width, height);
     }
 }
 
@@ -226,7 +241,8 @@ static const WidgetClass terminal_class = {
     .name = "Terminal",
 
     .paint = (WidgetPaintCallback)terminal_widget_paint,
-    .event = (WidgetEventCallback)terminal_widget_event_callback,
+    .event = (WidgetEventCallback)terminal_widget_event,
+    .layout = (WidgetLayoutCallback)terminal_widget_layout,
 };
 
 Widget *terminal_widget_create(Widget *parent)

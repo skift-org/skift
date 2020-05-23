@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libmath/MinMax.h>
+#include <libmath/math.h>
 #include <libsystem/Common.h>
 
 typedef union
@@ -63,4 +64,15 @@ static inline Vec2i vec2i_clamp(Vec2i p, Vec2i pmin, Vec2i pmax)
     p.y = MAX(pmin.y, MIN(pmax.y, p.y));
 
     return p;
+}
+
+static inline double vec2i_distance_square(Vec2i a, Vec2i b)
+{
+    return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}
+
+static inline double vec2i_distance(Vec2i a, Vec2i b)
+{
+    return sqrt((a.x - b.x) * (a.x - b.x) +
+                (a.y - b.y) * (a.y - b.y));
 }

@@ -193,6 +193,11 @@ static inline Rectangle rectangle_bottom(Rectangle rect, int size)
     return (Rectangle){{rect.x, rect.y + rect.height - size, rect.width, size}};
 }
 
+static inline Rectangle rectangle_cutoff_top_botton(Rectangle rect, int top, int bottom)
+{
+    return (Rectangle){{rect.x, rect.y + top, rect.width, rect.height - top - bottom}};
+}
+
 static inline Rectangle rectangle_left(Rectangle rect, int size)
 {
     return (Rectangle){{rect.x, rect.y, size, rect.height}};
@@ -201,6 +206,11 @@ static inline Rectangle rectangle_left(Rectangle rect, int size)
 static inline Rectangle rectangle_right(Rectangle rect, int size)
 {
     return (Rectangle){{rect.x + rect.width - size, rect.y, size, rect.height}};
+}
+
+static inline Rectangle rectangle_cutoff_left_right(Rectangle rect, int left, int right)
+{
+    return (Rectangle){{rect.x + left, rect.y, rect.width - left - right, rect.height}};
 }
 
 #define RECTANGLE_BORDER_TOP (1 << 0)

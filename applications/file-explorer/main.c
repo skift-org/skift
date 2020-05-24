@@ -1,13 +1,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Separator.h>
-#include <libwidget/Table.h>
-#include <libwidget/Toolbar.h>
+#include <libwidget/Widgets.h>
 
 #include "file-explorer/Breadcrumb.h"
 #include "file-explorer/FileSystemModel.h"

@@ -1,4 +1,4 @@
-#include <libwidget/Container.h>
+#include <libwidget/widgets/Container.h>
 
 static const WidgetClass container_class = {
     .name = "Container",

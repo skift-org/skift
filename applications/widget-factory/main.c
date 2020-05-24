@@ -1,7 +1,5 @@
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Panel.h>
+#include <libwidget/Widgets.h>
 
 int main(int argc, char **argv)
 {

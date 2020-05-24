@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libwidget/Image.h>
 #include <libwidget/Widget.h>
 
 typedef struct

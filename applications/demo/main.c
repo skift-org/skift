@@ -1,5 +1,4 @@
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
+#include <libwidget/Widgets.h>
 
 #include "demo/DemoWidget.h"
 

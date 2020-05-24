@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/cstring.h>
-#include <libwidget/IconCache.h>
-#include <libwidget/Placeholder.h>
 #include <libwidget/Window.h>
+#include <libwidget/utils/IconCache.h>
+#include <libwidget/widgets/Placeholder.h>
 
 void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rectangle)
 {

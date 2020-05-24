@@ -4,11 +4,7 @@
 #include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
-#include <libwidget/Panel.h>
+#include <libwidget/Widgets.h>
 
 typedef struct
 {

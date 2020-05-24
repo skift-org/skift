@@ -1,9 +1,6 @@
 #include <libsystem/assert.h>
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Separator.h>
-#include <libwidget/Toolbar.h>
+#include <libwidget/Widgets.h>
 
 #include "paint/Canvas.h"
 #include "paint/PaintDocument.h"

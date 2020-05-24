@@ -3,11 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/system.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Graph.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
+#include <libwidget/Widgets.h>
 
 void widget_date_and_time_update(Widget *widget)
 {

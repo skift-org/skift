@@ -1,8 +1,8 @@
-#include <libwidget/Button.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Toolbar.h>
+#include <libwidget/widgets/Button.h>
+#include <libwidget/widgets/Icon.h>
+#include <libwidget/widgets/Label.h>
+#include <libwidget/widgets/Panel.h>
+#include <libwidget/widgets/Toolbar.h>
 
 Widget *toolbar_create(Widget *parent)
 {

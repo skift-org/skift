@@ -1,6 +1,6 @@
 #include <libsystem/cstring.h>
 #include <libsystem/utils/HashMap.h>
-#include <libwidget/IconCache.h>
+#include <libwidget/utils/IconCache.h>
 
 static HashMap *_icons = NULL;
 

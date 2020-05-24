@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/logger.h>
-#include <libwidget/Panel.h>
+#include <libwidget/widgets/Panel.h>
 
 void panel_paint(Panel *widget, Painter *painter, Rectangle rectangle)
 {

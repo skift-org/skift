@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Image.h>
+#include <libwidget/widgets/Image.h>
 
 void image_paint(Image *widget, Painter *painter, Rectangle rectangle)
 {

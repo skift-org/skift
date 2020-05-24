@@ -1,8 +1,7 @@
 #include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
-#include <libwidget/Image.h>
-#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
+#include <libwidget/Widgets.h>
 
 void ok_button_pressed(void *target, Widget *sender, Event *event)
 {

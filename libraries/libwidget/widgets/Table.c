@@ -1,7 +1,8 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Table.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
+#include <libwidget/widgets/ScrollBar.h>
+#include <libwidget/widgets/Table.h>
 
 #define TABLE_ROW_HEIGHT 24
 

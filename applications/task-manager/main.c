@@ -1,13 +1,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system.h>
 #include <libwidget/Application.h>
-#include <libwidget/Container.h>
-#include <libwidget/Graph.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Table.h>
-#include <libwidget/Toolbar.h>
+#include <libwidget/Widgets.h>
 
 #include "task-manager/TaskModel.h"
 

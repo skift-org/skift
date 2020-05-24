@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/assert.h>
 #include <libsystem/logger.h>
-#include <libwidget/Graph.h>
+#include <libwidget/widgets/Graph.h>
 
 static double distance(double from, double to, int size)
 {

@@ -4,13 +4,9 @@
 #include <libsystem/logger.h>
 #include <libsystem/memory.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
 #include <libwidget/Event.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
-#include <libwidget/Panel.h>
 #include <libwidget/Theme.h>
+#include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
 #define WINDOW_RESIZE_AREA 16

@@ -1,9 +1,4 @@
-#include <libsystem/BuildInfo.h>
 #include <libwidget/Application.h>
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Image.h>
-#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
 
 int main(int argc, char **argv)

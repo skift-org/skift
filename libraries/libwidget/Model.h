@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Color.h>
-#include <libwidget/Variant.h>
+#include <libwidget/utils/Variant.h>
 
 struct Model;
 

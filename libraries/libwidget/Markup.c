@@ -4,13 +4,8 @@
 #include <libsystem/utils/NumberParser.h>
 #include <libsystem/utils/SourceReader.h>
 
-#include <libwidget/Button.h>
-#include <libwidget/Container.h>
-#include <libwidget/Image.h>
-#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
-#include <libwidget/Panel.h>
-#include <libwidget/Placeholder.h>
+#include <libwidget/Widgets.h>
 
 static void whitespace(SourceReader *reader)
 {

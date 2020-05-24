@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Event.h>
-#include <libwidget/IconCache.h>
-#include <libwidget/ScrollBar.h>
+#include <libwidget/utils/IconCache.h>
+#include <libwidget/widgets/ScrollBar.h>
 
 Rectangle scrollbar_button_down(ScrollBar *widget)
 {

@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/cstring.h>
-#include <libwidget/Label.h>
 #include <libwidget/Window.h>
+#include <libwidget/widgets/Label.h>
 
 void label_paint(Label *label, Painter *painter, Rectangle rectangle)
 {

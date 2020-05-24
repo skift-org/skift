@@ -1,7 +1,7 @@
 #include <libsystem/assert.h>
 #include <libsystem/cstring.h>
-#include <libwidget/IconCache.h>
-#include <libwidget/Variant.h>
+#include <libwidget/utils/IconCache.h>
+#include <libwidget/utils/Variant.h>
 
 Variant vint(int value)
 {

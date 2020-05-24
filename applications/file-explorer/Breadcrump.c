@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/IconCache.h>
 #include <libwidget/Window.h>
+#include <libwidget/utils/IconCache.h>
 
 #include "file-explorer/Breadcrumb.h"
 

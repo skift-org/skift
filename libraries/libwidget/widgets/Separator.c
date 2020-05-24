@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/logger.h>
-#include <libwidget/Separator.h>
+#include <libwidget/widgets/Separator.h>
 
 void separator_paint(Separator *widget, Painter *painter, Rectangle rectangle)
 {

@@ -2,9 +2,7 @@
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
 
-#include <libwidget/Button.h>
-#include <libwidget/Icon.h>
-#include <libwidget/Label.h>
+#include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
 void button_paint(Button *widget, Painter *painter, Rectangle rectangle)

@@ -328,6 +328,12 @@ Widget *window_child_at(Window *window, Vec2i position)
 
 void window_handle_event(Window *window, Event *event)
 {
+    if (is_mouse_event(event))
+    {
+        event->mouse.position = vec2i_sub(event->mouse.position, window->on_screen_bound.position);
+        event->mouse.old_position = vec2i_sub(event->mouse.old_position, window->on_screen_bound.position);
+    }
+
     switch (event->type)
     {
     case EVENT_GOT_FOCUS:

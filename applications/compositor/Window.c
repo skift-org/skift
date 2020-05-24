@@ -69,11 +69,6 @@ void window_resize(Window *window, Rectangle bound)
     renderer_region_dirty(window_bound(window));
 }
 
-Vec2i window_screen_window_position(Window *window, Vec2i position)
-{
-    return vec2i_sub(position, window_bound(window).position);
-}
-
 void window_send_event(Window *window, Event event)
 {
     CompositorMessage message = {
@@ -92,8 +87,8 @@ void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position
     Event event = {
         .type = EVENT_MOUSE_MOVE,
         .mouse = {
-            .position = window_screen_window_position(window, position),
-            .old_position = window_screen_window_position(window, old_position),
+            .position = position,
+            .old_position = old_position,
             .button = MOUSE_NO_BUTTON,
             .buttons = buttons,
         },
@@ -112,8 +107,8 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
         Event event = {
             .type = EVENT_MOUSE_BUTTON_PRESS,
             .mouse = {
-                .position = window_screen_window_position(window, position),
-                .old_position = window_screen_window_position(window, position),
+                .position = position,
+                .old_position = position,
                 .button = button,
                 .buttons = buttons,
             },
@@ -127,8 +122,8 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
         Event event = {
             .type = EVENT_MOUSE_BUTTON_RELEASE,
             .mouse = {
-                .position = window_screen_window_position(window, position),
-                .old_position = window_screen_window_position(window, position),
+                .position = position,
+                .old_position = position,
                 .button = button,
                 .buttons = buttons,
             },
@@ -154,8 +149,8 @@ void window_handle_double_click(Window *window, Vec2i position)
     Event event = {
         .type = EVENT_MOUSE_DOUBLE_CLICK,
         .mouse = {
-            .position = window_screen_window_position(window, position),
-            .old_position = window_screen_window_position(window, position),
+            .position = position,
+            .old_position = position,
             .button = MOUSE_BUTTON_LEFT,
             .buttons = MOUSE_BUTTON_LEFT,
         },

@@ -410,6 +410,96 @@ void painter_draw_line_not_aligned(Painter *painter, Vec2i a, Vec2i b, Color col
     }
 }
 
+#define __ipart(X) ((int)(X))
+#define __round(X) ((int)(((double)(X)) + 0.5))
+#define __fpart(X) (((double)(X)) - (double)__ipart(X))
+#define __rfpart(X) (1.0 - __fpart(X))
+#define __plot(__x, __y, __brightness) painter_plot_pixel(painter, vec2i((__x), (__y)), ALPHA(color, (color.A / 255.0) * (__brightness)))
+
+void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color)
+{
+
+    double x0 = a.x;
+    double y0 = a.y;
+    double x1 = b.x;
+    double y1 = b.y;
+
+    const bool steep = abs(y1 - a.y) > abs(x1 - x0);
+    if (steep)
+    {
+        __swap(double, x0, y0);
+        __swap(double, x1, y1);
+    }
+    if (x0 > x1)
+    {
+        __swap(double, x0, x1);
+        __swap(double, y0, y1);
+    }
+
+    const float dx = x1 - x0;
+    const float dy = y1 - y0;
+    const float gradient = (dx == 0) ? 1 : dy / dx;
+
+    int xpx11;
+    float intery;
+    {
+        const float xend = __round(x0);
+        const float yend = y0 + gradient * (xend - x0);
+        const float xgap = __rfpart(x0 + 0.5);
+        xpx11 = (int)xend;
+        const int ypx11 = __ipart(yend);
+        if (steep)
+        {
+            __plot(ypx11, xpx11, __rfpart(yend) * xgap);
+            __plot(ypx11 + 1, xpx11, __fpart(yend) * xgap);
+        }
+        else
+        {
+            __plot(xpx11, ypx11, __rfpart(yend) * xgap);
+            __plot(xpx11, ypx11 + 1, __fpart(yend) * xgap);
+        }
+        intery = yend + gradient;
+    }
+
+    int xpx12;
+    {
+        const float xend = __round(x1);
+        const float yend = y1 + gradient * (xend - x1);
+        const float xgap = __rfpart(x1 + 0.5);
+        xpx12 = (int)xend;
+        const int ypx12 = __ipart(yend);
+        if (steep)
+        {
+            __plot(ypx12, xpx12, __rfpart(yend) * xgap);
+            __plot(ypx12 + 1, xpx12, __fpart(yend) * xgap);
+        }
+        else
+        {
+            __plot(xpx12, ypx12, __rfpart(yend) * xgap);
+            __plot(xpx12, ypx12 + 1, __fpart(yend) * xgap);
+        }
+    }
+
+    if (steep)
+    {
+        for (int x = xpx11 + 1; x < xpx12; x++)
+        {
+            __plot(__ipart(intery), x, __rfpart(intery));
+            __plot(__ipart(intery) + 1, x, __fpart(intery));
+            intery += gradient;
+        }
+    }
+    else
+    {
+        for (int x = xpx11 + 1; x < xpx12; x++)
+        {
+            __plot(x, __ipart(intery), __rfpart(intery));
+            __plot(x, __ipart(intery) + 1, __fpart(intery));
+            intery += gradient;
+        }
+    }
+}
+
 __attribute__((flatten)) void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color)
 {
     if (a.x == b.x)

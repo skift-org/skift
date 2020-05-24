@@ -34,5 +34,6 @@ void lines_draw(Painter *painter, Rectangle screen, double time)
 
     line.color.A = 255;
 
-    painter_draw_line(painter, line.start, line.finish, line.color);
+    painter_fill_rectangle(painter, screen, ALPHA(COLOR_BLACK, 0.01));
+    painter_draw_line_antialias(painter, line.start, line.finish, line.color);
 }

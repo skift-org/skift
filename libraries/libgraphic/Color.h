@@ -6,7 +6,8 @@
 
 #include <libsystem/Common.h>
 
-typedef union {
+typedef union
+{
     struct
     {
         uint8_t R;

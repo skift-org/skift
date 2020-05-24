@@ -53,6 +53,8 @@ void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radiu
 
 void painter_draw_line(Painter *painter, Vec2i from, Vec2i to, Color color);
 
+void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color);
+
 void painter_draw_rectangle(Painter *painter, Rectangle rectangle, Color color);
 
 void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color);

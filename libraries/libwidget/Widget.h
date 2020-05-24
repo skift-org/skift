@@ -133,6 +133,8 @@ void widget_add_child(Widget *widget, Widget *child);
 
 void widget_remove_child(Widget *widget, Widget *child);
 
+void widget_clear_childs(Widget *widget);
+
 /* --- Widget enable state ------------------------------ */
 
 void widget_set_focus(Widget *widget);
@@ -158,3 +160,5 @@ Rectangle __widget_get_bound(Widget *widget);
 
 Rectangle __widget_get_content_bound(Widget *widget);
 #define widget_get_content_bound(__widget) __widget_get_content_bound(WIDGET(__widget))
+
+Vec2i widget_compute_size(Widget *widget);

@@ -24,8 +24,6 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_fill_rectangle(painter, widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-
     double cursor_position = widget->current / (double)widget->data_size;
 
     for (int i = 0; i < widget_get_bound(widget).width; i++)

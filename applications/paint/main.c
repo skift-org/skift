@@ -129,17 +129,17 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     // separator_create(toolbar);
 
     Widget *primary_color_container = container_create(toolbar);
-    primary_color_container->insets = INSETS(4, 4);
-    primary_color_container->max_width = 32;
+    primary_color_container->min_width = 20;
+    primary_color_container->insets = INSETS(4);
 
-    window->primary_color = panel_create(primary_color_container);
+    window->primary_color = rounded_panel_create(primary_color_container, 4);
     widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
 
     Widget *secondary_color_container = container_create(toolbar);
-    secondary_color_container->insets = INSETS(4, 4);
-    secondary_color_container->max_width = 32;
+    secondary_color_container->min_width = 20;
+    secondary_color_container->insets = INSETS(4);
 
-    window->secondary_color = panel_create(secondary_color_container);
+    window->secondary_color = rounded_panel_create(secondary_color_container, 4);
     widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
@@ -161,12 +161,13 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
 {
     __unused(window);
 
-    Widget *palette = panel_create(parent);
-    palette->layout = HGRID(1);
+    Widget *palette = toolbar_create(parent);
+    palette->layout = HFLOW(4);
 
     for (size_t i = 0; i < 18; i++)
     {
-        Widget *color_widget = panel_create(palette);
+        Widget *color_widget = rounded_panel_create(palette, 4);
+        color_widget->min_width = 28;
         widget_set_color(color_widget, THEME_MIDDLEGROUND, _color_palette[i]);
         widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(window, (EventHandlerCallback)on_color_palette_click));
     }

@@ -10,8 +10,8 @@ Widget *toolbar_create(Widget *parent)
 
     toolbar->layout = HFLOW(4);
     toolbar->insets = INSETS(4, 4);
-    toolbar->max_height = 36;
-    toolbar->min_height = 36;
+    toolbar->max_height = 38;
+    toolbar->min_height = 38;
 
     return toolbar;
 }
@@ -19,7 +19,8 @@ Widget *toolbar_create(Widget *parent)
 Widget *toolbar_icon_create(Widget *parent, const char *icon)
 {
     Widget *toolbar_icon = button_create(parent);
-    toolbar_icon->bound.width = 28;
+    toolbar_icon->layout = STACK();
+    toolbar_icon->insets = INSETS(6);
     icon_create(toolbar_icon, icon);
     return toolbar_icon;
 }

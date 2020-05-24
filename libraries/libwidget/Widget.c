@@ -97,6 +97,15 @@ void widget_remove_child(Widget *widget, Widget *child)
     widget_invalidate_layout(widget);
 }
 
+void widget_clear_childs(Widget *widget)
+{
+    Widget *child = NULL;
+    while (list_peek(widget->childs, (void **)&child))
+    {
+        widget_destroy(child);
+    }
+}
+
 void widget_dump(Widget *widget, int depth)
 {
     for (int i = 0; i < depth; i++)
@@ -154,6 +163,8 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 
     painter_push_clip(painter, widget_get_bound(widget));
 
+    // painter_fill_rectangle(painter, widget_get_content_bound(widget), ALPHA(COLOR_MAGENTA, 0.25));
+
     if (widget->klass->paint)
     {
         widget->klass->paint(widget, painter, rectangle);
@@ -167,12 +178,12 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    //painter_draw_rectangle(painter, widget_get_bound(widget), COLOR_CYAN);
+    // painter_draw_rectangle(painter, widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
 
     painter_pop_clip(painter);
 }
 
-static Vec2i widget_compute_size(Widget *widget)
+Vec2i widget_compute_size(Widget *widget)
 {
     int width = 0;
     int height = 0;
@@ -184,8 +195,8 @@ static Vec2i widget_compute_size(Widget *widget)
     else if (widget->layout.type == LAYOUT_STACK)
     {
 
-        width = widget->bound.width;
-        height = widget->bound.height;
+        width = widget->min_width;
+        height = widget->min_height;
 
         list_foreach(Widget, child, widget->childs)
         {
@@ -197,12 +208,6 @@ static Vec2i widget_compute_size(Widget *widget)
     }
     else
     {
-        if (widget->layout.type == LAYOUT_STACK)
-        {
-            width = widget->bound.width;
-            height = widget->bound.height;
-        }
-
         list_foreach(Widget, child, widget->childs)
         {
             Vec2i child_size = widget_compute_size(child);

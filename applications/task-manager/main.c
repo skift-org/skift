@@ -56,7 +56,6 @@ int main(int argc, char **argv)
     window_root((Window *)window)->layout = VFLOW(0);
 
     /// --- Toolbar --- ///
-
     Widget *toolbar = toolbar_create(window_root((Window *)window));
     toolbar_icon_with_text_create(toolbar, "plus", "New task");
     toolbar_icon_with_text_create(toolbar, "close", "Cancel task");
@@ -70,12 +69,14 @@ int main(int argc, char **argv)
     timer_start(window->table_timer);
 
     /// --- Graphs --- ///
-    Widget *graphs_container = container_create(window_root((Window *)window));
-    graphs_container->layout = HGRID(1);
+    Widget *graphs_container = panel_create(window_root((Window *)window));
+    graphs_container->layout = HFLOW(0);
+    graphs_container->max_height = 96;
 
     window->cpu_graph = graph_create(graphs_container, 256, COLOR_SEAGREEN);
     window->cpu_graph->layout = VFLOW(8);
     window->cpu_graph->insets = INSETS(8);
+    window->cpu_graph->layout_attributes = LAYOUT_FILL;
 
     Widget *cpu_icon_and_text = container_create(window->cpu_graph);
     cpu_icon_and_text->layout = HFLOW(4);
@@ -85,9 +86,12 @@ int main(int argc, char **argv)
     window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);
 
+    separator_create(graphs_container);
+
     window->ram_graph = graph_create(graphs_container, 256, COLOR_ROYALBLUE);
     window->ram_graph->layout = VFLOW(8);
     window->ram_graph->insets = INSETS(8);
+    window->ram_graph->layout_attributes = LAYOUT_FILL;
 
     Widget *ram_icon_and_text = container_create(window->ram_graph);
     ram_icon_and_text->layout = HFLOW(4);

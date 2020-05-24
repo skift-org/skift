@@ -25,7 +25,7 @@ Vec2i icon_size(Icon *widget)
 {
     if (widget->bitmap)
     {
-        return rectangle_expand(bitmap_bound(widget->bitmap), WIDGET(widget)->insets).size;
+        return bitmap_bound(widget->bitmap).size;
     }
     else
     {

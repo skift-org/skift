@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
 
-    Widget *graph_container = container_create(window_root(window));
+    Widget *graph_container = panel_create(window_root(window));
     graph_container->layout = VGRID(1);
 
     Widget *ram_graph = graph_create(graph_container, 50, COLOR_ROYALBLUE);
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
-    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(NULL, open_task_manager));
+    widget_set_event_handler(graph_container, EVENT_ACTION, EVENT_HANDLER(NULL, open_task_manager));
 
     window_show(window);
 

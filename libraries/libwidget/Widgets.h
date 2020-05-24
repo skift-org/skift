@@ -8,6 +8,7 @@
 #include <libwidget/widgets/Label.h>
 #include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/Placeholder.h>
+#include <libwidget/widgets/RoundedPanel.h>
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Separator.h>
 #include <libwidget/widgets/Table.h>

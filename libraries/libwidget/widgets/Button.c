@@ -85,6 +85,9 @@ Widget *button_create_with_icon(Widget *parent, const char *icon)
 {
     Widget *button = button_create(parent);
 
+    WIDGET(button)->layout = STACK();
+    WIDGET(button)->insets = INSETS(4, 4);
+
     icon_create(button, icon)->layout_attributes = LAYOUT_FILL;
 
     return button;

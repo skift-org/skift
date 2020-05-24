@@ -51,7 +51,9 @@ void window_initialize(
     window_header(window)->layout = HFLOW(4);
     window_header(window)->insets = INSETS(6, 6);
 
-    icon_create(window_header(window), icon ? icon : "application");
+    Widget *window_icon = icon_create(window_header(window), icon ? icon : "application");
+    window_icon->insets = INSETS(0, 0, 4, 0);
+
     button_create_with_text(window_header(window), title);
 
     container_create(window_header(window))
@@ -194,6 +196,8 @@ void window_paint(Window *window, Painter *painter, Rectangle rectangle)
 {
     painter_clear_rectangle(painter, rectangle, window_get_color(window, THEME_BACKGROUND));
 
+    painter_push_clip(painter, rectangle);
+
     if (rectangle_container_rectangle(window_content_bound(window), rectangle))
     {
         if (window_root(window))
@@ -218,6 +222,8 @@ void window_paint(Window *window, Painter *painter, Rectangle rectangle)
             painter_draw_rectangle(painter, window_bound(window), window_get_color(window, THEME_ACCENT));
         }
     }
+
+    painter_pop_clip(painter);
 }
 
 void window_dump(Window *window)
@@ -280,7 +286,6 @@ void window_begin_resize(Window *window, Vec2i mouse_position)
 
 void window_do_resize(Window *window, Vec2i mouse_position)
 {
-
     Rectangle new_bound = rectangle_from_two_point(window->resize_begin, vec2i_add(window_bound_on_screen(window).position, mouse_position));
 
     if (!window->resize_horizontal)
@@ -294,6 +299,11 @@ void window_do_resize(Window *window, Vec2i mouse_position)
         new_bound.y = window_bound_on_screen(window).y;
         new_bound.height = window_bound_on_screen(window).height;
     }
+
+    Vec2i content_size = widget_compute_size(window_root(window));
+
+    new_bound.height = MAX(new_bound.height, WINDOW_HEADER_AREA + content_size.height);
+    new_bound.width = MAX(new_bound.width, MAX(widget_compute_size(window_header(window)).width, content_size.width));
 
     window_set_on_screen_bound(window, new_bound);
 

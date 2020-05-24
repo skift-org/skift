@@ -148,6 +148,10 @@ void widget_event(Widget *widget, Event *event)
 
 void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 {
+    if (widget_get_bound(widget).width == 0 ||
+        widget_get_bound(widget).height == 0)
+        return;
+
     painter_push_clip(painter, widget_get_bound(widget));
 
     if (widget->klass->paint)

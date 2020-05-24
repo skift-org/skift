@@ -29,7 +29,7 @@ Widget *toolbar_icon_with_text_create(Widget *parent, const char *icon, const ch
     Widget *toolbar_icon = button_create(parent);
 
     toolbar_icon->layout = HFLOW(4);
-    toolbar_icon->insets = INSETS(0, 4);
+    toolbar_icon->insets = INSETS(0, 0, 4, 8);
 
     icon_create(toolbar_icon, icon);
     label_create(toolbar_icon, text);

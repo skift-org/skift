@@ -7,7 +7,7 @@
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"
 
-Result file_FsOperationOpen(FsFile *node, FsHandle *handle)
+static Result file_open(FsFile *node, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
@@ -20,7 +20,7 @@ Result file_FsOperationOpen(FsFile *node, FsHandle *handle)
     return SUCCESS;
 }
 
-Result file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result file_read(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     if (handle->offset <= node->size)
     {
@@ -31,7 +31,7 @@ Result file_FsOperationRead(FsFile *node, FsHandle *handle, void *buffer, size_t
     return SUCCESS;
 }
 
-Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result file_write(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     if ((handle->offset + size) > node->realsize)
     {
@@ -47,14 +47,14 @@ Result file_FsOperationWrite(FsFile *node, FsHandle *handle, const void *buffer,
     return SUCCESS;
 }
 
-size_t file_FsOperationSize(FsFile *node, FsHandle *handle)
+static size_t file_size(FsFile *node, FsHandle *handle)
 {
     __unused(handle);
 
     return node->size;
 }
 
-void file_FsOperationDestroy(FsFile *node)
+static void file_destroy(FsFile *node)
 {
     free(node->buffer);
 }
@@ -65,11 +65,11 @@ FsNode *file_create(void)
 
     fsnode_init(FSNODE(file), FILE_TYPE_REGULAR);
 
-    FSNODE(file)->open = (FsOperationOpen)file_FsOperationOpen;
-    FSNODE(file)->read = (FsOperationRead)file_FsOperationRead;
-    FSNODE(file)->write = (FsOperationWrite)file_FsOperationWrite;
-    FSNODE(file)->size = (FsOperationSize)file_FsOperationSize;
-    FSNODE(file)->destroy = (FsOperationDestroy)file_FsOperationDestroy;
+    FSNODE(file)->open = (FsNodeOpenCallback)file_open;
+    FSNODE(file)->read = (FsNodeReadCallback)file_read;
+    FSNODE(file)->write = (FsNodeWriteCallback)file_write;
+    FSNODE(file)->size = (FsNodeSizeCallback)file_size;
+    FSNODE(file)->destroy = (FsNodeDestroyCallback)file_destroy;
 
     file->buffer = (char *)malloc(512);
     file->realsize = 512;

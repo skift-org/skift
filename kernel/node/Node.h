@@ -7,33 +7,33 @@
 struct FsNode;
 struct FsHandle;
 
-typedef Result (*FsOperationOpen)(struct FsNode *node, struct FsHandle *handle);
-typedef void (*FsOperationClose)(struct FsNode *node, struct FsHandle *handle);
+typedef Result (*FsNodeOpenCallback)(struct FsNode *node, struct FsHandle *handle);
+typedef void (*FsNodeCloseCallback)(struct FsNode *node, struct FsHandle *handle);
 
-typedef bool (*FsOperationCanRead)(struct FsNode *node, struct FsHandle *handle);
-typedef bool (*FsOperationCanWrite)(struct FsNode *node, struct FsHandle *handle);
+typedef bool (*FsNodeCanReadCallback)(struct FsNode *node, struct FsHandle *handle);
+typedef bool (*FsNodeCanWriteCallback)(struct FsNode *node, struct FsHandle *handle);
 
-typedef Result (*FsOperationRead)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *read);
-typedef Result (*FsOperationWrite)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *written);
+typedef Result (*FsNodeReadCallback)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *read);
+typedef Result (*FsNodeWriteCallback)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
-typedef struct FsNode *(*FsOperationFind)(struct FsNode *node, const char *name);
-typedef Result (*FsOperationLink)(struct FsNode *node, const char *name, struct FsNode *child);
-typedef Result (*FsOperationUnlink)(struct FsNode *node, const char *name);
+typedef struct FsNode *(*FsNodeFindCallback)(struct FsNode *node, const char *name);
+typedef Result (*FsNodeLinkCallback)(struct FsNode *node, const char *name, struct FsNode *child);
+typedef Result (*FsNodeUnlinkCallback)(struct FsNode *node, const char *name);
 
-typedef Result (*FsOperationCall)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
-typedef Result (*FsOperationStat)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
+typedef Result (*FsNodeCallCallback)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
+typedef Result (*FsNodeStatCallback)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
-typedef size_t (*FsOperationSize)(struct FsNode *node, struct FsHandle *handle);
+typedef size_t (*FsNodeSizeCallback)(struct FsNode *node, struct FsHandle *handle);
 
-typedef struct FsNode *(*FsOperationOpenConnection)(struct FsNode *node);
+typedef struct FsNode *(*FsNodeOpenConnectionCallback)(struct FsNode *node);
 
-typedef void (*FsOperationAccept)(struct FsNode *node);
-typedef bool (*FsOperationIsAccepted)(struct FsNode *node);
+typedef void (*FsNodeAcceptCallback)(struct FsNode *node);
+typedef bool (*FsNodeIsAcceptedCallback)(struct FsNode *node);
 
-typedef bool (*FsOperationCanAcceptConnection)(struct FsNode *node);
-typedef struct FsNode *(*FsOperationAcceptConnection)(struct FsNode *node);
+typedef bool (*FsNodeCanAcceptConnectionCallback)(struct FsNode *node);
+typedef struct FsNode *(*FsNodeAcceptConnectionCallback)(struct FsNode *node);
 
-typedef void (*FsOperationDestroy)(struct FsNode *node);
+typedef void (*FsNodeDestroyCallback)(struct FsNode *node);
 
 typedef struct FsNode
 {
@@ -47,27 +47,27 @@ typedef struct FsNode
     uint server;
     uint master;
 
-    FsOperationOpen open;
-    FsOperationClose close;
-    FsOperationCanRead can_read;
-    FsOperationCanRead can_write;
-    FsOperationRead read;
-    FsOperationWrite write;
-    FsOperationFind find;
-    FsOperationLink link;
-    FsOperationUnlink unlink;
-    FsOperationCall call;
-    FsOperationStat stat;
-    FsOperationSize size;
+    FsNodeOpenCallback open;
+    FsNodeCloseCallback close;
+    FsNodeCanReadCallback can_read;
+    FsNodeCanWriteCallback can_write;
+    FsNodeReadCallback read;
+    FsNodeWriteCallback write;
+    FsNodeFindCallback find;
+    FsNodeLinkCallback link;
+    FsNodeUnlinkCallback unlink;
+    FsNodeCallCallback call;
+    FsNodeStatCallback stat;
+    FsNodeSizeCallback size;
 
-    FsOperationOpenConnection open_connection;
-    FsOperationAcceptConnection accept_connection;
-    FsOperationCanAcceptConnection can_accept_connection;
+    FsNodeOpenConnectionCallback open_connection;
+    FsNodeAcceptConnectionCallback accept_connection;
+    FsNodeCanAcceptConnectionCallback can_accept_connection;
 
-    FsOperationAccept accept;
-    FsOperationIsAccepted is_accepted;
+    FsNodeAcceptCallback accept;
+    FsNodeIsAcceptedCallback is_accepted;
 
-    FsOperationDestroy destroy;
+    FsNodeDestroyCallback destroy;
 } FsNode;
 
 #define FSNODE(__subclass) ((FsNode *)(__subclass))

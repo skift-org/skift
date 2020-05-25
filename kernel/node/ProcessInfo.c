@@ -22,7 +22,7 @@ static const char *TASK_STATES[] = {
     "canceled",
 };
 
-Result process_info_FsOperationOpen(FsProcessInfo *node, FsHandle *handle)
+static Result process_info_open(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -54,7 +54,7 @@ Result process_info_FsOperationOpen(FsProcessInfo *node, FsHandle *handle)
     return SUCCESS;
 }
 
-void process_info_FsOperationClose(FsProcessInfo *node, FsHandle *handle)
+static void process_info_close(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -64,7 +64,7 @@ void process_info_FsOperationClose(FsProcessInfo *node, FsHandle *handle)
     }
 }
 
-Result process_info_FsOperationRead(FsProcessInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result process_info_read(FsProcessInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
 
@@ -77,7 +77,7 @@ Result process_info_FsOperationRead(FsProcessInfo *node, FsHandle *handle, void 
     return SUCCESS;
 }
 
-size_t process_info_FsOperationSize(FsProcessInfo *node, FsHandle *handle)
+static size_t process_info_size(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -91,15 +91,16 @@ size_t process_info_FsOperationSize(FsProcessInfo *node, FsHandle *handle)
     }
 }
 
-FsNode *process_info_create(void)
+static FsNode *process_info_create(void)
 {
     FsProcessInfo *info = __create(FsProcessInfo);
 
     fsnode_init(FSNODE(info), FILE_TYPE_DEVICE);
 
-    FSNODE(info)->open = (FsOperationOpen)process_info_FsOperationOpen;
-    FSNODE(info)->read = (FsOperationRead)process_info_FsOperationRead;
-    FSNODE(info)->size = (FsOperationSize)process_info_FsOperationSize;
+    FSNODE(info)->open = (FsNodeOpenCallback)process_info_open;
+    FSNODE(info)->close = (FsNodeCloseCallback)process_info_close;
+    FSNODE(info)->read = (FsNodeReadCallback)process_info_read;
+    FSNODE(info)->size = (FsNodeSizeCallback)process_info_size;
 
     return (FsNode *)info;
 }

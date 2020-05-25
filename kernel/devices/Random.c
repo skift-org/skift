@@ -5,7 +5,7 @@
 
 static Random _random;
 
-static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result random_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
@@ -22,7 +22,7 @@ static Result random_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
     return SUCCESS;
 }
 
-static Result random_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *written)
+static Result random_write(FsNode *node, FsHandle *handle, const void *buffer, uint size, size_t *written)
 {
     __unused(node);
     __unused(handle);
@@ -41,8 +41,8 @@ void random_initialize(void)
 
     fsnode_init(random_device, FILE_TYPE_DEVICE);
 
-    FSNODE(random_device)->read = (FsOperationRead)random_FsOperationRead;
-    FSNODE(random_device)->write = (FsOperationWrite)random_FsOperationWrite;
+    FSNODE(random_device)->read = (FsNodeReadCallback)random_read;
+    FSNODE(random_device)->write = (FsNodeWriteCallback)random_write;
 
     Path *random_device_path = path_create("/dev/random");
     filesystem_link_and_take_ref(random_device_path, random_device);

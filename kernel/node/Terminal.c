@@ -7,7 +7,7 @@
 
 #define TERMINAL_RINGBUFFER_SIZE 1024
 
-bool terminal_FsOperationCanRead(FsTerminal *terminal, FsHandle *handle)
+static bool terminal_can_read(FsTerminal *terminal, FsHandle *handle)
 {
     __unused(handle);
 
@@ -21,7 +21,7 @@ bool terminal_FsOperationCanRead(FsTerminal *terminal, FsHandle *handle)
     }
 }
 
-bool terminal_FsOperationCanWrite(FsTerminal *terminal, FsHandle *handle)
+static bool terminal_can_write(FsTerminal *terminal, FsHandle *handle)
 {
     __unused(handle);
 
@@ -35,7 +35,7 @@ bool terminal_FsOperationCanWrite(FsTerminal *terminal, FsHandle *handle)
     }
 }
 
-Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result terminal_read(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(handle);
 
@@ -61,7 +61,7 @@ Result terminal_FsOperationRead(FsTerminal *terminal, FsHandle *handle, void *bu
     return SUCCESS;
 }
 
-Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result terminal_write(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(handle);
 
@@ -87,7 +87,7 @@ Result terminal_FsOperationWrite(FsTerminal *terminal, FsHandle *handle, const v
     return SUCCESS;
 }
 
-Result terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
+static Result terminal_iocall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
 {
     __unused(handle);
 
@@ -117,7 +117,7 @@ Result terminal_FsOperationCall(FsTerminal *terminal, FsHandle *handle, int requ
     }
 }
 
-size_t terminal_FsOperationSize(FsTerminal *terminal, FsHandle *handle)
+static size_t terminal_size(FsTerminal *terminal, FsHandle *handle)
 {
     __unused(handle);
     __unused(terminal);
@@ -125,7 +125,7 @@ size_t terminal_FsOperationSize(FsTerminal *terminal, FsHandle *handle)
     return TERMINAL_RINGBUFFER_SIZE;
 }
 
-void terminal_FsOperationDestroy(FsTerminal *terminal)
+static void terminal_destroy(FsTerminal *terminal)
 {
     ringbuffer_destroy(terminal->master_to_slave_buffer);
     ringbuffer_destroy(terminal->slave_to_master_buffer);
@@ -137,13 +137,13 @@ FsNode *terminal_create(void)
 
     fsnode_init(FSNODE(terminal), FILE_TYPE_TERMINAL);
 
-    FSNODE(terminal)->can_read = (FsOperationCanRead)terminal_FsOperationCanRead;
-    FSNODE(terminal)->can_write = (FsOperationCanWrite)terminal_FsOperationCanWrite;
-    FSNODE(terminal)->read = (FsOperationRead)terminal_FsOperationRead;
-    FSNODE(terminal)->write = (FsOperationWrite)terminal_FsOperationWrite;
-    FSNODE(terminal)->call = (FsOperationCall)terminal_FsOperationCall;
-    FSNODE(terminal)->size = (FsOperationSize)terminal_FsOperationSize;
-    FSNODE(terminal)->destroy = (FsOperationDestroy)terminal_FsOperationDestroy;
+    FSNODE(terminal)->can_read = (FsNodeCanReadCallback)terminal_can_read;
+    FSNODE(terminal)->can_write = (FsNodeCanWriteCallback)terminal_can_write;
+    FSNODE(terminal)->read = (FsNodeReadCallback)terminal_read;
+    FSNODE(terminal)->write = (FsNodeWriteCallback)terminal_write;
+    FSNODE(terminal)->call = (FsNodeCallCallback)terminal_iocall;
+    FSNODE(terminal)->size = (FsNodeSizeCallback)terminal_size;
+    FSNODE(terminal)->destroy = (FsNodeDestroyCallback)terminal_destroy;
 
     terminal->width = 80;
     terminal->width = 25;

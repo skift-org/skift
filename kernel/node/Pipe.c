@@ -6,7 +6,7 @@
 
 #define PIPE_BUFFER_SIZE 4096
 
-bool pipe_FsOperationCanRead(FsPipe *node, FsHandle *handle)
+static bool pipe_can_read(FsPipe *node, FsHandle *handle)
 {
     __unused(handle);
 
@@ -14,7 +14,7 @@ bool pipe_FsOperationCanRead(FsPipe *node, FsHandle *handle)
     return !ringbuffer_is_empty(node->buffer) || !node->node.writers;
 }
 
-bool pipe_FsOperationCanWrite(FsPipe *node, FsHandle *handle)
+static bool pipe_can_write(FsPipe *node, FsHandle *handle)
 {
     __unused(handle);
 
@@ -22,7 +22,7 @@ bool pipe_FsOperationCanWrite(FsPipe *node, FsHandle *handle)
     return !ringbuffer_is_full(node->buffer) || !node->node.readers;
 }
 
-Result pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result pipe_read(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(handle);
 
@@ -36,7 +36,7 @@ Result pipe_FsOperationRead(FsPipe *node, FsHandle *handle, void *buffer, size_t
     return SUCCESS;
 }
 
-Result pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result pipe_write(FsPipe *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(handle);
 
@@ -50,7 +50,7 @@ Result pipe_FsOperationWrite(FsPipe *node, FsHandle *handle, const void *buffer,
     return SUCCESS;
 }
 
-size_t pipe_FsOperationSize(FsPipe *node, FsHandle *handle)
+static size_t pipe_size(FsPipe *node, FsHandle *handle)
 {
     __unused(node);
     __unused(handle);
@@ -58,7 +58,7 @@ size_t pipe_FsOperationSize(FsPipe *node, FsHandle *handle)
     return PIPE_BUFFER_SIZE;
 }
 
-void pipe_FsOperationDestroy(FsPipe *node)
+static void pipe_destroy(FsPipe *node)
 {
     ringbuffer_destroy(node->buffer);
 }
@@ -69,12 +69,12 @@ FsNode *pipe_create(void)
 
     fsnode_init(FSNODE(pipe), FILE_TYPE_PIPE);
 
-    FSNODE(pipe)->can_read = (FsOperationCanRead)pipe_FsOperationCanRead;
-    FSNODE(pipe)->can_write = (FsOperationCanWrite)pipe_FsOperationCanWrite;
-    FSNODE(pipe)->read = (FsOperationRead)pipe_FsOperationRead;
-    FSNODE(pipe)->write = (FsOperationWrite)pipe_FsOperationWrite;
-    FSNODE(pipe)->size = (FsOperationSize)pipe_FsOperationSize;
-    FSNODE(pipe)->destroy = (FsOperationDestroy)pipe_FsOperationDestroy;
+    FSNODE(pipe)->can_read = (FsNodeCanReadCallback)pipe_can_read;
+    FSNODE(pipe)->can_write = (FsNodeCanWriteCallback)pipe_can_write;
+    FSNODE(pipe)->read = (FsNodeReadCallback)pipe_read;
+    FSNODE(pipe)->write = (FsNodeWriteCallback)pipe_write;
+    FSNODE(pipe)->size = (FsNodeSizeCallback)pipe_size;
+    FSNODE(pipe)->destroy = (FsNodeDestroyCallback)pipe_destroy;
 
     pipe->buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
 

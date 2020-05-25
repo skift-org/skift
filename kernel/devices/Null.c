@@ -3,7 +3,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 
-static Result null_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result null_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
@@ -15,7 +15,7 @@ static Result null_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer,
     return SUCCESS;
 }
 
-static Result null_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result null_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
@@ -32,8 +32,8 @@ void null_initialize(void)
 
     fsnode_init(null_device, FILE_TYPE_DEVICE);
 
-    FSNODE(null_device)->read = (FsOperationRead)null_FsOperationRead;
-    FSNODE(null_device)->write = (FsOperationWrite)null_FsOperationWrite;
+    FSNODE(null_device)->read = (FsNodeReadCallback)null_read;
+    FSNODE(null_device)->write = (FsNodeWriteCallback)null_write;
 
     Path *null_device_path = path_create("/dev/null");
     filesystem_link_and_take_ref(null_device_path, null_device);

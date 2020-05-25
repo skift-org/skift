@@ -233,7 +233,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     {
         handle->result = SUCCESS;
 
-        return serial_write(buffer, size);
+        return com_write(buffer, size);
     }
     else
     {

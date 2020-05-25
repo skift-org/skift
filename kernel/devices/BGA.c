@@ -118,7 +118,7 @@ void bga_initialize(DeviceInfo info)
     }
 
     FsNode *file = __create(FsNode);
-    file->call = (FsOperationCall)bga_iocall;
+    file->call = (FsNodeCallCallback)bga_iocall;
     fsnode_init(file, FILE_TYPE_DEVICE);
 
     Path *path = path_create("/dev/framebuffer");

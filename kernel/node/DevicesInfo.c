@@ -33,7 +33,7 @@ static IterationDecision append_device_info(JsonValue *root, DeviceInfo device)
     return ITERATION_CONTINUE;
 }
 
-Result device_info_FsOperationOpen(FsDeviceInfo *node, FsHandle *handle)
+static Result device_info_open(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -49,7 +49,7 @@ Result device_info_FsOperationOpen(FsDeviceInfo *node, FsHandle *handle)
     return SUCCESS;
 }
 
-void device_info_FsOperationClose(FsDeviceInfo *node, FsHandle *handle)
+static void device_info_close(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -59,7 +59,7 @@ void device_info_FsOperationClose(FsDeviceInfo *node, FsHandle *handle)
     }
 }
 
-Result device_info_FsOperationRead(FsDeviceInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result device_info_read(FsDeviceInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
 
@@ -72,7 +72,7 @@ Result device_info_FsOperationRead(FsDeviceInfo *node, FsHandle *handle, void *b
     return SUCCESS;
 }
 
-size_t device_info_FsOperationSize(FsDeviceInfo *node, FsHandle *handle)
+static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
 
@@ -86,15 +86,16 @@ size_t device_info_FsOperationSize(FsDeviceInfo *node, FsHandle *handle)
     }
 }
 
-FsNode *device_info_create(void)
+static FsNode *device_info_create(void)
 {
     FsDeviceInfo *info = __create(FsDeviceInfo);
 
     fsnode_init(FSNODE(info), FILE_TYPE_DEVICE);
 
-    FSNODE(info)->open = (FsOperationOpen)device_info_FsOperationOpen;
-    FSNODE(info)->read = (FsOperationRead)device_info_FsOperationRead;
-    FSNODE(info)->size = (FsOperationSize)device_info_FsOperationSize;
+    FSNODE(info)->open = (FsNodeOpenCallback)device_info_open;
+    FSNODE(info)->close = (FsNodeCloseCallback)device_info_close;
+    FSNODE(info)->read = (FsNodeReadCallback)device_info_read;
+    FSNODE(info)->size = (FsNodeSizeCallback)device_info_size;
 
     return (FsNode *)info;
 }

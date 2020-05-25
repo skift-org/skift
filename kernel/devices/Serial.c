@@ -9,26 +9,26 @@
 
 #define PORT_COM1 0x3f8
 
-static void wait_write()
+static void com_wait_write()
 {
     while ((in8(PORT_COM1 + 5) & 0x20) == 0)
     { /* do nothing */
     }
 }
 
-void serial_putc(char c)
+static void com_putc(char c)
 {
-    wait_write();
+    com_wait_write();
     out8(PORT_COM1, c);
 }
 
-int serial_write(const void *buffer, uint size)
+int com_write(const void *buffer, uint size)
 {
     atomic_begin();
 
     for (uint i = 0; i < size; i++)
     {
-        serial_putc(((const char *)buffer)[i]);
+        com_putc(((const char *)buffer)[i]);
     }
 
     atomic_end();
@@ -47,7 +47,7 @@ void serial_interrupt_handler(void)
     ringbuffer_write(serial_buffer, (const char *)&byte, sizeof(byte));
 }
 
-bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
+bool serial_can_read(FsNode *node, FsHandle *handle)
 {
     __unused(node);
     __unused(handle);
@@ -56,7 +56,7 @@ bool serial_FsOperationCanRead(FsNode *node, FsHandle *handle)
     return !ringbuffer_is_empty(serial_buffer);
 }
 
-static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result serial_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
@@ -69,12 +69,12 @@ static Result serial_FsOperationRead(FsNode *node, FsHandle *handle, void *buffe
     return SUCCESS;
 }
 
-static Result serial_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result serial_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
 
-    *written = serial_write(buffer, size);
+    *written = com_write(buffer, size);
 
     return SUCCESS;
 }
@@ -96,9 +96,9 @@ void serial_initialize(void)
     FsNode *serial_device = __create(FsNode);
     fsnode_init(serial_device, FILE_TYPE_DEVICE);
 
-    FSNODE(serial_device)->can_read = (FsOperationCanRead)serial_FsOperationCanRead;
-    FSNODE(serial_device)->read = (FsOperationRead)serial_FsOperationRead;
-    FSNODE(serial_device)->write = (FsOperationWrite)serial_FsOperationWrite;
+    FSNODE(serial_device)->can_read = (FsNodeCanReadCallback)serial_can_read;
+    FSNODE(serial_device)->read = (FsNodeReadCallback)serial_read;
+    FSNODE(serial_device)->write = (FsNodeWriteCallback)serial_write;
 
     Path *serial_device_path = path_create("/dev/serial");
     filesystem_link_and_take_ref(serial_device_path, serial_device);

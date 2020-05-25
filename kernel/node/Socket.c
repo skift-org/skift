@@ -3,7 +3,7 @@
 #include "kernel/node/Connection.h"
 #include "kernel/node/Socket.h"
 
-FsNode *socket_FsOperationOpenConnection(FsSocket *socket)
+static FsNode *socket_openConnection(FsSocket *socket)
 {
     FsNode *connection = connection_create();
 
@@ -12,12 +12,12 @@ FsNode *socket_FsOperationOpenConnection(FsSocket *socket)
     return connection;
 }
 
-bool socket_FsOperationCanAcceptConnection(FsSocket *socket)
+static bool socket_FsNodeCanAcceptConnectionCallback(FsSocket *socket)
 {
     return list_any(socket->pending);
 }
 
-FsNode *socket_FsOperationAcceptConnection(FsSocket *socket)
+static FsNode *socket_FsNodeAcceptConnectionCallback(FsSocket *socket)
 {
     assert(list_any(socket->pending));
 
@@ -32,7 +32,7 @@ FsNode *socket_FsOperationAcceptConnection(FsSocket *socket)
     return connection;
 }
 
-void socket_FsOperationDestroy(FsSocket *socket)
+static void socket_destroy(FsSocket *socket)
 {
     list_destroy_with_callback(socket->pending, (ListDestroyElementCallback)fsnode_deref);
 }
@@ -43,10 +43,10 @@ FsNode *socket_create(void)
 
     fsnode_init(FSNODE(socket), FILE_TYPE_SOCKET);
 
-    FSNODE(socket)->open_connection = (FsOperationOpenConnection)socket_FsOperationOpenConnection;
-    FSNODE(socket)->can_accept_connection = (FsOperationCanAcceptConnection)socket_FsOperationCanAcceptConnection;
-    FSNODE(socket)->accept_connection = (FsOperationAcceptConnection)socket_FsOperationAcceptConnection;
-    FSNODE(socket)->destroy = (FsOperationDestroy)socket_FsOperationDestroy;
+    FSNODE(socket)->open_connection = (FsNodeOpenConnectionCallback)socket_openConnection;
+    FSNODE(socket)->can_accept_connection = (FsNodeCanAcceptConnectionCallback)socket_FsNodeCanAcceptConnectionCallback;
+    FSNODE(socket)->accept_connection = (FsNodeAcceptConnectionCallback)socket_FsNodeAcceptConnectionCallback;
+    FSNODE(socket)->destroy = (FsNodeDestroyCallback)socket_destroy;
 
     socket->pending = list_create();
 

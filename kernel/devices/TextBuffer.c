@@ -59,7 +59,7 @@ void vga_cursor_position(s32 x, s32 y)
 
 /* --- Textmode abstract driver --------------------------------------------- */
 
-Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+Result textmode_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
@@ -73,7 +73,7 @@ Result textmode_FsOperationWrite(FsNode *node, FsHandle *handle, const void *buf
     return SUCCESS;
 }
 
-Result textmode_FsOperationCall(FsNode *node, FsHandle *handle, int request, void *args)
+Result textmode_iocall(FsNode *node, FsHandle *handle, int request, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -122,8 +122,8 @@ void textmode_initialize(void)
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FILE_TYPE_DEVICE);
 
-    FSNODE(textmode_device)->write = (FsOperationWrite)textmode_FsOperationWrite;
-    FSNODE(textmode_device)->call = (FsOperationCall)textmode_FsOperationCall;
+    FSNODE(textmode_device)->write = (FsNodeWriteCallback)textmode_write;
+    FSNODE(textmode_device)->call = (FsNodeCallCallback)textmode_iocall;
 
     Path *textmode_device_path = path_create(TEXTMODE_DEVICE);
     filesystem_link_and_take_ref(textmode_device_path, textmode_device);

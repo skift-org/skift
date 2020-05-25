@@ -1,10 +1,10 @@
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
 #include <libwidget/Application.h>

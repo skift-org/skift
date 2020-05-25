@@ -1,9 +1,9 @@
 
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
 static bool logger_log_level = LOGGER_TRACE;

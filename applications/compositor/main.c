@@ -1,9 +1,9 @@
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 

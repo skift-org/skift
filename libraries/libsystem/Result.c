@@ -1,7 +1,7 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
 #define RESULT_ENUM_ENTRY_STRING(__entry) #__entry,

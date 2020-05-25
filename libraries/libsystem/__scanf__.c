@@ -1,9 +1,9 @@
 
 /* scanf.c: scanf and sscanf internals                                        */
 
-/* #include <libsystem/ctype.h>
+/* #include <libsystem/CType.h>
+#include <libsystem/CString.h>
 #include <libsystem/__scanf__.h>
-#include <libsystem/cstring.h>
 
 int __scanf_scan_binary(scanf_info_t *info, va_list *va)
 {

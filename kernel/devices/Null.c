@@ -1,5 +1,5 @@
 
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 
 #include "kernel/filesystem/Filesystem.h"
 

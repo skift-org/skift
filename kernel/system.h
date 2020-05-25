@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/x86/Interrupts.h"
 #include "kernel/x86/x86.h"

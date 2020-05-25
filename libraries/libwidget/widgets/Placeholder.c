@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libwidget/Window.h>
 #include <libwidget/utils/IconCache.h>
 #include <libwidget/widgets/Placeholder.h>

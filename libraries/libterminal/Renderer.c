@@ -1,4 +1,4 @@
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libterminal/Renderer.h>
 #include <libterminal/Terminal.h>
 

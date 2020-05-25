@@ -1,4 +1,4 @@
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libsystem/utils/NumberParser.h>
 
 static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";

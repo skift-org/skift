@@ -1,6 +1,6 @@
-#include <libsystem/assert.h>
-#include <libsystem/logger.h>
-#include <libsystem/memory.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
+#include <libsystem/Memory.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"

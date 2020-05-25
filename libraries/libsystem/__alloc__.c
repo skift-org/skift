@@ -3,10 +3,10 @@
 
 #include <libsystem/__plugs__.h>
 
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 
 #define VERSION "1.1"
 #define ALIGNMENT 16ul

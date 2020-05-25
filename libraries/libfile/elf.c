@@ -2,7 +2,7 @@
 /* elf.c: in memory elf file parser.                                          */
 
 #include <libfile/elf.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 
 int check_magic(elf_header_t *header)
 {

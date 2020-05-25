@@ -1,5 +1,5 @@
 
-#include <libsystem/atomic.h>
+#include <libsystem/Atomic.h>
 
 #include "kernel/memory/Memory.h"
 #include "kernel/system.h"

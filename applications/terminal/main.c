@@ -1,7 +1,7 @@
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 

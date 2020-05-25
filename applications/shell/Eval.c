@@ -1,5 +1,5 @@
+#include <libsystem/CString.h>
 #include <libsystem/Result.h>
-#include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>

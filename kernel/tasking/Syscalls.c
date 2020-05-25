@@ -1,13 +1,13 @@
 
 /* syscalls.c syscalls handeling code                                         */
 
+#include <libsystem/Assert.h>
+#include <libsystem/Atomic.h>
 #include <libsystem/BuildInfo.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
-#include <libsystem/system.h>
+#include <libsystem/System.h>
 
 #include "kernel/clock.h"
 #include "kernel/filesystem/Filesystem.h"

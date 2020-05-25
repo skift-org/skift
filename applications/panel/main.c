@@ -1,7 +1,7 @@
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
+#include <libsystem/System.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/system.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 

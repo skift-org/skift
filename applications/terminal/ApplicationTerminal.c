@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>

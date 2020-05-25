@@ -8,13 +8,13 @@
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libmath/math.h>
+#include <libsystem/Atomic.h>
 #include <libsystem/BuildInfo.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 
 #include "kernel/clock.h"

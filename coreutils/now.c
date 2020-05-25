@@ -1,6 +1,6 @@
-#include <libsystem/cmdline.h>
+#include <libsystem/CMDLine.h>
+#include <libsystem/Time.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/time.h>
 
 static bool option_time = false;
 static bool option_date = false;

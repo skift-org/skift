@@ -1,11 +1,11 @@
 
 #include <libfile/elf.h>
 #include <libmath/math.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Atomic.h>
+#include <libsystem/CString.h>
+#include <libsystem/Debug.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
-#include <libsystem/debug.h>
 
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"

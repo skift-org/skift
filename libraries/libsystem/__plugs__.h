@@ -6,9 +6,9 @@
 #include <abi/Handle.h>
 #include <abi/Launchpad.h>
 
-#include <libsystem/lock.h>
-#include <libsystem/system.h>
-#include <libsystem/time.h>
+#include <libsystem/Lock.h>
+#include <libsystem/System.h>
+#include <libsystem/Time.h>
 
 void __plug_init(void);
 

@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include <libsystem/filesystem.h>
+#include <libsystem/Filesystem.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 
 #undef printf
 #undef puts

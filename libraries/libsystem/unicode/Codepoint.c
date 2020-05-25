@@ -1,5 +1,5 @@
 
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/unicode/Codepoint.h>
 
 bool codepoint_is_digit(Codepoint codepoint)

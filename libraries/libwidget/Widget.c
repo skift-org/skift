@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libmath/MinMax.h>
-#include <libsystem/assert.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Widget.h>

@@ -1,7 +1,7 @@
 #include <libjson/Json.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Directory.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>

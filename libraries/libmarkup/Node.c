@@ -1,5 +1,5 @@
 #include <libmarkup/Markup.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 
 MarkupNode *markup_node_create(char *type)
 {

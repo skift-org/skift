@@ -1,6 +1,6 @@
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/utils/SourceReader.h>
 
 SourceReader *source_create_from_stream(Stream *stream)

@@ -1,9 +1,9 @@
 
+#include <libsystem/CString.h>
+#include <libsystem/Lock.h>
+#include <libsystem/Logger.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/lock.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
 Lock memlock;

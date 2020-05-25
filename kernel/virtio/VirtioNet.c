@@ -1,4 +1,4 @@
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/bus/PCI.h"
 #include "kernel/virtio/Virtio.h"

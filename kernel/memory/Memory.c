@@ -1,8 +1,8 @@
 
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Atomic.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/Physical.h"

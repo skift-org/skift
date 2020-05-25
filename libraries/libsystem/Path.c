@@ -1,7 +1,7 @@
 
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
+#include <libsystem/Path.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/path.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 Path *path_create(const char *raw_path)

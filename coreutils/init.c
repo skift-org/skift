@@ -1,7 +1,7 @@
 
-#include <libsystem/filesystem.h>
+#include <libsystem/Filesystem.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 

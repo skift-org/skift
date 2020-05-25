@@ -6,12 +6,12 @@
 #include <libdevice/keymap.h>
 #include <libdevice/keys.c>
 #include <libdevice/keys.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Atomic.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/RingBuffer.h>
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"

@@ -1,5 +1,5 @@
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 

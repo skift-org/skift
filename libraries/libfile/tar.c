@@ -2,7 +2,7 @@
 /* tar.c: read in memory tar archive                                          */
 
 #include <libfile/tar.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 
 typedef struct __packed
 {

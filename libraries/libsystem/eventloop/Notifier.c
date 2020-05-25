@@ -1,7 +1,7 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
-#include <libsystem/logger.h>
 
 Notifier *notifier_create(
     void *target,

@@ -1,4 +1,4 @@
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libsystem/utils/HashMap.h>
 
 static char *hashmap_string_copy(const char *string)

@@ -1,10 +1,10 @@
 
 #include <libgraphic/Bitmap.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
+#include <libsystem/Memory.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
-#include <libsystem/memory.h>
 
 #define LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS

@@ -1,7 +1,7 @@
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Directory.h>
-#include <libsystem/logger.h>
 
 #include "file-explorer/FileSystemModel.h"
 

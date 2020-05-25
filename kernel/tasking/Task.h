@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/lock.h>
+#include <libsystem/Lock.h>
 
 #include "kernel/node/Handle.h"
 #include "kernel/tasking/Stack.h"

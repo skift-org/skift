@@ -1,7 +1,7 @@
 
 #include <libfile/elf.h>
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
 
 #include "kernel/tasking.h"
 

@@ -1,8 +1,8 @@
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
+#include <libsystem/Memory.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
-#include <libsystem/memory.h>
 #include <libwidget/Application.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>

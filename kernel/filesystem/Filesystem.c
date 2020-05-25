@@ -2,10 +2,10 @@
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
 #include <libmath/math.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"

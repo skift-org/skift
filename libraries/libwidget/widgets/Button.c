@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>

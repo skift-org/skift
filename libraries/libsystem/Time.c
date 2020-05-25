@@ -1,6 +1,6 @@
 
+#include <libsystem/Time.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/time.h>
 
 TimeStamp timestamp_now(void)
 {

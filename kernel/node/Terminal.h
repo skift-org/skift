@@ -1,7 +1,7 @@
 #pragma once
 
+#include <libsystem/Lock.h>
 #include <libsystem/RingBuffer.h>
-#include <libsystem/lock.h>
 
 #include "kernel/node/Node.h"
 

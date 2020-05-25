@@ -1,6 +1,6 @@
 
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/bus/PCI.h"
 #include "kernel/x86/x86.h"

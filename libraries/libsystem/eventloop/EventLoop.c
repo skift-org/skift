@@ -1,9 +1,9 @@
 
-#include <libsystem/assert.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/logger.h>
 #include <libsystem/utils/List.h>
 
 typedef struct

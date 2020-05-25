@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/path.h>
+#include <libsystem/Path.h>
 #include <libsystem/utils/List.h>
 
 #include "kernel/node/Handle.h"

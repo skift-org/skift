@@ -1,8 +1,8 @@
 
+#include <libsystem/Assert.h>
+#include <libsystem/Lock.h>
+#include <libsystem/Logger.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/assert.h>
-#include <libsystem/lock.h>
-#include <libsystem/logger.h>
 #include <libsystem/process/Process.h>
 
 void __lock_init(Lock *lock, const char *name)

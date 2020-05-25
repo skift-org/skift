@@ -1,8 +1,8 @@
 
 #include <abi/Syscalls.h>
 
+#include <libsystem/Assert.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/assert.h>
 
 static int _cached_this = -1;
 

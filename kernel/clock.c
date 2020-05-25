@@ -1,5 +1,5 @@
 
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/clock.h"
 #include "kernel/x86/x86.h"

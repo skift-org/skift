@@ -1,7 +1,7 @@
 
 #include <libmath/math.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 

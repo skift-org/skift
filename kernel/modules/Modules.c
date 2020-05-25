@@ -1,8 +1,8 @@
 
 /* modules.c : kernel modules/ramdisk loader                                  */
 
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/modules/Modules.h"
 

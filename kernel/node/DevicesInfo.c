@@ -1,10 +1,10 @@
 
 #include <libjson/Json.h>
 #include <libmath/MinMax.h>
+#include <libsystem/Atomic.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/atomic.h>
-#include <libsystem/cstring.h>
-#include <libsystem/logger.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"

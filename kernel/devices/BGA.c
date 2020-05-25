@@ -1,5 +1,5 @@
 #include <libmath/MinMax.h>
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"

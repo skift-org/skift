@@ -1,5 +1,5 @@
 
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libsystem/io/Stream.h>
 
 #include "kernel/x86/cpuid.h"

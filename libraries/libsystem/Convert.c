@@ -1,7 +1,7 @@
 
-#include <libsystem/assert.h>
-#include <libsystem/convert.h>
-#include <libsystem/cstring.h>
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Convert.h>
 
 static const char *basechar = "0123456789abcdefghijklmnopqrstuvwxyz";
 static const char *basechar_maj = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

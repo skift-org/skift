@@ -1,7 +1,7 @@
 
 #include <libdevice/Mouse.h>
+#include <libsystem/Atomic.h>
 #include <libsystem/RingBuffer.h>
-#include <libsystem/atomic.h>
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/tasking.h"

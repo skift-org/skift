@@ -1,8 +1,8 @@
 
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Atomic.h>
+#include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/system.h"

@@ -2,8 +2,8 @@
 
 /* stream.h: generic io interface                                           */
 
+#include <libsystem/Path.h>
 #include <libsystem/io/Handle.h>
-#include <libsystem/path.h>
 
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>

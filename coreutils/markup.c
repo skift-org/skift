@@ -1,5 +1,5 @@
 #include <libmarkup/Markup.h>
-#include <libsystem/cstring.h>
+#include <libsystem/CString.h>
 #include <libsystem/io/Stream.h>
 
 int main(int argc, char const *argv[])

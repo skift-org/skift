@@ -1,6 +1,6 @@
 
+#include <libsystem/System.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/system.h>
 
 SystemInfo system_get_info(void)
 {

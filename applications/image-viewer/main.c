@@ -1,9 +1,9 @@
 
+#include <libsystem/Assert.h>
+#include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
-#include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/logger.h>
 
 #include <libgraphic/Framebuffer.h>
 

@@ -2,9 +2,9 @@
 #include <abi/IOCall.h>
 
 #include <libgraphic/Framebuffer.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/__plugs__.h>
-#include <libsystem/logger.h>
 
 Framebuffer *framebuffer_open(void)
 {

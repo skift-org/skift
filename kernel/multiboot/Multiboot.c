@@ -1,5 +1,5 @@
-#include <libsystem/assert.h>
-#include <libsystem/logger.h>
+#include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/multiboot/Multiboot.h"
 #include "kernel/system.h"

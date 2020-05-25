@@ -1,4 +1,4 @@
-#include <libsystem/assert.h>
+#include <libsystem/Assert.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 BufferBuilder *buffer_builder_create(size_t preallocated)

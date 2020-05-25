@@ -1,4 +1,4 @@
-#include <libsystem/logger.h>
+#include <libsystem/Logger.h>
 #include <stdio.h>
 
 __attribute__((constructor)) void test_ctor()

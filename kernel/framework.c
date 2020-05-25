@@ -1,9 +1,9 @@
 
 #include <libsystem/__plugs__.h>
 
+#include <libsystem/Assert.h>
+#include <libsystem/Atomic.h>
 #include <libsystem/Result.h>
-#include <libsystem/assert.h>
-#include <libsystem/atomic.h>
 #include <libsystem/io/Stream.h>
 
 #include "kernel/clock.h"

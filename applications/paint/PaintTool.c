@@ -1,4 +1,4 @@
-#include <libsystem/assert.h>
+#include <libsystem/Assert.h>
 #include <libsystem/utils/List.h>
 
 #include "paint/PaintDocument.h"

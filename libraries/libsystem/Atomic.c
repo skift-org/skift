@@ -1,6 +1,6 @@
 
+#include <libsystem/Atomic.h>
 #include <libsystem/Common.h>
-#include <libsystem/atomic.h>
 
 static bool atomic_enabled = false;
 static uint atomic_depth = 0;

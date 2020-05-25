@@ -1,10 +1,10 @@
 
 // printf.c : printf and snprintf internals
 
+#include <libsystem/CString.h>
+#include <libsystem/CType.h>
+#include <libsystem/Convert.h>
 #include <libsystem/__printf__.h>
-#include <libsystem/convert.h>
-#include <libsystem/cstring.h>
-#include <libsystem/ctype.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
 {

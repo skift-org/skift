@@ -1,6 +1,6 @@
 
 #include <libmath/MinMax.h>
-#include <libsystem/memory.h>
+#include <libsystem/Memory.h>
 
 void memory_zero(void *where, uint how_many)
 {

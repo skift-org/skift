@@ -212,10 +212,23 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
     if (markup_node_is(node, "Button"))
     {
+        ButtonStyle button_style = BUTTON_TEXT;
+
+        if (markup_node_has_attribute(node, "filled"))
+        {
+            button_style = BUTTON_FILLED;
+        }
+
+        if (markup_node_has_attribute(node, "outlined"))
+        {
+            button_style = BUTTON_OUTLINE;
+        }
+
         if (markup_node_has_attribute(node, "text") && markup_node_has_attribute(node, "icon"))
         {
             widget = button_create_with_icon_and_text(
                 parent,
+                button_style,
                 markup_node_get_attribute_or_default(node, "icon", "duck"),
                 markup_node_get_attribute_or_default(node, "text", "Button"));
         }
@@ -223,17 +236,21 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
         {
             widget = button_create_with_text(
                 parent,
+                button_style,
                 markup_node_get_attribute_or_default(node, "text", "Button"));
         }
         else if (markup_node_has_attribute(node, "icon"))
         {
             widget = button_create_with_icon(
                 parent,
+                button_style,
                 markup_node_get_attribute_or_default(node, "icon", "duck"));
         }
         else
         {
-            widget = button_create(parent);
+            widget = button_create(
+                parent,
+                button_style);
         }
     }
 

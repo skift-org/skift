@@ -528,6 +528,11 @@ Rectangle __widget_get_content_bound(Widget *widget)
 
 Widget *widget_get_child_at(Widget *parent, Vec2i position)
 {
+    if (parent->layout_attributes & LAYOUT_GREEDY)
+    {
+        return parent;
+    }
+
     list_foreach(Widget, child, parent->childs)
     {
         if (rectangle_containe_point(widget_get_bound(child), position))

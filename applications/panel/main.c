@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = INSETS(4);
 
-    Widget *menu = button_create_with_icon_and_text(window_root(window), "menu", "skiftOS");
+    Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, "menu", "skiftOS");
     widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(NULL, open_menu));
 
     Widget *widget_date_and_time = label_create(window_root(window), "");

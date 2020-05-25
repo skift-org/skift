@@ -26,10 +26,10 @@ typedef enum
     LAYOUT_HFLOW,
 } LayoutType;
 
-typedef enum
-{
-    LAYOUT_FILL = 1 << 0,
-} LayoutAttributes;
+#define LAYOUT_FILL (1 << 0)
+#define LAYOUT_GREEDY (1 << 1)
+
+typedef unsigned LayoutAttributes;
 
 typedef struct
 {

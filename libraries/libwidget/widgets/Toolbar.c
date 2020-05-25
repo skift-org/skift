@@ -18,7 +18,7 @@ Widget *toolbar_create(Widget *parent)
 
 Widget *toolbar_icon_create(Widget *parent, const char *icon)
 {
-    Widget *toolbar_icon = button_create(parent);
+    Widget *toolbar_icon = button_create(parent, BUTTON_TEXT);
     toolbar_icon->layout = STACK();
     toolbar_icon->insets = INSETS(6);
     icon_create(toolbar_icon, icon);
@@ -27,7 +27,7 @@ Widget *toolbar_icon_create(Widget *parent, const char *icon)
 
 Widget *toolbar_icon_with_text_create(Widget *parent, const char *icon, const char *text)
 {
-    Widget *toolbar_icon = button_create(parent);
+    Widget *toolbar_icon = button_create(parent, BUTTON_OUTLINE);
 
     toolbar_icon->layout = HFLOW(4);
     toolbar_icon->insets = INSETS(0, 0, 4, 8);

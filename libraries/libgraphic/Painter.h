@@ -61,6 +61,10 @@ void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color
 
 void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color);
 
+void painter_draw_circle_helper(Painter *painter, Rectangle bound, Vec2i center, int radius, int thickness, Color color);
+
+void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radius, int thickness, Color color);
+
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color);
 
 void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color);

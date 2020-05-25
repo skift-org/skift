@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
         panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
         panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
-        button_create_with_text(panel_hflow, "Hello, world!")->layout_attributes = LAYOUT_FILL;
+        button_create_with_text(panel_hflow, BUTTON_TEXT, "Hello, world!")->layout_attributes = LAYOUT_FILL;
         panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
         panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
     }
@@ -29,7 +29,9 @@ int main(int argc, char **argv)
 
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
-        button_create_with_text(panel_hgrid, "Hello, world!");
+
+        button_create_with_text(panel_hgrid, BUTTON_OUTLINE, "Hello, world!");
+
         panel_create(panel_hgrid);
         panel_create(panel_hgrid);
     }
@@ -43,7 +45,7 @@ int main(int argc, char **argv)
         panel_create(panel_grid);
         panel_create(panel_grid);
 
-        button_create_with_text(panel_grid, "Grid layout!");
+        button_create_with_text(panel_grid, BUTTON_FILLED, "Grid layout!");
 
         panel_create(panel_grid);
         panel_create(panel_grid);

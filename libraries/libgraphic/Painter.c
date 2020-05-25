@@ -328,7 +328,7 @@ __attribute__((flatten)) void painter_fill_triangle(Painter *painter, Vec2i p0, 
     }
 }
 
-static double sample_circle(Vec2i center, double radius, Vec2i position)
+static double sample_fill_circle(Vec2i center, double radius, Vec2i position)
 {
     double distance = vec2i_distance(center, position) - radius;
     return clamp(0.5 - distance, 0, 1);
@@ -340,7 +340,7 @@ void painter_fill_circle_helper(Painter *painter, Rectangle bound, Vec2i center,
     {
         for (int y = 0; y < bound.height; y++)
         {
-            double distance = sample_circle(center, radius - 0.5, vec2i(x, y));
+            double distance = sample_fill_circle(center, radius - 0.5, vec2i(x, y));
             double alpha = (color.A / 255.0) * distance;
 
             painter_plot_pixel(painter, vec2i(bound.x + x, bound.y + y), ALPHA(color, alpha));
@@ -540,6 +540,47 @@ __attribute__((flatten)) void painter_draw_triangle(Painter *painter, Vec2i p0, 
     painter_draw_line(painter, p0, p1, color);
     painter_draw_line(painter, p1, p2, color);
     painter_draw_line(painter, p2, p0, color);
+}
+
+static double sample_draw_circle(Vec2i center, double radius, double thickness, Vec2i position)
+{
+    double distance = abs(vec2i_distance(center, position) - (radius - thickness / 2));
+
+    return clamp((0.5 - distance) + (thickness / 2), 0, 1);
+}
+
+void painter_draw_circle_helper(Painter *painter, Rectangle bound, Vec2i center, int radius, int thickness, Color color)
+{
+    for (int x = 0; x < bound.width; x++)
+    {
+        for (int y = 0; y < bound.height; y++)
+        {
+            double distance = sample_draw_circle(center, radius - 0.5, thickness, vec2i(x, y));
+            double alpha = (color.A / 255.0) * distance;
+
+            painter_plot_pixel(painter, vec2i(bound.x + x, bound.y + y), ALPHA(color, alpha));
+        }
+    }
+}
+
+void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radius, int thickness, Color color)
+{
+    radius = MIN(radius, bound.height / 2);
+    radius = MIN(radius, bound.width / 2);
+
+    Rectangle left_ear = rectangle_left(bound, radius);
+    Rectangle right_ear = rectangle_right(bound, radius);
+
+    painter_draw_circle_helper(painter, rectangle_top(left_ear, radius), vec2i(radius - 1, radius - 1), radius, thickness, color);
+    painter_draw_circle_helper(painter, rectangle_bottom(left_ear, radius), vec2i(radius - 1, 0), radius, thickness, color);
+
+    painter_draw_circle_helper(painter, rectangle_top(right_ear, radius), vec2i(0, radius - 1), radius, thickness, color);
+    painter_draw_circle_helper(painter, rectangle_bottom(right_ear, radius), vec2i(0, 0), radius, thickness, color);
+
+    painter_fill_rectangle(painter, rectangle_left(rectangle_cutoff_top_botton(left_ear, radius, radius), thickness), color);
+    painter_fill_rectangle(painter, rectangle_right(rectangle_cutoff_top_botton(right_ear, radius, radius), thickness), color);
+    painter_fill_rectangle(painter, rectangle_top(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
+    painter_fill_rectangle(painter, rectangle_bottom(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
 }
 
 __attribute__((flatten)) void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color)

@@ -54,18 +54,18 @@ void window_initialize(
     Widget *window_icon = icon_create(window_header(window), icon ? icon : "application");
     window_icon->insets = INSETS(0, 0, 4, 0);
 
-    button_create_with_text(window_header(window), title);
+    button_create_with_text(window_header(window), BUTTON_TEXT, title);
 
     container_create(window_header(window))
         ->layout_attributes = LAYOUT_FILL;
 
     if (flags & WINDOW_RESIZABLE)
     {
-        button_create_with_icon(window_header(window), "window-minimize");
-        button_create_with_icon(window_header(window), "window-maximize");
+        button_create_with_icon(window_header(window), BUTTON_TEXT, "window-minimize");
+        button_create_with_icon(window_header(window), BUTTON_TEXT, "window-maximize");
     }
 
-    Widget *close_button = button_create_with_icon(window_header(window), "window-close");
+    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, "window-close");
     widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
 
     window->root_container = container_create(NULL);

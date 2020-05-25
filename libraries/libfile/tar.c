@@ -1,11 +1,8 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 /* tar.c: read in memory tar archive                                          */
 
-#include <libsystem/cstring.h>
 #include <libfile/tar.h>
+#include <libsystem/cstring.h>
 
 typedef struct __packed
 {

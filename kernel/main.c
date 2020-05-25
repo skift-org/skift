@@ -5,10 +5,6 @@
 /*                      |_| |_|\___/|_____|_| \_\|_|                          */
 /*                                                                            */
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libmath/math.h>

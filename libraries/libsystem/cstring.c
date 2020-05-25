@@ -1,12 +1,9 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 #include <libmath/MinMax.h>
+#include <libsystem/Common.h>
 #include <libsystem/__printf__.h>
 #include <libsystem/cstring.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/Common.h>
 
 /* --- snprintf ------------------------------------------------------------- */
 

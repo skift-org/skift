@@ -1,9 +1,5 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 #define RESULT_ENUM(__ENTRY, __ENTRY_WITH_VALUE) \
     __ENTRY_WITH_VALUE(SUCCESS, 0)               \
     __ENTRY(TIMEOUT)                             \

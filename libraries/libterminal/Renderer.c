@@ -12,4 +12,3 @@ void terminal_renderer_destroy(TerminalRenderer *renderer)
     renderer->destroy(renderer);
     free(renderer);
 }
-

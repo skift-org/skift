@@ -1,9 +1,5 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 #include <libsystem/Common.h>
 
 enum
@@ -70,8 +66,7 @@ enum
 typedef struct __packed
 {
     char vendorid[16];
-    union __packed
-    {
+    union __packed {
         struct __packed
         {
             bool SSE3 : 1;
@@ -104,8 +99,7 @@ typedef struct __packed
         u32 RAW_ECX;
     };
 
-    union __packed
-    {
+    union __packed {
         struct __packed
         {
             bool FPU : 1;

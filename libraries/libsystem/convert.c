@@ -1,10 +1,7 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 #include <libsystem/assert.h>
-#include <libsystem/cstring.h>
 #include <libsystem/convert.h>
+#include <libsystem/cstring.h>
 
 static const char *basechar = "0123456789abcdefghijklmnopqrstuvwxyz";
 static const char *basechar_maj = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

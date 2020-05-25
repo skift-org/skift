@@ -1,9 +1,5 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 #define SYSCALL_LIST(__ENTRY)             \
     __ENTRY(SYS_PROCESS_THIS)             \
     __ENTRY(SYS_PROCESS_LAUNCH)           \

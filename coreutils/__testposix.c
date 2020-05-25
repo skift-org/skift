@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <libsystem/logger.h>
+#include <stdio.h>
 
 __attribute__((constructor)) void test_ctor()
 {
@@ -15,6 +15,6 @@ int main(int argc, char const *argv[])
     {
         putchar('=');
     }
-    
+
     return 0;
 }

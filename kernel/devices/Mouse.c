@@ -1,6 +1,3 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 #include <libdevice/Mouse.h>
 #include <libsystem/RingBuffer.h>
@@ -41,7 +38,7 @@ static void mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, uby
     event.middle = (MouseButtonState)((packet0 >> 2) & 1);
     event.right = (MouseButtonState)((packet0 >> 1) & 1);
     event.left = (MouseButtonState)((packet0)&1);
-    
+
     atomic_begin();
     if (ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
     {

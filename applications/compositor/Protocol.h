@@ -73,8 +73,7 @@ typedef struct
 {
     CompositorMessageType type;
 
-    union
-    {
+    union {
         CompositorCreateWindow create_window;
         CompositorDestroyWindow destroy_window;
         CompositorResizeWindow resize_window;

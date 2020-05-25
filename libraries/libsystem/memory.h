@@ -1,11 +1,7 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
-#include <libsystem/Result.h>
 #include <libsystem/Common.h>
+#include <libsystem/Result.h>
 
 void memory_zero(void *where, uint how_many);
 

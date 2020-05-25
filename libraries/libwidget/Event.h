@@ -53,8 +53,7 @@ typedef struct Event
     EventType type;
     bool accepted;
 
-    union
-    {
+    union {
         MouseEvent mouse;
         KeyboardEvent keyboard;
     };

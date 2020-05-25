@@ -1,11 +1,8 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 #include <abi/Task.h>
 
-#include <libsystem/cmdline.h>
 #include <libsystem/Result.h>
+#include <libsystem/cmdline.h>
 #include <libsystem/io/Stream.h>
 
 static bool option_cpu_usage = false;

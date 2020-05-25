@@ -17,8 +17,7 @@ typedef struct
 
     Bitmap *icon;
 
-    union
-    {
+    union {
         int as_int;
         float as_float;
     };

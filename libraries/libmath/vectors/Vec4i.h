@@ -1,7 +1,6 @@
 #pragma once
 
-typedef union
-{
+typedef union {
     struct
     {
         int x, y, z, w;

@@ -1,21 +1,21 @@
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
 #include <ctype.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <libsystem/process/Process.h>
 #include <libsystem/logger.h>
+#include <libsystem/process/Process.h>
 
 void __attribute__((noreturn)) exit(int status)
 {
     TRACE_FUNCTION_BEGIN;
 
     process_exit(status);
-    
+
     TRACE_FUNCTION_END;
 }
 
-int system(const char * command)
+int system(const char *command)
 {
     __unused(command);
 
@@ -114,28 +114,33 @@ float strtof(const char *nptr, char **endptr)
     return strtod(nptr, endptr);
 }
 
-double atof(const char * nptr) {
-	return strtod(nptr, NULL);
+double atof(const char *nptr)
+{
+    return strtod(nptr, NULL);
 }
 
-int atoi(const char * s) {
-	int n = 0;
-	int neg = 0;
-	while (isspace(*s)) {
-		s++;
-	}
-	switch (*s) {
-		case '-':
-			neg = 1;
-			/* Fallthrough */
-		case '+':
-			s++;
-	}
-	while (isdigit(*s)) {
-		n = 10*n - (*s++ - '0');
-	}
-	/* The sign order may look incorrect here but this is correct as n is calculated
+int atoi(const char *s)
+{
+    int n = 0;
+    int neg = 0;
+    while (isspace(*s))
+    {
+        s++;
+    }
+    switch (*s)
+    {
+    case '-':
+        neg = 1;
+        /* Fallthrough */
+    case '+':
+        s++;
+    }
+    while (isdigit(*s))
+    {
+        n = 10 * n - (*s++ - '0');
+    }
+    /* The sign order may look incorrect here but this is correct as n is calculated
 	 * as a negative number to avoid overflow on INT_MAX.
 	 */
-	return neg ? n : -n;
+    return neg ? n : -n;
 }

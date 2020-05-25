@@ -1,6 +1,3 @@
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
 
 #include <libmath/math.h>
 
@@ -20,8 +17,6 @@ double floor(double x)
     int x_i = x;
     return (double)x_i;
 }
-
-
 
 double sqrt(double x)
 {
@@ -44,4 +39,3 @@ double fmod(double left, double right)
         return 0.0;
     }
 }
-

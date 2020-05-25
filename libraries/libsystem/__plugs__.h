@@ -1,9 +1,5 @@
 #pragma once
 
-/* Copyright © 2018-2020 N. Van Bossuyt.                                      */
-/* This code is licensed under the MIT License.                               */
-/* See: LICENSE.md                                                            */
-
 // this header list all "plugs" function between the library and the syscalls or the kernel
 
 #include <abi/Filesystem.h>

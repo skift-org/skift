@@ -46,7 +46,7 @@ void multiboot_dump(void)
     for (size_t i = 0; i < _multiboot.memory_map_size; i++)
     {
         MemoryMapEntry *entry = &_multiboot.memory_map[i];
-        
+
         logger_info("\t%d: %08p-%08p: %s",
                     i,
                     entry->range.base,

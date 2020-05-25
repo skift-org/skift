@@ -21,6 +21,7 @@
     __ENTRY(ERR_IS_A_DIRECTORY)                  \
     __ENTRY(ERR_NO_SUCH_DEVICE)                  \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)       \
+    __ENTRY(ERR_NO_SUCH_TASK)                    \
     __ENTRY(ERR_NOT_A_DIRECTORY)                 \
     __ENTRY(ERR_NOT_A_SOCKET)                    \
     __ENTRY(ERR_NOT_A_STREAM)                    \

@@ -29,7 +29,7 @@ void __attribute__((noreturn)) process_exit(int code)
     ASSERT_NOT_REACHED();
 }
 
-int process_cancel(int pid)
+Result process_cancel(int pid)
 {
     return __plug_process_cancel(pid);
 }

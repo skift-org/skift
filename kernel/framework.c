@@ -131,9 +131,9 @@ void __plug_process_exit(int code)
     PANIC("Task exit failled!");
 }
 
-int __plug_process_cancel(int pid)
+Result __plug_process_cancel(int pid)
 {
-    int result;
+    Result result;
 
     ATOMIC({
         result = task_cancel(task_by_id(pid), -1);

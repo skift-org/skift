@@ -6,6 +6,7 @@
 
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Result.h>
+#include <libsystem/assert.h>
 #include <libsystem/atomic.h>
 #include <libsystem/cstring.h>
 #include <libsystem/logger.h>
@@ -28,9 +29,16 @@ bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 
 /* --- Process -------------------------------------------------------------- */
 
-int sys_process_this(void)
+int sys_process_this(int *pid)
 {
-    return scheduler_running_id();
+    if (!syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    *pid = scheduler_running_id();
+
+    return SUCCESS;
 }
 
 int sys_process_launch(Launchpad *launchpad, int *pid)
@@ -38,7 +46,7 @@ int sys_process_launch(Launchpad *launchpad, int *pid)
     if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
         !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
     {
-        return -ERR_BAD_ADDRESS;
+        return ERR_BAD_ADDRESS;
     }
 
     return task_launch(scheduler_running(), launchpad, pid);
@@ -47,15 +55,25 @@ int sys_process_launch(Launchpad *launchpad, int *pid)
 int sys_process_exit(int code)
 {
     task_exit(code);
-    return 0;
+
+    ASSERT_NOT_REACHED();
 }
 
 int sys_process_cancel(int pid)
 {
-    int result;
+    Result result = SUCCESS;
 
     ATOMIC({
-        result = task_cancel(task_by_id(pid), -1);
+        Task *task = task_by_id(pid);
+
+        if (task == NULL)
+        {
+            result = ERR_NO_SUCH_TASK;
+        }
+        else
+        {
+            result = task_cancel(task, -1);
+        }
     });
 
     return result;

@@ -15,7 +15,7 @@ Result process_run(const char *command, int *pid);
 
 void __attribute__((noreturn)) process_exit(int code);
 
-int process_cancel(int pid);
+Result process_cancel(int pid);
 
 int process_map(uintptr_t addr, size_t count);
 

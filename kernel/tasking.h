@@ -110,7 +110,7 @@ bool task_wait(int task_id, int *exitvalue);
 
 TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout);
 
-bool task_cancel(Task *task, int exitvalue);
+Result task_cancel(Task *task, int exitvalue);
 
 void task_exit(int exitvalue);
 

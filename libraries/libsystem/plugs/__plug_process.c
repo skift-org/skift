@@ -13,7 +13,7 @@ int __plug_process_this(void)
 {
     if (_cached_this == -1)
     {
-        _cached_this = __syscall(SYS_PROCESS_THIS, 0, 0, 0, 0, 0);
+        assert(__syscall(SYS_PROCESS_THIS, (int)&_cached_this, 0, 0, 0, 0) == SUCCESS);
     }
 
     return _cached_this;
@@ -31,9 +31,9 @@ void __plug_process_exit(int code)
     ASSERT_NOT_REACHED();
 }
 
-int __plug_process_cancel(int pid)
+Result __plug_process_cancel(int pid)
 {
-    return __syscall(SYS_PROCESS_CANCEL, pid, 0, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_CANCEL, pid, 0, 0, 0, 0);
 }
 
 int __plug_process_map(uint addr, uint count)

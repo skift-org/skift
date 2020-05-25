@@ -64,7 +64,7 @@ Result __plug_process_launch(Launchpad *launchpad, int *pid);
 
 void __attribute__((noreturn)) __plug_process_exit(int code);
 
-int __plug_process_cancel(int pid);
+Result __plug_process_cancel(int pid);
 
 int __plug_process_map(uint addr, uint count);
 

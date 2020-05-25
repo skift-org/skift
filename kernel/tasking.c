@@ -231,7 +231,7 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
     return t;
 }
 
-/* --- Tasks methodes ----------------------------------------------------- */
+/* --- Tasks methodes ------------------------------------------------------- */
 
 bool shortest_sleep_first(void *left, void *right)
 {
@@ -304,7 +304,7 @@ void task_go(Task *task)
     atomic_end();
 }
 
-/* --- Task wait state ---------------------------------------------------- */
+/* --- Task wait state ------------------------------------------------------ */
 
 task_sleep_result_t task_sleep(Task *task, int timeout)
 {
@@ -432,34 +432,28 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
 
 /* --- Task stopping and canceling ------------------------------------------ */
 
-bool task_cancel(Task *task, int exitvalue)
+Result task_cancel(Task *task, int exitvalue)
 {
+    assert(task);
+
     atomic_begin();
 
-    if (task != NULL)
-    {
-        // Set the new task state
-        task->exitvalue = exitvalue;
-        task_set_state(task, TASK_STATE_CANCELED);
+    task->exitvalue = exitvalue;
+    task_set_state(task, TASK_STATE_CANCELED);
 
-        // Wake up waiting tasks
-        list_foreach(Task, waittask, task_by_state(TASK_STATE_WAIT_TASK))
+    // Wake up waiting tasks
+    list_foreach(Task, waittask, task_by_state(TASK_STATE_WAIT_TASK))
+    {
+        if (waittask->wait.task.task_handle == task->id)
         {
-            if (waittask->wait.task.task_handle == task->id)
-            {
-                waittask->wait.task.exitvalue = exitvalue;
-                task_set_state(waittask, TASK_STATE_RUNNING);
-            }
+            waittask->wait.task.exitvalue = exitvalue;
+            task_set_state(waittask, TASK_STATE_RUNNING);
         }
+    }
 
-        atomic_end();
-        return true;
-    }
-    else
-    {
-        atomic_end();
-        return false;
-    }
+    atomic_end();
+
+    return SUCCESS;
 }
 
 void task_exit(int exitvalue)
@@ -471,7 +465,7 @@ void task_exit(int exitvalue)
     ASSERT_NOT_REACHED();
 }
 
-/* --- Task Memory management --------------------------------------------- */
+/* --- Task Memory management ----------------------------------------------- */
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 {
@@ -504,7 +498,7 @@ void task_memory_free(Task *task, uint addr, uint count)
     return memory_free(task->pdir, addr, count, 1);
 }
 
-/* --- Task dump ---------------------------------------------------------- */
+/* --- Task dump ------------------------------------------------------------ */
 
 static const char *TASK_STATES[] = {
     "HANG",
@@ -791,7 +785,7 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 }
 
 /* -------------------------------------------------------------------------- */
-/*   GARBAGE COLLECTOR                                                         */
+/*   GARBAGE COLLECTOR                                                        */
 /* -------------------------------------------------------------------------- */
 
 void collect_and_free_task(void)
@@ -821,7 +815,7 @@ void garbage_collector()
 }
 
 /* -------------------------------------------------------------------------- */
-/*   SCHEDULER                                                                 */
+/*   SCHEDULER                                                                */
 /* -------------------------------------------------------------------------- */
 
 static bool scheduler_context_switch = false;
@@ -944,7 +938,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
     return running->stack_pointer;
 }
 
-/* --- Scheduler info -------------------------------------------------------- */
+/* --- Scheduler info ------------------------------------------------------- */
 
 uint scheduler_get_ticks(void)
 {
@@ -964,7 +958,7 @@ void scheduler_yield()
     asm("int $32");
 }
 
-/* --- Running task info -------------------------------------------------- */
+/* --- Running task info ---------------------------------------------------- */
 
 Task *scheduler_running(void)
 {

@@ -362,6 +362,11 @@ void window_handle_event(Window *window, Event *event)
         {
             widget_event(window->mouse_over_widget, &mouse_leave);
         }
+
+        if (window->flags & WINDOW_POP_OVER)
+        {
+            window_destroy(window);
+        }
     }
     break;
 

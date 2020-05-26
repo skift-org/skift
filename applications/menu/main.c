@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 
     List *menu = load_menu();
 
-    Window *window = window_create(NULL, "Panel", 320, 768, WINDOW_BORDERLESS);
+    Window *window = window_create(NULL, "Panel", 320, 768, WINDOW_BORDERLESS | WINDOW_POP_OVER);
 
     window_root(window)->layout = VFLOW(8);
 

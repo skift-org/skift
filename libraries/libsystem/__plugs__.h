@@ -76,8 +76,6 @@ Result __plug_process_set_cwd(const char *cwd);
 
 int __plug_process_sleep(int time);
 
-int __plug_process_wakeup(int pid);
-
 int __plug_process_wait(int pid, int *exit_value);
 
 /* --- I/O ------------------------------------------------------------------ */

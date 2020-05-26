@@ -68,11 +68,6 @@ int __plug_process_sleep(int time)
     return __syscall(SYS_PROCESS_SLEEP, time, 0, 0, 0, 0);
 }
 
-int __plug_process_wakeup(int pid)
-{
-    return __syscall(SYS_PROCESS_WAKEUP, pid, 0, 0, 0, 0);
-}
-
 int __plug_process_wait(int pid, int *exit_value)
 {
     return __syscall(SYS_PROCESS_WAIT, pid, (int)exit_value, 0, 0, 0);

@@ -176,17 +176,6 @@ int __plug_process_sleep(int time)
     return task_sleep(scheduler_running(), time);
 }
 
-int __plug_process_wakeup(int pid)
-{
-    int result;
-
-    ATOMIC({
-        result = task_wakeup(task_by_id(pid));
-    });
-
-    return result;
-}
-
 int __plug_process_wait(int pid, int *exit_value)
 {
     return task_wait(pid, exit_value);

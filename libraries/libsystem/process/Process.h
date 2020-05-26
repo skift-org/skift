@@ -27,6 +27,4 @@ Result process_set_cwd(const char *cwd);
 
 int process_sleep(int time);
 
-int process_wakeup(int pid);
-
 int process_wait(int pid, int *exit_value);

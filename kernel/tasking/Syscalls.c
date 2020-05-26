@@ -113,17 +113,6 @@ int sys_process_sleep(int time)
     return task_sleep(scheduler_running(), time);
 }
 
-int sys_process_wakeup(int tid)
-{
-    int result;
-
-    ATOMIC({
-        result = task_wakeup(task_by_id(tid));
-    });
-
-    return result;
-}
-
 int sys_process_wait(int tid, int *exitvalue)
 {
     return task_wait(tid, exitvalue);
@@ -432,7 +421,6 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(sys_process_exit),
     [SYS_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(sys_process_cancel),
     [SYS_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(sys_process_sleep),
-    [SYS_PROCESS_WAKEUP] = reinterpret_cast<SyscallHandler>(sys_process_wakeup),
     [SYS_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(sys_process_wait),
     [SYS_PROCESS_GET_CWD] = reinterpret_cast<SyscallHandler>(sys_process_get_cwd),
     [SYS_PROCESS_SET_CWD] = reinterpret_cast<SyscallHandler>(sys_process_set_cwd),
@@ -476,7 +464,6 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_EXIT] = sys_process_exit,
     [SYS_PROCESS_CANCEL] = sys_process_cancel,
     [SYS_PROCESS_SLEEP] = sys_process_sleep,
-    [SYS_PROCESS_WAKEUP] = sys_process_wakeup,
     [SYS_PROCESS_WAIT] = sys_process_wait,
     [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
     [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,

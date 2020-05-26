@@ -19,7 +19,7 @@
 
 static int TID = 0;
 static List *tasks;
-static List *tasks_bystates[TASK_STATE_COUNT];
+static List *tasks_bystates[__TASK_STATE_COUNT];
 static uint ticks = 0;
 static Task *running = NULL;
 
@@ -37,7 +37,7 @@ void tasking_initialize(void)
 
     task_shared_memory_setup();
 
-    for (int i = 0; i < TASK_STATE_COUNT; i++)
+    for (int i = 0; i < __TASK_STATE_COUNT; i++)
     {
         tasks_bystates[i] = list_create();
     }
@@ -230,11 +230,6 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
 /* --- Tasks methodes ------------------------------------------------------- */
 
-bool shortest_sleep_first(void *left, void *right)
-{
-    return ((Task *)left)->wait.time.wakeuptick < ((Task *)right)->wait.time.wakeuptick;
-}
-
 void task_set_state(Task *task, TaskState state)
 {
     ASSERT_ATOMIC;
@@ -254,14 +249,7 @@ void task_set_state(Task *task, TaskState state)
     // Add the task to the groupe
     if (task->state != TASK_STATE_NONE)
     {
-        if (task->state == TASK_STATE_WAIT_TIME)
-        {
-            list_insert_sorted(tasks_bystates[TASK_STATE_WAIT_TIME], task, shortest_sleep_first);
-        }
-        else
-        {
-            list_pushback(tasks_bystates[task->state], task);
-        }
+        list_pushback(tasks_bystates[task->state], task);
     }
 }
 
@@ -303,42 +291,13 @@ void task_go(Task *task)
 
 /* --- Task wait state ------------------------------------------------------ */
 
-task_sleep_result_t task_sleep(Task *task, int timeout)
+#include "kernel/sheduling/TaskBlockerTime.h"
+
+Result task_sleep(Task *task, int timeout)
 {
-    ATOMIC({
-        task->wait.time.wakeuptick = ticks + timeout;
-        task->wait.time.gotwakeup = false;
+    task_block(task, blocker_time_create(ticks + timeout), -1);
 
-        task_set_state(task, TASK_STATE_WAIT_TIME);
-    });
-
-    scheduler_yield();
-
-    if (task->wait.time.gotwakeup)
-    {
-        return TASK_SLEEP_RESULT_WAKEUP;
-    }
-    else
-    {
-        return TASk_SLEEP_RESULT_TIMEOUT;
-    }
-}
-
-int task_wakeup(Task *task)
-{
-    ASSERT_ATOMIC;
-
-    if (task != NULL && task->state == TASK_STATE_WAIT_TIME)
-    {
-        task->wait.time.gotwakeup = true;
-        task->wait.time.wakeuptick = 0;
-
-        task_set_state(task, TASK_STATE_RUNNING);
-
-        return 0;
-    }
-
-    return -1;
+    return TIMEOUT;
 }
 
 bool task_wait(int task_id, int *exitvalue)
@@ -504,8 +463,6 @@ static const char *TASK_STATES[] = {
     "BLOCKED",
     "WAIT_TIME",
     "WAIT_TASK",
-    "WAIT_MESSAGE",
-    "WAIT_RESPOND",
     "CANCELED",
 };
 
@@ -838,26 +795,6 @@ void scheduler_setup(Task *main_kernel_task)
 
 /* --- Scheduling ----------------------------------------------------------- */
 
-void wakeup_sleeping_tasks(void)
-{
-    if (!list_empty(task_by_state(TASK_STATE_WAIT_TIME)))
-    {
-        Task *task = NULL;
-
-        do
-        {
-            if (list_peek(task_by_state(TASK_STATE_WAIT_TIME), (void **)&task))
-            {
-                if (task->wait.time.wakeuptick <= ticks)
-                {
-                    task_set_state(task, TASK_STATE_RUNNING);
-                }
-            }
-
-        } while (task != NULL && task->state == TASK_STATE_RUNNING);
-    }
-}
-
 void wakeup_blocked_task(void)
 {
     if (list_any(task_by_state(TASK_STATE_BLOCKED)))
@@ -914,7 +851,6 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
     scheduler_record[ticks % SCHEDULER_RECORD_COUNT] = running->id;
     ticks++;
 
-    wakeup_sleeping_tasks();
     wakeup_blocked_task();
 
     // Get the next task

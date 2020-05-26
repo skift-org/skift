@@ -17,12 +17,6 @@ typedef void (*TaskEntry)();
 
 typedef struct
 {
-    uint wakeuptick;
-    bool gotwakeup;
-} TaskWaitTimeInfo;
-
-typedef struct
-{
     int task_handle;
     int exitvalue;
 } TaskWaitTaskInfo;
@@ -43,7 +37,6 @@ typedef struct Task
 
     struct
     {
-        TaskWaitTimeInfo time;
         TaskWaitTaskInfo task;
     } wait;
 
@@ -92,15 +85,7 @@ uintptr_t task_stack_push(Task *task, const void *value, uint size);
 
 void task_go(Task *t);
 
-typedef enum
-{
-    TASK_SLEEP_RESULT_WAKEUP,
-    TASk_SLEEP_RESULT_TIMEOUT,
-} task_sleep_result_t;
-
-task_sleep_result_t task_sleep(Task *task, int timeout);
-
-int task_wakeup(Task *task);
+Result task_sleep(Task *task, int timeout);
 
 bool task_wait(int task_id, int *exitvalue);
 
@@ -210,8 +195,6 @@ void garbage_collector();
 void timer_set_frequency(u16 hz);
 
 void scheduler_setup(Task *main_kernel_task);
-
-void wakeup_sleeping_tasks(void);
 
 uintptr_t schedule(uintptr_t current_stack_pointer);
 

@@ -66,10 +66,6 @@ int process_sleep(int time)
     return __plug_process_sleep(time);
 }
 
-int process_wakeup(int pid)
-{
-    return __plug_process_wakeup(pid);
-}
 
 int process_wait(int pid, int *exit_value)
 {

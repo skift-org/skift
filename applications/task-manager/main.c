@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 
     /// --- Toolbar --- ///
     Widget *toolbar = toolbar_create(window_root((Window *)window));
-    toolbar_icon_with_text_create(toolbar, "plus", "New task");
-    toolbar_icon_with_text_create(toolbar, "close", "Cancel task");
+    button_create_with_icon_and_text(toolbar, BUTTON_FILLED, "plus", "New task");
+    button_create_with_icon_and_text(toolbar, BUTTON_TEXT, "close", "Cancel task");
 
     /// --- Table view --- //
     window->table_model = task_model_create();

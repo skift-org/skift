@@ -11,19 +11,23 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
 
     if (widget_is_enable(WIDGET(widget)))
     {
+        if (widget->style == BUTTON_OUTLINE)
+        {
+            painter_draw_rounded_rectangle(painter, widget_get_bound(widget), 4, 1, widget_get_color(widget, THEME_BORDER));
+        }
+        else if (widget->style == BUTTON_FILLED)
+        {
+            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, widget_get_color(widget, THEME_ACCENT));
+        }
+
         if (widget->state == BUTTON_OVER)
         {
-            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
+            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
         }
 
         if (widget->state == BUTTON_PRESS)
         {
-            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 6, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
-        }
-
-        if (WIDGET(widget)->window->mouse_focused_widget == WIDGET(widget))
-        {
-            painter_draw_rounded_rectangle(painter, widget_get_bound(widget), 6, 1, widget_get_color(widget, THEME_ACCENT));
+            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
         }
     }
 }
@@ -72,22 +76,14 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     widget->style = style;
     widget->state = BUTTON_IDLE;
 
-    WIDGET(widget)->layout = HFLOW(4);
-    WIDGET(widget)->insets = INSETS(0, 4);
+    WIDGET(widget)->layout = HFLOW(0);
+    WIDGET(widget)->insets = INSETS(0, 16);
+    WIDGET(widget)->min_height = 32;
     WIDGET(widget)->layout_attributes |= LAYOUT_GREEDY;
 
     widget_initialize(WIDGET(widget), &button_class, parent);
 
     return WIDGET(widget);
-}
-
-Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
-{
-    Widget *button = button_create(parent, style);
-
-    label_create(button, text)->layout_attributes = LAYOUT_FILL;
-
-    return button;
 }
 
 Widget *button_create_with_icon(Widget *parent, ButtonStyle style, const char *icon)
@@ -102,11 +98,27 @@ Widget *button_create_with_icon(Widget *parent, ButtonStyle style, const char *i
     return button;
 }
 
-Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, const char *icon, const char *text)
+Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
 {
     Widget *button = button_create(parent, style);
 
-    icon_create(button, icon);
+    button->insets = INSETS(0, 0, 8, 8);
+    button->min_width = 64;
+
+    label_create(button, text)->layout_attributes = LAYOUT_FILL;
+
+    return button;
+}
+
+Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, const char *icon, const char *text)
+{
+    Widget *button = button_create(parent, style);
+    button->insets = INSETS(0, 0, 6, 8);
+    button->min_width = 64;
+
+    Widget *button_icon = icon_create(button, icon);
+    button_icon->insets = INSETS(0, 0, 0, 8);
+
     label_create(button, text);
 
     return button;

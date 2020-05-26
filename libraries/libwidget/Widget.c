@@ -190,7 +190,9 @@ Vec2i widget_compute_size(Widget *widget)
 
     if (widget->klass->size)
     {
-        return widget->klass->size(widget);
+        Vec2i size = widget->klass->size(widget);
+        width = size.width;
+        height = size.height;
     }
     else if (widget->layout.type == LAYOUT_STACK)
     {

@@ -15,10 +15,7 @@ static const char *TASK_STATES[] = {
     "launchpad",
     "running",
     "blocked",
-    "wait_time",
-    "wait_task",
-    "wait_message",
-    "wait_respond",
+    "wait",
     "canceled",
 };
 

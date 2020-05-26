@@ -22,10 +22,7 @@ static List *tasks;
 static List *tasks_bystates[__TASK_STATE_COUNT];
 static uint ticks = 0;
 static Task *running = NULL;
-
-static Task *kernel_task;
-static Task *garbage_task;
-static Task *idle_task;
+static Task *idle;
 
 void idle_code() { HANG; }
 
@@ -46,15 +43,15 @@ void tasking_initialize(void)
 
     running = NULL;
 
-    idle_task = task_spawn(kernel_task, "Idle", idle_code, NULL, false);
-    task_go(idle_task);
-    task_set_state(idle_task, TASK_STATE_HANG);
+    idle = task_spawn(NULL, "Idle", idle_code, NULL, false);
+    task_go(idle);
+    task_set_state(idle, TASK_STATE_HANG);
 
-    garbage_task = task_spawn(kernel_task, "GarbageCollector", garbage_collector, NULL, false);
-    task_go(garbage_task);
-
-    kernel_task = task_spawn(NULL, "System", NULL, NULL, 0);
+    Task *kernel_task = task_spawn(NULL, "System", NULL, NULL, false);
     task_go(kernel_task);
+
+    Task *garbage_task = task_spawn(NULL, "GarbageCollector", garbage_collector, NULL, false);
+    task_go(garbage_task);
 
     scheduler_setup(kernel_task);
 }
@@ -306,40 +303,38 @@ bool task_wait(int task_id, int *exitvalue)
 
     Task *task = task_by_id(task_id);
 
-    if (task != NULL)
-    {
-        if (task->state == TASK_STATE_CANCELED)
-        {
-            if (exitvalue != NULL)
-            {
-                *exitvalue = task->exitvalue;
-            }
-
-            atomic_end();
-        }
-        else
-        {
-            running->wait.task.task_handle = task->id;
-            task_set_state(running, TASK_STATE_WAIT_TASK);
-
-            atomic_end();
-
-            scheduler_yield();
-
-            if (exitvalue != NULL)
-            {
-                *exitvalue = running->wait.task.exitvalue;
-            }
-        }
-
-        return true;
-    }
-    else
+    if (!task)
     {
         atomic_end();
 
         return false;
     }
+
+    if (task->state == TASK_STATE_CANCELED)
+    {
+        if (exitvalue != NULL)
+        {
+            *exitvalue = task->exitvalue;
+        }
+
+        atomic_end();
+
+        return true;
+    }
+
+    running->wait.task.task_handle = task->id;
+    task_set_state(running, TASK_STATE_WAIT);
+
+    atomic_end();
+
+    scheduler_yield();
+
+    if (exitvalue != NULL)
+    {
+        *exitvalue = running->wait.task.exitvalue;
+    }
+
+    return true;
 }
 
 TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
@@ -398,7 +393,7 @@ Result task_cancel(Task *task, int exitvalue)
     task_set_state(task, TASK_STATE_CANCELED);
 
     // Wake up waiting tasks
-    list_foreach(Task, waittask, task_by_state(TASK_STATE_WAIT_TASK))
+    list_foreach(Task, waittask, task_by_state(TASK_STATE_WAIT))
     {
         if (waittask->wait.task.task_handle == task->id)
         {
@@ -461,8 +456,7 @@ static const char *TASK_STATES[] = {
     "LAUNCHPAD",
     "RUNNING",
     "BLOCKED",
-    "WAIT_TIME",
-    "WAIT_TASK",
+    "WAIT",
     "CANCELED",
 };
 
@@ -857,7 +851,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
     if (!list_peek_and_pushback(task_by_state(TASK_STATE_RUNNING), (void **)&running))
     {
         // Or the idle task if there are no running tasks.
-        running = idle_task;
+        running = idle;
     }
 
     // Restore the context

@@ -43,6 +43,8 @@ void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
 
 void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color);
 
+void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color);
+
 void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color);
 
 void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radius, Color color);
@@ -64,3 +66,11 @@ void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radiu
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color);
 
 void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color);
+
+void painter_draw_string_within(
+    Painter *painter,
+    Font *font,
+    const char *str,
+    Rectangle container,
+    Position position,
+    Color color);

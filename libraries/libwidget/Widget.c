@@ -3,6 +3,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
+#include <libwidget/Application.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Widget.h>
@@ -163,7 +164,8 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
 
     painter_push_clip(painter, widget_get_bound(widget));
 
-    // painter_fill_rectangle(painter, widget_get_content_bound(widget), ALPHA(COLOR_MAGENTA, 0.25));
+    if (application_is_debbuging_layout())
+        painter_fill_insets(painter, widget_get_bound(widget), widget->insets, ALPHA(COLOR_MAGENTA, 0.25));
 
     if (widget->klass->paint)
     {
@@ -178,7 +180,8 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    // painter_draw_rectangle(painter, widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
+    if (application_is_debbuging_layout())
+        painter_draw_rectangle(painter, widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
 
     painter_pop_clip(painter);
 }

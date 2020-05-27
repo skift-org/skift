@@ -23,7 +23,8 @@ typedef struct __packed
     __INSETS(__VA_ARGS__, __INSETS4, __INSETS3, __INSETS2, __INSETS1) \
     (__VA_ARGS__)
 
-typedef union __packed {
+typedef union __packed
+{
     struct
     {
         int x;
@@ -38,6 +39,21 @@ typedef union __packed {
         Vec2i size;
     };
 } Rectangle;
+
+typedef enum
+{
+    POSITION_LEFT,
+    POSITION_CENTER,
+    POSITION_RIGHT,
+
+    POSITION_TOP_LEFT,
+    POSITION_TOP_CENTER,
+    POSITION_TOP_RIGHT,
+
+    POSITION_BOTTOM_LEFT,
+    POSITION_BOTTOM_CENTER,
+    POSITION_BOTTOM_RIGHT,
+} Position;
 
 #define RECTANGLE_EMPTY ((Rectangle){})
 #define RECTANGLE_SIZE(__width, __height) ((Rectangle){{0, 0, (__width), (__height)}})
@@ -251,4 +267,53 @@ static inline Rectangle rectangle_center_within(Rectangle rectangle, Rectangle c
         rectangle.width,
         rectangle.height,
     }};
+}
+
+static inline Rectangle rectangle_place_within(Rectangle rectangle, Position position, Rectangle container)
+{
+    Rectangle result = RECTANGLE_SIZE(rectangle.width, rectangle.height);
+
+    if (position == POSITION_LEFT ||
+        position == POSITION_TOP_LEFT ||
+        position == POSITION_BOTTOM_LEFT)
+    {
+        result.x = container.x;
+    }
+
+    if (position == POSITION_CENTER ||
+        position == POSITION_TOP_CENTER ||
+        position == POSITION_BOTTOM_CENTER)
+    {
+        result.x = container.x + container.width / 2 - rectangle.width / 2;
+    }
+
+    if (position == POSITION_RIGHT ||
+        position == POSITION_TOP_RIGHT ||
+        position == POSITION_BOTTOM_RIGHT)
+    {
+        result.x = container.x + container.width - rectangle.width;
+    }
+
+    if (position == POSITION_TOP_LEFT ||
+        position == POSITION_TOP_CENTER ||
+        position == POSITION_TOP_RIGHT)
+    {
+        result.y = container.y;
+    }
+
+    if (position == POSITION_LEFT ||
+        position == POSITION_CENTER ||
+        position == POSITION_RIGHT)
+    {
+        result.y = container.y + container.height / 2 - rectangle.height / 2;
+    }
+
+    if (position == POSITION_BOTTOM_LEFT ||
+        position == POSITION_BOTTOM_CENTER ||
+        position == POSITION_BOTTOM_RIGHT)
+    {
+        result.y = container.y + container.height - rectangle.height;
+    }
+
+    return result;
 }

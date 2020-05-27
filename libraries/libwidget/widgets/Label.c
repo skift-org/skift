@@ -6,15 +6,13 @@
 void label_paint(Label *label, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
-    int text_width = font_measure_string(widget_font(), label->text);
 
-    painter_draw_string(
+    painter_draw_string_within(
         painter,
         widget_font(),
         label->text,
-        vec2i(
-            widget_get_bound(label).x + widget_get_bound(label).width / 2 - text_width / 2,
-            widget_get_bound(label).y + widget_get_bound(label).height / 2 + 4),
+        widget_get_bound(label),
+        POSITION_CENTER,
         widget_get_color(label, THEME_FOREGROUND));
 }
 

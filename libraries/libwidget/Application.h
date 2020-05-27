@@ -10,6 +10,8 @@ int application_run(void);
 
 void application_exit(int exit_value);
 
+bool application_is_debbuging_layout(void);
+
 void application_dump(void);
 
 void application_add_window(Window *window);

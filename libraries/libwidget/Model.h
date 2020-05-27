@@ -5,21 +5,6 @@
 
 struct Model;
 
-typedef enum
-{
-    POSITION_TOP_LEFT,
-    POSITION_TOP_CENTER,
-    POSITION_TOP_RIGHT,
-
-    POSITION_LEFT,
-    POSITION_CENTER,
-    POSITION_RIGHT,
-
-    POSITION_BOTTOM_LEFT,
-    POSITION_BOTTOM_CENTER,
-    POSITION_BOTTOM_RIGHT,
-} Position;
-
 typedef struct
 {
     Position text_position;

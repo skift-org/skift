@@ -24,6 +24,7 @@ static ApplicationState _state = APPLICATION_NONE;
 static List *_windows;
 static Connection *_connection;
 static Notifier *_connection_notifier;
+static bool _is_debbuging_layout = false;
 
 void application_do_message(CompositorMessage *message)
 {
@@ -105,6 +106,11 @@ Result application_initialize(int argc, char **argv)
             theme_load(buffer);
             theme_changed = true;
         }
+
+        if (strcmp(argv[i], "--debug-layout") == 0)
+        {
+            _is_debbuging_layout = true;
+        }
     }
 
     if (!theme_changed)
@@ -158,6 +164,11 @@ void application_exit(int exit_value)
     eventloop_exit(exit_value);
 
     _state = APPLICATION_NONE;
+}
+
+bool application_is_debbuging_layout(void)
+{
+    return _is_debbuging_layout;
 }
 
 void application_exit_if_all_windows_are_closed(void)

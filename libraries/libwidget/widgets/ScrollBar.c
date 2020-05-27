@@ -26,9 +26,9 @@ static Rectangle scrollbar_thumb(ScrollBar *widget)
     int thump_position = track.height * (widget->value / (double)widget->track);
 
     return (Rectangle){{
-        track.x,
+        track.x + 4,
         track.y + thump_position,
-        track.width,
+        track.width - 8,
         thumb_height,
     }};
 }
@@ -39,7 +39,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
 
     painter_clear_rectangle(painter, widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     painter_clear_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-    painter_draw_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_BORDER));
+    painter_fill_rounded_rectangle(painter, scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
 
     painter_blit_icon(painter, icon_cache_get_icon("chevron-up"), scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
     painter_blit_icon(painter, icon_cache_get_icon("chevron-down"), scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));

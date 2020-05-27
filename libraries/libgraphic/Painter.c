@@ -260,6 +260,19 @@ __attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle
     }
 }
 
+__attribute__((flatten)) void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color)
+{
+    Rectangle left_ear = rectangle_left(rectangle, insets.left);
+    Rectangle right_ear = rectangle_right(rectangle, insets.right);
+    Rectangle top = rectangle_top(rectangle_cutoff_left_right(rectangle, insets.left, insets.right), insets.top);
+    Rectangle bottom = rectangle_bottom(rectangle_cutoff_left_right(rectangle, insets.left, insets.right), insets.bottom);
+
+    painter_fill_rectangle(painter, left_ear, color);
+    painter_fill_rectangle(painter, right_ear, color);
+    painter_fill_rectangle(painter, top, color);
+    painter_fill_rectangle(painter, bottom, color);
+}
+
 __attribute__((flatten)) void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
 {
     Vec2f a = vec2f(p0.x, p0.y);
@@ -636,4 +649,18 @@ __attribute__((flatten)) void painter_draw_string(Painter *painter, Font *font, 
         painter_draw_glyph(painter, font, glyph, position, color);
         position = vec2i_add(position, vec2i(glyph->advance, 0));
     }
+}
+
+void painter_draw_string_within(Painter *painter, Font *font, const char *str, Rectangle container, Position position, Color color)
+{
+    Rectangle bound = RECTANGLE_SIZE(font_measure_string(font, str), 16);
+
+    bound = rectangle_place_within(bound, position, container);
+
+    painter_draw_string(
+        painter,
+        font,
+        str,
+        vec2i(bound.x, bound.y + bound.height / 2 + 4),
+        color);
 }

@@ -2,7 +2,7 @@
 #include "kernel/tasking/Handles.h"
 #include "kernel/node/Pipe.h"
 #include "kernel/node/Terminal.h"
-#include "kernel/sheduling/TaskBlockerSelect.h"
+#include "kernel/sheduling/Blocker.h"
 
 Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 {
@@ -182,7 +182,7 @@ Result task_fshandle_select(
     }
 
     {
-        TaskBlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
+        BlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
 
         if (blocker_result == BLOCKER_TIMEOUT)
         {

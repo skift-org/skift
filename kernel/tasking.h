@@ -9,7 +9,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
-#include "kernel/sheduling/TaskBlocker.h"
+#include "kernel/sheduling/Blocker.h"
 
 struct Task;
 
@@ -40,7 +40,7 @@ typedef struct Task
         TaskWaitTaskInfo task;
     } wait;
 
-    TaskBlocker *blocker;
+    Blocker *blocker;
 
     List *memory_mapping;
 
@@ -89,7 +89,7 @@ Result task_sleep(Task *task, int timeout);
 
 bool task_wait(int task_id, int *exitvalue);
 
-TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout);
+BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout);
 
 Result task_cancel(Task *task, int exitvalue);
 

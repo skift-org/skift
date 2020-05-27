@@ -4,7 +4,7 @@
 #include <libsystem/RingBuffer.h>
 
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/sheduling/TaskBlocker.h"
+#include "kernel/sheduling/Blocker.h"
 #include "kernel/tasking.h"
 
 static RingBuffer *_interupts_to_dispatch = NULL;
@@ -23,7 +23,7 @@ void dispatcher_dispatch(int interrupt)
     ringbuffer_putc(_interupts_to_dispatch, interrupt);
 }
 
-bool dispatcher_can_unblock(TaskBlocker *blocker, Task *task)
+bool dispatcher_can_unblock(Blocker *blocker, Task *task)
 {
     __unused(blocker);
     __unused(task);
@@ -43,8 +43,8 @@ void dispatcher_service(void)
 
         if (should_block)
         {
-            TaskBlocker *blocker = __create(TaskBlocker);
-            blocker->can_unblock = (TaskBlockerCanUnblockCallback)dispatcher_can_unblock;
+            Blocker *blocker = __create(Blocker);
+            blocker->can_unblock = (BlockerCanUnblockCallback)dispatcher_can_unblock;
             task_block(scheduler_running(), blocker, -1);
         }
 

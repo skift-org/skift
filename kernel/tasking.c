@@ -288,8 +288,6 @@ void task_go(Task *task)
 
 /* --- Task wait state ------------------------------------------------------ */
 
-#include "kernel/sheduling/TaskBlockerTime.h"
-
 Result task_sleep(Task *task, int timeout)
 {
     task_block(task, blocker_time_create(ticks + timeout), -1);
@@ -337,7 +335,7 @@ bool task_wait(int task_id, int *exitvalue)
     return true;
 }
 
-TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
+BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 {
     assert(!task->blocker);
 
@@ -373,7 +371,7 @@ TaskBlockerResult task_block(Task *task, TaskBlocker *blocker, Timeout timeout)
 
     scheduler_yield();
 
-    TaskBlockerResult result = blocker->result;
+    BlockerResult result = blocker->result;
 
     free(blocker);
     task->blocker = NULL;
@@ -797,7 +795,7 @@ void wakeup_blocked_task(void)
 
         list_foreach(Task, task, task_by_state(TASK_STATE_BLOCKED))
         {
-            TaskBlocker *blocker = task->blocker;
+            Blocker *blocker = task->blocker;
 
             if (blocker->can_unblock(blocker, task))
             {

@@ -1,8 +1,20 @@
 
-#include "kernel/sheduling/TaskBlockerSelect.h"
+#include "kernel/sheduling/Blocker.h"
 #include "kernel/tasking.h"
 
-bool blocker_select_can_unblock(TaskBlockerSelect *blocker, Task *task)
+typedef struct
+{
+    Blocker blocker;
+
+    FsHandle **handles;
+    SelectEvent *events;
+    size_t count;
+
+    FsHandle **selected;
+    SelectEvent *selected_events;
+} BlockerSelect;
+
+static bool blocker_select_can_unblock(BlockerSelect *blocker, Task *task)
 {
     __unused(task);
 
@@ -17,7 +29,7 @@ bool blocker_select_can_unblock(TaskBlockerSelect *blocker, Task *task)
     return false;
 }
 
-void blocker_select_unblock(TaskBlockerSelect *blocker, Task *task)
+static void blocker_select_unblock(BlockerSelect *blocker, Task *task)
 {
     __unused(blocker);
     __unused(task);
@@ -36,12 +48,12 @@ void blocker_select_unblock(TaskBlockerSelect *blocker, Task *task)
     }
 }
 
-TaskBlocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events)
+Blocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events)
 {
-    TaskBlockerSelect *select_blocker = __create(TaskBlockerSelect);
+    BlockerSelect *select_blocker = __create(BlockerSelect);
 
-    TASK_BLOCKER(select_blocker)->can_unblock = (TaskBlockerCanUnblockCallback)blocker_select_can_unblock;
-    TASK_BLOCKER(select_blocker)->on_unblock = (TaskBlockerUnblockCallback)blocker_select_unblock;
+    TASK_BLOCKER(select_blocker)->can_unblock = (BlockerCanUnblockCallback)blocker_select_can_unblock;
+    TASK_BLOCKER(select_blocker)->on_unblock = (BlockerUnblockCallback)blocker_select_unblock;
 
     select_blocker->handles = handles;
     select_blocker->events = events;
@@ -49,5 +61,5 @@ TaskBlocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size
     select_blocker->selected = selected;
     select_blocker->selected_events = selected_events;
 
-    return (TaskBlocker *)select_blocker;
+    return (Blocker *)select_blocker;
 }

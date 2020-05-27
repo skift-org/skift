@@ -6,10 +6,7 @@
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
-#include "kernel/sheduling/TaskBlockerAccept.h"
-#include "kernel/sheduling/TaskBlockerConnect.h"
-#include "kernel/sheduling/TaskBlockerRead.h"
-#include "kernel/sheduling/TaskBlockerWrite.h"
+#include "kernel/sheduling/Blocker.h"
 #include "kernel/tasking.h"
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags)

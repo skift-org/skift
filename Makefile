@@ -23,6 +23,7 @@ SYSROOT=$(BUILD_DIRECTORY)/sysroot
 BOOTROOT=$(BUILD_DIRECTORY)/bootroot
 
 BUILD_DIRECTORY_LIBS=$(SYSROOT)/lib
+BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/lib/include
 BUILD_DIRECTORY_APPS=$(SYSROOT)/bin
 BUILD_DIRECTORY_UTILS=$(SYSROOT)/bin
 
@@ -137,6 +138,11 @@ $(BUILD_DIRECTORY_LIBS)/crtn.o: libraries/crtn.s
 
 # --- Libraries ------------------------------------------ #
 
+ABI_HEADERS = \
+	$(wildcard libraries/abi/*.h) \
+	$(wildcard libraries/abi/*/*.h)
+HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS))
+
 define LIB_TEMPLATE =
 
 $(1)_ARCHIVE = $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
@@ -146,8 +152,18 @@ $(1)_SOURCES = \
 
 $(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
 
+$(1)_HEADERS = \
+	$$(wildcard libraries/lib$($(1)_NAME)/*.h) \
+	$$(wildcard libraries/lib$($(1)_NAME)/*/*.h)
+
 OBJECTS += $$($(1)_OBJECTS)
 ICONS += $$($(1)_ICONS)
+
+ifneq ($(1), COMPAT)
+HEADERS += $$(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
+else
+HEADERS += $$(patsubst libraries/libcompat/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
+endif
 
 $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	$$(DIRECTORY_GUARD)
@@ -163,6 +179,14 @@ $(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.c
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) -c -o $$@ $$<
 
 endef
+
+$(BUILD_DIRECTORY_INCLUDE)/%.h: libraries/%.h
+	$(DIRECTORY_GUARD)
+	cp $< $@
+
+$(BUILD_DIRECTORY_INCLUDE)/%.h: libraries/libcompat/%.h
+	$(DIRECTORY_GUARD)
+	cp $< $@
 
 -include libraries/*/.build.mk
 $(foreach lib, $(LIBS), $(eval $(call LIB_TEMPLATE,$(lib))))
@@ -245,7 +269,7 @@ RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
 SYSROOT_CONTENT=$(wildcard sysroot/*) $(wildcard sysroot/*/*) $(wildcard sysroot/*/*/*)
 
-$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT) $(ICONS_PNGs)
+$(RAMDISK): $(CRTS) $(LIBS_ARCHIVES) $(UTILS_BINARIES) $(APPS_BINARIES) $(SYSROOT_CONTENT) $(ICONS_PNGs) $(HEADERS)
 	$(DIRECTORY_GUARD)
 
 	@echo [TAR] $@

@@ -33,21 +33,12 @@ A simple, handmade, operating system for the intel x86 cpu.
  - IPC sockets
  - Low level utility and system library (libsystem)
  - 2D and 3D graphic library (libgraphic)
- - PNG support throught lodepng
+ - PNG support through lodepng
  - Graphical user interface library (libwidget)
  - A compositing window manager (Compositor)
  - Posix and libc compatibility layer library (libcompat)
  - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
  - It can run DOOM :rage3:
-
-# Getting a build
-
-You can get a pre-build image from [the GitHub release page](https://github.com/skiftOS/skift/releases) (unstable!)
-
-And use the following command to run it:
-```
-qemu-system-x86_64 -cdrom bootdisk.iso -m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci -enable-kvm
-```
 
 # License
 

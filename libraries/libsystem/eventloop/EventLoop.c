@@ -1,4 +1,5 @@
 
+#include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
@@ -77,18 +78,29 @@ void eventloop_pump(void)
 
     Timeout timeout = UINT32_MAX;
 
+    TimeStamp current_tick = system_get_ticks();
+
     list_foreach(Timer, timer, _eventloop_timers)
     {
         if (timer->started && timer->interval != 0)
         {
-            Timeout remaining = timer->interval - timer->elapsed;
-
-            if (remaining < timeout)
+            if (timer->scheduled < current_tick)
             {
-                timeout = remaining;
+                timeout = 0;
+            }
+            else
+            {
+                Timeout remaining = timer->scheduled - current_tick;
+
+                if (remaining <= timeout)
+                {
+                    timeout = remaining;
+                }
             }
         }
     }
+
+    eventloop_update_timers();
 
     Result result = handle_select(
         &_eventloop_handles[0],
@@ -141,8 +153,6 @@ void eventloop_update_timers(void)
 
     TimeStamp current_fire = system_get_ticks();
 
-    ElapsedTime elapsed = current_fire - _eventloop_timer_last_fire;
-
     list_foreach(Timer, timer, _eventloop_timers)
     {
         if (!timer->started)
@@ -150,16 +160,14 @@ void eventloop_update_timers(void)
             continue;
         }
 
-        timer->elapsed += elapsed;
-
-        if (timer->elapsed >= timer->interval)
+        if (timer->scheduled <= current_fire)
         {
             if (timer->callback)
             {
                 timer->callback(timer->target);
             }
 
-            timer->elapsed = 0;
+            timer->scheduled = current_fire + timer->interval;
         }
     }
 

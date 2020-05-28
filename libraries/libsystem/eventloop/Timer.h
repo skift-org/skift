@@ -13,7 +13,7 @@ typedef struct Timer
 
     bool started;
     Timeout interval;
-    Timeout elapsed;
+    TimeStamp scheduled;
 } Timer;
 
 Timer *timer_create(void *target, Timeout interval, TimerCallback callback);

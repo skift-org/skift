@@ -39,7 +39,8 @@ void interrupts_initialize(void)
         idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
     }
 
-    idt[128] = IDT_ENTRY(__interrupt_vector[48], 0x08, TRAPGATE);
+    idt[127] = IDT_ENTRY(__interrupt_vector[48], 0x08, INTGATE);
+    idt[128] = IDT_ENTRY(__interrupt_vector[49], 0x08, TRAPGATE);
 
     logger_info("Flushing the IDT...");
     idt_flush((u32)&idt_descriptor);
@@ -134,12 +135,20 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 
         if (irq == 0)
         {
-            esp = schedule(esp);
+            esp = schedule(esp, false);
         }
         else
         {
             dispatcher_dispatch(irq);
         }
+
+        atomic_enable();
+    }
+    else if (stackframe.intno == 127)
+    {
+        atomic_disable();
+
+        esp = schedule(esp, true);
 
         atomic_enable();
     }

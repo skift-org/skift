@@ -246,7 +246,7 @@ void task_set_state(Task *task, TaskState state)
     // Add the task to the groupe
     if (task->state != TASK_STATE_NONE)
     {
-        list_pushback(tasks_bystates[task->state], task);
+        list_push(tasks_bystates[task->state], task);
     }
 }
 
@@ -831,7 +831,7 @@ void wakeup_blocked_task(void)
     }
 }
 
-uintptr_t schedule(uintptr_t current_stack_pointer)
+uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
 {
     scheduler_context_switch = true;
 
@@ -839,9 +839,12 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
     running->stack_pointer = current_stack_pointer;
     platform_save_context(running);
 
-    // Update the system ticks
-    scheduler_record[ticks % SCHEDULER_RECORD_COUNT] = running->id;
-    ticks++;
+    if (!yield)
+    {
+        // Update the system ticks
+        scheduler_record[ticks % SCHEDULER_RECORD_COUNT] = running->id;
+        ticks++;
+    }
 
     wakeup_blocked_task();
 
@@ -876,10 +879,7 @@ bool scheduler_is_context_switch(void)
 
 void scheduler_yield()
 {
-    // FIXME: simple hack for system ticks.
-
-    ticks--;
-    asm("int $32");
+    asm("int $127");
 }
 
 /* --- Running task info ---------------------------------------------------- */

@@ -10,7 +10,7 @@ Timer *timer_create(void *target, Timeout interval, TimerCallback callback)
     timer->callback = callback;
 
     timer->started = false;
-    timer->elapsed = 0;
+    timer->scheduled = 0;
 
     eventloop_register_timer(timer);
 

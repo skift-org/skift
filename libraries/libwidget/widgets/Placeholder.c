@@ -29,8 +29,8 @@ void placeholder_destroy(Placeholder *placeholder)
 static const WidgetClass placeholder_class = {
     .name = "Placeholder",
 
-    .paint = (WidgetPaintCallback)placeholder_paint,
     .destroy = (WidgetDestroyCallback)placeholder_destroy,
+    .paint = (WidgetPaintCallback)placeholder_paint,
 };
 
 Widget *placeholder_create(Widget *parent, const char *text)

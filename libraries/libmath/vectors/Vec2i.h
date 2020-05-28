@@ -18,7 +18,7 @@ typedef union {
     int components[2];
 } Vec2i;
 
-#define vec2i(__x, __y) ((Vec2i){{(__x), (__y)}})
+#define vec2i(__x, __y) ((Vec2i){{(int)(__x), (int)(__y)}})
 
 #define vec2i_zero vec2i(0, 0)
 

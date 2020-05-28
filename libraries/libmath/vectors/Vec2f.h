@@ -14,4 +14,4 @@ typedef union {
     float components[2];
 } Vec2f;
 
-#define vec2f(__x, __y) ((Vec2f){{(__x), (__y)}})
+#define vec2f(__x, __y) ((Vec2f){{(float)(__x), (float)(__y)}})

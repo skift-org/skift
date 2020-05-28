@@ -1,4 +1,5 @@
 #include <libmarkup/Markup.h>
+#include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/unicode/Codepoint.h>
@@ -69,7 +70,7 @@ static const char *escape(SourceReader *source)
             source_foreward(source);
         }
 
-        _Static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
+        static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
 
         Codepoint codepoint = 0;
         if (parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&codepoint))

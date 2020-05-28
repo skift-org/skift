@@ -47,9 +47,9 @@ void image_set_image(Widget *image, const char *path)
 static const WidgetClass image_class = {
     .name = "Image",
 
+    .destroy = (WidgetDestroyCallback)image_destroy,
     .paint = (WidgetPaintCallback)image_paint,
     .size = (WidgetComputeSizeCallback)image_size,
-    .destroy = (WidgetDestroyCallback)image_destroy,
 };
 
 Widget *image_create(Widget *parent, const char *path)

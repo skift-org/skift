@@ -700,7 +700,7 @@ void window_schedule_update(Window *window, Rectangle rectangle)
         if (rectangle_colide(*dirty_rect, rectangle))
         {
             *dirty_rect = rectangle_merge(*dirty_rect, rectangle);
-            goto merged;
+            return;
         }
     }
 
@@ -709,9 +709,6 @@ void window_schedule_update(Window *window, Rectangle rectangle)
     *dirty_rect = rectangle;
 
     list_pushback(window->dirty_rect, dirty_rect);
-
-merged:
-    return;
 }
 
 void window_layout(Window *window)

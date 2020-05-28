@@ -39,9 +39,9 @@ static inline Color color_blend(Color fg, Color bg)
     uint alpha = fg.A + 1;
     uint inv_alpha = 256 - fg.A;
 
-    result.R = (ubyte)((alpha * fg.R + inv_alpha * bg.R) / 256);
-    result.G = (ubyte)((alpha * fg.G + inv_alpha * bg.G) / 256);
-    result.B = (ubyte)((alpha * fg.B + inv_alpha * bg.B) / 256);
+    result.R = (uint8_t)((alpha * fg.R + inv_alpha * bg.R) / 256);
+    result.G = (uint8_t)((alpha * fg.G + inv_alpha * bg.G) / 256);
+    result.B = (uint8_t)((alpha * fg.B + inv_alpha * bg.B) / 256);
     result.A = 255;
 
     return result;
@@ -49,7 +49,7 @@ static inline Color color_blend(Color fg, Color bg)
 
 #define COLOR(__value) ((Color){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
 
-#define COLOR_RGBA(__R, __G, __B, __A) ((Color){{(__R), (__G), (__B), (__A)}})
+#define COLOR_RGBA(__R, __G, __B, __A) ((Color){{(uint8_t)(__R), (uint8_t)(__G), (uint8_t)(__B), (uint8_t)(__A)}})
 
 #define COLOR_ENUM(__ENTRY)                                               \
     __ENTRY(ALICEBLUE, AliceBlue, 0xF0, 0xF8, 0xFF)                       \

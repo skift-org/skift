@@ -37,8 +37,8 @@ void label_destroy(Label *label)
 static const WidgetClass label_class = {
     .name = "Label",
 
-    .paint = (WidgetPaintCallback)label_paint,
     .destroy = (WidgetDestroyCallback)label_destroy,
+    .paint = (WidgetPaintCallback)label_paint,
     .size = (WidgetComputeSizeCallback)label_size,
 };
 

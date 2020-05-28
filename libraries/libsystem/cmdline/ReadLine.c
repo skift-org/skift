@@ -1,8 +1,8 @@
 
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/readline/ReadLine.h>
 
 #define READLINE_ALLOCATED 128
 

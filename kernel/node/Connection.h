@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/RingBuffer.h>
+#include <libsystem/utils/RingBuffer.h>
 
 #include "kernel/node/Node.h"
 

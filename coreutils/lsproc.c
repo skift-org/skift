@@ -1,8 +1,8 @@
 
 #include <abi/Task.h>
 
-#include <libsystem/CMDLine.h>
 #include <libsystem/Result.h>
+#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 
 static bool option_cpu_usage = false;

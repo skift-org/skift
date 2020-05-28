@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libsystem/RingBuffer.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/utils/RingBuffer.h>
 
 typedef struct
 {

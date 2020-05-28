@@ -1,6 +1,6 @@
 
 #include <libsystem/Atomic.h>
-#include <libsystem/RingBuffer.h>
+#include <libsystem/utils/RingBuffer.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"

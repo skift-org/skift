@@ -1,5 +1,5 @@
-#include <libsystem/CMDLine.h>
 #include <libsystem/Time.h>
+#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 
 static bool option_time = false;

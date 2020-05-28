@@ -2,9 +2,9 @@
 /* cmdline.c: skiftOS command line application utils                          */
 
 #include <libsystem/Assert.h>
-#include <libsystem/CMDLine.h>
 #include <libsystem/CString.h>
 #include <libsystem/Convert.h>
+#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 

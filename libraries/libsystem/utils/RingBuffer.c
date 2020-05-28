@@ -1,6 +1,6 @@
 
 #include <libsystem/Assert.h>
-#include <libsystem/RingBuffer.h>
+#include <libsystem/utils/RingBuffer.h>
 
 RingBuffer *ringbuffer_create(size_t size)
 {

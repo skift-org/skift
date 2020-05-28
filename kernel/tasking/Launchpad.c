@@ -14,7 +14,7 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
     }
 
     PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
-    paging_load_directory(child_task->pdir);
+    memory_pdir_switch(child_task->pdir);
 
     task_memory_map(child_task, program_header->vaddr, PAGE_ALIGN_UP(program_header->memsz) / PAGE_SIZE);
     memset((void *)program_header->vaddr, 0, program_header->memsz);

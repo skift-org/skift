@@ -29,7 +29,7 @@ BUILD_DIRECTORY_UTILS=$(SYSROOT)/bin
 # --- Configs -------------------------------------------- #
 
 QEMU=qemu-system-x86_64
-QEMUFLAGS=-m 256M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
+QEMUFLAGS=-m 128M -serial mon:stdio -rtc base=localtime -nic user,model=virtio-net-pci
 
 CC:=i686-pc-skift-gcc
 CFLAGS:= \

@@ -13,7 +13,7 @@ static bool _memory_initialized = false;
 extern int __start;
 extern int __end;
 
-MemoryRange kernel_memory_range(void)
+static MemoryRange kernel_memory_range(void)
 {
     return memory_range_around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
 }
@@ -30,11 +30,11 @@ void memory_initialize(Multiboot *multiboot)
     // Setup the kernel pagedirectory.
     for (uint i = 0; i < 256; i++)
     {
-        PageDirectoryEntry *e = &kpdir.entries[i];
-        e->User = 0;
-        e->Write = 1;
-        e->Present = 1;
-        e->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
+        PageDirectoryEntry *entry = &kpdir.entries[i];
+        entry->User = 0;
+        entry->Write = 1;
+        entry->Present = 1;
+        entry->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
     }
 
     for (size_t i = 0; i < multiboot->memory_map_size; i++)
@@ -51,18 +51,18 @@ void memory_initialize(Multiboot *multiboot)
     TOTAL_MEMORY = multiboot->memory_usable;
 
     logger_info("Mapping kernel...");
-    memory_identity_map_range(&kpdir, kernel_memory_range());
+    memory_map_eternal(&kpdir, kernel_memory_range());
 
     logger_info("Mapping modules...");
     for (size_t i = 0; i < multiboot->modules_size; i++)
     {
-        memory_identity_map_range(&kpdir, multiboot->modules[i].range);
+        memory_map_eternal(&kpdir, multiboot->modules[i].range);
     }
 
     virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
     physical_set_used(0, 1);
 
-    paging_load_directory(&kpdir);
+    memory_pdir_switch(&kpdir);
     paging_enable();
 
     logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);
@@ -71,6 +71,39 @@ void memory_initialize(Multiboot *multiboot)
     logger_info("Paging enabled!");
 
     _memory_initialized = true;
+}
+
+void memory_dump(void)
+{
+    printf("\n\tMemory status:");
+    printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
+    printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
+}
+
+uint memory_get_used(void)
+{
+    uint result;
+
+    atomic_begin();
+
+    result = USED_MEMORY;
+
+    atomic_end();
+
+    return result;
+}
+
+uint memory_get_total(void)
+{
+    uint result;
+
+    atomic_begin();
+
+    result = TOTAL_MEMORY;
+
+    atomic_end();
+
+    return result;
 }
 
 PageDirectory *memory_kpdir(void)
@@ -115,23 +148,6 @@ uint memory_alloc(PageDirectory *pdir, uint count, int user)
     return vaddr;
 }
 
-uint memory_alloc_at(PageDirectory *pdir, uint count, uint paddr, int user)
-{
-    if (count == 0)
-        return 0;
-
-    atomic_begin();
-
-    uint vaddr = virtual_alloc(pdir, paddr, count, user);
-
-    atomic_end();
-
-    memset((void *)vaddr, 0, count * PAGE_SIZE);
-
-    return vaddr;
-}
-
-// Alloc a identity mapped memory region, usefull for paging data structures
 uint memory_alloc_identity(PageDirectory *pdir, uint count, int user)
 {
     if (count == 0)
@@ -194,12 +210,63 @@ void memory_free(PageDirectory *pdir, uint addr, uint count, int user)
     atomic_end();
 }
 
-// Alloc a pdir for a process
-PageDirectory *memory_alloc_pdir()
+int memory_map(PageDirectory *pdir, uint addr, uint count, int user)
 {
     atomic_begin();
 
-    PageDirectory *pdir = (PageDirectory *)memory_alloc_identity(&kpdir, 1, 0);
+    for (uint i = 0; i < count; i++)
+    {
+        uint vaddr = addr + i * PAGE_SIZE;
+
+        if (!virtual_present(pdir, vaddr, 1))
+        {
+            uint paddr = physical_alloc(1);
+            virtual_map(pdir, vaddr, paddr, 1, user);
+        }
+    }
+
+    atomic_end();
+
+    return 0;
+}
+
+int memory_map_eternal(PageDirectory *pdir, MemoryRange range)
+{
+    size_t page_count = PAGE_ALIGN_UP(range.size) / PAGE_SIZE;
+
+    atomic_begin();
+    physical_set_used(range.base, page_count);
+    virtual_map(pdir, range.base, range.base, page_count, 0);
+    atomic_end();
+
+    return 0;
+}
+
+int memory_unmap(PageDirectory *pdir, uint addr, uint count)
+{
+    atomic_begin();
+
+    for (uint i = 0; i < count; i++)
+    {
+        uint vaddr = addr + i * PAGE_SIZE;
+
+        if (virtual_present(pdir, vaddr, 1))
+        {
+            physical_free(virtual2physical(pdir, vaddr), 1);
+            virtual_unmap(pdir, vaddr, 1);
+        }
+    }
+
+    atomic_end();
+
+    return 0;
+}
+
+PageDirectory *memory_pdir_create()
+{
+    atomic_begin();
+
+    PageDirectory *pdir = (PageDirectory *)memory_alloc(&kpdir, 1, 0);
 
     if (pdir == NULL)
     {
@@ -224,8 +291,7 @@ PageDirectory *memory_alloc_pdir()
     return pdir;
 }
 
-// Free the pdir of a dying process
-void memory_free_pdir(PageDirectory *pdir)
+void memory_pdir_destroy(PageDirectory *pdir)
 {
     atomic_begin();
 
@@ -255,77 +321,6 @@ void memory_free_pdir(PageDirectory *pdir)
     atomic_end();
 }
 
-int memory_map(PageDirectory *pdir, uint addr, uint count, int user)
-{
-    atomic_begin();
-
-    for (uint i = 0; i < count; i++)
-    {
-        uint vaddr = addr + i * PAGE_SIZE;
-
-        if (!virtual_present(pdir, vaddr, 1))
-        {
-            uint paddr = physical_alloc(1);
-            virtual_map(pdir, vaddr, paddr, 1, user);
-        }
-    }
-
-    atomic_end();
-
-    return 0;
-}
-
-int memory_unmap(PageDirectory *pdir, uint addr, uint count)
-{
-    atomic_begin();
-
-    for (uint i = 0; i < count; i++)
-    {
-        uint vaddr = addr + i * PAGE_SIZE;
-
-        if (virtual_present(pdir, vaddr, 1))
-        {
-            physical_free(virtual2physical(pdir, vaddr), 1);
-            virtual_unmap(pdir, vaddr, 1);
-        }
-    }
-
-    atomic_end();
-
-    return 0;
-}
-
-void memory_identity_map_range(PageDirectory *pdir, MemoryRange range)
-{
-    memory_identity_map(pdir, range.base, PAGE_ALIGN_UP(range.size) / PAGE_SIZE);
-}
-
-int memory_identity_map(PageDirectory *pdir, uint addr, uint count)
-{
-    atomic_begin();
-    physical_set_used(addr, count);
-    virtual_map(pdir, addr, addr, count, 0);
-    atomic_end();
-
-    return 0;
-}
-
-int memory_identity_unmap(PageDirectory *pdir, uint addr, uint count)
-{
-    atomic_begin();
-    physical_set_free(addr, count);
-    virtual_unmap(pdir, addr, count);
-    atomic_end();
-
-    return 0;
-}
-
-void memory_dump(void)
-{
-    printf("\n\tMemory status:");
-    printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
-    printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
-}
 
 #define MEMORY_DUMP_REGION_START(__pdir, __addr)               \
     {                                                          \
@@ -341,7 +336,7 @@ void memory_dump(void)
         printf("%08x] %08x", virtual2physical(__pdir, __addr), (__addr)); \
     }
 
-void memory_layout_dump(PageDirectory *pdir, bool user)
+void memory_pdir_dump(PageDirectory *pdir, bool user)
 {
     if (!_memory_initialized)
         return;
@@ -395,28 +390,7 @@ void memory_layout_dump(PageDirectory *pdir, bool user)
     }
 }
 
-uint memory_get_used(void)
+void memory_pdir_switch(PageDirectory *pdir)
 {
-    uint result;
-
-    atomic_begin();
-
-    result = USED_MEMORY;
-
-    atomic_end();
-
-    return result;
-}
-
-uint memory_get_total(void)
-{
-    uint result;
-
-    atomic_begin();
-
-    result = TOTAL_MEMORY;
-
-    atomic_end();
-
-    return result;
+    paging_load_directory(virtual2physical(&kpdir, (uintptr_t)pdir));
 }

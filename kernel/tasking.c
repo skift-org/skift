@@ -99,7 +99,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     // Setup memory space
     if (user)
     {
-        task->pdir = memory_alloc_pdir();
+        task->pdir = memory_pdir_create();
     }
     else
     {
@@ -138,7 +138,7 @@ void task_destroy(Task *task)
 
     if (task->pdir != memory_kpdir())
     {
-        memory_free_pdir(task->pdir);
+        memory_pdir_destroy(task->pdir);
     }
 
     free(task);
@@ -422,7 +422,7 @@ PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 
     task->pdir = pdir;
 
-    paging_load_directory(pdir);
+    memory_pdir_switch(pdir);
 
     return oldpdir;
 }
@@ -464,7 +464,7 @@ void task_dump(Task *t)
     printf("\n\t - Task %d %s", t->id, t->name);
     printf("\n\t   State: %s", TASK_STATES[t->state]);
     printf("\n\t   User memory: ");
-    memory_layout_dump(t->pdir, false);
+    memory_pdir_dump(t->pdir, false);
     printf("\n\t   Page directory: %08x", t->pdir);
 
     printf("\n");
@@ -854,8 +854,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 
     // Restore the context
     // TODO: set_kernel_stack(...);
-    paging_load_directory(running->pdir);
-    paging_invalidate_tlb();
+    memory_pdir_switch(running->pdir);
 
     scheduler_context_switch = false;
 

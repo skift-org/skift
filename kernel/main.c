@@ -84,7 +84,7 @@ void kmain(void *info, uint magic)
 
     Multiboot *multiboot = multiboot_initialize(info, magic);
 
-    if (multiboot->memory_usable < 255 * 1024)
+    if (multiboot->memory_usable < 127 * 1024)
     {
         PANIC("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
     }

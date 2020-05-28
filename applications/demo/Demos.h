@@ -6,6 +6,8 @@
 
 void colors_draw(Painter *painter, Rectangle screen, double time);
 
+void latency_draw(Painter *painter, Rectangle screen, double time);
+
 void cube_draw(Painter *painter, Rectangle screen, double time);
 
 void graphics_draw(Painter *painter, Rectangle screen, double time);

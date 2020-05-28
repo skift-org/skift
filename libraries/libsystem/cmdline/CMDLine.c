@@ -3,10 +3,10 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
-#include <libsystem/Convert.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/utils/NumberParser.h>
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -49,7 +49,7 @@ void do_option(CommandLine *cmdline, CommandLineOption *option, int i, int argc,
         case COMMANDLINE_INTEGER:
             if (i + 1 < argc && argv[i + 1] != NULL)
             {
-                *((int *)option->value) = convert_string_to_uint(argv[i + 1], strnlen(argv[i + 1], 33), 10);
+                *((int *)option->value) = parse_int_inline(PARSER_DECIMAL, argv[i + 1], 0);
                 argv[i + 1] = NULL;
             }
             break;

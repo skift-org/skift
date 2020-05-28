@@ -3,15 +3,19 @@
 
 #include <libsystem/CString.h>
 #include <libsystem/CType.h>
-#include <libsystem/Convert.h>
 #include <libsystem/__printf__.h>
+#include <libsystem/utils/NumberFormatter.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
 {
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {};
-    convert_uint_to_string(v, buffer, 33, 2);
+
+    NumberFormater format = FORMAT_BINARY;
+    format.padded_with_zero = false;
+
+    format_uint(format, v, buffer, 33);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -30,7 +34,11 @@ int __printf_formate_octal(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {};
-    convert_uint_to_string(v, buffer, 33, 8);
+
+    NumberFormater format = FORMAT_OCTAL;
+    format.padded_with_zero = false;
+
+    format_uint(format, v, buffer, 33);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -50,19 +58,10 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
 
     char buffer[33] = {};
 
-    if (v < 0)
-    {
-        v = 0 - v;
+    NumberFormater format = FORMAT_DECIMAL;
+    format.padded_with_zero = false;
 
-        buffer[0] = '-';
-        buffer[1] = '\0';
-
-        convert_uint_to_string(v, buffer + 1, 33, 10);
-    }
-    else
-    {
-        convert_uint_to_string(v, buffer, 32, 10);
-    }
+    format_int(format, v, buffer, 33);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -81,7 +80,11 @@ int __printf_formate_decimal_unsigned(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {};
-    convert_uint_to_string(v, buffer, 32, 10);
+
+    NumberFormater format = FORMAT_DECIMAL;
+    format.padded_with_zero = false;
+
+    format_uint(format, v, buffer, 33);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -100,7 +103,11 @@ int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
     uint v = va_arg(*va, uint);
 
     char buffer[33] = {};
-    convert_uint_to_string(v, buffer, 32, 16);
+
+    NumberFormater format = FORMAT_HEXADECIMAL;
+    format.padded_with_zero = false;
+
+    format_uint(format, v, buffer, 33);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 

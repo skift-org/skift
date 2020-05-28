@@ -1,8 +1,8 @@
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
-#include <libsystem/Convert.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/utils/NumberParser.h>
 
 #include "shell/Builtin.h"
 
@@ -30,7 +30,7 @@ int shell_builtin_exit(int argc, const char **argv)
 {
     if (argc == 2)
     {
-        process_exit(convert_string_to_uint(argv[1], strnlen(argv[1], 32), 10));
+        process_exit(parse_int_inline(PARSER_DECIMAL, argv[1], -1));
     }
     else
     {

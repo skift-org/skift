@@ -324,13 +324,15 @@ Result filesystem_rename(Path *old_path, Path *new_path)
     FsNode *old_parent = filesystem_find_parent_and_ref(old_path);
     FsNode *new_parent = filesystem_find_parent_and_ref(new_path);
 
-    if (!old_parent || !new_parent)
+    if (!old_parent ||
+        !new_parent)
     {
         result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
     }
 
-    if (old_parent->type != FILE_TYPE_DIRECTORY || new_parent->type != FILE_TYPE_DIRECTORY)
+    if (old_parent->type != FILE_TYPE_DIRECTORY ||
+        new_parent->type != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
@@ -359,7 +361,7 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto unlock_cleanup_and_return;
     }
 
-    result = new_parent->link(child, path_filename(new_path), child);
+    result = new_parent->link(new_parent, path_filename(new_path), child);
 
     if (result == SUCCESS)
     {

@@ -14,7 +14,6 @@ UTILS = \
 	KEYBOARDCTL \
 	KILL \
 	LS \
-	LSPROC \
 	MARKUP \
 	MKDIR \
 	MV \
@@ -68,9 +67,6 @@ KILL_LIBS =
 
 LS_NAME = ls
 LS_LIBS =
-
-LSPROC_NAME = lsproc
-LSPROC_LIBS =
 
 MARKUP_NAME = markup
 MARKUP_LIBS = markup

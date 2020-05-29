@@ -15,34 +15,19 @@ struct Task;
 
 typedef void (*TaskEntry)();
 
-typedef struct
-{
-    int task_handle;
-    int exitvalue;
-} TaskWaitTaskInfo;
-
 typedef struct Task
 {
     int id;
-    char name[PROCESS_NAME_SIZE]; // Friendly name of the process
-    TaskState state;
-
     bool user;
+    char name[PROCESS_NAME_SIZE]; // Friendly name of the process
+
+    TaskState state;
+    Blocker *blocker;
 
     uintptr_t stack_pointer;
     byte stack[PROCESS_STACK_SIZE]; // Kernel stack
-
-    TaskEntry entry; // Our entry point
+    TaskEntry entry;                // Our entry point
     char fpu_registers[512];
-
-    struct
-    {
-        TaskWaitTaskInfo task;
-    } wait;
-
-    Blocker *blocker;
-
-    List *memory_mapping;
 
     Lock handles_lock;
     FsHandle *handles[PROCESS_HANDLE_COUNT];
@@ -50,9 +35,10 @@ typedef struct Task
     Lock cwd_lock;
     Path *cwd_path;
 
+    List *memory_mapping;
     PageDirectory *pdir; // Page directory
 
-    int exitvalue;
+    int exit_value;
 } Task;
 
 void tasking_initialize(void);
@@ -66,8 +52,6 @@ List *task_all(void);
 List *task_by_state(TaskState state);
 
 Task *task_by_id(int id);
-
-void task_get_info(Task *task, TaskInfo *info);
 
 int task_count(void);
 
@@ -87,13 +71,13 @@ void task_go(Task *t);
 
 Result task_sleep(Task *task, int timeout);
 
-bool task_wait(int task_id, int *exitvalue);
+Result task_wait(int task_id, int *exit_value);
 
 BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout);
 
-Result task_cancel(Task *task, int exitvalue);
+Result task_cancel(Task *task, int exit_value);
 
-void task_exit(int exitvalue);
+void task_exit(int exit_value);
 
 void task_dump(Task *t);
 

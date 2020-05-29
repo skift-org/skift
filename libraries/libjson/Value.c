@@ -4,6 +4,11 @@
 
 JsonValue *json_create_string(const char *string)
 {
+    if (string == NULL)
+    {
+        return json_create_null();
+    }
+
     JsonValue *value = __create(JsonValue);
 
     value->type = JSON_STRING;
@@ -14,6 +19,11 @@ JsonValue *json_create_string(const char *string)
 
 JsonValue *json_create_string_adopt(char *string)
 {
+    if (string == NULL)
+    {
+        return json_create_null();
+    }
+
     JsonValue *value = __create(JsonValue);
 
     value->type = JSON_STRING;

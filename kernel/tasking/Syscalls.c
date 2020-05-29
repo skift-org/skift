@@ -113,9 +113,9 @@ int sys_process_sleep(int time)
     return task_sleep(scheduler_running(), time);
 }
 
-int sys_process_wait(int tid, int *exitvalue)
+int sys_process_wait(int tid, int *exit_value)
 {
-    return task_wait(tid, exitvalue);
+    return task_wait(tid, exit_value);
 }
 
 /* --- Shared memory -------------------------------------------------------- */

@@ -64,10 +64,10 @@ void userspace_initialize(void)
         PANIC("Failled to start init : %s", result_to_string(result));
     }
 
-    int init_exitvalue = 0;
-    task_wait(init_process, &init_exitvalue);
+    int init_exit_value = 0;
+    task_wait(init_process, &init_exit_value);
 
-    PANIC("Init has return with code %d!", init_exitvalue);
+    PANIC("Init has return with code %d!", init_exit_value);
 }
 
 #ifdef __cplusplus

@@ -29,14 +29,16 @@ typedef struct Blocker
 
 #define TASK_BLOCKER(__subclass) ((Blocker *)(__subclass))
 
-Blocker *blocker_write_create(FsHandle *handle);
-
-Blocker *blocker_time_create(uint wake_up_tick);
-
-Blocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events);
-
-Blocker *blocker_read_create(FsHandle *handle);
+Blocker *blocker_accept_create(FsNode *node);
 
 Blocker *blocker_connect_create(FsNode *connection);
 
-Blocker *blocker_accept_create(FsNode *node);
+Blocker *blocker_read_create(FsHandle *handle);
+
+Blocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events);
+
+Blocker *blocker_time_create(uint wake_up_tick);
+
+Blocker *blocker_wait_create(struct Task *task, int *exit_value);
+
+Blocker *blocker_write_create(FsHandle *handle);

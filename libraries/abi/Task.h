@@ -3,29 +3,31 @@
 #include <abi/Filesystem.h>
 #include <abi/Process.h>
 
+#define TASK_STATE_LIST(__ENTRY) \
+    __ENTRY(NONE)                \
+    __ENTRY(HANG)                \
+    __ENTRY(EMBRYO)              \
+    __ENTRY(RUNNING)             \
+    __ENTRY(BLOCKED)             \
+    __ENTRY(CANCELED)
+
 typedef enum
 {
-    TASK_STATE_NONE = -1,
-
-    TASK_STATE_HANG,
-    TASK_STATE_LAUNCHPAD,
-    TASK_STATE_RUNNING,
-    TASK_STATE_BLOCKED,
-    TASK_STATE_WAIT,
-    TASK_STATE_CANCELED,
-
-    __TASK_STATE_COUNT
+#define TASK_STATE_ENUM_ENTRY(__state) TASK_STATE_##__state,
+    TASK_STATE_LIST(TASK_STATE_ENUM_ENTRY)
+        __TASK_STATE_COUNT
 } TaskState;
 
-typedef struct
+static inline const char *task_state_string(TaskState state)
 {
-    int id;
-    TaskState state;
+#define TASK_STATE_STRING_ENTRY(__state) #__state,
 
-    char name[PROCESS_NAME_SIZE];
-    char cwd[PATH_LENGTH];
+    const char *state_strings[] = {TASK_STATE_LIST(TASK_STATE_STRING_ENTRY)};
 
-    int usage_cpu;
-    int usage_virtual_memory;
-    int usage_physical_memory;
-} TaskInfo;
+    if (state >= 0 && state < __TASK_STATE_COUNT)
+    {
+        return state_strings[state];
+    }
+
+    return "undefined";
+}

@@ -165,19 +165,6 @@ Task *task_by_id(int id)
     return NULL;
 }
 
-void task_get_info(Task *task, TaskInfo *info)
-{
-    assert(task);
-
-    info->id = task->id;
-    info->state = task->state;
-
-    strlcpy(info->name, task->name, PROCESS_NAME_SIZE);
-    path_to_cstring(task->cwd_path, info->cwd, PATH_LENGTH);
-
-    info->usage_cpu = (scheduler_get_usage(task->id) * 100) / SCHEDULER_RECORD_COUNT;
-}
-
 int task_count(void)
 {
     atomic_begin();
@@ -295,44 +282,25 @@ Result task_sleep(Task *task, int timeout)
     return TIMEOUT;
 }
 
-bool task_wait(int task_id, int *exitvalue)
+Result task_wait(int task_id, int *exit_value)
 {
     atomic_begin();
-
     Task *task = task_by_id(task_id);
 
     if (!task)
     {
         atomic_end();
 
-        return false;
+        return ERR_NO_SUCH_TASK;
     }
-
-    if (task->state == TASK_STATE_CANCELED)
-    {
-        if (exitvalue != NULL)
-        {
-            *exitvalue = task->exitvalue;
-        }
-
-        atomic_end();
-
-        return true;
-    }
-
-    running->wait.task.task_handle = task->id;
-    task_set_state(running, TASK_STATE_WAIT);
 
     atomic_end();
 
-    scheduler_yield();
+    task_block(
+        scheduler_running(),
+        blocker_wait_create(task, exit_value), -1);
 
-    if (exitvalue != NULL)
-    {
-        *exitvalue = running->wait.task.exitvalue;
-    }
-
-    return true;
+    return SUCCESS;
 }
 
 BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
@@ -381,33 +349,23 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
 /* --- Task stopping and canceling ------------------------------------------ */
 
-Result task_cancel(Task *task, int exitvalue)
+Result task_cancel(Task *task, int exit_value)
 {
     assert(task);
 
     atomic_begin();
 
-    task->exitvalue = exitvalue;
+    task->exit_value = exit_value;
     task_set_state(task, TASK_STATE_CANCELED);
-
-    // Wake up waiting tasks
-    list_foreach(Task, waittask, task_by_state(TASK_STATE_WAIT))
-    {
-        if (waittask->wait.task.task_handle == task->id)
-        {
-            waittask->wait.task.exitvalue = exitvalue;
-            task_set_state(waittask, TASK_STATE_RUNNING);
-        }
-    }
 
     atomic_end();
 
     return SUCCESS;
 }
 
-void task_exit(int exitvalue)
+void task_exit(int exit_value)
 {
-    task_cancel(running, exitvalue);
+    task_cancel(running, exit_value);
 
     scheduler_yield();
 
@@ -449,23 +407,14 @@ void task_memory_free(Task *task, uint addr, uint count)
 
 /* --- Task dump ------------------------------------------------------------ */
 
-static const char *TASK_STATES[] = {
-    "HANG",
-    "LAUNCHPAD",
-    "RUNNING",
-    "BLOCKED",
-    "WAIT",
-    "CANCELED",
-};
-
-void task_dump(Task *t)
+void task_dump(Task *task)
 {
     atomic_begin();
-    printf("\n\t - Task %d %s", t->id, t->name);
-    printf("\n\t   State: %s", TASK_STATES[t->state]);
+    printf("\n\t - Task %d %s", task->id, task->name);
+    printf("\n\t   State: %s", task_state_string(task->state));
     printf("\n\t   User memory: ");
-    memory_pdir_dump(t->pdir, false);
-    printf("\n\t   Page directory: %08x", t->pdir);
+    memory_pdir_dump(task->pdir, false);
+    printf("\n\t   Page directory: %08x", task->pdir);
 
     printf("\n");
     atomic_end();

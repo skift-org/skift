@@ -70,7 +70,15 @@ Task *task_create(Task *parent, const char *name, bool user)
     strlcpy(task->name, name, PROCESS_NAME_SIZE);
     task->state = TASK_STATE_NONE;
 
-    list_pushback(tasks, task);
+    // Setup memory space
+    if (user)
+    {
+        task->pdir = memory_pdir_create();
+    }
+    else
+    {
+        task->pdir = memory_kpdir();
+    }
 
     // Setup shms
     task->memory_mapping = list_create();
@@ -96,21 +104,12 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = NULL;
     }
 
-    // Setup memory space
-    if (user)
-    {
-        task->pdir = memory_pdir_create();
-    }
-    else
-    {
-        task->pdir = memory_kpdir();
-    }
-
-    // setup the stack
-    memset(task->stack, 0, PROCESS_STACK_SIZE);
-    task->stack_pointer = (uintptr_t)(&task->stack[0] + PROCESS_STACK_SIZE - 1);
+    task->stack = (byte *)memory_alloc(task->pdir, PROCESS_STACK_SIZE / PAGE_SIZE, false);
+    task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
 
     platform_fpu_save_context(task);
+
+    list_pushback(tasks, task);
 
     return task;
 }

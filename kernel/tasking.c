@@ -104,7 +104,7 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = NULL;
     }
 
-    task->stack = (byte *)memory_alloc(task->pdir, PROCESS_STACK_SIZE / PAGE_SIZE, false);
+    task->stack = (byte *)memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR);
     task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
 
     platform_fpu_save_context(task);
@@ -396,12 +396,12 @@ int task_memory_unmap(Task *task, uint addr, uint count)
 
 uint task_memory_alloc(Task *task, uint count)
 {
-    return memory_alloc(task->pdir, count, 1);
+    return memory_alloc(task->pdir, count * PAGE_SIZE, MEMORY_USER | MEMORY_CLEAR);
 }
 
 void task_memory_free(Task *task, uint addr, uint count)
 {
-    return memory_free(task->pdir, addr, count, 1);
+    return memory_free(task->pdir, addr, count, MEMORY_USER | MEMORY_CLEAR);
 }
 
 /* --- Task dump ------------------------------------------------------------ */

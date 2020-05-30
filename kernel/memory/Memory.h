@@ -3,19 +3,24 @@
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/multiboot/Multiboot.h"
 
+#define MEMORY_NONE (0)
+#define MEMORY_USER (1 << 0)
+#define MEMORY_CLEAR (1 << 1)
+typedef unsigned int MemoryFlags;
+
 void memory_initialize(Multiboot *multiboot);
 
 void memory_dump(void);
 
-uint memory_get_used(void);
+size_t memory_get_used(void);
 
-uint memory_get_total(void);
+size_t memory_get_total(void);
 
 PageDirectory *memory_kpdir(void);
 
-uint memory_alloc(PageDirectory *pdir, uint count, int user);
+uintptr_t memory_alloc(PageDirectory *pdir, size_t size, MemoryFlags flags);
 
-uint memory_alloc_identity(PageDirectory *pdir, uint count, int user);
+uintptr_t memory_alloc_identity_page(PageDirectory *pdir);
 
 void memory_free(PageDirectory *pdir, uint addr, uint count, int user);
 

@@ -73,7 +73,7 @@ int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool us
 
         if (!pde->Present)
         {
-            ptable = (PageTable *)memory_alloc_identity(pdir, 1, 0);
+            ptable = (PageTable *)memory_alloc_identity_page(pdir);
 
             pde->Present = 1;
             pde->Write = 1;

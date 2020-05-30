@@ -85,7 +85,7 @@ int __plug_memalloc_unlock()
 
 void *__plug_memalloc_alloc(uint size)
 {
-    void *p = (void *)memory_alloc(memory_kpdir(), size, 0);
+    void *p = (void *)memory_alloc(memory_kpdir(), size * PAGE_SIZE, MEMORY_NONE);
     return p;
 }
 

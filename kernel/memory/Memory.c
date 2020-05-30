@@ -80,9 +80,9 @@ void memory_dump(void)
     printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
 
-uint memory_get_used(void)
+size_t memory_get_used(void)
 {
-    uint result;
+    size_t result;
 
     atomic_begin();
 
@@ -93,9 +93,9 @@ uint memory_get_used(void)
     return result;
 }
 
-uint memory_get_total(void)
+size_t memory_get_total(void)
 {
-    uint result;
+    size_t result;
 
     atomic_begin();
 
@@ -111,87 +111,75 @@ PageDirectory *memory_kpdir(void)
     return &kpdir;
 }
 
-uint memory_alloc(PageDirectory *pdir, uint count, int user)
+uintptr_t memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flags)
 {
-    if (count == 0)
+    if (!size)
         return 0;
+
+    size_t page_count = PAGE_ALIGN_UP(size) / PAGE_SIZE;
 
     atomic_begin();
 
-    uint paddr = physical_alloc(count);
+    uintptr_t physical_address = physical_alloc(page_count);
 
-    if (paddr == 0)
+    if (!physical_address)
     {
         atomic_end();
 
-        logger_error("Failled no enough physical memory!");
+        logger_error("Failled to allocate memory: not enough physical memory!");
 
         return 0;
     }
 
-    uint vaddr = virtual_alloc(pdir, paddr, count, user);
+    uintptr_t virtual_address = virtual_alloc(
+        page_directory,
+        physical_address,
+        page_count,
+        flags & MEMORY_USER);
 
-    if (vaddr == 0)
+    if (!virtual_address)
     {
-        physical_free(paddr, count);
+        physical_free(physical_address, page_count);
         atomic_end();
 
-        logger_error("Failled no enough virtual memory!");
+        logger_error("Failled to allocate memory: not enough virtual memory!");
 
         return 0;
     }
 
     atomic_end();
 
-    memset((void *)vaddr, 0, count * PAGE_SIZE);
+    if (flags & MEMORY_CLEAR)
+        memset((void *)virtual_address, 0, page_count * PAGE_SIZE);
 
-    return vaddr;
+    return virtual_address;
 }
 
-uint memory_alloc_identity(PageDirectory *pdir, uint count, int user)
+uintptr_t memory_alloc_identity_page(PageDirectory *pdir)
 {
-    if (count == 0)
-        return 0;
-
     atomic_begin();
 
-    uint current_size = 0;
-    uint startaddr = 0;
-
-    for (size_t i = (user ? 256 : 1); i < (user ? 1024 : 256) * 1024; i++)
+    for (size_t i = 1; i < 256 * 1024; i++)
     {
-        int addr = i * PAGE_SIZE;
+        int address = i * PAGE_SIZE;
 
-        if (!(page_present(pdir, addr) || physical_is_used(addr, 1)))
+        if (!page_present(pdir, address) &&
+            !physical_is_used(address, 1))
         {
-            if (current_size == 0)
-            {
-                startaddr = addr;
-            }
+            physical_set_used(address, 1);
+            virtual_map(pdir, address, address, 1, false);
 
-            current_size++;
+            atomic_end();
 
-            if (current_size == count)
-            {
-                physical_set_used(startaddr, count);
-                virtual_map(pdir, startaddr, startaddr, count, user);
+            memset((void *)address, 0, PAGE_SIZE);
 
-                atomic_end();
-
-                memset((void *)startaddr, 0, count * PAGE_SIZE);
-
-                return startaddr;
-            }
-        }
-        else
-        {
-            current_size = 0;
+            return address;
         }
     }
 
     atomic_end();
 
-    logger_warn("alloc failed!");
+    logger_warn("Failled to allocate identity mapped page!");
     return 0;
 }
 
@@ -266,7 +254,7 @@ PageDirectory *memory_pdir_create()
 {
     atomic_begin();
 
-    PageDirectory *pdir = (PageDirectory *)memory_alloc(&kpdir, 1, 0);
+    PageDirectory *pdir = (PageDirectory *)memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR);
 
     if (pdir == NULL)
     {
@@ -320,7 +308,6 @@ void memory_pdir_destroy(PageDirectory *pdir)
 
     atomic_end();
 }
-
 
 #define MEMORY_DUMP_REGION_START(__pdir, __addr)               \
     {                                                          \

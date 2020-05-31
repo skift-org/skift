@@ -204,7 +204,8 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 
 void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
-    if (event->type == EVENT_KEYBOARD_KEY_TYPED)
+    if (event->type == EVENT_KEYBOARD_KEY_TYPED &&
+        event->keyboard.codepoint != 0)
     {
         stream_write(terminal_widget->master_stream, &event->keyboard.codepoint, sizeof(char));
         event->accepted = true;

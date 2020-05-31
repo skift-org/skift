@@ -18,10 +18,13 @@ typedef enum
     EVENT_MOUSE_MOVE,
     EVENT_MOUSE_ENTER,
     EVENT_MOUSE_LEAVE,
+
     EVENT_MOUSE_BUTTON_PRESS,
     EVENT_MOUSE_BUTTON_RELEASE,
     EVENT_MOUSE_DOUBLE_CLICK,
 
+    EVENT_KEYBOARD_KEY_PRESS,
+    EVENT_KEYBOARD_KEY_RELEASE,
     EVENT_KEYBOARD_KEY_TYPED,
 
     __EVENT_TYPE_COUNT,
@@ -45,6 +48,7 @@ typedef struct
 
 typedef struct
 {
+    Key key;
     Codepoint codepoint;
 } KeyboardEvent;
 

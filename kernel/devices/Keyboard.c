@@ -66,20 +66,41 @@ void keyboard_handle_key(Key key, KeyMotion motion)
 {
     if (key_is_valid(key))
     {
-        if (motion == KEY_MOTION_DOWN)
-        {
-            if (keyboard_get_codepoint(key) != 0)
-            {
-                uint8_t utf8[5];
-                int length = codepoint_to_utf8(keyboard_get_codepoint(key), utf8);
 
-                if (_characters_node->readers)
-                    ringbuffer_write(_characters_buffer, (const char *)utf8, length);
+        Codepoint codepoint = keyboard_get_codepoint(key);
+
+        if (_characters_node->readers)
+        {
+            if (motion == KEY_MOTION_DOWN)
+            {
+                if (codepoint != 0)
+                {
+                    uint8_t utf8[5];
+                    int length = codepoint_to_utf8(codepoint, utf8);
+
+                    if (_characters_node->readers)
+                        ringbuffer_write(_characters_buffer, (const char *)utf8, length);
+                }
             }
         }
 
         if (_events_node->readers)
-            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, motion}, sizeof(KeyboardPacket));
+        {
+            if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
+            {
+                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_DOWN}, sizeof(KeyboardPacket));
+            }
+
+            if (motion == KEY_MOTION_UP)
+            {
+                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_UP}, sizeof(KeyboardPacket));
+            }
+
+            if (motion == KEY_MOTION_DOWN)
+            {
+                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_TYPED}, sizeof(KeyboardPacket));
+            }
+        }
 
         _keystate[key] = motion;
     }
@@ -261,7 +282,7 @@ void keyboard_initialize(void)
 
     filesystem_link_cstring("/dev/keyboard", _characters_node);
 
-    _events_buffer = ringbuffer_create(1024);
+    _events_buffer = ringbuffer_create(sizeof(KeyboardPacket) * 256);
     _events_node = __create(FsNode);
 
     fsnode_init(_events_node, FILE_TYPE_DEVICE);

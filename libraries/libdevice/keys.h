@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/Common.h>
+#include <libsystem/unicode/Codepoint.h>
 
 #define KEY_LIST(__ENTRY)                     \
     __ENTRY(KEY_INVALID, 0x0)                 \
@@ -125,12 +126,14 @@ typedef enum
 typedef enum
 {
     KEY_MOTION_UP,
-    KEY_MOTION_DOWN
+    KEY_MOTION_DOWN,
+    KEY_MOTION_TYPED,
 } KeyMotion;
 
 typedef struct
 {
     Key key;
+    Codepoint codepoint;
     KeyMotion motion;
 } KeyboardPacket;
 

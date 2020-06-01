@@ -200,12 +200,6 @@ void *malloc(size_t req_size)
 	struct liballoc_minor *new_min;
 	unsigned long size = req_size;
 
-	// For alignment, we adjust size so there's enough space to align.
-	if (ALIGNMENT > 1)
-	{
-		size += ALIGNMENT + ALIGN_INFO;
-	}
-
 	// So, ideally, we really want an alignment of 0 or 1 in order
 	// to save space.
 
@@ -219,6 +213,12 @@ void *malloc(size_t req_size)
 		__plug_memalloc_unlock();
 
 		return malloc(1);
+	}
+
+	// For alignment, we adjust size so there's enough space to align.
+	if (ALIGNMENT > 1)
+	{
+		size += ALIGNMENT + ALIGN_INFO;
 	}
 
 	if (l_memRoot == NULL)

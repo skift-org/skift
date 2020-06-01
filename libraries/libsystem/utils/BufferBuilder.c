@@ -1,8 +1,11 @@
+#include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 BufferBuilder *buffer_builder_create(size_t preallocated)
 {
+    preallocated = MAX(preallocated, 16);
+
     BufferBuilder *buffer = __create(BufferBuilder);
 
     buffer->buffer = (char *)calloc(preallocated, sizeof(char));

@@ -29,8 +29,8 @@ typedef struct
 
     /// --- Navigation --- //
     List *backward_history;
-    List *foreward_history;
     Path *current_path;
+    List *foreward_history;
 } FileExplorerWindow;
 
 static void update_navigation_bar(FileExplorerWindow *window)

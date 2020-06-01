@@ -1,5 +1,6 @@
 
 #include <libmath/MinMax.h>
+#include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
@@ -21,6 +22,37 @@ void unicode_string_destroy(UnicodeString *string)
 {
     free(string->buffer);
     free(string);
+}
+
+UnicodeString *unicode_string_clone(UnicodeString *original)
+{
+    UnicodeString *string = __create(UnicodeString);
+
+    string->allocated = original->used;
+    string->used = original->used;
+
+    string->buffer = (Codepoint *)calloc(original->used, sizeof(Codepoint));
+    memcpy(string->buffer, original->buffer, original->used * sizeof(Codepoint));
+
+    return string;
+}
+
+bool unicode_string_equals(UnicodeString *left, UnicodeString *right)
+{
+    if (left->used != right->used)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < left->used; i++)
+    {
+        if (left->buffer[i] != right->buffer[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t where)

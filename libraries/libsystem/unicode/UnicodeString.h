@@ -13,6 +13,10 @@ UnicodeString *unicode_string_create(size_t size);
 
 void unicode_string_destroy(UnicodeString *string);
 
+UnicodeString *unicode_string_clone(UnicodeString *string);
+
+bool unicode_string_equals(UnicodeString *left, UnicodeString *right);
+
 void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t where);
 
 void unicode_string_remove(UnicodeString *string, size_t where);

@@ -204,11 +204,35 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 
 void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
-    if (event->type == EVENT_KEYBOARD_KEY_TYPED &&
-        event->keyboard.codepoint != 0)
+    if (event->type == EVENT_KEYBOARD_KEY_TYPED)
     {
-        stream_write(terminal_widget->master_stream, &event->keyboard.codepoint, sizeof(char));
-        event->accepted = true;
+        if (event->keyboard.key == KEY_UP)
+        {
+            stream_printf(terminal_widget->master_stream, "\e[A");
+            event->accepted = true;
+        }
+        else if (event->keyboard.key == KEY_DOWN)
+        {
+            stream_printf(terminal_widget->master_stream, "\e[B");
+            event->accepted = true;
+        }
+        else if (event->keyboard.key == KEY_RIGHT)
+        {
+            stream_printf(terminal_widget->master_stream, "\e[C");
+            event->accepted = true;
+        }
+        else if (event->keyboard.key == KEY_LEFT)
+        {
+            stream_printf(terminal_widget->master_stream, "\e[D");
+            event->accepted = true;
+        }
+        else if (event->keyboard.codepoint != 0)
+        {
+            uint8_t buffer[5];
+            int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
+            stream_write(terminal_widget->master_stream, buffer, size);
+            event->accepted = true;
+        }
     }
 }
 

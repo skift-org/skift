@@ -39,7 +39,14 @@ void source_destroy(SourceReader *source)
 
 bool source_ended(SourceReader *source)
 {
-    return source->offset >= source->size;
+    if (source->string)
+    {
+        return source->offset >= source->size;
+    }
+    else
+    {
+        return source->offset >= source->size || handle_has_error(source->stream);
+    }
 }
 
 bool source_do_continue(SourceReader *source)
@@ -58,8 +65,12 @@ void source_foreward(SourceReader *source)
 
     if (source->stream)
     {
+        if (ringbuffer_is_empty(source->peek))
+        {
+            ringbuffer_putc(source->peek, stream_getchar(source->stream));
+        }
+
         ringbuffer_getc(source->peek);
-        ringbuffer_putc(source->peek, stream_getchar(source->stream));
     }
 }
 

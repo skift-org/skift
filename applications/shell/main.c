@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
 
-    ReadLine *readline = readline_create();
+    ReadLine *readline = readline_create(in_stream);
 
     int command_exit_value = 0;
 

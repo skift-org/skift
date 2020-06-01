@@ -4,6 +4,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 #include <libsystem/unicode/UnicodeString.h>
+#include <libsystem/utils/SourceReader.h>
 
 typedef struct
 {
@@ -12,11 +13,13 @@ typedef struct
     size_t cursor;
     size_t old_cursor;
 
+    Stream *stream;
     UTF8Decoder *decoder;
     UnicodeString *string;
+    SourceReader *reader;
 } ReadLine;
 
-ReadLine *readline_create(void);
+ReadLine *readline_create(Stream *stream);
 
 void readline_destroy(ReadLine *readline);
 

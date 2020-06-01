@@ -23,29 +23,8 @@ void readline_repaint(ReadLine *readline)
 
 void readline_decode_callback(ReadLine *readline, Codepoint codepoint)
 {
-    if (codepoint == U'\n')
-    {
-        readline->should_continue = false;
-    }
-    else if (codepoint == U'\b')
-    {
-        if (readline->cursor > 0)
-        {
-            readline->cursor--;
-            unicode_string_remove(readline->string, readline->cursor);
-        }
-    }
-    else if (codepoint == U'\t')
-    {
-    }
-    else if (codepoint == U'\e')
-    {
-    }
-    else
-    {
-        unicode_string_insert(readline->string, codepoint, readline->cursor);
-        readline->cursor++;
-    }
+    unicode_string_insert(readline->string, codepoint, readline->cursor);
+    readline->cursor++;
 }
 
 Result readline_readline(ReadLine *readline, char **line)
@@ -56,17 +35,57 @@ Result readline_readline(ReadLine *readline, char **line)
     readline->old_cursor = 0;
     readline->should_continue = true;
 
-    while (readline->should_continue)
+    while (readline->should_continue &&
+           !source_ended(readline->reader))
     {
-        char chr = stream_getchar(in_stream);
-
-        if (handle_has_error(in_stream))
+        if (source_current(readline->reader) == U'\n')
         {
             readline->should_continue = false;
-            return handle_get_error(in_stream);
+            source_foreward(readline->reader);
         }
+        else if (source_current(readline->reader) == U'\b')
+        {
+            if (readline->cursor > 0)
+            {
+                readline->cursor--;
+                unicode_string_remove(readline->string, readline->cursor);
+            }
 
-        utf8decoder_write(readline->decoder, chr);
+            source_foreward(readline->reader);
+        }
+        else if (source_current(readline->reader) == U'\t')
+        {
+            source_foreward(readline->reader);
+        }
+        else if (source_current(readline->reader) == U'\e')
+        {
+            source_foreward(readline->reader);
+
+            if (source_current(readline->reader) != '[')
+            {
+                continue;
+            }
+
+            source_foreward(readline->reader);
+
+            if (source_current(readline->reader) == 'C')
+            {
+                if (readline->cursor < unicode_string_length(readline->string))
+                    readline->cursor++;
+            }
+            else if (source_current(readline->reader) == 'D')
+            {
+                if (readline->cursor > 0)
+                    readline->cursor--;
+            }
+
+            source_foreward(readline->reader);
+        }
+        else
+        {
+            utf8decoder_write(readline->decoder, source_current(readline->reader));
+            source_foreward(readline->reader);
+        }
 
         readline_repaint(readline);
     }
@@ -75,23 +94,27 @@ Result readline_readline(ReadLine *readline, char **line)
 
     *line = unicode_string_as_cstring(readline->string);
 
-    return SUCCESS;
+    return handle_get_error(readline->stream);
 }
 
-ReadLine *readline_create(void)
+ReadLine *readline_create(Stream *stream)
 {
     ReadLine *readline = __create(ReadLine);
 
+    readline->stream = stream;
+
     readline->string = unicode_string_create(READLINE_ALLOCATED);
     readline->decoder = utf8decoder_create(readline, (UTF8DecoderCallback)readline_decode_callback);
+    readline->reader = source_create_from_stream(readline->stream);
 
     return readline;
 }
 
 void readline_destroy(ReadLine *readline)
 {
-    unicode_string_destroy(readline->string);
+    source_destroy(readline->reader);
     utf8decoder_destroy(readline->decoder);
+    unicode_string_destroy(readline->string);
 
     free(readline);
 }

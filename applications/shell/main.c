@@ -24,46 +24,6 @@ void shell_prompt(int last_command_exit_value)
     printf(PROMPT);
 }
 
-int shell_split(char *command, char **argv)
-{
-    int argc = 0;
-
-    strleadtrim(command, ' ');
-    strtrailtrim(command, ' ');
-
-    if (strlen(command) == 0)
-    {
-        return 0;
-    }
-
-    char *start = &command[0];
-
-    for (size_t i = 0; i < strlen(command) + 1; i++)
-    {
-        char c = command[i];
-
-        if (c == ' ' || c == '\0')
-        {
-            int buffer_len = &command[i] - start + 1;
-
-            if (buffer_len > 1)
-            {
-                char *buffer = (char *)malloc(buffer_len);
-                memcpy(buffer, start, buffer_len);
-                buffer[buffer_len - 1] = '\0';
-
-                argv[argc++] = buffer;
-            }
-
-            start = &command[i] + 1;
-        }
-    }
-
-    argv[argc] = NULL;
-
-    return argc;
-}
-
 int main(int argc, char **argv)
 {
     __unused(argc);
@@ -81,29 +41,15 @@ int main(int argc, char **argv)
         char *command = NULL;
         if (readline_readline(readline, &command) != SUCCESS)
         {
-            if (command)
-                free(command);
             return -1;
         }
 
-        char *command_argv[PROCESS_ARG_COUNT] = {};
-        int command_argc = shell_split(command, command_argv);
+        ShellNode *node = shell_parse(command);
+        command_exit_value = shell_eval(node);
 
-        if (command_argc != 0)
+        if (command)
         {
-            command_exit_value = shell_eval_command(command_argc, (const char **)command_argv);
-
-            for (int i = 0; i < command_argc; i++)
-            {
-                free(command_argv[i]);
-            }
-
             free(command);
-        }
-        else
-        {
-            stream_printf(err_stream, "Empty command!\n");
-            command_exit_value = -1;
         }
     }
 }

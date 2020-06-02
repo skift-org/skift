@@ -6,24 +6,43 @@
 
 #include "shell/Shell.h"
 
-int shell_eval_command(int argc, const char **argv)
+int shell_eval(ShellNode *node)
 {
-    ShellBuiltinCallback builtin = shell_get_builtin(argv[0]);
-
-    if (builtin)
+    switch (node->type)
     {
-        return builtin(argc, argv);
-    }
-    else
+    case SHELL_NODE_COMMAND:
     {
-        char executable[PATH_LENGTH];
-        snprintf(executable, PATH_LENGTH, "/bin/%s", argv[0]);
+        ShellNodeCommand *command = (ShellNodeCommand *)node;
 
-        Launchpad *launchpad = launchpad_create(argv[0], executable);
+        ShellBuiltinCallback builtin = shell_get_builtin(command->command);
 
-        for (int i = 1; i < argc; i++)
+        if (builtin)
         {
-            launchpad_argument(launchpad, argv[i]);
+            // list_count(command->arguments) + 1 for argv[0] which is the command name.
+            char **argv = (char **)calloc(list_count(command->arguments) + 1, sizeof(argv));
+            argv[0] = command->command;
+            int argc = 1;
+
+            list_foreach(char, arg, command->arguments)
+            {
+                argv[argc] = arg;
+                argc++;
+            }
+
+            int result = builtin(argc, (const char **)argv);
+            free(argv);
+
+            return result;
+        }
+
+        char executable[PATH_LENGTH];
+        snprintf(executable, PATH_LENGTH, "/bin/%s", command->command);
+
+        Launchpad *launchpad = launchpad_create(command->command, executable);
+
+        list_foreach(char, arg, command->arguments)
+        {
+            launchpad_argument(launchpad, arg);
         }
 
         int pid = -1;
@@ -31,7 +50,7 @@ int shell_eval_command(int argc, const char **argv)
 
         if (result != SUCCESS)
         {
-            printf("%s: Command not found! \e[90m%s\e[m\n", argv[0], result_to_string(result));
+            printf("%s: Command not found! \e[90m%s\e[m\n", command->command, result_to_string(result));
 
             return -1;
         }
@@ -42,4 +61,11 @@ int shell_eval_command(int argc, const char **argv)
             return command_result;
         }
     }
+    break;
+
+    default:
+        break;
+    }
+
+    return -1;
 }

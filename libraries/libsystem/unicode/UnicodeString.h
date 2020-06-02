@@ -15,6 +15,8 @@ void unicode_string_destroy(UnicodeString *string);
 
 UnicodeString *unicode_string_clone(UnicodeString *string);
 
+void unicode_string_copy(UnicodeString *source, UnicodeString *destination);
+
 bool unicode_string_equals(UnicodeString *left, UnicodeString *right);
 
 void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t where);

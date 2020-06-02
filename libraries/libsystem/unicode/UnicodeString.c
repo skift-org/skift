@@ -5,14 +5,32 @@
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
 
+static void unicode_string_ensure_capacity(UnicodeString *string, size_t size)
+{
+    size = MAX(16, size);
+
+    if (string->allocated >= size)
+    {
+        return;
+    }
+
+    if (string->buffer)
+    {
+        string->buffer = (Codepoint *)realloc(string->buffer, size * sizeof(Codepoint));
+    }
+    else
+    {
+        string->buffer = (Codepoint *)calloc(size, sizeof(Codepoint));
+    }
+
+    string->allocated = size;
+}
+
 UnicodeString *unicode_string_create(size_t size)
 {
     UnicodeString *string = __create(UnicodeString);
 
-    size = MAX(16, size);
-
-    string->buffer = (Codepoint *)calloc(size, sizeof(Codepoint));
-    string->allocated = size;
+    unicode_string_ensure_capacity(string, size);
     string->used = 0;
 
     return string;
@@ -28,13 +46,18 @@ UnicodeString *unicode_string_clone(UnicodeString *original)
 {
     UnicodeString *string = __create(UnicodeString);
 
-    string->allocated = original->used;
+    unicode_string_ensure_capacity(string, original->used);
+    memcpy(string->buffer, original->buffer, original->used * sizeof(Codepoint));
     string->used = original->used;
 
-    string->buffer = (Codepoint *)calloc(original->used, sizeof(Codepoint));
-    memcpy(string->buffer, original->buffer, original->used * sizeof(Codepoint));
-
     return string;
+}
+
+void unicode_string_copy(UnicodeString *source, UnicodeString *destination)
+{
+    unicode_string_ensure_capacity(destination, source->used);
+    memcpy(destination->buffer, source->buffer, source->used * sizeof(Codepoint));
+    destination->used = source->used;
 }
 
 bool unicode_string_equals(UnicodeString *left, UnicodeString *right)
@@ -59,12 +82,8 @@ void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t wh
 {
     size_t needed = MAX(string->used, where) + 1;
 
-    if (needed > string->allocated)
-    {
-        size_t new_allocated = MAX(string->allocated * 1.25, needed);
-        string->buffer = (Codepoint *)realloc(string->buffer, new_allocated * sizeof(Codepoint));
-        string->allocated = new_allocated;
-    }
+    size_t new_allocated = MAX(string->allocated * 1.25, needed);
+    unicode_string_ensure_capacity(string, new_allocated);
 
     for (size_t i = needed - 1; i > where; i--)
     {

@@ -40,3 +40,6 @@ void source_eat(SourceReader *source, const char *what);
 bool source_skip(SourceReader *source, char chr);
 
 bool source_skip_word(SourceReader *source, const char *word);
+
+// Read **JSON** escape sequence like \n \t \r or \uXXXX
+const char *source_read_escape_sequence(SourceReader *source);

@@ -30,72 +30,6 @@ static char *identifier(SourceReader *source)
     return buffer_builder_finalize(builder);
 }
 
-static const char *escape(SourceReader *source)
-{
-    source_skip(source, '\\');
-    char chr = source_current(source);
-
-    switch (chr)
-    {
-    case '"':
-        return "\"";
-
-    case '\\':
-        return "\\";
-
-    case '/':
-        return "/";
-
-    case 'b':
-        return "\b";
-
-    case 'f':
-        return "\f";
-
-    case 'n':
-        return "\n";
-
-    case 'r':
-        return "\r";
-
-    case 't':
-        return "\t";
-
-    case 'u':
-    {
-        char buffer[5];
-        for (size_t i = 0; i < 4 && source_current_is(source, MARKUP_XDIGITS); i++)
-        {
-            buffer[i] = source_current(source);
-            source_foreward(source);
-        }
-
-        static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
-
-        Codepoint codepoint = 0;
-        if (parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&codepoint))
-        {
-            static uint8_t utf8[5] = {};
-            codepoint_to_utf8(codepoint, utf8);
-
-            return (char *)utf8;
-        }
-        else
-        {
-            return "\\uXXXX";
-        }
-    }
-
-    default:
-        break;
-    }
-
-    static char buffer[3] = {'\\', 'x', '\0'};
-    buffer[1] = chr;
-
-    return buffer;
-}
-
 char *string(SourceReader *source)
 {
     BufferBuilder *builder = buffer_builder_create(16);
@@ -107,7 +41,7 @@ char *string(SourceReader *source)
     {
         if (source_current(source) == '\\')
         {
-            buffer_builder_append_str(builder, escape(source));
+            buffer_builder_append_str(builder, source_read_escape_sequence(source));
         }
         else
         {

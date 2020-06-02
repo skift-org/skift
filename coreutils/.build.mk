@@ -1,5 +1,4 @@
 UTILS = \
-	__TESTARGS \
 	__TESTEXEC \
 	__TESTPOSIX \
 	__TESTTERM \
@@ -22,9 +21,6 @@ UTILS = \
 	SYSFETCH \
 	TOUCH \
 	UNLINK
-
-__TESTARGS_NAME = __testargs
-__TESTARGS_LIBS =
 
 __TESTEXEC_NAME = __testexec
 __TESTEXEC_LIBS =

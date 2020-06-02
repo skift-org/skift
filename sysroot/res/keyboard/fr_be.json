@@ -80,6 +80,6 @@
         "KEY_TAB": ["\t","\t","\t","\t"],
 
         "KEY_NO_STANDARD_MEANING_1": ["","","",""],
-        "KEY_NO_STANDARD_MEANING_2": ["","","",""]
+        "KEY_NO_STANDARD_MEANING_2": ["<",">","\\",""]
     }
 }

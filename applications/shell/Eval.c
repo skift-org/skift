@@ -21,7 +21,7 @@ int shell_eval_command(int argc, const char **argv)
 
         Launchpad *launchpad = launchpad_create(argv[0], executable);
 
-        for (int i = 0; i < argc; i++)
+        for (int i = 1; i < argc; i++)
         {
             launchpad_argument(launchpad, argv[i]);
         }

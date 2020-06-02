@@ -21,6 +21,8 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     launchpad->handles[2] = 2;
     launchpad->handles[3] = 3;
 
+    launchpad_argument(launchpad, executable);
+
     return launchpad;
 }
 

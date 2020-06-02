@@ -4,8 +4,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 
-#include "shell/Builtin.h"
-#include "shell/Eval.h"
+#include "shell/Shell.h"
 
 #define PROMPT u8"\e[;1;94m µ \e[m"
 
@@ -90,21 +89,21 @@ int main(int argc, char **argv)
         char *command_argv[PROCESS_ARG_COUNT] = {};
         int command_argc = shell_split(command, command_argv);
 
-        if (command_argc == 0)
+        if (command_argc != 0)
         {
-            printf("Empty command!\n");
+            command_exit_value = shell_eval_command(command_argc, (const char **)command_argv);
 
+            for (int i = 0; i < command_argc; i++)
+            {
+                free(command_argv[i]);
+            }
+
+            free(command);
+        }
+        else
+        {
+            stream_printf(err_stream, "Empty command!\n");
             command_exit_value = -1;
-            continue;
         }
-
-        command_exit_value = shell_eval_command(command_argc, (const char **)command_argv);
-
-        for (int i = 0; i < command_argc; i++)
-        {
-            free(command_argv[i]);
-        }
-
-        free(command);
     }
 }

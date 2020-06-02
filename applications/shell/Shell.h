@@ -9,3 +9,5 @@ typedef struct
 } ShellBuiltin;
 
 ShellBuiltinCallback shell_get_builtin(const char *name);
+
+int shell_eval_command(int argc, const char **argv);

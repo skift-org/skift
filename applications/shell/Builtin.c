@@ -4,7 +4,7 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/NumberParser.h>
 
-#include "shell/Builtin.h"
+#include "shell/Shell.h"
 
 int shell_builtin_cd(int argc, const char **argv)
 {

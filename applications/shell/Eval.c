@@ -4,8 +4,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
-#include "shell/Builtin.h"
-#include "shell/Eval.h"
+#include "shell/Shell.h"
 
 int shell_eval_command(int argc, const char **argv)
 {

@@ -142,11 +142,16 @@ Result readline_readline(ReadLine *readline, char **line)
 
     printf("\n\e[0m");
 
+    if (handle_has_error(readline->stream))
+    {
+        return handle_get_error(readline->stream);
+    }
+
     *line = readline_cstring(readline);
 
     history_commit(readline->string);
 
-    return handle_get_error(readline->stream);
+    return SUCCESS;
 }
 
 ReadLine *readline_create(Stream *stream)

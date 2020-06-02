@@ -53,7 +53,7 @@ bool source_ended(SourceReader *source)
 
 bool source_do_continue(SourceReader *source)
 {
-    return source->offset < source->size;
+    return !source_ended(source);
 }
 
 void source_foreward(SourceReader *source)
@@ -171,10 +171,31 @@ bool source_skip_word(SourceReader *source, const char *word)
 
 #define XDIGITS "0123456789abcdef"
 
+static uint read_4hex(SourceReader *source)
+{
+    char buffer[5];
+    for (size_t i = 0; i < 4 && source_current_is(source, XDIGITS); i++)
+    {
+        buffer[i] = source_current(source);
+        source_foreward(source);
+    }
+
+    uint value = 0;
+    parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&value);
+    return value;
+}
+
 const char *source_read_escape_sequence(SourceReader *source)
 {
     source_skip(source, '\\');
+
+    if (source_ended(source))
+    {
+        return "\\";
+    }
+
     char chr = source_current(source);
+    source_foreward(source);
 
     switch (chr)
     {
@@ -204,34 +225,46 @@ const char *source_read_escape_sequence(SourceReader *source)
 
     case 'u':
     {
-        char buffer[5];
-        for (size_t i = 0; i < 4 && source_current_is(source, XDIGITS); i++)
+        uint first_surrogate = read_4hex(source);
+
+        if (first_surrogate >= 0xDC00 && first_surrogate <= 0xDFFF)
         {
-            buffer[i] = source_current(source);
-            source_foreward(source);
+            return u8"�";
         }
 
-        static_assert(sizeof(Codepoint) == sizeof(unsigned int), "Expecting size of Codepoint being the same as unsigned int");
-
-        Codepoint codepoint = 0;
-        if (parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&codepoint))
+        if (!(first_surrogate >= 0xD800 && first_surrogate <= 0xDBFF))
         {
+            // Not an UTF16 surrogate pair.
             static uint8_t utf8[5] = {};
-            codepoint_to_utf8(codepoint, utf8);
-
+            codepoint_to_utf8((Codepoint)first_surrogate, utf8);
             return (char *)utf8;
         }
-        else
+
+        if (!source_skip_word(source, "\\u"))
         {
-            return "\\uXXXX";
+            return u8"�";
         }
+
+        uint second_surrogate = read_4hex(source);
+
+        if ((second_surrogate < 0xDC00) || (second_surrogate > 0xDFFF))
+        {
+            // Invalid second half of the surrogate pair
+            return u8"�";
+        }
+
+        Codepoint codepoint = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));
+
+        static uint8_t utf8[5] = {};
+        codepoint_to_utf8((Codepoint)codepoint, utf8);
+        return (char *)utf8;
     }
 
     default:
         break;
     }
 
-    static char buffer[3] = {'\\', 'x', '\0'};
+    static char buffer[3] = "\\x";
     buffer[1] = chr;
 
     return buffer;

@@ -229,6 +229,9 @@ JsonValue *json_parse(const char *string, size_t size)
 {
     SourceReader *source = source_create_from_string(string, size);
 
+    // Skip the utf8 bom header if present.
+    source_skip_word(source, "\xEF\xBB\xBF");
+
     JsonValue *result = value(source);
 
     source_destroy(source);
@@ -246,6 +249,9 @@ JsonValue *json_parse_file(const char *path)
     }
 
     SourceReader *source = source_create_from_stream(json_file);
+
+    // Skip the utf8 bom header if present.
+    source_skip_word(source, "\xEF\xBB\xBF");
 
     JsonValue *result = value(source);
 

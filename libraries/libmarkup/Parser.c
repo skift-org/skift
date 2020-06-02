@@ -158,6 +158,9 @@ MarkupNode *markup_parse(const char *string, size_t size)
 {
     SourceReader *source = source_create_from_string(string, size);
 
+    // Skip the utf8 bom header if present.
+    source_skip_word(source, "\xEF\xBB\xBF");
+
     MarkupNode *node = parse_node(source);
 
     source_destroy(source);
@@ -175,6 +178,9 @@ MarkupNode *markup_parse_file(const char *path)
     }
 
     SourceReader *source = source_create_from_stream(json_file);
+
+    // Skip the utf8 bom header if present.
+    source_skip_word(source, "\xEF\xBB\xBF");
 
     MarkupNode *node = parse_node(source);
 

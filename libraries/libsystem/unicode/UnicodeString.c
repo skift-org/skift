@@ -82,8 +82,11 @@ void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t wh
 {
     size_t needed = MAX(string->used, where) + 1;
 
-    size_t new_allocated = MAX(string->allocated * 1.25, needed);
-    unicode_string_ensure_capacity(string, new_allocated);
+    if (needed > string->allocated)
+    {
+        size_t new_allocated = MAX(string->allocated * 1.25, needed);
+        unicode_string_ensure_capacity(string, new_allocated);
+    }
 
     for (size_t i = needed - 1; i > where; i--)
     {

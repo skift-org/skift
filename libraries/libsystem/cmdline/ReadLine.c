@@ -1,6 +1,7 @@
 
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/cmdline/History.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/io/Stream.h>
 
@@ -14,9 +15,7 @@ static UnicodeString *readline_string(ReadLine *readline)
     }
     else
     {
-        UnicodeString *str = NULL;
-        list_peekat(readline->history, readline->history_current - 1, (void **)&str);
-        return str;
+        return history_peek(readline->history_current - 1);
     }
 }
 
@@ -29,28 +28,7 @@ static void readline_recale_history(ReadLine *readline)
 {
     if (readline->history_current != 0)
     {
-        unicode_string_destroy(readline->string);
-
-        UnicodeString *str = NULL;
-        list_peekat(readline->history, readline->history_current - 1, (void **)&str);
-        readline->string = unicode_string_clone(str);
-        readline->history_current = 0;
-    }
-}
-
-static void readline_commit_history(ReadLine *readline)
-{
-    if (unicode_string_length(readline_string(readline)) > 0)
-    {
-        UnicodeString *most_recent = NULL;
-        if (list_peek(readline->history, (void **)&most_recent) &&
-            unicode_string_equals(readline_string(readline), most_recent))
-        {
-            readline->history_current = 0;
-            return;
-        }
-
-        list_push(readline->history, unicode_string_clone(readline_string(readline)));
+        unicode_string_copy(history_peek(readline->history_current - 1), readline->string);
         readline->history_current = 0;
     }
 }
@@ -124,7 +102,7 @@ Result readline_readline(ReadLine *readline, char **line)
 
             if (source_current(readline->reader) == 'A')
             {
-                if (readline->history_current < list_count(readline->history))
+                if (readline->history_current < history_length())
                 {
                     readline->history_current++;
                     readline->cursor = unicode_string_length(readline_string(readline));
@@ -166,7 +144,7 @@ Result readline_readline(ReadLine *readline, char **line)
 
     *line = readline_cstring(readline);
 
-    readline_commit_history(readline);
+    history_commit(readline->string);
 
     return handle_get_error(readline->stream);
 }
@@ -181,15 +159,11 @@ ReadLine *readline_create(Stream *stream)
     readline->decoder = utf8decoder_create(readline, (UTF8DecoderCallback)readline_decode_callback);
     readline->reader = source_create_from_stream(readline->stream);
 
-    readline->history = list_create();
-
     return readline;
 }
 
 void readline_destroy(ReadLine *readline)
 {
-    list_destroy_with_callback(readline->history, (ListDestroyElementCallback)unicode_string_destroy);
-
     source_destroy(readline->reader);
     utf8decoder_destroy(readline->decoder);
     unicode_string_destroy(readline->string);

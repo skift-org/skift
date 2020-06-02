@@ -13,8 +13,7 @@ typedef struct
     size_t cursor;
     size_t old_cursor;
 
-    int history_current;
-    List *history;
+    size_t history_current;
 
     Stream *stream;
     UTF8Decoder *decoder;

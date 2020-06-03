@@ -84,6 +84,21 @@ static ShellNode *command(SourceReader *source)
     return shell_node_command_create(command_name, arguments);
 }
 
+static ShellNode *operator_(SourceReader *source)
+{
+    ShellNode *left = command(source);
+    whitespace(source);
+
+    if (source_current(source) != '|')
+    {
+        return left;
+    }
+
+    ShellNode *right = command(source);
+
+    return shell_node_operator_create(SHELL_NODE_PIPE, left, right);
+}
+
 ShellNode *shell_parse(char *command_text)
 {
     SourceReader *source = source_create_from_string(command_text, strlen(command_text));
@@ -93,7 +108,7 @@ ShellNode *shell_parse(char *command_text)
 
     whitespace(source);
 
-    ShellNode *node = command(source);
+    ShellNode *node = operator_(source);
 
     source_destroy(source);
 

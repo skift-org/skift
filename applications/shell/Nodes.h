@@ -4,14 +4,9 @@
 
 typedef enum
 {
-    SHELL_OPERATOR_PIPE,
-    SHELL_OPERATOR_AND,
-    SHELL_OPERATOR_OR,
-} ShellOperator;
-
-typedef enum
-{
-    SHELL_NODE_COMMAND
+    SHELL_NODE_NONE,
+    SHELL_NODE_COMMAND,
+    SHELL_NODE_PIPE,
 } ShellNodeType;
 
 struct ShellNode;
@@ -39,9 +34,12 @@ typedef struct
 {
     SHELL_NODE;
 
-    ShellOperator operator_;
     ShellNode *left;
     ShellNode *right;
-} ShellNodeInfixOperator;
+} ShellNodeOperator;
+
+void shell_node_destroy(ShellNode *node);
 
 ShellNode *shell_node_command_create(char *command, List *arguments);
+
+ShellNode *shell_node_operator_create(ShellNodeType type, ShellNode *left, ShellNode *right);

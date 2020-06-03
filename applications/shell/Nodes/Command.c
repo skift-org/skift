@@ -10,6 +10,7 @@ ShellNode *shell_node_command_create(char *command, List *arguments)
 {
     ShellNodeCommand *node = __create(ShellNodeCommand);
 
+    node->type = SHELL_NODE_COMMAND;
     node->command = command;
     node->arguments = arguments;
     node->destroy = (ShellNodeDestroyCallback)shell_node_command_destroy;

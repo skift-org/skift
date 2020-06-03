@@ -45,11 +45,14 @@ int main(int argc, char **argv)
         }
 
         ShellNode *node = shell_parse(command);
-        command_exit_value = shell_eval(node);
 
         if (command)
         {
             free(command);
         }
+
+        command_exit_value = shell_eval(node, in_stream, out_stream);
+
+        shell_node_destroy(node);
     }
 }

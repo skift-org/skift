@@ -75,7 +75,7 @@ static ShellNode *command(SourceReader *source)
 
     whitespace(source);
 
-    while (source_do_continue(source))
+    while (source_do_continue(source) && source_current(source) != '|')
     {
         list_pushback(arguments, argument(source));
         whitespace(source);
@@ -87,12 +87,15 @@ static ShellNode *command(SourceReader *source)
 static ShellNode *operator_(SourceReader *source)
 {
     ShellNode *left = command(source);
+
     whitespace(source);
 
-    if (source_current(source) != '|')
+    if (!source_skip(source, '|'))
     {
         return left;
     }
+
+    whitespace(source);
 
     ShellNode *right = command(source);
 

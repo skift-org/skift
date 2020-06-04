@@ -47,7 +47,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         }
 
         launchpad_handle(launchpad, HANDLE(stdin), 0);
-        launchpad_handle(launchpad, HANDLE(stdin), 1);
+        launchpad_handle(launchpad, HANDLE(stdout), 1);
 
         int pid = -1;
         Result result = launchpad_launch(launchpad, &pid);
@@ -77,7 +77,6 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         stream_create_pipe(&reader, &writter);
 
         shell_eval(pipe->left, stdin, writter);
-
         shell_eval(pipe->right, reader, stdout);
 
         stream_close(reader);

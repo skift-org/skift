@@ -17,6 +17,8 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 
+#include "arch/x86/Interrupts.h"
+#include "arch/x86/gdt.h"
 #include "kernel/clock.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
@@ -29,8 +31,6 @@
 #include "kernel/serial.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/x86/Interrupts.h"
-#include "kernel/x86/gdt.h"
 
 static TimeStamp boot_timestamp = 0;
 
@@ -70,11 +70,7 @@ void userspace_initialize(void)
     PANIC("Init has return with code %d!", init_exit_value);
 }
 
-#ifdef __cplusplus
-extern "C" void kmain(void *info, uint magic)
-#else
 void kmain(void *info, uint magic)
-#endif
 {
     __plug_init();
     boot_timestamp = clock_now();

@@ -1,10 +1,10 @@
 
 #include <libsystem/Atomic.h>
 
+#include "arch/x86/cpuid.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
-#include "kernel/x86/cpuid.h"
 
 /* --- Version info --------------------------------------------------------- */
 

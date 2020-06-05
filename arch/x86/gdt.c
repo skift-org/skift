@@ -1,5 +1,5 @@
 
-#include "kernel/x86/gdt.h"
+#include "arch/x86/gdt.h"
 
 static TSS tss = {};
 

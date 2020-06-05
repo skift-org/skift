@@ -1,6 +1,6 @@
 #include "kernel/bus/PCIDevice.h"
+#include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
-#include "kernel/x86/x86.h"
 
 void pci_device_write(PCIDevice device, int field, int size, uint32_t value)
 {

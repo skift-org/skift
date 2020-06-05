@@ -2,8 +2,8 @@
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 
+#include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
-#include "kernel/x86/x86.h"
 
 IterationDecision pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus);
 

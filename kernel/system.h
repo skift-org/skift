@@ -2,8 +2,8 @@
 
 #include <libsystem/Logger.h>
 
-#include "kernel/x86/Interrupts.h"
-#include "kernel/x86/x86.h"
+#include "arch/x86/Interrupts.h"
+#include "arch/x86/x86.h"
 
 #define HANG   \
     while (1)  \

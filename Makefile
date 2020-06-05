@@ -68,11 +68,13 @@ ASFLAGS=-f elf32
 
 KERNEL_SOURCES = \
 	$(wildcard kernel/*.c) \
-	$(wildcard kernel/*/*.c)
+	$(wildcard kernel/*/*.c) \
+	$(wildcard arch/x86/*.c)
 
 KERNEL_ASSEMBLY_SOURCES = \
 	$(wildcard kernel/*.s) \
-	$(wildcard kernel/*/*.s)
+	$(wildcard kernel/*/*.s) \
+	$(wildcard arch/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libfile/*.c) \
@@ -104,7 +106,12 @@ $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.c
 	@echo [KERNEL] [CC] $<
 	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(BUILD_DIRECTORY)/kernel/%.s.o: kernel/%.s
+$(BUILD_DIRECTORY)/arch/%.o: arch/%.c
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [CC] $<
+	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+
+$(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@
@@ -112,7 +119,7 @@ $(BUILD_DIRECTORY)/kernel/%.s.o: kernel/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(LD) $(LDFLAGS) -T kernel/link.ld -o $@ $^
+	@$(LD) $(LDFLAGS) -T arch/x86/link.ld -o $@ $^
 
 # --- CRTs ----------------------------------------------- #
 

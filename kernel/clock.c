@@ -1,8 +1,8 @@
 
 #include <libsystem/Logger.h>
 
+#include "arch/x86/x86.h"
 #include "kernel/clock.h"
-#include "kernel/x86/x86.h"
 
 /* --- CMOS/RTC ------------------------------------------------------------- */
 
@@ -14,7 +14,7 @@ typedef enum
     T_DAY = 0x7,
     T_MONTH = 0x8,
     T_YEAR = 0x9,
-} time_selector_t;
+} CMOSTimeSelector;
 
 #define CMOS_ADDRESS 0x70
 #define CMOS_DATA 0x71
@@ -29,7 +29,7 @@ bool is_cmos_update()
     return (in8(CMOS_DATA) & 0x80);
 }
 
-char get_realtime_reg(int reg)
+char get_realtime_reg(CMOSTimeSelector reg)
 {
     out8(CMOS_ADDRESS, reg);
     return in8(CMOS_DATA);

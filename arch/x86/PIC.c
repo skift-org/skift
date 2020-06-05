@@ -1,6 +1,6 @@
 
-#include "kernel/x86/PIC.h"
-#include "kernel/x86/x86.h"
+#include "arch/x86/PIC.h"
+#include "arch/x86/x86.h"
 
 #define PIC_WAIT()                    \
 	do                                \

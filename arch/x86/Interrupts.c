@@ -4,13 +4,13 @@
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
 
+#include "arch/x86/IDT.h"
+#include "arch/x86/Interrupts.h"
+#include "arch/x86/PIC.h"
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"
-#include "kernel/x86/IDT.h"
-#include "kernel/x86/Interrupts.h"
-#include "kernel/x86/PIC.h"
 
 extern uintptr_t __interrupt_vector[];
 

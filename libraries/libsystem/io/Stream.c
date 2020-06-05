@@ -46,25 +46,6 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
     return stream;
 }
 
-Result stream_create_pipe(Stream **reader, Stream **writer)
-{
-    *reader = NULL;
-    *writer = NULL;
-
-    int reader_handle = HANDLE_INVALID_ID;
-    int writer_handle = HANDLE_INVALID_ID;
-
-    Result result = __plug_create_pipe(&reader_handle, &writer_handle);
-
-    if (result == SUCCESS)
-    {
-        *reader = stream_open_handle(reader_handle, OPEN_READ);
-        *writer = stream_open_handle(writer_handle, OPEN_WRITE);
-    }
-
-    return result;
-}
-
 Result stream_create_term(Stream **master, Stream **slave)
 {
     *master = NULL;

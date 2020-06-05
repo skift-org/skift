@@ -43,8 +43,6 @@ Stream *stream_open(const char *path, OpenFlag flags);
 
 Stream *stream_open_handle(int handle_id, OpenFlag flags);
 
-Result stream_create_pipe(Stream **reader, Stream **writer);
-
 Result stream_create_term(Stream **master, Stream **slave);
 
 void stream_close(Stream *stream);

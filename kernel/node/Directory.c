@@ -101,6 +101,12 @@ static Result directory_link(FsDirectory *node, const char *name, FsNode *child)
     return SUCCESS;
 }
 
+static void directory_entry_destroy(FsDirectoryEntry *entry)
+{
+    fsnode_deref(entry->node);
+    free(entry);
+}
+
 static Result directory_unlink(FsDirectory *node, const char *name)
 {
     list_foreach(FsDirectoryEntry, entry, node->childs)
@@ -108,8 +114,7 @@ static Result directory_unlink(FsDirectory *node, const char *name)
         if (strcmp(entry->name, name) == 0)
         {
             list_remove(node->childs, entry);
-            fsnode_deref(entry->node);
-            free(entry);
+            directory_entry_destroy(entry);
 
             return SUCCESS;
         }
@@ -120,7 +125,7 @@ static Result directory_unlink(FsDirectory *node, const char *name)
 
 static void directory_destroy(FsDirectory *node)
 {
-    list_destroy_with_callback(node->childs, (ListDestroyElementCallback)fsnode_deref);
+    list_destroy_with_callback(node->childs, (ListDestroyElementCallback)directory_entry_destroy);
 }
 
 FsNode *directory_create(void)

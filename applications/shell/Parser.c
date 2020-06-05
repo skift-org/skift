@@ -81,25 +81,29 @@ static ShellNode *command(SourceReader *source)
         whitespace(source);
     }
 
-    return shell_node_command_create(command_name, arguments);
+    return shell_command_create(command_name, arguments);
 }
 
-static ShellNode *operator_(SourceReader *source)
+static ShellNode *pipeline(SourceReader *source)
 {
-    ShellNode *left = command(source);
+    List *commands = list_create();
 
-    whitespace(source);
-
-    if (!source_skip(source, '|'))
+    do
     {
-        return left;
+        whitespace(source);
+        list_pushback(commands, command(source));
+        whitespace(source);
+    } while (source_skip(source, '|'));
+
+    if (list_count(commands) == 1)
+    {
+        ShellNode *node = NULL;
+        list_peek(commands, (void **)&node);
+        list_destroy(commands);
+        return node;
     }
 
-    whitespace(source);
-
-    ShellNode *right = command(source);
-
-    return shell_node_operator_create(SHELL_NODE_PIPE, left, right);
+    return shell_pipeline_create(commands);
 }
 
 ShellNode *shell_parse(char *command_text)
@@ -111,7 +115,7 @@ ShellNode *shell_parse(char *command_text)
 
     whitespace(source);
 
-    ShellNode *node = operator_(source);
+    ShellNode *node = pipeline(source);
 
     source_destroy(source);
 

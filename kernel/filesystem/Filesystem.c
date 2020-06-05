@@ -190,7 +190,7 @@ Result filesystem_mkfile(Path *path)
 
 Result filesystem_mkpipe(Path *path)
 {
-    FsNode *pipe = pipe_create();
+    FsNode *pipe = fspipe_create();
 
     Result result = filesystem_link(path, pipe);
 

@@ -360,7 +360,7 @@ Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle
 
     Result result = SUCCESS;
 
-    FsNode *pipe = pipe_create();
+    FsNode *pipe = fspipe_create();
 
     FsHandle *reader_handle = fshandle_create(pipe, OPEN_READ);
     FsHandle *writer_handle = fshandle_create(pipe, OPEN_WRITE);

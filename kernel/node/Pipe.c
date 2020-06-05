@@ -40,7 +40,7 @@ static Result pipe_write(FsPipe *node, FsHandle *handle, const void *buffer, siz
 {
     __unused(handle);
 
-    if (!node->node.readers == 0)
+    if (!node->node.readers)
     {
         return ERR_STREAM_CLOSED;
     }
@@ -63,7 +63,7 @@ static void pipe_destroy(FsPipe *node)
     ringbuffer_destroy(node->buffer);
 }
 
-FsNode *pipe_create(void)
+FsNode *fspipe_create(void)
 {
     FsPipe *pipe = __create(FsPipe);
 

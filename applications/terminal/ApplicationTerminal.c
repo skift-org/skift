@@ -211,17 +211,17 @@ void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
             stream_printf(terminal_widget->master_stream, "\e[A");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEYBOARD_KEY_UP)
+        else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
             stream_printf(terminal_widget->master_stream, "\e[B");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEYBOARD_KEY_UP)
+        else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
             stream_printf(terminal_widget->master_stream, "\e[C");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEYBOARD_KEY_UP)
+        else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
             stream_printf(terminal_widget->master_stream, "\e[D");
             event->accepted = true;

@@ -111,12 +111,17 @@ void path_normalize(Path *path)
 
 void path_push(Path *path, const char *element)
 {
-    int length = strlen(element);
-
-    if (length > 0)
+    if (!element)
     {
-        list_pushback(path->elements, (char *)element);
+        return;
     }
+
+    if (strlen(element) == 0)
+    {
+        return;
+    }
+
+    list_pushback(path->elements, (char *)element);
 }
 
 char *path_pop(Path *path)

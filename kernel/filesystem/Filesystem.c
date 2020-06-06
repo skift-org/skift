@@ -168,6 +168,12 @@ Result filesystem_connect(Path *path, FsHandle **connection_handle)
 
 Result filesystem_mkdir(Path *path)
 {
+    if (path_element_count(path) == 0)
+    {
+        // We are tring to create /
+        return ERR_FILE_EXISTS;
+    }
+
     FsNode *directory = directory_create();
 
     Result result = filesystem_link(path, directory);

@@ -150,6 +150,18 @@ int application_run(void)
     return eventloop_run();
 }
 
+int application_pump(void)
+{
+    if (_state == APPLICATION_INITALIZED)
+    {
+        _state = APPLICATION_RUNNING;
+    }
+
+    eventloop_pump(true);
+
+    return 0;
+}
+
 void application_exit(int exit_value)
 {
     assert(_state == APPLICATION_RUNNING);

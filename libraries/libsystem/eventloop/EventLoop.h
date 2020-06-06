@@ -10,7 +10,7 @@ void eventloop_initialize(void);
 
 int eventloop_run(void);
 
-void eventloop_pump(void);
+void eventloop_pump(bool pool);
 
 void eventloop_exit(int exit_value);
 

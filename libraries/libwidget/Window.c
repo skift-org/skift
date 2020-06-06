@@ -535,6 +535,8 @@ void window_handle_event(Window *window, Event *event)
     }
 
     case EVENT_KEYBOARD_KEY_TYPED:
+    case EVENT_KEYBOARD_KEY_PRESS:
+    case EVENT_KEYBOARD_KEY_RELEASE:
     {
         if (window->focused_widget)
         {

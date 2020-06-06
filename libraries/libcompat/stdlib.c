@@ -20,6 +20,8 @@ int system(const char *command)
     __unused(command);
 
     TRACE_FUNCTION_BEGIN;
+    logger_trace("system(%s)", command);
+
     TRACE_FUNCTION_END;
 
     return -1;

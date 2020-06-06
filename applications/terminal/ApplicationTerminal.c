@@ -206,22 +206,22 @@ void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
     if (event->type == EVENT_KEYBOARD_KEY_TYPED)
     {
-        if (event->keyboard.key == KEY_UP)
+        if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             stream_printf(terminal_widget->master_stream, "\e[A");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEY_DOWN)
+        else if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             stream_printf(terminal_widget->master_stream, "\e[B");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEY_RIGHT)
+        else if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             stream_printf(terminal_widget->master_stream, "\e[C");
             event->accepted = true;
         }
-        else if (event->keyboard.key == KEY_LEFT)
+        else if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             stream_printf(terminal_widget->master_stream, "\e[D");
             event->accepted = true;

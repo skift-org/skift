@@ -46,12 +46,12 @@ Codepoint keyboard_get_codepoint(Key key)
     }
     else
     {
-        if (_keystate[KEY_LSHIFT] == KEY_MOTION_DOWN ||
-            _keystate[KEY_RSHIFT] == KEY_MOTION_DOWN)
+        if (_keystate[KEYBOARD_KEY_LSHIFT] == KEY_MOTION_DOWN ||
+            _keystate[KEYBOARD_KEY_RSHIFT] == KEY_MOTION_DOWN)
         {
             return mapping->shift_codepoint;
         }
-        else if (_keystate[KEY_RALT] == KEY_MOTION_DOWN)
+        else if (_keystate[KEYBOARD_KEY_RALT] == KEY_MOTION_DOWN)
         {
             return mapping->alt_codepoint;
         }
@@ -118,7 +118,7 @@ Key keyboard_scancode_to_key(int scancode)
 
     KEY_LIST(SCAN_CODE_TO_KEY_ENTRY);
 
-    return KEY_INVALID;
+    return KEYBOARD_KEY_INVALID;
 }
 
 void keyboard_interrupt_handler(void)

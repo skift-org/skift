@@ -43,7 +43,6 @@ void eventloop_initialize(void)
 void eventloop_uninitialize(void)
 {
     assert(_eventloop_is_initialize);
-    assert(!_eventloop_is_running);
 
     list_destroy(_eventloop_notifiers);
     list_destroy(_eventloop_timers);
@@ -61,7 +60,7 @@ int eventloop_run(void)
 
     while (_eventloop_is_running)
     {
-        eventloop_pump();
+        eventloop_pump(false);
     }
 
     eventloop_uninitialize();
@@ -69,7 +68,7 @@ int eventloop_run(void)
     return _eventloop_exit_value;
 }
 
-void eventloop_pump(void)
+void eventloop_pump(bool pool)
 {
     assert(_eventloop_is_initialize);
 
@@ -101,6 +100,11 @@ void eventloop_pump(void)
     }
 
     eventloop_update_timers();
+
+    if (pool)
+    {
+        timeout = 0;
+    }
 
     Result result = handle_select(
         &_eventloop_handles[0],
@@ -140,7 +144,6 @@ void eventloop_pump(void)
 void eventloop_exit(int exit_value)
 {
     assert(_eventloop_is_initialize);
-    assert(_eventloop_is_running);
 
     _eventloop_is_running = false;
     _eventloop_exit_value = exit_value;
@@ -149,7 +152,6 @@ void eventloop_exit(int exit_value)
 void eventloop_update_timers(void)
 {
     assert(_eventloop_is_initialize);
-    assert(_eventloop_is_running);
 
     TimeStamp current_fire = system_get_ticks();
 

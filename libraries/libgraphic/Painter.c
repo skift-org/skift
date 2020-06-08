@@ -96,16 +96,14 @@ void painter_blit_bitmap_fast(
     Rectangle source,
     Rectangle destination)
 {
+    if (rectangle_is_empty(destination))
+        return;
+
     Rectangle clipped_destination = painter_apply_transform(painter, destination);
     clipped_destination = painter_apply_clip(painter, clipped_destination);
 
     Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
     clipped_source.position = vec2i_add(source.position, vec2i_sub(clipped_destination.position, destination.position));
-
-    if (rectangle_is_empty(destination))
-    {
-        return;
-    }
 
     for (int x = 0; x < clipped_destination.width; x++)
     {
@@ -123,6 +121,9 @@ void painter_blit_bitmap_scaled(
     Rectangle source,
     Rectangle destination)
 {
+    if (rectangle_is_empty(destination))
+        return;
+
     for (int x = 0; x < destination.width; x++)
     {
         for (int y = 0; y < destination.height; y++)
@@ -142,6 +143,9 @@ __attribute__((flatten)) void painter_blit_bitmap(
     Rectangle source,
     Rectangle destination)
 {
+    if (rectangle_is_empty(destination))
+        return;
+
     if (source.width == destination.width &&
         source.height == destination.height)
     {
@@ -375,6 +379,26 @@ void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radiu
     painter_fill_rectangle(painter, rectangle_cutoff_top_botton(right_ear, radius, radius), color);
 
     painter_fill_rectangle(painter, rectangle_cutoff_left_right(bound, radius, radius), color);
+}
+
+void painter_fill_checkboard(Painter *painter, Rectangle bound, int cell_size, Color fg_color, Color bg_color)
+{
+    for (int x = 0; x < bound.width; x++)
+    {
+        for (int y = 0; y < bound.height; y++)
+        {
+            Vec2i position = vec2i(bound.x + x, bound.y + y);
+
+            if (((y / cell_size) * bound.width + (x / cell_size) + (y / cell_size) % 2) % 2 == 0)
+            {
+                painter_plot_pixel(painter, position, fg_color);
+            }
+            else
+            {
+                painter_plot_pixel(painter, position, bg_color);
+            }
+        }
+    }
 }
 
 void painter_draw_line_x_aligned(Painter *painter, int x, int start, int end, Color color)

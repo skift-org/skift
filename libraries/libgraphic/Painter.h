@@ -49,6 +49,8 @@ void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color
 
 void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radius, Color color);
 
+void painter_fill_checkboard(Painter *painter, Rectangle bound, int cell_size, Color fg_color, Color bg_color);
+
 void painter_draw_line(Painter *painter, Vec2i from, Vec2i to, Color color);
 
 void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color);

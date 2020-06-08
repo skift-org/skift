@@ -33,9 +33,33 @@ int main(int argc, char **argv)
     printf("\e[16C OS: %sOS\n", info.system_name);
     printf("\e[16C KERNEL: %s\n", info.kernel_name);
     printf("\e[16C VERSION: %s\n", info.kernel_release);
-    printf("\e[16C UPTIME: 00:00\n");
-    printf("\e[16C SHELL: /bin/shell\n");
-    printf("\e[16C TERMINAL: /bin/terminal\n");
+    printf("\e[16C UPTIME: ");
+
+    ElapsedTime seconds = status.uptime;
+
+    if (seconds / 86400 > 0)
+    {
+        printf("%d day%s, ", seconds / 86400, (seconds / 86400) == 1 ? "" : "s");
+        seconds %= 86400;
+    }
+
+    if (seconds / 3600 > 0)
+    {
+        printf("%d hour%s, ", seconds / 3600, (seconds / 3600) == 1 ? "" : "s");
+        seconds %= 3600;
+    }
+
+    if (seconds / 60 > 0)
+    {
+        printf("%d minute%s, ", seconds / 60, (seconds / 60) == 1 ? "" : "s");
+        seconds %= 60;
+    }
+
+    printf("%d second%s\n", seconds, seconds == 1 ? "" : "s");
+
+    printf("\e[16C SHELL: /bin/Shell\n");
+    printf("\e[16C TERMINAL: /bin/Terminal\n");
+    printf("\e[16C COMPOSITOR: /bin/Compositor\n");
     printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", status.used_ram / (1024 * 1024), status.total_ram / (1024 * 1024));
 
     printf("\n");

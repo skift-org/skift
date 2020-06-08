@@ -234,10 +234,12 @@ int sys_system_get_info(SystemInfo *info)
     return SUCCESS;
 }
 
+ElapsedTime system_get_uptime(void);
+
 int sys_system_get_status(SystemStatus *status)
 {
     // FIXME: get a real uptime value;
-    status->uptime = 0;
+    status->uptime = system_get_uptime();
 
     status->total_ram = memory_get_total();
     status->used_ram = memory_get_used();

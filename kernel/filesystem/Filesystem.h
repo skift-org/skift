@@ -5,7 +5,6 @@
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/Node.h"
-#include "kernel/system.h"
 
 void filesystem_initialize(void);
 

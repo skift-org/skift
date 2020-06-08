@@ -1,6 +1,10 @@
 #pragma once
 
+#include "arch/Arch.h"
+
 #include <libsystem/Common.h>
+
+/* --- Assembly Helpers --------------------------------- */
 
 static inline u32 CR0()
 {

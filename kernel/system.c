@@ -1,7 +1,7 @@
 
 #include <libsystem/Atomic.h>
 
-#include "arch/x86/cpuid.h"
+#include "arch/x86/CPUID.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"

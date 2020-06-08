@@ -2,6 +2,7 @@
 #include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
 #include "kernel/node/Connection.h"

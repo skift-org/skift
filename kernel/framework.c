@@ -3,12 +3,14 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/Atomic.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
 #include "kernel/clock.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/serial.h"
+#include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 
@@ -35,13 +37,13 @@ void __plug_init(void)
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
     logger_fatal("Assert failed: %s in %s:%s() ln%d!", (char *)expr, (char *)file, (char *)function, line);
-    PANIC("Kernel assert failed (see logs).");
+    ASSERT_NOT_REACHED();
 }
 
 void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line)
 {
     logger_fatal("Lock assert failed: %s in %s:%s() ln%d!", (char *)lock->name, (char *)file, (char *)function, line);
-    PANIC("Kernel lock assert failed (see logs).");
+    ASSERT_NOT_REACHED();
 }
 
 /* --- Systeme API ---------------------------------------------------------- */

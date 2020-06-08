@@ -2,7 +2,7 @@
 #include <libsystem/CString.h>
 #include <libsystem/io/Stream.h>
 
-#include "arch/x86/cpuid.h"
+#include "arch/x86/CPUID.h"
 
 static inline int cpuid_string(int code, int where[4])
 {

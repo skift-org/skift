@@ -1,52 +1,20 @@
-
 #include <libsystem/Assert.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
 
-#include "arch/x86/IDT.h"
 #include "arch/x86/Interrupts.h"
 #include "arch/x86/PIC.h"
+#include "arch/x86/x86.h"
+
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"
 
-extern uintptr_t __interrupt_vector[];
-
-IDTEntry idt[IDT_ENTRY_COUNT];
-
-IDTDescriptor idt_descriptor = {
-    .size = sizeof(IDTEntry) * IDT_ENTRY_COUNT,
-    .offset = (u32)&idt[0],
-};
-
 void interrupts_initialize(void)
 {
-    logger_info("Remaping the PIC...");
-
-    pic_remap();
-
-    logger_info("Populating the IDT...");
-
-    for (int i = 0; i < 32; i++)
-    {
-        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
-    }
-
-    for (int i = 32; i < 48; i++)
-    {
-        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
-    }
-
-    idt[127] = IDT_ENTRY(__interrupt_vector[48], 0x08, INTGATE);
-    idt[128] = IDT_ENTRY(__interrupt_vector[49], 0x08, TRAPGATE);
-
-    logger_info("Flushing the IDT...");
-    idt_flush((u32)&idt_descriptor);
-
     dispatcher_initialize();
-
     atomic_enable();
     sti();
 }

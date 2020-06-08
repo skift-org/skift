@@ -9,7 +9,7 @@
 
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
-#include "kernel/platform.h"
+#include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 
@@ -53,7 +53,7 @@ void tasking_initialize(void)
     Task *garbage_task = task_spawn(NULL, "GarbageCollector", garbage_collector, NULL, false);
     task_go(garbage_task);
 
-    scheduler_setup(kernel_task);
+    running = kernel_task;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -107,7 +107,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     task->stack = (byte *)memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR);
     task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
 
-    platform_fpu_save_context(task);
+    arch_save_context(task);
 
     list_pushback(tasks, task);
 
@@ -715,26 +715,6 @@ void garbage_collector()
 static bool scheduler_context_switch = false;
 static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
 
-void timer_set_frequency(u16 hz)
-{
-    u32 divisor = 1193182 / hz;
-
-    out8(0x43, 0x36);
-    out8(0x40, divisor & 0xFF);
-    out8(0x40, (divisor >> 8) & 0xFF);
-
-    logger_info("Timer frequency is %dhz.", hz);
-}
-
-void scheduler_setup(Task *main_kernel_task)
-{
-    running = main_kernel_task;
-
-    timer_set_frequency(1000);
-}
-
-/* --- Scheduling ----------------------------------------------------------- */
-
 void wakeup_blocked_task(void)
 {
     if (list_any(task_by_state(TASK_STATE_BLOCKED)))
@@ -785,7 +765,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
 
     // Save the old context
     running->stack_pointer = current_stack_pointer;
-    platform_save_context(running);
+    arch_save_context(running);
 
     if (!yield)
     {
@@ -803,13 +783,11 @@ uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
         running = idle;
     }
 
-    // Restore the context
-    // TODO: set_kernel_stack(...);
     memory_pdir_switch(running->pdir);
+    arch_load_context(running);
 
     scheduler_context_switch = false;
 
-    platform_load_context(running);
     return running->stack_pointer;
 }
 

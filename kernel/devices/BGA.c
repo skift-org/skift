@@ -1,6 +1,8 @@
 #include <libmath/MinMax.h>
 #include <libsystem/Logger.h>
 
+#include "arch/x86/x86.h"
+
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"

@@ -7,17 +7,20 @@
 
 /* main.c : the entry point of the kernel.                                    */
 
+#include <libsystem/Assert.h>
 #include <libsystem/BuildInfo.h>
+#include <libsystem/Logger.h>
 #include <libsystem/__plugs__.h>
 
-#include "arch/x86/gdt.h"
+#include "arch/Arch.h"
+
 #include "kernel/clock.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
-#include "kernel/platform.h"
 #include "kernel/serial.h"
+#include "kernel/system.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Userspace.h"
 
@@ -33,7 +36,6 @@ void kmain(void *info, uint magic)
     __plug_init();
     boot_timestamp = clock_now();
     logger_level(LOGGER_TRACE);
-
     logger_info("hjert - " __BUILD_GITREF__);
 
     Multiboot *multiboot = multiboot_initialize(info, magic);
@@ -44,8 +46,7 @@ void kmain(void *info, uint magic)
     }
 
     logger_info("Initializing system...");
-    gdt_initialize();
-    platform_initialize();
+    arch_initialize();
     memory_initialize(multiboot);
     tasking_initialize();
     interrupts_initialize();
@@ -62,4 +63,6 @@ void kmain(void *info, uint magic)
     device_info_initialize();
     // textmode_initialize();
     userspace_initialize();
+
+    ASSERT_NOT_REACHED();
 }

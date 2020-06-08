@@ -1,6 +1,7 @@
 
 #include <libsystem/Atomic.h>
-#include <libsystem/Common.h>
+
+#include "arch/Arch.h"
 
 static bool atomic_enabled = false;
 static uint atomic_depth = 0;
@@ -24,7 +25,7 @@ void atomic_begin()
 {
     if (atomic_enabled)
     {
-        asm volatile("cli");
+        arch_disable_interupts();
         atomic_depth++;
     }
 }
@@ -36,8 +37,6 @@ void atomic_end()
         atomic_depth--;
 
         if (atomic_depth == 0)
-        {
-            asm volatile("sti");
-        }
+            arch_enable_interupts();
     }
 }

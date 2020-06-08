@@ -1,7 +1,10 @@
 
 #include <libdevice/Mouse.h>
 #include <libsystem/Atomic.h>
+#include <libsystem/Logger.h>
 #include <libsystem/utils/RingBuffer.h>
+
+#include "arch/x86/x86.h"
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/tasking.h"

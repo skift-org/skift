@@ -24,7 +24,7 @@
 #define ICW1_ICW4 0x01
 #define ICW1_INIT 0x10
 
-void pic_remap(void)
+void pic_initialize(void)
 {
 	/* Cascade initialization */
 	out8(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);

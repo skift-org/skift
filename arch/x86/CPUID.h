@@ -139,8 +139,6 @@ typedef struct __packed
 
 CPUID cpuid();
 
-char *cpuid_get_vendorid();
-
 #ifdef __cplusplus
 extern "C" u32 cpuid_get_feature_EDX();
 extern "C" u32 cpuid_get_feature_ECX();

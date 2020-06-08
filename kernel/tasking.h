@@ -176,10 +176,6 @@ void garbage_collector();
 
 #define SCHEDULER_RECORD_COUNT 1000
 
-void timer_set_frequency(u16 hz);
-
-void scheduler_setup(Task *main_kernel_task);
-
 uintptr_t schedule(uintptr_t current_stack_pointer, bool yield);
 
 uint scheduler_get_ticks(void);

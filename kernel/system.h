@@ -2,20 +2,20 @@
 
 #include <libsystem/Logger.h>
 
+#include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
-#include "arch/x86/x86.h"
 
-#define HANG   \
-    while (1)  \
-    {          \
-        hlt(); \
+#define HANG         \
+    while (1)        \
+    {                \
+        arch_halt(); \
     }
 
-#define STOP   \
-    while (1)  \
-    {          \
-        cli(); \
-        hlt(); \
+#define STOP                      \
+    while (1)                     \
+    {                             \
+        arch_disable_interupts(); \
+        arch_halt();              \
     }
 
 void __no_return __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);

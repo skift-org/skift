@@ -6,6 +6,8 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
+#include "arch/x86/x86.h"
+
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Virtual.h"

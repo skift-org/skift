@@ -13,6 +13,8 @@
 #include <libsystem/Result.h>
 #include <libsystem/utils/RingBuffer.h>
 
+#include "arch/x86/x86.h"
+
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
 

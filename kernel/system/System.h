@@ -3,6 +3,10 @@
 #include <libsystem/Common.h>
 #include <libsystem/Time.h>
 
+#include "kernel/multiboot/Multiboot.h"
+
+void system_main(Multiboot *multiboot);
+
 void system_initialize(void);
 
 void __no_return system_hang(void);

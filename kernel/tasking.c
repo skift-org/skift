@@ -760,7 +760,7 @@ void wakeup_blocked_task(void)
     }
 }
 
-uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
+uintptr_t schedule(uintptr_t current_stack_pointer)
 {
     scheduler_context_switch = true;
 
@@ -768,12 +768,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
     running->stack_pointer = current_stack_pointer;
     arch_save_context(running);
 
-    if (!yield)
-    {
-        // Update the system ticks
-        scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
-        system_tick();
-    }
+    scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
 
     wakeup_blocked_task();
 

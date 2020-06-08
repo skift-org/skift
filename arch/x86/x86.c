@@ -1,4 +1,4 @@
-#include "arch/x86/x86.h"
+#include <libsystem/__plugs__.h>
 
 #include "arch/x86/COM.h"
 #include "arch/x86/FPU.h"
@@ -7,9 +7,14 @@
 #include "arch/x86/PIC.h"
 #include "arch/x86/PIT.h"
 #include "arch/x86/RTC.h"
+#include "arch/x86/x86.h"
 
-void arch_initialize(void)
+#include "kernel/system/System.h"
+
+void arch_main(void *info, uint magic)
 {
+    __plug_init();
+
     com_initialize(COM1);
     com_initialize(COM2);
     com_initialize(COM3);
@@ -20,6 +25,15 @@ void arch_initialize(void)
     pic_initialize();
     fpu_initialize();
     pit_initialize(1000);
+
+    Multiboot *multiboot = multiboot_initialize(info, magic);
+
+    if (multiboot->memory_usable < 127 * 1024)
+    {
+        system_panic("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
+    }
+
+    system_main(multiboot);
 }
 
 void arch_disable_interupts(void)

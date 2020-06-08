@@ -8,7 +8,6 @@
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libsystem/Assert.h>
-#include <libsystem/__plugs__.h>
 
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
@@ -21,18 +20,8 @@
 #include "kernel/tasking.h"
 #include "kernel/tasking/Userspace.h"
 
-void kmain(void *info, uint magic)
+void system_main(Multiboot *multiboot)
 {
-    __plug_init();
-
-    Multiboot *multiboot = multiboot_initialize(info, magic);
-
-    if (multiboot->memory_usable < 127 * 1024)
-    {
-        system_panic("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
-    }
-
-    arch_initialize();
     system_initialize();
     memory_initialize(multiboot);
     tasking_initialize();

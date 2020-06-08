@@ -12,13 +12,6 @@
 #include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"
 
-void interrupts_initialize(void)
-{
-    dispatcher_initialize();
-    atomic_enable();
-    sti();
-}
-
 static const char *_exception_messages[32] = {
     "Division by zero",
     "Debug",
@@ -100,7 +93,8 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 
         if (irq == 0)
         {
-            esp = schedule(esp, false);
+            esp = schedule(esp);
+            system_tick();
         }
         else
         {
@@ -113,7 +107,7 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
     {
         atomic_disable();
 
-        esp = schedule(esp, true);
+        esp = schedule(esp);
 
         atomic_enable();
     }

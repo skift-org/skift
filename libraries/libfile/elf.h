@@ -31,7 +31,7 @@ typedef struct __packed
     u16 shentsize;
     u16 shnum;
     u16 shstrndx;
-} elf_header_t;
+} ELFHeader;
 
 typedef enum
 {
@@ -42,7 +42,7 @@ typedef enum
     ELFS_RELA = 4,     // Relocation (w/ addend)
     ELFS_NOBITS = 8,   // Not present in file
     ELFS_REL = 9,      // Relocation (no addend)
-} elf_section_type_t;
+} ELFSectionType;
 
 typedef struct __packed
 {
@@ -56,7 +56,7 @@ typedef struct __packed
     uint info;
     uint addralign;
     uint entsize;
-} elf_section_t;
+} ELFSection;
 
 typedef struct
 {
@@ -68,7 +68,7 @@ typedef struct
     u32 memsz;
     u32 flags;
     u32 align;
-} elf_program_t;
+} ELFProgram;
 
 typedef struct
 {
@@ -78,11 +78,11 @@ typedef struct
     uint8_t info;
     uint8_t other;
     u16 shndx;
-} elf_sym_t;
+} ELFSymbole;
 
-int elf_valid(elf_header_t *header);
+int elf_valid(ELFHeader *header);
 
-int elf_read_section(elf_header_t *header, elf_section_t *dest, uint index);
-int elf_read_program(elf_header_t *header, elf_program_t *dest, uint index);
+int elf_read_section(ELFHeader *header, ELFSection *dest, uint index);
+int elf_read_program(ELFHeader *header, ELFProgram *dest, uint index);
 
-char *elf_lookup_string(elf_header_t *header, int offset);
+char *elf_lookup_string(ELFHeader *header, int offset);

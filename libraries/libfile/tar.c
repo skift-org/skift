@@ -23,9 +23,9 @@ typedef struct __packed
     char devminor[8];   /* 337 */
     char prefix[155];   /* 345 */
                         /* 500 */
-} tar_rawblock_t;
+} TARRawBlock;
 
-uint get_file_size(tar_rawblock_t *header)
+uint get_file_size(TARRawBlock *header)
 {
     unsigned int size = 0;
     unsigned int count = 1;
@@ -40,7 +40,7 @@ uint get_file_size(tar_rawblock_t *header)
 
 uint tar_count(void *tarfile)
 {
-    tar_rawblock_t *header = (tar_rawblock_t *)tarfile;
+    TARRawBlock *header = (TARRawBlock *)tarfile;
     uint count = 0;
 
     while (header->name[0] != '\0')
@@ -49,18 +49,18 @@ uint tar_count(void *tarfile)
 
         u32 size = get_file_size(header);
 
-        header = (tar_rawblock_t *)((char *)header + ((size / 512) + 1) * 512);
+        header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
 
         if (size % 512)
-            header = (tar_rawblock_t *)((char *)header + 512);
+            header = (TARRawBlock *)((char *)header + 512);
     }
 
     return count;
 }
 
-bool tar_read(void *tarfile, tar_block_t *block, uint index)
+bool tar_read(void *tarfile, TARBlock *block, uint index)
 {
-    tar_rawblock_t *header = (tar_rawblock_t *)tarfile;
+    TARRawBlock *header = (TARRawBlock *)tarfile;
 
     for (size_t i = 0; i < index; i++)
     {
@@ -69,10 +69,10 @@ bool tar_read(void *tarfile, tar_block_t *block, uint index)
 
         u32 size = get_file_size(header);
 
-        header = (tar_rawblock_t *)((char *)header + ((size / 512) + 1) * 512);
+        header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
 
         if (size % 512)
-            header = (tar_rawblock_t *)((char *)header + 512);
+            header = (TARRawBlock *)((char *)header + 512);
     }
 
     if (header->name[0] == '\0')

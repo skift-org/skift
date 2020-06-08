@@ -7,6 +7,6 @@ typedef struct
     char name[100];
     u32 size;
     char *data;
-} tar_block_t;
+} TARBlock;
 
-bool tar_read(void *tarfile, tar_block_t *block, uint index);
+bool tar_read(void *tarfile, TARBlock *block, uint index);

@@ -18,7 +18,7 @@
         hlt(); \
     }
 
-void __attribute__((noreturn)) __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
+void __no_return __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...);
 
 #define PANIC(x...) __panic(__FILE__, __FUNCTION__, __LINE__, NULL, x)
 

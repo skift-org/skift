@@ -97,16 +97,19 @@ int __plug_memalloc_free(void *memory, uint size)
 
 /* --- Logger plugs --------------------------------------------------------- */
 
-int __plug_logger_lock()
+void __plug_logger_lock(void)
 {
     atomic_begin();
-    return 0;
 }
 
-int __plug_logger_unlock()
+void __plug_logger_unlock(void)
 {
     atomic_end();
-    return 0;
+}
+
+void __no_return __plug_logger_fatal(void)
+{
+    PANIC("Fatal error occurred (see logs)!");
 }
 
 /* --- Processes ------------------------------------------------------------ */

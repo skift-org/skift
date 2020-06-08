@@ -65,6 +65,11 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
 
         va_end(va);
 
+        if (level == LOGGER_FATAL)
+        {
+            __plug_logger_fatal();
+        }
+
         __plug_logger_unlock();
     }
 }

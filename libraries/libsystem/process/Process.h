@@ -9,7 +9,7 @@ int process_this(void);
 
 Result process_run(const char *command, int *pid);
 
-void __attribute__((noreturn)) process_exit(int code);
+void __no_return process_exit(int code);
 
 Result process_cancel(int pid);
 

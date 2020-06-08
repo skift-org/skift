@@ -15,6 +15,8 @@
         __y = __tmp;             \
     })
 
+#define __no_return __attribute__((noreturn))
+
 #define __cleanup(__function) __attribute__((__cleanup__(__function)))
 #define __cleanup_malloc __attribute__((__cleanup__(malloc_cleanup)))
 

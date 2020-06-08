@@ -19,7 +19,7 @@ Result process_run(const char *command, int *pid)
     return launchpad_launch(launchpad, pid);
 }
 
-void __attribute__((noreturn)) process_exit(int code)
+void __no_return process_exit(int code)
 {
     __plug_process_exit(code);
 
@@ -65,7 +65,6 @@ int process_sleep(int time)
 {
     return __plug_process_sleep(time);
 }
-
 
 int process_wait(int pid, int *exit_value)
 {

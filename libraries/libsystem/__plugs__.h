@@ -14,15 +14,17 @@ void __plug_init(void);
 
 void __plug_fini(int exit_code);
 
-void __attribute__((noreturn)) __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
+void __no_return __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 
 void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line);
 
 /* --- Logger --------------------------------------------------------------- */
 
-int __plug_logger_lock(void);
+void __plug_logger_lock(void);
 
-int __plug_logger_unlock(void);
+void __plug_logger_unlock(void);
+
+void __no_return __plug_logger_fatal(void);
 
 /* --- Memory allocator ----------------------------------------------------- */
 
@@ -58,7 +60,7 @@ int __plug_process_this(void);
 
 Result __plug_process_launch(Launchpad *launchpad, int *pid);
 
-void __attribute__((noreturn)) __plug_process_exit(int code);
+void __no_return __plug_process_exit(int code);
 
 Result __plug_process_cancel(int pid);
 

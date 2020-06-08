@@ -6,7 +6,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/process/Process.h>
 
-void __attribute__((noreturn)) exit(int status)
+void __no_return exit(int status)
 {
     TRACE_FUNCTION_BEGIN;
 

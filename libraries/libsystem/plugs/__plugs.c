@@ -70,16 +70,20 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
     process_exit(-1);
 }
 
-int __plug_logger_lock()
+void __plug_logger_lock(void)
 {
     lock_acquire(loglock);
-    return 0;
 }
 
-int __plug_logger_unlock()
+void __plug_logger_unlock(void)
 {
     lock_release(loglock);
-    return 0;
+}
+
+void __no_return __plug_logger_fatal(void)
+{
+    stream_printf(err_stream, "Fatal error occurred (see logs)!\n");
+    __plug_process_exit(-1);
 }
 
 int __plug_memalloc_lock()

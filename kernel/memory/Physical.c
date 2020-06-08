@@ -1,7 +1,7 @@
 
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Paging.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 
 uint TOTAL_MEMORY = 0;
 uint USED_MEMORY = 0;
@@ -65,7 +65,7 @@ uint physical_alloc(uint count)
         }
     }
 
-    PANIC("Out of physical memory!\n\tTrying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / PAGE_SIZE);
+    system_panic("Out of physical memory!\n\tTrying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / PAGE_SIZE);
     return 0;
 }
 

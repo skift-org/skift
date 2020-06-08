@@ -18,6 +18,7 @@
 #define __no_return __attribute__((noreturn))
 
 #define __cleanup(__function) __attribute__((__cleanup__(__function)))
+
 #define __cleanup_malloc __attribute__((__cleanup__(malloc_cleanup)))
 
 // Align the nearest _lower_ aligned address
@@ -31,3 +32,5 @@
 // ex: 9 with align = 8 -> 16
 // ex: 7 with align = 8 -> 8
 #define __align_up(__addr, __align) (((__addr) + (__align)-1) & ~((__align)-1))
+
+#define __array_length(__array) (sizeof(__array) / sizeof(__array[0]))

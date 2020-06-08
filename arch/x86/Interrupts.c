@@ -8,7 +8,7 @@
 #include "arch/x86/x86.h"
 
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"
 
@@ -64,11 +64,7 @@ void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
     printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }
 
-#ifdef __cplusplus
-extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
-#else
 uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
-#endif
 {
     if (stackframe.intno < 32)
     {
@@ -88,11 +84,12 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
         }
         else
         {
-            CPANIC(&stackframe,
-                   "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
-                   _exception_messages[stackframe.intno],
-                   stackframe.intno,
-                   stackframe.err);
+            system_panic_with_context(
+                &stackframe,
+                "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
+                _exception_messages[stackframe.intno],
+                stackframe.intno,
+                stackframe.err);
         }
     }
     else if (stackframe.intno < 48)

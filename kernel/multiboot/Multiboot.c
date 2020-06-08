@@ -2,7 +2,7 @@
 #include <libsystem/Logger.h>
 
 #include "kernel/multiboot/Multiboot.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 
 static Multiboot _multiboot;
 
@@ -18,7 +18,7 @@ void multiboot_assert(uint32_t magic)
 {
     if (!(is_multiboot1(magic) || is_multiboot2(magic)))
     {
-        PANIC("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x!", magic);
+        system_panic("Wrong bootloader please use a GRUB or any multiboot2 bootloader\n\tMagic number: 0x%08x!", magic);
     }
 }
 

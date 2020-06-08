@@ -16,10 +16,10 @@
 
 static FsNode *_filesystem_root = NULL;
 
-#define ASSERT_FILESYSTEM_READY                                       \
-    if (!root != NULL)                                                \
-    {                                                                 \
-        PANIC("Trying to use the filesystem before initialization."); \
+#define ASSERT_FILESYSTEM_READY                                              \
+    if (!root != NULL)                                                       \
+    {                                                                        \
+        system_panic("Trying to use the filesystem before initialization."); \
     }
 
 void filesystem_initialize(void)

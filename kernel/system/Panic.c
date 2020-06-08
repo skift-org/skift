@@ -1,25 +1,11 @@
-
 #include <libsystem/Atomic.h>
 
+/* XXX: we should not depend on X86 directly */
 #include "arch/x86/CPUID.h"
-#include "kernel/memory/Memory.h"
-#include "kernel/system.h"
+#include "arch/x86/Interrupts.h"
+
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
-
-/* --- Version info --------------------------------------------------------- */
-
-const char *__kernel_name = "hjert";
-
-int __kernel_version_major = 0;
-int __kernel_version_minor = 2;
-int __kernel_version_patch = 0;
-const char *__kernel_version_codename = "wheat";
-
-/* kernel version format major.minor.patch-codename */
-const char *__kernel_version_format = "%d.%d.%d-%s";
-const char *__kernel_uname_format = "%s %d.%d.%d-%s";
-
-/* --- Panic screen --------------------------------------------------------- */
 
 const char *const witty_comments[] = {
     "Witty comment unavailable :(",
@@ -62,7 +48,11 @@ const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void __panic(const char *file, const char *function, const int line, InterruptStackFrame *stackframe, const char *message, ...)
+void system_panic_internal(
+    SourceLocation location,
+    void *stackframe,
+    const char *message,
+    ...)
 {
     atomic_begin();
     atomic_disable();
@@ -71,9 +61,7 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
     va_start(va, message);
 
     if (nested_panic)
-    {
-        STOP;
-    }
+        system_stop();
 
     if (!has_panic)
     {
@@ -88,14 +76,14 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
         printf("\n\tNESTED");
     }
 
-    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[scheduler_get_ticks() % (sizeof(witty_comments) / sizeof(char *))]);
+    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
 
     vprintf(message, va);
-    printf("\e[0m\n\tthrow by %s %s() ln%d", file, function, line);
+    printf("\e[0m\n\tthrow by %s %s() ln%d", location.file, location.function, location.line);
 
     printf("\n");
     printf("\n\tDiagnostic:");
-    printf("\n\tThe system was running for %d tick.", scheduler_get_ticks());
+    printf("\n\tThe system was running for %d tick.", system_get_tick());
 
     if (scheduler_running_id() != -1)
     {
@@ -104,7 +92,7 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
 
     if (scheduler_is_context_switch())
     {
-        printf("\n\tWe are context switching\n", scheduler_get_ticks());
+        printf("\n\tWe are context switching\n", system_get_tick());
     }
     else
     {
@@ -114,7 +102,7 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
     if (stackframe)
     {
         printf("\n\tContext:\n");
-        interrupts_dump_stackframe(stackframe);
+        interrupts_dump_stackframe((InterruptStackFrame *)stackframe);
     }
 
     memory_dump();
@@ -133,5 +121,5 @@ void __panic(const char *file, const char *function, const int line, InterruptSt
 
     printf("\n\e[0;33m--------------------------------------------------------------------------------\n\n");
 
-    STOP;
+    system_stop();
 }

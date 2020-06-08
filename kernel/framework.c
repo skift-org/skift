@@ -7,10 +7,9 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
-#include "kernel/clock.h"
+#include "arch/Arch.h"
 #include "kernel/memory/Memory.h"
-#include "kernel/serial.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 
@@ -52,23 +51,23 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
 void __plug_system_get_info(SystemInfo *info)
 {
     __unused(info);
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 void __plug_system_get_status(SystemStatus *status)
 {
     __unused(status);
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 TimeStamp __plug_system_get_time(void)
 {
-    return clock_now();
+    return arch_get_time();
 }
 
 uint __plug_system_get_ticks()
 {
-    return scheduler_get_ticks();
+    return system_get_ticks();
 }
 
 /* --- Memory allocator plugs ----------------------------------------------- */
@@ -111,7 +110,7 @@ void __plug_logger_unlock(void)
 
 void __no_return __plug_logger_fatal(void)
 {
-    PANIC("Fatal error occurred (see logs)!");
+    system_panic("Fatal error occurred (see logs)!");
 }
 
 /* --- Processes ------------------------------------------------------------ */
@@ -130,7 +129,7 @@ void __plug_process_exit(int code)
 {
     task_exit(code);
 
-    PANIC("Task exit failled!");
+    system_panic("Task exit failled!");
 }
 
 Result __plug_process_cancel(int pid)
@@ -227,7 +226,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     {
         handle->result = SUCCESS;
 
-        return com_write(buffer, size);
+        return arch_debug_write(buffer, size);
     }
     else
     {

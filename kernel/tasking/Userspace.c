@@ -3,7 +3,6 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
-#include "kernel/system.h"
 #include "kernel/tasking/Userspace.h"
 
 void userspace_initialize(void)

@@ -33,6 +33,16 @@ typedef unsigned int uint;
 
 typedef long off_t;
 
+typedef struct
+{
+    const char *file;
+    const char *function;
+    int line;
+} SourceLocation;
+
+#define SOURCE_LOCATION \
+    ((SourceLocation){__FILE__, __FUNCTION__, __LINE__})
+
 /* --- Raw memory allocation ------------------------------------------------ */
 
 __attribute__((malloc)) __attribute__((alloc_size(1))) void *malloc(size_t size);

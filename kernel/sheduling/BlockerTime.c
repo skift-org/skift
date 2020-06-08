@@ -1,5 +1,5 @@
-
 #include "kernel/sheduling/Blocker.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 
 typedef struct
@@ -12,7 +12,7 @@ bool blocker_time_can_unblock(BlockerTime *blocker, Task *task)
 {
     __unused(task);
 
-    return scheduler_get_ticks() >= blocker->wakeup_tick;
+    return system_get_tick() >= blocker->wakeup_tick;
 }
 
 void blocker_time_unblock(BlockerTime *blocker, Task *task)

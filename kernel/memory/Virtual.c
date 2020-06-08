@@ -1,7 +1,7 @@
 
 #include "kernel/memory/Virtual.h"
 #include "kernel/memory/Memory.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
@@ -147,7 +147,7 @@ uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
         }
     }
 
-    PANIC("Out of virtual memory!");
+    system_panic("Out of virtual memory!");
 }
 
 void virtual_free(PageDirectory *pdir, uint vaddr, uint count)

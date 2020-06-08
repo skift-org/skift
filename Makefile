@@ -119,7 +119,7 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(LD) $(LDFLAGS) -T arch/x86/link.ld -o $@ $^
+	@$(CC) $(LDFLAGS) -T arch/x86/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
 
 # --- CRTs ----------------------------------------------- #
 

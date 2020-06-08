@@ -39,19 +39,19 @@ int main(int argc, char **argv)
 
     if (seconds / 86400 > 0)
     {
-        printf("%d day%s, ", seconds / 86400, (seconds / 86400) == 1 ? "" : "s");
+        printf("%d day%s, ", seconds / 86400, (seconds / 86400) == 1 ? "nothing" : "s");
         seconds %= 86400;
     }
 
     if (seconds / 3600 > 0)
     {
-        printf("%d hour%s, ", seconds / 3600, (seconds / 3600) == 1 ? "" : "s");
+        printf("%d hour%s, ", seconds / 3600, (seconds / 3600) == 1 ? "nothing" : "s");
         seconds %= 3600;
     }
 
     if (seconds / 60 > 0)
     {
-        printf("%d minute%s, ", seconds / 60, (seconds / 60) == 1 ? "" : "s");
+        printf("%d minute%s, ", seconds / 60, (seconds / 60) == 1 ? "nothing" : "s");
         seconds %= 60;
     }
 

@@ -5,11 +5,15 @@
 #include <libsystem/Atomic.h>
 #include <libsystem/CString.h>
 #include <libsystem/Debug.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+
+#include "arch/Arch.h"
+#include "arch/x86/Interrupts.h" /* XXX */
 
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 
@@ -20,11 +24,8 @@
 static int TID = 0;
 static List *tasks;
 static List *tasks_bystates[__TASK_STATE_COUNT];
-static uint ticks = 0;
 static Task *running = NULL;
 static Task *idle;
-
-void idle_code() { HANG; }
 
 void tasking_initialize(void)
 {
@@ -43,7 +44,7 @@ void tasking_initialize(void)
 
     running = NULL;
 
-    idle = task_spawn(NULL, "Idle", idle_code, NULL, false);
+    idle = task_spawn(NULL, "Idle", system_hang, NULL, false);
     task_go(idle);
     task_set_state(idle, TASK_STATE_HANG);
 
@@ -276,7 +277,7 @@ void task_go(Task *task)
 
 Result task_sleep(Task *task, int timeout)
 {
-    task_block(task, blocker_time_create(ticks + timeout), -1);
+    task_block(task, blocker_time_create(system_get_tick() + timeout), -1);
 
     return TIMEOUT;
 }
@@ -330,7 +331,7 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
     }
     else
     {
-        blocker->timeout = scheduler_get_ticks() + timeout;
+        blocker->timeout = system_get_tick() + timeout;
     }
 
     task_set_state(task, TASK_STATE_BLOCKED);
@@ -737,7 +738,7 @@ void wakeup_blocked_task(void)
                 list_pushback(task_to_wakeup, task);
             }
             else if (blocker->timeout != (Timeout)-1 &&
-                     blocker->timeout <= scheduler_get_ticks())
+                     blocker->timeout <= system_get_tick())
             {
                 if (blocker->on_timeout)
                 {
@@ -770,8 +771,8 @@ uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
     if (!yield)
     {
         // Update the system ticks
-        scheduler_record[ticks % SCHEDULER_RECORD_COUNT] = running->id;
-        ticks++;
+        scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
+        system_tick();
     }
 
     wakeup_blocked_task();
@@ -792,11 +793,6 @@ uintptr_t schedule(uintptr_t current_stack_pointer, bool yield)
 }
 
 /* --- Scheduler info ------------------------------------------------------- */
-
-uint scheduler_get_ticks(void)
-{
-    return ticks;
-}
 
 bool scheduler_is_context_switch(void)
 {

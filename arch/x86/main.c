@@ -8,45 +8,32 @@
 /* main.c : the entry point of the kernel.                                    */
 
 #include <libsystem/Assert.h>
-#include <libsystem/BuildInfo.h>
-#include <libsystem/Logger.h>
 #include <libsystem/__plugs__.h>
 
 #include "arch/Arch.h"
+#include "arch/x86/Interrupts.h"
 
-#include "kernel/clock.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
-#include "kernel/serial.h"
-#include "kernel/system.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Userspace.h"
-
-static TimeStamp boot_timestamp = 0;
-
-ElapsedTime system_get_uptime(void)
-{
-    return clock_now() - boot_timestamp;
-}
 
 void kmain(void *info, uint magic)
 {
     __plug_init();
-    boot_timestamp = clock_now();
-    logger_level(LOGGER_TRACE);
-    logger_info("hjert - " __BUILD_GITREF__);
 
     Multiboot *multiboot = multiboot_initialize(info, magic);
 
     if (multiboot->memory_usable < 127 * 1024)
     {
-        PANIC("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
+        system_panic("No enought memory (%uKio)!", multiboot->memory_usable / 1024);
     }
 
-    logger_info("Initializing system...");
     arch_initialize();
+    system_initialize();
     memory_initialize(multiboot);
     tasking_initialize();
     interrupts_initialize();

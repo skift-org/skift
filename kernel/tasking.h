@@ -178,8 +178,6 @@ void garbage_collector();
 
 uintptr_t schedule(uintptr_t current_stack_pointer, bool yield);
 
-uint scheduler_get_ticks(void);
-
 bool scheduler_is_context_switch(void);
 
 void scheduler_yield(void);

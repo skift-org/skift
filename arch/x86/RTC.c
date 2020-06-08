@@ -1,10 +1,4 @@
-
-#include <libsystem/Logger.h>
-
 #include "arch/x86/x86.h"
-#include "kernel/clock.h"
-
-/* --- CMOS/RTC ------------------------------------------------------------- */
 
 typedef enum
 {
@@ -35,9 +29,7 @@ char get_realtime_reg(CMOSTimeSelector reg)
     return in8(CMOS_DATA);
 }
 
-/* --- Clock ---------------------------------------------------------------- */
-
-TimeStamp clock_now(void)
+TimeStamp rtc_now(void)
 {
     CMOS_WAIT;
 

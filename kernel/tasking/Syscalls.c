@@ -7,10 +7,10 @@
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/System.h>
 
-#include "kernel/clock.h"
+#include "arch/Arch.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
 #include "kernel/tasking/Syscalls.h"
@@ -252,14 +252,14 @@ int sys_system_get_status(SystemStatus *status)
 
 int sys_system_get_time(TimeStamp *timestamp)
 {
-    *timestamp = clock_now();
+    *timestamp = arch_get_time();
 
     return SUCCESS;
 }
 
 int sys_system_get_ticks()
 {
-    return scheduler_get_ticks();
+    return system_get_tick();
 }
 
 /* --- Create --------------------------------------------------------------- */

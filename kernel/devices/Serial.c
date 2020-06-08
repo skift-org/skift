@@ -2,41 +2,11 @@
 #include <libsystem/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
+#include "arch/x86/COM.h"
 #include "arch/x86/x86.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/serial.h"
-#include "kernel/system.h"
-
-#define PORT_COM1 0x3f8
-
-static void com_wait_write()
-{
-    while ((in8(PORT_COM1 + 5) & 0x20) == 0)
-    { /* do nothing */
-    }
-}
-
-static void com_putc(char c)
-{
-    com_wait_write();
-    out8(PORT_COM1, c);
-}
-
-int com_write(const void *buffer, uint size)
-{
-    atomic_begin();
-
-    for (uint i = 0; i < size; i++)
-    {
-        com_putc(((const char *)buffer)[i]);
-    }
-
-    atomic_end();
-
-    return size;
-}
 
 /* --- Serial device  node -------------------------------------------------- */
 
@@ -44,7 +14,7 @@ static RingBuffer *serial_buffer;
 
 void serial_interrupt_handler(void)
 {
-    char byte = in8(PORT_COM1);
+    char byte = com_getc(COM1);
 
     ringbuffer_write(serial_buffer, (const char *)&byte, sizeof(byte));
 }
@@ -76,21 +46,13 @@ static Result serial_write(FsNode *node, FsHandle *handle, const void *buffer, s
     __unused(node);
     __unused(handle);
 
-    *written = com_write(buffer, size);
+    *written = com_write(COM1, buffer, size);
 
     return SUCCESS;
 }
 
 void serial_initialize(void)
 {
-    out8(PORT_COM1 + 2, 0);
-    out8(PORT_COM1 + 3, 0x80);
-    out8(PORT_COM1 + 0, 115200 / 9600);
-    out8(PORT_COM1 + 1, 0);
-    out8(PORT_COM1 + 3, 0x03);
-    out8(PORT_COM1 + 4, 0);
-    out8(PORT_COM1 + 1, 0x01);
-
     serial_buffer = ringbuffer_create(1024);
 
     dispatcher_register_handler(4, serial_interrupt_handler);

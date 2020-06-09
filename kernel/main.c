@@ -5,13 +5,10 @@
 /*                      |_| |_|\___/|_____|_| \_\|_|                          */
 /*                                                                            */
 
-/* main.c : the entry point of the kernel.                                    */
-
 #include <libsystem/Assert.h>
 
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
-
 #include "kernel/devices/Devices.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"

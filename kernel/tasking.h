@@ -9,7 +9,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
-#include "kernel/sheduling/Blocker.h"
+#include "kernel/scheduling/Blocker.h"
 
 struct Task;
 
@@ -65,7 +65,7 @@ void task_set_entry(Task *task, TaskEntry entry, bool user);
 
 uintptr_t task_stack_push(Task *task, const void *value, uint size);
 
-void task_go(Task *t);
+void task_go(Task *task);
 
 Result task_sleep(Task *task, int timeout);
 
@@ -77,7 +77,7 @@ Result task_cancel(Task *task, int exit_value);
 
 void task_exit(int exit_value);
 
-void task_dump(Task *t);
+void task_dump(Task *task);
 
 void task_panic_dump(void);
 
@@ -162,26 +162,4 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 /*   GARBAGE COLLECTOR                                                        */
 /* -------------------------------------------------------------------------- */
 
-void collect_and_free_task(void);
-
-void collect_and_free_process(void);
-
-void garbage_collector();
-
-/* -------------------------------------------------------------------------- */
-/*   SCHEDULER                                                                */
-/* -------------------------------------------------------------------------- */
-
-#define SCHEDULER_RECORD_COUNT 1000
-
-uintptr_t schedule(uintptr_t current_stack_pointer);
-
-bool scheduler_is_context_switch(void);
-
-void scheduler_yield(void);
-
-Task *scheduler_running(void);
-
-int scheduler_running_id(void);
-
-int scheduler_get_usage(int task_id);
+void garbage_collector(void);

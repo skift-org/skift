@@ -10,6 +10,8 @@ void arch_enable_interupts(void);
 
 void arch_halt(void);
 
+void arch_yield(void);
+
 void arch_save_context(Task *task);
 
 void arch_load_context(Task *task);

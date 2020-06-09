@@ -2,6 +2,7 @@
 #include <libsystem/Logger.h>
 
 #include "arch/Arch.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 
 void system_hang(void)

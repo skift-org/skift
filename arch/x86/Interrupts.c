@@ -8,6 +8,7 @@
 #include "arch/x86/x86.h"
 
 #include "kernel/interrupts/Dispatcher.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"

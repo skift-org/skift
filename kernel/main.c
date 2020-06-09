@@ -16,6 +16,7 @@
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Userspace.h"
@@ -24,6 +25,7 @@ void system_main(Multiboot *multiboot)
 {
     system_initialize();
     memory_initialize(multiboot);
+    scheduler_initialize();
     tasking_initialize();
     interrupts_initialize();
     filesystem_initialize();

@@ -10,6 +10,7 @@
 
 #include "arch/Arch.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
@@ -415,51 +416,6 @@ int sys_handle_accept(int handle, int *connection_handle)
     return task_fshandle_accept(scheduler_running(), handle, connection_handle);
 }
 
-#ifdef __cplusplus
-#pragma GCC diagnostic ignored "-Wcast-function-type"
-static SyscallHandler syscalls[__SYSCALL_COUNT] = {
-    [SYS_PROCESS_THIS] = reinterpret_cast<SyscallHandler>(sys_process_this),
-    [SYS_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(sys_process_launch),
-    [SYS_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(sys_process_exit),
-    [SYS_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(sys_process_cancel),
-    [SYS_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(sys_process_sleep),
-    [SYS_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(sys_process_wait),
-    [SYS_PROCESS_GET_CWD] = reinterpret_cast<SyscallHandler>(sys_process_get_cwd),
-    [SYS_PROCESS_SET_CWD] = reinterpret_cast<SyscallHandler>(sys_process_set_cwd),
-    [SYS_PROCESS_MAP] = reinterpret_cast<SyscallHandler>(sys_process_map),
-    [SYS_PROCESS_UNMAP] = reinterpret_cast<SyscallHandler>(sys_process_unmap),
-    [SYS_PROCESS_ALLOC] = reinterpret_cast<SyscallHandler>(sys_process_alloc),
-    [SYS_PROCESS_FREE] = reinterpret_cast<SyscallHandler>(sys_process_free),
-    [SYS_SHARED_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(sys_shared_memory_alloc),
-    [SYS_SHARED_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_free),
-    [SYS_SHARED_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_include),
-    [SYS_SHARED_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_get_handle),
-    [SYS_FILESYSTEM_LINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_link),
-    [SYS_FILESYSTEM_UNLINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_unlink),
-    [SYS_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(sys_filesystem_rename),
-    [SYS_FILESYSTEM_MKPIPE] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkpipe),
-    [SYS_FILESYSTEM_MKDIR] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkdir),
-    [SYS_SYSTEM_GET_INFO] = reinterpret_cast<SyscallHandler>(sys_system_get_info),
-    [SYS_SYSTEM_GET_STATUS] = reinterpret_cast<SyscallHandler>(sys_system_get_status),
-    [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),
-    [SYS_SYSTEM_GET_TICKS] = reinterpret_cast<SyscallHandler>(sys_system_get_ticks),
-    [SYS_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(sys_handle_open),
-    [SYS_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(sys_handle_close),
-    [SYS_HANDLE_SELECT] = reinterpret_cast<SyscallHandler>(sys_handle_select),
-    [SYS_HANDLE_READ] = reinterpret_cast<SyscallHandler>(sys_handle_read),
-    [SYS_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(sys_handle_write),
-    [SYS_HANDLE_CALL] = reinterpret_cast<SyscallHandler>(sys_handle_call),
-    [SYS_HANDLE_SEEK] = reinterpret_cast<SyscallHandler>(sys_handle_seek),
-    [SYS_HANDLE_TELL] = reinterpret_cast<SyscallHandler>(sys_handle_tell),
-    [SYS_HANDLE_STAT] = reinterpret_cast<SyscallHandler>(sys_handle_stat),
-    [SYS_HANDLE_CONNECT] = reinterpret_cast<SyscallHandler>(sys_handle_connect),
-    [SYS_HANDLE_ACCEPT] = reinterpret_cast<SyscallHandler>(sys_handle_accept),
-    [SYS_CREATE_PIPE] = reinterpret_cast<SyscallHandler>(sys_create_pipe),
-    [SYS_CREATE_TERM] = reinterpret_cast<SyscallHandler>(sys_create_term),
-};
-
-#else
-
 static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_LAUNCH] = sys_process_launch,
@@ -505,8 +461,6 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_HANDLE_CONNECT] = sys_handle_connect,
     [SYS_HANDLE_ACCEPT] = sys_handle_accept,
 };
-
-#endif
 
 SyscallHandler syscall_get_handler(Syscall syscall)
 {

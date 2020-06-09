@@ -1,4 +1,4 @@
-#include "kernel/sheduling/Blocker.h"
+#include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking.h"
 
 typedef struct

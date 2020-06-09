@@ -51,6 +51,11 @@ void arch_halt(void)
     hlt();
 }
 
+void arch_yield(void)
+{
+    asm("int $127");
+}
+
 void arch_save_context(Task *task)
 {
     fpu_save_context(task);

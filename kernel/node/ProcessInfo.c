@@ -8,6 +8,7 @@
 
 #include "kernel/node/Handle.h"
 #include "kernel/node/ProcessInfo.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking.h"
 
 static Result process_info_open(FsProcessInfo *node, FsHandle *handle)

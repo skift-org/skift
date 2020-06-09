@@ -12,7 +12,7 @@
 #include "kernel/node/File.h"
 #include "kernel/node/Pipe.h"
 #include "kernel/node/Socket.h"
-#include "kernel/tasking.h"
+#include "kernel/scheduling/Scheduler.h"
 
 static FsNode *_filesystem_root = NULL;
 

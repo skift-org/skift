@@ -5,7 +5,8 @@
 #include <libsystem/utils/RingBuffer.h>
 
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/sheduling/Blocker.h"
+#include "kernel/scheduling/Blocker.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking.h"
 
 static RingBuffer *_interupts_to_dispatch = NULL;

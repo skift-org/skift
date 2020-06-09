@@ -9,6 +9,7 @@
 
 #include "arch/Arch.h"
 #include "kernel/memory/Memory.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"

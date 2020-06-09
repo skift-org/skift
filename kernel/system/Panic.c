@@ -4,6 +4,7 @@
 #include "arch/x86/CPUID.h"
 #include "arch/x86/Interrupts.h"
 
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 

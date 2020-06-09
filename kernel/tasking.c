@@ -13,6 +13,7 @@
 
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
+#include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking.h"
 #include "kernel/tasking/Handles.h"
@@ -24,37 +25,26 @@
 static int TID = 0;
 
 static List *all_tasks;
-static List *running_tasks;
-static List *blocked_tasks;
-
-static Task *running = NULL;
-static Task *idle;
 
 void tasking_initialize(void)
 {
-    logger_info("Initializing tasking...");
-
     all_tasks = list_create();
-    running_tasks = list_create();
-    blocked_tasks = list_create();
 
     task_shared_memory_setup();
 
-    logger_info("Spawing system services...");
+    Task *idle_task = task_spawn(NULL, "Idle", system_hang, NULL, false);
+    task_go(idle_task);
+    task_set_state(idle_task, TASK_STATE_HANG);
 
-    running = NULL;
-
-    idle = task_spawn(NULL, "Idle", system_hang, NULL, false);
-    task_go(idle);
-    task_set_state(idle, TASK_STATE_HANG);
+    scheduler_did_create_idle_task(idle_task);
 
     Task *kernel_task = task_spawn(NULL, "System", NULL, NULL, false);
     task_go(kernel_task);
 
+    scheduler_did_create_running_task(kernel_task);
+
     Task *garbage_task = task_spawn(NULL, "GarbageCollector", garbage_collector, NULL, false);
     task_go(garbage_task);
-
-    running = kernel_task;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -174,12 +164,12 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
 {
     ASSERT_ATOMIC;
 
-    Task *t = task_create(parent, name, user);
+    Task *task = task_create(parent, name, user);
 
-    task_set_entry(t, entry, user);
-    task_stack_push(t, &arg, sizeof(arg));
+    task_set_entry(task, entry, user);
+    task_stack_push(task, &arg, sizeof(arg));
 
-    return t;
+    return task;
 }
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user)
@@ -214,31 +204,8 @@ void task_set_state(Task *task, TaskState state)
 {
     ASSERT_ATOMIC;
 
-    if (task->state != state)
-    {
-
-        if (task->state == TASK_STATE_RUNNING)
-        {
-            list_remove(running_tasks, task);
-        }
-
-        if (task->state == TASK_STATE_BLOCKED)
-        {
-            list_remove(blocked_tasks, task);
-        }
-
-        task->state = state;
-
-        if (task->state == TASK_STATE_BLOCKED)
-        {
-            list_push(blocked_tasks, task);
-        }
-
-        if (task->state == TASK_STATE_RUNNING)
-        {
-            list_push(running_tasks, task);
-        }
-    }
+    scheduler_did_change_task_state(task, task->state, state);
+    task->state = state;
 }
 
 void task_set_entry(Task *task, TaskEntry entry, bool user)
@@ -369,7 +336,7 @@ Result task_cancel(Task *task, int exit_value)
 
 void task_exit(int exit_value)
 {
-    task_cancel(running, exit_value);
+    task_cancel(scheduler_running(), exit_value);
 
     scheduler_yield();
 
@@ -426,7 +393,7 @@ void task_dump(Task *task)
 
 void task_panic_dump(void)
 {
-    if (running == NULL)
+    if (scheduler_running() == NULL)
         return;
 
     atomic_begin();
@@ -702,124 +669,10 @@ void garbage_collector(void)
 {
     while (true)
     {
-        task_sleep(scheduler_running(), 100); // We don't do this really often.
+        task_sleep(scheduler_running(), 1000); // We don't do this really often.
 
         atomic_begin();
         list_iterate(all_tasks, NULL, (ListIterationCallback)destroy_task_if_canceled);
         atomic_end();
     }
-}
-
-/* -------------------------------------------------------------------------- */
-/*   SCHEDULER                                                                */
-/* -------------------------------------------------------------------------- */
-
-static bool scheduler_context_switch = false;
-static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
-
-static IterationDecision wakeup_task_if_unblocked(void *target, Task *task)
-{
-    __unused(target);
-
-    Blocker *blocker = task->blocker;
-
-    if (blocker->can_unblock(blocker, task))
-    {
-        if (blocker->on_unblock)
-        {
-            blocker->on_unblock(blocker, task);
-        }
-
-        blocker->result = BLOCKER_UNBLOCKED;
-
-        task_set_state(task, TASK_STATE_RUNNING);
-    }
-    else if (blocker->timeout != (Timeout)-1 &&
-             blocker->timeout <= system_get_tick())
-    {
-        if (blocker->on_timeout)
-        {
-            blocker->on_timeout(blocker, task);
-        }
-
-        blocker->result = BLOCKER_TIMEOUT;
-
-        task_set_state(task, TASK_STATE_RUNNING);
-    }
-
-    return ITERATION_CONTINUE;
-}
-
-uintptr_t schedule(uintptr_t current_stack_pointer)
-{
-    scheduler_context_switch = true;
-
-    running->stack_pointer = current_stack_pointer;
-    arch_save_context(running);
-
-    scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
-
-    list_iterate(blocked_tasks, NULL, (ListIterationCallback)wakeup_task_if_unblocked);
-
-    // Get the next task
-    if (!list_peek_and_pushback(running_tasks, (void **)&running))
-    {
-        // Or the idle task if there are no running tasks.
-        running = idle;
-    }
-
-    memory_pdir_switch(running->pdir);
-    arch_load_context(running);
-
-    scheduler_context_switch = false;
-
-    return running->stack_pointer;
-}
-
-/* --- Scheduler info ------------------------------------------------------- */
-
-bool scheduler_is_context_switch(void)
-{
-    return scheduler_context_switch;
-}
-
-void scheduler_yield()
-{
-    asm("int $127");
-}
-
-/* --- Running task info ---------------------------------------------------- */
-
-Task *scheduler_running(void)
-{
-    return running;
-}
-
-int scheduler_running_id(void)
-{
-    if (running != NULL)
-    {
-        return running->id;
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-int scheduler_get_usage(int task_id)
-{
-    int count = 0;
-
-    atomic_begin();
-    for (int i = 0; i < SCHEDULER_RECORD_COUNT; i++)
-    {
-        if (scheduler_record[i] == task_id)
-        {
-            count++;
-        }
-    }
-    atomic_end();
-
-    return (count * 100) / SCHEDULER_RECORD_COUNT;
 }

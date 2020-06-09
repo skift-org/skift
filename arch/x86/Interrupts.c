@@ -93,8 +93,8 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 
         if (irq == 0)
         {
-            esp = schedule(esp);
             system_tick();
+            esp = schedule(esp);
         }
         else
         {

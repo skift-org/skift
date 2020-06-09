@@ -22,8 +22,11 @@
 /* -------------------------------------------------------------------------- */
 
 static int TID = 0;
-static List *tasks;
-static List *tasks_bystates[__TASK_STATE_COUNT];
+
+static List *all_tasks;
+static List *running_tasks;
+static List *blocked_tasks;
+
 static Task *running = NULL;
 static Task *idle;
 
@@ -31,14 +34,11 @@ void tasking_initialize(void)
 {
     logger_info("Initializing tasking...");
 
-    tasks = list_create();
+    all_tasks = list_create();
+    running_tasks = list_create();
+    blocked_tasks = list_create();
 
     task_shared_memory_setup();
-
-    for (int i = 0; i < __TASK_STATE_COUNT; i++)
-    {
-        tasks_bystates[i] = list_create();
-    }
 
     logger_info("Spawing system services...");
 
@@ -110,7 +110,7 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     arch_save_context(task);
 
-    list_pushback(tasks, task);
+    list_pushback(all_tasks, task);
 
     return task;
 }
@@ -118,10 +118,11 @@ Task *task_create(Task *parent, const char *name, bool user)
 void task_destroy(Task *task)
 {
     atomic_begin();
+
     if (task->state != TASK_STATE_NONE)
         task_set_state(task, TASK_STATE_NONE);
 
-    list_remove(tasks, task);
+    list_remove(all_tasks, task);
     atomic_end();
 
     list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
@@ -146,17 +147,12 @@ void task_destroy(Task *task)
 
 List *task_all(void)
 {
-    return tasks;
-}
-
-List *task_by_state(TaskState state)
-{
-    return tasks_bystates[state];
+    return all_tasks;
 }
 
 Task *task_by_id(int id)
 {
-    list_foreach(Task, task, tasks)
+    list_foreach(Task, task, all_tasks)
     {
         if (task->id == id)
             return task;
@@ -168,7 +164,7 @@ Task *task_by_id(int id)
 int task_count(void)
 {
     atomic_begin();
-    int result = list_count(tasks);
+    int result = list_count(all_tasks);
     atomic_end();
 
     return result;
@@ -190,26 +186,26 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 {
     atomic_begin();
 
-    Task *t = task_create(parent, name, user);
+    Task *task = task_create(parent, name, user);
 
-    task_set_entry(t, entry, true);
+    task_set_entry(task, entry, true);
 
     uint argv_list[PROCESS_ARG_COUNT] = {};
 
     int argc;
     for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
     {
-        argv_list[argc] = task_stack_push(t, argv[argc], strlen(argv[argc]) + 1);
+        argv_list[argc] = task_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
     }
 
-    uint argv_list_ref = task_stack_push(t, &argv_list, sizeof(argv_list));
+    uint argv_list_ref = task_stack_push(task, &argv_list, sizeof(argv_list));
 
-    task_stack_push(t, &argv_list_ref, sizeof(argv_list_ref));
-    task_stack_push(t, &argc, sizeof(argc));
+    task_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
+    task_stack_push(task, &argc, sizeof(argc));
 
     atomic_end();
 
-    return t;
+    return task;
 }
 
 /* --- Tasks methodes ------------------------------------------------------- */
@@ -218,29 +214,37 @@ void task_set_state(Task *task, TaskState state)
 {
     ASSERT_ATOMIC;
 
-    if (task->state == state)
-        return;
-
-    // Remove the task from its old groupe.
-    if (task->state != TASK_STATE_NONE)
+    if (task->state != state)
     {
-        list_remove(tasks_bystates[task->state], task);
-    }
 
-    // Update the task state
-    task->state = state;
+        if (task->state == TASK_STATE_RUNNING)
+        {
+            list_remove(running_tasks, task);
+        }
 
-    // Add the task to the groupe
-    if (task->state != TASK_STATE_NONE)
-    {
-        list_push(tasks_bystates[task->state], task);
+        if (task->state == TASK_STATE_BLOCKED)
+        {
+            list_remove(blocked_tasks, task);
+        }
+
+        task->state = state;
+
+        if (task->state == TASK_STATE_BLOCKED)
+        {
+            list_push(blocked_tasks, task);
+        }
+
+        if (task->state == TASK_STATE_RUNNING)
+        {
+            list_push(running_tasks, task);
+        }
     }
 }
 
-void task_set_entry(Task *t, TaskEntry entry, bool user)
+void task_set_entry(Task *task, TaskEntry entry, bool user)
 {
-    t->entry = entry;
-    t->user = user;
+    task->entry = entry;
+    task->user = user;
 }
 
 uintptr_t task_stack_push(Task *task, const void *value, uint size)
@@ -587,7 +591,6 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-
     memory_mapping->address = virtual_alloc(task->pdir, memory_object->address, PAGE_ALIGN_UP(memory_object->size) / PAGE_SIZE, 1);
     memory_mapping->size = memory_object->size;
 
@@ -683,29 +686,27 @@ Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_han
 /*   GARBAGE COLLECTOR                                                        */
 /* -------------------------------------------------------------------------- */
 
-void collect_and_free_task(void)
+static IterationDecision destroy_task_if_canceled(void *target, Task *task)
 {
-    List *task_to_free = list_create();
+    __unused(target);
 
-    atomic_begin();
-    // Get canceled tasks
-    list_foreach(Task, canceled_tasks, task_by_state(TASK_STATE_CANCELED))
+    if (task->state == TASK_STATE_CANCELED)
     {
-        list_pushback(task_to_free, canceled_tasks);
+        task_destroy(task);
     }
 
-    atomic_end();
-
-    // Cleanup all of those dead tasks.
-    list_destroy_with_callback(task_to_free, (ListDestroyElementCallback)task_destroy);
+    return ITERATION_CONTINUE;
 }
 
-void garbage_collector()
+void garbage_collector(void)
 {
     while (true)
     {
         task_sleep(scheduler_running(), 100); // We don't do this really often.
-        collect_and_free_task();
+
+        atomic_begin();
+        list_iterate(all_tasks, NULL, (ListIterationCallback)destroy_task_if_canceled);
+        atomic_end();
     }
 }
 
@@ -716,64 +717,52 @@ void garbage_collector()
 static bool scheduler_context_switch = false;
 static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
 
-void wakeup_blocked_task(void)
+static IterationDecision wakeup_task_if_unblocked(void *target, Task *task)
 {
-    if (list_any(task_by_state(TASK_STATE_BLOCKED)))
+    __unused(target);
+
+    Blocker *blocker = task->blocker;
+
+    if (blocker->can_unblock(blocker, task))
     {
-        List *task_to_wakeup = list_create();
-
-        list_foreach(Task, task, task_by_state(TASK_STATE_BLOCKED))
+        if (blocker->on_unblock)
         {
-            Blocker *blocker = task->blocker;
-
-            if (blocker->can_unblock(blocker, task))
-            {
-                if (blocker->on_unblock)
-                {
-                    blocker->on_unblock(blocker, task);
-                }
-
-                blocker->result = BLOCKER_UNBLOCKED;
-
-                list_pushback(task_to_wakeup, task);
-            }
-            else if (blocker->timeout != (Timeout)-1 &&
-                     blocker->timeout <= system_get_tick())
-            {
-                if (blocker->on_timeout)
-                {
-                    blocker->on_timeout(blocker, task);
-                }
-
-                blocker->result = BLOCKER_TIMEOUT;
-
-                list_pushback(task_to_wakeup, task);
-            }
+            blocker->on_unblock(blocker, task);
         }
 
-        list_foreach(Task, task, task_to_wakeup)
-        {
-            task_set_state(task, TASK_STATE_RUNNING);
-        }
+        blocker->result = BLOCKER_UNBLOCKED;
 
-        list_destroy(task_to_wakeup);
+        task_set_state(task, TASK_STATE_RUNNING);
     }
+    else if (blocker->timeout != (Timeout)-1 &&
+             blocker->timeout <= system_get_tick())
+    {
+        if (blocker->on_timeout)
+        {
+            blocker->on_timeout(blocker, task);
+        }
+
+        blocker->result = BLOCKER_TIMEOUT;
+
+        task_set_state(task, TASK_STATE_RUNNING);
+    }
+
+    return ITERATION_CONTINUE;
 }
 
 uintptr_t schedule(uintptr_t current_stack_pointer)
 {
     scheduler_context_switch = true;
 
-    // Save the old context
     running->stack_pointer = current_stack_pointer;
     arch_save_context(running);
 
     scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
 
-    wakeup_blocked_task();
+    list_iterate(blocked_tasks, NULL, (ListIterationCallback)wakeup_task_if_unblocked);
 
     // Get the next task
-    if (!list_peek_and_pushback(task_by_state(TASK_STATE_RUNNING), (void **)&running))
+    if (!list_peek_and_pushback(running_tasks, (void **)&running))
     {
         // Or the idle task if there are no running tasks.
         running = idle;

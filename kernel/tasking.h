@@ -49,8 +49,6 @@ void task_destroy(Task *task);
 
 List *task_all(void);
 
-List *task_by_state(TaskState state);
-
 Task *task_by_id(int id);
 
 int task_count(void);

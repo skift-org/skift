@@ -15,6 +15,7 @@
     __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE)   \
     __ENTRY(ERR_INVALID_ARGUMENT)                \
     __ENTRY(ERR_IS_A_DIRECTORY)                  \
+    __ENTRY(ERR_MEMORY_NOT_ALIGNED)              \
     __ENTRY(ERR_NO_SUCH_DEVICE)                  \
     __ENTRY(ERR_NO_SUCH_FILE_OR_DIRECTORY)       \
     __ENTRY(ERR_NO_SUCH_TASK)                    \
@@ -24,6 +25,7 @@
     __ENTRY(ERR_NOT_READABLE)                    \
     __ENTRY(ERR_NOT_WRITABLE)                    \
     __ENTRY(ERR_OPERATION_NOT_SUPPORTED)         \
+    __ENTRY(ERR_OUT_OF_MEMORY)                   \
     __ENTRY(ERR_READ_ONLY_STREAM)                \
     __ENTRY(ERR_SOCKET_OPERATION_ON_NON_SOCKET)  \
     __ENTRY(ERR_STREAM_CLOSED)                   \

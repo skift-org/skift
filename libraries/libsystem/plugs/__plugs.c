@@ -1,4 +1,5 @@
 
+#include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 #include <libsystem/Lock.h>
 #include <libsystem/Logger.h>
@@ -98,13 +99,18 @@ int __plug_memalloc_unlock()
     return 0;
 }
 
-void *__plug_memalloc_alloc(uint size)
+void *__plug_memalloc_alloc(size_t size)
 {
-    uint addr = process_alloc(size);
-    return (void *)addr;
+    uintptr_t address = 0;
+    if (process_alloc(size, &address) == SUCCESS)
+    {
+        return (void *)address;
+    }
+
+    ASSERT_NOT_REACHED();
 }
 
-int __plug_memalloc_free(void *memory, uint size)
+void __plug_memalloc_free(void *address, size_t size)
 {
-    return process_free((unsigned int)memory, size);
+    process_free((uintptr_t)address, size);
 }

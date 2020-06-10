@@ -85,16 +85,16 @@ int __plug_memalloc_unlock()
     return 0;
 }
 
-void *__plug_memalloc_alloc(uint size)
+void *__plug_memalloc_alloc(size_t size)
 {
-    void *p = (void *)memory_alloc(memory_kpdir(), size * PAGE_SIZE, MEMORY_NONE);
-    return p;
+    uintptr_t address = 0;
+    assert(memory_alloc(memory_kpdir(), size, MEMORY_CLEAR, &address) == SUCCESS);
+    return (void *)address;
 }
 
-int __plug_memalloc_free(void *memory, uint size)
+void __plug_memalloc_free(void *address, size_t size)
 {
-    memory_free(memory_kpdir(), (uint)memory, size, 0);
-    return 0;
+    memory_free(memory_kpdir(), (MemoryRange){(uintptr_t)address, size});
 }
 
 /* --- Logger plugs --------------------------------------------------------- */
@@ -144,31 +144,24 @@ Result __plug_process_cancel(int pid)
     return result;
 }
 
-int __plug_process_map(uint addr, uint count)
+Result __plug_process_map(uintptr_t address, size_t size)
 {
-    return task_memory_map(scheduler_running(), addr, count);
+    return task_memory_map(scheduler_running(), (MemoryRange){address, size});
 }
 
-int __plug_process_unmap(uint addr, uint count)
+Result __plug_process_alloc(size_t size, uintptr_t *out_address)
 {
-    return task_memory_unmap(scheduler_running(), addr, count);
+    return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
-uint __plug_process_alloc(uint count)
+Result __plug_process_free(uintptr_t address, size_t size)
 {
-    return task_memory_alloc(scheduler_running(), count);
-}
-
-int __plug_process_free(uint addr, uint count)
-{
-    task_memory_free(scheduler_running(), addr, count);
-    return 0;
+    return task_memory_free(scheduler_running(), (MemoryRange){address, size});
 }
 
 Result __plug_process_get_cwd(char *buffer, uint size)
 {
-    task_get_cwd(scheduler_running(), buffer, size);
-    return SUCCESS;
+    return task_get_cwd(scheduler_running(), buffer, size);
 }
 
 Result __plug_process_set_cwd(const char *cwd)
@@ -176,12 +169,12 @@ Result __plug_process_set_cwd(const char *cwd)
     return task_set_cwd(scheduler_running(), cwd);
 }
 
-int __plug_process_sleep(int time)
+Result __plug_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
 }
 
-int __plug_process_wait(int pid, int *exit_value)
+Result __plug_process_wait(int pid, int *exit_value)
 {
     return task_wait(pid, exit_value);
 }

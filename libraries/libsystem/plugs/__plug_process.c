@@ -33,24 +33,19 @@ Result __plug_process_cancel(int pid)
     return (Result)__syscall(SYS_PROCESS_CANCEL, pid, 0, 0, 0, 0);
 }
 
-int __plug_process_map(uint addr, uint count)
+Result __plug_process_map(uintptr_t address, size_t size)
 {
-    return __syscall(SYS_PROCESS_MAP, addr, count, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_MAP, address, size, 0, 0, 0);
 }
 
-int __plug_process_unmap(uint addr, uint count)
+Result __plug_process_alloc(size_t count, uintptr_t *out_address)
 {
-    return __syscall(SYS_PROCESS_UNMAP, addr, count, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_ALLOC, count, (int)out_address, 0, 0, 0);
 }
 
-uint __plug_process_alloc(uint count)
+Result __plug_process_free(uintptr_t address, size_t size)
 {
-    return __syscall(SYS_PROCESS_ALLOC, count, 0, 0, 0, 0);
-}
-
-int __plug_process_free(uint addr, uint count)
-{
-    return __syscall(SYS_PROCESS_FREE, addr, count, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_FREE, address, size, 0, 0, 0);
 }
 
 Result __plug_process_get_cwd(char *buffer, uint size)
@@ -63,12 +58,12 @@ Result __plug_process_set_cwd(const char *cwd)
     return (Result)__syscall(SYS_PROCESS_SET_CWD, (int)cwd, 0, 0, 0, 0);
 }
 
-int __plug_process_sleep(int time)
+Result __plug_process_sleep(int time)
 {
-    return __syscall(SYS_PROCESS_SLEEP, time, 0, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_SLEEP, time, 0, 0, 0, 0);
 }
 
-int __plug_process_wait(int pid, int *exit_value)
+Result __plug_process_wait(int pid, int *exit_value)
 {
-    return __syscall(SYS_PROCESS_WAIT, pid, (int)exit_value, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_WAIT, pid, (int)exit_value, 0, 0, 0);
 }

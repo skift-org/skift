@@ -9,7 +9,7 @@ void __lock_init(Lock *lock, const char *name)
 {
     lock->locked = 0;
     lock->name = name;
-    lock->holder = 0x939393;
+    lock->holder = 0xDEADDEAD;
 }
 
 void __lock_acquire(Lock *lock)

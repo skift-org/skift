@@ -85,13 +85,11 @@ void task_panic_dump(void);
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
 
-int task_memory_map(Task *task, uint addr, uint count);
+Result task_memory_map(Task *task, MemoryRange range);
 
-int task_memory_unmap(Task *task, uint addr, uint count);
+Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address);
 
-uint task_memory_alloc(Task *task, uint count);
-
-void task_memory_free(Task *task, uint addr, uint count);
+Result task_memory_free(Task *task, MemoryRange range);
 
 /* --- Task current working directory --------------------------------------- */
 
@@ -99,7 +97,7 @@ Path *task_cwd_resolve(Task *task, const char *buffer);
 
 Result task_set_cwd(Task *task, const char *buffer);
 
-void task_get_cwd(Task *task, char *buffer, uint size);
+Result task_get_cwd(Task *task, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 

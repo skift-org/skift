@@ -31,24 +31,19 @@ Result process_cancel(int pid)
     return __plug_process_cancel(pid);
 }
 
-int process_map(uintptr_t addr, size_t count)
+Result process_map(uintptr_t address, size_t size)
 {
-    return __plug_process_map(addr, count);
+    return __plug_process_map(address, size);
 }
 
-int process_unmap(uintptr_t addr, size_t count)
+Result process_alloc(size_t size, uintptr_t *out_address)
 {
-    return __plug_process_map(addr, count);
+    return __plug_process_alloc(size, out_address);
 }
 
-uint process_alloc(size_t count)
+Result process_free(uintptr_t address, size_t size)
 {
-    return __plug_process_alloc(count);
-}
-
-int process_free(uintptr_t addr, size_t count)
-{
-    return __plug_process_free(addr, count);
+    return __plug_process_free(address, size);
 }
 
 Result process_get_cwd(char *buffer, size_t size)
@@ -61,7 +56,7 @@ Result process_set_cwd(const char *cwd)
     return __plug_process_set_cwd(cwd);
 }
 
-int process_sleep(int time)
+Result process_sleep(int time)
 {
     return __plug_process_sleep(time);
 }

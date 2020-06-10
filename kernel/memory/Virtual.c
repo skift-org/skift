@@ -73,7 +73,7 @@ int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool us
 
         if (!pde->Present)
         {
-            ptable = (PageTable *)memory_alloc_identity_page(pdir);
+            memory_alloc_identity(pdir, MEMORY_CLEAR, (uintptr_t *)&ptable);
 
             pde->Present = 1;
             pde->Write = 1;
@@ -82,6 +82,7 @@ int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool us
         }
 
         PageTableEntry *p = &ptable->entries[pti];
+
         p->Present = 1;
         p->Write = 1;
         p->User = user;

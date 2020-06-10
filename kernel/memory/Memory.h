@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/Result.h>
+
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/multiboot/Multiboot.h"
 
@@ -18,17 +20,15 @@ size_t memory_get_total(void);
 
 PageDirectory *memory_kpdir(void);
 
-uintptr_t memory_alloc(PageDirectory *pdir, size_t size, MemoryFlags flags);
+Result memory_map(PageDirectory *page_directory, MemoryRange range, MemoryFlags flags);
 
-uintptr_t memory_alloc_identity_page(PageDirectory *pdir);
+Result memory_map_identity(PageDirectory *page_directory, MemoryRange range, MemoryFlags flags);
 
-void memory_free(PageDirectory *pdir, uint addr, uint count, int user);
+Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flags, uintptr_t *out_address);
 
-int memory_map(PageDirectory *pdir, uint addr, uint count, int user);
+Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, uintptr_t *out_address);
 
-int memory_map_eternal(PageDirectory *pdir, MemoryRange range);
-
-int memory_unmap(PageDirectory *pdir, uint addr, uint count);
+Result memory_free(PageDirectory *page_directory, MemoryRange range);
 
 PageDirectory *memory_pdir_create(void);
 

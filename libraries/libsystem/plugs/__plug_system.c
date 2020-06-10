@@ -22,5 +22,7 @@ TimeStamp __plug_system_get_time(void)
 
 uint __plug_system_get_ticks()
 {
-    return __syscall(SYS_SYSTEM_GET_TICKS, 0, 0, 0, 0, 0);
+    uint result = 0;
+    __syscall(SYS_SYSTEM_GET_TICKS, (int)&result, 0, 0, 0, 0);
+    return result;
 }

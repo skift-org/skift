@@ -159,7 +159,7 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 	if (st < l_pageCount)
 		st = l_pageCount;
 
-	maj = (struct liballoc_major *)__plug_memalloc_alloc(st);
+	maj = (struct liballoc_major *)__plug_memalloc_alloc(st * l_pageSize);
 
 	if (maj == NULL)
 	{
@@ -606,7 +606,7 @@ void free(void *ptr)
 			maj->next->prev = maj->prev;
 		l_allocated -= maj->size;
 
-		__plug_memalloc_free(maj, maj->pages);
+		__plug_memalloc_free(maj, maj->pages * l_pageSize);
 	}
 	else
 	{

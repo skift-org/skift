@@ -11,7 +11,6 @@
     __ENTRY(SYS_PROCESS_GET_CWD)          \
     __ENTRY(SYS_PROCESS_SET_CWD)          \
     __ENTRY(SYS_PROCESS_MAP)              \
-    __ENTRY(SYS_PROCESS_UNMAP)            \
     __ENTRY(SYS_PROCESS_ALLOC)            \
     __ENTRY(SYS_PROCESS_FREE)             \
                                           \

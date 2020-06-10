@@ -50,7 +50,7 @@ void ramdisk_load(Module *module)
         path_destroy(file_path);
     }
 
-    memory_free(memory_kpdir(), module->range.base, module->range.size / PAGE_SIZE, false);
+    memory_free(memory_kpdir(), module->range);
 
     logger_info("Loading ramdisk succeeded.");
 }

@@ -16,7 +16,7 @@
 #include "kernel/tasking/Handles.h"
 #include "kernel/tasking/Syscalls.h"
 
-typedef int (*SyscallHandler)(int, int, int, int, int);
+typedef Result (*SyscallHandler)(int, int, int, int, int);
 
 bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 {
@@ -27,7 +27,7 @@ bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 
 /* --- Process -------------------------------------------------------------- */
 
-int sys_process_this(int *pid)
+Result sys_process_this(int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
     {
@@ -39,7 +39,7 @@ int sys_process_this(int *pid)
     return SUCCESS;
 }
 
-int sys_process_launch(Launchpad *launchpad, int *pid)
+Result sys_process_launch(Launchpad *launchpad, int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
         !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
@@ -50,14 +50,14 @@ int sys_process_launch(Launchpad *launchpad, int *pid)
     return task_launch(scheduler_running(), launchpad, pid);
 }
 
-int sys_process_exit(int code)
+Result sys_process_exit(int code)
 {
     task_exit(code);
 
     ASSERT_NOT_REACHED();
 }
 
-int sys_process_cancel(int pid)
+Result sys_process_cancel(int pid)
 {
     Result result = SUCCESS;
 
@@ -77,51 +77,69 @@ int sys_process_cancel(int pid)
     return result;
 }
 
-int sys_process_map(uint addr, uint count)
+Result sys_process_map(uintptr_t address, size_t size)
 {
-    return task_memory_map(scheduler_running(), addr, count);
+    if (syscall_validate_ptr(address, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    if (address % PAGE_SIZE || size % PAGE_SIZE)
+    {
+        return ERR_MEMORY_NOT_ALIGNED;
+    }
+
+    return task_memory_map(scheduler_running(), (MemoryRange){address, size});
 }
 
-int sys_process_unmap(uint addr, uint count)
+Result sys_process_alloc(uintptr_t size, uintptr_t *out_address)
 {
-    return task_memory_unmap(scheduler_running(), addr, count);
+    if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
-int sys_process_alloc(uint count)
+Result sys_process_free(uint address, uint size)
 {
-    return task_memory_alloc(scheduler_running(), count);
+    if (!syscall_validate_ptr(address, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    if (address % PAGE_SIZE || size % PAGE_SIZE)
+    {
+        return ERR_MEMORY_NOT_ALIGNED;
+    }
+
+    return task_memory_free(scheduler_running(), (MemoryRange){address, size});
 }
 
-int sys_process_free(uint addr, uint count)
+Result sys_process_get_cwd(char *buffer, uint size)
 {
-    task_memory_free(scheduler_running(), addr, count);
-    return 0;
+    return task_get_cwd(scheduler_running(), buffer, size);
 }
 
-int sys_process_get_cwd(char *buffer, uint size)
-{
-    task_get_cwd(scheduler_running(), buffer, size);
-    return SUCCESS;
-}
-
-int sys_process_set_cwd(const char *path)
+Result sys_process_set_cwd(const char *path)
 {
     return task_set_cwd(scheduler_running(), path);
 }
 
-int sys_process_sleep(int time)
+Result sys_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
 }
 
-int sys_process_wait(int tid, int *exit_value)
+Result sys_process_wait(int tid, int *exit_value)
 {
     return task_wait(tid, exit_value);
 }
 
 /* --- Shared memory -------------------------------------------------------- */
 
-int sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
+Result sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
     {
@@ -131,13 +149,13 @@ int sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
     return task_shared_memory_alloc(scheduler_running(), size, out_address);
 }
 
-int sys_shared_memory_free(uintptr_t address)
+Result sys_shared_memory_free(uintptr_t address)
 {
 
     return task_shared_memory_free(scheduler_running(), address);
 }
 
-int sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
+Result sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
         !syscall_validate_ptr((uintptr_t)out_size, sizeof(size_t)))
@@ -148,7 +166,7 @@ int sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_si
     return task_shared_memory_include(scheduler_running(), handle, out_address, out_size);
 }
 
-int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
+Result sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)out_handle, sizeof(int)))
     {
@@ -160,7 +178,7 @@ int sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
 
 /* --- Filesystem ----------------------------------------------------------- */
 
-int sys_filesystem_mkdir(const char *dir_path)
+Result sys_filesystem_mkdir(const char *dir_path)
 {
     Path *path = task_cwd_resolve(scheduler_running(), dir_path);
 
@@ -171,7 +189,7 @@ int sys_filesystem_mkdir(const char *dir_path)
     return result;
 }
 
-int sys_filesystem_mkpipe(const char *fifo_path)
+Result sys_filesystem_mkpipe(const char *fifo_path)
 {
     Path *path = task_cwd_resolve(scheduler_running(), fifo_path);
 
@@ -182,7 +200,7 @@ int sys_filesystem_mkpipe(const char *fifo_path)
     return result;
 }
 
-int sys_filesystem_link(const char *old_path, const char *new_path)
+Result sys_filesystem_link(const char *old_path, const char *new_path)
 {
     Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
     Path *newp = task_cwd_resolve(scheduler_running(), new_path);
@@ -195,7 +213,7 @@ int sys_filesystem_link(const char *old_path, const char *new_path)
     return result;
 }
 
-int sys_filesystem_unlink(const char *link_path)
+Result sys_filesystem_unlink(const char *link_path)
 {
     Path *path = task_cwd_resolve(scheduler_running(), link_path);
 
@@ -206,7 +224,7 @@ int sys_filesystem_unlink(const char *link_path)
     return result;
 }
 
-int sys_filesystem_rename(const char *old_path, const char *new_path)
+Result sys_filesystem_rename(const char *old_path, const char *new_path)
 {
     Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
     Path *newp = task_cwd_resolve(scheduler_running(), new_path);
@@ -221,7 +239,7 @@ int sys_filesystem_rename(const char *old_path, const char *new_path)
 
 /* --- System info getter --------------------------------------------------- */
 
-int sys_system_get_info(SystemInfo *info)
+Result sys_system_get_info(SystemInfo *info)
 {
     strncpy(info->kernel_name, "hjert", SYSTEM_INFO_FIELD_SIZE);
 
@@ -237,7 +255,7 @@ int sys_system_get_info(SystemInfo *info)
 
 ElapsedTime system_get_uptime(void);
 
-int sys_system_get_status(SystemStatus *status)
+Result sys_system_get_status(SystemStatus *status)
 {
     // FIXME: get a real uptime value;
     status->uptime = system_get_uptime();
@@ -251,21 +269,27 @@ int sys_system_get_status(SystemStatus *status)
     return SUCCESS;
 }
 
-int sys_system_get_time(TimeStamp *timestamp)
+Result sys_system_get_time(TimeStamp *timestamp)
 {
     *timestamp = arch_get_time();
 
     return SUCCESS;
 }
 
-int sys_system_get_ticks()
+Result sys_system_get_ticks(uint32_t *tick)
 {
-    return system_get_tick();
+    if (!syscall_validate_ptr((uintptr_t)tick, sizeof(uintptr_t)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    *tick = system_get_tick();
+    return SUCCESS;
 }
 
 /* --- Create --------------------------------------------------------------- */
 
-int sys_create_pipe(int *reader_handle, int *writer_handle)
+Result sys_create_pipe(int *reader_handle, int *writer_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)reader_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)writer_handle, sizeof(int)))
@@ -276,7 +300,7 @@ int sys_create_pipe(int *reader_handle, int *writer_handle)
     return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
 }
 
-int sys_create_term(int *master_handle, int *slave_handle)
+Result sys_create_term(int *master_handle, int *slave_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)master_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)slave_handle, sizeof(int)))
@@ -289,7 +313,7 @@ int sys_create_term(int *master_handle, int *slave_handle)
 
 /* --- Handles -------------------------------------------------------------- */
 
-int sys_handle_open(int *handle, const char *path, OpenFlag flags)
+Result sys_handle_open(int *handle, const char *path, OpenFlag flags)
 {
     if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)))
     {
@@ -299,12 +323,12 @@ int sys_handle_open(int *handle, const char *path, OpenFlag flags)
     return task_fshandle_open(scheduler_running(), handle, path, flags);
 }
 
-int sys_handle_close(int handle)
+Result sys_handle_close(int handle)
 {
     return task_fshandle_close(scheduler_running(), handle);
 }
 
-int sys_handle_select(
+Result sys_handle_select(
     HandleSet *handles_set,
     int *selected,
     SelectEvent *selected_events,
@@ -324,8 +348,8 @@ int sys_handle_select(
         return ERR_TOO_MANY_OPEN_FILES;
     }
 
-    // FIXME: We need to copy these because this syscall uses task_fshandle_select
-    //        who block the current thread using a blocker which does a context switch.
+    // We need to copy these because this syscall uses task_fshandle_select
+    // who block the current thread using a blocker which does a context switch.
 
     int *handles_copy = (int *)calloc(handles_set->count, sizeof(int));
     memcpy(handles_copy, handles_set->handles, handles_set->count * sizeof(int));
@@ -354,7 +378,7 @@ int sys_handle_select(
     return result;
 }
 
-int sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
+Result sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)read, sizeof(size_t)))
@@ -365,7 +389,7 @@ int sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
     return task_fshandle_read(scheduler_running(), handle, buffer, size, read);
 }
 
-int sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
+Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)written, sizeof(size_t)))
@@ -376,17 +400,17 @@ int sys_handle_write(int handle, const char *buffer, size_t size, size_t *writte
     return task_fshandle_write(scheduler_running(), handle, buffer, size, written);
 }
 
-int sys_handle_call(int handle, int request, void *args)
+Result sys_handle_call(int handle, int request, void *args)
 {
     return task_fshandle_call(scheduler_running(), handle, request, args);
 }
 
-int sys_handle_seek(int handle, int offset, Whence whence)
+Result sys_handle_seek(int handle, int offset, Whence whence)
 {
     return task_fshandle_seek(scheduler_running(), handle, offset, whence);
 }
 
-int sys_handle_tell(int handle, Whence whence, int *offset)
+Result sys_handle_tell(int handle, Whence whence, int *offset)
 {
     if (!syscall_validate_ptr((uintptr_t)offset, sizeof(int)))
     {
@@ -396,7 +420,7 @@ int sys_handle_tell(int handle, Whence whence, int *offset)
     return task_fshandle_tell(scheduler_running(), handle, whence, offset);
 }
 
-int sys_handle_stat(int handle, FileState *state)
+Result sys_handle_stat(int handle, FileState *state)
 {
     if (!syscall_validate_ptr((uintptr_t)state, sizeof(FileState)))
     {
@@ -406,17 +430,17 @@ int sys_handle_stat(int handle, FileState *state)
     return task_fshandle_stat(scheduler_running(), handle, state);
 }
 
-int sys_handle_connect(int *handle, const char *path)
+Result sys_handle_connect(int *handle, const char *path)
 {
     return task_fshandle_connect(scheduler_running(), handle, path);
 }
 
-int sys_handle_accept(int handle, int *connection_handle)
+Result sys_handle_accept(int handle, int *connection_handle)
 {
     return task_fshandle_accept(scheduler_running(), handle, connection_handle);
 }
 
-static int (*syscalls[__SYSCALL_COUNT])() = {
+static Result (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_THIS] = sys_process_this,
     [SYS_PROCESS_LAUNCH] = sys_process_launch,
     [SYS_PROCESS_EXIT] = sys_process_exit,
@@ -426,7 +450,6 @@ static int (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
     [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
     [SYS_PROCESS_MAP] = sys_process_map,
-    [SYS_PROCESS_UNMAP] = sys_process_unmap,
     [SYS_PROCESS_ALLOC] = sys_process_alloc,
     [SYS_PROCESS_FREE] = sys_process_free,
 
@@ -488,27 +511,19 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
 {
     SyscallHandler handler = syscall_get_handler(syscall);
 
-    int result = 0;
+    Result result = SUCCESS;
 
-    if (handler != NULL)
+    if (handler == NULL)
     {
-        result = handler(arg0, arg1, arg2, arg3, arg4);
-    }
-    else
-    {
-        logger_error("Invalid syscall: (%08x, %08x, %08x, %08x, %08x)", arg0, arg1, arg2, arg3, arg4);
-        result = -ERR_FUNCTION_NOT_IMPLEMENTED;
+        logger_error("Invalid syscall: %d", syscall);
+        return ERR_FUNCTION_NOT_IMPLEMENTED;
     }
 
-    if (((syscall >= SYS_SHARED_MEMORY_ALLOC && syscall <= SYS_SHARED_MEMORY_GET_HANDLE) ||
-         syscall >= SYS_HANDLE_OPEN) &&
-        (result != SUCCESS && result != TIMEOUT))
+    result = handler(arg0, arg1, arg2, arg3, arg4);
+
+    if (result != SUCCESS && result != TIMEOUT)
     {
         logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
-    }
-    else if (syscall < SYS_HANDLE_OPEN && (int)result < 0)
-    {
-        logger_warn("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)-result));
     }
 
     return result;

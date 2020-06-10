@@ -13,13 +13,11 @@ void __no_return process_exit(int code);
 
 Result process_cancel(int pid);
 
-int process_map(uintptr_t addr, size_t count);
+Result process_map(uintptr_t address, size_t size);
 
-int process_unmap(uintptr_t addr, size_t count);
+Result process_alloc(size_t size, uintptr_t *out_address);
 
-uint process_alloc(size_t count);
-
-int process_free(size_t addr, size_t count);
+Result process_free(uintptr_t address, size_t size);
 
 Result process_get_cwd(char *buffer, size_t size);
 

@@ -95,7 +95,7 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = NULL;
     }
 
-    task->stack = (byte *)memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR);
+    memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->stack);
     task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
 
     arch_save_context(task);
@@ -356,24 +356,19 @@ PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
     return oldpdir;
 }
 
-int task_memory_map(Task *task, uint addr, uint count)
+Result task_memory_map(Task *task, MemoryRange range)
 {
-    return memory_map(task->pdir, addr, count, 1);
+    return memory_map(task->pdir, range, MEMORY_USER | MEMORY_CLEAR);
 }
 
-int task_memory_unmap(Task *task, uint addr, uint count)
+Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
-    return memory_unmap(task->pdir, addr, count);
+    return memory_alloc(task->pdir, size, MEMORY_USER | MEMORY_CLEAR, out_address);
 }
 
-uint task_memory_alloc(Task *task, uint count)
+Result task_memory_free(Task *task, MemoryRange range)
 {
-    return memory_alloc(task->pdir, count * PAGE_SIZE, MEMORY_USER | MEMORY_CLEAR);
-}
-
-void task_memory_free(Task *task, uint addr, uint count)
-{
-    return memory_free(task->pdir, addr, count, MEMORY_USER | MEMORY_CLEAR);
+    return memory_free(task->pdir, range);
 }
 
 /* --- Task dump ------------------------------------------------------------ */
@@ -385,7 +380,15 @@ void task_dump(Task *task)
     printf("\n\t   State: %s", task_state_string(task->state));
     printf("\n\t   User memory: ");
     memory_pdir_dump(task->pdir, false);
-    printf("\n\t   Page directory: %08x", task->pdir);
+
+    if (task->pdir == memory_kpdir())
+    {
+        printf("\n\t   Page directory: %08x (kpdir)", task->pdir);
+    }
+    else
+    {
+        printf("\n\t   Page directory: %08x", task->pdir);
+    }
 
     printf("\n");
     atomic_end();
@@ -463,13 +466,15 @@ cleanup_and_return:
     return result;
 }
 
-void task_get_cwd(Task *task, char *buffer, uint size)
+Result task_get_cwd(Task *task, char *buffer, uint size)
 {
     lock_acquire(task->cwd_lock);
 
     path_to_cstring(task->cwd_path, buffer, size);
 
     lock_release(task->cwd_lock);
+
+    return SUCCESS;
 }
 
 /* -------------------------------------------------------------------------- */

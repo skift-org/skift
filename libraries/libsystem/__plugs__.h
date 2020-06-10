@@ -32,9 +32,9 @@ int __plug_memalloc_lock(void);
 
 int __plug_memalloc_unlock(void);
 
-void *__plug_memalloc_alloc(uint size);
+void *__plug_memalloc_alloc(size_t size);
 
-int __plug_memalloc_free(void *memory, uint size);
+void __plug_memalloc_free(void *address, size_t size);
 
 /* --- File system ---------------------------------------------------------- */
 
@@ -64,21 +64,19 @@ void __no_return __plug_process_exit(int code);
 
 Result __plug_process_cancel(int pid);
 
-int __plug_process_map(uint addr, uint count);
+Result __plug_process_map(uintptr_t address, size_t size);
 
-int __plug_process_unmap(uint addr, uint count);
+Result __plug_process_alloc(size_t size, uintptr_t *out_address);
 
-uint __plug_process_alloc(uint count);
-
-int __plug_process_free(uint addr, uint count);
+Result __plug_process_free(uintptr_t address, size_t size);
 
 Result __plug_process_get_cwd(char *buffer, uint size);
 
 Result __plug_process_set_cwd(const char *cwd);
 
-int __plug_process_sleep(int time);
+Result __plug_process_sleep(int time);
 
-int __plug_process_wait(int pid, int *exit_value);
+Result __plug_process_wait(int pid, int *exit_value);
 
 /* --- I/O ------------------------------------------------------------------ */
 

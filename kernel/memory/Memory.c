@@ -60,7 +60,7 @@ void memory_initialize(Multiboot *multiboot)
         memory_map_identity(&kpdir, multiboot->modules[i].range, MEMORY_NONE);
     }
 
-    virtual_unmap(memory_kpdir(), 0, 1); // Unmap the 0 page
+    virtual_free(memory_kpdir(), 0, 1); // Unmap the 0 page
     physical_set_used(0, 1);
 
     memory_pdir_switch(&kpdir);
@@ -123,7 +123,7 @@ Result memory_map(PageDirectory *page_directory, MemoryRange range, MemoryFlags 
     {
         uint virtual_address = range.base + i * PAGE_SIZE;
 
-        if (!virtual_present(page_directory, virtual_address, 1))
+        if (!virtual_present(page_directory, virtual_address))
         {
             uint physical_address = physical_alloc(1);
             virtual_map(page_directory, virtual_address, physical_address, 1, flags & MEMORY_USER);
@@ -216,7 +216,7 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
     {
         int address = i * PAGE_SIZE;
 
-        if (!page_present(page_directory, address) &&
+        if (!virtual_present(page_directory, address) &&
             !physical_is_used(address, 1))
         {
             physical_set_used(address, 1);
@@ -255,10 +255,10 @@ Result memory_free(PageDirectory *page_directory, MemoryRange range)
     {
         uint virtual_address = range.base + i * PAGE_SIZE;
 
-        if (virtual_present(page_directory, virtual_address, 1))
+        if (virtual_present(page_directory, virtual_address))
         {
-            physical_free(virtual2physical(page_directory, virtual_address), 1);
-            virtual_unmap(page_directory, virtual_address, 1);
+            physical_free(virtual_to_physical(page_directory, virtual_address), 1);
+            virtual_free(page_directory, virtual_address, 1);
         }
     }
 
@@ -328,18 +328,18 @@ void memory_pdir_destroy(PageDirectory *page_directory)
     atomic_end();
 }
 
-#define MEMORY_DUMP_REGION_START(__pdir, __addr)               \
-    {                                                          \
-        memory_used = true;                                    \
-        memory_empty = false;                                  \
-        current_physical = virtual2physical(__pdir, __addr);   \
-        printf("\n\t %8x [%08x:", (__addr), current_physical); \
+#define MEMORY_DUMP_REGION_START(__pdir, __addr)                \
+    {                                                           \
+        memory_used = true;                                     \
+        memory_empty = false;                                   \
+        current_physical = virtual_to_physical(__pdir, __addr); \
+        printf("\n\t %8x [%08x:", (__addr), current_physical);  \
     }
 
-#define MEMORY_DUMP_REGION_END(__pdir, __addr)                            \
-    {                                                                     \
-        memory_used = false;                                              \
-        printf("%08x] %08x", virtual2physical(__pdir, __addr), (__addr)); \
+#define MEMORY_DUMP_REGION_END(__pdir, __addr)                               \
+    {                                                                        \
+        memory_used = false;                                                 \
+        printf("%08x] %08x", virtual_to_physical(__pdir, __addr), (__addr)); \
     }
 
 void memory_pdir_dump(PageDirectory *pdir, bool user)
@@ -372,7 +372,7 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
                 }
                 else if (p->Present)
                 {
-                    uint new_physical = virtual2physical(pdir, (i * 1024 + j) * PAGE_SIZE);
+                    uint new_physical = virtual_to_physical(pdir, (i * 1024 + j) * PAGE_SIZE);
 
                     if (!(current_physical + PAGE_SIZE == new_physical))
                     {
@@ -398,5 +398,5 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
 
 void memory_pdir_switch(PageDirectory *pdir)
 {
-    paging_load_directory(virtual2physical(&kpdir, (uintptr_t)pdir));
+    paging_load_directory(virtual_to_physical(&kpdir, (uintptr_t)pdir));
 }

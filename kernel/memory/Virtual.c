@@ -9,54 +9,39 @@
 PageDirectory kpdir __aligned(PAGE_SIZE) = {};
 PageTable kptable[256] __aligned(PAGE_SIZE) = {};
 
-int page_present(PageDirectory *pdir, uint vaddr)
+bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 {
-    uint pdi = PD_INDEX(vaddr);
-    uint pti = PT_INDEX(vaddr);
+    int page_directory_index = PD_INDEX(virtual_address);
+    int page_table_index = PT_INDEX(virtual_address);
 
-    PageDirectoryEntry *pde = &pdir->entries[pdi];
+    PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
 
-    if (!pde->Present)
+    if (!page_directory_entry->Present)
     {
-        return 0;
+        return false;
     }
 
-    PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
-    PageTableEntry *p = &ptable->entries[pti];
+    PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+    PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
-    if (!p->Present)
+    if (!page_table_entry->Present)
     {
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
-int virtual_present(PageDirectory *pdir, uint vaddr, uint count)
+uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address)
 {
-    for (uint i = 0; i < count; i++)
-    {
-        uint offset = i * PAGE_SIZE;
+    int page_directory_index = PD_INDEX(virtual_address);
+    int page_table_index = PT_INDEX(virtual_address);
 
-        if (!page_present(pdir, vaddr + offset))
-        {
-            return 0;
-        }
-    }
+    PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
+    PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+    PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
-    return 1;
-}
-
-uint virtual2physical(PageDirectory *pdir, uint vaddr)
-{
-    uint pdi = PD_INDEX(vaddr);
-    uint pti = PT_INDEX(vaddr);
-
-    PageDirectoryEntry *pde = &pdir->entries[pdi];
-    PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
-    PageTableEntry *p = &ptable->entries[pti];
-
-    return (p->PageFrameNumber * PAGE_SIZE) + (vaddr & 0xfff);
+    return (page_table_entry->PageFrameNumber * PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
 int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool user)
@@ -94,26 +79,6 @@ int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool us
     return 0;
 }
 
-void virtual_unmap(PageDirectory *pdir, uint vaddr, uint count)
-{
-    for (uint i = 0; i < count; i++)
-    {
-        uint offset = i * PAGE_SIZE;
-
-        uint pdi = PD_INDEX(vaddr + offset);
-        uint pti = PT_INDEX(vaddr + offset);
-
-        PageDirectoryEntry *pde = &pdir->entries[pdi];
-        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
-        PageTableEntry *p = &ptable->entries[pti];
-
-        if (pde->Present)
-            p->as_uint = 0;
-    }
-
-    paging_invalidate_tlb();
-}
-
 uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
 {
     if (count == 0)
@@ -127,7 +92,7 @@ uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
     {
         int vaddr = i * PAGE_SIZE;
 
-        if (!page_present(pdir, vaddr))
+        if (!virtual_present(pdir, vaddr))
         {
             if (current_size == 0)
             {
@@ -153,6 +118,20 @@ uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
 
 void virtual_free(PageDirectory *pdir, uint vaddr, uint count)
 {
-    // TODO: Check if the memory was allocated with ´virtual_alloc´.
-    virtual_unmap(pdir, vaddr, count);
+    for (uint i = 0; i < count; i++)
+    {
+        uint offset = i * PAGE_SIZE;
+
+        uint pdi = PD_INDEX(vaddr + offset);
+        uint pti = PT_INDEX(vaddr + offset);
+
+        PageDirectoryEntry *pde = &pdir->entries[pdi];
+        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
+        PageTableEntry *p = &ptable->entries[pti];
+
+        if (pde->Present)
+            p->as_uint = 0;
+    }
+
+    paging_invalidate_tlb();
 }

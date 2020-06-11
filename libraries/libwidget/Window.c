@@ -299,8 +299,8 @@ void window_do_resize(Window *window, Vec2i mouse_position)
 
     Vec2i content_size = widget_compute_size(window_root(window));
 
-    new_bound.height = MAX(new_bound.height, WINDOW_HEADER_AREA + content_size.height);
-    new_bound.width = MAX(new_bound.width, MAX(widget_compute_size(window_header(window)).width, content_size.width));
+    new_bound.height = MAX(new_bound.height, WINDOW_HEADER_AREA + content_size.height + WINDOW_CONTENT_PADDING);
+    new_bound.width = MAX(new_bound.width, MAX(widget_compute_size(window_header(window)).width, content_size.width) + WINDOW_CONTENT_PADDING * 2);
 
     window_set_on_screen_bound(window, new_bound);
 

@@ -28,12 +28,12 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle
     if (widget->demo)
     {
         widget->demo->callback(widget->painter, bitmap_bound(widget->bitmap), widget->time);
-
-        painter_draw_string(widget->painter, widget_font(), widget->demo->name, vec2i(9, 17), COLOR_BLACK);
-        painter_draw_string(widget->painter, widget_font(), widget->demo->name, vec2i(8, 16), COLOR_WHITE);
     }
 
     painter_blit_bitmap_no_alpha(painter, widget->bitmap, bitmap_bound(widget->bitmap), widget_get_bound(widget));
+
+    painter_draw_string(painter, widget_font(), widget->demo->name, vec2i_add(widget_get_bound(widget).position, vec2i(9, 17)), COLOR_BLACK);
+    painter_draw_string(painter, widget_font(), widget->demo->name, vec2i_add(widget_get_bound(widget).position, vec2i(8, 16)), COLOR_WHITE);
 }
 
 void demo_widget_on_timer_tick(DemoWidget *widget)

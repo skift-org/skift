@@ -51,7 +51,7 @@ void window_initialize(
     window_header(window)->layout = HFLOW(4);
     window_header(window)->insets = INSETS(6, 6);
 
-    button_create_with_icon_and_text(window_header(window), BUTTON_TEXT, icon ? icon : "application", title);
+    button_create_with_icon_and_text(window_header(window), BUTTON_TEXT, icon ? icon : "application", title ? title : "Window");
 
     container_create(window_header(window))
         ->layout_attributes = LAYOUT_FILL;

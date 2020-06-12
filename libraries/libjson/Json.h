@@ -20,7 +20,8 @@ typedef struct JsonValue
 {
     JsonType type;
 
-    union {
+    union
+    {
         char *storage_string;
         int storage_integer;
         double storage_double;

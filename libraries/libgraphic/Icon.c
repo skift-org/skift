@@ -1,6 +1,3 @@
-/**
-
-
 #include <libgraphic/Icon.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
@@ -12,7 +9,7 @@ static HashMap *_icons;
 const char *_icon_size_names[] = {ICON_SIZE_LIST(ICON_SIZE_NAME_ENTRY)};
 
 #define ICON_SIZES_ENTRY(__size) __size,
-const int *_icon_sizes[] = {ICON_SIZE_LIST(ICON_SIZES_ENTRY)};
+const int _icon_sizes[] = {ICON_SIZE_LIST(ICON_SIZES_ENTRY)};
 
 static Icon *icon_load(const char *name)
 {
@@ -48,10 +45,8 @@ Icon *icon_get(const char *name)
 
     if (!hashmap_has(_icons, name))
     {
-        hashmap_put(_icon, name, )
+        hashmap_put(_icons, name, icon_load(name));
     }
 
     return (Icon *)hashmap_get(_icons, name);
 }
-
-**/

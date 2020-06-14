@@ -1,4 +1,5 @@
-/**
+#pragma once
+
 #include <libgraphic/Bitmap.h>
 
 #define ICON_SIZE_LIST(__ENTRY) \
@@ -21,5 +22,3 @@ typedef struct
 Icon *icon_get(const char *name);
 
 Bitmap *icon_get_bitmap(Icon *icon, IconSize size);
-
-**/

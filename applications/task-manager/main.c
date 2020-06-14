@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     Widget *cpu_icon_and_text = container_create(window->cpu_graph);
     cpu_icon_and_text->layout = HFLOW(4);
-    icon_create(cpu_icon_and_text, "memory");
+    icon_panel_create(cpu_icon_and_text, "memory");
     label_create(cpu_icon_and_text, "Processor");
 
     window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
     Widget *ram_icon_and_text = container_create(window->ram_graph);
     ram_icon_and_text->layout = HFLOW(4);
-    icon_create(ram_icon_and_text, "chip");
+    icon_panel_create(ram_icon_and_text, "chip");
     label_create(ram_icon_and_text, "Memory");
 
     window->ram_timer = timer_create(window->ram_graph, 500, (TimerCallback)widget_ram_update);

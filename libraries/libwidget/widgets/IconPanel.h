@@ -7,6 +7,6 @@ typedef struct
     Widget widget;
 
     Bitmap *bitmap;
-} Icon;
+} IconPanel;
 
-Widget *icon_create(Widget *parent, const char *name);
+Widget *icon_panel_create(Widget *parent, const char *name);

@@ -3,7 +3,7 @@
 #include <libwidget/widgets/Button.h>
 #include <libwidget/widgets/Container.h>
 #include <libwidget/widgets/Graph.h>
-#include <libwidget/widgets/Icon.h>
+#include <libwidget/widgets/IconPanel.h>
 #include <libwidget/widgets/Image.h>
 #include <libwidget/widgets/Label.h>
 #include <libwidget/widgets/Panel.h>

@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/utils/IconCache.h>
-#include <libwidget/widgets/Icon.h>
+#include <libwidget/widgets/IconPanel.h>
 
-void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
+void icon_panel_paint(IconPanel *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
@@ -21,7 +21,7 @@ void icon_paint(Icon *widget, Painter *painter, Rectangle rectangle)
     }
 }
 
-Vec2i icon_size(Icon *widget)
+Vec2i icon_panel_size(IconPanel *widget)
 {
     if (widget->bitmap)
     {
@@ -33,21 +33,21 @@ Vec2i icon_size(Icon *widget)
     }
 }
 
-static const WidgetClass icon_class = {
-    .name = "Icon",
+static const WidgetClass icon_panel_class = {
+    .name = "IconPanel",
 
-    .paint = (WidgetPaintCallback)icon_paint,
-    .size = (WidgetComputeSizeCallback)icon_size,
+    .paint = (WidgetPaintCallback)icon_panel_paint,
+    .size = (WidgetComputeSizeCallback)icon_panel_size,
 };
 
-Widget *icon_create(Widget *parent, const char *name)
+Widget *icon_panel_create(Widget *parent, const char *name)
 {
-    Icon *icon = __create(Icon);
+    IconPanel *icon = __create(IconPanel);
 
     icon->bitmap = icon_cache_get_icon(name);
     icon->bitmap->filtering = BITMAP_FILTERING_LINEAR;
 
-    widget_initialize(WIDGET(icon), &icon_class, parent);
+    widget_initialize(WIDGET(icon), &icon_panel_class, parent);
 
     return WIDGET(icon);
 }

@@ -3,6 +3,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
+#include <libwidget/Menu.h>
 #include <libwidget/Widgets.h>
 
 void widget_date_and_time_update(Widget *widget)
@@ -33,8 +34,18 @@ void widget_cpu_update(Graph *widget)
 
 void open_menu()
 {
-    Launchpad *menu = launchpad_create("menu", "/bin/menu");
-    launchpad_launch(menu, NULL);
+    //Launchpad *menu = launchpad_create("menu", "/bin/menu");
+    //launchpad_launch(menu, NULL);
+
+    Menu *menu = menu_create(NULL, "application", "");
+
+    menu_create(menu, "application", "test1");
+    menu_create(menu, "application", "test2");
+    menu_create(menu, "application", "test3");
+    menu_create(menu, "application", "test4");
+    menu_create(menu, "application", "test5");
+
+    menu_show(menu);
 }
 
 void open_task_manager()

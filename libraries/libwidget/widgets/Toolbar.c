@@ -1,5 +1,5 @@
 #include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Icon.h>
+#include <libwidget/widgets/IconPanel.h>
 #include <libwidget/widgets/Label.h>
 #include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/Toolbar.h>
@@ -21,7 +21,9 @@ Widget *toolbar_icon_create(Widget *parent, const char *icon)
     Widget *toolbar_icon = button_create(parent, BUTTON_TEXT);
     toolbar_icon->layout = STACK();
     toolbar_icon->insets = INSETS(6);
-    icon_create(toolbar_icon, icon);
+
+    icon_panel_create(toolbar_icon, icon);
+
     return toolbar_icon;
 }
 
@@ -32,7 +34,7 @@ Widget *toolbar_icon_with_text_create(Widget *parent, const char *icon, const ch
     toolbar_icon->layout = HFLOW(4);
     toolbar_icon->insets = INSETS(0, 0, 4, 8);
 
-    icon_create(toolbar_icon, icon);
+    icon_panel_create(toolbar_icon, icon);
     label_create(toolbar_icon, text);
 
     return toolbar_icon;

@@ -93,7 +93,7 @@ Widget *button_create_with_icon(Widget *parent, ButtonStyle style, const char *i
     WIDGET(button)->layout = STACK();
     WIDGET(button)->insets = INSETS(4, 4);
 
-    icon_create(button, icon)->layout_attributes = LAYOUT_FILL;
+    icon_panel_create(button, icon)->layout_attributes = LAYOUT_FILL;
 
     return button;
 }
@@ -116,7 +116,7 @@ Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, cons
     button->insets = INSETS(0, 0, 6, 8);
     button->min_width = 64;
 
-    Widget *button_icon = icon_create(button, icon);
+    Widget *button_icon = icon_panel_create(button, icon);
     button_icon->insets = INSETS(0, 0, 0, 8);
 
     label_create(button, text);

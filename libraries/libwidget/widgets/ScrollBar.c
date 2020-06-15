@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Event.h>
-#include <libwidget/utils/IconCache.h>
 #include <libwidget/widgets/ScrollBar.h>
 
 Rectangle scrollbar_button_down(ScrollBar *widget)
@@ -41,8 +40,8 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
     painter_clear_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     painter_fill_rounded_rectangle(painter, scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
 
-    painter_blit_icon(painter, icon_cache_get_icon("chevron-up"), scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
-    painter_blit_icon(painter, icon_cache_get_icon("chevron-down"), scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter_blit_icon(painter, icon_get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter_blit_icon(painter, icon_get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
 }
 
 static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)

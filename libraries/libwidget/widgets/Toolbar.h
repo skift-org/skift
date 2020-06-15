@@ -4,6 +4,6 @@
 
 Widget *toolbar_create(Widget *parent);
 
-Widget *toolbar_icon_create(Widget *parent, const char *icon);
+Widget *toolbar_icon_create(Widget *parent, Icon *icon);
 
-Widget *toolbar_icon_with_text_create(Widget *parent, const char *icon, const char *text);
+Widget *toolbar_icon_with_text_create(Widget *parent, Icon *icon, const char *text);

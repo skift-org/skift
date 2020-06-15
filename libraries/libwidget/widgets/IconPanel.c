@@ -1,31 +1,32 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/utils/IconCache.h>
 #include <libwidget/widgets/IconPanel.h>
 
 void icon_panel_paint(IconPanel *widget, Painter *painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget->bitmap)
+    if (!widget->icon)
     {
-        Rectangle destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_get_content_bound(widget));
-
-        if (widget_is_enable(WIDGET(widget)))
-        {
-            painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND));
-        }
-        else
-        {
-            painter_blit_icon(painter, widget->bitmap, destination, widget_get_color(widget, THEME_FOREGROUND_DISABLED));
-        }
+        return;
     }
+
+    Rectangle destination = rectangle_center_within(
+        icon_bound(widget->icon, ICON_18PX),
+        widget_get_content_bound(widget));
+
+    painter_blit_icon(
+        painter,
+        widget->icon,
+        ICON_18PX,
+        destination,
+        widget_get_color(widget, THEME_FOREGROUND));
 }
 
 Vec2i icon_panel_size(IconPanel *widget)
 {
-    if (widget->bitmap)
+    if (widget->icon)
     {
-        return bitmap_bound(widget->bitmap).size;
+        return icon_bound(widget->icon, ICON_18PX).size;
     }
     else
     {
@@ -40,14 +41,12 @@ static const WidgetClass icon_panel_class = {
     .size = (WidgetComputeSizeCallback)icon_panel_size,
 };
 
-Widget *icon_panel_create(Widget *parent, const char *name)
+Widget *icon_panel_create(Widget *parent, Icon *icon)
 {
-    IconPanel *icon = __create(IconPanel);
+    IconPanel *widget = __create(IconPanel);
 
-    icon->bitmap = icon_cache_get_icon(name);
-    icon->bitmap->filtering = BITMAP_FILTERING_LINEAR;
+    widget->icon = icon;
+    widget_initialize(WIDGET(widget), &icon_panel_class, parent);
 
-    widget_initialize(WIDGET(icon), &icon_panel_class, parent);
-
-    return WIDGET(icon);
+    return WIDGET(widget);
 }

@@ -9,8 +9,8 @@ typedef struct
 
     Path *path;
 
-    Bitmap *icon_computer;
-    Bitmap *icon_expand;
+    Icon *icon_computer;
+    Icon *icon_expand;
 } Breadcrumb;
 
 Widget *breadcrumb_create(Widget *parent, const char *current_path);

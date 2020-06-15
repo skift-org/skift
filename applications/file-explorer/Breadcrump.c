@@ -1,6 +1,5 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Window.h>
-#include <libwidget/utils/IconCache.h>
 
 #include "file-explorer/Breadcrumb.h"
 
@@ -14,15 +13,16 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
     Rectangle computer_icon_bound = (Rectangle){{
         widget_get_bound(widget).x,
         widget_get_bound(widget).y,
-        bitmap_bound(widget->icon_computer).width + 16,
+        icon_bound(widget->icon_computer, ICON_18PX).width + 16,
         widget_get_bound(widget).height,
     }};
 
     painter_blit_icon(
         painter,
         widget->icon_computer,
+        ICON_18PX,
         rectangle_center_within(
-            bitmap_bound(widget->icon_computer),
+            icon_bound(widget->icon_computer, ICON_18PX),
             computer_icon_bound),
         widget_get_color(widget, THEME_FOREGROUND));
 
@@ -33,15 +33,16 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
         Rectangle expand_icon_bound = (Rectangle){{
             widget_get_bound(widget).x + current,
             widget_get_bound(widget).y,
-            bitmap_bound(widget->icon_expand).width,
+            icon_bound(widget->icon_expand, ICON_18PX).width,
             widget_get_bound(widget).height,
         }};
 
         painter_blit_icon(
             painter,
             widget->icon_expand,
+            ICON_18PX,
             rectangle_center_within(
-                bitmap_bound(widget->icon_expand),
+                icon_bound(widget->icon_expand, ICON_18PX),
                 expand_icon_bound),
             widget_get_color(widget, THEME_FOREGROUND));
 
@@ -65,7 +66,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             painter,
             widget_font(),
             element,
-            vec2i_add(element_bound.position, vec2i(0, 20)),
+            vec2i_add(element_bound.position, vec2i(0, 19)),
             widget_get_color(widget, THEME_FOREGROUND));
 
         current += text_width;
@@ -75,15 +76,16 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             Rectangle expand_icon_bound = (Rectangle){{
                 widget_get_bound(widget).x + current,
                 widget_get_bound(widget).y,
-                bitmap_bound(widget->icon_expand).width,
+                icon_bound(widget->icon_expand, ICON_18PX).width,
                 widget_get_bound(widget).height,
             }};
 
             painter_blit_icon(
                 painter,
                 widget->icon_expand,
+                ICON_18PX,
                 rectangle_center_within(
-                    bitmap_bound(widget->icon_expand),
+                    icon_bound(widget->icon_expand, ICON_18PX),
                     expand_icon_bound),
                 widget_get_color(widget, THEME_FOREGROUND));
 
@@ -109,8 +111,8 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
     Breadcrumb *widget = __create(Breadcrumb);
 
     widget->path = path_create(current_path);
-    widget->icon_computer = icon_cache_get_icon("laptop");
-    widget->icon_expand = icon_cache_get_icon("chevron-right");
+    widget->icon_computer = icon_get("laptop");
+    widget->icon_expand = icon_get("chevron-right");
 
     widget_initialize(WIDGET(widget), &breadcrumb_class, parent);
 

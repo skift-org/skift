@@ -54,7 +54,10 @@ int main(int argc, char **argv)
 {
     if (application_initialize(argc, argv) == SUCCESS)
     {
-        Window *window = window_create("console-line", "Terminal", 500, 400, WINDOW_RESIZABLE);
+        Window *window = window_create(500, 400, WINDOW_RESIZABLE);
+
+        window_set_icon(window, icon_get("console-line"));
+        window_set_title(window, "Terminal");
 
         Widget *widget = terminal_widget_create(window_root(window));
         widget_set_focus(widget);

@@ -43,10 +43,10 @@ typedef struct
     Widget *fill;
     Widget *picker;
 
-    // TODO:
-    // Widget *insert_line;
-    // Widget *insert_rectangle;
-    // Widget *insert_circle;
+    Widget *insert_text;
+    Widget *insert_line;
+    Widget *insert_rectangle;
+    Widget *insert_circle;
 
     Widget *primary_color;
     Widget *secondary_color;
@@ -97,36 +97,36 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
 {
     Widget *toolbar = toolbar_create(parent);
 
-    window->open_document = toolbar_icon_create(toolbar, "folder-open");
-    window->save_document = toolbar_icon_create(toolbar, "content-save");
-    window->new_document = toolbar_icon_create(toolbar, "image-plus");
+    window->open_document = toolbar_icon_create(toolbar, icon_get("folder-open"));
+    window->save_document = toolbar_icon_create(toolbar, icon_get("content-save"));
+    window->new_document = toolbar_icon_create(toolbar, icon_get("image-plus"));
 
     separator_create(toolbar);
 
-    window->pencil = toolbar_icon_create(toolbar, "pencil");
+    window->pencil = toolbar_icon_create(toolbar, icon_get("pencil"));
     widget_set_event_handler(window->pencil, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_pencil));
 
-    window->brush = toolbar_icon_create(toolbar, "brush");
+    window->brush = toolbar_icon_create(toolbar, icon_get("brush"));
     widget_set_event_handler(window->brush, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_brush));
 
-    window->eraser = toolbar_icon_create(toolbar, "eraser");
+    window->eraser = toolbar_icon_create(toolbar, icon_get("eraser"));
     widget_set_event_handler(window->eraser, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_eraser));
 
-    window->fill = toolbar_icon_create(toolbar, "format-color-fill");
+    window->fill = toolbar_icon_create(toolbar, icon_get("format-color-fill"));
     widget_set_event_handler(window->fill, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_fill));
 
-    window->picker = toolbar_icon_create(toolbar, "eyedropper");
+    window->picker = toolbar_icon_create(toolbar, icon_get("eyedropper"));
     widget_set_event_handler(window->picker, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_picker));
 
     separator_create(toolbar);
 
     // TODO:
-    // window->insert_text = toolbar_icon_create(toolbar, "format-text-variant");
-    // window->insert_line = toolbar_icon_create(toolbar,  "vector-line");
-    // window->insert_rectangle = toolbar_icon_create(toolbar, "rectangle-outline");
-    // window->insert_circle = toolbar_icon_create(toolbar,  "circle-outline");
-    //
-    // separator_create(toolbar);
+    window->insert_text = toolbar_icon_create(toolbar, icon_get("format-text-variant"));
+    window->insert_line = toolbar_icon_create(toolbar, icon_get("vector-line"));
+    window->insert_rectangle = toolbar_icon_create(toolbar, icon_get("rectangle-outline"));
+    window->insert_circle = toolbar_icon_create(toolbar, icon_get("circle-outline"));
+
+    separator_create(toolbar);
 
     Widget *primary_color_container = container_create(toolbar);
     primary_color_container->min_width = 22;
@@ -177,7 +177,10 @@ static Window *paint_create_window(PaintDocument *document)
 {
     PaintWindow *window = __create(PaintWindow);
     window->document = document;
-    window_initialize((Window *)window, "brush", "Paint", 600, 560, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, 600, 560, WINDOW_RESIZABLE);
+
+    window_set_icon((Window *)window, icon_get("brush"));
+    window_set_title((Window *)window, "Paint");
 
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);

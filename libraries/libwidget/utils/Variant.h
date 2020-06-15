@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libgraphic/Bitmap.h>
+#include <libgraphic/Icon.h>
 
 #define VARIANT_STRING_SIZE 128
 
@@ -15,7 +15,7 @@ typedef struct
 {
     VarianType type;
 
-    Bitmap *icon;
+    Icon *icon;
 
     union {
         int as_int;

@@ -52,13 +52,18 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
-    window_initialize((Window *)window, "memory", "Task Manager", 700, 500, WINDOW_RESIZABLE);
+
+    window_initialize((Window *)window, 700, 500, WINDOW_RESIZABLE);
+
+    window_set_icon((Window *)window, icon_get("memory"));
+    window_set_title((Window *)window, "Task Manager");
+
     window_root((Window *)window)->layout = VFLOW(0);
 
     /// --- Toolbar --- ///
     Widget *toolbar = toolbar_create(window_root((Window *)window));
-    button_create_with_icon_and_text(toolbar, BUTTON_FILLED, "plus", "New task");
-    button_create_with_icon_and_text(toolbar, BUTTON_TEXT, "close", "Cancel task");
+    button_create_with_icon_and_text(toolbar, BUTTON_FILLED, icon_get("plus"), "New task");
+    button_create_with_icon_and_text(toolbar, BUTTON_TEXT, icon_get("close"), "Cancel task");
 
     /// --- Table view --- //
     window->table_model = task_model_create();
@@ -80,7 +85,7 @@ int main(int argc, char **argv)
 
     Widget *cpu_icon_and_text = container_create(window->cpu_graph);
     cpu_icon_and_text->layout = HFLOW(4);
-    icon_panel_create(cpu_icon_and_text, "memory");
+    icon_panel_create(cpu_icon_and_text, icon_get("memory"));
     label_create(cpu_icon_and_text, "Processor");
 
     window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
@@ -95,7 +100,7 @@ int main(int argc, char **argv)
 
     Widget *ram_icon_and_text = container_create(window->ram_graph);
     ram_icon_and_text->layout = HFLOW(4);
-    icon_panel_create(ram_icon_and_text, "chip");
+    icon_panel_create(ram_icon_and_text, icon_get("chip"));
     label_create(ram_icon_and_text, "Memory");
 
     window->ram_timer = timer_create(window->ram_graph, 500, (TimerCallback)widget_ram_update);

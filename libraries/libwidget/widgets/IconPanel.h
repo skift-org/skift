@@ -1,12 +1,12 @@
 #pragma once
 
+#include <libgraphic/Icon.h>
 #include <libwidget/Widget.h>
 
 typedef struct
 {
     Widget widget;
-
-    Bitmap *bitmap;
+    Icon *icon;
 } IconPanel;
 
-Widget *icon_panel_create(Widget *parent, const char *name);
+Widget *icon_panel_create(Widget *parent, Icon *icon);

@@ -21,16 +21,49 @@ static void close_button_click(void *target, struct Widget *sender, struct Event
     window_hide(sender->window);
 }
 
+void window_populate_header(Window *window)
+{
+    widget_clear_childs(window->header_container);
+
+    window_header(window)->layout = HFLOW(4);
+    window_header(window)->insets = INSETS(6, 6);
+
+    button_create_with_icon_and_text(
+        window_header(window),
+        BUTTON_TEXT,
+        window->icon,
+        window->title);
+
+    container_create(window_header(window))
+        ->layout_attributes = LAYOUT_FILL;
+
+    if (window->flags & WINDOW_RESIZABLE)
+    {
+        Widget *button_minimize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-minimize"));
+        button_minimize->insets = INSETS(3);
+
+        Widget *button_maximize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-maximize"));
+        button_maximize->insets = INSETS(3);
+    }
+
+    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-close"));
+    close_button->insets = INSETS(3);
+
+    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
+}
+
 void window_initialize(
     Window *window,
-    const char *icon,
-    const char *title,
     int width,
     int height,
     WindowFlag flags)
 {
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
+    window->title = strdup("Window");
+    window->icon = icon_get("application");
+    window->flags = flags;
+
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
@@ -48,22 +81,7 @@ void window_initialize(
     window->header_container = container_create(NULL);
     window->header_container->window = window;
 
-    window_header(window)->layout = HFLOW(4);
-    window_header(window)->insets = INSETS(6, 6);
-
-    button_create_with_icon_and_text(window_header(window), BUTTON_TEXT, icon ? icon : "application", title ? title : "Window");
-
-    container_create(window_header(window))
-        ->layout_attributes = LAYOUT_FILL;
-
-    if (flags & WINDOW_RESIZABLE)
-    {
-        button_create_with_icon(window_header(window), BUTTON_TEXT, "window-minimize");
-        button_create_with_icon(window_header(window), BUTTON_TEXT, "window-maximize");
-    }
-
-    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, "window-close");
-    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
+    window_populate_header(window);
 
     window->root_container = container_create(NULL);
     window->root_container->window = window;
@@ -71,21 +89,17 @@ void window_initialize(
     window->focused_widget = window->root_container;
     window->widget_by_id = hashmap_create_string_to_value();
 
-    window->flags = flags;
-
     application_add_window(window);
 }
 
 Window *window_create(
-    const char *icon,
-    const char *title,
     int width,
     int height,
     WindowFlag flags)
 {
     Window *window = __create(Window);
 
-    window_initialize(window, icon, title, width, height, flags);
+    window_initialize(window, width, height, flags);
 
     return window;
 }
@@ -115,7 +129,28 @@ void window_destroy(Window *window)
         window->destroy(window);
     }
 
+    free(window->title);
     free(window);
+}
+
+void window_set_title(Window *window, const char *title)
+{
+    if (title)
+    {
+        free(window->title);
+        window->title = strdup(title);
+
+        window_populate_header(window);
+    }
+}
+
+void window_set_icon(Window *window, Icon *icon)
+{
+    if (icon)
+    {
+        window->icon = icon;
+        window_populate_header(window);
+    }
 }
 
 bool window_is_visible(Window *window)

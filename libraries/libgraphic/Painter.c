@@ -617,8 +617,10 @@ void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radiu
     painter_fill_rectangle(painter, rectangle_bottom(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
 }
 
-__attribute__((flatten)) void painter_blit_icon(Painter *painter, Bitmap *icon, Rectangle destination, Color color)
+__attribute__((flatten)) void painter_blit_icon(Painter *painter, Icon *icon, IconSize size, Rectangle destination, Color color)
 {
+    Bitmap *bitmap = icon_get_bitmap(icon, size);
+
     for (int x = 0; x < destination.width; x++)
     {
         for (int y = 0; y < destination.height; y++)
@@ -626,7 +628,7 @@ __attribute__((flatten)) void painter_blit_icon(Painter *painter, Bitmap *icon, 
             double xx = x / (double)destination.width;
             double yy = y / (double)destination.height;
 
-            Color sample = bitmap_sample(icon, bitmap_bound(icon), xx, yy);
+            Color sample = bitmap_sample(bitmap, bitmap_bound(bitmap), xx, yy);
 
             Color final = color;
             final.A = sample.A;

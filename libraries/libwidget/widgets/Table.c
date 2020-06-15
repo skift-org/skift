@@ -67,6 +67,7 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
         painter_blit_icon(
             painter,
             data.icon,
+            ICON_18PX,
             (Rectangle){{cell_bound.x + 4, cell_bound.y + 3, 18, 18}},
             widget_get_color(widget, THEME_FOREGROUND));
 

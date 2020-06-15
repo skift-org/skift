@@ -45,7 +45,12 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
-    window_initialize((Window *)window, "expansion-card-variant", "Device Manager", 700, 500, WINDOW_RESIZABLE);
+
+    window_initialize((Window *)window, 700, 500, WINDOW_RESIZABLE);
+
+    window_set_icon((Window *)window, icon_get("expansion-card-variant"));
+    window_set_title((Window *)window, "Device Manager");
+
     window_root((Window *)window)->layout = VFLOW(0);
 
     /// --- Table view --- //

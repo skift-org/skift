@@ -20,6 +20,9 @@ typedef void (*WindowDestroyCallback)(struct Window *window);
 typedef struct Window
 {
     int handle;
+    char *title;
+    Icon *icon;
+    WindowFlag flags;
 
     bool focused;
     bool visible;
@@ -52,26 +55,24 @@ typedef struct Window
     Widget *mouse_focused_widget;
     Widget *mouse_over_widget;
     HashMap *widget_by_id;
-
-    WindowFlag flags;
 } Window;
 
 Window *window_create(
-    const char *icon,
-    const char *title,
     int width,
     int height,
     WindowFlag flags);
 
 void window_initialize(
     Window *window,
-    const char *icon,
-    const char *title,
     int width,
     int height,
     WindowFlag flags);
 
 void window_destroy(Window *window);
+
+void window_set_title(Window *window, const char *title);
+
+void window_set_icon(Window *window, Icon *icon);
 
 void window_show(Window *window);
 

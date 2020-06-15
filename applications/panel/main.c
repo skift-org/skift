@@ -34,18 +34,8 @@ void widget_cpu_update(Graph *widget)
 
 void open_menu()
 {
-    //Launchpad *menu = launchpad_create("menu", "/bin/menu");
-    //launchpad_launch(menu, NULL);
-
-    Menu *menu = menu_create(NULL, "application", "");
-
-    menu_create(menu, "application", "test1");
-    menu_create(menu, "application", "test2");
-    menu_create(menu, "application", "test3");
-    menu_create(menu, "application", "test4");
-    menu_create(menu, "application", "test5");
-
-    menu_show(menu);
+    Launchpad *menu = launchpad_create("menu", "/bin/menu");
+    launchpad_launch(menu, NULL);
 }
 
 void open_task_manager()
@@ -58,12 +48,14 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(NULL, "Panel", 1024, 36, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = window_create(1024, 36, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+
+    window_set_title(window, "Panel");
 
     window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = INSETS(4);
 
-    Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, "menu", "skiftOS");
+    Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, icon_get("menu"), "skiftOS");
     widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(NULL, open_menu));
 
     Widget *widget_date_and_time = label_create(window_root(window), "");

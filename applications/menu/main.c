@@ -123,7 +123,7 @@ void menu_create_list(Widget *parent, List *menu)
 
     list_foreach(MenuEntry, entry, menu)
     {
-        Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, entry->icon, entry->name);
+        Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, icon_get(entry->icon), entry->name);
         item->insets = INSETS(8);
         widget_set_event_handler(item, EVENT_ACTION, EVENT_HANDLER(entry, (EventHandlerCallback)menu_item_click));
     }
@@ -135,7 +135,9 @@ int main(int argc, char **argv)
 
     List *menu = load_menu();
 
-    Window *window = window_create(NULL, "Panel", 320, 768, WINDOW_BORDERLESS | WINDOW_POP_OVER);
+    Window *window = window_create(320, 768, WINDOW_BORDERLESS | WINDOW_POP_OVER);
+
+    window_set_title(window, "Panel");
 
     window_root(window)->layout = VFLOW(8);
 

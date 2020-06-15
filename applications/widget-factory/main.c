@@ -5,7 +5,10 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create("widgets", "Widget Factory", 500, 400, WINDOW_RESIZABLE);
+    Window *window = window_create(500, 400, WINDOW_RESIZABLE);
+
+    window_set_icon(window, icon_get("widgets"));
+    window_set_title(window, "Widget Factory");
 
     window_root(window)->layout = VFLOW(8);
 
@@ -32,9 +35,9 @@ int main(int argc, char **argv)
         button_create_with_text(buttons, BUTTON_TEXT, "BUTTON");
         button_create_with_text(buttons, BUTTON_OUTLINE, "BUTTON");
         button_create_with_text(buttons, BUTTON_FILLED, "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_TEXT, "widgets", "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_OUTLINE, "widgets", "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_FILLED, "widgets", "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_TEXT, icon_get("widgets"), "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_OUTLINE, icon_get("widgets"), "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_FILLED, icon_get("widgets"), "BUTTON");
     }
 
     label_create(window_root(window), "Grid layout");

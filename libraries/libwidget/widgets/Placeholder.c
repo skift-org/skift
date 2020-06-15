@@ -1,7 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/CString.h>
 #include <libwidget/Window.h>
-#include <libwidget/utils/IconCache.h>
 #include <libwidget/widgets/Placeholder.h>
 
 void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rectangle)
@@ -9,7 +8,14 @@ void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rec
     __unused(rectangle);
     painter_draw_rectangle(painter, widget_get_bound(placeholder), COLOR_RED);
 
-    painter_blit_icon(painter, icon_cache_get_icon("alert"), rectangle_offset(RECTANGLE_SIZE(18, 18), vec2i_add(widget_get_bound(placeholder).position, vec2i(8, 8))), COLOR_RED);
+    Icon *alert_icon = icon_get("alert");
+
+    painter_blit_icon(
+        painter,
+        alert_icon,
+        ICON_18PX,
+        rectangle_offset(icon_bound(alert_icon, ICON_18PX), vec2i_add(widget_get_bound(placeholder).position, vec2i(8, 8))),
+        COLOR_RED);
 
     painter_draw_string(
         painter,

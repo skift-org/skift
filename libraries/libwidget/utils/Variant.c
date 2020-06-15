@@ -1,6 +1,5 @@
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
-#include <libwidget/utils/IconCache.h>
 #include <libwidget/utils/Variant.h>
 
 Variant vint(int value)
@@ -66,7 +65,7 @@ Variant vstringf(const char *fmt, ...)
 
 Variant variant_with_icon(Variant variant, const char *icon)
 {
-    variant.icon = icon_cache_get_icon(icon);
+    variant.icon = icon_get(icon);
 
     return variant;
 }

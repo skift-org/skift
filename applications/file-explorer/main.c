@@ -142,7 +142,11 @@ Window *file_explorer_window_create(const char *current_path)
 {
     FileExplorerWindow *window = __create(FileExplorerWindow);
 
-    window_initialize((Window *)window, "folder", "File Explorer", 700, 500, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, 700, 500, WINDOW_RESIZABLE);
+
+    window_set_icon((Window *)window, icon_get("folder"));
+    window_set_title((Window *)window, "File Explorer");
+
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);
 
@@ -153,19 +157,19 @@ Window *file_explorer_window_create(const char *current_path)
     /// --- Navigation bar --- ///
     Widget *toolbar = toolbar_create(root);
 
-    Widget *backward_button = toolbar_icon_create(toolbar, "arrow-left");
+    Widget *backward_button = toolbar_icon_create(toolbar, icon_get("arrow-left"));
     widget_set_event_handler(backward_button, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)go_backward));
     window->go_backward = backward_button;
 
-    Widget *foreward_button = toolbar_icon_create(toolbar, "arrow-right");
+    Widget *foreward_button = toolbar_icon_create(toolbar, icon_get("arrow-right"));
     widget_set_event_handler(foreward_button, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)go_foreward));
     window->go_foreward = foreward_button;
 
-    Widget *up_button = toolbar_icon_create(toolbar, "arrow-up");
+    Widget *up_button = toolbar_icon_create(toolbar, icon_get("arrow-up"));
     widget_set_event_handler(up_button, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)go_up));
     window->go_up = up_button;
 
-    Widget *home_button = toolbar_icon_create(toolbar, "home");
+    Widget *home_button = toolbar_icon_create(toolbar, icon_get("home"));
     widget_set_event_handler(home_button, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)go_home));
     window->go_home = home_button;
 
@@ -176,7 +180,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     separator_create(toolbar);
 
-    toolbar_icon_create(toolbar, "refresh");
+    toolbar_icon_create(toolbar, icon_get("refresh"));
 
     update_navigation_bar(window);
 

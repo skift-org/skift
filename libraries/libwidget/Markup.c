@@ -229,7 +229,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             widget = button_create_with_icon_and_text(
                 parent,
                 button_style,
-                markup_node_get_attribute_or_default(node, "icon", "duck"),
+                icon_get(markup_node_get_attribute_or_default(node, "icon", "duck")),
                 markup_node_get_attribute_or_default(node, "text", "Button"));
         }
         else if (markup_node_has_attribute(node, "text"))
@@ -244,7 +244,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             widget = button_create_with_icon(
                 parent,
                 button_style,
-                markup_node_get_attribute_or_default(node, "icon", "duck"));
+                icon_get(markup_node_get_attribute_or_default(node, "icon", "duck")));
         }
         else
         {
@@ -290,15 +290,27 @@ void widget_create_childs_from_markup(Widget *parent, MarkupNode *node)
 
 Window *window_create_from_markup(MarkupNode *node)
 {
-    const char *icon = markup_node_get_attribute_or_default(node, "icon", "application");
-    const char *title = markup_node_get_attribute_or_default(node, "title", "Window");
-
     int width = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "width"), 250);
+
     int height = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "height"), 250);
 
-    logger_trace("Window size: %s %d", markup_node_get_attribute(node, "width"), width);
+    Window *window = window_create(width, height, WINDOW_NONE);
 
-    return window_create(icon, title, width, height, WINDOW_NONE);
+    const char *icon = markup_node_get_attribute(node, "icon");
+
+    if (icon)
+    {
+        window_set_icon(window, icon_get(icon));
+    }
+
+    const char *title = markup_node_get_attribute(node, "title");
+
+    if (title)
+    {
+        window_set_title(window, title);
+    }
+
+    return window;
 }
 
 Window *window_create_from_file(const char *path)

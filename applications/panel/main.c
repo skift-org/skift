@@ -48,9 +48,10 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(1024, 36, WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_set_title(window, "Panel");
+    window_set_size(window, vec2i(1024, 36));
 
     window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = INSETS(4);

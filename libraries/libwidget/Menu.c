@@ -35,7 +35,9 @@ void menu_destroy(Menu *menu)
 
 void menu_show(Menu *menu)
 {
-    Window *window = window_create(128, list_count(menu->items) * 32, WINDOW_POP_OVER | WINDOW_BORDERLESS);
+    Window *window = window_create(WINDOW_POP_OVER | WINDOW_BORDERLESS);
+
+    window_set_size(window, vec2i(128, list_count(menu->items) * 32));
 
     window_root(window)->layout = VGRID(4);
 

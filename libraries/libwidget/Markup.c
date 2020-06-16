@@ -290,11 +290,14 @@ void widget_create_childs_from_markup(Widget *parent, MarkupNode *node)
 
 Window *window_create_from_markup(MarkupNode *node)
 {
+
+    Window *window = window_create(WINDOW_NONE);
+
     int width = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "width"), 250);
 
     int height = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "height"), 250);
 
-    Window *window = window_create(width, height, WINDOW_NONE);
+    window_set_size(window, vec2i(width, height));
 
     const char *icon = markup_node_get_attribute(node, "icon");
 

@@ -30,10 +30,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *window = window_create(500, 400, WINDOW_RESIZABLE);
+    Window *window = window_create(WINDOW_RESIZABLE);
 
     window_set_icon(window, icon_get("duck"));
     window_set_title(window, "Demos");
+    window_set_size(window, vec2i(500, 400));
 
     window_root(window)->layout = VFLOW(0);
 

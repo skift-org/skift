@@ -5,10 +5,11 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(500, 400, WINDOW_RESIZABLE);
+    Window *window = window_create(WINDOW_RESIZABLE);
 
     window_set_icon(window, icon_get("widgets"));
     window_set_title(window, "Widget Factory");
+    window_set_size(window, vec2i(500, 400));
 
     window_root(window)->layout = VFLOW(8);
 

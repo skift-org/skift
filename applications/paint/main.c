@@ -177,10 +177,11 @@ static Window *paint_create_window(PaintDocument *document)
 {
     PaintWindow *window = __create(PaintWindow);
     window->document = document;
-    window_initialize((Window *)window, 600, 560, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, WINDOW_RESIZABLE);
 
     window_set_icon((Window *)window, icon_get("brush"));
     window_set_title((Window *)window, "Paint");
+    window_set_size((Window *)window, vec2i(600, 560));
 
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);

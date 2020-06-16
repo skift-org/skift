@@ -52,11 +52,7 @@ void window_populate_header(Window *window)
     widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
 }
 
-void window_initialize(
-    Window *window,
-    int width,
-    int height,
-    WindowFlag flags)
+void window_initialize(Window *window, WindowFlag flags)
 {
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
@@ -67,15 +63,15 @@ void window_initialize(
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
-    window->frontbuffer = bitmap_create(width, height);
+    window->frontbuffer = bitmap_create(250, 250);
     window->frontbuffer_painter = painter_create(window->frontbuffer);
     shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
 
-    window->backbuffer = bitmap_create(width, height);
+    window->backbuffer = bitmap_create(250, 250);
     window->backbuffer_painter = painter_create(window->backbuffer);
     shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
 
-    window->on_screen_bound = RECTANGLE_SIZE(width, height);
+    window->on_screen_bound = RECTANGLE_SIZE(250, 250);
     window->dirty_rect = list_create();
 
     window->header_container = container_create(NULL);
@@ -92,14 +88,11 @@ void window_initialize(
     application_add_window(window);
 }
 
-Window *window_create(
-    int width,
-    int height,
-    WindowFlag flags)
+Window *window_create(WindowFlag flags)
 {
     Window *window = __create(Window);
 
-    window_initialize(window, width, height, flags);
+    window_initialize(window, flags);
 
     return window;
 }
@@ -153,6 +146,59 @@ void window_set_icon(Window *window, Icon *icon)
     }
 }
 
+void window_set_size(Window *window, Vec2i size)
+{
+    Rectangle bound = window->on_screen_bound;
+
+    bound.size = size;
+
+    window_set_bound(window, bound);
+}
+
+void window_set_position(Window *window, Vec2i position)
+{
+    Rectangle bound = window->on_screen_bound;
+
+    bound.position = position;
+
+    window_set_bound(window, bound);
+}
+
+static void window_change_framebuffer_if_needed(Window *window)
+{
+    if (window_bound(window).width != bitmap_bound(window->frontbuffer).width ||
+        window_bound(window).height != bitmap_bound(window->frontbuffer).height)
+    {
+        painter_destroy(window->frontbuffer_painter);
+        bitmap_destroy(window->frontbuffer);
+
+        painter_destroy(window->backbuffer_painter);
+        bitmap_destroy(window->backbuffer);
+
+        window->frontbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->frontbuffer_painter = painter_create(window->frontbuffer);
+        shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
+
+        window->backbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->backbuffer_painter = painter_create(window->backbuffer);
+        shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
+    }
+}
+
+void window_set_bound(Window *window, Rectangle bound)
+{
+    window->on_screen_bound = bound;
+
+    if (!window->visible)
+        return;
+
+    application_resize_window(window, window->on_screen_bound);
+
+    window_change_framebuffer_if_needed(window);
+    window_schedule_layout(window);
+    window_schedule_update(window, window_bound(window));
+}
+
 bool window_is_visible(Window *window)
 {
     return window->visible;
@@ -165,6 +211,7 @@ void window_show(Window *window)
 
     window->visible = true;
 
+    window_change_framebuffer_if_needed(window);
     window_schedule_layout(window);
     window_schedule_update(window, window_bound(window));
     application_show_window(window);
@@ -200,27 +247,6 @@ Rectangle window_content_bound(Window *window)
     else
     {
         return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
-    }
-}
-
-void window_change_framebuffer_if_needed(Window *window)
-{
-    if (window_bound(window).width != bitmap_bound(window->frontbuffer).width ||
-        window_bound(window).height != bitmap_bound(window->frontbuffer).height)
-    {
-        painter_destroy(window->frontbuffer_painter);
-        bitmap_destroy(window->frontbuffer);
-
-        painter_destroy(window->backbuffer_painter);
-        bitmap_destroy(window->backbuffer);
-
-        window->frontbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
-        window->frontbuffer_painter = painter_create(window->frontbuffer);
-        shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
-
-        window->backbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
-        window->backbuffer_painter = painter_create(window->backbuffer);
-        shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
     }
 }
 
@@ -337,20 +363,12 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     new_bound.height = MAX(new_bound.height, WINDOW_HEADER_AREA + content_size.height + WINDOW_CONTENT_PADDING);
     new_bound.width = MAX(new_bound.width, MAX(widget_compute_size(window_header(window)).width, content_size.width) + WINDOW_CONTENT_PADDING * 2);
 
-    window_set_on_screen_bound(window, new_bound);
-
-    window_change_framebuffer_if_needed(window);
-    window_schedule_layout(window);
-    window_schedule_update(window, window_bound(window));
+    window_set_bound(window, new_bound);
 }
 
 void window_end_resize(Window *window)
 {
     window->is_resizing = false;
-
-    window_change_framebuffer_if_needed(window);
-    window_schedule_layout(window);
-    window_schedule_update(window, window_bound(window));
 }
 
 Widget *window_child_at(Window *window, Vec2i position)

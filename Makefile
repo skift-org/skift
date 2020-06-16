@@ -378,10 +378,6 @@ sync:
 
 .PHONY: clean
 clean:
-	rm -rf $(BOOTROOT) $(BOOTDISK) $(RAMDISK)
-
-clean-all:
 	rm -rf $(BUILD_DIRECTORY)
-
 
 -include $(OBJECTS:.o=.d)

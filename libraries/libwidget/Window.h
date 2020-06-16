@@ -57,22 +57,21 @@ typedef struct Window
     HashMap *widget_by_id;
 } Window;
 
-Window *window_create(
-    int width,
-    int height,
-    WindowFlag flags);
+Window *window_create(WindowFlag flags);
 
-void window_initialize(
-    Window *window,
-    int width,
-    int height,
-    WindowFlag flags);
+void window_initialize(Window *window, WindowFlag flags);
 
 void window_destroy(Window *window);
 
 void window_set_title(Window *window, const char *title);
 
 void window_set_icon(Window *window, Icon *icon);
+
+void window_set_size(Window *window, Vec2i size);
+
+void window_set_position(Window *window, Vec2i position);
+
+void window_set_bound(Window *window, Rectangle bound);
 
 void window_show(Window *window);
 
@@ -87,8 +86,6 @@ void window_dump(Window *window);
 void window_handle_event(Window *window, Event *event);
 
 Rectangle window_bound_on_screen(Window *window);
-
-void window_set_on_screen_bound(Window *window, Rectangle new_bound);
 
 Rectangle window_bound(Window *window);
 

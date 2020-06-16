@@ -13,10 +13,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *window = window_create(700, 500, WINDOW_RESIZABLE);
+    Window *window = window_create(WINDOW_RESIZABLE);
 
     window_set_icon(window, icon_get("image"));
     window_set_title(window, "Image Viewer");
+    window_set_size(window, vec2i(700, 500));
 
     image_create(window_root(window), argv[1]);
 

@@ -46,10 +46,11 @@ int main(int argc, char **argv)
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
 
-    window_initialize((Window *)window, 700, 500, WINDOW_RESIZABLE);
+    window_initialize((Window *)window, WINDOW_RESIZABLE);
 
     window_set_icon((Window *)window, icon_get("expansion-card-variant"));
     window_set_title((Window *)window, "Device Manager");
+    window_set_size((Window *)window, vec2i(700, 500));
 
     window_root((Window *)window)->layout = VFLOW(0);
 

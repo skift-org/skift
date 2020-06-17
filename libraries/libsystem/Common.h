@@ -38,10 +38,10 @@ typedef struct
     const char *file;
     const char *function;
     int line;
-} SourceLocation;
+} __SOURCE_LOCATION__;
 
 #define SOURCE_LOCATION \
-    ((SourceLocation){__FILE__, __FUNCTION__, __LINE__})
+    ((__SOURCE_LOCATION__){__FILE__, __FUNCTION__, __LINE__})
 
 /* --- Raw memory allocation ------------------------------------------------ */
 

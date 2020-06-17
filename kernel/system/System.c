@@ -15,6 +15,9 @@ void system_hang(void)
 
 void system_stop(void)
 {
+    arch_disable_interupts();
+    logger_info("System stopped!");
+
     while (1)
     {
         arch_disable_interupts();

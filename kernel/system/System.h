@@ -26,7 +26,7 @@ ElapsedTime system_get_uptime(void);
     system_panic_internal(SOURCE_LOCATION, __context, __args)
 
 void __no_return system_panic_internal(
-    SourceLocation location,
+    __SOURCE_LOCATION__ location,
     void *stackframe,
     const char *message,
     ...);

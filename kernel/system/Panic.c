@@ -50,7 +50,7 @@ static bool has_panic = false;
 static bool nested_panic = false;
 
 void system_panic_internal(
-    SourceLocation location,
+    __SOURCE_LOCATION__ location,
     void *stackframe,
     const char *message,
     ...)

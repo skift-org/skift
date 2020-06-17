@@ -4,11 +4,9 @@
 
 struct Socket;
 
-typedef struct Connection
-{
-    Handle handle;
-    struct Socket *socket;
-} Connection;
+typedef struct Connection Connection;
+
+Connection *connection_create(struct Socket *socket, Handle handle);
 
 void connection_close(Connection *connection);
 

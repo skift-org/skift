@@ -3,16 +3,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/utils/RingBuffer.h>
 
-typedef struct
-{
-    Stream *stream;
-    /*    or    */
-    const char *string;
-
-    size_t size;
-    size_t offset;
-    RingBuffer *peek;
-} SourceReader;
+typedef struct SourceReader SourceReader;
 
 SourceReader *source_create_from_stream(Stream *stream);
 

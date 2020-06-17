@@ -2,18 +2,15 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
-{
-    size_t used;
-    size_t size;
-    char *buffer;
-} BufferBuilder;
+typedef struct BufferBuilder BufferBuilder;
 
 BufferBuilder *buffer_builder_create(size_t preallocated);
 
 void buffer_builder_destroy(BufferBuilder *buffer);
 
 char *buffer_builder_finalize(BufferBuilder *buffer);
+
+const char *buffer_builder_intermediate(BufferBuilder *builder);
 
 void buffer_builder_append_str(BufferBuilder *buffer, const char *str);
 

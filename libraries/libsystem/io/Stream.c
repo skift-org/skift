@@ -6,6 +6,7 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/__printf__.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/io/Stream_internal.h>
 
 static void stream_initialize(Stream *stream)
 {

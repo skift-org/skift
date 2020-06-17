@@ -2,6 +2,16 @@
 #include <libsystem/Assert.h>
 #include <libsystem/utils/RingBuffer.h>
 
+struct RingBuffer
+{
+    size_t head;
+    size_t tail;
+    size_t size;
+    size_t used;
+
+    char buffer[];
+};
+
 RingBuffer *ringbuffer_create(size_t size)
 {
     RingBuffer *ringbuffer = (RingBuffer *)calloc(1, sizeof(RingBuffer) + size);

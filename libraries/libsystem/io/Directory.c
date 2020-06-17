@@ -2,6 +2,11 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/io/Directory.h>
 
+struct Directory
+{
+    Handle handle;
+};
+
 Directory *directory_open(const char *path, OpenFlag flags)
 {
     Directory *directory = __create(Directory);

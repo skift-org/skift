@@ -4,16 +4,31 @@
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 
+struct Connection
+{
+    Handle handle;
+    struct Socket *socket;
+};
+
+Connection *connection_create(Socket *socket, Handle handle)
+{
+    Connection *connection = __create(Connection);
+
+    connection->handle = handle;
+    connection->socket = socket;
+
+    socket_did_connection_open(socket, connection);
+
+    return connection;
+}
+
 void connection_close(Connection *connection)
 {
     assert(connection != NULL);
 
-    if (connection->socket != NULL)
-    {
-        list_remove(connection->socket->connections, connection);
-        connection->socket = NULL;
-    }
+    socket_did_connection_close(connection->socket, connection);
 
+    connection->socket = NULL;
     __plug_handle_close(HANDLE(connection));
 }
 

@@ -6,6 +6,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/io/Stream_internal.h>
 
 #include "arch/Arch.h"
 #include "kernel/memory/Memory.h"

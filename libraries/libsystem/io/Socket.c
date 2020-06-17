@@ -2,6 +2,13 @@
 #include <libsystem/__plugs__.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
+#include <libsystem/utils/List.h>
+
+struct Socket
+{
+    Handle handle;
+    List *connections;
+};
 
 Socket *socket_open(const char *path, OpenFlag flags)
 {
@@ -23,23 +30,30 @@ void socket_close(Socket *socket)
 
 Connection *socket_connect(const char *path)
 {
-    Connection *connection = __create(Connection);
-
-    __plug_handle_connect(HANDLE(connection), path);
-
-    connection->socket = NULL;
-
-    return connection;
+    Handle handle = {};
+    __plug_handle_connect(&handle, path);
+    return connection_create(NULL, handle);
 }
 
 Connection *socket_accept(Socket *socket)
 {
-    Connection *connection = __create(Connection);
+    Handle handle = {};
+    __plug_handle_accept(HANDLE(socket), &handle);
+    return connection_create(socket, handle);
+}
 
-    __plug_handle_accept(HANDLE(socket), HANDLE(connection));
+void socket_did_connection_open(Socket *socket, struct Connection *connection)
+{
+    if (socket)
+    {
+        list_pushback(socket->connections, connection);
+    }
+}
 
-    list_pushback(socket->connections, connection);
-    connection->socket = socket;
-
-    return connection;
+void socket_did_connection_close(Socket *socket, struct Connection *connection)
+{
+    if (socket != NULL)
+    {
+        list_remove(socket->connections, connection);
+    }
 }

@@ -5,6 +5,17 @@
 #include <libsystem/utils/NumberParser.h>
 #include <libsystem/utils/SourceReader.h>
 
+struct SourceReader
+{
+    Stream *stream;
+    /*    or    */
+    const char *string;
+
+    size_t size;
+    size_t offset;
+    RingBuffer *peek;
+};
+
 SourceReader *source_create_from_stream(Stream *stream)
 {
     SourceReader *source = __create(SourceReader);

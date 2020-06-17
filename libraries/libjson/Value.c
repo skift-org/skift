@@ -191,7 +191,7 @@ void json_object_put(JsonValue *object, const char *key, JsonValue *value)
 {
     assert(json_is(object, JSON_OBJECT));
 
-    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyKeyCallback)json_destroy);
+    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)json_destroy);
 
     hashmap_put(object->storage_object, key, value);
 }
@@ -200,7 +200,7 @@ void json_object_remove(JsonValue *object, const char *key)
 {
     assert(json_is(object, JSON_OBJECT));
 
-    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyKeyCallback)json_destroy);
+    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)json_destroy);
 }
 
 size_t json_array_length(JsonValue *array)
@@ -239,5 +239,5 @@ void json_array_remove(JsonValue *array, size_t index)
 {
     assert(json_is(array, JSON_ARRAY));
 
-    list_remove_at_with_callback(array->storage_array, index, (HashMapDestroyKeyCallback)json_destroy);
+    list_remove_at_with_callback(array->storage_array, index, (HashMapDestroyValueCallback)json_destroy);
 }

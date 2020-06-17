@@ -2,15 +2,7 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
-{
-    size_t head;
-    size_t tail;
-    size_t size;
-    size_t used;
-
-    char buffer[];
-} RingBuffer;
+typedef struct RingBuffer RingBuffer;
 
 RingBuffer *ringbuffer_create(size_t size);
 

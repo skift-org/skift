@@ -5,7 +5,7 @@
 
 static FsNode *socket_openConnection(FsSocket *socket)
 {
-    FsNode *connection = connection_create();
+    FsNode *connection = fsconnection_create();
 
     list_pushback(socket->pending, fsnode_ref(connection));
 

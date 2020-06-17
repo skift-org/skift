@@ -15,4 +15,4 @@ typedef struct
     RingBuffer *data_to_client;
 } FsConnection;
 
-FsNode *connection_create(void);
+FsNode *fsconnection_create(void);

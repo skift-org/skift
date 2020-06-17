@@ -1,6 +1,29 @@
 #include <libsystem/CString.h>
 #include <libsystem/utils/HashMap.h>
 
+typedef void *(*HashMapCopyKeyCallback)(const void *value);
+typedef uint32_t (*HashMapHashKeyCallback)(const void *value);
+typedef int (*HashMapCompareKeyCallback)(const void *lhs, const void *rhs);
+typedef void (*HashMapDestroyKeyCallback)(void *value);
+
+struct HashMapItem
+{
+    uint32_t hash;
+    void *key;
+    void *value;
+};
+
+struct HashMap
+{
+    List **buckets;
+    size_t buckets_count;
+
+    HashMapCopyKeyCallback copy_key;
+    HashMapHashKeyCallback hash_key;
+    HashMapCompareKeyCallback compare_key;
+    HashMapDestroyKeyCallback destroy_key;
+};
+
 static char *hashmap_string_copy(const char *string)
 {
     return strdup(string);

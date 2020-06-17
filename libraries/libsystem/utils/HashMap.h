@@ -2,30 +2,11 @@
 
 #include <libsystem/utils/List.h>
 
-typedef void *(*HashMapCopyKeyCallback)(const void *value);
-typedef uint32_t (*HashMapHashKeyCallback)(const void *value);
-typedef int (*HashMapCompareKeyCallback)(const void *lhs, const void *rhs);
-typedef void (*HashMapDestroyKeyCallback)(void *value);
-
 typedef void (*HashMapDestroyValueCallback)(void *value);
 
-typedef struct HashMapItem
-{
-    uint32_t hash;
-    void *key;
-    void *value;
-} HashMapItem;
+typedef struct HashMapItem HashMapItem;
 
-typedef struct
-{
-    List **buckets;
-    size_t buckets_count;
-
-    HashMapCopyKeyCallback copy_key;
-    HashMapHashKeyCallback hash_key;
-    HashMapCompareKeyCallback compare_key;
-    HashMapDestroyKeyCallback destroy_key;
-} HashMap;
+typedef struct HashMap HashMap;
 
 HashMap *hashmap_create_string_to_value(void);
 

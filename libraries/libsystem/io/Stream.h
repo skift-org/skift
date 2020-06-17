@@ -17,22 +17,7 @@ typedef enum
 
 #define STREAM_BUFFER_SIZE 512
 
-typedef struct Stream
-{
-    Handle handle;
-
-    StreamBufferMode read_mode;
-    void *write_buffer;
-    int write_used;
-
-    StreamBufferMode write_mode;
-    void *read_buffer;
-    int read_used;
-    int read_head;
-
-    bool has_unget;
-    int unget_char;
-} Stream;
+typedef struct Stream Stream;
 
 extern Stream *in_stream;
 extern Stream *out_stream;

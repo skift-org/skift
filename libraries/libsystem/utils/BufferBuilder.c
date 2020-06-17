@@ -2,6 +2,13 @@
 #include <libsystem/Assert.h>
 #include <libsystem/utils/BufferBuilder.h>
 
+struct BufferBuilder
+{
+    size_t used;
+    size_t size;
+    char *buffer;
+};
+
 BufferBuilder *buffer_builder_create(size_t preallocated)
 {
     preallocated = MAX(preallocated, 16);
@@ -33,6 +40,11 @@ char *buffer_builder_finalize(BufferBuilder *buffer)
     buffer_builder_destroy(buffer);
 
     return result;
+}
+
+const char *buffer_builder_intermediate(BufferBuilder *builder)
+{
+    return builder->buffer;
 }
 
 void buffer_builder_append_str(BufferBuilder *buffer, const char *str)

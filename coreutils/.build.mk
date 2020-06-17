@@ -91,3 +91,26 @@ UNLINK_LIBS =
 
 UPTIME_NAME = uptime
 UPTIME_LIBS =
+
+define UTIL_TEMPLATE =
+
+$(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
+$(1)_SOURCE  = coreutils/$($(1)_NAME).c
+$(1)_OBJECT  = $$(patsubst coreutils/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCE))
+
+TARGETS += $$($(1)_BINARY)
+OBJECTS += $$($(1)_OBJECT)
+
+$$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [LD] $($(1)_NAME)
+	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
+
+$$($(1)_OBJECT): $$($(1)_SOURCE)
+	$$(DIRECTORY_GUARD)
+	@echo [$(1)] [CC] $$<
+	@$(CC) $(CFLAGS) -c -o $$@ $$<
+
+endef
+
+$(foreach util, $(UTILS), $(eval $(call UTIL_TEMPLATE,$(util))))

@@ -66,7 +66,7 @@ static Result device_info_read(FsDeviceInfo *node, FsHandle *handle, void *buffe
     if (handle->offset <= handle->attached_size)
     {
         *read = MIN(handle->attached_size - handle->offset, size);
-        memcpy(buffer, (byte *)handle->attached + handle->offset, *read);
+        memcpy(buffer, (char *)handle->attached + handle->offset, *read);
     }
 
     return SUCCESS;

@@ -3,11 +3,10 @@
 #include "kernel/memory/Paging.h"
 #include "kernel/system/System.h"
 
-uint TOTAL_MEMORY = 0;
-uint USED_MEMORY = 0;
+size_t TOTAL_MEMORY = 0;
+size_t USED_MEMORY = 0;
 
-uint FREE_MEMORY_SHORTCUT = 0;
-uchar MEMORY[1024 * 1024 / 8] = {};
+uint8_t MEMORY[1024 * 1024 / 8] = {};
 
 #define PHYSICAL_IS_USED(__addr) \
     (MEMORY[(uint)(__addr) / PAGE_SIZE / 8] & (1 << ((uint)(__addr) / PAGE_SIZE % 8)))

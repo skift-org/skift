@@ -24,7 +24,7 @@ static uint16_t *_text_buffer = NULL;
 
 #define VGA_ENTRY(__c, __fg, __bg) ((((__bg)&0XF) << 4 | ((__fg)&0XF)) << 8 | ((__c)&0XFF))
 
-void vga_cell(u32 x, u32 y, ushort entry)
+void vga_cell(u32 x, u32 y, uint16_t entry)
 {
     if (x < VGA_SCREEN_WIDTH)
     {
@@ -50,9 +50,9 @@ void vga_cursor_disable()
     out8(0x3D5, 0x20);
 }
 
-void vga_cursor_position(s32 x, s32 y)
+void vga_cursor_position(int x, int y)
 {
-    u16 cursorLocation = y * VGA_SCREEN_WIDTH + x;
+    int cursorLocation = y * VGA_SCREEN_WIDTH + x;
 
     out8(0x3D4, 0x0F);
     out8(0x3D5, (uint8_t)(cursorLocation & 0xFF));

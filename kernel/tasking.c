@@ -180,7 +180,7 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
     task_set_entry(task, entry, true);
 
-    uint argv_list[PROCESS_ARG_COUNT] = {};
+    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
 
     int argc;
     for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
@@ -188,7 +188,7 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
         argv_list[argc] = task_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
     }
 
-    uint argv_list_ref = task_stack_push(task, &argv_list, sizeof(argv_list));
+    uintptr_t argv_list_ref = task_stack_push(task, &argv_list, sizeof(argv_list));
 
     task_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
     task_stack_push(task, &argc, sizeof(argc));

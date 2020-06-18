@@ -10,11 +10,9 @@ static Result random_read(FsNode *node, FsHandle *handle, void *buffer, size_t s
     __unused(node);
     __unused(handle);
 
-    byte *b = (byte *)buffer;
-
-    for (uint i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
-        b[i] = random_uint32_max(&_random, 255);
+        ((char *)buffer)[i] = random_uint32_max(&_random, 255);
     }
 
     *read = size;

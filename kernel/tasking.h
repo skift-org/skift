@@ -25,7 +25,7 @@ typedef struct Task
     Blocker *blocker;
 
     uintptr_t stack_pointer;
-    byte *stack;     // Kernel stack
+    void *stack;     // Kernel stack
     TaskEntry entry; // Our entry point
     char fpu_registers[512];
 

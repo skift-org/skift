@@ -16,7 +16,7 @@ int cat(const char *path)
     stream_stat(stream, &stat);
 
     size_t read;
-    byte buffer[1024];
+    char buffer[1024];
 
     while ((read = stream_read(stream, &buffer, 1024)) != 0)
     {

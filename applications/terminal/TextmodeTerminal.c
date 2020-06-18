@@ -3,7 +3,7 @@
 
 #include "terminal/TextmodeTerminal.h"
 
-static byte textmode_colors[__TERMINAL_COLOR_COUNT] = {
+static uint8_t textmode_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = TEXTMODE_COLOR_BLACK,
     [TERMINAL_COLOR_RED] = TEXTMODE_COLOR_RED,
     [TERMINAL_COLOR_GREEN] = TEXTMODE_COLOR_GREEN,
@@ -52,7 +52,7 @@ void textmode_terminal_repaint(Terminal *terminal, TextmodeTerminalRenderer *ren
     };
 
     stream_call(renderer->device, IOCALL_TEXTMODE_SET_STATE, &args);
-    stream_write(renderer->device, renderer->buffer, terminal->width * terminal->height * sizeof(ushort));
+    stream_write(renderer->device, renderer->buffer, terminal->width * terminal->height * sizeof(uint16_t));
 }
 
 void textmode_terminal_destroy(TextmodeTerminalRenderer *renderer)
@@ -86,7 +86,7 @@ Terminal *textmode_terminal_create(void)
     TERMINAL_RENDERER(renderer)->destroy = (TerminalRendererDestroy)textmode_terminal_destroy;
 
     renderer->device = device;
-    renderer->buffer = (ushort *)calloc(args.width * args.height, sizeof(ushort));
+    renderer->buffer = (uint16_t *)calloc(args.width * args.height, sizeof(uint16_t));
 
     return terminal_create(args.width, args.height, TERMINAL_RENDERER(renderer));
 }

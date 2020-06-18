@@ -10,10 +10,10 @@
 #include "kernel/tasking.h"
 
 static RingBuffer *_mouse_buffer;
-static uchar _mouse_cycle = 0;
-static ubyte _mouse_packet[4];
+static int _mouse_cycle = 0;
+static uint8_t _mouse_packet[4];
 
-static void ps2mouse_handle_packet(ubyte packet0, ubyte packet1, ubyte packet2, ubyte packet3)
+static void ps2mouse_handle_packet(uint8_t packet0, uint8_t packet1, uint8_t packet2, uint8_t packet3)
 {
     //TODO: Scroll whell not suported yet
     __unused(packet3);
@@ -74,7 +74,7 @@ void ps2mouse_interrupt_handler(void)
     }
 }
 
-static inline void ps2mouse_wait(uchar a_type)
+static inline void ps2mouse_wait(int a_type)
 {
     uint time_out = 100000;
     if (a_type == 0)
@@ -101,7 +101,7 @@ static inline void ps2mouse_wait(uchar a_type)
     }
 }
 
-static inline void ps2mouse_write(uchar a_write)
+static inline void ps2mouse_write(uint8_t a_write)
 {
     ps2mouse_wait(1);
     out8(0x64, 0xD4);
@@ -109,7 +109,7 @@ static inline void ps2mouse_write(uchar a_write)
     out8(0x60, a_write);
 }
 
-static inline uchar ps2mouse_read(void)
+static inline uint8_t ps2mouse_read(void)
 {
     ps2mouse_wait(0);
     return in8(0x60);
@@ -139,7 +139,7 @@ static Result mouse_read(FsNode *node, FsHandle *handle, void *buffer, size_t si
 
 void mouse_initialize(void)
 {
-    uchar _status;
+    uint8_t _status;
 
     // Enable the auxiliary mouse device
     ps2mouse_wait(1);

@@ -47,7 +47,7 @@ static inline Color color_blend(Color fg, Color bg)
     return result;
 }
 
-#define COLOR(__value) ((Color){{(uchar)((__value) >> 16), (uchar)((__value) >> 8), (uchar)((__value)), 255}})
+#define COLOR(__value) ((Color){{(uint8_t)((__value) >> 16), (uint8_t)((__value) >> 8), (uint8_t)((__value)), 255}})
 
 #define COLOR_RGBA(__R, __G, __B, __A) ((Color){{(uint8_t)(__R), (uint8_t)(__G), (uint8_t)(__B), (uint8_t)(__A)}})
 

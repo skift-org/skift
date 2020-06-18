@@ -113,7 +113,7 @@ Color theme_parse_color(const char *text)
     {
         if (strlen(&text[1]) == 3)
         {
-            uint packed = 0;
+            unsigned int packed = 0;
             if (parse_uint(PARSER_HEXADECIMAL, &text[1], 3, &packed))
             {
                 uint8_t red = packed >> 8 & 0xf;
@@ -129,7 +129,7 @@ Color theme_parse_color(const char *text)
         }
         else if (strlen(&text[1]) == 4)
         {
-            uint packed = 0;
+            unsigned int packed = 0;
             if (parse_uint(PARSER_HEXADECIMAL, &text[1], 4, &packed))
             {
                 uint8_t red = packed >> 12 & 0xf;
@@ -146,7 +146,7 @@ Color theme_parse_color(const char *text)
         }
         else if (strlen(&text[1]) == 6)
         {
-            uint packed = 0;
+            unsigned int packed = 0;
             if (parse_uint(PARSER_HEXADECIMAL, &text[1], 6, &packed))
             {
                 return COLOR(packed);
@@ -154,7 +154,7 @@ Color theme_parse_color(const char *text)
         }
         else if (strlen(&text[1]) == 8)
         {
-            uint packed = 0;
+            unsigned int packed = 0;
             if (parse_uint(PARSER_HEXADECIMAL, &text[1], 8, &packed))
             {
                 Color color = COLOR(packed >> 8);

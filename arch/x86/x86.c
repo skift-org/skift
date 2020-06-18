@@ -11,7 +11,7 @@
 
 #include "kernel/system/System.h"
 
-void arch_main(void *info, uint magic)
+void arch_main(void *info, uint32_t magic)
 {
     __plug_init();
 

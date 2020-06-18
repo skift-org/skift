@@ -29,13 +29,13 @@ void memory_initialize(Multiboot *multiboot)
     }
 
     // Setup the kernel pagedirectory.
-    for (uint i = 0; i < 256; i++)
+    for (size_t i = 0; i < 256; i++)
     {
         PageDirectoryEntry *entry = &kpdir.entries[i];
         entry->User = 0;
         entry->Write = 1;
         entry->Present = 1;
-        entry->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
+        entry->PageFrameNumber = (size_t)&kptable[i] / PAGE_SIZE;
     }
 
     for (size_t i = 0; i < multiboot->memory_map_size; i++)

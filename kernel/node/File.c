@@ -25,7 +25,7 @@ static Result file_read(FsFile *node, FsHandle *handle, void *buffer, size_t siz
     if (handle->offset <= node->size)
     {
         *read = MIN(node->size - handle->offset, size);
-        memcpy(buffer, (byte *)node->buffer + handle->offset, *read);
+        memcpy(buffer, (char *)node->buffer + handle->offset, *read);
     }
 
     return SUCCESS;
@@ -40,7 +40,7 @@ static Result file_write(FsFile *node, FsHandle *handle, const void *buffer, siz
     }
 
     node->size = MAX(handle->offset + size, node->size);
-    memcpy((byte *)(node->buffer) + handle->offset, buffer, size);
+    memcpy((char *)(node->buffer) + handle->offset, buffer, size);
 
     *written = size;
 

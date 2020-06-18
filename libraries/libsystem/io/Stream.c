@@ -313,7 +313,7 @@ int stream_putchar(Stream *stream, char c)
         return -1;
     }
 
-    return (int)(uchar)c;
+    return c;
 }
 
 char stream_getchar(Stream *stream)
@@ -325,7 +325,7 @@ char stream_getchar(Stream *stream)
         return -1;
     }
 
-    return (int)(uchar)c;
+    return c;
 }
 
 int stream_ungetchar(Stream *stream, char c)

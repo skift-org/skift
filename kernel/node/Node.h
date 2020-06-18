@@ -20,7 +20,7 @@ typedef struct FsNode *(*FsNodeFindCallback)(struct FsNode *node, const char *na
 typedef Result (*FsNodeLinkCallback)(struct FsNode *node, const char *name, struct FsNode *child);
 typedef Result (*FsNodeUnlinkCallback)(struct FsNode *node, const char *name);
 
-typedef Result (*FsNodeCallCallback)(struct FsNode *node, struct FsHandle *handle, int request, void *args);
+typedef Result (*FsNodeCallCallback)(struct FsNode *node, struct FsHandle *handle, IOCall request, void *args);
 typedef Result (*FsNodeStatCallback)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
 typedef size_t (*FsNodeSizeCallback)(struct FsNode *node, struct FsHandle *handle);

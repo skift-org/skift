@@ -23,7 +23,7 @@ Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whenc
 
 Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset);
 
-Result task_fshandle_call(Task *task, int handle_index, int request, void *args);
+Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args);
 
 Result task_fshandle_stat(Task *task, int handle_index, FileState *stat);
 

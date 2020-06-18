@@ -241,7 +241,7 @@ Result task_fshandle_write(Task *task, int handle_index, const void *buffer, siz
     return result;
 }
 
-Result task_fshandle_call(Task *task, int handle_index, int request, void *args)
+Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 

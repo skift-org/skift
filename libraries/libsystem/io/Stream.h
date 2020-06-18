@@ -44,7 +44,7 @@ size_t stream_write(Stream *stream, const void *buffer, size_t size);
 
 void stream_flush(Stream *stream);
 
-Result stream_call(Stream *stream, int request, void *arg);
+Result stream_call(Stream *stream, IOCall request, void *arg);
 
 int stream_seek(Stream *stream, int offset, Whence whence);
 

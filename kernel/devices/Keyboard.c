@@ -177,7 +177,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     return keymap;
 }
 
-static Result keyboard_iocall(FsNode *node, FsHandle *handle, int request, void *args)
+static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, void *args)
 {
     __unused(node);
     __unused(handle);

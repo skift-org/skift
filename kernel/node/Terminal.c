@@ -87,7 +87,7 @@ static Result terminal_write(FsTerminal *terminal, FsHandle *handle, const void 
     return SUCCESS;
 }
 
-static Result terminal_iocall(FsTerminal *terminal, FsHandle *handle, int request, void *args)
+static Result terminal_iocall(FsTerminal *terminal, FsHandle *handle, IOCall request, void *args)
 {
     __unused(handle);
 

@@ -283,7 +283,7 @@ void stream_flush(Stream *stream)
     }
 }
 
-Result stream_call(Stream *stream, int request, void *arg)
+Result stream_call(Stream *stream, IOCall request, void *arg)
 {
     return __plug_handle_call(HANDLE(stream), request, arg);
 }

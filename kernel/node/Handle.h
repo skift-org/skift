@@ -31,7 +31,7 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
 Result fshandle_seek(FsHandle *handle, int offset, Whence whence);
 Result fshandle_tell(FsHandle *handle, Whence whence, int *offset);
 
-Result fshandle_call(FsHandle *handle, int request, void *args);
+Result fshandle_call(FsHandle *handle, IOCall request, void *args);
 Result fshandle_stat(FsHandle *handle, FileState *stat);
 
 Result fshandle_connect(FsNode *node, FsHandle **connection_handle);

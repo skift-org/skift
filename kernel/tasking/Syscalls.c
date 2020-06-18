@@ -351,10 +351,10 @@ Result sys_handle_select(
     // We need to copy these because this syscall uses task_fshandle_select
     // who block the current thread using a blocker which does a context switch.
 
-    int *handles_copy = (int *)calloc(handles_set->count, sizeof(int));
+    __cleanup_malloc int *handles_copy = (int *)calloc(handles_set->count, sizeof(int));
     memcpy(handles_copy, handles_set->handles, handles_set->count * sizeof(int));
 
-    SelectEvent *events_copy = (SelectEvent *)calloc(handles_set->count, sizeof(SelectEvent));
+    __cleanup_malloc SelectEvent *events_copy = (SelectEvent *)calloc(handles_set->count, sizeof(SelectEvent));
     memcpy(events_copy, handles_set->events, handles_set->count * sizeof(SelectEvent));
 
     int selected_copy;
@@ -371,9 +371,6 @@ Result sys_handle_select(
 
     *selected = selected_copy;
     *selected_events = selected_event_copy;
-
-    free(handles_copy);
-    free(events_copy);
 
     return result;
 }
@@ -400,7 +397,7 @@ Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *wri
     return task_fshandle_write(scheduler_running(), handle, buffer, size, written);
 }
 
-Result sys_handle_call(int handle, int request, void *args)
+Result sys_handle_call(int handle, IOCall request, void *args)
 {
     return task_fshandle_call(scheduler_running(), handle, request, args);
 }

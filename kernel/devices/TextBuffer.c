@@ -76,7 +76,7 @@ Result textmode_write(FsNode *node, FsHandle *handle, const void *buffer, size_t
     return SUCCESS;
 }
 
-Result textmode_iocall(FsNode *node, FsHandle *handle, int request, void *args)
+Result textmode_iocall(FsNode *node, FsHandle *handle, IOCall request, void *args)
 {
     __unused(node);
     __unused(handle);

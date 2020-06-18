@@ -291,7 +291,7 @@ Result fshandle_tell(FsHandle *handle, Whence whence, int *offset)
     return SUCCESS;
 }
 
-Result fshandle_call(FsHandle *handle, int request, void *args)
+Result fshandle_call(FsHandle *handle, IOCall request, void *args)
 {
     Result result = ERR_OPERATION_NOT_SUPPORTED;
 

@@ -39,7 +39,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     return written;
 }
 
-Result __plug_handle_call(Handle *handle, int request, void *args)
+Result __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
 
     handle->result = (Result)__syscall(SYS_HANDLE_CALL, handle->id, request, (int)args, 0, 0);

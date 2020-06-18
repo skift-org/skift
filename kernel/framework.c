@@ -233,7 +233,7 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     }
 }
 
-Result __plug_handle_call(Handle *handle, int request, void *args)
+Result __plug_handle_call(Handle *handle, IOCall request, void *args)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 

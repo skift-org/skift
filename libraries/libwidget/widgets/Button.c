@@ -113,11 +113,11 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
 Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, Icon *icon, const char *text)
 {
     Widget *button = button_create(parent, style);
-    button->insets = INSETS(0, 0, 6, 8);
+    button->insets = INSETS(0, 0, 6, 10);
     button->min_width = 64;
 
     Widget *button_icon = icon_panel_create(button, icon);
-    button_icon->insets = INSETS(0, 0, 0, 8);
+    button_icon->insets = INSETS(0, 0, 0, 4);
 
     label_create(button, text);
 

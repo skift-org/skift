@@ -1,5 +1,6 @@
+#include <abi/Paths.h>
+#include <abi/TextMode.h>
 
-#include <libdevice/textmode.h>
 #include <libmath/MinMax.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/CString.h>
@@ -80,9 +81,9 @@ Result textmode_iocall(FsNode *node, FsHandle *handle, int request, void *args)
     __unused(node);
     __unused(handle);
 
-    if (request == TEXTMODE_CALL_GET_INFO)
+    if (request == IOCALL_TEXTMODE_GET_STATE)
     {
-        textmode_info_t *info = (textmode_info_t *)args;
+        IOCallTextModeStateArgs *info = (IOCallTextModeStateArgs *)args;
 
         info->cursor_x = 0;
         info->cursor_y = 0;
@@ -92,20 +93,12 @@ Result textmode_iocall(FsNode *node, FsHandle *handle, int request, void *args)
 
         return SUCCESS;
     }
-    else if (request == TEXTMODE_CALL_SET_INFO)
+    else if (request == IOCALL_TEXTMODE_SET_STATE)
     {
-        textmode_info_t *info = (textmode_info_t *)args;
+        IOCallTextModeStateArgs *info = (IOCallTextModeStateArgs *)args;
 
         vga_cursor_position(info->cursor_x, info->cursor_y);
         vga_cursor_enable();
-
-        return SUCCESS;
-    }
-    else if (request == TEXTMODE_CALL_SET_CELL)
-    {
-        textmode_cell_info_t *cell = (textmode_cell_info_t *)args;
-
-        vga_cell(cell->x, cell->y, VGA_ENTRY(cell->c, cell->fg, cell->bg));
 
         return SUCCESS;
     }
@@ -127,7 +120,7 @@ void textmode_initialize(void)
     FSNODE(textmode_device)->write = (FsNodeWriteCallback)textmode_write;
     FSNODE(textmode_device)->call = (FsNodeCallCallback)textmode_iocall;
 
-    Path *textmode_device_path = path_create(TEXTMODE_DEVICE);
+    Path *textmode_device_path = path_create(TEXTMODE_DEVICE_PATH);
     filesystem_link_and_take_ref(textmode_device_path, textmode_device);
     path_destroy(textmode_device_path);
 }

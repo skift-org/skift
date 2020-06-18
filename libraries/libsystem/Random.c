@@ -1,11 +1,15 @@
 #include <libsystem/Random.h>
+#include <libsystem/io/Stream.h>
 
 Random random_create(void)
 {
-    Random random = {
-        6389,
-        6389,
-    };
+    Random random = {};
+
+    Stream *random_device = stream_open("/dev/random", OPEN_READ);
+
+    stream_read(random_device, &random, sizeof(Random));
+
+    stream_close(random_device);
 
     return random;
 }

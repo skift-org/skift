@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libsystem/Common.h>
 #include <libsystem/unicode/Codepoint.h>
 
 #define KEY_LIST(__ENTRY)                              \
@@ -137,6 +136,59 @@ typedef struct
     KeyMotion motion;
 } KeyboardPacket;
 
-const char *key_to_string(Key key);
+typedef struct
+{
+    Key key;
 
-bool key_is_valid(Key key);
+    Codepoint regular_codepoint;
+    Codepoint shift_codepoint;
+    Codepoint alt_codepoint;
+    Codepoint shift_alt_codepoint;
+} KeyMapping;
+
+#define KEYMAP_LANGUAGE_SIZE 16
+#define KEYMAP_REGION_SIZE 16
+
+typedef struct
+{
+    char magic[4]; /* kmap */
+    char language[KEYMAP_LANGUAGE_SIZE];
+    char region[KEYMAP_REGION_SIZE];
+
+    size_t length;
+    KeyMapping mappings[];
+} KeyMap;
+
+#define KEY_NAMES_ENTRY(__key_name, __key_number) #__key_name,
+
+static const char *KEYS_NAMES[] = {KEY_LIST(KEY_NAMES_ENTRY)};
+
+static inline const char *key_to_string(Key key)
+{
+    if (key < __KEY_COUNT)
+    {
+        return KEYS_NAMES[key];
+    }
+    else
+    {
+        return "overflow";
+    }
+}
+
+static inline bool key_is_valid(Key key)
+{
+    return key > 0 && key < __KEY_COUNT;
+}
+
+static inline KeyMapping *keymap_lookup(KeyMap *keymap, Key key)
+{
+    for (size_t i = 0; i < keymap->length; i++)
+    {
+        if (keymap->mappings[i].key == key)
+        {
+            return &keymap->mappings[i];
+        }
+    }
+
+    return NULL;
+}

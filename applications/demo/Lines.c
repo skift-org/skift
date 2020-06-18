@@ -1,9 +1,7 @@
 
-#include <libsystem/io/Stream.h>
+#include <libsystem/Random.h>
 
 #include "demo/Demos.h"
-
-static Stream *random_device = NULL;
 
 typedef struct
 {
@@ -12,25 +10,34 @@ typedef struct
     Color color;
 } Line;
 
+static Random random = {};
+static bool random_initialized = false;
+
 void lines_draw(Painter *painter, Rectangle screen, double time)
 {
     __unused(time);
 
-    if (random_device == NULL)
+    if (!random_initialized)
     {
-        random_device = stream_open("/dev/random", OPEN_READ);
+        random = random_create();
+        random_initialized = true;
     }
 
-    Line line = {};
-    stream_read(random_device, &line, sizeof(Line));
+    painter_fill_rectangle(painter, screen, ALPHA(COLOR_BLACK, 0.05));
 
-    line.start.x = screen.x + abs((int)line.start.x % screen.width);
-    line.start.y = screen.y + abs((int)line.start.y % screen.height);
-    line.finish.x = screen.x + abs((int)line.finish.x % screen.width);
-    line.finish.y = screen.y + abs((int)line.finish.y % screen.height);
+    for (size_t i = 0; i < 16; i++)
+    {
+        Line line = {};
 
-    line.color.A = 255;
+        line.start.x = random_uint32_max(&random, screen.width);
+        line.start.y = random_uint32_max(&random, screen.height);
 
-    painter_fill_rectangle(painter, screen, ALPHA(COLOR_BLACK, 0.01));
-    painter_draw_line_antialias(painter, line.start, line.finish, line.color);
+        line.finish.x = random_uint32_max(&random, screen.width);
+        line.finish.y = random_uint32_max(&random, screen.height);
+
+        line.color.packed = random_uint32_max(&random, 0xffffffff);
+        line.color.A = 255;
+
+        painter_draw_line_antialias(painter, line.start, line.finish, line.color);
+    }
 }

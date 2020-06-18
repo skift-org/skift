@@ -1,3 +1,6 @@
+#include <abi/Paths.h>
+#include <abi/TextMode.h>
+
 #include "terminal/TextmodeTerminal.h"
 
 static byte textmode_colors[__TERMINAL_COLOR_COUNT] = {
@@ -41,17 +44,14 @@ void textmode_terminal_on_paint(Terminal *terminal, TextmodeTerminalRenderer *re
     }
 }
 
-void textmode_terminal_on_cursor(Terminal *terminal, TextmodeTerminalRenderer *renderer, TerminalCursor cursor)
-{
-    __unused(terminal);
-
-    renderer->info.cursor_x = cursor.x;
-    renderer->info.cursor_y = cursor.y;
-}
-
 void textmode_terminal_repaint(Terminal *terminal, TextmodeTerminalRenderer *renderer)
 {
-    stream_call(renderer->device, TEXTMODE_CALL_SET_INFO, &renderer->info);
+    IOCallTextModeStateArgs args = {
+        .cursor_x = terminal->cursor.x,
+        .cursor_y = terminal->cursor.y,
+    };
+
+    stream_call(renderer->device, IOCALL_TEXTMODE_SET_STATE, &args);
     stream_write(renderer->device, renderer->buffer, terminal->width * terminal->height * sizeof(ushort));
 }
 
@@ -62,8 +62,8 @@ void textmode_terminal_destroy(TextmodeTerminalRenderer *renderer)
 
 Terminal *textmode_terminal_create(void)
 {
-    Stream *device = stream_open("/dev/txt", OPEN_WRITE);
-    textmode_info_t info;
+    Stream *device = stream_open(TEXTMODE_DEVICE_PATH, OPEN_WRITE);
+    IOCallTextModeStateArgs args;
 
     if (handle_has_error(device))
     {
@@ -72,7 +72,7 @@ Terminal *textmode_terminal_create(void)
         return NULL;
     }
 
-    if (stream_call(device, TEXTMODE_CALL_GET_INFO, &info) != SUCCESS)
+    if (stream_call(device, IOCALL_TEXTMODE_GET_STATE, &args) != SUCCESS)
     {
         stream_close(device);
 
@@ -81,14 +81,12 @@ Terminal *textmode_terminal_create(void)
 
     TextmodeTerminalRenderer *renderer = __create(TextmodeTerminalRenderer);
 
-    TERMINAL_RENDERER(renderer)->on_cursor = (TerminalOnCursorCallback)textmode_terminal_on_cursor;
     TERMINAL_RENDERER(renderer)->on_paint = (TerminalOnPaintCallback)textmode_terminal_on_paint;
     TERMINAL_RENDERER(renderer)->repaint = (TerminalRepaintCallback)textmode_terminal_repaint;
     TERMINAL_RENDERER(renderer)->destroy = (TerminalRendererDestroy)textmode_terminal_destroy;
 
     renderer->device = device;
-    renderer->buffer = (ushort *)calloc(info.width * info.height, sizeof(ushort));
-    renderer->info = info;
+    renderer->buffer = (ushort *)calloc(args.width * args.height, sizeof(ushort));
 
-    return terminal_create(info.width, info.height, TERMINAL_RENDERER(renderer));
+    return terminal_create(args.width, args.height, TERMINAL_RENDERER(renderer));
 }

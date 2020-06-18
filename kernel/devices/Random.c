@@ -35,7 +35,10 @@ static Result random_write(FsNode *node, FsHandle *handle, const void *buffer, u
 
 void random_initialize(void)
 {
-    _random = random_create();
+    _random = (Random){
+        6389,
+        6389,
+    };
 
     FsNode *random_device = __create(FsNode);
 

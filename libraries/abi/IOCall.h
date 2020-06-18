@@ -26,6 +26,20 @@ typedef struct
     int blit_height;
 } IOCallDisplayBlitArgs;
 
+typedef struct
+{
+    size_t size;
+    void *keymap;
+} IOCallKeyboardSetKeymapArgs;
+
+typedef struct
+{
+    int width;
+    int height;
+    int cursor_x;
+    int cursor_y;
+} IOCallTextModeStateArgs;
+
 typedef enum
 {
     IOCALL_TERMINAL_GET_SIZE,
@@ -34,6 +48,12 @@ typedef enum
     IOCALL_DISPLAY_GET_MODE,
     IOCALL_DISPLAY_SET_MODE,
     IOCALL_DISPLAY_BLIT,
+
+    IOCALL_KEYBOARD_SET_KEYMAP,
+    IOCALL_KEYBOARD_GET_KEYMAP,
+
+    IOCALL_TEXTMODE_GET_STATE,
+    IOCALL_TEXTMODE_SET_STATE,
 
     __IOCALL_COUNT,
 } IOCall;

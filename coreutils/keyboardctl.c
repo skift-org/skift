@@ -1,3 +1,5 @@
+#include <abi/Keyboard.h>
+#include <abi/Paths.h>
 
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
@@ -6,9 +8,6 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-
-#include <libdevice/keyboard.h>
-#include <libdevice/keymap.h>
 
 bool option_get;
 bool option_list;
@@ -95,8 +94,8 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         return -1;
     }
 
-    keyboard_set_keymap_args_t args = {.size = stat.size, .keymap = new_keymap};
-    stream_call(keyboard_device, KEYBOARD_CALL_SET_KEYMAP, &args);
+    IOCallKeyboardSetKeymapArgs args = {.size = stat.size, .keymap = new_keymap};
+    stream_call(keyboard_device, IOCALL_KEYBOARD_SET_KEYMAP, &args);
 
     printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
 
@@ -107,7 +106,7 @@ int loadkey_get_keymap(Stream *keyboard_device)
 {
     KeyMap keymap;
 
-    if (stream_call(keyboard_device, KEYBOARD_CALL_GET_KEYMAP, &keymap) != SUCCESS)
+    if (stream_call(keyboard_device, IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
     {
         handle_printf_error(keyboard_device, "keyboardctl: Failled to retrived the current keymap");
         return -1;
@@ -121,7 +120,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    __cleanup(stream_cleanup) Stream *keyboard_device = stream_open(KEYBOARD_DEVICE, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *keyboard_device = stream_open(KEYBOARD_DEVICE_PATH, OPEN_READ);
 
     if (handle_has_error(keyboard_device))
     {

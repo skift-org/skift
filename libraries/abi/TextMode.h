@@ -1,13 +1,5 @@
 #pragma once
 
-#include <libsystem/Common.h>
-
-#define TEXTMODE_DEVICE "/dev/txt"
-
-#define TEXTMODE_CALL_GET_INFO 0
-#define TEXTMODE_CALL_SET_INFO 1
-#define TEXTMODE_CALL_SET_CELL 2
-
 #define TEXTMODE_COLOR_BLACK 0x0
 #define TEXTMODE_COLOR_BLUE 0x1
 #define TEXTMODE_COLOR_GREEN 0x2
@@ -27,20 +19,3 @@
 
 #define TEXTMODE_COLOR(__fg, __bg) (__bg << 4 | __fg)
 #define TEXTMODE_ENTRY(__c, __fg, __bg) ((((__bg)&0XF) << 4 | ((__fg)&0XF)) << 8 | ((__c)&0XFF))
-
-typedef struct
-{
-    int width;
-    int height;
-    int cursor_x;
-    int cursor_y;
-} textmode_info_t;
-
-typedef struct
-{
-    int x;
-    int y;
-    uint8_t fg;
-    uint8_t bg;
-    int c;
-} textmode_cell_info_t;

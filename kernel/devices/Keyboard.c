@@ -1,11 +1,5 @@
+#include <abi/Keyboard.h>
 
-/* keyboard.c: keyboard driver                                                */
-
-#include <libdevice/keyboard.h>
-#include <libdevice/keymap.c>
-#include <libdevice/keymap.h>
-#include <libdevice/keys.c>
-#include <libdevice/keys.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/CString.h>
@@ -14,7 +8,6 @@
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/x86.h"
-
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
 
@@ -46,70 +39,66 @@ Codepoint keyboard_get_codepoint(Key key)
     {
         return 0;
     }
+
+    if (_keystate[KEYBOARD_KEY_LSHIFT] == KEY_MOTION_DOWN ||
+        _keystate[KEYBOARD_KEY_RSHIFT] == KEY_MOTION_DOWN)
+    {
+        return mapping->shift_codepoint;
+    }
+    else if (_keystate[KEYBOARD_KEY_RALT] == KEY_MOTION_DOWN)
+    {
+        return mapping->alt_codepoint;
+    }
     else
     {
-        if (_keystate[KEYBOARD_KEY_LSHIFT] == KEY_MOTION_DOWN ||
-            _keystate[KEYBOARD_KEY_RSHIFT] == KEY_MOTION_DOWN)
-        {
-            return mapping->shift_codepoint;
-        }
-        else if (_keystate[KEYBOARD_KEY_RALT] == KEY_MOTION_DOWN)
-        {
-            return mapping->alt_codepoint;
-        }
-        else
-        {
-            return mapping->regular_codepoint;
-        }
+        return mapping->regular_codepoint;
     }
 }
 
 void keyboard_handle_key(Key key, KeyMotion motion)
 {
-    if (key_is_valid(key))
-    {
-
-        Codepoint codepoint = keyboard_get_codepoint(key);
-
-        if (_characters_node->readers)
-        {
-            if (motion == KEY_MOTION_DOWN)
-            {
-                if (codepoint != 0)
-                {
-                    uint8_t utf8[5];
-                    int length = codepoint_to_utf8(codepoint, utf8);
-
-                    if (_characters_node->readers)
-                        ringbuffer_write(_characters_buffer, (const char *)utf8, length);
-                }
-            }
-        }
-
-        if (_events_node->readers)
-        {
-            if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
-            {
-                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_DOWN}, sizeof(KeyboardPacket));
-            }
-
-            if (motion == KEY_MOTION_UP)
-            {
-                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_UP}, sizeof(KeyboardPacket));
-            }
-
-            if (motion == KEY_MOTION_DOWN)
-            {
-                ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_TYPED}, sizeof(KeyboardPacket));
-            }
-        }
-
-        _keystate[key] = motion;
-    }
-    else
+    if (!key_is_valid(key))
     {
         logger_warn("Invalid scancode %d", key);
+        return;
     }
+
+    Codepoint codepoint = keyboard_get_codepoint(key);
+
+    if (_characters_node->readers)
+    {
+        if (motion == KEY_MOTION_DOWN)
+        {
+            if (codepoint != 0)
+            {
+                uint8_t utf8[5];
+                int length = codepoint_to_utf8(codepoint, utf8);
+
+                if (_characters_node->readers)
+                    ringbuffer_write(_characters_buffer, (const char *)utf8, length);
+            }
+        }
+    }
+
+    if (_events_node->readers)
+    {
+        if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
+        {
+            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_DOWN}, sizeof(KeyboardPacket));
+        }
+
+        if (motion == KEY_MOTION_UP)
+        {
+            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_UP}, sizeof(KeyboardPacket));
+        }
+
+        if (motion == KEY_MOTION_DOWN)
+        {
+            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_TYPED}, sizeof(KeyboardPacket));
+        }
+    }
+
+    _keystate[key] = motion;
 }
 
 Key keyboard_scancode_to_key(int scancode)
@@ -193,9 +182,9 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, int request, void 
     __unused(node);
     __unused(handle);
 
-    if (request == KEYBOARD_CALL_SET_KEYMAP)
+    if (request == IOCALL_KEYBOARD_SET_KEYMAP)
     {
-        keyboard_set_keymap_args_t *size_and_keymap = (keyboard_set_keymap_args_t *)args;
+        IOCallKeyboardSetKeymapArgs *size_and_keymap = (IOCallKeyboardSetKeymapArgs *)args;
         KeyMap *new_keymap = (KeyMap *)size_and_keymap->keymap;
 
         atomic_begin();
@@ -212,7 +201,7 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, int request, void 
 
         return SUCCESS;
     }
-    else if (request == KEYBOARD_CALL_GET_KEYMAP)
+    else if (request == IOCALL_KEYBOARD_GET_KEYMAP)
     {
         memcpy(args, _keymap, sizeof(KeyMap));
         return SUCCESS;

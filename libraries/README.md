@@ -1,7 +1,6 @@
 # skiftOS system libraries
 
 - libcompat : POSIX compatibility layer
-- libdevice : device APIs
 - libfile : file format codecs
 - libgraphic : graphic rendering library
 - libjson : json parser, stringifier and beautifier

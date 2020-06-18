@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libdevice/Mouse.h>
+#include <abi/Mouse.h>
 #include <libgraphic/Painter.h>
 
 void cursor_initialize(void);

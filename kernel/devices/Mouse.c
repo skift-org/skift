@@ -1,11 +1,11 @@
+#include <abi/Mouse.h>
+#include <abi/Paths.h>
 
-#include <libdevice/Mouse.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/Logger.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/x86.h"
-
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/tasking.h"
 
@@ -177,7 +177,7 @@ void mouse_initialize(void)
     FSNODE(mouse_device)->read = (FsNodeReadCallback)mouse_read;
     FSNODE(mouse_device)->can_read = (FsNodeCanReadCallback)mouse_can_read;
 
-    Path *mouse_device_path = path_create(MOUSE_DEVICE);
+    Path *mouse_device_path = path_create(MOUSE_DEVICE_PATH);
     filesystem_link_and_take_ref(mouse_device_path, mouse_device);
     path_destroy(mouse_device_path);
 }

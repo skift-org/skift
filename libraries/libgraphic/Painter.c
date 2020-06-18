@@ -284,11 +284,11 @@ __attribute__((flatten)) void painter_fill_triangle(Painter *painter, Vec2i p0, 
     Vec2f c = vec2f(p2.x, p2.y);
 
     if (a.y > b.y)
-        __swap(Vec2f, a, b);
+        __swap( a, b);
     if (a.y > c.y)
-        __swap(Vec2f, a, c);
+        __swap( a, c);
     if (b.y > c.y)
-        __swap(Vec2f, b, c);
+        __swap( b, c);
 
     Vec2f s = a;
     Vec2f e = a;
@@ -461,13 +461,13 @@ void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color
     const bool steep = abs(y1 - a.y) > abs(x1 - x0);
     if (steep)
     {
-        __swap(double, x0, y0);
-        __swap(double, x1, y1);
+        __swap( x0, y0);
+        __swap( x1, y1);
     }
     if (x0 > x1)
     {
-        __swap(double, x0, x1);
-        __swap(double, y0, y1);
+        __swap( x0, x1);
+        __swap( y0, y1);
     }
 
     const float dx = x1 - x0;

@@ -733,9 +733,9 @@ void window_update(Window *window)
 
     bitmap_copy(window->backbuffer, window->frontbuffer, repaited_regions);
 
-    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
-    __swap(Painter *, window->frontbuffer_painter, window->backbuffer_painter);
-    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
+    __swap(window->frontbuffer, window->backbuffer);
+    __swap(window->frontbuffer_painter, window->backbuffer_painter);
+    __swap(window->frontbuffer_handle, window->backbuffer_handle);
 
     application_flip_window(window, repaited_regions);
 }

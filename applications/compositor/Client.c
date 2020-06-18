@@ -114,8 +114,8 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         return;
     }
 
-    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
-    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
+    __swap(window->frontbuffer, window->backbuffer);
+    __swap(window->frontbuffer_handle, window->backbuffer_handle);
 
     if (window->frontbuffer_handle != flip_window.frontbuffer)
     {

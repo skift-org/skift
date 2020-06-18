@@ -124,6 +124,7 @@ Result application_initialize(int argc, char **argv)
         Result result = handle_get_error(_connection);
         connection_close(_connection);
         _connection = NULL;
+
         return result;
     }
 

@@ -2,11 +2,7 @@
 
 #include <libsystem/__plugs__.h>
 
-#define assert(__expr)                                                   \
-    if (!(__expr))                                                       \
-    {                                                                    \
-        __plug_assert_failed(#__expr, __FILE__, __FUNCTION__, __LINE__); \
-    }
+#define assert(__expr) ((__expr) ? (void)(0) : __plug_assert_failed(#__expr, __FILE__, __FUNCTION__, __LINE__))
 
 #define ASSERT_NOT_REACHED() \
     __plug_assert_failed("ASSERT_NOT_REACHED() reached!", __FILE__, __FUNCTION__, __LINE__)

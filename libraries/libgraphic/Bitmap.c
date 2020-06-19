@@ -1,3 +1,10 @@
+#define LODEPNG_NO_COMPILE_DISK
+#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+#define LODEPNG_NO_COMPILE_CPP
+#include <thirdparty/lodepng/lodepng.cpp>
+#undef LODEPNG_NO_COMPILE_CPP
+#undef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+#undef LODEPNG_NO_COMPILE_DISK
 
 #include <libgraphic/Bitmap.h>
 #include <libsystem/Assert.h>
@@ -5,14 +12,6 @@
 #include <libsystem/Memory.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
-
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_CPP
-
-#include <thirdparty/lodepng/lodepng.h>
-
-#include <thirdparty/lodepng/lodepng.cpp>
 
 Bitmap *bitmap_create(size_t width, size_t height)
 {

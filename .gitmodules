@@ -4,3 +4,6 @@
 [submodule "thirdparty/icons"]
 	path = thirdparty/icons
 	url = https://github.com/skiftOS/icons
+[submodule "thirdparty/stb"]
+	path = thirdparty/stb
+	url = https://github.com/skiftOS/stb

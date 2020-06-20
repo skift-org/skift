@@ -1,14 +1,10 @@
 #pragma once
 
+#include <abi/Memory.h>
 #include <libsystem/Result.h>
 
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/multiboot/Multiboot.h"
-
-#define MEMORY_NONE (0)
-#define MEMORY_USER (1 << 0)
-#define MEMORY_CLEAR (1 << 1)
-typedef unsigned int MemoryFlags;
 
 void memory_initialize(Multiboot *multiboot);
 

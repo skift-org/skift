@@ -495,11 +495,13 @@ void task_shared_memory_setup(void)
 
 MemoryObject *memory_object_create(size_t size)
 {
+    size = PAGE_ALIGN_UP(size);
+
     MemoryObject *memory_object = __create(MemoryObject);
 
     memory_object->id = _memory_object_id++;
     memory_object->refcount = 1;
-    memory_object->address = physical_alloc(PAGE_ALIGN_UP(size) / PAGE_SIZE);
+    memory_object->address = physical_alloc(size / PAGE_SIZE);
     memory_object->size = size;
 
     lock_acquire(_memory_objects_lock);
@@ -563,7 +565,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = virtual_alloc(task->pdir, memory_object->address, PAGE_ALIGN_UP(memory_object->size) / PAGE_SIZE, 1);
+    memory_mapping->address = virtual_alloc(task->pdir, (MemoryRange){memory_object->address, memory_object->size}, MEMORY_USER).base;
     memory_mapping->size = memory_object->size;
 
     list_pushback(task->memory_mapping, memory_mapping);
@@ -573,7 +575,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
 
 void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
-    virtual_free(task->pdir, memory_mapping->address, PAGE_ALIGN_UP(memory_mapping->size) / PAGE_SIZE);
+    virtual_free(task->pdir, (MemoryRange){memory_mapping->address, memory_mapping->size});
     memory_object_deref(memory_mapping->object);
 
     list_remove(task->memory_mapping, memory_mapping);

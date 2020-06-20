@@ -108,10 +108,13 @@ void bga_initialize(DeviceInfo info)
     bga_set_mode(VBE_DISPI_MAX_XRES, VBE_DISPI_MAX_YRES);
     framebuffer_physical = pci_device_read(info.pci_device, PCI_BAR0, 4);
     framebuffer_virtual = virtual_alloc(
-        &kpdir,
-        framebuffer_physical,
-        PAGE_ALIGN_UP(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_XRES * sizeof(uint32_t)) / PAGE_SIZE,
-        false);
+                              &kpdir,
+                              (MemoryRange){
+                                  framebuffer_physical,
+                                  PAGE_ALIGN_UP(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_XRES * sizeof(uint32_t)),
+                              },
+                              MEMORY_NONE)
+                              .base;
 
     if (framebuffer_virtual == 0)
     {

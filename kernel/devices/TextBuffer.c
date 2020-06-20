@@ -60,6 +60,11 @@ void vga_cursor_position(int x, int y)
     out8(0x3D5, (uint8_t)((cursorLocation >> 8) & 0xFF));
 }
 
+MemoryRange vga_physical_range(void)
+{
+    return (MemoryRange){VGA_FRAME_BUFFER, PAGE_ALIGN_UP(VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(uint16_t))};
+}
+
 /* --- Textmode abstract driver --------------------------------------------- */
 
 Result textmode_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
@@ -112,7 +117,7 @@ void textmode_initialize(void)
 {
     logger_info("Initializing textmode graphic");
 
-    _text_buffer = (uint16_t *)virtual_alloc(&kpdir, VGA_FRAME_BUFFER, PAGE_ALIGN_UP(VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(uint16_t)) / PAGE_SIZE, false);
+    _text_buffer = (uint16_t *)virtual_alloc(&kpdir, vga_physical_range(), MEMORY_NONE).base;
 
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FILE_TYPE_DEVICE);

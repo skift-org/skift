@@ -60,7 +60,7 @@ void memory_initialize(Multiboot *multiboot)
         memory_map_identity(&kpdir, multiboot->modules[i].range, MEMORY_NONE);
     }
 
-    virtual_free(memory_kpdir(), 0, 1); // Unmap the 0 page
+    virtual_free(memory_kpdir(), (MemoryRange){0, PAGE_SIZE}); // Unmap the 0 page
     physical_set_used(0, 1);
 
     memory_pdir_switch(&kpdir);
@@ -183,11 +183,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
         return ERR_OUT_OF_MEMORY;
     }
 
-    uintptr_t virtual_address = virtual_alloc(
-        page_directory,
-        physical_address,
-        page_count,
-        flags & MEMORY_USER);
+    uintptr_t virtual_address = virtual_alloc(page_directory, (MemoryRange){physical_address, size}, flags).base;
 
     if (!virtual_address)
     {
@@ -258,7 +254,7 @@ Result memory_free(PageDirectory *page_directory, MemoryRange range)
         if (virtual_present(page_directory, virtual_address))
         {
             physical_free(virtual_to_physical(page_directory, virtual_address), 1);
-            virtual_free(page_directory, virtual_address, 1);
+            virtual_free(page_directory, (MemoryRange){virtual_address, PAGE_SIZE});
         }
     }
 

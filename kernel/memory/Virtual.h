@@ -1,5 +1,8 @@
 #pragma once
 
+#include <abi/Memory.h>
+
+#include "kernel/memory/MemoryRange.h"
 #include "kernel/memory/Paging.h"
 
 extern PageDirectory kpdir;
@@ -11,6 +14,6 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
 
 int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool user);
 
-uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user);
+MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, MemoryFlags flags);
 
-void virtual_free(PageDirectory *pdir, uint vaddr, uint count);
+void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range);

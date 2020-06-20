@@ -1,4 +1,3 @@
-
 #include "kernel/memory/Virtual.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/system/System.h"
@@ -79,32 +78,31 @@ int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool us
     return 0;
 }
 
-uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
+MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, MemoryFlags flags)
 {
-    if (count == 0)
-        return 0;
+    bool is_user_memory = flags & MEMORY_USER;
 
-    uint current_size = 0;
-    uint startaddr = 0;
+    uintptr_t virtual_address = 0;
+    size_t current_size = 0;
 
     // we skip the first page to make null deref trigger a page fault
-    for (size_t i = (user ? 256 : 1) * 1024; i < (user ? 1024 : 256) * 1024; i++)
+    for (size_t i = (is_user_memory ? 256 : 1) * 1024; i < (is_user_memory ? 1024 : 256) * 1024; i++)
     {
-        int vaddr = i * PAGE_SIZE;
+        uintptr_t current_address = i * PAGE_SIZE;
 
-        if (!virtual_present(pdir, vaddr))
+        if (!virtual_present(pdir, current_address))
         {
             if (current_size == 0)
             {
-                startaddr = vaddr;
+                virtual_address = current_address;
             }
 
-            current_size++;
+            current_size += PAGE_SIZE;
 
-            if (current_size == count)
+            if (current_size == physical_range.size)
             {
-                virtual_map(pdir, startaddr, paddr, count, user);
-                return startaddr;
+                virtual_map(pdir, virtual_address, physical_range.base, physical_range.size / PAGE_SIZE, is_user_memory);
+                return (MemoryRange){virtual_address, current_size};
             }
         }
         else
@@ -116,21 +114,21 @@ uint virtual_alloc(PageDirectory *pdir, uint paddr, uint count, int user)
     system_panic("Out of virtual memory!");
 }
 
-void virtual_free(PageDirectory *pdir, uint vaddr, uint count)
+void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
-    for (uint i = 0; i < count; i++)
+    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
     {
-        uint offset = i * PAGE_SIZE;
+        size_t offset = i * PAGE_SIZE;
 
-        uint pdi = PD_INDEX(vaddr + offset);
-        uint pti = PT_INDEX(vaddr + offset);
+        size_t page_directory_index = PD_INDEX(virtual_range.base + offset);
+        size_t page_table_index = PT_INDEX(virtual_range.base + offset);
 
-        PageDirectoryEntry *pde = &pdir->entries[pdi];
-        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
-        PageTableEntry *p = &ptable->entries[pti];
+        PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
+        PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+        PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
-        if (pde->Present)
-            p->as_uint = 0;
+        if (page_table_entry->Present)
+            page_table_entry->as_uint = 0;
     }
 
     paging_invalidate_tlb();

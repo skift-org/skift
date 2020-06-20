@@ -3,6 +3,7 @@
 #include "demo/DemoWidget.h"
 
 static Demo _demos[] = {
+    //{"Fonts", fonts_draw},
     {"Latency", latency_draw},
     {"Colors", colors_draw},
     {"Cube", cube_draw},

@@ -690,3 +690,58 @@ void painter_draw_string_within(Painter *painter, Font *font, const char *str, R
         vec2i(bound.x, bound.y + bound.height / 2 + 4),
         color);
 }
+
+void painter_draw_truetype_glyph(Painter *painter, TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color)
+{
+    Rectangle dest;
+    dest.position = vec2i_add(position, glyph->offset);
+    dest.size = glyph->bound.size;
+
+    TrueTypeAtlas *atlas = truetypefont_get_atlas(font);
+
+    for (int x = 0; x < dest.width; x++)
+    {
+        for (int y = 0; y < dest.height; y++)
+        {
+            int alpha = (atlas->buffer[(y + glyph->bound.y) * atlas->width + (x + glyph->bound.x)] * color.A) / 255;
+
+            painter_plot_pixel(painter, vec2i(x + dest.x, y + dest.y), COLOR_RGBA(color.R, color.G, color.B, alpha));
+        }
+    }
+
+    //painter_draw_rectangle(painter, dest, COLOR_RED);
+}
+
+__flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font, const char *string, Vec2i position, Color color)
+{
+    Codepoint codepoint = 0;
+    size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
+    string += size;
+    while (size && codepoint != 0)
+    {
+        TrueTypeGlyph *glyph = truetypefont_get_glyph_for_codepoint(font, codepoint);
+
+        if (glyph)
+        {
+            painter_draw_truetype_glyph(painter, font, glyph, position, color);
+            position = vec2i_add(position, vec2i(glyph->advance, 0));
+        }
+
+        size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
+        string += size;
+    }
+}
+
+void painter_draw_truetype_string_within(Painter *painter, TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color)
+{
+    Rectangle bound = truetypefont_mesure_string(font, str);
+
+    bound = rectangle_place_within(bound, position, container);
+
+    painter_draw_truetype_string(
+        painter,
+        font,
+        str,
+        vec2i(bound.x, bound.y + bound.height / 2 + 4),
+        color);
+}

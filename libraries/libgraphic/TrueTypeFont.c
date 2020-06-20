@@ -25,18 +25,7 @@ struct TrueTypeFont
 
     size_t glyphs_count;
     TrueTypeGlyph *glyphs;
-
-    int bitmap_width;
-    int bitmap_height;
-    uint8_t *bitmap;
-};
-
-struct TrueTypeGlyph
-{
-    Codepoint codepoint;
-    Rectangle bound;
-    Vec2i offset;
-    int advance;
+    TrueTypeAtlas *atlas;
 };
 
 TrueTypeFamily *truetype_family_create(const char *path)
@@ -73,21 +62,23 @@ TrueTypeFont *truetypefont_create(TrueTypeFamily *family, int size)
     font->family = family;
     font->size = size;
 
-    font->bitmap_width = 512;
-    font->bitmap_height = 512;
-    font->bitmap = (uint8_t *)malloc(font->bitmap_width * font->bitmap_height);
+    TrueTypeAtlas *atlas = (TrueTypeAtlas *)malloc(sizeof(TrueTypeAtlas) + 512 * 512);
+    atlas->width = 512;
+    atlas->height = 512;
+
+    font->atlas = atlas;
 
     stbtt_PackBegin(
         &font->rasterizer,
-        font->bitmap,
-        font->bitmap_width,
-        font->bitmap_height,
+        atlas->buffer,
+        atlas->width,
+        atlas->height,
         0,
         1,
         NULL);
 
-    truetypefont_raster_range(font, 0x0020, 0x007f);
-    truetypefont_raster_range(font, 0x00A0, 0x00FF);
+    //truetypefont_raster_range(font, 0x0020, 0x007f);
+    //truetypefont_raster_range(font, 0x00A0, 0x00FF);
 
     return font;
 }
@@ -101,14 +92,14 @@ void truetypefont_destroy(TrueTypeFont *font)
         free(font->glyphs);
     }
 
-    free(font->bitmap);
+    free(font->atlas);
     free(font);
 }
 
 void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint end)
 {
     size_t start_index = 0;
-    size_t count = end - start;
+    size_t count = end - start + 1;
 
     if (!font->glyphs)
     {
@@ -134,10 +125,65 @@ void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint en
 
         glyph->offset = vec2i(packedchar[i].xoff, packedchar[i].yoff);
 
+        glyph->codepoint = start + i;
+
         glyph->bound = RECTANGLE(
             packedchar[i].x0,
             packedchar[i].y0,
             packedchar[i].x1 - packedchar[i].x0,
             packedchar[i].y1 - packedchar[i].y0);
     }
+}
+
+TrueTypeAtlas *truetypefont_get_atlas(TrueTypeFont *font)
+{
+    return font->atlas;
+}
+
+static TrueTypeGlyph *lookup_glyph(TrueTypeFont *font, Codepoint codepoint)
+{
+    for (size_t i = 0; i < font->glyphs_count; i++)
+    {
+        if (font->glyphs[i].codepoint == codepoint)
+        {
+            return &font->glyphs[i];
+        }
+    }
+
+    return NULL;
+}
+
+TrueTypeGlyph *truetypefont_get_glyph_for_codepoint(TrueTypeFont *font, Codepoint codepoint)
+{
+    TrueTypeGlyph *glyph = lookup_glyph(font, codepoint);
+
+    if (glyph != NULL)
+    {
+        return glyph;
+    }
+
+    truetypefont_raster_range(font, codepoint, codepoint);
+
+    return lookup_glyph(font, codepoint);
+}
+
+Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
+{
+    Codepoint codepoint = 0;
+
+    int width = 0;
+
+    size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
+    string += size;
+    while (size && codepoint != 0)
+    {
+        TrueTypeGlyph *glyph = truetypefont_get_glyph_for_codepoint(font, codepoint);
+
+        width += glyph->advance;
+
+        size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
+        string += size;
+    }
+
+    return RECTANGLE(0, 0, width, font->size);
 }

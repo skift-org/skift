@@ -3,6 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 #include <libgraphic/Icon.h>
+#include <libgraphic/TrueTypeFont.h>
 
 #define CLIPSTACK_SIZE 32
 #define ORIGINSTACK_SIZE 32
@@ -77,3 +78,7 @@ void painter_draw_string_within(
     Rectangle container,
     Position position,
     Color color);
+
+void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font, const char *string, Vec2i position, Color color);
+
+void painter_draw_truetype_string_within(Painter *painter, TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color);

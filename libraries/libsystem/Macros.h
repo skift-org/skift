@@ -8,7 +8,7 @@
 
 #define __create(__type) ((__type *)calloc(1, sizeof(__type)))
 
-#define __swap(__x, __y) \
+#define __swap(__x, __y)         \
     ({                           \
         typeof(__x) __tmp = __x; \
         __x = __y;               \
@@ -20,6 +20,8 @@
 #define __cleanup(__function) __attribute__((__cleanup__(__function)))
 
 #define __cleanup_malloc __attribute__((__cleanup__(malloc_cleanup)))
+
+#define __flatten __attribute__((flatten))
 
 // Align the nearest _lower_ aligned address
 // ex: 8 with align = 8 -> 8

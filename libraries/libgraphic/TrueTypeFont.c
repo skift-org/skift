@@ -8,7 +8,6 @@
 #include <libgraphic/TrueTypeFont.h>
 #include <libmath/Vectors.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/unicode/Codepoint.h>
 
 struct TrueTypeFamily
 {
@@ -86,6 +85,9 @@ TrueTypeFont *truetypefont_create(TrueTypeFamily *family, int size)
         0,
         1,
         NULL);
+
+    truetypefont_raster_range(font, 0x0020, 0x007f);
+    truetypefont_raster_range(font, 0x00A0, 0x00FF);
 
     return font;
 }

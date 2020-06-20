@@ -80,7 +80,7 @@ void painter_plot_pixel(Painter *painter, Vec2i position, Color color)
     }
 }
 
-__attribute__((flatten)) void painter_clear_pixel(Painter *painter, Vec2i position, Color color)
+__flatten void painter_clear_pixel(Painter *painter, Vec2i position, Color color)
 {
     Vec2i transformed = vec2i_add(position, painter->originestack[painter->originestack_top]);
 
@@ -137,7 +137,7 @@ void painter_blit_bitmap_scaled(
     }
 }
 
-__attribute__((flatten)) void painter_blit_bitmap(
+__flatten void painter_blit_bitmap(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,
@@ -203,7 +203,7 @@ void painter_blit_bitmap_scaled_no_alpha(
     }
 }
 
-__attribute__((flatten)) void painter_blit_bitmap_no_alpha(
+__flatten void painter_blit_bitmap_no_alpha(
     Painter *painter,
     Bitmap *bitmap,
     Rectangle source,
@@ -220,12 +220,12 @@ __attribute__((flatten)) void painter_blit_bitmap_no_alpha(
     }
 }
 
-__attribute__((flatten)) void painter_clear(Painter *painter, Color color)
+__flatten void painter_clear(Painter *painter, Color color)
 {
     painter_clear_rectangle(painter, bitmap_bound(painter->bitmap), color);
 }
 
-__attribute__((flatten)) void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
+__flatten void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
@@ -244,7 +244,7 @@ __attribute__((flatten)) void painter_clear_rectangle(Painter *painter, Rectangl
     }
 }
 
-__attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
+__flatten void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color)
 {
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
@@ -264,7 +264,7 @@ __attribute__((flatten)) void painter_fill_rectangle(Painter *painter, Rectangle
     }
 }
 
-__attribute__((flatten)) void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color)
+__flatten void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color)
 {
     Rectangle left_ear = rectangle_left(rectangle, insets.left);
     Rectangle right_ear = rectangle_right(rectangle, insets.right);
@@ -277,18 +277,18 @@ __attribute__((flatten)) void painter_fill_insets(Painter *painter, Rectangle re
     painter_fill_rectangle(painter, bottom, color);
 }
 
-__attribute__((flatten)) void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
+__flatten void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
 {
     Vec2f a = vec2f(p0.x, p0.y);
     Vec2f b = vec2f(p1.x, p1.y);
     Vec2f c = vec2f(p2.x, p2.y);
 
     if (a.y > b.y)
-        __swap( a, b);
+        __swap(a, b);
     if (a.y > c.y)
-        __swap( a, c);
+        __swap(a, c);
     if (b.y > c.y)
-        __swap( b, c);
+        __swap(b, c);
 
     Vec2f s = a;
     Vec2f e = a;
@@ -461,13 +461,13 @@ void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color
     const bool steep = abs(y1 - a.y) > abs(x1 - x0);
     if (steep)
     {
-        __swap( x0, y0);
-        __swap( x1, y1);
+        __swap(x0, y0);
+        __swap(x1, y1);
     }
     if (x0 > x1)
     {
-        __swap( x0, x1);
-        __swap( y0, y1);
+        __swap(x0, x1);
+        __swap(y0, y1);
     }
 
     const float dx = x1 - x0;
@@ -534,7 +534,7 @@ void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color
     }
 }
 
-__attribute__((flatten)) void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color)
+__flatten void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color)
 {
     if (a.x == b.x)
     {
@@ -550,7 +550,7 @@ __attribute__((flatten)) void painter_draw_line(Painter *painter, Vec2i a, Vec2i
     }
 }
 
-__attribute__((flatten)) void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
+__flatten void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
 {
     Vec2i topleft = rect.position;
     Vec2i topright = vec2i_add(rect.position, vec2i_x(rect.size));
@@ -569,7 +569,7 @@ __attribute__((flatten)) void painter_draw_rectangle(Painter *painter, Rectangle
     painter_draw_line(painter, vec2i_add(topright, vec2i(0, 1)), vec2i_sub(bottomright, vec2i(0, 1)), color);
 }
 
-__attribute__((flatten)) void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
+__flatten void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
 {
     painter_draw_line(painter, p0, p1, color);
     painter_draw_line(painter, p1, p2, color);
@@ -617,7 +617,7 @@ void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radiu
     painter_fill_rectangle(painter, rectangle_bottom(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
 }
 
-__attribute__((flatten)) void painter_blit_icon(Painter *painter, Icon *icon, IconSize size, Rectangle destination, Color color)
+__flatten void painter_blit_icon(Painter *painter, Icon *icon, IconSize size, Rectangle destination, Color color)
 {
     Bitmap *bitmap = icon_get_bitmap(icon, size);
 
@@ -638,7 +638,7 @@ __attribute__((flatten)) void painter_blit_icon(Painter *painter, Icon *icon, Ic
     }
 }
 
-__attribute__((flatten)) void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
+__flatten void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
 {
     for (int x = 0; x < dst_rect.width; x++)
     {
@@ -666,7 +666,7 @@ void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i positi
     painter_blit_bitmap_colored(painter, font->bitmap, glyph->bound, dest, color);
 }
 
-__attribute__((flatten)) void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color)
+__flatten void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color)
 {
     for (size_t i = 0; str[i]; i++)
     {

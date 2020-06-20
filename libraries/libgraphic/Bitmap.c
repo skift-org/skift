@@ -128,7 +128,7 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
     return SUCCESS;
 }
 
-__attribute__((flatten)) void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
+__flatten void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
 {
     region = rectangle_clip(region, bitmap_bound(source));
     region = rectangle_clip(region, bitmap_bound(destination));

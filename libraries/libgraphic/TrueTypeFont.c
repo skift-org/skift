@@ -187,3 +187,34 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
 
     return RECTANGLE(0, 0, width, font->size);
 }
+
+#include <libsystem/Logger.h>
+
+int truetypefont_get_kerning_for_codepoints(TrueTypeFont *font, Codepoint left, Codepoint right)
+{
+    double scale = stbtt_ScaleForPixelHeight(&font->family->info, font->size);
+
+    int kerning = stbtt_GetCodepointKernAdvance(&font->family->info, left, right);
+
+    return kerning * scale;
+}
+
+TrueTypeFontMetrics truetypefont_get_metrics(TrueTypeFont *font)
+{
+    TrueTypeFontMetrics metrics = {};
+
+    double scale = stbtt_ScaleForPixelHeight(&font->family->info, font->size);
+
+    stbtt_GetFontVMetrics(
+        &font->family->info,
+
+        &metrics.ascent,
+        &metrics.descent,
+        &metrics.linegap);
+
+    metrics.ascent *= scale;
+    metrics.descent *= scale;
+    metrics.linegap *= scale;
+
+    return metrics;
+}

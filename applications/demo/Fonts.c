@@ -12,7 +12,7 @@ void fonts_draw(Painter *painter, Rectangle screen, double time)
 
     if (!_family)
     {
-        _family = truetype_family_create("/res/fonts/RobotoMono/RobotoMono-Medium.ttf");
+        _family = truetype_family_create("/res/fonts/Roboto/Roboto-Medium.ttf");
 
         for (size_t i = 0; i < 16; i++)
         {
@@ -22,11 +22,21 @@ void fonts_draw(Painter *painter, Rectangle screen, double time)
 
     painter_clear(painter, COLOR_REBECCAPURPLE);
 
-    int current = 8;
+    int current = 4;
     for (size_t i = 0; i < 16; i++)
     {
-        painter_draw_truetype_string(painter, _fonts[i], "The quick brown fox jumps over the lazy dog.", vec2i(8, current), COLOR_WHITE);
+        TrueTypeFontMetrics metrics = truetypefont_get_metrics(_fonts[i]);
 
-        current += 8 + 4 * i;
+        current += metrics.ascent;
+
+        painter_draw_truetype_string(
+            painter,
+            _fonts[i],
+            u8"Latin Greek Cyrilic Vietnames Hebrew Arabic 24px Traditionally, text is composed to create a readable ",
+            vec2i(8, current),
+            COLOR_WHITE);
+
+        current -= metrics.descent;
+        current += metrics.linegap;
     }
 }

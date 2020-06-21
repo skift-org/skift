@@ -712,9 +712,20 @@ void painter_draw_truetype_glyph(Painter *painter, TrueTypeFont *font, TrueTypeG
     //painter_draw_rectangle(painter, dest, COLOR_RED);
 }
 
+#include <libsystem/Logger.h>
+
 __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font, const char *string, Vec2i position, Color color)
 {
+    // Rectangle bound = truetypefont_mesure_string(font, string);
+    // TrueTypeFontMetrics metrics = truetypefont_get_metrics(font);
+    //
+    // bound = rectangle_offset(bound, position);
+    // bound = rectangle_offset(bound, vec2i(0, -metrics.ascent));
+    //
+    // painter_draw_rectangle(painter, bound, COLOR_GREEN);
+
     Codepoint codepoint = 0;
+    Codepoint previouse = 0;
     size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
     string += size;
     while (size && codepoint != 0)
@@ -723,9 +734,18 @@ __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font
 
         if (glyph)
         {
+            if (previouse != 0)
+            {
+                int kerning = truetypefont_get_kerning_for_codepoints(font, previouse, codepoint);
+                position = vec2i_add(position, vec2i(kerning, 0));
+            }
+
             painter_draw_truetype_glyph(painter, font, glyph, position, color);
+
             position = vec2i_add(position, vec2i(glyph->advance, 0));
         }
+
+        previouse = codepoint;
 
         size_t size = utf8_to_codepoint((const uint8_t *)string, &codepoint);
         string += size;

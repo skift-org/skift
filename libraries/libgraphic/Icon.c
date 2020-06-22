@@ -19,16 +19,11 @@ static Icon *icon_load(const char *name)
 
     for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
     {
-        char path[512] = {};
-        snprintf(path, 512, "/res/icons/%s@%spx.png", name, _icon_size_names[i]);
+        char path[PATH_LENGTH] = {};
+        snprintf(path, PATH_LENGTH, "/res/icons/%s@%spx.png", name, _icon_size_names[i]);
 
         Bitmap *bitmap = NULL;
-        if (bitmap_load_from_can_fail(path, &bitmap) != SUCCESS)
-        {
-            logger_warn("Failled to load icon '%s' for size %spx.", name, _icon_size_names[i]);
-        }
-
-        if (bitmap != NULL)
+        if (bitmap_load_from_can_fail(path, &bitmap) == SUCCESS)
         {
             bitmap->filtering = BITMAP_FILTERING_LINEAR;
             icon->sizes[i] = bitmap;

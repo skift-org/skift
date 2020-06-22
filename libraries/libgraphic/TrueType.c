@@ -1,17 +1,14 @@
+// Base on stb truetype.
+
 #include <libgraphic/TrueType.h>
 #include <libmath/math.h>
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 
-#ifndef STBTT_MAX_OVERSAMPLE
 #define STBTT_MAX_OVERSAMPLE 8
-#endif
 
-#if STBTT_MAX_OVERSAMPLE > 255
-#error "STBTT_MAX_OVERSAMPLE cannot be > 255"
-#endif
-
-typedef int stbtt__test_oversample_pow2[(STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERSAMPLE - 1)) == 0 ? 1 : -1];
+static_assert(STBTT_MAX_OVERSAMPLE < 256, "STBTT_MAX_OVERSAMPLE cannot be > 255");
+static_assert((STBTT_MAX_OVERSAMPLE & (STBTT_MAX_OVERSAMPLE - 1)) == 0, "Test oversample pow2");
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -76,10 +73,13 @@ static stbtt__buf stbtt__new_buf(const void *p, size_t size)
 static stbtt__buf stbtt__buf_range(const stbtt__buf *b, int o, int s)
 {
     stbtt__buf r = stbtt__new_buf(NULL, 0);
+
     if (o < 0 || s < 0 || o > b->size || s > b->size - o)
         return r;
+
     r.data = b->data + o;
     r.size = s;
+
     return r;
 }
 
@@ -111,8 +111,8 @@ static uint32_t stbtt__cff_int(stbtt__buf *b)
         return stbtt__buf_get16(b);
     else if (b0 == 29)
         return stbtt__buf_get32(b);
-    assert(0);
-    return 0;
+
+    ASSERT_NOT_REACHED();
 }
 
 static void stbtt__cff_skip_operand(stbtt__buf *b)
@@ -462,8 +462,8 @@ int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codepoint)
     }
     else if (format == 2)
     {
-        assert(0); // @TODO: high-byte mapping for japanese/chinese/korean
-        return 0;
+        // @TODO: high-byte mapping for japanese/chinese/korean
+        ASSERT_NOT_REACHED();
     }
     else if (format == 4)
     { // standard mapping for windows fonts: binary search collection of ranges
@@ -541,8 +541,7 @@ int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codepoint)
         return 0; // not found
     }
     // @TODO
-    assert(0);
-    return 0;
+    ASSERT_NOT_REACHED();
 }
 
 int stbtt_GetCodepointShape(const stbtt_fontinfo *info, int unicode_codepoint, stbtt_vertex **vertices)
@@ -853,7 +852,7 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
             else
             {
                 // @TODO handle matching point
-                assert(0);
+                ASSERT_NOT_REACHED();
             }
             if (flags & (1 << 3))
             { // WE_HAVE_A_SCALE
@@ -1564,7 +1563,7 @@ static int32_t stbtt__GetCoverageIndex(uint8_t *coverageTable, int glyph)
     default:
     {
         // There are no other cases.
-        assert(0);
+        ASSERT_NOT_REACHED();
     }
     break;
     }
@@ -1620,7 +1619,7 @@ static int32_t stbtt__GetGlyphClass(uint8_t *classDefTable, int glyph)
     default:
     {
         // There are no other cases.
-        assert(0);
+        ASSERT_NOT_REACHED();
     }
     break;
     }
@@ -1763,7 +1762,7 @@ static int32_t stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, int gl
                 default:
                 {
                     // There are no other cases.
-                    assert(0);
+                    ASSERT_NOT_REACHED();
                     break;
                 };
                 }
@@ -1796,6 +1795,7 @@ int stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2)
 {
     if (!info->kern && !info->gpos) // if no kerning table, don't waste time looking up both codepoint->glyphs
         return 0;
+
     return stbtt_GetGlyphKernAdvance(info, stbtt_FindGlyphIndex(info, ch1), stbtt_FindGlyphIndex(info, ch2));
 }
 
@@ -1808,8 +1808,10 @@ void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent, int *descent
 {
     if (ascent)
         *ascent = ttSHORT(info->data + info->hhea + 4);
+
     if (descent)
         *descent = ttSHORT(info->data + info->hhea + 6);
+
     if (lineGap)
         *lineGap = ttSHORT(info->data + info->hhea + 8);
 }
@@ -1817,14 +1819,19 @@ void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent, int *descent
 int stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap)
 {
     int tab = stbtt__find_table(info->data, info->fontstart, "OS/2");
+
     if (!tab)
         return 0;
+
     if (typoAscent)
         *typoAscent = ttSHORT(info->data + tab + 68);
+
     if (typoDescent)
         *typoDescent = ttSHORT(info->data + tab + 70);
+
     if (typoLineGap)
         *typoLineGap = ttSHORT(info->data + tab + 72);
+
     return 1;
 }
 
@@ -1923,10 +1930,13 @@ void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font, int glyph, floa
         // move to integral bboxes (treating pixels as little squares, what pixels get touched)?
         if (ix0)
             *ix0 = floor(x0 * scale_x + shift_x);
+
         if (iy0)
             *iy0 = floor(-y1 * scale_y + shift_y);
+
         if (ix1)
             *ix1 = ceil(x1 * scale_x + shift_x);
+
         if (iy1)
             *iy1 = ceil(-y0 * scale_y + shift_y);
     }
@@ -2794,12 +2804,13 @@ unsigned char *stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, f
 
 void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int glyph)
 {
-    int ix0, iy0;
-    stbtt_vertex *vertices;
+    stbtt_vertex *vertices = NULL;
     int num_verts = stbtt_GetGlyphShape(info, glyph, &vertices);
-    stbtt__bitmap gbm;
 
+    int ix0, iy0;
     stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0, &iy0, 0, 0);
+
+    stbtt__bitmap gbm;
     gbm.pixels = output;
     gbm.w = out_w;
     gbm.h = out_h;
@@ -2808,7 +2819,8 @@ void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo *info, unsigned char *ou
     if (gbm.w && gbm.h)
         stbtt_Rasterize(&gbm, 0.35f, vertices, num_verts, scale_x, scale_y, shift_x, shift_y, ix0, iy0, 1);
 
-    free(vertices);
+    if (vertices)
+        free(vertices);
 }
 
 void stbtt_MakeGlyphBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int glyph)
@@ -3042,7 +3054,7 @@ void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip)
 
 #define STBTT__OVER_MASK (STBTT_MAX_OVERSAMPLE - 1)
 
-static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
+void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
 {
     unsigned char buffer[STBTT_MAX_OVERSAMPLE] = {};
     int safe_w = w - kernel_width;
@@ -3055,49 +3067,11 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
 
         total = 0;
 
-        // make kernel_width a constant in common cases so compiler can optimize out the divide
-        switch (kernel_width)
+        for (i = 0; i <= safe_w; ++i)
         {
-        case 2:
-            for (i = 0; i <= safe_w; ++i)
-            {
-                total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
-                pixels[i] = (unsigned char)(total / 2);
-            }
-            break;
-        case 3:
-            for (i = 0; i <= safe_w; ++i)
-            {
-                total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
-                pixels[i] = (unsigned char)(total / 3);
-            }
-            break;
-        case 4:
-            for (i = 0; i <= safe_w; ++i)
-            {
-                total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
-                pixels[i] = (unsigned char)(total / 4);
-            }
-            break;
-        case 5:
-            for (i = 0; i <= safe_w; ++i)
-            {
-                total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
-                pixels[i] = (unsigned char)(total / 5);
-            }
-            break;
-        default:
-            for (i = 0; i <= safe_w; ++i)
-            {
-                total += pixels[i] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
-                pixels[i] = (unsigned char)(total / kernel_width);
-            }
-            break;
+            total += pixels[i] - buffer[i & STBTT__OVER_MASK];
+            buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i];
+            pixels[i] = (unsigned char)(total / kernel_width);
         }
 
         for (; i < w; ++i)
@@ -3111,13 +3085,12 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h, int stride_i
     }
 }
 
-static void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
+void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_in_bytes, unsigned int kernel_width)
 {
-    unsigned char buffer[STBTT_MAX_OVERSAMPLE];
+    unsigned char buffer[STBTT_MAX_OVERSAMPLE] = {};
     int safe_h = h - kernel_width;
-    int j;
-    memset(buffer, 0, STBTT_MAX_OVERSAMPLE); // suppress bogus warning from VS2013 -analyze
-    for (j = 0; j < w; ++j)
+
+    for (int j = 0; j < w; ++j)
     {
         int i;
         unsigned int total;
@@ -3125,49 +3098,11 @@ static void stbtt__v_prefilter(unsigned char *pixels, int w, int h, int stride_i
 
         total = 0;
 
-        // make kernel_width a constant in common cases so compiler can optimize out the divide
-        switch (kernel_width)
+        for (i = 0; i <= safe_h; ++i)
         {
-        case 2:
-            for (i = 0; i <= safe_h; ++i)
-            {
-                total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
-                pixels[i * stride_in_bytes] = (unsigned char)(total / 2);
-            }
-            break;
-        case 3:
-            for (i = 0; i <= safe_h; ++i)
-            {
-                total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
-                pixels[i * stride_in_bytes] = (unsigned char)(total / 3);
-            }
-            break;
-        case 4:
-            for (i = 0; i <= safe_h; ++i)
-            {
-                total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
-                pixels[i * stride_in_bytes] = (unsigned char)(total / 4);
-            }
-            break;
-        case 5:
-            for (i = 0; i <= safe_h; ++i)
-            {
-                total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
-                pixels[i * stride_in_bytes] = (unsigned char)(total / 5);
-            }
-            break;
-        default:
-            for (i = 0; i <= safe_h; ++i)
-            {
-                total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
-                buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
-                pixels[i * stride_in_bytes] = (unsigned char)(total / kernel_width);
-            }
-            break;
+            total += pixels[i * stride_in_bytes] - buffer[i & STBTT__OVER_MASK];
+            buffer[(i + kernel_width) & STBTT__OVER_MASK] = pixels[i * stride_in_bytes];
+            pixels[i * stride_in_bytes] = (unsigned char)(total / kernel_width);
         }
 
         for (; i < h; ++i)
@@ -3433,8 +3368,6 @@ void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph, int c
     *xpos += b->xadvance;
 }
 
-
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // font name matching -- recommended not to use this
@@ -3513,18 +3446,19 @@ static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char 
 // will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian() to compare
 const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
 {
-    int32_t i, count, stringOffset;
     uint8_t *fc = font->data;
     uint32_t offset = font->fontstart;
-    uint32_t nm = stbtt__find_table(fc, offset, "name");
-    if (!nm)
+    uint32_t name_table = stbtt__find_table(fc, offset, "name");
+
+    if (!name_table)
         return NULL;
 
-    count = ttUSHORT(fc + nm + 2);
-    stringOffset = nm + ttUSHORT(fc + nm + 4);
-    for (i = 0; i < count; ++i)
+    int32_t count = ttUSHORT(fc + name_table + 2);
+    int32_t stringOffset = name_table + ttUSHORT(fc + name_table + 4);
+
+    for (int i = 0; i < count; i++)
     {
-        uint32_t loc = nm + 6 + 12 * i;
+        uint32_t loc = name_table + 6 + 12 * i;
         if (platformID == ttUSHORT(fc + loc + 0) && encodingID == ttUSHORT(fc + loc + 2) && languageID == ttUSHORT(fc + loc + 4) && nameID == ttUSHORT(fc + loc + 6))
         {
             *length = ttUSHORT(fc + loc + 8);
@@ -3536,57 +3470,64 @@ const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int
 
 static int stbtt__matchpair(uint8_t *fc, uint32_t nm, uint8_t *name, int32_t nlen, int32_t target_id, int32_t next_id)
 {
-    int32_t i;
     int32_t count = ttUSHORT(fc + nm + 2);
     int32_t stringOffset = nm + ttUSHORT(fc + nm + 4);
 
-    for (i = 0; i < count; ++i)
+    for (int32_t i = 0; i < count; ++i)
     {
         uint32_t loc = nm + 6 + 12 * i;
+
         int32_t id = ttUSHORT(fc + loc + 6);
-        if (id == target_id)
+
+        if (id != target_id)
         {
-            // find the encoding
-            int32_t platform = ttUSHORT(fc + loc + 0), encoding = ttUSHORT(fc + loc + 2), language = ttUSHORT(fc + loc + 4);
+            continue;
+        }
 
-            // is this a Unicode encoding?
-            if (platform == 0 || (platform == 3 && encoding == 1) || (platform == 3 && encoding == 10))
+        // find the encoding
+        int32_t platform = ttUSHORT(fc + loc + 0), encoding = ttUSHORT(fc + loc + 2), language = ttUSHORT(fc + loc + 4);
+
+        // is this a Unicode encoding?
+        if (platform == 0 ||
+            (platform == 3 && encoding == 1) ||
+            (platform == 3 && encoding == 10))
+        {
+            int32_t slen = ttUSHORT(fc + loc + 8);
+            int32_t off = ttUSHORT(fc + loc + 10);
+
+            // check if there's a prefix match
+            int32_t matchlen = stbtt__CompareUTF8toUTF16_bigendian_prefix(name, nlen, fc + stringOffset + off, slen);
+            if (matchlen < 0)
             {
-                int32_t slen = ttUSHORT(fc + loc + 8);
-                int32_t off = ttUSHORT(fc + loc + 10);
-
-                // check if there's a prefix match
-                int32_t matchlen = stbtt__CompareUTF8toUTF16_bigendian_prefix(name, nlen, fc + stringOffset + off, slen);
-                if (matchlen >= 0)
-                {
-                    // check for target_id+1 immediately following, with same encoding & language
-                    if (i + 1 < count && ttUSHORT(fc + loc + 12 + 6) == next_id && ttUSHORT(fc + loc + 12) == platform && ttUSHORT(fc + loc + 12 + 2) == encoding && ttUSHORT(fc + loc + 12 + 4) == language)
-                    {
-                        slen = ttUSHORT(fc + loc + 12 + 8);
-                        off = ttUSHORT(fc + loc + 12 + 10);
-                        if (slen == 0)
-                        {
-                            if (matchlen == nlen)
-                                return 1;
-                        }
-                        else if (matchlen < nlen && name[matchlen] == ' ')
-                        {
-                            ++matchlen;
-                            if (stbtt_CompareUTF8toUTF16_bigendian_internal((char *)(name + matchlen), nlen - matchlen, (char *)(fc + stringOffset + off), slen))
-                                return 1;
-                        }
-                    }
-                    else
-                    {
-                        // if nothing immediately following
-                        if (matchlen == nlen)
-                            return 1;
-                    }
-                }
+                continue;
             }
 
-            // @TODO handle other encodings
+            // check for target_id+1 immediately following, with same encoding & language
+            if (i + 1 < count && ttUSHORT(fc + loc + 12 + 6) == next_id && ttUSHORT(fc + loc + 12) == platform && ttUSHORT(fc + loc + 12 + 2) == encoding && ttUSHORT(fc + loc + 12 + 4) == language)
+            {
+                slen = ttUSHORT(fc + loc + 12 + 8);
+                off = ttUSHORT(fc + loc + 12 + 10);
+                if (slen == 0)
+                {
+                    if (matchlen == nlen)
+                        return 1;
+                }
+                else if (matchlen < nlen && name[matchlen] == ' ')
+                {
+                    ++matchlen;
+                    if (stbtt_CompareUTF8toUTF16_bigendian_internal((char *)(name + matchlen), nlen - matchlen, (char *)(fc + stringOffset + off), slen))
+                        return 1;
+                }
+            }
+            else
+            {
+                // if nothing immediately following
+                if (matchlen == nlen)
+                    return 1;
+            }
         }
+
+        // @TODO handle other encodings
     }
     return 0;
 }

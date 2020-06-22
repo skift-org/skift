@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef STBTT_STATIC
-#define static
-#else
-#define extern
-#endif
-
 // private structure
 typedef struct
 {
@@ -467,7 +461,8 @@ const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int
 //     http://www.microsoft.com/typography/otspec/name.htm
 
 enum
-{ // platformID
+{
+    // platformID
     STBTT_PLATFORM_ID_UNICODE = 0,
     STBTT_PLATFORM_ID_MAC = 1,
     STBTT_PLATFORM_ID_ISO = 2,
@@ -475,7 +470,8 @@ enum
 };
 
 enum
-{ // encodingID for STBTT_PLATFORM_ID_UNICODE
+{
+    // encodingID for STBTT_PLATFORM_ID_UNICODE
     STBTT_UNICODE_EID_UNICODE_1_0 = 0,
     STBTT_UNICODE_EID_UNICODE_1_1 = 1,
     STBTT_UNICODE_EID_ISO_10646 = 2,
@@ -484,7 +480,8 @@ enum
 };
 
 enum
-{ // encodingID for STBTT_PLATFORM_ID_MICROSOFT
+{
+    // encodingID for STBTT_PLATFORM_ID_MICROSOFT
     STBTT_MS_EID_SYMBOL = 0,
     STBTT_MS_EID_UNICODE_BMP = 1,
     STBTT_MS_EID_SHIFTJIS = 2,
@@ -492,7 +489,8 @@ enum
 };
 
 enum
-{ // encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes
+{
+    // encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes
     STBTT_MAC_EID_ROMAN = 0,
     STBTT_MAC_EID_ARABIC = 4,
     STBTT_MAC_EID_JAPANESE = 1,
@@ -504,7 +502,8 @@ enum
 };
 
 enum
-{ // languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID...
+{
+    // languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID...
     // problematic because there are e.g. 16 english LCIDs and 16 arabic LCIDs
     STBTT_MS_LANG_ENGLISH = 0x0409,
     STBTT_MS_LANG_ITALIAN = 0x0410,
@@ -521,7 +520,8 @@ enum
 };
 
 enum
-{ // languageID for STBTT_PLATFORM_ID_MAC
+{
+    // languageID for STBTT_PLATFORM_ID_MAC
     STBTT_MAC_LANG_ENGLISH = 0,
     STBTT_MAC_LANG_JAPANESE = 11,
     STBTT_MAC_LANG_ARABIC = 12,

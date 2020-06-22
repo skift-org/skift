@@ -50,7 +50,6 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 
     if (handle_has_error(file))
     {
-        logger_error("Failled to load bitmap from %s: %s", path, handle_error_string(file));
         return handle_get_error(file);
     }
 
@@ -73,7 +72,6 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 
     if (decode_result != 0)
     {
-        logger_error("Failled to decode bitmap from %s: %s", path, lodepng_error_text(decode_result));
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 

@@ -376,7 +376,8 @@ int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint
 
     uint16_t format = ttUSHORT(data + index_map + 0);
     if (format == 0)
-    { // apple byte encoding
+    {
+        // apple byte encoding
         int32_t bytes = ttUSHORT(data + index_map + 2);
         if (unicode_codepoint < bytes - 6)
             return ttBYTE(data + index_map + 6 + unicode_codepoint);
@@ -396,7 +397,8 @@ int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint
         ASSERT_NOT_REACHED();
     }
     else if (format == 4)
-    { // standard mapping for windows fonts: binary search collection of ranges
+    {
+        // standard mapping for windows fonts: binary search collection of ranges
         uint16_t segcount = ttUSHORT(data + index_map + 6) >> 1;
         uint16_t searchRange = ttUSHORT(data + index_map + 8) >> 1;
         uint16_t entrySelector = ttUSHORT(data + index_map + 10);
@@ -462,6 +464,7 @@ int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint
             else
             {
                 uint32_t start_glyph = ttULONG(data + index_map + 16 + mid * 12 + 8);
+
                 if (format == 12)
                     return start_glyph + unicode_codepoint - start_char;
                 else // format == 13
@@ -524,18 +527,23 @@ int truetype_GetGlyphBox(const truetype_fontinfo *info, int glyph_index, int *x0
     else
     {
         int g = truetype_GetGlyfOffset(info, glyph_index);
+
         if (g < 0)
             return 0;
 
         if (x0)
             *x0 = ttSHORT(info->data + g + 2);
+
         if (y0)
             *y0 = ttSHORT(info->data + g + 4);
+
         if (x1)
             *x1 = ttSHORT(info->data + g + 6);
+
         if (y1)
             *y1 = ttSHORT(info->data + g + 8);
     }
+
     return 1;
 }
 

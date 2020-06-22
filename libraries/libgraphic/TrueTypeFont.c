@@ -1,10 +1,5 @@
-#include <libsystem/Assert.h>
-
-#define STB_TRUETYPE_IMPLEMENTATION
-#include <thirdparty/stb/stb_truetype.h>
-#undef STB_TRUETYPE_IMPLEMENTATION
-
 #include <libgraphic/Bitmap.h>
+#include <libgraphic/TrueType.h>
 #include <libgraphic/TrueTypeFont.h>
 #include <libmath/Vectors.h>
 #include <libsystem/io/Stream.h>
@@ -74,8 +69,7 @@ TrueTypeFont *truetypefont_create(TrueTypeFamily *family, int size)
         atlas->width,
         atlas->height,
         0,
-        1,
-        NULL);
+        1);
 
     //truetypefont_raster_range(font, 0x0020, 0x007f);
     //truetypefont_raster_range(font, 0x00A0, 0x00FF);

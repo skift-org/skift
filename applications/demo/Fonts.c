@@ -32,7 +32,7 @@ void fonts_draw(Painter *painter, Rectangle screen, double time)
         painter_draw_truetype_string(
             painter,
             _fonts[i],
-            u8"Latin Greek Cyrilic Vietnames Hebrew Arabic 24px Traditionally, text is composed to create a readable ",
+            u8"The quick brown fox jumps over the lazy dog",
             vec2i(8, current),
             COLOR_WHITE);
 

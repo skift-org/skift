@@ -16,6 +16,7 @@ double floor(double value);
 double ceil(double x);
 
 #define abs(__value) ((__value) < 0 ? -(__value) : (__value))
+#define fabs(__value) abs(__value)
 
 double fmod(double x, double y);
 

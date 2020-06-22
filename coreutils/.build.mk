@@ -21,7 +21,8 @@ UTILS = \
 	SYSFETCH \
 	TOUCH \
 	UNLINK \
-	UPTIME
+	UPTIME \
+	TTFDUMP
 
 __TESTEXEC_NAME = __testexec
 __TESTEXEC_LIBS =
@@ -91,6 +92,9 @@ UNLINK_LIBS =
 
 UPTIME_NAME = uptime
 UPTIME_LIBS =
+
+TTFDUMP_NAME = ttfdump
+TTFDUMP_LIBS = graphic math
 
 define UTIL_TEMPLATE =
 

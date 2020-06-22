@@ -36,3 +36,5 @@
 #define __align_up(__addr, __align) (((__addr) + (__align)-1) & ~((__align)-1))
 
 #define __array_length(__array) (sizeof(__array) / sizeof(__array[0]))
+
+#define __big_endian __attribute__((scalar_storage_order("big-endian")))

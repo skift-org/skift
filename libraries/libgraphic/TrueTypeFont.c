@@ -6,14 +6,14 @@
 
 struct TrueTypeFamily
 {
-    stbtt_fontinfo info;
+    truetype_fontinfo info;
     void *buffer;
     size_t buffer_size;
 };
 
 struct TrueTypeFont
 {
-    stbtt_pack_context rasterizer;
+    truetype_pack_context rasterizer;
 
     TrueTypeFamily *family;
     int size;
@@ -36,10 +36,10 @@ TrueTypeFamily *truetype_family_create(const char *path)
 
     stream_read(font_file, family->buffer, state.size);
 
-    stbtt_InitFont(
+    truetype_InitFont(
         &family->info,
         (unsigned char *)family->buffer,
-        stbtt_GetFontOffsetForIndex((unsigned char *)family->buffer, 0));
+        truetype_GetFontOffsetForIndex((unsigned char *)family->buffer, 0));
 
     return family;
 }
@@ -63,7 +63,7 @@ TrueTypeFont *truetypefont_create(TrueTypeFamily *family, int size)
 
     font->atlas = atlas;
 
-    stbtt_PackBegin(
+    truetype_PackBegin(
         &font->rasterizer,
         atlas->buffer,
         atlas->width,
@@ -79,7 +79,7 @@ TrueTypeFont *truetypefont_create(TrueTypeFamily *family, int size)
 
 void truetypefont_destroy(TrueTypeFont *font)
 {
-    stbtt_PackEnd(&font->rasterizer);
+    truetype_PackEnd(&font->rasterizer);
 
     if (font->glyphs)
     {
@@ -108,8 +108,8 @@ void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint en
         font->glyphs = (TrueTypeGlyph *)realloc(font->glyphs, font->glyphs_count * sizeof(TrueTypeGlyph));
     }
 
-    __cleanup_malloc stbtt_packedchar *packedchar = (stbtt_packedchar *)calloc(0x02AF, sizeof(stbtt_packedchar));
-    stbtt_PackFontRange(&font->rasterizer, (unsigned char *)font->family->buffer, 0, font->size, start, count, packedchar);
+    __cleanup_malloc truetype_packedchar *packedchar = (truetype_packedchar *)calloc(0x02AF, sizeof(truetype_packedchar));
+    truetype_PackFontRange(&font->rasterizer, (unsigned char *)font->family->buffer, 0, font->size, start, count, packedchar);
 
     for (size_t i = 0; i < count; i++)
     {
@@ -186,9 +186,9 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
 
 int truetypefont_get_kerning_for_codepoints(TrueTypeFont *font, Codepoint left, Codepoint right)
 {
-    double scale = stbtt_ScaleForPixelHeight(&font->family->info, font->size);
+    double scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
 
-    int kerning = stbtt_GetCodepointKernAdvance(&font->family->info, left, right);
+    int kerning = truetype_GetCodepointKernAdvance(&font->family->info, left, right);
 
     return kerning * scale;
 }
@@ -197,9 +197,9 @@ TrueTypeFontMetrics truetypefont_get_metrics(TrueTypeFont *font)
 {
     TrueTypeFontMetrics metrics = {};
 
-    double scale = stbtt_ScaleForPixelHeight(&font->family->info, font->size);
+    double scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
 
-    stbtt_GetFontVMetrics(
+    truetype_GetFontVMetrics(
         &font->family->info,
 
         &metrics.ascent,

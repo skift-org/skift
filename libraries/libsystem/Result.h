@@ -41,17 +41,6 @@ typedef enum
         __RESULT_COUNT,
 } Result;
 
-#define RETURN_AND_SET_ERROR(__value, __good_return, __on_error_return) \
-    if ((__value) < 0)                                                  \
-    {                                                                   \
-        error_set((Result) - (__value));                                \
-        return (__on_error_return);                                     \
-    }                                                                   \
-    else                                                                \
-    {                                                                   \
-        return (__good_return);                                         \
-    }
-
 const char *result_to_string(Result error);
 
 Result error_get(void);

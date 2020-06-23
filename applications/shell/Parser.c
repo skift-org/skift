@@ -75,7 +75,9 @@ static ShellNode *command(SourceReader *source)
 
     whitespace(source);
 
-    while (source_do_continue(source) && source_current(source) != '|')
+    while (source_do_continue(source) &&
+           source_current(source) != '|' &&
+           source_current(source) != '>')
     {
         list_pushback(arguments, argument(source));
         whitespace(source);
@@ -106,6 +108,24 @@ static ShellNode *pipeline(SourceReader *source)
     return shell_pipeline_create(commands);
 }
 
+static ShellNode *redirect(SourceReader *source)
+{
+    ShellNode *node = pipeline(source);
+
+    whitespace(source);
+
+    if (!source_skip(source, '>'))
+    {
+        return node;
+    }
+
+    whitespace(source);
+
+    char *destination = argument(source);
+
+    return shell_redirect_create(node, destination);
+}
+
 ShellNode *shell_parse(char *command_text)
 {
     SourceReader *source = source_create_from_string(command_text, strlen(command_text));
@@ -115,7 +135,7 @@ ShellNode *shell_parse(char *command_text)
 
     whitespace(source);
 
-    ShellNode *node = pipeline(source);
+    ShellNode *node = redirect(source);
 
     source_destroy(source);
 

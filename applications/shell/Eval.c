@@ -128,6 +128,22 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
     }
     break;
 
+    case SHELL_NODE_REDIRECT:
+    {
+        ShellRedirect *redirect = (ShellRedirect *)node;
+
+        __cleanup(stream_cleanup) Stream *stream = stream_open(redirect->destination, OPEN_WRITE | OPEN_CREATE);
+
+        if (handle_has_error(stream))
+        {
+            handle_printf_error(stream, "Failled to open '%s'", redirect->destination);
+            return -1;
+        }
+
+        return shell_eval(redirect->command, stdin, stream);
+    }
+    break;
+
     default:
         break;
     }

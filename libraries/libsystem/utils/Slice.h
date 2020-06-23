@@ -9,6 +9,8 @@ typedef struct
     int size;
 } Slice;
 
+#define SLICE_NULL ((Slice){NULL, 0, 0})
+
 static inline Slice slice_create(const void *p, size_t size)
 {
     return (Slice){
@@ -22,12 +24,22 @@ static inline Slice slice_range(const Slice *slice, int offset, int size)
 {
     if (offset < 0 || size < 0 || offset > slice->size || size > slice->size - offset)
     {
-        return slice_create(NULL, 0);
+        return SLICE_NULL;
     }
     else
     {
         return slice_create(slice->data + offset, size);
     }
+}
+
+static inline Slice slice_sub_slice(Slice slice, int offset, int size)
+{
+    return slice_create(slice.data + offset, size);
+}
+
+static inline bool slice_is_empty(Slice slice)
+{
+    return slice.size == 0;
 }
 
 #define slice_get32(b) slice_get((b), 4)

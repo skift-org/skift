@@ -15,19 +15,19 @@ static_assert((TRUETYPE_MAX_OVERSAMPLE & (TRUETYPE_MAX_OVERSAMPLE - 1)) == 0, "T
 // Slice helpers to parse data from file
 //
 
-static Slice truetype_cff_get_index(Slice *b)
+static Slice truetype_cff_get_index(Slice *slice)
 {
-    int start = b->cursor;
-    int count = slice_get16(b);
+    int start = slice->cursor;
+    int count = slice_get16(slice);
 
     if (count)
     {
-        int offsize = slice_get8(b);
+        int offsize = slice_get8(slice);
         assert(offsize >= 1 && offsize <= 4);
-        slice_skip(b, offsize * count);
-        slice_skip(b, slice_get(b, offsize) - 1);
+        slice_skip(slice, offsize * count);
+        slice_skip(slice, slice_get(slice, offsize) - 1);
     }
-    return slice_range(b, start, b->cursor - start);
+    return slice_range(slice, start, slice->cursor - start);
 }
 
 static uint32_t truetype_cff_int(Slice *b)

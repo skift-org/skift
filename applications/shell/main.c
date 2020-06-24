@@ -26,8 +26,16 @@ void shell_prompt(int last_command_exit_value)
 
 int main(int argc, char **argv)
 {
-    __unused(argc);
-    __unused(argv);
+    if (argc == 3)
+    {
+        if (strcpy(argv[1], "-c"))
+        {
+            ShellNode *node = shell_parse(argv[2]);
+            int command_exit_value = shell_eval(node, in_stream, out_stream);
+            shell_node_destroy(node);
+            return command_exit_value;
+        }
+    }
 
     stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
 

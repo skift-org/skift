@@ -132,9 +132,18 @@ Result sys_process_sleep(int time)
     return task_sleep(scheduler_running(), time);
 }
 
-Result sys_process_wait(int tid, int *exit_value)
+Result sys_process_wait(int tid, int *user_exit_value)
 {
-    return task_wait(tid, exit_value);
+    int exit_value;
+
+    Result result = task_wait(tid, &exit_value);
+
+    if (syscall_validate_ptr((uintptr_t)user_exit_value, sizeof(int)))
+    {
+        *user_exit_value = exit_value;
+    }
+
+    return result;
 }
 
 /* --- Shared memory -------------------------------------------------------- */

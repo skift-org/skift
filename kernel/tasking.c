@@ -127,6 +127,8 @@ void task_destroy(Task *task)
     lock_acquire(task->cwd_lock);
     path_destroy(task->cwd_path);
 
+    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->stack, PROCESS_STACK_SIZE});
+
     if (task->pdir != memory_kpdir())
     {
         memory_pdir_destroy(task->pdir);
@@ -676,7 +678,7 @@ void garbage_collector(void)
 {
     while (true)
     {
-        task_sleep(scheduler_running(), 1000); // We don't do this really often.
+        task_sleep(scheduler_running(), 100); // We don't do this really often.
 
         atomic_begin();
         list_iterate(all_tasks, NULL, (ListIterationCallback)destroy_task_if_canceled);

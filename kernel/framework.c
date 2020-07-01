@@ -160,14 +160,14 @@ Result __plug_process_free(uintptr_t address, size_t size)
     return task_memory_free(scheduler_running(), (MemoryRange){address, size});
 }
 
-Result __plug_process_get_cwd(char *buffer, uint size)
+Result __plug_process_get_directory(char *buffer, uint size)
 {
     return task_get_directory(scheduler_running(), buffer, size);
 }
 
-Result __plug_process_set_cwd(const char *cwd)
+Result __plug_process_set_directory(const char *directory)
 {
-    return task_set_directory(scheduler_running(), cwd);
+    return task_set_directory(scheduler_running(), directory);
 }
 
 Result __plug_process_sleep(int time)

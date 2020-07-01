@@ -19,9 +19,9 @@ Result process_alloc(size_t size, uintptr_t *out_address);
 
 Result process_free(uintptr_t address, size_t size);
 
-Result process_get_cwd(char *buffer, size_t size);
+Result process_get_directory(char *buffer, size_t size);
 
-Result process_set_cwd(const char *cwd);
+Result process_set_directory(const char *directory);
 
 int process_sleep(int time);
 

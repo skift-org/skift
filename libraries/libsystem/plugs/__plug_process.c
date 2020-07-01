@@ -48,14 +48,14 @@ Result __plug_process_free(uintptr_t address, size_t size)
     return (Result)__syscall(SYS_PROCESS_FREE, address, size, 0, 0, 0);
 }
 
-Result __plug_process_get_cwd(char *buffer, uint size)
+Result __plug_process_get_directory(char *buffer, uint size)
 {
-    return (Result)__syscall(SYS_PROCESS_GET_CWD, (int)buffer, size, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_GET_DIRECTORY, (int)buffer, size, 0, 0, 0);
 }
 
-Result __plug_process_set_cwd(const char *cwd)
+Result __plug_process_set_directory(const char *directory)
 {
-    return (Result)__syscall(SYS_PROCESS_SET_CWD, (int)cwd, 0, 0, 0, 0);
+    return (Result)__syscall(SYS_PROCESS_SET_DIRECTORY, (int)directory, 0, 0, 0, 0);
 }
 
 Result __plug_process_sleep(int time)

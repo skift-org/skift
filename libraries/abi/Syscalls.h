@@ -8,8 +8,8 @@
     __ENTRY(SYS_PROCESS_SLEEP)            \
     __ENTRY(SYS_PROCESS_WAKEUP)           \
     __ENTRY(SYS_PROCESS_WAIT)             \
-    __ENTRY(SYS_PROCESS_GET_CWD)          \
-    __ENTRY(SYS_PROCESS_SET_CWD)          \
+    __ENTRY(SYS_PROCESS_GET_DIRECTORY)    \
+    __ENTRY(SYS_PROCESS_SET_DIRECTORY)    \
     __ENTRY(SYS_PROCESS_MAP)              \
     __ENTRY(SYS_PROCESS_ALLOC)            \
     __ENTRY(SYS_PROCESS_FREE)             \

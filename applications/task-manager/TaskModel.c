@@ -11,7 +11,7 @@ typedef enum
     COLUMN_NAME,
     COLUMN_STATE,
     COLUMN_CPU,
-    COLUMN_CWD,
+    COLUMN_DIRECTORY,
 
     __COLUMN_COUNT,
 } Column;
@@ -55,8 +55,8 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     case COLUMN_CPU:
         return vstringf("%2d%%", json_integer_value(json_object_get(task, "cpu")));
 
-    case COLUMN_CWD:
-        return vstring(json_string_value(json_object_get(task, "cwd")));
+    case COLUMN_DIRECTORY:
+        return vstring(json_string_value(json_object_get(task, "directory")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -89,7 +89,7 @@ static const char *task_model_column_name(int column)
     case COLUMN_CPU:
         return "CPU%";
 
-    case COLUMN_CWD:
+    case COLUMN_DIRECTORY:
         return "Directory";
 
     default:

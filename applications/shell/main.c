@@ -18,7 +18,7 @@ void shell_prompt(int last_command_exit_value)
     }
 
     char buffer[PATH_LENGTH];
-    process_get_cwd(buffer, PATH_LENGTH);
+    process_get_directory(buffer, PATH_LENGTH);
     printf("%s", buffer);
 
     printf(PROMPT);

@@ -117,12 +117,12 @@ Result sys_process_free(uint address, uint size)
     return task_memory_free(scheduler_running(), (MemoryRange){address, size});
 }
 
-Result sys_process_get_cwd(char *buffer, uint size)
+Result sys_process_get_directory(char *buffer, uint size)
 {
     return task_get_directory(scheduler_running(), buffer, size);
 }
 
-Result sys_process_set_cwd(const char *path)
+Result sys_process_set_directory(const char *path)
 {
     return task_set_directory(scheduler_running(), path);
 }
@@ -453,8 +453,8 @@ static Result (*syscalls[__SYSCALL_COUNT])() = {
     [SYS_PROCESS_CANCEL] = sys_process_cancel,
     [SYS_PROCESS_SLEEP] = sys_process_sleep,
     [SYS_PROCESS_WAIT] = sys_process_wait,
-    [SYS_PROCESS_GET_CWD] = sys_process_get_cwd,
-    [SYS_PROCESS_SET_CWD] = sys_process_set_cwd,
+    [SYS_PROCESS_GET_DIRECTORY] = sys_process_get_directory,
+    [SYS_PROCESS_SET_DIRECTORY] = sys_process_set_directory,
     [SYS_PROCESS_MAP] = sys_process_map,
     [SYS_PROCESS_ALLOC] = sys_process_alloc,
     [SYS_PROCESS_FREE] = sys_process_free,

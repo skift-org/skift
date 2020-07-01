@@ -8,18 +8,18 @@
 
 int shell_builtin_cd(int argc, const char **argv)
 {
-    const char *new_cwd = "/";
+    const char *new_directory = "/";
 
     if (argc == 2)
     {
-        new_cwd = argv[1];
+        new_directory = argv[1];
     }
 
-    Result result = process_set_cwd(new_cwd);
+    Result result = process_set_directory(new_directory);
 
     if (result != SUCCESS)
     {
-        stream_printf(err_stream, "cd: Cannot access '%s': %s\n", new_cwd, result_to_string(result));
+        stream_printf(err_stream, "cd: Cannot access '%s': %s\n", new_directory, result_to_string(result));
         return -1;
     }
 

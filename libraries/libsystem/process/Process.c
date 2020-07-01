@@ -46,14 +46,14 @@ Result process_free(uintptr_t address, size_t size)
     return __plug_process_free(address, size);
 }
 
-Result process_get_cwd(char *buffer, size_t size)
+Result process_get_directory(char *buffer, size_t size)
 {
-    return __plug_process_get_cwd(buffer, size);
+    return __plug_process_get_directory(buffer, size);
 }
 
-Result process_set_cwd(const char *cwd)
+Result process_set_directory(const char *directory)
 {
-    return __plug_process_set_cwd(cwd);
+    return __plug_process_set_directory(directory);
 }
 
 Result process_sleep(int time)

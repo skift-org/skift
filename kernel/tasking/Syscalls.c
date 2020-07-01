@@ -119,12 +119,12 @@ Result sys_process_free(uint address, uint size)
 
 Result sys_process_get_cwd(char *buffer, uint size)
 {
-    return task_get_cwd(scheduler_running(), buffer, size);
+    return task_get_directory(scheduler_running(), buffer, size);
 }
 
 Result sys_process_set_cwd(const char *path)
 {
-    return task_set_cwd(scheduler_running(), path);
+    return task_set_directory(scheduler_running(), path);
 }
 
 Result sys_process_sleep(int time)
@@ -189,7 +189,7 @@ Result sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
 
 Result sys_filesystem_mkdir(const char *dir_path)
 {
-    Path *path = task_cwd_resolve(scheduler_running(), dir_path);
+    Path *path = task_resolve_directory(scheduler_running(), dir_path);
 
     Result result = filesystem_mkdir(path);
 
@@ -200,7 +200,7 @@ Result sys_filesystem_mkdir(const char *dir_path)
 
 Result sys_filesystem_mkpipe(const char *fifo_path)
 {
-    Path *path = task_cwd_resolve(scheduler_running(), fifo_path);
+    Path *path = task_resolve_directory(scheduler_running(), fifo_path);
 
     Result result = filesystem_mkpipe(path);
 
@@ -211,8 +211,8 @@ Result sys_filesystem_mkpipe(const char *fifo_path)
 
 Result sys_filesystem_link(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
-    Path *newp = task_cwd_resolve(scheduler_running(), new_path);
+    Path *oldp = task_resolve_directory(scheduler_running(), old_path);
+    Path *newp = task_resolve_directory(scheduler_running(), new_path);
 
     Result result = filesystem_mklink(oldp, newp);
 
@@ -224,7 +224,7 @@ Result sys_filesystem_link(const char *old_path, const char *new_path)
 
 Result sys_filesystem_unlink(const char *link_path)
 {
-    Path *path = task_cwd_resolve(scheduler_running(), link_path);
+    Path *path = task_resolve_directory(scheduler_running(), link_path);
 
     Result result = filesystem_unlink(path);
 
@@ -235,8 +235,8 @@ Result sys_filesystem_unlink(const char *link_path)
 
 Result sys_filesystem_rename(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_cwd_resolve(scheduler_running(), old_path);
-    Path *newp = task_cwd_resolve(scheduler_running(), new_path);
+    Path *oldp = task_resolve_directory(scheduler_running(), old_path);
+    Path *newp = task_resolve_directory(scheduler_running(), new_path);
 
     Result result = filesystem_rename(oldp, newp);
 

@@ -162,12 +162,12 @@ Result __plug_process_free(uintptr_t address, size_t size)
 
 Result __plug_process_get_cwd(char *buffer, uint size)
 {
-    return task_get_cwd(scheduler_running(), buffer, size);
+    return task_get_directory(scheduler_running(), buffer, size);
 }
 
 Result __plug_process_set_cwd(const char *cwd)
 {
-    return task_set_cwd(scheduler_running(), cwd);
+    return task_set_directory(scheduler_running(), cwd);
 }
 
 Result __plug_process_sleep(int time)

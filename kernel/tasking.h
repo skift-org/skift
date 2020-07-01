@@ -11,8 +11,6 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Blocker.h"
 
-struct Task;
-
 typedef void (*TaskEntry)();
 
 typedef struct Task
@@ -32,8 +30,8 @@ typedef struct Task
     Lock handles_lock;
     FsHandle *handles[PROCESS_HANDLE_COUNT];
 
-    Lock cwd_lock;
-    Path *cwd_path;
+    Lock directory_lock;
+    Path *directory;
 
     List *memory_mapping;
     PageDirectory *pdir; // Page directory
@@ -47,7 +45,8 @@ Task *task_create(Task *parent, const char *name, bool user);
 
 void task_destroy(Task *task);
 
-List *task_all(void);
+typedef IterationDecision (*TaskIterateCallback)(void *target, Task *task);
+void task_iterate(void *target, TaskIterateCallback callback);
 
 Task *task_by_id(int id);
 
@@ -79,8 +78,6 @@ void task_exit(int exit_value);
 
 void task_dump(Task *task);
 
-void task_panic_dump(void);
-
 /* --- Task memory management ----------------------------------------------- */
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
@@ -93,11 +90,11 @@ Result task_memory_free(Task *task, MemoryRange range);
 
 /* --- Task current working directory --------------------------------------- */
 
-Path *task_cwd_resolve(Task *task, const char *buffer);
+Path *task_resolve_directory(Task *task, const char *buffer);
 
-Result task_set_cwd(Task *task, const char *buffer);
+Result task_set_directory(Task *task, const char *buffer);
 
-Result task_get_cwd(Task *task, char *buffer, uint size);
+Result task_get_directory(Task *task, char *buffer, uint size);
 
 /* --- Task file system access ---------------------------------------------- */
 

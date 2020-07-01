@@ -22,14 +22,8 @@
 /*   TASKING                                                                  */
 /* -------------------------------------------------------------------------- */
 
-static int TID = 0;
-
-static List *all_tasks;
-
 void tasking_initialize(void)
 {
-    all_tasks = list_create();
-
     task_shared_memory_setup();
 
     Task *idle_task = task_spawn(NULL, "Idle", system_hang, NULL, false);
@@ -50,117 +44,6 @@ void tasking_initialize(void)
 /* -------------------------------------------------------------------------- */
 /*   TASKS                                                                    */
 /* -------------------------------------------------------------------------- */
-
-Task *task_create(Task *parent, const char *name, bool user)
-{
-    ASSERT_ATOMIC;
-
-    Task *task = __create(Task);
-
-    task->id = TID++;
-    strlcpy(task->name, name, PROCESS_NAME_SIZE);
-    task->state = TASK_STATE_NONE;
-
-    // Setup memory space
-    if (user)
-    {
-        task->pdir = memory_pdir_create();
-    }
-    else
-    {
-        task->pdir = memory_kpdir();
-    }
-
-    // Setup shms
-    task->memory_mapping = list_create();
-
-    // Setup current working directory.
-    lock_init(task->cwd_lock);
-
-    if (parent != NULL)
-    {
-        task->cwd_path = path_clone(parent->cwd_path);
-    }
-    else
-    {
-        Path *path = path_create("/");
-        task->cwd_path = path;
-        assert(task->cwd_path);
-    }
-
-    // Setup fildes
-    lock_init(task->handles_lock);
-    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
-    {
-        task->handles[i] = NULL;
-    }
-
-    memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->stack);
-    task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
-
-    arch_save_context(task);
-
-    list_pushback(all_tasks, task);
-
-    return task;
-}
-
-void task_destroy(Task *task)
-{
-    atomic_begin();
-
-    if (task->state != TASK_STATE_NONE)
-        task_set_state(task, TASK_STATE_NONE);
-
-    list_remove(all_tasks, task);
-    atomic_end();
-
-    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
-    {
-        task_memory_mapping_destroy(task, memory_mapping);
-    }
-
-    list_destroy(task->memory_mapping);
-
-    task_fshandle_close_all(task);
-
-    lock_acquire(task->cwd_lock);
-    path_destroy(task->cwd_path);
-
-    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->stack, PROCESS_STACK_SIZE});
-
-    if (task->pdir != memory_kpdir())
-    {
-        memory_pdir_destroy(task->pdir);
-    }
-
-    free(task);
-}
-
-List *task_all(void)
-{
-    return all_tasks;
-}
-
-Task *task_by_id(int id)
-{
-    list_foreach(Task, task, all_tasks)
-    {
-        if (task->id == id)
-            return task;
-    }
-
-    return NULL;
-}
-
-int task_count(void)
-{
-    atomic_begin();
-    int result = list_count(all_tasks);
-    atomic_end();
-
-    return result;
-}
 
 Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user)
 {
@@ -396,34 +279,21 @@ void task_dump(Task *task)
     atomic_end();
 }
 
-void task_panic_dump(void)
-{
-    if (scheduler_running() == NULL)
-        return;
-
-    atomic_begin();
-
-    printf("\n\tRunning task %d: '%s'", scheduler_running_id(), scheduler_running()->name);
-    task_dump(scheduler_running());
-
-    atomic_end();
-}
-
 /* --- Current working directory -------------------------------------------- */
 
-Path *task_cwd_resolve(Task *task, const char *buffer)
+Path *task_resolve_directory(Task *task, const char *buffer)
 {
     Path *path = path_create(buffer);
 
     if (path_is_relative(path))
     {
-        lock_acquire(task->cwd_lock);
+        lock_acquire(task->directory_lock);
 
-        Path *combined = path_combine(task->cwd_path, path);
+        Path *combined = path_combine(task->directory, path);
         path_destroy(path);
         path = combined;
 
-        lock_release(task->cwd_lock);
+        lock_release(task->directory_lock);
     }
 
     path_normalize(path);
@@ -431,11 +301,11 @@ Path *task_cwd_resolve(Task *task, const char *buffer)
     return path;
 }
 
-Result task_set_cwd(Task *task, const char *buffer)
+Result task_set_directory(Task *task, const char *buffer)
 {
     Result result = SUCCESS;
 
-    Path *path = task_cwd_resolve(task, buffer);
+    Path *path = task_resolve_directory(task, buffer);
     FsNode *node = filesystem_find_and_ref(path);
 
     if (node == NULL)
@@ -450,13 +320,13 @@ Result task_set_cwd(Task *task, const char *buffer)
         goto cleanup_and_return;
     }
 
-    lock_acquire(task->cwd_lock);
+    lock_acquire(task->directory_lock);
 
-    path_destroy(task->cwd_path);
-    task->cwd_path = path;
+    path_destroy(task->directory);
+    task->directory = path;
     path = NULL;
 
-    lock_release(task->cwd_lock);
+    lock_release(task->directory_lock);
 
 cleanup_and_return:
     if (node)
@@ -468,13 +338,13 @@ cleanup_and_return:
     return result;
 }
 
-Result task_get_cwd(Task *task, char *buffer, uint size)
+Result task_get_directory(Task *task, char *buffer, uint size)
 {
-    lock_acquire(task->cwd_lock);
+    lock_acquire(task->directory_lock);
 
-    path_to_cstring(task->cwd_path, buffer, size);
+    path_to_cstring(task->directory, buffer, size);
 
-    lock_release(task->cwd_lock);
+    lock_release(task->directory_lock);
 
     return SUCCESS;
 }
@@ -678,10 +548,7 @@ void garbage_collector(void)
 {
     while (true)
     {
-        task_sleep(scheduler_running(), 100); // We don't do this really often.
-
-        atomic_begin();
-        list_iterate(all_tasks, NULL, (ListIterationCallback)destroy_task_if_canceled);
-        atomic_end();
+        task_sleep(scheduler_running(), 100);
+        task_iterate(NULL, destroy_task_if_canceled);
     }
 }

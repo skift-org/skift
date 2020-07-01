@@ -112,7 +112,7 @@ void system_panic_internal(
 
     if (!nested_panic)
     {
-        task_panic_dump();
+        task_dump(scheduler_running());
         cpuid_dump();
     }
 

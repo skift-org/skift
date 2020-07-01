@@ -106,7 +106,7 @@ Result task_fshandle_release(Task *task, int handle_index)
 
 Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, OpenFlag flags)
 {
-    Path *p = task_cwd_resolve(task, file_path);
+    Path *p = task_resolve_directory(task, file_path);
 
     FsHandle *handle = NULL;
     Result result = filesystem_open(p, flags, &handle);
@@ -307,7 +307,7 @@ Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 
 Result task_fshandle_connect(Task *task, int *connection_handle_index, const char *socket_path)
 {
-    Path *resolved_path = task_cwd_resolve(task, socket_path);
+    Path *resolved_path = task_resolve_directory(task, socket_path);
 
     FsHandle *connection_handle;
     Result result = filesystem_connect(resolved_path, &connection_handle);

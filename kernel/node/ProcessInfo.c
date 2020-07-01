@@ -11,34 +11,34 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking.h"
 
+static IterationDecision serialize_task(JsonValue *destination, Task *task)
+{
+    JsonValue *task_object = json_create_object();
+
+    json_object_put(task_object, "id", json_create_integer(task->id));
+    json_object_put(task_object, "name", json_create_string(task->name));
+    json_object_put(task_object, "state", json_create_string(task_state_string(task->state)));
+    json_object_put(task_object, "cwd", json_create_string_adopt(path_as_string(task->directory)));
+    json_object_put(task_object, "cpu", json_create_integer(scheduler_get_usage(task->id)));
+    json_object_put(task_object, "user", json_create_boolean(task->user));
+
+    json_array_append(destination, task_object);
+
+    return ITERATION_CONTINUE;
+}
+
 static Result process_info_open(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
-    JsonValue *root = json_create_array();
+    JsonValue *destination = json_create_array();
 
-    atomic_begin();
+    task_iterate(destination, (TaskIterateCallback)serialize_task);
 
-    list_foreach(Task, task, task_all())
-    {
-        JsonValue *task_object = json_create_object();
-
-        json_object_put(task_object, "id", json_create_integer(task->id));
-        json_object_put(task_object, "name", json_create_string(task->name));
-        json_object_put(task_object, "state", json_create_string(task_state_string(task->state)));
-        json_object_put(task_object, "cwd", json_create_string_adopt(path_as_string(task->cwd_path)));
-        json_object_put(task_object, "cpu", json_create_integer(scheduler_get_usage(task->id)));
-        json_object_put(task_object, "user", json_create_boolean(task->user));
-
-        json_array_append(root, task_object);
-    }
-
-    atomic_end();
-
-    handle->attached = json_stringify(root);
+    handle->attached = json_stringify(destination);
     handle->attached_size = strlen((const char *)handle->attached);
 
-    json_destroy(root);
+    json_destroy(destination);
 
     return SUCCESS;
 }

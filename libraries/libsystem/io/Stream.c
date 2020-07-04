@@ -330,7 +330,6 @@ char stream_getchar(Stream *stream)
 
 int stream_ungetchar(Stream *stream, char c)
 {
-
     stream->has_unget = true;
     stream->unget_char = c;
 

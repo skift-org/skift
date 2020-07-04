@@ -5,43 +5,24 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Path.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io/File.h>
 
 Glyph *font_load_glyph(const char *name)
 {
     char glyph_path[PATH_LENGTH];
     snprintf(glyph_path, PATH_LENGTH, "/res/font/%s.glyph", name);
 
-    __cleanup(stream_cleanup) Stream *glyph_file = stream_open(glyph_path, OPEN_READ);
+    Glyph *glyph_buffer = NULL;
+    size_t glyph_size = 0;
+    Result result = file_read_all(glyph_path, (void **)&glyph_buffer, &glyph_size);
 
-    if (handle_has_error(glyph_file))
+    if (result != SUCCESS)
     {
-        logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(glyph_file));
-
+        logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(result));
         return NULL;
     }
 
-    FileState stat;
-    stream_stat(glyph_file, &stat);
-    if (stat.type != FILE_TYPE_REGULAR)
-    {
-        logger_error("Failled to load  glyph from %s: The glyph file isn't a regular file but %d!", glyph_path, stat.type);
-
-        return NULL;
-    }
-
-    Glyph *glyph = (Glyph *)malloc(stat.size);
-    size_t read = stream_read(glyph_file, glyph, stat.size);
-
-    if (read != stat.size)
-    {
-        logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(glyph_file));
-        free(glyph);
-
-        return NULL;
-    }
-
-    return glyph;
+    return glyph_buffer;
 }
 
 Bitmap *font_load_bitmap_create(const char *name)

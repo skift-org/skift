@@ -3,7 +3,7 @@
 
 Result file_read_all(const char *path, void **buffer, size_t *size)
 {
-    Stream *stream = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
 
     if (handle_has_error(stream))
     {
@@ -27,6 +27,30 @@ Result file_read_all(const char *path, void **buffer, size_t *size)
     {
         free(buffer);
         return handle_get_error(stream);
+    }
+
+    return SUCCESS;
+}
+
+Result file_write_all(const char *path, void *buffer, size_t size)
+{
+    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE);
+
+    if (handle_has_error(stream))
+    {
+        return handle_get_error(stream);
+    }
+
+    size_t remaining = size;
+
+    while (remaining)
+    {
+        remaining -= stream_write(stream, ((char *)buffer + (size - remaining)), size);
+
+        if (handle_has_error(stream))
+        {
+            return handle_get_error(stream);
+        }
     }
 
     return SUCCESS;

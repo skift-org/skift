@@ -28,8 +28,8 @@ typedef struct
 
 typedef struct
 {
-    size_t size;
     void *keymap;
+    size_t size;
 } IOCallKeyboardSetKeymapArgs;
 
 typedef struct

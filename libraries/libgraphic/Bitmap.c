@@ -11,7 +11,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Memory.h>
 #include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/io/File.h>
 
 Bitmap *bitmap_create(size_t width, size_t height)
 {
@@ -46,18 +46,14 @@ static Color placeholder_buffer[] = {
 
 Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 {
-    __cleanup(stream_cleanup) Stream *file = stream_open(path, OPEN_READ);
+    void *rawdata;
+    size_t rawdata_size;
+    Result result = file_read_all(path, &rawdata, &rawdata_size);
 
-    if (handle_has_error(file))
+    if (result != SUCCESS)
     {
-        return handle_get_error(file);
+        return result;
     }
-
-    FileState state;
-    stream_stat(file, &state);
-
-    void *rawdata __cleanup_malloc = malloc(state.size);
-    assert(stream_read(file, rawdata, state.size) == state.size);
 
     uint decoded_width = 0;
     uint decoded_height = 0;
@@ -68,7 +64,7 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
         &decoded_width,
         &decoded_height,
         (const unsigned char *)rawdata,
-        state.size);
+        rawdata_size);
 
     if (decode_result != 0)
     {
@@ -101,14 +97,9 @@ Bitmap *bitmap_load_from(const char *path)
 Result bitmap_save_to(Bitmap *bitmap, const char *path)
 {
     void *outbuffer __cleanup_malloc = NULL;
-    Stream *file __cleanup(stream_cleanup) = stream_open(path, OPEN_WRITE);
-
-    if (handle_has_error(file))
-    {
-        return handle_get_error(file);
-    }
 
     size_t outbuffer_size = 0;
+
     int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
 
     if (err != 0)
@@ -116,14 +107,7 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    stream_write(file, outbuffer, outbuffer_size);
-
-    if (handle_has_error(file))
-    {
-        return handle_get_error(file);
-    }
-
-    return SUCCESS;
+    return file_write_all(path, outbuffer, outbuffer_size);
 }
 
 __flatten void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
@@ -132,9 +116,7 @@ __flatten void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region
     region = rectangle_clip(region, bitmap_bound(destination));
 
     if (rectangle_is_empty(region))
-    {
         return;
-    }
 
     for (int y = region.y; y < region.y + region.height; y++)
     {

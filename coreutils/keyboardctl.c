@@ -6,6 +6,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Directory.h>
+#include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 
@@ -61,43 +62,33 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
 
-    __cleanup(stream_cleanup) Stream *keymap_file = stream_open(keymap_path, OPEN_READ);
+    __cleanup_malloc KeyMap *keymap = NULL;
+    size_t keymap_size = 0;
+    Result result = file_read_all(keymap_path, (void **)&keymap, &keymap_size);
 
-    if (handle_has_error(keymap_file))
+    if (result != SUCCESS)
     {
-        handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keymap file");
-
+        stream_printf(err_stream, "keyboardctl: Failled to open the keymap file: %s", result_to_string(result));
         return -1;
     }
 
-    FileState stat;
-    stream_stat(keymap_file, &stat);
-
-    logger_info("Allocating keymap of size %dkio", stat.size / 1024);
-
-    if (stat.size < sizeof(KeyMap))
-    {
-        stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
-        return -1;
-    }
-
-    __cleanup_malloc KeyMap *new_keymap = (KeyMap *)malloc(stat.size);
-
-    stream_read(keymap_file, new_keymap, stat.size);
-
-    if (new_keymap->magic[0] != 'k' ||
-        new_keymap->magic[1] != 'm' ||
-        new_keymap->magic[2] != 'a' ||
-        new_keymap->magic[3] != 'p')
+    if (keymap_size < sizeof(KeyMap) ||
+        keymap->magic[0] != 'k' ||
+        keymap->magic[1] != 'm' ||
+        keymap->magic[2] != 'a' ||
+        keymap->magic[3] != 'p')
     {
         stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
         return -1;
     }
 
-    IOCallKeyboardSetKeymapArgs args = {.size = stat.size, .keymap = new_keymap};
+    IOCallKeyboardSetKeymapArgs args = {
+        .keymap = keymap,
+        .size = keymap_size,
+    };
     stream_call(keyboard_device, IOCALL_KEYBOARD_SET_KEYMAP, &args);
 
-    printf("Keymap set to %s(%s)\n", new_keymap->language, new_keymap->region);
+    printf("Keymap set to %s(%s)\n", keymap->language, keymap->region);
 
     return 0;
 }

@@ -67,7 +67,7 @@ int gfxmode_get(Stream *framebuffer_device)
 
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
-        error_print("Ioctl to /dev/framebuffer failled");
+        handle_printf_error(framebuffer_device, "Ioctl to /dev/framebuffer failled");
         return -1;
     }
 
@@ -84,9 +84,10 @@ int gfxmode_set(Stream *framebuffer_device, const char *mode_name)
 
     if (framebuffer_info != NULL)
     {
-        if (stream_call(framebuffer_device, IOCALL_DISPLAY_SET_MODE, framebuffer_info) < 0)
+        if (stream_call(framebuffer_device, IOCALL_DISPLAY_SET_MODE, framebuffer_info) != SUCCESS)
         {
-            error_print("Ioctl to /dev/framebuffer failled");
+            handle_printf_error(framebuffer_device, "Ioctl to /dev/framebuffer failled");
+
             return -1;
         }
 
@@ -126,28 +127,23 @@ int main(int argc, char **argv)
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
         handle_printf_error(framebuffer_device, "displayctl: Failled to open /dev/framebuffer");
-
         return -1;
     }
 
-    int result = -1;
-
     if (option_get)
     {
-        result = gfxmode_get(framebuffer_device);
+        return gfxmode_get(framebuffer_device);
     }
     else if (option_list)
     {
-        result = gfxmode_list(framebuffer_device);
+        return gfxmode_list(framebuffer_device);
     }
     else if (option_set != NULL)
     {
-        result = gfxmode_set(framebuffer_device, option_set);
+        return gfxmode_set(framebuffer_device, option_set);
     }
     else
     {
-        result = gfxmode_get(framebuffer_device);
+        return gfxmode_get(framebuffer_device);
     }
-
-    return result;
 }

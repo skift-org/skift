@@ -44,11 +44,3 @@ typedef enum
 const char *result_to_string(Result error);
 
 #define result_is_error(__result) ((__result) != SUCCESS && (__result) != TIMEOUT)
-
-Result error_get(void);
-
-void error_set(Result error);
-
-void error_print(const char *message);
-
-#define error_log(__message) logger_log("%s: %s\n", __message, result_to_string(error_value));

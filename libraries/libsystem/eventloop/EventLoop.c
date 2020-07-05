@@ -68,13 +68,8 @@ int eventloop_run(void)
     return _eventloop_exit_value;
 }
 
-void eventloop_pump(bool pool)
+static Timeout eventloop_get_timeout(void)
 {
-    assert(_eventloop_is_initialize);
-
-    Handle *selected = NULL;
-    SelectEvent selected_events = 0;
-
     Timeout timeout = UINT32_MAX;
 
     TimeStamp current_tick = system_get_ticks();
@@ -99,54 +94,7 @@ void eventloop_pump(bool pool)
         }
     }
 
-    eventloop_update_timers();
-
-    if (pool)
-    {
-        timeout = 0;
-    }
-
-    Result result = handle_select(
-        &_eventloop_handles[0],
-        &_eventloop_events[0],
-        _eventloop_handles_count,
-        &selected, &selected_events,
-        timeout);
-
-    eventloop_update_timers();
-
-    if (result == SUCCESS)
-    {
-        list_foreach(Notifier, notifier, _eventloop_notifiers)
-        {
-            if (notifier->handle == selected)
-            {
-                notifier->callback(notifier->target, notifier->handle, selected_events);
-            }
-        }
-    }
-    else if (result == TIMEOUT)
-    {
-        // ignore
-    }
-    else
-    {
-        logger_error("Failled to select : %s", result_to_string(result));
-    }
-
-    list_foreach(RunLater, run_later, _eventloop_run_later)
-    {
-        run_later->callback(run_later->target);
-    }
-    list_clear_with_callback(_eventloop_run_later, free);
-}
-
-void eventloop_exit(int exit_value)
-{
-    assert(_eventloop_is_initialize);
-
-    _eventloop_is_running = false;
-    _eventloop_exit_value = exit_value;
+    return timeout;
 }
 
 void eventloop_update_timers(void)
@@ -174,6 +122,63 @@ void eventloop_update_timers(void)
     }
 
     _eventloop_timer_last_fire = current_fire;
+}
+
+void eventloop_pump(bool pool)
+{
+    assert(_eventloop_is_initialize);
+
+    Timeout timeout = eventloop_get_timeout();
+
+    if (pool)
+    {
+        timeout = 0;
+    }
+
+    eventloop_update_timers();
+
+    Handle *selected = NULL;
+    SelectEvent selected_events = 0;
+
+    Result result = handle_select(
+        &_eventloop_handles[0],
+        &_eventloop_events[0],
+        _eventloop_handles_count,
+        &selected,
+        &selected_events,
+        timeout);
+
+    if (result_is_error(result))
+    {
+        logger_error("Failled to select : %s", result_to_string(result));
+        eventloop_exit(-1);
+    }
+
+    eventloop_update_timers();
+
+    list_foreach(Notifier, notifier, _eventloop_notifiers)
+    {
+        if (notifier->handle == selected)
+        {
+            notifier->callback(notifier->target, notifier->handle, selected_events);
+        }
+    }
+
+
+    list_foreach(RunLater, run_later, _eventloop_run_later)
+    {
+        run_later->callback(run_later->target);
+    }
+
+    list_clear_with_callback(_eventloop_run_later, free);
+}
+
+void eventloop_exit(int exit_value)
+{
+    assert(_eventloop_is_initialize);
+
+    _eventloop_is_running = false;
+    _eventloop_exit_value = exit_value;
 }
 
 void eventloop_update_notifier(void)

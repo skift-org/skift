@@ -2,7 +2,7 @@
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Directory.h>
-#include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
@@ -108,8 +108,7 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 {
     __unused(event);
 
-    Launchpad *launchpad = launchpad_create(entry->name, entry->command);
-    launchpad_launch(launchpad, NULL);
+    process_run(entry->command, NULL);
 
     window_hide(sender->window);
 }

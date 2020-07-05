@@ -9,6 +9,7 @@
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
+#include "kernel/memory/MemoryObject.h"
 #include "kernel/scheduling/Blocker.h"
 
 typedef void (*TaskEntry)();
@@ -112,32 +113,11 @@ Result task_fshandle_release(Task *task, int handle_index);
 
 typedef struct
 {
-    int id;
-    uintptr_t address;
-    size_t size;
-
-    int refcount;
-} MemoryObject;
-
-typedef struct
-{
     MemoryObject *object;
 
     uintptr_t address;
     size_t size;
 } MemoryMapping;
-
-void task_shared_memory_setup(void);
-
-MemoryObject *memory_object_create(size_t size);
-
-void memory_object_destroy(MemoryObject *memory_object);
-
-MemoryObject *memory_object_ref(MemoryObject *memory_object);
-
-void memory_object_deref(MemoryObject *memory_object);
-
-MemoryObject *memory_object_by_id(int id);
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object);
 

@@ -6,6 +6,7 @@
 #include <libsystem/io/Stream.h>
 
 #include "kernel/memory/Memory.h"
+#include "kernel/memory/MemoryObject.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
 
@@ -72,6 +73,8 @@ void memory_initialize(Multiboot *multiboot)
     logger_info("Paging enabled!");
 
     _memory_initialized = true;
+
+    memory_object_initialize();
 }
 
 void memory_dump(void)
@@ -155,6 +158,7 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange range, Mem
 
     return SUCCESS;
 }
+
 Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flags, uintptr_t *out_address)
 {
     assert(IS_PAGE_ALIGN(size));

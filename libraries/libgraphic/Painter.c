@@ -668,12 +668,18 @@ void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i positi
 
 __flatten void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color)
 {
-    for (size_t i = 0; str[i]; i++)
+    Codepoint codepoint = 0;
+    size_t size = utf8_to_codepoint((const uint8_t *)str, &codepoint);
+    str += size;
+    while (size && codepoint != 0)
     {
-        Glyph *glyph = font_glyph(font, str[i]);
+        Glyph *glyph = font_glyph(font, codepoint);
 
         painter_draw_glyph(painter, font, glyph, position, color);
         position = vec2i_add(position, vec2i(glyph->advance, 0));
+
+        size_t size = utf8_to_codepoint((const uint8_t *)str, &codepoint);
+        str += size;
     }
 }
 

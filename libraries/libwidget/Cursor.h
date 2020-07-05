@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 typedef enum
 {
     CURSOR_DEFAULT,

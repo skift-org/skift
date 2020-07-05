@@ -12,7 +12,15 @@
 Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid)
 {
     char executable[PATH_LENGTH];
-    snprintf(executable, PATH_LENGTH, "/bin/%s", command->command);
+    if (command->command[0] == '/' ||
+        command->command[0] == '.')
+    {
+        snprintf(executable, PATH_LENGTH, "%s", command->command);
+    }
+    else
+    {
+        snprintf(executable, PATH_LENGTH, "/bin/%s", command->command);
+    }
 
     Launchpad *launchpad = launchpad_create(command->command, executable);
 

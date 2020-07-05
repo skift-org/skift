@@ -113,7 +113,7 @@ void task_go(Task *task)
     stackframe.eip = (uintptr_t)task->entry;
     stackframe.ebp = ((uintptr_t)task->stack + PROCESS_STACK_SIZE);
 
-    // TODO: userspace task
+    // TODO: All tasks are still running has ring0 :/
     stackframe.cs = 0x08;
     stackframe.ds = 0x10;
     stackframe.es = 0x10;
@@ -172,9 +172,10 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
             blocker->on_unblock(blocker, task);
         }
 
+        atomic_end();
+
         task->blocker = NULL;
         free(blocker);
-        atomic_end();
 
         return BLOCKER_UNBLOCKED;
     }
@@ -195,8 +196,8 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
     BlockerResult result = blocker->result;
 
-    free(blocker);
     task->blocker = NULL;
+    free(blocker);
 
     return result;
 }

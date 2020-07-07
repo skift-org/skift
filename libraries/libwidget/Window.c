@@ -418,7 +418,7 @@ void window_handle_event(Window *window, Event *event)
 
         if (window->flags & WINDOW_POP_OVER)
         {
-            window_destroy(window);
+            window_hide(window);
         }
     }
     break;

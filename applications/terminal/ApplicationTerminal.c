@@ -117,6 +117,8 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
 {
     __unused(rectangle);
 
+    painter_clear_rectangle(painter, rectangle, widget_get_color(terminal_widget, THEME_ANSI_BACKGROUND));
+
     Terminal *terminal = terminal_widget->terminal;
 
     for (int y = 0; y < terminal->height; y++)

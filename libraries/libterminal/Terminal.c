@@ -75,17 +75,29 @@ void terminal_clear_line(Terminal *terminal, int line)
 
 void terminal_resize(Terminal *terminal, int width, int height)
 {
-    terminal->buffer = (TerminalCell *)realloc(terminal->buffer, sizeof(TerminalCell) * width * height);
+    TerminalCell *new_buffer = (TerminalCell *)malloc(sizeof(TerminalCell) * width * height);
+
+    for (int i = 0; i < width * height; i++)
+    {
+        new_buffer[i] = (TerminalCell){U' ', terminal->current_attributes, true};
+    }
+
+    for (int x = 0; x < MIN(width, terminal->width); x++)
+    {
+        for (int y = 0; y < MIN(height, terminal->height); y++)
+        {
+            new_buffer[y * width + x] = terminal_cell_at(terminal, x, y);
+        }
+    }
+
+    free(terminal->buffer);
+    terminal->buffer = new_buffer;
 
     terminal->width = width;
     terminal->height = height;
 
-    terminal->cursor.x = 0;
-    terminal->cursor.y = 0;
-
-    terminal_clear_all(terminal);
-
-    terminal_write(terminal, "[TERMINAL RESIZED]\n", 19);
+    terminal->cursor.x = clamp(terminal->cursor.x, 0, width);
+    terminal->cursor.y = clamp(terminal->cursor.y, 0, height);
 }
 
 TerminalCell terminal_cell_at(Terminal *terminal, int x, int y)

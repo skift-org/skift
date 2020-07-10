@@ -1,7 +1,9 @@
+#include <libjson/Json.h>
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Directory.h>
+#include <libsystem/process/Process.h>
 
 #include "file-explorer/FileSystemModel.h"
 
@@ -13,6 +15,46 @@ typedef enum
 
     __COLUMN_COUNT,
 } Column;
+
+static Icon *get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
+{
+    if (entry->stat.type == FILE_TYPE_DIRECTORY)
+    {
+        char manifest_path[PATH_LENGTH];
+        snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory, entry->name);
+
+        JsonValue *root = json_parse_file(manifest_path);
+
+        if (root != NULL && json_is(root, JSON_OBJECT))
+        {
+            JsonValue *icon_name = json_object_get(root, "icon");
+
+            if (json_is(icon_name, JSON_STRING))
+            {
+                Icon *icon = icon_get(json_string_value(icon_name));
+                json_destroy(root);
+                return icon;
+            }
+        }
+
+        json_destroy(root);
+        return icon_get("folder");
+    }
+    else if (entry->stat.type == FILE_TYPE_PIPE ||
+             entry->stat.type == FILE_TYPE_DEVICE ||
+             entry->stat.type == FILE_TYPE_SOCKET)
+    {
+        return icon_get("pipe");
+    }
+    else if (entry->stat.type == FILE_TYPE_TERMINAL)
+    {
+        return icon_get("console-network");
+    }
+    else
+    {
+        return icon_get("file");
+    }
+}
 
 static void filesystem_model_update(FileSystemModel *model)
 {
@@ -29,7 +71,8 @@ static void filesystem_model_update(FileSystemModel *model)
 
     if (handle_has_error(directory))
     {
-        handle_printf_error("Failled to open directory '%s'", model->current_path);
+        // FIXME: Use message box.
+        handle_printf_error(directory, "Failled to open directory '%s'", model->current_path);
         directory_close(directory);
         return;
     }
@@ -37,7 +80,15 @@ static void filesystem_model_update(FileSystemModel *model)
     DirectoryEntry entry;
     while (directory_read(directory, &entry) > 0)
     {
-        list_pushback_copy(model->files, &entry, sizeof(entry));
+        FileSystemNode node = {
+            .type = entry.stat.type,
+            .size = entry.stat.size,
+            .icon = get_icon_for_node(model->current_path, &entry),
+        };
+
+        strcpy(node.name, entry.name);
+
+        list_pushback_copy(model->files, &node, sizeof(node));
     }
 
     directory_close(directory);
@@ -45,24 +96,16 @@ static void filesystem_model_update(FileSystemModel *model)
 
 static Variant filesystem_model_data(FileSystemModel *model, int row, int column)
 {
-    DirectoryEntry *entry = NULL;
+    FileSystemNode *entry = NULL;
     assert(list_peekat(model->files, row, (void **)&entry));
 
     switch (column)
     {
     case COLUMN_NAME:
-
-        if (entry->stat.type == FILE_TYPE_DIRECTORY)
-        {
-            return variant_with_icon(vstring(entry->name), "folder");
-        }
-        else
-        {
-            return variant_with_icon(vstring(entry->name), "file");
-        }
+        return variant_with_icon(vstring(entry->name), entry->icon);
 
     case COLUMN_TYPE:
-        switch (entry->stat.type)
+        switch (entry->type)
         {
         case FILE_TYPE_REGULAR:
             return vstring("Regular file");
@@ -78,7 +121,7 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
         }
 
     case COLUMN_SIZE:
-        return vint(entry->stat.size);
+        return vint(entry->size);
 
     default:
         ASSERT_NOT_REACHED();
@@ -119,7 +162,7 @@ void filesystem_model_navigate(FileSystemModel *model, Path *path)
     }
 
     model->current_path = path_as_string(path);
-
+    process_set_directory(model->current_path);
     model_update((Model *)model);
 }
 
@@ -127,7 +170,7 @@ const char *filesystem_model_filename_by_index(FileSystemModel *model, int index
 {
     if (index >= 0 && index < list_count(model->files))
     {
-        DirectoryEntry *entry = NULL;
+        FileSystemNode *entry = NULL;
         assert(list_peekat(model->files, index, (void **)&entry));
 
         return entry->name;

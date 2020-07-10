@@ -1,4 +1,4 @@
-
+#include <abi/Paths.h>
 #include <libsystem/CString.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -35,7 +35,7 @@ void null_initialize(void)
     FSNODE(null_device)->read = (FsNodeReadCallback)null_read;
     FSNODE(null_device)->write = (FsNodeWriteCallback)null_write;
 
-    Path *null_device_path = path_create("/dev/null");
+    Path *null_device_path = path_create(UNIX_DEVICE_PATH("null"));
     filesystem_link_and_take_ref(null_device_path, null_device);
     path_destroy(null_device_path);
 }

@@ -63,10 +63,9 @@ Variant vstringf(const char *fmt, ...)
     return v;
 }
 
-Variant variant_with_icon(Variant variant, const char *icon)
+Variant variant_with_icon(Variant variant, Icon *icon)
 {
-    variant.icon = icon_get(icon);
-
+    variant.icon = icon;
     return variant;
 }
 

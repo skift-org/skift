@@ -4,6 +4,7 @@ FILE_EXPLORER_NAME = file-explorer
 FILE_EXPLORER_LIBS = widget graphic json math
 FILE_EXPLORER_ICONS = \
 	folder \
+	folder-outline \
 	file \
 	laptop \
 	chevron-right \
@@ -11,4 +12,6 @@ FILE_EXPLORER_ICONS = \
 	arrow-right \
 	arrow-up \
 	home \
-	refresh
+	refresh \
+	pipe \
+	console-network

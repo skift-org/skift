@@ -17,7 +17,8 @@ typedef struct
 
     Icon *icon;
 
-    union {
+    union
+    {
         int as_int;
         float as_float;
     };
@@ -33,6 +34,6 @@ Variant vstring(const char *value);
 
 Variant vstringf(const char *fmt, ...);
 
-Variant variant_with_icon(Variant variant, const char *icon);
+Variant variant_with_icon(Variant variant, Icon *icon);
 
 int variant_cmp(Variant left, Variant right);

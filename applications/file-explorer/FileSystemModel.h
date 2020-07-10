@@ -3,6 +3,15 @@
 #include <libsystem/Path.h>
 #include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
+
+typedef struct
+{
+    char name[FILE_NAME_LENGTH];
+    FileType type;
+    Icon *icon;
+    size_t size;
+} FileSystemNode;
+
 typedef struct
 {
     Model __super;

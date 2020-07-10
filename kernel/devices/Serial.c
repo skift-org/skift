@@ -1,10 +1,10 @@
+#include <abi/Paths.h>
 
 #include <libsystem/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/COM.h"
 #include "arch/x86/x86.h"
-
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
 
@@ -64,7 +64,7 @@ void serial_initialize(void)
     FSNODE(serial_device)->read = (FsNodeReadCallback)serial_read;
     FSNODE(serial_device)->write = (FsNodeWriteCallback)serial_write;
 
-    Path *serial_device_path = path_create("/dev/serial");
+    Path *serial_device_path = path_create(SERIAL_DEVICE_PATH);
     filesystem_link_and_take_ref(serial_device_path, serial_device);
     path_destroy(serial_device_path);
 }

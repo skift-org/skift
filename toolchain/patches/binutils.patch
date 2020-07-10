@@ -117,7 +117,7 @@ diff -Nru binutils-2.31_clean/ld/configure.tgt binutils-2.31/ld/configure.tgt
  case "${target}" in
  
 +*-*-skift*)
-+  NATIVE_LIB_DIRS='/lib /local/lib'
++  NATIVE_LIB_DIRS='/System/Libraries'
 +  ;;
 +
  *-*-dragonfly*)

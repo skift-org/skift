@@ -9,10 +9,10 @@ void userspace_initialize(void)
 {
     logger_info("Starting the userspace...");
 
-    Launchpad *init_lauchpad = launchpad_create("init", "/bin/init");
+    Launchpad *init_lauchpad = launchpad_create("init", "/System/Binaries/init");
 
-    Stream *keyboard_device = stream_open("/dev/keyboard", OPEN_READ);
-    Stream *serial_device = stream_open("/dev/serial", OPEN_WRITE);
+    Stream *keyboard_device = stream_open("/Devices/keyboard", OPEN_READ);
+    Stream *serial_device = stream_open("/Devices/serial", OPEN_WRITE);
 
     launchpad_handle(init_lauchpad, HANDLE(keyboard_device), 0);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 1);

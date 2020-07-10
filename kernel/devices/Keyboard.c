@@ -1,4 +1,5 @@
 #include <abi/Keyboard.h>
+#include <abi/Paths.h>
 
 #include <libsystem/Assert.h>
 #include <libsystem/Atomic.h>
@@ -260,7 +261,7 @@ void keyboard_initialize(void)
 {
     logger_info("Initializing keyboard...");
 
-    _keymap = keyboard_load_keymap("/res/keyboard/fr_be.kmap");
+    _keymap = keyboard_load_keymap("/System/Keyboards/fr_be.kmap");
 
     _characters_buffer = ringbuffer_create(1024);
     _characters_node = __create(FsNode);
@@ -271,7 +272,7 @@ void keyboard_initialize(void)
     FSNODE(_characters_node)->can_read = (FsNodeCanReadCallback)characters_can_read;
     FSNODE(_characters_node)->read = (FsNodeReadCallback)characters_read;
 
-    filesystem_link_cstring("/dev/keyboard", _characters_node);
+    filesystem_link_cstring(KEYBOARD_DEVICE_PATH, _characters_node);
 
     _events_buffer = ringbuffer_create(sizeof(KeyboardPacket) * 256);
     _events_node = __create(FsNode);
@@ -282,7 +283,7 @@ void keyboard_initialize(void)
     FSNODE(_events_node)->can_read = (FsNodeCanReadCallback)events_can_read;
     FSNODE(_events_node)->read = (FsNodeReadCallback)events_read;
 
-    filesystem_link_cstring("/dev/keyboard-events", _events_node);
+    filesystem_link_cstring(KEYBOARD_EVENT_DEVICE_PATH, _events_node);
 
     dispatcher_register_handler(1, keyboard_interrupt_handler);
 }

@@ -22,10 +22,10 @@ BUILD_DIRECTORY=$(shell pwd)/build
 SYSROOT=$(BUILD_DIRECTORY)/sysroot
 BOOTROOT=$(BUILD_DIRECTORY)/bootroot
 
-BUILD_DIRECTORY_LIBS=$(SYSROOT)/lib
-BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/lib/include
-BUILD_DIRECTORY_APPS=$(SYSROOT)/bin
-BUILD_DIRECTORY_UTILS=$(SYSROOT)/bin
+BUILD_DIRECTORY_LIBS=$(SYSROOT)/System/Libraries
+BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/System/Includes
+BUILD_DIRECTORY_APPS=$(SYSROOT)/Applications
+BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 
 # --- Configs -------------------------------------------- #
 
@@ -79,10 +79,27 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 	@echo [TAR] $@
 
 	@mkdir -p \
-		$(SYSROOT)/dev \
-		$(SYSROOT)/res \
-		$(SYSROOT)/srv \
-		$(SYSROOT)/sys
+		$(SYSROOT)/Applications \
+		$(SYSROOT)/Devices \
+		$(SYSROOT)/Session \
+		$(SYSROOT)/System \
+		$(SYSROOT)/System/Binaries \
+		$(SYSROOT)/System/Configs \
+		$(SYSROOT)/System/Fonts \
+		$(SYSROOT)/System/Icons \
+		$(SYSROOT)/System/Includes \
+		$(SYSROOT)/System/Libraries \
+		$(SYSROOT)/User \
+		$(SYSROOT)/User/Applications \
+		$(SYSROOT)/User/Configs \
+		$(SYSROOT)/User/Desktop \
+		$(SYSROOT)/User/Documents \
+		$(SYSROOT)/User/Download  \
+		$(SYSROOT)/User/Movies  \
+		$(SYSROOT)/User/Music  \
+		$(SYSROOT)/User/Pictures  \
+		$(SYSROOT)/User/Public  \
+		$(SYSROOT)/User/Sites  \
 
 	@cp -r sysroot/* $(SYSROOT)/
 
@@ -159,5 +176,8 @@ sync:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIRECTORY)
+
+clean-fs:
+	rm -rf $(SYSROOT)
 
 -include $(OBJECTS:.o=.d)

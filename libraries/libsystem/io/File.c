@@ -55,3 +55,15 @@ Result file_write_all(const char *path, void *buffer, size_t size)
 
     return SUCCESS;
 }
+
+bool file_exist(const char *path)
+{
+    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
+
+    if (handle_has_error(stream))
+    {
+        return false;
+    }
+
+    return true;
+}

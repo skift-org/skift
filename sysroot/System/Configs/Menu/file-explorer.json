@@ -2,5 +2,5 @@
     "name": "File Explorer",
     "comment": "Copy, past and managed your files.",
     "icon": "folder",
-    "command": "/bin/file-explorer"
+    "command": "file-explorer"
 }

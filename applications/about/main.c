@@ -16,18 +16,18 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create_from_file("/res/layouts/about.markup");
+    Window *window = window_create_from_file("/System/Layouts/about.markup");
 
     Widget *system_image = NULL;
     if ((system_image = window_get_widget_by_id(window, "system-image")))
     {
         if (theme_is_dark())
         {
-            image_set_image(system_image, "/res/skift-white.png");
+            image_set_image(system_image, "/System/skift-white.png");
         }
         else
         {
-            image_set_image(system_image, "/res/skift-black.png");
+            image_set_image(system_image, "/System/skift-black.png");
         }
     }
 

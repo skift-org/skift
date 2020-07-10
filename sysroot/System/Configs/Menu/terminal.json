@@ -2,5 +2,5 @@
     "name": "Terminal",
     "comment": "An ansi capable terminal emulator.",
     "icon": "console",
-    "command": "/bin/terminal"
+    "command": "terminal"
 }

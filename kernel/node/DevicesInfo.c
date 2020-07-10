@@ -104,7 +104,7 @@ void device_info_initialize(void)
 {
     FsNode *device_info_device = device_info_create();
 
-    Path *device_info_device_path = path_create("/sys/devices");
+    Path *device_info_device_path = path_create("/System/devices");
     filesystem_link_and_take_ref(device_info_device_path, device_info_device);
     path_destroy(device_info_device_path);
 }

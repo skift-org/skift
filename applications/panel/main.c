@@ -34,13 +34,13 @@ void widget_cpu_update(Graph *widget)
 
 void open_menu()
 {
-    Launchpad *menu = launchpad_create("menu", "/bin/menu");
+    Launchpad *menu = launchpad_create("menu", "/Applications/menu");
     launchpad_launch(menu, NULL);
 }
 
 void open_task_manager()
 {
-    Launchpad *task_manager = launchpad_create("task-manager", "/bin/task-manager");
+    Launchpad *task_manager = launchpad_create("task-manager", "/Applications/task-manager");
     launchpad_launch(task_manager, NULL);
 }
 

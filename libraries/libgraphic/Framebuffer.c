@@ -1,5 +1,6 @@
 
 #include <abi/IOCall.h>
+#include <abi/Paths.h>
 
 #include <libgraphic/Framebuffer.h>
 #include <libsystem/Logger.h>
@@ -10,7 +11,7 @@ Framebuffer *framebuffer_open(void)
 {
     Framebuffer *framebuffer = __create(Framebuffer);
 
-    __plug_handle_open(&framebuffer->handle, "/dev/framebuffer", OPEN_READ | OPEN_WRITE);
+    __plug_handle_open(&framebuffer->handle, FRAMEBUFFER_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
 
     if (handle_has_error(framebuffer))
     {
@@ -23,7 +24,7 @@ Framebuffer *framebuffer_open(void)
 
     if (handle_has_error(framebuffer))
     {
-        handle_printf_error(framebuffer, "Failled to do iocall on /dev/framebuffer");
+        handle_printf_error(framebuffer, "Failled to do iocall on " FRAMEBUFFER_DEVICE_PATH);
         return framebuffer;
     }
 
@@ -51,7 +52,7 @@ Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
 
     if (handle_has_error(framebuffer))
     {
-        handle_printf_error(framebuffer, "Failled to iocall device /dev/framebuffer");
+        handle_printf_error(framebuffer, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
         return handle_get_error(framebuffer);
     }
 
@@ -120,7 +121,7 @@ void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
 
     if (handle_has_error(HANDLE(framebuffer)))
     {
-        handle_printf_error(HANDLE(framebuffer), "Failled to iocall device /dev/framebuffer");
+        handle_printf_error(HANDLE(framebuffer), "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
     }
 }
 

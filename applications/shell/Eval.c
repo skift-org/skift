@@ -2,6 +2,7 @@
 #include <libsystem/CString.h>
 #include <libsystem/Filesystem.h>
 #include <libsystem/Result.h>
+#include <libsystem/io/File.h>
 #include <libsystem/io/Pipe.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
@@ -9,20 +10,46 @@
 
 #include "shell/Shell.h"
 
-Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid)
+static const char *PATH[] = {
+    "/System/Binaries",
+    "/System/Posix/bin",
+    "/Applications",
+};
+
+static bool find_command_path(char *buffer, const char *command)
 {
-    char executable[PATH_LENGTH];
-    if (command->command[0] == '/' ||
-        command->command[0] == '.')
+    if (command[0] == '/' ||
+        command[0] == '.')
     {
-        snprintf(executable, PATH_LENGTH, "%s", command->command);
+        snprintf(buffer, PATH_LENGTH, "%s", command);
+        return file_exist(buffer);
     }
     else
     {
-        snprintf(executable, PATH_LENGTH, "/bin/%s", command->command);
+        for (size_t i = 0; i < __array_length(PATH); i++)
+        {
+            snprintf(buffer, PATH_LENGTH, "%s/%s", PATH[i], command);
+
+            if (file_exist(buffer))
+            {
+                return true;
+            }
+        }
     }
 
-    Launchpad *launchpad = launchpad_create(command->command, executable);
+    return false;
+}
+
+Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid)
+{
+    char executable[PATH_LENGTH];
+    if (!find_command_path(executable, command->command))
+    {
+        *pid = -1;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
+
+    Launchpad *launchpad = launchpad_create(executable, executable);
 
     list_foreach(char, arg, command->arguments)
     {

@@ -11,7 +11,7 @@ int process_this(void)
 
 Result process_run(const char *command, int *pid)
 {
-    Launchpad *launchpad = launchpad_create("shell", "/bin/shell");
+    Launchpad *launchpad = launchpad_create("shell", "/Applications/shell");
 
     launchpad_argument(launchpad, "-c");
     launchpad_argument(launchpad, command);

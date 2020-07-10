@@ -10,7 +10,7 @@
 Glyph *font_load_glyph(const char *name)
 {
     char glyph_path[PATH_LENGTH];
-    snprintf(glyph_path, PATH_LENGTH, "/res/font/%s.glyph", name);
+    snprintf(glyph_path, PATH_LENGTH, "/System/Fonts/%s.glyph", name);
 
     Glyph *glyph_buffer = NULL;
     size_t glyph_size = 0;
@@ -28,7 +28,7 @@ Glyph *font_load_glyph(const char *name)
 Bitmap *font_load_bitmap_create(const char *name)
 {
     char bitmap_path[PATH_LENGTH];
-    snprintf(bitmap_path, PATH_LENGTH, "/res/font/%s.png", name);
+    snprintf(bitmap_path, PATH_LENGTH, "/System/Fonts/%s.png", name);
 
     Bitmap *bitmap = bitmap_load_from(bitmap_path);
 

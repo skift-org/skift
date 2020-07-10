@@ -20,15 +20,15 @@ static uint _last_click = 0;
 void cursor_initialize(void)
 {
     const char *cursor_paths[] = {
-        [CURSOR_BUSY] = "/res/mouse/busy.png",
-        [CURSOR_DEFAULT] = "/res/mouse/default.png",
-        [CURSOR_DISABLED] = "/res/mouse/disabled.png",
-        [CURSOR_MOVE] = "/res/mouse/move.png",
-        [CURSOR_RESIZEH] = "/res/mouse/resizeh.png",
-        [CURSOR_RESIZEHV] = "/res/mouse/resizehv.png",
-        [CURSOR_RESIZEV] = "/res/mouse/resizev.png",
-        [CURSOR_RESIZEVH] = "/res/mouse/resizevh.png",
-        [CURSOR_TEXT] = "/res/mouse/text.png",
+        [CURSOR_BUSY] = "/System/Cursors/busy.png",
+        [CURSOR_DEFAULT] = "/System/Cursors/default.png",
+        [CURSOR_DISABLED] = "/System/Cursors/disabled.png",
+        [CURSOR_MOVE] = "/System/Cursors/move.png",
+        [CURSOR_RESIZEH] = "/System/Cursors/resizeh.png",
+        [CURSOR_RESIZEHV] = "/System/Cursors/resizehv.png",
+        [CURSOR_RESIZEV] = "/System/Cursors/resizev.png",
+        [CURSOR_RESIZEVH] = "/System/Cursors/resizevh.png",
+        [CURSOR_TEXT] = "/System/Cursors/text.png",
     };
 
     for (size_t i = 0; i < __CURSOR_COUNT; i++)

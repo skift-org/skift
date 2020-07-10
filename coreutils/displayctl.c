@@ -1,3 +1,4 @@
+#include <abi/Paths.h>
 
 #include <libsystem/CString.h>
 #include <libsystem/Result.h>
@@ -67,7 +68,7 @@ int gfxmode_get(Stream *framebuffer_device)
 
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
-        handle_printf_error(framebuffer_device, "Ioctl to /dev/framebuffer failled");
+        handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
         return -1;
     }
 
@@ -86,7 +87,7 @@ int gfxmode_set(Stream *framebuffer_device, const char *mode_name)
     {
         if (stream_call(framebuffer_device, IOCALL_DISPLAY_SET_MODE, framebuffer_info) != SUCCESS)
         {
-            handle_printf_error(framebuffer_device, "Ioctl to /dev/framebuffer failled");
+            handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
 
             return -1;
         }
@@ -122,11 +123,11 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    __cleanup(stream_cleanup) Stream *framebuffer_device = stream_open("/dev/framebuffer", OPEN_READ);
+    __cleanup(stream_cleanup) Stream *framebuffer_device = stream_open(FRAMEBUFFER_DEVICE_PATH, OPEN_READ);
 
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
-        handle_printf_error(framebuffer_device, "displayctl: Failled to open /dev/framebuffer");
+        handle_printf_error(framebuffer_device, "displayctl: Failled to open " FRAMEBUFFER_DEVICE_PATH);
         return -1;
     }
 

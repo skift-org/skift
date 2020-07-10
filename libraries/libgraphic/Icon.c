@@ -20,7 +20,7 @@ static Icon *icon_load(const char *name)
     for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
     {
         char path[PATH_LENGTH] = {};
-        snprintf(path, PATH_LENGTH, "/res/icons/%s@%spx.png", name, _icon_size_names[i]);
+        snprintf(path, PATH_LENGTH, "/System/Icons/%s@%spx.png", name, _icon_size_names[i]);
 
         Bitmap *bitmap = NULL;
         if (bitmap_load_from_can_fail(path, &bitmap) == SUCCESS)

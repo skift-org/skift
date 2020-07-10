@@ -2,5 +2,5 @@
     "name": "About",
     "comment": "About the skift operating system.",
     "icon": "information",
-    "command": "/bin/about"
+    "command": "about"
 }

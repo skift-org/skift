@@ -1,3 +1,5 @@
+#include <abi/Paths.h>
+
 #include <libmath/MinMax.h>
 #include <libsystem/Logger.h>
 
@@ -126,7 +128,7 @@ void bga_initialize(DeviceInfo info)
     file->call = (FsNodeCallCallback)bga_iocall;
     fsnode_init(file, FILE_TYPE_DEVICE);
 
-    Path *path = path_create("/dev/framebuffer");
+    Path *path = path_create(FRAMEBUFFER_DEVICE_PATH);
     filesystem_link(path, file);
     path_destroy(path);
 }

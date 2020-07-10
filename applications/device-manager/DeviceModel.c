@@ -20,7 +20,7 @@ static void device_model_update(DeviceModel *model)
         json_destroy(model->data);
     }
 
-    model->data = json_parse_file("/sys/devices");
+    model->data = json_parse_file("/System/devices");
 }
 
 static Variant device_model_data(DeviceModel *model, int row, int column)

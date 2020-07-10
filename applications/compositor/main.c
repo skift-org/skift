@@ -1,3 +1,5 @@
+#include <abi/Paths.h>
+
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
@@ -115,9 +117,9 @@ int main(int argc, char const *argv[])
 
     eventloop_initialize();
 
-    Stream *keyboard_stream = stream_open("/dev/keyboard-events", OPEN_READ);
-    Stream *mouse_stream = stream_open("/dev/mouse", OPEN_READ);
-    Socket *socket = socket_open("/srv/compositor.ipc", OPEN_CREATE);
+    Stream *keyboard_stream = stream_open(KEYBOARD_EVENT_DEVICE_PATH, OPEN_READ);
+    Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
+    Socket *socket = socket_open("/Session/compositor.ipc", OPEN_CREATE);
 
     notifier_create(NULL, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
     notifier_create(NULL, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
@@ -130,7 +132,7 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    Launchpad *panel = launchpad_create("panel", "/bin/panel");
+    Launchpad *panel = launchpad_create("panel", "/Applications/panel");
     launchpad_launch(panel, NULL);
 
     return eventloop_run();

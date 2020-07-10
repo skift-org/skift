@@ -98,7 +98,7 @@ void process_info_initialize(void)
 {
     FsNode *info_device = process_info_create();
 
-    Path *info_device_path = path_create("/sys/processes");
+    Path *info_device_path = path_create("/System/processes");
     filesystem_link_and_take_ref(info_device_path, info_device);
     path_destroy(info_device_path);
 }

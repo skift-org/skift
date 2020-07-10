@@ -23,7 +23,7 @@ static void task_model_update(TaskModel *model)
         json_destroy(model->data);
     }
 
-    model->data = json_parse_file("/sys/processes");
+    model->data = json_parse_file("/System/processes");
 }
 
 static Variant task_model_data(TaskModel *model, int row, int column)

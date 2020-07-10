@@ -12,7 +12,7 @@ void graphics_draw(Painter *painter, Rectangle screen, double time)
 
     if (_test_image == NULL)
     {
-        _test_image = bitmap_load_from("/res/skift-black.png");
+        _test_image = bitmap_load_from("/System/skift-black.png");
     }
 
     for (int x = 0; x < screen.width; x++)

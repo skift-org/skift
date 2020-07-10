@@ -2,5 +2,5 @@
     "name": "Widget Factory",
     "comment": "A libwidget demo application.",
     "icon": "widgets",
-    "command": "/bin/widget-factory"
+    "command": "widget-factory"
 }

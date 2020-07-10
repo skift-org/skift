@@ -1,3 +1,5 @@
+#include <abi/Paths.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
@@ -77,7 +79,7 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        Stream *keyboard = stream_open("/dev/keyboard", OPEN_READ);
+        Stream *keyboard = stream_open(KEYBOARD_DEVICE_PATH, OPEN_READ);
 
         if (handle_has_error(keyboard))
         {
@@ -106,7 +108,7 @@ int main(int argc, char **argv)
         timer_start(timer_create(terminal, 250, (TimerCallback)cursor_callback));
         timer_start(timer_create(terminal, 16, (TimerCallback)repaint_callback));
 
-        Launchpad *shell_launchpad = launchpad_create("shell", "/bin/shell");
+        Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell");
         launchpad_handle(shell_launchpad, HANDLE(slave), 0);
         launchpad_handle(shell_launchpad, HANDLE(slave), 1);
         launchpad_handle(shell_launchpad, HANDLE(slave), 2);

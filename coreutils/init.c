@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    int term = init_exec("/bin/compositor");
+    int term = init_exec("/Applications/compositor");
 
     process_wait(term, NULL);
 

@@ -291,7 +291,7 @@ Widget *terminal_widget_create(Widget *parent)
     widget->cursor_blink_timer = timer_create(widget, 250, (TimerCallback)terminal_widget_cursor_callback);
     timer_start(widget->cursor_blink_timer);
 
-    Launchpad *shell_launchpad = launchpad_create("shell", "/bin/shell");
+    Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell");
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 0);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 1);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);

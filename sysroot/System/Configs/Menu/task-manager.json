@@ -2,5 +2,5 @@
     "name": "Task Manager",
     "comment": "Manage running task on your system.",
     "icon": "memory",
-    "command": "/bin/task-manager"
+    "command": "task-manager"
 }

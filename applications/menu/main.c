@@ -82,7 +82,7 @@ List *load_menu(void)
 {
     List *menu = list_create();
 
-    Directory *directory = directory_open("/cfg/menu", OPEN_READ);
+    Directory *directory = directory_open("/System/Configs/Menu", OPEN_READ);
 
     DirectoryEntry entry = {};
     while (directory_read(directory, &entry) > 0)
@@ -90,7 +90,7 @@ List *load_menu(void)
         if (entry.stat.type == FILE_TYPE_REGULAR)
         {
             char path[256];
-            snprintf(path, 256, "/cfg/menu/%s", entry.name);
+            snprintf(path, 256, "/System/Configs/Menu/%s", entry.name);
 
             MenuEntry *entry = menu_entry_create(path);
 

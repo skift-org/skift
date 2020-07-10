@@ -2,5 +2,5 @@
     "name": "Paint",
     "comment": "Drawing application.",
     "icon": "brush",
-    "command": "/bin/paint"
+    "command": "paint"
 }

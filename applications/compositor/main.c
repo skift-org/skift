@@ -8,6 +8,7 @@
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 
 #include "compositor/Client.h"
@@ -132,8 +133,7 @@ int main(int argc, char const *argv[])
     cursor_initialize();
     renderer_initialize();
 
-    Launchpad *panel = launchpad_create("panel", "/Applications/panel");
-    launchpad_launch(panel, NULL);
+    process_run("panel", NULL);
 
     return eventloop_run();
 }

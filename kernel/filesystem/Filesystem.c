@@ -108,7 +108,6 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
     if (!node)
     {
-        logger_warn("Failled to open file %s", path_as_string(path));
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 

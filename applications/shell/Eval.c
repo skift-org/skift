@@ -26,6 +26,13 @@ static bool find_command_path(char *buffer, const char *command)
     }
     else
     {
+        snprintf(buffer, PATH_LENGTH, "/Applications/%s/%s", command, command);
+
+        if (file_exist(buffer))
+        {
+            return true;
+        }
+
         for (size_t i = 0; i < __array_length(PATH); i++)
         {
             snprintf(buffer, PATH_LENGTH, "%s/%s", PATH[i], command);
@@ -49,7 +56,7 @@ Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Launchpad *launchpad = launchpad_create(executable, executable);
+    Launchpad *launchpad = launchpad_create(command->command, executable);
 
     list_foreach(char, arg, command->arguments)
     {

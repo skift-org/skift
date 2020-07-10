@@ -108,7 +108,7 @@ int main(int argc, char **argv)
         timer_start(timer_create(terminal, 250, (TimerCallback)cursor_callback));
         timer_start(timer_create(terminal, 16, (TimerCallback)repaint_callback));
 
-        Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell");
+        Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell/shell");
         launchpad_handle(shell_launchpad, HANDLE(slave), 0);
         launchpad_handle(shell_launchpad, HANDLE(slave), 1);
         launchpad_handle(shell_launchpad, HANDLE(slave), 2);

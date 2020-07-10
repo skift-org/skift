@@ -100,9 +100,7 @@ JsonValue *json_create_null(void)
 void json_destroy(JsonValue *value)
 {
     if (!value)
-    {
         return;
-    }
 
     switch (value->type)
     {

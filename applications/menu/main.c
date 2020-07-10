@@ -82,15 +82,21 @@ List *load_menu(void)
 {
     List *menu = list_create();
 
-    Directory *directory = directory_open("/System/Configs/Menu", OPEN_READ);
+    Directory *directory = directory_open("/Applications", OPEN_READ);
+
+    if (handle_has_error(directory))
+    {
+        directory_close(directory);
+        return menu;
+    }
 
     DirectoryEntry entry = {};
     while (directory_read(directory, &entry) > 0)
     {
-        if (entry.stat.type == FILE_TYPE_REGULAR)
+        if (entry.stat.type == FILE_TYPE_DIRECTORY)
         {
-            char path[256];
-            snprintf(path, 256, "/System/Configs/Menu/%s", entry.name);
+            char path[PATH_LENGTH];
+            snprintf(path, PATH_LENGTH, "/Applications/%s/manifest.json", entry.name);
 
             MenuEntry *entry = menu_entry_create(path);
 
@@ -101,6 +107,7 @@ List *load_menu(void)
         }
     }
 
+    directory_close(directory);
     return menu;
 }
 

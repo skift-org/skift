@@ -1,7 +1,7 @@
 #include <libsystem/CString.h>
 #include <libsystem/System.h>
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Menu.h>
 #include <libwidget/Widgets.h>
@@ -34,14 +34,12 @@ void widget_cpu_update(Graph *widget)
 
 void open_menu()
 {
-    Launchpad *menu = launchpad_create("menu", "/Applications/menu");
-    launchpad_launch(menu, NULL);
+    process_run("menu", NULL);
 }
 
 void open_task_manager()
 {
-    Launchpad *task_manager = launchpad_create("task-manager", "/Applications/task-manager");
-    launchpad_launch(task_manager, NULL);
+    process_run("task-manager", NULL);
 }
 
 int main(int argc, char **argv)

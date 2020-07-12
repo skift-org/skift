@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <libsystem/Filesystem.h>
 #include <libsystem/Logger.h>
@@ -197,4 +198,9 @@ int rename(const char *oldpath, const char *newpath)
     int r = filesystem_rename(oldpath, newpath);
 
     return r;
+}
+
+int fputs(const char *string, FILE *restrict stream)
+{
+    return stream_write((Stream *)stream, string, strlen(string));
 }

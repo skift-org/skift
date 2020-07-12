@@ -54,6 +54,26 @@ const char *path_filename(Path *path)
     }
 }
 
+const char *path_extension(Path *path)
+{
+    const char *filename = path_filename(path);
+
+    if (!filename)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; filename[i]; i++)
+    {
+        if (filename[i] == '.')
+        {
+            return &filename[i];
+        }
+    }
+
+    return NULL;
+}
+
 const char *path_peek_at(Path *path, int index)
 {
     const char *element;

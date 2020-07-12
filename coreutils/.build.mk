@@ -17,12 +17,13 @@ UTILS = \
 	MKDIR \
 	MV \
 	NOW \
+	OPEN \
 	PANIC \
 	SYSFETCH \
 	TOUCH \
+	TTFDUMP \
 	UNLINK \
-	UPTIME \
-	TTFDUMP
+	UPTIME
 
 __TESTEXEC_NAME = __testexec
 __TESTEXEC_LIBS =
@@ -78,6 +79,9 @@ MV_LIBS =
 NOW_NAME = now
 NOW_LIBS =
 
+OPEN_NAME = open
+OPEN_LIBS = json math
+
 PANIC_NAME = panic
 PANIC_LIBS =
 
@@ -87,14 +91,14 @@ SYSFETCH_LIBS =
 TOUCH_NAME = touch
 TOUCH_LIBS =
 
+TTFDUMP_NAME = ttfdump
+TTFDUMP_LIBS = graphic math
+
 UNLINK_NAME = unlink
 UNLINK_LIBS =
 
 UPTIME_NAME = uptime
 UPTIME_LIBS =
-
-TTFDUMP_NAME = ttfdump
-TTFDUMP_LIBS = graphic math
 
 define UTIL_TEMPLATE =
 

@@ -126,7 +126,7 @@ bool json_is(JsonValue *value, JsonType type)
 {
     if (value == NULL)
     {
-        return false;
+        return type == JSON_NULL;
     }
 
     return value->type == type;

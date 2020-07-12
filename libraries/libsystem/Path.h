@@ -16,6 +16,8 @@ void path_destroy(Path *path);
 
 const char *path_filename(Path *path);
 
+const char *path_extension(Path *path);
+
 const char *path_peek_at(Path *path, int index);
 
 bool path_is_absolute(Path *path);

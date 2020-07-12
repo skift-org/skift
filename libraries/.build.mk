@@ -41,6 +41,7 @@ TARGETS += $$($(1)_ARCHIVE)
 OBJECTS += $$($(1)_OBJECTS)
 ICONS += $$($(1)_ICONS)
 
+# Special case for libcompat to copy the headers to the right location without the libcompat prefix.
 ifneq ($(1), COMPAT)
 HEADERS += $$(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
 else

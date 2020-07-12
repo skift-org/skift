@@ -71,7 +71,7 @@ diff -Nru gcc-8.2.0_clean/gcc/config.gcc gcc-8.2.0/gcc/config.gcc
 +  gas=yes
 +  gnu_ld=yes
 +  default_use_cxa_atexit=yes
-+  use_gcc_stdint=wrap
++  use_gcc_stdint=provide
 +	native_system_header_dir=/System/Includes
 +  ;;
  *-*-darwin*)

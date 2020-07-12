@@ -27,3 +27,17 @@ int directory_read(Directory *directory, DirectoryEntry *entry)
 {
     return __plug_handle_read(HANDLE(directory), entry, sizeof(DirectoryEntry));
 }
+
+bool directory_exist(const char *path)
+{
+    Directory *directory = directory_open(path, OPEN_READ);
+
+    if (handle_has_error(directory))
+    {
+        directory_close(directory);
+        return false;
+    }
+
+    directory_close(directory);
+    return true;
+}

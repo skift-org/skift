@@ -25,3 +25,5 @@ FileSystemModel *filesystem_model_create(const char *current_path);
 void filesystem_model_navigate(FileSystemModel *model, Path *path);
 
 const char *filesystem_model_filename_by_index(FileSystemModel *model, int index);
+
+FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index);

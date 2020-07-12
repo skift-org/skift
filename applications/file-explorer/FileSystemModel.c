@@ -179,6 +179,19 @@ const char *filesystem_model_filename_by_index(FileSystemModel *model, int index
     return NULL;
 }
 
+FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index)
+{
+    if (index >= 0 && index < list_count(model->files))
+    {
+        FileSystemNode *entry = NULL;
+        assert(list_peekat(model->files, index, (void **)&entry));
+
+        return entry->type;
+    }
+
+    return FILE_TYPE_UNKNOWN;
+}
+
 static void filesystem_model_destroy(FileSystemModel *model)
 {
     free(model->current_path);

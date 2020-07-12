@@ -1,5 +1,7 @@
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/io/Directory.h>
+#include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
@@ -79,15 +81,24 @@ static void clear_foreward_history(FileExplorerWindow *window)
     list_clear_with_callback(window->foreward_history, (ListDestroyElementCallback)path_destroy);
 }
 
-static void open(FileExplorerWindow *window, ...)
+static void on_open(FileExplorerWindow *window, ...)
 {
+
     if (((Table *)window->table)->selected >= 0)
     {
-        Path *new_path = path_clone(window->current_path);
-        path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected)));
-
-        clear_foreward_history(window);
-        navigate(window, new_path, RECORD_BACKWARD);
+        if (filesystem_model_filetype_by_index(window->model, ((Table *)window->table)->selected) == FILE_TYPE_DIRECTORY)
+        {
+            Path *new_path = path_clone(window->current_path);
+            path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected)));
+            clear_foreward_history(window);
+            navigate(window, new_path, RECORD_BACKWARD);
+        }
+        else
+        {
+            Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
+            launchpad_argument(launchpad, filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected));
+            launchpad_launch(launchpad, NULL);
+        }
     }
 }
 
@@ -190,7 +201,7 @@ Window *file_explorer_window_create(const char *current_path)
     window->table = table_create(root, (Model *)window->model);
     window->table->layout_attributes = LAYOUT_FILL;
 
-    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, EVENT_HANDLER(window, (EventHandlerCallback)open));
+    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, EVENT_HANDLER(window, (EventHandlerCallback)on_open));
 
     return (Window *)window;
 }

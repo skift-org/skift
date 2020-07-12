@@ -66,7 +66,8 @@ uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
         {
             sti();
 
-            logger_error("Task %d triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
+            logger_error("Task %s(%d) triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
+                         scheduler_running()->name,
                          scheduler_running_id(),
                          _exception_messages[stackframe.intno],
                          stackframe.intno,

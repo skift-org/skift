@@ -65,5 +65,13 @@ bool file_exist(const char *path)
         return false;
     }
 
+    FileState state = {};
+    stream_stat(stream, &state);
+
+    if (state.type != FILE_TYPE_REGULAR)
+    {
+        return false;
+    }
+
     return true;
 }

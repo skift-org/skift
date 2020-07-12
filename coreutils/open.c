@@ -29,24 +29,33 @@ int main(int argc, char const *argv[])
 
     if (!json_is(file_extensions, JSON_OBJECT))
     {
-        stream_printf(err_stream, "The file extension database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
+        stream_printf(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
         return -1;
     }
 
     JsonValue *file_type = json_object_get(file_extensions, extension);
 
     if (!json_is(file_type, JSON_STRING))
+    {
+        stream_printf(err_stream, "Unknown file extension %s.\n", extension);
         return -1;
+    }
 
     JsonValue *file_types = json_parse_file(FILE_TYPES_DATABASE_PATH);
 
     if (!json_is(file_types, JSON_OBJECT))
+    {
+        stream_printf(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
         return -1;
+    }
 
     JsonValue *file_type_info = json_object_get(file_types, json_string_value(file_type));
 
     if (!json_is(file_type_info, JSON_OBJECT))
+    {
+        stream_printf(err_stream, "Unknown file type %s.\n", json_string_value(file_type));
         return -1;
+    }
 
     JsonValue *file_type_open_with = json_object_get(file_type_info, "open-with");
 

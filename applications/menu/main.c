@@ -144,6 +144,7 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_POP_OVER);
 
     window_set_title(window, "Panel");
+    window_set_position(window, vec2i_zero);
     window_set_size(window, vec2i(320, 768));
 
     window_root(window)->layout = VFLOW(8);

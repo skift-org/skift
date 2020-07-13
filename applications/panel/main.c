@@ -49,6 +49,7 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_set_title(window, "Panel");
+    window_set_position(window, vec2i_zero);
     window_set_size(window, vec2i(1024, 36));
 
     window_root(window)->layout = HFLOW(8);
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
-    widget_set_event_handler(graph_container, EVENT_ACTION, EVENT_HANDLER(NULL, open_task_manager));
+    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(NULL, open_task_manager));
 
     window_show(window);
 

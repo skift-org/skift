@@ -86,6 +86,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->widget_by_id = hashmap_create_string_to_value();
 
     application_add_window(window);
+    window_set_position(window, vec2i(96, 72));
 }
 
 Window *window_create(WindowFlag flags)

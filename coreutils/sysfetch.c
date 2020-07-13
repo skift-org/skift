@@ -57,9 +57,9 @@ int main(int argc, char **argv)
 
     printf("%d second%s\n", seconds, seconds == 1 ? "" : "s");
 
-    printf("\e[16C SHELL: /bin/Shell\n");
-    printf("\e[16C TERMINAL: /bin/Terminal\n");
-    printf("\e[16C COMPOSITOR: /bin/Compositor\n");
+    printf("\e[16C SHELL: /Applications/shell\n");
+    printf("\e[16C TERMINAL: /Applications/terminal\n");
+    printf("\e[16C COMPOSITOR: /Applications/compositor\n");
     printf("\e[16C MEMORY: \e[m%dMib / %dMib\n", status.used_ram / (1024 * 1024), status.total_ram / (1024 * 1024));
 
     printf("\n");

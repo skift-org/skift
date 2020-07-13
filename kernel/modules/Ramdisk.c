@@ -1,6 +1,5 @@
 
 #include <libfile/tar.h>
-#include <libmath/math.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>

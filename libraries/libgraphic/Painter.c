@@ -1,7 +1,7 @@
 
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
-#include <libmath/math.h>
+#include <libmath/Math.h>
 #include <libsystem/Assert.h>
 
 Painter *painter_create(Bitmap *bitmap)

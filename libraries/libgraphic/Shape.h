@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libmath/Math.h>
 #include <libmath/MinMax.h>
 #include <libmath/Vectors.h>
-#include <libmath/math.h>
 
 typedef struct __packed
 {

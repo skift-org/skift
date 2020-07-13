@@ -10,5 +10,6 @@ double tan(double x)
         "fstp %0\n"
         : "=m"(out), "=m"(one)
         : "m"(_x));
+
     return out;
 }

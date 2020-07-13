@@ -1,4 +1,4 @@
-#include <libmath/math.h>
+#include <libmath/Math.h>
 #include <libsystem/CString.h>
 #include <libsystem/utils/NumberFormatter.h>
 

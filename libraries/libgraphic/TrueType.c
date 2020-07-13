@@ -1,7 +1,7 @@
 // Base on stb truetype.
 
 #include <libgraphic/TrueType.h>
-#include <libmath/math.h>
+#include <libmath/Math.h>
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 

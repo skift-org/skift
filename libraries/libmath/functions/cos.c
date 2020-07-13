@@ -1,4 +1,4 @@
-#include <libmath/math.h>
+#include <libmath/Math.h>
 
 double cos(double value)
 {

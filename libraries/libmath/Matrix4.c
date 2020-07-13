@@ -1,5 +1,5 @@
+#include <libmath/Math.h>
 #include <libmath/Matrix4.h>
-#include <libmath/math.h>
 
 Matrix4 matrix_create_projection(double near, double far, double fov, double aspect_ratio)
 {

@@ -1,6 +1,6 @@
 
 #include <libfile/elf.h>
-#include <libmath/math.h>
+#include <libmath/Math.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/CString.h>

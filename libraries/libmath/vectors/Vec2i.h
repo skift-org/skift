@@ -1,10 +1,11 @@
 #pragma once
 
+#include <libmath/Math.h>
 #include <libmath/MinMax.h>
-#include <libmath/math.h>
 #include <libsystem/Common.h>
 
-typedef union {
+typedef union
+{
     struct
     {
         int x, y;

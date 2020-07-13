@@ -2,7 +2,7 @@
 
 #include <libgraphic/Color.h>
 #include <libgraphic/Shape.h>
-#include <libmath/math.h>
+#include <libmath/Math.h>
 #include <libsystem/Result.h>
 
 typedef enum

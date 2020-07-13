@@ -1,4 +1,4 @@
-#include <libmath/math.h>
+#include <libmath/Math.h>
 
 double acos(double x)
 {

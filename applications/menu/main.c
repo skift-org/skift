@@ -4,6 +4,7 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
+#include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
 typedef struct
@@ -145,7 +146,7 @@ int main(int argc, char **argv)
 
     window_set_title(window, "Panel");
     window_set_position(window, vec2i_zero);
-    window_set_size(window, vec2i(320, 768));
+    window_set_size(window, vec2i(320, screen_get_bound().height));
 
     window_root(window)->layout = VFLOW(8);
 

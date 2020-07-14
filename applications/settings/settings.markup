@@ -1,0 +1,10 @@
+<Window
+    title="Settings"
+    icon="cog"
+    width="700"
+    height="500"
+    layout="hflow(8)"
+    >
+
+    <Label text="Work In Progress" />
+</Window>

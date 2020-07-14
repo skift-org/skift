@@ -1,0 +1,6 @@
+{
+    "name": "Settings",
+    "comment": "System settings.",
+    "icon": "cog",
+    "command": "settings"
+}

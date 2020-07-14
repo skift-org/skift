@@ -18,7 +18,7 @@ ICONS += $$($(1)_ICONS)
 $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
-	@cp $$($(1)_OTHER) $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)
+	@cp $$($(1)_OTHER) $(BUILD_DIRECTORY_APPS)/$($(1)_NAME) || true
 	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
 
 $$(BUILD_DIRECTORY)/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.c

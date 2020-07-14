@@ -1,5 +1,10 @@
 {
     ".png": "image",
     ".jpg": "image",
-    ".jpeg": "image"
+    ".jpeg": "image",
+    ".txt": "text",
+    ".text": "text",
+    ".json": "text",
+    ".c": "text",
+    ".h": "text"
 }

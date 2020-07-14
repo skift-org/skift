@@ -1,5 +1,8 @@
 {
     "image": {
         "open-with": "image-viewer"
+    },
+    "text": {
+        "open-with": "text-editor"
     }
 }

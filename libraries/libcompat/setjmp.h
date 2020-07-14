@@ -1,7 +1,7 @@
 #pragma once
 
 /* i386 */
-#define _JBLEN 9
+#define _JBLEN 6
 
 typedef int jmp_buf[_JBLEN];
 

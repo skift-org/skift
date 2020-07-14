@@ -27,11 +27,17 @@ HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS))
 define LIB_TEMPLATE =
 
 $(1)_ARCHIVE = $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
+
 $(1)_SOURCES = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.c) \
 	$$(wildcard libraries/lib$($(1)_NAME)/*/*.c)
 
-$(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
+$(1)_ASSEMBLY_SOURCES = \
+	$$(wildcard libraries/lib$($(1)_NAME)/*.s) \
+	$$(wildcard libraries/lib$($(1)_NAME)/*/*.s)
+
+$(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES)) \
+			   $$(patsubst libraries/%.s, $(BUILD_DIRECTORY)/%.s.o, $$($(1)_ASSEMBLY_SOURCES))
 
 $(1)_HEADERS = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.h) \
@@ -57,6 +63,11 @@ $(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.c
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CC] $$<
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) -c -o $$@ $$<
+
+$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.s.o: libraries/lib$($(1)_NAME)/%.s
+	$$(DIRECTORY_GUARD)
+	@echo [LIB$(1)] [AS] $$<
+	@$(AS) $(ASFLAGS) $$^ -o $$@
 
 endef
 

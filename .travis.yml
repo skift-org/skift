@@ -1,5 +1,5 @@
 os: linux
-dist: bionic
+dist: focal
 language: cpp
 compiler:
 - gcc
@@ -10,7 +10,7 @@ cache:
 before_install:
 - sudo apt-get update
 - sudo apt-get install -y libmpfr-dev libmpc-dev libgmp-dev
-- sudo apt-get install -y inkscape
+- sudo apt-get install -y inkscape xorriso
 - sudo apt-get install -y e2fsprogs qemu-system-i386 qemu-utils
 - sudo apt-get install -y mtools grub-pc-bin nasm python3
 script:
@@ -27,7 +27,7 @@ deploy:
   provider: releases
   token:
     secure: STrXM1ysn4w7kpNBli/Fjbc2vI9d/lGshtyyoAM5ioegIiQmZq+lUUwnA/tEGWavWo/wPYqfaLEuNT7IiQo/1ypfWyBi+DKLmTx17nonXGk5luJ8t0wRlO2lG1JWCmNlzUifmM7PHdB3ZnoIN99rjk6X4hVQBkwaf/WeMf76pnlY/tQ3iBx2lYPQCYcG+mEYS7+JXvitduINy+nIjZ2fEuWwnOb4Sh/7ITZdLkwI1/rW2jR5ng6tDDxCa9BBm7hbaW35PCedRm88ZgBfhW7/KRsjg4vIfE9PX2FS31AFagDff8vHiGk9eJK0iKB2rHBcn6okYfJDq1btae/8ClibPxajdjNogZ9EBVT1pf/hcHC5wLSLKNm+4Uss2v8b8zkg7K4G+DoitZsPgz/Q2dNzX5jCILyuUYvU4oBn1I9gFobxcvOvARAIpEBPrOC8O4LMQEioEwwgPoGgsAxRs8J6dV19htxoOfdZZWxUUE248CQiL8R5SHv2zai63c/zlabbSpNI65O7dvMRa1evOdCBbg+8+P4+w+qe1ei92+vAPDAfda/z74bBEOAMj1kmglQZWmc9IXAOYh3efh7+Sy1dS299LXiskgHIBND8NcXV6FQcg08NsH4if6nU4o/HDa3cWi6fdQqqOlzgHgrOpqmXA8UtGMNV7prV1XTA5al/Gi8=
-  file: "build/bootdisk.iso"
+  file: "/home/travis/build/skiftOS/skift/build/bootdisk.iso"
   on:
     repo: skiftOS/skift
-  cleanup: 'false'
+  skip_cleanup: true

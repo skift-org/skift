@@ -25,44 +25,52 @@ void dispatcher_dispatch(int interrupt)
     ringbuffer_putc(_interupts_to_dispatch, interrupt);
 }
 
-bool dispatcher_can_unblock(Blocker *blocker, Task *task)
+static bool dispatcher_has_interupt(void)
+{
+    atomic_begin();
+    bool result = !ringbuffer_is_empty(_interupts_to_dispatch);
+    atomic_end();
+
+    return result;
+}
+
+static int dispatcher_get_interupt(void)
+{
+    atomic_begin();
+    int interrupt = ringbuffer_getc(_interupts_to_dispatch);
+    atomic_end();
+
+    return interrupt;
+}
+
+static bool dispatcher_can_unblock(Blocker *blocker, Task *task)
 {
     __unused(blocker);
     __unused(task);
 
-    return !ringbuffer_is_empty(_interupts_to_dispatch);
+    return dispatcher_has_interupt();
 }
 
 void dispatcher_service(void)
 {
     while (true)
     {
-        atomic_begin();
+        Blocker *blocker = __create(Blocker);
+        blocker->can_unblock = (BlockerCanUnblockCallback)dispatcher_can_unblock;
+        task_block(scheduler_running(), blocker, -1);
 
-        bool should_block = ringbuffer_is_empty(_interupts_to_dispatch);
-
-        atomic_end();
-
-        if (should_block)
+        while (dispatcher_has_interupt())
         {
-            Blocker *blocker = __create(Blocker);
-            blocker->can_unblock = (BlockerCanUnblockCallback)dispatcher_can_unblock;
-            task_block(scheduler_running(), blocker, -1);
-        }
+            int interrupt = dispatcher_get_interupt();
 
-        atomic_begin();
-
-        int interrupt = ringbuffer_getc(_interupts_to_dispatch);
-
-        atomic_end();
-
-        if (_interupts_to_handlers[interrupt])
-        {
-            _interupts_to_handlers[interrupt]();
-        }
-        else
-        {
-            logger_warn("No handler for interrupt %d!", interrupt);
+            if (_interupts_to_handlers[interrupt])
+            {
+                _interupts_to_handlers[interrupt]();
+            }
+            else
+            {
+                logger_warn("No handler for interrupt %d!", interrupt);
+            }
         }
     }
 }

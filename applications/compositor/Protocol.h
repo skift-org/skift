@@ -8,6 +8,7 @@ typedef enum
 {
     COMPOSITOR_MESSAGE_INVALID,
     COMPOSITOR_MESSAGE_ACK,
+    COMPOSITOR_MESSAGE_GREETINGS,
 
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
@@ -17,6 +18,11 @@ typedef enum
     COMPOSITOR_MESSAGE_EVENT_WINDOW,
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
 } CompositorMessageType;
+
+typedef struct
+{
+    Rectangle screen_bound;
+} CompositorGreetings;
 
 typedef struct
 {
@@ -74,6 +80,7 @@ typedef struct
     CompositorMessageType type;
 
     union {
+        CompositorGreetings greetings;
         CompositorCreateWindow create_window;
         CompositorDestroyWindow destroy_window;
         CompositorResizeWindow resize_window;

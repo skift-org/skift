@@ -8,6 +8,7 @@
 #include <libsystem/process/Process.h>
 
 #include <libwidget/Application.h>
+#include <libwidget/Screen.h>
 
 #include "compositor/Protocol.h"
 
@@ -48,14 +49,14 @@ void application_send_message(CompositorMessage message)
     connection_send(_connection, &message, sizeof(CompositorMessage));
 }
 
-void application_wait_for_ack(void)
+CompositorMessage *application_wait_for_message(CompositorMessageType expected_message)
 {
     List *pending_messages = list_create();
 
-    __cleanup_malloc CompositorMessage *message = __create(CompositorMessage);
+    CompositorMessage *message = __create(CompositorMessage);
     connection_receive(_connection, message, sizeof(CompositorMessage));
 
-    while (message->type != COMPOSITOR_MESSAGE_ACK)
+    while (message->type != expected_message)
     {
         list_pushback(pending_messages, message);
         message = __create(CompositorMessage);
@@ -68,6 +69,17 @@ void application_wait_for_ack(void)
     }
 
     list_destroy_with_callback(pending_messages, free);
+
+    return message;
+}
+
+void application_wait_for_ack(void)
+{
+    CompositorMessage *ack_message = application_wait_for_message(COMPOSITOR_MESSAGE_ACK);
+    if (ack_message)
+    {
+        free(ack_message);
+    }
 }
 
 void application_request_callback(
@@ -139,6 +151,13 @@ Result application_initialize(int argc, char **argv)
         (NotifierCallback)application_request_callback);
 
     _state = APPLICATION_INITALIZED;
+
+    CompositorMessage *greetings_message = application_wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
+
+    if (greetings_message)
+    {
+        screen_set_bound(greetings_message->greetings.screen_bound);
+    }
 
     return SUCCESS;
 }

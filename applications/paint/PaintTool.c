@@ -1,5 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/utils/List.h>
+#include <libsystem/Logger.h>
+#include <libsystem/utils/Vector.h>
 
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
@@ -125,6 +126,7 @@ PaintTool *eraser_tool_create(void)
 
 static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
 {
+
     if (!rectangle_containe_point(bitmap_bound(bitmap), position))
     {
         return;
@@ -140,12 +142,47 @@ static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
         return;
     }
 
-    bitmap_set_pixel(bitmap, position, fill);
+    Vector *queue = vector_create(sizeof(Vec2i), 256);
+    vector_pushback(queue, &position);
 
-    flood_fill(bitmap, vec2i_add(position, vec2i(1, 0)), target, fill);
-    flood_fill(bitmap, vec2i_add(position, vec2i(-1, 0)), target, fill);
-    flood_fill(bitmap, vec2i_add(position, vec2i(0, 1)), target, fill);
-    flood_fill(bitmap, vec2i_add(position, vec2i(0, -1)), target, fill);
+    while (!vector_empty(queue))
+    {
+        Vec2i current = {};
+        vector_popback(queue, &current);
+
+        if (!color_equals(bitmap_get_pixel(bitmap, current), target))
+        {
+            continue;
+        }
+
+        bitmap_set_pixel(bitmap, current, fill);
+
+        if (current.x != 0)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(-1, 0));
+            vector_pushback(queue, &new_position);
+        }
+
+        if (current.x != bitmap_bound(bitmap).width - 1)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(1, 0));
+            vector_pushback(queue, &new_position);
+        }
+
+        if (current.y != 0)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(0, -1));
+            vector_pushback(queue, &new_position);
+        }
+
+        if (current.y != bitmap_bound(bitmap).height - 1)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(0, 1));
+            vector_pushback(queue, &new_position);
+        }
+    }
+
+    vector_destroy(queue);
 }
 
 void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)

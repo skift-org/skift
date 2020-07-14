@@ -256,6 +256,13 @@ Client *client_create(Connection *connection)
 
     logger_info("Client %08x connected", client);
 
+    client_send_message(client, (CompositorMessage){
+                                    .type = COMPOSITOR_MESSAGE_GREETINGS,
+                                    .greetings = {
+                                        .screen_bound = renderer_bound(),
+                                    },
+                                });
+
     return client;
 }
 

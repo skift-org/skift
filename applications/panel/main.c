@@ -4,6 +4,7 @@
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Menu.h>
+#include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
 void widget_date_and_time_update(Widget *widget)
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
 
     window_set_title(window, "Panel");
     window_set_position(window, vec2i_zero);
-    window_set_size(window, vec2i(1024, 36));
+    window_set_size(window, vec2i(screen_get_bound().width, 36));
 
     window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = INSETS(4);

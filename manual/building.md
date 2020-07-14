@@ -18,7 +18,7 @@ And for testing et debuging
 
 ```sh
 # On Ubuntu
-$ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools
+$ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
 ```
 
 ## 1. Get the source code

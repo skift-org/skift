@@ -1,5 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/utils/List.h>
+#include <libsystem/Logger.h>
+#include <libsystem/utils/Vector.h>
 
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
@@ -141,46 +142,47 @@ static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
         return;
     }
 
-    List *queue = list_create();
-    list_pushback_copy(queue, &position, sizeof(Vec2i));
+    Vector *queue = vector_create(sizeof(Vec2i), 256);
+    vector_pushback(queue, &position);
 
-    while (!list_empty(queue))
+    while (!vector_empty(queue))
     {
-        Vec2i *current;
-        list_pop(queue, (void **)&current);
+        Vec2i current = {};
+        vector_popback(queue, &current);
 
-        if (!color_equals(bitmap_get_pixel(bitmap, *current), target))
+        if (!color_equals(bitmap_get_pixel(bitmap, current), target))
+        {
             continue;
-
-        bitmap_set_pixel(bitmap, *current, fill);
-
-        if (current->x != 0)
-        {
-            Vec2i new_position = vec2i_add(*current, vec2i(-1, 0));
-            list_pushback_copy(queue, &new_position, sizeof(Vec2i));
         }
 
-        if (current->x != bitmap_bound(bitmap).width - 1)
+        bitmap_set_pixel(bitmap, current, fill);
+
+        if (current.x != 0)
         {
-            Vec2i new_position = vec2i_add(*current, vec2i(1, 0));
-            list_pushback_copy(queue, &new_position, sizeof(Vec2i));
+            Vec2i new_position = vec2i_add(current, vec2i(-1, 0));
+            vector_pushback(queue, &new_position);
         }
 
-        if (current->y != 0)
+        if (current.x != bitmap_bound(bitmap).width - 1)
         {
-            Vec2i new_position = vec2i_add(*current, vec2i(0, -1));
-            list_pushback_copy(queue, &new_position, sizeof(Vec2i));
-        }
-        if (current->y != bitmap_bound(bitmap).height - 1)
-        {
-            Vec2i new_position = vec2i_add(*current, vec2i(0, 1));
-            list_pushback_copy(queue, &new_position, sizeof(Vec2i));
+            Vec2i new_position = vec2i_add(current, vec2i(1, 0));
+            vector_pushback(queue, &new_position);
         }
 
-        free(current);
+        if (current.y != 0)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(0, -1));
+            vector_pushback(queue, &new_position);
+        }
+
+        if (current.y != bitmap_bound(bitmap).height - 1)
+        {
+            Vec2i new_position = vec2i_add(current, vec2i(0, 1));
+            vector_pushback(queue, &new_position);
+        }
     }
 
-    list_destroy(queue);
+    vector_destroy(queue);
 }
 
 void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)

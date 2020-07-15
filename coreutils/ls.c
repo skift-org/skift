@@ -35,7 +35,7 @@ static CommandLine cmdline = CMDLINE(
 const char *file_type_name[] = {
     "-", // None
     "-", // File
-    "c", // Char devoce
+    "c", // Char device
     "d", // Directory
     "p", // Pipe
 };

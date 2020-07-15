@@ -11,12 +11,6 @@ extern void *memchr(const void *src, int c, size_t n);
 extern void *memrchr(const void *m, int c, size_t n);
 extern int memcmp(const void *vl, const void *vr, size_t n);
 
-extern void *__attribute__((malloc)) malloc(uintptr_t size);
-extern void *__attribute__((malloc)) realloc(void *ptr, uintptr_t size);
-extern void *__attribute__((malloc)) calloc(uintptr_t nmemb, uintptr_t size);
-extern void *__attribute__((malloc)) valloc(uintptr_t size);
-extern void free(void *ptr);
-
 extern char *strdup(const char *s);
 extern char *stpcpy(char *d, const char *s);
 extern char *strcpy(char *dest, const char *src);

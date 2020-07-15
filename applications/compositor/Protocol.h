@@ -17,6 +17,7 @@ typedef enum
     COMPOSITOR_MESSAGE_FLIP_WINDOW,
     COMPOSITOR_MESSAGE_EVENT_WINDOW,
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
+    COMPOSITOR_MESSAGE_SET_RESOLUTION,
 } CompositorMessageType;
 
 typedef struct
@@ -77,6 +78,12 @@ typedef struct
 
 typedef struct
 {
+    int width;
+    int height;
+} CompositorSetResolution;
+
+typedef struct
+{
     CompositorMessageType type;
 
     union {
@@ -88,5 +95,6 @@ typedef struct
         CompositorFlipWindow flip_window;
         CompositorEventWindow event_window;
         CompositorCursorWindow cursor_window;
+        CompositorSetResolution set_resolution;
     };
 } CompositorMessage;

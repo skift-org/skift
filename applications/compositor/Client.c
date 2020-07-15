@@ -180,6 +180,14 @@ void client_handle_cursor_window(Client *client, CompositorCursorWindow cursor_w
     renderer_region_dirty(cursor_bound());
 }
 
+void client_handle_set_resolution(Client *client, CompositorSetResolution set_resolution)
+{
+    __unused(client);
+
+    logger_debug("New resolution is %dx%d", set_resolution.width, set_resolution.height);
+    renderer_set_resolution(set_resolution.width, set_resolution.height);
+}
+
 void client_request_callback(Client *client, Connection *connection, SelectEvent events)
 {
     assert(events & SELECT_READ);
@@ -226,6 +234,10 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
     case COMPOSITOR_MESSAGE_CURSOR_WINDOW:
         client_handle_cursor_window(client, message.cursor_window);
+        break;
+
+    case COMPOSITOR_MESSAGE_SET_RESOLUTION:
+        client_handle_set_resolution(client, message.set_resolution);
         break;
 
     default:

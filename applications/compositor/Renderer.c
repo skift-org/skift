@@ -93,3 +93,10 @@ void renderer_repaint_dirty(void)
     framebuffer_blit_dirty(_framebuffer);
     list_clear_with_callback(_dirty_regions, free);
 }
+
+void renderer_set_resolution(int width, int height)
+{
+    framebuffer_set_mode(_framebuffer, width, height);
+    renderer_region_dirty(renderer_bound());
+    
+}

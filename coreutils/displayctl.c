@@ -3,7 +3,12 @@
 #include <libsystem/CString.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
+#include <libsystem/io/Connection.h>
+#include <libsystem/io/File.h>
+#include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
+
+#include "compositor/Protocol.h"
 
 static bool option_list = false;
 static bool option_get = false;
@@ -46,6 +51,7 @@ SupportedMode gfxmodes[] = {
     {"800x600", {800, 600}},
     {"1024x768", {1024, 768}},
     {"1280x768", {1280, 768}},
+    {"1920x1080", {1920, 1080}},
     {NULL, {0, 0}},
 };
 
@@ -79,26 +85,64 @@ int gfxmode_get(Stream *framebuffer_device)
     return 0;
 }
 
-int gfxmode_set(Stream *framebuffer_device, const char *mode_name)
+int gfxmode_set_compositor(IOCallDisplayModeArgs *mode)
 {
-    IOCallDisplayModeArgs *framebuffer_info = gfxmode_by_name(mode_name);
+    Connection *compositor_connection = socket_connect("/Session/compositor.ipc");
 
-    if (framebuffer_info != NULL)
+    if (handle_has_error(compositor_connection))
     {
-        if (stream_call(framebuffer_device, IOCALL_DISPLAY_SET_MODE, framebuffer_info) != SUCCESS)
-        {
-            handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
+        handle_printf_error(compositor_connection, "Failled to connect to the compositor (Failling back on iocall)");
+        return -1;
+    }
 
-            return -1;
-        }
+    CompositorMessage message = (CompositorMessage){
+        .type = COMPOSITOR_MESSAGE_SET_RESOLUTION,
+        .set_resolution = {
+            mode->width,
+            mode->height,
+        },
+    };
 
+    connection_send(compositor_connection, &message, sizeof(message));
+
+    return 0;
+}
+
+int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs *mode)
+{
+    if (stream_call(device, IOCALL_DISPLAY_SET_MODE, mode) != SUCCESS)
+    {
+        handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
+        return -1;
+    }
+
+    return 0;
+}
+
+int gfxmode_set(Stream *device, const char *mode_name)
+{
+    IOCallDisplayModeArgs *mode = gfxmode_by_name(mode_name);
+
+    if (!mode)
+    {
+        printf("Error: unknow graphic mode: %s\n", mode_name);
+        return -1;
+    }
+
+    int result = gfxmode_set_compositor(mode);
+
+    if (result != 0)
+    {
+        result = gfxmode_set_iocall(device, mode);
+    }
+
+    if (result == 0)
+    {
         printf("Graphic mode set to: %s\n", mode_name);
-
         return 0;
     }
     else
     {
-        printf("Error: unknow graphic mode: %s\n", mode_name);
         return -1;
     }
 }

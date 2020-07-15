@@ -17,4 +17,6 @@ struct Stream
 
     bool has_unget;
     int unget_char;
+
+    bool is_end_of_file;
 };

@@ -58,6 +58,8 @@ char stream_getchar(Stream *stream);
 
 int stream_ungetchar(Stream *stream, char c);
 
+bool stream_is_end_file(Stream *stream);
+
 int stream_printf(Stream *stream, const char *fmt, ...);
 
 int stream_vprintf(Stream *stream, const char *fmt, va_list va);

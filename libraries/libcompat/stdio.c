@@ -166,7 +166,6 @@ int printf(const char *fmt, ...)
 
 int fprintf(FILE *stream, const char *fmt, ...)
 {
-
     va_list va;
     va_start(va, fmt);
 
@@ -179,7 +178,6 @@ int fprintf(FILE *stream, const char *fmt, ...)
 
 int vfprintf(FILE *stream, const char *fmt, va_list va)
 {
-
     int r = stream_vprintf((Stream *)stream, fmt, va);
 
     return r;
@@ -203,4 +201,42 @@ int rename(const char *oldpath, const char *newpath)
 int fputs(const char *string, FILE *restrict stream)
 {
     return stream_write((Stream *)stream, string, strlen(string));
+}
+
+void clearerr(FILE *stream)
+{
+    handle_clear_error((Stream *)stream);
+}
+
+int feof(FILE *stream)
+{
+    return stream_is_end_file((Stream *)stream);
+}
+
+int ferror(FILE *stream)
+{
+    return handle_has_error((Stream *)stream);
+}
+
+char *fgets(char *s, int size, FILE *stream)
+{
+    Stream *native_stream = (Stream *)stream;
+
+    for (int i = 0; i < size; i++)
+    {
+        s[i] = stream_getchar(native_stream);
+
+        if (handle_has_error(native_stream) ||
+            stream_is_end_file(native_stream))
+        {
+            return s;
+        }
+    }
+
+    return s;
+}
+
+int fgetc(FILE *stream)
+{
+    return stream_getchar((Stream *)stream);
 }

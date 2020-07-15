@@ -15,6 +15,11 @@ void __no_return exit(int status)
     TRACE_FUNCTION_END;
 }
 
+void abort(void)
+{
+    process_exit(-1);
+}
+
 int system(const char *command)
 {
     __unused(command);

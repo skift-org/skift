@@ -116,7 +116,6 @@ void stream_set_read_buffer_mode(Stream *stream, StreamBufferMode mode)
 
 void stream_set_write_buffer_mode(Stream *stream, StreamBufferMode mode)
 {
-
     stream_flush(stream);
 
     if (mode == STREAM_BUFFERED_NONE)
@@ -192,14 +191,23 @@ size_t stream_read(Stream *stream, void *buffer, size_t size)
         size--;
     }
 
+    size_t result = 0;
+
     if (stream->write_mode == STREAM_BUFFERED_NONE)
     {
-        return __plug_handle_read(HANDLE(stream), buffer, size);
+        result = __plug_handle_read(HANDLE(stream), buffer, size);
     }
     else
     {
-        return stream_read_buffered(stream, buffer, size);
+        result = stream_read_buffered(stream, buffer, size);
     }
+
+    if (result == 0)
+    {
+        stream->is_end_of_file = true;
+    }
+
+    return result;
 }
 
 static size_t stream_write_linebuffered(Stream *stream, const void *buffer, size_t size)
@@ -363,4 +371,9 @@ int stream_vprintf(Stream *stream, const char *fmt, va_list va)
     info.allocated = -1;
 
     return __printf(&info, va);
+}
+
+bool stream_is_end_file(Stream *stream)
+{
+    return stream->is_end_of_file;
 }

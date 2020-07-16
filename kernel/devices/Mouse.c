@@ -5,6 +5,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/utils/RingBuffer.h>
 
+#include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/tasking.h"
@@ -13,7 +14,7 @@ static RingBuffer *_mouse_buffer;
 static int _mouse_cycle = 0;
 static uint8_t _mouse_packet[4];
 
-static void ps2mouse_handle_packet(uint8_t packet0, uint8_t packet1, uint8_t packet2, uint8_t packet3)
+static void ps2mouse_handle_finished_packet(uint8_t packet0, uint8_t packet1, uint8_t packet2, uint8_t packet3)
 {
     //TODO: Scroll whell not suported yet
     __unused(packet3);
@@ -50,27 +51,40 @@ static void ps2mouse_handle_packet(uint8_t packet0, uint8_t packet1, uint8_t pac
     atomic_end();
 }
 
-void ps2mouse_interrupt_handler(void)
+void ps2mouse_handle_packet(uint8_t packet)
 {
     switch (_mouse_cycle)
     {
     case 0:
-        _mouse_packet[0] = in8(0x60);
+        _mouse_packet[0] = packet;
         if (_mouse_packet[0] & 8)
         {
             _mouse_cycle++;
         }
         break;
     case 1:
-        _mouse_packet[1] = in8(0x60);
+        _mouse_packet[1] = packet;
         _mouse_cycle++;
         break;
     case 2:
-        _mouse_packet[2] = in8(0x60);
+        _mouse_packet[2] = packet;
 
-        ps2mouse_handle_packet(_mouse_packet[0], _mouse_packet[1], _mouse_packet[2], _mouse_packet[3]);
+        ps2mouse_handle_finished_packet(_mouse_packet[0], _mouse_packet[1], _mouse_packet[2], _mouse_packet[3]);
         _mouse_cycle = 0;
         break;
+    }
+}
+
+void ps2mouse_interrupt_handler(void)
+{
+    uint8_t status = in8(PS2_STATUS);
+
+    while (((status & PS2_WHICH_BUFFER) == PS2_MOUSE_BUFFER) &&
+           (status & PS2_BUFFER_FULL))
+    {
+        uint8_t packet = in8(PS2_BUFFER);
+        ps2mouse_handle_packet(packet);
+        status = in8(PS2_STATUS);
     }
 }
 
@@ -81,7 +95,7 @@ static inline void ps2mouse_wait(int a_type)
     {
         while (time_out--)
         {
-            if ((in8(0x64) & 1) == 1)
+            if ((in8(PS2_STATUS) & 1) == 1)
             {
                 return;
             }
@@ -92,7 +106,7 @@ static inline void ps2mouse_wait(int a_type)
     {
         while (time_out--)
         {
-            if ((in8(0x64) & 2) == 0)
+            if ((in8(PS2_STATUS) & 2) == 0)
             {
                 return;
             }

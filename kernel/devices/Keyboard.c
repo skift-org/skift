@@ -8,6 +8,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/utils/RingBuffer.h>
 
+#include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
@@ -115,26 +116,34 @@ Key keyboard_scancode_to_key(int scancode)
 
 void keyboard_interrupt_handler(void)
 {
-    uint8_t scancode = in8(0x60);
+    uint8_t status = in8(PS2_STATUS);
 
-    if (_state == PS2KBD_STATE_NORMAL)
+    while (((status & PS2_WHICH_BUFFER) == PS2_KEYBOARD_BUFFER) &&
+           (status & PS2_BUFFER_FULL))
     {
-        if (scancode == PS2KBD_ESCAPE)
+        uint8_t scancode = in8(PS2_BUFFER);
+
+        if (_state == PS2KBD_STATE_NORMAL)
         {
-            _state = PS2KBD_STATE_ESCAPED;
+            if (scancode == PS2KBD_ESCAPE)
+            {
+                _state = PS2KBD_STATE_ESCAPED;
+            }
+            else
+            {
+                Key key = keyboard_scancode_to_key(scancode & 0x7F);
+                keyboard_handle_key(key, scancode & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
+            }
         }
-        else
+        else if (_state == PS2KBD_STATE_ESCAPED)
         {
-            Key key = keyboard_scancode_to_key(scancode & 0x7F);
+            _state = PS2KBD_STATE_NORMAL;
+
+            Key key = keyboard_scancode_to_key((scancode & 0x7F) + 0x80);
             keyboard_handle_key(key, scancode & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
         }
-    }
-    else if (_state == PS2KBD_STATE_ESCAPED)
-    {
-        _state = PS2KBD_STATE_NORMAL;
 
-        Key key = keyboard_scancode_to_key((scancode & 0x7F) + 0x80);
-        keyboard_handle_key(key, scancode & 0x80 ? KEY_MOTION_UP : KEY_MOTION_DOWN);
+        status = in8(PS2_STATUS);
     }
 }
 

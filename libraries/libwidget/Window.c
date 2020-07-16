@@ -8,6 +8,7 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
+#include <libsystem/Assert.h>
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 36
@@ -18,7 +19,11 @@ static void close_button_click(void *target, struct Widget *sender, struct Event
     __unused(target);
     __unused(event);
 
-    window_hide(sender->window);
+    Event close_event = {
+        .type = EVENT_WINDOW_CLOSING,
+    };
+
+    window_event(sender->window, &close_event);
 }
 
 void window_populate_header(Window *window)
@@ -218,6 +223,11 @@ void window_show(Window *window)
     application_show_window(window);
 }
 
+void window_show_dialog(Window *window)
+{
+    window_show(window);
+}
+
 void window_hide(Window *window)
 {
     event_cancel_run_later_for(window);
@@ -387,12 +397,26 @@ Widget *window_child_at(Window *window, Vec2i position)
     return NULL;
 }
 
-void window_handle_event(Window *window, Event *event)
+void window_event(Window *window, Event *event)
 {
     if (is_mouse_event(event))
     {
         event->mouse.position = vec2i_sub(event->mouse.position, window->on_screen_bound.position);
         event->mouse.old_position = vec2i_sub(event->mouse.old_position, window->on_screen_bound.position);
+    }
+
+    if (window->handlers[event->type].callback != NULL)
+    {
+        event->accepted = true;
+        window->handlers[event->type].callback(
+            window->handlers[event->type].target,
+            window,
+            event);
+    }
+
+    if (event->accepted)
+    {
+        return;
     }
 
     switch (event->type)
@@ -421,6 +445,12 @@ void window_handle_event(Window *window, Event *event)
         {
             window_hide(window);
         }
+    }
+    break;
+
+    case EVENT_WINDOW_CLOSING:
+    {
+        window_hide(window);
     }
     break;
 
@@ -602,6 +632,12 @@ void window_handle_event(Window *window, Event *event)
     default:
         break;
     }
+}
+
+void window_set_event_handler(Window *window, EventType event, EventHandler handler)
+{
+    assert(event < __EVENT_TYPE_COUNT);
+    window->handlers[event] = handler;
 }
 
 Rectangle window_bound_on_screen(Window *window)

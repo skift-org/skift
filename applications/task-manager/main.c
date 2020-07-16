@@ -2,6 +2,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/dialog/Dialog.h>
 
 #include "task-manager/TaskModel.h"
 
@@ -47,6 +48,11 @@ void task_manager_window_destroy(TaskManagerWindow *window)
     model_destroy((Model *)window->table_model);
 }
 
+void cancel_task()
+{
+    dialog_message(icon_get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_OK);
+}
+
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
@@ -63,8 +69,11 @@ int main(int argc, char **argv)
 
     /// --- Toolbar --- ///
     Widget *toolbar = toolbar_create(window_root((Window *)window));
-    button_create_with_icon_and_text(toolbar, BUTTON_FILLED, icon_get("plus"), "New task");
-    button_create_with_icon_and_text(toolbar, BUTTON_TEXT, icon_get("close"), "Cancel task");
+    Widget *new_task_button = button_create_with_icon_and_text(toolbar, BUTTON_FILLED, icon_get("plus"), "New task");
+    __unused(new_task_button);
+
+    Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, icon_get("close"), "Cancel task");
+    widget_set_event_handler(cancel_task_button, EVENT_ACTION, EVENT_HANDLER(NULL, cancel_task));
 
     /// --- Table view --- //
     window->table_model = task_model_create();

@@ -49,6 +49,8 @@ typedef struct Window
     List *dirty_rect;
     bool dirty_layout;
 
+    EventHandler handlers[__EVENT_TYPE_COUNT];
+
     Widget *header_container;
     Widget *root_container;
     Widget *focused_widget;
@@ -83,7 +85,9 @@ void window_paint(Window *window, Painter *painter, Rectangle rectangle);
 
 void window_dump(Window *window);
 
-void window_handle_event(Window *window, Event *event);
+void window_event(Window *window, Event *event);
+
+void window_set_event_handler(Window *window, EventType event, EventHandler handler);
 
 Rectangle window_bound_on_screen(Window *window);
 

@@ -10,9 +10,13 @@ void eventloop_initialize(void);
 
 int eventloop_run(void);
 
+int eventloop_run_nested(void);
+
 void eventloop_pump(bool pool);
 
 void eventloop_exit(int exit_value);
+
+void eventloop_exit_nested(int exit_value);
 
 void eventloop_register_notifier(struct Notifier *notifier);
 

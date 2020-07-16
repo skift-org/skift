@@ -8,9 +8,13 @@ Result application_initialize(int argc, char **argv);
 
 int application_run(void);
 
+int application_run_nested(void);
+
 int application_pump(void);
 
 void application_exit(int exit_value);
+
+void application_exit_nested(int exit_value);
 
 bool application_is_debbuging_layout(void);
 

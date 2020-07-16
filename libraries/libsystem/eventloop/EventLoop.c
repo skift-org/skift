@@ -27,6 +27,9 @@ static bool _eventloop_is_running = false;
 static bool _eventloop_is_initialize = false;
 static int _eventloop_exit_value = 0;
 
+static bool _nested_eventloop_is_running = false;
+static int _nested_eventloop_exit_value = 0;
+
 void eventloop_initialize(void)
 {
     assert(!_eventloop_is_initialize);
@@ -66,6 +69,22 @@ int eventloop_run(void)
     eventloop_uninitialize();
 
     return _eventloop_exit_value;
+}
+
+int eventloop_run_nested(void)
+{
+    assert(_eventloop_is_initialize);
+    assert(_eventloop_is_running);
+    assert(!_nested_eventloop_is_running);
+
+    _nested_eventloop_is_running = true;
+
+    while (_nested_eventloop_is_running)
+    {
+        eventloop_pump(false);
+    }
+
+    return _nested_eventloop_exit_value;
 }
 
 static Timeout eventloop_get_timeout(void)
@@ -164,7 +183,6 @@ void eventloop_pump(bool pool)
         }
     }
 
-
     list_foreach(RunLater, run_later, _eventloop_run_later)
     {
         run_later->callback(run_later->target);
@@ -179,6 +197,15 @@ void eventloop_exit(int exit_value)
 
     _eventloop_is_running = false;
     _eventloop_exit_value = exit_value;
+}
+
+void eventloop_exit_nested(int exit_value)
+{
+    assert(_eventloop_is_initialize);
+    assert(_nested_eventloop_is_running);
+
+    _nested_eventloop_is_running = false;
+    _nested_eventloop_exit_value = exit_value;
 }
 
 void eventloop_update_notifier(void)

@@ -35,7 +35,7 @@ void application_do_message(CompositorMessage *message)
 
         if (window)
         {
-            window_handle_event(window, &message->event_window.event);
+            window_event(window, &message->event_window.event);
         }
     }
     else
@@ -170,6 +170,13 @@ int application_run(void)
     return eventloop_run();
 }
 
+int application_run_nested(void)
+{
+    assert(_state == APPLICATION_RUNNING);
+
+    return eventloop_run_nested();
+}
+
 int application_pump(void)
 {
     if (_state == APPLICATION_INITALIZED)
@@ -196,6 +203,12 @@ void application_exit(int exit_value)
     eventloop_exit(exit_value);
 
     _state = APPLICATION_NONE;
+}
+
+void application_exit_nested(int exit_value)
+{
+    assert(_state == APPLICATION_RUNNING);
+    eventloop_exit_nested(exit_value);
 }
 
 bool application_is_debbuging_layout(void)

@@ -15,6 +15,8 @@ typedef enum
     EVENT_GOT_FOCUS,
     EVENT_LOST_FOCUS,
 
+    EVENT_WINDOW_CLOSING,
+
     EVENT_MOUSE_MOVE,
     EVENT_MOUSE_ENTER,
     EVENT_MOUSE_LEAVE,
@@ -57,7 +59,8 @@ typedef struct Event
     EventType type;
     bool accepted;
 
-    union {
+    union
+    {
         MouseEvent mouse;
         KeyboardEvent keyboard;
     };

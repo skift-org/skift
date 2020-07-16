@@ -552,7 +552,6 @@ Widget *widget_get_child_at(Widget *parent, Vec2i position)
 void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler)
 {
     assert(event < __EVENT_TYPE_COUNT);
-
     widget->handlers[event] = handler;
 }
 

@@ -180,4 +180,7 @@ clean:
 clean-fs:
 	rm -rf $(SYSROOT)
 
+.PHONY: install-headers
+install-headers: $(HEADERS)
+
 -include $(OBJECTS:.o=.d)

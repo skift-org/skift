@@ -86,6 +86,11 @@ pushd "$DIR/build/"
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1
+
+        make -C "$DIR/../" install-headers || exit 1
+
+        # make all-target-libstdc++-v3 || exit 1
+        # make install-target-libstdc++-v3 || exit 1
     popd
 popd
 

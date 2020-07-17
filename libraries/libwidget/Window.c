@@ -1,3 +1,4 @@
+#include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Memory.h>
@@ -8,7 +9,6 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
-#include <libsystem/Assert.h>
 
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 36

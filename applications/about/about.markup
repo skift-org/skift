@@ -4,6 +4,7 @@
     width="250"
     height="250"
     layout="vflow(8)"
+    padding="insets(8)"
     >
 
     <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
@@ -14,7 +15,8 @@
         <Label text="Copyright © 2018-2020 N. Van Bossuyt."/>
     </Container>
 
-    <Container padding="insets(4)" layout="stack">
-        <Button id="ok-button" text="Ok"/>
+    <Container padding="insets(4)" layout="hflow(0)">
+        <Container fill/>
+        <Button id="ok-button" text="Ok" filled/>
     </Container>
 </Window>

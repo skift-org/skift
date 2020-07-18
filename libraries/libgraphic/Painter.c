@@ -1,6 +1,7 @@
 
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
+#include <libgraphic/StackBlur.h>
 #include <libmath/Math.h>
 #include <libsystem/Assert.h>
 
@@ -655,6 +656,19 @@ __flatten void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectan
             painter_plot_pixel(painter, vec2i_add(dst_rect.position, vec2i(x, y)), final);
         }
     }
+}
+
+void painter_blur_rectangle(Painter *painter, Rectangle rectangle, int radius)
+{
+    rectangle = painter_apply_transform(painter, rectangle);
+    rectangle = painter_apply_clip(painter, rectangle);
+
+    stackblurJob((unsigned char *)painter->bitmap->pixels,
+                 painter->bitmap->width,
+                 painter->bitmap->height,
+                 radius,
+                 rectangle.x, rectangle.x + rectangle.width,
+                 rectangle.y, rectangle.y + rectangle.height);
 }
 
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color)

@@ -34,17 +34,22 @@ Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx,
 
 static inline Color color_blend(Color fg, Color bg)
 {
-    Color result;
+    float r0 = fg.R / 255.0;
+    float g0 = fg.G / 255.0;
+    float b0 = fg.B / 255.0;
+    float a0 = fg.A / 255.0;
 
-    uint alpha = fg.A + 1;
-    uint inv_alpha = 256 - fg.A;
+    float r1 = bg.R / 255.0;
+    float g1 = bg.G / 255.0;
+    float b1 = bg.B / 255.0;
+    float a1 = bg.A / 255.0;
 
-    result.R = (uint8_t)((alpha * fg.R + inv_alpha * bg.R) / 256);
-    result.G = (uint8_t)((alpha * fg.G + inv_alpha * bg.G) / 256);
-    result.B = (uint8_t)((alpha * fg.B + inv_alpha * bg.B) / 256);
-    result.A = 255;
+    float a01 = (1 - a0) * a1 + a0;
+    float r01 = ((1 - a0) * a1 * r1 + a0 * r0) / a01;
+    float g01 = ((1 - a0) * a1 * g1 + a0 * g0) / a01;
+    float b01 = ((1 - a0) * a1 * b1 + a0 * b0) / a01;
 
-    return result;
+    return RGBA(r01, g01, b01, a01);
 }
 
 #define COLOR(__value) ((Color){{(uint8_t)((__value) >> 16), (uint8_t)((__value) >> 8), (uint8_t)((__value)), 255}})

@@ -43,5 +43,7 @@ void graphics_draw(Painter *painter, Rectangle screen, double time)
     painter_draw_rounded_rectangle(painter, screen, 64, 8, ALPHA(COLOR_GREEN, 0.75));
     painter_draw_rounded_rectangle(painter, screen, 64, 4, ALPHA(COLOR_BLUE, 0.75));
 
+    painter_blur_rectangle(painter, RECTANGLE(100, 100, 200, 200), 8);
+
     _frame++;
 }

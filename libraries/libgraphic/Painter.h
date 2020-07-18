@@ -67,6 +67,8 @@ void painter_draw_circle_helper(Painter *painter, Rectangle bound, Vec2i center,
 
 void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radius, int thickness, Color color);
 
+void painter_blur_rectangle(Painter *painter, Rectangle rectangle, int radius);
+
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color);
 
 void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color);

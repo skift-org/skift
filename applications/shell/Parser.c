@@ -99,8 +99,7 @@ static ShellNode *pipeline(SourceReader *source)
 
     if (list_count(commands) == 1)
     {
-        ShellNode *node = NULL;
-        list_peek(commands, (void **)&node);
+        ShellNode *node = (ShellNode *)list_peek(commands);
         list_destroy(commands);
         return node;
     }

@@ -6,7 +6,7 @@
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking.h"
+#include "kernel/tasking/Task.h"
 
 const char *const witty_comments[] = {
     "Witty comment unavailable :(",

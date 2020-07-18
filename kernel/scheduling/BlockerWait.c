@@ -1,5 +1,5 @@
 #include "kernel/scheduling/Blocker.h"
-#include "kernel/tasking.h"
+#include "kernel/tasking/Task.h"
 
 typedef struct
 {

@@ -10,12 +10,13 @@
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
 #include "kernel/devices/Devices.h"
+#include "kernel/filesystem/Filesystem.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking.h"
+#include "kernel/tasking/Tasking.h"
 #include "kernel/tasking/Userspace.h"
 
 void system_main(Multiboot *multiboot)

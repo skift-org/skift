@@ -4,7 +4,8 @@
 #include <libsystem/Logger.h>
 
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking.h"
+#include "kernel/tasking/Task-Memory.h"
+#include "kernel/tasking/Task.h"
 
 Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, ELFProgram *program_header)
 {

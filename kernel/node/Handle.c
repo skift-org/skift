@@ -9,7 +9,6 @@
 #include "kernel/node/Handle.h"
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking.h"
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 {

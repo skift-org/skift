@@ -1,11 +1,13 @@
 
 #include <libsystem/Logger.h>
 
+#include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Pipe.h"
 #include "kernel/node/Terminal.h"
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Handles.h"
+#include "kernel/tasking/Task-Directory.h"
+#include "kernel/tasking/Task-Handles.h"
 
 Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 {

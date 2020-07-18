@@ -10,7 +10,6 @@
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking.h"
 #include "kernel/tasking/Syscalls.h"
 
 static const char *_exception_messages[32] = {

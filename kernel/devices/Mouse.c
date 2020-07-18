@@ -7,8 +7,8 @@
 
 #include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
+#include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
-#include "kernel/tasking.h"
 
 static RingBuffer *_mouse_buffer;
 static int _mouse_cycle = 0;

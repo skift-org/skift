@@ -6,10 +6,10 @@
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 
+#include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Handle.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking.h"
 
 static IterationDecision serialize_task(JsonValue *destination, Task *task)
 {

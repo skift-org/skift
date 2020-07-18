@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/tasking.h"
+#include "kernel/tasking/Task.h"
 
 Result task_fshandle_open(Task *task, int *handle_index, const char *path, OpenFlag flags);
 

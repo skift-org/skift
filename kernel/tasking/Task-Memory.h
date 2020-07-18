@@ -1,0 +1,34 @@
+#pragma once
+
+#include "kernel/memory/MemoryObject.h"
+#include "kernel/tasking/Task.h"
+
+typedef struct
+{
+    MemoryObject *object;
+
+    uintptr_t address;
+    size_t size;
+} MemoryMapping;
+
+MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object);
+
+void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping);
+
+MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address);
+
+Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address);
+
+Result task_shared_memory_free(Task *task, uintptr_t address);
+
+Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size);
+
+Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
+
+PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
+
+Result task_memory_map(Task *task, MemoryRange range);
+
+Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address);
+
+Result task_memory_free(Task *task, MemoryRange range);

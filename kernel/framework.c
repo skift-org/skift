@@ -12,8 +12,10 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking.h"
-#include "kernel/tasking/Handles.h"
+#include "kernel/tasking/Task-Directory.h"
+#include "kernel/tasking/Task-Handles.h"
+#include "kernel/tasking/Task-Lanchpad.h"
+#include "kernel/tasking/Task-Memory.h"
 
 /* --- Framework initialization --------------------------------------------- */
 

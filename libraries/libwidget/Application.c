@@ -193,11 +193,12 @@ void application_exit(int exit_value)
 {
     assert(_state == APPLICATION_RUNNING);
     _state = APPLICATION_EXITING;
-    Window *window = NULL;
 
-    while (list_peek(_windows, (void **)&window))
+    Window *window = (Window *)list_peek(_windows);
+    while (window)
     {
         window_destroy(window);
+        window = (Window *)list_peek(_windows);
     }
 
     eventloop_exit(exit_value);

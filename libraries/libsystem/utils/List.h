@@ -43,11 +43,11 @@ List *list_clone(List *list);
 
 void list_insert_sorted(List *list, void *value, ListCompareElementCallback comparator);
 
-bool list_peek(List *list, void **value);
+void *list_peek(List *list);
 
 bool list_peek_and_pushback(List *list, void **value);
 
-bool list_peekback(List *list, void **value);
+void *list_peekback(List *list);
 
 bool list_peekat(List *list, int index, void **value);
 

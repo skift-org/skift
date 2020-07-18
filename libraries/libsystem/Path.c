@@ -42,16 +42,7 @@ void path_destroy(Path *path)
 
 const char *path_filename(Path *path)
 {
-    const char *element;
-
-    if (list_peekback(path->elements, (void **)&element))
-    {
-        return element;
-    }
-    else
-    {
-        return NULL;
-    }
+    return (const char *)list_peekback(path->elements);
 }
 
 const char *path_extension(Path *path)

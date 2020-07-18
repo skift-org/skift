@@ -92,25 +92,23 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback call
     }
 }
 
-bool list_peek(List *list, void **value)
+void *list_peek(List *list)
 {
     if (list->head != NULL)
     {
-        *value = list->head->value;
-
-        return true;
+        return list->head->value;
     }
     else
     {
-        *value = NULL;
-
-        return false;
+        return NULL;
     }
 }
 
 bool list_peek_and_pushback(List *list, void **value)
 {
-    if (list_peek(list, value))
+    *value = list_peek(list);
+
+    if (*value)
     {
         ListItem *item = list->head;
 
@@ -155,17 +153,15 @@ bool list_peek_and_pushback(List *list, void **value)
     }
 }
 
-bool list_peekback(List *list, void **value)
+void *list_peekback(List *list)
 {
     if (list->tail != NULL)
     {
-        *value = list->tail->value;
-
-        return true;
+        return list->tail->value;
     }
     else
     {
-        return false;
+        return NULL;
     }
 }
 

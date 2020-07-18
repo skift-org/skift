@@ -54,16 +54,7 @@ void manager_unregister_window(Window *window)
     renderer_region_dirty(window_bound(window));
     list_remove(_managed_windows, window);
 
-    Window *top_window = NULL;
-
-    if (list_peek(_managed_windows, (void **)&top_window))
-    {
-        manager_set_focus_window(top_window);
-    }
-    else
-    {
-        manager_set_focus_window(NULL);
-    }
+    manager_set_focus_window((Window *)list_peek(_managed_windows));
 }
 
 void manager_set_focus_window(Window *window)

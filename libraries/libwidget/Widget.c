@@ -47,10 +47,11 @@ void widget_destroy(Widget *widget)
         widget->klass->destroy(widget);
     }
 
-    Widget *child = NULL;
-    while (list_peek(widget->childs, (void **)&child))
+    Widget *child = (Widget *)list_peek(widget->childs);
+    while (child)
     {
         widget_destroy(child);
+        child = (Widget *)list_peek(widget->childs);
     }
 
     list_destroy(widget->childs);
@@ -100,10 +101,11 @@ void widget_remove_child(Widget *widget, Widget *child)
 
 void widget_clear_childs(Widget *widget)
 {
-    Widget *child = NULL;
-    while (list_peek(widget->childs, (void **)&child))
+    Widget *child = (Widget *)list_peek(widget->childs);
+    while (child)
     {
         widget_destroy(child);
+        child = (Widget *)list_peek(widget->childs);
     }
 }
 

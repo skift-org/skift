@@ -4,7 +4,7 @@
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Table.h>
 
-#define TABLE_ROW_HEIGHT 24
+#define TABLE_ROW_HEIGHT 32
 
 Rectangle table_bound(Table *widget)
 {
@@ -68,14 +68,14 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             painter,
             data.icon,
             ICON_18PX,
-            (Rectangle){{cell_bound.x + 4, cell_bound.y + 3, 18, 18}},
+            (Rectangle){{cell_bound.x + 7, cell_bound.y + 7, 18, 18}},
             widget_get_color(widget, THEME_FOREGROUND));
 
         painter_draw_string(
             painter,
             widget_font(),
             data.as_string,
-            vec2i(cell_bound.x + 4 + 18 + 4, cell_bound.y + 16),
+            vec2i(cell_bound.x + 7 + 18 + 7, cell_bound.y + 20),
             widget_get_color(widget, THEME_FOREGROUND));
     }
     else
@@ -84,7 +84,7 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
             painter,
             widget_font(),
             data.as_string,
-            vec2i(cell_bound.x + 4, cell_bound.y + 16),
+            vec2i(cell_bound.x + 7, cell_bound.y + 20),
             widget_get_color(widget, THEME_FOREGROUND));
     }
 
@@ -150,8 +150,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
         painter_fill_rectangle(painter, rectangle_bottom(header_bound, 1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 4, header_bound.y + 16), widget_get_color(widget, THEME_FOREGROUND));
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 4 + 1, header_bound.y + 16), widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 7, header_bound.y + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), vec2i(header_bound.x + 7 + 1, header_bound.y + 20), widget_get_color(widget, THEME_FOREGROUND));
     }
 
     painter_pop_clip(painter);

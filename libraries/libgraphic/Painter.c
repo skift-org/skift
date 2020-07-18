@@ -180,6 +180,9 @@ void painter_blit_bitmap_fast_no_alpha(
         for (int y = 0; y < clipped_destination.height; y++)
         {
             Color sample = bitmap_get_pixel(bitmap, vec2i(clipped_source.x + x, clipped_source.y + y));
+
+            sample.A = 255;
+
             bitmap_set_pixel_no_check(painter->bitmap, vec2i_add(clipped_destination.position, vec2i(x, y)), sample);
         }
     }

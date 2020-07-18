@@ -16,12 +16,12 @@ void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            painter_draw_line(document->painter, from, to, document->primary_color);
+            painter_draw_line_antialias(document->painter, from, to, document->primary_color);
             document->dirty = true;
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            painter_draw_line(document->painter, from, to, document->secondary_color);
+            painter_draw_line_antialias(document->painter, from, to, document->secondary_color);
             document->dirty = true;
         }
     }

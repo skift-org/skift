@@ -263,7 +263,7 @@ Rectangle window_content_bound(Window *window)
 
 void window_paint(Window *window, Painter *painter, Rectangle rectangle)
 {
-    painter_clear_rectangle(painter, rectangle, ALPHA(window_get_color(window, THEME_BACKGROUND), 0.8));
+    painter_clear_rectangle(painter, rectangle, window_get_color(window, THEME_BACKGROUND));
 
     painter_push_clip(painter, rectangle);
 

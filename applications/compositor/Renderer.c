@@ -64,8 +64,7 @@ void renderer_region(Rectangle region)
                 destination.height,
             }};
 
-            painter_blur_rectangle(_painter, destination, 32);
-            painter_blit_bitmap(_painter, window->frontbuffer, source, destination);
+            painter_blit_bitmap_no_alpha(_painter, window->frontbuffer, source, destination);
         }
     }
 

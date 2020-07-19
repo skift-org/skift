@@ -15,7 +15,7 @@ static IterationDecision append_device_info(JsonValue *root, DeviceInfo device)
 {
     JsonValue *task_object = json_create_object();
 
-    json_object_put(task_object, "device", json_create_string(device_to_string(device)));
+    json_object_put(task_object, "device", json_create_string(device_to_static_string(device)));
 
     const DeviceDriverInfo *driver = device_get_diver_info(device);
 

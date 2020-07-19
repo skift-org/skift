@@ -3,11 +3,22 @@
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
+#include "kernel/virtio/Network.h"
 #include "kernel/virtio/Virtio.h"
 
 static DeviceDriverInfo drivers[] = {
-    {"BOCHS/QEMU Graphics Adaptor", BUS_PCI, bga_match, bga_initialize},
-    {"VirtIO Network Adaptor", BUS_PCI, virtio_net_match, virtio_net_initialize},
+    {
+        "BOCHS/QEMU Graphics Adaptor",
+        BUS_PCI,
+        bga_match,
+        bga_initialize,
+    },
+    {
+        "VirtIO Network Adaptor",
+        BUS_PCI,
+        virtio_network_match,
+        virtio_network_initialize,
+    },
     {NULL, BUS_NONE, NULL, NULL},
 };
 
@@ -27,7 +38,7 @@ const DeviceDriverInfo *device_get_diver_info(DeviceInfo info)
     return NULL;
 }
 
-const char *device_to_string(DeviceInfo info)
+const char *device_to_static_string(DeviceInfo info)
 {
     static char buffer[512];
 
@@ -57,16 +68,20 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
     if (driver)
     {
 
-        logger_info("%s: %s", device_to_string(info), driver->description);
+        logger_info("%s: %s", device_to_static_string(info), driver->description);
 
         if (driver->initialize)
         {
             driver->initialize(info);
         }
     }
+    else if (virtio_is_virtio_device(info))
+    {
+        logger_warn("%s: Unknown virtIO device", device_to_static_string(info));
+    }
     else
     {
-        logger_warn("%s: Unknown device", device_to_string(info));
+        logger_warn("%s: Unknown device", device_to_static_string(info));
     }
 
     return ITERATION_CONTINUE;

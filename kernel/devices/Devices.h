@@ -27,7 +27,8 @@ typedef struct
 {
     Bus bus;
 
-    union {
+    union
+    {
         UNIXDeviceAddress unix_device;
         PCIDevice pci_device;
     };
@@ -51,7 +52,7 @@ void device_initialize(void);
 
 const DeviceDriverInfo *device_get_diver_info(DeviceInfo info);
 
-const char *device_to_string(DeviceInfo info);
+const char *device_to_static_string(DeviceInfo info);
 
 void device_iterate(void *target, DeviceIterateCallback callback);
 

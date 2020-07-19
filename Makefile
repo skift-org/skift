@@ -131,14 +131,22 @@ VM_MEMORY?=128
 QEMU=qemu-system-x86_64
 QEMUFLAGS=-m $(VM_MEMORY)M \
 		  -serial mon:stdio \
-		  -rtc base=localtime \
-		  -nic user,model=virtio-net-pci
+		  -rtc base=localtime
+
+QEMUFLAGS_VIRTIO=-device virtio-rng-pci \
+				 -device virtio-serial \
+				 -nic user,model=virtio-net-pci
+#				 -vga virtio
 
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
 	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -enable-kvm || \
 	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
+
+run-qemu-virtio: $(BOOTDISK)
+	@echo [QEMU] $^
+	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUFLAGS_VIRTIO) $(QEMUEXTRA) -enable-kvm
 
 .PHONY: run-vbox
 run-vbox: $(BOOTDISK)

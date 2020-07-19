@@ -13,13 +13,16 @@
 
 ### ACPI
  - [ ] Get the acpi table from the bootloader
+    (https://uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf)
  - [ ] Implement a fallback
  - [ ] Port lai
     (https://github.com/qword-os/lai)
 
 ### VirtIO
  - [ ] VirtIO bus
-    (https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-3001r1)
+    (https://wiki.osdev.org/Virtio)
+    (https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-3200007)
+    (https://github.com/doug65536/dgos/tree/master/kernel/device/virtio-base)
 
 ### x86 platform
  - [ ] Support for SMP
@@ -44,6 +47,7 @@
  - [ ] VirtIO Graphic device
  - [ ] VirtGL support
     (https://studiopixl.com/2017-08-27/3d-acceleration-using-virtio.html)
+    (https://github.com/Keenuts/virtio-gpu-documentation/blob/master/src/virtio-gpu.md)
 
 ## Application
 

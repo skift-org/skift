@@ -123,7 +123,7 @@ bool bga_match(DeviceInfo info)
 void bga_initialize(DeviceInfo info)
 {
     bga_set_mode(VBE_DISPI_DEFAULT_XRES, VBE_DISPI_DEFAULT_YRES);
-    framebuffer_physical = pci_device_read(info.pci_device, PCI_BAR0, 4);
+    framebuffer_physical = pci_device_read(info.pci_device, PCI_BAR0, 4) & 0xFFFFFFF0;
     framebuffer_virtual = virtual_alloc(
                               &kpdir,
                               (MemoryRange){

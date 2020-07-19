@@ -27,8 +27,7 @@ typedef struct
 {
     Bus bus;
 
-    union
-    {
+    union {
         UNIXDeviceAddress unix_device;
         PCIDevice pci_device;
     };

@@ -16,6 +16,7 @@
 #define PCI_LATENCY_TIMER 0x0d
 #define PCI_HEADER_TYPE 0x0e
 #define PCI_BIST 0x0f
+
 #define PCI_BAR0 0x10
 #define PCI_BAR1 0x14
 #define PCI_BAR2 0x18

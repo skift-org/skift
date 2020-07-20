@@ -132,8 +132,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    painter_blur_rectangle(painter, table_header_bound(widget), 16);
-    painter_fill_rectangle(painter, table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.5));
+    painter_blur_rectangle(painter, table_header_bound(widget), 8);
+    painter_fill_rectangle(painter, table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.9));
 
     for (int column = 0; column < column_count; column++)
     {

@@ -5,7 +5,7 @@
 
 void virtio_device_initialize(DeviceInfo info)
 {
-    logger_info("Initializing virtI/O device %s", device_to_static_string(info));
+    logger_info("Initializing virtIO device %s", device_to_static_string(info));
 }
 
 bool virtio_is_virtio_device(DeviceInfo info)

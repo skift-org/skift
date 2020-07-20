@@ -18,18 +18,15 @@ uint32_t pci_device_read(PCIDevice device, int field, int size)
 
     if (size == 4)
     {
-        uint32_t t = in32(PCI_VALUE_PORT);
-        return t;
+        return in32(PCI_VALUE_PORT);
     }
     else if (size == 2)
     {
-        uint16_t t = in16(PCI_VALUE_PORT + (field & 2));
-        return t;
+        return in16(PCI_VALUE_PORT + (field & 2));
     }
     else if (size == 1)
     {
-        uint8_t t = in8(PCI_VALUE_PORT + (field & 3));
-        return t;
+        return in8(PCI_VALUE_PORT + (field & 3));
     }
 
     return 0xFFFF;

@@ -3,6 +3,10 @@
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
+#include "kernel/virtio/Block.h"
+#include "kernel/virtio/Console.h"
+#include "kernel/virtio/Entropy.h"
+#include "kernel/virtio/Graphic.h"
 #include "kernel/virtio/Network.h"
 #include "kernel/virtio/Virtio.h"
 
@@ -18,6 +22,30 @@ static DeviceDriverInfo drivers[] = {
         BUS_PCI,
         virtio_network_match,
         virtio_network_initialize,
+    },
+    {
+        "VirtIO Block Device",
+        BUS_PCI,
+        virtio_block_match,
+        virtio_block_initialize,
+    },
+    {
+        "VirtIO Console",
+        BUS_PCI,
+        virtio_console_match,
+        virtio_console_initialize,
+    },
+    {
+        "VirtIO Entropy Source",
+        BUS_PCI,
+        virtio_entropy_match,
+        virtio_entropy_initialize,
+    },
+    {
+        "VirtIO Graphic Adaptor",
+        BUS_PCI,
+        virtio_graphic_match,
+        virtio_graphic_initialize,
     },
     {NULL, BUS_NONE, NULL, NULL},
 };

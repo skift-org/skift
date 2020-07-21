@@ -6,11 +6,13 @@
 /*                                                                            */
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/graphics/Graphics.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"
@@ -21,6 +23,8 @@
 
 void system_main(Multiboot *multiboot)
 {
+    logger_info("Framebuffer at %08x %d %d", multiboot->framebuffer_addr, multiboot->framebuffer_width, multiboot->framebuffer_height);
+
     system_initialize();
     memory_initialize(multiboot);
     scheduler_initialize();
@@ -37,7 +41,7 @@ void system_main(Multiboot *multiboot)
     keyboard_initialize();
     process_info_initialize();
     device_info_initialize();
-    // textmode_initialize();
+    graphic_initialize(multiboot);
     userspace_initialize();
 
     ASSERT_NOT_REACHED();

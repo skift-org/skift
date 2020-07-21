@@ -8,6 +8,7 @@
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/graphics/Graphics.h"
 #include "kernel/memory/Virtual.h"
 
 #define VBE_DISPI_BANK_ADDRESS 0xA0000
@@ -138,6 +139,8 @@ void bga_initialize(DeviceInfo info)
         logger_error("Failed to allocate memory for the framebuffer!");
         return;
     }
+
+    graphic_did_find_framebuffer();
 
     FsNode *file = __create(FsNode);
     file->call = (FsNodeCallCallback)bga_iocall;

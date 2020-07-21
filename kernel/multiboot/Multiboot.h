@@ -45,6 +45,7 @@ typedef struct
     uintptr_t framebuffer_addr;
     size_t framebuffer_width;
     size_t framebuffer_height;
+    size_t framebuffer_pitch;
     PixelFormat framebuffer_pixelformat;
 } Multiboot;
 

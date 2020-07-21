@@ -97,6 +97,7 @@ void multiboot2_parse_framebuffer(Multiboot *multiboot, struct multiboot_tag_fra
     multiboot->framebuffer_addr = tag->framebuffer_addr;
     multiboot->framebuffer_width = tag->framebuffer_width;
     multiboot->framebuffer_height = tag->framebuffer_height;
+    multiboot->framebuffer_pitch = tag->framebuffer_pitch;
 
     if (tag->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT)
     {

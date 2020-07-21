@@ -11,6 +11,7 @@ static uintptr_t _framebuffer_physical = 0;
 static uintptr_t _framebuffer_virtual = 0;
 static int _framebuffer_width = 0;
 static int _framebuffer_height = 0;
+static int _framebuffer_pitch = 0;
 
 Result framebuffer_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
 {
@@ -40,7 +41,7 @@ Result framebuffer_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *a
                                            ((pixel)&0xff00ff00) |
                                            ((pixel << 16) & 0x00ff0000);
 
-                ((uint32_t *)_framebuffer_virtual)[y * _framebuffer_width + x] = converted_pixel;
+                ((uint32_t *)_framebuffer_virtual)[y * (_framebuffer_pitch / 4) + x] = converted_pixel;
             }
         }
 
@@ -56,6 +57,7 @@ void framebuffer_initialize(Multiboot *multiboot)
 {
     _framebuffer_width = multiboot->framebuffer_width;
     _framebuffer_height = multiboot->framebuffer_height;
+    _framebuffer_pitch = multiboot->framebuffer_pitch;
 
     _framebuffer_physical = multiboot->framebuffer_addr;
     _framebuffer_virtual = virtual_alloc(

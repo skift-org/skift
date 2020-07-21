@@ -70,4 +70,18 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
 
         multiboot->memory_map_size++;
     }
+
+    multiboot->framebuffer_addr = info->framebuffer_addr;
+    multiboot->framebuffer_width = info->framebuffer_width;
+    multiboot->framebuffer_height = info->framebuffer_height;
+
+    if (info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT)
+    {
+        multiboot->framebuffer_pixelformat = PIXELFORMAT_CGA;
+    }
+
+    if (info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB)
+    {
+        multiboot->framebuffer_pixelformat = PIXELFORMAT_RGB;
+    }
 }

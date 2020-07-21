@@ -92,6 +92,23 @@ void multiboot2_parse_module(Multiboot *multiboot, struct multiboot_tag_module *
     multiboot->modules_size++;
 }
 
+void multiboot2_parse_framebuffer(Multiboot *multiboot, struct multiboot_tag_framebuffer_common *tag)
+{
+    multiboot->framebuffer_addr = tag->framebuffer_addr;
+    multiboot->framebuffer_width = tag->framebuffer_width;
+    multiboot->framebuffer_height = tag->framebuffer_height;
+
+    if (tag->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT)
+    {
+        multiboot->framebuffer_pixelformat = PIXELFORMAT_CGA;
+    }
+
+    if (tag->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB)
+    {
+        multiboot->framebuffer_pixelformat = PIXELFORMAT_RGB;
+    }
+}
+
 void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
 {
     __unused(multiboot);
@@ -124,6 +141,10 @@ void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
 
         case MULTIBOOT_TAG_TYPE_CMDLINE:
             strncpy(multiboot->command_line, ((struct multiboot_tag_string *)tag)->string, MULTIBOOT_COMMAND_LINE_SIZE);
+            break;
+
+        case MULTIBOOT_TAG_TYPE_FRAMEBUFFER:
+            multiboot2_parse_framebuffer(multiboot, (struct multiboot_tag_framebuffer_common *)tag);
             break;
 
         default:

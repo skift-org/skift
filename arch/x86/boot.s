@@ -7,16 +7,16 @@ MULTIBOOT_MEMORY_INFO  equ  1 << 1            ; provide memory map
 MULTIBOOT_VIDEO_MODE  equ  1 << 2            ; provide memory map
 MULTIBOOT_MAGIC    equ  0x1BADB002        ; 'magic number' lets bootloader find the header
 
-multiboot_flags    equ  MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO  ; this is the Multiboot 'flag' field
+multiboot_flags    equ  MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_VIDEO_MODE; this is the Multiboot 'flag' field
 multiboot_checksum equ -(MULTIBOOT_MAGIC + multiboot_flags)   ; checksum of above, to prove we are multiboot
- 
+
 ; Declare a multiboot header that marks the program as a kernel.
 section .multiboot
 align 4
 	dd MULTIBOOT_MAGIC
 	dd multiboot_flags
 	dd multiboot_checksum
-	
+
 	dd 0x00000000
 	dd 0x00000000
 	dd 0x00000000
@@ -24,8 +24,8 @@ align 4
 	dd 0x00000000
 
 	dd 0x00000000
-	dd 800
-	dd 600
+	dd 0
+	dd 0
 	dd 32
 
 ;; --- multiboot-2 header. -------------------------------------------------- ;;
@@ -34,6 +34,8 @@ MULTIBOOT2_HEADER_MAGIC equ 0xe85250d6
 MULTIBOOT2_ARCHITECTURE_I386 equ 0
 MULTIBOOT2_HEADER_LENGTH equ __multiboot_header_end - __multiboot_header_start
 MULTIBOOT2_CHECKSUM equ -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT2_ARCHITECTURE_I386 + MULTIBOOT2_HEADER_LENGTH)
+
+MULTIBOOT2_HEADER_TAG_OPTIONAL equ 1
 
 MULTIBOOT2_HEADER_TAG_END equ 0
 MULTIBOOT2_HEADER_TAG_INFORMATION_REQUEST equ 1
@@ -48,21 +50,29 @@ MULTIBOOT2_HEADER_TAG_ENTRY_ADDRESS_EFI64 equ 9
 MULTIBOOT2_HEADER_TAG_RELOCATABLE equ 10
 
 section .multiboot
+align 8
 __multiboot_header_start:
+	dd MULTIBOOT2_HEADER_MAGIC
+	dd MULTIBOOT2_ARCHITECTURE_I386
+	dd MULTIBOOT2_HEADER_LENGTH
+	dd MULTIBOOT2_CHECKSUM
 
-align 4
-    dd MULTIBOOT2_HEADER_MAGIC
-    dd MULTIBOOT2_ARCHITECTURE_I386
-    dd MULTIBOOT2_HEADER_LENGTH
-    dd MULTIBOOT2_CHECKSUM
+align 8
+; FRAMEBUFFER HEADER TAG
+	dw MULTIBOOT2_HEADER_TAG_FRAMEBUFFER
+	dw MULTIBOOT2_HEADER_TAG_OPTIONAL
+	dd 20
+	dd 0
+	dd 0
+	dd 32
 
+align 8
 ; END HEADER TAG
-    dw MULTIBOOT2_HEADER_TAG_END
-    dw 0
-    dw 8
-
+	dw MULTIBOOT2_HEADER_TAG_END
+	dw 0
+	dd 8
 __multiboot_header_end:
- 
+
 ;; --- kernel stack --------------------------------------------------------- ;;
 
 section .bss

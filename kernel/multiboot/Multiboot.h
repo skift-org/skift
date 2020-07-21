@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kernel/graphics/PixelFormat.h"
 #include "kernel/memory/MemoryRange.h"
 
 #define MULTIBOOT_BOOTLOADER_NAME_SIZE 64
@@ -40,6 +41,11 @@ typedef struct
 
     Module modules[MULTIBOOT_MODULES_SIZE];
     size_t modules_size;
+
+    uintptr_t framebuffer_addr;
+    size_t framebuffer_width;
+    size_t framebuffer_height;
+    PixelFormat framebuffer_pixelformat;
 } Multiboot;
 
 void multiboot_assert(uint32_t magic);

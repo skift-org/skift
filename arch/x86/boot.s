@@ -1,11 +1,11 @@
-;; boots.s: the HJERT kernel entry point from the bootloader.                 ;;
+;; boot.s: the HJERT kernel entry point from the bootloader.                 ;;
 
 ;; --- multiboot-1 header. -------------------------------------------------- ;;
 
 MULTIBOOT_PAGE_ALIGN  equ  1 << 0            ; align loaded modules on page boundaries
-MULTIBOOT_MEMORY_INFO  equ  1 << 1            ; provide memory map
-MULTIBOOT_VIDEO_MODE  equ  1 << 2            ; provide memory map
-MULTIBOOT_MAGIC    equ  0x1BADB002        ; 'magic number' lets bootloader find the header
+MULTIBOOT_MEMORY_INFO  equ  1 << 1           ; provide memory map
+MULTIBOOT_VIDEO_MODE  equ  1 << 2            ; provide a video mode
+MULTIBOOT_MAGIC    equ  0x1BADB002           ; 'magic number' lets bootloader find the header
 
 multiboot_flags    equ  MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_VIDEO_MODE; this is the Multiboot 'flag' field
 multiboot_checksum equ -(MULTIBOOT_MAGIC + multiboot_flags)   ; checksum of above, to prove we are multiboot
@@ -94,6 +94,7 @@ _kstart:
 	; To set up a stack, we set the esp register to point to the top of our
 	; stack (as it grows downwards on x86 systems).
 	mov esp, __stack_top
+	mov ebp, esp
 
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.

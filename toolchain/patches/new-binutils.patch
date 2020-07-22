@@ -1,277 +1,139 @@
-diff --git a/kernel/tasking/Task.c b/kernel/tasking/Task.c
-index a699830b..e0db9481 100644
---- a/kernel/tasking/Task.c
-+++ b/kernel/tasking/Task.c
-@@ -1,6 +1,7 @@
- #include <libsystem/Assert.h>
- #include <libsystem/Atomic.h>
- #include <libsystem/CString.h>
-+#include <libsystem/Logger.h>
- 
- #include "arch/Arch.h"
- #include "arch/x86/Interrupts.h" /* XXX */
-diff --git a/libraries/libcompat/assert.h b/libraries/libcompat/assert.h
-index 6f70f09b..aeb61a23 100644
---- a/libraries/libcompat/assert.h
-+++ b/libraries/libcompat/assert.h
-@@ -1 +1,3 @@
- #pragma once
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 13d678e1..2f7f7174 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -220,6 +220,20 @@ esac
+ case "${targ}" in
+ # START OF targmatch.h
+ #ifdef BFD64
 +
-+#define assert(__condition)
-diff --git a/libraries/libcompat/locale.h b/libraries/libcompat/locale.h
-index 4331364c..41daae9b 100644
---- a/libraries/libcompat/locale.h
-+++ b/libraries/libcompat/locale.h
-@@ -37,3 +37,5 @@ struct lconv
- };
- 
- struct lconv *localeconv(void);
++  i[3-7]86-*-skift*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
++#ifdef BFD64
++  x86_64-*-skift*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
++#endif
 +
-+char *setlocale(int category, const char *locale);
-diff --git a/libraries/libcompat/signal.h b/libraries/libcompat/signal.h
-index d45d60f9..4c2981a4 100644
---- a/libraries/libcompat/signal.h
-+++ b/libraries/libcompat/signal.h
-@@ -42,3 +42,5 @@ typedef int sig_atomic_t;
+   aarch64-*-darwin*)
+     targ_defvec=aarch64_mach_o_vec
+     targ_selvecs="arm_mach_o_vec mach_o_le_vec mach_o_be_vec mach_o_fat_vec"
+diff --git a/config.sub b/config.sub
+index 5b158ac4..f4e60010 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1346,7 +1346,7 @@ case $os in
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+ 	     | sym* | kopensolaris* | plan9* \
+ 	     | amigaos* | amigados* | msdos* | newsos* | unicos* | aof* \
+-	     | aos* | aros* | cloudabi* | sortix* \
++	     | aos* | aros* | cloudabi* | sortix* | skift* \
+ 	     | nindy* | vxsim* | vxworks* | ebmon* | hms* | mvs* \
+ 	     | clix* | riscos* | uniplus* | iris* | isc* | rtu* | xenix* \
+ 	     | knetbsd* | mirbsd* | netbsd* \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index a4828c4c..73fafe3b 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -121,6 +121,7 @@ esac
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-skift*)     fmt=elf;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-linux*)			fmt=elf em=linux
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 0509c2e5..ab9d6dd9 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -284,6 +284,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32xstormy16.c \
+ 	eelf32xtensa.c \
+ 	eelf_i386.c \
++	eelf_i386_skift.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+@@ -455,6 +456,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_skift.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_nacl.c \
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 9898392a..ffb27087 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -771,6 +771,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32xstormy16.c \
+ 	eelf32xtensa.c \
+ 	eelf_i386.c \
++	eelf_i386_skift.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+@@ -941,6 +942,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_skift.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_nacl.c \
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index c81bc8a7..d58b7321 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -45,6 +45,15 @@ targ64_extra_libpath=
+ # architecture variants should be kept together even if their names
+ # break the alpha sorting.
+ case "${targ}" in
++i[3-7]86-*-skift*)
++			targ_emul=elf_i386_skift
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_skift elf_x86_64"
++			;;
++x86_64-*-skift*)
++			targ_emul=elf_x86_64_skift
++			targ_extra_emuls="elf_i386_skift elf_x86_64 elf_i386"
++			;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf" ;;
+ aarch64-*-elf | aarch64-*-rtems*)
+@@ -782,6 +791,10 @@ esac
+ NATIVE_LIB_DIRS='/usr/local/lib /lib /usr/lib'
+ case "${target}" in
  
- typedef void (*__sighandler)(int);
- __sighandler signal(int sig, __sighandler handler);
++*-*-skift*)
++  NATIVE_LIB_DIRS='/System/Libraries'
++  ;;
 +
-+int raise(int sig);
-diff --git a/libraries/libcompat/stdlib.h b/libraries/libcompat/stdlib.h
-index a36c7249..d85cd78b 100644
---- a/libraries/libcompat/stdlib.h
-+++ b/libraries/libcompat/stdlib.h
-@@ -2,6 +2,8 @@
- 
- #include <stddef.h>
- 
-+int abs(int value);
-+
- extern void exit(int status);
- extern char *getenv(const char *name);
- 
-diff --git a/libraries/libcompat/time.h b/libraries/libcompat/time.h
-index 560aa33d..1374cd14 100644
---- a/libraries/libcompat/time.h
-+++ b/libraries/libcompat/time.h
-@@ -34,3 +34,7 @@ size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr);
- time_t mktime(struct tm *ptm);
- 
- double difftime(time_t timer2, time_t timer1);
-+
-+char *asctime(const struct tm *pTime);
-+
-+char *ctime(const time_t *pTime);
-diff --git a/libraries/libcompat/unistd.h b/libraries/libcompat/unistd.h
-index fd53a447..134e4a84 100644
---- a/libraries/libcompat/unistd.h
-+++ b/libraries/libcompat/unistd.h
-@@ -1,8 +1,9 @@
- #pragma once
- 
-+#include <stdint.h>
- #include <sys/types.h>
- 
--char **environ;
-+extern char **environ;
- 
- pid_t getpid(void);
- pid_t getppid(void);
-@@ -52,8 +53,8 @@ int access(const char *pathname, int mode);
- 
- int getopt(int argc, char *const argv[], const char *optstring);
- 
--char *optarg;
--int optind, opterr, optopt;
-+extern char *optarg;
-+extern int optind, opterr, optopt;
- 
- int unlink(const char *pathname);
- 
-diff --git a/libraries/libsystem/CString.c b/libraries/libsystem/CString.c
-index 4ef7407f..448ed8b0 100644
---- a/libraries/libsystem/CString.c
-+++ b/libraries/libsystem/CString.c
-@@ -19,7 +19,7 @@ void string_printf_append(printf_info_t *info, char c)
-     }
- }
- 
--int snprintf(char *s, int n, const char *fmt, ...)
-+int snprintf(char *s, size_t n, const char *fmt, ...)
- {
-     va_list va;
-     va_start(va, fmt);
-@@ -31,7 +31,7 @@ int snprintf(char *s, int n, const char *fmt, ...)
-     return result;
- }
- 
--int vsnprintf(char *s, int n, const char *fmt, va_list va)
-+int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
- {
- 
-     if (n == 0)
-diff --git a/libraries/libsystem/CString.h b/libraries/libsystem/CString.h
-index 760ab39c..c23bb0fc 100644
---- a/libraries/libsystem/CString.h
-+++ b/libraries/libsystem/CString.h
-@@ -9,8 +9,8 @@ void strrvs(char *str);
- void strleadtrim(char *str, char c);
- void strtrailtrim(char *str, char c);
- 
--int snprintf(char *s, int n, const char *fmt, ...);
--int vsnprintf(char *s, int n, const char *fmt, va_list va);
-+int snprintf(char *s, size_t n, const char *fmt, ...);
-+int vsnprintf(char *s, size_t n, const char *fmt, va_list va);
- 
- // STANDART
- void *memchr(const void *str, int c, size_t n);
-diff --git a/toolchain/build-it.sh b/toolchain/build-it.sh
-index 773a5f7a..79d64b9d 100755
---- a/toolchain/build-it.sh
-+++ b/toolchain/build-it.sh
-@@ -1,16 +1,30 @@
- #!/bin/bash
- set -e
- 
-+# ----- Configs -------------------------------------------------------------- #
-+
-+BINUTILS_VERSION=2.33.1
-+BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
-+BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
-+BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
-+
-+GCC_VERSION=10.1.0
-+GCC_DIRECTORY="gcc-$GCC_VERSION"
-+GCC_FILENAME="$GCC_DIRECTORY.tar.gz"
-+GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
-+
-+# ---------------------------------------------------------------------------- #
-+
- DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
- 
- TARGET=i686-pc-skift
- PREFIX="$DIR/local"
- SYSROOT="$DIR/../build/sysroot"
- 
--if [ -e "$PREFIX/build-ok" ]; then
--    echo "The toolchain is build and ready :)"
--    exit 0
--fi
-+# if [ -e "$PREFIX/build-ok" ]; then
-+#     echo "The toolchain is build and ready :)"
-+#     exit 0
-+# fi
- 
- cd "$DIR"
- 
-@@ -19,35 +33,43 @@ mkdir -p tarballs
- source "$DIR/use-it.sh"
- 
- pushd tarballs
--    if [ ! -e "binutils-2.31.tar.gz" ]; then
--        wget "http://ftp.gnu.org/gnu/binutils/binutils-2.31.tar.gz"
-+    if [ ! -e "$BINUTILS_FILENAME" ]; then
-+        wget "$BINUTILS_URL"
-     else
-         echo "Skipped downloading binutils"
-     fi
- 
--    if [ ! -e "gcc-8.2.0.tar.gz" ]; then
--        wget "http://ftp.gnu.org/gnu/gcc/gcc-8.2.0/gcc-8.2.0.tar.gz"
-+    if [ ! -e "$GCC_FILENAME" ]; then
-+        wget "$GCC_URL"
-     else
-         echo "Skipped downloading gcc"
-     fi
- 
--    if [ ! -d "binutils-2.31" ]; then
-+    if [ ! -d "$BINUTILS_DIRECTORY" ]; then
-         echo "Extracting binutils..."
--        tar -xf "binutils-2.31.tar.gz"
-+        tar -xf "$BINUTILS_FILENAME"
- 
--        pushd "binutils-2.31"
--            patch -p1 < $DIR/patches/binutils.patch
-+        pushd "$BINUTILS_DIRECTORY"
-+            git init > /dev/null
-+            git add . > /dev/null
-+            git commit -am "BASE" > /dev/null
-+
-+#            patch -p1 < $DIR/patches/binutils.patch
-         popd
-     else
-         echo "Skipped extracting binutils"
-     fi
- 
--    if [ ! -d "gcc-8.2.0" ]; then
-+    if [ ! -d "$GCC_DIRECTORY" ]; then
-         echo "Extracting gcc..."
--        tar -xf "gcc-8.2.0.tar.gz"
-+        tar -xf "$GCC_FILENAME"
-+
-+        pushd "$GCC_DIRECTORY"
-+            git init > /dev/null
-+            git add . > /dev/null
-+            git commit -am "BASE" > /dev/null
- 
--        pushd "gcc-8.2.0"
--            patch -p1 < $DIR/patches/gcc.patch
-+#            patch -p1 < $DIR/patches/gcc.patch
-         popd
-     else
-         echo "Skipped extracting gcc"
-@@ -60,37 +82,39 @@ mkdir -p "$DIR/build/binutils"
- mkdir -p "$DIR/build/gcc"
- 
- if [ -z "$MAKEJOBS" ]; then
--    MAKEJOBS=$(nproc)
-+    MAKEJOBS=1 #$(nproc)
- fi
- 
- pushd "$DIR/build/"
--
-     unset PKG_CONFIG_LIBDIR # Just in case
- 
-     pushd binutils
--        $DIR/tarballs/binutils-2.31/configure --target=$TARGET \
--                                              --prefix=$PREFIX \
--                                              --with-sysroot=$SYSROOT \
--                                              --disable-werror || exit 1
-+        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-+            --target=$TARGET \
-+            --prefix=$PREFIX \
-+            --with-sysroot=$SYSROOT \
-+            --disable-werror || exit 1
-+
-         make -j $MAKEJOBS || exit 1
-         make install || exit 1
-     popd
- 
-     pushd gcc
--        $DIR/tarballs/gcc-8.2.0/configure --target=$TARGET \
--                                          --prefix=$PREFIX \
--                                          --disable-nls \
--                                          --with-newlib \
--                                          --with-sysroot=$SYSROOT \
--                                          --enable-languages=c,c++|| exit 1
-+        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-+            --target=$TARGET \
-+            --prefix=$PREFIX \
-+            --disable-nls \
-+            --with-newlib \
-+            --with-sysroot=$SYSROOT \
-+            --enable-languages=c,c++|| exit 1
- 
-         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
-         make install-gcc install-target-libgcc || exit 1
- 
-         make -C "$DIR/../" install-headers || exit 1
- 
--        # make all-target-libstdc++-v3 || exit 1
--        # make install-target-libstdc++-v3 || exit 1
-+        make all-target-libstdc++-v3 || exit 1
-+        make install-target-libstdc++-v3 || exit 1
-     popd
- popd
- 
+ *-*-dragonfly*)
+   NATIVE_LIB_DIRS='/lib /usr/lib /usr/pkg/lib /usr/local/lib'
+   ;;
+diff --git a/ld/emulparams/elf_i386_skift.sh b/ld/emulparams/elf_i386_skift.sh
+new file mode 100644
+index 00000000..1369b907
+--- /dev/null
++++ b/ld/emulparams/elf_i386_skift.sh
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++TEXT_START_ADDR=0x40000000
+diff --git a/ld/emulparams/elf_x86_64_skift.sh b/ld/emulparams/elf_x86_64_skift.sh
+new file mode 100644
+index 00000000..0dd7354a
+--- /dev/null
++++ b/ld/emulparams/elf_x86_64_skift.sh
+@@ -0,0 +1,2 @@
+++. ${srcdir}/emulparams/elf_x86_64.sh
+++TEXT_START_ADDR=0x40000000

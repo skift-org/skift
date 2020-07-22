@@ -21,10 +21,10 @@ TARGET=i686-pc-skift
 PREFIX="$DIR/local"
 SYSROOT="$DIR/../build/sysroot"
 
-# if [ -e "$PREFIX/build-ok" ]; then
-#     echo "The toolchain is build and ready :)"
-#     exit 0
-# fi
+if [ -e "$PREFIX/build-ok" ]; then
+    echo "The toolchain is build and ready :)"
+    exit 0
+fi
 
 cd "$DIR"
 
@@ -53,7 +53,7 @@ pushd tarballs
             git init
             git add .
             git commit -am "BASE"
-            git apply $DIR/patches/binutils.patch
+            git apply $DIR/patches/new-binutils.patch
         popd
     else
         echo "Skipped extracting binutils"
@@ -80,7 +80,7 @@ mkdir -p "$DIR/build/binutils"
 mkdir -p "$DIR/build/gcc"
 
 if [ -z "$MAKEJOBS" ]; then
-    MAKEJOBS=1 #$(nproc)
+    MAKEJOBS=$(nproc)
 fi
 
 pushd "$DIR/build/"
@@ -106,10 +106,10 @@ pushd "$DIR/build/"
             --with-sysroot=$SYSROOT \
             --enable-languages=c,c++|| exit 1
 
+        make -C "$DIR/../" install-headers || exit 1
+
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1
-
-        make -C "$DIR/../" install-headers || exit 1
 
         make all-target-libstdc++-v3 || exit 1
         make install-target-libstdc++-v3 || exit 1

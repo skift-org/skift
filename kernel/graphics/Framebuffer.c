@@ -1,6 +1,7 @@
 #include <abi/Paths.h>
 
 #include <libmath/MinMax.h>
+#include <libsystem/Atomic.h>
 #include <libsystem/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -31,6 +32,8 @@ Result framebuffer_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *a
     {
         IOCallDisplayBlitArgs *blit = (IOCallDisplayBlitArgs *)args;
 
+        atomic_begin();
+
         for (int y = MAX(0, blit->blit_y); y < MIN(_framebuffer_height, blit->blit_y + blit->blit_height); y++)
         {
             for (int x = MAX(0, blit->blit_x); x < MIN(_framebuffer_width, blit->blit_x + blit->blit_width); x++)
@@ -44,6 +47,8 @@ Result framebuffer_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *a
                 ((uint32_t *)_framebuffer_virtual)[y * (_framebuffer_pitch / 4) + x] = converted_pixel;
             }
         }
+
+        atomic_end();
 
         return SUCCESS;
     }

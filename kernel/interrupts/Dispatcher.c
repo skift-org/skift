@@ -21,7 +21,10 @@ void dispatcher_initialize(void)
 
 void dispatcher_dispatch(int interrupt)
 {
-    ringbuffer_putc(_interupts_to_dispatch, interrupt);
+    if (_interupts_to_handlers[interrupt])
+    {
+        ringbuffer_putc(_interupts_to_dispatch, interrupt);
+    }
 }
 
 static bool dispatcher_has_interupt(void)

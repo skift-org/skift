@@ -19,7 +19,7 @@ void string_printf_append(printf_info_t *info, char c)
     }
 }
 
-int snprintf(char *s, int n, const char *fmt, ...)
+int snprintf(char *s, size_t n, const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -31,7 +31,7 @@ int snprintf(char *s, int n, const char *fmt, ...)
     return result;
 }
 
-int vsnprintf(char *s, int n, const char *fmt, va_list va)
+int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
 {
 
     if (n == 0)

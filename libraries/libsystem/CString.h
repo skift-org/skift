@@ -9,8 +9,8 @@ void strrvs(char *str);
 void strleadtrim(char *str, char c);
 void strtrailtrim(char *str, char c);
 
-int snprintf(char *s, int n, const char *fmt, ...);
-int vsnprintf(char *s, int n, const char *fmt, va_list va);
+int snprintf(char *s, size_t n, const char *fmt, ...);
+int vsnprintf(char *s, size_t n, const char *fmt, va_list va);
 
 // STANDART
 void *memchr(const void *str, int c, size_t n);

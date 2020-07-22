@@ -42,3 +42,5 @@ typedef int sig_atomic_t;
 
 typedef void (*__sighandler)(int);
 __sighandler signal(int sig, __sighandler handler);
+
+int raise(int sig);

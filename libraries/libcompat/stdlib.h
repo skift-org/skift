@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+int abs(int value);
+
 extern void exit(int status);
 extern char *getenv(const char *name);
 

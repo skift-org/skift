@@ -34,3 +34,7 @@ size_t strftime(char *s, size_t n, const char *format, const struct tm *tptr);
 time_t mktime(struct tm *ptm);
 
 double difftime(time_t timer2, time_t timer1);
+
+char *asctime(const struct tm *pTime);
+
+char *ctime(const time_t *pTime);

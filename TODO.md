@@ -3,8 +3,8 @@
 ## Project
 
 ### Transition from C to C++
- - [ ] Update to GCC 10
- - [ ] Update binutils
+ - [x] Update to GCC 10
+ - [x] Update binutils
  - [ ] Update the make file to support C++
  - [ ] Rename all files from .c to .cpp
  - [ ] Rewrite the content of libsystem/utils

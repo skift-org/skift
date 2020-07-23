@@ -13,9 +13,9 @@ private:
     size_t _capacity;
 
 public:
-    size_t count() { return _count; }
-    bool empty() { return _count == 0; }
-    bool any() { return !empty(); }
+    size_t count() const { return _count; }
+    bool empty() const { return _count == 0; }
+    bool any() const { return !empty(); }
 
     Vector() : Vector(16) {}
 
@@ -195,7 +195,7 @@ public:
         insert(insert_index, value);
     }
 
-    void remove(size_t index)
+    void remove_index(size_t index)
     {
         _storage[index].~T();
 
@@ -207,25 +207,25 @@ public:
         shrink();
     }
 
-    void remove(T &value)
+    void remove_value(const T &value)
     {
         for (size_t i = 0; i < _count; i++)
         {
             if (_storage[i] == value)
             {
-                remove(i);
+                remove_index(i);
                 return;
             }
         }
     }
 
-    void remove_all(T &value)
+    void remove_all_value(const T &value)
     {
         for (size_t i = 0; i < _count; i++)
         {
             if (_storage[i] == value)
             {
-                remove(i);
+                remove_index(i);
             }
         }
     }
@@ -246,7 +246,7 @@ public:
 
         T value = move(_storage[0]);
 
-        remove(0);
+        remove_index(0);
 
         return value;
     }
@@ -257,24 +257,24 @@ public:
 
         T value = move(_storage[_count - 1]);
 
-        remove(_count - 1);
+        remove_index(_count - 1);
 
         return value;
     }
 
-    T &peek()
+    T &peek() const
     {
         assert(_count > 0);
         return _storage[0];
     }
 
-    T &peek_back()
+    T &peek_back() const
     {
         assert(_count > 0);
         return _storage[_count - 1];
     }
 
-    bool containe(T value)
+    bool containe(const T &value) const
     {
         for (size_t i = 0; i < _count; i++)
         {

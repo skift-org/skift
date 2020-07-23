@@ -15,12 +15,12 @@ FILE *__stdio_get_stdin(void)
 
 FILE *__stdio_get_stdout(void)
 {
-    return in_stream;
+    return out_stream;
 }
 
 FILE *__stdio_get_stderr(void)
 {
-    return in_stream;
+    return err_stream;
 }
 
 OpenFlag stdio_parse_mode(const char *mode)

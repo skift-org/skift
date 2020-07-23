@@ -1,7 +1,11 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <stdint.h>
 #include <sys/types.h>
+
+__BEGIN_HEADER
 
 extern char **environ;
 
@@ -92,3 +96,5 @@ pid_t getpgid(pid_t);
 unsigned int alarm(unsigned int seconds);
 
 void *sbrk(intptr_t increment);
+
+__END_HEADER

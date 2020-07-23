@@ -1,5 +1,9 @@
 #pragma once
 
+#include <__libc__.h>
+
+__BEGIN_HEADER
+
 #define M_PI 3.1415926
 #define PI (3.141592654)
 
@@ -38,3 +42,5 @@ double tanh(double x);
 double atan(double x);
 double modf(double x, double *iptr);
 double hypot(double x, double y);
+
+__END_HEADER

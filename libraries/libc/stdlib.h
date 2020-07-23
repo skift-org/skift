@@ -1,6 +1,10 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <stddef.h>
+
+__BEGIN_HEADER
 
 int abs(int value);
 
@@ -72,3 +76,5 @@ extern ldiv_t ldiv(long numerator, long denominator);
 #define PATH_MAX 4096
 #define NAME_MAX 255
 extern char *realpath(const char *path, char *resolved_path);
+
+__END_HEADER

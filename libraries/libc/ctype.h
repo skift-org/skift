@@ -1,22 +1,26 @@
 #pragma once
 
-extern int isalnum(int c);
-extern int isalpha(int c);
-extern int isdigit(int c);
-extern int islower(int c);
-extern int isprint(int c);
-extern int isgraph(int c);
-extern int iscntrl(int c);
-extern int isgraph(int c);
-extern int ispunct(int c);
-extern int isspace(int c);
-extern int isupper(int c);
-extern int isxdigit(int c);
+#include <__libc__.h>
 
-extern int isascii(int c);
+__BEGIN_HEADER
 
-extern int tolower(int c);
-extern int toupper(int c);
+int isalnum(int c);
+int isalpha(int c);
+int isdigit(int c);
+int islower(int c);
+int isprint(int c);
+int isgraph(int c);
+int iscntrl(int c);
+int isgraph(int c);
+int ispunct(int c);
+int isspace(int c);
+int isupper(int c);
+int isxdigit(int c);
+
+int isascii(int c);
+
+int tolower(int c);
+int toupper(int c);
 
 #define _U 01
 #define _L 02
@@ -27,4 +31,6 @@ extern int toupper(int c);
 #define _X 0100
 #define _B 0200
 
-extern char _ctype_[256];
+char _ctype_[256];
+
+__END_HEADER

@@ -1,7 +1,11 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <stdarg.h>
 #include <stddef.h>
+
+__BEGIN_HEADER
 
 typedef void FILE;
 #define __DEFINED_FILE
@@ -94,3 +98,5 @@ typedef long fpos_t;
 
 extern int fgetpos(FILE *stream, fpos_t *pos);
 extern int fsetpos(FILE *stream, const fpos_t *pos);
+
+__END_HEADER

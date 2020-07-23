@@ -1,6 +1,10 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <sys/types.h>
+
+__BEGIN_HEADER
 
 #define O_RDONLY 0x0000
 #define O_WRONLY 0x0001
@@ -44,3 +48,5 @@ struct flock
 extern int open(const char *, int, ...);
 extern int chmod(const char *path, mode_t mode);
 extern int fcntl(int fd, int cmd, ...);
+
+__END_HEADER

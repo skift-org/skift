@@ -1,5 +1,9 @@
 #pragma once
 
+#include <__libc__.h>
+
+__BEGIN_HEADER
+
 #define EPERM 1             /* Not super-user */
 #define ENOENT 2            /* No such file or directory */
 #define ESRCH 3             /* No such process */
@@ -133,3 +137,5 @@ extern int errno;
         ret = -1;          \
     }                      \
     return ret
+
+__END_HEADER

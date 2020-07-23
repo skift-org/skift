@@ -1,5 +1,9 @@
 #pragma once
 
+#include <__libc__.h>
+
+__BEGIN_HEADER
+
 #define SIG_ERR ((__sighandler)(void *)(-1))
 #define SIG_DFL ((__sighandler)(void *)(-2))
 #define SIG_IGN ((__sighandler)(void *)(-3))
@@ -44,3 +48,5 @@ typedef void (*__sighandler)(int);
 __sighandler signal(int sig, __sighandler handler);
 
 int raise(int sig);
+
+__END_HEADER

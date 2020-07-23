@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/Logger.h>
 
 #undef printf
 #undef puts
@@ -198,7 +198,7 @@ int rename(const char *oldpath, const char *newpath)
     return r;
 }
 
-int fputs(const char *string, FILE *restrict stream)
+int fputs(const char *string, FILE *stream)
 {
     return stream_write((Stream *)stream, string, strlen(string));
 }

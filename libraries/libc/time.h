@@ -1,6 +1,10 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <stddef.h>
+
+__BEGIN_HEADER
 
 #define CLOCKS_PER_SEC 1000
 
@@ -38,3 +42,5 @@ double difftime(time_t timer2, time_t timer1);
 char *asctime(const struct tm *pTime);
 
 char *ctime(const time_t *pTime);
+
+__END_HEADER

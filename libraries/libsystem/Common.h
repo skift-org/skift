@@ -7,6 +7,8 @@
 
 #include <libsystem/Macros.h>
 #include <libsystem/core/Allocator.h>
+#include <libsystem/utils/Iteration.h>
+#include <libsystem/utils/Move.h>
 
 typedef unsigned int uint;
 

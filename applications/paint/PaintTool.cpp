@@ -128,27 +128,20 @@ static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
 {
 
     if (!rectangle_containe_point(bitmap_bound(bitmap), position))
-    {
         return;
-    }
 
     if (color_equals(bitmap_get_pixel(bitmap, position), fill))
-    {
         return;
-    }
 
     if (!color_equals(bitmap_get_pixel(bitmap, position), target))
-    {
         return;
-    }
 
-    Vector *queue = vector_create(sizeof(Vec2i), 256);
-    vector_pushback(queue, &position);
+    auto queue = Vector<Vec2i>(256);
+    queue.push_back(position);
 
-    while (!vector_empty(queue))
+    while (!queue.empty())
     {
-        Vec2i current = {};
-        vector_popback(queue, &current);
+        Vec2i current = queue.pop_back();
 
         if (!color_equals(bitmap_get_pixel(bitmap, current), target))
         {
@@ -160,29 +153,27 @@ static void flood_fill(Bitmap *bitmap, Vec2i position, Color target, Color fill)
         if (current.x != 0)
         {
             Vec2i new_position = vec2i_add(current, vec2i(-1, 0));
-            vector_pushback(queue, &new_position);
+            queue.push_back(new_position);
         }
 
         if (current.x != bitmap_bound(bitmap).width - 1)
         {
             Vec2i new_position = vec2i_add(current, vec2i(1, 0));
-            vector_pushback(queue, &new_position);
+            queue.push_back(new_position);
         }
 
         if (current.y != 0)
         {
             Vec2i new_position = vec2i_add(current, vec2i(0, -1));
-            vector_pushback(queue, &new_position);
+            queue.push_back(new_position);
         }
 
         if (current.y != bitmap_bound(bitmap).height - 1)
         {
             Vec2i new_position = vec2i_add(current, vec2i(0, 1));
-            vector_pushback(queue, &new_position);
+            queue.push_back(new_position);
         }
     }
-
-    vector_destroy(queue);
 }
 
 void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)

@@ -1,4 +1,8 @@
 <p align="center">
+<b>Notice!</b> The system was recently ported to C++. This is not idiomatique c++, expect to have some C mixed in.
+</p>
+
+<p align="center">
 <br>
 <br>
 <img src="manual/logo.svg" height=64 />

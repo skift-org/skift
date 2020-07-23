@@ -1,69 +1,33 @@
-diff -Nru gcc-8.2.0_clean/config.sub gcc-8.2.0/config.sub
---- gcc-8.2.0_clean/config.sub	2018-01-03 05:25:18.000000000 +0100
-+++ gcc-8.2.0/config.sub	2019-05-23 19:52:47.904721449 +0200
-@@ -1391,6 +1391,7 @@
- 	# Each alternative MUST end in a * to match a version number.
- 	# -sysv* is not here because it comes later, after sysvr4.
- 	-gnu* | -bsd* | -mach* | -minix* | -genix* | -ultrix* | -irix* \
-+		  | -skift* \
- 	      | -*vms* | -sco* | -esix* | -isc* | -aix* | -cnk* | -sunos | -sunos[34]*\
- 	      | -hpux* | -unos* | -osf* | -luna* | -dgux* | -auroraux* | -solaris* \
- 	      | -sym* | -kopensolaris* | -plan9* \
-diff -Nru gcc-8.2.0_clean/fixincludes/mkfixinc.sh gcc-8.2.0/fixincludes/mkfixinc.sh
---- gcc-8.2.0_clean/fixincludes/mkfixinc.sh	2016-06-21 23:57:20.000000000 +0200
-+++ gcc-8.2.0/fixincludes/mkfixinc.sh	2019-05-23 19:47:05.034718192 +0200
-@@ -11,6 +11,7 @@
+diff --git a/config.sub b/config.sub
+index a318a4686..808badcb0 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1343,7 +1343,7 @@ case $os in
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+ 	     | sym* | kopensolaris* | plan9* \
+ 	     | amigaos* | amigados* | msdos* | newsos* | unicos* | aof* \
+-	     | aos* | aros* | cloudabi* | sortix* \
++	     | aos* | aros* | cloudabi* | sortix* | skift* \
+ 	     | nindy* | vxsim* | vxworks* | ebmon* | hms* | mvs* \
+ 	     | clix* | riscos* | uniplus* | iris* | isc* | rtu* | xenix* \
+ 	     | knetbsd* | mirbsd* | netbsd* \
+diff --git a/fixincludes/mkfixinc.sh b/fixincludes/mkfixinc.sh
+index df90720b7..d17a16fff 100755
+--- a/fixincludes/mkfixinc.sh
++++ b/fixincludes/mkfixinc.sh
+@@ -11,6 +11,7 @@ target=fixinc.sh
  
  # Check for special fix rules for particular targets
  case $machine in
-+    i?86-*-skift* | \
++    *-skift* | \
      i?86-*-cygwin* | \
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
-diff -Nru gcc-8.2.0_clean/gcc/config/skift.h gcc-8.2.0/gcc/config/skift.h
---- gcc-8.2.0_clean/gcc/config/skift.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-8.2.0/gcc/config/skift.h	2019-05-23 19:47:05.034718192 +0200
-@@ -0,0 +1,36 @@
-+/* Useful if you wish to make target-specific GCC changes. */
-+#undef TARGET_skift
-+#define TARGET_skift 1
-+ 
-+#undef STANDARD_STARTFILE_PREFIX
-+#define STANDARD_STARTFILE_PREFIX "/System/Libraries/"
-+
-+/* Default arguments you want when running your
-+   i686-skift-gcc/x86_64-skift-gcc toolchain */
-+#undef LIB_SPEC
-+#define LIB_SPEC "-lsystem" /* link against system library */
-+ 
-+/* Files that are linked before user code.
-+   The %s tells GCC to look for these files in the library directory. */
-+#undef STARTFILE_SPEC
-+#define STARTFILE_SPEC "crt0.o%s crti.o%s crtbegin.o%s"
-+ 
-+/* Files that are linked after user code. */
-+#undef ENDFILE_SPEC
-+#define ENDFILE_SPEC "crtend.o%s crtn.o%s"
-+ 
-+/* Don't automatically add extern "C" { } around header files. */
-+#undef  NO_IMPLICIT_EXTERN_C
-+#define NO_IMPLICIT_EXTERN_C 1
-+ 
-+/* Additional predefined macros. */
-+#undef TARGET_OS_CPP_BUILTINS
-+#define TARGET_OS_CPP_BUILTINS()      \
-+  do {                                \
-+    builtin_define ("__skift__");      \
-+    builtin_define ("__unix__");      \
-+    builtin_assert ("system=skift");   \
-+    builtin_assert ("system=unix");   \
-+    builtin_assert ("system=posix");   \
-+  } while(0);
-+  
-diff -Nru gcc-8.2.0_clean/gcc/config.gcc gcc-8.2.0/gcc/config.gcc
---- gcc-8.2.0_clean/gcc/config.gcc	2018-06-25 21:34:01.000000000 +0200
-+++ gcc-8.2.0/gcc/config.gcc	2019-05-23 19:47:05.038051526 +0200
-@@ -646,6 +646,13 @@
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index cf1a87e2e..0ea5c7fa7 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -675,6 +675,13 @@ x86_cpus="generic intel"
  
  # Common parts for widely ported systems.
  case ${target} in
@@ -72,12 +36,12 @@ diff -Nru gcc-8.2.0_clean/gcc/config.gcc gcc-8.2.0/gcc/config.gcc
 +  gnu_ld=yes
 +  default_use_cxa_atexit=yes
 +  use_gcc_stdint=provide
-+	native_system_header_dir=/System/Includes
++  native_system_header_dir=/System/Includes
 +  ;;
  *-*-darwin*)
-   tmake_file="t-darwin ${cpu_type}/t-darwin"
+   tmake_file="t-darwin "
    tm_file="${tm_file} darwin.h"
-@@ -938,6 +945,12 @@
+@@ -1033,6 +1040,12 @@ case ${target} in
  esac
  
  case ${target} in
@@ -89,29 +53,71 @@ diff -Nru gcc-8.2.0_clean/gcc/config.gcc gcc-8.2.0/gcc/config.gcc
 +    ;;
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
- 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-elf-raw.h"
-diff -Nru gcc-8.2.0_clean/libgcc/config.host gcc-8.2.0/libgcc/config.host
---- gcc-8.2.0_clean/libgcc/config.host	2018-04-06 22:04:17.000000000 +0200
-+++ gcc-8.2.0/libgcc/config.host	2019-05-23 20:06:43.481396062 +0200
-@@ -1359,6 +1359,14 @@
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
+diff --git a/gcc/config/skift.h b/gcc/config/skift.h
+new file mode 100644
+index 000000000..e9fb8ab0d
+--- /dev/null
++++ b/gcc/config/skift.h
+@@ -0,0 +1,34 @@
++/* Useful if you wish to make target-specific GCC changes. */
++#undef TARGET_skift
++#define TARGET_skift 1
++
++#undef STANDARD_STARTFILE_PREFIX
++#define STANDARD_STARTFILE_PREFIX "/System/Libraries/"
++
++#define MATH_LIBRARY ""
++
++/* Default arguments you want when running your
++   i686-skift-gcc/x86_64-skift-gcc toolchain */
++#undef LIB_SPEC
++#define LIB_SPEC "-lsystem" /* link against system library */
++
++/* Files that are linked before user code.
++   The %s tells GCC to look for these files in the library directory. */
++#undef STARTFILE_SPEC
++#define STARTFILE_SPEC "crt0.o%s crti.o%s crtbegin.o%s"
++
++/* Files that are linked after user code. */
++#undef ENDFILE_SPEC
++#define ENDFILE_SPEC "crtend.o%s crtn.o%s"
++
++/* Additional predefined macros. */
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()      \
++   do                                 \
++   {                                  \
++      builtin_define("__skift__");    \
++      builtin_define("__unix__");     \
++      builtin_assert("system=skift"); \
++      builtin_assert("system=unix");  \
++      builtin_assert("system=posix"); \
++   } while (0);
+diff --git a/libgcc/config.host b/libgcc/config.host
+index 1ff415923..91543e550 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -1485,6 +1485,14 @@ nvptx-*)
  	tmake_file="$tmake_file nvptx/t-nvptx"
  	extra_parts="crt0.o"
  	;;
 +i[34567]86-*-skift*)
-+	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtend.o crtendS.o crtn.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
 +	;;
 +x86_64-*-skift*)
-+	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtend.o crtendS.o crtn.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
 +	;;
  *)
  	echo "*** Configuration ${host} not supported" 1>&2
  	exit 1
-diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configure
---- gcc-8.2.0_clean/libstdc++-v3/configure	2018-07-04 13:45:51.000000000 +0200
-+++ gcc-8.2.0/libstdc++-v3/configure	2019-05-23 19:47:05.044718193 +0200
-@@ -28973,6 +28973,5984 @@
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index 9f9c5a241..40027b90c 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -29846,6 +29846,5968 @@ else
  
  # Base decisions on target environment.
  case "${host}" in
@@ -129,13 +135,6 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +  ac_test_CXXFLAGS="${CXXFLAGS+set}"
 +  ac_save_CXXFLAGS="$CXXFLAGS"
-+
-+  # Check for maintainer-mode bits.
-+  if test x"$USE_MAINTAINER_MODE" = xno; then
-+    WERROR=''
-+  else
-+    WERROR='-Werror'
-+  fi
 +
 +  # Check for -ffunction-sections -fdata-sections
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for g++ that supports -ffunction-sections -fdata-sections" >&5
@@ -179,7 +178,6 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +
 +
-+
 +  # If we're not using GNU ld, then there's no point in even trying these
 +  # tests.  Check for that first.  We should have already tested for gld
 +  # by now (in libtool), but require it now just to be safe...
@@ -214,7 +212,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      glibcxx_ld_is_gold=yes
 +    fi
 +    ldver=`$LD --version 2>/dev/null |
-+	   sed -e 's/GNU gold /GNU ld /;s/GNU ld version /GNU ld /;s/GNU ld ([^)]*) /GNU ld /;s/GNU ld \([0-9.][0-9.]*\).*/\1/; q'`
++	   sed -e 's/[. ][0-9]\{8\}$//;s/.* \([^ ]\{1,\}\)$/\1/; q'`
 +
 +    glibcxx_gnu_ld_version=`echo $ldver | \
 +	   $AWK -F. '{ if (NF<3) $3=0; print ($1*100+$2)*100+$3 }'`
@@ -248,7 +246,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld that supports -Wl,--gc-sections" >&5
 +$as_echo_n "checking for ld that supports -Wl,--gc-sections... " >&6; }
 +    if test x$gcc_no_link = xyes; then
-+  as_fn_error "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
 +fi
 +cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 +/* end confdefs.h.  */
@@ -325,13 +323,13 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sin in -lm" >&5
 +$as_echo_n "checking for sin in -lm... " >&6; }
-+if test "${ac_cv_lib_m_sin+set}" = set; then :
++if ${ac_cv_lib_m_sin+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +  ac_check_lib_save_LIBS=$LIBS
 +LIBS="-lm  $LIBS"
 +if test x$gcc_no_link = xyes; then
-+  as_fn_error "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
 +fi
 +cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 +/* end confdefs.h.  */
@@ -362,7 +360,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +fi
 +{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_sin" >&5
 +$as_echo "$ac_cv_lib_m_sin" >&6; }
-+if test "x$ac_cv_lib_m_sin" = x""yes; then :
++if test "x$ac_cv_lib_m_sin" = xyes; then :
 +  libm="-lm"
 +fi
 +
@@ -374,7 +372,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isinf declaration" >&5
 +$as_echo_n "checking for isinf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isinf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isinf_use+set}" = set; then :
++    if ${glibcxx_cv_func_isinf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -423,7 +421,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isinf
 +do :
 +  ac_fn_c_check_func "$LINENO" "isinf" "ac_cv_func_isinf"
-+if test "x$ac_cv_func_isinf" = x""yes; then :
++if test "x$ac_cv_func_isinf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISINF 1
 +_ACEOF
@@ -436,7 +434,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isinf declaration" >&5
 +$as_echo_n "checking for _isinf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isinf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isinf_use+set}" = set; then :
++    if ${glibcxx_cv_func__isinf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -485,7 +483,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isinf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isinf" "ac_cv_func__isinf"
-+if test "x$ac_cv_func__isinf" = x""yes; then :
++if test "x$ac_cv_func__isinf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISINF 1
 +_ACEOF
@@ -503,7 +501,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isnan declaration" >&5
 +$as_echo_n "checking for isnan declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isnan_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isnan_use+set}" = set; then :
++    if ${glibcxx_cv_func_isnan_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -552,7 +550,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isnan
 +do :
 +  ac_fn_c_check_func "$LINENO" "isnan" "ac_cv_func_isnan"
-+if test "x$ac_cv_func_isnan" = x""yes; then :
++if test "x$ac_cv_func_isnan" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISNAN 1
 +_ACEOF
@@ -565,7 +563,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isnan declaration" >&5
 +$as_echo_n "checking for _isnan declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isnan_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isnan_use+set}" = set; then :
++    if ${glibcxx_cv_func__isnan_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -614,7 +612,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isnan
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isnan" "ac_cv_func__isnan"
-+if test "x$ac_cv_func__isnan" = x""yes; then :
++if test "x$ac_cv_func__isnan" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISNAN 1
 +_ACEOF
@@ -632,7 +630,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for finite declaration" >&5
 +$as_echo_n "checking for finite declaration... " >&6; }
 +  if test x${glibcxx_cv_func_finite_use+set} != xset; then
-+    if test "${glibcxx_cv_func_finite_use+set}" = set; then :
++    if ${glibcxx_cv_func_finite_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -681,7 +679,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in finite
 +do :
 +  ac_fn_c_check_func "$LINENO" "finite" "ac_cv_func_finite"
-+if test "x$ac_cv_func_finite" = x""yes; then :
++if test "x$ac_cv_func_finite" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FINITE 1
 +_ACEOF
@@ -694,7 +692,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _finite declaration" >&5
 +$as_echo_n "checking for _finite declaration... " >&6; }
 +  if test x${glibcxx_cv_func__finite_use+set} != xset; then
-+    if test "${glibcxx_cv_func__finite_use+set}" = set; then :
++    if ${glibcxx_cv_func__finite_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -743,7 +741,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _finite
 +do :
 +  ac_fn_c_check_func "$LINENO" "_finite" "ac_cv_func__finite"
-+if test "x$ac_cv_func__finite" = x""yes; then :
++if test "x$ac_cv_func__finite" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FINITE 1
 +_ACEOF
@@ -761,7 +759,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sincos declaration" >&5
 +$as_echo_n "checking for sincos declaration... " >&6; }
 +  if test x${glibcxx_cv_func_sincos_use+set} != xset; then
-+    if test "${glibcxx_cv_func_sincos_use+set}" = set; then :
++    if ${glibcxx_cv_func_sincos_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -806,7 +804,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in sincos
 +do :
 +  ac_fn_c_check_func "$LINENO" "sincos" "ac_cv_func_sincos"
-+if test "x$ac_cv_func_sincos" = x""yes; then :
++if test "x$ac_cv_func_sincos" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_SINCOS 1
 +_ACEOF
@@ -819,7 +817,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _sincos declaration" >&5
 +$as_echo_n "checking for _sincos declaration... " >&6; }
 +  if test x${glibcxx_cv_func__sincos_use+set} != xset; then
-+    if test "${glibcxx_cv_func__sincos_use+set}" = set; then :
++    if ${glibcxx_cv_func__sincos_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -864,7 +862,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _sincos
 +do :
 +  ac_fn_c_check_func "$LINENO" "_sincos" "ac_cv_func__sincos"
-+if test "x$ac_cv_func__sincos" = x""yes; then :
++if test "x$ac_cv_func__sincos" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__SINCOS 1
 +_ACEOF
@@ -882,7 +880,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fpclass declaration" >&5
 +$as_echo_n "checking for fpclass declaration... " >&6; }
 +  if test x${glibcxx_cv_func_fpclass_use+set} != xset; then
-+    if test "${glibcxx_cv_func_fpclass_use+set}" = set; then :
++    if ${glibcxx_cv_func_fpclass_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -931,7 +929,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in fpclass
 +do :
 +  ac_fn_c_check_func "$LINENO" "fpclass" "ac_cv_func_fpclass"
-+if test "x$ac_cv_func_fpclass" = x""yes; then :
++if test "x$ac_cv_func_fpclass" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FPCLASS 1
 +_ACEOF
@@ -944,7 +942,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _fpclass declaration" >&5
 +$as_echo_n "checking for _fpclass declaration... " >&6; }
 +  if test x${glibcxx_cv_func__fpclass_use+set} != xset; then
-+    if test "${glibcxx_cv_func__fpclass_use+set}" = set; then :
++    if ${glibcxx_cv_func__fpclass_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -993,7 +991,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _fpclass
 +do :
 +  ac_fn_c_check_func "$LINENO" "_fpclass" "ac_cv_func__fpclass"
-+if test "x$ac_cv_func__fpclass" = x""yes; then :
++if test "x$ac_cv_func__fpclass" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FPCLASS 1
 +_ACEOF
@@ -1011,7 +1009,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for qfpclass declaration" >&5
 +$as_echo_n "checking for qfpclass declaration... " >&6; }
 +  if test x${glibcxx_cv_func_qfpclass_use+set} != xset; then
-+    if test "${glibcxx_cv_func_qfpclass_use+set}" = set; then :
++    if ${glibcxx_cv_func_qfpclass_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1060,7 +1058,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in qfpclass
 +do :
 +  ac_fn_c_check_func "$LINENO" "qfpclass" "ac_cv_func_qfpclass"
-+if test "x$ac_cv_func_qfpclass" = x""yes; then :
++if test "x$ac_cv_func_qfpclass" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_QFPCLASS 1
 +_ACEOF
@@ -1073,7 +1071,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _qfpclass declaration" >&5
 +$as_echo_n "checking for _qfpclass declaration... " >&6; }
 +  if test x${glibcxx_cv_func__qfpclass_use+set} != xset; then
-+    if test "${glibcxx_cv_func__qfpclass_use+set}" = set; then :
++    if ${glibcxx_cv_func__qfpclass_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1122,7 +1120,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _qfpclass
 +do :
 +  ac_fn_c_check_func "$LINENO" "_qfpclass" "ac_cv_func__qfpclass"
-+if test "x$ac_cv_func__qfpclass" = x""yes; then :
++if test "x$ac_cv_func__qfpclass" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__QFPCLASS 1
 +_ACEOF
@@ -1140,7 +1138,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hypot declaration" >&5
 +$as_echo_n "checking for hypot declaration... " >&6; }
 +  if test x${glibcxx_cv_func_hypot_use+set} != xset; then
-+    if test "${glibcxx_cv_func_hypot_use+set}" = set; then :
++    if ${glibcxx_cv_func_hypot_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1185,7 +1183,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in hypot
 +do :
 +  ac_fn_c_check_func "$LINENO" "hypot" "ac_cv_func_hypot"
-+if test "x$ac_cv_func_hypot" = x""yes; then :
++if test "x$ac_cv_func_hypot" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_HYPOT 1
 +_ACEOF
@@ -1198,7 +1196,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _hypot declaration" >&5
 +$as_echo_n "checking for _hypot declaration... " >&6; }
 +  if test x${glibcxx_cv_func__hypot_use+set} != xset; then
-+    if test "${glibcxx_cv_func__hypot_use+set}" = set; then :
++    if ${glibcxx_cv_func__hypot_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1243,7 +1241,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _hypot
 +do :
 +  ac_fn_c_check_func "$LINENO" "_hypot" "ac_cv_func__hypot"
-+if test "x$ac_cv_func__hypot" = x""yes; then :
++if test "x$ac_cv_func__hypot" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__HYPOT 1
 +_ACEOF
@@ -1260,7 +1258,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for float trig functions" >&5
 +$as_echo_n "checking for float trig functions... " >&6; }
-+  if test "${glibcxx_cv_func_float_trig_use+set}" = set; then :
++  if ${glibcxx_cv_func_float_trig_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1303,8 +1301,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -1315,7 +1312,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  else
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _float trig functions" >&5
 +$as_echo_n "checking for _float trig functions... " >&6; }
-+    if test "${glibcxx_cv_func__float_trig_use+set}" = set; then :
++    if ${glibcxx_cv_func__float_trig_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1358,8 +1355,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -1376,7 +1372,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for float round functions" >&5
 +$as_echo_n "checking for float round functions... " >&6; }
-+  if test "${glibcxx_cv_func_float_round_use+set}" = set; then :
++  if ${glibcxx_cv_func_float_round_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1419,8 +1415,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -1431,7 +1426,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  else
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _float round functions" >&5
 +$as_echo_n "checking for _float round functions... " >&6; }
-+    if test "${glibcxx_cv_func__float_round_use+set}" = set; then :
++    if ${glibcxx_cv_func__float_round_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1474,8 +1469,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -1494,7 +1488,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for expf declaration" >&5
 +$as_echo_n "checking for expf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_expf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_expf_use+set}" = set; then :
++    if ${glibcxx_cv_func_expf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1543,7 +1537,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in expf
 +do :
 +  ac_fn_c_check_func "$LINENO" "expf" "ac_cv_func_expf"
-+if test "x$ac_cv_func_expf" = x""yes; then :
++if test "x$ac_cv_func_expf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_EXPF 1
 +_ACEOF
@@ -1556,7 +1550,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _expf declaration" >&5
 +$as_echo_n "checking for _expf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__expf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__expf_use+set}" = set; then :
++    if ${glibcxx_cv_func__expf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1605,7 +1599,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _expf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_expf" "ac_cv_func__expf"
-+if test "x$ac_cv_func__expf" = x""yes; then :
++if test "x$ac_cv_func__expf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__EXPF 1
 +_ACEOF
@@ -1623,7 +1617,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isnanf declaration" >&5
 +$as_echo_n "checking for isnanf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isnanf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isnanf_use+set}" = set; then :
++    if ${glibcxx_cv_func_isnanf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1672,7 +1666,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isnanf
 +do :
 +  ac_fn_c_check_func "$LINENO" "isnanf" "ac_cv_func_isnanf"
-+if test "x$ac_cv_func_isnanf" = x""yes; then :
++if test "x$ac_cv_func_isnanf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISNANF 1
 +_ACEOF
@@ -1685,7 +1679,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isnanf declaration" >&5
 +$as_echo_n "checking for _isnanf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isnanf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isnanf_use+set}" = set; then :
++    if ${glibcxx_cv_func__isnanf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1734,7 +1728,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isnanf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isnanf" "ac_cv_func__isnanf"
-+if test "x$ac_cv_func__isnanf" = x""yes; then :
++if test "x$ac_cv_func__isnanf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISNANF 1
 +_ACEOF
@@ -1752,7 +1746,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isinff declaration" >&5
 +$as_echo_n "checking for isinff declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isinff_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isinff_use+set}" = set; then :
++    if ${glibcxx_cv_func_isinff_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1801,7 +1795,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isinff
 +do :
 +  ac_fn_c_check_func "$LINENO" "isinff" "ac_cv_func_isinff"
-+if test "x$ac_cv_func_isinff" = x""yes; then :
++if test "x$ac_cv_func_isinff" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISINFF 1
 +_ACEOF
@@ -1814,7 +1808,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isinff declaration" >&5
 +$as_echo_n "checking for _isinff declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isinff_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isinff_use+set}" = set; then :
++    if ${glibcxx_cv_func__isinff_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1863,7 +1857,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isinff
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isinff" "ac_cv_func__isinff"
-+if test "x$ac_cv_func__isinff" = x""yes; then :
++if test "x$ac_cv_func__isinff" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISINFF 1
 +_ACEOF
@@ -1881,7 +1875,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for atan2f declaration" >&5
 +$as_echo_n "checking for atan2f declaration... " >&6; }
 +  if test x${glibcxx_cv_func_atan2f_use+set} != xset; then
-+    if test "${glibcxx_cv_func_atan2f_use+set}" = set; then :
++    if ${glibcxx_cv_func_atan2f_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1926,7 +1920,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in atan2f
 +do :
 +  ac_fn_c_check_func "$LINENO" "atan2f" "ac_cv_func_atan2f"
-+if test "x$ac_cv_func_atan2f" = x""yes; then :
++if test "x$ac_cv_func_atan2f" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ATAN2F 1
 +_ACEOF
@@ -1939,7 +1933,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _atan2f declaration" >&5
 +$as_echo_n "checking for _atan2f declaration... " >&6; }
 +  if test x${glibcxx_cv_func__atan2f_use+set} != xset; then
-+    if test "${glibcxx_cv_func__atan2f_use+set}" = set; then :
++    if ${glibcxx_cv_func__atan2f_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -1984,7 +1978,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _atan2f
 +do :
 +  ac_fn_c_check_func "$LINENO" "_atan2f" "ac_cv_func__atan2f"
-+if test "x$ac_cv_func__atan2f" = x""yes; then :
++if test "x$ac_cv_func__atan2f" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ATAN2F 1
 +_ACEOF
@@ -2002,7 +1996,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fabsf declaration" >&5
 +$as_echo_n "checking for fabsf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_fabsf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_fabsf_use+set}" = set; then :
++    if ${glibcxx_cv_func_fabsf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2051,7 +2045,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in fabsf
 +do :
 +  ac_fn_c_check_func "$LINENO" "fabsf" "ac_cv_func_fabsf"
-+if test "x$ac_cv_func_fabsf" = x""yes; then :
++if test "x$ac_cv_func_fabsf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FABSF 1
 +_ACEOF
@@ -2064,7 +2058,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _fabsf declaration" >&5
 +$as_echo_n "checking for _fabsf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__fabsf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__fabsf_use+set}" = set; then :
++    if ${glibcxx_cv_func__fabsf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2113,7 +2107,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _fabsf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_fabsf" "ac_cv_func__fabsf"
-+if test "x$ac_cv_func__fabsf" = x""yes; then :
++if test "x$ac_cv_func__fabsf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FABSF 1
 +_ACEOF
@@ -2131,7 +2125,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fmodf declaration" >&5
 +$as_echo_n "checking for fmodf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_fmodf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_fmodf_use+set}" = set; then :
++    if ${glibcxx_cv_func_fmodf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2176,7 +2170,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in fmodf
 +do :
 +  ac_fn_c_check_func "$LINENO" "fmodf" "ac_cv_func_fmodf"
-+if test "x$ac_cv_func_fmodf" = x""yes; then :
++if test "x$ac_cv_func_fmodf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FMODF 1
 +_ACEOF
@@ -2189,7 +2183,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _fmodf declaration" >&5
 +$as_echo_n "checking for _fmodf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__fmodf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__fmodf_use+set}" = set; then :
++    if ${glibcxx_cv_func__fmodf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2234,7 +2228,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _fmodf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_fmodf" "ac_cv_func__fmodf"
-+if test "x$ac_cv_func__fmodf" = x""yes; then :
++if test "x$ac_cv_func__fmodf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FMODF 1
 +_ACEOF
@@ -2252,7 +2246,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for frexpf declaration" >&5
 +$as_echo_n "checking for frexpf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_frexpf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_frexpf_use+set}" = set; then :
++    if ${glibcxx_cv_func_frexpf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2297,7 +2291,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in frexpf
 +do :
 +  ac_fn_c_check_func "$LINENO" "frexpf" "ac_cv_func_frexpf"
-+if test "x$ac_cv_func_frexpf" = x""yes; then :
++if test "x$ac_cv_func_frexpf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FREXPF 1
 +_ACEOF
@@ -2310,7 +2304,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _frexpf declaration" >&5
 +$as_echo_n "checking for _frexpf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__frexpf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__frexpf_use+set}" = set; then :
++    if ${glibcxx_cv_func__frexpf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2355,7 +2349,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _frexpf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_frexpf" "ac_cv_func__frexpf"
-+if test "x$ac_cv_func__frexpf" = x""yes; then :
++if test "x$ac_cv_func__frexpf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FREXPF 1
 +_ACEOF
@@ -2373,7 +2367,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hypotf declaration" >&5
 +$as_echo_n "checking for hypotf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_hypotf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_hypotf_use+set}" = set; then :
++    if ${glibcxx_cv_func_hypotf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2418,7 +2412,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in hypotf
 +do :
 +  ac_fn_c_check_func "$LINENO" "hypotf" "ac_cv_func_hypotf"
-+if test "x$ac_cv_func_hypotf" = x""yes; then :
++if test "x$ac_cv_func_hypotf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_HYPOTF 1
 +_ACEOF
@@ -2431,7 +2425,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _hypotf declaration" >&5
 +$as_echo_n "checking for _hypotf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__hypotf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__hypotf_use+set}" = set; then :
++    if ${glibcxx_cv_func__hypotf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2476,7 +2470,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _hypotf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_hypotf" "ac_cv_func__hypotf"
-+if test "x$ac_cv_func__hypotf" = x""yes; then :
++if test "x$ac_cv_func__hypotf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__HYPOTF 1
 +_ACEOF
@@ -2494,7 +2488,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ldexpf declaration" >&5
 +$as_echo_n "checking for ldexpf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_ldexpf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_ldexpf_use+set}" = set; then :
++    if ${glibcxx_cv_func_ldexpf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2539,7 +2533,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in ldexpf
 +do :
 +  ac_fn_c_check_func "$LINENO" "ldexpf" "ac_cv_func_ldexpf"
-+if test "x$ac_cv_func_ldexpf" = x""yes; then :
++if test "x$ac_cv_func_ldexpf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LDEXPF 1
 +_ACEOF
@@ -2552,7 +2546,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _ldexpf declaration" >&5
 +$as_echo_n "checking for _ldexpf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__ldexpf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__ldexpf_use+set}" = set; then :
++    if ${glibcxx_cv_func__ldexpf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2597,7 +2591,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _ldexpf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_ldexpf" "ac_cv_func__ldexpf"
-+if test "x$ac_cv_func__ldexpf" = x""yes; then :
++if test "x$ac_cv_func__ldexpf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LDEXPF 1
 +_ACEOF
@@ -2615,7 +2609,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for logf declaration" >&5
 +$as_echo_n "checking for logf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_logf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_logf_use+set}" = set; then :
++    if ${glibcxx_cv_func_logf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2664,7 +2658,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in logf
 +do :
 +  ac_fn_c_check_func "$LINENO" "logf" "ac_cv_func_logf"
-+if test "x$ac_cv_func_logf" = x""yes; then :
++if test "x$ac_cv_func_logf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LOGF 1
 +_ACEOF
@@ -2677,7 +2671,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _logf declaration" >&5
 +$as_echo_n "checking for _logf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__logf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__logf_use+set}" = set; then :
++    if ${glibcxx_cv_func__logf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2726,7 +2720,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _logf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_logf" "ac_cv_func__logf"
-+if test "x$ac_cv_func__logf" = x""yes; then :
++if test "x$ac_cv_func__logf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LOGF 1
 +_ACEOF
@@ -2744,7 +2738,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for log10f declaration" >&5
 +$as_echo_n "checking for log10f declaration... " >&6; }
 +  if test x${glibcxx_cv_func_log10f_use+set} != xset; then
-+    if test "${glibcxx_cv_func_log10f_use+set}" = set; then :
++    if ${glibcxx_cv_func_log10f_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2793,7 +2787,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in log10f
 +do :
 +  ac_fn_c_check_func "$LINENO" "log10f" "ac_cv_func_log10f"
-+if test "x$ac_cv_func_log10f" = x""yes; then :
++if test "x$ac_cv_func_log10f" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LOG10F 1
 +_ACEOF
@@ -2806,7 +2800,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _log10f declaration" >&5
 +$as_echo_n "checking for _log10f declaration... " >&6; }
 +  if test x${glibcxx_cv_func__log10f_use+set} != xset; then
-+    if test "${glibcxx_cv_func__log10f_use+set}" = set; then :
++    if ${glibcxx_cv_func__log10f_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2855,7 +2849,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _log10f
 +do :
 +  ac_fn_c_check_func "$LINENO" "_log10f" "ac_cv_func__log10f"
-+if test "x$ac_cv_func__log10f" = x""yes; then :
++if test "x$ac_cv_func__log10f" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LOG10F 1
 +_ACEOF
@@ -2873,7 +2867,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for modff declaration" >&5
 +$as_echo_n "checking for modff declaration... " >&6; }
 +  if test x${glibcxx_cv_func_modff_use+set} != xset; then
-+    if test "${glibcxx_cv_func_modff_use+set}" = set; then :
++    if ${glibcxx_cv_func_modff_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2918,7 +2912,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in modff
 +do :
 +  ac_fn_c_check_func "$LINENO" "modff" "ac_cv_func_modff"
-+if test "x$ac_cv_func_modff" = x""yes; then :
++if test "x$ac_cv_func_modff" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_MODFF 1
 +_ACEOF
@@ -2931,7 +2925,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _modff declaration" >&5
 +$as_echo_n "checking for _modff declaration... " >&6; }
 +  if test x${glibcxx_cv_func__modff_use+set} != xset; then
-+    if test "${glibcxx_cv_func__modff_use+set}" = set; then :
++    if ${glibcxx_cv_func__modff_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -2976,7 +2970,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _modff
 +do :
 +  ac_fn_c_check_func "$LINENO" "_modff" "ac_cv_func__modff"
-+if test "x$ac_cv_func__modff" = x""yes; then :
++if test "x$ac_cv_func__modff" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__MODFF 1
 +_ACEOF
@@ -2994,7 +2988,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for modf declaration" >&5
 +$as_echo_n "checking for modf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_modf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_modf_use+set}" = set; then :
++    if ${glibcxx_cv_func_modf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3039,7 +3033,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in modf
 +do :
 +  ac_fn_c_check_func "$LINENO" "modf" "ac_cv_func_modf"
-+if test "x$ac_cv_func_modf" = x""yes; then :
++if test "x$ac_cv_func_modf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_MODF 1
 +_ACEOF
@@ -3052,7 +3046,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _modf declaration" >&5
 +$as_echo_n "checking for _modf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__modf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__modf_use+set}" = set; then :
++    if ${glibcxx_cv_func__modf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3097,7 +3091,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _modf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_modf" "ac_cv_func__modf"
-+if test "x$ac_cv_func__modf" = x""yes; then :
++if test "x$ac_cv_func__modf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__MODF 1
 +_ACEOF
@@ -3115,7 +3109,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for powf declaration" >&5
 +$as_echo_n "checking for powf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_powf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_powf_use+set}" = set; then :
++    if ${glibcxx_cv_func_powf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3160,7 +3154,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in powf
 +do :
 +  ac_fn_c_check_func "$LINENO" "powf" "ac_cv_func_powf"
-+if test "x$ac_cv_func_powf" = x""yes; then :
++if test "x$ac_cv_func_powf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_POWF 1
 +_ACEOF
@@ -3173,7 +3167,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _powf declaration" >&5
 +$as_echo_n "checking for _powf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__powf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__powf_use+set}" = set; then :
++    if ${glibcxx_cv_func__powf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3218,7 +3212,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _powf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_powf" "ac_cv_func__powf"
-+if test "x$ac_cv_func__powf" = x""yes; then :
++if test "x$ac_cv_func__powf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__POWF 1
 +_ACEOF
@@ -3236,7 +3230,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqrtf declaration" >&5
 +$as_echo_n "checking for sqrtf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_sqrtf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_sqrtf_use+set}" = set; then :
++    if ${glibcxx_cv_func_sqrtf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3285,7 +3279,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in sqrtf
 +do :
 +  ac_fn_c_check_func "$LINENO" "sqrtf" "ac_cv_func_sqrtf"
-+if test "x$ac_cv_func_sqrtf" = x""yes; then :
++if test "x$ac_cv_func_sqrtf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_SQRTF 1
 +_ACEOF
@@ -3298,7 +3292,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _sqrtf declaration" >&5
 +$as_echo_n "checking for _sqrtf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__sqrtf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__sqrtf_use+set}" = set; then :
++    if ${glibcxx_cv_func__sqrtf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3347,7 +3341,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _sqrtf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_sqrtf" "ac_cv_func__sqrtf"
-+if test "x$ac_cv_func__sqrtf" = x""yes; then :
++if test "x$ac_cv_func__sqrtf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__SQRTF 1
 +_ACEOF
@@ -3365,7 +3359,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sincosf declaration" >&5
 +$as_echo_n "checking for sincosf declaration... " >&6; }
 +  if test x${glibcxx_cv_func_sincosf_use+set} != xset; then
-+    if test "${glibcxx_cv_func_sincosf_use+set}" = set; then :
++    if ${glibcxx_cv_func_sincosf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3410,7 +3404,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in sincosf
 +do :
 +  ac_fn_c_check_func "$LINENO" "sincosf" "ac_cv_func_sincosf"
-+if test "x$ac_cv_func_sincosf" = x""yes; then :
++if test "x$ac_cv_func_sincosf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_SINCOSF 1
 +_ACEOF
@@ -3423,7 +3417,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _sincosf declaration" >&5
 +$as_echo_n "checking for _sincosf declaration... " >&6; }
 +  if test x${glibcxx_cv_func__sincosf_use+set} != xset; then
-+    if test "${glibcxx_cv_func__sincosf_use+set}" = set; then :
++    if ${glibcxx_cv_func__sincosf_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3468,7 +3462,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _sincosf
 +do :
 +  ac_fn_c_check_func "$LINENO" "_sincosf" "ac_cv_func__sincosf"
-+if test "x$ac_cv_func__sincosf" = x""yes; then :
++if test "x$ac_cv_func__sincosf" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__SINCOSF 1
 +_ACEOF
@@ -3486,7 +3480,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for finitef declaration" >&5
 +$as_echo_n "checking for finitef declaration... " >&6; }
 +  if test x${glibcxx_cv_func_finitef_use+set} != xset; then
-+    if test "${glibcxx_cv_func_finitef_use+set}" = set; then :
++    if ${glibcxx_cv_func_finitef_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3532,11 +3526,11 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +$as_echo "$glibcxx_cv_func_finitef_use" >&6; }
 +
 +  if test x$glibcxx_cv_func_finitef_use = x"yes"; then
-+    for ac_func in finitefdiff -Nru
++    for ac_func in finitef
 +do :
-+  ac_fn_c_check_func "$LINdiff -Nru_cv_func_finitef"
-+if test "x$ac_cv_func_finidiff -Nrun :
-+  cat >>confdefs.h <<_ACEOdiff -Nru
++  ac_fn_c_check_func "$LINENO" "finitef" "ac_cv_func_finitef"
++if test "x$ac_cv_func_finitef" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FINITEF 1
 +_ACEOF
 +
@@ -3545,11 +3539,11 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +  else
 +
-+  { $as_echo "$as_me:${as_diff -Nruhecking for _finitef declaration" >&5
-+$as_echo_n "checking for _diff -Nrun... " >&6; }
-+  if test x${glibcxx_cv_fudiff -Nrut} != xset; then
-+    if test "${glibcxx_cv_diff -Nruset}" = set; then :
-+  $as_echo_n "(cached) " >diff -Nru
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _finitef declaration" >&5
++$as_echo_n "checking for _finitef declaration... " >&6; }
++  if test x${glibcxx_cv_func__finitef_use+set} != xset; then
++    if ${glibcxx_cv_func__finitef_use+:} false; then :
++  $as_echo_n "(cached) " >&6
 +else
 +
 +
@@ -3597,7 +3591,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _finitef
 +do :
 +  ac_fn_c_check_func "$LINENO" "_finitef" "ac_cv_func__finitef"
-+if test "x$ac_cv_func__finitef" = x""yes; then :
++if test "x$ac_cv_func__finitef" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FINITEF 1
 +_ACEOF
@@ -3614,7 +3608,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long double trig functions" >&5
 +$as_echo_n "checking for long double trig functions... " >&6; }
-+  if test "${glibcxx_cv_func_long_double_trig_use+set}" = set; then :
++  if ${glibcxx_cv_func_long_double_trig_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3657,8 +3651,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -3669,7 +3662,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  else
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _long double trig functions" >&5
 +$as_echo_n "checking for _long double trig functions... " >&6; }
-+    if test "${glibcxx_cv_func__long_double_trig_use+set}" = set; then :
++    if ${glibcxx_cv_func__long_double_trig_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3712,8 +3705,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -3730,7 +3722,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for long double round functions" >&5
 +$as_echo_n "checking for long double round functions... " >&6; }
-+  if test "${glibcxx_cv_func_long_double_round_use+set}" = set; then :
++  if ${glibcxx_cv_func_long_double_round_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3773,8 +3765,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -3785,7 +3776,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  else
 +    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _long double round functions" >&5
 +$as_echo_n "checking for _long double round functions... " >&6; }
-+    if test "${glibcxx_cv_func__long_double_round_use+set}" = set; then :
++    if ${glibcxx_cv_func__long_double_round_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3828,8 +3819,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +do :
 +  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 +ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-+eval as_val=\$$as_ac_var
-+   if test "x$as_val" = x""yes; then :
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 +_ACEOF
@@ -3848,7 +3838,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isnanl declaration" >&5
 +$as_echo_n "checking for isnanl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isnanl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isnanl_use+set}" = set; then :
++    if ${glibcxx_cv_func_isnanl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3897,7 +3887,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isnanl
 +do :
 +  ac_fn_c_check_func "$LINENO" "isnanl" "ac_cv_func_isnanl"
-+if test "x$ac_cv_func_isnanl" = x""yes; then :
++if test "x$ac_cv_func_isnanl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISNANL 1
 +_ACEOF
@@ -3910,7 +3900,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isnanl declaration" >&5
 +$as_echo_n "checking for _isnanl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isnanl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isnanl_use+set}" = set; then :
++    if ${glibcxx_cv_func__isnanl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -3959,7 +3949,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isnanl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isnanl" "ac_cv_func__isnanl"
-+if test "x$ac_cv_func__isnanl" = x""yes; then :
++if test "x$ac_cv_func__isnanl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISNANL 1
 +_ACEOF
@@ -3977,7 +3967,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for isinfl declaration" >&5
 +$as_echo_n "checking for isinfl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_isinfl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_isinfl_use+set}" = set; then :
++    if ${glibcxx_cv_func_isinfl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4026,7 +4016,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in isinfl
 +do :
 +  ac_fn_c_check_func "$LINENO" "isinfl" "ac_cv_func_isinfl"
-+if test "x$ac_cv_func_isinfl" = x""yes; then :
++if test "x$ac_cv_func_isinfl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ISINFL 1
 +_ACEOF
@@ -4039,7 +4029,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _isinfl declaration" >&5
 +$as_echo_n "checking for _isinfl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__isinfl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__isinfl_use+set}" = set; then :
++    if ${glibcxx_cv_func__isinfl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4088,7 +4078,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _isinfl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_isinfl" "ac_cv_func__isinfl"
-+if test "x$ac_cv_func__isinfl" = x""yes; then :
++if test "x$ac_cv_func__isinfl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ISINFL 1
 +_ACEOF
@@ -4106,7 +4096,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for atan2l declaration" >&5
 +$as_echo_n "checking for atan2l declaration... " >&6; }
 +  if test x${glibcxx_cv_func_atan2l_use+set} != xset; then
-+    if test "${glibcxx_cv_func_atan2l_use+set}" = set; then :
++    if ${glibcxx_cv_func_atan2l_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4151,7 +4141,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in atan2l
 +do :
 +  ac_fn_c_check_func "$LINENO" "atan2l" "ac_cv_func_atan2l"
-+if test "x$ac_cv_func_atan2l" = x""yes; then :
++if test "x$ac_cv_func_atan2l" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_ATAN2L 1
 +_ACEOF
@@ -4164,7 +4154,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _atan2l declaration" >&5
 +$as_echo_n "checking for _atan2l declaration... " >&6; }
 +  if test x${glibcxx_cv_func__atan2l_use+set} != xset; then
-+    if test "${glibcxx_cv_func__atan2l_use+set}" = set; then :
++    if ${glibcxx_cv_func__atan2l_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4209,7 +4199,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _atan2l
 +do :
 +  ac_fn_c_check_func "$LINENO" "_atan2l" "ac_cv_func__atan2l"
-+if test "x$ac_cv_func__atan2l" = x""yes; then :
++if test "x$ac_cv_func__atan2l" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__ATAN2L 1
 +_ACEOF
@@ -4227,7 +4217,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for expl declaration" >&5
 +$as_echo_n "checking for expl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_expl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_expl_use+set}" = set; then :
++    if ${glibcxx_cv_func_expl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4276,7 +4266,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in expl
 +do :
 +  ac_fn_c_check_func "$LINENO" "expl" "ac_cv_func_expl"
-+if test "x$ac_cv_func_expl" = x""yes; then :
++if test "x$ac_cv_func_expl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_EXPL 1
 +_ACEOF
@@ -4289,7 +4279,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _expl declaration" >&5
 +$as_echo_n "checking for _expl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__expl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__expl_use+set}" = set; then :
++    if ${glibcxx_cv_func__expl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4338,7 +4328,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _expl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_expl" "ac_cv_func__expl"
-+if test "x$ac_cv_func__expl" = x""yes; then :
++if test "x$ac_cv_func__expl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__EXPL 1
 +_ACEOF
@@ -4356,7 +4346,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fabsl declaration" >&5
 +$as_echo_n "checking for fabsl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_fabsl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_fabsl_use+set}" = set; then :
++    if ${glibcxx_cv_func_fabsl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4405,7 +4395,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in fabsl
 +do :
 +  ac_fn_c_check_func "$LINENO" "fabsl" "ac_cv_func_fabsl"
-+if test "x$ac_cv_func_fabsl" = x""yes; then :
++if test "x$ac_cv_func_fabsl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FABSL 1
 +_ACEOF
@@ -4418,7 +4408,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _fabsl declaration" >&5
 +$as_echo_n "checking for _fabsl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__fabsl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__fabsl_use+set}" = set; then :
++    if ${glibcxx_cv_func__fabsl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4467,7 +4457,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _fabsl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_fabsl" "ac_cv_func__fabsl"
-+if test "x$ac_cv_func__fabsl" = x""yes; then :
++if test "x$ac_cv_func__fabsl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FABSL 1
 +_ACEOF
@@ -4485,7 +4475,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fmodl declaration" >&5
 +$as_echo_n "checking for fmodl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_fmodl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_fmodl_use+set}" = set; then :
++    if ${glibcxx_cv_func_fmodl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4530,7 +4520,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in fmodl
 +do :
 +  ac_fn_c_check_func "$LINENO" "fmodl" "ac_cv_func_fmodl"
-+if test "x$ac_cv_func_fmodl" = x""yes; then :
++if test "x$ac_cv_func_fmodl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FMODL 1
 +_ACEOF
@@ -4543,7 +4533,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _fmodl declaration" >&5
 +$as_echo_n "checking for _fmodl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__fmodl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__fmodl_use+set}" = set; then :
++    if ${glibcxx_cv_func__fmodl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4588,7 +4578,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _fmodl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_fmodl" "ac_cv_func__fmodl"
-+if test "x$ac_cv_func__fmodl" = x""yes; then :
++if test "x$ac_cv_func__fmodl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FMODL 1
 +_ACEOF
@@ -4606,7 +4596,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for frexpl declaration" >&5
 +$as_echo_n "checking for frexpl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_frexpl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_frexpl_use+set}" = set; then :
++    if ${glibcxx_cv_func_frexpl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4651,7 +4641,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in frexpl
 +do :
 +  ac_fn_c_check_func "$LINENO" "frexpl" "ac_cv_func_frexpl"
-+if test "x$ac_cv_func_frexpl" = x""yes; then :
++if test "x$ac_cv_func_frexpl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FREXPL 1
 +_ACEOF
@@ -4664,7 +4654,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _frexpl declaration" >&5
 +$as_echo_n "checking for _frexpl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__frexpl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__frexpl_use+set}" = set; then :
++    if ${glibcxx_cv_func__frexpl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4709,7 +4699,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _frexpl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_frexpl" "ac_cv_func__frexpl"
-+if test "x$ac_cv_func__frexpl" = x""yes; then :
++if test "x$ac_cv_func__frexpl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FREXPL 1
 +_ACEOF
@@ -4727,7 +4717,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hypotl declaration" >&5
 +$as_echo_n "checking for hypotl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_hypotl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_hypotl_use+set}" = set; then :
++    if ${glibcxx_cv_func_hypotl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4772,7 +4762,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in hypotl
 +do :
 +  ac_fn_c_check_func "$LINENO" "hypotl" "ac_cv_func_hypotl"
-+if test "x$ac_cv_func_hypotl" = x""yes; then :
++if test "x$ac_cv_func_hypotl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_HYPOTL 1
 +_ACEOF
@@ -4785,7 +4775,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _hypotl declaration" >&5
 +$as_echo_n "checking for _hypotl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__hypotl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__hypotl_use+set}" = set; then :
++    if ${glibcxx_cv_func__hypotl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4830,7 +4820,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _hypotl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_hypotl" "ac_cv_func__hypotl"
-+if test "x$ac_cv_func__hypotl" = x""yes; then :
++if test "x$ac_cv_func__hypotl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__HYPOTL 1
 +_ACEOF
@@ -4848,7 +4838,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ldexpl declaration" >&5
 +$as_echo_n "checking for ldexpl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_ldexpl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_ldexpl_use+set}" = set; then :
++    if ${glibcxx_cv_func_ldexpl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4893,7 +4883,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in ldexpl
 +do :
 +  ac_fn_c_check_func "$LINENO" "ldexpl" "ac_cv_func_ldexpl"
-+if test "x$ac_cv_func_ldexpl" = x""yes; then :
++if test "x$ac_cv_func_ldexpl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LDEXPL 1
 +_ACEOF
@@ -4906,7 +4896,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _ldexpl declaration" >&5
 +$as_echo_n "checking for _ldexpl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__ldexpl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__ldexpl_use+set}" = set; then :
++    if ${glibcxx_cv_func__ldexpl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -4951,7 +4941,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _ldexpl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_ldexpl" "ac_cv_func__ldexpl"
-+if test "x$ac_cv_func__ldexpl" = x""yes; then :
++if test "x$ac_cv_func__ldexpl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LDEXPL 1
 +_ACEOF
@@ -4969,7 +4959,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for logl declaration" >&5
 +$as_echo_n "checking for logl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_logl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_logl_use+set}" = set; then :
++    if ${glibcxx_cv_func_logl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5018,7 +5008,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in logl
 +do :
 +  ac_fn_c_check_func "$LINENO" "logl" "ac_cv_func_logl"
-+if test "x$ac_cv_func_logl" = x""yes; then :
++if test "x$ac_cv_func_logl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LOGL 1
 +_ACEOF
@@ -5031,7 +5021,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _logl declaration" >&5
 +$as_echo_n "checking for _logl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__logl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__logl_use+set}" = set; then :
++    if ${glibcxx_cv_func__logl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5080,7 +5070,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _logl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_logl" "ac_cv_func__logl"
-+if test "x$ac_cv_func__logl" = x""yes; then :
++if test "x$ac_cv_func__logl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LOGL 1
 +_ACEOF
@@ -5098,7 +5088,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for log10l declaration" >&5
 +$as_echo_n "checking for log10l declaration... " >&6; }
 +  if test x${glibcxx_cv_func_log10l_use+set} != xset; then
-+    if test "${glibcxx_cv_func_log10l_use+set}" = set; then :
++    if ${glibcxx_cv_func_log10l_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5147,7 +5137,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in log10l
 +do :
 +  ac_fn_c_check_func "$LINENO" "log10l" "ac_cv_func_log10l"
-+if test "x$ac_cv_func_log10l" = x""yes; then :
++if test "x$ac_cv_func_log10l" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_LOG10L 1
 +_ACEOF
@@ -5160,7 +5150,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _log10l declaration" >&5
 +$as_echo_n "checking for _log10l declaration... " >&6; }
 +  if test x${glibcxx_cv_func__log10l_use+set} != xset; then
-+    if test "${glibcxx_cv_func__log10l_use+set}" = set; then :
++    if ${glibcxx_cv_func__log10l_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5209,7 +5199,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _log10l
 +do :
 +  ac_fn_c_check_func "$LINENO" "_log10l" "ac_cv_func__log10l"
-+if test "x$ac_cv_func__log10l" = x""yes; then :
++if test "x$ac_cv_func__log10l" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__LOG10L 1
 +_ACEOF
@@ -5227,7 +5217,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for modfl declaration" >&5
 +$as_echo_n "checking for modfl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_modfl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_modfl_use+set}" = set; then :
++    if ${glibcxx_cv_func_modfl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5272,7 +5262,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in modfl
 +do :
 +  ac_fn_c_check_func "$LINENO" "modfl" "ac_cv_func_modfl"
-+if test "x$ac_cv_func_modfl" = x""yes; then :
++if test "x$ac_cv_func_modfl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_MODFL 1
 +_ACEOF
@@ -5285,7 +5275,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _modfl declaration" >&5
 +$as_echo_n "checking for _modfl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__modfl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__modfl_use+set}" = set; then :
++    if ${glibcxx_cv_func__modfl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5330,7 +5320,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _modfl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_modfl" "ac_cv_func__modfl"
-+if test "x$ac_cv_func__modfl" = x""yes; then :
++if test "x$ac_cv_func__modfl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__MODFL 1
 +_ACEOF
@@ -5348,7 +5338,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for powl declaration" >&5
 +$as_echo_n "checking for powl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_powl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_powl_use+set}" = set; then :
++    if ${glibcxx_cv_func_powl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5393,7 +5383,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in powl
 +do :
 +  ac_fn_c_check_func "$LINENO" "powl" "ac_cv_func_powl"
-+if test "x$ac_cv_func_powl" = x""yes; then :
++if test "x$ac_cv_func_powl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_POWL 1
 +_ACEOF
@@ -5406,7 +5396,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _powl declaration" >&5
 +$as_echo_n "checking for _powl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__powl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__powl_use+set}" = set; then :
++    if ${glibcxx_cv_func__powl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5451,7 +5441,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _powl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_powl" "ac_cv_func__powl"
-+if test "x$ac_cv_func__powl" = x""yes; then :
++if test "x$ac_cv_func__powl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__POWL 1
 +_ACEOF
@@ -5469,7 +5459,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqrtl declaration" >&5
 +$as_echo_n "checking for sqrtl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_sqrtl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_sqrtl_use+set}" = set; then :
++    if ${glibcxx_cv_func_sqrtl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5518,7 +5508,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in sqrtl
 +do :
 +  ac_fn_c_check_func "$LINENO" "sqrtl" "ac_cv_func_sqrtl"
-+if test "x$ac_cv_func_sqrtl" = x""yes; then :
++if test "x$ac_cv_func_sqrtl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_SQRTL 1
 +_ACEOF
@@ -5531,7 +5521,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _sqrtl declaration" >&5
 +$as_echo_n "checking for _sqrtl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__sqrtl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__sqrtl_use+set}" = set; then :
++    if ${glibcxx_cv_func__sqrtl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5580,7 +5570,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _sqrtl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_sqrtl" "ac_cv_func__sqrtl"
-+if test "x$ac_cv_func__sqrtl" = x""yes; then :
++if test "x$ac_cv_func__sqrtl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__SQRTL 1
 +_ACEOF
@@ -5598,7 +5588,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sincosl declaration" >&5
 +$as_echo_n "checking for sincosl declaration... " >&6; }
 +  if test x${glibcxx_cv_func_sincosl_use+set} != xset; then
-+    if test "${glibcxx_cv_func_sincosl_use+set}" = set; then :
++    if ${glibcxx_cv_func_sincosl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5643,7 +5633,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in sincosl
 +do :
 +  ac_fn_c_check_func "$LINENO" "sincosl" "ac_cv_func_sincosl"
-+if test "x$ac_cv_func_sincosl" = x""yes; then :
++if test "x$ac_cv_func_sincosl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_SINCOSL 1
 +_ACEOF
@@ -5656,7 +5646,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _sincosl declaration" >&5
 +$as_echo_n "checking for _sincosl declaration... " >&6; }
 +  if test x${glibcxx_cv_func__sincosl_use+set} != xset; then
-+    if test "${glibcxx_cv_func__sincosl_use+set}" = set; then :
++    if ${glibcxx_cv_func__sincosl_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5701,7 +5691,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _sincosl
 +do :
 +  ac_fn_c_check_func "$LINENO" "_sincosl" "ac_cv_func__sincosl"
-+if test "x$ac_cv_func__sincosl" = x""yes; then :
++if test "x$ac_cv_func__sincosl" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__SINCOSL 1
 +_ACEOF
@@ -5719,7 +5709,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for finitel declaration" >&5
 +$as_echo_n "checking for finitel declaration... " >&6; }
 +  if test x${glibcxx_cv_func_finitel_use+set} != xset; then
-+    if test "${glibcxx_cv_func_finitel_use+set}" = set; then :
++    if ${glibcxx_cv_func_finitel_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5768,7 +5758,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in finitel
 +do :
 +  ac_fn_c_check_func "$LINENO" "finitel" "ac_cv_func_finitel"
-+if test "x$ac_cv_func_finitel" = x""yes; then :
++if test "x$ac_cv_func_finitel" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_FINITEL 1
 +_ACEOF
@@ -5781,7 +5771,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for _finitel declaration" >&5
 +$as_echo_n "checking for _finitel declaration... " >&6; }
 +  if test x${glibcxx_cv_func__finitel_use+set} != xset; then
-+    if test "${glibcxx_cv_func__finitel_use+set}" = set; then :
++    if ${glibcxx_cv_func__finitel_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5830,7 +5820,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +      for ac_func in _finitel
 +do :
 +  ac_fn_c_check_func "$LINENO" "_finitel" "ac_cv_func__finitel"
-+if test "x$ac_cv_func__finitel" = x""yes; then :
++if test "x$ac_cv_func__finitel" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE__FINITEL 1
 +_ACEOF
@@ -5856,7 +5846,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for at_quick_exit declaration" >&5
 +$as_echo_n "checking for at_quick_exit declaration... " >&6; }
 +  if test x${glibcxx_cv_func_at_quick_exit_use+set} != xset; then
-+    if test "${glibcxx_cv_func_at_quick_exit_use+set}" = set; then :
++    if ${glibcxx_cv_func_at_quick_exit_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5900,7 +5890,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in at_quick_exit
 +do :
 +  ac_fn_c_check_func "$LINENO" "at_quick_exit" "ac_cv_func_at_quick_exit"
-+if test "x$ac_cv_func_at_quick_exit" = x""yes; then :
++if test "x$ac_cv_func_at_quick_exit" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_AT_QUICK_EXIT 1
 +_ACEOF
@@ -5914,7 +5904,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for quick_exit declaration" >&5
 +$as_echo_n "checking for quick_exit declaration... " >&6; }
 +  if test x${glibcxx_cv_func_quick_exit_use+set} != xset; then
-+    if test "${glibcxx_cv_func_quick_exit_use+set}" = set; then :
++    if ${glibcxx_cv_func_quick_exit_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -5958,7 +5948,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in quick_exit
 +do :
 +  ac_fn_c_check_func "$LINENO" "quick_exit" "ac_cv_func_quick_exit"
-+if test "x$ac_cv_func_quick_exit" = x""yes; then :
++if test "x$ac_cv_func_quick_exit" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_QUICK_EXIT 1
 +_ACEOF
@@ -5972,7 +5962,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for strtold declaration" >&5
 +$as_echo_n "checking for strtold declaration... " >&6; }
 +  if test x${glibcxx_cv_func_strtold_use+set} != xset; then
-+    if test "${glibcxx_cv_func_strtold_use+set}" = set; then :
++    if ${glibcxx_cv_func_strtold_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -6016,7 +6006,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in strtold
 +do :
 +  ac_fn_c_check_func "$LINENO" "strtold" "ac_cv_func_strtold"
-+if test "x$ac_cv_func_strtold" = x""yes; then :
++if test "x$ac_cv_func_strtold" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_STRTOLD 1
 +_ACEOF
@@ -6032,7 +6022,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for strtof declaration" >&5
 +$as_echo_n "checking for strtof declaration... " >&6; }
 +  if test x${glibcxx_cv_func_strtof_use+set} != xset; then
-+    if test "${glibcxx_cv_func_strtof_use+set}" = set; then :
++    if ${glibcxx_cv_func_strtof_use+:} false; then :
 +  $as_echo_n "(cached) " >&6
 +else
 +
@@ -6076,7 +6066,7 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
 +    for ac_func in strtof
 +do :
 +  ac_fn_c_check_func "$LINENO" "strtof" "ac_cv_func_strtof"
-+if test "x$ac_cv_func_strtof" = x""yes; then :
++if test "x$ac_cv_func_strtof" = xyes; then :
 +  cat >>confdefs.h <<_ACEOF
 +#define HAVE_STRTOF 1
 +_ACEOF
@@ -6096,10 +6086,11 @@ diff -Nru gcc-8.2.0_clean/libstdc++-v3/configure gcc-8.2.0/libstdc++-v3/configur
    arm*-*-symbianelf*)
      # This is a freestanding configuration; there is nothing to do here.
      ;;
-diff -Nru gcc-8.2.0_clean/libstdc++-v3/crossconfig.m4 gcc-8.2.0/libstdc++-v3/crossconfig.m4
---- gcc-8.2.0_clean/libstdc++-v3/crossconfig.m4	2018-07-04 13:45:51.000000000 +0200
-+++ gcc-8.2.0/libstdc++-v3/crossconfig.m4	2019-05-23 19:47:05.044718193 +0200
-@@ -5,6 +5,13 @@
+diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
+index fe1828835..7a717c65e 100644
+--- a/libstdc++-v3/crossconfig.m4
++++ b/libstdc++-v3/crossconfig.m4
+@@ -5,6 +5,13 @@ dnl
  AC_DEFUN([GLIBCXX_CROSSCONFIG],[
  # Base decisions on target environment.
  case "${host}" in

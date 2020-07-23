@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+# ----- Configs -------------------------------------------------------------- #
+
+BINUTILS_VERSION=2.33.1
+BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
+BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
+BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
+
+GCC_VERSION=10.1.0
+GCC_DIRECTORY="gcc-$GCC_VERSION"
+GCC_FILENAME="$GCC_DIRECTORY.tar.gz"
+GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
+
+# ---------------------------------------------------------------------------- #
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 TARGET=i686-pc-skift
@@ -12,6 +26,15 @@ if [ -e "$PREFIX/build-ok" ]; then
     exit 0
 fi
 
+DEV_MODE=
+while [ "$1" != "" ]; do
+    case $1 in
+        --dev )           DEV_MODE=1
+                          ;;
+    esac
+    shift
+done
+
 cd "$DIR"
 
 mkdir -p tarballs
@@ -19,35 +42,49 @@ mkdir -p tarballs
 source "$DIR/use-it.sh"
 
 pushd tarballs
-    if [ ! -e "binutils-2.31.tar.gz" ]; then
-        wget "http://ftp.gnu.org/gnu/binutils/binutils-2.31.tar.gz"
+    if [ ! -e "$BINUTILS_FILENAME" ]; then
+        wget "$BINUTILS_URL"
     else
         echo "Skipped downloading binutils"
     fi
 
-    if [ ! -e "gcc-8.2.0.tar.gz" ]; then
-        wget "http://ftp.gnu.org/gnu/gcc/gcc-8.2.0/gcc-8.2.0.tar.gz"
+    if [ ! -e "$GCC_FILENAME" ]; then
+        wget "$GCC_URL"
     else
         echo "Skipped downloading gcc"
     fi
 
-    if [ ! -d "binutils-2.31" ]; then
+    if [ ! -d "$BINUTILS_DIRECTORY" ]; then
         echo "Extracting binutils..."
-        tar -xf "binutils-2.31.tar.gz"
+        tar -xf "$BINUTILS_FILENAME"
 
-        pushd "binutils-2.31"
-            patch -p1 < $DIR/patches/binutils.patch
+        pushd "$BINUTILS_DIRECTORY"
+            if [ "$DEV_MODE" = "1" ]; then
+                git init
+                git add .
+                git commit -am "BASE"
+                git apply $DIR/patches/binutils.patch
+            else
+                patch -p1 < $DIR/Patches/binutils.patch
+            fi
         popd
     else
         echo "Skipped extracting binutils"
     fi
 
-    if [ ! -d "gcc-8.2.0" ]; then
+    if [ ! -d "$GCC_DIRECTORY" ]; then
         echo "Extracting gcc..."
-        tar -xf "gcc-8.2.0.tar.gz"
+        tar -xf "$GCC_FILENAME"
 
-        pushd "gcc-8.2.0"
-            patch -p1 < $DIR/patches/gcc.patch
+        pushd "$GCC_DIRECTORY"
+            if [ "$DEV_MODE" = "1" ]; then
+                git init
+                git add .
+                git commit -am "BASE"
+                git apply $DIR/patches/gcc.patch
+            else
+                patch -p1 < $DIR/patches/gcc.patch
+            fi
         popd
     else
         echo "Skipped extracting gcc"
@@ -64,33 +101,35 @@ if [ -z "$MAKEJOBS" ]; then
 fi
 
 pushd "$DIR/build/"
-
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils
-        $DIR/tarballs/binutils-2.31/configure --target=$TARGET \
-                                              --prefix=$PREFIX \
-                                              --with-sysroot=$SYSROOT \
-                                              --disable-werror || exit 1
+        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
+            --target=$TARGET \
+            --prefix=$PREFIX \
+            --with-sysroot=$SYSROOT \
+            --disable-werror || exit 1
+
         make -j $MAKEJOBS || exit 1
         make install || exit 1
     popd
 
     pushd gcc
-        $DIR/tarballs/gcc-8.2.0/configure --target=$TARGET \
-                                          --prefix=$PREFIX \
-                                          --disable-nls \
-                                          --with-newlib \
-                                          --with-sysroot=$SYSROOT \
-                                          --enable-languages=c,c++|| exit 1
+        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
+            --target=$TARGET \
+            --prefix=$PREFIX \
+            --disable-nls \
+            --with-newlib \
+            --with-sysroot=$SYSROOT \
+            --enable-languages=c,c++|| exit 1
+
+        make -C "$DIR/../" install-headers || exit 1
 
         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
         make install-gcc install-target-libgcc || exit 1
 
-        make -C "$DIR/../" install-headers || exit 1
-
-        # make all-target-libstdc++-v3 || exit 1
-        # make install-target-libstdc++-v3 || exit 1
+        make all-target-libstdc++-v3 || exit 1
+        make install-target-libstdc++-v3 || exit 1
     popd
 popd
 

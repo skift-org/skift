@@ -55,7 +55,7 @@ INIT_NAME = init
 INIT_LIBS =
 
 JSON_NAME = json
-JSON_LIBS = json math
+JSON_LIBS = json
 
 KEYBOARDCTL_NAME = keyboardctl
 KEYBOARDCTL_LIBS =
@@ -79,7 +79,7 @@ NOW_NAME = now
 NOW_LIBS =
 
 OPEN_NAME = open
-OPEN_LIBS = json math
+OPEN_LIBS = json
 
 PANIC_NAME = panic
 PANIC_LIBS =

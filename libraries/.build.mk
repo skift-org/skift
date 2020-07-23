@@ -26,7 +26,7 @@ HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS))
 
 define LIB_TEMPLATE =
 
-$(1)_ARCHIVE = $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
+$(1)_ARCHIVE ?= $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
 
 $(1)_SOURCES = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.c) \

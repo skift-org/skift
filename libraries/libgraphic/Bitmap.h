@@ -2,8 +2,8 @@
 
 #include <libgraphic/Color.h>
 #include <libgraphic/Shape.h>
-#include <libmath/Math.h>
 #include <libsystem/Result.h>
+#include <libsystem/math/Math.h>
 
 typedef enum
 {
@@ -96,4 +96,3 @@ static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Vec2i p, Color co
 }
 
 void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region);
-

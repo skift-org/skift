@@ -1,6 +1,6 @@
 
-#include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
+#include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>
 
 Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)

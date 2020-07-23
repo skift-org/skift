@@ -1,11 +1,11 @@
 #include <abi/Paths.h>
 #include <abi/TextMode.h>
 
-#include <libmath/MinMax.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/CString.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+#include <libsystem/math/MinMax.h>
 
 #include "arch/x86/x86.h"
 

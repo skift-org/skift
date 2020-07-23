@@ -1,5 +1,5 @@
-#include <libmath/Math.h>
 #include <libsystem/CString.h>
+#include <libsystem/math/Math.h>
 #include <libsystem/utils/NumberFormatter.h>
 
 static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";

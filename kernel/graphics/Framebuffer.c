@@ -1,8 +1,8 @@
 #include <abi/Paths.h>
 
-#include <libmath/MinMax.h>
 #include <libsystem/Atomic.h>
 #include <libsystem/Logger.h>
+#include <libsystem/math/MinMax.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"

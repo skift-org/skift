@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libmath/vectors/Vec2f.h>
-#include <libmath/vectors/Vec2i.h>
+#include <libsystem/math/Vec2f.h>
+#include <libsystem/math/Vec2i.h>
 
 typedef enum
 {

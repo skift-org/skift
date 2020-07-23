@@ -1,5 +1,5 @@
-#include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
+#include <libsystem/math/MinMax.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 struct BufferBuilder

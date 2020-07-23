@@ -1,4 +1,4 @@
 APPS += COMPOSITOR
 
 COMPOSITOR_NAME = compositor
-COMPOSITOR_LIBS = graphic math
+COMPOSITOR_LIBS = graphic

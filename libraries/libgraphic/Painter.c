@@ -2,8 +2,8 @@
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>
-#include <libmath/Math.h>
 #include <libsystem/Assert.h>
+#include <libsystem/math/Math.h>
 
 Painter *painter_create(Bitmap *bitmap)
 {

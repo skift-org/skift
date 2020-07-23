@@ -1,6 +1,6 @@
 
 #include <libgraphic/Color.h>
-#include <libmath/Lerp.h>
+#include <libsystem/math/Lerp.h>
 
 Color RGB(float R, float G, float B)
 {

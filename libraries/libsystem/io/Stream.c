@@ -1,12 +1,12 @@
 
 #include <string.h>
 
-#include <libmath/MinMax.h>
 #include <libsystem/Assert.h>
 #include <libsystem/__plugs__.h>
 #include <libsystem/__printf__.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
+#include <libsystem/math/MinMax.h>
 
 static void stream_initialize(Stream *stream)
 {

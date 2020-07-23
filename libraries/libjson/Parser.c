@@ -1,8 +1,8 @@
 #include <libjson/Json.h>
-#include <libmath/Math.h>
 #include <libsystem/Assert.h>
 #include <libsystem/CString.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberParser.h>

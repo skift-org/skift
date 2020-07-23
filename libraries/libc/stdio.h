@@ -26,77 +26,77 @@ FILE *__stdio_get_stderr(void);
 #define SEEK_CUR 1
 #define SEEK_END 2
 
-extern FILE *fopen(const char *path, const char *mode);
-extern int fclose(FILE *stream);
-extern int fseek(FILE *stream, long offset, int whence);
-extern long ftell(FILE *stream);
-extern FILE *fdopen(int fd, const char *mode);
-extern FILE *freopen(const char *path, const char *mode, FILE *stream);
+FILE *fopen(const char *path, const char *mode);
+int fclose(FILE *stream);
+int fseek(FILE *stream, long offset, int whence);
+long ftell(FILE *stream);
+FILE *fdopen(int fd, const char *mode);
+FILE *freopen(const char *path, const char *mode, FILE *stream);
 
-extern size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-extern size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-extern int fileno(FILE *stream);
-extern int fflush(FILE *stream);
+int fileno(FILE *stream);
+int fflush(FILE *stream);
 
-extern int vasprintf(char **buf, const char *fmt, va_list args);
-extern int sprintf(char *buf, const char *fmt, ...);
-extern int fprintf(FILE *stream, const char *fmt, ...);
-extern int printf(const char *fmt, ...);
-extern int snprintf(char *buf, size_t size, const char *fmt, ...);
-extern int vsprintf(char *buf, const char *fmt, va_list args);
-extern int vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
-extern int vfprintf(FILE *stream, const char *format, va_list ap);
-extern int vprintf(const char *format, va_list ap);
+int vasprintf(char **buf, const char *fmt, va_list args);
+int sprintf(char *buf, const char *fmt, ...);
+int fprintf(FILE *stream, const char *fmt, ...);
+int printf(const char *fmt, ...);
+int snprintf(char *buf, size_t size, const char *fmt, ...);
+int vsprintf(char *buf, const char *fmt, va_list args);
+int vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
+int vfprintf(FILE *stream, const char *format, va_list ap);
+int vprintf(const char *format, va_list ap);
 
-extern int puts(const char *s);
-extern int fputs(const char *s, FILE *stream);
-extern int fputc(int c, FILE *stream);
-extern int putc(int c, FILE *stream);
-extern int putchar(int c);
-extern int fgetc(FILE *stream);
-extern int getc(FILE *stream);
-extern char *fgets(char *s, int size, FILE *stream);
-extern int getchar(void);
+int puts(const char *s);
+int fputs(const char *s, FILE *stream);
+int fputc(int c, FILE *stream);
+int putc(int c, FILE *stream);
+int putchar(int c);
+int fgetc(FILE *stream);
+int getc(FILE *stream);
+char *fgets(char *s, int size, FILE *stream);
+int getchar(void);
 
-extern void rewind(FILE *stream);
-extern void setbuf(FILE *stream, char *buf);
+void rewind(FILE *stream);
+void setbuf(FILE *stream, char *buf);
 
-extern void perror(const char *s);
+void perror(const char *s);
 
-extern int ungetc(int c, FILE *stream);
+int ungetc(int c, FILE *stream);
 
-extern int feof(FILE *stream);
-extern void clearerr(FILE *stream);
-extern int ferror(FILE *stream);
+int feof(FILE *stream);
+void clearerr(FILE *stream);
+int ferror(FILE *stream);
 
-extern char *strerror(int errnum);
+char *strerror(int errnum);
 
-extern int _fwouldblock(FILE *stream);
+int _fwouldblock(FILE *stream);
 
-extern FILE *tmpfile(void);
+FILE *tmpfile(void);
 
-extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
+int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 
-extern int remove(const char *pathname);
-extern int rename(const char *oldpath, const char *newpath);
+int remove(const char *pathname);
+int rename(const char *oldpath, const char *newpath);
 
 #define _IONBF 0
 #define _IOLBF 1
 #define _IOFBF 2
 
-extern char *tmpnam(char *s);
+char *tmpnam(char *s);
 #define L_tmpnam 256
 
-extern int vsscanf(const char *str, const char *format, va_list ap);
-extern int sscanf(const char *str, const char *format, ...);
-extern int vfscanf(FILE *stream, const char *format, va_list ap);
-extern int fscanf(FILE *stream, const char *format, ...);
-extern int scanf(const char *format, ...);
+int vsscanf(const char *str, const char *format, va_list ap);
+int sscanf(const char *str, const char *format, ...);
+int vfscanf(FILE *stream, const char *format, va_list ap);
+int fscanf(FILE *stream, const char *format, ...);
+int scanf(const char *format, ...);
 
 typedef long fpos_t;
 
-extern int fgetpos(FILE *stream, fpos_t *pos);
-extern int fsetpos(FILE *stream, const fpos_t *pos);
+int fgetpos(FILE *stream, fpos_t *pos);
+int fsetpos(FILE *stream, const fpos_t *pos);
 
 __END_HEADER

@@ -1,4 +1,3 @@
-
 #include <libsystem/Common.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/core/Printf.h>

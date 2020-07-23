@@ -240,3 +240,8 @@ int fgetc(FILE *stream)
 {
     return stream_getchar((Stream *)stream);
 }
+
+int fputc(int c, FILE *stream)
+{
+    return stream_putchar((Stream *)stream, (char)c);
+}

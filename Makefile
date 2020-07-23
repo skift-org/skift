@@ -37,13 +37,12 @@ CFLAGS:= \
 	\
 	-Wall \
 	-Wextra  \
-	-Wc++-compat \
 	-Werror \
 	\
 	-I. \
 	-Iapplications \
 	-Ilibraries \
-	-Ilibraries/libcompat \
+	-Ilibraries/libc \
 	\
 	-D__BUILD_ARCH__=\""$(BUILD_ARCH)"\" \
 	-D__BUILD_CONFIG__=\""$(BUILD_CONFIG)"\" \

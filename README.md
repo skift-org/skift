@@ -36,7 +36,6 @@ A simple, handmade, operating system for the intel x86 cpu.
  - PNG support through lodepng
  - Graphical user interface library (libwidget)
  - A compositing window manager (Compositor)
- - Posix and libc compatibility layer library (libcompat)
  - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
  - It can run DOOM :rage3:
 

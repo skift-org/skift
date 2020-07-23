@@ -1,4 +1,4 @@
 -Ikernel
 -Ilibraries
 -Iapplication
--Ilibraries/libcompat
+-Ilibraries/libc

@@ -47,11 +47,11 @@ TARGETS += $$($(1)_ARCHIVE)
 OBJECTS += $$($(1)_OBJECTS)
 ICONS += $$($(1)_ICONS)
 
-# Special case for libcompat to copy the headers to the right location without the libcompat prefix.
-ifneq ($(1), COMPAT)
+# Special case for libc to copy the headers to the right location without the libc prefix.
+ifneq ($(1), C)
 HEADERS += $$(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
 else
-HEADERS += $$(patsubst libraries/libcompat/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
+HEADERS += $$(patsubst libraries/libc/%, $(BUILD_DIRECTORY_INCLUDE)/%, $$($(1)_HEADERS))
 endif
 
 $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
@@ -75,7 +75,7 @@ $(BUILD_DIRECTORY_INCLUDE)/%.h: libraries/%.h
 	$(DIRECTORY_GUARD)
 	cp $< $@
 
-$(BUILD_DIRECTORY_INCLUDE)/%.h: libraries/libcompat/%.h
+$(BUILD_DIRECTORY_INCLUDE)/%.h: libraries/libc/%.h
 	$(DIRECTORY_GUARD)
 	cp $< $@
 

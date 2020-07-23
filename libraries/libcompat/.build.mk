@@ -1,3 +1,0 @@
-LIBS += COMPAT
-
-COMPAT_NAME = compat

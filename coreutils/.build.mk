@@ -28,7 +28,7 @@ __TESTEXEC_NAME = __testexec
 __TESTEXEC_LIBS =
 
 __TESTPOSIX_NAME = __testposix
-__TESTPOSIX_LIBS = compat
+__TESTPOSIX_LIBS = c
 
 __TESTTERM_NAME = __testterm
 __TESTTERM_LIBS =

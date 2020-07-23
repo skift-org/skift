@@ -26,6 +26,15 @@ if [ -e "$PREFIX/build-ok" ]; then
     exit 0
 fi
 
+DEV_MODE=
+while [ "$1" != "" ]; do
+    case $1 in
+        --dev )           DEV_MODE=1
+                          ;;
+    esac
+    shift
+done
+
 cd "$DIR"
 
 mkdir -p tarballs
@@ -50,10 +59,14 @@ pushd tarballs
         tar -xf "$BINUTILS_FILENAME"
 
         pushd "$BINUTILS_DIRECTORY"
-            git init
-            git add .
-            git commit -am "BASE"
-            git apply $DIR/patches/new-binutils.patch
+            if [ "$DEV_MODE" = "1" ]; then
+                git init
+                git add .
+                git commit -am "BASE"
+                git apply $DIR/patches/new-binutils.patch
+            else
+                patch -p1 < $DIR/Patches/new-binutils.patch
+            fi
         popd
     else
         echo "Skipped extracting binutils"
@@ -64,10 +77,14 @@ pushd tarballs
         tar -xf "$GCC_FILENAME"
 
         pushd "$GCC_DIRECTORY"
-            git init
-            git add .
-            git commit -am "BASE"
-            git apply $DIR/patches/new-gcc.patch
+            if [ "$DEV_MODE" = "1" ]; then
+                git init
+                git add .
+                git commit -am "BASE"
+                git apply $DIR/patches/new-gcc.patch
+            else
+                patch -p1 < $DIR/patches/new-gcc.patch
+            fi
         popd
     else
         echo "Skipped extracting gcc"

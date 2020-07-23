@@ -56,16 +56,18 @@ index cf1a87e2e..0ea5c7fa7 100644
  	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
 diff --git a/gcc/config/skift.h b/gcc/config/skift.h
 new file mode 100644
-index 000000000..6e38e9846
+index 000000000..e9fb8ab0d
 --- /dev/null
 +++ b/gcc/config/skift.h
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,34 @@
 +/* Useful if you wish to make target-specific GCC changes. */
 +#undef TARGET_skift
 +#define TARGET_skift 1
 +
 +#undef STANDARD_STARTFILE_PREFIX
 +#define STANDARD_STARTFILE_PREFIX "/System/Libraries/"
++
++#define MATH_LIBRARY ""
 +
 +/* Default arguments you want when running your
 +   i686-skift-gcc/x86_64-skift-gcc toolchain */
@@ -83,15 +85,15 @@ index 000000000..6e38e9846
 +
 +/* Additional predefined macros. */
 +#undef TARGET_OS_CPP_BUILTINS
-+#define TARGET_OS_CPP_BUILTINS()        \
-+    do                                  \
-+    {                                   \
-+        builtin_define("__skift__");    \
-+        builtin_define("__unix__");     \
-+        builtin_assert("system=skift"); \
-+        builtin_assert("system=unix");  \
-+        builtin_assert("system=posix"); \
-+    } while (0);
++#define TARGET_OS_CPP_BUILTINS()      \
++   do                                 \
++   {                                  \
++      builtin_define("__skift__");    \
++      builtin_define("__unix__");     \
++      builtin_assert("system=skift"); \
++      builtin_assert("system=unix");  \
++      builtin_assert("system=posix"); \
++   } while (0);
 diff --git a/libgcc/config.host b/libgcc/config.host
 index 1ff415923..91543e550 100644
 --- a/libgcc/config.host

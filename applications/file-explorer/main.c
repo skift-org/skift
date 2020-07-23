@@ -1,7 +1,7 @@
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/system/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 

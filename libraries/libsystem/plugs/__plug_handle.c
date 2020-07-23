@@ -1,7 +1,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
 {

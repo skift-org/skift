@@ -1,5 +1,5 @@
 
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 
 int __handle_printf_error(Handle *handle, const char *fmt, ...)
@@ -11,7 +11,7 @@ int __handle_printf_error(Handle *handle, const char *fmt, ...)
 
     va_end(va);
 
-    stream_printf(err_stream, ": %s\n", handle_error_string(handle));
+    stream_format(err_stream, ": %s\n", handle_error_string(handle));
 
     return result;
 }

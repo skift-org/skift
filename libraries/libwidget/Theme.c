@@ -1,6 +1,6 @@
 #include <libjson/Json.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/system/Logger.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libwidget/Theme.h>
 

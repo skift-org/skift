@@ -16,7 +16,10 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/unicode/*.c) \
 	$(wildcard libraries/libsystem/process/*.c) \
 	$(wildcard libraries/libsystem/math/*.c) \
-	$(wildcard libraries/libsystem/utils/*.c)
+	$(wildcard libraries/libsystem/utils/*.c) \
+	$(wildcard libraries/libsystem/core/*.c) \
+	$(wildcard libraries/libsystem/thread/*.c) \
+	$(wildcard libraries/libsystem/system/*.c)
 
 KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 

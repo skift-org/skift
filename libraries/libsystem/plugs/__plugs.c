@@ -1,11 +1,11 @@
 
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
-#include <libsystem/Lock.h>
-#include <libsystem/Logger.h>
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/system/Logger.h>
+#include <libsystem/thread/Lock.h>
 
 Lock memlock;
 Lock loglock;
@@ -83,7 +83,7 @@ void __plug_logger_unlock(void)
 
 void __no_return __plug_logger_fatal(void)
 {
-    stream_printf(err_stream, "Fatal error occurred (see logs)!\n");
+    stream_format(err_stream, "Fatal error occurred (see logs)!\n");
     __plug_process_exit(-1);
 }
 

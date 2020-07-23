@@ -182,7 +182,7 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
     return RECTANGLE(0, 0, width, font->size);
 }
 
-#include <libsystem/Logger.h>
+#include <libsystem/system/Logger.h>
 
 int truetypefont_get_kerning_for_codepoints(TrueTypeFont *font, Codepoint left, Codepoint right)
 {

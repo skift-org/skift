@@ -1,4 +1,4 @@
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/io/Pipe.h>
 
 Pipe *pipe_create(void)

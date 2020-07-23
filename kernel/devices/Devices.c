@@ -1,5 +1,5 @@
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/system/Logger.h>
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"

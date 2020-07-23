@@ -1,5 +1,5 @@
-#include <libsystem/Random.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/system/Random.h>
 
 Random random_create(void)
 {

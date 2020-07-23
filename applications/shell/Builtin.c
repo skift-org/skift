@@ -1,5 +1,5 @@
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/NumberParser.h>
@@ -19,7 +19,7 @@ int shell_builtin_cd(int argc, const char **argv)
 
     if (result != SUCCESS)
     {
-        stream_printf(err_stream, "cd: Cannot access '%s': %s\n", new_directory, result_to_string(result));
+        stream_format(err_stream, "cd: Cannot access '%s': %s\n", new_directory, result_to_string(result));
         return -1;
     }
 

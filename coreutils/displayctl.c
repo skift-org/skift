@@ -1,8 +1,8 @@
 #include <abi/Paths.h>
 
-#include <libsystem/CString.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Socket.h>

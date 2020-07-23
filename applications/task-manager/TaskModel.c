@@ -1,7 +1,7 @@
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
+#include <libsystem/system/Logger.h>
 
 #include "task-manager/TaskModel.h"
 

@@ -1,14 +1,14 @@
 #include <abi/Keyboard.h>
 #include <abi/Paths.h>
 
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/system/Logger.h>
 
 bool option_get;
 bool option_list;
@@ -68,7 +68,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     if (result != SUCCESS)
     {
-        stream_printf(err_stream, "keyboardctl: Failled to open the keymap file: %s", result_to_string(result));
+        stream_format(err_stream, "keyboardctl: Failled to open the keymap file: %s", result_to_string(result));
         return -1;
     }
 
@@ -78,7 +78,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         keymap->magic[2] != 'a' ||
         keymap->magic[3] != 'p')
     {
-        stream_printf(err_stream, "keyboardctl: Invalid keymap file format!\n");
+        stream_format(err_stream, "keyboardctl: Invalid keymap file format!\n");
         return -1;
     }
 

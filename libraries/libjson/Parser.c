@@ -1,6 +1,6 @@
 #include <libjson/Json.h>
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>

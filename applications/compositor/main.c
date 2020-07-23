@@ -1,7 +1,6 @@
 #include <abi/Paths.h>
 
 #include <libsystem/Assert.h>
-#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
@@ -9,6 +8,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/system/Logger.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 
 #include "compositor/Client.h"

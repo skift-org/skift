@@ -1,5 +1,5 @@
 #include <abi/Paths.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/filesystem/Filesystem.h"
 

@@ -1,4 +1,4 @@
-#include <libsystem/Atomic.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "arch/x86/COM.h"
 #include "arch/x86/x86.h"

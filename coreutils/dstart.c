@@ -8,7 +8,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        stream_printf(err_stream, "dstart: No executable specified!\n");
+        stream_format(err_stream, "dstart: No executable specified!\n");
         return -1;
     }
 
@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
 
     if (result < 0)
     {
-        stream_printf(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string(result));
+        stream_format(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string(result));
         return -1;
     }
 

@@ -1,7 +1,7 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/Result.h>
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 
 int process_this(void)

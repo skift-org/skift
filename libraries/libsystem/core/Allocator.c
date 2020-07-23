@@ -1,12 +1,12 @@
 
 /* __alloc__.c : based on durand's Amazing Super Duper Memory functions.      */
 
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/system/Logger.h>
 
 #define VERSION "1.1"
 #define ALIGNMENT 16ul
@@ -105,17 +105,17 @@ static void liballoc_dump()
 	struct liballoc_minor *min = NULL;
 #endif
 
-	stream_printf(log_stream, "liballoc: ------ Memory data ---------------\n");
-	stream_printf(log_stream, "liballoc: System memory allocated: %i bytes\n", l_allocated);
-	stream_printf(log_stream, "liballoc: Memory in used (malloc'ed): %i bytes\n", l_inuse);
-	stream_printf(log_stream, "liballoc: Warning count: %i\n", l_warningCount);
-	stream_printf(log_stream, "liballoc: Error count: %i\n", l_errorCount);
-	stream_printf(log_stream, "liballoc: Possible overruns: %i\n", l_possibleOverruns);
+	stream_format(log_stream, "liballoc: ------ Memory data ---------------\n");
+	stream_format(log_stream, "liballoc: System memory allocated: %i bytes\n", l_allocated);
+	stream_format(log_stream, "liballoc: Memory in used (malloc'ed): %i bytes\n", l_inuse);
+	stream_format(log_stream, "liballoc: Warning count: %i\n", l_warningCount);
+	stream_format(log_stream, "liballoc: Error count: %i\n", l_errorCount);
+	stream_format(log_stream, "liballoc: Possible overruns: %i\n", l_possibleOverruns);
 
 #ifdef DEBUG
 	while (maj != NULL)
 	{
-		stream_printf(log_stream, "liballoc: 0x%x: total = %i, used = %i\n",
+		stream_format(log_stream, "liballoc: 0x%x: total = %i, used = %i\n",
 					  maj,
 					  maj->size,
 					  maj->usage);
@@ -123,7 +123,7 @@ static void liballoc_dump()
 		min = maj->first;
 		while (min != NULL)
 		{
-			stream_printf(log_stream, "liballoc:    0x%x: %i bytes\n",
+			stream_format(log_stream, "liballoc:    0x%x: %i bytes\n",
 						  min,
 						  min->size);
 			min = min->next;
@@ -180,9 +180,9 @@ static struct liballoc_major *allocate_new_page(unsigned int size)
 	l_allocated += maj->size;
 
 #ifdef DEBUG
-	stream_printf(log_stream, "liballoc: Resource allocated 0x%x of %i pages (%i bytes) for %i size.\n", maj, st, maj->size, size);
+	stream_format(log_stream, "liballoc: Resource allocated 0x%x of %i pages (%i bytes) for %i size.\n", maj, st, maj->size, size);
 
-	stream_printf(log_stream, "liballoc: Total memory usage = %i KB\n", (int)((l_allocated / (1024))));
+	stream_format(log_stream, "liballoc: Total memory usage = %i KB\n", (int)((l_allocated / (1024))));
 	FLUSH();
 #endif
 
@@ -225,7 +225,7 @@ void *malloc(size_t req_size)
 	{
 #if defined DEBUG || defined INFO
 #ifdef DEBUG
-		stream_printf(log_stream, "liballoc: initialization of liballoc " VERSION "\n");
+		stream_format(log_stream, "liballoc: initialization of liballoc " VERSION "\n");
 #endif
 		FLUSH();
 #endif
@@ -236,20 +236,20 @@ void *malloc(size_t req_size)
 		{
 			__plug_memalloc_unlock();
 #ifdef DEBUG
-			stream_printf(log_stream, "liballoc: initial l_memRoot initialization failed\n", p);
+			stream_format(log_stream, "liballoc: initial l_memRoot initialization failed\n", p);
 			FLUSH();
 #endif
 			return NULL;
 		}
 
 #ifdef DEBUG
-		stream_printf(log_stream, "liballoc: set up first memory major 0x%x\n", l_memRoot);
+		stream_format(log_stream, "liballoc: set up first memory major 0x%x\n", l_memRoot);
 		FLUSH();
 #endif
 	}
 
 #ifdef DEBUG
-	stream_printf(log_stream, "liballoc: 0x%x malloc( %i ): ",
+	stream_format(log_stream, "liballoc: 0x%x malloc( %i ): ",
 				  __builtin_return_address(0),
 				  size);
 	FLUSH();
@@ -290,7 +290,7 @@ void *malloc(size_t req_size)
 		if (diff < (size + sizeof(struct liballoc_minor)))
 		{
 #ifdef DEBUG
-			stream_printf(log_stream, "CASE 1: Insufficient space in block 0x%x\n", maj);
+			stream_format(log_stream, "CASE 1: Insufficient space in block 0x%x\n", maj);
 			FLUSH();
 #endif
 
@@ -342,7 +342,7 @@ void *malloc(size_t req_size)
 			ALIGN(p);
 
 #ifdef DEBUG
-			stream_printf(log_stream, "CASE 2: returning 0x%x\n", p);
+			stream_format(log_stream, "CASE 2: returning 0x%x\n", p);
 			FLUSH();
 #endif
 			__plug_memalloc_unlock(); // release the lock
@@ -378,7 +378,7 @@ void *malloc(size_t req_size)
 			ALIGN(p);
 
 #ifdef DEBUG
-			stream_printf(log_stream, "CASE 3: returning 0x%x\n", p);
+			stream_format(log_stream, "CASE 3: returning 0x%x\n", p);
 			FLUSH();
 #endif
 			__plug_memalloc_unlock(); // release the lock
@@ -424,7 +424,7 @@ void *malloc(size_t req_size)
 					ALIGN(p);
 
 #ifdef DEBUG
-					stream_printf(log_stream, "CASE 4.1: returning 0x%x\n", p);
+					stream_format(log_stream, "CASE 4.1: returning 0x%x\n", p);
 					FLUSH();
 #endif
 					__plug_memalloc_unlock(); // release the lock
@@ -463,7 +463,7 @@ void *malloc(size_t req_size)
 					ALIGN(p);
 
 #ifdef DEBUG
-					stream_printf(log_stream, "CASE 4.2: returning 0x%x\n", p);
+					stream_format(log_stream, "CASE 4.2: returning 0x%x\n", p);
 					FLUSH();
 #endif
 
@@ -483,7 +483,7 @@ void *malloc(size_t req_size)
 		if (maj->next == NULL)
 		{
 #ifdef DEBUG
-			stream_printf(log_stream, "CASE 5: block full\n");
+			stream_format(log_stream, "CASE 5: block full\n");
 			FLUSH();
 #endif
 
@@ -569,7 +569,7 @@ void free(void *ptr)
 	}
 
 #ifdef DEBUG
-	stream_printf(log_stream, "liballoc: 0x%x free( 0x%x ): ",
+	stream_format(log_stream, "liballoc: 0x%x free( 0x%x ): ",
 				  __builtin_return_address(0),
 				  ptr);
 	FLUSH();
@@ -621,7 +621,7 @@ void free(void *ptr)
 	}
 
 #ifdef DEBUG
-	stream_printf(log_stream, "OK\n");
+	stream_format(log_stream, "OK\n");
 	FLUSH();
 #endif
 

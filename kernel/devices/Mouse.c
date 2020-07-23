@@ -1,8 +1,8 @@
 #include <abi/Mouse.h>
 #include <abi/Paths.h>
 
-#include <libsystem/Atomic.h>
-#include <libsystem/Logger.h>
+#include <libsystem/system/Logger.h>
+#include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/PS2.h"

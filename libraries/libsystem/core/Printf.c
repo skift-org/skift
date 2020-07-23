@@ -1,9 +1,9 @@
 
 // printf.c : printf and snprintf internals
 
-#include <libsystem/CString.h>
-#include <libsystem/CType.h>
-#include <libsystem/__printf__.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/core/CType.h>
+#include <libsystem/core/Printf.h>
 #include <libsystem/utils/NumberFormatter.h>
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)

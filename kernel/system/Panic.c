@@ -1,4 +1,4 @@
-#include <libsystem/Atomic.h>
+#include <libsystem/thread/Atomic.h>
 
 /* XXX: we should not depend on X86 directly */
 #include "arch/x86/CPUID.h"

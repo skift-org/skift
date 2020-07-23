@@ -1,4 +1,4 @@
-#include <libsystem/Lock.h>
+#include <libsystem/thread/Lock.h>
 #include <libsystem/utils/List.h>
 
 #include "kernel/memory/Memory.h"

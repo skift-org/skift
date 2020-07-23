@@ -1,9 +1,9 @@
 
 #include <libsystem/Assert.h>
-#include <libsystem/Atomic.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/system/Logger.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/MemoryObject.h"

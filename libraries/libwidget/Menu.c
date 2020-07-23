@@ -1,4 +1,4 @@
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libwidget/Menu.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>

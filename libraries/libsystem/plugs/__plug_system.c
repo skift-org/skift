@@ -1,7 +1,7 @@
 
 #include <abi/Syscalls.h>
 
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 
 void __plug_system_get_info(SystemInfo *info)
 {

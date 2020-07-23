@@ -1,4 +1,4 @@
-#include <libsystem/Atomic.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
 

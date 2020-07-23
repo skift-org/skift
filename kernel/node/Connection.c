@@ -1,5 +1,5 @@
 
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"

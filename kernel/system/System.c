@@ -1,5 +1,5 @@
 #include <libsystem/BuildInfo.h>
-#include <libsystem/Logger.h>
+#include <libsystem/system/Logger.h>
 
 #include "arch/Arch.h"
 #include "kernel/scheduling/Scheduler.h"

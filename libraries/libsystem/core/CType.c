@@ -1,5 +1,5 @@
 
-#include <libsystem/CType.h>
+#include <libsystem/core/CType.h>
 
 int islower(int c)
 {

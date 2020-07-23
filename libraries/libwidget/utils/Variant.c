@@ -1,5 +1,5 @@
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libwidget/utils/Variant.h>
 
 Variant vint(int value)

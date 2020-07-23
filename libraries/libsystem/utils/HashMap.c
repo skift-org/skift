@@ -1,4 +1,4 @@
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/utils/HashMap.h>
 
 typedef void *(*HashMapCopyKeyCallback)(const void *value);

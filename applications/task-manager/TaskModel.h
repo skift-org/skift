@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libjson/Json.h>
-#include <libsystem/Path.h>
+#include <libsystem/io/Path.h>
 #include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
 

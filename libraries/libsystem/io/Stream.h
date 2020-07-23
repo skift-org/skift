@@ -2,8 +2,8 @@
 
 /* stream.h: generic io interface                                           */
 
-#include <libsystem/Path.h>
 #include <libsystem/io/Handle.h>
+#include <libsystem/io/Path.h>
 
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>
@@ -60,10 +60,10 @@ int stream_ungetchar(Stream *stream, char c);
 
 bool stream_is_end_file(Stream *stream);
 
-int stream_printf(Stream *stream, const char *fmt, ...);
+int stream_format(Stream *stream, const char *fmt, ...);
 
 int stream_vprintf(Stream *stream, const char *fmt, va_list va);
 
-#define printf(__args...) stream_printf(out_stream, __args)
+#define printf(__args...) stream_format(out_stream, __args)
 
 #define vprintf(__fmt, __va) stream_vprintf(out_stream, __fmt, __va)

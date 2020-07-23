@@ -3,9 +3,9 @@
 #include <abi/Paths.h>
 
 #include <libgraphic/Framebuffer.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
+#include <libsystem/system/Logger.h>
 
 Framebuffer *framebuffer_open(void)
 {

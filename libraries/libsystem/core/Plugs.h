@@ -6,10 +6,11 @@
 #include <abi/Handle.h>
 #include <abi/IOCall.h>
 #include <abi/Launchpad.h>
+#include <abi/System.h>
 
-#include <libsystem/Lock.h>
-#include <libsystem/System.h>
 #include <libsystem/Time.h>
+#include <libsystem/io/Path.h>
+#include <libsystem/thread/Lock.h>
 
 void __plug_init(void);
 

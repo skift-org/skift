@@ -1,7 +1,7 @@
 
-#include <libsystem/CString.h>
 #include <libsystem/Common.h>
-#include <libsystem/__printf__.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/core/Printf.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/math/MinMax.h>
 

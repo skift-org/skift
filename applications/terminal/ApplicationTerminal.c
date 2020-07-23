@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/Logger.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/system/Logger.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
 
@@ -210,22 +210,22 @@ void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
     {
         if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
-            stream_printf(terminal_widget->master_stream, "\e[A");
+            stream_format(terminal_widget->master_stream, "\e[A");
             event->accepted = true;
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
-            stream_printf(terminal_widget->master_stream, "\e[B");
+            stream_format(terminal_widget->master_stream, "\e[B");
             event->accepted = true;
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
-            stream_printf(terminal_widget->master_stream, "\e[C");
+            stream_format(terminal_widget->master_stream, "\e[C");
             event->accepted = true;
         }
         else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
-            stream_printf(terminal_widget->master_stream, "\e[D");
+            stream_format(terminal_widget->master_stream, "\e[D");
             event->accepted = true;
         }
         else if (event->keyboard.codepoint != 0)

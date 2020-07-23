@@ -1,6 +1,6 @@
 #include <abi/Paths.h>
 
-#include <libsystem/Atomic.h>
+#include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/COM.h"

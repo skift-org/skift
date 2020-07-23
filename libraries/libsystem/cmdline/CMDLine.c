@@ -2,8 +2,8 @@
 /* cmdline.c: skiftOS command line application utils                          */
 
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
 #include <libsystem/cmdline/CMDLine.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/NumberParser.h>
@@ -178,7 +178,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
 
             if (option == NULL)
             {
-                stream_printf(err_stream, "Unknow option '%s'!\n", current_argument + 2);
+                stream_format(err_stream, "Unknow option '%s'!\n", current_argument + 2);
                 process_exit(-1);
             }
 
@@ -192,7 +192,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
 
                 if (option == NULL)
                 {
-                    stream_printf(err_stream, "Unknow option '%c'!\n", current_argument[1 + j]);
+                    stream_format(err_stream, "Unknow option '%c'!\n", current_argument[1 + j]);
                     process_exit(-1);
                 }
 

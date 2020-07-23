@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libsystem/Logger.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/system/Logger.h>
 
 void __no_return exit(int status)
 {

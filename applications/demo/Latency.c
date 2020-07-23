@@ -1,6 +1,7 @@
+#include <libsystem/io/Path.h>
+#include <libsystem/system/System.h>
 
 #include "demo/Demos.h"
-#include <libsystem/System.h>
 
 static int _last_tick = 0;
 static int __i;

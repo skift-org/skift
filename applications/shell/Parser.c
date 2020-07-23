@@ -1,4 +1,4 @@
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/SourceReader.h>
 

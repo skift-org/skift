@@ -2,11 +2,11 @@
 /* syscalls.c syscalls handeling code                                         */
 
 #include <libsystem/Assert.h>
-#include <libsystem/Atomic.h>
 #include <libsystem/BuildInfo.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/system/Logger.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
 #include "kernel/filesystem/Filesystem.h"

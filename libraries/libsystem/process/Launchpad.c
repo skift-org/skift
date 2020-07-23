@@ -1,7 +1,7 @@
 
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)

@@ -1,6 +1,6 @@
 
-#include <libsystem/CString.h>
-#include <libsystem/Path.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/utils/BufferBuilder.h>
 

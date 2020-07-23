@@ -1,5 +1,5 @@
 #include <abi/Paths.h>
-#include <libsystem/Random.h>
+#include <libsystem/system/Random.h>
 
 #include "kernel/filesystem/Filesystem.h"
 

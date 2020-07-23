@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Label.h>
 

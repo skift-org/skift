@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libsystem/Lock.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/thread/Lock.h>
 
 struct FsNode;
 struct FsHandle;

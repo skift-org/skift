@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libsystem/Filesystem.h>
-#include <libsystem/Logger.h>
+#include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/system/Logger.h>
 
 #undef printf
 #undef puts

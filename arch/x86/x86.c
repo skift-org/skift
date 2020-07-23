@@ -1,4 +1,4 @@
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 
 #include "arch/x86/COM.h"
 #include "arch/x86/FPU.h"

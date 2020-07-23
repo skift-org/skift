@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Lock.h>
+#include <libsystem/thread/Lock.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "kernel/node/Node.h"

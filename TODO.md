@@ -24,6 +24,7 @@
     (https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-3200007)
     (https://github.com/doug65536/dgos/tree/master/kernel/device/virtio-base)
 
+
 ### x86 platform
  - [ ] Support for SMP
  - [ ] Map the kernel to the higher half of the memory

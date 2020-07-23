@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include <libsystem/Assert.h>
-#include <libsystem/__plugs__.h>
-#include <libsystem/__printf__.h>
+#include <libsystem/core/Plugs.h>
+#include <libsystem/core/Printf.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
 #include <libsystem/math/MinMax.h>
@@ -344,12 +344,12 @@ int stream_ungetchar(Stream *stream, char c)
     return 0;
 }
 
-void stream_printf_append(printf_info_t *info, char c)
+void stream_format_append(printf_info_t *info, char c)
 {
     stream_write((Stream *)info->output, &c, 1);
 }
 
-int stream_printf(Stream *stream, const char *fmt, ...)
+int stream_format(Stream *stream, const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -366,7 +366,7 @@ int stream_vprintf(Stream *stream, const char *fmt, va_list va)
     printf_info_t info = {};
 
     info.format = fmt;
-    info.append = stream_printf_append;
+    info.append = stream_format_append;
     info.output = (void *)stream;
     info.allocated = -1;
 

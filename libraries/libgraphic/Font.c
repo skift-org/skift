@@ -1,11 +1,11 @@
 
 #include <libgraphic/Font.h>
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
-#include <libsystem/Path.h>
 #include <libsystem/Result.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
+#include <libsystem/io/Path.h>
+#include <libsystem/system/Logger.h>
 
 Glyph *font_load_glyph(const char *name)
 {

@@ -1,6 +1,6 @@
 #include <libjson/Json.h>
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 
 JsonValue *json_create_string(const char *string)
 {

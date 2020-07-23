@@ -2,7 +2,7 @@
 
 #include <libgraphic/TrueType.h>
 #include <libsystem/Assert.h>
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
 
 #define TRUETYPE_MAX_OVERSAMPLE 8

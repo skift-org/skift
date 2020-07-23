@@ -2,10 +2,10 @@
 #include <abi/Paths.h>
 
 #include <libsystem/Assert.h>
-#include <libsystem/Atomic.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/system/Logger.h>
+#include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
 #include "arch/x86/PS2.h"

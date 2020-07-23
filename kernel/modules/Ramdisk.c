@@ -1,8 +1,8 @@
 
 #include <libfile/tar.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/system/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"

@@ -1,4 +1,4 @@
-#include <libsystem/CString.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 
 int matchstar(int c, char *re, char *text);
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 {
     if (argc <= 1)
     {
-        stream_printf(err_stream, "usage: grep pattern [file ...]\n");
+        stream_format(err_stream, "usage: grep pattern [file ...]\n");
         return 0;
     }
 

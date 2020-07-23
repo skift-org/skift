@@ -2,7 +2,7 @@
 #include <abi/Syscalls.h>
 
 #include <libsystem/Assert.h>
-#include <libsystem/__plugs__.h>
+#include <libsystem/core/Plugs.h>
 
 static int _cached_this = -1;
 

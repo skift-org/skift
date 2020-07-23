@@ -1,9 +1,9 @@
 #include <libjson/Json.h>
-#include <libsystem/CString.h>
-#include <libsystem/Logger.h>
-#include <libsystem/Path.h>
+#include <libsystem/core/CString.h>
+#include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/system/Logger.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/System/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/System/Configs/open/file-types.json"
@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
 {
     if (argc != 2)
     {
-        stream_printf(err_stream, "Usage: open FILENAME\n");
+        stream_format(err_stream, "Usage: open FILENAME\n");
         return -1;
     }
 
@@ -22,14 +22,14 @@ int main(int argc, char const *argv[])
 
     if (extension == NULL)
     {
-        stream_printf(err_stream, "The file does not have an extension.\n");
+        stream_format(err_stream, "The file does not have an extension.\n");
         return -1;
     }
     JsonValue *file_extensions = json_parse_file(FILE_EXTENSIONS_DATABASE_PATH);
 
     if (!json_is(file_extensions, JSON_OBJECT))
     {
-        stream_printf(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
+        stream_format(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
         return -1;
     }
 
@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
 
     if (!json_is(file_type, JSON_STRING))
     {
-        stream_printf(err_stream, "Unknown file extension %s.\n", extension);
+        stream_format(err_stream, "Unknown file extension %s.\n", extension);
         return -1;
     }
 
@@ -45,7 +45,7 @@ int main(int argc, char const *argv[])
 
     if (!json_is(file_types, JSON_OBJECT))
     {
-        stream_printf(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
+        stream_format(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
         return -1;
     }
 
@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
 
     if (!json_is(file_type_info, JSON_OBJECT))
     {
-        stream_printf(err_stream, "Unknown file type %s.\n", json_string_value(file_type));
+        stream_format(err_stream, "Unknown file type %s.\n", json_string_value(file_type));
         return -1;
     }
 

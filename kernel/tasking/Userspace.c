@@ -1,7 +1,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/tasking/Userspace.h"
 

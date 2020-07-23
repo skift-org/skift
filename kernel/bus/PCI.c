@@ -1,6 +1,6 @@
 
 #include <libsystem/core/CString.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"

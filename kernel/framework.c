@@ -5,7 +5,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/system/System.h>
 #include <libsystem/thread/Atomic.h>
 

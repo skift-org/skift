@@ -5,7 +5,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"

@@ -4,7 +4,7 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 
 #include "terminal/ApplicationTerminal.h"

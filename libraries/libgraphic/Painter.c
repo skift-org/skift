@@ -735,7 +735,7 @@ void painter_draw_truetype_glyph(Painter *painter, TrueTypeFont *font, TrueTypeG
     //painter_draw_rectangle(painter, dest, COLOR_RED);
 }
 
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font, const char *string, Vec2i position, Color color)
 {

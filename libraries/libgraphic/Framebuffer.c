@@ -5,7 +5,7 @@
 #include <libgraphic/Framebuffer.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 Framebuffer *framebuffer_open(void)
 {

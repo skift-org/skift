@@ -6,7 +6,7 @@
 /*                                                                            */
 
 #include <libsystem/Assert.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"

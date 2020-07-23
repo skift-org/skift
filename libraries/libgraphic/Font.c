@@ -5,7 +5,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Path.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 Glyph *font_load_glyph(const char *name)
 {

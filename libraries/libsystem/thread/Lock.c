@@ -2,7 +2,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/thread/Lock.h>
 
 void __lock_init(Lock *lock, const char *name)

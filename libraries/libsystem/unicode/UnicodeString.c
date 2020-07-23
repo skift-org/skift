@@ -1,7 +1,7 @@
 
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
 

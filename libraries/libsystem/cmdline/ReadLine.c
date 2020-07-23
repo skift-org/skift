@@ -3,7 +3,7 @@
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #define READLINE_ALLOCATED 128
 

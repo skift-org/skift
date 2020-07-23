@@ -1,6 +1,6 @@
 
 #include <libsystem/Assert.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 

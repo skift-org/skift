@@ -1,5 +1,5 @@
 #include <libsystem/Assert.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 
 #include "compositor/Client.h"

@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/Assert.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libwidget/widgets/Graph.h>
 
 static double distance(double from, double to, int size)

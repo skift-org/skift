@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
 

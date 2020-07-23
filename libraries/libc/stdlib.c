@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 void __no_return exit(int status)
 {

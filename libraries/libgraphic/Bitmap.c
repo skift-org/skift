@@ -10,7 +10,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/File.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 
 Bitmap *bitmap_create(size_t width, size_t height)

@@ -4,7 +4,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 static bool option_all = false;
 static bool option_list = false;

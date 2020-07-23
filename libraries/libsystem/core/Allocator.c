@@ -6,7 +6,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #define VERSION "1.1"
 #define ALIGNMENT 16ul

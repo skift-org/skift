@@ -1,7 +1,7 @@
 #include <libgraphic/Icon.h>
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/utils/HashMap.h>
 
 static HashMap *_icons;

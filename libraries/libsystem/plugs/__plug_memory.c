@@ -2,7 +2,7 @@
 #include <abi/Syscalls.h>
 
 #include <libsystem/Result.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 
 Result shared_memory_alloc(size_t size, uintptr_t *out_address)

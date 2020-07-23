@@ -1,7 +1,7 @@
 #include <abi/Paths.h>
 
 #include <libsystem/math/MinMax.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "kernel/filesystem/Filesystem.h"

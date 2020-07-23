@@ -4,7 +4,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 int main(int argc, char **argv)
 {

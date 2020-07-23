@@ -8,7 +8,7 @@
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 bool option_get;
 bool option_list;

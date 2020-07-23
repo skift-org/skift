@@ -1,5 +1,5 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libwidget/widgets/Panel.h>
 
 void panel_paint(Panel *widget, Painter *painter, Rectangle rectangle)

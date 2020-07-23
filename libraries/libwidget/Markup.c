@@ -1,6 +1,6 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libsystem/utils/SourceReader.h>
 

@@ -4,7 +4,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 static bool logger_log_level = LOGGER_TRACE;
 

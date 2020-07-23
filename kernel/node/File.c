@@ -2,7 +2,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/system/Logger.h>
+#include <libsystem/Logger.h>
 
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"

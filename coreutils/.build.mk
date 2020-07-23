@@ -21,7 +21,6 @@ UTILS = \
 	PANIC \
 	SYSFETCH \
 	TOUCH \
-	TTFDUMP \
 	UNLINK \
 	UPTIME
 
@@ -90,9 +89,6 @@ SYSFETCH_LIBS =
 
 TOUCH_NAME = touch
 TOUCH_LIBS =
-
-TTFDUMP_NAME = ttfdump
-TTFDUMP_LIBS = graphic math
 
 UNLINK_NAME = unlink
 UNLINK_LIBS =

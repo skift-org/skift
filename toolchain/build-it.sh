@@ -65,7 +65,7 @@ pushd tarballs
                 git commit -am "BASE"
                 git apply $DIR/patches/binutils.patch
             else
-                patch -p1 < $DIR/Patches/binutils.patch
+                patch -p1 < $DIR/patches/binutils.patch
             fi
         popd
     else

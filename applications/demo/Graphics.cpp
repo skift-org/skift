@@ -19,7 +19,9 @@ void graphics_draw(Painter *painter, Rectangle screen, double time)
     {
         for (int y = 0; y < screen.height; y++)
         {
-            painter_plot_pixel(painter, vec2i(screen.x + x, screen.y + y), (Color){{x ^ y, x ^ y, x ^ y, 255}});
+            uint8_t pixel = x ^ y;
+
+            painter_plot_pixel(painter, vec2i(screen.x + x, screen.y + y), (Color){{pixel, pixel, pixel, 255}});
         }
     }
 

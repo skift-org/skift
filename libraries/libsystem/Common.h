@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include <libsystem/Macros.h>
+#include <libsystem/core/Allocator.h>
 
 typedef unsigned int uint;
 
@@ -28,17 +29,6 @@ typedef struct
 
 #define SOURCE_LOCATION \
     ((__SOURCE_LOCATION__){__FILE__, __FUNCTION__, __LINE__})
-
-/* --- Raw memory allocation ------------------------------------------------ */
-
-__attribute__((malloc)) __attribute__((alloc_size(1))) void *malloc(size_t size);
-__attribute__((malloc)) __attribute__((alloc_size(1, 2))) void *calloc(size_t, size_t);
-
-void *realloc(void *p, size_t size);
-
-void free(void *);
-
-void malloc_cleanup(void *buffer);
 
 /* --- Loops ---------------------------------------------------------------- */
 

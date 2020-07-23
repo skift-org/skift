@@ -47,6 +47,8 @@ void textmode_terminal_on_paint(Terminal *terminal, TextmodeTerminalRenderer *re
 void textmode_terminal_repaint(Terminal *terminal, TextmodeTerminalRenderer *renderer)
 {
     IOCallTextModeStateArgs args = {
+        .width = -1,
+        .height = -1,
         .cursor_x = terminal->cursor.x,
         .cursor_y = terminal->cursor.y,
     };

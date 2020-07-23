@@ -102,8 +102,8 @@ void breadcrumb_destroy(Breadcrumb *widget)
 static const WidgetClass breadcrumb_class = {
     .name = "Breadcrumb",
 
-    .paint = (WidgetPaintCallback)breadcrumb_paint,
     .destroy = (WidgetDestroyCallback)breadcrumb_destroy,
+    .paint = (WidgetPaintCallback)breadcrumb_paint,
 };
 
 Widget *breadcrumb_create(Widget *parent, const char *current_path)

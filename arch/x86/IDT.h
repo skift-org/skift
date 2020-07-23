@@ -32,6 +32,6 @@ typedef struct __packed
         .offset16_31 = (u16)(((__offset) >> 16) & 0xffff), \
     }
 
-extern void idt_flush(u32);
+extern "C" void idt_flush(u32);
 
 void idt_initialize(void);

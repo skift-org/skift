@@ -51,7 +51,10 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
+    Event event_value_changed = {};
+    event_value_changed.type = EVENT_VALUE_CHANGE;
+    widget_event(WIDGET(widget), &event_value_changed);
+
     widget_update(WIDGET(widget));
 }
 
@@ -64,7 +67,10 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
-    widget_event(WIDGET(widget), &(Event){.type = EVENT_VALUE_CHANGE});
+    Event event_value_changed = {};
+    event_value_changed.type = EVENT_VALUE_CHANGE;
+    widget_event(WIDGET(widget), &event_value_changed);
+
     widget_update(WIDGET(widget));
 }
 

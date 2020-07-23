@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
@@ -58,7 +58,11 @@ void button_event(Button *widget, Event *event)
         widget_update(WIDGET(widget));
         event->accepted = true;
 
-        widget_event(WIDGET(widget), &(Event){.type = EVENT_ACTION});
+        Event action_event = {};
+
+        action_event.type = EVENT_ACTION;
+
+        widget_event(WIDGET(widget), &action_event);
     }
 }
 

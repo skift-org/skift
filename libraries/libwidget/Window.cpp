@@ -19,9 +19,9 @@ static void close_button_click(void *target, struct Widget *sender, struct Event
     __unused(target);
     __unused(event);
 
-    Event close_event = {
-        .type = EVENT_WINDOW_CLOSING,
-    };
+    Event close_event = {};
+
+    close_event.type = EVENT_WINDOW_CLOSING;
 
     window_event(sender->window, &close_event);
 }

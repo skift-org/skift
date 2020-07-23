@@ -6,7 +6,6 @@
     __ENTRY(SYS_PROCESS_EXIT)             \
     __ENTRY(SYS_PROCESS_CANCEL)           \
     __ENTRY(SYS_PROCESS_SLEEP)            \
-    __ENTRY(SYS_PROCESS_WAKEUP)           \
     __ENTRY(SYS_PROCESS_WAIT)             \
     __ENTRY(SYS_PROCESS_GET_DIRECTORY)    \
     __ENTRY(SYS_PROCESS_SET_DIRECTORY)    \

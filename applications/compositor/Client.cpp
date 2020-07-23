@@ -114,8 +114,8 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         return;
     }
 
-    __swap(window->frontbuffer, window->backbuffer);
-    __swap(window->frontbuffer_handle, window->backbuffer_handle);
+    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
+    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
 
     if (window->frontbuffer_handle != flip_window.frontbuffer)
     {
@@ -160,7 +160,10 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
     }
 
     renderer_region_dirty(rectangle_offset(flip_window.bound, window->bound.position));
-    client_send_message(client, (CompositorMessage){.type = COMPOSITOR_MESSAGE_ACK});
+
+    CompositorMessage message = {};
+    message.type = COMPOSITOR_MESSAGE_ACK;
+    client_send_message(client, message);
 }
 
 void client_handle_cursor_window(Client *client, CompositorCursorWindow cursor_window)

@@ -1,9 +1,9 @@
 #include <libjson/Json.h>
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 
 #include "file-explorer/FileSystemModel.h"
 
@@ -81,9 +81,10 @@ static void filesystem_model_update(FileSystemModel *model)
     while (directory_read(directory, &entry) > 0)
     {
         FileSystemNode node = {
+            .name = {},
             .type = entry.stat.type,
-            .size = entry.stat.size,
             .icon = get_icon_for_node(model->current_path, &entry),
+            .size = entry.stat.size,
         };
 
         strcpy(node.name, entry.name);

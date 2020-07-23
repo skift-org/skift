@@ -29,11 +29,12 @@ BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 
 # --- Configs -------------------------------------------- #
 
-CC:=i686-pc-skift-gcc
+CC:=i686-pc-skift-g++
 CFLAGS:= \
-	-x c \
 	-O2 \
-	-std=gnu11 \
+	-std=c++17 \
+	-fno-rtti \
+	-fno-exceptions \
 	-MD \
 	\
 	-Wall \

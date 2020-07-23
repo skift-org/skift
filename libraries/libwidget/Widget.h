@@ -68,11 +68,11 @@ typedef struct WidgetClass
 {
     const char *name;
 
-    WidgetDestroyCallback destroy;
-    WidgetPaintCallback paint;
-    WidgetEventCallback event;
-    WidgetComputeSizeCallback size;
-    WidgetLayoutCallback layout;
+    WidgetDestroyCallback destroy = nullptr;
+    WidgetPaintCallback paint = nullptr;
+    WidgetEventCallback event = nullptr;
+    WidgetComputeSizeCallback size = nullptr;
+    WidgetLayoutCallback layout = nullptr;
 } WidgetClass;
 
 typedef struct Widget

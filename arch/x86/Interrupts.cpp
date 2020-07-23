@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/Logger.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/x86/Interrupts.h"
@@ -57,7 +57,7 @@ void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
     printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }
 
-uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
+extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
     if (stackframe.intno < 32)
     {

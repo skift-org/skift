@@ -1,10 +1,10 @@
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Lock.h>
 
 Lock memlock;
@@ -15,8 +15,8 @@ Stream *out_stream;
 Stream *err_stream;
 Stream *log_stream;
 
-extern void _init();
-extern void _fini();
+extern "C" void _init();
+extern "C" void _fini();
 
 void __plug_init(void)
 {

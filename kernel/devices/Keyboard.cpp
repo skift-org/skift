@@ -2,9 +2,9 @@
 #include <abi/Paths.h>
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/RingBuffer.h>
 
@@ -86,17 +86,23 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     {
         if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
         {
-            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_DOWN}, sizeof(KeyboardPacket));
+            KeyboardPacket packet = {key, codepoint, KEY_MOTION_DOWN};
+
+            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_UP)
         {
-            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_UP}, sizeof(KeyboardPacket));
+            KeyboardPacket packet = {key, codepoint, KEY_MOTION_UP};
+
+            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_DOWN)
         {
-            ringbuffer_write(_events_buffer, (char *)&(KeyboardPacket){key, codepoint, KEY_MOTION_TYPED}, sizeof(KeyboardPacket));
+            KeyboardPacket packet = {key, codepoint, KEY_MOTION_TYPED};
+
+            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
     }
 

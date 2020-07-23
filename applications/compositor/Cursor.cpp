@@ -1,6 +1,6 @@
 #include <libgraphic/Bitmap.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/Logger.h>
+#include <libsystem/io/Path.h>
 #include <libsystem/system/System.h>
 
 #include "compositor/Cursor.h"
@@ -21,15 +21,15 @@ static uint _last_click = 0;
 void cursor_initialize(void)
 {
     const char *cursor_paths[] = {
-        [CURSOR_BUSY] = "/System/Cursors/busy.png",
-        [CURSOR_DEFAULT] = "/System/Cursors/default.png",
-        [CURSOR_DISABLED] = "/System/Cursors/disabled.png",
-        [CURSOR_MOVE] = "/System/Cursors/move.png",
-        [CURSOR_RESIZEH] = "/System/Cursors/resizeh.png",
-        [CURSOR_RESIZEHV] = "/System/Cursors/resizehv.png",
-        [CURSOR_RESIZEV] = "/System/Cursors/resizev.png",
-        [CURSOR_RESIZEVH] = "/System/Cursors/resizevh.png",
-        [CURSOR_TEXT] = "/System/Cursors/text.png",
+        "/System/Cursors/default.png",
+        "/System/Cursors/text.png",
+        "/System/Cursors/disabled.png",
+        "/System/Cursors/busy.png",
+        "/System/Cursors/move.png",
+        "/System/Cursors/resizeh.png",
+        "/System/Cursors/resizehv.png",
+        "/System/Cursors/resizev.png",
+        "/System/Cursors/resizevh.png",
     };
 
     for (size_t i = 0; i < __CURSOR_COUNT; i++)

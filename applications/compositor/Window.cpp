@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "compositor/Client.h"
 #include "compositor/Manager.h"
@@ -86,12 +86,15 @@ void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position
 {
     Event event = {
         .type = EVENT_MOUSE_MOVE,
+        .accepted = false,
         .mouse = {
             .position = position,
             .old_position = old_position,
             .button = MOUSE_NO_BUTTON,
             .buttons = buttons,
         },
+
+        .keyboard = {},
     };
 
     window_send_event(window, event);
@@ -106,12 +109,15 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
     {
         Event event = {
             .type = EVENT_MOUSE_BUTTON_PRESS,
+            .accepted = false,
             .mouse = {
                 .position = position,
                 .old_position = position,
                 .button = button,
                 .buttons = buttons,
             },
+
+            .keyboard = {},
         };
 
         window_send_event(window, event);
@@ -121,12 +127,15 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
     {
         Event event = {
             .type = EVENT_MOUSE_BUTTON_RELEASE,
+            .accepted = false,
             .mouse = {
                 .position = position,
                 .old_position = position,
                 .button = button,
                 .buttons = buttons,
             },
+
+            .keyboard = {},
         };
 
         window_send_event(window, event);
@@ -148,12 +157,15 @@ void window_handle_double_click(Window *window, Vec2i position)
 {
     Event event = {
         .type = EVENT_MOUSE_DOUBLE_CLICK,
+        .accepted = false,
         .mouse = {
             .position = position,
             .old_position = position,
             .button = MOUSE_BUTTON_LEFT,
             .buttons = MOUSE_BUTTON_LEFT,
         },
+
+        .keyboard = {},
     };
 
     window_send_event(window, event);
@@ -162,11 +174,17 @@ void window_handle_double_click(Window *window, Vec2i position)
 void window_get_focus(Window *window)
 {
     renderer_region_dirty(window_bound(window));
-    window_send_event(window, (Event){.type = EVENT_GOT_FOCUS});
+
+    Event event = {};
+    event.type = EVENT_GOT_FOCUS;
+    window_send_event(window, event);
 }
 
 void window_lost_focus(Window *window)
 {
     renderer_region_dirty(window_bound(window));
-    window_send_event(window, (Event){.type = EVENT_LOST_FOCUS});
+
+    Event event = {};
+    event.type = EVENT_LOST_FOCUS;
+    window_send_event(window, event);
 }

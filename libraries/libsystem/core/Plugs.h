@@ -12,9 +12,9 @@
 #include <libsystem/io/Path.h>
 #include <libsystem/thread/Lock.h>
 
-void __plug_init(void);
+extern "C" void __plug_init(void);
 
-void __plug_fini(int exit_code);
+extern "C" void __plug_fini(int exit_code);
 
 void __no_return __plug_assert_failed(const char *expr, const char *file, const char *function, int line);
 

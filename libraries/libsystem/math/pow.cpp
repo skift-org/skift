@@ -1,3 +1,5 @@
+#include <libsystem/math/Math.h>
+
 double pow(double x, double y)
 {
     double out;

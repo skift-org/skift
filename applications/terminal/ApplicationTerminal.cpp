@@ -1,6 +1,6 @@
 #include <libgraphic/Painter.h>
-#include <libsystem/process/Launchpad.h>
 #include <libsystem/Logger.h>
+#include <libsystem/process/Launchpad.h>
 #include <libwidget/Event.h>
 #include <libwidget/Window.h>
 
@@ -9,8 +9,6 @@
 static Vec2i _cell_size = vec2i(7, 16);
 
 static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
-    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = THEME_ANSI_FOREGROUND,
-    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = THEME_ANSI_BACKGROUND,
     [TERMINAL_COLOR_BLACK] = THEME_ANSI_BLACK,
     [TERMINAL_COLOR_RED] = THEME_ANSI_RED,
     [TERMINAL_COLOR_GREEN] = THEME_ANSI_GREEN,
@@ -27,6 +25,8 @@ static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BRIGHT_MAGENTA] = THEME_ANSI_BRIGHT_MAGENTA,
     [TERMINAL_COLOR_BRIGHT_CYAN] = THEME_ANSI_BRIGHT_CYAN,
     [TERMINAL_COLOR_BRIGHT_GREY] = THEME_ANSI_BRIGHT_WHITE,
+    [TERMINAL_COLOR_DEFAULT_FOREGROUND] = THEME_ANSI_FOREGROUND,
+    [TERMINAL_COLOR_DEFAULT_BACKGROUND] = THEME_ANSI_BACKGROUND,
 };
 
 Font *get_terminal_font(void)

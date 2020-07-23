@@ -1,6 +1,6 @@
 
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
@@ -48,8 +48,12 @@ IterationDecision pci_device_iterate_slot(
     int slot)
 {
     PCIDevice device = {
+        .vendor = 0,
+        .device = 0,
+
         .bus = bus,
         .slot = slot,
+        .func = 0,
     };
 
     if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
@@ -64,6 +68,9 @@ IterationDecision pci_device_iterate_slot(
     for (int func = 1; func < 8; func++)
     {
         PCIDevice device = {
+            .vendor = 0,
+            .device = 0,
+
             .bus = bus,
             .slot = slot,
             .func = func,
@@ -97,7 +104,13 @@ IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callbac
 
     for (int func = 0; func < 8; ++func)
     {
-        PCIDevice device = {.bus = 0, .slot = 0, .func = func};
+        PCIDevice device = {
+            .vendor = 0,
+            .device = 0,
+            .bus = 0,
+            .slot = 0,
+            .func = func,
+        };
 
         if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
         {

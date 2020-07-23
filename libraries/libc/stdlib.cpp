@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libsystem/process/Process.h>
 #include <libsystem/Logger.h>
+#include <libsystem/process/Process.h>
 
 void __no_return exit(int status)
 {
@@ -13,11 +13,6 @@ void __no_return exit(int status)
     process_exit(status);
 
     TRACE_FUNCTION_END;
-}
-
-void abort(void)
-{
-    process_exit(-1);
 }
 
 int system(const char *command)

@@ -22,11 +22,11 @@ typedef struct CommandLineOption
 {
     CommandLineOptionType type;
 
+    void *value;
     const char short_name;
     const char *long_name;
     const char *description;
 
-    void *value;
     CommandLineCallback *callback;
 } CommandLineOption;
 
@@ -50,79 +50,87 @@ typedef struct CommandLine
     {                                            \
         .type = COMMANDLINE_SECTION,             \
         .value = COMMANDLINE_NO_VALUE,           \
-        .long_name = __name,                     \
         .short_name = COMMANDLINE_NO_SHORT_NAME, \
-        .callback = COMMANDLINE_NO_CALLBACK,     \
+        .long_name = __name,                     \
         .description = NULL,                     \
+        .callback = COMMANDLINE_NO_CALLBACK,     \
     }
 
 #define COMMANDLINE_OPT_SEPARATOR                \
     {                                            \
         .type = COMMANDLINE_SEPARATOR,           \
         .value = COMMANDLINE_NO_VALUE,           \
-        .long_name = NULL,                       \
         .short_name = COMMANDLINE_NO_SHORT_NAME, \
-        .callback = COMMANDLINE_NO_CALLBACK,     \
+        .long_name = NULL,                       \
         .description = NULL,                     \
+        .callback = COMMANDLINE_NO_CALLBACK,     \
     }
 
 #define COMMANDLINE_OPT_BOOL(__long_name, __short_name, __value, __description, __callback) \
     {                                                                                       \
         .type = COMMANDLINE_BOOLEAN,                                                        \
         .value = &(__value),                                                                \
-        .long_name = __long_name,                                                           \
         .short_name = __short_name,                                                         \
-        .callback = __callback,                                                             \
+        .long_name = __long_name,                                                           \
         .description = __description,                                                       \
+        .callback = __callback,                                                             \
     }
 
 #define COMMANDLINE_OPT_STRING(__long_name, __short_name, __value, __description, __callback) \
     {                                                                                         \
         .type = COMMANDLINE_STRING,                                                           \
         .value = &(__value),                                                                  \
-        .long_name = __long_name,                                                             \
         .short_name = __short_name,                                                           \
-        .callback = __callback,                                                               \
+        .long_name = __long_name,                                                             \
         .description = __description,                                                         \
+        .callback = __callback,                                                               \
     }
 
 #define COMMANDLINE_OPT_INT(__long_name, __short_name, __value, __description, __callback) \
     {                                                                                      \
         .type = COMMANDLINE_INTEGER,                                                       \
         .value = &(__value),                                                               \
-        .long_name = __long_name,                                                          \
         .short_name = __short_name,                                                        \
-        .callback = __callback,                                                            \
+        .long_name = __long_name,                                                          \
         .description = __description,                                                      \
+        .callback = __callback,                                                            \
     }
 
 #define COMMANDLINE_OPT_ACTION(__long_name, __short_name, __description, __callback) \
     {                                                                                \
         .type = COMMANDLINE_ACTION,                                                  \
         .value = COMMANDLINE_NO_VALUE,                                               \
-        .long_name = __long_name,                                                    \
         .short_name = __short_name,                                                  \
-        .callback = __callback,                                                      \
+        .long_name = __long_name,                                                    \
         .description = __description,                                                \
+        .callback = __callback,                                                      \
     }
 
 #define COMMANDLINE_OPT_HELP                               \
     {                                                      \
         .type = COMMANDLINE_BOOLEAN,                       \
         .value = NULL,                                     \
-        .long_name = "help",                               \
         .short_name = 'h',                                 \
-        .callback = cmdline_callback_help,                 \
+        .long_name = "help",                               \
         .description = "Show this help message and exit.", \
+        .callback = cmdline_callback_help,                 \
     }
 
 #define COMMANDLINE_OPT_END      \
     {                            \
         .type = COMMANDLINE_END, \
+                                 \
+        .value = NULL,           \
+        .short_name = 'x',       \
+        .long_name = "",         \
+        .description = "",       \
+                                 \
+        .callback = nullptr,     \
     }
 
 #define CMDLINE(__usages, __options, __prologue, __epiloge) \
     {                                                       \
+        .name = "<null>",                                   \
         .usages = __usages,                                 \
         .prologue = __prologue,                             \
         .options = __options,                               \

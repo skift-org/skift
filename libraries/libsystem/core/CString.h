@@ -1,6 +1,10 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <libsystem/Common.h>
+
+__BEGIN_HEADER
 
 void strnapd(char *str, char c, size_t n);
 void strapd(char *str, char c);
@@ -44,3 +48,5 @@ size_t strspn(const char *str1, const char *str2);
 char *strstr(const char *haystack, const char *needle);
 char *strtok(char *s, char **state, const char *delim);
 size_t strxfrm(char *dest, const char *src, size_t n);
+
+__END_HEADER

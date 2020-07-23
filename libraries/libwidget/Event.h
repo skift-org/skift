@@ -59,11 +59,8 @@ typedef struct Event
     EventType type;
     bool accepted;
 
-    union
-    {
-        MouseEvent mouse;
-        KeyboardEvent keyboard;
-    };
+    MouseEvent mouse;
+    KeyboardEvent keyboard;
 } Event;
 
 #define is_mouse_event(__event)                                  \

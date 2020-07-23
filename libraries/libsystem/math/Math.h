@@ -1,6 +1,10 @@
 #pragma once
 
+#include <__libc__.h>
+
 #include <libsystem/Common.h>
+
+__BEGIN_HEADER
 
 #define M_PI 3.1415926
 #define PI (3.141592654)
@@ -43,3 +47,5 @@ float floorf(float x);
 float fmodf(float x, float y);
 float sinf(float x);
 float sqrtf(float arg);
+
+__END_HEADER

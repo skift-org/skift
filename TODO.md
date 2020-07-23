@@ -6,8 +6,11 @@
  - [x] Update to GCC 10
  - [x] Update binutils
  - [ ] Update the make file to support C++
- - [ ] Rename all files from .c to .cpp
+ - [x] Rename all files from .c to .cpp
  - [ ] Rewrite the content of libsystem/utils
+
+## Build
+ - [ ] Improve make clean, don't removed rendered icons. 
 
 ## Kernel
 

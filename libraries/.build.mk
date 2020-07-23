@@ -29,14 +29,14 @@ define LIB_TEMPLATE =
 $(1)_ARCHIVE ?= $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
 
 $(1)_SOURCES = \
-	$$(wildcard libraries/lib$($(1)_NAME)/*.c) \
-	$$(wildcard libraries/lib$($(1)_NAME)/*/*.c)
+	$$(wildcard libraries/lib$($(1)_NAME)/*.cpp) \
+	$$(wildcard libraries/lib$($(1)_NAME)/*/*.cpp)
 
 $(1)_ASSEMBLY_SOURCES = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.s) \
 	$$(wildcard libraries/lib$($(1)_NAME)/*/*.s)
 
-$(1)_OBJECTS = $$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES)) \
+$(1)_OBJECTS = $$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES)) \
 			   $$(patsubst libraries/%.s, $(BUILD_DIRECTORY)/%.s.o, $$($(1)_ASSEMBLY_SOURCES))
 
 $(1)_HEADERS = \
@@ -59,7 +59,7 @@ $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	@echo [LIB$(1)] [AR] $$@
 	@$(AR) $(ARFLAGS) $$@ $$^
 
-$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.c
+$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CC] $$<
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) -c -o $$@ $$<

@@ -2,14 +2,14 @@ define APP_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/$($(1)_NAME)
 
-$(1)_SOURCES = $$(wildcard applications/$($(1)_NAME)/*.c) \
-			   $$(wildcard applications/$($(1)_NAME)/*/*.c)
+$(1)_SOURCES = $$(wildcard applications/$($(1)_NAME)/*.cpp) \
+			   $$(wildcard applications/$($(1)_NAME)/*/*.cpp)
 
 $(1)_OTHER = $$(wildcard applications/$($(1)_NAME)/*.markup) \
 			 $$(wildcard applications/$($(1)_NAME)/*.json) \
 			 $$(wildcard applications/$($(1)_NAME)/*.png)
 
-$(1)_OBJECTS = $$(patsubst applications/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
+$(1)_OBJECTS = $$(patsubst applications/%.cpp, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECTS)
@@ -21,7 +21,7 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 	@cp $$($(1)_OTHER) $(BUILD_DIRECTORY_APPS)/$($(1)_NAME) || true
 	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
 
-$$(BUILD_DIRECTORY)/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.c
+$$(BUILD_DIRECTORY)/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CC] $$<
 	@$(CC) $(CFLAGS) -c -o $$@ $$<

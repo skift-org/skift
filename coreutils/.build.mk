@@ -99,8 +99,8 @@ UPTIME_LIBS =
 define UTIL_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
-$(1)_SOURCE  = coreutils/$($(1)_NAME).c
-$(1)_OBJECT  = $$(patsubst coreutils/%.c, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCE))
+$(1)_SOURCE  = coreutils/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst coreutils/%.cpp, $$(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)

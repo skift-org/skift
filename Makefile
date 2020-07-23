@@ -31,6 +31,7 @@ BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 
 CC:=i686-pc-skift-gcc
 CFLAGS:= \
+	-x c \
 	-O2 \
 	-std=gnu11 \
 	-MD \

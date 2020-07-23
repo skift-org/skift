@@ -102,6 +102,8 @@ void *memmove(void *dest, const void *src, size_t n)
     return dest;
 }
 
+#if 0
+
 void *memcpy(void *s1, const void *s2, size_t n)
 {
     char *cdest;
@@ -126,6 +128,8 @@ void *memcpy(void *s1, const void *s2, size_t n)
 
     return s1;
 }
+
+#endif
 
 void *memset(void *str, int c, size_t n)
 {

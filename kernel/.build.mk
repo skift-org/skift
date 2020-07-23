@@ -19,12 +19,25 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/process/*.c) \
 	$(wildcard libraries/libsystem/utils/*.c)
 
+KERNEL_LIBRARIES_ASSEMBLY_SOURCES = \
+	$(wildcard libraries/libfile/*.s) \
+	$(wildcard libraries/libjson/*.s) \
+	$(wildcard libraries/libmath/*.s) \
+	$(wildcard libraries/libmath/*/*.s) \
+	$(wildcard libraries/libsystem/*.s) \
+	$(wildcard libraries/libsystem/io/*.s) \
+	$(wildcard libraries/libsystem/unicode/*.s) \
+	$(wildcard libraries/libsystem/process/*.s) \
+	$(wildcard libraries/libsystem/utils/*.s)
+
+
 KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 
 KERNEL_OBJECTS = \
 	$(patsubst %.c, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
 	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
+	$(patsubst libraries/%.c, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES)) \
+	$(patsubst libraries/%.s, $(BUILD_DIRECTORY)/kernel/%.s.o, $(KERNEL_LIBRARIES_ASSEMBLY_SOURCES))
 
 OBJECTS += $(KERNEL_OBJECTS)
 
@@ -32,6 +45,11 @@ $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.c
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CC] $<
 	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+
+$(BUILD_DIRECTORY)/kernel/%.s.o: libraries/%.s
+	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [AS] $<
+	@$(AS) $(ASFLAGS) $^ -o $@
 
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.c
 	$(DIRECTORY_GUARD)

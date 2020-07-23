@@ -8,9 +8,9 @@
 
 #define __create(__type) ((__type *)calloc(1, sizeof(__type)))
 
-#define __swap(__x, __y)         \
+#define __swap(__type, __x, __y) \
     ({                           \
-        typeof(__x) __tmp = __x; \
+        __type __tmp = __x;      \
         __x = __y;               \
         __y = __tmp;             \
     })

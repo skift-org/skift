@@ -15,8 +15,8 @@ static inline Slice slice_create(const void *p, size_t size)
 {
     return (Slice){
         .data = (uint8_t *)p,
-        .size = (int)size,
         .cursor = 0,
+        .size = (int)size,
     };
 }
 

@@ -1,8 +1,8 @@
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 #include <libwidget/Application.h>
 #include <libwidget/Event.h>
@@ -770,9 +770,9 @@ void window_update(Window *window)
 
     bitmap_copy(window->backbuffer, window->frontbuffer, repaited_regions);
 
-    __swap(window->frontbuffer, window->backbuffer);
-    __swap(window->frontbuffer_painter, window->backbuffer_painter);
-    __swap(window->frontbuffer_handle, window->backbuffer_handle);
+    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
+    __swap(Painter *, window->frontbuffer_painter, window->backbuffer_painter);
+    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
 
     application_flip_window(window, repaited_regions);
 }

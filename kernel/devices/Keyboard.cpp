@@ -24,7 +24,7 @@ typedef enum
 } PS2KeyboardState;
 
 static PS2KeyboardState _state = PS2KBD_STATE_NORMAL;
-static KeyMotion _keystate[__KEY_COUNT] = {KEY_MOTION_UP};
+static KeyMotion _keystate[__KEY_COUNT] = {};
 static KeyMap *_keymap = NULL;
 
 static FsNode *_characters_node = NULL;

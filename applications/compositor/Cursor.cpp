@@ -129,8 +129,6 @@ void cursor_render(Painter *painter)
     Bitmap *cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 
     painter_blit_bitmap(painter, cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
-    painter_draw_rectangle(painter, cursor_dirty_bound_from_position(_mouse_position), COLOR_BLUE);
-    painter_draw_rectangle(painter, cursor_bound(), COLOR_RED);
 }
 
 Rectangle cursor_bound_from_position(Vec2i position)

@@ -161,7 +161,7 @@ __flatten void painter_blit_bitmap(
     }
     else
     {
-        //painter_blit_bitmap_scaled(painter, bitmap, source, destination);
+        painter_blit_bitmap_scaled(painter, bitmap, source, destination);
     }
 }
 

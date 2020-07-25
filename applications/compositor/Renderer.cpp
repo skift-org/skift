@@ -1,4 +1,5 @@
 #include <libgraphic/Framebuffer.h>
+#include <libsystem/utils/Vector.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"
@@ -9,14 +10,13 @@ static Framebuffer *_framebuffer;
 static Painter *_painter;
 static Bitmap *_wallpaper;
 
-static List *_dirty_regions = NULL;
+static Vector<Rectangle> _dirty_regions;
 
 void renderer_initialize(void)
 {
     _framebuffer = framebuffer_open();
     _painter = _framebuffer->painter;
     _wallpaper = bitmap_load_from("/System/Wallpapers/mountains.png");
-    _dirty_regions = list_create();
 
     renderer_region_dirty(framebuffer_bound(_framebuffer));
 }
@@ -25,25 +25,23 @@ void renderer_region_dirty(Rectangle new_region)
 {
     bool merged = false;
 
-    list_foreach(Rectangle, region, _dirty_regions)
-    {
-        int region_area = region->area();
+    _dirty_regions.foreach ([&](Rectangle &region) {
+        int region_area = region.area();
         int new_region_area = new_region.area();
-        int merge_area = region->merged_with(new_region).area();
+        int merge_area = region.merged_with(new_region).area();
 
-        if (region->colide_with(new_region) && (region_area + new_region_area > merge_area))
+        if (region.colide_with(new_region) && (region_area + new_region_area > merge_area))
         {
-            *region = region->merged_with(new_region);
+            region = region.merged_with(new_region);
             merged = true;
         }
-    }
+
+        return Iteration::CONTINUE;
+    });
 
     if (!merged)
     {
-        Rectangle *r = __create(Rectangle);
-        *r = new_region;
-
-        list_pushback(_dirty_regions, r);
+        _dirty_regions.push_back(new_region);
     }
 }
 
@@ -75,20 +73,22 @@ Rectangle renderer_bound(void)
 
 void renderer_repaint_dirty(void)
 {
-    list_foreach(Rectangle, region, _dirty_regions)
-    {
-        renderer_region(*region);
+    _dirty_regions.foreach ([](Rectangle region) {
+        renderer_region(region);
 
-        if (region->colide_with(cursor_bound()))
+        if (region.colide_with(cursor_bound()))
         {
             renderer_region(cursor_bound());
 
             cursor_render(_painter);
         }
-    }
+
+        return Iteration::CONTINUE;
+    });
 
     framebuffer_blit_dirty(_framebuffer);
-    list_clear_with_callback(_dirty_regions, free);
+
+    _dirty_regions.clear();
 }
 
 void renderer_set_resolution(int width, int height)

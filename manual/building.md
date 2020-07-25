@@ -85,3 +85,17 @@ $ make run-vbox # for Virtual Box
 ```
 
 > If you made any modification to the source code or the content of the sysroot/ directory, the build system should be able to rebuild the project from step 3 automagically :^)
+
+## 5. Using the system
+
+**How to change the keyboard layout?**
+
+```sh
+µ keyboardctl en_us
+```
+
+**How to change display resolution?**
+
+```sh
+µ displayctl -s 1920x1080
+```

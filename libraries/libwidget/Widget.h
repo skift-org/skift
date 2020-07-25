@@ -41,22 +41,22 @@ typedef struct
 } Layout;
 
 #define STACK() \
-    ((Layout){LAYOUT_STACK, 0, 0, vec2i_zero})
+    ((Layout){LAYOUT_STACK, 0, 0, Vec2i::zero()})
 
 #define GRID(_hcell, _vcell, _hspacing, _vspacing) \
-    ((Layout){LAYOUT_GRID, (_hcell), (_vcell), vec2i((_hspacing), (_vspacing))})
+    ((Layout){LAYOUT_GRID, (_hcell), (_vcell), Vec2i((_hspacing), (_vspacing))})
 
 #define VGRID(_vspacing) \
-    ((Layout){LAYOUT_VGRID, 0, 0, vec2i(0, (_vspacing))})
+    ((Layout){LAYOUT_VGRID, 0, 0, Vec2i(0, (_vspacing))})
 
 #define HGRID(_hspacing) \
-    ((Layout){LAYOUT_HGRID, 0, 0, vec2i((_hspacing), 0)})
+    ((Layout){LAYOUT_HGRID, 0, 0, Vec2i((_hspacing), 0)})
 
 #define VFLOW(_vspacing) \
-    ((Layout){LAYOUT_VFLOW, 0, 0, vec2i(0, (_vspacing))})
+    ((Layout){LAYOUT_VFLOW, 0, 0, Vec2i(0, (_vspacing))})
 
 #define HFLOW(_hspacing) \
-    ((Layout){LAYOUT_HFLOW, 0, 0, vec2i((_hspacing), 0)})
+    ((Layout){LAYOUT_HFLOW, 0, 0, Vec2i((_hspacing), 0)})
 
 typedef struct
 {

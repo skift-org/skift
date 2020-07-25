@@ -34,22 +34,22 @@ int main(int argc, char **argv)
 
     window_set_icon(window, icon_get("duck"));
     window_set_title(window, "Demos");
-    window_set_size(window, vec2i(500, 400));
+    window_set_size(window, Vec2i(500, 400));
 
     window_root(window)->layout = VFLOW(0);
 
-    Widget *side_bar = container_create(window_root(window));
-    side_bar->insets = INSETS(4, 4);
-    side_bar->layout = HGRID(4);
-    side_bar->bound.height = 32;
+    Widget *navbar = container_create(window_root(window));
+    navbar->insets = Insets(4, 4);
+    navbar->layout = HGRID(4);
+    navbar->bound = navbar->bound.with_width(32);
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        Widget *demo_button = button_create_with_text(side_bar, BUTTON_TEXT, _demos[i].name);
+        Widget *demo_button = button_create_with_text(navbar, BUTTON_TEXT, _demos[i].name);
         widget_set_event_handler(demo_button, EVENT_ACTION, EVENT_HANDLER(&_demos[i], (EventHandlerCallback)set_current_demo_callback));
     }
 
-    side_bar->bound.width = 128;
+    navbar->bound = navbar->bound.with_width(128);
 
     _demo_widget = demo_widget_create(window_root(window));
     _demo_widget->layout_attributes = LAYOUT_FILL;

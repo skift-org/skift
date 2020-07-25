@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
     window_set_icon(window, icon_get("widgets"));
     window_set_title(window, "Widget Factory");
-    window_set_size(window, vec2i(500, 400));
+    window_set_size(window, Vec2i(500, 400));
 
     window_root(window)->layout = VFLOW(8);
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     Widget *buttons = container_create(window_root(window));
     {
         buttons->layout = HFLOW(8);
-        buttons->insets = INSETS(0, 8);
+        buttons->insets = Insets(0, 8);
 
         button_create_with_text(buttons, BUTTON_TEXT, "BUTTON");
         button_create_with_text(buttons, BUTTON_OUTLINE, "BUTTON");

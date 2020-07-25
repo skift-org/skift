@@ -1,6 +1,6 @@
 #include "terminal/FramebufferTerminal.h"
 
-static Vec2i char_size = vec2i(7, 16);
+static Vec2i char_size = Vec2i(7, 16);
 
 static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = COLOR(0x000000),
@@ -27,11 +27,7 @@ static Color framebuffer_colors[__TERMINAL_COLOR_COUNT] = {
 
 Rectangle framebuffer_terminal_cell_bound(int x, int y)
 {
-    Rectangle bound;
-    bound.position = vec2i(x * char_size.x, y * (int)(char_size.y));
-    bound.size = vec2i(char_size.x, (char_size.y));
-
-    return bound;
+    return {Vec2(x, y) * char_size, char_size};
 }
 
 void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y, TerminalCell cell)
@@ -57,8 +53,8 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
     {
         painter_draw_line(
             painter,
-            vec2i_add(bound.position, vec2i(0, 13)),
-            vec2i_add(bound.position, vec2i(bound.width, 13)),
+            bound.position() + Vec2i(0, 13),
+            bound.position() + Vec2i(bound.width(), 13),
             foreground_color);
     }
 
@@ -75,7 +71,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
             painter,
             font,
             glyph,
-            vec2i_add(bound.position, vec2i(0, 12)),
+            bound.position() + Vec2i(0, 12),
             foreground_color);
 
         if (attributes.bold)
@@ -84,7 +80,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
                 painter,
                 font,
                 glyph,
-                vec2i_add(bound.position, vec2i(1, 12)),
+                bound.position() + Vec2i(1, 12),
                 foreground_color);
         }
     }
@@ -139,11 +135,11 @@ void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRende
 {
     __unused(terminal);
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, false);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x(), renderer->framebuffer_cursor.y(), false);
 
-    renderer->framebuffer_cursor = vec2i(cursor.x, cursor.y);
+    renderer->framebuffer_cursor = Vec2i(cursor.x, cursor.y);
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, true);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x(), renderer->framebuffer_cursor.y(), true);
     renderer->cursor_blink = false;
 }
 
@@ -151,7 +147,7 @@ void framebuffer_terminal_on_blink(Terminal *terminal, FramebufferTerminalRender
 {
     renderer->cursor_blink = !renderer->cursor_blink;
 
-    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x, renderer->framebuffer_cursor.y, renderer->cursor_blink);
+    framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x(), renderer->framebuffer_cursor.y(), renderer->cursor_blink);
 
     framebuffer_blit_dirty(renderer->framebuffer);
 }
@@ -186,5 +182,5 @@ Terminal *framebuffer_terminal_create(void)
     renderer->framebuffer = framebuffer;
     renderer->mono_font = font_create("mono");
 
-    return terminal_create(framebuffer->width / char_size.x, framebuffer->height / char_size.y, TERMINAL_RENDERER(renderer));
+    return terminal_create(framebuffer->width / char_size.x(), framebuffer->height / char_size.y(), TERMINAL_RENDERER(renderer));
 }

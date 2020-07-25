@@ -13,14 +13,14 @@ void latency_draw(Painter *painter, Rectangle screen, double time)
     int current_tick = system_get_ticks();
 
     painter_fill_rectangle(painter, screen, ALPHA(COLOR_BLACK, 0.005));
-    painter_draw_line(painter, vec2i(screen.x, screen.y + 64), vec2i(screen.x + screen.width, screen.y + 64), ALPHA(COLOR_WHITE, 0.01));
+    painter_draw_line(painter, Vec2i(screen.x(), screen.y() + 64), Vec2i(screen.x() + screen.width(), screen.y() + 64), ALPHA(COLOR_WHITE, 0.01));
 
-    int x = __i % screen.width;
+    int x = __i % screen.width();
     __i++;
 
     for (int y = 0; y < abs(current_tick - _last_tick) * 4; y++)
     {
-        painter_plot_pixel(painter, vec2i(screen.x + x, screen.y + y), COLOR_MAGENTA);
+        painter_plot_pixel(painter, Vec2i(screen.x() + x, screen.y() + y), COLOR_MAGENTA);
     }
 
     _last_tick = current_tick;

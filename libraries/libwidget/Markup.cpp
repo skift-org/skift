@@ -1,6 +1,6 @@
 #include <libmarkup/Markup.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libsystem/utils/SourceReader.h>
 
@@ -120,7 +120,7 @@ Insets insets_parse(const char *string)
 {
     if (!string)
     {
-        return INSETS(0);
+        return Insets(0);
     }
 
     SourceReader *reader = source_create_from_string(string, strlen(string));
@@ -129,7 +129,7 @@ Insets insets_parse(const char *string)
     {
         source_destroy(reader);
 
-        return INSETS(0);
+        return Insets(0);
     }
 
     source_skip(reader, '(');
@@ -146,23 +146,23 @@ Insets insets_parse(const char *string)
         whitespace(reader);
     }
 
-    Insets result = INSETS(0);
+    Insets result = Insets(0);
 
     if (count == 1)
     {
-        result = INSETS(args[0]);
+        result = Insets(args[0]);
     }
     else if (count == 2)
     {
-        result = INSETS(args[0], args[1]);
+        result = Insets(args[0], args[1]);
     }
     else if (count == 3)
     {
-        result = INSETS(args[0], args[1], args[2]);
+        result = Insets(args[0], args[1], args[2]);
     }
     else if (count == 4)
     {
-        result = INSETS(args[0], args[1], args[2], args[3]);
+        result = Insets(args[0], args[1], args[2], args[3]);
     }
 
     source_destroy(reader);
@@ -297,7 +297,7 @@ Window *window_create_from_markup(MarkupNode *node)
 
     int height = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "height"), 250);
 
-    window_set_size(window, vec2i(width, height));
+    window_set_size(window, Vec2i(width, height));
 
     const char *icon = markup_node_get_attribute(node, "icon");
 

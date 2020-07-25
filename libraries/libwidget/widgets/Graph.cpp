@@ -26,37 +26,35 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
 
     double cursor_position = widget->current / (double)widget->data_size;
 
-    for (int i = 0; i < widget_get_bound(widget).width; i++)
+    for (int i = 0; i < widget_get_bound(widget).width(); i++)
     {
-        double where = i / (double)widget_get_bound(widget).width;
+        double where = i / (double)widget_get_bound(widget).width();
         double data = graph_sample(widget, where);
 
-        Rectangle bar = (Rectangle){{
-            widget_get_bound(widget).x + i,
-            (int)(widget_get_bound(widget).y + widget_get_bound(widget).height * (1.0 - data)),
+        Rectangle bar(
+            widget_get_bound(widget).x() + i,
+            (int)(widget_get_bound(widget).y() + widget_get_bound(widget).height() * (1.0 - data)),
             1,
-            widget_get_bound(widget).height,
-        }};
+            widget_get_bound(widget).height());
 
         double dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
         painter_fill_rectangle(painter, bar, ALPHA(widget->color, dist));
-        painter_plot_pixel(painter, bar.position, widget->color);
+        painter_plot_pixel(painter, bar.position(), widget->color);
     }
 
-    Rectangle cursor = (Rectangle){{
-        (int)(widget_get_bound(widget).x + widget_get_bound(widget).width * cursor_position),
-        widget_get_bound(widget).y,
+    Rectangle cursor(
+        (int)(widget_get_bound(widget).x() + widget_get_bound(widget).width() * cursor_position),
+        widget_get_bound(widget).y(),
         1,
-        widget_get_bound(widget).height,
-    }};
+        widget_get_bound(widget).height());
 
     painter_fill_rectangle(painter, cursor, widget_get_color(widget, THEME_BORDER));
 }
 
 Vec2i graph_size(Graph *widget)
 {
-    return vec2i(widget->data_size, 100);
+    return Vec2i(widget->data_size, 100);
 }
 
 void graph_record(Graph *widget, double data)

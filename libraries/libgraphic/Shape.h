@@ -4,315 +4,340 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/math/Vectors.h>
 
-typedef struct __packed
+struct Insets
 {
-    int top;
-    int bottom;
-    int left;
-    int right;
-} Insets;
+private:
+    int _top;
+    int _bottom;
+    int _left;
+    int _right;
 
-#define __INSETS1(__tblr) ((Insets){.top = __tblr, .bottom = __tblr, .left = __tblr, .right = __tblr})
-#define __INSETS2(__tb, __lr) ((Insets){.top = __tb, .bottom = __tb, .left = __lr, .right = __lr})
-#define __INSETS3(__t, __b, __lr) ((Insets){.top = __t, .bottom = __b, .left = __lr, .right = __lr})
-#define __INSETS4(__t, __b, __l, __r) ((Insets){__t, __b, __l, __r})
+public:
+    int top() const { return _top; }
+    int bottom() const { return _bottom; }
+    int left() const { return _left; }
+    int right() const { return _right; }
 
-#define __INSETS(_1, _2, _3, _4, NAME, ...) NAME
-
-#define INSETS(...)                                                   \
-    __INSETS(__VA_ARGS__, __INSETS4, __INSETS3, __INSETS2, __INSETS1) \
-    (__VA_ARGS__)
-
-typedef union __packed {
-    struct
+    Insets(int tblr)
+        : _top(tblr),
+          _bottom(tblr),
+          _left(tblr),
+          _right(tblr)
     {
-        int x;
-        int y;
-        int width;
-        int height;
-    };
-
-    struct
-    {
-        Vec2i position;
-        Vec2i size;
-    };
-} Rectangle;
-
-typedef enum
-{
-    POSITION_LEFT,
-    POSITION_CENTER,
-    POSITION_RIGHT,
-
-    POSITION_TOP_LEFT,
-    POSITION_TOP_CENTER,
-    POSITION_TOP_RIGHT,
-
-    POSITION_BOTTOM_LEFT,
-    POSITION_BOTTOM_CENTER,
-    POSITION_BOTTOM_RIGHT,
-} Position;
-
-#define RECTANGLE_EMPTY ((Rectangle){})
-#define RECTANGLE_SIZE(__width, __height) ((Rectangle){{0, 0, (__width), (__height)}})
-#define RECTANGLE(__x, __y, __width, __height) ((Rectangle){{(__x), (__y), (__width), (__height)}})
-
-static inline Vec2i vec2i_clamp_to_rect(Vec2i p, Rectangle rect)
-{
-    return vec2i_clamp(p, rect.position, vec2i_add(rect.position, rect.size));
-}
-
-static inline Rectangle rectangle_min_size(Rectangle rectangle, Vec2i size)
-{
-    rectangle.width = MIN(size.x, rectangle.width);
-    rectangle.width = MIN(size.y, rectangle.height);
-
-    return rectangle;
-}
-
-static inline Rectangle rectangle_max_size(Rectangle rectangle, Vec2i size)
-{
-    rectangle.width = MAX(size.x, rectangle.width);
-    rectangle.width = MAX(size.y, rectangle.height);
-
-    return rectangle;
-}
-
-static inline Rectangle rectangle_from_two_point(Vec2i a, Vec2i b)
-{
-    return (Rectangle){{
-        MIN(a.x, b.x),
-        MIN(a.y, b.y),
-        abs(a.x - b.x),
-        abs(a.y - b.y),
-    }};
-}
-
-static inline bool rectangle_colide(Rectangle a, Rectangle b)
-{
-    return a.x < b.x + b.width &&
-           a.x + a.width > b.x &&
-           a.y < b.y + b.height &&
-           a.height + a.y > b.y;
-}
-
-static inline int rectangle_area(Rectangle rectangle)
-{
-    return rectangle.width * rectangle.height;
-}
-
-static inline Rectangle rectangle_merge(Rectangle a, Rectangle b)
-{
-    Vec2i topleft;
-    topleft.x = MIN(a.x, b.x);
-    topleft.y = MIN(a.y, b.y);
-
-    Vec2i bottomright;
-    bottomright.x = MAX(a.x + a.width, b.x + b.width);
-    bottomright.y = MAX(a.y + a.height, b.y + b.height);
-
-    Rectangle rectangle = {};
-
-    rectangle.position = topleft;
-    rectangle.size = vec2i_sub(bottomright, topleft);
-
-    return rectangle;
-}
-
-static inline Rectangle rectangle_clip(Rectangle left, Rectangle right)
-{
-    int x = MAX(left.x, right.x);
-    int y = MAX(left.y, right.y);
-
-    int width = MIN(left.x + left.width, right.x + right.width) - x;
-    int height = MIN(left.y + left.height, right.y + right.height) - y;
-
-    return (Rectangle){{x, y, width, height}};
-}
-
-static inline bool rectangle_containe_point(Rectangle rectange, Vec2i position)
-{
-    return (rectange.x <= position.x && (rectange.x + rectange.width) > position.x) &&
-           (rectange.y <= position.y && (rectange.y + rectange.height) > position.y);
-}
-
-static inline bool rectangle_container_rectangle(Rectangle rectange, Rectangle contained)
-{
-    return (rectange.x <= contained.x && (contained.x + contained.width) >= contained.x) &&
-           (rectange.y <= contained.y && (contained.y + contained.height) >= contained.y);
-}
-
-static inline Rectangle rectangle_shrink(Rectangle rect, Insets spacing)
-{
-    Rectangle result;
-
-    result.x = rect.x + spacing.left;
-    result.y = rect.y + spacing.top;
-    result.width = rect.width - spacing.left - spacing.right;
-    result.height = rect.height - spacing.top - spacing.bottom;
-
-    return result;
-}
-
-static inline Rectangle rectangle_expand(Rectangle rect, Insets spacing)
-{
-    Rectangle result;
-
-    result.x = rect.x - spacing.left;
-    result.y = rect.y - spacing.top;
-    result.width = rect.width + spacing.left + spacing.right;
-    result.height = rect.height + spacing.top + spacing.bottom;
-
-    return result;
-}
-
-static inline Rectangle rectangle_offset(Rectangle rect, Vec2i offset)
-{
-    rect.position = vec2i_add(rect.position, offset);
-
-    return rect;
-}
-
-static inline bool rectangle_is_empty(Rectangle rect)
-{
-    return rect.width == 0 && rect.height == 0;
-}
-
-static inline Rectangle rectangle_set_height(Rectangle rect, size_t height)
-{
-    rect.height = height;
-
-    return rect;
-}
-
-static inline Rectangle rectangle_set_width(Rectangle rect, size_t width)
-{
-    rect.width = width;
-
-    return rect;
-}
-
-static inline Rectangle rectangle_top(Rectangle rect, int size)
-{
-    return (Rectangle){{rect.x, rect.y, rect.width, size}};
-}
-
-static inline Rectangle rectangle_bottom(Rectangle rect, int size)
-{
-    return (Rectangle){{rect.x, rect.y + rect.height - size, rect.width, size}};
-}
-
-static inline Rectangle rectangle_cutoff_top_botton(Rectangle rect, int top, int bottom)
-{
-    return (Rectangle){{rect.x, rect.y + top, rect.width, rect.height - top - bottom}};
-}
-
-static inline Rectangle rectangle_left(Rectangle rect, int size)
-{
-    return (Rectangle){{rect.x, rect.y, size, rect.height}};
-}
-
-static inline Rectangle rectangle_right(Rectangle rect, int size)
-{
-    return (Rectangle){{rect.x + rect.width - size, rect.y, size, rect.height}};
-}
-
-static inline Rectangle rectangle_cutoff_left_right(Rectangle rect, int left, int right)
-{
-    return (Rectangle){{rect.x + left, rect.y, rect.width - left - right, rect.height}};
-}
-
-#define RECTANGLE_BORDER_TOP (1 << 0)
-#define RECTANGLE_BORDER_BOTTOM (1 << 1)
-#define RECTANGLE_BORDER_LEFT (1 << 2)
-#define RECTANGLE_BORDER_RIGHT (1 << 3)
-
-typedef unsigned RectangeBorder;
-
-static inline RectangeBorder rectangle_inset_containe_point(Rectangle rect, Insets spacing, Vec2i position)
-{
-    RectangeBorder borders = 0;
-
-    if (rectangle_containe_point(rectangle_top(rect, spacing.top), position))
-    {
-        borders |= RECTANGLE_BORDER_TOP;
     }
 
-    if (rectangle_containe_point(rectangle_bottom(rect, spacing.bottom), position))
+    Insets(int tb, int lr)
+        : _top(tb),
+          _bottom(tb),
+          _left(lr),
+          _right(lr)
     {
-        borders |= RECTANGLE_BORDER_BOTTOM;
     }
 
-    if (rectangle_containe_point(rectangle_left(rect, spacing.left), position))
+    Insets(int top, int bottom, int lr)
+        : _top(top),
+          _bottom(bottom),
+          _left(lr),
+          _right(lr)
     {
-        borders |= RECTANGLE_BORDER_LEFT;
     }
 
-    if (rectangle_containe_point(rectangle_right(rect, spacing.right), position))
+    Insets(int top, int bottom, int left, int right)
+        : _top(top),
+          _bottom(bottom),
+          _left(left),
+          _right(right)
     {
-        borders |= RECTANGLE_BORDER_RIGHT;
     }
+};
 
-    return borders;
-}
-
-static inline Rectangle rectangle_center_within(Rectangle rectangle, Rectangle container)
+enum class Position
 {
-    return (Rectangle){{
-        container.x + container.width / 2 - rectangle.width / 2,
-        container.y + container.height / 2 - rectangle.height / 2,
+    LEFT,
+    CENTER,
+    RIGHT,
+    TOP_LEFT,
+    TOP_CENTER,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_CENTER,
+    BOTTOM_RIGHT,
+};
 
-        rectangle.width,
-        rectangle.height,
-    }};
-}
-
-static inline Rectangle rectangle_place_within(Rectangle rectangle, Position position, Rectangle container)
+enum RectangleBorder : uint32_t
 {
-    Rectangle result = RECTANGLE_SIZE(rectangle.width, rectangle.height);
+    NONE = 0,
+    TOP = (1 << 0),
+    BOTTOM = (1 << 1),
+    LEFT = (1 << 2),
+    RIGHT = (1 << 3),
+};
+__enum_flags(RectangleBorder);
 
-    if (position == POSITION_LEFT ||
-        position == POSITION_TOP_LEFT ||
-        position == POSITION_BOTTOM_LEFT)
+struct __packed Rectangle
+{
+private:
+    int _x;
+    int _y;
+    int _width;
+    int _height;
+
+public:
+    static Rectangle empty()
     {
-        result.x = container.x;
+        return Rectangle(0, 0, 0, 0);
     }
 
-    if (position == POSITION_CENTER ||
-        position == POSITION_TOP_CENTER ||
-        position == POSITION_BOTTOM_CENTER)
+    static Rectangle from_two_point(Vec2i a, Vec2i b)
     {
-        result.x = container.x + container.width / 2 - rectangle.width / 2;
+        int x0 = MIN(a.x(), b.x());
+        int y0 = MIN(a.y(), b.y());
+        int x1 = MAX(a.x(), b.x());
+        int y1 = MAX(a.y(), b.y());
+
+        return {x0, y0, x1 - x0, y1 - y0};
     }
 
-    if (position == POSITION_RIGHT ||
-        position == POSITION_TOP_RIGHT ||
-        position == POSITION_BOTTOM_RIGHT)
+    int x() const { return _x; }
+
+    int y() const { return _y; }
+
+    int width() const { return _width; }
+
+    int height() const { return _height; }
+
+    Vec2i position() const { return Vec2i(_x, _y); }
+
+    Vec2i size() const { return Vec2i(_width, _height); }
+
+    int area() { return width() * height(); }
+
+    Rectangle() = default;
+
+    Rectangle(int width, int height)
+        : _x(0),
+          _y(0),
+          _width(width),
+          _height(height)
     {
-        result.x = container.x + container.width - rectangle.width;
     }
 
-    if (position == POSITION_TOP_LEFT ||
-        position == POSITION_TOP_CENTER ||
-        position == POSITION_TOP_RIGHT)
+    Rectangle(Vec2i position, Vec2i size)
+        : _x(position.x()),
+          _y(position.y()),
+          _width(size.x()),
+          _height(size.y())
     {
-        result.y = container.y;
     }
 
-    if (position == POSITION_LEFT ||
-        position == POSITION_CENTER ||
-        position == POSITION_RIGHT)
+    Rectangle(int x, int y, int width, int height)
+        : _x(x),
+          _y(y),
+          _width(width),
+          _height(height)
     {
-        result.y = container.y + container.height / 2 - rectangle.height / 2;
     }
 
-    if (position == POSITION_BOTTOM_LEFT ||
-        position == POSITION_BOTTOM_CENTER ||
-        position == POSITION_BOTTOM_RIGHT)
+    Rectangle with_width(int width) const
     {
-        result.y = container.y + container.height - rectangle.height;
+        Rectangle new_rect = Rectangle(*this);
+        new_rect._width = width;
+        return new_rect;
     }
 
-    return result;
-}
+    Rectangle with_height(int height) const
+    {
+        Rectangle new_rect = Rectangle(*this);
+        new_rect._height = height;
+        return new_rect;
+    }
+
+    Rectangle centered_within(Rectangle container) const
+    {
+        return Rectangle(
+            container._x + container._width - container._width / 2 - _width / 2,
+            container._y + container._height - container._height / 2 - _height / 2,
+            _width,
+            _height);
+    }
+
+    Rectangle place_within(Rectangle container, Position position) const
+    {
+        int x = container._x;
+        int y = container._y;
+        int width = _width;
+        int height = _height;
+
+        if (position == Position::CENTER ||
+            position == Position::TOP_CENTER ||
+            position == Position::BOTTOM_CENTER)
+        {
+            x += container._width / 2 - _width / 2;
+        }
+
+        if (position == Position::RIGHT ||
+            position == Position::TOP_RIGHT ||
+            position == Position::BOTTOM_RIGHT)
+        {
+            x += container._width - _width;
+        }
+
+        if (position == Position::LEFT ||
+            position == Position::CENTER ||
+            position == Position::RIGHT)
+        {
+            y += container._height / 2 - _height / 2;
+        }
+
+        if (position == Position::BOTTOM_LEFT ||
+            position == Position::BOTTOM_CENTER ||
+            position == Position::BOTTOM_RIGHT)
+        {
+            y += container._height - _height;
+        }
+
+        return Rectangle(x, y, width, height);
+    }
+
+    Rectangle merged_with(Rectangle other) const
+    {
+        Vec2i topleft(
+            MIN(_x, other._x),
+            MIN(_y, other._y));
+
+        Vec2i bottomright(
+            MAX(_x + _width, other._x + other._width),
+            MAX(_y + _height, other._y + other._height));
+
+        return Rectangle::from_two_point(topleft, bottomright);
+    }
+
+    Rectangle clipped_with(Rectangle other) const
+    {
+        Vec2i topleft(
+            MAX(_x, other._x),
+            MAX(_y, other._y));
+
+        Vec2i bottomright(
+            MIN(_x + _width, other._x + other._width),
+            MIN(_y + _height, other._y + other._height));
+
+        return Rectangle::from_two_point(topleft, bottomright);
+    }
+
+    Rectangle take_top(int size) const
+    {
+        return Rectangle(x(), y(), width(), size);
+    }
+
+    Rectangle take_bottom(int size) const
+    {
+        return Rectangle(x(), y() + height() - size, width(), size);
+    }
+
+    Rectangle take_left(int size) const
+    {
+        return Rectangle(x(), y(), size, height());
+    }
+
+    Rectangle take_right(int size) const
+    {
+        return Rectangle(x() + width() - size, y(), size, height());
+    }
+
+    Rectangle cutoff_top_and_botton(int top, int bottom) const
+    {
+        return Rectangle(x(), y() + top, width(), height() - top - bottom);
+    }
+
+    Rectangle cutoff_left_and_right(int left, int right) const
+    {
+        return Rectangle(x() + left, y(), width() - left - right, height());
+    }
+
+    Rectangle shrinked(Insets insets) const
+    {
+        return Rectangle(
+            _x + insets.left(),
+            _y + insets.top(),
+            _width - insets.left() - insets.right(),
+            _height - insets.top() - insets.bottom());
+    }
+
+    Rectangle expended(Insets insets) const
+    {
+        return Rectangle(
+            _x - insets.left(),
+            _y - insets.top(),
+            _width + insets.left() + insets.right(),
+            _height + insets.top() + insets.bottom());
+    }
+
+    Rectangle resized(Vec2i size) const
+    {
+        return Rectangle(
+            _x,
+            _y,
+            size.x(),
+            size.y());
+    }
+
+    Rectangle moved(Vec2i position) const
+    {
+        return Rectangle(position, size());
+    }
+
+    Rectangle offset(Vec2i offset) const
+    {
+        return Rectangle(position() + offset, size());
+    }
+
+    bool colide_with(Rectangle other) const
+    {
+        return _x < other._x + other._width &&
+               _x + _width > other._x &&
+               _y < other._y + other._height &&
+               _height + _y > other._y;
+    }
+
+    bool containe(Vec2i other) const
+    {
+        return (_x <= other.x() && (_x + _width) > other.x()) &&
+               (_y <= other.y() && (_y + _height) > other.y());
+    }
+
+    bool containe(Rectangle other) const
+    {
+        return (_x <= other._x && (_x + _width) >= (other._x + other._width)) &&
+               (_y <= other._y && (_y + _height) >= (other._y + other._width));
+    }
+
+    RectangleBorder containe(Insets spacing, Vec2i position) const
+    {
+        RectangleBorder borders = RectangleBorder::NONE;
+
+        if (take_top(spacing.top()).containe(position))
+        {
+            borders |= RectangleBorder::TOP;
+        }
+
+        if (take_bottom(spacing.bottom()).containe(position))
+        {
+            borders |= RectangleBorder::BOTTOM;
+        }
+
+        if (take_left(spacing.left()).containe(position))
+        {
+            borders |= RectangleBorder::LEFT;
+        }
+
+        if (take_right(spacing.right()).containe(position))
+        {
+            borders |= RectangleBorder::RIGHT;
+        }
+
+        return borders;
+    }
+
+    bool is_empty() const { return _width == 0 && _height == 0; };
+};

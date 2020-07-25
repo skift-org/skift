@@ -53,7 +53,6 @@ typedef struct
 
     /// --- Canvas --- ///
     Widget *canvas;
-
 } PaintWindow;
 
 static void update_toolbar(PaintWindow *window)
@@ -130,14 +129,14 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
 
     Widget *primary_color_container = container_create(toolbar);
     primary_color_container->min_width = 22;
-    primary_color_container->insets = INSETS(4);
+    primary_color_container->insets = Insets(4);
 
     window->primary_color = rounded_panel_create(primary_color_container, 4);
     widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color);
 
     Widget *secondary_color_container = container_create(toolbar);
     secondary_color_container->min_width = 22;
-    secondary_color_container->insets = INSETS(4);
+    secondary_color_container->insets = Insets(4);
 
     window->secondary_color = rounded_panel_create(secondary_color_container, 4);
     widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
@@ -181,7 +180,7 @@ static Window *paint_create_window(PaintDocument *document)
 
     window_set_icon((Window *)window, icon_get("brush"));
     window_set_title((Window *)window, "Paint");
-    window_set_size((Window *)window, vec2i(600, 560));
+    window_set_size((Window *)window, Vec2i(600, 560));
 
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);

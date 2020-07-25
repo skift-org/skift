@@ -10,9 +10,7 @@ void icon_panel_paint(IconPanel *widget, Painter *painter, Rectangle rectangle)
         return;
     }
 
-    Rectangle destination = rectangle_center_within(
-        icon_bound(widget->icon, ICON_18PX),
-        widget_get_content_bound(widget));
+    Rectangle destination = icon_bound(widget->icon, ICON_18PX).centered_within(widget_get_content_bound(widget));
 
     painter_blit_icon(
         painter,
@@ -26,11 +24,11 @@ Vec2i icon_panel_size(IconPanel *widget)
 {
     if (widget->icon)
     {
-        return icon_bound(widget->icon, ICON_18PX).size;
+        return icon_bound(widget->icon, ICON_18PX).size();
     }
     else
     {
-        return widget_get_bound(widget).size;
+        return widget_get_bound(widget).size();
     }
 }
 

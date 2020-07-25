@@ -29,11 +29,11 @@ void lines_draw(Painter *painter, Rectangle screen, double time)
     {
         Line line = {};
 
-        line.start.x = random_uint32_max(&random, screen.width);
-        line.start.y = random_uint32_max(&random, screen.height);
+        line.start = Vec2i(random_uint32_max(&random, screen.width()),
+                           random_uint32_max(&random, screen.height()));
 
-        line.finish.x = random_uint32_max(&random, screen.width);
-        line.finish.y = random_uint32_max(&random, screen.height);
+        line.finish = Vec2i(random_uint32_max(&random, screen.width()),
+                            random_uint32_max(&random, screen.height()));
 
         line.color.packed = random_uint32_max(&random, 0xffffffff);
         line.color.A = 255;

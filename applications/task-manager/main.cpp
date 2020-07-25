@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
     window_set_icon((Window *)window, icon_get("memory"));
     window_set_title((Window *)window, "Task Manager");
-    window_set_size((Window *)window, vec2i(700, 500));
+    window_set_size((Window *)window, Vec2i(700, 500));
 
     window_root((Window *)window)->layout = VFLOW(0);
 
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 
     window->cpu_graph = graph_create(graphs_container, 256, COLOR_SEAGREEN);
     window->cpu_graph->layout = VFLOW(8);
-    window->cpu_graph->insets = INSETS(8);
+    window->cpu_graph->insets = Insets(8);
     window->cpu_graph->layout_attributes = LAYOUT_FILL;
 
     Widget *cpu_icon_and_text = container_create(window->cpu_graph);
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 
     window->ram_graph = graph_create(graphs_container, 256, COLOR_ROYALBLUE);
     window->ram_graph->layout = VFLOW(8);
-    window->ram_graph->insets = INSETS(8);
+    window->ram_graph->insets = Insets(8);
     window->ram_graph->layout_attributes = LAYOUT_FILL;
 
     Widget *ram_icon_and_text = container_create(window->ram_graph);

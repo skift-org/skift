@@ -54,13 +54,14 @@ MouseButton cursor_pack_mouse_buttons(MousePacket packet)
     return buttons;
 }
 
+Vec2i vec2i_clamp_to_rect(Vec2i p, Rectangle rect)
+{
+    return p.clamped(rect.position(), rect.position() + rect.size());
+}
+
 Vec2i cursor_pack_mouse_position(MousePacket packet)
 {
-    return vec2i_clamp_to_rect(
-        vec2i_add(
-            _mouse_position,
-            vec2i(packet.offx, packet.offy)),
-        renderer_bound());
+    return vec2i_clamp_to_rect(_mouse_position + Vec2i(packet.offx, packet.offy), renderer_bound());
 }
 
 void cursor_handle_packet(MousePacket packet)
@@ -74,7 +75,7 @@ void cursor_handle_packet(MousePacket packet)
     Window *window_under = manager_get_window_at(_mouse_position);
     Window *window_on_focus = manager_focus_window();
 
-    if (!vec2i_equ(_mouse_old_position, _mouse_position))
+    if (_mouse_old_position != _mouse_position)
     {
         renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_old_position));
         renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_position));
@@ -128,13 +129,15 @@ void cursor_render(Painter *painter)
     Bitmap *cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 
     painter_blit_bitmap(painter, cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
+    painter_draw_rectangle(painter, cursor_dirty_bound_from_position(_mouse_position), COLOR_BLUE);
+    painter_draw_rectangle(painter, cursor_bound(), COLOR_RED);
 }
 
 Rectangle cursor_bound_from_position(Vec2i position)
 {
     CursorState state = cursor_get_state();
 
-    Rectangle bound;
+    Rectangle bound(position, Vec2i(28, 28));
 
     if (state == CURSOR_MOVE ||
         state == CURSOR_RESIZEH ||
@@ -142,14 +145,12 @@ Rectangle cursor_bound_from_position(Vec2i position)
         state == CURSOR_RESIZEHV ||
         state == CURSOR_RESIZEVH)
     {
-        bound.position = vec2i_add(position, vec2i(-14, -14));
+        bound = bound.offset({-14, -14});
     }
     else
     {
-        bound.position = vec2i_add(position, vec2i(-2, -2));
+        bound = bound.offset({-2, -2});
     }
-
-    bound.size = vec2i(28, 28);
 
     return bound;
 }
@@ -161,11 +162,7 @@ Rectangle cursor_bound(void)
 
 Rectangle cursor_dirty_bound_from_position(Vec2i position)
 {
-    Rectangle bound;
-
-    bound.position = vec2i_add(position, vec2i(-28, -28));
-
-    bound.size = vec2i(56, 56);
-
-    return bound;
+    return Rectangle(
+        position + Vec2i(-28, -28),
+        Vec2i(56, 56));
 }

@@ -27,13 +27,13 @@ void renderer_region_dirty(Rectangle new_region)
 
     list_foreach(Rectangle, region, _dirty_regions)
     {
-        int region_area = rectangle_area(*region);
-        int new_region_area = rectangle_area(new_region);
-        int merge_area = rectangle_area(rectangle_merge(*region, new_region));
+        int region_area = region->area();
+        int new_region_area = new_region.area();
+        int merge_area = region->merged_with(new_region).area();
 
-        if (rectangle_colide(*region, new_region) && (region_area + new_region_area > merge_area))
+        if (region->colide_with(new_region) && (region_area + new_region_area > merge_area))
         {
-            *region = rectangle_merge(*region, new_region);
+            *region = region->merged_with(new_region);
             merged = true;
         }
     }
@@ -53,16 +53,13 @@ void renderer_region(Rectangle region)
 
     list_foreach_reversed(Window, window, manager_get_windows())
     {
-        if (rectangle_colide(window_bound(window), region))
+        if (window_bound(window).colide_with(region))
         {
-            Rectangle destination = rectangle_clip(window_bound(window), region);
+            Rectangle destination = window_bound(window).clipped_with(region);
 
-            Rectangle source = {{
-                (destination.x - window_bound(window).x),
-                (destination.y - window_bound(window).y),
-                destination.width,
-                destination.height,
-            }};
+            Rectangle source(
+                destination.position() - window_bound(window).position(),
+                destination.size());
 
             painter_blit_bitmap_no_alpha(_painter, window->frontbuffer, source, destination);
         }
@@ -82,7 +79,7 @@ void renderer_repaint_dirty(void)
     {
         renderer_region(*region);
 
-        if (rectangle_colide(*region, cursor_bound()))
+        if (region->colide_with(cursor_bound()))
         {
             renderer_region(cursor_bound());
 

@@ -3,9 +3,9 @@
 #include <abi/Paths.h>
 
 #include <libgraphic/Framebuffer.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
-#include <libsystem/Logger.h>
 
 Framebuffer *framebuffer_open(void)
 {
@@ -72,23 +72,23 @@ Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
 
 Rectangle framebuffer_bound(Framebuffer *framebuffer)
 {
-    return (Rectangle){{0, 0, framebuffer->width, framebuffer->height}};
+    return Rectangle(framebuffer->width, framebuffer->height);
 }
 
 void framebuffer_mark_dirty(Framebuffer *framebuffer, Rectangle bound)
 {
-    if (rectangle_colide(bitmap_bound(framebuffer->backbuffer), bound))
+    if (bitmap_bound(framebuffer->backbuffer).colide_with(bound))
     {
-        bound = rectangle_clip(bitmap_bound(framebuffer->backbuffer), bound);
+        bound = bitmap_bound(framebuffer->backbuffer).clipped_with(bound);
 
         if (framebuffer->is_dirty)
         {
-            framebuffer->dirty_bound = rectangle_merge(framebuffer->dirty_bound, bound);
+            framebuffer->dirty_bound = framebuffer->dirty_bound.merged_with(bound);
         }
         else
         {
             framebuffer->is_dirty = true;
-            framebuffer->dirty_bound = rectangle_clip(bitmap_bound(framebuffer->backbuffer), bound);
+            framebuffer->dirty_bound = bitmap_bound(framebuffer->backbuffer).clipped_with(bound);
         }
     }
 }
@@ -101,7 +101,7 @@ void framebuffer_mark_dirty_all(Framebuffer *framebuffer)
 
 void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
 {
-    if (rectangle_is_empty(bound))
+    if (bound.is_empty())
     {
         return;
     }
@@ -109,13 +109,13 @@ void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
     IOCallDisplayBlitArgs args;
 
     args.buffer = (uint32_t *)framebuffer->backbuffer->pixels;
-    args.buffer_width = bitmap_bound(framebuffer->backbuffer).size.x;
-    args.buffer_height = bitmap_bound(framebuffer->backbuffer).size.y;
+    args.buffer_width = bitmap_bound(framebuffer->backbuffer).width();
+    args.buffer_height = bitmap_bound(framebuffer->backbuffer).height();
 
-    args.blit_x = bound.x;
-    args.blit_y = bound.y;
-    args.blit_width = bound.width;
-    args.blit_height = bound.height;
+    args.blit_x = bound.x();
+    args.blit_y = bound.y();
+    args.blit_width = bound.width();
+    args.blit_height = bound.height();
 
     __plug_handle_call(HANDLE(framebuffer), IOCALL_DISPLAY_BLIT, &args);
 

@@ -51,11 +51,10 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window_set_title(window, "Panel");
-    window_set_position(window, vec2i_zero);
-    window_set_size(window, vec2i(screen_get_bound().width, 36));
+    window_set_bound(window, screen_get_bound().take_top(36));
 
     window_root(window)->layout = HFLOW(8);
-    window_root(window)->insets = INSETS(4);
+    window_root(window)->insets = Insets(4);
 
     Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, icon_get("menu"), "Applications");
     widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(NULL, open_menu));

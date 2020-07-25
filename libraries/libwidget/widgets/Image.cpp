@@ -11,7 +11,7 @@ void image_paint(Image *widget, Painter *painter, Rectangle rectangle)
 
         if (widget->size_mode == IMAGE_CENTER)
         {
-            destination = rectangle_center_within(bitmap_bound(widget->bitmap), widget_get_bound(widget));
+            destination = bitmap_bound(widget->bitmap).centered_within(widget_get_bound(widget));
         }
 
         painter_blit_bitmap(painter, widget->bitmap, bitmap_bound(widget->bitmap), destination);
@@ -22,11 +22,11 @@ Vec2i image_size(Image *widget)
 {
     if (widget->bitmap)
     {
-        return bitmap_bound(widget->bitmap).size;
+        return bitmap_bound(widget->bitmap).size();
     }
     else
     {
-        return widget_get_bound(widget).size;
+        return widget_get_bound(widget).size();
     }
 }
 

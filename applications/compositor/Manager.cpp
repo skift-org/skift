@@ -34,7 +34,7 @@ Window *manager_get_window_at(Vec2i position)
 {
     list_foreach(Window, window, _managed_windows)
     {
-        if (rectangle_containe_point(window_cursor_capture_bound(window), position))
+        if (window_cursor_capture_bound(window).containe(position))
         {
             return window;
         }

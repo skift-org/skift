@@ -10,43 +10,37 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
 
     int current = 0;
 
-    Rectangle computer_icon_bound = (Rectangle){{
-        widget_get_bound(widget).x,
-        widget_get_bound(widget).y,
-        icon_bound(widget->icon_computer, ICON_18PX).width + 16,
-        widget_get_bound(widget).height,
-    }};
+    Rectangle computer_icon_bound(
+        widget_get_bound(widget).x(),
+        widget_get_bound(widget).y(),
+        icon_bound(widget->icon_computer, ICON_18PX).width() + 16,
+        widget_get_bound(widget).height());
 
     painter_blit_icon(
         painter,
         widget->icon_computer,
         ICON_18PX,
-        rectangle_center_within(
-            icon_bound(widget->icon_computer, ICON_18PX),
-            computer_icon_bound),
+        icon_bound(widget->icon_computer, ICON_18PX).centered_within(computer_icon_bound),
         widget_get_color(widget, THEME_FOREGROUND));
 
-    current += computer_icon_bound.width;
+    current += computer_icon_bound.width();
 
     if (path_element_count(widget->path) != 0)
     {
-        Rectangle expand_icon_bound = (Rectangle){{
-            widget_get_bound(widget).x + current,
-            widget_get_bound(widget).y,
-            icon_bound(widget->icon_expand, ICON_18PX).width,
-            widget_get_bound(widget).height,
-        }};
+        Rectangle expand_icon_bound(
+            widget_get_bound(widget).x() + current,
+            widget_get_bound(widget).y(),
+            icon_bound(widget->icon_expand, ICON_18PX).width(),
+            widget_get_bound(widget).height());
 
         painter_blit_icon(
             painter,
             widget->icon_expand,
             ICON_18PX,
-            rectangle_center_within(
-                icon_bound(widget->icon_expand, ICON_18PX),
-                expand_icon_bound),
+            icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),
             widget_get_color(widget, THEME_FOREGROUND));
 
-        current += expand_icon_bound.width;
+        current += expand_icon_bound.width();
     }
 
     for (size_t i = 0; i < path_element_count(widget->path); i++)
@@ -55,41 +49,37 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
 
         int text_width = font_measure_string(widget_font(), element);
 
-        Rectangle element_bound = (Rectangle){{
-            widget_get_bound(widget).x + current,
-            widget_get_bound(widget).y,
+        Rectangle element_bound(
+            widget_get_bound(widget).x() + current,
+            widget_get_bound(widget).y(),
             text_width,
-            widget_get_bound(widget).height,
-        }};
+            widget_get_bound(widget).height());
 
         painter_draw_string(
             painter,
             widget_font(),
             element,
-            vec2i_add(element_bound.position, vec2i(0, 19)),
+            element_bound.position() + Vec2i(0, 19),
             widget_get_color(widget, THEME_FOREGROUND));
 
         current += text_width;
 
         if (i != path_element_count(widget->path) - 1)
         {
-            Rectangle expand_icon_bound = (Rectangle){{
-                widget_get_bound(widget).x + current,
-                widget_get_bound(widget).y,
-                icon_bound(widget->icon_expand, ICON_18PX).width,
-                widget_get_bound(widget).height,
-            }};
+            Rectangle expand_icon_bound(
+                widget_get_bound(widget).x() + current,
+                widget_get_bound(widget).y(),
+                icon_bound(widget->icon_expand, ICON_18PX).width(),
+                widget_get_bound(widget).height());
 
             painter_blit_icon(
                 painter,
                 widget->icon_expand,
                 ICON_18PX,
-                rectangle_center_within(
-                    icon_bound(widget->icon_expand, ICON_18PX),
-                    expand_icon_bound),
+                icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),
                 widget_get_color(widget, THEME_FOREGROUND));
 
-            current += expand_icon_bound.width;
+            current += expand_icon_bound.width();
         }
     }
 }

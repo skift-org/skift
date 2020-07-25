@@ -26,7 +26,7 @@ void painter_push_clip(Painter *painter, Rectangle clip)
     assert(painter->clipstack_top < CLIPSTACK_SIZE);
 
     painter->clipstack_top++;
-    painter->clipstack[painter->clipstack_top] = rectangle_clip(painter->clipstack[painter->clipstack_top - 1], clip);
+    painter->clipstack[painter->clipstack_top] = painter->clipstack[painter->clipstack_top - 1].clipped_with(clip);
 }
 
 void painter_pop_clip(Painter *painter)
@@ -41,7 +41,7 @@ void painter_push_origin(Painter *painter, Vec2i origin)
     assert(painter->originestack_top < ORIGINSTACK_SIZE);
 
     painter->originestack_top++;
-    painter->originestack[painter->originestack_top] = vec2i_add(painter->originestack[painter->originestack_top - 1], origin);
+    painter->originestack[painter->originestack_top] = painter->originestack[painter->originestack_top - 1] + origin;
 }
 
 void painter_pop_origin(Painter *painter)
@@ -53,29 +53,29 @@ void painter_pop_origin(Painter *painter)
 
 Rectangle painter_apply_clip(Painter *painter, Rectangle rectangle)
 {
-    if (rectangle_colide(painter->clipstack[painter->clipstack_top], rectangle))
+    if (painter->clipstack[painter->clipstack_top].colide_with(rectangle))
     {
-        rectangle = rectangle_clip(painter->clipstack[painter->clipstack_top], rectangle);
-        rectangle = rectangle_clip(bitmap_bound(painter->bitmap), rectangle);
+        rectangle = rectangle.clipped_with(painter->clipstack[painter->clipstack_top]);
+        rectangle = rectangle.clipped_with(bitmap_bound(painter->bitmap));
 
         return rectangle;
     }
     else
     {
-        return RECTANGLE_EMPTY;
+        return Rectangle::empty();
     }
 }
 
 Rectangle painter_apply_transform(Painter *painter, Rectangle rectangle)
 {
-    return rectangle_offset(rectangle, painter->originestack[painter->originestack_top]);
+    return rectangle.offset(painter->originestack[painter->originestack_top]);
 }
 
 void painter_plot_pixel(Painter *painter, Vec2i position, Color color)
 {
-    Vec2i transformed = vec2i_add(position, painter->originestack[painter->originestack_top]);
+    Vec2i transformed = position + painter->originestack[painter->originestack_top];
 
-    if (rectangle_containe_point(painter->clipstack[painter->clipstack_top], transformed))
+    if (painter->clipstack[painter->clipstack_top].containe(transformed))
     {
         bitmap_blend_pixel(painter->bitmap, transformed, color);
     }
@@ -83,9 +83,9 @@ void painter_plot_pixel(Painter *painter, Vec2i position, Color color)
 
 __flatten void painter_clear_pixel(Painter *painter, Vec2i position, Color color)
 {
-    Vec2i transformed = vec2i_add(position, painter->originestack[painter->originestack_top]);
+    Vec2i transformed = position + painter->originestack[painter->originestack_top];
 
-    if (rectangle_containe_point(painter->clipstack[painter->clipstack_top], transformed))
+    if (painter->clipstack[painter->clipstack_top].containe(transformed))
     {
         bitmap_set_pixel(painter->bitmap, transformed, color);
     }
@@ -97,21 +97,28 @@ void painter_blit_bitmap_fast(
     Rectangle source,
     Rectangle destination)
 {
-    if (rectangle_is_empty(destination))
-        return;
-
     Rectangle clipped_destination = painter_apply_transform(painter, destination);
     clipped_destination = painter_apply_clip(painter, clipped_destination);
 
-    Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
-    clipped_source.position = vec2i_add(source.position, vec2i_sub(clipped_destination.position, destination.position));
+    Rectangle clipped_source = Rectangle(clipped_destination.width(), clipped_destination.height());
+    clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
 
-    for (int x = 0; x < clipped_destination.width; x++)
+    if (clipped_destination.is_empty())
+        return;
+
+    for (int x = 0; x < clipped_destination.width(); x++)
     {
-        for (int y = 0; y < clipped_destination.height; y++)
+        for (int y = 0; y < clipped_destination.height(); y++)
         {
-            Color sample = bitmap_get_pixel(bitmap, vec2i(clipped_source.x + x, clipped_source.y + y));
-            bitmap_blend_pixel_no_check(painter->bitmap, vec2i_add(clipped_destination.position, vec2i(x, y)), sample);
+            Vec2i position(x, y);
+
+            Color sample = bitmap_get_pixel(
+                bitmap,
+                clipped_source.position() + position);
+
+            bitmap_blend_pixel(
+                painter->bitmap,
+                clipped_destination.position() + position, sample);
         }
     }
 }
@@ -122,18 +129,18 @@ void painter_blit_bitmap_scaled(
     Rectangle source,
     Rectangle destination)
 {
-    if (rectangle_is_empty(destination))
+    if (destination.is_empty())
         return;
 
-    for (int x = 0; x < destination.width; x++)
+    for (int x = 0; x < destination.width(); x++)
     {
-        for (int y = 0; y < destination.height; y++)
+        for (int y = 0; y < destination.height(); y++)
         {
-            float xx = x / (float)destination.width;
-            float yy = y / (float)destination.height;
+            float xx = x / (float)destination.width();
+            float yy = y / (float)destination.height();
 
             Color sample = bitmap_sample(bitmap, source, xx, yy);
-            painter_plot_pixel(painter, vec2i_add(destination.position, vec2i(x, y)), sample);
+            painter_plot_pixel(painter, destination.position() + Vec2i(x, y), sample);
         }
     }
 }
@@ -144,17 +151,17 @@ __flatten void painter_blit_bitmap(
     Rectangle source,
     Rectangle destination)
 {
-    if (rectangle_is_empty(destination))
+    if (destination.is_empty())
         return;
 
-    if (source.width == destination.width &&
-        source.height == destination.height)
+    if (source.width() == destination.width() &&
+        source.height() == destination.height())
     {
         painter_blit_bitmap_fast(painter, bitmap, source, destination);
     }
     else
     {
-        painter_blit_bitmap_scaled(painter, bitmap, source, destination);
+        //painter_blit_bitmap_scaled(painter, bitmap, source, destination);
     }
 }
 
@@ -167,23 +174,23 @@ void painter_blit_bitmap_fast_no_alpha(
     Rectangle clipped_destination = painter_apply_transform(painter, destination);
     clipped_destination = painter_apply_clip(painter, clipped_destination);
 
-    Rectangle clipped_source = RECTANGLE_SIZE(clipped_destination.width, clipped_destination.height);
-    clipped_source.position = vec2i_add(source.position, vec2i_sub(clipped_destination.position, destination.position));
+    Rectangle clipped_source = Rectangle(clipped_destination.width(), clipped_destination.height());
+    clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
 
-    if (rectangle_is_empty(clipped_destination))
-    {
+    if (clipped_destination.is_empty())
         return;
-    }
 
-    for (int x = 0; x < clipped_destination.width; x++)
+    for (int x = 0; x < clipped_destination.width(); x++)
     {
-        for (int y = 0; y < clipped_destination.height; y++)
+        for (int y = 0; y < clipped_destination.height(); y++)
         {
-            Color sample = bitmap_get_pixel(bitmap, vec2i(clipped_source.x + x, clipped_source.y + y));
+            Vec2i position(x, y);
+
+            Color sample = bitmap_get_pixel(bitmap, clipped_source.position() + position);
 
             sample.A = 255;
 
-            bitmap_set_pixel_no_check(painter->bitmap, vec2i_add(clipped_destination.position, vec2i(x, y)), sample);
+            bitmap_set_pixel_no_check(painter->bitmap, clipped_destination.position() + position, sample);
         }
     }
 }
@@ -194,15 +201,15 @@ void painter_blit_bitmap_scaled_no_alpha(
     Rectangle source,
     Rectangle destination)
 {
-    for (int x = 0; x < destination.width; x++)
+    for (int x = 0; x < destination.width(); x++)
     {
-        for (int y = 0; y < destination.height; y++)
+        for (int y = 0; y < destination.height(); y++)
         {
-            float xx = x / (float)destination.width;
-            float yy = y / (float)destination.height;
+            float xx = x / (float)destination.width();
+            float yy = y / (float)destination.height();
 
             Color sample = bitmap_sample(bitmap, source, xx, yy);
-            painter_plot_pixel(painter, vec2i_add(destination.position, vec2i(x, y)), sample);
+            painter_plot_pixel(painter, destination.position() + Vec2i(x, y), sample);
         }
     }
 }
@@ -213,8 +220,8 @@ __flatten void painter_blit_bitmap_no_alpha(
     Rectangle source,
     Rectangle destination)
 {
-    if (source.width == destination.width &&
-        source.height == destination.height)
+    if (source.width() == destination.width() &&
+        source.height() == destination.height())
     {
         painter_blit_bitmap_fast_no_alpha(painter, bitmap, source, destination);
     }
@@ -234,16 +241,16 @@ __flatten void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Co
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
 
-    if (rectangle_is_empty(rectangle))
+    if (rectangle.is_empty())
     {
         return;
     }
 
-    for (int x = 0; x < rectangle.width; x++)
+    for (int x = 0; x < rectangle.width(); x++)
     {
-        for (int y = 0; y < rectangle.height; y++)
+        for (int y = 0; y < rectangle.height(); y++)
         {
-            bitmap_set_pixel_no_check(painter->bitmap, vec2i(rectangle.x + x, rectangle.y + y), color);
+            bitmap_set_pixel_no_check(painter->bitmap, Vec2i(rectangle.x() + x, rectangle.y() + y), color);
         }
     }
 }
@@ -253,16 +260,16 @@ __flatten void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Col
     rectangle = painter_apply_transform(painter, rectangle);
     rectangle = painter_apply_clip(painter, rectangle);
 
-    if (rectangle_is_empty(rectangle))
+    if (rectangle.is_empty())
     {
         return;
     }
 
-    for (int x = 0; x < rectangle.width; x++)
+    for (int x = 0; x < rectangle.width(); x++)
     {
-        for (int y = 0; y < rectangle.height; y++)
+        for (int y = 0; y < rectangle.height(); y++)
         {
-            bitmap_blend_pixel_no_check(painter->bitmap, vec2i(rectangle.x + x, rectangle.y + y),
+            bitmap_blend_pixel_no_check(painter->bitmap, Vec2i(rectangle.x() + x, rectangle.y() + y),
                                         color);
         }
     }
@@ -270,10 +277,11 @@ __flatten void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Col
 
 __flatten void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color)
 {
-    Rectangle left_ear = rectangle_left(rectangle, insets.left);
-    Rectangle right_ear = rectangle_right(rectangle, insets.right);
-    Rectangle top = rectangle_top(rectangle_cutoff_left_right(rectangle, insets.left, insets.right), insets.top);
-    Rectangle bottom = rectangle_bottom(rectangle_cutoff_left_right(rectangle, insets.left, insets.right), insets.bottom);
+    Rectangle left_ear = rectangle.take_left(insets.left());
+    Rectangle right_ear = rectangle.take_right(insets.right());
+
+    Rectangle top = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_top(insets.top());
+    Rectangle bottom = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_bottom(insets.bottom());
 
     painter_fill_rectangle(painter, left_ear, color);
     painter_fill_rectangle(painter, right_ear, color);
@@ -283,16 +291,16 @@ __flatten void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets
 
 __flatten void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
 {
-    Vec2f a = vec2f(p0.x, p0.y);
-    Vec2f b = vec2f(p1.x, p1.y);
-    Vec2f c = vec2f(p2.x, p2.y);
+    Vec2f a(p0);
+    Vec2f b(p1);
+    Vec2f c(p2);
 
-    if (a.y > b.y)
-        __swap(Vec2f, a, b);
-    if (a.y > c.y)
-        __swap(Vec2f, a, c);
-    if (b.y > c.y)
-        __swap(Vec2f, b, c);
+    if (a.y() > b.y())
+        swap(a, b);
+    if (a.y() > c.y())
+        swap(a, c);
+    if (b.y() > c.y())
+        swap(b, c);
 
     Vec2f s = a;
     Vec2f e = a;
@@ -301,99 +309,111 @@ __flatten void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i
     double dx2 = 0;
     double dx3 = 0;
 
-    if (b.y - a.y > 0)
+    if (b.y() - a.y() > 0)
     {
-        dx1 = (b.x - a.x) / (double)(b.y - a.y);
+        dx1 = (b.x() - a.x()) / (double)(b.y() - a.y());
     }
 
-    if (c.y - a.y > 0)
+    if (c.y() - a.y() > 0)
     {
-        dx2 = (c.x - a.x) / (double)(c.y - a.y);
+        dx2 = (c.x() - a.x()) / (double)(c.y() - a.y());
     }
 
-    if (c.y - b.y > 0)
+    if (c.y() - b.y() > 0)
     {
-        dx3 = (c.x - b.x) / (double)(c.y - b.y);
+        dx3 = (c.x() - b.x()) / (double)(c.y() - b.y());
     }
 
     if (dx1 > dx2)
     {
-        for (; s.y <= b.y; s.y++, e.y++, s.x += dx2, e.x += dx1)
+        do
         {
-            painter_draw_line(painter, vec2i(s.x - 1, s.y), vec2i(e.x + 1, s.y), color);
-        }
+            painter_draw_line(painter, Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
+
+            s += Vec2f(dx2, 1);
+            e += Vec2f(dx1, 1);
+        } while (s.y() <= b.y());
 
         e = b;
 
-        for (; s.y <= c.y; s.y++, e.y++, s.x += dx2, e.x += dx3)
+        do
         {
-            painter_draw_line(painter, vec2i(s.x - 1, s.y), vec2i(e.x + 1, s.y), color);
-        }
+            painter_draw_line(painter, Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
+
+            s += Vec2f(dx2, 1);
+            e += Vec2f(dx3, 1);
+        } while (s.y() <= c.y());
     }
     else
     {
-        for (; s.y <= b.y; s.y++, e.y++, s.x += dx1, e.x += dx2)
+        do
         {
-            painter_draw_line(painter, vec2i(s.x - 1, s.y), vec2i(e.x + 1, s.y), color);
-        }
+            painter_draw_line(painter, Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
+
+            s += Vec2f(dx1, 1);
+            e += Vec2f(dx2, 1);
+        } while (s.y() <= b.y());
 
         s = b;
 
-        for (; s.y <= c.y; s.y++, e.y++, s.x += dx3, e.x += dx2)
+        do
         {
-            painter_draw_line(painter, vec2i(s.x - 1, s.y), vec2i(e.x + 1, s.y), color);
-        }
+            painter_draw_line(painter, Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
+
+            s += Vec2f(dx3, 1);
+            e += Vec2f(dx2, 1);
+        } while (s.y() <= c.y());
     }
 }
 
 static double sample_fill_circle(Vec2i center, double radius, Vec2i position)
 {
-    double distance = vec2i_distance(center, position) - radius;
+    double distance = center.distance_to(position) - radius;
     return clamp(0.5 - distance, 0, 1);
 }
 
 void painter_fill_circle_helper(Painter *painter, Rectangle bound, Vec2i center, int radius, Color color)
 {
-    for (int x = 0; x < bound.width; x++)
+    for (int x = 0; x < bound.width(); x++)
     {
-        for (int y = 0; y < bound.height; y++)
+        for (int y = 0; y < bound.height(); y++)
         {
-            double distance = sample_fill_circle(center, radius - 0.5, vec2i(x, y));
+            double distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
             double alpha = (color.A / 255.0) * distance;
 
-            painter_plot_pixel(painter, vec2i(bound.x + x, bound.y + y), ALPHA(color, alpha));
+            painter_plot_pixel(painter, Vec2i(bound.x() + x, bound.y() + y), ALPHA(color, alpha));
         }
     }
 }
 
 void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radius, Color color)
 {
-    radius = MIN(radius, bound.height / 2);
-    radius = MIN(radius, bound.width / 2);
+    radius = MIN(radius, bound.height() / 2);
+    radius = MIN(radius, bound.width() / 2);
 
-    Rectangle left_ear = rectangle_left(bound, radius);
-    Rectangle right_ear = rectangle_right(bound, radius);
+    Rectangle left_ear = bound.take_left(radius);
+    Rectangle right_ear = bound.take_right(radius);
 
-    painter_fill_circle_helper(painter, rectangle_top(left_ear, radius), vec2i(radius - 1, radius - 1), radius, color);
-    painter_fill_circle_helper(painter, rectangle_bottom(left_ear, radius), vec2i(radius - 1, 0), radius, color);
-    painter_fill_rectangle(painter, rectangle_cutoff_top_botton(left_ear, radius, radius), color);
+    painter_fill_circle_helper(painter, left_ear.take_top(radius), Vec2i(radius - 1, radius - 1), radius, color);
+    painter_fill_circle_helper(painter, left_ear.take_bottom(radius), Vec2i(radius - 1, 0), radius, color);
+    painter_fill_rectangle(painter, left_ear.cutoff_top_and_botton(radius, radius), color);
 
-    painter_fill_circle_helper(painter, rectangle_top(right_ear, radius), vec2i(0, radius - 1), radius, color);
-    painter_fill_circle_helper(painter, rectangle_bottom(right_ear, radius), vec2i(0, 0), radius, color);
-    painter_fill_rectangle(painter, rectangle_cutoff_top_botton(right_ear, radius, radius), color);
+    painter_fill_circle_helper(painter, right_ear.take_top(radius), Vec2i(0, radius - 1), radius, color);
+    painter_fill_circle_helper(painter, right_ear.take_bottom(radius), Vec2i::zero(), radius, color);
+    painter_fill_rectangle(painter, right_ear.cutoff_top_and_botton(radius, radius), color);
 
-    painter_fill_rectangle(painter, rectangle_cutoff_left_right(bound, radius, radius), color);
+    painter_fill_rectangle(painter, bound.cutoff_left_and_right(radius, radius), color);
 }
 
 void painter_fill_checkboard(Painter *painter, Rectangle bound, int cell_size, Color fg_color, Color bg_color)
 {
-    for (int x = 0; x < bound.width; x++)
+    for (int x = 0; x < bound.width(); x++)
     {
-        for (int y = 0; y < bound.height; y++)
+        for (int y = 0; y < bound.height(); y++)
         {
-            Vec2i position = vec2i(bound.x + x, bound.y + y);
+            Vec2i position = bound.position() + Vec2i(x, y);
 
-            if (((y / cell_size) * bound.width + (x / cell_size) + (y / cell_size) % 2) % 2 == 0)
+            if (((y / cell_size) * bound.width() + (x / cell_size) + (y / cell_size) % 2) % 2 == 0)
             {
                 painter_plot_pixel(painter, position, fg_color);
             }
@@ -409,7 +429,7 @@ void painter_draw_line_x_aligned(Painter *painter, int x, int start, int end, Co
 {
     for (int i = start; i <= end; i++)
     {
-        painter_plot_pixel(painter, vec2i(x, i), color);
+        painter_plot_pixel(painter, Vec2i(x, i), color);
     }
 }
 
@@ -417,33 +437,37 @@ void painter_draw_line_y_aligned(Painter *painter, int y, int start, int end, Co
 {
     for (int i = start; i <= end; i++)
     {
-        painter_plot_pixel(painter, vec2i(i, y), color);
+        painter_plot_pixel(painter, Vec2i(i, y), color);
     }
 }
 
 void painter_draw_line_not_aligned(Painter *painter, Vec2i a, Vec2i b, Color color)
 {
-    int dx = abs(b.x - a.x), sx = a.x < b.x ? 1 : -1;
-    int dy = abs(b.y - a.y), sy = a.y < b.y ? 1 : -1;
+    int dx = abs(b.x() - a.x());
+    int dy = abs(b.y() - a.y());
+
+    int sx = a.x() < b.x() ? 1 : -1;
+    int sy = a.y() < b.y() ? 1 : -1;
+
     int err = (dx > dy ? dx : -dy) / 2, e2;
 
     for (;;)
     {
         painter_plot_pixel(painter, a, color);
 
-        if (a.x == b.x && a.y == b.y)
+        if (a.x() == b.x() && a.y() == b.y())
             break;
 
         e2 = err;
         if (e2 > -dx)
         {
             err -= dy;
-            a.x += sx;
+            a += Vec2(sx, 0);
         }
         if (e2 < dy)
         {
             err += dx;
-            a.y += sy;
+            a += Vec2(0, sy);
         }
     }
 }
@@ -452,17 +476,16 @@ void painter_draw_line_not_aligned(Painter *painter, Vec2i a, Vec2i b, Color col
 #define __round(X) ((int)(((double)(X)) + 0.5))
 #define __fpart(X) (((double)(X)) - (double)__ipart(X))
 #define __rfpart(X) (1.0 - __fpart(X))
-#define __plot(__x, __y, __brightness) painter_plot_pixel(painter, vec2i((__x), (__y)), ALPHA(color, (color.A / 255.0) * (__brightness)))
+#define __plot(__x, __y, __brightness) painter_plot_pixel(painter, Vec2i((__x), (__y)), ALPHA(color, (color.A / 255.0) * (__brightness)))
 
 void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color)
 {
+    double x0 = a.x();
+    double y0 = a.y();
+    double x1 = b.x();
+    double y1 = b.y();
 
-    double x0 = a.x;
-    double y0 = a.y;
-    double x1 = b.x;
-    double y1 = b.y;
-
-    const bool steep = abs(y1 - a.y) > abs(x1 - x0);
+    const bool steep = abs(y1 - a.y()) > abs(x1 - x0);
     if (steep)
     {
         __swap(double, x0, y0);
@@ -540,13 +563,13 @@ void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color
 
 __flatten void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color)
 {
-    if (a.x == b.x)
+    if (a.x() == b.x())
     {
-        painter_draw_line_x_aligned(painter, a.x, MIN(a.y, b.y), MAX(a.y, b.y), color);
+        painter_draw_line_x_aligned(painter, a.x(), MIN(a.y(), b.y()), MAX(a.y(), b.y()), color);
     }
-    else if (a.y == b.y)
+    else if (a.y() == b.y())
     {
-        painter_draw_line_y_aligned(painter, a.y, MIN(a.x, b.x), MAX(a.x, b.x), color);
+        painter_draw_line_y_aligned(painter, a.y(), MIN(a.x(), b.x()), MAX(a.x(), b.x()), color);
     }
     else
     {
@@ -556,21 +579,16 @@ __flatten void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color
 
 __flatten void painter_draw_rectangle(Painter *painter, Rectangle rect, Color color)
 {
-    Vec2i topleft = rect.position;
-    Vec2i topright = vec2i_add(rect.position, vec2i_x(rect.size));
-    topright = vec2i_sub(topright, vec2i(1, 0));
-
-    Vec2i bottomleft = vec2i_add(rect.position, vec2i_y(rect.size));
-    bottomleft = vec2i_sub(bottomleft, vec2i(0, 1));
-
-    Vec2i bottomright = vec2i_add(rect.position, rect.size);
-    bottomright = vec2i_sub(bottomright, vec2i(1, 1));
+    Vec2i topleft = rect.position();
+    Vec2i topright = rect.position() + rect.size().extract_x() - Vec2i::oneX();
+    Vec2i bottomleft = rect.position() + rect.size().extract_y() - Vec2i::oneY();
+    Vec2i bottomright = rect.position() + rect.size() - Vec2i::one();
 
     painter_draw_line(painter, topleft, topright, color);
     painter_draw_line(painter, bottomleft, bottomright, color);
 
-    painter_draw_line(painter, vec2i_add(topleft, vec2i(0, 1)), vec2i_sub(bottomleft, vec2i(0, 1)), color);
-    painter_draw_line(painter, vec2i_add(topright, vec2i(0, 1)), vec2i_sub(bottomright, vec2i(0, 1)), color);
+    painter_draw_line(painter, topleft + Vec2i::oneY(), bottomleft - Vec2i::oneY(), color);
+    painter_draw_line(painter, topright + Vec2i::oneY(), bottomright - Vec2i::oneY(), color);
 }
 
 __flatten void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color)
@@ -582,81 +600,84 @@ __flatten void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i
 
 static double sample_draw_circle(Vec2i center, double radius, double thickness, Vec2i position)
 {
-    double distance = abs(vec2i_distance(center, position) - (radius - thickness / 2));
+    double distance = abs(center.distance_to(position) - (radius - thickness / 2));
 
     return clamp((0.5 - distance) + (thickness / 2), 0, 1);
 }
 
 void painter_draw_circle_helper(Painter *painter, Rectangle bound, Vec2i center, int radius, int thickness, Color color)
 {
-    for (int x = 0; x < bound.width; x++)
+    for (int x = 0; x < bound.width(); x++)
     {
-        for (int y = 0; y < bound.height; y++)
+        for (int y = 0; y < bound.height(); y++)
         {
-            double distance = sample_draw_circle(center, radius - 0.5, thickness, vec2i(x, y));
+            Vec2i position = Vec2i(x, y);
+
+            double distance = sample_draw_circle(center, radius - 0.5, thickness, position);
             double alpha = (color.A / 255.0) * distance;
 
-            painter_plot_pixel(painter, vec2i(bound.x + x, bound.y + y), ALPHA(color, alpha));
+            painter_plot_pixel(painter, bound.position() + position, ALPHA(color, alpha));
         }
     }
 }
 
 void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radius, int thickness, Color color)
 {
-    radius = MIN(radius, bound.height / 2);
-    radius = MIN(radius, bound.width / 2);
+    radius = MIN(radius, bound.height() / 2);
+    radius = MIN(radius, bound.width() / 2);
 
-    Rectangle left_ear = rectangle_left(bound, radius);
-    Rectangle right_ear = rectangle_right(bound, radius);
+    Rectangle left_ear = bound.take_left(radius);
+    Rectangle right_ear = bound.take_right(radius);
 
-    painter_draw_circle_helper(painter, rectangle_top(left_ear, radius), vec2i(radius - 1, radius - 1), radius, thickness, color);
-    painter_draw_circle_helper(painter, rectangle_bottom(left_ear, radius), vec2i(radius - 1, 0), radius, thickness, color);
+    painter_draw_circle_helper(painter, left_ear.take_top(radius), Vec2i(radius - 1, radius - 1), radius, thickness, color);
+    painter_draw_circle_helper(painter, left_ear.take_bottom(radius), Vec2i(radius - 1, 0), radius, thickness, color);
 
-    painter_draw_circle_helper(painter, rectangle_top(right_ear, radius), vec2i(0, radius - 1), radius, thickness, color);
-    painter_draw_circle_helper(painter, rectangle_bottom(right_ear, radius), vec2i(0, 0), radius, thickness, color);
+    painter_draw_circle_helper(painter, right_ear.take_top(radius), Vec2i(0, radius - 1), radius, thickness, color);
+    painter_draw_circle_helper(painter, right_ear.take_bottom(radius), Vec2i::zero(), radius, thickness, color);
 
-    painter_fill_rectangle(painter, rectangle_left(rectangle_cutoff_top_botton(left_ear, radius, radius), thickness), color);
-    painter_fill_rectangle(painter, rectangle_right(rectangle_cutoff_top_botton(right_ear, radius, radius), thickness), color);
-    painter_fill_rectangle(painter, rectangle_top(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
-    painter_fill_rectangle(painter, rectangle_bottom(rectangle_cutoff_left_right(bound, radius, radius), thickness), color);
+    painter_fill_rectangle(painter, left_ear.cutoff_top_and_botton(radius, radius).take_left(thickness), color);
+    painter_fill_rectangle(painter, right_ear.cutoff_top_and_botton(radius, radius).take_right(thickness), color);
+
+    painter_fill_rectangle(painter, bound.cutoff_left_and_right(radius, radius).take_top(thickness), color);
+    painter_fill_rectangle(painter, bound.cutoff_left_and_right(radius, radius).take_bottom(thickness), color);
 }
 
 __flatten void painter_blit_icon(Painter *painter, Icon *icon, IconSize size, Rectangle destination, Color color)
 {
     Bitmap *bitmap = icon_get_bitmap(icon, size);
 
-    for (int x = 0; x < destination.width; x++)
+    for (int x = 0; x < destination.width(); x++)
     {
-        for (int y = 0; y < destination.height; y++)
+        for (int y = 0; y < destination.height(); y++)
         {
-            double xx = x / (double)destination.width;
-            double yy = y / (double)destination.height;
+            double xx = x / (double)destination.width();
+            double yy = y / (double)destination.height();
 
             Color sample = bitmap_sample(bitmap, bitmap_bound(bitmap), xx, yy);
 
             Color final = color;
             final.A = sample.A;
 
-            painter_plot_pixel(painter, vec2i_add(destination.position, vec2i(x, y)), final);
+            painter_plot_pixel(painter, destination.position() + Vec2i(x, y), final);
         }
     }
 }
 
 __flatten void painter_blit_bitmap_colored(Painter *painter, Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
 {
-    for (int x = 0; x < dst_rect.width; x++)
+    for (int x = 0; x < dst_rect.width(); x++)
     {
-        for (int y = 0; y < dst_rect.height; y++)
+        for (int y = 0; y < dst_rect.height(); y++)
         {
-            double xx = x / (double)dst_rect.width;
-            double yy = y / (double)dst_rect.height;
+            double xx = x / (double)dst_rect.width();
+            double yy = y / (double)dst_rect.height();
 
             Color sample = bitmap_sample(src, src_rect, xx, yy);
 
             Color final = color;
             final.A = (sample.R * color.A) / 255;
 
-            painter_plot_pixel(painter, vec2i_add(dst_rect.position, vec2i(x, y)), final);
+            painter_plot_pixel(painter, dst_rect.position() + Vec2i(x, y), final);
         }
     }
 }
@@ -670,16 +691,13 @@ void painter_blur_rectangle(Painter *painter, Rectangle rectangle, int radius)
                  painter->bitmap->width,
                  painter->bitmap->height,
                  radius,
-                 rectangle.x, rectangle.x + rectangle.width,
-                 rectangle.y, rectangle.y + rectangle.height);
+                 rectangle.x(), rectangle.x() + rectangle.width(),
+                 rectangle.y(), rectangle.y() + rectangle.height());
 }
 
 void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color)
 {
-    Rectangle dest;
-    dest.position = vec2i_sub(position, glyph->origin);
-    dest.size = glyph->bound.size;
-
+    Rectangle dest(position - glyph->origin, glyph->bound.size());
     painter_blit_bitmap_colored(painter, font->bitmap, glyph->bound, dest, color);
 }
 
@@ -693,7 +711,7 @@ __flatten void painter_draw_string(Painter *painter, Font *font, const char *str
         Glyph *glyph = font_glyph(font, codepoint);
 
         painter_draw_glyph(painter, font, glyph, position, color);
-        position = vec2i_add(position, vec2i(glyph->advance, 0));
+        position = position + Vec2i(glyph->advance, 0);
 
         size_t size = utf8_to_codepoint((const uint8_t *)str, &codepoint);
         str += size;
@@ -702,33 +720,30 @@ __flatten void painter_draw_string(Painter *painter, Font *font, const char *str
 
 void painter_draw_string_within(Painter *painter, Font *font, const char *str, Rectangle container, Position position, Color color)
 {
-    Rectangle bound = RECTANGLE_SIZE(font_measure_string(font, str), 16);
+    Rectangle bound = Rectangle(font_measure_string(font, str), 16);
 
-    bound = rectangle_place_within(bound, position, container);
+    bound = bound.place_within(container, position);
 
     painter_draw_string(
         painter,
         font,
         str,
-        vec2i(bound.x, bound.y + bound.height / 2 + 4),
+        Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4),
         color);
 }
 
 void painter_draw_truetype_glyph(Painter *painter, TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color)
 {
-    Rectangle dest;
-    dest.position = vec2i_add(position, glyph->offset);
-    dest.size = glyph->bound.size;
-
+    Rectangle dest(position + glyph->offset, glyph->bound.size());
     TrueTypeAtlas *atlas = truetypefont_get_atlas(font);
 
-    for (int x = 0; x < dest.width; x++)
+    for (int x = 0; x < dest.width(); x++)
     {
-        for (int y = 0; y < dest.height; y++)
+        for (int y = 0; y < dest.height(); y++)
         {
-            int alpha = (atlas->buffer[(y + glyph->bound.y) * atlas->width + (x + glyph->bound.x)] * color.A) / 255;
+            int alpha = (atlas->buffer[(y + glyph->bound.y()) * atlas->width + (x + glyph->bound.x())] * color.A) / 255;
 
-            painter_plot_pixel(painter, vec2i(x + dest.x, y + dest.y), COLOR_RGBA(color.R, color.G, color.B, alpha));
+            painter_plot_pixel(painter, dest.position() + Vec2i(x, y), COLOR_RGBA(color.R, color.G, color.B, alpha));
         }
     }
 
@@ -743,7 +758,7 @@ __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font
     // TrueTypeFontMetrics metrics = truetypefont_get_metrics(font);
     //
     // bound = rectangle_offset(bound, position);
-    // bound = rectangle_offset(bound, vec2i(0, -metrics.ascent));
+    // bound = rectangle_offset(bound, Vec2i(0, -metrics.ascent));
     //
     // painter_draw_rectangle(painter, bound, COLOR_GREEN);
 
@@ -760,12 +775,12 @@ __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font
             if (previouse != 0)
             {
                 int kerning = truetypefont_get_kerning_for_codepoints(font, previouse, codepoint);
-                position = vec2i_add(position, vec2i(kerning, 0));
+                position = position + Vec2i(kerning, 0);
             }
 
             painter_draw_truetype_glyph(painter, font, glyph, position, color);
 
-            position = vec2i_add(position, vec2i(glyph->advance, 0));
+            position = position + Vec2i(glyph->advance, 0);
         }
 
         previouse = codepoint;
@@ -777,14 +792,14 @@ __flatten void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font
 
 void painter_draw_truetype_string_within(Painter *painter, TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color)
 {
-    Rectangle bound = truetypefont_mesure_string(font, str);
-
-    bound = rectangle_place_within(bound, position, container);
+    Rectangle bound =
+        truetypefont_mesure_string(font, str)
+            .place_within(container, position);
 
     painter_draw_truetype_string(
         painter,
         font,
         str,
-        vec2i(bound.x, bound.y + bound.height / 2 + 4),
+        Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4),
         color);
 }

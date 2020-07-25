@@ -1,7 +1,7 @@
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
@@ -157,7 +157,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     window_set_icon((Window *)window, icon_get("folder"));
     window_set_title((Window *)window, "File Explorer");
-    window_set_size((Window *)window, vec2i(700, 500));
+    window_set_size((Window *)window, Vec2i(700, 500));
 
     Widget *root = window_root((Window *)window);
     root->layout = VFLOW(0);

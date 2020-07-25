@@ -81,7 +81,7 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     widget->state = BUTTON_IDLE;
 
     WIDGET(widget)->layout = HFLOW(0);
-    WIDGET(widget)->insets = INSETS(0, 16);
+    WIDGET(widget)->insets = Insets(0, 16);
     WIDGET(widget)->min_height = 32;
     WIDGET(widget)->layout_attributes |= LAYOUT_GREEDY;
 
@@ -95,7 +95,7 @@ Widget *button_create_with_icon(Widget *parent, ButtonStyle style, Icon *icon)
     Widget *button = button_create(parent, style);
 
     WIDGET(button)->layout = STACK();
-    WIDGET(button)->insets = INSETS(4, 4);
+    WIDGET(button)->insets = Insets(4, 4);
 
     icon_panel_create(button, icon)->layout_attributes = LAYOUT_FILL;
 
@@ -106,7 +106,7 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
 {
     Widget *button = button_create(parent, style);
 
-    button->insets = INSETS(0, 0, 8, 8);
+    button->insets = Insets(0, 0, 8, 8);
     button->min_width = 64;
 
     label_create(button, text)->layout_attributes = LAYOUT_FILL;
@@ -117,11 +117,11 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
 Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, Icon *icon, const char *text)
 {
     Widget *button = button_create(parent, style);
-    button->insets = INSETS(0, 0, 6, 10);
+    button->insets = Insets(0, 0, 6, 10);
     button->min_width = 64;
 
     Widget *button_icon = icon_panel_create(button, icon);
-    button_icon->insets = INSETS(0, 0, 0, 4);
+    button_icon->insets = Insets(0, 0, 0, 4);
 
     label_create(button, text);
 

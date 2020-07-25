@@ -8,9 +8,9 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/File.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
 
 Bitmap *bitmap_create(size_t width, size_t height)
@@ -34,7 +34,7 @@ void bitmap_destroy(Bitmap *bitmap)
 
 Rectangle bitmap_bound(Bitmap *bitmap)
 {
-    return (Rectangle){{0, 0, bitmap->width, bitmap->height}};
+    return Rectangle(bitmap->width, bitmap->height);
 }
 
 static Color placeholder_buffer[] = {
@@ -112,17 +112,17 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
 
 __flatten void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
 {
-    region = rectangle_clip(region, bitmap_bound(source));
-    region = rectangle_clip(region, bitmap_bound(destination));
+    region = region.clipped_with(bitmap_bound(source));
+    region = region.clipped_with(bitmap_bound(destination));
 
-    if (rectangle_is_empty(region))
+    if (region.is_empty())
         return;
 
-    for (int y = region.y; y < region.y + region.height; y++)
+    for (int y = region.y(); y < region.y() + region.height(); y++)
     {
-        for (int x = region.x; x < region.x + region.width; x++)
+        for (int x = region.x(); x < region.x() + region.width(); x++)
         {
-            bitmap_set_pixel_no_check(destination, vec2i(x, y), bitmap_get_pixel_no_check(source, vec2i(x, y)));
+            bitmap_set_pixel_no_check(destination, Vec2i(x, y), bitmap_get_pixel_no_check(source, Vec2i(x, y)));
         }
     }
 }

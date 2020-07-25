@@ -14,16 +14,14 @@ void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rec
         painter,
         alert_icon,
         ICON_18PX,
-        rectangle_offset(icon_bound(alert_icon, ICON_18PX), vec2i_add(widget_get_bound(placeholder).position, vec2i(8, 8))),
+        icon_bound(alert_icon, ICON_18PX).moved(widget_get_bound(placeholder).position() + Vec2i(8, 8)),
         COLOR_RED);
 
     painter_draw_string(
         painter,
         widget_font(),
         placeholder->text,
-        vec2i(
-            widget_get_bound(placeholder).x + 32,
-            widget_get_bound(placeholder).y + 20),
+        widget_get_bound(placeholder).position() + Vec2i(32, 10),
         widget_get_color(placeholder, THEME_FOREGROUND));
 }
 

@@ -12,13 +12,13 @@ void label_paint(Label *label, Painter *painter, Rectangle rectangle)
         widget_font(),
         label->text,
         widget_get_bound(label),
-        POSITION_CENTER,
+        Position::CENTER,
         widget_get_color(label, THEME_FOREGROUND));
 }
 
 Vec2i label_size(Label *label)
 {
-    return vec2i(font_measure_string(widget_font(), label->text), 16);
+    return Vec2i(font_measure_string(widget_font(), label->text), 16);
 }
 
 void label_set_text(Widget *label, const char *text)

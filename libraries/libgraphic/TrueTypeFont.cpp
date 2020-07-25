@@ -117,11 +117,11 @@ void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint en
 
         glyph->advance = packedchar[i].xadvance;
 
-        glyph->offset = vec2i(packedchar[i].xoff, packedchar[i].yoff);
+        glyph->offset = Vec2i(packedchar[i].xoff, packedchar[i].yoff);
 
         glyph->codepoint = start + i;
 
-        glyph->bound = RECTANGLE(
+        glyph->bound = Rectangle(
             packedchar[i].x0,
             packedchar[i].y0,
             packedchar[i].x1 - packedchar[i].x0,
@@ -179,7 +179,7 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
         string += size;
     }
 
-    return RECTANGLE(0, 0, width, font->size);
+    return Rectangle(width, font->size);
 }
 
 #include <libsystem/Logger.h>

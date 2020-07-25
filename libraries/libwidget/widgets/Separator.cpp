@@ -10,7 +10,7 @@ Vec2i separator_size(Separator *widget)
 {
     __unused(widget);
 
-    return vec2i(1, 1);
+    return Vec2i(1, 1);
 }
 
 static const WidgetClass separator_class = {

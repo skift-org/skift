@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     window_set_icon(window, icon_get("image"));
     window_set_title(window, "Image Viewer");
-    window_set_size(window, vec2i(700, 500));
+    window_set_size(window, Vec2i(700, 500));
 
     image_create(window_root(window), argv[1]);
 

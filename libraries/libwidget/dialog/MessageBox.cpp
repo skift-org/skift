@@ -24,9 +24,9 @@ DialogButton dialog_message(
 
     window_set_icon(window, icon);
     window_set_title(window, title);
-    window_set_size(window, vec2i(300, 200));
+    window_set_size(window, Vec2i(300, 200));
     window_root(window)->layout = VFLOW(0);
-    window_root(window)->insets = INSETS(8);
+    window_root(window)->insets = Insets(8);
 
     window_set_event_handler(window, EVENT_WINDOW_CLOSING, EVENT_HANDLER(NULL, on_dialog_close));
 

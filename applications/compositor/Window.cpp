@@ -48,14 +48,14 @@ Rectangle window_bound(Window *window)
 
 Rectangle window_cursor_capture_bound(Window *window)
 {
-    return rectangle_expand(window_bound(window), INSETS(16));
+    return window_bound(window).expended(Insets(16));
 }
 
 void window_move(Window *window, Vec2i position)
 {
     renderer_region_dirty(window_bound(window));
 
-    window->bound.position = position;
+    window->bound = window->bound.moved(position);
 
     renderer_region_dirty(window_bound(window));
 }

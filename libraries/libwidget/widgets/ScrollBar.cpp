@@ -4,32 +4,31 @@
 
 Rectangle scrollbar_button_down(ScrollBar *widget)
 {
-    return rectangle_bottom(widget_get_bound(widget), widget_get_bound(widget).width);
+    return widget_get_bound(widget).take_bottom(widget_get_bound(widget).width());
 }
 
 Rectangle scrollbar_button_up(ScrollBar *widget)
 {
-    return rectangle_top(widget_get_bound(widget), widget_get_bound(widget).width);
+    return widget_get_bound(widget).take_top(widget_get_bound(widget).width());
 }
 
 static Rectangle scrollbar_track(ScrollBar *widget)
 {
-    return rectangle_shrink(widget_get_bound(widget), INSETS(widget_get_bound(widget).width, 0));
+    return widget_get_bound(widget).shrinked(Insets(widget_get_bound(widget).width(), 0));
 }
 
 static Rectangle scrollbar_thumb(ScrollBar *widget)
 {
     Rectangle track = scrollbar_track(widget);
 
-    int thumb_height = MIN(track.height * (widget->thumb / (double)widget->track), track.height);
-    int thump_position = track.height * (widget->value / (double)widget->track);
+    int thumb_height = MIN(track.height() * (widget->thumb / (double)widget->track), track.height());
+    int thump_position = track.height() * (widget->value / (double)widget->track);
 
-    return (Rectangle){{
-        track.x + 4,
-        track.y + thump_position,
-        track.width - 8,
-        thumb_height,
-    }};
+    return Rectangle(
+        track.x() + 4,
+        track.y() + thump_position,
+        track.width() - 8,
+        thumb_height);
 }
 
 static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle rectangle)
@@ -46,8 +45,8 @@ static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle recta
 
 static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 {
-    int new_value = mouse_position.y - scrollbar_track(widget).y;
-    widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track - widget->thumb / 2;
+    int new_value = mouse_position.y() - scrollbar_track(widget).y();
+    widget->value = (new_value / (double)scrollbar_track(widget).height()) * widget->track - widget->thumb / 2;
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
@@ -60,10 +59,10 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 
 static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
 {
-    mouse_position = vec2i_sub(mouse_position, widget->mouse_origine);
+    mouse_position = mouse_position - widget->mouse_origine;
 
-    int new_value = mouse_position.y - scrollbar_track(widget).y;
-    widget->value = (new_value / (double)scrollbar_track(widget).height) * widget->track;
+    int new_value = mouse_position.y() - scrollbar_track(widget).y();
+    widget->value = (new_value / (double)scrollbar_track(widget).height()) * widget->track;
 
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
@@ -86,12 +85,12 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
         }
         else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
         {
-            if (!rectangle_containe_point(scrollbar_thumb(widget), mouse_event.position))
+            if (!scrollbar_thumb(widget).containe(mouse_event.position))
             {
                 scrollbar_scroll_to(widget, mouse_event.position);
             }
 
-            widget->mouse_origine = vec2i_sub(mouse_event.position, scrollbar_thumb(widget).position);
+            widget->mouse_origine = mouse_event.position - scrollbar_thumb(widget).position();
         }
 
         event->accepted = true;

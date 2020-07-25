@@ -6,7 +6,7 @@
 
 #include "terminal/ApplicationTerminal.h"
 
-static Vec2i _cell_size = vec2i(7, 16);
+static Vec2i _cell_size = Vec2i(7, 16);
 
 static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_BLACK] = THEME_ANSI_BLACK,
@@ -43,12 +43,10 @@ Font *get_terminal_font(void)
 
 Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
 {
-    Rectangle bound = {};
-
-    bound.position = vec2i(widget_get_bound(widget).x + x * _cell_size.x, widget_get_bound(widget).y + y * (int)(_cell_size.y));
-    bound.size = vec2i(_cell_size.x, (_cell_size.y));
-
-    return bound;
+    return {
+        widget_get_bound(widget).position() + Vec2i(x, y) * _cell_size,
+        _cell_size,
+    };
 }
 
 void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *painter, int x, int y, Codepoint codepoint, Color foreground, Color background, TerminalAttributes attributes)
@@ -68,8 +66,8 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
     {
         painter_draw_line(
             painter,
-            vec2i_add(bound.position, vec2i(0, 13)),
-            vec2i_add(bound.position, vec2i(bound.width, 13)),
+            bound.position() + Vec2i(0, 13),
+            bound.position() + Vec2i(bound.width(), 13),
             foreground);
     }
 
@@ -86,7 +84,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
             painter,
             get_terminal_font(),
             glyph,
-            vec2i_add(bound.position, vec2i(0, 12)),
+            bound.position() + Vec2i(0, 12),
             foreground);
 
         if (attributes.bold)
@@ -95,7 +93,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
                 painter,
                 get_terminal_font(),
                 glyph,
-                vec2i_add(bound.position, vec2i(1, 12)),
+                bound.position() + Vec2i(1, 12),
                 foreground);
         }
     }
@@ -134,7 +132,7 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
 
     int cx = terminal->cursor.x;
     int cy = terminal->cursor.y;
-    if (rectangle_colide(terminal_widget_cell_bound(terminal_widget, cx, cy), rectangle))
+    if (terminal_widget_cell_bound(terminal_widget, cx, cy).colide_with(rectangle))
     {
         TerminalCell cell = terminal_cell_at(terminal, cx, cy);
 
@@ -240,8 +238,10 @@ void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 
 void terminal_widget_layout(TerminalWidget *widget)
 {
-    int width = widget_get_bound(widget).width / _cell_size.width;
-    int height = widget_get_bound(widget).height / _cell_size.height;
+    logger_debug("%d %d", _cell_size.x(), _cell_size.y());
+
+    int width = widget_get_bound(widget).width() / _cell_size.x();
+    int height = widget_get_bound(widget).height() / _cell_size.y();
 
     width = MAX(width, 8);
     height = MAX(height, 8);

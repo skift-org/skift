@@ -31,7 +31,7 @@ void window_populate_header(Window *window)
     widget_clear_childs(window->header_container);
 
     window_header(window)->layout = HFLOW(4);
-    window_header(window)->insets = INSETS(6, 6);
+    window_header(window)->insets = Insets(6, 6);
 
     button_create_with_icon_and_text(
         window_header(window),
@@ -45,14 +45,14 @@ void window_populate_header(Window *window)
     if (window->flags & WINDOW_RESIZABLE)
     {
         Widget *button_minimize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-minimize"));
-        button_minimize->insets = INSETS(3);
+        button_minimize->insets = Insets(3);
 
         Widget *button_maximize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-maximize"));
-        button_maximize->insets = INSETS(3);
+        button_maximize->insets = Insets(3);
     }
 
     Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-close"));
-    close_button->insets = INSETS(3);
+    close_button->insets = Insets(3);
 
     widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
 }
@@ -76,7 +76,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->backbuffer_painter = painter_create(window->backbuffer);
     shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
 
-    window->on_screen_bound = RECTANGLE_SIZE(250, 250);
+    window->on_screen_bound = Rectangle(250, 250);
     window->dirty_rect = list_create();
 
     window->header_container = container_create(NULL);
@@ -91,7 +91,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->widget_by_id = hashmap_create_string_to_value();
 
     application_add_window(window);
-    window_set_position(window, vec2i(96, 72));
+    window_set_position(window, Vec2i(96, 72));
 }
 
 Window *window_create(WindowFlag flags)
@@ -154,26 +154,18 @@ void window_set_icon(Window *window, Icon *icon)
 
 void window_set_size(Window *window, Vec2i size)
 {
-    Rectangle bound = window->on_screen_bound;
-
-    bound.size = size;
-
-    window_set_bound(window, bound);
+    window_set_bound(window, window->on_screen_bound.resized(size));
 }
 
 void window_set_position(Window *window, Vec2i position)
 {
-    Rectangle bound = window->on_screen_bound;
-
-    bound.position = position;
-
-    window_set_bound(window, bound);
+    window_set_bound(window, window->on_screen_bound.moved(position));
 }
 
 static void window_change_framebuffer_if_needed(Window *window)
 {
-    if (window_bound(window).width != bitmap_bound(window->frontbuffer).width ||
-        window_bound(window).height != bitmap_bound(window->frontbuffer).height)
+    if (window_bound(window).width() != bitmap_bound(window->frontbuffer).width() ||
+        window_bound(window).height() != bitmap_bound(window->frontbuffer).height())
     {
         painter_destroy(window->frontbuffer_painter);
         bitmap_destroy(window->frontbuffer);
@@ -181,11 +173,11 @@ static void window_change_framebuffer_if_needed(Window *window)
         painter_destroy(window->backbuffer_painter);
         bitmap_destroy(window->backbuffer);
 
-        window->frontbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->frontbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
         window->frontbuffer_painter = painter_create(window->frontbuffer);
         shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
 
-        window->backbuffer = bitmap_create(window_bound(window).width, window_bound(window).height);
+        window->backbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
         window->backbuffer_painter = painter_create(window->backbuffer);
         shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
     }
@@ -241,12 +233,12 @@ void window_hide(Window *window)
 
 Rectangle window_header_bound(Window *window)
 {
-    return rectangle_set_height(window_bound(window), WINDOW_HEADER_AREA);
+    return window_bound(window).take_top(WINDOW_HEADER_AREA);
 }
 
 Rectangle window_header_bound_on_screen(Window *window)
 {
-    return rectangle_set_height(window_bound_on_screen(window), WINDOW_HEADER_AREA);
+    return window_bound_on_screen(window).take_top(WINDOW_HEADER_AREA);
 }
 
 Rectangle window_content_bound(Window *window)
@@ -257,7 +249,7 @@ Rectangle window_content_bound(Window *window)
     }
     else
     {
-        return rectangle_shrink(window_bound(window), INSETS(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+        return window_bound(window).shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
     }
 }
 
@@ -267,7 +259,7 @@ void window_paint(Window *window, Painter *painter, Rectangle rectangle)
 
     painter_push_clip(painter, rectangle);
 
-    if (rectangle_container_rectangle(window_content_bound(window), rectangle))
+    if (window_content_bound(window).containe(rectangle))
     {
         if (window_root(window))
         {
@@ -299,55 +291,41 @@ void window_dump(Window *window)
 {
     printf("Window(0x%p) (%d, %d) %dx%d\n",
            window,
-           window->on_screen_bound.x,
-           window->on_screen_bound.y,
-           window->on_screen_bound.width,
-           window->on_screen_bound.height);
+           window->on_screen_bound.x(),
+           window->on_screen_bound.y(),
+           window->on_screen_bound.width(),
+           window->on_screen_bound.height());
 
     widget_dump(window->root_container, 1);
 }
 
-RectangeBorder window_resize_bound_containe(Window *window, Vec2i position)
+RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
-    Rectangle resize_bound = rectangle_expand(
-        window_bound(window),
-        INSETS(WINDOW_RESIZE_AREA));
-
-    return rectangle_inset_containe_point(
-        resize_bound,
-        INSETS(WINDOW_RESIZE_AREA),
-        position);
+    Rectangle resize_bound = window_bound(window).expended(Insets(WINDOW_RESIZE_AREA));
+    return resize_bound.containe(Insets(WINDOW_RESIZE_AREA), position);
 }
 
 void window_begin_resize(Window *window, Vec2i mouse_position)
 {
     window->is_resizing = true;
 
-    RectangeBorder borders = window_resize_bound_containe(window, mouse_position);
+    RectangleBorder borders = window_resize_bound_containe(window, mouse_position);
 
-    window->resize_horizontal = borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT);
-    window->resize_vertical = borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM);
+    window->resize_horizontal = borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT);
+    window->resize_vertical = borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM);
 
-    Vec2i resize_region_begin = {};
+    Vec2i resize_region_begin(
+        window_bound_on_screen(window).x(),
+        window_bound_on_screen(window).y());
 
-    if (borders & RECTANGLE_BORDER_TOP)
+    if (borders & RectangleBorder::TOP)
     {
-        resize_region_begin.y = window_bound_on_screen(window).y + window_bound_on_screen(window).height;
+        resize_region_begin += Vec2i(0, window_bound_on_screen(window).height());
     }
 
-    if (borders & RECTANGLE_BORDER_BOTTOM)
+    if (borders & RectangleBorder::LEFT)
     {
-        resize_region_begin.y = window_bound_on_screen(window).y;
-    }
-
-    if (borders & RECTANGLE_BORDER_LEFT)
-    {
-        resize_region_begin.x = window_bound_on_screen(window).x + window_bound_on_screen(window).width;
-    }
-
-    if (borders & RECTANGLE_BORDER_RIGHT)
-    {
-        resize_region_begin.x = window_bound_on_screen(window).x;
+        resize_region_begin += Vec2i(window_bound_on_screen(window).width(), 0);
     }
 
     window->resize_begin = resize_region_begin;
@@ -355,24 +333,28 @@ void window_begin_resize(Window *window, Vec2i mouse_position)
 
 void window_do_resize(Window *window, Vec2i mouse_position)
 {
-    Rectangle new_bound = rectangle_from_two_point(window->resize_begin, vec2i_add(window_bound_on_screen(window).position, mouse_position));
+    Rectangle new_bound = Rectangle::from_two_point(
+        window->resize_begin,
+        window_bound_on_screen(window).position() + mouse_position);
 
     if (!window->resize_horizontal)
     {
-        new_bound.x = window_bound_on_screen(window).x;
-        new_bound.width = window_bound_on_screen(window).width;
+        new_bound = new_bound
+                        .moved({window_bound_on_screen(window).x(), new_bound.y()})
+                        .with_width(window_bound_on_screen(window).width());
     }
 
     if (!window->resize_vertical)
     {
-        new_bound.y = window_bound_on_screen(window).y;
-        new_bound.height = window_bound_on_screen(window).height;
+        new_bound = new_bound
+                        .moved({new_bound.x(), window_bound_on_screen(window).y()})
+                        .with_height(window_bound_on_screen(window).height());
     }
 
     Vec2i content_size = widget_compute_size(window_root(window));
 
-    new_bound.height = MAX(new_bound.height, WINDOW_HEADER_AREA + content_size.height + WINDOW_CONTENT_PADDING);
-    new_bound.width = MAX(new_bound.width, MAX(widget_compute_size(window_header(window)).width, content_size.width) + WINDOW_CONTENT_PADDING * 2);
+    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(widget_compute_size(window_header(window)).x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
+    new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
 
     window_set_bound(window, new_bound);
 }
@@ -384,12 +366,12 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (rectangle_containe_point(widget_get_bound(window_root(window)), position))
+    if (widget_get_bound(window_root(window)).containe(position))
     {
         return widget_get_child_at(window_root(window), position);
     }
 
-    if (rectangle_containe_point(widget_get_bound(window_header(window)), position))
+    if (widget_get_bound(window_header(window)).containe(position))
     {
         return widget_get_child_at(window_header(window), position);
     }
@@ -401,8 +383,8 @@ void window_event(Window *window, Event *event)
 {
     if (is_mouse_event(event))
     {
-        event->mouse.position = vec2i_sub(event->mouse.position, window->on_screen_bound.position);
-        event->mouse.old_position = vec2i_sub(event->mouse.old_position, window->on_screen_bound.position);
+        event->mouse.position = event->mouse.position - window->on_screen_bound.position();
+        event->mouse.old_position = event->mouse.old_position - window->on_screen_bound.position();
     }
 
     if (window->handlers[event->type].callback != NULL)
@@ -456,13 +438,13 @@ void window_event(Window *window, Event *event)
 
     case EVENT_MOUSE_MOVE:
     {
-        RectangeBorder borders = window_resize_bound_containe(window, event->mouse.position);
+        RectangleBorder borders = window_resize_bound_containe(window, event->mouse.position);
 
         if (window->is_dragging)
         {
-            Vec2i offset = vec2i_sub(event->mouse.position, event->mouse.old_position);
-            window->on_screen_bound = rectangle_offset(window->on_screen_bound, offset);
-            application_move_window(window, window->on_screen_bound.position);
+            Vec2i offset = event->mouse.position - event->mouse.old_position;
+            window->on_screen_bound = window->on_screen_bound.offset(offset);
+            application_move_window(window, window->on_screen_bound.position());
         }
         else if (window->is_resizing)
         {
@@ -470,27 +452,27 @@ void window_event(Window *window, Event *event)
         }
         else if (borders && (window->flags & WINDOW_RESIZABLE))
         {
-            if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_LEFT))
+            if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
             {
                 window_set_cursor(window, CURSOR_RESIZEHV);
             }
-            else if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_RIGHT))
+            else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::RIGHT))
             {
                 window_set_cursor(window, CURSOR_RESIZEHV);
             }
-            else if ((borders & RECTANGLE_BORDER_TOP) && (borders & RECTANGLE_BORDER_RIGHT))
+            else if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::RIGHT))
             {
                 window_set_cursor(window, CURSOR_RESIZEVH);
             }
-            else if ((borders & RECTANGLE_BORDER_BOTTOM) && (borders & RECTANGLE_BORDER_LEFT))
+            else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::LEFT))
             {
                 window_set_cursor(window, CURSOR_RESIZEVH);
             }
-            else if (borders & (RECTANGLE_BORDER_TOP | RECTANGLE_BORDER_BOTTOM))
+            else if (borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM))
             {
                 window_set_cursor(window, CURSOR_RESIZEV);
             }
-            else if (borders & (RECTANGLE_BORDER_LEFT | RECTANGLE_BORDER_RIGHT))
+            else if (borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT))
             {
                 window_set_cursor(window, CURSOR_RESIZEH);
             }
@@ -534,7 +516,7 @@ void window_event(Window *window, Event *event)
 
     case EVENT_MOUSE_BUTTON_PRESS:
     {
-        if (rectangle_containe_point(widget_get_bound(window_root(window)), event->mouse.position))
+        if (widget_get_bound(window_root(window)).containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -547,7 +529,7 @@ void window_event(Window *window, Event *event)
 
         if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && rectangle_containe_point(widget_get_bound(window_header(window)), event->mouse.position))
+            if (!event->accepted && widget_get_bound(window_header(window)).containe(event->mouse.position))
             {
                 Widget *widget = widget_get_child_at(window_header(window), event->mouse.position);
 
@@ -560,7 +542,7 @@ void window_event(Window *window, Event *event)
             if (!event->accepted &&
                 !window->is_dragging &&
                 event->mouse.button == MOUSE_BUTTON_LEFT &&
-                rectangle_containe_point(window_header_bound(window), event->mouse.position))
+                window_header_bound(window).containe(event->mouse.position))
             {
                 window->is_dragging = true;
                 window_set_cursor(window, CURSOR_MOVE);
@@ -605,7 +587,7 @@ void window_event(Window *window, Event *event)
 
     case EVENT_MOUSE_DOUBLE_CLICK:
     {
-        if (rectangle_containe_point(widget_get_bound(window_root(window)), event->mouse.position))
+        if (widget_get_bound(window_root(window)).containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -657,11 +639,7 @@ void window_set_on_screen_bound(Window *window, Rectangle new_bound)
 
 Rectangle window_bound(Window *window)
 {
-    Rectangle bound = {};
-
-    bound.size = window->on_screen_bound.size;
-
-    return bound;
+    return window->on_screen_bound.moved({0, 0});
 }
 
 void window_set_cursor(Window *window, CursorState state)
@@ -750,19 +728,19 @@ Widget *window_root(Window *window)
 
 void window_update(Window *window)
 {
-    Rectangle repaited_regions = RECTANGLE_EMPTY;
+    Rectangle repaited_regions = Rectangle::empty();
 
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
         window_paint(window, window->backbuffer_painter, *rectangle);
 
-        if (rectangle_is_empty(repaited_regions))
+        if (repaited_regions.is_empty())
         {
             repaited_regions = *rectangle;
         }
         else
         {
-            repaited_regions = rectangle_merge(*rectangle, repaited_regions);
+            repaited_regions = rectangle->merged_with(repaited_regions);
         }
     }
 
@@ -789,9 +767,9 @@ void window_schedule_update(Window *window, Rectangle rectangle)
 
     list_foreach(Rectangle, dirty_rect, window->dirty_rect)
     {
-        if (rectangle_colide(*dirty_rect, rectangle))
+        if (dirty_rect->colide_with(rectangle))
         {
-            *dirty_rect = rectangle_merge(*dirty_rect, rectangle);
+            *dirty_rect = dirty_rect->merged_with(rectangle);
             return;
         }
     }

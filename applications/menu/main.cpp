@@ -1,8 +1,8 @@
 #include <libjson/Json.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
@@ -126,12 +126,12 @@ void menu_create_list(Widget *parent, List *menu)
     Widget *list = container_create(parent);
     list->layout = VFLOW(4);
     list->layout_attributes = LAYOUT_FILL;
-    list->insets = INSETS(4);
+    list->insets = Insets(4);
 
     list_foreach(MenuEntry, entry, menu)
     {
         Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, icon_get(entry->icon), entry->name);
-        item->insets = INSETS(8);
+        item->insets = Insets(8);
         widget_set_event_handler(item, EVENT_ACTION, EVENT_HANDLER(entry, (EventHandlerCallback)menu_item_click));
     }
 }
@@ -145,8 +145,8 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_POP_OVER);
 
     window_set_title(window, "Panel");
-    window_set_position(window, vec2i_zero);
-    window_set_size(window, vec2i(320, screen_get_bound().height));
+    window_set_position(window, Vec2i::zero());
+    window_set_size(window, Vec2i(320, screen_get_bound().height()));
 
     window_root(window)->layout = VFLOW(8);
 

@@ -159,7 +159,7 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         }
     }
 
-    renderer_region_dirty(rectangle_offset(flip_window.bound, window->bound.position));
+    renderer_region_dirty(flip_window.bound.offset(window->bound.position()));
 
     CompositorMessage message = {};
     message.type = COMPOSITOR_MESSAGE_ACK;

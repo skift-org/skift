@@ -1,10 +1,10 @@
 #include <abi/Paths.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/Logger.h>
 #include <libwidget/Application.h>
 
 #include "terminal/ApplicationTerminal.h"
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
         window_set_icon(window, icon_get("console-line"));
         window_set_title(window, "Terminal");
-        window_set_size(window, vec2i(500, 400));
+        window_set_size(window, Vec2i(500, 400));
 
         Widget *widget = terminal_widget_create(window_root(window));
         widget_set_focus(widget);

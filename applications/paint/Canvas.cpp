@@ -3,40 +3,11 @@
 #include "paint/Canvas.h"
 #include "paint/PaintTool.h"
 
-#define CHECKER_SIZE 8
-
-static void checker_board(Painter *painter, Rectangle rectangle)
-{
-    for (int x = 0; x < rectangle.width / CHECKER_SIZE + 1; x++)
-    {
-        for (int y = 0; y < rectangle.height / CHECKER_SIZE + 1; y++)
-        {
-            Rectangle cell = (Rectangle){
-                {
-                    rectangle.x + x * CHECKER_SIZE,
-                    rectangle.y + y * CHECKER_SIZE,
-                    CHECKER_SIZE,
-                    CHECKER_SIZE,
-                }};
-
-            cell = rectangle_clip(cell, rectangle);
-
-            if ((x + y) % 2 == 0)
-                painter_fill_rectangle(painter, cell, COLOR_WHITE);
-            else
-                painter_fill_rectangle(painter, cell, COLOR_GAINSBORO);
-        }
-    }
-}
-
 Rectangle canvas_bound(Canvas *widget)
 {
     Rectangle bound = bitmap_bound(widget->document->bitmap);
-
-    bound = rectangle_offset(bound, widget_get_bound(widget).position);
-
-    bound = rectangle_center_within(bound, widget_get_bound(widget));
-
+    bound = bound.offset(widget_get_bound(widget).position());
+    bound = bound.centered_within(widget_get_bound(widget));
     return bound;
 }
 
@@ -46,7 +17,7 @@ void canvas_paint(Canvas *widget, Painter *painter, Rectangle rectangle)
 
     Rectangle destination = canvas_bound(widget);
 
-    checker_board(painter, destination);
+    painter_fill_checkboard(painter, destination, 8, COLOR_WHITE, COLOR_GAINSBORO);
     painter_draw_rectangle(painter, destination, widget_get_color(widget, THEME_BORDER));
 
     painter_blit_bitmap(
@@ -61,8 +32,8 @@ void canvas_event(Canvas *widget, Event *event)
     {
         Event event_copy = *event;
 
-        event_copy.mouse.old_position = vec2i_sub(event_copy.mouse.old_position, canvas_bound(widget).position);
-        event_copy.mouse.position = vec2i_sub(event_copy.mouse.position, canvas_bound(widget).position);
+        event_copy.mouse.old_position = event_copy.mouse.old_position - canvas_bound(widget).position();
+        event_copy.mouse.position = event_copy.mouse.position - canvas_bound(widget).position();
 
         if (widget->document->tool->on_mouse_event)
             widget->document->tool->on_mouse_event(widget->document->tool, widget->document, event_copy);

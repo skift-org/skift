@@ -38,3 +38,12 @@
 #define __array_length(__array) (sizeof(__array) / sizeof(__array[0]))
 
 #define __big_endian __attribute__((scalar_storage_order("big-endian")))
+
+#define __enum_flags(__type)                                                                  \
+    inline __type operator~(__type a) { return (__type) ~(int)a; }                            \
+    inline __type operator|(__type a, __type b) { return (__type)((int)a | (int)b); }         \
+    inline __type operator&(__type a, __type b) { return (__type)((int)a & (int)b); }         \
+    inline __type operator^(__type a, __type b) { return (__type)((int)a ^ (int)b); }         \
+    inline __type &operator|=(__type &a, __type b) { return (__type &)((int &)a |= (int)b); } \
+    inline __type &operator&=(__type &a, __type b) { return (__type &)((int &)a &= (int)b); } \
+    inline __type &operator^=(__type &a, __type b) { return (__type &)((int &)a ^= (int)b); }

@@ -7,6 +7,8 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/thread/Lock.h>
 
+#include <libsystem/cxx/cxx.h>
+
 Lock memlock;
 Lock loglock;
 
@@ -42,6 +44,7 @@ void __plug_init(void)
 void __plug_fini(int exit_code)
 {
     _fini();
+    __cxa_finalize(nullptr);
 
     if (in_stream)
     {

@@ -18,7 +18,7 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
     }
 
     size_t size;
-    Bitmap *frontbuffer = NULL;
+    Bitmap *frontbuffer = nullptr;
     int frontbuffer_handle = create_window.frontbuffer;
     Result frontbuffer_result = shared_memory_include(frontbuffer_handle, (uintptr_t *)&frontbuffer, &size);
 
@@ -32,7 +32,7 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
         return;
     }
 
-    Bitmap *backbuffer = NULL;
+    Bitmap *backbuffer = nullptr;
     int backbuffer_handle = create_window.backbuffer;
     Result backbuffer_result = shared_memory_include(backbuffer_handle, (uintptr_t *)&backbuffer, &size);
 
@@ -71,9 +71,9 @@ void client_handle_destroy_window(Client *client, CompositorDestroyWindow destro
     }
 
     shared_memory_free((uintptr_t)window->frontbuffer);
-    window->frontbuffer = NULL;
+    window->frontbuffer = nullptr;
     shared_memory_free((uintptr_t)window->backbuffer);
-    window->backbuffer = NULL;
+    window->backbuffer = nullptr;
 
     window_destroy(window);
 }
@@ -119,7 +119,7 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
 
     if (window->frontbuffer_handle != flip_window.frontbuffer)
     {
-        Bitmap *new_frontbuffer = NULL;
+        Bitmap *new_frontbuffer = nullptr;
 
         size_t size;
         if (shared_memory_include(
@@ -140,7 +140,7 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
 
     if (window->backbuffer_handle != flip_window.backbuffer)
     {
-        Bitmap *new_backbuffer = NULL;
+        Bitmap *new_backbuffer = nullptr;
 
         size_t size;
         if (shared_memory_include(
@@ -249,7 +249,7 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     }
 }
 
-static List *_connected_client = NULL;
+static List *_connected_client = nullptr;
 
 Client *client_create(Connection *connection)
 {
@@ -342,6 +342,6 @@ void client_destroy_disconnected(void)
 {
     if (_connected_client)
     {
-        list_iterate(_connected_client, NULL, (ListIterationCallback)client_destroy_if_disconnected);
+        list_iterate(_connected_client, nullptr, (ListIterationCallback)client_destroy_if_disconnected);
     }
 }

@@ -17,7 +17,7 @@ unsigned int parse_uint_inline(NumberParser parser, const char *str, uint defaul
 
 bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int *result)
 {
-    if (str == NULL || size == 0)
+    if (str == nullptr || size == 0)
     {
         *result = 0;
         return false;
@@ -44,7 +44,7 @@ bool parse_uint(NumberParser parser, const char *str, size_t size, unsigned int 
 
 int parse_int_inline(NumberParser parser, const char *str, int default_value)
 {
-    if (str == NULL)
+    if (str == nullptr)
     {
         return default_value;
     }
@@ -60,7 +60,7 @@ int parse_int_inline(NumberParser parser, const char *str, int default_value)
 
 bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
 {
-    if (str == NULL || size == 0)
+    if (str == nullptr || size == 0)
     {
         *result = 0;
         return false;

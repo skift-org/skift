@@ -20,7 +20,7 @@ uint32_t system_get_tick(void);
 ElapsedTime system_get_uptime(void);
 
 #define system_panic(__args...) \
-    system_panic_internal(SOURCE_LOCATION, NULL, __args)
+    system_panic_internal(SOURCE_LOCATION, nullptr, __args)
 
 #define system_panic_with_context(__context, __args...) \
     system_panic_internal(SOURCE_LOCATION, __context, __args)

@@ -6,7 +6,7 @@ Variant vint(int value)
 {
     Variant v = (Variant){
         .type = VARIANT_INT,
-        .icon = NULL,
+        .icon = nullptr,
         .as_int = value,
         .as_string = {},
     };
@@ -20,7 +20,7 @@ Variant vfloat(float value)
 {
     Variant v = (Variant){
         .type = VARIANT_FLOAT,
-        .icon = NULL,
+        .icon = nullptr,
         .as_float = value,
         .as_string = {},
     };
@@ -34,7 +34,7 @@ Variant vstring(const char *value)
 {
     Variant v = (Variant){
         .type = VARIANT_STRING,
-        .icon = NULL,
+        .icon = nullptr,
         .as_int = -1,
         .as_string = {},
     };
@@ -50,7 +50,7 @@ Variant vstringf(const char *fmt, ...)
 {
     Variant v = (Variant){
         .type = VARIANT_STRING,
-        .icon = NULL,
+        .icon = nullptr,
         .as_int = -1,
         .as_string = {},
     };

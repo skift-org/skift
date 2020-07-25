@@ -1,7 +1,7 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberParser.h>
@@ -70,7 +70,7 @@ static MarkupAttribute *attribute(SourceReader *source)
     }
     else
     {
-        return markup_attribute_create_adopt(ident, NULL);
+        return markup_attribute_create_adopt(ident, nullptr);
     }
 }
 
@@ -131,7 +131,7 @@ static MarkupNode *parse_node(SourceReader *source)
 {
     whitespace(source);
 
-    MarkupNode *node = NULL;
+    MarkupNode *node = nullptr;
     if (!opening_tag(&node, source))
     {
         return node;
@@ -174,7 +174,7 @@ MarkupNode *markup_parse_file(const char *path)
 
     if (handle_has_error(json_file))
     {
-        return NULL;
+        return nullptr;
     }
 
     SourceReader *source = source_create_from_stream(json_file);

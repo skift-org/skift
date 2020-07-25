@@ -12,14 +12,14 @@
 
 static bool option_list = false;
 static bool option_get = false;
-static char *option_set = NULL;
+static char *option_set = nullptr;
 
 /* --- Command line application initialization -------------------------------*/
 
 static const char *usages[] = {
     "",
     "OPTION...",
-    NULL,
+    nullptr,
 };
 
 static CommandLineOption options[] = {
@@ -52,7 +52,7 @@ SupportedMode gfxmodes[] = {
     {"1024x768", {1024, 768}},
     {"1280x768", {1280, 768}},
     {"1920x1080", {1920, 1080}},
-    {NULL, {0, 0}},
+    {nullptr, {0, 0}},
 };
 
 IOCallDisplayModeArgs *gfxmode_by_name(const char *name)
@@ -65,7 +65,7 @@ IOCallDisplayModeArgs *gfxmode_by_name(const char *name)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int gfxmode_get(Stream *framebuffer_device)
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
     {
         return gfxmode_list(framebuffer_device);
     }
-    else if (option_set != NULL)
+    else if (option_set != nullptr)
     {
         return gfxmode_set(framebuffer_device, option_set);
     }

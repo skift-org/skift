@@ -74,7 +74,7 @@ HashMap *hashmap_create_string_to_value(void)
 
 void hashmap_destroy(HashMap *hashmap)
 {
-    hashmap_destroy_with_callback(hashmap, NULL);
+    hashmap_destroy_with_callback(hashmap, nullptr);
 }
 
 void hashmap_destroy_with_callback(
@@ -102,7 +102,7 @@ void hashmap_destroy_with_callback(
 
 void hashmap_clear(HashMap *hashmap)
 {
-    hashmap_clear_with_callback(hashmap, NULL);
+    hashmap_clear_with_callback(hashmap, nullptr);
 }
 
 void hashmap_clear_with_callback(
@@ -140,7 +140,7 @@ static HashMapItem *hashmap_find_item(HashMap *hashmap, const void *key)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static HashMapItem *hashmap_find_item_by_value(HashMap *hashmap, void *value)
@@ -158,7 +158,7 @@ static HashMapItem *hashmap_find_item_by_value(HashMap *hashmap, void *value)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool hashmap_put(HashMap *hashmap, const void *key, void *value)
@@ -186,19 +186,19 @@ void *hashmap_get(HashMap *hashmap, const void *key)
     HashMapItem *item = hashmap_find_item(hashmap, key);
 
     if (!item)
-        return NULL;
+        return nullptr;
 
     return item->value;
 }
 
 bool hashmap_has(HashMap *hashmap, const void *key)
 {
-    return hashmap_find_item(hashmap, key) != NULL;
+    return hashmap_find_item(hashmap, key) != nullptr;
 }
 
 bool hashmap_remove(HashMap *hashmap, const void *key)
 {
-    return hashmap_remove_with_callback(hashmap, key, NULL);
+    return hashmap_remove_with_callback(hashmap, key, nullptr);
 }
 
 void hashmap_remove_value(HashMap *hashmap, void *value)

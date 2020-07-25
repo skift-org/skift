@@ -1,6 +1,7 @@
 #include <abi/Keyboard.h>
 #include <abi/Paths.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/core/CString.h>
@@ -8,7 +9,6 @@
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 
 bool option_get;
 bool option_list;
@@ -16,7 +16,7 @@ bool option_list;
 static const char *usages[] = {
     "",
     "OPTION...",
-    NULL,
+    nullptr,
 };
 
 static CommandLineOption options[] = {
@@ -62,7 +62,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 {
     logger_info("Loading keymap file from %s", keymap_path);
 
-    __cleanup_malloc KeyMap *keymap = NULL;
+    __cleanup_malloc KeyMap *keymap = nullptr;
     size_t keymap_size = 0;
     Result result = file_read_all(keymap_path, (void **)&keymap, &keymap_size);
 

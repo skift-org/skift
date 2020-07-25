@@ -49,7 +49,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
     {
         Window *window = manager_focus_window();
 
-        if (window != NULL)
+        if (window != nullptr)
         {
             Event event = {
                 .type = key_motion_to_event_type(packet.motion),
@@ -124,18 +124,18 @@ int main(int argc, char const *argv[])
     Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
     Socket *socket = socket_open("/Session/compositor.ipc", OPEN_CREATE);
 
-    notifier_create(NULL, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
-    notifier_create(NULL, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
-    notifier_create(NULL, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
+    notifier_create(nullptr, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
+    notifier_create(nullptr, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
+    notifier_create(nullptr, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
 
-    Timer *repaint_timer = timer_create(NULL, 1000 / 60, render_callback);
+    Timer *repaint_timer = timer_create(nullptr, 1000 / 60, render_callback);
     timer_start(repaint_timer);
 
     manager_initialize();
     cursor_initialize();
     renderer_initialize();
 
-    process_run("panel", NULL);
+    process_run("panel", nullptr);
 
     return eventloop_run();
 }

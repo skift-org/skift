@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     __unused(new_task_button);
 
     Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, icon_get("close"), "Cancel task");
-    widget_set_event_handler(cancel_task_button, EVENT_ACTION, EVENT_HANDLER(NULL, cancel_task));
+    widget_set_event_handler(cancel_task_button, EVENT_ACTION, EVENT_HANDLER(nullptr, cancel_task));
 
     /// --- Table view --- //
     window->table_model = task_model_create();

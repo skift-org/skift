@@ -43,12 +43,12 @@ int shell_builtin_exit(int argc, const char **argv)
 static ShellBuiltin _shell_builtins[] = {
     {"cd", shell_builtin_cd},
     {"exit", shell_builtin_exit},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 ShellBuiltinCallback shell_get_builtin(const char *name)
 {
-    for (int i = 0; _shell_builtins[i].name != NULL; i++)
+    for (int i = 0; _shell_builtins[i].name != nullptr; i++)
     {
         if (strcmp(_shell_builtins[i].name, name) == 0)
         {
@@ -56,5 +56,5 @@ ShellBuiltinCallback shell_get_builtin(const char *name)
         }
     }
 
-    return NULL;
+    return nullptr;
 }

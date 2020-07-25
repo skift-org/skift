@@ -144,7 +144,7 @@ int __printf_formate_string(printf_info_t *info, va_list *va)
 {
     const char *v = va_arg(*va, char *);
 
-    if (v == NULL)
+    if (v == nullptr)
     {
         v = "(null)";
     }
@@ -170,19 +170,19 @@ static printf_formatter_t formaters[] = {
     /* Hexadecimal   */ {'x', __printf_formate_hexadecimal},
     /* Hexadecimal   */ {'p', __printf_formate_hexadecimal},
 
-    /* Float         */ {'f', NULL},
+    /* Float         */ {'f', nullptr},
 
     /* Char          */ {'c', __printf_formate_char},
     /* String        */ {'s', __printf_formate_string},
 
-    /* End of the list */ {'\0', NULL},
+    /* End of the list */ {'\0', nullptr},
 };
 
 void __printf_formate(printf_info_t *info, char c, va_list *va)
 {
     for (int i = 0; formaters[i].c; i++)
     {
-        if (formaters[i].c == c && formaters[i].impl != NULL)
+        if (formaters[i].c == c && formaters[i].impl != nullptr)
         {
             formaters[i].impl(info, va);
             return;
@@ -205,7 +205,7 @@ int __printf(printf_info_t *info, va_list va)
     info->padding = ' ';
     info->length = 0;
 
-    if (info->format == NULL)
+    if (info->format == nullptr)
     {
         for (int i = 0; "(null)"[i]; i++)
         {

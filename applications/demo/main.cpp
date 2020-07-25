@@ -8,10 +8,10 @@ static Demo _demos[] = {
     {"Colors", colors_draw},
     {"Graphics", graphics_draw},
     {"Lines", lines_draw},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
-Widget *_demo_widget = NULL;
+Widget *_demo_widget = nullptr;
 
 void set_current_demo_callback(Demo *demo, Widget *sender, Event *event)
 {

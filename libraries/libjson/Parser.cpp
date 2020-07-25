@@ -197,7 +197,7 @@ static JsonValue *value(SourceReader *source)
 {
     whitespace(source);
 
-    JsonValue *value = NULL;
+    JsonValue *value = nullptr;
 
     if (source_current(source) == '"')
     {
@@ -245,7 +245,7 @@ JsonValue *json_parse_file(const char *path)
 
     if (handle_has_error(json_file))
     {
-        return NULL;
+        return nullptr;
     }
 
     SourceReader *source = source_create_from_stream(json_file);

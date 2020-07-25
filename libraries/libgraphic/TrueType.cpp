@@ -217,11 +217,11 @@ static Slice truetype_get_subrs(Slice cff, Slice fontdict)
     Slice pdict;
     truetype_dict_get_ints(&fontdict, 18, 2, private_loc);
     if (!private_loc[1] || !private_loc[0])
-        return slice_create(NULL, 0);
+        return slice_create(nullptr, 0);
     pdict = slice_range(&cff, private_loc[1], private_loc[0]);
     truetype_dict_get_ints(&pdict, 19, 1, &subrsoff);
     if (!subrsoff)
-        return slice_create(NULL, 0);
+        return slice_create(nullptr, 0);
     slice_seek(&cff, private_loc[1] + subrsoff);
     return truetype_cff_get_index(&cff);
 }
@@ -250,7 +250,7 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
 {
     info->data = data;
     info->fontstart = fontstart;
-    info->cff = slice_create(NULL, 0);
+    info->cff = slice_create(nullptr, 0);
 
     uint32_t cmap = truetype_find_table(data, fontstart, "cmap"); // required
     info->loca = truetype_find_table(data, fontstart, "loca");    // required
@@ -280,8 +280,8 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
         if (!cff)
             return 0;
 
-        info->fontdicts = slice_create(NULL, 0);
-        info->fdselect = slice_create(NULL, 0);
+        info->fontdicts = slice_create(nullptr, 0);
+        info->fdselect = slice_create(nullptr, 0);
 
         // @TODO this should use size from table (not 512MB)
         info->cff = slice_create(data + cff, 512 * 1024 * 1024);
@@ -557,7 +557,7 @@ int truetype_IsGlyphEmpty(const truetype_fontinfo *info, int glyph_index)
     int16_t numberOfContours;
     int g;
     if (info->cff.size)
-        return truetype_GetGlyphInfoT2(info, glyph_index, NULL, NULL, NULL, NULL) == 0;
+        return truetype_GetGlyphInfoT2(info, glyph_index, nullptr, nullptr, nullptr, nullptr) == 0;
     g = truetype_GetGlyfOffset(info, glyph_index);
     if (g < 0)
         return 1;
@@ -593,7 +593,7 @@ static int truetype_GetGlyphShapeTT(const truetype_fontinfo *info, int glyph_ind
     int num_vertices = 0;
     int g = truetype_GetGlyfOffset(info, glyph_index);
 
-    *pvertices = NULL;
+    *pvertices = nullptr;
 
     if (g < 0)
         return 0;
@@ -884,9 +884,9 @@ typedef struct
     int num_vertices;
 } truetype_csctx;
 
-#define TRUETYPE_CSCTX_INIT(bounds)                \
-    {                                              \
-        bounds, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0 \
+#define TRUETYPE_CSCTX_INIT(bounds)                   \
+    {                                                 \
+        bounds, 0, 0, 0, 0, 0, 0, 0, 0, 0, nullptr, 0 \
     }
 
 static void truetype_track_vertex(truetype_csctx *c, int32_t x, int32_t y)
@@ -964,7 +964,7 @@ static Slice truetype_get_subr(Slice idx, int n)
         bias = 1131;
     n += bias;
     if (n < 0 || n >= count)
-        return slice_create(NULL, 0);
+        return slice_create(nullptr, 0);
     return truetype_cff_index_get(idx, n);
 }
 
@@ -998,7 +998,7 @@ static Slice truetype_cid_get_glyph_subrs(const truetype_fontinfo *info, int gly
         }
     }
     if (fdselector == -1)
-        slice_create(NULL, 0);
+        slice_create(nullptr, 0);
     return truetype_get_subrs(info->cff, truetype_cff_index_get(info->fontdicts, fdselector));
 }
 
@@ -1320,7 +1320,7 @@ static int truetype_GetGlyphShapeT2(const truetype_fontinfo *info, int glyph_ind
             return output_ctx.num_vertices;
         }
     }
-    *pvertices = NULL;
+    *pvertices = nullptr;
     return 0;
 }
 
@@ -1827,7 +1827,7 @@ int truetype_GetGlyphSVG(const truetype_fontinfo *info, int gl, const char **svg
         return 0;
 
     svg_doc = truetype_FindSVGDoc(info, gl);
-    if (svg_doc != NULL)
+    if (svg_doc != nullptr)
     {
         *svg = (char *)data + info->svg + ttULONG(svg_doc + 4);
         return ttULONG(svg_doc + 8);
@@ -1925,8 +1925,8 @@ static void *truetype_hheap_alloc(truetype_hheap *hh, size_t size)
         {
             int count = (size < 32 ? 2000 : size < 128 ? 800 : 100);
             truetype_hheap_chunk *c = (truetype_hheap_chunk *)malloc(sizeof(truetype_hheap_chunk) + size * count);
-            if (c == NULL)
-                return NULL;
+            if (c == nullptr)
+                return nullptr;
             c->next = hh->head;
             hh->head = c;
             hh->num_remaining_in_head_chunk = count;
@@ -1972,7 +1972,7 @@ static truetype_active_edge *truetype_new_active(truetype_hheap *hh, truetype_ed
 {
     truetype_active_edge *z = (truetype_active_edge *)truetype_hheap_alloc(hh, sizeof(*z));
     float dxdy = (e->x1 - e->x0) / (e->y1 - e->y0);
-    assert(z != NULL);
+    assert(z != nullptr);
     //assert(e->y0 <= start_point);
     if (!z)
         return z;
@@ -2235,7 +2235,7 @@ static void truetype_fill_active_edges_new(float *scanline, float *scanline_fill
 static void truetype_rasterize_sorted_edges(truetype_bitmap *result, truetype_edge *e, int n, int vsubsample, int off_x, int off_y)
 {
     truetype_hheap hh = {0, 0, 0};
-    truetype_active_edge *active = NULL;
+    truetype_active_edge *active = nullptr;
     int y, j = 0, i;
     float scanline_data[129], *scanline, *scanline2;
 
@@ -2285,7 +2285,7 @@ static void truetype_rasterize_sorted_edges(truetype_bitmap *result, truetype_ed
             if (e->y0 != e->y1)
             {
                 truetype_active_edge *z = truetype_new_active(&hh, e, off_x, scan_y_top);
-                if (z != NULL)
+                if (z != nullptr)
                 {
                     if (j == 0 && off_y != 0)
                     {
@@ -2615,7 +2615,7 @@ static truetype_point *truetype_FlattenCurves(truetype_vertex *vertices, int num
         if (pass == 1)
         {
             points = (truetype_point *)malloc(num_points * sizeof(points[0]));
-            if (points == NULL)
+            if (points == nullptr)
                 goto error;
         }
         num_points = 0;
@@ -2664,14 +2664,14 @@ error:
     free(*contour_lengths);
     *contour_lengths = 0;
     *num_contours = 0;
-    return NULL;
+    return nullptr;
 }
 
 void truetype_Rasterize(truetype_bitmap *result, float flatness_in_pixels, truetype_vertex *vertices, int num_verts, float scale_x, float scale_y, float shift_x, float shift_y, int x_off, int y_off, int invert)
 {
     float scale = scale_x > scale_y ? scale_y : scale_x;
     int winding_count = 0;
-    int *winding_lengths = NULL;
+    int *winding_lengths = nullptr;
     truetype_point *windings = truetype_FlattenCurves(vertices, num_verts, flatness_in_pixels / scale, &winding_lengths, &winding_count);
     if (windings)
     {
@@ -2700,7 +2700,7 @@ unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype_fontinfo *info, fl
         if (scale_x == 0)
         {
             free(vertices);
-            return NULL;
+            return nullptr;
         }
         scale_y = scale_x;
     }
@@ -2710,7 +2710,7 @@ unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype_fontinfo *info, fl
     // now we get the size
     gbm.w = (ix1 - ix0);
     gbm.h = (iy1 - iy0);
-    gbm.pixels = NULL; // in case we error
+    gbm.pixels = nullptr; // in case we error
 
     if (width)
         *width = gbm.w;
@@ -2742,7 +2742,7 @@ unsigned char *truetype_GetGlyphBitmap(const truetype_fontinfo *info, float scal
 
 void truetype_MakeGlyphBitmapSubpixel(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int glyph)
 {
-    truetype_vertex *vertices = NULL;
+    truetype_vertex *vertices = nullptr;
     int num_verts = truetype_GetGlyphShape(info, glyph, &vertices);
 
     int ix0, iy0;
@@ -2941,11 +2941,11 @@ int truetype_PackBegin(truetype_pack_context *spc, unsigned char *pixels, int pw
     int num_nodes = pw - padding;
     stbrp_node *nodes = (stbrp_node *)malloc(sizeof(*nodes) * num_nodes);
 
-    if (context == NULL || nodes == NULL)
+    if (context == nullptr || nodes == nullptr)
     {
-        if (context != NULL)
+        if (context != nullptr)
             free(context);
-        if (nodes != NULL)
+        if (nodes != nullptr)
             free(nodes);
         return 0;
     }
@@ -3081,7 +3081,7 @@ int truetype_PackFontGatherRects(truetype_pack_context *spc, const truetype_font
     for (j = 0; j < range->num_chars; ++j)
     {
         int x0, y0, x1, y1;
-        int codepoint = range->array_of_unicode_codepoints == NULL ? range->first_unicode_codepoint_in_range + j : range->array_of_unicode_codepoints[j];
+        int codepoint = range->array_of_unicode_codepoints == nullptr ? range->first_unicode_codepoint_in_range + j : range->array_of_unicode_codepoints[j];
         int glyph = truetype_FindGlyphIndex(info, codepoint);
         if (glyph == 0 && (spc->skip_missing || missing_glyph_added))
         {
@@ -3156,7 +3156,7 @@ int truetype_PackFontRenderIntoRects(truetype_pack_context *spc, const truetype_
         {
             truetype_packedchar *bc = &range->chardata_for_range[j];
             int advance, lsb, x0, y0, x1, y1;
-            int codepoint = range->array_of_unicode_codepoints == NULL ? range->first_unicode_codepoint_in_range + j : range->array_of_unicode_codepoints[j];
+            int codepoint = range->array_of_unicode_codepoints == nullptr ? range->first_unicode_codepoint_in_range + j : range->array_of_unicode_codepoints[j];
             int glyph = truetype_FindGlyphIndex(info, codepoint);
             stbrp_coord pad = (stbrp_coord)spc->padding;
 
@@ -3255,7 +3255,7 @@ int truetype_PackFontRange(truetype_pack_context *spc, const unsigned char *font
     truetype_pack_range range;
 
     range.first_unicode_codepoint_in_range = first_unicode_codepoint_in_range;
-    range.array_of_unicode_codepoints = NULL;
+    range.array_of_unicode_codepoints = nullptr;
     range.num_chars = num_chars_in_range;
     range.chardata_for_range = chardata_for_range;
     range.font_size = font_size;
@@ -3389,7 +3389,7 @@ const char *truetype_GetFontNameString(const truetype_fontinfo *font, int *lengt
     uint32_t name_table = truetype_find_table(fc, offset, "name");
 
     if (!name_table)
-        return NULL;
+        return nullptr;
 
     int32_t count = ttUSHORT(fc + name_table + 2);
     int32_t stringOffset = name_table + ttUSHORT(fc + name_table + 4);
@@ -3403,7 +3403,7 @@ const char *truetype_GetFontNameString(const truetype_fontinfo *font, int *lengt
             return (const char *)(fc + stringOffset + ttUSHORT(fc + loc + 10));
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 static int truetype_matchpair(uint8_t *fc, uint32_t nm, uint8_t *name, int32_t nlen, int32_t target_id, int32_t next_id)

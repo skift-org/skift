@@ -190,5 +190,5 @@ static inline KeyMapping *keymap_lookup(KeyMap *keymap, Key key)
         }
     }
 
-    return NULL;
+    return nullptr;
 }

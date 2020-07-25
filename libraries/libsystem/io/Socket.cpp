@@ -32,7 +32,7 @@ Connection *socket_connect(const char *path)
 {
     Handle handle = {};
     __plug_handle_connect(&handle, path);
-    return connection_create(NULL, handle);
+    return connection_create(nullptr, handle);
 }
 
 Connection *socket_accept(Socket *socket)
@@ -52,7 +52,7 @@ void socket_did_connection_open(Socket *socket, struct Connection *connection)
 
 void socket_did_connection_close(Socket *socket, struct Connection *connection)
 {
-    if (socket != NULL)
+    if (socket != nullptr)
     {
         list_remove(socket->connections, connection);
     }

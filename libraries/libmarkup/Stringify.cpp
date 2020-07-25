@@ -4,5 +4,5 @@ char *markup_stringify(MarkupNode *root)
 {
     __unused(root);
 
-    return NULL;
+    return nullptr;
 }

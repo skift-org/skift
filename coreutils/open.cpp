@@ -1,9 +1,9 @@
 #include <libjson/Json.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
-#include <libsystem/Logger.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/System/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/System/Configs/open/file-types.json"
@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
 
     const char *extension = path_extension(path);
 
-    if (extension == NULL)
+    if (extension == nullptr)
     {
         stream_format(err_stream, "The file does not have an extension.\n");
         return -1;
@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
     Launchpad *launchpad = launchpad_create(application_name, application_path);
     launchpad_argument(launchpad, argv[1]);
 
-    if (launchpad_launch(launchpad, NULL) != SUCCESS)
+    if (launchpad_launch(launchpad, nullptr) != SUCCESS)
         return -1;
 
     return 0;

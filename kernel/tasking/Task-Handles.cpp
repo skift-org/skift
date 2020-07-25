@@ -17,7 +17,7 @@ Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
-        if (task->handles[i] == NULL)
+        if (task->handles[i] == nullptr)
         {
             task->handles[i] = handle;
             *handle_index = i;
@@ -40,10 +40,10 @@ Result task_fshandle_remove(Task *task, int handle_index)
     {
         lock_acquire(task->handles_lock);
 
-        if (task->handles[handle_index] != NULL)
+        if (task->handles[handle_index] != nullptr)
         {
             fshandle_destroy(task->handles[handle_index]);
-            task->handles[handle_index] = NULL;
+            task->handles[handle_index] = nullptr;
 
             result = SUCCESS;
         }
@@ -60,13 +60,13 @@ Result task_fshandle_remove(Task *task, int handle_index)
 
 FsHandle *task_fshandle_acquire(Task *task, int handle_index)
 {
-    FsHandle *result = NULL;
+    FsHandle *result = nullptr;
 
     if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
     {
         lock_acquire(task->handles_lock);
 
-        if (task->handles[handle_index] != NULL)
+        if (task->handles[handle_index] != nullptr)
         {
             fshandle_acquire_lock(task->handles[handle_index], task->id);
             result = task->handles[handle_index];
@@ -90,7 +90,7 @@ Result task_fshandle_release(Task *task, int handle_index)
     {
         lock_acquire(task->handles_lock);
 
-        if (task->handles[handle_index] != NULL)
+        if (task->handles[handle_index] != nullptr)
         {
             fshandle_release_lock(task->handles[handle_index], task->id);
             result = SUCCESS;
@@ -110,12 +110,12 @@ Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, 
 {
     Path *p = task_resolve_directory(task, file_path);
 
-    FsHandle *handle = NULL;
+    FsHandle *handle = nullptr;
     Result result = filesystem_open(p, flags, &handle);
 
     path_destroy(p);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         *handle_index = HANDLE_INVALID_ID;
         return result;
@@ -149,7 +149,7 @@ Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t siz
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         *read = 0;
         return ERR_BAD_FILE_DESCRIPTOR;
@@ -171,14 +171,14 @@ Result task_fshandle_select(
 {
     Result result = SUCCESS;
 
-    FsHandle *selected_handle = NULL;
+    FsHandle *selected_handle = nullptr;
     FsHandle **handles = (FsHandle **)calloc(handles_set->count, sizeof(FsHandle *));
 
     for (size_t i = 0; i < handles_set->count; i++)
     {
         handles[i] = task_fshandle_acquire(task, handles_set->handles[i]);
 
-        if (handles[i] == NULL)
+        if (handles[i] == nullptr)
         {
             result = ERR_BAD_FILE_DESCRIPTOR;
 
@@ -231,7 +231,7 @@ Result task_fshandle_write(Task *task, int handle_index, const void *buffer, siz
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
@@ -247,7 +247,7 @@ Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *ar
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
@@ -263,7 +263,7 @@ Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whenc
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
@@ -279,7 +279,7 @@ Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offs
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
@@ -295,7 +295,7 @@ Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 {
     FsHandle *handle = task_fshandle_acquire(task, handle_index);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
@@ -335,7 +335,7 @@ Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection
 {
     FsHandle *socket_handle = task_fshandle_acquire(task, socket_handle_index);
 
-    if (socket_handle == NULL)
+    if (socket_handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }

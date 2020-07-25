@@ -2,10 +2,10 @@
 #include <libsystem/core/Plugs.h>
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/System.h>
 #include <libsystem/thread/Atomic.h>
 
@@ -20,10 +20,10 @@
 
 /* --- Framework initialization --------------------------------------------- */
 
-Stream *in_stream = NULL;
-Stream *out_stream = NULL;
-Stream *err_stream = NULL;
-Stream *log_stream = NULL;
+Stream *in_stream = nullptr;
+Stream *out_stream = nullptr;
+Stream *err_stream = nullptr;
+Stream *log_stream = nullptr;
 
 #define INTERNAL_LOG_STREAM_HANDLE HANDLE_INVALID_ID
 static Stream internal_log_stream = {};
@@ -32,7 +32,7 @@ void __plug_init(void)
 {
     internal_log_stream.handle.id = INTERNAL_LOG_STREAM_HANDLE;
 
-    in_stream = NULL;
+    in_stream = nullptr;
     out_stream = &internal_log_stream;
     err_stream = &internal_log_stream;
     log_stream = &internal_log_stream;

@@ -41,7 +41,7 @@ void launchpad_argument(Launchpad *launchpad, const char *argument)
     assert(launchpad->argc < PROCESS_ARG_COUNT);
 
     launchpad->argv[launchpad->argc] = strdup(argument);
-    launchpad->argv[launchpad->argc + 1] = NULL;
+    launchpad->argv[launchpad->argc + 1] = nullptr;
 
     launchpad->argc++;
 }
@@ -57,7 +57,7 @@ Result launchpad_launch(Launchpad *launchpad, int *pid)
 {
     int discard;
 
-    if (pid == NULL)
+    if (pid == nullptr)
     {
         pid = &discard;
     }

@@ -33,7 +33,7 @@ MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /* --- User facing API ------------------------------------------------------ */

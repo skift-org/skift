@@ -35,7 +35,7 @@ void buffer_builder_destroy(BufferBuilder *buffer)
 char *buffer_builder_finalize(BufferBuilder *buffer)
 {
     char *result = buffer->buffer;
-    buffer->buffer = NULL;
+    buffer->buffer = nullptr;
 
     buffer_builder_destroy(buffer);
 

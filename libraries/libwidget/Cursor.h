@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum
+enum CursorState
 {
     CURSOR_DEFAULT,
     CURSOR_TEXT,
@@ -13,4 +13,4 @@ typedef enum
     CURSOR_RESIZEVH,
 
     __CURSOR_COUNT
-} CursorState;
+};

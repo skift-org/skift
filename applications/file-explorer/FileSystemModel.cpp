@@ -25,7 +25,7 @@ static Icon *get_icon_for_node(const char *current_directory, DirectoryEntry *en
 
         JsonValue *root = json_parse_file(manifest_path);
 
-        if (root != NULL && json_is(root, JSON_OBJECT))
+        if (root != nullptr && json_is(root, JSON_OBJECT))
         {
             JsonValue *icon_name = json_object_get(root, "icon");
 
@@ -97,7 +97,7 @@ static void filesystem_model_update(FileSystemModel *model)
 
 static Variant filesystem_model_data(FileSystemModel *model, int row, int column)
 {
-    FileSystemNode *entry = NULL;
+    FileSystemNode *entry = nullptr;
     assert(list_peekat(model->files, row, (void **)&entry));
 
     switch (column)
@@ -171,20 +171,20 @@ const char *filesystem_model_filename_by_index(FileSystemModel *model, int index
 {
     if (index >= 0 && index < list_count(model->files))
     {
-        FileSystemNode *entry = NULL;
+        FileSystemNode *entry = nullptr;
         assert(list_peekat(model->files, index, (void **)&entry));
 
         return entry->name;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index)
 {
     if (index >= 0 && index < list_count(model->files))
     {
-        FileSystemNode *entry = NULL;
+        FileSystemNode *entry = nullptr;
         assert(list_peekat(model->files, index, (void **)&entry));
 
         return entry->type;

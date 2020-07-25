@@ -7,7 +7,7 @@ void demo_widget_paint(DemoWidget *widget, Painter *painter, Rectangle rectangle
 {
     __unused(rectangle);
 
-    if (widget->bitmap == NULL)
+    if (widget->bitmap == nullptr)
     {
         widget->bitmap = bitmap_create(widget_get_bound(widget).width(), widget_get_bound(widget).height());
         widget->painter = painter_create(widget->bitmap);
@@ -72,7 +72,7 @@ Widget *demo_widget_create(Widget *parent)
 
     widget_initialize(WIDGET(widget), &demo_class, parent);
 
-    widget->demo = NULL;
+    widget->demo = nullptr;
     widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
     timer_start(widget->timer);
 

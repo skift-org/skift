@@ -51,7 +51,7 @@ const char *path_extension(Path *path)
 
     if (!filename)
     {
-        return NULL;
+        return nullptr;
     }
 
     for (size_t i = 0; filename[i]; i++)
@@ -62,7 +62,7 @@ const char *path_extension(Path *path)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const char *path_peek_at(Path *path, int index)
@@ -75,7 +75,7 @@ const char *path_peek_at(Path *path, int index)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -137,7 +137,7 @@ void path_push(Path *path, const char *element)
 
 char *path_pop(Path *path)
 {
-    char *element = NULL;
+    char *element = nullptr;
     list_popback(path->elements, (void **)&element);
     return element;
 }
@@ -148,11 +148,11 @@ Path *path_combine(Path *left, Path *right)
     p->elements = list_create();
 
     // Check if the resulting path is absolute
-    if (left != NULL)
+    if (left != nullptr)
     {
         p->is_absolute = left->is_absolute;
     }
-    else if (right != NULL)
+    else if (right != nullptr)
     {
         p->is_absolute = right->is_absolute;
     }
@@ -162,7 +162,7 @@ Path *path_combine(Path *left, Path *right)
     }
 
     // Append the left part of the path
-    if (left != NULL)
+    if (left != nullptr)
     {
         p->is_absolute = left->is_absolute;
 
@@ -173,7 +173,7 @@ Path *path_combine(Path *left, Path *right)
     }
 
     // Append the right parte of the path
-    if (right != NULL)
+    if (right != nullptr)
     {
         list_foreach(const char, i, right->elements)
         {

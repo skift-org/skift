@@ -1,11 +1,11 @@
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
@@ -135,7 +135,7 @@ Result application_initialize(int argc, char **argv)
         logger_error("Failled to connect to the compositor: %s", handle_error_string(_connection));
         Result result = handle_get_error(_connection);
         connection_close(_connection);
-        _connection = NULL;
+        _connection = nullptr;
 
         return result;
     }
@@ -145,7 +145,7 @@ Result application_initialize(int argc, char **argv)
     eventloop_initialize();
 
     _connection_notifier = notifier_create(
-        NULL,
+        nullptr,
         HANDLE(_connection),
         SELECT_READ,
         (NotifierCallback)application_request_callback);
@@ -276,7 +276,7 @@ Window *application_get_window(int id)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void application_show_window(Window *window)

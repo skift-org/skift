@@ -1,7 +1,7 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/node/Directory.h"
 #include "kernel/node/Handle.h"
@@ -24,7 +24,7 @@ static Result directory_open(FsDirectory *node, FsHandle *handle)
 
         if (node->size)
         {
-            record->stat.size = node->size(entry->node, NULL);
+            record->stat.size = node->size(entry->node, nullptr);
         }
         else
         {
@@ -78,7 +78,7 @@ static FsNode *directory_find(FsDirectory *node, const char *name)
         }
     };
 
-    return NULL;
+    return nullptr;
 }
 
 static Result directory_link(FsDirectory *node, const char *name, FsNode *child)

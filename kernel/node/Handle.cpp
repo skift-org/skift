@@ -1,9 +1,9 @@
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/node/Connection.h"
 #include "kernel/node/Handle.h"
@@ -348,7 +348,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     fsnode_release_lock(node, scheduler_running_id());
 
-    if (connection == NULL)
+    if (connection == nullptr)
     {
         return ERR_CONNECTION_REFUSED;
     }

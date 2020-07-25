@@ -66,7 +66,7 @@ FILE *fopen(const char *path, const char *mode)
     {
         stream_close(stream);
 
-        return NULL;
+        return nullptr;
     }
 
     return stream;

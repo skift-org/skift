@@ -144,14 +144,14 @@ static TrueTypeGlyph *lookup_glyph(TrueTypeFont *font, Codepoint codepoint)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 TrueTypeGlyph *truetypefont_get_glyph_for_codepoint(TrueTypeFont *font, Codepoint codepoint)
 {
     TrueTypeGlyph *glyph = lookup_glyph(font, codepoint);
 
-    if (glyph != NULL)
+    if (glyph != nullptr)
     {
         return glyph;
     }

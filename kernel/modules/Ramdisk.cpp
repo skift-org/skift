@@ -1,8 +1,8 @@
 
 #include <libfile/tar.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"
@@ -26,7 +26,7 @@ void ramdisk_load(Module *module)
         }
         else
         {
-            FsHandle *handle = NULL;
+            FsHandle *handle = nullptr;
             Result result = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE, &handle);
 
             if (result != SUCCESS)

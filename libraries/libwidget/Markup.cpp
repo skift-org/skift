@@ -198,7 +198,7 @@ void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
 
 Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 {
-    Widget *widget = NULL;
+    Widget *widget = nullptr;
 
     if (markup_node_is(node, "Container"))
     {
@@ -268,7 +268,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             markup_node_get_attribute_or_default(node, "path", "null"));
     }
 
-    if (widget == NULL)
+    if (widget == nullptr)
     {
         widget = placeholder_create(parent, markup_node_type(node));
     }

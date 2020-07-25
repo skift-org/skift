@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
@@ -18,7 +18,7 @@ Task *task_create(Task *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
 
-    if (_tasks == NULL)
+    if (_tasks == nullptr)
     {
         _tasks = list_create();
     }
@@ -45,7 +45,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     // Setup current working directory.
     lock_init(task->directory_lock);
 
-    if (parent != NULL)
+    if (parent != nullptr)
     {
         task->directory = path_clone(parent->directory);
     }
@@ -60,7 +60,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     lock_init(task->handles_lock);
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
-        task->handles[i] = NULL;
+        task->handles[i] = nullptr;
     }
 
     memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->stack);
@@ -126,7 +126,7 @@ Task *task_by_id(int id)
             return task;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int task_count(void)
@@ -271,7 +271,7 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
         atomic_end();
 
-        task->blocker = NULL;
+        task->blocker = nullptr;
         free(blocker);
 
         return BLOCKER_UNBLOCKED;
@@ -293,7 +293,7 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
     BlockerResult result = blocker->result;
 
-    task->blocker = NULL;
+    task->blocker = nullptr;
     free(blocker);
 
     return result;

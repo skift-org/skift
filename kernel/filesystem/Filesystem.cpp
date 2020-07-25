@@ -2,10 +2,10 @@
 /* filesystem.c: the skiftOS virtual filesystem.                              */
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"
@@ -14,10 +14,10 @@
 #include "kernel/node/Socket.h"
 #include "kernel/scheduling/Scheduler.h"
 
-static FsNode *_filesystem_root = NULL;
+static FsNode *_filesystem_root = nullptr;
 
 #define ASSERT_FILESYSTEM_READY                                              \
-    if (!root != NULL)                                                       \
+    if (!root != nullptr)                                                    \
     {                                                                        \
         system_panic("Trying to use the filesystem before initialization."); \
     }
@@ -33,7 +33,7 @@ void filesystem_initialize(void)
 
 FsNode *filesystem_find_and_ref(Path *path)
 {
-    assert(_filesystem_root != NULL);
+    assert(_filesystem_root != nullptr);
 
     FsNode *current = fsnode_ref(_filesystem_root);
 
@@ -43,7 +43,7 @@ FsNode *filesystem_find_and_ref(Path *path)
         {
             const char *element = path_peek_at(path, i);
 
-            FsNode *found = NULL;
+            FsNode *found = nullptr;
 
             if (current->find)
             {
@@ -57,7 +57,7 @@ FsNode *filesystem_find_and_ref(Path *path)
         }
         else
         {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -75,7 +75,7 @@ FsNode *filesystem_find_parent_and_ref(Path *path)
 
 Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 {
-    *handle = NULL;
+    *handle = nullptr;
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
     FsNode *node = filesystem_find_and_ref(path);
@@ -209,7 +209,7 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
 {
     FsNode *child = filesystem_find_and_ref(old_path);
 
-    if (child == NULL)
+    if (child == nullptr)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
@@ -261,7 +261,7 @@ Result filesystem_link(Path *path, FsNode *node)
     fsnode_release_lock(parent, scheduler_running_id());
 
 cleanup_and_return:
-    if (parent != NULL)
+    if (parent != nullptr)
         fsnode_deref(parent);
 
     return result;
@@ -314,7 +314,7 @@ Result filesystem_unlink(Path *path)
     fsnode_release_lock(parent, scheduler_running_id());
 
 cleanup_and_return:
-    if (parent != NULL)
+    if (parent != nullptr)
         fsnode_deref(parent);
 
     return result;
@@ -326,7 +326,7 @@ Result filesystem_rename(Path *old_path, Path *new_path)
 
     Result result = SUCCESS;
 
-    FsNode *child = NULL;
+    FsNode *child = nullptr;
     FsNode *old_parent = filesystem_find_parent_and_ref(old_path);
     FsNode *new_parent = filesystem_find_parent_and_ref(new_path);
 

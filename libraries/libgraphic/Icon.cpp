@@ -1,7 +1,7 @@
 #include <libgraphic/Icon.h>
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/utils/HashMap.h>
 
 static HashMap *_icons;
@@ -22,7 +22,7 @@ static Icon *icon_load(const char *name)
         char path[PATH_LENGTH] = {};
         snprintf(path, PATH_LENGTH, "/System/Icons/%s@%spx.png", name, _icon_size_names[i]);
 
-        Bitmap *bitmap = NULL;
+        Bitmap *bitmap = nullptr;
         if (bitmap_load_from_can_fail(path, &bitmap) == SUCCESS)
         {
             bitmap->filtering = BITMAP_FILTERING_LINEAR;
@@ -57,7 +57,7 @@ Bitmap *icon_get_bitmap(Icon *icon, IconSize size)
 {
     Bitmap *bitmap = icon->sizes[size];
 
-    if (bitmap == NULL)
+    if (bitmap == nullptr)
     {
         for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
         {

@@ -1,25 +1,25 @@
 
 #include <libgraphic/Font.h>
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Path.h>
-#include <libsystem/Logger.h>
 
 Glyph *font_load_glyph(const char *name)
 {
     char glyph_path[PATH_LENGTH];
     snprintf(glyph_path, PATH_LENGTH, "/System/Fonts/%s.glyph", name);
 
-    Glyph *glyph_buffer = NULL;
+    Glyph *glyph_buffer = nullptr;
     size_t glyph_size = 0;
     Result result = file_read_all(glyph_path, (void **)&glyph_buffer, &glyph_size);
 
     if (result != SUCCESS)
     {
         logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(result));
-        return NULL;
+        return nullptr;
     }
 
     return glyph_buffer;
@@ -41,20 +41,20 @@ Font *font_create(const char *name)
 {
     Glyph *glyph = font_load_glyph(name);
 
-    if (glyph == NULL)
+    if (glyph == nullptr)
     {
         logger_error("Failled to load font %s: missing glyphs", name);
-        return NULL;
+        return nullptr;
     }
 
     Bitmap *bitmap = font_load_bitmap_create(name);
 
-    if (bitmap == NULL)
+    if (bitmap == nullptr)
     {
         logger_error("Failled to load font %s: missing bitmap", name);
 
         free(glyph);
-        return NULL;
+        return nullptr;
     }
 
     Font *font = __create(Font);

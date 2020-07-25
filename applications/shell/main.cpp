@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     while (true)
     {
         shell_prompt(command_exit_value);
-        char *command = NULL;
+        char *command = nullptr;
         if (readline_readline(readline, &command) != SUCCESS)
         {
             return -1;

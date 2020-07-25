@@ -1,7 +1,7 @@
 #include <libfile/elf.h>
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
@@ -49,7 +49,7 @@ void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *laun
 
         if (parent_handle_id >= 0 &&
             parent_handle_id < PROCESS_HANDLE_COUNT &&
-            parent_task->handles[parent_handle_id] != NULL)
+            parent_task->handles[parent_handle_id] != nullptr)
         {
             fshandle_acquire_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
             child_task->handles[child_handle_id] = fshandle_clone(parent_task->handles[parent_handle_id]);

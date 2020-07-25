@@ -1,5 +1,5 @@
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
@@ -47,7 +47,7 @@ static DeviceDriverInfo drivers[] = {
         virtio_graphic_match,
         virtio_graphic_initialize,
     },
-    {NULL, BUS_NONE, NULL, NULL},
+    {nullptr, BUS_NONE, nullptr, nullptr},
 };
 
 const DeviceDriverInfo *device_get_diver_info(DeviceInfo info)
@@ -63,7 +63,7 @@ const DeviceDriverInfo *device_get_diver_info(DeviceInfo info)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const char *device_to_static_string(DeviceInfo info)
@@ -118,7 +118,7 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
 void device_initialize(void)
 {
     logger_info("Initializing devices...");
-    device_iterate(NULL, print_device_info);
+    device_iterate(nullptr, print_device_info);
 }
 
 void device_iterate(void *target, DeviceIterateCallback callback)

@@ -1,8 +1,8 @@
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "kernel/memory/Memory.h"
@@ -271,12 +271,12 @@ PageDirectory *memory_pdir_create(void)
 {
     atomic_begin();
 
-    PageDirectory *page_directory = NULL;
+    PageDirectory *page_directory = nullptr;
 
     if (memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
         logger_error("Page directory allocation failled!");
-        return NULL;
+        return nullptr;
     }
 
     memset(page_directory, 0, sizeof(PageDirectory));

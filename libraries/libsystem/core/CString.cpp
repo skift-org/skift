@@ -62,7 +62,7 @@ void *memchr(const void *str, int c, size_t n)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int memcmp(const void *str1, const void *str2, size_t n)
@@ -201,7 +201,7 @@ char *strchr(const char *p, int ch)
         if (*p == c)
             return ((char *)p);
         if (*p == '\0')
-            return (NULL);
+            return (nullptr);
     }
 }
 
@@ -323,7 +323,7 @@ size_t strnlen(const char *s, size_t maxlen)
 char *strpbrk(const char *s, const char *accept)
 {
     s += strcspn(s, accept);
-    return *s ? (char *)s : NULL;
+    return *s ? (char *)s : nullptr;
 }
 
 char *strrchr(const char *s, int c)
@@ -366,7 +366,7 @@ char *strstr(const char *s1, const char *s2)
         if (strncmp(p, s2, len) == 0)
             return (char *)p;
     }
-    return NULL;
+    return nullptr;
 }
 
 char *strtok(char *s, char **state, const char *delim)
@@ -459,7 +459,7 @@ char *strdup(const char *s)
     int length = strlen(s) + 1;
     char *allocated_string = (char *)malloc(length);
 
-    if (allocated_string != NULL)
+    if (allocated_string != nullptr)
     {
         memcpy(allocated_string, s, length);
     }

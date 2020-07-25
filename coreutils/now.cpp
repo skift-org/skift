@@ -9,7 +9,7 @@ static bool option_epoch = false;
 static const char *usages[] = {
     "",
     "OPTION...",
-    NULL};
+    nullptr};
 
 static CommandLineOption options[] = {
     COMMANDLINE_OPT_HELP,

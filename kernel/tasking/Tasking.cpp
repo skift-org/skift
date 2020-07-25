@@ -20,23 +20,23 @@ void garbage_collector(void)
     while (true)
     {
         task_sleep(scheduler_running(), 100);
-        task_iterate(NULL, destroy_task_if_canceled);
+        task_iterate(nullptr, destroy_task_if_canceled);
     }
 }
 
 void tasking_initialize(void)
 {
-    Task *idle_task = task_spawn(NULL, "Idle", system_hang, NULL, false);
+    Task *idle_task = task_spawn(nullptr, "Idle", system_hang, nullptr, false);
     task_go(idle_task);
     task_set_state(idle_task, TASK_STATE_HANG);
 
     scheduler_did_create_idle_task(idle_task);
 
-    Task *kernel_task = task_spawn(NULL, "System", NULL, NULL, false);
+    Task *kernel_task = task_spawn(nullptr, "System", nullptr, nullptr, false);
     task_go(kernel_task);
 
     scheduler_did_create_running_task(kernel_task);
 
-    Task *garbage_task = task_spawn(NULL, "GarbageCollector", garbage_collector, NULL, false);
+    Task *garbage_task = task_spawn(nullptr, "GarbageCollector", garbage_collector, nullptr, false);
     task_go(garbage_task);
 }

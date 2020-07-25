@@ -8,8 +8,8 @@
 static bool scheduler_context_switch = false;
 static int scheduler_record[SCHEDULER_RECORD_COUNT] = {};
 
-static Task *running = NULL;
-static Task *idle = NULL;
+static Task *running = nullptr;
+static Task *idle = nullptr;
 
 static List *blocked_tasks;
 static List *running_tasks;
@@ -68,7 +68,7 @@ Task *scheduler_running(void)
 
 int scheduler_running_id(void)
 {
-    if (running == NULL)
+    if (running == nullptr)
     {
         return -1;
     }
@@ -140,7 +140,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 
     scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
 
-    list_iterate(blocked_tasks, NULL, (ListIterationCallback)wakeup_task_if_unblocked);
+    list_iterate(blocked_tasks, nullptr, (ListIterationCallback)wakeup_task_if_unblocked);
 
     // Get the next task
     if (!list_peek_and_pushback(running_tasks, (void **)&running))

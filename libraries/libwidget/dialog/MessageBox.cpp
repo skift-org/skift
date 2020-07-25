@@ -28,7 +28,7 @@ DialogButton dialog_message(
     window_root(window)->layout = VFLOW(0);
     window_root(window)->insets = Insets(8);
 
-    window_set_event_handler(window, EVENT_WINDOW_CLOSING, EVENT_HANDLER(NULL, on_dialog_close));
+    window_set_event_handler(window, EVENT_WINDOW_CLOSING, EVENT_HANDLER(nullptr, on_dialog_close));
 
     Widget *message_label = label_create(window_root(window), message);
     message_label->layout_attributes = LAYOUT_FILL;

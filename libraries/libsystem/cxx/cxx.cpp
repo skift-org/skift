@@ -30,7 +30,7 @@ extern "C"
         // From the itanium abi, https://itanium-cxx-abi.github.io/cxx-abi/abi.html#dso-dtor-runtime-api
         //
         // When __cxa_finalize(d) is called, it should walk the termination function list, calling each in turn
-        // if d matches __dso_handle for the termination function entry. If d == NULL, it should call all of them.
+        // if d matches __dso_handle for the termination function entry. If d == nullptr, it should call all of them.
         // Multiple calls to __cxa_finalize shall not result in calling termination function entries multiple times;
         // the implementation may either remove entries or mark them finished.
 

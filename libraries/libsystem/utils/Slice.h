@@ -9,7 +9,7 @@ typedef struct
     int size;
 } Slice;
 
-#define SLICE_NULL ((Slice){NULL, 0, 0})
+#define SLICE_NULL ((Slice){nullptr, 0, 0})
 
 static inline Slice slice_create(const void *p, size_t size)
 {

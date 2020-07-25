@@ -19,7 +19,7 @@ MenuEntry *menu_entry_create(const char *path)
 {
     JsonValue *root = json_parse_file(path);
 
-    MenuEntry *entry = NULL;
+    MenuEntry *entry = nullptr;
 
     if (json_is(root, JSON_OBJECT))
     {
@@ -101,7 +101,7 @@ List *load_menu(void)
 
             MenuEntry *entry = menu_entry_create(path);
 
-            if (entry != NULL)
+            if (entry != nullptr)
             {
                 list_pushback(menu, entry);
             }
@@ -116,7 +116,7 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 {
     __unused(event);
 
-    process_run(entry->command, NULL);
+    process_run(entry->command, nullptr);
 
     window_hide(sender->window);
 }

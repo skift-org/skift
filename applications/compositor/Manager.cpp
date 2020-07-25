@@ -5,7 +5,7 @@
 #include "compositor/Window.h"
 
 static List *_managed_windows;
-static Window *_focused_window = NULL;
+static Window *_focused_window = nullptr;
 
 void manager_initialize(void)
 {
@@ -27,7 +27,7 @@ Window *manager_get_window(struct Client *client, int id)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Window *manager_get_window_at(Vec2i position)
@@ -40,7 +40,7 @@ Window *manager_get_window_at(Vec2i position)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void manager_register_window(Window *window)

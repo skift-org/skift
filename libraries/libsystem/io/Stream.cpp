@@ -49,8 +49,8 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
 
 Result stream_create_term(Stream **master, Stream **slave)
 {
-    *master = NULL;
-    *slave = NULL;
+    *master = nullptr;
+    *slave = nullptr;
 
     int master_handle = HANDLE_INVALID_ID;
     int slave_handle = HANDLE_INVALID_ID;
@@ -90,7 +90,7 @@ void stream_cleanup(Stream **stream)
     if (*stream)
     {
         stream_close(*stream);
-        *stream = NULL;
+        *stream = nullptr;
     }
 }
 
@@ -284,7 +284,7 @@ void stream_flush(Stream *stream)
     if (!stream)
         return;
 
-    if (stream->write_buffer != NULL && stream->write_used > 0)
+    if (stream->write_buffer != nullptr && stream->write_used > 0)
     {
         __plug_handle_write(HANDLE(stream), stream->write_buffer, stream->write_used);
         stream->write_used = 0;

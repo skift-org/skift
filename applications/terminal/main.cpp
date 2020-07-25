@@ -13,7 +13,7 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-Stream *master = NULL, *slave = NULL;
+Stream *master = nullptr, *slave = nullptr;
 
 void keyboard_callback(void *target, Stream *keyboard, SelectEvent events)
 {
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
         launchpad_handle(shell_launchpad, HANDLE(slave), 0);
         launchpad_handle(shell_launchpad, HANDLE(slave), 1);
         launchpad_handle(shell_launchpad, HANDLE(slave), 2);
-        launchpad_launch(shell_launchpad, NULL);
+        launchpad_launch(shell_launchpad, nullptr);
 
         return eventloop_run();
     }

@@ -2,7 +2,7 @@
 
 #include <libsystem/utils/HashMap.h>
 
-typedef enum
+enum JsonType
 {
     JSON_STRING,
     JSON_INTEGER,
@@ -14,21 +14,20 @@ typedef enum
     JSON_NULL,
 
     __JSON_TYPE_COUNT,
-} JsonType;
+};
 
-typedef struct JsonValue
+struct JsonValue
 {
     JsonType type;
 
-    union
-    {
+    union {
         char *storage_string;
         int storage_integer;
         double storage_double;
         HashMap *storage_object;
         List *storage_array;
     };
-} JsonValue;
+};
 
 /* --- JsonValue constructor and destructor --------------------------------- */
 
@@ -123,5 +122,5 @@ char *json_prettify(JsonValue *value);
 JsonValue *json_parse(const char *str, size_t size);
 
 // Parse a json file and return a JsonValue tree.
-// Return NULL on error.
+// Return nullptr on error.
 JsonValue *json_parse_file(const char *path);

@@ -2,7 +2,7 @@
 #include <libsystem/cmdline/History.h>
 #include <libsystem/utils/List.h>
 
-static List *history = NULL;
+static List *history = nullptr;
 
 static void initialize_history_if_not_already(void)
 {
@@ -39,7 +39,7 @@ UnicodeString *history_peek(size_t index)
 
     assert(index < history_length());
 
-    UnicodeString *str = NULL;
+    UnicodeString *str = nullptr;
     list_peekat(history, index, (void **)&str);
 
     return str;

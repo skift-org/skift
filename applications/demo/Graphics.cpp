@@ -3,14 +3,14 @@
 
 #include "demo/Demos.h"
 
-static Bitmap *_test_image = NULL;
+static Bitmap *_test_image = nullptr;
 static int _frame = 0;
 
 void graphics_draw(Painter *painter, Rectangle screen, double time)
 {
     __unused(time);
 
-    if (_test_image == NULL)
+    if (_test_image == nullptr)
     {
         _test_image = bitmap_load_from("/System/skift.png");
     }

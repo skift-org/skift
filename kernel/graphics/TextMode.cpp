@@ -1,10 +1,10 @@
 #include <abi/Paths.h>
 #include <abi/TextMode.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/x86/x86.h"
@@ -17,7 +17,7 @@
 
 #define VGA_FRAME_BUFFER 0XB8000
 
-static uint16_t *_text_buffer = NULL;
+static uint16_t *_text_buffer = nullptr;
 
 #define VGA_SCREEN_WIDTH 80
 #define VGA_SCREEN_HEIGHT 25

@@ -2,7 +2,7 @@
 
 #include "demo/Demos.h"
 
-static TrueTypeFamily *_family = NULL;
+static TrueTypeFamily *_family = nullptr;
 static TrueTypeFont *_fonts[16];
 
 void fonts_draw(Painter *painter, Rectangle screen, double time)

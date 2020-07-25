@@ -4,7 +4,7 @@
 
 JsonValue *json_create_string(const char *string)
 {
-    if (string == NULL)
+    if (string == nullptr)
     {
         return json_create_null();
     }
@@ -19,7 +19,7 @@ JsonValue *json_create_string(const char *string)
 
 JsonValue *json_create_string_adopt(char *string)
 {
-    if (string == NULL)
+    if (string == nullptr)
     {
         return json_create_null();
     }
@@ -124,7 +124,7 @@ void json_destroy(JsonValue *value)
 
 bool json_is(JsonValue *value, JsonType type)
 {
-    if (value == NULL)
+    if (value == nullptr)
     {
         return type == JSON_NULL;
     }
@@ -212,7 +212,7 @@ JsonValue *json_array_get(JsonValue *array, size_t index)
 {
     assert(json_is(array, JSON_ARRAY));
 
-    JsonValue *value = NULL;
+    JsonValue *value = nullptr;
 
     assert(list_peekat(array->storage_array, index, (void **)&value));
 

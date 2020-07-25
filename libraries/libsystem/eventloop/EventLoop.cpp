@@ -1,10 +1,10 @@
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
 
@@ -14,11 +14,11 @@ typedef struct
     void *target;
 } RunLater;
 
-static List *_eventloop_timers = NULL;
+static List *_eventloop_timers = nullptr;
 static TimeStamp _eventloop_timer_last_fire = 0;
 
-static List *_eventloop_notifiers = NULL;
-static List *_eventloop_run_later = NULL;
+static List *_eventloop_notifiers = nullptr;
+static List *_eventloop_run_later = nullptr;
 
 static size_t _eventloop_handles_count;
 static Handle *_eventloop_handles[PROCESS_HANDLE_COUNT];
@@ -157,7 +157,7 @@ void eventloop_pump(bool pool)
 
     eventloop_update_timers();
 
-    Handle *selected = NULL;
+    Handle *selected = nullptr;
     SelectEvent selected_events = 0;
 
     Result result = handle_select(

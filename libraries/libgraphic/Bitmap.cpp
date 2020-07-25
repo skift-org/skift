@@ -15,7 +15,7 @@
 
 Bitmap *bitmap_create(size_t width, size_t height)
 {
-    Bitmap *bitmap = NULL;
+    Bitmap *bitmap = nullptr;
 
     shared_memory_alloc(sizeof(Bitmap) + width * height * sizeof(Color), (uintptr_t *)&bitmap);
     assert(bitmap);
@@ -57,7 +57,7 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 
     uint decoded_width = 0;
     uint decoded_height = 0;
-    void *decoded_data __cleanup_malloc = NULL;
+    void *decoded_data __cleanup_malloc = nullptr;
 
     int decode_result = lodepng_decode32(
         (unsigned char **)&decoded_data,
@@ -82,7 +82,7 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 
 Bitmap *bitmap_load_from(const char *path)
 {
-    Bitmap *bitmap = NULL;
+    Bitmap *bitmap = nullptr;
     Result result = bitmap_load_from_can_fail(path, &bitmap);
 
     if (result != SUCCESS)
@@ -96,7 +96,7 @@ Bitmap *bitmap_load_from(const char *path)
 
 Result bitmap_save_to(Bitmap *bitmap, const char *path)
 {
-    void *outbuffer __cleanup_malloc = NULL;
+    void *outbuffer __cleanup_malloc = nullptr;
 
     size_t outbuffer_size = 0;
 

@@ -41,10 +41,10 @@ typedef struct CommandLine
 
 #define COMMANDLINE_NEWLINE "\n\t"
 
-#define COMMANDLINE_NO_LONG_NAME NULL
+#define COMMANDLINE_NO_LONG_NAME nullptr
 #define COMMANDLINE_NO_SHORT_NAME '\0'
-#define COMMANDLINE_NO_CALLBACK NULL
-#define COMMANDLINE_NO_VALUE NULL
+#define COMMANDLINE_NO_CALLBACK nullptr
+#define COMMANDLINE_NO_VALUE nullptr
 
 #define COMMANDLINE_OPT_SECTION(__name)          \
     {                                            \
@@ -52,7 +52,7 @@ typedef struct CommandLine
         .value = COMMANDLINE_NO_VALUE,           \
         .short_name = COMMANDLINE_NO_SHORT_NAME, \
         .long_name = __name,                     \
-        .description = NULL,                     \
+        .description = nullptr,                  \
         .callback = COMMANDLINE_NO_CALLBACK,     \
     }
 
@@ -61,8 +61,8 @@ typedef struct CommandLine
         .type = COMMANDLINE_SEPARATOR,           \
         .value = COMMANDLINE_NO_VALUE,           \
         .short_name = COMMANDLINE_NO_SHORT_NAME, \
-        .long_name = NULL,                       \
-        .description = NULL,                     \
+        .long_name = nullptr,                    \
+        .description = nullptr,                  \
         .callback = COMMANDLINE_NO_CALLBACK,     \
     }
 
@@ -109,7 +109,7 @@ typedef struct CommandLine
 #define COMMANDLINE_OPT_HELP                               \
     {                                                      \
         .type = COMMANDLINE_BOOLEAN,                       \
-        .value = NULL,                                     \
+        .value = nullptr,                                  \
         .short_name = 'h',                                 \
         .long_name = "help",                               \
         .description = "Show this help message and exit.", \
@@ -120,7 +120,7 @@ typedef struct CommandLine
     {                            \
         .type = COMMANDLINE_END, \
                                  \
-        .value = NULL,           \
+        .value = nullptr,        \
         .short_name = 'x',       \
         .long_name = "",         \
         .description = "",       \

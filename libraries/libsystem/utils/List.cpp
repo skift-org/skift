@@ -7,20 +7,20 @@ List *list_create(void)
     List *list = __create(List);
 
     list->count = 0;
-    list->head = NULL;
-    list->tail = NULL;
+    list->head = nullptr;
+    list->tail = nullptr;
 
     return list;
 }
 
-void list_destroy(List *list) { list_destroy_with_callback(list, NULL); }
+void list_destroy(List *list) { list_destroy_with_callback(list, nullptr); }
 void list_destroy_with_callback(List *list, ListDestroyElementCallback callback)
 {
     list_clear_with_callback(list, callback);
     free(list);
 }
 
-void list_clear(List *list) { list_clear_with_callback(list, NULL); }
+void list_clear(List *list) { list_clear_with_callback(list, nullptr); }
 void list_clear_with_callback(List *list, ListDestroyElementCallback callback)
 {
     ListItem *current = list->head;
@@ -40,8 +40,8 @@ void list_clear_with_callback(List *list, ListDestroyElementCallback callback)
     }
 
     list->count = 0;
-    list->head = NULL;
-    list->tail = NULL;
+    list->head = nullptr;
+    list->tail = nullptr;
 }
 
 List *list_clone(List *list)
@@ -58,7 +58,7 @@ List *list_clone(List *list)
 
 void list_insert_sorted(List *list, void *value, ListCompareElementCallback callback)
 {
-    if (list->head == NULL || callback(value, list->head->value))
+    if (list->head == nullptr || callback(value, list->head->value))
     {
         list_push(list, value);
     }
@@ -66,7 +66,7 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback call
     {
         ListItem *current = list->head;
 
-        while (current->next != NULL && callback(current->next->value, value))
+        while (current->next != nullptr && callback(current->next->value, value))
         {
             current = current->next;
         }
@@ -77,7 +77,7 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback call
         item->next = current->next;
         item->value = value;
 
-        if (current->next == NULL)
+        if (current->next == nullptr)
         {
             list->tail = item;
         }
@@ -94,13 +94,13 @@ void list_insert_sorted(List *list, void *value, ListCompareElementCallback call
 
 void *list_peek(List *list)
 {
-    if (list->head != NULL)
+    if (list->head != nullptr)
     {
         return list->head->value;
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -116,24 +116,24 @@ bool list_peek_and_pushback(List *list, void **value)
         if (list->count == 1)
         {
             list->count = 0;
-            list->head = NULL;
-            list->tail = NULL;
+            list->head = nullptr;
+            list->tail = nullptr;
         }
         else if (list->count > 1)
         {
-            item->next->prev = NULL;
+            item->next->prev = nullptr;
             list->head = item->next;
 
             list->count--;
         }
 
         // Push back
-        item->prev = NULL;
-        item->next = NULL;
+        item->prev = nullptr;
+        item->next = nullptr;
 
         list->count++;
 
-        if (list->tail == NULL)
+        if (list->tail == nullptr)
         {
             list->tail = item;
             list->head = item;
@@ -155,13 +155,13 @@ bool list_peek_and_pushback(List *list, void **value)
 
 void *list_peekback(List *list)
 {
-    if (list->tail != NULL)
+    if (list->tail != nullptr)
     {
         return list->tail->value;
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -197,7 +197,7 @@ static void list_peekat_from_back(List *list, int index, void **value)
 
 bool list_peekat(List *list, int index, void **value)
 {
-    *value = NULL;
+    *value = nullptr;
 
     if (list->count >= 1 && index >= 0 && index < list->count)
     {
@@ -282,7 +282,7 @@ void list_push(List *list, void *value)
 
     list->count++;
 
-    if (list->head == NULL)
+    if (list->head == nullptr)
     {
         list->head = item;
         list->tail = item;
@@ -306,18 +306,18 @@ bool list_pop(List *list, void **value)
     else if (list->count == 1)
     {
         list->count = 0;
-        list->head = NULL;
-        list->tail = NULL;
+        list->head = nullptr;
+        list->tail = nullptr;
     }
     else if (list->count > 1)
     {
-        item->next->prev = NULL;
+        item->next->prev = nullptr;
         list->head = item->next;
 
         list->count--;
     }
 
-    if (value != NULL)
+    if (value != nullptr)
     {
         *value = item->value;
     }
@@ -329,13 +329,13 @@ void list_pushback(List *list, void *value)
 {
     ListItem *item = __create(ListItem);
 
-    item->prev = NULL;
-    item->next = NULL;
+    item->prev = nullptr;
+    item->next = nullptr;
     item->value = value;
 
     list->count++;
 
-    if (list->tail == NULL)
+    if (list->tail == nullptr)
     {
         list->tail = item;
         list->head = item;
@@ -361,23 +361,23 @@ bool list_popback(List *list, void **value)
 
     if (list->count == 0)
     {
-        return NULL;
+        return false;
     }
     else if (list->count == 1)
     {
         list->count = 0;
-        list->head = NULL;
-        list->tail = NULL;
+        list->head = nullptr;
+        list->tail = nullptr;
     }
     else if (list->count > 1)
     {
-        item->prev->next = NULL;
+        item->prev->next = nullptr;
         list->tail = item->prev;
 
         list->count--;
     }
 
-    if (value != NULL)
+    if (value != nullptr)
     {
         *value = item->value;
     }
@@ -385,14 +385,14 @@ bool list_popback(List *list, void **value)
     return true;
 }
 
-bool list_remove(List *list, void *value) { return list_remove_with_callback(list, value, NULL); }
+bool list_remove(List *list, void *value) { return list_remove_with_callback(list, value, nullptr); }
 bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallback callback)
 {
-    for (ListItem *item = list->head; item != NULL; item = item->next)
+    for (ListItem *item = list->head; item != nullptr; item = item->next)
     {
         if (item->value == value)
         {
-            if (item->prev != NULL)
+            if (item->prev != nullptr)
             {
                 item->prev->next = item->next;
             }
@@ -401,7 +401,7 @@ bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallba
                 list->head = item->next;
             }
 
-            if (item->next != NULL)
+            if (item->next != nullptr)
             {
                 item->next->prev = item->prev;
             }
@@ -428,12 +428,12 @@ bool list_remove_with_callback(List *list, void *value, ListDestroyElementCallba
 
 bool list_remove_at(List *list, int index)
 {
-    return list_remove_at_with_callback(list, index, NULL);
+    return list_remove_at_with_callback(list, index, nullptr);
 }
 
 bool list_remove_at_with_callback(List *list, int index, ListDestroyElementCallback callback)
 {
-    void *value = NULL;
+    void *value = nullptr;
     list_peekat(list, index, &value);
     return list_remove_with_callback(list, value, callback);
 }

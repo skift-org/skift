@@ -65,7 +65,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
 
     Glyph *glyph = font_glyph(font, cell.codepoint);
 
-    if (glyph != NULL)
+    if (glyph != nullptr)
     {
         painter_draw_glyph(
             painter,
@@ -166,7 +166,7 @@ Terminal *framebuffer_terminal_create(void)
     {
         framebuffer_close(framebuffer);
 
-        return NULL;
+        return nullptr;
     }
 
     painter_clear(framebuffer->painter, framebuffer_colors[TERMINAL_COLOR_DEFAULT_BACKGROUND]);

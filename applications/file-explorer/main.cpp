@@ -97,7 +97,7 @@ static void on_open(FileExplorerWindow *window, ...)
         {
             Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
             launchpad_argument(launchpad, filesystem_model_filename_by_index(window->model, ((Table *)window->table)->selected));
-            launchpad_launch(launchpad, NULL);
+            launchpad_launch(launchpad, nullptr);
         }
     }
 }
@@ -126,7 +126,7 @@ static void go_backward(FileExplorerWindow *window, ...)
 {
     if (list_any(window->backward_history))
     {
-        Path *path = NULL;
+        Path *path = nullptr;
         list_popback(window->backward_history, (void **)&path);
 
         navigate(window, path, RECORD_FOREWARD);
@@ -137,7 +137,7 @@ static void go_foreward(FileExplorerWindow *window, ...)
 {
     if (list_any(window->foreward_history))
     {
-        Path *path = NULL;
+        Path *path = nullptr;
         list_popback(window->foreward_history, (void **)&path);
 
         navigate(window, path, RECORD_BACKWARD);

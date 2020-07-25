@@ -54,7 +54,7 @@ void window_populate_header(Window *window)
     Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-close"));
     close_button->insets = Insets(3);
 
-    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(NULL, close_button_click));
+    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(nullptr, close_button_click));
 }
 
 void window_initialize(Window *window, WindowFlag flags)
@@ -79,12 +79,12 @@ void window_initialize(Window *window, WindowFlag flags)
     window->on_screen_bound = Rectangle(250, 250);
     window->dirty_rect = list_create();
 
-    window->header_container = container_create(NULL);
+    window->header_container = container_create(nullptr);
     window->header_container->window = window;
 
     window_populate_header(window);
 
-    window->root_container = container_create(NULL);
+    window->root_container = container_create(nullptr);
     window->root_container->window = window;
 
     window->focused_widget = window->root_container;
@@ -376,7 +376,7 @@ Widget *window_child_at(Window *window, Vec2i position)
         return widget_get_child_at(window_header(window), position);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void window_event(Window *window, Event *event)
@@ -387,7 +387,7 @@ void window_event(Window *window, Event *event)
         event->mouse.old_position = event->mouse.old_position - window->on_screen_bound.position();
     }
 
-    if (window->handlers[event->type].callback != NULL)
+    if (window->handlers[event->type].callback != nullptr)
     {
         event->accepted = true;
         window->handlers[event->type].callback(
@@ -663,17 +663,17 @@ void window_widget_removed(Window *window, Widget *widget)
 {
     if (window->focused_widget == widget)
     {
-        window->focused_widget = NULL;
+        window->focused_widget = nullptr;
     }
 
     if (window->mouse_focused_widget == widget)
     {
-        window->mouse_focused_widget = NULL;
+        window->mouse_focused_widget = nullptr;
     }
 
     if (window->mouse_over_widget == widget)
     {
-        window->mouse_over_widget = NULL;
+        window->mouse_over_widget = nullptr;
     }
 
     hashmap_remove_value(window->widget_by_id, widget);
@@ -697,7 +697,7 @@ Widget *window_get_widget_by_id(Window *window, const char *id)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 

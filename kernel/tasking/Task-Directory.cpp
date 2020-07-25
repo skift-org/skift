@@ -28,7 +28,7 @@ Result task_set_directory(Task *task, const char *buffer)
     Path *path = task_resolve_directory(task, buffer);
     FsNode *node = filesystem_find_and_ref(path);
 
-    if (node == NULL)
+    if (node == nullptr)
     {
         result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
@@ -44,7 +44,7 @@ Result task_set_directory(Task *task, const char *buffer)
 
     path_destroy(task->directory);
     task->directory = path;
-    path = NULL;
+    path = nullptr;
 
     lock_release(task->directory_lock);
 

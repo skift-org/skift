@@ -31,9 +31,9 @@ static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
 
 Font *get_terminal_font(void)
 {
-    static Font *font = NULL;
+    static Font *font = nullptr;
 
-    if (font == NULL)
+    if (font == nullptr)
     {
         font = font_create("mono");
     }
@@ -78,7 +78,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
 
     Glyph *glyph = font_glyph(get_terminal_font(), codepoint);
 
-    if (glyph != NULL)
+    if (glyph != nullptr)
     {
         painter_draw_glyph(
             painter,
@@ -295,7 +295,7 @@ Widget *terminal_widget_create(Widget *parent)
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 0);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 1);
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);
-    launchpad_launch(shell_launchpad, NULL);
+    launchpad_launch(shell_launchpad, nullptr);
 
     widget_initialize(WIDGET(widget), &terminal_class, parent);
 

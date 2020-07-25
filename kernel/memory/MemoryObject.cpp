@@ -78,5 +78,5 @@ MemoryObject *memory_object_by_id(int id)
 
     lock_release(_memory_objects_lock);
 
-    return NULL;
+    return nullptr;
 }

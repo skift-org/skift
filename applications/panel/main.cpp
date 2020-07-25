@@ -36,12 +36,12 @@ void widget_cpu_update(Graph *widget)
 
 void open_menu()
 {
-    process_run("menu", NULL);
+    process_run("menu", nullptr);
 }
 
 void open_task_manager()
 {
-    process_run("task-manager", NULL);
+    process_run("task-manager", nullptr);
 }
 
 int main(int argc, char **argv)
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     window_root(window)->insets = Insets(4);
 
     Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, icon_get("menu"), "Applications");
-    widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(NULL, open_menu));
+    widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(nullptr, open_menu));
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
-    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(NULL, open_task_manager));
+    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(nullptr, open_task_manager));
 
     window_show(window);
 

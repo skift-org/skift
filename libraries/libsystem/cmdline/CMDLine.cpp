@@ -16,7 +16,7 @@ CommandLineOption *get_long_option(CommandLine *cmdline, const char *name)
         if (strcmp(cmdline->options[i].long_name, name) == 0)
             return &cmdline->options[i];
 
-    return NULL;
+    return nullptr;
 }
 
 CommandLineOption *get_short_option(CommandLine *cmdline, const char name)
@@ -25,12 +25,12 @@ CommandLineOption *get_short_option(CommandLine *cmdline, const char name)
         if (cmdline->options[i].short_name == name)
             return &cmdline->options[i];
 
-    return NULL;
+    return nullptr;
 }
 
 void do_option(CommandLine *cmdline, CommandLineOption *option, int i, int argc, char **argv)
 {
-    if (option->value != NULL)
+    if (option->value != nullptr)
     {
         switch (option->type)
         {
@@ -39,18 +39,18 @@ void do_option(CommandLine *cmdline, CommandLineOption *option, int i, int argc,
             break;
 
         case COMMANDLINE_STRING:
-            if (i + 1 < argc && argv[i + 1] != NULL)
+            if (i + 1 < argc && argv[i + 1] != nullptr)
             {
                 *((char **)option->value) = argv[i + 1];
-                argv[i + 1] = NULL;
+                argv[i + 1] = nullptr;
             }
             break;
 
         case COMMANDLINE_INTEGER:
-            if (i + 1 < argc && argv[i + 1] != NULL)
+            if (i + 1 < argc && argv[i + 1] != nullptr)
             {
                 *((int *)option->value) = parse_int_inline(PARSER_DECIMAL, argv[i + 1], 0);
-                argv[i + 1] = NULL;
+                argv[i + 1] = nullptr;
             }
             break;
 
@@ -74,7 +74,7 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
         printf("%s\n\n", cmdline->prologue);
     }
 
-    if (cmdline->usages != NULL)
+    if (cmdline->usages != nullptr)
     {
         printf("\e[1mUsages:\e[0m ");
 
@@ -109,7 +109,7 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
                 printf("    ");
             }
 
-            if (opt->long_name != NULL)
+            if (opt->long_name != nullptr)
             {
                 printf(", --%s ", opt->long_name);
             }
@@ -124,14 +124,14 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
                 printf("[value] ");
             }
 
-            if (opt->long_name == NULL)
+            if (opt->long_name == nullptr)
             {
                 printf("  ");
             }
 
             printf("\t");
 
-            if (opt->description != NULL)
+            if (opt->description != nullptr)
             {
                 printf("%s", opt->description);
             }
@@ -162,7 +162,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
     {
         char *current_argument = argv[i];
 
-        if (current_argument == NULL)
+        if (current_argument == nullptr)
         {
             continue;
         }
@@ -176,7 +176,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
         {
             CommandLineOption *option = get_long_option(cmdline, current_argument + 2);
 
-            if (option == NULL)
+            if (option == nullptr)
             {
                 stream_format(err_stream, "Unknow option '%s'!\n", current_argument + 2);
                 process_exit(-1);
@@ -190,7 +190,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
             {
                 CommandLineOption *option = get_short_option(cmdline, current_argument[1 + j]);
 
-                if (option == NULL)
+                if (option == nullptr)
                 {
                     stream_format(err_stream, "Unknow option '%c'!\n", current_argument[1 + j]);
                     process_exit(-1);
@@ -200,7 +200,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
             }
         }
 
-        argv[i] = NULL;
+        argv[i] = nullptr;
     }
 
     // Packing argv
@@ -208,7 +208,7 @@ int cmdline_parse(CommandLine *cmdline, int argc, char **argv)
 
     for (int i = 0; i < argc; i++)
     {
-        if (argv[i] != NULL)
+        if (argv[i] != nullptr)
         {
             argv[index] = argv[i];
             index++;

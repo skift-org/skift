@@ -25,19 +25,19 @@ typedef enum
 
 static PS2KeyboardState _state = PS2KBD_STATE_NORMAL;
 static KeyMotion _keystate[__KEY_COUNT] = {};
-static KeyMap *_keymap = NULL;
+static KeyMap *_keymap = nullptr;
 
-static FsNode *_characters_node = NULL;
-static RingBuffer *_characters_buffer = NULL;
+static FsNode *_characters_node = nullptr;
+static RingBuffer *_characters_buffer = nullptr;
 
-static FsNode *_events_node = NULL;
-static RingBuffer *_events_buffer = NULL;
+static FsNode *_events_node = nullptr;
+static RingBuffer *_events_buffer = nullptr;
 
 Codepoint keyboard_get_codepoint(Key key)
 {
     KeyMapping *mapping = keymap_lookup(_keymap, key);
 
-    if (mapping == NULL)
+    if (mapping == nullptr)
     {
         return 0;
     }
@@ -163,7 +163,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     {
         logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
 
-        return NULL;
+        return nullptr;
     }
 
     FileState stat;
@@ -173,7 +173,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
     {
         logger_info("Failled to load keymap from %s: This is not a regular file", keymap_path);
 
-        return NULL;
+        return nullptr;
     }
 
     logger_info("Allocating keymap of size %dkio", stat.size / 1024);
@@ -187,7 +187,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
         free(keymap);
 
-        return NULL;
+        return nullptr;
     }
 
     return keymap;
@@ -205,7 +205,7 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, vo
 
         atomic_begin();
 
-        if (_keymap != NULL)
+        if (_keymap != nullptr)
         {
             free(_keymap);
         }

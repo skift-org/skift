@@ -66,7 +66,7 @@ Result sys_process_cancel(int pid)
     ATOMIC({
         Task *task = task_by_id(pid);
 
-        if (task == NULL)
+        if (task == nullptr)
         {
             result = ERR_NO_SUCH_TASK;
         }
@@ -497,7 +497,7 @@ SyscallHandler syscall_get_handler(Syscall syscall)
 {
     if (syscall >= 0 && syscall < __SYSCALL_COUNT)
     {
-        if ((SyscallHandler)syscalls[syscall] == NULL)
+        if ((SyscallHandler)syscalls[syscall] == nullptr)
         {
             logger_error("Syscall not implemented ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
         }
@@ -507,7 +507,7 @@ SyscallHandler syscall_get_handler(Syscall syscall)
     else
     {
         logger_error("Unknow syscall ID=%d call by PROCESS=%d.", syscall, scheduler_running_id());
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -521,7 +521,7 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
 
     Result result = SUCCESS;
 
-    if (handler == NULL)
+    if (handler == nullptr)
     {
         logger_error("Invalid syscall: %d", syscall);
         return ERR_FUNCTION_NOT_IMPLEMENTED;

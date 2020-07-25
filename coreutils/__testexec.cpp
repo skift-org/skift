@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
         assert(result == SUCCESS);
 
-        process_wait(pid, NULL);
+        process_wait(pid, nullptr);
     }
 
     printf("PASS\n");

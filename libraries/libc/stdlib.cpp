@@ -118,7 +118,7 @@ float strtof(const char *nptr, char **endptr)
 
 double atof(const char *nptr)
 {
-    return strtod(nptr, NULL);
+    return strtod(nptr, nullptr);
 }
 
 int atoi(const char *s)

@@ -1,9 +1,9 @@
 
 #include <libjson/Json.h>
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "kernel/devices/Devices.h"
@@ -76,7 +76,7 @@ static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return 0;
     }

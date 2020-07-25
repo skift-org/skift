@@ -38,7 +38,7 @@ void __plug_init(void)
 
     const size_t size = __init_array_end - __init_array_start;
     for (size_t i = 0; i < size; i++)
-        (*__init_array_start[i])(0, NULL, NULL);
+        (*__init_array_start[i])(0, nullptr, nullptr);
 }
 
 void __plug_fini(int exit_code)

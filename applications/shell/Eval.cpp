@@ -132,7 +132,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
 
         for (int i = 0; i < list_count(pipeline->commands); i++)
         {
-            ShellCommand *command = NULL;
+            ShellCommand *command = nullptr;
             list_peekat(pipeline->commands, i, (void **)&command);
             assert(command);
 

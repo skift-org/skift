@@ -31,7 +31,7 @@ static Result fsconnection_read(
     size_t size,
     size_t *read)
 {
-    RingBuffer *data = NULL;
+    RingBuffer *data = nullptr;
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
@@ -64,7 +64,7 @@ static Result fsconnection_write(
     size_t size,
     size_t *written)
 {
-    RingBuffer *data = NULL;
+    RingBuffer *data = nullptr;
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {

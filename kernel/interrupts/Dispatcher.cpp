@@ -8,14 +8,14 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/scheduling/Scheduler.h"
 
-static RingBuffer *_interupts_to_dispatch = NULL;
+static RingBuffer *_interupts_to_dispatch = nullptr;
 static DispatcherInteruptHandler _interupts_to_handlers[255] = {};
 
 void dispatcher_initialize(void)
 {
     _interupts_to_dispatch = ringbuffer_create(1024);
 
-    Task *interrupts_dispatcher_task = task_spawn(NULL, "InterruptsDispatcher", dispatcher_service, NULL, false);
+    Task *interrupts_dispatcher_task = task_spawn(nullptr, "InterruptsDispatcher", dispatcher_service, nullptr, false);
     task_go(interrupts_dispatcher_task);
 }
 
@@ -89,7 +89,7 @@ void dispatcher_unregister_handler(DispatcherInteruptHandler handler)
     {
         if (_interupts_to_handlers[i] == handler)
         {
-            _interupts_to_handlers[i] = NULL;
+            _interupts_to_handlers[i] = nullptr;
         }
     }
 }

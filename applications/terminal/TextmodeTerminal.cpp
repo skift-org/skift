@@ -71,14 +71,14 @@ Terminal *textmode_terminal_create(void)
     {
         stream_close(device);
 
-        return NULL;
+        return nullptr;
     }
 
     if (stream_call(device, IOCALL_TEXTMODE_GET_STATE, &args) != SUCCESS)
     {
         stream_close(device);
 
-        return NULL;
+        return nullptr;
     }
 
     TextmodeTerminalRenderer *renderer = __create(TextmodeTerminalRenderer);

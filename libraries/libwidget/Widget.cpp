@@ -9,10 +9,10 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
-static Font *_widget_font = NULL;
+static Font *_widget_font = nullptr;
 Font *widget_font(void)
 {
-    if (_widget_font == NULL)
+    if (_widget_font == nullptr)
     {
         _widget_font = font_create("sans");
     }
@@ -25,15 +25,15 @@ void widget_initialize(
     const WidgetClass *klass,
     Widget *parent)
 {
-    assert(widget != NULL);
-    assert(klass != NULL);
+    assert(widget != nullptr);
+    assert(klass != nullptr);
 
     widget->enabled = true;
     widget->klass = klass;
     widget->childs = list_create();
     widget->bound = Rectangle(32, 32);
 
-    if (parent != NULL)
+    if (parent != nullptr)
     {
         widget->window = parent->window;
         widget_add_child(parent, widget);
@@ -79,7 +79,7 @@ void widget_invalidate_layout(Widget *widget)
 
 void widget_add_child(Widget *widget, Widget *child)
 {
-    assert(child->parent == NULL);
+    assert(child->parent == nullptr);
 
     child->parent = widget;
     child->window = widget->window;
@@ -92,8 +92,8 @@ void widget_remove_child(Widget *widget, Widget *child)
 {
     assert(child->parent == widget);
 
-    child->parent = NULL;
-    child->window = NULL;
+    child->parent = nullptr;
+    child->window = nullptr;
     list_remove(widget->childs, child);
 
     widget_invalidate_layout(widget);
@@ -116,7 +116,7 @@ void widget_dump(Widget *widget, int depth)
         printf("\t");
     }
 
-    if (widget == NULL)
+    if (widget == nullptr)
     {
         printf("<null>\n");
         return;
@@ -143,7 +143,7 @@ void widget_event(Widget *widget, Event *event)
         widget->klass->event(widget, event);
     }
 
-    if (!event->accepted && widget->handlers[event->type].callback != NULL)
+    if (!event->accepted && widget->handlers[event->type].callback != nullptr)
     {
         event->accepted = true;
         widget->handlers[event->type].callback(
@@ -561,8 +561,8 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 {
     assert(event < __EVENT_TYPE_COUNT);
 
-    widget->handlers[event].target = NULL;
-    widget->handlers[event].callback = NULL;
+    widget->handlers[event].target = nullptr;
+    widget->handlers[event].callback = nullptr;
 }
 
 Color __widget_get_color(Widget *widget, ThemeColorRole role)

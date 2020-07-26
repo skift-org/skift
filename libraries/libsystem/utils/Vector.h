@@ -1,16 +1,19 @@
 #pragma once
 
+#include <type_traits>
+
 #include <libsystem/Common.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
 
 template <typename T>
 class Vector
 {
 private:
-    T *_storage;
-    size_t _count;
-    size_t _capacity;
+    T *_storage{};
+    size_t _count{};
+    size_t _capacity{};
 
 public:
     size_t count() const { return _count; }
@@ -21,15 +24,44 @@ public:
 
     Vector(size_t capacity)
     {
-        _count = 0;
-        _capacity = capacity;
-        _storage = new T[capacity];
+        ensure_capacity(capacity);
+    }
+
+    Vector(Vector &other)
+    {
+        ensure_capacity(other.count());
+        _count = other.count();
+
+        if constexpr (std::is_trivially_copyable_v<T>)
+        {
+            memcpy(_storage, other._storage, sizeof(T) * _count);
+        }
+        else
+        {
+            for (size_t i = 0; i < _count; i++)
+            {
+                new (&_storage[i]) T(other._storage[i]);
+            }
+        }
+    }
+
+    Vector(Vector &&other)
+    {
+        _storage = other._storage;
+        _capacity = other._capacity;
+        _count = other.count();
+
+        other._storage = nullptr;
+        other._capacity = 0;
+        other._count = 0;
     }
 
     ~Vector()
     {
         clear();
-        delete[] _storage;
+
+        if (_storage)
+            delete[] _storage;
     }
 
     T &operator[](size_t index)
@@ -74,10 +106,21 @@ public:
                 }
             }
         }
+
+        std::is_trivially_copyable
     }
 
-    void capacity(size_t capacity)
+    void ensure_capacity(size_t capacity)
     {
+        if (!_storage)
+        {
+            _storage = new T[capacity];
+            _capacity = capacity;
+            _count = 0;
+
+            return;
+        }
+
         capacity = MAX(_count, capacity);
 
         if (capacity <= _capacity)
@@ -285,5 +328,9 @@ public:
         }
 
         return false;
+    }
+
+    T* raw_storage(){
+        return _storage;
     }
 };

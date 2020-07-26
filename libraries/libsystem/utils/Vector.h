@@ -106,8 +106,6 @@ public:
                 }
             }
         }
-
-        std::is_trivially_copyable
     }
 
     void ensure_capacity(size_t capacity)
@@ -330,7 +328,8 @@ public:
         return false;
     }
 
-    T* raw_storage(){
+    T *raw_storage()
+    {
         return _storage;
     }
 };

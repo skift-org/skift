@@ -4,69 +4,69 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
+#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
-#include <libsystem/utils/SourceReader.h>
 
 #define MARKUP_WHITESPACE " \n\r\t"
 #define MARKUP_XDIGITS "0123456789abcdef"
 #define MARKUP_ALPHA "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-static void whitespace(SourceReader *source)
+static void whitespace(Lexer &lexer)
 {
-    source_eat(source, MARKUP_WHITESPACE);
+    lexer.eat(MARKUP_WHITESPACE);
 }
 
-static char *identifier(SourceReader *source)
+static char *identifier(Lexer &lexer)
 {
     BufferBuilder *builder = buffer_builder_create(6);
 
-    while (source_current_is(source, MARKUP_ALPHA) &&
-           source_do_continue(source))
+    while (lexer.current_is(MARKUP_ALPHA) &&
+           lexer.do_continue())
     {
-        buffer_builder_append_chr(builder, source_current(source));
-        source_foreward(source);
+        buffer_builder_append_chr(builder, lexer.current());
+        lexer.foreward();
     }
 
     return buffer_builder_finalize(builder);
 }
 
-char *string(SourceReader *source)
+char *string(Lexer &lexer)
 {
     BufferBuilder *builder = buffer_builder_create(16);
 
-    source_skip(source, '"');
+    lexer.skip('"');
 
-    while (source_current(source) != '"' &&
-           source_do_continue(source))
+    while (lexer.current() != '"' &&
+           lexer.do_continue())
     {
-        if (source_current(source) == '\\')
+        if (lexer.current() == '\\')
         {
-            buffer_builder_append_str(builder, source_read_escape_sequence(source));
+            buffer_builder_append_str(builder, lexer.read_escape_sequence());
         }
         else
         {
-            buffer_builder_append_chr(builder, source_current(source));
-            source_foreward(source);
+            buffer_builder_append_chr(builder, lexer.current());
+            lexer.foreward();
         }
     }
 
-    source_skip(source, '"');
+    lexer.skip('"');
 
     return buffer_builder_finalize(builder);
 }
 
-static MarkupAttribute *attribute(SourceReader *source)
+static MarkupAttribute *attribute(Lexer &lexer)
 {
-    char *ident = identifier(source);
+    char *ident = identifier(lexer);
 
-    whitespace(source);
+    whitespace(lexer);
 
-    if (source_skip(source, '='))
+    if (lexer.skip('='))
     {
 
-        whitespace(source);
+        whitespace(lexer);
 
-        return markup_attribute_create_adopt(ident, string(source));
+        return markup_attribute_create_adopt(ident, string(lexer));
     }
     else
     {
@@ -74,43 +74,43 @@ static MarkupAttribute *attribute(SourceReader *source)
     }
 }
 
-static bool opening_tag(MarkupNode **node, SourceReader *source)
+static bool opening_tag(MarkupNode **node, Lexer &lexer)
 {
-    source_skip(source, '<');
+    lexer.skip('<');
 
-    whitespace(source);
+    whitespace(lexer);
 
-    *node = markup_node_create_adopt(identifier(source));
+    *node = markup_node_create_adopt(identifier(lexer));
 
-    whitespace(source);
+    whitespace(lexer);
 
-    while (source_current_is(source, MARKUP_ALPHA) &&
-           source_do_continue(source))
+    while (lexer.current_is(MARKUP_ALPHA) &&
+           lexer.do_continue())
     {
-        markup_node_add_attribute(*node, attribute(source));
-        whitespace(source);
+        markup_node_add_attribute(*node, attribute(lexer));
+        whitespace(lexer);
     }
 
-    if (source_skip(source, '/'))
+    if (lexer.skip('/'))
     {
-        source_skip(source, '>');
+        lexer.skip('>');
 
         return false;
     }
 
-    source_skip(source, '>');
+    lexer.skip('>');
 
     return true;
 }
 
-static void closing_tag(MarkupNode *node, SourceReader *source)
+static void closing_tag(MarkupNode *node, Lexer &lexer)
 {
-    source_skip(source, '<');
-    source_skip(source, '/');
+    lexer.skip('<');
+    lexer.skip('/');
 
-    whitespace(source);
+    whitespace(lexer);
 
-    char *node_other_name = identifier(source);
+    char *node_other_name = identifier(lexer);
 
     if (strcmp(markup_node_type(node), node_other_name) != 0)
     {
@@ -122,69 +122,59 @@ static void closing_tag(MarkupNode *node, SourceReader *source)
 
     free(node_other_name);
 
-    whitespace(source);
+    whitespace(lexer);
 
-    source_skip(source, '>');
+    lexer.skip('>');
 }
 
-static MarkupNode *parse_node(SourceReader *source)
+static MarkupNode *node(Lexer &lexer)
 {
-    whitespace(source);
+    whitespace(lexer);
 
-    MarkupNode *node = nullptr;
-    if (!opening_tag(&node, source))
+    MarkupNode *current_node = nullptr;
+    if (!opening_tag(&current_node, lexer))
     {
-        return node;
+        return current_node;
     }
 
-    whitespace(source);
+    whitespace(lexer);
 
-    while (source_peek(source, 0) == '<' &&
-           source_peek(source, 1) != '/' &&
-           source_do_continue(source))
+    while (lexer.peek(0) == '<' &&
+           lexer.peek(1) != '/' &&
+           lexer.do_continue())
     {
-        markup_node_add_child(node, parse_node(source));
-        whitespace(source);
+        markup_node_add_child(current_node, node(lexer));
+        whitespace(lexer);
     }
 
-    whitespace(source);
+    whitespace(lexer);
 
-    closing_tag(node, source);
+    closing_tag(current_node, lexer);
 
-    return node;
+    return current_node;
 }
 
 MarkupNode *markup_parse(const char *string, size_t size)
 {
-    SourceReader *source = source_create_from_string(string, size);
-
+    Lexer lexer(string, size);
     // Skip the utf8 bom header if present.
-    source_skip_word(source, "\xEF\xBB\xBF");
+    lexer.skip_word("\xEF\xBB\xBF");
 
-    MarkupNode *node = parse_node(source);
-
-    source_destroy(source);
-
-    return node;
+    return node(lexer);
 }
 
 MarkupNode *markup_parse_file(const char *path)
 {
-    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *markup_file = stream_open(path, OPEN_READ);
 
-    if (handle_has_error(json_file))
+    if (handle_has_error(markup_file))
     {
         return nullptr;
     }
 
-    SourceReader *source = source_create_from_stream(json_file);
-
+    Lexer lexer(markup_file);
     // Skip the utf8 bom header if present.
-    source_skip_word(source, "\xEF\xBB\xBF");
+    lexer.skip_word("\xEF\xBB\xBF");
 
-    MarkupNode *node = parse_node(source);
-
-    source_destroy(source);
-
-    return node;
+    return node(lexer);
 }

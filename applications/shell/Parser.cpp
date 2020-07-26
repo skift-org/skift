@@ -1,101 +1,101 @@
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/utils/BufferBuilder.h>
-#include <libsystem/utils/SourceReader.h>
+#include <libsystem/utils/Lexer.h>
 
 #include "shell/Nodes.h"
 
 #define SHELL_WHITESPACE " \r\n\t"
 
-static void whitespace(SourceReader *source)
+static void whitespace(Lexer &lexer)
 {
-    source_eat(source, SHELL_WHITESPACE);
+    lexer.eat(SHELL_WHITESPACE);
 }
 
-static char *string(SourceReader *source)
+static char *string(Lexer &lexer)
 {
     BufferBuilder *builder = buffer_builder_create(16);
 
-    source_skip(source, '"');
+    lexer.skip('"');
 
-    while (source_current(source) != '"' &&
-           source_do_continue(source))
+    while (lexer.current() != '"' &&
+           lexer.do_continue())
     {
-        if (source_current(source) == '\\')
+        if (lexer.current() == '\\')
         {
-            buffer_builder_append_str(builder, source_read_escape_sequence(source));
+            buffer_builder_append_str(builder, lexer.read_escape_sequence());
         }
         else
         {
-            buffer_builder_append_chr(builder, source_current(source));
-            source_foreward(source);
+            buffer_builder_append_chr(builder, lexer.current());
+            lexer.foreward();
         }
     }
 
-    source_skip(source, '"');
+    lexer.skip('"');
 
     return buffer_builder_finalize(builder);
 }
 
-static char *argument(SourceReader *source)
+static char *argument(Lexer &lexer)
 {
-    if (source_current(source) == '"')
+    if (lexer.current() == '"')
     {
-        return string(source);
+        return string(lexer);
     }
-    else
+
+    BufferBuilder *builder = buffer_builder_create(16);
+
+    while (!lexer.current_is(SHELL_WHITESPACE) &&
+           lexer.do_continue())
     {
-        BufferBuilder *builder = buffer_builder_create(16);
-
-        while (!source_current_is(source, SHELL_WHITESPACE) &&
-               source_do_continue(source))
+        if (lexer.current() == '\\')
         {
-            if (source_current(source) == '\\')
-            {
-                source_foreward(source);
-            }
-
-            if (source_do_continue(source))
-            {
-                buffer_builder_append_chr(builder, source_current(source));
-                source_foreward(source);
-            }
+            lexer.foreward();
         }
 
-        return buffer_builder_finalize(builder);
+        if (lexer.do_continue())
+        {
+            buffer_builder_append_chr(builder, lexer.current());
+            lexer.foreward();
+        }
     }
+
+
+    return buffer_builder_finalize(builder);
 }
 
-static ShellNode *command(SourceReader *source)
+static ShellNode *command(Lexer &lexer)
 {
-    char *command_name = argument(source);
+    char *command_name = argument(lexer);
 
-    whitespace(source);
+    whitespace(lexer);
 
     List *arguments = list_create();
 
-    whitespace(source);
+    whitespace(lexer);
 
-    while (source_do_continue(source) &&
-           source_current(source) != '|' &&
-           source_current(source) != '>')
+    while (lexer.do_continue() &&
+           lexer.current() != '|' &&
+           lexer.current() != '>')
     {
-        list_pushback(arguments, argument(source));
-        whitespace(source);
+        list_pushback(arguments, argument(lexer));
+        whitespace(lexer);
     }
 
     return shell_command_create(command_name, arguments);
 }
 
-static ShellNode *pipeline(SourceReader *source)
+static ShellNode *pipeline(Lexer &lexer)
 {
     List *commands = list_create();
 
     do
     {
-        whitespace(source);
-        list_pushback(commands, command(source));
-        whitespace(source);
-    } while (source_skip(source, '|'));
+        whitespace(lexer);
+        list_pushback(commands, command(lexer));
+        whitespace(lexer);
+    } while (lexer.skip('|'));
 
     if (list_count(commands) == 1)
     {
@@ -107,36 +107,31 @@ static ShellNode *pipeline(SourceReader *source)
     return shell_pipeline_create(commands);
 }
 
-static ShellNode *redirect(SourceReader *source)
+static ShellNode *redirect(Lexer &lexer)
 {
-    ShellNode *node = pipeline(source);
+    ShellNode *node = pipeline(lexer);
 
-    whitespace(source);
+    whitespace(lexer);
 
-    if (!source_skip(source, '>'))
+    if (!lexer.skip('>'))
     {
         return node;
     }
 
-    whitespace(source);
+    whitespace(lexer);
 
-    char *destination = argument(source);
+    char *destination = argument(lexer);
 
     return shell_redirect_create(node, destination);
 }
 
 ShellNode *shell_parse(char *command_text)
 {
-    SourceReader *source = source_create_from_string(command_text, strlen(command_text));
+
+    Lexer lexer(command_text, strlen(command_text));
 
     // Skip the utf8 bom header if present.
-    source_skip_word(source, "\xEF\xBB\xBF");
-
-    whitespace(source);
-
-    ShellNode *node = redirect(source);
-
-    source_destroy(source);
-
-    return node;
+    lexer.skip_word("\xEF\xBB\xBF");
+    whitespace(lexer);
+    return redirect(lexer);
 }

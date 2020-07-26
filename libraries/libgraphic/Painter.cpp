@@ -1,4 +1,3 @@
-
 #include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>

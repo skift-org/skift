@@ -1,26 +1,26 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
+#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
-#include <libsystem/utils/SourceReader.h>
 
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
 
-static void whitespace(SourceReader *reader)
+static void whitespace(Lexer &lexer)
 {
-    source_eat(reader, " ");
+    lexer.eat(" ");
 }
 
-static int number(SourceReader *reader)
+static int number(Lexer &lexer)
 {
     int number = 0;
 
-    while (source_current_is(reader, "0123456789"))
+    while (lexer.current_is("0123456789"))
     {
         number *= 10;
-        number += source_current(reader) - '0';
-        source_foreward(reader);
+        number += lexer.current() - '0';
+        lexer.foreward();
     }
 
     return number;
@@ -35,83 +35,81 @@ static Layout layout_parse(const char *string)
 
     Layout result = STACK();
 
-    SourceReader *reader = source_create_from_string(string, strlen(string));
+    Lexer lexer(string, strlen(string));
 
-    if (source_skip_word(reader, "stack"))
+    if (lexer.skip_word("stack"))
     {
         result = STACK();
     }
 
-    if (source_skip_word(reader, "grid"))
+    if (lexer.skip_word("grid"))
     {
-        source_skip(reader, '(');
+        lexer.skip('(');
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        int hcell = number(reader);
+        int hcell = number(lexer);
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        source_skip(reader, ',');
+        lexer.skip(',');
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        int vcell = number(reader);
+        int vcell = number(lexer);
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        source_skip(reader, ',');
+        lexer.skip(',');
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        int hspacing = number(reader);
+        int hspacing = number(lexer);
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        source_skip(reader, ',');
+        lexer.skip(',');
 
-        whitespace(reader);
+        whitespace(lexer);
 
-        int vspacing = number(reader);
+        int vspacing = number(lexer);
 
         result = GRID(hcell, vcell, hspacing, vspacing);
     }
 
-    if (source_skip_word(reader, "vgrid"))
+    if (lexer.skip_word("vgrid"))
     {
-        source_skip(reader, '(');
-        whitespace(reader);
-        int spacing = number(reader);
+        lexer.skip('(');
+        whitespace(lexer);
+        int spacing = number(lexer);
         result = VGRID(spacing);
     }
 
-    if (source_skip_word(reader, "hgrid"))
+    if (lexer.skip_word("hgrid"))
     {
-        source_skip(reader, '(');
-        whitespace(reader);
-        int spacing = number(reader);
+        lexer.skip('(');
+        whitespace(lexer);
+        int spacing = number(lexer);
         result = HGRID(spacing);
     }
 
-    if (source_skip_word(reader, "vflow"))
+    if (lexer.skip_word("vflow"))
     {
-        source_skip(reader, '(');
-        whitespace(reader);
+        lexer.skip('(');
+        whitespace(lexer);
 
-        int spacing = number(reader);
+        int spacing = number(lexer);
         result = VFLOW(spacing);
     }
 
-    if (source_skip_word(reader, "hflow"))
+    if (lexer.skip_word("hflow"))
     {
-        source_skip(reader, '(');
-        whitespace(reader);
+        lexer.skip('(');
+        whitespace(lexer);
 
-        int spacing = number(reader);
+        int spacing = number(lexer);
         result = HFLOW(spacing);
     }
-
-    source_destroy(reader);
 
     return result;
 }
@@ -123,27 +121,25 @@ Insets insets_parse(const char *string)
         return Insets(0);
     }
 
-    SourceReader *reader = source_create_from_string(string, strlen(string));
+    Lexer lexer(string, strlen(string));
 
-    if (!source_skip_word(reader, "insets"))
+    if (!lexer.skip_word("insets"))
     {
-        source_destroy(reader);
-
         return Insets(0);
     }
 
-    source_skip(reader, '(');
-    whitespace(reader);
+    lexer.skip('(');
+    whitespace(lexer);
 
     int count;
     int args[4];
 
-    for (count = 0; count < 4 && source_current_is(reader, "0123456789"); count++)
+    for (count = 0; count < 4 && lexer.current_is("0123456789"); count++)
     {
-        args[count] = number(reader);
-        whitespace(reader);
-        source_skip(reader, ',');
-        whitespace(reader);
+        args[count] = number(lexer);
+        whitespace(lexer);
+        lexer.skip(',');
+        whitespace(lexer);
     }
 
     Insets result = Insets(0);
@@ -164,8 +160,6 @@ Insets insets_parse(const char *string)
     {
         result = Insets(args[0], args[1], args[2], args[3]);
     }
-
-    source_destroy(reader);
 
     return result;
 }

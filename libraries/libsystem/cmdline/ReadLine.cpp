@@ -1,9 +1,8 @@
-
+#include <libsystem/Logger.h>
 #include <libsystem/cmdline/History.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/Logger.h>
 
 #define READLINE_ALLOCATED 128
 
@@ -63,17 +62,17 @@ Result readline_readline(ReadLine *readline, char **line)
     readline->should_continue = true;
 
     while (readline->should_continue &&
-           !source_ended(readline->reader))
+           !readline->lexer->ended())
     {
-        if (source_current(readline->reader) == U'\n')
+        if (readline->lexer->current() == U'\n')
         {
             readline_recale_history(readline);
 
             readline->should_continue = false;
 
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
         }
-        else if (source_current(readline->reader) == U'\b')
+        else if (readline->lexer->current() == U'\b')
         {
             readline_recale_history(readline);
 
@@ -83,24 +82,24 @@ Result readline_readline(ReadLine *readline, char **line)
                 unicode_string_remove(readline->string, readline->cursor);
             }
 
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
         }
-        else if (source_current(readline->reader) == U'\t')
+        else if (readline->lexer->current() == U'\t')
         {
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
         }
-        else if (source_current(readline->reader) == U'\e')
+        else if (readline->lexer->current() == U'\e')
         {
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
 
-            if (source_current(readline->reader) != '[')
+            if (readline->lexer->current() != '[')
             {
                 continue;
             }
 
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
 
-            if (source_current(readline->reader) == 'A')
+            if (readline->lexer->current() == 'A')
             {
                 if (readline->history_current < history_length())
                 {
@@ -108,7 +107,7 @@ Result readline_readline(ReadLine *readline, char **line)
                     readline->cursor = unicode_string_length(readline_string(readline));
                 }
             }
-            else if (source_current(readline->reader) == 'B')
+            else if (readline->lexer->current() == 'B')
             {
                 if (readline->history_current > 0)
                 {
@@ -116,25 +115,25 @@ Result readline_readline(ReadLine *readline, char **line)
                     readline->cursor = unicode_string_length(readline_string(readline));
                 }
             }
-            else if (source_current(readline->reader) == 'C')
+            else if (readline->lexer->current() == 'C')
             {
                 if (readline->cursor < unicode_string_length(readline_string(readline)))
                     readline->cursor++;
             }
-            else if (source_current(readline->reader) == 'D')
+            else if (readline->lexer->current() == 'D')
             {
                 if (readline->cursor > 0)
                     readline->cursor--;
             }
 
-            source_foreward(readline->reader);
+            readline->lexer->foreward();
         }
         else
         {
             readline_recale_history(readline);
 
-            utf8decoder_write(readline->decoder, source_current(readline->reader));
-            source_foreward(readline->reader);
+            utf8decoder_write(readline->decoder, readline->lexer->current());
+            readline->lexer->foreward();
         }
 
         readline_repaint(readline);
@@ -162,14 +161,14 @@ ReadLine *readline_create(Stream *stream)
 
     readline->string = unicode_string_create(READLINE_ALLOCATED);
     readline->decoder = utf8decoder_create(readline, (UTF8DecoderCallback)readline_decode_callback);
-    readline->reader = source_create_from_stream(readline->stream);
+    readline->lexer = new Lexer(readline->stream);
 
     return readline;
 }
 
 void readline_destroy(ReadLine *readline)
 {
-    source_destroy(readline->reader);
+    delete readline->lexer;
     utf8decoder_destroy(readline->decoder);
     unicode_string_destroy(readline->string);
 

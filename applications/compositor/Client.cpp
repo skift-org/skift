@@ -187,7 +187,6 @@ void client_handle_set_resolution(Client *client, CompositorSetResolution set_re
 {
     __unused(client);
 
-    logger_debug("New resolution is %dx%d", set_resolution.width, set_resolution.height);
     renderer_set_resolution(set_resolution.width, set_resolution.height);
 }
 

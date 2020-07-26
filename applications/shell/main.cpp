@@ -1,4 +1,5 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
         {
             ShellNode *node = shell_parse(argv[2]);
             int command_exit_value = shell_eval(node, in_stream, out_stream);
+
             shell_node_destroy(node);
             return command_exit_value;
         }

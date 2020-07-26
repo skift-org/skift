@@ -238,8 +238,6 @@ void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 
 void terminal_widget_layout(TerminalWidget *widget)
 {
-    logger_debug("%d %d", _cell_size.x(), _cell_size.y());
-
     int width = widget_get_bound(widget).width() / _cell_size.x();
     int height = widget_get_bound(widget).height() / _cell_size.y();
 

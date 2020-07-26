@@ -1,5 +1,7 @@
 #pragma once
 
+using nullptr_t = decltype(nullptr);
+
 template <typename T>
 struct Identity
 {

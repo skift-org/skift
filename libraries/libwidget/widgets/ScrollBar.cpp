@@ -31,16 +31,16 @@ static Rectangle scrollbar_thumb(ScrollBar *widget)
         thumb_height);
 }
 
-static void scrollbar_paint(ScrollBar *widget, Painter *painter, Rectangle rectangle)
+static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_clear_rectangle(painter, widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-    painter_clear_rectangle(painter, scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-    painter_fill_rounded_rectangle(painter, scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
+    painter.clear_rectangle(widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
+    painter.clear_rectangle(scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
+    painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
 
-    painter_blit_icon(painter, icon_get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
-    painter_blit_icon(painter, icon_get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter.blit_icon(icon_get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter.blit_icon(icon_get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
 }
 
 static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)

@@ -20,7 +20,7 @@ double graph_sample(Graph *widget, float where)
     return widget->data[(size_t)(widget->data_size * where)];
 }
 
-void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
+void graph_paint(Graph *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
@@ -39,8 +39,8 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
 
         double dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
-        painter_fill_rectangle(painter, bar, ALPHA(widget->color, dist));
-        painter_plot_pixel(painter, bar.position(), widget->color);
+        painter.fill_rectangle(bar, ALPHA(widget->color, dist));
+        painter.plot_pixel(bar.position(), widget->color);
     }
 
     Rectangle cursor(
@@ -49,7 +49,7 @@ void graph_paint(Graph *widget, Painter *painter, Rectangle rectangle)
         1,
         widget_get_bound(widget).height());
 
-    painter_fill_rectangle(painter, cursor, widget_get_color(widget, THEME_BORDER));
+    painter.fill_rectangle(cursor, widget_get_color(widget, THEME_BORDER));
 }
 
 Vec2i graph_size(Graph *widget)

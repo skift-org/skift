@@ -3,12 +3,11 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Label.h>
 
-void label_paint(Label *label, Painter *painter, Rectangle rectangle)
+void label_paint(Label *label, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_draw_string_within(
-        painter,
+    painter.draw_string_within(
         widget_font(),
         label->text,
         widget_get_bound(label),

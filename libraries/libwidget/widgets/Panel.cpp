@@ -2,9 +2,9 @@
 #include <libsystem/Logger.h>
 #include <libwidget/widgets/Panel.h>
 
-void panel_paint(Panel *widget, Painter *painter, Rectangle rectangle)
+void panel_paint(Panel *widget, Painter &painter, Rectangle rectangle)
 {
-    painter_clear_rectangle(painter, rectangle, widget_get_color(widget, THEME_MIDDLEGROUND));
+    painter.clear_rectangle(rectangle, widget_get_color(widget, THEME_MIDDLEGROUND));
 }
 
 static const WidgetClass panel_class = {

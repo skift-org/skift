@@ -49,7 +49,7 @@ Rectangle terminal_widget_cell_bound(TerminalWidget *widget, int x, int y)
     };
 }
 
-void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *painter, int x, int y, Codepoint codepoint, Color foreground, Color background, TerminalAttributes attributes)
+void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter &painter, int x, int y, Codepoint codepoint, Color foreground, Color background, TerminalAttributes attributes)
 {
     Rectangle bound = terminal_widget_cell_bound(widget, x, y);
 
@@ -60,12 +60,11 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
         foreground = tmp;
     }
 
-    painter_clear_rectangle(painter, bound, background);
+    painter.clear_rectangle(bound, background);
 
     if (attributes.underline)
     {
-        painter_draw_line(
-            painter,
+        painter.draw_line(
             bound.position() + Vec2i(0, 13),
             bound.position() + Vec2i(bound.width(), 13),
             foreground);
@@ -80,8 +79,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
 
     if (glyph != nullptr)
     {
-        painter_draw_glyph(
-            painter,
+        painter.draw_glyph(
             get_terminal_font(),
             glyph,
             bound.position() + Vec2i(0, 12),
@@ -89,8 +87,7 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
 
         if (attributes.bold)
         {
-            painter_draw_glyph(
-                painter,
+            painter.draw_glyph(
                 get_terminal_font(),
                 glyph,
                 bound.position() + Vec2i(1, 12),
@@ -99,11 +96,11 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter *paint
     }
     else
     {
-        painter_draw_rectangle(painter, bound, foreground);
+        painter.draw_rectangle(bound, foreground);
     }
 }
 
-void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, int x, int y, TerminalCell cell)
+void terminal_widget_render_cell(TerminalWidget *widget, Painter &painter, int x, int y, TerminalCell cell)
 {
     Color background_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.background]);
     Color foreground_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.foreground]);
@@ -111,11 +108,11 @@ void terminal_widget_render_cell(TerminalWidget *widget, Painter *painter, int x
     terminal_widget_render_cell_extended(widget, painter, x, y, cell.codepoint, foreground_color, background_color, cell.attributes);
 }
 
-void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Rectangle rectangle)
+void terminal_widget_paint(TerminalWidget *terminal_widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_clear_rectangle(painter, rectangle, widget_get_color(terminal_widget, THEME_ANSI_BACKGROUND));
+    painter.clear_rectangle(rectangle, widget_get_color(terminal_widget, THEME_ANSI_BACKGROUND));
 
     Terminal *terminal = terminal_widget->terminal;
 
@@ -157,7 +154,7 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter *painter, Re
         else
         {
             terminal_widget_render_cell(terminal_widget, painter, cx, cy, cell);
-            painter_draw_rectangle(painter, terminal_widget_cell_bound(terminal_widget, cx, cy), widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR));
+            painter.draw_rectangle(terminal_widget_cell_bound(terminal_widget, cx, cy), widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR));
         }
     }
 }

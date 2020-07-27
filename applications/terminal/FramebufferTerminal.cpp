@@ -30,7 +30,7 @@ Rectangle framebuffer_terminal_cell_bound(int x, int y)
     return {Vec2(x, y) * char_size, char_size};
 }
 
-void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y, TerminalCell cell)
+void framebuffer_terminal_render_cell(Painter &painter, Font *font, int x, int y, TerminalCell cell)
 {
     Rectangle bound = framebuffer_terminal_cell_bound(x, y);
 
@@ -47,12 +47,11 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
         foreground_color = tmp;
     }
 
-    painter_clear_rectangle(painter, bound, background_color);
+    painter.clear_rectangle(bound, background_color);
 
     if (attributes.underline)
     {
-        painter_draw_line(
-            painter,
+        painter.draw_line(
             bound.position() + Vec2i(0, 13),
             bound.position() + Vec2i(bound.width(), 13),
             foreground_color);
@@ -67,8 +66,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
 
     if (glyph != nullptr)
     {
-        painter_draw_glyph(
-            painter,
+        painter.draw_glyph(
             font,
             glyph,
             bound.position() + Vec2i(0, 12),
@@ -76,8 +74,7 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
 
         if (attributes.bold)
         {
-            painter_draw_glyph(
-                painter,
+            painter.draw_glyph(
                 font,
                 glyph,
                 bound.position() + Vec2i(1, 12),
@@ -86,13 +83,13 @@ void framebuffer_terminal_render_cell(Painter *painter, Font *font, int x, int y
     }
     else
     {
-        painter_draw_rectangle(painter, bound, foreground_color);
+        painter.draw_rectangle(bound, foreground_color);
     }
 }
 
 void framebuffer_terminal_repaint(Terminal *terminal, FramebufferTerminalRenderer *renderer)
 {
-    Painter *painter = renderer->framebuffer->painter;
+    Painter &painter = renderer->framebuffer->painter;
 
     for (int y = 0; y < terminal->height; y++)
     {
@@ -116,7 +113,7 @@ void framebuffer_terminal_repaint(Terminal *terminal, FramebufferTerminalRendere
 
 void framebuffer_terminal_render_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, int x, int y, bool visible)
 {
-    Painter *painter = renderer->framebuffer->painter;
+    Painter &painter = renderer->framebuffer->painter;
 
     TerminalCell cell = terminal_cell_at(terminal, x, y);
 
@@ -169,7 +166,7 @@ Terminal *framebuffer_terminal_create(void)
         return nullptr;
     }
 
-    painter_clear(framebuffer->painter, framebuffer_colors[TERMINAL_COLOR_DEFAULT_BACKGROUND]);
+    framebuffer->painter.clear(framebuffer_colors[TERMINAL_COLOR_DEFAULT_BACKGROUND]);
     framebuffer_blit(framebuffer);
 
     FramebufferTerminalRenderer *renderer = __create(FramebufferTerminalRenderer);

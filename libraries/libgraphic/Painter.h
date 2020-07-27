@@ -8,79 +8,93 @@
 #define CLIPSTACK_SIZE 32
 #define ORIGINSTACK_SIZE 32
 
-typedef struct Painter
+class Painter
 {
-    Bitmap *bitmap;
+private:
+    Bitmap *_bitmap;
 
-    int clipstack_top;
-    Rectangle clipstack[CLIPSTACK_SIZE];
+    int _clipstack_top = 0;
+    Rectangle _clipstack[CLIPSTACK_SIZE] = {};
 
-    int originestack_top;
-    Vec2i originestack[ORIGINSTACK_SIZE];
-} Painter;
+    int _originestack_top = 0;
+    Vec2i _originestack[ORIGINSTACK_SIZE] = {};
 
-Painter *painter_create(Bitmap *bitmap);
+    Rectangle apply_clip(Rectangle rectangle);
 
-void painter_destroy(Painter *painter);
+    Rectangle apply_transform(Rectangle rectangle);
 
-void painter_push_clip(Painter *painter, Rectangle clip);
+    void blit_bitmap_fast(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_pop_clip(Painter *painter);
+    void blit_bitmap_scaled(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_push_origin(Painter *painter, Vec2i origin);
+    void blit_bitmap_fast_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_pop_origin(Painter *painter);
+    void blit_bitmap_scaled_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_plot_pixel(Painter *painter, Vec2i position, Color color);
+    void draw_line_x_aligned(int x, int start, int end, Color color);
 
-void painter_blit_bitmap(Painter *painter, Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void draw_line_y_aligned(int y, int start, int end, Color color);
 
-void painter_blit_bitmap_no_alpha(Painter *painter, Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void draw_line_not_aligned(Vec2i a, Vec2i b, Color color);
 
-void painter_blit_icon(Painter *painter, Icon *icon, IconSize size, Rectangle destination, Color color);
+    void blit_bitmap_colored(Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color);
 
-void painter_clear(Painter *painter, Color color);
+    void draw_circle_helper(Rectangle bound, Vec2i center, int radius, int thickness, Color color);
 
-void painter_clear_rectangle(Painter *painter, Rectangle rectangle, Color color);
+public:
+    Painter(Bitmap *bitmap);
 
-void painter_fill_rectangle(Painter *painter, Rectangle rectangle, Color color);
+    void push_clip(Rectangle clip);
 
-void painter_fill_insets(Painter *painter, Rectangle rectangle, Insets insets, Color color);
+    void pop_clip();
 
-void painter_fill_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color);
+    void push_origin(Vec2i origin);
 
-void painter_fill_rounded_rectangle(Painter *painter, Rectangle bound, int radius, Color color);
+    void pop_origin();
 
-void painter_fill_checkboard(Painter *painter, Rectangle bound, int cell_size, Color fg_color, Color bg_color);
+    void plot_pixel(Vec2i position, Color color);
 
-void painter_draw_line(Painter *painter, Vec2i from, Vec2i to, Color color);
+    void blit_bitmap(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_draw_line_antialias(Painter *painter, Vec2i a, Vec2i b, Color color);
+    void blit_bitmap_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
 
-void painter_draw_rectangle(Painter *painter, Rectangle rectangle, Color color);
+    void blit_icon(Icon *icon, IconSize size, Rectangle destination, Color color);
 
-void painter_draw_triangle(Painter *painter, Vec2i p0, Vec2i p1, Vec2i p2, Color color);
+    void clear(Color color);
 
-void painter_draw_line(Painter *painter, Vec2i a, Vec2i b, Color color);
+    void clear_rectangle(Rectangle rectangle, Color color);
 
-void painter_draw_circle_helper(Painter *painter, Rectangle bound, Vec2i center, int radius, int thickness, Color color);
+    void fill_rectangle(Rectangle rectangle, Color color);
 
-void painter_draw_rounded_rectangle(Painter *painter, Rectangle bound, int radius, int thickness, Color color);
+    void fill_insets(Rectangle rectangle, Insets insets, Color color);
 
-void painter_blur_rectangle(Painter *painter, Rectangle rectangle, int radius);
+    void fill_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color);
 
-void painter_draw_glyph(Painter *painter, Font *font, Glyph *glyph, Vec2i position, Color color);
+    void fill_rounded_rectangle(Rectangle bound, int radius, Color color);
 
-void painter_draw_string(Painter *painter, Font *font, const char *str, Vec2i position, Color color);
+    void fill_checkboard(Rectangle bound, int cell_size, Color fg_color, Color bg_color);
 
-void painter_draw_string_within(
-    Painter *painter,
-    Font *font,
-    const char *str,
-    Rectangle container,
-    Position position,
-    Color color);
+    void draw_line(Vec2i from, Vec2i to, Color color);
 
-void painter_draw_truetype_string(Painter *painter, TrueTypeFont *font, const char *string, Vec2i position, Color color);
+    void draw_line_antialias(Vec2i from, Vec2i to, Color color);
 
-void painter_draw_truetype_string_within(Painter *painter, TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color);
+    void draw_rectangle(Rectangle rectangle, Color color);
+
+    void draw_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color);
+
+    void draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color);
+
+    void blur_rectangle(Rectangle rectangle, int radius);
+
+    void draw_glyph(Font *font, Glyph *glyph, Vec2i position, Color color);
+
+    void draw_string(Font *font, const char *str, Vec2i position, Color color);
+
+    void draw_string_within(Font *font, const char *str, Rectangle container, Position position, Color color);
+
+    void draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color);
+
+    void draw_truetype_string(TrueTypeFont *font, const char *string, Vec2i position, Color color);
+
+    void draw_truetype_string_within(TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color);
+};

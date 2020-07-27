@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/IconPanel.h>
 
-void icon_panel_paint(IconPanel *widget, Painter *painter, Rectangle rectangle)
+void icon_panel_paint(IconPanel *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
@@ -12,8 +12,7 @@ void icon_panel_paint(IconPanel *widget, Painter *painter, Rectangle rectangle)
 
     Rectangle destination = icon_bound(widget->icon, ICON_18PX).centered_within(widget_get_content_bound(widget));
 
-    painter_blit_icon(
-        painter,
+    painter.blit_icon(
         widget->icon,
         ICON_18PX,
         destination,

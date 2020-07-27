@@ -16,12 +16,12 @@ void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            painter_draw_line_antialias(document->painter, from, to, document->primary_color);
+            document->painter->draw_line_antialias(from, to, document->primary_color);
             document->dirty = true;
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            painter_draw_line_antialias(document->painter, from, to, document->secondary_color);
+            document->painter->draw_line_antialias(from, to, document->secondary_color);
             document->dirty = true;
         }
     }
@@ -49,7 +49,7 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
             color = document->secondary_color;
         }
 
-        painter_fill_rectangle(document->painter, Rectangle(event.mouse.position, Vec2i(32, 32)), color);
+        document->painter->fill_rectangle(Rectangle(event.mouse.position, Vec2i(32, 32)), color);
 
         document->dirty = true;
     }
@@ -72,8 +72,7 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            painter_clear_rectangle(
-                document->painter,
+            document->painter->clear_rectangle(
                 Rectangle(
                     event.mouse.position.x() - 16,
                     event.mouse.position.y() - 16,
@@ -85,8 +84,7 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            painter_clear_rectangle(
-                document->painter,
+            document->painter->clear_rectangle(
                 Rectangle(
                     event.mouse.position.x() - 16,
                     event.mouse.position.y() - 16,

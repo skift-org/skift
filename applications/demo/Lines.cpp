@@ -13,7 +13,7 @@ typedef struct
 static Random random = {};
 static bool random_initialized = false;
 
-void lines_draw(Painter *painter, Rectangle screen, double time)
+void lines_draw(Painter &painter, Rectangle screen, double time)
 {
     __unused(time);
 
@@ -23,7 +23,7 @@ void lines_draw(Painter *painter, Rectangle screen, double time)
         random_initialized = true;
     }
 
-    painter_fill_rectangle(painter, screen, ALPHA(COLOR_BLACK, 0.05));
+    painter.fill_rectangle(screen, ALPHA(COLOR_BLACK, 0.05));
 
     for (size_t i = 0; i < 16; i++)
     {
@@ -38,6 +38,6 @@ void lines_draw(Painter *painter, Rectangle screen, double time)
         line.color.packed = random_uint32_max(&random, 0xffffffff);
         line.color.A = 255;
 
-        painter_draw_line_antialias(painter, line.start, line.finish, line.color);
+        painter.draw_line_antialias(line.start, line.finish, line.color);
     }
 }

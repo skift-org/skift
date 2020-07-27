@@ -5,7 +5,7 @@
 static TrueTypeFamily *_family = nullptr;
 static TrueTypeFont *_fonts[16];
 
-void fonts_draw(Painter *painter, Rectangle screen, double time)
+void fonts_draw(Painter &painter, Rectangle screen, double time)
 {
     __unused(screen);
     __unused(time);
@@ -20,7 +20,7 @@ void fonts_draw(Painter *painter, Rectangle screen, double time)
         }
     }
 
-    painter_clear(painter, COLOR_REBECCAPURPLE);
+    painter.clear(COLOR_REBECCAPURPLE);
 
     int current = 4;
     for (size_t i = 0; i < 16; i++)
@@ -29,8 +29,7 @@ void fonts_draw(Painter *painter, Rectangle screen, double time)
 
         current += metrics.ascent;
 
-        painter_draw_truetype_string(
-            painter,
+        painter.draw_truetype_string(
             _fonts[i],
             u8"The quick brown fox jumps over the lazy dog",
             Vec2i(8, current),

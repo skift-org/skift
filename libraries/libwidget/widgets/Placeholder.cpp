@@ -3,22 +3,20 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Placeholder.h>
 
-void placeholder_paint(Placeholder *placeholder, Painter *painter, Rectangle rectangle)
+void placeholder_paint(Placeholder *placeholder, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
-    painter_draw_rectangle(painter, widget_get_bound(placeholder), COLOR_RED);
+    painter.draw_rectangle(widget_get_bound(placeholder), COLOR_RED);
 
     Icon *alert_icon = icon_get("alert");
 
-    painter_blit_icon(
-        painter,
+    painter.blit_icon(
         alert_icon,
         ICON_18PX,
         icon_bound(alert_icon, ICON_18PX).moved(widget_get_bound(placeholder).position() + Vec2i(8, 8)),
         COLOR_RED);
 
-    painter_draw_string(
-        painter,
+    painter.draw_string(
         widget_font(),
         placeholder->text,
         widget_get_bound(placeholder).position() + Vec2i(32, 10),

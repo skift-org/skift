@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/Image.h>
 
-void image_paint(Image *widget, Painter *painter, Rectangle rectangle)
+void image_paint(Image *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
@@ -14,7 +14,7 @@ void image_paint(Image *widget, Painter *painter, Rectangle rectangle)
             destination = bitmap_bound(widget->bitmap).centered_within(widget_get_bound(widget));
         }
 
-        painter_blit_bitmap(painter, widget->bitmap, bitmap_bound(widget->bitmap), destination);
+        painter.blit_bitmap(widget->bitmap, bitmap_bound(widget->bitmap), destination);
     }
 }
 

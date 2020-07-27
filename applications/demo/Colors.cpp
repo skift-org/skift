@@ -1,7 +1,7 @@
 
 #include "demo/Demos.h"
 
-void colors_draw(Painter *painter, Rectangle screen, double time)
+void colors_draw(Painter &painter, Rectangle screen, double time)
 {
     double hue = (int)(time * 80) % 360;
 
@@ -10,7 +10,7 @@ void colors_draw(Painter *painter, Rectangle screen, double time)
         for (int y = 0; y < screen.height(); y++)
         {
             Color color = HSV(hue, (y / (float)screen.height()), 1);
-            painter_plot_pixel(painter, screen.position() + Vec2i(x, y), color);
+            painter.plot_pixel(screen.position() + Vec2i(x, y), color);
         }
     }
 }

@@ -2,11 +2,11 @@
 #include <libsystem/Logger.h>
 #include <libwidget/widgets/RoundedPanel.h>
 
-void rounded_panel_paint(RoundedPanel *widget, Painter *painter, Rectangle rectangle)
+void rounded_panel_paint(RoundedPanel *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_fill_rounded_rectangle(painter, widget_get_bound(widget), widget->radius, widget_get_color(widget, THEME_MIDDLEGROUND));
+    painter.fill_rounded_rectangle(widget_get_bound(widget), widget->radius, widget_get_color(widget, THEME_MIDDLEGROUND));
 }
 
 static const WidgetClass rounded_panel_class = {

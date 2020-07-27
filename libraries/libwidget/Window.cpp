@@ -69,11 +69,13 @@ void window_initialize(Window *window, WindowFlag flags)
     window->cursor_state = CURSOR_DEFAULT;
 
     window->frontbuffer = bitmap_create(250, 250);
-    window->frontbuffer_painter = painter_create(window->frontbuffer);
+    window->frontbuffer_painter = new Painter(window->frontbuffer);
+
     shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
 
     window->backbuffer = bitmap_create(250, 250);
-    window->backbuffer_painter = painter_create(window->backbuffer);
+    window->backbuffer_painter = new Painter(window->backbuffer);
+
     shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
 
     window->on_screen_bound = Rectangle(250, 250);
@@ -115,10 +117,10 @@ void window_destroy(Window *window)
     widget_destroy(window->root_container);
     widget_destroy(window->header_container);
 
-    painter_destroy(window->frontbuffer_painter);
+    delete window->frontbuffer_painter;
     bitmap_destroy(window->frontbuffer);
 
-    painter_destroy(window->backbuffer_painter);
+    delete window->backbuffer_painter;
     bitmap_destroy(window->backbuffer);
 
     list_destroy_with_callback(window->dirty_rect, free);
@@ -164,21 +166,22 @@ void window_set_position(Window *window, Vec2i position)
 
 static void window_change_framebuffer_if_needed(Window *window)
 {
-    if (window_bound(window).width() != bitmap_bound(window->frontbuffer).width() ||
-        window_bound(window).height() != bitmap_bound(window->frontbuffer).height())
+    if (window_bound(window).width() > bitmap_bound(window->frontbuffer).width() ||
+        window_bound(window).height() > bitmap_bound(window->frontbuffer).height() ||
+        window_bound(window).area() < bitmap_bound(window->frontbuffer).area() * 0.75)
     {
-        painter_destroy(window->frontbuffer_painter);
+        delete window->frontbuffer_painter;
         bitmap_destroy(window->frontbuffer);
 
-        painter_destroy(window->backbuffer_painter);
+        delete window->backbuffer_painter;
         bitmap_destroy(window->backbuffer);
 
         window->frontbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
-        window->frontbuffer_painter = painter_create(window->frontbuffer);
+        window->frontbuffer_painter = new Painter(window->frontbuffer);
         shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
 
         window->backbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
-        window->backbuffer_painter = painter_create(window->backbuffer);
+        window->backbuffer_painter = new Painter(window->backbuffer);
         shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
     }
 }
@@ -253,11 +256,11 @@ Rectangle window_content_bound(Window *window)
     }
 }
 
-void window_paint(Window *window, Painter *painter, Rectangle rectangle)
+void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
-    painter_clear_rectangle(painter, rectangle, window_get_color(window, THEME_BACKGROUND));
+    painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND));
 
-    painter_push_clip(painter, rectangle);
+    painter.push_clip(rectangle);
 
     if (window_content_bound(window).containe(rectangle))
     {
@@ -280,11 +283,11 @@ void window_paint(Window *window, Painter *painter, Rectangle rectangle)
                 widget_paint(window_header(window), painter, rectangle);
             }
 
-            painter_draw_rectangle(painter, window_bound(window), window_get_color(window, THEME_ACCENT));
+            painter.draw_rectangle(window_bound(window), window_get_color(window, THEME_ACCENT));
         }
     }
 
-    painter_pop_clip(painter);
+    painter.pop_clip();
 }
 
 void window_dump(Window *window)
@@ -732,7 +735,7 @@ void window_update(Window *window)
 
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
-        window_paint(window, window->backbuffer_painter, *rectangle);
+        window_paint(window, *window->backbuffer_painter, *rectangle);
 
         if (repaited_regions.is_empty())
         {

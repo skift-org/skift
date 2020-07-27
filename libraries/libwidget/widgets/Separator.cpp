@@ -1,9 +1,9 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/Separator.h>
 
-void separator_paint(Separator *widget, Painter *painter, Rectangle rectangle)
+void separator_paint(Separator *widget, Painter &painter, Rectangle rectangle)
 {
-    painter_fill_rectangle(painter, rectangle, widget_get_color(widget, THEME_BORDER));
+    painter.fill_rectangle(rectangle, widget_get_color(widget, THEME_BORDER));
 }
 
 Vec2i separator_size(Separator *widget)

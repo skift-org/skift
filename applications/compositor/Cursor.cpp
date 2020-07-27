@@ -124,11 +124,11 @@ CursorState cursor_get_state(void)
     }
 }
 
-void cursor_render(Painter *painter)
+void cursor_render(Painter &painter)
 {
     Bitmap *cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 
-    painter_blit_bitmap(painter, cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
+    painter.blit_bitmap(cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
 }
 
 Rectangle cursor_bound_from_position(Vec2i position)

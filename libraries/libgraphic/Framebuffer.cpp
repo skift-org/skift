@@ -30,10 +30,8 @@ Framebuffer *framebuffer_open(void)
 
     Bitmap *framebuffer_backbuffer = bitmap_create(mode_info.width, mode_info.height);
 
-    Painter *framebuffer_painter = painter_create(framebuffer_backbuffer);
-
     framebuffer->backbuffer = framebuffer_backbuffer;
-    framebuffer->painter = framebuffer_painter;
+    framebuffer->painter = Painter(framebuffer_backbuffer);
     framebuffer->is_dirty = false;
 
     framebuffer->width = mode_info.width;
@@ -56,11 +54,10 @@ Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
         return handle_get_error(framebuffer);
     }
 
-    painter_destroy(framebuffer->painter);
     bitmap_destroy(framebuffer->backbuffer);
 
     framebuffer->backbuffer = bitmap_create(width, height);
-    framebuffer->painter = painter_create(framebuffer->backbuffer);
+    framebuffer->painter = Painter(framebuffer->backbuffer);
 
     framebuffer->width = mode_info.width;
     framebuffer->height = mode_info.height;
@@ -144,11 +141,6 @@ void framebuffer_blit(Framebuffer *framebuffer)
 void framebuffer_close(Framebuffer *framebuffer)
 {
     __plug_handle_close(HANDLE(framebuffer));
-
-    if (framebuffer->painter)
-    {
-        painter_destroy(framebuffer->painter);
-    }
 
     if (framebuffer->backbuffer)
     {

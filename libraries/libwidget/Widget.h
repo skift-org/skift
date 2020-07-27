@@ -12,7 +12,7 @@ struct Window;
 
 typedef Vec2i (*WidgetComputeSizeCallback)(struct Widget *widget);
 typedef void (*WidgetDestroyCallback)(struct Widget *widget);
-typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter *painter, Rectangle rectangle);
+typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter &painter, Rectangle rectangle);
 typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
 typedef void (*WidgetLayoutCallback)(struct Widget *widget);
 
@@ -113,7 +113,7 @@ void widget_dump(Widget *widget, int depth);
 
 void widget_event(Widget *widget, struct Event *event);
 
-void widget_paint(Widget *widget, struct Painter *painter, Rectangle rectangle);
+void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
 

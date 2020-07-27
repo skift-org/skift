@@ -5,7 +5,7 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
+void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
@@ -13,21 +13,21 @@ void button_paint(Button *widget, Painter *painter, Rectangle rectangle)
     {
         if (widget->style == BUTTON_OUTLINE)
         {
-            painter_draw_rounded_rectangle(painter, widget_get_bound(widget), 4, 1, widget_get_color(widget, THEME_BORDER));
+            painter.draw_rounded_rectangle(widget_get_bound(widget), 4, 1, widget_get_color(widget, THEME_BORDER));
         }
         else if (widget->style == BUTTON_FILLED)
         {
-            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, widget_get_color(widget, THEME_ACCENT));
+            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, widget_get_color(widget, THEME_ACCENT));
         }
 
         if (widget->state == BUTTON_OVER)
         {
-            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
+            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
         }
 
         if (widget->state == BUTTON_PRESS)
         {
-            painter_fill_rounded_rectangle(painter, widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
+            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
         }
     }
 }

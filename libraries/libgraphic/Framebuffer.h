@@ -9,7 +9,7 @@ typedef struct
     Handle handle;
 
     Bitmap *backbuffer;
-    Painter *painter;
+    Painter painter;
 
     int width;
     int height;

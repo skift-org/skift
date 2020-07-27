@@ -3,7 +3,7 @@
 
 #include "file-explorer/Breadcrumb.h"
 
-void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
+void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(widget);
     __unused(rectangle);
@@ -16,8 +16,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
         icon_bound(widget->icon_computer, ICON_18PX).width() + 16,
         widget_get_bound(widget).height());
 
-    painter_blit_icon(
-        painter,
+    painter.blit_icon(
         widget->icon_computer,
         ICON_18PX,
         icon_bound(widget->icon_computer, ICON_18PX).centered_within(computer_icon_bound),
@@ -33,8 +32,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             icon_bound(widget->icon_expand, ICON_18PX).width(),
             widget_get_bound(widget).height());
 
-        painter_blit_icon(
-            painter,
+        painter.blit_icon(
             widget->icon_expand,
             ICON_18PX,
             icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),
@@ -55,8 +53,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
             text_width,
             widget_get_bound(widget).height());
 
-        painter_draw_string(
-            painter,
+        painter.draw_string(
             widget_font(),
             element,
             element_bound.position() + Vec2i(0, 19),
@@ -72,8 +69,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter *painter, Rectangle rectangle)
                 icon_bound(widget->icon_expand, ICON_18PX).width(),
                 widget_get_bound(widget).height());
 
-            painter_blit_icon(
-                painter,
+            painter.blit_icon(
                 widget->icon_expand,
                 ICON_18PX,
                 icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),

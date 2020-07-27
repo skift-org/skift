@@ -11,17 +11,16 @@ Rectangle canvas_bound(Canvas *widget)
     return bound;
 }
 
-void canvas_paint(Canvas *widget, Painter *painter, Rectangle rectangle)
+void canvas_paint(Canvas *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
     Rectangle destination = canvas_bound(widget);
 
-    painter_fill_checkboard(painter, destination, 8, COLOR_WHITE, COLOR_GAINSBORO);
-    painter_draw_rectangle(painter, destination, widget_get_color(widget, THEME_BORDER));
+    painter.fill_checkboard(destination, 8, COLOR_WHITE, COLOR_GAINSBORO);
+    painter.draw_rectangle(destination, widget_get_color(widget, THEME_BORDER));
 
-    painter_blit_bitmap(
-        painter,
+    painter.blit_bitmap(
         widget->document->bitmap,
         bitmap_bound(widget->document->bitmap), destination);
 }

@@ -7,7 +7,6 @@
 #include "compositor/Window.h"
 
 static Framebuffer *_framebuffer;
-static Painter *_painter;
 static Bitmap *_wallpaper;
 
 static Vector<Rectangle> _dirty_regions;
@@ -15,7 +14,6 @@ static Vector<Rectangle> _dirty_regions;
 void renderer_initialize(void)
 {
     _framebuffer = framebuffer_open();
-    _painter = _framebuffer->painter;
     _wallpaper = bitmap_load_from("/System/Wallpapers/mountains.png");
 
     renderer_region_dirty(framebuffer_bound(_framebuffer));
@@ -47,7 +45,7 @@ void renderer_region_dirty(Rectangle new_region)
 
 void renderer_region(Rectangle region)
 {
-    painter_blit_bitmap_no_alpha(_painter, _wallpaper, region, region);
+    _framebuffer->painter.blit_bitmap_no_alpha(_wallpaper, region, region);
 
     list_foreach_reversed(Window, window, manager_get_windows())
     {
@@ -59,7 +57,7 @@ void renderer_region(Rectangle region)
                 destination.position() - window_bound(window).position(),
                 destination.size());
 
-            painter_blit_bitmap_no_alpha(_painter, window->frontbuffer, source, destination);
+            _framebuffer->painter.blit_bitmap_no_alpha(window->frontbuffer, source, destination);
         }
     }
 
@@ -80,7 +78,7 @@ void renderer_repaint_dirty(void)
         {
             renderer_region(cursor_bound());
 
-            cursor_render(_painter);
+            cursor_render(_framebuffer->painter);
         }
 
         return Iteration::CONTINUE;

@@ -158,16 +158,16 @@ void widget_event(Widget *widget, Event *event)
     }
 }
 
-void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
+void widget_paint(Widget *widget, Painter &painter, Rectangle rectangle)
 {
     if (widget_get_bound(widget).width() == 0 ||
         widget_get_bound(widget).height() == 0)
         return;
 
-    painter_push_clip(painter, widget_get_bound(widget));
+    painter.push_clip(widget_get_bound(widget));
 
     if (application_is_debbuging_layout())
-        painter_fill_insets(painter, widget_get_bound(widget), widget->insets, ALPHA(COLOR_MAGENTA, 0.25));
+        painter.fill_insets(widget_get_bound(widget), widget->insets, ALPHA(COLOR_MAGENTA, 0.25));
 
     if (widget->klass->paint)
     {
@@ -183,9 +183,9 @@ void widget_paint(Widget *widget, Painter *painter, Rectangle rectangle)
     }
 
     if (application_is_debbuging_layout())
-        painter_draw_rectangle(painter, widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
+        painter.draw_rectangle(widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
 
-    painter_pop_clip(painter);
+    painter.pop_clip();
 }
 
 Vec2i widget_compute_size(Widget *widget)

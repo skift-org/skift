@@ -48,29 +48,27 @@ Rectangle table_cell_bound(Table *widget, int row, int column)
         TABLE_ROW_HEIGHT);
 }
 
-void table_render_cell(Table *widget, Painter *painter, int row, int column)
+void table_render_cell(Table *widget, Painter &painter, int row, int column)
 {
     Rectangle cell_bound = table_cell_bound(widget, row, column);
     Variant data = model_data(widget->model, row, column);
 
-    painter_push_clip(painter, cell_bound);
+    painter.push_clip(cell_bound);
 
     if (row % 2 == 0)
     {
-        painter_fill_rectangle(painter, cell_bound, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
+        painter.fill_rectangle(cell_bound, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
     }
 
     if (data.icon)
     {
-        painter_blit_icon(
-            painter,
+        painter.blit_icon(
             data.icon,
             ICON_18PX,
             Rectangle(cell_bound.x() + 7, cell_bound.y() + 7, 18, 18),
             widget_get_color(widget, THEME_FOREGROUND));
 
-        painter_draw_string(
-            painter,
+        painter.draw_string(
             widget_font(),
             data.as_string,
             Vec2i(cell_bound.x() + 7 + 18 + 7, cell_bound.y() + 20),
@@ -78,15 +76,14 @@ void table_render_cell(Table *widget, Painter *painter, int row, int column)
     }
     else
     {
-        painter_draw_string(
-            painter,
+        painter.draw_string(
             widget_font(),
             data.as_string,
             Vec2i(cell_bound.x() + 7, cell_bound.y() + 20),
             widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    painter_pop_clip(painter);
+    painter.pop_clip();
 }
 
 int table_row_at(Table *widget, Vec2i position)
@@ -103,11 +100,11 @@ int table_row_at(Table *widget, Vec2i position)
     return row;
 }
 
-void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
+void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter_push_clip(painter, widget_get_bound(widget));
+    painter.push_clip(widget_get_bound(widget));
 
     int column_count = model_column_count(widget->model);
     int column_width = table_bound(widget).width() / column_count;
@@ -120,8 +117,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 
         if (widget->selected == row)
         {
-            painter_fill_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTION));
-            painter_draw_rectangle(painter, row_bound, widget_get_color(widget, THEME_SELECTION));
+            painter.fill_rectangle(row_bound, widget_get_color(widget, THEME_SELECTION));
+            painter.draw_rectangle(row_bound, widget_get_color(widget, THEME_SELECTION));
         }
 
         for (int column = 0; column < column_count; column++)
@@ -130,8 +127,8 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
         }
     }
 
-    painter_blur_rectangle(painter, table_header_bound(widget), 8);
-    painter_fill_rectangle(painter, table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.9));
+    painter.blur_rectangle(table_header_bound(widget), 8);
+    painter.fill_rectangle(table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.9));
 
     for (int column = 0; column < column_count; column++)
     {
@@ -143,15 +140,15 @@ void table_paint(Table *widget, Painter *painter, Rectangle rectangle)
 
         if (column < column_count - 1)
         {
-            painter_fill_rectangle(painter, header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
+            painter.fill_rectangle(header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
         }
-        painter_fill_rectangle(painter, header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
+        painter.fill_rectangle(header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
 
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
-        painter_draw_string(painter, widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter.draw_string(widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter.draw_string(widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    painter_pop_clip(painter);
+    painter.pop_clip();
 }
 
 void table_event(Table *widget, Event *event)

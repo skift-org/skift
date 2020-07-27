@@ -1,5 +1,5 @@
 <p align="center">
-<b>Notice!</b> The system was recently ported to C++. This is not idiomatique c++, expect to have some C mixed in.
+<b>Notice!</b> The system was recently ported to C++. This is not idiomatique C++, expect to have some C mixed in.
 </p>
 
 <p align="center">

@@ -2,6 +2,11 @@
 
 #include <libsystem/utils/RefCounted.h>
 
+enum AdoptTag
+{
+    ADOPT
+};
+
 template <typename T>
 class RefPtr
 {
@@ -9,23 +14,18 @@ private:
     T *_ptr;
 
 public:
-    enum AdoptTag
-    {
-        Adopt
-    };
-
     RefPtr() : _ptr(nullptr) {}
     RefPtr(nullptr_t) : _ptr(nullptr) {}
 
     RefPtr(T &object) : _ptr(const_cast<T *>(&object)) { _ptr->ref(); }
     RefPtr(AdoptTag, T &object) : _ptr(const_cast<T *>(&object)) {}
 
-    RefPtr(RefPtr &other) : _ptr(other.necked()) { _ptr->ref(); }
+    RefPtr(RefPtr &other) : _ptr(other.naked()) { _ptr->ref(); }
     RefPtr(AdoptTag, RefPtr &other) : _ptr(other.give_ref()) {}
     RefPtr(RefPtr &&other) : _ptr(other.give_ref()) {}
 
     template <typename U>
-    RefPtr(RefPtr<U> &other) : _ptr(static_cast<T *>(other.necked())) { _ptr->ref(); }
+    RefPtr(RefPtr<U> &other) : _ptr(static_cast<T *>(other.naked())) { _ptr->ref(); }
 
     template <typename U>
     RefPtr(AdoptTag, RefPtr<U> &other) : _ptr(static_cast<T *>(other.give_ref())) {}
@@ -37,7 +37,7 @@ public:
     {
         if (_ptr)
         {
-            necked()->deref();
+            naked()->deref();
         }
 
         return *this;
@@ -45,14 +45,14 @@ public:
 
     RefPtr &operator=(RefPtr &other)
     {
-        if (necked() != other.necked())
+        if (naked() != other.naked())
         {
             if (_ptr)
             {
-                necked()->deref();
+                naked()->deref();
             }
 
-            _ptr = other.necked();
+            _ptr = other.naked();
             _ptr->ref();
         }
 
@@ -77,15 +77,15 @@ public:
     template <typename U>
     RefPtr &operator=(RefPtr<U> &other)
     {
-        if (necked() != other.necked())
+        if (naked() != other.naked())
         {
-            if (necked())
+            if (naked())
             {
-                necked()->deref();
+                naked()->deref();
             }
 
-            _ptr = other.necked();
-            necked()->ref();
+            _ptr = other.naked();
+            naked()->ref();
         }
 
         return *this;
@@ -96,9 +96,9 @@ public:
     {
         if (this != static_cast<void *>(&other))
         {
-            if (necked())
+            if (naked())
             {
-                necked()->deref();
+                naked()->deref();
             }
 
             _ptr = other.give_ref();
@@ -155,7 +155,7 @@ public:
         return ptr;
     }
 
-    T *necked()
+    T *naked()
     {
         return _ptr;
     }
@@ -164,7 +164,7 @@ public:
 template <typename T>
 inline RefPtr<T> adopt(T &object)
 {
-    return RefPtr<T>(RefPtr<T>::Adopt, object);
+    return RefPtr<T>(AdoptTag::ADOPT, object);
 }
 
 template <typename Type, typename... Args>

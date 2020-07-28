@@ -31,7 +31,7 @@ public:
 
     OwnPtr &operator=(OwnPtr &other)
     {
-        if (necked() != other.necked())
+        if (naked() != other.naked())
         {
             if (_ptr)
             {
@@ -47,7 +47,7 @@ public:
     template <typename U>
     OwnPtr &operator=(OwnPtr<U> &other)
     {
-        if (necked() != other.necked())
+        if (naked() != other.naked())
         {
             if (_ptr)
             {
@@ -129,7 +129,7 @@ public:
         return ref;
     }
 
-    T *necked()
+    T *naked()
     {
         return _ptr;
     }

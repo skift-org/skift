@@ -210,7 +210,7 @@ void task_go(Task *task)
 
     stackframe.eflags = 0x202;
     stackframe.eip = (uintptr_t)task->entry;
-    stackframe.ebp = ((uintptr_t)task->stack + PROCESS_STACK_SIZE);
+    stackframe.ebp = 0;
 
     // TODO: All tasks are still running has ring0 :/
     stackframe.cs = 0x08;

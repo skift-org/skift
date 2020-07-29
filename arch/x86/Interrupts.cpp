@@ -57,6 +57,23 @@ void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
     printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
 }
 
+struct Stackframe
+{
+    struct Stackframe *ebp;
+    uint32_t eip;
+};
+
+void backtrace(uint32_t ebp)
+{
+    Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
+
+    for (unsigned int frame = 0; stackframe; ++frame)
+    {
+        logger_debug(" at 0x%08x", stackframe->eip);
+        stackframe = stackframe->ebp;
+    }
+}
+
 extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
     if (stackframe.intno < 32)
@@ -73,6 +90,8 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
                          stackframe.err,
                          stackframe.eip,
                          CR2());
+
+            backtrace(stackframe.ebp);
 
             task_exit(-1);
         }

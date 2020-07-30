@@ -288,6 +288,7 @@ void application_show_window(Window *window)
         .type = COMPOSITOR_MESSAGE_CREATE_WINDOW,
         .create_window = {
             .id = window_handle(window),
+            .flags = window->flags,
             .frontbuffer = window_frontbuffer_handle(window),
             .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window_backbuffer_handle(window),

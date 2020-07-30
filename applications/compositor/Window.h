@@ -5,11 +5,14 @@
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 
+#include "compositor/Protocol.h"
+
 struct Client;
 
 typedef struct Window
 {
     int id;
+    WindowFlag flags;
     struct Client *client;
     Rectangle bound;
     CursorState cursor_state;
@@ -20,6 +23,7 @@ typedef struct Window
 
 Window *window_create(
     int id,
+    WindowFlag flags,
     struct Client *client,
     Rectangle bound,
     RefPtr<Bitmap> frontbuffer,

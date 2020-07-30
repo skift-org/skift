@@ -33,6 +33,7 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
 
     window_create(
         create_window.id,
+        create_window.flags,
         client,
         create_window.bound,
         frontbuffer.take_value(),

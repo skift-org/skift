@@ -20,6 +20,14 @@ typedef enum
     COMPOSITOR_MESSAGE_SET_RESOLUTION,
 } CompositorMessageType;
 
+#define WINDOW_NONE (0)
+#define WINDOW_BORDERLESS (1 << 0)
+#define WINDOW_RESIZABLE (1 << 1)
+#define WINDOW_ALWAYS_FOCUSED (1 << 2)
+#define WINDOW_POP_OVER (1 << 3)
+
+typedef unsigned int WindowFlag;
+
 typedef struct
 {
     Rectangle screen_bound;
@@ -28,6 +36,7 @@ typedef struct
 typedef struct
 {
     int id;
+    WindowFlag flags;
 
     int frontbuffer;
     Vec2i frontbuffer_size;

@@ -10,6 +10,7 @@
 
 Window *window_create(
     int id,
+    WindowFlag flags,
     struct Client *client,
     Rectangle bound,
     RefPtr<Bitmap> frontbuffer,
@@ -18,6 +19,7 @@ Window *window_create(
     Window *window = __create(Window);
 
     window->id = id;
+    window->flags = flags;
     window->client = client;
     window->bound = bound;
 

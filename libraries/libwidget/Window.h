@@ -8,13 +8,7 @@
 #include <libwidget/Event.h>
 #include <libwidget/Widget.h>
 
-#define WINDOW_NONE (0)
-#define WINDOW_BORDERLESS (1 << 0)
-#define WINDOW_RESIZABLE (1 << 1)
-#define WINDOW_ALWAYS_FOCUSED (1 << 2)
-#define WINDOW_POP_OVER (1 << 3)
-
-typedef unsigned int WindowFlag;
+#include "compositor/Protocol.h"
 
 typedef void (*WindowDestroyCallback)(struct Window *window);
 

@@ -53,7 +53,8 @@ void table_render_cell(Table *widget, Painter &painter, int row, int column)
     Rectangle cell_bound = table_cell_bound(widget, row, column);
     Variant data = model_data(widget->model, row, column);
 
-    painter.push_clip(cell_bound);
+    painter.push();
+    painter.clip(cell_bound);
 
     if (row % 2 == 0)
     {
@@ -83,7 +84,7 @@ void table_render_cell(Table *widget, Painter &painter, int row, int column)
             widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    painter.pop_clip();
+    painter.pop();
 }
 
 int table_row_at(Table *widget, Vec2i position)
@@ -104,7 +105,8 @@ void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter.push_clip(widget_get_bound(widget));
+    painter.push();
+    painter.clip(widget_get_bound(widget));
 
     int column_count = model_column_count(widget->model);
     int column_width = table_bound(widget).width() / column_count;
@@ -148,7 +150,7 @@ void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
         painter.draw_string(*widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
     }
 
-    painter.pop_clip();
+    painter.pop();
 }
 
 void table_event(Table *widget, Event *event)

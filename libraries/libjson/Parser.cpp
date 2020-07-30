@@ -128,7 +128,6 @@ static JsonValue *array(Lexer &lexer)
     do
     {
         lexer.skip(',');
-
         json_array_put(array, index, value(lexer));
         index++;
     } while (lexer.current() == ',');

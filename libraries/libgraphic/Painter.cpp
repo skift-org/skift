@@ -7,45 +7,45 @@
 Painter::Painter(RefPtr<Bitmap> bitmap)
 {
     _bitmap = bitmap;
-    _clipstack_top = 0;
-    _clipstack[0] = bitmap->bound();
+    _state_stack_top = 0;
+    _state_stack[0] = {
+        Vec2i::zero(),
+        bitmap->bound(),
+    };
 }
 
-void Painter::push_clip(Rectangle clip)
+void Painter::push()
 {
-    assert(_clipstack_top < CLIPSTACK_SIZE);
+    assert(_state_stack_top < STATESTACK_SIZE);
 
-    _clipstack_top++;
-    _clipstack[_clipstack_top] = _clipstack[_clipstack_top - 1].clipped_with(clip);
+    _state_stack_top++;
+    _state_stack[_state_stack_top] = _state_stack[_state_stack_top - 1];
 }
 
-void Painter::pop_clip()
+void Painter::pop()
 {
-    assert(_clipstack_top > 0);
-
-    _clipstack_top--;
+    assert(_state_stack_top > 0);
+    _state_stack_top--;
 }
 
-void Painter::push_origin(Vec2i origin)
+void Painter::clip(Rectangle rectangle)
 {
-    assert(_originestack_top < ORIGINSTACK_SIZE);
+    Rectangle transformed_rectangle = rectangle.offset(origine());
+    Rectangle clipped_rectangle = transformed_rectangle.clipped_with(clip());
 
-    _originestack_top++;
-    _originestack[_originestack_top] = _originestack[_originestack_top - 1] + origin;
+    _state_stack[_state_stack_top].clip = clipped_rectangle;
 }
 
-void Painter::pop_origin()
+void Painter::transform(Vec2i offset)
 {
-    assert(_originestack_top > 0);
-
-    _originestack_top--;
+    _state_stack[_state_stack_top].origine += offset;
 }
 
 Rectangle Painter::apply_clip(Rectangle rectangle)
 {
-    if (_clipstack[_clipstack_top].colide_with(rectangle))
+    if (rectangle.colide_with(clip()))
     {
-        rectangle = rectangle.clipped_with(_clipstack[_clipstack_top]);
+        rectangle = rectangle.clipped_with(clip());
         rectangle = rectangle.clipped_with(_bitmap->bound());
 
         return rectangle;
@@ -59,14 +59,14 @@ Rectangle Painter::apply_clip(Rectangle rectangle)
 Rectangle Painter::apply_transform(Rectangle rectangle)
 {
 
-    return rectangle.offset(_originestack[_originestack_top]);
+    return rectangle.offset(_state_stack[_state_stack_top].origine);
 }
 
 void Painter::plot_pixel(Vec2i position, Color color)
 {
-    Vec2i transformed = position + _originestack[_originestack_top];
+    Vec2i transformed = position + _state_stack[_state_stack_top].origine;
 
-    if (_clipstack[_clipstack_top].containe(transformed))
+    if (clip().containe(transformed))
     {
         _bitmap->blend_pixel(transformed, color);
     }

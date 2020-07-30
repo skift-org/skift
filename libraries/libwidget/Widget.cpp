@@ -165,15 +165,18 @@ void widget_paint(Widget *widget, Painter &painter, Rectangle rectangle)
         widget_get_bound(widget).height() == 0)
         return;
 
-    painter.push_clip(widget_get_bound(widget));
+    painter.push();
+    painter.clip(widget_get_bound(widget));
 
     if (application_is_debbuging_layout())
         painter.fill_insets(widget_get_bound(widget), widget->insets, ALPHA(COLOR_MAGENTA, 0.25));
 
+    painter.push();
     if (widget->klass->paint)
     {
         widget->klass->paint(widget, painter, rectangle);
     }
+    painter.pop();
 
     list_foreach(Widget, child, widget->childs)
     {
@@ -186,7 +189,7 @@ void widget_paint(Widget *widget, Painter &painter, Rectangle rectangle)
     if (application_is_debbuging_layout())
         painter.draw_rectangle(widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
 
-    painter.pop_clip();
+    painter.pop();
 }
 
 Vec2i widget_compute_size(Widget *widget)

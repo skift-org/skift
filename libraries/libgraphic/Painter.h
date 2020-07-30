@@ -5,52 +5,31 @@
 #include <libgraphic/Icon.h>
 #include <libgraphic/TrueTypeFont.h>
 
-#define CLIPSTACK_SIZE 32
-#define ORIGINSTACK_SIZE 32
+#define STATESTACK_SIZE 32
+
+struct PainterState
+{
+    Vec2i origine;
+    Rectangle clip;
+};
 
 class Painter
 {
 private:
     RefPtr<Bitmap> _bitmap;
-
-    int _clipstack_top = 0;
-    Rectangle _clipstack[CLIPSTACK_SIZE] = {};
-
-    int _originestack_top = 0;
-    Vec2i _originestack[ORIGINSTACK_SIZE] = {};
-
-    Rectangle apply_clip(Rectangle rectangle);
-
-    Rectangle apply_transform(Rectangle rectangle);
-
-    void blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle destination);
-
-    void blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle destination);
-
-    void blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
-
-    void blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
-
-    void draw_line_x_aligned(int x, int start, int end, Color color);
-
-    void draw_line_y_aligned(int y, int start, int end, Color color);
-
-    void draw_line_not_aligned(Vec2i a, Vec2i b, Color color);
-
-    void blit_bitmap_colored(Bitmap &src, Rectangle src_rect, Rectangle dst_rect, Color color);
-
-    void draw_circle_helper(Rectangle bound, Vec2i center, int radius, int thickness, Color color);
+    int _state_stack_top = 0;
+    PainterState _state_stack[STATESTACK_SIZE];
 
 public:
     Painter(RefPtr<Bitmap> bitmap);
 
-    void push_clip(Rectangle clip);
+    void push();
 
-    void pop_clip();
+    void pop();
 
-    void push_origin(Vec2i origin);
+    void clip(Rectangle rectangle);
 
-    void pop_origin();
+    void transform(Vec2i offset);
 
     void plot_pixel(Vec2i position, Color color);
 
@@ -97,4 +76,31 @@ public:
     void draw_truetype_string(TrueTypeFont *font, const char *string, Vec2i position, Color color);
 
     void draw_truetype_string_within(TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color);
+
+private:
+    Rectangle clip() { return _state_stack[_state_stack_top].clip; }
+
+    Vec2i origine() { return _state_stack[_state_stack_top].origine; };
+
+    Rectangle apply_clip(Rectangle rectangle);
+
+    Rectangle apply_transform(Rectangle rectangle);
+
+    void blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle destination);
+
+    void blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle destination);
+
+    void blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
+
+    void blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
+
+    void draw_line_x_aligned(int x, int start, int end, Color color);
+
+    void draw_line_y_aligned(int y, int start, int end, Color color);
+
+    void draw_line_not_aligned(Vec2i a, Vec2i b, Color color);
+
+    void blit_bitmap_colored(Bitmap &src, Rectangle src_rect, Rectangle dst_rect, Color color);
+
+    void draw_circle_helper(Rectangle bound, Vec2i center, int radius, int thickness, Color color);
 };

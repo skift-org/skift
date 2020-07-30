@@ -248,7 +248,8 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
     painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND));
 
-    painter.push_clip(rectangle);
+    painter.push();
+    painter.clip(rectangle);
 
     if (window_content_bound(window).containe(rectangle))
     {
@@ -275,7 +276,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
         }
     }
 
-    painter.pop_clip();
+    painter.pop();
 }
 
 void window_dump(Window *window)

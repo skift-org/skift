@@ -1,5 +1,5 @@
 #include <libgraphic/Framebuffer.h>
-#include <libsystem/utils/Vector.h>
+#include <libutils/Vector.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"

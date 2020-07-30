@@ -2,7 +2,7 @@
 
 #include <libsystem/io/Path.h>
 #include <libsystem/utils/List.h>
-#include <libsystem/utils/Vector.h>
+#include <libutils/Vector.h>
 #include <libwidget/Model.h>
 
 typedef struct

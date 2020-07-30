@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
 #include <libsystem/io/Handle.h>
-#include <libsystem/utils/OwnPtr.h>
+#include <libutils/OwnPtr.h>
 
 class Framebuffer
 {

@@ -2,8 +2,8 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/String.h>
-#include <libsystem/utils/Vector.h>
+#include <libutils/String.h>
+#include <libutils/Vector.h>
 
 typedef struct
 {

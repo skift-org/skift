@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/utils/Vector.h>
+#include <libutils/Vector.h>
 
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"

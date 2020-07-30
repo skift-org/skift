@@ -22,7 +22,11 @@ ABI_HEADERS = \
 	$(wildcard libraries/abi/*.h) \
 	$(wildcard libraries/abi/*/*.h)
 
-HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS))
+LIBUTILS_HEADERS = \
+	$(wildcard libraries/abi/*.h) \
+	$(wildcard libraries/abi/*/*.h)
+
+HEADERS += $(patsubst libraries/%, $(BUILD_DIRECTORY_INCLUDE)/%, $(ABI_HEADERS) $(LIBUTILS_HEADERS))
 
 define LIB_TEMPLATE =
 

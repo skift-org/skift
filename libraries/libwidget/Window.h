@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
 #include <libsystem/utils/HashMap.h>
-#include <libsystem/utils/Vector.h>
+#include <libutils/Vector.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 #include <libwidget/Widget.h>

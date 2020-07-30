@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libsystem/core/CString.h>
-#include <libsystem/utils/RefCounted.h>
+#include <libutils/RefCounted.h>
 
 class StringStorage : public RefCounted<StringStorage>
 {

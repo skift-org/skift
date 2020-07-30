@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libsystem/utils/String.h>
+#include <libutils/String.h>
 
 #define ICON_SIZE_LIST(__ENTRY) \
     __ENTRY(18)                 \

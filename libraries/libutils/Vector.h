@@ -6,7 +6,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/utils/RefPtr.h>
+#include <libutils/RefPtr.h>
 
 template <typename T>
 class Vector

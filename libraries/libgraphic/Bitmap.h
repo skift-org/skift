@@ -5,8 +5,8 @@
 #include <libsystem/Result.h>
 #include <libsystem/math/Math.h>
 
-#include <libsystem/utils/RefPtr.h>
-#include <libsystem/utils/ResultOr.h>
+#include <libutils/RefPtr.h>
+#include <libutils/ResultOr.h>
 
 enum BitmapStorage
 {

@@ -1,15 +1,17 @@
 #pragma once
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 
 template <typename T>
 class RefCounted
 {
-    // FIXME: make ref and deref atomics
-
 private:
     int _refcount;
     bool _orphan;
+
+    __noncopyable(RefCounted);
+    __nonmovable(RefCounted);
 
 public:
     RefCounted()

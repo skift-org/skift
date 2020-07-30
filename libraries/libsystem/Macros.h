@@ -39,6 +39,14 @@
 
 #define __big_endian __attribute__((scalar_storage_order("big-endian")))
 
+#define __noncopyable(__class_name)              \
+    __class_name(const __class_name &) = delete; \
+    __class_name &operator=(const __class_name &) = delete;
+
+#define __nonmovable(__class_name)                \
+    __class_name(const __class_name &&) = delete; \
+    __class_name &operator=(const __class_name &&) = delete;
+
 #define __enum_flags(__type)                                                                  \
     inline __type operator~(__type a) { return (__type) ~(int)a; }                            \
     inline __type operator|(__type a, __type b) { return (__type)((int)a | (int)b); }         \

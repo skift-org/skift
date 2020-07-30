@@ -40,7 +40,7 @@ static Variant device_model_data(DeviceModel *model, int row, int column)
     }
 }
 
-static int device_model_column_count(void)
+static int device_model_column_count()
 {
     return __COLUMN_COUNT;
 }
@@ -70,7 +70,7 @@ static void device_model_destroy(DeviceModel *model)
     json_destroy(model->data);
 }
 
-DeviceModel *device_model_create(void)
+DeviceModel *device_model_create()
 {
     DeviceModel *model = __create(DeviceModel);
 

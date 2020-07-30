@@ -11,7 +11,7 @@
 #include <libwidget/Window.h>
 
 static RefPtr<Font> _widget_font = nullptr;
-RefPtr<Font> widget_font(void)
+RefPtr<Font> widget_font()
 {
     if (_widget_font == nullptr)
     {

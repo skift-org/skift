@@ -80,7 +80,7 @@ static size_t process_info_size(FsProcessInfo *node, FsHandle *handle)
     }
 }
 
-static FsNode *process_info_create(void)
+static FsNode *process_info_create()
 {
     FsProcessInfo *info = __create(FsProcessInfo);
 
@@ -94,7 +94,7 @@ static FsNode *process_info_create(void)
     return (FsNode *)info;
 }
 
-void process_info_initialize(void)
+void process_info_initialize()
 {
     FsNode *info_device = process_info_create();
 

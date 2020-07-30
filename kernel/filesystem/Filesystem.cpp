@@ -22,7 +22,7 @@ static FsNode *_filesystem_root = nullptr;
         system_panic("Trying to use the filesystem before initialization."); \
     }
 
-void filesystem_initialize(void)
+void filesystem_initialize()
 {
     logger_info("Initializing filesystem...");
 

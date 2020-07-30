@@ -2,7 +2,7 @@
 
 #include "kernel/tasking/Task.h"
 
-void fpu_initialize(void);
+void fpu_initialize();
 
 void fpu_save_context(Task *task);
 

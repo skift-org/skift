@@ -60,7 +60,7 @@ void vga_cursor_position(int x, int y)
     out8(0x3D5, (uint8_t)((cursorLocation >> 8) & 0xFF));
 }
 
-MemoryRange vga_physical_range(void)
+MemoryRange vga_physical_range()
 {
     return (MemoryRange){VGA_FRAME_BUFFER, PAGE_ALIGN_UP(VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(uint16_t))};
 }
@@ -113,7 +113,7 @@ Result textmode_iocall(FsNode *node, FsHandle *handle, IOCall request, void *arg
     }
 }
 
-void textmode_initialize(void)
+void textmode_initialize()
 {
     logger_info("Initializing textmode graphic");
 

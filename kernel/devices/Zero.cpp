@@ -26,7 +26,7 @@ static Result zero_write(FsNode *node, FsHandle *handle, const void *buffer, siz
     return SUCCESS;
 }
 
-void zero_initialize(void)
+void zero_initialize()
 {
     FsNode *zero_device = __create(FsNode);
     fsnode_init(zero_device, FILE_TYPE_DEVICE);

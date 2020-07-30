@@ -79,7 +79,7 @@ void menu_entry_destroy(MenuEntry *entry)
     free(entry);
 }
 
-List *load_menu(void)
+List *load_menu()
 {
     List *menu = list_create();
 

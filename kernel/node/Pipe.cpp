@@ -63,7 +63,7 @@ static void pipe_destroy(FsPipe *node)
     ringbuffer_destroy(node->buffer);
 }
 
-FsNode *fspipe_create(void)
+FsNode *fspipe_create()
 {
     FsPipe *pipe = __create(FsPipe);
 

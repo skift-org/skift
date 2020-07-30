@@ -34,7 +34,7 @@ static CommandLine cmdline = CMDLINE(
     "Get or set the current keyboard keymap",
     "Options can be combined.");
 
-int loadkey_list_keymap(void)
+int loadkey_list_keymap()
 {
     Directory *keymap_directory = directory_open("/System/Keyboards", OPEN_READ);
 

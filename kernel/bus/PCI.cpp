@@ -144,7 +144,7 @@ static bool has_pci_isa = false;
 static PCIDevice pci_isa = {};
 static uint8_t pci_remaps[4] = {};
 
-void pci_remap(void)
+void pci_remap()
 {
     if (pci_device_iterate(&pci_isa, (DeviceIterateCallback)find_isa_bridge) == ITERATION_STOP)
     {

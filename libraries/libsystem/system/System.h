@@ -2,8 +2,8 @@
 
 #include <abi/System.h>
 
-SystemInfo system_get_info(void);
+SystemInfo system_get_info();
 
-SystemStatus system_get_status(void);
+SystemStatus system_get_status();
 
-uint system_get_ticks(void);
+uint system_get_ticks();

@@ -45,7 +45,7 @@ void task_iterate(void *target, TaskIterateCallback callback);
 
 Task *task_by_id(int id);
 
-int task_count(void);
+int task_count();
 
 Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user);
 

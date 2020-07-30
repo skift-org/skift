@@ -2,7 +2,7 @@
 
 #include <libsystem/process/Process.h>
 
-void abort(void)
+void abort()
 {
     process_exit(-1);
 }

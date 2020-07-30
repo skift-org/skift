@@ -8,17 +8,17 @@
 #undef printf
 #undef puts
 
-FILE *__stdio_get_stdin(void)
+FILE *__stdio_get_stdin()
 {
     return in_stream;
 }
 
-FILE *__stdio_get_stdout(void)
+FILE *__stdio_get_stdout()
 {
     return out_stream;
 }
 
-FILE *__stdio_get_stderr(void)
+FILE *__stdio_get_stderr()
 {
     return err_stream;
 }

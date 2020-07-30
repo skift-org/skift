@@ -71,7 +71,7 @@ typedef enum
     __THEME_COLOR_COUNT
 } ThemeColorRole;
 
-bool theme_is_dark(void);
+bool theme_is_dark();
 
 void theme_load(const char *path);
 

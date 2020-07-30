@@ -18,4 +18,4 @@ void client_destroy(Client *client);
 
 Result client_send_message(Client *client, CompositorMessage message);
 
-void client_destroy_disconnected(void);
+void client_destroy_disconnected();

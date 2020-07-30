@@ -6,7 +6,7 @@
 #include "kernel/node/Handle.h"
 #include "kernel/node/Node.h"
 
-void filesystem_initialize(void);
+void filesystem_initialize();
 
 FsNode *filesystem_find_and_ref(Path *path);
 

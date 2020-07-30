@@ -20,7 +20,7 @@ Stream *log_stream;
 extern "C" void _init();
 extern "C" void _fini();
 
-void __plug_init(void)
+void __plug_init()
 {
     lock_init(memlock);
     lock_init(loglock);
@@ -81,17 +81,17 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
     process_exit(-1);
 }
 
-void __plug_logger_lock(void)
+void __plug_logger_lock()
 {
     lock_acquire(loglock);
 }
 
-void __plug_logger_unlock(void)
+void __plug_logger_unlock()
 {
     lock_release(loglock);
 }
 
-void __no_return __plug_logger_fatal(void)
+void __no_return __plug_logger_fatal()
 {
     stream_format(err_stream, "Fatal error occurred (see logs)!\n");
     __plug_process_exit(-1);

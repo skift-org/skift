@@ -3,8 +3,8 @@
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    __unused(argc);
+    __unused(argv);
 
     printf("\e[H\e[2J");
 

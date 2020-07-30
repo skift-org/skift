@@ -1,6 +1,6 @@
 #include <libjson/Json.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libwidget/Theme.h>
 
@@ -102,7 +102,7 @@ static const char *_theme_colors_names[__THEME_COLOR_COUNT] = {
     [THEME_ANSI_BRIGHT_WHITE] = "ansi-bright-white",
 };
 
-bool theme_is_dark(void)
+bool theme_is_dark()
 {
     return _theme_is_dark;
 }

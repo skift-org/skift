@@ -21,7 +21,7 @@ public:
 
     Rectangle resolution() { return _bitmap->bound(); }
 
-    static ResultOr<OwnPtr<Framebuffer>> open(void);
+    static ResultOr<OwnPtr<Framebuffer>> open();
 
     Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
 

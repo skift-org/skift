@@ -2,7 +2,7 @@
 #include <libsystem/Time.h>
 #include <libsystem/core/Plugs.h>
 
-TimeStamp timestamp_now(void)
+TimeStamp timestamp_now()
 {
     return __plug_system_get_time();
 }
@@ -76,7 +76,7 @@ TimeStamp datetime_to_timestamp(DateTime datetime)
     return timestamp;
 }
 
-DateTime datetime_now(void)
+DateTime datetime_now()
 {
     return timestamp_to_datetime(timestamp_now());
 }

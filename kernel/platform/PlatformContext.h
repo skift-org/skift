@@ -5,7 +5,7 @@ typedef struct
     char fpu_registers[512];
 } PlatformContext;
 
-PlatformContext *platform_context_create(void);
+PlatformContext *platform_context_create();
 
 void platform_context_destroy(PlatformContext *context);
 

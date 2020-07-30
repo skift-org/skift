@@ -129,7 +129,7 @@ Task *task_by_id(int id)
     return nullptr;
 }
 
-int task_count(void)
+int task_count()
 {
     atomic_begin();
     if (!_tasks)

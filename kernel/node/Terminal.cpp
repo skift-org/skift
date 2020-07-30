@@ -131,7 +131,7 @@ static void terminal_destroy(FsTerminal *terminal)
     ringbuffer_destroy(terminal->slave_to_master_buffer);
 }
 
-FsNode *terminal_create(void)
+FsNode *terminal_create()
 {
     FsTerminal *terminal = __create(FsTerminal);
 

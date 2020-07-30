@@ -62,7 +62,7 @@ void textmode_terminal_destroy(TextmodeTerminalRenderer *renderer)
     stream_close(renderer->device);
 }
 
-Terminal *textmode_terminal_create(void)
+Terminal *textmode_terminal_create()
 {
     Stream *device = stream_open(TEXTMODE_DEVICE_PATH, OPEN_WRITE);
     IOCallTextModeStateArgs args;

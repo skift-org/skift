@@ -31,7 +31,7 @@ static int _eventloop_exit_value = 0;
 static bool _nested_eventloop_is_running = false;
 static int _nested_eventloop_exit_value = 0;
 
-void eventloop_initialize(void)
+void eventloop_initialize()
 {
     assert(!_eventloop_is_initialize);
 
@@ -44,7 +44,7 @@ void eventloop_initialize(void)
     _eventloop_is_initialize = true;
 }
 
-void eventloop_uninitialize(void)
+void eventloop_uninitialize()
 {
     assert(_eventloop_is_initialize);
 
@@ -55,7 +55,7 @@ void eventloop_uninitialize(void)
     _eventloop_is_initialize = false;
 }
 
-int eventloop_run(void)
+int eventloop_run()
 {
     assert(_eventloop_is_initialize);
     assert(!_eventloop_is_running);
@@ -72,7 +72,7 @@ int eventloop_run(void)
     return _eventloop_exit_value;
 }
 
-int eventloop_run_nested(void)
+int eventloop_run_nested()
 {
     assert(_eventloop_is_initialize);
     assert(_eventloop_is_running);
@@ -88,7 +88,7 @@ int eventloop_run_nested(void)
     return _nested_eventloop_exit_value;
 }
 
-static Timeout eventloop_get_timeout(void)
+static Timeout eventloop_get_timeout()
 {
     Timeout timeout = UINT32_MAX;
 
@@ -117,7 +117,7 @@ static Timeout eventloop_get_timeout(void)
     return timeout;
 }
 
-void eventloop_update_timers(void)
+void eventloop_update_timers()
 {
     assert(_eventloop_is_initialize);
 
@@ -209,7 +209,7 @@ void eventloop_exit_nested(int exit_value)
     _nested_eventloop_exit_value = exit_value;
 }
 
-void eventloop_update_notifier(void)
+void eventloop_update_notifier()
 {
     _eventloop_handles_count = 0;
 

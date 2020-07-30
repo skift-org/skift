@@ -36,22 +36,22 @@ extern "C" void arch_main(void *info, uint32_t magic)
     system_main(multiboot);
 }
 
-void arch_disable_interupts(void)
+void arch_disable_interupts()
 {
     cli();
 }
 
-void arch_enable_interupts(void)
+void arch_enable_interupts()
 {
     sti();
 }
 
-void arch_halt(void)
+void arch_halt()
 {
     hlt();
 }
 
-void arch_yield(void)
+void arch_yield()
 {
     asm("int $127");
 }
@@ -71,7 +71,7 @@ size_t arch_debug_write(const void *buffer, size_t size)
     return com_write(COM1, buffer, size);
 }
 
-TimeStamp arch_get_time(void)
+TimeStamp arch_get_time()
 {
     return rtc_now();
 }

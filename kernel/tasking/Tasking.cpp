@@ -15,7 +15,7 @@ static IterationDecision destroy_task_if_canceled(void *target, Task *task)
     return ITERATION_CONTINUE;
 }
 
-void garbage_collector(void)
+void garbage_collector()
 {
     while (true)
     {
@@ -24,7 +24,7 @@ void garbage_collector(void)
     }
 }
 
-void tasking_initialize(void)
+void tasking_initialize()
 {
     Task *idle_task = task_spawn(nullptr, "Idle", system_hang, nullptr, false);
     task_go(idle_task);

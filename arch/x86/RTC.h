@@ -2,4 +2,4 @@
 
 #include <libsystem/Time.h>
 
-TimeStamp rtc_now(void);
+TimeStamp rtc_now();

@@ -3,7 +3,7 @@
 #include <abi/Mouse.h>
 #include <libgraphic/Painter.h>
 
-void cursor_initialize(void);
+void cursor_initialize();
 
 void cursor_handle_packet(MousePacket packet);
 
@@ -13,4 +13,4 @@ Rectangle cursor_bound_from_position(Vec2i position);
 
 Rectangle cursor_dirty_bound_from_position(Vec2i position);
 
-Rectangle cursor_bound(void);
+Rectangle cursor_bound();

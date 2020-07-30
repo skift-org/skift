@@ -28,7 +28,7 @@ Stream *log_stream = nullptr;
 #define INTERNAL_LOG_STREAM_HANDLE HANDLE_INVALID_ID
 static Stream internal_log_stream = {};
 
-void __plug_init(void)
+void __plug_init()
 {
     internal_log_stream.handle.id = INTERNAL_LOG_STREAM_HANDLE;
 
@@ -65,7 +65,7 @@ void __plug_system_get_status(SystemStatus *status)
     ASSERT_NOT_REACHED();
 }
 
-TimeStamp __plug_system_get_time(void)
+TimeStamp __plug_system_get_time()
 {
     return arch_get_time();
 }
@@ -103,24 +103,24 @@ void __plug_memalloc_free(void *address, size_t size)
 
 /* --- Logger plugs --------------------------------------------------------- */
 
-void __plug_logger_lock(void)
+void __plug_logger_lock()
 {
     atomic_begin();
 }
 
-void __plug_logger_unlock(void)
+void __plug_logger_unlock()
 {
     atomic_end();
 }
 
-void __no_return __plug_logger_fatal(void)
+void __no_return __plug_logger_fatal()
 {
     system_panic("Fatal error occurred (see logs)!");
 }
 
 /* --- Processes ------------------------------------------------------------ */
 
-int __plug_process_this(void)
+int __plug_process_this()
 {
     return scheduler_running_id();
 }

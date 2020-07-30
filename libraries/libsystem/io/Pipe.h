@@ -8,6 +8,6 @@ typedef struct
     Stream *out;
 } Pipe;
 
-Pipe *pipe_create(void);
+Pipe *pipe_create();
 
 void pipe_destroy(Pipe *pipe);

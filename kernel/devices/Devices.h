@@ -47,7 +47,7 @@ typedef struct
 
 typedef IterationDecision (*DeviceIterateCallback)(void *target, DeviceInfo device);
 
-void device_initialize(void);
+void device_initialize();
 
 const DeviceDriverInfo *device_get_diver_info(DeviceInfo info);
 
@@ -60,18 +60,18 @@ void device_iterate(void *target, DeviceIterateCallback callback);
 bool bga_match(DeviceInfo info);
 void bga_initialize(DeviceInfo info);
 
-void keyboard_initialize(void);
+void keyboard_initialize();
 
-void null_initialize(void);
+void null_initialize();
 
-void proc_initialize(void);
+void proc_initialize();
 
-void random_initialize(void);
+void random_initialize();
 
-void textmode_initialize(void);
+void textmode_initialize();
 
-void zero_initialize(void);
+void zero_initialize();
 
-void serial_initialize(void);
+void serial_initialize();
 
-void mouse_initialize(void);
+void mouse_initialize();

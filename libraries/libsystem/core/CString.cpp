@@ -296,7 +296,7 @@ size_t strcspn(const char *string, const char *chars)
 
 const char *strerror(int errnum)
 {
-    (void)(errnum);
+    __unused(errnum);
     return "Error";
 }
 
@@ -392,7 +392,7 @@ size_t strxfrm(char *dest, const char *src, size_t n)
     size_t len;
 
     len = strlen(src);
-    (void)memcpy((void *)dest, (void *)src, MIN(n, len + 1));
+    memcpy((void *)dest, (void *)src, MIN(n, len + 1));
 
     return len;
 }

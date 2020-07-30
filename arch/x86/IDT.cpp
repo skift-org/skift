@@ -10,7 +10,7 @@ IDTDescriptor idt_descriptor = {
     .offset = (u32)&idt[0],
 };
 
-void idt_initialize(void)
+void idt_initialize()
 {
     for (int i = 0; i < 32; i++)
     {

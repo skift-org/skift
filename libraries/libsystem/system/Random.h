@@ -8,7 +8,7 @@ typedef struct
     uint64_t inc;
 } Random;
 
-Random random_create(void);
+Random random_create();
 
 uint32_t random_uint32(Random *random);
 

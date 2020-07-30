@@ -11,7 +11,7 @@ static RefPtr<Bitmap> _wallpaper;
 
 static Vector<Rectangle> _dirty_regions;
 
-void renderer_initialize(void)
+void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
     _wallpaper = Bitmap::load_from_or_placeholder("/System/Wallpapers/mountains.png");
@@ -64,12 +64,12 @@ void renderer_region(Rectangle region)
     _framebuffer->mark_dirty(region);
 }
 
-Rectangle renderer_bound(void)
+Rectangle renderer_bound()
 {
     return _framebuffer->resolution();
 }
 
-void renderer_repaint_dirty(void)
+void renderer_repaint_dirty()
 {
     _dirty_regions.foreach ([](Rectangle region) {
         renderer_region(region);

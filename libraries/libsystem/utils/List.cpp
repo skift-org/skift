@@ -2,7 +2,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/utils/List.h>
 
-List *list_create(void)
+List *list_create()
 {
     List *list = __create(List);
 

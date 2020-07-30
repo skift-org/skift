@@ -52,7 +52,7 @@ JsonValue *json_create_double(double double_)
     return value;
 }
 
-JsonValue *json_create_object(void)
+JsonValue *json_create_object()
 {
     JsonValue *value = __create(JsonValue);
 
@@ -62,7 +62,7 @@ JsonValue *json_create_object(void)
     return value;
 }
 
-JsonValue *json_create_array(void)
+JsonValue *json_create_array()
 {
     JsonValue *value = __create(JsonValue);
 
@@ -88,7 +88,7 @@ JsonValue *json_create_boolean(bool boolean)
     return value;
 }
 
-JsonValue *json_create_null(void)
+JsonValue *json_create_null()
 {
     JsonValue *value = __create(JsonValue);
 

@@ -100,7 +100,7 @@ typedef struct Widget
 
 #define WIDGET(__subclass) ((Widget *)(__subclass))
 
-RefPtr<Font> widget_font(void);
+RefPtr<Font> widget_font();
 
 void widget_initialize(
     Widget *widget,

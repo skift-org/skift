@@ -115,7 +115,7 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
     return ITERATION_CONTINUE;
 }
 
-void device_initialize(void)
+void device_initialize()
 {
     logger_info("Initializing devices...");
     device_iterate(nullptr, print_device_info);

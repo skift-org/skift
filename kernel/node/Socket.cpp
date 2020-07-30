@@ -37,7 +37,7 @@ static void socket_destroy(FsSocket *socket)
     list_destroy_with_callback(socket->pending, (ListDestroyElementCallback)fsnode_deref);
 }
 
-FsNode *socket_create(void)
+FsNode *socket_create()
 {
     FsSocket *socket = __create(FsSocket);
 

@@ -96,7 +96,7 @@ static void fsconnection_destroy(FsConnection *connection)
     ringbuffer_destroy(connection->data_to_server);
 }
 
-FsNode *fsconnection_create(void)
+FsNode *fsconnection_create()
 {
     FsConnection *connection = __create(FsConnection);
 

@@ -2,7 +2,7 @@
 
 static Rectangle _screen_bound;
 
-Rectangle screen_get_bound(void)
+Rectangle screen_get_bound()
 {
     return _screen_bound;
 }

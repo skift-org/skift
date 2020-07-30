@@ -7,7 +7,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 
-ResultOr<OwnPtr<Framebuffer>> Framebuffer::open(void)
+ResultOr<OwnPtr<Framebuffer>> Framebuffer::open()
 {
     Handle handle;
     __plug_handle_open(&handle, FRAMEBUFFER_DEVICE_PATH, OPEN_READ | OPEN_WRITE);

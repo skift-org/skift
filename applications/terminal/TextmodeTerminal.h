@@ -11,4 +11,4 @@ typedef struct
     uint16_t *buffer;
 } TextmodeTerminalRenderer;
 
-Terminal *textmode_terminal_create(void);
+Terminal *textmode_terminal_create();

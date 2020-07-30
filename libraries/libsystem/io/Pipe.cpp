@@ -1,7 +1,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Pipe.h>
 
-Pipe *pipe_create(void)
+Pipe *pipe_create()
 {
     Pipe *pipe = __create(Pipe);
 

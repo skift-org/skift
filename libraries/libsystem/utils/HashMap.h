@@ -8,7 +8,7 @@ typedef struct HashMapItem HashMapItem;
 
 typedef struct HashMap HashMap;
 
-HashMap *hashmap_create_string_to_value(void);
+HashMap *hashmap_create_string_to_value();
 
 void hashmap_destroy(HashMap *hashmap);
 

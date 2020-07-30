@@ -6,6 +6,6 @@ void graphic_initialize(Multiboot *multiboot);
 
 void framebuffer_initialize(Multiboot *multiboot);
 
-void textmode_initialize(void);
+void textmode_initialize();
 
-void graphic_did_find_framebuffer(void);
+void graphic_did_find_framebuffer();

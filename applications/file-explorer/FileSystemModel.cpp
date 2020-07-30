@@ -128,7 +128,7 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
     }
 }
 
-static int filesystem_model_column_count(void)
+static int filesystem_model_column_count()
 {
     return __COLUMN_COUNT;
 }

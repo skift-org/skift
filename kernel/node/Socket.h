@@ -10,4 +10,4 @@ typedef struct
     List *pending;
 } FsSocket;
 
-FsNode *socket_create(void);
+FsNode *socket_create();

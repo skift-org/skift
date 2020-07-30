@@ -52,7 +52,7 @@ static void hashmap_string_destroy(char *string)
 
 #define HASHMAP_BUCKET_COUNT 32
 
-HashMap *hashmap_create_string_to_value(void)
+HashMap *hashmap_create_string_to_value()
 {
     HashMap *hashmap = __create(HashMap);
 

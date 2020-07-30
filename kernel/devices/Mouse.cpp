@@ -75,7 +75,7 @@ void ps2mouse_handle_packet(uint8_t packet)
     }
 }
 
-void ps2mouse_interrupt_handler(void)
+void ps2mouse_interrupt_handler()
 {
     uint8_t status = in8(PS2_STATUS);
 
@@ -123,7 +123,7 @@ static inline void ps2mouse_write(uint8_t a_write)
     out8(0x60, a_write);
 }
 
-static inline uint8_t ps2mouse_read(void)
+static inline uint8_t ps2mouse_read()
 {
     ps2mouse_wait(0);
     return in8(0x60);
@@ -151,7 +151,7 @@ static Result mouse_read(FsNode *node, FsHandle *handle, void *buffer, size_t si
     return SUCCESS;
 }
 
-void mouse_initialize(void)
+void mouse_initialize()
 {
     uint8_t _status;
 

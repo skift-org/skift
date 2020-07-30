@@ -29,7 +29,7 @@ char get_realtime_reg(CMOSTimeSelector reg)
     return in8(CMOS_DATA);
 }
 
-TimeStamp rtc_now(void)
+TimeStamp rtc_now()
 {
     CMOS_WAIT;
 

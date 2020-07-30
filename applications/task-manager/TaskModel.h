@@ -12,7 +12,7 @@ typedef struct
     JsonValue *data;
 } TaskModel;
 
-TaskModel *task_model_create(void);
+TaskModel *task_model_create();
 
 void task_model_navigate(TaskModel *model, Path *path);
 

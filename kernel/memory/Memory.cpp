@@ -15,7 +15,7 @@ static bool _memory_initialized = false;
 extern int __start;
 extern int __end;
 
-static MemoryRange kernel_memory_range(void)
+static MemoryRange kernel_memory_range()
 {
     return memory_range_around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
 }
@@ -77,14 +77,14 @@ void memory_initialize(Multiboot *multiboot)
     memory_object_initialize();
 }
 
-void memory_dump(void)
+void memory_dump()
 {
     printf("\n\tMemory status:");
     printf("\n\t - Used  physical Memory: %12dkib", USED_MEMORY / 1024);
     printf("\n\t - Total physical Memory: %12dkib", TOTAL_MEMORY / 1024);
 }
 
-size_t memory_get_used(void)
+size_t memory_get_used()
 {
     size_t result;
 
@@ -97,7 +97,7 @@ size_t memory_get_used(void)
     return result;
 }
 
-size_t memory_get_total(void)
+size_t memory_get_total()
 {
     size_t result;
 
@@ -110,7 +110,7 @@ size_t memory_get_total(void)
     return result;
 }
 
-PageDirectory *memory_kpdir(void)
+PageDirectory *memory_kpdir()
 {
     return &kpdir;
 }
@@ -267,7 +267,7 @@ Result memory_free(PageDirectory *page_directory, MemoryRange range)
     return SUCCESS;
 }
 
-PageDirectory *memory_pdir_create(void)
+PageDirectory *memory_pdir_create()
 {
     atomic_begin();
 

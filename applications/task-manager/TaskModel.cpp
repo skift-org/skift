@@ -63,7 +63,7 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     }
 }
 
-static int task_model_column_count(void)
+static int task_model_column_count()
 {
     return __COLUMN_COUNT;
 }
@@ -102,7 +102,7 @@ static void task_model_destroy(TaskModel *model)
     json_destroy(model->data);
 }
 
-TaskModel *task_model_create(void)
+TaskModel *task_model_create()
 {
     TaskModel *model = __create(TaskModel);
 

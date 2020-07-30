@@ -4,7 +4,7 @@
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"
 
-void interrupts_initialize(void)
+void interrupts_initialize()
 {
     dispatcher_initialize();
     atomic_enable();

@@ -8,13 +8,13 @@
 
 void memory_initialize(Multiboot *multiboot);
 
-void memory_dump(void);
+void memory_dump();
 
-size_t memory_get_used(void);
+size_t memory_get_used();
 
-size_t memory_get_total(void);
+size_t memory_get_total();
 
-PageDirectory *memory_kpdir(void);
+PageDirectory *memory_kpdir();
 
 Result memory_map(PageDirectory *page_directory, MemoryRange range, MemoryFlags flags);
 
@@ -26,7 +26,7 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
 Result memory_free(PageDirectory *page_directory, MemoryRange range);
 
-PageDirectory *memory_pdir_create(void);
+PageDirectory *memory_pdir_create();
 
 void memory_pdir_destroy(PageDirectory *pdir);
 

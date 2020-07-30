@@ -1,8 +1,8 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"
@@ -59,7 +59,7 @@ static void file_destroy(FsFile *node)
     free(node->buffer);
 }
 
-FsNode *file_create(void)
+FsNode *file_create()
 {
     FsFile *file = __create(FsFile);
 

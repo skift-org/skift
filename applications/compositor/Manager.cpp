@@ -7,12 +7,12 @@
 static List *_managed_windows;
 static Window *_focused_window = nullptr;
 
-void manager_initialize(void)
+void manager_initialize()
 {
     _managed_windows = list_create();
 }
 
-List *manager_get_windows(void)
+List *manager_get_windows()
 {
     return _managed_windows;
 }
@@ -75,7 +75,7 @@ void manager_set_focus_window(Window *window)
     }
 }
 
-struct Window *manager_focus_window(void)
+struct Window *manager_focus_window()
 {
     return _focused_window;
 }

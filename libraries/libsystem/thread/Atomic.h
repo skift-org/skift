@@ -2,11 +2,11 @@
 
 #include <libsystem/Common.h>
 
-void atomic_enable(void);
-void atomic_disable(void);
-void atomic_begin(void);
-void atomic_end(void);
-bool is_atomic(void);
+void atomic_enable();
+void atomic_disable();
+void atomic_begin();
+void atomic_end();
+bool is_atomic();
 
 #define ASSERT_ATOMIC assert(is_atomic())
 

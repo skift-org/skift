@@ -48,16 +48,16 @@ JsonValue *json_create_double(double double_);
 JsonValue *json_create_boolean(bool value);
 
 // Create a JsonValue of type JSON_OBJECT which is a HashMap.
-JsonValue *json_create_object(void);
+JsonValue *json_create_object();
 
 // Create a JsonValue of type JSON_ARRAY which is a array of JsonValue.
-JsonValue *json_create_array(void);
+JsonValue *json_create_array();
 
 // Create a JsonValue of type JSON_TRUE or JSON_FALSE.
 JsonValue *json_create_boolean(bool value);
 
 // Create a JsonValue of type JSON_NULL.
-JsonValue *json_create_null(void);
+JsonValue *json_create_null();
 
 // Destroy a JsonValue and all of its childrens.
 void json_destroy(JsonValue *value);

@@ -18,4 +18,4 @@ typedef struct
     RingBuffer *slave_to_master_buffer;
 } FsTerminal;
 
-FsNode *terminal_create(void);
+FsNode *terminal_create();

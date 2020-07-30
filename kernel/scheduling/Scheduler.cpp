@@ -14,7 +14,7 @@ static Task *idle = nullptr;
 static List *blocked_tasks;
 static List *running_tasks;
 
-void scheduler_initialize(void)
+void scheduler_initialize()
 {
     blocked_tasks = list_create();
     running_tasks = list_create();
@@ -56,17 +56,17 @@ void scheduler_did_change_task_state(Task *task, TaskState oldstate, TaskState n
     }
 }
 
-bool scheduler_is_context_switch(void)
+bool scheduler_is_context_switch()
 {
     return scheduler_context_switch;
 }
 
-Task *scheduler_running(void)
+Task *scheduler_running()
 {
     return running;
 }
 
-int scheduler_running_id(void)
+int scheduler_running_id()
 {
     if (running == nullptr)
     {
@@ -76,7 +76,7 @@ int scheduler_running_id(void)
     return running->id;
 }
 
-void scheduler_yield(void)
+void scheduler_yield()
 {
     arch_yield();
 }

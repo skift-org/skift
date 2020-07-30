@@ -128,7 +128,7 @@ static void directory_destroy(FsDirectory *node)
     list_destroy_with_callback(node->childs, (ListDestroyElementCallback)directory_entry_destroy);
 }
 
-FsNode *directory_create(void)
+FsNode *directory_create()
 {
     FsDirectory *directory = __create(FsDirectory);
 

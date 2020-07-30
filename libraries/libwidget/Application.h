@@ -6,19 +6,19 @@
 
 Result application_initialize(int argc, char **argv);
 
-int application_run(void);
+int application_run();
 
-int application_run_nested(void);
+int application_run_nested();
 
-int application_pump(void);
+int application_pump();
 
 void application_exit(int exit_value);
 
 void application_exit_nested(int exit_value);
 
-bool application_is_debbuging_layout(void);
+bool application_is_debbuging_layout();
 
-void application_dump(void);
+void application_dump();
 
 void application_add_window(Window *window);
 

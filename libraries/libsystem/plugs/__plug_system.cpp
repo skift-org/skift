@@ -13,7 +13,7 @@ void __plug_system_get_status(SystemStatus *status)
     __syscall(SYS_SYSTEM_GET_STATUS, (int)status, 0, 0, 0, 0);
 }
 
-TimeStamp __plug_system_get_time(void)
+TimeStamp __plug_system_get_time()
 {
     TimeStamp timestamp = 0;
     __syscall(SYS_SYSTEM_GET_TIME, (int)&timestamp, 0, 0, 0, 0);

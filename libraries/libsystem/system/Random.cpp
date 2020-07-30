@@ -2,7 +2,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/system/Random.h>
 
-Random random_create(void)
+Random random_create()
 {
     Random random = {};
 

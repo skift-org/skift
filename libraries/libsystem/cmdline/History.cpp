@@ -4,7 +4,7 @@
 
 static List *history = nullptr;
 
-static void initialize_history_if_not_already(void)
+static void initialize_history_if_not_already()
 {
     if (history)
     {
@@ -45,7 +45,7 @@ UnicodeString *history_peek(size_t index)
     return str;
 }
 
-size_t history_length(void)
+size_t history_length()
 {
     initialize_history_if_not_already();
 

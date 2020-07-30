@@ -18,7 +18,7 @@ static RefPtr<Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
 
 static uint _last_click = 0;
 
-void cursor_initialize(void)
+void cursor_initialize()
 {
     const char *cursor_paths[] = {
         "/System/Cursors/default.png",
@@ -110,7 +110,7 @@ void cursor_handle_packet(MousePacket packet)
         window_handle_mouse_buttons(window_on_focus, _mouse_old_buttons, _mouse_buttons, _mouse_position);
 }
 
-CursorState cursor_get_state(void)
+CursorState cursor_get_state()
 {
     Window *window = manager_focus_window();
 
@@ -153,7 +153,7 @@ Rectangle cursor_bound_from_position(Vec2i position)
     return bound;
 }
 
-Rectangle cursor_bound(void)
+Rectangle cursor_bound()
 {
     return cursor_bound_from_position(_mouse_position);
 }

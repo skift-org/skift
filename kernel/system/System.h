@@ -7,17 +7,17 @@
 
 void system_main(Multiboot *multiboot);
 
-void system_initialize(void);
+void system_initialize();
 
-void __no_return system_hang(void);
+void __no_return system_hang();
 
-void __no_return system_stop(void);
+void __no_return system_stop();
 
-void system_tick(void);
+void system_tick();
 
-uint32_t system_get_tick(void);
+uint32_t system_get_tick();
 
-ElapsedTime system_get_uptime(void);
+ElapsedTime system_get_uptime();
 
 #define system_panic(__args...) \
     system_panic_internal(SOURCE_LOCATION, nullptr, __args)

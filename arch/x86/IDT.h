@@ -34,4 +34,4 @@ typedef struct __packed
 
 extern "C" void idt_flush(u32);
 
-void idt_initialize(void);
+void idt_initialize();

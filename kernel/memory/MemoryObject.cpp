@@ -9,7 +9,7 @@ static int _memory_object_id = 0;
 static List *_memory_objects;
 static Lock _memory_objects_lock;
 
-void memory_object_initialize(void)
+void memory_object_initialize()
 {
     lock_init(_memory_objects_lock);
     _memory_objects = list_create();

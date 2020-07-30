@@ -15,12 +15,12 @@ typedef struct PaintTool
     PaintToolDestroyCallback destroy;
 } PaintTool;
 
-PaintTool *pencil_tool_create(void);
+PaintTool *pencil_tool_create();
 
-PaintTool *brush_tool_create(void);
+PaintTool *brush_tool_create();
 
-PaintTool *eraser_tool_create(void);
+PaintTool *eraser_tool_create();
 
-PaintTool *fill_tool_create(void);
+PaintTool *fill_tool_create();
 
-PaintTool *picker_tool_create(void);
+PaintTool *picker_tool_create();

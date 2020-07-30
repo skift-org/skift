@@ -264,7 +264,7 @@ Result sys_system_get_info(SystemInfo *info)
     return SUCCESS;
 }
 
-ElapsedTime system_get_uptime(void);
+ElapsedTime system_get_uptime();
 
 Result sys_system_get_status(SystemStatus *status)
 {

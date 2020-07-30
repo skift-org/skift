@@ -13,4 +13,4 @@ typedef struct
     bool cursor_blink;
 } FramebufferTerminalRenderer;
 
-Terminal *framebuffer_terminal_create(void);
+Terminal *framebuffer_terminal_create();

@@ -25,7 +25,7 @@ void graphic_initialize(Multiboot *multiboot)
     }
 }
 
-void graphic_did_find_framebuffer(void)
+void graphic_did_find_framebuffer()
 {
     _has_framebuffer = true;
 }

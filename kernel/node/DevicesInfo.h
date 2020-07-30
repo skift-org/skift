@@ -7,4 +7,4 @@ typedef struct
     FsNode node;
 } FsDeviceInfo;
 
-void device_info_initialize(void);
+void device_info_initialize();

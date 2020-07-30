@@ -6,11 +6,11 @@ struct Notifier;
 
 struct Timer;
 
-void eventloop_initialize(void);
+void eventloop_initialize();
 
-int eventloop_run(void);
+int eventloop_run();
 
-int eventloop_run_nested(void);
+int eventloop_run_nested();
 
 void eventloop_pump(bool pool);
 
@@ -32,4 +32,4 @@ void eventloop_run_later(RunLaterCallback callback, void *target);
 
 void event_cancel_run_later_for(void *target);
 
-void eventloop_update_timers(void);
+void eventloop_update_timers();

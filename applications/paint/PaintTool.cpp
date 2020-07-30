@@ -27,7 +27,7 @@ void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
     }
 }
 
-PaintTool *pencil_tool_create(void)
+PaintTool *pencil_tool_create()
 {
     PaintTool *tool = __create(PaintTool);
 
@@ -55,7 +55,7 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
     }
 }
 
-PaintTool *brush_tool_create(void)
+PaintTool *brush_tool_create()
 {
     PaintTool *tool = __create(PaintTool);
 
@@ -97,7 +97,7 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
     }
 }
 
-PaintTool *eraser_tool_create(void)
+PaintTool *eraser_tool_create()
 {
     PaintTool *tool = __create(PaintTool);
 
@@ -183,7 +183,7 @@ void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event
     }
 }
 
-PaintTool *fill_tool_create(void)
+PaintTool *fill_tool_create()
 {
     PaintTool *tool = __create(PaintTool);
 
@@ -209,7 +209,7 @@ void picker_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
     }
 }
 
-PaintTool *picker_tool_create(void)
+PaintTool *picker_tool_create()
 {
     PaintTool *tool = __create(PaintTool);
 

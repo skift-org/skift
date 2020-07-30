@@ -44,6 +44,6 @@ uint16_t pci_read_type(uint32_t dev);
 
 IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callback);
 
-void pci_remap(void);
+void pci_remap();
 
 int pci_get_interrupt(PCIDevice device);

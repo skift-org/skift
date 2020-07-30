@@ -6,7 +6,7 @@
 
 static int _cached_this = -1;
 
-int __plug_process_this(void)
+int __plug_process_this()
 {
     if (_cached_this == -1)
     {

@@ -11,7 +11,7 @@ typedef struct
     int refcount;
 } MemoryObject;
 
-void memory_object_initialize(void);
+void memory_object_initialize();
 
 MemoryObject *memory_object_create(size_t size);
 

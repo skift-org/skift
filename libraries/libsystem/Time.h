@@ -57,7 +57,7 @@ typedef union {
     };
 } DateTime;
 
-TimeStamp timestamp_now(void);
+TimeStamp timestamp_now();
 
 Time timestamp_to_time(TimeStamp timestamp);
 
@@ -67,4 +67,4 @@ DateTime timestamp_to_datetime(TimeStamp timestamp);
 
 TimeStamp datetime_to_timestamp(DateTime datetime);
 
-DateTime datetime_now(void);
+DateTime datetime_now();

@@ -29,7 +29,7 @@ static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_DEFAULT_BACKGROUND] = THEME_ANSI_BACKGROUND,
 };
 
-RefPtr<Font> get_terminal_font(void)
+RefPtr<Font> get_terminal_font()
 {
     static RefPtr<Font> font = nullptr;
 

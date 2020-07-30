@@ -2,21 +2,21 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Path.h>
 
-SystemInfo system_get_info(void)
+SystemInfo system_get_info()
 {
     SystemInfo info;
     __plug_system_get_info(&info);
     return info;
 }
 
-SystemStatus system_get_status(void)
+SystemStatus system_get_status()
 {
     SystemStatus status;
     __plug_system_get_status(&status);
     return status;
 }
 
-uint system_get_ticks(void)
+uint system_get_ticks()
 {
     return __plug_system_get_ticks();
 }

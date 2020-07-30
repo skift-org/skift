@@ -12,7 +12,7 @@ typedef struct
     JsonValue *data;
 } DeviceModel;
 
-DeviceModel *device_model_create(void);
+DeviceModel *device_model_create();
 
 void device_model_navigate(DeviceModel *model, Path *path);
 

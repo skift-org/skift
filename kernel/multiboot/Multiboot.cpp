@@ -37,7 +37,7 @@ int multiboot_version(uint32_t magic)
     ASSERT_NOT_REACHED();
 }
 
-void multiboot_dump(void)
+void multiboot_dump()
 {
     logger_info("Bootloader: '%s'", _multiboot.bootloader);
     logger_info("Command lines: '%s'", _multiboot.command_line);

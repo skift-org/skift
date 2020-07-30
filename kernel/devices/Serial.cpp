@@ -12,7 +12,7 @@
 
 static RingBuffer *serial_buffer;
 
-void serial_interrupt_handler(void)
+void serial_interrupt_handler()
 {
     char byte = com_getc(COM1);
 
@@ -51,7 +51,7 @@ static Result serial_write(FsNode *node, FsHandle *handle, const void *buffer, s
     return SUCCESS;
 }
 
-void serial_initialize(void)
+void serial_initialize()
 {
     serial_buffer = ringbuffer_create(1024);
 

@@ -18,7 +18,7 @@ typedef struct
 typedef void (*ModelUpdateCallback)(struct Model *model);
 typedef Variant (*ModelDataCallback)(struct Model *model, int row, int column);
 typedef CellStyle (*ModelStyleCallback)(struct Model *model, int row, int column);
-typedef int (*ModelColumnCountCallback)(void);
+typedef int (*ModelColumnCountCallback)();
 typedef int (*ModelRowCountCallback)(struct Model *model);
 typedef const char *(*ModelColumnNameCallback)(int column);
 typedef void (*ModelDestroyCallback)(struct Model *model);

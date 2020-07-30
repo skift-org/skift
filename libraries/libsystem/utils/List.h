@@ -29,7 +29,7 @@ typedef struct List
 typedef bool (*ListCompareElementCallback)(void *left, void *right);
 typedef void (*ListDestroyElementCallback)(void *element);
 
-List *list_create(void);
+List *list_create();
 
 void list_destroy(List *list);
 

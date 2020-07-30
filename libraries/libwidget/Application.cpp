@@ -73,7 +73,7 @@ CompositorMessage *application_wait_for_message(CompositorMessageType expected_m
     return message;
 }
 
-void application_wait_for_ack(void)
+void application_wait_for_ack()
 {
     CompositorMessage *ack_message = application_wait_for_message(COMPOSITOR_MESSAGE_ACK);
     if (ack_message)
@@ -162,7 +162,7 @@ Result application_initialize(int argc, char **argv)
     return SUCCESS;
 }
 
-int application_run(void)
+int application_run()
 {
     assert(_state == APPLICATION_INITALIZED);
     _state = APPLICATION_RUNNING;
@@ -170,14 +170,14 @@ int application_run(void)
     return eventloop_run();
 }
 
-int application_run_nested(void)
+int application_run_nested()
 {
     assert(_state == APPLICATION_RUNNING);
 
     return eventloop_run_nested();
 }
 
-int application_pump(void)
+int application_pump()
 {
     if (_state == APPLICATION_INITALIZED)
     {
@@ -212,12 +212,12 @@ void application_exit_nested(int exit_value)
     eventloop_exit_nested(exit_value);
 }
 
-bool application_is_debbuging_layout(void)
+bool application_is_debbuging_layout()
 {
     return _is_debbuging_layout;
 }
 
-void application_exit_if_all_windows_are_closed(void)
+void application_exit_if_all_windows_are_closed()
 {
     if (_state == APPLICATION_EXITING)
     {
@@ -240,7 +240,7 @@ void application_exit_if_all_windows_are_closed(void)
     }
 }
 
-void application_dump(void)
+void application_dump()
 {
     assert(_state >= APPLICATION_INITALIZED);
 

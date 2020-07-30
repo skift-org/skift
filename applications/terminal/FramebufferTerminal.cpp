@@ -148,7 +148,7 @@ void framebuffer_terminal_destroy(FramebufferTerminalRenderer *renderer)
     renderer->mono_font = nullptr;
 }
 
-Terminal *framebuffer_terminal_create(void)
+Terminal *framebuffer_terminal_create()
 {
     auto framebuffer = Framebuffer::open();
 

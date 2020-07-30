@@ -10,4 +10,4 @@ typedef struct
     RingBuffer *buffer;
 } FsPipe;
 
-FsNode *fspipe_create(void);
+FsNode *fspipe_create();

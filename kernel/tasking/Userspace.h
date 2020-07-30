@@ -1,3 +1,3 @@
 #pragma once
 
-void userspace_initialize(void);
+void userspace_initialize();

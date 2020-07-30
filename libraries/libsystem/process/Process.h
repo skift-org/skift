@@ -5,7 +5,7 @@
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
 
-int process_this(void);
+int process_this();
 
 Result process_run(const char *command, int *pid);
 

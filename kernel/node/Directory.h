@@ -20,4 +20,4 @@ typedef struct
     List *childs;
 } FsDirectory;
 
-FsNode *directory_create(void);
+FsNode *directory_create();

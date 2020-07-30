@@ -7,4 +7,4 @@ typedef struct
     FsNode node;
 } FsProcessInfo;
 
-void process_info_initialize(void);
+void process_info_initialize();

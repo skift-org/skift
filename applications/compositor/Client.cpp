@@ -296,7 +296,7 @@ IterationDecision client_destroy_if_disconnected(void *target, Client *client)
     return ITERATION_CONTINUE;
 }
 
-void client_destroy_disconnected(void)
+void client_destroy_disconnected()
 {
     if (_connected_client)
     {

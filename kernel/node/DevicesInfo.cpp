@@ -86,7 +86,7 @@ static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
     }
 }
 
-static FsNode *device_info_create(void)
+static FsNode *device_info_create()
 {
     FsDeviceInfo *info = __create(FsDeviceInfo);
 
@@ -100,7 +100,7 @@ static FsNode *device_info_create(void)
     return (FsNode *)info;
 }
 
-void device_info_initialize(void)
+void device_info_initialize()
 {
     FsNode *device_info_device = device_info_create();
 

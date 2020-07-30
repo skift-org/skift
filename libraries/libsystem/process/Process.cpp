@@ -4,7 +4,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Launchpad.h>
 
-int process_this(void)
+int process_this()
 {
     return __plug_process_this();
 }

@@ -13,7 +13,7 @@ static inline int cpuid_string(int code, int where[4])
     return (int)where[0];
 }
 
-CPUID cpuid(void)
+CPUID cpuid()
 {
     CPUID cid;
     memset(&cid.vendorid, 0, 16);

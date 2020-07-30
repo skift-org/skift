@@ -46,9 +46,9 @@ static inline u32 CR4()
     return r;
 }
 
-static inline void cli(void) { asm volatile("cli"); }
-static inline void sti(void) { asm volatile("sti"); }
-static inline void hlt(void) { asm volatile("hlt"); }
+static inline void cli() { asm volatile("cli"); }
+static inline void sti() { asm volatile("sti"); }
+static inline void hlt() { asm volatile("hlt"); }
 
 static inline u8 in8(u16 port)
 {

@@ -120,7 +120,7 @@ Key keyboard_scancode_to_key(int scancode)
     return KEYBOARD_KEY_INVALID;
 }
 
-void keyboard_interrupt_handler(void)
+void keyboard_interrupt_handler()
 {
     uint8_t status = in8(PS2_STATUS);
 
@@ -272,7 +272,7 @@ static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t s
     return SUCCESS;
 }
 
-void keyboard_initialize(void)
+void keyboard_initialize()
 {
     logger_info("Initializing keyboard...");
 

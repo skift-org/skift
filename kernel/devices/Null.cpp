@@ -26,7 +26,7 @@ static Result null_write(FsNode *node, FsHandle *handle, const void *buffer, siz
     return SUCCESS;
 }
 
-void null_initialize(void)
+void null_initialize()
 {
     FsNode *null_device = __create(FsNode);
 

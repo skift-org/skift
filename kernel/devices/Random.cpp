@@ -31,7 +31,7 @@ static Result random_write(FsNode *node, FsHandle *handle, const void *buffer, u
     return SUCCESS;
 }
 
-void random_initialize(void)
+void random_initialize()
 {
     _random = (Random){
         6389,

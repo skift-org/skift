@@ -11,4 +11,4 @@ typedef struct
     size_t size;
 } FsFile;
 
-FsNode *file_create(void);
+FsNode *file_create();

@@ -11,7 +11,7 @@
 static RingBuffer *_interupts_to_dispatch = nullptr;
 static DispatcherInteruptHandler _interupts_to_handlers[255] = {};
 
-void dispatcher_initialize(void)
+void dispatcher_initialize()
 {
     _interupts_to_dispatch = ringbuffer_create(1024);
 
@@ -27,7 +27,7 @@ void dispatcher_dispatch(int interrupt)
     }
 }
 
-static bool dispatcher_has_interupt(void)
+static bool dispatcher_has_interupt()
 {
     atomic_begin();
     bool result = !ringbuffer_is_empty(_interupts_to_dispatch);
@@ -36,7 +36,7 @@ static bool dispatcher_has_interupt(void)
     return result;
 }
 
-static int dispatcher_get_interupt(void)
+static int dispatcher_get_interupt()
 {
     atomic_begin();
     int interrupt = ringbuffer_getc(_interupts_to_dispatch);
@@ -53,7 +53,7 @@ static bool dispatcher_can_unblock(Blocker *blocker, Task *task)
     return dispatcher_has_interupt();
 }
 
-void dispatcher_service(void)
+void dispatcher_service()
 {
     while (true)
     {

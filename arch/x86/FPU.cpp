@@ -2,7 +2,7 @@
 
 #include "arch/x86/FPU.h"
 
-void fpu_initialize(void)
+void fpu_initialize()
 {
     asm volatile("clts");
     size_t t;

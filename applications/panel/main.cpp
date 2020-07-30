@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     window_root(window)->layout = HFLOW(8);
     window_root(window)->insets = Insets(4);
 
-    Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, icon_get("menu"), "Applications");
+    Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, Icon::get("menu"), "Applications");
     widget_set_event_handler(menu, EVENT_ACTION, EVENT_HANDLER(nullptr, open_menu));
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
@@ -66,10 +66,8 @@ int main(int argc, char **argv)
     graph_container->layout = VGRID(1);
 
     Widget *ram_graph = graph_create(graph_container, 50, COLOR_ROYALBLUE);
-    label_create(ram_graph, "RAM");
 
     Widget *cpu_graph = graph_create(graph_container, 50, COLOR_SEAGREEN);
-    label_create(cpu_graph, "CPU");
 
     label_create(window_root(window), "user");
 

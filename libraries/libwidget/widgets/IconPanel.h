@@ -6,7 +6,7 @@
 typedef struct
 {
     Widget widget;
-    Icon *icon;
+    RefPtr<Icon> icon;
 } IconPanel;
 
-Widget *icon_panel_create(Widget *parent, Icon *icon);
+Widget *icon_panel_create(Widget *parent, RefPtr<Icon> icon);

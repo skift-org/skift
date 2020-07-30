@@ -7,145 +7,123 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
 
-Framebuffer *framebuffer_open(void)
+ResultOr<OwnPtr<Framebuffer>> Framebuffer::open(void)
 {
-    Framebuffer *framebuffer = __create(Framebuffer);
+    Handle handle;
+    __plug_handle_open(&handle, FRAMEBUFFER_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
 
-    __plug_handle_open(&framebuffer->handle, FRAMEBUFFER_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
-
-    if (handle_has_error(framebuffer))
+    if (handle_has_error(&handle))
     {
-        return framebuffer;
+        return handle_get_error(&handle);
     }
 
     IOCallDisplayModeArgs mode_info = {};
+    __plug_handle_call(&handle, IOCALL_DISPLAY_GET_MODE, &mode_info);
 
-    __plug_handle_call(&framebuffer->handle, IOCALL_DISPLAY_GET_MODE, &mode_info);
-
-    if (handle_has_error(framebuffer))
+    if (handle_has_error(&handle))
     {
-        handle_printf_error(framebuffer, "Failled to do iocall on " FRAMEBUFFER_DEVICE_PATH);
-        return framebuffer;
+        return handle_get_error(&handle);
     }
 
-    Bitmap *framebuffer_backbuffer = bitmap_create(mode_info.width, mode_info.height);
+    auto bitmap_or_error = Bitmap::create_shared(mode_info.width, mode_info.height);
 
-    framebuffer->backbuffer = framebuffer_backbuffer;
-    framebuffer->painter = Painter(framebuffer_backbuffer);
-    framebuffer->is_dirty = false;
+    if (!bitmap_or_error.success())
+    {
+        return bitmap_or_error.result();
+    }
 
-    framebuffer->width = mode_info.width;
-    framebuffer->height = mode_info.height;
-
-    logger_info("Framebuffer create with graphic mode %dx%d.", mode_info.width, mode_info.height);
-
-    return framebuffer;
+    return own<Framebuffer>(handle, bitmap_or_error.take_value());
 }
 
-Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height)
+Framebuffer::Framebuffer(Handle handle, RefPtr<Bitmap> bitmap)
+    : _handle(handle),
+      _bitmap(bitmap),
+      _painter(bitmap)
 {
-    IOCallDisplayModeArgs mode_info = (IOCallDisplayModeArgs){width, height};
+}
 
-    __plug_handle_call(&framebuffer->handle, IOCALL_DISPLAY_SET_MODE, &mode_info);
+Framebuffer::~Framebuffer()
+{
+    __plug_handle_close(&_handle);
+}
 
-    if (handle_has_error(framebuffer))
+Result Framebuffer::set_resolution(Vec2i size)
+{
+    auto bitmap_or_result = Bitmap::create_shared(size.x(), size.y());
+
+    if (!bitmap_or_result.success())
     {
-        handle_printf_error(framebuffer, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
-        return handle_get_error(framebuffer);
+        return bitmap_or_result.result();
     }
 
-    bitmap_destroy(framebuffer->backbuffer);
+    IOCallDisplayModeArgs mode_info = (IOCallDisplayModeArgs){size.x(), size.y()};
 
-    framebuffer->backbuffer = bitmap_create(width, height);
-    framebuffer->painter = Painter(framebuffer->backbuffer);
+    __plug_handle_call(&_handle, IOCALL_DISPLAY_SET_MODE, &mode_info);
 
-    framebuffer->width = mode_info.width;
-    framebuffer->height = mode_info.height;
+    if (handle_has_error(&_handle))
+    {
+        return handle_get_error(&_handle);
+    }
 
-    framebuffer_mark_dirty(framebuffer, bitmap_bound(framebuffer->backbuffer));
+    _bitmap = bitmap_or_result.take_value();
+    _painter = Painter(_bitmap);
 
     return SUCCESS;
 }
 
-Rectangle framebuffer_bound(Framebuffer *framebuffer)
+void Framebuffer::mark_dirty(Rectangle bound)
 {
-    return Rectangle(framebuffer->width, framebuffer->height);
-}
+    bound = _bitmap->bound().clipped_with(bound);
 
-void framebuffer_mark_dirty(Framebuffer *framebuffer, Rectangle bound)
-{
-    if (bitmap_bound(framebuffer->backbuffer).colide_with(bound))
+    if (bound.is_empty())
     {
-        bound = bitmap_bound(framebuffer->backbuffer).clipped_with(bound);
+        return;
+    }
 
-        if (framebuffer->is_dirty)
+    if (_bitmap->bound().colide_with(bound))
+    {
+        if (_is_dirty)
         {
-            framebuffer->dirty_bound = framebuffer->dirty_bound.merged_with(bound);
+            _dirty_bound = _dirty_bound.merged_with(bound);
         }
         else
         {
-            framebuffer->is_dirty = true;
-            framebuffer->dirty_bound = bitmap_bound(framebuffer->backbuffer).clipped_with(bound);
+            _is_dirty = true;
+            _dirty_bound = _bitmap->bound().clipped_with(bound);
         }
     }
 }
 
-void framebuffer_mark_dirty_all(Framebuffer *framebuffer)
+void Framebuffer::mark_dirty_all()
 {
-    framebuffer->is_dirty = true;
-    framebuffer->dirty_bound = bitmap_bound(framebuffer->backbuffer);
+    _is_dirty = true;
+    _dirty_bound = _bitmap->bound();
 }
 
-void framebuffer_blit_region(Framebuffer *framebuffer, Rectangle bound)
+void Framebuffer::blit()
 {
-    if (bound.is_empty())
+    if (_dirty_bound.is_empty())
     {
         return;
     }
 
     IOCallDisplayBlitArgs args;
 
-    args.buffer = (uint32_t *)framebuffer->backbuffer->pixels;
-    args.buffer_width = bitmap_bound(framebuffer->backbuffer).width();
-    args.buffer_height = bitmap_bound(framebuffer->backbuffer).height();
+    args.buffer = (uint32_t *)_bitmap->pixels();
+    args.buffer_width = _bitmap->width();
+    args.buffer_height = _bitmap->height();
 
-    args.blit_x = bound.x();
-    args.blit_y = bound.y();
-    args.blit_width = bound.width();
-    args.blit_height = bound.height();
+    args.blit_x = _dirty_bound.x();
+    args.blit_y = _dirty_bound.y();
+    args.blit_width = _dirty_bound.width();
+    args.blit_height = _dirty_bound.height();
 
-    __plug_handle_call(HANDLE(framebuffer), IOCALL_DISPLAY_BLIT, &args);
+    __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
 
-    if (handle_has_error(HANDLE(framebuffer)))
+    if (handle_has_error(&_handle))
     {
-        handle_printf_error(HANDLE(framebuffer), "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
-    }
-}
-
-void framebuffer_blit_dirty(Framebuffer *framebuffer)
-{
-    if (framebuffer->is_dirty)
-    {
-        framebuffer_blit_region(framebuffer, framebuffer->dirty_bound);
-
-        framebuffer->is_dirty = false;
-    }
-}
-
-void framebuffer_blit(Framebuffer *framebuffer)
-{
-    framebuffer_blit_region(framebuffer, bitmap_bound(framebuffer->backbuffer));
-    framebuffer->is_dirty = false;
-}
-
-void framebuffer_close(Framebuffer *framebuffer)
-{
-    __plug_handle_close(HANDLE(framebuffer));
-
-    if (framebuffer->backbuffer)
-    {
-        bitmap_destroy(framebuffer->backbuffer);
+        handle_printf_error(&_handle, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
     }
 
-    free(framebuffer);
+    _is_dirty = false;
 }

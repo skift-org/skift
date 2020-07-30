@@ -10,8 +10,10 @@ typedef struct
 
     double time;
     Demo *demo;
-    Bitmap *bitmap;
-    Painter *painter;
+
+    RefPtr<Bitmap> bitmap;
+    Painter painter;
+
     Timer *timer;
 } DemoWidget;
 

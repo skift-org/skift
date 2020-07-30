@@ -3,7 +3,7 @@
 
 #include "demo/Demos.h"
 
-static Bitmap *_test_image = nullptr;
+static RefPtr<Bitmap> _test_image = nullptr;
 static int _frame = 0;
 
 void graphics_draw(Painter &painter, Rectangle screen, double time)
@@ -12,7 +12,7 @@ void graphics_draw(Painter &painter, Rectangle screen, double time)
 
     if (_test_image == nullptr)
     {
-        _test_image = bitmap_load_from("/System/skift.png");
+        _test_image = Bitmap::load_from_or_placeholder("/System/skift.png");
     }
 
     for (int x = 0; x < screen.width(); x++)
@@ -31,7 +31,7 @@ void graphics_draw(Painter &painter, Rectangle screen, double time)
         _frame % screen.width(),
         _frame % screen.height());
 
-    painter.blit_bitmap(_test_image, bitmap_bound(_test_image), test_image_bound);
+    painter.blit_bitmap(*_test_image, _test_image->bound(), test_image_bound);
 
     painter.draw_rectangle(Rectangle(75, 75, 100, 100), COLOR_WHITE);
     painter.fill_rectangle(Rectangle(100, 100, 100, 100), ALPHA(COLOR_RED, 0.5));

@@ -30,7 +30,7 @@ Rectangle framebuffer_terminal_cell_bound(int x, int y)
     return {Vec2(x, y) * char_size, char_size};
 }
 
-void framebuffer_terminal_render_cell(Painter &painter, Font *font, int x, int y, TerminalCell cell)
+void framebuffer_terminal_render_cell(Painter &painter, Font &font, int x, int y, TerminalCell cell)
 {
     Rectangle bound = framebuffer_terminal_cell_bound(x, y);
 
@@ -62,34 +62,27 @@ void framebuffer_terminal_render_cell(Painter &painter, Font *font, int x, int y
         return;
     }
 
-    Glyph *glyph = font_glyph(font, cell.codepoint);
+    Glyph &glyph = font.glyph(cell.codepoint);
 
-    if (glyph != nullptr)
+    painter.draw_glyph(
+        font,
+        glyph,
+        bound.position() + Vec2i(0, 12),
+        foreground_color);
+
+    if (attributes.bold)
     {
         painter.draw_glyph(
             font,
             glyph,
-            bound.position() + Vec2i(0, 12),
+            bound.position() + Vec2i(1, 12),
             foreground_color);
-
-        if (attributes.bold)
-        {
-            painter.draw_glyph(
-                font,
-                glyph,
-                bound.position() + Vec2i(1, 12),
-                foreground_color);
-        }
-    }
-    else
-    {
-        painter.draw_rectangle(bound, foreground_color);
     }
 }
 
 void framebuffer_terminal_repaint(Terminal *terminal, FramebufferTerminalRenderer *renderer)
 {
-    Painter &painter = renderer->framebuffer->painter;
+    Painter &painter = renderer->framebuffer->painter();
 
     for (int y = 0; y < terminal->height; y++)
     {
@@ -99,21 +92,21 @@ void framebuffer_terminal_repaint(Terminal *terminal, FramebufferTerminalRendere
 
             if (cell.dirty)
             {
-                framebuffer_terminal_render_cell(painter, renderer->mono_font, x, y, cell);
+                framebuffer_terminal_render_cell(painter, *renderer->mono_font, x, y, cell);
 
-                framebuffer_mark_dirty(renderer->framebuffer, framebuffer_terminal_cell_bound(x, y));
+                renderer->framebuffer->mark_dirty(framebuffer_terminal_cell_bound(x, y));
 
                 terminal_cell_undirty(terminal, x, y);
             }
         }
     }
 
-    framebuffer_blit_dirty(renderer->framebuffer);
+    renderer->framebuffer->blit();
 }
 
 void framebuffer_terminal_render_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, int x, int y, bool visible)
 {
-    Painter &painter = renderer->framebuffer->painter;
+    Painter &painter = renderer->framebuffer->painter();
 
     TerminalCell cell = terminal_cell_at(terminal, x, y);
 
@@ -123,9 +116,9 @@ void framebuffer_terminal_render_cursor(Terminal *terminal, FramebufferTerminalR
         cell.attributes.foreground = TERMINAL_COLOR_YELLOW;
     }
 
-    framebuffer_terminal_render_cell(painter, renderer->mono_font, x, y, cell);
+    framebuffer_terminal_render_cell(painter, *renderer->mono_font, x, y, cell);
 
-    framebuffer_mark_dirty(renderer->framebuffer, framebuffer_terminal_cell_bound(x, y));
+    renderer->framebuffer->mark_dirty(framebuffer_terminal_cell_bound(x, y));
 }
 
 void framebuffer_terminal_on_cursor(Terminal *terminal, FramebufferTerminalRenderer *renderer, TerminalCursor cursor)
@@ -146,28 +139,23 @@ void framebuffer_terminal_on_blink(Terminal *terminal, FramebufferTerminalRender
 
     framebuffer_terminal_render_cursor(terminal, renderer, renderer->framebuffer_cursor.x(), renderer->framebuffer_cursor.y(), renderer->cursor_blink);
 
-    framebuffer_blit_dirty(renderer->framebuffer);
+    renderer->framebuffer->blit();
 }
 
 void framebuffer_terminal_destroy(FramebufferTerminalRenderer *renderer)
 {
-    framebuffer_close(renderer->framebuffer);
-    font_destroy(renderer->mono_font);
+    renderer->framebuffer = nullptr;
+    renderer->mono_font = nullptr;
 }
 
 Terminal *framebuffer_terminal_create(void)
 {
-    Framebuffer *framebuffer = framebuffer_open();
+    auto framebuffer = Framebuffer::open();
 
-    if (handle_has_error(framebuffer))
+    if (!framebuffer.success())
     {
-        framebuffer_close(framebuffer);
-
         return nullptr;
     }
-
-    framebuffer->painter.clear(framebuffer_colors[TERMINAL_COLOR_DEFAULT_BACKGROUND]);
-    framebuffer_blit(framebuffer);
 
     FramebufferTerminalRenderer *renderer = __create(FramebufferTerminalRenderer);
 
@@ -176,8 +164,8 @@ Terminal *framebuffer_terminal_create(void)
     TERMINAL_RENDERER(renderer)->destroy = (TerminalRendererDestroy)framebuffer_terminal_destroy;
     TERMINAL_RENDERER(renderer)->on_blink = (TerminalOnBlinkCallback)framebuffer_terminal_on_blink;
 
-    renderer->framebuffer = framebuffer;
-    renderer->mono_font = font_create("mono");
+    renderer->framebuffer = framebuffer.take_value();
+    renderer->mono_font = Font::create("mono").take_value();
 
-    return terminal_create(framebuffer->width / char_size.x(), framebuffer->height / char_size.y(), TERMINAL_RENDERER(renderer));
+    return terminal_create(renderer->framebuffer->resolution().width() / char_size.x(), renderer->framebuffer->resolution().height() / char_size.y(), TERMINAL_RENDERER(renderer));
 }

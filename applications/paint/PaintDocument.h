@@ -11,8 +11,8 @@ typedef struct PaintDocument
     Color primary_color;
     Color secondary_color;
 
-    Bitmap *bitmap;
-    Painter *painter;
+    RefPtr<Bitmap> bitmap;
+    Painter painter;
 
     struct PaintTool *tool;
 } PaintDocument;

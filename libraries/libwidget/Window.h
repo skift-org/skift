@@ -22,7 +22,7 @@ typedef struct Window
 {
     int handle;
     char *title;
-    Icon *icon;
+    RefPtr<Icon> icon;
     WindowFlag flags;
 
     bool focused;
@@ -39,13 +39,11 @@ typedef struct Window
     Rectangle on_screen_bound;
     CursorState cursor_state;
 
-    Bitmap *frontbuffer;
-    Painter *frontbuffer_painter;
-    int frontbuffer_handle;
+    RefPtr<Bitmap> frontbuffer;
+    Painter frontbuffer_painter;
 
-    Bitmap *backbuffer;
-    Painter *backbuffer_painter;
-    int backbuffer_handle;
+    RefPtr<Bitmap> backbuffer;
+    Painter backbuffer_painter;
 
     List *dirty_rect;
     bool dirty_layout;
@@ -68,7 +66,7 @@ void window_destroy(Window *window);
 
 void window_set_title(Window *window, const char *title);
 
-void window_set_icon(Window *window, Icon *icon);
+void window_set_icon(Window *window, RefPtr<Icon> icon);
 
 void window_set_size(Window *window, Vec2i size);
 

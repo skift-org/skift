@@ -4,11 +4,11 @@
 #include <libsystem/Assert.h>
 #include <libsystem/math/Math.h>
 
-Painter::Painter(Bitmap *bitmap)
+Painter::Painter(RefPtr<Bitmap> bitmap)
 {
     _bitmap = bitmap;
     _clipstack_top = 0;
-    _clipstack[0] = bitmap_bound(bitmap);
+    _clipstack[0] = bitmap->bound();
 }
 
 void Painter::push_clip(Rectangle clip)
@@ -46,7 +46,7 @@ Rectangle Painter::apply_clip(Rectangle rectangle)
     if (_clipstack[_clipstack_top].colide_with(rectangle))
     {
         rectangle = rectangle.clipped_with(_clipstack[_clipstack_top]);
-        rectangle = rectangle.clipped_with(bitmap_bound(_bitmap));
+        rectangle = rectangle.clipped_with(_bitmap->bound());
 
         return rectangle;
     }
@@ -58,6 +58,7 @@ Rectangle Painter::apply_clip(Rectangle rectangle)
 
 Rectangle Painter::apply_transform(Rectangle rectangle)
 {
+
     return rectangle.offset(_originestack[_originestack_top]);
 }
 
@@ -67,11 +68,11 @@ void Painter::plot_pixel(Vec2i position, Color color)
 
     if (_clipstack[_clipstack_top].containe(transformed))
     {
-        bitmap_blend_pixel(_bitmap, transformed, color);
+        _bitmap->blend_pixel(transformed, color);
     }
 }
 
-void Painter::blit_bitmap_fast(Bitmap *bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     Rectangle clipped_destination = apply_transform(destination);
     clipped_destination = apply_clip(clipped_destination);
@@ -88,16 +89,14 @@ void Painter::blit_bitmap_fast(Bitmap *bitmap, Rectangle source, Rectangle desti
         {
             Vec2i position(x, y);
 
-            Color sample = bitmap_get_pixel(
-                bitmap,
-                clipped_source.position() + position);
+            Color sample = bitmap.get_pixel(clipped_source.position() + position);
 
-            bitmap_blend_pixel(_bitmap, clipped_destination.position() + position, sample);
+            _bitmap->blend_pixel(clipped_destination.position() + position, sample);
         }
     }
 }
 
-void Painter::blit_bitmap_scaled(Bitmap *bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     if (destination.is_empty())
         return;
@@ -109,13 +108,13 @@ void Painter::blit_bitmap_scaled(Bitmap *bitmap, Rectangle source, Rectangle des
             float xx = x / (float)destination.width();
             float yy = y / (float)destination.height();
 
-            Color sample = bitmap_sample(bitmap, source, xx, yy);
+            Color sample = bitmap.sample(source, Vec2f(xx, yy));
             plot_pixel(destination.position() + Vec2i(x, y), sample);
         }
     }
 }
 
-__flatten void Painter::blit_bitmap(Bitmap *bitmap, Rectangle source, Rectangle destination)
+__flatten void Painter::blit_bitmap(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     if (destination.is_empty())
         return;
@@ -131,7 +130,7 @@ __flatten void Painter::blit_bitmap(Bitmap *bitmap, Rectangle source, Rectangle 
     }
 }
 
-void Painter::blit_bitmap_fast_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     Rectangle clipped_destination = apply_transform(destination);
     clipped_destination = apply_clip(clipped_destination);
@@ -148,16 +147,16 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap *bitmap, Rectangle source, Rectan
         {
             Vec2i position(x, y);
 
-            Color sample = bitmap_get_pixel(bitmap, clipped_source.position() + position);
+            Color sample = bitmap.get_pixel(clipped_source.position() + position);
 
             sample.A = 255;
 
-            bitmap_set_pixel_no_check(_bitmap, clipped_destination.position() + position, sample);
+            _bitmap->set_pixel_no_check(clipped_destination.position() + position, sample);
         }
     }
 }
 
-void Painter::blit_bitmap_scaled_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     for (int x = 0; x < destination.width(); x++)
     {
@@ -166,13 +165,13 @@ void Painter::blit_bitmap_scaled_no_alpha(Bitmap *bitmap, Rectangle source, Rect
             float xx = x / (float)destination.width();
             float yy = y / (float)destination.height();
 
-            Color sample = bitmap_sample(bitmap, source, xx, yy);
+            Color sample = bitmap.sample(source, Vec2f(xx, yy));
             plot_pixel(destination.position() + Vec2i(x, y), sample);
         }
     }
 }
 
-__flatten void Painter::blit_bitmap_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination)
+__flatten void Painter::blit_bitmap_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
 {
     if (source.width() == destination.width() &&
         source.height() == destination.height())
@@ -187,7 +186,7 @@ __flatten void Painter::blit_bitmap_no_alpha(Bitmap *bitmap, Rectangle source, R
 
 __flatten void Painter::clear(Color color)
 {
-    clear_rectangle(bitmap_bound(_bitmap), color);
+    clear_rectangle(_bitmap->bound(), color);
 }
 
 __flatten void Painter::clear_rectangle(Rectangle rectangle, Color color)
@@ -204,7 +203,7 @@ __flatten void Painter::clear_rectangle(Rectangle rectangle, Color color)
     {
         for (int y = 0; y < rectangle.height(); y++)
         {
-            bitmap_set_pixel_no_check(_bitmap, Vec2i(rectangle.x() + x, rectangle.y() + y), color);
+            _bitmap->set_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y), color);
         }
     }
 }
@@ -223,8 +222,8 @@ __flatten void Painter::fill_rectangle(Rectangle rectangle, Color color)
     {
         for (int y = 0; y < rectangle.height(); y++)
         {
-            bitmap_blend_pixel_no_check(_bitmap, Vec2i(rectangle.x() + x, rectangle.y() + y),
-                                        color);
+            _bitmap->blend_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y),
+                                          color);
         }
     }
 }
@@ -596,18 +595,19 @@ void Painter::draw_rounded_rectangle(Rectangle bound, int radius, int thickness,
     fill_rectangle(bound.cutoff_left_and_right(radius, radius).take_bottom(thickness), color);
 }
 
-__flatten void Painter::blit_icon(Icon *icon, IconSize size, Rectangle destination, Color color)
+__flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destination, Color color)
 {
-    Bitmap *bitmap = icon_get_bitmap(icon, size);
+    Bitmap &bitmap = *icon.bitmap(size);
 
     for (int x = 0; x < destination.width(); x++)
     {
         for (int y = 0; y < destination.height(); y++)
         {
-            double xx = x / (double)destination.width();
-            double yy = y / (double)destination.height();
+            Vec2f sample_point(
+                x / (double)destination.width(),
+                y / (double)destination.height());
 
-            Color sample = bitmap_sample(bitmap, bitmap_bound(bitmap), xx, yy);
+            Color sample = bitmap.sample(sample_point);
 
             Color final = color;
             final.A = sample.A;
@@ -622,68 +622,56 @@ void Painter::blur_rectangle(Rectangle rectangle, int radius)
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
 
-    stackblurJob((unsigned char *)_bitmap->pixels,
-                 _bitmap->width,
-                 _bitmap->height,
+    stackblurJob((unsigned char *)_bitmap->pixels(),
+                 _bitmap->width(),
+                 _bitmap->height(),
                  radius,
                  rectangle.x(), rectangle.x() + rectangle.width(),
                  rectangle.y(), rectangle.y() + rectangle.height());
 }
 
-__flatten void Painter::blit_bitmap_colored(Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color)
+__flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Rectangle source, Rectangle destination, Color color)
 {
-    for (int x = 0; x < dst_rect.width(); x++)
+    for (int x = 0; x < destination.width(); x++)
     {
-        for (int y = 0; y < dst_rect.height(); y++)
+        for (int y = 0; y < destination.height(); y++)
         {
-            double xx = x / (double)dst_rect.width();
-            double yy = y / (double)dst_rect.height();
+            Vec2f sample_point(
+                x / (double)destination.width(),
+                y / (double)destination.height());
 
-            Color sample = bitmap_sample(src, src_rect, xx, yy);
+            Color sample = bitmap.sample(source, sample_point);
 
             Color final = color;
             final.A = (sample.R * color.A) / 255;
 
-            plot_pixel(dst_rect.position() + Vec2i(x, y), final);
+            plot_pixel(destination.position() + Vec2i(x, y), final);
         }
     }
 }
 
-void Painter::draw_glyph(Font *font, Glyph *glyph, Vec2i position, Color color)
+void Painter::draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color)
 {
-    Rectangle dest(position - glyph->origin, glyph->bound.size());
-    blit_bitmap_colored(font->bitmap, glyph->bound, dest, color);
+    Rectangle dest(position - glyph.origin, glyph.bound.size());
+    blit_bitmap_colored(font.bitmap(), glyph.bound, dest, color);
 }
 
-__flatten void Painter::draw_string(Font *font, const char *str, Vec2i position, Color color)
+__flatten void Painter::draw_string(Font &font, const char *str, Vec2i position, Color color)
 {
-    Codepoint codepoint = 0;
-    size_t size = utf8_to_codepoint((const uint8_t *)str, &codepoint);
-    str += size;
-    while (size && codepoint != 0)
-    {
-        Glyph *glyph = font_glyph(font, codepoint);
-
+    codepoint_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto codepoint) {
+        Glyph &glyph = font.glyph(codepoint);
         draw_glyph(font, glyph, position, color);
-        position = position + Vec2i(glyph->advance, 0);
-
-        size_t size = utf8_to_codepoint((const uint8_t *)str, &codepoint);
-        str += size;
-    }
+        position = position + Vec2i(glyph.advance, 0);
+    });
 }
 
-void Painter::draw_string_within(Font *font, const char *str, Rectangle container, Position position, Color color)
+void Painter::draw_string_within(Font &font, const char *str, Rectangle container, Position position, Color color)
 {
-    Rectangle bound = Rectangle(font_measure_string(font, str), 16);
+    Rectangle bound = font.mesure_string(str);
 
     bound = bound.place_within(container, position);
 
-    draw_string(
-
-        font,
-        str,
-        Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4),
-        color);
+    draw_string(font, str, Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4), color);
 }
 
 void Painter::draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color)

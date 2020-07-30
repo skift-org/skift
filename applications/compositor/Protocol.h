@@ -30,7 +30,10 @@ typedef struct
     int id;
 
     int frontbuffer;
+    Vec2i frontbuffer_size;
     int backbuffer;
+    Vec2i backbuffer_size;
+
     Rectangle bound;
 } CompositorCreateWindow;
 
@@ -58,7 +61,10 @@ typedef struct
     int id;
 
     int frontbuffer;
+    Vec2i frontbuffer_size;
     int backbuffer;
+    Vec2i backbuffer_size;
+
     Rectangle bound;
 } CompositorFlipWindow;
 

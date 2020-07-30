@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 
     Window *window = window_create(WINDOW_RESIZABLE);
 
-    window_set_icon(window, icon_get("widgets"));
+    window_set_icon(window, Icon::get("widgets"));
     window_set_title(window, "Widget Factory");
     window_set_size(window, Vec2i(500, 400));
 
@@ -36,9 +36,9 @@ int main(int argc, char **argv)
         button_create_with_text(buttons, BUTTON_TEXT, "BUTTON");
         button_create_with_text(buttons, BUTTON_OUTLINE, "BUTTON");
         button_create_with_text(buttons, BUTTON_FILLED, "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_TEXT, icon_get("widgets"), "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_OUTLINE, icon_get("widgets"), "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_FILLED, icon_get("widgets"), "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_TEXT, Icon::get("widgets"), "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_OUTLINE, Icon::get("widgets"), "BUTTON");
+        button_create_with_icon_and_text(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
     }
 
     label_create(window_root(window), "Grid layout");

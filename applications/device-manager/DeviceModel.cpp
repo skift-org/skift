@@ -1,7 +1,7 @@
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
-#include <libsystem/Logger.h>
 
 #include "device-manager/DeviceModel.h"
 
@@ -30,10 +30,10 @@ static Variant device_model_data(DeviceModel *model, int row, int column)
     switch (column)
     {
     case COLUMN_DEVICE:
-        return vstring(json_string_value(json_object_get(device, "device")));
+        return Variant(json_string_value(json_object_get(device, "device")));
 
     case COLUMN_DESCRIPTION:
-        return vstring(json_string_value(json_object_get(device, "description")));
+        return Variant(json_string_value(json_object_get(device, "description")));
 
     default:
         ASSERT_NOT_REACHED();

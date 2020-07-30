@@ -39,8 +39,8 @@ static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle recta
     painter.clear_rectangle(scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
     painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
 
-    painter.blit_icon(icon_get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
-    painter.blit_icon(icon_get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
+    painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
 }
 
 static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)

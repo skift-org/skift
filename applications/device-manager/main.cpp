@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
     window_initialize((Window *)window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, icon_get("expansion-card-variant"));
+    window_set_icon((Window *)window, Icon::get("expansion-card-variant"));
     window_set_title((Window *)window, "Device Manager");
     window_set_size((Window *)window, Vec2i(700, 500));
 

@@ -60,25 +60,25 @@ void table_render_cell(Table *widget, Painter &painter, int row, int column)
         painter.fill_rectangle(cell_bound, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
     }
 
-    if (data.icon)
+    if (data.has_icon())
     {
         painter.blit_icon(
-            data.icon,
+            *data.icon(),
             ICON_18PX,
             Rectangle(cell_bound.x() + 7, cell_bound.y() + 7, 18, 18),
             widget_get_color(widget, THEME_FOREGROUND));
 
         painter.draw_string(
-            widget_font(),
-            data.as_string,
+            *widget_font(),
+            data.as_string(),
             Vec2i(cell_bound.x() + 7 + 18 + 7, cell_bound.y() + 20),
             widget_get_color(widget, THEME_FOREGROUND));
     }
     else
     {
         painter.draw_string(
-            widget_font(),
-            data.as_string,
+            *widget_font(),
+            data.as_string(),
             Vec2i(cell_bound.x() + 7, cell_bound.y() + 20),
             widget_get_color(widget, THEME_FOREGROUND));
     }
@@ -144,8 +144,8 @@ void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
         }
         painter.fill_rectangle(header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
 
-        painter.draw_string(widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
-        painter.draw_string(widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter.draw_string(*widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter.draw_string(*widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
     }
 
     painter.pop_clip();

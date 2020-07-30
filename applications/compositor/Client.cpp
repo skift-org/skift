@@ -17,34 +17,17 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
         return;
     }
 
-    size_t size;
-    Bitmap *frontbuffer = nullptr;
-    int frontbuffer_handle = create_window.frontbuffer;
-    Result frontbuffer_result = shared_memory_include(frontbuffer_handle, (uintptr_t *)&frontbuffer, &size);
+    auto frontbuffer = Bitmap::create_shared_from_handle(create_window.frontbuffer, create_window.backbuffer_size);
 
-    if (frontbuffer_result != SUCCESS)
+    if (!frontbuffer.success())
     {
-        logger_error(
-            "Failled to include shared memory object %d has a front buffer: %s",
-            frontbuffer_handle,
-            result_to_string(frontbuffer_result));
-
         return;
     }
 
-    Bitmap *backbuffer = nullptr;
-    int backbuffer_handle = create_window.backbuffer;
-    Result backbuffer_result = shared_memory_include(backbuffer_handle, (uintptr_t *)&backbuffer, &size);
+    auto backbuffer = Bitmap::create_shared_from_handle(create_window.backbuffer, create_window.backbuffer_size);
 
-    if (backbuffer_result != SUCCESS)
+    if (!backbuffer.success())
     {
-        logger_error(
-            "Failled to include shared memory object %d has a front buffer: %s",
-            backbuffer_handle,
-            result_to_string(backbuffer_result));
-
-        shared_memory_free((uintptr_t)frontbuffer);
-
         return;
     }
 
@@ -52,12 +35,8 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
         create_window.id,
         client,
         create_window.bound,
-
-        frontbuffer,
-        frontbuffer_handle,
-
-        backbuffer,
-        backbuffer_handle);
+        frontbuffer.take_value(),
+        backbuffer.take_value());
 }
 
 void client_handle_destroy_window(Client *client, CompositorDestroyWindow destroy_window)
@@ -69,11 +48,6 @@ void client_handle_destroy_window(Client *client, CompositorDestroyWindow destro
         logger_warn("Invalid window id %d for client %08x", destroy_window.id, client);
         return;
     }
-
-    shared_memory_free((uintptr_t)window->frontbuffer);
-    window->frontbuffer = nullptr;
-    shared_memory_free((uintptr_t)window->backbuffer);
-    window->backbuffer = nullptr;
 
     window_destroy(window);
 }
@@ -114,49 +88,34 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         return;
     }
 
-    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
-    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
+    swap(window->frontbuffer, window->backbuffer);
 
-    if (window->frontbuffer_handle != flip_window.frontbuffer)
+    if (window->frontbuffer->handle() != flip_window.frontbuffer)
     {
-        Bitmap *new_frontbuffer = nullptr;
 
-        size_t size;
-        if (shared_memory_include(
-                flip_window.frontbuffer,
-                (uintptr_t *)&new_frontbuffer,
-                &size) == SUCCESS)
-        {
-            shared_memory_free((uintptr_t)window->frontbuffer);
+        auto new_frontbuffer = Bitmap::create_shared_from_handle(flip_window.frontbuffer, flip_window.frontbuffer_size);
 
-            window->frontbuffer = new_frontbuffer;
-            window->frontbuffer_handle = flip_window.frontbuffer;
-        }
-        else
+        if (!new_frontbuffer.success())
         {
             logger_error("Client application gave us a jankie shared memory object id");
+            return;
         }
+
+        window->frontbuffer = new_frontbuffer.take_value();
     }
 
-    if (window->backbuffer_handle != flip_window.backbuffer)
+    if (window->backbuffer->handle() != flip_window.backbuffer)
     {
-        Bitmap *new_backbuffer = nullptr;
 
-        size_t size;
-        if (shared_memory_include(
-                flip_window.backbuffer,
-                (uintptr_t *)&new_backbuffer,
-                &size) == SUCCESS)
-        {
-            shared_memory_free((uintptr_t)window->backbuffer);
+        auto new_backbuffer = Bitmap::create_shared_from_handle(flip_window.backbuffer, flip_window.backbuffer_size);
 
-            window->backbuffer = new_backbuffer;
-            window->backbuffer_handle = flip_window.backbuffer;
-        }
-        else
+        if (!new_backbuffer.success())
         {
             logger_error("Client application gave us a jankie shared memory object id");
+            return;
         }
+
+        window->backbuffer = new_backbuffer.take_value();
     }
 
     renderer_region_dirty(flip_window.bound.offset(window->bound.position()));

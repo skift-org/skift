@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
+#include <libsystem/utils/String.h>
 
 #define ICON_SIZE_LIST(__ENTRY) \
     __ENTRY(18)                 \
@@ -14,14 +15,24 @@ typedef enum
     ICON_SIZE_LIST(ICON_SIZE_ENUM_ENTRY) __ICON_SIZE_COUNT,
 } IconSize;
 
-typedef struct
+class Icon : public RefCounted<Icon>
 {
-    char *name;
-    Bitmap *sizes[__ICON_SIZE_COUNT];
-} Icon;
+private:
+    String _name;
+    RefPtr<Bitmap> _bitmaps[__ICON_SIZE_COUNT] = {};
 
-Icon *icon_get(const char *name);
+public:
+    static RefPtr<Icon> get(String name);
 
-Rectangle icon_bound(Icon *icon, IconSize size);
+    String &name() { return _name; }
 
-Bitmap *icon_get_bitmap(Icon *icon, IconSize size);
+    Icon(String name);
+
+    ~Icon();
+
+    Rectangle bound(IconSize size);
+
+    RefPtr<Bitmap> bitmap(IconSize size);
+
+    void set_bitmap(IconSize size, RefPtr<Bitmap> bitmap);
+};

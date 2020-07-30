@@ -16,7 +16,7 @@ Widget *toolbar_create(Widget *parent)
     return toolbar;
 }
 
-Widget *toolbar_icon_create(Widget *parent, Icon *icon)
+Widget *toolbar_icon_create(Widget *parent, RefPtr<Icon> icon)
 {
     Widget *toolbar_icon = button_create(parent, BUTTON_TEXT);
     toolbar_icon->layout = STACK();
@@ -27,7 +27,7 @@ Widget *toolbar_icon_create(Widget *parent, Icon *icon)
     return toolbar_icon;
 }
 
-Widget *toolbar_icon_with_text_create(Widget *parent, Icon *icon, const char *text)
+Widget *toolbar_icon_with_text_create(Widget *parent, RefPtr<Icon> icon, const char *text)
 {
     Widget *toolbar_icon = button_create(parent, BUTTON_OUTLINE);
 

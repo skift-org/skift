@@ -90,7 +90,7 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     return WIDGET(widget);
 }
 
-Widget *button_create_with_icon(Widget *parent, ButtonStyle style, Icon *icon)
+Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 {
     Widget *button = button_create(parent, style);
 
@@ -114,7 +114,7 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
     return button;
 }
 
-Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, Icon *icon, const char *text)
+Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
 {
     Widget *button = button_create(parent, style);
     button->insets = Insets(0, 0, 6, 10);

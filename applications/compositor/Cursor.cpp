@@ -14,7 +14,7 @@ static MouseButton _mouse_buttons;
 static Vec2i _mouse_old_position;
 static MouseButton _mouse_old_buttons;
 
-static Bitmap *_cursor_bitmaps[__CURSOR_COUNT] = {};
+static RefPtr<Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
 
 static uint _last_click = 0;
 
@@ -34,7 +34,7 @@ void cursor_initialize(void)
 
     for (size_t i = 0; i < __CURSOR_COUNT; i++)
     {
-        _cursor_bitmaps[i] = bitmap_load_from(cursor_paths[i]);
+        _cursor_bitmaps[i] = Bitmap::load_from_or_placeholder(cursor_paths[i]);
     }
 }
 
@@ -126,9 +126,9 @@ CursorState cursor_get_state(void)
 
 void cursor_render(Painter &painter)
 {
-    Bitmap *cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
+    auto cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 
-    painter.blit_bitmap(cursor_bitmap, bitmap_bound(cursor_bitmap), cursor_bound());
+    painter.blit_bitmap(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
 }
 
 Rectangle cursor_bound_from_position(Vec2i position)

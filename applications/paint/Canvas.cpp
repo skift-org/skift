@@ -5,8 +5,7 @@
 
 Rectangle canvas_bound(Canvas *widget)
 {
-    Rectangle bound = bitmap_bound(widget->document->bitmap);
-    bound = bound.offset(widget_get_bound(widget).position());
+    Rectangle bound = widget->document->bitmap->bound();
     bound = bound.centered_within(widget_get_bound(widget));
     return bound;
 }
@@ -21,8 +20,8 @@ void canvas_paint(Canvas *widget, Painter &painter, Rectangle rectangle)
     painter.draw_rectangle(destination, widget_get_color(widget, THEME_BORDER));
 
     painter.blit_bitmap(
-        widget->document->bitmap,
-        bitmap_bound(widget->document->bitmap), destination);
+        *widget->document->bitmap,
+        widget->document->bitmap->bound(), destination);
 }
 
 void canvas_event(Canvas *widget, Event *event)

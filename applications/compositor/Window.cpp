@@ -12,10 +12,8 @@ Window *window_create(
     int id,
     struct Client *client,
     Rectangle bound,
-    Bitmap *frontbuffer,
-    int frontbuffer_handle,
-    Bitmap *backbuffer,
-    int backbuffer_handle)
+    RefPtr<Bitmap> frontbuffer,
+    RefPtr<Bitmap> backbuffer)
 {
     Window *window = __create(Window);
 
@@ -24,10 +22,7 @@ Window *window_create(
     window->bound = bound;
 
     window->frontbuffer = frontbuffer;
-    window->frontbuffer_handle = frontbuffer_handle;
-
     window->backbuffer = backbuffer;
-    window->backbuffer_handle = backbuffer_handle;
 
     manager_register_window(window);
 
@@ -37,6 +32,9 @@ Window *window_create(
 void window_destroy(Window *window)
 {
     manager_unregister_window(window);
+
+    window->frontbuffer = nullptr;
+    window->backbuffer = nullptr;
 
     free(window);
 }

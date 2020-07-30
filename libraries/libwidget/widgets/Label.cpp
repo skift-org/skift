@@ -8,7 +8,7 @@ void label_paint(Label *label, Painter &painter, Rectangle rectangle)
     __unused(rectangle);
 
     painter.draw_string_within(
-        widget_font(),
+        *widget_font(),
         label->text,
         widget_get_bound(label),
         Position::CENTER,
@@ -17,7 +17,7 @@ void label_paint(Label *label, Painter &painter, Rectangle rectangle)
 
 Vec2i label_size(Label *label)
 {
-    return Vec2i(font_measure_string(widget_font(), label->text), 16);
+    return widget_font()->mesure_string(label->text).size();
 }
 
 void label_set_text(Widget *label, const char *text)

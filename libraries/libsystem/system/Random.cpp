@@ -1,3 +1,4 @@
+#include <abi/Paths.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/system/Random.h>
 
@@ -5,7 +6,7 @@ Random random_create(void)
 {
     Random random = {};
 
-    Stream *random_device = stream_open("/dev/random", OPEN_READ);
+    Stream *random_device = stream_open(UNIX_DEVICE_PATH("random"), OPEN_READ);
 
     stream_read(random_device, &random, sizeof(Random));
 

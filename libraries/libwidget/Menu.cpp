@@ -5,12 +5,12 @@
 
 struct Menu
 {
-    Icon *icon;
+    RefPtr<Icon> icon;
     char *text;
     List *items;
 };
 
-Menu *menu_create(Menu *parent, Icon *icon, const char *text)
+Menu *menu_create(Menu *parent, RefPtr<Icon> icon, const char *text)
 {
     Menu *menu = __create(Menu);
 

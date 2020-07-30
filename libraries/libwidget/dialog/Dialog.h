@@ -11,7 +11,7 @@
 typedef unsigned DialogButton;
 
 DialogButton dialog_message(
-    Icon *icon,
+    RefPtr<Icon> icon,
     const char *title,
     const char *message,
     DialogButton buttons);

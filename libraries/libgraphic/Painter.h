@@ -11,7 +11,7 @@
 class Painter
 {
 private:
-    Bitmap *_bitmap;
+    RefPtr<Bitmap> _bitmap;
 
     int _clipstack_top = 0;
     Rectangle _clipstack[CLIPSTACK_SIZE] = {};
@@ -23,13 +23,13 @@ private:
 
     Rectangle apply_transform(Rectangle rectangle);
 
-    void blit_bitmap_fast(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
-    void blit_bitmap_scaled(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
-    void blit_bitmap_fast_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
-    void blit_bitmap_scaled_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
     void draw_line_x_aligned(int x, int start, int end, Color color);
 
@@ -37,12 +37,12 @@ private:
 
     void draw_line_not_aligned(Vec2i a, Vec2i b, Color color);
 
-    void blit_bitmap_colored(Bitmap *src, Rectangle src_rect, Rectangle dst_rect, Color color);
+    void blit_bitmap_colored(Bitmap &src, Rectangle src_rect, Rectangle dst_rect, Color color);
 
     void draw_circle_helper(Rectangle bound, Vec2i center, int radius, int thickness, Color color);
 
 public:
-    Painter(Bitmap *bitmap);
+    Painter(RefPtr<Bitmap> bitmap);
 
     void push_clip(Rectangle clip);
 
@@ -54,11 +54,11 @@ public:
 
     void plot_pixel(Vec2i position, Color color);
 
-    void blit_bitmap(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
-    void blit_bitmap_no_alpha(Bitmap *bitmap, Rectangle source, Rectangle destination);
+    void blit_bitmap_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination);
 
-    void blit_icon(Icon *icon, IconSize size, Rectangle destination, Color color);
+    void blit_icon(Icon &icon, IconSize size, Rectangle destination, Color color);
 
     void clear(Color color);
 
@@ -86,11 +86,11 @@ public:
 
     void blur_rectangle(Rectangle rectangle, int radius);
 
-    void draw_glyph(Font *font, Glyph *glyph, Vec2i position, Color color);
+    void draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color);
 
-    void draw_string(Font *font, const char *str, Vec2i position, Color color);
+    void draw_string(Font &font, const char *str, Vec2i position, Color color);
 
-    void draw_string_within(Font *font, const char *str, Rectangle container, Position position, Color color);
+    void draw_string_within(Font &font, const char *str, Rectangle container, Position position, Color color);
 
     void draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color);
 

@@ -69,7 +69,8 @@ void backtrace(uint32_t ebp)
 
     for (unsigned int frame = 0; stackframe; ++frame)
     {
-        logger_debug(" at 0x%08x", stackframe->eip);
+        stream_format(log_stream, "%08x\n", stackframe->eip);
+        //logger_debug(" at 0x%08x", stackframe->eip);
         stackframe = stackframe->ebp;
     }
 }

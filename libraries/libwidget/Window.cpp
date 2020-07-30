@@ -44,14 +44,14 @@ void window_populate_header(Window *window)
 
     if (window->flags & WINDOW_RESIZABLE)
     {
-        Widget *button_minimize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-minimize"));
+        Widget *button_minimize = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-minimize"));
         button_minimize->insets = Insets(3);
 
-        Widget *button_maximize = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-maximize"));
+        Widget *button_maximize = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
         button_maximize->insets = Insets(3);
     }
 
-    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, icon_get("window-close"));
+    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets = Insets(3);
 
     widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(nullptr, close_button_click));
@@ -62,21 +62,17 @@ void window_initialize(Window *window, WindowFlag flags)
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
     window->title = strdup("Window");
-    window->icon = icon_get("application");
+    window->icon = Icon::get("application");
     window->flags = flags;
 
     window->focused = false;
     window->cursor_state = CURSOR_DEFAULT;
 
-    window->frontbuffer = bitmap_create(250, 250);
-    window->frontbuffer_painter = new Painter(window->frontbuffer);
+    window->frontbuffer = Bitmap::create_shared(250, 250).take_value();
+    window->frontbuffer_painter = Painter(window->frontbuffer);
 
-    shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
-
-    window->backbuffer = bitmap_create(250, 250);
-    window->backbuffer_painter = new Painter(window->backbuffer);
-
-    shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
+    window->backbuffer = Bitmap::create_shared(250, 250).take_value();
+    window->backbuffer_painter = Painter(window->backbuffer);
 
     window->on_screen_bound = Rectangle(250, 250);
     window->dirty_rect = list_create();
@@ -117,11 +113,11 @@ void window_destroy(Window *window)
     widget_destroy(window->root_container);
     widget_destroy(window->header_container);
 
-    delete window->frontbuffer_painter;
-    bitmap_destroy(window->frontbuffer);
+    window->frontbuffer_painter.~Painter();
+    window->frontbuffer = nullptr;
 
-    delete window->backbuffer_painter;
-    bitmap_destroy(window->backbuffer);
+    window->backbuffer_painter.~Painter();
+    window->backbuffer = nullptr;
 
     list_destroy_with_callback(window->dirty_rect, free);
 
@@ -145,7 +141,7 @@ void window_set_title(Window *window, const char *title)
     }
 }
 
-void window_set_icon(Window *window, Icon *icon)
+void window_set_icon(Window *window, RefPtr<Icon> icon)
 {
     if (icon)
     {
@@ -166,23 +162,15 @@ void window_set_position(Window *window, Vec2i position)
 
 static void window_change_framebuffer_if_needed(Window *window)
 {
-    if (window_bound(window).width() > bitmap_bound(window->frontbuffer).width() ||
-        window_bound(window).height() > bitmap_bound(window->frontbuffer).height() ||
-        window_bound(window).area() < bitmap_bound(window->frontbuffer).area() * 0.75)
+    if (window_bound(window).width() > window->frontbuffer->width() ||
+        window_bound(window).height() > window->frontbuffer->height() ||
+        window_bound(window).area() < window->frontbuffer->bound().area() * 0.75)
     {
-        delete window->frontbuffer_painter;
-        bitmap_destroy(window->frontbuffer);
+        window->frontbuffer = Bitmap::create_shared(window_bound(window).width(), window_bound(window).height()).take_value();
+        window->frontbuffer_painter = Painter(window->frontbuffer);
 
-        delete window->backbuffer_painter;
-        bitmap_destroy(window->backbuffer);
-
-        window->frontbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
-        window->frontbuffer_painter = new Painter(window->frontbuffer);
-        shared_memory_get_handle((uintptr_t)window->frontbuffer, &window->frontbuffer_handle);
-
-        window->backbuffer = bitmap_create(window_bound(window).width(), window_bound(window).height());
-        window->backbuffer_painter = new Painter(window->backbuffer);
-        shared_memory_get_handle((uintptr_t)window->backbuffer, &window->backbuffer_handle);
+        window->backbuffer = Bitmap::create_shared(window_bound(window).width(), window_bound(window).height()).take_value();
+        window->backbuffer_painter = Painter(window->backbuffer);
     }
 }
 
@@ -711,12 +699,12 @@ int window_handle(Window *window)
 
 int window_frontbuffer_handle(Window *window)
 {
-    return window->frontbuffer_handle;
+    return window->frontbuffer->handle();
 }
 
 int window_backbuffer_handle(Window *window)
 {
-    return window->backbuffer_handle;
+    return window->backbuffer->handle();
 }
 
 Widget *window_header(Window *window)
@@ -735,7 +723,7 @@ void window_update(Window *window)
 
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
-        window_paint(window, *window->backbuffer_painter, *rectangle);
+        window_paint(window, window->backbuffer_painter, *rectangle);
 
         if (repaited_regions.is_empty())
         {
@@ -749,11 +737,10 @@ void window_update(Window *window)
 
     list_clear_with_callback(window->dirty_rect, free);
 
-    bitmap_copy(window->backbuffer, window->frontbuffer, repaited_regions);
+    window->frontbuffer->copy_from(*window->backbuffer, repaited_regions);
 
-    __swap(Bitmap *, window->frontbuffer, window->backbuffer);
-    __swap(Painter *, window->frontbuffer_painter, window->backbuffer_painter);
-    __swap(int, window->frontbuffer_handle, window->backbuffer_handle);
+    swap(window->frontbuffer, window->backbuffer);
+    swap(window->frontbuffer_painter, window->backbuffer_painter);
 
     application_flip_window(window, repaited_regions);
 }

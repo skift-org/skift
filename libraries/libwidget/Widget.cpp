@@ -1,3 +1,4 @@
+#include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
@@ -9,12 +10,12 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
-static Font *_widget_font = nullptr;
-Font *widget_font(void)
+static RefPtr<Font> _widget_font = nullptr;
+RefPtr<Font> widget_font(void)
 {
     if (_widget_font == nullptr)
     {
-        _widget_font = font_create("sans");
+        _widget_font = Font::create("sans").take_value();
     }
 
     return _widget_font;

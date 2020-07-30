@@ -29,13 +29,13 @@ static ThemeColorRole terminal_color_to_role[__TERMINAL_COLOR_COUNT] = {
     [TERMINAL_COLOR_DEFAULT_BACKGROUND] = THEME_ANSI_BACKGROUND,
 };
 
-Font *get_terminal_font(void)
+RefPtr<Font> get_terminal_font(void)
 {
-    static Font *font = nullptr;
+    static RefPtr<Font> font = nullptr;
 
     if (font == nullptr)
     {
-        font = font_create("mono");
+        font = Font::create("mono").take_value();
     }
 
     return font;
@@ -75,28 +75,21 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter &paint
         return;
     }
 
-    Glyph *glyph = font_glyph(get_terminal_font(), codepoint);
+    Glyph &glyph = get_terminal_font()->glyph(codepoint);
 
-    if (glyph != nullptr)
+    painter.draw_glyph(
+        *get_terminal_font(),
+        glyph,
+        bound.position() + Vec2i(0, 12),
+        foreground);
+
+    if (attributes.bold)
     {
         painter.draw_glyph(
-            get_terminal_font(),
+            *get_terminal_font(),
             glyph,
-            bound.position() + Vec2i(0, 12),
+            bound.position() + Vec2i(1, 12),
             foreground);
-
-        if (attributes.bold)
-        {
-            painter.draw_glyph(
-                get_terminal_font(),
-                glyph,
-                bound.position() + Vec2i(1, 12),
-                foreground);
-        }
-    }
-    else
-    {
-        painter.draw_rectangle(bound, foreground);
     }
 }
 

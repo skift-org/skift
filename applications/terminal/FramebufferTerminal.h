@@ -7,9 +7,9 @@ typedef struct
 {
     TerminalRenderer renderer;
 
-    Font *mono_font;
+    RefPtr<Font> mono_font;
     Vec2i framebuffer_cursor;
-    Framebuffer *framebuffer;
+    OwnPtr<Framebuffer> framebuffer;
     bool cursor_blink;
 } FramebufferTerminalRenderer;
 

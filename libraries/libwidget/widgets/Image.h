@@ -13,7 +13,7 @@ typedef struct
     Widget widget;
 
     ImageSizeMode size_mode;
-    Bitmap *bitmap;
+    RefPtr<Bitmap> bitmap;
 } Image;
 
 void image_set_image(Widget *image, const char *path);

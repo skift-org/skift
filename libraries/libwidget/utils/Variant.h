@@ -4,36 +4,50 @@
 
 #define VARIANT_STRING_SIZE 128
 
-typedef enum
+enum VarianType
 {
-    VARIANT_INT,
-    VARIANT_FLOAT,
-    VARIANT_STRING,
-} VarianType;
+    INT,
+    FLOAT,
+    STRING,
+};
 
-typedef struct
+class Variant
 {
-    VarianType type;
+private:
+    VarianType _type;
 
-    Icon *icon;
+    RefPtr<Icon> _icon = nullptr;
+    int _as_int;
+    float _as_float;
+    char _as_string[VARIANT_STRING_SIZE];
 
-    union
+public:
+    bool has_icon()
     {
-        int as_int;
-        float as_float;
-    };
+        return _icon != nullptr;
+    }
 
-    char as_string[VARIANT_STRING_SIZE];
-} Variant;
+    RefPtr<Icon> icon() { return _icon; }
 
-Variant vint(int value);
+    VarianType type() { return _type; }
 
-Variant vfloat(float value);
+    int as_int() { return _as_int; }
 
-Variant vstring(const char *value);
+    float as_float() { return _as_float; }
 
-Variant vstringf(const char *fmt, ...);
+    const char *as_string() { return _as_string; }
 
-Variant variant_with_icon(Variant variant, Icon *icon);
+    Variant(int value);
+
+    Variant(float value);
+
+    Variant(const char *fmt, ...);
+
+    Variant with_icon(RefPtr<Icon> icon)
+    {
+        _icon = icon;
+        return *this;
+    }
+};
 
 int variant_cmp(Variant left, Variant right);

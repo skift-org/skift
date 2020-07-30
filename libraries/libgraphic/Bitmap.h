@@ -5,94 +5,146 @@
 #include <libsystem/Result.h>
 #include <libsystem/math/Math.h>
 
-typedef enum
+#include <libsystem/utils/RefPtr.h>
+#include <libsystem/utils/ResultOr.h>
+
+enum BitmapStorage
+{
+    BITMAP_SHARED,
+    BITMAP_STATIC,
+    BITMAP_MALLOC,
+};
+
+enum BitmapFiltering
 {
     BITMAP_FILTERING_NEAREST,
     BITMAP_FILTERING_LINEAR,
-} BitmapFiltering;
+};
 
-typedef struct
+class Bitmap : public RefCounted<Bitmap>
 {
-    int width;
-    int height;
-    BitmapFiltering filtering;
+private:
+    int _handle;
+    BitmapStorage _storage;
+    int _width;
+    int _height;
+    BitmapFiltering _filtering;
+    Color *_pixels;
 
-    Color pixels[];
-} Bitmap;
+    __noncopyable(Bitmap);
+    __nonmovable(Bitmap);
 
-Bitmap *bitmap_create(size_t width, size_t height);
-
-void bitmap_destroy(Bitmap *bitmap);
-
-Rectangle bitmap_bound(Bitmap *bitmap);
-
-Bitmap *bitmap_load_from(const char *path);
-
-Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap);
-
-Result bitmap_save_to(Bitmap *bitmap, const char *path);
-
-static inline void bitmap_set_pixel(Bitmap *bitmap, Vec2i p, Color color)
-{
-    if (bitmap_bound(bitmap).containe(p))
-        bitmap->pixels[(int)(p.x() + p.y() * bitmap->width)] = color;
-}
-
-static inline void bitmap_set_pixel_no_check(Bitmap *bitmap, Vec2i position, Color color)
-{
-    bitmap->pixels[(int)(position.x() + position.y() * bitmap->width)] = color;
-}
-
-static inline Color bitmap_get_pixel(Bitmap *bitmap, Vec2i position)
-{
-    int xi = abs(position.x() % bitmap->width);
-    int yi = abs(position.y() % bitmap->height);
-
-    return bitmap->pixels[xi + yi * bitmap->width];
-}
-
-static inline Color bitmap_get_pixel_no_check(Bitmap *bitmap, Vec2i position)
-{
-    return bitmap->pixels[position.x() + position.y() * bitmap->width];
-}
-
-static inline Color bitmap_sample(Bitmap *bitmap, Rectangle src_rect, double x, double y)
-{
-    Color result;
-
-    double xx = src_rect.width() * x;
-    double yy = src_rect.height() * y;
-
-    int xxi = (int)xx;
-    int yyi = (int)yy;
-
-    if (bitmap->filtering == BITMAP_FILTERING_NEAREST)
+public:
+    Bitmap(int handle, BitmapStorage storage, int width, int height, Color *pixels)
+        : _handle(handle),
+          _storage(storage),
+          _width(width),
+          _height(height),
+          _filtering(BITMAP_FILTERING_LINEAR),
+          _pixels(pixels)
     {
-        result = bitmap_get_pixel(bitmap, Vec2i(src_rect.x() + xxi, src_rect.y() + yyi));
-    }
-    else
-    {
-        Color c00 = bitmap_get_pixel(bitmap, Vec2i(src_rect.x() + xxi, src_rect.y() + yyi));
-        Color c10 = bitmap_get_pixel(bitmap, Vec2i(src_rect.x() + xxi + 1, src_rect.y() + yyi));
-        Color c01 = bitmap_get_pixel(bitmap, Vec2i(src_rect.x() + xxi, src_rect.y() + yyi + 1));
-        Color c11 = bitmap_get_pixel(bitmap, Vec2i(src_rect.x() + xxi + 1, src_rect.y() + yyi + 1));
-
-        result = color_blerp(c00, c10, c01, c11, xx - xxi, yy - yyi);
     }
 
-    return result;
-}
+    ~Bitmap();
 
-static inline void bitmap_blend_pixel(Bitmap *bitmap, Vec2i p, Color color)
-{
-    Color bg = bitmap_get_pixel(bitmap, p);
-    bitmap_set_pixel(bitmap, p, color_blend(color, bg));
-}
+    Color *pixels()
+    {
+        return _pixels;
+    }
 
-static inline void bitmap_blend_pixel_no_check(Bitmap *bitmap, Vec2i p, Color color)
-{
-    Color bg = bitmap_get_pixel_no_check(bitmap, p);
-    bitmap_set_pixel_no_check(bitmap, p, color_blend(color, bg));
-}
+    int handle() { return _handle; }
+    int width() { return _width; }
+    int height() { return _height; }
+    Vec2i size() { return Vec2i(_width, _height); }
+    Rectangle bound() { return Rectangle(_width, _height); }
 
-void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region);
+    static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
+
+    static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Vec2i width_and_height);
+
+    static RefPtr<Bitmap> create_static(int width, int height, Color *pixels);
+
+    static ResultOr<RefPtr<Bitmap>> load_from(const char *path);
+
+    static RefPtr<Bitmap> load_from_or_placeholder(const char *path);
+
+    Result save_to(const char *path);
+
+    void set_pixel(Vec2i position, Color color)
+    {
+        if (bound().containe(position))
+            _pixels[(int)(position.x() + position.y() * width())] = color;
+    }
+
+    void set_pixel_no_check(Vec2i position, Color color)
+    {
+        _pixels[(int)(position.x() + position.y() * width())] = color;
+    }
+
+    void blend_pixel(Vec2i position, Color color)
+    {
+        Color background = get_pixel(position);
+        set_pixel(position, color_blend(color, background));
+    }
+
+    void blend_pixel_no_check(Vec2i position, Color color)
+    {
+        Color background = get_pixel_no_check(position);
+        set_pixel_no_check(position, color_blend(color, background));
+    }
+
+    Color get_pixel(Vec2i position)
+    {
+        if (bound().containe(position))
+            return _pixels[position.y() * width() + position.x()];
+        else
+            return COLOR_BLACK;
+    }
+
+    Color get_pixel_no_check(Vec2i position)
+    {
+        return _pixels[position.y() * width() + position.x()];
+    }
+
+    __flatten Color sample(Vec2f position)
+    {
+        return sample(bound(), position);
+    }
+
+    __flatten Color sample(Rectangle source, Vec2f position)
+    {
+        Vec2i sample_position = source.position() + (source.size() * position);
+
+        if (_filtering == BITMAP_FILTERING_NEAREST)
+        {
+            return get_pixel(source.position() + sample_position);
+        }
+
+        Color c00 = get_pixel(sample_position + Vec2i(0, 0));
+        Color c10 = get_pixel(sample_position + Vec2i(1, 0));
+        Color c01 = get_pixel(sample_position + Vec2i(0, 1));
+        Color c11 = get_pixel(sample_position + Vec2i(1, 1));
+
+        double xx = source.width() * position.x();
+        double yy = source.height() * position.y();
+
+        return color_blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
+    }
+
+    __flatten void copy_from(Bitmap &source, Rectangle region)
+    {
+        region = region.clipped_with(source.bound());
+        region = region.clipped_with(bound());
+
+        if (region.is_empty())
+            return;
+
+        for (int y = region.y(); y < region.y() + region.height(); y++)
+        {
+            for (int x = region.x(); x < region.x() + region.width(); x++)
+            {
+                set_pixel_no_check(Vec2i(x, y), source.get_pixel_no_check(Vec2i(x, y)));
+            }
+        }
+    }
+};

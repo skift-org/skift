@@ -6,17 +6,17 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static Framebuffer *_framebuffer;
-static Bitmap *_wallpaper;
+static OwnPtr<Framebuffer> _framebuffer;
+static RefPtr<Bitmap> _wallpaper;
 
 static Vector<Rectangle> _dirty_regions;
 
 void renderer_initialize(void)
 {
-    _framebuffer = framebuffer_open();
-    _wallpaper = bitmap_load_from("/System/Wallpapers/mountains.png");
+    _framebuffer = Framebuffer::open().take_value();
+    _wallpaper = Bitmap::load_from_or_placeholder("/System/Wallpapers/mountains.png");
 
-    renderer_region_dirty(framebuffer_bound(_framebuffer));
+    renderer_region_dirty(_framebuffer->resolution());
 }
 
 void renderer_region_dirty(Rectangle new_region)
@@ -45,7 +45,7 @@ void renderer_region_dirty(Rectangle new_region)
 
 void renderer_region(Rectangle region)
 {
-    _framebuffer->painter.blit_bitmap_no_alpha(_wallpaper, region, region);
+    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
 
     list_foreach_reversed(Window, window, manager_get_windows())
     {
@@ -57,16 +57,16 @@ void renderer_region(Rectangle region)
                 destination.position() - window_bound(window).position(),
                 destination.size());
 
-            _framebuffer->painter.blit_bitmap_no_alpha(window->frontbuffer, source, destination);
+            _framebuffer->painter().blit_bitmap_no_alpha(*window->frontbuffer, source, destination);
         }
     }
 
-    framebuffer_mark_dirty(_framebuffer, region);
+    _framebuffer->mark_dirty(region);
 }
 
 Rectangle renderer_bound(void)
 {
-    return framebuffer_bound(_framebuffer);
+    return _framebuffer->resolution();
 }
 
 void renderer_repaint_dirty(void)
@@ -78,19 +78,19 @@ void renderer_repaint_dirty(void)
         {
             renderer_region(cursor_bound());
 
-            cursor_render(_framebuffer->painter);
+            cursor_render(_framebuffer->painter());
         }
 
         return Iteration::CONTINUE;
     });
 
-    framebuffer_blit_dirty(_framebuffer);
+    _framebuffer->blit();
 
     _dirty_regions.clear();
 }
 
 void renderer_set_resolution(int width, int height)
 {
-    framebuffer_set_mode(_framebuffer, width, height);
+    _framebuffer->set_resolution(Vec2i(width, height));
     renderer_region_dirty(renderer_bound());
 }

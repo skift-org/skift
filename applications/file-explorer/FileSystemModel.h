@@ -2,13 +2,14 @@
 
 #include <libsystem/io/Path.h>
 #include <libsystem/utils/List.h>
+#include <libsystem/utils/Vector.h>
 #include <libwidget/Model.h>
 
 typedef struct
 {
     char name[FILE_NAME_LENGTH];
     FileType type;
-    Icon *icon;
+    RefPtr<Icon> icon;
     size_t size;
 } FileSystemNode;
 

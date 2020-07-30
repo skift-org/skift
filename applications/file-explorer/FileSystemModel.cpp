@@ -16,7 +16,7 @@ typedef enum
     __COLUMN_COUNT,
 } Column;
 
-static Icon *get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
+static auto get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
 {
     if (entry->stat.type == FILE_TYPE_DIRECTORY)
     {
@@ -31,28 +31,28 @@ static Icon *get_icon_for_node(const char *current_directory, DirectoryEntry *en
 
             if (json_is(icon_name, JSON_STRING))
             {
-                Icon *icon = icon_get(json_string_value(icon_name));
+                auto icon = Icon::get(json_string_value(icon_name));
                 json_destroy(root);
                 return icon;
             }
         }
 
         json_destroy(root);
-        return icon_get("folder");
+        return Icon::get("folder");
     }
     else if (entry->stat.type == FILE_TYPE_PIPE ||
              entry->stat.type == FILE_TYPE_DEVICE ||
              entry->stat.type == FILE_TYPE_SOCKET)
     {
-        return icon_get("pipe");
+        return Icon::get("pipe");
     }
     else if (entry->stat.type == FILE_TYPE_TERMINAL)
     {
-        return icon_get("console-network");
+        return Icon::get("console-network");
     }
     else
     {
-        return icon_get("file");
+        return Icon::get("file");
     }
 }
 
@@ -80,16 +80,15 @@ static void filesystem_model_update(FileSystemModel *model)
     DirectoryEntry entry;
     while (directory_read(directory, &entry) > 0)
     {
-        FileSystemNode node = {
+        FileSystemNode *node = new FileSystemNode{
             .name = {},
             .type = entry.stat.type,
             .icon = get_icon_for_node(model->current_path, &entry),
-            .size = entry.stat.size,
-        };
+            .size = entry.stat.size};
 
-        strcpy(node.name, entry.name);
+        strcpy(node->name, entry.name);
 
-        list_pushback_copy(model->files, &node, sizeof(node));
+        list_pushback(model->files, node);
     }
 
     directory_close(directory);
@@ -103,26 +102,26 @@ static Variant filesystem_model_data(FileSystemModel *model, int row, int column
     switch (column)
     {
     case COLUMN_NAME:
-        return variant_with_icon(vstring(entry->name), entry->icon);
+        return Variant(entry->name).with_icon(entry->icon);
 
     case COLUMN_TYPE:
         switch (entry->type)
         {
         case FILE_TYPE_REGULAR:
-            return vstring("Regular file");
+            return Variant("Regular file");
 
         case FILE_TYPE_DIRECTORY:
-            return vstring("Directory");
+            return Variant("Directory");
 
         case FILE_TYPE_DEVICE:
-            return vstring("Device");
+            return Variant("Device");
 
         default:
-            return vstring("Special file");
+            return Variant("Special file");
         }
 
     case COLUMN_SIZE:
-        return vint(entry->size);
+        return Variant((int)entry->size);
 
     default:
         ASSERT_NOT_REACHED();

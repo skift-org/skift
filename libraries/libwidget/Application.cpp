@@ -289,7 +289,9 @@ void application_show_window(Window *window)
         .create_window = {
             .id = window_handle(window),
             .frontbuffer = window_frontbuffer_handle(window),
+            .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window_backbuffer_handle(window),
+            .backbuffer_size = window->frontbuffer->size(),
             .bound = window_bound_on_screen(window),
         },
     };
@@ -323,7 +325,9 @@ void application_flip_window(Window *window, Rectangle bound)
         .flip_window = {
             .id = window_handle(window),
             .frontbuffer = window_frontbuffer_handle(window),
+            .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window_backbuffer_handle(window),
+            .backbuffer_size = window->frontbuffer->size(),
             .bound = bound,
         },
     };

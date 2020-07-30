@@ -223,7 +223,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             widget = button_create_with_icon_and_text(
                 parent,
                 button_style,
-                icon_get(markup_node_get_attribute_or_default(node, "icon", "duck")),
+                Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")),
                 markup_node_get_attribute_or_default(node, "text", "Button"));
         }
         else if (markup_node_has_attribute(node, "text"))
@@ -238,7 +238,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             widget = button_create_with_icon(
                 parent,
                 button_style,
-                icon_get(markup_node_get_attribute_or_default(node, "icon", "duck")));
+                Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")));
         }
         else
         {
@@ -297,7 +297,7 @@ Window *window_create_from_markup(MarkupNode *node)
 
     if (icon)
     {
-        window_set_icon(window, icon_get(icon));
+        window_set_icon(window, Icon::get(icon));
     }
 
     const char *title = markup_node_get_attribute(node, "title");

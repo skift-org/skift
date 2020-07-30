@@ -2,85 +2,42 @@
 #include <libsystem/core/CString.h>
 #include <libwidget/utils/Variant.h>
 
-Variant vint(int value)
+Variant::Variant(int value) : _type(VarianType::INT)
 {
-    Variant v = (Variant){
-        .type = VARIANT_INT,
-        .icon = nullptr,
-        .as_int = value,
-        .as_string = {},
-    };
-
-    snprintf(v.as_string, VARIANT_STRING_SIZE, "%d", value);
-
-    return v;
+    _as_float = value;
+    _as_int = value;
+    snprintf(_as_string, VARIANT_STRING_SIZE, "%d", value);
 }
 
-Variant vfloat(float value)
+Variant::Variant(float value) : _type(VarianType::FLOAT)
 {
-    Variant v = (Variant){
-        .type = VARIANT_FLOAT,
-        .icon = nullptr,
-        .as_float = value,
-        .as_string = {},
-    };
-
-    snprintf(v.as_string, VARIANT_STRING_SIZE, "%.2f", value);
-
-    return v;
+    _as_float = value;
+    _as_int = value;
+    snprintf(_as_string, VARIANT_STRING_SIZE, "%.2f", value);
 }
 
-Variant vstring(const char *value)
+Variant::Variant(const char *fmt, ...) : _type(VarianType::STRING)
 {
-    Variant v = (Variant){
-        .type = VARIANT_STRING,
-        .icon = nullptr,
-        .as_int = -1,
-        .as_string = {},
-    };
-
-    assert(strlen(value) < VARIANT_STRING_SIZE);
-
-    strncpy(v.as_string, value, VARIANT_STRING_SIZE);
-
-    return v;
-}
-
-Variant vstringf(const char *fmt, ...)
-{
-    Variant v = (Variant){
-        .type = VARIANT_STRING,
-        .icon = nullptr,
-        .as_int = -1,
-        .as_string = {},
-    };
+    assert(strlen(fmt) < VARIANT_STRING_SIZE);
 
     va_list args;
     va_start(args, fmt);
-    vsnprintf(v.as_string, VARIANT_STRING_SIZE, fmt, args);
+    vsnprintf(_as_string, VARIANT_STRING_SIZE, fmt, args);
     va_end(args);
-
-    return v;
-}
-
-Variant variant_with_icon(Variant variant, Icon *icon)
-{
-    variant.icon = icon;
-    return variant;
 }
 
 int variant_cmp(Variant left, Variant right)
 {
-    if (left.type == VARIANT_INT && right.type == VARIANT_INT)
+    if (left.type() == VarianType::INT && right.type() == VarianType::INT)
     {
-        return left.as_int - right.as_int;
+        return left.as_int() - right.as_int();
     }
-    else if (left.type == VARIANT_FLOAT && right.type == VARIANT_FLOAT)
+    else if (left.type() == VarianType::FLOAT && right.type() == VarianType::FLOAT)
     {
-        return left.as_float - right.as_float;
+        return left.as_float() - right.as_float();
     }
     else
     {
-        return strcmp(left.as_string, right.as_string);
+        return strcmp(left.as_string(), right.as_string());
     }
 }

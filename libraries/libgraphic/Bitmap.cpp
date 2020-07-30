@@ -13,38 +13,53 @@
 #include <libsystem/io/File.h>
 #include <libsystem/system/Memory.h>
 
-Bitmap *bitmap_create(size_t width, size_t height)
-{
-    Bitmap *bitmap = nullptr;
-
-    shared_memory_alloc(sizeof(Bitmap) + width * height * sizeof(Color), (uintptr_t *)&bitmap);
-    assert(bitmap);
-
-    bitmap->width = width;
-    bitmap->height = height;
-    bitmap->filtering = BITMAP_FILTERING_NEAREST;
-
-    return bitmap;
-}
-
-void bitmap_destroy(Bitmap *bitmap)
-{
-    shared_memory_free((uintptr_t)bitmap);
-}
-
-Rectangle bitmap_bound(Bitmap *bitmap)
-{
-    return Rectangle(bitmap->width, bitmap->height);
-}
-
-static Color placeholder_buffer[] = {
+static Color _placeholder_buffer[] = {
     (Color){{255, 0, 255, 255}},
     (Color){{0, 0, 0, 255}},
     (Color){{0, 0, 0, 255}},
     (Color){{255, 0, 255, 255}},
 };
 
-Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
+ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
+{
+    Color *pixels = nullptr;
+    Result result = shared_memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
+
+    if (result != SUCCESS)
+        return result;
+
+    int handle = -1;
+    shared_memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
+
+    return make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
+}
+
+ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i width_and_height)
+{
+    Color *pixels = nullptr;
+    size_t size = 0;
+    Result result = shared_memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size);
+
+    if (result != SUCCESS)
+        return result;
+
+    if (size < width_and_height.x() * width_and_height.y() * sizeof(Color))
+    {
+        shared_memory_free(reinterpret_cast<uintptr_t>(pixels));
+        return ERR_BAD_IMAGE_FILE_FORMAT;
+    }
+
+    shared_memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
+
+    return make<Bitmap>(handle, BITMAP_SHARED, width_and_height.x(), width_and_height.y(), pixels);
+}
+
+RefPtr<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
+{
+    return make<Bitmap>(-1, BITMAP_STATIC, width, height, pixels);
+}
+
+ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
 {
     void *rawdata;
     size_t rawdata_size;
@@ -57,7 +72,7 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
 
     uint decoded_width = 0;
     uint decoded_height = 0;
-    void *decoded_data __cleanup_malloc = nullptr;
+    void *decoded_data = nullptr;
 
     int decode_result = lodepng_decode32(
         (unsigned char **)&decoded_data,
@@ -71,36 +86,34 @@ Result bitmap_load_from_can_fail(const char *path, Bitmap **bitmap)
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    size_t decoded_size = decoded_width * decoded_height * sizeof(Color);
-
-    *bitmap = bitmap_create(decoded_width, decoded_height);
-
-    memcpy((*bitmap)->pixels, decoded_data, decoded_size);
-
-    return SUCCESS;
+    return make<Bitmap>(-1, BITMAP_MALLOC, decoded_width, decoded_height, reinterpret_cast<Color *>(decoded_data));
 }
 
-Bitmap *bitmap_load_from(const char *path)
+RefPtr<Bitmap> Bitmap::load_from_or_placeholder(const char *path)
 {
-    Bitmap *bitmap = nullptr;
-    Result result = bitmap_load_from_can_fail(path, &bitmap);
+    auto result = load_from(path);
 
-    if (result != SUCCESS)
+    if (!result.success())
     {
-        bitmap = bitmap_create(2, 2);
-        memcpy(bitmap->pixels, placeholder_buffer, 2 * 2 * sizeof(Color));
+        return create_static(2, 2, _placeholder_buffer);
     }
 
-    return bitmap;
+    return result.take_value();
 }
 
-Result bitmap_save_to(Bitmap *bitmap, const char *path)
+Result Bitmap::save_to(const char *path)
 {
     void *outbuffer __cleanup_malloc = nullptr;
 
     size_t outbuffer_size = 0;
 
-    int err = lodepng_encode_memory((unsigned char **)&outbuffer, &outbuffer_size, (const unsigned char *)bitmap->pixels, bitmap->width, bitmap->height, LCT_RGBA, 8);
+    int err = lodepng_encode_memory(
+        (unsigned char **)&outbuffer,
+        &outbuffer_size,
+        (const unsigned char *)_pixels,
+        _width,
+        _height,
+        LCT_RGBA, 8);
 
     if (err != 0)
     {
@@ -110,19 +123,10 @@ Result bitmap_save_to(Bitmap *bitmap, const char *path)
     return file_write_all(path, outbuffer, outbuffer_size);
 }
 
-__flatten void bitmap_copy(Bitmap *source, Bitmap *destination, Rectangle region)
+Bitmap::~Bitmap()
 {
-    region = region.clipped_with(bitmap_bound(source));
-    region = region.clipped_with(bitmap_bound(destination));
-
-    if (region.is_empty())
-        return;
-
-    for (int y = region.y(); y < region.y() + region.height(); y++)
-    {
-        for (int x = region.x(); x < region.x() + region.width(); x++)
-        {
-            bitmap_set_pixel_no_check(destination, Vec2i(x, y), bitmap_get_pixel_no_check(source, Vec2i(x, y)));
-        }
-    }
+    if (_storage == BITMAP_SHARED)
+        shared_memory_free(reinterpret_cast<uintptr_t>(_pixels));
+    else if (_storage == BITMAP_MALLOC)
+        free(_pixels);
 }

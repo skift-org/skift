@@ -13,13 +13,13 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
     Rectangle computer_icon_bound(
         widget_get_bound(widget).x(),
         widget_get_bound(widget).y(),
-        icon_bound(widget->icon_computer, ICON_18PX).width() + 16,
+        widget->icon_computer->bound(ICON_18PX).width() + 16,
         widget_get_bound(widget).height());
 
     painter.blit_icon(
-        widget->icon_computer,
+        *widget->icon_computer,
         ICON_18PX,
-        icon_bound(widget->icon_computer, ICON_18PX).centered_within(computer_icon_bound),
+        widget->icon_computer->bound(ICON_18PX).centered_within(computer_icon_bound),
         widget_get_color(widget, THEME_FOREGROUND));
 
     current += computer_icon_bound.width();
@@ -29,13 +29,13 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
         Rectangle expand_icon_bound(
             widget_get_bound(widget).x() + current,
             widget_get_bound(widget).y(),
-            icon_bound(widget->icon_expand, ICON_18PX).width(),
+            widget->icon_expand->bound(ICON_18PX).width(),
             widget_get_bound(widget).height());
 
         painter.blit_icon(
-            widget->icon_expand,
+            *widget->icon_expand,
             ICON_18PX,
-            icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),
+            widget->icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
             widget_get_color(widget, THEME_FOREGROUND));
 
         current += expand_icon_bound.width();
@@ -45,7 +45,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
     {
         const char *element = path_peek_at(widget->path, i);
 
-        int text_width = font_measure_string(widget_font(), element);
+        int text_width = widget_font()->mesure_string(element).width();
 
         Rectangle element_bound(
             widget_get_bound(widget).x() + current,
@@ -54,7 +54,7 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
             widget_get_bound(widget).height());
 
         painter.draw_string(
-            widget_font(),
+            *widget_font(),
             element,
             element_bound.position() + Vec2i(0, 19),
             widget_get_color(widget, THEME_FOREGROUND));
@@ -66,13 +66,13 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
             Rectangle expand_icon_bound(
                 widget_get_bound(widget).x() + current,
                 widget_get_bound(widget).y(),
-                icon_bound(widget->icon_expand, ICON_18PX).width(),
+                widget->icon_expand->bound(ICON_18PX).width(),
                 widget_get_bound(widget).height());
 
             painter.blit_icon(
-                widget->icon_expand,
+                *widget->icon_expand,
                 ICON_18PX,
-                icon_bound(widget->icon_expand, ICON_18PX).centered_within(expand_icon_bound),
+                widget->icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
                 widget_get_color(widget, THEME_FOREGROUND));
 
             current += expand_icon_bound.width();
@@ -82,6 +82,9 @@ void breadcrumb_paint(Breadcrumb *widget, Painter &painter, Rectangle rectangle)
 
 void breadcrumb_destroy(Breadcrumb *widget)
 {
+    widget->icon_computer = nullptr;
+    widget->icon_expand = nullptr;
+
     path_destroy(widget->path);
 }
 
@@ -97,8 +100,8 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
     Breadcrumb *widget = __create(Breadcrumb);
 
     widget->path = path_create(current_path);
-    widget->icon_computer = icon_get("laptop");
-    widget->icon_expand = icon_get("chevron-right");
+    widget->icon_computer = Icon::get("laptop");
+    widget->icon_expand = Icon::get("chevron-right");
 
     widget_initialize(WIDGET(widget), &breadcrumb_class, parent);
 

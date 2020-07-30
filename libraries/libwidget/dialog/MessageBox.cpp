@@ -13,7 +13,7 @@ static void on_dialog_close(void *target, struct Window *sender, struct Event *e
 }
 
 DialogButton dialog_message(
-    Icon *icon,
+    RefPtr<Icon> icon,
     const char *title,
     const char *message,
     DialogButton buttons)

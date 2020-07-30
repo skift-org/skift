@@ -8,16 +8,16 @@ void placeholder_paint(Placeholder *placeholder, Painter &painter, Rectangle rec
     __unused(rectangle);
     painter.draw_rectangle(widget_get_bound(placeholder), COLOR_RED);
 
-    Icon *alert_icon = icon_get("alert");
+    auto alert_icon = Icon::get("alert");
 
     painter.blit_icon(
-        alert_icon,
+        *alert_icon,
         ICON_18PX,
-        icon_bound(alert_icon, ICON_18PX).moved(widget_get_bound(placeholder).position() + Vec2i(8, 8)),
+        alert_icon->bound(ICON_18PX).moved(widget_get_bound(placeholder).position() + Vec2i(8, 8)),
         COLOR_RED);
 
     painter.draw_string(
-        widget_font(),
+        *widget_font(),
         placeholder->text,
         widget_get_bound(placeholder).position() + Vec2i(32, 10),
         widget_get_color(placeholder, THEME_FOREGROUND));

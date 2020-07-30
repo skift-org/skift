@@ -2,6 +2,8 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libsystem/unicode/Codepoint.h>
+#include <libsystem/utils/String.h>
+#include <libsystem/utils/Vector.h>
 
 typedef struct
 {
@@ -11,20 +13,28 @@ typedef struct
     int advance;
 } Glyph;
 
-typedef struct
+class Font : public RefCounted<Font>
 {
-    Bitmap *bitmap;
+private:
+    RefPtr<Bitmap> _bitmap;
+    Glyph _default;
+    Vector<Glyph> _glyphs;
 
-    Glyph default_glyph;
-    Glyph *glyph;
-} Font;
+public:
+    Bitmap &bitmap() { return *_bitmap; }
 
-Font *font_create(const char *name);
+    static ResultOr<RefPtr<Font>> create(String name);
 
-void font_destroy(Font *font);
+    Font(RefPtr<Bitmap> bitmap, Vector<Glyph> glyphs)
+        : _bitmap(bitmap),
+          _glyphs(glyphs)
+    {
+        _default = glyph(U'?');
+    }
 
-bool font_has_glyph(Font *font, Codepoint codepoint);
+    Glyph &glyph(Codepoint codepoint);
 
-Glyph *font_glyph(Font *font, Codepoint codepoint);
+    bool has_glyph(Codepoint codepoint);
 
-int font_measure_string(Font *font, const char *str);
+    Rectangle mesure_string(const char *string);
+};

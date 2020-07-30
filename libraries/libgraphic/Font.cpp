@@ -1,4 +1,3 @@
-
 #include <libgraphic/Font.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
@@ -7,10 +6,10 @@
 #include <libsystem/io/File.h>
 #include <libsystem/io/Path.h>
 
-Glyph *font_load_glyph(const char *name)
+static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {
     char glyph_path[PATH_LENGTH];
-    snprintf(glyph_path, PATH_LENGTH, "/System/Fonts/%s.glyph", name);
+    snprintf(glyph_path, PATH_LENGTH, "/System/Fonts/%s.glyph", name.cstring());
 
     Glyph *glyph_buffer = nullptr;
     size_t glyph_size = 0;
@@ -19,101 +18,74 @@ Glyph *font_load_glyph(const char *name)
     if (result != SUCCESS)
     {
         logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(result));
-        return nullptr;
+        return result;
     }
 
-    return glyph_buffer;
+    return Vector(ADOPT, glyph_buffer, glyph_size / sizeof(Glyph));
 }
 
-Bitmap *font_load_bitmap_create(const char *name)
+static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)
 {
     char bitmap_path[PATH_LENGTH];
-    snprintf(bitmap_path, PATH_LENGTH, "/System/Fonts/%s.png", name);
-
-    Bitmap *bitmap = bitmap_load_from(bitmap_path);
-
-    bitmap->filtering = BITMAP_FILTERING_LINEAR;
-
-    return bitmap;
+    snprintf(bitmap_path, PATH_LENGTH, "/System/Fonts/%s.png", name.cstring());
+    return Bitmap::load_from(bitmap_path);
 }
 
-Font *font_create(const char *name)
+ResultOr<RefPtr<Font>> Font::create(String name)
 {
-    Glyph *glyph = font_load_glyph(name);
+    auto glyph_or_error = font_load_glyph(name);
 
-    if (glyph == nullptr)
+    if (!glyph_or_error.success())
     {
-        logger_error("Failled to load font %s: missing glyphs", name);
-        return nullptr;
+        logger_error("Failled to load font %s: missing glyphs", name.cstring());
+        return glyph_or_error.result();
     }
 
-    Bitmap *bitmap = font_load_bitmap_create(name);
+    auto bitmap_or_error = font_load_bitmap(name);
 
-    if (bitmap == nullptr)
+    if (!bitmap_or_error.success())
     {
-        logger_error("Failled to load font %s: missing bitmap", name);
-
-        free(glyph);
-        return nullptr;
+        logger_error("Failled to load font %s: missing bitmap", name.cstring());
+        return bitmap_or_error.result();
     }
 
-    Font *font = __create(Font);
-
-    font->bitmap = bitmap;
-    font->glyph = glyph;
-    font->default_glyph = *font_glyph(font, '?');
-
-    return font;
+    return make<Font>(bitmap_or_error.take_value(), glyph_or_error.take_value());
 }
 
-void font_destroy(Font *font)
+Glyph &Font::glyph(Codepoint codepoint)
 {
-    assert(font);
-
-    free(font->glyph);
-    bitmap_destroy(font->bitmap);
-    free(font);
-}
-
-Glyph *font_glyph(Font *font, Codepoint codepoint)
-{
-    assert(font);
-
-    for (int i = 0; font->glyph[i].codepoint != 0; i++)
+    for (int i = 0; _glyphs[i].codepoint != 0; i++)
     {
-        if (font->glyph[i].codepoint == codepoint)
+        if (_glyphs[i].codepoint == codepoint)
         {
-            return &font->glyph[i];
+            return _glyphs[i];
         }
     }
 
-    return &font->default_glyph;
+    return _default;
 }
 
-int font_measure_width(Font *font, float font_size, const char *str, int str_size)
+bool Font::has_glyph(Codepoint codepoint)
 {
-    assert(font);
-
-    int width = 0;
-
-    for (int i = 0; i < str_size; i++)
+    for (int i = 0; _glyphs[i].codepoint != 0; i++)
     {
-        Glyph *g = font_glyph(font, str[i]);
-        width += g->advance * (font_size / 16.0);
+        if (_glyphs[i].codepoint == codepoint)
+        {
+            return true;
+        }
     }
 
-    return width;
+    return false;
 }
 
-int font_measure_string(Font *font, const char *str)
+Rectangle Font::mesure_string(const char *string)
 {
     int width = 0;
 
-    for (size_t i = 0; str[i]; i++)
-    {
-        Glyph *glyph = font_glyph(font, str[i]);
-        width += glyph->advance;
-    }
+    codepoint_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto codepoint) {
+        Glyph &g = glyph(codepoint);
+        width += g.advance;
+    });
 
-    return width;
+    return Rectangle(width, 16);
 }

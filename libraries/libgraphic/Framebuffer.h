@@ -3,33 +3,35 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
 #include <libsystem/io/Handle.h>
+#include <libsystem/utils/OwnPtr.h>
 
-typedef struct
+class Framebuffer
 {
-    Handle handle;
+private:
+    Handle _handle;
 
-    Bitmap *backbuffer;
-    Painter painter;
+    RefPtr<Bitmap> _bitmap;
+    Painter _painter;
 
-    int width;
-    int height;
+    bool _is_dirty = false;
+    Rectangle _dirty_bound = Rectangle::empty();
 
-    bool is_dirty;
-    Rectangle dirty_bound;
-} Framebuffer;
+public:
+    Painter &painter() { return _painter; }
 
-Framebuffer *framebuffer_open(void);
+    Rectangle resolution() { return _bitmap->bound(); }
 
-Result framebuffer_set_mode(Framebuffer *framebuffer, int width, int height);
+    static ResultOr<OwnPtr<Framebuffer>> open(void);
 
-Rectangle framebuffer_bound(Framebuffer *framebuffer);
+    Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
 
-void framebuffer_mark_dirty(Framebuffer *framebuffer, Rectangle bound);
+    ~Framebuffer();
 
-void framebuffer_mark_dirty_all(Framebuffer *framebuffer);
+    Result set_resolution(Vec2i size);
 
-void framebuffer_blit_dirty(Framebuffer *framebuffer);
+    void mark_dirty(Rectangle rectangle);
 
-void framebuffer_blit(Framebuffer *framebuffer);
+    void mark_dirty_all();
 
-void framebuffer_close(Framebuffer *framebuffer);
+    void blit();
+};

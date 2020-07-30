@@ -130,7 +130,7 @@ void menu_create_list(Widget *parent, List *menu)
 
     list_foreach(MenuEntry, entry, menu)
     {
-        Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, icon_get(entry->icon), entry->name);
+        Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);
         item->insets = Insets(8);
         widget_set_event_handler(item, EVENT_ACTION, EVENT_HANDLER(entry, (EventHandlerCallback)menu_item_click));
     }

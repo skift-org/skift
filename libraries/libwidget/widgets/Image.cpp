@@ -11,10 +11,10 @@ void image_paint(Image *widget, Painter &painter, Rectangle rectangle)
 
         if (widget->size_mode == IMAGE_CENTER)
         {
-            destination = bitmap_bound(widget->bitmap).centered_within(widget_get_bound(widget));
+            destination = widget->bitmap->bound().centered_within(widget_get_bound(widget));
         }
 
-        painter.blit_bitmap(widget->bitmap, bitmap_bound(widget->bitmap), destination);
+        painter.blit_bitmap(*widget->bitmap, widget->bitmap->bound(), destination);
     }
 }
 
@@ -22,7 +22,7 @@ Vec2i image_size(Image *widget)
 {
     if (widget->bitmap)
     {
-        return bitmap_bound(widget->bitmap).size();
+        return widget->bitmap->bound().size();
     }
     else
     {
@@ -34,14 +34,13 @@ void image_destroy(Image *widget)
 {
     if (widget->bitmap)
     {
-        bitmap_destroy(widget->bitmap);
+        widget->bitmap = nullptr;
     }
 }
 
 void image_set_image(Widget *image, const char *path)
 {
-    bitmap_destroy(((Image *)image)->bitmap);
-    ((Image *)image)->bitmap = bitmap_load_from(path);
+    ((Image *)image)->bitmap = Bitmap::load_from_or_placeholder(path);
 }
 
 static const WidgetClass image_class = {
@@ -56,7 +55,7 @@ Widget *image_create(Widget *parent, const char *path)
 {
     Image *image = __create(Image);
 
-    image->bitmap = bitmap_load_from(path);
+    image->bitmap = Bitmap::load_from_or_placeholder(path);
     image->size_mode = IMAGE_CENTER;
 
     widget_initialize(WIDGET(image), &image_class, parent);

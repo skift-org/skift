@@ -1,7 +1,7 @@
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
-#include <libsystem/Logger.h>
 
 #include "task-manager/TaskModel.h"
 
@@ -34,29 +34,29 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     {
     case COLUMN_ID:
     {
-        Variant value = vint(json_integer_value(json_object_get(task, "id")));
+        Variant value = Variant(json_integer_value(json_object_get(task, "id")));
 
         if (json_is(json_object_get(task, "user"), JSON_TRUE))
         {
-            return variant_with_icon(value, icon_get("account"));
+            return value.with_icon(Icon::get("account"));
         }
         else
         {
-            return variant_with_icon(value, icon_get("cog"));
+            return value.with_icon(Icon::get("cog"));
         }
     }
 
     case COLUMN_NAME:
-        return vstring(json_string_value(json_object_get(task, "name")));
+        return Variant(json_string_value(json_object_get(task, "name")));
 
     case COLUMN_STATE:
-        return vstring(json_string_value(json_object_get(task, "state")));
+        return Variant(json_string_value(json_object_get(task, "state")));
 
     case COLUMN_CPU:
-        return vstringf("%2d%%", json_integer_value(json_object_get(task, "cpu")));
+        return Variant("%2d%%", json_integer_value(json_object_get(task, "cpu")));
 
     case COLUMN_DIRECTORY:
-        return vstring(json_string_value(json_object_get(task, "directory")));
+        return Variant(json_string_value(json_object_get(task, "directory")));
 
     default:
         ASSERT_NOT_REACHED();

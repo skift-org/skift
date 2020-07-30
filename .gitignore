@@ -1,5 +1,6 @@
 .vscode/
 build/
+cache/
 toolchain/build/
 toolchain/tarballs/
 toolchain/local/

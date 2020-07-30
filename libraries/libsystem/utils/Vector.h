@@ -6,6 +6,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
+#include <libsystem/utils/RefPtr.h>
 
 template <typename T>
 class Vector
@@ -16,6 +17,8 @@ private:
     size_t _capacity{};
 
 public:
+    T *raw_storage() { return _storage; }
+
     size_t count() const { return _count; }
     bool empty() const { return _count == 0; }
     bool any() const { return !empty(); }
@@ -25,6 +28,13 @@ public:
     Vector(size_t capacity)
     {
         ensure_capacity(capacity);
+    }
+
+    Vector(AdoptTag, T *storage, size_t size)
+        : _storage(storage),
+          _count(size),
+          _capacity(size)
+    {
     }
 
     Vector(Vector &other)
@@ -326,10 +336,5 @@ public:
         }
 
         return false;
-    }
-
-    T *raw_storage()
-    {
-        return _storage;
     }
 };

@@ -66,8 +66,9 @@ int main(int argc, char **argv)
     graph_container->layout = VGRID(1);
 
     Widget *ram_graph = graph_create(graph_container, 50, COLOR_ROYALBLUE);
-
+    label_create(ram_graph, "RAM");
     Widget *cpu_graph = graph_create(graph_container, 50, COLOR_SEAGREEN);
+    label_create(cpu_graph, "CPU");
 
     label_create(window_root(window), "user");
 

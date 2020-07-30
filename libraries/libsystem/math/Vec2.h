@@ -59,6 +59,12 @@ public:
         return Vec2(x() * rhs.x(), y() * rhs.y());
     }
 
+    template <typename U>
+    Vec2 operator*(const Vec2<U> &rhs) const
+    {
+        return Vec2(x() * rhs.x(), y() * rhs.y());
+    }
+
     Vec2 &operator*=(const Vec2 &rhs)
     {
         *this = *this * rhs;

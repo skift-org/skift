@@ -150,6 +150,22 @@ void client_handle_set_resolution(Client *client, CompositorSetResolution set_re
     renderer_set_resolution(set_resolution.width, set_resolution.height);
 }
 
+void client_handle_set_wallpaper(Client *client, CompositorSetWallaper set_wallpaper)
+{
+    __unused(client);
+
+    auto wallaper = Bitmap::create_shared_from_handle(set_wallpaper.wallpaper, set_wallpaper.resolution);
+
+    if (wallaper.success())
+    {
+        renderer_set_wallaper(wallaper.take_value());
+    }
+    else
+    {
+        logger_warn("The client sent us a bad wallpaper handle.");
+    }
+}
+
 void client_request_callback(Client *client, Connection *connection, SelectEvent events)
 {
     assert(events & SELECT_READ);
@@ -200,6 +216,10 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
     case COMPOSITOR_MESSAGE_SET_RESOLUTION:
         client_handle_set_resolution(client, message.set_resolution);
+        break;
+
+    case COMPOSITOR_MESSAGE_SET_WALLPAPER:
+        client_handle_set_wallpaper(client, message.set_wallaper);
         break;
 
     default:

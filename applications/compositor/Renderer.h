@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libgraphic/Bitmap.h>
 #include <libgraphic/Shape.h>
 
 void renderer_initialize();
@@ -11,3 +12,5 @@ void renderer_region_dirty(Rectangle region);
 void renderer_repaint_dirty();
 
 void renderer_set_resolution(int width, int height);
+
+void renderer_set_wallaper(RefPtr<Bitmap> wallaper);

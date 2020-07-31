@@ -94,3 +94,9 @@ void renderer_set_resolution(int width, int height)
     _framebuffer->set_resolution(Vec2i(width, height));
     renderer_region_dirty(renderer_bound());
 }
+
+void renderer_set_wallaper(RefPtr<Bitmap> wallaper)
+{
+    _wallpaper = wallaper;
+    renderer_region_dirty(renderer_bound());
+}

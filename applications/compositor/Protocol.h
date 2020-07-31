@@ -18,6 +18,7 @@ typedef enum
     COMPOSITOR_MESSAGE_EVENT_WINDOW,
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
     COMPOSITOR_MESSAGE_SET_RESOLUTION,
+    COMPOSITOR_MESSAGE_SET_WALLPAPER,
 } CompositorMessageType;
 
 #define WINDOW_NONE (0)
@@ -99,6 +100,12 @@ typedef struct
 
 typedef struct
 {
+    int wallpaper;
+    Vec2i resolution;
+} CompositorSetWallaper;
+
+typedef struct
+{
     CompositorMessageType type;
 
     union {
@@ -111,5 +118,6 @@ typedef struct
         CompositorEventWindow event_window;
         CompositorCursorWindow cursor_window;
         CompositorSetResolution set_resolution;
+        CompositorSetWallaper set_wallaper;
     };
 } CompositorMessage;

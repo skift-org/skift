@@ -7,28 +7,28 @@ ICONS_AT_48PX = $(patsubst thirdparty/icons/svg/%.svg, $(SYSROOT)/System/Icons/%
 
 TARGETS += $(ICONS_AT_18PX) $(ICONS_AT_24PX) $(ICONS_AT_36PX) $(ICONS_AT_48PX)
 
-.PRECIOUS: cache/Icons/%@18px.png
+.SECONDARY: cache/Icons/%@18px.png
 cache/Icons/%@18px.png: thirdparty/icons/svg/%.svg
 	$(DIRECTORY_GUARD)
 	@echo [ICON] $(notdir $@)
 	@inkscape --export-filename=$@ -w 18 -h 18 $< || \
 	 inkscape --export-png $@ -w 18 -h 18 $< &>/dev/null
 
-.PRECIOUS: cache/Icons/%@24px.png
+.SECONDARY: cache/Icons/%@24px.png
 cache/Icons/%@24px.png: thirdparty/icons/svg/%.svg
 	$(DIRECTORY_GUARD)
 	@echo [ICON] $(notdir $@)
 	@inkscape --export-filename=$@ -w 24 -h 24 $< || \
 	 inkscape --export-png $@ -w 24 -h 24 $< &>/dev/null
 
-.PRECIOUS: cache/Icons/%@36px.png
+.SECONDARY: cache/Icons/%@36px.png
 cache/Icons/%@36px.png: thirdparty/icons/svg/%.svg
 	$(DIRECTORY_GUARD)
 	@echo [ICON] $(notdir $@)
 	@inkscape --export-filename=$@ -w 36 -h 36 $< || \
 	 inkscape --export-png $@ -w 36 -h 36 $< &>/dev/null
 
-.PRECIOUS: cache/Icons/%@48px.png
+.SECONDARY: cache/Icons/%@48px.png
 cache/Icons/%@48px.png: thirdparty/icons/svg/%.svg
 	$(DIRECTORY_GUARD)
 	@echo [ICON] $(notdir $@)

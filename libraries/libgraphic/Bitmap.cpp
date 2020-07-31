@@ -86,7 +86,20 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    return make<Bitmap>(-1, BITMAP_MALLOC, decoded_width, decoded_height, reinterpret_cast<Color *>(decoded_data));
+    auto bitmap_or_result = Bitmap::create_shared(decoded_width, decoded_height);
+
+    if (bitmap_or_result.success())
+    {
+        auto bitmap = bitmap_or_result.take_value();
+        memcpy(bitmap->pixels(), decoded_data, sizeof(Color) * decoded_width * decoded_height);
+        free(decoded_data);
+        return bitmap;
+    }
+    else
+    {
+        free(decoded_data);
+        return bitmap_or_result;
+    }
 }
 
 RefPtr<Bitmap> Bitmap::load_from_or_placeholder(const char *path)

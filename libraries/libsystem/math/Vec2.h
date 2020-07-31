@@ -23,6 +23,7 @@ public:
     Vec2 extract_y() const { return Vec2(0, _y); }
 
     Vec2() : _x(0), _y(0) {}
+    Vec2(Scalar v) : _x(v), _y(v) {}
     Vec2(Scalar x, Scalar y) : _x(x), _y(y) {}
 
     template <typename OtherScalar>

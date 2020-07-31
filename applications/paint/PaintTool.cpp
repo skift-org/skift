@@ -40,18 +40,21 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_MOVE || event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == EVENT_MOUSE_MOVE ||
+        event.type == EVENT_MOUSE_BUTTON_PRESS)
     {
-        Color color = document->primary_color;
-
-        if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
+        if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            color = document->secondary_color;
+            Color color = document->primary_color;
+            document->painter.fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
+            document->dirty = true;
         }
-
-        document->painter.fill_rectangle(Rectangle(event.mouse.position, Vec2i(32, 32)), color);
-
-        document->dirty = true;
+        else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
+        {
+            Color color = document->secondary_color;
+            document->painter.fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
+            document->dirty = true;
+        }
     }
 }
 
@@ -72,26 +75,14 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            document->painter.clear_rectangle(
-                Rectangle(
-                    event.mouse.position.x() - 16,
-                    event.mouse.position.y() - 16,
-                    32,
-                    32),
-                COLOR_RGBA(0, 0, 0, 0));
-
+            Color color = COLOR_RGBA(0, 0, 0, 0);
+            document->painter.clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
             document->dirty = true;
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            document->painter.clear_rectangle(
-                Rectangle(
-                    event.mouse.position.x() - 16,
-                    event.mouse.position.y() - 16,
-                    32,
-                    32),
-                document->secondary_color);
-
+            Color color = document->secondary_color;
+            document->painter.clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
             document->dirty = true;
         }
     }
@@ -160,26 +151,20 @@ void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event
 
     if (event.type == EVENT_MOUSE_BUTTON_PRESS)
     {
-        Color fill_color = COLOR_MAGENTA;
-
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            fill_color = document->primary_color;
+            Color fill_color = document->primary_color;
+            Color target_color = document->bitmap->get_pixel(event.mouse.position);
+            flood_fill(*document->bitmap, event.mouse.position, target_color, fill_color);
+            document->dirty = true;
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            fill_color = document->secondary_color;
+            Color fill_color = document->secondary_color;
+            Color target_color = document->bitmap->get_pixel(event.mouse.position);
+            flood_fill(*document->bitmap, event.mouse.position, target_color, fill_color);
+            document->dirty = true;
         }
-        else
-        {
-            return;
-        }
-
-        Color target_color = document->bitmap->get_pixel(event.mouse.position);
-
-        flood_fill(*document->bitmap, event.mouse.position, target_color, fill_color);
-
-        document->dirty = true;
     }
 }
 

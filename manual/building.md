@@ -84,9 +84,13 @@ $ make run-qemu # for QEMU
 $ make run-vbox # for Virtual Box
 ```
 
+## 5. Tips
+
 > If you made any modification to the source code or the content of the sysroot/ directory, the build system should be able to rebuild the project from step 3 automagically :^)
 
-## 5. Using the system
+> You can change the default keyboard layout by passing CONFIG_KEYBOARD_LAYOUT="fr_fr" to make.
+
+## 6. Using the system
 
 **How to change the keyboard layout?**
 
@@ -98,4 +102,9 @@ $ make run-vbox # for Virtual Box
 
 ```sh
 µ displayctl -s 1920x1080
+```
+**How to change to wallpaper?**
+
+```sh
+µ wallpaperctl /System/Wallpapers/paint.png
 ```

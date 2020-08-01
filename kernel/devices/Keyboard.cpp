@@ -10,12 +10,9 @@
 
 #include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
+#include "kernel/Configs.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
-
-/*#ifndef KEYBOARD_LAYOUT
-#define KEYBOARD_LAYOUT "/System/Keyboards/fr_be.kmap"
-#endif*/
 
 /* --- Private functions ---------------------------------------------------- */
 
@@ -280,7 +277,7 @@ void keyboard_initialize()
 {
     logger_info("Initializing keyboard...");
 
-    _keymap = keyboard_load_keymap(KEYBOARD_LAYOUT);
+    _keymap = keyboard_load_keymap("/System/Keyboards/" CONFIG_KEYBOARD_LAYOUT ".kmap");
 
     _characters_buffer = ringbuffer_create(1024);
     _characters_node = __create(FsNode);

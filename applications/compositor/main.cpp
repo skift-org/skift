@@ -122,7 +122,16 @@ int main(int argc, char const *argv[])
 
     Stream *keyboard_stream = stream_open(KEYBOARD_EVENT_DEVICE_PATH, OPEN_READ);
     Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
+    
+    __cleanup(stream_cleanup) Stream *socket_stream = stream_open("/Session/compositor.lock", OPEN_READ);
+    if (!handle_has_error(socket_stream))
+    {
+        return 0;
+    }
+
     Socket *socket = socket_open("/Session/compositor.ipc", OPEN_CREATE);
+    Stream *lock_stream = stream_open("/Session/compositor.lock", OPEN_CREATE);
+    stream_close(lock_stream);
 
     notifier_create(nullptr, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
     notifier_create(nullptr, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);

@@ -1,3 +1,5 @@
+KEYBOARD_LAYOUT="fr_be"
+
 KERNEL_SOURCES = \
 	$(wildcard kernel/*.cpp) \
 	$(wildcard kernel/*/*.cpp) \
@@ -38,7 +40,7 @@ $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CC] $<
-	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CC) -DKEYBOARD_LAYOUT=\"/System/Keyboards/$(KEYBOARD_LAYOUT).kmap\" $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.o: arch/%.cpp
 	$(DIRECTORY_GUARD)

@@ -13,6 +13,10 @@
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Dispatcher.h"
 
+/*#ifndef KEYBOARD_LAYOUT
+#define KEYBOARD_LAYOUT "/System/Keyboards/fr_be.kmap"
+#endif*/
+
 /* --- Private functions ---------------------------------------------------- */
 
 #define PS2KBD_ESCAPE 0xE0
@@ -276,7 +280,7 @@ void keyboard_initialize()
 {
     logger_info("Initializing keyboard...");
 
-    _keymap = keyboard_load_keymap("/System/Keyboards/fr_be.kmap");
+    _keymap = keyboard_load_keymap(KEYBOARD_LAYOUT);
 
     _characters_buffer = ringbuffer_create(1024);
     _characters_node = __create(FsNode);

@@ -18,6 +18,8 @@ void system_stop()
     arch_disable_interupts();
     logger_info("System stopped!");
 
+    asm("jmp __reboot");
+
     while (1)
     {
         arch_disable_interupts();

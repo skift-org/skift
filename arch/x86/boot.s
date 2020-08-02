@@ -106,3 +106,13 @@ _kstart:
 .hang:	hlt
 	jmp .hang
 .end:
+global __reboot:function (__reboot.end - __reboot)
+__reboot:
+	xor eax, eax
+	in al, 0x64
+	test al, 0x02
+	jnz __reboot
+	mov al, 0xfc
+	out 0x64, al
+	jmp short __reboot
+.end

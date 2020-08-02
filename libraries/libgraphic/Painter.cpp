@@ -610,7 +610,7 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destinati
             Color sample = bitmap.sample(sample_point);
 
             Color final = color;
-            final.A = sample.A;
+            final.A = sample.A * (color.A / 255.0);
 
             plot_pixel(destination.position() + Vec2i(x, y), final);
         }

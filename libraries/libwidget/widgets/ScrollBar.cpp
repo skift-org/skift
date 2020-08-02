@@ -36,11 +36,30 @@ static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle recta
     __unused(rectangle);
 
     painter.clear_rectangle(widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-    painter.clear_rectangle(scrollbar_thumb(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
-    painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
 
-    painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
-    painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+    Rectangle track = scrollbar_track(widget);
+    if (track.height() * (widget->thumb / (double)widget->track) < track.height())
+    {
+        painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
+    }
+
+    if (widget->value == 0)
+    {
+        painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_BORDER));
+    }
+    else
+    {
+        painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
+    }
+
+    if (widget->value >= widget->track - widget->thumb)
+    {
+        painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_BORDER));
+    }
+    else
+    {
+        painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+    }
 }
 
 static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)

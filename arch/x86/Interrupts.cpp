@@ -98,6 +98,8 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
         }
         else
         {
+            backtrace(stackframe.ebp);
+
             system_panic_with_context(
                 &stackframe,
                 "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",

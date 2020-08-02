@@ -291,7 +291,7 @@ Result filesystem_unlink(Path *path)
 
     FsNode *parent = filesystem_find_parent_and_ref(path);
 
-    if (!parent)
+    if (!parent || !path_filename(path))
     {
         result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
         goto cleanup_and_return;
@@ -314,7 +314,7 @@ Result filesystem_unlink(Path *path)
     fsnode_release_lock(parent, scheduler_running_id());
 
 cleanup_and_return:
-    if (parent != nullptr)
+    if (parent)
         fsnode_deref(parent);
 
     return result;

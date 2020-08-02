@@ -5,6 +5,8 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 
+extern void __reboot();
+
 void system_hang()
 {
     while (true)

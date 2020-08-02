@@ -5,6 +5,7 @@
     height="500"
     layout="hflow(8)"
     >
-
+    <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
     <Label text="Work In Progress" />
+    </Container>
 </Window>

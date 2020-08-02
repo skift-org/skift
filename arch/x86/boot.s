@@ -114,5 +114,5 @@ __reboot:
 	jnz __reboot
 	mov al, 0xfc
 	out 0x64, al
-	jmp short __reboot
+	ret
 .end:

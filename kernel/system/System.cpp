@@ -5,7 +5,7 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 
-extern void __reboot();
+extern "C" void __reboot();
 
 void system_hang()
 {
@@ -20,7 +20,7 @@ void system_stop()
     arch_disable_interupts();
     logger_info("System stopped!");
 
-    asm("jmp __reboot");
+    __reboot();
 
     while (1)
     {

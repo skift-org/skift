@@ -1,5 +1,4 @@
-CONFIG_KEYBOARD_LAYOUT?=en_us"
-CONFIG_KEYBOARD_LAYOUT:=\"$(CONFIG_KEYBOARD_LAYOUT)\"
+CONFIG_KEYBOARD_LAYOUT?=en_us
 
 KERNEL_SOURCES = \
 	$(wildcard kernel/*.cpp) \
@@ -41,7 +40,7 @@ $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CC] $<
-	@$(CC) -DCONFIG_KEYBOARD_LAYOUT=${CONFIG_KEYBOARD_LAYOUT} $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CC) -DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.o: arch/%.cpp
 	$(DIRECTORY_GUARD)

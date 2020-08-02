@@ -4,7 +4,7 @@
 
 #include "demo/Demos.h"
 
-typedef struct
+struct DemoWidget
 {
     Widget widget;
 
@@ -15,7 +15,7 @@ typedef struct
     Painter painter;
 
     Timer *timer;
-} DemoWidget;
+} ;
 
 void demo_widget_set_demo(Widget *widget, Demo *demo);
 

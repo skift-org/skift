@@ -33,7 +33,7 @@
 #define THEME_DEFAULT_ANSI_BRIGHT_CYAN COLOR(0x95e6cb)
 #define THEME_DEFAULT_ANSI_BRIGHT_WHITE COLOR(0xffffff)
 
-typedef enum
+enum ThemeColorRole
 {
     THEME_BORDER,
     THEME_BACKGROUND,
@@ -69,7 +69,7 @@ typedef enum
     THEME_ANSI_BRIGHT_WHITE,
 
     __THEME_COLOR_COUNT
-} ThemeColorRole;
+};
 
 bool theme_is_dark();
 

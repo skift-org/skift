@@ -4,7 +4,7 @@
 
 struct Socket;
 
-typedef struct Connection Connection;
+struct Connection;
 
 Connection *connection_create(struct Socket *socket, Handle handle);
 

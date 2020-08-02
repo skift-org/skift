@@ -2,12 +2,12 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct Lock
 {
     bool locked;
     int holder;
     const char *name;
-} Lock;
+};
 
 void __lock_init(Lock *lock, const char *name);
 

@@ -1,6 +1,6 @@
 #include "arch/x86/x86.h"
 
-typedef enum
+enum CMOSTimeSelector
 {
     T_SECOND = 0x0,
     T_MINUTE = 0x2,
@@ -8,7 +8,7 @@ typedef enum
     T_DAY = 0x7,
     T_MONTH = 0x8,
     T_YEAR = 0x9,
-} CMOSTimeSelector;
+};
 
 #define CMOS_ADDRESS 0x70
 #define CMOS_DATA 0x71

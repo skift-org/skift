@@ -7,14 +7,14 @@
 
 #include "file-explorer/FileSystemModel.h"
 
-typedef enum
+enum Column
 {
     COLUMN_NAME,
     COLUMN_TYPE,
     COLUMN_SIZE,
 
     __COLUMN_COUNT,
-} Column;
+};
 
 static auto get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
 {

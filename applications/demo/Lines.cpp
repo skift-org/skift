@@ -3,12 +3,12 @@
 
 #include "demo/Demos.h"
 
-typedef struct
+struct Line
 {
     Vec2i start;
     Vec2i finish;
     Color color;
-} Line;
+} ;
 
 static Random random = {};
 static bool random_initialized = false;

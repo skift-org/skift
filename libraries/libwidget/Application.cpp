@@ -12,14 +12,14 @@
 
 #include "compositor/Protocol.h"
 
-typedef enum
+enum ApplicationState
 {
     APPLICATION_NONE,
 
     APPLICATION_INITALIZED,
     APPLICATION_RUNNING,
     APPLICATION_EXITING,
-} ApplicationState;
+};
 
 static ApplicationState _state = APPLICATION_NONE;
 static List *_windows;

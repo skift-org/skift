@@ -2,9 +2,9 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct FsProcessInfo
 {
     FsNode node;
-} FsProcessInfo;
+};
 
 void process_info_initialize();

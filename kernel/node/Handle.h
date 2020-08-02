@@ -2,7 +2,7 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct FsHandle
+struct FsHandle
 {
     Lock lock;
     FsNode *node;
@@ -11,7 +11,7 @@ typedef struct FsHandle
 
     void *attached;
     size_t attached_size;
-} FsHandle;
+};
 
 bool fshandle_has_flag(FsHandle *handle, OpenFlag flag);
 

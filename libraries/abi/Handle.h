@@ -12,19 +12,19 @@
 
 typedef unsigned int SelectEvent;
 
-typedef struct
+struct Handle
 {
     int id;
     OpenFlag flags;
     Result result;
-} Handle;
+};
 
-typedef struct
+struct HandleSet
 {
     int *handles;
     SelectEvent *events;
     size_t count;
-} HandleSet;
+};
 
 #define HANDLE_INVALID_ID (-1)
 

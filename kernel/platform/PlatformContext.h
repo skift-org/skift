@@ -1,9 +1,9 @@
 #pragma once
 
-typedef struct
+struct PlatformContext
 {
     char fpu_registers[512];
-} PlatformContext;
+};
 
 PlatformContext *platform_context_create();
 

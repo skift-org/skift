@@ -2,19 +2,19 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct IOCallTerminalSizeArgs
 {
     int width;
     int height;
-} IOCallTerminalSizeArgs;
+};
 
-typedef struct
+struct IOCallDisplayModeArgs
 {
     int width;
     int height;
-} IOCallDisplayModeArgs;
+};
 
-typedef struct
+struct IOCallDisplayBlitArgs
 {
     uint32_t *buffer;
     int buffer_width;
@@ -24,23 +24,23 @@ typedef struct
     int blit_y;
     int blit_width;
     int blit_height;
-} IOCallDisplayBlitArgs;
+};
 
-typedef struct
+struct IOCallKeyboardSetKeymapArgs
 {
     void *keymap;
     size_t size;
-} IOCallKeyboardSetKeymapArgs;
+};
 
-typedef struct
+struct IOCallTextModeStateArgs
 {
     int width;
     int height;
     int cursor_x;
     int cursor_y;
-} IOCallTextModeStateArgs;
+};
 
-typedef enum
+enum IOCall
 {
     IOCALL_TERMINAL_GET_SIZE,
     IOCALL_TERMINAL_SET_SIZE,
@@ -56,4 +56,4 @@ typedef enum
     IOCALL_TEXTMODE_SET_STATE,
 
     __IOCALL_COUNT,
-} IOCall;
+};

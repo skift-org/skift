@@ -1,12 +1,12 @@
 #pragma once
 
-typedef enum
+enum MouseButtonState
 {
     MOUSE_BUTTON_RELEASED,
     MOUSE_BUTTON_PRESSED,
-} MouseButtonState;
+};
 
-typedef struct
+struct MousePacket
 {
     int offx;
     int offy;
@@ -15,4 +15,4 @@ typedef struct
     MouseButtonState left;
     MouseButtonState right;
     MouseButtonState middle;
-} MousePacket;
+};

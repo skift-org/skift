@@ -18,11 +18,11 @@
 
 #define PS2KBD_ESCAPE 0xE0
 
-typedef enum
+enum PS2KeyboardState
 {
     PS2KBD_STATE_NORMAL,
     PS2KBD_STATE_ESCAPED,
-} PS2KeyboardState;
+};
 
 static PS2KeyboardState _state = PS2KBD_STATE_NORMAL;
 static KeyMotion _keystate[__KEY_COUNT] = {};

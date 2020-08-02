@@ -17,8 +17,7 @@
 
 #define IS_PAGE_ALIGN(__x) (__x % PAGE_SIZE == 0)
 
-typedef union __packed // page table entry
-{
+union __packed PageTableEntry {
     struct __packed
     {
         bool Present : 1;
@@ -34,14 +33,14 @@ typedef union __packed // page table entry
     };
 
     u32 as_uint;
-} PageTableEntry;
+};
 
-typedef struct __packed
+struct __packed PageTable
 {
     PageTableEntry entries[PAGE_TABLE_ENTRY_COUNT];
-} PageTable;
+};
 
-typedef union __packed {
+union __packed PageDirectoryEntry {
     struct __packed
     {
         bool Present : 1;
@@ -56,12 +55,12 @@ typedef union __packed {
         u32 PageFrameNumber : 20;
     };
     u32 as_uint;
-} PageDirectoryEntry;
+};
 
-typedef struct __packed
+struct __packed PageDirectory
 {
     PageDirectoryEntry entries[PAGE_DIRECTORY_ENTRY_COUNT];
-} PageDirectory;
+};
 
 extern "C" void paging_enable();
 extern "C" void paging_disable();

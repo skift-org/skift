@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct PCIDevice
 {
     int vendor;
     int device;
@@ -10,7 +10,7 @@ typedef struct
     int bus;
     int slot;
     int func;
-} PCIDevice;
+} ;
 
 static inline uint32_t pci_device_get_address(PCIDevice device, int field)
 {

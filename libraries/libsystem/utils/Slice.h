@@ -2,12 +2,12 @@
 
 #include <libsystem/Assert.h>
 
-typedef struct
+struct Slice
 {
     unsigned char *data;
     int cursor;
     int size;
-} Slice;
+};
 
 #define SLICE_NULL ((Slice){nullptr, 0, 0})
 

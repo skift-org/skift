@@ -10,7 +10,7 @@
 
 typedef void (*TaskEntry)();
 
-typedef struct Task
+struct Task
 {
     int id;
     bool user;
@@ -34,7 +34,7 @@ typedef struct Task
     PageDirectory *pdir; // Page directory
 
     int exit_value;
-} Task;
+};
 
 Task *task_create(Task *parent, const char *name, bool user);
 

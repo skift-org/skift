@@ -40,11 +40,11 @@ static CommandLine cmdline = CMDLINE(
 
 /* --- gfxmode logic -------------------------------------------------------- */
 
-typedef struct
+struct SupportedMode
 {
     const char *name;
     IOCallDisplayModeArgs info;
-} SupportedMode;
+};
 
 SupportedMode gfxmodes[] = {
     {"640x360", {640, 360}},

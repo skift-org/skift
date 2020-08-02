@@ -2,22 +2,22 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct DirectoryListing
 {
     size_t count;
     DirectoryEntry entries[];
-} DirectoryListing;
+};
 
-typedef struct
+struct FsDirectoryEntry
 {
     char name[FILE_NAME_LENGTH];
     FsNode *node;
-} FsDirectoryEntry;
+};
 
-typedef struct
+struct FsDirectory
 {
     FsNode node;
     List *childs;
-} FsDirectory;
+};
 
 FsNode *directory_create();

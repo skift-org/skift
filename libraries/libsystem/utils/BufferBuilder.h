@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-typedef struct BufferBuilder BufferBuilder;
+struct BufferBuilder;
 
 BufferBuilder *buffer_builder_create(size_t preallocated);
 

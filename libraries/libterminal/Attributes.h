@@ -3,7 +3,7 @@
 #include <libsystem/Common.h>
 #include <libterminal/Color.h>
 
-typedef struct
+struct TerminalAttributes
 {
     TerminalColor foreground;
     TerminalColor background;
@@ -11,7 +11,7 @@ typedef struct
     bool bold;
     bool inverted;
     bool underline;
-} TerminalAttributes;
+};
 
 TerminalAttributes terminal_attributes_bold(TerminalAttributes attributes);
 

@@ -5,12 +5,12 @@
 
 #include "compositor/Protocol.h"
 
-typedef struct Client
+struct Client
 {
     Notifier *notifier;
     Connection *connection;
     bool disconnected;
-} Client;
+};
 
 Client *client_create(Connection *connection);
 

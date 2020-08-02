@@ -2,7 +2,7 @@
 
 #include <libsystem/io/Handle.h>
 
-typedef struct Directory Directory;
+struct Directory;
 
 Directory *directory_open(const char *path, OpenFlag flags);
 

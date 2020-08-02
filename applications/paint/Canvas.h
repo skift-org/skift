@@ -4,10 +4,10 @@
 
 #include "paint/PaintDocument.h"
 
-typedef struct
+struct Canvas
 {
     Widget widget;
     PaintDocument *document;
-} Canvas;
+};
 
 Widget *canvas_create(Widget *parent, PaintDocument *document);

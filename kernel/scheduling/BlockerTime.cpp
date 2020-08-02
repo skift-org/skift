@@ -2,11 +2,11 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
 
-typedef struct
+struct BlockerTime
 {
     Blocker blocker;
     uint wakeup_tick;
-} BlockerTime;
+};
 
 bool blocker_time_can_unblock(BlockerTime *blocker, Task *task)
 {

@@ -4,7 +4,7 @@
 
 struct PaintTool;
 
-typedef struct PaintDocument
+struct PaintDocument
 {
     bool dirty;
 
@@ -15,7 +15,7 @@ typedef struct PaintDocument
     Painter painter;
 
     struct PaintTool *tool;
-} PaintDocument;
+};
 
 PaintDocument *paint_document_create(int width, int height, Color fill_color);
 

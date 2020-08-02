@@ -10,21 +10,21 @@
     for (ListItem *__i = __list->tail; __i != nullptr; __i = __i->prev) \
         for (__type *__item = (__type *)__i->value, *__loop_once = (__type *)1; __loop_once; __loop_once = 0)
 
-typedef struct ListItem
+struct ListItem
 {
     void *value;
 
     struct ListItem *prev;
     struct ListItem *next;
-} ListItem;
+};
 
-typedef struct List
+struct List
 {
     int count;
 
     ListItem *head;
     ListItem *tail;
-} List;
+};
 
 typedef bool (*ListCompareElementCallback)(void *left, void *right);
 typedef void (*ListDestroyElementCallback)(void *element);

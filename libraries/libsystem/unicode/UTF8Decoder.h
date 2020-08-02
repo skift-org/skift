@@ -4,7 +4,7 @@
 
 typedef void (*UTF8DecoderCallback)(void *target, Codepoint codepoint);
 
-typedef struct
+struct UTF8Decoder
 {
     bool is_decoding;
     Codepoint current_decoding;
@@ -12,7 +12,7 @@ typedef struct
 
     void *target;
     UTF8DecoderCallback callback;
-} UTF8Decoder;
+};
 
 UTF8Decoder *utf8decoder_create(void *target, UTF8DecoderCallback callback);
 

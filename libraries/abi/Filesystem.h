@@ -7,14 +7,14 @@
 #define PATH_DEPTH (16)
 #define PATH_SEPARATOR '/'
 
-typedef enum
+enum Whence
 {
     WHENCE_START,
     WHENCE_HERE,
     WHENCE_END,
-} Whence;
+};
 
-typedef enum
+enum FileType
 {
     FILE_TYPE_UNKNOWN,
 
@@ -25,7 +25,7 @@ typedef enum
     FILE_TYPE_SOCKET,
     FILE_TYPE_CONNECTION,
     FILE_TYPE_TERMINAL,
-} FileType;
+};
 
 #define OPEN_READ (1 << 0)
 #define OPEN_WRITE (1 << 1)
@@ -42,14 +42,14 @@ typedef enum
 
 typedef unsigned int OpenFlag;
 
-typedef struct
+struct FileState
 {
     size_t size;
     FileType type;
-} FileState;
+};
 
-typedef struct
+struct DirectoryEntry
 {
     char name[FILE_NAME_LENGTH];
     FileState stat;
-} DirectoryEntry;
+};

@@ -3,7 +3,7 @@
 #include <libsystem/io/Path.h>
 #include <libwidget/Widget.h>
 
-typedef struct
+struct Breadcrumb
 {
     Widget widget;
 
@@ -11,7 +11,7 @@ typedef struct
 
     RefPtr<Icon> icon_computer;
     RefPtr<Icon> icon_expand;
-} Breadcrumb;
+};
 
 Widget *breadcrumb_create(Widget *parent, const char *current_path);
 

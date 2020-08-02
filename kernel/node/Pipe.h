@@ -4,10 +4,10 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct FsPipe
 {
     FsNode node;
     RingBuffer *buffer;
-} FsPipe;
+} ;
 
 FsNode *fspipe_create();

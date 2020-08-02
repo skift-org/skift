@@ -5,12 +5,12 @@
 #include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
 
-typedef struct
+struct TaskModel
 {
     Model __super;
 
     JsonValue *data;
-} TaskModel;
+} ;
 
 TaskModel *task_model_create();
 

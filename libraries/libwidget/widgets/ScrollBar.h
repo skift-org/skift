@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-typedef struct
+struct ScrollBar
 {
     Widget widget;
 
@@ -11,6 +11,6 @@ typedef struct
     int track;
     int thumb;
     int value;
-} ScrollBar;
+};
 
 Widget *scrollbar_create(Widget *parent);

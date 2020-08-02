@@ -4,7 +4,7 @@
 
 struct Connection;
 
-typedef struct Socket Socket;
+struct Socket;
 
 Socket *socket_open(const char *path, OpenFlag flags);
 

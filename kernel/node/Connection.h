@@ -4,7 +4,7 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct FsConnection
 {
     FsNode node;
 
@@ -13,6 +13,6 @@ typedef struct
 
     RingBuffer *data_to_server;
     RingBuffer *data_to_client;
-} FsConnection;
+};
 
 FsNode *fsconnection_create();

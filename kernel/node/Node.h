@@ -35,7 +35,7 @@ typedef struct FsNode *(*FsNodeAcceptConnectionCallback)(struct FsNode *node);
 
 typedef void (*FsNodeDestroyCallback)(struct FsNode *node);
 
-typedef struct FsNode
+struct FsNode
 {
     FileType type;
     Lock lock;
@@ -68,7 +68,7 @@ typedef struct FsNode
     FsNodeIsAcceptedCallback is_accepted;
 
     FsNodeDestroyCallback destroy;
-} FsNode;
+};
 
 #define FSNODE(__subclass) ((FsNode *)(__subclass))
 

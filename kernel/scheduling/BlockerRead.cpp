@@ -2,11 +2,11 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-typedef struct
+struct BlockerRead
 {
     Blocker blocker;
     FsHandle *handle;
-} BlockerRead;
+} ;
 
 static bool blocker_read_can_unblock(BlockerRead *blocker, Task *task)
 {

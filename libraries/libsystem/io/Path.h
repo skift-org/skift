@@ -4,11 +4,11 @@
 
 #include <libsystem/utils/List.h>
 
-typedef struct
+struct Path
 {
     List *elements;
     bool is_absolute;
-} Path;
+} ;
 
 Path *path_create(const char *raw_path);
 

@@ -8,16 +8,16 @@
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>
 
-typedef enum
+enum StreamBufferMode
 {
     STREAM_BUFFERED_NONE,
     STREAM_BUFFERED_LINE,
     STREAM_BUFFERED_BLOCK,
-} StreamBufferMode;
+};
 
 #define STREAM_BUFFER_SIZE 512
 
-typedef struct Stream Stream;
+struct Stream;
 
 extern Stream *in_stream;
 extern Stream *out_stream;

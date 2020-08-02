@@ -116,27 +116,27 @@
 
 #define KEY_ENUM_ENTRY(__key_name, __key_number) __key_name,
 
-typedef enum
+enum Key
 {
     KEY_LIST(KEY_ENUM_ENTRY)
         __KEY_COUNT,
-} Key;
+};
 
-typedef enum
+enum KeyMotion
 {
     KEY_MOTION_UP,
     KEY_MOTION_DOWN,
     KEY_MOTION_TYPED,
-} KeyMotion;
+};
 
-typedef struct
+struct KeyboardPacket
 {
     Key key;
     Codepoint codepoint;
     KeyMotion motion;
-} KeyboardPacket;
+};
 
-typedef struct
+struct KeyMapping
 {
     Key key;
 
@@ -144,12 +144,12 @@ typedef struct
     Codepoint shift_codepoint;
     Codepoint alt_codepoint;
     Codepoint shift_alt_codepoint;
-} KeyMapping;
+};
 
 #define KEYMAP_LANGUAGE_SIZE 16
 #define KEYMAP_REGION_SIZE 16
 
-typedef struct
+struct KeyMap
 {
     char magic[4]; /* kmap */
     char language[KEYMAP_LANGUAGE_SIZE];
@@ -157,7 +157,7 @@ typedef struct
 
     size_t length;
     KeyMapping mappings[];
-} KeyMap;
+};
 
 #define KEY_NAMES_ENTRY(__key_name, __key_number) #__key_name,
 

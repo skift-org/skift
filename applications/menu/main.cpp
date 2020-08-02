@@ -7,13 +7,13 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
-typedef struct
+struct MenuEntry
 {
     char *name;
     char *comment;
     char *icon;
     char *command;
-} MenuEntry;
+};
 
 MenuEntry *menu_entry_create(const char *path)
 {

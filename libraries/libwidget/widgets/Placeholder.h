@@ -2,10 +2,10 @@
 
 #include <libwidget/Widget.h>
 
-typedef struct
+struct Placeholder
 {
     Widget widget;
     char *text;
-} Placeholder;
+};
 
 Widget *placeholder_create(Widget *parent, const char *name);

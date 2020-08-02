@@ -4,10 +4,10 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct FsSocket
 {
     FsNode node;
     List *pending;
-} FsSocket;
+} ;
 
 FsNode *socket_create();

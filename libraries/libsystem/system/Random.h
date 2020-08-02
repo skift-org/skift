@@ -2,11 +2,11 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct Random
 {
     uint64_t state;
     uint64_t inc;
-} Random;
+};
 
 Random random_create();
 

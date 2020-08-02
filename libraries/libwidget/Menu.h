@@ -2,7 +2,7 @@
 
 #include <libgraphic/Icon.h>
 
-typedef struct Menu Menu;
+struct Menu;
 
 Menu *menu_create(Menu *parent, RefPtr<Icon> icon, const char *text);
 

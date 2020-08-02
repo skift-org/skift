@@ -9,7 +9,7 @@
 
 struct Client;
 
-typedef struct Window
+struct Window
 {
     int id;
     WindowFlag flags;
@@ -19,7 +19,7 @@ typedef struct Window
 
     RefPtr<Bitmap> frontbuffer;
     RefPtr<Bitmap> backbuffer;
-} Window;
+};
 
 Window *window_create(
     int id,

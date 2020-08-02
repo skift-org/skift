@@ -2,18 +2,18 @@
 
 #include <libsystem/utils/List.h>
 
-typedef struct
+struct MarkupAttribute
 {
     char *name;
     char *value;
-} MarkupAttribute;
+} ;
 
-typedef struct
+struct MarkupNode
 {
     char *type;
     List *childs;
     List *attributes;
-} MarkupNode;
+} ;
 
 MarkupNode *markup_node_create(char *type);
 

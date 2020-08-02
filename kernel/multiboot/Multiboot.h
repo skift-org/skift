@@ -8,28 +8,28 @@
 #define MULTIBOOT_MEMORY_MAP_SIZE 64
 #define MULTIBOOT_MODULES_SIZE 16
 
-typedef enum
+enum MemoryMapEntryType
 {
     MEMORY_MAP_ENTRY_AVAILABLE,
     MEMORY_MAP_ENTRY_RESERVED,
     MEMORY_MAP_ENTRY_ACPI_RECLAIMABLE,
     MEMORY_MAP_ENTRY_NVS,
     MEMORY_MAP_ENTRY_BADRAM,
-} MemoryMapEntryType;
+};
 
-typedef struct
+struct MemoryMapEntry
 {
     MemoryRange range;
     MemoryMapEntryType type;
-} MemoryMapEntry;
+};
 
-typedef struct
+struct Module
 {
     MemoryRange range;
     char command_line[MULTIBOOT_COMMAND_LINE_SIZE];
-} Module;
+};
 
-typedef struct
+struct Multiboot
 {
     char bootloader[MULTIBOOT_BOOTLOADER_NAME_SIZE];
     char command_line[MULTIBOOT_COMMAND_LINE_SIZE];
@@ -47,7 +47,7 @@ typedef struct
     size_t framebuffer_height;
     size_t framebuffer_pitch;
     PixelFormat framebuffer_pixelformat;
-} Multiboot;
+};
 
 void multiboot_assert(uint32_t magic);
 

@@ -4,7 +4,7 @@
 #include <libfile/tar.h>
 #include <libsystem/core/CString.h>
 
-typedef struct __packed
+struct __packed TARRawBlock
 {
     char name[100];     /*   0 */
     char mode[8];       /* 100 */
@@ -23,7 +23,7 @@ typedef struct __packed
     char devminor[8];   /* 337 */
     char prefix[155];   /* 345 */
                         /* 500 */
-} TARRawBlock;
+};
 
 uint get_file_size(TARRawBlock *header)
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-typedef struct
+struct TerminalCursor
 {
     int x;
     int y;
 
     bool visible;
-} TerminalCursor;
+};

@@ -5,13 +5,13 @@
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
-typedef struct
+struct Glyph
 {
     Codepoint codepoint;
     Rectangle bound;
     Vec2i origin;
     int advance;
-} Glyph;
+};
 
 class Font : public RefCounted<Font>
 {

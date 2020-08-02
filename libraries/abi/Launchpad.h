@@ -3,7 +3,7 @@
 #include <abi/Filesystem.h>
 #include <abi/Process.h>
 
-typedef struct
+struct Launchpad
 {
     char name[PROCESS_NAME_SIZE];
     char executable[PATH_LENGTH];
@@ -12,4 +12,4 @@ typedef struct
     int argc;
 
     int handles[PROCESS_HANDLE_COUNT];
-} Launchpad;
+} ;

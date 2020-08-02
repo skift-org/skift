@@ -8,13 +8,13 @@
 #include "file-explorer/Breadcrumb.h"
 #include "file-explorer/FileSystemModel.h"
 
-typedef enum
+enum RecordHistory
 {
     RECORD_BACKWARD,
     RECORD_FOREWARD,
-} RecordHistory;
+};
 
-typedef struct
+struct FileExplorerWindow
 {
     Window window;
 
@@ -33,7 +33,7 @@ typedef struct
     List *backward_history;
     Path *current_path;
     List *foreward_history;
-} FileExplorerWindow;
+};
 
 static void update_navigation_bar(FileExplorerWindow *window)
 {

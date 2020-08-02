@@ -2,13 +2,13 @@
 
 #include "kernel/node/Node.h"
 
-typedef struct
+struct FsFile
 {
     FsNode node;
 
     char *buffer;
     size_t realsize;
     size_t size;
-} FsFile;
+};
 
 FsNode *file_create();

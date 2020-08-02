@@ -7,7 +7,7 @@
 
 struct FsTerminalEndpoint;
 
-typedef struct
+struct FsTerminal
 {
     FsNode node;
 
@@ -16,6 +16,6 @@ typedef struct
 
     RingBuffer *master_to_slave_buffer;
     RingBuffer *slave_to_master_buffer;
-} FsTerminal;
+};
 
 FsNode *terminal_create();

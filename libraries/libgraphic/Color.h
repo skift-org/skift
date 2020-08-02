@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-typedef union {
+union Color {
     struct
     {
         uint8_t R;
@@ -12,7 +12,7 @@ typedef union {
     };
 
     uint32_t packed;
-} Color;
+};
 
 Color RGB(float R, float G, float B);
 

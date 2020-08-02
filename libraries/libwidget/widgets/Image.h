@@ -2,19 +2,19 @@
 
 #include <libwidget/Widget.h>
 
-typedef enum
+enum ImageSizeMode
 {
     IMAGE_CENTER,
     IMAGE_STRETCH,
-} ImageSizeMode;
+};
 
-typedef struct
+struct Image
 {
     Widget widget;
 
     ImageSizeMode size_mode;
     RefPtr<Bitmap> bitmap;
-} Image;
+};
 
 void image_set_image(Widget *image, const char *path);
 

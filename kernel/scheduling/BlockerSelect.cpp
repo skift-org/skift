@@ -2,7 +2,7 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-typedef struct
+struct BlockerSelect
 {
     Blocker blocker;
 
@@ -12,7 +12,7 @@ typedef struct
 
     FsHandle **selected;
     SelectEvent *selected_events;
-} BlockerSelect;
+};
 
 static bool blocker_select_can_unblock(BlockerSelect *blocker, Task *task)
 {

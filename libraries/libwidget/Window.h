@@ -10,9 +10,11 @@
 
 #include "compositor/Protocol.h"
 
-typedef void (*WindowDestroyCallback)(struct Window *window);
+struct Window;
 
-typedef struct Window
+typedef void (*WindowDestroyCallback)(Window *window);
+
+struct Window
 {
     int handle;
     char *title;
@@ -50,7 +52,7 @@ typedef struct Window
     Widget *mouse_focused_widget;
     Widget *mouse_over_widget;
     HashMap *widget_by_id;
-} Window;
+};
 
 Window *window_create(WindowFlag flags);
 

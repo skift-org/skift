@@ -16,8 +16,8 @@ void lines_draw(Painter &painter, Rectangle screen, double time);
 
 typedef void (*DrawDemoCallback)(Painter &painter, Rectangle screen, double time);
 
-typedef struct
+struct Demo
 {
     const char *name;
     DrawDemoCallback callback;
-} Demo;
+} ;

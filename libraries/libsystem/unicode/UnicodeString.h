@@ -2,12 +2,12 @@
 
 #include <libsystem/unicode/Codepoint.h>
 
-typedef struct
+struct UnicodeString
 {
     Codepoint *buffer;
     size_t used;
     size_t allocated;
-} UnicodeString;
+};
 
 UnicodeString *unicode_string_create(size_t size);
 

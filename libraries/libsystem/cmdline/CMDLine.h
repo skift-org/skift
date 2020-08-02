@@ -7,7 +7,7 @@ struct CommandLineOption;
 
 typedef void CommandLineCallback(struct CommandLine *cmdline, struct CommandLineOption *opt);
 
-typedef enum
+enum CommandLineOptionType
 {
     COMMANDLINE_BOOLEAN,
     COMMANDLINE_STRING,
@@ -16,9 +16,9 @@ typedef enum
     COMMANDLINE_SECTION,
     COMMANDLINE_SEPARATOR,
     COMMANDLINE_END
-} CommandLineOptionType;
+};
 
-typedef struct CommandLineOption
+struct CommandLineOption
 {
     CommandLineOptionType type;
 
@@ -28,16 +28,16 @@ typedef struct CommandLineOption
     const char *description;
 
     CommandLineCallback *callback;
-} CommandLineOption;
+};
 
-typedef struct CommandLine
+struct CommandLine
 {
     const char *name;
     const char *const *usages;
     const char *prologue;
     CommandLineOption *options;
     const char *epiloge;
-} CommandLine;
+};
 
 #define COMMANDLINE_NEWLINE "\n\t"
 

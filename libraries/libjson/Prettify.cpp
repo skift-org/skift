@@ -2,12 +2,12 @@
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberFormatter.h>
 
-typedef struct
+struct JsonPrettifyState
 {
     BufferBuilder *builder;
     int depth;
     bool color;
-} JsonPrettifyState;
+} ;
 
 static const char *depth_color[] = {
     "\e[91m",

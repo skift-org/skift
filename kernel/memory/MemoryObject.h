@@ -2,14 +2,14 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct MemoryObject
 {
     int id;
     uintptr_t address;
     size_t size;
 
     int refcount;
-} MemoryObject;
+};
 
 void memory_object_initialize();
 

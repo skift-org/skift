@@ -9,11 +9,11 @@ typedef void (*PaintToolMouseEventCallback)(struct PaintTool *tool, struct Paint
 
 typedef void (*PaintToolDestroyCallback)(struct PaintTool *tool);
 
-typedef struct PaintTool
+struct PaintTool
 {
     PaintToolMouseEventCallback on_mouse_event;
     PaintToolDestroyCallback destroy;
-} PaintTool;
+};
 
 PaintTool *pencil_tool_create();
 

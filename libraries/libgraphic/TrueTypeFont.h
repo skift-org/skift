@@ -3,31 +3,31 @@
 #include <libgraphic/Bitmap.h>
 #include <libsystem/unicode/Codepoint.h>
 
-typedef struct TrueTypeFamily TrueTypeFamily;
+struct TrueTypeFamily;
 
-typedef struct TrueTypeFont TrueTypeFont;
+struct TrueTypeFont;
 
-typedef struct
+struct TrueTypeFontMetrics
 {
     int ascent;
     int descent;
     int linegap;
-} TrueTypeFontMetrics;
+};
 
-typedef struct TrueTypeGlyph
+struct TrueTypeGlyph
 {
     Codepoint codepoint;
     Rectangle bound;
     Vec2i offset;
     int advance;
-} TrueTypeGlyph;
+};
 
-typedef struct TrueTypeAtlas
+struct TrueTypeAtlas
 {
     int width;
     int height;
     uint8_t buffer[];
-} TrueTypeAtlas;
+};
 
 TrueTypeFamily *truetype_family_create(const char *path);
 

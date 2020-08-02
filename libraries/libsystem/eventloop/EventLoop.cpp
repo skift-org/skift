@@ -8,11 +8,11 @@
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
 
-typedef struct
+struct RunLater
 {
     RunLaterCallback callback;
     void *target;
-} RunLater;
+} ;
 
 static List *_eventloop_timers = nullptr;
 static TimeStamp _eventloop_timer_last_fire = 0;

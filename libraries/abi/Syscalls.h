@@ -46,10 +46,10 @@
 
 #define SYSCALL_ENUM_ENTRY(__entry) __entry,
 
-typedef enum
+enum Syscall
 {
     SYSCALL_LIST(SYSCALL_ENUM_ENTRY) __SYSCALL_COUNT
-} Syscall;
+};
 
 static inline int __syscall(Syscall syscall, int p1, int p2, int p3, int p4, int p5)
 {

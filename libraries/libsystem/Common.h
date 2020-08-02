@@ -34,8 +34,8 @@ typedef struct
 
 /* --- Loops ---------------------------------------------------------------- */
 
-typedef enum
+enum IterationDecision
 {
     ITERATION_CONTINUE,
     ITERATION_STOP,
-} IterationDecision;
+};

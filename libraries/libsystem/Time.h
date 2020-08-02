@@ -25,21 +25,21 @@ typedef uint32_t TimeStamp;
 
 typedef uint32_t Timeout;
 
-typedef struct
+struct Time
 {
     int second;
     int minute;
     int hour;
-} Time;
+};
 
-typedef struct
+struct Date
 {
     int day;
     int month;
     int year;
-} Date;
+};
 
-typedef union {
+union DateTime {
     struct
     {
         Time time;
@@ -55,7 +55,7 @@ typedef union {
         int month;
         int year;
     };
-} DateTime;
+};
 
 TimeStamp timestamp_now();
 

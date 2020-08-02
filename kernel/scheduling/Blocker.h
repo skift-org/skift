@@ -11,13 +11,13 @@ typedef bool (*BlockerCanUnblockCallback)(struct Blocker *blocker, struct Task *
 typedef void (*BlockerUnblockCallback)(struct Blocker *blocker, struct Task *task);
 typedef void (*BlockerTimeoutCallback)(struct Blocker *blocker, struct Task *task);
 
-typedef enum
+enum BlockerResult
 {
     BLOCKER_UNBLOCKED,
     BLOCKER_TIMEOUT,
-} BlockerResult;
+};
 
-typedef struct Blocker
+struct Blocker
 {
     BlockerResult result;
     TimeStamp timeout;
@@ -25,7 +25,7 @@ typedef struct Blocker
     BlockerCanUnblockCallback can_unblock;
     BlockerUnblockCallback on_unblock;
     BlockerTimeoutCallback on_timeout;
-} Blocker;
+};
 
 #define TASK_BLOCKER(__subclass) ((Blocker *)(__subclass))
 

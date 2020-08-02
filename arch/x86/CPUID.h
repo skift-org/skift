@@ -63,7 +63,7 @@ enum
     CPUID_FEAT_EDX_PBE = 1 << 31
 };
 
-typedef struct __packed
+struct __packed CPUID
 {
     char vendorid[16];
     union __packed {
@@ -135,7 +135,7 @@ typedef struct __packed
         };
         u32 RAW_EDX;
     };
-} CPUID;
+};
 
 CPUID cpuid();
 

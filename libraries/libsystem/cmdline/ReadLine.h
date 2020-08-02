@@ -6,7 +6,7 @@
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/Lexer.h>
 
-typedef struct
+struct ReadLine
 {
     bool should_continue;
 
@@ -19,7 +19,7 @@ typedef struct
     UTF8Decoder *decoder;
     UnicodeString *string;
     Lexer *lexer;
-} ReadLine;
+} ;
 
 ReadLine *readline_create(Stream *stream);
 

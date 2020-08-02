@@ -2,9 +2,9 @@
 
 #include <libwidget/Widget.h>
 
-typedef struct
+struct Separator
 {
     Widget widget;
-} Separator;
+};
 
 Widget *separator_create(Widget *parent);

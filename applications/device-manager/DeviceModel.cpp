@@ -5,13 +5,13 @@
 
 #include "device-manager/DeviceModel.h"
 
-typedef enum
+enum Column
 {
     COLUMN_DEVICE,
     COLUMN_DESCRIPTION,
 
     __COLUMN_COUNT,
-} Column;
+};
 
 static void device_model_update(DeviceModel *model)
 {

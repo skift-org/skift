@@ -9,14 +9,14 @@
 
 struct TerminalWidget;
 
-typedef struct
+struct TerminalWidgetRenderer
 {
     TerminalRenderer renderer;
 
     struct TerminalWidget *widget;
-} TerminalWidgetRenderer;
+};
 
-typedef struct TerminalWidget
+struct TerminalWidget
 {
     Widget widget;
 
@@ -28,6 +28,6 @@ typedef struct TerminalWidget
 
     Timer *cursor_blink_timer;
     Notifier *master_notifier;
-} TerminalWidget;
+};
 
 Widget *terminal_widget_create(Widget *parent);

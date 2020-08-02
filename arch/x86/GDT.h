@@ -13,7 +13,7 @@
 #define GDT_FLAGS 0b1100
 #define TSS_FLAGS 0
 
-typedef struct __packed
+struct __packed TSS
 {
 	u32 prev_tss;
 	u32 esp0;
@@ -42,15 +42,15 @@ typedef struct __packed
 	u32 ldt;
 	u16 trap;
 	u16 iomap_base;
-} TSS;
+};
 
-typedef struct __packed
+struct __packed GDTDescriptor
 {
 	u16 size;
 	u32 offset;
-} GDTDescriptor;
+};
 
-typedef struct __packed
+struct __packed GDTEntry
 {
 	u16 limit0_15;
 	u16 base0_15;
@@ -59,7 +59,7 @@ typedef struct __packed
 	u8 limit16_19 : 4;
 	u8 flags : 4;
 	u8 base24_31;
-} GDTEntry;
+};
 
 #define GDT_ENTRY(__base, __limit, __access, __flags) \
 	(GDTEntry)                                        \

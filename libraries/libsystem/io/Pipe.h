@@ -2,11 +2,11 @@
 
 #include <libsystem/io/Stream.h>
 
-typedef struct
+struct Pipe
 {
     Stream *in;
     Stream *out;
-} Pipe;
+};
 
 Pipe *pipe_create();
 

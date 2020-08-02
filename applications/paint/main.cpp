@@ -27,7 +27,7 @@ static Color _color_palette[] = {
     COLOR(0x333c57),
 };
 
-typedef struct
+struct PaintWindow
 {
     Window window;
     PaintDocument *document;
@@ -53,7 +53,7 @@ typedef struct
 
     /// --- Canvas --- ///
     Widget *canvas;
-} PaintWindow;
+} ;
 
 static void update_toolbar(PaintWindow *window)
 {

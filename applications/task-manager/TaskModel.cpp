@@ -5,7 +5,7 @@
 
 #include "task-manager/TaskModel.h"
 
-typedef enum
+enum Column
 {
     COLUMN_ID,
     COLUMN_NAME,
@@ -14,7 +14,7 @@ typedef enum
     COLUMN_DIRECTORY,
 
     __COLUMN_COUNT,
-} Column;
+};
 
 static void task_model_update(TaskModel *model)
 {

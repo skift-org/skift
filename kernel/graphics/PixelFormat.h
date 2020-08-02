@@ -1,9 +1,9 @@
 #pragma once
 
-typedef enum
+enum PixelFormat
 {
     PIXELFORMAT_NONE,
 
     PIXELFORMAT_CGA,
     PIXELFORMAT_RGB,
-} PixelFormat;
+};

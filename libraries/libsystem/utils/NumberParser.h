@@ -2,10 +2,10 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct NumberParser
 {
     int base;
-} NumberParser;
+};
 
 #define PARSER_BINARY ((NumberParser){2})
 #define PARSER_OCTAL ((NumberParser){8})

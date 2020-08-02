@@ -35,11 +35,11 @@
 #define RESULT_ENUM_ENTRY(__entry) __entry,
 #define RESULT_ENUM_ENTRY_WITH_VALUE(__entry, __value) __entry = __value,
 
-typedef enum
+enum Result
 {
     RESULT_ENUM(RESULT_ENUM_ENTRY, RESULT_ENUM_ENTRY_WITH_VALUE)
         __RESULT_COUNT,
-} Result;
+};
 
 const char *result_to_string(Result error);
 

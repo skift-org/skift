@@ -2,13 +2,13 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct NumberFormater
 {
     int base;
     int after_point;
     bool padded_with_zero;
     bool capitalized;
-} NumberFormater;
+};
 
 #define FORMAT_BINARY ((NumberFormater){2, 4, true, false})
 #define FORMAT_OCTAL ((NumberFormater){8, 4, true, false})

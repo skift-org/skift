@@ -11,12 +11,12 @@
     __ENTRY(BLOCKED)             \
     __ENTRY(CANCELED)
 
-typedef enum
+enum TaskState
 {
 #define TASK_STATE_ENUM_ENTRY(__state) TASK_STATE_##__state,
     TASK_STATE_LIST(TASK_STATE_ENUM_ENTRY)
         __TASK_STATE_COUNT
-} TaskState;
+};
 
 static inline const char *task_state_string(TaskState state)
 {

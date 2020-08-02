@@ -3,26 +3,26 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Widget.h>
 
-typedef enum
+enum ButtonState
 {
     BUTTON_IDLE,
     BUTTON_OVER,
     BUTTON_PRESS,
-} ButtonState;
+};
 
-typedef enum
+enum ButtonStyle
 {
     BUTTON_TEXT,
     BUTTON_OUTLINE,
     BUTTON_FILLED,
-} ButtonStyle;
+};
 
-typedef struct
+struct Button
 {
     Widget widget;
     ButtonState state;
     ButtonStyle style;
-} Button;
+};
 
 Widget *button_create(Widget *parent, ButtonStyle style);
 

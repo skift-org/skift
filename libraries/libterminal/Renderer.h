@@ -6,13 +6,13 @@
 struct Terminal;
 struct TerminalRenderer;
 
-typedef void (*TerminalOnPaintCallback)(struct Terminal *terminal, struct TerminalRenderer *renderer, int x, int y, TerminalCell cell);
-typedef void (*TerminalOnCursorCallback)(struct Terminal *terminal, struct TerminalRenderer *renderer, TerminalCursor cursor);
-typedef void (*TerminalOnBlinkCallback)(struct Terminal *terminal, struct TerminalRenderer *renderer);
-typedef void (*TerminalRepaintCallback)(struct Terminal *terminal, struct TerminalRenderer *renderer);
-typedef void (*TerminalRendererDestroy)(struct TerminalRenderer *renderer);
+typedef void (*TerminalOnPaintCallback)(Terminal *terminal, TerminalRenderer *renderer, int x, int y, TerminalCell cell);
+typedef void (*TerminalOnCursorCallback)(Terminal *terminal, TerminalRenderer *renderer, TerminalCursor cursor);
+typedef void (*TerminalOnBlinkCallback)(Terminal *terminal, TerminalRenderer *renderer);
+typedef void (*TerminalRepaintCallback)(Terminal *terminal, TerminalRenderer *renderer);
+typedef void (*TerminalRendererDestroy)(TerminalRenderer *renderer);
 
-typedef struct TerminalRenderer
+struct TerminalRenderer
 {
     TerminalOnPaintCallback on_paint;
     TerminalOnCursorCallback on_cursor;
@@ -21,7 +21,7 @@ typedef struct TerminalRenderer
     TerminalRepaintCallback repaint;
 
     TerminalRendererDestroy destroy;
-} TerminalRenderer;
+};
 
 #define TERMINAL_RENDERER(__subclass) ((TerminalRenderer *)(__subclass))
 

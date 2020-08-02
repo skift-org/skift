@@ -2,11 +2,11 @@
 
 #include "kernel/memory/Paging.h"
 
-typedef struct
+struct MemoryRange
 {
     uintptr_t base;
     size_t size;
-} MemoryRange;
+};
 
 inline bool memory_range_empty(MemoryRange range)
 {

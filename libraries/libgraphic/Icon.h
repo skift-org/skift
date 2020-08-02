@@ -10,10 +10,10 @@
     __ENTRY(48)
 
 #define ICON_SIZE_ENUM_ENTRY(__size) ICON_##__size##PX,
-typedef enum
+enum IconSize
 {
     ICON_SIZE_LIST(ICON_SIZE_ENUM_ENTRY) __ICON_SIZE_COUNT,
-} IconSize;
+};
 
 class Icon : public RefCounted<Icon>
 {

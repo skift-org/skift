@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-typedef enum
+enum LogLevel
 {
     LOGGER_TRACE,
     LOGGER_DEBUG,
@@ -10,7 +10,7 @@ typedef enum
     LOGGER_WARN,
     LOGGER_ERROR,
     LOGGER_FATAL,
-} LogLevel;
+};
 
 void logger_level(LogLevel log_level);
 

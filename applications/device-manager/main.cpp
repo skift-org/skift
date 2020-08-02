@@ -6,14 +6,14 @@
 
 #include "device-manager/DeviceModel.h"
 
-typedef struct
+struct TaskManagerWindow
 {
     Window window;
 
     /// --- Table view --- //
     Widget *table;
     DeviceModel *table_model;
-} TaskManagerWindow;
+};
 
 void widget_ram_update(Graph *widget)
 {

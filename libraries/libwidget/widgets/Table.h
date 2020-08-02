@@ -3,7 +3,7 @@
 #include <libwidget/Model.h>
 #include <libwidget/Widget.h>
 
-typedef struct
+struct Table
 {
     Widget widget;
     Model *model;
@@ -11,7 +11,7 @@ typedef struct
     int scroll_offset;
 
     Widget *scrollbar;
-} Table;
+};
 
 Widget *table_create(Widget *parent, Model *model);
 

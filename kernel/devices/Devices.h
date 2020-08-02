@@ -4,26 +4,26 @@
 
 #include "kernel/bus/PCIDevice.h"
 
-typedef enum
+enum Bus
 {
     BUS_NONE,
     BUS_UNIX,
     BUS_PCI,
-} Bus;
+};
 
-typedef enum
+enum UNIXDevice
 {
     UNIX_ZERO,
     UNIX_NULL,
     UNIX_RANDOM,
-} UNIXDevice;
+};
 
-typedef struct
+struct UNIXDeviceAddress
 {
     UNIXDevice device;
-} UNIXDeviceAddress;
+};
 
-typedef struct
+struct DeviceInfo
 {
     Bus bus;
 
@@ -31,19 +31,19 @@ typedef struct
         UNIXDeviceAddress unix_device;
         PCIDevice pci_device;
     };
-} DeviceInfo;
+};
 
 typedef bool (*DeviceDriverInfoMatch)(DeviceInfo info);
 typedef void (*DeviceDriverInfoInitialize)(DeviceInfo info);
 
-typedef struct
+struct DeviceDriverInfo
 {
     const char *description;
 
     Bus bus;
     DeviceDriverInfoMatch match;
     DeviceDriverInfoInitialize initialize;
-} DeviceDriverInfo;
+};
 
 typedef IterationDecision (*DeviceIterateCallback)(void *target, DeviceInfo device);
 

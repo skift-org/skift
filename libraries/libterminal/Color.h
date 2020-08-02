@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum
+enum TerminalColor
 {
     TERMINAL_COLOR_BLACK,
     TERMINAL_COLOR_RED,
@@ -23,4 +23,4 @@ typedef enum
     TERMINAL_COLOR_DEFAULT_BACKGROUND,
 
     __TERMINAL_COLOR_COUNT
-} TerminalColor;
+};

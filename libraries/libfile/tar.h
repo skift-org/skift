@@ -2,11 +2,11 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct TARBlock
 {
     char name[100];
     u32 size;
     char *data;
-} TARBlock;
+} ;
 
 bool tar_read(void *tarfile, TARBlock *block, uint index);

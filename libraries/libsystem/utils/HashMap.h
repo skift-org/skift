@@ -4,9 +4,9 @@
 
 typedef void (*HashMapDestroyValueCallback)(void *value);
 
-typedef struct HashMapItem HashMapItem;
+struct HashMapItem;
 
-typedef struct HashMap HashMap;
+struct HashMap;
 
 HashMap *hashmap_create_string_to_value();
 

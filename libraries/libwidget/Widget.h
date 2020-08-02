@@ -10,13 +10,13 @@ struct Widget;
 struct Painter;
 struct Window;
 
-typedef Vec2i (*WidgetComputeSizeCallback)(struct Widget *widget);
-typedef void (*WidgetDestroyCallback)(struct Widget *widget);
-typedef void (*WidgetPaintCallback)(struct Widget *widget, struct Painter &painter, Rectangle rectangle);
-typedef void (*WidgetEventCallback)(struct Widget *widget, struct Event *event);
-typedef void (*WidgetLayoutCallback)(struct Widget *widget);
+typedef Vec2i (*WidgetComputeSizeCallback)(Widget *widget);
+typedef void (*WidgetDestroyCallback)(Widget *widget);
+typedef void (*WidgetPaintCallback)(Widget *widget, Painter &painter, Rectangle rectangle);
+typedef void (*WidgetEventCallback)(Widget *widget, Event *event);
+typedef void (*WidgetLayoutCallback)(Widget *widget);
 
-typedef enum
+enum LayoutType
 {
     LAYOUT_STACK,
     LAYOUT_GRID,
@@ -24,21 +24,21 @@ typedef enum
     LAYOUT_HGRID,
     LAYOUT_VFLOW,
     LAYOUT_HFLOW,
-} LayoutType;
+};
 
 #define LAYOUT_FILL (1 << 0)
 #define LAYOUT_GREEDY (1 << 1)
 
 typedef unsigned LayoutAttributes;
 
-typedef struct
+struct Layout
 {
     LayoutType type;
 
     int hcell;
     int vcell;
     Vec2i spacing;
-} Layout;
+};
 
 #define STACK() \
     ((Layout){LAYOUT_STACK, 0, 0, Vec2i::zero()})
@@ -58,13 +58,13 @@ typedef struct
 #define HFLOW(_hspacing) \
     ((Layout){LAYOUT_HFLOW, 0, 0, Vec2i((_hspacing), 0)})
 
-typedef struct
+struct WidgetColor
 {
     bool overwritten;
     Color color;
-} WidgetColor;
+};
 
-typedef struct WidgetClass
+struct WidgetClass
 {
     const char *name;
 
@@ -73,9 +73,9 @@ typedef struct WidgetClass
     WidgetEventCallback event = nullptr;
     WidgetComputeSizeCallback size = nullptr;
     WidgetLayoutCallback layout = nullptr;
-} WidgetClass;
+};
 
-typedef struct Widget
+struct Widget
 {
     const WidgetClass *klass;
 
@@ -96,7 +96,7 @@ typedef struct Widget
     struct Widget *parent;
     struct Window *window;
     List *childs;
-} Widget;
+};
 
 #define WIDGET(__subclass) ((Widget *)(__subclass))
 

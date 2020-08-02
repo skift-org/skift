@@ -1,12 +1,12 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-typedef struct
+struct BlockerWait
 {
     Blocker blocker;
     Task *task;
     int *exit_value;
-} BlockerWait;
+};
 
 static bool blocker_wait_can_unblock(BlockerWait *blocker, Task *task)
 {

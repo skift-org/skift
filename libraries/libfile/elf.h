@@ -15,7 +15,7 @@
 
 typedef unsigned int elf_type_t;
 
-typedef struct __packed
+struct __packed ELFHeader
 {
     u8 ident[ELF_NIDENT];
     u16 type;
@@ -31,9 +31,9 @@ typedef struct __packed
     u16 shentsize;
     u16 shnum;
     u16 shstrndx;
-} ELFHeader;
+};
 
-typedef enum
+enum ELFSectionType
 {
     ELFS_NULL = 0,     // Null section
     ELFS_PROGBITS = 1, // Program information
@@ -42,9 +42,9 @@ typedef enum
     ELFS_RELA = 4,     // Relocation (w/ addend)
     ELFS_NOBITS = 8,   // Not present in file
     ELFS_REL = 9,      // Relocation (no addend)
-} ELFSectionType;
+};
 
-typedef struct __packed
+struct __packed ELFSection
 {
     uint name;
     uint type;
@@ -56,9 +56,9 @@ typedef struct __packed
     uint info;
     uint addralign;
     uint entsize;
-} ELFSection;
+};
 
-typedef struct
+struct ELFProgram
 {
     u32 type;
     u32 offset;
@@ -68,9 +68,9 @@ typedef struct
     u32 memsz;
     u32 flags;
     u32 align;
-} ELFProgram;
+};
 
-typedef struct
+struct ELFSymbole
 {
     u32 name;
     u32 value;
@@ -78,7 +78,7 @@ typedef struct
     uint8_t info;
     uint8_t other;
     u16 shndx;
-} ELFSymbole;
+};
 
 int elf_valid(ELFHeader *header);
 

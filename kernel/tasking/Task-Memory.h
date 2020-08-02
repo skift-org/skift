@@ -3,13 +3,13 @@
 #include "kernel/memory/MemoryObject.h"
 #include "kernel/tasking/Task.h"
 
-typedef struct
+struct MemoryMapping
 {
     MemoryObject *object;
 
     uintptr_t address;
     size_t size;
-} MemoryMapping;
+} ;
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object);
 

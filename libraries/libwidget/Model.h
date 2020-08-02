@@ -5,25 +5,25 @@
 
 struct Model;
 
-typedef struct
+struct CellStyle
 {
     Position text_position;
 
     Color foreground;
     Color background;
-} CellStyle;
+};
 
 #define DEFAULT_STYLE ((CellStyle){Position::LEFT, COLOR_WHITE, COLOR_BLACK})
 
-typedef void (*ModelUpdateCallback)(struct Model *model);
-typedef Variant (*ModelDataCallback)(struct Model *model, int row, int column);
-typedef CellStyle (*ModelStyleCallback)(struct Model *model, int row, int column);
+typedef void (*ModelUpdateCallback)(Model *model);
+typedef Variant (*ModelDataCallback)(Model *model, int row, int column);
+typedef CellStyle (*ModelStyleCallback)(Model *model, int row, int column);
 typedef int (*ModelColumnCountCallback)();
-typedef int (*ModelRowCountCallback)(struct Model *model);
+typedef int (*ModelRowCountCallback)(Model *model);
 typedef const char *(*ModelColumnNameCallback)(int column);
-typedef void (*ModelDestroyCallback)(struct Model *model);
+typedef void (*ModelDestroyCallback)(Model *model);
 
-typedef struct Model
+struct Model
 {
     ModelUpdateCallback model_update;
     ModelDataCallback model_data;
@@ -32,7 +32,7 @@ typedef struct Model
     ModelColumnCountCallback model_column_count;
     ModelColumnNameCallback model_column_name;
     ModelDestroyCallback model_destroy;
-} Model;
+};
 
 #define MODEL(__subclass) ((Model *)__subclass)
 

@@ -8,20 +8,20 @@
 
 struct Terminal;
 
-typedef enum
+enum TerminalState
 {
     TERMINAL_STATE_WAIT_ESC,
     TERMINAL_STATE_EXPECT_BRACKET,
     TERMINAL_STATE_READ_ATTRIBUTE,
-} TerminalState;
+};
 
-typedef struct
+struct TerminalParameter
 {
     int value;
     bool empty;
-} TerminalParameter;
+};
 
-typedef struct Terminal
+struct Terminal
 {
     int height;
     int width;
@@ -39,7 +39,7 @@ typedef struct Terminal
 #define TERMINAL_MAX_PARAMETERS 8
     int parameters_top;
     TerminalParameter parameters[TERMINAL_MAX_PARAMETERS];
-} Terminal;
+};
 
 Terminal *terminal_create(int width, int height, TerminalRenderer *renderer);
 void terminal_destroy(Terminal *terminal);

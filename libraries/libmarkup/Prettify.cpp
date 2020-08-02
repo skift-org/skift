@@ -1,13 +1,13 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/utils/BufferBuilder.h>
 
-typedef struct
+struct MarkupPrettifyState
 {
     BufferBuilder *builder;
     int depth;
     bool color;
     bool first_line;
-} MarkupPrettifyState;
+};
 
 static const char *depth_color[] = {
     "\e[91m",

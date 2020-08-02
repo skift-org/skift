@@ -2,11 +2,11 @@
 
 #include <libsystem/Common.h>
 
-typedef struct
+struct Stack
 {
     void *buffer;
     uintptr_t pointer;
-} Stack;
+} ;
 
 Stack *stack_create(size_t size);
 

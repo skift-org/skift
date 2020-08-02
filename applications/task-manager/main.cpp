@@ -7,7 +7,7 @@
 
 #include "task-manager/TaskModel.h"
 
-typedef struct
+struct TaskManagerWindow
 {
     Window window;
 
@@ -21,7 +21,7 @@ typedef struct
     Widget *table;
     TaskModel *table_model;
     Timer *table_timer;
-} TaskManagerWindow;
+};
 
 void widget_ram_update(Graph *widget)
 {

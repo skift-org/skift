@@ -2,13 +2,13 @@
 
 #include <libsystem/utils/List.h>
 
-typedef enum
+enum ShellNodeType
 {
     SHELL_NODE_NONE,
     SHELL_NODE_COMMAND,
     SHELL_NODE_PIPELINE,
     SHELL_NODE_REDIRECT,
-} ShellNodeType;
+};
 
 struct ShellNode;
 
@@ -18,33 +18,33 @@ typedef void (*ShellNodeDestroyCallback)(struct ShellNode *node);
     ShellNodeType type; \
     ShellNodeDestroyCallback destroy;
 
-typedef struct ShellNode
+struct ShellNode
 {
     SHELL_NODE;
-} ShellNode;
+};
 
-typedef struct
+struct ShellCommand
 {
     SHELL_NODE;
 
     char *command;
     List /* of cstring */ *arguments;
-} ShellCommand;
+};
 
-typedef struct
+struct ShellPipeline
 {
     SHELL_NODE;
 
     List *commands;
-} ShellPipeline;
+};
 
-typedef struct
+struct ShellRedirect
 {
     SHELL_NODE;
 
     ShellNode *command;
     char *destination;
-} ShellRedirect;
+};
 
 void shell_node_destroy(ShellNode *node);
 

@@ -3,9 +3,9 @@
 #include <libsystem/unicode/Codepoint.h>
 #include <libterminal/Attributes.h>
 
-typedef struct
+struct TerminalCell
 {
     Codepoint codepoint;
     TerminalAttributes attributes;
     bool dirty;
-} TerminalCell;
+};

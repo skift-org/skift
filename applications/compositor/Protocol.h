@@ -4,7 +4,7 @@
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 
-typedef enum
+enum CompositorMessageType
 {
     COMPOSITOR_MESSAGE_INVALID,
     COMPOSITOR_MESSAGE_ACK,
@@ -19,7 +19,7 @@ typedef enum
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
     COMPOSITOR_MESSAGE_SET_RESOLUTION,
     COMPOSITOR_MESSAGE_SET_WALLPAPER,
-} CompositorMessageType;
+};
 
 #define WINDOW_NONE (0)
 #define WINDOW_BORDERLESS (1 << 0)
@@ -29,12 +29,12 @@ typedef enum
 
 typedef unsigned int WindowFlag;
 
-typedef struct
+struct CompositorGreetings
 {
     Rectangle screen_bound;
-} CompositorGreetings;
+};
 
-typedef struct
+struct CompositorCreateWindow
 {
     int id;
     WindowFlag flags;
@@ -45,28 +45,28 @@ typedef struct
     Vec2i backbuffer_size;
 
     Rectangle bound;
-} CompositorCreateWindow;
+};
 
-typedef struct
+struct CompositorDestroyWindow
 {
     int id;
-} CompositorDestroyWindow;
+};
 
-typedef struct
+struct CompositorResizeWindow
 {
     int id;
 
     Rectangle bound;
-} CompositorResizeWindow;
+};
 
-typedef struct
+struct CompositorMoveWindow
 {
     int id;
 
     Vec2i position;
-} CompositorMoveWindow;
+};
 
-typedef struct
+struct CompositorFlipWindow
 {
     int id;
 
@@ -76,35 +76,35 @@ typedef struct
     Vec2i backbuffer_size;
 
     Rectangle bound;
-} CompositorFlipWindow;
+};
 
-typedef struct
+struct CompositorEventWindow
 {
     int id;
 
     Event event;
-} CompositorEventWindow;
+};
 
-typedef struct
+struct CompositorCursorWindow
 {
     int id;
 
     CursorState state;
-} CompositorCursorWindow;
+};
 
-typedef struct
+struct CompositorSetResolution
 {
     int width;
     int height;
-} CompositorSetResolution;
+};
 
-typedef struct
+struct CompositorSetWallaper
 {
     int wallpaper;
     Vec2i resolution;
-} CompositorSetWallaper;
+};
 
-typedef struct
+struct CompositorMessage
 {
     CompositorMessageType type;
 
@@ -120,4 +120,4 @@ typedef struct
         CompositorSetResolution set_resolution;
         CompositorSetWallaper set_wallaper;
     };
-} CompositorMessage;
+};

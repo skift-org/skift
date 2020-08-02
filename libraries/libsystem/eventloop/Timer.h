@@ -6,7 +6,7 @@ struct Timer;
 
 typedef void (*TimerCallback)(void *target);
 
-typedef struct Timer
+struct Timer
 {
     void *target;
     TimerCallback callback;
@@ -14,7 +14,7 @@ typedef struct Timer
     bool started;
     Timeout interval;
     TimeStamp scheduled;
-} Timer;
+};
 
 Timer *timer_create(void *target, Timeout interval, TimerCallback callback);
 

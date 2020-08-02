@@ -3,7 +3,7 @@
 #include <libsystem/utils/RingBuffer.h>
 #include <libwidget/Widget.h>
 
-typedef struct
+struct Graph
 {
     Widget widget;
 
@@ -11,7 +11,7 @@ typedef struct
     double *data;
     size_t data_size;
     size_t current;
-} Graph;
+};
 
 void graph_record(Graph *widget, double data);
 

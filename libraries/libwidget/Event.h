@@ -7,7 +7,7 @@
 #define EVENT_LIST(__EVENT) \
     __EVENT(CHILD_ADDED)
 
-typedef enum
+enum EventType
 {
     EVENT_VALUE_CHANGE,
     EVENT_ACTION,
@@ -30,7 +30,7 @@ typedef enum
     EVENT_KEYBOARD_KEY_TYPED,
 
     __EVENT_TYPE_COUNT,
-} EventType;
+};
 
 #define MOUSE_NO_BUTTON (0)
 #define MOUSE_BUTTON_LEFT (1 << 1)
@@ -39,29 +39,29 @@ typedef enum
 
 typedef unsigned int MouseButton;
 
-typedef struct
+struct MouseEvent
 {
     Vec2i position;
     Vec2i old_position;
 
     MouseButton button;
     MouseButton buttons;
-} MouseEvent;
+};
 
-typedef struct
+struct KeyboardEvent
 {
     Key key;
     Codepoint codepoint;
-} KeyboardEvent;
+};
 
-typedef struct Event
+struct Event
 {
     EventType type;
     bool accepted;
 
     MouseEvent mouse;
     KeyboardEvent keyboard;
-} Event;
+};
 
 #define is_mouse_event(__event)                                  \
     (((Event *)(__event))->type == EVENT_MOUSE_MOVE ||           \
@@ -73,11 +73,11 @@ typedef struct Event
 
 typedef void (*EventHandlerCallback)(void *target, void *sender, Event *event);
 
-typedef struct
+struct EventHandler
 {
     void *target;
     EventHandlerCallback callback;
-} EventHandler;
+};
 
 #define EVENT_HANDLER(__target, __callback) \
     ((EventHandler){(__target), (EventHandlerCallback)(__callback)})

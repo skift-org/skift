@@ -5,21 +5,21 @@
 #include <libutils/Vector.h>
 #include <libwidget/Model.h>
 
-typedef struct
+struct FileSystemNode
 {
     char name[FILE_NAME_LENGTH];
     FileType type;
     RefPtr<Icon> icon;
     size_t size;
-} FileSystemNode;
+};
 
-typedef struct
+struct FileSystemModel
 {
     Model __super;
 
     char *current_path;
     List *files;
-} FileSystemModel;
+};
 
 FileSystemModel *filesystem_model_create(const char *current_path);
 

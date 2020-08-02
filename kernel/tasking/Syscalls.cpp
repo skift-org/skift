@@ -298,6 +298,16 @@ Result sys_system_get_ticks(uint32_t *tick)
     return SUCCESS;
 }
 
+extern "C" void __reboot();
+
+Result sys_system_reboot()
+{
+    logger_info("Rebooting...");
+    __reboot();
+
+    ASSERT_NOT_REACHED();
+}
+
 /* --- Create --------------------------------------------------------------- */
 
 Result sys_create_pipe(int *reader_handle, int *writer_handle)
@@ -476,6 +486,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_SYSTEM_GET_STATUS] = reinterpret_cast<SyscallHandler>(sys_system_get_status),
     [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),
     [SYS_SYSTEM_GET_TICKS] = reinterpret_cast<SyscallHandler>(sys_system_get_ticks),
+    [SYS_SYSTEM_REBOOT] = reinterpret_cast<SyscallHandler>(sys_system_reboot),
     [SYS_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(sys_handle_open),
     [SYS_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(sys_handle_close),
     [SYS_HANDLE_SELECT] = reinterpret_cast<SyscallHandler>(sys_handle_select),

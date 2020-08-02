@@ -16,6 +16,7 @@ UTILS = \
 	MKDIR \
 	MV \
 	NOW \
+	POWERCTL \
 	OPEN \
 	PANIC \
 	SYSFETCH \
@@ -75,6 +76,9 @@ MV_LIBS =
 
 NOW_NAME = now
 NOW_LIBS =
+
+POWERCTL_NAME = powerctl
+POWERCTL_LIBS =
 
 OPEN_NAME = open
 OPEN_LIBS = json

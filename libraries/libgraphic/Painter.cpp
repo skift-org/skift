@@ -339,7 +339,7 @@ static void fill_circle_helper(Painter &painter, Rectangle bound, Vec2i center, 
     }
 }
 
-void Painter::fill_rounded_rectangle(Rectangle bound, int radius, Color color)
+__flatten void Painter::fill_rounded_rectangle(Rectangle bound, int radius, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
@@ -358,7 +358,7 @@ void Painter::fill_rounded_rectangle(Rectangle bound, int radius, Color color)
     fill_rectangle(bound.cutoff_left_and_right(radius, radius), color);
 }
 
-void Painter::fill_checkboard(Rectangle bound, int cell_size, Color fg_color, Color bg_color)
+__flatten void Painter::fill_checkboard(Rectangle bound, int cell_size, Color fg_color, Color bg_color)
 {
     for (int x = 0; x < bound.width(); x++)
     {
@@ -431,7 +431,7 @@ void Painter::draw_line_not_aligned(Vec2i a, Vec2i b, Color color)
 #define __rfpart(X) (1.0 - __fpart(X))
 #define __plot(__x, __y, __brightness) plot_pixel(Vec2i((__x), (__y)), ALPHA(color, (color.A / 255.0) * (__brightness)))
 
-void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
+__flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
 {
     double x0 = a.x();
     double y0 = a.y();
@@ -574,7 +574,7 @@ void Painter::draw_circle_helper(Rectangle bound, Vec2i center, int radius, int 
     }
 }
 
-void Painter::draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color)
+__flatten void Painter::draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
@@ -617,7 +617,7 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destinati
     }
 }
 
-void Painter::blur_rectangle(Rectangle rectangle, int radius)
+__flatten void Painter::blur_rectangle(Rectangle rectangle, int radius)
 {
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);

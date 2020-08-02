@@ -7,18 +7,19 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/List.h>
+#include <libutils/Vector.h>
 
 struct RunLater
 {
     RunLaterCallback callback;
     void *target;
-} ;
+};
 
 static List *_eventloop_timers = nullptr;
 static TimeStamp _eventloop_timer_last_fire = 0;
 
 static List *_eventloop_notifiers = nullptr;
-static List *_eventloop_run_later = nullptr;
+static Vector<RunLater> *_eventloop_run_later = nullptr;
 
 static size_t _eventloop_handles_count;
 static Handle *_eventloop_handles[PROCESS_HANDLE_COUNT];
@@ -39,7 +40,7 @@ void eventloop_initialize()
     _eventloop_timer_last_fire = system_get_ticks();
 
     _eventloop_notifiers = list_create();
-    _eventloop_run_later = list_create();
+    _eventloop_run_later = new Vector<RunLater>();
 
     _eventloop_is_initialize = true;
 }
@@ -50,7 +51,7 @@ void eventloop_uninitialize()
 
     list_destroy(_eventloop_notifiers);
     list_destroy(_eventloop_timers);
-    list_destroy_with_callback(_eventloop_run_later, free);
+    delete _eventloop_run_later;
 
     _eventloop_is_initialize = false;
 }
@@ -184,12 +185,13 @@ void eventloop_pump(bool pool)
         }
     }
 
-    list_foreach(RunLater, run_later, _eventloop_run_later)
-    {
-        run_later->callback(run_later->target);
-    }
+    _eventloop_run_later->foreach ([](auto &run_later) {
+        run_later.callback(run_later.target);
 
-    list_clear_with_callback(_eventloop_run_later, free);
+        return Iteration::CONTINUE;
+    });
+
+    _eventloop_run_later->clear();
 }
 
 void eventloop_exit(int exit_value)
@@ -260,20 +262,12 @@ void eventloop_run_later(RunLaterCallback callback, void *target)
     run_later->callback = callback;
     run_later->target = target;
 
-    list_pushback(_eventloop_run_later, run_later);
-}
-
-static IterationDecision cancel_run_later(void *target, RunLater *run_later)
-{
-    if (run_later->target == target)
-    {
-        list_remove(_eventloop_run_later, run_later);
-    }
-
-    return ITERATION_CONTINUE;
+    _eventloop_run_later->push_back(RunLater{callback, target});
 }
 
 void event_cancel_run_later_for(void *target)
 {
-    list_iterate(_eventloop_run_later, target, (ListIterationCallback)cancel_run_later);
+    _eventloop_run_later->remove_all_match([&](auto &run_later) {
+        return run_later.target == target;
+    });
 }

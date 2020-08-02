@@ -52,11 +52,11 @@ public:
         return _pixels;
     }
 
-    int handle() { return _handle; }
-    int width() { return _width; }
-    int height() { return _height; }
-    Vec2i size() { return Vec2i(_width, _height); }
-    Rectangle bound() { return Rectangle(_width, _height); }
+    int handle() const { return _handle; }
+    int width() const { return _width; }
+    int height() const { return _height; }
+    Vec2i size() const { return Vec2i(_width, _height); }
+    Rectangle bound() const { return Rectangle(_width, _height); }
 
     static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
 

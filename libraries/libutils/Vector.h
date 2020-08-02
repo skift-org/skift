@@ -281,6 +281,18 @@ public:
         }
     }
 
+    template <typename MatchCallback>
+    void remove_all_match(MatchCallback match)
+    {
+        for (size_t i = 0; i < _count; i++)
+        {
+            while (match(_storage[i]) && i < _count)
+            {
+                remove_index(i);
+            }
+        }
+    }
+
     void push(T value)
     {
         insert(0, value);

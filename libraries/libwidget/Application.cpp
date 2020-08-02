@@ -51,24 +51,32 @@ void application_send_message(CompositorMessage message)
 
 CompositorMessage *application_wait_for_message(CompositorMessageType expected_message)
 {
-    List *pending_messages = list_create();
+    List *pending_messages = nullptr;
 
     CompositorMessage *message = __create(CompositorMessage);
     connection_receive(_connection, message, sizeof(CompositorMessage));
 
     while (message->type != expected_message)
     {
+        if (pending_messages == nullptr)
+        {
+            pending_messages = list_create();
+        }
+
         list_pushback(pending_messages, message);
         message = __create(CompositorMessage);
         connection_receive(_connection, message, sizeof(CompositorMessage));
     }
 
-    list_foreach(CompositorMessage, message, pending_messages)
+    if (pending_messages)
     {
-        application_do_message(message);
-    }
+        list_foreach(CompositorMessage, message, pending_messages)
+        {
+            application_do_message(message);
+        }
 
-    list_destroy_with_callback(pending_messages, free);
+        list_destroy_with_callback(pending_messages, free);
+    }
 
     return message;
 }

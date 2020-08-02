@@ -17,9 +17,8 @@ enum ButtonStyle
     BUTTON_FILLED,
 };
 
-struct Button
+struct Button : public Widget
 {
-    Widget widget;
     ButtonState state;
     ButtonStyle style;
 };

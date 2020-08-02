@@ -4,10 +4,8 @@
 
 #include "demo/Demos.h"
 
-struct DemoWidget
+struct DemoWidget : public Widget
 {
-    Widget widget;
-
     double time;
     Demo *demo;
 
@@ -15,7 +13,7 @@ struct DemoWidget
     Painter painter;
 
     Timer *timer;
-} ;
+};
 
 void demo_widget_set_demo(Widget *widget, Demo *demo);
 

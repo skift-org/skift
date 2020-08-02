@@ -2,9 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct RoundedPanel
+struct RoundedPanel : public Widget
 {
-    Widget widget;
     int radius;
 };
 

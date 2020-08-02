@@ -52,9 +52,9 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
 
     Event event_value_changed = {};
     event_value_changed.type = EVENT_VALUE_CHANGE;
-    widget_event(WIDGET(widget), &event_value_changed);
+    widget_event(widget, &event_value_changed);
 
-    widget_update(WIDGET(widget));
+    widget_update(widget);
 }
 
 static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
@@ -68,9 +68,9 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
 
     Event event_value_changed = {};
     event_value_changed.type = EVENT_VALUE_CHANGE;
-    widget_event(WIDGET(widget), &event_value_changed);
+    widget_event(widget, &event_value_changed);
 
-    widget_update(WIDGET(widget));
+    widget_update(widget);
 }
 
 static void scrollbar_event(ScrollBar *widget, Event *event)
@@ -112,7 +112,7 @@ Widget *scrollbar_create(Widget *parent)
     scrollbar->value = 512;
     scrollbar->thumb = 128;
 
-    widget_initialize(WIDGET(scrollbar), &scrollbar_class, parent);
+    widget_initialize(scrollbar, &scrollbar_class, parent);
 
-    return WIDGET(scrollbar);
+    return scrollbar;
 }

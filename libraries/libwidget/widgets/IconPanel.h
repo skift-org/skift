@@ -3,9 +3,8 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Widget.h>
 
-struct IconPanel
+struct IconPanel : public Widget
 {
-    Widget widget;
     RefPtr<Icon> icon;
 };
 

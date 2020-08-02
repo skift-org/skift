@@ -7,10 +7,8 @@
 
 struct FsTerminalEndpoint;
 
-struct FsTerminal
+struct FsTerminal : public FsNode
 {
-    FsNode node;
-
     int width;
     int height;
 

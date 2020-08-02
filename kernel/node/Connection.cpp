@@ -19,9 +19,9 @@ static bool fsconnection_is_accepted(FsConnection *connection)
 static bool fsconnection_can_read(FsConnection *connection, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_CLIENT))
-        return !ringbuffer_is_empty(connection->data_to_client) || !connection->node.server;
+        return !ringbuffer_is_empty(connection->data_to_client) || !connection->server;
     else
-        return !ringbuffer_is_empty(connection->data_to_server) || !connection->node.clients;
+        return !ringbuffer_is_empty(connection->data_to_server) || !connection->clients;
 }
 
 static Result fsconnection_read(
@@ -35,7 +35,7 @@ static Result fsconnection_read(
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
-        if (!connection->node.server)
+        if (!connection->server)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -44,7 +44,7 @@ static Result fsconnection_read(
     }
     else
     {
-        if (!connection->node.clients)
+        if (!connection->clients)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -68,7 +68,7 @@ static Result fsconnection_write(
 
     if (fshandle_has_flag(handle, OPEN_CLIENT))
     {
-        if (!connection->node.server)
+        if (!connection->server)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -77,7 +77,7 @@ static Result fsconnection_write(
     }
     else
     {
-        if (!connection->node.clients)
+        if (!connection->clients)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -100,17 +100,17 @@ FsNode *fsconnection_create()
 {
     FsConnection *connection = __create(FsConnection);
 
-    fsnode_init(FSNODE(connection), FILE_TYPE_CONNECTION);
+    fsnode_init(connection, FILE_TYPE_CONNECTION);
 
-    FSNODE(connection)->accept = (FsNodeAcceptCallback)fsconnection_accept;
-    FSNODE(connection)->is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
-    FSNODE(connection)->can_read = (FsNodeCanReadCallback)fsconnection_can_read;
-    FSNODE(connection)->read = (FsNodeReadCallback)fsconnection_read;
-    FSNODE(connection)->write = (FsNodeWriteCallback)fsconnection_write;
-    FSNODE(connection)->destroy = (FsNodeDestroyCallback)fsconnection_destroy;
+    connection->accept = (FsNodeAcceptCallback)fsconnection_accept;
+    connection->is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
+    connection->can_read = (FsNodeCanReadCallback)fsconnection_can_read;
+    connection->read = (FsNodeReadCallback)fsconnection_read;
+    connection->write = (FsNodeWriteCallback)fsconnection_write;
+    connection->destroy = (FsNodeDestroyCallback)fsconnection_destroy;
 
     connection->data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
     connection->data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
 
-    return FSNODE(connection);
+    return connection;
 }

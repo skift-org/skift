@@ -84,12 +84,12 @@ static FsNode *process_info_create()
 {
     FsProcessInfo *info = __create(FsProcessInfo);
 
-    fsnode_init(FSNODE(info), FILE_TYPE_DEVICE);
+    fsnode_init(info, FILE_TYPE_DEVICE);
 
-    FSNODE(info)->open = (FsNodeOpenCallback)process_info_open;
-    FSNODE(info)->close = (FsNodeCloseCallback)process_info_close;
-    FSNODE(info)->read = (FsNodeReadCallback)process_info_read;
-    FSNODE(info)->size = (FsNodeSizeCallback)process_info_size;
+    info->open = (FsNodeOpenCallback)process_info_open;
+    info->close = (FsNodeCloseCallback)process_info_close;
+    info->read = (FsNodeReadCallback)process_info_read;
+    info->size = (FsNodeSizeCallback)process_info_size;
 
     return (FsNode *)info;
 }

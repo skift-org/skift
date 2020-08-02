@@ -95,8 +95,8 @@ void terminal_widget_render_cell_extended(TerminalWidget *widget, Painter &paint
 
 void terminal_widget_render_cell(TerminalWidget *widget, Painter &painter, int x, int y, TerminalCell cell)
 {
-    Color background_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.background]);
-    Color foreground_color = widget_get_color(WIDGET(widget), terminal_color_to_role[cell.attributes.foreground]);
+    Color background_color = widget_get_color(widget, terminal_color_to_role[cell.attributes.background]);
+    Color foreground_color = widget_get_color(widget, terminal_color_to_role[cell.attributes.foreground]);
 
     terminal_widget_render_cell_extended(widget, painter, x, y, cell.codepoint, foreground_color, background_color, cell.attributes);
 }
@@ -126,7 +126,7 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter &painter, Re
     {
         TerminalCell cell = terminal_cell_at(terminal, cx, cy);
 
-        if (window_is_focused(WIDGET(terminal_widget)->window))
+        if (window_is_focused(terminal_widget->window))
         {
             if (terminal_widget->cursor_blink)
             {
@@ -136,8 +136,8 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter &painter, Re
                     cx,
                     cy,
                     cell.codepoint,
-                    widget_get_color(WIDGET(terminal_widget), THEME_ANSI_FOREGROUND),
-                    widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR), cell.attributes);
+                    widget_get_color(terminal_widget, THEME_ANSI_FOREGROUND),
+                    widget_get_color(terminal_widget, THEME_ANSI_CURSOR), cell.attributes);
             }
             else
             {
@@ -147,7 +147,7 @@ void terminal_widget_paint(TerminalWidget *terminal_widget, Painter &painter, Re
         else
         {
             terminal_widget_render_cell(terminal_widget, painter, cx, cy, cell);
-            painter.draw_rectangle(terminal_widget_cell_bound(terminal_widget, cx, cy), widget_get_color(WIDGET(terminal_widget), THEME_ANSI_CURSOR));
+            painter.draw_rectangle(terminal_widget_cell_bound(terminal_widget, cx, cy), widget_get_color(terminal_widget, THEME_ANSI_CURSOR));
         }
     }
 }
@@ -168,7 +168,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     }
 
     terminal_write(widget->terminal, buffer, size);
-    widget_update(WIDGET(widget));
+    widget_update(widget);
 }
 
 void terminal_widget_cursor_callback(TerminalWidget *widget)
@@ -178,7 +178,7 @@ void terminal_widget_cursor_callback(TerminalWidget *widget)
 
     int cx = widget->terminal->cursor.x;
     int cy = widget->terminal->cursor.y;
-    widget_update_region(WIDGET(widget), terminal_widget_cell_bound(widget, cx, cy));
+    widget_update_region(widget, terminal_widget_cell_bound(widget, cx, cy));
 }
 
 void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
@@ -285,7 +285,7 @@ Widget *terminal_widget_create(Widget *parent)
     launchpad_handle(shell_launchpad, HANDLE(widget->slave_stream), 2);
     launchpad_launch(shell_launchpad, nullptr);
 
-    widget_initialize(WIDGET(widget), &terminal_class, parent);
+    widget_initialize(widget, &terminal_class, parent);
 
-    return WIDGET(widget);
+    return widget;
 }

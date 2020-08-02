@@ -4,9 +4,8 @@
 
 #include "paint/PaintDocument.h"
 
-struct Canvas
+struct Canvas : public Widget
 {
-    Widget widget;
     PaintDocument *document;
 };
 

@@ -2,9 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct Separator
+struct Separator : public Widget
 {
-    Widget widget;
 };
 
 Widget *separator_create(Widget *parent);

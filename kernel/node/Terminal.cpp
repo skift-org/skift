@@ -13,11 +13,11 @@ static bool terminal_can_read(FsTerminal *terminal, FsHandle *handle)
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        return !ringbuffer_is_empty(terminal->slave_to_master_buffer) || !terminal->node.writers;
+        return !ringbuffer_is_empty(terminal->slave_to_master_buffer) || !terminal->writers;
     }
     else
     {
-        return !ringbuffer_is_empty(terminal->master_to_slave_buffer) || !terminal->node.master;
+        return !ringbuffer_is_empty(terminal->master_to_slave_buffer) || !terminal->master;
     }
 }
 
@@ -27,11 +27,11 @@ static bool terminal_can_write(FsTerminal *terminal, FsHandle *handle)
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        return !ringbuffer_is_full(terminal->master_to_slave_buffer) || !terminal->node.readers;
+        return !ringbuffer_is_full(terminal->master_to_slave_buffer) || !terminal->readers;
     }
     else
     {
-        return !ringbuffer_is_full(terminal->slave_to_master_buffer) || !terminal->node.master;
+        return !ringbuffer_is_full(terminal->slave_to_master_buffer) || !terminal->master;
     }
 }
 
@@ -41,7 +41,7 @@ static Result terminal_read(FsTerminal *terminal, FsHandle *handle, void *buffer
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        if (!terminal->node.writers)
+        if (!terminal->writers)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -50,7 +50,7 @@ static Result terminal_read(FsTerminal *terminal, FsHandle *handle, void *buffer
     }
     else
     {
-        if (!terminal->node.master)
+        if (!terminal->master)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -67,7 +67,7 @@ static Result terminal_write(FsTerminal *terminal, FsHandle *handle, const void 
 
     if (fshandle_has_flag(handle, OPEN_MASTER))
     {
-        if (!terminal->node.readers)
+        if (!terminal->readers)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -76,7 +76,7 @@ static Result terminal_write(FsTerminal *terminal, FsHandle *handle, const void 
     }
     else
     {
-        if (!terminal->node.master)
+        if (!terminal->master)
         {
             return ERR_STREAM_CLOSED;
         }
@@ -135,15 +135,15 @@ FsNode *terminal_create()
 {
     FsTerminal *terminal = __create(FsTerminal);
 
-    fsnode_init(FSNODE(terminal), FILE_TYPE_TERMINAL);
+    fsnode_init(terminal, FILE_TYPE_TERMINAL);
 
-    FSNODE(terminal)->can_read = (FsNodeCanReadCallback)terminal_can_read;
-    FSNODE(terminal)->can_write = (FsNodeCanWriteCallback)terminal_can_write;
-    FSNODE(terminal)->read = (FsNodeReadCallback)terminal_read;
-    FSNODE(terminal)->write = (FsNodeWriteCallback)terminal_write;
-    FSNODE(terminal)->call = (FsNodeCallCallback)terminal_iocall;
-    FSNODE(terminal)->size = (FsNodeSizeCallback)terminal_size;
-    FSNODE(terminal)->destroy = (FsNodeDestroyCallback)terminal_destroy;
+    terminal->can_read = (FsNodeCanReadCallback)terminal_can_read;
+    terminal->can_write = (FsNodeCanWriteCallback)terminal_can_write;
+    terminal->read = (FsNodeReadCallback)terminal_read;
+    terminal->write = (FsNodeWriteCallback)terminal_write;
+    terminal->call = (FsNodeCallCallback)terminal_iocall;
+    terminal->size = (FsNodeSizeCallback)terminal_size;
+    terminal->destroy = (FsNodeDestroyCallback)terminal_destroy;
 
     terminal->width = 80;
     terminal->width = 25;
@@ -151,5 +151,5 @@ FsNode *terminal_create()
     terminal->master_to_slave_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
     terminal->slave_to_master_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
 
-    return FSNODE(terminal);
+    return terminal;
 }

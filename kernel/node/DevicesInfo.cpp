@@ -90,12 +90,12 @@ static FsNode *device_info_create()
 {
     FsDeviceInfo *info = __create(FsDeviceInfo);
 
-    fsnode_init(FSNODE(info), FILE_TYPE_DEVICE);
+    fsnode_init(info, FILE_TYPE_DEVICE);
 
-    FSNODE(info)->open = (FsNodeOpenCallback)device_info_open;
-    FSNODE(info)->close = (FsNodeCloseCallback)device_info_close;
-    FSNODE(info)->read = (FsNodeReadCallback)device_info_read;
-    FSNODE(info)->size = (FsNodeSizeCallback)device_info_size;
+    info->open = (FsNodeOpenCallback)device_info_open;
+    info->close = (FsNodeCloseCallback)device_info_close;
+    info->read = (FsNodeReadCallback)device_info_read;
+    info->size = (FsNodeSizeCallback)device_info_size;
 
     return (FsNode *)info;
 }

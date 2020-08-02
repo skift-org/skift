@@ -42,8 +42,8 @@ void random_initialize()
 
     fsnode_init(random_device, FILE_TYPE_DEVICE);
 
-    FSNODE(random_device)->read = (FsNodeReadCallback)random_read;
-    FSNODE(random_device)->write = (FsNodeWriteCallback)random_write;
+    random_device->read = (FsNodeReadCallback)random_read;
+    random_device->write = (FsNodeWriteCallback)random_write;
 
     Path *random_device_path = path_create(UNIX_DEVICE_PATH("random"));
     filesystem_link_and_take_ref(random_device_path, random_device);

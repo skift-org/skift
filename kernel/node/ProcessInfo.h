@@ -2,9 +2,8 @@
 
 #include "kernel/node/Node.h"
 
-struct FsProcessInfo
+struct FsProcessInfo : public FsNode
 {
-    FsNode node;
 };
 
 void process_info_initialize();

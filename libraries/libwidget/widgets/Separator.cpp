@@ -24,7 +24,7 @@ Widget *separator_create(Widget *parent)
 {
     Separator *separator = __create(Separator);
 
-    widget_initialize(WIDGET(separator), &separator_class, parent);
+    widget_initialize(separator, &separator_class, parent);
 
-    return WIDGET(separator);
+    return separator;
 }

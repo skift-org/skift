@@ -11,7 +11,7 @@ static bool pipe_can_read(FsPipe *node, FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(node->buffer) || !node->node.writers;
+    return !ringbuffer_is_empty(node->buffer) || !node->writers;
 }
 
 static bool pipe_can_write(FsPipe *node, FsHandle *handle)
@@ -19,14 +19,14 @@ static bool pipe_can_write(FsPipe *node, FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !ringbuffer_is_full(node->buffer) || !node->node.readers;
+    return !ringbuffer_is_full(node->buffer) || !node->readers;
 }
 
 static Result pipe_read(FsPipe *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(handle);
 
-    if (!node->node.writers)
+    if (!node->writers)
     {
         return ERR_STREAM_CLOSED;
     }
@@ -40,7 +40,7 @@ static Result pipe_write(FsPipe *node, FsHandle *handle, const void *buffer, siz
 {
     __unused(handle);
 
-    if (!node->node.readers)
+    if (!node->readers)
     {
         return ERR_STREAM_CLOSED;
     }
@@ -67,14 +67,14 @@ FsNode *fspipe_create()
 {
     FsPipe *pipe = __create(FsPipe);
 
-    fsnode_init(FSNODE(pipe), FILE_TYPE_PIPE);
+    fsnode_init(pipe, FILE_TYPE_PIPE);
 
-    FSNODE(pipe)->can_read = (FsNodeCanReadCallback)pipe_can_read;
-    FSNODE(pipe)->can_write = (FsNodeCanWriteCallback)pipe_can_write;
-    FSNODE(pipe)->read = (FsNodeReadCallback)pipe_read;
-    FSNODE(pipe)->write = (FsNodeWriteCallback)pipe_write;
-    FSNODE(pipe)->size = (FsNodeSizeCallback)pipe_size;
-    FSNODE(pipe)->destroy = (FsNodeDestroyCallback)pipe_destroy;
+    pipe->can_read = (FsNodeCanReadCallback)pipe_can_read;
+    pipe->can_write = (FsNodeCanWriteCallback)pipe_can_write;
+    pipe->read = (FsNodeReadCallback)pipe_read;
+    pipe->write = (FsNodeWriteCallback)pipe_write;
+    pipe->size = (FsNodeSizeCallback)pipe_size;
+    pipe->destroy = (FsNodeDestroyCallback)pipe_destroy;
 
     pipe->buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
 

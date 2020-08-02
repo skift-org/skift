@@ -3,10 +3,8 @@
 #include <libsystem/utils/RingBuffer.h>
 #include <libwidget/Widget.h>
 
-struct Graph
+struct Graph : public Widget
 {
-    Widget widget;
-
     Color color;
     double *data;
     size_t data_size;

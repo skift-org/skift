@@ -32,8 +32,8 @@ void null_initialize()
 
     fsnode_init(null_device, FILE_TYPE_DEVICE);
 
-    FSNODE(null_device)->read = (FsNodeReadCallback)null_read;
-    FSNODE(null_device)->write = (FsNodeWriteCallback)null_write;
+    null_device->read = (FsNodeReadCallback)null_read;
+    null_device->write = (FsNodeWriteCallback)null_write;
 
     Path *null_device_path = path_create(UNIX_DEVICE_PATH("null"));
     filesystem_link_and_take_ref(null_device_path, null_device);

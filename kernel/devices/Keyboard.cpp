@@ -284,9 +284,9 @@ void keyboard_initialize()
 
     fsnode_init(_characters_node, FILE_TYPE_DEVICE);
 
-    FSNODE(_characters_node)->call = (FsNodeCallCallback)keyboard_iocall;
-    FSNODE(_characters_node)->can_read = (FsNodeCanReadCallback)characters_can_read;
-    FSNODE(_characters_node)->read = (FsNodeReadCallback)characters_read;
+    _characters_node->call = (FsNodeCallCallback)keyboard_iocall;
+    _characters_node->can_read = (FsNodeCanReadCallback)characters_can_read;
+    _characters_node->read = (FsNodeReadCallback)characters_read;
 
     filesystem_link_cstring(KEYBOARD_DEVICE_PATH, _characters_node);
 
@@ -295,9 +295,9 @@ void keyboard_initialize()
 
     fsnode_init(_events_node, FILE_TYPE_DEVICE);
 
-    FSNODE(_events_node)->call = (FsNodeCallCallback)keyboard_iocall;
-    FSNODE(_events_node)->can_read = (FsNodeCanReadCallback)events_can_read;
-    FSNODE(_events_node)->read = (FsNodeReadCallback)events_read;
+    _events_node->call = (FsNodeCallCallback)keyboard_iocall;
+    _events_node->can_read = (FsNodeCanReadCallback)events_can_read;
+    _events_node->read = (FsNodeReadCallback)events_read;
 
     filesystem_link_cstring(KEYBOARD_EVENT_DEVICE_PATH, _events_node);
 

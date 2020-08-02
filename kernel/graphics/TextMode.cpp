@@ -122,8 +122,8 @@ void textmode_initialize()
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FILE_TYPE_DEVICE);
 
-    FSNODE(textmode_device)->write = (FsNodeWriteCallback)textmode_write;
-    FSNODE(textmode_device)->call = (FsNodeCallCallback)textmode_iocall;
+    textmode_device->write = (FsNodeWriteCallback)textmode_write;
+    textmode_device->call = (FsNodeCallCallback)textmode_iocall;
 
     Path *textmode_device_path = path_create(TEXTMODE_DEVICE_PATH);
     filesystem_link_and_take_ref(textmode_device_path, textmode_device);

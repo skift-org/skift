@@ -31,8 +31,8 @@ void zero_initialize()
     FsNode *zero_device = __create(FsNode);
     fsnode_init(zero_device, FILE_TYPE_DEVICE);
 
-    FSNODE(zero_device)->read = (FsNodeReadCallback)zero_read;
-    FSNODE(zero_device)->write = (FsNodeWriteCallback)zero_write;
+    zero_device->read = (FsNodeReadCallback)zero_read;
+    zero_device->write = (FsNodeWriteCallback)zero_write;
 
     filesystem_link_and_take_ref_cstring(UNIX_DEVICE_PATH("zero"), zero_device);
 }

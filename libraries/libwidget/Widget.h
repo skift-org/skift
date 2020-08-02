@@ -98,8 +98,6 @@ struct Widget
     List *childs;
 };
 
-#define WIDGET(__subclass) ((Widget *)(__subclass))
-
 RefPtr<Font> widget_font();
 
 void widget_initialize(
@@ -149,16 +147,12 @@ void widget_enable(Widget *widget);
 
 /* --- Widget Style ------------------------------------- */
 
-Color __widget_get_color(Widget *widget, ThemeColorRole role);
-#define widget_get_color(__widget, __role) __widget_get_color(WIDGET(__widget), (__role))
+Color widget_get_color(Widget *widget, ThemeColorRole role);
 
-void __widget_set_color(Widget *widget, ThemeColorRole role, Color color);
-#define widget_set_color(__widget, __role, __color) __widget_set_color(WIDGET(__widget), (__role), (__color))
+void widget_set_color(Widget *widget, ThemeColorRole role, Color color);
 
-Rectangle __widget_get_bound(Widget *widget);
-#define widget_get_bound(__widget) __widget_get_bound(WIDGET(__widget))
+Rectangle widget_get_bound(Widget *widget);
 
-Rectangle __widget_get_content_bound(Widget *widget);
-#define widget_get_content_bound(__widget) __widget_get_content_bound(WIDGET(__widget))
+Rectangle widget_get_content_bound(Widget *widget);
 
 Vec2i widget_compute_size(Widget *widget);

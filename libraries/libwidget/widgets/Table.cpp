@@ -158,7 +158,7 @@ void table_event(Table *widget, Event *event)
     if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
         widget->selected = table_row_at(widget, event->mouse.position);
-        widget_update(WIDGET(widget));
+        widget_update(widget);
     }
 }
 
@@ -176,7 +176,7 @@ void table_on_scrollbar_scroll(Table *table, ScrollBar *sender, Event *event)
     __unused(event);
 
     table->scroll_offset = sender->value;
-    widget_update(WIDGET(table));
+    widget_update(table);
 }
 
 static const WidgetClass table_class = {
@@ -195,10 +195,10 @@ Widget *table_create(Widget *parent, Model *model)
     table->selected = -1;
     table->scroll_offset = 0;
 
-    widget_initialize(WIDGET(table), &table_class, parent);
+    widget_initialize(table, &table_class, parent);
 
-    table->scrollbar = scrollbar_create(WIDGET(table));
+    table->scrollbar = scrollbar_create(table);
     widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, EVENT_HANDLER(table, table_on_scrollbar_scroll));
 
-    return WIDGET(table);
+    return table;
 }

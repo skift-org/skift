@@ -47,7 +47,7 @@ Widget *label_create(Widget *parent, const char *text)
 
     label->text = strdup(text);
 
-    widget_initialize(WIDGET(label), &label_class, parent);
+    widget_initialize(label, &label_class, parent);
 
-    return WIDGET(label);
+    return label;
 }

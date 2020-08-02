@@ -17,7 +17,7 @@ Widget *panel_create(Widget *parent)
 {
     Panel *panel = __create(Panel);
 
-    widget_initialize(WIDGET(panel), &panel_class, parent);
+    widget_initialize(panel, &panel_class, parent);
 
-    return WIDGET(panel);
+    return panel;
 }

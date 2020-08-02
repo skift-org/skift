@@ -2,9 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct Placeholder
+struct Placeholder : public Widget
 {
-    Widget widget;
     char *text;
 };
 

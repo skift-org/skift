@@ -2,10 +2,8 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerSelect
+struct BlockerSelect : public Blocker
 {
-    Blocker blocker;
-
     FsHandle **handles;
     SelectEvent *events;
     size_t count;

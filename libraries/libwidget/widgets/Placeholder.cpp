@@ -44,7 +44,7 @@ Widget *placeholder_create(Widget *parent, const char *text)
 
     placeholder->text = strdup(buffer);
 
-    widget_initialize(WIDGET(placeholder), &placeholder_class, parent);
+    widget_initialize(placeholder, &placeholder_class, parent);
 
-    return WIDGET(placeholder);
+    return placeholder;
 }

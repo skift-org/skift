@@ -58,7 +58,7 @@ Widget *image_create(Widget *parent, const char *path)
     image->bitmap = Bitmap::load_from_or_placeholder(path);
     image->size_mode = IMAGE_CENTER;
 
-    widget_initialize(WIDGET(image), &image_class, parent);
+    widget_initialize(image, &image_class, parent);
 
-    return WIDGET(image);
+    return image;
 }

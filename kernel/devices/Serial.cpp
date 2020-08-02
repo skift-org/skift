@@ -60,9 +60,9 @@ void serial_initialize()
     FsNode *serial_device = __create(FsNode);
     fsnode_init(serial_device, FILE_TYPE_DEVICE);
 
-    FSNODE(serial_device)->can_read = (FsNodeCanReadCallback)serial_can_read;
-    FSNODE(serial_device)->read = (FsNodeReadCallback)serial_read;
-    FSNODE(serial_device)->write = (FsNodeWriteCallback)serial_write;
+    serial_device->can_read = (FsNodeCanReadCallback)serial_can_read;
+    serial_device->read = (FsNodeReadCallback)serial_read;
+    serial_device->write = (FsNodeWriteCallback)serial_write;
 
     Path *serial_device_path = path_create(SERIAL_DEVICE_PATH);
     filesystem_link_and_take_ref(serial_device_path, serial_device);

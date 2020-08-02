@@ -8,7 +8,7 @@ Widget *container_create(Widget *parent)
 {
     Container *container = __create(Container);
 
-    widget_initialize(WIDGET(container), &container_class, parent);
+    widget_initialize(container, &container_class, parent);
 
-    return WIDGET(container);
+    return container;
 }

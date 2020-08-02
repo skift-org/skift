@@ -2,9 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct Label
+struct Label : public Widget
 {
-    Widget widget;
     char *text;
 };
 

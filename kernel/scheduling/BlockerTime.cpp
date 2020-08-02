@@ -2,9 +2,8 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerTime
+struct BlockerTime : public Blocker
 {
-    Blocker blocker;
     uint wakeup_tick;
 };
 

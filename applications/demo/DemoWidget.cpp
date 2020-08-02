@@ -36,7 +36,7 @@ void demo_widget_paint(DemoWidget *widget, Painter &painter, Rectangle rectangle
 void demo_widget_on_timer_tick(DemoWidget *widget)
 {
     widget->time += 1.0 / 60;
-    widget_update(WIDGET(widget));
+    widget_update(widget);
 }
 
 void demo_widget_set_demo(Widget *widget, Demo *demo)
@@ -64,11 +64,11 @@ Widget *demo_widget_create(Widget *parent)
 {
     DemoWidget *widget = __create(DemoWidget);
 
-    widget_initialize(WIDGET(widget), &demo_class, parent);
+    widget_initialize(widget, &demo_class, parent);
 
     widget->demo = nullptr;
     widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
     timer_start(widget->timer);
 
-    return WIDGET(widget);
+    return widget;
 }

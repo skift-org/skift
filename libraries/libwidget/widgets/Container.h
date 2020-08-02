@@ -2,9 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct Container
+struct Container : public Widget
 {
-    Widget widget;
 };
 
 Widget *container_create(Widget *parent);

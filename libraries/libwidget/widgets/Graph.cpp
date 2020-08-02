@@ -62,7 +62,7 @@ void graph_record(Graph *widget, double data)
     widget->data[widget->current] = data;
     widget->current = (widget->current + 1) % widget->data_size;
 
-    widget_update(WIDGET(widget));
+    widget_update(widget);
 }
 
 void graph_destroy(Graph *widget)
@@ -87,7 +87,7 @@ Widget *graph_create(Widget *parent, size_t data_size, Color color)
     widget->data_size = data_size;
     widget->current = 0;
 
-    widget_initialize(WIDGET(widget), &graph_class, parent);
+    widget_initialize(widget, &graph_class, parent);
 
-    return WIDGET(widget);
+    return widget;
 }

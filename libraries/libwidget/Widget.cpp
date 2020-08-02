@@ -527,14 +527,14 @@ void widget_update_region(Widget *widget, Rectangle bound)
     }
 }
 
-Rectangle __widget_get_bound(Widget *widget)
+Rectangle widget_get_bound(Widget *widget)
 {
     return widget->bound;
 }
 
-Rectangle __widget_get_content_bound(Widget *widget)
+Rectangle widget_get_content_bound(Widget *widget)
 {
-    return __widget_get_bound(widget).shrinked(widget->insets);
+    return widget_get_bound(widget).shrinked(widget->insets);
 }
 
 Widget *widget_get_child_at(Widget *parent, Vec2i position)
@@ -569,7 +569,7 @@ void widget_clear_event_handler(Widget *widget, EventType event)
     widget->handlers[event].callback = nullptr;
 }
 
-Color __widget_get_color(Widget *widget, ThemeColorRole role)
+Color widget_get_color(Widget *widget, ThemeColorRole role)
 {
     if (!widget->enabled || (widget->parent && !widget->parent->enabled))
     {
@@ -597,7 +597,7 @@ Color __widget_get_color(Widget *widget, ThemeColorRole role)
     return window_get_color(widget->window, role);
 }
 
-void __widget_set_color(Widget *widget, ThemeColorRole role, Color color)
+void widget_set_color(Widget *widget, ThemeColorRole role, Color color)
 {
     widget->colors[role].overwritten = true;
     widget->colors[role].color = color;

@@ -20,7 +20,7 @@ Widget *rounded_panel_create(Widget *parent, int radius)
 
     rounded_panel->radius = radius;
 
-    widget_initialize(WIDGET(rounded_panel), &rounded_panel_class, parent);
+    widget_initialize(rounded_panel, &rounded_panel_class, parent);
 
-    return WIDGET(rounded_panel);
+    return rounded_panel;
 }

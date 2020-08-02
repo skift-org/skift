@@ -2,9 +2,8 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerConnect
+struct BlockerConnect : public Blocker
 {
-    Blocker blocker;
     FsNode *connection;
 };
 

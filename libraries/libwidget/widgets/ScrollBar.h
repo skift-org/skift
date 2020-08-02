@@ -2,10 +2,8 @@
 
 #include <libwidget/Widget.h>
 
-struct ScrollBar
+struct ScrollBar : public Widget
 {
-    Widget widget;
-
     Vec2i mouse_origine;
 
     int track;

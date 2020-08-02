@@ -187,7 +187,7 @@ Window *file_explorer_window_create(const char *current_path)
     separator_create(toolbar);
 
     window->breadcrumb = breadcrumb_create(toolbar, current_path);
-    WIDGET(window->breadcrumb)->layout_attributes = LAYOUT_FILL;
+    window->breadcrumb->layout_attributes = LAYOUT_FILL;
 
     separator_create(toolbar);
 

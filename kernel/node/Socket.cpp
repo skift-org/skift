@@ -41,14 +41,14 @@ FsNode *socket_create()
 {
     FsSocket *socket = __create(FsSocket);
 
-    fsnode_init(FSNODE(socket), FILE_TYPE_SOCKET);
+    fsnode_init(socket, FILE_TYPE_SOCKET);
 
-    FSNODE(socket)->open_connection = (FsNodeOpenConnectionCallback)socket_openConnection;
-    FSNODE(socket)->can_accept_connection = (FsNodeCanAcceptConnectionCallback)socket_FsNodeCanAcceptConnectionCallback;
-    FSNODE(socket)->accept_connection = (FsNodeAcceptConnectionCallback)socket_FsNodeAcceptConnectionCallback;
-    FSNODE(socket)->destroy = (FsNodeDestroyCallback)socket_destroy;
+    socket->open_connection = (FsNodeOpenConnectionCallback)socket_openConnection;
+    socket->can_accept_connection = (FsNodeCanAcceptConnectionCallback)socket_FsNodeCanAcceptConnectionCallback;
+    socket->accept_connection = (FsNodeAcceptConnectionCallback)socket_FsNodeAcceptConnectionCallback;
+    socket->destroy = (FsNodeDestroyCallback)socket_destroy;
 
     socket->pending = list_create();
 
-    return FSNODE(socket);
+    return socket;
 }

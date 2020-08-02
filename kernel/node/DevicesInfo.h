@@ -2,9 +2,8 @@
 
 #include "kernel/node/Node.h"
 
-struct FsDeviceInfo
+struct FsDeviceInfo : public FsNode
 {
-    FsNode node;
 };
 
 void device_info_initialize();

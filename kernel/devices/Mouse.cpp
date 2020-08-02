@@ -188,8 +188,8 @@ void mouse_initialize()
 
     fsnode_init(mouse_device, FILE_TYPE_DEVICE);
 
-    FSNODE(mouse_device)->read = (FsNodeReadCallback)mouse_read;
-    FSNODE(mouse_device)->can_read = (FsNodeCanReadCallback)mouse_can_read;
+    mouse_device->read = (FsNodeReadCallback)mouse_read;
+    mouse_device->can_read = (FsNodeCanReadCallback)mouse_can_read;
 
     Path *mouse_device_path = path_create(MOUSE_DEVICE_PATH);
     filesystem_link_and_take_ref(mouse_device_path, mouse_device);

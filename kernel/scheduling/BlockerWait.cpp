@@ -1,9 +1,8 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerWait
+struct BlockerWait : public Blocker
 {
-    Blocker blocker;
     Task *task;
     int *exit_value;
 };

@@ -3,10 +3,8 @@
 #include <libsystem/io/Path.h>
 #include <libwidget/Widget.h>
 
-struct Breadcrumb
+struct Breadcrumb : public Widget
 {
-    Widget widget;
-
     Path *path;
 
     RefPtr<Icon> icon_computer;

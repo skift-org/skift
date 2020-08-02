@@ -2,9 +2,8 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerAccept
+struct BlockerAccept : public Blocker
 {
-    Blocker blocker;
     FsNode *node;
 };
 

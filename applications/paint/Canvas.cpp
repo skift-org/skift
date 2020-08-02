@@ -38,7 +38,7 @@ void canvas_event(Canvas *widget, Event *event)
 
         if (widget->document->dirty)
         {
-            widget_update(WIDGET(widget));
+            widget_update(widget);
             widget->document->dirty = false;
         }
     }
@@ -57,7 +57,7 @@ Widget *canvas_create(Widget *parent, PaintDocument *document)
 
     canvas->document = document;
 
-    widget_initialize(WIDGET(canvas), &canvas_class, parent);
+    widget_initialize(canvas, &canvas_class, parent);
 
-    return WIDGET(canvas);
+    return canvas;
 }

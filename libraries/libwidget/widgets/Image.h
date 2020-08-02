@@ -8,10 +8,8 @@ enum ImageSizeMode
     IMAGE_STRETCH,
 };
 
-struct Image
+struct Image : public Widget
 {
-    Widget widget;
-
     ImageSizeMode size_mode;
     RefPtr<Bitmap> bitmap;
 };

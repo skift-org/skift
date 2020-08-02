@@ -2,11 +2,10 @@
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/tasking/Task.h"
 
-struct BlockerWrite
+struct BlockerWrite : public Blocker
 {
-    Blocker blocker;
     FsHandle *handle;
-} ;
+};
 
 bool blocker_write_can_unblock(BlockerWrite *blocker, Task *task)
 {

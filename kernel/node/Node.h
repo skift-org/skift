@@ -70,8 +70,6 @@ struct FsNode
     FsNodeDestroyCallback destroy;
 };
 
-#define FSNODE(__subclass) ((FsNode *)(__subclass))
-
 void fsnode_init(FsNode *node, FileType type);
 
 FsNode *fsnode_ref(FsNode *node);

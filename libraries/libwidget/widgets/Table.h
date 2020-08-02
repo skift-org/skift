@@ -3,9 +3,8 @@
 #include <libwidget/Model.h>
 #include <libwidget/Widget.h>
 
-struct Table
+struct Table : public Widget
 {
-    Widget widget;
     Model *model;
     int selected;
     int scroll_offset;

@@ -14,9 +14,8 @@ struct FsDirectoryEntry
     FsNode *node;
 };
 
-struct FsDirectory
+struct FsDirectory : public FsNode
 {
-    FsNode node;
     List *childs;
 };
 

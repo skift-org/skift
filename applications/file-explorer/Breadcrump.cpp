@@ -103,9 +103,9 @@ Widget *breadcrumb_create(Widget *parent, const char *current_path)
     widget->icon_computer = Icon::get("laptop");
     widget->icon_expand = Icon::get("chevron-right");
 
-    widget_initialize(WIDGET(widget), &breadcrumb_class, parent);
+    widget_initialize(widget, &breadcrumb_class, parent);
 
-    return WIDGET(widget);
+    return widget;
 }
 
 void breadcrumb_navigate(Widget *widget, Path *path)

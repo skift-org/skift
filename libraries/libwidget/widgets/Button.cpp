@@ -9,7 +9,7 @@ void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget_is_enable(WIDGET(widget)))
+    if (widget_is_enable(widget))
     {
         if (widget->style == BUTTON_OUTLINE)
         {
@@ -37,32 +37,32 @@ void button_event(Button *widget, Event *event)
     if (event->type == EVENT_MOUSE_ENTER)
     {
         widget->state = BUTTON_OVER;
-        widget_update(WIDGET(widget));
+        widget_update(widget);
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_LEAVE)
     {
         widget->state = BUTTON_IDLE;
-        widget_update(WIDGET(widget));
+        widget_update(widget);
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
         widget->state = BUTTON_PRESS;
-        widget_update(WIDGET(widget));
+        widget_update(widget);
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
     {
         widget->state = BUTTON_OVER;
-        widget_update(WIDGET(widget));
+        widget_update(widget);
         event->accepted = true;
 
         Event action_event = {};
 
         action_event.type = EVENT_ACTION;
 
-        widget_event(WIDGET(widget), &action_event);
+        widget_event(widget, &action_event);
     }
 }
 
@@ -80,22 +80,22 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     widget->style = style;
     widget->state = BUTTON_IDLE;
 
-    WIDGET(widget)->layout = HFLOW(0);
-    WIDGET(widget)->insets = Insets(0, 16);
-    WIDGET(widget)->min_height = 32;
-    WIDGET(widget)->layout_attributes |= LAYOUT_GREEDY;
+    widget->layout = HFLOW(0);
+    widget->insets = Insets(0, 16);
+    widget->min_height = 32;
+    widget->layout_attributes |= LAYOUT_GREEDY;
 
-    widget_initialize(WIDGET(widget), &button_class, parent);
+    widget_initialize(widget, &button_class, parent);
 
-    return WIDGET(widget);
+    return widget;
 }
 
 Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 {
     Widget *button = button_create(parent, style);
 
-    WIDGET(button)->layout = STACK();
-    WIDGET(button)->insets = Insets(4, 4);
+    button->layout = STACK();
+    button->insets = Insets(4, 4);
 
     icon_panel_create(button, icon)->layout_attributes = LAYOUT_FILL;
 

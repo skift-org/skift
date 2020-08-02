@@ -16,10 +16,8 @@ struct TerminalWidgetRenderer
     struct TerminalWidget *widget;
 };
 
-struct TerminalWidget
+struct TerminalWidget : public Widget
 {
-    Widget widget;
-
     Terminal *terminal;
     bool cursor_blink;
 

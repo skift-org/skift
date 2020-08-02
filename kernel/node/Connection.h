@@ -4,10 +4,8 @@
 
 #include "kernel/node/Node.h"
 
-struct FsConnection
+struct FsConnection : public FsNode
 {
-    FsNode node;
-
     bool accepted;
     bool is_open;
 

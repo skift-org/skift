@@ -43,7 +43,7 @@ Widget *icon_panel_create(Widget *parent, RefPtr<Icon> icon)
     IconPanel *widget = __create(IconPanel);
 
     widget->icon = icon;
-    widget_initialize(WIDGET(widget), &icon_panel_class, parent);
+    widget_initialize(widget, &icon_panel_class, parent);
 
-    return WIDGET(widget);
+    return widget;
 }

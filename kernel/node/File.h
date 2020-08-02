@@ -2,13 +2,11 @@
 
 #include "kernel/node/Node.h"
 
-struct FsFile
+struct FsFile : public FsNode
 {
-    FsNode node;
-
     char *buffer;
-    size_t realsize;
-    size_t size;
+    size_t buffer_allocated;
+    size_t buffer_size;
 };
 
 FsNode *file_create();

@@ -214,11 +214,11 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    /*if (child->type == FILE_TYPE_DIRECTORY)
+    if (child->type == FILE_TYPE_DIRECTORY)
     {
         fsnode_deref(child);
         return ERR_IS_A_DIRECTORY;
-    }*/
+    }
 
     return filesystem_link_and_take_ref(new_path, child);
 }

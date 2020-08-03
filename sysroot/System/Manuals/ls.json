@@ -1,0 +1,5 @@
+{
+    "description": "ls is short for list. ls lists the contents of a directory",
+    "usage": "ls [PATH]",
+    "example": "ls: \nDocuments Downloads Pictures"
+}

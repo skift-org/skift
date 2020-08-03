@@ -1,0 +1,5 @@
+{
+    	"description": "man is short for manual. It provides documentation on commands",
+    	"usage": "man [OPTIONS]",
+    	"example": "man echo uptime"
+}

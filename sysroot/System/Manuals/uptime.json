@@ -1,0 +1,5 @@
+{
+    	"description": "returns how long the computer has been on for",
+    	"usage": "uptime",
+    	"example": "uptime: Up 8 minutes, 9 seconds"
+}

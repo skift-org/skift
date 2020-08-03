@@ -28,9 +28,45 @@ int main(int argc, char **argv)
 	       const char* description = "";
 	       const char* usage = "";
 	       const char* example = "";
-	       if (json_object_has(manpage, "description")) { JsonValue *value = json_object_get(manpage, "description"); if(json_is(value, JSON_STRING)) { description = json_string_value(value); } else { printf(message, manpath); return -1; }  } else { printf(message, manpath); return -1; }
-	       if (json_object_has(manpage, "usage")) { JsonValue *value = json_object_get(manpage, "usage"); if(json_is(value, JSON_STRING)) { usage = json_string_value(value); } else { printf(message, manpath); return -1; }  } else { printf(message, manpath); return -1; }
-	       if (json_object_has(manpage, "example")) { JsonValue *value = json_object_get(manpage, "example"); if(json_is(value, JSON_STRING)) { example = json_string_value(value); } else { printf(message, manpath); return -1; }  } else { printf(message, manpath); return -1; }
+		   
+	       if (json_object_has(manpage, "description")) { 
+		       JsonValue *value = json_object_get(manpage, "description");
+		       if(json_is(value, JSON_STRING))
+		       {
+			       description = json_string_value(value);
+		       } else 
+		       { 
+			       printf(message, manpath); 
+			       return -1; 
+		       }  
+	       } else { 
+		       printf(message, manpath);
+		       return -1;
+	       }
+		   
+	       if (json_object_has(manpage, "usage")) {
+		       JsonValue *value = json_object_get(manpage, "usage");
+		       if(json_is(value, JSON_STRING)) {
+			       usage = json_string_value(value);
+		       } else { 
+			       printf(message, manpath); 
+			       return -1; 
+		       }  
+	       } else {
+		       printf(message, manpath);
+		       return -1;
+	       }
+	       if (json_object_has(manpage, "example")) {
+		       JsonValue *value = json_object_get(manpage, "example");
+		       if(json_is(value, JSON_STRING)) {
+			       example = json_string_value(value);
+		       } else {
+			       printf(message, manpath); return -1;
+		       }
+	       } else {
+		       printf(message, manpath); return -1;
+	       }
+	       // print it out to the terminal
                printf("%s -\nDESCRIPTION:\n %s\nUSAGE:\n%s\nEXAMPLE:\n%s\n", argv[i], description, usage, example);
            } else {
                printf("man: No manual entry for \"%s\"\n", argv[i]);

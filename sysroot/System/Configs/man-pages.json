@@ -21,19 +21,19 @@
     	"description": "grabs system information such as the kernel, version, uptime, shell, etc",
     	"usage": "sysfetch",
     	"example": "sysfetch"
-    }
+    },
     
     "cd": {
     	"description": "cd is shell builtin that changes the directory. cd is short for \"Change Directory\"",
     	"usage": "cd [PATH]",
     	"example": "cd Documents"
-    }
+    },
     
     "cat": {
     	"description": "not to be confused with the animal cat, cat reads a file and prints it's contents to the terminal",
     	"usage": "cat [FILE]",
     	"example": "cat document.txt"
-    }
+    },
     
     "ls": {
     	"description": "ls is short for list. ls lists the contents of a directory",

@@ -1,0 +1,43 @@
+{
+    "echo": {
+    	"description": "prints text to the terminal",
+    	"usage": "echo [STRING]",
+    	"example": "echo hello world: hello world"
+    },
+    
+    "uptime": {
+    	"description": "returns how long the computer has been on for",
+    	"usage": "uptime",
+    	"example": "uptime: Up 8 minutes, 9 seconds"
+    },
+    
+    "man": {
+    	"description": "man is short for manual. It provides documentation on commands",
+    	"usage": "man [OPTIONS]",
+    	"example": "man echo uptime"
+    },
+    
+    "sysfetch": {
+    	"description": "grabs system information such as the kernel, version, uptime, shell, etc",
+    	"usage": "sysfetch",
+    	"example": "sysfetch"
+    }
+    
+    "cd": {
+    	"description": "cd is shell builtin that changes the directory. cd is short for \"Change Directory\"",
+    	"usage": "cd [PATH]",
+    	"example": "cd Documents"
+    }
+    
+    "cat": {
+    	"description": "not to be confused with the animal cat, cat reads a file and prints it's contents to the terminal",
+    	"usage": "cat [FILE]",
+    	"example": "cat document.txt"
+    }
+    
+    "ls": {
+    	"description": "ls is short for list. ls lists the contents of a directory",
+    	"usage": "ls [PATH]",
+    	"example": "ls: \nDocuments Downloads Pictures"
+    }
+}

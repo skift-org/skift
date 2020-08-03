@@ -12,6 +12,7 @@ UTILS = \
 	KEYBOARDCTL \
 	KILL \
 	LS \
+	MAN \
 	MARKUP \
 	MKDIR \
 	MV \
@@ -64,6 +65,9 @@ KILL_LIBS =
 
 LS_NAME = ls
 LS_LIBS =
+
+MAN_NAME = man
+MAN_LIBS = json
 
 MARKUP_NAME = markup
 MARKUP_LIBS = markup

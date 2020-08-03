@@ -4,21 +4,21 @@
 
 Building skiftOS requires
 
-- A good linux distro
+- A good Linux distro
 - nasm
 - gcc
 - binutils
 - grub
 - inkscape
 
-And for testing et debuging
+And for testing and debugging
 - qemu-system-i386
 - gdb
 
 
 ```sh
 # On Ubuntu
-$ apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
+$ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
 ```
 
 ## 1. Get the source code
@@ -34,7 +34,7 @@ $ cd skift
 ## 2. Setting up
 
 Building the toolchain is pretty straight-forward,
-first make sure you have all GCC and binutils dependancies:
+first make sure you have all GCC and binutils dependencies:
  - build-essential
  - bison
  - flex
@@ -45,7 +45,7 @@ first make sure you have all GCC and binutils dependancies:
 
 You can run the following command on ubuntu:
 ```sh
-$ apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+$ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
 ```
 
 Then for building the toolchain run the `build-it.sh` script
@@ -59,7 +59,7 @@ $ toolchain/build-it.sh
 
 The script will do the following operation without installing anything to the host system nor requiering root access:
  - Download `gcc` and `binutils` from the GNU project
- - Patch them using binutils.patch and gcc.patch located in the toolchain directory.
+ - Patch them using binutils.patch and gcc.patch which are located in the toolchain directory.
  - Then configure and build
 
 ## 3. Building

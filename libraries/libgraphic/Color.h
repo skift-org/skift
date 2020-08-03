@@ -2,7 +2,8 @@
 
 #include <libsystem/Common.h>
 
-union Color {
+union Color
+{
     struct
     {
         uint8_t R;
@@ -16,7 +17,10 @@ union Color {
 
 Color RGB(float R, float G, float B);
 
-Color RGBA(float R, float G, float B, float A);
+static __always_inline Color RGBA(float R, float G, float B, float A)
+{
+    return (Color){{(uint8_t)(R * 255.0), (uint8_t)(G * 255.0), (uint8_t)(B * 255.0), (uint8_t)(A * 255.0)}};
+}
 
 Color HSV(float H, float S, float V);
 
@@ -32,7 +36,7 @@ Color color_lerp(Color a, Color b, float transition);
 
 Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony);
 
-static inline Color color_blend(Color fg, Color bg)
+static __always_inline Color color_blend(Color fg, Color bg)
 {
     float r0 = fg.R / 255.0;
     float g0 = fg.G / 255.0;

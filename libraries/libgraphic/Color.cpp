@@ -7,11 +7,6 @@ Color RGB(float R, float G, float B)
     return RGBA(R, G, B, 1.0);
 }
 
-Color RGBA(float R, float G, float B, float A)
-{
-    return (Color){{(uint8_t)(R * 255.0), (uint8_t)(G * 255.0), (uint8_t)(B * 255.0), (uint8_t)(A * 255.0)}};
-}
-
 Color HSV(float H, float S, float V)
 {
     return HSVA(H, S, V, 1.0);
@@ -19,78 +14,43 @@ Color HSV(float H, float S, float V)
 
 Color HSVA(float H, float S, float V, float A)
 {
-    float r = 0, g = 0, b = 0;
-
     if (S == 0)
     {
-        r = V;
-        g = V;
-        b = V;
+        return RGBA(V, V, V, A);
     }
+
+    if (H == 360)
+        H = 0;
     else
+        H = H / 60;
+
+    int i = (int)H;
+
+    float f = H - i;
+    float p = V * (1.0 - S);
+    float q = V * (1.0 - (S * f));
+    float t = V * (1.0 - (S * (1.0 - f)));
+
+    switch (i)
     {
-        int i;
-        float f, p, q, t;
+    case 0:
+        return RGBA(V, t, p, A);
 
-        if (H == 360)
-            H = 0;
-        else
-            H = H / 60;
+    case 1:
+        return RGBA(q, V, p, A);
 
-        i = (int)H;
-        f = H - i;
+    case 2:
+        return RGBA(p, V, t, A);
 
-        p = V * (1.0 - S);
-        q = V * (1.0 - (S * f));
-        t = V * (1.0 - (S * (1.0 - f)));
+    case 3:
+        return RGBA(p, q, V, A);
 
-        switch (i)
-        {
-        case 0:
-            r = V;
-            g = t;
-            b = p;
-            break;
+    case 4:
+        return RGBA(t, p, V, A);
 
-        case 1:
-            r = q;
-            g = V;
-            b = p;
-            break;
-
-        case 2:
-            r = p;
-            g = V;
-            b = t;
-            break;
-
-        case 3:
-            r = p;
-            g = q;
-            b = V;
-            break;
-
-        case 4:
-            r = t;
-            g = p;
-            b = V;
-            break;
-
-        default:
-            r = V;
-            g = p;
-            b = q;
-            break;
-        }
+    default:
+        return RGBA(V, p, q, A);
     }
-
-    Color rgb;
-    rgb.R = (int)(r * 255.0);
-    rgb.G = (int)(g * 255.0);
-    rgb.B = (int)(b * 255.0);
-    rgb.A = (int)(A * 255.0);
-
-    return rgb;
 }
 
 Color ALPHA(Color color, float alpha)
@@ -114,7 +74,8 @@ Color color_lerp(Color a, Color b, float transition)
 
 Color color_blerp(Color c00, Color c10, Color c01, Color c11, float transitionx, float transitiony)
 {
-    return color_lerp(color_lerp(c00, c10, transitionx), color_lerp(c01, c11, transitionx), transitiony);
+    return color_lerp(color_lerp(c00, c10, transitionx),
+                      color_lerp(c01, c11, transitionx), transitiony);
 }
 
 // TODO: color form name

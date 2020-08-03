@@ -223,6 +223,25 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
     return filesystem_link_and_take_ref(new_path, child);
 }
 
+Result filesystem_mklink_for_tar(Path *old_path, Path *new_path)
+{
+    FsNode *child = filesystem_find_and_ref(old_path);
+
+    if (child == nullptr)
+    {
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
+
+    /*if (child->type == FILE_TYPE_DIRECTORY)
+    {
+        fsnode_deref(child);
+        return ERR_IS_A_DIRECTORY;
+    }*/
+
+    return filesystem_link_and_take_ref(new_path, child);
+}
+
+
 Result filesystem_link_cstring(const char *path, FsNode *node)
 {
     Path *path_object = path_create(path);

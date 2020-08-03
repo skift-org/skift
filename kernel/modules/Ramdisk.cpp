@@ -47,7 +47,7 @@ void ramdisk_load(Module *module)
         }
         else if (block.name[strlen(block.name) - 1] != '/')
         {
-            filesystem_mklink(file_path, (Path*) block.linkname);
+            filesystem_mklink_for_tar(file_path, (Path*) block.linkname);
         }
 
         path_destroy(file_path);

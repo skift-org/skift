@@ -24,7 +24,7 @@ void ramdisk_load(Module *module)
                 logger_warn("Failed to create directory %s: %s", block.name, result_to_string(result));
             }
         }
-        else
+        else if (block.typeflag == 0)
         {
             FsHandle *handle = nullptr;
             Result result = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE, &handle);
@@ -44,6 +44,10 @@ void ramdisk_load(Module *module)
             }
 
             fshandle_destroy(handle);
+        }
+        else
+        {
+            filesystem_link(data.name, data.linkname);
         }
 
         path_destroy(file_path);

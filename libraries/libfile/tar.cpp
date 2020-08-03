@@ -80,6 +80,8 @@ bool tar_read(void *tarfile, TARBlock *block, uint index)
 
     memcpy(block->name, header->name, 100);
     block->size = get_file_size(header);
+    memcpy(block->typeflag, header->typeflag, 1);
+    memcpy(block->linkname, header->linkname, 100);
     block->data = (char *)header + 512;
 
     return true;

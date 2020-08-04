@@ -11,6 +11,7 @@ enum Column
     COLUMN_NAME,
     COLUMN_STATE,
     COLUMN_CPU,
+    COLUMN_RAM,
     COLUMN_DIRECTORY,
 
     __COLUMN_COUNT,
@@ -55,6 +56,9 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     case COLUMN_CPU:
         return Variant("%2d%%", json_integer_value(json_object_get(task, "cpu")));
 
+    case COLUMN_RAM:
+        return Variant("%5d Kio", json_integer_value(json_object_get(task, "ram")) / 1024);
+
     case COLUMN_DIRECTORY:
         return Variant(json_string_value(json_object_get(task, "directory")));
 
@@ -88,6 +92,9 @@ static const char *task_model_column_name(int column)
 
     case COLUMN_CPU:
         return "CPU%";
+
+    case COLUMN_RAM:
+        return "RAM(Kio)";
 
     case COLUMN_DIRECTORY:
         return "Directory";

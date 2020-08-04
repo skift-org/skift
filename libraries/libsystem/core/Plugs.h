@@ -66,12 +66,6 @@ void __no_return __plug_process_exit(int code);
 
 Result __plug_process_cancel(int pid);
 
-Result __plug_process_map(uintptr_t address, size_t size);
-
-Result __plug_process_alloc(size_t size, uintptr_t *out_address);
-
-Result __plug_process_free(uintptr_t address, size_t size);
-
 Result __plug_process_get_directory(char *buffer, uint size);
 
 Result __plug_process_set_directory(const char *directory);

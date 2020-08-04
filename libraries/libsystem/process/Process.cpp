@@ -31,21 +31,6 @@ Result process_cancel(int pid)
     return __plug_process_cancel(pid);
 }
 
-Result process_map(uintptr_t address, size_t size)
-{
-    return __plug_process_map(address, size);
-}
-
-Result process_alloc(size_t size, uintptr_t *out_address)
-{
-    return __plug_process_alloc(size, out_address);
-}
-
-Result process_free(uintptr_t address, size_t size)
-{
-    return __plug_process_free(address, size);
-}
-
 Result process_get_directory(char *buffer, size_t size)
 {
     return __plug_process_get_directory(buffer, size);

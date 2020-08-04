@@ -1,5 +1,7 @@
-#include "kernel/tasking/Task-Memory.h"
+#include <libsystem/core/CString.h>
+
 #include "kernel/memory/Virtual.h"
+#include "kernel/tasking/Task-Memory.h"
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object)
 {
@@ -7,6 +9,19 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = virtual_alloc(task->pdir, (MemoryRange){memory_object->address, memory_object->size}, MEMORY_USER).base;
+    memory_mapping->size = memory_object->size;
+
+    list_pushback(task->memory_mapping, memory_mapping);
+
+    return memory_mapping;
+}
+
+MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_object, uintptr_t address)
+{
+    MemoryMapping *memory_mapping = __create(MemoryMapping);
+
+    memory_mapping->object = memory_object_ref(memory_object);
+    memory_mapping->address = virtual_map(task->pdir, address, memory_object->address, memory_object->size / PAGE_SIZE, true);
     memory_mapping->size = memory_object->size;
 
     list_pushback(task->memory_mapping, memory_mapping);
@@ -36,6 +51,20 @@ MemoryMapping *task_memory_mapping_by_address(Task *task, uintptr_t address)
     return nullptr;
 }
 
+bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
+{
+    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    {
+        if (address < memory_mapping->address + memory_mapping->size &&
+            address + size > memory_mapping->address)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /* --- User facing API ------------------------------------------------------ */
 
 Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
@@ -47,6 +76,27 @@ Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
     memory_object_deref(memory_object);
 
     *out_address = memory_mapping->address;
+
+    return SUCCESS;
+}
+
+Result task_shared_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
+{
+    if (task_memory_mapping_colides(task, address, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    MemoryObject *memory_object = memory_object_create(size);
+
+    task_memory_mapping_create_at(task, memory_object, address);
+
+    memory_object_deref(memory_object);
+
+    if (flags & MEMORY_CLEAR)
+    {
+        memset((void *)address, 0, size);
+    }
 
     return SUCCESS;
 }
@@ -106,19 +156,4 @@ PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
     memory_pdir_switch(pdir);
 
     return oldpdir;
-}
-
-Result task_memory_map(Task *task, MemoryRange range)
-{
-    return memory_map(task->pdir, range, MEMORY_USER | MEMORY_CLEAR);
-}
-
-Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
-{
-    return memory_alloc(task->pdir, size, MEMORY_USER | MEMORY_CLEAR, out_address);
-}
-
-Result task_memory_free(Task *task, MemoryRange range)
-{
-    return memory_free(task->pdir, range);
 }

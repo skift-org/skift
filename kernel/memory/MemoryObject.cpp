@@ -1,3 +1,4 @@
+#include <libsystem/Logger.h>
 #include <libsystem/thread/Lock.h>
 #include <libsystem/utils/List.h>
 

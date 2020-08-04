@@ -9,9 +9,6 @@
     __ENTRY(SYS_PROCESS_WAIT)             \
     __ENTRY(SYS_PROCESS_GET_DIRECTORY)    \
     __ENTRY(SYS_PROCESS_SET_DIRECTORY)    \
-    __ENTRY(SYS_PROCESS_MAP)              \
-    __ENTRY(SYS_PROCESS_ALLOC)            \
-    __ENTRY(SYS_PROCESS_FREE)             \
                                           \
     __ENTRY(SYS_SHARED_MEMORY_ALLOC)      \
     __ENTRY(SYS_SHARED_MEMORY_FREE)       \

@@ -148,21 +148,6 @@ Result __plug_process_cancel(int pid)
     return result;
 }
 
-Result __plug_process_map(uintptr_t address, size_t size)
-{
-    return task_memory_map(scheduler_running(), (MemoryRange){address, size});
-}
-
-Result __plug_process_alloc(size_t size, uintptr_t *out_address)
-{
-    return task_memory_alloc(scheduler_running(), size, out_address);
-}
-
-Result __plug_process_free(uintptr_t address, size_t size)
-{
-    return task_memory_free(scheduler_running(), (MemoryRange){address, size});
-}
-
 Result __plug_process_get_directory(char *buffer, uint size)
 {
     return task_get_directory(scheduler_running(), buffer, size);

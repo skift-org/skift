@@ -33,21 +33,6 @@ Result __plug_process_cancel(int pid)
     return (Result)__syscall(SYS_PROCESS_CANCEL, pid, 0, 0, 0, 0);
 }
 
-Result __plug_process_map(uintptr_t address, size_t size)
-{
-    return (Result)__syscall(SYS_PROCESS_MAP, address, size, 0, 0, 0);
-}
-
-Result __plug_process_alloc(size_t count, uintptr_t *out_address)
-{
-    return (Result)__syscall(SYS_PROCESS_ALLOC, count, (int)out_address, 0, 0, 0);
-}
-
-Result __plug_process_free(uintptr_t address, size_t size)
-{
-    return (Result)__syscall(SYS_PROCESS_FREE, address, size, 0, 0, 0);
-}
-
 Result __plug_process_get_directory(char *buffer, uint size)
 {
     return (Result)__syscall(SYS_PROCESS_GET_DIRECTORY, (int)buffer, size, 0, 0, 0);

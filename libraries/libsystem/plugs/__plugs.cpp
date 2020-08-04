@@ -5,6 +5,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/system/Memory.h>
 #include <libsystem/thread/Lock.h>
 
 #include <libsystem/cxx/cxx.h>
@@ -112,15 +113,12 @@ int __plug_memalloc_unlock()
 void *__plug_memalloc_alloc(size_t size)
 {
     uintptr_t address = 0;
-    if (process_alloc(size, &address) == SUCCESS)
-    {
-        return (void *)address;
-    }
-
-    ASSERT_NOT_REACHED();
+    assert(shared_memory_alloc(size, &address) == SUCCESS);
+    return (void *)address;
 }
 
 void __plug_memalloc_free(void *address, size_t size)
 {
-    process_free((uintptr_t)address, size);
+    __unused(size);
+    shared_memory_free((uintptr_t)address);
 }

@@ -79,46 +79,6 @@ Result sys_process_cancel(int pid)
     return result;
 }
 
-Result sys_process_map(uintptr_t address, size_t size)
-{
-    if (syscall_validate_ptr(address, size))
-    {
-        return ERR_BAD_ADDRESS;
-    }
-
-    if (address % PAGE_SIZE || size % PAGE_SIZE)
-    {
-        return ERR_MEMORY_NOT_ALIGNED;
-    }
-
-    return task_memory_map(scheduler_running(), (MemoryRange){address, size});
-}
-
-Result sys_process_alloc(uintptr_t size, uintptr_t *out_address)
-{
-    if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
-    {
-        return ERR_BAD_ADDRESS;
-    }
-
-    return task_memory_alloc(scheduler_running(), size, out_address);
-}
-
-Result sys_process_free(uint address, uint size)
-{
-    if (!syscall_validate_ptr(address, size))
-    {
-        return ERR_BAD_ADDRESS;
-    }
-
-    if (address % PAGE_SIZE || size % PAGE_SIZE)
-    {
-        return ERR_MEMORY_NOT_ALIGNED;
-    }
-
-    return task_memory_free(scheduler_running(), (MemoryRange){address, size});
-}
-
 Result sys_process_get_directory(char *buffer, uint size)
 {
     return task_get_directory(scheduler_running(), buffer, size);
@@ -470,9 +430,6 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(sys_process_wait),
     [SYS_PROCESS_GET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_get_directory),
     [SYS_PROCESS_SET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_set_directory),
-    [SYS_PROCESS_MAP] = reinterpret_cast<SyscallHandler>(sys_process_map),
-    [SYS_PROCESS_ALLOC] = reinterpret_cast<SyscallHandler>(sys_process_alloc),
-    [SYS_PROCESS_FREE] = reinterpret_cast<SyscallHandler>(sys_process_free),
     [SYS_SHARED_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(sys_shared_memory_alloc),
     [SYS_SHARED_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_free),
     [SYS_SHARED_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_include),

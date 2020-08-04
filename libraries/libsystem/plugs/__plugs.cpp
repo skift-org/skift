@@ -113,12 +113,12 @@ int __plug_memalloc_unlock()
 void *__plug_memalloc_alloc(size_t size)
 {
     uintptr_t address = 0;
-    assert(shared_memory_alloc(size, &address) == SUCCESS);
+    assert(memory_alloc(size, &address) == SUCCESS);
     return (void *)address;
 }
 
 void __plug_memalloc_free(void *address, size_t size)
 {
     __unused(size);
-    shared_memory_free((uintptr_t)address);
+    memory_free((uintptr_t)address);
 }

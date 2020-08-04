@@ -11,10 +11,10 @@ void memory_copy(void *from, size_t from_size, void *to, size_t to_size);
 
 void memory_move(void *from, size_t from_size, void *to, size_t to_size);
 
-Result shared_memory_alloc(size_t size, uintptr_t *out_address);
+Result memory_alloc(size_t size, uintptr_t *out_address);
 
-Result shared_memory_free(uintptr_t address);
+Result memory_free(uintptr_t address);
 
-Result shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size);
+Result memory_include(int handle, uintptr_t *out_address, size_t *out_size);
 
-Result shared_memory_get_handle(uintptr_t address, int *out_handle);
+Result memory_get_handle(uintptr_t address, int *out_handle);

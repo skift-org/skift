@@ -110,23 +110,23 @@ Result sys_process_wait(int tid, int *user_exit_value)
 
 /* --- Shared memory -------------------------------------------------------- */
 
-Result sys_shared_memory_alloc(size_t size, uintptr_t *out_address)
+Result sys_memory_alloc(size_t size, uintptr_t *out_address)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_alloc(scheduler_running(), size, out_address);
+    return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
-Result sys_shared_memory_free(uintptr_t address)
+Result sys_memory_free(uintptr_t address)
 {
 
-    return task_shared_memory_free(scheduler_running(), address);
+    return task_memory_free(scheduler_running(), address);
 }
 
-Result sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
+Result sys_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
         !syscall_validate_ptr((uintptr_t)out_size, sizeof(size_t)))
@@ -134,17 +134,17 @@ Result sys_shared_memory_include(int handle, uintptr_t *out_address, size_t *out
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_include(scheduler_running(), handle, out_address, out_size);
+    return task_memory_include(scheduler_running(), handle, out_address, out_size);
 }
 
-Result sys_shared_memory_get_handle(uintptr_t address, int *out_handle)
+Result sys_memory_get_handle(uintptr_t address, int *out_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)out_handle, sizeof(int)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    return task_shared_memory_get_handle(scheduler_running(), address, out_handle);
+    return task_memory_get_handle(scheduler_running(), address, out_handle);
 }
 
 /* --- Filesystem ----------------------------------------------------------- */
@@ -430,10 +430,10 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(sys_process_wait),
     [SYS_PROCESS_GET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_get_directory),
     [SYS_PROCESS_SET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_set_directory),
-    [SYS_SHARED_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(sys_shared_memory_alloc),
-    [SYS_SHARED_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_free),
-    [SYS_SHARED_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_include),
-    [SYS_SHARED_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(sys_shared_memory_get_handle),
+    [SYS_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(sys_memory_alloc),
+    [SYS_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(sys_memory_free),
+    [SYS_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(sys_memory_include),
+    [SYS_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(sys_memory_get_handle),
     [SYS_FILESYSTEM_LINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_link),
     [SYS_FILESYSTEM_UNLINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_unlink),
     [SYS_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(sys_filesystem_rename),

@@ -67,7 +67,7 @@ bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
 
 /* --- User facing API ------------------------------------------------------ */
 
-Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
+Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
     MemoryObject *memory_object = memory_object_create(size);
 
@@ -80,7 +80,7 @@ Result task_shared_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
     return SUCCESS;
 }
 
-Result task_shared_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
+Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
 {
     if (task_memory_mapping_colides(task, address, size))
     {
@@ -101,7 +101,7 @@ Result task_shared_memory_map(Task *task, uintptr_t address, size_t size, Memory
     return SUCCESS;
 }
 
-Result task_shared_memory_free(Task *task, uintptr_t address)
+Result task_memory_free(Task *task, uintptr_t address)
 {
     MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
 
@@ -115,7 +115,7 @@ Result task_shared_memory_free(Task *task, uintptr_t address)
     return SUCCESS;
 }
 
-Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
+Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
 {
     MemoryObject *memory_object = memory_object_by_id(handle);
 
@@ -134,7 +134,7 @@ Result task_shared_memory_include(Task *task, int handle, uintptr_t *out_address
     return SUCCESS;
 }
 
-Result task_shared_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
+Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
 {
     MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
 

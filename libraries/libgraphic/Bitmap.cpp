@@ -23,13 +23,13 @@ static Color _placeholder_buffer[] = {
 ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
 {
     Color *pixels = nullptr;
-    Result result = shared_memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
+    Result result = memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
 
     if (result != SUCCESS)
         return result;
 
     int handle = -1;
-    shared_memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
+    memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
     return make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
 }
@@ -38,18 +38,18 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i wid
 {
     Color *pixels = nullptr;
     size_t size = 0;
-    Result result = shared_memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size);
+    Result result = memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size);
 
     if (result != SUCCESS)
         return result;
 
     if (size < width_and_height.x() * width_and_height.y() * sizeof(Color))
     {
-        shared_memory_free(reinterpret_cast<uintptr_t>(pixels));
+        memory_free(reinterpret_cast<uintptr_t>(pixels));
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    shared_memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
+    memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
     return make<Bitmap>(handle, BITMAP_SHARED, width_and_height.x(), width_and_height.y(), pixels);
 }
@@ -139,7 +139,7 @@ Result Bitmap::save_to(const char *path)
 Bitmap::~Bitmap()
 {
     if (_storage == BITMAP_SHARED)
-        shared_memory_free(reinterpret_cast<uintptr_t>(_pixels));
+        memory_free(reinterpret_cast<uintptr_t>(_pixels));
     else if (_storage == BITMAP_MALLOC)
         free(_pixels);
 }

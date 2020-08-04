@@ -157,3 +157,15 @@ PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 
     return oldpdir;
 }
+
+size_t task_memory_usage(Task *task)
+{
+    size_t total = 0;
+
+    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    {
+        total += memory_mapping->size;
+    }
+
+    return total;
+}

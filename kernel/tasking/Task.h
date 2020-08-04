@@ -70,3 +70,4 @@ Result task_cancel(Task *task, int exit_value);
 void task_exit(int exit_value);
 
 void task_dump(Task *task);
+

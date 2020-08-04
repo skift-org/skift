@@ -10,6 +10,7 @@
 #include "kernel/node/Handle.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"
+#include "kernel/tasking/Task-Memory.h"
 
 static IterationDecision serialize_task(JsonValue *destination, Task *task)
 {
@@ -20,6 +21,7 @@ static IterationDecision serialize_task(JsonValue *destination, Task *task)
     json_object_put(task_object, "state", json_create_string(task_state_string(task->state)));
     json_object_put(task_object, "directory", json_create_string_adopt(path_as_string(task->directory)));
     json_object_put(task_object, "cpu", json_create_integer(scheduler_get_usage(task->id)));
+    json_object_put(task_object, "ram", json_create_integer(task_memory_usage(task)));
     json_object_put(task_object, "user", json_create_boolean(task->user));
 
     json_array_append(destination, task_object);

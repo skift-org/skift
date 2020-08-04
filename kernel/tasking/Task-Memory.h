@@ -28,3 +28,5 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
 Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle);
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir);
+
+size_t task_memory_usage(Task *task);

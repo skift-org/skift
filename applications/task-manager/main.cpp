@@ -16,36 +16,46 @@ struct TaskManagerWindow
     Timer *ram_timer;
     Widget *cpu_graph;
     Timer *cpu_timer;
+    
+    // --- CPU/RAM stats --- //
+    Widget *ram_usage;
+    Widget *ram_avaliable;
+    Widget *ram_greedy;
+    Widget *cpu_average;
+    Widget *cpu_greedy;
 
     /// --- Table view --- //
     Widget *table;
     TaskModel *table_model;
     Timer *table_timer;
 };
-TaskManagerWindow *window;
 
-void widget_ram_update(Graph *widget)
+void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
-
-    graph_record(widget, status.used_ram / (double)status.total_ram);
     
-    char buffer[200];
-    int percentage = (int)100 * status.used_ram / status.total_ram;
-    snprintf(buffer, 200, "RAM: %i%%", percentage);
-    label_set_text(window->ram_percent, buffer);
+    graph_record((Graph*)window->ram_graph, status.used_ram / (double)status.total_ram);
+    
+    char buffer1[200];
+    char buffer2[200];
+    int usage = (int)status.used_ram / 1024 / 1024;
+    int avaliable = (int)status.total_ram / 1024 / 1024;
+    snprintf(buffer1, 200, "Usage: %i Mio", usage);
+    snprintf(buffer2, 200, "Avaliable: %i Mio", avaliable);
+    label_set_text(window->ram_usage, buffer1);
+    label_set_text(window->ram_avaliable, buffer2);
 }
 
-void widget_cpu_update(Graph *widget)
+void widget_cpu_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record(widget, status.cpu_usage / 100.0);
+    graph_record((Graph*)window->cpu_graph, status.cpu_usage / 100.0);
     
     char buffer[200];
     int percentage = (int)status.cpu_usage;
-    snprintf(buffer, 200, "CPU: %i%%", percentage);
-    label_set_text(window->cpu_percent, buffer);
+    snprintf(buffer, 200, "Average: %i%%", percentage);
+    label_set_text(window->cpu_average, buffer);
 }
 
 void widget_table_update(TaskManagerWindow *window)
@@ -69,7 +79,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    window = __create(TaskManagerWindow);
+    TaskManagerWindow *window = __create(TaskManagerWindow);
 
     window_initialize((Window *)window, WINDOW_RESIZABLE);
 
@@ -109,11 +119,8 @@ int main(int argc, char **argv)
     cpu_icon_and_text->layout = HFLOW(4);
     icon_panel_create(cpu_icon_and_text, Icon::get("memory"));
     label_create(cpu_icon_and_text, "Processor");
-
-    window->ram_percent = label_create(window_root((Window*)window), "undefined%");
-    window->cpu_percent = label_create(window_root((Window*)window), "undefined%");
     
-    window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
+    window->cpu_timer = timer_create(window, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);
 
     separator_create(graphs_container);
@@ -127,8 +134,14 @@ int main(int argc, char **argv)
     ram_icon_and_text->layout = HFLOW(4);
     icon_panel_create(ram_icon_and_text, Icon::get("chip"));
     label_create(ram_icon_and_text, "Memory");
+    
+    window->ram_usage = label_create(window->ram_graph, "Usage: nil Mio");
+    window->ram_avaliable = label_create(window->ram_graph, "Avaliable: nil Mio");
+    window->ram_greedy = label_create(window->ram_graph, "Most greedy: the compositor eats a lot");
+    window->cpu_average = label_create(window->cpu_graph, "Average: nil%");
+    window->cpu_greedy = label_create(window->cpu_graph, "Most greedy: nil");
 
-    window->ram_timer = timer_create(window->ram_graph, 500, (TimerCallback)widget_ram_update);
+    window->ram_timer = timer_create(window, 500, (TimerCallback)widget_ram_update);
     timer_start(window->ram_timer);
 
     window_show((Window *)window);

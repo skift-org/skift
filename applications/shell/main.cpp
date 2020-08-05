@@ -22,7 +22,8 @@ void shell_prompt(int last_command_exit_value)
     process_get_directory(buffer, PATH_LENGTH);
     printf("%s", buffer);
 
-    printf(PROMPT);
+    // FIXME: We should use char8_t
+    printf(reinterpret_cast<const char *>(PROMPT));
 }
 
 int main(int argc, char **argv)

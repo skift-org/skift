@@ -29,9 +29,10 @@ void fonts_draw(Painter &painter, Rectangle screen, double time)
 
         current += metrics.ascent;
 
+        // FIXME: We should use char8_t
         painter.draw_truetype_string(
             _fonts[i],
-            u8"The quick brown fox jumps over the lazy dog",
+            reinterpret_cast<const char *>(u8"The quick brown fox jumps over the lazy dog"),
             Vec2i(8, current),
             COLOR_WHITE);
 

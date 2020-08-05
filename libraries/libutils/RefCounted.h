@@ -52,6 +52,16 @@ public:
 
             _refcount--;
 
+            if (_refcount == 1)
+            {
+                if constexpr (requires(const T &t) {
+                                  t.one_ref_left();
+                              })
+                {
+                    this->one_ref_left();
+                }
+            }
+
             if (_refcount == 0)
             {
                 delete static_cast<T *>(this);

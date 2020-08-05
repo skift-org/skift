@@ -220,7 +220,8 @@ const char *Lexer::read_escape_sequence()
 
         if (first_surrogate >= 0xDC00 && first_surrogate <= 0xDFFF)
         {
-            return u8"�";
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
         }
 
         if (!(first_surrogate >= 0xD800 && first_surrogate <= 0xDBFF))
@@ -233,7 +234,8 @@ const char *Lexer::read_escape_sequence()
 
         if (!skip_word("\\u"))
         {
-            return u8"�";
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
         }
 
         uint second_surrogate = read_4hex();
@@ -241,7 +243,8 @@ const char *Lexer::read_escape_sequence()
         if ((second_surrogate < 0xDC00) || (second_surrogate > 0xDFFF))
         {
             // Invalid second half of the surrogate pair
-            return u8"�";
+            // FIXME: We should use char8_t
+            return reinterpret_cast<const char *>(u8"�");
         }
 
         Codepoint codepoint = 0x10000 + (((first_surrogate & 0x3FF) << 10) | (second_surrogate & 0x3FF));

@@ -32,7 +32,7 @@ BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 CC:=i686-pc-skift-g++
 CFLAGS:= \
 	-O2 \
-	-std=c++17 \
+	-std=c++20 \
 	-fno-rtti \
 	-fno-exceptions \
 	-MD \

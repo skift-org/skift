@@ -11,7 +11,7 @@ void label_paint(Label *label, Painter &painter, Rectangle rectangle)
         *widget_font(),
         label->text,
         widget_get_bound(label),
-        Position::CENTER,
+        label->text_position,
         widget_get_color(label, THEME_FOREGROUND));
 }
 
@@ -24,6 +24,13 @@ void label_set_text(Widget *label, const char *text)
 {
     free(((Label *)label)->text);
     ((Label *)label)->text = strdup(text);
+
+    widget_update(label);
+}
+
+void label_set_text_position(Widget *label, Position text_position)
+{
+    ((Label *)label)->text_position = text_position;
 
     widget_update(label);
 }
@@ -46,6 +53,7 @@ Widget *label_create(Widget *parent, const char *text)
     Label *label = __create(Label);
 
     label->text = strdup(text);
+    label->text_position = Position::CENTER;
 
     widget_initialize(label, &label_class, parent);
 

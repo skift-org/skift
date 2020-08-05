@@ -22,12 +22,18 @@ struct TaskManagerWindow
     TaskModel *table_model;
     Timer *table_timer;
 };
+TaskManagerWindow *window;
 
 void widget_ram_update(Graph *widget)
 {
     SystemStatus status = system_get_status();
 
     graph_record(widget, status.used_ram / (double)status.total_ram);
+    
+    char buffer[200];
+    int percentage = (int)100 * status.used_ram / status.total_ram;
+    snprintf(buffer, 200, "RAM: %i%%", percentage);
+    label_set_text(window->ram_percent, buffer);
 }
 
 void widget_cpu_update(Graph *widget)
@@ -35,6 +41,11 @@ void widget_cpu_update(Graph *widget)
     SystemStatus status = system_get_status();
 
     graph_record(widget, status.cpu_usage / 100.0);
+    
+    char buffer[200];
+    int percentage = (int)status.cpu_usage;
+    snprintf(buffer, 200, "CPU: %i%%", percentage);
+    label_set_text(window->cpu_percent, buffer);
 }
 
 void widget_table_update(TaskManagerWindow *window)
@@ -58,7 +69,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    TaskManagerWindow *window = __create(TaskManagerWindow);
+    window = __create(TaskManagerWindow);
 
     window_initialize((Window *)window, WINDOW_RESIZABLE);
 
@@ -99,6 +110,9 @@ int main(int argc, char **argv)
     icon_panel_create(cpu_icon_and_text, Icon::get("memory"));
     label_create(cpu_icon_and_text, "Processor");
 
+    window->ram_percent = label_create(window_root((Window*)window), "undefined%");
+    window->cpu_percent = label_create(window_root((Window*)window), "undefined%");
+    
     window->cpu_timer = timer_create(window->cpu_graph, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);
 

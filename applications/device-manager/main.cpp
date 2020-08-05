@@ -6,10 +6,8 @@
 
 #include "device-manager/DeviceModel.h"
 
-struct TaskManagerWindow
+struct TaskManagerWindow : public Window
 {
-    Window window;
-
     /// --- Table view --- //
     Widget *table;
     DeviceModel *table_model;
@@ -47,21 +45,21 @@ int main(int argc, char **argv)
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
 
-    window_initialize((Window *)window, WINDOW_RESIZABLE);
+    window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, Icon::get("expansion-card-variant"));
-    window_set_title((Window *)window, "Device Manager");
-    window_set_size((Window *)window, Vec2i(700, 500));
+    window_set_icon(window, Icon::get("expansion-card-variant"));
+    window_set_title(window, "Device Manager");
+    window_set_size(window, Vec2i(700, 500));
 
-    window_root((Window *)window)->layout = VFLOW(0);
+    window_root(window)->layout = VFLOW(0);
 
     /// --- Table view --- //
     window->table_model = device_model_create();
 
-    window->table = table_create(window_root((Window *)window), (Model *)window->table_model);
+    window->table = table_create(window_root(window), (Model *)window->table_model);
     window->table->layout_attributes = LAYOUT_FILL;
 
-    window_show((Window *)window);
+    window_show(window);
 
     return application_run();
 }

@@ -14,10 +14,8 @@ enum RecordHistory
     RECORD_FOREWARD,
 };
 
-struct FileExplorerWindow
+struct FileExplorerWindow : public Window
 {
-    Window window;
-
     /// --- Navigation bar --- ///
     Widget *go_backward;
     Widget *go_foreward;
@@ -152,13 +150,13 @@ Window *file_explorer_window_create(const char *current_path)
 {
     FileExplorerWindow *window = __create(FileExplorerWindow);
 
-    window_initialize((Window *)window, WINDOW_RESIZABLE);
+    window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, Icon::get("folder"));
-    window_set_title((Window *)window, "File Explorer");
-    window_set_size((Window *)window, Vec2i(700, 500));
+    window_set_icon(window, Icon::get("folder"));
+    window_set_title(window, "File Explorer");
+    window_set_size(window, Vec2i(700, 500));
 
-    Widget *root = window_root((Window *)window);
+    Widget *root = window_root(window);
     root->layout = VFLOW(0);
 
     window->current_path = path_create(current_path);
@@ -202,7 +200,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, EVENT_HANDLER(window, (EventHandlerCallback)on_open));
 
-    return (Window *)window;
+    return window;
 }
 
 int main(int argc, char **argv)

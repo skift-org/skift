@@ -27,9 +27,8 @@ static Color _color_palette[] = {
     COLOR(0x333c57),
 };
 
-struct PaintWindow
+struct PaintWindow : public Window
 {
-    Window window;
     PaintDocument *document;
 
     /// --- Toolbar --- ///
@@ -53,7 +52,7 @@ struct PaintWindow
 
     /// --- Canvas --- ///
     Widget *canvas;
-} ;
+};
 
 static void update_toolbar(PaintWindow *window)
 {
@@ -176,13 +175,13 @@ static Window *paint_create_window(PaintDocument *document)
 {
     PaintWindow *window = __create(PaintWindow);
     window->document = document;
-    window_initialize((Window *)window, WINDOW_RESIZABLE);
+    window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, Icon::get("brush"));
-    window_set_title((Window *)window, "Paint");
-    window_set_size((Window *)window, Vec2i(600, 560));
+    window_set_icon(window, Icon::get("brush"));
+    window_set_title(window, "Paint");
+    window_set_size(window, Vec2i(600, 560));
 
-    Widget *root = window_root((Window *)window);
+    Widget *root = window_root(window);
     root->layout = VFLOW(0);
 
     create_toolbar(window, root);
@@ -192,7 +191,7 @@ static Window *paint_create_window(PaintDocument *document)
 
     create_color_palette(window, root);
 
-    return (Window *)window;
+    return window;
 }
 
 int main(int argc, char **argv)
@@ -202,7 +201,7 @@ int main(int argc, char **argv)
     PaintDocument *document = paint_document_create(400, 400, COLOR_RGBA(0, 0, 0, 0));
 
     Window *window = paint_create_window(document);
-    window_show((Window *)window);
+    window_show(window);
 
     int result = application_run();
 

@@ -124,3 +124,36 @@ TaskModel *task_model_create()
 
     return model;
 }
+
+const char *task_model_get_greedy_process(TaskModel *model, int ram_cpu)
+{
+    const char *greedy = "";
+
+    int row_count = json_array_length(model->data);
+    int list[row_count];
+    for (int row = 0; row < row_count; row++)
+    {
+        // 0 means memory. 1 means processor
+        if (ram_cpu == 0)
+        {
+            JsonValue *task = json_array_get(model->data, (size_t)row);
+            list[row] = json_integer_value(json_object_get(task, "ram"));
+        }
+        else if (ram_cpu == 1)
+        {
+            JsonValue *task = json_array_get(model->data, (size_t)row);
+            list[row] = json_integer_value(json_object_get(task, "cpu"));
+        }
+    }
+    int greedy_index = 0;
+    for (int i = 0; i < row_count; i++)
+    {
+        if (list[greedy_index] < list[i])
+        {
+            greedy_index = i;
+        }
+    }
+    JsonValue *task = json_array_get(model->data, (size_t)greedy_index);
+    greedy = json_string_value(json_object_get(task, "name"));
+    return greedy;
+}

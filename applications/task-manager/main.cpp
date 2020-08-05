@@ -30,39 +30,6 @@ struct TaskManagerWindow
     Timer *table_timer;
 };
 
-const char *get_greedy_process(TaskModel *model, int ram_cpu)
-{
-    const char *greedy = "";
-
-    int row_count = json_array_length(model->data);
-    int list[row_count];
-    for (int row = 0; row < row_count; row++)
-    {
-        // 0 means memory. 1 means processor
-        if (ram_cpu == 0)
-        {
-            JsonValue *task = json_array_get(model->data, (size_t)row);
-            list[row] = json_integer_value(json_object_get(task, "ram"));
-        }
-        else if (ram_cpu == 1)
-        {
-            JsonValue *task = json_array_get(model->data, (size_t)row);
-            list[row] = json_integer_value(json_object_get(task, "cpu"));
-        }
-    }
-    int greedy_index = 0;
-    for (int i = 0; i < row_count; i++)
-    {
-        if (list[greedy_index] < list[i])
-        {
-            greedy_index = i;
-        }
-    }
-    JsonValue *task = json_array_get(model->data, (size_t)greedy_index);
-    greedy = json_string_value(json_object_get(task, "name"));
-    return greedy;
-}
-
 void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
@@ -76,7 +43,7 @@ void widget_ram_update(TaskManagerWindow *window)
 
     int usage = (int)status.used_ram / 1024 / 1024;
     int avaliable = (int)status.total_ram / 1024 / 1024;
-    const char *greedy = get_greedy_process(window->table_model, 0);
+    const char *greedy = task_model_get_greedy_process(window->table_model, 0);
 
     snprintf(buffer1, 200, "Usage: %i Mio", usage);
     snprintf(buffer2, 200, "Avaliable: %i Mio", avaliable);
@@ -96,7 +63,7 @@ void widget_cpu_update(TaskManagerWindow *window)
     char buffer1[200];
     char buffer2[400];
 
-    const char *greedy = get_greedy_process(window->table_model, 1);
+    const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
     snprintf(buffer1, 200, "Average: %i%%", percentage);
     snprintf(buffer2, 400, "Most greedy: %s", greedy);

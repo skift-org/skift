@@ -14,6 +14,9 @@
 
 static IterationDecision serialize_task(JsonValue *destination, Task *task)
 {
+    if (task->id == 0)
+        return ITERATION_CONTINUE;
+
     JsonValue *task_object = json_create_object();
 
     json_object_put(task_object, "id", json_create_integer(task->id));

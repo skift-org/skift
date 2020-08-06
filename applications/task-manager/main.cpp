@@ -36,18 +36,18 @@ void widget_ram_update(TaskManagerWindow *window)
 
     graph_record((Graph *)window->ram_graph, status.used_ram / (double)status.total_ram);
 
-    char buffer1[200];
-    char buffer2[200];
-    // This not ideal, when dealing with program names longer than 400 characters. Hopefully that shouldn't happen
-    char buffer3[400];
-
     int usage = (int)status.used_ram / 1024 / 1024;
     int avaliable = (int)status.total_ram / 1024 / 1024;
     const char *greedy = task_model_get_greedy_process(window->table_model, 0);
 
+    char buffer1[200];
+    char buffer2[200];
+    int buff_size = strlen("Most greedy: ") + strlen(greedy) + 1;
+    char buffer3[buff_size];
+
     snprintf(buffer1, 200, "Usage: %i Mio", usage);
     snprintf(buffer2, 200, "Avaliable: %i Mio", avaliable);
-    snprintf(buffer3, 400, "Most greedy: %s", greedy);
+    snprintf(buffer3, buff_size, "Most greedy: %s", greedy);
 
     label_set_text(window->ram_usage, buffer1);
     label_set_text(window->ram_avaliable, buffer2);
@@ -60,13 +60,17 @@ void widget_cpu_update(TaskManagerWindow *window)
 
     graph_record((Graph *)window->cpu_graph, status.cpu_usage / 100.0);
 
-    char buffer1[200];
-    char buffer2[400];
 
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
+
+    char buffer1[200];
+    int buff_size = strlen("Most greedy: ") + strlen(greedy) + 1;
+    char buffer2[buff_size];
+
     snprintf(buffer1, 200, "Average: %i%%", percentage);
-    snprintf(buffer2, 400, "Most greedy: %s", greedy);
+    snprintf(buffer2, buff_size, "Most greedy: %s", greedy);
+
     label_set_text(window->cpu_average, buffer1);
     label_set_text(window->cpu_greedy, buffer2);
 }

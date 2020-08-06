@@ -1,4 +1,5 @@
 # skiftOS manual
 
 - [Build guide](building.md)
-- [resources](resource.md)
+- [Resources](resource.md)
+- [Developer guide](developer-guide)

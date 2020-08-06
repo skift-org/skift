@@ -1,6 +1,7 @@
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/io/Path.h>
 #include <libsystem/system/System.h>
+#include <libsystem/utils/BufferBuilder.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/dialog/Dialog.h>
@@ -36,22 +37,31 @@ void widget_ram_update(TaskManagerWindow *window)
 
     graph_record((Graph *)window->ram_graph, status.used_ram / (double)status.total_ram);
 
+    // Stats
     int usage = (int)status.used_ram / 1024 / 1024;
     int avaliable = (int)status.total_ram / 1024 / 1024;
     const char *greedy = task_model_get_greedy_process(window->table_model, 0);
 
-    char buffer1[200];
-    char buffer2[200];
-    int buff_size = strlen("Most greedy: ") + strlen(greedy) + 1;
-    char buffer3[buff_size];
+    char buffer_usage[50];
+    char buffer_avaliable[50];
 
-    snprintf(buffer1, 200, "Usage: %i Mio", usage);
-    snprintf(buffer2, 200, "Avaliable: %i Mio", avaliable);
-    snprintf(buffer3, buff_size, "Most greedy: %s", greedy);
+    size_t buff_greedy_size = strlen("Most greedy: ") + strlen(greedy);
+    auto buffer_greedy = buffer_builder_create(buff_greedy_size);
 
-    label_set_text(window->ram_usage, buffer1);
-    label_set_text(window->ram_avaliable, buffer2);
-    label_set_text(window->ram_greedy, buffer3);
+    buffer_builder_append_str(buffer_greedy, "Most greedy: ");
+    buffer_builder_append_str(buffer_greedy, greedy);
+
+    snprintf(buffer_usage, 50, "Usage: %i Mio", usage);
+    snprintf(buffer_avaliable, 50, "Avaliable: %i Mio", avaliable);
+
+    label_set_text(window->ram_usage, buffer_usage);
+
+    label_set_text(window->ram_avaliable, buffer_avaliable);
+
+    label_set_text(window->ram_greedy, buffer_builder_intermediate(buffer_greedy));
+
+    // Destroy buffer
+    buffer_builder_destroy(buffer_greedy);
 }
 
 void widget_cpu_update(TaskManagerWindow *window)
@@ -64,15 +74,21 @@ void widget_cpu_update(TaskManagerWindow *window)
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
 
-    char buffer1[200];
-    int buff_size = strlen("Most greedy: ") + strlen(greedy) + 1;
-    char buffer2[buff_size];
+    char buffer_average[50];
 
-    snprintf(buffer1, 200, "Average: %i%%", percentage);
-    snprintf(buffer2, buff_size, "Most greedy: %s", greedy);
+    size_t buff_greedy_size = strlen("Most greedy: ") + strlen(greedy);
+    auto buffer_greedy = buffer_builder_create(buff_greedy_size);
 
-    label_set_text(window->cpu_average, buffer1);
-    label_set_text(window->cpu_greedy, buffer2);
+    buffer_builder_append_str(buffer_greedy, "Most greedy: ");
+    buffer_builder_append_str(buffer_greedy, greedy);
+
+    snprintf(buffer_average, 200, "Average: %i%%", percentage);
+
+    label_set_text(window->cpu_average, buffer_average);
+    label_set_text(window->cpu_greedy, buffer_builder_intermediate(buffer_greedy));
+
+    // Destroy
+    buffer_builder_destroy(buffer_greedy);
 }
 
 void widget_table_update(TaskManagerWindow *window)

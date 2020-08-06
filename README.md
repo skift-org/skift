@@ -1,8 +1,4 @@
 <p align="center">
-<b>Notice!</b> The system was recently ported to C++. This is not idiomatique C++, expect to have some C mixed in.
-</p>
-
-<p align="center">
 <br>
 <br>
 <img src="manual/logo.svg" height=64 />
@@ -16,6 +12,10 @@ A simple, handmade, operating system for the intel x86 cpu.
 <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
 <a href="manual/readme.md">Manual</a> -
 <a href="https://travis-ci.org/skiftOS/skift"><img src="https://travis-ci.org/skiftOS/skift.svg?branch=master" height=16 /></a>
+</p>
+
+<p align="center">
+<b>Notice!</b> The system was recently ported to C++. This is not idiomatic C++, expect it has some C mixed in.
 </p>
 
 # What skiftOS is about

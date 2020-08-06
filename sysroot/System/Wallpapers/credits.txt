@@ -1,3 +1,4 @@
 mountains.png - Charlie Deptula
 water.png - Shifaaz shamoon
 light.png - https://unsplash.com/photos/W5q8uoqss3Q
+snow.png - Cael Rasmussen

@@ -100,7 +100,7 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 		$(SYSROOT)/User/Music  \
 		$(SYSROOT)/User/Pictures  \
 		$(SYSROOT)/User/Public  \
-		$(SYSROOT)/User/Sites  \
+		$(SYSROOT)/User/Sites
 
 	@cp -r sysroot/* $(SYSROOT)/
 

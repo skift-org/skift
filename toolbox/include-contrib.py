@@ -2,20 +2,24 @@
 import sys
 import os
 
+if not "SKIFT_SYSROOT" in os.environ:
+    print("Please run use-it.sh first")
+    exit(1)
+
 def usage():
     print(f"Usage: {sys.argv[0]} <name> <name> ...")
 
 if len(sys.argv) < 2:
     usage()
 
-sysroot = os.env["SKIFT_SYSROOT"]
+sysroot = os.environ["SKIFT_SYSROOT"]
 skift = os.path.join(sysroot, "..", "..", "..")
 contrib = os.path.join(skift, "contrib")
 
 for module in sys.argv[1:]:
     path = os.path.join(contrib, module)
     if not os.path.isdir(path):
-        print(f"{} not found")
+        print(f"{module} not found")
         continue
     os.chdir(path)
     if not os.system("./get-it.sh") == 0:

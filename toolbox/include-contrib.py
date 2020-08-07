@@ -13,8 +13,8 @@ if len(sys.argv) < 2:
     usage()
 
 sysroot = os.environ["SKIFT_SYSROOT"]
-skift = os.path.join(sysroot, "..", "..", "..")
-contrib = os.path.join(skift, "contrib")
+contrib = os.environ["SKIFT_CONTRIBROOT"]
+skift = os.path.join(contrib, "..")
 
 for module in sys.argv[1:]:
     path = os.path.join(contrib, module)

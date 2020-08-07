@@ -36,7 +36,7 @@ void demo_widget_paint(DemoWidget *widget, Painter &painter, Rectangle rectangle
 void demo_widget_on_timer_tick(DemoWidget *widget)
 {
     widget->time += 1.0 / 60;
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 void demo_widget_set_demo(Widget *widget, Demo *demo)

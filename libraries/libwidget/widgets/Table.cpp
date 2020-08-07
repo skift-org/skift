@@ -158,7 +158,7 @@ void table_event(Table *widget, Event *event)
     if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
         widget->selected = table_row_at(widget, event->mouse.position);
-        widget_update(widget);
+        widget->should_repaint();
     }
 }
 
@@ -176,7 +176,7 @@ void table_on_scrollbar_scroll(Table *table, ScrollBar *sender, Event *event)
     __unused(event);
 
     table->scroll_offset = sender->value;
-    widget_update(table);
+    table->should_repaint();
 }
 
 static const WidgetClass table_class = {

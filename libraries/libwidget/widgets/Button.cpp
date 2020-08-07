@@ -37,25 +37,27 @@ void button_event(Button *widget, Event *event)
     if (event->type == EVENT_MOUSE_ENTER)
     {
         widget->state = BUTTON_OVER;
-        widget_update(widget);
+        widget->should_repaint();
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_LEAVE)
     {
         widget->state = BUTTON_IDLE;
-        widget_update(widget);
+        widget->should_repaint();
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
     {
         widget->state = BUTTON_PRESS;
-        widget_update(widget);
+        widget->should_repaint();
+
         event->accepted = true;
     }
     else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
     {
         widget->state = BUTTON_OVER;
-        widget_update(widget);
+        widget->should_repaint();
+
         event->accepted = true;
 
         Event action_event = {};

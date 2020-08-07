@@ -115,5 +115,5 @@ void breadcrumb_navigate(Widget *widget, Path *path)
     path_destroy(breadcrumb->path);
     breadcrumb->path = path_clone(path);
 
-    widget_update(widget);
+    widget->should_repaint();
 }

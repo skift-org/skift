@@ -38,7 +38,7 @@ void canvas_event(Canvas *widget, Event *event)
 
         if (widget->document->dirty)
         {
-            widget_update(widget);
+            widget->should_repaint();
             widget->document->dirty = false;
         }
     }

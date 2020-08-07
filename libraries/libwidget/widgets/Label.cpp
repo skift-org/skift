@@ -25,14 +25,14 @@ void label_set_text(Widget *label, const char *text)
     free(((Label *)label)->text);
     ((Label *)label)->text = strdup(text);
 
-    widget_update(label);
+    label->should_repaint();
 }
 
 void label_set_text_position(Widget *label, Position text_position)
 {
     ((Label *)label)->text_position = text_position;
 
-    widget_update(label);
+    label->should_repaint();
 }
 
 void label_destroy(Label *label)

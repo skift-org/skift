@@ -75,8 +75,6 @@ struct WidgetClass
     WidgetLayoutCallback layout = nullptr;
 };
 
-void widget_update(Widget *widget);
-
 struct Widget
 {
     const WidgetClass *klass;
@@ -99,6 +97,8 @@ struct Widget
     struct Window *window;
     List *childs;
 
+    /* --- Enable/ Disable state -------------------------------------------- */
+
     bool enabled();
 
     bool disabled();
@@ -111,9 +111,17 @@ struct Widget
 
     void enable_if(bool condition);
 
+    /* --- Focus state ------------------------------------------------------ */
+
     bool focused();
 
     void focus();
+
+    /* --- Paint ------------------------------------------------------------ */
+
+    void should_repaint();
+
+    void should_repaint(Rectangle rectangle);
 };
 
 RefPtr<Font> widget_font();
@@ -132,8 +140,6 @@ void widget_event(Widget *widget, struct Event *event);
 void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
-
-void widget_update_region(Widget *widget, Rectangle region);
 
 void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler);
 

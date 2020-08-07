@@ -62,7 +62,7 @@ void graph_record(Graph *widget, double data)
     widget->data[widget->current] = data;
     widget->current = (widget->current + 1) % widget->data_size;
 
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 void graph_destroy(Graph *widget)

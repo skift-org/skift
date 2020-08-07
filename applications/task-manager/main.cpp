@@ -91,7 +91,7 @@ void widget_cpu_update(TaskManagerWindow *window)
 void widget_table_update(TaskManagerWindow *window)
 {
     model_update((Model *)window->table_model);
-    widget_update(window->table);
+    window->table->should_repaint();
     widget_layout(window->table);
 }
 

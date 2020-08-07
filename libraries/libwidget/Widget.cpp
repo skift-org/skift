@@ -10,6 +10,8 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+/* --- Enable/ Disable state -------------------------------------------- */
+
 bool Widget::enabled() { return _enabled; }
 
 bool Widget::disabled() { return !_enabled; }
@@ -19,7 +21,7 @@ void Widget::enable()
     if (disabled())
     {
         _enabled = true;
-        widget_update(this);
+        should_repaint();
     }
 }
 
@@ -28,7 +30,7 @@ void Widget::disable()
     if (enabled())
     {
         _enabled = false;
-        widget_update(this);
+        should_repaint();
     }
 }
 
@@ -48,6 +50,8 @@ void Widget::enable_if(bool condition)
         disable();
 }
 
+/* --- Focus state ---------------------------------------------------------- */
+
 bool Widget::focused()
 {
     return window && window->focused_widget == this;
@@ -57,6 +61,24 @@ void Widget::focus()
 {
     if (window)
         window_set_focused_widget(window, this);
+}
+
+/* --- Paint ---------------------------------------------------------------- */
+
+void Widget::should_repaint()
+{
+    if (window)
+    {
+        window_schedule_update(window, bound);
+    }
+}
+
+void Widget::should_repaint(Rectangle rectangle)
+{
+    if (window)
+    {
+        window_schedule_update(window, rectangle);
+    }
 }
 
 static RefPtr<Font> _widget_font = nullptr;
@@ -560,22 +582,6 @@ void widget_set_focus(Widget *widget)
     }
 }
 
-void widget_update(Widget *widget)
-{
-    if (widget->window)
-    {
-        window_schedule_update(widget->window, widget->bound);
-    }
-}
-
-void widget_update_region(Widget *widget, Rectangle bound)
-{
-    if (widget->window)
-    {
-        window_schedule_update(widget->window, bound);
-    }
-}
-
 Rectangle widget_get_bound(Widget *widget)
 {
     return widget->bound;
@@ -651,5 +657,5 @@ void widget_set_color(Widget *widget, ThemeColorRole role, Color color)
     widget->colors[role].overwritten = true;
     widget->colors[role].color = color;
 
-    widget_update(widget);
+    widget->should_repaint();
 }

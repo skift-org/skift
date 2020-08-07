@@ -29,7 +29,7 @@ void widget_initialize(
     assert(widget != nullptr);
     assert(klass != nullptr);
 
-    widget->enabled = true;
+    widget->_enabled = true;
     widget->klass = klass;
     widget->childs = list_create();
     widget->bound = Rectangle(32, 32);
@@ -571,7 +571,7 @@ void widget_clear_event_handler(Widget *widget, EventType event)
 
 Color widget_get_color(Widget *widget, ThemeColorRole role)
 {
-    if (!widget->enabled || (widget->parent && !widget->parent->enabled))
+    if (!widget->enabled() || (widget->parent && !widget->parent->enabled()))
     {
         if (role == THEME_FOREGROUND)
         {
@@ -603,28 +603,4 @@ void widget_set_color(Widget *widget, ThemeColorRole role, Color color)
     widget->colors[role].color = color;
 
     widget_update(widget);
-}
-
-void widget_set_enable(Widget *widget, bool enable)
-{
-    if (widget->enabled != enable)
-    {
-        widget->enabled = enable;
-        widget_update(widget);
-    }
-}
-
-bool widget_is_enable(Widget *widget)
-{
-    return widget->enabled;
-}
-
-void widget_disable(Widget *widget)
-{
-    widget_set_enable(widget, false);
-}
-
-void widget_enable(Widget *widget)
-{
-    widget_set_enable(widget, true);
 }

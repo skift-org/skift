@@ -35,9 +35,9 @@ struct FileExplorerWindow : public Window
 
 static void update_navigation_bar(FileExplorerWindow *window)
 {
-    widget_set_enable(window->go_backward, list_any(window->backward_history));
-    widget_set_enable(window->go_foreward, list_any(window->foreward_history));
-    widget_set_enable(window->go_up, path_element_count(window->current_path) > 0);
+    window->go_backward->enable_if(list_any(window->backward_history));
+    window->go_foreward->enable_if(list_any(window->foreward_history));
+    window->go_up->enable_if(path_element_count(window->current_path) > 0);
 }
 
 static void navigate(FileExplorerWindow *window, Path *path, RecordHistory record_history)

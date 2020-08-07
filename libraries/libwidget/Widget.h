@@ -75,11 +75,13 @@ struct WidgetClass
     WidgetLayoutCallback layout = nullptr;
 };
 
+void widget_update(Widget *widget);
+
 struct Widget
 {
     const WidgetClass *klass;
 
-    bool enabled;
+    bool _enabled;
     Rectangle bound;
 
     int max_height;
@@ -96,6 +98,46 @@ struct Widget
     struct Widget *parent;
     struct Window *window;
     List *childs;
+
+    /* --- Enabled/Disabled state ----------------------- */
+
+    bool enabled() { return _enabled; }
+
+    bool disabled() { return !_enabled; }
+
+    void enable()
+    {
+        if (disabled())
+        {
+            _enabled = true;
+            widget_update(this);
+        }
+    }
+
+    void disable()
+    {
+        if (enabled())
+        {
+            _enabled = false;
+            widget_update(this);
+        }
+    }
+
+    void disable_if(bool condition)
+    {
+        if (condition)
+            disable();
+        else
+            enable();
+    }
+
+    void enable_if(bool condition)
+    {
+        if (condition)
+            enable();
+        else
+            disable();
+    }
 };
 
 RefPtr<Font> widget_font();
@@ -114,8 +156,6 @@ void widget_event(Widget *widget, struct Event *event);
 void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
-
-void widget_update(Widget *widget);
 
 void widget_update_region(Widget *widget, Rectangle region);
 
@@ -136,14 +176,6 @@ void widget_clear_childs(Widget *widget);
 /* --- Widget enable state ------------------------------ */
 
 void widget_set_focus(Widget *widget);
-
-bool widget_is_enable(Widget *widget);
-
-void widget_set_enable(Widget *widget, bool enable);
-
-void widget_disable(Widget *widget);
-
-void widget_enable(Widget *widget);
 
 /* --- Widget Style ------------------------------------- */
 

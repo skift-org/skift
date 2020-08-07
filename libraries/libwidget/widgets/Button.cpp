@@ -9,7 +9,7 @@ void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget_is_enable(widget))
+    if (widget->enabled())
     {
         if (widget->style == BUTTON_OUTLINE)
         {

@@ -6,4 +6,4 @@ struct Separator : public Widget
 {
 };
 
-Widget *separator_create(Widget *parent);
+Separator *separator_create(Widget *parent);

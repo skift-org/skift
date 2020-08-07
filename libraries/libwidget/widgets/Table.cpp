@@ -187,9 +187,9 @@ static const WidgetClass table_class = {
     .layout = (WidgetLayoutCallback)table_layout,
 };
 
-Widget *table_create(Widget *parent, Model *model)
+Table *table_create(Widget *parent, Model *model)
 {
-    Table *table = __create(Table);
+    auto table = __create(Table);
 
     table->model = model;
     table->selected = -1;

@@ -12,6 +12,6 @@ struct Table : public Widget
     Widget *scrollbar;
 };
 
-Widget *table_create(Widget *parent, Model *model);
+Table *table_create(Widget *parent, Model *model);
 
 void table_update_model(Table *table);

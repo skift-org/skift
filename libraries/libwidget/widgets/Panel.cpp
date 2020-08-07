@@ -13,9 +13,9 @@ static const WidgetClass panel_class = {
     .paint = (WidgetPaintCallback)panel_paint,
 };
 
-Widget *panel_create(Widget *parent)
+Panel *panel_create(Widget *parent)
 {
-    Panel *panel = __create(Panel);
+    auto panel = __create(Panel);
 
     widget_initialize(panel, &panel_class, parent);
 

@@ -113,12 +113,12 @@ TaskModel *task_model_create()
 {
     TaskModel *model = __create(TaskModel);
 
-    MODEL(model)->model_update = (ModelUpdateCallback)task_model_update;
-    MODEL(model)->model_data = (ModelDataCallback)task_model_data;
-    MODEL(model)->model_row_count = (ModelRowCountCallback)task_model_row_count;
-    MODEL(model)->model_column_count = (ModelColumnCountCallback)task_model_column_count;
-    MODEL(model)->model_column_name = (ModelColumnNameCallback)task_model_column_name;
-    MODEL(model)->model_destroy = (ModelDestroyCallback)task_model_destroy;
+    model->model_update = (ModelUpdateCallback)task_model_update;
+    model->model_data = (ModelDataCallback)task_model_data;
+    model->model_row_count = (ModelRowCountCallback)task_model_row_count;
+    model->model_column_count = (ModelColumnCountCallback)task_model_column_count;
+    model->model_column_name = (ModelColumnNameCallback)task_model_column_name;
+    model->model_destroy = (ModelDestroyCallback)task_model_destroy;
 
     model_initialize((Model *)model);
 

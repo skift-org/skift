@@ -78,9 +78,9 @@ static const WidgetClass graph_class = {
     .size = (WidgetComputeSizeCallback)graph_size,
 };
 
-Widget *graph_create(Widget *parent, size_t data_size, Color color)
+Graph *graph_create(Widget *parent, size_t data_size, Color color)
 {
-    Graph *widget = __create(Graph);
+    auto widget = __create(Graph);
 
     widget->color = color;
     widget->data = (double *)calloc(data_size, sizeof(double));

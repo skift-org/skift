@@ -13,10 +13,8 @@ struct FileSystemNode
     size_t size;
 };
 
-struct FileSystemModel
+struct FileSystemModel : public Model
 {
-    Model __super;
-
     char *current_path;
     List *files;
 };

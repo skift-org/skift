@@ -11,4 +11,4 @@ struct ScrollBar : public Widget
     int value;
 };
 
-Widget *scrollbar_create(Widget *parent);
+ScrollBar *scrollbar_create(Widget *parent);

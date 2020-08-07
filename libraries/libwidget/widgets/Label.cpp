@@ -48,9 +48,9 @@ static const WidgetClass label_class = {
     .size = (WidgetComputeSizeCallback)label_size,
 };
 
-Widget *label_create(Widget *parent, const char *text)
+Label *label_create(Widget *parent, const char *text)
 {
-    Label *label = __create(Label);
+    auto label = __create(Label);
 
     label->text = strdup(text);
     label->text_position = Position::CENTER;

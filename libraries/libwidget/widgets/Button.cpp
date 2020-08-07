@@ -73,9 +73,9 @@ static const WidgetClass button_class = {
     .event = (WidgetEventCallback)button_event,
 };
 
-Widget *button_create(Widget *parent, ButtonStyle style)
+Button *button_create(Widget *parent, ButtonStyle style)
 {
-    Button *widget = __create(Button);
+    auto widget = __create(Button);
 
     widget->style = style;
     widget->state = BUTTON_IDLE;
@@ -90,9 +90,9 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     return widget;
 }
 
-Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
+Button *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
 
     button->layout = STACK();
     button->insets = Insets(4, 4);
@@ -102,9 +102,9 @@ Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> 
     return button;
 }
 
-Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
+Button *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
 
     button->insets = Insets(0, 0, 8, 8);
     button->min_width = 64;
@@ -114,9 +114,9 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
     return button;
 }
 
-Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
+Button *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
     button->insets = Insets(0, 0, 6, 10);
     button->min_width = 64;
 

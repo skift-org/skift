@@ -11,20 +11,20 @@
 struct TaskManagerWindow : public Window
 {
     /// --- Graphs --- ///
-    Widget *ram_graph;
+    Graph *ram_graph;
     Timer *ram_timer;
-    Widget *cpu_graph;
+    Graph *cpu_graph;
     Timer *cpu_timer;
 
     // --- CPU/RAM stats --- //
-    Widget *ram_usage;
-    Widget *ram_avaliable;
-    Widget *ram_greedy;
-    Widget *cpu_average;
-    Widget *cpu_greedy;
+    Label *ram_usage;
+    Label *ram_avaliable;
+    Label *ram_greedy;
+    Label *cpu_average;
+    Label *cpu_greedy;
 
     /// --- Table view --- //
-    Widget *table;
+    Table *table;
     TaskModel *table_model;
     Timer *table_timer;
 };
@@ -33,7 +33,7 @@ void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record((Graph *)window->ram_graph, status.used_ram / (double)status.total_ram);
+    graph_record(window->ram_graph, status.used_ram / (double)status.total_ram);
 
     // Stats
     int usage = (int)status.used_ram / 1024 / 1024;
@@ -66,7 +66,7 @@ void widget_cpu_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record((Graph *)window->cpu_graph, status.cpu_usage / 100.0);
+    graph_record(window->cpu_graph, status.cpu_usage / 100.0);
 
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;

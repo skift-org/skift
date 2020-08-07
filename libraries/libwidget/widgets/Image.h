@@ -16,4 +16,4 @@ struct Image : public Widget
 
 void image_set_image(Widget *image, const char *path);
 
-Widget *image_create(Widget *parent, const char *path);
+Image *image_create(Widget *parent, const char *path);

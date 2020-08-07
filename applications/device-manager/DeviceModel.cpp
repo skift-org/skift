@@ -74,12 +74,12 @@ DeviceModel *device_model_create()
 {
     DeviceModel *model = __create(DeviceModel);
 
-    MODEL(model)->model_update = (ModelUpdateCallback)device_model_update;
-    MODEL(model)->model_data = (ModelDataCallback)device_model_data;
-    MODEL(model)->model_row_count = (ModelRowCountCallback)device_model_row_count;
-    MODEL(model)->model_column_count = (ModelColumnCountCallback)device_model_column_count;
-    MODEL(model)->model_column_name = (ModelColumnNameCallback)device_model_column_name;
-    MODEL(model)->model_destroy = (ModelDestroyCallback)device_model_destroy;
+    model->model_update = (ModelUpdateCallback)device_model_update;
+    model->model_data = (ModelDataCallback)device_model_data;
+    model->model_row_count = (ModelRowCountCallback)device_model_row_count;
+    model->model_column_count = (ModelColumnCountCallback)device_model_column_count;
+    model->model_column_name = (ModelColumnNameCallback)device_model_column_name;
+    model->model_destroy = (ModelDestroyCallback)device_model_destroy;
 
     model_initialize((Model *)model);
 

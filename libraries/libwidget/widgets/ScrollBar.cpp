@@ -123,9 +123,9 @@ static const WidgetClass scrollbar_class = {
     .event = (WidgetEventCallback)scrollbar_event,
 };
 
-Widget *scrollbar_create(Widget *parent)
+ScrollBar *scrollbar_create(Widget *parent)
 {
-    ScrollBar *scrollbar = __create(ScrollBar);
+    auto scrollbar = __create(ScrollBar);
 
     scrollbar->track = 1024;
     scrollbar->value = 512;

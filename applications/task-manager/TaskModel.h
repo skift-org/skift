@@ -5,10 +5,8 @@
 #include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
 
-struct TaskModel
+struct TaskModel : public Model
 {
-    Model __super;
-
     JsonValue *data;
 };
 

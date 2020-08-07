@@ -10,7 +10,7 @@
  - [ ] Rewrite the content of libsystem/utils
 
 ## Build
- - [ ] Improve make clean, don't removed rendered icons. 
+ - [ ] Improve make clean, don't remove rendered icons. 
 
 ## Kernel
 

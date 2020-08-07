@@ -19,7 +19,7 @@ contrib = os.path.join(skift, "contrib")
 for module in sys.argv[1:]:
     path = os.path.join(contrib, module)
     if not os.path.isdir(path):
-        print(f"{module} not found")
+        print(f"{path} not found")
         continue
     os.chdir(path)
     if not os.system("./get-it.sh") == 0:
@@ -32,3 +32,5 @@ for module in sys.argv[1:]:
         print(f"Error while installing {module}")
         continue
     os.chdir(skift)
+os.chdir(contrib)
+os.system("git checkout -- *")

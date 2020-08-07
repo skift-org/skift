@@ -99,45 +99,21 @@ struct Widget
     struct Window *window;
     List *childs;
 
-    /* --- Enabled/Disabled state ----------------------- */
+    bool enabled();
 
-    bool enabled() { return _enabled; }
+    bool disabled();
 
-    bool disabled() { return !_enabled; }
+    void enable();
 
-    void enable()
-    {
-        if (disabled())
-        {
-            _enabled = true;
-            widget_update(this);
-        }
-    }
+    void disable();
 
-    void disable()
-    {
-        if (enabled())
-        {
-            _enabled = false;
-            widget_update(this);
-        }
-    }
+    void disable_if(bool condition);
 
-    void disable_if(bool condition)
-    {
-        if (condition)
-            disable();
-        else
-            enable();
-    }
+    void enable_if(bool condition);
 
-    void enable_if(bool condition)
-    {
-        if (condition)
-            enable();
-        else
-            disable();
-    }
+    bool focused();
+
+    void focus();
 };
 
 RefPtr<Font> widget_font();
@@ -172,10 +148,6 @@ void widget_add_child(Widget *widget, Widget *child);
 void widget_remove_child(Widget *widget, Widget *child);
 
 void widget_clear_childs(Widget *widget);
-
-/* --- Widget enable state ------------------------------ */
-
-void widget_set_focus(Widget *widget);
 
 /* --- Widget Style ------------------------------------- */
 

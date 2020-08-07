@@ -10,6 +10,55 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+bool Widget::enabled() { return _enabled; }
+
+bool Widget::disabled() { return !_enabled; }
+
+void Widget::enable()
+{
+    if (disabled())
+    {
+        _enabled = true;
+        widget_update(this);
+    }
+}
+
+void Widget::disable()
+{
+    if (enabled())
+    {
+        _enabled = false;
+        widget_update(this);
+    }
+}
+
+void Widget::disable_if(bool condition)
+{
+    if (condition)
+        disable();
+    else
+        enable();
+}
+
+void Widget::enable_if(bool condition)
+{
+    if (condition)
+        enable();
+    else
+        disable();
+}
+
+bool Widget::focused()
+{
+    return window && window->focused_widget == this;
+}
+
+void Widget::focus()
+{
+    if (window)
+        window_set_focused_widget(window, this);
+}
+
 static RefPtr<Font> _widget_font = nullptr;
 RefPtr<Font> widget_font()
 {

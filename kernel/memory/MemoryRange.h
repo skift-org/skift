@@ -6,6 +6,11 @@ struct MemoryRange
 {
     uintptr_t base;
     size_t size;
+
+    auto is_page_aligned()
+    {
+        return IS_PAGE_ALIGN(base) && IS_PAGE_ALIGN(size);
+    }
 };
 
 inline bool memory_range_empty(MemoryRange range)

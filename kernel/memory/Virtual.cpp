@@ -11,19 +11,19 @@ PageTable kptable[256] __aligned(PAGE_SIZE) = {};
 bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 {
     int page_directory_index = PD_INDEX(virtual_address);
-    int page_table_index = PT_INDEX(virtual_address);
+    PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
 
-    PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
-
-    if (!page_directory_entry->Present)
+    if (!page_directory_entry.Present)
     {
         return false;
     }
 
-    PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
-    PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
+    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
 
-    if (!page_table_entry->Present)
+    int page_table_index = PT_INDEX(virtual_address);
+    PageTableEntry &page_table_entry = page_table.entries[page_table_index];
+
+    if (!page_table_entry.Present)
     {
         return false;
     }
@@ -34,51 +34,66 @@ bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address)
 {
     int page_directory_index = PD_INDEX(virtual_address);
+    PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
+
+    if (!page_directory_entry.Present)
+    {
+        return 0;
+    }
+
+    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
+
     int page_table_index = PT_INDEX(virtual_address);
+    PageTableEntry &page_table_entry = page_table.entries[page_table_index];
 
-    PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
-    PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
-    PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
+    if (!page_table_entry.Present)
+    {
+        return 0;
+    }
 
-    return (page_table_entry->PageFrameNumber * PAGE_SIZE) + (virtual_address & 0xfff);
+    return (page_table_entry.PageFrameNumber * PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
-int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool user)
+Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
-    for (uint i = 0; i < count; i++)
+    for (size_t i = 0; i < physical_range.size / PAGE_SIZE; i++)
     {
-        uint offset = i * PAGE_SIZE;
+        size_t offset = i * PAGE_SIZE;
 
-        uint pdi = PD_INDEX(vaddr + offset);
-        uint pti = PT_INDEX(vaddr + offset);
+        int page_directory_index = PD_INDEX(virtual_address + offset);
+        PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
+        PageTable *page_table = reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
 
-        PageDirectoryEntry *pde = &pdir->entries[pdi];
-        PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
-
-        if (!pde->Present)
+        if (!page_directory_entry.Present)
         {
-            memory_alloc_identity(pdir, MEMORY_CLEAR, (uintptr_t *)&ptable);
+            Result alloc_result = memory_alloc_identity(page_directory, MEMORY_CLEAR, (uintptr_t *)&page_table);
 
-            pde->Present = 1;
-            pde->Write = 1;
-            pde->User = user;
-            pde->PageFrameNumber = (u32)(ptable) >> 12;
+            if (alloc_result != SUCCESS)
+            {
+                return alloc_result;
+            }
+
+            page_directory_entry.Present = 1;
+            page_directory_entry.Write = 1;
+            page_directory_entry.User = flags & MEMORY_USER;
+            page_directory_entry.PageFrameNumber = (u32)(page_table) >> 12;
         }
 
-        PageTableEntry *p = &ptable->entries[pti];
+        int page_table_index = PT_INDEX(virtual_address + offset);
+        PageTableEntry &page_table_entry = page_table->entries[page_table_index];
 
-        p->Present = 1;
-        p->Write = 1;
-        p->User = user;
-        p->PageFrameNumber = (paddr + offset) >> 12;
+        page_table_entry.Present = 1;
+        page_table_entry.Write = 1;
+        page_table_entry.User = flags & MEMORY_USER;
+        page_table_entry.PageFrameNumber = (physical_range.base + offset) >> 12;
     }
 
     paging_invalidate_tlb();
 
-    return 0;
+    return SUCCESS;
 }
 
-MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, MemoryFlags flags)
+MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags)
 {
     bool is_user_memory = flags & MEMORY_USER;
 
@@ -90,7 +105,7 @@ MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, Memor
     {
         uintptr_t current_address = i * PAGE_SIZE;
 
-        if (!virtual_present(pdir, current_address))
+        if (!virtual_present(page_directory, current_address))
         {
             if (current_size == 0)
             {
@@ -101,7 +116,8 @@ MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, Memor
 
             if (current_size == physical_range.size)
             {
-                virtual_map(pdir, virtual_address, physical_range.base, physical_range.size / PAGE_SIZE, is_user_memory);
+                virtual_map(page_directory, physical_range, virtual_address, flags);
+
                 return (MemoryRange){virtual_address, current_size};
             }
         }
@@ -121,10 +137,11 @@ void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
         size_t offset = i * PAGE_SIZE;
 
         size_t page_directory_index = PD_INDEX(virtual_range.base + offset);
-        size_t page_table_index = PT_INDEX(virtual_range.base + offset);
-
         PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
+
         PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+
+        size_t page_table_index = PT_INDEX(virtual_range.base + offset);
         PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
         if (page_table_entry->Present)

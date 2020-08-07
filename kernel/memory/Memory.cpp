@@ -115,46 +115,49 @@ PageDirectory *memory_kpdir()
     return &kpdir;
 }
 
-Result memory_map(PageDirectory *page_directory, MemoryRange range, MemoryFlags flags)
+Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, MemoryFlags flags)
 {
-    assert(IS_PAGE_ALIGN(range.base));
-    assert(IS_PAGE_ALIGN(range.size));
+    assert(virtual_range.is_page_aligned());
 
     atomic_begin();
 
-    for (uint i = 0; i < range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
     {
-        uint virtual_address = range.base + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base + i * PAGE_SIZE;
 
         if (!virtual_present(page_directory, virtual_address))
         {
-            uint physical_address = physical_alloc(1);
-            virtual_map(page_directory, virtual_address, physical_address, 1, flags & MEMORY_USER);
+            uintptr_t physical_address = physical_alloc(1);
+            Result virtual_map_result = virtual_map(page_directory, MemoryRange{physical_address, PAGE_SIZE}, virtual_address, flags);
+
+            if (virtual_map_result != SUCCESS)
+            {
+                return virtual_map_result;
+            }
         }
     }
 
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)range.base, 0, range.size);
+        memset((void *)virtual_range.base, 0, virtual_range.size);
 
     return SUCCESS;
 }
 
-Result memory_map_identity(PageDirectory *page_directory, MemoryRange range, MemoryFlags flags)
+Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags)
 {
-    assert(IS_PAGE_ALIGN(range.base));
-    assert(IS_PAGE_ALIGN(range.size));
+    assert(physical_range.is_page_aligned());
 
-    size_t page_count = range.size / PAGE_SIZE;
+    size_t page_count = physical_range.size / PAGE_SIZE;
 
     atomic_begin();
-    physical_set_used(range.base, page_count);
-    virtual_map(page_directory, range.base, range.base, page_count, flags & MEMORY_USER);
+    physical_set_used(physical_range.base, page_count);
+    virtual_map(page_directory, physical_range, physical_range.base, flags);
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)range.base, 0, range.size);
+        memset((void *)physical_range.base, 0, physical_range.size);
 
     return SUCCESS;
 }
@@ -214,23 +217,20 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
-        int address = i * PAGE_SIZE;
+        uintptr_t identity_address = i * PAGE_SIZE;
 
-        if (!virtual_present(page_directory, address) &&
-            !physical_is_used(address, 1))
+        if (!virtual_present(page_directory, identity_address) &&
+            !physical_is_used(identity_address, 1))
         {
-            physical_set_used(address, 1);
-            virtual_map(page_directory, address, address, 1, flags & MEMORY_USER);
+            physical_set_used(identity_address, 1);
+            virtual_map(page_directory, MemoryRange{identity_address, PAGE_SIZE}, identity_address, flags);
 
             atomic_end();
 
             if (flags & MEMORY_CLEAR)
-                memset((void *)address, 0, PAGE_SIZE);
+                memset((void *)identity_address, 0, PAGE_SIZE);
 
-            *out_address = address;
-
-            if (flags & MEMORY_CLEAR)
-                memset((void *)address, 0, PAGE_SIZE);
+            *out_address = identity_address;
 
             return SUCCESS;
         }
@@ -241,19 +241,19 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
     logger_warn("Failled to allocate identity mapped page!");
 
     *out_address = 0;
+
     return ERR_OUT_OF_MEMORY;
 }
 
-Result memory_free(PageDirectory *page_directory, MemoryRange range)
+Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
-    assert(IS_PAGE_ALIGN(range.base));
-    assert(IS_PAGE_ALIGN(range.size));
+    assert(virtual_range.is_page_aligned());
 
     atomic_begin();
 
-    for (uint i = 0; i < range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
     {
-        uint virtual_address = range.base + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base + i * PAGE_SIZE;
 
         if (virtual_present(page_directory, virtual_address))
         {

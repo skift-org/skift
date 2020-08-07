@@ -2,6 +2,8 @@
 
 #include <abi/Memory.h>
 
+#include <libsystem/Result.h>
+
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/memory/Paging.h"
 
@@ -12,8 +14,8 @@ bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address);
 
 uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address);
 
-int virtual_map(PageDirectory *pdir, uint vaddr, uint paddr, uint count, bool user);
+Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags);
 
-MemoryRange virtual_alloc(PageDirectory *pdir, MemoryRange physical_range, MemoryFlags flags);
+MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags);
 
 void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range);

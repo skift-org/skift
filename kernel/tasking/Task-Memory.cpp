@@ -21,7 +21,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = virtual_map(task->pdir, address, memory_object->address, memory_object->size / PAGE_SIZE, true);
+    memory_mapping->address = virtual_map(task->pdir, memory_object->range(), address, MEMORY_USER);
     memory_mapping->size = memory_object->size;
 
     list_pushback(task->memory_mapping, memory_mapping);

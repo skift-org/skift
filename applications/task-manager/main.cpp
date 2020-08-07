@@ -8,10 +8,8 @@
 
 #include "task-manager/TaskModel.h"
 
-struct TaskManagerWindow
+struct TaskManagerWindow : public Window
 {
-    Window window;
-
     /// --- Graphs --- ///
     Widget *ram_graph;
     Timer *ram_timer;
@@ -70,7 +68,6 @@ void widget_cpu_update(TaskManagerWindow *window)
 
     graph_record((Graph *)window->cpu_graph, status.cpu_usage / 100.0);
 
-
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
 
@@ -114,16 +111,16 @@ int main(int argc, char **argv)
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
 
-    window_initialize((Window *)window, WINDOW_RESIZABLE);
+    window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, Icon::get("memory"));
-    window_set_title((Window *)window, "Task Manager");
-    window_set_size((Window *)window, Vec2i(700, 500));
+    window_set_icon(window, Icon::get("memory"));
+    window_set_title(window, "Task Manager");
+    window_set_size(window, Vec2i(700, 500));
 
-    window_root((Window *)window)->layout = VFLOW(0);
+    window_root(window)->layout = VFLOW(0);
 
     /// --- Toolbar --- ///
-    Widget *toolbar = toolbar_create(window_root((Window *)window));
+    Widget *toolbar = toolbar_create(window_root(window));
     Widget *new_task_button = button_create_with_icon_and_text(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
     __unused(new_task_button);
 
@@ -133,13 +130,13 @@ int main(int argc, char **argv)
     /// --- Table view --- //
     window->table_model = task_model_create();
 
-    window->table = table_create(window_root((Window *)window), (Model *)window->table_model);
+    window->table = table_create(window_root(window), (Model *)window->table_model);
     window->table->layout_attributes = LAYOUT_FILL;
     window->table_timer = timer_create(window, 1000, (TimerCallback)widget_table_update);
     timer_start(window->table_timer);
 
     /// --- Graphs --- ///
-    Widget *graphs_container = panel_create(window_root((Window *)window));
+    Widget *graphs_container = panel_create(window_root(window));
     graphs_container->layout = HFLOW(0);
     graphs_container->max_height = 96;
 
@@ -185,7 +182,7 @@ int main(int argc, char **argv)
     window->ram_timer = timer_create(window, 500, (TimerCallback)widget_ram_update);
     timer_start(window->ram_timer);
 
-    window_show((Window *)window);
+    window_show(window);
 
     return application_run();
 }

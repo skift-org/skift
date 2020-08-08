@@ -271,18 +271,6 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
     painter.pop();
 }
 
-void window_dump(Window *window)
-{
-    printf("Window(0x%p) (%d, %d) %dx%d\n",
-           window,
-           window->on_screen_bound.x(),
-           window->on_screen_bound.y(),
-           window->on_screen_bound.width(),
-           window->on_screen_bound.height());
-
-    widget_dump(window->root_container, 1);
-}
-
 RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
     Rectangle resize_bound = window_bound(window).expended(Insets(WINDOW_RESIZE_AREA));

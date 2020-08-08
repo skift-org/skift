@@ -45,8 +45,6 @@ void canvas_event(Canvas *widget, Event *event)
 }
 
 static const WidgetClass canvas_class = {
-    .name = "Canvas",
-
     .paint = (WidgetPaintCallback)canvas_paint,
     .event = (WidgetEventCallback)canvas_event,
 };

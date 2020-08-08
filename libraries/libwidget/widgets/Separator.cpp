@@ -14,8 +14,6 @@ Vec2i separator_size(Separator *widget)
 }
 
 static const WidgetClass separator_class = {
-    .name = "Separator",
-
     .paint = (WidgetPaintCallback)separator_paint,
     .size = (WidgetComputeSizeCallback)separator_size,
 };

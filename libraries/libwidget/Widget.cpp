@@ -189,33 +189,6 @@ void widget_clear_childs(Widget *widget)
     }
 }
 
-void widget_dump(Widget *widget, int depth)
-{
-    for (int i = 0; i < depth; i++)
-    {
-        printf("\t");
-    }
-
-    if (widget == nullptr)
-    {
-        printf("<null>\n");
-        return;
-    }
-
-    printf("%s(0x%08x) (%d, %d) %dx%d\n",
-           widget->klass->name,
-           widget,
-           widget->bound.x(),
-           widget->bound.y(),
-           widget->bound.width(),
-           widget->bound.height());
-
-    list_foreach(Widget, child, widget->childs)
-    {
-        widget_dump(child, depth + 1);
-    }
-}
-
 void widget_event(Widget *widget, Event *event)
 {
     if (widget->klass->event)

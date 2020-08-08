@@ -54,8 +54,6 @@ void demo_widget_destroy(DemoWidget *widget)
 }
 
 static const WidgetClass demo_class = {
-    .name = "Demo",
-
     .destroy = (WidgetDestroyCallback)demo_widget_destroy,
     .paint = (WidgetPaintCallback)demo_widget_paint,
 };

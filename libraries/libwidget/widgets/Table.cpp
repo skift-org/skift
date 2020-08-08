@@ -172,8 +172,6 @@ void table_layout(Table *widget)
 }
 
 static const WidgetClass table_class = {
-    .name = "Table",
-
     .paint = (WidgetPaintCallback)table_paint,
     .event = (WidgetEventCallback)table_event,
     .layout = (WidgetLayoutCallback)table_layout,

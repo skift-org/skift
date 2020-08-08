@@ -71,8 +71,6 @@ void graph_destroy(Graph *widget)
 }
 
 static const WidgetClass graph_class = {
-    .name = "Graph",
-
     .destroy = (WidgetDestroyCallback)graph_destroy,
     .paint = (WidgetPaintCallback)graph_paint,
     .size = (WidgetComputeSizeCallback)graph_size,

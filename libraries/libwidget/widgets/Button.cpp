@@ -69,8 +69,6 @@ void button_event(Button *widget, Event *event)
 }
 
 static const WidgetClass button_class = {
-    .name = "Button",
-
     .paint = (WidgetPaintCallback)button_paint,
     .event = (WidgetEventCallback)button_event,
 };

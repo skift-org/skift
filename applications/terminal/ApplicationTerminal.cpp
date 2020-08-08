@@ -253,8 +253,6 @@ void terminal_widget_destroy(TerminalWidget *terminal_widget)
 }
 
 static const WidgetClass terminal_class = {
-    .name = "Terminal",
-
     .paint = (WidgetPaintCallback)terminal_widget_paint,
     .event = (WidgetEventCallback)terminal_widget_event,
     .layout = (WidgetLayoutCallback)terminal_widget_layout,

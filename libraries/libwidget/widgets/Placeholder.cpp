@@ -29,8 +29,6 @@ void placeholder_destroy(Placeholder *placeholder)
 }
 
 static const WidgetClass placeholder_class = {
-    .name = "Placeholder",
-
     .destroy = (WidgetDestroyCallback)placeholder_destroy,
     .paint = (WidgetPaintCallback)placeholder_paint,
 };

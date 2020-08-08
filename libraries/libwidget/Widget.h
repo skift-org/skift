@@ -66,8 +66,6 @@ struct WidgetColor
 
 struct WidgetClass
 {
-    const char *name;
-
     WidgetDestroyCallback destroy = nullptr;
     WidgetPaintCallback paint = nullptr;
     WidgetEventCallback event = nullptr;
@@ -136,8 +134,6 @@ void widget_initialize(
     Widget *parent);
 
 void widget_destroy(Widget *widget);
-
-void widget_dump(Widget *widget, int depth);
 
 void widget_event(Widget *widget, struct Event *event);
 

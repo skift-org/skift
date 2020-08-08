@@ -32,8 +32,6 @@ Vec2i icon_panel_size(IconPanel *widget)
 }
 
 static const WidgetClass icon_panel_class = {
-    .name = "IconPanel",
-
     .paint = (WidgetPaintCallback)icon_panel_paint,
     .size = (WidgetComputeSizeCallback)icon_panel_size,
 };

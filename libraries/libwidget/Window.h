@@ -80,8 +80,6 @@ bool window_is_visible(Window *window);
 
 void window_paint(Window *window, Painter &painter, Rectangle rectangle);
 
-void window_dump(Window *window);
-
 void window_event(Window *window, Event *event);
 
 Rectangle window_bound_on_screen(Window *window);

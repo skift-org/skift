@@ -118,8 +118,6 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
 }
 
 static const WidgetClass scrollbar_class = {
-    .name = "ScrollBar",
-
     .paint = (WidgetPaintCallback)scrollbar_paint,
     .event = (WidgetEventCallback)scrollbar_event,
 };

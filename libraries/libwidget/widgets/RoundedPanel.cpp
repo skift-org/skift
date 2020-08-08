@@ -10,7 +10,6 @@ void rounded_panel_paint(RoundedPanel *widget, Painter &painter, Rectangle recta
 }
 
 static const WidgetClass rounded_panel_class = {
-    .name = "RoundedPanel",
     .paint = (WidgetPaintCallback)rounded_panel_paint,
 };
 

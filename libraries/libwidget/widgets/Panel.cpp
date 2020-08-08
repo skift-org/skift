@@ -8,8 +8,6 @@ void panel_paint(Panel *widget, Painter &painter, Rectangle rectangle)
 }
 
 static const WidgetClass panel_class = {
-    .name = "Panel",
-
     .paint = (WidgetPaintCallback)panel_paint,
 };
 

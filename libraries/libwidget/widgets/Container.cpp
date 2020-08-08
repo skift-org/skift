@@ -1,8 +1,6 @@
 #include <libwidget/widgets/Container.h>
 
-static const WidgetClass container_class = {
-    .name = "Container",
-};
+static const WidgetClass container_class = {};
 
 Container *container_create(Widget *parent)
 {

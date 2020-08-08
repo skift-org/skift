@@ -91,7 +91,7 @@ struct Widget
     Layout layout; // FIXME: this shoul be a separeted object
     LayoutAttributes layout_attributes;
 
-    EventHandler handlers[__EVENT_TYPE_COUNT];
+    Callback<void(Event *)> handlers[__EVENT_TYPE_COUNT];
 
     struct Widget *parent;
     struct Window *window;
@@ -141,7 +141,7 @@ void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
 
-void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler);
+void widget_set_event_handler(Widget *widget, EventType event, Callback<void(Event *)> &&handler);
 
 void widget_clear_event_handler(Widget *widget, EventType event);
 

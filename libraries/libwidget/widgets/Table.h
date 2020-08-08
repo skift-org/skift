@@ -2,6 +2,7 @@
 
 #include <libwidget/Model.h>
 #include <libwidget/Widget.h>
+#include <libwidget/widgets/ScrollBar.h>
 
 struct Table : public Widget
 {
@@ -9,7 +10,7 @@ struct Table : public Widget
     int selected;
     int scroll_offset;
 
-    Widget *scrollbar;
+    ScrollBar *scrollbar;
 };
 
 Table *table_create(Widget *parent, Model *model);

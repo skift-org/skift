@@ -14,18 +14,6 @@
 #define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
 
-static void close_button_click(void *target, struct Widget *sender, struct Event *event)
-{
-    __unused(target);
-    __unused(event);
-
-    Event close_event = {};
-
-    close_event.type = EVENT_WINDOW_CLOSING;
-
-    window_event(sender->window, &close_event);
-}
-
 void window_populate_header(Window *window)
 {
     widget_clear_childs(window->header_container);
@@ -54,7 +42,11 @@ void window_populate_header(Window *window)
     Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets = Insets(3);
 
-    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(nullptr, close_button_click));
+    widget_set_event_handler(close_button, EVENT_ACTION, [window](auto) {
+        Event close_event = {};
+        close_event.type = EVENT_WINDOW_CLOSING;
+        window_event(window, &close_event);
+    });
 }
 
 void window_initialize(Window *window, WindowFlag flags)
@@ -379,13 +371,10 @@ void window_event(Window *window, Event *event)
         event->mouse.old_position = event->mouse.old_position - window->on_screen_bound.position();
     }
 
-    if (window->handlers[event->type].callback != nullptr)
+    if (window->handlers[event->type])
     {
         event->accepted = true;
-        window->handlers[event->type].callback(
-            window->handlers[event->type].target,
-            window,
-            event);
+        window->handlers[event->type](event);
     }
 
     if (event->accepted)
@@ -608,10 +597,10 @@ void window_event(Window *window, Event *event)
     }
 }
 
-void window_set_event_handler(Window *window, EventType event, EventHandler handler)
+void window_set_event_handler(Window *window, EventType event, Callback<void(Event *)> &&handler)
 {
     assert(event < __EVENT_TYPE_COUNT);
-    window->handlers[event] = handler;
+    window->handlers[event] = move(handler);
 }
 
 Rectangle window_bound_on_screen(Window *window)

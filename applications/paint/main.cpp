@@ -60,37 +60,6 @@ static void update_toolbar(PaintWindow *window)
     widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
-static void select_pencil(PaintWindow *window, ...)
-{
-    paint_document_set_tool(window->document, pencil_tool_create());
-
-    update_toolbar(window);
-}
-
-static void select_brush(PaintWindow *window, ...)
-{
-    paint_document_set_tool(window->document, brush_tool_create());
-    update_toolbar(window);
-}
-
-static void select_eraser(PaintWindow *window, ...)
-{
-    paint_document_set_tool(window->document, eraser_tool_create());
-    update_toolbar(window);
-}
-
-static void select_fill(PaintWindow *window, ...)
-{
-    paint_document_set_tool(window->document, fill_tool_create());
-    update_toolbar(window);
-}
-
-static void select_picker(PaintWindow *window, ...)
-{
-    paint_document_set_tool(window->document, picker_tool_create());
-    update_toolbar(window);
-}
-
 static void create_toolbar(PaintWindow *window, Widget *parent)
 {
     Widget *toolbar = toolbar_create(parent);
@@ -102,19 +71,34 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     separator_create(toolbar);
 
     window->pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
-    widget_set_event_handler(window->pencil, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_pencil));
+    widget_set_event_handler(window->pencil, EVENT_ACTION, [window](auto) {
+        paint_document_set_tool(window->document, pencil_tool_create());
+        update_toolbar(window);
+    });
 
     window->brush = toolbar_icon_create(toolbar, Icon::get("brush"));
-    widget_set_event_handler(window->brush, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_brush));
+    widget_set_event_handler(window->brush, EVENT_ACTION, [window](auto) {
+        paint_document_set_tool(window->document, brush_tool_create());
+        update_toolbar(window);
+    });
 
     window->eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
-    widget_set_event_handler(window->eraser, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_eraser));
+    widget_set_event_handler(window->eraser, EVENT_ACTION, [window](auto) {
+        paint_document_set_tool(window->document, eraser_tool_create());
+        update_toolbar(window);
+    });
 
     window->fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
-    widget_set_event_handler(window->fill, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_fill));
+    widget_set_event_handler(window->fill, EVENT_ACTION, [window](auto) {
+        paint_document_set_tool(window->document, fill_tool_create());
+        update_toolbar(window);
+    });
 
     window->picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
-    widget_set_event_handler(window->picker, EVENT_ACTION, EVENT_HANDLER(window, (EventHandlerCallback)select_picker));
+    widget_set_event_handler(window->picker, EVENT_ACTION, [window](auto) {
+        paint_document_set_tool(window->document, picker_tool_create());
+        update_toolbar(window);
+    });
 
     separator_create(toolbar);
 
@@ -141,20 +125,6 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color);
 }
 
-static void on_color_palette_click(PaintWindow *window, Widget *sender, Event *event)
-{
-    if (event->mouse.button == MOUSE_BUTTON_LEFT)
-    {
-        window->document->primary_color = widget_get_color(sender, THEME_MIDDLEGROUND);
-    }
-    else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
-    {
-        window->document->secondary_color = widget_get_color(sender, THEME_MIDDLEGROUND);
-    }
-
-    update_toolbar(window);
-}
-
 static void create_color_palette(PaintWindow *window, Widget *parent)
 {
     __unused(window);
@@ -164,10 +134,24 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
 
     for (size_t i = 0; i < 18; i++)
     {
+        Color color = _color_palette[i];
+
         Widget *color_widget = rounded_panel_create(palette, 4);
         color_widget->min_width = 30;
-        widget_set_color(color_widget, THEME_MIDDLEGROUND, _color_palette[i]);
-        widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, EVENT_HANDLER(window, (EventHandlerCallback)on_color_palette_click));
+        widget_set_color(color_widget, THEME_MIDDLEGROUND, color);
+
+        widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, [window, color](auto event) {
+            if (event->mouse.button == MOUSE_BUTTON_LEFT)
+            {
+                window->document->primary_color = color;
+            }
+            else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
+            {
+                window->document->secondary_color = color;
+            }
+
+            update_toolbar(window);
+        });
     }
 }
 

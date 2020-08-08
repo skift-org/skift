@@ -44,7 +44,7 @@ struct Window
     List *dirty_rect;
     bool dirty_layout;
 
-    EventHandler handlers[__EVENT_TYPE_COUNT];
+    Callback<void(Event *)> handlers[__EVENT_TYPE_COUNT];
 
     Widget *header_container;
     Widget *root_container;
@@ -82,7 +82,7 @@ void window_dump(Window *window);
 
 void window_event(Window *window, Event *event);
 
-void window_set_event_handler(Window *window, EventType event, EventHandler handler);
+void window_set_event_handler(Window *window, EventType event, Callback<void(Event *)> &&handler);
 
 Rectangle window_bound_on_screen(Window *window);
 

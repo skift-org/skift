@@ -56,4 +56,6 @@
     inline __type &operator&=(__type &a, __type b) { return (__type &)((int &)a &= (int)b); } \
     inline __type &operator^=(__type &a, __type b) { return (__type &)((int &)a ^= (int)b); }
 
+#ifndef __always_inline
 #define __always_inline inline __attribute__((always_inline))
+#endif

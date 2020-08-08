@@ -215,13 +215,10 @@ void widget_event(Widget *widget, Event *event)
         widget->klass->event(widget, event);
     }
 
-    if (!event->accepted && widget->handlers[event->type].callback != nullptr)
+    if (!event->accepted && widget->handlers[event->type])
     {
         event->accepted = true;
-        widget->handlers[event->type].callback(
-            widget->handlers[event->type].target,
-            widget,
-            event);
+        widget->handlers[event->type](event);
     }
 
     if (!event->accepted && widget->parent)
@@ -610,18 +607,17 @@ Widget *widget_get_child_at(Widget *parent, Vec2i position)
     return parent;
 }
 
-void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler)
+void widget_set_event_handler(Widget *widget, EventType event, Callback<void(Event *)> &&handler)
 {
     assert(event < __EVENT_TYPE_COUNT);
-    widget->handlers[event] = handler;
+    widget->handlers[event] = move(handler);
 }
 
 void widget_clear_event_handler(Widget *widget, EventType event)
 {
     assert(event < __EVENT_TYPE_COUNT);
 
-    widget->handlers[event].target = nullptr;
-    widget->handlers[event].callback = nullptr;
+    widget->handlers[event] = nullptr;
 }
 
 Color widget_get_color(Widget *widget, ThemeColorRole role)

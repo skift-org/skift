@@ -171,14 +171,6 @@ void table_layout(Table *widget)
     ((ScrollBar *)widget->scrollbar)->value = 0;
 }
 
-void table_on_scrollbar_scroll(Table *table, ScrollBar *sender, Event *event)
-{
-    __unused(event);
-
-    table->scroll_offset = sender->value;
-    table->should_repaint();
-}
-
 static const WidgetClass table_class = {
     .name = "Table",
 
@@ -198,7 +190,11 @@ Table *table_create(Widget *parent, Model *model)
     widget_initialize(table, &table_class, parent);
 
     table->scrollbar = scrollbar_create(table);
-    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, EVENT_HANDLER(table, table_on_scrollbar_scroll));
+
+    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, [table](auto) {
+        table->scroll_offset = table->scrollbar->value;
+        table->should_repaint();
+    });
 
     return table;
 }

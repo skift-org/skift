@@ -3,15 +3,6 @@
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
 
-void ok_button_pressed(void *target, Widget *sender, Event *event)
-{
-    __unused(target);
-    __unused(event);
-    __unused(sender);
-
-    application_exit(-1);
-}
-
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
@@ -40,7 +31,9 @@ int main(int argc, char **argv)
     Widget *ok_button = nullptr;
     if ((ok_button = window_get_widget_by_id(window, "ok-button")))
     {
-        widget_set_event_handler(ok_button, EVENT_ACTION, EVENT_HANDLER(nullptr, ok_button_pressed));
+        widget_set_event_handler(ok_button, EVENT_ACTION, [](auto) {
+            application_exit(0);
+        });
     }
 
     window_show(window);

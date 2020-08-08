@@ -100,11 +100,6 @@ void task_manager_window_destroy(TaskManagerWindow *window)
     model_destroy((Model *)window->table_model);
 }
 
-void cancel_task()
-{
-    dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_OK);
-}
-
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
@@ -125,7 +120,9 @@ int main(int argc, char **argv)
     __unused(new_task_button);
 
     Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
-    widget_set_event_handler(cancel_task_button, EVENT_ACTION, EVENT_HANDLER(nullptr, cancel_task));
+    widget_set_event_handler(cancel_task_button, EVENT_ACTION, [](auto) {
+        dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO);
+    });
 
     /// --- Table view --- //
     window->table_model = task_model_create();

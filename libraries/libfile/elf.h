@@ -17,20 +17,20 @@ typedef unsigned int elf_type_t;
 
 struct __packed ELFHeader
 {
-    u8 ident[ELF_NIDENT];
-    u16 type;
-    u16 machine;
-    u32 version;
-    u32 entry;
-    u32 phoff;
-    u32 shoff;
-    u32 flags;
-    u16 ehsize;
-    u16 phentsize;
-    u16 phnum;
-    u16 shentsize;
-    u16 shnum;
-    u16 shstrndx;
+    uint8_t ident[ELF_NIDENT];
+    uint16_t type;
+    uint16_t machine;
+    uint32_t version;
+    uint32_t entry;
+    uint32_t phoff;
+    uint32_t shoff;
+    uint32_t flags;
+    uint16_t ehsize;
+    uint16_t phentsize;
+    uint16_t phnum;
+    uint16_t shentsize;
+    uint16_t shnum;
+    uint16_t shstrndx;
 };
 
 enum ELFSectionType
@@ -60,24 +60,24 @@ struct __packed ELFSection
 
 struct ELFProgram
 {
-    u32 type;
-    u32 offset;
-    u32 vaddr;
-    u32 paddr;
-    u32 filesz;
-    u32 memsz;
-    u32 flags;
-    u32 align;
+    uint32_t type;
+    uint32_t offset;
+    uint32_t vaddr;
+    uint32_t paddr;
+    uint32_t filesz;
+    uint32_t memsz;
+    uint32_t flags;
+    uint32_t align;
 };
 
 struct ELFSymbole
 {
-    u32 name;
-    u32 value;
-    u32 size;
+    uint32_t name;
+    uint32_t value;
+    uint32_t size;
     uint8_t info;
     uint8_t other;
-    u16 shndx;
+    uint16_t shndx;
 };
 
 int elf_valid(ELFHeader *header);

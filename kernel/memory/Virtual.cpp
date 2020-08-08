@@ -76,7 +76,7 @@ Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, ui
             page_directory_entry.Present = 1;
             page_directory_entry.Write = 1;
             page_directory_entry.User = flags & MEMORY_USER;
-            page_directory_entry.PageFrameNumber = (u32)(page_table) >> 12;
+            page_directory_entry.PageFrameNumber = (uint32_t)(page_table) >> 12;
         }
 
         int page_table_index = PT_INDEX(virtual_address + offset);

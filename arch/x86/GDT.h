@@ -15,70 +15,70 @@
 
 struct __packed TSS
 {
-	u32 prev_tss;
-	u32 esp0;
-	u32 ss0;
-	u32 esp1;
-	u32 ss1;
-	u32 esp2;
-	u32 ss2;
-	u32 cr3;
-	u32 eip;
-	u32 eflags;
-	u32 eax;
-	u32 ecx;
-	u32 edx;
-	u32 ebx;
-	u32 esp;
-	u32 ebp;
-	u32 esi;
-	u32 edi;
-	u32 es;
-	u32 cs;
-	u32 ss;
-	u32 ds;
-	u32 fs;
-	u32 gs;
-	u32 ldt;
-	u16 trap;
-	u16 iomap_base;
+	uint32_t prev_tss;
+	uint32_t esp0;
+	uint32_t ss0;
+	uint32_t esp1;
+	uint32_t ss1;
+	uint32_t esp2;
+	uint32_t ss2;
+	uint32_t cr3;
+	uint32_t eip;
+	uint32_t eflags;
+	uint32_t eax;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t ebx;
+	uint32_t esp;
+	uint32_t ebp;
+	uint32_t esi;
+	uint32_t edi;
+	uint32_t es;
+	uint32_t cs;
+	uint32_t ss;
+	uint32_t ds;
+	uint32_t fs;
+	uint32_t gs;
+	uint32_t ldt;
+	uint16_t trap;
+	uint16_t iomap_base;
 };
 
 struct __packed GDTDescriptor
 {
-	u16 size;
-	u32 offset;
+	uint16_t size;
+	uint32_t offset;
 };
 
 struct __packed GDTEntry
 {
-	u16 limit0_15;
-	u16 base0_15;
-	u8 base16_23;
-	u8 acces;
-	u8 limit16_19 : 4;
-	u8 flags : 4;
-	u8 base24_31;
+	uint16_t limit0_15;
+	uint16_t base0_15;
+	uint8_t base16_23;
+	uint8_t acces;
+	uint8_t limit16_19 : 4;
+	uint8_t flags : 4;
+	uint8_t base24_31;
 };
 
-#define GDT_ENTRY(__base, __limit, __access, __flags) \
-	(GDTEntry)                                        \
-	{                                                 \
-		.limit0_15 = (u16)((__limit)&0xffff),         \
-		.base0_15 = (u16)((__base)&0xffff),           \
-		.base16_23 = (u8)(((__base) >> 16) & 0xff),   \
-		.acces = (__access),                          \
-		.limit16_19 = ((__limit) >> 16) & 0x0f,       \
-		.flags = (__flags),                           \
-		.base24_31 = (u8)(((__base) >> 24) & 0xff),   \
+#define GDT_ENTRY(__base, __limit, __access, __flags)    \
+	(GDTEntry)                                           \
+	{                                                    \
+		.limit0_15 = (uint16_t)((__limit)&0xffff),       \
+		.base0_15 = (uint16_t)((__base)&0xffff),         \
+		.base16_23 = (uint8_t)(((__base) >> 16) & 0xff), \
+		.acces = (__access),                             \
+		.limit16_19 = ((__limit) >> 16) & 0x0f,          \
+		.flags = (__flags),                              \
+		.base24_31 = (uint8_t)(((__base) >> 24) & 0xff), \
 	}
 
 void gdt_initialize();
 
 #ifdef __cplusplus
-extern "C" void gdt_flush(u32);
+extern "C" void gdt_flush(uint32_t);
 #else
-extern void gdt_flush(u32);
+extern void gdt_flush(uint32_t);
 #endif
 
-void set_kernel_stack(u32 stack);
+void set_kernel_stack(uint32_t stack);

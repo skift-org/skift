@@ -28,11 +28,11 @@ union __packed PageTableEntry {
         bool Accessed : 1;
         bool Dirty : 1;
         bool Pat : 1;
-        u32 Ignored : 4;
-        u32 PageFrameNumber : 20;
+        uint32_t Ignored : 4;
+        uint32_t PageFrameNumber : 20;
     };
 
-    u32 as_uint;
+    uint32_t as_uint;
 };
 
 struct __packed PageTable
@@ -51,10 +51,10 @@ union __packed PageDirectoryEntry {
         bool Accessed : 1;
         bool Ignored1 : 1;
         bool LargePage : 1;
-        u32 Ignored2 : 4;
-        u32 PageFrameNumber : 20;
+        uint32_t Ignored2 : 4;
+        uint32_t PageFrameNumber : 20;
     };
-    u32 as_uint;
+    uint32_t as_uint;
 };
 
 struct __packed PageDirectory

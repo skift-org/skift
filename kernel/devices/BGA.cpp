@@ -1,7 +1,7 @@
 #include <abi/Paths.h>
 
-#include <libsystem/math/MinMax.h>
 #include <libsystem/Logger.h>
+#include <libsystem/math/MinMax.h>
 
 #include "arch/x86/x86.h"
 
@@ -45,19 +45,19 @@ static uintptr_t framebuffer_virtual = 0;
 static int framebuffer_width = 0;
 static int framebuffer_height = 0;
 
-void bga_write_register(u16 IndexValue, u16 DataValue)
+void bga_write_register(uint16_t IndexValue, uint16_t DataValue)
 {
     out16(VBE_DISPI_IOPORT_INDEX, IndexValue);
     out16(VBE_DISPI_IOPORT_DATA, DataValue);
 }
 
-u16 bga_read_register(u16 IndexValue)
+uint16_t bga_read_register(uint16_t IndexValue)
 {
     out16(VBE_DISPI_IOPORT_INDEX, IndexValue);
     return in16(VBE_DISPI_IOPORT_DATA);
 }
 
-void bga_set_mode(u32 width, u32 height)
+void bga_set_mode(int width, int height)
 {
     bga_write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
     bga_write_register(VBE_DISPI_INDEX_XRES, width);

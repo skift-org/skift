@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include <thirdparty/multiboot/Multiboot.h>
 
@@ -30,7 +30,7 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
         multiboot->modules_size++;
     }
 
-    for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)info->mmap_addr; (u32)mmap < info->mmap_addr + info->mmap_length; mmap = (multiboot_memory_map_t *)((u32)mmap + mmap->size + sizeof(mmap->size)))
+    for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)info->mmap_addr; (uint32_t)mmap < info->mmap_addr + info->mmap_length; mmap = (multiboot_memory_map_t *)((uint32_t)mmap + mmap->size + sizeof(mmap->size)))
     {
         assert(multiboot->memory_map_size < MULTIBOOT_MEMORY_MAP_SIZE);
 

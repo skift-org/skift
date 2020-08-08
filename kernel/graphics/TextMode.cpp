@@ -24,13 +24,13 @@ static uint16_t *_text_buffer = nullptr;
 
 #define VGA_ENTRY(__c, __fg, __bg) ((((__bg)&0XF) << 4 | ((__fg)&0XF)) << 8 | ((__c)&0XFF))
 
-void vga_cell(u32 x, u32 y, uint16_t entry)
+void vga_cell(int x, int y, uint16_t entry)
 {
     if (x < VGA_SCREEN_WIDTH)
     {
         if (y < VGA_SCREEN_HEIGHT)
         {
-            ((u16 *)_text_buffer)[y * VGA_SCREEN_WIDTH + x] = (u16)entry;
+            ((uint16_t *)_text_buffer)[y * VGA_SCREEN_WIDTH + x] = (uint16_t)entry;
         }
     }
 }

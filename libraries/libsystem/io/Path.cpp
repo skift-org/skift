@@ -91,7 +91,7 @@ bool path_is_relative(Path *path)
 
 size_t path_element_count(Path *path)
 {
-    return list_count(path->elements);
+    return path->elements->count();
 }
 
 void path_normalize(Path *path)
@@ -252,12 +252,12 @@ bool path_equals(Path *left, Path *right)
         return false;
     }
 
-    if (list_count(left->elements) != list_count(right->elements))
+    if (left->elements->count() != right->elements->count())
     {
         return false;
     }
 
-    for (int i = 0; i < list_count(left->elements); i++)
+    for (int i = 0; i < left->elements->count(); i++)
     {
         const char *leftstr;
         list_peekat(left->elements, i, (void **)&leftstr);

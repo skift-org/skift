@@ -35,8 +35,8 @@ struct FileExplorerWindow : public Window
 
 static void update_navigation_bar(FileExplorerWindow *window)
 {
-    window->go_backward->enable_if(list_any(window->backward_history));
-    window->go_foreward->enable_if(list_any(window->foreward_history));
+    window->go_backward->enable_if(window->backward_history->any());
+    window->go_foreward->enable_if(window->foreward_history->any());
     window->go_up->enable_if(path_element_count(window->current_path) > 0);
 }
 
@@ -121,7 +121,7 @@ static void go_up(FileExplorerWindow *window, ...)
 
 static void go_backward(FileExplorerWindow *window, ...)
 {
-    if (list_any(window->backward_history))
+    if (window->backward_history->any())
     {
         Path *path = nullptr;
         list_popback(window->backward_history, (void **)&path);
@@ -132,7 +132,7 @@ static void go_backward(FileExplorerWindow *window, ...)
 
 static void go_foreward(FileExplorerWindow *window, ...)
 {
-    if (list_any(window->foreward_history))
+    if (window->foreward_history->any())
     {
         Path *path = nullptr;
         list_popback(window->foreward_history, (void **)&path);

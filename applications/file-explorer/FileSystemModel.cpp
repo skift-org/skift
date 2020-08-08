@@ -135,7 +135,7 @@ static int filesystem_model_column_count()
 
 static int filesystem_model_row_count(FileSystemModel *model)
 {
-    return list_count(model->files);
+    return model->files->count();
 }
 
 static const char *filesystem_model_column_name(int column)
@@ -168,7 +168,7 @@ void filesystem_model_navigate(FileSystemModel *model, Path *path)
 
 const char *filesystem_model_filename_by_index(FileSystemModel *model, int index)
 {
-    if (index >= 0 && index < list_count(model->files))
+    if (index >= 0 && index < model->files->count())
     {
         FileSystemNode *entry = nullptr;
         assert(list_peekat(model->files, index, (void **)&entry));
@@ -181,7 +181,7 @@ const char *filesystem_model_filename_by_index(FileSystemModel *model, int index
 
 FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index)
 {
-    if (index >= 0 && index < list_count(model->files))
+    if (index >= 0 && index < model->files->count())
     {
         FileSystemNode *entry = nullptr;
         assert(list_peekat(model->files, index, (void **)&entry));

@@ -205,7 +205,7 @@ size_t json_array_length(JsonValue *array)
 {
     assert(json_is(array, JSON_ARRAY));
 
-    return list_count(array->storage_array);
+    return array->storage_array->count();
 }
 
 JsonValue *json_array_get(JsonValue *array, size_t index)

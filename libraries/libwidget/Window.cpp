@@ -751,7 +751,7 @@ void window_schedule_update(Window *window, Rectangle rectangle)
     if (!window->visible)
         return;
 
-    if (list_count(window->dirty_rect) == 0)
+    if (window->dirty_rect->empty())
     {
         eventloop_run_later((RunLaterCallback)window_update, window);
     }

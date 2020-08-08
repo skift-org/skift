@@ -63,7 +63,7 @@ static void markup_prettify_internal(MarkupPrettifyState *state, MarkupNode *nod
         }
     }
 
-    if (list_count(node->childs) == 0)
+    if (node->childs->empty())
     {
         buffer_builder_append_str(state->builder, "/>");
         return;

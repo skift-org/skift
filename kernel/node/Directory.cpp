@@ -8,9 +8,9 @@
 
 static Result directory_open(FsDirectory *node, FsHandle *handle)
 {
-    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * list_count(node->childs));
+    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * node->childs->count());
 
-    listing->count = list_count(node->childs);
+    listing->count = node->childs->count();
 
     int current_index = 0;
 

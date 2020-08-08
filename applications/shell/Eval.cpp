@@ -89,7 +89,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         if (builtin)
         {
             // list_count(command->arguments) + 1 for argv[0] which is the command name.
-            char **argv = (char **)calloc(list_count(command->arguments) + 1, sizeof(argv));
+            char **argv = (char **)calloc(command->arguments->count() + 1, sizeof(argv));
             argv[0] = command->command;
             int argc = 1;
 
@@ -123,14 +123,14 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
 
         List *pipes = list_create();
 
-        for (int i = 0; i < list_count(pipeline->commands) - 1; i++)
+        for (int i = 0; i < pipeline->commands->count() - 1; i++)
         {
             list_pushback(pipes, pipe_create());
         }
 
-        int *processes = (int *)calloc(list_count(pipeline->commands), sizeof(int));
+        int *processes = (int *)calloc(pipeline->commands->count(), sizeof(int));
 
-        for (int i = 0; i < list_count(pipeline->commands); i++)
+        for (int i = 0; i < pipeline->commands->count(); i++)
         {
             ShellCommand *command = nullptr;
             list_peekat(pipeline->commands, i, (void **)&command);
@@ -146,7 +146,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
                 command_stdin = input_pipe->out;
             }
 
-            if (i < list_count(pipeline->commands) - 1)
+            if (i < pipeline->commands->count() - 1)
             {
                 Pipe *output_pipe;
                 assert(list_peekat(pipes, i, (void **)&output_pipe));
@@ -158,7 +158,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
 
         list_destroy_with_callback(pipes, (ListDestroyElementCallback)pipe_destroy);
 
-        for (int i = 0; i < list_count(pipeline->commands); i++)
+        for (int i = 0; i < pipeline->commands->count(); i++)
         {
             int exit_value;
             process_wait(processes[i], &exit_value);

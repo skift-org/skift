@@ -317,12 +317,12 @@ Vec2i widget_compute_size(Widget *widget)
 
         if (widget->layout.type == LAYOUT_HFLOW || widget->layout.type == LAYOUT_HGRID)
         {
-            width += widget->layout.spacing.x() * (list_count(widget->childs) - 1);
+            width += widget->layout.spacing.x() * (widget->childs->count() - 1);
         }
 
         if (widget->layout.type == LAYOUT_VFLOW || widget->layout.type == LAYOUT_VGRID)
         {
-            height += widget->layout.spacing.y() * (list_count(widget->childs) - 1);
+            height += widget->layout.spacing.y() * (widget->childs->count() - 1);
         }
     }
 
@@ -362,9 +362,9 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
     int current = widget_get_content_bound(widget).position().component(dim);
     int spacing = layout.spacing.component(dim);
     int size = widget_get_content_bound(widget).size().component(dim);
-    int used_space_without_spacing = size - (spacing * (list_count(widget->childs) - 1));
-    int child_size = used_space_without_spacing / list_count(widget->childs);
-    int used_space_with_spacing = child_size * list_count(widget->childs) + (spacing * (list_count(widget->childs) - 1));
+    int used_space_without_spacing = size - (spacing * (widget->childs->count() - 1));
+    int child_size = used_space_without_spacing / widget->childs->count();
+    int used_space_with_spacing = child_size * widget->childs->count() + (spacing * (widget->childs->count() - 1));
     int correction_space = size - used_space_with_spacing;
 
     list_foreach(Widget, child, widget->childs)
@@ -406,7 +406,7 @@ void widget_layout(Widget *widget)
         return;
     }
 
-    if (list_count(widget->childs) == 0)
+    if (widget->childs->count() == 0)
         return;
 
     Layout layout = widget->layout;
@@ -474,7 +474,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_get_content_bound(widget).width() -
-            layout.spacing.x() * (list_count(widget->childs) - 1);
+            layout.spacing.x() * (widget->childs->count() - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
@@ -530,7 +530,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_get_content_bound(widget).height() -
-            layout.spacing.y() * (list_count(widget->childs) - 1);
+            layout.spacing.y() * (widget->childs->count() - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 

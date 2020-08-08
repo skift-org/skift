@@ -15,4 +15,3 @@ struct Table : public Widget
 
 Table *table_create(Widget *parent, Model *model);
 
-void table_update_model(Table *table);

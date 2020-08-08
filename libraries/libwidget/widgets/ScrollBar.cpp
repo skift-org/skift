@@ -38,6 +38,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle recta
     painter.clear_rectangle(widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
 
     Rectangle track = scrollbar_track(widget);
+
     if (track.height() * (widget->thumb / (double)widget->track) < track.height())
     {
         painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));

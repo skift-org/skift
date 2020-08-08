@@ -166,9 +166,9 @@ void table_layout(Table *widget)
 {
     widget->scrollbar->bound = table_scrollbar_bound(widget);
 
-    ((ScrollBar *)widget->scrollbar)->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
-    ((ScrollBar *)widget->scrollbar)->thumb = table_body_bound(widget).height();
-    ((ScrollBar *)widget->scrollbar)->value = 0;
+    widget->scrollbar->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
+    widget->scrollbar->thumb = table_body_bound(widget).height();
+    widget->scrollbar->value = 0;
 }
 
 static const WidgetClass table_class = {

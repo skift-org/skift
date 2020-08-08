@@ -80,6 +80,6 @@ bool list_remove_at(List *list, int index);
 
 bool list_remove_at_with_callback(List *list, int index, ListDestroyElementCallback callback);
 
-typedef IterationDecision (*ListIterationCallback)(void *target, void *value);
+typedef Iteration (*ListIterationCallback)(void *target, void *value);
 
 bool list_iterate(List *list, void *target, ListIterationCallback callback);

@@ -87,7 +87,7 @@ const char *device_to_static_string(DeviceInfo info)
     return buffer;
 }
 
-static IterationDecision print_device_info(void *target, DeviceInfo info)
+static Iteration print_device_info(void *target, DeviceInfo info)
 {
     __unused(target);
 
@@ -112,7 +112,7 @@ static IterationDecision print_device_info(void *target, DeviceInfo info)
         logger_warn("%s: Unknown device", device_to_static_string(info));
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 void device_initialize()
@@ -123,7 +123,7 @@ void device_initialize()
 
 void device_iterate(void *target, DeviceIterateCallback callback)
 {
-    if (pci_device_iterate(target, callback) == ITERATION_STOP)
+    if (pci_device_iterate(target, callback) == Iteration::STOP)
     {
         return;
     }

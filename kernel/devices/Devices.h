@@ -45,7 +45,7 @@ struct DeviceDriverInfo
     DeviceDriverInfoInitialize initialize;
 };
 
-typedef IterationDecision (*DeviceIterateCallback)(void *target, DeviceInfo device);
+typedef Iteration (*DeviceIterateCallback)(void *target, DeviceInfo device);
 
 void device_initialize();
 

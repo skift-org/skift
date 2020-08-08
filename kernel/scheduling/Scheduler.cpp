@@ -98,7 +98,7 @@ int scheduler_get_usage(int task_id)
     return (count * 100) / SCHEDULER_RECORD_COUNT;
 }
 
-static IterationDecision wakeup_task_if_unblocked(void *target, Task *task)
+static Iteration wakeup_task_if_unblocked(void *target, Task *task)
 {
     __unused(target);
 
@@ -128,7 +128,7 @@ static IterationDecision wakeup_task_if_unblocked(void *target, Task *task)
         task_set_state(task, TASK_STATE_RUNNING);
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 uintptr_t schedule(uintptr_t current_stack_pointer)

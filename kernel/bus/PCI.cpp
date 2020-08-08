@@ -5,9 +5,9 @@
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
 
-IterationDecision pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus);
+Iteration pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus);
 
-IterationDecision pci_device_iterate_hit(
+Iteration pci_device_iterate_hit(
     void *target,
     DeviceIterateCallback callback,
     PCIDevice device)
@@ -18,14 +18,14 @@ IterationDecision pci_device_iterate_hit(
     return callback(target, (DeviceInfo){.bus = BUS_PCI, .pci_device = device});
 }
 
-IterationDecision pci_device_iterate_func(
+Iteration pci_device_iterate_func(
     void *target,
     DeviceIterateCallback callback,
     PCIDevice device)
 {
-    if (pci_device_iterate_hit(target, callback, device) == ITERATION_STOP)
+    if (pci_device_iterate_hit(target, callback, device) == Iteration::STOP)
     {
-        return ITERATION_STOP;
+        return Iteration::STOP;
     }
 
     if (pci_device_type(device) == PCI_TYPE_BRIDGE)
@@ -37,11 +37,11 @@ IterationDecision pci_device_iterate_func(
     }
     else
     {
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
     }
 }
 
-IterationDecision pci_device_iterate_slot(
+Iteration pci_device_iterate_slot(
     void *target,
     DeviceIterateCallback callback,
     int bus,
@@ -57,13 +57,13 @@ IterationDecision pci_device_iterate_slot(
     };
 
     if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
 
-    if (pci_device_iterate_func(target, callback, device) == ITERATION_STOP)
-        return ITERATION_STOP;
+    if (pci_device_iterate_func(target, callback, device) == Iteration::STOP)
+        return Iteration::STOP;
 
     if (!pci_device_read(device, PCI_HEADER_TYPE, 1))
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
 
     for (int func = 1; func < 8; func++)
     {
@@ -77,23 +77,23 @@ IterationDecision pci_device_iterate_slot(
         };
 
         if (pci_device_read(device, PCI_VENDOR_ID, 2) != PCI_NONE)
-            if (pci_device_iterate_func(target, callback, device) == ITERATION_STOP)
-                return ITERATION_STOP;
+            if (pci_device_iterate_func(target, callback, device) == Iteration::STOP)
+                return Iteration::STOP;
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
-IterationDecision pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus)
+Iteration pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus)
 {
     for (int slot = 0; slot < 32; ++slot)
-        if (pci_device_iterate_slot(target, callback, bus, slot) == ITERATION_STOP)
-            return ITERATION_STOP;
+        if (pci_device_iterate_slot(target, callback, bus, slot) == Iteration::STOP)
+            return Iteration::STOP;
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
-IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callback)
+Iteration pci_device_iterate(void *target, DeviceIterateCallback callback)
 {
     PCIDevice device = {};
 
@@ -114,30 +114,30 @@ IterationDecision pci_device_iterate(void *target, DeviceIterateCallback callbac
 
         if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
         {
-            return ITERATION_CONTINUE;
+            return Iteration::CONTINUE;
         }
 
-        if (pci_device_iterate_bus(target, callback, func) == ITERATION_STOP)
+        if (pci_device_iterate_bus(target, callback, func) == Iteration::STOP)
         {
-            return ITERATION_STOP;
+            return Iteration::STOP;
         }
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
-static IterationDecision find_isa_bridge(PCIDevice *pci_isa, DeviceInfo info)
+static Iteration find_isa_bridge(PCIDevice *pci_isa, DeviceInfo info)
 {
     if (info.pci_device.vendor != 0x8086)
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
 
     if (info.pci_device.device != 0x7000 ||
         info.pci_device.device != 0x7110)
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
 
     *pci_isa = info.pci_device;
 
-    return ITERATION_STOP;
+    return Iteration::STOP;
 }
 
 static bool has_pci_isa = false;
@@ -146,7 +146,7 @@ static uint8_t pci_remaps[4] = {};
 
 void pci_remap()
 {
-    if (pci_device_iterate(&pci_isa, (DeviceIterateCallback)find_isa_bridge) == ITERATION_STOP)
+    if (pci_device_iterate(&pci_isa, (DeviceIterateCallback)find_isa_bridge) == Iteration::STOP)
     {
         has_pci_isa = true;
 

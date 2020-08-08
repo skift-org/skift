@@ -11,7 +11,7 @@
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
 
-static IterationDecision append_device_info(JsonValue *root, DeviceInfo device)
+static Iteration append_device_info(JsonValue *root, DeviceInfo device)
 {
     JsonValue *task_object = json_create_object();
 
@@ -30,7 +30,7 @@ static IterationDecision append_device_info(JsonValue *root, DeviceInfo device)
 
     json_array_append(root, task_object);
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 static Result device_info_open(FsDeviceInfo *node, FsHandle *handle)

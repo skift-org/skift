@@ -20,11 +20,3 @@ typedef struct
 
 #define SOURCE_LOCATION \
     ((__SOURCE_LOCATION__){__FILE__, __FUNCTION__, __LINE__})
-
-/* --- Loops ---------------------------------------------------------------- */
-
-enum IterationDecision
-{
-    ITERATION_CONTINUE,
-    ITERATION_STOP,
-};

@@ -458,7 +458,7 @@ bool list_iterate(List *list, void *target, ListIterationCallback callback)
     while (current)
     {
         ListItem *next = current->next;
-        if (callback(target, current->value) == ITERATION_STOP)
+        if (callback(target, current->value) == Iteration::STOP)
         {
             return false;
         }

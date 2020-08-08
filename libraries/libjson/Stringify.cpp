@@ -4,7 +4,7 @@
 
 void json_stringify_internal(BufferBuilder *builder, JsonValue *value);
 
-IterationDecision json_stringify_object(BufferBuilder *builder, char *key, JsonValue *value)
+Iteration json_stringify_object(BufferBuilder *builder, char *key, JsonValue *value)
 {
     buffer_builder_append_str(builder, "\"");
     buffer_builder_append_str(builder, key);
@@ -13,15 +13,15 @@ IterationDecision json_stringify_object(BufferBuilder *builder, char *key, JsonV
     json_stringify_internal(builder, value);
     buffer_builder_append_str(builder, ", ");
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
-IterationDecision json_stringify_array(BufferBuilder *builder, JsonValue *value)
+Iteration json_stringify_array(BufferBuilder *builder, JsonValue *value)
 {
     json_stringify_internal(builder, value);
     buffer_builder_append_str(builder, ", ");
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 void json_stringify_internal(BufferBuilder *builder, JsonValue *value)

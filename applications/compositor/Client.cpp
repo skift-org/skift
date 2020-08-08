@@ -260,14 +260,14 @@ Client *client_create(Connection *connection)
     return client;
 }
 
-IterationDecision destroy_window_if_client_match(Client *client, Window *window)
+Iteration destroy_window_if_client_match(Client *client, Window *window)
 {
     if (window->client == client)
     {
         window_destroy(window);
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 void client_close_all_windows(Client *client)
@@ -305,7 +305,7 @@ Result client_send_message(Client *client, CompositorMessage message)
     return SUCCESS;
 }
 
-IterationDecision client_destroy_if_disconnected(void *target, Client *client)
+Iteration client_destroy_if_disconnected(void *target, Client *client)
 {
     __unused(target);
 
@@ -314,7 +314,7 @@ IterationDecision client_destroy_if_disconnected(void *target, Client *client)
         client_destroy(client);
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 void client_destroy_disconnected()

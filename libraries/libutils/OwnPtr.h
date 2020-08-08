@@ -8,16 +8,9 @@ private:
 
 public:
     OwnPtr() {}
-    OwnPtr(T *ptr) : _ptr(ptr) {}
+    OwnPtr(nullptr_t) {}
 
-    ~OwnPtr()
-    {
-        if (_ptr)
-        {
-            delete _ptr;
-            _ptr = nullptr;
-        }
-    }
+    OwnPtr(T *ptr) : _ptr(ptr) {}
 
     OwnPtr(OwnPtr &other) : _ptr(other.give_ref()) {}
 
@@ -28,6 +21,15 @@ public:
 
     template <typename U>
     OwnPtr(OwnPtr<U> &&other) : _ptr(static_cast<U *>(other.give_ref())) {}
+
+    ~OwnPtr()
+    {
+        if (_ptr)
+        {
+            delete _ptr;
+            _ptr = nullptr;
+        }
+    }
 
     OwnPtr &operator=(OwnPtr &other)
     {

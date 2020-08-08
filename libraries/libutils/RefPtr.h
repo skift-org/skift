@@ -152,7 +152,7 @@ public:
         }
     }
 
-    T *give_ref()
+    [[nodiscard]] T *give_ref()
     {
         T *ptr = _ptr;
         _ptr = nullptr;

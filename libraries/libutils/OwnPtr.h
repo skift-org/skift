@@ -123,7 +123,7 @@ public:
         return _ptr == nullptr;
     }
 
-    T *give_ref()
+    [[nodiscard]] T *give_ref()
     {
         auto ref = _ptr;
         _ptr = nullptr;
@@ -140,5 +140,5 @@ public:
 template <typename Type, typename... Args>
 inline OwnPtr<Type> own(Args &&... args)
 {
-    return OwnPtr<Type>(new Type(args...));
+    return OwnPtr<Type>(new Type(forward<Args>(args)...));
 }

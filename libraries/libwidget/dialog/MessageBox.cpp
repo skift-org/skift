@@ -19,7 +19,7 @@ DialogButton dialog_message(
     window_root(window)->layout = VFLOW(0);
     window_root(window)->insets = Insets(8);
 
-    window_set_event_handler(window, EVENT_WINDOW_CLOSING, [window](auto) {
+    window->on(Event::WINDOW_CLOSING, [window](auto) {
         application_exit_nested(DIALOG_BUTTON_CLOSED);
         window_hide(window);
     });

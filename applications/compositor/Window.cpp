@@ -85,7 +85,7 @@ void window_send_event(Window *window, Event event)
 void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position, MouseButton buttons)
 {
     Event event = {
-        .type = EVENT_MOUSE_MOVE,
+        .type = Event::MOUSE_MOVE,
         .accepted = false,
         .mouse = {
             .position = position,
@@ -108,7 +108,7 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
     if (is_button_pressed && !was_button_pressed)
     {
         Event event = {
-            .type = EVENT_MOUSE_BUTTON_PRESS,
+            .type = Event::MOUSE_BUTTON_PRESS,
             .accepted = false,
             .mouse = {
                 .position = position,
@@ -126,7 +126,7 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
     if (was_button_pressed && !is_button_pressed)
     {
         Event event = {
-            .type = EVENT_MOUSE_BUTTON_RELEASE,
+            .type = Event::MOUSE_BUTTON_RELEASE,
             .accepted = false,
             .mouse = {
                 .position = position,
@@ -156,7 +156,7 @@ void window_handle_mouse_buttons(
 void window_handle_double_click(Window *window, Vec2i position)
 {
     Event event = {
-        .type = EVENT_MOUSE_DOUBLE_CLICK,
+        .type = Event::MOUSE_DOUBLE_CLICK,
         .accepted = false,
         .mouse = {
             .position = position,
@@ -176,7 +176,7 @@ void window_get_focus(Window *window)
     renderer_region_dirty(window_bound(window));
 
     Event event = {};
-    event.type = EVENT_GOT_FOCUS;
+    event.type = Event::GOT_FOCUS;
     window_send_event(window, event);
 }
 
@@ -185,6 +185,6 @@ void window_lost_focus(Window *window)
     renderer_region_dirty(window_bound(window));
 
     Event event = {};
-    event.type = EVENT_LOST_FOCUS;
+    event.type = Event::LOST_FOCUS;
     window_send_event(window, event);
 }

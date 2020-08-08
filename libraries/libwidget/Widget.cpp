@@ -85,7 +85,7 @@ void Widget::should_repaint(Rectangle rectangle)
 
 void Widget::on(EventType event_type, EventHandler handler)
 {
-    assert(event_type < __EVENT_TYPE_COUNT);
+    assert(event_type < EventType::__COUNT);
     handlers[event_type] = move(handler);
 }
 

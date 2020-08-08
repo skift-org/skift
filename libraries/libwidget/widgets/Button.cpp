@@ -34,26 +34,26 @@ void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 
 void button_event(Button *widget, Event *event)
 {
-    if (event->type == EVENT_MOUSE_ENTER)
+    if (event->type == Event::MOUSE_ENTER)
     {
         widget->state = BUTTON_OVER;
         widget->should_repaint();
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_LEAVE)
+    else if (event->type == Event::MOUSE_LEAVE)
     {
         widget->state = BUTTON_IDLE;
         widget->should_repaint();
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         widget->state = BUTTON_PRESS;
         widget->should_repaint();
 
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
+    else if (event->type == Event::MOUSE_BUTTON_RELEASE)
     {
         widget->state = BUTTON_OVER;
         widget->should_repaint();
@@ -62,7 +62,7 @@ void button_event(Button *widget, Event *event)
 
         Event action_event = {};
 
-        action_event.type = EVENT_ACTION;
+        action_event.type = Event::ACTION;
 
         widget_event(widget, &action_event);
     }

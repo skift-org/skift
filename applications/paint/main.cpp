@@ -71,31 +71,31 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     separator_create(toolbar);
 
     window->pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
-    window->pencil->on(EVENT_ACTION, [window](auto) {
+    window->pencil->on(Event::ACTION, [window](auto) {
         paint_document_set_tool(window->document, pencil_tool_create());
         update_toolbar(window);
     });
 
     window->brush = toolbar_icon_create(toolbar, Icon::get("brush"));
-    window->brush->on(EVENT_ACTION, [window](auto) {
+    window->brush->on(Event::ACTION, [window](auto) {
         paint_document_set_tool(window->document, brush_tool_create());
         update_toolbar(window);
     });
 
     window->eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
-    window->eraser->on(EVENT_ACTION, [window](auto) {
+    window->eraser->on(Event::ACTION, [window](auto) {
         paint_document_set_tool(window->document, eraser_tool_create());
         update_toolbar(window);
     });
 
     window->fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
-    window->fill->on(EVENT_ACTION, [window](auto) {
+    window->fill->on(Event::ACTION, [window](auto) {
         paint_document_set_tool(window->document, fill_tool_create());
         update_toolbar(window);
     });
 
     window->picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
-    window->picker->on(EVENT_ACTION, [window](auto) {
+    window->picker->on(Event::ACTION, [window](auto) {
         paint_document_set_tool(window->document, picker_tool_create());
         update_toolbar(window);
     });
@@ -140,7 +140,7 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
         color_widget->min_width = 30;
         widget_set_color(color_widget, THEME_MIDDLEGROUND, color);
 
-        color_widget->on(EVENT_MOUSE_BUTTON_PRESS, [window, color](auto event) {
+        color_widget->on(Event::MOUSE_BUTTON_PRESS, [window, color](auto event) {
             if (event->mouse.button == MOUSE_BUTTON_LEFT)
             {
                 window->document->primary_color = color;

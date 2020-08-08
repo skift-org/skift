@@ -44,7 +44,7 @@ struct Window
     List *dirty_rect;
     bool dirty_layout;
 
-    Callback<void(Event *)> handlers[__EVENT_TYPE_COUNT];
+    EventHandler handlers[EventType::__COUNT];
 
     Widget *header_container;
     Widget *root_container;
@@ -52,6 +52,8 @@ struct Window
     Widget *mouse_focused_widget;
     Widget *mouse_over_widget;
     HashMap *widget_by_id;
+
+    void on(EventType event, EventHandler handler);
 };
 
 Window *window_create(WindowFlag flags);
@@ -81,8 +83,6 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle);
 void window_dump(Window *window);
 
 void window_event(Window *window, Event *event);
-
-void window_set_event_handler(Window *window, EventType event, Callback<void(Event *)> &&handler);
 
 Rectangle window_bound_on_screen(Window *window);
 

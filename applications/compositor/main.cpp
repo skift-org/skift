@@ -21,17 +21,17 @@ static EventType key_motion_to_event_type(KeyMotion motion)
 {
     if (motion == KEY_MOTION_DOWN)
     {
-        return EVENT_KEYBOARD_KEY_PRESS;
+        return Event::KEYBOARD_KEY_PRESS;
     }
 
     if (motion == KEY_MOTION_UP)
     {
-        return EVENT_KEYBOARD_KEY_RELEASE;
+        return Event::KEYBOARD_KEY_RELEASE;
     }
 
     if (motion == KEY_MOTION_TYPED)
     {
-        return EVENT_KEYBOARD_KEY_TYPED;
+        return Event::KEYBOARD_KEY_TYPED;
     }
 
     ASSERT_NOT_REACHED();

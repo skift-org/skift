@@ -5,34 +5,6 @@
 #include <libsystem/unicode/Codepoint.h>
 #include <libutils/Callback.h>
 
-#define EVENT_LIST(__EVENT) \
-    __EVENT(CHILD_ADDED)
-
-enum EventType
-{
-    EVENT_VALUE_CHANGE,
-    EVENT_ACTION,
-
-    EVENT_GOT_FOCUS,
-    EVENT_LOST_FOCUS,
-
-    EVENT_WINDOW_CLOSING,
-
-    EVENT_MOUSE_MOVE,
-    EVENT_MOUSE_ENTER,
-    EVENT_MOUSE_LEAVE,
-
-    EVENT_MOUSE_BUTTON_PRESS,
-    EVENT_MOUSE_BUTTON_RELEASE,
-    EVENT_MOUSE_DOUBLE_CLICK,
-
-    EVENT_KEYBOARD_KEY_PRESS,
-    EVENT_KEYBOARD_KEY_RELEASE,
-    EVENT_KEYBOARD_KEY_TYPED,
-
-    __EVENT_TYPE_COUNT,
-};
-
 #define MOUSE_NO_BUTTON (0)
 #define MOUSE_BUTTON_LEFT (1 << 1)
 #define MOUSE_BUTTON_RIGHT (1 << 2)
@@ -57,20 +29,45 @@ struct KeyboardEvent
 
 struct Event
 {
-    EventType type;
+    enum Type
+    {
+        VALUE_CHANGE,
+        ACTION,
+
+        GOT_FOCUS,
+        LOST_FOCUS,
+
+        WINDOW_CLOSING,
+
+        MOUSE_MOVE,
+        MOUSE_ENTER,
+        MOUSE_LEAVE,
+
+        MOUSE_BUTTON_PRESS,
+        MOUSE_BUTTON_RELEASE,
+        MOUSE_DOUBLE_CLICK,
+
+        KEYBOARD_KEY_PRESS,
+        KEYBOARD_KEY_RELEASE,
+        KEYBOARD_KEY_TYPED,
+
+        __COUNT,
+    };
+
+    Type type;
     bool accepted;
 
     MouseEvent mouse;
     KeyboardEvent keyboard;
 };
 
+using EventType = Event::Type;
 using EventHandler = Callback<void(Event *)>;
 
-
-#define is_mouse_event(__event)                                  \
-    (((Event *)(__event))->type == EVENT_MOUSE_MOVE ||           \
-     ((Event *)(__event))->type == EVENT_MOUSE_ENTER ||          \
-     ((Event *)(__event))->type == EVENT_MOUSE_LEAVE ||          \
-     ((Event *)(__event))->type == EVENT_MOUSE_BUTTON_PRESS ||   \
-     ((Event *)(__event))->type == EVENT_MOUSE_BUTTON_RELEASE || \
-     ((Event *)(__event))->type == EVENT_MOUSE_DOUBLE_CLICK)
+#define is_mouse_event(__event)                                   \
+    (((Event *)(__event))->type == Event::MOUSE_MOVE ||           \
+     ((Event *)(__event))->type == Event::MOUSE_ENTER ||          \
+     ((Event *)(__event))->type == Event::MOUSE_LEAVE ||          \
+     ((Event *)(__event))->type == Event::MOUSE_BUTTON_PRESS ||   \
+     ((Event *)(__event))->type == Event::MOUSE_BUTTON_RELEASE || \
+     ((Event *)(__event))->type == Event::MOUSE_DOUBLE_CLICK)

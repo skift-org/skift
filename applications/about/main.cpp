@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     Widget *ok_button = nullptr;
     if ((ok_button = window_get_widget_by_id(window, "ok-button")))
     {
-        ok_button->on(EVENT_ACTION, [](auto) {
+        ok_button->on(Event::ACTION, [](auto) {
             application_exit(0);
         });
     }

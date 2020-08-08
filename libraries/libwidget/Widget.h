@@ -91,7 +91,7 @@ struct Widget
     Layout layout; // FIXME: this shoul be a separeted object
     LayoutAttributes layout_attributes;
 
-    EventHandler handlers[__EVENT_TYPE_COUNT];
+    EventHandler handlers[EventType::__COUNT];
 
     struct Widget *parent;
     struct Window *window;
@@ -125,7 +125,7 @@ struct Widget
 
     /* --- Events ----------------------------------------------------------- */
 
-    void on(EventType event_type, EventHandler handler);
+    void on(EventType event, EventHandler handler);
 };
 
 RefPtr<Font> widget_font();

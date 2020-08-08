@@ -70,7 +70,7 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
     Event event_value_changed = {};
-    event_value_changed.type = EVENT_VALUE_CHANGE;
+    event_value_changed.type = Event::VALUE_CHANGE;
     widget_event(widget, &event_value_changed);
 
     widget->should_repaint();
@@ -86,7 +86,7 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
     Event event_value_changed = {};
-    event_value_changed.type = EVENT_VALUE_CHANGE;
+    event_value_changed.type = Event::VALUE_CHANGE;
     widget_event(widget, &event_value_changed);
 
     widget->should_repaint();
@@ -98,11 +98,11 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
     {
         MouseEvent mouse_event = event->mouse;
 
-        if (event->type == EVENT_MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
+        if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
             scrollbar_scroll_thumb(widget, mouse_event.position);
         }
-        else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+        else if (event->type == Event::MOUSE_BUTTON_PRESS)
         {
             if (!scrollbar_thumb(widget).containe(mouse_event.position))
             {

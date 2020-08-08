@@ -194,7 +194,7 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 
 void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
-    if (event->type == EVENT_KEYBOARD_KEY_TYPED)
+    if (event->type == Event::KEYBOARD_KEY_TYPED)
     {
         if (event->keyboard.key == KEYBOARD_KEY_UP)
         {

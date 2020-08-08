@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     __unused(new_task_button);
 
     Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
-    cancel_task_button->on(EVENT_ACTION, [](auto) {
+    cancel_task_button->on(Event::ACTION, [](auto) {
         dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO);
     });
 

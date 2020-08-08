@@ -155,7 +155,7 @@ void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
 
 void table_event(Table *widget, Event *event)
 {
-    if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         widget->selected = table_row_at(widget, event->mouse.position);
         widget->should_repaint();
@@ -191,7 +191,7 @@ Table *table_create(Widget *parent, Model *model)
 
     table->scrollbar = scrollbar_create(table);
 
-    table->scrollbar->on(EVENT_VALUE_CHANGE, [table](auto) {
+    table->scrollbar->on(Event::VALUE_CHANGE, [table](auto) {
         table->scroll_offset = table->scrollbar->value;
         table->should_repaint();
     });

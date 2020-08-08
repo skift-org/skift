@@ -81,6 +81,14 @@ void Widget::should_repaint(Rectangle rectangle)
     }
 }
 
+/* --- Events ----------------------------------------------------------------*/
+
+void Widget::on(EventType event_type, EventHandler handler)
+{
+    assert(event_type < __EVENT_TYPE_COUNT);
+    handlers[event_type] = move(handler);
+}
+
 static RefPtr<Font> _widget_font = nullptr;
 RefPtr<Font> widget_font()
 {
@@ -605,19 +613,6 @@ Widget *widget_get_child_at(Widget *parent, Vec2i position)
     }
 
     return parent;
-}
-
-void widget_set_event_handler(Widget *widget, EventType event, Callback<void(Event *)> &&handler)
-{
-    assert(event < __EVENT_TYPE_COUNT);
-    widget->handlers[event] = move(handler);
-}
-
-void widget_clear_event_handler(Widget *widget, EventType event)
-{
-    assert(event < __EVENT_TYPE_COUNT);
-
-    widget->handlers[event] = nullptr;
 }
 
 Color widget_get_color(Widget *widget, ThemeColorRole role)

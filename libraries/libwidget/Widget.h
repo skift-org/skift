@@ -91,7 +91,7 @@ struct Widget
     Layout layout; // FIXME: this shoul be a separeted object
     LayoutAttributes layout_attributes;
 
-    Callback<void(Event *)> handlers[__EVENT_TYPE_COUNT];
+    EventHandler handlers[__EVENT_TYPE_COUNT];
 
     struct Widget *parent;
     struct Window *window;
@@ -122,6 +122,10 @@ struct Widget
     void should_repaint();
 
     void should_repaint(Rectangle rectangle);
+
+    /* --- Events ----------------------------------------------------------- */
+
+    void on(EventType event_type, EventHandler handler);
 };
 
 RefPtr<Font> widget_font();
@@ -140,10 +144,6 @@ void widget_event(Widget *widget, struct Event *event);
 void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
-
-void widget_set_event_handler(Widget *widget, EventType event, Callback<void(Event *)> &&handler);
-
-void widget_clear_event_handler(Widget *widget, EventType event);
 
 /* --- Widget childs ------------------------------------ */
 

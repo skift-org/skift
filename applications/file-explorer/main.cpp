@@ -106,7 +106,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     Widget *backward_button = toolbar_icon_create(toolbar, Icon::get("arrow-left"));
 
-    widget_set_event_handler(backward_button, EVENT_ACTION, [window](auto) {
+    backward_button->on(EVENT_ACTION, [window](auto) {
         if (window->backward_history->any())
         {
             Path *path = nullptr;
@@ -120,7 +120,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     Widget *foreward_button = toolbar_icon_create(toolbar, Icon::get("arrow-right"));
 
-    widget_set_event_handler(foreward_button, EVENT_ACTION, [window](auto) {
+    foreward_button->on(EVENT_ACTION, [window](auto) {
         if (window->foreward_history->any())
         {
             Path *path = nullptr;
@@ -134,7 +134,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     Widget *up_button = toolbar_icon_create(toolbar, Icon::get("arrow-up"));
 
-    widget_set_event_handler(up_button, EVENT_ACTION, [window](auto) {
+    up_button->on(EVENT_ACTION, [window](auto) {
         Path *new_path = path_clone(window->current_path);
         char *poped_element = path_pop(new_path);
 
@@ -151,7 +151,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     Widget *home_button = toolbar_icon_create(toolbar, Icon::get("home"));
 
-    widget_set_event_handler(home_button, EVENT_ACTION, [window](auto) {
+    home_button->on(EVENT_ACTION, [window](auto) {
         clear_foreward_history(window);
         navigate(window, path_create("/"), RECORD_BACKWARD);
     });
@@ -174,7 +174,7 @@ Window *file_explorer_window_create(const char *current_path)
     window->table = table_create(root, (Model *)window->model);
     window->table->layout_attributes = LAYOUT_FILL;
 
-    widget_set_event_handler(window->table, EVENT_MOUSE_DOUBLE_CLICK, [window](auto) {
+    window->table->on(EVENT_MOUSE_DOUBLE_CLICK, [window](auto) {
         if (window->table->selected >= 0)
         {
             if (filesystem_model_filetype_by_index(window->model, window->table->selected) == FILE_TYPE_DIRECTORY)

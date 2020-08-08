@@ -42,7 +42,7 @@ void window_populate_header(Window *window)
     Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets = Insets(3);
 
-    widget_set_event_handler(close_button, EVENT_ACTION, [window](auto) {
+    close_button->on(EVENT_ACTION, [window](auto) {
         Event close_event = {};
         close_event.type = EVENT_WINDOW_CLOSING;
         window_event(window, &close_event);

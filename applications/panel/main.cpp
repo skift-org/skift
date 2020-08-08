@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     window_root(window)->insets = Insets(4);
 
     Widget *menu = button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, Icon::get("menu"), "Applications");
-    widget_set_event_handler(menu, EVENT_ACTION, [](auto) { process_run("menu", nullptr); });
+    menu->on(EVENT_ACTION, [](auto) { process_run("menu", nullptr); });
 
     Widget *widget_date_and_time = label_create(window_root(window), "");
     widget_date_and_time->layout_attributes = LAYOUT_FILL;
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
-    widget_set_event_handler(graph_container, EVENT_MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
+    graph_container->on(EVENT_MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
 
     window_show(window);
 

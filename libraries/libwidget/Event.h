@@ -64,6 +64,9 @@ struct Event
     KeyboardEvent keyboard;
 };
 
+using EventHandler = Callback<void(Event *)>;
+
+
 #define is_mouse_event(__event)                                  \
     (((Event *)(__event))->type == EVENT_MOUSE_MOVE ||           \
      ((Event *)(__event))->type == EVENT_MOUSE_ENTER ||          \

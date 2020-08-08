@@ -71,31 +71,31 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     separator_create(toolbar);
 
     window->pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
-    widget_set_event_handler(window->pencil, EVENT_ACTION, [window](auto) {
+    window->pencil->on(EVENT_ACTION, [window](auto) {
         paint_document_set_tool(window->document, pencil_tool_create());
         update_toolbar(window);
     });
 
     window->brush = toolbar_icon_create(toolbar, Icon::get("brush"));
-    widget_set_event_handler(window->brush, EVENT_ACTION, [window](auto) {
+    window->brush->on(EVENT_ACTION, [window](auto) {
         paint_document_set_tool(window->document, brush_tool_create());
         update_toolbar(window);
     });
 
     window->eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
-    widget_set_event_handler(window->eraser, EVENT_ACTION, [window](auto) {
+    window->eraser->on(EVENT_ACTION, [window](auto) {
         paint_document_set_tool(window->document, eraser_tool_create());
         update_toolbar(window);
     });
 
     window->fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
-    widget_set_event_handler(window->fill, EVENT_ACTION, [window](auto) {
+    window->fill->on(EVENT_ACTION, [window](auto) {
         paint_document_set_tool(window->document, fill_tool_create());
         update_toolbar(window);
     });
 
     window->picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
-    widget_set_event_handler(window->picker, EVENT_ACTION, [window](auto) {
+    window->picker->on(EVENT_ACTION, [window](auto) {
         paint_document_set_tool(window->document, picker_tool_create());
         update_toolbar(window);
     });
@@ -140,7 +140,7 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
         color_widget->min_width = 30;
         widget_set_color(color_widget, THEME_MIDDLEGROUND, color);
 
-        widget_set_event_handler(color_widget, EVENT_MOUSE_BUTTON_PRESS, [window, color](auto event) {
+        color_widget->on(EVENT_MOUSE_BUTTON_PRESS, [window, color](auto event) {
             if (event->mouse.button == MOUSE_BUTTON_LEFT)
             {
                 window->document->primary_color = color;

@@ -191,7 +191,7 @@ Table *table_create(Widget *parent, Model *model)
 
     table->scrollbar = scrollbar_create(table);
 
-    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, [table](auto) {
+    table->scrollbar->on(EVENT_VALUE_CHANGE, [table](auto) {
         table->scroll_offset = table->scrollbar->value;
         table->should_repaint();
     });

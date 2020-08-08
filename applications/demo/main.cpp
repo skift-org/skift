@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     {
         Widget *demo_button = button_create_with_text(navbar, BUTTON_TEXT, _demos[i].name);
 
-        widget_set_event_handler(demo_button, EVENT_ACTION, [i](auto) {
+        demo_button->on(EVENT_ACTION, [i](auto) {
             demo_widget_set_demo(_demo_widget, &_demos[i]);
         });
     }

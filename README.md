@@ -41,7 +41,7 @@ A simple, handmade, operating system for the intel x86 cpu.
  - Graphical user interface library (libwidget)
  - A compositing window manager (Compositor)
  - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
- - It can run DOOM :rage3:
+ - [It can run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # License
 

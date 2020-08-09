@@ -22,6 +22,9 @@ for module in sys.argv[1:]:
         print(f"{path} not found")
         continue
     os.chdir(path)
+    if not os.system("./clean-it.sh") == 0:
+        print(f"Error while cleaning {module}")
+        continue
     if not os.system("./get-it.sh") == 0:
         print(f"Error while downloading {module}")
         continue

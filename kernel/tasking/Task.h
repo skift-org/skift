@@ -40,7 +40,7 @@ Task *task_create(Task *parent, const char *name, bool user);
 
 void task_destroy(Task *task);
 
-typedef IterationDecision (*TaskIterateCallback)(void *target, Task *task);
+typedef Iteration (*TaskIterateCallback)(void *target, Task *task);
 void task_iterate(void *target, TaskIterateCallback callback);
 
 Task *task_by_id(int id);
@@ -70,4 +70,3 @@ Result task_cancel(Task *task, int exit_value);
 void task_exit(int exit_value);
 
 void task_dump(Task *task);
-

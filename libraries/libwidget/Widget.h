@@ -66,8 +66,6 @@ struct WidgetColor
 
 struct WidgetClass
 {
-    const char *name;
-
     WidgetDestroyCallback destroy = nullptr;
     WidgetPaintCallback paint = nullptr;
     WidgetEventCallback event = nullptr;
@@ -79,7 +77,7 @@ struct Widget
 {
     const WidgetClass *klass;
 
-    bool enabled;
+    bool _enabled;
     Rectangle bound;
 
     int max_height;
@@ -91,11 +89,41 @@ struct Widget
     Layout layout; // FIXME: this shoul be a separeted object
     LayoutAttributes layout_attributes;
 
-    EventHandler handlers[__EVENT_TYPE_COUNT];
+    EventHandler handlers[EventType::__COUNT];
 
     struct Widget *parent;
     struct Window *window;
     List *childs;
+
+    /* --- Enable/ Disable state -------------------------------------------- */
+
+    bool enabled();
+
+    bool disabled();
+
+    void enable();
+
+    void disable();
+
+    void disable_if(bool condition);
+
+    void enable_if(bool condition);
+
+    /* --- Focus state ------------------------------------------------------ */
+
+    bool focused();
+
+    void focus();
+
+    /* --- Paint ------------------------------------------------------------ */
+
+    void should_repaint();
+
+    void should_repaint(Rectangle rectangle);
+
+    /* --- Events ----------------------------------------------------------- */
+
+    void on(EventType event, EventHandler handler);
 };
 
 RefPtr<Font> widget_font();
@@ -107,21 +135,11 @@ void widget_initialize(
 
 void widget_destroy(Widget *widget);
 
-void widget_dump(Widget *widget, int depth);
-
 void widget_event(Widget *widget, struct Event *event);
 
 void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
 
 void widget_layout(Widget *widget);
-
-void widget_update(Widget *widget);
-
-void widget_update_region(Widget *widget, Rectangle region);
-
-void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler);
-
-void widget_clear_event_handler(Widget *widget, EventType event);
 
 /* --- Widget childs ------------------------------------ */
 
@@ -132,18 +150,6 @@ void widget_add_child(Widget *widget, Widget *child);
 void widget_remove_child(Widget *widget, Widget *child);
 
 void widget_clear_childs(Widget *widget);
-
-/* --- Widget enable state ------------------------------ */
-
-void widget_set_focus(Widget *widget);
-
-bool widget_is_enable(Widget *widget);
-
-void widget_set_enable(Widget *widget, bool enable);
-
-void widget_disable(Widget *widget);
-
-void widget_enable(Widget *widget);
 
 /* --- Widget Style ------------------------------------- */
 

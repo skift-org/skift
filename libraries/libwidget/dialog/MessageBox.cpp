@@ -3,15 +3,6 @@
 #include <libwidget/Window.h>
 #include <libwidget/dialog/Dialog.h>
 
-static void on_dialog_close(void *target, struct Window *sender, struct Event *event)
-{
-    __unused(target);
-    __unused(event);
-
-    application_exit_nested(DIALOG_BUTTON_CLOSED);
-    window_hide(sender);
-}
-
 DialogButton dialog_message(
     RefPtr<Icon> icon,
     const char *title,
@@ -28,7 +19,10 @@ DialogButton dialog_message(
     window_root(window)->layout = VFLOW(0);
     window_root(window)->insets = Insets(8);
 
-    window_set_event_handler(window, EVENT_WINDOW_CLOSING, EVENT_HANDLER(nullptr, on_dialog_close));
+    window->on(Event::WINDOW_CLOSING, [window](auto) {
+        application_exit_nested(DIALOG_BUTTON_CLOSED);
+        window_hide(window);
+    });
 
     Widget *message_label = label_create(window_root(window), message);
     message_label->layout_attributes = LAYOUT_FILL;
@@ -36,8 +30,18 @@ DialogButton dialog_message(
     Widget *buttons_container = container_create(window_root(window));
     buttons_container->layout = HFLOW(4);
     container_create(buttons_container)->layout_attributes = LAYOUT_FILL;
-    button_create_with_text(buttons_container, BUTTON_OUTLINE, "No");
-    button_create_with_text(buttons_container, BUTTON_FILLED, "Yes");
+
+    Widget *button_no = button_create_with_text(buttons_container, BUTTON_OUTLINE, "No");
+    Widget *button_yes = button_create_with_text(buttons_container, BUTTON_FILLED, "Yes");
+
+    button_no->on(Event::ACTION, [&window](auto) {
+        application_exit_nested(DIALOG_BUTTON_CLOSED);
+        window_hide(window);
+    });
+    button_yes->on(Event::ACTION, [&window](auto) {
+        application_exit_nested(DIALOG_BUTTON_YES);
+        window_hide(window);
+    });
 
     window_show(window);
 

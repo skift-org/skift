@@ -9,29 +9,29 @@
 
 struct __packed IDTDescriptor
 {
-    u16 size;
-    u32 offset;
+    uint16_t size;
+    uint32_t offset;
 };
 
 struct __packed IDTEntry
 {
-    u16 offset0_15; // offset bits 0..15
-    u16 selector;   // a code segment selector in GDT or LDT
-    u8 zero;
-    u8 type_attr;    // type and attributes
-    u16 offset16_31; // offset bits 16..31
+    uint16_t offset0_15; // offset bits 0..15
+    uint16_t selector;   // a code segment selector in GDT or LDT
+    uint8_t zero;
+    uint8_t type_attr;    // type and attributes
+    uint16_t offset16_31; // offset bits 16..31
 };
 
-#define IDT_ENTRY(__offset, __selector, __type)            \
-    (IDTEntry)                                             \
-    {                                                      \
-        .offset0_15 = (u16)((__offset)&0xffff),            \
-        .selector = (__selector),                          \
-        .zero = 0,                                         \
-        .type_attr = (__type),                             \
-        .offset16_31 = (u16)(((__offset) >> 16) & 0xffff), \
+#define IDT_ENTRY(__offset, __selector, __type)                 \
+    (IDTEntry)                                                  \
+    {                                                           \
+        .offset0_15 = (uint16_t)((__offset)&0xffff),            \
+        .selector = (__selector),                               \
+        .zero = 0,                                              \
+        .type_attr = (__type),                                  \
+        .offset16_31 = (uint16_t)(((__offset) >> 16) & 0xffff), \
     }
 
-extern "C" void idt_flush(u32);
+extern "C" void idt_flush(uint32_t);
 
 void idt_initialize();

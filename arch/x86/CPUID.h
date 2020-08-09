@@ -96,7 +96,7 @@ struct __packed CPUID
             bool OSXSAVE : 1;
             bool AVX : 1;
         };
-        u32 RAW_ECX;
+        uint32_t RAW_ECX;
     };
 
     union __packed {
@@ -133,18 +133,18 @@ struct __packed CPUID
             bool IA64 : 1;
             bool PBE : 1;
         };
-        u32 RAW_EDX;
+        uint32_t RAW_EDX;
     };
 };
 
 CPUID cpuid();
 
 #ifdef __cplusplus
-extern "C" u32 cpuid_get_feature_EDX();
-extern "C" u32 cpuid_get_feature_ECX();
+extern "C" uint32_t cpuid_get_feature_EDX();
+extern "C" uint32_t cpuid_get_feature_ECX();
 #else
-extern u32 cpuid_get_feature_EDX();
-extern u32 cpuid_get_feature_ECX();
+extern uint32_t cpuid_get_feature_EDX();
+extern uint32_t cpuid_get_feature_ECX();
 #endif
 
 void cpuid_dump();

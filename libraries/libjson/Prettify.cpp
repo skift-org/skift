@@ -7,7 +7,7 @@ struct JsonPrettifyState
     BufferBuilder *builder;
     int depth;
     bool color;
-} ;
+};
 
 static const char *depth_color[] = {
     "\e[91m",
@@ -29,7 +29,7 @@ static void json_prettify_ident(JsonPrettifyState *state)
     }
 }
 
-static IterationDecision json_prettify_object(JsonPrettifyState *state, char *key, JsonValue *value)
+static Iteration json_prettify_object(JsonPrettifyState *state, char *key, JsonValue *value)
 {
     json_prettify_ident(state);
 
@@ -51,16 +51,16 @@ static IterationDecision json_prettify_object(JsonPrettifyState *state, char *ke
     json_prettify_internal(state, value);
     buffer_builder_append_str(state->builder, ",");
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
-static IterationDecision json_prettify_array(JsonPrettifyState *state, JsonValue *value)
+static Iteration json_prettify_array(JsonPrettifyState *state, JsonValue *value)
 {
     json_prettify_ident(state);
     json_prettify_internal(state, value);
     buffer_builder_append_str(state->builder, ",");
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 static void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)

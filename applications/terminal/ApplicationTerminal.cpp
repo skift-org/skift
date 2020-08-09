@@ -168,7 +168,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     }
 
     terminal_write(widget->terminal, buffer, size);
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 void terminal_widget_cursor_callback(TerminalWidget *widget)
@@ -178,7 +178,7 @@ void terminal_widget_cursor_callback(TerminalWidget *widget)
 
     int cx = widget->terminal->cursor.x;
     int cy = widget->terminal->cursor.y;
-    widget_update_region(widget, terminal_widget_cell_bound(widget, cx, cy));
+    widget->should_repaint(terminal_widget_cell_bound(widget, cx, cy));
 }
 
 void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
@@ -194,7 +194,7 @@ void terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 
 void terminal_widget_event(TerminalWidget *terminal_widget, Event *event)
 {
-    if (event->type == EVENT_KEYBOARD_KEY_TYPED)
+    if (event->type == Event::KEYBOARD_KEY_TYPED)
     {
         if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
@@ -253,8 +253,6 @@ void terminal_widget_destroy(TerminalWidget *terminal_widget)
 }
 
 static const WidgetClass terminal_class = {
-    .name = "Terminal",
-
     .paint = (WidgetPaintCallback)terminal_widget_paint,
     .event = (WidgetEventCallback)terminal_widget_event,
     .layout = (WidgetLayoutCallback)terminal_widget_layout,

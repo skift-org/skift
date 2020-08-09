@@ -248,16 +248,6 @@ void application_exit_if_all_windows_are_closed()
     }
 }
 
-void application_dump()
-{
-    assert(_state >= APPLICATION_INITALIZED);
-
-    list_foreach(Window, window, _windows)
-    {
-        window_dump(window);
-    }
-}
-
 void application_add_window(Window *window)
 {
     assert(_state >= APPLICATION_INITALIZED);

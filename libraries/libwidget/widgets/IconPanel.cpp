@@ -32,15 +32,13 @@ Vec2i icon_panel_size(IconPanel *widget)
 }
 
 static const WidgetClass icon_panel_class = {
-    .name = "IconPanel",
-
     .paint = (WidgetPaintCallback)icon_panel_paint,
     .size = (WidgetComputeSizeCallback)icon_panel_size,
 };
 
-Widget *icon_panel_create(Widget *parent, RefPtr<Icon> icon)
+IconPanel *icon_panel_create(Widget *parent, RefPtr<Icon> icon)
 {
-    IconPanel *widget = __create(IconPanel);
+    auto widget = __create(IconPanel);
 
     widget->icon = icon;
     widget_initialize(widget, &icon_panel_class, parent);

@@ -2,12 +2,12 @@
 
 #include <libsystem/Common.h>
 
-#define list_foreach(__type, __item, __list)                            \
-    for (ListItem *__i = __list->head; __i != nullptr; __i = __i->next) \
+#define list_foreach(__type, __item, __list)                             \
+    for (ListItem *__i = __list->_head; __i != nullptr; __i = __i->next) \
         for (__type *__item = (__type *)__i->value, *__loop_once = (__type *)1; __loop_once; __loop_once = 0)
 
-#define list_foreach_reversed(__type, __item, __list)                   \
-    for (ListItem *__i = __list->tail; __i != nullptr; __i = __i->prev) \
+#define list_foreach_reversed(__type, __item, __list)                    \
+    for (ListItem *__i = __list->_tail; __i != nullptr; __i = __i->prev) \
         for (__type *__item = (__type *)__i->value, *__loop_once = (__type *)1; __loop_once; __loop_once = 0)
 
 struct ListItem
@@ -20,10 +20,15 @@ struct ListItem
 
 struct List
 {
-    int count;
+    int _count;
+    ListItem *_head;
+    ListItem *_tail;
 
-    ListItem *head;
-    ListItem *tail;
+    auto empty() { return _count == 0; }
+
+    auto any() { return _count > 0; }
+
+    auto count() { return _count; }
 };
 
 typedef bool (*ListCompareElementCallback)(void *left, void *right);
@@ -75,12 +80,6 @@ bool list_remove_at(List *list, int index);
 
 bool list_remove_at_with_callback(List *list, int index, ListDestroyElementCallback callback);
 
-#define list_empty(__list) ((__list)->count == 0)
-
-#define list_any(__list) ((__list)->count != 0)
-
-#define list_count(__list) ((__list)->count)
-
-typedef IterationDecision (*ListIterationCallback)(void *target, void *value);
+typedef Iteration (*ListIterationCallback)(void *target, void *value);
 
 bool list_iterate(List *list, void *target, ListIterationCallback callback);

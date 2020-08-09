@@ -12,10 +12,10 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
 
-static IterationDecision serialize_task(JsonValue *destination, Task *task)
+static Iteration serialize_task(JsonValue *destination, Task *task)
 {
     if (task->id == 0)
-        return ITERATION_CONTINUE;
+        return Iteration::CONTINUE;
 
     JsonValue *task_object = json_create_object();
 
@@ -29,7 +29,7 @@ static IterationDecision serialize_task(JsonValue *destination, Task *task)
 
     json_array_append(destination, task_object);
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 static Result process_info_open(FsProcessInfo *node, FsHandle *handle)

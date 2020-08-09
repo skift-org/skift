@@ -9,7 +9,7 @@ void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_MOVE || event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
         Vec2i from = event.mouse.old_position;
         Vec2i to = event.mouse.position;
@@ -40,8 +40,8 @@ void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event even
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_MOVE ||
-        event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == Event::MOUSE_MOVE ||
+        event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
@@ -71,7 +71,7 @@ void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_MOVE || event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
@@ -149,7 +149,7 @@ void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
@@ -181,7 +181,7 @@ void picker_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event eve
 {
     __unused(tool);
 
-    if (event.type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {

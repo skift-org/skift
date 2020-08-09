@@ -18,8 +18,6 @@ void application_exit_nested(int exit_value);
 
 bool application_is_debbuging_layout();
 
-void application_dump();
-
 void application_add_window(Window *window);
 
 void application_remove_window(Window *window);

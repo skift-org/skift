@@ -9,6 +9,8 @@ struct MemoryObject
     size_t size;
 
     int refcount;
+
+    auto range() { return MemoryRange{address, size}; }
 };
 
 void memory_object_initialize();

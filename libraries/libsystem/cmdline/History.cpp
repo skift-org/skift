@@ -23,10 +23,10 @@ void history_commit(UnicodeString *text)
 
     initialize_history_if_not_already();
 
-    if (!list_empty(history) &&
+    if (history->any() &&
         unicode_string_equals(history_peek(0), text))
     {
-        // We don't went duplicated entry in our history!
+        // We don't want duplicated entry in our history!
         return;
     }
 
@@ -49,5 +49,5 @@ size_t history_length()
 {
     initialize_history_if_not_already();
 
-    return list_count(history);
+    return history->count();
 }

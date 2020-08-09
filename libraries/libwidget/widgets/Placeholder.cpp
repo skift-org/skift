@@ -29,15 +29,13 @@ void placeholder_destroy(Placeholder *placeholder)
 }
 
 static const WidgetClass placeholder_class = {
-    .name = "Placeholder",
-
     .destroy = (WidgetDestroyCallback)placeholder_destroy,
     .paint = (WidgetPaintCallback)placeholder_paint,
 };
 
-Widget *placeholder_create(Widget *parent, const char *text)
+Placeholder *placeholder_create(Widget *parent, const char *text)
 {
-    Placeholder *placeholder = __create(Placeholder);
+    auto placeholder = __create(Placeholder);
 
     char buffer[256];
     snprintf(buffer, 256, "Cannot create an instance of \"%s\".", text);

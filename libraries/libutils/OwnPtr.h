@@ -8,16 +8,9 @@ private:
 
 public:
     OwnPtr() {}
-    OwnPtr(T *ptr) : _ptr(ptr) {}
+    OwnPtr(nullptr_t) {}
 
-    ~OwnPtr()
-    {
-        if (_ptr)
-        {
-            delete _ptr;
-            _ptr = nullptr;
-        }
-    }
+    OwnPtr(T *ptr) : _ptr(ptr) {}
 
     OwnPtr(OwnPtr &other) : _ptr(other.give_ref()) {}
 
@@ -28,6 +21,15 @@ public:
 
     template <typename U>
     OwnPtr(OwnPtr<U> &&other) : _ptr(static_cast<U *>(other.give_ref())) {}
+
+    ~OwnPtr()
+    {
+        if (_ptr)
+        {
+            delete _ptr;
+            _ptr = nullptr;
+        }
+    }
 
     OwnPtr &operator=(OwnPtr &other)
     {
@@ -121,7 +123,7 @@ public:
         return _ptr == nullptr;
     }
 
-    T *give_ref()
+    [[nodiscard]] T *give_ref()
     {
         auto ref = _ptr;
         _ptr = nullptr;
@@ -138,5 +140,5 @@ public:
 template <typename Type, typename... Args>
 inline OwnPtr<Type> own(Args &&... args)
 {
-    return OwnPtr<Type>(new Type(args...));
+    return OwnPtr<Type>(new Type(forward<Args>(args)...));
 }

@@ -155,10 +155,10 @@ void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
 
 void table_event(Table *widget, Event *event)
 {
-    if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         widget->selected = table_row_at(widget, event->mouse.position);
-        widget_update(widget);
+        widget->should_repaint();
     }
 }
 
@@ -166,30 +166,20 @@ void table_layout(Table *widget)
 {
     widget->scrollbar->bound = table_scrollbar_bound(widget);
 
-    ((ScrollBar *)widget->scrollbar)->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
-    ((ScrollBar *)widget->scrollbar)->thumb = table_body_bound(widget).height();
-    ((ScrollBar *)widget->scrollbar)->value = 0;
-}
-
-void table_on_scrollbar_scroll(Table *table, ScrollBar *sender, Event *event)
-{
-    __unused(event);
-
-    table->scroll_offset = sender->value;
-    widget_update(table);
+    widget->scrollbar->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
+    widget->scrollbar->thumb = table_body_bound(widget).height();
+    widget->scrollbar->value = 0;
 }
 
 static const WidgetClass table_class = {
-    .name = "Table",
-
     .paint = (WidgetPaintCallback)table_paint,
     .event = (WidgetEventCallback)table_event,
     .layout = (WidgetLayoutCallback)table_layout,
 };
 
-Widget *table_create(Widget *parent, Model *model)
+Table *table_create(Widget *parent, Model *model)
 {
-    Table *table = __create(Table);
+    auto table = __create(Table);
 
     table->model = model;
     table->selected = -1;
@@ -198,7 +188,11 @@ Widget *table_create(Widget *parent, Model *model)
     widget_initialize(table, &table_class, parent);
 
     table->scrollbar = scrollbar_create(table);
-    widget_set_event_handler(table->scrollbar, EVENT_VALUE_CHANGE, EVENT_HANDLER(table, table_on_scrollbar_scroll));
+
+    table->scrollbar->on(Event::VALUE_CHANGE, [table](auto) {
+        table->scroll_offset = table->scrollbar->value;
+        table->should_repaint();
+    });
 
     return table;
 }

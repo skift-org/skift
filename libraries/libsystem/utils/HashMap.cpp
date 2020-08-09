@@ -244,7 +244,7 @@ bool hashmap_iterate(HashMap *hashmap, void *target, HashMapIterationCallback ca
     {
         list_foreach(HashMapItem, item, hashmap->buckets[i])
         {
-            if (callback(target, item->key, item->value) == ITERATION_STOP)
+            if (callback(target, item->key, item->value) == Iteration::STOP)
             {
                 return false;
             }

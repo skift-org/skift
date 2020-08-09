@@ -7,4 +7,4 @@ struct Placeholder : public Widget
     char *text;
 };
 
-Widget *placeholder_create(Widget *parent, const char *name);
+Placeholder *placeholder_create(Widget *parent, const char *name);

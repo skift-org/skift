@@ -1,39 +1,23 @@
 #pragma once
 
+#include <libutils/Traits.h>
+
 using nullptr_t = decltype(nullptr);
 
 template <typename T>
-struct Identity
+constexpr typename RemoveReference<T>::Type &&move(T &&arg)
 {
-    using Type = T;
-};
-
-template <typename T>
-struct Identity<T &>
-{
-    using Type = T;
-};
-
-template <typename T>
-struct Identity<T &&>
-{
-    using Type = T;
-};
-
-template <typename T>
-constexpr typename Identity<T>::Type &&move(T &&arg)
-{
-    return static_cast<typename Identity<T>::Type &&>(arg);
+    return static_cast<typename RemoveReference<T>::Type &&>(arg);
 }
 
 template <class T>
-constexpr T &&forward(typename Identity<T>::Type &param)
+constexpr T &&forward(typename RemoveReference<T>::Type &param)
 {
     return static_cast<T &&>(param);
 }
 
 template <class T>
-constexpr T &&forward(typename Identity<T>::Type &&param)
+constexpr T &&forward(typename RemoveReference<T>::Type &&param)
 {
     return static_cast<T &&>(param);
 }

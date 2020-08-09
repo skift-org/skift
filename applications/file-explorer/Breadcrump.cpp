@@ -89,8 +89,6 @@ void breadcrumb_destroy(Breadcrumb *widget)
 }
 
 static const WidgetClass breadcrumb_class = {
-    .name = "Breadcrumb",
-
     .destroy = (WidgetDestroyCallback)breadcrumb_destroy,
     .paint = (WidgetPaintCallback)breadcrumb_paint,
 };
@@ -115,5 +113,5 @@ void breadcrumb_navigate(Widget *widget, Path *path)
     path_destroy(breadcrumb->path);
     breadcrumb->path = path_clone(path);
 
-    widget_update(widget);
+    widget->should_repaint();
 }

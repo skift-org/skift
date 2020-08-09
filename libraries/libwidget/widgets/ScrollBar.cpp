@@ -38,6 +38,7 @@ static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle recta
     painter.clear_rectangle(widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
 
     Rectangle track = scrollbar_track(widget);
+
     if (track.height() * (widget->thumb / (double)widget->track) < track.height())
     {
         painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
@@ -70,10 +71,10 @@ static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
     Event event_value_changed = {};
-    event_value_changed.type = EVENT_VALUE_CHANGE;
+    event_value_changed.type = Event::VALUE_CHANGE;
     widget_event(widget, &event_value_changed);
 
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
@@ -86,10 +87,10 @@ static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
     widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
 
     Event event_value_changed = {};
-    event_value_changed.type = EVENT_VALUE_CHANGE;
+    event_value_changed.type = Event::VALUE_CHANGE;
     widget_event(widget, &event_value_changed);
 
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 static void scrollbar_event(ScrollBar *widget, Event *event)
@@ -98,11 +99,11 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
     {
         MouseEvent mouse_event = event->mouse;
 
-        if (event->type == EVENT_MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
+        if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
             scrollbar_scroll_thumb(widget, mouse_event.position);
         }
-        else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+        else if (event->type == Event::MOUSE_BUTTON_PRESS)
         {
             if (!scrollbar_thumb(widget).containe(mouse_event.position))
             {
@@ -117,15 +118,13 @@ static void scrollbar_event(ScrollBar *widget, Event *event)
 }
 
 static const WidgetClass scrollbar_class = {
-    .name = "ScrollBar",
-
     .paint = (WidgetPaintCallback)scrollbar_paint,
     .event = (WidgetEventCallback)scrollbar_event,
 };
 
-Widget *scrollbar_create(Widget *parent)
+ScrollBar *scrollbar_create(Widget *parent)
 {
-    ScrollBar *scrollbar = __create(ScrollBar);
+    auto scrollbar = __create(ScrollBar);
 
     scrollbar->track = 1024;
     scrollbar->value = 512;

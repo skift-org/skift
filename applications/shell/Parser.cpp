@@ -61,7 +61,6 @@ static char *argument(Lexer &lexer)
         }
     }
 
-
     return buffer_builder_finalize(builder);
 }
 
@@ -97,7 +96,7 @@ static ShellNode *pipeline(Lexer &lexer)
         whitespace(lexer);
     } while (lexer.skip('|'));
 
-    if (list_count(commands) == 1)
+    if (commands->count() == 1)
     {
         ShellNode *node = (ShellNode *)list_peek(commands);
         list_destroy(commands);

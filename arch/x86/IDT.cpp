@@ -7,7 +7,7 @@ IDTEntry idt[IDT_ENTRY_COUNT];
 
 IDTDescriptor idt_descriptor = {
     .size = sizeof(IDTEntry) * IDT_ENTRY_COUNT,
-    .offset = (u32)&idt[0],
+    .offset = (uint32_t)&idt[0],
 };
 
 void idt_initialize()
@@ -25,5 +25,5 @@ void idt_initialize()
     idt[127] = IDT_ENTRY(__interrupt_vector[48], 0x08, INTGATE);
     idt[128] = IDT_ENTRY(__interrupt_vector[49], 0x08, TRAPGATE);
 
-    idt_flush((u32)&idt_descriptor);
+    idt_flush((uint32_t)&idt_descriptor);
 }

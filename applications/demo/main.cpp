@@ -13,14 +13,6 @@ static Demo _demos[] = {
 
 Widget *_demo_widget = nullptr;
 
-void set_current_demo_callback(Demo *demo, Widget *sender, Event *event)
-{
-    __unused(sender);
-    __unused(event);
-
-    demo_widget_set_demo(_demo_widget, demo);
-}
-
 int main(int argc, char **argv)
 {
     Result result = application_initialize(argc, argv);
@@ -46,7 +38,10 @@ int main(int argc, char **argv)
     for (size_t i = 0; _demos[i].name; i++)
     {
         Widget *demo_button = button_create_with_text(navbar, BUTTON_TEXT, _demos[i].name);
-        widget_set_event_handler(demo_button, EVENT_ACTION, EVENT_HANDLER(&_demos[i], (EventHandlerCallback)set_current_demo_callback));
+
+        demo_button->on(Event::ACTION, [i](auto) {
+            demo_widget_set_demo(_demo_widget, &_demos[i]);
+        });
     }
 
     navbar->bound = navbar->bound.with_width(128);

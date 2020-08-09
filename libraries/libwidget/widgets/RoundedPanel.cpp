@@ -10,13 +10,12 @@ void rounded_panel_paint(RoundedPanel *widget, Painter &painter, Rectangle recta
 }
 
 static const WidgetClass rounded_panel_class = {
-    .name = "RoundedPanel",
     .paint = (WidgetPaintCallback)rounded_panel_paint,
 };
 
-Widget *rounded_panel_create(Widget *parent, int radius)
+RoundedPanel *rounded_panel_create(Widget *parent, int radius)
 {
-    RoundedPanel *rounded_panel = __create(RoundedPanel);
+    auto rounded_panel = __create(RoundedPanel);
 
     rounded_panel->radius = radius;
 

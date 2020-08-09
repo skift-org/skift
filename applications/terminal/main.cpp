@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         window_set_size(window, Vec2i(500, 400));
 
         Widget *widget = terminal_widget_create(window_root(window));
-        widget_set_focus(widget);
+        widget->focus();
 
         window_show(window);
 

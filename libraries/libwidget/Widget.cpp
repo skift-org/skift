@@ -10,6 +10,85 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+/* --- Enable/ Disable state -------------------------------------------- */
+
+bool Widget::enabled() { return _enabled; }
+
+bool Widget::disabled() { return !_enabled; }
+
+void Widget::enable()
+{
+    if (disabled())
+    {
+        _enabled = true;
+        should_repaint();
+    }
+}
+
+void Widget::disable()
+{
+    if (enabled())
+    {
+        _enabled = false;
+        should_repaint();
+    }
+}
+
+void Widget::disable_if(bool condition)
+{
+    if (condition)
+        disable();
+    else
+        enable();
+}
+
+void Widget::enable_if(bool condition)
+{
+    if (condition)
+        enable();
+    else
+        disable();
+}
+
+/* --- Focus state ---------------------------------------------------------- */
+
+bool Widget::focused()
+{
+    return window && window->focused_widget == this;
+}
+
+void Widget::focus()
+{
+    if (window)
+        window_set_focused_widget(window, this);
+}
+
+/* --- Paint ---------------------------------------------------------------- */
+
+void Widget::should_repaint()
+{
+    if (window)
+    {
+        window_schedule_update(window, bound);
+    }
+}
+
+void Widget::should_repaint(Rectangle rectangle)
+{
+    if (window)
+    {
+        window_schedule_update(window, rectangle);
+    }
+}
+
+/* --- Events ----------------------------------------------------------------*/
+
+void Widget::on(EventType event_type, EventHandler handler)
+{
+    assert(event_type < EventType::__COUNT);
+    handlers[event_type] = move(handler);
+}
+
 static RefPtr<Font> _widget_font = nullptr;
 RefPtr<Font> widget_font()
 {
@@ -29,7 +108,7 @@ void widget_initialize(
     assert(widget != nullptr);
     assert(klass != nullptr);
 
-    widget->enabled = true;
+    widget->_enabled = true;
     widget->klass = klass;
     widget->childs = list_create();
     widget->bound = Rectangle(32, 32);
@@ -110,33 +189,6 @@ void widget_clear_childs(Widget *widget)
     }
 }
 
-void widget_dump(Widget *widget, int depth)
-{
-    for (int i = 0; i < depth; i++)
-    {
-        printf("\t");
-    }
-
-    if (widget == nullptr)
-    {
-        printf("<null>\n");
-        return;
-    }
-
-    printf("%s(0x%08x) (%d, %d) %dx%d\n",
-           widget->klass->name,
-           widget,
-           widget->bound.x(),
-           widget->bound.y(),
-           widget->bound.width(),
-           widget->bound.height());
-
-    list_foreach(Widget, child, widget->childs)
-    {
-        widget_dump(child, depth + 1);
-    }
-}
-
 void widget_event(Widget *widget, Event *event)
 {
     if (widget->klass->event)
@@ -144,13 +196,10 @@ void widget_event(Widget *widget, Event *event)
         widget->klass->event(widget, event);
     }
 
-    if (!event->accepted && widget->handlers[event->type].callback != nullptr)
+    if (!event->accepted && widget->handlers[event->type])
     {
         event->accepted = true;
-        widget->handlers[event->type].callback(
-            widget->handlers[event->type].target,
-            widget,
-            event);
+        widget->handlers[event->type](event);
     }
 
     if (!event->accepted && widget->parent)
@@ -246,12 +295,12 @@ Vec2i widget_compute_size(Widget *widget)
 
         if (widget->layout.type == LAYOUT_HFLOW || widget->layout.type == LAYOUT_HGRID)
         {
-            width += widget->layout.spacing.x() * (list_count(widget->childs) - 1);
+            width += widget->layout.spacing.x() * (widget->childs->count() - 1);
         }
 
         if (widget->layout.type == LAYOUT_VFLOW || widget->layout.type == LAYOUT_VGRID)
         {
-            height += widget->layout.spacing.y() * (list_count(widget->childs) - 1);
+            height += widget->layout.spacing.y() * (widget->childs->count() - 1);
         }
     }
 
@@ -291,9 +340,9 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
     int current = widget_get_content_bound(widget).position().component(dim);
     int spacing = layout.spacing.component(dim);
     int size = widget_get_content_bound(widget).size().component(dim);
-    int used_space_without_spacing = size - (spacing * (list_count(widget->childs) - 1));
-    int child_size = used_space_without_spacing / list_count(widget->childs);
-    int used_space_with_spacing = child_size * list_count(widget->childs) + (spacing * (list_count(widget->childs) - 1));
+    int used_space_without_spacing = size - (spacing * (widget->childs->count() - 1));
+    int child_size = used_space_without_spacing / widget->childs->count();
+    int used_space_with_spacing = child_size * widget->childs->count() + (spacing * (widget->childs->count() - 1));
     int correction_space = size - used_space_with_spacing;
 
     list_foreach(Widget, child, widget->childs)
@@ -335,7 +384,7 @@ void widget_layout(Widget *widget)
         return;
     }
 
-    if (list_count(widget->childs) == 0)
+    if (widget->childs->count() == 0)
         return;
 
     Layout layout = widget->layout;
@@ -403,7 +452,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_get_content_bound(widget).width() -
-            layout.spacing.x() * (list_count(widget->childs) - 1);
+            layout.spacing.x() * (widget->childs->count() - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
@@ -459,7 +508,7 @@ void widget_layout(Widget *widget)
 
         int usable_space =
             widget_get_content_bound(widget).height() -
-            layout.spacing.y() * (list_count(widget->childs) - 1);
+            layout.spacing.y() * (widget->childs->count() - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 
@@ -511,22 +560,6 @@ void widget_set_focus(Widget *widget)
     }
 }
 
-void widget_update(Widget *widget)
-{
-    if (widget->window)
-    {
-        window_schedule_update(widget->window, widget->bound);
-    }
-}
-
-void widget_update_region(Widget *widget, Rectangle bound)
-{
-    if (widget->window)
-    {
-        window_schedule_update(widget->window, bound);
-    }
-}
-
 Rectangle widget_get_bound(Widget *widget)
 {
     return widget->bound;
@@ -555,23 +588,9 @@ Widget *widget_get_child_at(Widget *parent, Vec2i position)
     return parent;
 }
 
-void widget_set_event_handler(Widget *widget, EventType event, EventHandler handler)
-{
-    assert(event < __EVENT_TYPE_COUNT);
-    widget->handlers[event] = handler;
-}
-
-void widget_clear_event_handler(Widget *widget, EventType event)
-{
-    assert(event < __EVENT_TYPE_COUNT);
-
-    widget->handlers[event].target = nullptr;
-    widget->handlers[event].callback = nullptr;
-}
-
 Color widget_get_color(Widget *widget, ThemeColorRole role)
 {
-    if (!widget->enabled || (widget->parent && !widget->parent->enabled))
+    if (!widget->enabled() || (widget->parent && !widget->parent->enabled()))
     {
         if (role == THEME_FOREGROUND)
         {
@@ -602,29 +621,5 @@ void widget_set_color(Widget *widget, ThemeColorRole role, Color color)
     widget->colors[role].overwritten = true;
     widget->colors[role].color = color;
 
-    widget_update(widget);
-}
-
-void widget_set_enable(Widget *widget, bool enable)
-{
-    if (widget->enabled != enable)
-    {
-        widget->enabled = enable;
-        widget_update(widget);
-    }
-}
-
-bool widget_is_enable(Widget *widget)
-{
-    return widget->enabled;
-}
-
-void widget_disable(Widget *widget)
-{
-    widget_set_enable(widget, false);
-}
-
-void widget_enable(Widget *widget)
-{
-    widget_set_enable(widget, true);
+    widget->should_repaint();
 }

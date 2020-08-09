@@ -14,18 +14,6 @@
 #define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
 
-static void close_button_click(void *target, struct Widget *sender, struct Event *event)
-{
-    __unused(target);
-    __unused(event);
-
-    Event close_event = {};
-
-    close_event.type = EVENT_WINDOW_CLOSING;
-
-    window_event(sender->window, &close_event);
-}
-
 void window_populate_header(Window *window)
 {
     widget_clear_childs(window->header_container);
@@ -54,7 +42,11 @@ void window_populate_header(Window *window)
     Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets = Insets(3);
 
-    widget_set_event_handler(close_button, EVENT_ACTION, EVENT_HANDLER(nullptr, close_button_click));
+    close_button->on(Event::ACTION, [window](auto) {
+        Event close_event = {};
+        close_event.type = Event::WINDOW_CLOSING;
+        window_event(window, &close_event);
+    });
 }
 
 void window_initialize(Window *window, WindowFlag flags)
@@ -279,18 +271,6 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
     painter.pop();
 }
 
-void window_dump(Window *window)
-{
-    printf("Window(0x%p) (%d, %d) %dx%d\n",
-           window,
-           window->on_screen_bound.x(),
-           window->on_screen_bound.y(),
-           window->on_screen_bound.width(),
-           window->on_screen_bound.height());
-
-    widget_dump(window->root_container, 1);
-}
-
 RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
     Rectangle resize_bound = window_bound(window).expended(Insets(WINDOW_RESIZE_AREA));
@@ -379,13 +359,10 @@ void window_event(Window *window, Event *event)
         event->mouse.old_position = event->mouse.old_position - window->on_screen_bound.position();
     }
 
-    if (window->handlers[event->type].callback != nullptr)
+    if (window->handlers[event->type])
     {
         event->accepted = true;
-        window->handlers[event->type].callback(
-            window->handlers[event->type].target,
-            window,
-            event);
+        window->handlers[event->type](event);
     }
 
     if (event->accepted)
@@ -395,20 +372,20 @@ void window_event(Window *window, Event *event)
 
     switch (event->type)
     {
-    case EVENT_GOT_FOCUS:
+    case Event::GOT_FOCUS:
     {
         window->focused = true;
         window_schedule_update(window, window_bound(window));
     }
     break;
 
-    case EVENT_LOST_FOCUS:
+    case Event::LOST_FOCUS:
     {
         window->focused = false;
         window_schedule_update(window, window_bound(window));
 
         Event mouse_leave = *event;
-        mouse_leave.type = EVENT_MOUSE_LEAVE;
+        mouse_leave.type = Event::MOUSE_LEAVE;
 
         if (window->mouse_over_widget)
         {
@@ -422,13 +399,13 @@ void window_event(Window *window, Event *event)
     }
     break;
 
-    case EVENT_WINDOW_CLOSING:
+    case Event::WINDOW_CLOSING:
     {
         window_hide(window);
     }
     break;
 
-    case EVENT_MOUSE_MOVE:
+    case Event::MOUSE_MOVE:
     {
         RectangleBorder borders = window_resize_bound_containe(window, event->mouse.position);
 
@@ -479,7 +456,7 @@ void window_event(Window *window, Event *event)
             if (mouse_over_widget != window->mouse_over_widget)
             {
                 Event mouse_leave = *event;
-                mouse_leave.type = EVENT_MOUSE_LEAVE;
+                mouse_leave.type = Event::MOUSE_LEAVE;
 
                 if (window->mouse_over_widget)
                 {
@@ -487,7 +464,7 @@ void window_event(Window *window, Event *event)
                 }
 
                 Event mouse_enter = *event;
-                mouse_enter.type = EVENT_MOUSE_ENTER;
+                mouse_enter.type = Event::MOUSE_ENTER;
 
                 if (mouse_over_widget)
                 {
@@ -506,7 +483,7 @@ void window_event(Window *window, Event *event)
         break;
     }
 
-    case EVENT_MOUSE_BUTTON_PRESS:
+    case Event::MOUSE_BUTTON_PRESS:
     {
         if (widget_get_bound(window_root(window)).containe(event->mouse.position))
         {
@@ -552,7 +529,7 @@ void window_event(Window *window, Event *event)
         break;
     }
 
-    case EVENT_MOUSE_BUTTON_RELEASE:
+    case Event::MOUSE_BUTTON_RELEASE:
     {
         Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -577,7 +554,7 @@ void window_event(Window *window, Event *event)
         break;
     }
 
-    case EVENT_MOUSE_DOUBLE_CLICK:
+    case Event::MOUSE_DOUBLE_CLICK:
     {
         if (widget_get_bound(window_root(window)).containe(event->mouse.position))
         {
@@ -592,9 +569,9 @@ void window_event(Window *window, Event *event)
         break;
     }
 
-    case EVENT_KEYBOARD_KEY_TYPED:
-    case EVENT_KEYBOARD_KEY_PRESS:
-    case EVENT_KEYBOARD_KEY_RELEASE:
+    case Event::KEYBOARD_KEY_TYPED:
+    case Event::KEYBOARD_KEY_PRESS:
+    case Event::KEYBOARD_KEY_RELEASE:
     {
         if (window->focused_widget)
         {
@@ -608,10 +585,10 @@ void window_event(Window *window, Event *event)
     }
 }
 
-void window_set_event_handler(Window *window, EventType event, EventHandler handler)
+void Window::on(EventType event, EventHandler handler)
 {
-    assert(event < __EVENT_TYPE_COUNT);
-    window->handlers[event] = handler;
+    assert(event < EventType::__COUNT);
+    handlers[event] = move(handler);
 }
 
 Rectangle window_bound_on_screen(Window *window)
@@ -751,7 +728,7 @@ void window_schedule_update(Window *window, Rectangle rectangle)
     if (!window->visible)
         return;
 
-    if (list_count(window->dirty_rect) == 0)
+    if (window->dirty_rect->empty())
     {
         eventloop_run_later((RunLaterCallback)window_update, window);
     }

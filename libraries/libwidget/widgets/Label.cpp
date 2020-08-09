@@ -25,14 +25,14 @@ void label_set_text(Widget *label, const char *text)
     free(((Label *)label)->text);
     ((Label *)label)->text = strdup(text);
 
-    widget_update(label);
+    label->should_repaint();
 }
 
 void label_set_text_position(Widget *label, Position text_position)
 {
     ((Label *)label)->text_position = text_position;
 
-    widget_update(label);
+    label->should_repaint();
 }
 
 void label_destroy(Label *label)
@@ -41,16 +41,14 @@ void label_destroy(Label *label)
 }
 
 static const WidgetClass label_class = {
-    .name = "Label",
-
     .destroy = (WidgetDestroyCallback)label_destroy,
     .paint = (WidgetPaintCallback)label_paint,
     .size = (WidgetComputeSizeCallback)label_size,
 };
 
-Widget *label_create(Widget *parent, const char *text)
+Label *label_create(Widget *parent, const char *text)
 {
-    Label *label = __create(Label);
+    auto label = __create(Label);
 
     label->text = strdup(text);
     label->text_position = Position::CENTER;

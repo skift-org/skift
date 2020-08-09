@@ -14,12 +14,12 @@ static FsNode *socket_openConnection(FsSocket *socket)
 
 static bool socket_FsNodeCanAcceptConnectionCallback(FsSocket *socket)
 {
-    return list_any(socket->pending);
+    return socket->pending->any();
 }
 
 static FsNode *socket_FsNodeAcceptConnectionCallback(FsSocket *socket)
 {
-    assert(list_any(socket->pending));
+    assert(socket->pending->any());
 
     FsNode *connection;
     list_pop(socket->pending, (void **)&connection);

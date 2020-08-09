@@ -14,15 +14,13 @@ Vec2i separator_size(Separator *widget)
 }
 
 static const WidgetClass separator_class = {
-    .name = "Separator",
-
     .paint = (WidgetPaintCallback)separator_paint,
     .size = (WidgetComputeSizeCallback)separator_size,
 };
 
-Widget *separator_create(Widget *parent)
+Separator *separator_create(Widget *parent)
 {
-    Separator *separator = __create(Separator);
+    auto separator = __create(Separator);
 
     widget_initialize(separator, &separator_class, parent);
 

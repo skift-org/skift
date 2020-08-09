@@ -3,7 +3,7 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
 
-static IterationDecision destroy_task_if_canceled(void *target, Task *task)
+static Iteration destroy_task_if_canceled(void *target, Task *task)
 {
     __unused(target);
 
@@ -12,7 +12,7 @@ static IterationDecision destroy_task_if_canceled(void *target, Task *task)
         task_destroy(task);
     }
 
-    return ITERATION_CONTINUE;
+    return Iteration::CONTINUE;
 }
 
 void garbage_collector()

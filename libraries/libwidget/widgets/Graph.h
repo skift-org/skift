@@ -13,4 +13,4 @@ struct Graph : public Widget
 
 void graph_record(Graph *widget, double data);
 
-Widget *graph_create(Widget *parent, size_t data_size, Color color);
+Graph *graph_create(Widget *parent, size_t data_size, Color color);

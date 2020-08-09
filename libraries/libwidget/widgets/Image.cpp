@@ -44,16 +44,14 @@ void image_set_image(Widget *image, const char *path)
 }
 
 static const WidgetClass image_class = {
-    .name = "Image",
-
     .destroy = (WidgetDestroyCallback)image_destroy,
     .paint = (WidgetPaintCallback)image_paint,
     .size = (WidgetComputeSizeCallback)image_size,
 };
 
-Widget *image_create(Widget *parent, const char *path)
+Image *image_create(Widget *parent, const char *path)
 {
-    Image *image = __create(Image);
+    auto image = __create(Image);
 
     image->bitmap = Bitmap::load_from_or_placeholder(path);
     image->size_mode = IMAGE_CENTER;

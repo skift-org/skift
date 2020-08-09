@@ -9,7 +9,7 @@ void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget_is_enable(widget))
+    if (widget->enabled())
     {
         if (widget->style == BUTTON_OUTLINE)
         {
@@ -34,48 +34,48 @@ void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
 
 void button_event(Button *widget, Event *event)
 {
-    if (event->type == EVENT_MOUSE_ENTER)
+    if (event->type == Event::MOUSE_ENTER)
     {
         widget->state = BUTTON_OVER;
-        widget_update(widget);
+        widget->should_repaint();
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_LEAVE)
+    else if (event->type == Event::MOUSE_LEAVE)
     {
         widget->state = BUTTON_IDLE;
-        widget_update(widget);
+        widget->should_repaint();
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_BUTTON_PRESS)
+    else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         widget->state = BUTTON_PRESS;
-        widget_update(widget);
+        widget->should_repaint();
+
         event->accepted = true;
     }
-    else if (event->type == EVENT_MOUSE_BUTTON_RELEASE)
+    else if (event->type == Event::MOUSE_BUTTON_RELEASE)
     {
         widget->state = BUTTON_OVER;
-        widget_update(widget);
+        widget->should_repaint();
+
         event->accepted = true;
 
         Event action_event = {};
 
-        action_event.type = EVENT_ACTION;
+        action_event.type = Event::ACTION;
 
         widget_event(widget, &action_event);
     }
 }
 
 static const WidgetClass button_class = {
-    .name = "Button",
-
     .paint = (WidgetPaintCallback)button_paint,
     .event = (WidgetEventCallback)button_event,
 };
 
-Widget *button_create(Widget *parent, ButtonStyle style)
+Button *button_create(Widget *parent, ButtonStyle style)
 {
-    Button *widget = __create(Button);
+    auto widget = __create(Button);
 
     widget->style = style;
     widget->state = BUTTON_IDLE;
@@ -90,9 +90,9 @@ Widget *button_create(Widget *parent, ButtonStyle style)
     return widget;
 }
 
-Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
+Button *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
 
     button->layout = STACK();
     button->insets = Insets(4, 4);
@@ -102,9 +102,9 @@ Widget *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> 
     return button;
 }
 
-Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
+Button *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
 
     button->insets = Insets(0, 0, 8, 8);
     button->min_width = 64;
@@ -114,9 +114,9 @@ Widget *button_create_with_text(Widget *parent, ButtonStyle style, const char *t
     return button;
 }
 
-Widget *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
+Button *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
 {
-    Widget *button = button_create(parent, style);
+    auto button = button_create(parent, style);
     button->insets = Insets(0, 0, 6, 10);
     button->min_width = 64;
 

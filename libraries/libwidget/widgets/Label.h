@@ -8,7 +8,7 @@ struct Label : public Widget
     Position text_position;
 };
 
-Widget *label_create(Widget *parent, const char *text);
+Label *label_create(Widget *parent, const char *text);
 
 void label_set_text(Widget *label, const char *text);
 

@@ -47,7 +47,7 @@ uint tar_count(void *tarfile)
     {
         count++;
 
-        u32 size = get_file_size(header);
+        size_t size = get_file_size(header);
 
         header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
 
@@ -67,7 +67,7 @@ bool tar_read(void *tarfile, TARBlock *block, uint index)
         if (header->name[0] == '\0')
             return false;
 
-        u32 size = get_file_size(header);
+        size_t size = get_file_size(header);
 
         header = (TARRawBlock *)((char *)header + ((size / 512) + 1) * 512);
 
@@ -80,6 +80,8 @@ bool tar_read(void *tarfile, TARBlock *block, uint index)
 
     memcpy(block->name, header->name, 100);
     block->size = get_file_size(header);
+    block->typeflag = header->typeflag;
+    memcpy(block->linkname, header->linkname, 100);
     block->data = (char *)header + 512;
 
     return true;

@@ -33,5 +33,5 @@ bool hashmap_remove_with_callback(
     const void *key,
     HashMapDestroyValueCallback callback);
 
-typedef IterationDecision (*HashMapIterationCallback)(void *target, void *key, void *value);
+typedef Iteration (*HashMapIterationCallback)(void *target, void *key, void *value);
 bool hashmap_iterate(HashMap *hashmap, void *target, HashMapIterationCallback callback);

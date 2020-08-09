@@ -6,4 +6,4 @@ struct Panel : public Widget
 {
 };
 
-Widget *panel_create(Widget *parent);
+Panel *panel_create(Widget *parent);

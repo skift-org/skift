@@ -62,7 +62,7 @@ void graph_record(Graph *widget, double data)
     widget->data[widget->current] = data;
     widget->current = (widget->current + 1) % widget->data_size;
 
-    widget_update(widget);
+    widget->should_repaint();
 }
 
 void graph_destroy(Graph *widget)
@@ -71,16 +71,14 @@ void graph_destroy(Graph *widget)
 }
 
 static const WidgetClass graph_class = {
-    .name = "Graph",
-
     .destroy = (WidgetDestroyCallback)graph_destroy,
     .paint = (WidgetPaintCallback)graph_paint,
     .size = (WidgetComputeSizeCallback)graph_size,
 };
 
-Widget *graph_create(Widget *parent, size_t data_size, Color color)
+Graph *graph_create(Widget *parent, size_t data_size, Color color)
 {
-    Graph *widget = __create(Graph);
+    auto widget = __create(Graph);
 
     widget->color = color;
     widget->data = (double *)calloc(data_size, sizeof(double));

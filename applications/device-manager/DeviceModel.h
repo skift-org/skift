@@ -5,12 +5,10 @@
 #include <libsystem/utils/List.h>
 #include <libwidget/Model.h>
 
-struct DeviceModel
+struct DeviceModel : public Model
 {
-    Model __super;
-
     JsonValue *data;
-} ;
+};
 
 DeviceModel *device_model_create();
 

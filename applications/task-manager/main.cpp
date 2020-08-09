@@ -8,25 +8,23 @@
 
 #include "task-manager/TaskModel.h"
 
-struct TaskManagerWindow
+struct TaskManagerWindow : public Window
 {
-    Window window;
-
     /// --- Graphs --- ///
-    Widget *ram_graph;
+    Graph *ram_graph;
     Timer *ram_timer;
-    Widget *cpu_graph;
+    Graph *cpu_graph;
     Timer *cpu_timer;
 
     // --- CPU/RAM stats --- //
-    Widget *ram_usage;
-    Widget *ram_avaliable;
-    Widget *ram_greedy;
-    Widget *cpu_average;
-    Widget *cpu_greedy;
+    Label *ram_usage;
+    Label *ram_avaliable;
+    Label *ram_greedy;
+    Label *cpu_average;
+    Label *cpu_greedy;
 
     /// --- Table view --- //
-    Widget *table;
+    Table *table;
     TaskModel *table_model;
     Timer *table_timer;
 };
@@ -35,7 +33,7 @@ void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record((Graph *)window->ram_graph, status.used_ram / (double)status.total_ram);
+    graph_record(window->ram_graph, status.used_ram / (double)status.total_ram);
 
     // Stats
     int usage = (int)status.used_ram / 1024 / 1024;
@@ -68,8 +66,7 @@ void widget_cpu_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record((Graph *)window->cpu_graph, status.cpu_usage / 100.0);
-
+    graph_record(window->cpu_graph, status.cpu_usage / 100.0);
 
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
@@ -94,7 +91,7 @@ void widget_cpu_update(TaskManagerWindow *window)
 void widget_table_update(TaskManagerWindow *window)
 {
     model_update((Model *)window->table_model);
-    widget_update(window->table);
+    window->table->should_repaint();
     widget_layout(window->table);
 }
 
@@ -103,43 +100,40 @@ void task_manager_window_destroy(TaskManagerWindow *window)
     model_destroy((Model *)window->table_model);
 }
 
-void cancel_task()
-{
-    dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_OK);
-}
-
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
     TaskManagerWindow *window = __create(TaskManagerWindow);
 
-    window_initialize((Window *)window, WINDOW_RESIZABLE);
+    window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon((Window *)window, Icon::get("memory"));
-    window_set_title((Window *)window, "Task Manager");
-    window_set_size((Window *)window, Vec2i(700, 500));
+    window_set_icon(window, Icon::get("memory"));
+    window_set_title(window, "Task Manager");
+    window_set_size(window, Vec2i(700, 500));
 
-    window_root((Window *)window)->layout = VFLOW(0);
+    window_root(window)->layout = VFLOW(0);
 
     /// --- Toolbar --- ///
-    Widget *toolbar = toolbar_create(window_root((Window *)window));
+    Widget *toolbar = toolbar_create(window_root(window));
     Widget *new_task_button = button_create_with_icon_and_text(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
     __unused(new_task_button);
 
     Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
-    widget_set_event_handler(cancel_task_button, EVENT_ACTION, EVENT_HANDLER(nullptr, cancel_task));
+    cancel_task_button->on(Event::ACTION, [](auto) {
+        dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO);
+    });
 
     /// --- Table view --- //
     window->table_model = task_model_create();
 
-    window->table = table_create(window_root((Window *)window), (Model *)window->table_model);
+    window->table = table_create(window_root(window), (Model *)window->table_model);
     window->table->layout_attributes = LAYOUT_FILL;
     window->table_timer = timer_create(window, 1000, (TimerCallback)widget_table_update);
     timer_start(window->table_timer);
 
     /// --- Graphs --- ///
-    Widget *graphs_container = panel_create(window_root((Window *)window));
+    Widget *graphs_container = panel_create(window_root(window));
     graphs_container->layout = HFLOW(0);
     graphs_container->max_height = 96;
 
@@ -185,7 +179,7 @@ int main(int argc, char **argv)
     window->ram_timer = timer_create(window, 500, (TimerCallback)widget_ram_update);
     timer_start(window->ram_timer);
 
-    window_show((Window *)window);
+    window_show(window);
 
     return application_run();
 }

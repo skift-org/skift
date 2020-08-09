@@ -8,14 +8,12 @@ void panel_paint(Panel *widget, Painter &painter, Rectangle rectangle)
 }
 
 static const WidgetClass panel_class = {
-    .name = "Panel",
-
     .paint = (WidgetPaintCallback)panel_paint,
 };
 
-Widget *panel_create(Widget *parent)
+Panel *panel_create(Widget *parent)
 {
-    Panel *panel = __create(Panel);
+    auto panel = __create(Panel);
 
     widget_initialize(panel, &panel_class, parent);
 

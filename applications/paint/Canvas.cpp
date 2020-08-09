@@ -38,15 +38,13 @@ void canvas_event(Canvas *widget, Event *event)
 
         if (widget->document->dirty)
         {
-            widget_update(widget);
+            widget->should_repaint();
             widget->document->dirty = false;
         }
     }
 }
 
 static const WidgetClass canvas_class = {
-    .name = "Canvas",
-
     .paint = (WidgetPaintCallback)canvas_paint,
     .event = (WidgetEventCallback)canvas_event,
 };

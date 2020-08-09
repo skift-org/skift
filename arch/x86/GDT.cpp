@@ -7,7 +7,7 @@ static GDTEntry gdt_entries[GDT_ENTRY_COUNT];
 
 static GDTDescriptor gdt_descriptor = {
     .size = sizeof(GDTEntry) * GDT_ENTRY_COUNT,
-    .offset = (u32)&gdt_entries[0],
+    .offset = (uint32_t)&gdt_entries[0],
 };
 
 void gdt_initialize()
@@ -31,10 +31,10 @@ void gdt_initialize()
 
     gdt_entries[5] = GDT_ENTRY(((uintptr_t)&tss), sizeof(TSS), GDT_PRESENT | GDT_EXECUTABLE | GDT_ACCESSED, TSS_FLAGS);
 
-    gdt_flush((u32)&gdt_descriptor);
+    gdt_flush((uint32_t)&gdt_descriptor);
 }
 
-void set_kernel_stack(u32 stack)
+void set_kernel_stack(uint32_t stack)
 {
     tss.esp0 = stack;
 }

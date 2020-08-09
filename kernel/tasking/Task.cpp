@@ -138,7 +138,7 @@ int task_count()
         return 0;
     }
 
-    int result = list_count(_tasks);
+    int result = _tasks->count();
     atomic_end();
 
     return result;

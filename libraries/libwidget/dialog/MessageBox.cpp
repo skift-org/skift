@@ -31,24 +31,19 @@ DialogButton dialog_message(
     buttons_container->layout = HFLOW(4);
     container_create(buttons_container)->layout_attributes = LAYOUT_FILL;
 
-    DialogButton dialog_result = DIALOG_BUTTON_NO;
-
     Widget *button_no = button_create_with_text(buttons_container, BUTTON_OUTLINE, "No");
     Widget *button_yes = button_create_with_text(buttons_container, BUTTON_FILLED, "Yes");
 
-    button_no->on(Event::ACTION, [&dialog_result, &window](auto) {
-        dialog_result = DIALOG_BUTTON_NO;
+    button_no->on(Event::ACTION, [&window](auto) {
         application_exit_nested(DIALOG_BUTTON_CLOSED);
         window_hide(window);
     });
-    button_yes->on(Event::ACTION, [&dialog_result, &window](auto) {
-        dialog_result = DIALOG_BUTTON_YES;
-        application_exit_nested(DIALOG_BUTTON_CLOSED);
+    button_yes->on(Event::ACTION, [&window](auto) {
+        application_exit_nested(DIALOG_BUTTON_YES);
         window_hide(window);
     });
 
     window_show(window);
 
-    application_run_nested();
-    return dialog_result;
+    return application_run_nested();
 }

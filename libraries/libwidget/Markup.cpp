@@ -164,6 +164,48 @@ Insets insets_parse(const char *string)
     return result;
 }
 
+Position position_parse(const char *string)
+{
+    if (strcmp(string, "left") == 0)
+    {
+        return Position::LEFT;
+    }
+    if (strcmp(string, "center") == 0)
+    {
+        return Position::CENTER;
+    }
+    if (strcmp(string, "right") == 0)
+    {
+        return Position::RIGHT;
+    }
+    if (strcmp(string, "top_left") == 0)
+    {
+        return Position::TOP_LEFT;
+    }
+    if (strcmp(string, "top_center") == 0)
+    {
+        return Position::TOP_CENTER;
+    }
+    if (strcmp(string, "top_right") == 0)
+    {
+        return Position::TOP_RIGHT;
+    }
+    if (strcmp(string, "bottom_left") == 0)
+    {
+        return Position::BOTTOM_LEFT;
+    }
+    if (strcmp(string, "bottom_center") == 0)
+    {
+        return Position::BOTTOM_CENTER;
+    }
+    if (strcmp(string, "bottom_right") == 0)
+    {
+        return Position::BOTTOM_RIGHT;
+    }
+
+    return Position::LEFT;
+}
+
 void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
 {
     if (markup_node_has_attribute(node, "id"))
@@ -196,12 +238,12 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
     if (markup_node_is(node, "Container"))
     {
-        widget = container_create(parent);
+        widget = new Container(parent);
     }
 
     if (markup_node_is(node, "Panel"))
     {
-        widget = panel_create(parent);
+        widget = new Panel(parent);
     }
 
     if (markup_node_is(node, "Button"))
@@ -220,7 +262,7 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
         if (markup_node_has_attribute(node, "text") && markup_node_has_attribute(node, "icon"))
         {
-            widget = button_create_with_icon_and_text(
+            widget = new Button(
                 parent,
                 button_style,
                 Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")),
@@ -228,21 +270,21 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
         }
         else if (markup_node_has_attribute(node, "text"))
         {
-            widget = button_create_with_text(
+            widget = new Button(
                 parent,
                 button_style,
                 markup_node_get_attribute_or_default(node, "text", "Button"));
         }
         else if (markup_node_has_attribute(node, "icon"))
         {
-            widget = button_create_with_icon(
+            widget = new Button(
                 parent,
                 button_style,
                 Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")));
         }
         else
         {
-            widget = button_create(
+            widget = new Button(
                 parent,
                 button_style);
         }
@@ -250,21 +292,22 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
     if (markup_node_is(node, "Label"))
     {
-        widget = label_create(
+        widget = new Label(
             parent,
-            markup_node_get_attribute_or_default(node, "text", "Label"));
+            markup_node_get_attribute_or_default(node, "text", "Label"),
+            position_parse(markup_node_get_attribute_or_default(node, "position", "left")));
     }
 
     if (markup_node_is(node, "Image"))
     {
-        widget = image_create(
+        widget = new Image(
             parent,
-            markup_node_get_attribute_or_default(node, "path", "null"));
+            Bitmap::load_from_or_placeholder(markup_node_get_attribute_or_default(node, "path", "null")));
     }
 
     if (widget == nullptr)
     {
-        widget = placeholder_create(parent, markup_node_type(node));
+        widget = new Placeholder(parent, markup_node_type(node));
     }
 
     widget_apply_attribute_from_markup(widget, node);

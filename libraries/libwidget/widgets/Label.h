@@ -4,12 +4,20 @@
 
 struct Label : public Widget
 {
-    char *text;
-    Position text_position;
+private:
+    char *_text = nullptr;
+    Position _position = Position::LEFT;
+
+public:
+    void update_text(const char *text);
+
+    Label(Widget *parent, const char *text);
+
+    Label(Widget *parent, const char *text, Position position);
+
+    ~Label();
+
+    void paint(Painter &painter, Rectangle rectangle);
+
+    Vec2i size();
 };
-
-Label *label_create(Widget *parent, const char *text);
-
-void label_set_text(Widget *label, const char *text);
-
-void label_set_text_position(Widget *label, Position text_position);

@@ -11,8 +11,6 @@ static Demo _demos[] = {
     {nullptr, nullptr},
 };
 
-Widget *_demo_widget = nullptr;
-
 int main(int argc, char **argv)
 {
     Result result = application_initialize(argc, argv);
@@ -30,26 +28,25 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = VFLOW(0);
 
-    Widget *navbar = container_create(window_root(window));
+    Widget *navbar = new Container(window_root(window));
     navbar->insets = Insets(4, 4);
     navbar->layout = HGRID(4);
-    navbar->bound = navbar->bound.with_width(32);
+    navbar->bound = navbar->bound.with_height(32);
+    navbar->bound = navbar->bound.with_width(128);
+
+    DemoWidget *demo_widget = nullptr;
+    demo_widget = new DemoWidget(window_root(window));
+    demo_widget->layout_attributes = LAYOUT_FILL;
+    demo_widget->demo(&_demos[0]);
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        Widget *demo_button = button_create_with_text(navbar, BUTTON_TEXT, _demos[i].name);
+        Widget *demo_button = new Button(navbar, BUTTON_TEXT, _demos[i].name);
 
-        demo_button->on(Event::ACTION, [i](auto) {
-            demo_widget_set_demo(_demo_widget, &_demos[i]);
+        demo_button->on(Event::ACTION, [i, demo_widget](auto) {
+            demo_widget->demo(&_demos[i]);
         });
     }
-
-    navbar->bound = navbar->bound.with_width(128);
-
-    _demo_widget = demo_widget_create(window_root(window));
-    _demo_widget->layout_attributes = LAYOUT_FILL;
-
-    demo_widget_set_demo(_demo_widget, &_demos[0]);
 
     window_show(window);
 

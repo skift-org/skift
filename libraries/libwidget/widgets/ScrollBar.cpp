@@ -2,135 +2,96 @@
 #include <libwidget/Event.h>
 #include <libwidget/widgets/ScrollBar.h>
 
-Rectangle scrollbar_button_down(ScrollBar *widget)
+ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
 {
-    return widget_get_bound(widget).take_bottom(widget_get_bound(widget).width());
+    _track = 1024;
+    _value = 512;
+    _thumb = 128;
 }
 
-Rectangle scrollbar_button_up(ScrollBar *widget)
-{
-    return widget_get_bound(widget).take_top(widget_get_bound(widget).width());
-}
-
-static Rectangle scrollbar_track(ScrollBar *widget)
-{
-    return widget_get_bound(widget).shrinked(Insets(widget_get_bound(widget).width(), 0));
-}
-
-static Rectangle scrollbar_thumb(ScrollBar *widget)
-{
-    Rectangle track = scrollbar_track(widget);
-
-    int thumb_height = MIN(track.height() * (widget->thumb / (double)widget->track), track.height());
-    int thump_position = track.height() * (widget->value / (double)widget->track);
-
-    return Rectangle(
-        track.x() + 4,
-        track.y() + thump_position,
-        track.width() - 8,
-        thumb_height);
-}
-
-static void scrollbar_paint(ScrollBar *widget, Painter &painter, Rectangle rectangle)
+void ScrollBar::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter.clear_rectangle(widget_get_bound(widget), widget_get_color(widget, THEME_MIDDLEGROUND));
+    if (_thumb >= _track)
+        return;
 
-    Rectangle track = scrollbar_track(widget);
-
-    if (track.height() * (widget->thumb / (double)widget->track) < track.height())
+    if (_mouse_over)
     {
-        painter.fill_rounded_rectangle(scrollbar_thumb(widget), 4, widget_get_color(widget, THEME_BORDER));
-    }
-
-    if (widget->value == 0)
-    {
-        painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_BORDER));
+        painter.fill_rounded_rectangle(track_bound(), 4, widget_get_color(this, THEME_BORDER));
+        painter.fill_rounded_rectangle(thumb_bound(), 4, widget_get_color(this, THEME_BORDER));
     }
     else
     {
-        painter.blit_icon(*Icon::get("chevron-up"), ICON_18PX, scrollbar_button_up(widget), widget_get_color(widget, THEME_FOREGROUND));
-    }
-
-    if (widget->value >= widget->track - widget->thumb)
-    {
-        painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_BORDER));
-    }
-    else
-    {
-        painter.blit_icon(*Icon::get("chevron-down"), ICON_18PX, scrollbar_button_down(widget), widget_get_color(widget, THEME_FOREGROUND));
+        painter.fill_rounded_rectangle(thumb_bound(), 4, widget_get_color(this, THEME_BORDER));
     }
 }
 
-static void scrollbar_scroll_to(ScrollBar *widget, Vec2i mouse_position)
+void ScrollBar::scroll_to(Vec2i position)
 {
-    int new_value = mouse_position.y() - scrollbar_track(widget).y();
-    widget->value = (new_value / (double)scrollbar_track(widget).height()) * widget->track - widget->thumb / 2;
-
-    widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
+    int new_value = position.y() - track_bound().y();
+    value((new_value / (double)track_bound().height()) * _track);
 
     Event event_value_changed = {};
     event_value_changed.type = Event::VALUE_CHANGE;
-    widget_event(widget, &event_value_changed);
+    widget_event(this, &event_value_changed);
 
-    widget->should_repaint();
+    should_repaint();
 }
 
-static void scrollbar_scroll_thumb(ScrollBar *widget, Vec2i mouse_position)
+void ScrollBar::event(Event *event)
 {
-    mouse_position = mouse_position - widget->mouse_origine;
+    if (_thumb >= _track)
+    {
+        if (_mouse_over)
+        {
+            _mouse_over = false;
+            should_repaint();
+        }
 
-    int new_value = mouse_position.y() - scrollbar_track(widget).y();
-    widget->value = (new_value / (double)scrollbar_track(widget).height()) * widget->track;
+        return;
+    }
 
-    widget->value = clamp(widget->value, 0, widget->track - widget->thumb);
-
-    Event event_value_changed = {};
-    event_value_changed.type = Event::VALUE_CHANGE;
-    widget_event(widget, &event_value_changed);
-
-    widget->should_repaint();
-}
-
-static void scrollbar_event(ScrollBar *widget, Event *event)
-{
     if (is_mouse_event(event))
     {
         MouseEvent mouse_event = event->mouse;
 
+        if (event->type == Event::MOUSE_ENTER)
+        {
+            _mouse_over = true;
+            should_repaint();
+
+            event->accepted = true;
+        }
+        else if (event->type == Event::MOUSE_LEAVE)
+        {
+            _mouse_over = false;
+
+            should_repaint();
+
+            event->accepted = true;
+        }
+
         if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
-            scrollbar_scroll_thumb(widget, mouse_event.position);
+            Vec2i position = mouse_event.position - _mouse_origine;
+            scroll_to(position);
+
+            event->accepted = true;
         }
         else if (event->type == Event::MOUSE_BUTTON_PRESS)
         {
-            if (!scrollbar_thumb(widget).containe(mouse_event.position))
+            if (thumb_bound().containe(mouse_event.position))
             {
-                scrollbar_scroll_to(widget, mouse_event.position);
+                _mouse_origine = mouse_event.position - thumb_bound().position();
+            }
+            else
+            {
+                scroll_to(mouse_event.position);
+                _mouse_origine = thumb_bound().size() / 2;
             }
 
-            widget->mouse_origine = mouse_event.position - scrollbar_thumb(widget).position();
+            event->accepted = true;
         }
-
-        event->accepted = true;
     }
-}
-
-static const WidgetClass scrollbar_class = {
-    .paint = (WidgetPaintCallback)scrollbar_paint,
-    .event = (WidgetEventCallback)scrollbar_event,
-};
-
-ScrollBar *scrollbar_create(Widget *parent)
-{
-    auto scrollbar = __create(ScrollBar);
-
-    scrollbar->track = 1024;
-    scrollbar->value = 512;
-    scrollbar->thumb = 128;
-
-    widget_initialize(scrollbar, &scrollbar_class, parent);
-
-    return scrollbar;
 }

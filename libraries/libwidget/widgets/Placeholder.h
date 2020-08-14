@@ -4,7 +4,14 @@
 
 struct Placeholder : public Widget
 {
-    char *text;
-};
+private:
+    char *_text;
+    RefPtr<Icon> _alert_icon;
 
-Placeholder *placeholder_create(Widget *parent, const char *name);
+public:
+    Placeholder(Widget *parent, const char *text);
+
+    ~Placeholder();
+
+    void paint(Painter &painter, Rectangle rectangle);
+};

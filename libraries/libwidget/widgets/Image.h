@@ -2,18 +2,26 @@
 
 #include <libwidget/Widget.h>
 
-enum ImageSizeMode
+enum class ImageScalling
 {
-    IMAGE_CENTER,
-    IMAGE_STRETCH,
+    CENTER,
+    STRETCH,
 };
 
 struct Image : public Widget
 {
-    ImageSizeMode size_mode;
-    RefPtr<Bitmap> bitmap;
+private:
+    RefPtr<Bitmap> _bitmap;
+    ImageScalling _scalling = ImageScalling::CENTER;
+
+public:
+    Image(Widget *parent, RefPtr<Bitmap> bitmap);
+
+    void change_bitmap(RefPtr<Bitmap> bitmap);
+
+    void change_scaling(ImageScalling scaling);
+
+    void paint(Painter &painter, Rectangle rectangle);
+
+    Vec2i size();
 };
-
-void image_set_image(Widget *image, const char *path);
-
-Image *image_create(Widget *parent, const char *path);

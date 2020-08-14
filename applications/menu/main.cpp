@@ -123,14 +123,14 @@ void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
 
 void menu_create_list(Widget *parent, List *menu)
 {
-    Widget *list = container_create(parent);
+    Widget *list = new Container(parent);
     list->layout = VFLOW(4);
     list->layout_attributes = LAYOUT_FILL;
     list->insets = Insets(4);
 
     list_foreach(MenuEntry, entry, menu)
     {
-        Widget *item = button_create_with_icon_and_text(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);
+        auto item = new Button(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);
         item->insets = Insets(8);
 
         item->on(Event::ACTION, [entry](auto) {
@@ -154,7 +154,6 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = VFLOW(8);
 
-    panel_create(window_root(window));
     menu_create_list(window_root(window), menu);
 
     window_show(window);

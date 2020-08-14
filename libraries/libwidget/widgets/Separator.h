@@ -4,6 +4,11 @@
 
 struct Separator : public Widget
 {
-};
+private:
+public:
+    Separator(Widget *parent);
 
-Separator *separator_create(Widget *parent);
+    void paint(Painter &painter, Rectangle rectangle);
+
+    Vec2i size();
+};

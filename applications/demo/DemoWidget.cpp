@@ -3,70 +3,49 @@
 
 #include "demo/DemoWidget.h"
 
-void demo_widget_paint(DemoWidget *widget, Painter &painter, Rectangle rectangle)
-{
-    __unused(rectangle);
-
-    if (widget->bitmap == nullptr)
-    {
-        widget->bitmap = Bitmap::create_shared(widget_get_bound(widget).width(), widget_get_bound(widget).height()).take_value();
-        widget->painter = Painter(widget->bitmap);
-        widget->painter.clear(COLOR_BLACK);
-    }
-
-    if (widget_get_bound(widget).width() != widget->bitmap->width() ||
-        widget_get_bound(widget).height() != widget->bitmap->height())
-    {
-        widget->bitmap = Bitmap::create_shared(widget_get_bound(widget).width(), widget_get_bound(widget).height()).take_value();
-        widget->painter = Painter(widget->bitmap);
-        widget->painter.clear(COLOR_BLACK);
-    }
-
-    if (widget->demo)
-    {
-        widget->demo->callback(widget->painter, widget->bitmap->bound(), widget->time);
-    }
-
-    painter.blit_bitmap_no_alpha(*widget->bitmap, widget->bitmap->bound(), widget_get_bound(widget));
-
-    painter.draw_string(*widget_font(), widget->demo->name, widget_get_bound(widget).position() + Vec2i(9, 17), COLOR_BLACK);
-    painter.draw_string(*widget_font(), widget->demo->name, widget_get_bound(widget).position() + Vec2i(8, 16), COLOR_WHITE);
-}
-
 void demo_widget_on_timer_tick(DemoWidget *widget)
 {
-    widget->time += 1.0 / 60;
+    widget->tick();
     widget->should_repaint();
 }
 
-void demo_widget_set_demo(Widget *widget, Demo *demo)
+DemoWidget::DemoWidget(Widget *parent)
+    : Widget(parent)
 {
-    if (((DemoWidget *)widget)->bitmap)
-        ((DemoWidget *)widget)->painter.clear(COLOR_BLACK);
-    ((DemoWidget *)widget)->demo = demo;
+    _demo = nullptr;
+    _timer = timer_create(this, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
+    timer_start(_timer);
 }
 
-void demo_widget_destroy(DemoWidget *widget)
+DemoWidget::~DemoWidget()
 {
-    timer_destroy(widget->timer);
-    widget->painter.~Painter();
-    widget->bitmap = nullptr;
+    timer_destroy(_timer);
 }
 
-static const WidgetClass demo_class = {
-    .destroy = (WidgetDestroyCallback)demo_widget_destroy,
-    .paint = (WidgetPaintCallback)demo_widget_paint,
-};
-
-Widget *demo_widget_create(Widget *parent)
+void DemoWidget::paint(Painter &painter, Rectangle)
 {
-    DemoWidget *widget = __create(DemoWidget);
+    if (_bitmap == nullptr)
+    {
+        _bitmap = Bitmap::create_shared(widget_get_bound(this).width(), widget_get_bound(this).height()).take_value();
+        _painter = own<Painter>(_bitmap);
+        _painter->clear(COLOR_BLACK);
+    }
 
-    widget_initialize(widget, &demo_class, parent);
+    if (widget_get_bound(this).width() != _bitmap->width() ||
+        widget_get_bound(this).height() != _bitmap->height())
+    {
+        _bitmap = Bitmap::create_shared(widget_get_bound(this).width(), widget_get_bound(this).height()).take_value();
+        _painter = own<Painter>(_bitmap);
+        _painter->clear(COLOR_BLACK);
+    }
 
-    widget->demo = nullptr;
-    widget->timer = timer_create(widget, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
-    timer_start(widget->timer);
+    if (_demo)
+    {
+        _demo->callback(*_painter, _bitmap->bound(), _time);
+    }
 
-    return widget;
+    painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), widget_get_bound(this));
+
+    painter.draw_string(*widget_font(), _demo->name, widget_get_bound(this).position() + Vec2i(9, 17), COLOR_BLACK);
+    painter.draw_string(*widget_font(), _demo->name, widget_get_bound(this).position() + Vec2i(8, 16), COLOR_WHITE);
 }

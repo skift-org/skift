@@ -1,47 +1,37 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/IconPanel.h>
 
-void icon_panel_paint(IconPanel *widget, Painter &painter, Rectangle rectangle)
+IconPanel::IconPanel(Widget *parent, RefPtr<Icon> icon)
+    : Widget(parent), _icon(icon)
+{
+}
+
+void IconPanel::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (!widget->icon)
+    if (!_icon)
     {
         return;
     }
 
-    Rectangle destination = widget->icon->bound(ICON_18PX).centered_within(widget_get_content_bound(widget));
+    Rectangle destination = _icon->bound(ICON_18PX).centered_within(widget_get_content_bound(this));
 
     painter.blit_icon(
-        *widget->icon,
+        *_icon,
         ICON_18PX,
         destination,
-        widget_get_color(widget, THEME_FOREGROUND));
+        widget_get_color(this, THEME_FOREGROUND));
 }
 
-Vec2i icon_panel_size(IconPanel *widget)
+Vec2i IconPanel::size()
 {
-    if (widget->icon)
+    if (_icon)
     {
-        return widget->icon->bound(ICON_18PX).size();
+        return _icon->bound(ICON_18PX).size();
     }
     else
     {
-        return widget_get_bound(widget).size();
+        return widget_get_bound(this).size();
     }
-}
-
-static const WidgetClass icon_panel_class = {
-    .paint = (WidgetPaintCallback)icon_panel_paint,
-    .size = (WidgetComputeSizeCallback)icon_panel_size,
-};
-
-IconPanel *icon_panel_create(Widget *parent, RefPtr<Icon> icon)
-{
-    auto widget = __create(IconPanel);
-
-    widget->icon = icon;
-    widget_initialize(widget, &icon_panel_class, parent);
-
-    return widget;
 }

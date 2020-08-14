@@ -44,6 +44,11 @@ public:
         return *this;
     }
 
+    Vec2 operator-() const
+    {
+        return Vec2(-x(), -y());
+    }
+
     Vec2 operator-(const Vec2 &rhs) const
     {
         return Vec2(x() - rhs.x(), y() - rhs.y());
@@ -64,6 +69,18 @@ public:
     Vec2 operator*(const Vec2<U> &rhs) const
     {
         return Vec2(x() * rhs.x(), y() * rhs.y());
+    }
+
+    template <typename U>
+    Vec2 operator*(U rhs) const
+    {
+        return Vec2(x() * rhs, y() * rhs);
+    }
+
+    template <typename U>
+    Vec2 operator/(U rhs) const
+    {
+        return Vec2(x() / rhs, y() / rhs);
     }
 
     Vec2 &operator*=(const Vec2 &rhs)

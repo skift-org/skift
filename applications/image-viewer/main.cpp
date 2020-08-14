@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     window_set_title(window, "Image Viewer");
     window_set_size(window, Vec2i(700, 500));
 
-    image_create(window_root(window), argv[1]);
+    new Image(window_root(window), Bitmap::load_from_or_placeholder(argv[1]));
 
     window_show(window);
 

@@ -6,15 +6,31 @@
 
 struct DemoWidget : public Widget
 {
-    double time;
-    Demo *demo;
+private:
+    double _time;
+    Demo *_demo;
 
-    RefPtr<Bitmap> bitmap;
-    Painter painter;
+    RefPtr<Bitmap> _bitmap;
+    OwnPtr<Painter> _painter;
 
-    Timer *timer;
+    Timer *_timer;
+
+public:
+    Demo *demo() { return _demo; }
+    void demo(Demo *demo)
+    {
+        if (_painter)
+        {
+            _painter->clear(COLOR_BLACK);
+        }
+        _demo = demo;
+    }
+
+    DemoWidget(Widget *parent);
+
+    ~DemoWidget();
+
+    void tick() { _time += 1.0 / 60; }
+
+    void paint(Painter &painter, Rectangle rectangle);
 };
-
-void demo_widget_set_demo(Widget *widget, Demo *demo);
-
-Widget *demo_widget_create(Widget *parent);

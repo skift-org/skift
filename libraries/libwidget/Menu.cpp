@@ -43,7 +43,7 @@ void menu_show(Menu *menu)
 
     list_foreach(Menu, item, menu->items)
     {
-        button_create_with_icon_and_text(window_root(window), BUTTON_TEXT, item->icon, item->text);
+        new Button(window_root(window), BUTTON_TEXT, item->icon, item->text);
     }
 
     window_show(window);

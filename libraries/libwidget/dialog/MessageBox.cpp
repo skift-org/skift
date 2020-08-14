@@ -24,15 +24,16 @@ DialogButton dialog_message(
         window_hide(window);
     });
 
-    Widget *message_label = label_create(window_root(window), message);
+    Widget *message_label = new Label(window_root(window), message);
     message_label->layout_attributes = LAYOUT_FILL;
 
-    Widget *buttons_container = container_create(window_root(window));
+    Widget *buttons_container = new Container(window_root(window));
     buttons_container->layout = HFLOW(4);
-    container_create(buttons_container)->layout_attributes = LAYOUT_FILL;
+    auto spacer = new Container(buttons_container);
+    spacer->layout_attributes = LAYOUT_FILL;
 
-    Widget *button_no = button_create_with_text(buttons_container, BUTTON_OUTLINE, "No");
-    Widget *button_yes = button_create_with_text(buttons_container, BUTTON_FILLED, "Yes");
+    Widget *button_no = new Button(buttons_container, BUTTON_OUTLINE, "No");
+    Widget *button_yes = new Button(buttons_container, BUTTON_FILLED, "Yes");
 
     button_no->on(Event::ACTION, [&window](auto) {
         application_exit_nested(DIALOG_BUTTON_CLOSED);

@@ -2,20 +2,19 @@
 #include <libsystem/Logger.h>
 #include <libwidget/widgets/Panel.h>
 
-void panel_paint(Panel *widget, Painter &painter, Rectangle rectangle)
+Panel::Panel(Widget *parent)
+    : Widget(parent)
 {
-    painter.clear_rectangle(rectangle, widget_get_color(widget, THEME_MIDDLEGROUND));
 }
 
-static const WidgetClass panel_class = {
-    .paint = (WidgetPaintCallback)panel_paint,
-};
-
-Panel *panel_create(Widget *parent)
+void Panel::paint(Painter &painter, Rectangle rectangle)
 {
-    auto panel = __create(Panel);
-
-    widget_initialize(panel, &panel_class, parent);
-
-    return panel;
+    if (_border_radius > 0)
+    {
+        painter.fill_rounded_rectangle(widget_get_bound(this), _border_radius, widget_get_color(this, THEME_MIDDLEGROUND));
+    }
+    else
+    {
+        painter.clear_rectangle(rectangle, widget_get_color(this, THEME_MIDDLEGROUND));
+    }
 }

@@ -4,96 +4,68 @@
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Table.h>
 
-#define TABLE_ROW_HEIGHT 32
-
-Rectangle table_bound(Table *widget)
+Rectangle Table::body_bound() const
 {
-    return widget_get_content_bound(widget).shrinked(Insets(0, 0, 0, 16));
+    return widget_get_content_bound(this);
 }
 
-Rectangle table_scrollbar_bound(Table *widget)
+Rectangle Table::header_bound() const
 {
-    return widget_get_content_bound(widget).take_right(16);
+    return body_bound().take_top(TABLE_ROW_HEIGHT);
 }
 
-Rectangle table_header_bound(Table *widget)
+Rectangle Table::list_bound() const
 {
-    return table_bound(widget).take_top(TABLE_ROW_HEIGHT);
+    return body_bound().shrinked(Insets(TABLE_ROW_HEIGHT, 0, 0));
 }
 
-Rectangle table_body_bound(Table *widget)
+Rectangle Table::scrollbar_bound() const
 {
-    return table_bound(widget).shrinked(Insets(TABLE_ROW_HEIGHT, 0, 0));
+    return list_bound().take_right(16);
 }
 
-Rectangle table_row_bound(Table *widget, int row)
+Rectangle Table::row_bound(int row) const
 {
     return Rectangle(
-        table_body_bound(widget).x(),
-        table_body_bound(widget).y() + row * TABLE_ROW_HEIGHT - widget->scroll_offset,
-        table_body_bound(widget).width(),
+        list_bound().x(),
+        list_bound().y() + row * TABLE_ROW_HEIGHT - _scroll_offset,
+        list_bound().width(),
         TABLE_ROW_HEIGHT);
 }
 
-Rectangle table_cell_bound(Table *widget, int row, int column)
+Rectangle Table::column_bound(int column) const
 {
-    int column_count = model_column_count(widget->model);
-    int column_width = table_body_bound(widget).width() / column_count;
-    Rectangle row_bound = table_row_bound(widget, row);
+    int column_count = model_column_count(_model);
+    int column_width = list_bound().width() / column_count;
 
     return Rectangle(
-        row_bound.x() + column * column_width,
-        row_bound.y(),
+        list_bound().x() + column_width * column,
+        list_bound().y(),
         column_width,
-        TABLE_ROW_HEIGHT);
+        list_bound().height());
 }
 
-void table_render_cell(Table *widget, Painter &painter, int row, int column)
+Rectangle Table::cell_bound(int row, int column) const
 {
-    Rectangle cell_bound = table_cell_bound(widget, row, column);
-    Variant data = model_data(widget->model, row, column);
-
-    painter.push();
-    painter.clip(cell_bound);
-
-    if (row % 2 == 0)
-    {
-        painter.fill_rectangle(cell_bound, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.05));
-    }
-
-    if (data.has_icon())
-    {
-        painter.blit_icon(
-            *data.icon(),
-            ICON_18PX,
-            Rectangle(cell_bound.x() + 7, cell_bound.y() + 7, 18, 18),
-            widget_get_color(widget, THEME_FOREGROUND));
-
-        painter.draw_string(
-            *widget_font(),
-            data.as_string(),
-            Vec2i(cell_bound.x() + 7 + 18 + 7, cell_bound.y() + 20),
-            widget_get_color(widget, THEME_FOREGROUND));
-    }
-    else
-    {
-        painter.draw_string(
-            *widget_font(),
-            data.as_string(),
-            Vec2i(cell_bound.x() + 7, cell_bound.y() + 20),
-            widget_get_color(widget, THEME_FOREGROUND));
-    }
-
-    painter.pop();
+    return Rectangle(
+        row_bound(row).x() + column * column_bound(column).width(),
+        row_bound(row).y(),
+        column_bound(column).width(),
+        row_bound(row).height());
 }
 
-int table_row_at(Table *widget, Vec2i position)
+int Table::row_at(Vec2i position) const
 {
-    position = position - table_body_bound(widget).position();
+    if (!list_bound().containe(position))
+    {
+        return -1;
+    }
 
-    int row = (position.y() + widget->scroll_offset) / TABLE_ROW_HEIGHT;
+    position = position - list_bound().position();
 
-    if (row < 0 || row >= model_row_count(widget->model))
+    int row = (position.y() + _scroll_offset) / TABLE_ROW_HEIGHT;
+
+    if (row < 0 || row >= model_row_count(_model))
     {
         row = -1;
     }
@@ -101,98 +73,120 @@ int table_row_at(Table *widget, Vec2i position)
     return row;
 }
 
-void table_paint(Table *widget, Painter &painter, Rectangle rectangle)
+void Table::paint_cell(Painter &painter, int row, int column)
 {
-    __unused(rectangle);
+    Rectangle bound = cell_bound(row, column);
+    Variant data = model_data(_model, row, column);
 
     painter.push();
-    painter.clip(widget_get_bound(widget));
+    painter.clip(bound);
 
-    int column_count = model_column_count(widget->model);
-    int column_width = table_bound(widget).width() / column_count;
-
-    for (int row = MAX(0, widget->scroll_offset / TABLE_ROW_HEIGHT - 1);
-         row < MIN(model_row_count(widget->model), ((widget->scroll_offset + table_body_bound(widget).height()) / TABLE_ROW_HEIGHT) + 1);
-         row++)
+    if (row % 2 == 0)
     {
-        Rectangle row_bound = table_row_bound(widget, row);
-
-        if (widget->selected == row)
-        {
-            painter.fill_rectangle(row_bound, widget_get_color(widget, THEME_SELECTION));
-            painter.draw_rectangle(row_bound, widget_get_color(widget, THEME_SELECTION));
-        }
-
-        for (int column = 0; column < column_count; column++)
-        {
-            table_render_cell(widget, painter, row, column);
-        }
+        painter.fill_rectangle(bound, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.05));
     }
 
-    painter.blur_rectangle(table_header_bound(widget), 8);
-    painter.fill_rectangle(table_header_bound(widget), ALPHA(widget_get_color(widget, THEME_BACKGROUND), 0.9));
-
-    for (int column = 0; column < column_count; column++)
+    if (data.has_icon())
     {
-        Rectangle header_bound = Rectangle(
-            table_header_bound(widget).x() + column * column_width,
-            table_header_bound(widget).y(),
-            column_width,
-            TABLE_ROW_HEIGHT);
+        painter.blit_icon(
+            *data.icon(),
+            ICON_18PX,
+            Rectangle(bound.x() + 7, bound.y() + 7, 18, 18),
+            widget_get_color(this, THEME_FOREGROUND));
 
-        if (column < column_count - 1)
-        {
-            painter.fill_rectangle(header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
-        }
-        painter.fill_rectangle(header_bound.take_right(1), widget_get_color(widget, THEME_BORDER));
-
-        painter.draw_string(*widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
-        painter.draw_string(*widget_font(), model_column_name(widget->model, column), Vec2i(header_bound.x() + 7 + 1, header_bound.y() + 20), widget_get_color(widget, THEME_FOREGROUND));
+        painter.draw_string(
+            *widget_font(),
+            data.as_string(),
+            Vec2i(bound.x() + 7 + 18 + 7, bound.y() + 20),
+            widget_get_color(this, THEME_FOREGROUND));
+    }
+    else
+    {
+        painter.draw_string(
+            *widget_font(),
+            data.as_string(),
+            Vec2i(bound.x() + 7, bound.y() + 20),
+            widget_get_color(this, THEME_FOREGROUND));
     }
 
     painter.pop();
 }
 
-void table_event(Table *widget, Event *event)
+Table::Table(Widget *parent, Model *model) : Widget(parent)
+{
+    _model = model;
+    _selected = -1;
+    _scroll_offset = 0;
+
+    _scrollbar = new ScrollBar(this);
+
+    _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
+        _scroll_offset = _scrollbar->value();
+        should_repaint();
+    });
+}
+
+void Table::paint(Painter &painter, Rectangle rectangle)
+{
+    __unused(rectangle);
+
+    painter.push();
+    painter.clip(widget_get_bound(this));
+
+    int column_count = model_column_count(_model);
+    int column_width = body_bound().width() / column_count;
+
+    for (int row = MAX(0, _scroll_offset / TABLE_ROW_HEIGHT - 1);
+         row < MIN(model_row_count(_model), ((_scroll_offset + list_bound().height()) / TABLE_ROW_HEIGHT) + 1);
+         row++)
+    {
+
+        if (_selected == row)
+        {
+            painter.fill_rectangle(row_bound(row), widget_get_color(this, THEME_SELECTION));
+            painter.draw_rectangle(row_bound(row), widget_get_color(this, THEME_SELECTION));
+        }
+
+        for (int column = 0; column < column_count; column++)
+        {
+            paint_cell(painter, row, column);
+        }
+    }
+
+    painter.blur_rectangle(header_bound(), 8);
+    painter.fill_rectangle(header_bound(), ALPHA(widget_get_color(this, THEME_BACKGROUND), 0.9));
+
+    for (int column = 0; column < column_count; column++)
+    {
+        Rectangle header_bound_cell = Rectangle(
+            header_bound().x() + column * column_width,
+            header_bound().y(),
+            column_width,
+            TABLE_ROW_HEIGHT);
+
+        if (column < column_count - 1)
+        {
+            painter.fill_rectangle(header_bound_cell.take_right(1), widget_get_color(this, THEME_BORDER));
+        }
+
+        painter.draw_string(*widget_font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), widget_get_color(this, THEME_FOREGROUND));
+        painter.draw_string(*widget_font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), widget_get_color(this, THEME_FOREGROUND));
+    }
+
+    painter.pop();
+}
+
+void Table::event(Event *event)
 {
     if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        widget->selected = table_row_at(widget, event->mouse.position);
-        widget->should_repaint();
+        _selected = row_at(event->mouse.position);
+        should_repaint();
     }
 }
 
-void table_layout(Table *widget)
+void Table::do_layout()
 {
-    widget->scrollbar->bound = table_scrollbar_bound(widget);
-
-    widget->scrollbar->track = TABLE_ROW_HEIGHT * model_row_count(widget->model);
-    widget->scrollbar->thumb = table_body_bound(widget).height();
-    widget->scrollbar->value = 0;
-}
-
-static const WidgetClass table_class = {
-    .paint = (WidgetPaintCallback)table_paint,
-    .event = (WidgetEventCallback)table_event,
-    .layout = (WidgetLayoutCallback)table_layout,
-};
-
-Table *table_create(Widget *parent, Model *model)
-{
-    auto table = __create(Table);
-
-    table->model = model;
-    table->selected = -1;
-    table->scroll_offset = 0;
-
-    widget_initialize(table, &table_class, parent);
-
-    table->scrollbar = scrollbar_create(table);
-
-    table->scrollbar->on(Event::VALUE_CHANGE, [table](auto) {
-        table->scroll_offset = table->scrollbar->value;
-        table->should_repaint();
-    });
-
-    return table;
+    _scrollbar->bound = scrollbar_bound();
+    _scrollbar->update(TABLE_ROW_HEIGHT * model_row_count(_model), list_bound().height(), _scroll_offset);
 }

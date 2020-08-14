@@ -10,12 +10,6 @@ struct Widget;
 struct Painter;
 struct Window;
 
-typedef Vec2i (*WidgetComputeSizeCallback)(Widget *widget);
-typedef void (*WidgetDestroyCallback)(Widget *widget);
-typedef void (*WidgetPaintCallback)(Widget *widget, Painter &painter, Rectangle rectangle);
-typedef void (*WidgetEventCallback)(Widget *widget, Event *event);
-typedef void (*WidgetLayoutCallback)(Widget *widget);
-
 enum LayoutType
 {
     LAYOUT_STACK,
@@ -64,36 +58,39 @@ struct WidgetColor
     Color color;
 };
 
-struct WidgetClass
-{
-    WidgetDestroyCallback destroy = nullptr;
-    WidgetPaintCallback paint = nullptr;
-    WidgetEventCallback event = nullptr;
-    WidgetComputeSizeCallback size = nullptr;
-    WidgetLayoutCallback layout = nullptr;
-};
-
 struct Widget
 {
-    const WidgetClass *klass;
-
     bool _enabled;
     Rectangle bound;
 
-    int max_height;
-    int max_width;
-    int min_height;
-    int min_width;
-    Insets insets;
-    WidgetColor colors[__THEME_COLOR_COUNT];
-    Layout layout; // FIXME: this shoul be a separeted object
-    LayoutAttributes layout_attributes;
+    int max_height = 0;
+    int max_width = 0;
+    int min_height = 0;
+    int min_width = 0;
+    Insets insets = {};
+    WidgetColor colors[__THEME_COLOR_COUNT] = {};
+    Layout layout = {}; // FIXME: this shoul be a separeted object
+    LayoutAttributes layout_attributes = {};
 
-    EventHandler handlers[EventType::__COUNT];
+    EventHandler handlers[EventType::__COUNT] = {};
 
-    struct Widget *parent;
-    struct Window *window;
-    List *childs;
+    struct Widget *parent = {};
+    struct Window *window = {};
+    List *childs = {};
+
+    /* --- subclass API ----------------------------------------------------- */
+
+    Widget(Widget *parent);
+
+    virtual ~Widget();
+
+    virtual void paint(Painter &painter, Rectangle rectangle);
+
+    virtual void event(Event *event);
+
+    virtual void do_layout();
+
+    virtual Vec2i size();
 
     /* --- Enable/ Disable state -------------------------------------------- */
 
@@ -121,6 +118,12 @@ struct Widget
 
     void should_repaint(Rectangle rectangle);
 
+    /* --- Layout ----------------------------------------------------------- */
+
+    void relayout();
+
+    void should_relayout();
+
     /* --- Events ----------------------------------------------------------- */
 
     void on(EventType event, EventHandler handler);
@@ -128,18 +131,9 @@ struct Widget
 
 RefPtr<Font> widget_font();
 
-void widget_initialize(
-    Widget *widget,
-    const WidgetClass *klass,
-    Widget *parent);
-
-void widget_destroy(Widget *widget);
-
 void widget_event(Widget *widget, struct Event *event);
 
 void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
-
-void widget_layout(Widget *widget);
 
 /* --- Widget childs ------------------------------------ */
 
@@ -157,8 +151,8 @@ Color widget_get_color(Widget *widget, ThemeColorRole role);
 
 void widget_set_color(Widget *widget, ThemeColorRole role, Color color);
 
-Rectangle widget_get_bound(Widget *widget);
+Rectangle widget_get_bound(const Widget *widget);
 
-Rectangle widget_get_content_bound(Widget *widget);
+Rectangle widget_get_content_bound(const Widget *widget);
 
 Vec2i widget_compute_size(Widget *widget);

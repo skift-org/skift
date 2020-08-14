@@ -11,7 +11,11 @@ private:
 public:
     bool success() { return _result == SUCCESS; }
 
-    T &&take_value() { return move(_value); }
+    T &&take_value()
+    {
+        assert(success());
+        return move(_value);
+    }
 
     Result result() { return _result; }
 

@@ -19,14 +19,20 @@ enum ButtonStyle
 
 struct Button : public Widget
 {
-    ButtonState state;
-    ButtonStyle style;
+private:
+    ButtonState _state = BUTTON_IDLE;
+    ButtonStyle _style;
+
+public:
+    Button(Widget *parent, ButtonStyle style);
+
+    Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon);
+
+    Button(Widget *parent, ButtonStyle style, const char *text);
+
+    Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text);
+
+    void paint(Painter &painter, Rectangle rectangle);
+
+    void event(Event *event);
 };
-
-Button *button_create(Widget *parent, ButtonStyle style);
-
-Button *button_create_with_text(Widget *parent, ButtonStyle style, const char *text);
-
-Button *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon);
-
-Button *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text);

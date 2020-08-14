@@ -1,28 +1,16 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/Separator.h>
 
-void separator_paint(Separator *widget, Painter &painter, Rectangle rectangle)
+Separator::Separator(Widget *parent) : Widget(parent)
 {
-    painter.fill_rectangle(rectangle, widget_get_color(widget, THEME_BORDER));
 }
 
-Vec2i separator_size(Separator *widget)
+void Separator::paint(Painter &painter, Rectangle rectangle)
 {
-    __unused(widget);
+    painter.fill_rectangle(rectangle, widget_get_color(this, THEME_BORDER));
+}
 
+Vec2i Separator::size()
+{
     return Vec2i(1, 1);
-}
-
-static const WidgetClass separator_class = {
-    .paint = (WidgetPaintCallback)separator_paint,
-    .size = (WidgetComputeSizeCallback)separator_size,
-};
-
-Separator *separator_create(Widget *parent)
-{
-    auto separator = __create(Separator);
-
-    widget_initialize(separator, &separator_class, parent);
-
-    return separator;
 }

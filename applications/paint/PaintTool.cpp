@@ -5,101 +5,53 @@
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
-void pencil_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)
+void PencilTool::event(PaintDocument &document, Event &event, Color &color)
 {
-    __unused(tool);
-
     if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
         Vec2i from = event.mouse.old_position;
         Vec2i to = event.mouse.position;
 
-        if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
+        if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
-            document->painter.draw_line_antialias(from, to, document->primary_color);
-            document->dirty = true;
-        }
-        else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
-        {
-            document->painter.draw_line_antialias(from, to, document->secondary_color);
-            document->dirty = true;
+            document.painter().draw_line_antialias(from, to, color);
+            document.dirty(true);
         }
     }
 }
 
-PaintTool *pencil_tool_create()
+void BrushTool::event(PaintDocument &document, Event &event, Color &color)
 {
-    PaintTool *tool = __create(PaintTool);
-
-    tool->on_mouse_event = pencil_tool_mouse_event;
-
-    return tool;
-}
-
-void brush_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)
-{
-    __unused(tool);
-
     if (event.type == Event::MOUSE_MOVE ||
         event.type == Event::MOUSE_BUTTON_PRESS)
     {
-        if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
+        if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
-            Color color = document->primary_color;
-            document->painter.fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-            document->dirty = true;
-        }
-        else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
-        {
-            Color color = document->secondary_color;
-            document->painter.fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-            document->dirty = true;
+            document.painter().fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
+            document.dirty(true);
         }
     }
 }
 
-PaintTool *brush_tool_create()
+void EraserTool::event(PaintDocument &document, Event &event, Color &color)
 {
-    PaintTool *tool = __create(PaintTool);
-
-    tool->on_mouse_event = brush_tool_mouse_event;
-
-    return tool;
-}
-
-void eraser_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)
-{
-    __unused(tool);
-
     if (event.type == Event::MOUSE_MOVE || event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            Color color = COLOR_RGBA(0, 0, 0, 0);
-            document->painter.clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-            document->dirty = true;
+            document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), COLOR_RGBA(0, 0, 0, 0));
+            document.dirty(true);
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            Color color = document->secondary_color;
-            document->painter.clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-            document->dirty = true;
+            document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
+            document.dirty(true);
         }
     }
 }
 
-PaintTool *eraser_tool_create()
-{
-    PaintTool *tool = __create(PaintTool);
-
-    tool->on_mouse_event = eraser_tool_mouse_event;
-
-    return tool;
-}
-
 static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
 {
-
     if (!bitmap.bound().containe(position))
         return;
 
@@ -145,60 +97,32 @@ static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
     }
 }
 
-void fill_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)
+void FillTool::event(PaintDocument &document, Event &event, Color &color)
 {
-    __unused(tool);
+    if (event.type == Event::MOUSE_BUTTON_PRESS)
+    {
+        if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
+        {
+            Color target_color = document.bitmap().get_pixel(event.mouse.position);
+            flood_fill(document.bitmap(), event.mouse.position, target_color, color);
+            document.dirty(true);
+        }
+    }
+}
+
+void PickerTool::event(PaintDocument &document, Event &event, Color &color)
+{
+    __unused(color);
 
     if (event.type == Event::MOUSE_BUTTON_PRESS)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            Color fill_color = document->primary_color;
-            Color target_color = document->bitmap->get_pixel(event.mouse.position);
-            flood_fill(*document->bitmap, event.mouse.position, target_color, fill_color);
-            document->dirty = true;
+            document.primary_color(document.bitmap().get_pixel(event.mouse.position));
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            Color fill_color = document->secondary_color;
-            Color target_color = document->bitmap->get_pixel(event.mouse.position);
-            flood_fill(*document->bitmap, event.mouse.position, target_color, fill_color);
-            document->dirty = true;
+            document.secondary_color(document.bitmap().get_pixel(event.mouse.position));
         }
     }
-}
-
-PaintTool *fill_tool_create()
-{
-    PaintTool *tool = __create(PaintTool);
-
-    tool->on_mouse_event = fill_tool_mouse_event;
-
-    return tool;
-}
-
-void picker_tool_mouse_event(PaintTool *tool, PaintDocument *document, Event event)
-{
-    __unused(tool);
-
-    if (event.type == Event::MOUSE_BUTTON_PRESS)
-    {
-        if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
-        {
-            document->primary_color = document->bitmap->get_pixel(event.mouse.position);
-        }
-        else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
-        {
-            document->secondary_color = document->bitmap->get_pixel(event.mouse.position);
-        }
-    }
-}
-
-PaintTool *picker_tool_create()
-{
-    PaintTool *tool = __create(PaintTool);
-
-    tool->on_mouse_event = picker_tool_mouse_event;
-
-    return tool;
 }

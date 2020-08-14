@@ -7,8 +7,8 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 
-#include "terminal/ApplicationTerminal.h"
 #include "terminal/FramebufferTerminal.h"
+#include "terminal/TerminalWidget.h"
 #include "terminal/TextmodeTerminal.h"
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         window_set_title(window, "Terminal");
         window_set_size(window, Vec2i(500, 400));
 
-        Widget *widget = terminal_widget_create(window_root(window));
+        Widget *widget = new TerminalWidget(window_root(window));
         widget->focus();
 
         window_show(window);

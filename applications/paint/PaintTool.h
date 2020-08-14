@@ -1,18 +1,57 @@
 #pragma once
 
+#include <libgraphic/Color.h>
 #include <libwidget/Event.h>
 
-struct PaintTool;
 struct PaintDocument;
 
-typedef void (*PaintToolMouseEventCallback)(struct PaintTool *tool, struct PaintDocument *document, Event event);
-
-typedef void (*PaintToolDestroyCallback)(struct PaintTool *tool);
-
-struct PaintTool
+class PaintTool
 {
-    PaintToolMouseEventCallback on_mouse_event;
-    PaintToolDestroyCallback destroy;
+private:
+public:
+    virtual ~PaintTool() {}
+
+    virtual void event(PaintDocument &document, Event &event, Color &color)
+    {
+        __unused(document);
+        __unused(event);
+        __unused(color);
+    }
+};
+
+class PencilTool : public PaintTool
+{
+private:
+public:
+    void event(PaintDocument &document, Event &event, Color &color);
+};
+
+class BrushTool : public PaintTool
+{
+private:
+public:
+    void event(PaintDocument &document, Event &event, Color &color);
+};
+
+class EraserTool : public PaintTool
+{
+private:
+public:
+    void event(PaintDocument &document, Event &event, Color &color);
+};
+
+class FillTool : public PaintTool
+{
+private:
+public:
+    void event(PaintDocument &document, Event &event, Color &color);
+};
+
+class PickerTool : public PaintTool
+{
+private:
+public:
+    void event(PaintDocument &document, Event &event, Color &color);
 };
 
 PaintTool *pencil_tool_create();

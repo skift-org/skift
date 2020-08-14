@@ -5,7 +5,13 @@
 
 struct IconPanel : public Widget
 {
-    RefPtr<Icon> icon;
-};
+private:
+    RefPtr<Icon> _icon;
 
-IconPanel *icon_panel_create(Widget *parent, RefPtr<Icon> icon);
+public:
+    IconPanel(Widget *parent, RefPtr<Icon> icon);
+
+    void paint(Painter &painter, Rectangle rectangle);
+
+    Vec2i size();
+};

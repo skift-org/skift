@@ -3,57 +3,48 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Label.h>
 
-void label_paint(Label *label, Painter &painter, Rectangle rectangle)
+void Label::update_text(const char *text)
+{
+    if (text)
+    {
+        if (_text)
+            free(_text);
+
+        _text = strdup(text);
+    }
+}
+
+Label::Label(Widget *parent, const char *text)
+    : Label(parent, text, Position::LEFT)
+{
+}
+
+Label::Label(Widget *parent, const char *text, Position position)
+    : Widget(parent)
+{
+    update_text(text);
+    _position = position;
+}
+
+Label::~Label()
+{
+    if (_text)
+        free(_text);
+}
+
+void Label::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
     painter.draw_string_within(
         *widget_font(),
-        label->text,
-        widget_get_bound(label),
-        label->text_position,
-        widget_get_color(label, THEME_FOREGROUND));
+        _text,
+        widget_get_bound(this),
+        _position,
+        widget_get_color(this, THEME_FOREGROUND));
 }
 
-Vec2i label_size(Label *label)
+Vec2i Label::size()
 {
-    return widget_font()->mesure_string(label->text).size();
-}
-
-void label_set_text(Widget *label, const char *text)
-{
-    free(((Label *)label)->text);
-    ((Label *)label)->text = strdup(text);
-
-    label->should_repaint();
-}
-
-void label_set_text_position(Widget *label, Position text_position)
-{
-    ((Label *)label)->text_position = text_position;
-
-    label->should_repaint();
-}
-
-void label_destroy(Label *label)
-{
-    free(label->text);
-}
-
-static const WidgetClass label_class = {
-    .destroy = (WidgetDestroyCallback)label_destroy,
-    .paint = (WidgetPaintCallback)label_paint,
-    .size = (WidgetComputeSizeCallback)label_size,
-};
-
-Label *label_create(Widget *parent, const char *text)
-{
-    auto label = __create(Label);
-
-    label->text = strdup(text);
-    label->text_position = Position::CENTER;
-
-    widget_initialize(label, &label_class, parent);
-
-    return label;
+    return widget_font()->mesure_string(_text).size();
 }

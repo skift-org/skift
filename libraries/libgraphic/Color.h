@@ -2,8 +2,7 @@
 
 #include <libsystem/Common.h>
 
-union Color
-{
+union Color {
     struct
     {
         uint8_t R;
@@ -13,6 +12,11 @@ union Color
     };
 
     uint32_t packed;
+
+    bool operator==(Color &other)
+    {
+        return packed == other.packed;
+    }
 };
 
 Color RGB(float R, float G, float B);

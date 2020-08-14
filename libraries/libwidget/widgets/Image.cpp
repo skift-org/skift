@@ -1,62 +1,60 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/widgets/Image.h>
 
-void image_paint(Image *widget, Painter &painter, Rectangle rectangle)
+Image::Image(Widget *parent, RefPtr<Bitmap> bitmap)
+    : Widget(parent), _bitmap(bitmap)
+{
+}
+
+void Image::change_bitmap(RefPtr<Bitmap> bitmap)
+{
+    if (_bitmap != bitmap)
+    {
+        _bitmap = bitmap;
+        should_repaint();
+    }
+}
+
+void Image::change_scaling(ImageScalling scaling)
+{
+    if (_scalling != scaling)
+    {
+        _scalling = scaling;
+        should_repaint();
+    }
+}
+
+void Image::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget->bitmap)
+    if (!_bitmap)
     {
-        Rectangle destination = widget_get_bound(widget);
-
-        if (widget->size_mode == IMAGE_CENTER)
-        {
-            destination = widget->bitmap->bound().centered_within(widget_get_bound(widget));
-        }
-
-        painter.blit_bitmap(*widget->bitmap, widget->bitmap->bound(), destination);
+        return;
     }
+
+    Rectangle destination = widget_get_bound(this);
+
+    if (_scalling == ImageScalling::CENTER)
+    {
+        destination = _bitmap->bound().centered_within(widget_get_bound(this));
+    }
+    else if (_scalling == ImageScalling::STRETCH)
+    {
+        destination = widget_get_bound(this);
+    }
+
+    painter.blit_bitmap(*_bitmap, _bitmap->bound(), destination);
 }
 
-Vec2i image_size(Image *widget)
+Vec2i Image::size()
 {
-    if (widget->bitmap)
+    if (_bitmap)
     {
-        return widget->bitmap->bound().size();
+        return _bitmap->bound().size();
     }
     else
     {
-        return widget_get_bound(widget).size();
+        return widget_get_bound(this).size();
     }
-}
-
-void image_destroy(Image *widget)
-{
-    if (widget->bitmap)
-    {
-        widget->bitmap = nullptr;
-    }
-}
-
-void image_set_image(Widget *image, const char *path)
-{
-    ((Image *)image)->bitmap = Bitmap::load_from_or_placeholder(path);
-}
-
-static const WidgetClass image_class = {
-    .destroy = (WidgetDestroyCallback)image_destroy,
-    .paint = (WidgetPaintCallback)image_paint,
-    .size = (WidgetComputeSizeCallback)image_size,
-};
-
-Image *image_create(Widget *parent, const char *path)
-{
-    auto image = __create(Image);
-
-    image->bitmap = Bitmap::load_from_or_placeholder(path);
-    image->size_mode = IMAGE_CENTER;
-
-    widget_initialize(image, &image_class, parent);
-
-    return image;
 }

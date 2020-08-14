@@ -21,25 +21,25 @@ void window_populate_header(Window *window)
     window_header(window)->layout = HFLOW(4);
     window_header(window)->insets = Insets(6, 6);
 
-    button_create_with_icon_and_text(
+    new Button(
         window_header(window),
         BUTTON_TEXT,
         window->icon,
         window->title);
 
-    container_create(window_header(window))
-        ->layout_attributes = LAYOUT_FILL;
+    auto spacer = new Container(window_header(window));
+    spacer->layout_attributes = LAYOUT_FILL;
 
     if (window->flags & WINDOW_RESIZABLE)
     {
-        Widget *button_minimize = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-minimize"));
+        Widget *button_minimize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-minimize"));
         button_minimize->insets = Insets(3);
 
-        Widget *button_maximize = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
+        Widget *button_maximize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
         button_maximize->insets = Insets(3);
     }
 
-    Widget *close_button = button_create_with_icon(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
+    Widget *close_button = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets = Insets(3);
 
     close_button->on(Event::ACTION, [window](auto) {
@@ -69,12 +69,12 @@ void window_initialize(Window *window, WindowFlag flags)
     window->on_screen_bound = Rectangle(250, 250);
     window->dirty_rect = list_create();
 
-    window->header_container = container_create(nullptr);
+    window->header_container = new Container(nullptr);
     window->header_container->window = window;
 
     window_populate_header(window);
 
-    window->root_container = container_create(nullptr);
+    window->root_container = new Container(nullptr);
     window->root_container->window = window;
 
     window->focused_widget = window->root_container;
@@ -102,8 +102,8 @@ void window_destroy(Window *window)
 
     application_remove_window(window);
 
-    widget_destroy(window->root_container);
-    widget_destroy(window->header_container);
+    delete window->root_container;
+    delete window->header_container;
 
     window->frontbuffer_painter.~Painter();
     window->frontbuffer = nullptr;
@@ -752,10 +752,10 @@ void window_schedule_update(Window *window, Rectangle rectangle)
 void window_layout(Window *window)
 {
     window_header(window)->bound = window_header_bound(window);
-    widget_layout(window_header(window));
+    window_header(window)->relayout();
 
     window_root(window)->bound = window_content_bound(window);
-    widget_layout(window_root(window));
+    window_root(window)->relayout();
 
     window->dirty_layout = false;
 }

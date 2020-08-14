@@ -18,27 +18,23 @@ public:
     int left() const { return _left; }
     int right() const { return _right; }
 
+    Insets()
+        : Insets(0, 0, 0, 0)
+    {
+    }
+
     Insets(int tblr)
-        : _top(tblr),
-          _bottom(tblr),
-          _left(tblr),
-          _right(tblr)
+        : Insets(tblr, tblr, tblr, tblr)
     {
     }
 
     Insets(int tb, int lr)
-        : _top(tb),
-          _bottom(tb),
-          _left(lr),
-          _right(lr)
+        : Insets(tb, tb, lr, lr)
     {
     }
 
     Insets(int top, int bottom, int lr)
-        : _top(top),
-          _bottom(bottom),
-          _left(lr),
-          _right(lr)
+        : Insets(top, bottom, lr, lr)
     {
     }
 

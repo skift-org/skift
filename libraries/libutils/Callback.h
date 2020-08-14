@@ -67,14 +67,14 @@ public:
     template <typename CallableType, class = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
     Callback &operator=(CallableType &&callable)
     {
-        _wrapper = make<CallableWrapper<CallableType>>(move(callable));
+        _wrapper = own<CallableWrapper<CallableType>>(move(callable));
         return *this;
     }
 
     template <typename FunctionType, class = typename EnableIf<IsPointer<FunctionType>::value && IsFunction<typename RemovePointer<FunctionType>::Type>::value>::Type>
     Callback &operator=(FunctionType f)
     {
-        _wrapper = make<CallableWrapper<FunctionType>>(move(f));
+        _wrapper = own<CallableWrapper<FunctionType>>(move(f));
         return *this;
     }
 

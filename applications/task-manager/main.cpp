@@ -32,8 +32,7 @@ struct TaskManagerWindow : public Window
 void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
-
-    graph_record(window->ram_graph, status.used_ram / (double)status.total_ram);
+    window->ram_graph->record(status.used_ram / (double)status.total_ram);
 
     // Stats
     int usage = (int)status.used_ram / 1024 / 1024;
@@ -52,11 +51,11 @@ void widget_ram_update(TaskManagerWindow *window)
     snprintf(buffer_usage, 50, "Usage: %i Mio", usage);
     snprintf(buffer_avaliable, 50, "Avaliable: %i Mio", avaliable);
 
-    label_set_text(window->ram_usage, buffer_usage);
+    window->ram_usage->update_text(buffer_usage);
 
-    label_set_text(window->ram_avaliable, buffer_avaliable);
+    window->ram_avaliable->update_text(buffer_avaliable);
 
-    label_set_text(window->ram_greedy, buffer_builder_intermediate(buffer_greedy));
+    window->ram_greedy->update_text(buffer_builder_intermediate(buffer_greedy));
 
     // Destroy buffer
     buffer_builder_destroy(buffer_greedy);
@@ -66,25 +65,19 @@ void widget_cpu_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
 
-    graph_record(window->cpu_graph, status.cpu_usage / 100.0);
+    window->cpu_graph->record(status.cpu_usage / 100.0);
 
     const char *greedy = task_model_get_greedy_process(window->table_model, 1);
     int percentage = (int)status.cpu_usage;
 
     char buffer_average[50];
+    snprintf(buffer_average, 200, "Average: %i%%", percentage);
+    window->cpu_average->update_text(buffer_average);
 
-    size_t buff_greedy_size = strlen("Most greedy: ") + strlen(greedy);
-    auto buffer_greedy = buffer_builder_create(buff_greedy_size);
-
+    auto buffer_greedy = buffer_builder_create(24);
     buffer_builder_append_str(buffer_greedy, "Most greedy: ");
     buffer_builder_append_str(buffer_greedy, greedy);
-
-    snprintf(buffer_average, 200, "Average: %i%%", percentage);
-
-    label_set_text(window->cpu_average, buffer_average);
-    label_set_text(window->cpu_greedy, buffer_builder_intermediate(buffer_greedy));
-
-    // Destroy
+    window->cpu_greedy->update_text(buffer_builder_intermediate(buffer_greedy));
     buffer_builder_destroy(buffer_greedy);
 }
 
@@ -92,7 +85,7 @@ void widget_table_update(TaskManagerWindow *window)
 {
     model_update((Model *)window->table_model);
     window->table->should_repaint();
-    widget_layout(window->table);
+    window->table->should_relayout();
 }
 
 void task_manager_window_destroy(TaskManagerWindow *window)
@@ -115,11 +108,10 @@ int main(int argc, char **argv)
     window_root(window)->layout = VFLOW(0);
 
     /// --- Toolbar --- ///
-    Widget *toolbar = toolbar_create(window_root(window));
-    Widget *new_task_button = button_create_with_icon_and_text(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
-    __unused(new_task_button);
+    auto toolbar = toolbar_create(window_root(window));
+    new Button(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
 
-    Widget *cancel_task_button = button_create_with_icon_and_text(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
+    auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
     cancel_task_button->on(Event::ACTION, [](auto) {
         dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO);
     });
@@ -127,54 +119,53 @@ int main(int argc, char **argv)
     /// --- Table view --- //
     window->table_model = task_model_create();
 
-    window->table = table_create(window_root(window), (Model *)window->table_model);
+    window->table = new Table(window_root(window), window->table_model);
     window->table->layout_attributes = LAYOUT_FILL;
     window->table_timer = timer_create(window, 1000, (TimerCallback)widget_table_update);
     timer_start(window->table_timer);
 
     /// --- Graphs --- ///
-    Widget *graphs_container = panel_create(window_root(window));
+    auto graphs_container = new Panel(window_root(window));
     graphs_container->layout = HFLOW(0);
     graphs_container->max_height = 96;
 
-    window->cpu_graph = graph_create(graphs_container, 256, COLOR_SEAGREEN);
+    window->cpu_graph = new Graph(graphs_container, 256, COLOR_SEAGREEN);
     window->cpu_graph->layout = VFLOW(0);
     window->cpu_graph->insets = Insets(8);
     window->cpu_graph->layout_attributes = LAYOUT_FILL;
 
-    Widget *cpu_icon_and_text = container_create(window->cpu_graph);
+    auto cpu_icon_and_text = new Container(window->cpu_graph);
     cpu_icon_and_text->layout = HFLOW(4);
-    icon_panel_create(cpu_icon_and_text, Icon::get("memory"));
-    label_create(cpu_icon_and_text, "Processor");
+    new IconPanel(cpu_icon_and_text, Icon::get("memory"));
+    new Label(cpu_icon_and_text, "Processor");
+
+    auto cpu_filler = new Container(window->cpu_graph);
+    cpu_filler->layout_attributes = LAYOUT_FILL;
+
+    window->cpu_average = new Label(window->cpu_graph, "Average: nil%", Position::RIGHT);
+    window->cpu_greedy = new Label(window->cpu_graph, "Most greedy: the compositor eats a lot", Position::RIGHT);
 
     window->cpu_timer = timer_create(window, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);
 
-    separator_create(graphs_container);
+    new Separator(graphs_container);
 
-    window->ram_graph = graph_create(graphs_container, 256, COLOR_ROYALBLUE);
+    window->ram_graph = new Graph(graphs_container, 256, COLOR_ROYALBLUE);
     window->ram_graph->layout = VFLOW(0);
     window->ram_graph->insets = Insets(8);
     window->ram_graph->layout_attributes = LAYOUT_FILL;
 
-    Widget *ram_icon_and_text = container_create(window->ram_graph);
+    auto ram_icon_and_text = new Container(window->ram_graph);
     ram_icon_and_text->layout = HFLOW(4);
-    icon_panel_create(ram_icon_and_text, Icon::get("chip"));
-    label_create(ram_icon_and_text, "Memory");
+    new IconPanel(ram_icon_and_text, Icon::get("chip"));
+    new Label(ram_icon_and_text, "Memory");
 
-    container_create(window->ram_graph)->layout_attributes = LAYOUT_FILL;
-    window->ram_usage = label_create(window->ram_graph, "Usage: nil Mio");
-    label_set_text_position(window->ram_usage, Position::RIGHT);
-    window->ram_avaliable = label_create(window->ram_graph, "Avaliable: nil Mio");
-    label_set_text_position(window->ram_avaliable, Position::RIGHT);
-    window->ram_greedy = label_create(window->ram_graph, "Most greedy: nil");
-    label_set_text_position(window->ram_greedy, Position::RIGHT);
+    auto ram_filler = new Container(window->ram_graph);
+    ram_filler->layout_attributes = LAYOUT_FILL;
 
-    container_create(window->cpu_graph)->layout_attributes = LAYOUT_FILL;
-    window->cpu_average = label_create(window->cpu_graph, "Average: nil%");
-    label_set_text_position(window->cpu_average, Position::BOTTOM_RIGHT);
-    window->cpu_greedy = label_create(window->cpu_graph, "Most greedy: the compositor eats a lot");
-    label_set_text_position(window->cpu_greedy, Position::BOTTOM_RIGHT);
+    window->ram_usage = new Label(window->ram_graph, "Usage: nil Mio", Position::RIGHT);
+    window->ram_avaliable = new Label(window->ram_graph, "Avaliable: nil Mio", Position::RIGHT);
+    window->ram_greedy = new Label(window->ram_graph, "Most greedy: nil", Position::RIGHT);
 
     window->ram_timer = timer_create(window, 500, (TimerCallback)widget_ram_update);
     timer_start(window->ram_timer);

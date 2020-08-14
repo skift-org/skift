@@ -13,55 +13,64 @@ int main(int argc, char **argv)
 
     window_root(window)->layout = VFLOW(8);
 
-    panel_create(window_root(window));
-    panel_create(window_root(window));
+    new Panel(window_root(window));
+    new Panel(window_root(window));
 
-    Widget *panel_hflow = container_create(window_root(window));
+    Widget *panel_hflow = new Container(window_root(window));
     {
         panel_hflow->layout = HFLOW(8);
 
-        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
-        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
-        button_create_with_text(panel_hflow, BUTTON_TEXT, "Hello, world!")->layout_attributes = LAYOUT_FILL;
-        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
-        panel_create(panel_hflow)->layout_attributes = LAYOUT_FILL;
+        auto p0 = new Panel(panel_hflow);
+        p0->layout_attributes = LAYOUT_FILL;
+
+        auto p1 = new Panel(panel_hflow);
+        p1->layout_attributes = LAYOUT_FILL;
+
+        auto button = new Button(panel_hflow, BUTTON_TEXT, "Hello, world!");
+        button->layout_attributes = LAYOUT_FILL;
+
+        auto p2 = new Panel(panel_hflow);
+        p2->layout_attributes = LAYOUT_FILL;
+
+        auto p3 = new Panel(panel_hflow);
+        p3->layout_attributes = LAYOUT_FILL;
     }
 
-    label_create(window_root(window), "Buttons");
-    Widget *buttons = container_create(window_root(window));
+    new Label(window_root(window), "Buttons");
+    Widget *buttons = new Container(window_root(window));
     {
         buttons->layout = HFLOW(8);
         buttons->insets = Insets(0, 8);
 
-        button_create_with_text(buttons, BUTTON_TEXT, "BUTTON");
-        button_create_with_text(buttons, BUTTON_OUTLINE, "BUTTON");
-        button_create_with_text(buttons, BUTTON_FILLED, "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_TEXT, Icon::get("widgets"), "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_OUTLINE, Icon::get("widgets"), "BUTTON");
-        button_create_with_icon_and_text(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, BUTTON_TEXT, "BUTTON");
+        new Button(buttons, BUTTON_OUTLINE, "BUTTON");
+        new Button(buttons, BUTTON_FILLED, "BUTTON");
+        new Button(buttons, BUTTON_TEXT, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, BUTTON_OUTLINE, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
     }
 
-    label_create(window_root(window), "Grid layout");
+    new Label(window_root(window), "Grid layout");
 
-    Widget *panel_grid = container_create(window_root(window));
+    Widget *panel_grid = new Container(window_root(window));
     {
         panel_grid->layout = GRID(3, 3, 2, 4);
         panel_grid->layout_attributes = LAYOUT_FILL;
 
-        panel_create(panel_grid);
-        panel_create(panel_grid);
-        panel_create(panel_grid);
-        panel_create(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
 
-        button_create_with_text(panel_grid, BUTTON_FILLED, "Grid layout!");
+        new Button(panel_grid, BUTTON_FILLED, "Grid layout!");
 
-        panel_create(panel_grid);
-        panel_create(panel_grid);
-        panel_create(panel_grid);
-        panel_create(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
+        new Panel(panel_grid);
     }
 
-    panel_create(window_root(window));
+    new Panel(window_root(window));
 
     window_show(window);
 

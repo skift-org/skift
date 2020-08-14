@@ -6,7 +6,7 @@
 
 Widget *toolbar_create(Widget *parent)
 {
-    Widget *toolbar = panel_create(parent);
+    auto toolbar = new Panel(parent);
 
     toolbar->layout = HFLOW(4);
     toolbar->insets = Insets(4, 4);
@@ -18,24 +18,24 @@ Widget *toolbar_create(Widget *parent)
 
 Widget *toolbar_icon_create(Widget *parent, RefPtr<Icon> icon)
 {
-    Widget *toolbar_icon = button_create(parent, BUTTON_TEXT);
+    auto toolbar_icon = new Button(parent, BUTTON_TEXT);
     toolbar_icon->layout = STACK();
     toolbar_icon->insets = Insets(6);
 
-    icon_panel_create(toolbar_icon, icon);
+    new IconPanel(toolbar_icon, icon);
 
     return toolbar_icon;
 }
 
 Widget *toolbar_icon_with_text_create(Widget *parent, RefPtr<Icon> icon, const char *text)
 {
-    Widget *toolbar_icon = button_create(parent, BUTTON_OUTLINE);
+    auto toolbar_icon = new Button(parent, BUTTON_OUTLINE);
 
     toolbar_icon->layout = HFLOW(4);
     toolbar_icon->insets = Insets(0, 0, 4, 8);
 
-    icon_panel_create(toolbar_icon, icon);
-    label_create(toolbar_icon, text);
+    new IconPanel(toolbar_icon, icon);
+    new Label(toolbar_icon, text);
 
     return toolbar_icon;
 }

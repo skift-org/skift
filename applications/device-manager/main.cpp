@@ -13,27 +13,6 @@ struct TaskManagerWindow : public Window
     DeviceModel *table_model;
 };
 
-void widget_ram_update(Graph *widget)
-{
-    SystemStatus status = system_get_status();
-
-    graph_record(widget, status.used_ram / (double)status.total_ram);
-}
-
-void widget_cpu_update(Graph *widget)
-{
-    SystemStatus status = system_get_status();
-
-    graph_record(widget, status.cpu_usage / 100.0);
-}
-
-void widget_table_update(TaskManagerWindow *window)
-{
-    model_update((Model *)window->table_model);
-    window->table->should_repaint();
-    widget_layout(window->table);
-}
-
 void task_manager_window_destroy(TaskManagerWindow *window)
 {
     model_destroy((Model *)window->table_model);
@@ -56,7 +35,7 @@ int main(int argc, char **argv)
     /// --- Table view --- //
     window->table_model = device_model_create();
 
-    window->table = table_create(window_root(window), (Model *)window->table_model);
+    window->table = new Table(window_root(window), (Model *)window->table_model);
     window->table->layout_attributes = LAYOUT_FILL;
 
     window_show(window);

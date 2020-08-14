@@ -5,12 +5,18 @@
 
 struct Breadcrumb : public Widget
 {
-    Path *path;
+private:
+    Path *_path;
 
-    RefPtr<Icon> icon_computer;
-    RefPtr<Icon> icon_expand;
+    RefPtr<Icon> _icon_computer;
+    RefPtr<Icon> _icon_expand;
+
+public:
+    Breadcrumb(Widget *parent, Path *path);
+
+    ~Breadcrumb();
+
+    void navigate(Path *path);
+
+    void paint(Painter &painter, Rectangle rectangle);
 };
-
-Widget *breadcrumb_create(Widget *parent, const char *current_path);
-
-void breadcrumb_navigate(Widget *widget, Path *path);

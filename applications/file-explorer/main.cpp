@@ -21,7 +21,7 @@ struct FileExplorerWindow : public Window
     Widget *go_foreward;
     Widget *go_up;
     Widget *go_home;
-    Widget *breadcrumb;
+    Breadcrumb *breadcrumb;
 
     /// --- Table view --- ///
     Table *table;
@@ -48,7 +48,8 @@ static void navigate(FileExplorerWindow *window, Path *path, RecordHistory recor
         return;
     }
 
-    ((Table *)window->table)->selected = -1;
+    window->table->select(-1);
+    window->table->scroll_to_top();
 
     if (record_history == RECORD_BACKWARD)
     {
@@ -67,10 +68,8 @@ static void navigate(FileExplorerWindow *window, Path *path, RecordHistory recor
 
     window->current_path = path;
 
-    breadcrumb_navigate(window->breadcrumb, path);
+    window->breadcrumb->navigate(path);
     filesystem_model_navigate(window->model, path);
-    window->table->should_repaint();
-    widget_layout(window->table);
     update_navigation_bar(window);
 }
 
@@ -158,12 +157,12 @@ Window *file_explorer_window_create(const char *current_path)
 
     window->go_home = home_button;
 
-    separator_create(toolbar);
+    new Separator(toolbar);
 
-    window->breadcrumb = breadcrumb_create(toolbar, current_path);
+    window->breadcrumb = new Breadcrumb(toolbar, window->current_path);
     window->breadcrumb->layout_attributes = LAYOUT_FILL;
 
-    separator_create(toolbar);
+    new Separator(toolbar);
 
     toolbar_icon_create(toolbar, Icon::get("refresh"));
 
@@ -171,23 +170,23 @@ Window *file_explorer_window_create(const char *current_path)
 
     /// --- Table view --- ///
     window->model = filesystem_model_create(current_path);
-    window->table = table_create(root, (Model *)window->model);
+    window->table = new Table(root, window->model);
     window->table->layout_attributes = LAYOUT_FILL;
 
     window->table->on(Event::MOUSE_DOUBLE_CLICK, [window](auto) {
-        if (window->table->selected >= 0)
+        if (window->table->selected() >= 0)
         {
-            if (filesystem_model_filetype_by_index(window->model, window->table->selected) == FILE_TYPE_DIRECTORY)
+            if (filesystem_model_filetype_by_index(window->model, window->table->selected()) == FILE_TYPE_DIRECTORY)
             {
                 Path *new_path = path_clone(window->current_path);
-                path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, window->table->selected)));
+                path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, window->table->selected())));
                 clear_foreward_history(window);
                 navigate(window, new_path, RECORD_BACKWARD);
             }
             else
             {
                 Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
-                launchpad_argument(launchpad, filesystem_model_filename_by_index(window->model, window->table->selected));
+                launchpad_argument(launchpad, filesystem_model_filename_by_index(window->model, window->table->selected()));
                 launchpad_launch(launchpad, nullptr);
             }
         }

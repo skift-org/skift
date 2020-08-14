@@ -1,24 +1,56 @@
 #pragma once
 
 #include <libgraphic/Painter.h>
+#include <libutils/Callback.h>
 
-struct PaintTool;
-
-struct PaintDocument
+class PaintDocument : public RefCounted<PaintDocument>
 {
-    bool dirty;
+private:
+    RefPtr<Bitmap> _bitmap;
+    Painter _painter;
 
-    Color primary_color;
-    Color secondary_color;
+    Color _primary_color = COLOR_BLACK;
+    Color _secondary_color = COLOR_WHITE;
 
-    RefPtr<Bitmap> bitmap;
-    Painter painter;
+    bool _dirty = true;
 
-    struct PaintTool *tool;
+public:
+    Callback<void()> on_color_change;
+
+    Rectangle bound() { return _bitmap->bound(); }
+    Bitmap &bitmap() { return *_bitmap; }
+    Painter &painter() { return _painter; }
+
+    bool dirty() { return _dirty; }
+    void dirty(bool value) { _dirty = value; }
+
+    Color primary_color() { return _primary_color; }
+
+    void primary_color(Color value)
+    {
+        _primary_color = value;
+
+        if (on_color_change)
+            on_color_change();
+    }
+
+    Color secondary_color()
+    {
+
+        return _secondary_color;
+    }
+
+    void secondary_color(Color value)
+    {
+        _secondary_color = value;
+
+        if (on_color_change)
+            on_color_change();
+    }
+
+    PaintDocument(RefPtr<Bitmap> bitmap)
+        : _bitmap(bitmap),
+          _painter(bitmap)
+    {
+    }
 };
-
-PaintDocument *paint_document_create(int width, int height, Color fill_color);
-
-void paint_document_destroy(PaintDocument *document);
-
-void paint_document_set_tool(PaintDocument *document, struct PaintTool *tool);

@@ -5,125 +5,106 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-void button_paint(Button *widget, Painter &painter, Rectangle rectangle)
+void Button::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    if (widget->enabled())
+    if (enabled())
     {
-        if (widget->style == BUTTON_OUTLINE)
+        if (_style == BUTTON_OUTLINE)
         {
-            painter.draw_rounded_rectangle(widget_get_bound(widget), 4, 1, widget_get_color(widget, THEME_BORDER));
+            painter.draw_rounded_rectangle(widget_get_bound(this), 4, 1, widget_get_color(this, THEME_BORDER));
         }
-        else if (widget->style == BUTTON_FILLED)
+        else if (_style == BUTTON_FILLED)
         {
-            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, widget_get_color(widget, THEME_ACCENT));
-        }
-
-        if (widget->state == BUTTON_OVER)
-        {
-            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.1));
+            painter.fill_rounded_rectangle(widget_get_bound(this), 4, widget_get_color(this, THEME_ACCENT));
         }
 
-        if (widget->state == BUTTON_PRESS)
+        if (_state == BUTTON_OVER)
         {
-            painter.fill_rounded_rectangle(widget_get_bound(widget), 4, ALPHA(widget_get_color(widget, THEME_FOREGROUND), 0.2));
+            painter.fill_rounded_rectangle(widget_get_bound(this), 4, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.1));
+        }
+
+        if (_state == BUTTON_PRESS)
+        {
+            painter.fill_rounded_rectangle(widget_get_bound(this), 4, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.2));
         }
     }
 }
 
-void button_event(Button *widget, Event *event)
+void Button::event(Event *event)
 {
     if (event->type == Event::MOUSE_ENTER)
     {
-        widget->state = BUTTON_OVER;
-        widget->should_repaint();
+        _state = BUTTON_OVER;
+        should_repaint();
+
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_LEAVE)
     {
-        widget->state = BUTTON_IDLE;
-        widget->should_repaint();
+        _state = BUTTON_IDLE;
+        should_repaint();
+
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        widget->state = BUTTON_PRESS;
-        widget->should_repaint();
+        _state = BUTTON_PRESS;
+        should_repaint();
 
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_BUTTON_RELEASE)
     {
-        widget->state = BUTTON_OVER;
-        widget->should_repaint();
+        _state = BUTTON_OVER;
+        should_repaint();
 
         event->accepted = true;
 
         Event action_event = {};
-
         action_event.type = Event::ACTION;
-
-        widget_event(widget, &action_event);
+        widget_event(this, &action_event);
     }
 }
 
-static const WidgetClass button_class = {
-    .paint = (WidgetPaintCallback)button_paint,
-    .event = (WidgetEventCallback)button_event,
-};
-
-Button *button_create(Widget *parent, ButtonStyle style)
+Button::Button(Widget *parent, ButtonStyle style)
+    : Widget(parent),
+      _style(style)
 {
-    auto widget = __create(Button);
-
-    widget->style = style;
-    widget->state = BUTTON_IDLE;
-
-    widget->layout = HFLOW(0);
-    widget->insets = Insets(0, 16);
-    widget->min_height = 32;
-    widget->layout_attributes |= LAYOUT_GREEDY;
-
-    widget_initialize(widget, &button_class, parent);
-
-    return widget;
+    layout = HFLOW(0);
+    insets = Insets(0, 16);
+    min_height = 32;
+    layout_attributes |= LAYOUT_GREEDY;
 }
 
-Button *button_create_with_icon(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
+Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
+    : Button(parent, style)
 {
-    auto button = button_create(parent, style);
+    layout = STACK();
+    insets = Insets(4, 4);
 
-    button->layout = STACK();
-    button->insets = Insets(4, 4);
-
-    icon_panel_create(button, icon)->layout_attributes = LAYOUT_FILL;
-
-    return button;
+    new IconPanel(this, icon);
 }
 
-Button *button_create_with_text(Widget *parent, ButtonStyle style, const char *text)
+Button::Button(Widget *parent, ButtonStyle style, const char *text)
+    : Button(parent, style)
 {
-    auto button = button_create(parent, style);
+    layout = STACK();
+    insets = Insets(0, 0, 8, 8);
+    min_width = 64;
 
-    button->insets = Insets(0, 0, 8, 8);
-    button->min_width = 64;
-
-    label_create(button, text)->layout_attributes = LAYOUT_FILL;
-
-    return button;
+    new Label(this, text, Position::CENTER);
 }
 
-Button *button_create_with_icon_and_text(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
+Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
+    : Button(parent, style)
 {
-    auto button = button_create(parent, style);
-    button->insets = Insets(0, 0, 6, 10);
-    button->min_width = 64;
+    insets = Insets(0, 0, 6, 10);
+    min_width = 64;
 
-    Widget *button_icon = icon_panel_create(button, icon);
-    button_icon->insets = Insets(0, 0, 0, 4);
+    auto icon_panel = new IconPanel(this, icon);
+    icon_panel->insets = Insets(0, 0, 0, 4);
 
-    label_create(button, text);
-
-    return button;
+    new Label(this, text);
 }

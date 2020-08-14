@@ -4,6 +4,5 @@
 
 struct Container : public Widget
 {
+    Container(Widget *parent);
 };
-
-Container *container_create(Widget *parent);

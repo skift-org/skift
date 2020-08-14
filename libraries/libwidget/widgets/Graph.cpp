@@ -3,89 +3,76 @@
 #include <libsystem/Logger.h>
 #include <libwidget/widgets/Graph.h>
 
-static double distance(double from, double to, int size)
+Graph::Graph(Widget *parent, size_t data_size, Color data_color)
+    : Widget(parent)
 {
-    if (from > to)
-    {
-        from -= size;
-    }
-
-    return abs(to - from) / (double)size;
+    _data = (double *)calloc(data_size, sizeof(double));
+    _data_size = data_size;
+    _color = data_color;
+    _current = 0;
 }
 
-double graph_sample(Graph *widget, float where)
+Graph::~Graph()
 {
-    assert(where >= 0 && where <= 1);
-
-    return widget->data[(size_t)(widget->data_size * where)];
+    free(_data);
 }
 
-void graph_paint(Graph *widget, Painter &painter, Rectangle rectangle)
+void Graph::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    double cursor_position = widget->current / (double)widget->data_size;
+    auto distance = [](double from, double to, int size) {
+        if (from > to)
+        {
+            from -= size;
+        }
 
-    for (int i = 0; i < widget_get_bound(widget).width(); i++)
+        return abs(to - from) / (double)size;
+    };
+
+    auto graph_sample = [&](float where) {
+        assert(where >= 0 && where <= 1);
+
+        return _data[(size_t)(_data_size * where)];
+    };
+
+    double cursor_position = _current / (double)_data_size;
+
+    for (int i = 0; i < widget_get_bound(this).width(); i++)
     {
-        double where = i / (double)widget_get_bound(widget).width();
-        double data = graph_sample(widget, where);
+        double where = i / (double)widget_get_bound(this).width();
+        double data = graph_sample(where);
 
         Rectangle bar(
-            widget_get_bound(widget).x() + i,
-            (int)(widget_get_bound(widget).y() + widget_get_bound(widget).height() * (1.0 - data)),
+            widget_get_bound(this).x() + i,
+            (int)(widget_get_bound(this).y() + widget_get_bound(this).height() * (1.0 - data)),
             1,
-            widget_get_bound(widget).height());
+            widget_get_bound(this).height());
 
         double dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
-        painter.fill_rectangle(bar, ALPHA(widget->color, dist));
-        painter.plot_pixel(bar.position(), widget->color);
+        painter.fill_rectangle(bar, ALPHA(_color, dist));
+        painter.plot_pixel(bar.position(), _color);
     }
 
     Rectangle cursor(
-        (int)(widget_get_bound(widget).x() + widget_get_bound(widget).width() * cursor_position),
-        widget_get_bound(widget).y(),
+        (int)(widget_get_bound(this).x() + widget_get_bound(this).width() * cursor_position),
+        widget_get_bound(this).y(),
         1,
-        widget_get_bound(widget).height());
+        widget_get_bound(this).height());
 
-    painter.fill_rectangle(cursor, widget_get_color(widget, THEME_BORDER));
+    painter.fill_rectangle(cursor, widget_get_color(this, THEME_BORDER));
 }
 
-Vec2i graph_size(Graph *widget)
+Vec2i Graph::size()
 {
-    return Vec2i(widget->data_size, 100);
+    return Vec2i(_data_size, 100);
 }
 
-void graph_record(Graph *widget, double data)
+void Graph::record(double data)
 {
-    widget->data[widget->current] = data;
-    widget->current = (widget->current + 1) % widget->data_size;
+    _data[_current] = data;
+    _current = (_current + 1) % _data_size;
 
-    widget->should_repaint();
-}
-
-void graph_destroy(Graph *widget)
-{
-    free(widget->data);
-}
-
-static const WidgetClass graph_class = {
-    .destroy = (WidgetDestroyCallback)graph_destroy,
-    .paint = (WidgetPaintCallback)graph_paint,
-    .size = (WidgetComputeSizeCallback)graph_size,
-};
-
-Graph *graph_create(Widget *parent, size_t data_size, Color color)
-{
-    auto widget = __create(Graph);
-
-    widget->color = color;
-    widget->data = (double *)calloc(data_size, sizeof(double));
-    widget->data_size = data_size;
-    widget->current = 0;
-
-    widget_initialize(widget, &graph_class, parent);
-
-    return widget;
+    should_repaint();
 }

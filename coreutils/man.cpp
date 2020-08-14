@@ -52,7 +52,8 @@ void list_pages()
 
 int main(int argc, char **argv)
 {
-
+	bool man_list = false;
+	
 	if (argc == 1)
 	{
 		printf("What manual page do you need? eg. man man\n");

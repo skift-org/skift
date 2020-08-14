@@ -39,7 +39,7 @@ void menu_show(Menu *menu)
 
     window_set_size(window, Vec2i(128, menu->items->count() * 32));
 
-    window_root(window)->layout = VGRID(4);
+    window_root(window)->layout(VGRID(4));
 
     list_foreach(Menu, item, menu->items)
     {

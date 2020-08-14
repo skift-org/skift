@@ -15,13 +15,13 @@ void IconPanel::paint(Painter &painter, Rectangle rectangle)
         return;
     }
 
-    Rectangle destination = _icon->bound(ICON_18PX).centered_within(widget_get_content_bound(this));
+    Rectangle destination = _icon->bound(ICON_18PX).centered_within(content_bound());
 
     painter.blit_icon(
         *_icon,
         ICON_18PX,
         destination,
-        widget_get_color(this, THEME_FOREGROUND));
+        color(THEME_FOREGROUND));
 }
 
 Vec2i IconPanel::size()
@@ -32,6 +32,6 @@ Vec2i IconPanel::size()
     }
     else
     {
-        return widget_get_bound(this).size();
+        return bound().size();
     }
 }

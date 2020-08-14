@@ -10,30 +10,71 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
+void Widget::id(const char *id)
+{
+    window_register_widget_by_id(_window, id, this);
+}
+
+Color Widget::color(ThemeColorRole role)
+{
+    if (!enabled() || (_parent && !_parent->enabled()))
+    {
+        if (role == THEME_FOREGROUND)
+        {
+            role = THEME_FOREGROUND_INACTIVE;
+        }
+
+        if (role == THEME_SELECTION)
+        {
+            role = THEME_SELECTION_INACTIVE;
+        }
+
+        if (role == THEME_ACCENT)
+        {
+            role = THEME_ACCENT_INACTIVE;
+        }
+    }
+
+    if (_colors[role].overwritten)
+    {
+        return _colors[role].color;
+    }
+
+    return window_get_color(_window, role);
+}
+
+void Widget::color(ThemeColorRole role, Color color)
+{
+    _colors[role].overwritten = true;
+    _colors[role].color = color;
+
+    should_repaint();
+}
+
 Widget::Widget(Widget *parent)
 {
     _enabled = true;
-    childs = list_create();
-    bound = Rectangle(32, 32);
+    _childs = list_create();
+    _bound = Rectangle(32, 32);
 
     if (parent)
     {
-        window = parent->window;
-        widget_add_child(parent, this);
+        _window = parent->_window;
+        parent->add_child(this);
     }
 }
 
 Widget::~Widget()
 {
-    widget_clear_childs(this);
+    clear_childs();
 
-    list_destroy(childs);
+    list_destroy(_childs);
 
-    if (parent)
-        widget_remove_child(parent, this);
+    if (_parent)
+        _parent->remove_child(this);
 
-    if (window)
-        window_widget_removed(window, this);
+    if (_window)
+        window_widget_removed(_window, this);
 }
 
 void Widget::paint(Painter &painter, Rectangle rectangle)
@@ -47,19 +88,19 @@ void Widget::event(Event *event)
     __unused(event);
 }
 
-static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim)
+void Widget::do_vhgrid_layout(Layout layout, Dimension dim)
 {
     Dimension ivdim = dimension_invert_xy(dim);
 
-    int current = widget_get_content_bound(widget).position().component(dim);
+    int current = content_bound().position().component(dim);
     int spacing = layout.spacing.component(dim);
-    int size = widget_get_content_bound(widget).size().component(dim);
-    int used_space_without_spacing = size - (spacing * (widget->childs->count() - 1));
-    int child_size = used_space_without_spacing / widget->childs->count();
-    int used_space_with_spacing = child_size * widget->childs->count() + (spacing * (widget->childs->count() - 1));
+    int size = content_bound().size().component(dim);
+    int used_space_without_spacing = size - (spacing * (_childs->count() - 1));
+    int child_size = used_space_without_spacing / _childs->count();
+    int used_space_with_spacing = child_size * _childs->count() + (spacing * (_childs->count() - 1));
     int correction_space = size - used_space_with_spacing;
 
-    list_foreach(Widget, child, widget->childs)
+    list_foreach(Widget, child, _childs)
     {
         int current_child_size = MAX(1, child_size);
 
@@ -71,19 +112,19 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
 
         if (dim == Dimension::X)
         {
-            child->bound = Rectangle(
+            child->bound(Rectangle(
                 current,
-                widget_get_content_bound(widget).position().component(ivdim),
+                content_bound().position().component(ivdim),
                 current_child_size,
-                widget_get_content_bound(widget).size().component(ivdim));
+                content_bound().size().component(ivdim)));
         }
         else
         {
-            child->bound = Rectangle(
-                widget_get_content_bound(widget).position().component(ivdim),
+            child->bound(Rectangle(
+                content_bound().position().component(ivdim),
                 current,
-                widget_get_content_bound(widget).size().component(ivdim),
-                current_child_size);
+                content_bound().size().component(ivdim),
+                current_child_size));
         }
 
         current += current_child_size + spacing;
@@ -92,34 +133,33 @@ static void widget_do_vhgrid_layout(Widget *widget, Layout layout, Dimension dim
 
 void Widget::do_layout()
 {
-
-    switch (layout.type)
+    switch (_layout.type)
     {
     case LAYOUT_STACK:
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            child->bound = widget_get_content_bound(this);
+            child->bound(content_bound());
         }
         break;
     case LAYOUT_GRID:
     {
-        int originX = widget_get_content_bound(this).x();
-        int originY = widget_get_content_bound(this).y();
+        int originX = content_bound().x();
+        int originY = content_bound().y();
 
-        int child_width = (widget_get_content_bound(this).width() - (layout.spacing.x() * (layout.hcell - 1))) / layout.hcell;
-        int child_height = (widget_get_content_bound(this).height() - (layout.spacing.y() * (layout.vcell - 1))) / layout.vcell;
+        int child_width = (content_bound().width() - (_layout.spacing.x() * (_layout.hcell - 1))) / _layout.hcell;
+        int child_height = (content_bound().height() - (_layout.spacing.y() * (_layout.vcell - 1))) / _layout.vcell;
 
         int index = 0;
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            int x = index % layout.hcell;
-            int y = index / layout.hcell;
+            int x = index % _layout.hcell;
+            int y = index / _layout.hcell;
 
-            child->bound = Rectangle(
-                originX + x * (child_width + layout.spacing.x()),
-                originY + y * (child_height + layout.spacing.y()),
+            child->bound(Rectangle(
+                originX + x * (child_width + _layout.spacing.x()),
+                originY + y * (child_height + _layout.spacing.y()),
                 child_width,
-                child_height);
+                child_height));
 
             index++;
         }
@@ -127,11 +167,11 @@ void Widget::do_layout()
     break;
 
     case LAYOUT_HGRID:
-        widget_do_vhgrid_layout(this, layout, Dimension::X);
+        do_vhgrid_layout(_layout, Dimension::X);
         break;
 
     case LAYOUT_VGRID:
-        widget_do_vhgrid_layout(this, layout, Dimension::Y);
+        do_vhgrid_layout(_layout, Dimension::Y);
         break;
 
     case LAYOUT_HFLOW:
@@ -141,50 +181,50 @@ void Widget::do_layout()
 
         int fill_child_count = 0;
 
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            if (child->layout_attributes & LAYOUT_FILL)
+            if (child->attributes() & LAYOUT_FILL)
             {
                 fill_child_count++;
             }
             else
             {
                 fixed_child_count++;
-                fixed_child_total_width += widget_compute_size(child).x();
+                fixed_child_total_width += child->compute_size().x();
             }
         }
 
         int usable_space =
-            widget_get_content_bound(this).width() -
-            layout.spacing.x() * (childs->count() - 1);
+            content_bound().width() -
+            _layout.spacing.x() * (_childs->count() - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
         int fill_child_width = (fill_child_total_width) / MAX(1, fill_child_count);
 
-        int current = widget_get_content_bound(this).x();
+        int current = content_bound().x();
 
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            if (child->layout_attributes & LAYOUT_FILL)
+            if (child->attributes() & LAYOUT_FILL)
             {
-                child->bound = Rectangle(
+                child->bound(Rectangle(
                     current,
-                    widget_get_content_bound(this).y(),
+                    content_bound().y(),
                     fill_child_width,
-                    widget_get_content_bound(this).height());
+                    content_bound().height()));
 
-                current += fill_child_width + layout.spacing.x();
+                current += fill_child_width + _layout.spacing.x();
             }
             else
             {
-                child->bound = Rectangle(
+                child->bound(Rectangle(
                     current,
-                    widget_get_content_bound(this).y(),
-                    widget_compute_size(child).x(),
-                    widget_get_content_bound(this).height());
+                    content_bound().y(),
+                    child->compute_size().x(),
+                    content_bound().height()));
 
-                current += widget_compute_size(child).x() + layout.spacing.x();
+                current += child->compute_size().x() + _layout.spacing.x();
             }
         }
     }
@@ -197,50 +237,50 @@ void Widget::do_layout()
 
         int fill_child_count = 0;
 
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            if (child->layout_attributes & LAYOUT_FILL)
+            if (child->attributes() & LAYOUT_FILL)
             {
                 fill_child_count++;
             }
             else
             {
                 fixed_child_count++;
-                fixed_child_total_height += widget_compute_size(child).y();
+                fixed_child_total_height += child->compute_size().y();
             }
         }
 
         int usable_space =
-            widget_get_content_bound(this).height() -
-            layout.spacing.y() * (childs->count() - 1);
+            content_bound().height() -
+            _layout.spacing.y() * (_childs->count() - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 
         int fill_child_height = (fill_child_total_height) / MAX(1, fill_child_count);
 
-        int current = widget_get_content_bound(this).y();
+        int current = content_bound().y();
 
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            if (child->layout_attributes & LAYOUT_FILL)
+            if (child->attributes() & LAYOUT_FILL)
             {
-                child->bound = Rectangle(
-                    widget_get_content_bound(this).x(),
+                child->bound(Rectangle(
+                    content_bound().x(),
                     current,
-                    widget_get_content_bound(this).width(),
-                    fill_child_height);
+                    content_bound().width(),
+                    fill_child_height));
 
-                current += fill_child_height + layout.spacing.y();
+                current += fill_child_height + _layout.spacing.y();
             }
             else
             {
-                child->bound = Rectangle(
-                    widget_get_content_bound(this).x(),
+                child->bound(Rectangle(
+                    content_bound().x(),
                     current,
-                    widget_get_content_bound(this).width(),
-                    widget_compute_size(child).y());
+                    content_bound().width(),
+                    child->compute_size().y()));
 
-                current += widget_compute_size(child).y() + layout.spacing.y();
+                current += child->compute_size().y() + _layout.spacing.y();
             }
         }
     }
@@ -255,10 +295,10 @@ void Widget::relayout()
 {
     do_layout();
 
-    if (childs->count() == 0)
+    if (_childs->count() == 0)
         return;
 
-    list_foreach(Widget, child, childs)
+    list_foreach(Widget, child, _childs)
     {
         child->relayout();
     }
@@ -266,9 +306,9 @@ void Widget::relayout()
 
 void Widget::should_relayout()
 {
-    if (window)
+    if (_window)
     {
-        window_schedule_layout(window);
+        window_schedule_layout(_window);
     }
 }
 
@@ -277,15 +317,15 @@ Vec2i Widget::size()
     int width = 0;
     int height = 0;
 
-    if (layout.type == LAYOUT_STACK)
+    if (_layout.type == LAYOUT_STACK)
     {
 
-        width = min_width;
-        height = min_height;
+        width = _min_width;
+        height = _min_height;
 
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            Vec2i child_size = widget_compute_size(child);
+            Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
@@ -293,11 +333,11 @@ Vec2i Widget::size()
     }
     else
     {
-        list_foreach(Widget, child, childs)
+        list_foreach(Widget, child, _childs)
         {
-            Vec2i child_size = widget_compute_size(child);
+            Vec2i child_size = child->compute_size();
 
-            switch (layout.type)
+            switch (_layout.type)
             {
             case LAYOUT_HFLOW:
             case LAYOUT_HGRID:
@@ -318,21 +358,21 @@ Vec2i Widget::size()
             }
         }
 
-        if (layout.type == LAYOUT_HFLOW || layout.type == LAYOUT_HGRID)
+        if (_layout.type == LAYOUT_HFLOW || _layout.type == LAYOUT_HGRID)
         {
-            width += layout.spacing.x() * (childs->count() - 1);
+            width += _layout.spacing.x() * (_childs->count() - 1);
         }
 
-        if (layout.type == LAYOUT_VFLOW || layout.type == LAYOUT_VGRID)
+        if (_layout.type == LAYOUT_VFLOW || _layout.type == LAYOUT_VGRID)
         {
-            height += layout.spacing.y() * (childs->count() - 1);
+            height += _layout.spacing.y() * (_childs->count() - 1);
         }
     }
 
     return Vec2i(width, height);
 }
 
-/* --- Enable/ Disable state -------------------------------------------- */
+/* --- Enable/ Disable state ------------------------------------------------ */
 
 bool Widget::enabled() { return _enabled; }
 
@@ -372,34 +412,116 @@ void Widget::enable_if(bool condition)
         disable();
 }
 
+/* --- Childs --------------------------------------------------------------- */
+
+Widget *Widget::child_at(Vec2i position)
+{
+    if (_layout_attributes & LAYOUT_GREEDY)
+    {
+        return this;
+    }
+
+    list_foreach(Widget, child, _childs)
+    {
+        if (child->bound().containe(position))
+        {
+            return child->child_at(position);
+        }
+    }
+
+    return this;
+}
+
+void Widget::add_child(Widget *child)
+{
+    assert(child);
+    assert(child->_parent == nullptr);
+
+    child->_parent = this;
+    child->_window = _window;
+    list_pushback(_childs, child);
+
+    should_relayout();
+}
+
+void Widget::remove_child(Widget *child)
+{
+    assert(child->_parent == this);
+
+    child->_parent = nullptr;
+    child->_window = nullptr;
+    list_remove(_childs, child);
+
+    should_relayout();
+}
+
+void Widget::clear_childs()
+{
+    Widget *child = (Widget *)list_peek(_childs);
+    while (child)
+    {
+        delete child;
+        child = (Widget *)list_peek(_childs);
+    }
+}
+
 /* --- Focus state ---------------------------------------------------------- */
 
 bool Widget::focused()
 {
-    return window && window->focused_widget == this;
+    return _window && _window->focused_widget == this;
 }
 
 void Widget::focus()
 {
-    if (window)
-        window_set_focused_widget(window, this);
+    if (_window)
+        window_set_focused_widget(_window, this);
 }
 
 /* --- Paint ---------------------------------------------------------------- */
 
+void Widget::repaint(Painter &painter, Rectangle rectangle)
+{
+    if (bound().width() == 0 || bound().height() == 0)
+        return;
+
+    painter.push();
+    painter.clip(bound());
+
+    if (application_is_debbuging_layout())
+        painter.fill_insets(bound(), _insets, ALPHA(COLOR_MAGENTA, 0.25));
+
+    painter.push();
+    paint(painter, rectangle);
+    painter.pop();
+
+    list_foreach(Widget, child, _childs)
+    {
+        if (rectangle.colide_with(child->bound()))
+        {
+            child->repaint(painter, rectangle);
+        }
+    }
+
+    if (application_is_debbuging_layout())
+        painter.draw_rectangle(bound(), ALPHA(COLOR_CYAN, 0.25));
+
+    painter.pop();
+}
+
 void Widget::should_repaint()
 {
-    if (window)
+    if (_window)
     {
-        window_schedule_update(window, bound);
+        window_schedule_update(_window, bound());
     }
 }
 
 void Widget::should_repaint(Rectangle rectangle)
 {
-    if (window)
+    if (_window)
     {
-        window_schedule_update(window, rectangle);
+        window_schedule_update(_window, rectangle);
     }
 }
 
@@ -408,11 +530,27 @@ void Widget::should_repaint(Rectangle rectangle)
 void Widget::on(EventType event_type, EventHandler handler)
 {
     assert(event_type < EventType::__COUNT);
-    handlers[event_type] = move(handler);
+    _handlers[event_type] = move(handler);
+}
+
+void Widget::dispatch_event(Event *event)
+{
+    this->event(event);
+
+    if (!event->accepted && _handlers[event->type])
+    {
+        event->accepted = true;
+        _handlers[event->type](event);
+    }
+
+    if (!event->accepted && _parent)
+    {
+        _parent->dispatch_event(event);
+    }
 }
 
 static RefPtr<Font> _widget_font = nullptr;
-RefPtr<Font> widget_font()
+RefPtr<Font> Widget::font()
 {
     if (_widget_font == nullptr)
     {
@@ -422,188 +560,38 @@ RefPtr<Font> widget_font()
     return _widget_font;
 }
 
-void widget_invalidate_layout(Widget *widget)
+Vec2i Widget::compute_size()
 {
-    if (widget->window)
-    {
-        window_schedule_layout(widget->window);
-    }
-}
-
-void widget_add_child(Widget *widget, Widget *child)
-{
-    assert(child->parent == nullptr);
-
-    child->parent = widget;
-    child->window = widget->window;
-    list_pushback(widget->childs, child);
-
-    widget_invalidate_layout(widget);
-}
-
-void widget_remove_child(Widget *widget, Widget *child)
-{
-    assert(child->parent == widget);
-
-    child->parent = nullptr;
-    child->window = nullptr;
-    list_remove(widget->childs, child);
-
-    widget_invalidate_layout(widget);
-}
-
-void widget_clear_childs(Widget *widget)
-{
-    Widget *child = (Widget *)list_peek(widget->childs);
-    while (child)
-    {
-        delete child;
-        child = (Widget *)list_peek(widget->childs);
-    }
-}
-
-void widget_event(Widget *widget, Event *event)
-{
-    widget->event(event);
-
-    if (!event->accepted && widget->handlers[event->type])
-    {
-        event->accepted = true;
-        widget->handlers[event->type](event);
-    }
-
-    if (!event->accepted && widget->parent)
-    {
-        widget_event(widget->parent, event);
-    }
-}
-
-void widget_paint(Widget *widget, Painter &painter, Rectangle rectangle)
-{
-    if (widget_get_bound(widget).width() == 0 ||
-        widget_get_bound(widget).height() == 0)
-        return;
-
-    painter.push();
-    painter.clip(widget_get_bound(widget));
-
-    if (application_is_debbuging_layout())
-        painter.fill_insets(widget_get_bound(widget), widget->insets, ALPHA(COLOR_MAGENTA, 0.25));
-
-    painter.push();
-    widget->paint(painter, rectangle);
-    painter.pop();
-
-    list_foreach(Widget, child, widget->childs)
-    {
-        if (rectangle.colide_with(child->bound))
-        {
-            widget_paint(child, painter, rectangle);
-        }
-    }
-
-    if (application_is_debbuging_layout())
-        painter.draw_rectangle(widget_get_bound(widget), ALPHA(COLOR_CYAN, 0.25));
-
-    painter.pop();
-}
-
-Vec2i widget_compute_size(Widget *widget)
-{
-    Vec2i size = widget->size();
+    Vec2i size = this->size();
 
     int width = size.x();
     int height = size.y();
 
-    width += widget->insets.left();
-    width += widget->insets.right();
+    width += _insets.left();
+    width += _insets.right();
 
-    height += widget->insets.top();
-    height += widget->insets.bottom();
+    height += _insets.top();
+    height += _insets.bottom();
 
-    if (widget->max_width)
+    if (_max_width)
     {
-        width = MIN(width, widget->max_width);
+        width = MIN(width, _max_width);
     }
 
-    if (widget->max_height)
+    if (_max_height)
     {
-        height = MIN(height, widget->max_height);
+        height = MIN(height, _max_height);
     }
 
-    if (widget->min_width)
+    if (_min_width)
     {
-        width = MAX(width, widget->min_width);
+        width = MAX(width, _min_width);
     }
 
-    if (widget->min_height)
+    if (_min_height)
     {
-        height = MAX(height, widget->min_height);
+        height = MAX(height, _min_height);
     }
 
     return Vec2i(width, height);
-}
-
-Rectangle widget_get_bound(const Widget *widget)
-{
-    return widget->bound;
-}
-
-Rectangle widget_get_content_bound(const Widget *widget)
-{
-    return widget_get_bound(widget).shrinked(widget->insets);
-}
-
-Widget *widget_get_child_at(Widget *parent, Vec2i position)
-{
-    if (parent->layout_attributes & LAYOUT_GREEDY)
-    {
-        return parent;
-    }
-
-    list_foreach(Widget, child, parent->childs)
-    {
-        if (widget_get_bound(child).containe(position))
-        {
-            return widget_get_child_at(child, position);
-        }
-    }
-
-    return parent;
-}
-
-Color widget_get_color(Widget *widget, ThemeColorRole role)
-{
-    if (!widget->enabled() || (widget->parent && !widget->parent->enabled()))
-    {
-        if (role == THEME_FOREGROUND)
-        {
-            role = THEME_FOREGROUND_INACTIVE;
-        }
-
-        if (role == THEME_SELECTION)
-        {
-            role = THEME_SELECTION_INACTIVE;
-        }
-
-        if (role == THEME_ACCENT)
-        {
-            role = THEME_ACCENT_INACTIVE;
-        }
-    }
-
-    if (widget->colors[role].overwritten)
-    {
-        return widget->colors[role].color;
-    }
-
-    return window_get_color(widget->window, role);
-}
-
-void widget_set_color(Widget *widget, ThemeColorRole role, Color color)
-{
-    widget->colors[role].overwritten = true;
-    widget->colors[role].color = color;
-
-    widget->should_repaint();
 }

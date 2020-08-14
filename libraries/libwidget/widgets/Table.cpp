@@ -6,7 +6,7 @@
 
 Rectangle Table::body_bound() const
 {
-    return widget_get_content_bound(this);
+    return content_bound();
 }
 
 Rectangle Table::header_bound() const
@@ -83,7 +83,7 @@ void Table::paint_cell(Painter &painter, int row, int column)
 
     if (row % 2 == 0)
     {
-        painter.fill_rectangle(bound, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.05));
+        painter.fill_rectangle(bound, ALPHA(color(THEME_FOREGROUND), 0.05));
     }
 
     if (data.has_icon())
@@ -92,21 +92,21 @@ void Table::paint_cell(Painter &painter, int row, int column)
             *data.icon(),
             ICON_18PX,
             Rectangle(bound.x() + 7, bound.y() + 7, 18, 18),
-            widget_get_color(this, THEME_FOREGROUND));
+            color(THEME_FOREGROUND));
 
         painter.draw_string(
-            *widget_font(),
+            *font(),
             data.as_string(),
             Vec2i(bound.x() + 7 + 18 + 7, bound.y() + 20),
-            widget_get_color(this, THEME_FOREGROUND));
+            color(THEME_FOREGROUND));
     }
     else
     {
         painter.draw_string(
-            *widget_font(),
+            *font(),
             data.as_string(),
             Vec2i(bound.x() + 7, bound.y() + 20),
-            widget_get_color(this, THEME_FOREGROUND));
+            color(THEME_FOREGROUND));
     }
 
     painter.pop();
@@ -131,7 +131,7 @@ void Table::paint(Painter &painter, Rectangle rectangle)
     __unused(rectangle);
 
     painter.push();
-    painter.clip(widget_get_bound(this));
+    painter.clip(bound());
 
     int column_count = model_column_count(_model);
     int column_width = body_bound().width() / column_count;
@@ -143,8 +143,8 @@ void Table::paint(Painter &painter, Rectangle rectangle)
 
         if (_selected == row)
         {
-            painter.fill_rectangle(row_bound(row), widget_get_color(this, THEME_SELECTION));
-            painter.draw_rectangle(row_bound(row), widget_get_color(this, THEME_SELECTION));
+            painter.fill_rectangle(row_bound(row), color(THEME_SELECTION));
+            painter.draw_rectangle(row_bound(row), color(THEME_SELECTION));
         }
 
         for (int column = 0; column < column_count; column++)
@@ -154,7 +154,7 @@ void Table::paint(Painter &painter, Rectangle rectangle)
     }
 
     painter.blur_rectangle(header_bound(), 8);
-    painter.fill_rectangle(header_bound(), ALPHA(widget_get_color(this, THEME_BACKGROUND), 0.9));
+    painter.fill_rectangle(header_bound(), ALPHA(color(THEME_BACKGROUND), 0.9));
 
     for (int column = 0; column < column_count; column++)
     {
@@ -166,11 +166,11 @@ void Table::paint(Painter &painter, Rectangle rectangle)
 
         if (column < column_count - 1)
         {
-            painter.fill_rectangle(header_bound_cell.take_right(1), widget_get_color(this, THEME_BORDER));
+            painter.fill_rectangle(header_bound_cell.take_right(1), color(THEME_BORDER));
         }
 
-        painter.draw_string(*widget_font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), widget_get_color(this, THEME_FOREGROUND));
-        painter.draw_string(*widget_font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), widget_get_color(this, THEME_FOREGROUND));
+        painter.draw_string(*font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
+        painter.draw_string(*font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
     }
 
     painter.pop();
@@ -187,6 +187,6 @@ void Table::event(Event *event)
 
 void Table::do_layout()
 {
-    _scrollbar->bound = scrollbar_bound();
+    _scrollbar->bound(scrollbar_bound());
     _scrollbar->update(TABLE_ROW_HEIGHT * model_row_count(_model), list_bound().height(), _scroll_offset);
 }

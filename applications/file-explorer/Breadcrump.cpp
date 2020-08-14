@@ -29,32 +29,32 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
     int current = 0;
 
     Rectangle computer_icon_bound(
-        widget_get_bound(this).x(),
-        widget_get_bound(this).y(),
+        bound().x(),
+        bound().y(),
         _icon_computer->bound(ICON_18PX).width() + 16,
-        widget_get_bound(this).height());
+        bound().height());
 
     painter.blit_icon(
         *_icon_computer,
         ICON_18PX,
         _icon_computer->bound(ICON_18PX).centered_within(computer_icon_bound),
-        widget_get_color(this, THEME_FOREGROUND));
+        color(THEME_FOREGROUND));
 
     current += computer_icon_bound.width();
 
     if (path_element_count(_path) != 0)
     {
         Rectangle expand_icon_bound(
-            widget_get_bound(this).x() + current,
-            widget_get_bound(this).y(),
+            bound().x() + current,
+            bound().y(),
             _icon_expand->bound(ICON_18PX).width(),
-            widget_get_bound(this).height());
+            bound().height());
 
         painter.blit_icon(
             *_icon_expand,
             ICON_18PX,
             _icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
-            widget_get_color(this, THEME_FOREGROUND));
+            color(THEME_FOREGROUND));
 
         current += expand_icon_bound.width();
     }
@@ -63,35 +63,35 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
     {
         const char *element = path_peek_at(_path, i);
 
-        int text_width = widget_font()->mesure_string(element).width();
+        int text_width = font()->mesure_string(element).width();
 
         Rectangle element_bound(
-            widget_get_bound(this).x() + current,
-            widget_get_bound(this).y(),
+            bound().x() + current,
+            bound().y(),
             text_width,
-            widget_get_bound(this).height());
+            bound().height());
 
         painter.draw_string(
-            *widget_font(),
+            *font(),
             element,
             element_bound.position() + Vec2i(0, 19),
-            widget_get_color(this, THEME_FOREGROUND));
+            color(THEME_FOREGROUND));
 
         current += text_width;
 
         if (i != path_element_count(_path) - 1)
         {
             Rectangle expand_icon_bound(
-                widget_get_bound(this).x() + current,
-                widget_get_bound(this).y(),
+                bound().x() + current,
+                bound().y(),
                 _icon_expand->bound(ICON_18PX).width(),
-                widget_get_bound(this).height());
+                bound().height());
 
             painter.blit_icon(
                 *_icon_expand,
                 ICON_18PX,
                 _icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
-                widget_get_color(this, THEME_FOREGROUND));
+                color(THEME_FOREGROUND));
 
             current += expand_icon_bound.width();
         }

@@ -16,8 +16,8 @@ DialogButton dialog_message(
     window_set_icon(window, icon);
     window_set_title(window, title);
     window_set_size(window, Vec2i(300, 200));
-    window_root(window)->layout = VFLOW(0);
-    window_root(window)->insets = Insets(8);
+    window_root(window)->layout(VFLOW(0));
+    window_root(window)->insets(Insets(8));
 
     window->on(Event::WINDOW_CLOSING, [window](auto) {
         application_exit_nested(DIALOG_BUTTON_CLOSED);
@@ -25,12 +25,12 @@ DialogButton dialog_message(
     });
 
     Widget *message_label = new Label(window_root(window), message);
-    message_label->layout_attributes = LAYOUT_FILL;
+    message_label->attributes(LAYOUT_FILL);
 
     Widget *buttons_container = new Container(window_root(window));
-    buttons_container->layout = HFLOW(4);
+    buttons_container->layout(HFLOW(4));
     auto spacer = new Container(buttons_container);
-    spacer->layout_attributes = LAYOUT_FILL;
+    spacer->attributes(LAYOUT_FILL);
 
     Widget *button_no = new Button(buttons_container, BUTTON_OUTLINE, "No");
     Widget *button_yes = new Button(buttons_container, BUTTON_FILLED, "Yes");

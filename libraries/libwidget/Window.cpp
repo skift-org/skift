@@ -16,10 +16,10 @@
 
 void window_populate_header(Window *window)
 {
-    widget_clear_childs(window->header_container);
+    window->header_container->clear_childs();
 
-    window_header(window)->layout = HFLOW(4);
-    window_header(window)->insets = Insets(6, 6);
+    window_header(window)->layout(HFLOW(4));
+    window_header(window)->insets(Insets(6, 6));
 
     new Button(
         window_header(window),
@@ -28,19 +28,19 @@ void window_populate_header(Window *window)
         window->title);
 
     auto spacer = new Container(window_header(window));
-    spacer->layout_attributes = LAYOUT_FILL;
+    spacer->attributes(LAYOUT_FILL);
 
     if (window->flags & WINDOW_RESIZABLE)
     {
         Widget *button_minimize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-minimize"));
-        button_minimize->insets = Insets(3);
+        button_minimize->insets(Insets(3));
 
         Widget *button_maximize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
-        button_maximize->insets = Insets(3);
+        button_maximize->insets(Insets(3));
     }
 
     Widget *close_button = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
-    close_button->insets = Insets(3);
+    close_button->insets(Insets(3));
 
     close_button->on(Event::ACTION, [window](auto) {
         Event close_event = {};
@@ -70,12 +70,12 @@ void window_initialize(Window *window, WindowFlag flags)
     window->dirty_rect = list_create();
 
     window->header_container = new Container(nullptr);
-    window->header_container->window = window;
+    window->header_container->window(window);
 
     window_populate_header(window);
 
     window->root_container = new Container(nullptr);
-    window->root_container->window = window;
+    window->root_container->window(window);
 
     window->focused_widget = window->root_container;
     window->widget_by_id = hashmap_create_string_to_value();
@@ -247,21 +247,21 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
     {
         if (window_root(window))
         {
-            widget_paint(window_root(window), painter, rectangle);
+            window_root(window)->repaint(painter, rectangle);
         }
     }
     else
     {
         if (window_root(window))
         {
-            widget_paint(window_root(window), painter, rectangle);
+            window_root(window)->repaint(painter, rectangle);
         }
 
         if (!(window->flags & WINDOW_BORDERLESS))
         {
             if (window_header(window))
             {
-                widget_paint(window_header(window), painter, rectangle);
+                window_header(window)->repaint(painter, rectangle);
             }
 
             painter.draw_rectangle(window_bound(window), window_get_color(window, THEME_ACCENT));
@@ -323,9 +323,9 @@ void window_do_resize(Window *window, Vec2i mouse_position)
                         .with_height(window_bound_on_screen(window).height());
     }
 
-    Vec2i content_size = widget_compute_size(window_root(window));
+    Vec2i content_size = window_root(window)->compute_size();
 
-    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(widget_compute_size(window_header(window)).x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
+    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(window_header(window)->compute_size().x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
     new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
 
     window_set_bound(window, new_bound);
@@ -338,14 +338,14 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (widget_get_bound(window_root(window)).containe(position))
+    if (window_root(window)->bound().containe(position))
     {
-        return widget_get_child_at(window_root(window), position);
+        return window_root(window)->child_at(position);
     }
 
-    if (widget_get_bound(window_header(window)).containe(position))
+    if (window_header(window)->bound().containe(position))
     {
-        return widget_get_child_at(window_header(window), position);
+        return window_header(window)->child_at(position);
     }
 
     return nullptr;
@@ -389,7 +389,7 @@ void window_event(Window *window, Event *event)
 
         if (window->mouse_over_widget)
         {
-            widget_event(window->mouse_over_widget, &mouse_leave);
+            window->mouse_over_widget->dispatch_event(&mouse_leave);
         }
 
         if (window->flags & WINDOW_POP_OVER)
@@ -460,7 +460,7 @@ void window_event(Window *window, Event *event)
 
                 if (window->mouse_over_widget)
                 {
-                    widget_event(window->mouse_over_widget, &mouse_leave);
+                    window->mouse_over_widget->dispatch_event(&mouse_leave);
                 }
 
                 Event mouse_enter = *event;
@@ -468,7 +468,7 @@ void window_event(Window *window, Event *event)
 
                 if (mouse_over_widget)
                 {
-                    widget_event(mouse_over_widget, &mouse_enter);
+                    mouse_over_widget->dispatch_event(&mouse_enter);
                 }
 
                 window->mouse_over_widget = mouse_over_widget;
@@ -476,7 +476,7 @@ void window_event(Window *window, Event *event)
 
             if (window->mouse_focused_widget)
             {
-                widget_event(window->mouse_focused_widget, event);
+                window->mouse_focused_widget->dispatch_event(event);
             }
         }
 
@@ -485,26 +485,26 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_BUTTON_PRESS:
     {
-        if (widget_get_bound(window_root(window)).containe(event->mouse.position))
+        if (window_root(window)->bound().containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {
                 window->mouse_focused_widget = widget;
-                widget_event(widget, event);
+                widget->dispatch_event(event);
             }
         }
 
         if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && widget_get_bound(window_header(window)).containe(event->mouse.position))
+            if (!event->accepted && window_header(window)->bound().containe(event->mouse.position))
             {
-                Widget *widget = widget_get_child_at(window_header(window), event->mouse.position);
+                Widget *widget = window_header(window)->child_at(event->mouse.position);
 
                 if (widget)
                 {
-                    widget_event(widget, event);
+                    widget->dispatch_event(event);
                 }
             }
 
@@ -536,7 +536,7 @@ void window_event(Window *window, Event *event)
         if (widget)
         {
             window->mouse_focused_widget = widget;
-            widget_event(widget, event);
+            widget->dispatch_event(event);
         }
 
         if (window->is_dragging &&
@@ -556,13 +556,13 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_DOUBLE_CLICK:
     {
-        if (widget_get_bound(window_root(window)).containe(event->mouse.position))
+        if (window_root(window)->bound().containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
             if (widget)
             {
-                widget_event(widget, event);
+                widget->dispatch_event(event);
             }
         }
 
@@ -575,7 +575,7 @@ void window_event(Window *window, Event *event)
     {
         if (window->focused_widget)
         {
-            widget_event(window->focused_widget, event);
+            window->focused_widget->dispatch_event(event);
         }
         break;
     }
@@ -751,10 +751,10 @@ void window_schedule_update(Window *window, Rectangle rectangle)
 
 void window_layout(Window *window)
 {
-    window_header(window)->bound = window_header_bound(window);
+    window_header(window)->bound(window_header_bound(window));
     window_header(window)->relayout();
 
-    window_root(window)->bound = window_content_bound(window);
+    window_root(window)->bound(window_content_bound(window));
     window_root(window)->relayout();
 
     window->dirty_layout = false;

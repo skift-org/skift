@@ -26,17 +26,17 @@ int main(int argc, char **argv)
     window_set_title(window, "Demos");
     window_set_size(window, Vec2i(500, 400));
 
-    window_root(window)->layout = VFLOW(0);
+    window_root(window)->layout(VFLOW(0));
 
     Widget *navbar = new Container(window_root(window));
-    navbar->insets = Insets(4, 4);
-    navbar->layout = HGRID(4);
-    navbar->bound = navbar->bound.with_height(32);
-    navbar->bound = navbar->bound.with_width(128);
+    navbar->insets(Insets(4, 4));
+    navbar->layout(HGRID(4));
+    navbar->bound(navbar->bound().with_height(32));
+    navbar->bound(navbar->bound().with_width(128));
 
     DemoWidget *demo_widget = nullptr;
     demo_widget = new DemoWidget(window_root(window));
-    demo_widget->layout_attributes = LAYOUT_FILL;
+    demo_widget->attributes(LAYOUT_FILL);
     demo_widget->demo(&_demos[0]);
 
     for (size_t i = 0; _demos[i].name; i++)

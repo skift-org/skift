@@ -210,25 +210,22 @@ void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
 {
     if (markup_node_has_attribute(node, "id"))
     {
-        window_register_widget_by_id(
-            widget->window,
-            markup_node_get_attribute(node, "id"),
-            widget);
+        widget->id(markup_node_get_attribute(node, "id"));
     }
 
     if (markup_node_has_attribute(node, "layout"))
     {
-        widget->layout = layout_parse(markup_node_get_attribute(node, "layout"));
+        widget->layout(layout_parse(markup_node_get_attribute(node, "layout")));
     }
 
     if (markup_node_has_attribute(node, "padding"))
     {
-        widget->insets = insets_parse(markup_node_get_attribute(node, "padding"));
+        widget->insets(insets_parse(markup_node_get_attribute(node, "padding")));
     }
 
     if (markup_node_has_attribute(node, "fill"))
     {
-        widget->layout_attributes = LAYOUT_FILL;
+        widget->attributes(LAYOUT_FILL);
     }
 }
 

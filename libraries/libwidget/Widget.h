@@ -60,23 +60,70 @@ struct WidgetColor
 
 struct Widget
 {
+private:
     bool _enabled;
-    Rectangle bound;
+    Rectangle _bound;
 
-    int max_height = 0;
-    int max_width = 0;
-    int min_height = 0;
-    int min_width = 0;
-    Insets insets = {};
-    WidgetColor colors[__THEME_COLOR_COUNT] = {};
-    Layout layout = {}; // FIXME: this shoul be a separeted object
-    LayoutAttributes layout_attributes = {};
+    int _max_height = 0;
+    int _max_width = 0;
+    int _min_height = 0;
+    int _min_width = 0;
+    Insets _insets = {};
+    WidgetColor _colors[__THEME_COLOR_COUNT] = {};
+    Layout _layout = {}; // FIXME: this shoul be a separeted object
+    LayoutAttributes _layout_attributes = {};
 
-    EventHandler handlers[EventType::__COUNT] = {};
+    EventHandler _handlers[EventType::__COUNT] = {};
 
-    struct Widget *parent = {};
-    struct Window *window = {};
-    List *childs = {};
+    struct Widget *_parent = {};
+    struct Window *_window = {};
+
+    List *_childs = {};
+
+public:
+    void id(const char *id);
+
+    RefPtr<Font> font();
+
+    Color color(ThemeColorRole role);
+    void color(ThemeColorRole role, Color color);
+
+    Rectangle content_bound() const { return bound().shrinked(_insets); }
+
+    Rectangle bound() const { return _bound; }
+    void bound(Rectangle value) { _bound = value; }
+
+    Insets insets() const { return _insets; }
+    void insets(Insets insets)
+    {
+        _insets = insets;
+        should_relayout();
+    }
+
+    void layout(Layout layout) { _layout = layout; }
+
+    void attributes(LayoutAttributes attributes) { _layout_attributes = attributes; }
+    LayoutAttributes attributes() { return _layout_attributes; }
+
+    void window(Window *window)
+    {
+        assert(!_window);
+
+        _window = window;
+    }
+
+    Window *window()
+    {
+        return _window;
+    }
+
+    void max_height(int value) { _max_height = value; }
+
+    void max_width(int value) { _max_width = value; }
+
+    void min_height(int value) { _min_height = value; }
+
+    void min_width(int value) { _min_width = value; }
 
     /* --- subclass API ----------------------------------------------------- */
 
@@ -106,6 +153,16 @@ struct Widget
 
     void enable_if(bool condition);
 
+    /* --- Childs ----------------------------------------------------------- */
+
+    Widget *child_at(Vec2i position);
+
+    void add_child(Widget *child);
+
+    void remove_child(Widget *child);
+
+    void clear_childs();
+
     /* --- Focus state ------------------------------------------------------ */
 
     bool focused();
@@ -114,45 +171,25 @@ struct Widget
 
     /* --- Paint ------------------------------------------------------------ */
 
+    void repaint(Painter &painter, Rectangle rectangle);
+
     void should_repaint();
 
     void should_repaint(Rectangle rectangle);
 
     /* --- Layout ----------------------------------------------------------- */
 
+    void do_vhgrid_layout(Layout layout, Dimension dim);
+
     void relayout();
 
     void should_relayout();
 
+    Vec2i compute_size();
+
     /* --- Events ----------------------------------------------------------- */
 
     void on(EventType event, EventHandler handler);
+
+    void dispatch_event(Event *event);
 };
-
-RefPtr<Font> widget_font();
-
-void widget_event(Widget *widget, struct Event *event);
-
-void widget_paint(Widget *widget, struct Painter &painter, Rectangle rectangle);
-
-/* --- Widget childs ------------------------------------ */
-
-Widget *widget_get_child_at(Widget *parent, Vec2i position);
-
-void widget_add_child(Widget *widget, Widget *child);
-
-void widget_remove_child(Widget *widget, Widget *child);
-
-void widget_clear_childs(Widget *widget);
-
-/* --- Widget Style ------------------------------------- */
-
-Color widget_get_color(Widget *widget, ThemeColorRole role);
-
-void widget_set_color(Widget *widget, ThemeColorRole role, Color color);
-
-Rectangle widget_get_bound(const Widget *widget);
-
-Rectangle widget_get_content_bound(const Widget *widget);
-
-Vec2i widget_compute_size(Widget *widget);

@@ -26,15 +26,15 @@ void DemoWidget::paint(Painter &painter, Rectangle)
 {
     if (_bitmap == nullptr)
     {
-        _bitmap = Bitmap::create_shared(widget_get_bound(this).width(), widget_get_bound(this).height()).take_value();
+        _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
         _painter = own<Painter>(_bitmap);
         _painter->clear(COLOR_BLACK);
     }
 
-    if (widget_get_bound(this).width() != _bitmap->width() ||
-        widget_get_bound(this).height() != _bitmap->height())
+    if (bound().width() != _bitmap->width() ||
+        bound().height() != _bitmap->height())
     {
-        _bitmap = Bitmap::create_shared(widget_get_bound(this).width(), widget_get_bound(this).height()).take_value();
+        _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
         _painter = own<Painter>(_bitmap);
         _painter->clear(COLOR_BLACK);
     }
@@ -44,8 +44,8 @@ void DemoWidget::paint(Painter &painter, Rectangle)
         _demo->callback(*_painter, _bitmap->bound(), _time);
     }
 
-    painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), widget_get_bound(this));
+    painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), bound());
 
-    painter.draw_string(*widget_font(), _demo->name, widget_get_bound(this).position() + Vec2i(9, 17), COLOR_BLACK);
-    painter.draw_string(*widget_font(), _demo->name, widget_get_bound(this).position() + Vec2i(8, 16), COLOR_WHITE);
+    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(9, 17), COLOR_BLACK);
+    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(8, 16), COLOR_WHITE);
 }

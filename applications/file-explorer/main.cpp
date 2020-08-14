@@ -94,7 +94,7 @@ Window *file_explorer_window_create(const char *current_path)
     window_set_size(window, Vec2i(700, 500));
 
     Widget *root = window_root(window);
-    root->layout = VFLOW(0);
+    root->layout(VFLOW(0));
 
     window->current_path = path_create(current_path);
     window->backward_history = list_create();
@@ -160,7 +160,7 @@ Window *file_explorer_window_create(const char *current_path)
     new Separator(toolbar);
 
     window->breadcrumb = new Breadcrumb(toolbar, window->current_path);
-    window->breadcrumb->layout_attributes = LAYOUT_FILL;
+    window->breadcrumb->attributes(LAYOUT_FILL);
 
     new Separator(toolbar);
 
@@ -171,7 +171,7 @@ Window *file_explorer_window_create(const char *current_path)
     /// --- Table view --- ///
     window->model = filesystem_model_create(current_path);
     window->table = new Table(root, window->model);
-    window->table->layout_attributes = LAYOUT_FILL;
+    window->table->attributes(LAYOUT_FILL);
 
     window->table->on(Event::MOUSE_DOUBLE_CLICK, [window](auto) {
         if (window->table->selected() >= 0)

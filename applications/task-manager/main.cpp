@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     window_set_title(window, "Task Manager");
     window_set_size(window, Vec2i(700, 500));
 
-    window_root(window)->layout = VFLOW(0);
+    window_root(window)->layout(VFLOW(0));
 
     /// --- Toolbar --- ///
     auto toolbar = toolbar_create(window_root(window));
@@ -120,27 +120,27 @@ int main(int argc, char **argv)
     window->table_model = task_model_create();
 
     window->table = new Table(window_root(window), window->table_model);
-    window->table->layout_attributes = LAYOUT_FILL;
+    window->table->attributes(LAYOUT_FILL);
     window->table_timer = timer_create(window, 1000, (TimerCallback)widget_table_update);
     timer_start(window->table_timer);
 
     /// --- Graphs --- ///
     auto graphs_container = new Panel(window_root(window));
-    graphs_container->layout = HFLOW(0);
-    graphs_container->max_height = 96;
+    graphs_container->layout(HFLOW(0));
+    graphs_container->max_height(96);
 
     window->cpu_graph = new Graph(graphs_container, 256, COLOR_SEAGREEN);
-    window->cpu_graph->layout = VFLOW(0);
-    window->cpu_graph->insets = Insets(8);
-    window->cpu_graph->layout_attributes = LAYOUT_FILL;
+    window->cpu_graph->layout(VFLOW(0));
+    window->cpu_graph->insets(Insets(8));
+    window->cpu_graph->attributes(LAYOUT_FILL);
 
     auto cpu_icon_and_text = new Container(window->cpu_graph);
-    cpu_icon_and_text->layout = HFLOW(4);
+    cpu_icon_and_text->layout(HFLOW(4));
     new IconPanel(cpu_icon_and_text, Icon::get("memory"));
     new Label(cpu_icon_and_text, "Processor");
 
     auto cpu_filler = new Container(window->cpu_graph);
-    cpu_filler->layout_attributes = LAYOUT_FILL;
+    cpu_filler->attributes(LAYOUT_FILL);
 
     window->cpu_average = new Label(window->cpu_graph, "Average: nil%", Position::RIGHT);
     window->cpu_greedy = new Label(window->cpu_graph, "Most greedy: the compositor eats a lot", Position::RIGHT);
@@ -151,17 +151,17 @@ int main(int argc, char **argv)
     new Separator(graphs_container);
 
     window->ram_graph = new Graph(graphs_container, 256, COLOR_ROYALBLUE);
-    window->ram_graph->layout = VFLOW(0);
-    window->ram_graph->insets = Insets(8);
-    window->ram_graph->layout_attributes = LAYOUT_FILL;
+    window->ram_graph->layout(VFLOW(0));
+    window->ram_graph->insets(Insets(8));
+    window->ram_graph->attributes(LAYOUT_FILL);
 
     auto ram_icon_and_text = new Container(window->ram_graph);
-    ram_icon_and_text->layout = HFLOW(4);
+    ram_icon_and_text->layout(HFLOW(4));
     new IconPanel(ram_icon_and_text, Icon::get("chip"));
     new Label(ram_icon_and_text, "Memory");
 
     auto ram_filler = new Container(window->ram_graph);
-    ram_filler->layout_attributes = LAYOUT_FILL;
+    ram_filler->attributes(LAYOUT_FILL);
 
     window->ram_usage = new Label(window->ram_graph, "Usage: nil Mio", Position::RIGHT);
     window->ram_avaliable = new Label(window->ram_graph, "Avaliable: nil Mio", Position::RIGHT);

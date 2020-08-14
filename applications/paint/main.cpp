@@ -56,8 +56,8 @@ struct PaintWindow : public Window
 
 static void update_toolbar(PaintWindow *window)
 {
-    widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color());
-    widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color());
+    window->primary_color->color(THEME_MIDDLEGROUND, window->document->primary_color());
+    window->secondary_color->color(THEME_MIDDLEGROUND, window->document->secondary_color());
 }
 
 static void create_toolbar(PaintWindow *window, Widget *parent)
@@ -111,20 +111,20 @@ static void create_toolbar(PaintWindow *window, Widget *parent)
     new Separator(toolbar);
 
     Widget *primary_color_container = new Container(toolbar);
-    primary_color_container->min_width = 22;
-    primary_color_container->insets = Insets(4);
+    primary_color_container->min_width(22);
+    primary_color_container->insets(Insets(4));
 
     window->primary_color = new Panel(primary_color_container);
     window->primary_color->border_radius(4);
-    widget_set_color(window->primary_color, THEME_MIDDLEGROUND, window->document->primary_color());
+    window->primary_color->color(THEME_MIDDLEGROUND, window->document->primary_color());
 
     Widget *secondary_color_container = new Container(toolbar);
-    secondary_color_container->min_width = 22;
-    secondary_color_container->insets = Insets(4);
+    secondary_color_container->min_width(22);
+    secondary_color_container->insets(Insets(4));
 
     window->secondary_color = new Panel(secondary_color_container);
     window->secondary_color->border_radius(4);
-    widget_set_color(window->secondary_color, THEME_MIDDLEGROUND, window->document->secondary_color());
+    window->secondary_color->color(THEME_MIDDLEGROUND, window->document->secondary_color());
 }
 
 static void create_color_palette(PaintWindow *window, Widget *parent)
@@ -132,7 +132,7 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
     __unused(window);
 
     Widget *palette = toolbar_create(parent);
-    palette->layout = HFLOW(4);
+    palette->layout(HFLOW(4));
 
     for (size_t i = 0; i < 18; i++)
     {
@@ -140,8 +140,8 @@ static void create_color_palette(PaintWindow *window, Widget *parent)
 
         auto color_widget = new Panel(palette);
         color_widget->border_radius(4);
-        color_widget->min_width = 30;
-        widget_set_color(color_widget, THEME_MIDDLEGROUND, color);
+        color_widget->min_width(30);
+        color_widget->color(THEME_MIDDLEGROUND, color);
 
         color_widget->on(Event::MOUSE_BUTTON_PRESS, [window, color](auto event) {
             if (event->mouse.button == MOUSE_BUTTON_LEFT)
@@ -170,12 +170,12 @@ static Window *paint_create_window(RefPtr<PaintDocument> document)
     window->document = document;
 
     Widget *root = window_root(window);
-    root->layout = VFLOW(0);
+    root->layout(VFLOW(0));
 
     create_toolbar(window, root);
 
     window->canvas = new PaintCanvas(root, window->document);
-    window->canvas->layout_attributes = LAYOUT_FILL;
+    window->canvas->attributes(LAYOUT_FILL);
 
     create_color_palette(window, root);
 

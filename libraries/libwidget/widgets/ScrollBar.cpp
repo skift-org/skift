@@ -18,12 +18,12 @@ void ScrollBar::paint(Painter &painter, Rectangle rectangle)
 
     if (_mouse_over)
     {
-        painter.fill_rounded_rectangle(track_bound(), 4, widget_get_color(this, THEME_BORDER));
-        painter.fill_rounded_rectangle(thumb_bound(), 4, widget_get_color(this, THEME_BORDER));
+        painter.fill_rounded_rectangle(track_bound(), 4, color(THEME_BORDER));
+        painter.fill_rounded_rectangle(thumb_bound(), 4, color(THEME_BORDER));
     }
     else
     {
-        painter.fill_rounded_rectangle(thumb_bound(), 4, widget_get_color(this, THEME_BORDER));
+        painter.fill_rounded_rectangle(thumb_bound(), 4, color(THEME_BORDER));
     }
 }
 
@@ -34,7 +34,7 @@ void ScrollBar::scroll_to(Vec2i position)
 
     Event event_value_changed = {};
     event_value_changed.type = Event::VALUE_CHANGE;
-    widget_event(this, &event_value_changed);
+    dispatch_event(&event_value_changed);
 
     should_repaint();
 }

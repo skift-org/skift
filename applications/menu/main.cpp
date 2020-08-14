@@ -112,26 +112,17 @@ List *load_menu()
     return menu;
 }
 
-void menu_item_click(MenuEntry *entry, Widget *sender, Event *event)
-{
-    __unused(event);
-
-    process_run(entry->command, nullptr);
-
-    window_hide(sender->window);
-}
-
 void menu_create_list(Widget *parent, List *menu)
 {
     Widget *list = new Container(parent);
-    list->layout = VFLOW(4);
-    list->layout_attributes = LAYOUT_FILL;
-    list->insets = Insets(4);
+    list->layout(VFLOW(4));
+    list->attributes(LAYOUT_FILL);
+    list->insets(Insets(4));
 
     list_foreach(MenuEntry, entry, menu)
     {
         auto item = new Button(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);
-        item->insets = Insets(8);
+        item->insets(Insets(8));
 
         item->on(Event::ACTION, [entry](auto) {
             process_run(entry->command, nullptr);
@@ -152,7 +143,7 @@ int main(int argc, char **argv)
     window_set_position(window, Vec2i::zero());
     window_set_size(window, Vec2i(320, screen_get_bound().height()));
 
-    window_root(window)->layout = VFLOW(8);
+    window_root(window)->layout(VFLOW(8));
 
     menu_create_list(window_root(window), menu);
 

@@ -13,7 +13,7 @@ void PaintCanvas::paint(Painter &painter, Rectangle rectangle)
     __unused(rectangle);
 
     painter.fill_checkboard(paint_area(), 8, COLOR_WHITE, COLOR_GAINSBORO);
-    painter.draw_rectangle(paint_area(), widget_get_color(this, THEME_BORDER));
+    painter.draw_rectangle(paint_area(), color(THEME_BORDER));
 
     painter.blit_bitmap(
         _document->bitmap(),

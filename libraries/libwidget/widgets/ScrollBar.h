@@ -15,7 +15,7 @@ private:
 
     Rectangle track_bound()
     {
-        return widget_get_bound(this).shrinked(Insets(4, 4, 4));
+        return bound().shrinked(Insets(4, 4, 4));
     }
 
     Rectangle thumb_bound()

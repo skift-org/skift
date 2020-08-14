@@ -33,7 +33,7 @@ void terminal_widget_cursor_callback(TerminalWidget *widget)
     int cx = widget->terminal()->cursor.x;
     int cy = widget->terminal()->cursor.y;
 
-    widget->should_repaint(terminal::cell_bound(cx, cy).offset(widget_get_bound(widget).position()));
+    widget->should_repaint(terminal::cell_bound(cx, cy).offset(widget->bound().position()));
 }
 
 Terminal *terminal_widget_renderer_create(TerminalWidget *terminal_widget)
@@ -83,12 +83,12 @@ TerminalWidget::~TerminalWidget()
 
 void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 {
-    painter.clear_rectangle(rectangle, widget_get_color(this, THEME_ANSI_BACKGROUND));
+    painter.clear_rectangle(rectangle, color(THEME_ANSI_BACKGROUND));
 
     painter.push();
-    painter.transform(widget_get_bound(this).position());
+    painter.transform(bound().position());
 
-    rectangle = rectangle.offset(-widget_get_bound(this).position());
+    rectangle = rectangle.offset(-bound().position());
 
     Terminal *terminal = _terminal;
 
@@ -109,7 +109,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
     {
         TerminalCell cell = terminal_cell_at(terminal, cx, cy);
 
-        if (window_is_focused(window))
+        if (window_is_focused(window()))
         {
             if (_cursor_blink)
             {
@@ -134,7 +134,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
         else
         {
             terminal::render_cell(painter, cx, cy, cell);
-            painter.draw_rectangle(terminal::cell_bound(cx, cy), widget_get_color(this, THEME_ANSI_CURSOR));
+            painter.draw_rectangle(terminal::cell_bound(cx, cy), color(THEME_ANSI_CURSOR));
         }
     }
 
@@ -177,10 +177,8 @@ void TerminalWidget::event(Event *event)
 
 void TerminalWidget::do_layout()
 {
-    logger_trace("layout ?");
-
-    int width = widget_get_bound(this).width() / terminal::cell_size().x();
-    int height = widget_get_bound(this).height() / terminal::cell_size().y();
+    int width = bound().width() / terminal::cell_size().x();
+    int height = bound().height() / terminal::cell_size().y();
 
     width = MAX(width, 8);
     height = MAX(height, 8);

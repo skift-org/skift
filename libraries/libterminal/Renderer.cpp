@@ -9,6 +9,8 @@ void terminal_renderer_initialize(TerminalRenderer *renderer)
 
 void terminal_renderer_destroy(TerminalRenderer *renderer)
 {
-    renderer->destroy(renderer);
+    if (renderer->destroy)
+        renderer->destroy(renderer);
+
     free(renderer);
 }

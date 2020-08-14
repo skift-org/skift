@@ -33,15 +33,15 @@ void Image::paint(Painter &painter, Rectangle rectangle)
         return;
     }
 
-    Rectangle destination = widget_get_bound(this);
+    Rectangle destination = bound();
 
     if (_scalling == ImageScalling::CENTER)
     {
-        destination = _bitmap->bound().centered_within(widget_get_bound(this));
+        destination = _bitmap->bound().centered_within(bound());
     }
     else if (_scalling == ImageScalling::STRETCH)
     {
-        destination = widget_get_bound(this);
+        destination = bound();
     }
 
     painter.blit_bitmap(*_bitmap, _bitmap->bound(), destination);
@@ -55,6 +55,6 @@ Vec2i Image::size()
     }
     else
     {
-        return widget_get_bound(this).size();
+        return bound().size();
     }
 }

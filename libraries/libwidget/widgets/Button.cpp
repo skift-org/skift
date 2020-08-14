@@ -13,21 +13,21 @@ void Button::paint(Painter &painter, Rectangle rectangle)
     {
         if (_style == BUTTON_OUTLINE)
         {
-            painter.draw_rounded_rectangle(widget_get_bound(this), 4, 1, widget_get_color(this, THEME_BORDER));
+            painter.draw_rounded_rectangle(bound(), 4, 1, color(THEME_BORDER));
         }
         else if (_style == BUTTON_FILLED)
         {
-            painter.fill_rounded_rectangle(widget_get_bound(this), 4, widget_get_color(this, THEME_ACCENT));
+            painter.fill_rounded_rectangle(bound(), 4, color(THEME_ACCENT));
         }
 
         if (_state == BUTTON_OVER)
         {
-            painter.fill_rounded_rectangle(widget_get_bound(this), 4, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.1));
+            painter.fill_rounded_rectangle(bound(), 4, ALPHA(color(THEME_FOREGROUND), 0.1));
         }
 
         if (_state == BUTTON_PRESS)
         {
-            painter.fill_rounded_rectangle(widget_get_bound(this), 4, ALPHA(widget_get_color(this, THEME_FOREGROUND), 0.2));
+            painter.fill_rounded_rectangle(bound(), 4, ALPHA(color(THEME_FOREGROUND), 0.2));
         }
     }
 }
@@ -64,7 +64,7 @@ void Button::event(Event *event)
 
         Event action_event = {};
         action_event.type = Event::ACTION;
-        widget_event(this, &action_event);
+        dispatch_event(&action_event);
     }
 }
 
@@ -72,17 +72,17 @@ Button::Button(Widget *parent, ButtonStyle style)
     : Widget(parent),
       _style(style)
 {
-    layout = HFLOW(0);
-    insets = Insets(0, 16);
-    min_height = 32;
-    layout_attributes |= LAYOUT_GREEDY;
+    layout(HFLOW(0));
+    insets(Insets(0, 16));
+    min_height(32);
+    attributes(LAYOUT_GREEDY);
 }
 
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
     : Button(parent, style)
 {
-    layout = STACK();
-    insets = Insets(4, 4);
+    layout(STACK());
+    insets(Insets(4, 4));
 
     new IconPanel(this, icon);
 }
@@ -90,9 +90,9 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 Button::Button(Widget *parent, ButtonStyle style, const char *text)
     : Button(parent, style)
 {
-    layout = STACK();
-    insets = Insets(0, 0, 8, 8);
-    min_width = 64;
+    layout(STACK());
+    insets(Insets(0, 0, 8, 8));
+    min_width(64);
 
     new Label(this, text, Position::CENTER);
 }
@@ -100,11 +100,11 @@ Button::Button(Widget *parent, ButtonStyle style, const char *text)
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text)
     : Button(parent, style)
 {
-    insets = Insets(0, 0, 6, 10);
-    min_width = 64;
+    insets(Insets(0, 0, 6, 10));
+    min_width(64);
 
     auto icon_panel = new IconPanel(this, icon);
-    icon_panel->insets = Insets(0, 0, 0, 4);
+    icon_panel->insets(Insets(0, 0, 0, 4));
 
     new Label(this, text);
 }

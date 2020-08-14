@@ -38,16 +38,16 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
 
     double cursor_position = _current / (double)_data_size;
 
-    for (int i = 0; i < widget_get_bound(this).width(); i++)
+    for (int i = 0; i < bound().width(); i++)
     {
-        double where = i / (double)widget_get_bound(this).width();
+        double where = i / (double)bound().width();
         double data = graph_sample(where);
 
         Rectangle bar(
-            widget_get_bound(this).x() + i,
-            (int)(widget_get_bound(this).y() + widget_get_bound(this).height() * (1.0 - data)),
+            bound().x() + i,
+            (int)(bound().y() + bound().height() * (1.0 - data)),
             1,
-            widget_get_bound(this).height());
+            bound().height());
 
         double dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
@@ -56,12 +56,12 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
     }
 
     Rectangle cursor(
-        (int)(widget_get_bound(this).x() + widget_get_bound(this).width() * cursor_position),
-        widget_get_bound(this).y(),
+        (int)(bound().x() + bound().width() * cursor_position),
+        bound().y(),
         1,
-        widget_get_bound(this).height());
+        bound().height());
 
-    painter.fill_rectangle(cursor, widget_get_color(this, THEME_BORDER));
+    painter.fill_rectangle(cursor, color(THEME_BORDER));
 }
 
 Vec2i Graph::size()

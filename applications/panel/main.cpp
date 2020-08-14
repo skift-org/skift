@@ -39,17 +39,17 @@ int main(int argc, char **argv)
     window_set_title(window, "Panel");
     window_set_bound(window, screen_get_bound().take_top(36));
 
-    window_root(window)->layout = HFLOW(8);
-    window_root(window)->insets = Insets(4);
+    window_root(window)->layout(HFLOW(8));
+    window_root(window)->insets(Insets(4));
 
     Widget *menu = new Button(window_root(window), BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
     auto widget_date_and_time = new Label(window_root(window), "", Position::CENTER);
-    widget_date_and_time->layout_attributes = LAYOUT_FILL;
+    widget_date_and_time->attributes(LAYOUT_FILL);
 
     Widget *graph_container = new Panel(window_root(window));
-    graph_container->layout = VGRID(1);
+    graph_container->layout(VGRID(1));
 
     Widget *ram_graph = new Graph(graph_container, 50, COLOR_ROYALBLUE);
     new Label(ram_graph, "RAM", Position::CENTER);

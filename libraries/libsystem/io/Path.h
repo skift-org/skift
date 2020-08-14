@@ -8,7 +8,7 @@ struct Path
 {
     List *elements;
     bool is_absolute;
-} ;
+};
 
 Path *path_create(const char *raw_path);
 

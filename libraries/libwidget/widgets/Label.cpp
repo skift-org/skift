@@ -37,14 +37,14 @@ void Label::paint(Painter &painter, Rectangle rectangle)
     __unused(rectangle);
 
     painter.draw_string_within(
-        *widget_font(),
+        *font(),
         _text,
-        widget_get_bound(this),
+        bound(),
         _position,
-        widget_get_color(this, THEME_FOREGROUND));
+        color(THEME_FOREGROUND));
 }
 
 Vec2i Label::size()
 {
-    return widget_font()->mesure_string(_text).size();
+    return font()->mesure_string(_text).size();
 }

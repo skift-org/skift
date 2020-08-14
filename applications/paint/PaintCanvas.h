@@ -11,16 +11,13 @@ private:
     RefPtr<PaintDocument> _document;
     OwnPtr<PaintTool> _tool;
 
-
-
 public:
     void tool(OwnPtr<PaintTool> tool) { _tool = tool; }
 
     Rectangle paint_area()
     {
-        return _document->bound().centered_within(widget_get_bound(this));
+        return _document->bound().centered_within(bound());
     }
-
 
     PaintCanvas(Widget *parent, RefPtr<PaintDocument> document);
 

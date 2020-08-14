@@ -81,11 +81,6 @@ void Table::paint_cell(Painter &painter, int row, int column)
     painter.push();
     painter.clip(bound);
 
-    if (row % 2 == 0)
-    {
-        painter.fill_rectangle(bound, ALPHA(color(THEME_FOREGROUND), 0.05));
-    }
-
     if (data.has_icon())
     {
         painter.blit_icon(
@@ -145,6 +140,10 @@ void Table::paint(Painter &painter, Rectangle rectangle)
         {
             painter.fill_rectangle(row_bound(row), color(THEME_SELECTION));
             painter.draw_rectangle(row_bound(row), color(THEME_SELECTION));
+        }
+        else if (row % 2)
+        {
+            painter.fill_rectangle(row_bound(row), ALPHA(color(THEME_FOREGROUND), 0.05));
         }
 
         for (int column = 0; column < column_count; column++)

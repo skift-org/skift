@@ -9,7 +9,6 @@
 #include <abi/System.h>
 
 #include <libsystem/Time.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/thread/Lock.h>
 
 extern "C" void __plug_init();

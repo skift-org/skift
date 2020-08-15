@@ -20,8 +20,10 @@ struct TaskManagerWindow : public Window
     Label *ram_usage;
     Label *ram_avaliable;
     Label *ram_greedy;
+
     Label *cpu_average;
     Label *cpu_greedy;
+    Label *cpu_uptime;
 
     /// --- Table view --- //
     Table *table;
@@ -79,6 +81,18 @@ void widget_cpu_update(TaskManagerWindow *window)
     buffer_builder_append_str(buffer_greedy, greedy);
     window->cpu_greedy->update_text(buffer_builder_intermediate(buffer_greedy));
     buffer_builder_destroy(buffer_greedy);
+
+    ElapsedTime seconds = status.uptime;
+    int days = seconds / 86400;
+    seconds %= 86400;
+    int hours = seconds / 3600;
+    seconds %= 3600;
+    int minutes = seconds / 60;
+    seconds %= 60;
+
+    char buffer_uptime[50];
+    snprintf(buffer_uptime, 50, "Uptime: %3d:%02d:%02d:%02d", days, hours, minutes, seconds);
+    window->cpu_uptime->update_text(buffer_uptime);
 }
 
 void widget_table_update(TaskManagerWindow *window)
@@ -143,7 +157,8 @@ int main(int argc, char **argv)
     cpu_filler->attributes(LAYOUT_FILL);
 
     window->cpu_average = new Label(window->cpu_graph, "Average: nil%", Position::RIGHT);
-    window->cpu_greedy = new Label(window->cpu_graph, "Most greedy: the compositor eats a lot", Position::RIGHT);
+    window->cpu_greedy = new Label(window->cpu_graph, "Most greedy: nil", Position::RIGHT);
+    window->cpu_uptime = new Label(window->cpu_graph, "Uptime: nil", Position::RIGHT);
 
     window->cpu_timer = timer_create(window, 100, (TimerCallback)widget_cpu_update);
     timer_start(window->cpu_timer);

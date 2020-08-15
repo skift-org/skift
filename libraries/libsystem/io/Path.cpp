@@ -4,6 +4,24 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/utils/BufferBuilder.h>
 
+String path_filename_without_extension(Path *file)
+{
+	const char *filename = path_filename(file);
+	const char *extension = path_extension(file);
+
+	size_t size = strlen(filename) - sizeof(extension);
+	char buf[size + 1];
+
+	size_t i;
+	for (i = 0; i < size - 1; i++)
+	{
+		buf[i] = filename[i];
+	}
+	buf[i] = '\0';
+
+	return String(buf, size);
+}
+
 Path *path_create(const char *raw_path)
 {
     Path *path = __create(Path);

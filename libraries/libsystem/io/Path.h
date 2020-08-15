@@ -2,6 +2,8 @@
 
 #include <abi/Filesystem.h>
 
+#include <libutils/String.h>
+
 #include <libsystem/utils/List.h>
 
 struct Path

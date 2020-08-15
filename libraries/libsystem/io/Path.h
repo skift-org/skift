@@ -4,6 +4,8 @@
 
 #include <libsystem/utils/List.h>
 
+#include <libutils/String.h>
+
 struct Path
 {
     List *elements;
@@ -17,6 +19,8 @@ void path_destroy(Path *path);
 const char *path_filename(Path *path);
 
 const char *path_extension(Path *path);
+
+String path_filename_without_extension(Path *file);
 
 const char *path_peek_at(Path *path, int index);
 

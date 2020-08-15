@@ -9,6 +9,7 @@ enum CompositorMessageType
     COMPOSITOR_MESSAGE_INVALID,
     COMPOSITOR_MESSAGE_ACK,
     COMPOSITOR_MESSAGE_GREETINGS,
+    COMPOSITOR_MESSAGE_EVENT,
 
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
@@ -33,6 +34,11 @@ typedef unsigned int WindowFlag;
 struct CompositorGreetings
 {
     Rectangle screen_bound;
+};
+
+struct CompositorEvent
+{
+    Event event;
 };
 
 struct CompositorCreateWindow
@@ -111,6 +117,7 @@ struct CompositorMessage
 
     union {
         CompositorGreetings greetings;
+        CompositorEvent event;
         CompositorCreateWindow create_window;
         CompositorDestroyWindow destroy_window;
         CompositorResizeWindow resize_window;

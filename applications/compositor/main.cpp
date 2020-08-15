@@ -59,6 +59,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
                     .key = packet.key,
                     .codepoint = packet.codepoint,
                 },
+                .display = {},
             };
 
             window->send_event(event);

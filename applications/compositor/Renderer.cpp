@@ -89,10 +89,11 @@ void renderer_repaint_dirty()
     _dirty_regions.clear();
 }
 
-void renderer_set_resolution(int width, int height)
+bool renderer_set_resolution(int width, int height)
 {
-    _framebuffer->set_resolution(Vec2i(width, height));
+    auto result = _framebuffer->set_resolution(Vec2i(width, height));
     renderer_region_dirty(renderer_bound());
+    return result == SUCCESS;
 }
 
 void renderer_set_wallaper(RefPtr<Bitmap> wallaper)

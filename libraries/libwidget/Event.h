@@ -27,6 +27,11 @@ struct KeyboardEvent
     Codepoint codepoint;
 };
 
+struct DisplayEvent
+{
+    Vec2i size;
+};
+
 struct Event
 {
     enum Type
@@ -51,6 +56,8 @@ struct Event
         KEYBOARD_KEY_RELEASE,
         KEYBOARD_KEY_TYPED,
 
+        DISPLAY_SIZE_CHANGED,
+
         __COUNT,
     };
 
@@ -59,6 +66,7 @@ struct Event
 
     MouseEvent mouse;
     KeyboardEvent keyboard;
+    DisplayEvent display;
 };
 
 using EventType = Event::Type;

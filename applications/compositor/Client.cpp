@@ -9,6 +9,8 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
+static List *_connected_client = nullptr;
+
 void client_handle_create_window(Client *client, CompositorCreateWindow create_window)
 {
     if (manager_get_window(client, create_window.id))
@@ -116,7 +118,13 @@ void client_handle_set_resolution(Client *client, CompositorSetResolution set_re
 {
     __unused(client);
 
-    renderer_set_resolution(set_resolution.width, set_resolution.height);
+    if (renderer_set_resolution(set_resolution.width, set_resolution.height))
+    {
+        Event event = {};
+        event.type = Event::DISPLAY_SIZE_CHANGED;
+        event.display.size = Vec2i(set_resolution.width, set_resolution.height);
+        manager_broadcast_event(event);
+    }
 }
 
 void client_handle_set_wallpaper(Client *client, CompositorSetWallaper set_wallpaper)
@@ -196,8 +204,6 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
         break;
     }
 }
-
-static List *_connected_client = nullptr;
 
 Client *client_create(Connection *connection)
 {

@@ -23,7 +23,7 @@ void list_pages()
 		Path *p = path_create(buffer);
 		if (strcmp(path_extension(p), ".json") == 0)
 		{
-			String file = remove_filename_ext(p);
+			String file = path_filename_without_extension(p);
 			printf("%s\n", file.cstring());
 		}
 		path_destroy(p);

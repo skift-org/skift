@@ -1,27 +1,9 @@
-#include <libjson/Json.h>
 #include <stdio.h>
-#include <string.h>
+#include <libutils/String.h>
+#include <libjson/Json.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/utils/BufferBuilder.h>
-
-const char *remove_filename_ext(Path *file)
-{
-	const char *filename = path_filename(file);
-	const char *extension = path_extension(file);
-
-	size_t size = strlen(filename) - sizeof(extension);
-	char *buf = new char[size + 1];
-
-	size_t i;
-	for (i = 0; i < size - 1; i++)
-	{
-		buf[i] = filename[i];
-	}
-	buf[i] = '\0';
-
-	return buf;
-}
 
 void list_pages()
 {
@@ -41,9 +23,8 @@ void list_pages()
 		Path *p = path_create(buffer);
 		if (strcmp(path_extension(p), ".json") == 0)
 		{
-			const char *file = remove_filename_ext(p);
-			printf("%s\n", file);
-			delete file;
+			String file = remove_filename_ext(p);
+			printf("%s\n", file.cstring());
 		}
 		path_destroy(p);
 		buffer_builder_destroy(buf);

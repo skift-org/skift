@@ -1,10 +1,38 @@
-#include <libjson/Json.h>
 #include <stdio.h>
-#include <string.h>
+#include <libjson/Json.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/io/Directory.h>
+#include <libsystem/utils/BufferBuilder.h>
+
+void list_pages()
+{
+
+	const char *manpages = "/System/Manuals/";
+
+	Directory *directory = directory_open(manpages, OPEN_READ);
+	DirectoryEntry entry;
+
+	while (directory_read(directory, &entry) > 0)
+	{
+		auto buf = buffer_builder_create(strlen(manpages) + strlen(entry.name));
+		buffer_builder_append_str(buf, manpages);
+		buffer_builder_append_str(buf, entry.name);
+
+		const char *buffer = buffer_builder_intermediate(buf);
+		Path *p = path_create(buffer);
+		if (strcmp(path_extension(p), ".json") == 0)
+		{
+			String file = path_filename_without_extension(p);
+			printf("%s\n", file.cstring());
+		}
+		path_destroy(p);
+		buffer_builder_destroy(buf);
+	}
+}
 
 int main(int argc, char **argv)
 {
+	bool man_list = false;
 
 	if (argc == 1)
 	{
@@ -12,6 +40,11 @@ int main(int argc, char **argv)
 	}
 	for (int i = 1; i < argc; i++)
 	{
+		if (strcmp(argv[i], "--list") == 0 || strcmp(argv[i], "-l") == 0)
+		{
+			man_list = true;
+			break;
+		}
 		// This is why c code can be annoying sometimes
 		char tmp[strlen("/System/Manuals/") + strlen(argv[i]) + strlen(".json")];
 		sprintf(tmp, "/System/Manuals/%s%s", argv[i], ".json");
@@ -96,5 +129,10 @@ int main(int argc, char **argv)
 			printf("man: No manual entry for \"%s\"\n", argv[i]);
 		}
 	}
-return 0;
+	if (man_list)
+	{
+		list_pages();
+	}
+
+	return 0;
 }

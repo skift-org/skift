@@ -1,5 +1,5 @@
 {
-    	"description": "man is short for manual. It provides documentation on commands",
+    	"description": "man is short for manual. It provides documentation on commands. Add the -l parameter to show a list of the avaliable manuals. Try it",
     	"usage": "man [OPTIONS]",
     	"example": "man echo uptime"
 }

@@ -125,6 +125,37 @@ Result readline_readline(ReadLine *readline, char **line)
                 if (readline->cursor > 0)
                     readline->cursor--;
             }
+            else if (readline->lexer->current_is("0123456789"))
+            {
+                // https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_input_sequences
+                int digits = 0;
+
+                while (readline->lexer->current_is("0123456789"))
+                {
+                    digits *= 10;
+                    digits += readline->lexer->current() - '0';
+                    readline->lexer->foreward();
+                }
+
+                if (readline->lexer->current() == '~')
+                {
+                    if (digits == 1) // Home
+                    {
+                        readline->cursor = 0;
+                    }
+                    else if (digits == 3) // Delete
+                    {
+                        if (readline->cursor < unicode_string_length(readline_string(readline)))
+                        {
+                            unicode_string_remove(readline->string, readline->cursor);
+                        }
+                    }
+                    else if (digits == 4) // End
+                    {
+                        readline->cursor = unicode_string_length(readline_string(readline));
+                    }
+                }
+            }
 
             readline->lexer->foreward();
         }

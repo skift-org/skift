@@ -143,34 +143,93 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 
 void TerminalWidget::event(Event *event)
 {
+    auto send_sequence = [&](auto sequence) {
+        stream_format(_master_stream, sequence);
+        event->accepted = true;
+    };
+
     if (event->type == Event::KEYBOARD_KEY_TYPED)
     {
-        if (event->keyboard.key == KEYBOARD_KEY_UP)
+        switch (event->keyboard.key)
         {
-            stream_format(_master_stream, "\e[A");
-            event->accepted = true;
-        }
-        else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
-        {
-            stream_format(_master_stream, "\e[B");
-            event->accepted = true;
-        }
-        else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
-        {
-            stream_format(_master_stream, "\e[C");
-            event->accepted = true;
-        }
-        else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
-        {
-            stream_format(_master_stream, "\e[D");
-            event->accepted = true;
-        }
-        else if (event->keyboard.codepoint != 0)
-        {
-            uint8_t buffer[5];
-            int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
-            stream_write(_master_stream, buffer, size);
-            event->accepted = true;
+
+        case KEYBOARD_KEY_DELETE:
+            send_sequence("\e[3~");
+            break;
+        case KEYBOARD_KEY_END:
+            send_sequence("\e[4~");
+            break;
+        case KEYBOARD_KEY_F1:
+            send_sequence("\e[11~");
+            break;
+        case KEYBOARD_KEY_F2:
+            send_sequence("\e[12~");
+            break;
+        case KEYBOARD_KEY_F3:
+            send_sequence("\e[13~");
+            break;
+        case KEYBOARD_KEY_F4:
+            send_sequence("\e[14~");
+            break;
+        case KEYBOARD_KEY_F5:
+            send_sequence("\e[15~");
+            break;
+        case KEYBOARD_KEY_F6:
+            send_sequence("\e[17~");
+            break;
+        case KEYBOARD_KEY_F7:
+            send_sequence("\e[18~");
+            break;
+        case KEYBOARD_KEY_F8:
+            send_sequence("\e[19~");
+            break;
+        case KEYBOARD_KEY_F9:
+            send_sequence("\e[20~");
+            break;
+        case KEYBOARD_KEY_F10:
+            send_sequence("\e[21~");
+            break;
+        case KEYBOARD_KEY_F11:
+            send_sequence("\e[23~");
+            break;
+        case KEYBOARD_KEY_F12:
+            send_sequence("\e[24~");
+            break;
+        case KEYBOARD_KEY_HOME:
+            send_sequence("\e[1~");
+            break;
+        case KEYBOARD_KEY_INSERT:
+            send_sequence("\e[2~");
+            break;
+        case KEYBOARD_KEY_PGUP:
+            send_sequence("\e[5~");
+            break;
+        case KEYBOARD_KEY_PGDOWN:
+            send_sequence("\e[6~");
+            break;
+
+        case KEYBOARD_KEY_UP:
+            send_sequence("\e[A");
+            break;
+        case KEYBOARD_KEY_DOWN:
+            send_sequence("\e[B");
+            break;
+        case KEYBOARD_KEY_RIGHT:
+            send_sequence("\e[C");
+            break;
+        case KEYBOARD_KEY_LEFT:
+            send_sequence("\e[D");
+            break;
+
+        default:
+            if (event->keyboard.codepoint != 0)
+            {
+                uint8_t buffer[5];
+                int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
+                stream_write(_master_stream, buffer, size);
+                event->accepted = true;
+            }
+            break;
         }
     }
 }

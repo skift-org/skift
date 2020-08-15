@@ -41,12 +41,10 @@ char *strdup(const char *s);
 char *strchr(const char *str, int c);
 int strcoll(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);
-const char *strerror(int errnum);
 char *strpbrk(const char *str1, const char *str2);
 char *strrchr(const char *str, int c);
 size_t strspn(const char *str1, const char *str2);
 char *strstr(const char *haystack, const char *needle);
-char *strtok(char *s, char **state, const char *delim);
 size_t strxfrm(char *dest, const char *src, size_t n);
 
 __END_HEADER

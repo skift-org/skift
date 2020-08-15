@@ -49,7 +49,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
     {
         Window *window = manager_focus_window();
 
-        if (window != nullptr)
+        if (window)
         {
             Event event = {
                 .type = key_motion_to_event_type(packet.motion),
@@ -61,7 +61,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
                 },
             };
 
-            window_send_event(window, event);
+            window->send_event(event);
         }
     }
     else

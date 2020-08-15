@@ -49,15 +49,15 @@ void renderer_region(Rectangle region)
 
     list_foreach_reversed(Window, window, manager_get_windows())
     {
-        if (window_bound(window).colide_with(region))
+        if (window->bound().colide_with(region))
         {
-            Rectangle destination = window_bound(window).clipped_with(region);
+            Rectangle destination = window->bound().clipped_with(region);
 
             Rectangle source(
-                destination.position() - window_bound(window).position(),
+                destination.position() - window->bound().position(),
                 destination.size());
 
-            _framebuffer->painter().blit_bitmap_no_alpha(*window->frontbuffer, source, destination);
+            _framebuffer->painter().blit_bitmap_no_alpha(window->frontbuffer(), source, destination);
         }
     }
 

@@ -21,7 +21,7 @@ Window *manager_get_window(struct Client *client, int id)
 {
     list_foreach(Window, window, _managed_windows)
     {
-        if (window->client == client && window->id == id)
+        if (window->client() == client && window->id() == id)
         {
             return window;
         }
@@ -34,7 +34,7 @@ Window *manager_get_window_at(Vec2i position)
 {
     list_foreach(Window, window, _managed_windows)
     {
-        if (window_cursor_capture_bound(window).containe(position))
+        if (window->cursor_capture_bound().containe(position))
         {
             return window;
         }
@@ -46,12 +46,12 @@ Window *manager_get_window_at(Vec2i position)
 void manager_register_window(Window *window)
 {
     manager_set_focus_window(window);
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(window->bound());
 }
 
 void manager_unregister_window(Window *window)
 {
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(window->bound());
     list_remove(_managed_windows, window);
 
     manager_set_focus_window((Window *)list_peek(_managed_windows));
@@ -61,7 +61,7 @@ void manager_set_focus_window(Window *window)
 {
     if (_focused_window)
     {
-        window_lost_focus(_focused_window);
+        _focused_window->lost_focus();
     }
 
     _focused_window = window;
@@ -71,7 +71,7 @@ void manager_set_focus_window(Window *window)
         list_remove(_managed_windows, window);
         list_push(_managed_windows, window);
 
-        window_get_focus(window);
+        window->get_focus();
     }
 }
 

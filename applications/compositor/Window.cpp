@@ -8,81 +8,70 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-Window *window_create(
+Window::Window(
     int id,
     WindowFlag flags,
     struct Client *client,
     Rectangle bound,
     RefPtr<Bitmap> frontbuffer,
     RefPtr<Bitmap> backbuffer)
+    : _id(id),
+      _flags(flags),
+      _client(client),
+      _bound(bound),
+      _frontbuffer(frontbuffer),
+      _backbuffer(backbuffer)
 {
-    Window *window = __create(Window);
-
-    window->id = id;
-    window->flags = flags;
-    window->client = client;
-    window->bound = bound;
-
-    window->frontbuffer = frontbuffer;
-    window->backbuffer = backbuffer;
-
-    manager_register_window(window);
-
-    return window;
+    manager_register_window(this);
 }
 
-void window_destroy(Window *window)
+Window::~Window()
 {
-    manager_unregister_window(window);
-
-    window->frontbuffer = nullptr;
-    window->backbuffer = nullptr;
-
-    free(window);
+    manager_unregister_window(this);
 }
 
-Rectangle window_bound(Window *window)
+Rectangle Window::bound()
 {
-    return window->bound;
+    return _bound;
 }
 
-Rectangle window_cursor_capture_bound(Window *window)
+Rectangle Window::cursor_capture_bound()
 {
-    return window_bound(window).expended(Insets(16));
+    return bound().expended({16});
 }
 
-void window_move(Window *window, Vec2i position)
+void Window::move(Vec2i new_position)
 {
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 
-    window->bound = window->bound.moved(position);
+    _bound = _bound.moved(new_position);
 
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 }
 
-void window_resize(Window *window, Rectangle bound)
+void Window::resize(Rectangle new_bound)
 {
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 
-    window->bound = bound;
+    _bound = new_bound;
 
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 }
 
-void window_send_event(Window *window, Event event)
+void Window::send_event(Event event)
 {
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_EVENT_WINDOW,
         .event_window = {
-            .id = window->id,
+            .id = _id,
             .event = event,
         },
     };
 
-    client_send_message(window->client, message);
+    client_send_message(_client, message);
 }
 
-void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position, MouseButton buttons)
+void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton buttons)
 {
     Event event = {
         .type = Event::MOUSE_MOVE,
@@ -97,10 +86,10 @@ void window_handle_mouse_move(Window *window, Vec2i old_position, Vec2i position
         .keyboard = {},
     };
 
-    window_send_event(window, event);
+    send_event(event);
 }
 
-void window_handle_mouse_button(Window *window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Vec2i position)
+static void handle_mouse_button(Window &window, MouseButton button, MouseButton old_buttons, MouseButton buttons, Vec2i position)
 {
     bool was_button_pressed = old_buttons & button;
     bool is_button_pressed = buttons & button;
@@ -120,7 +109,7 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
             .keyboard = {},
         };
 
-        window_send_event(window, event);
+        window.send_event(event);
     }
 
     if (was_button_pressed && !is_button_pressed)
@@ -138,22 +127,18 @@ void window_handle_mouse_button(Window *window, MouseButton button, MouseButton 
             .keyboard = {},
         };
 
-        window_send_event(window, event);
+        window.send_event(event);
     }
 }
 
-void window_handle_mouse_buttons(
-    Window *window,
-    MouseButton old_buttons,
-    MouseButton buttons,
-    Vec2i position)
+void Window::handle_mouse_buttons(MouseButton old_buttons, MouseButton buttons, Vec2i position)
 {
-    window_handle_mouse_button(window, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
-    window_handle_mouse_button(window, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
-    window_handle_mouse_button(window, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
+    handle_mouse_button(*this, MOUSE_BUTTON_LEFT, old_buttons, buttons, position);
+    handle_mouse_button(*this, MOUSE_BUTTON_RIGHT, old_buttons, buttons, position);
+    handle_mouse_button(*this, MOUSE_BUTTON_MIDDLE, old_buttons, buttons, position);
 }
 
-void window_handle_double_click(Window *window, Vec2i position)
+void Window::handle_double_click(Vec2i position)
 {
     Event event = {
         .type = Event::MOUSE_DOUBLE_CLICK,
@@ -168,23 +153,58 @@ void window_handle_double_click(Window *window, Vec2i position)
         .keyboard = {},
     };
 
-    window_send_event(window, event);
+    send_event(event);
 }
 
-void window_get_focus(Window *window)
+void Window::get_focus()
 {
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 
     Event event = {};
     event.type = Event::GOT_FOCUS;
-    window_send_event(window, event);
+    send_event(event);
 }
 
-void window_lost_focus(Window *window)
+void Window::lost_focus()
 {
-    renderer_region_dirty(window_bound(window));
+    renderer_region_dirty(bound());
 
     Event event = {};
     event.type = Event::LOST_FOCUS;
-    window_send_event(window, event);
+    send_event(event);
+}
+
+void Window::flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int backbuffer_handle, Vec2i backbuffer_size, Rectangle region)
+{
+    swap(_frontbuffer, _backbuffer);
+
+    if (_frontbuffer->handle() != frontbuffer_handle)
+    {
+
+        auto new_frontbuffer = Bitmap::create_shared_from_handle(frontbuffer_handle, frontbuffer_size);
+
+        if (!new_frontbuffer.success())
+        {
+            logger_error("Client application gave us a jankie shared memory object id");
+            return;
+        }
+
+        _frontbuffer = new_frontbuffer.take_value();
+    }
+
+    if (_backbuffer->handle() != backbuffer_handle)
+    {
+
+        auto new_backbuffer = Bitmap::create_shared_from_handle(backbuffer_handle, backbuffer_size);
+
+        if (!new_backbuffer.success())
+        {
+            logger_error("Client application gave us a jankie shared memory object id");
+            return;
+        }
+
+        _backbuffer = new_backbuffer.take_value();
+    }
+
+    renderer_region_dirty(region.offset(bound().position()));
 }

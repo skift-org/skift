@@ -31,13 +31,12 @@ void client_handle_create_window(Client *client, CompositorCreateWindow create_w
         return;
     }
 
-    window_create(
-        create_window.id,
-        create_window.flags,
-        client,
-        create_window.bound,
-        frontbuffer.take_value(),
-        backbuffer.take_value());
+    new Window(create_window.id,
+               create_window.flags,
+               client,
+               create_window.bound,
+               frontbuffer.take_value(),
+               backbuffer.take_value());
 }
 
 void client_handle_destroy_window(Client *client, CompositorDestroyWindow destroy_window)
@@ -50,7 +49,7 @@ void client_handle_destroy_window(Client *client, CompositorDestroyWindow destro
         return;
     }
 
-    window_destroy(window);
+    delete window;
 }
 
 void client_handle_resize_window(Client *client, CompositorResizeWindow resize_window)
@@ -63,7 +62,7 @@ void client_handle_resize_window(Client *client, CompositorResizeWindow resize_w
         return;
     }
 
-    window_resize(window, resize_window.bound);
+    window->resize(resize_window.bound);
 }
 
 void client_handle_move_window(Client *client, CompositorMoveWindow move_window)
@@ -76,7 +75,7 @@ void client_handle_move_window(Client *client, CompositorMoveWindow move_window)
         return;
     }
 
-    window_move(window, move_window.position);
+    window->move(move_window.position);
 }
 
 void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
@@ -89,37 +88,7 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         return;
     }
 
-    swap(window->frontbuffer, window->backbuffer);
-
-    if (window->frontbuffer->handle() != flip_window.frontbuffer)
-    {
-
-        auto new_frontbuffer = Bitmap::create_shared_from_handle(flip_window.frontbuffer, flip_window.frontbuffer_size);
-
-        if (!new_frontbuffer.success())
-        {
-            logger_error("Client application gave us a jankie shared memory object id");
-            return;
-        }
-
-        window->frontbuffer = new_frontbuffer.take_value();
-    }
-
-    if (window->backbuffer->handle() != flip_window.backbuffer)
-    {
-
-        auto new_backbuffer = Bitmap::create_shared_from_handle(flip_window.backbuffer, flip_window.backbuffer_size);
-
-        if (!new_backbuffer.success())
-        {
-            logger_error("Client application gave us a jankie shared memory object id");
-            return;
-        }
-
-        window->backbuffer = new_backbuffer.take_value();
-    }
-
-    renderer_region_dirty(flip_window.bound.offset(window->bound.position()));
+    window->flip_buffers(flip_window.frontbuffer, flip_window.frontbuffer_size, flip_window.backbuffer, flip_window.backbuffer_size, flip_window.bound);
 
     CompositorMessage message = {};
     message.type = COMPOSITOR_MESSAGE_ACK;
@@ -138,7 +107,7 @@ void client_handle_cursor_window(Client *client, CompositorCursorWindow cursor_w
 
     renderer_region_dirty(cursor_bound());
 
-    window->cursor_state = cursor_window.state;
+    window->cursor_state(cursor_window.state);
 
     renderer_region_dirty(cursor_bound());
 }
@@ -262,9 +231,9 @@ Client *client_create(Connection *connection)
 
 Iteration destroy_window_if_client_match(Client *client, Window *window)
 {
-    if (window->client == client)
+    if (window->client() == client)
     {
-        window_destroy(window);
+        delete window;
     }
 
     return Iteration::CONTINUE;

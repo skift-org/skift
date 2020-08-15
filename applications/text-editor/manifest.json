@@ -1,0 +1,6 @@
+{
+    "name": "Text Editor",
+    "comment": "A simple text editor.",
+    "icon": "text-box",
+    "command": "text-editor"
+}

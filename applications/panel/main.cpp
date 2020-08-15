@@ -65,6 +65,10 @@ int main(int argc, char **argv)
 
     graph_container->on(Event::MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
 
+    window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto event) {
+        window_set_bound(window, window_bound(window).with_width(event->display.size.x()));
+    });
+
     window_show(window);
 
     return application_run();

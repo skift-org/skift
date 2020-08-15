@@ -70,8 +70,6 @@ int feof(FILE *stream);
 void clearerr(FILE *stream);
 int ferror(FILE *stream);
 
-char *strerror(int errnum);
-
 int _fwouldblock(FILE *stream);
 
 FILE *tmpfile(void);

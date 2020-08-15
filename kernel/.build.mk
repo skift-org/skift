@@ -21,7 +21,8 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/utils/*.cpp) \
 	$(wildcard libraries/libsystem/core/*.cpp) \
 	$(wildcard libraries/libsystem/thread/*.cpp) \
-	$(wildcard libraries/libsystem/system/*.cpp)
+	$(wildcard libraries/libsystem/system/*.cpp) \
+	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
 KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 

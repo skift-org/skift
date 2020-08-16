@@ -5,8 +5,8 @@
 ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
 {
     _track = 1024;
-    _value = 512;
-    _thumb = 128;
+    _value = 0;
+    _thumb = 512;
 }
 
 void ScrollBar::paint(Painter &painter, Rectangle rectangle)

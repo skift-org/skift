@@ -1,10 +1,11 @@
 {
-    ".png": "image",
-    ".jpg": "image",
-    ".jpeg": "image",
-    ".txt": "text",
-    ".text": "text",
-    ".json": "text",
     ".c": "text",
-    ".h": "text"
+    ".h": "text",
+    ".jpeg": "image",
+    ".jpg": "image",
+    ".json": "text",
+    ".markup": "text",
+    ".png": "image",
+    ".text": "text",
+    ".txt": "text"
 }

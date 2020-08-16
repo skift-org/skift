@@ -1,0 +1,22 @@
+<Window
+    title="Calculator"
+    icon="calculator-variant"
+    width="250"
+    height="250"
+    layout="vflow(8)"
+    padding="insets(4)"
+    >
+
+    <Panel padding="insets(8)" rounded>
+        <Label text="#value"/>
+    </Panel>
+
+    <Container layout="grid(4, 6, 2, 2)" fill>
+        <Button text="%" outlined/> <Button text="CE" outlined/> <Button text="C" outlined/> <Button text="<-" outlined/>
+        <Button text="1/x" outlined/> <Button text="x^2" outlined/> <Button text="sqrt" outlined/> <Button text="/" outlined/>
+        <Button text="7"/> <Button text="8" /> <Button text="9" /> <Button text="*" outlined/>
+        <Button text="4" /> <Button text="5" /> <Button text="6" /> <Button text="-" outlined/>
+        <Button text="1" /> <Button text="2" /> <Button text="3" /> <Button text="+" outlined/>
+        <Button text="+/-" outlined/> <Button text="0" /> <Button text="." outlined/> <Button text="=" filled/>
+    </Container>
+</Window>

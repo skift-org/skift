@@ -240,7 +240,16 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
 
     if (markup_node_is(node, "Panel"))
     {
-        widget = new Panel(parent);
+        if (markup_node_has_attribute(node, "rounded"))
+        {
+            auto panel = new Panel(parent);
+            panel->border_radius(6);
+            widget = panel;
+        }
+        else
+        {
+            widget = new Panel(parent);
+        }
     }
 
     if (markup_node_is(node, "Button"))

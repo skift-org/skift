@@ -24,7 +24,7 @@ DialogButton dialog_message(
         window_hide(window);
     });
 
-    Widget *message_label = new Label(window_root(window), message);
+    Widget *message_label = new Label(window_root(window), message, Position::CENTER);
     message_label->attributes(LAYOUT_FILL);
 
     Widget *buttons_container = new Container(window_root(window));

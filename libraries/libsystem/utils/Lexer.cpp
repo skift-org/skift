@@ -68,6 +68,34 @@ void Lexer::foreward()
     }
 }
 
+void Lexer::foreward(size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        foreward();
+    }
+}
+
+void Lexer::foreward_codepoint()
+{
+    if ((current() & 0xf8) == 0xf0)
+    {
+        foreward(4);
+    }
+    else if ((current() & 0xf0) == 0xe0)
+    {
+        foreward(3);
+    }
+    else if ((current() & 0xe0) == 0xc0)
+    {
+        foreward(2);
+    }
+    else
+    {
+        foreward(1);
+    }
+}
+
 char Lexer::peek(size_t peek)
 {
     assert(peek < SOURCE_READER_MAX_PEEK);
@@ -97,6 +125,35 @@ char Lexer::peek(size_t peek)
 char Lexer::current()
 {
     return peek(0);
+}
+
+Codepoint Lexer::current_codepoint()
+{
+    size_t size = 0;
+    Codepoint codepoint = peek(0);
+
+    if ((current() & 0xf8) == 0xf0)
+    {
+        size = 4;
+        codepoint = (0x07 & codepoint) << 18;
+    }
+    else if ((current() & 0xf0) == 0xe0)
+    {
+        size = 3;
+        codepoint = (0x0f & codepoint) << 12;
+    }
+    else if ((current() & 0xe0) == 0xc0)
+    {
+        codepoint = (0x1f & codepoint) << 6;
+        size = 2;
+    }
+
+    for (size_t i = 1; i < size; i++)
+    {
+        codepoint |= (0x3f & peek(i)) << (6 * (size - i - 1));
+    }
+
+    return codepoint;
 }
 
 bool Lexer::current_is(const char *what)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/io/Stream.h>
+#include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/RingBuffer.h>
 
 class Lexer
@@ -27,9 +28,15 @@ public:
 
     void foreward();
 
+    void foreward(size_t n);
+
+    void foreward_codepoint();
+
     char peek(size_t peek);
 
     char current();
+
+    Codepoint current_codepoint();
 
     bool current_is(const char *what);
 

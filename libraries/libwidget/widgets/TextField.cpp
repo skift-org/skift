@@ -4,9 +4,17 @@
 TextField::TextField(Widget *parent, RefPtr<TextModel> model)
     : Widget(parent), _model(model)
 {
-    _scrollbar = new ScrollBar(this);
-    _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
-        _scroll_offset = _scrollbar->value();
+    _vscrollbar = new ScrollBar(this);
+    _vscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
+        _vscroll_offset = _vscrollbar->value();
+        should_repaint();
+    });
+
+    _hscrollbar = new ScrollBar(this);
+    _hscrollbar->horizontal(true);
+
+    _hscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
+        _hscroll_offset = _hscrollbar->value();
         should_repaint();
     });
 }
@@ -24,11 +32,11 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
     painter.fill_rectangle(this->content_bound().take_left(32), color(THEME_BORDER));
     painter.fill_rectangle(this->content_bound().take_left(32).take_right(1), color(THEME_BORDER));
 
-    for (size_t i = MAX(0, _scroll_offset / LINE_HEIGHT - 1);
-         i < MIN(_model->line_count(), (((unsigned)this->content_bound().height() + _scroll_offset) / LINE_HEIGHT) + 1);
+    for (size_t i = MAX(0, _vscroll_offset / LINE_HEIGHT - 1);
+         i < MIN(_model->line_count(), (((unsigned)this->content_bound().height() + _vscroll_offset) / LINE_HEIGHT) + 1);
          i++)
     {
-        Rectangle line_bound = Rectangle(content_bound().position() + Vec2i(0, LINE_HEIGHT * i - _scroll_offset), Vec2i(content_bound().width(), LINE_HEIGHT));
+        Rectangle line_bound = Rectangle(content_bound().position() + Vec2i(0, LINE_HEIGHT * i - _vscroll_offset), Vec2i(content_bound().width(), LINE_HEIGHT));
 
         if (_cursor.line() == i)
         {
@@ -47,10 +55,12 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
             painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, ALPHA(color(THEME_FOREGROUND), 0.6));
         }
 
+        painter.push();
+        painter.clip(content_bound().cutoff_left_and_right(32, 0));
         // Line content
         auto line = _model->line(i);
 
-        Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(0, LINE_HEIGHT / 2 + 4);
+        Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(-_hscroll_offset, LINE_HEIGHT / 2 + 4);
 
         for (size_t j = 0; j < line.length(); j++)
         {
@@ -72,6 +82,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
                 current_position += Vec2i(glyph.advance, 0);
             }
         }
+        painter.pop();
     }
 }
 
@@ -96,7 +107,7 @@ void TextField::event(Event *event)
     }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        size_t line = ((size_t)(event->mouse.position - content_bound().position()).y() + _scroll_offset) / LINE_HEIGHT;
+        size_t line = ((size_t)(event->mouse.position - content_bound().position()).y() + _vscroll_offset) / LINE_HEIGHT;
 
         _cursor.move_to_within(*_model, line);
         should_repaint();
@@ -106,6 +117,9 @@ void TextField::event(Event *event)
 
 void TextField::do_layout()
 {
-    _scrollbar->bound(this->content_bound().take_right(16));
-    _scrollbar->update(_model->line_count() * LINE_HEIGHT, content_bound().height());
+    _vscrollbar->bound(this->content_bound().take_right(16).cutoff_top_and_botton(0, 16));
+    _vscrollbar->update((_model->line_count() + 1) * LINE_HEIGHT, content_bound().height());
+
+    _hscrollbar->bound(this->content_bound().take_bottom(16).cutoff_left_and_right(32, 16));
+    _hscrollbar->update(1000, content_bound().width() - 32);
 }

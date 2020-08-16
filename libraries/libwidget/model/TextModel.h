@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libsystem/unicode/Codepoint.h>
-
 #include <libsystem/utils/Lexer.h>
+
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
@@ -109,6 +109,7 @@ public:
     void move_up_within(TextModel &model)
     {
         __unused(model);
+
         if (_line > 0)
         {
             _line--;

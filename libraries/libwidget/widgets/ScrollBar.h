@@ -12,6 +12,7 @@ private:
     int _value = 0;
 
     bool _mouse_over;
+    bool _horizontal = false;
 
     Rectangle track_bound()
     {
@@ -22,17 +23,36 @@ private:
     {
         Rectangle track = track_bound();
 
-        int thumb_height = MIN(track.height() * (_thumb / (double)_track), track.height());
-        int thump_position = track.height() * (_value / (double)_track);
+        if (_horizontal)
+        {
+            int thumb_width = MIN(track.width() * (_thumb / (double)_track), track.width());
+            int thump_position = track.width() * (_value / (double)_track);
 
-        return Rectangle(
-            track.x(),
-            track.y() + thump_position,
-            track.width(),
-            thumb_height);
+            return Rectangle(
+                track.x() + thump_position,
+                track.y(),
+                thumb_width,
+                track.height());
+        }
+        else
+        {
+            int thumb_height = MIN(track.height() * (_thumb / (double)_track), track.height());
+            int thump_position = track.height() * (_value / (double)_track);
+
+            return Rectangle(
+                track.x(),
+                track.y() + thump_position,
+                track.width(),
+                thumb_height);
+        }
     }
 
 public:
+    void horizontal(bool value)
+    {
+        _horizontal = value;
+    }
+
     ScrollBar(Widget *parent);
 
     void paint(Painter &painter, Rectangle rectangle);

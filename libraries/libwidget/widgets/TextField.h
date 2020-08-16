@@ -7,10 +7,14 @@
 class TextField : public Widget
 {
 private:
-    ScrollBar *_scrollbar;
     RefPtr<TextModel> _model;
     TextCursor _cursor{};
-    int _scroll_offset = 0;
+
+    ScrollBar *_vscrollbar;
+    ScrollBar *_hscrollbar;
+
+    int _vscroll_offset = 0;
+    int _hscroll_offset = 0;
 
 public:
     TextField(Widget *parent, RefPtr<TextModel> model);

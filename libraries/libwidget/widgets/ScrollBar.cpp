@@ -29,8 +29,16 @@ void ScrollBar::paint(Painter &painter, Rectangle rectangle)
 
 void ScrollBar::scroll_to(Vec2i position)
 {
-    int new_value = position.y() - track_bound().y();
-    value((new_value / (double)track_bound().height()) * _track);
+    if (_horizontal)
+    {
+        int new_value = position.x() - track_bound().x();
+        value((new_value / (double)track_bound().width()) * _track);
+    }
+    else
+    {
+        int new_value = position.y() - track_bound().y();
+        value((new_value / (double)track_bound().height()) * _track);
+    }
 
     Event event_value_changed = {};
     event_value_changed.type = Event::VALUE_CHANGE;

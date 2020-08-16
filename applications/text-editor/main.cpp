@@ -9,15 +9,35 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_RESIZABLE);
 
     window_set_icon(window, Icon::get("text-box"));
-    window_set_title(window, "Text Editor");
+
+    if (argc == 2)
+    {
+        window_set_title(window, argv[1]);
+    }
+    else
+    {
+        window_set_title(window, "Text Editor");
+    }
+
+    window_set_size(window, Vec2i(700, 500));
 
     window_root(window)->layout(VFLOW(0));
 
-    toolbar_create(window_root(window));
+    auto toolbar = toolbar_create(window_root(window));
+    toolbar_icon_create(toolbar, Icon::get("folder-open"));
+    toolbar_icon_create(toolbar, Icon::get("content-save"));
+    toolbar_icon_create(toolbar, Icon::get("file-plus"));
 
-    auto field = new TextField(window_root(window));
+    auto model = make<TextModel>();
 
+    if (argc == 2)
+    {
+        model = TextModel::from_file(argv[1]);
+    }
+
+    auto field = new TextField(window_root(window), model);
     field->attributes(LAYOUT_FILL);
+    field->focus();
 
     window_show(window);
 

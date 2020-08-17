@@ -163,9 +163,10 @@ static Window *paint_create_window(RefPtr<PaintDocument> document)
     PaintWindow *window = __create(PaintWindow);
 
     window_initialize(window, WINDOW_RESIZABLE);
-    window_set_icon(window, Icon::get("brush"));
-    window_set_title(window, "Paint");
-    window_set_size(window, Vec2i(600, 560));
+
+    window->icon(Icon::get("brush"));
+    window->title("Paint");
+    window->size(Vec2i(600, 560));
 
     window->document = document;
 

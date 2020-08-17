@@ -139,9 +139,9 @@ int main(int argc, char **argv)
 
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_POP_OVER);
 
-    window_set_title(window, "Panel");
-    window_set_position(window, Vec2i::zero());
-    window_set_size(window, Vec2i(320, screen_get_bound().height()));
+    window->title("Panel");
+    window->position(Vec2i::zero());
+    window->size(Vec2i(320, screen_get_bound().height()));
 
     window_root(window)->layout(VFLOW(8));
 

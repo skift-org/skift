@@ -340,20 +340,20 @@ Window *window_create_from_markup(MarkupNode *node)
 
     int height = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "height"), 250);
 
-    window_set_size(window, Vec2i(width, height));
+    window->size(Vec2i(width, height));
 
     const char *icon = markup_node_get_attribute(node, "icon");
 
     if (icon)
     {
-        window_set_icon(window, Icon::get(icon));
+        window->icon(Icon::get(icon));
     }
 
     const char *title = markup_node_get_attribute(node, "title");
 
     if (title)
     {
-        window_set_title(window, title);
+        window->title(title);
     }
 
     return window;

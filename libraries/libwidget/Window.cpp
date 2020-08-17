@@ -24,8 +24,8 @@ void window_populate_header(Window *window)
     new Button(
         window_header(window),
         BUTTON_TEXT,
-        window->icon,
-        window->title);
+        window->_icon,
+        window->_title);
 
     auto spacer = new Container(window_header(window));
     spacer->attributes(LAYOUT_FILL);
@@ -53,8 +53,8 @@ void window_initialize(Window *window, WindowFlag flags)
 {
     static int window_handle_counter = 0;
     window->handle = window_handle_counter++;
-    window->title = strdup("Window");
-    window->icon = Icon::get("application");
+    window->_title = strdup("Window");
+    window->_icon = Icon::get("application");
     window->flags = flags;
 
     window->focused = false;
@@ -66,7 +66,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->backbuffer = Bitmap::create_shared(250, 250).take_value();
     window->backbuffer_painter = Painter(window->backbuffer);
 
-    window->on_screen_bound = Rectangle(250, 250);
+    window->_bound = Rectangle(250, 250);
     window->dirty_rect = list_create();
 
     window->header_container = new Container(nullptr);
@@ -81,7 +81,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->widget_by_id = hashmap_create_string_to_value();
 
     application_add_window(window);
-    window_set_position(window, Vec2i(96, 72));
+    window->position(Vec2i(96, 72));
 }
 
 Window *window_create(WindowFlag flags)
@@ -118,38 +118,8 @@ void window_destroy(Window *window)
         window->destroy(window);
     }
 
-    free(window->title);
+    free(window->_title);
     free(window);
-}
-
-void window_set_title(Window *window, const char *title)
-{
-    if (title)
-    {
-        free(window->title);
-        window->title = strdup(title);
-
-        window_populate_header(window);
-    }
-}
-
-void window_set_icon(Window *window, RefPtr<Icon> icon)
-{
-    if (icon)
-    {
-        window->icon = icon;
-        window_populate_header(window);
-    }
-}
-
-void window_set_size(Window *window, Vec2i size)
-{
-    window_set_bound(window, window->on_screen_bound.resized(size));
-}
-
-void window_set_position(Window *window, Vec2i position)
-{
-    window_set_bound(window, window->on_screen_bound.moved(position));
 }
 
 static void window_change_framebuffer_if_needed(Window *window)
@@ -164,20 +134,6 @@ static void window_change_framebuffer_if_needed(Window *window)
         window->backbuffer = Bitmap::create_shared(window_bound(window).width(), window_bound(window).height()).take_value();
         window->backbuffer_painter = Painter(window->backbuffer);
     }
-}
-
-void window_set_bound(Window *window, Rectangle bound)
-{
-    window->on_screen_bound = bound;
-
-    if (!window->visible)
-        return;
-
-    application_resize_window(window, window->on_screen_bound);
-
-    window_change_framebuffer_if_needed(window);
-    window_schedule_layout(window);
-    window_schedule_update(window, window_bound(window));
 }
 
 bool window_is_visible(Window *window)
@@ -328,7 +284,7 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(window_header(window)->compute_size().x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
     new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
 
-    window_set_bound(window, new_bound);
+    window->bound(new_bound);
 }
 
 void window_end_resize(Window *window)
@@ -355,8 +311,8 @@ void window_event(Window *window, Event *event)
 {
     if (is_mouse_event(event))
     {
-        event->mouse.position = event->mouse.position - window->on_screen_bound.position();
-        event->mouse.old_position = event->mouse.old_position - window->on_screen_bound.position();
+        event->mouse.position = event->mouse.position - window->_bound.position();
+        event->mouse.old_position = event->mouse.old_position - window->_bound.position();
     }
 
     if (window->handlers[event->type])
@@ -412,8 +368,8 @@ void window_event(Window *window, Event *event)
         if (window->is_dragging)
         {
             Vec2i offset = event->mouse.position - event->mouse.old_position;
-            window->on_screen_bound = window->on_screen_bound.offset(offset);
-            application_move_window(window, window->on_screen_bound.position());
+            window->_bound = window->_bound.offset(offset);
+            application_move_window(window, window->_bound.position());
         }
         else if (window->is_resizing)
         {
@@ -593,22 +549,12 @@ void Window::on(EventType event, EventHandler handler)
 
 Rectangle window_bound_on_screen(Window *window)
 {
-    return window->on_screen_bound;
-}
-
-void window_set_on_screen_bound(Window *window, Rectangle new_bound)
-{
-    window->on_screen_bound = new_bound;
-
-    if (!window->visible)
-        return;
-
-    application_resize_window(window, new_bound);
+    return window->_bound;
 }
 
 Rectangle window_bound(Window *window)
 {
-    return window->on_screen_bound.moved({0, 0});
+    return window->_bound.moved({0, 0});
 }
 
 void window_set_cursor(Window *window, CursorState state)
@@ -803,4 +749,48 @@ Color window_get_color(Window *window, ThemeColorRole role)
     }
 
     return theme_get_color(role);
+}
+
+void Window::title(const char *title)
+{
+    if (_title)
+    {
+        free(_title);
+        _title = strdup(title);
+
+        window_populate_header(this);
+    }
+}
+
+void Window::icon(RefPtr<Icon> icon)
+{
+    if (icon)
+    {
+        _icon = icon;
+        window_populate_header(this);
+    }
+}
+
+void Window::size(Vec2i size)
+{
+    bound(_bound.resized(size));
+}
+
+void Window::position(Vec2i position)
+{
+    bound(_bound.moved(position));
+}
+
+void Window::bound(Rectangle bound)
+{
+    _bound = bound;
+
+    if (!visible)
+        return;
+
+    application_resize_window(this, _bound);
+
+    window_change_framebuffer_if_needed(this);
+    window_schedule_layout(this);
+    window_schedule_update(this, window_bound(this));
 }

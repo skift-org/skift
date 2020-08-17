@@ -8,18 +8,18 @@ int main(int argc, char **argv)
 
     Window *window = window_create(WINDOW_RESIZABLE);
 
-    window_set_icon(window, Icon::get("text-box"));
+    window->icon(Icon::get("text-box"));
 
     if (argc == 2)
     {
-        window_set_title(window, argv[1]);
+        window->title(argv[1]);
     }
     else
     {
-        window_set_title(window, "Text Editor");
+        window->title("Text Editor");
     }
 
-    window_set_size(window, Vec2i(700, 500));
+    window->size(Vec2i(700, 500));
 
     window_root(window)->layout(VFLOW(0));
 

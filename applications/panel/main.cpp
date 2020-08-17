@@ -36,8 +36,11 @@ int main(int argc, char **argv)
 
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
-    window_set_title(window, "Panel");
-    window_set_bound(window, screen_get_bound().take_top(36));
+    window->title("Panel");
+    window->bound(screen_get_bound().take_top(36));
+    window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto event) {
+        window->bound(window_bound(window).with_width(event->display.size.x()));
+    });
 
     window_root(window)->layout(HFLOW(8));
     window_root(window)->insets(Insets(4));
@@ -64,10 +67,6 @@ int main(int argc, char **argv)
     timer_start(timer_create(cpu_graph, 100, (TimerCallback)widget_cpu_update));
 
     graph_container->on(Event::MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
-
-    window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto event) {
-        window_set_bound(window, window_bound(window).with_width(event->display.size.x()));
-    });
 
     window_show(window);
 

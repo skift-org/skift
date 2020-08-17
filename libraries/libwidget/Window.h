@@ -17,8 +17,10 @@ typedef void (*WindowDestroyCallback)(Window *window);
 struct Window
 {
     int handle;
-    char *title;
-    RefPtr<Icon> icon;
+
+    char *_title;
+    RefPtr<Icon> _icon;
+    Rectangle _bound;
     WindowFlag flags;
 
     bool focused;
@@ -32,7 +34,6 @@ struct Window
 
     WindowDestroyCallback destroy;
 
-    Rectangle on_screen_bound;
     CursorState cursor_state;
 
     RefPtr<Bitmap> frontbuffer;
@@ -48,10 +49,18 @@ struct Window
 
     Widget *header_container;
     Widget *root_container;
+
     Widget *focused_widget;
     Widget *mouse_focused_widget;
     Widget *mouse_over_widget;
     HashMap *widget_by_id;
+
+public:
+    void title(const char *title);
+    void icon(RefPtr<Icon> icon);
+    void size(Vec2i size);
+    void position(Vec2i position);
+    void bound(Rectangle bound);
 
     void on(EventType event, EventHandler handler);
 };
@@ -61,16 +70,6 @@ Window *window_create(WindowFlag flags);
 void window_initialize(Window *window, WindowFlag flags);
 
 void window_destroy(Window *window);
-
-void window_set_title(Window *window, const char *title);
-
-void window_set_icon(Window *window, RefPtr<Icon> icon);
-
-void window_set_size(Window *window, Vec2i size);
-
-void window_set_position(Window *window, Vec2i position);
-
-void window_set_bound(Window *window, Rectangle bound);
 
 void window_show(Window *window);
 

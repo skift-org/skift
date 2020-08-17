@@ -89,9 +89,9 @@ Window *file_explorer_window_create(const char *current_path)
 
     window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon(window, Icon::get("folder"));
-    window_set_title(window, "File Explorer");
-    window_set_size(window, Vec2i(700, 500));
+    window->icon(Icon::get("folder"));
+    window->title("File Explorer");
+    window->size(Vec2i(700, 500));
 
     Widget *root = window_root(window);
     root->layout(VFLOW(0));

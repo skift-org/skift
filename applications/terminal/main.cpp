@@ -58,9 +58,9 @@ int main(int argc, char **argv)
     {
         Window *window = window_create(WINDOW_RESIZABLE);
 
-        window_set_icon(window, Icon::get("console-line"));
-        window_set_title(window, "Terminal");
-        window_set_size(window, Vec2i(500, 400));
+        window->icon(Icon::get("console-line"));
+        window->title("Terminal");
+        window->size(Vec2i(500, 400));
 
         Widget *widget = new TerminalWidget(window_root(window));
         widget->focus();

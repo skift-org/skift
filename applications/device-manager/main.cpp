@@ -26,9 +26,9 @@ int main(int argc, char **argv)
 
     window_initialize(window, WINDOW_RESIZABLE);
 
-    window_set_icon(window, Icon::get("expansion-card-variant"));
-    window_set_title(window, "Device Manager");
-    window_set_size(window, Vec2i(700, 500));
+    window->icon(Icon::get("expansion-card-variant"));
+    window->title("Device Manager");
+    window->size(Vec2i(700, 500));
 
     window_root(window)->layout(VFLOW(0));
 

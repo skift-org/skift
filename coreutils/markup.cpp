@@ -10,7 +10,6 @@ int main(int argc, char const *argv[])
 
         __cleanup_malloc char *markup_string = markup_prettify(markup_node);
 
-        //printf("length: %d\n", strlen(markup_string));
         printf("%s", markup_string);
     }
 

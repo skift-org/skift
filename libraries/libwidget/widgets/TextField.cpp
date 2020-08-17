@@ -1,4 +1,5 @@
 #include <libgraphic/Painter.h>
+#include <libwidget/Window.h>
 #include <libwidget/widgets/TextField.h>
 
 TextField::TextField(Widget *parent, RefPtr<TextModel> model)
@@ -66,6 +67,11 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
         {
             Codepoint codepoint = line[j];
 
+            if (i == _cursor.line() && j == _cursor.column())
+            {
+                painter.draw_rectangle(Rectangle(current_position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+            }
+
             if (codepoint == U'\t')
             {
                 current_position += Vec2i(8 * 4, 0);
@@ -82,6 +88,12 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
                 current_position += Vec2i(glyph.advance, 0);
             }
         }
+
+        if (i == _cursor.line() && line.length() == _cursor.column())
+        {
+            painter.draw_rectangle(Rectangle(current_position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+        }
+
         painter.pop();
     }
 }
@@ -100,6 +112,23 @@ void TextField::event(Event *event)
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
             _cursor.move_down_within(*_model);
+            should_repaint();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
+        {
+            _cursor.move_left_withing(*_model);
+            should_repaint();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
+        {
+            _cursor.move_right_withing(*_model);
+            should_repaint();
+        }
+        else if (event->keyboard.codepoint != 0)
+        {
+            _model->append_at(_cursor, event->keyboard.codepoint);
+            _cursor.move_right_withing(*_model);
+
             should_repaint();
         }
 

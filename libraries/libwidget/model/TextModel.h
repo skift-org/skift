@@ -39,6 +39,16 @@ public:
     {
         _codepoints.push_back(codepoint);
     }
+
+    void append_at(size_t index, Codepoint codepoint)
+    {
+        _codepoints.insert(index, codepoint);
+    }
+
+    void remove(size_t index)
+    {
+        _codepoints.remove_index(index);
+    }
 };
 
 class TextModel : public RefCounted<TextModel>
@@ -47,45 +57,11 @@ private:
     Vector<OwnPtr<TextModelLine>> _lines{1024};
 
 public:
-    static RefPtr<TextModel> from_file(const char *path)
-    {
-        auto model = make<TextModel>();
+    static RefPtr<TextModel> empty();
 
-        Stream *stream = stream_open(path, OPEN_READ | OPEN_BUFFERED);
+    static RefPtr<TextModel> from_file(const char *path);
 
-        Lexer lexer(stream);
-
-        // Skip the utf8 bom header if present.
-        lexer.skip_word("\xEF\xBB\xBF");
-
-        while (lexer.do_continue())
-        {
-            auto line = own<TextModelLine>();
-
-            while (lexer.do_continue() && lexer.current_codepoint() != '\n')
-            {
-                line->append(lexer.current_codepoint());
-
-                lexer.foreward_codepoint();
-            }
-
-            model->append_line(line);
-            lexer.foreward_codepoint();
-        }
-
-        stream_close(stream);
-
-        if (model->line_count() == 0)
-        {
-            model->append_line(own<TextModelLine>());
-        }
-
-        return model;
-    }
-
-    TextModel()
-    {
-    }
+    TextModel() {}
 
     ~TextModel() {}
 
@@ -94,6 +70,8 @@ public:
     size_t line_count() { return _lines.count(); }
 
     void append_line(OwnPtr<TextModelLine> line) { _lines.push_back(line); }
+
+    void append_at(TextCursor &cursor, Codepoint codepoint);
 };
 
 struct TextCursor
@@ -113,6 +91,7 @@ public:
         if (_line > 0)
         {
             _line--;
+            _column = clamp(_column, 0, model.line(_line).length() - 1);
         }
     }
 
@@ -121,6 +100,7 @@ public:
         if (_line < model.line_count() - 1)
         {
             _line++;
+            _column = clamp(_column, 0, model.line(_line).length() - 1);
         }
     }
 
@@ -130,5 +110,19 @@ public:
         {
             _line = line;
         }
+    }
+
+    void move_left_withing(TextModel &model)
+    {
+        __unused(model);
+
+        if (_column > 0)
+            _column--;
+    }
+
+    void move_right_withing(TextModel &model)
+    {
+        if (_column < model.line(_line).length())
+            _column++;
     }
 };

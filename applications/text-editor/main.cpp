@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     toolbar_icon_create(toolbar, Icon::get("content-save"));
     toolbar_icon_create(toolbar, Icon::get("file-plus"));
 
-    auto model = make<TextModel>();
+    auto model = TextModel::empty();
 
     if (argc == 2)
     {

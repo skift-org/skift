@@ -34,7 +34,7 @@ Result file_read_all(const char *path, void **buffer, size_t *size)
 
 Result file_write_all(const char *path, void *buffer, size_t size)
 {
-    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE | OPEN_CREATE);
 
     if (handle_has_error(stream))
     {

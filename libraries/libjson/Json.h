@@ -2,125 +2,128 @@
 
 #include <libsystem/utils/HashMap.h>
 
-enum JsonType
+namespace json
 {
-    JSON_STRING,
-    JSON_INTEGER,
-    JSON_DOUBLE,
-    JSON_OBJECT,
-    JSON_ARRAY,
-    JSON_TRUE,
-    JSON_FALSE,
-    JSON_NULL,
+    enum Type
+    {
+        STRING,
+        INTEGER,
+        DOUBLE,
+        OBJECT,
+        ARRAY,
+        TRUE,
+        FALSE,
+        NIL,
 
-    __JSON_TYPE_COUNT,
-};
-
-struct JsonValue
-{
-    JsonType type;
-
-    union {
-        char *storage_string;
-        int storage_integer;
-        double storage_double;
-        HashMap *storage_object;
-        List *storage_array;
+        __TYPE_COUNT,
     };
-};
 
-/* --- JsonValue constructor and destructor --------------------------------- */
+    struct Value
+    {
+        Type type;
 
-// Create a JsonValue of type JSON_STRING  from a cstring by creating a copy.
-JsonValue *json_create_string(const char *string);
+        union {
+            char *storage_string;
+            int storage_integer;
+            double storage_double;
+            HashMap *storage_object;
+            List *storage_array;
+        };
+    };
 
-// Create a JsonValue of type JSON_STRING from a mallocated string
-// and take the ownership of the given string.
-JsonValue *json_create_string_adopt(char *string);
+    /* --- Value constructor and destructor --------------------------------- */
 
-// Create a JsonValue of type JSON_INTEGER.
-JsonValue *json_create_integer(int integer);
+    // Create a Value of type JSON_STRING  from a cstring by creating a copy.
+    Value *create_string(const char *string);
 
-// Create a JsonValue of type JSON_DOUBLE.
-JsonValue *json_create_double(double double_);
+    // Create a Value of type JSON_STRING from a mallocated string
+    // and take the ownership of the given string.
+    Value *create_string_adopt(char *string);
 
-// Create a JsonValue of type JSON_TRUE or JSON_FALSE.
-JsonValue *json_create_boolean(bool value);
+    // Create a Value of type JSON_INTEGER.
+    Value *create_integer(int integer);
 
-// Create a JsonValue of type JSON_OBJECT which is a HashMap.
-JsonValue *json_create_object();
+    // Create a Value of type JSON_DOUBLE.
+    Value *create_double(double double_);
 
-// Create a JsonValue of type JSON_ARRAY which is a array of JsonValue.
-JsonValue *json_create_array();
+    // Create a Value of type JSON_TRUE or JSON_FALSE.
+    Value *create_boolean(bool value);
 
-// Create a JsonValue of type JSON_TRUE or JSON_FALSE.
-JsonValue *json_create_boolean(bool value);
+    // Create a Value of type JSON_OBJECT which is a HashMap.
+    Value *create_object();
 
-// Create a JsonValue of type JSON_NULL.
-JsonValue *json_create_null();
+    // Create a Value of type JSON_ARRAY which is a array of Value.
+    Value *create_array();
 
-// Destroy a JsonValue and all of its childrens.
-void json_destroy(JsonValue *value);
+    // Create a Value of type JSON_TRUE or JSON_FALSE.
+    Value *create_boolean(bool value);
 
-/* --- Json value methodes -------------------------------------------------- */
+    // Create a Value of type JSON_NULL.
+    Value *create_nil();
 
-// The following operation operate on specifique JsonValue type.
-// If the JsonType don't match, an assert will fail.
-// So use `json_is()` before using any of these.
+    // Destroy a Value and all of its childrens.
+    void destroy(Value *value);
 
-// Check the type of a json value.
-bool json_is(JsonValue *value, JsonType type);
+    /* ---  value methodes -------------------------------------------------- */
 
-// Get the value of a string JsonValue.
-const char *json_string_value(JsonValue *value);
+    // The following operation operate on specifique Value type.
+    // If the Type don't match, an assert will fail.
+    // So use `is()` before using any of these.
 
-// Get the value of a JSON_DOUBLE or JSON_INTEGER has a int
-int json_integer_value(JsonValue *value);
+    // Check the type of a json value.
+    bool is(Value *value, Type type);
 
-// Get the value of a JSON_DOUBLE or JSON_INTEGER has a double
-double json_double_value(JsonValue *value);
+    // Get the value of a string Value.
+    const char *string_value(Value *value);
 
-// Return true if the JSON_OBJECT containe the key
-bool json_object_has(JsonValue *object, const char *key);
+    // Get the value of a JSON_DOUBLE or JSON_INTEGER has a int
+    int integer_value(Value *value);
 
-// Return a JsonValue contained in a JSON_OBJECT by its key. The object keep the ownership of the value
-JsonValue *json_object_get(JsonValue *object, const char *key);
+    // Get the value of a JSON_DOUBLE or JSON_INTEGER has a double
+    double double_value(Value *value);
 
-// Put a JsonValue in the json object.
-// The object will take the ownership of the value and create a copy of the key.
-void json_object_put(JsonValue *object, const char *key, JsonValue *value);
+    // Return true if the JSON_OBJECT containe the key
+    bool object_has(Value *object, const char *key);
 
-// Remove a child from a JSON_OBJECT using a key.
-void json_object_remove(JsonValue *object, const char *key);
+    // Return a Value contained in a JSON_OBJECT by its key. The object keep the ownership of the value
+    Value *object_get(Value *object, const char *key);
 
-// Return the length of a JSON_ARRAY
-size_t json_array_length(JsonValue *array);
+    // Put a Value in the json object.
+    // The object will take the ownership of the value and create a copy of the key.
+    void object_put(Value *object, const char *key, Value *value);
 
-// Return a child a the specified index. The array keep the ownership of the child.
-JsonValue *json_array_get(JsonValue *array, size_t index);
+    // Remove a child from a JSON_OBJECT using a key.
+    void object_remove(Value *object, const char *key);
 
-// Put a JsonValue in the json array at a specified index.
-// The array will take the ownership of the value.
-void json_array_put(JsonValue *array, size_t index, JsonValue *value);
+    // Return the length of a JSON_ARRAY
+    size_t array_length(Value *array);
 
-// Append a JsonValue a the end of the array.
-void json_array_append(JsonValue *array, JsonValue *value);
+    // Return a child a the specified index. The array keep the ownership of the child.
+    Value *array_get(Value *array, size_t index);
 
-// Remove a json value at the specified index and shift all indexes after by -1.
-void json_array_remove(JsonValue *array, size_t index);
+    // Put a Value in the json array at a specified index.
+    // The array will take the ownership of the value.
+    void array_put(Value *array, size_t index, Value *value);
 
-/* --- Serialization and Deserialization ------------------------------------ */
+    // Append a Value a the end of the array.
+    void array_append(Value *array, Value *value);
 
-// Return a mallocated string representation of the JsonValue tree.
-char *json_stringify(JsonValue *value);
+    // Remove a json value at the specified index and shift all indexes after by -1.
+    void array_remove(Value *array, size_t index);
 
-// Return a mallocated string representation of the JsonValue tree
-// *WITH* beautiful vt100 colors.
-char *json_prettify(JsonValue *value);
+    /* --- Serialization and Deserialization ------------------------------------ */
 
-// Parse a json string and return a JsonValue tree.
-JsonValue *json_parse(const char *str, size_t size);
+    // Return a mallocated string representation of the Value tree.
+    char *stringify(Value *value);
 
-// Parse a json file and return a JsonValue tree.
-// Return nullptr on error.
-JsonValue *json_parse_file(const char *path);
+    // Return a mallocated string representation of the Value tree
+    // *WITH* beautiful vt100 colors.
+    char *prettify(Value *value);
+
+    // Parse a json string and return a Value tree.
+    Value *parse(const char *str, size_t size);
+
+    // Parse a json file and return a Value tree.
+    // Return nullptr on error.
+    Value *parse_file(const char *path);
+} // namespace json

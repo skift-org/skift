@@ -17,23 +17,23 @@ static void device_model_update(DeviceModel *model)
 {
     if (model->data)
     {
-        json_destroy(model->data);
+        json::destroy(model->data);
     }
 
-    model->data = json_parse_file("/System/devices");
+    model->data = json::parse_file("/System/devices");
 }
 
 static Variant device_model_data(DeviceModel *model, int row, int column)
 {
-    JsonValue *device = json_array_get(model->data, (size_t)row);
+    auto device = json::array_get(model->data, (size_t)row);
 
     switch (column)
     {
     case COLUMN_DEVICE:
-        return Variant(json_string_value(json_object_get(device, "device")));
+        return Variant(json::string_value(json::object_get(device, "device")));
 
     case COLUMN_DESCRIPTION:
-        return Variant(json_string_value(json_object_get(device, "description")));
+        return Variant(json::string_value(json::object_get(device, "description")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -47,7 +47,7 @@ static int device_model_column_count()
 
 static int device_model_row_count(DeviceModel *model)
 {
-    return json_array_length(model->data);
+    return json::array_length(model->data);
 }
 
 static const char *device_model_column_name(int column)
@@ -67,7 +67,7 @@ static const char *device_model_column_name(int column)
 
 static void device_model_destroy(DeviceModel *model)
 {
-    json_destroy(model->data);
+    json::destroy(model->data);
 }
 
 DeviceModel *device_model_create()

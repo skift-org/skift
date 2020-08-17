@@ -21,23 +21,23 @@ static void task_model_update(TaskModel *model)
 {
     if (model->data)
     {
-        json_destroy(model->data);
+        json::destroy(model->data);
     }
 
-    model->data = json_parse_file("/System/processes");
+    model->data = json::parse_file("/System/processes");
 }
 
 static Variant task_model_data(TaskModel *model, int row, int column)
 {
-    JsonValue *task = json_array_get(model->data, (size_t)row);
+    auto task = json::array_get(model->data, (size_t)row);
 
     switch (column)
     {
     case COLUMN_ID:
     {
-        Variant value = Variant(json_integer_value(json_object_get(task, "id")));
+        Variant value = Variant(json::integer_value(json::object_get(task, "id")));
 
-        if (json_is(json_object_get(task, "user"), JSON_TRUE))
+        if (json::is(json::object_get(task, "user"), json::TRUE))
         {
             return value.with_icon(Icon::get("account"));
         }
@@ -48,19 +48,19 @@ static Variant task_model_data(TaskModel *model, int row, int column)
     }
 
     case COLUMN_NAME:
-        return Variant(json_string_value(json_object_get(task, "name")));
+        return Variant(json::string_value(json::object_get(task, "name")));
 
     case COLUMN_STATE:
-        return Variant(json_string_value(json_object_get(task, "state")));
+        return Variant(json::string_value(json::object_get(task, "state")));
 
     case COLUMN_CPU:
-        return Variant("%2d%%", json_integer_value(json_object_get(task, "cpu")));
+        return Variant("%2d%%", json::integer_value(json::object_get(task, "cpu")));
 
     case COLUMN_RAM:
-        return Variant("%5d Kio", json_integer_value(json_object_get(task, "ram")) / 1024);
+        return Variant("%5d Kio", json::integer_value(json::object_get(task, "ram")) / 1024);
 
     case COLUMN_DIRECTORY:
-        return Variant(json_string_value(json_object_get(task, "directory")));
+        return Variant(json::string_value(json::object_get(task, "directory")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -74,7 +74,7 @@ static int task_model_column_count()
 
 static int task_model_row_count(TaskModel *model)
 {
-    return json_array_length(model->data);
+    return json::array_length(model->data);
 }
 
 static const char *task_model_column_name(int column)
@@ -106,7 +106,7 @@ static const char *task_model_column_name(int column)
 
 static void task_model_destroy(TaskModel *model)
 {
-    json_destroy(model->data);
+    json::destroy(model->data);
 }
 
 TaskModel *task_model_create()
@@ -129,22 +129,24 @@ const char *task_model_get_greedy_process(TaskModel *model, int ram_cpu)
 {
     const char *greedy = "";
 
-    int row_count = json_array_length(model->data);
+    int row_count = json::array_length(model->data);
     int list[row_count];
+
     for (int row = 0; row < row_count; row++)
     {
         // 0 means memory. 1 means processor
         if (ram_cpu == 0)
         {
-            JsonValue *task = json_array_get(model->data, (size_t)row);
-            list[row] = json_integer_value(json_object_get(task, "ram"));
+            auto task = json::array_get(model->data, (size_t)row);
+            list[row] = json::integer_value(json::object_get(task, "ram"));
         }
         else if (ram_cpu == 1)
         {
-            JsonValue *task = json_array_get(model->data, (size_t)row);
-            list[row] = json_integer_value(json_object_get(task, "cpu"));
+            auto task = json::array_get(model->data, (size_t)row);
+            list[row] = json::integer_value(json::object_get(task, "cpu"));
         }
     }
+
     int greedy_index = 0;
     for (int i = 0; i < row_count; i++)
     {
@@ -153,7 +155,9 @@ const char *task_model_get_greedy_process(TaskModel *model, int ram_cpu)
             greedy_index = i;
         }
     }
-    JsonValue *task = json_array_get(model->data, (size_t)greedy_index);
-    greedy = json_string_value(json_object_get(task, "name"));
+
+    auto task = json::array_get(model->data, (size_t)greedy_index);
+    greedy = json::string_value(json::object_get(task, "name"));
+
     return greedy;
 }

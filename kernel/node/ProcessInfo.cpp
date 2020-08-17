@@ -12,22 +12,22 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
 
-static Iteration serialize_task(JsonValue *destination, Task *task)
+static Iteration serialize_task(json::Value *destination, Task *task)
 {
     if (task->id == 0)
         return Iteration::CONTINUE;
 
-    JsonValue *task_object = json_create_object();
+    auto task_object = json::create_object();
 
-    json_object_put(task_object, "id", json_create_integer(task->id));
-    json_object_put(task_object, "name", json_create_string(task->name));
-    json_object_put(task_object, "state", json_create_string(task_state_string(task->state)));
-    json_object_put(task_object, "directory", json_create_string_adopt(path_as_string(task->directory)));
-    json_object_put(task_object, "cpu", json_create_integer(scheduler_get_usage(task->id)));
-    json_object_put(task_object, "ram", json_create_integer(task_memory_usage(task)));
-    json_object_put(task_object, "user", json_create_boolean(task->user));
+    json::object_put(task_object, "id", json::create_integer(task->id));
+    json::object_put(task_object, "name", json::create_string(task->name));
+    json::object_put(task_object, "state", json::create_string(task_state_string(task->state)));
+    json::object_put(task_object, "directory", json::create_string_adopt(path_as_string(task->directory)));
+    json::object_put(task_object, "cpu", json::create_integer(scheduler_get_usage(task->id)));
+    json::object_put(task_object, "ram", json::create_integer(task_memory_usage(task)));
+    json::object_put(task_object, "user", json::create_boolean(task->user));
 
-    json_array_append(destination, task_object);
+    json::array_append(destination, task_object);
 
     return Iteration::CONTINUE;
 }
@@ -36,14 +36,14 @@ static Result process_info_open(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
 
-    JsonValue *destination = json_create_array();
+    auto destination = json::create_array();
 
     task_iterate(destination, (TaskIterateCallback)serialize_task);
 
-    handle->attached = json_stringify(destination);
+    handle->attached = json::stringify(destination);
     handle->attached_size = strlen((const char *)handle->attached);
 
-    json_destroy(destination);
+    json::destroy(destination);
 
     return SUCCESS;
 }

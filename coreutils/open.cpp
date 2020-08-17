@@ -25,44 +25,44 @@ int main(int argc, char const *argv[])
         stream_format(err_stream, "The file does not have an extension.\n");
         return -1;
     }
-    JsonValue *file_extensions = json_parse_file(FILE_EXTENSIONS_DATABASE_PATH);
+    auto file_extensions = json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
 
-    if (!json_is(file_extensions, JSON_OBJECT))
+    if (!json::is(file_extensions, json::OBJECT))
     {
         stream_format(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
         return -1;
     }
 
-    JsonValue *file_type = json_object_get(file_extensions, extension);
+    auto file_type = json::object_get(file_extensions, extension);
 
-    if (!json_is(file_type, JSON_STRING))
+    if (!json::is(file_type, json::STRING))
     {
         stream_format(err_stream, "Unknown file extension %s.\n", extension);
         return -1;
     }
 
-    JsonValue *file_types = json_parse_file(FILE_TYPES_DATABASE_PATH);
+    auto file_types = json::parse_file(FILE_TYPES_DATABASE_PATH);
 
-    if (!json_is(file_types, JSON_OBJECT))
+    if (!json::is(file_types, json::OBJECT))
     {
         stream_format(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
         return -1;
     }
 
-    JsonValue *file_type_info = json_object_get(file_types, json_string_value(file_type));
+    auto file_type_info = json::object_get(file_types, json::string_value(file_type));
 
-    if (!json_is(file_type_info, JSON_OBJECT))
+    if (!json::is(file_type_info, json::OBJECT))
     {
-        stream_format(err_stream, "Unknown file type %s.\n", json_string_value(file_type));
+        stream_format(err_stream, "Unknown file type %s.\n", json::string_value(file_type));
         return -1;
     }
 
-    JsonValue *file_type_open_with = json_object_get(file_type_info, "open-with");
+    auto file_type_open_with = json::object_get(file_type_info, "open-with");
 
-    if (!json_is(file_type_open_with, JSON_STRING))
+    if (!json::is(file_type_open_with, json::STRING))
         return -1;
 
-    const char *application_name = json_string_value(file_type_open_with);
+    const char *application_name = json::string_value(file_type_open_with);
     char application_path[PATH_LENGTH] = {};
 
     snprintf(application_path, PATH_LENGTH, "/Applications/%s/%s", application_name, application_name);

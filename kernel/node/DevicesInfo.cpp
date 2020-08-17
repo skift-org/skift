@@ -11,24 +11,24 @@
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
 
-static Iteration append_device_info(JsonValue *root, DeviceInfo device)
+static Iteration append_device_info(json::Value *root, DeviceInfo device)
 {
-    JsonValue *task_object = json_create_object();
+    auto task_object = json::create_object();
 
-    json_object_put(task_object, "device", json_create_string(device_to_static_string(device)));
+    json::object_put(task_object, "device", json::create_string(device_to_static_string(device)));
 
     const DeviceDriverInfo *driver = device_get_diver_info(device);
 
     if (driver)
     {
-        json_object_put(task_object, "description", json_create_string(driver->description));
+        json::object_put(task_object, "description", json::create_string(driver->description));
     }
     else
     {
-        json_object_put(task_object, "description", json_create_string("Unknown"));
+        json::object_put(task_object, "description", json::create_string("Unknown"));
     }
 
-    json_array_append(root, task_object);
+    json::array_append(root, task_object);
 
     return Iteration::CONTINUE;
 }
@@ -37,14 +37,14 @@ static Result device_info_open(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
 
-    JsonValue *root = json_create_array();
+    auto root = json::create_array();
 
     device_iterate(root, (DeviceIterateCallback)append_device_info);
 
-    handle->attached = json_stringify(root);
+    handle->attached = json::stringify(root);
     handle->attached_size = strlen((const char *)handle->attached);
 
-    json_destroy(root);
+    json::destroy(root);
 
     return SUCCESS;
 }

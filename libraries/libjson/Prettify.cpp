@@ -2,138 +2,141 @@
 #include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberFormatter.h>
 
-struct JsonPrettifyState
+namespace json
 {
-    BufferBuilder *builder;
-    int depth;
-    bool color;
-};
-
-static const char *depth_color[] = {
-    "\e[91m",
-    "\e[92m",
-    "\e[93m",
-    "\e[94m",
-    "\e[95m",
-    "\e[96m",
-};
-
-static void json_prettify_internal(JsonPrettifyState *state, JsonValue *value);
-
-static void json_prettify_ident(JsonPrettifyState *state)
-{
-    buffer_builder_append_chr(state->builder, '\n');
-    for (int i = 0; i < state->depth; i++)
+    struct PrettifyState
     {
-        buffer_builder_append_str(state->builder, "    ");
-    }
-}
+        BufferBuilder *builder;
+        int depth;
+        bool color;
+    };
 
-static Iteration json_prettify_object(JsonPrettifyState *state, char *key, JsonValue *value)
-{
-    json_prettify_ident(state);
+    static const char *depth_color[] = {
+        "\e[91m",
+        "\e[92m",
+        "\e[93m",
+        "\e[94m",
+        "\e[95m",
+        "\e[96m",
+    };
 
-    if (state->color)
+    static void prettify_internal(PrettifyState *state, Value *value);
+
+    static void prettify_ident(PrettifyState *state)
     {
-        buffer_builder_append_str(state->builder, depth_color[state->depth % 6]);
+        buffer_builder_append_chr(state->builder, '\n');
+        for (int i = 0; i < state->depth; i++)
+        {
+            buffer_builder_append_str(state->builder, "    ");
+        }
     }
 
-    buffer_builder_append_str(state->builder, "\"");
-    buffer_builder_append_str(state->builder, key);
-    buffer_builder_append_str(state->builder, "\"");
-
-    if (state->color)
+    static Iteration prettify_object(PrettifyState *state, char *key, Value *value)
     {
-        buffer_builder_append_str(state->builder, "\e[m");
-    }
+        prettify_ident(state);
 
-    buffer_builder_append_str(state->builder, ": ");
-    json_prettify_internal(state, value);
-    buffer_builder_append_str(state->builder, ",");
+        if (state->color)
+        {
+            buffer_builder_append_str(state->builder, depth_color[state->depth % 6]);
+        }
 
-    return Iteration::CONTINUE;
-}
-
-static Iteration json_prettify_array(JsonPrettifyState *state, JsonValue *value)
-{
-    json_prettify_ident(state);
-    json_prettify_internal(state, value);
-    buffer_builder_append_str(state->builder, ",");
-
-    return Iteration::CONTINUE;
-}
-
-static void json_prettify_internal(JsonPrettifyState *state, JsonValue *value)
-{
-    switch (value->type)
-    {
-    case JSON_STRING:
         buffer_builder_append_str(state->builder, "\"");
-        buffer_builder_append_str(state->builder, value->storage_string);
+        buffer_builder_append_str(state->builder, key);
         buffer_builder_append_str(state->builder, "\"");
-        break;
-    case JSON_INTEGER:
+
+        if (state->color)
+        {
+            buffer_builder_append_str(state->builder, "\e[m");
+        }
+
+        buffer_builder_append_str(state->builder, ": ");
+        prettify_internal(state, value);
+        buffer_builder_append_str(state->builder, ",");
+
+        return Iteration::CONTINUE;
+    }
+
+    static Iteration prettify_array(PrettifyState *state, Value *value)
     {
-        char buffer[128];
-        format_int(FORMAT_DECIMAL, value->storage_integer, buffer, 128);
-        buffer_builder_append_str(state->builder, buffer);
+        prettify_ident(state);
+        prettify_internal(state, value);
+        buffer_builder_append_str(state->builder, ",");
 
-        break;
+        return Iteration::CONTINUE;
     }
 
-    case JSON_DOUBLE:
+    static void prettify_internal(PrettifyState *state, Value *value)
     {
-        char buffer[128];
-        format_double(FORMAT_DECIMAL, value->storage_double, buffer, 128);
-        buffer_builder_append_str(state->builder, buffer);
+        switch (value->type)
+        {
+        case STRING:
+            buffer_builder_append_str(state->builder, "\"");
+            buffer_builder_append_str(state->builder, value->storage_string);
+            buffer_builder_append_str(state->builder, "\"");
+            break;
+        case INTEGER:
+        {
+            char buffer[128];
+            format_int(FORMAT_DECIMAL, value->storage_integer, buffer, 128);
+            buffer_builder_append_str(state->builder, buffer);
 
-        break;
+            break;
+        }
+
+        case DOUBLE:
+        {
+            char buffer[128];
+            format_double(FORMAT_DECIMAL, value->storage_double, buffer, 128);
+            buffer_builder_append_str(state->builder, buffer);
+
+            break;
+        }
+
+        case OBJECT:
+            buffer_builder_append_str(state->builder, "{");
+
+            state->depth++;
+            hashmap_iterate(value->storage_object, state, (HashMapIterationCallback)prettify_object);
+            buffer_builder_rewind(state->builder, 1); // remove the last ","
+            state->depth--;
+
+            prettify_ident(state);
+            buffer_builder_append_str(state->builder, "}");
+            break;
+        case ARRAY:
+            buffer_builder_append_str(state->builder, "[");
+
+            state->depth++;
+            list_iterate(value->storage_array, state, (ListIterationCallback)prettify_array);
+            buffer_builder_rewind(state->builder, 1); // remove the last ","
+            state->depth--;
+
+            prettify_ident(state);
+            buffer_builder_append_str(state->builder, "]");
+            break;
+        case TRUE:
+            buffer_builder_append_str(state->builder, "true");
+            break;
+        case FALSE:
+            buffer_builder_append_str(state->builder, "false");
+            break;
+        case NIL:
+            buffer_builder_append_str(state->builder, "null");
+            break;
+
+        default:
+            break;
+        }
     }
 
-    case JSON_OBJECT:
-        buffer_builder_append_str(state->builder, "{");
+    char *prettify(Value *value)
+    {
+        BufferBuilder *builder = buffer_builder_create(128);
 
-        state->depth++;
-        hashmap_iterate(value->storage_object, state, (HashMapIterationCallback)json_prettify_object);
-        buffer_builder_rewind(state->builder, 1); // remove the last ","
-        state->depth--;
+        PrettifyState state = {builder, 0, true};
 
-        json_prettify_ident(state);
-        buffer_builder_append_str(state->builder, "}");
-        break;
-    case JSON_ARRAY:
-        buffer_builder_append_str(state->builder, "[");
+        prettify_internal(&state, value);
 
-        state->depth++;
-        list_iterate(value->storage_array, state, (ListIterationCallback)json_prettify_array);
-        buffer_builder_rewind(state->builder, 1); // remove the last ","
-        state->depth--;
-
-        json_prettify_ident(state);
-        buffer_builder_append_str(state->builder, "]");
-        break;
-    case JSON_TRUE:
-        buffer_builder_append_str(state->builder, "true");
-        break;
-    case JSON_FALSE:
-        buffer_builder_append_str(state->builder, "false");
-        break;
-    case JSON_NULL:
-        buffer_builder_append_str(state->builder, "null");
-        break;
-
-    default:
-        break;
+        return buffer_builder_finalize(builder);
     }
-}
-
-char *json_prettify(JsonValue *value)
-{
-    BufferBuilder *builder = buffer_builder_create(128);
-
-    JsonPrettifyState state = {builder, 0, true};
-
-    json_prettify_internal(&state, value);
-
-    return buffer_builder_finalize(builder);
-}
+} // namespace json

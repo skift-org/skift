@@ -2,240 +2,245 @@
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
 
-JsonValue *json_create_string(const char *string)
+namespace json
 {
-    if (string == nullptr)
+
+    Value *create_string(const char *string)
     {
-        return json_create_null();
+        if (string == nullptr)
+        {
+            return create_nil();
+        }
+
+        Value *value = __create(Value);
+
+        value->type = STRING;
+        value->storage_string = strdup(string);
+
+        return value;
     }
 
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_STRING;
-    value->storage_string = strdup(string);
-
-    return value;
-}
-
-JsonValue *json_create_string_adopt(char *string)
-{
-    if (string == nullptr)
+    Value *create_string_adopt(char *string)
     {
-        return json_create_null();
+        if (string == nullptr)
+        {
+            return create_nil();
+        }
+
+        Value *value = __create(Value);
+
+        value->type = STRING;
+        value->storage_string = string;
+
+        return value;
     }
 
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_STRING;
-    value->storage_string = string;
-
-    return value;
-}
-
-JsonValue *json_create_integer(int integer)
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_INTEGER;
-    value->storage_integer = integer;
-
-    return value;
-}
-
-JsonValue *json_create_double(double double_)
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_DOUBLE;
-    value->storage_double = double_;
-
-    return value;
-}
-
-JsonValue *json_create_object()
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_OBJECT;
-    value->storage_object = hashmap_create_string_to_value();
-
-    return value;
-}
-
-JsonValue *json_create_array()
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_ARRAY;
-    value->storage_array = list_create();
-
-    return value;
-}
-
-JsonValue *json_create_boolean(bool boolean)
-{
-    JsonValue *value = __create(JsonValue);
-
-    if (boolean)
+    Value *create_integer(int integer)
     {
-        value->type = JSON_TRUE;
-    }
-    else
-    {
-        value->type = JSON_FALSE;
+        Value *value = __create(Value);
+
+        value->type = INTEGER;
+        value->storage_integer = integer;
+
+        return value;
     }
 
-    return value;
-}
-
-JsonValue *json_create_null()
-{
-    JsonValue *value = __create(JsonValue);
-
-    value->type = JSON_NULL;
-
-    return value;
-}
-
-void json_destroy(JsonValue *value)
-{
-    if (!value)
-        return;
-
-    switch (value->type)
+    Value *create_double(double double_)
     {
-    case JSON_STRING:
-        free(value->storage_string);
-        break;
-    case JSON_OBJECT:
-        hashmap_destroy_with_callback(value->storage_object, (HashMapDestroyValueCallback)json_destroy);
-        break;
-    case JSON_ARRAY:
-        list_destroy_with_callback(value->storage_array, (ListDestroyElementCallback)json_destroy);
-        break;
-    default:
-        break;
+        Value *value = __create(Value);
+
+        value->type = DOUBLE;
+        value->storage_double = double_;
+
+        return value;
     }
 
-    free(value);
-}
-
-/* --- JsonValue members ---------------------------------------------------- */
-
-bool json_is(JsonValue *value, JsonType type)
-{
-    if (value == nullptr)
+    Value *create_object()
     {
-        return type == JSON_NULL;
+        Value *value = __create(Value);
+
+        value->type = OBJECT;
+        value->storage_object = hashmap_create_string_to_value();
+
+        return value;
     }
 
-    return value->type == type;
-}
-
-const char *json_string_value(JsonValue *value)
-{
-    assert(json_is(value, JSON_STRING));
-
-    return value->storage_string;
-}
-
-int json_integer_value(JsonValue *value)
-{
-    if (json_is(value, JSON_INTEGER))
+    Value *create_array()
     {
-        return value->storage_integer;
+        Value *value = __create(Value);
+
+        value->type = ARRAY;
+        value->storage_array = list_create();
+
+        return value;
     }
-    else if (json_is(value, JSON_INTEGER))
+
+    Value *create_boolean(bool boolean)
     {
-        return value->storage_double;
+        Value *value = __create(Value);
+
+        if (boolean)
+        {
+            value->type = TRUE;
+        }
+        else
+        {
+            value->type = FALSE;
+        }
+
+        return value;
     }
-    else
+
+    Value *create_nil()
     {
-        ASSERT_NOT_REACHED();
-    }
-}
+        Value *value = __create(Value);
 
-double json_double_value(JsonValue *value)
-{
-    if (json_is(value, JSON_INTEGER))
+        value->type = NIL;
+
+        return value;
+    }
+
+    void destroy(Value *value)
     {
-        return value->storage_integer;
+        if (!value)
+            return;
+
+        switch (value->type)
+        {
+        case STRING:
+            free(value->storage_string);
+            break;
+        case OBJECT:
+            hashmap_destroy_with_callback(value->storage_object, (HashMapDestroyValueCallback)destroy);
+            break;
+        case ARRAY:
+            list_destroy_with_callback(value->storage_array, (ListDestroyElementCallback)destroy);
+            break;
+        default:
+            break;
+        }
+
+        free(value);
     }
-    else if (json_is(value, JSON_INTEGER))
+
+    /* --- Value members ---------------------------------------------------- */
+
+    bool is(Value *value, Type type)
     {
-        return value->storage_double;
+        if (value == nullptr)
+        {
+            return type == NIL;
+        }
+
+        return value->type == type;
     }
-    else
+
+    const char *string_value(Value *value)
     {
-        ASSERT_NOT_REACHED();
+        assert(is(value, STRING));
+
+        return value->storage_string;
     }
-}
 
-bool json_object_has(JsonValue *object, const char *key)
-{
-    assert(json_is(object, JSON_OBJECT));
+    int integer_value(Value *value)
+    {
+        if (is(value, INTEGER))
+        {
+            return value->storage_integer;
+        }
+        else if (is(value, INTEGER))
+        {
+            return value->storage_double;
+        }
+        else
+        {
+            ASSERT_NOT_REACHED();
+        }
+    }
 
-    return hashmap_has(object->storage_object, key);
-}
+    double double_value(Value *value)
+    {
+        if (is(value, INTEGER))
+        {
+            return value->storage_integer;
+        }
+        else if (is(value, INTEGER))
+        {
+            return value->storage_double;
+        }
+        else
+        {
+            ASSERT_NOT_REACHED();
+        }
+    }
 
-JsonValue *json_object_get(JsonValue *object, const char *key)
-{
-    assert(json_is(object, JSON_OBJECT));
+    bool object_has(Value *object, const char *key)
+    {
+        assert(is(object, OBJECT));
 
-    return (JsonValue *)hashmap_get(object->storage_object, key);
-}
+        return hashmap_has(object->storage_object, key);
+    }
 
-void json_object_put(JsonValue *object, const char *key, JsonValue *value)
-{
-    assert(json_is(object, JSON_OBJECT));
+    Value *object_get(Value *object, const char *key)
+    {
+        assert(is(object, OBJECT));
 
-    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)json_destroy);
+        return (Value *)hashmap_get(object->storage_object, key);
+    }
 
-    hashmap_put(object->storage_object, key, value);
-}
+    void object_put(Value *object, const char *key, Value *value)
+    {
+        assert(is(object, OBJECT));
 
-void json_object_remove(JsonValue *object, const char *key)
-{
-    assert(json_is(object, JSON_OBJECT));
+        hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)destroy);
 
-    hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)json_destroy);
-}
+        hashmap_put(object->storage_object, key, value);
+    }
 
-size_t json_array_length(JsonValue *array)
-{
-    assert(json_is(array, JSON_ARRAY));
+    void object_remove(Value *object, const char *key)
+    {
+        assert(is(object, OBJECT));
 
-    return array->storage_array->count();
-}
+        hashmap_remove_with_callback(object->storage_object, key, (HashMapDestroyValueCallback)destroy);
+    }
 
-JsonValue *json_array_get(JsonValue *array, size_t index)
-{
-    assert(json_is(array, JSON_ARRAY));
+    size_t array_length(Value *array)
+    {
+        assert(is(array, ARRAY));
 
-    JsonValue *value = nullptr;
+        return array->storage_array->count();
+    }
 
-    assert(list_peekat(array->storage_array, index, (void **)&value));
+    Value *array_get(Value *array, size_t index)
+    {
+        assert(is(array, ARRAY));
 
-    return value;
-}
+        Value *value = nullptr;
 
-void json_array_put(JsonValue *array, size_t index, JsonValue *value)
-{
-    assert(json_is(array, JSON_ARRAY));
+        assert(list_peekat(array->storage_array, index, (void **)&value));
 
-    list_insert(array->storage_array, index, value);
-}
+        return value;
+    }
 
-void json_array_append(JsonValue *array, JsonValue *value)
-{
-    assert(json_is(array, JSON_ARRAY));
+    void array_put(Value *array, size_t index, Value *value)
+    {
+        assert(is(array, ARRAY));
 
-    list_pushback(array->storage_array, value);
-}
+        list_insert(array->storage_array, index, value);
+    }
 
-void json_array_remove(JsonValue *array, size_t index)
-{
-    assert(json_is(array, JSON_ARRAY));
+    void array_append(Value *array, Value *value)
+    {
+        assert(is(array, ARRAY));
 
-    list_remove_at_with_callback(array->storage_array, index, (HashMapDestroyValueCallback)json_destroy);
-}
+        list_pushback(array->storage_array, value);
+    }
+
+    void array_remove(Value *array, size_t index)
+    {
+        assert(is(array, ARRAY));
+
+        list_remove_at_with_callback(array->storage_array, index, (HashMapDestroyValueCallback)destroy);
+    }
+
+} // namespace json

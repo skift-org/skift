@@ -7,7 +7,7 @@
 
 struct DeviceModel : public Model
 {
-    JsonValue *data;
+    json::Value *data;
 };
 
 DeviceModel *device_model_create();

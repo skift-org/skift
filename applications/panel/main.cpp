@@ -15,7 +15,7 @@ void widget_date_and_time_update(Label *widget)
 
     char buffer[256];
     snprintf(buffer, 256, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
-    widget->update_text(buffer);
+    widget->text(buffer);
 }
 
 void widget_ram_update(Graph *widget)

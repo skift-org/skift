@@ -173,49 +173,50 @@ Color theme_parse_color(const char *text)
 void theme_load(const char *path)
 {
     logger_info("Loading theme from '%s'", path);
-    JsonValue *root = json_parse_file(path);
 
-    if (!json_is(root, JSON_OBJECT) || !json_object_has(root, "colors"))
+    auto root = json::parse_file(path);
+
+    if (!json::is(root, json::OBJECT) || !json::object_has(root, "colors"))
     {
-        json_destroy(root);
+        json::destroy(root);
         memcpy(_theme_colors, _theme_default_colors, sizeof(_theme_default_colors));
         return;
     }
 
-    JsonValue *colors = json_object_get(root, "colors");
+    auto colors = json::object_get(root, "colors");
 
-    if (json_object_has(root, "dark"))
+    if (json::object_has(root, "dark"))
     {
-        JsonValue *is_dark = json_object_get(root, "dark");
+        auto is_dark = json::object_get(root, "dark");
 
-        _theme_is_dark = json_is(is_dark, JSON_TRUE);
+        _theme_is_dark = json::is(is_dark, json::TRUE);
     }
     else
     {
         _theme_is_dark = false;
     }
 
-    if (!json_is(colors, JSON_OBJECT))
+    if (!json::is(colors, json::OBJECT))
     {
-        json_destroy(root);
+        json::destroy(root);
         memcpy(_theme_colors, _theme_default_colors, sizeof(_theme_default_colors));
         return;
     }
 
     for (int i = 0; i < __THEME_COLOR_COUNT; i++)
     {
-        if (json_object_has(colors, _theme_colors_names[i]))
+        if (json::object_has(colors, _theme_colors_names[i]))
         {
-            JsonValue *color = json_object_get(colors, _theme_colors_names[i]);
+            auto color = json::object_get(colors, _theme_colors_names[i]);
 
-            if (json_is(color, JSON_STRING))
+            if (json::is(color, json::STRING))
             {
-                _theme_colors[i] = theme_parse_color(json_string_value(color));
+                _theme_colors[i] = theme_parse_color(json::string_value(color));
             }
         }
     }
 
-    json_destroy(root);
+    json::destroy(root);
 }
 
 Color theme_get_color(ThemeColorRole role)

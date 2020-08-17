@@ -17,56 +17,56 @@ struct MenuEntry
 
 MenuEntry *menu_entry_create(const char *path)
 {
-    JsonValue *root = json_parse_file(path);
+    auto root = json::parse_file(path);
 
     MenuEntry *entry = nullptr;
 
-    if (json_is(root, JSON_OBJECT))
+    if (json::is(root, json::OBJECT))
     {
         entry = __create(MenuEntry);
 
-        if (json_object_has(root, "name"))
+        if (json::object_has(root, "name"))
         {
-            JsonValue *value = json_object_get(root, "name");
+            auto value = json::object_get(root, "name");
 
-            if (json_is(value, JSON_STRING))
+            if (json::is(value, json::STRING))
             {
-                entry->name = strdup(json_string_value(value));
+                entry->name = strdup(json::string_value(value));
             }
         }
 
-        if (json_object_has(root, "comment"))
+        if (json::object_has(root, "comment"))
         {
-            JsonValue *value = json_object_get(root, "comment");
+            auto value = json::object_get(root, "comment");
 
-            if (json_is(value, JSON_STRING))
+            if (json::is(value, json::STRING))
             {
-                entry->comment = strdup(json_string_value(value));
+                entry->comment = strdup(json::string_value(value));
             }
         }
 
-        if (json_object_has(root, "icon"))
+        if (json::object_has(root, "icon"))
         {
-            JsonValue *value = json_object_get(root, "icon");
+            auto value = json::object_get(root, "icon");
 
-            if (json_is(value, JSON_STRING))
+            if (json::is(value, json::STRING))
             {
-                entry->icon = strdup(json_string_value(value));
+                entry->icon = strdup(json::string_value(value));
             }
         }
 
-        if (json_object_has(root, "command"))
+        if (json::object_has(root, "command"))
         {
-            JsonValue *value = json_object_get(root, "command");
+            auto value = json::object_get(root, "command");
 
-            if (json_is(value, JSON_STRING))
+            if (json::is(value, json::STRING))
             {
-                entry->command = strdup(json_string_value(value));
+                entry->command = strdup(json::string_value(value));
             }
         }
     }
 
-    json_destroy(root);
+    json::destroy(root);
     return entry;
 }
 

@@ -8,247 +8,250 @@
 #include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
 
-#define JSON_WHITESPACE " \n\r\t"
-#define JSON_DIGITS "0123456789"
-#define JSON_ALPHA "abcdefghijklmnopqrstuvwxyz"
-
-static JsonValue *value(Lexer &lexer);
-
-static void whitespace(Lexer &lexer)
+namespace json
 {
-    lexer.eat(JSON_WHITESPACE);
-}
+    static constexpr const char *WHITESPACE = " \n\r\t";
+    static constexpr const char *DIGITS = "0123456789";
+    static constexpr const char *ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
-static int digits(Lexer &lexer)
-{
-    int digits = 0;
+    static Value *value(Lexer &lexer);
 
-    while (lexer.current_is(JSON_DIGITS))
+    static void whitespace(Lexer &lexer)
     {
-        digits *= 10;
-        digits += lexer.current() - '0';
-        lexer.foreward();
+        lexer.eat(WHITESPACE);
     }
 
-    return digits;
-}
-
-static JsonValue *number(Lexer &lexer)
-{
-    int ipart_sign = 1;
-
-    if (lexer.skip('-'))
+    static int digits(Lexer &lexer)
     {
-        ipart_sign = -1;
-    }
+        int digits = 0;
 
-    int ipart = 0;
-
-    if (lexer.current_is(JSON_DIGITS))
-    {
-        ipart = digits(lexer);
-    }
-
-    double fpart = 0;
-
-    if (lexer.current() == '.')
-    {
-        lexer.foreward();
-
-        double multiplier = 0.1;
-
-        while (lexer.current_is(JSON_DIGITS))
+        while (lexer.current_is(DIGITS))
         {
-            fpart += multiplier * (lexer.current() - '0');
-            multiplier *= 0.1;
+            digits *= 10;
+            digits += lexer.current() - '0';
             lexer.foreward();
         }
+
+        return digits;
     }
 
-    int exp = 0;
-
-    if (lexer.current_is("eE"))
+    static Value *number(Lexer &lexer)
     {
-        lexer.foreward();
-        int exp_sign = 1;
+        int ipart_sign = 1;
 
-        if (lexer.current() == '-')
+        if (lexer.skip('-'))
         {
-            exp_sign = -1;
+            ipart_sign = -1;
         }
 
-        if (lexer.current_is("+-"))
+        int ipart = 0;
+
+        if (lexer.current_is(DIGITS))
+        {
+            ipart = digits(lexer);
+        }
+
+        double fpart = 0;
+
+        if (lexer.current() == '.')
+        {
             lexer.foreward();
 
-        exp = digits(lexer) * exp_sign;
-    }
+            double multiplier = 0.1;
 
-    if (fpart == 0 && exp >= 0)
-    {
-        return json_create_integer(ipart_sign * ipart * pow(10, exp));
-    }
-    else
-    {
-        return json_create_double(ipart_sign * (ipart + fpart) * pow(10, exp));
-    }
-}
+            while (lexer.current_is(DIGITS))
+            {
+                fpart += multiplier * (lexer.current() - '0');
+                multiplier *= 0.1;
+                lexer.foreward();
+            }
+        }
 
-static char *string(Lexer &lexer)
-{
-    BufferBuilder *builder = buffer_builder_create(16);
+        int exp = 0;
 
-    lexer.skip('"');
-
-    while (lexer.current() != '"' &&
-           lexer.do_continue())
-    {
-        if (lexer.current() == '\\')
+        if (lexer.current_is("eE"))
         {
-            buffer_builder_append_str(builder, lexer.read_escape_sequence());
+            lexer.foreward();
+            int exp_sign = 1;
+
+            if (lexer.current() == '-')
+            {
+                exp_sign = -1;
+            }
+
+            if (lexer.current_is("+-"))
+                lexer.foreward();
+
+            exp = digits(lexer) * exp_sign;
+        }
+
+        if (fpart == 0 && exp >= 0)
+        {
+            return create_integer(ipart_sign * ipart * pow(10, exp));
         }
         else
+        {
+            return create_double(ipart_sign * (ipart + fpart) * pow(10, exp));
+        }
+    }
+
+    static char *string(Lexer &lexer)
+    {
+        BufferBuilder *builder = buffer_builder_create(16);
+
+        lexer.skip('"');
+
+        while (lexer.current() != '"' &&
+               lexer.do_continue())
+        {
+            if (lexer.current() == '\\')
+            {
+                buffer_builder_append_str(builder, lexer.read_escape_sequence());
+            }
+            else
+            {
+                buffer_builder_append_chr(builder, lexer.current());
+                lexer.foreward();
+            }
+        }
+
+        lexer.skip('"');
+
+        return buffer_builder_finalize(builder);
+    }
+
+    static Value *array(Lexer &lexer)
+    {
+        lexer.skip('[');
+
+        Value *array = create_array();
+
+        int index = 0;
+        do
+        {
+            lexer.skip(',');
+            array_put(array, index, value(lexer));
+            index++;
+        } while (lexer.current() == ',');
+
+        lexer.skip(']');
+
+        return array;
+    }
+
+    static Value *object(Lexer &lexer)
+    {
+        lexer.skip('{');
+
+        Value *object = create_object();
+
+        whitespace(lexer);
+        while (lexer.current() != '}')
+        {
+            char *k __cleanup_malloc = string(lexer);
+            whitespace(lexer);
+
+            lexer.skip(':');
+
+            Value *v = value(lexer);
+
+            object_put(object, k, v);
+
+            lexer.skip(',');
+
+            whitespace(lexer);
+        }
+
+        lexer.skip('}');
+
+        return object;
+    }
+
+    static Value *keyword(Lexer &lexer)
+    {
+        BufferBuilder *builder = buffer_builder_create(6);
+
+        while (lexer.current_is(ALPHA) &&
+               lexer.do_continue())
         {
             buffer_builder_append_chr(builder, lexer.current());
             lexer.foreward();
         }
+
+        __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
+
+        if (strcmp(keyword, "true") == 0)
+        {
+            return create_boolean(true);
+        }
+        else if (strcmp(keyword, "false") == 0)
+        {
+            return create_boolean(false);
+        }
+        else
+        {
+            return create_nil();
+        }
     }
 
-    lexer.skip('"');
-
-    return buffer_builder_finalize(builder);
-}
-
-static JsonValue *array(Lexer &lexer)
-{
-    lexer.skip('[');
-
-    JsonValue *array = json_create_array();
-
-    int index = 0;
-    do
+    static Value *value(Lexer &lexer)
     {
-        lexer.skip(',');
-        json_array_put(array, index, value(lexer));
-        index++;
-    } while (lexer.current() == ',');
-
-    lexer.skip(']');
-
-    return array;
-}
-
-static JsonValue *object(Lexer &lexer)
-{
-    lexer.skip('{');
-
-    JsonValue *object = json_create_object();
-
-    whitespace(lexer);
-    while (lexer.current() != '}')
-    {
-        char *k __cleanup_malloc = string(lexer);
         whitespace(lexer);
 
-        lexer.skip(':');
+        Value *value = nullptr;
 
-        JsonValue *v = value(lexer);
-
-        json_object_put(object, k, v);
-
-        lexer.skip(',');
+        if (lexer.current() == '"')
+        {
+            value = create_string_adopt(string(lexer));
+        }
+        else if (lexer.current_is("-0123456789"))
+        {
+            value = number(lexer);
+        }
+        else if (lexer.current() == '{')
+        {
+            value = object(lexer);
+        }
+        else if (lexer.current() == '[')
+        {
+            value = array(lexer);
+        }
+        else
+        {
+            value = keyword(lexer);
+        }
 
         whitespace(lexer);
+
+        return value;
     }
 
-    lexer.skip('}');
-
-    return object;
-}
-
-static JsonValue *keyword(Lexer &lexer)
-{
-    BufferBuilder *builder = buffer_builder_create(6);
-
-    while (lexer.current_is(JSON_ALPHA) &&
-           lexer.do_continue())
+    Value *parse(const char *string, size_t size)
     {
-        buffer_builder_append_chr(builder, lexer.current());
-        lexer.foreward();
+        Lexer lexer(string, size);
+        // Skip the utf8 bom header if present.
+        lexer.skip_word("\xEF\xBB\xBF");
+
+        Value *result = value(lexer);
+
+        return result;
     }
 
-    __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
-
-    if (strcmp(keyword, "true") == 0)
+    Value *parse_file(const char *path)
     {
-        return json_create_boolean(true);
+        __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
+
+        if (handle_has_error(json_file))
+        {
+            return nullptr;
+        }
+
+        Lexer lexer(json_file);
+        // Skip the utf8 bom header if present.
+        lexer.skip_word("\xEF\xBB\xBF");
+
+        Value *result = value(lexer);
+
+        return result;
     }
-    else if (strcmp(keyword, "false") == 0)
-    {
-        return json_create_boolean(false);
-    }
-    else
-    {
-        return json_create_null();
-    }
-}
-
-static JsonValue *value(Lexer &lexer)
-{
-    whitespace(lexer);
-
-    JsonValue *value = nullptr;
-
-    if (lexer.current() == '"')
-    {
-        value = json_create_string_adopt(string(lexer));
-    }
-    else if (lexer.current_is("-0123456789"))
-    {
-        value = number(lexer);
-    }
-    else if (lexer.current() == '{')
-    {
-        value = object(lexer);
-    }
-    else if (lexer.current() == '[')
-    {
-        value = array(lexer);
-    }
-    else
-    {
-        value = keyword(lexer);
-    }
-
-    whitespace(lexer);
-
-    return value;
-}
-
-JsonValue *json_parse(const char *string, size_t size)
-{
-    Lexer lexer(string, size);
-    // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
-
-    JsonValue *result = value(lexer);
-
-    return result;
-}
-
-JsonValue *json_parse_file(const char *path)
-{
-    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
-
-    if (handle_has_error(json_file))
-    {
-        return nullptr;
-    }
-
-    Lexer lexer(json_file);
-    // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
-
-    JsonValue *result = value(lexer);
-
-    return result;
-}
+} // namespace json

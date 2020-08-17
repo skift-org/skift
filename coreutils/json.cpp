@@ -5,9 +5,9 @@ int main(int argc, char const *argv[])
 {
     if (argc > 1)
     {
-        JsonValue *json_object = json_parse_file(argv[1]);
+        auto json_object = json::parse_file(argv[1]);
 
-        char *json_string = json_prettify(json_object);
+        auto json_string = json::prettify(json_object);
 
         printf("%s", json_string);
     }

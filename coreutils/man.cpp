@@ -1,7 +1,7 @@
-#include <stdio.h>
 #include <libjson/Json.h>
-#include <libsystem/io/Stream.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
+#include <libsystem/io/Stream.h>
 #include <libsystem/utils/BufferBuilder.h>
 
 void list_pages()
@@ -45,9 +45,12 @@ int main(int argc, char **argv)
 			man_list = true;
 			break;
 		}
+
+		// FIXME: vla...
 		// This is why c code can be annoying sometimes
 		char tmp[strlen("/System/Manuals/") + strlen(argv[i]) + strlen(".json")];
-		sprintf(tmp, "/System/Manuals/%s%s", argv[i], ".json");
+		snprintf(tmp, strlen("/System/Manuals/") + strlen(argv[i]) + strlen(".json"), "/System/Manuals/%s%s", argv[i], ".json");
+
 		const char *manpath = tmp;
 		__cleanup(stream_cleanup) Stream *stream = stream_open(manpath, OPEN_READ);
 		if (handle_has_error(stream))
@@ -55,9 +58,10 @@ int main(int argc, char **argv)
 			handle_printf_error(stream, "man: No manual entry for \"%s\"", argv[i]);
 			return -1;
 		}
-		JsonValue *root = json_parse_file(manpath);
 
-		if (json_is(root, JSON_OBJECT))
+		auto root = json::parse_file(manpath);
+
+		if (json::is(root, json::OBJECT))
 		{
 			const char *message = "man: It looks like this man page is corrupted\n";
 
@@ -65,12 +69,13 @@ int main(int argc, char **argv)
 			const char *usage = "";
 			const char *example = "";
 
-			if (json_object_has(root, "description"))
+			if (json::object_has(root, "description"))
 			{
-				JsonValue *value = json_object_get(root, "description");
-				if (json_is(value, JSON_STRING))
+				auto value = json::object_get(root, "description");
+
+				if (json::is(value, json::STRING))
 				{
-					description = json_string_value(value);
+					description = json::string_value(value);
 				}
 				else
 				{
@@ -84,12 +89,12 @@ int main(int argc, char **argv)
 				return -1;
 			}
 
-			if (json_object_has(root, "usage"))
+			if (json::object_has(root, "usage"))
 			{
-				JsonValue *value = json_object_get(root, "usage");
-				if (json_is(value, JSON_STRING))
+				auto value = json::object_get(root, "usage");
+				if (json::is(value, json::STRING))
 				{
-					usage = json_string_value(value);
+					usage = json::string_value(value);
 				}
 				else
 				{
@@ -103,12 +108,12 @@ int main(int argc, char **argv)
 				return -1;
 			}
 
-			if (json_object_has(root, "example"))
+			if (json::object_has(root, "example"))
 			{
-				JsonValue *value = json_object_get(root, "example");
-				if (json_is(value, JSON_STRING))
+				auto value = json::object_get(root, "example");
+				if (json::is(value, json::STRING))
 				{
-					example = json_string_value(value);
+					example = json::string_value(value);
 				}
 				else
 				{

@@ -5,10 +5,10 @@ This example shows how to read JSON files
 **file.json**
 ```json
 {
-    "value": "hello",
-    "object": {
-         "obj_value": "object value"
-    }
+	"value": "hello",
+	"object": {
+			"obj_value": "object value"
+	}
 }
 
 ```
@@ -34,20 +34,20 @@ int main(int argc, char **argv)
 		handle_printf_error(stream, "Json file \"%s\" couldn't be read or is not found", file);
 		return -1;
 	}
-	JsonValue *root = json_parse_file(file);
+	auto root = json::parse_file(file);
 
-	if (json_is(root, JSON_OBJECT))
+	if (json::is(root, json::OBJECT))
 	{
 		const char *value = "";
 		const char *obj_value = "";
 
 		// Checks if the json file has the value object
-		if (json_object_has(root, "value"))
+		if (json::object_has(root, "value"))
 		{
-			JsonValue *value_json = json_object_get(root, "value");
-			if (json_is(value_json, JSON_STRING))
+			auto value_json = json::object_get(root, "value");
+			if (json::is(value_json, json::STRING))
 			{
-				value = json_string_value(value_json);
+				value = json::string_value(value_json);
 			}
 			else
 			{
@@ -61,20 +61,20 @@ int main(int argc, char **argv)
 			return -1;
 		}
 
-		if (json_object_has(root, "object"))
+		if (json::object_has(root, "object"))
 		{
-			JsonValue *object_json = json_object_get(root, "object");
-			if (json_is(object_json, JSON_OBJECT))
+			auto object_json = json::object_get(root, "object");
+			if (json::is(object_json, json::OBJECT))
 			{
-				JsonValue *obj_value_json = json_object_get(object_json, "obj_value");
-				if (json_is(obj_value_json, JSON_STRING))
+				auto obj_value_json = json::object_get(object_json, "obj_value");
+				if (json::is(obj_value_json, json::STRING))
 				{
-					obj_value = json_string_value(obj_value_json);
+					obj_value = json::string_value(obj_value_json);
 				}
 			}
 			else
 			{
-				printf("object is not an JSON_OBJECT");
+				printf("object is not an json::OBJECT");
 				return -1;
 			}
 		}

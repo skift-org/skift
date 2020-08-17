@@ -7,7 +7,7 @@
 
 struct TaskModel : public Model
 {
-    JsonValue *data;
+    json::Value *data;
 };
 
 TaskModel *task_model_create();

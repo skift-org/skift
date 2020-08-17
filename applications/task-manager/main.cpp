@@ -53,11 +53,11 @@ void widget_ram_update(TaskManagerWindow *window)
     snprintf(buffer_usage, 50, "Usage: %i Mio", usage);
     snprintf(buffer_avaliable, 50, "Avaliable: %i Mio", avaliable);
 
-    window->ram_usage->update_text(buffer_usage);
+    window->ram_usage->text(buffer_usage);
 
-    window->ram_avaliable->update_text(buffer_avaliable);
+    window->ram_avaliable->text(buffer_avaliable);
 
-    window->ram_greedy->update_text(buffer_builder_intermediate(buffer_greedy));
+    window->ram_greedy->text(buffer_builder_intermediate(buffer_greedy));
 
     // Destroy buffer
     buffer_builder_destroy(buffer_greedy);
@@ -74,12 +74,12 @@ void widget_cpu_update(TaskManagerWindow *window)
 
     char buffer_average[50];
     snprintf(buffer_average, 200, "Average: %i%%", percentage);
-    window->cpu_average->update_text(buffer_average);
+    window->cpu_average->text(buffer_average);
 
     auto buffer_greedy = buffer_builder_create(24);
     buffer_builder_append_str(buffer_greedy, "Most greedy: ");
     buffer_builder_append_str(buffer_greedy, greedy);
-    window->cpu_greedy->update_text(buffer_builder_intermediate(buffer_greedy));
+    window->cpu_greedy->text(buffer_builder_intermediate(buffer_greedy));
     buffer_builder_destroy(buffer_greedy);
 
     ElapsedTime seconds = status.uptime;
@@ -92,7 +92,7 @@ void widget_cpu_update(TaskManagerWindow *window)
 
     char buffer_uptime[50];
     snprintf(buffer_uptime, 50, "Uptime: %3d:%02d:%02d:%02d", days, hours, minutes, seconds);
-    window->cpu_uptime->update_text(buffer_uptime);
+    window->cpu_uptime->text(buffer_uptime);
 }
 
 void widget_table_update(TaskManagerWindow *window)

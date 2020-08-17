@@ -23,21 +23,21 @@ static auto get_icon_for_node(const char *current_directory, DirectoryEntry *ent
         char manifest_path[PATH_LENGTH];
         snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory, entry->name);
 
-        JsonValue *root = json_parse_file(manifest_path);
+        auto root = json::parse_file(manifest_path);
 
-        if (root != nullptr && json_is(root, JSON_OBJECT))
+        if (root != nullptr && json::is(root, json::OBJECT))
         {
-            JsonValue *icon_name = json_object_get(root, "icon");
+            auto icon_name = json::object_get(root, "icon");
 
-            if (json_is(icon_name, JSON_STRING))
+            if (json::is(icon_name, json::STRING))
             {
-                auto icon = Icon::get(json_string_value(icon_name));
-                json_destroy(root);
+                auto icon = Icon::get(json::string_value(icon_name));
+                json::destroy(root);
                 return icon;
             }
         }
 
-        json_destroy(root);
+        json::destroy(root);
         return Icon::get("folder");
     }
     else if (entry->stat.type == FILE_TYPE_PIPE ||

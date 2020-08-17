@@ -99,7 +99,7 @@ public:
         return x() != rhs.x() || y() != rhs.y();
     }
 
-    double distance_to(const Vec2 &other) const
+    Scalar distance_to(const Vec2 &other) const
     {
         return sqrt((x() - other.x()) * (x() - other.x()) +
                     (y() - other.y()) * (y() - other.y()));

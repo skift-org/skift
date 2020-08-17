@@ -68,31 +68,6 @@ size_t format_int(NumberFormater formater, int value, char *str, size_t size)
     return written;
 }
 
-static double __pow(double x, double y)
-{
-    double out;
-    asm volatile(
-        "fyl2x;"
-        "fld %%st;"
-        "frndint;"
-        "fsub %%st,%%st(1);"
-        "fxch;"
-        "fchs;"
-        "f2xm1;"
-        "fld1;"
-        "faddp;"
-        "fxch;"
-        "fld1;"
-        "fscale;"
-        "fstp %%st(1);"
-        "fmulp;"
-        : "=t"(out)
-        : "0"(x), "u"(y)
-        : "st(1)");
-
-    return out;
-}
-
 size_t format_double(NumberFormater formater, double value, char *str, size_t size)
 {
     int ipart = (int)value;
@@ -106,7 +81,7 @@ size_t format_double(NumberFormater formater, double value, char *str, size_t si
         strnapd(str, '.', size);
         written++;
 
-        fpart = fpart * __pow(formater.base, formater.after_point);
+        fpart = fpart * pow(formater.base, formater.after_point);
 
         format_int(formater, (int)fpart, str + written, size - written);
     }

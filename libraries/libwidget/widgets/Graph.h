@@ -7,7 +7,7 @@ struct Graph : public Widget
 {
 private:
     Color _color;
-    double *_data;
+    float *_data;
     size_t _data_size;
     size_t _current;
 
@@ -20,5 +20,5 @@ public:
 
     Vec2i size();
 
-    void record(double data);
+    void record(float data);
 };

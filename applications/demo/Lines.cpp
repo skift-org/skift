@@ -13,7 +13,7 @@ struct Line
 static Random random = {};
 static bool random_initialized = false;
 
-void lines_draw(Painter &painter, Rectangle screen, double time)
+void lines_draw(Painter &painter, Rectangle screen, float time)
 {
     __unused(time);
 

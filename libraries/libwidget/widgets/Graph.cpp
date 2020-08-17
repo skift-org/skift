@@ -6,7 +6,7 @@
 Graph::Graph(Widget *parent, size_t data_size, Color data_color)
     : Widget(parent)
 {
-    _data = (double *)calloc(data_size, sizeof(double));
+    _data = (float *)calloc(data_size, sizeof(float));
     _data_size = data_size;
     _color = data_color;
     _current = 0;
@@ -21,13 +21,13 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    auto distance = [](double from, double to, int size) {
+    auto distance = [](float from, float to, int size) {
         if (from > to)
         {
             from -= size;
         }
 
-        return abs(to - from) / (double)size;
+        return abs(to - from) / (float)size;
     };
 
     auto graph_sample = [&](float where) {
@@ -36,12 +36,12 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
         return _data[(size_t)(_data_size * where)];
     };
 
-    double cursor_position = _current / (double)_data_size;
+    float cursor_position = _current / (float)_data_size;
 
     for (int i = 0; i < bound().width(); i++)
     {
-        double where = i / (double)bound().width();
-        double data = graph_sample(where);
+        float where = i / (float)bound().width();
+        float data = graph_sample(where);
 
         Rectangle bar(
             bound().x() + i,
@@ -49,7 +49,7 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
             1,
             bound().height());
 
-        double dist = (1 - distance(where, cursor_position, 1)) * 0.5;
+        float dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
         painter.fill_rectangle(bar, ALPHA(_color, dist));
         painter.plot_pixel(bar.position(), _color);
@@ -69,7 +69,7 @@ Vec2i Graph::size()
     return Vec2i(_data_size, 100);
 }
 
-void Graph::record(double data)
+void Graph::record(float data)
 {
     _data[_current] = data;
     _current = (_current + 1) % _data_size;

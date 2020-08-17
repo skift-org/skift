@@ -21,7 +21,7 @@ void widget_date_and_time_update(Label *widget)
 void widget_ram_update(Graph *widget)
 {
     SystemStatus status = system_get_status();
-    widget->record(status.used_ram / (double)status.total_ram);
+    widget->record(status.used_ram / (float)status.total_ram);
 }
 
 void widget_cpu_update(Graph *widget)

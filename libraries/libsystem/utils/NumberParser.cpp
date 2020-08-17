@@ -93,6 +93,6 @@ bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
 }
 
 // TODO
-// bool parse_double(NumberParser parser, const char *str, size_t size, int *result)
+// bool parse_double(NumberParser parser, const char *str, size_t size, double *result)
 // {
 // }

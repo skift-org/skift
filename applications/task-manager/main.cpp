@@ -34,7 +34,7 @@ struct TaskManagerWindow : public Window
 void widget_ram_update(TaskManagerWindow *window)
 {
     SystemStatus status = system_get_status();
-    window->ram_graph->record(status.used_ram / (double)status.total_ram);
+    window->ram_graph->record(status.used_ram / (float)status.total_ram);
 
     // Stats
     int usage = (int)status.used_ram / 1024 / 1024;

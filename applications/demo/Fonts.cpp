@@ -5,7 +5,7 @@
 static TrueTypeFamily *_family = nullptr;
 static TrueTypeFont *_fonts[16];
 
-void fonts_draw(Painter &painter, Rectangle screen, double time)
+void fonts_draw(Painter &painter, Rectangle screen, float time)
 {
     __unused(screen);
     __unused(time);

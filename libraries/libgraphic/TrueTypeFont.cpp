@@ -186,7 +186,7 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
 
 int truetypefont_get_kerning_for_codepoints(TrueTypeFont *font, Codepoint left, Codepoint right)
 {
-    double scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
+    auto scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
 
     int kerning = truetype_GetCodepointKernAdvance(&font->family->info, left, right);
 
@@ -197,7 +197,7 @@ TrueTypeFontMetrics truetypefont_get_metrics(TrueTypeFont *font)
 {
     TrueTypeFontMetrics metrics = {};
 
-    double scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
+    auto scale = truetype_ScaleForPixelHeight(&font->family->info, font->size);
 
     truetype_GetFontVMetrics(
         &font->family->info,

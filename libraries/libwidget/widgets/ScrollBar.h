@@ -25,8 +25,8 @@ private:
 
         if (_horizontal)
         {
-            int thumb_width = MIN(track.width() * (_thumb / (double)_track), track.width());
-            int thump_position = track.width() * (_value / (double)_track);
+            int thumb_width = MIN(track.width() * (_thumb / (float)_track), track.width());
+            int thump_position = track.width() * (_value / (float)_track);
 
             return Rectangle(
                 track.x() + thump_position,
@@ -36,8 +36,8 @@ private:
         }
         else
         {
-            int thumb_height = MIN(track.height() * (_thumb / (double)_track), track.height());
-            int thump_position = track.height() * (_value / (double)_track);
+            int thumb_height = MIN(track.height() * (_thumb / (float)_track), track.height());
+            int thump_position = track.height() * (_value / (float)_track);
 
             return Rectangle(
                 track.x(),

@@ -258,23 +258,23 @@ __flatten void Painter::fill_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color)
     Vec2f s = a;
     Vec2f e = a;
 
-    double dx1 = 0;
-    double dx2 = 0;
-    double dx3 = 0;
+    float dx1 = 0;
+    float dx2 = 0;
+    float dx3 = 0;
 
     if (b.y() - a.y() > 0)
     {
-        dx1 = (b.x() - a.x()) / (double)(b.y() - a.y());
+        dx1 = (b.x() - a.x()) / (float)(b.y() - a.y());
     }
 
     if (c.y() - a.y() > 0)
     {
-        dx2 = (c.x() - a.x()) / (double)(c.y() - a.y());
+        dx2 = (c.x() - a.x()) / (float)(c.y() - a.y());
     }
 
     if (c.y() - b.y() > 0)
     {
-        dx3 = (c.x() - b.x()) / (double)(c.y() - b.y());
+        dx3 = (c.x() - b.x()) / (float)(c.y() - b.y());
     }
 
     if (dx1 > dx2)
@@ -319,9 +319,9 @@ __flatten void Painter::fill_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color)
     }
 }
 
-static double sample_fill_circle(Vec2i center, double radius, Vec2i position)
+static float sample_fill_circle(Vec2i center, float radius, Vec2i position)
 {
-    double distance = center.distance_to(position) - radius;
+    float distance = center.distance_to(position) - radius;
     return clamp(0.5 - distance, 0, 1);
 }
 
@@ -331,8 +331,8 @@ static void fill_circle_helper(Painter &painter, Rectangle bound, Vec2i center, 
     {
         for (int y = 0; y < bound.height(); y++)
         {
-            double distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
-            double alpha = (color.A / 255.0) * distance;
+            float distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
+            float alpha = (color.A / 255.0) * distance;
 
             painter.plot_pixel(Vec2i(bound.x() + x, bound.y() + y), ALPHA(color, alpha));
         }

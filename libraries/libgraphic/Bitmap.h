@@ -95,10 +95,7 @@ public:
 
     Color get_pixel(Vec2i position)
     {
-        if (bound().containe(position))
-            return _pixels[position.y() * width() + position.x()];
-        else
-            return COLOR_BLACK;
+        return _pixels[clamp(position.y(), 0, height() - 1) * width() + clamp(position.x(), 0, width() - 1)];
     }
 
     Color get_pixel_no_check(Vec2i position)
@@ -125,8 +122,8 @@ public:
         Color c01 = get_pixel(sample_position + Vec2i(0, 1));
         Color c11 = get_pixel(sample_position + Vec2i(1, 1));
 
-        double xx = source.width() * position.x();
-        double yy = source.height() * position.y();
+        float xx = source.width() * position.x();
+        float yy = source.height() * position.y();
 
         return color_blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
     }

@@ -6,7 +6,7 @@
 static RefPtr<Bitmap> _test_image = nullptr;
 static int _frame = 0;
 
-void graphics_draw(Painter &painter, Rectangle screen, double time)
+void graphics_draw(Painter &painter, Rectangle screen, float time)
 {
     __unused(time);
 

@@ -9,7 +9,7 @@ private:
     Position _position = Position::LEFT;
 
 public:
-    void update_text(const char *text);
+    void text(const char *text);
 
     Label(Widget *parent, const char *text);
 

@@ -3,7 +3,7 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Label.h>
 
-void Label::update_text(const char *text)
+void Label::text(const char *text)
 {
     if (text)
     {
@@ -11,6 +11,8 @@ void Label::update_text(const char *text)
             free(_text);
 
         _text = strdup(text);
+
+        should_repaint();
     }
 }
 
@@ -22,7 +24,7 @@ Label::Label(Widget *parent, const char *text)
 Label::Label(Widget *parent, const char *text, Position position)
     : Widget(parent)
 {
-    update_text(text);
+    this->text(text);
     _position = position;
 }
 

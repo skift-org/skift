@@ -1,13 +1,13 @@
 <Window
     title="Calculator"
     icon="calculator-variant"
-    width="250"
-    height="250"
+    width="260"
+    height="320"
     layout="vflow(8)"
-    padding="insets(4)"
+    padding="insets(6)"
     >
 
-    <Panel padding="insets(8)" rounded>
+    <Panel padding="insets(12)" rounded>
         <Label text="#value"/>
     </Panel>
 

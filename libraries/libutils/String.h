@@ -66,4 +66,9 @@ public:
 
         return true;
     }
+    
+    char operator[](int index)
+    {
+        return at(index);   
+    }
 };

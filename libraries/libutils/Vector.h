@@ -6,22 +6,36 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
+
+#include <libutils/New.h>
 #include <libutils/RefPtr.h>
 
 template <typename T>
 class Vector
 {
 private:
-    T *_storage{};
-    size_t _count{};
-    size_t _capacity{};
+    T *_storage = nullptr;
+    size_t _count = 0;
+    size_t _capacity = 0;
+
+    void remove_index_but_dont_destroy(size_t index)
+    {
+        for (size_t j = index + 1; j < _count; j++)
+        {
+            new (&_storage[j - 1]) T(move(_storage[j]));
+        }
+
+        shrink();
+    }
 
 public:
-    T *raw_storage() { return _storage; }
-
     size_t count() const { return _count; }
+
     bool empty() const { return _count == 0; }
+
     bool any() const { return !empty(); }
+
+    T *raw_storage() { return _storage; }
 
     Vector() : Vector(16) {}
 
@@ -71,7 +85,7 @@ public:
         clear();
 
         if (_storage)
-            delete[] _storage;
+            free(_storage);
     }
 
     T &operator[](size_t index)
@@ -122,7 +136,7 @@ public:
     {
         if (!_storage)
         {
-            _storage = new T[capacity];
+            _storage = reinterpret_cast<T *>(calloc(capacity, sizeof(T)));
             _capacity = capacity;
             _count = 0;
 
@@ -141,14 +155,14 @@ public:
             new_capacity *= 1.25;
         }
 
-        T *new_storage = new T[new_capacity];
+        T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
 
         for (size_t i = 0; i < _count; i++)
         {
-            new_storage[i] = move(_storage[i]);
+            new (&new_storage[i]) T(move(_storage[i]));
         }
 
-        delete[] _storage;
+        free(_storage);
         _storage = new_storage;
         _capacity = new_capacity;
 
@@ -160,14 +174,14 @@ public:
         if (_count + 1 >= _capacity)
         {
             size_t new_capacity = _capacity * 1.25;
-            T *new_storage = new T[new_capacity];
+            T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
 
             for (size_t i = 0; i < _count; i++)
             {
-                new_storage[i] = move(_storage[i]);
+                new (&new_storage[i]) T(move(_storage[i]));
             }
 
-            delete[] _storage;
+            free(_storage);
             _storage = new_storage;
             _capacity = new_capacity;
         }
@@ -182,14 +196,14 @@ public:
         if (_count < _capacity * 0.75)
         {
             size_t new_capacity = _capacity * 0.75;
-            T *new_storage = new T[new_capacity];
+            T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
 
             for (size_t i = 0; i < _count; i++)
             {
-                new_storage[i] = move(_storage[i]);
+                new (&new_storage[i]) T(move(_storage[i]));
             }
 
-            delete[] _storage;
+            free(_storage);
             _storage = new_storage;
             _capacity = new_capacity;
         }
@@ -201,10 +215,10 @@ public:
 
         for (size_t j = _count; j > index; j--)
         {
-            _storage[j] = move(_storage[j - 1]);
+            new (&_storage[j]) T(move(_storage[j - 1]));
         }
 
-        _storage[index] = move(value);
+        new (&_storage[index]) T(move(value));
     }
 
     void insert_sorted(T value)
@@ -249,13 +263,7 @@ public:
     void remove_index(size_t index)
     {
         _storage[index].~T();
-
-        for (size_t j = index + 1; j < _count; j++)
-        {
-            _storage[j - 1] = move(_storage[j]);
-        }
-
-        shrink();
+        remove_index_but_dont_destroy(index);
     }
 
     void remove_value(const T &value)
@@ -309,7 +317,7 @@ public:
 
         T value = move(_storage[0]);
 
-        remove_index(0);
+        remove_index_but_dont_destroy(0);
 
         return value;
     }
@@ -319,8 +327,7 @@ public:
         assert(_count > 0);
 
         T value = move(_storage[_count - 1]);
-
-        remove_index(_count - 1);
+        remove_index_but_dont_destroy(_count - 1);
 
         return value;
     }

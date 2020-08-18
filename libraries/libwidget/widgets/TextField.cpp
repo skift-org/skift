@@ -129,6 +129,11 @@ void TextField::event(Event *event)
             _model->backspace_at(_cursor);
             should_repaint();
         }
+        else if (event->keyboard.key == KEYBOARD_KEY_DELETE)
+        {
+            _model->delete_at(_cursor);
+            should_repaint();
+        }
         else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
         {
             _model->newline_at(_cursor);

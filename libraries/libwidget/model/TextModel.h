@@ -52,6 +52,11 @@ public:
 
     void backspace_at(size_t index)
     {
+        _codepoints.remove_index(index - 1);
+    }
+
+    void delete_at(size_t index)
+    {
         _codepoints.remove_index(index);
     }
 };
@@ -79,6 +84,8 @@ public:
     void append_at(TextCursor &cursor, Codepoint codepoint);
 
     void backspace_at(TextCursor &cursor);
+
+    void delete_at(TextCursor &cursor);
 
     void newline_at(TextCursor &cursor);
 };

@@ -269,6 +269,7 @@ public:
     void remove_index(size_t index)
     {
         assert(index < _count);
+
         _storage[index].~T();
         remove_index_but_dont_destroy(index);
     }

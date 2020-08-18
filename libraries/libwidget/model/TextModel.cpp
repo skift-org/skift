@@ -56,14 +56,30 @@ void TextModel::backspace_at(TextCursor &cursor)
     {
         int line_length = line(cursor.line() - 1).length();
         line(cursor.line() - 1).append(line(cursor.line()));
+
         _lines.remove_index(cursor.line());
+
         cursor.move_up_within(*this);
         cursor.move_to_within(line(cursor.line()), line_length);
     }
     else if (cursor.column() > 0 && line(cursor.line()).length() > 0)
     {
-        line(cursor.line()).backspace_at(cursor.column() - 1);
+        line(cursor.line()).backspace_at(cursor.column());
         cursor.move_left_withing(*this);
+    }
+}
+
+void TextModel::delete_at(TextCursor &cursor)
+{
+    if (cursor.line() < line_count() - 1 && cursor.column() == line(cursor.line()).length())
+    {
+        line(cursor.line()).append(line(cursor.line() + 1));
+
+        _lines.remove_index(cursor.line() + 1);
+    }
+    else if (cursor.column() < line(cursor.line()).length() && line(cursor.line()).length() > 0)
+    {
+        line(cursor.line()).delete_at(cursor.column());
     }
 }
 

@@ -12,7 +12,7 @@ public:
     size_t length() { return _buffer->length(); }
     const char *cstring() { return _buffer->cstring(); }
     char at(int index) { return _buffer->cstring()[index]; }
-    
+
     String(const char *cstring = "")
     {
         _buffer = make<StringStorage>(cstring);
@@ -66,9 +66,9 @@ public:
 
         return true;
     }
-    
+
     char operator[](int index)
     {
-        return at(index);   
+        return at(index);
     }
 };

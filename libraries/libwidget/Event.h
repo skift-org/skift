@@ -58,6 +58,7 @@ struct Event
 
         DISPLAY_SIZE_CHANGED,
 
+        WINDOW_MAXIMIZING,
         __COUNT,
     };
 

@@ -59,7 +59,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
         painter.push();
         painter.clip(content_bound().cutoff_left_and_right(32, 0));
         // Line content
-        auto line = _model->line(i);
+        auto &line = _model->line(i);
 
         Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(-_hscroll_offset, LINE_HEIGHT / 2 + 4);
 
@@ -124,11 +124,14 @@ void TextField::event(Event *event)
             _cursor.move_right_withing(*_model);
             should_repaint();
         }
+        else if (event->keyboard.key == KEYBOARD_KEY_BKSPC)
+        {
+            _model->backspace_at(_cursor);
+            should_repaint();
+        }
         else if (event->keyboard.codepoint != 0)
         {
             _model->append_at(_cursor, event->keyboard.codepoint);
-            _cursor.move_right_withing(*_model);
-
             should_repaint();
         }
 

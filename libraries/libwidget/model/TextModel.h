@@ -45,7 +45,7 @@ public:
         _codepoints.insert(index, codepoint);
     }
 
-    void remove(size_t index)
+    void backspace_at(size_t index)
     {
         _codepoints.remove_index(index);
     }
@@ -72,6 +72,8 @@ public:
     void append_line(OwnPtr<TextModelLine> line) { _lines.push_back(line); }
 
     void append_at(TextCursor &cursor, Codepoint codepoint);
+
+    void backspace_at(TextCursor &cursor);
 };
 
 struct TextCursor
@@ -79,6 +81,7 @@ struct TextCursor
 private:
     size_t _line = 0;
     size_t _column = 0;
+    size_t _prefered_column = 0;
 
 public:
     size_t line() { return _line; }
@@ -91,7 +94,7 @@ public:
         if (_line > 0)
         {
             _line--;
-            _column = clamp(_column, 0, model.line(_line).length() - 1);
+            _column = clamp(_prefered_column, 0, model.line(_line).length() - 1);
         }
     }
 
@@ -100,7 +103,7 @@ public:
         if (_line < model.line_count() - 1)
         {
             _line++;
-            _column = clamp(_column, 0, model.line(_line).length() - 1);
+            _column = clamp(_prefered_column, 0, model.line(_line).length() - 1);
         }
     }
 
@@ -117,12 +120,31 @@ public:
         __unused(model);
 
         if (_column > 0)
+        {
             _column--;
+        }
+        else if (_column == 0 && _line > 0)
+        {
+            move_up_within(model);
+            _column = model.line(_line).length() - 1;
+        }
+
+        _prefered_column = _column;
     }
 
     void move_right_withing(TextModel &model)
     {
         if (_column < model.line(_line).length())
+        {
             _column++;
+        }
+        else if (_column == model.line(_line).length() &&
+                 _line < model.line_count() - 1)
+        {
+            move_down_within(model);
+            _column = 0;
+        }
+
+        _prefered_column = _column;
     }
 };

@@ -21,12 +21,12 @@ public:
 
     ResultOr(Result result) : _result(result), _value() {}
 
-    ResultOr(T value) : _result(SUCCESS), _value(value) {}
+    ResultOr(T value) : _result(SUCCESS), _value(move(value)) {}
 
-    ResultOr(Result result, T value) : _result(result), _value(value) {}
+    ResultOr(Result result, T value) : _result(result), _value(move(value)) {}
 
     template <typename U>
-    ResultOr(ResultOr<U> result, T value) : _result(result.result()), _value(value) {}
+    ResultOr(ResultOr<U> result, T value) : _result(result.result()), _value(move(value)) {}
 
     bool operator==(Result result)
     {

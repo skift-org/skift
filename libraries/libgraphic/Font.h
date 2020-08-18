@@ -27,7 +27,7 @@ public:
 
     Font(RefPtr<Bitmap> bitmap, Vector<Glyph> glyphs)
         : _bitmap(bitmap),
-          _glyphs(glyphs)
+          _glyphs(move(glyphs))
     {
         _default = glyph(U'?');
     }

@@ -53,9 +53,11 @@ public:
 
     Vector(Vector &other)
     {
-        ensure_capacity(other.count());
-        _count = other.count();
+        ASSERT_NOT_REACHED();
 
+        ensure_capacity(other.count());
+
+        _count = other.count();
         if constexpr (std::is_trivially_copyable_v<T>)
         {
             memcpy(_storage, other._storage, sizeof(T) * _count);
@@ -134,6 +136,8 @@ public:
 
     void ensure_capacity(size_t capacity)
     {
+        capacity = MAX(capacity, 16);
+
         if (!_storage)
         {
             _storage = reinterpret_cast<T *>(calloc(capacity, sizeof(T)));

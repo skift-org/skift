@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Move.h>
 #include <libutils/RefCounted.h>
 
 enum AdoptTag
@@ -174,5 +175,5 @@ inline RefPtr<T> adopt(T &object)
 template <typename Type, typename... Args>
 inline RefPtr<Type> make(Args &&... args)
 {
-    return RefPtr<Type>(adopt(*new Type(args...)));
+    return RefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
 }

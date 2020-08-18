@@ -16,6 +16,8 @@ private:
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
 
+    void scroll_to_cursor();
+
 public:
     TextField(Widget *parent, RefPtr<TextModel> model);
 

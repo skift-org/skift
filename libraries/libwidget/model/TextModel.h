@@ -127,6 +127,16 @@ public:
         }
     }
 
+    void move_up_within(TextModel &model, size_t lines)
+    {
+        __unused(model);
+
+        for (size_t i = 0; i < lines; i++)
+        {
+            move_up_within(model);
+        }
+    }
+
     void move_down_within(TextModel &model)
     {
         if (_line < model.line_count() - 1)
@@ -136,7 +146,15 @@ public:
         }
     }
 
-    void move_left_withing(TextModel &model)
+    void move_down_within(TextModel &model, size_t lines)
+    {
+        for (size_t i = 0; i < lines; i++)
+        {
+            move_down_within(model);
+        }
+    }
+
+    void move_left_within(TextModel &model)
     {
         __unused(model);
 
@@ -153,7 +171,7 @@ public:
         _prefered_column = _column;
     }
 
-    void move_right_withing(TextModel &model)
+    void move_right_within(TextModel &model)
     {
         if (_column < model.line(_line).length())
         {
@@ -166,6 +184,20 @@ public:
             _column = 0;
         }
 
+        _prefered_column = _column;
+    }
+
+    void move_home_within(TextModel &model)
+    {
+        __unused(model);
+
+        _column = 0;
+        _prefered_column = _column;
+    }
+
+    void move_end_within(TextModel &model)
+    {
+        _column = model.line(_line).length();
         _prefered_column = _column;
     }
 };

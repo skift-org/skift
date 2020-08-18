@@ -46,7 +46,7 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
 void TextModel::append_at(TextCursor &cursor, Codepoint codepoint)
 {
     line(cursor.line()).append_at(cursor.column(), codepoint);
-    cursor.move_right_withing(*this);
+    cursor.move_right_within(*this);
 }
 
 void TextModel::backspace_at(TextCursor &cursor)
@@ -65,7 +65,7 @@ void TextModel::backspace_at(TextCursor &cursor)
     else if (cursor.column() > 0 && line(cursor.line()).length() > 0)
     {
         line(cursor.line()).backspace_at(cursor.column());
-        cursor.move_left_withing(*this);
+        cursor.move_left_within(*this);
     }
 }
 

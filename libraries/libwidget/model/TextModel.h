@@ -40,6 +40,11 @@ public:
         _codepoints.push_back(codepoint);
     }
 
+    void append(TextModelLine &line)
+    {
+        _codepoints.push_back_many(line._codepoints);
+    }
+
     void append_at(size_t index, Codepoint codepoint)
     {
         _codepoints.insert(index, codepoint);
@@ -87,6 +92,20 @@ public:
     size_t line() { return _line; }
     size_t column() { return _column; }
 
+    void move_to_within(TextModel &model, size_t line)
+    {
+        if (line < model.line_count())
+        {
+            _line = line;
+        }
+    }
+
+    void move_to_within(TextModelLine &line, size_t column)
+    {
+        _column = clamp(column, 0, line.length());
+        _prefered_column = _column;
+    }
+
     void move_up_within(TextModel &model)
     {
         __unused(model);
@@ -94,7 +113,7 @@ public:
         if (_line > 0)
         {
             _line--;
-            _column = clamp(_prefered_column, 0, model.line(_line).length() - 1);
+            _column = clamp(_prefered_column, 0, model.line(_line).length());
         }
     }
 
@@ -103,15 +122,7 @@ public:
         if (_line < model.line_count() - 1)
         {
             _line++;
-            _column = clamp(_prefered_column, 0, model.line(_line).length() - 1);
-        }
-    }
-
-    void move_to_within(TextModel &model, size_t line)
-    {
-        if (line < model.line_count())
-        {
-            _line = line;
+            _column = clamp(_prefered_column, 0, model.line(_line).length());
         }
     }
 
@@ -126,7 +137,7 @@ public:
         else if (_column == 0 && _line > 0)
         {
             move_up_within(model);
-            _column = model.line(_line).length() - 1;
+            _column = model.line(_line).length();
         }
 
         _prefered_column = _column;

@@ -51,11 +51,16 @@ void TextModel::append_at(TextCursor &cursor, Codepoint codepoint)
 
 void TextModel::backspace_at(TextCursor &cursor)
 {
-    if (line(cursor.line()).length() == 0)
+    if (cursor.line() > 0 &&
+        cursor.column() == 0)
     {
+        int line_length = line(cursor.line() - 1).length();
+        line(cursor.line() - 1).append(line(cursor.line()));
         _lines.remove_index(cursor.line());
+        cursor.move_up_within(*this);
+        cursor.move_to_within(line(cursor.line()), line_length);
     }
-    else
+    else if (cursor.column() > 0 && line(cursor.line()).length() > 0)
     {
         line(cursor.line()).backspace_at(cursor.column() - 1);
         cursor.move_left_withing(*this);

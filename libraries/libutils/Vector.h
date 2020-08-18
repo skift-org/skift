@@ -197,7 +197,7 @@ public:
     {
         _count--;
 
-        if (_count < _capacity * 0.75)
+        if (MAX(_count, 16) < _capacity * 0.75)
         {
             size_t new_capacity = _capacity * 0.75;
             T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
@@ -215,6 +215,8 @@ public:
 
     void insert(size_t index, T value)
     {
+        assert(index <= _count);
+
         grow();
 
         for (size_t j = _count; j > index; j--)
@@ -266,6 +268,7 @@ public:
 
     void remove_index(size_t index)
     {
+        assert(index < _count);
         _storage[index].~T();
         remove_index_but_dont_destroy(index);
     }
@@ -313,6 +316,14 @@ public:
     void push_back(T value)
     {
         insert(_count, value);
+    }
+
+    void push_back_many(Vector<T> &values)
+    {
+        for (size_t i = 0; i < values.count(); i++)
+        {
+            push_back(values[i]);
+        }
     }
 
     T pop()

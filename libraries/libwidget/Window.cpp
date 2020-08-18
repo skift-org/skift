@@ -6,10 +6,11 @@
 #include <libsystem/system/Memory.h>
 #include <libwidget/Application.h>
 #include <libwidget/Event.h>
+#include <libwidget/Screen.h>
 #include <libwidget/Theme.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
-#include <libwidget/Screen.h>
+
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
@@ -37,7 +38,7 @@ void window_populate_header(Window *window)
 
         Widget *button_maximize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
         button_maximize->insets(Insets(3));
-        button_maximize->on(Event::ACTION, [window](auto){
+        button_maximize->on(Event::ACTION, [window](auto) {
             Event maximise_event = {};
             maximise_event.type = Event::WINDOW_MAXIMIZING;
             window_event(window, &maximise_event);
@@ -312,7 +313,7 @@ Widget *window_child_at(Window *window, Vec2i position)
     return nullptr;
 }
 
-void window_update(Window *window); // for maximize 
+void window_update(Window *window); // for maximize
 
 void window_event(Window *window, Event *event)
 {
@@ -371,18 +372,18 @@ void window_event(Window *window, Event *event)
     case Event::MOUSE_MOVE:
     {
         RectangleBorder borders = window_resize_bound_containe(window, event->mouse.position);
-        
+
         if (window->is_dragging && !window->is_maximised)
         {
             Vec2i offset = event->mouse.position - event->mouse.old_position;
             window->_bound = window->_bound.offset(offset);
             application_move_window(window, window->_bound.position());
         }
-        else if (window->is_resizing&& !window->is_maximised)
+        else if (window->is_resizing && !window->is_maximised)
         {
             window_do_resize(window, event->mouse.position);
         }
-        else if (borders && (window->flags & WINDOW_RESIZABLE)&& !window->is_maximised)
+        else if (borders && (window->flags & WINDOW_RESIZABLE) && !window->is_maximised)
         {
             if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
             {
@@ -548,19 +549,18 @@ void window_event(Window *window, Event *event)
         if (window->is_maximised == true)
         {
             window->is_maximised = false;
-            window->bound(window->previous_bound);  
-            
-        }else{
+            window->bound(window->previous_bound);
+        }
+        else
+        {
             window->is_maximised = true;
-             
             window->previous_bound = window->_bound;
             Rectangle new_size = screen_get_bound();
-            new_size = Rectangle(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height()-WINDOW_HEADER_AREA );
+            new_size = Rectangle(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
 
-             
             window->bound(new_size);
         }
-        
+
         break;
     default:
         break;
@@ -666,8 +666,17 @@ Widget *window_root(Window *window)
     return window->root_container;
 }
 
+void window_layout(Window *window);
+
 void window_update(Window *window)
 {
+    // FIXME: find a better way to schedule update after layout.
+
+    if (window->dirty_layout)
+    {
+        window_layout(window);
+    }
+
     Rectangle repaited_regions = Rectangle::empty();
 
     list_foreach(Rectangle, rectangle, window->dirty_rect)

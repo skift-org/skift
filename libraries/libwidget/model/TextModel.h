@@ -79,6 +79,8 @@ public:
     void append_at(TextCursor &cursor, Codepoint codepoint);
 
     void backspace_at(TextCursor &cursor);
+
+    void newline_at(TextCursor &cursor);
 };
 
 struct TextCursor
@@ -97,6 +99,7 @@ public:
         if (line < model.line_count())
         {
             _line = line;
+            _column = clamp(_prefered_column, 0, model.line(_line).length());
         }
     }
 

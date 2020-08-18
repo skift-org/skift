@@ -66,3 +66,27 @@ void TextModel::backspace_at(TextCursor &cursor)
         cursor.move_left_withing(*this);
     }
 }
+
+void TextModel::newline_at(TextCursor &cursor)
+{
+    auto left_side_line = own<TextModelLine>();
+    auto right_side_line = own<TextModelLine>();
+
+    for (size_t i = 0; i < cursor.column(); i++)
+    {
+        left_side_line->append(line(cursor.line())[i]);
+    }
+
+    for (size_t i = cursor.column(); i < line(cursor.line()).length(); i++)
+    {
+        right_side_line->append(line(cursor.line())[i]);
+    }
+
+    _lines.remove_index(cursor.line());
+
+    _lines.insert(cursor.line(), left_side_line);
+    _lines.insert(cursor.line() + 1, right_side_line);
+
+    cursor.move_down_within(*this);
+    cursor.move_to_within(*right_side_line, 0);
+}

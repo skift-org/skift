@@ -83,7 +83,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
             else
             {
                 auto glyph = font()->glyph(codepoint);
-                painter.draw_glyph(*font(), glyph, current_position, COLOR_WHITE);
+                painter.draw_glyph(*font(), glyph, current_position, color(THEME_FOREGROUND));
 
                 current_position += Vec2i(glyph.advance, 0);
             }

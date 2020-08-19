@@ -23,6 +23,13 @@ public:
         _buffer = make<StringStorage>(cstring, length);
     }
 
+    String(char c)
+    {
+        char cstr[2];
+        cstr[0] = c;
+        _buffer = make<StringStorage>(cstr, 1);
+    }
+    
     String(const String &other) : _buffer(const_cast<String &>(other)._buffer) {}
 
     String(String &&other) : _buffer(move(other._buffer)) {}
@@ -48,7 +55,16 @@ public:
 
         return *this;
     }
+    
+    void operator+=(String &&other)
+    {
+        char* cstr = strdup(cstring());
 
+        strcat(cstr, other.cstring());
+        String s(cstr);
+        _buffer = move(s._buffer);
+    }
+    
     bool operator==(String &&other)
     {
         if (length() != other.length())

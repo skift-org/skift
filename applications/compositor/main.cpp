@@ -57,6 +57,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
                 .mouse = {},
                 .keyboard = {
                     .key = packet.key,
+                    .modifiers = packet.modifiers,
                     .codepoint = packet.codepoint,
                 },
                 .display = {},

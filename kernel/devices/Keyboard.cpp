@@ -58,6 +58,41 @@ Codepoint keyboard_get_codepoint(Key key)
     }
 }
 
+KeyModifier keyboard_get_modifiers()
+{
+    KeyModifier modifiers = 0;
+
+    if (_keystate[KEYBOARD_KEY_LALT] == KEY_MOTION_DOWN)
+    {
+        modifiers |= KEY_MODIFIER_ALT;
+    }
+
+    if (_keystate[KEYBOARD_KEY_RALT] == KEY_MOTION_DOWN)
+    {
+        modifiers |= KEY_MODIFIER_ALTGR;
+    }
+
+    if (_keystate[KEYBOARD_KEY_LSHIFT] == KEY_MOTION_DOWN ||
+        _keystate[KEYBOARD_KEY_RSHIFT] == KEY_MOTION_DOWN)
+    {
+        modifiers |= KEY_MODIFIER_SHIFT;
+    }
+
+    if (_keystate[KEYBOARD_KEY_LCTRL] == KEY_MOTION_DOWN ||
+        _keystate[KEYBOARD_KEY_RCTRL] == KEY_MOTION_DOWN)
+    {
+        modifiers |= KEY_MODIFIER_CTRL;
+    }
+
+    if (_keystate[KEYBOARD_KEY_LSUPER] == KEY_MOTION_DOWN ||
+        _keystate[KEYBOARD_KEY_RSUPER] == KEY_MOTION_DOWN)
+    {
+        modifiers |= KEY_MODIFIER_SUPER;
+    }
+
+    return modifiers;
+}
+
 void keyboard_handle_key(Key key, KeyMotion motion)
 {
     if (!key_is_valid(key))
@@ -87,21 +122,36 @@ void keyboard_handle_key(Key key, KeyMotion motion)
     {
         if (_keystate[key] == KEY_MOTION_UP && motion == KEY_MOTION_DOWN)
         {
-            KeyboardPacket packet = {key, codepoint, KEY_MOTION_DOWN};
+            KeyboardPacket packet = {
+                key,
+                keyboard_get_modifiers(),
+                codepoint,
+                KEY_MOTION_DOWN,
+            };
 
             ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_UP)
         {
-            KeyboardPacket packet = {key, codepoint, KEY_MOTION_UP};
+            KeyboardPacket packet = {
+                key,
+                keyboard_get_modifiers(),
+                codepoint,
+                KEY_MOTION_UP,
+            };
 
             ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_DOWN)
         {
-            KeyboardPacket packet = {key, codepoint, KEY_MOTION_TYPED};
+            KeyboardPacket packet = {
+                key,
+                keyboard_get_modifiers(),
+                codepoint,
+                KEY_MOTION_TYPED,
+            };
 
             ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
         }
@@ -123,6 +173,7 @@ Key keyboard_scancode_to_key(int scancode)
 
 void keyboard_interrupt_handler()
 {
+    atomic_begin();
     uint8_t status = in8(PS2_STATUS);
 
     while (((status & PS2_WHICH_BUFFER) == PS2_KEYBOARD_BUFFER) &&
@@ -152,6 +203,7 @@ void keyboard_interrupt_handler()
 
         status = in8(PS2_STATUS);
     }
+    atomic_end();
 }
 
 /* --- Public functions ----------------------------------------------------- */

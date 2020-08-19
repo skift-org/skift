@@ -129,9 +129,17 @@ enum KeyMotion
     KEY_MOTION_TYPED,
 };
 
+#define KEY_MODIFIER_ALT (1 << 0)
+#define KEY_MODIFIER_ALTGR (1 << 1)
+#define KEY_MODIFIER_SHIFT (1 << 2)
+#define KEY_MODIFIER_CTRL (1 << 3)
+#define KEY_MODIFIER_SUPER (1 << 3)
+typedef unsigned int KeyModifier;
+
 struct KeyboardPacket
 {
     Key key;
+    KeyModifier modifiers;
     Codepoint codepoint;
     KeyMotion motion;
 };

@@ -24,6 +24,7 @@ struct MouseEvent
 struct KeyboardEvent
 {
     Key key;
+    KeyModifier modifiers;
     Codepoint codepoint;
 };
 

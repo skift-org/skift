@@ -56,13 +56,15 @@ public:
         return *this;
     }
     
-    void operator+=(String &&other)
+    String &operator+=(String &&other)
     {
         char* cstr = strdup(cstring());
 
         strcat(cstr, other.cstring());
         String s(cstr);
         _buffer = move(s._buffer);
+        
+        return *this;
     }
     
     bool operator==(String &&other)

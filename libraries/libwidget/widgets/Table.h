@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libutils/String.h>
+
 #include <libwidget/Model.h>
 #include <libwidget/Widget.h>
 #include <libwidget/widgets/ScrollBar.h>
@@ -14,6 +16,8 @@ private:
     int _scroll_offset = 0;
     ScrollBar *_scrollbar;
 
+    String _empty_message{"No data to display"};
+
     Rectangle body_bound() const;
     Rectangle scrollbar_bound() const;
     Rectangle header_bound() const;
@@ -25,6 +29,11 @@ private:
     void paint_cell(Painter &painter, int row, int column);
 
 public:
+    void empty_message(String message)
+    {
+        _empty_message = message;
+    }
+
     int selected() { return _selected; }
 
     void select(int index)

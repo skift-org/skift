@@ -131,27 +131,33 @@ void Table::paint(Painter &painter, Rectangle rectangle)
     int column_count = model_column_count(_model);
     int column_width = body_bound().width() / column_count;
 
-    for (int row = MAX(0, _scroll_offset / TABLE_ROW_HEIGHT - 1);
-         row < MIN(model_row_count(_model), ((_scroll_offset + list_bound().height()) / TABLE_ROW_HEIGHT) + 1);
-         row++)
+    if (model_row_count(_model) == 0)
     {
+        painter.draw_string_within(*font(), _empty_message.cstring(), list_bound().take_top(TABLE_ROW_HEIGHT), Position::CENTER, color(THEME_FOREGROUND));
+    }
+    else
+    {
+        for (int row = MAX(0, _scroll_offset / TABLE_ROW_HEIGHT - 1);
+             row < MIN(model_row_count(_model), ((_scroll_offset + list_bound().height()) / TABLE_ROW_HEIGHT) + 1);
+             row++)
+        {
 
-        if (_selected == row)
-        {
-            painter.fill_rectangle(row_bound(row), color(THEME_SELECTION));
-            painter.draw_rectangle(row_bound(row), color(THEME_SELECTION));
-        }
-        else if (row % 2)
-        {
-            painter.fill_rectangle(row_bound(row), ALPHA(color(THEME_FOREGROUND), 0.05));
-        }
+            if (_selected == row)
+            {
+                painter.fill_rectangle(row_bound(row), color(THEME_SELECTION));
+                painter.draw_rectangle(row_bound(row), color(THEME_SELECTION));
+            }
+            else if (row % 2)
+            {
+                painter.fill_rectangle(row_bound(row), ALPHA(color(THEME_FOREGROUND), 0.05));
+            }
 
-        for (int column = 0; column < column_count; column++)
-        {
-            paint_cell(painter, row, column);
+            for (int column = 0; column < column_count; column++)
+            {
+                paint_cell(painter, row, column);
+            }
         }
     }
-
     painter.blur_rectangle(header_bound(), 8);
     painter.fill_rectangle(header_bound(), ALPHA(color(THEME_BACKGROUND), 0.9));
 

@@ -172,6 +172,7 @@ Window *file_explorer_window_create(const char *current_path)
     window->model = filesystem_model_create(current_path);
     window->table = new Table(root, window->model);
     window->table->attributes(LAYOUT_FILL);
+    window->table->empty_message("This directory is empty.");
 
     window->table->on(Event::MOUSE_DOUBLE_CLICK, [window](auto) {
         if (window->table->selected() >= 0)

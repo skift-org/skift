@@ -58,12 +58,15 @@ public:
     
     String &operator+=(String &&other)
     {
-        char* cstr = strdup(cstring());
+        int buff_length = length() + other.length() + 1;
+        char* buffer = new char[buff_length];
 
-        strcat(cstr, other.cstring());
-        String s(cstr);
+        snprintf(buffer, buff_length, "%s%s", cstring(), other.cstring());
+
+        String s(buffer, buff_length);
         _buffer = move(s._buffer);
-        
+        delete buffer;
+
         return *this;
     }
     

@@ -130,11 +130,11 @@ run: run-qemu
 VM_MEMORY?=128
 
 QEMU=qemu-system-x86_64
-QEMUFLAGS=-m $(VM_MEMORY)M \
+QEMU_FLAGS=-m $(VM_MEMORY)M \
 		  -serial mon:stdio \
 		  -rtc base=localtime
 
-QEMUFLAGS_VIRTIO=-device virtio-rng-pci \
+QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 				 -device virtio-serial \
 				 -nic user,model=virtio-net-pci
 #				 -vga virtio
@@ -142,32 +142,34 @@ QEMUFLAGS_VIRTIO=-device virtio-rng-pci \
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA) -enable-kvm || \
-	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUEXTRA)
+	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
+	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
 
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) -cdrom $^ $(QEMUFLAGS) $(QEMUFLAGS_VIRTIO) $(QEMUEXTRA) -enable-kvm
+	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm
 
 .PHONY: run-vbox
 run-vbox: $(BOOTDISK)
-	VBoxManage unregistervm --delete "skiftOS-dev" || echo "Look like it's the fist time you are running this command, this is fine"
-	VBoxManage createvm \
+	@VBoxManage unregistervm --delete "skiftOS-dev" || echo "Look like it's the fist time you are running this command, this is fine"
+	@VBoxManage createvm \
 		--name skiftOS-dev \
 		--ostype Other \
 		--register \
 		--basefolder $(shell pwd)/vm
 
-	VBoxManage modifyvm \
+	@VBoxManage modifyvm \
 		skiftOS-dev \
-		--memory $(VM_MEMORY)
+		--memory $(VM_MEMORY) \
+		--uart1 0x3F8 4 \
+		--uartmode1 tcpserver 1234
 
-	VBoxManage storagectl \
+	@VBoxManage storagectl \
 		skiftOS-dev \
 		--name IDE \
 		--add ide \
 
-	VBoxManage storageattach \
+	@VBoxManage storageattach \
 		skiftOS-dev \
 		--storagectl IDE \
 		--port 0 \
@@ -175,7 +177,14 @@ run-vbox: $(BOOTDISK)
 		--type dvddrive \
 		--medium $(BOOTDISK)
 
-	VBoxManage startvm skiftOS-dev --type gui
+ifeq ($(VBOX_DISPLAY),sdl)
+	@vboxsdl --startvm skiftOS-dev &
+	@sleep 1
+else
+	@VBoxManage startvm skiftOS-dev --type gui
+endif
+	nc localhost 1234
+
 
 .PHONY: sync
 sync:

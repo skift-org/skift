@@ -152,7 +152,7 @@ Window *file_explorer_window_create(const char *current_path)
 
     home_button->on(Event::ACTION, [window](auto) {
         clear_foreward_history(window);
-        navigate(window, path_create("/"), RECORD_BACKWARD);
+        navigate(window, path_create("/User"), RECORD_BACKWARD);
     });
 
     window->go_home = home_button;
@@ -199,7 +199,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = file_explorer_window_create("/");
+    Window *window = file_explorer_window_create("/User");
     window_show(window);
 
     return application_run();

@@ -3,7 +3,8 @@
 #include <libwidget/widgets/TextField.h>
 
 TextField::TextField(Widget *parent, RefPtr<TextModel> model)
-    : Widget(parent), _model(model)
+    : Widget(parent),
+      _model(model)
 {
     _vscrollbar = new ScrollBar(this);
     _vscrollbar->on(Event::VALUE_CHANGE, [this](auto) {
@@ -104,56 +105,107 @@ void TextField::event(Event *event)
 
     if (event->type == Event::KEYBOARD_KEY_TYPED)
     {
-        if (event->keyboard.key == KEYBOARD_KEY_UP)
+        if (event->keyboard.key == KEYBOARD_KEY_UP && event->keyboard.modifiers & KEY_MODIFIER_ALT)
+        {
+            _model->move_line_up_at(_cursor);
+            scroll_to_cursor();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_DOWN && event->keyboard.modifiers & KEY_MODIFIER_ALT)
+        {
+            _model->move_line_down_at(_cursor);
+            scroll_to_cursor();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_UP && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _vscroll_offset = MAX(_vscroll_offset - LINE_HEIGHT, 0);
+            update_scrollbar();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_DOWN && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _vscroll_offset = MIN(_vscroll_offset + LINE_HEIGHT, (int)_model->line_count() * LINE_HEIGHT - bound().height() + LINE_HEIGHT);
+            update_scrollbar();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_PGUP && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _vscroll_offset = MAX(_vscroll_offset - bound().height() + LINE_HEIGHT, 0);
+            update_scrollbar();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_PGDOWN && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _vscroll_offset = MIN(_vscroll_offset + bound().height() - LINE_HEIGHT, (int)_model->line_count() * LINE_HEIGHT - bound().height() + LINE_HEIGHT);
+            update_scrollbar();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             _cursor.move_up_within(*_model);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
             _cursor.move_down_within(*_model);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
             _cursor.move_left_within(*_model);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
             _cursor.move_right_within(*_model);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_PGUP)
         {
             _cursor.move_up_within(*_model, bound().height() / LINE_HEIGHT);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_PGDOWN)
         {
             _cursor.move_down_within(*_model, bound().height() / LINE_HEIGHT);
+            scroll_to_cursor();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_HOME && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _cursor.move_home_within(*_model);
+            scroll_to_cursor();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_END && event->keyboard.modifiers & KEY_MODIFIER_CTRL)
+        {
+            _cursor.move_end_within(*_model);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_HOME)
         {
-            _cursor.move_home_within(*_model);
+            _cursor.move_home_within(_model->line(_cursor.line()));
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_END)
         {
-            _cursor.move_end_within(*_model);
+            _cursor.move_end_within(_model->line(_cursor.line()));
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_BKSPC)
         {
             _model->backspace_at(_cursor);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DELETE)
         {
             _model->delete_at(_cursor);
+            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
         {
             _model->newline_at(_cursor);
+            scroll_to_cursor();
         }
         else if (event->keyboard.codepoint != 0)
         {
             _model->append_at(_cursor, event->keyboard.codepoint);
+            scroll_to_cursor();
         }
 
-        scroll_to_cursor();
         should_repaint();
 
         event->accepted = true;
@@ -168,13 +220,18 @@ void TextField::event(Event *event)
     }
 }
 
+void TextField::update_scrollbar()
+{
+    _vscrollbar->update((_model->line_count() + 1) * LINE_HEIGHT, content_bound().height(), _vscroll_offset);
+    _hscrollbar->update(1000, content_bound().width() - 32, _hscroll_offset);
+}
+
 void TextField::do_layout()
 {
     _vscrollbar->bound(this->content_bound().take_right(16).cutoff_top_and_botton(0, 16));
-    _vscrollbar->update((_model->line_count() + 1) * LINE_HEIGHT, content_bound().height());
-
     _hscrollbar->bound(this->content_bound().take_bottom(16).cutoff_left_and_right(32, 16));
-    _hscrollbar->update(1000, content_bound().width() - 32);
+
+    update_scrollbar();
 }
 
 void TextField::scroll_to_cursor()
@@ -189,5 +246,5 @@ void TextField::scroll_to_cursor()
         _vscroll_offset = (_cursor.line() + 2) * LINE_HEIGHT - content_bound().height();
     }
 
-    _vscrollbar->update((_model->line_count() + 1) * LINE_HEIGHT, content_bound().height(), _vscroll_offset);
+    update_scrollbar();
 }

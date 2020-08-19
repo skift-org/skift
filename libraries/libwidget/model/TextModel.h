@@ -88,6 +88,10 @@ public:
     void delete_at(TextCursor &cursor);
 
     void newline_at(TextCursor &cursor);
+
+    void move_line_up_at(TextCursor &cursor);
+
+    void move_line_down_at(TextCursor &cursor);
 };
 
 struct TextCursor
@@ -187,16 +191,32 @@ public:
         _prefered_column = _column;
     }
 
+    void move_home_within(TextModelLine &line)
+    {
+        __unused(line);
+
+        _column = 0;
+        _prefered_column = _column;
+    }
+
+    void move_end_within(TextModelLine &line)
+    {
+        _column = line.length();
+        _prefered_column = _column;
+    }
+
     void move_home_within(TextModel &model)
     {
         __unused(model);
 
+        _line = 0;
         _column = 0;
         _prefered_column = _column;
     }
 
     void move_end_within(TextModel &model)
     {
+        _line = model.line_count() - 1;
         _column = model.line(_line).length();
         _prefered_column = _column;
     }

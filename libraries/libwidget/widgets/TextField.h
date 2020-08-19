@@ -16,6 +16,8 @@ private:
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
 
+    void update_scrollbar();
+
     void scroll_to_cursor();
 
 public:

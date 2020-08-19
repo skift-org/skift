@@ -309,6 +309,15 @@ public:
         }
     }
 
+    T take_at(size_t index)
+    {
+        assert(index < _count);
+
+        T copy = _storage[index];
+        remove_index(index);
+        return copy;
+    }
+
     void push(T value)
     {
         insert(0, value);

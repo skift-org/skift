@@ -106,3 +106,21 @@ void TextModel::newline_at(TextCursor &cursor)
     cursor.move_down_within(*this);
     cursor.move_to_within(*right_side_line, 0);
 }
+
+void TextModel::move_line_up_at(TextCursor &cursor)
+{
+    if (cursor.line() > 0)
+    {
+        _lines.insert(cursor.line() - 1, _lines.take_at(cursor.line()));
+        cursor.move_up_within(*this);
+    }
+}
+
+void TextModel::move_line_down_at(TextCursor &cursor)
+{
+    if (cursor.line() < line_count())
+    {
+        _lines.insert(cursor.line() + 1, _lines.take_at(cursor.line()));
+        cursor.move_down_within(*this);
+    }
+}

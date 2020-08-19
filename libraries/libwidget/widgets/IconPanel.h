@@ -3,7 +3,7 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Widget.h>
 
-struct IconPanel : public Widget
+class IconPanel : public Widget
 {
 private:
     RefPtr<Icon> _icon;

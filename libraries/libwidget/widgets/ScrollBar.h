@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-struct ScrollBar : public Widget
+class ScrollBar : public Widget
 {
 private:
     Vec2i _mouse_origine;

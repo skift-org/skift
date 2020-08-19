@@ -4,7 +4,7 @@
 
 #include "demo/Demos.h"
 
-struct DemoWidget : public Widget
+class DemoWidget : public Widget
 {
 private:
     double _time;

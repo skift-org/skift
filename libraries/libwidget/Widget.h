@@ -58,7 +58,7 @@ struct WidgetColor
     Color color;
 };
 
-struct Widget
+class Widget
 {
 private:
     bool _enabled;

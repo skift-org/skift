@@ -8,7 +8,7 @@ enum class ImageScalling
     STRETCH,
 };
 
-struct Image : public Widget
+class Image : public Widget
 {
 private:
     RefPtr<Bitmap> _bitmap;

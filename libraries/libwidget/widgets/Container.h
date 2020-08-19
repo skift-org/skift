@@ -2,7 +2,9 @@
 
 #include <libwidget/Widget.h>
 
-struct Container : public Widget
+class Container : public Widget
 {
+private:
+public:
     Container(Widget *parent);
 };

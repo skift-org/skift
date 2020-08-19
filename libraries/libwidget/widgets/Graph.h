@@ -3,7 +3,7 @@
 #include <libsystem/utils/RingBuffer.h>
 #include <libwidget/Widget.h>
 
-struct Graph : public Widget
+class Graph : public Widget
 {
 private:
     Color _color;

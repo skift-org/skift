@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-struct Separator : public Widget
+class Separator : public Widget
 {
 private:
 public:

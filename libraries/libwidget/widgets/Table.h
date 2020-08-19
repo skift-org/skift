@@ -4,7 +4,7 @@
 #include <libwidget/Widget.h>
 #include <libwidget/widgets/ScrollBar.h>
 
-struct Table : public Widget
+class Table : public Widget
 {
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;

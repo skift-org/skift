@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-struct Placeholder : public Widget
+class Placeholder : public Widget
 {
 private:
     char *_text;

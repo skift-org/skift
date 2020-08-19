@@ -17,7 +17,7 @@ enum ButtonStyle
     BUTTON_FILLED,
 };
 
-struct Button : public Widget
+class Button : public Widget
 {
 private:
     ButtonState _state = BUTTON_IDLE;

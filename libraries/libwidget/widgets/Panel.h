@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-struct Panel : public Widget
+class Panel : public Widget
 {
 private:
     int _border_radius = 0;

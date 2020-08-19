@@ -2,7 +2,7 @@
 
 #include <libwidget/Widget.h>
 
-struct Label : public Widget
+class Label : public Widget
 {
 private:
     char *_text = nullptr;

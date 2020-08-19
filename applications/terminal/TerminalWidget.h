@@ -16,7 +16,7 @@ struct TerminalWidgetRenderer
     struct TerminalWidget *widget;
 };
 
-struct TerminalWidget : public Widget
+class TerminalWidget : public Widget
 {
 private:
     Terminal *_terminal;

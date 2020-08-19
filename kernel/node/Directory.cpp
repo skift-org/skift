@@ -74,7 +74,7 @@ static FsNode *directory_find(FsDirectory *node, const char *name)
     {
         if (strcmp(entry->name, name) == 0)
         {
-            return fsnode_ref(entry->node);
+            return entry->node->ref();
         }
     };
 
@@ -93,7 +93,7 @@ static Result directory_link(FsDirectory *node, const char *name, FsNode *child)
 
     FsDirectoryEntry *new_entry = __create(FsDirectoryEntry);
 
-    new_entry->node = fsnode_ref(child);
+    new_entry->node = child->ref();
     strcpy(new_entry->name, name);
 
     list_pushback(node->childs, new_entry);
@@ -103,7 +103,7 @@ static Result directory_link(FsDirectory *node, const char *name, FsNode *child)
 
 static void directory_entry_destroy(FsDirectoryEntry *entry)
 {
-    fsnode_deref(entry->node);
+    entry->node->deref();
     free(entry);
 }
 

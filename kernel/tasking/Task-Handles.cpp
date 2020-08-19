@@ -403,7 +403,7 @@ cleanup_and_return:
         fshandle_destroy(writer_handle);
     }
 
-    fsnode_deref(pipe);
+    pipe->deref();
 
     return result;
 }
@@ -453,7 +453,7 @@ cleanup_and_return:
         fshandle_destroy(slave_handle);
     }
 
-    fsnode_deref(terminal);
+    terminal->deref();
 
     return result;
 }

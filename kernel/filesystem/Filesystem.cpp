@@ -35,7 +35,7 @@ FsNode *filesystem_find_and_ref(Path *path)
 {
     assert(_filesystem_root != nullptr);
 
-    FsNode *current = fsnode_ref(_filesystem_root);
+    FsNode *current = _filesystem_root->ref();
 
     for (size_t i = 0; i < path_element_count(path); i++)
     {
@@ -52,7 +52,7 @@ FsNode *filesystem_find_and_ref(Path *path)
                 fsnode_release_lock(current, scheduler_running_id());
             }
 
-            fsnode_deref(current);
+            current->deref();
             current = found;
         }
         else
@@ -102,7 +102,7 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
                 fsnode_release_lock(parent, scheduler_running_id());
             }
 
-            fsnode_deref(parent);
+            parent->deref();
         }
     }
 
@@ -113,14 +113,14 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
     if ((flags & OPEN_DIRECTORY) && node->type != FILE_TYPE_DIRECTORY)
     {
-        fsnode_deref(node);
+        node->deref();
 
         return ERR_NOT_A_DIRECTORY;
     }
 
     if ((flags & OPEN_SOCKET) && node->type != FILE_TYPE_SOCKET)
     {
-        fsnode_deref(node);
+        node->deref();
 
         return ERR_NOT_A_SOCKET;
     }
@@ -132,14 +132,14 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
     if ((flags & OPEN_STREAM) && !(is_node_stream))
     {
-        fsnode_deref(node);
+        node->deref();
 
         return ERR_NOT_A_STREAM;
     }
 
     *handle = fshandle_create(node, flags);
 
-    fsnode_deref(node);
+    node->deref();
 
     return SUCCESS;
 }
@@ -155,13 +155,13 @@ Result filesystem_connect(Path *path, FsHandle **connection_handle)
 
     if (node->type != FILE_TYPE_SOCKET)
     {
-        fsnode_deref(node);
+        node->deref();
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
     Result result = fshandle_connect(node, connection_handle);
 
-    fsnode_deref(node);
+    node->deref();
 
     return result;
 }
@@ -178,7 +178,7 @@ Result filesystem_mkdir(Path *path)
 
     Result result = filesystem_link(path, directory);
 
-    fsnode_deref(directory);
+    directory->deref();
 
     return result;
 }
@@ -189,7 +189,7 @@ Result filesystem_mkfile(Path *path)
 
     Result result = filesystem_link(path, file);
 
-    fsnode_deref(file);
+    file->deref();
 
     return result;
 }
@@ -200,7 +200,7 @@ Result filesystem_mkpipe(Path *path)
 
     Result result = filesystem_link(path, pipe);
 
-    fsnode_deref(pipe);
+    pipe->deref();
 
     return result;
 }
@@ -216,7 +216,7 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
 
     if (child->type == FILE_TYPE_DIRECTORY)
     {
-        fsnode_deref(child);
+        child->deref();
         return ERR_IS_A_DIRECTORY;
     }
 
@@ -234,13 +234,12 @@ Result filesystem_mklink_for_tar(Path *old_path, Path *new_path)
 
     /*if (child->type == FILE_TYPE_DIRECTORY)
     {
-        fsnode_deref(child);
+        child->deref()
         return ERR_IS_A_DIRECTORY;
     }*/
 
     return filesystem_link_and_take_ref(new_path, child);
 }
-
 
 Result filesystem_link_cstring(const char *path, FsNode *node)
 {
@@ -281,7 +280,7 @@ Result filesystem_link(Path *path, FsNode *node)
 
 cleanup_and_return:
     if (parent != nullptr)
-        fsnode_deref(parent);
+        parent->deref();
 
     return result;
 }
@@ -291,7 +290,7 @@ Result filesystem_link_and_take_ref_cstring(const char *path, FsNode *node)
     Path *path_object = path_create(path);
 
     Result result = filesystem_link(path_object, node);
-    fsnode_deref(node);
+    node->deref();
 
     path_destroy(path_object);
     return result;
@@ -300,7 +299,7 @@ Result filesystem_link_and_take_ref_cstring(const char *path, FsNode *node)
 Result filesystem_link_and_take_ref(Path *path, FsNode *node)
 {
     Result result = filesystem_link(path, node);
-    fsnode_deref(node);
+    node->deref();
     return result;
 }
 
@@ -334,7 +333,7 @@ Result filesystem_unlink(Path *path)
 
 cleanup_and_return:
     if (parent)
-        fsnode_deref(parent);
+        parent->deref();
 
     return result;
 }
@@ -404,13 +403,13 @@ unlock_cleanup_and_return:
 
 cleanup_and_return:
     if (child)
-        fsnode_deref(child);
+        child->deref();
 
     if (old_parent)
-        fsnode_deref(old_parent);
+        old_parent->deref();
 
     if (new_parent)
-        fsnode_deref(new_parent);
+        new_parent->deref();
 
     return result;
 }

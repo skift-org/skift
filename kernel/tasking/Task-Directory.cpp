@@ -50,7 +50,7 @@ Result task_set_directory(Task *task, const char *buffer)
 
 cleanup_and_return:
     if (node)
-        fsnode_deref(node);
+        node->deref();
 
     if (path)
         path_destroy(path);

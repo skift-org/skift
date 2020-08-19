@@ -1,6 +1,6 @@
 
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/filesystem/Filesystem.h"
 
@@ -11,64 +11,64 @@ void fsnode_init(FsNode *node, FileType type)
     node->type = type;
 }
 
-FsNode *fsnode_ref(FsNode *node)
+FsNode *FsNode::ref()
 {
-    __atomic_add_fetch(&node->refcount, 1, __ATOMIC_SEQ_CST);
+    __atomic_add_fetch(&refcount, 1, __ATOMIC_SEQ_CST);
 
-    return node;
+    return this;
 }
 
-void fsnode_deref(FsNode *node)
+void FsNode::deref()
 {
-    if (__atomic_sub_fetch(&node->refcount, 1, __ATOMIC_SEQ_CST) == 0)
+    if (__atomic_sub_fetch(&refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
-        if (node->destroy)
+        if (destroy)
         {
-            node->destroy(node);
+            destroy(this);
         }
 
-        free(node);
+        free(this);
     }
 }
 
-FsNode *fsnode_ref_handle(FsNode *node, OpenFlag flags)
+void FsNode::ref_handle(FsHandle &handle)
 {
-    if (flags & OPEN_READ)
-        __atomic_add_fetch(&node->readers, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_READ)
+        __atomic_add_fetch(&this->readers, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_WRITE)
-        __atomic_add_fetch(&node->writers, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_WRITE)
+        __atomic_add_fetch(&this->writers, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_CLIENT)
-        __atomic_add_fetch(&node->clients, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_CLIENT)
+        __atomic_add_fetch(&this->clients, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_SERVER)
-        __atomic_add_fetch(&node->server, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_SERVER)
+        __atomic_add_fetch(&this->server, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_MASTER)
-        __atomic_add_fetch(&node->master, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_MASTER)
+        __atomic_add_fetch(&this->master, 1, __ATOMIC_SEQ_CST);
 
-    return fsnode_ref(node);
+    this->ref();
 }
 
-void fsnode_deref_handle(FsNode *node, OpenFlag flags)
+void FsNode::deref_handle(FsHandle &handle)
 {
-    if (flags & OPEN_READ)
-        __atomic_sub_fetch(&node->readers, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_READ)
+        __atomic_sub_fetch(&this->readers, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_WRITE)
-        __atomic_sub_fetch(&node->writers, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_WRITE)
+        __atomic_sub_fetch(&this->writers, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_CLIENT)
-        __atomic_sub_fetch(&node->clients, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_CLIENT)
+        __atomic_sub_fetch(&this->clients, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_SERVER)
-        __atomic_sub_fetch(&node->server, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_SERVER)
+        __atomic_sub_fetch(&this->server, 1, __ATOMIC_SEQ_CST);
 
-    if (flags & OPEN_MASTER)
-        __atomic_sub_fetch(&node->master, 1, __ATOMIC_SEQ_CST);
+    if (handle.flags & OPEN_MASTER)
+        __atomic_sub_fetch(&this->master, 1, __ATOMIC_SEQ_CST);
 
-    fsnode_deref(node);
+    this->deref();
 }
 
 bool fsnode_can_read(FsNode *node, FsHandle *handle)

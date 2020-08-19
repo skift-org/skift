@@ -68,17 +68,18 @@ struct FsNode
     FsNodeIsAcceptedCallback is_accepted;
 
     FsNodeDestroyCallback destroy;
+
+public:
+    FsNode *ref();
+
+    void deref();
+
+    void ref_handle(FsHandle &handle);
+
+    void deref_handle(FsHandle &handle);
 };
 
 void fsnode_init(FsNode *node, FileType type);
-
-FsNode *fsnode_ref(FsNode *node);
-
-void fsnode_deref(FsNode *node);
-
-FsNode *fsnode_ref_handle(FsNode *node, OpenFlag flags);
-
-void fsnode_deref_handle(FsNode *node, OpenFlag flags);
 
 bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 

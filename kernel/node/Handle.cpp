@@ -16,9 +16,10 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 
     lock_init(handle->lock);
 
-    handle->node = fsnode_ref_handle(node, flags);
     handle->offset = 0;
     handle->flags = flags;
+    node->ref_handle(*handle);
+    handle->node = node;
 
     if (node->open)
     {
@@ -37,9 +38,10 @@ FsHandle *fshandle_clone(FsHandle *handle)
 
     lock_init(clone->lock);
 
-    clone->node = fsnode_ref_handle(node, handle->flags);
     clone->offset = handle->offset;
     clone->flags = handle->flags;
+    node->ref_handle(*handle);
+    clone->node = node;
 
     if (node->open)
     {
@@ -67,7 +69,7 @@ void fshandle_destroy(FsHandle *handle)
         fsnode_release_lock(node, scheduler_running_id());
     }
 
-    fsnode_deref_handle(node, handle->flags);
+    node->deref_handle(*handle);
     free(handle);
 }
 
@@ -360,7 +362,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     task_block(scheduler_running(), blocker_connect_create(connection), -1);
 
-    fsnode_deref(connection);
+    connection->deref();
 
     return SUCCESS;
 }
@@ -385,7 +387,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 
     fsnode_release_lock(node, scheduler_running_id());
 
-    fsnode_deref(connection);
+    connection->deref();
 
     return SUCCESS;
 }

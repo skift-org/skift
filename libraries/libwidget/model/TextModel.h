@@ -7,6 +7,8 @@
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
 
+#include <libwidget/Theme.h>
+
 struct TextCursor;
 
 class TextModelLine
@@ -61,10 +63,50 @@ public:
     }
 };
 
+class TextModelSpan
+{
+private:
+    size_t _line;
+    size_t _start;
+    size_t _end;
+
+    ThemeColorRole _foreground;
+    ThemeColorRole _background;
+
+public:
+    size_t line() { return _line; }
+
+    size_t start() { return _start; }
+
+    size_t end() { return _end; }
+
+    ThemeColorRole foreground() { return _foreground; }
+
+    ThemeColorRole background() { return _background; }
+
+    TextModelSpan(size_t line, size_t start, size_t end) : TextModelSpan(line, start, end, THEME_FOREGROUND, THEME_BACKGROUND)
+    {
+    }
+
+    TextModelSpan(size_t line, size_t start, size_t end, ThemeColorRole foreground, ThemeColorRole background)
+        : _line(line),
+          _start(start),
+          _end(end),
+          _foreground(foreground),
+          _background(background)
+    {
+    }
+
+    ~TextModelSpan()
+    {
+    }
+};
+
 class TextModel : public RefCounted<TextModel>
 {
 private:
     Vector<OwnPtr<TextModelLine>> _lines{1024};
+    Vector<TextModelSpan> _spans{1024};
 
 public:
     static RefPtr<TextModel> empty();
@@ -74,6 +116,8 @@ public:
     TextModel() {}
 
     ~TextModel() {}
+
+    /* --- Editing ---------------------------------------------------------- */
 
     TextModelLine &line(int index) { return *_lines[index]; }
 
@@ -92,6 +136,36 @@ public:
     void move_line_up_at(TextCursor &cursor);
 
     void move_line_down_at(TextCursor &cursor);
+
+    /* --- Coloration ------------------------------------------------------- */
+
+    void span_add(TextModelSpan span)
+    {
+        _spans.insert_sorted(span, [](auto &left, auto &right) {
+            return left.line() < right.line() &&
+                   left.start() < right.start();
+        });
+    }
+
+    TextModelSpan span_at(size_t line, size_t column)
+    {
+        for (size_t i = 0; i < _spans.count(); i++)
+        {
+            auto &span = _spans[i];
+
+            if (span.line() == line && column >= span.start() && column < span.end())
+            {
+                return span;
+            }
+        }
+
+        return TextModelSpan(line, column, column + 1);
+    }
+
+    void span_clear()
+    {
+        _spans.clear();
+    }
 };
 
 struct TextCursor

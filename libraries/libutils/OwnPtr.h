@@ -95,6 +95,7 @@ public:
 
     T *operator->() const
     {
+        assert(_ptr);
         return _ptr;
     }
 

@@ -83,8 +83,10 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
             }
             else
             {
+                auto span = _model->span_at(i, j);
+
                 auto glyph = font()->glyph(codepoint);
-                painter.draw_glyph(*font(), glyph, current_position, color(THEME_FOREGROUND));
+                painter.draw_glyph(*font(), glyph, current_position, color(span.foreground()));
 
                 current_position += Vec2i(glyph.advance, 0);
             }

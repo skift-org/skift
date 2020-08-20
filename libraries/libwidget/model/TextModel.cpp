@@ -9,7 +9,7 @@ RefPtr<TextModel> TextModel::empty()
 
 RefPtr<TextModel> TextModel::from_file(const char *path)
 {
-    auto model = make<TextModel>();
+    auto model = empty();
 
     Stream *stream = stream_open(path, OPEN_READ | OPEN_BUFFERED);
 
@@ -39,6 +39,8 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
     {
         model->append_line(own<TextModelLine>());
     }
+
+    model->span_add(TextModelSpan(0, 0, 10, THEME_ANSI_RED, THEME_ANSI_BLUE));
 
     return model;
 }

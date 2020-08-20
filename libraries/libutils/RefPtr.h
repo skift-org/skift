@@ -118,8 +118,9 @@ public:
         return *this;
     }
 
-    T *operator->()
+    T *operator->() const
     {
+        assert(_ptr);
         return _ptr;
     }
 

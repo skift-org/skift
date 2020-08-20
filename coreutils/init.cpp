@@ -13,6 +13,10 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
+    int splash_pid = -1;
+    process_run("splash-screen", &splash_pid);
+    process_wait(splash_pid, nullptr);
+
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {
         int compositor_pid = -1;

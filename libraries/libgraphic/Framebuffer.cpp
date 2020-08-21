@@ -71,59 +71,71 @@ Result Framebuffer::set_resolution(Vec2i size)
     return SUCCESS;
 }
 
-void Framebuffer::mark_dirty(Rectangle bound)
+void Framebuffer::mark_dirty(Rectangle new_bound)
 {
-    bound = _bitmap->bound().clipped_with(bound);
+    new_bound = _bitmap->bound().clipped_with(new_bound);
 
-    if (bound.is_empty())
+    if (new_bound.is_empty())
     {
         return;
     }
 
-    if (_bitmap->bound().colide_with(bound))
+    bool merged = false;
+
+    _dirty_bounds.foreach ([&](Rectangle &region) {
+        int region_area = region.area();
+        int merge_area = region.merged_with(new_bound).area();
+
+        if (region.colide_with(new_bound) && (region_area + new_bound.area() > merge_area))
+        {
+            region = region.merged_with(new_bound);
+            merged = true;
+
+            return Iteration::STOP;
+        }
+
+        return Iteration::CONTINUE;
+    });
+
+    if (!merged)
     {
-        if (_is_dirty)
-        {
-            _dirty_bound = _dirty_bound.merged_with(bound);
-        }
-        else
-        {
-            _is_dirty = true;
-            _dirty_bound = _bitmap->bound().clipped_with(bound);
-        }
+        _dirty_bounds.push_back(new_bound);
     }
 }
 
 void Framebuffer::mark_dirty_all()
 {
-    _is_dirty = true;
-    _dirty_bound = _bitmap->bound();
+    _dirty_bounds.clear();
+    mark_dirty(_bitmap->bound());
 }
 
 void Framebuffer::blit()
 {
-    if (_dirty_bound.is_empty())
+    if (_dirty_bounds.empty())
     {
         return;
     }
+    _dirty_bounds.foreach ([&](auto &bound) {
+        IOCallDisplayBlitArgs args;
 
-    IOCallDisplayBlitArgs args;
+        args.buffer = (uint32_t *)_bitmap->pixels();
+        args.buffer_width = _bitmap->width();
+        args.buffer_height = _bitmap->height();
 
-    args.buffer = (uint32_t *)_bitmap->pixels();
-    args.buffer_width = _bitmap->width();
-    args.buffer_height = _bitmap->height();
+        args.blit_x = bound.x();
+        args.blit_y = bound.y();
+        args.blit_width = bound.width();
+        args.blit_height = bound.height();
 
-    args.blit_x = _dirty_bound.x();
-    args.blit_y = _dirty_bound.y();
-    args.blit_width = _dirty_bound.width();
-    args.blit_height = _dirty_bound.height();
+        __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
 
-    __plug_handle_call(&_handle, IOCALL_DISPLAY_BLIT, &args);
+        if (handle_has_error(&_handle))
+        {
+            handle_printf_error(&_handle, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
+        }
 
-    if (handle_has_error(&_handle))
-    {
-        handle_printf_error(&_handle, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
-    }
+        return Iteration::CONTINUE;
+    });
 
-    _is_dirty = false;
+    _dirty_bounds.clear();
 }

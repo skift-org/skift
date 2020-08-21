@@ -13,8 +13,7 @@ private:
     RefPtr<Bitmap> _bitmap;
     Painter _painter;
 
-    bool _is_dirty = false;
-    Rectangle _dirty_bound = Rectangle::empty();
+    Vector<Rectangle> _dirty_bounds{};
 
 public:
     static ResultOr<OwnPtr<Framebuffer>> open();

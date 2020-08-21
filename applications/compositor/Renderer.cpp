@@ -32,6 +32,8 @@ void renderer_region_dirty(Rectangle new_region)
         {
             region = region.merged_with(new_region);
             merged = true;
+
+            return Iteration::STOP;
         }
 
         return Iteration::CONTINUE;

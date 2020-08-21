@@ -74,7 +74,7 @@ int gfxmode_get(Stream *framebuffer_device)
 
     if (stream_call(framebuffer_device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) < 0)
     {
-        handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
+        handle_printf_error(framebuffer_device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
         return -1;
     }
 
@@ -91,7 +91,7 @@ int gfxmode_set_compositor(IOCallDisplayModeArgs *mode)
 
     if (handle_has_error(compositor_connection))
     {
-        handle_printf_error(compositor_connection, "Failled to connect to the compositor (Failling back on iocall)");
+        handle_printf_error(compositor_connection, "Failed to connect to the compositor (Failling back on iocall)");
         return -1;
     }
 
@@ -112,7 +112,7 @@ int gfxmode_set_iocall(Stream *device, IOCallDisplayModeArgs *mode)
 {
     if (stream_call(device, IOCALL_DISPLAY_SET_MODE, mode) != SUCCESS)
     {
-        handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failled");
+        handle_printf_error(device, "Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
         return -1;
     }
 
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 
     if (handle_has_error(HANDLE(framebuffer_device)))
     {
-        handle_printf_error(framebuffer_device, "displayctl: Failled to open " FRAMEBUFFER_DEVICE_PATH);
+        handle_printf_error(framebuffer_device, "displayctl: Failed to open " FRAMEBUFFER_DEVICE_PATH);
         return -1;
     }
 

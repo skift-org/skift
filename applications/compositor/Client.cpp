@@ -272,7 +272,7 @@ Result client_send_message(Client *client, CompositorMessage message)
 
     if (handle_has_error(client->connection))
     {
-        logger_error("Failled to send message to %08x: %s", client, handle_error_string(client->connection));
+        logger_error("Failed to send message to %08x: %s", client, handle_error_string(client->connection));
         client->disconnected = true;
         return handle_get_error(client->connection);
     }

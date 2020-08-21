@@ -35,7 +35,7 @@ void master_callback(Terminal *terminal, Stream *master, SelectEvent events)
 
     if (handle_has_error(master))
     {
-        handle_printf_error(master, "Terminal: read from master failled");
+        handle_printf_error(master, "Terminal: read from master failed");
         return;
     }
 
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 
         if (result != SUCCESS)
         {
-            logger_error("Failled to create the terminal device: %s", result_to_string(result));
+            logger_error("Failed to create the terminal device: %s", result_to_string(result));
             return -1;
         }
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 
         if (handle_has_error(keyboard))
         {
-            logger_error("Failled to open the keyboard device: %s", handle_get_error(keyboard));
+            logger_error("Failed to open the keyboard device: %s", handle_get_error(keyboard));
             return -1;
         }
 
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
             if (!terminal)
             {
-                logger_error("Failled to open a device to display the terminal in!");
+                logger_error("Failed to open a device to display the terminal in!");
                 return -1;
             }
         }

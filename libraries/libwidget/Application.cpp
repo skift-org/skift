@@ -140,7 +140,7 @@ Result application_initialize(int argc, char **argv)
 
     if (handle_has_error(_connection))
     {
-        logger_error("Failled to connect to the compositor: %s", handle_error_string(_connection));
+        logger_error("Failed to connect to the compositor: %s", handle_error_string(_connection));
         Result result = handle_get_error(_connection);
         connection_close(_connection);
         _connection = nullptr;

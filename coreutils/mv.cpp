@@ -9,7 +9,7 @@ int main(int argc, char **argv)
         Result result = filesystem_rename(argv[1], argv[2]);
         if (result != SUCCESS)
         {
-            stream_format(err_stream, "Failled to move file: %s", result_to_string(result));
+            stream_format(err_stream, "Failed to move file: %s", result_to_string(result));
             return -1;
         }
         else

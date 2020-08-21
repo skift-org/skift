@@ -24,7 +24,7 @@ int main(int argc, char const *argv[])
 
     if (result < 0)
     {
-        stream_format(err_stream, "dstart: Failled to start %s: %s\n", argv[1], result_to_string(result));
+        stream_format(err_stream, "dstart: Failed to start %s: %s\n", argv[1], result_to_string(result));
         return -1;
     }
 

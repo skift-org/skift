@@ -18,7 +18,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
 
     if (handle_has_error(master))
     {
-        handle_printf_error(master, "Terminal: read from master failled");
+        handle_printf_error(master, "Terminal: read from master failed");
         return;
     }
 

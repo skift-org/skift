@@ -40,7 +40,7 @@ int loadkey_list_keymap()
 
     if (handle_has_error(keymap_directory))
     {
-        handle_printf_error(keymap_directory, "keyboardctl: Failled to query keymaps from /System/Keyboards");
+        handle_printf_error(keymap_directory, "keyboardctl: Failed to query keymaps from /System/Keyboards");
         directory_close(keymap_directory);
 
         return -1;
@@ -68,7 +68,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     if (result != SUCCESS)
     {
-        stream_format(err_stream, "keyboardctl: Failled to open the keymap file: %s", result_to_string(result));
+        stream_format(err_stream, "keyboardctl: Failed to open the keymap file: %s", result_to_string(result));
         return -1;
     }
 
@@ -99,7 +99,7 @@ int loadkey_get_keymap(Stream *keyboard_device)
 
     if (stream_call(keyboard_device, IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
     {
-        handle_printf_error(keyboard_device, "keyboardctl: Failled to retrived the current keymap");
+        handle_printf_error(keyboard_device, "keyboardctl: Failed to retrived the current keymap");
         return -1;
     }
 
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 
     if (handle_has_error(keyboard_device))
     {
-        handle_printf_error(keyboard_device, "keyboardctl: Failled to open the keyboard device");
+        handle_printf_error(keyboard_device, "keyboardctl: Failed to open the keyboard device");
 
         return -1;
     }

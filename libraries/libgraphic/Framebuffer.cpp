@@ -131,7 +131,7 @@ void Framebuffer::blit()
 
         if (handle_has_error(&_handle))
         {
-            handle_printf_error(&_handle, "Failled to iocall device " FRAMEBUFFER_DEVICE_PATH);
+            handle_printf_error(&_handle, "Failed to iocall device " FRAMEBUFFER_DEVICE_PATH);
         }
 
         return Iteration::CONTINUE;

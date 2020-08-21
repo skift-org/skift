@@ -165,7 +165,7 @@ Color theme_parse_color(const char *text)
         return COLOR_GREEN;
     }
 
-    logger_warn("Failled to parse %c '%s' %d", text[0], text, strlen(text));
+    logger_warn("Failed to parse %c '%s' %d", text[0], text, strlen(text));
 
     return COLOR_MAGENTA;
 }

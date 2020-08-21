@@ -40,7 +40,7 @@ void ramdisk_load(Module *module)
 
             if (result != SUCCESS)
             {
-                logger_error("Failled to write file: %s", result_to_string(result));
+                logger_error("Failed to write file: %s", result_to_string(result));
             }
 
             fshandle_destroy(handle);

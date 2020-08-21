@@ -134,7 +134,7 @@ void __plug_process_exit(int code)
 {
     task_exit(code);
 
-    system_panic("Task exit failled!");
+    system_panic("Task exit failed!");
 }
 
 Result __plug_process_cancel(int pid)

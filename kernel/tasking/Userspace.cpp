@@ -27,7 +27,7 @@ void userspace_initialize()
 
     if (result != SUCCESS)
     {
-        logger_fatal("Failled to start init : %s", result_to_string(result));
+        logger_fatal("Failed to start init : %s", result_to_string(result));
     }
 
     int init_exit_value = 0;

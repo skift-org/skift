@@ -185,7 +185,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     {
         atomic_end();
 
-        logger_error("Failled to allocate memory: Not enough physical memory!");
+        logger_error("Failed to allocate memory: Not enough physical memory!");
 
         return ERR_OUT_OF_MEMORY;
     }
@@ -197,7 +197,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
         physical_free(physical_address, page_count);
         atomic_end();
 
-        logger_error("Failled to allocate memory: Not enough virtual memory!");
+        logger_error("Failed to allocate memory: Not enough virtual memory!");
 
         return ERR_OUT_OF_MEMORY;
     }
@@ -238,7 +238,7 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
     atomic_end();
 
-    logger_warn("Failled to allocate identity mapped page!");
+    logger_warn("Failed to allocate identity mapped page!");
 
     *out_address = 0;
 
@@ -275,7 +275,7 @@ PageDirectory *memory_pdir_create()
 
     if (memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
-        logger_error("Page directory allocation failled!");
+        logger_error("Page directory allocation failed!");
         return nullptr;
     }
 

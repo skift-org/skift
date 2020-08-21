@@ -12,7 +12,7 @@ int set_wallpaper(const char *path)
 
     if (handle_has_error(compositor_connection))
     {
-        handle_printf_error(compositor_connection, "Failled to connect to the compositor.");
+        handle_printf_error(compositor_connection, "Failed to connect to the compositor.");
         return -1;
     }
 
@@ -20,7 +20,7 @@ int set_wallpaper(const char *path)
 
     if (!wallaper_or_result.success())
     {
-        stream_format(err_stream, "wallpaperctl: failled to load wallaper from %s: %s\n", path, result_to_string(wallaper_or_result.result()));
+        stream_format(err_stream, "wallpaperctl: failed to load wallaper from %s: %s\n", path, result_to_string(wallaper_or_result.result()));
         return -1;
     }
 

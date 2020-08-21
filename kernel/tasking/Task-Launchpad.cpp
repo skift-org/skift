@@ -72,7 +72,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
     if (handle_has_error(elf_file))
     {
-        logger_error("Failled to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
+        logger_error("Failed to open ELF file %s: %s!", launchpad->executable, handle_error_string(elf_file));
         return handle_get_error(elf_file);
     }
 
@@ -82,7 +82,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
         if (elf_header_size != sizeof(ELFHeader) || !elf_valid(&elf_header))
         {
-            logger_error("Failled to load ELF file %s: bad exec format!", launchpad->executable);
+            logger_error("Failed to load ELF file %s: bad exec format!", launchpad->executable);
             return ERR_EXEC_FORMAT_ERROR;
         }
     }

@@ -214,7 +214,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
     if (handle_has_error(keymap_file))
     {
-        logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        logger_error("Failed to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
 
         return nullptr;
     }
@@ -224,7 +224,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
     if (stat.type != FILE_TYPE_REGULAR)
     {
-        logger_info("Failled to load keymap from %s: This is not a regular file", keymap_path);
+        logger_info("Failed to load keymap from %s: This is not a regular file", keymap_path);
 
         return nullptr;
     }
@@ -236,7 +236,7 @@ KeyMap *keyboard_load_keymap(const char *keymap_path)
 
     if (read != stat.size)
     {
-        logger_error("Failled to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
+        logger_error("Failed to load keymap from %s: %s", keymap_path, handle_error_string(keymap_file));
 
         free(keymap);
 

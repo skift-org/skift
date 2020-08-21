@@ -171,7 +171,7 @@ void eventloop_pump(bool pool)
 
     if (result_is_error(result))
     {
-        logger_error("Failled to select : %s", result_to_string(result));
+        logger_error("Failed to select : %s", result_to_string(result));
         eventloop_exit(-1);
     }
 

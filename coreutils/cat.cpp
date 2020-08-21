@@ -22,7 +22,7 @@ int cat(const char *path)
     {
         if (handle_has_error(stream))
         {
-            handle_printf_error(stream, "cat: Failled to read from %s", path);
+            handle_printf_error(stream, "cat: Failed to read from %s", path);
 
             return -1;
         }
@@ -31,7 +31,7 @@ int cat(const char *path)
 
         if (handle_has_error(out_stream))
         {
-            handle_printf_error(out_stream, "cat: Failled to write to stdout");
+            handle_printf_error(out_stream, "cat: Failed to write to stdout");
 
             return -1;
         }

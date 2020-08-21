@@ -72,7 +72,7 @@ static void filesystem_model_update(FileSystemModel *model)
     if (handle_has_error(directory))
     {
         // FIXME: Use message box.
-        handle_printf_error(directory, "Failled to open directory '%s'", model->current_path);
+        handle_printf_error(directory, "Failed to open directory '%s'", model->current_path);
         directory_close(directory);
         return;
     }

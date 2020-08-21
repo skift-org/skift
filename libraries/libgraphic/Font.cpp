@@ -17,7 +17,7 @@ static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 
     if (result != SUCCESS)
     {
-        logger_error("Failled to load glyph from %s: %s", glyph_path, handle_error_string(result));
+        logger_error("Failed to load glyph from %s: %s", glyph_path, handle_error_string(result));
         return result;
     }
 
@@ -37,7 +37,7 @@ ResultOr<RefPtr<Font>> Font::create(String name)
 
     if (!glyph_or_error.success())
     {
-        logger_error("Failled to load font %s: missing glyphs", name.cstring());
+        logger_error("Failed to load font %s: missing glyphs", name.cstring());
         return glyph_or_error.result();
     }
 
@@ -45,7 +45,7 @@ ResultOr<RefPtr<Font>> Font::create(String name)
 
     if (!bitmap_or_error.success())
     {
-        logger_error("Failled to load font %s: missing bitmap", name.cstring());
+        logger_error("Failed to load font %s: missing bitmap", name.cstring());
         return bitmap_or_error.result();
     }
 

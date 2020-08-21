@@ -121,7 +121,7 @@ public:
 
     TextModelLine &line(int index) { return *_lines[index]; }
 
-    size_t line_count() { return _lines.count(); }
+    size_t line_count() const { return _lines.count(); }
 
     void append_line(OwnPtr<TextModelLine> line) { _lines.push_back(line); }
 

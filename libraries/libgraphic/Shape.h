@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libsystem/Logger.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
 #include <libsystem/math/Vectors.h>
@@ -241,14 +242,79 @@ public:
         return Rectangle(x() + width() - size, y(), size, height());
     }
 
+    Rectangle cutoff_top(int top) const
+    {
+        return cutoff_top_and_botton(top, 0);
+    }
+
+    Rectangle cutoff_botton(int bottom) const
+    {
+        return cutoff_top_and_botton(0, bottom);
+    }
+
     Rectangle cutoff_top_and_botton(int top, int bottom) const
     {
         return Rectangle(x(), y() + top, width(), height() - top - bottom);
     }
 
+    Rectangle cutoff_left(int left) const
+    {
+        return cutoff_left_and_right(left, 0);
+    }
+
+    Rectangle cutoff_right(int right) const
+    {
+        return cutoff_left_and_right(0, right);
+    }
+
     Rectangle cutoff_left_and_right(int left, int right) const
     {
         return Rectangle(x() + left, y(), width() - left - right, height());
+    }
+
+    Rectangle row(int row_count, int row) const
+    {
+        int row_height = height() / row_count;
+
+        int correction = height() - (row_height * row_count);
+
+        int current_row_height = row_height;
+
+        if (row < correction)
+        {
+            current_row_height += 1;
+        }
+
+        int current_row_position = row_height * row + MIN(row, correction);
+
+        return Rectangle{
+            x(),
+            y() + current_row_position,
+            width(),
+            row_height,
+        };
+    }
+
+    Rectangle column(int column_count, int column) const
+    {
+        int column_width = width() / column_count;
+
+        int correction = width() - (column_width * column_count);
+
+        int current_column_width = column_width;
+        if (column < correction)
+        {
+            current_column_width += 1;
+        }
+
+        int current_column_position = column_width * column + MIN(column, correction);
+
+        return Rectangle{
+            x() + current_column_position,
+            y(),
+            current_column_width,
+            height(),
+        };
     }
 
     Rectangle shrinked(Insets insets) const

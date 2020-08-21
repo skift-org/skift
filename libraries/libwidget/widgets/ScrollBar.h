@@ -48,6 +48,8 @@ private:
     }
 
 public:
+    static constexpr int SIZE = 16;
+
     void horizontal(bool value)
     {
         _horizontal = value;

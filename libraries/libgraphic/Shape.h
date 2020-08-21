@@ -402,4 +402,24 @@ public:
     }
 
     bool is_empty() const { return _width == 0 && _height == 0; };
+
+    Vec2i top_left()
+    {
+        return position();
+    }
+
+    Vec2i bottom_left()
+    {
+        return position() + size().extract_y();
+    }
+
+    Vec2i top_right()
+    {
+        return position() + size().extract_x();
+    }
+
+    Vec2i bottom_right()
+    {
+        return position() + size();
+    }
 };

@@ -17,11 +17,11 @@ private:
     Rectangle _dirty_bound = Rectangle::empty();
 
 public:
+    static ResultOr<OwnPtr<Framebuffer>> open();
+
     Painter &painter() { return _painter; }
 
     Rectangle resolution() { return _bitmap->bound(); }
-
-    static ResultOr<OwnPtr<Framebuffer>> open();
 
     Framebuffer(Handle handle, RefPtr<Bitmap> bitmap);
 

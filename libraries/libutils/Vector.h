@@ -99,9 +99,12 @@ public:
 
     void clear()
     {
-        for (size_t i = 0; i < _count; i++)
+        if constexpr (!std::is_trivially_destructible_v<T>)
         {
-            _storage[i].~T();
+            for (size_t i = 0; i < _count; i++)
+            {
+                _storage[i].~T();
+            }
         }
 
         _count = 0;

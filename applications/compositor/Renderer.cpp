@@ -21,22 +21,36 @@ void renderer_initialize()
 
 void renderer_region_dirty(Rectangle new_region)
 {
+    if (new_region.is_empty())
+    {
+        return;
+    }
+
     bool merged = false;
 
     _dirty_regions.foreach ([&](Rectangle &region) {
-        int region_area = region.area();
-        int new_region_area = new_region.area();
-        int merge_area = region.merged_with(new_region).area();
-
-        if (region.colide_with(new_region) && (region_area + new_region_area > merge_area))
+        if (region.colide_with(new_region))
         {
-            region = region.merged_with(new_region);
+            Rectangle top;
+            Rectangle botton;
+            Rectangle left;
+            Rectangle right;
+
+            new_region.substract(region, top, botton, left, right);
+
+            renderer_region_dirty(top);
+            renderer_region_dirty(botton);
+            renderer_region_dirty(left);
+            renderer_region_dirty(right);
+
             merged = true;
 
             return Iteration::STOP;
         }
-
-        return Iteration::CONTINUE;
+        else
+        {
+            return Iteration::CONTINUE;
+        }
     });
 
     if (!merged)

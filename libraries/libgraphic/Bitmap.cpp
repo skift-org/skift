@@ -31,7 +31,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     int handle = -1;
     memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
-    memset(pixels, 0xff, width * height * sizeof(Color));
+    memset(pixels, 0x00, width * height * sizeof(Color));
 
     return make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
 }

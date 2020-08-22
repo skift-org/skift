@@ -107,7 +107,49 @@ public:
 
     Vec2i size() const { return Vec2i(_width, _height); }
 
+    Vec2i top_left() const
+    {
+        return position();
+    }
+
+    Vec2i bottom_left() const
+    {
+        return position() + size().extract_y();
+    }
+
+    Vec2i top_right() const
+    {
+        return position() + size().extract_x();
+    }
+
+    Vec2i bottom_right() const
+    {
+        return position() + size();
+    }
+
+    int top() const
+    {
+        return y();
+    }
+
+    int bottom() const
+    {
+        return y() + height();
+    }
+
+    int left() const
+    {
+        return x();
+    }
+
+    int right() const
+    {
+        return x() + width();
+    }
+
     int area() { return width() * height(); }
+
+    bool is_empty() const { return _width == 0 || _height == 0; };
 
     Rectangle() = default;
 
@@ -401,25 +443,24 @@ public:
         return borders;
     }
 
-    bool is_empty() const { return _width == 0 && _height == 0; };
-
-    Vec2i top_left()
+    void substract(Rectangle other, Rectangle &t, Rectangle &b, Rectangle &l, Rectangle &r) const
     {
-        return position();
-    }
+        if (colide_with(other))
+        {
+            other = other.clipped_with(*this);
 
-    Vec2i bottom_left()
-    {
-        return position() + size().extract_y();
-    }
+            l = Rectangle(x(), y(), other.left() - left(), height());
+            r = Rectangle(other.right(), y(), right() - other.right(), height());
 
-    Vec2i top_right()
-    {
-        return position() + size().extract_x();
-    }
-
-    Vec2i bottom_right()
-    {
-        return position() + size();
+            t = Rectangle(l.right(), y(), r.left() - l.right(), other.top() - top());
+            b = Rectangle(l.right(), other.bottom(), r.left() - l.right(), bottom() - other.bottom());
+        }
+        else
+        {
+            t = *this;
+            b = empty();
+            l = empty();
+            r = empty();
+        }
     }
 };

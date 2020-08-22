@@ -10,6 +10,7 @@
 
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
+#include "kernel/acpi/ACPI.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
@@ -27,6 +28,7 @@ void system_main(Multiboot *multiboot)
 
     system_initialize();
     memory_initialize(multiboot);
+    // acpi_initialize(multiboot);
     scheduler_initialize();
     tasking_initialize();
     interrupts_initialize();

@@ -149,7 +149,8 @@ void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
             break;
 
         case MULTIBOOT_TAG_TYPE_ACPI_OLD:
-            multiboot->acpi_rsdp = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
+            multiboot->acpi_rsdp_address = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
+            multiboot->acpi_rsdp_size = ((struct multiboot_tag_old_acpi *)tag)->size;
             break;
 
         default:

@@ -1,3 +1,5 @@
 #pragma once
 
-void acpi_initialize();
+#include "kernel/multiboot/Multiboot.h"
+
+void acpi_initialize(Multiboot *multiboot);

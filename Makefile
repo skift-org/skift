@@ -28,9 +28,30 @@ BUILD_DIRECTORY_APPS=$(SYSROOT)/Applications
 BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 
 # --- Configs -------------------------------------------- #
+CC:=i686-pc-skift-gcc
+CFLAGS= \
+	-O2 \
+	-std=gnu11 \
+	-MD \
+	\
+	-Wall \
+	-Wextra  \
+	-Werror \
+	\
+	-I. \
+	-Iapplications \
+	-Ilibraries \
+	-Ilibraries/libc \
+	\
+	-D__BUILD_ARCH__=\""$(BUILD_ARCH)"\" \
+	-D__BUILD_CONFIG__=\""$(BUILD_CONFIG)"\" \
+	-D__BUILD_SYSTEM__=\""$(BUILD_SYSTEM)"\" \
+	-D__BUILD_TARGET__=\""$(BUILD_TARGET)"\" \
+	-D__BUILD_GITREF__=\""$(BUILD_GITREF)"\" \
+	-D__BUILD_UNAME__=\""$(BUILD_UNAME)"\"
 
-CC:=i686-pc-skift-g++
-CFLAGS:= \
+CXX:=i686-pc-skift-g++
+CXXFLAGS:= \
 	-O2 \
 	-std=c++20 \
 	-fno-rtti \

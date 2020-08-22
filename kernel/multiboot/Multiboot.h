@@ -47,6 +47,8 @@ struct Multiboot
     size_t framebuffer_height;
     size_t framebuffer_pitch;
     PixelFormat framebuffer_pixelformat;
+
+    uintptr_t acpi_rsdp;
 };
 
 void multiboot_assert(uint32_t magic);

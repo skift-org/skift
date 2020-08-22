@@ -1,6 +1,6 @@
 #include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include <thirdparty/multiboot/Multiboot2.h>
 
@@ -146,6 +146,10 @@ void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
 
         case MULTIBOOT_TAG_TYPE_FRAMEBUFFER:
             multiboot2_parse_framebuffer(multiboot, (struct multiboot_tag_framebuffer_common *)tag);
+            break;
+
+        case MULTIBOOT_TAG_TYPE_ACPI_OLD:
+            multiboot->acpi_rsdp = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
             break;
 
         default:

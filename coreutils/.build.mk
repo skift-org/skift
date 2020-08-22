@@ -120,12 +120,12 @@ OBJECTS += $$($(1)_OBJECT)
 $$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a, $$($(1)_LIBS) system) $(CRTS)
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
-	@$(CC) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
+	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
 
 $$($(1)_OBJECT): $$($(1)_SOURCE)
 	$$(DIRECTORY_GUARD)
-	@echo [$(1)] [CC] $$<
-	@$(CC) $(CFLAGS) -c -o $$@ $$<
+	@echo [$(1)] [CXX] $$<
+	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<
 
 endef
 

@@ -65,8 +65,8 @@ $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 
 $(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
-	@echo [LIB$(1)] [CC] $$<
-	@$(CC) $(CFLAGS) $($(1)_CFLAGS) -c -o $$@ $$<
+	@echo [LIB$(1)] [CXX] $$<
+	@$(CXX) $(CXXFLAGS) $($(1)_CXXFLAGS) -c -o $$@ $$<
 
 $(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.s.o: libraries/lib$($(1)_NAME)/%.s
 	$$(DIRECTORY_GUARD)

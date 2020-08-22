@@ -24,29 +24,40 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/system/*.cpp) \
 	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
+KERNEL_LAI_SOURCES = \
+	$(wildcard thirdparty/lai/core/*.c) \
+	$(wildcard thirdparty/lai/drivers/*.c) \
+	$(wildcard thirdparty/lai/helpers/*.c)
+
 KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 
 KERNEL_OBJECTS = \
 	$(patsubst %.cpp, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
 	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
+	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES)) \
+	$(patsubst thirdparty/%.c, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LAI_SOURCES))
 
 OBJECTS += $(KERNEL_OBJECTS)
 
 $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 	$(DIRECTORY_GUARD)
+	@echo [KERNEL] [CXX] $<
+	@$(CXX) $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+
+$(BUILD_DIRECTORY)/kernel/%.o: thirdparty/%.c
+	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CC] $<
-	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -Ithirdparty/lai/include -c -o $@ $<
 
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
-	@echo [KERNEL] [CC] $<
-	@$(CC) -DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@echo [KERNEL] [CXX] $<
+	@$(CXX) -DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.o: arch/%.cpp
 	$(DIRECTORY_GUARD)
-	@echo [KERNEL] [CC] $<
-	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@echo [KERNEL] [CXX] $<
+	@$(CXX) $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 	$(DIRECTORY_GUARD)
@@ -56,4 +67,4 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CC) $(LDFLAGS) -T arch/x86/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) -T arch/x86/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

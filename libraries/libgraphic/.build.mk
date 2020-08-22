@@ -2,4 +2,4 @@ LIBS += GRAPHIC
 
 GRAPHIC_NAME = graphic
 
-GRAPHIC_CFLAGS=-O3 -mmmx -msse -msse2
+GRAPHIC_CXXFLAGS=-O3 -mmmx -msse -msse2

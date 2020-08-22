@@ -14,3 +14,5 @@ Rectangle cursor_bound_from_position(Vec2i position);
 Rectangle cursor_dirty_bound_from_position(Vec2i position);
 
 Rectangle cursor_bound();
+
+Rectangle cursor_dirty_bound();

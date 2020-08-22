@@ -111,7 +111,6 @@ INTERRUPT_NOERR 47
 INTERRUPT_NOERR 127
 INTERRUPT_SYSCALL 128
 
-
 global __interrupt_vector
 
 __interrupt_vector:

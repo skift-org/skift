@@ -47,10 +47,7 @@ public:
 
     ~Bitmap();
 
-    Color *pixels()
-    {
-        return _pixels;
-    }
+    Color *pixels() { return _pixels; }
 
     int handle() const { return _handle; }
     int width() const { return _width; }
@@ -142,6 +139,14 @@ public:
             {
                 set_pixel_no_check(Vec2i(x, y), source.get_pixel_no_check(Vec2i(x, y)));
             }
+        }
+    }
+
+    void clear(Color color)
+    {
+        for (int i = 0; i < width() * height(); i++)
+        {
+            pixels()[i] = color;
         }
     }
 };

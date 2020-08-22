@@ -474,6 +474,7 @@ void window_event(Window *window, Event *event)
 
             if (!event->accepted &&
                 !window->is_dragging &&
+                !window->is_maximised &&
                 event->mouse.button == MOUSE_BUTTON_LEFT &&
                 window_header_bound(window).containe(event->mouse.position))
             {
@@ -484,6 +485,7 @@ void window_event(Window *window, Event *event)
             if ((window->flags & WINDOW_RESIZABLE) &&
                 !event->accepted &&
                 !window->is_resizing &&
+                !window->is_maximised &&
                 window_resize_bound_containe(window, event->mouse.position))
             {
                 window_begin_resize(window, event->mouse.position);

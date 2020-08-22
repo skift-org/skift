@@ -107,11 +107,11 @@ void client_handle_cursor_window(Client *client, CompositorCursorWindow cursor_w
         return;
     }
 
-    renderer_region_dirty(cursor_bound());
+    renderer_region_dirty(cursor_dirty_bound());
 
     window->cursor_state(cursor_window.state);
 
-    renderer_region_dirty(cursor_bound());
+    renderer_region_dirty(cursor_dirty_bound());
 }
 
 void client_handle_set_resolution(Client *client, CompositorSetResolution set_resolution)

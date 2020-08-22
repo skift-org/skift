@@ -31,9 +31,9 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     int handle = -1;
     memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
-    memset(pixels, 0x00, width * height * sizeof(Color));
-
-    return make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
+    auto bitmap = make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
+    bitmap->clear(COLOR_BLACK);
+    return bitmap;
 }
 
 ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i width_and_height)

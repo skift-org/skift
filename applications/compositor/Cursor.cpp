@@ -164,3 +164,8 @@ Rectangle cursor_dirty_bound_from_position(Vec2i position)
         position + Vec2i(-28, -28),
         Vec2i(56, 56));
 }
+
+Rectangle cursor_dirty_bound()
+{
+    return cursor_dirty_bound_from_position(_mouse_position);
+}

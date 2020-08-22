@@ -1,4 +1,3 @@
-
 #include "demo/Demos.h"
 
 void colors_draw(Painter &painter, Rectangle screen, float time)

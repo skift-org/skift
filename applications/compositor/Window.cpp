@@ -37,7 +37,14 @@ Rectangle Window::bound()
 
 Rectangle Window::cursor_capture_bound()
 {
-    return bound().expended({16});
+    if (_flags & WINDOW_RESIZABLE)
+    {
+        return bound().expended({16});
+    }
+    else
+    {
+        return bound();
+    }
 }
 
 void Window::move(Vec2i new_position)

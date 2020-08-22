@@ -7,7 +7,7 @@
 class DemoWidget : public Widget
 {
 private:
-    double _time;
+    double _time{};
     Demo *_demo;
 
     RefPtr<Bitmap> _bitmap;

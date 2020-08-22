@@ -192,6 +192,7 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     auto bitmap = Bitmap::create_shared(400, 400).take_value();
+    bitmap->clear(RGBA(0, 0, 0, 0));
     auto document = make<PaintDocument>(bitmap);
     window_show(paint_create_window(document));
 

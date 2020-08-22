@@ -61,9 +61,12 @@ void renderer_region_dirty(Rectangle new_region)
 
 void renderer_region(Rectangle region)
 {
-    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
+    if (region.is_empty())
+    {
+        return;
+    }
 
-    list_foreach_reversed(Window, window, manager_get_windows())
+    list_foreach(Window, window, manager_get_windows())
     {
         if (window->bound().colide_with(region))
         {
@@ -74,9 +77,25 @@ void renderer_region(Rectangle region)
                 destination.size());
 
             _framebuffer->painter().blit_bitmap_no_alpha(window->frontbuffer(), source, destination);
+            _framebuffer->mark_dirty(destination);
+
+            Rectangle top;
+            Rectangle botton;
+            Rectangle left;
+            Rectangle right;
+
+            region.substract(destination, top, botton, left, right);
+
+            renderer_region(top);
+            renderer_region(botton);
+            renderer_region(left);
+            renderer_region(right);
+
+            return;
         }
     }
 
+    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
     _framebuffer->mark_dirty(region);
 }
 

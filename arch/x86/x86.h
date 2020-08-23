@@ -97,3 +97,17 @@ static inline void out32(uint16_t port, uint32_t data)
                  :
                  : "a"(data), "d"(port));
 }
+
+static inline void rdmsr(uint32_t msr, uint32_t *lo, uint32_t *hi)
+{
+    asm volatile("rdmsr"
+                 : "=a"(*lo), "=d"(*hi)
+                 : "c"(msr));
+}
+
+static inline void wrmsr(uint32_t msr, uint32_t lo, uint32_t hi)
+{
+    asm volatile("wrmsr"
+                 :
+                 : "a"(lo), "d"(hi), "c"(msr));
+}

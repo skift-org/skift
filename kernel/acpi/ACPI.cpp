@@ -1,6 +1,9 @@
 #include <libsystem/Logger.h>
 #include <libutils/String.h>
 
+#include "arch/x86/IOAPIC.h"
+#include "arch/x86/LAPIC.h"
+
 #include "kernel/acpi/ACPI.h"
 #include "kernel/acpi/Tables.h"
 #include "kernel/memory/MemoryWindow.h"
@@ -9,20 +12,25 @@ void acpi_madt_initialize(MemoryWindow<MADT> &madt)
 {
     logger_info("MADT found, size is %d", madt->record_count());
 
+    lapic_found(madt->local_apic);
+
     madt->foreach_record([](auto record) {
         switch (record->type)
         {
         case MADTH_LAPIC:
         {
             auto local_apic = reinterpret_cast<MADTLocalApicRecord *>(record);
-
             logger_info("Local APIC (cpu_id=%d, apic_id=%d, flags=%08x)", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
         }
         break;
 
         case MADTH_IOAPIC:
-            logger_info("I/O APIC");
-            break;
+        {
+            auto ioapic = reinterpret_cast<MADTIOApicRecord *>(record);
+            logger_info("I/O APIC (id=%d, address=%08x)", ioapic->id, ioapic->address);
+            ioapic_found(ioapic->address);
+        }
+        break;
 
         case MADTH_ISO:
             logger_info("Interrupt Source Override");

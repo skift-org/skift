@@ -44,6 +44,15 @@ struct __packed MADTLocalApicRecord
     uint32_t flags;
 };
 
+struct __packed MADTIOApicRecord
+{
+    MADTRecord header;
+    uint8_t id;
+    uint8_t reserved;
+    uint32_t address;
+    uint32_t interrupt_base;
+};
+
 struct __packed MADT
 {
     SDTH header;

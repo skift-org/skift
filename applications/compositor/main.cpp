@@ -139,7 +139,7 @@ int main(int argc, char const *argv[])
     notifier_create(nullptr, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
     notifier_create(nullptr, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
 
-    Timer *repaint_timer = timer_create(nullptr, 1000 / 144, render_callback);
+    Timer *repaint_timer = timer_create(nullptr, 1000 / 60, render_callback);
     timer_start(repaint_timer);
 
     manager_initialize();

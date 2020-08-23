@@ -15,11 +15,11 @@
 ## Kernel
 
 ### ACPI
- - [ ] Get the acpi table from the bootloader
+ - [x] Get the acpi table from the bootloader
     (https://uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf)
  - [ ] Implement a fallback
- - [ ] Port lai
-    (https://github.com/qword-os/lai)
+ - [x] Port lai
+    (https://github.com/qword-os/lai) (same callback are still missing)
 
 ### VirtIO
  - [ ] VirtIO bus
@@ -29,6 +29,7 @@
 
 
 ### x86 platform
+ - [ ] Enable localapic and ioapic
  - [ ] Support for SMP
  - [ ] Map the kernel to the higher half of the memory
 

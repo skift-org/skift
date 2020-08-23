@@ -29,7 +29,7 @@ public:
         cstr[0] = c;
         _buffer = make<StringStorage>(cstr, 1);
     }
-    
+
     String(const String &other) : _buffer(const_cast<String &>(other)._buffer) {}
 
     String(String &&other) : _buffer(move(other._buffer)) {}
@@ -55,14 +55,14 @@ public:
 
         return *this;
     }
-    
+
     String &operator+=(String &&other)
     {
         _buffer = make<StringStorage>(*_buffer, *other._buffer);
 
         return *this;
     }
-    
+
     bool operator==(String &&other)
     {
         if (length() != other.length())
@@ -73,6 +73,24 @@ public:
         for (size_t i = 0; i < length(); i++)
         {
             if (cstring()[i] != other.cstring()[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool operator==(const char *str)
+    {
+        if (length() != strlen(str))
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < length(); i++)
+        {
+            if (cstring()[i] != str[i])
             {
                 return false;
             }

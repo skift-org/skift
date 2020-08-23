@@ -28,7 +28,7 @@ void system_main(Multiboot *multiboot)
 
     system_initialize();
     memory_initialize(multiboot);
-    // acpi_initialize(multiboot);
+    acpi_initialize(multiboot);
     scheduler_initialize();
     tasking_initialize();
     interrupts_initialize();

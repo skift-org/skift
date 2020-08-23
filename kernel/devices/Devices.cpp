@@ -77,10 +77,12 @@ const char *device_to_static_string(DeviceInfo info)
         break;
 
     default:
-        snprintf(buffer, 512, "PCI: %02d:%02d.%d",
+        snprintf(buffer, 512, "PCI: %02d:%02d.%d 0x%x:0x%x",
                  info.pci_device.bus,
                  info.pci_device.slot,
-                 info.pci_device.func);
+                 info.pci_device.func,
+                 info.pci_device.vendor,
+                 info.pci_device.device);
         break;
     }
 

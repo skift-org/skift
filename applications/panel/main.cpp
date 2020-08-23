@@ -43,16 +43,22 @@ int main(int argc, char **argv)
         window->bound(window_bound(window).with_width(event->display.size.x()));
     });
 
-    window_root(window)->layout(HFLOW(8));
-    window_root(window)->insets(Insets(4));
+    window_root(window)->layout(VFLOW(0));
 
-    Widget *menu = new Button(window_root(window), BUTTON_TEXT, Icon::get("menu"), "Applications");
+    auto panel_container = new Container(window_root(window));
+    panel_container->attributes(LAYOUT_FILL);
+    panel_container->layout(HFLOW(8));
+    panel_container->insets(Insets(4));
+
+    new Separator(window_root(window));
+
+    Widget *menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
-    auto widget_date_and_time = new Label(window_root(window), "", Position::CENTER);
+    auto widget_date_and_time = new Label(panel_container, "", Position::CENTER);
     widget_date_and_time->attributes(LAYOUT_FILL);
 
-    Widget *graph_container = new Panel(window_root(window));
+    Widget *graph_container = new Panel(panel_container);
     graph_container->layout(VGRID(1));
 
     Widget *ram_graph = new Graph(graph_container, 50, COLOR_ROYALBLUE);
@@ -61,7 +67,7 @@ int main(int argc, char **argv)
     Widget *cpu_graph = new Graph(graph_container, 50, COLOR_SEAGREEN);
     new Label(cpu_graph, "CPU", Position::CENTER);
 
-    new Label(window_root(window), "user");
+    new Label(panel_container, "user");
 
     timer_start(timer_create(widget_date_and_time, 500, (TimerCallback)widget_date_and_time_update));
     timer_start(timer_create(ram_graph, 500, (TimerCallback)widget_ram_update));

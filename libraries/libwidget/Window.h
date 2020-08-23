@@ -22,6 +22,7 @@ struct Window
     RefPtr<Icon> _icon;
     Rectangle _bound;
     WindowFlag flags;
+    WindowType _type;
 
     bool focused;
     bool visible;
@@ -31,7 +32,7 @@ struct Window
     bool resize_vertical;
     bool resize_horizontal;
     Vec2i resize_begin;
-    Rectangle previous_bound; // used for maximize 
+    Rectangle previous_bound; // used for maximize
     WindowDestroyCallback destroy;
 
     CursorState cursor_state;
@@ -61,6 +62,8 @@ public:
     void size(Vec2i size);
     void position(Vec2i position);
     void bound(Rectangle bound);
+    void type(WindowType type);
+    WindowType type() { return _type; }
 
     void on(EventType event, EventHandler handler);
 };
@@ -106,7 +109,6 @@ int window_backbuffer_handle(Window *window);
 Widget *window_root(Window *window);
 
 Widget *window_header(Window *window);
-
 
 void window_schedule_update(Window *window, Rectangle rectangle);
 

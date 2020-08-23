@@ -61,13 +61,14 @@ void renderer_region_dirty(Rectangle new_region)
 
 void renderer_region(Rectangle region)
 {
+    bool should_paint_wallpaper = true;
+
     if (region.is_empty())
     {
         return;
     }
 
-    list_foreach(Window, window, manager_get_windows())
-    {
+    manager_iterate_front_to_back([&](Window *window) {
         if (window->bound().colide_with(region))
         {
             Rectangle destination = window->bound().clipped_with(region);
@@ -91,12 +92,19 @@ void renderer_region(Rectangle region)
             renderer_region(left);
             renderer_region(right);
 
-            return;
-        }
-    }
+            should_paint_wallpaper = false;
 
-    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
-    _framebuffer->mark_dirty(region);
+            return Iteration::STOP;
+        }
+
+        return Iteration::CONTINUE;
+    });
+
+    if (should_paint_wallpaper)
+    {
+        _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
+        _framebuffer->mark_dirty(region);
+    }
 }
 
 Rectangle renderer_bound()

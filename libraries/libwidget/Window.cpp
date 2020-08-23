@@ -61,6 +61,7 @@ void window_initialize(Window *window, WindowFlag flags)
     window->handle = window_handle_counter++;
     window->_title = strdup("Window");
     window->_icon = Icon::get("application");
+    window->_type = WINDOW_TYPE_REGULAR;
     window->flags = flags;
     window->is_maximised = false;
     window->focused = false;
@@ -829,4 +830,9 @@ void Window::bound(Rectangle bound)
     window_change_framebuffer_if_needed(this);
     window_schedule_layout(this);
     window_schedule_update(this, window_bound(this));
+}
+
+void Window::type(WindowType type)
+{
+    _type = type;
 }

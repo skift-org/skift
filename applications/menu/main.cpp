@@ -119,6 +119,9 @@ void menu_create_list(Widget *parent, List *menu)
     list->attributes(LAYOUT_FILL);
     list->insets(Insets(4));
 
+    auto spacer = new Container(list);
+    spacer->min_height(32);
+
     list_foreach(MenuEntry, entry, menu)
     {
         auto item = new Button(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);

@@ -11,12 +11,14 @@
 Window::Window(
     int id,
     WindowFlag flags,
+    WindowType type,
     struct Client *client,
     Rectangle bound,
     RefPtr<Bitmap> frontbuffer,
     RefPtr<Bitmap> backbuffer)
     : _id(id),
       _flags(flags),
+      _type(type),
       _client(client),
       _bound(bound),
       _frontbuffer(frontbuffer),

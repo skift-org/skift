@@ -9,6 +9,8 @@ int main(int argc, char **argv)
 
     Window *window = window_create_from_file("/Applications/about/about.markup");
 
+    window->type(WINDOW_TYPE_DIALOG);
+
     Image *system_image = nullptr;
     if ((system_image = (Image *)window_get_widget_by_id(window, "system-image")))
     {

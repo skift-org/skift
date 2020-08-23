@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window->title("Panel");
+    window->type(WINDOW_TYPE_PANEL);
     window->bound(screen_get_bound().take_top(36));
     window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto event) {
         window->bound(window_bound(window).with_width(event->display.size.x()));

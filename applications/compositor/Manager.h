@@ -25,3 +25,38 @@ void manager_unregister_window(struct Window *window);
 void manager_set_focus_window(struct Window *window);
 
 struct Window *manager_focus_window();
+
+#include "compositor/Window.h"
+
+template <typename Callback>
+Iteration manager_iterate_by_type_front_to_back(WindowType type, Callback callback)
+{
+    list_foreach(Window, window, manager_get_windows())
+    {
+        if (window->type() == type)
+        {
+            if (callback(window) == Iteration::STOP)
+            {
+                return Iteration::STOP;
+            }
+        }
+    }
+
+    return Iteration::CONTINUE;
+}
+
+template <typename Callback>
+void manager_iterate_front_to_back(Callback callback)
+{
+    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)
+        return;
+
+    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_DIALOG, callback) == Iteration::STOP)
+        return;
+
+    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_REGULAR, callback) == Iteration::STOP)
+        return;
+
+    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_DESKTOP, callback) == Iteration::STOP)
+        return;
+}

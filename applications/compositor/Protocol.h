@@ -31,6 +31,14 @@ enum CompositorMessageType
 
 typedef unsigned int WindowFlag;
 
+enum WindowType
+{
+    WINDOW_TYPE_PANEL,
+    WINDOW_TYPE_DIALOG,
+    WINDOW_TYPE_REGULAR,
+    WINDOW_TYPE_DESKTOP,
+};
+
 struct CompositorGreetings
 {
     Rectangle screen_bound;
@@ -45,6 +53,7 @@ struct CompositorCreateWindow
 {
     int id;
     WindowFlag flags;
+    WindowType type;
 
     int frontbuffer;
     Vec2i frontbuffer_size;
@@ -115,7 +124,8 @@ struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union {
+    union
+    {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;

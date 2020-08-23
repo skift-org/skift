@@ -32,15 +32,19 @@ Window *manager_get_window(struct Client *client, int id)
 
 Window *manager_get_window_at(Vec2i position)
 {
-    list_foreach(Window, window, _managed_windows)
-    {
+    Window *result = nullptr;
+
+    manager_iterate_front_to_back([&](Window *window) {
         if (window->cursor_capture_bound().containe(position))
         {
-            return window;
+            result = window;
+            return Iteration::STOP;
         }
-    }
 
-    return nullptr;
+        return Iteration::CONTINUE;
+    });
+
+    return result;
 }
 
 void manager_broadcast_event(Event event)

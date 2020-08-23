@@ -14,6 +14,8 @@ struct Window
 private:
     int _id;
     WindowFlag _flags;
+    WindowType _type;
+
     struct Client *_client;
     Rectangle _bound;
     CursorState _cursor_state{};
@@ -23,6 +25,8 @@ private:
 
 public:
     int id() { return _id; }
+    WindowFlag flags() { return _flags; };
+    WindowType type() { return _type; };
 
     Client *client() { return _client; }
 
@@ -39,6 +43,7 @@ public:
     Window(
         int id,
         WindowFlag flags,
+        WindowType type,
         struct Client *client,
         Rectangle bound,
         RefPtr<Bitmap> frontbuffer,

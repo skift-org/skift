@@ -15,6 +15,7 @@ DialogButton dialog_message(
 
     window->icon(icon);
     window->title(title);
+    window->type(WINDOW_TYPE_DIALOG);
     window->size(Vec2i(300, 200));
     window_root(window)->layout(VFLOW(0));
     window_root(window)->insets(Insets(8));

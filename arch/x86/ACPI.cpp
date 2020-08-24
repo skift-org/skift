@@ -1,16 +1,13 @@
 #include <libsystem/Logger.h>
-#include <libutils/String.h>
 
+#include "arch/x86/ACPI.h"
 #include "arch/x86/IOAPIC.h"
 #include "arch/x86/LAPIC.h"
-
-#include "kernel/acpi/ACPI.h"
 #include "kernel/acpi/tables/MADT.h"
 #include "kernel/acpi/tables/RSDP.h"
 #include "kernel/acpi/tables/RSDT.h"
-#include "kernel/memory/MemoryWindow.h"
 
-void acpi_madt_initialize(MemoryWindow<MADT> &madt)
+void acpi_madt_initialize(MADT *madt)
 {
     logger_info("MADT found, size is %d", madt->record_count());
 
@@ -56,29 +53,11 @@ void acpi_madt_initialize(MemoryWindow<MADT> &madt)
 
 void acpi_initialize(Multiboot *multiboot)
 {
-    logger_info("Initializing ACPI subsystem...");
+    RSDP *rsdp = (RSDP *)(multiboot->acpi_rsdp_address);
 
-    MemoryWindow<RSDP> rsdp_window(multiboot->acpi_rsdp_address, multiboot->acpi_rsdp_size);
+    RSDT *rsdt = (RSDT *)(rsdp->rsdt_address);
 
-    logger_info("RSDP(%08x) signature: '%s'", multiboot->acpi_rsdp_address, String(rsdp_window->signature, 8).cstring());
+    MADT *madt = (MADT *)rsdt->child("APIC");
 
-    MemoryWindow<RSDT> rsdt_window(rsdp_window->rsdt_address, sizeof(RSDT));
-
-    logger_info("RSDT(%08x) signature: '%s'", rsdp_window->rsdt_address, String(rsdt_window->header.Signature, 4).cstring());
-
-    for (size_t i = 0; i < rsdt_window->child_count(); i++)
-    {
-        MemoryWindow<SDTH> sdth_window(rsdt_window->child(i));
-
-        String signature(sdth_window->Signature, 4);
-
-        logger_info("(%08x) -> '%s'", rsdt_window->child(i), signature.cstring());
-
-        if (signature == "APIC")
-        {
-            MemoryWindow<MADT> madt_window((uintptr_t)rsdt_window->child(i), sdth_window->Length);
-
-            acpi_madt_initialize(madt_window);
-        }
-    }
+    acpi_madt_initialize(madt);
 }

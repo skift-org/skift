@@ -1,10 +1,14 @@
+#include <libsystem/Logger.h>
+
 #include "arch/x86/LAPIC.h"
+#include "arch/x86/PIC.h"
 
 static volatile uint32_t *lapic = nullptr;
 
 void lapic_found(uintptr_t address)
 {
     lapic = reinterpret_cast<uint32_t *>(address);
+    logger_info("LAPIC found at %08x", lapic);
 }
 
 uint32_t lapic_read(uint32_t reg)
@@ -15,4 +19,16 @@ uint32_t lapic_read(uint32_t reg)
 void lapic_write(uint32_t reg, uint32_t data)
 {
     *((volatile uint32_t *)(lapic + reg)) = data;
+}
+
+void lapic_ack()
+{
+    lapic_write(LAPIC_EOI, 0);
+}
+
+void lapic_initialize()
+{
+    pic_disable();
+
+    lapic_write(0xF0, lapic_read(0xF0) | 0x100);
 }

@@ -5,7 +5,9 @@
 #include "arch/x86/LAPIC.h"
 
 #include "kernel/acpi/ACPI.h"
-#include "kernel/acpi/Tables.h"
+#include "kernel/acpi/tables/MADT.h"
+#include "kernel/acpi/tables/RSDP.h"
+#include "kernel/acpi/tables/RSDT.h"
 #include "kernel/memory/MemoryWindow.h"
 
 void acpi_madt_initialize(MemoryWindow<MADT> &madt)

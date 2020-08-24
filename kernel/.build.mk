@@ -24,18 +24,12 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/system/*.cpp) \
 	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
-KERNEL_LAI_SOURCES = \
-	$(wildcard thirdparty/lai/core/*.c) \
-	$(wildcard thirdparty/lai/drivers/*.c) \
-	$(wildcard thirdparty/lai/helpers/*.c)
-
 KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
 
 KERNEL_OBJECTS = \
 	$(patsubst %.cpp, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
 	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES)) \
-	$(patsubst thirdparty/%.c, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LAI_SOURCES))
+	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
 OBJECTS += $(KERNEL_OBJECTS)
 
@@ -43,11 +37,6 @@ $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
-
-$(BUILD_DIRECTORY)/kernel/%.o: thirdparty/%.c
-	$(DIRECTORY_GUARD)
-	@echo [KERNEL] [CC] $<
-	@$(CC) $(CFLAGS) -ffreestanding -nostdlib -Ithirdparty/lai/include -c -o $@ $<
 
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)

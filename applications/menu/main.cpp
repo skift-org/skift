@@ -146,7 +146,7 @@ int main(int argc, char **argv)
     window->position(Vec2i::zero());
     window->size(Vec2i(320, screen_get_bound().height()));
 
-    window_root(window)->layout(HFLOW(8));
+    window_root(window)->layout(HFLOW(0));
 
     menu_create_list(window_root(window), menu);
 

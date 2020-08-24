@@ -1,0 +1,21 @@
+protocol (
+    property id = "c01eb5f9";
+    property name = "desktop";
+
+    enum DesktopScaling (
+        STRETCH,
+        TILE,
+        CENTER,
+        COVER,
+    );
+
+    struct BitmapHandle (
+        uint32_t memory_object,
+        uint32_t width,
+        uint32_t height,
+    );
+
+    event next_wallpaper();
+    request set_wallpaper(BitmapHandle bitmap) -> ();
+    request set_scaling(DesktopScaling scaling) -> ();
+);

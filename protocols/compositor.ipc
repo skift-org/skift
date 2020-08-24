@@ -1,0 +1,34 @@
+protocol (
+    property id = "553be5a1 ";
+    property name = "compositor";
+
+    request create_window(
+        int id,
+        WindowFlag flags,
+        WindowType type,
+        int frontbuffer,
+        Vec2i frontbuffer_size,
+        int backbuffer,
+        Vec2i backbuffer_size,
+        Rectangle bound,
+    ) -> ();
+
+    request destroy_window(int id);
+
+    request resize_window(int id, Rectangle bound);
+
+    request flip_window(
+        int id,
+        BitmapHandle frontbuffer,
+        BitmapHandle backbuffer,
+        Rectangle bound);
+
+    request cursor_window(
+        int id,
+        CursorState state);
+
+    request set_resolution(
+        int width,
+        int height,
+    );
+);

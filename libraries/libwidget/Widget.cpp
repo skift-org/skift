@@ -88,49 +88,6 @@ void Widget::event(Event *event)
     __unused(event);
 }
 
-void Widget::do_vhgrid_layout(Layout layout, Dimension dim)
-{
-    Dimension ivdim = dimension_invert_xy(dim);
-
-    int current = content_bound().position().component(dim);
-    int spacing = layout.spacing.component(dim);
-    int size = content_bound().size().component(dim);
-    int used_space_without_spacing = size - (spacing * (_childs->count() - 1));
-    int child_size = used_space_without_spacing / _childs->count();
-    int used_space_with_spacing = child_size * _childs->count() + (spacing * (_childs->count() - 1));
-    int correction_space = size - used_space_with_spacing;
-
-    list_foreach(Widget, child, _childs)
-    {
-        int current_child_size = MAX(1, child_size);
-
-        if (correction_space > 0)
-        {
-            current_child_size++;
-            correction_space--;
-        }
-
-        if (dim == Dimension::X)
-        {
-            child->bound(Rectangle(
-                current,
-                content_bound().position().component(ivdim),
-                current_child_size,
-                content_bound().size().component(ivdim)));
-        }
-        else
-        {
-            child->bound(Rectangle(
-                content_bound().position().component(ivdim),
-                current,
-                content_bound().size().component(ivdim),
-                current_child_size));
-        }
-
-        current += current_child_size + spacing;
-    }
-}
-
 void Widget::do_layout()
 {
     switch (_layout.type)
@@ -143,36 +100,52 @@ void Widget::do_layout()
         break;
     case LAYOUT_GRID:
     {
-        int originX = content_bound().x();
-        int originY = content_bound().y();
-
-        int child_width = (content_bound().width() - (_layout.spacing.x() * (_layout.hcell - 1))) / _layout.hcell;
-        int child_height = (content_bound().height() - (_layout.spacing.y() * (_layout.vcell - 1))) / _layout.vcell;
-
         int index = 0;
         list_foreach(Widget, child, _childs)
         {
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
-            child->bound(Rectangle(
-                originX + x * (child_width + _layout.spacing.x()),
-                originY + y * (child_height + _layout.spacing.y()),
-                child_width,
-                child_height));
+            Rectangle row = content_bound().row(_layout.vcell, y, _layout.spacing.y());
+            Rectangle column = row.column(_layout.hcell, x, _layout.spacing.x());
 
+            child->bound(column);
             index++;
         }
     }
     break;
 
     case LAYOUT_HGRID:
-        do_vhgrid_layout(_layout, Dimension::X);
-        break;
+    {
+        int index = 0;
+        list_foreach(Widget, child, _childs)
+        {
+            child->bound(
+                content_bound().column(
+                    _childs->count(),
+                    index,
+                    _layout.spacing.x()));
+
+            index++;
+        }
+    }
+    break;
 
     case LAYOUT_VGRID:
-        do_vhgrid_layout(_layout, Dimension::Y);
-        break;
+    {
+        int index = 0;
+        list_foreach(Widget, child, _childs)
+        {
+            child->bound(
+                content_bound().row(
+                    _childs->count(),
+                    index,
+                    _layout.spacing.y()));
+
+            index++;
+        }
+    }
+    break;
 
     case LAYOUT_HFLOW:
     {

@@ -314,20 +314,35 @@ public:
         return Rectangle(x() + left, y(), width() - left - right, height());
     }
 
-    Rectangle row(int row_count, int row) const
+    Rectangle row(int row_count, int index) const
     {
-        int row_height = height() / row_count;
+        return row(row_count, index, 0);
+    }
 
-        int correction = height() - (row_height * row_count);
+    Rectangle row(int row_count, int index, int spacing) const
+    {
+        assert(index >= 0);
+        assert(row_count > 0);
+
+        int spacing_height = spacing * row_count - 1;
+
+        int available_height = height() - spacing_height;
+
+        int row_height = available_height / row_count;
+
+        int correction = available_height - (row_height * row_count);
 
         int current_row_height = row_height;
 
-        if (row < correction)
+        if (index < correction)
         {
             current_row_height += 1;
         }
 
-        int current_row_position = row_height * row + MIN(row, correction);
+        int current_row_position =
+            row_height * index +
+            (spacing * index) +
+            MIN(index, correction);
 
         return Rectangle{
             x(),
@@ -337,19 +352,34 @@ public:
         };
     }
 
-    Rectangle column(int column_count, int column) const
+    Rectangle column(int column_count, int index) const
     {
-        int column_width = width() / column_count;
+        return column(column_count, index, 0);
+    }
 
-        int correction = width() - (column_width * column_count);
+    Rectangle column(int column_count, int index, int spacing) const
+    {
+        assert(index >= 0);
+        assert(column_count > 0);
+
+        int spacing_width = spacing * column_count - 1;
+
+        int available_width = width() - spacing_width;
+
+        int column_width = available_width / column_count;
+
+        int correction = available_width - (column_width * column_count);
 
         int current_column_width = column_width;
-        if (column < correction)
+        if (index < correction)
         {
             current_column_width += 1;
         }
 
-        int current_column_position = column_width * column + MIN(column, correction);
+        int current_column_position =
+            column_width * index +
+            (spacing * index) +
+            MIN(index, correction);
 
         return Rectangle{
             x() + current_column_position,

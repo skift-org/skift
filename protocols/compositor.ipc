@@ -1,34 +1,42 @@
 protocol (
     property id = "553be5a1 ";
     property name = "compositor";
+    property file = "/Session/compositor.ipc";
 
-    request create_window(
-        int id,
-        WindowFlag flags,
-        WindowType type,
-        int frontbuffer,
-        Vec2i frontbuffer_size,
-        int backbuffer,
-        Vec2i backbuffer_size,
-        Rectangle bound,
-    ) -> ();
+    peer compositor (
+        request create_window(
+            int id,
+            WindowFlag flags,
+            WindowType type,
+            int frontbuffer,
+            Vec2i frontbuffer_size,
+            int backbuffer,
+            Vec2i backbuffer_size,
+            Rectangle bound,
+        ) -> ();
 
-    request destroy_window(int id);
+        request destroy_window(int id);
 
-    request resize_window(int id, Rectangle bound);
+        request resize_window(int id, Rectangle bound);
 
-    request flip_window(
-        int id,
-        BitmapHandle frontbuffer,
-        BitmapHandle backbuffer,
-        Rectangle bound);
+        request flip_window(
+            int id,
+            BitmapHandle frontbuffer,
+            BitmapHandle backbuffer,
+            Rectangle bound);
 
-    request cursor_window(
-        int id,
-        CursorState state);
+        request cursor_window(
+            int id,
+            CursorState state);
 
-    request set_resolution(
-        int width,
-        int height,
+        request set_resolution(
+            int width,
+            int height,
+        );
+    );
+
+    peer application (
+        event greetings(Rectangle screen_bound);
+        event event(Event event);
     );
 );

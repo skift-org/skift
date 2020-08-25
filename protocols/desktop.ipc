@@ -15,7 +15,9 @@ protocol (
         uint32_t height,
     );
 
-    event next_wallpaper();
-    request set_wallpaper(BitmapHandle bitmap) -> ();
-    request set_scaling(DesktopScaling scaling) -> ();
+    peer desktop (
+        event next_wallpaper();
+        request set_wallpaper(BitmapHandle bitmap) -> ();
+        request set_scaling(DesktopScaling scaling) -> ();
+    );
 );

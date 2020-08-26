@@ -26,7 +26,7 @@ paging_invalidate_tlb:
     mov cr3, eax
     ret
 
-# --- CPU tables ------------------------------------------------------------- #
+;; --- CPU tables ----------------------------------------------------------- ;;
 
 global gdt_flush
 gdt_flush:
@@ -50,7 +50,7 @@ idt_flush:
     lidt [eax]
     ret
 
-# --- CPUID ------------------------------------------------------------------ #
+;; --- CPUID ---------------------------------------------------------------- ;;
 
 global cpuid_get_feature_EDX
 cpuid_get_feature_EDX:

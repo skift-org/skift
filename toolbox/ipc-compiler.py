@@ -22,7 +22,7 @@ def read_file_to_string(path: str) -> str:
 lexer = Lexer(read_file_to_string(sys.argv[1]))
 prot = Parser.protocol(lexer)
 
-pp.pprint(prot)
+# pp.pprint(prot)
 
 gen = Generator()
 Emit.protocol(gen, prot["properties"]["name"], prot)

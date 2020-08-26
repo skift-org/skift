@@ -86,7 +86,7 @@ def structure(lexer: Lexer):
     return {structure_name: structure_field}
 
 
-def request_or_event(lexer: Lexer):
+def request_or_signal(lexer: Lexer):
     lexer.eat_whitespace()
     request_name = identifier(lexer)
 
@@ -109,23 +109,29 @@ def peer_field(lexer: Lexer, peer):
     if lexer.skip_word("property"):
         peer["properties"].update(property_(lexer))
     elif lexer.skip_word("request"):
-        peer["requests"].update(request_or_event(lexer))
-    elif lexer.skip_word("event"):
-        peer["events"].update(request_or_event(lexer))
+        peer["requests"].update(request_or_signal(lexer))
+    elif lexer.skip_word("signal"):
+        peer["signals"].update(request_or_signal(lexer))
 
     lexer.eat_whitespace()
 
 
-def peer(lexer: Lexer):
+def peer(lexer: Lexer, type_: str):
     peer = {
+        "name": {},
+        "type": type_,
         "properties": {},
         "requests": {},
-        "events": {},
+        "signals": {},
     }
 
     lexer.eat_whitespace()
-    peer_name = identifier(lexer)
+    peer["name"] = identifier(lexer)
     lexer.eat_whitespace()
+
+    if not lexer.current_is("("):
+        return peer
+
     lexer.skip_and_expect("(")
     lexer.eat_whitespace()
 
@@ -138,7 +144,7 @@ def peer(lexer: Lexer):
     lexer.skip_and_expect(")")
     lexer.eat_whitespace()
 
-    return {peer_name: peer}
+    return peer
 
 
 def protocol_field(lexer: Lexer, protocol):
@@ -148,8 +154,10 @@ def protocol_field(lexer: Lexer, protocol):
         protocol["structures"].update(structure(lexer))
     elif lexer.skip_word("enum"):
         protocol["enumerations"].update(enumeration(lexer))
-    elif lexer.skip_word("peer"):
-        protocol["peers"].update(peer(lexer))
+    elif lexer.skip_word("client"):
+        protocol["client"] = peer(lexer, "client")
+    elif lexer.skip_word("server"):
+        protocol["server"] = peer(lexer, "server")
 
     lexer.eat_whitespace()
 
@@ -159,7 +167,8 @@ def protocol(lexer: Lexer):
         "properties": {},
         "enumerations": {},
         "structures": {},
-        "peers": {},
+        "client": {},
+        "server": {},
     }
 
     lexer.eat_whitespace()

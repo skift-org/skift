@@ -10,11 +10,14 @@ class Generator:
         self.ident = self.ident - 1
 
     def emit(self, *code):
-        self.buffer = self.buffer + '    ' * self.ident + ''.join(code) + '\n'
+        if (''.join(code) == ""):
+            self.buffer += "\n"
+        else:
+            self.buffer += '    ' * self.ident + ''.join(code) + '\n'
 
     def emit_section(self, title):
-        self.buffer += "\n/* --- " + title + " " + \
-            "-" * (69 - len(title)) + " */\n\n"  # nice
+        self.buffer += '    ' * self.ident + "/* --- " + title + " " + \
+            "-" * (69 - len(title) - 4 * self.ident) + " */\n\n"  # nice
 
     def finalize(self):
         return self.buffer

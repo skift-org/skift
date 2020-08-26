@@ -2,4 +2,16 @@ APPS += CALCULATOR
 
 CALCULATOR_NAME = calculator
 CALCULATOR_LIBS = widget markup json graphic
-CALCULATOR_ICONS = calculator calculator-variant
+CALCULATOR_ICONS = \
+	calculator \
+	calculator-variant \
+	equal \
+	plus \
+	minus \
+	close \
+	plus-minus-variant \
+	slash-forward \
+	backspace-outline \
+	square-root \
+	exponent \
+	percent

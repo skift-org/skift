@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     Widget *panel_grid = new Container(window_root(window));
     {
-        panel_grid->layout(GRID(3, 3, 2, 4));
+        panel_grid->layout(GRID(3, 3, 4, 4));
         panel_grid->attributes(LAYOUT_FILL);
 
         new Panel(panel_grid);
@@ -69,8 +69,6 @@ int main(int argc, char **argv)
         new Panel(panel_grid);
         new Panel(panel_grid);
     }
-
-    new Panel(window_root(window));
 
     window_show(window);
 

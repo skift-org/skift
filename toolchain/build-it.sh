@@ -43,13 +43,13 @@ source "$DIR/use-it.sh"
 
 pushd tarballs
     if [ ! -e "$BINUTILS_FILENAME" ]; then
-        wget "$BINUTILS_URL"
+        wget -4 "$BINUTILS_URL"
     else
         echo "Skipped downloading binutils"
     fi
 
     if [ ! -e "$GCC_FILENAME" ]; then
-        wget "$GCC_URL"
+        wget -4 "$GCC_URL"
     else
         echo "Skipped downloading gcc"
     fi

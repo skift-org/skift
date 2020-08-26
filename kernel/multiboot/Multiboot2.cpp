@@ -112,15 +112,11 @@ void multiboot2_parse_framebuffer(Multiboot *multiboot, struct multiboot_tag_fra
 
 void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
 {
-    __unused(multiboot);
-    __unused(header_ptr);
-
-    header_ptr = (void *)((uintptr_t)header_ptr + 8);
-
-    struct multiboot_tag *tag = (struct multiboot_tag *)header_ptr;
-
     strcpy(multiboot->bootloader, "unknown");
     strcpy(multiboot->command_line, "");
+
+    header_ptr = (void *)((uintptr_t)header_ptr + 8);
+    struct multiboot_tag *tag = (struct multiboot_tag *)header_ptr;
 
     while (tag->type != MULTIBOOT_TAG_TYPE_END)
     {

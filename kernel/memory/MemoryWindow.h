@@ -17,7 +17,7 @@ public:
 
     MemoryWindow(uintptr_t address, size_t size)
     {
-        size_t offset_withing_page = address % PAGE_SIZE;
+        size_t offset_withing_page = address % ARCH_PAGE_SIZE;
 
         _virtual_ranger = virtual_alloc(memory_kpdir(), memory_range_around_non_aligned_address(address, size + offset_withing_page), MEMORY_NONE);
         _virtual_address = reinterpret_cast<T *>(_virtual_ranger.base + offset_withing_page);

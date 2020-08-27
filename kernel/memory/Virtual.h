@@ -1,11 +1,10 @@
 #pragma once
 
 #include <abi/Memory.h>
-
 #include <libsystem/Result.h>
 
+#include "arch/x86/Paging.h"
 #include "kernel/memory/MemoryRange.h"
-#include "kernel/memory/Paging.h"
 
 extern PageDirectory kpdir;
 extern PageTable kptable[256];

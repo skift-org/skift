@@ -36,7 +36,7 @@ void memory_initialize(Multiboot *multiboot)
         entry->User = 0;
         entry->Write = 1;
         entry->Present = 1;
-        entry->PageFrameNumber = (size_t)&kptable[i] / PAGE_SIZE;
+        entry->PageFrameNumber = (size_t)&kptable[i] / ARCH_PAGE_SIZE;
     }
 
     for (size_t i = 0; i < multiboot->memory_map_size; i++)
@@ -45,7 +45,7 @@ void memory_initialize(Multiboot *multiboot)
 
         if (entry->type == MEMORY_MAP_ENTRY_AVAILABLE)
         {
-            physical_set_free(entry->range.base(), entry->range.size() / PAGE_SIZE);
+            physical_set_free(entry->range.base(), entry->range.size() / ARCH_PAGE_SIZE);
         }
     }
 
@@ -61,7 +61,7 @@ void memory_initialize(Multiboot *multiboot)
         memory_map_identity(&kpdir, multiboot->modules[i].range, MEMORY_NONE);
     }
 
-    virtual_free(memory_kpdir(), (MemoryRange){0, PAGE_SIZE}); // Unmap the 0 page
+    virtual_free(memory_kpdir(), (MemoryRange){0, ARCH_PAGE_SIZE}); // Unmap the 0 page
     physical_set_used(0, 1);
 
     memory_pdir_switch(&kpdir);
@@ -121,14 +121,14 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
 
     atomic_begin();
 
-    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
-        uintptr_t virtual_address = virtual_range.base() + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base() + i * ARCH_PAGE_SIZE;
 
         if (!virtual_present(page_directory, virtual_address))
         {
             uintptr_t physical_address = physical_alloc(1);
-            Result virtual_map_result = virtual_map(page_directory, MemoryRange{physical_address, PAGE_SIZE}, virtual_address, flags);
+            Result virtual_map_result = virtual_map(page_directory, MemoryRange{physical_address, ARCH_PAGE_SIZE}, virtual_address, flags);
 
             if (virtual_map_result != SUCCESS)
             {
@@ -149,7 +149,7 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_r
 {
     assert(physical_range.is_page_aligned());
 
-    size_t page_count = physical_range.size() / PAGE_SIZE;
+    size_t page_count = physical_range.size() / ARCH_PAGE_SIZE;
 
     atomic_begin();
     physical_set_used(physical_range.base(), page_count);
@@ -175,7 +175,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
 
     *out_address = 0;
 
-    size_t page_count = size / PAGE_SIZE;
+    size_t page_count = size / ARCH_PAGE_SIZE;
 
     atomic_begin();
 
@@ -205,7 +205,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)virtual_address, 0, page_count * PAGE_SIZE);
+        memset((void *)virtual_address, 0, page_count * ARCH_PAGE_SIZE);
 
     *out_address = virtual_address;
     return SUCCESS;
@@ -217,18 +217,18 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
-        uintptr_t identity_address = i * PAGE_SIZE;
+        uintptr_t identity_address = i * ARCH_PAGE_SIZE;
 
         if (!virtual_present(page_directory, identity_address) &&
             !physical_is_used(identity_address, 1))
         {
             physical_set_used(identity_address, 1);
-            virtual_map(page_directory, MemoryRange{identity_address, PAGE_SIZE}, identity_address, flags);
+            virtual_map(page_directory, MemoryRange{identity_address, ARCH_PAGE_SIZE}, identity_address, flags);
 
             atomic_end();
 
             if (flags & MEMORY_CLEAR)
-                memset((void *)identity_address, 0, PAGE_SIZE);
+                memset((void *)identity_address, 0, ARCH_PAGE_SIZE);
 
             *out_address = identity_address;
 
@@ -251,14 +251,14 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
 
     atomic_begin();
 
-    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
-        uintptr_t virtual_address = virtual_range.base() + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base() + i * ARCH_PAGE_SIZE;
 
         if (virtual_present(page_directory, virtual_address))
         {
             physical_free(virtual_to_physical(page_directory, virtual_address), 1);
-            virtual_free(page_directory, (MemoryRange){virtual_address, PAGE_SIZE});
+            virtual_free(page_directory, (MemoryRange){virtual_address, ARCH_PAGE_SIZE});
         }
     }
 
@@ -289,7 +289,7 @@ PageDirectory *memory_pdir_create()
         page_directory_entry->User = 0;
         page_directory_entry->Write = 1;
         page_directory_entry->Present = 1;
-        page_directory_entry->PageFrameNumber = (uint)&kptable[i] / PAGE_SIZE;
+        page_directory_entry->PageFrameNumber = (uint)&kptable[i] / ARCH_PAGE_SIZE;
     }
 
     atomic_end();
@@ -307,7 +307,7 @@ void memory_pdir_destroy(PageDirectory *page_directory)
 
         if (page_directory_entry->Present)
         {
-            PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+            PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * ARCH_PAGE_SIZE);
 
             for (size_t i = 0; i < 1024; i++)
             {
@@ -315,7 +315,7 @@ void memory_pdir_destroy(PageDirectory *page_directory)
 
                 if (page_table_entry->Present)
                 {
-                    physical_free(page_table_entry->PageFrameNumber * PAGE_SIZE, 1);
+                    physical_free(page_table_entry->PageFrameNumber * ARCH_PAGE_SIZE, 1);
                 }
             }
 
@@ -356,7 +356,7 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
         PageDirectoryEntry *pde = &pdir->entries[i];
         if (pde->Present)
         {
-            PageTable *ptable = (PageTable *)(pde->PageFrameNumber * PAGE_SIZE);
+            PageTable *ptable = (PageTable *)(pde->PageFrameNumber * ARCH_PAGE_SIZE);
 
             for (int j = 0; j < 1024; j++)
             {
@@ -364,17 +364,17 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
 
                 if (p->Present && !memory_used)
                 {
-                    MEMORY_DUMP_REGION_START(pdir, (i * 1024 + j) * PAGE_SIZE);
+                    MEMORY_DUMP_REGION_START(pdir, (i * 1024 + j) * ARCH_PAGE_SIZE);
                 }
                 else if (!p->Present && memory_used)
                 {
-                    MEMORY_DUMP_REGION_END(pdir, (i * 1024 + j - 1) * PAGE_SIZE);
+                    MEMORY_DUMP_REGION_END(pdir, (i * 1024 + j - 1) * ARCH_PAGE_SIZE);
                 }
                 else if (p->Present)
                 {
-                    uint new_physical = virtual_to_physical(pdir, (i * 1024 + j) * PAGE_SIZE);
+                    uint new_physical = virtual_to_physical(pdir, (i * 1024 + j) * ARCH_PAGE_SIZE);
 
-                    if (!(current_physical + PAGE_SIZE == new_physical))
+                    if (!(current_physical + ARCH_PAGE_SIZE == new_physical))
                     {
                         printf("%08x | ", current_physical);
                         printf("%08x:", new_physical);
@@ -386,7 +386,7 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
         }
         else if (memory_used)
         {
-            MEMORY_DUMP_REGION_END(pdir, (i * 1024 - 1) * PAGE_SIZE);
+            MEMORY_DUMP_REGION_END(pdir, (i * 1024 - 1) * ARCH_PAGE_SIZE);
         }
     }
 

@@ -2,7 +2,7 @@
 
 #include <libsystem/Assert.h>
 
-#include "kernel/memory/Paging.h"
+#include "arch/Paging.h"
 
 class MemoryRange
 {
@@ -38,9 +38,9 @@ public:
 
     static inline MemoryRange from_non_aligned_address(uintptr_t base, size_t size)
     {
-        size_t align = PAGE_SIZE - base % PAGE_SIZE;
+        size_t align = ARCH_PAGE_SIZE - base % ARCH_PAGE_SIZE;
 
-        if (base % PAGE_SIZE == 0)
+        if (base % ARCH_PAGE_SIZE == 0)
         {
             align = 0;
         }
@@ -48,19 +48,19 @@ public:
         base += align;
         size -= align;
 
-        size -= size % PAGE_SIZE;
+        size -= size % ARCH_PAGE_SIZE;
 
         return (MemoryRange){base, size};
     }
 
     static inline MemoryRange around_non_aligned_address(uintptr_t base, size_t size)
     {
-        size_t align = base % PAGE_SIZE;
+        size_t align = base % ARCH_PAGE_SIZE;
 
         base -= align;
         size += align;
 
-        size += PAGE_SIZE - size % PAGE_SIZE;
+        size += ARCH_PAGE_SIZE - size % ARCH_PAGE_SIZE;
 
         return (MemoryRange){base, size};
     }

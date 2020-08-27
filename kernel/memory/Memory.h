@@ -3,6 +3,7 @@
 #include <abi/Memory.h>
 #include <libsystem/Result.h>
 
+#include "arch/x86/Paging.h"
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/multiboot/Multiboot.h"
 

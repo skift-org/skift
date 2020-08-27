@@ -5,8 +5,8 @@
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
 #define PT_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
-PageDirectory kpdir __aligned(PAGE_SIZE) = {};
-PageTable kptable[256] __aligned(PAGE_SIZE) = {};
+PageDirectory kpdir __aligned(ARCH_PAGE_SIZE) = {};
+PageTable kptable[256] __aligned(ARCH_PAGE_SIZE) = {};
 
 bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 {
@@ -18,7 +18,7 @@ bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
         return false;
     }
 
-    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
+    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * ARCH_PAGE_SIZE);
 
     int page_table_index = PT_INDEX(virtual_address);
     PageTableEntry &page_table_entry = page_table.entries[page_table_index];
@@ -41,7 +41,7 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
         return 0;
     }
 
-    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
+    PageTable &page_table = *reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * ARCH_PAGE_SIZE);
 
     int page_table_index = PT_INDEX(virtual_address);
     PageTableEntry &page_table_entry = page_table.entries[page_table_index];
@@ -51,18 +51,18 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
         return 0;
     }
 
-    return (page_table_entry.PageFrameNumber * PAGE_SIZE) + (virtual_address & 0xfff);
+    return (page_table_entry.PageFrameNumber * ARCH_PAGE_SIZE) + (virtual_address & 0xfff);
 }
 
 Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
-    for (size_t i = 0; i < physical_range.size() / PAGE_SIZE; i++)
+    for (size_t i = 0; i < physical_range.size() / ARCH_PAGE_SIZE; i++)
     {
-        size_t offset = i * PAGE_SIZE;
+        size_t offset = i * ARCH_PAGE_SIZE;
 
         int page_directory_index = PD_INDEX(virtual_address + offset);
         PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
-        PageTable *page_table = reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * PAGE_SIZE);
+        PageTable *page_table = reinterpret_cast<PageTable *>(page_directory_entry.PageFrameNumber * ARCH_PAGE_SIZE);
 
         if (!page_directory_entry.Present)
         {
@@ -103,7 +103,7 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
     // we skip the first page to make null deref trigger a page fault
     for (size_t i = (is_user_memory ? 256 : 1) * 1024; i < (is_user_memory ? 1024 : 256) * 1024; i++)
     {
-        uintptr_t current_address = i * PAGE_SIZE;
+        uintptr_t current_address = i * ARCH_PAGE_SIZE;
 
         if (!virtual_present(page_directory, current_address))
         {
@@ -112,7 +112,7 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
                 virtual_address = current_address;
             }
 
-            current_size += PAGE_SIZE;
+            current_size += ARCH_PAGE_SIZE;
 
             if (current_size == physical_range.size())
             {
@@ -132,14 +132,14 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
 
 void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
-    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
-        size_t offset = i * PAGE_SIZE;
+        size_t offset = i * ARCH_PAGE_SIZE;
 
         size_t page_directory_index = PD_INDEX(virtual_range.base() + offset);
         PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
 
-        PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
+        PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * ARCH_PAGE_SIZE);
 
         size_t page_table_index = PT_INDEX(virtual_range.base() + offset);
         PageTableEntry *page_table_entry = &page_table->entries[page_table_index];

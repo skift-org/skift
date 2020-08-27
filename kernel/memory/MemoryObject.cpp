@@ -24,7 +24,7 @@ MemoryObject *memory_object_create(size_t size)
 
     memory_object->id = _memory_object_id++;
     memory_object->refcount = 1;
-    memory_object->address = physical_alloc(size / PAGE_SIZE);
+    memory_object->address = physical_alloc(size / ARCH_PAGE_SIZE);
     memory_object->size = size;
 
     lock_acquire(_memory_objects_lock);
@@ -38,7 +38,7 @@ void memory_object_destroy(MemoryObject *memory_object)
 {
     list_remove(_memory_objects, memory_object);
 
-    physical_free(memory_object->address, PAGE_ALIGN_UP(memory_object->size) / PAGE_SIZE);
+    physical_free(memory_object->address, PAGE_ALIGN_UP(memory_object->size) / ARCH_PAGE_SIZE);
     free(memory_object);
 }
 

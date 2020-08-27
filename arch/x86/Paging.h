@@ -2,20 +2,10 @@
 
 #include <libsystem/Common.h>
 
+#include "arch/Paging.h"
+
 #define PAGE_TABLE_ENTRY_COUNT 1024
 #define PAGE_DIRECTORY_ENTRY_COUNT 1024
-
-#define PAGE_SIZE 0x1000
-#define PAGE_ALIGN(__x) ((__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
-
-#define PAGE_ALIGN_UP(__x)  \
-    ((__x % PAGE_SIZE == 0) \
-         ? (__x)            \
-         : (__x) + PAGE_SIZE - ((__x) % PAGE_SIZE))
-
-#define PAGE_ALIGN_DOWN(__x) ((__x) - ((__x) % PAGE_SIZE))
-
-#define IS_PAGE_ALIGN(__x) (__x % PAGE_SIZE == 0)
 
 union __packed PageTableEntry {
     struct __packed
@@ -63,6 +53,9 @@ struct __packed PageDirectory
 };
 
 extern "C" void paging_enable();
+
 extern "C" void paging_disable();
+
 extern "C" void paging_load_directory(uintptr_t directory);
+
 extern "C" void paging_invalidate_tlb();

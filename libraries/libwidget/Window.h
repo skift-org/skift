@@ -61,9 +61,22 @@ public:
 
     void icon(RefPtr<Icon> icon);
 
-    void size(Vec2i size);
+    Rectangle bound_on_screen() { return _bound; }
 
-    void position(Vec2i position);
+    Rectangle bound() { return _bound.moved({0, 0}); }
+
+    int x() { return position().x(); }
+    int y() { return position().y(); }
+    int width() { return size().x(); }
+    int height() { return size().y(); }
+
+    Vec2i position() { return bound_on_screen().position(); }
+
+    void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
+
+    Vec2i size() { return bound().size(); }
+
+    void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
 
     void bound(Rectangle bound);
 
@@ -93,10 +106,6 @@ bool window_is_visible(Window *window);
 void window_paint(Window *window, Painter &painter, Rectangle rectangle);
 
 void window_event(Window *window, Event *event);
-
-Rectangle window_bound_on_screen(Window *window);
-
-Rectangle window_bound(Window *window);
 
 Rectangle window_content_bound(Window *window);
 

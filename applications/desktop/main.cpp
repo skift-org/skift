@@ -10,9 +10,9 @@ int main(int argc, char **argv)
 
     window->title("Desktop");
     window->type(WINDOW_TYPE_DESKTOP);
-    window->bound(screen_get_bound());
-    window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto event) {
-        window->bound(window_bound(window).resized(event->display.size));
+    window->bound(Screen::bound());
+    window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto) {
+        window->bound(Screen::bound());
     });
 
     window->root()->layout(STACK());

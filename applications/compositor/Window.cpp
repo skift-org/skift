@@ -93,7 +93,6 @@ void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton b
         },
 
         .keyboard = {},
-        .display = {},
     };
 
     send_event(event);
@@ -117,7 +116,6 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             },
 
             .keyboard = {},
-            .display = {},
         };
 
         window.send_event(event);
@@ -136,7 +134,6 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             },
 
             .keyboard = {},
-            .display = {},
         };
 
         window.send_event(event);
@@ -163,7 +160,6 @@ void Window::handle_double_click(Vec2i position)
         },
 
         .keyboard = {},
-        .display = {},
     };
 
     send_event(event);

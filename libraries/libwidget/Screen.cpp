@@ -1,13 +1,18 @@
 #include <libwidget/Screen.h>
 
-static Rectangle _screen_bound;
-
-Rectangle screen_get_bound()
+namespace Screen
 {
-    return _screen_bound;
+
+static Rectangle _bound;
+
+Rectangle bound()
+{
+    return _bound;
 }
 
-void screen_set_bound(Rectangle rectangle)
+void bound(Rectangle bound)
 {
-    _screen_bound = rectangle;
+    _bound = bound;
 }
+
+} // namespace Screen

@@ -16,6 +16,8 @@ Client *client_create(Connection *connection);
 
 void client_destroy(Client *client);
 
+void client_broadcast(CompositorMessage message);
+
 Result client_send_message(Client *client, CompositorMessage message);
 
 void client_destroy_disconnected();

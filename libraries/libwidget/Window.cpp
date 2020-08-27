@@ -131,14 +131,14 @@ void window_destroy(Window *window)
 
 static void window_change_framebuffer_if_needed(Window *window)
 {
-    if (window_bound(window).width() > window->frontbuffer->width() ||
-        window_bound(window).height() > window->frontbuffer->height() ||
-        window_bound(window).area() < window->frontbuffer->bound().area() * 0.75)
+    if (window->bound().width() > window->frontbuffer->width() ||
+        window->bound().height() > window->frontbuffer->height() ||
+        window->bound().area() < window->frontbuffer->bound().area() * 0.75)
     {
-        window->frontbuffer = Bitmap::create_shared(window_bound(window).width(), window_bound(window).height()).take_value();
+        window->frontbuffer = Bitmap::create_shared(window->width(), window->height()).take_value();
         window->frontbuffer_painter = Painter(window->frontbuffer);
 
-        window->backbuffer = Bitmap::create_shared(window_bound(window).width(), window_bound(window).height()).take_value();
+        window->backbuffer = Bitmap::create_shared(window->width(), window->height()).take_value();
         window->backbuffer_painter = Painter(window->backbuffer);
     }
 }
@@ -157,7 +157,7 @@ void Window::show()
 
     window_change_framebuffer_if_needed(this);
     window_schedule_layout(this);
-    window_schedule_update(this, window_bound(this));
+    window_schedule_update(this, bound());
     application_show_window(this);
 }
 
@@ -174,24 +174,19 @@ void Window::hide()
 
 Rectangle window_header_bound(Window *window)
 {
-    return window_bound(window).take_top(WINDOW_HEADER_AREA);
-}
-
-Rectangle window_header_bound_on_screen(Window *window)
-{
-    return window_bound_on_screen(window).take_top(WINDOW_HEADER_AREA);
+    return window->bound().take_top(WINDOW_HEADER_AREA);
 }
 
 Rectangle window_content_bound(Window *window)
 {
-    if (window->flags & WINDOW_BORDERLESS)
+    Rectangle result = window->bound();
+
+    if (!(window->flags & WINDOW_BORDERLESS))
     {
-        return window_bound(window);
+        result = result.shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
     }
-    else
-    {
-        return window_bound(window).shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
-    }
+
+    return result;
 }
 
 void window_paint(Window *window, Painter &painter, Rectangle rectangle)
@@ -222,7 +217,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
                 window->header()->repaint(painter, rectangle);
             }
 
-            painter.draw_rectangle(window_bound(window), window_get_color(window, THEME_ACCENT));
+            painter.draw_rectangle(window->bound(), window_get_color(window, THEME_ACCENT));
         }
     }
 
@@ -231,7 +226,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 
 RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
-    Rectangle resize_bound = window_bound(window).expended(Insets(WINDOW_RESIZE_AREA));
+    Rectangle resize_bound = window->bound().expended(Insets(WINDOW_RESIZE_AREA));
     return resize_bound.containe(Insets(WINDOW_RESIZE_AREA), position);
 }
 
@@ -244,18 +239,16 @@ void window_begin_resize(Window *window, Vec2i mouse_position)
     window->resize_horizontal = borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT);
     window->resize_vertical = borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM);
 
-    Vec2i resize_region_begin(
-        window_bound_on_screen(window).x(),
-        window_bound_on_screen(window).y());
+    Vec2i resize_region_begin = window->position();
 
     if (borders & RectangleBorder::TOP)
     {
-        resize_region_begin += Vec2i(0, window_bound_on_screen(window).height());
+        resize_region_begin += Vec2i(0, window->height());
     }
 
     if (borders & RectangleBorder::LEFT)
     {
-        resize_region_begin += Vec2i(window_bound_on_screen(window).width(), 0);
+        resize_region_begin += Vec2i(window->width(), 0);
     }
 
     window->resize_begin = resize_region_begin;
@@ -265,20 +258,20 @@ void window_do_resize(Window *window, Vec2i mouse_position)
 {
     Rectangle new_bound = Rectangle::from_two_point(
         window->resize_begin,
-        window_bound_on_screen(window).position() + mouse_position);
+        window->position() + mouse_position);
 
     if (!window->resize_horizontal)
     {
         new_bound = new_bound
-                        .moved({window_bound_on_screen(window).x(), new_bound.y()})
-                        .with_width(window_bound_on_screen(window).width());
+                        .moved({window->x(), new_bound.y()})
+                        .with_width(window->width());
     }
 
     if (!window->resize_vertical)
     {
         new_bound = new_bound
-                        .moved({new_bound.x(), window_bound_on_screen(window).y()})
-                        .with_height(window_bound_on_screen(window).height());
+                        .moved({new_bound.x(), window->y()})
+                        .with_height(window->height());
     }
 
     Vec2i content_size = window->root()->compute_size();
@@ -335,14 +328,14 @@ void window_event(Window *window, Event *event)
     case Event::GOT_FOCUS:
     {
         window->focused = true;
-        window_schedule_update(window, window_bound(window));
+        window_schedule_update(window, window->bound());
     }
     break;
 
     case Event::LOST_FOCUS:
     {
         window->focused = false;
-        window_schedule_update(window, window_bound(window));
+        window_schedule_update(window, window->bound());
 
         Event mouse_leave = *event;
         mouse_leave.type = Event::MOUSE_LEAVE;
@@ -553,7 +546,7 @@ void window_event(Window *window, Event *event)
         {
             window->is_maximised = true;
             window->previous_bound = window->_bound;
-            Rectangle new_size = screen_get_bound();
+            Rectangle new_size = Screen::bound();
             new_size = Rectangle(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
 
             window->bound(new_size);
@@ -569,16 +562,6 @@ void Window::on(EventType event, EventHandler handler)
 {
     assert(event < EventType::__COUNT);
     handlers[event] = move(handler);
-}
-
-Rectangle window_bound_on_screen(Window *window)
-{
-    return window->_bound;
-}
-
-Rectangle window_bound(Window *window)
-{
-    return window->_bound.moved({0, 0});
 }
 
 void window_set_cursor(Window *window, CursorState state)
@@ -803,19 +786,9 @@ void Window::icon(RefPtr<Icon> icon)
     }
 }
 
-void Window::size(Vec2i size)
+void Window::bound(Rectangle new_bound)
 {
-    bound(_bound.resized(size));
-}
-
-void Window::position(Vec2i position)
-{
-    bound(_bound.moved(position));
-}
-
-void Window::bound(Rectangle bound)
-{
-    _bound = bound;
+    _bound = new_bound;
 
     if (!visible)
         return;
@@ -824,7 +797,7 @@ void Window::bound(Rectangle bound)
 
     window_change_framebuffer_if_needed(this);
     window_schedule_layout(this);
-    window_schedule_update(this, window_bound(this));
+    window_schedule_update(this, bound());
 }
 
 void Window::type(WindowType type)

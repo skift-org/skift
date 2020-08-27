@@ -28,11 +28,6 @@ struct KeyboardEvent
     Codepoint codepoint;
 };
 
-struct DisplayEvent
-{
-    Vec2i size;
-};
-
 struct Event
 {
     enum Type
@@ -68,7 +63,6 @@ struct Event
 
     MouseEvent mouse;
     KeyboardEvent keyboard;
-    DisplayEvent display;
 };
 
 using EventType = Event::Type;

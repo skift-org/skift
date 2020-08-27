@@ -121,10 +121,12 @@ void client_handle_set_resolution(Client *client, CompositorSetResolution set_re
 
     if (renderer_set_resolution(set_resolution.width, set_resolution.height))
     {
-        Event event = {};
-        event.type = Event::DISPLAY_SIZE_CHANGED;
-        event.display.size = Vec2i(set_resolution.width, set_resolution.height);
-        manager_broadcast_event(event);
+        client_broadcast((CompositorMessage){
+            .type = COMPOSITOR_MESSAGE_CHANGED_RESOLUTION,
+            .changed_resolution = {
+                .resolution = renderer_bound(),
+            },
+        });
     }
 }
 
@@ -260,6 +262,14 @@ void client_destroy(Client *client)
     notifier_destroy(client->notifier);
     connection_close(client->connection);
     free(client);
+}
+
+void client_broadcast(CompositorMessage message)
+{
+    list_foreach(Client, client, _connected_client)
+    {
+        client_send_message(client, message);
+    }
 }
 
 Result client_send_message(Client *client, CompositorMessage message)

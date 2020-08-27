@@ -47,14 +47,6 @@ Window *manager_get_window_at(Vec2i position)
     return result;
 }
 
-void manager_broadcast_event(Event event)
-{
-    list_foreach(Window, window, _managed_windows)
-    {
-        window->send_event(event);
-    }
-}
-
 void manager_register_window(Window *window)
 {
     manager_set_focus_window(window);

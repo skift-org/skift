@@ -38,6 +38,22 @@ void application_do_message(CompositorMessage *message)
             window_event(window, &message->event_window.event);
         }
     }
+    else if (message->type == COMPOSITOR_MESSAGE_CHANGED_RESOLUTION)
+    {
+        Screen::bound(message->changed_resolution.resolution);
+
+        list_foreach(Window, window, _windows)
+        {
+            Event event = {
+                .type = Event::DISPLAY_SIZE_CHANGED,
+                .accepted = false,
+                .mouse = {},
+                .keyboard = {},
+            };
+
+            window_event(window, &event);
+        }
+    }
     else
     {
         logger_warn("Got an invalid message from compositor!");
@@ -164,7 +180,7 @@ Result application_initialize(int argc, char **argv)
 
     if (greetings_message)
     {
-        screen_set_bound(greetings_message->greetings.screen_bound);
+        Screen::bound((greetings_message->greetings.screen_bound));
     }
 
     return SUCCESS;
@@ -292,7 +308,7 @@ void application_show_window(Window *window)
             .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window_backbuffer_handle(window),
             .backbuffer_size = window->frontbuffer->size(),
-            .bound = window_bound_on_screen(window),
+            .bound = window->bound_on_screen(),
         },
     };
 

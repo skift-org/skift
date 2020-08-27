@@ -10,6 +10,7 @@ enum CompositorMessageType
     COMPOSITOR_MESSAGE_ACK,
     COMPOSITOR_MESSAGE_GREETINGS,
     COMPOSITOR_MESSAGE_EVENT,
+    COMPOSITOR_MESSAGE_CHANGED_RESOLUTION,
 
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
@@ -120,12 +121,16 @@ struct CompositorSetWallaper
     Vec2i resolution;
 };
 
+struct CompositorChangedResolution
+{
+    Rectangle resolution;
+};
+
 struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union
-    {
+    union {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;
@@ -137,5 +142,6 @@ struct CompositorMessage
         CompositorCursorWindow cursor_window;
         CompositorSetResolution set_resolution;
         CompositorSetWallaper set_wallaper;
+        CompositorChangedResolution changed_resolution;
     };
 };

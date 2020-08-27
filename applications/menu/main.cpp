@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 
     window->title("Panel");
     window->position(Vec2i::zero());
-    window->size(Vec2i(320, screen_get_bound().height()));
+    window->bound(Screen::bound().with_width(320));
 
     window->root()->layout(HFLOW(0));
 

@@ -2,6 +2,11 @@
 
 #include <libgraphic/Shape.h>
 
-Rectangle screen_get_bound();
+namespace Screen
+{
 
-void screen_set_bound(Rectangle);
+Rectangle bound();
+
+void bound(Rectangle);
+
+} // namespace Screen

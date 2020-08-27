@@ -16,8 +16,6 @@ struct Window *manager_get_window(struct Client *client, int id);
 
 struct Window *manager_get_window_at(Vec2i position);
 
-void manager_broadcast_event(Event event);
-
 void manager_register_window(struct Window *window);
 
 void manager_unregister_window(struct Window *window);

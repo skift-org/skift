@@ -28,9 +28,9 @@ public:
 
     Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon);
 
-    Button(Widget *parent, ButtonStyle style, const char *text);
+    Button(Widget *parent, ButtonStyle style, String text);
 
-    Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, const char *text);
+    Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text);
 
     void paint(Painter &painter, Rectangle rectangle);
 

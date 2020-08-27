@@ -1,21 +1,20 @@
 #pragma once
 
+#include <libutils/String.h>
 #include <libwidget/Widget.h>
 
 class Label : public Widget
 {
 private:
-    char *_text = nullptr;
+    String _text = "Label";
     Position _position = Position::LEFT;
 
 public:
-    void text(const char *text);
+    void text(String text) { _text = text; }
 
-    Label(Widget *parent, const char *text);
+    Label(Widget *parent, String text);
 
-    Label(Widget *parent, const char *text, Position position);
-
-    ~Label();
+    Label(Widget *parent, String text, Position position);
 
     void paint(Painter &painter, Rectangle rectangle);
 

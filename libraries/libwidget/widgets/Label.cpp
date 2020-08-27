@@ -3,35 +3,16 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Label.h>
 
-void Label::text(const char *text)
-{
-    if (text)
-    {
-        if (_text)
-            free(_text);
-
-        _text = strdup(text);
-
-        should_repaint();
-    }
-}
-
-Label::Label(Widget *parent, const char *text)
+Label::Label(Widget *parent, String text)
     : Label(parent, text, Position::LEFT)
 {
 }
 
-Label::Label(Widget *parent, const char *text, Position position)
+Label::Label(Widget *parent, String text, Position position)
     : Widget(parent)
 {
-    this->text(text);
+    _text = text;
     _position = position;
-}
-
-Label::~Label()
-{
-    if (_text)
-        free(_text);
 }
 
 void Label::paint(Painter &painter, Rectangle rectangle)
@@ -40,7 +21,7 @@ void Label::paint(Painter &painter, Rectangle rectangle)
 
     painter.draw_string_within(
         *font(),
-        _text,
+        _text.cstring(),
         bound(),
         _position,
         color(THEME_FOREGROUND));
@@ -48,5 +29,5 @@ void Label::paint(Painter &painter, Rectangle rectangle)
 
 Vec2i Label::size()
 {
-    return font()->mesure_string(_text).size();
+    return font()->mesure_string(_text.cstring()).size();
 }

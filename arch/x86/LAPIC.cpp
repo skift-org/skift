@@ -3,6 +3,8 @@
 #include "arch/x86/LAPIC.h"
 #include "arch/x86/PIC.h"
 
+constexpr int LAPIC_EOI = 0x00B0;
+
 static volatile uint32_t *lapic = nullptr;
 
 void lapic_found(uintptr_t address)

@@ -2,14 +2,18 @@
 
 #include "kernel/acpi/tables/SDTH.h"
 
+enum class MADTRecordType : uint8_t
+{
+    LAPIC = 0,
+    IOAPIC = 1,
+    ISO = 2,
+    NMI = 4,
+    LAPIC_OVERRIDE = 5,
+};
+
 struct __packed MADTRecord
 {
-#define MADTH_LAPIC (0)
-#define MADTH_IOAPIC (1)
-#define MADTH_ISO (2)
-#define MADTH_NMI (4)
-#define MADTH_LAPIC_OVERRIDE (5)
-    uint8_t type;
+    MADTRecordType type;
     uint8_t lenght;
 };
 

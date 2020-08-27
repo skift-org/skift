@@ -16,14 +16,14 @@ void acpi_madt_initialize(MADT *madt)
     madt->foreach_record([](auto record) {
         switch (record->type)
         {
-        case MADTH_LAPIC:
+        case MADTRecordType::LAPIC:
         {
             auto local_apic = reinterpret_cast<MADTLocalApicRecord *>(record);
             logger_info("Local APIC (cpu_id=%d, apic_id=%d, flags=%08x)", local_apic->processor_id, local_apic->apic_id, local_apic->flags);
         }
         break;
 
-        case MADTH_IOAPIC:
+        case MADTRecordType::IOAPIC:
         {
             auto ioapic = reinterpret_cast<MADTIOApicRecord *>(record);
             logger_info("I/O APIC (id=%d, address=%08x)", ioapic->id, ioapic->address);
@@ -31,15 +31,15 @@ void acpi_madt_initialize(MADT *madt)
         }
         break;
 
-        case MADTH_ISO:
+        case MADTRecordType::ISO:
             logger_info("Interrupt Source Override");
             break;
 
-        case MADTH_NMI:
+        case MADTRecordType::NMI:
             logger_info("Non-maskable interrupts");
             break;
 
-        case MADTH_LAPIC_OVERRIDE:
+        case MADTRecordType::LAPIC_OVERRIDE:
             logger_info("Local APIC Address Override");
             break;
 

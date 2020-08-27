@@ -138,7 +138,8 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) grub.cfg
 	@mkdir -p $(BOOTROOT)/boot/grub
 	@cp grub.cfg $(BOOTROOT)/boot/grub/
 
-	@grub-mkrescue -o $@ $(BOOTROOT) || grub2-mkrescue -o $@ $(BOOTROOT)
+	@grub-mkrescue -o $@ $(BOOTROOT) || \
+	 grub2-mkrescue -o $@ $(BOOTROOT)
 
 # --- Phony ---------------------------------------------- #
 

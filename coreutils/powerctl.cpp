@@ -7,5 +7,8 @@ int main(int argc, char **argv)
     if (argc == 2 && String(argv[1]) == "--reboot")
         __syscall(SYS_SYSTEM_REBOOT);
 
-    return 0;
+    else if (argc == 2 && String(argv[1]) == "--shutdown")
+        __syscall(SYS_SYSTEM_SHUTDOWN);
+
+    return -1;
 }

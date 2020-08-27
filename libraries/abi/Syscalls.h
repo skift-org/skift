@@ -28,6 +28,7 @@
     __ENTRY(SYS_SYSTEM_GET_TIME)       \
     __ENTRY(SYS_SYSTEM_GET_TICKS)      \
     __ENTRY(SYS_SYSTEM_REBOOT)         \
+    __ENTRY(SYS_SYSTEM_SHUTDOWN)       \
                                        \
     __ENTRY(SYS_HANDLE_OPEN)           \
     __ENTRY(SYS_HANDLE_CLOSE)          \

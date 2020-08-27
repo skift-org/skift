@@ -5,8 +5,6 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 
-extern "C" void __reboot();
-
 void system_hang()
 {
     while (true)
@@ -19,8 +17,6 @@ void system_stop()
 {
     arch_disable_interupts();
     logger_info("System stopped!");
-
-    __reboot();
 
     while (1)
     {

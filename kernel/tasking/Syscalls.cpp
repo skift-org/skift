@@ -258,13 +258,15 @@ Result sys_system_get_ticks(uint32_t *tick)
     return SUCCESS;
 }
 
-extern "C" void __reboot();
-
 Result sys_system_reboot()
 {
-    logger_info("Rebooting...");
-    __reboot();
+    arch_reboot();
+    ASSERT_NOT_REACHED();
+}
 
+Result sys_system_shutdown()
+{
+    arch_shutdown();
     ASSERT_NOT_REACHED();
 }
 
@@ -444,6 +446,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),
     [SYS_SYSTEM_GET_TICKS] = reinterpret_cast<SyscallHandler>(sys_system_get_ticks),
     [SYS_SYSTEM_REBOOT] = reinterpret_cast<SyscallHandler>(sys_system_reboot),
+    [SYS_SYSTEM_SHUTDOWN] = reinterpret_cast<SyscallHandler>(sys_system_shutdown),
     [SYS_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(sys_handle_open),
     [SYS_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(sys_handle_close),
     [SYS_HANDLE_SELECT] = reinterpret_cast<SyscallHandler>(sys_handle_select),

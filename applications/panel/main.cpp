@@ -27,14 +27,14 @@ int main(int argc, char **argv)
         window->bound(window_bound(window).with_width(event->display.size.x()));
     });
 
-    window_root(window)->layout(VFLOW(0));
+    window->root()->layout(VFLOW(0));
 
-    auto panel_container = new Container(window_root(window));
+    auto panel_container = new Container(window->root());
     panel_container->attributes(LAYOUT_FILL);
     panel_container->layout(HFLOW(8));
     panel_container->insets(Insets(4));
 
-    new Separator(window_root(window));
+    new Separator(window->root());
 
     auto menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     graph_container->on(Event::MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

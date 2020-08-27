@@ -146,13 +146,13 @@ int main(int argc, char **argv)
     window->position(Vec2i::zero());
     window->size(Vec2i(320, screen_get_bound().height()));
 
-    window_root(window)->layout(HFLOW(0));
+    window->root()->layout(HFLOW(0));
 
-    menu_create_list(window_root(window), menu);
+    menu_create_list(window->root(), menu);
 
-    new Separator(window_root(window));
+    new Separator(window->root());
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

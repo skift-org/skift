@@ -57,10 +57,10 @@ int main(int argc, char **argv)
         window->title("Terminal");
         window->size(Vec2i(500, 400));
 
-        Widget *widget = new TerminalWidget(window_root(window));
+        Widget *widget = new TerminalWidget(window->root());
         widget->focus();
 
-        window_show(window);
+        window->show();
 
         return application_run();
     }

@@ -11,12 +11,12 @@ int main(int argc, char **argv)
     window->title("Widget Factory");
     window->size(Vec2i(500, 400));
 
-    window_root(window)->layout(VFLOW(8));
+    window->root()->layout(VFLOW(8));
 
-    new Panel(window_root(window));
-    new Panel(window_root(window));
+    new Panel(window->root());
+    new Panel(window->root());
 
-    Widget *panel_hflow = new Container(window_root(window));
+    Widget *panel_hflow = new Container(window->root());
     {
         panel_hflow->layout(HFLOW(8));
 
@@ -36,8 +36,8 @@ int main(int argc, char **argv)
         p3->attributes(LAYOUT_FILL);
     }
 
-    new Label(window_root(window), "Buttons", Position::CENTER);
-    Widget *buttons = new Container(window_root(window));
+    new Label(window->root(), "Buttons", Position::CENTER);
+    Widget *buttons = new Container(window->root());
     {
         buttons->layout(HFLOW(8));
         buttons->insets(Insets(0, 8));
@@ -50,9 +50,9 @@ int main(int argc, char **argv)
         new Button(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
     }
 
-    new Label(window_root(window), "Grid layout", Position::CENTER);
+    new Label(window->root(), "Grid layout", Position::CENTER);
 
-    Widget *panel_grid = new Container(window_root(window));
+    Widget *panel_grid = new Container(window->root());
     {
         panel_grid->layout(GRID(3, 3, 4, 4));
         panel_grid->attributes(LAYOUT_FILL);
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         new Panel(panel_grid);
     }
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

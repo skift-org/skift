@@ -38,12 +38,12 @@ void menu_show(Menu *menu)
     Window *window = window_create(WINDOW_POP_OVER | WINDOW_BORDERLESS);
     window->size(Vec2i(128, menu->items->count() * 32));
 
-    window_root(window)->layout(VGRID(4));
+    window->root()->layout(VGRID(4));
 
     list_foreach(Menu, item, menu->items)
     {
-        new Button(window_root(window), BUTTON_TEXT, item->icon, item->text);
+        new Button(window->root(), BUTTON_TEXT, item->icon, item->text);
     }
 
-    window_show(window);
+    window->show();
 }

@@ -19,24 +19,24 @@ void window_populate_header(Window *window)
 {
     window->header_container->clear_childs();
 
-    window_header(window)->layout(HFLOW(4));
-    window_header(window)->insets(Insets(6, 6));
+    window->header()->layout(HFLOW(4));
+    window->header()->insets(Insets(6, 6));
 
     new Button(
-        window_header(window),
+        window->header(),
         BUTTON_TEXT,
         window->_icon,
         window->_title);
 
-    auto spacer = new Container(window_header(window));
+    auto spacer = new Container(window->header());
     spacer->attributes(LAYOUT_FILL);
 
     if (window->flags & WINDOW_RESIZABLE)
     {
-        Widget *button_minimize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-minimize"));
+        Widget *button_minimize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-minimize"));
         button_minimize->insets(Insets(3));
 
-        Widget *button_maximize = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-maximize"));
+        Widget *button_maximize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-maximize"));
         button_maximize->insets(Insets(3));
         button_maximize->on(Event::ACTION, [window](auto) {
             Event maximise_event = {};
@@ -45,7 +45,7 @@ void window_populate_header(Window *window)
         });
     }
 
-    Widget *close_button = new Button(window_header(window), BUTTON_TEXT, Icon::get("window-close"));
+    Widget *close_button = new Button(window->header(), BUTTON_TEXT, Icon::get("window-close"));
     close_button->insets(Insets(3));
 
     close_button->on(Event::ACTION, [window](auto) {
@@ -104,7 +104,7 @@ void window_destroy(Window *window)
 {
     if (window->visible)
     {
-        window_hide(window);
+        window->hide();
     }
 
     application_remove_window(window);
@@ -148,33 +148,28 @@ bool window_is_visible(Window *window)
     return window->visible;
 }
 
-void window_show(Window *window)
+void Window::show()
 {
-    if (window->visible)
+    if (visible)
         return;
 
-    window->visible = true;
+    visible = true;
 
-    window_change_framebuffer_if_needed(window);
-    window_schedule_layout(window);
-    window_schedule_update(window, window_bound(window));
-    application_show_window(window);
+    window_change_framebuffer_if_needed(this);
+    window_schedule_layout(this);
+    window_schedule_update(this, window_bound(this));
+    application_show_window(this);
 }
 
-void window_show_dialog(Window *window)
+void Window::hide()
 {
-    window_show(window);
-}
+    event_cancel_run_later_for(this);
 
-void window_hide(Window *window)
-{
-    event_cancel_run_later_for(window);
-
-    if (!window->visible)
+    if (!visible)
         return;
 
-    window->visible = false;
-    application_hide_window(window);
+    visible = false;
+    application_hide_window(this);
 }
 
 Rectangle window_header_bound(Window *window)
@@ -208,23 +203,23 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 
     if (window_content_bound(window).containe(rectangle))
     {
-        if (window_root(window))
+        if (window->root())
         {
-            window_root(window)->repaint(painter, rectangle);
+            window->root()->repaint(painter, rectangle);
         }
     }
     else
     {
-        if (window_root(window))
+        if (window->root())
         {
-            window_root(window)->repaint(painter, rectangle);
+            window->root()->repaint(painter, rectangle);
         }
 
         if (!(window->flags & WINDOW_BORDERLESS))
         {
-            if (window_header(window))
+            if (window->header())
             {
-                window_header(window)->repaint(painter, rectangle);
+                window->header()->repaint(painter, rectangle);
             }
 
             painter.draw_rectangle(window_bound(window), window_get_color(window, THEME_ACCENT));
@@ -286,9 +281,9 @@ void window_do_resize(Window *window, Vec2i mouse_position)
                         .with_height(window_bound_on_screen(window).height());
     }
 
-    Vec2i content_size = window_root(window)->compute_size();
+    Vec2i content_size = window->root()->compute_size();
 
-    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(window_header(window)->compute_size().x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
+    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(window->header()->compute_size().x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
     new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
 
     window->bound(new_bound);
@@ -301,14 +296,14 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (window_root(window)->bound().containe(position))
+    if (window->root()->bound().containe(position))
     {
-        return window_root(window)->child_at(position);
+        return window->root()->child_at(position);
     }
 
-    if (window_header(window)->bound().containe(position))
+    if (window->header()->bound().containe(position))
     {
-        return window_header(window)->child_at(position);
+        return window->header()->child_at(position);
     }
 
     return nullptr;
@@ -359,14 +354,14 @@ void window_event(Window *window, Event *event)
 
         if (window->flags & WINDOW_POP_OVER)
         {
-            window_hide(window);
+            window->hide();
         }
     }
     break;
 
     case Event::WINDOW_CLOSING:
     {
-        window_hide(window);
+        window->hide();
     }
     break;
 
@@ -450,7 +445,7 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_BUTTON_PRESS:
     {
-        if (window_root(window)->bound().containe(event->mouse.position))
+        if (window->root()->bound().containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -463,9 +458,9 @@ void window_event(Window *window, Event *event)
 
         if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && window_header(window)->bound().containe(event->mouse.position))
+            if (!event->accepted && window->header()->bound().containe(event->mouse.position))
             {
-                Widget *widget = window_header(window)->child_at(event->mouse.position);
+                Widget *widget = window->header()->child_at(event->mouse.position);
 
                 if (widget)
                 {
@@ -523,7 +518,7 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_DOUBLE_CLICK:
     {
-        if (window_root(window)->bound().containe(event->mouse.position))
+        if (window->root()->bound().containe(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -734,11 +729,11 @@ void window_schedule_update(Window *window, Rectangle rectangle)
 
 void window_layout(Window *window)
 {
-    window_header(window)->bound(window_header_bound(window));
-    window_header(window)->relayout();
+    window->header()->bound(window_header_bound(window));
+    window->header()->relayout();
 
-    window_root(window)->bound(window_content_bound(window));
-    window_root(window)->relayout();
+    window->root()->bound(window_content_bound(window));
+    window->root()->relayout();
 
     window->dirty_layout = false;
 }

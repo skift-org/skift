@@ -93,7 +93,7 @@ Window *file_explorer_window_create(const char *current_path)
     window->title("File Explorer");
     window->size(Vec2i(700, 500));
 
-    Widget *root = window_root(window);
+    Widget *root = window->root();
     root->layout(VFLOW(0));
 
     window->current_path = path_create(current_path);
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     Window *window = file_explorer_window_create("/User");
-    window_show(window);
+    window->show();
 
     return application_run();
 }

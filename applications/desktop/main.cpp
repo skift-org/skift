@@ -15,16 +15,16 @@ int main(int argc, char **argv)
         window->bound(window_bound(window).resized(event->display.size));
     });
 
-    window_root(window)->layout(STACK());
+    window->root()->layout(STACK());
 
     if (argc == 2)
     {
         auto wallpaper = Bitmap::load_from_or_placeholder(argv[1]);
-        auto background = new Image(window_root(window), wallpaper);
+        auto background = new Image(window->root(), wallpaper);
         background->change_scaling(ImageScalling::STRETCH);
     }
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

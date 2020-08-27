@@ -119,10 +119,10 @@ int main(int argc, char **argv)
     window->title("Task Manager");
     window->size(Vec2i(700, 500));
 
-    window_root(window)->layout(VFLOW(0));
+    window->root()->layout(VFLOW(0));
 
     /// --- Toolbar --- ///
-    auto toolbar = toolbar_create(window_root(window));
+    auto toolbar = toolbar_create(window->root());
     new Button(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
 
     auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
@@ -133,13 +133,13 @@ int main(int argc, char **argv)
     /// --- Table view --- //
     window->table_model = task_model_create();
 
-    window->table = new Table(window_root(window), window->table_model);
+    window->table = new Table(window->root(), window->table_model);
     window->table->attributes(LAYOUT_FILL);
     window->table_timer = make<Timer>(1000, [&]() { widget_table_update(window); });
     window->table_timer->start();
 
     /// --- Graphs --- ///
-    auto graphs_container = new Panel(window_root(window));
+    auto graphs_container = new Panel(window->root());
     graphs_container->layout(HFLOW(0));
     graphs_container->max_height(96);
 
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     window->ram_timer = make<Timer>(500, [&]() { widget_ram_update(window); });
     window->ram_timer->start();
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

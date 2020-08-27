@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
     Window *window = window_create_from_file("/Applications/calculator/calculator.markup");
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

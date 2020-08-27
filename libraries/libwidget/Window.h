@@ -58,14 +58,28 @@ struct Window
 
 public:
     void title(const char *title);
+
     void icon(RefPtr<Icon> icon);
+
     void size(Vec2i size);
+
     void position(Vec2i position);
+
     void bound(Rectangle bound);
+
     void type(WindowType type);
+
     WindowType type() { return _type; }
 
+    Widget *root() { return root_container; }
+
+    Widget *header() { return header_container; }
+
     void on(EventType event, EventHandler handler);
+
+    void show();
+
+    void hide();
 };
 
 Window *window_create(WindowFlag flags);
@@ -73,10 +87,6 @@ Window *window_create(WindowFlag flags);
 void window_initialize(Window *window, WindowFlag flags);
 
 void window_destroy(Window *window);
-
-void window_show(Window *window);
-
-void window_hide(Window *window);
 
 bool window_is_visible(Window *window);
 
@@ -105,10 +115,6 @@ int window_handle(Window *window);
 int window_frontbuffer_handle(Window *window);
 
 int window_backbuffer_handle(Window *window);
-
-Widget *window_root(Window *window);
-
-Widget *window_header(Window *window);
 
 void window_schedule_update(Window *window, Rectangle rectangle);
 

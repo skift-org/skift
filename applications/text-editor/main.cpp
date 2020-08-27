@@ -21,9 +21,9 @@ int main(int argc, char **argv)
 
     window->size(Vec2i(700, 500));
 
-    window_root(window)->layout(VFLOW(0));
+    window->root()->layout(VFLOW(0));
 
-    auto toolbar = toolbar_create(window_root(window));
+    auto toolbar = toolbar_create(window->root());
     toolbar_icon_create(toolbar, Icon::get("folder-open"));
     toolbar_icon_create(toolbar, Icon::get("content-save"));
     toolbar_icon_create(toolbar, Icon::get("file-plus"));
@@ -35,11 +35,11 @@ int main(int argc, char **argv)
         model = TextModel::from_file(argv[1]);
     }
 
-    auto field = new TextField(window_root(window), model);
+    auto field = new TextField(window->root(), model);
     field->attributes(LAYOUT_FILL);
     field->focus();
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

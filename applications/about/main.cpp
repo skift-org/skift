@@ -38,7 +38,7 @@ int main(int argc, char **argv)
         });
     }
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

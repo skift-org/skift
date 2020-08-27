@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
         Window *window = window_create_from_file(argv[1]);
 
-        window_show(window);
+        window->show();
 
         return application_run();
     }

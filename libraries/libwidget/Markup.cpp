@@ -364,8 +364,8 @@ Window *window_create_from_file(const char *path)
     MarkupNode *root = markup_parse_file(path);
 
     Window *window = window_create_from_markup(root);
-    widget_apply_attribute_from_markup(window_root(window), root);
-    widget_create_childs_from_markup(window_root(window), root);
+    widget_apply_attribute_from_markup(window->root(), root);
+    widget_create_childs_from_markup(window->root(), root);
 
     markup_node_destroy(root);
 

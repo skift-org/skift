@@ -30,15 +30,15 @@ int main(int argc, char **argv)
     window->title("Device Manager");
     window->size(Vec2i(700, 500));
 
-    window_root(window)->layout(VFLOW(0));
+    window->root()->layout(VFLOW(0));
 
     /// --- Table view --- //
     window->table_model = device_model_create();
 
-    window->table = new Table(window_root(window), (Model *)window->table_model);
+    window->table = new Table(window->root(), (Model *)window->table_model);
     window->table->attributes(LAYOUT_FILL);
 
-    window_show(window);
+    window->show();
 
     return application_run();
 }

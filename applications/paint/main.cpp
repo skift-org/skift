@@ -170,7 +170,7 @@ static Window *paint_create_window(RefPtr<PaintDocument> document)
 
     window->document = document;
 
-    Widget *root = window_root(window);
+    Widget *root = window->root();
     root->layout(VFLOW(0));
 
     create_toolbar(window, root);
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
     auto bitmap = Bitmap::create_shared(400, 400).take_value();
     bitmap->clear(RGBA(0, 0, 0, 0));
     auto document = make<PaintDocument>(bitmap);
-    window_show(paint_create_window(document));
+    paint_create_window(document)->show();
 
     return application_run();
 }

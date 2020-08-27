@@ -13,13 +13,16 @@ DemoWidget::DemoWidget(Widget *parent)
     : Widget(parent)
 {
     _demo = nullptr;
-    _timer = timer_create(this, 1000 / 60, (TimerCallback)demo_widget_on_timer_tick);
-    timer_start(_timer);
+    _timer = make<Timer>(1000 / 60, [this]() {
+        tick();
+        should_repaint();
+    });
+
+    _timer->start();
 }
 
 DemoWidget::~DemoWidget()
 {
-    timer_destroy(_timer);
 }
 
 void DemoWidget::paint(Painter &painter, Rectangle)

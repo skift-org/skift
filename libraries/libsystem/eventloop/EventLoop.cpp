@@ -15,7 +15,7 @@ struct RunLater
     void *target;
 };
 
-static List *_eventloop_timers = nullptr;
+static Vector<Timer *> _eventloop_timers;
 static TimeStamp _eventloop_timer_last_fire = 0;
 
 static List *_eventloop_notifiers = nullptr;
@@ -36,7 +36,6 @@ void eventloop_initialize()
 {
     assert(!_eventloop_is_initialize);
 
-    _eventloop_timers = list_create();
     _eventloop_timer_last_fire = system_get_ticks();
 
     _eventloop_notifiers = list_create();
@@ -50,7 +49,6 @@ void eventloop_uninitialize()
     assert(_eventloop_is_initialize);
 
     list_destroy(_eventloop_notifiers);
-    list_destroy(_eventloop_timers);
     delete _eventloop_run_later;
 
     _eventloop_is_initialize = false;
@@ -95,17 +93,16 @@ static Timeout eventloop_get_timeout()
 
     TimeStamp current_tick = system_get_ticks();
 
-    list_foreach(Timer, timer, _eventloop_timers)
-    {
-        if (timer->started && timer->interval != 0)
+    _eventloop_timers.foreach ([&](auto timer) {
+        if (timer->running() && timer->interval() != 0)
         {
-            if (timer->scheduled < current_tick)
+            if (timer->scheduled() < current_tick)
             {
                 timeout = 0;
             }
             else
             {
-                Timeout remaining = timer->scheduled - current_tick;
+                Timeout remaining = timer->scheduled() - current_tick;
 
                 if (remaining <= timeout)
                 {
@@ -113,7 +110,9 @@ static Timeout eventloop_get_timeout()
                 }
             }
         }
-    }
+
+        return Iteration::CONTINUE;
+    });
 
     return timeout;
 }
@@ -124,23 +123,17 @@ void eventloop_update_timers()
 
     TimeStamp current_fire = system_get_ticks();
 
-    list_foreach(Timer, timer, _eventloop_timers)
-    {
-        if (!timer->started)
+    auto timers_list_copy = _eventloop_timers;
+
+    timers_list_copy.foreach ([&](auto timer) {
+        if (timer->running() && timer->scheduled() <= current_fire)
         {
-            continue;
+            timer->trigger();
+            timer->schedule(current_fire + timer->interval());
         }
 
-        if (timer->scheduled <= current_fire)
-        {
-            if (timer->callback)
-            {
-                timer->callback(timer->target);
-            }
-
-            timer->scheduled = current_fire + timer->interval;
-        }
-    }
+        return Iteration::CONTINUE;
+    });
 
     _eventloop_timer_last_fire = current_fire;
 }
@@ -245,14 +238,13 @@ void eventloop_register_timer(struct Timer *timer)
 {
     assert(_eventloop_is_initialize);
 
-    list_pushback(_eventloop_timers, timer);
+    _eventloop_timers.push_back(timer);
 }
 
 void eventloop_unregister_timer(struct Timer *timer)
 {
     assert(_eventloop_is_initialize);
-
-    list_remove(_eventloop_timers, timer);
+    _eventloop_timers.remove_value(timer);
 }
 
 void eventloop_run_later(RunLaterCallback callback, void *target)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/Assert.h>
+
 template <typename T>
 class OwnPtr
 {

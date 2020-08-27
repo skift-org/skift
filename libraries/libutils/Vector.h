@@ -53,8 +53,6 @@ public:
 
     Vector(Vector &other)
     {
-        ASSERT_NOT_REACHED();
-
         ensure_capacity(other.count());
 
         _count = other.count();

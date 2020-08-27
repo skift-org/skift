@@ -12,9 +12,9 @@ struct TaskManagerWindow : public Window
 {
     /// --- Graphs --- ///
     Graph *ram_graph;
-    Timer *ram_timer;
+    RefPtr<Timer> ram_timer;
     Graph *cpu_graph;
-    Timer *cpu_timer;
+    RefPtr<Timer> cpu_timer;
 
     // --- CPU/RAM stats --- //
     Label *ram_usage;
@@ -28,7 +28,7 @@ struct TaskManagerWindow : public Window
     /// --- Table view --- //
     Table *table;
     TaskModel *table_model;
-    Timer *table_timer;
+    RefPtr<Timer> table_timer;
 };
 
 void widget_ram_update(TaskManagerWindow *window)
@@ -135,8 +135,8 @@ int main(int argc, char **argv)
 
     window->table = new Table(window_root(window), window->table_model);
     window->table->attributes(LAYOUT_FILL);
-    window->table_timer = timer_create(window, 1000, (TimerCallback)widget_table_update);
-    timer_start(window->table_timer);
+    window->table_timer = make<Timer>(1000, [&]() { widget_table_update(window); });
+    window->table_timer->start();
 
     /// --- Graphs --- ///
     auto graphs_container = new Panel(window_root(window));
@@ -160,8 +160,8 @@ int main(int argc, char **argv)
     window->cpu_greedy = new Label(window->cpu_graph, "Most greedy: nil", Position::RIGHT);
     window->cpu_uptime = new Label(window->cpu_graph, "Uptime: nil", Position::RIGHT);
 
-    window->cpu_timer = timer_create(window, 100, (TimerCallback)widget_cpu_update);
-    timer_start(window->cpu_timer);
+    window->cpu_timer = make<Timer>(100, [&]() { widget_cpu_update(window); });
+    window->cpu_timer->start();
 
     new Separator(graphs_container);
 
@@ -182,8 +182,8 @@ int main(int argc, char **argv)
     window->ram_avaliable = new Label(window->ram_graph, "Avaliable: nil Mio", Position::RIGHT);
     window->ram_greedy = new Label(window->ram_graph, "Most greedy: nil", Position::RIGHT);
 
-    window->ram_timer = timer_create(window, 500, (TimerCallback)widget_ram_update);
-    timer_start(window->ram_timer);
+    window->ram_timer = make<Timer>(500, [&]() { widget_ram_update(window); });
+    window->ram_timer->start();
 
     window_show(window);
 

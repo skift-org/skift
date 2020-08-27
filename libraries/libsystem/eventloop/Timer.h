@@ -1,25 +1,37 @@
 #pragma once
 
 #include <libsystem/Time.h>
+#include <libutils/Callback.h>
+#include <libutils/RefPtr.h>
 
-struct Timer;
-
-typedef void (*TimerCallback)(void *target);
-
-struct Timer
+class Timer : public RefCounted<Timer>
 {
-    void *target;
-    TimerCallback callback;
+private:
+    bool _running = false;
+    TimeStamp _scheduled = 0;
+    Timeout _interval = 0;
+    Callback<void()> _callback;
 
-    bool started;
-    Timeout interval;
-    TimeStamp scheduled;
+public:
+    auto running() { return _running; }
+
+    auto interval() { return _interval; }
+
+    auto scheduled() { return _scheduled; }
+
+    void schedule(TimeStamp when) { _scheduled = when; }
+
+    void trigger()
+    {
+        //logger_trace("Timer triggered %08x!", this);
+        _callback();
+    }
+
+    Timer(Timeout interval, Callback<void()> callback);
+
+    ~Timer();
+
+    void start();
+
+    void stop();
 };
-
-Timer *timer_create(void *target, Timeout interval, TimerCallback callback);
-
-void timer_destroy(Timer *timer);
-
-void timer_start(Timer *timer);
-
-void timer_stop(Timer *timer);

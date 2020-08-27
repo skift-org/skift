@@ -1,40 +1,31 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Timer.h>
 
-Timer *timer_create(void *target, Timeout interval, TimerCallback callback)
+Timer::Timer(Timeout interval, Callback<void()> callback)
+    : _interval(interval),
+      _callback(callback)
 {
-    Timer *timer = __create(Timer);
-
-    timer->target = target;
-    timer->interval = interval;
-    timer->callback = callback;
-
-    timer->started = false;
-    timer->scheduled = 0;
-
-    eventloop_register_timer(timer);
-
-    return timer;
 }
 
-void timer_destroy(Timer *timer)
+Timer::~Timer()
 {
-    eventloop_unregister_timer(timer);
+    stop();
+}
 
-    if (timer->started)
+void Timer::start()
+{
+    if (!_running)
     {
-        timer_stop(timer);
+        _running = true;
+        eventloop_register_timer(this);
     }
-
-    free(timer);
 }
 
-void timer_start(Timer *timer)
+void Timer::stop()
 {
-    timer->started = true;
-}
-
-void timer_stop(Timer *timer)
-{
-    timer->started = false;
+    if (_running)
+    {
+        _running = false;
+        eventloop_unregister_timer(this);
+    }
 }

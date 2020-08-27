@@ -47,11 +47,6 @@ void repaint_callback(Terminal *terminal)
     terminal_repaint(terminal);
 }
 
-void cursor_callback(Terminal *terminal)
-{
-    terminal_blink(terminal);
-}
-
 int main(int argc, char **argv)
 {
     if (application_initialize(argc, argv) == SUCCESS)
@@ -105,8 +100,11 @@ int main(int argc, char **argv)
         notifier_create(terminal, HANDLE(keyboard), SELECT_READ, (NotifierCallback)keyboard_callback);
         notifier_create(terminal, HANDLE(master), SELECT_READ, (NotifierCallback)master_callback);
 
-        timer_start(timer_create(terminal, 250, (TimerCallback)cursor_callback));
-        timer_start(timer_create(terminal, 16, (TimerCallback)repaint_callback));
+        auto blink_timer = make<Timer>(250, [&]() { terminal_blink(terminal); });
+        blink_timer->start();
+
+        auto repaint_timer = make<Timer>(1000 / 60, [&]() { terminal_repaint(terminal); });
+        repaint_timer->start();
 
         Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell/shell");
         launchpad_handle(shell_launchpad, HANDLE(slave), 0);

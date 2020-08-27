@@ -26,16 +26,6 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     widget->should_repaint();
 }
 
-void terminal_widget_cursor_callback(TerminalWidget *widget)
-{
-    widget->blink();
-
-    int cx = widget->terminal()->cursor.x;
-    int cy = widget->terminal()->cursor.y;
-
-    widget->should_repaint(terminal::cell_bound(cx, cy).offset(widget->bound().position()));
-}
-
 Terminal *terminal_widget_renderer_create(TerminalWidget *terminal_widget)
 {
     TerminalWidgetRenderer *terminal_renderer = __create(TerminalWidgetRenderer);
@@ -60,8 +50,16 @@ TerminalWidget::TerminalWidget(Widget *parent)
         SELECT_READ,
         (NotifierCallback)terminal_widget_master_callback);
 
-    _cursor_blink_timer = timer_create(this, 250, (TimerCallback)terminal_widget_cursor_callback);
-    timer_start(_cursor_blink_timer);
+    _cursor_blink_timer = make<Timer>(250, [this]() {
+        blink();
+
+        int cx = terminal()->cursor.x;
+        int cy = terminal()->cursor.y;
+
+        should_repaint(terminal::cell_bound(cx, cy).offset(bound().position()));
+    });
+
+    _cursor_blink_timer->start();
 
     Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell/shell");
     launchpad_handle(shell_launchpad, HANDLE(_slave_stream), 0);
@@ -75,7 +73,6 @@ TerminalWidget::~TerminalWidget()
     terminal_destroy(_terminal);
 
     notifier_destroy(_master_notifier);
-    timer_destroy(_cursor_blink_timer);
 
     stream_close(_master_stream);
     stream_close(_slave_stream);

@@ -17,9 +17,9 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
 
     PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
 
-    MemoryRange range = memory_range_around_non_aligned_address(program_header->vaddr, program_header->memsz);
+    MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
 
-    task_memory_map(child_task, range.base, range.size, MEMORY_CLEAR);
+    task_memory_map(child_task, range.base(), range.size(), MEMORY_CLEAR);
 
     stream_seek(elf_file, program_header->offset, WHENCE_START);
     size_t read = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);

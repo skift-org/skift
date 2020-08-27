@@ -49,8 +49,8 @@ void multiboot_dump()
 
         logger_info("\t%d: %08p-%08p: %s",
                     i,
-                    entry->range.base,
-                    entry->range.base + entry->range.size - 1,
+                    entry->range.base(),
+                    entry->range.base() + entry->range.size() - 1,
                     entry_type_to_string[entry->type]);
     }
     logger_info("\t -> Usable memory: %dKio", _multiboot.memory_usable / 1024);
@@ -61,8 +61,8 @@ void multiboot_dump()
         Module *module = &_multiboot.modules[i];
         logger_info("\t%d: %08p-%08p: %s",
                     i,
-                    module->range.base,
-                    module->range.base + module->range.size - 1,
+                    module->range.base(),
+                    module->range.base() + module->range.size() - 1,
                     module->command_line);
     }
     logger_info("\t-> %d module found", _multiboot.modules_size);

@@ -132,7 +132,7 @@ void bga_initialize(DeviceInfo info)
                                   PAGE_ALIGN_UP(VBE_DISPI_MAX_XRES * VBE_DISPI_MAX_XRES * sizeof(uint32_t)),
                               },
                               MEMORY_NONE)
-                              .base;
+                              .base();
 
     if (framebuffer_virtual == 0)
     {

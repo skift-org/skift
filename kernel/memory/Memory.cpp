@@ -17,7 +17,7 @@ extern int __end;
 
 static MemoryRange kernel_memory_range()
 {
-    return memory_range_around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
+    return MemoryRange::around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
 }
 
 void memory_initialize(Multiboot *multiboot)
@@ -45,7 +45,7 @@ void memory_initialize(Multiboot *multiboot)
 
         if (entry->type == MEMORY_MAP_ENTRY_AVAILABLE)
         {
-            physical_set_free(entry->range.base, entry->range.size / PAGE_SIZE);
+            physical_set_free(entry->range.base(), entry->range.size() / PAGE_SIZE);
         }
     }
 
@@ -121,9 +121,9 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
 
     atomic_begin();
 
-    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
     {
-        uintptr_t virtual_address = virtual_range.base + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base() + i * PAGE_SIZE;
 
         if (!virtual_present(page_directory, virtual_address))
         {
@@ -140,7 +140,7 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)virtual_range.base, 0, virtual_range.size);
+        memset((void *)virtual_range.base(), 0, virtual_range.size());
 
     return SUCCESS;
 }
@@ -149,15 +149,15 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_r
 {
     assert(physical_range.is_page_aligned());
 
-    size_t page_count = physical_range.size / PAGE_SIZE;
+    size_t page_count = physical_range.size() / PAGE_SIZE;
 
     atomic_begin();
-    physical_set_used(physical_range.base, page_count);
-    virtual_map(page_directory, physical_range, physical_range.base, flags);
+    physical_set_used(physical_range.base(), page_count);
+    virtual_map(page_directory, physical_range, physical_range.base(), flags);
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)physical_range.base, 0, physical_range.size);
+        memset((void *)physical_range.base(), 0, physical_range.size());
 
     return SUCCESS;
 }
@@ -190,7 +190,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
         return ERR_OUT_OF_MEMORY;
     }
 
-    uintptr_t virtual_address = virtual_alloc(page_directory, (MemoryRange){physical_address, size}, flags).base;
+    uintptr_t virtual_address = virtual_alloc(page_directory, (MemoryRange){physical_address, size}, flags).base();
 
     if (!virtual_address)
     {
@@ -251,9 +251,9 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
 
     atomic_begin();
 
-    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
     {
-        uintptr_t virtual_address = virtual_range.base + i * PAGE_SIZE;
+        uintptr_t virtual_address = virtual_range.base() + i * PAGE_SIZE;
 
         if (virtual_present(page_directory, virtual_address))
         {

@@ -11,7 +11,7 @@
 void ramdisk_load(Module *module)
 {
     TARBlock block;
-    for (size_t i = 0; tar_read((void *)module->range.base, &block, i); i++)
+    for (size_t i = 0; tar_read((void *)module->range.base(), &block, i); i++)
     {
         Path *file_path = path_create(block.name);
 

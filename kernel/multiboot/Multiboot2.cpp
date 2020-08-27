@@ -57,7 +57,7 @@ void multiboot2_parse_memory_map(Multiboot *multiboot, struct multiboot_tag_mmap
 
         MemoryMapEntry *entry = &multiboot->memory_map[multiboot->memory_map_size];
 
-        entry->range = memory_range_from_non_aligned_address(mmap->addr, mmap->len);
+        entry->range = MemoryRange::from_non_aligned_address(mmap->addr, mmap->len);
 
         switch (mmap->type)
         {
@@ -87,7 +87,7 @@ void multiboot2_parse_module(Multiboot *multiboot, struct multiboot_tag_module *
     assert(multiboot->modules_size < MULTIBOOT_MODULES_SIZE);
 
     Module *module = &multiboot->modules[multiboot->modules_size];
-    module->range = memory_range_around_non_aligned_address(m->mod_start, m->mod_end - m->mod_start);
+    module->range = MemoryRange::around_non_aligned_address(m->mod_start, m->mod_end - m->mod_start);
     strncpy(module->command_line, (const char *)m->cmdline, MULTIBOOT_COMMAND_LINE_SIZE);
     multiboot->modules_size++;
 }

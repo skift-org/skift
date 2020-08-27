@@ -56,7 +56,7 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
 
 Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
-    for (size_t i = 0; i < physical_range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < physical_range.size() / PAGE_SIZE; i++)
     {
         size_t offset = i * PAGE_SIZE;
 
@@ -85,7 +85,7 @@ Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, ui
         page_table_entry.Present = 1;
         page_table_entry.Write = 1;
         page_table_entry.User = flags & MEMORY_USER;
-        page_table_entry.PageFrameNumber = (physical_range.base + offset) >> 12;
+        page_table_entry.PageFrameNumber = (physical_range.base() + offset) >> 12;
     }
 
     paging_invalidate_tlb();
@@ -114,7 +114,7 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
 
             current_size += PAGE_SIZE;
 
-            if (current_size == physical_range.size)
+            if (current_size == physical_range.size())
             {
                 virtual_map(page_directory, physical_range, virtual_address, flags);
 
@@ -132,16 +132,16 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
 
 void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
-    for (size_t i = 0; i < virtual_range.size / PAGE_SIZE; i++)
+    for (size_t i = 0; i < virtual_range.size() / PAGE_SIZE; i++)
     {
         size_t offset = i * PAGE_SIZE;
 
-        size_t page_directory_index = PD_INDEX(virtual_range.base + offset);
+        size_t page_directory_index = PD_INDEX(virtual_range.base() + offset);
         PageDirectoryEntry *page_directory_entry = &page_directory->entries[page_directory_index];
 
         PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * PAGE_SIZE);
 
-        size_t page_table_index = PT_INDEX(virtual_range.base + offset);
+        size_t page_table_index = PT_INDEX(virtual_range.base() + offset);
         PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
         if (page_table_entry->Present)

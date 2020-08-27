@@ -33,3 +33,5 @@ void memory_pdir_destroy(PageDirectory *pdir);
 void memory_pdir_dump(PageDirectory *pdir, bool user);
 
 void memory_pdir_switch(PageDirectory *pdir);
+
+void memory_map_me_later(MemoryRange range);

@@ -117,7 +117,7 @@ void textmode_initialize()
 {
     logger_info("Initializing textmode graphic");
 
-    _text_buffer = (uint16_t *)virtual_alloc(&kpdir, vga_physical_range(), MEMORY_NONE).base;
+    _text_buffer = (uint16_t *)virtual_alloc(&kpdir, vga_physical_range(), MEMORY_NONE).base();
 
     FsNode *textmode_device = __create(FsNode);
     fsnode_init(textmode_device, FILE_TYPE_DEVICE);

@@ -1,7 +1,7 @@
 #include <abi/Paths.h>
 
-#include <libsystem/math/MinMax.h>
 #include <libsystem/Logger.h>
+#include <libsystem/math/MinMax.h>
 #include <libsystem/thread/Atomic.h>
 
 #include "kernel/filesystem/Filesystem.h"
@@ -72,7 +72,7 @@ void framebuffer_initialize(Multiboot *multiboot)
                                    PAGE_ALIGN_UP(_framebuffer_width * _framebuffer_height * sizeof(uint32_t)),
                                },
                                MEMORY_NONE)
-                               .base;
+                               .base();
 
     if (_framebuffer_virtual == 0)
     {

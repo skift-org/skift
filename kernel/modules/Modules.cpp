@@ -27,8 +27,8 @@ void modules_initialize(Multiboot *multiboot)
 
         logger_info("\tModule %d: %08x-%08x: %s",
                     i,
-                    module->range.base,
-                    module->range.base + module->range.size - 1,
+                    module->range.base(),
+                    module->range.base() + module->range.size() - 1,
                     module->command_line);
 
         module_load(module);

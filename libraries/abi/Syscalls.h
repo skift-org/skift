@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/Result.h>
+
 #define SYSCALL_LIST(__ENTRY)          \
     __ENTRY(SYS_PROCESS_THIS)          \
     __ENTRY(SYS_PROCESS_LAUNCH)        \
@@ -49,12 +51,37 @@ enum Syscall
     SYSCALL_LIST(SYSCALL_ENUM_ENTRY) __SYSCALL_COUNT
 };
 
-static inline int __syscall(Syscall syscall, int p1, int p2, int p3, int p4, int p5)
+static inline Result __syscall(Syscall syscall, int p1, int p2, int p3, int p4, int p5)
 {
-    int __ret;
+    Result __ret;
     __asm__ __volatile__("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx"
                          : "=a"(__ret)
                          : "0"(syscall), "r"((int)(p1)), "c"((int)(p2)), "d"((int)(p3)), "S"((int)(p4)), "D"((int)(p5))
                          : "memory");
     return __ret;
+}
+
+static inline Result __syscall(Syscall syscall, int p1, int p2, int p3, int p4)
+{
+    return __syscall(syscall, p1, p2, p3, p4, 0);
+}
+
+static inline Result __syscall(Syscall syscall, int p1, int p2, int p3)
+{
+    return __syscall(syscall, p1, p2, p3, 0, 0);
+}
+
+static inline Result __syscall(Syscall syscall, int p1, int p2)
+{
+    return __syscall(syscall, p1, p2, 0, 0, 0);
+}
+
+static inline Result __syscall(Syscall syscall, int p1)
+{
+    return __syscall(syscall, p1, 0, 0, 0, 0);
+}
+
+static inline Result __syscall(Syscall syscall)
+{
+    return __syscall(syscall, 0, 0, 0, 0, 0);
 }

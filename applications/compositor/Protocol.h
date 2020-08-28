@@ -34,6 +34,7 @@ typedef unsigned int WindowFlag;
 
 enum WindowType
 {
+    WINDOW_TYPE_POPOVER,
     WINDOW_TYPE_PANEL,
     WINDOW_TYPE_DIALOG,
     WINDOW_TYPE_REGULAR,
@@ -130,7 +131,8 @@ struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union {
+    union
+    {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;

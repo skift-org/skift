@@ -119,9 +119,6 @@ void menu_create_list(Widget *parent, List *menu)
     list->attributes(LAYOUT_FILL);
     list->insets(Insets(4));
 
-    auto spacer = new Container(list);
-    spacer->min_height(32);
-
     list_foreach(MenuEntry, entry, menu)
     {
         auto item = new Button(list, BUTTON_TEXT, Icon::get(entry->icon), entry->name);
@@ -145,6 +142,7 @@ int main(int argc, char **argv)
     window->title("Panel");
     window->position(Vec2i::zero());
     window->bound(Screen::bound().with_width(320));
+    window->type(WINDOW_TYPE_POPOVER);
 
     window->root()->layout(HFLOW(0));
 

@@ -46,6 +46,9 @@ Iteration manager_iterate_by_type_front_to_back(WindowType type, Callback callba
 template <typename Callback>
 void manager_iterate_front_to_back(Callback callback)
 {
+    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_POPOVER, callback) == Iteration::STOP)
+        return;
+
     if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)
         return;
 

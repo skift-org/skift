@@ -59,6 +59,33 @@ void renderer_region_dirty(Rectangle new_region)
     }
 }
 
+void renderer_composite_region(Rectangle region, Window *window_transparent)
+{
+    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
+
+    manager_iterate_back_to_front([&](Window *window) {
+        if (window == window_transparent)
+        {
+            return Iteration::STOP;
+        }
+
+        if (window->bound().colide_with(region))
+        {
+            Rectangle destination = window->bound().clipped_with(region);
+
+            Rectangle source(
+                destination.position() - window->bound().position(),
+                destination.size());
+
+            _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+        }
+
+        return Iteration::CONTINUE;
+    });
+
+    _framebuffer->mark_dirty(region);
+}
+
 void renderer_region(Rectangle region)
 {
     bool should_paint_wallpaper = true;
@@ -77,7 +104,17 @@ void renderer_region(Rectangle region)
                 destination.position() - window->bound().position(),
                 destination.size());
 
-            _framebuffer->painter().blit_bitmap_no_alpha(window->frontbuffer(), source, destination);
+            if (window->flags() & WINDOW_TRANSPARENT)
+            {
+                renderer_composite_region(destination, window);
+                // _framebuffer->painter().blur_rectangle(destination, 16); blur is a bit buggy :/
+                _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+            }
+            else
+            {
+                _framebuffer->painter().blit_bitmap_no_alpha(window->frontbuffer(), source, destination);
+            }
+
             _framebuffer->mark_dirty(destination);
 
             Rectangle top;

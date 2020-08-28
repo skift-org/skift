@@ -27,8 +27,8 @@ enum CompositorMessageType
 #define WINDOW_BORDERLESS (1 << 0)
 #define WINDOW_RESIZABLE (1 << 1)
 #define WINDOW_ALWAYS_FOCUSED (1 << 2)
-#define WINDOW_POP_OVER (1 << 3)
-#define WINDOW_SWALLOW (1 << 4)
+#define WINDOW_SWALLOW (1 << 3)
+#define WINDOW_TRANSPARENT (1 << 4)
 
 typedef unsigned int WindowFlag;
 

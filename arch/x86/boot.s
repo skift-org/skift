@@ -94,7 +94,7 @@ _kstart:
 	; To set up a stack, we set the esp register to point to the top of our
 	; stack (as it grows downwards on x86 systems).
 	mov esp, __stack_top
-	mov ebp, esp
+	xor ebp, ebp
 
 	push eax ; Push the multiboot magic
 	push ebx ; Push the multiboot header adress.

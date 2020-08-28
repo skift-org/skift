@@ -18,11 +18,12 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
 
     window->title("Panel");
     window->type(WINDOW_TYPE_PANEL);
     window->bound(Screen::bound().take_top(36));
+    window->opacity(0.9);
     window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto) {
         window->bound(Screen::bound().take_top(32));
     });

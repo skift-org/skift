@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
     List *menu = load_menu();
 
-    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_POP_OVER);
+    Window *window = window_create(WINDOW_BORDERLESS);
 
     window->title("Panel");
     window->position(Vec2i::zero());

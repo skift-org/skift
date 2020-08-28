@@ -24,6 +24,8 @@ struct Window
     WindowFlag flags;
     WindowType _type;
 
+    float _opacity;
+
     bool focused;
     bool visible;
     bool is_dragging;
@@ -69,6 +71,8 @@ public:
     int y() { return position().y(); }
     int width() { return size().x(); }
     int height() { return size().y(); }
+
+    void opacity(float value) { _opacity = value; }
 
     Vec2i position() { return bound_on_screen().position(); }
 

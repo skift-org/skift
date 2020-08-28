@@ -8,7 +8,6 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     Window *window = window_create_from_file("/Applications/about/about.markup");
-
     window->type(WINDOW_TYPE_DIALOG);
 
     Image *system_image = nullptr;

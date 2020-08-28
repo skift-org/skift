@@ -191,7 +191,14 @@ Rectangle window_content_bound(Window *window)
 
 void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
-    painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND));
+    if (window->flags & WINDOW_TRANSPARENT)
+    {
+        painter.clear_rectangle(rectangle, ALPHA(window_get_color(window, THEME_BACKGROUND), window->_opacity));
+    }
+    else
+    {
+        painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND));
+    }
 
     painter.push();
     painter.clip(rectangle);
@@ -345,7 +352,7 @@ void window_event(Window *window, Event *event)
             window->mouse_over_widget->dispatch_event(&mouse_leave);
         }
 
-        if (window->flags & WINDOW_POP_OVER)
+        if (window->_type == WINDOW_TYPE_POPOVER)
         {
             window->hide();
         }

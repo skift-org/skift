@@ -27,22 +27,20 @@ BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/System/Includes
 BUILD_DIRECTORY_APPS=$(SYSROOT)/Applications
 BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
 
-# --- Configs -------------------------------------------- #
-CC:=i686-pc-skift-gcc
-CFLAGS= \
-	-O2 \
-	-std=gnu11 \
-	-MD \
-	\
+BUILD_OPTIMISATIONS:=-O2
+
+BUILD_WARNING:= \
 	-Wall \
 	-Wextra  \
 	-Werror \
-	\
+
+BUILD_INCLUDE:= \
 	-I. \
 	-Iapplications \
 	-Ilibraries \
-	-Ilibraries/libc \
-	\
+	-Ilibraries/libc
+
+BUILD_DEFINES:= \
 	-D__BUILD_ARCH__=\""$(BUILD_ARCH)"\" \
 	-D__BUILD_CONFIG__=\""$(BUILD_CONFIG)"\" \
 	-D__BUILD_SYSTEM__=\""$(BUILD_SYSTEM)"\" \
@@ -50,29 +48,26 @@ CFLAGS= \
 	-D__BUILD_GITREF__=\""$(BUILD_GITREF)"\" \
 	-D__BUILD_UNAME__=\""$(BUILD_UNAME)"\"
 
+# --- Configs -------------------------------------------- #
+CC:=i686-pc-skift-gcc
+CFLAGS= \
+	-std=gnu11 \
+	-MD \
+	$(BUILD_OPTIMISATIONS) \
+	$(BUILD_WARNING) \
+	$(BUILD_INCLUDE) \
+	$(BUILD_DEFINES)
+
 CXX:=i686-pc-skift-g++
 CXXFLAGS:= \
-	-O2 \
 	-std=c++20 \
 	-fno-rtti \
 	-fno-exceptions \
 	-MD \
-	\
-	-Wall \
-	-Wextra  \
-	-Werror \
-	\
-	-I. \
-	-Iapplications \
-	-Ilibraries \
-	-Ilibraries/libc \
-	\
-	-D__BUILD_ARCH__=\""$(BUILD_ARCH)"\" \
-	-D__BUILD_CONFIG__=\""$(BUILD_CONFIG)"\" \
-	-D__BUILD_SYSTEM__=\""$(BUILD_SYSTEM)"\" \
-	-D__BUILD_TARGET__=\""$(BUILD_TARGET)"\" \
-	-D__BUILD_GITREF__=\""$(BUILD_GITREF)"\" \
-	-D__BUILD_UNAME__=\""$(BUILD_UNAME)"\"
+	$(BUILD_OPTIMISATIONS) \
+	$(BUILD_WARNING) \
+	$(BUILD_INCLUDE) \
+	$(BUILD_DEFINES)
 
 LD:=i686-pc-skift-ld
 LDFLAGS:=

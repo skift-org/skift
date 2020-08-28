@@ -107,7 +107,7 @@ void renderer_region(Rectangle region)
             if (window->flags() & WINDOW_TRANSPARENT)
             {
                 renderer_composite_region(destination, window);
-                // _framebuffer->painter().blur_rectangle(destination, 16); blur is a bit buggy :/
+                _framebuffer->painter().blur_rectangle(destination, 16);
                 _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
             }
             else

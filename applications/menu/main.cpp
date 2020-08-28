@@ -137,12 +137,13 @@ int main(int argc, char **argv)
 
     List *menu = load_menu();
 
-    Window *window = window_create(WINDOW_BORDERLESS);
+    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_TRANSPARENT);
 
     window->title("Panel");
     window->position(Vec2i::zero());
     window->bound(Screen::bound().with_width(320));
     window->type(WINDOW_TYPE_POPOVER);
+    window->opacity(0.7);
 
     window->root()->layout(HFLOW(0));
 

@@ -17,6 +17,8 @@ public:
 
     auto size() { return _size; }
 
+    auto page_count() { return size() / ARCH_PAGE_SIZE; }
+
     auto empty() { return size() == 0; }
 
     constexpr MemoryRange()

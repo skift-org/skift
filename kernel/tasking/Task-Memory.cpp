@@ -8,8 +8,8 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = virtual_alloc(task->pdir, (MemoryRange){memory_object->address, memory_object->size}, MEMORY_USER).base();
-    memory_mapping->size = memory_object->size;
+    memory_mapping->address = virtual_alloc(task->pdir, memory_object->range(), MEMORY_USER).base();
+    memory_mapping->size = memory_object->range().size();
 
     list_pushback(task->memory_mapping, memory_mapping);
 
@@ -22,7 +22,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = virtual_map(task->pdir, memory_object->range(), address, MEMORY_USER);
-    memory_mapping->size = memory_object->size;
+    memory_mapping->size = memory_object->range().size();
 
     list_pushback(task->memory_mapping, memory_mapping);
 

@@ -8,67 +8,98 @@ size_t USED_MEMORY = 0;
 
 uint8_t MEMORY[1024 * 1024 / 8] = {};
 
-#define PHYSICAL_IS_USED(__addr) \
-    (MEMORY[(uint)(__addr) / ARCH_PAGE_SIZE / 8] & (1 << ((uint)(__addr) / ARCH_PAGE_SIZE % 8)))
-
-#define PHYSICAL_SET_USED(__addr) \
-    (MEMORY[(uint)(__addr) / ARCH_PAGE_SIZE / 8] |= (1 << ((uint)(__addr) / ARCH_PAGE_SIZE % 8)))
-
-#define PHYSICAL_SET_FREE(__addr) \
-    (MEMORY[(uint)(__addr) / ARCH_PAGE_SIZE / 8] &= ~(1 << ((uint)(__addr) / ARCH_PAGE_SIZE % 8)))
-
-int physical_is_used(uint addr, uint count)
+bool physical_page_is_used(uintptr_t address)
 {
-    for (uint i = 0; i < count; i++)
-    {
-        if (PHYSICAL_IS_USED(addr + (i * ARCH_PAGE_SIZE)))
-            return 1;
-    }
+    uintptr_t page = address / ARCH_PAGE_SIZE;
 
-    return 0;
+    return MEMORY[page / 8] & (1 << (page % 8));
 }
 
-void physical_set_used(uint addr, uint count)
+void physical_page_set_used(uintptr_t address)
 {
-    for (uint i = 0; i < count; i++)
+    uintptr_t page = address / ARCH_PAGE_SIZE;
+
+    MEMORY[page / 8] |= 1 << (page % 8);
+}
+
+void phyisical_page_set_used(uintptr_t address)
+{
+    uintptr_t page = address / ARCH_PAGE_SIZE;
+
+    MEMORY[page / 8] &= ~(1 << (page % 8));
+}
+
+MemoryRange physical_alloc(size_t size)
+{
+    assert(IS_PAGE_ALIGN(size));
+
+    for (size_t i = 0; i < ((TOTAL_MEMORY - size) / ARCH_PAGE_SIZE); i++)
     {
-        if (!PHYSICAL_IS_USED(addr + (i * ARCH_PAGE_SIZE)))
+        MemoryRange range(i * ARCH_PAGE_SIZE, size);
+
+        if (!physical_is_used(range))
+        {
+            physical_set_used(range);
+            return range;
+        }
+    }
+
+    system_panic("Out of physical memory!\tTrying to allocat %dkio but free memory is %dkio !", size / 1024, (TOTAL_MEMORY - USED_MEMORY) / 1024);
+    return MemoryRange();
+}
+
+void physical_free(MemoryRange range)
+{
+    assert(range.is_page_aligned());
+
+    physical_set_free(range);
+}
+
+bool physical_is_used(MemoryRange range)
+{
+    assert(range.is_page_aligned());
+
+    for (size_t i = 0; i < range.page_count(); i++)
+    {
+        uintptr_t address = range.base() + i * ARCH_PAGE_SIZE;
+
+        if (physical_page_is_used(address))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void physical_set_used(MemoryRange range)
+{
+    assert(range.is_page_aligned());
+
+    for (size_t i = 0; i < range.page_count(); i++)
+    {
+        uintptr_t address = range.base() + i * ARCH_PAGE_SIZE;
+
+        if (!physical_page_is_used(address))
         {
             USED_MEMORY += ARCH_PAGE_SIZE;
-            PHYSICAL_SET_USED(addr + (i * ARCH_PAGE_SIZE));
+            physical_page_set_used(address);
         }
     }
 }
 
-void physical_set_free(uint addr, uint count)
+void physical_set_free(MemoryRange range)
 {
-    for (uint i = 0; i < count; i++)
+    assert(range.is_page_aligned());
+
+    for (size_t i = 0; i < range.page_count(); i++)
     {
-        if (PHYSICAL_IS_USED(addr + (i * ARCH_PAGE_SIZE)))
+        uintptr_t address = range.base() + i * ARCH_PAGE_SIZE;
+
+        if (physical_page_is_used(address))
         {
             USED_MEMORY -= ARCH_PAGE_SIZE;
-            PHYSICAL_SET_FREE(addr + (i * ARCH_PAGE_SIZE));
+            phyisical_page_set_used(address);
         }
     }
-}
-
-uint physical_alloc(uint count)
-{
-    for (uint i = 0; i < (TOTAL_MEMORY / ARCH_PAGE_SIZE); i++)
-    {
-        uint addr = i * ARCH_PAGE_SIZE;
-        if (!physical_is_used(addr, count))
-        {
-            physical_set_used(addr, count);
-            return addr;
-        }
-    }
-
-    system_panic("Out of physical memory!\n\tTrying to allocat %d pages but free memory is %d pages !", count, (TOTAL_MEMORY - USED_MEMORY) / ARCH_PAGE_SIZE);
-    return 0;
-}
-
-void physical_free(uint addr, uint count)
-{
-    physical_set_free(addr, count);
 }

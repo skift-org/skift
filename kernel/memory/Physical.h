@@ -2,16 +2,18 @@
 
 #include <libsystem/Common.h>
 
+#include "kernel/memory/MemoryRange.h"
+
 extern size_t TOTAL_MEMORY;
 extern size_t USED_MEMORY;
 extern uint8_t MEMORY[1024 * 1024 / 8];
 
-uint physical_alloc(uint count);
+MemoryRange physical_alloc(size_t size);
 
-void physical_free(uint addr, uint count);
+void physical_free(MemoryRange range);
 
-int physical_is_used(uint addr, uint count);
+bool physical_is_used(MemoryRange range);
 
-void physical_set_used(uint addr, uint count);
+void physical_set_used(MemoryRange range);
 
-void physical_set_free(uint addr, uint count);
+void physical_set_free(MemoryRange range);

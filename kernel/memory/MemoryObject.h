@@ -5,12 +5,11 @@
 struct MemoryObject
 {
     int id;
-    uintptr_t address;
-    size_t size;
+    MemoryRange _range;
 
     int refcount;
 
-    auto range() { return MemoryRange{address, size}; }
+    auto range() { return _range; }
 };
 
 void memory_object_initialize();

@@ -45,7 +45,7 @@ void memory_initialize(Multiboot *multiboot)
 
         if (entry->type == MEMORY_MAP_ENTRY_AVAILABLE)
         {
-            physical_set_free(entry->range.base(), entry->range.size() / ARCH_PAGE_SIZE);
+            physical_set_free(entry->range);
         }
     }
 
@@ -61,8 +61,10 @@ void memory_initialize(Multiboot *multiboot)
         memory_map_identity(&kpdir, multiboot->modules[i].range, MEMORY_NONE);
     }
 
-    virtual_free(memory_kpdir(), (MemoryRange){0, ARCH_PAGE_SIZE}); // Unmap the 0 page
-    physical_set_used(0, 1);
+    // Unmap the 0 page
+    MemoryRange page_zero{0, ARCH_PAGE_SIZE};
+    virtual_free(memory_kpdir(), page_zero);
+    physical_set_used(page_zero);
 
     memory_pdir_switch(&kpdir);
     paging_enable();
@@ -127,8 +129,8 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
 
         if (!virtual_present(page_directory, virtual_address))
         {
-            uintptr_t physical_address = physical_alloc(1);
-            Result virtual_map_result = virtual_map(page_directory, MemoryRange{physical_address, ARCH_PAGE_SIZE}, virtual_address, flags);
+            auto physical_range = physical_alloc(ARCH_PAGE_SIZE);
+            Result virtual_map_result = virtual_map(page_directory, physical_range, virtual_address, flags);
 
             if (virtual_map_result != SUCCESS)
             {
@@ -149,10 +151,8 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_r
 {
     assert(physical_range.is_page_aligned());
 
-    size_t page_count = physical_range.size() / ARCH_PAGE_SIZE;
-
     atomic_begin();
-    physical_set_used(physical_range.base(), page_count);
+    physical_set_used(physical_range);
     virtual_map(page_directory, physical_range, physical_range.base(), flags);
     atomic_end();
 
@@ -175,13 +175,11 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
 
     *out_address = 0;
 
-    size_t page_count = size / ARCH_PAGE_SIZE;
-
     atomic_begin();
 
-    uintptr_t physical_address = physical_alloc(page_count);
+    auto physical_range = physical_alloc(size);
 
-    if (!physical_address)
+    if (physical_range.empty())
     {
         atomic_end();
 
@@ -190,11 +188,11 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
         return ERR_OUT_OF_MEMORY;
     }
 
-    uintptr_t virtual_address = virtual_alloc(page_directory, (MemoryRange){physical_address, size}, flags).base();
+    uintptr_t virtual_address = virtual_alloc(page_directory, physical_range, flags).base();
 
     if (!virtual_address)
     {
-        physical_free(physical_address, page_count);
+        physical_free(physical_range);
         atomic_end();
 
         logger_error("Failed to allocate memory: Not enough virtual memory!");
@@ -205,7 +203,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     atomic_end();
 
     if (flags & MEMORY_CLEAR)
-        memset((void *)virtual_address, 0, page_count * ARCH_PAGE_SIZE);
+        memset((void *)virtual_address, 0, size);
 
     *out_address = virtual_address;
     return SUCCESS;
@@ -217,20 +215,21 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
-        uintptr_t identity_address = i * ARCH_PAGE_SIZE;
 
-        if (!virtual_present(page_directory, identity_address) &&
-            !physical_is_used(identity_address, 1))
+        MemoryRange identity_range{i * ARCH_PAGE_SIZE, ARCH_PAGE_SIZE};
+
+        if (!virtual_present(page_directory, identity_range.base()) &&
+            !physical_is_used(identity_range))
         {
-            physical_set_used(identity_address, 1);
-            virtual_map(page_directory, MemoryRange{identity_address, ARCH_PAGE_SIZE}, identity_address, flags);
+            physical_set_used(identity_range);
+            virtual_map(page_directory, identity_range, identity_range.base(), flags);
 
             atomic_end();
 
             if (flags & MEMORY_CLEAR)
-                memset((void *)identity_address, 0, ARCH_PAGE_SIZE);
+                memset((void *)identity_range.base(), 0, ARCH_PAGE_SIZE);
 
-            *out_address = identity_address;
+            *out_address = identity_range.base();
 
             return SUCCESS;
         }
@@ -257,8 +256,11 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
 
         if (virtual_present(page_directory, virtual_address))
         {
-            physical_free(virtual_to_physical(page_directory, virtual_address), 1);
-            virtual_free(page_directory, (MemoryRange){virtual_address, ARCH_PAGE_SIZE});
+            MemoryRange page_physical_range{virtual_to_physical(page_directory, virtual_address), ARCH_PAGE_SIZE};
+            MemoryRange page_virtual_range{virtual_address, ARCH_PAGE_SIZE};
+
+            physical_free(page_physical_range);
+            virtual_free(page_directory, page_virtual_range);
         }
     }
 
@@ -315,7 +317,11 @@ void memory_pdir_destroy(PageDirectory *page_directory)
 
                 if (page_table_entry->Present)
                 {
-                    physical_free(page_table_entry->PageFrameNumber * ARCH_PAGE_SIZE, 1);
+                    uintptr_t physical_address = page_table_entry->PageFrameNumber * ARCH_PAGE_SIZE;
+
+                    MemoryRange physical_range{physical_address, ARCH_PAGE_SIZE};
+
+                    physical_free(physical_range);
                 }
             }
 

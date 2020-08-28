@@ -40,8 +40,8 @@ $(1)_ASSEMBLY_SOURCES = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.s) \
 	$$(wildcard libraries/lib$($(1)_NAME)/*/*.s)
 
-$(1)_OBJECTS = $$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/%.o, $$($(1)_SOURCES)) \
-			   $$(patsubst libraries/%.s, $(BUILD_DIRECTORY)/%.s.o, $$($(1)_ASSEMBLY_SOURCES))
+$(1)_OBJECTS = $$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/libraries/%.o, $$($(1)_SOURCES)) \
+			   $$(patsubst libraries/%.s, $(BUILD_DIRECTORY)/libraries/%.s.o, $$($(1)_ASSEMBLY_SOURCES))
 
 $(1)_HEADERS = \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.h) \
@@ -63,12 +63,12 @@ $$($(1)_ARCHIVE): $$($(1)_OBJECTS)
 	@echo [LIB$(1)] [AR] $$@
 	@$(AR) $(ARFLAGS) $$@ $$^
 
-$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.cpp
+$(BUILD_DIRECTORY)/libraries/lib$($(1)_NAME)/%.o: libraries/lib$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) $($(1)_CXXFLAGS) -c -o $$@ $$<
 
-$(BUILD_DIRECTORY)/lib$($(1)_NAME)/%.s.o: libraries/lib$($(1)_NAME)/%.s
+$(BUILD_DIRECTORY)/libraries/lib$($(1)_NAME)/%.s.o: libraries/lib$($(1)_NAME)/%.s
 	$$(DIRECTORY_GUARD)
 	@echo [LIB$(1)] [AS] $$<
 	@$(AS) $(ASFLAGS) $$^ -o $$@

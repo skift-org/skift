@@ -51,20 +51,26 @@ static Result serial_write(FsNode *node, FsHandle *handle, const void *buffer, s
     return SUCCESS;
 }
 
+class Serial : public FsNode
+{
+private:
+    /* data */
+public:
+    Serial() : FsNode(FILE_TYPE_DEVICE)
+    {
+        can_read = (FsNodeCanReadCallback)serial_can_read;
+        read = (FsNodeReadCallback)serial_read;
+        write = (FsNodeWriteCallback)serial_write;
+    }
+
+    ~Serial() {}
+};
+
 void serial_initialize()
 {
     serial_buffer = ringbuffer_create(1024);
 
     dispatcher_register_handler(4, serial_interrupt_handler);
 
-    FsNode *serial_device = __create(FsNode);
-    fsnode_init(serial_device, FILE_TYPE_DEVICE);
-
-    serial_device->can_read = (FsNodeCanReadCallback)serial_can_read;
-    serial_device->read = (FsNodeReadCallback)serial_read;
-    serial_device->write = (FsNodeWriteCallback)serial_write;
-
-    Path *serial_device_path = path_create(SERIAL_DEVICE_PATH);
-    filesystem_link_and_take_ref(serial_device_path, serial_device);
-    path_destroy(serial_device_path);
+    filesystem_link_and_take_ref_cstring(SERIAL_DEVICE_PATH, new Serial());
 }

@@ -26,7 +26,7 @@ void filesystem_initialize()
 {
     logger_info("Initializing filesystem...");
 
-    _filesystem_root = directory_create();
+    _filesystem_root = new FsDirectory();
 
     logger_info("File system root at 0x%x", _filesystem_root);
 }
@@ -75,6 +75,7 @@ FsNode *filesystem_find_parent_and_ref(Path *path)
 
 Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 {
+
     *handle = nullptr;
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
@@ -90,11 +91,11 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
             {
                 if (flags & OPEN_SOCKET)
                 {
-                    node = socket_create();
+                    node = new FsSocket();
                 }
                 else
                 {
-                    node = file_create();
+                    node = new FsFile();
                 }
 
                 fsnode_acquire_lock(parent, scheduler_running_id());
@@ -174,7 +175,7 @@ Result filesystem_mkdir(Path *path)
         return ERR_FILE_EXISTS;
     }
 
-    FsNode *directory = directory_create();
+    auto directory = new FsDirectory();
 
     Result result = filesystem_link(path, directory);
 
@@ -183,20 +184,9 @@ Result filesystem_mkdir(Path *path)
     return result;
 }
 
-Result filesystem_mkfile(Path *path)
-{
-    FsNode *file = file_create();
-
-    Result result = filesystem_link(path, file);
-
-    file->deref();
-
-    return result;
-}
-
 Result filesystem_mkpipe(Path *path)
 {
-    FsNode *pipe = fspipe_create();
+    auto pipe = new FsPipe();
 
     Result result = filesystem_link(path, pipe);
 

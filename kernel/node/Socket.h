@@ -7,6 +7,6 @@
 struct FsSocket : public FsNode
 {
     List *pending;
-};
 
-FsNode *socket_create();
+    FsSocket();
+};

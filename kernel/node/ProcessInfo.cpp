@@ -85,23 +85,17 @@ static size_t process_info_size(FsProcessInfo *node, FsHandle *handle)
     }
 }
 
-static FsNode *process_info_create()
+FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 {
-    FsProcessInfo *info = __create(FsProcessInfo);
-
-    fsnode_init(info, FILE_TYPE_DEVICE);
-
-    info->open = (FsNodeOpenCallback)process_info_open;
-    info->close = (FsNodeCloseCallback)process_info_close;
-    info->read = (FsNodeReadCallback)process_info_read;
-    info->size = (FsNodeSizeCallback)process_info_size;
-
-    return (FsNode *)info;
+    open = (FsNodeOpenCallback)process_info_open;
+    close = (FsNodeCloseCallback)process_info_close;
+    read = (FsNodeReadCallback)process_info_read;
+    size = (FsNodeSizeCallback)process_info_size;
 }
 
 void process_info_initialize()
 {
-    FsNode *info_device = process_info_create();
+    auto info_device = new FsProcessInfo();
 
     Path *info_device_path = path_create("/System/processes");
     filesystem_link_and_take_ref(info_device_path, info_device);

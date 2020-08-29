@@ -14,6 +14,6 @@ struct FsTerminal : public FsNode
 
     RingBuffer *master_to_slave_buffer;
     RingBuffer *slave_to_master_buffer;
-};
 
-FsNode *terminal_create();
+    FsTerminal();
+};

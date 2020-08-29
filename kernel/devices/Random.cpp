@@ -31,6 +31,20 @@ static Result random_write(FsNode *node, FsHandle *handle, const void *buffer, u
     return SUCCESS;
 }
 
+class RandomDevice : public FsNode
+{
+private:
+    /* data */
+public:
+    RandomDevice() : FsNode(FILE_TYPE_DEVICE)
+    {
+        read = (FsNodeReadCallback)random_read;
+        write = (FsNodeWriteCallback)random_write;
+    }
+
+    ~RandomDevice() {}
+};
+
 void random_initialize()
 {
     _random = (Random){
@@ -38,14 +52,5 @@ void random_initialize()
         6389,
     };
 
-    FsNode *random_device = __create(FsNode);
-
-    fsnode_init(random_device, FILE_TYPE_DEVICE);
-
-    random_device->read = (FsNodeReadCallback)random_read;
-    random_device->write = (FsNodeWriteCallback)random_write;
-
-    Path *random_device_path = path_create(UNIX_DEVICE_PATH("random"));
-    filesystem_link_and_take_ref(random_device_path, random_device);
-    path_destroy(random_device_path);
+    filesystem_link_and_take_ref_cstring(UNIX_DEVICE_PATH("random"), new RandomDevice());
 }

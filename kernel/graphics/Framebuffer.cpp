@@ -58,6 +58,21 @@ Result framebuffer_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *a
     }
 }
 
+class Framebuffer : public FsNode
+{
+private:
+    /* data */
+public:
+    Framebuffer(/* args */) : FsNode(FILE_TYPE_DEVICE)
+    {
+        call = (FsNodeCallCallback)framebuffer_iocall;
+    }
+
+    ~Framebuffer()
+    {
+    }
+};
+
 void framebuffer_initialize(Multiboot *multiboot)
 {
     _framebuffer_width = multiboot->framebuffer_width;
@@ -82,11 +97,5 @@ void framebuffer_initialize(Multiboot *multiboot)
 
     graphic_did_find_framebuffer();
 
-    FsNode *file = __create(FsNode);
-    file->call = (FsNodeCallCallback)framebuffer_iocall;
-    fsnode_init(file, FILE_TYPE_DEVICE);
-
-    Path *path = path_create(FRAMEBUFFER_DEVICE_PATH);
-    filesystem_link(path, file);
-    path_destroy(path);
+    filesystem_link_and_take_ref_cstring(FRAMEBUFFER_DEVICE_PATH, new Framebuffer());
 }

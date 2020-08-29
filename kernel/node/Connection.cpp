@@ -96,21 +96,15 @@ static void fsconnection_destroy(FsConnection *connection)
     ringbuffer_destroy(connection->data_to_server);
 }
 
-FsNode *fsconnection_create()
+FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
 {
-    FsConnection *connection = __create(FsConnection);
+    accept = (FsNodeAcceptCallback)fsconnection_accept;
+    is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
+    can_read = (FsNodeCanReadCallback)fsconnection_can_read;
+    read = (FsNodeReadCallback)fsconnection_read;
+    write = (FsNodeWriteCallback)fsconnection_write;
+    destroy = (FsNodeDestroyCallback)fsconnection_destroy;
 
-    fsnode_init(connection, FILE_TYPE_CONNECTION);
-
-    connection->accept = (FsNodeAcceptCallback)fsconnection_accept;
-    connection->is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
-    connection->can_read = (FsNodeCanReadCallback)fsconnection_can_read;
-    connection->read = (FsNodeReadCallback)fsconnection_read;
-    connection->write = (FsNodeWriteCallback)fsconnection_write;
-    connection->destroy = (FsNodeDestroyCallback)fsconnection_destroy;
-
-    connection->data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
-    connection->data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
-
-    return connection;
+    data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
+    data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
 }

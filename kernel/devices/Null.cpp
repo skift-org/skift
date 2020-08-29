@@ -26,16 +26,21 @@ static Result null_write(FsNode *node, FsHandle *handle, const void *buffer, siz
     return SUCCESS;
 }
 
+class Null : public FsNode
+{
+private:
+    /* data */
+public:
+    Null() : FsNode(FILE_TYPE_DEVICE)
+    {
+        read = (FsNodeReadCallback)null_read;
+        write = (FsNodeWriteCallback)null_write;
+    }
+
+    ~Null() {}
+};
+
 void null_initialize()
 {
-    FsNode *null_device = __create(FsNode);
-
-    fsnode_init(null_device, FILE_TYPE_DEVICE);
-
-    null_device->read = (FsNodeReadCallback)null_read;
-    null_device->write = (FsNodeWriteCallback)null_write;
-
-    Path *null_device_path = path_create(UNIX_DEVICE_PATH("null"));
-    filesystem_link_and_take_ref(null_device_path, null_device);
-    path_destroy(null_device_path);
+    filesystem_link_and_take_ref_cstring(UNIX_DEVICE_PATH("null"), new Null());
 }

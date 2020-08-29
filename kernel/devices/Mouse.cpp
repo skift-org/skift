@@ -151,6 +151,20 @@ static Result mouse_read(FsNode *node, FsHandle *handle, void *buffer, size_t si
     return SUCCESS;
 }
 
+class Mouse : public FsNode
+{
+private:
+    /* data */
+public:
+    Mouse() : FsNode(FILE_TYPE_DEVICE)
+    {
+        read = (FsNodeReadCallback)mouse_read;
+        can_read = (FsNodeCanReadCallback)mouse_can_read;
+    }
+
+    ~Mouse() {}
+};
+
 void mouse_initialize()
 {
     uint8_t _status;
@@ -177,21 +191,11 @@ void mouse_initialize()
     ps2mouse_write(0xF4);
     ps2mouse_read(); //Acknowledge
 
-    // try to enable mouse whell
-    // TODO
+    // FIXME: try to enable mouse whell
 
     // Setup the mouse handler
     _mouse_buffer = ringbuffer_create(sizeof(MousePacket) * 256);
     dispatcher_register_handler(12, ps2mouse_interrupt_handler);
 
-    FsNode *mouse_device = __create(FsNode);
-
-    fsnode_init(mouse_device, FILE_TYPE_DEVICE);
-
-    mouse_device->read = (FsNodeReadCallback)mouse_read;
-    mouse_device->can_read = (FsNodeCanReadCallback)mouse_can_read;
-
-    Path *mouse_device_path = path_create(MOUSE_DEVICE_PATH);
-    filesystem_link_and_take_ref(mouse_device_path, mouse_device);
-    path_destroy(mouse_device_path);
+    filesystem_link_and_take_ref_cstring(MOUSE_DEVICE_PATH, new Mouse());
 }

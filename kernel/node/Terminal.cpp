@@ -131,25 +131,19 @@ static void terminal_destroy(FsTerminal *terminal)
     ringbuffer_destroy(terminal->slave_to_master_buffer);
 }
 
-FsNode *terminal_create()
+FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
 {
-    FsTerminal *terminal = __create(FsTerminal);
+    can_read = (FsNodeCanReadCallback)terminal_can_read;
+    can_write = (FsNodeCanWriteCallback)terminal_can_write;
+    read = (FsNodeReadCallback)terminal_read;
+    write = (FsNodeWriteCallback)terminal_write;
+    call = (FsNodeCallCallback)terminal_iocall;
+    size = (FsNodeSizeCallback)terminal_size;
+    destroy = (FsNodeDestroyCallback)terminal_destroy;
 
-    fsnode_init(terminal, FILE_TYPE_TERMINAL);
+    width = 80;
+    width = 25;
 
-    terminal->can_read = (FsNodeCanReadCallback)terminal_can_read;
-    terminal->can_write = (FsNodeCanWriteCallback)terminal_can_write;
-    terminal->read = (FsNodeReadCallback)terminal_read;
-    terminal->write = (FsNodeWriteCallback)terminal_write;
-    terminal->call = (FsNodeCallCallback)terminal_iocall;
-    terminal->size = (FsNodeSizeCallback)terminal_size;
-    terminal->destroy = (FsNodeDestroyCallback)terminal_destroy;
-
-    terminal->width = 80;
-    terminal->width = 25;
-
-    terminal->master_to_slave_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
-    terminal->slave_to_master_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
-
-    return terminal;
+    master_to_slave_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
+    slave_to_master_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
 }

@@ -11,6 +11,6 @@ struct FsConnection : public FsNode
 
     RingBuffer *data_to_server;
     RingBuffer *data_to_client;
-};
 
-FsNode *fsconnection_create();
+    FsConnection();
+};

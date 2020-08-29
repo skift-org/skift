@@ -86,23 +86,17 @@ static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
     }
 }
 
-static FsNode *device_info_create()
+FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 {
-    FsDeviceInfo *info = __create(FsDeviceInfo);
-
-    fsnode_init(info, FILE_TYPE_DEVICE);
-
-    info->open = (FsNodeOpenCallback)device_info_open;
-    info->close = (FsNodeCloseCallback)device_info_close;
-    info->read = (FsNodeReadCallback)device_info_read;
-    info->size = (FsNodeSizeCallback)device_info_size;
-
-    return (FsNode *)info;
+    open = (FsNodeOpenCallback)device_info_open;
+    close = (FsNodeCloseCallback)device_info_close;
+    read = (FsNodeReadCallback)device_info_read;
+    size = (FsNodeSizeCallback)device_info_size;
 }
 
 void device_info_initialize()
 {
-    FsNode *device_info_device = device_info_create();
+    auto device_info_device = new FsDeviceInfo();
 
     Path *device_info_device_path = path_create("/System/devices");
     filesystem_link_and_take_ref(device_info_device_path, device_info_device);

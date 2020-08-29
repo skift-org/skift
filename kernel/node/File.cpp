@@ -59,21 +59,15 @@ static void file_destroy(FsFile *node)
     free(node->buffer);
 }
 
-FsNode *file_create()
+FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
 {
-    FsFile *file = __create(FsFile);
+    open = (FsNodeOpenCallback)file_open;
+    read = (FsNodeReadCallback)file_read;
+    write = (FsNodeWriteCallback)file_write;
+    size = (FsNodeSizeCallback)file_size;
+    destroy = (FsNodeDestroyCallback)file_destroy;
 
-    fsnode_init(file, FILE_TYPE_REGULAR);
-
-    file->open = (FsNodeOpenCallback)file_open;
-    file->read = (FsNodeReadCallback)file_read;
-    file->write = (FsNodeWriteCallback)file_write;
-    file->size = (FsNodeSizeCallback)file_size;
-    file->destroy = (FsNodeDestroyCallback)file_destroy;
-
-    file->buffer = (char *)malloc(512);
-    file->buffer_allocated = 512;
-    file->buffer_size = 0;
-
-    return (FsNode *)file;
+    buffer = (char *)malloc(512);
+    buffer_allocated = 512;
+    buffer_size = 0;
 }

@@ -325,6 +325,37 @@ static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t s
     return SUCCESS;
 }
 
+class Keyboard : public FsNode
+{
+private:
+    /* data */
+public:
+    Keyboard() : FsNode(FILE_TYPE_DEVICE)
+    {
+        call = (FsNodeCallCallback)keyboard_iocall;
+        can_read = (FsNodeCanReadCallback)characters_can_read;
+        read = (FsNodeReadCallback)characters_read;
+    }
+
+    ~Keyboard() {}
+};
+
+class KeyboardEvent : public FsNode
+{
+private:
+public:
+    KeyboardEvent() : FsNode(FILE_TYPE_DEVICE)
+    {
+        call = (FsNodeCallCallback)keyboard_iocall;
+        can_read = (FsNodeCanReadCallback)events_can_read;
+        read = (FsNodeReadCallback)events_read;
+    }
+
+    ~KeyboardEvent()
+    {
+    }
+};
+
 void keyboard_initialize()
 {
     logger_info("Initializing keyboard...");
@@ -332,24 +363,12 @@ void keyboard_initialize()
     _keymap = keyboard_load_keymap("/System/Keyboards/" CONFIG_KEYBOARD_LAYOUT ".kmap");
 
     _characters_buffer = ringbuffer_create(1024);
-    _characters_node = __create(FsNode);
-
-    fsnode_init(_characters_node, FILE_TYPE_DEVICE);
-
-    _characters_node->call = (FsNodeCallCallback)keyboard_iocall;
-    _characters_node->can_read = (FsNodeCanReadCallback)characters_can_read;
-    _characters_node->read = (FsNodeReadCallback)characters_read;
+    _characters_node = new Keyboard();
 
     filesystem_link_cstring(KEYBOARD_DEVICE_PATH, _characters_node);
 
     _events_buffer = ringbuffer_create(sizeof(KeyboardPacket) * 256);
-    _events_node = __create(FsNode);
-
-    fsnode_init(_events_node, FILE_TYPE_DEVICE);
-
-    _events_node->call = (FsNodeCallCallback)keyboard_iocall;
-    _events_node->can_read = (FsNodeCanReadCallback)events_can_read;
-    _events_node->read = (FsNodeReadCallback)events_read;
+    _events_node = new KeyboardEvent();
 
     filesystem_link_cstring(KEYBOARD_EVENT_DEVICE_PATH, _events_node);
 

@@ -63,20 +63,14 @@ static void pipe_destroy(FsPipe *node)
     ringbuffer_destroy(node->buffer);
 }
 
-FsNode *fspipe_create()
+FsPipe::FsPipe() : FsNode(FILE_TYPE_PIPE)
 {
-    FsPipe *pipe = __create(FsPipe);
+    can_read = (FsNodeCanReadCallback)pipe_can_read;
+    can_write = (FsNodeCanWriteCallback)pipe_can_write;
+    read = (FsNodeReadCallback)pipe_read;
+    write = (FsNodeWriteCallback)pipe_write;
+    size = (FsNodeSizeCallback)pipe_size;
+    destroy = (FsNodeDestroyCallback)pipe_destroy;
 
-    fsnode_init(pipe, FILE_TYPE_PIPE);
-
-    pipe->can_read = (FsNodeCanReadCallback)pipe_can_read;
-    pipe->can_write = (FsNodeCanWriteCallback)pipe_can_write;
-    pipe->read = (FsNodeReadCallback)pipe_read;
-    pipe->write = (FsNodeWriteCallback)pipe_write;
-    pipe->size = (FsNodeSizeCallback)pipe_size;
-    pipe->destroy = (FsNodeDestroyCallback)pipe_destroy;
-
-    pipe->buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
-
-    return (FsNode *)pipe;
+    buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
 }

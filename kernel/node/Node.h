@@ -47,18 +47,18 @@ struct FsNode
     uint server;
     uint master;
 
-    FsNodeOpenCallback open;
-    FsNodeCloseCallback close;
-    FsNodeCanReadCallback can_read;
-    FsNodeCanWriteCallback can_write;
-    FsNodeReadCallback read;
-    FsNodeWriteCallback write;
-    FsNodeFindCallback find;
-    FsNodeLinkCallback link;
-    FsNodeUnlinkCallback unlink;
-    FsNodeCallCallback call;
-    FsNodeStatCallback stat;
-    FsNodeSizeCallback size;
+    FsNodeOpenCallback open = nullptr;
+    FsNodeCloseCallback close = nullptr;
+    FsNodeCanReadCallback can_read = nullptr;
+    FsNodeCanWriteCallback can_write = nullptr;
+    FsNodeReadCallback read = nullptr;
+    FsNodeWriteCallback write = nullptr;
+    FsNodeFindCallback find = nullptr;
+    FsNodeLinkCallback link = nullptr;
+    FsNodeUnlinkCallback unlink = nullptr;
+    FsNodeCallCallback call = nullptr;
+    FsNodeStatCallback stat = nullptr;
+    FsNodeSizeCallback size = nullptr;
 
     FsNodeOpenConnectionCallback open_connection;
     FsNodeAcceptConnectionCallback accept_connection;
@@ -70,6 +70,8 @@ struct FsNode
     FsNodeDestroyCallback destroy;
 
 public:
+    FsNode(FileType type);
+
     FsNode *ref();
 
     void deref();
@@ -78,8 +80,6 @@ public:
 
     void deref_handle(FsHandle &handle);
 };
-
-void fsnode_init(FsNode *node, FileType type);
 
 bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
 

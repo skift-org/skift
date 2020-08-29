@@ -17,6 +17,6 @@ struct FsDirectoryEntry
 struct FsDirectory : public FsNode
 {
     List *childs;
-};
 
-FsNode *directory_create();
+    FsDirectory();
+};

@@ -4,11 +4,11 @@
 
 #include "kernel/filesystem/Filesystem.h"
 
-void fsnode_init(FsNode *node, FileType type)
+FsNode::FsNode(FileType type)
 {
-    lock_init(node->lock);
-    node->refcount = 1;
-    node->type = type;
+    lock_init(lock);
+    refcount = 1;
+    this->type = type;
 }
 
 FsNode *FsNode::ref()

@@ -365,7 +365,7 @@ Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle
 
     Result result = SUCCESS;
 
-    FsNode *pipe = fspipe_create();
+    FsNode *pipe = new FsPipe();
 
     FsHandle *reader_handle = fshandle_create(pipe, OPEN_READ);
     FsHandle *writer_handle = fshandle_create(pipe, OPEN_WRITE);
@@ -415,7 +415,7 @@ Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_
 
     Result result = SUCCESS;
 
-    FsNode *terminal = terminal_create();
+    FsNode *terminal = new FsTerminal();
 
     FsHandle *master_handle = fshandle_create(terminal, OPEN_MASTER);
     FsHandle *slave_handle = fshandle_create(terminal, OPEN_READ | OPEN_WRITE);

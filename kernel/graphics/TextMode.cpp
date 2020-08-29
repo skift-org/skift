@@ -113,19 +113,24 @@ Result textmode_iocall(FsNode *node, FsHandle *handle, IOCall request, void *arg
     }
 }
 
+class TextMode : public FsNode
+{
+private:
+public:
+    TextMode() : FsNode(FILE_TYPE_DEVICE)
+    {
+        write = (FsNodeWriteCallback)textmode_write;
+        call = (FsNodeCallCallback)textmode_iocall;
+    }
+
+    ~TextMode() {}
+};
+
 void textmode_initialize()
 {
     logger_info("Initializing textmode graphic");
 
     _text_buffer = (uint16_t *)virtual_alloc(&kpdir, vga_physical_range(), MEMORY_NONE).base();
 
-    FsNode *textmode_device = __create(FsNode);
-    fsnode_init(textmode_device, FILE_TYPE_DEVICE);
-
-    textmode_device->write = (FsNodeWriteCallback)textmode_write;
-    textmode_device->call = (FsNodeCallCallback)textmode_iocall;
-
-    Path *textmode_device_path = path_create(TEXTMODE_DEVICE_PATH);
-    filesystem_link_and_take_ref(textmode_device_path, textmode_device);
-    path_destroy(textmode_device_path);
+    filesystem_link_and_take_ref_cstring(TEXTMODE_DEVICE_PATH, new TextMode());
 }

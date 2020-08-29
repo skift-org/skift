@@ -115,6 +115,18 @@ Result bga_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
     }
 }
 
+class BGA : public FsNode
+{
+private:
+public:
+    BGA() : FsNode(FILE_TYPE_DEVICE)
+    {
+        call = (FsNodeCallCallback)bga_iocall;
+    }
+
+    ~BGA() {}
+};
+
 bool bga_match(DeviceInfo info)
 {
     return /* QEMU */ (info.pci_device.vendor == 0x1234 && info.pci_device.device == 0x1111) ||
@@ -142,11 +154,5 @@ void bga_initialize(DeviceInfo info)
 
     graphic_did_find_framebuffer();
 
-    FsNode *file = __create(FsNode);
-    file->call = (FsNodeCallCallback)bga_iocall;
-    fsnode_init(file, FILE_TYPE_DEVICE);
-
-    Path *path = path_create(FRAMEBUFFER_DEVICE_PATH);
-    filesystem_link(path, file);
-    path_destroy(path);
+    filesystem_link_and_take_ref_cstring(FRAMEBUFFER_DEVICE_PATH, new BGA());
 }

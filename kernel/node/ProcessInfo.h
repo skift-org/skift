@@ -4,6 +4,7 @@
 
 struct FsProcessInfo : public FsNode
 {
+    FsProcessInfo();
 };
 
 void process_info_initialize();

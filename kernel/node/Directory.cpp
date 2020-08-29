@@ -128,21 +128,15 @@ static void directory_destroy(FsDirectory *node)
     list_destroy_with_callback(node->childs, (ListDestroyElementCallback)directory_entry_destroy);
 }
 
-FsNode *directory_create()
+FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 {
-    FsDirectory *directory = __create(FsDirectory);
+    open = (FsNodeOpenCallback)directory_open;
+    close = (FsNodeCloseCallback)directory_close;
+    read = (FsNodeReadCallback)directory_read;
+    find = (FsNodeFindCallback)directory_find;
+    link = (FsNodeLinkCallback)directory_link;
+    unlink = (FsNodeUnlinkCallback)directory_unlink;
+    destroy = (FsNodeDestroyCallback)directory_destroy;
 
-    fsnode_init(directory, FILE_TYPE_DIRECTORY);
-
-    directory->open = (FsNodeOpenCallback)directory_open;
-    directory->close = (FsNodeCloseCallback)directory_close;
-    directory->read = (FsNodeReadCallback)directory_read;
-    directory->find = (FsNodeFindCallback)directory_find;
-    directory->link = (FsNodeLinkCallback)directory_link;
-    directory->unlink = (FsNodeUnlinkCallback)directory_unlink;
-    directory->destroy = (FsNodeDestroyCallback)directory_destroy;
-
-    directory->childs = list_create();
-
-    return (FsNode *)directory;
+    childs = list_create();
 }

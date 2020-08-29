@@ -7,6 +7,6 @@
 struct FsPipe : public FsNode
 {
     RingBuffer *buffer;
-};
 
-FsNode *fspipe_create();
+    FsPipe();
+};

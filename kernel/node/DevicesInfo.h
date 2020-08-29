@@ -4,6 +4,7 @@
 
 struct FsDeviceInfo : public FsNode
 {
+    FsDeviceInfo();
 };
 
 void device_info_initialize();

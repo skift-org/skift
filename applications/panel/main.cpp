@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     window->title("Panel");
     window->type(WINDOW_TYPE_PANEL);
     window->bound(Screen::bound().take_top(36));
-    window->opacity(0.9);
+    window->opacity(0.95);
     window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto) {
         window->bound(Screen::bound().take_top(32));
     });
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     auto widget_date_and_time = new Label(panel_container, "", Position::CENTER);
     widget_date_and_time->attributes(LAYOUT_FILL);
 
-    auto graph_container = new Panel(panel_container);
+    auto graph_container = new Container(panel_container);
     graph_container->layout(VGRID(1));
 
     auto ram_graph = new Graph(graph_container, 50, COLOR_ROYALBLUE);
@@ -54,12 +54,13 @@ int main(int argc, char **argv)
 
     new Label(panel_container, "user");
 
-    auto clock_timer = make<Timer>(500, [&]() {
+    auto clock_timer = make<Timer>(1000, [&]() {
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 
         char buffer[256];
         snprintf(buffer, 256, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
+
         widget_date_and_time->text(buffer);
     });
 

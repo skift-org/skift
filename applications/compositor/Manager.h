@@ -63,20 +63,37 @@ void manager_iterate_front_to_back(Callback callback)
 }
 
 template <typename Callback>
+Iteration manager_iterate_by_type_back_to_front(WindowType type, Callback callback)
+{
+    list_foreach_reversed(Window, window, manager_get_windows())
+    {
+        if (window->type() == type)
+        {
+            if (callback(window) == Iteration::STOP)
+            {
+                return Iteration::STOP;
+            }
+        }
+    }
+
+    return Iteration::CONTINUE;
+}
+
+template <typename Callback>
 void manager_iterate_back_to_front(Callback callback)
 {
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_DESKTOP, callback) == Iteration::STOP)
+    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_DESKTOP, callback) == Iteration::STOP)
         return;
 
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_REGULAR, callback) == Iteration::STOP)
+    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_REGULAR, callback) == Iteration::STOP)
         return;
 
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_DIALOG, callback) == Iteration::STOP)
+    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_DIALOG, callback) == Iteration::STOP)
         return;
 
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)
+    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)
         return;
 
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_POPOVER, callback) == Iteration::STOP)
+    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_POPOVER, callback) == Iteration::STOP)
         return;
 }

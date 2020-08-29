@@ -10,7 +10,11 @@ private:
     Position _position = Position::LEFT;
 
 public:
-    void text(String text) { _text = text; }
+    void text(String text)
+    {
+        _text = text;
+        should_repaint();
+    }
 
     Label(Widget *parent, String text);
 

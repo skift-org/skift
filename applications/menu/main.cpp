@@ -143,7 +143,7 @@ int main(int argc, char **argv)
     window->position(Vec2i::zero());
     window->bound(Screen::bound().with_width(320));
     window->type(WINDOW_TYPE_POPOVER);
-    window->opacity(0.7);
+    window->opacity(0.95);
 
     window->root()->layout(HFLOW(0));
 

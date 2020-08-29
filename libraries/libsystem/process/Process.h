@@ -17,6 +17,6 @@ Result process_get_directory(char *buffer, size_t size);
 
 Result process_set_directory(const char *directory);
 
-int process_sleep(int time);
+Result process_sleep(int time);
 
-int process_wait(int pid, int *exit_value);
+Result process_wait(int pid, int *exit_value);

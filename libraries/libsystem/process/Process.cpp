@@ -46,7 +46,7 @@ Result process_sleep(int time)
     return __plug_process_sleep(time);
 }
 
-int process_wait(int pid, int *exit_value)
+Result process_wait(int pid, int *exit_value)
 {
     return __plug_process_wait(pid, exit_value);
 }

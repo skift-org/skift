@@ -17,14 +17,23 @@ void __no_return exit(int status)
 
 int system(const char *command)
 {
-    __unused(command);
+    int pid = -1;
+    auto result = process_run(command, &pid);
 
-    TRACE_FUNCTION_BEGIN;
-    logger_trace("system(%s)", command);
+    if (result != SUCCESS)
+    {
+        return -1;
+    }
 
-    TRACE_FUNCTION_END;
+    int exit_value = -1;
+    result = process_wait(pid, &exit_value);
 
-    return -1;
+    if (result != SUCCESS)
+    {
+        return -1;
+    }
+
+    return exit_value;
 }
 
 double strtod(const char *nptr, char **endptr)

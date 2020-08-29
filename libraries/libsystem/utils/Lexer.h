@@ -9,6 +9,7 @@ class Lexer
 private:
     Stream *_stream = nullptr;
     RingBuffer *_peek = nullptr;
+    bool _is_stream;
     /*    or    */
     const char *_string = nullptr;
 

@@ -13,7 +13,13 @@ Lexer::Lexer(Stream *stream)
     stream_stat(stream, &state);
 
     _stream = stream;
+
     _size = state.size;
+    if (state.type != FILE_TYPE_REGULAR)
+    {
+        _is_stream = true;
+    }
+
     _peek = ringbuffer_create(SOURCE_READER_MAX_PEEK);
 }
 
@@ -39,7 +45,7 @@ bool Lexer::ended()
     }
     else
     {
-        return _offset >= _size || handle_has_error(_stream);
+        return ((_offset >= _size) && !_is_stream) || handle_has_error(_stream);
     }
 }
 
@@ -102,7 +108,7 @@ char Lexer::peek(size_t peek)
 
     size_t offset = _offset + peek;
 
-    if (offset >= _size)
+    if (offset >= _size && !_is_stream)
     {
         return '\0';
     }

@@ -64,7 +64,8 @@ Result readline_readline(ReadLine *readline, char **line)
     while (readline->should_continue &&
            !readline->lexer->ended())
     {
-        if (readline->lexer->current() == U'\n')
+        if (readline->lexer->current() == U'\n' ||
+            readline->lexer->current() == U'\r')
         {
             readline_recale_history(readline);
 
@@ -72,7 +73,8 @@ Result readline_readline(ReadLine *readline, char **line)
 
             readline->lexer->foreward();
         }
-        else if (readline->lexer->current() == U'\b')
+        else if (readline->lexer->current() == U'\b' ||
+                 readline->lexer->current() == 127 /*DEL*/)
         {
             readline_recale_history(readline);
 

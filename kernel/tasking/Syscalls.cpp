@@ -501,8 +501,6 @@ static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
-    logger_trace("%s(%08x, %08x, %08x, %08x, %08x)", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4);
-
     SyscallHandler handler = syscall_get_handler(syscall);
 
     Result result = SUCCESS;

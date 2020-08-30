@@ -16,6 +16,8 @@ gdt_flush:
     jmp 0x08:._gdt_flush
 
 ._gdt_flush:
+    mov ax, 0x28
+    ltr ax
     ret
 
 global idt_flush
@@ -23,6 +25,7 @@ idt_flush:
     mov eax, [esp + 4]
     lidt [eax]
     ret
+
 
 ;; --- CPUID ---------------------------------------------------------------- ;;
 

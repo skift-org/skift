@@ -21,9 +21,16 @@ void arch_halt() { hlt(); }
 
 void arch_yield() { asm("int $127"); }
 
-void arch_save_context(Task *task) { fpu_save_context(task); }
+void arch_save_context(Task *task)
+{
+    fpu_save_context(task);
+}
 
-void arch_load_context(Task *task) { fpu_load_context(task); }
+void arch_load_context(Task *task)
+{
+    fpu_load_context(task);
+    set_kernel_stack(task->stack_pointer);
+}
 
 size_t arch_debug_write(const void *buffer, size_t size) { return com_write(COM1, buffer, size); }
 

@@ -1,4 +1,3 @@
-
 #include "arch/x86/GDT.h"
 
 static TSS tss = {
@@ -20,24 +19,24 @@ static TSS tss = {
     .ebp = 0,
     .esi = 0,
     .edi = 0,
-    .es = 0x13,
-    .cs = 0x0b,
-    .ss = 0x13,
-    .ds = 0x13,
-    .fs = 0x13,
-    .gs = 0x13,
+    .es = 0,
+    .cs = 0,
+    .ss = 0,
+    .ds = 0,
+    .fs = 0,
+    .gs = 0,
     .ldt = 0,
     .trap = 0,
     .iomap_base = 0,
 };
 
-static const GDTEntry gdt_entries[GDT_ENTRY_COUNT] = {
+static GDTEntry gdt_entries[GDT_ENTRY_COUNT] = {
     {0, 0, 0, 0},
     {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_FLAGS},
     {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE, GDT_FLAGS},
     {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER | GDT_EXECUTABLE, GDT_FLAGS},
     {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER, GDT_FLAGS},
-    {((uintptr_t)&tss), sizeof(TSS), GDT_PRESENT | GDT_EXECUTABLE | GDT_ACCESSED, TSS_FLAGS},
+    {0, 0, 0, 0},
 };
 
 static GDTDescriptor gdt_descriptor = {
@@ -47,6 +46,16 @@ static GDTDescriptor gdt_descriptor = {
 
 void gdt_initialize()
 {
+    gdt_entries[5] = GDTEntry{(uintptr_t)&tss,
+                              ((uintptr_t)&tss) + sizeof(TSS),
+                              GDT_TSS_PRESENT | GDT_ACCESSED | GDT_EXECUTABLE | GDT_USER,
+                              TSS_FLAGS};
+
+    for (size_t i = 0; i < GDT_ENTRY_COUNT; i++)
+    {
+        gdt_entries[i].dump(i);
+    }
+
     gdt_flush((uint32_t)&gdt_descriptor);
 }
 

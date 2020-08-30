@@ -1,17 +1,19 @@
 #pragma once
 
 #include <libsystem/Common.h>
+#include <libsystem/Logger.h>
 
 #define GDT_ENTRY_COUNT 6
 
-#define GDT_PRESENT 0b10010000    // Present bit. This must be 1 for all valid selectors.
-#define GDT_USER 0b01100000       // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
-#define GDT_EXECUTABLE 0b00001000 // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
-#define GDT_READWRITE 0b00000010  // Readable bit for code selectors //Writable bit for data selectors
+#define GDT_PRESENT 0b10010000     // Present bit. This must be 1 for all valid selectors.
+#define GDT_TSS_PRESENT 0b10000000 // Present bit. This must be 1 for all valid selectors.
+#define GDT_USER 0b01100000        // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
+#define GDT_EXECUTABLE 0b00001000  // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
+#define GDT_READWRITE 0b00000010   // Readable bit for code selectors //Writable bit for data selectors
 #define GDT_ACCESSED 0b00000001
 
 #define GDT_FLAGS 0b1100
-#define TSS_FLAGS 0
+#define TSS_FLAGS 0b0000
 
 struct __packed TSS
 {
@@ -70,14 +72,25 @@ struct __packed GDTEntry
           base24_31((uint8_t)(((base) >> 24) & 0xff))
     {
     }
+
+    void dump(int i)
+    {
+        logger_trace("GDT[%d] = limit0_15=%04x base0_15=%04x base16_23=%02x access=%02x limit16_19=%02x flags=%02x base24_31=%02x",
+                     i,
+                     limit0_15,
+                     base0_15,
+                     base16_23,
+                     access,
+                     limit16_19,
+                     flags,
+                     base24_31);
+    }
 };
 
 void gdt_initialize();
 
-#ifdef __cplusplus
 extern "C" void gdt_flush(uint32_t);
-#else
-extern void gdt_flush(uint32_t);
-#endif
+
+extern "C" void tss_flush(uint32_t);
 
 void set_kernel_stack(uint32_t stack);

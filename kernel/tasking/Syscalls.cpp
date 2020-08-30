@@ -49,7 +49,21 @@ Result sys_process_launch(Launchpad *launchpad, int *pid)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_launch(scheduler_running(), launchpad, pid);
+    Launchpad launchpad_copy = *launchpad;
+
+    for (int i = 0; i < launchpad->argc; i++)
+    {
+        launchpad_copy.argv[i] = strdup(launchpad->argv[i]);
+    }
+
+    Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
+
+    for (int i = 0; i < launchpad->argc; i++)
+    {
+        free(launchpad_copy.argv[i]);
+    }
+
+    return result;
 }
 
 Result sys_process_exit(int code)
@@ -122,7 +136,6 @@ Result sys_memory_alloc(size_t size, uintptr_t *out_address)
 
 Result sys_memory_free(uintptr_t address)
 {
-
     return task_memory_free(scheduler_running(), address);
 }
 
@@ -488,6 +501,8 @@ static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
+    logger_trace("%s(%08x, %08x, %08x, %08x, %08x)", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4);
+
     SyscallHandler handler = syscall_get_handler(syscall);
 
     Result result = SUCCESS;

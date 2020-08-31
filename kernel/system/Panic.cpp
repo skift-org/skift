@@ -49,6 +49,8 @@ const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
+void backtrace(uint32_t ebp);
+
 void system_panic_internal(
     __SOURCE_LOCATION__ location,
     void *stackframe,
@@ -104,6 +106,10 @@ void system_panic_internal(
     {
         printf("\n\tContext:\n");
         interrupts_dump_stackframe((InterruptStackFrame *)stackframe);
+
+        printf("\n\tBacktrace:\n");
+        backtrace(((InterruptStackFrame *)stackframe)->ebp);
+        printf("\n");
     }
 
     memory_dump();

@@ -12,4 +12,4 @@ struct Launchpad
     int argc;
 
     int handles[PROCESS_HANDLE_COUNT];
-} ;
+};

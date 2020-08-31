@@ -38,6 +38,11 @@ public:
         return IS_PAGE_ALIGN(base()) && IS_PAGE_ALIGN(size());
     }
 
+    auto containe(uintptr_t address)
+    {
+        return address >= base() && address <= end();
+    }
+
     static inline MemoryRange from_non_aligned_address(uintptr_t base, size_t size)
     {
         size_t align = ARCH_PAGE_SIZE - base % ARCH_PAGE_SIZE;

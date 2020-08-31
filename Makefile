@@ -148,7 +148,7 @@ VM_MEMORY?=128
 
 QEMU=qemu-system-x86_64
 QEMU_FLAGS=-m $(VM_MEMORY)M \
-		  -serial mon:stdio \
+		  -serial stdio \
 		  -rtc base=localtime
 
 QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \

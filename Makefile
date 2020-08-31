@@ -162,6 +162,9 @@ run-qemu: $(BOOTDISK)
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
 
+run-qemu-no-kvm:
+	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
+
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm

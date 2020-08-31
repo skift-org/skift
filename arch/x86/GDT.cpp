@@ -30,30 +30,25 @@ static TSS tss = {
     .iomap_base = 0,
 };
 
-static GDTEntry gdt_entries[GDT_ENTRY_COUNT] = {
-    {0, 0, 0, 0},
-    {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_FLAGS},
-    {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE, GDT_FLAGS},
-    {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER | GDT_EXECUTABLE, GDT_FLAGS},
-    {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER, GDT_FLAGS},
-    {0, 0, 0, 0},
-};
+static GDTEntry gdt[GDT_ENTRY_COUNT] = {};
 
 static GDTDescriptor gdt_descriptor = {
     .size = sizeof(GDTEntry) * GDT_ENTRY_COUNT,
-    .offset = (uint32_t)&gdt_entries[0],
+    .offset = (uint32_t)&gdt[0],
 };
 
 void gdt_initialize()
 {
-    gdt_entries[5] = GDTEntry{(uintptr_t)&tss,
-                              ((uintptr_t)&tss) + sizeof(TSS),
-                              GDT_TSS_PRESENT | GDT_ACCESSED | GDT_EXECUTABLE | GDT_USER,
-                              TSS_FLAGS};
+    gdt[0] = {0, 0, 0, 0};
+    gdt[1] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_FLAGS};
+    gdt[2] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE, GDT_FLAGS};
+    gdt[3] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER | GDT_EXECUTABLE, GDT_FLAGS};
+    gdt[4] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER, GDT_FLAGS};
+    gdt[5] = {&tss, GDT_TSS_PRESENT | GDT_ACCESSED | GDT_EXECUTABLE | GDT_USER, TSS_FLAGS};
 
     for (size_t i = 0; i < GDT_ENTRY_COUNT; i++)
     {
-        gdt_entries[i].dump(i);
+        gdt[i].dump(i);
     }
 
     gdt_flush((uint32_t)&gdt_descriptor);

@@ -62,6 +62,11 @@ struct __packed GDTEntry
     uint8_t flags : 4;
     uint8_t base24_31;
 
+    constexpr GDTEntry()
+        : GDTEntry(0, 0, 0, 0)
+    {
+    }
+
     constexpr GDTEntry(uint32_t base, uint32_t limit, uint8_t access, uint8_t flags)
         : limit0_15((uint16_t)((limit)&0xffff)),
           base0_15((uint16_t)((base)&0xffff)),
@@ -70,6 +75,11 @@ struct __packed GDTEntry
           limit16_19(((limit) >> 16) & 0x0f),
           flags((flags)),
           base24_31((uint8_t)(((base) >> 24) & 0xff))
+    {
+    }
+
+    constexpr GDTEntry(TSS *tss, uint8_t access, uint8_t flags)
+        : GDTEntry((uintptr_t)tss, ((uintptr_t)tss) + sizeof(TSS), access, flags)
     {
     }
 

@@ -16,6 +16,8 @@ static List *_tasks;
 
 Task *task_create(Task *parent, const char *name, bool user)
 {
+    logger_trace("Creating task %s", name);
+
     ASSERT_ATOMIC;
 
     if (_tasks == nullptr)
@@ -63,8 +65,14 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = nullptr;
     }
 
-    memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->stack);
-    task->stack_pointer = ((uintptr_t)task->stack + PROCESS_STACK_SIZE - 1);
+    memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
+    task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
+    logger_trace("Kernel stack at %08x-%08x", task->kernel_stack, task->kernel_stack_pointer);
+
+    memory_map(task->pdir, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
+    task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
+    task->user_stack = (void *)0xff000000;
+    logger_trace("User stack at %08x-%08x", task->user_stack, task->user_stack_pointer);
 
     arch_save_context(task);
 
@@ -95,7 +103,8 @@ void task_destroy(Task *task)
     lock_acquire(task->directory_lock);
     path_destroy(task->directory);
 
-    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->stack, PROCESS_STACK_SIZE});
+    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
+    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
 
     if (task->pdir != memory_kpdir())
     {
@@ -151,9 +160,45 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
     Task *task = task_create(parent, name, user);
 
     task_set_entry(task, entry, user);
-    task_stack_push(task, &arg, sizeof(arg));
+    task_kernel_stack_push(task, &arg, sizeof(arg));
 
     return task;
+}
+
+// static void pass_argc_argv_user(Task *task, const char **argv)
+// {
+//     PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->pdir);
+//
+//     uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
+//
+//     int argc;
+//     for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
+//     {
+//         argv_list[argc] = task_user_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
+//     }
+//
+//     uintptr_t argv_list_ref = task_user_stack_push(task, &argv_list, sizeof(argv_list));
+//
+//     task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
+//     task_user_stack_push(task, &argc, sizeof(argc));
+//
+//     task_switch_pdir(scheduler_running(), parent_pdir);
+// }
+
+static void pass_argc_argv_kernel(Task *task, const char **argv)
+{
+    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
+
+    int argc;
+    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
+    {
+        argv_list[argc] = task_kernel_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
+    }
+
+    uintptr_t argv_list_ref = task_kernel_stack_push(task, &argv_list, sizeof(argv_list));
+
+    task_kernel_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
+    task_kernel_stack_push(task, &argc, sizeof(argc));
 }
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user)
@@ -164,18 +209,15 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
     task_set_entry(task, entry, true);
 
-    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
-
-    int argc;
-    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
+    // FIXME: User tasks
+    //    if (user)
+    //    {
+    //        pass_argc_argv_user(task, argv);
+    //    }
+    //    else
     {
-        argv_list[argc] = task_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
+        pass_argc_argv_kernel(task, argv);
     }
-
-    uintptr_t argv_list_ref = task_stack_push(task, &argv_list, sizeof(argv_list));
-
-    task_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
-    task_stack_push(task, &argc, sizeof(argc));
 
     atomic_end();
 
@@ -196,30 +238,59 @@ void task_set_entry(Task *task, TaskEntry entry, bool user)
     task->user = user;
 }
 
-uintptr_t task_stack_push(Task *task, const void *value, uint size)
+uintptr_t task_kernel_stack_push(Task *task, const void *value, size_t size)
 {
-    task->stack_pointer -= size;
-    memcpy((void *)task->stack_pointer, value, size);
+    task->kernel_stack_pointer -= size;
+    memcpy((void *)task->kernel_stack_pointer, value, size);
 
-    return task->stack_pointer;
+    return task->kernel_stack_pointer;
+}
+
+uintptr_t task_user_stack_push(Task *task, const void *value, size_t size)
+{
+    task->user_stack_pointer -= size;
+    memcpy((void *)task->user_stack_pointer, value, size);
+    return task->user_stack_pointer;
 }
 
 void task_go(Task *task)
 {
-    InterruptStackFrame stackframe;
+    // FIXME: User tasks
+    // if (task->user)
+    // {
+    //     UserInterruptStackFrame stackframe = {};
+    //
+    //     stackframe.user_esp = task->user_stack_pointer;
+    //
+    //     stackframe.eflags = 0x202;
+    //     stackframe.eip = (uintptr_t)task->entry;
+    //     stackframe.ebp = 0;
+    //
+    //     stackframe.cs = 0x1b;
+    //     stackframe.ds = 0x23;
+    //     stackframe.es = 0x23;
+    //     stackframe.fs = 0x23;
+    //     stackframe.gs = 0x23;
+    //     stackframe.ss = 0x23;
+    //
+    //     task_kernel_stack_push(task, &stackframe, sizeof(UserInterruptStackFrame));
+    // }
+    // else
+    {
+        InterruptStackFrame stackframe = {};
 
-    stackframe.eflags = 0x202;
-    stackframe.eip = (uintptr_t)task->entry;
-    stackframe.ebp = 0;
+        stackframe.eflags = 0x202;
+        stackframe.eip = (uintptr_t)task->entry;
+        stackframe.ebp = 0;
 
-    // TODO: All tasks are still running has ring0 :/
-    stackframe.cs = 0x08;
-    stackframe.ds = 0x10;
-    stackframe.es = 0x10;
-    stackframe.fs = 0x10;
-    stackframe.gs = 0x10;
+        stackframe.cs = 0x08;
+        stackframe.ds = 0x10;
+        stackframe.es = 0x10;
+        stackframe.fs = 0x10;
+        stackframe.gs = 0x10;
 
-    task_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
+        task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
+    }
 
     atomic_begin();
     task_set_state(task, TASK_STATE_RUNNING);

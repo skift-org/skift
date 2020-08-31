@@ -11,10 +11,9 @@ void userspace_initialize()
 
     Launchpad *init_lauchpad = launchpad_create("init", "/System/Binaries/init");
 
-    Stream *keyboard_device = stream_open("/Devices/keyboard", OPEN_READ);
-    Stream *serial_device = stream_open("/Devices/serial", OPEN_WRITE);
+    Stream *serial_device = stream_open("/Devices/serial", OPEN_WRITE | OPEN_READ);
 
-    launchpad_handle(init_lauchpad, HANDLE(keyboard_device), 0);
+    launchpad_handle(init_lauchpad, HANDLE(serial_device), 0);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 1);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 2);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 3);
@@ -22,7 +21,6 @@ void userspace_initialize()
     int init_process = -1;
     Result result = launchpad_launch(init_lauchpad, &init_process);
 
-    stream_close(keyboard_device);
     stream_close(serial_device);
 
     if (result != SUCCESS)

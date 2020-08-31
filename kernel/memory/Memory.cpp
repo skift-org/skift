@@ -278,6 +278,8 @@ PageDirectory *memory_pdir_create()
     if (memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
         logger_error("Page directory allocation failed!");
+        atomic_end();
+
         return nullptr;
     }
 

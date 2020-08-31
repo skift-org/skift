@@ -135,7 +135,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 {
     scheduler_context_switch = true;
 
-    running->stack_pointer = current_stack_pointer;
+    running->kernel_stack_pointer = current_stack_pointer;
     arch_save_context(running);
 
     scheduler_record[system_get_tick() % SCHEDULER_RECORD_COUNT] = running->id;
@@ -154,5 +154,5 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
 
     scheduler_context_switch = false;
 
-    return running->stack_pointer;
+    return running->kernel_stack_pointer;
 }

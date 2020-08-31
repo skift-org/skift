@@ -93,7 +93,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         for (int i = 0; i < elf_header.phnum; i++)
         {
             ELFProgram elf_program_header;
-            stream_seek(elf_file, elf_header.phoff + (elf_header.phentsize) * i, WHENCE_START);
+            stream_seek(elf_file, elf_header.phoff + elf_header.phentsize * i, WHENCE_START);
 
             if (stream_read(elf_file, &elf_program_header, sizeof(ELFProgram)) != sizeof(ELFProgram))
             {

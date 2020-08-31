@@ -3,7 +3,7 @@
 
 extern uintptr_t __interrupt_vector[];
 
-IDTEntry idt[IDT_ENTRY_COUNT];
+IDTEntry idt[IDT_ENTRY_COUNT] = {};
 
 IDTDescriptor idt_descriptor = {
     .size = sizeof(IDTEntry) * IDT_ENTRY_COUNT,

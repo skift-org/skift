@@ -91,14 +91,13 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
                          stackframe.eip,
                          CR2());
 
+            task_dump(scheduler_running());
             backtrace(stackframe.ebp);
 
             task_exit(-1);
         }
         else
         {
-            backtrace(stackframe.ebp);
-
             system_panic_with_context(
                 &stackframe,
                 "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",

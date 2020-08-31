@@ -19,8 +19,12 @@ struct Task
     TaskState state;
     Blocker *blocker;
 
-    uintptr_t stack_pointer;
-    void *stack;     // Kernel stack
+    uintptr_t user_stack_pointer;
+    void *user_stack;
+
+    uintptr_t kernel_stack_pointer;
+    void *kernel_stack; // Kernel stack
+
     TaskEntry entry; // Our entry point
     char fpu_registers[512];
 
@@ -55,7 +59,9 @@ void task_set_state(Task *task, TaskState state);
 
 void task_set_entry(Task *task, TaskEntry entry, bool user);
 
-uintptr_t task_stack_push(Task *task, const void *value, uint size);
+uintptr_t task_kernel_stack_push(Task *task, const void *value, size_t size);
+
+uintptr_t task_user_stack_push(Task *task, const void *value, size_t size);
 
 void task_go(Task *task);
 

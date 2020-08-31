@@ -17,6 +17,9 @@ int main(int argc, char **argv)
     process_run("splash-screen", &splash_pid);
     process_wait(splash_pid, nullptr);
 
+    // Start a "DEBUG" shell
+    process_run("shell", NULL);
+
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {
         int compositor_pid = -1;
@@ -28,12 +31,6 @@ int main(int argc, char **argv)
         int terminal_pid = -1;
         process_run("terminal", &terminal_pid);
         process_wait(terminal_pid, nullptr);
-    }
-    else
-    {
-        int shell_pid = -1;
-        process_run("shell", &shell_pid);
-        process_wait(shell_pid, nullptr);
     }
 
     printf("\n\n\t\e[1;34mGoodbye!\e[m - n°1\n\n");

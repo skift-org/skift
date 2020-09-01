@@ -10,6 +10,10 @@
 
 #include "compositor/Protocol.h"
 
+#define WINDOW_RESIZE_AREA 16
+#define WINDOW_HEADER_AREA 36
+#define WINDOW_CONTENT_PADDING 1
+
 struct Window;
 
 typedef void (*WindowDestroyCallback)(Window *window);
@@ -67,6 +71,18 @@ public:
 
     Rectangle bound() { return _bound.moved({0, 0}); }
 
+    Rectangle content_bound()
+    {
+        Rectangle result = bound();
+
+        if (!(flags & WINDOW_BORDERLESS))
+        {
+            result = result.shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+        }
+
+        return result;
+    }
+
     int x() { return position().x(); }
     int y() { return position().y(); }
     int width() { return size().x(); }
@@ -110,8 +126,6 @@ bool window_is_visible(Window *window);
 void window_paint(Window *window, Painter &painter, Rectangle rectangle);
 
 void window_event(Window *window, Event *event);
-
-Rectangle window_content_bound(Window *window);
 
 void window_set_cursor(Window *window, CursorState state);
 

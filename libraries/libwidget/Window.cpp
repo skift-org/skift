@@ -11,10 +11,6 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-#define WINDOW_RESIZE_AREA 16
-#define WINDOW_HEADER_AREA 36
-#define WINDOW_CONTENT_PADDING 1
-
 void window_populate_header(Window *window)
 {
     window->header_container->clear_childs();
@@ -177,18 +173,6 @@ Rectangle window_header_bound(Window *window)
     return window->bound().take_top(WINDOW_HEADER_AREA);
 }
 
-Rectangle window_content_bound(Window *window)
-{
-    Rectangle result = window->bound();
-
-    if (!(window->flags & WINDOW_BORDERLESS))
-    {
-        result = result.shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
-    }
-
-    return result;
-}
-
 void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
     if (window->flags & WINDOW_TRANSPARENT)
@@ -203,7 +187,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
     painter.push();
     painter.clip(rectangle);
 
-    if (window_content_bound(window).containe(rectangle))
+    if (window->content_bound().containe(rectangle))
     {
         if (window->root())
         {
@@ -722,7 +706,7 @@ void window_layout(Window *window)
     window->header()->bound(window_header_bound(window));
     window->header()->relayout();
 
-    window->root()->bound(window_content_bound(window));
+    window->root()->bound(window->content_bound());
     window->root()->relayout();
 
     window->dirty_layout = false;

@@ -36,7 +36,7 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
         return _data[(size_t)(_data_size * where)];
     };
 
-    float cursor_position = _current / (float)_data_size;
+    float cursor_position = (_current % _data_size) / (float)_data_size;
 
     for (int i = 0; i < bound().width(); i++)
     {
@@ -71,8 +71,8 @@ Vec2i Graph::size()
 
 void Graph::record(float data)
 {
-    _data[_current] = data;
-    _current = (_current + 1) % _data_size;
+    _data[_current % _data_size] = data;
+    _current++;
 
     should_repaint();
 }

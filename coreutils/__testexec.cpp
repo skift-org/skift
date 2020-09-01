@@ -10,21 +10,6 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    printf("\n");
-
-    for (int i = 0; i < LOOP_MAX; i++)
-    {
-        printf("\r%d out %d... ", i + 1, LOOP_MAX);
-
-        int pid = -1;
-        Result result = process_run("sysfetch", &pid);
-
-        assert(result == SUCCESS);
-
-        process_wait(pid, nullptr);
-    }
-
-    printf("PASS\n");
-
+    process_run("__testexec", NULL);
     return 0;
 }

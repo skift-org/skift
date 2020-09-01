@@ -1,5 +1,5 @@
 #include <libsystem/Logger.h>
-#include <libsystem/thread/Lock.h>
+#include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/List.h>
 
 #include "kernel/memory/Memory.h"
@@ -8,11 +8,9 @@
 
 static int _memory_object_id = 0;
 static List *_memory_objects;
-static Lock _memory_objects_lock;
 
 void memory_object_initialize()
 {
-    lock_init(_memory_objects_lock);
     _memory_objects = list_create();
 }
 
@@ -26,9 +24,9 @@ MemoryObject *memory_object_create(size_t size)
     memory_object->refcount = 1;
     memory_object->_range = physical_alloc(size);
 
-    lock_acquire(_memory_objects_lock);
+    atomic_begin();
     list_pushback(_memory_objects, memory_object);
-    lock_release(_memory_objects_lock);
+    atomic_end();
 
     return memory_object;
 }
@@ -50,19 +48,19 @@ MemoryObject *memory_object_ref(MemoryObject *memory_object)
 
 void memory_object_deref(MemoryObject *memory_object)
 {
-    lock_acquire(_memory_objects_lock);
+    atomic_begin();
 
     if (__atomic_sub_fetch(&memory_object->refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
         memory_object_destroy(memory_object);
     }
 
-    lock_release(_memory_objects_lock);
+    atomic_end();
 }
 
 MemoryObject *memory_object_by_id(int id)
 {
-    lock_acquire(_memory_objects_lock);
+    atomic_begin();
 
     list_foreach(MemoryObject, memory_object, _memory_objects)
     {
@@ -70,13 +68,13 @@ MemoryObject *memory_object_by_id(int id)
         {
             memory_object_ref(memory_object);
 
-            lock_release(_memory_objects_lock);
+            atomic_end();
 
             return memory_object;
         }
     }
 
-    lock_release(_memory_objects_lock);
+    atomic_end();
 
     return nullptr;
 }

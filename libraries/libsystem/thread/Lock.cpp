@@ -1,25 +1,22 @@
 
 #include <libsystem/Assert.h>
+#include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 #include <libsystem/thread/Lock.h>
+
+#define LOCK_NO_HOLDER 0xDEADDEAD
 
 void __lock_init(Lock *lock, const char *name)
 {
     lock->locked = 0;
     lock->name = name;
-    lock->holder = 0xDEADDEAD;
+    lock->holder = LOCK_NO_HOLDER;
 }
 
 void __lock_acquire(Lock *lock)
 {
-    while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
-        asm("hlt"); // Don't burn the CPU ;)
-
-    __sync_synchronize();
-
-    lock->holder = process_this();
+    __lock_acquire_by(lock, process_this());
 }
 
 void __lock_acquire_by(Lock *lock, int holder)
@@ -34,14 +31,18 @@ void __lock_acquire_by(Lock *lock, int holder)
 
 bool __lock_try_acquire(Lock *lock)
 {
-    while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
+    if (__sync_bool_compare_and_swap(&lock->locked, 0, 1))
+    {
+        __sync_synchronize();
+
+        lock->holder = process_this();
+
+        return true;
+    }
+    else
+    {
         return false;
-
-    __sync_synchronize();
-
-    lock->holder = process_this();
-
-    return true;
+    }
 }
 
 void __lock_release(Lock *lock, const char *file, const char *function, int line)
@@ -50,8 +51,8 @@ void __lock_release(Lock *lock, const char *file, const char *function, int line
 
     __sync_synchronize();
 
-    lock->holder = -1;
-    lock->locked = 0;
+    lock->holder = 0xDEADDEAD;
+    __atomic_store_n(&lock->locked, 0, __ATOMIC_SEQ_CST);
 }
 
 void __lock_release_by(Lock *lock, int holder, const char *file, const char *function, int line)
@@ -70,8 +71,8 @@ void __lock_release_by(Lock *lock, int holder, const char *file, const char *fun
 
     __sync_synchronize();
 
-    lock->holder = 0;
-    lock->locked = 0;
+    lock->holder = LOCK_NO_HOLDER;
+    __atomic_store_n(&lock->locked, 0, __ATOMIC_SEQ_CST);
 }
 
 void __lock_assert(Lock *lock, const char *file, const char *function, int line)

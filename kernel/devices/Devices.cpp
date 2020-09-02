@@ -18,6 +18,12 @@ static DeviceDriverInfo drivers[] = {
         bga_initialize,
     },
     {
+        "Intel e1000/I217/82577LM Network Adaptor",
+        BUS_PCI,
+        e1000_match,
+        e1000_initialize,
+    },
+    {
         "VirtIO Network Adaptor",
         BUS_PCI,
         virtio_network_match,

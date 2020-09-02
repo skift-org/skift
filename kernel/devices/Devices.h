@@ -60,6 +60,9 @@ void device_iterate(void *target, DeviceIterateCallback callback);
 bool bga_match(DeviceInfo info);
 void bga_initialize(DeviceInfo info);
 
+bool e1000_match(DeviceInfo info);
+void e1000_initialize(DeviceInfo info);
+
 void keyboard_initialize();
 
 void null_initialize();

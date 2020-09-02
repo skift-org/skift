@@ -2,7 +2,7 @@
 
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
-#include <libsystem/utils/BufferBuilder.h>
+#include <libutils/StringBuilder.h>
 #include <libwidget/Widgets.h>
 
 #include "task-manager/TaskModel.h"
@@ -55,11 +55,7 @@ public:
             snprintf(buffer_average, 200, "Average: %i%%", (int)(average() * 100.0));
             _label_average->text(buffer_average);
 
-            auto buffer_greedy = buffer_builder_create(24);
-            buffer_builder_append_str(buffer_greedy, "Most greedy: ");
-            buffer_builder_append_str(buffer_greedy, greedy);
-            _label_greedy->text(buffer_builder_intermediate(buffer_greedy));
-            buffer_builder_destroy(buffer_greedy);
+            _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());
 
             ElapsedTime seconds = status.uptime;
             int days = seconds / 86400;

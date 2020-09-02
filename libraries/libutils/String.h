@@ -30,9 +30,20 @@ public:
         _buffer = make<StringStorage>(cstr, 1);
     }
 
-    String(const String &other) : _buffer(const_cast<String &>(other)._buffer) {}
+    String(RefPtr<StringStorage> storage)
+        : _buffer(storage)
+    {
+    }
 
-    String(String &&other) : _buffer(move(other._buffer)) {}
+    String(const String &other)
+        : _buffer(const_cast<String &>(other)._buffer)
+    {
+    }
+
+    String(String &&other)
+        : _buffer(move(other._buffer))
+    {
+    }
 
     ~String() {}
 

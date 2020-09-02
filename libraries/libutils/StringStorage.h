@@ -14,7 +14,10 @@ public:
 
     size_t length() { return _length; }
 
-    StringStorage(const char *cstring) : StringStorage(cstring, strlen(cstring)){};
+    StringStorage(const char *cstring)
+        : StringStorage(cstring, strlen(cstring))
+    {
+    }
 
     StringStorage(const char *cstring, size_t length)
     {
@@ -22,6 +25,12 @@ public:
         _buffer = new char[length + 1];
         memcpy(_buffer, cstring, length);
         _buffer[length] = '\0';
+    }
+
+    StringStorage(AdoptTag, char *buffer, size_t length)
+    {
+        _length = length;
+        _buffer = buffer;
     }
 
     StringStorage(StringStorage &left, StringStorage &right)

@@ -2,7 +2,7 @@
 
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
-#include <libsystem/utils/BufferBuilder.h>
+#include <libutils/StringBuilder.h>
 #include <libwidget/Widgets.h>
 
 #include "task-manager/TaskModel.h"
@@ -61,11 +61,7 @@ public:
             _label_available->text(buffer_avaliable);
 
             const char *greedy = task_model_get_greedy_process(_model, 0);
-            auto buffer_greedy = buffer_builder_create(32);
-            buffer_builder_append_str(buffer_greedy, "Most greedy: ");
-            buffer_builder_append_str(buffer_greedy, greedy);
-            _label_greedy->text(buffer_builder_intermediate(buffer_greedy));
-            buffer_builder_destroy(buffer_greedy);
+            _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());
         });
 
         _text_timer->start();

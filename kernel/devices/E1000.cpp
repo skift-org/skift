@@ -1,5 +1,5 @@
 #include <libsystem/Logger.h>
-#include <libsystem/net/MacAddress.h>
+#include <libsystem/network/MacAddress.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
@@ -18,10 +18,12 @@ static MacAddress _mac_address = {};
 int _current_rx_descriptors = 0;
 static MemoryRange _rx_descriptors_range = {};
 static E1000RXDescriptor *_rx_descriptors = {};
+static void **_rx_buffers = nullptr;
 
 int _current_tx_descriptors = 0;
 static MemoryRange _tx_descriptors_range = {};
 static E1000TXDescriptor *_tx_descriptors = {};
+static void **_tx_buffers = nullptr;
 
 static void e1000_write(uint16_t offset, uint32_t value)
 {
@@ -129,14 +131,14 @@ MacAddress e1000_mac_address_read()
 void e1000_initialize_rx()
 {
     _rx_descriptors_range = physical_alloc(PAGE_ALIGN_UP(sizeof(E1000RXDescriptor) * E1000_NUM_RX_DESC));
+    _rx_buffers = (void **)calloc(E1000_NUM_RX_DESC, sizeof(void *));
     _rx_descriptors = (E1000RXDescriptor *)virtual_alloc(&kpdir, _rx_descriptors_range, MEMORY_NONE).base();
 
     for (size_t i = 0; i < E1000_NUM_RX_DESC; i++)
     {
-        uintptr_t rx_buffer = 0;
-        memory_alloc(&kpdir, 8192, MEMORY_NONE, &rx_buffer);
+        memory_alloc(&kpdir, 8192, MEMORY_NONE, (uintptr_t *)&_rx_buffers[i]);
 
-        _rx_descriptors[i].address = virtual_to_physical(&kpdir, rx_buffer);
+        _rx_descriptors[i].address = virtual_to_physical(&kpdir, (uintptr_t)_rx_buffers[i]);
         _rx_descriptors[i].status = 0;
     }
 
@@ -152,14 +154,14 @@ void e1000_initialize_rx()
 void e1000_initialize_tx()
 {
     _tx_descriptors_range = physical_alloc(PAGE_ALIGN_UP(sizeof(E1000TXDescriptor) * E1000_NUM_TX_DESC));
+    _tx_buffers = (void **)calloc(E1000_NUM_TX_DESC, sizeof(void *));
     _tx_descriptors = (E1000TXDescriptor *)virtual_alloc(&kpdir, _tx_descriptors_range, MEMORY_NONE).base();
 
     for (size_t i = 0; i < E1000_NUM_TX_DESC; i++)
     {
-        uintptr_t tx_buffer = 0;
-        memory_alloc(&kpdir, 8192, MEMORY_NONE, &tx_buffer);
+        memory_alloc(&kpdir, 8192, MEMORY_NONE, (uintptr_t *)&_tx_buffers[i]);
 
-        _tx_descriptors[i].address = virtual_to_physical(&kpdir, tx_buffer);
+        _tx_descriptors[i].address = virtual_to_physical(&kpdir, (uintptr_t)_tx_buffers[i]);
         _tx_descriptors[i].status = 0;
     }
 
@@ -179,14 +181,50 @@ void e1000_enable_interrupt()
     e1000_read(0xc0);
 }
 
+/* --- Send/Receive --------------------------------------------------------- */
+
+void e1000_handle_receive()
+{
+    while (_rx_descriptors[_current_rx_descriptors].status & 0x1)
+    {
+        uint8_t *buffer = (uint8_t *)_rx_descriptors[_current_rx_descriptors].address;
+        uint16_t size = _rx_descriptors[_current_rx_descriptors].length;
+
+        // FIXME: Send this up the stack
+        __unused(buffer);
+        __unused(size);
+
+        _rx_descriptors[_current_rx_descriptors].status = 0;
+        uint16_t old_cur = _current_rx_descriptors;
+        _current_rx_descriptors = (_current_rx_descriptors + 1) % E1000_NUM_RX_DESC;
+        e1000_write(E1000_REG_RX_TAIL, old_cur);
+    }
+}
+
+void e1000_send_packet(const void *buffer, uint16_t size)
+{
+    _tx_descriptors[_current_tx_descriptors].address = (uint64_t)buffer;
+    _tx_descriptors[_current_tx_descriptors].length = size;
+    _tx_descriptors[_current_tx_descriptors].command = CMD_EOP | CMD_IFCS | CMD_RS;
+    _tx_descriptors[_current_tx_descriptors].status = 0;
+
+    uint8_t old_cur = _current_tx_descriptors;
+    _current_tx_descriptors = (_current_tx_descriptors + 1) % E1000_NUM_TX_DESC;
+    e1000_write(E1000_REG_TX_TAIL, _current_tx_descriptors);
+
+    while (!(_tx_descriptors[old_cur].status & 0xff))
+    {
+    }
+}
+
 /* --- device --------------------------------------------------------------- */
 
 bool e1000_match(DeviceInfo info)
 {
     return info.pci_device.vendor == 0x8086 &&
-           (info.pci_device.device == 0x100E || //  Qemu, Bochs, and VirtualBox emmulated NICs
+           (info.pci_device.device == 0x100E || // Qemu, Bochs, and VirtualBox emulated NICs
             info.pci_device.device == 0x153A || // Intel I217
-            info.pci_device.device == 0x153A);  //  Intel 82577LM
+            info.pci_device.device == 0x153A);  // Intel 82577LM
 }
 
 void e1000_initialize(DeviceInfo info)

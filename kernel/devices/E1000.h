@@ -62,6 +62,14 @@
 #define TSTA_LC (1 << 2) // Late Collision
 #define LSTA_TU (1 << 3) // Transmit Underrun
 
+#define CMD_EOP (1 << 0)  // End of Packet
+#define CMD_IFCS (1 << 1) // Insert FCS
+#define CMD_IC (1 << 2)   // Insert Checksum
+#define CMD_RS (1 << 3)   // Report Status
+#define CMD_RPS (1 << 4)  // Report Packet Sent
+#define CMD_VLE (1 << 6)  // VLAN Packet Enable
+#define CMD_IDE (1 << 7)  // Interrupt Delay Enable
+
 #define E1000_NUM_RX_DESC 32
 #define E1000_NUM_TX_DESC 8
 

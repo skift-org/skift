@@ -7,12 +7,21 @@
 #include "kernel/devices/E1000.h"
 #include "kernel/devices/MMIO.h"
 #include "kernel/memory/MemoryRange.h"
+#include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
 
 static MemoryRange _mmio_range = {};
 static uint16_t _pio_base = 0;
 static bool _has_eeprom = false;
 static MacAddress _mac_address = {};
+
+int _current_rx_descriptors = 0;
+static MemoryRange _rx_descriptors_range = {};
+static E1000RXDescriptor *_rx_descriptors = {};
+
+int _current_tx_descriptors = 0;
+static MemoryRange _tx_descriptors_range = {};
+static E1000TXDescriptor *_tx_descriptors = {};
 
 static void e1000_write(uint16_t offset, uint32_t value)
 {
@@ -26,6 +35,7 @@ static void e1000_write(uint16_t offset, uint32_t value)
         out32(_pio_base + 4, value);
     }
 }
+
 static uint32_t e1000_read(uint16_t offset)
 {
     if (!_mmio_range.empty())
@@ -60,24 +70,22 @@ bool e1000_eeprom_detect()
 
 uint16_t e1000_eeprom_read(uint32_t address)
 {
+    uint16_t data = 0;
     uint32_t tmp = 0;
-
     if (_has_eeprom)
     {
-        e1000_write(E1000_REG_EEPROM, 1 | (address << 8));
-
+        e1000_write(E1000_REG_EEPROM, (1) | ((uint32_t)(address) << 8));
         while (!((tmp = e1000_read(E1000_REG_EEPROM)) & (1 << 4)))
             ;
     }
     else
     {
-        e1000_write(E1000_REG_EEPROM, 1 | (address << 2));
-
+        e1000_write(E1000_REG_EEPROM, (1) | ((uint32_t)(address) << 2));
         while (!((tmp = e1000_read(E1000_REG_EEPROM)) & (1 << 1)))
             ;
     }
-
-    return (uint16_t)((tmp >> 16) & 0xFFFF);
+    data = (uint16_t)((tmp >> 16) & 0xFFFF);
+    return data;
 }
 
 /* --- Mac Address ---------------------------------------------------------- */
@@ -116,6 +124,61 @@ MacAddress e1000_mac_address_read()
     return address;
 }
 
+/* --- Rx/Tx ---------------------------------------------------------------- */
+
+void e1000_initialize_rx()
+{
+    _rx_descriptors_range = physical_alloc(PAGE_ALIGN_UP(sizeof(E1000RXDescriptor) * E1000_NUM_RX_DESC));
+    _rx_descriptors = (E1000RXDescriptor *)virtual_alloc(&kpdir, _rx_descriptors_range, MEMORY_NONE).base();
+
+    for (size_t i = 0; i < E1000_NUM_RX_DESC; i++)
+    {
+        uintptr_t rx_buffer = 0;
+        memory_alloc(&kpdir, 8192, MEMORY_NONE, &rx_buffer);
+
+        _rx_descriptors[i].address = virtual_to_physical(&kpdir, rx_buffer);
+        _rx_descriptors[i].status = 0;
+    }
+
+    e1000_write(E1000_REG_RX_LOW, _rx_descriptors_range.base());
+    e1000_write(E1000_REG_RX_HIGH, 0);
+    e1000_write(E1000_REG_RX_LENGTH, E1000_NUM_RX_DESC * sizeof(E1000RXDescriptor));
+
+    e1000_write(E1000_REG_RX_HEAD, 0);
+    e1000_write(E1000_REG_RX_TAIL, E1000_NUM_RX_DESC - 1);
+    e1000_write(E1000_REG_RX_CONTROL, RCTL_EN | RCTL_SBP | RCTL_UPE | RCTL_MPE | RCTL_LBM_NONE | RTCL_RDMTS_HALF | RCTL_BAM | RCTL_SECRC | RCTL_BSIZE_8192);
+}
+
+void e1000_initialize_tx()
+{
+    _tx_descriptors_range = physical_alloc(PAGE_ALIGN_UP(sizeof(E1000TXDescriptor) * E1000_NUM_TX_DESC));
+    _tx_descriptors = (E1000TXDescriptor *)virtual_alloc(&kpdir, _tx_descriptors_range, MEMORY_NONE).base();
+
+    for (size_t i = 0; i < E1000_NUM_TX_DESC; i++)
+    {
+        uintptr_t tx_buffer = 0;
+        memory_alloc(&kpdir, 8192, MEMORY_NONE, &tx_buffer);
+
+        _tx_descriptors[i].address = virtual_to_physical(&kpdir, tx_buffer);
+        _tx_descriptors[i].status = 0;
+    }
+
+    e1000_write(E1000_REG_TX_LOW, _tx_descriptors_range.base());
+    e1000_write(E1000_REG_TX_HIGH, 0);
+    e1000_write(E1000_REG_TX_LENGTH, E1000_NUM_TX_DESC * sizeof(E1000TXDescriptor));
+
+    e1000_write(E1000_REG_TX_HEAD, 0);
+    e1000_write(E1000_REG_TX_TAIL, E1000_NUM_TX_DESC - 1);
+    e1000_write(E1000_REG_TX_CONTROL, TCTL_EN | TCTL_PSP | (15 << TCTL_CT_SHIFT) | (64 << TCTL_COLD_SHIFT) | TCTL_RTLC);
+}
+
+void e1000_enable_interrupt()
+{
+    e1000_write(E1000_REG_IMASK, 0x1F6DC);
+    e1000_write(E1000_REG_IMASK, 0xff & ~4);
+    e1000_read(0xc0);
+}
+
 /* --- device --------------------------------------------------------------- */
 
 bool e1000_match(DeviceInfo info)
@@ -142,6 +205,10 @@ void e1000_initialize(DeviceInfo info)
 
     _has_eeprom = e1000_eeprom_detect();
     _mac_address = e1000_mac_address_read();
+
+    e1000_initialize_rx();
+    e1000_initialize_tx();
+    e1000_enable_interrupt();
 
     logger_trace("Mac address is %02x:%02x:%02x:%02x:%02x:%02x",
                  _mac_address[0], _mac_address[1], _mac_address[2], _mac_address[3], _mac_address[4], _mac_address[5]);

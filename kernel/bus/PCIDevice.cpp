@@ -64,13 +64,13 @@ PCIBarType pci_device_type_bar(PCIDevice device, int bar)
 
     uint32_t bar_value = pci_device_read_bar(device, bar);
 
-    if (bar_value & 0x1)
+    if (bar_value & 0b0001)
     {
         return PCIBarType::PIO;
     }
     else
     {
-        if ((bar_value & 0b110) == 0b110)
+        if ((bar_value & 0b0110) == 0b0110)
         {
             return PCIBarType::MMIO64;
         }

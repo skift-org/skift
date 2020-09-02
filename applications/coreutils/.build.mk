@@ -3,13 +3,11 @@ UTILS = \
 	__TESTTERM \
 	CAT \
 	CLEAR \
-	DISPLAYCTL \
 	DSTART \
 	ECHO \
 	GREP \
 	INIT \
 	JSON \
-	KEYBOARDCTL \
 	KILL \
 	LS \
 	MAN \
@@ -17,102 +15,88 @@ UTILS = \
 	MKDIR \
 	MV \
 	NOW \
-	POWERCTL \
 	OPEN \
 	PANIC \
 	SYSFETCH \
 	TOUCH \
 	UNLINK \
 	UPTIME \
-	WALLPAPERCTL \
 	LINK
 
-__TESTEXEC_NAME = __testexec
 __TESTEXEC_LIBS =
+__TESTEXEC_NAME = __testexec
 
-__TESTTERM_NAME = __testterm
 __TESTTERM_LIBS =
+__TESTTERM_NAME = __testterm
 
-CAT_NAME = cat
 CAT_LIBS =
+CAT_NAME = cat
 
-CLEAR_NAME = clear
 CLEAR_LIBS =
+CLEAR_NAME = clear
 
-DISPLAYCTL_NAME = displayctl
-DISPLAYCTL_LIBS =
-
-DSTART_NAME = dstart
 DSTART_LIBS =
+DSTART_NAME = dstart
 
-ECHO_NAME = echo
 ECHO_LIBS =
+ECHO_NAME = echo
 
-GREP_NAME = grep
 GREP_LIBS =
+GREP_NAME = grep
 
-INIT_NAME = init
 INIT_LIBS =
+INIT_NAME = init
 
-JSON_NAME = json
 JSON_LIBS = json
+JSON_NAME = json
 
-KEYBOARDCTL_NAME = keyboardctl
-KEYBOARDCTL_LIBS =
-
-KILL_NAME = kill
 KILL_LIBS =
+KILL_NAME = kill
 
-LS_NAME = ls
-LS_LIBS =
-
-MAN_NAME = man
-MAN_LIBS = json
-
-MARKUP_NAME = markup
-MARKUP_LIBS = markup
-
-MKDIR_NAME = mkdir
-MKDIR_LIBS =
-
-MV_NAME = mv
-MV_LIBS =
-
-NOW_NAME = now
-NOW_LIBS =
-
-POWERCTL_NAME = powerctl
-POWERCTL_LIBS =
-
-OPEN_NAME = open
-OPEN_LIBS = json
-
-PANIC_NAME = panic
-PANIC_LIBS =
-
-SYSFETCH_NAME = sysfetch
-SYSFETCH_LIBS =
-
-TOUCH_NAME = touch
-TOUCH_LIBS =
-
-UNLINK_NAME = unlink
-UNLINK_LIBS =
-
-UPTIME_NAME = uptime
-UPTIME_LIBS =
-
-WALLPAPERCTL_NAME = wallpaperctl
-WALLPAPERCTL_LIBS = graphic
-
-LINK_NAME = link
 LINK_LIBS =
+LINK_NAME = link
+
+LS_LIBS =
+LS_NAME = ls
+
+MAN_LIBS = json
+MAN_NAME = man
+
+MARKUP_LIBS = markup
+MARKUP_NAME = markup
+
+MKDIR_LIBS =
+MKDIR_NAME = mkdir
+
+MV_LIBS =
+MV_NAME = mv
+
+NOW_LIBS =
+NOW_NAME = now
+
+OPEN_LIBS = json
+OPEN_NAME = open
+
+PANIC_LIBS =
+PANIC_NAME = panic
+
+SYSFETCH_LIBS =
+SYSFETCH_NAME = sysfetch
+
+TOUCH_LIBS =
+TOUCH_NAME = touch
+
+UNLINK_LIBS =
+UNLINK_NAME = unlink
+
+UPTIME_LIBS =
+UPTIME_NAME = uptime
 
 define UTIL_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
-$(1)_SOURCE  = coreutils/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst coreutils/%.cpp, $$(BUILD_DIRECTORY)/coreutils/%.o, $$($(1)_SOURCE))
+$(1)_SOURCE  = applications/coreutils/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst applications/coreutils/%.cpp, $$(BUILD_DIRECTORY)/applications/coreutils/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)

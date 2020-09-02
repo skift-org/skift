@@ -80,7 +80,6 @@ ASFLAGS=-f elf32
 
 include kernel/.build.mk
 include libraries/.build.mk
-include coreutils/.build.mk
 include applications/.build.mk
 include icons/.build.mk
 

@@ -14,7 +14,7 @@ void idt_initialize()
 {
     for (int i = 0; i < 32; i++)
     {
-        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
+        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, TRAPGATE);
     }
 
     for (int i = 32; i < 48; i++)

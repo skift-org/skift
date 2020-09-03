@@ -1,5 +1,6 @@
 #include <abi/Paths.h>
 #include <libsystem/Logger.h>
+#include <libsystem/math/MinMax.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
@@ -7,6 +8,7 @@
 #include "kernel/devices/E1000.h"
 #include "kernel/devices/MMIO.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Dispatcher.h"
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
@@ -199,11 +201,14 @@ void e1000_handle_receive()
         uint16_t old_cur = _current_rx_descriptors;
         _current_rx_descriptors = (_current_rx_descriptors + 1) % E1000_NUM_RX_DESC;
         e1000_write(E1000_REG_RX_TAIL, old_cur);
+
+        logger_trace("rx");
     }
 }
 
 void e1000_send_packet(const void *buffer, uint16_t size)
 {
+
     _tx_descriptors[_current_tx_descriptors].address = (uint64_t)buffer;
     _tx_descriptors[_current_tx_descriptors].length = size;
     _tx_descriptors[_current_tx_descriptors].command = CMD_EOP | CMD_IFCS | CMD_RS;
@@ -216,11 +221,23 @@ void e1000_send_packet(const void *buffer, uint16_t size)
     while (!(_tx_descriptors[old_cur].status & 0xff))
     {
     }
+
+    logger_trace("tx");
 }
 
 /* --- FsNode --------------------------------------------------------------- */
 
-Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
+static void e1000_interrupt_handler()
+{
+    e1000_write(E1000_REG_IMASK, 0x1);
+
+    uint32_t status = e1000_read(E1000_REG_STATUS);
+
+    if (status & 0x80)
+        e1000_handle_receive();
+}
+
+Result e1000_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -237,13 +254,54 @@ Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
     }
 }
 
+static Result e1000_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+{
+    __unused(node);
+    __unused(handle);
+    __unused(buffer);
+    __unused(size);
+    __unused(read);
+
+    return ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+static Result e1000_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+{
+    __unused(node);
+    __unused(handle);
+
+    e1000_send_packet(buffer, size);
+    *written = MIN(size, 8192);
+    return SUCCESS;
+}
+
+bool e1000_can_write(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    return true;
+}
+
+bool e1000_can_read(FsNode *node, FsHandle *handle)
+{
+    __unused(node);
+    __unused(handle);
+
+    return true;
+}
+
 class Net : public FsNode
 {
 private:
 public:
     Net() : FsNode(FILE_TYPE_DEVICE)
     {
-        call = (FsNodeCallCallback)net_iocall;
+        call = (FsNodeCallCallback)e1000_iocall;
+        read = (FsNodeReadCallback)e1000_read;
+        write = (FsNodeWriteCallback)e1000_write;
+        can_read = (FsNodeCanReadCallback)e1000_can_read;
+        can_write = (FsNodeCanReadCallback)e1000_can_write;
     }
 
     ~Net()
@@ -282,5 +340,6 @@ void e1000_initialize(DeviceInfo info)
     e1000_initialize_tx();
     e1000_enable_interrupt();
 
+    dispatcher_register_handler(pci_device_get_interrupt(info.pci_device), e1000_interrupt_handler);
     filesystem_link_and_take_ref_cstring(NETWORK_DEVICE_PATH, new Net());
 }

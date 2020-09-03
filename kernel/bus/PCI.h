@@ -46,4 +46,3 @@ Iteration pci_device_iterate(void *target, DeviceIterateCallback callback);
 
 void pci_remap();
 
-int pci_get_interrupt(PCIDevice device);

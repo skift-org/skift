@@ -166,7 +166,7 @@ void pci_remap()
     }
 }
 
-int pci_get_interrupt(PCIDevice device)
+int pci_device_get_interrupt(PCIDevice device)
 {
     if (has_pci_isa)
     {

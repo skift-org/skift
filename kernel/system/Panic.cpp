@@ -111,6 +111,16 @@ void system_panic_internal(
         backtrace(((InterruptStackFrame *)stackframe)->ebp);
         printf("\n");
     }
+    else
+    {
+        uint32_t ebp;
+        asm("movl %%ebp,%0"
+            : "=r"(ebp)::);
+
+        printf("\n\tBacktrace:\n");
+        backtrace(ebp);
+        printf("\n");
+    }
 
     memory_dump();
 

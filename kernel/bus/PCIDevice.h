@@ -41,3 +41,5 @@ size_t pci_device_size_bar(PCIDevice device, int bar);
 PCIBarType pci_device_type_bar(PCIDevice device, int bar);
 
 uint16_t pci_device_type(PCIDevice device);
+
+int pci_device_get_interrupt(PCIDevice device);

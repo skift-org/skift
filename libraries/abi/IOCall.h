@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <abi/Network.h>
 
 struct IOCallTerminalSizeArgs
 {
@@ -40,6 +40,11 @@ struct IOCallTextModeStateArgs
     int cursor_y;
 };
 
+struct IOCallNetworkSateAgs
+{
+    MacAddress mac_address;
+};
+
 enum IOCall
 {
     IOCALL_TERMINAL_GET_SIZE,
@@ -54,6 +59,8 @@ enum IOCall
 
     IOCALL_TEXTMODE_GET_STATE,
     IOCALL_TEXTMODE_SET_STATE,
+
+    IOCALL_NETWORK_GET_STATE,
 
     __IOCALL_COUNT,
 };

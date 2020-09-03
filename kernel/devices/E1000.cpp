@@ -1,11 +1,12 @@
+#include <abi/Paths.h>
 #include <libsystem/Logger.h>
-#include <libsystem/network/MacAddress.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/E1000.h"
 #include "kernel/devices/MMIO.h"
+#include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/MemoryRange.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
@@ -217,6 +218,39 @@ void e1000_send_packet(const void *buffer, uint16_t size)
     }
 }
 
+/* --- FsNode --------------------------------------------------------------- */
+
+Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
+{
+    __unused(node);
+    __unused(handle);
+
+    if (iocall == IOCALL_NETWORK_GET_STATE)
+    {
+        IOCallNetworkSateAgs *state = (IOCallNetworkSateAgs *)args;
+        state->mac_address = _mac_address;
+        return SUCCESS;
+    }
+    else
+    {
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+    }
+}
+
+class Net : public FsNode
+{
+private:
+public:
+    Net() : FsNode(FILE_TYPE_DEVICE)
+    {
+        call = (FsNodeCallCallback)net_iocall;
+    }
+
+    ~Net()
+    {
+    }
+};
+
 /* --- device --------------------------------------------------------------- */
 
 bool e1000_match(DeviceInfo info)
@@ -250,4 +284,6 @@ void e1000_initialize(DeviceInfo info)
 
     logger_trace("Mac address is %02x:%02x:%02x:%02x:%02x:%02x",
                  _mac_address[0], _mac_address[1], _mac_address[2], _mac_address[3], _mac_address[4], _mac_address[5]);
+
+    filesystem_link_and_take_ref_cstring(NETWORK_DEVICE_PATH, new Net());
 }

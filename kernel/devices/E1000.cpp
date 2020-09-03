@@ -282,8 +282,5 @@ void e1000_initialize(DeviceInfo info)
     e1000_initialize_tx();
     e1000_enable_interrupt();
 
-    logger_trace("Mac address is %02x:%02x:%02x:%02x:%02x:%02x",
-                 _mac_address[0], _mac_address[1], _mac_address[2], _mac_address[3], _mac_address[4], _mac_address[5]);
-
     filesystem_link_and_take_ref_cstring(NETWORK_DEVICE_PATH, new Net());
 }

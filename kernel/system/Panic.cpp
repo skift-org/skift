@@ -71,15 +71,15 @@ void system_panic_internal(
         has_panic = true;
         printf("\n\e[0;33m--- \e[0;31m!!!\e[0;33m ------------------------------------------------------------------------\e[0m\n");
         printf("\n\tKERNEL");
+        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
     }
     else
     {
         nested_panic = true;
         printf("\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
         printf("\n\tNESTED");
+        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[1]);
     }
-
-    printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[system_get_tick() % __array_length(witty_comments)]);
 
     vprintf(message, va);
     printf("\e[0m\n\tthrow by %s %s() ln%d", location.file, location.function, location.line);

@@ -16,8 +16,6 @@ static List *_tasks;
 
 Task *task_create(Task *parent, const char *name, bool user)
 {
-    logger_trace("Creating task %s", name);
-
     ASSERT_ATOMIC;
 
     if (_tasks == nullptr)
@@ -67,12 +65,10 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
-    logger_trace("Kernel stack at %08x-%08x", task->kernel_stack, task->kernel_stack_pointer);
 
     memory_map(task->pdir, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
     task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
     task->user_stack = (void *)0xff000000;
-    logger_trace("User stack at %08x-%08x", task->user_stack, task->user_stack_pointer);
 
     arch_save_context(task);
 
@@ -89,6 +85,7 @@ void task_destroy(Task *task)
         task_set_state(task, TASK_STATE_NONE);
 
     list_remove(_tasks, task);
+
     atomic_end();
 
     list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)

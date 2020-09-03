@@ -66,7 +66,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
 
 static void reboot_8042()
 {
-    logger_trace("Trying to reboot using the 8042...");
+    logger_info("Trying to reboot using the 8042...");
 
     uint8_t good = 0x02;
     while (good & 0x02)
@@ -79,13 +79,13 @@ __no_return void arch_reboot()
 {
     reboot_8042();
 
-    logger_error("Failled to reboot: Halting!");
+    logger_info("Failled to reboot: Halting!");
     system_stop();
 }
 
 static void shutdown_virtual_machines()
 {
-    logger_trace("Maybe your are running a VM, trying to shutdown using io ports...");
+    logger_info("Maybe your are running a VM, trying to shutdown using io ports...");
 
     // Bochs, and older versions of QEMU(than 2.0)
     out16(0xB004, 0x2000);

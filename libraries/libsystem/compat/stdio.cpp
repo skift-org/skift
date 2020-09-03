@@ -58,8 +58,6 @@ OpenFlag stdio_parse_mode(const char *mode)
 
 FILE *fopen(const char *path, const char *mode)
 {
-    logger_trace("fopen(%s, %s)", path, mode);
-
     Stream *stream = stream_open(path, stdio_parse_mode(mode));
 
     if (handle_has_error(stream))

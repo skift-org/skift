@@ -495,9 +495,8 @@ SyscallHandler syscall_get_handler(Syscall syscall)
     }
 }
 
-#define SYSCALL_NAMES_ENTRY(__entry) #__entry,
-
-static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
+// #define SYSCALL_NAMES_ENTRY(__entry) #__entry,
+// static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {
@@ -513,10 +512,10 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
 
     result = handler(arg0, arg1, arg2, arg3, arg4);
 
-    if (result != SUCCESS && result != TIMEOUT)
-    {
-        logger_trace("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
-    }
+    // if (result != SUCCESS && result != TIMEOUT)
+    // {
+    //     logger_trace("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
+    // }
 
     return result;
 }

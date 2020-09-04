@@ -4,8 +4,10 @@
 
 #include "kernel/node/Node.h"
 
-struct FsConnection : public FsNode
+class FsConnection : public FsNode
 {
+private:
+public:
     bool accepted;
     bool is_open;
 
@@ -13,4 +15,6 @@ struct FsConnection : public FsNode
     RingBuffer *data_to_client;
 
     FsConnection();
+
+    bool can_read(FsHandle *handle);
 };

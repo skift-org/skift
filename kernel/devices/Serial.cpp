@@ -19,15 +19,6 @@ void serial_interrupt_handler()
     ringbuffer_write(serial_buffer, (const char *)&byte, sizeof(byte));
 }
 
-bool serial_can_read(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(serial_buffer);
-}
-
 static Result serial_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
@@ -58,12 +49,19 @@ private:
 public:
     Serial() : FsNode(FILE_TYPE_DEVICE)
     {
-        can_read = (FsNodeCanReadCallback)serial_can_read;
         read = (FsNodeReadCallback)serial_read;
         write = (FsNodeWriteCallback)serial_write;
     }
 
     ~Serial() {}
+
+    bool can_read(FsHandle *handle)
+    {
+        __unused(handle);
+
+        // FIXME: make this atomic or something...
+        return !ringbuffer_is_empty(serial_buffer);
+    }
 };
 
 void serial_initialize()

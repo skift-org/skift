@@ -5,10 +5,10 @@
 
 #include "kernel/node/Node.h"
 
-struct FsTerminalEndpoint;
-
-struct FsTerminal : public FsNode
+class FsTerminal : public FsNode
 {
+private:
+public:
     int width;
     int height;
 
@@ -16,4 +16,8 @@ struct FsTerminal : public FsNode
     RingBuffer *slave_to_master_buffer;
 
     FsTerminal();
+
+    bool can_read(FsHandle *handle);
+
+    bool can_write(FsHandle *handle);
 };

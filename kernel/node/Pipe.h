@@ -4,9 +4,15 @@
 
 #include "kernel/node/Node.h"
 
-struct FsPipe : public FsNode
+class FsPipe : public FsNode
 {
+private:
+public:
     RingBuffer *buffer;
 
     FsPipe();
+
+    bool can_read(FsHandle *handle);
+
+    bool can_write(FsHandle *handle);
 };

@@ -11,7 +11,7 @@ static bool blocker_read_can_unblock(BlockerRead *blocker, Task *task)
 {
     __unused(task);
 
-    return !fsnode_is_acquire(blocker->handle->node) && fsnode_can_read(blocker->handle->node, blocker->handle);
+    return !fsnode_is_acquire(blocker->handle->node) && blocker->handle->node->can_read(blocker->handle);
 }
 
 static void blocker_read_unblock(BlockerRead *blocker, Task *task)

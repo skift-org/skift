@@ -78,12 +78,12 @@ SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
     FsNode *node = handle->node;
     SelectEvent selected_events = 0;
 
-    if ((events & SELECT_READ) && fsnode_can_read(node, handle))
+    if ((events & SELECT_READ) && node->can_read(handle))
     {
         selected_events |= SELECT_READ;
     }
 
-    if ((events & SELECT_WRITE) && fsnode_can_write(node, handle))
+    if ((events & SELECT_WRITE) && node->can_write(handle))
     {
         selected_events |= SELECT_WRITE;
     }

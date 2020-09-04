@@ -10,9 +10,6 @@ struct FsHandle;
 typedef Result (*FsNodeOpenCallback)(struct FsNode *node, struct FsHandle *handle);
 typedef void (*FsNodeCloseCallback)(struct FsNode *node, struct FsHandle *handle);
 
-typedef bool (*FsNodeCanReadCallback)(struct FsNode *node, struct FsHandle *handle);
-typedef bool (*FsNodeCanWriteCallback)(struct FsNode *node, struct FsHandle *handle);
-
 typedef Result (*FsNodeReadCallback)(struct FsNode *node, struct FsHandle *handle, void *buffer, size_t size, size_t *read);
 typedef Result (*FsNodeWriteCallback)(struct FsNode *node, struct FsHandle *handle, const void *buffer, size_t size, size_t *written);
 
@@ -49,8 +46,6 @@ struct FsNode
 
     FsNodeOpenCallback open = nullptr;
     FsNodeCloseCallback close = nullptr;
-    FsNodeCanReadCallback can_read = nullptr;
-    FsNodeCanWriteCallback can_write = nullptr;
     FsNodeReadCallback read = nullptr;
     FsNodeWriteCallback write = nullptr;
     FsNodeFindCallback find = nullptr;
@@ -79,11 +74,19 @@ public:
     void ref_handle(FsHandle &handle);
 
     void deref_handle(FsHandle &handle);
+
+    virtual bool can_read(FsHandle *handle)
+    {
+        __unused(handle);
+        return true;
+    }
+
+    virtual bool can_write(FsHandle *handle)
+    {
+        __unused(handle);
+        return true;
+    }
 };
-
-bool fsnode_can_read(FsNode *node, struct FsHandle *handle);
-
-bool fsnode_can_write(FsNode *node, struct FsHandle *handle);
 
 bool fsnode_can_accept(FsNode *node);
 

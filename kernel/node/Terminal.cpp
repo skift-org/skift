@@ -7,34 +7,6 @@
 
 #define TERMINAL_RINGBUFFER_SIZE 1024
 
-static bool terminal_can_read(FsTerminal *terminal, FsHandle *handle)
-{
-    __unused(handle);
-
-    if (fshandle_has_flag(handle, OPEN_MASTER))
-    {
-        return !ringbuffer_is_empty(terminal->slave_to_master_buffer) || !terminal->writers;
-    }
-    else
-    {
-        return !ringbuffer_is_empty(terminal->master_to_slave_buffer) || !terminal->master;
-    }
-}
-
-static bool terminal_can_write(FsTerminal *terminal, FsHandle *handle)
-{
-    __unused(handle);
-
-    if (fshandle_has_flag(handle, OPEN_MASTER))
-    {
-        return !ringbuffer_is_full(terminal->master_to_slave_buffer) || !terminal->readers;
-    }
-    else
-    {
-        return !ringbuffer_is_full(terminal->slave_to_master_buffer) || !terminal->master;
-    }
-}
-
 static Result terminal_read(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(handle);
@@ -133,8 +105,6 @@ static void terminal_destroy(FsTerminal *terminal)
 
 FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
 {
-    can_read = (FsNodeCanReadCallback)terminal_can_read;
-    can_write = (FsNodeCanWriteCallback)terminal_can_write;
     read = (FsNodeReadCallback)terminal_read;
     write = (FsNodeWriteCallback)terminal_write;
     call = (FsNodeCallCallback)terminal_iocall;
@@ -146,4 +116,32 @@ FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
 
     master_to_slave_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
     slave_to_master_buffer = ringbuffer_create(TERMINAL_RINGBUFFER_SIZE);
+}
+
+bool FsTerminal::can_read(FsHandle *handle)
+{
+    __unused(handle);
+
+    if (fshandle_has_flag(handle, OPEN_MASTER))
+    {
+        return !ringbuffer_is_empty(slave_to_master_buffer) || !writers;
+    }
+    else
+    {
+        return !ringbuffer_is_empty(master_to_slave_buffer) || !master;
+    }
+}
+
+bool FsTerminal::can_write(FsHandle *handle)
+{
+    __unused(handle);
+
+    if (fshandle_has_flag(handle, OPEN_MASTER))
+    {
+        return !ringbuffer_is_full(master_to_slave_buffer) || !readers;
+    }
+    else
+    {
+        return !ringbuffer_is_full(slave_to_master_buffer) || !master;
+    }
 }

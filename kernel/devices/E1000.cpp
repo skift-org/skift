@@ -274,22 +274,6 @@ static Result net_write(FsNode *node, FsHandle *handle, const void *buffer, size
     return SUCCESS;
 }
 
-bool net_can_write(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    return true;
-}
-
-bool net_can_read(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    return true;
-}
-
 class Net : public FsNode
 {
 private:
@@ -299,12 +283,24 @@ public:
         call = (FsNodeCallCallback)net_iocall;
         read = (FsNodeReadCallback)net_read;
         write = (FsNodeWriteCallback)net_write;
-        can_read = (FsNodeCanReadCallback)net_can_read;
-        can_write = (FsNodeCanReadCallback)net_can_write;
     }
 
     ~Net()
     {
+    }
+
+    bool can_write(FsHandle *handle)
+    {
+        __unused(handle);
+
+        return true;
+    }
+
+    bool can_read(FsHandle *handle)
+    {
+        __unused(handle);
+
+        return true;
     }
 };
 

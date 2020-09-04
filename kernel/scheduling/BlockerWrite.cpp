@@ -12,7 +12,7 @@ bool blocker_write_can_unblock(BlockerWrite *blocker, Task *task)
     __unused(task);
 
     return !fsnode_is_acquire(blocker->handle->node) &&
-           fsnode_can_write(blocker->handle->node, blocker->handle);
+           blocker->handle->node->can_write(blocker->handle);
 }
 
 void blocker_write_unblock(BlockerWrite *blocker, Task *task)

@@ -281,15 +281,6 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, vo
     }
 }
 
-static bool characters_can_read(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(_characters_buffer);
-}
-
 static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
@@ -301,15 +292,6 @@ static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size
     atomic_end();
 
     return SUCCESS;
-}
-
-static bool events_can_read(FsNode *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(_events_buffer);
 }
 
 static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
@@ -333,11 +315,18 @@ public:
     Keyboard() : FsNode(FILE_TYPE_DEVICE)
     {
         call = (FsNodeCallCallback)keyboard_iocall;
-        can_read = (FsNodeCanReadCallback)characters_can_read;
         read = (FsNodeReadCallback)characters_read;
     }
 
     ~Keyboard() {}
+
+    bool can_read(FsHandle *handle)
+    {
+        __unused(handle);
+
+        // FIXME: make this atomic or something...
+        return !ringbuffer_is_empty(_characters_buffer);
+    }
 };
 
 class KeyboardEvent : public FsNode
@@ -347,12 +336,19 @@ public:
     KeyboardEvent() : FsNode(FILE_TYPE_DEVICE)
     {
         call = (FsNodeCallCallback)keyboard_iocall;
-        can_read = (FsNodeCanReadCallback)events_can_read;
         read = (FsNodeReadCallback)events_read;
     }
 
     ~KeyboardEvent()
     {
+    }
+
+    bool can_read(FsHandle *handle)
+    {
+        __unused(handle);
+
+        // FIXME: make this atomic or something...
+        return !ringbuffer_is_empty(_events_buffer);
     }
 };
 

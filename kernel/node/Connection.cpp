@@ -16,14 +16,6 @@ static bool fsconnection_is_accepted(FsConnection *connection)
     return connection->accepted;
 }
 
-static bool fsconnection_can_read(FsConnection *connection, FsHandle *handle)
-{
-    if (fshandle_has_flag(handle, OPEN_CLIENT))
-        return !ringbuffer_is_empty(connection->data_to_client) || !connection->server;
-    else
-        return !ringbuffer_is_empty(connection->data_to_server) || !connection->clients;
-}
-
 static Result fsconnection_read(
     FsConnection *connection,
     FsHandle *handle,
@@ -100,11 +92,22 @@ FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
 {
     accept = (FsNodeAcceptCallback)fsconnection_accept;
     is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
-    can_read = (FsNodeCanReadCallback)fsconnection_can_read;
     read = (FsNodeReadCallback)fsconnection_read;
     write = (FsNodeWriteCallback)fsconnection_write;
     destroy = (FsNodeDestroyCallback)fsconnection_destroy;
 
     data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
     data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
+}
+
+bool FsConnection::can_read(FsHandle *handle)
+{
+    if (fshandle_has_flag(handle, OPEN_CLIENT))
+    {
+        return !ringbuffer_is_empty(data_to_client) || !server;
+    }
+    else
+    {
+        return !ringbuffer_is_empty(data_to_server) || !clients;
+    }
 }

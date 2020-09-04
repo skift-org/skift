@@ -71,30 +71,6 @@ void FsNode::deref_handle(FsHandle &handle)
     this->deref();
 }
 
-bool fsnode_can_read(FsNode *node, FsHandle *handle)
-{
-    if (node->can_read)
-    {
-        return node->can_read(node, handle);
-    }
-    else
-    {
-        return true;
-    }
-}
-
-bool fsnode_can_write(FsNode *node, FsHandle *handle)
-{
-    if (node->can_write)
-    {
-        return node->can_write(node, handle);
-    }
-    else
-    {
-        return true;
-    }
-}
-
 bool fsnode_can_accept(FsNode *node)
 {
     if (node->can_accept_connection)

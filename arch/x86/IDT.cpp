@@ -12,12 +12,16 @@ IDTDescriptor idt_descriptor = {
 
 void idt_initialize()
 {
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 3; i++)
     {
-        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, TRAPGATE);
+        idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
     }
 
-    for (int i = 32; i < 48; i++)
+    idt[3] = IDT_ENTRY(__interrupt_vector[3], 0x08, TRAPGATE);
+    idt[4] = IDT_ENTRY(__interrupt_vector[4], 0x08, TRAPGATE);
+
+
+    for (int i = 5; i < 48; i++)
     {
         idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
     }

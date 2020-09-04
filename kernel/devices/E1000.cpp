@@ -208,8 +208,7 @@ void e1000_handle_receive()
 
 void e1000_send_packet(const void *buffer, uint16_t size)
 {
-
-    _tx_descriptors[_current_tx_descriptors].address = (uint64_t)buffer;
+    memcpy(_tx_buffers[_current_tx_descriptors], buffer, size);
     _tx_descriptors[_current_tx_descriptors].length = size;
     _tx_descriptors[_current_tx_descriptors].command = CMD_EOP | CMD_IFCS | CMD_RS;
     _tx_descriptors[_current_tx_descriptors].status = 0;
@@ -237,7 +236,7 @@ static void e1000_interrupt_handler()
         e1000_handle_receive();
 }
 
-Result e1000_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
+Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
 {
     __unused(node);
     __unused(handle);
@@ -254,7 +253,7 @@ Result e1000_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
     }
 }
 
-static Result e1000_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+static Result net_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
     __unused(node);
     __unused(handle);
@@ -265,7 +264,7 @@ static Result e1000_read(FsNode *node, FsHandle *handle, void *buffer, size_t si
     return ERR_FUNCTION_NOT_IMPLEMENTED;
 }
 
-static Result e1000_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+static Result net_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
 {
     __unused(node);
     __unused(handle);
@@ -275,7 +274,7 @@ static Result e1000_write(FsNode *node, FsHandle *handle, const void *buffer, si
     return SUCCESS;
 }
 
-bool e1000_can_write(FsNode *node, FsHandle *handle)
+bool net_can_write(FsNode *node, FsHandle *handle)
 {
     __unused(node);
     __unused(handle);
@@ -283,7 +282,7 @@ bool e1000_can_write(FsNode *node, FsHandle *handle)
     return true;
 }
 
-bool e1000_can_read(FsNode *node, FsHandle *handle)
+bool net_can_read(FsNode *node, FsHandle *handle)
 {
     __unused(node);
     __unused(handle);
@@ -297,11 +296,11 @@ private:
 public:
     Net() : FsNode(FILE_TYPE_DEVICE)
     {
-        call = (FsNodeCallCallback)e1000_iocall;
-        read = (FsNodeReadCallback)e1000_read;
+        call = (FsNodeCallCallback)net_iocall;
+        read = (FsNodeReadCallback)net_read;
         write = (FsNodeWriteCallback)e1000_write;
-        can_read = (FsNodeCanReadCallback)e1000_can_read;
-        can_write = (FsNodeCanReadCallback)e1000_can_write;
+        can_read = (FsNodeCanReadCallback)net_can_read;
+        can_write = (FsNodeCanReadCallback)net_can_write;
     }
 
     ~Net()

@@ -298,7 +298,7 @@ public:
     {
         call = (FsNodeCallCallback)net_iocall;
         read = (FsNodeReadCallback)net_read;
-        write = (FsNodeWriteCallback)e1000_write;
+        write = (FsNodeWriteCallback)net_write;
         can_read = (FsNodeCanReadCallback)net_can_read;
         can_write = (FsNodeCanReadCallback)net_can_write;
     }

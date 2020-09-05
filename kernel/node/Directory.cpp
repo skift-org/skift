@@ -46,28 +46,6 @@ static void directory_close(FsDirectory *node, FsHandle *handle)
     free(handle->attached);
 }
 
-static Result directory_read(FsDirectory *node, FsHandle *handle, void *buffer, uint size, size_t *read)
-{
-    __unused(node);
-    // FIXME: directories should no be read using read().
-
-    if (size == sizeof(DirectoryEntry))
-    {
-        size_t index = handle->offset / sizeof(DirectoryEntry);
-
-        DirectoryListing *listing = (DirectoryListing *)handle->attached;
-
-        if (index < listing->count)
-        {
-            *((DirectoryEntry *)buffer) = listing->entries[index];
-
-            *read = sizeof(DirectoryEntry);
-        }
-    }
-
-    return SUCCESS;
-}
-
 static FsNode *directory_find(FsDirectory *node, const char *name)
 {
     list_foreach(FsDirectoryEntry, entry, node->childs)
@@ -132,11 +110,35 @@ FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 {
     open = (FsNodeOpenCallback)directory_open;
     close = (FsNodeCloseCallback)directory_close;
-    read = (FsNodeReadCallback)directory_read;
     find = (FsNodeFindCallback)directory_find;
     link = (FsNodeLinkCallback)directory_link;
     unlink = (FsNodeUnlinkCallback)directory_unlink;
     destroy = (FsNodeDestroyCallback)directory_destroy;
 
     childs = list_create();
+}
+
+ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
+{
+    if (size == sizeof(DirectoryEntry))
+    {
+        size_t index = handle.offset / sizeof(DirectoryEntry);
+
+        DirectoryListing *listing = (DirectoryListing *)handle.attached;
+
+        if (index < listing->count)
+        {
+            *((DirectoryEntry *)buffer) = listing->entries[index];
+
+            return sizeof(DirectoryEntry);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
+    }
 }

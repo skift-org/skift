@@ -129,19 +129,6 @@ static inline uint8_t ps2mouse_read()
     return in8(0x60);
 }
 
-static Result mouse_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: use locks
-    atomic_begin();
-    *read = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
-    atomic_end();
-
-    return SUCCESS;
-}
-
 class Mouse : public FsNode
 {
 private:
@@ -149,7 +136,6 @@ private:
 public:
     Mouse() : FsNode(FILE_TYPE_DEVICE)
     {
-        read = (FsNodeReadCallback)mouse_read;
     }
 
     ~Mouse() {}
@@ -160,6 +146,18 @@ public:
 
         // FIXME: make this atomic or something...
         return !ringbuffer_is_empty(_mouse_buffer);
+    }
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        // FIXME: use locks
+        atomic_begin();
+        size_t read = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
+        atomic_end();
+
+        return read;
     }
 };
 

@@ -3,41 +3,33 @@
 
 #include "kernel/filesystem/Filesystem.h"
 
-static Result null_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-    __unused(buffer);
-    __unused(size);
-
-    *read = 0;
-
-    return SUCCESS;
-}
-
-static Result null_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
-{
-    __unused(node);
-    __unused(handle);
-    __unused(buffer);
-
-    *written = size;
-
-    return SUCCESS;
-}
-
 class Null : public FsNode
 {
 private:
-    /* data */
 public:
     Null() : FsNode(FILE_TYPE_DEVICE)
     {
-        read = (FsNodeReadCallback)null_read;
-        write = (FsNodeWriteCallback)null_write;
     }
 
     ~Null() {}
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+        __unused(buffer);
+        __unused(size);
+
+        return 0;
+    }
+
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
+    {
+        __unused(handle);
+        __unused(buffer);
+        __unused(size);
+
+        return size;
+    }
 };
 
 void null_initialize()

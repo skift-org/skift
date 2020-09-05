@@ -7,58 +7,6 @@
 
 #define TERMINAL_RINGBUFFER_SIZE 1024
 
-static Result terminal_read(FsTerminal *terminal, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(handle);
-
-    if (fshandle_has_flag(handle, OPEN_MASTER))
-    {
-        if (!terminal->writers)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
-        *read = ringbuffer_read(terminal->slave_to_master_buffer, (char *)buffer, size);
-    }
-    else
-    {
-        if (!terminal->master)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
-        *read = ringbuffer_read(terminal->master_to_slave_buffer, (char *)buffer, size);
-    }
-
-    return SUCCESS;
-}
-
-static Result terminal_write(FsTerminal *terminal, FsHandle *handle, const void *buffer, size_t size, size_t *written)
-{
-    __unused(handle);
-
-    if (fshandle_has_flag(handle, OPEN_MASTER))
-    {
-        if (!terminal->readers)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
-        *written = ringbuffer_write(terminal->master_to_slave_buffer, (const char *)buffer, size);
-    }
-    else
-    {
-        if (!terminal->master)
-        {
-            return ERR_STREAM_CLOSED;
-        }
-
-        *written = ringbuffer_write(terminal->slave_to_master_buffer, (const char *)buffer, size);
-    }
-
-    return SUCCESS;
-}
-
 static Result terminal_iocall(FsTerminal *terminal, FsHandle *handle, IOCall request, void *args)
 {
     __unused(handle);
@@ -105,8 +53,6 @@ static void terminal_destroy(FsTerminal *terminal)
 
 FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
 {
-    read = (FsNodeReadCallback)terminal_read;
-    write = (FsNodeWriteCallback)terminal_write;
     call = (FsNodeCallCallback)terminal_iocall;
     size = (FsNodeSizeCallback)terminal_size;
     destroy = (FsNodeDestroyCallback)terminal_destroy;
@@ -144,4 +90,60 @@ bool FsTerminal::can_write(FsHandle *handle)
     {
         return !ringbuffer_is_full(slave_to_master_buffer) || !master;
     }
+}
+
+ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
+{
+    __unused(handle);
+
+    size_t read = 0;
+
+    if (fshandle_has_flag(&handle, OPEN_MASTER))
+    {
+        if (!writers)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
+        read = ringbuffer_read(slave_to_master_buffer, (char *)buffer, size);
+    }
+    else
+    {
+        if (!master)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
+        read = ringbuffer_read(master_to_slave_buffer, (char *)buffer, size);
+    }
+
+    return read;
+}
+
+ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t size)
+{
+    __unused(handle);
+
+    size_t written = 0;
+
+    if (fshandle_has_flag(&handle, OPEN_MASTER))
+    {
+        if (!readers)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
+        written = ringbuffer_write(master_to_slave_buffer, (const char *)buffer, size);
+    }
+    else
+    {
+        if (!master)
+        {
+            return ERR_STREAM_CLOSED;
+        }
+
+        written = ringbuffer_write(slave_to_master_buffer, (const char *)buffer, size);
+    }
+
+    return written;
 }

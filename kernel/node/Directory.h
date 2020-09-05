@@ -14,9 +14,13 @@ struct FsDirectoryEntry
     FsNode *node;
 };
 
-struct FsDirectory : public FsNode
+class FsDirectory : public FsNode
 {
+private:
+public:
     List *childs;
 
     FsDirectory();
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size);
 };

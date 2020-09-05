@@ -2,9 +2,13 @@
 
 #include "kernel/node/Node.h"
 
-struct FsDeviceInfo : public FsNode
+class FsDeviceInfo : public FsNode
 {
+private:
+public:
     FsDeviceInfo();
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size);
 };
 
 void device_info_initialize();

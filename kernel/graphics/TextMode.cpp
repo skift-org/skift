@@ -67,20 +67,6 @@ MemoryRange vga_physical_range()
 
 /* --- Textmode abstract driver --------------------------------------------- */
 
-Result textmode_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
-{
-    __unused(node);
-    __unused(handle);
-
-    size_t tocopy = MIN(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
-
-    memcpy((void *)_text_buffer, buffer, tocopy);
-
-    *written = tocopy;
-
-    return SUCCESS;
-}
-
 Result textmode_iocall(FsNode *node, FsHandle *handle, IOCall request, void *args)
 {
     __unused(node);
@@ -119,11 +105,21 @@ private:
 public:
     TextMode() : FsNode(FILE_TYPE_DEVICE)
     {
-        write = (FsNodeWriteCallback)textmode_write;
         call = (FsNodeCallCallback)textmode_iocall;
     }
 
     ~TextMode() {}
+
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        size_t written = MIN(size, VGA_SCREEN_WIDTH * VGA_SCREEN_HEIGHT * sizeof(short));
+
+        memcpy((void *)_text_buffer, buffer, written);
+
+        return written;
+    }
 };
 
 void textmode_initialize()

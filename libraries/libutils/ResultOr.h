@@ -11,6 +11,12 @@ private:
 public:
     bool success() { return _result == SUCCESS; }
 
+    T &value()
+    {
+        assert(success());
+        return _value;
+    }
+
     T &&take_value()
     {
         assert(success());

@@ -20,4 +20,8 @@ public:
     bool can_read(FsHandle *handle);
 
     bool can_write(FsHandle *handle);
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size);
+
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size);
 };

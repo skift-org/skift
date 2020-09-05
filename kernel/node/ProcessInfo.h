@@ -2,9 +2,13 @@
 
 #include "kernel/node/Node.h"
 
-struct FsProcessInfo : public FsNode
+class FsProcessInfo : public FsNode
 {
+private:
+public:
     FsProcessInfo();
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size);
 };
 
 void process_info_initialize();

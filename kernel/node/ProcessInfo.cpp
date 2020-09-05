@@ -58,19 +58,6 @@ static void process_info_close(FsProcessInfo *node, FsHandle *handle)
     }
 }
 
-static Result process_info_read(FsProcessInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-
-    if (handle->offset <= handle->attached_size)
-    {
-        *read = MIN(handle->attached_size - handle->offset, size);
-        memcpy(buffer, (char *)handle->attached + handle->offset, *read);
-    }
-
-    return SUCCESS;
-}
-
 static size_t process_info_size(FsProcessInfo *node, FsHandle *handle)
 {
     __unused(node);
@@ -89,8 +76,21 @@ FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 {
     open = (FsNodeOpenCallback)process_info_open;
     close = (FsNodeCloseCallback)process_info_close;
-    read = (FsNodeReadCallback)process_info_read;
     size = (FsNodeSizeCallback)process_info_size;
+}
+
+ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size)
+{
+
+    size_t read = 0;
+
+    if (handle.offset <= handle.attached_size)
+    {
+        read = MIN(handle.attached_size - handle.offset, size);
+        memcpy(buffer, (char *)handle.attached + handle.offset, read);
+    }
+
+    return read;
 }
 
 void process_info_initialize()

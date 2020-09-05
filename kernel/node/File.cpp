@@ -11,63 +11,60 @@ static Result file_open(FsFile *node, FsHandle *handle)
 {
     if (fshandle_has_flag(handle, OPEN_TRUNC))
     {
-        free(node->buffer);
-        node->buffer = (char *)malloc(512);
-        node->buffer_allocated = 512;
-        node->buffer_size = 0;
+        free(node->_buffer);
+        node->_buffer = (char *)malloc(512);
+        node->_buffer_allocated = 512;
+        node->_buffer_size = 0;
     }
 
     return SUCCESS;
 }
 
-static Result file_read(FsFile *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
+ResultOr<size_t> FsFile::read(FsHandle &handle, void *buffer, size_t size)
 {
-    if (handle->offset <= node->buffer_size)
+    size_t read = 0;
+
+    if (handle.offset <= _buffer_size)
     {
-        *read = MIN(node->buffer_size - handle->offset, size);
-        memcpy(buffer, (char *)node->buffer + handle->offset, *read);
+        read = MIN(_buffer_size - handle.offset, size);
+        memcpy(buffer, (char *)_buffer + handle.offset, read);
     }
 
-    return SUCCESS;
+    return read;
 }
 
-static Result file_write(FsFile *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
+ResultOr<size_t> FsFile::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    if ((handle->offset + size) > node->buffer_allocated)
+    if ((handle.offset + size) > _buffer_allocated)
     {
-        node->buffer = (char *)realloc(node->buffer, handle->offset + size);
-        node->buffer_allocated = handle->offset + size;
+        _buffer = (char *)realloc(_buffer, handle.offset + size);
+        _buffer_allocated = handle.offset + size;
     }
 
-    node->buffer_size = MAX(handle->offset + size, node->buffer_size);
-    memcpy((char *)(node->buffer) + handle->offset, buffer, size);
+    _buffer_size = MAX(handle.offset + size, _buffer_size);
+    memcpy((char *)(_buffer) + handle.offset, buffer, size);
 
-    *written = size;
-
-    return SUCCESS;
+    return size;
 }
-
 static size_t file_size(FsFile *node, FsHandle *handle)
 {
     __unused(handle);
 
-    return node->buffer_size;
+    return node->_buffer_size;
 }
 
 static void file_destroy(FsFile *node)
 {
-    free(node->buffer);
+    free(node->_buffer);
 }
 
 FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
 {
     open = (FsNodeOpenCallback)file_open;
-    read = (FsNodeReadCallback)file_read;
-    write = (FsNodeWriteCallback)file_write;
     size = (FsNodeSizeCallback)file_size;
     destroy = (FsNodeDestroyCallback)file_destroy;
 
-    buffer = (char *)malloc(512);
-    buffer_allocated = 512;
-    buffer_size = 0;
+    _buffer = (char *)malloc(512);
+    _buffer_allocated = 512;
+    _buffer_size = 0;
 }

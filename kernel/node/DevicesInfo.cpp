@@ -59,19 +59,6 @@ static void device_info_close(FsDeviceInfo *node, FsHandle *handle)
     }
 }
 
-static Result device_info_read(FsDeviceInfo *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-
-    if (handle->offset <= handle->attached_size)
-    {
-        *read = MIN(handle->attached_size - handle->offset, size);
-        memcpy(buffer, (char *)handle->attached + handle->offset, *read);
-    }
-
-    return SUCCESS;
-}
-
 static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
 {
     __unused(node);
@@ -90,8 +77,20 @@ FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 {
     open = (FsNodeOpenCallback)device_info_open;
     close = (FsNodeCloseCallback)device_info_close;
-    read = (FsNodeReadCallback)device_info_read;
     size = (FsNodeSizeCallback)device_info_size;
+}
+
+ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
+{
+    size_t read = 0;
+
+    if (handle.offset <= handle.attached_size)
+    {
+        read = MIN(handle.attached_size - handle.offset, size);
+        memcpy(buffer, (char *)handle.attached + handle.offset, read);
+    }
+
+    return read;
 }
 
 void device_info_initialize()

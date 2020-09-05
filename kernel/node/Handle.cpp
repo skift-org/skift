@@ -134,22 +134,23 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
 
     FsNode *node = handle->node;
 
-    if (!node->read)
-    {
-        return ERR_NOT_READABLE;
-    }
-
     task_block(scheduler_running(), blocker_read_create(handle), -1);
 
-    *read = 0;
+    auto result_or_read = node->read(*handle, buffer, size);
 
-    Result result = node->read(node, handle, buffer, size, read);
-
-    handle->offset += *read;
+    if (result_or_read.success())
+    {
+        handle->offset += result_or_read.value();
+        *read = result_or_read.value();
+    }
+    else
+    {
+        *read = 0;
+    }
 
     fsnode_release_lock(node, scheduler_running_id());
 
-    return result;
+    return result_or_read.result();
 }
 
 static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size_t size, size_t *written)
@@ -166,15 +167,21 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
         }
     }
 
-    *written = 0;
+    auto result_or_written = node->write(*handle, buffer, size);
 
-    Result result = node->write(node, handle, buffer, size, written);
-
-    handle->offset += *written;
+    if (result_or_written.success())
+    {
+        handle->offset += result_or_written.value();
+        *written = result_or_written.value();
+    }
+    else
+    {
+        *written = 0;
+    }
 
     fsnode_release_lock(node, scheduler_running_id());
 
-    return result;
+    return result_or_written.result();
 }
 
 Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written)
@@ -191,11 +198,6 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
         !fshandle_has_flag(handle, OPEN_CLIENT))
     {
         return ERR_READ_ONLY_STREAM;
-    }
-
-    if (!handle->node->write)
-    {
-        return ERR_NOT_WRITABLE;
     }
 
     while (remaining > 0 && result == SUCCESS)

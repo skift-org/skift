@@ -19,29 +19,6 @@ void serial_interrupt_handler()
     ringbuffer_write(serial_buffer, (const char *)&byte, sizeof(byte));
 }
 
-static Result serial_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: use locks
-    atomic_begin();
-    *read = ringbuffer_read(serial_buffer, (char *)buffer, size);
-    atomic_end();
-
-    return SUCCESS;
-}
-
-static Result serial_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
-{
-    __unused(node);
-    __unused(handle);
-
-    *written = com_write(COM1, buffer, size);
-
-    return SUCCESS;
-}
-
 class Serial : public FsNode
 {
 private:
@@ -49,11 +26,7 @@ private:
 public:
     Serial() : FsNode(FILE_TYPE_DEVICE)
     {
-        read = (FsNodeReadCallback)serial_read;
-        write = (FsNodeWriteCallback)serial_write;
     }
-
-    ~Serial() {}
 
     bool can_read(FsHandle *handle)
     {
@@ -61,6 +34,29 @@ public:
 
         // FIXME: make this atomic or something...
         return !ringbuffer_is_empty(serial_buffer);
+    }
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        // FIXME: use locks
+        atomic_begin();
+        size_t read = ringbuffer_read(serial_buffer, (char *)buffer, size);
+        atomic_end();
+
+        return read;
+    }
+
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        atomic_begin();
+        size_t written = com_write(COM1, buffer, size);
+        atomic_end();
+
+        return written;
     }
 };
 

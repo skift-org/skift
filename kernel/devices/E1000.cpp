@@ -253,27 +253,6 @@ Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
     }
 }
 
-static Result net_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-    __unused(buffer);
-    __unused(size);
-    __unused(read);
-
-    return ERR_FUNCTION_NOT_IMPLEMENTED;
-}
-
-static Result net_write(FsNode *node, FsHandle *handle, const void *buffer, size_t size, size_t *written)
-{
-    __unused(node);
-    __unused(handle);
-
-    e1000_send_packet(buffer, size);
-    *written = MIN(size, 8192);
-    return SUCCESS;
-}
-
 class Net : public FsNode
 {
 private:
@@ -281,8 +260,6 @@ public:
     Net() : FsNode(FILE_TYPE_DEVICE)
     {
         call = (FsNodeCallCallback)net_iocall;
-        read = (FsNodeReadCallback)net_read;
-        write = (FsNodeWriteCallback)net_write;
     }
 
     ~Net()
@@ -301,6 +278,23 @@ public:
         __unused(handle);
 
         return true;
+    }
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+        __unused(buffer);
+        __unused(size);
+
+        return ERR_FUNCTION_NOT_IMPLEMENTED;
+    }
+
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        e1000_send_packet(buffer, size);
+        return MIN(size, 8192);
     }
 };
 

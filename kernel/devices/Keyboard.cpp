@@ -281,32 +281,6 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, vo
     }
 }
 
-static Result characters_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: use locks
-    atomic_begin();
-    *read = ringbuffer_read(_characters_buffer, (char *)buffer, size);
-    atomic_end();
-
-    return SUCCESS;
-}
-
-static Result events_read(FsNode *node, FsHandle *handle, void *buffer, size_t size, size_t *read)
-{
-    __unused(node);
-    __unused(handle);
-
-    // FIXME: use locks
-    atomic_begin();
-    *read = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
-    atomic_end();
-
-    return SUCCESS;
-}
-
 class Keyboard : public FsNode
 {
 private:
@@ -315,7 +289,6 @@ public:
     Keyboard() : FsNode(FILE_TYPE_DEVICE)
     {
         call = (FsNodeCallCallback)keyboard_iocall;
-        read = (FsNodeReadCallback)characters_read;
     }
 
     ~Keyboard() {}
@@ -327,6 +300,17 @@ public:
         // FIXME: make this atomic or something...
         return !ringbuffer_is_empty(_characters_buffer);
     }
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        // FIXME: use locks
+        atomic_begin();
+        size_t read = ringbuffer_read(_characters_buffer, (char *)buffer, size);
+        atomic_end();
+        return read;
+    }
 };
 
 class KeyboardEvent : public FsNode
@@ -336,7 +320,6 @@ public:
     KeyboardEvent() : FsNode(FILE_TYPE_DEVICE)
     {
         call = (FsNodeCallCallback)keyboard_iocall;
-        read = (FsNodeReadCallback)events_read;
     }
 
     ~KeyboardEvent()
@@ -349,6 +332,18 @@ public:
 
         // FIXME: make this atomic or something...
         return !ringbuffer_is_empty(_events_buffer);
+    }
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
+    {
+        __unused(handle);
+
+        // FIXME: use locks
+        atomic_begin();
+        size_t read = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
+        atomic_end();
+
+        return read;
     }
 };
 

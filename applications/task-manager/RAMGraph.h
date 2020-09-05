@@ -50,14 +50,14 @@ public:
         _text_timer = make<Timer>(1000, [&]() {
             SystemStatus status = system_get_status();
 
-            int usage = (int)status.used_ram / 1024 / 1024;
+            unsigned usage = status.used_ram / 1024 / 1024;
             char buffer_usage[50];
-            snprintf(buffer_usage, 50, "Usage: %i Mio", usage);
+            snprintf(buffer_usage, 50, "Usage: %u Mio", usage);
             _label_usage->text(buffer_usage);
 
-            int avaliable = (int)status.total_ram / 1024 / 1024;
+            unsigned avaliable = status.total_ram / 1024 / 1024;
             char buffer_avaliable[50];
-            snprintf(buffer_avaliable, 50, "Avaliable: %i Mio", avaliable);
+            snprintf(buffer_avaliable, 50, "Avaliable: %u Mio", avaliable);
             _label_available->text(buffer_avaliable);
 
             const char *greedy = task_model_get_greedy_process(_model, 0);

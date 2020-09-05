@@ -11,9 +11,12 @@ struct FsHandle
 
     void *attached;
     size_t attached_size;
-};
 
-bool fshandle_has_flag(FsHandle *handle, OpenFlag flag);
+    bool has_flag(OpenFlag flag)
+    {
+        return (flags & flag) == flag;
+    }
+};
 
 FsHandle *fshandle_create(FsNode *node, OpenFlag flags);
 

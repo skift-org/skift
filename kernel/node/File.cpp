@@ -9,7 +9,7 @@
 
 static Result file_open(FsFile *node, FsHandle *handle)
 {
-    if (fshandle_has_flag(handle, OPEN_TRUNC))
+    if (handle->has_flag(OPEN_TRUNC))
     {
         free(node->_buffer);
         node->_buffer = (char *)malloc(512);

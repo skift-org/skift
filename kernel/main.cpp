@@ -25,6 +25,15 @@ void system_main(Multiboot *multiboot)
 {
     logger_info("Framebuffer at %08x %d %d", multiboot->framebuffer_addr, multiboot->framebuffer_width, multiboot->framebuffer_height);
 
+    logger_trace("                         _   _     _ _____ ____ _____                           ");
+    logger_trace("                        | | | |   | | ____|  _ \\_   _|                          ");
+    logger_trace("                        | |_| |_  | |  _| | |_) || |                            ");
+    logger_trace("                        |  _  | |_| | |___|  _ < | |                            ");
+    logger_trace("                        |_| |_|\\___/|_____|_| \\_\\|_|                            ");
+    logger_trace("                                                                                ");
+    logger_trace("--------------------------------------------------------------------------------");
+    logger_trace("                                       The skiftOS contributors (c) 2018-2020 ");
+
     system_initialize();
     memory_initialize(multiboot);
     scheduler_initialize();

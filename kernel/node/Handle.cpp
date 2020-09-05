@@ -53,11 +53,6 @@ FsHandle *fshandle_clone(FsHandle *handle)
     return clone;
 }
 
-bool fshandle_has_flag(FsHandle *handle, OpenFlag flag)
-{
-    return (handle->flags & flag) == flag;
-}
-
 void fshandle_destroy(FsHandle *handle)
 {
     FsNode *node = handle->node;
@@ -124,10 +119,10 @@ void fshandle_release_lock(FsHandle *handle, int who_release)
 
 Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
 {
-    if (!fshandle_has_flag(handle, OPEN_READ) &&
-        !fshandle_has_flag(handle, OPEN_MASTER) &&
-        !fshandle_has_flag(handle, OPEN_SERVER) &&
-        !fshandle_has_flag(handle, OPEN_CLIENT))
+    if (!handle->has_flag(OPEN_READ) &&
+        !handle->has_flag(OPEN_MASTER) &&
+        !handle->has_flag(OPEN_SERVER) &&
+        !handle->has_flag(OPEN_CLIENT))
     {
         return ERR_WRITE_ONLY_STREAM;
     }
@@ -159,7 +154,7 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
 
     task_block(scheduler_running(), blocker_write_create(handle), -1);
 
-    if (fshandle_has_flag(handle, OPEN_APPEND))
+    if (handle->has_flag(OPEN_APPEND))
     {
         if (node->size)
         {
@@ -192,10 +187,10 @@ Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t 
 
     *written = 0;
 
-    if (!fshandle_has_flag(handle, OPEN_WRITE) &&
-        !fshandle_has_flag(handle, OPEN_MASTER) &&
-        !fshandle_has_flag(handle, OPEN_SERVER) &&
-        !fshandle_has_flag(handle, OPEN_CLIENT))
+    if (!handle->has_flag(OPEN_WRITE) &&
+        !handle->has_flag(OPEN_MASTER) &&
+        !handle->has_flag(OPEN_SERVER) &&
+        !handle->has_flag(OPEN_CLIENT))
     {
         return ERR_READ_ONLY_STREAM;
     }

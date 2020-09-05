@@ -68,7 +68,7 @@ bool FsTerminal::can_read(FsHandle *handle)
 {
     __unused(handle);
 
-    if (fshandle_has_flag(handle, OPEN_MASTER))
+    if (handle->has_flag(OPEN_MASTER))
     {
         return !ringbuffer_is_empty(slave_to_master_buffer) || !writers;
     }
@@ -82,7 +82,7 @@ bool FsTerminal::can_write(FsHandle *handle)
 {
     __unused(handle);
 
-    if (fshandle_has_flag(handle, OPEN_MASTER))
+    if (handle->has_flag(OPEN_MASTER))
     {
         return !ringbuffer_is_full(master_to_slave_buffer) || !readers;
     }
@@ -94,11 +94,9 @@ bool FsTerminal::can_write(FsHandle *handle)
 
 ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 {
-    __unused(handle);
-
     size_t read = 0;
 
-    if (fshandle_has_flag(&handle, OPEN_MASTER))
+    if (handle.has_flag(OPEN_MASTER))
     {
         if (!writers)
         {
@@ -122,11 +120,9 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    __unused(handle);
-
     size_t written = 0;
 
-    if (fshandle_has_flag(&handle, OPEN_MASTER))
+    if (handle.has_flag(OPEN_MASTER))
     {
         if (!readers)
         {

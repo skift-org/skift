@@ -34,7 +34,7 @@ FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
 
 bool FsConnection::can_read(FsHandle *handle)
 {
-    if (fshandle_has_flag(handle, OPEN_CLIENT))
+    if (handle->has_flag(OPEN_CLIENT))
     {
         return !ringbuffer_is_empty(data_to_client) || !server;
     }
@@ -46,7 +46,7 @@ bool FsConnection::can_read(FsHandle *handle)
 
 bool FsConnection::can_write(FsHandle *handle)
 {
-    if (fshandle_has_flag(handle, OPEN_CLIENT))
+    if (handle->has_flag(OPEN_CLIENT))
     {
         return !ringbuffer_is_full(data_to_server) || !server;
     }
@@ -60,7 +60,7 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
 {
     RingBuffer *data = nullptr;
 
-    if (fshandle_has_flag(&handle, OPEN_CLIENT))
+    if (handle.has_flag(OPEN_CLIENT))
     {
         if (!server)
         {
@@ -86,7 +86,7 @@ ResultOr<size_t> FsConnection::write(FsHandle &handle, const void *buffer, size_
 {
     RingBuffer *data = nullptr;
 
-    if (fshandle_has_flag(&handle, OPEN_CLIENT))
+    if (handle.has_flag(OPEN_CLIENT))
     {
         if (!server)
         {

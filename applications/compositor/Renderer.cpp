@@ -139,7 +139,16 @@ void renderer_region(Rectangle region)
 
     if (should_paint_wallpaper)
     {
-        _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, region, region);
+        double scale_x = _wallpaper->width() / (double)_framebuffer->resolution().width();
+        double scale_y = _wallpaper->height() / (double)_framebuffer->resolution().height();
+
+        Rectangle source(
+            region.x() * scale_x,
+            region.y() * scale_y,
+            region.width() * scale_x,
+            region.height() * scale_y);
+
+        _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, source, region);
         _framebuffer->mark_dirty(region);
     }
 }

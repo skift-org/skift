@@ -188,5 +188,7 @@ bool renderer_set_resolution(int width, int height)
 void renderer_set_wallaper(RefPtr<Bitmap> wallaper)
 {
     _wallpaper = wallaper;
+    _wallpaper->filtering(BITMAP_FILTERING_LINEAR);
+
     renderer_region_dirty(renderer_bound());
 }

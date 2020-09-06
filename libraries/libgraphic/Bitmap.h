@@ -55,6 +55,8 @@ public:
     Vec2i size() const { return Vec2i(_width, _height); }
     Rectangle bound() const { return Rectangle(_width, _height); }
 
+    void filtering(BitmapFiltering filtering) { _filtering = filtering; }
+
     static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
 
     static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Vec2i width_and_height);

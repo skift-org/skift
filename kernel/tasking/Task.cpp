@@ -88,9 +88,11 @@ void task_destroy(Task *task)
 
     atomic_end();
 
-    list_foreach(MemoryMapping, memory_mapping, task->memory_mapping)
+    MemoryMapping *mapping = nullptr;
+
+    while ((mapping = (MemoryMapping *)list_peek(task->memory_mapping)))
     {
-        task_memory_mapping_destroy(task, memory_mapping);
+        task_memory_mapping_destroy(task, mapping);
     }
 
     list_destroy(task->memory_mapping);

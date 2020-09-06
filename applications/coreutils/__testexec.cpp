@@ -1,7 +1,7 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/process/Process.h>
+#include <libsystem/process/Launchpad.h>
 
 #define LOOP_MAX 1000
 
@@ -10,6 +10,6 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    process_run("__testexec", NULL);
-    return 0;
+    Launchpad *launchpad = launchpad_create("__testexec", "/System/Binaries/__testexec");
+    return launchpad_launch(launchpad, NULL);
 }

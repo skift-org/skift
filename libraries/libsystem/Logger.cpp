@@ -1,27 +1,20 @@
 
 #include <libsystem/core/CString.h>
 
+#include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/Logger.h>
 
 static bool logger_log_level = LOGGER_TRACE;
 
-static bool logger_use_colors = true;
 static bool logger_is_quiet = false;
 
-static const char *logger_level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 static const char *logger_level_colors[] = {"\e[34m", "\e[36m", "\e[32m", "\e[33m", "\e[31m", "\e[35m"};
 
 void logger_level(LogLevel log_level)
 {
     logger_log_level = log_level;
-}
-
-void logger_colors(bool use_colors)
-{
-    logger_use_colors = use_colors;
 }
 
 void logger_quiet(bool quiet)
@@ -47,14 +40,7 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
         DateTime datetime = datetime_now();
         stream_format(log_stream, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
 
-        if (logger_use_colors)
-        {
-            stream_format(log_stream, "%s%s \e[0m%s:%d: \e[37;1m", logger_level_colors[level], logger_level_names[level], file, line);
-        }
-        else
-        {
-            stream_format(log_stream, "%s %s:%d: ", logger_level_names[level], file, line);
-        }
+        stream_format(log_stream, "%s%s:%d:\e[37;1m ", logger_level_colors[level], file, line);
 
         va_list va;
         va_start(va, fmt);

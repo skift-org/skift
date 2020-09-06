@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     process_wait(splash_pid, nullptr);
 
     // Start a "DEBUG" shell
-    process_run("shell", NULL);
+    // process_run("shell", NULL);
 
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {

@@ -194,7 +194,6 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
-
         MemoryRange identity_range{i * ARCH_PAGE_SIZE, ARCH_PAGE_SIZE};
 
         if (!virtual_present(page_directory, identity_range.base()) &&

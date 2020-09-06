@@ -159,25 +159,25 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
     return task;
 }
 
-// static void pass_argc_argv_user(Task *task, const char **argv)
-// {
-//     PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->pdir);
-//
-//     uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
-//
-//     int argc;
-//     for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
-//     {
-//         argv_list[argc] = task_user_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
-//     }
-//
-//     uintptr_t argv_list_ref = task_user_stack_push(task, &argv_list, sizeof(argv_list));
-//
-//     task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
-//     task_user_stack_push(task, &argc, sizeof(argc));
-//
-//     task_switch_pdir(scheduler_running(), parent_pdir);
-// }
+static void pass_argc_argv_user(Task *task, const char **argv)
+{
+    PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->pdir);
+
+    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
+
+    int argc;
+    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
+    {
+        argv_list[argc] = task_user_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
+    }
+
+    uintptr_t argv_list_ref = task_user_stack_push(task, &argv_list, sizeof(argv_list));
+
+    task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
+    task_user_stack_push(task, &argc, sizeof(argc));
+
+    task_switch_pdir(scheduler_running(), parent_pdir);
+}
 
 static void pass_argc_argv_kernel(Task *task, const char **argv)
 {
@@ -203,12 +203,11 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
 
     task_set_entry(task, entry, true);
 
-    // FIXME: User tasks
-    //    if (user)
-    //    {
-    //        pass_argc_argv_user(task, argv);
-    //    }
-    //    else
+    if (user)
+    {
+        pass_argc_argv_user(task, argv);
+    }
+    else
     {
         pass_argc_argv_kernel(task, argv);
     }
@@ -247,27 +246,26 @@ uintptr_t task_user_stack_push(Task *task, const void *value, size_t size)
 
 void task_go(Task *task)
 {
-    // FIXME: User tasks
-    // if (task->user)
-    // {
-    //     UserInterruptStackFrame stackframe = {};
-    //
-    //     stackframe.user_esp = task->user_stack_pointer;
-    //
-    //     stackframe.eflags = 0x202;
-    //     stackframe.eip = (uintptr_t)task->entry;
-    //     stackframe.ebp = 0;
-    //
-    //     stackframe.cs = 0x1b;
-    //     stackframe.ds = 0x23;
-    //     stackframe.es = 0x23;
-    //     stackframe.fs = 0x23;
-    //     stackframe.gs = 0x23;
-    //     stackframe.ss = 0x23;
-    //
-    //     task_kernel_stack_push(task, &stackframe, sizeof(UserInterruptStackFrame));
-    // }
-    // else
+    if (task->user)
+    {
+        UserInterruptStackFrame stackframe = {};
+
+        stackframe.user_esp = task->user_stack_pointer;
+
+        stackframe.eflags = 0x202;
+        stackframe.eip = (uintptr_t)task->entry;
+        stackframe.ebp = 0;
+
+        stackframe.cs = 0x1b;
+        stackframe.ds = 0x23;
+        stackframe.es = 0x23;
+        stackframe.fs = 0x23;
+        stackframe.gs = 0x23;
+        stackframe.ss = 0x23;
+
+        task_kernel_stack_push(task, &stackframe, sizeof(UserInterruptStackFrame));
+    }
+    else
     {
         InterruptStackFrame stackframe = {};
 

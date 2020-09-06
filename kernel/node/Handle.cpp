@@ -129,7 +129,7 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
 
     FsNode *node = handle->node;
 
-    task_block(scheduler_running(), blocker_read_create(handle), -1);
+    task_block(scheduler_running(), new BlockerRead(handle), -1);
 
     auto result_or_read = node->read(*handle, buffer, size);
 
@@ -152,7 +152,7 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
 {
     FsNode *node = handle->node;
 
-    task_block(scheduler_running(), blocker_write_create(handle), -1);
+    task_block(scheduler_running(), new BlockerWrite(handle), -1);
 
     if (handle->has_flag(OPEN_APPEND))
     {
@@ -357,7 +357,7 @@ Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
 
-    task_block(scheduler_running(), blocker_connect_create(connection), -1);
+    task_block(scheduler_running(), new BlockerConnect(connection), -1);
 
     connection->deref();
 
@@ -373,7 +373,7 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    task_block(scheduler_running(), blocker_accept_create(node), -1);
+    task_block(scheduler_running(), new BlockerAccept(node), -1);
 
     FsNode *connection = node->accept_connection(node);
 

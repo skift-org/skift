@@ -40,21 +40,25 @@ static int dispatcher_get_interupt()
     return ringbuffer_getc(_interupts_to_dispatch);
 }
 
-static bool dispatcher_can_unblock(Blocker *blocker, Task *task)
+class BlockerDispatcher : public Blocker
 {
-    __unused(blocker);
-    __unused(task);
+private:
+public:
+    BlockerDispatcher() {}
 
-    return dispatcher_has_interupt();
-}
+    bool can_unblock(struct Task *task)
+    {
+        __unused(task);
+
+        return dispatcher_has_interupt();
+    }
+};
 
 void dispatcher_service()
 {
     while (true)
     {
-        Blocker *blocker = __create(Blocker);
-        blocker->can_unblock = (BlockerCanUnblockCallback)dispatcher_can_unblock;
-        task_block(scheduler_running(), blocker, -1);
+        task_block(scheduler_running(), new BlockerDispatcher(), -1);
 
         while (dispatcher_has_interupt())
         {

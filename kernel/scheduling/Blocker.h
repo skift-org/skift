@@ -3,13 +3,9 @@
 #include <libsystem/Time.h>
 
 #include "kernel/node/Handle.h"
+#include "kernel/system/System.h"
 
 struct Task;
-struct Blocker;
-
-typedef bool (*BlockerCanUnblockCallback)(struct Blocker *blocker, struct Task *task);
-typedef void (*BlockerUnblockCallback)(struct Blocker *blocker, struct Task *task);
-typedef void (*BlockerTimeoutCallback)(struct Blocker *blocker, struct Task *task);
 
 enum BlockerResult
 {
@@ -19,26 +15,145 @@ enum BlockerResult
 
 struct Blocker
 {
-    BlockerResult result;
-    TimeStamp timeout;
+    BlockerResult _result;
+    TimeStamp _timeout;
 
-    BlockerCanUnblockCallback can_unblock;
-    BlockerUnblockCallback on_unblock;
-    BlockerTimeoutCallback on_timeout;
+    virtual ~Blocker() {}
+
+    virtual bool can_unblock(struct Task *task)
+    {
+        __unused(task);
+        return true;
+    }
+
+    virtual void on_unblock(struct Task *task)
+    {
+        __unused(task);
+    }
+
+    virtual void on_timeout(struct Task *task)
+    {
+        __unused(task);
+    }
 };
 
-#define TASK_BLOCKER(__subclass) ((Blocker *)(__subclass))
+class BlockerAccept : public Blocker
+{
+private:
+    FsNode *_node;
 
-Blocker *blocker_accept_create(FsNode *node);
+public:
+    BlockerAccept(FsNode *node) : _node(node)
+    {
+    }
 
-Blocker *blocker_connect_create(FsNode *connection);
+    bool can_unblock(struct Task *task);
 
-Blocker *blocker_read_create(FsHandle *handle);
+    void on_unblock(struct Task *task);
+};
 
-Blocker *blocker_select_create(FsHandle **handles, SelectEvent *events, size_t count, FsHandle **selected, SelectEvent *selected_events);
+class BlockerConnect : public Blocker
+{
+private:
+    FsNode *_connection;
 
-Blocker *blocker_time_create(uint wake_up_tick);
+public:
+    BlockerConnect(FsNode *connection)
+        : _connection(connection)
+    {
+    }
 
-Blocker *blocker_wait_create(struct Task *task, int *exit_value);
+    bool can_unblock(struct Task *task);
+};
 
-Blocker *blocker_write_create(FsHandle *handle);
+class BlockerRead : public Blocker
+{
+private:
+    FsHandle *_handle;
+
+public:
+    BlockerRead(FsHandle *handle)
+        : _handle(handle)
+    {
+    }
+
+    bool can_unblock(Task *task);
+
+    void on_unblock(Task *task);
+};
+
+class BlockerSelect : public Blocker
+{
+private:
+    FsHandle **_handles;
+    SelectEvent *_events;
+    size_t _count;
+
+    FsHandle **_selected;
+    SelectEvent *_selected_events;
+
+public:
+    BlockerSelect(FsHandle **handles,
+                  SelectEvent *events,
+                  size_t count,
+                  FsHandle **selected,
+                  SelectEvent *selected_events)
+        : _handles(handles),
+          _events(events),
+          _count(count),
+          _selected(selected),
+          _selected_events(selected_events)
+    {
+    }
+
+    bool can_unblock(Task *task);
+
+    void on_unblock(Task *task);
+};
+
+class BlockerTime : public Blocker
+{
+private:
+    uint _wakeup_tick;
+
+public:
+    BlockerTime(uint wakeup_tick)
+        : _wakeup_tick(wakeup_tick)
+    {
+    }
+
+    bool can_unblock(Task *task);
+};
+
+class BlockerWait : public Blocker
+{
+private:
+    Task *_task;
+    int *_exit_value;
+
+public:
+    BlockerWait(Task *task, int *exit_value)
+        : _task(task), _exit_value(exit_value)
+    {
+    }
+
+    bool can_unblock(Task *task);
+
+    void on_unblock(Task *task);
+};
+
+class BlockerWrite : public Blocker
+{
+private:
+    FsHandle *_handle;
+
+public:
+    BlockerWrite(FsHandle *handle)
+        : _handle(handle)
+    {
+    }
+
+    bool can_unblock(Task *task);
+
+    void on_unblock(Task *task);
+};

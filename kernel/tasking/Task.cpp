@@ -289,7 +289,7 @@ void task_go(Task *task)
 
 Result task_sleep(Task *task, int timeout)
 {
-    task_block(task, blocker_time_create(system_get_tick() + timeout), -1);
+    task_block(task, new BlockerTime(system_get_tick() + timeout), -1);
 
     return TIMEOUT;
 }
@@ -305,9 +305,7 @@ Result task_wait(int task_id, int *exit_value)
         return ERR_NO_SUCH_TASK;
     }
 
-    task_block(
-        scheduler_running(),
-        blocker_wait_create(task, exit_value), -1);
+    task_block(scheduler_running(), new BlockerWait(task, exit_value), -1);
 
     return SUCCESS;
 }
@@ -318,29 +316,25 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
     atomic_begin();
     task->blocker = blocker;
-    if (blocker->can_unblock(blocker, task))
+    if (blocker->can_unblock(task))
     {
-
-        if (blocker->on_unblock)
-        {
-            blocker->on_unblock(blocker, task);
-        }
+        blocker->on_unblock(task);
 
         atomic_end();
 
         task->blocker = nullptr;
-        free(blocker);
+        delete blocker;
 
         return BLOCKER_UNBLOCKED;
     }
 
     if (timeout == (Timeout)-1)
     {
-        blocker->timeout = (Timeout)-1;
+        blocker->_timeout = (Timeout)-1;
     }
     else
     {
-        blocker->timeout = system_get_tick() + timeout;
+        blocker->_timeout = system_get_tick() + timeout;
     }
 
     task_set_state(task, TASK_STATE_BLOCKED);
@@ -348,10 +342,10 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 
     scheduler_yield();
 
-    BlockerResult result = blocker->result;
+    BlockerResult result = blocker->_result;
 
     task->blocker = nullptr;
-    free(blocker);
+    delete blocker;
 
     return result;
 }

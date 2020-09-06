@@ -104,26 +104,18 @@ static Iteration wakeup_task_if_unblocked(void *target, Task *task)
 
     Blocker *blocker = task->blocker;
 
-    if (blocker->can_unblock(blocker, task))
+    if (blocker->can_unblock(task))
     {
-        if (blocker->on_unblock)
-        {
-            blocker->on_unblock(blocker, task);
-        }
-
-        blocker->result = BLOCKER_UNBLOCKED;
+        blocker->on_unblock(task);
+        blocker->_result = BLOCKER_UNBLOCKED;
 
         task_set_state(task, TASK_STATE_RUNNING);
     }
-    else if (blocker->timeout != (Timeout)-1 &&
-             blocker->timeout <= system_get_tick())
+    else if (blocker->_timeout != (Timeout)-1 &&
+             blocker->_timeout <= system_get_tick())
     {
-        if (blocker->on_timeout)
-        {
-            blocker->on_timeout(blocker, task);
-        }
-
-        blocker->result = BLOCKER_TIMEOUT;
+        blocker->on_timeout(task);
+        blocker->_result = BLOCKER_TIMEOUT;
 
         task_set_state(task, TASK_STATE_RUNNING);
     }

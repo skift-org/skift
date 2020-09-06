@@ -167,7 +167,7 @@ Result task_fshandle_select(
     }
 
     {
-        BlockerResult blocker_result = task_block(task, blocker_select_create(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
+        BlockerResult blocker_result = task_block(task, new BlockerSelect(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
 
         if (blocker_result == BLOCKER_TIMEOUT)
         {

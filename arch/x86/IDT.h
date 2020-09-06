@@ -23,18 +23,6 @@ struct __packed IDTEntry
     uint8_t zero;
     uint8_t type_attr;    // type and attributes
     uint16_t offset16_31; // offset bits 16..31
-
-    void dump(int i)
-    {
-        if (type_attr & 0b10000000)
-            logger_trace("IDT[%d] offset0_15=%04x selector=%04x zero=%02x type_attr=%02x offset16_31=%04x",
-                         i,
-                         offset0_15,
-                         selector,
-                         zero,
-                         type_attr,
-                         offset16_31);
-    }
 };
 
 #define IDT_ENTRY(__offset, __selector, __type)                 \

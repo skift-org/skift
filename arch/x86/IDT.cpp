@@ -20,7 +20,6 @@ void idt_initialize()
     idt[3] = IDT_ENTRY(__interrupt_vector[3], 0x08, TRAPGATE);
     idt[4] = IDT_ENTRY(__interrupt_vector[4], 0x08, TRAPGATE);
 
-
     for (int i = 5; i < 48; i++)
     {
         idt[i] = IDT_ENTRY(__interrupt_vector[i], 0x08, INTGATE);
@@ -28,11 +27,6 @@ void idt_initialize()
 
     idt[127] = IDT_ENTRY(__interrupt_vector[48], 0x08, INTGATE);
     idt[128] = IDT_ENTRY(__interrupt_vector[49], 0x08, INTGATE | IDT_USER);
-
-    for (size_t i = 0; i <= 128; i++)
-    {
-        idt[i].dump(i);
-    }
 
     idt_flush((uint32_t)&idt_descriptor);
 }

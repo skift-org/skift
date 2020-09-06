@@ -46,11 +46,6 @@ void gdt_initialize()
     gdt[4] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER, GDT_FLAGS};
     gdt[5] = {&tss, GDT_TSS_PRESENT | GDT_ACCESSED | GDT_EXECUTABLE | GDT_USER, TSS_FLAGS};
 
-    for (size_t i = 0; i < GDT_ENTRY_COUNT; i++)
-    {
-        gdt[i].dump(i);
-    }
-
     gdt_flush((uint32_t)&gdt_descriptor);
 }
 

@@ -88,28 +88,16 @@ void memory_dump()
 
 size_t memory_get_used()
 {
-    size_t result;
+    AtomicHolder holder;
 
-    atomic_begin();
-
-    result = USED_MEMORY;
-
-    atomic_end();
-
-    return result;
+    return USED_MEMORY;
 }
 
 size_t memory_get_total()
 {
-    size_t result;
+    AtomicHolder holder;
 
-    atomic_begin();
-
-    result = TOTAL_MEMORY;
-
-    atomic_end();
-
-    return result;
+    return TOTAL_MEMORY;
 }
 
 PageDirectory *memory_kpdir()
@@ -121,7 +109,7 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
 {
     assert(virtual_range.is_page_aligned());
 
-    atomic_begin();
+    AtomicHolder holder;
 
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
@@ -139,8 +127,6 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
         }
     }
 
-    atomic_end();
-
     if (flags & MEMORY_CLEAR)
         memset((void *)virtual_range.base(), 0, virtual_range.size());
 
@@ -151,10 +137,10 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_r
 {
     assert(physical_range.is_page_aligned());
 
-    atomic_begin();
+    AtomicHolder holder;
+
     physical_set_used(physical_range);
     virtual_map(page_directory, physical_range, physical_range.base(), flags);
-    atomic_end();
 
     if (flags & MEMORY_CLEAR)
         memset((void *)physical_range.base(), 0, physical_range.size());
@@ -166,6 +152,8 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
 {
     assert(IS_PAGE_ALIGN(size));
 
+    AtomicHolder holder;
+
     if (!size)
     {
         *out_address = 0;
@@ -175,16 +163,11 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
 
     *out_address = 0;
 
-    atomic_begin();
-
     auto physical_range = physical_alloc(size);
 
     if (physical_range.empty())
     {
-        atomic_end();
-
         logger_error("Failed to allocate memory: Not enough physical memory!");
-
         return ERR_OUT_OF_MEMORY;
     }
 
@@ -193,14 +176,10 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     if (!virtual_address)
     {
         physical_free(physical_range);
-        atomic_end();
 
         logger_error("Failed to allocate memory: Not enough virtual memory!");
-
         return ERR_OUT_OF_MEMORY;
     }
-
-    atomic_end();
 
     if (flags & MEMORY_CLEAR)
         memset((void *)virtual_address, 0, size);
@@ -211,7 +190,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
 
 Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, uintptr_t *out_address)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
@@ -224,8 +203,6 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
             physical_set_used(identity_range);
             virtual_map(page_directory, identity_range, identity_range.base(), flags);
 
-            atomic_end();
-
             if (flags & MEMORY_CLEAR)
                 memset((void *)identity_range.base(), 0, ARCH_PAGE_SIZE);
 
@@ -234,8 +211,6 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
             return SUCCESS;
         }
     }
-
-    atomic_end();
 
     logger_warn("Failed to allocate identity mapped page!");
 
@@ -248,7 +223,7 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
     assert(virtual_range.is_page_aligned());
 
-    atomic_begin();
+    AtomicHolder holder;
 
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
@@ -264,21 +239,18 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
         }
     }
 
-    atomic_end();
-
     return SUCCESS;
 }
 
 PageDirectory *memory_pdir_create()
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     PageDirectory *page_directory = nullptr;
 
     if (memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
     {
         logger_error("Page directory allocation failed!");
-        atomic_end();
 
         return nullptr;
     }
@@ -296,14 +268,12 @@ PageDirectory *memory_pdir_create()
         page_directory_entry->PageFrameNumber = (uint)&kptable[i] / ARCH_PAGE_SIZE;
     }
 
-    atomic_end();
-
     return page_directory;
 }
 
 void memory_pdir_destroy(PageDirectory *page_directory)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     for (size_t i = 256; i < 1024; i++)
     {
@@ -332,8 +302,6 @@ void memory_pdir_destroy(PageDirectory *page_directory)
     }
 
     memory_free(&kpdir, (MemoryRange){(uintptr_t)page_directory, sizeof(PageDirectory)});
-
-    atomic_end();
 }
 
 #define MEMORY_DUMP_REGION_START(__pdir, __addr)                \
@@ -406,5 +374,6 @@ void memory_pdir_dump(PageDirectory *pdir, bool user)
 
 void memory_pdir_switch(PageDirectory *pdir)
 {
+    AtomicHolder holder;
     paging_load_directory(virtual_to_physical(&kpdir, (uintptr_t)pdir));
 }

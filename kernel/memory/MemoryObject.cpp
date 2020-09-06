@@ -16,6 +16,8 @@ void memory_object_initialize()
 
 MemoryObject *memory_object_create(size_t size)
 {
+    AtomicHolder holder;
+
     size = PAGE_ALIGN_UP(size);
 
     MemoryObject *memory_object = __create(MemoryObject);
@@ -24,9 +26,7 @@ MemoryObject *memory_object_create(size_t size)
     memory_object->refcount = 1;
     memory_object->_range = physical_alloc(size);
 
-    atomic_begin();
     list_pushback(_memory_objects, memory_object);
-    atomic_end();
 
     return memory_object;
 }
@@ -48,33 +48,26 @@ MemoryObject *memory_object_ref(MemoryObject *memory_object)
 
 void memory_object_deref(MemoryObject *memory_object)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     if (__atomic_sub_fetch(&memory_object->refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
         memory_object_destroy(memory_object);
     }
-
-    atomic_end();
 }
 
 MemoryObject *memory_object_by_id(int id)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     list_foreach(MemoryObject, memory_object, _memory_objects)
     {
         if (memory_object->id == id)
         {
             memory_object_ref(memory_object);
-
-            atomic_end();
-
             return memory_object;
         }
     }
-
-    atomic_end();
 
     return nullptr;
 }

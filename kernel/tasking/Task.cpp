@@ -97,7 +97,6 @@ void task_destroy(Task *task)
 
     task_fshandle_close_all(task);
 
-    lock_acquire(task->directory_lock);
     path_destroy(task->directory);
 
     memory_free(task->pdir, (MemoryRange){(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
@@ -113,15 +112,14 @@ void task_destroy(Task *task)
 
 void task_iterate(void *target, TaskIterateCallback callback)
 {
-    atomic_begin();
+    AtomicHolder holder;
+
     if (!_tasks)
     {
-        atomic_end();
         return;
     }
 
     list_iterate(_tasks, target, (ListIterationCallback)callback);
-    atomic_end();
 }
 
 Task *task_by_id(int id)
@@ -137,17 +135,14 @@ Task *task_by_id(int id)
 
 int task_count()
 {
-    atomic_begin();
+    AtomicHolder holder;
+
     if (!_tasks)
     {
-        atomic_end();
         return 0;
     }
 
-    int result = _tasks->count();
-    atomic_end();
-
-    return result;
+    return _tasks->count();
 }
 
 Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user)
@@ -200,7 +195,7 @@ static void pass_argc_argv_kernel(Task *task, const char **argv)
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     Task *task = task_create(parent, name, user);
 
@@ -215,8 +210,6 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, cons
     {
         pass_argc_argv_kernel(task, argv);
     }
-
-    atomic_end();
 
     return task;
 }
@@ -303,17 +296,14 @@ Result task_sleep(Task *task, int timeout)
 
 Result task_wait(int task_id, int *exit_value)
 {
-    atomic_begin();
+    AtomicHolder holder;
+
     Task *task = task_by_id(task_id);
 
     if (!task)
     {
-        atomic_end();
-
         return ERR_NO_SUCH_TASK;
     }
-
-    atomic_end();
 
     task_block(
         scheduler_running(),
@@ -327,7 +317,6 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
     assert(!task->blocker);
 
     atomic_begin();
-
     task->blocker = blocker;
     if (blocker->can_unblock(blocker, task))
     {
@@ -371,12 +360,10 @@ Result task_cancel(Task *task, int exit_value)
 {
     assert(task);
 
-    atomic_begin();
+    AtomicHolder holder;
 
     task->exit_value = exit_value;
     task_set_state(task, TASK_STATE_CANCELED);
-
-    atomic_end();
 
     return SUCCESS;
 }
@@ -395,7 +382,7 @@ void task_dump(Task *task)
     atomic_begin();
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state));
-    printf("\n\t   User memory: ");
+    printf("\n\t   Memory: ");
     memory_pdir_dump(task->pdir, false);
 
     if (task->pdir == memory_kpdir())

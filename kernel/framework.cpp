@@ -139,13 +139,8 @@ void __plug_process_exit(int code)
 
 Result __plug_process_cancel(int pid)
 {
-    Result result;
-
-    ATOMIC({
-        result = task_cancel(task_by_id(pid), -1);
-    });
-
-    return result;
+    AtomicHolder holder;
+    return task_cancel(task_by_id(pid), -1);
 }
 
 Result __plug_process_get_directory(char *buffer, uint size)

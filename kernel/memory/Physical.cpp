@@ -1,3 +1,5 @@
+#include <libsystem/thread/Atomic.h>
+
 #include "arch/Paging.h"
 
 #include "kernel/memory/Physical.h"
@@ -31,6 +33,8 @@ void phyisical_page_set_used(uintptr_t address)
 
 MemoryRange physical_alloc(size_t size)
 {
+    ASSERT_ATOMIC;
+
     assert(IS_PAGE_ALIGN(size));
 
     for (size_t i = 0; i < ((TOTAL_MEMORY - size) / ARCH_PAGE_SIZE); i++)
@@ -50,6 +54,8 @@ MemoryRange physical_alloc(size_t size)
 
 void physical_free(MemoryRange range)
 {
+    ASSERT_ATOMIC;
+
     assert(range.is_page_aligned());
 
     physical_set_free(range);
@@ -57,6 +63,8 @@ void physical_free(MemoryRange range)
 
 bool physical_is_used(MemoryRange range)
 {
+    ASSERT_ATOMIC;
+
     assert(range.is_page_aligned());
 
     for (size_t i = 0; i < range.page_count(); i++)
@@ -74,6 +82,8 @@ bool physical_is_used(MemoryRange range)
 
 void physical_set_used(MemoryRange range)
 {
+    ASSERT_ATOMIC;
+
     assert(range.is_page_aligned());
 
     for (size_t i = 0; i < range.page_count(); i++)
@@ -90,6 +100,8 @@ void physical_set_used(MemoryRange range)
 
 void physical_set_free(MemoryRange range)
 {
+    ASSERT_ATOMIC;
+
     assert(range.is_page_aligned());
 
     for (size_t i = 0; i < range.page_count(); i++)

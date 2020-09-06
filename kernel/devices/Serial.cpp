@@ -40,23 +40,16 @@ public:
     {
         __unused(handle);
 
-        // FIXME: use locks
-        atomic_begin();
-        size_t read = ringbuffer_read(serial_buffer, (char *)buffer, size);
-        atomic_end();
-
-        return read;
+        AtomicHolder holder;
+        return ringbuffer_read(serial_buffer, (char *)buffer, size);
     }
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
     {
         __unused(handle);
 
-        atomic_begin();
-        size_t written = com_write(COM1, buffer, size);
-        atomic_end();
-
-        return written;
+        AtomicHolder holder;
+        return com_write(COM1, buffer, size);
     }
 };
 

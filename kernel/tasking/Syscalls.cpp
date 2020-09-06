@@ -75,22 +75,18 @@ Result sys_process_exit(int code)
 
 Result sys_process_cancel(int pid)
 {
-    Result result = SUCCESS;
+    AtomicHolder holder;
 
-    ATOMIC({
-        Task *task = task_by_id(pid);
+    Task *task = task_by_id(pid);
 
-        if (task == nullptr)
-        {
-            result = ERR_NO_SUCH_TASK;
-        }
-        else
-        {
-            result = task_cancel(task, -1);
-        }
-    });
-
-    return result;
+    if (task == nullptr)
+    {
+        return ERR_NO_SUCH_TASK;
+    }
+    else
+    {
+        return task_cancel(task, -1);
+    }
 }
 
 Result sys_process_get_directory(char *buffer, uint size)

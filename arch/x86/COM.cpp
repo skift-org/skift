@@ -31,14 +31,12 @@ char com_getc(COMPort port)
 
 size_t com_write(COMPort port, const void *buffer, size_t size)
 {
-    atomic_begin();
+    AtomicHolder holder;
 
     for (size_t i = 0; i < size; i++)
     {
         com_putc(port, ((const char *)buffer)[i]);
     }
-
-    atomic_end();
 
     return size;
 }

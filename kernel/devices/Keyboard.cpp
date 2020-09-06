@@ -173,7 +173,8 @@ Key keyboard_scancode_to_key(int scancode)
 
 void keyboard_interrupt_handler()
 {
-    atomic_begin();
+    AtomicHolder holder;
+
     uint8_t status = in8(PS2_STATUS);
 
     while (((status & PS2_WHICH_BUFFER) == PS2_KEYBOARD_BUFFER) &&
@@ -203,7 +204,6 @@ void keyboard_interrupt_handler()
 
         status = in8(PS2_STATUS);
     }
-    atomic_end();
 }
 
 /* --- Public functions ----------------------------------------------------- */
@@ -256,7 +256,7 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, vo
         IOCallKeyboardSetKeymapArgs *size_and_keymap = (IOCallKeyboardSetKeymapArgs *)args;
         KeyMap *new_keymap = (KeyMap *)size_and_keymap->keymap;
 
-        atomic_begin();
+        AtomicHolder holder;
 
         if (_keymap != nullptr)
         {
@@ -265,8 +265,6 @@ static Result keyboard_iocall(FsNode *node, FsHandle *handle, IOCall request, vo
 
         _keymap = (KeyMap *)malloc(size_and_keymap->size);
         memcpy(_keymap, new_keymap, size_and_keymap->size);
-
-        atomic_end();
 
         return SUCCESS;
     }
@@ -305,11 +303,10 @@ public:
     {
         __unused(handle);
 
+        AtomicHolder holder;
+
         // FIXME: use locks
-        atomic_begin();
-        size_t read = ringbuffer_read(_characters_buffer, (char *)buffer, size);
-        atomic_end();
-        return read;
+        return ringbuffer_read(_characters_buffer, (char *)buffer, size);
     }
 };
 
@@ -338,12 +335,9 @@ public:
     {
         __unused(handle);
 
-        // FIXME: use locks
-        atomic_begin();
-        size_t read = ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
-        atomic_end();
+        AtomicHolder holder;
 
-        return read;
+        return ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
     }
 };
 

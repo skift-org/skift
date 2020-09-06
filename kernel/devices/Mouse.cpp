@@ -43,12 +43,12 @@ static void ps2mouse_handle_finished_packet(uint8_t packet0, uint8_t packet1, ui
     event.right = (MouseButtonState)((packet0 >> 1) & 1);
     event.left = (MouseButtonState)((packet0)&1);
 
-    atomic_begin();
+    AtomicHolder holder;
+
     if (ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
     {
         logger_warn("Mouse buffer overflow!");
     }
-    atomic_end();
 }
 
 void ps2mouse_handle_packet(uint8_t packet)
@@ -152,12 +152,8 @@ public:
     {
         __unused(handle);
 
-        // FIXME: use locks
-        atomic_begin();
-        size_t read = ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
-        atomic_end();
-
-        return read;
+        AtomicHolder holder;
+        return ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
     }
 };
 

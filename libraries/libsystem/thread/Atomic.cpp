@@ -8,7 +8,7 @@ static uint atomic_depth = 0;
 
 bool is_atomic()
 {
-    return !(atomic_enabled && atomic_depth == 0);
+    return !atomic_enabled || atomic_depth > 0;
 }
 
 void atomic_enable()

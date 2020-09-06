@@ -1,6 +1,7 @@
 #include <abi/Paths.h>
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
@@ -310,6 +311,8 @@ bool e1000_match(DeviceInfo info)
 
 void e1000_initialize(DeviceInfo info)
 {
+    AtomicHolder holder;
+
     if (pci_device_type_bar(info.pci_device, 0) == PCIBarType::MMIO32)
     {
         uintptr_t memory_base = pci_device_read_bar(info.pci_device, 0) & 0xFFFFFFF0;

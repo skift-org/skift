@@ -1,10 +1,13 @@
 #include <libsystem/core/CString.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "kernel/memory/Virtual.h"
 #include "kernel/tasking/Task-Memory.h"
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object)
 {
+    AtomicHolder holder;
+
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
@@ -18,6 +21,8 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
 
 MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_object, uintptr_t address)
 {
+    AtomicHolder holder;
+
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
@@ -31,6 +36,8 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 
 void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
+    AtomicHolder holder;
+
     virtual_free(task->pdir, (MemoryRange){memory_mapping->address, memory_mapping->size});
     memory_object_deref(memory_mapping->object);
 

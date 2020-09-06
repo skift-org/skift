@@ -1,5 +1,7 @@
-#include "kernel/memory/Virtual.h"
+#include <libsystem/thread/Atomic.h>
+
 #include "kernel/memory/Memory.h"
+#include "kernel/memory/Virtual.h"
 #include "kernel/system/System.h"
 
 #define PD_INDEX(vaddr) ((vaddr) >> 22)
@@ -10,6 +12,8 @@ PageTable kptable[256] __aligned(ARCH_PAGE_SIZE) = {};
 
 bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 {
+    ASSERT_ATOMIC;
+
     int page_directory_index = PD_INDEX(virtual_address);
     PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
 
@@ -33,6 +37,8 @@ bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
 
 uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address)
 {
+    ASSERT_ATOMIC;
+
     int page_directory_index = PD_INDEX(virtual_address);
     PageDirectoryEntry &page_directory_entry = page_directory->entries[page_directory_index];
 
@@ -56,6 +62,8 @@ uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_a
 
 Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
+    ASSERT_ATOMIC;
+
     for (size_t i = 0; i < physical_range.size() / ARCH_PAGE_SIZE; i++)
     {
         size_t offset = i * ARCH_PAGE_SIZE;
@@ -95,6 +103,8 @@ Result virtual_map(PageDirectory *page_directory, MemoryRange physical_range, ui
 
 MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags)
 {
+    ASSERT_ATOMIC;
+
     bool is_user_memory = flags & MEMORY_USER;
 
     uintptr_t virtual_address = 0;
@@ -132,6 +142,8 @@ MemoryRange virtual_alloc(PageDirectory *page_directory, MemoryRange physical_ra
 
 void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
 {
+    ASSERT_ATOMIC;
+
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
         size_t offset = i * ARCH_PAGE_SIZE;

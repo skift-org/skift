@@ -134,7 +134,9 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     }
     else if (stackframe.intno == 128)
     {
+        sti();
         stackframe.eax = task_do_syscall((Syscall)stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
+        cli();
     }
 
     pic_ack(stackframe.intno);

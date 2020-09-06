@@ -29,20 +29,15 @@ void dispatcher_dispatch(int interrupt)
 
 static bool dispatcher_has_interupt()
 {
-    atomic_begin();
-    bool result = !ringbuffer_is_empty(_interupts_to_dispatch);
-    atomic_end();
+    AtomicHolder holder;
 
-    return result;
+    return !ringbuffer_is_empty(_interupts_to_dispatch);
 }
 
 static int dispatcher_get_interupt()
 {
-    atomic_begin();
-    int interrupt = ringbuffer_getc(_interupts_to_dispatch);
-    atomic_end();
-
-    return interrupt;
+    AtomicHolder holder;
+    return ringbuffer_getc(_interupts_to_dispatch);
 }
 
 static bool dispatcher_can_unblock(Blocker *blocker, Task *task)

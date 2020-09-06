@@ -2,6 +2,7 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "arch/x86/x86.h"
 
@@ -135,6 +136,8 @@ bool bga_match(DeviceInfo info)
 
 void bga_initialize(DeviceInfo info)
 {
+    AtomicHolder holder;
+
     bga_set_mode(VBE_DISPI_DEFAULT_XRES, VBE_DISPI_DEFAULT_YRES);
     framebuffer_physical = pci_device_read_bar(info.pci_device, 0) & 0xFFFFFFF0;
     framebuffer_virtual = virtual_alloc(

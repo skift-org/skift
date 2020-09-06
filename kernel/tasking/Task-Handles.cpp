@@ -11,9 +11,9 @@
 
 Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
 {
-    Result result = ERR_TOO_MANY_OPEN_FILES;
+    LockHolder holder(task->handles_lock);
 
-    lock_acquire(task->handles_lock);
+    Result result = ERR_TOO_MANY_OPEN_FILES;
 
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
@@ -27,83 +27,57 @@ Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
         }
     }
 
-    lock_release(task->handles_lock);
-
     return result;
+}
+
+static bool is_valid_handle(Task *task, int handle)
+{
+    return handle >= 0 && handle < PROCESS_HANDLE_COUNT &&
+           task->handles[handle] != nullptr;
 }
 
 Result task_fshandle_remove(Task *task, int handle_index)
 {
-    Result result = ERR_BAD_FILE_DESCRIPTOR;
+    LockHolder holder(task->handles_lock);
 
-    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
-    {
-        lock_acquire(task->handles_lock);
-
-        if (task->handles[handle_index] != nullptr)
-        {
-            fshandle_destroy(task->handles[handle_index]);
-            task->handles[handle_index] = nullptr;
-
-            result = SUCCESS;
-        }
-
-        lock_release(task->handles_lock);
-    }
-    else
+    if (!is_valid_handle(task, handle_index))
     {
         logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    return result;
+    fshandle_destroy(task->handles[handle_index]);
+    task->handles[handle_index] = nullptr;
+
+    return SUCCESS;
 }
 
 FsHandle *task_fshandle_acquire(Task *task, int handle_index)
 {
-    FsHandle *result = nullptr;
+    LockHolder holder(task->handles_lock);
 
-    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
-    {
-        lock_acquire(task->handles_lock);
-
-        if (task->handles[handle_index] != nullptr)
-        {
-            fshandle_acquire_lock(task->handles[handle_index], task->id);
-            result = task->handles[handle_index];
-        }
-
-        lock_release(task->handles_lock);
-    }
-    else
+    if (!is_valid_handle(task, handle_index))
     {
         logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
+        return nullptr;
     }
 
-    return result;
+    fshandle_acquire_lock(task->handles[handle_index], task->id);
+    return task->handles[handle_index];
 }
 
 Result task_fshandle_release(Task *task, int handle_index)
 {
-    Result result = ERR_BAD_FILE_DESCRIPTOR;
+    LockHolder holder(task->handles_lock);
 
-    if (handle_index >= 0 && handle_index < PROCESS_HANDLE_COUNT)
-    {
-        lock_acquire(task->handles_lock);
-
-        if (task->handles[handle_index] != nullptr)
-        {
-            fshandle_release_lock(task->handles[handle_index], task->id);
-            result = SUCCESS;
-        }
-
-        lock_release(task->handles_lock);
-    }
-    else
+    if (!is_valid_handle(task, handle_index))
     {
         logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
+        return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    return result;
+    fshandle_release_lock(task->handles[handle_index], task->id);
+    return SUCCESS;
 }
 
 Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, OpenFlag flags)
@@ -134,9 +108,15 @@ Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, 
 
 void task_fshandle_close_all(Task *task)
 {
+    LockHolder holder(task->handles_lock);
+
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
-        task_fshandle_close(task, i);
+        if (task->handles[i])
+        {
+            fshandle_destroy(task->handles[i]);
+            task->handles[i] = nullptr;
+        }
     }
 }
 

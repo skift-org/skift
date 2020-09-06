@@ -83,9 +83,10 @@ void scheduler_yield()
 
 int scheduler_get_usage(int task_id)
 {
+    AtomicHolder holder;
+
     int count = 0;
 
-    atomic_begin();
     for (int i = 0; i < SCHEDULER_RECORD_COUNT; i++)
     {
         if (scheduler_record[i] == task_id)
@@ -93,7 +94,6 @@ int scheduler_get_usage(int task_id)
             count++;
         }
     }
-    atomic_end();
 
     return (count * 100) / SCHEDULER_RECORD_COUNT;
 }

@@ -38,3 +38,20 @@ void __lock_assert(Lock *lock, const char *file, const char *function, int line)
 #define lock_assert(lock) __lock_assert(&lock, __FILE__, __FUNCTION__, __LINE__)
 
 #define lock_is_acquire(__lock) ((&__lock)->locked)
+
+class LockHolder
+{
+private:
+    Lock &_lock;
+
+public:
+    LockHolder(Lock &lock) : _lock(lock)
+    {
+        lock_acquire(_lock);
+    }
+
+    ~LockHolder()
+    {
+        lock_release(_lock);
+    }
+};

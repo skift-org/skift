@@ -42,7 +42,7 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
 
 void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *launchpad)
 {
-    lock_acquire(parent_task->handles_lock);
+    LockHolder holder(parent_task->handles_lock);
 
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
@@ -58,8 +58,6 @@ void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *laun
             fshandle_release_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
         }
     }
-
-    lock_release(parent_task->handles_lock);
 }
 
 Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)

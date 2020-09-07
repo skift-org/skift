@@ -18,15 +18,15 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
 
     handle->offset = 0;
     handle->flags = flags;
-    node->ref_handle(*handle);
     handle->node = node;
 
+    fsnode_acquire_lock(node, scheduler_running_id());
+    node->ref_handle(*handle);
     if (node->open)
     {
-        fsnode_acquire_lock(node, scheduler_running_id());
         node->open(node, handle);
-        fsnode_release_lock(node, scheduler_running_id());
     }
+    fsnode_release_lock(node, scheduler_running_id());
 
     return handle;
 }
@@ -57,14 +57,14 @@ void fshandle_destroy(FsHandle *handle)
 {
     FsNode *node = handle->node;
 
+    fsnode_acquire_lock(node, scheduler_running_id());
     if (node->close)
     {
-        fsnode_acquire_lock(node, scheduler_running_id());
         node->close(node, handle);
-        fsnode_release_lock(node, scheduler_running_id());
     }
-
     node->deref_handle(*handle);
+    fsnode_release_lock(node, scheduler_running_id());
+
     free(handle);
 }
 
@@ -81,12 +81,6 @@ SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
     if ((events & SELECT_WRITE) && node->can_write(handle))
     {
         selected_events |= SELECT_WRITE;
-    }
-
-    if ((events & SELECT_SEND))
-    {
-        // FIXME: check if the message buffer is not full
-        selected_events |= SELECT_SEND;
     }
 
     if ((events & SELECT_CONNECT) && fsnode_is_accepted(node))

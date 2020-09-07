@@ -2,6 +2,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
 #include <libsystem/thread/Atomic.h>
+#include <libsystem/utils/Hexdump.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
@@ -143,7 +144,7 @@ void e1000_initialize_rx()
         memory_alloc(&kpdir, 8192, MEMORY_NONE, (uintptr_t *)&_rx_buffers[i]);
 
         _rx_descriptors[i].address = virtual_to_physical(&kpdir, (uintptr_t)_rx_buffers[i]);
-        _rx_descriptors[i].status = 0;
+        _rx_descriptors[i].status = 0x1;
     }
 
     e1000_write(E1000_REG_RX_LOW, _rx_descriptors_range.base());
@@ -166,7 +167,7 @@ void e1000_initialize_tx()
         memory_alloc(&kpdir, 8192, MEMORY_NONE, (uintptr_t *)&_tx_buffers[i]);
 
         _tx_descriptors[i].address = virtual_to_physical(&kpdir, (uintptr_t)_tx_buffers[i]);
-        _tx_descriptors[i].status = 0;
+        _tx_descriptors[i].status = 0xff;
     }
 
     e1000_write(E1000_REG_TX_LOW, _tx_descriptors_range.base());
@@ -187,54 +188,53 @@ void e1000_enable_interrupt()
 
 /* --- Send/Receive --------------------------------------------------------- */
 
-void e1000_handle_receive()
+size_t e1000_receive_packet(void *buffer, size_t size)
 {
-    while (_rx_descriptors[_current_rx_descriptors].status & 0x1)
-    {
-        uint8_t *buffer = (uint8_t *)_rx_descriptors[_current_rx_descriptors].address;
-        uint16_t size = _rx_descriptors[_current_rx_descriptors].length;
+    __unused(size);
 
-        // FIXME: Send this up the stack
-        __unused(buffer);
-        __unused(size);
+    logger_trace("rx");
 
-        _rx_descriptors[_current_rx_descriptors].status = 0;
-        uint16_t old_cur = _current_rx_descriptors;
-        _current_rx_descriptors = (_current_rx_descriptors + 1) % E1000_NUM_RX_DESC;
-        e1000_write(E1000_REG_RX_TAIL, old_cur);
+    void *packet_buffer = _rx_buffers[_current_rx_descriptors];
+    uint32_t packet_size = _rx_descriptors[_current_rx_descriptors].length;
+    memcpy(buffer, packet_buffer, packet_size);
+    _rx_descriptors[_current_rx_descriptors].status = 0;
 
-        logger_trace("rx");
-    }
+    uint16_t old_cur = _current_rx_descriptors;
+    _current_rx_descriptors = (_current_rx_descriptors + 1) % E1000_NUM_RX_DESC;
+    e1000_write(E1000_REG_RX_TAIL, old_cur);
+
+    return packet_size;
 }
 
-void e1000_send_packet(const void *buffer, uint16_t size)
+size_t e1000_send_packet(const void *buffer, size_t size)
 {
+    logger_trace("tx");
+
     memcpy(_tx_buffers[_current_tx_descriptors], buffer, size);
     _tx_descriptors[_current_tx_descriptors].length = size;
     _tx_descriptors[_current_tx_descriptors].command = CMD_EOP | CMD_IFCS | CMD_RS;
     _tx_descriptors[_current_tx_descriptors].status = 0;
 
-    uint8_t old_cur = _current_tx_descriptors;
     _current_tx_descriptors = (_current_tx_descriptors + 1) % E1000_NUM_TX_DESC;
     e1000_write(E1000_REG_TX_TAIL, _current_tx_descriptors);
 
-    while (!(_tx_descriptors[old_cur].status & 0xff))
-    {
-    }
-
-    logger_trace("tx");
+    return size;
 }
 
 /* --- FsNode --------------------------------------------------------------- */
 
 static void e1000_interrupt_handler()
 {
-    e1000_write(E1000_REG_IMASK, 0x1);
+    e1000_write(E1000_REG_IMASK, 0x0);
 
     uint32_t status = e1000_read(E1000_REG_STATUS);
+    logger_trace("e1000 interupt (STATUS=%08x)!", status);
 
-    if (status & 0x80)
-        e1000_handle_receive();
+    if (status & 4)
+    {
+        uint32_t flags = e1000_read(E1000_REG_CONTROL);
+        e1000_write(E1000_REG_CONTROL, flags | E1000_CTL_START_LINK);
+    }
 }
 
 Result net_iocall(FsNode *node, FsHandle *handle, IOCall iocall, void *args)
@@ -271,31 +271,34 @@ public:
     {
         __unused(handle);
 
-        return true;
+        return (_tx_descriptors[_current_tx_descriptors].status & 1);
     }
 
     bool can_read(FsHandle *handle)
     {
         __unused(handle);
 
-        return true;
+        return _rx_descriptors[_current_rx_descriptors].status & 0x1;
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
     {
         __unused(handle);
-        __unused(buffer);
-        __unused(size);
 
-        return ERR_FUNCTION_NOT_IMPLEMENTED;
+        size_t packet_size = e1000_receive_packet(buffer, size);
+        logger_trace("Packet receive (size=%u)", packet_size);
+        hexdump(buffer, packet_size);
+        return packet_size;
     }
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size)
     {
         __unused(handle);
 
-        e1000_send_packet(buffer, size);
-        return MIN(size, 8192);
+        size_t packet_size = e1000_send_packet(buffer, size);
+        logger_trace("Packet send (size=%u)", packet_size);
+        hexdump(buffer, packet_size);
+        return packet_size;
     }
 };
 
@@ -306,7 +309,7 @@ bool e1000_match(DeviceInfo info)
     return info.pci_device.vendor == 0x8086 &&
            (info.pci_device.device == 0x100E || // Qemu, Bochs, and VirtualBox emulated NICs
             info.pci_device.device == 0x153A || // Intel I217
-            info.pci_device.device == 0x153A);  // Intel 82577LM
+            info.pci_device.device == 0x10EA);  // Intel 82577LM
 }
 
 void e1000_initialize(DeviceInfo info)
@@ -334,4 +337,6 @@ void e1000_initialize(DeviceInfo info)
 
     dispatcher_register_handler(pci_device_get_interrupt(info.pci_device), e1000_interrupt_handler);
     filesystem_link_and_take_ref_cstring(NETWORK_DEVICE_PATH, new Net());
+
+    logger_debug("TX HEAD=%d TX TAIL=%d", e1000_read(E1000_REG_TX_HEAD), e1000_read(E1000_REG_TX_TAIL));
 }

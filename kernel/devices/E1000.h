@@ -2,9 +2,11 @@
 
 #include <libsystem/Common.h>
 
+#define E1000_REG_CONTROL 0x0000
+#define E1000_REG_STATUS 0x0008
+
 #define E1000_REG_EEPROM 0x0014
 #define E1000_REG_IMASK 0x00D0
-#define E1000_REG_STATUS 0x00D0
 #define E1000_REG_MAC_LOW 0x5400
 #define E1000_REG_MAC_HIGHT 0x5404
 
@@ -73,6 +75,8 @@
 
 #define E1000_NUM_RX_DESC 32
 #define E1000_NUM_TX_DESC 8
+
+#define E1000_CTL_START_LINK 0x40 //set link up
 
 struct __packed E1000RXDescriptor
 {

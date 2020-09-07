@@ -1,6 +1,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/system/Memory.h>
+#include <libsystem/utils/Hexdump.h>
 
 #include "compositor/Client.h"
 #include "compositor/Cursor.h"
@@ -151,12 +152,12 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     assert(events & SELECT_READ);
 
     CompositorMessage message = {};
-    size_t message_size = 0;
-
-    message_size = connection_receive(connection, &message, sizeof(CompositorMessage));
+    size_t message_size = connection_receive(connection, &message, sizeof(CompositorMessage));
 
     if (handle_has_error(connection))
     {
+        logger_error("Client handle has error: %s!", handle_error_string(connection));
+
         client->disconnected = true;
         client_destroy_disconnected();
         return;
@@ -164,8 +165,12 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
 
     if (message_size != sizeof(CompositorMessage))
     {
+        logger_error("Got a message with an invalid size from client %u != %u!", sizeof(CompositorMessage), message_size);
+        hexdump(&message, message_size);
+
         client->disconnected = true;
         client_destroy_disconnected();
+
         return;
     }
 
@@ -203,7 +208,12 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
         break;
 
     default:
-        logger_warn("Invalid message for client %08x", client);
+        logger_error("Invalid message for client %08x", client);
+        hexdump(&message, message_size);
+
+        client->disconnected = true;
+        client_destroy_disconnected();
+
         break;
     }
 }

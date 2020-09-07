@@ -6,6 +6,7 @@
 #include <libsystem/io/Connection.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/utils/Hexdump.h>
 
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
@@ -56,7 +57,9 @@ void application_do_message(CompositorMessage *message)
     }
     else
     {
-        logger_warn("Got an invalid message from compositor!");
+        logger_error("Got an invalid message from compositor (%d)!", message->type);
+        hexdump(&message, sizeof(CompositorMessage));
+        application_exit(-1);
     }
 }
 
@@ -115,13 +118,20 @@ void application_request_callback(
     __unused(events);
 
     CompositorMessage message = {};
-    connection_receive(connection, &message, sizeof(CompositorMessage));
+    memset((void *)&message, 0xff, sizeof(CompositorMessage));
+    size_t message_size = connection_receive(connection, &message, sizeof(CompositorMessage));
 
-    if (handle_get_error(connection) == ERR_STREAM_CLOSED)
+    if (handle_has_error(connection))
     {
-        logger_error("Connection to the compositor closed!");
+        logger_error("Connection to the compositor closed %s!", handle_error_string(connection));
         application_exit(-1);
-        return;
+    }
+
+    if (message_size != sizeof(CompositorMessage))
+    {
+        logger_error("Got a message with an invalid size from compositor %u != %u!", sizeof(CompositorMessage), message_size);
+        hexdump(&message, message_size);
+        application_exit(-1);
     }
 
     application_do_message(&message);

@@ -23,8 +23,6 @@
 
 void system_main(Multiboot *multiboot)
 {
-    logger_info("Framebuffer at %08x %d %d", multiboot->framebuffer_addr, multiboot->framebuffer_width, multiboot->framebuffer_height);
-
     stream_format(log_stream, "\n");
     stream_format(log_stream, "                         _   _     _ _____ ____ _____                           \n");
     stream_format(log_stream, "                        | | | |   | | ____|  _ \\_   _|                          \n");
@@ -35,9 +33,6 @@ void system_main(Multiboot *multiboot)
     stream_format(log_stream, "\u001b[34;1m--------------------------------------------------------------------------------\e[0m\n");
     stream_format(log_stream, "                              Copyright (c) 2018-2020 The skiftOS contributors \n");
     stream_format(log_stream, "\n");
-
-    logger_info("Hello, world!");
-    
 
     system_initialize();
     memory_initialize(multiboot);

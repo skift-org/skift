@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libsystem/utils/RingBuffer.h>
 #include <libwidget/Widget.h>
 
 class Graph : public Widget

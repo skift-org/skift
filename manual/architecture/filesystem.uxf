@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>549</y>
+      <w>315</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Disk Driver</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>378</x>
+      <y>513</y>
+      <w>558</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=.
+r1=USERSPACE
+m1=KERNEL</panel_attributes>
+    <additional_attributes>10.0;20.0;600.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>378</y>
+      <w>549</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=.
+r1=APPLICATION
+m1=SYSTEM</panel_attributes>
+    <additional_attributes>10.0;20.0;590.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>450</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>ext2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>414</y>
+      <w>315</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>VFS</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>630</x>
+      <y>450</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>dev-fs</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>738</x>
+      <y>450</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>net-fs
+
+/Network/https:github.com/index.html</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>486</y>
+      <w>315</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>block-cache</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>351</y>
+      <w>315</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Applications</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

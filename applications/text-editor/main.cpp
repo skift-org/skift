@@ -32,6 +32,7 @@ int main(int argc, char **argv)
 
     if (argc == 2)
     {
+        logger_info("Opening text document from '%s'", argv[1]);
         model = TextModel::from_file(argv[1]);
     }
 

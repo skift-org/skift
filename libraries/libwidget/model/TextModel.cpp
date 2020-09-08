@@ -22,15 +22,15 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
     {
         auto line = own<TextModelLine>();
 
-        while (lexer.do_continue() && lexer.current_codepoint() != '\n')
+        while (lexer.do_continue() &&
+               lexer.current_codepoint() != '\n')
         {
             line->append(lexer.current_codepoint());
-
             lexer.foreward_codepoint();
         }
+        lexer.skip('\n'); // skip the \n
 
         model->append_line(line);
-        lexer.foreward_codepoint();
     }
 
     stream_close(stream);

@@ -18,6 +18,7 @@ Lexer::Lexer(Stream *stream)
     if (state.type != FILE_TYPE_REGULAR)
     {
         _is_stream = true;
+        _size = 0;
     }
 
     _peek = ringbuffer_create(SOURCE_READER_MAX_PEEK);

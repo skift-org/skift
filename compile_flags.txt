@@ -1,4 +1,6 @@
+-m32
 -std=c++20
+-I.
 -Ikernel
 -Ilibraries
 -Iapplications

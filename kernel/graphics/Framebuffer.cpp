@@ -73,6 +73,8 @@ public:
 
 void framebuffer_initialize(Multiboot *multiboot)
 {
+    AtomicHolder holder;
+
     _framebuffer_width = multiboot->framebuffer_width;
     _framebuffer_height = multiboot->framebuffer_height;
     _framebuffer_pitch = multiboot->framebuffer_pitch;

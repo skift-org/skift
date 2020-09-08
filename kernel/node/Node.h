@@ -36,11 +36,11 @@ struct FsNode
     Lock lock;
     uint refcount;
 
-    uint readers;
-    uint writers;
-    uint clients;
-    uint server;
-    uint master;
+    uint readers = 0;
+    uint writers = 0;
+    uint clients = 0;
+    uint server = 0;
+    uint master = 0;
 
     FsNodeOpenCallback open = nullptr;
     FsNodeCloseCallback close = nullptr;

@@ -8,18 +8,18 @@
 
 static void fsconnection_accept(FsConnection *connection)
 {
-    connection->accepted = true;
+    connection->_accepted = true;
 }
 
 static bool fsconnection_is_accepted(FsConnection *connection)
 {
-    return connection->accepted;
+    return connection->_accepted;
 }
 
 static void fsconnection_destroy(FsConnection *connection)
 {
-    ringbuffer_destroy(connection->data_to_client);
-    ringbuffer_destroy(connection->data_to_server);
+    ringbuffer_destroy(connection->_data_to_client);
+    ringbuffer_destroy(connection->_data_to_server);
 }
 
 FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
@@ -28,19 +28,19 @@ FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
     is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
     destroy = (FsNodeDestroyCallback)fsconnection_destroy;
 
-    data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
-    data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
+    _data_to_client = ringbuffer_create(CONNECTION_BUFFER_SIZE);
+    _data_to_server = ringbuffer_create(CONNECTION_BUFFER_SIZE);
 }
 
 bool FsConnection::can_read(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_CLIENT))
     {
-        return !ringbuffer_is_empty(data_to_client) || !server;
+        return !ringbuffer_is_empty(_data_to_client) || !server;
     }
     else
     {
-        return !ringbuffer_is_empty(data_to_server) || !clients;
+        return !ringbuffer_is_empty(_data_to_server) || !clients;
     }
 }
 
@@ -48,11 +48,11 @@ bool FsConnection::can_write(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_CLIENT))
     {
-        return !ringbuffer_is_full(data_to_server) || !server;
+        return !ringbuffer_is_full(_data_to_server) || !server;
     }
     else
     {
-        return !ringbuffer_is_full(data_to_client) || !clients;
+        return !ringbuffer_is_full(_data_to_client) || !clients;
     }
 }
 
@@ -67,7 +67,7 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
             return ERR_STREAM_CLOSED;
         }
 
-        data = data_to_client;
+        data = _data_to_client;
     }
     else
     {
@@ -76,7 +76,7 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
             return ERR_STREAM_CLOSED;
         }
 
-        data = data_to_server;
+        data = _data_to_server;
     }
 
     return ringbuffer_read(data, (char *)buffer, size);
@@ -93,7 +93,7 @@ ResultOr<size_t> FsConnection::write(FsHandle &handle, const void *buffer, size_
             return ERR_STREAM_CLOSED;
         }
 
-        data = data_to_server;
+        data = _data_to_server;
     }
     else
     {
@@ -102,7 +102,7 @@ ResultOr<size_t> FsConnection::write(FsHandle &handle, const void *buffer, size_
             return ERR_STREAM_CLOSED;
         }
 
-        data = data_to_client;
+        data = _data_to_client;
     }
 
     return ringbuffer_write(data, (const char *)buffer, size);

@@ -8,10 +8,10 @@ class FsConnection : public FsNode
 {
 private:
 public:
-    bool accepted;
+    bool _accepted = false;
 
-    RingBuffer *data_to_server;
-    RingBuffer *data_to_client;
+    RingBuffer *_data_to_server;
+    RingBuffer *_data_to_client;
 
     FsConnection();
 

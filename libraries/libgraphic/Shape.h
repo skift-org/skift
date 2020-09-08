@@ -391,15 +391,25 @@ public:
 
     Rectangle shrinked(Insets insets) const
     {
+        assert(insets.top() >= 0);
+        assert(insets.bottom() >= 0);
+        assert(insets.left() >= 0);
+        assert(insets.right() >= 0);
+
         return Rectangle(
             _x + insets.left(),
             _y + insets.top(),
-            _width - insets.left() - insets.right(),
-            _height - insets.top() - insets.bottom());
+            MAX(0, _width - insets.left() - insets.right()),
+            MAX(0, _height - insets.top() - insets.bottom()));
     }
 
     Rectangle expended(Insets insets) const
     {
+        assert(insets.top() >= 0);
+        assert(insets.bottom() >= 0);
+        assert(insets.left() >= 0);
+        assert(insets.right() >= 0);
+
         return Rectangle(
             _x - insets.left(),
             _y - insets.top(),

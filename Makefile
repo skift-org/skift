@@ -168,6 +168,10 @@ run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm
 
+.PHONY: run-bochs
+run-bochs: $(BOOTDISK)
+	bochs -q -rc .bochsini
+
 .PHONY: run-vbox
 run-vbox: $(BOOTDISK)
 	@VBoxManage unregistervm --delete "skiftOS-dev" || echo "Look like it's the fist time you are running this command, this is fine"

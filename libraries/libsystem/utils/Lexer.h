@@ -2,13 +2,15 @@
 
 #include <libsystem/io/Stream.h>
 #include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 class Lexer
 {
 private:
+    static constexpr int PEEK_SIZE = 16;
+
     Stream *_stream = nullptr;
-    RingBuffer *_peek = nullptr;
+    RingBuffer _peek{PEEK_SIZE};
     bool _is_stream = false;
     /*    or    */
     const char *_string = nullptr;
@@ -20,8 +22,6 @@ public:
     Lexer(Stream *stream);
 
     Lexer(const char *string, size_t size);
-
-    ~Lexer();
 
     bool ended();
 

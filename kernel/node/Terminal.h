@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libsystem/thread/Lock.h>
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "kernel/node/Node.h"
 
@@ -12,8 +12,10 @@ public:
     int width;
     int height;
 
-    RingBuffer *master_to_slave_buffer;
-    RingBuffer *slave_to_master_buffer;
+    static constexpr int BUFFER_SIZE = 1024;
+
+    RingBuffer master_to_slave_buffer{BUFFER_SIZE};
+    RingBuffer slave_to_master_buffer{BUFFER_SIZE};
 
     FsTerminal();
 

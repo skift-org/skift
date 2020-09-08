@@ -20,22 +20,12 @@ Lexer::Lexer(Stream *stream)
         _is_stream = true;
         _size = 0;
     }
-
-    _peek = ringbuffer_create(SOURCE_READER_MAX_PEEK);
 }
 
 Lexer::Lexer(const char *string, size_t size)
 {
     _string = string;
     _size = size;
-}
-
-Lexer::~Lexer()
-{
-    if (_peek)
-    {
-        ringbuffer_destroy(_peek);
-    }
 }
 
 bool Lexer::ended()
@@ -66,12 +56,12 @@ void Lexer::foreward()
 
     if (_stream)
     {
-        if (ringbuffer_is_empty(_peek))
+        if (_peek.empty())
         {
-            ringbuffer_putc(_peek, stream_getchar(_stream));
+            _peek.put(stream_getchar(_stream));
         }
 
-        ringbuffer_getc(_peek);
+        _peek.get();
     }
 }
 
@@ -120,12 +110,12 @@ char Lexer::peek(size_t peek)
     }
     else
     {
-        while (peek >= ringbuffer_used(_peek))
+        while (peek >= _peek.used())
         {
-            ringbuffer_putc(_peek, stream_getchar(_stream));
+            _peek.put(stream_getchar(_stream));
         }
 
-        return ringbuffer_peek(_peek, peek);
+        return _peek.peek(peek);
     }
 }
 

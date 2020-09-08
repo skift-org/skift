@@ -2,7 +2,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/scheduling/Blocker.h"
@@ -13,7 +13,7 @@ static DispatcherInteruptHandler _interupts_to_handlers[255] = {};
 
 void dispatcher_initialize()
 {
-    _interupts_to_dispatch = ringbuffer_create(1024);
+    _interupts_to_dispatch = new RingBuffer(1024);
 
     Task *interrupts_dispatcher_task = task_spawn(nullptr, "InterruptsDispatcher", dispatcher_service, nullptr, false);
     task_go(interrupts_dispatcher_task);
@@ -23,7 +23,7 @@ void dispatcher_dispatch(int interrupt)
 {
     if (_interupts_to_handlers[interrupt])
     {
-        ringbuffer_putc(_interupts_to_dispatch, interrupt);
+        _interupts_to_dispatch->put(interrupt);
     }
 }
 
@@ -31,13 +31,13 @@ static bool dispatcher_has_interupt()
 {
     AtomicHolder holder;
 
-    return !ringbuffer_is_empty(_interupts_to_dispatch);
+    return !_interupts_to_dispatch->empty();
 }
 
 static int dispatcher_get_interupt()
 {
     AtomicHolder holder;
-    return ringbuffer_getc(_interupts_to_dispatch);
+    return _interupts_to_dispatch->get();
 }
 
 class BlockerDispatcher : public Blocker

@@ -6,7 +6,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/thread/Atomic.h>
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
@@ -113,7 +113,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
                 int length = codepoint_to_utf8(codepoint, utf8);
 
                 if (_characters_node->readers)
-                    ringbuffer_write(_characters_buffer, (const char *)utf8, length);
+                    _characters_buffer->write((const char *)utf8, length);
             }
         }
     }
@@ -129,7 +129,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
                 KEY_MOTION_DOWN,
             };
 
-            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
+            _events_buffer->write((char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_UP)
@@ -141,7 +141,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
                 KEY_MOTION_UP,
             };
 
-            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
+            _events_buffer->write((char *)&packet, sizeof(KeyboardPacket));
         }
 
         if (motion == KEY_MOTION_DOWN)
@@ -153,7 +153,7 @@ void keyboard_handle_key(Key key, KeyMotion motion)
                 KEY_MOTION_TYPED,
             };
 
-            ringbuffer_write(_events_buffer, (char *)&packet, sizeof(KeyboardPacket));
+            _events_buffer->write((char *)&packet, sizeof(KeyboardPacket));
         }
     }
 
@@ -296,7 +296,7 @@ public:
         __unused(handle);
 
         // FIXME: make this atomic or something...
-        return !ringbuffer_is_empty(_characters_buffer);
+        return !_characters_buffer->empty();
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
@@ -306,7 +306,7 @@ public:
         AtomicHolder holder;
 
         // FIXME: use locks
-        return ringbuffer_read(_characters_buffer, (char *)buffer, size);
+        return _characters_buffer->read((char *)buffer, size);
     }
 };
 
@@ -328,7 +328,7 @@ public:
         __unused(handle);
 
         // FIXME: make this atomic or something...
-        return !ringbuffer_is_empty(_events_buffer);
+        return !_events_buffer->empty();
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
@@ -337,7 +337,7 @@ public:
 
         AtomicHolder holder;
 
-        return ringbuffer_read(_events_buffer, (char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
+        return _events_buffer->read((char *)buffer, (size / sizeof(KeyboardPacket)) * sizeof(KeyboardPacket));
     }
 };
 
@@ -347,12 +347,12 @@ void keyboard_initialize()
 
     _keymap = keyboard_load_keymap("/System/Keyboards/" CONFIG_KEYBOARD_LAYOUT ".kmap");
 
-    _characters_buffer = ringbuffer_create(1024);
+    _characters_buffer = new RingBuffer(1024);
     _characters_node = new Keyboard();
 
     filesystem_link_cstring(KEYBOARD_DEVICE_PATH, _characters_node);
 
-    _events_buffer = ringbuffer_create(sizeof(KeyboardPacket) * 256);
+    _events_buffer = new RingBuffer(sizeof(KeyboardPacket) * 256);
     _events_node = new KeyboardEvent();
 
     filesystem_link_cstring(KEYBOARD_EVENT_DEVICE_PATH, _events_node);

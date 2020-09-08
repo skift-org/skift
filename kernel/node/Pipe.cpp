@@ -14,16 +14,9 @@ static size_t pipe_size(FsPipe *node, FsHandle *handle)
     return PIPE_BUFFER_SIZE;
 }
 
-static void pipe_destroy(FsPipe *node)
-{
-    ringbuffer_destroy(node->_buffer);
-}
-
 FsPipe::FsPipe() : FsNode(FILE_TYPE_PIPE)
 {
     size = (FsNodeSizeCallback)pipe_size;
-    destroy = (FsNodeDestroyCallback)pipe_destroy;
-    _buffer = ringbuffer_create(PIPE_BUFFER_SIZE);
 }
 
 bool FsPipe::can_read(FsHandle *handle)
@@ -31,7 +24,7 @@ bool FsPipe::can_read(FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !ringbuffer_is_empty(_buffer) || !writers;
+    return !_buffer.empty() || !writers;
 }
 
 bool FsPipe::can_write(FsHandle *handle)
@@ -39,7 +32,7 @@ bool FsPipe::can_write(FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !ringbuffer_is_full(_buffer) || !readers;
+    return !_buffer.full() || !readers;
 }
 
 ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
@@ -51,7 +44,7 @@ ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
         return ERR_STREAM_CLOSED;
     }
 
-    return ringbuffer_read(_buffer, (char *)buffer, size);
+    return _buffer.read((char *)buffer, size);
 }
 
 ResultOr<size_t> FsPipe::write(FsHandle &handle, const void *buffer, size_t size)
@@ -63,5 +56,5 @@ ResultOr<size_t> FsPipe::write(FsHandle &handle, const void *buffer, size_t size
         return ERR_STREAM_CLOSED;
     }
 
-    return ringbuffer_write(_buffer, (const char *)buffer, size);
+    return _buffer.write((const char *)buffer, size);
 }

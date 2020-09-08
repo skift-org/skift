@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "kernel/node/Node.h"
 
@@ -8,7 +8,9 @@ class FsPipe : public FsNode
 {
 private:
 public:
-    RingBuffer *_buffer;
+    static constexpr int BUFFER_SIZE = 4096;
+
+    RingBuffer _buffer{BUFFER_SIZE};
 
     FsPipe();
 

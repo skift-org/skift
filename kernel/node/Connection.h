@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "kernel/node/Node.h"
 
@@ -8,10 +8,13 @@ class FsConnection : public FsNode
 {
 private:
 public:
+    static constexpr int BUFFER_SIZE = 4096;
+
     bool _accepted = false;
 
-    RingBuffer *_data_to_server;
-    RingBuffer *_data_to_client;
+    RingBuffer _data_to_server{BUFFER_SIZE};
+
+    RingBuffer _data_to_client{BUFFER_SIZE};
 
     FsConnection();
 

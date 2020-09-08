@@ -3,7 +3,7 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
-#include <libsystem/utils/RingBuffer.h>
+#include <libutils/RingBuffer.h>
 
 #include "arch/x86/PS2.h"
 #include "arch/x86/x86.h"
@@ -45,7 +45,7 @@ static void ps2mouse_handle_finished_packet(uint8_t packet0, uint8_t packet1, ui
 
     AtomicHolder holder;
 
-    if (ringbuffer_write(_mouse_buffer, (const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
+    if (_mouse_buffer->write((const char *)&event, sizeof(MousePacket)) != sizeof(MousePacket))
     {
         logger_warn("Mouse buffer overflow!");
     }
@@ -145,7 +145,7 @@ public:
         __unused(handle);
 
         // FIXME: make this atomic or something...
-        return !ringbuffer_is_empty(_mouse_buffer);
+        return !_mouse_buffer->empty();
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size)
@@ -153,7 +153,7 @@ public:
         __unused(handle);
 
         AtomicHolder holder;
-        return ringbuffer_read(_mouse_buffer, (char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
+        return _mouse_buffer->read((char *)buffer, (size / sizeof(MousePacket)) * sizeof(MousePacket));
     }
 };
 
@@ -186,7 +186,7 @@ void mouse_initialize()
     // FIXME: try to enable mouse whell
 
     // Setup the mouse handler
-    _mouse_buffer = ringbuffer_create(sizeof(MousePacket) * 256);
+    _mouse_buffer = new RingBuffer(sizeof(MousePacket) * 256);
     dispatcher_register_handler(12, ps2mouse_interrupt_handler);
 
     filesystem_link_and_take_ref_cstring(MOUSE_DEVICE_PATH, new Mouse());

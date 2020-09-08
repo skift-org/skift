@@ -51,14 +51,14 @@ struct FsNode
     FsNodeStatCallback stat = nullptr;
     FsNodeSizeCallback size = nullptr;
 
-    FsNodeOpenConnectionCallback open_connection;
-    FsNodeAcceptConnectionCallback accept_connection;
-    FsNodeCanAcceptConnectionCallback can_accept_connection;
+    FsNodeOpenConnectionCallback open_connection = nullptr;
+    FsNodeAcceptConnectionCallback accept_connection = nullptr;
+    FsNodeCanAcceptConnectionCallback can_accept_connection = nullptr;
 
-    FsNodeAcceptCallback accept;
-    FsNodeIsAcceptedCallback is_accepted;
+    FsNodeAcceptCallback accept = nullptr;
+    FsNodeIsAcceptedCallback is_accepted = nullptr;
 
-    FsNodeDestroyCallback destroy;
+    FsNodeDestroyCallback destroy = nullptr;
 
 public:
     FsNode(FileType type);

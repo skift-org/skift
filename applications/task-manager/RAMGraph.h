@@ -30,8 +30,8 @@ public:
 
         auto icon_and_text = new Container(this);
         icon_and_text->layout(HFLOW(4));
-        new IconPanel(icon_and_text, Icon::get("memory"));
-        new Label(icon_and_text, "Processor");
+        new IconPanel(icon_and_text, Icon::get("chip"));
+        new Label(icon_and_text, "Memory");
 
         auto cpu_filler = new Container(this);
         cpu_filler->attributes(LAYOUT_FILL);

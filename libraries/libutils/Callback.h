@@ -23,6 +23,9 @@ private:
     template <typename CallableType>
     class CallableWrapper final : public CallableWrapperBase
     {
+    private:
+        CallableType _callable;
+
     public:
         explicit CallableWrapper(CallableType &&callable)
             : _callable(move(callable))
@@ -32,10 +35,10 @@ private:
         CallableWrapper(const CallableWrapper &) = delete;
         CallableWrapper &operator=(const CallableWrapper &) = delete;
 
-        Out call(In... in) const final override { return _callable(forward<In>(in)...); }
-
-    private:
-        CallableType _callable;
+        Out call(In... in) const final override
+        {
+            return _callable(forward<In>(in)...);
+        }
     };
 
     OwnPtr<CallableWrapperBase> _wrapper;
@@ -62,7 +65,7 @@ public:
         return _wrapper->call(forward<In>(in)...);
     }
 
-    explicit operator bool() const { return !!_wrapper; }
+    explicit operator bool() const { return _wrapper; }
 
     template <typename CallableType, class = typename EnableIf<!(IsPointer<CallableType>::value && IsFunction<typename RemovePointer<CallableType>::Type>::value) && IsRvalueReference<CallableType &&>::value>::Type>
     Callback &operator=(CallableType &&callable)

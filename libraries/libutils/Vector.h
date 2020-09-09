@@ -109,15 +109,17 @@ public:
     }
 
     template <typename Callback>
-    void foreach (Callback callback)
+    Iteration foreach (Callback callback)
     {
         for (size_t i = 0; i < _count; i++)
         {
             if (callback(_storage[i]) == Iteration::STOP)
             {
-                return;
+                return Iteration::STOP;
             }
         }
+
+        return Iteration::CONTINUE;
     }
 
     template <typename Comparator>

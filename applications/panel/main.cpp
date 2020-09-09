@@ -8,11 +8,7 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
-void widget_cpu_update(Graph *widget)
-{
-    SystemStatus status = system_get_status();
-    widget->record(status.cpu_usage / 100.0);
-}
+static constexpr int PANEL_HEIGHT = 36;
 
 int main(int argc, char **argv)
 {
@@ -22,10 +18,10 @@ int main(int argc, char **argv)
 
     window->title("Panel");
     window->type(WINDOW_TYPE_PANEL);
-    window->bound(Screen::bound().take_top(36));
+    window->bound(Screen::bound().take_top(PANEL_HEIGHT));
     window->opacity(0.95);
     window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto) {
-        window->bound(Screen::bound().take_top(32));
+        window->bound(Screen::bound().take_top(PANEL_HEIGHT));
     });
 
     window->root()->layout(VFLOW(0));

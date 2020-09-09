@@ -51,11 +51,12 @@ int main(int argc, char **argv)
 {
     if (application_initialize(argc, argv) == SUCCESS)
     {
-        Window *window = window_create(WINDOW_RESIZABLE);
+        Window *window = window_create(WINDOW_RESIZABLE | WINDOW_TRANSPARENT);
 
         window->icon(Icon::get("console-line"));
         window->title("Terminal");
         window->size(Vec2i(500, 400));
+        window->opacity(1);
 
         Widget *widget = new TerminalWidget(window->root());
         widget->focus();

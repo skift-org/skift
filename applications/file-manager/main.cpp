@@ -5,8 +5,8 @@
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
-#include "file-explorer/Breadcrumb.h"
-#include "file-explorer/FileSystemModel.h"
+#include "file-manager/Breadcrumb.h"
+#include "file-manager/FileSystemModel.h"
 
 enum RecordHistory
 {

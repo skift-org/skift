@@ -1,0 +1,6 @@
+{
+    "name": "File Manager",
+    "comment": "Manage your Files",
+    "icon": "folder-outline",
+    "command": "file-manager"
+}

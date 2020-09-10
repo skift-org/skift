@@ -5,7 +5,7 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
 
-#include "file-explorer/FileSystemModel.h"
+#include "file-manager/FileSystemModel.h"
 
 enum Column
 {

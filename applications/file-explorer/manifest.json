@@ -1,6 +1,0 @@
-{
-    "name": "File Explorer",
-    "comment": "Copy, past and managed your files.",
-    "icon": "folder-outline",
-    "command": "file-explorer"
-}

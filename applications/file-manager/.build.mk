@@ -1,9 +1,9 @@
-APPS += FILE_EXPLORER
+APPS += FILE_MANAGER
 
-FILE_EXPLORER_NAME = file-explorer
-FILE_EXPLORER_LIBS = widget graphic json
-FILE_EXPLORER_ICONS = \
-	folder \
+FILE_MANAGER_NAME = file-manager
+FILE_MANAGER_LIBS = widget graphic json
+FILE_MANAGER_ICONS = \
+	folder
 	folder-outline \
 	file \
 	laptop \

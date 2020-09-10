@@ -1,7 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Window.h>
 
-#include "file-explorer/Breadcrumb.h"
+#include "file-manager/Breadcrumb.h"
 
 Breadcrumb::Breadcrumb(Widget *parent, Path *path) : Widget(parent)
 {

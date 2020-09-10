@@ -6,6 +6,7 @@ UTILS = \
 	DSTART \
 	ECHO \
 	GREP \
+	HEXDUMP \
 	INIT \
 	JSON \
 	KILL \
@@ -21,7 +22,7 @@ UTILS = \
 	TOUCH \
 	UNLINK \
 	UPTIME \
-	LINK
+	LINK 
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -43,6 +44,9 @@ ECHO_NAME = echo
 
 GREP_LIBS =
 GREP_NAME = grep
+
+HEXDUMP_LIBS = 
+HEXDUMP_NAME = hexdump
 
 INIT_LIBS =
 INIT_NAME = init

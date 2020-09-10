@@ -24,7 +24,7 @@ A simple, handmade, operating system for the intel x86 cpu.
  - **skiftOS** is pretty easy to build from source, just follow the [build guide](manual/building.md)
  - **skiftOS is a student project, don't expect it to be secure or stable at this stage.**
 
-# Screenshot
+# Screenshots
 
 <p align="center">
 <img src="manual/screenshots/2020-05-26.png" />

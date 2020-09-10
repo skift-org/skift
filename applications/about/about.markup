@@ -10,13 +10,13 @@
     <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
         <Image id="system-image" fill/>
 
-        <Label text="The skift operating system." position="center"/>
-        <Label id="version-label" position="center"/>
-        <Label text="Copyright © 2018-2020 N. Van Bossuyt." position="center"/>
+        <Label text="The Skift operating system." position="center"/>
+        <Label text="Version: 2020.0910" position="center"/>
+        <Label text="Copyright (c) 2018-2020 N. Van Bossuyt." position="center"/>
     </Container>
 
     <Container padding="insets(4)" layout="hflow(0)">
         <Container fill/>
-        <Button id="ok-button" text="Ok" filled/>
+        <Button id="ok-button" text="Close" filled/>
     </Container>
 </Window>

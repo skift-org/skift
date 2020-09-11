@@ -23,3 +23,7 @@
 #ifndef __BUILD_UNAME__
 #define __BUILD_UNAME__ "unknown"
 #endif
+
+#ifndef __BUILD_VERSION__
+#define __BUILD_VERSION__ "0000.0000"
+#endif

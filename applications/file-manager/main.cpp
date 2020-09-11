@@ -90,7 +90,7 @@ Window *file_explorer_window_create(const char *current_path)
     window_initialize(window, WINDOW_RESIZABLE);
 
     window->icon(Icon::get("folder"));
-    window->title("File Explorer");
+    window->title("File Manager");
     window->size(Vec2i(700, 500));
 
     Widget *root = window->root();

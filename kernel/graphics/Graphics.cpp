@@ -11,18 +11,7 @@ void graphic_initialize(Multiboot *multiboot)
         return;
     }
 
-    if (multiboot->framebuffer_pixelformat == PIXELFORMAT_CGA)
-    {
-        textmode_initialize();
-    }
-    else if (multiboot->framebuffer_pixelformat == PIXELFORMAT_RGB)
-    {
-        framebuffer_initialize(multiboot);
-    }
-    else
-    {
-        logger_error("No valid pixel format found!");
-    }
+    framebuffer_initialize(multiboot);
 }
 
 void graphic_did_find_framebuffer()

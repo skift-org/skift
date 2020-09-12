@@ -5,36 +5,6 @@
 #include "kernel/node/Handle.h"
 #include "kernel/node/Terminal.h"
 
-static Result terminal_iocall(FsTerminal *terminal, FsHandle *handle, IOCall request, void *args)
-{
-    __unused(handle);
-
-    IOCallTerminalSizeArgs *size_args = (IOCallTerminalSizeArgs *)args;
-
-    switch (request)
-    {
-    case IOCALL_TERMINAL_GET_SIZE:
-        size_args->width = terminal->width;
-        size_args->height = terminal->height;
-
-        return SUCCESS;
-
-    case IOCALL_TERMINAL_SET_SIZE:
-        if (size_args->width < 0 || size_args->height < 0)
-        {
-            return ERR_INVALID_ARGUMENT;
-        }
-
-        terminal->width = size_args->width;
-        terminal->height = size_args->height;
-
-        return SUCCESS;
-
-    default:
-        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
-    }
-}
-
 static size_t terminal_size(FsTerminal *terminal, FsHandle *handle)
 {
     __unused(handle);
@@ -45,7 +15,6 @@ static size_t terminal_size(FsTerminal *terminal, FsHandle *handle)
 
 FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
 {
-    call = (FsNodeCallCallback)terminal_iocall;
     size = (FsNodeSizeCallback)terminal_size;
 
     width = 80;
@@ -130,5 +99,35 @@ ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t 
         {
             return ERR_STREAM_CLOSED;
         }
+    }
+}
+
+Result FsTerminal::call(FsHandle &handle, IOCall request, void *args)
+{
+    __unused(handle);
+
+    IOCallTerminalSizeArgs *size_args = (IOCallTerminalSizeArgs *)args;
+
+    switch (request)
+    {
+    case IOCALL_TERMINAL_GET_SIZE:
+        size_args->width = width;
+        size_args->height = height;
+
+        return SUCCESS;
+
+    case IOCALL_TERMINAL_SET_SIZE:
+        if (size_args->width < 0 || size_args->height < 0)
+        {
+            return ERR_INVALID_ARGUMENT;
+        }
+
+        width = size_args->width;
+        height = size_args->height;
+
+        return SUCCESS;
+
+    default:
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
     }
 }

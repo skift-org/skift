@@ -7,6 +7,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
 
+#include <libutils/Iteration.h>
 #include <libutils/New.h>
 #include <libutils/RefPtr.h>
 

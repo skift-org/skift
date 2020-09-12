@@ -121,7 +121,7 @@ int main(int argc, char const *argv[])
 
     eventloop_initialize();
 
-    Stream *keyboard_stream = stream_open(KEYBOARD_EVENT_DEVICE_PATH, OPEN_READ);
+    Stream *keyboard_stream = stream_open(KEYBOARD_DEVICE_PATH, OPEN_READ);
     Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
 
     __cleanup(stream_cleanup) Stream *socket_stream = stream_open("/Session/compositor.lock", OPEN_READ);

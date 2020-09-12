@@ -49,6 +49,11 @@ public:
         return String(make<StringStorage>(_buffer, _used));
     }
 
+    StringBuilder &append(String string)
+    {
+        return append(string.cstring());
+    }
+
     StringBuilder &append(const char *str)
     {
         if (!str)

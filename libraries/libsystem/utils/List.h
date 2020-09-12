@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/Common.h>
+#include <libutils/Iteration.h>
 
 #define list_foreach(__type, __item, __list)                             \
     for (ListItem *__i = __list->_head; __i != nullptr; __i = __i->next) \

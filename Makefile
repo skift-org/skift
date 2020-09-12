@@ -97,7 +97,6 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 
 	@mkdir -p \
 		$(SYSROOT)/Applications \
-		$(SYSROOT)/Devices \
 		$(SYSROOT)/Session \
 		$(SYSROOT)/System \
 		$(SYSROOT)/System/Binaries \

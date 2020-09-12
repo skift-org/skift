@@ -1,39 +1,28 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
+#include <libutils/Vector.h>
 
 #include "arch/x86/x86.h"
 #include "kernel/bus/PCI.h"
 
-Iteration pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus);
+Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus);
 
-Iteration pci_device_iterate_hit(
-    void *target,
-    DeviceIterateCallback callback,
-    PCIDevice device)
+Iteration pci_scan_hit(IterationCallback<PCIAddress> &callback, PCIAddress &address)
 {
-    device.vendor = (int)pci_device_read(device, PCI_VENDOR_ID, 2);
-    device.device = (int)pci_device_read(device, PCI_DEVICE_ID, 2);
-
-    return callback(target, (DeviceInfo){.bus = BUS_PCI, .pci_device = device});
+    return callback(address);
 }
 
-Iteration pci_device_iterate_func(
-    void *target,
-    DeviceIterateCallback callback,
-    PCIDevice device)
+Iteration pci_scan_func(IterationCallback<PCIAddress> &callback, PCIAddress &address)
 {
-    if (pci_device_iterate_hit(target, callback, device) == Iteration::STOP)
+    if (pci_scan_hit(callback, address) == Iteration::STOP)
     {
         return Iteration::STOP;
     }
 
-    if (pci_device_type(device) == PCI_TYPE_BRIDGE)
+    if (address.read_class_sub_class() == PCI_TYPE_BRIDGE)
     {
-        return pci_device_iterate_bus(
-            target,
-            callback,
-            pci_device_read(device, PCI_SECONDARY_BUS, 1));
+        return pci_scan_bus(callback, address.read8(PCI_SECONDARY_BUS));
     }
     else
     {
@@ -41,83 +30,65 @@ Iteration pci_device_iterate_func(
     }
 }
 
-Iteration pci_device_iterate_slot(
-    void *target,
-    DeviceIterateCallback callback,
-    int bus,
-    int slot)
+Iteration pci_scan_slot(IterationCallback<PCIAddress> &callback, int bus, int slot)
 {
-    PCIDevice device = {
-        .vendor = 0,
-        .device = 0,
+    PCIAddress address{bus, slot, 0};
 
-        .bus = bus,
-        .slot = slot,
-        .func = 0,
-    };
-
-    if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
+    if (address.read16(PCI_VENDOR_ID) == PCI_NONE)
         return Iteration::CONTINUE;
 
-    if (pci_device_iterate_func(target, callback, device) == Iteration::STOP)
+    if (pci_scan_func(callback, address) == Iteration::STOP)
         return Iteration::STOP;
 
-    if (!pci_device_read(device, PCI_HEADER_TYPE, 1))
+    if (!address.read8(PCI_HEADER_TYPE))
         return Iteration::CONTINUE;
 
     for (int func = 1; func < 8; func++)
     {
-        PCIDevice device = {
-            .vendor = 0,
-            .device = 0,
+        PCIAddress address{bus, slot, func};
 
-            .bus = bus,
-            .slot = slot,
-            .func = func,
-        };
-
-        if (pci_device_read(device, PCI_VENDOR_ID, 2) != PCI_NONE)
-            if (pci_device_iterate_func(target, callback, device) == Iteration::STOP)
-                return Iteration::STOP;
+        if (address.read16(PCI_VENDOR_ID) != PCI_NONE &&
+            pci_scan_func(callback, address) == Iteration::STOP)
+        {
+            return Iteration::STOP;
+        }
     }
 
     return Iteration::CONTINUE;
 }
 
-Iteration pci_device_iterate_bus(void *target, DeviceIterateCallback callback, int bus)
+Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus)
 {
     for (int slot = 0; slot < 32; ++slot)
-        if (pci_device_iterate_slot(target, callback, bus, slot) == Iteration::STOP)
+    {
+        if (pci_scan_slot(callback, bus, slot) == Iteration::STOP)
+        {
             return Iteration::STOP;
+        }
+    }
 
     return Iteration::CONTINUE;
 }
 
-Iteration pci_device_iterate(void *target, DeviceIterateCallback callback)
+Iteration pci_scan(IterationCallback<PCIAddress> callback)
 {
-    PCIDevice device = {};
+    PCIAddress address{};
 
-    if ((pci_device_read(device, PCI_HEADER_TYPE, 1) & 0x80) == 0)
+    if ((address.read8(PCI_HEADER_TYPE) & 0x80) == 0)
     {
-        return pci_device_iterate_bus(target, callback, 0);
+        return pci_scan_bus(callback, 0);
     }
 
     for (int func = 0; func < 8; ++func)
     {
-        PCIDevice device = {
-            .vendor = 0,
-            .device = 0,
-            .bus = 0,
-            .slot = 0,
-            .func = func,
-        };
+        PCIAddress address{0, 0, func};
 
-        if (pci_device_read(device, PCI_VENDOR_ID, 2) == PCI_NONE)
+        if (address.read16(PCI_VENDOR_ID) == PCI_NONE)
         {
             return Iteration::CONTINUE;
         }
 
-        if (pci_device_iterate_bus(target, callback, func) == Iteration::STOP)
+        if (pci_scan_bus(callback, func) == Iteration::STOP)
         {
             return Iteration::STOP;
         }
@@ -126,93 +97,100 @@ Iteration pci_device_iterate(void *target, DeviceIterateCallback callback)
     return Iteration::CONTINUE;
 }
 
-static Iteration find_isa_bridge(PCIDevice *pci_isa, DeviceInfo info)
+static bool _has_isa_bridge = false;
+static PCIAddress _isa_bridge_address = {};
+static uint8_t _isa_remaps[4] = {};
+
+void pci_initialize_isa_bridge()
 {
-    if (info.pci_device.vendor != 0x8086)
-        return Iteration::CONTINUE;
+    auto is_isa_bridge = [](PCIAddress &address) {
+        return address.read16(PCI_VENDOR_ID) == 0x8086 &&
+               (address.read16(PCI_DEVICE_ID) == 0x7000 ||
+                address.read16(PCI_DEVICE_ID) == 0x7110);
+    };
 
-    if (info.pci_device.device != 0x7000 ||
-        info.pci_device.device != 0x7110)
-        return Iteration::CONTINUE;
-
-    *pci_isa = info.pci_device;
-
-    return Iteration::STOP;
-}
-
-static bool has_pci_isa = false;
-static PCIDevice pci_isa = {};
-static uint8_t pci_remaps[4] = {};
-
-void pci_remap()
-{
-    if (pci_device_iterate(&pci_isa, (DeviceIterateCallback)find_isa_bridge) == Iteration::STOP)
-    {
-        has_pci_isa = true;
-
-        for (int i = 0; i < 4; ++i)
+    pci_scan([&](PCIAddress address) {
+        if (is_isa_bridge(address))
         {
-            pci_remaps[i] = pci_device_read(pci_isa, 0x60 + i, 1);
+            logger_info("Found isa bridge on PCI:%02x:%02x.%x", address.bus(), address.slot(), address.func());
+            _isa_bridge_address = address;
+            _has_isa_bridge = true;
 
-            if (pci_remaps[i] == 0x80)
+            for (int i = 0; i < 4; ++i)
             {
-                pci_remaps[i] = 10 + (i % 1);
-            }
-        }
+                _isa_remaps[i] = address.read8(0x60 + i);
 
-        uint32_t out = 0;
-        memcpy(&out, &pci_remaps, 4);
-        pci_device_write(pci_isa, 0x60, 4, out);
-    }
+                if (_isa_remaps[i] == 0x80)
+                {
+                    _isa_remaps[i] = 10 + (i % 1);
+                }
+            }
+
+            uint32_t out = 0;
+            memcpy(&out, &_isa_remaps, 4);
+            address.write32(0x60, out);
+
+            return Iteration::STOP;
+        }
+        else
+        {
+            return Iteration::CONTINUE;
+        }
+    });
 }
 
-int pci_device_get_interrupt(PCIDevice device)
+int pci_get_interrupt(PCIAddress address)
 {
-    if (has_pci_isa)
+    if (_has_isa_bridge)
     {
-        uint32_t irq_pin = pci_device_read(device, 0x3D, 1);
+        uint32_t irq_pin = address.read8(PCI_INTERRUPT_PIN);
         if (irq_pin == 0)
         {
-            logger_error("PCI device does not specific interrupt line");
-            return pci_device_read(device, PCI_INTERRUPT_LINE, 1);
+            logger_warn("PCI device does not specify an interrupt line!");
+            return address.read8(PCI_INTERRUPT_LINE);
         }
 
-        int pirq = (irq_pin + device.slot - 2) % 4;
-        int int_line = pci_device_read(device, PCI_INTERRUPT_LINE, 1);
+        int pirq = (irq_pin + address.slot() - 2) % 4;
+        int int_line = address.read8(PCI_INTERRUPT_LINE);
 
-        logger_info("slot is %d, irq pin is %d, so pirq is %d and that maps to %d? int_line=%d", device.slot, irq_pin, pirq, pci_remaps[pirq], int_line);
+        logger_info("Slot is %d, irq pin is %d, so pirq is %d and that maps to %d? int_line=%d",
+                    address.slot(), irq_pin, pirq, _isa_remaps[pirq], int_line);
 
         for (int i = 0; i < 4; ++i)
         {
-            logger_info("  irq[%d] = %d", i, pci_remaps[i]);
+            logger_info("  irq[%d] = %d", i, _isa_remaps[i]);
         }
 
-        if (pci_remaps[pirq] >= 0x80)
+        if (_isa_remaps[pirq] >= 0x80)
         {
-            logger_error("not mapped, remapping?");
+            logger_info("Not mapped, remapping?");
 
             if (int_line == 0xFF)
             {
-                int_line = 10;
-                pci_device_write(device, PCI_INTERRUPT_LINE, 1, int_line);
-
                 logger_warn("Just going in blind here.");
+                int_line = 10;
+                address.write8(PCI_INTERRUPT_LINE, 1);
             }
 
-            pci_remaps[pirq] = int_line;
+            _isa_remaps[pirq] = int_line;
             uint32_t out = 0;
-            memcpy(&out, &pci_remaps, 4);
-            pci_device_write(pci_isa, 0x60, 4, out);
+            memcpy(&out, &_isa_remaps, 4);
+            _isa_bridge_address.write32(0x60, out);
 
             return int_line;
         }
 
-        pci_device_write(device, PCI_INTERRUPT_LINE, 1, pci_remaps[pirq]);
+        address.write8(PCI_INTERRUPT_LINE, _isa_remaps[pirq]);
 
-        return pci_remaps[pirq];
+        return _isa_remaps[pirq];
     }
     else
     {
-        return pci_device_read(device, PCI_INTERRUPT_LINE, 1);
+        return address.read8(PCI_INTERRUPT_LINE);
     }
+}
+
+void pci_initialize()
+{
+    pci_initialize_isa_bridge();
 }

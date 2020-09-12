@@ -75,14 +75,4 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
     multiboot->framebuffer_width = info->framebuffer_width;
     multiboot->framebuffer_height = info->framebuffer_height;
     multiboot->framebuffer_pitch = info->framebuffer_pitch;
-
-    if (info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT)
-    {
-        multiboot->framebuffer_pixelformat = PIXELFORMAT_CGA;
-    }
-
-    if (info->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_RGB)
-    {
-        multiboot->framebuffer_pixelformat = PIXELFORMAT_RGB;
-    }
 }

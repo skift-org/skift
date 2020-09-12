@@ -9,7 +9,6 @@
 
 #include "terminal/FramebufferTerminal.h"
 #include "terminal/TerminalWidget.h"
-#include "terminal/TextmodeTerminal.h"
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
@@ -87,13 +86,8 @@ int main(int argc, char **argv)
 
         if (!terminal)
         {
-            terminal = textmode_terminal_create();
-
-            if (!terminal)
-            {
-                logger_error("Failed to open a device to display the terminal in!");
-                return -1;
-            }
+            logger_error("Failed to open a device to display the terminal in!");
+            return -1;
         }
 
         eventloop_initialize();

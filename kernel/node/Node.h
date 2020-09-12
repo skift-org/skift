@@ -15,7 +15,6 @@ typedef struct FsNode *(*FsNodeFindCallback)(struct FsNode *node, const char *na
 typedef Result (*FsNodeLinkCallback)(struct FsNode *node, const char *name, struct FsNode *child);
 typedef Result (*FsNodeUnlinkCallback)(struct FsNode *node, const char *name);
 
-typedef Result (*FsNodeCallCallback)(struct FsNode *node, struct FsHandle *handle, IOCall request, void *args);
 typedef Result (*FsNodeStatCallback)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
 
 typedef size_t (*FsNodeSizeCallback)(struct FsNode *node, struct FsHandle *handle);
@@ -47,7 +46,6 @@ struct FsNode
     FsNodeFindCallback find = nullptr;
     FsNodeLinkCallback link = nullptr;
     FsNodeUnlinkCallback unlink = nullptr;
-    FsNodeCallCallback call = nullptr;
     FsNodeStatCallback stat = nullptr;
     FsNodeSizeCallback size = nullptr;
 
@@ -70,6 +68,15 @@ public:
     void ref_handle(FsHandle &handle);
 
     void deref_handle(FsHandle &handle);
+
+    virtual Result call(FsHandle &handle, IOCall request, void *args)
+    {
+        __unused(handle);
+        __unused(request);
+        __unused(args);
+
+        return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
+    }
 
     virtual bool can_read(FsHandle *handle)
     {

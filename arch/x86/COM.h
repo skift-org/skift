@@ -10,6 +10,10 @@ enum COMPort
     COM4 = 0x2E8,
 };
 
+bool com_can_read(COMPort port);
+
+bool com_can_write(COMPort port);
+
 void com_wait_write(COMPort port);
 
 void com_wait_read(COMPort port);

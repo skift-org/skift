@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libutils/Iteration.h>
+
 #include "kernel/acpi/tables/SDTH.h"
 
 enum class MADTRecordType : uint8_t

@@ -11,6 +11,8 @@
 #include "arch/Arch.h"
 #include "arch/x86/Interrupts.h"
 #include "kernel/devices/Devices.h"
+#include "kernel/devices/Driver.h"
+#include "kernel/filesystem/DevicesFileSystem.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/modules/Modules.h"
@@ -46,15 +48,11 @@ void system_main(Multiboot *multiboot)
     interrupts_initialize();
     filesystem_initialize();
     modules_initialize(multiboot);
+    driver_initialize();
     device_initialize();
-    null_initialize();
-    zero_initialize();
-    random_initialize();
-    serial_initialize();
-    mouse_initialize();
-    keyboard_initialize();
     process_info_initialize();
     device_info_initialize();
+    devices_filesystem_initialize();
     graphic_initialize(multiboot);
     userspace_initialize();
 

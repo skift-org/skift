@@ -13,9 +13,9 @@
 
 #include "kernel/system/System.h"
 
-void arch_disable_interupts() { cli(); }
+void arch_disable_interrupts() { cli(); }
 
-void arch_enable_interupts() { sti(); }
+void arch_enable_interrupts() { sti(); }
 
 void arch_halt() { hlt(); }
 

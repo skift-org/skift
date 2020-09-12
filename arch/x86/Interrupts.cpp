@@ -67,7 +67,7 @@ void backtrace(uint32_t ebp)
 {
     Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
 
-    for (unsigned int frame = 0; stackframe; ++frame)
+    while (stackframe)
     {
         stream_format(log_stream, "\t%08x\n", stackframe->eip);
         stackframe = stackframe->ebp;

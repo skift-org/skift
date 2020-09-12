@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Move.h>
 #include <libutils/RefPtr.h>
 #include <libutils/StringStorage.h>
 

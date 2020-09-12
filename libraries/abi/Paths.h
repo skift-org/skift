@@ -4,8 +4,6 @@
 
 #define KEYBOARD_DEVICE_PATH DEVICE_PATH "/keyboard"
 
-#define KEYBOARD_EVENT_DEVICE_PATH DEVICE_PATH "/keyboard-event"
-
 #define MOUSE_DEVICE_PATH DEVICE_PATH "/mouse"
 
 #define TEXTMODE_DEVICE_PATH DEVICE_PATH "/textmode"

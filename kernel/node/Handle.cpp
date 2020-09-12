@@ -289,12 +289,9 @@ Result fshandle_call(FsHandle *handle, IOCall request, void *args)
 
     FsNode *node = handle->node;
 
-    if (node->call)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        result = node->call(node, handle, request, args);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
+    fsnode_acquire_lock(node, scheduler_running_id());
+    result = node->call(*handle, request, args);
+    fsnode_release_lock(node, scheduler_running_id());
 
     return result;
 }

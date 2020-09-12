@@ -7,8 +7,10 @@
 
 enum Column
 {
-    COLUMN_DEVICE,
+    COLUMN_NAME,
     COLUMN_DESCRIPTION,
+    COLUMN_PATH,
+    COLUMN_ADDRESS,
 
     __COLUMN_COUNT,
 };
@@ -29,11 +31,17 @@ static Variant device_model_data(DeviceModel *model, int row, int column)
 
     switch (column)
     {
-    case COLUMN_DEVICE:
-        return Variant(json::string_value(json::object_get(device, "device")));
+    case COLUMN_NAME:
+        return Variant(json::string_value(json::object_get(device, "name")));
 
     case COLUMN_DESCRIPTION:
         return Variant(json::string_value(json::object_get(device, "description")));
+
+    case COLUMN_PATH:
+        return Variant(json::string_value(json::object_get(device, "path")));
+
+    case COLUMN_ADDRESS:
+        return Variant(json::string_value(json::object_get(device, "address")));
 
     default:
         ASSERT_NOT_REACHED();
@@ -54,11 +62,17 @@ static const char *device_model_column_name(int column)
 {
     switch (column)
     {
-    case COLUMN_DEVICE:
-        return "Device";
+    case COLUMN_NAME:
+        return "Name";
 
     case COLUMN_DESCRIPTION:
         return "Description";
+
+    case COLUMN_PATH:
+        return "Path";
+
+    case COLUMN_ADDRESS:
+        return "Address";
 
     default:
         ASSERT_NOT_REACHED();

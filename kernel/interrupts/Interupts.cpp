@@ -8,5 +8,5 @@ void interrupts_initialize()
 {
     dispatcher_initialize();
     atomic_enable();
-    arch_enable_interupts();
+    arch_enable_interrupts();
 }

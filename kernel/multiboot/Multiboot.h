@@ -46,7 +46,6 @@ struct Multiboot
     size_t framebuffer_width;
     size_t framebuffer_height;
     size_t framebuffer_pitch;
-    PixelFormat framebuffer_pixelformat;
 
     size_t acpi_rsdp_size;
     uintptr_t acpi_rsdp_address;

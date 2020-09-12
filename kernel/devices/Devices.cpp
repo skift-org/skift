@@ -1,138 +1,107 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
+#include <libsystem/utils/NumberFormatter.h>
+#include <libutils/StringBuilder.h>
+#include <libutils/Vector.h>
 
+#include "kernel/bus/Legacy.h"
 #include "kernel/bus/PCI.h"
+#include "kernel/bus/UNIX.h"
 #include "kernel/devices/Devices.h"
-#include "kernel/virtio/Block.h"
-#include "kernel/virtio/Console.h"
-#include "kernel/virtio/Entropy.h"
-#include "kernel/virtio/Graphic.h"
-#include "kernel/virtio/Network.h"
-#include "kernel/virtio/Virtio.h"
+#include "kernel/devices/Driver.h"
 
-static DeviceDriverInfo drivers[] = {
-    {
-        "BOCHS/QEMU Graphics Adaptor",
-        BUS_PCI,
-        bga_match,
-        bga_initialize,
-    },
-    {
-        "Intel e1000/I217/82577LM Network Adaptor",
-        BUS_PCI,
-        e1000_match,
-        e1000_initialize,
-    },
-    {
-        "VirtIO Network Adaptor",
-        BUS_PCI,
-        virtio_network_match,
-        virtio_network_initialize,
-    },
-    {
-        "VirtIO Block Device",
-        BUS_PCI,
-        virtio_block_match,
-        virtio_block_initialize,
-    },
-    {
-        "VirtIO Console",
-        BUS_PCI,
-        virtio_console_match,
-        virtio_console_initialize,
-    },
-    {
-        "VirtIO Entropy Source",
-        BUS_PCI,
-        virtio_entropy_match,
-        virtio_entropy_initialize,
-    },
-    {
-        "VirtIO Graphic Adaptor",
-        BUS_PCI,
-        virtio_graphic_match,
-        virtio_graphic_initialize,
-    },
-    {nullptr, BUS_NONE, nullptr, nullptr},
-};
+static Vector<RefPtr<Device>> *_devices = nullptr;
 
-const DeviceDriverInfo *device_get_diver_info(DeviceInfo info)
+static int _device_ids[(uint8_t)DeviceClass::__COUNT] = {};
+static const char *_device_names[(uint8_t)DeviceClass::__COUNT] = {
+#define DEVICE_NAMES_ENTRY(__type, __name) #__name,
+    DEVICE_CLASS_LIST(DEVICE_NAMES_ENTRY)};
+
+void device_scan(IterationCallback<DeviceAddress> callback)
 {
-    for (size_t i = 0; drivers[i].match; i++)
+    if (legacy_scan([&](LegacyAddress address) {
+            return callback(DeviceAddress(address));
+        }) == Iteration::STOP)
     {
-        const DeviceDriverInfo *driver = &drivers[i];
-
-        if (driver->bus == info.bus &&
-            driver->match(info))
-        {
-            return driver;
-        }
+        return;
     }
 
-    return nullptr;
+    if (pci_scan([&](PCIAddress address) {
+            return callback(DeviceAddress(address));
+        }) == Iteration::STOP)
+    {
+        return;
+    }
+
+    if (unix_scan([&](UNIXAddress address) {
+            return callback(DeviceAddress(address));
+        }) == Iteration::STOP)
+    {
+        return;
+    }
 }
 
-const char *device_to_static_string(DeviceInfo info)
+String device_claim_name(DeviceClass klass)
 {
-    static char buffer[512];
+    const char *name = _device_names[(uint8_t)klass];
 
-    switch (info.bus)
+    StringBuilder builder{};
+
+    builder.append(name);
+
+    if (_device_ids[(uint8_t)klass] > 0)
     {
-    case BUS_UNIX:
-        snprintf(buffer, 512, "UNIX: %d", info.unix_device.device);
-        break;
-
-    default:
-        snprintf(buffer, 512, "PCI: %02d:%02d.%d 0x%x:0x%x",
-                 info.pci_device.bus,
-                 info.pci_device.slot,
-                 info.pci_device.func,
-                 info.pci_device.vendor,
-                 info.pci_device.device);
-        break;
+        char number_buffer[12] = {};
+        format_int(FORMAT_DECIMAL, _device_ids[(uint8_t)klass], number_buffer, 12);
+        builder.append(number_buffer);
     }
 
-    return buffer;
+    _device_ids[(uint8_t)klass]++;
+
+    return builder.finalize();
 }
 
-static Iteration print_device_info(void *target, DeviceInfo info)
+void device_iterate(IterationCallback<RefPtr<Device>> callback)
 {
-    __unused(target);
+    _devices->foreach (callback);
+}
 
-    const DeviceDriverInfo *driver = device_get_diver_info(info);
-
-    if (driver)
-    {
-
-        logger_info("%s: %s", device_to_static_string(info), driver->description);
-
-        if (driver->initialize)
+void devices_handle_interrupt(int interrupt)
+{
+    device_iterate([&](auto device) {
+        if (device->interrupt() == interrupt)
         {
-            driver->initialize(info);
+            device->handle_interrupt();
         }
-    }
-    else if (virtio_is_virtio_device(info))
-    {
-        logger_warn("%s: Unknown virtIO device", device_to_static_string(info));
-    }
-    else
-    {
-        logger_warn("%s: Unknown device", device_to_static_string(info));
-    }
 
-    return Iteration::CONTINUE;
+        return Iteration::CONTINUE;
+    });
 }
 
 void device_initialize()
 {
-    logger_info("Initializing devices...");
-    device_iterate(nullptr, print_device_info);
-}
+    pci_initialize();
 
-void device_iterate(void *target, DeviceIterateCallback callback)
-{
-    if (pci_device_iterate(target, callback) == Iteration::STOP)
-    {
-        return;
-    }
+    logger_info("Initializing devices...");
+
+    _devices = new Vector<RefPtr<Device>>();
+
+    device_scan([&](DeviceAddress address) {
+        logger_info("Initializing device %s...", address.as_static_cstring());
+
+        auto driver = driver_for(address);
+
+        if (!driver)
+        {
+            logger_warn("No driver found!");
+
+            return Iteration::CONTINUE;
+        }
+
+        logger_info("Found a driver: %s", driver->name());
+
+        _devices->push_back(driver->instance(address));
+
+        return Iteration::CONTINUE;
+    });
 }

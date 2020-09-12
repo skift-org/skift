@@ -1,8 +1,9 @@
 #pragma once
 
 #include <libsystem/Assert.h>
-#include <libsystem/Common.h>
 #include <libsystem/core/CString.h>
+
+#include <libutils/Move.h>
 
 struct RingBuffer;
 

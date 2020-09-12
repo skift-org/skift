@@ -15,12 +15,12 @@ void system_hang()
 
 void system_stop()
 {
-    arch_disable_interupts();
+    arch_disable_interrupts();
     logger_info("System stopped!");
 
     while (1)
     {
-        arch_disable_interupts();
+        arch_disable_interrupts();
         arch_halt();
     }
 }

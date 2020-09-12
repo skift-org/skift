@@ -25,7 +25,7 @@ void atomic_begin()
 {
     if (atomic_enabled)
     {
-        arch_disable_interupts();
+        arch_disable_interrupts();
         atomic_depth++;
     }
 }
@@ -37,6 +37,6 @@ void atomic_end()
         atomic_depth--;
 
         if (atomic_depth == 0)
-            arch_enable_interupts();
+            arch_enable_interrupts();
     }
 }

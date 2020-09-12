@@ -3,16 +3,26 @@
 #include "arch/x86/COM.h"
 #include "arch/x86/x86.h"
 
+bool com_can_read(COMPort port)
+{
+    return (in8(port + 5) & 0b0000001);
+}
+
+bool com_can_write(COMPort port)
+{
+    return (in8(port + 5) & 0b0100000);
+}
+
 void com_wait_write(COMPort port)
 {
-    while ((in8(port + 5) & 0x20) == 0)
+    while (!com_can_write(port))
     { /* do nothing */
     }
 }
 
 void com_wait_read(COMPort port)
 {
-    while ((in8(port + 5) & 0x01) == 0)
+    while (!com_can_read(port))
     { /* do nothing */
     }
 }

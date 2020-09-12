@@ -4,18 +4,19 @@
     width="250"
     height="250"
     layout="vflow(8)"
-    padding="insets(8)"
+    padding="insets(4)"
     >
 
-    <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
+    <Container layout="vflow(8)" fill>
         <Image id="system-image" fill/>
 
         <Label text="The skift operating system." position="center"/>
         <Label id="version-label" position="center"/>
+        <Label id="commit-label" position="center"/>
         <Label text="Copyright © 2018-2020 N. Van Bossuyt." position="center"/>
     </Container>
 
-    <Container padding="insets(4)" layout="hflow(0)">
+    <Container layout="hflow(0)">
         <Container fill/>
         <Button id="ok-button" text="Ok" filled/>
     </Container>

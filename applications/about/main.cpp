@@ -26,7 +26,13 @@ int main(int argc, char **argv)
     Label *version_label = nullptr;
     if ((version_label = (Label *)window_get_widget_by_id(window, "version-label")))
     {
-        version_label->text(__BUILD_GITREF__ "/" __BUILD_CONFIG__);
+        version_label->text(__BUILD_VERSION__);
+    }
+
+    Label *commit_label = nullptr;
+    if ((commit_label = (Label *)window_get_widget_by_id(window, "commit-label")))
+    {
+        commit_label->text(__BUILD_GITREF__ "/" __BUILD_CONFIG__);
     }
 
     Widget *ok_button = nullptr;

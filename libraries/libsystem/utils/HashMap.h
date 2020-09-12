@@ -14,6 +14,8 @@ void hashmap_destroy(HashMap *hashmap);
 
 void hashmap_destroy_with_callback(HashMap *hashmap, HashMapDestroyValueCallback callback);
 
+size_t hashmap_count(HashMap *hashmap);
+
 void hashmap_clear(HashMap *hashmap);
 
 void hashmap_clear_with_callback(HashMap *hashmap, HashMapDestroyValueCallback callback);

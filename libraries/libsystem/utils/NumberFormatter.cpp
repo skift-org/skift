@@ -54,6 +54,7 @@ size_t format_int(NumberFormater formater, int value, char *str, size_t size)
         return 0;
 
     size_t written = 0;
+    str[0] = '\0';
 
     if (value < 0)
     {

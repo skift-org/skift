@@ -100,6 +100,18 @@ void hashmap_destroy_with_callback(
     free(hashmap);
 }
 
+size_t hashmap_count(HashMap *hashmap)
+{
+    size_t result = 0;
+
+    for (size_t i = 0; i < HASHMAP_BUCKET_COUNT; i++)
+    {
+        result += hashmap->buckets[i]->count();
+    }
+
+    return result;
+}
+
 void hashmap_clear(HashMap *hashmap)
 {
     hashmap_clear_with_callback(hashmap, nullptr);

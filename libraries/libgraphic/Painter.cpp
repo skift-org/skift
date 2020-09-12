@@ -147,7 +147,7 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectan
         {
             Vec2i position(x, y);
 
-            Color sample = bitmap.get_pixel_no_check(clipped_source.position() + position);
+            Color sample = bitmap.get_pixel(clipped_source.position() + position);
 
             sample.A = 255;
 

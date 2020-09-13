@@ -161,7 +161,7 @@ public:
 
     void remove_child(Widget *child);
 
-    void clear_childs();
+    void clear_children();
 
     /* --- Focus state ------------------------------------------------------ */
 

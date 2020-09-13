@@ -167,8 +167,6 @@ def protocol(lexer: Lexer):
         "properties": {},
         "enumerations": {},
         "structures": {},
-        "client": {},
-        "server": {},
     }
 
     lexer.eat_whitespace()

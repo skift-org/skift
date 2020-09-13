@@ -193,13 +193,14 @@ def protocol(gen: Generator, name: str, protocol):
         f"static constexpr int MAGIC = 0x{protocol['properties']['magic']};")
     gen.emit("")
 
-    gen.emit_section("Client")
+    if "client" in protocol:
+        gen.emit_section("Client")
+        peer(gen, protocol["client"])
 
-    peer(gen, protocol["client"])
 
-    gen.emit_section("Server")
-
-    peer(gen, protocol["server"])
+    if "server" in protocol:
+        gen.emit_section("Server")
+        peer(gen, protocol["server"])
 
     gen.pop_ident()
 

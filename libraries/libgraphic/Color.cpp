@@ -133,11 +133,7 @@ Color Color::parse(const char *name)
             hex[7] = buffer[7];
         }
 
-        uint32_t value = parse_uint_inline(PARSER_HEXADECIMAL, hex, 0);
-
-        logger_trace("PARSE: '%s' -> '%s' %d = %08x", buffer, hex, length, value);
-
-        return from_hexa(value);
+        return from_hexa(parse_uint_inline(PARSER_HEXADECIMAL, hex, 0));
     }
     else if (lexer.skip_word("rgb"))
     {

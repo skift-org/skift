@@ -66,7 +66,7 @@ Widget::Widget(Widget *parent)
 
 Widget::~Widget()
 {
-    clear_childs();
+    clear_children();
 
     list_destroy(_childs);
 
@@ -428,7 +428,7 @@ void Widget::remove_child(Widget *child)
     should_relayout();
 }
 
-void Widget::clear_childs()
+void Widget::clear_children()
 {
     Widget *child = (Widget *)list_peek(_childs);
     while (child)

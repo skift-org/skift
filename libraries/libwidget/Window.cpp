@@ -13,7 +13,7 @@
 
 void window_populate_header(Window *window)
 {
-    window->header_container->clear_childs();
+    window->header_container->clear_children();
 
     window->header()->layout(HFLOW(4));
     window->header()->insets(Insets(6, 6));

@@ -6,7 +6,7 @@
 
 static bool _theme_is_dark = true;
 
-static Color _theme_default_colors[__THEME_COLOR_COUNT] = {
+static constexpr Color _theme_default_colors[__THEME_COLOR_COUNT] = {
     [THEME_BORDER] = THEME_DEFAULT_BORDER,
     [THEME_BACKGROUND] = THEME_DEFAULT_BACKGROUND,
     [THEME_MIDDLEGROUND] = THEME_DEFAULT_MIDDLEGROUND,
@@ -107,69 +107,6 @@ bool theme_is_dark()
     return _theme_is_dark;
 }
 
-Color theme_parse_color(const char *text)
-{
-    if (text[0] == '#')
-    {
-        if (strlen(&text[1]) == 3)
-        {
-            unsigned int packed = 0;
-            if (parse_uint(PARSER_HEXADECIMAL, &text[1], 3, &packed))
-            {
-                uint8_t red = packed >> 8 & 0xf;
-                uint8_t green = packed >> 4 & 0xf;
-                uint8_t blue = packed & 0xf;
-
-                return COLOR_RGBA(
-                    red << 4 | red,
-                    green << 4 | green,
-                    blue << 4 | blue,
-                    0xff);
-            }
-        }
-        else if (strlen(&text[1]) == 4)
-        {
-            unsigned int packed = 0;
-            if (parse_uint(PARSER_HEXADECIMAL, &text[1], 4, &packed))
-            {
-                uint8_t red = packed >> 12 & 0xf;
-                uint8_t green = packed >> 8 & 0xf;
-                uint8_t blue = packed >> 4 & 0xf;
-                uint8_t alpha = packed & 0xf;
-
-                return COLOR_RGBA(
-                    red << 4 | red,
-                    green << 4 | green,
-                    blue << 4 | blue,
-                    alpha << 4 | alpha);
-            }
-        }
-        else if (strlen(&text[1]) == 6)
-        {
-            unsigned int packed = 0;
-            if (parse_uint(PARSER_HEXADECIMAL, &text[1], 6, &packed))
-            {
-                return COLOR(packed);
-            }
-        }
-        else if (strlen(&text[1]) == 8)
-        {
-            unsigned int packed = 0;
-            if (parse_uint(PARSER_HEXADECIMAL, &text[1], 8, &packed))
-            {
-                Color color = COLOR(packed >> 8);
-                color.A = packed & 0xff;
-                return color;
-            }
-        }
-        return COLOR_GREEN;
-    }
-
-    logger_warn("Failed to parse %c '%s' %d", text[0], text, strlen(text));
-
-    return COLOR_MAGENTA;
-}
-
 void theme_load(const char *path)
 {
     logger_info("Loading theme from '%s'", path);
@@ -211,7 +148,7 @@ void theme_load(const char *path)
 
             if (json::is(color, json::STRING))
             {
-                _theme_colors[i] = theme_parse_color(json::string_value(color));
+                _theme_colors[i] = Color::parse(json::string_value(color));
             }
         }
     }

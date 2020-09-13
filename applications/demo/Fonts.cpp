@@ -20,7 +20,7 @@ void fonts_draw(Painter &painter, Rectangle screen, float time)
         }
     }
 
-    painter.clear(COLOR_REBECCAPURPLE);
+    painter.clear(Colors::REBECCAPURPLE);
 
     int current = 4;
     for (size_t i = 0; i < 16; i++)
@@ -34,7 +34,7 @@ void fonts_draw(Painter &painter, Rectangle screen, float time)
             _fonts[i],
             reinterpret_cast<const char *>(u8"The quick brown fox jumps over the lazy dog"),
             Vec2i(8, current),
-            COLOR_WHITE);
+            Colors::WHITE);
 
         current -= metrics.descent;
         current += metrics.linegap;

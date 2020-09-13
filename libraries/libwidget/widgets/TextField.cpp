@@ -54,7 +54,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
         }
         else
         {
-            painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, ALPHA(color(THEME_FOREGROUND), 0.6));
+            painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
         }
 
         painter.push();

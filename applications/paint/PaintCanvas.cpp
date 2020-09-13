@@ -12,7 +12,7 @@ void PaintCanvas::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter.fill_checkboard(paint_area(), 8, COLOR_WHITE, COLOR_GAINSBORO);
+    painter.fill_checkboard(paint_area(), 8, Colors::WHITE, Colors::GAINSBORO);
     painter.draw_rectangle(paint_area(), color(THEME_BORDER));
 
     painter.blit_bitmap(
@@ -28,7 +28,7 @@ void PaintCanvas::event(Event *event)
         event_copy.mouse.old_position = event_copy.mouse.old_position - paint_area().position();
         event_copy.mouse.position = event_copy.mouse.position - paint_area().position();
 
-        Color color = COLOR_MAGENTA;
+        Color color = Colors::MAGENTA;
         if (event_copy.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
             color = _document->primary_color();

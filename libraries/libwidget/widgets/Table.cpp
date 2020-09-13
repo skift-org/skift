@@ -149,7 +149,7 @@ void Table::paint(Painter &painter, Rectangle rectangle)
             }
             else if (row % 2)
             {
-                painter.fill_rectangle(row_bound(row), ALPHA(color(THEME_FOREGROUND), 0.05));
+                painter.fill_rectangle(row_bound(row), color(THEME_FOREGROUND).with_alpha(0.05));
             }
 
             for (int column = 0; column < column_count; column++)
@@ -159,7 +159,7 @@ void Table::paint(Painter &painter, Rectangle rectangle)
         }
     }
     painter.blur_rectangle(header_bound(), 8);
-    painter.fill_rectangle(header_bound(), ALPHA(color(THEME_BACKGROUND), 0.9));
+    painter.fill_rectangle(header_bound(), color(THEME_BACKGROUND).with_alpha(0.9));
 
     for (int column = 0; column < column_count; column++)
     {

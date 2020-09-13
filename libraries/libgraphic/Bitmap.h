@@ -83,13 +83,13 @@ public:
     void blend_pixel(Vec2i position, Color color)
     {
         Color background = get_pixel(position);
-        set_pixel(position, color_blend(color, background));
+        set_pixel(position, Color::blend(color, background));
     }
 
     void blend_pixel_no_check(Vec2i position, Color color)
     {
         Color background = get_pixel_no_check(position);
-        set_pixel_no_check(position, color_blend(color, background));
+        set_pixel_no_check(position, Color::blend(color, background));
     }
 
     Color get_pixel(Vec2i position)
@@ -124,7 +124,7 @@ public:
         float xx = source.width() * position.x();
         float yy = source.height() * position.y();
 
-        return color_blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
+        return Color::blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
     }
 
     __flatten void copy_from(Bitmap &source, Rectangle region)

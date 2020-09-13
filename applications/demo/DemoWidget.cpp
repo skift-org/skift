@@ -31,7 +31,7 @@ void DemoWidget::paint(Painter &painter, Rectangle)
     {
         _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
         _painter = own<Painter>(_bitmap);
-        _painter->clear(COLOR_BLACK);
+        _painter->clear(Colors::BLACK);
     }
 
     if (bound().width() != _bitmap->width() ||
@@ -39,7 +39,7 @@ void DemoWidget::paint(Painter &painter, Rectangle)
     {
         _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
         _painter = own<Painter>(_bitmap);
-        _painter->clear(COLOR_BLACK);
+        _painter->clear(Colors::BLACK);
     }
 
     if (_demo)
@@ -49,6 +49,6 @@ void DemoWidget::paint(Painter &painter, Rectangle)
 
     painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), bound());
 
-    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(9, 17), COLOR_BLACK);
-    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(8, 16), COLOR_WHITE);
+    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(9, 17), Colors::BLACK);
+    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(8, 16), Colors::WHITE);
 }

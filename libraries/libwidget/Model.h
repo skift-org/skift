@@ -13,7 +13,7 @@ struct CellStyle
     Color background;
 };
 
-#define DEFAULT_STYLE ((CellStyle){Position::LEFT, COLOR_WHITE, COLOR_BLACK})
+#define DEFAULT_STYLE ((CellStyle){Position::LEFT, Colors::WHITE, Colors::BLACK})
 
 typedef void (*ModelUpdateCallback)(Model *model);
 typedef Variant (*ModelDataCallback)(Model *model, int row, int column);

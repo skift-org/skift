@@ -7,24 +7,24 @@
 #include "paint/PaintTool.h"
 
 static Color _color_palette[] = {
-    COLOR(0x000000),
-    COLOR(0x1a1c2c),
-    COLOR(0x5d275d),
-    COLOR(0xb13e53),
-    COLOR(0xef7d57),
-    COLOR(0xffcd75),
-    COLOR(0xa7f070),
-    COLOR(0x38b764),
-    COLOR(0x257179),
-    COLOR(0x29366f),
-    COLOR(0x3b5dc9),
-    COLOR(0x41a6f6),
-    COLOR(0x73eff7),
-    COLOR(0xffffff),
-    COLOR(0xf4f4f4),
-    COLOR(0x94b0c2),
-    COLOR(0x566c86),
-    COLOR(0x333c57),
+    Color::from_hex(0x000000),
+    Color::from_hex(0x1a1c2c),
+    Color::from_hex(0x5d275d),
+    Color::from_hex(0xb13e53),
+    Color::from_hex(0xef7d57),
+    Color::from_hex(0xffcd75),
+    Color::from_hex(0xa7f070),
+    Color::from_hex(0x38b764),
+    Color::from_hex(0x257179),
+    Color::from_hex(0x29366f),
+    Color::from_hex(0x3b5dc9),
+    Color::from_hex(0x41a6f6),
+    Color::from_hex(0x73eff7),
+    Color::from_hex(0xffffff),
+    Color::from_hex(0xf4f4f4),
+    Color::from_hex(0x94b0c2),
+    Color::from_hex(0x566c86),
+    Color::from_hex(0x333c57),
 };
 
 struct PaintWindow : public Window
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     auto bitmap = Bitmap::create_shared(400, 400).take_value();
-    bitmap->clear(RGBA(0, 0, 0, 0));
+    bitmap->clear(Colors::BLACKTRANSPARENT);
     auto document = make<PaintDocument>(bitmap);
     paint_create_window(document)->show();
 

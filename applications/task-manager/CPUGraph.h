@@ -21,7 +21,7 @@ private:
 
 public:
     CPUGraph(Widget *parent, TaskModel *model)
-        : Graph(parent, 256, COLOR_SEAGREEN),
+        : Graph(parent, 256, Colors::SEAGREEN),
           _model(model)
     {
         layout(VFLOW(0));

@@ -42,10 +42,10 @@ int main(int argc, char **argv)
     auto graph_container = new Container(panel_container);
     graph_container->layout(VGRID(1));
 
-    auto ram_graph = new Graph(graph_container, 50, COLOR_ROYALBLUE);
+    auto ram_graph = new Graph(graph_container, 50, Colors::ROYALBLUE);
     new Label(ram_graph, "RAM", Position::CENTER);
 
-    auto cpu_graph = new Graph(graph_container, 50, COLOR_SEAGREEN);
+    auto cpu_graph = new Graph(graph_container, 50, Colors::SEAGREEN);
     new Label(cpu_graph, "CPU", Position::CENTER);
 
     new Label(panel_container, "user");

@@ -39,7 +39,7 @@ void EraserTool::event(PaintDocument &document, Event &event, Color &color)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), COLOR_RGBA(0, 0, 0, 0));
+            document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
             document.dirty(true);
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
@@ -55,10 +55,10 @@ static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
     if (!bitmap.bound().containe(position))
         return;
 
-    if (color_equals(bitmap.get_pixel(position), fill))
+    if (bitmap.get_pixel(position) == fill)
         return;
 
-    if (!color_equals(bitmap.get_pixel(position), target))
+    if (bitmap.get_pixel(position) != target)
         return;
 
     auto queue = Vector<Vec2i>(256);
@@ -68,7 +68,7 @@ static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
     {
         Vec2i current = queue.pop_back();
 
-        if (!color_equals(bitmap.get_pixel(current), target))
+        if (bitmap.get_pixel(current) != target)
         {
             continue;
         }

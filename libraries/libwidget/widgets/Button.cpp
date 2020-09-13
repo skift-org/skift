@@ -22,12 +22,12 @@ void Button::paint(Painter &painter, Rectangle rectangle)
 
         if (_state == BUTTON_OVER)
         {
-            painter.fill_rounded_rectangle(bound(), 4, ALPHA(color(THEME_FOREGROUND), 0.1));
+            painter.fill_rounded_rectangle(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
 
         if (_state == BUTTON_PRESS)
         {
-            painter.fill_rounded_rectangle(bound(), 4, ALPHA(color(THEME_FOREGROUND), 0.2));
+            painter.fill_rounded_rectangle(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.2));
         }
     }
 }

@@ -9,8 +9,8 @@ private:
     RefPtr<Bitmap> _bitmap;
     Painter _painter;
 
-    Color _primary_color = COLOR_BLACK;
-    Color _secondary_color = COLOR_WHITE;
+    Color _primary_color = Colors::BLACK;
+    Color _secondary_color = Colors::WHITE;
 
     bool _dirty = true;
 

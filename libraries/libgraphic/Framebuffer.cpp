@@ -118,7 +118,7 @@ void Framebuffer::blit()
     _dirty_bounds.foreach ([&](auto &bound) {
         IOCallDisplayBlitArgs args;
 
-        args.buffer = (uint32_t *)_bitmap->pixels();
+        args.buffer = reinterpret_cast<uint32_t *>(_bitmap->pixels());
         args.buffer_width = _bitmap->width();
         args.buffer_height = _bitmap->height();
 

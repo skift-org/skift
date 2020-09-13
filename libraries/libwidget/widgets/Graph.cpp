@@ -51,7 +51,7 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
 
         float dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
-        painter.fill_rectangle(bar, ALPHA(_color, dist));
+        painter.fill_rectangle(bar, _color.with_alpha(dist));
         painter.plot_pixel(bar.position(), _color);
     }
 

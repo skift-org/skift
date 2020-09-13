@@ -14,10 +14,10 @@
 #include <libsystem/system/Memory.h>
 
 static Color _placeholder_buffer[] = {
-    (Color){{255, 0, 255, 255}},
-    (Color){{0, 0, 0, 255}},
-    (Color){{0, 0, 0, 255}},
-    (Color){{255, 0, 255, 255}},
+    Colors::MAGENTA,
+    Colors::BLACK,
+    Colors::BLACK,
+    Colors::MAGENTA,
 };
 
 ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
@@ -32,7 +32,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
     auto bitmap = make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
-    bitmap->clear(COLOR_BLACK);
+    bitmap->clear(Colors::BLACK);
     return bitmap;
 }
 

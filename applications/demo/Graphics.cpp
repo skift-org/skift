@@ -21,7 +21,7 @@ void graphics_draw(Painter &painter, Rectangle screen, float time)
         {
             uint8_t pixel = x ^ y;
 
-            painter.plot_pixel(screen.position() + Vec2i(x, y), (Color){{pixel, pixel, pixel, 255}});
+            painter.plot_pixel(screen.position() + Vec2i(x, y), Color::from_byte(pixel, pixel, pixel));
         }
     }
 
@@ -33,15 +33,15 @@ void graphics_draw(Painter &painter, Rectangle screen, float time)
 
     painter.blit_bitmap(*_test_image, _test_image->bound(), test_image_bound);
 
-    painter.draw_rectangle(Rectangle(75, 75, 100, 100), COLOR_WHITE);
-    painter.fill_rectangle(Rectangle(100, 100, 100, 100), ALPHA(COLOR_RED, 0.5));
-    painter.fill_rectangle(Rectangle(125, 125, 100, 100), ALPHA(COLOR_GREEN, 0.5));
-    painter.fill_rounded_rectangle(Rectangle(150, 150, 100, 100), 32, ALPHA(COLOR_BLUE, 0.5));
+    painter.draw_rectangle(Rectangle(75, 75, 100, 100), Colors::WHITE);
+    painter.fill_rectangle(Rectangle(100, 100, 100, 100), Colors::RED.with_alpha(0.5));
+    painter.fill_rectangle(Rectangle(125, 125, 100, 100), Colors::GREEN.with_alpha(0.5));
+    painter.fill_rounded_rectangle(Rectangle(150, 150, 100, 100), 32, Colors::BLUE.with_alpha(0.5));
 
-    painter.draw_rounded_rectangle(screen, 64, 16, ALPHA(COLOR_RED, 0.75));
-    painter.draw_rounded_rectangle(screen, 64, 12, ALPHA(COLOR_YELLOW, 0.75));
-    painter.draw_rounded_rectangle(screen, 64, 8, ALPHA(COLOR_GREEN, 0.75));
-    painter.draw_rounded_rectangle(screen, 64, 4, ALPHA(COLOR_BLUE, 0.75));
+    painter.draw_rounded_rectangle(screen, 64, 16, Colors::RED.with_alpha(0.75));
+    painter.draw_rounded_rectangle(screen, 64, 12, Colors::YELLOW.with_alpha(0.75));
+    painter.draw_rounded_rectangle(screen, 64, 8, Colors::GREEN.with_alpha(0.75));
+    painter.draw_rounded_rectangle(screen, 64, 4, Colors::BLUE.with_alpha(0.75));
 
     painter.blur_rectangle(Rectangle(100, 100, 200, 200), 8);
 

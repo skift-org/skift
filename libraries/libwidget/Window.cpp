@@ -177,7 +177,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
     if (window->flags & WINDOW_TRANSPARENT)
     {
-        painter.clear_rectangle(rectangle, ALPHA(window_get_color(window, THEME_BACKGROUND), window->_opacity));
+        painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND).with_alpha(window->_opacity));
     }
     else
     {

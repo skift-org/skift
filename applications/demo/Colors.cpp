@@ -8,7 +8,7 @@ void colors_draw(Painter &painter, Rectangle screen, float time)
     {
         for (int y = 0; y < screen.height(); y++)
         {
-            Color color = HSV(hue, (y / (float)screen.height()), 1);
+            Color color = Color::from_hsv(hue, (y / (float)screen.height()), 1);
             painter.plot_pixel(screen.position() + Vec2i(x, y), color);
         }
     }

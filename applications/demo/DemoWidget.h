@@ -21,7 +21,7 @@ public:
     {
         if (_painter)
         {
-            _painter->clear(COLOR_BLACK);
+            _painter->clear(Colors::BLACK);
         }
         _demo = demo;
     }

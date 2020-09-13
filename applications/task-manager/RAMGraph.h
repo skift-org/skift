@@ -21,7 +21,7 @@ private:
 
 public:
     RAMGraph(Widget *parent, TaskModel *model)
-        : Graph(parent, 256, COLOR_ROYALBLUE),
+        : Graph(parent, 256, Colors::ROYALBLUE),
           _model(model)
     {
         layout(VFLOW(0));

@@ -148,10 +148,7 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectan
             Vec2i position(x, y);
 
             Color sample = bitmap.get_pixel(clipped_source.position() + position);
-
-            sample.A = 255;
-
-            _bitmap->set_pixel_no_check(clipped_destination.position() + position, sample);
+            _bitmap->set_pixel_no_check(clipped_destination.position() + position, sample.with_alpha(1));
         }
     }
 }
@@ -332,9 +329,9 @@ static void fill_circle_helper(Painter &painter, Rectangle bound, Vec2i center, 
         for (int y = 0; y < bound.height(); y++)
         {
             float distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
-            float alpha = (color.A / 255.0) * distance;
+            float alpha = color.alphaf() * distance;
 
-            painter.plot_pixel(Vec2i(bound.x() + x, bound.y() + y), ALPHA(color, alpha));
+            painter.plot_pixel(Vec2i(bound.x() + x, bound.y() + y), color.with_alpha(alpha));
         }
     }
 }
@@ -429,7 +426,7 @@ void Painter::draw_line_not_aligned(Vec2i a, Vec2i b, Color color)
 #define __round(X) ((int)(((double)(X)) + 0.5))
 #define __fpart(X) (((double)(X)) - (double)__ipart(X))
 #define __rfpart(X) (1.0 - __fpart(X))
-#define __plot(__x, __y, __brightness) plot_pixel(Vec2i((__x), (__y)), ALPHA(color, (color.A / 255.0) * (__brightness)))
+#define __plot(__x, __y, __brightness) plot_pixel(Vec2i((__x), (__y)), color.with_alpha(color.alphaf() * (__brightness)))
 
 __flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
 {
@@ -567,9 +564,9 @@ void Painter::draw_circle_helper(Rectangle bound, Vec2i center, int radius, int 
             Vec2i position = Vec2i(x, y);
 
             double distance = sample_draw_circle(center, radius - 0.5, thickness, position);
-            double alpha = (color.A / 255.0) * distance;
+            double alpha = color.alphaf() * distance;
 
-            plot_pixel(bound.position() + position, ALPHA(color, alpha));
+            plot_pixel(bound.position() + position, color.with_alpha(alpha));
         }
     }
 }
@@ -609,10 +606,8 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destinati
 
             Color sample = bitmap.sample(sample_point);
 
-            Color final = color;
-            final.A = sample.A * (color.A / 255.0);
-
-            plot_pixel(destination.position() + Vec2i(x, y), final);
+            auto alpha = sample.alphaf() * color.alphaf();
+            plot_pixel(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
         }
     }
 }
@@ -642,10 +637,8 @@ __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Rectangle source, Re
 
             Color sample = bitmap.sample(source, sample_point);
 
-            Color final = color;
-            final.A = (sample.R * color.A) / 255;
-
-            plot_pixel(destination.position() + Vec2i(x, y), final);
+            auto alpha = sample.redf() * color.alphaf();
+            plot_pixel(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
         }
     }
 }
@@ -683,9 +676,11 @@ void Painter::draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2
     {
         for (int y = 0; y < dest.height(); y++)
         {
-            int alpha = (atlas->buffer[(y + glyph->bound.y()) * atlas->width + (x + glyph->bound.x())] * color.A) / 255;
+            int pixel_index = (y + glyph->bound.y()) * atlas->width + (x + glyph->bound.x());
 
-            plot_pixel(dest.position() + Vec2i(x, y), COLOR_RGBA(color.R, color.G, color.B, alpha));
+            auto alpha = (atlas->buffer[pixel_index] / 255.0) * color.alphaf();
+
+            plot_pixel(dest.position() + Vec2i(x, y), color.with_alpha(alpha));
         }
     }
 

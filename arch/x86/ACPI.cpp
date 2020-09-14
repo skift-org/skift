@@ -3,9 +3,8 @@
 #include "arch/x86/ACPI.h"
 #include "arch/x86/IOAPIC.h"
 #include "arch/x86/LAPIC.h"
-#include "kernel/acpi/tables/MADT.h"
-#include "kernel/acpi/tables/RSDP.h"
-#include "kernel/acpi/tables/RSDT.h"
+
+#include "kernel/firmware/ACPI.h"
 
 void acpi_madt_initialize(MADT *madt)
 {

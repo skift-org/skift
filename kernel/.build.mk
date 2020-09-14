@@ -3,6 +3,7 @@ CONFIG_KEYBOARD_LAYOUT?=en_us
 KERNEL_SOURCES = \
 	$(wildcard kernel/*.cpp) \
 	$(wildcard kernel/*/*.cpp) \
+	$(wildcard kernel/*/*/*.cpp) \
 	$(wildcard arch/x86/*.cpp)
 
 KERNEL_ASSEMBLY_SOURCES = \

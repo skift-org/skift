@@ -373,7 +373,7 @@ public:
         return _storage[_count - 1];
     }
 
-    bool containe(const T &value) const
+    bool contains(const T &value) const
     {
         for (size_t i = 0; i < _count; i++)
         {

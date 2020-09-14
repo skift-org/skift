@@ -52,7 +52,7 @@ void EraserTool::event(PaintDocument &document, Event &event, Color &color)
 
 static void flood_fill(Bitmap &bitmap, Vec2i position, Color target, Color fill)
 {
-    if (!bitmap.bound().containe(position))
+    if (!bitmap.bound().contains(position))
         return;
 
     if (bitmap.get_pixel(position) == fill)

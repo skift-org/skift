@@ -444,38 +444,38 @@ public:
                _height + _y > other._y;
     }
 
-    bool containe(Vec2i other) const
+    bool contains(Vec2i other) const
     {
         return (_x <= other.x() && (_x + _width) > other.x()) &&
                (_y <= other.y() && (_y + _height) > other.y());
     }
 
-    bool containe(Rectangle other) const
+    bool contains(Rectangle other) const
     {
         return (_x <= other._x && (_x + _width) >= (other._x + other._width)) &&
                (_y <= other._y && (_y + _height) >= (other._y + other._width));
     }
 
-    RectangleBorder containe(Insets spacing, Vec2i position) const
+    RectangleBorder contains(Insets spacing, Vec2i position) const
     {
         RectangleBorder borders = RectangleBorder::NONE;
 
-        if (take_top(spacing.top()).containe(position))
+        if (take_top(spacing.top()).contains(position))
         {
             borders |= RectangleBorder::TOP;
         }
 
-        if (take_bottom(spacing.bottom()).containe(position))
+        if (take_bottom(spacing.bottom()).contains(position))
         {
             borders |= RectangleBorder::BOTTOM;
         }
 
-        if (take_left(spacing.left()).containe(position))
+        if (take_left(spacing.left()).contains(position))
         {
             borders |= RectangleBorder::LEFT;
         }
 
-        if (take_right(spacing.right()).containe(position))
+        if (take_right(spacing.right()).contains(position))
         {
             borders |= RectangleBorder::RIGHT;
         }

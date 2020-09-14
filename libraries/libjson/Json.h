@@ -82,7 +82,7 @@ namespace json
     // Get the value of a JSON_DOUBLE or JSON_INTEGER has a double
     double double_value(Value *value);
 
-    // Return true if the JSON_OBJECT containe the key
+    // Return true if the JSON_OBJECT contains the key
     bool object_has(Value *object, const char *key);
 
     // Return a Value contained in a JSON_OBJECT by its key. The object keep the ownership of the value

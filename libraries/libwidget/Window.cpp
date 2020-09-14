@@ -187,7 +187,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
     painter.push();
     painter.clip(rectangle);
 
-    if (window->content_bound().containe(rectangle))
+    if (window->content_bound().contains(rectangle))
     {
         if (window->root())
         {
@@ -218,7 +218,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
 {
     Rectangle resize_bound = window->bound().expended(Insets(WINDOW_RESIZE_AREA));
-    return resize_bound.containe(Insets(WINDOW_RESIZE_AREA), position);
+    return resize_bound.contains(Insets(WINDOW_RESIZE_AREA), position);
 }
 
 void window_begin_resize(Window *window, Vec2i mouse_position)
@@ -280,12 +280,12 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (window->root()->bound().containe(position))
+    if (window->root()->bound().contains(position))
     {
         return window->root()->child_at(position);
     }
 
-    if (window->header()->bound().containe(position))
+    if (window->header()->bound().contains(position))
     {
         return window->header()->child_at(position);
     }
@@ -429,7 +429,7 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_BUTTON_PRESS:
     {
-        if (window->root()->bound().containe(event->mouse.position))
+        if (window->root()->bound().contains(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 
@@ -442,7 +442,7 @@ void window_event(Window *window, Event *event)
 
         if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && window->header()->bound().containe(event->mouse.position))
+            if (!event->accepted && window->header()->bound().contains(event->mouse.position))
             {
                 Widget *widget = window->header()->child_at(event->mouse.position);
 
@@ -456,7 +456,7 @@ void window_event(Window *window, Event *event)
                 !window->is_dragging &&
                 !window->is_maximised &&
                 event->mouse.button == MOUSE_BUTTON_LEFT &&
-                window_header_bound(window).containe(event->mouse.position))
+                window_header_bound(window).contains(event->mouse.position))
             {
                 window->is_dragging = true;
                 window_set_cursor(window, CURSOR_MOVE);
@@ -502,7 +502,7 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_DOUBLE_CLICK:
     {
-        if (window->root()->bound().containe(event->mouse.position))
+        if (window->root()->bound().contains(event->mouse.position))
         {
             Widget *widget = window_child_at(window, event->mouse.position);
 

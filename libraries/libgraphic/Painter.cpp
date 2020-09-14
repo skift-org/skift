@@ -66,7 +66,7 @@ void Painter::plot_pixel(Vec2i position, Color color)
 {
     Vec2i transformed = position + _state_stack[_state_stack_top].origine;
 
-    if (clip().containe(transformed))
+    if (clip().contains(transformed))
     {
         _bitmap->blend_pixel(transformed, color);
     }

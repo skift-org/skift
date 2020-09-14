@@ -56,7 +56,7 @@ Rectangle Table::cell_bound(int row, int column) const
 
 int Table::row_at(Vec2i position) const
 {
-    if (!list_bound().containe(position))
+    if (!list_bound().contains(position))
     {
         return -1;
     }

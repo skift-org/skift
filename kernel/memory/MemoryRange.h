@@ -38,7 +38,7 @@ public:
         return IS_PAGE_ALIGN(base()) && IS_PAGE_ALIGN(size());
     }
 
-    auto containe(uintptr_t address)
+    auto contains(uintptr_t address)
     {
         return address >= base() && address <= end();
     }

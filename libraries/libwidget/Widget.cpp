@@ -396,7 +396,7 @@ Widget *Widget::child_at(Vec2i position)
 
     list_foreach(Widget, child, _childs)
     {
-        if (child->bound().containe(position))
+        if (child->bound().contains(position))
         {
             return child->child_at(position);
         }

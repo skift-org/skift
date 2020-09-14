@@ -89,7 +89,7 @@ void ScrollBar::event(Event *event)
         }
         else if (event->type == Event::MOUSE_BUTTON_PRESS)
         {
-            if (thumb_bound().containe(mouse_event.position))
+            if (thumb_bound().contains(mouse_event.position))
             {
                 _mouse_origine = mouse_event.position - thumb_bound().position();
             }

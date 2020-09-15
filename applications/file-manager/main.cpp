@@ -2,6 +2,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
@@ -165,6 +166,12 @@ Window *file_explorer_window_create(const char *current_path)
     new Separator(toolbar);
 
     toolbar_icon_create(toolbar, Icon::get("refresh"));
+
+    Widget *terminal_button = toolbar_icon_create(toolbar, Icon::get("console"));
+
+    terminal_button->on(Event::ACTION, [](auto) {
+        process_run("terminal", NULL);
+    });
 
     update_navigation_bar(window);
 

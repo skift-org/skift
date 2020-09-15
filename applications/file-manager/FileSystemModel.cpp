@@ -202,6 +202,7 @@ FileSystemModel *filesystem_model_create(const char *current_path)
     FileSystemModel *model = __create(FileSystemModel);
 
     model->current_path = strdup(current_path);
+    process_set_directory(model->current_path);
 
     model->model_update = (ModelUpdateCallback)filesystem_model_update;
     model->model_data = (ModelDataCallback)filesystem_model_data;

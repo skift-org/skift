@@ -152,8 +152,8 @@ QEMU_FLAGS=-m $(VM_MEMORY)M \
 
 QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 				 -device virtio-serial \
-				 -nic user,model=virtio-net-pci
-#				 -vga virtio
+				 -nic user,model=virtio-net-pci \
+				 -vga virtio
 
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
@@ -161,7 +161,7 @@ run-qemu: $(BOOTDISK)
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
 
-run-qemu-no-kvm:
+run-qemu-no-kvm: $(BOOTDISK)
 	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
 
 run-qemu-virtio: $(BOOTDISK)

@@ -28,7 +28,7 @@ A simple, handmade, operating system for the intel x86 cpu.
 
 <p align="center">
 <img src="manual/screenshots/2020-05-26.png" />
-skift OS running in QEMU
+skiftOS running in QEMU
 </p>
 <br/>
 <p align="center">

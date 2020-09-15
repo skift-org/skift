@@ -9,12 +9,12 @@
 #include <libsystem/Logger.h>
 
 #include "arch/Arch.h"
-#include "arch/x86/Interrupts.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"
 #include "kernel/filesystem/DevicesFileSystem.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/modules/Modules.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/ProcessInfo.h"

@@ -7,7 +7,7 @@
 namespace smbios
 {
 
-#define SMBIOS_HEADER8TYPE_LIST(__ENTRY)                 \
+#define SMBIOS_HEADER_TYPE_LIST(__ENTRY)                 \
     __ENTRY(BIOS_INFORMATION, 0)                         \
     __ENTRY(SYSTEM_INFORMATION, 1)                       \
     __ENTRY(BASEBOARD_OR_MODULE_INFORMATION, 2)          \
@@ -58,56 +58,16 @@ namespace smbios
 
 enum class HearderType : uint8_t
 {
-    BIOS_INFORMATION = 0,
-    SYSTEM_INFORMATION = 1,
-    BASEBOARD_OR_MODULE_INFORMATION = 2,
-    SYSTEM_ENCLOSURE_OR_CHASSIS = 3,
-    PROCESSOR_INFORMATION = 4,
-    MEMORY_CONTROLLER_INFORMATION = 5,
-    MEMORY_MODULE_INFORMATION = 6,
-    CACHE_INFORMATION = 7,
-    PORT_CONNECTOR_INFORMATION = 8,
-    SYSTEM_SLOTS = 9,
-    ON_BOARD_DEVICES_INFORMATION = 10,
-    OEM_STRINGS = 11,
-    SYSTEM_CONFIGURATION_OPTIONS = 12,
-    BIOS_LANGUAGE_INFORMATION = 13,
-    GROUP_ASSOCIATIONS = 14,
-    SYSTEM_EVENT_LOG = 15,
-    PHYSICAL_MEMORY_ARRAY = 16,
-    MEMORY_DEVICE = 17,
-    MEMORY_ERROR_INFORMATION_32_BIT = 18,
-    MEMORY_ARRAY_MAPPED_ADDRESS = 19,
-    MEMORY_DEVICE_MAPPED_ADDRESS = 20,
-    BUILT_IN_POINTING_DEVICE = 21,
-    PORTABLE_BATTERY = 22,
-    SYSTEM_RESET = 23,
-    HARDWARE_SECURITY = 24,
-    SYSTEM_POWER_CONTROLS = 25,
-    VOLTAGE_PROBE = 26,
-    COOLING_DEVICE = 27,
-    TEMPERATURE_PROBE = 28,
-    ELECTRICAL_CURRENT_PROBE = 29,
-    OUT_OF_BAND_REMOTE_ACCESS = 30,
-    BOOT_INTEGRITY_SERVICES_BIS_ENTRY_POINT = 31,
-    SYSTEM_BOOT_INFORMATION = 32,
-    MEMORY_ERROR_INFORMATION_64_BIT = 33,
-    MANAGEMENT_DEVICE = 34,
-    MANAGEMENT_DEVICE_COMPONENT = 35,
-    MANAGEMENT_DEVICE_THRESHOLD_DATA = 36,
-    MEMORY_CHANNEL = 37,
-    IPMI_DEVICE_INFORMATION = 38,
-    SYSTEM_POWER_SUPPLY = 39,
-    ADDITIONAL_INFORMATION = 40,
-    ONBOARD_DEVICES_EXTENDED_INFORMATION = 41,
-    MANAGEMENT_CONTROLLER_HOST_INTERFACE = 42,
-    TPM_DEVICE = 43,
-    PROCESSOR_ADDITIONAL_INFORMATION = 44,
-    INACTIVE = 126,
-    END_OF_TABLE = 127,
+
+#define __ENTRY(__name, __id) \
+    __name = __id,
+
+    SMBIOS_HEADER_TYPE_LIST(__ENTRY)
+#undef __ENTRY
+
 };
 
-struct Header
+struct __packed Header
 {
     HearderType type;
     uint8_t length;
@@ -117,12 +77,14 @@ struct Header
     {
         switch (static_cast<int>(type))
         {
+
 #define __ENTRY(__name, __id) \
     case __id:                \
-        return #__name;
+    {                         \
+        return #__name;       \
+    }
 
-            SMBIOS_HEADER8TYPE_LIST(__ENTRY)
-
+            SMBIOS_HEADER_TYPE_LIST(__ENTRY)
 #undef __ENTRY
 
         default:
@@ -179,6 +141,177 @@ struct Header
 
         return size + 2; // We add two for terminators;
     }
+};
+
+struct __packed BIOSInfo
+{
+    Header header;
+
+    uint8_t _vendor;
+    const char *vendor() const { return header.string(_vendor); }
+
+    uint8_t _version;
+    const char *version() const { return header.string(_version); }
+};
+
+struct __packed SystemInfo
+{
+    Header header;
+
+    uint8_t _manufaturer;
+    const char *manufaturer() const { return header.string(_manufaturer); }
+
+    uint8_t _product;
+    const char *product() const { return header.string(_product); }
+
+    uint8_t _version;
+    const char *version() const { return header.string(_version); }
+
+    uint8_t _serial_number;
+    const char *serial_number() const { return header.string(_serial_number); }
+};
+
+struct __packed MainboardInfo
+{
+    Header header;
+
+    uint8_t _manufaturer;
+    const char *manufaturer() const { return header.string(_manufaturer); }
+
+    uint8_t _product;
+    const char *product() const { return header.string(_product); }
+
+    uint8_t _version;
+    const char *version() const { return header.string(_version); }
+
+    uint8_t _serial_number;
+    const char *serial_number() const { return header.string(_serial_number); }
+};
+
+#define ENCLOSURE_TYPE_LIST(__ENTRY)     \
+    __ENTRY(OTHER, 0x01)                 \
+    __ENTRY(UNKNOWN, 0x02)               \
+    __ENTRY(DESKTOP, 0x03)               \
+    __ENTRY(LOW_PROFILE_DESKTOP, 0x04)   \
+    __ENTRY(PIZZA_BOX, 0x05)             \
+    __ENTRY(MINI_TOWER, 0x06)            \
+    __ENTRY(TOWER, 0x07)                 \
+    __ENTRY(PORTABLE, 0x08)              \
+    __ENTRY(LAPTOP, 0x09)                \
+    __ENTRY(NOTEBOOK, 0x0A)              \
+    __ENTRY(HAND_HELD, 0x0B)             \
+    __ENTRY(DOCKING_STATION, 0x0C)       \
+    __ENTRY(ALL_IN_ONE, 0x0D)            \
+    __ENTRY(SUB_NOTEBOOK, 0x0E)          \
+    __ENTRY(SPACE_SAVING, 0x0F)          \
+    __ENTRY(LUNCH_BOX, 0x10)             \
+    __ENTRY(MAIN_SERVER_CHASSIS, 0x11)   \
+    __ENTRY(EXPANSION_CHASSIS, 0x12)     \
+    __ENTRY(SUB_CHASSIS, 0x13)           \
+    __ENTRY(BUS_EXPANSION_CHASSIS, 0x14) \
+    __ENTRY(PERIPHERAL_CHASSIS, 0x15)    \
+    __ENTRY(RAID_CHASSIS, 0x16)          \
+    __ENTRY(RACK_MOUNT_CHASSIS, 0x17)    \
+    __ENTRY(SEALED_CASE_PC, 0x18)        \
+    __ENTRY(MULTI_SYSTEM_CHASSIS, 0x19)  \
+    __ENTRY(COMPACT_PCI, 0x1A)           \
+    __ENTRY(ADVANCED_TCA, 0x1B)          \
+    __ENTRY(BLADE, 0x1C)                 \
+    __ENTRY(BLADE_ENCLOSURE, 0x1D)       \
+    __ENTRY(TABLET, 0x1E)                \
+    __ENTRY(CONVERTIBLE, 0x1F)           \
+    __ENTRY(DETACHABLE, 0x20)            \
+    __ENTRY(IOT_GATEWAY, 0x21)           \
+    __ENTRY(EMBEDDED_PC, 0x22)           \
+    __ENTRY(MINI_PC, 0x23)               \
+    __ENTRY(STICK_PC, 0x24)
+
+enum class EnclosureType : uint8_t
+{
+#define __ENTRY(__name, __id) \
+    __name = __id,
+
+    ENCLOSURE_TYPE_LIST(__ENTRY)
+#undef __ENTRY
+};
+
+struct __packed EnclosureInfo
+{
+    Header header;
+
+    uint8_t has_lock : 1;
+    EnclosureType type : 7;
+
+    const char *type_string()
+    {
+        switch (static_cast<int>(type))
+        {
+
+#define __ENTRY(__name, __id) \
+    case __id:                \
+    {                         \
+        return #__name;       \
+    }
+
+            ENCLOSURE_TYPE_LIST(__ENTRY)
+#undef __ENTRY
+
+        default:
+            return "UNKNOW";
+        }
+    }
+
+    uint8_t _manufaturer;
+    const char *manufaturer() const { return header.string(_manufaturer); }
+
+    uint8_t _product;
+    const char *product() const { return header.string(_product); }
+
+    uint8_t _version;
+    const char *version() const { return header.string(_version); }
+
+    uint8_t _serial_number;
+    const char *serial_number() const { return header.string(_serial_number); }
+};
+
+struct __packed ProcessorInfo
+{
+    Header header;
+};
+
+struct __packed CacheInfo
+{
+    Header header;
+};
+
+struct __packed SlotsInfo
+{
+    Header header;
+};
+
+struct __packed PhysicalMemoryArray
+{
+    Header header;
+};
+
+struct __packed MemoryDeviceInfo
+{
+    Header header;
+};
+
+struct __packed MemoryArrayMappedAddress
+{
+    Header header;
+};
+
+struct __packed MemoryDeviceMappedAddress
+{
+    Header header;
+};
+
+struct __packed SystemBootInfo
+{
+    Header header;
 };
 
 struct EntryPoint

@@ -66,18 +66,18 @@ extern "C" void arch_main(void *info, uint32_t magic)
     if (smbios_entrypoint)
     {
         logger_info("Found SMBIOS entrypoint at %08x (Version %d.%02d)", smbios_entrypoint, smbios_entrypoint->major_version, smbios_entrypoint->major_version);
+
+        smbios_entrypoint->iterate([&](smbios::Header *table) {
+            logger_info(" - %s (Type=%d, StringCount=%d) ", table->name(), table->type, table->string_table_lenght());
+
+            for (size_t i = 1; i < table->string_table_lenght(); i++)
+            {
+                logger_info("    - %s", table->string(i));
+            }
+
+            return Iteration::CONTINUE;
+        });
     }
-
-    smbios_entrypoint->iterate([&](smbios::Header *table) {
-        logger_info(" - %s (Type=%d, StringCount=%d) ", table->name(), table->type, table->string_table_lenght());
-
-        for (size_t i = 1; i < table->string_table_lenght(); i++)
-        {
-            logger_info("    - %s", table->string(i));
-        }
-
-        return Iteration::CONTINUE;
-    });
 
     system_main(multiboot);
 }

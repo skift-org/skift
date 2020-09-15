@@ -2,6 +2,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
+#include <libsystem/eventloop/Invoker.h>
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/math/MinMax.h>
@@ -15,10 +16,11 @@ struct RunLater
     void *target;
 };
 
-static Vector<Timer *> _eventloop_timers;
 static TimeStamp _eventloop_timer_last_fire = 0;
 
+static Vector<Timer *> _eventloop_timers;
 static List *_eventloop_notifiers = nullptr;
+static Vector<Invoker *> _eventloop_invoker;
 static Vector<RunLater> *_eventloop_run_later = nullptr;
 
 static size_t _eventloop_handles_count;
@@ -49,7 +51,6 @@ void eventloop_uninitialize()
     assert(_eventloop_is_initialize);
 
     list_destroy(_eventloop_notifiers);
-    delete _eventloop_run_later;
 
     _eventloop_is_initialize = false;
 }
@@ -178,13 +179,14 @@ void eventloop_pump(bool pool)
         }
     }
 
-    _eventloop_run_later->foreach ([](auto &run_later) {
-        run_later.callback(run_later.target);
+    _eventloop_invoker.foreach ([](Invoker *invoker) {
+        if (invoker->should_be_invoke_later())
+        {
+            invoker->invoke();
+        }
 
         return Iteration::CONTINUE;
     });
-
-    _eventloop_run_later->clear();
 }
 
 void eventloop_exit(int exit_value)
@@ -245,6 +247,18 @@ void eventloop_unregister_timer(struct Timer *timer)
 {
     assert(_eventloop_is_initialize);
     _eventloop_timers.remove_value(timer);
+}
+
+void eventloop_register_invoker(struct Invoker *invoker)
+{
+    assert(_eventloop_is_initialize);
+    _eventloop_invoker.push_back(invoker);
+}
+
+void eventloop_unregister_invoker(struct Invoker *invoker)
+{
+    assert(_eventloop_is_initialize);
+    _eventloop_invoker.remove_value(invoker);
 }
 
 void eventloop_run_later(RunLaterCallback callback, void *target)

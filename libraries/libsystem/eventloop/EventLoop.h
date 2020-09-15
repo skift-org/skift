@@ -2,9 +2,11 @@
 
 #include <libsystem/Common.h>
 
-struct Notifier;
+class Notifier;
 
-struct Timer;
+class Timer;
+
+class Invoker;
 
 void eventloop_initialize();
 
@@ -25,6 +27,10 @@ void eventloop_unregister_notifier(struct Notifier *notifier);
 void eventloop_register_timer(struct Timer *timer);
 
 void eventloop_unregister_timer(struct Timer *timer);
+
+void eventloop_register_invoker(struct Invoker *timer);
+
+void eventloop_unregister_invoker(struct Invoker *timer);
 
 typedef void (*RunLaterCallback)(void *target);
 

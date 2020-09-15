@@ -144,6 +144,8 @@ bool window_is_visible(Window *window)
     return window->visible;
 }
 
+void window_layout(Window *window);
+
 void Window::show()
 {
     if (visible)
@@ -152,8 +154,10 @@ void Window::show()
     visible = true;
 
     window_change_framebuffer_if_needed(this);
-    window_schedule_layout(this);
-    window_schedule_update(this, bound());
+
+    window_layout(this);
+    window_paint(this, this->frontbuffer_painter, bound());
+
     application_show_window(this);
 }
 

@@ -179,6 +179,11 @@ void eventloop_pump(bool pool)
         }
     }
 
+    _eventloop_run_later->foreach ([](RunLater &run_later) {
+        run_later.callback(run_later.target);
+        return Iteration::CONTINUE;
+    });
+
     _eventloop_invoker.foreach ([](Invoker *invoker) {
         if (invoker->should_be_invoke_later())
         {

@@ -29,7 +29,6 @@ Task *task_create(Task *parent, const char *name, bool user)
     strlcpy(task->name, name, PROCESS_NAME_SIZE);
     task->state = TASK_STATE_NONE;
 
-    // Setup memory space
     if (user)
     {
         task->page_directory = memory_pdir_create();
@@ -45,15 +44,13 @@ Task *task_create(Task *parent, const char *name, bool user)
     // Setup current working directory.
     lock_init(task->directory_lock);
 
-    if (parent != nullptr)
+    if (parent)
     {
         task->directory = path_clone(parent->directory);
     }
     else
     {
-        Path *path = path_create("/");
-        task->directory = path;
-        assert(task->directory);
+        task->directory = path_create("/");
     }
 
     // Setup fildes
@@ -101,8 +98,8 @@ void task_destroy(Task *task)
 
     path_destroy(task->directory);
 
-    memory_free(task->page_directory, (MemoryRange){(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
-    memory_free(task->page_directory, (MemoryRange){(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
+    memory_free(task->page_directory, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
+    memory_free(task->page_directory, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
 
     if (task->page_directory != memory_kpdir())
     {

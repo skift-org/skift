@@ -8,12 +8,13 @@
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
 
-const char *const witty_comments[] = {
-    "Witty comment unavailable :(",
-
+static const char *YO_DAWG =
     "Yo DAWG, I heard you like errors, \n\t"
     "// so I put an error in your error handler\n\t"
-    "// so you can get error while you get error",
+    "// so you can get error while you get error";
+
+static const char *const witty_comments[] = {
+    "Witty comment unavailable :(",
 
     "Excuse me Sir, \n\t"
     "// Do you have a moment to talk about TempleOS?",
@@ -78,7 +79,7 @@ void system_panic_internal(
         nested_panic = true;
         printf("\n\n\e[0;33m- - \e[0;31mNESTED\e[0;33m - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\e[0m\n");
         printf("\n\tNESTED");
-        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", witty_comments[1]);
+        printf(" PANIC\n\t// %s\n\n\t\e[0;31m", YO_DAWG);
     }
 
     vprintf(message, va);

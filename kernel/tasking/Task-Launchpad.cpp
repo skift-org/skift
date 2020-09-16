@@ -15,7 +15,7 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
         return ERR_EXEC_FORMAT_ERROR;
     }
 
-    PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->pdir);
+    PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->page_directory);
 
     MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
 
@@ -86,7 +86,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
     }
 
     {
-        Task *child_task = task_spawn_with_argv(parent_task, launchpad->name, (TaskEntry)elf_header.entry, (const char **)launchpad->argv, true);
+        Task *child_task = task_spawn_with_argv(parent_task, launchpad->name, (TaskEntryPoint)elf_header.entry, (const char **)launchpad->argv, true);
 
         for (int i = 0; i < elf_header.phnum; i++)
         {

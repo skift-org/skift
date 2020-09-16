@@ -32,11 +32,11 @@ Task *task_create(Task *parent, const char *name, bool user)
     // Setup memory space
     if (user)
     {
-        task->pdir = memory_pdir_create();
+        task->page_directory = memory_pdir_create();
     }
     else
     {
-        task->pdir = memory_kpdir();
+        task->page_directory = memory_kpdir();
     }
 
     // Setup shms
@@ -63,10 +63,10 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = nullptr;
     }
 
-    memory_alloc(task->pdir, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
+    memory_alloc(task->page_directory, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
-    memory_map(task->pdir, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
+    memory_map(task->page_directory, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
     task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
     task->user_stack = (void *)0xff000000;
 
@@ -101,12 +101,12 @@ void task_destroy(Task *task)
 
     path_destroy(task->directory);
 
-    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
-    memory_free(task->pdir, (MemoryRange){(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
+    memory_free(task->page_directory, (MemoryRange){(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
+    memory_free(task->page_directory, (MemoryRange){(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
 
-    if (task->pdir != memory_kpdir())
+    if (task->page_directory != memory_kpdir())
     {
-        memory_pdir_destroy(task->pdir);
+        memory_pdir_destroy(task->page_directory);
     }
 
     free(task);
@@ -147,7 +147,7 @@ int task_count()
     return _tasks->count();
 }
 
-Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, bool user)
+Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, bool user)
 {
     ASSERT_ATOMIC;
 
@@ -161,7 +161,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntry entry, void *arg, boo
 
 static void pass_argc_argv_user(Task *task, const char **argv)
 {
-    PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->pdir);
+    PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->page_directory);
 
     uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
 
@@ -195,7 +195,7 @@ static void pass_argc_argv_kernel(Task *task, const char **argv)
     task_kernel_stack_push(task, &argc, sizeof(argc));
 }
 
-Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntry entry, const char **argv, bool user)
+Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntryPoint entry, const char **argv, bool user)
 {
     AtomicHolder holder;
 
@@ -223,9 +223,9 @@ void task_set_state(Task *task, TaskState state)
     task->state = state;
 }
 
-void task_set_entry(Task *task, TaskEntry entry, bool user)
+void task_set_entry(Task *task, TaskEntryPoint entry, bool user)
 {
-    task->entry = entry;
+    task->entry_point = entry;
     task->user = user;
 }
 
@@ -253,7 +253,7 @@ void task_go(Task *task)
         stackframe.user_esp = task->user_stack_pointer;
 
         stackframe.eflags = 0x202;
-        stackframe.eip = (uintptr_t)task->entry;
+        stackframe.eip = (uintptr_t)task->entry_point;
         stackframe.ebp = 0;
 
         stackframe.cs = 0x1b;
@@ -270,7 +270,7 @@ void task_go(Task *task)
         InterruptStackFrame stackframe = {};
 
         stackframe.eflags = 0x202;
-        stackframe.eip = (uintptr_t)task->entry;
+        stackframe.eip = (uintptr_t)task->entry_point;
         stackframe.ebp = 0;
 
         stackframe.cs = 0x08;
@@ -377,15 +377,15 @@ void task_dump(Task *task)
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state));
     printf("\n\t   Memory: ");
-    memory_pdir_dump(task->pdir, false);
+    memory_pdir_dump(task->page_directory, false);
 
-    if (task->pdir == memory_kpdir())
+    if (task->page_directory == memory_kpdir())
     {
-        printf("\n\t   Page directory: %08x (kpdir)", task->pdir);
+        printf("\n\t   Page directory: %08x (kpdir)", task->page_directory);
     }
     else
     {
-        printf("\n\t   Page directory: %08x", task->pdir);
+        printf("\n\t   Page directory: %08x", task->page_directory);
     }
 
     printf("\n");

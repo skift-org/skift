@@ -11,7 +11,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = virtual_alloc(task->pdir, memory_object->range(), MEMORY_USER).base();
+    memory_mapping->address = virtual_alloc(task->page_directory, memory_object->range(), MEMORY_USER).base();
     memory_mapping->size = memory_object->range().size();
 
     list_pushback(task->memory_mapping, memory_mapping);
@@ -26,7 +26,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
     MemoryMapping *memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = virtual_map(task->pdir, memory_object->range(), address, MEMORY_USER);
+    memory_mapping->address = virtual_map(task->page_directory, memory_object->range(), address, MEMORY_USER);
     memory_mapping->size = memory_object->range().size();
 
     list_pushback(task->memory_mapping, memory_mapping);
@@ -38,7 +38,7 @@ void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
     AtomicHolder holder;
 
-    virtual_free(task->pdir, (MemoryRange){memory_mapping->address, memory_mapping->size});
+    virtual_free(task->page_directory, (MemoryRange){memory_mapping->address, memory_mapping->size});
     memory_object_deref(memory_mapping->object);
 
     list_remove(task->memory_mapping, memory_mapping);
@@ -156,9 +156,9 @@ Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
 
 PageDirectory *task_switch_pdir(Task *task, PageDirectory *pdir)
 {
-    PageDirectory *oldpdir = task->pdir;
+    PageDirectory *oldpdir = task->page_directory;
 
-    task->pdir = pdir;
+    task->page_directory = pdir;
 
     memory_pdir_switch(pdir);
 

@@ -141,7 +141,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
         running = idle;
     }
 
-    memory_pdir_switch(running->pdir);
+    memory_pdir_switch(running->page_directory);
     arch_load_context(running);
 
     scheduler_context_switch = false;

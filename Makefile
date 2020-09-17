@@ -10,7 +10,7 @@ endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
-BUILD_ARCH?=i686
+BUILD_ARCH?=x86_32
 BUILD_CONFIG?=debug
 BUILD_SYSTEM?=skift
 
@@ -79,6 +79,8 @@ ARFLAGS:=rcs
 AS=nasm
 ASFLAGS=-f elf32
 
+include thirdparty/.build.mk
+include arch/.build.mk
 include kernel/.build.mk
 include libraries/.build.mk
 include applications/.build.mk

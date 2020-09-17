@@ -1,8 +1,8 @@
 #include <libsystem/thread/Atomic.h>
 
 /* XXX: we should not depend on X86 directly */
-#include "arch/x86/CPUID.h"
-#include "arch/x86/Interrupts.h"
+#include "arch/x86_32/CPUID.h"
+#include "arch/x86_32/Interrupts.h"
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

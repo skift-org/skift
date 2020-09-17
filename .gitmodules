@@ -4,3 +4,9 @@
 [submodule "thirdparty/icons"]
 	path = thirdparty/icons
 	url = https://github.com/skiftOS/icons
+[submodule "thirdparty/limine"]
+	path = thirdparty/limine
+	url = https://github.com/skiftOS/limine
+[submodule "thirdparty/echfs"]
+	path = thirdparty/echfs
+	url = https://github.com/skiftOS/echfs

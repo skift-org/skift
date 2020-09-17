@@ -1,15 +1,13 @@
 CONFIG_KEYBOARD_LAYOUT?=en_us
 
-KERNEL_SOURCES = \
+KERNEL_SOURCES += \
 	$(wildcard kernel/*.cpp) \
 	$(wildcard kernel/*/*.cpp) \
-	$(wildcard kernel/*/*/*.cpp) \
-	$(wildcard arch/x86/*.cpp)
+	$(wildcard kernel/*/*/*.cpp)
 
-KERNEL_ASSEMBLY_SOURCES = \
+KERNEL_ASSEMBLY_SOURCES += \
 	$(wildcard kernel/*.s) \
-	$(wildcard kernel/*/*.s) \
-	$(wildcard arch/*/*.s)
+	$(wildcard kernel/*/*.s)
 
 KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libfile/*.cpp) \
@@ -58,4 +56,4 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) -T arch/x86/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) -T arch/x86_32/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

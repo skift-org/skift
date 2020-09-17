@@ -3,9 +3,9 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/x86/Interrupts.h"
-#include "arch/x86/PIC.h"
-#include "arch/x86/x86.h"
+#include "arch/x86_32/Interrupts.h"
+#include "arch/x86_32/PIC.h"
+#include "arch/x86_32/x86_32.h"
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/scheduling/Scheduler.h"

@@ -1,4 +1,4 @@
-#include "arch/x86/x86.h"
+#include "arch/x86_32/x86_32.h"
 
 enum CMOSTimeSelector
 {

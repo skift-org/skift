@@ -1,4 +1,4 @@
-#include "arch/x86/GDT.h"
+#include "arch/x86_32/GDT.h"
 
 static TSS tss = {
     .prev_tss = 0,

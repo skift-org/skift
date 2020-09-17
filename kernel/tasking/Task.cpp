@@ -4,7 +4,7 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
-#include "arch/x86/Interrupts.h" /* XXX */
+#include "arch/x86_32/Interrupts.h" /* XXX */
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task-Handles.h"

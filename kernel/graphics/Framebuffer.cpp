@@ -69,15 +69,15 @@ public:
     }
 };
 
-void framebuffer_initialize(Multiboot *multiboot)
+void framebuffer_initialize(Handover *handover)
 {
     AtomicHolder holder;
 
-    _framebuffer_width = multiboot->framebuffer_width;
-    _framebuffer_height = multiboot->framebuffer_height;
-    _framebuffer_pitch = multiboot->framebuffer_pitch;
+    _framebuffer_width = handover->framebuffer_width;
+    _framebuffer_height = handover->framebuffer_height;
+    _framebuffer_pitch = handover->framebuffer_pitch;
 
-    _framebuffer_physical = multiboot->framebuffer_addr;
+    _framebuffer_physical = handover->framebuffer_addr;
     _framebuffer_virtual = virtual_alloc(
                                &kpdir,
                                (MemoryRange){

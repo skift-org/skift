@@ -4,7 +4,7 @@
 
 #include <thirdparty/multiboot/Multiboot2.h>
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
 bool is_multiboot2(uint32_t magic)
 {
@@ -36,13 +36,13 @@ const char *_multiboot2_tag_name[] = {
     "LOAD_BASE_ADDR",
 };
 
-void multiboot2_parse_memory_map(Multiboot *multiboot, struct multiboot_tag_mmap *tag)
+void multiboot2_parse_memory_map(Handover *handover, struct multiboot_tag_mmap *tag)
 {
     for (multiboot_memory_map_t *mmap = tag->entries;
          (uint8_t *)mmap < (uint8_t *)tag + tag->size;
          mmap = (multiboot_memory_map_t *)((uintptr_t)mmap + tag->entry_size))
     {
-        assert(multiboot->memory_map_size < MULTIBOOT_MEMORY_MAP_SIZE);
+        assert(handover->memory_map_size < HANDOVER_MEMORY_MAP_SIZE);
 
         if ((mmap->addr > UINT32_MAX) ||
             (mmap->addr + mmap->len > UINT32_MAX))
@@ -52,10 +52,10 @@ void multiboot2_parse_memory_map(Multiboot *multiboot, struct multiboot_tag_mmap
 
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
         {
-            multiboot->memory_usable += mmap->len;
+            handover->memory_usable += mmap->len;
         }
 
-        MemoryMapEntry *entry = &multiboot->memory_map[multiboot->memory_map_size];
+        MemoryMapEntry *entry = &handover->memory_map[handover->memory_map_size];
 
         entry->range = MemoryRange::from_non_aligned_address(mmap->addr, mmap->len);
 
@@ -78,32 +78,32 @@ void multiboot2_parse_memory_map(Multiboot *multiboot, struct multiboot_tag_mmap
             break;
         }
 
-        multiboot->memory_map_size++;
+        handover->memory_map_size++;
     }
 }
 
-void multiboot2_parse_module(Multiboot *multiboot, struct multiboot_tag_module *m)
+void multiboot2_parse_module(Handover *handover, struct multiboot_tag_module *m)
 {
-    assert(multiboot->modules_size < MULTIBOOT_MODULES_SIZE);
+    assert(handover->modules_size < HANDOVER_MODULES_SIZE);
 
-    Module *module = &multiboot->modules[multiboot->modules_size];
+    Module *module = &handover->modules[handover->modules_size];
     module->range = MemoryRange::around_non_aligned_address(m->mod_start, m->mod_end - m->mod_start);
-    strncpy(module->command_line, (const char *)m->cmdline, MULTIBOOT_COMMAND_LINE_SIZE);
-    multiboot->modules_size++;
+    strncpy(module->command_line, (const char *)m->cmdline, HANDOVER_COMMAND_LINE_SIZE);
+    handover->modules_size++;
 }
 
-void multiboot2_parse_framebuffer(Multiboot *multiboot, struct multiboot_tag_framebuffer_common *tag)
+void multiboot2_parse_framebuffer(Handover *handover, struct multiboot_tag_framebuffer_common *tag)
 {
-    multiboot->framebuffer_addr = tag->framebuffer_addr;
-    multiboot->framebuffer_width = tag->framebuffer_width;
-    multiboot->framebuffer_height = tag->framebuffer_height;
-    multiboot->framebuffer_pitch = tag->framebuffer_pitch;
+    handover->framebuffer_addr = tag->framebuffer_addr;
+    handover->framebuffer_width = tag->framebuffer_width;
+    handover->framebuffer_height = tag->framebuffer_height;
+    handover->framebuffer_pitch = tag->framebuffer_pitch;
 }
 
-void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
+void multiboot2_parse_header(Handover *handover, void *header_ptr)
 {
-    strcpy(multiboot->bootloader, "unknown");
-    strcpy(multiboot->command_line, "");
+    strcpy(handover->bootloader, "unknown");
+    strcpy(handover->command_line, "");
 
     header_ptr = (void *)((uintptr_t)header_ptr + 8);
     struct multiboot_tag *tag = (struct multiboot_tag *)header_ptr;
@@ -115,28 +115,28 @@ void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr)
         switch (tag->type)
         {
         case MULTIBOOT_TAG_TYPE_MMAP:
-            multiboot2_parse_memory_map(multiboot, (struct multiboot_tag_mmap *)tag);
+            multiboot2_parse_memory_map(handover, (struct multiboot_tag_mmap *)tag);
             break;
 
         case MULTIBOOT_TAG_TYPE_MODULE:
-            multiboot2_parse_module(multiboot, (struct multiboot_tag_module *)tag);
+            multiboot2_parse_module(handover, (struct multiboot_tag_module *)tag);
             break;
 
         case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
-            strncpy(multiboot->bootloader, ((struct multiboot_tag_string *)tag)->string, MULTIBOOT_BOOTLOADER_NAME_SIZE);
+            strncpy(handover->bootloader, ((struct multiboot_tag_string *)tag)->string, HANDOVER_BOOTLOADER_NAME_SIZE);
             break;
 
         case MULTIBOOT_TAG_TYPE_CMDLINE:
-            strncpy(multiboot->command_line, ((struct multiboot_tag_string *)tag)->string, MULTIBOOT_COMMAND_LINE_SIZE);
+            strncpy(handover->command_line, ((struct multiboot_tag_string *)tag)->string, HANDOVER_COMMAND_LINE_SIZE);
             break;
 
         case MULTIBOOT_TAG_TYPE_FRAMEBUFFER:
-            multiboot2_parse_framebuffer(multiboot, (struct multiboot_tag_framebuffer_common *)tag);
+            multiboot2_parse_framebuffer(handover, (struct multiboot_tag_framebuffer_common *)tag);
             break;
 
         case MULTIBOOT_TAG_TYPE_ACPI_OLD:
-            multiboot->acpi_rsdp_address = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
-            multiboot->acpi_rsdp_size = ((struct multiboot_tag_old_acpi *)tag)->size;
+            handover->acpi_rsdp_address = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
+            handover->acpi_rsdp_size = ((struct multiboot_tag_old_acpi *)tag)->size;
             break;
 
         default:

@@ -50,15 +50,15 @@ void acpi_madt_initialize(MADT *madt)
     });
 }
 
-void acpi_initialize(Multiboot *multiboot)
+void acpi_initialize(Handover *handover)
 {
-    if (!multiboot->acpi_rsdp_address)
+    if (!handover->acpi_rsdp_address)
     {
         logger_warn("No acpi rsdp found!");
         return;
     }
 
-    RSDP *rsdp = (RSDP *)(multiboot->acpi_rsdp_address);
+    RSDP *rsdp = (RSDP *)(handover->acpi_rsdp_address);
 
     RSDT *rsdt = (RSDT *)(rsdp->rsdt_address);
 

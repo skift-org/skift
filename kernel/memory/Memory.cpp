@@ -20,7 +20,7 @@ static MemoryRange kernel_memory_range()
     return MemoryRange::around_non_aligned_address((uintptr_t)&__start, (size_t)&__end - (size_t)&__start);
 }
 
-void memory_initialize(Multiboot *multiboot)
+void memory_initialize(Handover *handover)
 {
     logger_info("Initializing memory management...");
 
@@ -39,9 +39,9 @@ void memory_initialize(Multiboot *multiboot)
         entry->PageFrameNumber = (size_t)&kptable[i] / ARCH_PAGE_SIZE;
     }
 
-    for (size_t i = 0; i < multiboot->memory_map_size; i++)
+    for (size_t i = 0; i < handover->memory_map_size; i++)
     {
-        MemoryMapEntry *entry = &multiboot->memory_map[i];
+        MemoryMapEntry *entry = &handover->memory_map[i];
 
         if (entry->type == MEMORY_MAP_ENTRY_AVAILABLE)
         {
@@ -50,15 +50,15 @@ void memory_initialize(Multiboot *multiboot)
     }
 
     USED_MEMORY = 0;
-    TOTAL_MEMORY = multiboot->memory_usable;
+    TOTAL_MEMORY = handover->memory_usable;
 
     logger_info("Mapping kernel...");
     memory_map_identity(&kpdir, kernel_memory_range(), MEMORY_NONE);
 
     logger_info("Mapping modules...");
-    for (size_t i = 0; i < multiboot->modules_size; i++)
+    for (size_t i = 0; i < handover->modules_size; i++)
     {
-        memory_map_identity(&kpdir, multiboot->modules[i].range, MEMORY_NONE);
+        memory_map_identity(&kpdir, handover->modules[i].range, MEMORY_NONE);
     }
 
     // Unmap the 0 page

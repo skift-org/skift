@@ -1,8 +1,8 @@
 
 /* modules.c : kernel modules/ramdisk loader                                  */
 
-#include <libsystem/core/CString.h>
 #include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "kernel/modules/Modules.h"
 
@@ -18,12 +18,12 @@ void module_load(Module *module)
     }
 }
 
-void modules_initialize(Multiboot *multiboot)
+void modules_initialize(Handover *handover)
 {
     logger_info("Loading modules:");
-    for (size_t i = 0; i < multiboot->modules_size; i++)
+    for (size_t i = 0; i < handover->modules_size; i++)
     {
-        Module *module = &multiboot->modules[i];
+        Module *module = &handover->modules[i];
 
         logger_info("\tModule %d: %08x-%08x: %s",
                     i,
@@ -34,5 +34,5 @@ void modules_initialize(Multiboot *multiboot)
         module_load(module);
     }
 
-    logger_info("%d module loaded!", multiboot->modules_size);
+    logger_info("%d module loaded!", handover->modules_size);
 }

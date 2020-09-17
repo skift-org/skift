@@ -1,10 +1,10 @@
 #pragma once
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
-void graphic_initialize(Multiboot *multiboot);
+void graphic_initialize(Handover *handover);
 
-void framebuffer_initialize(Multiboot *multiboot);
+void framebuffer_initialize(Handover *handover);
 
 void textmode_initialize();
 

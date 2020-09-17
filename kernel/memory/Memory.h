@@ -4,10 +4,10 @@
 #include <libsystem/Result.h>
 
 #include "arch/x86_32/Paging.h"
+#include "kernel/handover/Handover.h"
 #include "kernel/memory/MemoryRange.h"
-#include "kernel/multiboot/Multiboot.h"
 
-void memory_initialize(Multiboot *multiboot);
+void memory_initialize(Handover *handover);
 
 void memory_dump();
 

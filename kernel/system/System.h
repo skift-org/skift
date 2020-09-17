@@ -3,9 +3,9 @@
 #include <libsystem/Common.h>
 #include <libsystem/Time.h>
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
-void system_main(Multiboot *multiboot);
+void system_main(Handover *handover);
 
 void system_initialize();
 

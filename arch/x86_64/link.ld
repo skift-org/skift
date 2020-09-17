@@ -5,6 +5,8 @@ SECTIONS
     kernel_phys_offset = 0xffffffff80000000;
     . = kernel_phys_offset + 0x100000;
 
+    __start = .;
+
     .stivalehdr ALIGN(4K) :
     {
         KEEP(*(.stivalehdr))
@@ -30,4 +32,6 @@ SECTIONS
         KEEP(*(COMMON))
         KEEP(*(.bss*))
     }
+
+    __end = .;
 }

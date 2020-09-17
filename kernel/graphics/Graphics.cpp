@@ -4,14 +4,14 @@
 
 static bool _has_framebuffer;
 
-void graphic_initialize(Multiboot *multiboot)
+void graphic_initialize(Handover *handover)
 {
     if (_has_framebuffer)
     {
         return;
     }
 
-    framebuffer_initialize(multiboot);
+    framebuffer_initialize(handover);
 }
 
 void graphic_did_find_framebuffer()

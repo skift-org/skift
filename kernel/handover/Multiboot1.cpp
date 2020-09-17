@@ -4,35 +4,35 @@
 
 #include <thirdparty/multiboot/Multiboot.h>
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
 bool is_multiboot1(uint32_t magic)
 {
     return magic == MULTIBOOT_BOOTLOADER_MAGIC;
 }
 
-void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
+void multiboot1_parse_header(Handover *handover, void *header_ptr)
 {
     multiboot_info_t *info = (multiboot_info_t *)header_ptr;
 
-    strncpy(multiboot->bootloader, (char *)info->boot_loader_name, MULTIBOOT_BOOTLOADER_NAME_SIZE);
-    strncpy(multiboot->command_line, (char *)info->cmdline, MULTIBOOT_COMMAND_LINE_SIZE);
+    strncpy(handover->bootloader, (char *)info->boot_loader_name, HANDOVER_BOOTLOADER_NAME_SIZE);
+    strncpy(handover->command_line, (char *)info->cmdline, HANDOVER_COMMAND_LINE_SIZE);
 
     multiboot_module_t *m = (multiboot_module_t *)info->mods_addr;
     for (size_t i = 0; i < info->mods_count; i++)
     {
-        Module *module = &multiboot->modules[multiboot->modules_size];
+        Module *module = &handover->modules[handover->modules_size];
 
         module->range = MemoryRange::around_non_aligned_address(m->mod_start, m->mod_end - m->mod_start);
-        strncpy(module->command_line, (const char *)m->cmdline, MULTIBOOT_COMMAND_LINE_SIZE);
+        strncpy(module->command_line, (const char *)m->cmdline, HANDOVER_COMMAND_LINE_SIZE);
 
         m = (multiboot_module_t *)(m->mod_end + 1);
-        multiboot->modules_size++;
+        handover->modules_size++;
     }
 
     for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)info->mmap_addr; (uint32_t)mmap < info->mmap_addr + info->mmap_length; mmap = (multiboot_memory_map_t *)((uint32_t)mmap + mmap->size + sizeof(mmap->size)))
     {
-        assert(multiboot->memory_map_size < MULTIBOOT_MEMORY_MAP_SIZE);
+        assert(handover->memory_map_size < HANDOVER_MEMORY_MAP_SIZE);
 
         if ((mmap->addr > UINT32_MAX) ||
             (mmap->addr + mmap->len > UINT32_MAX))
@@ -42,10 +42,10 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
 
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
         {
-            multiboot->memory_usable += mmap->len;
+            handover->memory_usable += mmap->len;
         }
 
-        MemoryMapEntry *entry = &multiboot->memory_map[multiboot->memory_map_size];
+        MemoryMapEntry *entry = &handover->memory_map[handover->memory_map_size];
 
         entry->range = MemoryRange::from_non_aligned_address(mmap->addr, mmap->len);
 
@@ -68,11 +68,11 @@ void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr)
             break;
         }
 
-        multiboot->memory_map_size++;
+        handover->memory_map_size++;
     }
 
-    multiboot->framebuffer_addr = info->framebuffer_addr;
-    multiboot->framebuffer_width = info->framebuffer_width;
-    multiboot->framebuffer_height = info->framebuffer_height;
-    multiboot->framebuffer_pitch = info->framebuffer_pitch;
+    handover->framebuffer_addr = info->framebuffer_addr;
+    handover->framebuffer_width = info->framebuffer_width;
+    handover->framebuffer_height = info->framebuffer_height;
+    handover->framebuffer_pitch = info->framebuffer_pitch;
 }

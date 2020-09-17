@@ -1,5 +1,5 @@
 #pragma once
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
-void acpi_initialize(Multiboot *multiboot);
+void acpi_initialize(Handover *handover);

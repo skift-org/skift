@@ -3,10 +3,10 @@
 #include "kernel/graphics/PixelFormat.h"
 #include "kernel/memory/MemoryRange.h"
 
-#define MULTIBOOT_BOOTLOADER_NAME_SIZE 64
-#define MULTIBOOT_COMMAND_LINE_SIZE 256
-#define MULTIBOOT_MEMORY_MAP_SIZE 64
-#define MULTIBOOT_MODULES_SIZE 16
+#define HANDOVER_BOOTLOADER_NAME_SIZE 64
+#define HANDOVER_COMMAND_LINE_SIZE 256
+#define HANDOVER_MEMORY_MAP_SIZE 64
+#define HANDOVER_MODULES_SIZE 16
 
 enum MemoryMapEntryType
 {
@@ -15,6 +15,7 @@ enum MemoryMapEntryType
     MEMORY_MAP_ENTRY_ACPI_RECLAIMABLE,
     MEMORY_MAP_ENTRY_NVS,
     MEMORY_MAP_ENTRY_BADRAM,
+    MEMORY_MAP_ENTRY_KERNEL
 };
 
 struct MemoryMapEntry
@@ -26,20 +27,20 @@ struct MemoryMapEntry
 struct Module
 {
     MemoryRange range;
-    char command_line[MULTIBOOT_COMMAND_LINE_SIZE];
+    char command_line[HANDOVER_COMMAND_LINE_SIZE];
 };
 
-struct Multiboot
+struct Handover
 {
-    char bootloader[MULTIBOOT_BOOTLOADER_NAME_SIZE];
-    char command_line[MULTIBOOT_COMMAND_LINE_SIZE];
+    char bootloader[HANDOVER_BOOTLOADER_NAME_SIZE];
+    char command_line[HANDOVER_COMMAND_LINE_SIZE];
 
     size_t memory_usable;
 
-    MemoryMapEntry memory_map[MULTIBOOT_MEMORY_MAP_SIZE];
+    MemoryMapEntry memory_map[HANDOVER_MEMORY_MAP_SIZE];
     size_t memory_map_size;
 
-    Module modules[MULTIBOOT_MODULES_SIZE];
+    Module modules[HANDOVER_MODULES_SIZE];
     size_t modules_size;
 
     uintptr_t framebuffer_addr;
@@ -51,16 +52,14 @@ struct Multiboot
     uintptr_t acpi_rsdp_address;
 };
 
-void multiboot_assert(uint32_t magic);
+void handover_assert(uint32_t magic);
 
-int multiboot_version(uint32_t magic);
-
-Multiboot *multiboot_initialize(void *header, uint32_t magic);
+Handover *handover_initialize(void *header, uint32_t magic);
 
 bool is_multiboot1(uint32_t magic);
 
 bool is_multiboot2(uint32_t magic);
 
-void multiboot1_parse_header(Multiboot *multiboot, void *header_ptr);
+void multiboot1_parse_header(Handover *handover, void *header_ptr);
 
-void multiboot2_parse_header(Multiboot *multiboot, void *header_ptr);
+void multiboot2_parse_header(Handover *handover, void *header_ptr);

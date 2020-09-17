@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kernel/multiboot/Multiboot.h"
+#include "kernel/handover/Handover.h"
 
-void modules_initialize(Multiboot *multiboot);
+void modules_initialize(Handover *handover);
 
 void ramdisk_load(Module *module);

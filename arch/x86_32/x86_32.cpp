@@ -46,11 +46,11 @@ extern "C" void arch_main(void *info, uint32_t magic)
     com_initialize(COM3);
     com_initialize(COM4);
 
-    auto multiboot = multiboot_initialize(info, magic);
+    auto handover = handover_initialize(info, magic);
 
-    if (multiboot->memory_usable < 127 * 1024)
+    if (handover->memory_usable < 127 * 1024)
     {
-        system_panic("No enoughs memory (%uKio)!", multiboot->memory_usable / 1024);
+        system_panic("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
     }
 
     gdt_initialize();
@@ -59,7 +59,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
     fpu_initialize();
     pit_initialize(1000);
 
-    acpi_initialize(multiboot);
+    acpi_initialize(handover);
     //lapic_initialize();
     smbios::EntryPoint *smbios_entrypoint = smbios::find({0xF0000, 65536});
 
@@ -79,7 +79,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
         });
     }
 
-    system_main(multiboot);
+    system_main(handover);
 }
 
 static void reboot_8042()

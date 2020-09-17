@@ -16,8 +16,6 @@
 
 struct Window;
 
-typedef void (*WindowDestroyCallback)(Window *window);
-
 struct Window
 {
     int handle;
@@ -25,29 +23,28 @@ struct Window
     char *_title;
     RefPtr<Icon> _icon;
     Rectangle _bound;
-    WindowFlag flags;
+    WindowFlag _flags;
     WindowType _type;
 
     float _opacity;
 
-    bool focused;
-    bool visible;
-    bool is_dragging;
-    bool is_maximised;
-    bool is_resizing;
-    bool resize_vertical;
-    bool resize_horizontal;
+    bool focused = false;
+    bool visible = false;
+    bool is_dragging = false;
+    bool is_maximised = false;
+    bool is_resizing = false;
+    bool resize_vertical = false;
+    bool resize_horizontal = false;
     Vec2i resize_begin;
     Rectangle previous_bound; // used for maximize
-    WindowDestroyCallback destroy;
 
     CursorState cursor_state;
 
     RefPtr<Bitmap> frontbuffer;
-    Painter frontbuffer_painter;
+    OwnPtr<Painter> frontbuffer_painter;
 
     RefPtr<Bitmap> backbuffer;
-    Painter backbuffer_painter;
+    OwnPtr<Painter> backbuffer_painter;
 
     List *dirty_rect;
     bool dirty_layout;
@@ -57,56 +54,55 @@ struct Window
     Widget *header_container;
     Widget *root_container;
 
-    Widget *focused_widget;
-    Widget *mouse_focused_widget;
-    Widget *mouse_over_widget;
-    HashMap *widget_by_id;
+    Widget *focused_widget = nullptr;
+    Widget *mouse_focused_widget = nullptr;
+    Widget *mouse_over_widget = nullptr;
+    HashMap *widget_by_id = nullptr;
 
 public:
     void title(const char *title);
 
     void icon(RefPtr<Icon> icon);
 
-    Rectangle bound_on_screen() { return _bound; }
-
-    Rectangle bound() { return _bound.moved({0, 0}); }
-
-    Rectangle content_bound()
-    {
-        Rectangle result = bound();
-
-        if (!(flags & WINDOW_BORDERLESS))
-        {
-            result = result.shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
-        }
-
-        return result;
-    }
-
     int x() { return position().x(); }
     int y() { return position().y(); }
     int width() { return size().x(); }
     int height() { return size().y(); }
 
-    void opacity(float value) { _opacity = value; }
-
     Vec2i position() { return bound_on_screen().position(); }
-
     void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
 
     Vec2i size() { return bound().size(); }
-
     void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
 
+    Rectangle bound() { return _bound.moved({0, 0}); }
     void bound(Rectangle bound);
 
-    void type(WindowType type);
+    Rectangle bound_on_screen() { return _bound; }
+
+    Rectangle content_bound()
+    {
+        if (_flags & WINDOW_BORDERLESS)
+        {
+            return bound();
+        }
+        else
+        {
+            return bound().shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+        }
+    }
+
+    void opacity(float value) { _opacity = value; }
+    float opacity() { return _opacity; }
 
     WindowType type() { return _type; }
+    void type(WindowType type) { _type = type; }
 
     Widget *root() { return root_container; }
-
     Widget *header() { return header_container; }
+
+    Window(WindowFlag flags);
+    virtual ~Window();
 
     void on(EventType event, EventHandler handler);
 
@@ -114,12 +110,6 @@ public:
 
     void hide();
 };
-
-Window *window_create(WindowFlag flags);
-
-void window_initialize(Window *window, WindowFlag flags);
-
-void window_destroy(Window *window);
 
 bool window_is_visible(Window *window);
 

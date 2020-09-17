@@ -231,7 +231,7 @@ void application_exit(int exit_value)
     Window *window = (Window *)list_peek(_windows);
     while (window)
     {
-        window_destroy(window);
+        delete window;
         window = (Window *)list_peek(_windows);
     }
 
@@ -312,7 +312,7 @@ void application_show_window(Window *window)
         .type = COMPOSITOR_MESSAGE_CREATE_WINDOW,
         .create_window = {
             .id = window_handle(window),
-            .flags = window->flags,
+            .flags = window->_flags,
             .type = window->type(),
             .frontbuffer = window_frontbuffer_handle(window),
             .frontbuffer_size = window->frontbuffer->size(),

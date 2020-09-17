@@ -35,7 +35,7 @@ void menu_destroy(Menu *menu)
 
 void menu_show(Menu *menu)
 {
-    Window *window = window_create(WINDOW_BORDERLESS);
+    Window *window = new Window(WINDOW_BORDERLESS);
     window->size(Vec2i(128, menu->items->count() * 32));
 
     window->root()->layout(VGRID(4));

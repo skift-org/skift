@@ -6,38 +6,38 @@
 
 #include "device-manager/DeviceModel.h"
 
-struct TaskManagerWindow : public Window
+class DeviceManagerWindow : public Window
 {
-    /// --- Table view --- //
-    Widget *table;
-    DeviceModel *table_model;
-};
+private:
+    Widget *_table;
+    DeviceModel *_model;
 
-void task_manager_window_destroy(TaskManagerWindow *window)
-{
-    model_destroy((Model *)window->table_model);
-}
+public:
+    DeviceManagerWindow() : Window(WINDOW_RESIZABLE)
+    {
+        icon(Icon::get("expansion-card-variant"));
+        title("Device Manager");
+        size(Vec2i(700, 500));
+
+        root()->layout(VFLOW(0));
+
+        _model = device_model_create();
+
+        _table = new Table(root(), (Model *)_model);
+        _table->attributes(LAYOUT_FILL);
+    }
+
+    ~DeviceManagerWindow() override
+    {
+        model_destroy((Model *)_model);
+    }
+};
 
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    TaskManagerWindow *window = __create(TaskManagerWindow);
-
-    window_initialize(window, WINDOW_RESIZABLE);
-
-    window->icon(Icon::get("expansion-card-variant"));
-    window->title("Device Manager");
-    window->size(Vec2i(700, 500));
-
-    window->root()->layout(VFLOW(0));
-
-    /// --- Table view --- //
-    window->table_model = device_model_create();
-
-    window->table = new Table(window->root(), (Model *)window->table_model);
-    window->table->attributes(LAYOUT_FILL);
-
+    auto window = new DeviceManagerWindow();
     window->show();
 
     return application_run();

@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
     List *menu = load_menu();
 
-    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_TRANSPARENT);
+    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT);
 
     window->title("Panel");
     window->position(Vec2i::zero());

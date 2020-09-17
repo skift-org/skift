@@ -15,199 +15,187 @@ enum RecordHistory
     RECORD_FOREWARD,
 };
 
-struct FileExplorerWindow : public Window
+class FileExplorerWindow : public Window
 {
+private:
     /// --- Navigation bar --- ///
-    Widget *go_backward;
-    Widget *go_foreward;
-    Widget *go_up;
-    Widget *go_home;
-    Breadcrumb *breadcrumb;
+    Widget *_go_backward;
+    Widget *_go_foreward;
+    Widget *_go_up;
+    Widget *_go_home;
+    Breadcrumb *_breadcrumb;
 
     /// --- Table view --- ///
-    Table *table;
-    FileSystemModel *model;
+    Table *_table;
+    FileSystemModel *_model;
 
-    /// --- Navigation --- //
-    List *backward_history;
-    Path *current_path;
-    List *foreward_history;
+    /// --- Navigation --- ///
+    List *_backward_history;
+    Path *_current_path;
+    List *_foreward_history;
+
+public:
+    FileExplorerWindow(const char *path) : Window(WINDOW_RESIZABLE)
+    {
+        icon(Icon::get("folder"));
+        title("File Manager");
+        size(Vec2i(700, 500));
+
+        root()->layout(VFLOW(0));
+
+        _current_path = path_create(path);
+        _backward_history = list_create();
+        _foreward_history = list_create();
+
+        /// --- Navigation bar --- ///
+        Widget *toolbar = toolbar_create(root());
+
+        _go_backward = toolbar_icon_create(toolbar, Icon::get("arrow-left"));
+
+        _go_backward->on(Event::ACTION, [this](auto) {
+            if (_backward_history->any())
+            {
+                Path *path = nullptr;
+                list_popback(_backward_history, (void **)&path);
+
+                navigate(path, RECORD_FOREWARD);
+            }
+        });
+
+        _go_foreward = toolbar_icon_create(toolbar, Icon::get("arrow-right"));
+
+        _go_foreward->on(Event::ACTION, [this](auto) {
+            if (_foreward_history->any())
+            {
+                Path *path = nullptr;
+                list_popback(_foreward_history, (void **)&path);
+
+                navigate(path, RECORD_BACKWARD);
+            }
+        });
+
+        _go_up = toolbar_icon_create(toolbar, Icon::get("arrow-up"));
+
+        _go_up->on(Event::ACTION, [this](auto) {
+            Path *new_path = path_clone(_current_path);
+            char *poped_element = path_pop(new_path);
+
+            if (poped_element)
+            {
+                free(poped_element);
+
+                clear_foreward_history();
+                navigate(new_path, RECORD_BACKWARD);
+            }
+        });
+
+        _go_home = toolbar_icon_create(toolbar, Icon::get("home"));
+
+        _go_home->on(Event::ACTION, [this](auto) {
+            clear_foreward_history();
+            navigate(path_create("/User"), RECORD_BACKWARD);
+        });
+
+        new Separator(toolbar);
+
+        _breadcrumb = new Breadcrumb(toolbar, _current_path);
+        _breadcrumb->attributes(LAYOUT_FILL);
+
+        new Separator(toolbar);
+
+        toolbar_icon_create(toolbar, Icon::get("refresh"));
+
+        Widget *terminal_button = toolbar_icon_create(toolbar, Icon::get("console"));
+
+        terminal_button->on(Event::ACTION, [](auto) {
+            process_run("terminal", NULL);
+        });
+
+        update_navigation_bar();
+
+        /// --- Table view --- ///
+        _model = filesystem_model_create(path);
+
+        _table = new Table(root(), _model);
+        _table->attributes(LAYOUT_FILL);
+        _table->empty_message("This directory is empty.");
+
+        _table->on(Event::MOUSE_DOUBLE_CLICK, [this](auto) {
+            if (_table->selected() >= 0)
+            {
+                if (filesystem_model_filetype_by_index(_model, _table->selected()) == FILE_TYPE_DIRECTORY)
+                {
+                    Path *new_path = path_clone(_current_path);
+                    path_push(new_path, strdup(filesystem_model_filename_by_index(_model, _table->selected())));
+                    clear_foreward_history();
+                    navigate(new_path, RECORD_BACKWARD);
+                }
+                else
+                {
+                    Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
+                    launchpad_argument(launchpad, filesystem_model_filename_by_index(_model, _table->selected()));
+                    launchpad_launch(launchpad, nullptr);
+                }
+            }
+        });
+    }
+
+    ~FileExplorerWindow() override
+    {
+        model_destroy((Model *)_model);
+    }
+
+    void update_navigation_bar()
+    {
+        _go_backward->enable_if(_backward_history->any());
+        _go_foreward->enable_if(_foreward_history->any());
+        _go_up->enable_if(path_element_count(_current_path) > 0);
+    }
+
+    void navigate(Path *path, RecordHistory record_history)
+    {
+        if (path_equals(_current_path, path))
+        {
+            path_destroy(path);
+            return;
+        }
+
+        _table->select(-1);
+        _table->scroll_to_top();
+
+        if (record_history == RECORD_BACKWARD)
+        {
+            if (_current_path)
+            {
+                list_pushback(_backward_history, _current_path);
+            }
+        }
+        else if (record_history == RECORD_FOREWARD)
+        {
+            if (_current_path)
+            {
+                list_pushback(_foreward_history, _current_path);
+            }
+        }
+
+        _current_path = path;
+
+        _breadcrumb->navigate(path);
+        filesystem_model_navigate(_model, path);
+        update_navigation_bar();
+    }
+
+    void clear_foreward_history()
+    {
+        list_clear_with_callback(_foreward_history, (ListDestroyElementCallback)path_destroy);
+    }
 };
-
-static void update_navigation_bar(FileExplorerWindow *window)
-{
-    window->go_backward->enable_if(window->backward_history->any());
-    window->go_foreward->enable_if(window->foreward_history->any());
-    window->go_up->enable_if(path_element_count(window->current_path) > 0);
-}
-
-static void navigate(FileExplorerWindow *window, Path *path, RecordHistory record_history)
-{
-    if (path_equals(window->current_path, path))
-    {
-        path_destroy(path);
-        return;
-    }
-
-    window->table->select(-1);
-    window->table->scroll_to_top();
-
-    if (record_history == RECORD_BACKWARD)
-    {
-        if (window->current_path)
-        {
-            list_pushback(window->backward_history, window->current_path);
-        }
-    }
-    else if (record_history == RECORD_FOREWARD)
-    {
-        if (window->current_path)
-        {
-            list_pushback(window->foreward_history, window->current_path);
-        }
-    }
-
-    window->current_path = path;
-
-    window->breadcrumb->navigate(path);
-    filesystem_model_navigate(window->model, path);
-    update_navigation_bar(window);
-}
-
-static void clear_foreward_history(FileExplorerWindow *window)
-{
-    list_clear_with_callback(window->foreward_history, (ListDestroyElementCallback)path_destroy);
-}
-
-void file_explorer_window_destroy(FileExplorerWindow *window)
-{
-    model_destroy((Model *)window->model);
-}
-
-Window *file_explorer_window_create(const char *current_path)
-{
-    FileExplorerWindow *window = __create(FileExplorerWindow);
-
-    window_initialize(window, WINDOW_RESIZABLE);
-
-    window->icon(Icon::get("folder"));
-    window->title("File Manager");
-    window->size(Vec2i(700, 500));
-
-    Widget *root = window->root();
-    root->layout(VFLOW(0));
-
-    window->current_path = path_create(current_path);
-    window->backward_history = list_create();
-    window->foreward_history = list_create();
-
-    /// --- Navigation bar --- ///
-    Widget *toolbar = toolbar_create(root);
-
-    Widget *backward_button = toolbar_icon_create(toolbar, Icon::get("arrow-left"));
-
-    backward_button->on(Event::ACTION, [window](auto) {
-        if (window->backward_history->any())
-        {
-            Path *path = nullptr;
-            list_popback(window->backward_history, (void **)&path);
-
-            navigate(window, path, RECORD_FOREWARD);
-        }
-    });
-
-    window->go_backward = backward_button;
-
-    Widget *foreward_button = toolbar_icon_create(toolbar, Icon::get("arrow-right"));
-
-    foreward_button->on(Event::ACTION, [window](auto) {
-        if (window->foreward_history->any())
-        {
-            Path *path = nullptr;
-            list_popback(window->foreward_history, (void **)&path);
-
-            navigate(window, path, RECORD_BACKWARD);
-        }
-    });
-
-    window->go_foreward = foreward_button;
-
-    Widget *up_button = toolbar_icon_create(toolbar, Icon::get("arrow-up"));
-
-    up_button->on(Event::ACTION, [window](auto) {
-        Path *new_path = path_clone(window->current_path);
-        char *poped_element = path_pop(new_path);
-
-        if (poped_element)
-        {
-            free(poped_element);
-
-            clear_foreward_history(window);
-            navigate(window, new_path, RECORD_BACKWARD);
-        }
-    });
-
-    window->go_up = up_button;
-
-    Widget *home_button = toolbar_icon_create(toolbar, Icon::get("home"));
-
-    home_button->on(Event::ACTION, [window](auto) {
-        clear_foreward_history(window);
-        navigate(window, path_create("/User"), RECORD_BACKWARD);
-    });
-
-    window->go_home = home_button;
-
-    new Separator(toolbar);
-
-    window->breadcrumb = new Breadcrumb(toolbar, window->current_path);
-    window->breadcrumb->attributes(LAYOUT_FILL);
-
-    new Separator(toolbar);
-
-    toolbar_icon_create(toolbar, Icon::get("refresh"));
-
-    Widget *terminal_button = toolbar_icon_create(toolbar, Icon::get("console"));
-
-    terminal_button->on(Event::ACTION, [](auto) {
-        process_run("terminal", NULL);
-    });
-
-    update_navigation_bar(window);
-
-    /// --- Table view --- ///
-    window->model = filesystem_model_create(current_path);
-    window->table = new Table(root, window->model);
-    window->table->attributes(LAYOUT_FILL);
-    window->table->empty_message("This directory is empty.");
-
-    window->table->on(Event::MOUSE_DOUBLE_CLICK, [window](auto) {
-        if (window->table->selected() >= 0)
-        {
-            if (filesystem_model_filetype_by_index(window->model, window->table->selected()) == FILE_TYPE_DIRECTORY)
-            {
-                Path *new_path = path_clone(window->current_path);
-                path_push(new_path, strdup(filesystem_model_filename_by_index(window->model, window->table->selected())));
-                clear_foreward_history(window);
-                navigate(window, new_path, RECORD_BACKWARD);
-            }
-            else
-            {
-                Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
-                launchpad_argument(launchpad, filesystem_model_filename_by_index(window->model, window->table->selected()));
-                launchpad_launch(launchpad, nullptr);
-            }
-        }
-    });
-
-    return window;
-}
 
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = file_explorer_window_create("/User");
+    auto window = new FileExplorerWindow("/User");
     window->show();
 
     return application_run();

@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    Window *window = window_create(WINDOW_RESIZABLE);
+    Window *window = new Window(WINDOW_RESIZABLE);
     window->icon(Icon::get("duck"));
     window->title("Demos");
     window->size(Vec2i(500, 400));

@@ -11,7 +11,7 @@ DialogButton dialog_message(
 {
     __unused(buttons);
 
-    Window *window = window_create(WINDOW_NONE);
+    Window *window = new Window(WINDOW_NONE);
 
     window->icon(icon);
     window->title(title);

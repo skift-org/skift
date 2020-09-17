@@ -29,163 +29,156 @@ static Color _color_palette[] = {
 
 struct PaintWindow : public Window
 {
-    RefPtr<PaintDocument> document;
+private:
+    RefPtr<PaintDocument> _document;
 
     /// --- Toolbar --- ///
-    Widget *open_document;
-    Widget *save_document;
-    Widget *new_document;
+    Widget *_open_document;
+    Widget *_save_document;
+    Widget *_new_document;
 
-    Widget *pencil;
-    Widget *brush;
-    Widget *eraser;
-    Widget *fill;
-    Widget *picker;
+    Widget *_pencil;
+    Widget *_brush;
+    Widget *_eraser;
+    Widget *_fill;
+    Widget *_picker;
 
-    Widget *insert_text;
-    Widget *insert_line;
-    Widget *insert_rectangle;
-    Widget *insert_circle;
+    Widget *_insert_text;
+    Widget *_insert_line;
+    Widget *_insert_rectangle;
+    Widget *_insert_circle;
 
-    Panel *primary_color;
-    Panel *secondary_color;
+    Panel *_primary_color;
+    Panel *_secondary_color;
 
     /// --- Canvas --- ///
-    PaintCanvas *canvas;
-};
+    PaintCanvas *_canvas;
 
-static void update_toolbar(PaintWindow *window)
-{
-    window->primary_color->color(THEME_MIDDLEGROUND, window->document->primary_color());
-    window->secondary_color->color(THEME_MIDDLEGROUND, window->document->secondary_color());
-}
-
-static void create_toolbar(PaintWindow *window, Widget *parent)
-{
-    Widget *toolbar = toolbar_create(parent);
-
-    window->open_document = toolbar_icon_create(toolbar, Icon::get("folder-open"));
-    window->save_document = toolbar_icon_create(toolbar, Icon::get("content-save"));
-    window->new_document = toolbar_icon_create(toolbar, Icon::get("image-plus"));
-
-    new Separator(toolbar);
-
-    window->pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
-    window->pencil->on(Event::ACTION, [window](auto) {
-        window->canvas->tool(own<PencilTool>());
-        update_toolbar(window);
-    });
-
-    window->brush = toolbar_icon_create(toolbar, Icon::get("brush"));
-    window->brush->on(Event::ACTION, [window](auto) {
-        window->canvas->tool(own<BrushTool>());
-        update_toolbar(window);
-    });
-
-    window->eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
-    window->eraser->on(Event::ACTION, [window](auto) {
-        window->canvas->tool(own<EraserTool>());
-        update_toolbar(window);
-    });
-
-    window->fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
-    window->fill->on(Event::ACTION, [window](auto) {
-        window->canvas->tool(own<FillTool>());
-        update_toolbar(window);
-    });
-
-    window->picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
-    window->picker->on(Event::ACTION, [window](auto) {
-        window->canvas->tool(own<PickerTool>());
-        update_toolbar(window);
-    });
-
-    new Separator(toolbar);
-
-    // TODO:
-    window->insert_text = toolbar_icon_create(toolbar, Icon::get("format-text-variant"));
-    window->insert_line = toolbar_icon_create(toolbar, Icon::get("vector-line"));
-    window->insert_rectangle = toolbar_icon_create(toolbar, Icon::get("rectangle-outline"));
-    window->insert_circle = toolbar_icon_create(toolbar, Icon::get("circle-outline"));
-
-    new Separator(toolbar);
-
-    Widget *primary_color_container = new Container(toolbar);
-    primary_color_container->min_width(22);
-    primary_color_container->insets(Insets(4));
-
-    window->primary_color = new Panel(primary_color_container);
-    window->primary_color->border_radius(4);
-    window->primary_color->color(THEME_MIDDLEGROUND, window->document->primary_color());
-
-    Widget *secondary_color_container = new Container(toolbar);
-    secondary_color_container->min_width(22);
-    secondary_color_container->insets(Insets(4));
-
-    window->secondary_color = new Panel(secondary_color_container);
-    window->secondary_color->border_radius(4);
-    window->secondary_color->color(THEME_MIDDLEGROUND, window->document->secondary_color());
-}
-
-static void create_color_palette(PaintWindow *window, Widget *parent)
-{
-    __unused(window);
-
-    Widget *palette = toolbar_create(parent);
-    palette->layout(HFLOW(4));
-
-    for (size_t i = 0; i < 18; i++)
+public:
+    PaintWindow(RefPtr<PaintDocument> document) : Window(WINDOW_RESIZABLE)
     {
-        Color color = _color_palette[i];
+        icon(Icon::get("brush"));
+        title("Paint");
+        size(Vec2i(600, 560));
 
-        auto color_widget = new Panel(palette);
-        color_widget->border_radius(4);
-        color_widget->min_width(30);
-        color_widget->color(THEME_MIDDLEGROUND, color);
+        _document = document;
 
-        color_widget->on(Event::MOUSE_BUTTON_PRESS, [window, color](auto event) {
-            if (event->mouse.button == MOUSE_BUTTON_LEFT)
-            {
-                window->document->primary_color(color);
-            }
-            else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
-            {
-                window->document->secondary_color(color);
-            }
+        root()->layout(VFLOW(0));
 
-            update_toolbar(window);
-        });
+        create_toolbar(root());
+
+        _canvas = new PaintCanvas(root(), document);
+        _canvas->attributes(LAYOUT_FILL);
+
+        create_color_palette(root());
+
+        document->on_color_change = [this]() {
+            update_toolbar();
+        };
     }
-}
 
-static Window *paint_create_window(RefPtr<PaintDocument> document)
-{
-    PaintWindow *window = __create(PaintWindow);
+    void create_toolbar(Widget *parent)
+    {
+        Widget *toolbar = toolbar_create(parent);
 
-    window_initialize(window, WINDOW_RESIZABLE);
+        _open_document = toolbar_icon_create(toolbar, Icon::get("folder-open"));
+        _save_document = toolbar_icon_create(toolbar, Icon::get("content-save"));
+        _new_document = toolbar_icon_create(toolbar, Icon::get("image-plus"));
 
-    window->icon(Icon::get("brush"));
-    window->title("Paint");
-    window->size(Vec2i(600, 560));
+        new Separator(toolbar);
 
-    window->document = document;
+        _pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
+        _pencil->on(Event::ACTION, [this](auto) {
+            _canvas->tool(own<PencilTool>());
+            update_toolbar();
+        });
 
-    Widget *root = window->root();
-    root->layout(VFLOW(0));
+        _brush = toolbar_icon_create(toolbar, Icon::get("brush"));
+        _brush->on(Event::ACTION, [this](auto) {
+            _canvas->tool(own<BrushTool>());
+            update_toolbar();
+        });
 
-    create_toolbar(window, root);
+        _eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
+        _eraser->on(Event::ACTION, [this](auto) {
+            _canvas->tool(own<EraserTool>());
+            update_toolbar();
+        });
 
-    window->canvas = new PaintCanvas(root, window->document);
-    window->canvas->attributes(LAYOUT_FILL);
+        _fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
+        _fill->on(Event::ACTION, [this](auto) {
+            _canvas->tool(own<FillTool>());
+            update_toolbar();
+        });
 
-    create_color_palette(window, root);
+        _picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
+        _picker->on(Event::ACTION, [this](auto) {
+            _canvas->tool(own<PickerTool>());
+            update_toolbar();
+        });
 
-    document->on_color_change = [window]() {
-        update_toolbar(window);
-    };
+        new Separator(toolbar);
 
-    return window;
-}
+        // TODO:
+        _insert_text = toolbar_icon_create(toolbar, Icon::get("format-text-variant"));
+        _insert_line = toolbar_icon_create(toolbar, Icon::get("vector-line"));
+        _insert_rectangle = toolbar_icon_create(toolbar, Icon::get("rectangle-outline"));
+        _insert_circle = toolbar_icon_create(toolbar, Icon::get("circle-outline"));
+
+        new Separator(toolbar);
+
+        Widget *primary_color_container = new Container(toolbar);
+        primary_color_container->min_width(22);
+        primary_color_container->insets(Insets(4));
+
+        _primary_color = new Panel(primary_color_container);
+        _primary_color->border_radius(4);
+        _primary_color->color(THEME_MIDDLEGROUND, _document->primary_color());
+
+        Widget *secondary_color_container = new Container(toolbar);
+        secondary_color_container->min_width(22);
+        secondary_color_container->insets(Insets(4));
+
+        _secondary_color = new Panel(secondary_color_container);
+        _secondary_color->border_radius(4);
+        _secondary_color->color(THEME_MIDDLEGROUND, _document->secondary_color());
+    }
+
+    void create_color_palette(Widget *parent)
+    {
+        Widget *palette = toolbar_create(parent);
+        palette->layout(HFLOW(4));
+
+        for (size_t i = 0; i < __array_length(_color_palette); i++)
+        {
+            Color color = _color_palette[i];
+
+            auto color_widget = new Panel(palette);
+            color_widget->border_radius(4);
+            color_widget->min_width(30);
+            color_widget->color(THEME_MIDDLEGROUND, color);
+
+            color_widget->on(Event::MOUSE_BUTTON_PRESS, [this, color](auto event) {
+                if (event->mouse.button == MOUSE_BUTTON_LEFT)
+                {
+                    _document->primary_color(color);
+                }
+                else if (event->mouse.button == MOUSE_BUTTON_RIGHT)
+                {
+                    _document->secondary_color(color);
+                }
+
+                update_toolbar();
+            });
+        }
+    }
+
+    void update_toolbar()
+    {
+        _primary_color->color(THEME_MIDDLEGROUND, _document->primary_color());
+        _secondary_color->color(THEME_MIDDLEGROUND, _document->secondary_color());
+    }
+};
 
 int main(int argc, char **argv)
 {
@@ -193,8 +186,11 @@ int main(int argc, char **argv)
 
     auto bitmap = Bitmap::create_shared(400, 400).take_value();
     bitmap->clear(Colors::BLACKTRANSPARENT);
+
     auto document = make<PaintDocument>(bitmap);
-    paint_create_window(document)->show();
+
+    auto window = new PaintWindow(document);
+    window->show();
 
     return application_run();
 }

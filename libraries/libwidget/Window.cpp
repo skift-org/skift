@@ -27,7 +27,7 @@ void window_populate_header(Window *window)
     auto spacer = new Container(window->header());
     spacer->attributes(LAYOUT_FILL);
 
-    if (window->flags & WINDOW_RESIZABLE)
+    if (window->_flags & WINDOW_RESIZABLE)
     {
         Widget *button_minimize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-minimize"));
         button_minimize->insets(Insets(3));
@@ -51,78 +51,57 @@ void window_populate_header(Window *window)
     });
 }
 
-void window_initialize(Window *window, WindowFlag flags)
+Window::Window(WindowFlag flags)
 {
     static int window_handle_counter = 0;
-    window->handle = window_handle_counter++;
-    window->_title = strdup("Window");
-    window->_icon = Icon::get("application");
-    window->_type = WINDOW_TYPE_REGULAR;
-    window->flags = flags;
-    window->is_maximised = false;
-    window->focused = false;
-    window->cursor_state = CURSOR_DEFAULT;
+    handle = window_handle_counter++;
+    _title = strdup("Window");
+    _icon = Icon::get("application");
+    _type = WINDOW_TYPE_REGULAR;
+    _flags = flags;
+    is_maximised = false;
+    focused = false;
+    cursor_state = CURSOR_DEFAULT;
 
-    window->frontbuffer = Bitmap::create_shared(250, 250).take_value();
-    window->frontbuffer_painter = Painter(window->frontbuffer);
+    frontbuffer = Bitmap::create_shared(250, 250).take_value();
+    frontbuffer_painter = own<Painter>(frontbuffer);
 
-    window->backbuffer = Bitmap::create_shared(250, 250).take_value();
-    window->backbuffer_painter = Painter(window->backbuffer);
+    backbuffer = Bitmap::create_shared(250, 250).take_value();
+    backbuffer_painter = own<Painter>(backbuffer);
 
-    window->_bound = Rectangle(250, 250);
-    window->dirty_rect = list_create();
+    _bound = Rectangle(250, 250);
+    dirty_rect = list_create();
 
-    window->header_container = new Container(nullptr);
-    window->header_container->window(window);
+    header_container = new Container(nullptr);
+    header_container->window(this);
 
-    window_populate_header(window);
+    window_populate_header(this);
 
-    window->root_container = new Container(nullptr);
-    window->root_container->window(window);
+    root_container = new Container(nullptr);
+    root_container->window(this);
 
-    window->focused_widget = window->root_container;
-    window->widget_by_id = hashmap_create_string_to_value();
+    focused_widget = root_container;
+    widget_by_id = hashmap_create_string_to_value();
 
-    application_add_window(window);
-    window->position(Vec2i(96, 72));
+    application_add_window(this);
+    position(Vec2i(96, 72));
 }
 
-Window *window_create(WindowFlag flags)
+Window::~Window()
 {
-    Window *window = __create(Window);
-
-    window_initialize(window, flags);
-
-    return window;
-}
-
-void window_destroy(Window *window)
-{
-    if (window->visible)
+    if (visible)
     {
-        window->hide();
+        hide();
     }
 
-    application_remove_window(window);
+    application_remove_window(this);
 
-    delete window->root_container;
-    delete window->header_container;
+    delete root_container;
+    delete header_container;
 
-    window->frontbuffer_painter.~Painter();
-    window->frontbuffer = nullptr;
+    list_destroy_with_callback(dirty_rect, free);
 
-    window->backbuffer_painter.~Painter();
-    window->backbuffer = nullptr;
-
-    list_destroy_with_callback(window->dirty_rect, free);
-
-    if (window->destroy)
-    {
-        window->destroy(window);
-    }
-
-    free(window->_title);
-    free(window);
+    free(_title);
 }
 
 static void window_change_framebuffer_if_needed(Window *window)
@@ -132,10 +111,10 @@ static void window_change_framebuffer_if_needed(Window *window)
         window->bound().area() < window->frontbuffer->bound().area() * 0.75)
     {
         window->frontbuffer = Bitmap::create_shared(window->width(), window->height()).take_value();
-        window->frontbuffer_painter = Painter(window->frontbuffer);
+        window->frontbuffer_painter = own<Painter>(window->frontbuffer);
 
         window->backbuffer = Bitmap::create_shared(window->width(), window->height()).take_value();
-        window->backbuffer_painter = Painter(window->backbuffer);
+        window->backbuffer_painter = own<Painter>(window->backbuffer);
     }
 }
 
@@ -156,7 +135,7 @@ void Window::show()
     window_change_framebuffer_if_needed(this);
 
     window_layout(this);
-    window_paint(this, this->frontbuffer_painter, bound());
+    window_paint(this, *this->frontbuffer_painter, bound());
 
     application_show_window(this);
 }
@@ -179,7 +158,7 @@ Rectangle window_header_bound(Window *window)
 
 void window_paint(Window *window, Painter &painter, Rectangle rectangle)
 {
-    if (window->flags & WINDOW_TRANSPARENT)
+    if (window->_flags & WINDOW_TRANSPARENT)
     {
         painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND).with_alpha(window->_opacity));
     }
@@ -205,7 +184,7 @@ void window_paint(Window *window, Painter &painter, Rectangle rectangle)
             window->root()->repaint(painter, rectangle);
         }
 
-        if (!(window->flags & WINDOW_BORDERLESS))
+        if (!(window->_flags & WINDOW_BORDERLESS))
         {
             if (window->header())
             {
@@ -367,7 +346,7 @@ void window_event(Window *window, Event *event)
         {
             window_do_resize(window, event->mouse.position);
         }
-        else if (borders && (window->flags & WINDOW_RESIZABLE) && !window->is_maximised)
+        else if (borders && (window->_flags & WINDOW_RESIZABLE) && !window->is_maximised)
         {
             if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
             {
@@ -444,7 +423,7 @@ void window_event(Window *window, Event *event)
             }
         }
 
-        if (!event->accepted && !(window->flags & WINDOW_BORDERLESS))
+        if (!event->accepted && !(window->_flags & WINDOW_BORDERLESS))
         {
             if (!event->accepted && window->header()->bound().contains(event->mouse.position))
             {
@@ -466,7 +445,7 @@ void window_event(Window *window, Event *event)
                 window_set_cursor(window, CURSOR_MOVE);
             }
 
-            if ((window->flags & WINDOW_RESIZABLE) &&
+            if ((window->_flags & WINDOW_RESIZABLE) &&
                 !event->accepted &&
                 !window->is_resizing &&
                 !window->is_maximised &&
@@ -657,7 +636,7 @@ void window_update(Window *window)
 
     list_foreach(Rectangle, rectangle, window->dirty_rect)
     {
-        window_paint(window, window->backbuffer_painter, *rectangle);
+        window_paint(window, *window->backbuffer_painter, *rectangle);
 
         if (repaited_regions.is_empty())
         {
@@ -728,7 +707,7 @@ void window_schedule_layout(Window *window)
 
 bool window_is_focused(Window *window)
 {
-    if (window->flags & WINDOW_ALWAYS_FOCUSED)
+    if (window->_flags & WINDOW_ALWAYS_FOCUSED)
     {
         return true;
     }
@@ -793,9 +772,4 @@ void Window::bound(Rectangle new_bound)
     window_change_framebuffer_if_needed(this);
     window_schedule_layout(this);
     window_schedule_update(this, bound());
-}
-
-void Window::type(WindowType type)
-{
-    _type = type;
 }

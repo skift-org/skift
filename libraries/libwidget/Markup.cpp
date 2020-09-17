@@ -333,7 +333,7 @@ void widget_create_childs_from_markup(Widget *parent, MarkupNode *node)
 
 Window *window_create_from_markup(MarkupNode *node)
 {
-    Window *window = window_create(WINDOW_NONE);
+    Window *window = new Window(WINDOW_NONE);
 
     int width = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "width"), 250);
 

@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
+    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED);
 
     window->title("Desktop");
     window->type(WINDOW_TYPE_DESKTOP);

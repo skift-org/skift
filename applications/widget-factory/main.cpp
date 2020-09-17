@@ -5,7 +5,7 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create(WINDOW_RESIZABLE);
+    Window *window = new Window(WINDOW_RESIZABLE);
 
     window->icon(Icon::get("widgets"));
     window->title("Widget Factory");

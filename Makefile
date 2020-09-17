@@ -13,6 +13,8 @@ DIRECTORY_GUARD=@mkdir -p $(@D)
 BUILD_ARCH?=x86_32
 BUILD_CONFIG?=debug
 BUILD_SYSTEM?=skift
+BUILD_LOADER?=multiboot
+BUILD_DISTRO?=$(BUILD_LOADER)-$(BUILD_ARCH)
 
 BUILD_TARGET=$(BUILD_CONFIG)-$(BUILD_ARCH)-$(BUILD_SYSTEM)
 BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)@$(shell git rev-parse --short HEAD || echo unknown)
@@ -20,7 +22,10 @@ BUILD_UNAME=$(shell uname -s -o -m -r)
 BUILD_DIRECTORY=$(shell pwd)/build
 
 SYSROOT=$(BUILD_DIRECTORY)/sysroot
-BOOTROOT=$(BUILD_DIRECTORY)/bootroot
+BOOTROOT=$(BUILD_DIRECTORY)/bootroot/
+BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.img
+
+RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar
 
 BUILD_DIRECTORY_LIBS=$(SYSROOT)/System/Libraries
 BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/System/Includes
@@ -85,10 +90,9 @@ include kernel/.build.mk
 include libraries/.build.mk
 include applications/.build.mk
 include icons/.build.mk
+include distro/.build.mk
 
 # --- Ramdisk -------------------------------------------- #
-
-RAMDISK=$(BOOTROOT)/boot/ramdisk.tar
 
 SYSROOT_CONTENT=$(shell find sysroot/ -type f)
 
@@ -123,20 +127,6 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 
 	@cd $(SYSROOT); tar -cf $@ *
 
-# --- Bootdisk ------------------------------------------- #
-
-BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.iso
-
-$(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) grub.cfg
-	$(DIRECTORY_GUARD)
-	@echo [GRUB-MKRESCUE] $@
-
-	@mkdir -p $(BOOTROOT)/boot/grub
-	@cp grub.cfg $(BOOTROOT)/boot/grub/
-
-	@grub-mkrescue -o $@ $(BOOTROOT) || \
-	 grub2-mkrescue -o $@ $(BOOTROOT)
-
 # --- Phony ---------------------------------------------- #
 
 .PHONY: all
@@ -152,6 +142,8 @@ QEMU_FLAGS=-m $(VM_MEMORY)M \
 		  -serial stdio \
 		  -rtc base=localtime
 
+QEMU_DISK?=-cdrom $(BOOTDISK)
+
 QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 				 -device virtio-serial \
 				 -nic user,model=virtio-net-pci \
@@ -160,15 +152,15 @@ QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
-	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA)
 
 run-qemu-no-kvm: $(BOOTDISK)
-	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_EXTRA)
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA)
 
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) -cdrom $^ $(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm
+	$(QEMU) $(QEMU_DISK)$(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm
 
 .PHONY: run-bochs
 run-bochs: $(BOOTDISK)

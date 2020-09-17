@@ -24,7 +24,7 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/system/*.cpp) \
 	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
-KERNEL_BINARY = $(BOOTROOT)/boot/kernel.bin
+KERNEL_BINARY = $(BOOTROOT)/kernel.bin
 
 KERNEL_OBJECTS = \
 	$(patsubst %.cpp, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \

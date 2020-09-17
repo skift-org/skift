@@ -3,16 +3,16 @@
 #include "arch/x86/COM.h"
 #include "arch/x86_64/x86_64.h"
 
-#include "kernel/multiboot/Stivale.h"
+#include "kernel/handover/Stivale1.h"
 
 __aligned(4096) static char stack[16384] = {};
 
 __attribute__((section(".stivalehdr"), used)) StivaleHeader header = {
     .stack = (uintptr_t)stack + sizeof(stack),
+    .flags = 1,
     .framebuffer_bpp = 32,
     .framebuffer_width = 0,
     .framebuffer_height = 0,
-    .flags = 1,
     .entry_point = 0,
 };
 

@@ -63,7 +63,10 @@ String device_claim_name(DeviceClass klass)
 
 void device_iterate(IterationCallback<RefPtr<Device>> callback)
 {
-    _devices->foreach (callback);
+    if (_devices)
+    {
+        _devices->foreach (callback);
+    }
 }
 
 void devices_handle_interrupt(int interrupt)

@@ -4,7 +4,7 @@
 <img src="manual/logo.svg" height=64 />
 <br>
 <br>
-A simple, handmade, operating system for the intel x86 cpu.
+A simple, handmade, operating system for the x86 platform.
 <br>
 <br>
 <a href="https://discord.gg/gamGsfg">Discord</a> -
@@ -20,7 +20,7 @@ A simple, handmade, operating system for the intel x86 cpu.
 
 # What skiftOS is about
 
- - **skiftOS** is a simple, handmade, operating system for the intel x86 cpu. Aiming for clean and pretty API while keeping the spirit of UNIX.
+ - **skiftOS** is a simple, handmade, operating system for the x86 platform. Aiming for clean and pretty API while keeping the spirit of UNIX.
  - **skiftOS** is pretty easy to build from source, just follow the [build guide](manual/building.md)
  - **skiftOS is a student project, don't expect it to be secure or stable at this stage.**
 

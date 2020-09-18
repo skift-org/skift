@@ -60,10 +60,10 @@ bool is_multiboot1(uint32_t magic);
 
 bool is_multiboot2(uint32_t magic);
 
-bool is_stival1(uint32_t magic);
+bool is_stivale1(uint32_t magic);
 
 void multiboot1_parse_header(Handover *handover, void *header_ptr);
 
 void multiboot2_parse_header(Handover *handover, void *header_ptr);
 
-void stival1_parse_header(Handover *handover, void *header_ptr);
+void stivale1_parse_header(Handover *handover, void *header_ptr);

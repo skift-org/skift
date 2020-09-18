@@ -1,7 +1,5 @@
 #include <libsystem/Common.h>
 
-#include "kernel/handover/Stivale1.h"
-
 extern "C" void arch_main(void *info, uint32_t magic);
 
 extern "C" void _kstart_stivale1(void *info)

@@ -1,37 +1,38 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 
-#include "kernel/handover/Handover.h"
-#include "kernel/handover/Stivale1.h"
+#include <thirdparty/limine/stivale/stivale.h>
 
-bool is_stival1(uint32_t magic)
+#include "kernel/handover/Handover.h"
+
+bool is_stivale1(uint32_t magic)
 {
     return magic == 0x7374766c;
 }
 
-void stival1_parse_header(Handover *handover, void *header_ptr)
+void stivale1_parse_header(Handover *handover, void *header_ptr)
 {
-    auto info = reinterpret_cast<Stivale1Info *>(header_ptr);
+    auto info = reinterpret_cast<stivale_struct *>(header_ptr);
 
     strncpy(handover->bootloader, "Stivale1 compliant", HANDOVER_BOOTLOADER_NAME_SIZE);
     strncpy(handover->command_line, reinterpret_cast<const char *>(info->cmdline), HANDOVER_COMMAND_LINE_SIZE);
 
-    Stivale1Module *module = reinterpret_cast<Stivale1Module *>(info->modules);
+    auto module = reinterpret_cast<stivale_module *>(info->modules);
     while (module)
     {
         Module *m = &handover->modules[handover->modules_size];
         m->range = MemoryRange::around_non_aligned_address(module->begin, module->end - module->begin);
         strncpy(m->command_line, (const char *)module->string, HANDOVER_COMMAND_LINE_SIZE);
 
-        module = reinterpret_cast<Stivale1Module *>(module->next);
+        module = reinterpret_cast<stivale_module *>(module->next);
         handover->modules_size++;
     }
 
-    Stivale1Memory *memory = reinterpret_cast<Stivale1Memory *>(info->memory_map_addr);
+    auto memory = reinterpret_cast<stivale_mmap_entry *>(info->memory_map_addr);
 
     for (size_t i = 0; i < info->memory_map_entries; i++)
     {
-        Stivale1Memory *entry = &memory[i];
+        auto entry = &memory[i];
 
         if ((entry->base > UINT32_MAX) ||
             (entry->base + entry->length > UINT32_MAX))
@@ -39,8 +40,8 @@ void stival1_parse_header(Handover *handover, void *header_ptr)
             continue;
         }
 
-        if (entry->type == Stivale1MemoryType::USABLE ||
-            entry->type == Stivale1MemoryType::KERNEL)
+        if (entry->type == STIVALE_MMAP_USABLE ||
+            entry->type == STIVALE_MMAP_KERNEL_AND_MODULES)
         {
             handover->memory_usable += entry->length;
         }
@@ -50,17 +51,17 @@ void stival1_parse_header(Handover *handover, void *header_ptr)
 
         switch (entry->type)
         {
-        case Stivale1MemoryType::USABLE:
-        case Stivale1MemoryType::KERNEL:
+        case STIVALE_MMAP_USABLE:
+        case STIVALE_MMAP_KERNEL_AND_MODULES:
             e->type = MEMORY_MAP_ENTRY_AVAILABLE;
             break;
-        case Stivale1MemoryType::ACPI_RECLAIMABLE:
+        case STIVALE_MMAP_ACPI_RECLAIMABLE:
             e->type = MEMORY_MAP_ENTRY_ACPI_RECLAIMABLE;
             break;
-        case Stivale1MemoryType::NVS:
+        case STIVALE_MMAP_ACPI_NVS:
             e->type = MEMORY_MAP_ENTRY_NVS;
             break;
-        case Stivale1MemoryType::BADRAM:
+        case STIVALE_MMAP_BAD_MEMORY:
             e->type = MEMORY_MAP_ENTRY_BADRAM;
             break;
         default:

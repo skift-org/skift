@@ -17,7 +17,7 @@ const char *entry_type_to_string[] = {
 
 void handover_assert(uint32_t magic)
 {
-    if (!(is_multiboot1(magic) || is_multiboot2(magic) || is_stival1(magic)))
+    if (!(is_multiboot1(magic) || is_multiboot2(magic) || is_stivale1(magic)))
     {
         system_panic("Wrong bootloader please use any multiboot/stival bootloader\n\tMagic number: 0x%08x!", magic);
     }
@@ -69,9 +69,9 @@ Handover *handover_initialize(void *header, uint32_t magic)
     {
         multiboot2_parse_header(&_handover, header);
     }
-    else if (is_stival1(magic))
+    else if (is_stivale1(magic))
     {
-        stival1_parse_header(&_handover, header);
+        stivale1_parse_header(&_handover, header);
     }
     else
     {

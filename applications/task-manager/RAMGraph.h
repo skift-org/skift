@@ -16,8 +16,8 @@ private:
     Label *_label_available;
     Label *_label_greedy;
 
-    RefPtr<Timer> _graph_timer{};
-    RefPtr<Timer> _text_timer{};
+    OwnPtr<Timer> _graph_timer{};
+    OwnPtr<Timer> _text_timer{};
 
 public:
     RAMGraph(Widget *parent, TaskModel *model)
@@ -40,14 +40,14 @@ public:
         _label_available = new Label(this, "Available: nil Mio", Position::RIGHT);
         _label_greedy = new Label(this, "Most greedy: nil", Position::RIGHT);
 
-        _graph_timer = make<Timer>(500, [&]() {
+        _graph_timer = own<Timer>(500, [&]() {
             SystemStatus status = system_get_status();
             record(status.used_ram / (float)status.total_ram);
         });
 
         _graph_timer->start();
 
-        _text_timer = make<Timer>(1000, [&]() {
+        _text_timer = own<Timer>(1000, [&]() {
             SystemStatus status = system_get_status();
 
             unsigned usage = status.used_ram / 1024 / 1024;

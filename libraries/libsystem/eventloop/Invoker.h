@@ -4,7 +4,7 @@
 #include <libutils/Callback.h>
 #include <libutils/RefCounted.h>
 
-class Invoker : public RefCounted<Invoker>
+class Invoker
 {
 private:
     bool _invoke_later = false;

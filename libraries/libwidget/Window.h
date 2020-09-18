@@ -2,6 +2,7 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
+#include <libsystem/eventloop/Invoker.h>
 #include <libsystem/utils/HashMap.h>
 #include <libutils/Vector.h>
 #include <libwidget/Cursor.h>
@@ -59,6 +60,10 @@ struct Window
     Widget *mouse_over_widget = nullptr;
     HashMap *widget_by_id = nullptr;
 
+    OwnPtr<Invoker> _repaint_invoker;
+
+    OwnPtr<Invoker> _relayout_invoker;
+
 public:
     void title(const char *title);
 
@@ -109,11 +114,19 @@ public:
     void show();
 
     void hide();
+
+    void repaint(Rectangle rectangle);
+
+    void repaint_dirty();
+
+    void relayout();
+
+    void should_repaint(Rectangle rectangle);
+
+    void should_relayout();
 };
 
 bool window_is_visible(Window *window);
-
-void window_paint(Window *window, Painter &painter, Rectangle rectangle);
 
 void window_event(Window *window, Event *event);
 
@@ -132,10 +145,6 @@ int window_handle(Window *window);
 int window_frontbuffer_handle(Window *window);
 
 int window_backbuffer_handle(Window *window);
-
-void window_schedule_update(Window *window, Rectangle rectangle);
-
-void window_schedule_layout(Window *window);
 
 bool window_is_focused(Window *window);
 

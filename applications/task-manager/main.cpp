@@ -18,7 +18,7 @@ private:
 
     Table *_table;
     TaskModel *_table_model;
-    RefPtr<Timer> _table_timer;
+    OwnPtr<Timer> _table_timer;
 
 public:
     TaskManagerWindow() : Window(WINDOW_RESIZABLE)
@@ -43,7 +43,7 @@ public:
 
         _table = new Table(root(), _table_model);
         _table->attributes(LAYOUT_FILL);
-        _table_timer = make<Timer>(1000, [&]() { widget_table_update(); });
+        _table_timer = own<Timer>(1000, [&]() { widget_table_update(); });
         _table_timer->start();
 
         /// --- Graphs --- ///

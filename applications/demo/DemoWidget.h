@@ -12,7 +12,7 @@ private:
 
     RefPtr<Bitmap> _bitmap;
     OwnPtr<Painter> _painter;
-    RefPtr<Timer> _timer;
+    OwnPtr<Timer> _timer;
 
 public:
     Demo *demo() { return _demo; }

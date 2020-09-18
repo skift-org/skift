@@ -281,7 +281,7 @@ void Widget::should_relayout()
 {
     if (_window)
     {
-        window_schedule_layout(_window);
+        _window->should_relayout();
     }
 }
 
@@ -486,7 +486,7 @@ void Widget::should_repaint()
 {
     if (_window)
     {
-        window_schedule_update(_window, bound());
+        _window->should_repaint(bound());
     }
 }
 
@@ -494,7 +494,7 @@ void Widget::should_repaint(Rectangle rectangle)
 {
     if (_window)
     {
-        window_schedule_update(_window, rectangle);
+        _window->should_repaint(rectangle);
     }
 }
 

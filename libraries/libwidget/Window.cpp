@@ -11,6 +11,8 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
+Rectangle window_header_bound(Window *window);
+
 void window_populate_header(Window *window)
 {
     window->header_container->clear_children();
@@ -83,6 +85,14 @@ Window::Window(WindowFlag flags)
     focused_widget = root_container;
     widget_by_id = hashmap_create_string_to_value();
 
+    _repaint_invoker = own<Invoker>([this]() {
+        repaint_dirty();
+    });
+
+    _relayout_invoker = own<Invoker>([this]() {
+        relayout();
+    });
+
     application_add_window(this);
     position(Vec2i(96, 72));
 }
@@ -104,6 +114,130 @@ Window::~Window()
     free(_title);
 }
 
+void Window::repaint(Rectangle rectangle)
+{
+    Painter &painter = *backbuffer_painter;
+
+    if (_flags & WINDOW_TRANSPARENT)
+    {
+        painter.clear_rectangle(rectangle, window_get_color(this, THEME_BACKGROUND).with_alpha(_opacity));
+    }
+    else
+    {
+        painter.clear_rectangle(rectangle, window_get_color(this, THEME_BACKGROUND));
+    }
+
+    painter.push();
+    painter.clip(rectangle);
+
+    if (content_bound().contains(rectangle))
+    {
+        if (root())
+        {
+            root()->repaint(painter, rectangle);
+        }
+    }
+    else
+    {
+        if (root())
+        {
+            root()->repaint(painter, rectangle);
+        }
+
+        if (!(_flags & WINDOW_BORDERLESS))
+        {
+            if (header())
+            {
+                header()->repaint(painter, rectangle);
+            }
+
+            painter.draw_rectangle(bound(), window_get_color(this, THEME_ACCENT));
+        }
+    }
+
+    painter.pop();
+}
+
+void Window::repaint_dirty()
+{
+    // FIXME: find a better way to schedule update after layout.
+
+    if (dirty_layout)
+    {
+        relayout();
+    }
+
+    Rectangle repaited_regions = Rectangle::empty();
+
+    list_foreach(Rectangle, rectangle, dirty_rect)
+    {
+        repaint(*rectangle);
+
+        if (repaited_regions.is_empty())
+        {
+            repaited_regions = *rectangle;
+        }
+        else
+        {
+            repaited_regions = rectangle->merged_with(repaited_regions);
+        }
+    }
+
+    list_clear_with_callback(dirty_rect, free);
+
+    frontbuffer->copy_from(*backbuffer, repaited_regions);
+
+    swap(frontbuffer, backbuffer);
+    swap(frontbuffer_painter, backbuffer_painter);
+
+    application_flip_window(this, repaited_regions);
+}
+
+void Window::relayout()
+{
+    header()->bound(window_header_bound(this));
+    header()->relayout();
+
+    root()->bound(content_bound());
+    root()->relayout();
+
+    dirty_layout = false;
+}
+
+void Window::should_repaint(Rectangle rectangle)
+{
+    if (!visible)
+        return;
+
+    if (dirty_rect->empty())
+    {
+        _repaint_invoker->invoke_later();
+    }
+
+    list_foreach(Rectangle, dirty_rect, dirty_rect)
+    {
+        if (dirty_rect->colide_with(rectangle))
+        {
+            *dirty_rect = dirty_rect->merged_with(rectangle);
+            return;
+        }
+    }
+
+    Rectangle *dirty = __create(Rectangle);
+    *dirty = rectangle;
+    list_pushback(dirty_rect, dirty);
+}
+
+void Window::should_relayout()
+{
+    if (dirty_layout || !visible)
+        return;
+
+    dirty_layout = true;
+
+    _relayout_invoker->invoke_later();
+}
+
 static void window_change_framebuffer_if_needed(Window *window)
 {
     if (window->bound().width() > window->frontbuffer->width() ||
@@ -123,8 +257,6 @@ bool window_is_visible(Window *window)
     return window->visible;
 }
 
-void window_layout(Window *window);
-
 void Window::show()
 {
     if (visible)
@@ -134,8 +266,8 @@ void Window::show()
 
     window_change_framebuffer_if_needed(this);
 
-    window_layout(this);
-    window_paint(this, *this->frontbuffer_painter, bound());
+    relayout();
+    repaint(bound());
 
     application_show_window(this);
 }
@@ -154,48 +286,6 @@ void Window::hide()
 Rectangle window_header_bound(Window *window)
 {
     return window->bound().take_top(WINDOW_HEADER_AREA);
-}
-
-void window_paint(Window *window, Painter &painter, Rectangle rectangle)
-{
-    if (window->_flags & WINDOW_TRANSPARENT)
-    {
-        painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND).with_alpha(window->_opacity));
-    }
-    else
-    {
-        painter.clear_rectangle(rectangle, window_get_color(window, THEME_BACKGROUND));
-    }
-
-    painter.push();
-    painter.clip(rectangle);
-
-    if (window->content_bound().contains(rectangle))
-    {
-        if (window->root())
-        {
-            window->root()->repaint(painter, rectangle);
-        }
-    }
-    else
-    {
-        if (window->root())
-        {
-            window->root()->repaint(painter, rectangle);
-        }
-
-        if (!(window->_flags & WINDOW_BORDERLESS))
-        {
-            if (window->header())
-            {
-                window->header()->repaint(painter, rectangle);
-            }
-
-            painter.draw_rectangle(window->bound(), window_get_color(window, THEME_ACCENT));
-        }
-    }
-
-    painter.pop();
 }
 
 RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
@@ -302,14 +392,15 @@ void window_event(Window *window, Event *event)
     case Event::GOT_FOCUS:
     {
         window->focused = true;
-        window_schedule_update(window, window->bound());
+
+        window->should_repaint(window->bound());
     }
     break;
 
     case Event::LOST_FOCUS:
     {
         window->focused = false;
-        window_schedule_update(window, window->bound());
+        window->should_repaint(window->bound());
 
         Event mouse_leave = *event;
         mouse_leave.type = Event::MOUSE_LEAVE;
@@ -621,90 +712,6 @@ Widget *window_root(Window *window)
     return window->root_container;
 }
 
-void window_layout(Window *window);
-
-void window_update(Window *window)
-{
-    // FIXME: find a better way to schedule update after layout.
-
-    if (window->dirty_layout)
-    {
-        window_layout(window);
-    }
-
-    Rectangle repaited_regions = Rectangle::empty();
-
-    list_foreach(Rectangle, rectangle, window->dirty_rect)
-    {
-        window_paint(window, *window->backbuffer_painter, *rectangle);
-
-        if (repaited_regions.is_empty())
-        {
-            repaited_regions = *rectangle;
-        }
-        else
-        {
-            repaited_regions = rectangle->merged_with(repaited_regions);
-        }
-    }
-
-    list_clear_with_callback(window->dirty_rect, free);
-
-    window->frontbuffer->copy_from(*window->backbuffer, repaited_regions);
-
-    swap(window->frontbuffer, window->backbuffer);
-    swap(window->frontbuffer_painter, window->backbuffer_painter);
-
-    application_flip_window(window, repaited_regions);
-}
-
-void window_schedule_update(Window *window, Rectangle rectangle)
-{
-    if (!window->visible)
-        return;
-
-    if (window->dirty_rect->empty())
-    {
-        eventloop_run_later((RunLaterCallback)window_update, window);
-    }
-
-    list_foreach(Rectangle, dirty_rect, window->dirty_rect)
-    {
-        if (dirty_rect->colide_with(rectangle))
-        {
-            *dirty_rect = dirty_rect->merged_with(rectangle);
-            return;
-        }
-    }
-
-    Rectangle *dirty_rect = __create(Rectangle);
-
-    *dirty_rect = rectangle;
-
-    list_pushback(window->dirty_rect, dirty_rect);
-}
-
-void window_layout(Window *window)
-{
-    window->header()->bound(window_header_bound(window));
-    window->header()->relayout();
-
-    window->root()->bound(window->content_bound());
-    window->root()->relayout();
-
-    window->dirty_layout = false;
-}
-
-void window_schedule_layout(Window *window)
-{
-    if (window->dirty_layout || !window->visible)
-        return;
-
-    window->dirty_layout = true;
-
-    eventloop_run_later((RunLaterCallback)window_layout, window);
-}
-
 bool window_is_focused(Window *window)
 {
     if (window->_flags & WINDOW_ALWAYS_FOCUSED)
@@ -770,6 +777,7 @@ void Window::bound(Rectangle new_bound)
     application_resize_window(this, _bound);
 
     window_change_framebuffer_if_needed(this);
-    window_schedule_layout(this);
-    window_schedule_update(this, bound());
+
+    should_relayout();
+    should_repaint(bound());
 }

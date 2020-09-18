@@ -4,7 +4,7 @@
 #include <libutils/Callback.h>
 #include <libutils/RefPtr.h>
 
-class Timer : public RefCounted<Timer>
+class Timer
 {
 private:
     bool _running = false;

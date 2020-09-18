@@ -25,7 +25,7 @@ private:
     Stream *_master_stream;
     Stream *_slave_stream;
 
-    RefPtr<Timer> _cursor_blink_timer;
+    OwnPtr<Timer> _cursor_blink_timer;
     Notifier *_master_notifier;
 
 public:

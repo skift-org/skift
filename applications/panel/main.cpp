@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
     new Label(panel_container, "user");
 
-    auto clock_timer = make<Timer>(1000, [&]() {
+    auto clock_timer = own<Timer>(1000, [&]() {
         TimeStamp timestamp = timestamp_now();
         DateTime datetime = timestamp_to_datetime(timestamp);
 
@@ -62,14 +62,14 @@ int main(int argc, char **argv)
 
     clock_timer->start();
 
-    auto ram_timer = make<Timer>(500, [&]() {
+    auto ram_timer = own<Timer>(500, [&]() {
         SystemStatus status = system_get_status();
         ram_graph->record(status.used_ram / (float)status.total_ram);
     });
 
     ram_timer->start();
 
-    auto cpu_timer = make<Timer>(100, [&]() {
+    auto cpu_timer = own<Timer>(100, [&]() {
         SystemStatus status = system_get_status();
         cpu_graph->record(status.cpu_usage / 100.0);
     });

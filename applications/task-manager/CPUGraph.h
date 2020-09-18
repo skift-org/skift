@@ -16,8 +16,8 @@ private:
     Label *_label_greedy;
     Label *_label_uptime;
 
-    RefPtr<Timer> _graph_timer{};
-    RefPtr<Timer> _text_timer{};
+    OwnPtr<Timer> _graph_timer{};
+    OwnPtr<Timer> _text_timer{};
 
 public:
     CPUGraph(Widget *parent, TaskModel *model)
@@ -40,14 +40,14 @@ public:
         _label_greedy = new Label(this, "Most greedy: nil", Position::RIGHT);
         _label_uptime = new Label(this, "Uptime: nil", Position::RIGHT);
 
-        _graph_timer = make<Timer>(100, [&]() {
+        _graph_timer = own<Timer>(100, [&]() {
             SystemStatus status = system_get_status();
             record(status.cpu_usage / 100.0);
         });
 
         _graph_timer->start();
 
-        _text_timer = make<Timer>(1000, [&]() {
+        _text_timer = own<Timer>(1000, [&]() {
             SystemStatus status = system_get_status();
             const char *greedy = task_model_get_greedy_process(_model, 1);
 

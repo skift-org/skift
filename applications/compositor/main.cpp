@@ -138,7 +138,7 @@ int main(int argc, char const *argv[])
     notifier_create(nullptr, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
     notifier_create(nullptr, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
 
-    auto repaint_timer = make<Timer>(1000 / 60, []() {
+    auto repaint_timer = own<Timer>(1000 / 60, []() {
         renderer_repaint_dirty();
         client_destroy_disconnected();
     });

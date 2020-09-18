@@ -50,7 +50,7 @@ TerminalWidget::TerminalWidget(Widget *parent)
         SELECT_READ,
         (NotifierCallback)terminal_widget_master_callback);
 
-    _cursor_blink_timer = make<Timer>(250, [this]() {
+    _cursor_blink_timer = own<Timer>(250, [this]() {
         blink();
 
         int cx = terminal()->cursor.x;

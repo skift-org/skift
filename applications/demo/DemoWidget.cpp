@@ -13,7 +13,7 @@ DemoWidget::DemoWidget(Widget *parent)
     : Widget(parent)
 {
     _demo = nullptr;
-    _timer = make<Timer>(1000 / 60, [this]() {
+    _timer = own<Timer>(1000 / 60, [this]() {
         tick();
         should_repaint();
     });

@@ -81,9 +81,7 @@ Result BGA::call(FsHandle &handle, IOCall request, void *args)
     else if (request == IOCALL_DISPLAY_SET_MODE)
     {
         IOCallDisplayModeArgs *mode = (IOCallDisplayModeArgs *)args;
-        set_resolution(mode->width, mode->height);
-
-        return SUCCESS;
+        return set_resolution(mode->width, mode->height);
     }
     else if (request == IOCALL_DISPLAY_BLIT)
     {

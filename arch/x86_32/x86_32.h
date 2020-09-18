@@ -47,6 +47,22 @@ static inline uint32_t CR4()
     return r;
 }
 
+static inline uint32_t EBP()
+{
+    uint32_t r;
+    asm volatile("mov %%ebp, %0"
+                 : "=r"(r));
+    return r;
+}
+
+static inline uint32_t ESP()
+{
+    uint32_t r;
+    asm volatile("mov %%esp, %0"
+                 : "=r"(r));
+    return r;
+}
+
 static inline uint8_t in8(uint16_t port)
 {
     uint8_t data;

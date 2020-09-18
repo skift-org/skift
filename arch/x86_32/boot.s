@@ -73,6 +73,21 @@ align 8
 	dd 8
 __multiboot_header_end:
 
+;; --- Stival1 Header ------------------------------------------------------- ;;
+
+section .stivalehdr
+
+extern _kstart_stivale1
+
+align 4
+__stivale1_header:
+	dq __stack_top
+	dw 1
+	dw 0
+	dw 0
+	dw 32
+	dq _kstart_stivale1
+
 ;; --- kernel stack --------------------------------------------------------- ;;
 
 section .bss
@@ -80,6 +95,7 @@ align 16
 
 global __stack_bottom
 global __stack_top
+
 __stack_bottom:
 resb 16384 ; 16 KiB
 __stack_top:
@@ -87,10 +103,12 @@ __stack_top:
 ;; --- kernel entry point --------------------------------------------------- ;;
 
 section .text
+
 global _kstart:function (_kstart.end - _kstart)
 _kstart:
 	cli
 	cld
+
 	; To set up a stack, we set the esp register to point to the top of our
 	; stack (as it grows downwards on x86 systems).
 	mov esp, __stack_top
@@ -103,6 +121,9 @@ _kstart:
 	call arch_main
 
 	cli
-.hang:	hlt
+
+.hang:
+	hlt
 	jmp .hang
+
 .end:

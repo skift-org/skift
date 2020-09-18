@@ -2,7 +2,7 @@
 
 #include <libsystem/Common.h>
 
-struct __packed StivaleHeader
+struct __packed Stivale1Header
 {
     uint64_t stack;
     uint16_t flags;
@@ -12,7 +12,7 @@ struct __packed StivaleHeader
     uint64_t entry_point;
 };
 
-struct __packed StivaleModule
+struct __packed Stivale1Module
 {
     uint64_t begin;
     uint64_t end;
@@ -20,7 +20,25 @@ struct __packed StivaleModule
     uint64_t next;
 };
 
-struct __packed StivaleStruct
+enum Stivale1MemoryType
+{
+    USABLE = 1,
+    RESERVED = 2,
+    ACPI_RECLAIMABLE = 3,
+    NVS = 4,
+    BADRAM = 5,
+    KERNEL = 10,
+};
+
+struct __packed Stivale1Memory
+{
+    uint64_t base;   // Base of the memory section
+    uint64_t length; // Length of the section
+    uint32_t type;   // Type (described below)
+    uint32_t unused;
+};
+
+struct __packed Stivale1Info
 {
     uint64_t cmdline;
     uint64_t memory_map_addr;

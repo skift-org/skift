@@ -370,7 +370,11 @@ void task_exit(int exit_value)
 
 void task_dump(Task *task)
 {
-    atomic_begin();
+    if (!task)
+        return;
+
+    AtomicHolder holder;
+
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state));
     printf("\n\t   Memory: ");
@@ -386,5 +390,4 @@ void task_dump(Task *task)
     }
 
     printf("\n");
-    atomic_end();
 }

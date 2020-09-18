@@ -48,7 +48,6 @@ struct Handover
     size_t framebuffer_height;
     size_t framebuffer_pitch;
 
-    size_t acpi_rsdp_size;
     uintptr_t acpi_rsdp_address;
 };
 

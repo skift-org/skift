@@ -136,7 +136,6 @@ void multiboot2_parse_header(Handover *handover, void *header_ptr)
 
         case MULTIBOOT_TAG_TYPE_ACPI_OLD:
             handover->acpi_rsdp_address = (uintptr_t) & ((struct multiboot_tag_old_acpi *)tag)->rsdp;
-            handover->acpi_rsdp_size = ((struct multiboot_tag_old_acpi *)tag)->size;
             break;
 
         default:

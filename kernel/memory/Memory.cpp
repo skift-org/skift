@@ -9,6 +9,7 @@
 #include "kernel/memory/MemoryObject.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/memory/Virtual.h"
+#include "kernel/graphics/Graphics.h"
 
 static bool _memory_initialized = false;
 
@@ -67,6 +68,8 @@ void memory_initialize(Handover *handover)
     physical_set_used(page_zero);
 
     memory_pdir_switch(&kpdir);
+
+    graphic_did_find_framebuffer(0, 0, 0);
     paging_enable();
 
     logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);

@@ -10,6 +10,7 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
+#include "kernel/graphics/EarlyConsole.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
@@ -204,7 +205,10 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     {
         handle->result = SUCCESS;
 
-        return arch_debug_write(buffer, size);
+        early_console_write(buffer, size);
+        arch_debug_write(buffer, size);
+
+        return size;
     }
     else
     {

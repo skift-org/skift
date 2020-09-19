@@ -3,6 +3,7 @@
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
+#include "kernel/graphics/EarlyConsole.h"
 #include "kernel/tasking/Userspace.h"
 
 void userspace_initialize()
@@ -17,6 +18,8 @@ void userspace_initialize()
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 1);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 2);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 3);
+
+    early_console_disable(); // We disable the early console to prevent artefact.
 
     int init_process = -1;
     Result result = launchpad_launch(init_lauchpad, &init_process);

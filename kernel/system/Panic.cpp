@@ -4,6 +4,7 @@
 #include "arch/x86_32/CPUID.h"
 #include "arch/x86_32/Interrupts.h"
 
+#include "kernel/graphics/EarlyConsole.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
@@ -60,6 +61,8 @@ void system_panic_internal(
 {
     atomic_begin();
     atomic_disable();
+
+    early_console_enable();
 
     va_list va;
     va_start(va, message);

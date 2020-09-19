@@ -45,7 +45,7 @@ BGA::BGA(DeviceAddress address) : PCIDevice(address, DeviceClass::FRAMEBUFFER)
 {
     _framebuffer = make<MMIORange>(bar(0).range());
     set_resolution(1024, 768);
-    graphic_did_find_framebuffer();
+    graphic_did_find_framebuffer(_framebuffer->base(), 1024, 768);
 }
 
 size_t BGA::size(FsHandle &handle)
@@ -81,7 +81,15 @@ Result BGA::call(FsHandle &handle, IOCall request, void *args)
     else if (request == IOCALL_DISPLAY_SET_MODE)
     {
         IOCallDisplayModeArgs *mode = (IOCallDisplayModeArgs *)args;
-        return set_resolution(mode->width, mode->height);
+
+        Result result = set_resolution(mode->width, mode->height);
+
+        if (result == SUCCESS)
+        {
+            graphic_did_find_framebuffer(_framebuffer->base(), mode->width, mode->height);
+        }
+
+        return result;
     }
     else if (request == IOCALL_DISPLAY_BLIT)
     {

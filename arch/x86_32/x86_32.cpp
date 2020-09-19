@@ -13,6 +13,7 @@
 #include "arch/x86_32/x86_32.h"
 
 #include "kernel/firmware/SMBIOS.h"
+#include "kernel/graphics/Graphics.h"
 #include "kernel/system/System.h"
 
 void arch_disable_interrupts() { cli(); }
@@ -51,6 +52,8 @@ extern "C" void arch_main(void *info, uint32_t magic)
     logger_info("ESP=%08x EBP=%08x", ESP(), EBP());
 
     auto handover = handover_initialize(info, magic);
+
+    graphic_early_initialize(handover);
 
     if (handover->memory_usable < 127 * 1024)
     {

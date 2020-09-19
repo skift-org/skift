@@ -9,7 +9,7 @@ RefPtr<TextModel> TextModel::empty()
 
 RefPtr<TextModel> TextModel::from_file(const char *path)
 {
-    auto model = empty();
+    auto model = make<TextModel>();
 
     Stream *stream = stream_open(path, OPEN_READ | OPEN_BUFFERED);
 
@@ -41,6 +41,11 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
     }
 
     model->span_add(TextModelSpan(0, 0, 10, THEME_ANSI_RED, THEME_ANSI_BLUE));
+
+    if (model->line_count() == 0)
+    {
+        model->append_line(own<TextModelLine>());
+    }
 
     return model;
 }
@@ -106,7 +111,7 @@ void TextModel::newline_at(TextCursor &cursor)
     _lines.insert(cursor.line() + 1, right_side_line);
 
     cursor.move_down_within(*this);
-    cursor.move_to_within(*right_side_line, 0);
+    cursor.move_to_beginning_of_the_line();
 }
 
 void TextModel::move_line_up_at(TextCursor &cursor)

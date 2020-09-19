@@ -194,6 +194,12 @@ public:
         _prefered_column = _column;
     }
 
+    void move_to_beginning_of_the_line()
+    {
+        _column = 0;
+        _prefered_column = 0;
+    }
+
     void move_up_within(TextModel &model)
     {
         __unused(model);

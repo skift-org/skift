@@ -49,7 +49,7 @@ void __plug_fini(int exit_code)
 
     if (in_stream)
     {
-        stream_flush(out_stream);
+        stream_flush(in_stream);
     }
 
     if (out_stream)

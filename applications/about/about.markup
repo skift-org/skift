@@ -4,10 +4,10 @@
     width="250"
     height="250"
     layout="vflow(8)"
-    padding="insets(4)"
+    padding="insets(6)"
     >
 
-    <Container layout="vflow(8)" fill>
+    <Container layout="vflow(4)" fill>
         <Image id="system-image" fill/>
 
         <Label text="The skift operating system." position="center"/>

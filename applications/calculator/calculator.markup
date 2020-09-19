@@ -11,7 +11,7 @@
         <Label text="#value"/>
     </Panel>
 
-    <Container layout="grid(4, 6, 2, 2)" fill>
+    <Container layout="grid(4, 6, 4, 4)" fill>
         <Button icon="percent" outlined/> <Button text="CE" outlined/> <Button text="C" outlined/> <Button icon="backspace-outline" outlined/>
         <Button text="1/x" outlined/> <Button icon="exponent" outlined/> <Button icon="square-root" outlined/> <Button icon="slash-forward" outlined/>
         <Button text="7"/> <Button text="8" /> <Button text="9" /> <Button icon="close" outlined/>

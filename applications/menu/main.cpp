@@ -147,7 +147,25 @@ int main(int argc, char **argv)
 
     window->root()->layout(HFLOW(0));
 
-    menu_create_list(window->root(), menu);
+    auto containter = new Container(window->root());
+    containter->layout(VFLOW(0));
+    containter->attributes(LAYOUT_FILL);
+
+    menu_create_list(containter, menu);
+
+    auto bottom_container = new Panel(containter);
+
+    bottom_container->layout(HFLOW(4));
+    bottom_container->insets({6});
+
+    new IconPanel(bottom_container, Icon::get("account"));
+
+    auto user_name_label = new Label(bottom_container, "User");
+    user_name_label->attributes(LAYOUT_FILL);
+
+    new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
+    new Button(bottom_container, BUTTON_TEXT, Icon::get("cog"));
+    new Button(bottom_container, BUTTON_TEXT, Icon::get("power-standby"));
 
     new Separator(window->root());
 

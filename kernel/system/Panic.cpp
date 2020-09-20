@@ -63,7 +63,7 @@ void system_panic_internal(
     atomic_begin();
     atomic_disable();
 
-    font_set_bg(0xffff0000);
+    font_set_bg(0xff333333);
 
     early_console_enable();
 

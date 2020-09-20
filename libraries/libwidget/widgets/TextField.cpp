@@ -63,7 +63,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
         // Line content
         auto &line = _model->line(i);
 
-        Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(-_hscroll_offset, LINE_HEIGHT / 2 + 4);
+        Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(0, LINE_HEIGHT / 2 + 4);
 
         for (size_t j = 0; j < line.length(); j++)
         {

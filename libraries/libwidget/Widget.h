@@ -70,7 +70,7 @@ private:
     int _min_width = 0;
     Insets _insets = {};
     WidgetColor _colors[__THEME_COLOR_COUNT] = {};
-    Layout _layout = {}; // FIXME: this shoul be a separeted object
+    Layout _layout = {};
     LayoutAttributes _layout_attributes = {};
 
     EventHandler _handlers[EventType::__COUNT] = {};

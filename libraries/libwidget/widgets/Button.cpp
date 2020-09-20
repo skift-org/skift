@@ -82,7 +82,7 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insets(4, 4));
+    insets(Insets(6));
 
     new IconPanel(this, icon);
 }
@@ -91,7 +91,7 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insets(0, 0, 8, 8));
+    insets(Insets(0, 0, 6, 6));
     min_width(64);
 
     new Label(this, text, Position::CENTER);

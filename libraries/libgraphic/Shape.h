@@ -161,6 +161,14 @@ public:
     {
     }
 
+    Rectangle(Vec2i size)
+        : _x(0),
+          _y(0),
+          _width(size.x()),
+          _height(size.y())
+    {
+    }
+
     Rectangle(Vec2i position, Vec2i size)
         : _x(position.x()),
           _y(position.y()),

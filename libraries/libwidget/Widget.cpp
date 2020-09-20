@@ -287,15 +287,16 @@ void Widget::should_relayout()
 
 Vec2i Widget::size()
 {
+    if (_childs->count() == 0)
+    {
+        return Vec2i(0);
+    }
+
     int width = 0;
     int height = 0;
 
     if (_layout.type == LAYOUT_STACK)
     {
-
-        width = _min_width;
-        height = _min_height;
-
         list_foreach(Widget, child, _childs)
         {
             Vec2i child_size = child->compute_size();
@@ -477,7 +478,9 @@ void Widget::repaint(Painter &painter, Rectangle rectangle)
     }
 
     if (application_is_debbuging_layout())
+    {
         painter.draw_rectangle(bound(), Colors::CYAN.with_alpha(0.25));
+    }
 
     painter.pop();
 }
@@ -540,11 +543,8 @@ Vec2i Widget::compute_size()
     int width = size.x();
     int height = size.y();
 
-    width += _insets.left();
-    width += _insets.right();
-
-    height += _insets.top();
-    height += _insets.bottom();
+    width += _insets.left() + _insets.right();
+    height += _insets.top() + _insets.bottom();
 
     if (_max_width)
     {

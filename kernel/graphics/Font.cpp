@@ -132,6 +132,12 @@ static uint8_t font8x8_basic[128][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // U+007F
 };
 
+static int fg = 0x00ffffff;
+static int bg = 0xff000000;
+
+void font_set_fg(int color) { fg = color; }
+void font_set_bg(int color) { bg = color; }
+
 int font_height() { return 8; }
 
 int font_width() { return 8; }
@@ -154,11 +160,11 @@ void font_draw(Codepoint cp, int x, int y)
 
             if (set)
             {
-                plot_pixel(x + xx, y + yy, 0x00ffffff);
+                plot_pixel(x + xx, y + yy, fg);
             }
             else
             {
-                plot_pixel(x + xx, y + yy, 0xff000000);
+                plot_pixel(x + xx, y + yy, bg);
             }
         }
     }

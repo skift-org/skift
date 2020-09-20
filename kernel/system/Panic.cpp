@@ -5,6 +5,7 @@
 #include "arch/x86_32/Interrupts.h"
 
 #include "kernel/graphics/EarlyConsole.h"
+#include "kernel/graphics/Font.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
@@ -61,6 +62,8 @@ void system_panic_internal(
 {
     atomic_begin();
     atomic_disable();
+
+    font_set_bg(0xffff0000);
 
     early_console_enable();
 

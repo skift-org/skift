@@ -191,13 +191,26 @@ void Widget::do_layout()
             }
             else
             {
-                child->bound(Rectangle(
-                    current,
-                    content_bound().y(),
-                    child->compute_size().x(),
-                    content_bound().height()));
+                if (child->attributes() & LAYOUT_SQUARE)
+                {
+                    child->bound(Rectangle(
+                        current,
+                        content_bound().y(),
+                        content_bound().height(),
+                        content_bound().height()));
 
-                current += child->compute_size().x() + _layout.spacing.x();
+                    current += content_bound().height() + _layout.spacing.x();
+                }
+                else
+                {
+                    child->bound(Rectangle(
+                        current,
+                        content_bound().y(),
+                        child->compute_size().x(),
+                        content_bound().height()));
+
+                    current += child->compute_size().x() + _layout.spacing.x();
+                }
             }
         }
     }
@@ -247,13 +260,26 @@ void Widget::do_layout()
             }
             else
             {
-                child->bound(Rectangle(
-                    content_bound().x(),
-                    current,
-                    content_bound().width(),
-                    child->compute_size().y()));
+                if (child->attributes() & LAYOUT_SQUARE)
+                {
+                    child->bound(Rectangle(
+                        content_bound().x(),
+                        current,
+                        content_bound().width(),
+                        content_bound().width()));
 
-                current += child->compute_size().y() + _layout.spacing.y();
+                    current += content_bound().width() + _layout.spacing.y();
+                }
+                else
+                {
+                    child->bound(Rectangle(
+                        content_bound().x(),
+                        current,
+                        content_bound().width(),
+                        child->compute_size().y()));
+
+                    current += child->compute_size().y() + _layout.spacing.y();
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ enum LayoutType
 
 #define LAYOUT_FILL (1 << 0)
 #define LAYOUT_GREEDY (1 << 1)
+#define LAYOUT_SQUARE (1 << 2)
 
 typedef unsigned LayoutAttributes;
 

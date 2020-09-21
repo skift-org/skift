@@ -10,6 +10,8 @@ endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
+include config/config.mk
+
 BUILD_ARCH?=x86_32
 BUILD_CONFIG?=debug
 BUILD_SYSTEM?=skift
@@ -62,7 +64,8 @@ CFLAGS= \
 	$(BUILD_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
 	$(BUILD_INCLUDE) \
-	$(BUILD_DEFINES)
+	$(BUILD_DEFINES) \
+	$(BUILD_CONFIG)
 
 CXX:=i686-pc-skift-g++
 CXXFLAGS:= \

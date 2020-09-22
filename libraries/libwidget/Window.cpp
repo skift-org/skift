@@ -274,7 +274,8 @@ void Window::show()
 
 void Window::hide()
 {
-    event_cancel_run_later_for(this);
+    _relayout_invoker->cancel();
+    _repaint_invoker->cancel();
 
     if (!visible)
         return;

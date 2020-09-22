@@ -32,10 +32,4 @@ void eventloop_register_invoker(struct Invoker *timer);
 
 void eventloop_unregister_invoker(struct Invoker *timer);
 
-typedef void (*RunLaterCallback)(void *target);
-
-void eventloop_run_later(RunLaterCallback callback, void *target);
-
-void event_cancel_run_later_for(void *target);
-
 void eventloop_update_timers();

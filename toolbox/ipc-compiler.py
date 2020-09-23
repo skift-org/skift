@@ -6,8 +6,7 @@ import pprint
 
 from utils.Lexer import Lexer
 from utils.Generator import Generator
-from ipc import Parser
-from ipc import Emit
+from ipc import Parser, EmitProtocol, EmitPeer
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -19,11 +18,19 @@ def read_file_to_string(path: str) -> str:
     return ""
 
 
-lexer = Lexer(read_file_to_string(sys.argv[1]))
+lexer = Lexer(read_file_to_string(sys.argv[2]))
 prot = Parser.protocol(lexer)
 
 # pp.pprint(prot)
 
+
 gen = Generator()
-Emit.protocol(gen, prot["properties"]["name"], prot)
+
+if sys.argv[1] == "--protocol":
+    EmitProtocol.protocol(gen, prot["properties"]["name"], prot)
+elif sys.argv[1] == "--server" and "server" in prot:
+    EmitPeer.peer(gen, prot["server"])
+elif sys.argv[1] == "--client" and "client" in prot:
+    EmitPeer.peer(gen, prot["client"])
+
 print(gen.finalize())

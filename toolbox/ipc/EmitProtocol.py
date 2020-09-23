@@ -1,8 +1,4 @@
-from utils import Generator
-
-
-def camelcase(name: str):
-    return name.replace("_", " ").title().replace(" ", "")
+from utils import Generator, camelcase
 
 
 def struct(gen: Generator, name: str, fields):
@@ -140,7 +136,7 @@ def response_packed(gen: Generator, peer):
     gen.emit("};")
 
 
-def peer(gen: Generator, peer):
+def peer_request_and_response(gen: Generator, peer):
     message_types(gen, peer)
     gen.emit('')
 
@@ -195,12 +191,11 @@ def protocol(gen: Generator, name: str, protocol):
 
     if "client" in protocol:
         gen.emit_section("Client")
-        peer(gen, protocol["client"])
-
+        peer_request_and_response(gen, protocol["client"])
 
     if "server" in protocol:
         gen.emit_section("Server")
-        peer(gen, protocol["server"])
+        peer_request_and_response(gen, protocol["server"])
 
     gen.pop_ident()
 

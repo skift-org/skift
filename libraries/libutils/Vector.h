@@ -2,8 +2,6 @@
 
 #include <type_traits>
 
-#include <libsystem/Common.h>
-#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
 

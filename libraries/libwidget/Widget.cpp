@@ -40,7 +40,7 @@ Color Widget::color(ThemeColorRole role)
         return _colors[role].color;
     }
 
-    return window_get_color(_window, role);
+    return _window->color(role);
 }
 
 void Widget::color(ThemeColorRole role, Color color)

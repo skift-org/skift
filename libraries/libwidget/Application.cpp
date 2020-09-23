@@ -36,7 +36,7 @@ void application_do_message(CompositorMessage *message)
 
         if (window)
         {
-            window_event(window, &message->event_window.event);
+            window->dispatch_event(&message->event_window.event);
         }
     }
     else if (message->type == COMPOSITOR_MESSAGE_CHANGED_RESOLUTION)
@@ -52,7 +52,7 @@ void application_do_message(CompositorMessage *message)
                 .keyboard = {},
             };
 
-            window_event(window, &event);
+            window->dispatch_event(&event);
         }
     }
     else
@@ -262,7 +262,7 @@ void application_exit_if_all_windows_are_closed()
 
     list_foreach(Window, window, _windows)
     {
-        if (window_is_visible(window))
+        if (window->visible())
         {
             should_application_close = false;
         }
@@ -294,7 +294,7 @@ Window *application_get_window(int id)
 
     list_foreach(Window, window, _windows)
     {
-        if (window_handle(window) == id)
+        if (window->handle() == id)
         {
             return window;
         }
@@ -311,7 +311,7 @@ void application_show_window(Window *window)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_CREATE_WINDOW,
         .create_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
             .flags = window->_flags,
             .type = window->type(),
             .frontbuffer = window_frontbuffer_handle(window),
@@ -333,7 +333,7 @@ void application_hide_window(Window *window)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_DESTROY_WINDOW,
         .destroy_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
         },
     };
 
@@ -349,7 +349,7 @@ void application_flip_window(Window *window, Rectangle bound)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_FLIP_WINDOW,
         .flip_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
             .frontbuffer = window_frontbuffer_handle(window),
             .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window_backbuffer_handle(window),
@@ -370,7 +370,7 @@ void application_move_window(Window *window, Vec2i position)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_MOVE_WINDOW,
         .move_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
             .position = position,
         },
     };
@@ -386,7 +386,7 @@ void application_resize_window(Window *window, Rectangle bound)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_RESIZE_WINDOW,
         .resize_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
             .bound = bound,
         },
     };
@@ -402,7 +402,7 @@ void application_window_change_cursor(Window *window, CursorState state)
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_CURSOR_WINDOW,
         .cursor_window = {
-            .id = window_handle(window),
+            .id = window->handle(),
             .state = state,
         },
     };

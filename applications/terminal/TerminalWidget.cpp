@@ -106,7 +106,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
     {
         TerminalCell cell = terminal_cell_at(terminal, cx, cy);
 
-        if (window_is_focused(window()))
+        if (window()->focused())
         {
             if (_cursor_blink)
             {

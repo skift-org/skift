@@ -39,7 +39,7 @@ void window_populate_header(Window *window)
         button_maximize->on(Event::ACTION, [window](auto) {
             Event maximise_event = {};
             maximise_event.type = Event::WINDOW_MAXIMIZING;
-            window_event(window, &maximise_event);
+            window->dispatch_event(&maximise_event);
         });
     }
 
@@ -49,20 +49,20 @@ void window_populate_header(Window *window)
     close_button->on(Event::ACTION, [window](auto) {
         Event close_event = {};
         close_event.type = Event::WINDOW_CLOSING;
-        window_event(window, &close_event);
+        window->dispatch_event(&close_event);
     });
 }
 
 Window::Window(WindowFlag flags)
 {
     static int window_handle_counter = 0;
-    handle = window_handle_counter++;
+    _handle = window_handle_counter++;
     _title = strdup("Window");
     _icon = Icon::get("application");
     _type = WINDOW_TYPE_REGULAR;
     _flags = flags;
     is_maximised = false;
-    focused = false;
+    _focused = false;
     cursor_state = CURSOR_DEFAULT;
 
     frontbuffer = Bitmap::create_shared(250, 250).take_value();
@@ -99,7 +99,7 @@ Window::Window(WindowFlag flags)
 
 Window::~Window()
 {
-    if (visible)
+    if (_visible)
     {
         hide();
     }
@@ -120,11 +120,11 @@ void Window::repaint(Rectangle rectangle)
 
     if (_flags & WINDOW_TRANSPARENT)
     {
-        painter.clear_rectangle(rectangle, window_get_color(this, THEME_BACKGROUND).with_alpha(_opacity));
+        painter.clear_rectangle(rectangle, color(THEME_BACKGROUND).with_alpha(_opacity));
     }
     else
     {
-        painter.clear_rectangle(rectangle, window_get_color(this, THEME_BACKGROUND));
+        painter.clear_rectangle(rectangle, color(THEME_BACKGROUND));
     }
 
     painter.push();
@@ -151,7 +151,7 @@ void Window::repaint(Rectangle rectangle)
                 header()->repaint(painter, rectangle);
             }
 
-            painter.draw_rectangle(bound(), window_get_color(this, THEME_ACCENT));
+            painter.draw_rectangle(bound(), color(THEME_ACCENT));
         }
     }
 
@@ -206,7 +206,7 @@ void Window::relayout()
 
 void Window::should_repaint(Rectangle rectangle)
 {
-    if (!visible)
+    if (!_visible)
         return;
 
     if (dirty_rect->empty())
@@ -230,7 +230,7 @@ void Window::should_repaint(Rectangle rectangle)
 
 void Window::should_relayout()
 {
-    if (dirty_layout || !visible)
+    if (dirty_layout || !_visible)
         return;
 
     dirty_layout = true;
@@ -252,17 +252,12 @@ static void window_change_framebuffer_if_needed(Window *window)
     }
 }
 
-bool window_is_visible(Window *window)
-{
-    return window->visible;
-}
-
 void Window::show()
 {
-    if (visible)
+    if (_visible)
         return;
 
-    visible = true;
+    _visible = true;
 
     window_change_framebuffer_if_needed(this);
 
@@ -277,10 +272,10 @@ void Window::hide()
     _relayout_invoker->cancel();
     _repaint_invoker->cancel();
 
-    if (!visible)
+    if (!_visible)
         return;
 
-    visible = false;
+    _visible = false;
     application_hide_window(this);
 }
 
@@ -369,18 +364,18 @@ Widget *window_child_at(Window *window, Vec2i position)
 
 void window_update(Window *window); // for maximize
 
-void window_event(Window *window, Event *event)
+void Window::dispatch_event(Event *event)
 {
     if (is_mouse_event(event))
     {
-        event->mouse.position = event->mouse.position - window->_bound.position();
-        event->mouse.old_position = event->mouse.old_position - window->_bound.position();
+        event->mouse.position = event->mouse.position - _bound.position();
+        event->mouse.old_position = event->mouse.old_position - _bound.position();
     }
 
-    if (window->handlers[event->type])
+    if (handlers[event->type])
     {
         event->accepted = true;
-        window->handlers[event->type](event);
+        handlers[event->type](event);
     }
 
     if (event->accepted)
@@ -392,110 +387,110 @@ void window_event(Window *window, Event *event)
     {
     case Event::GOT_FOCUS:
     {
-        window->focused = true;
+        _focused = true;
 
-        window->should_repaint(window->bound());
+        should_repaint(bound());
     }
     break;
 
     case Event::LOST_FOCUS:
     {
-        window->focused = false;
-        window->should_repaint(window->bound());
+        _focused = false;
+        should_repaint(bound());
 
         Event mouse_leave = *event;
         mouse_leave.type = Event::MOUSE_LEAVE;
 
-        if (window->mouse_over_widget)
+        if (mouse_over_widget)
         {
-            window->mouse_over_widget->dispatch_event(&mouse_leave);
+            mouse_over_widget->dispatch_event(&mouse_leave);
         }
 
-        if (window->_type == WINDOW_TYPE_POPOVER)
+        if (_type == WINDOW_TYPE_POPOVER)
         {
-            window->hide();
+            hide();
         }
     }
     break;
 
     case Event::WINDOW_CLOSING:
     {
-        window->hide();
+        hide();
     }
     break;
 
     case Event::MOUSE_MOVE:
     {
-        RectangleBorder borders = window_resize_bound_containe(window, event->mouse.position);
+        RectangleBorder borders = window_resize_bound_containe(this, event->mouse.position);
 
-        if (window->is_dragging && !window->is_maximised)
+        if (is_dragging && !is_maximised)
         {
             Vec2i offset = event->mouse.position - event->mouse.old_position;
-            window->_bound = window->_bound.offset(offset);
-            application_move_window(window, window->_bound.position());
+            _bound = _bound.offset(offset);
+            application_move_window(this, _bound.position());
         }
-        else if (window->is_resizing && !window->is_maximised)
+        else if (is_resizing && !is_maximised)
         {
-            window_do_resize(window, event->mouse.position);
+            window_do_resize(this, event->mouse.position);
         }
-        else if (borders && (window->_flags & WINDOW_RESIZABLE) && !window->is_maximised)
+        else if (borders && (_flags & WINDOW_RESIZABLE) && !is_maximised)
         {
             if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
             {
-                window_set_cursor(window, CURSOR_RESIZEHV);
+                window_set_cursor(this, CURSOR_RESIZEHV);
             }
             else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::RIGHT))
             {
-                window_set_cursor(window, CURSOR_RESIZEHV);
+                window_set_cursor(this, CURSOR_RESIZEHV);
             }
             else if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::RIGHT))
             {
-                window_set_cursor(window, CURSOR_RESIZEVH);
+                window_set_cursor(this, CURSOR_RESIZEVH);
             }
             else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::LEFT))
             {
-                window_set_cursor(window, CURSOR_RESIZEVH);
+                window_set_cursor(this, CURSOR_RESIZEVH);
             }
             else if (borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM))
             {
-                window_set_cursor(window, CURSOR_RESIZEV);
+                window_set_cursor(this, CURSOR_RESIZEV);
             }
             else if (borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT))
             {
-                window_set_cursor(window, CURSOR_RESIZEH);
+                window_set_cursor(this, CURSOR_RESIZEH);
             }
         }
         else
         {
             // FIXME: Set the cursor based on the focused widget.
-            window_set_cursor(window, CURSOR_DEFAULT);
+            window_set_cursor(this, CURSOR_DEFAULT);
 
-            Widget *mouse_over_widget = window_child_at(window, event->mouse.position);
+            Widget *result = window_child_at(this, event->mouse.position);
 
-            if (mouse_over_widget != window->mouse_over_widget)
+            if (mouse_over_widget != result)
             {
                 Event mouse_leave = *event;
                 mouse_leave.type = Event::MOUSE_LEAVE;
 
-                if (window->mouse_over_widget)
+                if (mouse_over_widget)
                 {
-                    window->mouse_over_widget->dispatch_event(&mouse_leave);
+                    mouse_over_widget->dispatch_event(&mouse_leave);
                 }
 
                 Event mouse_enter = *event;
                 mouse_enter.type = Event::MOUSE_ENTER;
 
-                if (mouse_over_widget)
+                if (result)
                 {
-                    mouse_over_widget->dispatch_event(&mouse_enter);
+                    result->dispatch_event(&mouse_enter);
                 }
 
-                window->mouse_over_widget = mouse_over_widget;
+                mouse_over_widget = result;
             }
 
-            if (window->mouse_focused_widget)
+            if (mouse_focused_widget)
             {
-                window->mouse_focused_widget->dispatch_event(event);
+                mouse_focused_widget->dispatch_event(event);
             }
         }
 
@@ -504,22 +499,22 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_BUTTON_PRESS:
     {
-        if (window->root()->bound().contains(event->mouse.position))
+        if (root()->bound().contains(event->mouse.position))
         {
-            Widget *widget = window_child_at(window, event->mouse.position);
+            Widget *widget = window_child_at(this, event->mouse.position);
 
             if (widget)
             {
-                window->mouse_focused_widget = widget;
+                mouse_focused_widget = widget;
                 widget->dispatch_event(event);
             }
         }
 
-        if (!event->accepted && !(window->_flags & WINDOW_BORDERLESS))
+        if (!event->accepted && !(_flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && window->header()->bound().contains(event->mouse.position))
+            if (!event->accepted && header()->bound().contains(event->mouse.position))
             {
-                Widget *widget = window->header()->child_at(event->mouse.position);
+                Widget *widget = header()->child_at(event->mouse.position);
 
                 if (widget)
                 {
@@ -528,22 +523,22 @@ void window_event(Window *window, Event *event)
             }
 
             if (!event->accepted &&
-                !window->is_dragging &&
-                !window->is_maximised &&
+                !is_dragging &&
+                !is_maximised &&
                 event->mouse.button == MOUSE_BUTTON_LEFT &&
-                window_header_bound(window).contains(event->mouse.position))
+                window_header_bound(this).contains(event->mouse.position))
             {
-                window->is_dragging = true;
-                window_set_cursor(window, CURSOR_MOVE);
+                is_dragging = true;
+                window_set_cursor(this, CURSOR_MOVE);
             }
 
-            if ((window->_flags & WINDOW_RESIZABLE) &&
+            if ((_flags & WINDOW_RESIZABLE) &&
                 !event->accepted &&
-                !window->is_resizing &&
-                !window->is_maximised &&
-                window_resize_bound_containe(window, event->mouse.position))
+                !is_resizing &&
+                !is_maximised &&
+                window_resize_bound_containe(this, event->mouse.position))
             {
-                window_begin_resize(window, event->mouse.position);
+                window_begin_resize(this, event->mouse.position);
             }
         }
 
@@ -552,24 +547,24 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_BUTTON_RELEASE:
     {
-        Widget *widget = window_child_at(window, event->mouse.position);
+        Widget *widget = window_child_at(this, event->mouse.position);
 
         if (widget)
         {
-            window->mouse_focused_widget = widget;
+            mouse_focused_widget = widget;
             widget->dispatch_event(event);
         }
 
-        if (window->is_dragging &&
+        if (is_dragging &&
             event->mouse.button == MOUSE_BUTTON_LEFT)
         {
-            window->is_dragging = false;
-            window_set_cursor(window, CURSOR_DEFAULT);
+            is_dragging = false;
+            window_set_cursor(this, CURSOR_DEFAULT);
         }
 
-        if (window->is_resizing)
+        if (is_resizing)
         {
-            window_end_resize(window);
+            window_end_resize(this);
         }
 
         break;
@@ -577,9 +572,9 @@ void window_event(Window *window, Event *event)
 
     case Event::MOUSE_DOUBLE_CLICK:
     {
-        if (window->root()->bound().contains(event->mouse.position))
+        if (root()->bound().contains(event->mouse.position))
         {
-            Widget *widget = window_child_at(window, event->mouse.position);
+            Widget *widget = window_child_at(this, event->mouse.position);
 
             if (widget)
             {
@@ -594,28 +589,28 @@ void window_event(Window *window, Event *event)
     case Event::KEYBOARD_KEY_PRESS:
     case Event::KEYBOARD_KEY_RELEASE:
     {
-        if (window->focused_widget)
+        if (focused_widget)
         {
-            window->focused_widget->dispatch_event(event);
+            focused_widget->dispatch_event(event);
         }
         break;
     }
     case Event::DISPLAY_SIZE_CHANGED:
         break;
     case Event::WINDOW_MAXIMIZING:
-        if (window->is_maximised == true)
+        if (is_maximised == true)
         {
-            window->is_maximised = false;
-            window->bound(window->previous_bound);
+            is_maximised = false;
+            bound(previous_bound);
         }
         else
         {
-            window->is_maximised = true;
-            window->previous_bound = window->_bound;
+            is_maximised = true;
+            previous_bound = _bound;
             Rectangle new_size = Screen::bound();
             new_size = Rectangle(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
 
-            window->bound(new_size);
+            bound(new_size);
         }
 
         break;
@@ -688,11 +683,6 @@ Widget *window_get_widget_by_id(Window *window, const char *id)
     }
 }
 
-int window_handle(Window *window)
-{
-    return window->handle;
-}
-
 int window_frontbuffer_handle(Window *window)
 {
     return window->frontbuffer->handle();
@@ -713,21 +703,9 @@ Widget *window_root(Window *window)
     return window->root_container;
 }
 
-bool window_is_focused(Window *window)
+Color Window::color(ThemeColorRole role)
 {
-    if (window->_flags & WINDOW_ALWAYS_FOCUSED)
-    {
-        return true;
-    }
-    else
-    {
-        return window->focused;
-    }
-}
-
-Color window_get_color(Window *window, ThemeColorRole role)
-{
-    if (!window_is_focused(window))
+    if (!focused())
     {
         if (role == THEME_FOREGROUND)
         {
@@ -772,7 +750,7 @@ void Window::bound(Rectangle new_bound)
 {
     _bound = new_bound;
 
-    if (!visible)
+    if (!_visible)
         return;
 
     application_resize_window(this, _bound);

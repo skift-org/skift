@@ -19,7 +19,7 @@ struct Window;
 
 struct Window
 {
-    int handle;
+    int _handle;
 
     char *_title;
     RefPtr<Icon> _icon;
@@ -29,8 +29,8 @@ struct Window
 
     float _opacity;
 
-    bool focused = false;
-    bool visible = false;
+    bool _focused = false;
+    bool _visible = false;
     bool is_dragging = false;
     bool is_maximised = false;
     bool is_resizing = false;
@@ -65,6 +65,8 @@ struct Window
     OwnPtr<Invoker> _relayout_invoker;
 
 public:
+    int handle() { return this->_handle; }
+
     void title(const char *title);
 
     void icon(RefPtr<Icon> icon);
@@ -100,8 +102,23 @@ public:
     void opacity(float value) { _opacity = value; }
     float opacity() { return _opacity; }
 
+    bool visible() { return _visible; }
+    bool focused()
+    {
+        if (_flags & WINDOW_ALWAYS_FOCUSED)
+        {
+            return true;
+        }
+        else
+        {
+            return _focused;
+        }
+    }
+
     WindowType type() { return _type; }
     void type(WindowType type) { _type = type; }
+
+    Color color(ThemeColorRole role);
 
     Widget *root() { return root_container; }
     Widget *header() { return header_container; }
@@ -115,6 +132,8 @@ public:
 
     void hide();
 
+    void dispatch_event(Event *event);
+
     void repaint(Rectangle rectangle);
 
     void repaint_dirty();
@@ -126,10 +145,6 @@ public:
     void should_relayout();
 };
 
-bool window_is_visible(Window *window);
-
-void window_event(Window *window, Event *event);
-
 void window_set_cursor(Window *window, CursorState state);
 
 void window_set_focused_widget(Window *window, Widget *widget);
@@ -140,12 +155,6 @@ void window_register_widget_by_id(Window *window, const char *id, Widget *widget
 
 Widget *window_get_widget_by_id(Window *window, const char *id);
 
-int window_handle(Window *window);
-
 int window_frontbuffer_handle(Window *window);
 
 int window_backbuffer_handle(Window *window);
-
-bool window_is_focused(Window *window);
-
-Color window_get_color(Window *window, ThemeColorRole role);

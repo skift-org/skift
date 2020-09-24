@@ -54,7 +54,7 @@ BUILD_DEFINES:= \
 	-D__BUILD_TARGET__=\""$(BUILD_TARGET)"\" \
 	-D__BUILD_GITREF__=\""$(BUILD_GITREF)"\" \
 	-D__BUILD_UNAME__=\""$(BUILD_UNAME)"\" \
-	-D__BUILD_VERSION__=\""${shell date +'%Y.%m%d'}"\"
+	-D__BUILD_VERSION__=\""$(CONFIG_VERSION)"\"
 
 # --- Configs -------------------------------------------- #
 CC:=i686-pc-skift-gcc

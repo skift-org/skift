@@ -1,7 +1,8 @@
 .vscode/
 build/
 cache/
-toolchain/build/
+toolchain/build-x86_64/
+toolchain/build-x86_32/
 toolchain/tarballs/
 toolchain/local/
 vm/

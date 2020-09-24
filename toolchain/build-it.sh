@@ -143,42 +143,42 @@ popd
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
 
-# TARGET64=x86_64-pc-skift
-# 
-# mkdir -p "$DIR/build-x86_64/binutils"
-# mkdir -p "$DIR/build-x86_64/gcc"
-# 
-# pushd "$DIR/build-x86_64/"
-#     unset PKG_CONFIG_LIBDIR # Just in case
-# 
-#     pushd binutils
-#         "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-#             --target=$TARGET64 \
-#             --prefix=$PREFIX \
-#             --with-sysroot=$SYSROOT \
-#             --disable-werror || exit 1
-# 
-#         make -j $MAKEJOBS || exit 1
-#         make install || exit 1
-#     popd
-# 
-#     pushd gcc
-#         "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-#             --target=$TARGET64 \
-#             --prefix=$PREFIX \
-#             --disable-nls \
-#             --with-newlib \
-#             --with-sysroot=$SYSROOT \
-#             --enable-languages=c,c++|| exit 1
-# 
-#         make -C "$DIR/../" install-headers || exit 1
-# 
-#         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
-#         make install-gcc install-target-libgcc || exit 1
-# 
-#         make all-target-libstdc++-v3 || exit 1
-#         make install-target-libstdc++-v3 || exit 1
-#     popd
-# popd
+TARGET64=x86_64-pc-skift
+
+mkdir -p "$DIR/build-x86_64/binutils"
+mkdir -p "$DIR/build-x86_64/gcc"
+
+pushd "$DIR/build-x86_64/"
+    unset PKG_CONFIG_LIBDIR # Just in case
+
+    pushd binutils
+        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
+            --target=$TARGET64 \
+            --prefix=$PREFIX \
+            --with-sysroot=$SYSROOT \
+            --disable-werror || exit 1
+
+        make -j $MAKEJOBS || exit 1
+        make install || exit 1
+    popd
+
+    pushd gcc
+        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
+            --target=$TARGET64 \
+            --prefix=$PREFIX \
+            --disable-nls \
+            --with-newlib \
+            --with-sysroot=$SYSROOT \
+            --enable-languages=c,c++|| exit 1
+
+        make -C "$DIR/../" install-headers || exit 1
+
+        make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
+        make install-gcc install-target-libgcc || exit 1
+
+        make all-target-libstdc++-v3 || exit 1
+        make install-target-libstdc++-v3 || exit 1
+    popd
+popd
 
 touch $PREFIX/build-ok

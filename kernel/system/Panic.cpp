@@ -1,9 +1,6 @@
 #include <libsystem/thread/Atomic.h>
 
-/* XXX: we should not depend on X86 directly */
-#include "arch/x86_32/CPUID.h"
-#include "arch/x86_32/Interrupts.h"
-
+#include "arch/Arch.h"
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
 #include "kernel/scheduling/Scheduler.h"
@@ -51,8 +48,6 @@ static const char *const witty_comments[] = {
 
 static bool has_panic = false;
 static bool nested_panic = false;
-
-void backtrace(uint32_t ebp);
 
 void system_panic_internal(
     __SOURCE_LOCATION__ location,
@@ -109,25 +104,16 @@ void system_panic_internal(
         printf("\n");
     }
 
+    printf("\n\tStackframe:\n");
     if (stackframe)
     {
-        printf("\n\tContext:\n");
-        interrupts_dump_stackframe((InterruptStackFrame *)stackframe);
-
-        printf("\n\tBacktrace:\n");
-        backtrace(((InterruptStackFrame *)stackframe)->ebp);
-        printf("\n");
+        arch_dump_stack_frame(stackframe);
     }
     else
     {
-        uint32_t ebp;
-        asm("movl %%ebp,%0"
-            : "=r"(ebp)::);
-
-        printf("\n\tBacktrace:\n");
-        backtrace(ebp);
-        printf("\n");
+        arch_backtrace();
     }
+    printf("\n");
 
     memory_dump();
 
@@ -136,7 +122,7 @@ void system_panic_internal(
     if (!nested_panic)
     {
         task_dump(scheduler_running());
-        cpuid_dump();
+        arch_panic_dump();
     }
 
     printf("\n");

@@ -47,33 +47,6 @@ static const char *_exception_messages[32] = {
     "Reserved",
 };
 
-void interrupts_dump_stackframe(InterruptStackFrame *stackframe)
-{
-    printf("\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
-    printf("\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
-    printf("\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
-    printf("\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
-
-    printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
-}
-
-struct Stackframe
-{
-    struct Stackframe *ebp;
-    uint32_t eip;
-};
-
-void backtrace(uint32_t ebp)
-{
-    Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
-
-    while (stackframe)
-    {
-        stream_format(log_stream, "\t%08x\n", stackframe->eip);
-        stackframe = stackframe->ebp;
-    }
-}
-
 extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackframe)
 {
     if (stackframe.intno < 32)
@@ -92,7 +65,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
                          CR2());
 
             task_dump(scheduler_running());
-            backtrace(stackframe.ebp);
+            arch_dump_stack_frame(reinterpret_cast<void *>(&stackframe));
 
             task_exit(-1);
         }

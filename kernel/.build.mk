@@ -37,7 +37,7 @@ KERNEL_CXXFLAGS = \
 	-fno-exceptions \
 	-ffreestanding \
 	-nostdlib \
-	-DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" 
+	-DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\"
 
 OBJECTS += $(KERNEL_OBJECTS)
 
@@ -64,4 +64,4 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) -T arch/x86_32/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) -T arch/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

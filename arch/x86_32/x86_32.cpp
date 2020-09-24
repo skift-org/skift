@@ -3,9 +3,11 @@
 
 #include "arch/x86/COM.h"
 #include "arch/x86_32/ACPI.h"
+#include "arch/x86_32/CPUID.h"
 #include "arch/x86_32/FPU.h"
 #include "arch/x86_32/GDT.h"
 #include "arch/x86_32/IDT.h"
+#include "arch/x86_32/Interrupts.h"
 #include "arch/x86_32/LAPIC.h"
 #include "arch/x86_32/PIC.h"
 #include "arch/x86_32/PIT.h"
@@ -128,4 +130,51 @@ __no_return void arch_shutdown()
 
     logger_error("Failled to shutdown: Halting!");
     system_stop();
+}
+
+void arch_panic_dump()
+{
+    cpuid_dump();
+}
+
+struct Stackframe
+{
+    struct Stackframe *ebp;
+    uint32_t eip;
+};
+
+void backtrace_internal(uint32_t ebp)
+{
+    bool empty = true;
+    Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
+
+    while (stackframe)
+    {
+        empty = false;
+        stream_format(log_stream, "\t%08x\n", stackframe->eip);
+        stackframe = stackframe->ebp;
+    }
+
+    if (empty)
+        stream_format(log_stream, "\t[EMPTY]\n");
+}
+
+void arch_dump_stack_frame(void *sf)
+{
+    auto stackframe = reinterpret_cast<InterruptStackFrame *>(sf);
+
+    printf("\tCS=%04x DS=%04x ES=%04x FS=%04x GS=%04x\n", stackframe->cs, stackframe->ds, stackframe->es, stackframe->fs, stackframe->gs);
+    printf("\tEAX=%08x EBX=%08x ECX=%08x EDX=%08x\n", stackframe->eax, stackframe->ebx, stackframe->ecx, stackframe->edx);
+    printf("\tEDI=%08x ESI=%08x EBP=%08x ESP=%08x\n", stackframe->edi, stackframe->esi, stackframe->ebp, stackframe->esp);
+    printf("\tINT=%08x ERR=%08x EIP=%08x FLG=%08x\n", stackframe->intno, stackframe->err, stackframe->eip, stackframe->eflags);
+
+    printf("\tCR0=%08x CR2=%08x CR3=%08x CR4=%08x\n", CR0(), CR2(), CR3(), CR4());
+
+    printf("\n\tBacktrace:\n");
+    backtrace_internal(stackframe->ebp);
+}
+
+void arch_backtrace()
+{
+    backtrace_internal(EBP());
 }

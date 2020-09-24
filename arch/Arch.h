@@ -21,3 +21,9 @@ TimeStamp arch_get_time();
 __no_return void arch_reboot();
 
 __no_return void arch_shutdown();
+
+void arch_panic_dump();
+
+void arch_dump_stack_frame(void *stackframe);
+
+void arch_backtrace();

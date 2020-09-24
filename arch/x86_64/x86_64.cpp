@@ -92,3 +92,18 @@ __no_return void arch_shutdown()
 {
     ASSERT_NOT_REACHED();
 }
+
+void arch_panic_dump()
+{
+    ASSERT_NOT_REACHED();
+}
+
+void arch_dump_stack_frame(void *stackframe)
+{
+    ASSERT_NOT_REACHED();
+}
+
+void arch_backtrace()
+{
+    ASSERT_NOT_REACHED();
+}

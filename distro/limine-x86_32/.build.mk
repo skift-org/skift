@@ -12,6 +12,7 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) $(DISTRO_DIRECTORY)/limine.cfg $(ECHFS)
 	$(ECHFS) -m -p0 $(BOOTDISK) import $(KERNEL_BINARY) kernel.bin
 	$(ECHFS) -m -p0 $(BOOTDISK) import $(RAMDISK) ramdisk.tar
 	$(ECHFS) -m -p0 $(BOOTDISK) import $(DISTRO_DIRECTORY)/limine.cfg limine.cfg
+	$(ECHFS) -m -p0 $(BOOTDISK) import $(DISTRO_DIRECTORY)/background.bmp background.bmp
 
 	$(LIMINE) $(LIMINE_LOADER) $(BOOTDISK)
 

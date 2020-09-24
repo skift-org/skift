@@ -1,5 +1,3 @@
-CONFIG_KEYBOARD_LAYOUT?=en_us
-
 KERNEL_SOURCES += \
 	$(wildcard kernel/*.cpp) \
 	$(wildcard kernel/*/*.cpp) \

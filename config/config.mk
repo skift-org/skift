@@ -48,8 +48,8 @@ CONFIG_VMACHINE       ?=qemu
 CONFIG_KEYBOARD_LAYOUT?=en_us
 
 # Set the bootloader.
-# Possible values: multiboot, multiboot2, stivale
-CONFIG_LOADER         ?=multiboot
+# Possible values: grub, grub2, limine
+CONFIG_LOADER         ?=grub2
 
 # Enable/disable the logger.
 CONFIG_LOG            ?=true
@@ -73,12 +73,6 @@ include config/$(CONFIG).mk
 include config/config-user.mk
 
 define BUILD_CONFIG_TEMPLATE =
--D__$(1)__=\""$($(1))"\"
-endef
-
-BUILD_CONFIGS := $(foreach cfg, $(CONFIGS), $(call BUILD_CONFIG_TEMPLATE,$(cfg)))
-
-define CONFIG_HEADER_TEMPLATE =
 -D__$(1)__=\""$($(1))"\"
 endef
 

@@ -136,10 +136,9 @@ all: $(BOOTDISK)
 .PHONY: run
 run: run-qemu
 
-VM_MEMORY?=128
 
 QEMU=qemu-system-x86_64
-QEMU_FLAGS=-m $(VM_MEMORY)M \
+QEMU_FLAGS=-m $(CONFIG_MEMORY)M \
 		  -serial stdio \
 		  -rtc base=localtime
 
@@ -178,7 +177,7 @@ run-vbox: $(BOOTDISK)
 
 	@VBoxManage modifyvm \
 		skiftOS-dev \
-		--memory $(VM_MEMORY) \
+		--memory $(CONFIG_MEMORY) \
 		--uart1 0x3F8 4 \
 		--uartmode1 tcpserver 1234
 

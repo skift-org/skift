@@ -143,6 +143,20 @@ public:
     void should_repaint(Rectangle rectangle);
 
     void should_relayout();
+
+    template <typename WidgetType, typename CallbackType>
+    void with_widget(const char *name, CallbackType callback)
+    {
+        if (hashmap_has(widget_by_id, name))
+        {
+            auto widget = dynamic_cast<WidgetType *>((Widget *)hashmap_get(widget_by_id, name));
+
+            if (widget)
+            {
+                callback(widget);
+            }
+        }
+    }
 };
 
 void window_set_cursor(Window *window, CursorState state);
@@ -152,8 +166,6 @@ void window_set_focused_widget(Window *window, Widget *widget);
 void window_widget_removed(Window *window, Widget *widget);
 
 void window_register_widget_by_id(Window *window, const char *id, Widget *widget);
-
-Widget *window_get_widget_by_id(Window *window, const char *id);
 
 int window_frontbuffer_handle(Window *window);
 

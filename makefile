@@ -70,8 +70,6 @@ CFLAGS= \
 CXX:=i686-pc-skift-g++
 CXXFLAGS:= \
 	-std=c++20 \
-	-fno-rtti \
-	-fno-exceptions \
 	-MD \
 	$(BUILD_OPTIMISATIONS) \
 	$(BUILD_WARNING) \

@@ -31,22 +31,30 @@ KERNEL_OBJECTS = \
 	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
 	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
+KERNEL_CXXFLAGS = \
+	$(CXXFLAGS) 	\
+	-fno-rtti \
+	-fno-exceptions \
+	-ffreestanding \
+	-nostdlib \
+	-DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" 
+
 OBJECTS += $(KERNEL_OBJECTS)
 
 $(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
-	@$(CXX) $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
 $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
-	@$(CXX) -DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\" $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.o: arch/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
-	@$(CXX) $(CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
+	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
 $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 	$(DIRECTORY_GUARD)

@@ -24,7 +24,7 @@ BUILD_UNAME=$(shell uname -s -o -m -r)
 BUILD_DIRECTORY=$(shell pwd)/build
 
 SYSROOT=$(BUILD_DIRECTORY)/sysroot
-BOOTROOT=$(BUILD_DIRECTORY)/bootroot/
+BOOTROOT=$(BUILD_DIRECTORY)/bootroot
 BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.img
 
 RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar

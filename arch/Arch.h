@@ -2,8 +2,6 @@
 
 #include "kernel/tasking/Task.h"
 
-void arch_initialize();
-
 void arch_disable_interrupts();
 
 void arch_enable_interrupts();

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "arch/Arch.h"
 #include "arch/x86/x86.h"
 
 #include <libsystem/Common.h>

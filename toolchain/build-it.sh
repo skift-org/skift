@@ -17,7 +17,6 @@ GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-TARGET=i686-pc-skift
 PREFIX="$DIR/local"
 SYSROOT="$DIR/../build/sysroot"
 
@@ -40,6 +39,9 @@ cd "$DIR"
 mkdir -p tarballs
 
 source "$DIR/use-it.sh"
+
+# Download and unpack GCC and binutils
+# ---------------------------------------------------------------------------- #
 
 pushd tarballs
     if [ ! -e "$BINUTILS_FILENAME" ]; then
@@ -93,19 +95,24 @@ popd
 
 mkdir -p $PREFIX
 
-mkdir -p "$DIR/build/binutils"
-mkdir -p "$DIR/build/gcc"
-
 if [ -z "$MAKEJOBS" ]; then
     MAKEJOBS=$(nproc)
 fi
 
-pushd "$DIR/build/"
+# Build GCC and binutils for the x86_32 target
+# ---------------------------------------------------------------------------- #
+
+TARGET32=i686-pc-skift
+
+mkdir -p "$DIR/build-x86_32/binutils"
+mkdir -p "$DIR/build-x86_32/gcc"
+
+pushd "$DIR/build-x86_32/"
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils
         "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-            --target=$TARGET \
+            --target=$TARGET32 \
             --prefix=$PREFIX \
             --with-sysroot=$SYSROOT \
             --disable-werror || exit 1
@@ -116,7 +123,7 @@ pushd "$DIR/build/"
 
     pushd gcc
         "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-            --target=$TARGET \
+            --target=$TARGET32 \
             --prefix=$PREFIX \
             --disable-nls \
             --with-newlib \
@@ -132,5 +139,46 @@ pushd "$DIR/build/"
         make install-target-libstdc++-v3 || exit 1
     popd
 popd
+
+# Build GCC and binutils for the x86_64 target
+# ---------------------------------------------------------------------------- #
+
+# TARGET64=x86_64-pc-skift
+# 
+# mkdir -p "$DIR/build-x86_64/binutils"
+# mkdir -p "$DIR/build-x86_64/gcc"
+# 
+# pushd "$DIR/build-x86_64/"
+#     unset PKG_CONFIG_LIBDIR # Just in case
+# 
+#     pushd binutils
+#         "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
+#             --target=$TARGET64 \
+#             --prefix=$PREFIX \
+#             --with-sysroot=$SYSROOT \
+#             --disable-werror || exit 1
+# 
+#         make -j $MAKEJOBS || exit 1
+#         make install || exit 1
+#     popd
+# 
+#     pushd gcc
+#         "$DIR/tarballs/$GCC_DIRECTORY/configure" \
+#             --target=$TARGET64 \
+#             --prefix=$PREFIX \
+#             --disable-nls \
+#             --with-newlib \
+#             --with-sysroot=$SYSROOT \
+#             --enable-languages=c,c++|| exit 1
+# 
+#         make -C "$DIR/../" install-headers || exit 1
+# 
+#         make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
+#         make install-gcc install-target-libgcc || exit 1
+# 
+#         make all-target-libstdc++-v3 || exit 1
+#         make install-target-libstdc++-v3 || exit 1
+#     popd
+# popd
 
 touch $PREFIX/build-ok

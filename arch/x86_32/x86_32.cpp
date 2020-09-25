@@ -15,6 +15,7 @@
 #include "arch/x86_32/x86_32.h"
 
 #include "kernel/firmware/SMBIOS.h"
+#include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/system/System.h"
 
@@ -101,6 +102,9 @@ static void reboot_8042()
 
 __no_return void arch_reboot()
 {
+    early_console_enable();
+    logger_warn("We don't support shutting down real hardware!");
+
     reboot_8042();
 
     logger_info("Failled to reboot: Halting!");
@@ -117,12 +121,15 @@ static void shutdown_virtual_machines()
     // Newer versions of QEMU
     out16(0x604, 0x2000);
 
-    // Virtualbox, you can do shutdown
+    // Virtualbox
     out16(0x4004, 0x3400);
 }
 
 __no_return void arch_shutdown()
 {
+    early_console_enable();
+    logger_warn("We don't support shutting down real hardware!");
+
     shutdown_virtual_machines();
 
     logger_error("Failled to shutdown: Halting!");

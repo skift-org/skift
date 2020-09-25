@@ -3,6 +3,7 @@
 
 #include "kernel/drivers/BGA.h"
 #include "kernel/graphics/Graphics.h"
+#include "kernel/handover/Handover.h"
 
 void BGA::write_register(uint16_t address, uint16_t data)
 {
@@ -44,8 +45,8 @@ Result BGA::set_resolution(int width, int height)
 BGA::BGA(DeviceAddress address) : PCIDevice(address, DeviceClass::FRAMEBUFFER)
 {
     _framebuffer = make<MMIORange>(bar(0).range());
-    set_resolution(1024, 768);
-    graphic_did_find_framebuffer(_framebuffer->base(), 1024, 768);
+    set_resolution(handover()->framebuffer_width, handover()->framebuffer_height);
+    graphic_did_find_framebuffer(_framebuffer->base(), handover()->framebuffer_width, handover()->framebuffer_height);
 }
 
 size_t BGA::size(FsHandle &handle)

@@ -51,6 +51,8 @@ struct Handover
     uintptr_t acpi_rsdp_address;
 };
 
+Handover *handover();
+
 void handover_assert(uint32_t magic);
 
 Handover *handover_initialize(void *header, uint32_t magic);

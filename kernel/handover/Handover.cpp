@@ -15,6 +15,11 @@ const char *entry_type_to_string[] = {
     "KERNEL",
 };
 
+Handover *handover()
+{
+    return &_handover;
+}
+
 void handover_assert(uint32_t magic)
 {
     if (!(is_multiboot1(magic) || is_multiboot2(magic) || is_stivale1(magic)))

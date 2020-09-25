@@ -138,9 +138,9 @@ static int bg = 0xff000000;
 void font_set_fg(int color) { fg = color; }
 void font_set_bg(int color) { bg = color; }
 
-int font_height() { return 8; }
+int font_height() { return 9; }
 
-int font_width() { return 8; }
+int font_width() { return 9; }
 
 void plot_pixel(int x, int y, uint32_t color)
 {
@@ -152,11 +152,11 @@ void font_draw(Codepoint cp, int x, int y)
     if (cp > 0x7f)
         return;
 
-    for (int xx = 0; xx < 8; xx++)
+    for (int yy = 0; yy < 9; yy++)
     {
-        for (int yy = 0; yy < 8; yy++)
+        for (int xx = 0; xx < 9; xx++)
         {
-            int set = font8x8_basic[cp][yy] & (1 << xx);
+            int set = xx != 8 && yy != 8 && (font8x8_basic[cp][yy] & (1 << xx));
 
             if (set)
             {

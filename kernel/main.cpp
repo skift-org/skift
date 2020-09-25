@@ -41,8 +41,6 @@ void system_main(Handover *handover)
 {
     splash_screen();
 
-    logger_debug("bpp %d %d", handover->framebuffer_pitch, handover->framebuffer_width);
-
     system_initialize();
     memory_initialize(handover);
     scheduler_initialize();
@@ -56,7 +54,6 @@ void system_main(Handover *handover)
     device_info_initialize();
     devices_filesystem_initialize();
     graphic_initialize(handover);
-
     userspace_initialize();
 
     ASSERT_NOT_REACHED();

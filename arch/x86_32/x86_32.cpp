@@ -50,9 +50,6 @@ extern "C" void arch_main(void *info, uint32_t magic)
     com_initialize(COM3);
     com_initialize(COM4);
 
-    logger_info("INFO=%08x MAGIC=%08x", info, magic);
-    logger_info("ESP=%08x EBP=%08x", ESP(), EBP());
-
     auto handover = handover_initialize(info, magic);
 
     graphic_early_initialize(handover);

@@ -26,8 +26,6 @@ void graphic_initialize(Handover *handover)
 
 void graphic_did_find_framebuffer(uintptr_t address, int width, int height)
 {
-    logger_trace("Buffer at %08x %dx%d", address, width, height);
-
     AtomicHolder holder;
 
     _framebuffer_address = address;

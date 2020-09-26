@@ -32,6 +32,8 @@ void scheduler_did_create_running_task(Task *task)
 
 void scheduler_did_change_task_state(Task *task, TaskState oldstate, TaskState newstate)
 {
+    ASSERT_ATOMIC;
+
     if (oldstate != newstate)
     {
         if (oldstate == TASK_STATE_RUNNING)
@@ -108,16 +110,14 @@ static Iteration wakeup_task_if_unblocked(void *target, Task *task)
     {
         blocker->on_unblock(task);
         blocker->_result = BLOCKER_UNBLOCKED;
-
-        task_set_state(task, TASK_STATE_RUNNING);
+        task->state(TASK_STATE_RUNNING);
     }
     else if (blocker->_timeout != (Timeout)-1 &&
              blocker->_timeout <= system_get_tick())
     {
         blocker->on_timeout(task);
         blocker->_result = BLOCKER_TIMEOUT;
-
-        task_set_state(task, TASK_STATE_RUNNING);
+        task->state(TASK_STATE_RUNNING);
     }
 
     return Iteration::CONTINUE;

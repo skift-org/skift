@@ -66,10 +66,9 @@ Result sys_process_launch(Launchpad *launchpad, int *pid)
     return result;
 }
 
-Result sys_process_exit(int code)
+Result sys_process_exit(int exit_code)
 {
-    task_exit(code);
-
+    scheduler_running()->cancel(exit_code);
     ASSERT_NOT_REACHED();
 }
 
@@ -85,7 +84,8 @@ Result sys_process_cancel(int pid)
     }
     else
     {
-        return task_cancel(task, -1);
+        task->cancel(-1);
+        return SUCCESS;
     }
 }
 
@@ -491,8 +491,8 @@ SyscallHandler syscall_get_handler(Syscall syscall)
     }
 }
 
- #define SYSCALL_NAMES_ENTRY(__entry) #__entry,
- static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
+#define SYSCALL_NAMES_ENTRY(__entry) #__entry,
+static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
 int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
 {

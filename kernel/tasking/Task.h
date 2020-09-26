@@ -16,7 +16,7 @@ struct Task
     bool user;
     char name[PROCESS_NAME_SIZE];
 
-    TaskState state;
+    TaskState _state;
     Blocker *blocker;
 
     uintptr_t user_stack_pointer;
@@ -38,6 +38,12 @@ struct Task
     PageDirectory *page_directory;
 
     int exit_value;
+
+    TaskState state();
+
+    void state(TaskState state);
+
+    void cancel(int exit_value);
 };
 
 Task *task_create(Task *parent, const char *name, bool user);
@@ -55,8 +61,6 @@ Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg
 
 Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntryPoint entry, const char **argv, bool user);
 
-void task_set_state(Task *task, TaskState state);
-
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user);
 
 uintptr_t task_kernel_stack_push(Task *task, const void *value, size_t size);
@@ -70,9 +74,5 @@ Result task_sleep(Task *task, int timeout);
 Result task_wait(int task_id, int *exit_value);
 
 BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout);
-
-Result task_cancel(Task *task, int exit_value);
-
-void task_exit(int exit_value);
 
 void task_dump(Task *task);

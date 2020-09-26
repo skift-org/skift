@@ -133,15 +133,14 @@ Result __plug_process_launch(Launchpad *launchpad, int *pid)
 
 void __plug_process_exit(int code)
 {
-    task_exit(code);
-
+    scheduler_running()->cancel(code);
     system_panic("Task exit failed!");
 }
 
 Result __plug_process_cancel(int pid)
 {
-    AtomicHolder holder;
-    return task_cancel(task_by_id(pid), -1);
+    __unused(pid);
+    ASSERT_NOT_REACHED();
 }
 
 Result __plug_process_get_directory(char *buffer, uint size)

@@ -7,7 +7,7 @@ static Iteration destroy_task_if_canceled(void *target, Task *task)
 {
     __unused(target);
 
-    if (task->state == TASK_STATE_CANCELED)
+    if (task->state() == TASK_STATE_CANCELED)
     {
         task_destroy(task);
     }
@@ -28,7 +28,7 @@ void tasking_initialize()
 {
     Task *idle_task = task_spawn(nullptr, "Idle", system_hang, nullptr, false);
     task_go(idle_task);
-    task_set_state(idle_task, TASK_STATE_HANG);
+    idle_task->state(TASK_STATE_HANG);
 
     scheduler_did_create_idle_task(idle_task);
 

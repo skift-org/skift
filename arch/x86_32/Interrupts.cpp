@@ -67,7 +67,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
             task_dump(scheduler_running());
             arch_dump_stack_frame(reinterpret_cast<void *>(&stackframe));
 
-            task_exit(-1);
+            scheduler_running()->cancel(-1);
         }
         else
         {

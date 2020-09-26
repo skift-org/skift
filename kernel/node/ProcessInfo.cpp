@@ -21,7 +21,7 @@ static Iteration serialize_task(json::Value *destination, Task *task)
 
     json::object_put(task_object, "id", json::create_integer(task->id));
     json::object_put(task_object, "name", json::create_string(task->name));
-    json::object_put(task_object, "state", json::create_string(task_state_string(task->state)));
+    json::object_put(task_object, "state", json::create_string(task_state_string(task->state())));
     json::object_put(task_object, "directory", json::create_string_adopt(path_as_string(task->directory)));
     json::object_put(task_object, "cpu", json::create_integer(scheduler_get_usage(task->id)));
     json::object_put(task_object, "ram", json::create_integer(task_memory_usage(task)));

@@ -14,6 +14,31 @@
 static int _task_ids = 0;
 static List *_tasks;
 
+TaskState Task::state()
+{
+    return _state;
+}
+
+void Task::state(TaskState state)
+{
+    scheduler_did_change_task_state(this, _state, state);
+    _state = state;
+}
+
+void Task::cancel(int exit_value)
+{
+    AtomicHolder holder;
+
+    exit_value = exit_value;
+    state(TASK_STATE_CANCELED);
+
+    if (this == scheduler_running())
+    {
+        scheduler_yield();
+        ASSERT_NOT_REACHED();
+    }
+}
+
 Task *task_create(Task *parent, const char *name, bool user)
 {
     ASSERT_ATOMIC;
@@ -27,7 +52,7 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     task->id = _task_ids++;
     strlcpy(task->name, name, PROCESS_NAME_SIZE);
-    task->state = TASK_STATE_NONE;
+    task->_state = TASK_STATE_NONE;
 
     if (user)
     {
@@ -77,9 +102,7 @@ Task *task_create(Task *parent, const char *name, bool user)
 void task_destroy(Task *task)
 {
     atomic_begin();
-
-    if (task->state != TASK_STATE_NONE)
-        task_set_state(task, TASK_STATE_NONE);
+    task->state(TASK_STATE_NONE);
 
     list_remove(_tasks, task);
 
@@ -212,14 +235,6 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntryPoint entry,
     return task;
 }
 
-void task_set_state(Task *task, TaskState state)
-{
-    ASSERT_ATOMIC;
-
-    scheduler_did_change_task_state(task, task->state, state);
-    task->state = state;
-}
-
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user)
 {
     task->entry_point = entry;
@@ -280,7 +295,7 @@ void task_go(Task *task)
     }
 
     atomic_begin();
-    task_set_state(task, TASK_STATE_RUNNING);
+    task->state(TASK_STATE_RUNNING);
     atomic_end();
 }
 
@@ -334,7 +349,7 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
         blocker->_timeout = system_get_tick() + timeout;
     }
 
-    task_set_state(task, TASK_STATE_BLOCKED);
+    task->state(TASK_STATE_BLOCKED);
     atomic_end();
 
     scheduler_yield();
@@ -347,27 +362,6 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
     return result;
 }
 
-Result task_cancel(Task *task, int exit_value)
-{
-    assert(task);
-
-    AtomicHolder holder;
-
-    task->exit_value = exit_value;
-    task_set_state(task, TASK_STATE_CANCELED);
-
-    return SUCCESS;
-}
-
-void task_exit(int exit_value)
-{
-    task_cancel(scheduler_running(), exit_value);
-
-    scheduler_yield();
-
-    ASSERT_NOT_REACHED();
-}
-
 void task_dump(Task *task)
 {
     if (!task)
@@ -376,7 +370,7 @@ void task_dump(Task *task)
     AtomicHolder holder;
 
     printf("\n\t - Task %d %s", task->id, task->name);
-    printf("\n\t   State: %s", task_state_string(task->state));
+    printf("\n\t   State: %s", task_state_string(task->state()));
     printf("\n\t   Memory: ");
     memory_pdir_dump(task->page_directory, false);
 

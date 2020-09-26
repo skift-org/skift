@@ -87,7 +87,7 @@ bool BlockerWait::can_unblock(Task *task)
 {
     __unused(task);
 
-    return _task->state == TASK_STATE_CANCELED;
+    return _task->state() == TASK_STATE_CANCELED;
 }
 
 void BlockerWait::on_unblock(Task *task)

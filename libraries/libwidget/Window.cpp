@@ -110,8 +110,6 @@ Window::~Window()
     delete header_container;
 
     list_destroy_with_callback(dirty_rect, free);
-
-    free(_title);
 }
 
 void Window::repaint(Rectangle rectangle)
@@ -437,33 +435,33 @@ void Window::dispatch_event(Event *event)
         {
             if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
             {
-                window_set_cursor(this, CURSOR_RESIZEHV);
+                cursor(CURSOR_RESIZEHV);
             }
             else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::RIGHT))
             {
-                window_set_cursor(this, CURSOR_RESIZEHV);
+                cursor(CURSOR_RESIZEHV);
             }
             else if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::RIGHT))
             {
-                window_set_cursor(this, CURSOR_RESIZEVH);
+                cursor(CURSOR_RESIZEVH);
             }
             else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::LEFT))
             {
-                window_set_cursor(this, CURSOR_RESIZEVH);
+                cursor(CURSOR_RESIZEVH);
             }
             else if (borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM))
             {
-                window_set_cursor(this, CURSOR_RESIZEV);
+                cursor(CURSOR_RESIZEV);
             }
             else if (borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT))
             {
-                window_set_cursor(this, CURSOR_RESIZEH);
+                cursor(CURSOR_RESIZEH);
             }
         }
         else
         {
             // FIXME: Set the cursor based on the focused widget.
-            window_set_cursor(this, CURSOR_DEFAULT);
+            cursor(CURSOR_DEFAULT);
 
             Widget *result = window_child_at(this, event->mouse.position);
 
@@ -529,7 +527,7 @@ void Window::dispatch_event(Event *event)
                 window_header_bound(this).contains(event->mouse.position))
             {
                 is_dragging = true;
-                window_set_cursor(this, CURSOR_MOVE);
+                cursor(CURSOR_MOVE);
             }
 
             if ((_flags & WINDOW_RESIZABLE) &&
@@ -559,7 +557,7 @@ void Window::dispatch_event(Event *event)
             event->mouse.button == MOUSE_BUTTON_LEFT)
         {
             is_dragging = false;
-            window_set_cursor(this, CURSOR_DEFAULT);
+            cursor(CURSOR_DEFAULT);
         }
 
         if (is_resizing)
@@ -625,82 +623,50 @@ void Window::on(EventType event, EventHandler handler)
     handlers[event] = move(handler);
 }
 
-void window_set_cursor(Window *window, CursorState state)
+void Window::cursor(CursorState state)
 {
-    if (window->is_resizing)
+    if (is_resizing)
         return;
 
-    if (window->cursor_state != state)
+    if (cursor_state != state)
     {
-        application_window_change_cursor(window, state);
-        window->cursor_state = state;
+        application_window_change_cursor(this, state);
+        cursor_state = state;
     }
 }
 
-void window_set_focused_widget(Window *window, Widget *widget)
+void Window::focus_widget(Widget *widget)
 {
-    window->focused_widget = widget;
+    focused_widget = widget;
 }
 
-void window_widget_removed(Window *window, Widget *widget)
+void Window::widget_removed(Widget *widget)
 {
-    if (window->focused_widget == widget)
+    if (focused_widget == widget)
     {
-        window->focused_widget = nullptr;
+        focused_widget = nullptr;
     }
-    if (window->mouse_focused_widget == widget)
+    if (mouse_focused_widget == widget)
     {
-        window->mouse_focused_widget = nullptr;
-    }
-
-    if (window->mouse_over_widget == widget)
-    {
-        window->mouse_over_widget = nullptr;
+        mouse_focused_widget = nullptr;
     }
 
-    hashmap_remove_value(window->widget_by_id, widget);
-}
-
-void window_register_widget_by_id(Window *window, const char *id, Widget *widget)
-{
-    if (hashmap_has(window->widget_by_id, id))
+    if (mouse_over_widget == widget)
     {
-        hashmap_remove(window->widget_by_id, id);
+        mouse_over_widget = nullptr;
     }
 
-    hashmap_put(window->widget_by_id, id, widget);
+    hashmap_remove_value(widget_by_id, widget);
 }
 
-Widget *window_get_widget_by_id(Window *window, const char *id)
+void Window::register_widget_by_id(const char *id, Widget *widget)
 {
-    if (hashmap_has(window->widget_by_id, id))
+    if (hashmap_has(widget_by_id, id))
     {
-        return (Widget *)hashmap_get(window->widget_by_id, id);
+        hashmap_remove(widget_by_id, id);
     }
-    else
-    {
-        return nullptr;
-    }
-}
 
-int window_frontbuffer_handle(Window *window)
-{
-    return window->frontbuffer->handle();
-}
-
-int window_backbuffer_handle(Window *window)
-{
-    return window->backbuffer->handle();
-}
-
-Widget *window_header(Window *window)
-{
-    return window->header_container;
-}
-
-Widget *window_root(Window *window)
-{
-    return window->root_container;
+    hashmap_put(widget_by_id, id, widget);
 }
 
 Color Window::color(ThemeColorRole role)
@@ -726,15 +692,10 @@ Color Window::color(ThemeColorRole role)
     return theme_get_color(role);
 }
 
-void Window::title(const char *title)
+void Window::title(String title)
 {
-    if (_title)
-    {
-        free(_title);
-        _title = strdup(title);
-
-        window_populate_header(this);
-    }
+    _title = title;
+    window_populate_header(this);
 }
 
 void Window::icon(RefPtr<Icon> icon)

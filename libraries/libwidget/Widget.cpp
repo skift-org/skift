@@ -12,7 +12,7 @@
 
 void Widget::id(const char *id)
 {
-    window_register_widget_by_id(_window, id, this);
+    _window->register_widget_by_id(id, this);
 }
 
 Color Widget::color(ThemeColorRole role)
@@ -74,7 +74,7 @@ Widget::~Widget()
         _parent->remove_child(this);
 
     if (_window)
-        window_widget_removed(_window, this);
+        _window->widget_removed(this);
 }
 
 void Widget::paint(Painter &painter, Rectangle rectangle)
@@ -475,7 +475,7 @@ bool Widget::focused()
 void Widget::focus()
 {
     if (_window)
-        window_set_focused_widget(_window, this);
+        _window->focus_widget(this);
 }
 
 /* --- Paint ---------------------------------------------------------------- */

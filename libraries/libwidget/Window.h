@@ -21,7 +21,7 @@ struct Window
 {
     int _handle;
 
-    char *_title;
+    String _title;
     RefPtr<Icon> _icon;
     Rectangle _bound;
     WindowFlag _flags;
@@ -66,9 +66,10 @@ struct Window
 
 public:
     int handle() { return this->_handle; }
+    int frontbuffer_handle() { return frontbuffer->handle(); }
+    int backbuffer_handle() { return backbuffer->handle(); }
 
-    void title(const char *title);
-
+    void title(String title);
     void icon(RefPtr<Icon> icon);
 
     int x() { return position().x(); }
@@ -157,16 +158,12 @@ public:
             }
         }
     }
+
+    void cursor(CursorState state);
+
+    void focus_widget(Widget *widget);
+
+    void widget_removed(Widget *widget);
+
+    void register_widget_by_id(const char *id, Widget *widget);
 };
-
-void window_set_cursor(Window *window, CursorState state);
-
-void window_set_focused_widget(Window *window, Widget *widget);
-
-void window_widget_removed(Window *window, Widget *widget);
-
-void window_register_widget_by_id(Window *window, const char *id, Widget *widget);
-
-int window_frontbuffer_handle(Window *window);
-
-int window_backbuffer_handle(Window *window);

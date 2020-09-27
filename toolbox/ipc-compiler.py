@@ -23,14 +23,13 @@ prot = Parser.protocol(lexer)
 
 # pp.pprint(prot)
 
-
 gen = Generator()
 
 if sys.argv[1] == "--protocol":
     EmitProtocol.protocol(gen, prot["properties"]["name"], prot)
 elif sys.argv[1] == "--server" and "server" in prot:
-    EmitPeer.peer(gen, prot["server"])
+    EmitPeer.peer(gen, prot, prot["server"])
 elif sys.argv[1] == "--client" and "client" in prot:
-    EmitPeer.peer(gen, prot["client"])
+    EmitPeer.peer(gen, prot, prot["client"])
 
 print(gen.finalize())

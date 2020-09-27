@@ -86,6 +86,7 @@ AS=nasm
 ASFLAGS=-f elf32
 
 include thirdparty/.build.mk
+include protocols/.build.mk
 include arch/.build.mk
 include kernel/.build.mk
 include libraries/.build.mk

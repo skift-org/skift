@@ -9,5 +9,6 @@ AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: false
 ColumnLimit: 0
 AccessModifierOffset: -4
+FixNamespaceComments: true
 
 ...

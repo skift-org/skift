@@ -1,3 +1,5 @@
+#pragma once
+
 #include <libsystem/Result.h>
 #include <libutils/Move.h>
 

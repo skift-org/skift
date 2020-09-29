@@ -15,8 +15,6 @@
 #define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
 
-struct Window;
-
 struct Window
 {
     int _handle;
@@ -37,7 +35,7 @@ struct Window
     bool resize_vertical = false;
     bool resize_horizontal = false;
     Vec2i resize_begin;
-    Rectangle previous_bound; // used for maximize
+    Rectangle previous_bound;
 
     CursorState cursor_state;
 

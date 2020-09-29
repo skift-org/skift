@@ -77,7 +77,7 @@ void Window::send_event(Event event)
         },
     };
 
-    client_send_message(_client, message);
+    _client->send_message(message);
 }
 
 void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton buttons)

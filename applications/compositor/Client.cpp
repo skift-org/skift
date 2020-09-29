@@ -96,7 +96,7 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
 
     CompositorMessage message = {};
     message.type = COMPOSITOR_MESSAGE_ACK;
-    client_send_message(client, message);
+    client->send_message(message);
 }
 
 void client_handle_cursor_window(Client *client, CompositorCursorWindow cursor_window)
@@ -218,6 +218,32 @@ void client_request_callback(Client *client, Connection *connection, SelectEvent
     }
 }
 
+Client::Client(Connection *connection)
+{
+    if (!_connected_client)
+    {
+        _connected_client = list_create();
+    }
+
+    this->connection = connection;
+    this->notifier = notifier_create(
+        this,
+        HANDLE(connection),
+        SELECT_READ,
+        (NotifierCallback)client_request_callback);
+
+    list_pushback(_connected_client, this);
+
+    logger_info("Client %08x connected", this);
+
+    this->send_message((CompositorMessage){
+        .type = COMPOSITOR_MESSAGE_GREETINGS,
+        .greetings = {
+            .screen_bound = renderer_bound(),
+        },
+    });
+}
+
 Client *client_create(Connection *connection)
 {
     if (!_connected_client)
@@ -238,12 +264,12 @@ Client *client_create(Connection *connection)
 
     logger_info("Client %08x connected", client);
 
-    client_send_message(client, (CompositorMessage){
-                                    .type = COMPOSITOR_MESSAGE_GREETINGS,
-                                    .greetings = {
-                                        .screen_bound = renderer_bound(),
-                                    },
-                                });
+    client->send_message((CompositorMessage){
+        .type = COMPOSITOR_MESSAGE_GREETINGS,
+        .greetings = {
+            .screen_bound = renderer_bound(),
+        },
+    });
 
     return client;
 }
@@ -263,39 +289,38 @@ void client_close_all_windows(Client *client)
     list_iterate(manager_get_windows(), client, (ListIterationCallback)destroy_window_if_client_match);
 }
 
-void client_destroy(Client *client)
+Client::~Client()
 {
-    logger_info("Disconnecting client %08x", client);
+    logger_info("Disconnecting client %08x", this);
 
-    client_close_all_windows(client);
-    list_remove(_connected_client, client);
-    notifier_destroy(client->notifier);
-    connection_close(client->connection);
-    free(client);
+    client_close_all_windows(this);
+    list_remove(_connected_client, this);
+    notifier_destroy(notifier);
+    connection_close(connection);
 }
 
 void client_broadcast(CompositorMessage message)
 {
     list_foreach(Client, client, _connected_client)
     {
-        client_send_message(client, message);
+        client->send_message(message);
     }
 }
 
-Result client_send_message(Client *client, CompositorMessage message)
+Result Client::send_message(CompositorMessage message)
 {
-    if (client->disconnected)
+    if (disconnected)
     {
         return ERR_STREAM_CLOSED;
     }
 
-    connection_send(client->connection, &message, sizeof(CompositorMessage));
+    connection_send(connection, &message, sizeof(CompositorMessage));
 
-    if (handle_has_error(client->connection))
+    if (handle_has_error(connection))
     {
-        logger_error("Failed to send message to %08x: %s", client, handle_error_string(client->connection));
-        client->disconnected = true;
-        return handle_get_error(client->connection);
+        logger_error("Failed to send message to %08x: %s", this, handle_error_string(connection));
+        disconnected = true;
+        return handle_get_error(connection);
     }
 
     return SUCCESS;
@@ -307,7 +332,7 @@ Iteration client_destroy_if_disconnected(void *target, Client *client)
 
     if (client->disconnected)
     {
-        client_destroy(client);
+        delete client;
     }
 
     return Iteration::CONTINUE;

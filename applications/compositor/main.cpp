@@ -100,7 +100,7 @@ void accept_callback(void *target, Socket *socket, SelectEvent events)
 
     Connection *incoming_connection = socket_accept(socket);
 
-    client_create(incoming_connection);
+    new Client(incoming_connection);
 
     client_destroy_disconnected();
 }

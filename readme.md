@@ -1,24 +1,21 @@
+
+![Banner](manual/header.png)
+
 <p align="center">
-<br>
-<br>
-<img src="manual/logo.svg" height=64 />
-<br>
-<br>
-A simple, handmade, operating system for the x86 platform.
-<br>
-<br>
 <a href="https://discord.gg/gamGsfg">Discord</a> -
 <a href="https://skiftOS.github.io/">Website</a> -
 <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
-<a href="manual/readme.md">Manual</a> -
-<a href="https://travis-ci.org/skiftOS/skift"><img src="https://travis-ci.org/skiftOS/skift.svg?branch=master" height=16 /></a>
+<a href="manual/readme.md">Manual</a>
 </p>
-
 <p align="center">
 <b>Notice!</b> We've moved the project to C++ recently, so don't expect it to be idiomatic yet. There is still a lot of work to be done, and any help is very appreciated :)
 </p>
 
-# What skiftOS is about
+# skiftOS
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)
+![GitHub last commit](https://img.shields.io/github/last-commit/skiftOS/skift)
+![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)
 
  - **skiftOS** is a simple, handmade, operating system for the x86 platform. Aiming for clean and pretty API while keeping the spirit of UNIX.
  - **skiftOS** is pretty easy to build from source, just follow the [build guide](manual/building.md)

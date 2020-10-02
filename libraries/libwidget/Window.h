@@ -45,7 +45,7 @@ struct Window
     RefPtr<Bitmap> backbuffer;
     OwnPtr<Painter> backbuffer_painter;
 
-    List *dirty_rect;
+    Vector<Rectangle> _dirty_rects{};
     bool dirty_layout;
 
     EventHandler handlers[EventType::__COUNT];

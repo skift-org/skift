@@ -1,7 +1,5 @@
 #pragma once
 
-#include <libsystem/utils/List.h>
-
 #include <libwidget/Window.h>
 
 Result application_initialize(int argc, char **argv);

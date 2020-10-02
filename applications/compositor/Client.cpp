@@ -244,36 +244,6 @@ Client::Client(Connection *connection)
     });
 }
 
-Client *client_create(Connection *connection)
-{
-    if (!_connected_client)
-    {
-        _connected_client = list_create();
-    }
-
-    Client *client = __create(Client);
-
-    client->connection = connection;
-    client->notifier = notifier_create(
-        client,
-        HANDLE(connection),
-        SELECT_READ,
-        (NotifierCallback)client_request_callback);
-
-    list_pushback(_connected_client, client);
-
-    logger_info("Client %08x connected", client);
-
-    client->send_message((CompositorMessage){
-        .type = COMPOSITOR_MESSAGE_GREETINGS,
-        .greetings = {
-            .screen_bound = renderer_bound(),
-        },
-    });
-
-    return client;
-}
-
 Iteration destroy_window_if_client_match(Client *client, Window *window)
 {
     if (window->client() == client)

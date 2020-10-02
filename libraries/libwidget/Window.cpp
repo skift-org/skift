@@ -72,7 +72,6 @@ Window::Window(WindowFlag flags)
     backbuffer_painter = own<Painter>(backbuffer);
 
     _bound = Rectangle(250, 250);
-    dirty_rect = list_create();
 
     header_container = new Container(nullptr);
     header_container->window(this);
@@ -108,8 +107,6 @@ Window::~Window()
 
     delete root_container;
     delete header_container;
-
-    list_destroy_with_callback(dirty_rect, free);
 }
 
 void Window::repaint(Rectangle rectangle)
@@ -167,21 +164,22 @@ void Window::repaint_dirty()
 
     Rectangle repaited_regions = Rectangle::empty();
 
-    list_foreach(Rectangle, rectangle, dirty_rect)
-    {
-        repaint(*rectangle);
+    _dirty_rects.foreach ([&](Rectangle &rect) {
+        repaint(rect);
 
         if (repaited_regions.is_empty())
         {
-            repaited_regions = *rectangle;
+            repaited_regions = rect;
         }
         else
         {
-            repaited_regions = rectangle->merged_with(repaited_regions);
+            repaited_regions = rect.merged_with(repaited_regions);
         }
-    }
 
-    list_clear_with_callback(dirty_rect, free);
+        return Iteration::CONTINUE;
+    });
+
+    _dirty_rects.clear();
 
     frontbuffer->copy_from(*backbuffer, repaited_regions);
 
@@ -207,23 +205,21 @@ void Window::should_repaint(Rectangle rectangle)
     if (!_visible)
         return;
 
-    if (dirty_rect->empty())
+    if (_dirty_rects.empty())
     {
         _repaint_invoker->invoke_later();
     }
 
-    list_foreach(Rectangle, dirty_rect, dirty_rect)
+    for (size_t i = 0; i < _dirty_rects.count(); i++)
     {
-        if (dirty_rect->colide_with(rectangle))
+        if (_dirty_rects[i].colide_with(rectangle))
         {
-            *dirty_rect = dirty_rect->merged_with(rectangle);
+            _dirty_rects[i] = _dirty_rects[i].merged_with(rectangle);
             return;
         }
     }
 
-    Rectangle *dirty = __create(Rectangle);
-    *dirty = rectangle;
-    list_pushback(dirty_rect, dirty);
+    _dirty_rects.push_back(rectangle);
 }
 
 void Window::should_relayout()

@@ -32,6 +32,19 @@ void BrushTool::event(PaintDocument &document, Event &event, Color &color)
             int y0 = event.mouse.old_position.y();
             int x1 = event.mouse.position.x();
             int y1 = event.mouse.position.y();
+            if (x0 > x1)
+            {
+                int tx = x0;
+                x0 = x1;
+                x1 = tx;
+            }
+
+            if (y0 > y1)
+            {
+                int ty = y0;
+                y0 = y1;
+                y1 = ty;
+            }
 
             dx = x1 - x0;
             dy = y1 - y0;
@@ -68,38 +81,96 @@ void EraserTool::event(PaintDocument &document, Event &event, Color &color)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            int dx = (event.mouse.position - event.mouse.old_position).x() > 0 ? 1 : -1;
-            int dy = (event.mouse.position - event.mouse.old_position).y() > 0 ? 1 : -1;
-            Vec2 _old_position = event.mouse.old_position;
-            while (1)
+            int dx, dy, p, x, y = 0;
+            int x0 = event.mouse.old_position.x();
+            int y0 = event.mouse.old_position.y();
+            int x1 = event.mouse.position.x();
+            int y1 = event.mouse.position.y();
+            if (x0 > x1)
             {
-                Vec2 diff = event.mouse.position - _old_position;
-                document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
-                event.mouse.old_position = event.mouse.position;
-                event.mouse.position += Vec2(dx, dy);
-                if (abs(diff.x()) < 32 and abs(diff.y()) < 32)
-                {
-                    break;
-                }
+                int tx = x0;
+                x0 = x1;
+                x1 = tx;
             }
+
+            if (y0 > y1)
+            {
+                int ty = y0;
+                y0 = y1;
+                y1 = ty;
+            }
+
+            dx = x1 - x0;
+            dy = y1 - y0;
+
+            x = x0;
+            y = y0;
+
+            p = 2 * dy - dx;
+
+            while (x < x1)
+            {
+                if (p >= 0)
+                {
+                    document.painter().clear_rectangle(Rectangle(Vec2(x, y) - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
+                    y = y + 1;
+                    p = p + 2 * dy - 2 * dx;
+                }
+                else
+                {
+                    document.painter().clear_rectangle(Rectangle(Vec2(x, y) - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
+                    p = p + 2 * dy;
+                }
+                x = x + 1;
+            }
+
             document.dirty(true);
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            int dx = (event.mouse.position - event.mouse.old_position).x() > 0 ? 1 : -1;
-            int dy = (event.mouse.position - event.mouse.old_position).y() > 0 ? 1 : -1;
-            Vec2 _old_position = event.mouse.old_position;
-            while (1)                                                                                        
+            int dx, dy, p, x, y = 0;
+            int x0 = event.mouse.old_position.x();
+            int y0 = event.mouse.old_position.y();
+            int x1 = event.mouse.position.x();
+            int y1 = event.mouse.position.y();
+            if (x0 > x1)
             {
-                Vec2 diff = event.mouse.position - _old_position;
-                document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-                event.mouse.old_position = event.mouse.position;
-                event.mouse.position += Vec2(dx, dy);
-                if (abs(diff.x()) < 32 and abs(diff.y()) < 32)
-                {
-                    break;
-                }
+                int tx = x0;
+                x0 = x1;
+                x1 = tx;
             }
+
+            if (y0 > y1)
+            {
+                int ty = y0;
+                y0 = y1;
+                y1 = ty;
+            }
+
+            dx = x1 - x0;
+            dy = y1 - y0;
+
+            x = x0;
+            y = y0;
+
+            p = 2 * dy - dx;
+
+            while (x < x1)
+            {
+                if (p >= 0)
+                {
+                    document.painter().clear_rectangle(Rectangle(Vec2(x, y) - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
+                    y = y + 1;
+                    p = p + 2 * dy - 2 * dx;
+                }
+                else
+                {
+                    document.painter().clear_rectangle(Rectangle(Vec2(x, y) - Vec2i(16), Vec2i(32, 32)), color);
+                    p = p + 2 * dy;
+                }
+                x = x + 1;
+            }
+
             document.dirty(true);
         }
     }

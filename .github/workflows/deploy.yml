@@ -15,13 +15,27 @@ jobs:
     - name: Installing packages
       run: |
         sudo apt update
-        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
-        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
-  
+        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86
+        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
+        sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo clang-format
+
     - name: Fetching submodules
       run: |
         git submodule update --init --recursive
-  
+
+    - name: Cache cross-toolchain
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-cross-toolchain
+      with:
+        path: |
+          **/toolchain/local
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - name: Building cross-toolchain
       run: |
         toolchain/build-it.sh
@@ -30,7 +44,7 @@ jobs:
       run: |
           make all
           echo "::set-env name=RELEASE_TAG::$(date +'%y.%W')"
-  
+
     - name: Creating Release
       id: create_release
       uses: actions/create-release@v1

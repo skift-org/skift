@@ -21,6 +21,19 @@ jobs:
       run: |
         git submodule update --init --recursive
 
+    - name: Cache cross-toolchain
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-cross-toolchain
+      with:
+        path: |
+          **/toolchain/local
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - name: Building cross-toolchain
       run: |
         toolchain/build-it.sh

@@ -2,6 +2,8 @@
 #include <libsystem/Logger.h>
 #include <libutils/Vector.h>
 
+#include <libsystem/math/Bresenham.h>
+
 #include "paint/PaintDocument.h"
 #include "paint/PaintTool.h"
 
@@ -27,20 +29,9 @@ void BrushTool::event(PaintDocument &document, Event &event, Color &color)
     {
         if (event.mouse.buttons & (MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT))
         {
-            int dx = (event.mouse.position - event.mouse.old_position).x() > 0 ? 1 : -1;
-            int dy = (event.mouse.position - event.mouse.old_position).y() > 0 ? 1 : -1;
-            Vec2 _old_position = event.mouse.old_position;
-            while (1)
-            {
-                Vec2 diff = event.mouse.position - _old_position;
-                document.painter().fill_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-                event.mouse.old_position = event.mouse.position;
-                event.mouse.position += Vec2(dx, dy);
-                if (abs(diff.x()) < 32 and abs(diff.y()) < 32)
-                {
-                    break;
-                }
-            }
+            bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2){
+                document.painter().fill_rectangle(Rectangle(vec1, vec2), color);
+            });
             document.dirty(true);
         }
     }
@@ -52,38 +43,16 @@ void EraserTool::event(PaintDocument &document, Event &event, Color &color)
     {
         if (event.mouse.buttons & MOUSE_BUTTON_LEFT)
         {
-            int dx = (event.mouse.position - event.mouse.old_position).x() > 0 ? 1 : -1;
-            int dy = (event.mouse.position - event.mouse.old_position).y() > 0 ? 1 : -1;
-            Vec2 _old_position = event.mouse.old_position;
-            while (1)
-            {
-                Vec2 diff = event.mouse.position - _old_position;
-                document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), Colors::BLACKTRANSPARENT);
-                event.mouse.old_position = event.mouse.position;
-                event.mouse.position += Vec2(dx, dy);
-                if (abs(diff.x()) < 32 and abs(diff.y()) < 32)
-                {
-                    break;
-                }
-            }
+            bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2){
+                document.painter().clear_rectangle(Rectangle(vec1, vec2), Colors::BLACKTRANSPARENT);
+            });
             document.dirty(true);
         }
         else if (event.mouse.buttons & MOUSE_BUTTON_RIGHT)
         {
-            int dx = (event.mouse.position - event.mouse.old_position).x() > 0 ? 1 : -1;
-            int dy = (event.mouse.position - event.mouse.old_position).y() > 0 ? 1 : -1;
-            Vec2 _old_position = event.mouse.old_position;
-            while (1)                                                                                        
-            {
-                Vec2 diff = event.mouse.position - _old_position;
-                document.painter().clear_rectangle(Rectangle(event.mouse.position - Vec2i(16), Vec2i(32, 32)), color);
-                event.mouse.old_position = event.mouse.position;
-                event.mouse.position += Vec2(dx, dy);
-                if (abs(diff.x()) < 32 and abs(diff.y()) < 32)
-                {
-                    break;
-                }
-            }
+            bresenham(event.mouse.old_position, event.mouse.position, 32, [&](auto vec1, auto vec2){
+                document.painter().clear_rectangle(Rectangle(vec1, vec2), color);
+            });
             document.dirty(true);
         }
     }

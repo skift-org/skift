@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Installing packages
+      run: |
+        sudo apt update
+        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
+        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+        
+    - name: Fetching submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Building cross-toolchain
+      run: |
+        toolchain/build-it.sh
+
+    - name: Building skiftOS
+      run: |
+          make all

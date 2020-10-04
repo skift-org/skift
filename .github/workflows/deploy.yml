@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  schedule:
+    - cron: 0 12 * * 1
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Installing packages
+      run: |
+        sudo apt update
+        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
+        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+  
+    - name: Fetching submodules
+      run: |
+        git submodule update --init --recursive
+  
+    - name: Building cross-toolchain
+      run: |
+        toolchain/build-it.sh
+
+    - name: Building skiftOS
+      run: |
+          make all
+          echo "::set-env name=RELEASE_TAG::$(date +'%y.%W')"
+  
+    - name: Creating Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.RELEASE_TAG  }}
+        release_name: ${{ env.RELEASE_TAG }}
+        body: ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: false
+
+    - name: Upload release assets
+      id: upload-release-assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/bootdisk.img
+        asset_name: bootdisk.img
+        asset_content_type: application/x-ima

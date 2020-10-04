@@ -43,6 +43,11 @@ first make sure you have all GCC and binutils dependencies:
  - libmpfr-dev
  - texinfo
 
+must install as clang-format dependency
+```sh
+$ sudo apt install clang-format
+```
+
 You can run the following command on ubuntu:
 ```sh
 $ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo

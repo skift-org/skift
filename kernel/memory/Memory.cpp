@@ -131,8 +131,10 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
     }
 
     if (flags & MEMORY_CLEAR)
+    {
         memset((void *)virtual_range.base(), 0, virtual_range.size());
-
+    }
+    
     return SUCCESS;
 }
 
@@ -146,8 +148,10 @@ Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_r
     virtual_map(page_directory, physical_range, physical_range.base(), flags);
 
     if (flags & MEMORY_CLEAR)
+    {
         memset((void *)physical_range.base(), 0, physical_range.size());
-
+    }
+    
     return SUCCESS;
 }
 
@@ -185,7 +189,9 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     }
 
     if (flags & MEMORY_CLEAR)
+    {
         memset((void *)virtual_address, 0, size);
+    }
 
     *out_address = virtual_address;
     return SUCCESS;
@@ -206,7 +212,9 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
             virtual_map(page_directory, identity_range, identity_range.base(), flags);
 
             if (flags & MEMORY_CLEAR)
+            {
                 memset((void *)identity_range.base(), 0, ARCH_PAGE_SIZE);
+            }
 
             *out_address = identity_range.base();
 
@@ -323,7 +331,9 @@ void memory_pdir_destroy(PageDirectory *page_directory)
 void memory_pdir_dump(PageDirectory *pdir, bool user)
 {
     if (!_memory_initialized)
+    {
         return;
+    }
 
     bool memory_used = false;
     bool memory_empty = true;

@@ -9,4 +9,6 @@ struct FsSocket : public FsNode
     List *pending;
 
     FsSocket();
+
+    ~FsSocket() override;
 };

@@ -7,18 +7,14 @@ template <typename T>
 class RefCounted
 {
 private:
-    int _refcount;
-    bool _orphan;
+    int _refcount = 1;
+    bool _orphan = false;
 
     __noncopyable(RefCounted);
     __nonmovable(RefCounted);
 
 public:
-    RefCounted()
-    {
-        _refcount = 1;
-        _orphan = false;
-    }
+    RefCounted() {}
 
     virtual ~RefCounted()
     {
@@ -38,9 +34,8 @@ public:
     {
         if (!_orphan)
         {
-            assert(_refcount > 0);
-
-            _refcount++;
+            int refcount = __atomic_add_fetch(&_refcount, 1, __ATOMIC_SEQ_CST);
+            assert(refcount >= 0);
         }
     }
 
@@ -48,11 +43,10 @@ public:
     {
         if (!_orphan)
         {
-            assert(_refcount > 0);
+            int refcount = __atomic_sub_fetch(&_refcount, 1, __ATOMIC_SEQ_CST);
+            assert(refcount >= 0);
 
-            _refcount--;
-
-            if (_refcount == 1)
+            if (refcount == 1)
             {
                 if constexpr (requires(const T &t) {
                                   t.one_ref_left();
@@ -62,7 +56,7 @@ public:
                 }
             }
 
-            if (_refcount == 0)
+            if (refcount == 0)
             {
                 delete static_cast<T *>(this);
             }

@@ -7,28 +7,11 @@
 FsNode::FsNode(FileType type)
 {
     lock_init(lock);
-    refcount = 1;
     this->type = type;
 }
 
-FsNode *FsNode::ref()
+FsNode::~FsNode()
 {
-    __atomic_add_fetch(&refcount, 1, __ATOMIC_SEQ_CST);
-
-    return this;
-}
-
-void FsNode::deref()
-{
-    if (__atomic_sub_fetch(&refcount, 1, __ATOMIC_SEQ_CST) == 0)
-    {
-        if (destroy)
-        {
-            destroy(this);
-        }
-
-        free(this);
-    }
 }
 
 void FsNode::ref_handle(FsHandle &handle)

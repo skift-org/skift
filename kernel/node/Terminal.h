@@ -8,12 +8,12 @@
 class FsTerminal : public FsNode
 {
 private:
-public:
-    int width;
-    int height;
-
     static constexpr int BUFFER_SIZE = 1024;
 
+    int _width = 80;
+    int _height = 25;
+
+public:
     RingBuffer master_to_slave_buffer{BUFFER_SIZE};
     RingBuffer slave_to_master_buffer{BUFFER_SIZE};
 

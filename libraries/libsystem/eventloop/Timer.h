@@ -23,7 +23,6 @@ public:
 
     void trigger()
     {
-        //logger_trace("Timer triggered %08x!", this);
         _callback();
     }
 

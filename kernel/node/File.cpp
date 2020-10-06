@@ -53,18 +53,17 @@ static size_t file_size(FsFile *node, FsHandle *handle)
     return node->_buffer_size;
 }
 
-static void file_destroy(FsFile *node)
-{
-    free(node->_buffer);
-}
-
 FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
 {
     open = (FsNodeOpenCallback)file_open;
     size = (FsNodeSizeCallback)file_size;
-    destroy = (FsNodeDestroyCallback)file_destroy;
 
     _buffer = (char *)malloc(512);
     _buffer_allocated = 512;
     _buffer_size = 0;
+}
+
+FsFile::~FsFile()
+{
+    free(_buffer);
 }

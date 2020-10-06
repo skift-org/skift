@@ -22,5 +22,7 @@ public:
 
     FsDirectory();
 
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size);
+    ~FsDirectory() override;
+
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 };

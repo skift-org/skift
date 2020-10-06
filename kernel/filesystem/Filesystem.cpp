@@ -35,7 +35,8 @@ FsNode *filesystem_find_and_ref(Path *path)
 {
     assert(_filesystem_root != nullptr);
 
-    FsNode *current = _filesystem_root->ref();
+    _filesystem_root->ref();
+    FsNode *current = _filesystem_root;
 
     for (size_t i = 0; i < path_element_count(path); i++)
     {
@@ -176,9 +177,7 @@ Result filesystem_mkdir(Path *path)
     }
 
     auto directory = new FsDirectory();
-
     Result result = filesystem_link(path, directory);
-
     directory->deref();
 
     return result;

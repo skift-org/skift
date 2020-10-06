@@ -7,7 +7,8 @@ static FsNode *socket_openConnection(FsSocket *socket)
 {
     FsNode *connection = new FsConnection();
 
-    list_pushback(socket->pending, connection->ref());
+    connection->ref();
+    list_pushback(socket->pending, connection);
 
     return connection;
 }
@@ -37,17 +38,16 @@ static void deref_connection(FsNode *node)
     node->deref();
 }
 
-static void socket_destroy(FsSocket *socket)
-{
-    list_destroy_with_callback(socket->pending, (ListDestroyElementCallback)deref_connection);
-}
-
 FsSocket::FsSocket() : FsNode(FILE_TYPE_SOCKET)
 {
     open_connection = (FsNodeOpenConnectionCallback)socket_openConnection;
     can_accept_connection = (FsNodeCanAcceptConnectionCallback)socket_FsNodeCanAcceptConnectionCallback;
     accept_connection = (FsNodeAcceptConnectionCallback)socket_FsNodeAcceptConnectionCallback;
-    destroy = (FsNodeDestroyCallback)socket_destroy;
 
     pending = list_create();
+}
+
+FsSocket::~FsSocket()
+{
+    list_destroy_with_callback(pending, (ListDestroyElementCallback)deref_connection);
 }

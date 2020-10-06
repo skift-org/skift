@@ -33,8 +33,6 @@ MMIORange::MMIORange(MemoryRange range)
 
 MMIORange::~MMIORange()
 {
-    logger_trace("DESTROYED");
-
     if (empty())
         return;
 

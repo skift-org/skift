@@ -3,6 +3,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Lock.h>
+#include <libutils/RefCounted.h>
 #include <libutils/ResultOr.h>
 
 struct FsNode;
@@ -27,13 +28,10 @@ typedef bool (*FsNodeIsAcceptedCallback)(struct FsNode *node);
 typedef bool (*FsNodeCanAcceptConnectionCallback)(struct FsNode *node);
 typedef struct FsNode *(*FsNodeAcceptConnectionCallback)(struct FsNode *node);
 
-typedef void (*FsNodeDestroyCallback)(struct FsNode *node);
-
-struct FsNode
+struct FsNode : public RefCounted<FsNode>
 {
     FileType type;
     Lock lock;
-    uint refcount;
 
     uint readers = 0;
     uint writers = 0;
@@ -56,14 +54,10 @@ struct FsNode
     FsNodeAcceptCallback accept = nullptr;
     FsNodeIsAcceptedCallback is_accepted = nullptr;
 
-    FsNodeDestroyCallback destroy = nullptr;
-
 public:
     FsNode(FileType type);
 
-    FsNode *ref();
-
-    void deref();
+    virtual ~FsNode();
 
     void ref_handle(FsHandle &handle);
 

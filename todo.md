@@ -54,6 +54,14 @@
     (https://studiopixl.com/2017-08-27/3d-acceleration-using-virtio.html)
     (https://github.com/Keenuts/virtio-gpu-documentation/blob/master/src/virtio-gpu.md)
 
+## Userspace
+
+- [ ] IPC framework
+ - [ ] IPC interface description language (toolbox/ipc-compiler.py)
+ - [ ] IPC library (libraries/libipc/)
+ 
+- [ ] init/sevice-manager (OpenRC/launchd/upstart/systemd like)
+
 ## Application
 
 ### Http Server (Required Kernel/Networking)

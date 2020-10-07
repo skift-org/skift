@@ -12,6 +12,10 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
 
+FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
+{
+}
+
 static Iteration serialize_task(json::Value *destination, Task *task)
 {
     if (task->id == 0)
@@ -32,10 +36,8 @@ static Iteration serialize_task(json::Value *destination, Task *task)
     return Iteration::CONTINUE;
 }
 
-static Result process_info_open(FsProcessInfo *node, FsHandle *handle)
+Result FsProcessInfo::open(FsHandle *handle)
 {
-    __unused(node);
-
     auto destination = json::create_array();
 
     task_iterate(destination, (TaskIterateCallback)serialize_task);
@@ -48,40 +50,16 @@ static Result process_info_open(FsProcessInfo *node, FsHandle *handle)
     return SUCCESS;
 }
 
-static void process_info_close(FsProcessInfo *node, FsHandle *handle)
+void FsProcessInfo::close(FsHandle *handle)
 {
-    __unused(node);
-
     if (handle->attached)
     {
         free(handle->attached);
     }
 }
 
-static size_t process_info_size(FsProcessInfo *node, FsHandle *handle)
-{
-    __unused(node);
-
-    if (handle == nullptr)
-    {
-        return 0;
-    }
-    else
-    {
-        return handle->attached_size;
-    }
-}
-
-FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
-{
-    open = (FsNodeOpenCallback)process_info_open;
-    close = (FsNodeCloseCallback)process_info_close;
-    size = (FsNodeSizeCallback)process_info_size;
-}
-
 ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size)
 {
-
     size_t read = 0;
 
     if (handle.offset <= handle.attached_size)
@@ -96,8 +74,5 @@ ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size
 void process_info_initialize()
 {
     auto info_device = new FsProcessInfo();
-
-    Path *info_device_path = path_create("/System/processes");
-    filesystem_link_and_take_ref(info_device_path, info_device);
-    path_destroy(info_device_path);
+    filesystem_link_and_take_ref_cstring("/System/processes", info_device);
 }

@@ -9,50 +9,16 @@
 struct FsNode;
 struct FsHandle;
 
-typedef Result (*FsNodeOpenCallback)(struct FsNode *node, struct FsHandle *handle);
-typedef void (*FsNodeCloseCallback)(struct FsNode *node, struct FsHandle *handle);
-
-typedef struct FsNode *(*FsNodeFindCallback)(struct FsNode *node, const char *name);
-typedef Result (*FsNodeLinkCallback)(struct FsNode *node, const char *name, struct FsNode *child);
-typedef Result (*FsNodeUnlinkCallback)(struct FsNode *node, const char *name);
-
-typedef Result (*FsNodeStatCallback)(struct FsNode *node, struct FsHandle *handle, FileState *stat);
-
-typedef size_t (*FsNodeSizeCallback)(struct FsNode *node, struct FsHandle *handle);
-
-typedef struct FsNode *(*FsNodeOpenConnectionCallback)(struct FsNode *node);
-
-typedef void (*FsNodeAcceptCallback)(struct FsNode *node);
-typedef bool (*FsNodeIsAcceptedCallback)(struct FsNode *node);
-
-typedef bool (*FsNodeCanAcceptConnectionCallback)(struct FsNode *node);
-typedef struct FsNode *(*FsNodeAcceptConnectionCallback)(struct FsNode *node);
-
 struct FsNode : public RefCounted<FsNode>
 {
     FileType type;
-    Lock lock;
+    Lock _lock;
 
     uint readers = 0;
     uint writers = 0;
     uint clients = 0;
     uint server = 0;
     uint master = 0;
-
-    FsNodeOpenCallback open = nullptr;
-    FsNodeCloseCallback close = nullptr;
-    FsNodeFindCallback find = nullptr;
-    FsNodeLinkCallback link = nullptr;
-    FsNodeUnlinkCallback unlink = nullptr;
-    FsNodeStatCallback stat = nullptr;
-    FsNodeSizeCallback size = nullptr;
-
-    FsNodeOpenConnectionCallback open_connection = nullptr;
-    FsNodeAcceptConnectionCallback accept_connection = nullptr;
-    FsNodeCanAcceptConnectionCallback can_accept_connection = nullptr;
-
-    FsNodeAcceptCallback accept = nullptr;
-    FsNodeIsAcceptedCallback is_accepted = nullptr;
 
 public:
     FsNode(FileType type);
@@ -62,6 +28,22 @@ public:
     void ref_handle(FsHandle &handle);
 
     void deref_handle(FsHandle &handle);
+
+    virtual Result open(FsHandle *handle)
+    {
+        __unused(handle);
+        return SUCCESS;
+    }
+
+    virtual void close(FsHandle *handle)
+    {
+        __unused(handle);
+    }
+
+    virtual size_t size()
+    {
+        return 0;
+    }
 
     virtual Result call(FsHandle &handle, IOCall request, void *args)
     {
@@ -103,14 +85,44 @@ public:
 
         return ERR_NOT_WRITABLE;
     }
+
+    virtual FsNode *find(const char *name)
+    {
+        __unused(name);
+
+        return nullptr;
+    }
+
+    virtual Result link(const char *name, FsNode *child)
+    {
+        __unused(name);
+        __unused(child);
+
+        return ERR_OPERATION_NOT_SUPPORTED;
+    }
+
+    virtual Result unlink(const char *name)
+    {
+        __unused(name);
+
+        return ERR_OPERATION_NOT_SUPPORTED;
+    }
+
+    // Function called when the server accept the connection.
+    virtual void accepted() {}
+
+    // Return true if the connection is accepted
+    virtual bool is_accepted() { return false; }
+
+    virtual ResultOr<FsNode *> connect() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+
+    virtual bool can_accept() { return false; }
+
+    virtual ResultOr<FsNode *> accept() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+
+    bool is_acquire();
+
+    void acquire(int who_acquire);
+
+    void release(int who_release);
 };
-
-bool fsnode_can_accept(FsNode *node);
-
-bool fsnode_is_accepted(FsNode *node);
-
-bool fsnode_is_acquire(FsNode *node);
-
-void fsnode_acquire_lock(FsNode *node, int who_acquire);
-
-void fsnode_release_lock(FsNode *node, int who_release);

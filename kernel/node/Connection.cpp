@@ -6,20 +6,16 @@
 
 #define CONNECTION_BUFFER_SIZE 4096
 
-static void fsconnection_accept(FsConnection *connection)
+FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION) {}
+
+void FsConnection::accepted()
 {
-    connection->_accepted = true;
+    _accepted = true;
 }
 
-static bool fsconnection_is_accepted(FsConnection *connection)
+bool FsConnection::is_accepted()
 {
-    return connection->_accepted;
-}
-
-FsConnection::FsConnection() : FsNode(FILE_TYPE_CONNECTION)
-{
-    accept = (FsNodeAcceptCallback)fsconnection_accept;
-    is_accepted = (FsNodeIsAcceptedCallback)fsconnection_is_accepted;
+    return _accepted;
 }
 
 bool FsConnection::can_read(FsHandle *handle)

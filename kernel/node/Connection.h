@@ -7,7 +7,6 @@
 class FsConnection : public FsNode
 {
 private:
-public:
     static constexpr int BUFFER_SIZE = 4096;
 
     bool _accepted = false;
@@ -16,11 +15,16 @@ public:
 
     RingBuffer _data_to_client{BUFFER_SIZE};
 
+public:
     FsConnection();
 
-    bool can_read(FsHandle *handle);
+    void accepted() override;
 
-    bool can_write(FsHandle *handle);
+    bool is_accepted() override;
+
+    bool can_read(FsHandle *handle) override;
+
+    bool can_write(FsHandle *handle) override;
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 

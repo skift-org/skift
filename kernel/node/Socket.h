@@ -6,9 +6,17 @@
 
 struct FsSocket : public FsNode
 {
-    List *pending;
+private:
+    List *_pending;
 
+public:
     FsSocket();
 
     ~FsSocket() override;
+
+    ResultOr<FsNode *> connect() override;
+
+    bool can_accept() override;
+
+    ResultOr<FsNode *> accept() override;
 };

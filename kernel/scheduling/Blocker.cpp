@@ -7,12 +7,12 @@ bool BlockerAccept::can_unblock(struct Task *task)
 {
     __unused(task);
 
-    return !fsnode_is_acquire(_node) && fsnode_can_accept(_node);
+    return !_node->is_acquire() && _node->can_accept();
 }
 
 void BlockerAccept::on_unblock(struct Task *task)
 {
-    fsnode_acquire_lock(_node, task->id);
+    _node->acquire(task->id);
 }
 
 /* --- BlockerConnect ------------------------------------------------------- */
@@ -20,7 +20,7 @@ void BlockerAccept::on_unblock(struct Task *task)
 bool BlockerConnect::can_unblock(struct Task *task)
 {
     __unused(task);
-    return fsnode_is_accepted(_connection);
+    return _connection->is_accepted();
 }
 
 /* --- BlockerRead ---------------------------------------------------------- */
@@ -29,12 +29,12 @@ bool BlockerRead::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !fsnode_is_acquire(_handle->node) && _handle->node->can_read(_handle);
+    return !_handle->node->is_acquire() && _handle->node->can_read(_handle);
 }
 
 void BlockerRead::on_unblock(Task *task)
 {
-    fsnode_acquire_lock(_handle->node, task->id);
+    _handle->node->acquire(task->id);
 }
 
 /* --- BlockerSelect -------------------------------------------------------- */
@@ -103,11 +103,11 @@ bool BlockerWrite::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !fsnode_is_acquire(_handle->node) &&
+    return !_handle->node->is_acquire() &&
            _handle->node->can_write(_handle);
 }
 
 void BlockerWrite::on_unblock(Task *task)
 {
-    fsnode_acquire_lock(_handle->node, task->id);
+    _handle->node->acquire(task->id);
 }

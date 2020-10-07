@@ -44,14 +44,9 @@ FsNode *filesystem_find_and_ref(Path *path)
         {
             const char *element = path_peek_at(path, i);
 
-            FsNode *found = nullptr;
-
-            if (current->find)
-            {
-                fsnode_acquire_lock(current, scheduler_running_id());
-                found = current->find(current, element);
-                fsnode_release_lock(current, scheduler_running_id());
-            }
+            current->acquire(scheduler_running_id());
+            auto found = current->find(element);
+            current->release(scheduler_running_id());
 
             current->deref();
             current = found;
@@ -88,21 +83,18 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
 
         if (parent)
         {
-            if (parent->link)
+            if (flags & OPEN_SOCKET)
             {
-                if (flags & OPEN_SOCKET)
-                {
-                    node = new FsSocket();
-                }
-                else
-                {
-                    node = new FsFile();
-                }
-
-                fsnode_acquire_lock(parent, scheduler_running_id());
-                parent->link(parent, path_filename(path), node);
-                fsnode_release_lock(parent, scheduler_running_id());
+                node = new FsSocket();
             }
+            else
+            {
+                node = new FsFile();
+            }
+
+            parent->acquire(scheduler_running_id());
+            parent->link(path_filename(path), node);
+            parent->release(scheduler_running_id());
 
             parent->deref();
         }
@@ -257,15 +249,9 @@ Result filesystem_link(Path *path, FsNode *node)
         goto cleanup_and_return;
     }
 
-    if (!parent->link)
-    {
-        result = ERR_OPERATION_NOT_SUPPORTED;
-        goto cleanup_and_return;
-    }
-
-    fsnode_acquire_lock(parent, scheduler_running_id());
-    result = parent->link(parent, path_filename(path), node);
-    fsnode_release_lock(parent, scheduler_running_id());
+    parent->acquire(scheduler_running_id());
+    result = parent->link(path_filename(path), node);
+    parent->release(scheduler_running_id());
 
 cleanup_and_return:
     if (parent != nullptr)
@@ -310,15 +296,9 @@ Result filesystem_unlink(Path *path)
         goto cleanup_and_return;
     }
 
-    if (!parent->unlink)
-    {
-        result = ERR_OPERATION_NOT_SUPPORTED;
-        goto cleanup_and_return;
-    }
-
-    fsnode_acquire_lock(parent, scheduler_running_id());
-    result = parent->unlink(parent, path_filename(path));
-    fsnode_release_lock(parent, scheduler_running_id());
+    parent->acquire(scheduler_running_id());
+    result = parent->unlink(path_filename(path));
+    parent->release(scheduler_running_id());
 
 cleanup_and_return:
     if (parent)
@@ -351,22 +331,14 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto cleanup_and_return;
     }
 
-    if (!old_parent->unlink ||
-        !old_parent->find ||
-        !new_parent->link)
-    {
-        result = ERR_OPERATION_NOT_SUPPORTED;
-        goto cleanup_and_return;
-    }
-
-    fsnode_acquire_lock(new_parent, scheduler_running_id());
+    new_parent->acquire(scheduler_running_id());
 
     if (old_parent != new_parent)
     {
-        fsnode_acquire_lock(old_parent, scheduler_running_id());
+        old_parent->acquire(scheduler_running_id());
     }
 
-    child = old_parent->find(old_parent, path_filename(old_path));
+    child = old_parent->find(path_filename(old_path));
 
     if (!child)
     {
@@ -374,21 +346,21 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto unlock_cleanup_and_return;
     }
 
-    result = new_parent->link(new_parent, path_filename(new_path), child);
+    result = new_parent->link(path_filename(new_path), child);
 
     if (result == SUCCESS)
     {
-        result = old_parent->unlink(old_parent, path_filename(old_path));
+        result = old_parent->unlink(path_filename(old_path));
     }
 
 unlock_cleanup_and_return:
 
     if (old_parent != new_parent)
     {
-        fsnode_release_lock(old_parent, scheduler_running_id());
+        old_parent->release(scheduler_running_id());
     }
 
-    fsnode_release_lock(new_parent, scheduler_running_id());
+    new_parent->release(scheduler_running_id());
 
 cleanup_and_return:
     if (child)

@@ -7,17 +7,34 @@
 #include "kernel/node/File.h"
 #include "kernel/node/Handle.h"
 
-static Result file_open(FsFile *node, FsHandle *handle)
+FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
+{
+    _buffer = (char *)malloc(512);
+    _buffer_allocated = 512;
+    _buffer_size = 0;
+}
+
+FsFile::~FsFile()
+{
+    free(_buffer);
+}
+
+Result FsFile::open(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_TRUNC))
     {
-        free(node->_buffer);
-        node->_buffer = (char *)malloc(512);
-        node->_buffer_allocated = 512;
-        node->_buffer_size = 0;
+        free(_buffer);
+        _buffer = (char *)malloc(512);
+        _buffer_allocated = 512;
+        _buffer_size = 0;
     }
 
     return SUCCESS;
+}
+
+size_t FsFile::size()
+{
+    return _buffer_size;
 }
 
 ResultOr<size_t> FsFile::read(FsHandle &handle, void *buffer, size_t size)
@@ -45,25 +62,4 @@ ResultOr<size_t> FsFile::write(FsHandle &handle, const void *buffer, size_t size
     memcpy((char *)(_buffer) + handle.offset, buffer, size);
 
     return size;
-}
-static size_t file_size(FsFile *node, FsHandle *handle)
-{
-    __unused(handle);
-
-    return node->_buffer_size;
-}
-
-FsFile::FsFile() : FsNode(FILE_TYPE_REGULAR)
-{
-    open = (FsNodeOpenCallback)file_open;
-    size = (FsNodeSizeCallback)file_size;
-
-    _buffer = (char *)malloc(512);
-    _buffer_allocated = 512;
-    _buffer_size = 0;
-}
-
-FsFile::~FsFile()
-{
-    free(_buffer);
 }

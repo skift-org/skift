@@ -5,14 +5,10 @@
 #include "kernel/node/Handle.h"
 #include "kernel/node/Terminal.h"
 
-FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL)
-{
-}
+FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL) {}
 
 bool FsTerminal::can_read(FsHandle *handle)
 {
-    __unused(handle);
-
     if (handle->has_flag(OPEN_MASTER))
     {
         return !slave_to_master_buffer.empty() || !writers;
@@ -25,8 +21,6 @@ bool FsTerminal::can_read(FsHandle *handle)
 
 bool FsTerminal::can_write(FsHandle *handle)
 {
-    __unused(handle);
-
     if (handle->has_flag(OPEN_MASTER))
     {
         return !master_to_slave_buffer.full() || !readers;

@@ -334,6 +334,10 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
 
     window->bound(new_bound);
+
+    Event resize_event = {};
+    resize_event.type = Event::WINDOW_RESIZE;
+    window->dispatch_event(&resize_event);
 }
 
 void window_end_resize(Window *window)

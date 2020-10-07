@@ -246,6 +246,15 @@ static void window_change_framebuffer_if_needed(Window *window)
     }
 }
 
+void Window::size(Vec2i size)
+{
+    bound(bound_on_screen().resized(size));
+
+    Event size_changed = {};
+    size_changed.type = Event::WINDOW_SIZE_CHANGED;
+    dispatch_event(&size_changed);
+}
+
 void Window::show()
 {
     if (_visible)
@@ -336,8 +345,12 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     window->bound(new_bound);
 
     Event resize_event = {};
-    resize_event.type = Event::WINDOW_RESIZE;
+    resize_event.type = Event::WINDOW_RESIZED;
     window->dispatch_event(&resize_event);
+
+    Event size_changed = {};
+	size_changed.type = Event::WINDOW_SIZE_CHANGED;
+	window->dispatch_event(&size_changed);
 }
 
 void window_end_resize(Window *window)

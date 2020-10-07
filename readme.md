@@ -52,4 +52,4 @@ Running on real hardware (Thinkpad x250)
 
 The skift operating system and its core components are licensed under the **MIT License**.
 
-See: [LICENSE.md](https://github.com/skiftOS/skift/blob/master/LICENSE.md)
+See: [LICENSE.md](./license.md)

@@ -152,7 +152,9 @@ void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
         PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
         if (page_table_entry->Present)
+        {
             page_table_entry->as_uint = 0;
+        }
     }
 
     paging_invalidate_tlb();

@@ -79,7 +79,7 @@ public:
     void position(Vec2i position) { bound(bound_on_screen().moved(position)); }
 
     Vec2i size() { return bound().size(); }
-    void size(Vec2i size) { bound(bound_on_screen().resized(size)); }
+    void size(Vec2i size);
 
     Rectangle bound() { return _bound.moved({0, 0}); }
     void bound(Rectangle bound);

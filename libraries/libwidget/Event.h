@@ -39,7 +39,8 @@ struct Event
         LOST_FOCUS,
 
         WINDOW_CLOSING,
-        WINDOW_RESIZE,
+        WINDOW_RESIZED,
+		WINDOW_SIZE_CHANGED,
 
         MOUSE_MOVE,
         MOUSE_ENTER,

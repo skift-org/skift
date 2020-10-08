@@ -2,6 +2,7 @@
 
 #include "kernel/bus/PCI.h"
 #include "kernel/devices/Driver.h"
+#include "kernel/memory/MemoryRange.h"
 
 enum class PCIBarType
 {

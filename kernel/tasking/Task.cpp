@@ -4,7 +4,9 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
+#include "arch/VirtualMemory.h"
 #include "arch/x86_32/Interrupts.h" /* XXX */
+
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task-Handles.h"
@@ -56,11 +58,11 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     if (user)
     {
-        task->page_directory = memory_pdir_create();
+        task->address_space = arch_address_space_create();
     }
     else
     {
-        task->page_directory = memory_kpdir();
+        task->address_space = arch_kernel_address_space();
     }
 
     // Setup shms
@@ -85,10 +87,10 @@ Task *task_create(Task *parent, const char *name, bool user)
         task->handles[i] = nullptr;
     }
 
-    memory_alloc(task->page_directory, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
+    memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
-    memory_map(task->page_directory, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
+    memory_map(task->address_space, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
     task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
     task->user_stack = (void *)0xff000000;
 
@@ -121,12 +123,12 @@ void task_destroy(Task *task)
 
     path_destroy(task->directory);
 
-    memory_free(task->page_directory, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
-    memory_free(task->page_directory, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
+    memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
+    memory_free(task->address_space, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
 
-    if (task->page_directory != memory_kpdir())
+    if (task->address_space != arch_kernel_address_space())
     {
-        memory_pdir_destroy(task->page_directory);
+        arch_address_space_destroy(task->address_space);
     }
 
     free(task);
@@ -181,7 +183,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg
 
 static void pass_argc_argv_user(Task *task, const char **argv)
 {
-    PageDirectory *parent_pdir = task_switch_pdir(scheduler_running(), task->page_directory);
+    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
 
     uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
 
@@ -196,7 +198,7 @@ static void pass_argc_argv_user(Task *task, const char **argv)
     task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
     task_user_stack_push(task, &argc, sizeof(argc));
 
-    task_switch_pdir(scheduler_running(), parent_pdir);
+    task_switch_address_space(scheduler_running(), parent_address_space);
 }
 
 static void pass_argc_argv_kernel(Task *task, const char **argv)
@@ -258,6 +260,8 @@ uintptr_t task_user_stack_push(Task *task, const void *value, size_t size)
 
 void task_go(Task *task)
 {
+    AtomicHolder holder;
+
     if (task->user)
     {
         UserInterruptStackFrame stackframe = {};
@@ -294,9 +298,7 @@ void task_go(Task *task)
         task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
     }
 
-    atomic_begin();
     task->state(TASK_STATE_RUNNING);
-    atomic_end();
 }
 
 Result task_sleep(Task *task, int timeout)
@@ -372,15 +374,15 @@ void task_dump(Task *task)
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state()));
     printf("\n\t   Memory: ");
-    memory_pdir_dump(task->page_directory, false);
+    arch_address_space_dump(task->address_space, false);
 
-    if (task->page_directory == memory_kpdir())
+    if (task->address_space == arch_kernel_address_space())
     {
-        printf("\n\t   Page directory: %08x (kpdir)", task->page_directory);
+        printf("\n\t   Address Space: %08x (kpdir)", task->address_space);
     }
     else
     {
-        printf("\n\t   Page directory: %08x", task->page_directory);
+        printf("\n\t   Address Space: %08x", task->address_space);
     }
 
     printf("\n");

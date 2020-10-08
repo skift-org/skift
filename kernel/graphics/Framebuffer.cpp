@@ -4,9 +4,10 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/thread/Atomic.h>
 
+#include "arch/VirtualMemory.h"
+
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
-#include "kernel/memory/Virtual.h"
 
 static uintptr_t _framebuffer_physical = 0;
 static uintptr_t _framebuffer_virtual = 0;
@@ -78,8 +79,8 @@ void framebuffer_initialize(Handover *handover)
     _framebuffer_pitch = handover->framebuffer_pitch;
 
     _framebuffer_physical = handover->framebuffer_addr;
-    _framebuffer_virtual = virtual_alloc(
-                               &kpdir,
+    _framebuffer_virtual = arch_virtual_alloc(
+                               arch_kernel_address_space(),
                                (MemoryRange){
                                    _framebuffer_physical,
                                    PAGE_ALIGN_UP(_framebuffer_width * _framebuffer_height * sizeof(uint32_t)),

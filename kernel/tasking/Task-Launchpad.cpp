@@ -15,7 +15,7 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
         return ERR_EXEC_FORMAT_ERROR;
     }
 
-    PageDirectory *parent_page_directory = task_switch_pdir(parent_task, child_task->page_directory);
+    void *parent_address_space = task_switch_address_space(parent_task, child_task->address_space);
 
     MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
 
@@ -28,13 +28,13 @@ Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_fil
     {
         logger_error("Didn't read the right amount from the ELF file!");
 
-        task_switch_pdir(parent_task, parent_page_directory);
+        task_switch_address_space(parent_task, parent_address_space);
 
         return ERR_EXEC_FORMAT_ERROR;
     }
     else
     {
-        task_switch_pdir(parent_task, parent_page_directory);
+        task_switch_address_space(parent_task, parent_address_space);
 
         return SUCCESS;
     }

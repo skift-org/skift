@@ -35,7 +35,7 @@ struct Task
     Path *directory;
 
     List *memory_mapping;
-    PageDirectory *page_directory;
+    void *address_space;
 
     int exit_value;
 

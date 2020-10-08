@@ -2,12 +2,16 @@
 
 #include <libsystem/Common.h>
 
-#include "arch/Paging.h"
+#include "arch/Memory.h"
+
+#define PAGE_DIRECTORY_INDEX(vaddr) ((vaddr) >> 22)
+#define PAGE_TABLE_INDEX(vaddr) (((vaddr) >> 12) & 0x03ff)
 
 #define PAGE_TABLE_ENTRY_COUNT 1024
 #define PAGE_DIRECTORY_ENTRY_COUNT 1024
 
-union __packed PageTableEntry {
+union __packed PageTableEntry
+{
     struct __packed
     {
         bool Present : 1;
@@ -30,7 +34,8 @@ struct __packed PageTable
     PageTableEntry entries[PAGE_TABLE_ENTRY_COUNT];
 };
 
-union __packed PageDirectoryEntry {
+union __packed PageDirectoryEntry
+{
     struct __packed
     {
         bool Present : 1;

@@ -10,6 +10,8 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
+#include "arch/VirtualMemory.h"
+
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
@@ -93,13 +95,13 @@ int __plug_memalloc_unlock()
 void *__plug_memalloc_alloc(size_t size)
 {
     uintptr_t address = 0;
-    assert(memory_alloc(memory_kpdir(), size, MEMORY_CLEAR, &address) == SUCCESS);
+    assert(memory_alloc(arch_kernel_address_space(), size, MEMORY_CLEAR, &address) == SUCCESS);
     return (void *)address;
 }
 
 void __plug_memalloc_free(void *address, size_t size)
 {
-    memory_free(memory_kpdir(), (MemoryRange){(uintptr_t)address, size});
+    memory_free(arch_kernel_address_space(), (MemoryRange){(uintptr_t)address, size});
 }
 
 /* --- Logger plugs --------------------------------------------------------- */

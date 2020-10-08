@@ -1,6 +1,8 @@
 #pragma once
 
-#include "kernel/tasking/Task.h"
+#include <libsystem/Time.h>
+
+struct Task;
 
 void arch_disable_interrupts();
 

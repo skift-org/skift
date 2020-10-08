@@ -7,11 +7,11 @@
 class FsPipe : public FsNode
 {
 private:
-public:
     static constexpr int BUFFER_SIZE = 4096;
 
     RingBuffer _buffer{BUFFER_SIZE};
 
+public:
     FsPipe();
 
     bool can_read(FsHandle *handle) override;

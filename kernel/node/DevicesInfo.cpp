@@ -11,10 +11,12 @@
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
 
-static Result device_info_open(FsDeviceInfo *node, FsHandle *handle)
+FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 {
-    __unused(node);
+}
 
+Result FsDeviceInfo::open(FsHandle *handle)
+{
     auto root = json::create_array();
 
     device_iterate([&](RefPtr<Device> device) {
@@ -44,35 +46,12 @@ static Result device_info_open(FsDeviceInfo *node, FsHandle *handle)
     return SUCCESS;
 }
 
-static void device_info_close(FsDeviceInfo *node, FsHandle *handle)
+void FsDeviceInfo::close(FsHandle *handle)
 {
-    __unused(node);
-
     if (handle->attached)
     {
         free(handle->attached);
     }
-}
-
-static size_t device_info_size(FsDeviceInfo *node, FsHandle *handle)
-{
-    __unused(node);
-
-    if (handle == nullptr)
-    {
-        return 0;
-    }
-    else
-    {
-        return handle->attached_size;
-    }
-}
-
-FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
-{
-    open = (FsNodeOpenCallback)device_info_open;
-    close = (FsNodeCloseCallback)device_info_close;
-    size = (FsNodeSizeCallback)device_info_size;
 }
 
 ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
@@ -91,8 +70,5 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
 void device_info_initialize()
 {
     auto device_info_device = new FsDeviceInfo();
-
-    Path *device_info_device_path = path_create("/System/devices");
-    filesystem_link_and_take_ref(device_info_device_path, device_info_device);
-    path_destroy(device_info_device_path);
+    filesystem_link_and_take_ref_cstring("/System/devices", device_info_device);
 }

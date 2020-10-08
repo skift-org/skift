@@ -6,30 +6,39 @@
 #include "kernel/node/Directory.h"
 #include "kernel/node/Handle.h"
 
-static Result directory_open(FsDirectory *node, FsHandle *handle)
+static void directory_entry_destroy(FsDirectoryEntry *entry)
 {
-    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * node->childs->count());
+    entry->node->deref();
+    free(entry);
+}
 
-    listing->count = node->childs->count();
+FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
+{
+    _childs = list_create();
+}
+
+FsDirectory::~FsDirectory()
+{
+    list_destroy_with_callback(_childs, (ListDestroyElementCallback)directory_entry_destroy);
+}
+
+Result FsDirectory::open(FsHandle *handle)
+{
+    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * _childs->count());
+
+    listing->count = _childs->count();
 
     int current_index = 0;
 
-    list_foreach(FsDirectoryEntry, entry, node->childs)
+    list_foreach(FsDirectoryEntry, entry, _childs)
     {
         DirectoryEntry *record = &listing->entries[current_index];
         FsNode *node = entry->node;
 
         strcpy(record->name, entry->name);
-        record->stat.type = node->type;
 
-        if (node->size)
-        {
-            record->stat.size = node->size(entry->node, nullptr);
-        }
-        else
-        {
-            record->stat.size = 0;
-        }
+        record->stat.type = node->type;
+        record->stat.size = node->size();
 
         current_index++;
     };
@@ -39,85 +48,9 @@ static Result directory_open(FsDirectory *node, FsHandle *handle)
     return SUCCESS;
 }
 
-static void directory_close(FsDirectory *node, FsHandle *handle)
+void FsDirectory::close(FsHandle *handle)
 {
-    __unused(node);
-
     free(handle->attached);
-}
-
-static FsNode *directory_find(FsDirectory *node, const char *name)
-{
-    list_foreach(FsDirectoryEntry, entry, node->childs)
-    {
-        if (strcmp(entry->name, name) == 0)
-        {
-            entry->node->ref();
-            return entry->node;
-        }
-    };
-
-    return nullptr;
-}
-
-static Result directory_link(FsDirectory *node, const char *name, FsNode *child)
-{
-    list_foreach(FsDirectoryEntry, entry, node->childs)
-    {
-        if (strcmp(entry->name, name) == 0)
-        {
-            return ERR_FILE_EXISTS;
-        }
-    };
-
-    FsDirectoryEntry *new_entry = __create(FsDirectoryEntry);
-
-    child->ref();
-    new_entry->node = child;
-    strcpy(new_entry->name, name);
-
-    list_pushback(node->childs, new_entry);
-
-    return SUCCESS;
-}
-
-static void directory_entry_destroy(FsDirectoryEntry *entry)
-{
-    entry->node->deref();
-    free(entry);
-}
-
-static Result directory_unlink(FsDirectory *node, const char *name)
-{
-    list_foreach(FsDirectoryEntry, entry, node->childs)
-    {
-        if (strcmp(entry->name, name) == 0)
-        {
-            list_remove(node->childs, entry);
-            directory_entry_destroy(entry);
-
-            return SUCCESS;
-        }
-    }
-
-    return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-}
-
-FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
-{
-
-    open = (FsNodeOpenCallback)directory_open;
-    close = (FsNodeCloseCallback)directory_close;
-    find = (FsNodeFindCallback)directory_find;
-    link = (FsNodeLinkCallback)directory_link;
-    unlink = (FsNodeUnlinkCallback)directory_unlink;
-
-    childs = list_create();
-}
-
-FsDirectory::~FsDirectory()
-{
-    list_destroy_with_callback(childs, (ListDestroyElementCallback)directory_entry_destroy);
 }
 
 ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
@@ -143,4 +76,55 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
     {
         return 0;
     }
+}
+
+FsNode *FsDirectory::find(const char *name)
+{
+    list_foreach(FsDirectoryEntry, entry, _childs)
+    {
+        if (strcmp(entry->name, name) == 0)
+        {
+            entry->node->ref();
+            return entry->node;
+        }
+    };
+
+    return nullptr;
+}
+
+Result FsDirectory::link(const char *name, FsNode *child)
+{
+    list_foreach(FsDirectoryEntry, entry, _childs)
+    {
+        if (strcmp(entry->name, name) == 0)
+        {
+            return ERR_FILE_EXISTS;
+        }
+    };
+
+    FsDirectoryEntry *new_entry = __create(FsDirectoryEntry);
+
+    child->ref();
+    new_entry->node = child;
+    strcpy(new_entry->name, name);
+
+    list_pushback(_childs, new_entry);
+
+    return SUCCESS;
+}
+
+Result FsDirectory::unlink(const char *name)
+{
+    list_foreach(FsDirectoryEntry, entry, _childs)
+    {
+        if (strcmp(entry->name, name) == 0)
+        {
+            list_remove(_childs, entry);
+            directory_entry_destroy(entry);
+
+            return SUCCESS;
+        }
+    }
+
+    return ERR_NO_SUCH_FILE_OR_DIRECTORY;
 }

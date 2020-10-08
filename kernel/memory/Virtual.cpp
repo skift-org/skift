@@ -27,12 +27,7 @@ bool virtual_present(PageDirectory *page_directory, uintptr_t virtual_address)
     int page_table_index = PT_INDEX(virtual_address);
     PageTableEntry &page_table_entry = page_table.entries[page_table_index];
 
-    if (!page_table_entry.Present)
-    {
-        return false;
-    }
-
-    return true;
+    return page_table_entry.Present;
 }
 
 uintptr_t virtual_to_physical(PageDirectory *page_directory, uintptr_t virtual_address)
@@ -157,7 +152,9 @@ void virtual_free(PageDirectory *page_directory, MemoryRange virtual_range)
         PageTableEntry *page_table_entry = &page_table->entries[page_table_index];
 
         if (page_table_entry->Present)
+        {
             page_table_entry->as_uint = 0;
+        }
     }
 
     paging_invalidate_tlb();

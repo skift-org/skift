@@ -20,13 +20,10 @@ FsHandle *fshandle_create(FsNode *node, OpenFlag flags)
     handle->flags = flags;
     handle->node = node;
 
-    fsnode_acquire_lock(node, scheduler_running_id());
+    node->acquire(scheduler_running_id());
     node->ref_handle(*handle);
-    if (node->open)
-    {
-        node->open(node, handle);
-    }
-    fsnode_release_lock(node, scheduler_running_id());
+    node->open(handle);
+    node->release(scheduler_running_id());
 
     return handle;
 }
@@ -43,12 +40,9 @@ FsHandle *fshandle_clone(FsHandle *handle)
     node->ref_handle(*handle);
     clone->node = node;
 
-    if (node->open)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        node->open(node, clone);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
+    node->acquire(scheduler_running_id());
+    node->open(clone);
+    node->release(scheduler_running_id());
 
     return clone;
 }
@@ -57,13 +51,10 @@ void fshandle_destroy(FsHandle *handle)
 {
     FsNode *node = handle->node;
 
-    fsnode_acquire_lock(node, scheduler_running_id());
-    if (node->close)
-    {
-        node->close(node, handle);
-    }
+    node->acquire(scheduler_running_id());
+    node->close(handle);
     node->deref_handle(*handle);
-    fsnode_release_lock(node, scheduler_running_id());
+    node->release(scheduler_running_id());
 
     free(handle);
 }
@@ -83,12 +74,12 @@ SelectEvent fshandle_select(FsHandle *handle, SelectEvent events)
         selected_events |= SELECT_WRITE;
     }
 
-    if ((events & SELECT_CONNECT) && fsnode_is_accepted(node))
+    if ((events & SELECT_CONNECT) && node->is_accepted())
     {
         selected_events |= SELECT_CONNECT;
     }
 
-    if ((events & SELECT_ACCEPT) && fsnode_can_accept(node))
+    if ((events & SELECT_ACCEPT) && node->can_accept())
     {
         selected_events |= SELECT_ACCEPT;
     }
@@ -137,7 +128,7 @@ Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read)
         *read = 0;
     }
 
-    fsnode_release_lock(node, scheduler_running_id());
+    node->release(scheduler_running_id());
 
     return result_or_read.result();
 }
@@ -150,10 +141,7 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
 
     if (handle->has_flag(OPEN_APPEND))
     {
-        if (node->size)
-        {
-            handle->offset = node->size(node, handle);
-        }
+        handle->offset = node->size();
     }
 
     auto result_or_written = node->write(*handle, buffer, size);
@@ -168,7 +156,7 @@ static Result fshandle_write_internal(FsHandle *handle, const void *buffer, size
         *written = 0;
     }
 
-    fsnode_release_lock(node, scheduler_running_id());
+    node->release(scheduler_running_id());
 
     return result_or_written.result();
 }
@@ -208,14 +196,9 @@ Result fshandle_seek(FsHandle *handle, int offset, Whence whence)
 {
     FsNode *node = handle->node;
 
-    size_t size = 0;
-
-    if (node->size)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        size = node->size(node, handle);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
+    node->acquire(scheduler_running_id());
+    size_t size = node->size();
+    node->release(scheduler_running_id());
 
     switch (whence)
     {
@@ -259,12 +242,9 @@ Result fshandle_tell(FsHandle *handle, Whence whence, int *offset)
 
     size_t size = 0;
 
-    if (node->size)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        size = node->size(node, handle);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
+    node->acquire(scheduler_running_id());
+    size = node->size();
+    node->release(scheduler_running_id());
 
     switch (whence)
     {
@@ -289,9 +269,9 @@ Result fshandle_call(FsHandle *handle, IOCall request, void *args)
 
     FsNode *node = handle->node;
 
-    fsnode_acquire_lock(node, scheduler_running_id());
+    node->acquire(scheduler_running_id());
     result = node->call(*handle, request, args);
-    fsnode_release_lock(node, scheduler_running_id());
+    node->release(scheduler_running_id());
 
     return result;
 }
@@ -302,49 +282,29 @@ Result fshandle_stat(FsHandle *handle, FileState *stat)
 
     FsNode *node = handle->node;
 
-    if (node->size)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        stat->size = node->size(node, handle);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
-    else
-    {
-        stat->size = 0;
-    }
-
+    node->acquire(scheduler_running_id());
+    stat->size = node->size();
     stat->type = node->type;
-
-    if (node->stat)
-    {
-        fsnode_acquire_lock(node, scheduler_running_id());
-        result = node->stat(node, handle, stat);
-        fsnode_release_lock(node, scheduler_running_id());
-    }
+    node->release(scheduler_running_id());
 
     return result;
 }
 
 Result fshandle_connect(FsNode *node, FsHandle **connection_handle)
 {
-    if (!node->open_connection)
+    node->acquire(scheduler_running_id());
+    auto connection_or_result = node->connect();
+    node->release(scheduler_running_id());
+
+    if (!connection_or_result.success())
     {
-        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
-    }
-
-    fsnode_acquire_lock(node, scheduler_running_id());
-
-    FsNode *connection = node->open_connection(node);
-
-    fsnode_release_lock(node, scheduler_running_id());
-
-    if (connection == nullptr)
-    {
-        return ERR_CONNECTION_REFUSED;
+        return connection_or_result.result();
     }
 
     // We need to create the fshandle before releasing the lock
     // Because this will increment FsNode::clients
+
+    auto connection = connection_or_result.take_value();
 
     *connection_handle = fshandle_create(connection, OPEN_CLIENT);
 
@@ -359,21 +319,24 @@ Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle)
 {
     FsNode *node = handle->node;
 
-    if (!node->accept_connection)
-    {
-        return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
-    }
-
     task_block(scheduler_running(), new BlockerAccept(node), -1);
 
-    FsNode *connection = node->accept_connection(node);
+    auto connection_or_result = node->accept();
+
+    if (!connection_or_result.success())
+    {
+        node->release(scheduler_running_id());
+        return connection_or_result.result();
+    }
 
     // We need to create the fshandle before releasing the lock
     // Because this will increment FsNode::servers
 
+    auto connection = connection_or_result.take_value();
+
     *connection_handle = fshandle_create(connection, OPEN_SERVER);
 
-    fsnode_release_lock(node, scheduler_running_id());
+    node->release(scheduler_running_id());
 
     connection->deref();
 

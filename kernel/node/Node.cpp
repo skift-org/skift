@@ -6,7 +6,7 @@
 
 FsNode::FsNode(FileType type)
 {
-    lock_init(lock);
+    lock_init(_lock);
     this->type = type;
 }
 
@@ -54,41 +54,17 @@ void FsNode::deref_handle(FsHandle &handle)
     this->deref();
 }
 
-bool fsnode_can_accept(FsNode *node)
+bool FsNode::is_acquire()
 {
-    if (node->can_accept_connection)
-    {
-        return node->can_accept_connection(node);
-    }
-    else
-    {
-        return true;
-    }
+    return lock_is_acquire(_lock);
 }
 
-bool fsnode_is_accepted(FsNode *node)
+void FsNode::acquire(int who_acquire)
 {
-    if (node->is_accepted)
-    {
-        return node->is_accepted(node);
-    }
-    else
-    {
-        return true;
-    }
+    lock_acquire_by(_lock, who_acquire);
 }
 
-bool fsnode_is_acquire(FsNode *node)
+void FsNode::release(int who_release)
 {
-    return lock_is_acquire(node->lock);
-}
-
-void fsnode_acquire_lock(FsNode *node, int who_acquire)
-{
-    lock_acquire_by(node->lock, who_acquire);
-}
-
-void fsnode_release_lock(FsNode *node, int who_release)
-{
-    lock_release_by(node->lock, who_release);
+    lock_release_by(_lock, who_release);
 }

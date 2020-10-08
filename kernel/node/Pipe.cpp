@@ -4,19 +4,8 @@
 #include "kernel/node/Handle.h"
 #include "kernel/node/Pipe.h"
 
-#define PIPE_BUFFER_SIZE 4096
-
-static size_t pipe_size(FsPipe *node, FsHandle *handle)
-{
-    __unused(node);
-    __unused(handle);
-
-    return PIPE_BUFFER_SIZE;
-}
-
 FsPipe::FsPipe() : FsNode(FILE_TYPE_PIPE)
 {
-    size = (FsNodeSizeCallback)pipe_size;
 }
 
 bool FsPipe::can_read(FsHandle *handle)

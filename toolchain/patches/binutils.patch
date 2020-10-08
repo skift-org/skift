@@ -131,9 +131,9 @@ index 00000000..1369b907
 +TEXT_START_ADDR=0x40000000
 diff --git a/ld/emulparams/elf_x86_64_skift.sh b/ld/emulparams/elf_x86_64_skift.sh
 new file mode 100644
-index 00000000..0dd7354a
+index 00000000..f4097a25
 --- /dev/null
 +++ b/ld/emulparams/elf_x86_64_skift.sh
 @@ -0,0 +1,2 @@
-++. ${srcdir}/emulparams/elf_x86_64.sh
-++TEXT_START_ADDR=0x40000000
++. ${srcdir}/emulparams/elf_x86_64.sh
++TEXT_START_ADDR=0x40000000

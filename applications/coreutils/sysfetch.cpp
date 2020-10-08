@@ -33,6 +33,7 @@ int main(int argc, char **argv)
     printf("\e[16C OS: %sOS\n", info.system_name);
     printf("\e[16C KERNEL: %s\n", info.kernel_name);
     printf("\e[16C VERSION: %s\n", info.kernel_release);
+    printf("\e[16C BUILD: %s\n", info.kernel_build);
     printf("\e[16C UPTIME: ");
 
     ElapsedTime seconds = status.uptime;

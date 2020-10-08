@@ -22,7 +22,8 @@ UTILS = \
 	TOUCH \
 	UNLINK \
 	UPTIME \
-	LINK 
+	LINK  \
+	UNAME
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -95,6 +96,9 @@ UNLINK_NAME = unlink
 
 UPTIME_LIBS =
 UPTIME_NAME = uptime
+
+UNAME_LIBS = 
+UNAME_NAME = uname
 
 define UTIL_TEMPLATE =
 

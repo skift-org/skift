@@ -1,6 +1,7 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/Arch.h"
+#include "arch/VirtualMemory.h"
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
@@ -141,7 +142,7 @@ uintptr_t schedule(uintptr_t current_stack_pointer)
         running = idle;
     }
 
-    memory_pdir_switch(running->page_directory);
+    arch_address_space_switch(running->address_space);
     arch_load_context(running);
 
     scheduler_context_switch = false;

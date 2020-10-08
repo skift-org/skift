@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/io/Stream.h>
+
 #include "kernel/bus/LegacyAddress.h"
 #include "kernel/bus/PCIAddress.h"
 #include "kernel/bus/UNIXAddress.h"

@@ -107,3 +107,4 @@ void arch_backtrace()
 {
     ASSERT_NOT_REACHED();
 }
+

@@ -5,11 +5,12 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
 
+#include "arch/VirtualMemory.h"
+
+#include "kernel/graphics/Graphics.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/MemoryObject.h"
 #include "kernel/memory/Physical.h"
-#include "kernel/memory/Virtual.h"
-#include "kernel/graphics/Graphics.h"
 
 static bool _memory_initialized = false;
 
@@ -30,16 +31,6 @@ void memory_initialize(Handover *handover)
         MEMORY[i] = 0xff;
     }
 
-    // Setup the kernel pagedirectory.
-    for (size_t i = 0; i < 256; i++)
-    {
-        PageDirectoryEntry *entry = &kpdir.entries[i];
-        entry->User = 0;
-        entry->Write = 1;
-        entry->Present = 1;
-        entry->PageFrameNumber = (size_t)&kptable[i] / ARCH_PAGE_SIZE;
-    }
-
     for (size_t i = 0; i < handover->memory_map_size; i++)
     {
         MemoryMapEntry *entry = &handover->memory_map[i];
@@ -50,27 +41,29 @@ void memory_initialize(Handover *handover)
         }
     }
 
+    arch_virtual_initialize();
+
     USED_MEMORY = 0;
     TOTAL_MEMORY = handover->memory_usable;
 
     logger_info("Mapping kernel...");
-    memory_map_identity(&kpdir, kernel_memory_range(), MEMORY_NONE);
+    memory_map_identity(arch_kernel_address_space(), kernel_memory_range(), MEMORY_NONE);
 
     logger_info("Mapping modules...");
     for (size_t i = 0; i < handover->modules_size; i++)
     {
-        memory_map_identity(&kpdir, handover->modules[i].range, MEMORY_NONE);
+        memory_map_identity(arch_kernel_address_space(), handover->modules[i].range, MEMORY_NONE);
     }
 
     // Unmap the 0 page
     MemoryRange page_zero{0, ARCH_PAGE_SIZE};
-    virtual_free(memory_kpdir(), page_zero);
+    arch_virtual_free(arch_kernel_address_space(), page_zero);
     physical_set_used(page_zero);
 
-    memory_pdir_switch(&kpdir);
+    arch_address_space_switch(arch_kernel_address_space());
 
     graphic_did_find_framebuffer(0, 0, 0);
-    paging_enable();
+    arch_virtual_memory_enable();
 
     logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);
     logger_info("%uKio of memory is used by the kernel", USED_MEMORY / 1024);
@@ -103,12 +96,7 @@ size_t memory_get_total()
     return TOTAL_MEMORY;
 }
 
-PageDirectory *memory_kpdir()
-{
-    return &kpdir;
-}
-
-Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, MemoryFlags flags)
+Result memory_map(void *address_space, MemoryRange virtual_range, MemoryFlags flags)
 {
     assert(virtual_range.is_page_aligned());
 
@@ -118,10 +106,10 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
     {
         uintptr_t virtual_address = virtual_range.base() + i * ARCH_PAGE_SIZE;
 
-        if (!virtual_present(page_directory, virtual_address))
+        if (!arch_virtual_present(address_space, virtual_address))
         {
             auto physical_range = physical_alloc(ARCH_PAGE_SIZE);
-            Result virtual_map_result = virtual_map(page_directory, physical_range, virtual_address, flags);
+            Result virtual_map_result = arch_virtual_map(address_space, physical_range, virtual_address, flags);
 
             if (virtual_map_result != SUCCESS)
             {
@@ -134,28 +122,29 @@ Result memory_map(PageDirectory *page_directory, MemoryRange virtual_range, Memo
     {
         memset((void *)virtual_range.base(), 0, virtual_range.size());
     }
-    
+
     return SUCCESS;
 }
 
-Result memory_map_identity(PageDirectory *page_directory, MemoryRange physical_range, MemoryFlags flags)
+Result memory_map_identity(void *address_space, MemoryRange physical_range, MemoryFlags flags)
 {
     assert(physical_range.is_page_aligned());
 
     AtomicHolder holder;
 
     physical_set_used(physical_range);
-    virtual_map(page_directory, physical_range, physical_range.base(), flags);
+    arch_virtual_map(address_space, physical_range, physical_range.base(), flags);
 
     if (flags & MEMORY_CLEAR)
     {
         memset((void *)physical_range.base(), 0, physical_range.size());
     }
-    
+
     return SUCCESS;
 }
 
-Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flags, uintptr_t *out_address)
+Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr_t *out_address)
+
 {
     assert(IS_PAGE_ALIGN(size));
 
@@ -178,7 +167,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
         return ERR_OUT_OF_MEMORY;
     }
 
-    uintptr_t virtual_address = virtual_alloc(page_directory, physical_range, flags).base();
+    uintptr_t virtual_address = arch_virtual_alloc(address_space, physical_range, flags).base();
 
     if (!virtual_address)
     {
@@ -197,7 +186,7 @@ Result memory_alloc(PageDirectory *page_directory, size_t size, MemoryFlags flag
     return SUCCESS;
 }
 
-Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, uintptr_t *out_address)
+Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *out_address)
 {
     AtomicHolder holder;
 
@@ -205,11 +194,11 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
     {
         MemoryRange identity_range{i * ARCH_PAGE_SIZE, ARCH_PAGE_SIZE};
 
-        if (!virtual_present(page_directory, identity_range.base()) &&
+        if (!arch_virtual_present(address_space, identity_range.base()) &&
             !physical_is_used(identity_range))
         {
             physical_set_used(identity_range);
-            virtual_map(page_directory, identity_range, identity_range.base(), flags);
+            arch_virtual_map(address_space, identity_range, identity_range.base(), flags);
 
             if (flags & MEMORY_CLEAR)
             {
@@ -229,7 +218,7 @@ Result memory_alloc_identity(PageDirectory *page_directory, MemoryFlags flags, u
     return ERR_OUT_OF_MEMORY;
 }
 
-Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
+Result memory_free(void *address_space, MemoryRange virtual_range)
 {
     assert(virtual_range.is_page_aligned());
 
@@ -239,153 +228,15 @@ Result memory_free(PageDirectory *page_directory, MemoryRange virtual_range)
     {
         uintptr_t virtual_address = virtual_range.base() + i * ARCH_PAGE_SIZE;
 
-        if (virtual_present(page_directory, virtual_address))
+        if (arch_virtual_present(address_space, virtual_address))
         {
-            MemoryRange page_physical_range{virtual_to_physical(page_directory, virtual_address), ARCH_PAGE_SIZE};
+            MemoryRange page_physical_range{arch_virtual_to_physical(address_space, virtual_address), ARCH_PAGE_SIZE};
             MemoryRange page_virtual_range{virtual_address, ARCH_PAGE_SIZE};
 
             physical_free(page_physical_range);
-            virtual_free(page_directory, page_virtual_range);
+            arch_virtual_free(address_space, page_virtual_range);
         }
     }
 
     return SUCCESS;
-}
-
-PageDirectory *memory_pdir_create()
-{
-    AtomicHolder holder;
-
-    PageDirectory *page_directory = nullptr;
-
-    if (memory_alloc(&kpdir, sizeof(PageDirectory), MEMORY_CLEAR, (uintptr_t *)&page_directory) != SUCCESS)
-    {
-        logger_error("Page directory allocation failed!");
-
-        return nullptr;
-    }
-
-    memset(page_directory, 0, sizeof(PageDirectory));
-
-    // Copy first gigs of virtual memory (kernel space);
-    for (uint i = 0; i < 256; i++)
-    {
-        PageDirectoryEntry *page_directory_entry = &page_directory->entries[i];
-
-        page_directory_entry->User = 0;
-        page_directory_entry->Write = 1;
-        page_directory_entry->Present = 1;
-        page_directory_entry->PageFrameNumber = (uint)&kptable[i] / ARCH_PAGE_SIZE;
-    }
-
-    return page_directory;
-}
-
-void memory_pdir_destroy(PageDirectory *page_directory)
-{
-    AtomicHolder holder;
-
-    for (size_t i = 256; i < 1024; i++)
-    {
-        PageDirectoryEntry *page_directory_entry = &page_directory->entries[i];
-
-        if (page_directory_entry->Present)
-        {
-            PageTable *page_table = (PageTable *)(page_directory_entry->PageFrameNumber * ARCH_PAGE_SIZE);
-
-            for (size_t i = 0; i < 1024; i++)
-            {
-                PageTableEntry *page_table_entry = &page_table->entries[i];
-
-                if (page_table_entry->Present)
-                {
-                    uintptr_t physical_address = page_table_entry->PageFrameNumber * ARCH_PAGE_SIZE;
-
-                    MemoryRange physical_range{physical_address, ARCH_PAGE_SIZE};
-
-                    physical_free(physical_range);
-                }
-            }
-
-            memory_free(&kpdir, (MemoryRange){(uintptr_t)page_table, sizeof(PageTable)});
-        }
-    }
-
-    memory_free(&kpdir, (MemoryRange){(uintptr_t)page_directory, sizeof(PageDirectory)});
-}
-
-#define MEMORY_DUMP_REGION_START(__pdir, __addr)                \
-    {                                                           \
-        memory_used = true;                                     \
-        memory_empty = false;                                   \
-        current_physical = virtual_to_physical(__pdir, __addr); \
-        printf("\n\t %8x [%08x:", (__addr), current_physical);  \
-    }
-
-#define MEMORY_DUMP_REGION_END(__pdir, __addr)                               \
-    {                                                                        \
-        memory_used = false;                                                 \
-        printf("%08x] %08x", virtual_to_physical(__pdir, __addr), (__addr)); \
-    }
-
-void memory_pdir_dump(PageDirectory *pdir, bool user)
-{
-    if (!_memory_initialized)
-    {
-        return;
-    }
-
-    bool memory_used = false;
-    bool memory_empty = true;
-    uint current_physical = 0;
-
-    for (int i = user ? 256 : 0; i < 1024; i++)
-    {
-        PageDirectoryEntry *pde = &pdir->entries[i];
-        if (pde->Present)
-        {
-            PageTable *ptable = (PageTable *)(pde->PageFrameNumber * ARCH_PAGE_SIZE);
-
-            for (int j = 0; j < 1024; j++)
-            {
-                PageTableEntry *p = &ptable->entries[j];
-
-                if (p->Present && !memory_used)
-                {
-                    MEMORY_DUMP_REGION_START(pdir, (i * 1024 + j) * ARCH_PAGE_SIZE);
-                }
-                else if (!p->Present && memory_used)
-                {
-                    MEMORY_DUMP_REGION_END(pdir, (i * 1024 + j - 1) * ARCH_PAGE_SIZE);
-                }
-                else if (p->Present)
-                {
-                    uint new_physical = virtual_to_physical(pdir, (i * 1024 + j) * ARCH_PAGE_SIZE);
-
-                    if (!(current_physical + ARCH_PAGE_SIZE == new_physical))
-                    {
-                        printf("%08x | ", current_physical);
-                        printf("%08x:", new_physical);
-                    }
-
-                    current_physical = new_physical;
-                }
-            }
-        }
-        else if (memory_used)
-        {
-            MEMORY_DUMP_REGION_END(pdir, (i * 1024 - 1) * ARCH_PAGE_SIZE);
-        }
-    }
-
-    if (memory_empty)
-    {
-        printf("[empty]");
-    }
-}
-
-void memory_pdir_switch(PageDirectory *pdir)
-{
-    AtomicHolder holder;
-    paging_load_directory(virtual_to_physical(&kpdir, (uintptr_t)pdir));
 }

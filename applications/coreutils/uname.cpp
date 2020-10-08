@@ -54,12 +54,12 @@ int main(int argc, char **argv)
 
     if(option_kernel_release || option_all)
     {
-        printf("%s ", __BUILD_VERSION__);
+        printf("%s ", info.kernel_release);
     }
 
     if(option_kernel_version || option_all)
     {
-        printf("%s ", info.kernel_release);
+        printf("%s ", info.kernel_build);
     }
 
     if(option_machine || option_all)

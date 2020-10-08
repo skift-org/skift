@@ -3,7 +3,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
 #include <libsystem/eventloop/Invoker.h>
-#include <libsystem/utils/HashMap.h>
+#include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
@@ -56,7 +56,7 @@ struct Window
     Widget *focused_widget = nullptr;
     Widget *mouse_focused_widget = nullptr;
     Widget *mouse_over_widget = nullptr;
-    HashMap *widget_by_id = nullptr;
+    HashMap<String, Widget *> widget_by_id{};
 
     OwnPtr<Invoker> _repaint_invoker;
 
@@ -144,11 +144,11 @@ public:
     void should_relayout();
 
     template <typename WidgetType, typename CallbackType>
-    void with_widget(const char *name, CallbackType callback)
+    void with_widget(String name, CallbackType callback)
     {
-        if (hashmap_has(widget_by_id, name))
+        if (widget_by_id.has_key(name))
         {
-            auto widget = dynamic_cast<WidgetType *>((Widget *)hashmap_get(widget_by_id, name));
+            auto widget = dynamic_cast<WidgetType *>(widget_by_id[name]);
 
             if (widget)
             {
@@ -163,5 +163,5 @@ public:
 
     void widget_removed(Widget *widget);
 
-    void register_widget_by_id(const char *id, Widget *widget);
+    void register_widget_by_id(String id, Widget *widget);
 };

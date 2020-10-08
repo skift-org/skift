@@ -6,10 +6,10 @@ namespace json
 {
 void stringify_internal(BufferBuilder *builder, Value *value);
 
-Iteration stringify_object(BufferBuilder *builder, char *key, Value *value)
+Iteration stringify_object(BufferBuilder *builder, String &key, Value *value)
 {
     buffer_builder_append_str(builder, "\"");
-    buffer_builder_append_str(builder, key);
+    buffer_builder_append_str(builder, key.cstring());
     buffer_builder_append_str(builder, "\"");
     buffer_builder_append_str(builder, " : ");
     stringify_internal(builder, value);
@@ -56,9 +56,12 @@ void stringify_internal(BufferBuilder *builder, Value *value)
     case OBJECT:
         buffer_builder_append_str(builder, "{");
 
-        if (hashmap_count(value->storage_object) > 0)
+        if (value->storage_object->count() > 0)
         {
-            hashmap_iterate(value->storage_object, builder, (HashMapIterationCallback)stringify_object);
+            value->storage_object->foreach ([&](auto &key, auto &value) {
+                stringify_object(builder, key, value);
+                return Iteration::CONTINUE;
+            });
             buffer_builder_rewind(builder, 2); // remove the last ", "
         }
 
@@ -69,7 +72,11 @@ void stringify_internal(BufferBuilder *builder, Value *value)
 
         if (value->storage_array->count() > 0)
         {
-            list_iterate(value->storage_array, builder, (ListIterationCallback)stringify_array);
+            value->storage_array->foreach ([&](auto &value) {
+                stringify_array(builder, value);
+                return Iteration::CONTINUE;
+            });
+
             buffer_builder_rewind(builder, 2); // remove the last ", "
         }
 

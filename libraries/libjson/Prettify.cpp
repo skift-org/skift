@@ -31,7 +31,7 @@ static void prettify_ident(PrettifyState *state)
     }
 }
 
-static Iteration prettify_object(PrettifyState *state, char *key, Value *value)
+static Iteration prettify_object(PrettifyState *state, String &key, Value *value)
 {
     prettify_ident(state);
 
@@ -41,7 +41,7 @@ static Iteration prettify_object(PrettifyState *state, char *key, Value *value)
     }
 
     buffer_builder_append_str(state->builder, "\"");
-    buffer_builder_append_str(state->builder, key);
+    buffer_builder_append_str(state->builder, key.cstring());
     buffer_builder_append_str(state->builder, "\"");
 
     if (state->color)
@@ -98,10 +98,15 @@ static void prettify_internal(PrettifyState *state, Value *value)
     {
         buffer_builder_append_str(state->builder, "{");
 
-        if (hashmap_count(value->storage_object) > 0)
+        if (value->storage_object->count() > 0)
         {
             state->depth++;
-            hashmap_iterate(value->storage_object, state, (HashMapIterationCallback)prettify_object);
+
+            value->storage_object->foreach ([&](auto &key, auto &value) {
+                prettify_object(state, key, value);
+                return Iteration::CONTINUE;
+            });
+
             buffer_builder_rewind(state->builder, 1); // remove the last ","
             state->depth--;
         }
@@ -118,8 +123,13 @@ static void prettify_internal(PrettifyState *state, Value *value)
         if (value->storage_array->count() > 0)
         {
             state->depth++;
-            list_iterate(value->storage_array, state, (ListIterationCallback)prettify_array);
+
+            value->storage_array->foreach ([&](auto &value) {
+                prettify_array(state, value);
+                return Iteration::CONTINUE;
+            });
             buffer_builder_rewind(state->builder, 1); // remove the last ","
+
             state->depth--;
         }
 

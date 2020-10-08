@@ -215,7 +215,7 @@ public:
         }
     }
 
-    void insert(size_t index, T value)
+    T &insert(size_t index, T value)
     {
         assert(index <= _count);
 
@@ -227,6 +227,8 @@ public:
         }
 
         new (&_storage[index]) T(move(value));
+
+        return _storage[index];
     }
 
     void insert_sorted(T value)
@@ -315,19 +317,19 @@ public:
     {
         assert(index < _count);
 
-        T copy = _storage[index];
+        T copy = move(_storage[index]);
         remove_index(index);
         return copy;
     }
 
-    void push(T value)
+    T &push(T value)
     {
-        insert(0, value);
+        return insert(0, value);
     }
 
-    void push_back(T value)
+    T &push_back(T value)
     {
-        insert(_count, value);
+        return insert(_count, value);
     }
 
     void push_back_many(Vector<T> &values)

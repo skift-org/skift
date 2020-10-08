@@ -2,9 +2,9 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/utils/HashMap.h>
+#include <libutils/HashMap.h>
 
-static HashMap *_icons = nullptr;
+static HashMap<String, RefPtr<Icon>> _icons{};
 
 #define ICON_SIZE_NAME_ENTRY(__size) #__size,
 const char *_icon_size_names[] = {ICON_SIZE_LIST(ICON_SIZE_NAME_ENTRY)};
@@ -33,30 +33,21 @@ static RefPtr<Icon> icon_load(String name)
 
 RefPtr<Icon> Icon::get(String name)
 {
-    if (!_icons)
+    if (!_icons.has_key(name))
     {
-        _icons = hashmap_create_string_to_value();
+        _icons[name] = icon_load(name);
     }
 
-    if (!hashmap_has(_icons, name.cstring()))
-    {
-        return icon_load(name);
-    }
-    else
-    {
-        return *(Icon *)hashmap_get(_icons, name.cstring());
-    }
+    return _icons[name];
 }
 
 Icon::Icon(String name)
     : _name(name)
 {
-    hashmap_put(_icons, name.cstring(), this);
 }
 
 Icon::~Icon()
 {
-    hashmap_remove_value(_icons, this);
 }
 
 Rectangle Icon::bound(IconSize size)

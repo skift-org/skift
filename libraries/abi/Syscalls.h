@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libsystem/Common.h>
 #include <libsystem/Result.h>
 
 #define SYSCALL_LIST(__ENTRY)          \
@@ -52,32 +53,45 @@ enum Syscall
     SYSCALL_LIST(SYSCALL_ENUM_ENTRY) __SYSCALL_COUNT
 };
 
-static inline Result __syscall(Syscall syscall, int p1, int p2, int p3, int p4, int p5)
+static inline Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p3, uintptr_t p4, uintptr_t p5)
 {
-    Result __ret;
+    Result __ret = ERR_FUNCTION_NOT_IMPLEMENTED;
+
+#if defined(__x86_64__)
+    // TODO: x86_64 syscall.
+    __unused(syscall);
+    __unused(p1);
+    __unused(p2);
+    __unused(p3);
+    __unused(p4);
+    __unused(p5);
+
+#elif defined(__i386__)
     __asm__ __volatile__("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx"
                          : "=a"(__ret)
-                         : "0"(syscall), "r"((int)(p1)), "c"((int)(p2)), "d"((int)(p3)), "S"((int)(p4)), "D"((int)(p5))
+                         : "0"(syscall), "r"(p1), "c"(p2), "d"(p3), "S"(p4), "D"(p5)
                          : "memory");
+#endif
+
     return __ret;
 }
 
-static inline Result __syscall(Syscall syscall, int p1, int p2, int p3, int p4)
+static inline Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p3, uintptr_t p4)
 {
     return __syscall(syscall, p1, p2, p3, p4, 0);
 }
 
-static inline Result __syscall(Syscall syscall, int p1, int p2, int p3)
+static inline Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uintptr_t p3)
 {
     return __syscall(syscall, p1, p2, p3, 0, 0);
 }
 
-static inline Result __syscall(Syscall syscall, int p1, int p2)
+static inline Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2)
 {
     return __syscall(syscall, p1, p2, 0, 0, 0);
 }
 
-static inline Result __syscall(Syscall syscall, int p1)
+static inline Result __syscall(Syscall syscall, uintptr_t p1)
 {
     return __syscall(syscall, p1, 0, 0, 0, 0);
 }

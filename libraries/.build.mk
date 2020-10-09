@@ -1,23 +1,3 @@
-CRTS= \
-	$(BUILD_DIRECTORY_LIBS)/crt0.o \
-	$(BUILD_DIRECTORY_LIBS)/crti.o \
-	$(BUILD_DIRECTORY_LIBS)/crtn.o
-
-$(BUILD_DIRECTORY_LIBS)/crt0.o: libraries/crt0.s
-	$(DIRECTORY_GUARD)
-	@echo [AS] $^
-	@$(AS) $(ASFLAGS) -o $@ $^
-
-$(BUILD_DIRECTORY_LIBS)/crti.o: libraries/crti.s
-	$(DIRECTORY_GUARD)
-	@echo [AS] $^
-	@$(AS) $(ASFLAGS) -o $@ $^
-
-$(BUILD_DIRECTORY_LIBS)/crtn.o: libraries/crtn.s
-	$(DIRECTORY_GUARD)
-	@echo [AS] $^
-	@$(AS) $(ASFLAGS) -o $@ $^
-
 ABI_HEADERS = \
 	$(wildcard libraries/abi/*.h) \
 	$(wildcard libraries/abi/*/*.h)

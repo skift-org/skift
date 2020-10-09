@@ -1,6 +1,6 @@
 #pragma once
 
-#include "arch/x86/x86.h"
+#include "arch/x86/kernel/x86.h"
 
 #include <libsystem/Common.h>
 

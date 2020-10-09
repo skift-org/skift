@@ -1,6 +1,6 @@
 #include <libsystem/Logger.h>
 
-#include "arch/x86_32/IOAPIC.h"
+#include "arch/x86_32/kernel/IOAPIC.h"
 
 static volatile uint32_t *ioapic = nullptr;
 

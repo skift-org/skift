@@ -1,6 +1,6 @@
 #pragma once
 
-#include "arch/x86_32/x86_32.h"
+#include "arch/x86_32/kernel/x86_32.h"
 
 #define PCI_VENDOR_ID 0x00
 #define PCI_DEVICE_ID 0x02

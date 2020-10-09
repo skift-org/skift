@@ -1,8 +1,8 @@
 #include <libsystem/Logger.h>
 
-#include "arch/x86_32/ACPI.h"
-#include "arch/x86_32/IOAPIC.h"
-#include "arch/x86_32/LAPIC.h"
+#include "arch/x86_32/kernel/ACPI.h"
+#include "arch/x86_32/kernel/IOAPIC.h"
+#include "arch/x86_32/kernel/LAPIC.h"
 
 #include "kernel/firmware/ACPI.h"
 

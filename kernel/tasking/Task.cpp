@@ -5,7 +5,7 @@
 
 #include "arch/Arch.h"
 #include "arch/VirtualMemory.h"
-#include "arch/x86_32/Interrupts.h" /* XXX */
+#include "arch/x86_32/kernel/Interrupts.h" /* XXX */
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

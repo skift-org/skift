@@ -3,7 +3,7 @@
 #include <libsystem/core/CString.h>
 #include <libutils/Vector.h>
 
-#include "arch/x86_32/x86_32.h"
+#include "arch/x86_32/kernel/x86_32.h"
 #include "kernel/bus/PCI.h"
 
 Iteration pci_scan_bus(IterationCallback<PCIAddress> &callback, int bus);

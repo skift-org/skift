@@ -3,7 +3,7 @@
 #include <libsystem/thread/Lock.h>
 #include <libutils/RingBuffer.h>
 
-#include "arch/x86/COM.h"
+#include "arch/x86/kernel/COM.h"
 
 #include "kernel/devices/LegacyDevice.h"
 

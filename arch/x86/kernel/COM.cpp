@@ -1,7 +1,7 @@
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/x86/COM.h"
-#include "arch/x86_32/x86_32.h"
+#include "arch/x86/kernel/COM.h"
+#include "arch/x86_32/kernel/x86_32.h"
 
 bool com_can_read(COMPort port)
 {

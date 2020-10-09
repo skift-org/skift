@@ -2,8 +2,8 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 
-#include "arch/x86/COM.h"
-#include "arch/x86_64/x86_64.h"
+#include "arch/x86/kernel/COM.h"
+#include "arch/x86_64/kernel/x86_64.h"
 
 #include "thirdparty/limine/stivale/stivale.h"
 
@@ -100,6 +100,8 @@ void arch_panic_dump()
 
 void arch_dump_stack_frame(void *stackframe)
 {
+    __unused(stackframe);
+
     ASSERT_NOT_REACHED();
 }
 
@@ -107,4 +109,3 @@ void arch_backtrace()
 {
     ASSERT_NOT_REACHED();
 }
-

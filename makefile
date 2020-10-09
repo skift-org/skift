@@ -3,6 +3,7 @@
 
 export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export PATH := $(shell toolbox/use-it.sh):$(PATH)
+export LC_ALL=C
 
 ifeq (, $(shell which inkscape))
 $(error "No inkscape in PATH, consider installing it")
@@ -86,9 +87,10 @@ ARFLAGS:=rcs
 AS=nasm
 ASFLAGS=-f elf32
 
+include arch/.build.mk
+
 include thirdparty/.build.mk
 include protocols/.build.mk
-include arch/.build.mk
 include kernel/.build.mk
 include libraries/.build.mk
 include applications/.build.mk

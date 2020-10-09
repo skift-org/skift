@@ -2,7 +2,7 @@
 #include <libsystem/thread/Atomic.h>
 
 #include "arch/VirtualMemory.h"
-#include "arch/x86_32/Paging.h"
+#include "arch/x86_32/kernel/Paging.h"
 
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/Physical.h"

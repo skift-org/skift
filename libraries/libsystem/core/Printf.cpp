@@ -198,6 +198,9 @@ void __printf_formate(printf_info_t *info, char c, va_list *va)
 
 int __printf(printf_info_t *info, va_list va)
 {
+    va_list args_copy;
+    va_copy(args_copy, va);
+
     info->written = 0;
     info->format_offset = 0;
     info->state = PFSTATE_ESC;
@@ -283,7 +286,7 @@ int __printf(printf_info_t *info, va_list va)
             break;
 
         case PFSTATE_FINALIZE:
-            __printf_formate(info, info->c, &va);
+            __printf_formate(info, info->c, &args_copy);
 
             if (info->written == info->allocated)
             {
@@ -304,4 +307,6 @@ int __printf(printf_info_t *info, va_list va)
             break;
         }
     }
+
+    va_end(args_copy);
 }

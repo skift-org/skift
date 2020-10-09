@@ -283,7 +283,10 @@ int __printf(printf_info_t *info, va_list va)
             break;
 
         case PFSTATE_FINALIZE:
-            __printf_formate(info, info->c, &va);
+            // In x86_64 va_list must be copied. Don't ask me why
+            va_list va_cp;
+            va_copy(va_cp, va);
+            __printf_formate(info, info->c, &va_cp);
 
             if (info->written == info->allocated)
             {

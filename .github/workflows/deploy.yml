@@ -17,7 +17,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86
-        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
+        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libfuse-dev
         sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo clang-format
 
     - name: Fetching submodules

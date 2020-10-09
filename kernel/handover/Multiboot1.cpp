@@ -15,22 +15,22 @@ void multiboot1_parse_header(Handover *handover, void *header_ptr)
 {
     multiboot_info_t *info = (multiboot_info_t *)header_ptr;
 
-    strncpy(handover->bootloader, (char *)info->boot_loader_name, HANDOVER_BOOTLOADER_NAME_SIZE);
-    strncpy(handover->command_line, (char *)info->cmdline, HANDOVER_COMMAND_LINE_SIZE);
+    strncpy(handover->bootloader, reinterpret_cast<char *>(info->boot_loader_name), HANDOVER_BOOTLOADER_NAME_SIZE);
+    strncpy(handover->command_line, reinterpret_cast<char *>(info->cmdline), HANDOVER_COMMAND_LINE_SIZE);
 
-    multiboot_module_t *m = (multiboot_module_t *)info->mods_addr;
+    multiboot_module_t *m = reinterpret_cast<multiboot_module_t *>(info->mods_addr);
     for (size_t i = 0; i < info->mods_count; i++)
     {
         Module *module = &handover->modules[handover->modules_size];
 
         module->range = MemoryRange::around_non_aligned_address(m->mod_start, m->mod_end - m->mod_start);
-        strncpy(module->command_line, (const char *)m->cmdline, HANDOVER_COMMAND_LINE_SIZE);
+        strncpy(module->command_line, reinterpret_cast<char *>(m->cmdline), HANDOVER_COMMAND_LINE_SIZE);
 
-        m = (multiboot_module_t *)(m->mod_end + 1);
+        m = reinterpret_cast<multiboot_module_t *>(m->mod_end + 1);
         handover->modules_size++;
     }
 
-    for (multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)info->mmap_addr; (uint32_t)mmap < info->mmap_addr + info->mmap_length; mmap = (multiboot_memory_map_t *)((uint32_t)mmap + mmap->size + sizeof(mmap->size)))
+    for (multiboot_memory_map_t *mmap = reinterpret_cast<multiboot_memory_map_t *>(info->mmap_addr); (uintptr_t)mmap < info->mmap_addr + info->mmap_length; mmap = (multiboot_memory_map_t *)((uintptr_t)mmap + mmap->size + sizeof(mmap->size)))
     {
         assert(handover->memory_map_size < HANDOVER_MEMORY_MAP_SIZE);
 

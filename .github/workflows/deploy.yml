@@ -31,7 +31,7 @@ jobs:
       with:
         path: |
           **/toolchain/local
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/*.patch') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-

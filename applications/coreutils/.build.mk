@@ -23,7 +23,10 @@ UTILS = \
 	UNLINK \
 	UPTIME \
 	LINK  \
-	UNAME
+	UNAME \
+	TRUE \
+	FALSE \
+	YES
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -99,6 +102,15 @@ UPTIME_NAME = uptime
 
 UNAME_LIBS = 
 UNAME_NAME = uname
+
+TRUE_LIBS = 
+TRUE_NAME = true
+
+FALSE_LIBS = 
+FALSE_NAME = false
+
+YES_LIBS = 
+YES_NAME = yes
 
 define UTIL_TEMPLATE =
 

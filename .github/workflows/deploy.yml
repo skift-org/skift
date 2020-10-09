@@ -1,4 +1,4 @@
-name: Build And Deploy
+name: Deploy
 
 on:
   schedule:
@@ -31,11 +31,10 @@ jobs:
       with:
         path: |
           **/toolchain/local
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/*.patch') }}
+        key: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
         restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
 
     - name: Building cross-toolchain
       run: |

@@ -1,4 +1,4 @@
-#include <libfile/elf.h>
+#include <libfile/ELF32.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
@@ -7,7 +7,7 @@
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 
-Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, ELFProgram *program_header)
+Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, ELF32Program *program_header)
 {
     if (program_header->vaddr <= 0x100000)
     {
@@ -74,11 +74,11 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         return handle_get_error(elf_file);
     }
 
-    ELFHeader elf_header;
+    ELF32Header elf_header;
     {
-        size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(ELFHeader));
+        size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(ELF32Header));
 
-        if (elf_header_size != sizeof(ELFHeader) || !elf_valid(&elf_header))
+        if (elf_header_size != sizeof(ELF32Header) || !elf_header.valid())
         {
             logger_error("Failed to load ELF file %s: bad exec format!", launchpad->executable);
             return ERR_EXEC_FORMAT_ERROR;
@@ -90,10 +90,10 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
         for (int i = 0; i < elf_header.phnum; i++)
         {
-            ELFProgram elf_program_header;
+            ELF32Program elf_program_header;
             stream_seek(elf_file, elf_header.phoff + elf_header.phentsize * i, WHENCE_START);
 
-            if (stream_read(elf_file, &elf_program_header, sizeof(ELFProgram)) != sizeof(ELFProgram))
+            if (stream_read(elf_file, &elf_program_header, sizeof(ELF32Program)) != sizeof(ELF32Program))
             {
                 task_destroy(child_task);
                 return ERR_EXEC_FORMAT_ERROR;

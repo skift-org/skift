@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Hash.h>
 #include <libutils/Move.h>
 #include <libutils/RefPtr.h>
 #include <libutils/StringStorage.h>
@@ -10,9 +11,9 @@ private:
     RefPtr<StringStorage> _buffer;
 
 public:
-    size_t length() { return _buffer->length(); }
-    const char *cstring() { return _buffer->cstring(); }
-    char at(int index) { return _buffer->cstring()[index]; }
+    size_t length() const { return _buffer->length(); }
+    const char *cstring() const { return _buffer->cstring(); }
+    char at(int index) const { return _buffer->cstring()[index]; }
 
     String(const char *cstring = "")
     {
@@ -68,14 +69,14 @@ public:
         return *this;
     }
 
-    String &operator+=(String &&other)
+    String &operator+=(String &other)
     {
         _buffer = make<StringStorage>(*_buffer, *other._buffer);
 
         return *this;
     }
 
-    bool operator==(String &&other)
+    bool operator==(const String &other) const
     {
         if (length() != other.length())
         {
@@ -93,7 +94,7 @@ public:
         return true;
     }
 
-    bool operator==(const char *str)
+    bool operator==(const char *str) const
     {
         if (length() != strlen(str))
         {
@@ -111,8 +112,14 @@ public:
         return true;
     }
 
-    char operator[](int index)
+    char operator[](int index) const
     {
         return at(index);
     }
 };
+
+template <>
+inline uint32_t hash<String>(const String &value)
+{
+    return hash(value.cstring(), value.length());
+}

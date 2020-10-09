@@ -75,3 +75,21 @@ public:
         }
     }
 };
+
+template <typename T>
+void ref_if_not_null(T *ptr)
+{
+    if (ptr)
+    {
+        ptr->ref();
+    }
+}
+
+template <typename T>
+void deref_if_not_null(T *ptr)
+{
+    if (ptr)
+    {
+        ptr->deref();
+    }
+}

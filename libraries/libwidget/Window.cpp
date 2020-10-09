@@ -82,7 +82,6 @@ Window::Window(WindowFlag flags)
     root_container->window(this);
 
     focused_widget = root_container;
-    widget_by_id = hashmap_create_string_to_value();
 
     _repaint_invoker = own<Invoker>([this]() {
         repaint_dirty();
@@ -349,8 +348,8 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     window->dispatch_event(&resize_event);
 
     Event size_changed = {};
-	size_changed.type = Event::WINDOW_SIZE_CHANGED;
-	window->dispatch_event(&size_changed);
+    size_changed.type = Event::WINDOW_SIZE_CHANGED;
+    window->dispatch_event(&size_changed);
 }
 
 void window_end_resize(Window *window)
@@ -669,17 +668,12 @@ void Window::widget_removed(Widget *widget)
         mouse_over_widget = nullptr;
     }
 
-    hashmap_remove_value(widget_by_id, widget);
+    widget_by_id.remove_value(widget);
 }
 
-void Window::register_widget_by_id(const char *id, Widget *widget)
+void Window::register_widget_by_id(String id, Widget *widget)
 {
-    if (hashmap_has(widget_by_id, id))
-    {
-        hashmap_remove(widget_by_id, id);
-    }
-
-    hashmap_put(widget_by_id, id, widget);
+    widget_by_id[id] = widget;
 }
 
 Color Window::color(ThemeColorRole role)

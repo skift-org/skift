@@ -1,4 +1,4 @@
-name: Build
+name: Build And Test
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ jobs:
         sudo apt update
         sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
         sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
-        
+
     - name: Fetching submodules
       run: |
         git submodule update --init --recursive
@@ -38,6 +38,18 @@ jobs:
       run: |
         toolchain/build-it.sh
 
-    - name: Building skiftOS
+    - name: Building skiftOS (x86_32)
       run: |
-          make all
+          make clean
+          make all BUILD_ARCH=x86_32 BUILD_LOADER=limine
+
+    - name: Building skiftOS (x86_64)
+      run: |
+          make clean
+          make all BUILD_ARCH=x86_64 BUILD_LOADER=limine
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: disks
+        path: disks/

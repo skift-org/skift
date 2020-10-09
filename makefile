@@ -22,10 +22,11 @@ BUILD_TARGET=$(BUILD_CONFIG)-$(BUILD_ARCH)-$(BUILD_SYSTEM)
 BUILD_GITREF=$(shell git rev-parse --abbrev-ref HEAD || echo unknown)@$(shell git rev-parse --short HEAD || echo unknown)
 BUILD_UNAME=$(shell uname -s -o -m -r)
 BUILD_DIRECTORY=$(shell pwd)/build
+ASSETS_DIRECTORY=$(shell pwd)/disks
 
 SYSROOT=$(BUILD_DIRECTORY)/sysroot
-BOOTROOT=$(BUILD_DIRECTORY)/bootroot
-BOOTDISK=$(BUILD_DIRECTORY)/bootdisk.img
+BOOTROOT=$(BUILD_DIRECTORY)/bootroot-$(BUILD_LOADER)-$(BUILD_ARCH)
+BOOTDISK=$(ASSETS_DIRECTORY)/bootdisk-$(BUILD_LOADER)-$(BUILD_ARCH).img
 
 RAMDISK=$(BUILD_DIRECTORY)/ramdisk.tar
 

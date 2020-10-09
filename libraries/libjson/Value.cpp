@@ -111,9 +111,17 @@ void destroy(Value *value)
         free(value->storage_string);
         break;
     case OBJECT:
+        value->storage_object->foreach ([](auto, auto value) {
+            destroy(value);
+            return Iteration::CONTINUE;
+        });
         delete value->storage_object;
         break;
     case ARRAY:
+        value->storage_array->foreach ([](auto value) {
+            destroy(value);
+            return Iteration::CONTINUE;
+        });
         delete value->storage_array;
         break;
     default:

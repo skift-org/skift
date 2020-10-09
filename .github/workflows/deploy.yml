@@ -1,4 +1,4 @@
-name: Deploy
+name: Build And Deploy
 
 on:
   schedule:
@@ -7,11 +7,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Installing packages
       run: |
@@ -41,9 +41,17 @@ jobs:
       run: |
         toolchain/build-it.sh
 
-    - name: Building skiftOS
+    - name: Building skiftOS (x86_32)
       run: |
-          make all
+          make clean
+          make all BUILD_LOADER=grub2
+          make all BUILD_LOADER=limine
+          echo "::set-env name=RELEASE_TAG::$(date +'%y.%W')"
+
+    - name: Building skiftOS (x86_64)
+      run: |
+          make clean
+          make all BUILD_ARCH=x86_64 BUILD_LOADER=limine
           echo "::set-env name=RELEASE_TAG::$(date +'%y.%W')"
 
     - name: Creating Release
@@ -54,17 +62,28 @@ jobs:
       with:
         tag_name: v${{ env.RELEASE_TAG  }}
         release_name: ${{ env.RELEASE_TAG }}
-        body: ${{ github.event.head_commit.message }}
+        body_path: manual/release.md
         draft: false
         prerelease: false
 
-    - name: Upload release assets
+    - name: Upload release assets (grub2-x86_32)
       id: upload-release-assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/bootdisk.img
-        asset_name: bootdisk.img
+        asset_path: disks/bootdisk-grub2-x86_32.img
+        asset_name: bootdisk-grub2-x86_32.img
+        asset_content_type: application/x-ima
+
+    - name: Upload release assets (limine-x86_32)
+      id: upload-release-assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: disks/bootdisk-limine-x86_32.img
+        asset_name: bootdisk-limine-x86_32.img
         asset_content_type: application/x-ima

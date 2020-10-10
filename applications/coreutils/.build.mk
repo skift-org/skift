@@ -3,6 +3,7 @@ UTILS = \
 	__TESTTERM \
 	CAT \
 	CLEAR \
+	CP \
 	DSTART \
 	ECHO \
 	GREP \
@@ -39,6 +40,9 @@ CAT_NAME = cat
 
 CLEAR_LIBS =
 CLEAR_NAME = clear
+
+CP_LIBS = 
+CP_NAME = cp
 
 DSTART_LIBS =
 DSTART_NAME = dstart

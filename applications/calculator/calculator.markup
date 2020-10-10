@@ -8,15 +8,15 @@
     >
 
     <Panel padding="insets(12)" rounded>
-        <Label text="#value"/>
+        <Label id="calculator_screen" text="#value"/>
     </Panel>
 
     <Container layout="grid(4, 6, 4, 4)" fill>
-        <Button icon="percent" outlined/> <Button text="CE" outlined/> <Button text="C" outlined/> <Button icon="backspace-outline" outlined/>
+        <Button icon="percent" outlined/> <Button id="calculator_button_clear_all" text="CE" outlined/> <Button id="calculator_button_clear" text="C" outlined/> <Button icon="backspace-outline" outlined/>
         <Button text="1/x" outlined/> <Button icon="exponent" outlined/> <Button icon="square-root" outlined/> <Button icon="slash-forward" outlined/>
-        <Button text="7"/> <Button text="8" /> <Button text="9" /> <Button icon="close" outlined/>
-        <Button text="4" /> <Button text="5" /> <Button text="6" /> <Button icon="minus" outlined/>
-        <Button text="1" /> <Button text="2" /> <Button text="3" /> <Button icon="plus" outlined/>
-        <Button icon="plus-minus-variant" outlined/> <Button text="0" /> <Button text="." outlined/> <Button icon="equal" filled/>
+        <Button id="calculator_button_7" text="7"/> <Button id="calculator_button_8" text="8" /> <Button id="calculator_button_9" text="9" /> <Button icon="close" outlined/>
+        <Button id="calculator_button_4" text="4" /> <Button id="calculator_button_5" text="5" /> <Button id="calculator_button_6" text="6" /> <Button id="calculator_button_minus" icon="minus" outlined/>
+        <Button id="calculator_button_1" text="1" /> <Button id="calculator_button_2" text="2" /> <Button id="calculator_button_3" text="3" /> <Button id="calculator_button_plus" icon="plus" outlined/>
+        <Button icon="plus-minus-variant" outlined/> <Button id="calculator_button_0" text="0" /> <Button text="." outlined/> <Button id="calculator_button_equal" icon="equal" filled/>
     </Container>
 </Window>

@@ -369,7 +369,13 @@ char *strstr(const char *s1, const char *s2)
     return nullptr;
 }
 
-char *strtok(char *s, char **state, const char *delim)
+char *strtok(char *s, const char *delim)
+{
+    static char *old;
+    return strtok_r(s, delim, &old);
+}
+
+char *strtok_r(char *s, const char *delim, char **state)
 {
     int ch;
 

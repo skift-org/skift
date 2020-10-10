@@ -3,7 +3,6 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
-#include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>

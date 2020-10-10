@@ -65,6 +65,24 @@ void do_option(CommandLine *cmdline, CommandLineOption *option, int i, int argc,
     }
 }
 
+size_t cmdline_option_padding(CommandLineOption *options)
+{
+    size_t maximal_length = 0;
+
+    for (int i = 0; options[i].type != COMMANDLINE_END; i++)
+    {
+        CommandLineOption *opt = &options[i];
+        size_t long_length = strlen(opt->long_name);
+
+        if (long_length > maximal_length)
+        {
+            maximal_length = long_length;
+        }
+    }
+
+    return maximal_length + 1;
+}
+
 void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
 {
     __unused(option);
@@ -85,6 +103,8 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
 
         printf("\n");
     }
+
+    size_t padding = cmdline_option_padding(cmdline->options);
 
     printf("\e[1mOptions:\e[0m");
     for (int i = 0; cmdline->options[i].type != COMMANDLINE_END; i++)
@@ -111,7 +131,7 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
 
             if (opt->long_name != nullptr)
             {
-                printf(", --%s ", opt->long_name);
+                printf(", --%s", opt->long_name);
             }
             else
             {
@@ -129,10 +149,15 @@ void cmdline_callback_help(CommandLine *cmdline, CommandLineOption *option)
                 printf("  ");
             }
 
-            printf("\t");
-
             if (opt->description != nullptr)
             {
+                size_t pad_length = padding - strlen(opt->long_name);
+
+                for (size_t i = 0; i < pad_length; i++)
+                {
+                    printf(" ");
+                }
+
                 printf("%s", opt->description);
             }
         }

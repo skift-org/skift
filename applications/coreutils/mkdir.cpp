@@ -1,9 +1,28 @@
 
+#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
 #include <stdio.h>
 #include <unistd.h>
+
+static bool parent = false;
+
+static CommandLineOption options[] = {
+    COMMANDLINE_OPT_HELP,
+    COMMANDLINE_OPT_BOOL("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_END};
+
+static const char *usages[] = {
+    "[OPTION]... DIRECTORY...",
+    nullptr,
+};
+
+static CommandLine cmdline = CMDLINE(
+    usages,
+    options,
+    "Create the DIRECTORY(ies), if they do not already exist.",
+    "Options can be combined.");
 
 int mkdir(const char *path)
 {
@@ -41,17 +60,17 @@ void mkdir_parent_dirs(const char *path)
 }
 
 int main(int argc, char **argv)
-{
+{    
     if (argc == 2)
     {
         return mkdir(argv[1]);
     }
 
-    if (argc == 3)
+    argc = cmdline_parse(&cmdline, argc, argv);
+    
+    if (parent)
     {
-        if (!strcmp(argv[1], "-p") || !strcmp(argv[1], "--parents"))
-            mkdir_parent_dirs(argv[2]);
-
+        mkdir_parent_dirs(argv[2]);
         return 0;
     }
     return -1;

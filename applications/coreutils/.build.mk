@@ -14,6 +14,7 @@ UTILS = \
 	MAN \
 	MARKUP \
 	MKDIR \
+	RMDIR \
 	MV \
 	NOW \
 	OPEN \
@@ -75,6 +76,9 @@ MARKUP_NAME = markup
 
 MKDIR_LIBS =
 MKDIR_NAME = mkdir
+
+RMDIR_LIBS =
+RMDIR_NAME = rmdir
 
 MV_LIBS =
 MV_NAME = mv

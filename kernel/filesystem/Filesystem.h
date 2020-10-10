@@ -18,6 +18,8 @@ Result filesystem_connect(Path *path, FsHandle **connection_handle);
 
 Result filesystem_mkdir(Path *path);
 
+Result filesystem_rmdir(Path *path);
+
 Result filesystem_mkpipe(Path *path);
 
 Result filesystem_mklink(Path *old_path, Path *new_path);

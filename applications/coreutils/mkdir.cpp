@@ -1,8 +1,15 @@
 
 #include <libsystem/io/Filesystem.h>
+#include <libsystem/io/Directory.h>
+#include <libsystem/io/Stream.h>
 
-int mkdir(const char *path)
+Result mkdir(const char *path)
 {
+    if(directory_exist(path)){
+        printf("mkdir: cannot create directory '%s': File exists", path);
+        return ERR_FILE_EXISTS;
+    }
+
     return filesystem_mkdir(path);
 }
 

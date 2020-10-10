@@ -45,6 +45,8 @@ Result __plug_filesystem_unlink(const char *path);
 
 Result __plug_filesystem_mkdir(const char *path);
 
+Result __plug_filesystem_rmdir(const char *path);
+
 /* --- System --------------------------------------------------------------- */
 
 void __plug_system_get_info(SystemInfo *info);

@@ -169,6 +169,17 @@ Result sys_filesystem_mkdir(const char *dir_path)
     return result;
 }
 
+Result sys_filesystem_rmdir(const char *dir_path)
+{
+    Path *path = task_resolve_directory(scheduler_running(), dir_path);
+
+    Result result = filesystem_rmdir(path);
+
+    path_destroy(path);
+
+    return result;
+}
+
 Result sys_filesystem_mkpipe(const char *fifo_path)
 {
     Path *path = task_resolve_directory(scheduler_running(), fifo_path);
@@ -452,6 +463,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(sys_filesystem_rename),
     [SYS_FILESYSTEM_MKPIPE] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkpipe),
     [SYS_FILESYSTEM_MKDIR] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkdir),
+    [SYS_FILESYSTEM_RMDIR] = reinterpret_cast<SyscallHandler>(sys_filesystem_rmdir),
     [SYS_SYSTEM_GET_INFO] = reinterpret_cast<SyscallHandler>(sys_system_get_info),
     [SYS_SYSTEM_GET_STATUS] = reinterpret_cast<SyscallHandler>(sys_system_get_status),
     [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),

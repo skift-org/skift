@@ -23,6 +23,7 @@
     __ENTRY(SYS_FILESYSTEM_RENAME)     \
     __ENTRY(SYS_FILESYSTEM_MKPIPE)     \
     __ENTRY(SYS_FILESYSTEM_MKDIR)      \
+    __ENTRY(SYS_FILESYSTEM_RMDIR)      \
                                        \
     __ENTRY(SYS_SYSTEM_GET_INFO)       \
     __ENTRY(SYS_SYSTEM_GET_STATUS)     \

@@ -18,6 +18,11 @@ Result filesystem_mkdir(const char *path)
     return __syscall(SYS_FILESYSTEM_MKDIR, (uintptr_t)path);
 }
 
+Result filesystem_rmdir(const char *path)
+{
+    return __syscall(SYS_FILESYSTEM_RMDIR, (uintptr_t)path);
+}
+
 Result filesystem_mkpipe(const char *path)
 {
     return __syscall(SYS_FILESYSTEM_MKPIPE, (uintptr_t)path);

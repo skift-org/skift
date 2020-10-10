@@ -6,6 +6,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
+#include <libsystem/io/Directory.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"
@@ -173,6 +174,28 @@ Result filesystem_mkdir(Path *path)
     directory->deref();
 
     return result;
+}
+
+Result filesystem_rmdir(Path *path)
+{
+    Directory *directory = directory_open(path_as_string(path), OPEN_READ);
+    
+    if (handle_has_error(directory))
+    {
+        directory_close(directory);
+        return ERR_NOT_READABLE;
+    }
+
+    DirectoryEntry entry;
+    if(directory_read(directory, &entry) > 0)
+    {
+        directory_close(directory);
+        return ERR_DIRECTORY_NOT_EMPTY;
+    }
+
+    directory_close(directory);
+
+    return filesystem_unlink(path);
 }
 
 Result filesystem_mkpipe(Path *path)

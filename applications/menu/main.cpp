@@ -3,6 +3,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/process/Process.h>
+#include <libsystem/process/Launchpad.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
@@ -163,8 +164,15 @@ int main(int argc, char **argv)
     auto user_name_label = new Label(bottom_container, "User");
     user_name_label->attributes(LAYOUT_FILL);
 
-    new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
-    new Button(bottom_container, BUTTON_TEXT, Icon::get("cog"));
+    Button* foldet_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
+    foldet_button->on(EventType::ACTION, [&](auto){
+        process_run("file-manager", nullptr);
+    });
+    
+    Button* setting_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("cog"));
+    setting_button->on(EventType::ACTION, [&](auto){
+        process_run("settings", nullptr);
+    });
     new Button(bottom_container, BUTTON_TEXT, Icon::get("power-standby"));
 
     new Separator(window->root());

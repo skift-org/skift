@@ -49,7 +49,7 @@ enum CALCULATOR_OPERATOR
 #define CALC_ID_BUTTON_CLEAR "calculator_button_clear"
 #define CALC_TEXT_BOX_NAME "calculator_screen"
 
-class calculator_system
+class Calculator
 {
 private:
     double main_number = 0;
@@ -63,10 +63,10 @@ private:
     char *calculator_text;
 
 public:
-    calculator_system()
+    Calculator()
     {
     }
-    calculator_system(char *result_buffer, int calculator_buffer_length)
+    Calculator(char *result_buffer, int calculator_buffer_length)
     {
         buffer_changed = true;
         calculator_text = result_buffer;
@@ -193,7 +193,7 @@ public:
         update_calculator_text();
     }
 };
-calculator_system main_calculator_system;
+Calculator main_calculator_system;
 
 int main(int argc, char **argv)
 {
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
     window = window_create_from_file("/Applications/calculator/calculator.markup");
 
     char *buffer = reinterpret_cast<char *>(malloc(32));
-    main_calculator_system = calculator_system(buffer, 32);
+    main_calculator_system = Calculator(buffer, 32);
 
     CALCULATOR_BUTTON(CALC_ID_BUTTON_0, true, 0)
     CALCULATOR_BUTTON(CALC_ID_BUTTON_1, true, 1)

@@ -6,6 +6,7 @@ AS:=nasm
 ASFLAGS:=-f elf64
 
 KERNEL_CXXFLAGS += \
+	-z max-page-size=0x1000 	   \
 	-fno-pic                       \
 	-mno-sse                       \
 	-mno-sse2                      \
@@ -16,6 +17,8 @@ KERNEL_CXXFLAGS += \
 	-ffreestanding                 \
 	-fno-stack-protector           \
 	-fno-omit-frame-pointer
+
+KERNEL_LDFLAGS += -z max-page-size=0x1000
 
 KERNEL_SOURCES += $(wildcard arch/x86/kernel/*.cpp)
 KERNEL_ASSEMBLY_SOURCES += $(wildcard arch/x86/kernel/*.s)

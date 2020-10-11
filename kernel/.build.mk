@@ -62,4 +62,4 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) -T arch/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T arch/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

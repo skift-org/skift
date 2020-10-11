@@ -3,6 +3,8 @@
 #include <libsystem/core/Plugs.h>
 
 #include "arch/x86/kernel/COM.h"
+#include "arch/x86/kernel/IOPort.h"
+#include "arch/x86/kernel/RTC.h"
 #include "arch/x86_64/kernel/x86_64.h"
 
 #include "thirdparty/limine/stivale/stivale.h"
@@ -72,15 +74,12 @@ void arch_load_context(Task *task)
 
 size_t arch_debug_write(const void *buffer, size_t size)
 {
-    __unused(buffer);
-    __unused(size);
-
-    ASSERT_NOT_REACHED();
+    return com_write(COM1, buffer, size);
 }
 
 TimeStamp arch_get_time()
 {
-    ASSERT_NOT_REACHED();
+    return rtc_now();
 }
 
 __no_return void arch_reboot()

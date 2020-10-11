@@ -122,7 +122,11 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
     Task *task = task_create(parent_task, launchpad->name, true);
     atomic_end();
 
+#ifdef __x86_64__
     Result result = ELFLoader<ELF64>::load(task, elf_file);
+#else
+    Result result = ELFLoader<ELF32>::load(task, elf_file);
+#endif
 
     if (result != SUCCESS)
     {

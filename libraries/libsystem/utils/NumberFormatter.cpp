@@ -69,6 +69,8 @@ size_t format_int(NumberFormater formater, int value, char *str, size_t size)
     return written;
 }
 
+#ifndef __KERNEL__
+
 size_t format_double(NumberFormater formater, double value, char *str, size_t size)
 {
     int ipart = (int)value;
@@ -89,3 +91,5 @@ size_t format_double(NumberFormater formater, double value, char *str, size_t si
 
     return written;
 }
+
+#endif

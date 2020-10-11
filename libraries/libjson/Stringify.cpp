@@ -44,6 +44,8 @@ void stringify_internal(BufferBuilder *builder, Value *value)
         break;
     }
 
+#ifndef __KERNEL__
+
     case DOUBLE:
     {
         char buffer[128];
@@ -52,6 +54,8 @@ void stringify_internal(BufferBuilder *builder, Value *value)
 
         break;
     }
+
+#endif
 
     case OBJECT:
         buffer_builder_append_str(builder, "{");

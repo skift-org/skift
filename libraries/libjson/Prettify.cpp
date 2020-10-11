@@ -86,6 +86,8 @@ static void prettify_internal(PrettifyState *state, Value *value)
         break;
     }
 
+#ifndef __KERNEL__
+
     case DOUBLE:
     {
         char buffer[128];
@@ -93,6 +95,8 @@ static void prettify_internal(PrettifyState *state, Value *value)
         buffer_builder_append_str(state->builder, buffer);
         break;
     }
+
+#endif
 
     case OBJECT:
     {

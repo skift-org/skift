@@ -34,7 +34,11 @@ uint32_t random_uint32_max(Random *random, uint32_t max)
     return random_uint32(random) % max;
 }
 
+#ifndef __KERNEL__
+
 double random_double(Random *random)
 {
     return random_uint32(random) / ((double)UINT32_MAX);
 }
+
+#endif

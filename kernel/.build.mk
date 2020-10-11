@@ -15,7 +15,6 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/compat/ctype.cpp) \
 	$(wildcard libraries/libsystem/unicode/*.cpp) \
 	$(wildcard libraries/libsystem/process/*.cpp) \
-	$(wildcard libraries/libsystem/math/*.cpp) \
 	$(wildcard libraries/libsystem/utils/*.cpp) \
 	$(wildcard libraries/libsystem/core/*.cpp) \
 	$(wildcard libraries/libsystem/thread/*.cpp) \
@@ -29,12 +28,13 @@ KERNEL_OBJECTS = \
 	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
 	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
-KERNEL_CXXFLAGS = \
+KERNEL_CXXFLAGS += \
 	$(CXXFLAGS) 	\
 	-fno-rtti \
 	-fno-exceptions \
 	-ffreestanding \
 	-nostdlib \
+	-D__KERNEL__ \
 	-DCONFIG_KEYBOARD_LAYOUT=\""${CONFIG_KEYBOARD_LAYOUT}"\"
 
 OBJECTS += $(KERNEL_OBJECTS)

@@ -166,6 +166,8 @@ int integer_value(Value *value)
     }
 }
 
+#if !defined(__KERNEL__)
+
 double double_value(Value *value)
 {
     if (is(value, INTEGER))
@@ -181,6 +183,8 @@ double double_value(Value *value)
         ASSERT_NOT_REACHED();
     }
 }
+
+#endif
 
 bool object_has(Value *object, const String &key)
 {

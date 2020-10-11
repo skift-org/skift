@@ -51,6 +51,9 @@ static Value *number(Lexer &lexer)
         ipart = digits(lexer);
     }
 
+#ifdef __KERNEL__
+    return create_integer(ipart_sign * ipart);
+#else
     double fpart = 0;
 
     if (lexer.skip('.'))
@@ -91,6 +94,7 @@ static Value *number(Lexer &lexer)
     {
         return create_double(ipart_sign * (ipart + fpart) * pow(10, exp));
     }
+#endif
 }
 
 static char *string(Lexer &lexer)

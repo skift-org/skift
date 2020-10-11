@@ -158,7 +158,7 @@ public:
 
         while (new_capacity <= capacity)
         {
-            new_capacity *= 1.25;
+            new_capacity += new_capacity / 4;
         }
 
         T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
@@ -179,7 +179,7 @@ public:
     {
         if (_count + 1 >= _capacity)
         {
-            size_t new_capacity = _capacity * 1.25;
+            size_t new_capacity = _capacity + _capacity / 4;
             T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
 
             for (size_t i = 0; i < _count; i++)
@@ -199,9 +199,10 @@ public:
     {
         _count--;
 
-        if (MAX(_count, 16) < _capacity * 0.75)
+        size_t new_capacity = _capacity - _capacity / 4;
+
+        if (MAX(_count, 16) < new_capacity)
         {
-            size_t new_capacity = _capacity * 0.75;
             T *new_storage = reinterpret_cast<T *>(calloc(new_capacity, sizeof(T)));
 
             for (size_t i = 0; i < _count; i++)

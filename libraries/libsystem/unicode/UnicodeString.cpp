@@ -1,7 +1,7 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/Logger.h>
 #include <libsystem/unicode/UnicodeString.h>
 #include <libsystem/utils/BufferBuilder.h>
 
@@ -84,7 +84,7 @@ void unicode_string_insert(UnicodeString *string, Codepoint codepoint, size_t wh
 
     if (needed > string->allocated)
     {
-        size_t new_allocated = MAX(string->allocated * 1.25, needed);
+        size_t new_allocated = MAX(string->allocated + string->allocated / 4, needed);
         unicode_string_ensure_capacity(string, new_allocated);
     }
 
@@ -118,7 +118,7 @@ size_t unicode_string_length(UnicodeString *string)
 
 char *unicode_string_as_cstring(UnicodeString *string)
 {
-    BufferBuilder *builder = buffer_builder_create(string->used * 1.1);
+    BufferBuilder *builder = buffer_builder_create(string->used + string->used / 4);
 
     for (size_t i = 0; i < string->used; i++)
     {

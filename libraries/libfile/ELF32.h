@@ -70,3 +70,11 @@ struct ELF32Symbole
     uint8_t other;
     uint16_t shndx;
 };
+
+struct ELF32
+{
+    using Header = ELF32Header;
+    using Section = ELF32Section;
+    using Program = ELF32Program;
+    using Symbole = ELF32Symbole;
+};

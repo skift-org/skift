@@ -71,3 +71,11 @@ struct __packed ELF64Symbole
     uint64_t value;
     uint64_t size;
 };
+
+struct ELF64
+{
+    using Header = ELF64Header;
+    using Section = ELF64Section;
+    using Program = ELF64Program;
+    using Symbole = ELF64Symbole;
+};

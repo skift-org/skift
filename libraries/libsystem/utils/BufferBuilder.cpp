@@ -81,7 +81,7 @@ void buffer_builder_append_chr(BufferBuilder *buffer, char chr)
 {
     if (buffer->used + 1 == buffer->size)
     {
-        buffer->size *= 1.25;
+        buffer->size += buffer->size / 4;
         buffer->buffer = (char *)realloc(buffer->buffer, buffer->size);
     }
 

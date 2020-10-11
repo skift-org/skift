@@ -1,46 +1,90 @@
 #include <libfile/ELF32.h>
+#include <libfile/ELF64.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 
-Result task_launch_load_elf(Task *parent_task, Task *child_task, Stream *elf_file, ELF32Program *program_header)
+template <typename TELFFormat>
+struct ELFLoader
 {
-    if (program_header->vaddr <= 0x100000)
+    using Header = TELFFormat::Header;
+    using Section = TELFFormat::Section;
+    using Program = TELFFormat::Program;
+    using Symbole = TELFFormat::Symbole;
+
+    static Result load_program(Task *task, Stream *elf_file, Program *program_header)
     {
-        logger_error("ELF program no in user memory (0x%08x)!", program_header->vaddr);
-        return ERR_EXEC_FORMAT_ERROR;
+        if (program_header->vaddr <= 0x100000)
+        {
+            logger_error("ELF program no in user memory (0x%08x)!", program_header->vaddr);
+            return ERR_EXEC_FORMAT_ERROR;
+        }
+
+        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+
+        MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
+
+        task_memory_map(task, range.base(), range.size(), MEMORY_CLEAR);
+
+        stream_seek(elf_file, program_header->offset, WHENCE_START);
+        size_t read = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);
+
+        if (read != program_header->filesz)
+        {
+            logger_error("Didn't read the right amount from the ELF file!");
+
+            task_switch_address_space(scheduler_running(), parent_address_space);
+
+            return ERR_EXEC_FORMAT_ERROR;
+        }
+        else
+        {
+            task_switch_address_space(scheduler_running(), parent_address_space);
+
+            return SUCCESS;
+        }
     }
 
-    void *parent_address_space = task_switch_address_space(parent_task, child_task->address_space);
-
-    MemoryRange range = MemoryRange::around_non_aligned_address(program_header->vaddr, program_header->memsz);
-
-    task_memory_map(child_task, range.base(), range.size(), MEMORY_CLEAR);
-
-    stream_seek(elf_file, program_header->offset, WHENCE_START);
-    size_t read = stream_read(elf_file, (void *)program_header->vaddr, program_header->filesz);
-
-    if (read != program_header->filesz)
+    static Result load(Task *task, Stream *elf_file)
     {
-        logger_error("Didn't read the right amount from the ELF file!");
+        Header elf_header;
+        size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(Header));
 
-        task_switch_address_space(parent_task, parent_address_space);
+        if (elf_header_size != sizeof(Header) || !elf_header.valid())
+        {
+            return ERR_EXEC_FORMAT_ERROR;
+        }
 
-        return ERR_EXEC_FORMAT_ERROR;
-    }
-    else
-    {
-        task_switch_address_space(parent_task, parent_address_space);
+        task_set_entry(task, reinterpret_cast<TaskEntryPoint>(elf_header.entry), true);
+
+        for (int i = 0; i < elf_header.phnum; i++)
+        {
+            Program elf_program_header;
+            stream_seek(elf_file, elf_header.phoff + elf_header.phentsize * i, WHENCE_START);
+
+            if (stream_read(elf_file, &elf_program_header, sizeof(Program)) != sizeof(Program))
+            {
+                return ERR_EXEC_FORMAT_ERROR;
+            }
+
+            Result result = load_program(task, elf_file, &elf_program_header);
+
+            if (result != SUCCESS)
+            {
+                return result;
+            }
+        }
 
         return SUCCESS;
     }
-}
+};
 
-void task_launch_passhandle(Task *parent_task, Task *child_task, Launchpad *launchpad)
+void task_pass_handles(Task *parent_task, Task *child_task, Launchpad *launchpad)
 {
     LockHolder holder(parent_task->handles_lock);
 
@@ -74,45 +118,25 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         return handle_get_error(elf_file);
     }
 
-    ELF32Header elf_header;
-    {
-        size_t elf_header_size = stream_read(elf_file, &elf_header, sizeof(ELF32Header));
+    atomic_begin();
+    Task *task = task_create(parent_task, launchpad->name, true);
+    atomic_end();
 
-        if (elf_header_size != sizeof(ELF32Header) || !elf_header.valid())
-        {
-            logger_error("Failed to load ELF file %s: bad exec format!", launchpad->executable);
-            return ERR_EXEC_FORMAT_ERROR;
-        }
+    Result result = ELFLoader<ELF64>::load(task, elf_file);
+
+    if (result != SUCCESS)
+    {
+        task_destroy(task);
+        return result;
     }
 
-    {
-        Task *child_task = task_spawn_with_argv(parent_task, launchpad->name, (TaskEntryPoint)elf_header.entry, (const char **)launchpad->argv, true);
+    task_pass_argv_argc(task, (const char **)(launchpad->argv));
 
-        for (int i = 0; i < elf_header.phnum; i++)
-        {
-            ELF32Program elf_program_header;
-            stream_seek(elf_file, elf_header.phoff + elf_header.phentsize * i, WHENCE_START);
+    task_pass_handles(parent_task, task, launchpad);
 
-            if (stream_read(elf_file, &elf_program_header, sizeof(ELF32Program)) != sizeof(ELF32Program))
-            {
-                task_destroy(child_task);
-                return ERR_EXEC_FORMAT_ERROR;
-            }
+    *pid = task->id;
 
-            Result result = task_launch_load_elf(parent_task, child_task, elf_file, &elf_program_header);
-
-            if (result != SUCCESS)
-            {
-                task_destroy(child_task);
-                return result;
-            }
-        }
-
-        task_launch_passhandle(parent_task, child_task, launchpad);
-
-        *pid = child_task->id;
-        task_go(child_task);
-    }
+    task_go(task);
 
     return SUCCESS;
 }

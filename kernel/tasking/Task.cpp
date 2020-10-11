@@ -217,15 +217,9 @@ static void pass_argc_argv_kernel(Task *task, const char **argv)
     task_kernel_stack_push(task, &argc, sizeof(argc));
 }
 
-Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntryPoint entry, const char **argv, bool user)
+void task_pass_argv_argc(Task *task, const char **argv)
 {
-    AtomicHolder holder;
-
-    Task *task = task_create(parent, name, user);
-
-    task_set_entry(task, entry, true);
-
-    if (user)
+    if (task->user)
     {
         pass_argc_argv_user(task, argv);
     }
@@ -233,8 +227,6 @@ Task *task_spawn_with_argv(Task *parent, const char *name, TaskEntryPoint entry,
     {
         pass_argc_argv_kernel(task, argv);
     }
-
-    return task;
 }
 
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user)

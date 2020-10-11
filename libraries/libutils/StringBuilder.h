@@ -99,7 +99,7 @@ public:
 
         if (_used + 1 == _size)
         {
-            _size *= 1.25;
+            _size += _size / 4;
             _buffer = (char *)realloc(_buffer, _size);
         }
 

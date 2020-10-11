@@ -1,4 +1,3 @@
-
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
@@ -6,11 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
-static bool parent = false;
+static char *parent = NULL;
 
 static CommandLineOption options[] = {
     COMMANDLINE_OPT_HELP,
-    COMMANDLINE_OPT_BOOL("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_STRING("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
     COMMANDLINE_OPT_END};
 
 static const char *usages[] = {
@@ -39,13 +38,23 @@ void mkdir_parent_dirs(const char *path)
     char *construct_parent_dirs = (char *)calloc(path_len + 1, sizeof(char));
     char *iter_recursively = construct_parent_dirs;
 
+    if (!path_len)
+    {
+        free(construct_parent_dirs);
+        return;
+    }
+
     while (*iter != '\0')
     {
         *iter_recursively = *iter;
 
         if (*iter == '/')
+        {
             if (!directory_exist(construct_parent_dirs))
+            {
                 filesystem_mkdir(construct_parent_dirs);
+            }
+        }
 
         ++iter_recursively;
         ++iter;
@@ -53,24 +62,28 @@ void mkdir_parent_dirs(const char *path)
 
     --iter;
     if (*iter != '/')
+    {
         if (!directory_exist(construct_parent_dirs))
+        {
             filesystem_mkdir(construct_parent_dirs);
+        }
+    }
 
     free(construct_parent_dirs);
 }
 
 int main(int argc, char **argv)
-{    
+{
+    cmdline_parse(&cmdline, argc, argv);
+
     if (argc == 2)
     {
         return mkdir(argv[1]);
     }
 
-    argc = cmdline_parse(&cmdline, argc, argv);
-    
     if (parent)
     {
-        mkdir_parent_dirs(argv[2]);
+        mkdir_parent_dirs(parent);
         return 0;
     }
     return -1;

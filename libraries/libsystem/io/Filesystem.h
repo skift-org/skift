@@ -10,6 +10,8 @@ Result filesystem_unlink(const char *path);
 
 Result filesystem_mkdir(const char *path);
 
+Result filesystem_rmdir(const char *path);
+
 Result filesystem_mkpipe(const char *path);
 
 Result filesystem_rename(const char *old_path, const char *new_path);

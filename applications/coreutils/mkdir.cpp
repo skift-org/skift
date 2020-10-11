@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
-static char *parent = NULL;
+static bool parent = false;
 
 static CommandLineOption options[] = {
     COMMANDLINE_OPT_HELP,
-    COMMANDLINE_OPT_STRING("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
     COMMANDLINE_OPT_END};
 
 static const char *usages[] = {
@@ -83,7 +83,10 @@ int main(int argc, char **argv)
 
     if (parent)
     {
-        mkdir_parent_dirs(parent);
+        for (int i = 1; i < argc; ++i)
+        {
+            mkdir_parent_dirs(argv[i]);
+        }
         return 0;
     }
     return -1;

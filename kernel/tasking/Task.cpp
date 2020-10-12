@@ -31,7 +31,7 @@ void Task::cancel(int exit_value)
 {
     AtomicHolder holder;
 
-    exit_value = exit_value;
+    this->exit_value = exit_value;
     state(TASK_STATE_CANCELED);
 
     if (this == scheduler_running())

@@ -158,15 +158,16 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
 
         list_destroy_with_callback(pipes, (ListDestroyElementCallback)pipe_destroy);
 
+        int exit_value;
+
         for (int i = 0; i < pipeline->commands->count(); i++)
         {
-            int exit_value;
             process_wait(processes[i], &exit_value);
         }
 
         free(processes);
 
-        return 0;
+        return exit_value;
     }
     break;
 

@@ -94,7 +94,7 @@ void BlockerWait::on_unblock(Task *task)
 {
     __unused(task);
 
-    *_exit_value = task->exit_value;
+    *_exit_value = _task->exit_value;
 }
 
 /* --- BlockerWrite ---------------------------------------------------------- */

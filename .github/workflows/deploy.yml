@@ -66,7 +66,7 @@ jobs:
         prerelease: false
 
     - name: Upload release assets (grub2-x86_32)
-      id: upload-release-assets
+      id: upload_release_assets_grub_x86_32
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,7 +77,7 @@ jobs:
         asset_content_type: application/x-ima
 
     - name: Upload release assets (limine-x86_32)
-      id: upload-release-assets
+      id: upload_release_assets_limine_x86_32
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,4 +85,15 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: disks/bootdisk-limine-x86_32.img
         asset_name: bootdisk-limine-x86_32.img
+        asset_content_type: application/x-ima
+
+    - name: Upload release assets (limine-x86_64)
+      id: upload_release_assets_limine_x86_32
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: disks/bootdisk-limine-x86_64.img
+        asset_name: bootdisk-limine-x86_64.img
         asset_content_type: application/x-ima

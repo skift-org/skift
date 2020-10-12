@@ -1,6 +1,7 @@
 UTILS = \
 	__TESTEXEC \
 	__TESTTERM \
+	BASENAME \
 	CAT \
 	CLEAR \
 	CP \
@@ -35,6 +36,9 @@ __TESTEXEC_NAME = __testexec
 
 __TESTTERM_LIBS =
 __TESTTERM_NAME = __testterm
+
+BASENAME_LIBS = 
+BASENAME_NAME = basename
 
 CAT_LIBS =
 CAT_NAME = cat

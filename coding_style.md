@@ -92,6 +92,21 @@ foo();
 * Use a space after `if`, `for`, `while`, `switch`.
 * Do not use a space after the opening ( and before the closing ).
 * Preferably use () with `sizeof`.
+* Always use curly braces after `if`, `for`, `while`, `switch` statements
+
+**DON'T**
+```C++
+if (foo)
+    bar;
+```
+
+**DO**
+```C++
+if (foo)
+{
+    bar;
+}
+```
 
 ## Switch
 

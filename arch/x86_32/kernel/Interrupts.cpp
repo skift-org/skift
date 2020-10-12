@@ -3,8 +3,8 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
 
+#include "arch/x86/kernel/PIC.h"
 #include "arch/x86_32/kernel/Interrupts.h"
-#include "arch/x86_32/kernel/PIC.h"
 #include "arch/x86_32/kernel/x86_32.h"
 
 #include "kernel/interrupts/Dispatcher.h"

@@ -1,5 +1,5 @@
-#include "arch/x86_32/kernel/PIT.h"
-#include "arch/x86_32/kernel/x86_32.h"
+#include "arch/x86/kernel/PIT.h"
+#include "arch/x86/kernel/IOPort.h"
 
 void pit_initialize(int frequency)
 {

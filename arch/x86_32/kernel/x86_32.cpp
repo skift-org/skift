@@ -2,6 +2,8 @@
 #include <libsystem/core/Plugs.h>
 
 #include "arch/x86/kernel/COM.h"
+#include "arch/x86/kernel/PIC.h"
+#include "arch/x86/kernel/PIT.h"
 #include "arch/x86/kernel/RTC.h"
 #include "arch/x86_32/kernel/ACPI.h"
 #include "arch/x86_32/kernel/CPUID.h"
@@ -10,8 +12,6 @@
 #include "arch/x86_32/kernel/IDT.h"
 #include "arch/x86_32/kernel/Interrupts.h"
 #include "arch/x86_32/kernel/LAPIC.h"
-#include "arch/x86_32/kernel/PIC.h"
-#include "arch/x86_32/kernel/PIT.h"
 #include "arch/x86_32/kernel/x86_32.h"
 
 #include "kernel/firmware/SMBIOS.h"

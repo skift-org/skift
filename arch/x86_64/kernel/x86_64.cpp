@@ -4,7 +4,11 @@
 
 #include "arch/x86/kernel/COM.h"
 #include "arch/x86/kernel/IOPort.h"
+#include "arch/x86/kernel/PIC.h"
+#include "arch/x86/kernel/PIT.h"
 #include "arch/x86/kernel/RTC.h"
+#include "arch/x86_64/kernel/GDT.h"
+#include "arch/x86_64/kernel/IDT.h"
 #include "arch/x86_64/kernel/x86_64.h"
 
 #include "thirdparty/limine/stivale/stivale.h"
@@ -31,26 +35,33 @@ extern "C" void _start(void *info)
     com_initialize(COM4);
 
     logger_info("Hello, world!");
+    gdt_initialize();
+    idt_initialize();
+    pic_initialize();
+    pit_initialize(1);
+    logger_info("Hello, world!");
+
+    sti();
 
     while (true)
     {
-        hlt();
+        logger_info("Still alive!");
     }
 }
 
 void arch_disable_interrupts()
 {
-    ASSERT_NOT_REACHED();
+    cli();
 }
 
 void arch_enable_interrupts()
 {
-    ASSERT_NOT_REACHED();
+    sti();
 }
 
 void arch_halt()
 {
-    ASSERT_NOT_REACHED();
+    hlt();
 }
 
 void arch_yield()
@@ -84,16 +95,20 @@ TimeStamp arch_get_time()
 
 __no_return void arch_reboot()
 {
+    logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();
 }
 
 __no_return void arch_shutdown()
 {
+    logger_warn("STUB %s", __func__);
+
     ASSERT_NOT_REACHED();
 }
 
 void arch_panic_dump()
 {
+    logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();
 }
 
@@ -101,10 +116,12 @@ void arch_dump_stack_frame(void *stackframe)
 {
     __unused(stackframe);
 
+    logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();
 }
 
 void arch_backtrace()
 {
+    logger_warn("STUB %s", __func__);
     ASSERT_NOT_REACHED();
 }

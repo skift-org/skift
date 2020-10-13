@@ -6,7 +6,7 @@ import pprint
 
 from utils.Lexer import Lexer
 from utils.Generator import Generator
-from ipc import Parser, EmitProtocol, EmitPeer
+from ipc import Parser, EmitProtocol, EmitPeer, EmitConnection
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -31,5 +31,9 @@ elif sys.argv[1] == "--server" and "server" in prot:
     EmitPeer.peer(gen, prot, prot["server"])
 elif sys.argv[1] == "--client" and "client" in prot:
     EmitPeer.peer(gen, prot, prot["client"])
+elif sys.argv[1] == "--client-connection" and "client" in prot:
+    EmitConnection.connection(gen, prot, prot["client"])
+elif sys.argv[1] == "--server-connection" and "client" in prot:
+    EmitConnection.connection(gen, prot, prot["server"])
 
 print(gen.finalize())

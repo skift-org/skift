@@ -48,7 +48,7 @@ def request_handler(gen: Generator, request_name: str, prot, request):
     gen.emit("")
 
 
-def signal_handler(gen: Generator, signal_name: str, signal):
+def signal_handler(gen: Generator, signal_name: str,  prot, signal):
     gen.emit(
         f"void {signal_name}({arguments(signal['arguments'])})")
     gen.emit("{")

@@ -7,12 +7,11 @@ int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_TRANSPARENT);
+    Window *window = new Window(WINDOW_RESIZABLE);
 
     window->icon(Icon::get("console-line"));
     window->title("Terminal");
     window->size(Vec2i(500, 400));
-    window->opacity(1);
 
     Widget *widget = new TerminalWidget(window->root());
     widget->focus();

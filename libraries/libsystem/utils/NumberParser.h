@@ -20,4 +20,8 @@ int parse_int_inline(NumberParser parser, const char *str, int default_value);
 
 bool parse_int(NumberParser parser, const char *str, size_t size, int *result);
 
+#ifndef __KERNEL__
+
 bool parse_double(NumberParser parser, const char *str, size_t size, double *result);
+
+#endif

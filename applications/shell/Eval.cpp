@@ -180,7 +180,7 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         if (handle_has_error(stream))
         {
             handle_printf_error(stream, "Failed to open '%s'", redirect->destination);
-            return -1;
+            return PROCESS_FAILURE;
         }
 
         return shell_eval(redirect->command, stdin, stream);

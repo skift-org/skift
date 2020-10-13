@@ -1,13 +1,14 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/process/Process.h>
 
 int main(int argc, char **argv)
 {
     if (argc == 1)
     {
         stream_format(err_stream, "usage: %s path\n", argv[0]);
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     Path *path = path_create(argv[1]);
@@ -17,16 +18,17 @@ int main(int argc, char **argv)
     {
         if (strcmp(argv[1], "") == 0)
         {
-            printf(".");
+            printf(".\n");
         }
         else
         {
-            printf("/");
+            printf("/\n");
         }
     }
     else
     {
-        printf("%s", basename);
+        printf("%s\n", basename);
     }
-    return 0;
+
+    return PROCESS_SUCCESS;
 }

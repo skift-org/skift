@@ -1,18 +1,15 @@
 
-#include <libsystem/Result.h>
 #include <libraries/libsystem/io/Filesystem.h>
-
-int link(const char *src, const char *dest)
-{
-    return filesystem_link(src, dest);
-}
+#include <libsystem/Result.h>
+#include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
 {
-    if (argc == 3)
+    if (argc == 1)
     {
-        return link(argv[1], argv[2]);
+        stream_format(err_stream, "%s: no eough arguments\n", argv[0]);
+        return PROCESS_FAILURE;
     }
 
-    return -1;
+    return filesystem_link(argv[1], argv[2]);
 }

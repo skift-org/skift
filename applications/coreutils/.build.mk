@@ -29,7 +29,8 @@ UTILS = \
 	UNAME \
 	TRUE \
 	FALSE \
-	YES
+	YES \
+	PWD
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -123,6 +124,9 @@ FALSE_NAME = false
 
 YES_LIBS = 
 YES_NAME = yes
+
+PWD_LIBS = 
+PWD_NAME = pwd
 
 define UTIL_TEMPLATE =
 

@@ -2,14 +2,13 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 
-int cat(const char *path)
+Result cat(const char *path)
 {
     __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
 
     if (handle_has_error(stream))
     {
-        handle_printf_error(stream, "cat: Cannot access %s", path);
-        return -1;
+        return handle_get_error(stream);
     }
 
     FileState stat = {};
@@ -22,39 +21,43 @@ int cat(const char *path)
     {
         if (handle_has_error(stream))
         {
-            handle_printf_error(stream, "cat: Failed to read from %s", path);
-
-            return -1;
+            return handle_get_error(stream);
         }
 
         stream_write(out_stream, buffer, read);
 
         if (handle_has_error(out_stream))
         {
-            handle_printf_error(out_stream, "cat: Failed to write to stdout");
-
-            return -1;
+            return ERR_WRITE_STDOUT;
         }
     }
 
     stream_flush(out_stream);
 
-    return 0;
+    return SUCCESS;
 }
 
 int main(int argc, char **argv)
 {
-    if (argc >= 2)
+    if (argc == 1)
     {
-        int result = 0;
-
-        for (int i = 1; i < argc; i++)
-        {
-            result |= cat(argv[i]);
-        }
-
-        return result;
+        /* TODO: stdin option */
+        return PROCESS_SUCCESS;
     }
 
-    return -1;
+    Result result;
+    int exit_code = PROCESS_SUCCESS;
+
+    for (int i = 1; i < argc; i++)
+    {
+        result = cat(argv[i]);
+
+        if (result != SUCCESS)
+        {
+            stream_format(err_stream, "%s: %s: %s", argv[0], argv[i], get_result_description(result));
+            exit_code = PROCESS_FAILURE;
+        }
+    }
+
+    return exit_code;
 }

@@ -6,6 +6,7 @@
 
 #include <libsystem/Macros.h>
 #include <libsystem/core/Allocator.h>
+#include <libsystem/process/Process.h>
 
 typedef unsigned int uint;
 

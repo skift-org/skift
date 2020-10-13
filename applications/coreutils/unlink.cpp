@@ -1,17 +1,19 @@
-
 #include <libsystem/io/Filesystem.h>
-
-int unlink(const char *path)
-{
-    return filesystem_unlink(path);
-}
+#include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
 {
-    if (argc == 2)
+    if (argc == 1)
     {
-        return unlink(argv[1]);
+        stream_format(err_stream, "%s: missing operand", argv[0]);
+        return PROCESS_FAILURE;
     }
 
-    return -1;
+    if (argc < 2)
+    {
+        stream_format(err_stream, "%s: extra operand\n,", argv[2]);
+        return PROCESS_FAILURE;
+    }
+
+    return filesystem_unlink(argv[1]);
 }

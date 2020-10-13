@@ -1,13 +1,13 @@
+#include <libsystem/BuildInfo.h>
+#include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/system/System.h>
-#include <libsystem/cmdline/CMDLine.h>
-#include <libsystem/BuildInfo.h>
 
 static bool option_all = false;
-static bool option_kernel_name = false;        
-static bool option_kernel_release = false;     
-static bool option_kernel_version = false;    
-static bool option_machine = false;        
+static bool option_kernel_name = false;
+static bool option_kernel_release = false;
+static bool option_kernel_version = false;
+static bool option_machine = false;
 static bool option_nodename = false;
 static bool option_operating_system = false;
 
@@ -42,38 +42,37 @@ int main(int argc, char **argv)
 
     SystemInfo info = system_get_info();
 
-    if(argc == 1  || option_kernel_name || option_all)
+    if (argc == 1 || option_kernel_name || option_all)
     {
         printf("%s ", info.kernel_name);
     }
 
-    if(option_nodename || option_all)
+    if (option_nodename || option_all)
     {
         printf("%s ", info.machine);
     }
 
-    if(option_kernel_release || option_all)
+    if (option_kernel_release || option_all)
     {
         printf("%s ", info.kernel_release);
     }
 
-    if(option_kernel_version || option_all)
+    if (option_kernel_version || option_all)
     {
         printf("%s ", info.kernel_build);
     }
 
-    if(option_machine || option_all)
+    if (option_machine || option_all)
     {
         printf("%s ", __BUILD_TARGET__);
     }
-    
-    if(option_operating_system || option_all)
+
+    if (option_operating_system || option_all)
     {
         printf("%s", info.system_name);
     }
 
     printf("\n");
 
-    return 0;
-
+    return PROCESS_FAILURE;
 }

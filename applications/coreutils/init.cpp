@@ -35,5 +35,5 @@ int main(int argc, char **argv)
 
     printf("\n\n\t\e[1;34mGoodbye!\e[m - n°1\n\n");
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

@@ -10,5 +10,5 @@ int main(int argc, char **argv)
     process_get_directory(buffer, PATH_LENGTH);
     printf("%s", buffer);
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

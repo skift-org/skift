@@ -9,5 +9,5 @@ int main(int argc, char **argv)
         stream_close(stream);
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

@@ -74,5 +74,5 @@ int main(int argc, char **argv)
 
     printf("\n");
 
-    return PROCESS_FAILURE;
+    return PROCESS_SUCCESS;
 }

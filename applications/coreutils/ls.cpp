@@ -58,15 +58,14 @@ void ls_print_entry(DirectoryEntry *entry)
     }
 }
 
-int ls(const char *target_path, bool with_prefix)
+Result ls(const char *target_path, bool with_prefix)
 {
     Directory *directory = directory_open(target_path, OPEN_READ);
 
     if (handle_has_error(directory))
     {
-        handle_printf_error(directory, "ls: cannot access '%s'", target_path);
         directory_close(directory);
-        return -1;
+        return handle_get_error(directory);
     }
 
     if (with_prefix)
@@ -88,28 +87,30 @@ int ls(const char *target_path, bool with_prefix)
 
     directory_close(directory);
 
-    return 0;
+    return SUCCESS;
 }
 
 int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    if (argc == 2)
-    {
-        return ls(argv[1], false);
-    }
-    else if (argc > 2)
-    {
-        for (int i = 1; i < argc; i++)
-        {
-            ls(argv[i], true);
-        }
-
-        return 0;
-    }
-    else
+    if (argc == 1)
     {
         return ls(".", false);
     }
+
+    Result result;
+    int exit_code = PROCESS_SUCCESS;
+
+    for (int i = 1; i < argc; i++)
+    {
+        result = ls(argv[i], argc == 2);
+
+        if (result != SUCCESS)
+        {
+            exit_code = PROCESS_FAILURE;
+        }
+    }
+
+    return exit_code;
 }

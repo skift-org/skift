@@ -4,14 +4,16 @@
 
 int main(int argc, char const *argv[])
 {
-    if (argc > 1)
+    if (argc == 1)
     {
-        MarkupNode *markup_node = markup_parse_file(argv[1]);
-
-        __cleanup_malloc char *markup_string = markup_prettify(markup_node);
-
-        printf("%s", markup_string);
+        stream_format(err_stream, "Usage: %s FILENAME\n", argv[0]);
+        return PROCESS_FAILURE;
     }
 
-    return 0;
+    MarkupNode *markup_node = markup_parse_file(argv[1]);
+    __cleanup_malloc char *markup_string = markup_prettify(markup_node);
+
+    printf("%s", markup_string);
+
+    return PROCESS_SUCCESS;
 }

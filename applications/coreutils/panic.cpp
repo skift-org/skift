@@ -8,5 +8,5 @@ int main(int argc, char **argv)
     // do a page fault
     asm("int $1");
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

@@ -8,5 +8,5 @@ int main(int argc, char **argv)
 
     printf("\e[H\e[2J");
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

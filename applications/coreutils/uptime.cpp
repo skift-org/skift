@@ -33,5 +33,5 @@ int main(int argc, char const *argv[])
 
     printf("%d second%s\n", seconds, seconds == 1 ? "" : "s");
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

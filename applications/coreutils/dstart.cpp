@@ -6,17 +6,17 @@
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 2)
+    if (argc == 1)
     {
         stream_format(err_stream, "dstart: No executable specified!\n");
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     Launchpad *launchpad = launchpad_create(argv[1], argv[1]);
 
-    for (int i = 0; i < argc - 1; i++)
+    for (int i = 1; i < argc; i++)
     {
-        launchpad_argument(launchpad, argv[i + 1]);
+        launchpad_argument(launchpad, argv[i]);
     }
 
     int pid = -1;
@@ -24,9 +24,9 @@ int main(int argc, char const *argv[])
 
     if (result < 0)
     {
-        stream_format(err_stream, "dstart: Failed to start %s: %s\n", argv[1], result_to_string(result));
-        return -1;
+        stream_format(err_stream, "dstart: Failed to start %s: %s\n", argv[1], get_result_description(result));
+        return PROCESS_FAILURE;
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

@@ -32,9 +32,10 @@ int main(int argc, char **argv)
 
         if (handle_has_error(out_stream))
         {
-            return -1;
+            handle_printf_error(out_stream, "Couldn't write to stdout\n");
+            return PROCESS_FAILURE;
         }
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

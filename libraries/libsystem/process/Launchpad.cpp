@@ -2,6 +2,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/core/Plugs.h>
+#include <libsystem/io/Path.h>
 #include <libsystem/process/Launchpad.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
@@ -21,7 +22,9 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     launchpad->handles[2] = 2;
     launchpad->handles[3] = 3;
 
-    launchpad_argument(launchpad, executable);
+    Path *executable_path = path_create(executable);
+    launchpad_argument(launchpad, path_filename(executable_path));
+    path_destroy(executable_path);
 
     return launchpad;
 }
@@ -40,7 +43,15 @@ void launchpad_argument(Launchpad *launchpad, const char *argument)
 {
     assert(launchpad->argc < PROCESS_ARG_COUNT);
 
-    launchpad->argv[launchpad->argc] = strdup(argument);
+    if (argument)
+    {
+        launchpad->argv[launchpad->argc] = strdup(argument);
+    }
+    else
+    {
+        launchpad->argv[launchpad->argc] = strdup("");
+    }
+
     launchpad->argv[launchpad->argc + 1] = nullptr;
 
     launchpad->argc++;

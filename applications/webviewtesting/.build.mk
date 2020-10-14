@@ -1,0 +1,3 @@
+APPS += WEBVIEWTESTING
+WEBVIEWTESTING_NAME = webviewtesting
+WEBVIEWTESTING_LIBS = widget graphic json

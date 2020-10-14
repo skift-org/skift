@@ -5,9 +5,6 @@
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
 
-#define PROCESS_SUCCESS (0)
-#define PROCESS_FAILURE (1)
-
 int process_this();
 
 Result process_run(const char *command, int *pid);

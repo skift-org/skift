@@ -243,5 +243,8 @@ void TerminalWidget::do_layout()
         _terminal->height != height)
     {
         terminal_resize(_terminal, width, height);
+
+        IOCallTerminalSizeArgs args = {width, height};
+        stream_call(_master_stream, IOCALL_TERMINAL_SET_SIZE, &args);
     }
 }

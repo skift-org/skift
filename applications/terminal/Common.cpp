@@ -73,8 +73,7 @@ void render_cell(
         swap(foreground, background);
     }
 
-    if (background != TERMINAL_COLOR_BRIGHT_GREY &&
-        background != TERMINAL_COLOR_DEFAULT_BACKGROUND)
+    if (background != TERMINAL_COLOR_DEFAULT_BACKGROUND)
     {
         painter.clear_rectangle(bound, color(background));
     }

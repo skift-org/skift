@@ -1,6 +1,8 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Path.h>
+#include <libsystem/core/CString.h>
+
 
 static bool zero = false;
 
@@ -24,14 +26,23 @@ static CommandLine cmdline = CMDLINE(
     "Output each NAME with its last non-slash component and trailing slashes removed;",
     "if NAME contains no  /'s,  output  '.'  (meaning  the  current directory).");
 
-const char *dirname(Path *path)
+char *get_dirname(char *raw_path)
 {
-    if(path_element_count(path) == 1)
+    Path *path = path_create(raw_path);
+    char *_dir;
+    
+    free(path_pop(path));
+    
+    if (path_element_count(path) == 0 && raw_path[0] != '/')
     {
-        return ".";
+        return nullptr;
     }
-    path_pop(path);
-    return (const char*)path_as_string(path);
+
+    _dir = path_as_string(path);
+    
+    path_destroy(path);
+
+    return _dir;
 }
 
 int main(int argc, char **argv)
@@ -41,14 +52,26 @@ int main(int argc, char **argv)
     if (argc == 1)
     {
         printf("dirname: missing operand\nTry 'dirname --help' for more information.\n");
+
         return PROCESS_FAILURE;
     }
 
     for (int i = 1; i < argc; i++)
     {
-        Path *path  = path_create(argv[i]);
-        printf("%s%c", dirname(path), zero? '\0':'\n');
-        path_destroy(path);
+        char *dir_name = get_dirname(argv[i]);
+        char terminator = zero ? '\0': '\n';
+
+        //if nullptr is returned
+        if (!dir_name)
+        {
+            printf(".%c", terminator);
+        }
+        else
+        {
+            printf("%s%c", dir_name, terminator);
+        }
+        
+        free(dir_name);
     }
 
     return PROCESS_SUCCESS;

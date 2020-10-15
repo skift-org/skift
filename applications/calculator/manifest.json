@@ -1,6 +1,6 @@
 {
     "name": "Calculator",
-    "comment": "TODO",
+    "comment": "A plain and simple calculator.",
     "icon": "calculator",
     "command": "calculator"
 }

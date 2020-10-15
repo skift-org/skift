@@ -6,6 +6,7 @@ UTILS = \
 	CLEAR \
 	CP \
 	DSTART \
+	DIRNAME \
 	ECHO \
 	GREP \
 	HEXDUMP \
@@ -53,6 +54,9 @@ CP_NAME = cp
 DSTART_LIBS =
 DSTART_NAME = dstart
 
+DIRNAME_LIBS =
+DIRNAME_NAME = dirname
+
 ECHO_LIBS =
 ECHO_NAME = echo
 
@@ -86,9 +90,6 @@ MARKUP_NAME = markup
 MKDIR_LIBS =
 MKDIR_NAME = mkdir
 
-RMDIR_LIBS =
-RMDIR_NAME = rmdir
-
 MV_LIBS =
 MV_NAME = mv
 
@@ -100,6 +101,9 @@ OPEN_NAME = open
 
 PANIC_LIBS =
 PANIC_NAME = panic
+
+RMDIR_LIBS =
+RMDIR_NAME = rmdir
 
 SYSFETCH_LIBS =
 SYSFETCH_NAME = sysfetch

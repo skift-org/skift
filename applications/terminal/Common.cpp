@@ -68,7 +68,7 @@ void render_cell(
 {
     Rectangle bound = cell_bound(x, y);
 
-    if (attributes.inverted)
+    if (attributes.invert)
     {
         swap(foreground, background);
     }

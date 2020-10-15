@@ -9,20 +9,59 @@ struct TerminalAttributes
     TerminalColor background;
 
     bool bold;
-    bool inverted;
+    bool invert;
     bool underline;
+
+    TerminalAttributes bolded() const
+    {
+        TerminalAttributes attr = *this;
+        attr.bold = true;
+        return attr;
+    }
+
+    TerminalAttributes inverted() const
+    {
+        TerminalAttributes attr = *this;
+        attr.invert = true;
+        return attr;
+    }
+
+    TerminalAttributes underlined() const
+    {
+        TerminalAttributes attr = *this;
+        attr.underline = true;
+        return attr;
+    }
+
+    TerminalAttributes reset() const
+    {
+        TerminalAttributes attr = *this;
+        attr.bold = false;
+        attr.invert = false;
+        attr.underline = false;
+        return attr;
+    }
+
+    TerminalAttributes with_forground(TerminalColor color) const
+    {
+        TerminalAttributes attr = *this;
+        attr.foreground = color;
+        return attr;
+    }
+
+    TerminalAttributes with_background(TerminalColor color) const
+    {
+        TerminalAttributes attr = *this;
+        attr.background = color;
+        return attr;
+    }
+
+    bool operator==(const TerminalAttributes &other) const
+    {
+        return foreground == other.foreground &&
+               background == other.background &&
+               bold == other.bold &&
+               invert == other.invert &&
+               underline == other.underline;
+    }
 };
-
-TerminalAttributes terminal_attributes_bold(TerminalAttributes attributes);
-
-TerminalAttributes terminal_attributes_inverted(TerminalAttributes attributes);
-
-TerminalAttributes terminal_attributes_underline(TerminalAttributes attributes);
-
-TerminalAttributes terminal_attributes_regular(TerminalAttributes attributes);
-
-TerminalAttributes terminal_attributes_with_foreground(TerminalAttributes attributes, TerminalColor foreground);
-
-TerminalAttributes terminal_attributes_with_background(TerminalAttributes attributes, TerminalColor background);
-
-bool terminal_attributes_equals(TerminalAttributes left, TerminalAttributes right);

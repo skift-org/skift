@@ -128,7 +128,7 @@ void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell)
         TerminalCell old_cell = terminal->buffer[y * terminal->width + x];
 
         if (old_cell.codepoint != cell.codepoint ||
-            !terminal_attributes_equals(old_cell.attributes, cell.attributes))
+            old_cell.attributes != cell.attributes)
         {
             terminal->buffer[y * terminal->width + x] = cell;
             terminal->buffer[y * terminal->width + x].dirty = true;
@@ -454,31 +454,31 @@ void terminal_do_ansi(Terminal *terminal, Codepoint codepoint)
 
                 if (attr == 1)
                 {
-                    terminal->current_attributes = terminal_attributes_bold(terminal->current_attributes);
+                    terminal->current_attributes = terminal->current_attributes.bolded();
                 }
                 else if (attr == 3)
                 {
-                    terminal->current_attributes = terminal_attributes_inverted(terminal->current_attributes);
+                    terminal->current_attributes = terminal->current_attributes.inverted();
                 }
                 else if (attr == 4)
                 {
-                    terminal->current_attributes = terminal_attributes_underline(terminal->current_attributes);
+                    terminal->current_attributes = terminal->current_attributes.underlined();
                 }
                 else if (attr >= 30 && attr <= 37)
                 {
-                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, (TerminalColor)(attr - 30));
+                    terminal->current_attributes = terminal->current_attributes.with_forground((TerminalColor)(attr - 30));
                 }
                 else if (attr >= 90 && attr <= 97)
                 {
-                    terminal->current_attributes = terminal_attributes_with_foreground(terminal->current_attributes, (TerminalColor)(attr - 90 + 8));
+                    terminal->current_attributes = terminal->current_attributes.with_forground((TerminalColor)(attr - 90 + 8));
                 }
                 else if (attr >= 40 && attr <= 47)
                 {
-                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, (TerminalColor)(attr - 40));
+                    terminal->current_attributes = terminal->current_attributes.with_background((TerminalColor)(attr - 40));
                 }
                 else if (attr >= 100 && attr <= 107)
                 {
-                    terminal->current_attributes = terminal_attributes_with_background(terminal->current_attributes, (TerminalColor)(attr - 100 + 8));
+                    terminal->current_attributes = terminal->current_attributes.with_background((TerminalColor)(attr - 100 + 8));
                 }
             }
         }

@@ -30,7 +30,7 @@ void physical_page_set_used(uintptr_t address)
     MEMORY[page / 8] |= 1 << (page % 8);
 }
 
-void phyisical_page_set_used(uintptr_t address)
+void physical_page_set_free(uintptr_t address)
 {
     uintptr_t page = address / ARCH_PAGE_SIZE;
 
@@ -122,7 +122,7 @@ void physical_set_free(MemoryRange range)
         if (physical_page_is_used(address))
         {
             USED_MEMORY -= ARCH_PAGE_SIZE;
-            phyisical_page_set_used(address);
+            physical_page_set_free(address);
         }
     }
 }

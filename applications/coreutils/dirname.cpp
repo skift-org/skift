@@ -1,8 +1,6 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Path.h>
-#include <libsystem/core/CString.h>
-
 
 static bool zero = false;
 

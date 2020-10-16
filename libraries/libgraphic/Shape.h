@@ -261,13 +261,18 @@ public:
 
     Rectangle clipped_with(Rectangle other) const
     {
+        if (!colide_with(other))
+        {
+            return empty();
+        }
+
         Vec2i topleft(
-            MAX(_x, other._x),
-            MAX(_y, other._y));
+            MAX(left(), other.left()),
+            MAX(top(), other.top()));
 
         Vec2i bottomright(
-            MIN(_x + _width, other._x + other._width),
-            MIN(_y + _height, other._y + other._height));
+            MIN(right(), other.right()),
+            MIN(bottom(), other.bottom()));
 
         return Rectangle::from_two_point(topleft, bottomright);
     }
@@ -452,10 +457,10 @@ public:
                _height + _y > other._y;
     }
 
-    bool contains(Vec2i other) const
+    bool contains(Vec2i p) const
     {
-        return (_x <= other.x() && (_x + _width) > other.x()) &&
-               (_y <= other.y() && (_y + _height) > other.y());
+        return p.x() >= left() && p.x() < right() &&
+               p.y() >= top() && p.y() < bottom();
     }
 
     bool contains(Rectangle other) const

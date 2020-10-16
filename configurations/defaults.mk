@@ -1,6 +1,6 @@
 
 # ---------------------------------------------------------------------------- #
-#        DON'T EDIT THIS FILE, USE ENV VARIABLES or CONFIG-USER.MK             #
+#             DON'T EDIT THIS FILE, USE ENV VARIABLES or USER.MK               #
 # ---------------------------------------------------------------------------- #
 
 CONFIGS = \
@@ -69,8 +69,8 @@ CONFIG_OPTIMISATIONS  ?=-O2
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
 
-include config/$(CONFIG).mk
-include config/config-user.mk
+include configurations/$(CONFIG).mk
+include configurations/user.mk
 
 define BUILD_CONFIG_TEMPLATE =
 -D__$(1)__=\""$($(1))"\"

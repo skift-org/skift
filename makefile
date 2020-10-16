@@ -11,7 +11,7 @@ endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
-include config/config.mk
+include configurations/defaults.mk
 
 BUILD_ARCH?=x86_32
 BUILD_CONFIG?=debug

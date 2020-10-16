@@ -20,21 +20,28 @@ struct TerminalParameter
 
 struct Terminal
 {
-    int height;
-    int width;
-    TerminalCell *buffer;
-    UTF8Decoder *decoder;
+private:
+    int _height;
+    int _width;
+    TerminalCell *_buffer;
+    UTF8Decoder _decoder;
 
-    TerminalState state;
-    TerminalCursor saved_cursor;
-    TerminalCursor cursor;
+    TerminalState _state;
+    TerminalCursor _saved_cursor;
+    TerminalCursor _cursor;
 
-    TerminalAttributes current_attributes;
-    TerminalAttributes default_attributes;
+    TerminalAttributes _attributes;
 
-#define TERMINAL_MAX_PARAMETERS 8
-    int parameters_top;
-    TerminalParameter parameters[TERMINAL_MAX_PARAMETERS];
+    static constexpr int MAX_PARAMETERS = 8;
+    int _parameters_top;
+    TerminalParameter _parameters[MAX_PARAMETERS];
+
+public:
+    int width() { return _width; }
+
+    int height() { return _height; }
+
+    const TerminalCursor &cursor() { return _cursor; }
 
     Terminal(int width, int height);
 
@@ -49,19 +56,28 @@ struct Terminal
     void resize(int width, int height);
 
     TerminalCell cell_at(int x, int y);
+
     void cell_undirty(int x, int y);
+
     void set_cell(int x, int y, TerminalCell cell);
+
+    void cursor_move(int offx, int offy);
+
+    void cursor_set(int x, int y);
+
+    void scroll(int how_many_line);
+
+    void new_line();
+
+    void backspace();
+
+    void append(Codepoint codepoint);
+
+    void do_ansi(Codepoint codepoint);
+
+    void write(Codepoint codepoint);
+
+    void write(char c);
+
+    void write(const char *buffer, size_t size);
 };
-
-void terminal_cursor_move(Terminal *terminal, int offx, int offy);
-void terminal_cursor_set(Terminal *terminal, int x, int y);
-
-void terminal_scroll(Terminal *terminal, int how_many_line);
-void terminal_new_line(Terminal *terminal);
-void terminal_backspace(Terminal *terminal);
-
-void terminal_append(Terminal *terminal, Codepoint codepoint);
-void terminal_do_ansi(Terminal *terminal, Codepoint codepoint);
-void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint);
-void terminal_write_char(Terminal *terminal, char c);
-void terminal_write(Terminal *terminal, const char *buffer, size_t size);

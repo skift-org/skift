@@ -47,12 +47,6 @@ static void readline_repaint(ReadLine *readline)
     readline->old_cursor = readline->cursor;
 }
 
-static void readline_decode_callback(ReadLine *readline, Codepoint codepoint)
-{
-    unicode_string_insert(readline->string, codepoint, readline->cursor);
-    readline->cursor++;
-}
-
 Result readline_readline(ReadLine *readline, char **line)
 {
     unicode_string_clear(readline->string);
@@ -165,7 +159,7 @@ Result readline_readline(ReadLine *readline, char **line)
         {
             readline_recale_history(readline);
 
-            utf8decoder_write(readline->decoder, readline->lexer->current());
+            readline->decoder->write(readline->lexer->current());
             readline->lexer->foreward();
         }
 
@@ -193,7 +187,12 @@ ReadLine *readline_create(Stream *stream)
     readline->stream = stream;
 
     readline->string = unicode_string_create(READLINE_ALLOCATED);
-    readline->decoder = utf8decoder_create(readline, (UTF8DecoderCallback)readline_decode_callback);
+
+    readline->decoder = new UTF8Decoder([readline](auto codepoint) {
+        unicode_string_insert(readline->string, codepoint, readline->cursor);
+        readline->cursor++;
+    });
+
     readline->lexer = new Lexer(readline->stream);
 
     return readline;
@@ -202,7 +201,7 @@ ReadLine *readline_create(Stream *stream)
 void readline_destroy(ReadLine *readline)
 {
     delete readline->lexer;
-    utf8decoder_destroy(readline->decoder);
+    delete readline->decoder;
     unicode_string_destroy(readline->string);
 
     free(readline);

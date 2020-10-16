@@ -22,7 +22,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
         return;
     }
 
-    terminal_write(widget->terminal(), buffer, size);
+    widget->terminal()->write(buffer, size);
     widget->should_repaint();
 }
 
@@ -44,8 +44,8 @@ TerminalWidget::TerminalWidget(Widget *parent)
     _cursor_blink_timer = own<Timer>(250, [this]() {
         blink();
 
-        int cx = terminal()->cursor.x;
-        int cy = terminal()->cursor.y;
+        int cx = terminal()->cursor().x;
+        int cy = terminal()->cursor().y;
 
         should_repaint(terminal::cell_bound(cx, cy).offset(bound().position()));
     });
@@ -80,9 +80,9 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 
     Terminal *terminal = _terminal;
 
-    for (int y = 0; y < terminal->height; y++)
+    for (int y = 0; y < terminal->height(); y++)
     {
-        for (int x = 0; x < terminal->width; x++)
+        for (int x = 0; x < terminal->width(); x++)
         {
             TerminalCell cell = terminal->cell_at(x, y);
             terminal::render_cell(painter, x, y, cell);
@@ -90,8 +90,8 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
         }
     }
 
-    int cx = terminal->cursor.x;
-    int cy = terminal->cursor.y;
+    int cx = terminal->cursor().x;
+    int cy = terminal->cursor().y;
 
     if (terminal::cell_bound(cx, cy).colide_with(rectangle))
     {
@@ -108,7 +108,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
                     cell.codepoint,
                     TERMINAL_COLOR_DEFAULT_BACKGROUND,
                     TERMINAL_COLOR_DEFAULT_FOREGROUND,
-                    _terminal->default_attributes);
+                    TerminalAttributes::defaults());
             }
             else
             {
@@ -249,8 +249,8 @@ void TerminalWidget::do_layout()
     width = MAX(width, 8);
     height = MAX(height, 8);
 
-    if (_terminal->width != width ||
-        _terminal->height != height)
+    if (_terminal->width() != width ||
+        _terminal->height() != height)
     {
         _terminal->resize(width, height);
 

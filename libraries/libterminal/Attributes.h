@@ -12,6 +12,11 @@ struct TerminalAttributes
     bool invert;
     bool underline;
 
+    static TerminalAttributes defaults()
+    {
+        return {TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
+    }
+
     TerminalAttributes bolded() const
     {
         TerminalAttributes attr = *this;

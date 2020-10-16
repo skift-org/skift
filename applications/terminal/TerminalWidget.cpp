@@ -29,7 +29,7 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
 TerminalWidget::TerminalWidget(Widget *parent)
     : Widget(parent)
 {
-    _terminal = terminal_create(80, 24);
+    _terminal = new Terminal(80, 24);
 
     stream_create_term(
         &_master_stream,
@@ -61,7 +61,7 @@ TerminalWidget::TerminalWidget(Widget *parent)
 
 TerminalWidget::~TerminalWidget()
 {
-    terminal_destroy(_terminal);
+    delete _terminal;
 
     notifier_destroy(_master_notifier);
 
@@ -84,9 +84,9 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
     {
         for (int x = 0; x < terminal->width; x++)
         {
-            TerminalCell cell = terminal_cell_at(terminal, x, y);
+            TerminalCell cell = terminal->cell_at(x, y);
             terminal::render_cell(painter, x, y, cell);
-            terminal_cell_undirty(terminal, x, y);
+            terminal->cell_undirty(x, y);
         }
     }
 
@@ -95,7 +95,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 
     if (terminal::cell_bound(cx, cy).colide_with(rectangle))
     {
-        TerminalCell cell = terminal_cell_at(terminal, cx, cy);
+        TerminalCell cell = terminal->cell_at(cx, cy);
 
         if (window()->focused())
         {
@@ -252,7 +252,7 @@ void TerminalWidget::do_layout()
     if (_terminal->width != width ||
         _terminal->height != height)
     {
-        terminal_resize(_terminal, width, height);
+        _terminal->resize(width, height);
 
         IOCallTerminalSizeArgs args = {width, height};
         stream_call(_master_stream, IOCALL_TERMINAL_SET_SIZE, &args);

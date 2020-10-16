@@ -34,5 +34,3 @@ public:
 
     void do_layout();
 };
-
-Widget *terminal_widget_create(Widget *parent);

@@ -5,8 +5,6 @@
 #include <libterminal/Cell.h>
 #include <libterminal/Cursor.h>
 
-struct Terminal;
-
 enum class TerminalState
 {
     WAIT_ESC,
@@ -37,23 +35,24 @@ struct Terminal
 #define TERMINAL_MAX_PARAMETERS 8
     int parameters_top;
     TerminalParameter parameters[TERMINAL_MAX_PARAMETERS];
+
+    Terminal(int width, int height);
+
+    ~Terminal();
+
+    void clear(int fromx, int fromy, int tox, int toy);
+
+    void clear_all();
+
+    void clear_line(int line);
+
+    void resize(int width, int height);
+
+    TerminalCell cell_at(int x, int y);
+    void cell_undirty(int x, int y);
+    void set_cell(int x, int y, TerminalCell cell);
 };
 
-Terminal *terminal_create(int width, int height);
-void terminal_destroy(Terminal *terminal);
-
-void terminal_clear(Terminal *terminal, int fromx, int fromy, int tox, int toy);
-void terminal_clear_all(Terminal *terminal);
-void terminal_clear_line(Terminal *terminal, int line);
-
-void terminal_resize(Terminal *terminal, int width, int height);
-
-TerminalCell terminal_cell_at(Terminal *terminal, int x, int y);
-void terminal_cell_undirty(Terminal *terminal, int x, int y);
-void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell);
-
-void terminal_cursor_show(Terminal *terminal);
-void terminal_cursor_hide(Terminal *terminal);
 void terminal_cursor_move(Terminal *terminal, int offx, int offy);
 void terminal_cursor_set(Terminal *terminal, int x, int y);
 

@@ -3,150 +3,125 @@
 #include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>
 
-Terminal *terminal_create(int width, int height)
+Terminal::Terminal(int width, int height)
 {
-    Terminal *terminal = __create(Terminal);
+    this->width = width;
+    this->height = height;
+    buffer = (TerminalCell *)calloc(width * height, sizeof(TerminalCell));
 
-    terminal->width = width;
-    terminal->height = height;
-    terminal->buffer = (TerminalCell *)calloc(width * height, sizeof(TerminalCell));
+    decoder = utf8decoder_create(this, (UTF8DecoderCallback)terminal_write_codepoint);
 
-    terminal->decoder = utf8decoder_create(terminal, (UTF8DecoderCallback)terminal_write_codepoint);
+    cursor = (TerminalCursor){0, 0, true};
+    saved_cursor = (TerminalCursor){0, 0, true};
 
-    terminal->cursor = (TerminalCursor){0, 0, true};
-    terminal->saved_cursor = (TerminalCursor){0, 0, true};
+    current_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
+    default_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
 
-    terminal->current_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
-    terminal->default_attributes = (TerminalAttributes){TERMINAL_COLOR_DEFAULT_FOREGROUND, TERMINAL_COLOR_DEFAULT_BACKGROUND, false, false, false};
-
-    terminal->parameters_top = 0;
+    parameters_top = 0;
 
     for (int i = 0; i < TERMINAL_MAX_PARAMETERS; i++)
     {
-        terminal->parameters[i].empty = true;
-        terminal->parameters[i].value = 0;
+        parameters[i].empty = true;
+        parameters[i].value = 0;
     }
 
-    terminal_clear_all(terminal);
-
-    return terminal;
+    clear_all();
 }
 
-void terminal_destroy(Terminal *terminal)
+Terminal::~Terminal()
 {
-    utf8decoder_destroy(terminal->decoder);
-    free(terminal->buffer);
-    free(terminal);
+    utf8decoder_destroy(decoder);
+    free(buffer);
 }
 
-void terminal_clear(Terminal *terminal, int fromx, int fromy, int tox, int toy)
+void Terminal::clear(int fromx, int fromy, int tox, int toy)
 {
-    for (int i = fromx + fromy * terminal->width; i < tox + toy * terminal->width; i++)
+    for (int i = fromx + fromy * width; i < tox + toy * width; i++)
     {
-        terminal_set_cell(
-            terminal,
-            i % terminal->width,
-            i / terminal->width,
-            (TerminalCell){U' ', terminal->current_attributes, true});
+        set_cell(
+            i % width,
+            i / width,
+            (TerminalCell){U' ', current_attributes, true});
     }
 }
 
-void terminal_clear_all(Terminal *terminal)
+void Terminal::clear_all()
 {
-    terminal_clear(terminal, 0, 0, terminal->width, terminal->height);
+    Terminal::clear(0, 0, width, height);
 }
 
-void terminal_clear_line(Terminal *terminal, int line)
+void Terminal::clear_line(int line)
 {
-    if (line >= 0 && line < terminal->height)
+    if (line >= 0 && line < height)
     {
-        for (int i = 0; i < terminal->width; i++)
+        for (int i = 0; i < width; i++)
         {
-            terminal_set_cell(
-                terminal,
+            set_cell(
                 i,
                 line,
-                (TerminalCell){U' ', terminal->current_attributes, true});
+                (TerminalCell){U' ', current_attributes, true});
         }
     }
 }
 
-void terminal_resize(Terminal *terminal, int width, int height)
+void Terminal::resize(int width, int height)
 {
     TerminalCell *new_buffer = (TerminalCell *)malloc(sizeof(TerminalCell) * width * height);
 
     for (int i = 0; i < width * height; i++)
     {
-        new_buffer[i] = (TerminalCell){U' ', terminal->current_attributes, true};
+        new_buffer[i] = (TerminalCell){U' ', current_attributes, true};
     }
 
-    for (int x = 0; x < MIN(width, terminal->width); x++)
+    for (int x = 0; x < MIN(width, this->width); x++)
     {
-        for (int y = 0; y < MIN(height, terminal->height); y++)
+        for (int y = 0; y < MIN(height, this->height); y++)
         {
-            new_buffer[y * width + x] = terminal_cell_at(terminal, x, y);
+            new_buffer[y * width + x] = cell_at(x, y);
         }
     }
 
-    free(terminal->buffer);
-    terminal->buffer = new_buffer;
+    free(buffer);
+    buffer = new_buffer;
 
-    terminal->width = width;
-    terminal->height = height;
+    this->width = width;
+    this->height = height;
 
-    terminal->cursor.x = clamp(terminal->cursor.x, 0, width);
-    terminal->cursor.y = clamp(terminal->cursor.y, 0, height);
+    cursor.x = clamp(cursor.x, 0, width);
+    cursor.y = clamp(cursor.y, 0, height);
 }
 
-TerminalCell terminal_cell_at(Terminal *terminal, int x, int y)
+TerminalCell Terminal::cell_at(int x, int y)
 {
-    if (x >= 0 && x < terminal->width &&
-        y >= 0 && y < terminal->height)
+    if (x >= 0 && x < width && y >= 0 && y < height)
     {
-        return terminal->buffer[y * terminal->width + x];
+        return buffer[y * width + x];
     }
 
-    return (TerminalCell){U' ', terminal->current_attributes, true};
+    return (TerminalCell){U' ', current_attributes, true};
 }
 
-void terminal_cell_undirty(Terminal *terminal, int x, int y)
+void Terminal::cell_undirty(int x, int y)
 {
-    if (x >= 0 && x < terminal->width &&
-        y >= 0 && y < terminal->height)
+    if (x >= 0 && x < width && y >= 0 && y < height)
     {
-        terminal->buffer[y * terminal->width + x].dirty = false;
+        buffer[y * width + x].dirty = false;
     }
 }
 
-void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell)
+void Terminal::set_cell(int x, int y, TerminalCell cell)
 {
-    if (x >= 0 && x < terminal->width &&
-        y >= 0 && y < terminal->height)
+    if (x >= 0 && x < width &&
+        y >= 0 && y < height)
     {
-        TerminalCell old_cell = terminal->buffer[y * terminal->width + x];
+        TerminalCell old_cell = buffer[y * width + x];
 
         if (old_cell.codepoint != cell.codepoint ||
             old_cell.attributes != cell.attributes)
         {
-            terminal->buffer[y * terminal->width + x] = cell;
-            terminal->buffer[y * terminal->width + x].dirty = true;
+            buffer[y * width + x] = cell;
+            buffer[y * width + x].dirty = true;
         }
-    }
-}
-
-void terminal_cursor_show(Terminal *terminal)
-{
-    if (!terminal->cursor.visible)
-    {
-        terminal->cursor.visible = true;
-    }
-}
-
-void terminal_cursor_hide(Terminal *terminal)
-{
-    if (terminal->cursor.visible)
-    {
-        terminal->cursor.visible = false;
     }
 }
 
@@ -205,10 +180,10 @@ void terminal_scroll(Terminal *terminal, int how_many_line)
                 int x = i % terminal->width;
                 int y = i / terminal->width;
 
-                terminal_set_cell(terminal, x, y, terminal_cell_at(terminal, x, y - 1));
+                terminal->set_cell(x, y, terminal->cell_at(x, y - 1));
             }
 
-            terminal_clear_line(terminal, 0);
+            terminal->clear_line(0);
         }
     }
     else if (how_many_line > 0)
@@ -220,10 +195,10 @@ void terminal_scroll(Terminal *terminal, int how_many_line)
                 int x = i % terminal->width;
                 int y = i / terminal->width;
 
-                terminal_set_cell(terminal, x, y, terminal_cell_at(terminal, x, y + 1));
+                terminal->set_cell(x, y, terminal->cell_at(x, y + 1));
             }
 
-            terminal_clear_line(terminal, terminal->height - 1);
+            terminal->clear_line(terminal->height - 1);
         }
     }
 }
@@ -258,8 +233,7 @@ void terminal_append(Terminal *terminal, Codepoint codepoint)
     }
     else
     {
-        terminal_set_cell(
-            terminal,
+        terminal->set_cell(
             terminal->cursor.x,
             terminal->cursor.y,
             (TerminalCell){codepoint, terminal->current_attributes, true});
@@ -380,30 +354,30 @@ void terminal_do_ansi(Terminal *terminal, Codepoint codepoint)
     case U'J':
         if (terminal->parameters[0].value == 0)
         {
-            terminal_clear(terminal, terminal->cursor.x, terminal->cursor.y, terminal->width, terminal->height);
+            terminal->clear(terminal->cursor.x, terminal->cursor.y, terminal->width, terminal->height);
         }
         else if (terminal->parameters[0].value == 1)
         {
-            terminal_clear(terminal, 0, 0, terminal->cursor.x, terminal->cursor.y);
+            terminal->clear(0, 0, terminal->cursor.x, terminal->cursor.y);
         }
         else if (terminal->parameters[0].value == 2)
         {
-            terminal_clear(terminal, 0, 0, terminal->width, terminal->height);
+            terminal->clear(0, 0, terminal->width, terminal->height);
         }
         break;
 
     case U'K':
         if (terminal->parameters[0].value == 0)
         {
-            terminal_clear(terminal, terminal->cursor.x, terminal->cursor.y, terminal->width, terminal->cursor.y);
+            terminal->clear(terminal->cursor.x, terminal->cursor.y, terminal->width, terminal->cursor.y);
         }
         else if (terminal->parameters[0].value == 1)
         {
-            terminal_clear(terminal, 0, terminal->cursor.y, terminal->cursor.x, terminal->cursor.y);
+            terminal->clear(0, terminal->cursor.y, terminal->cursor.x, terminal->cursor.y);
         }
         else if (terminal->parameters[0].value == 2)
         {
-            terminal_clear(terminal, 0, terminal->cursor.y, terminal->width, terminal->cursor.y);
+            terminal->clear(0, terminal->cursor.y, terminal->width, terminal->cursor.y);
         }
         break;
 
@@ -520,7 +494,7 @@ void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint)
             terminal->state = TerminalState::WAIT_ESC;
 
             terminal_cursor_set(terminal, 0, 0);
-            terminal_clear_all(terminal);
+            terminal->clear_all();
         }
         else
         {

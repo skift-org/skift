@@ -26,19 +26,10 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     widget->should_repaint();
 }
 
-Terminal *terminal_widget_renderer_create(TerminalWidget *terminal_widget)
-{
-    TerminalWidgetRenderer *terminal_renderer = __create(TerminalWidgetRenderer);
-
-    terminal_renderer->widget = terminal_widget;
-
-    return terminal_create(80, 24, (TerminalRenderer *)terminal_renderer);
-}
-
 TerminalWidget::TerminalWidget(Widget *parent)
     : Widget(parent)
 {
-    _terminal = terminal_widget_renderer_create(this);
+    _terminal = terminal_create(80, 24);
 
     stream_create_term(
         &_master_stream,
@@ -149,58 +140,74 @@ void TerminalWidget::event(Event *event)
     {
         switch (event->keyboard.key)
         {
-
         case KEYBOARD_KEY_DELETE:
             send_sequence("\e[3~");
             break;
+
         case KEYBOARD_KEY_END:
             send_sequence("\e[4~");
             break;
+
         case KEYBOARD_KEY_F1:
             send_sequence("\e[11~");
             break;
+
         case KEYBOARD_KEY_F2:
             send_sequence("\e[12~");
             break;
+
         case KEYBOARD_KEY_F3:
             send_sequence("\e[13~");
             break;
+
         case KEYBOARD_KEY_F4:
             send_sequence("\e[14~");
             break;
+
         case KEYBOARD_KEY_F5:
             send_sequence("\e[15~");
             break;
+
         case KEYBOARD_KEY_F6:
             send_sequence("\e[17~");
             break;
+
         case KEYBOARD_KEY_F7:
             send_sequence("\e[18~");
             break;
+
         case KEYBOARD_KEY_F8:
             send_sequence("\e[19~");
             break;
+
         case KEYBOARD_KEY_F9:
             send_sequence("\e[20~");
             break;
+
         case KEYBOARD_KEY_F10:
             send_sequence("\e[21~");
             break;
+
         case KEYBOARD_KEY_F11:
             send_sequence("\e[23~");
             break;
+
         case KEYBOARD_KEY_F12:
             send_sequence("\e[24~");
             break;
+
         case KEYBOARD_KEY_HOME:
             send_sequence("\e[1~");
             break;
+
         case KEYBOARD_KEY_INSERT:
             send_sequence("\e[2~");
             break;
+
         case KEYBOARD_KEY_PGUP:
             send_sequence("\e[5~");
             break;
+
         case KEYBOARD_KEY_PGDOWN:
             send_sequence("\e[6~");
             break;
@@ -208,12 +215,15 @@ void TerminalWidget::event(Event *event)
         case KEYBOARD_KEY_UP:
             send_sequence("\e[A");
             break;
+
         case KEYBOARD_KEY_DOWN:
             send_sequence("\e[B");
             break;
+
         case KEYBOARD_KEY_RIGHT:
             send_sequence("\e[C");
             break;
+
         case KEYBOARD_KEY_LEFT:
             send_sequence("\e[D");
             break;

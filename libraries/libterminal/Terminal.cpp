@@ -3,7 +3,7 @@
 #include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>
 
-Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
+Terminal *terminal_create(int width, int height)
 {
     Terminal *terminal = __create(Terminal);
 
@@ -12,7 +12,6 @@ Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
     terminal->buffer = (TerminalCell *)calloc(width * height, sizeof(TerminalCell));
 
     terminal->decoder = utf8decoder_create(terminal, (UTF8DecoderCallback)terminal_write_codepoint);
-    terminal->renderer = renderer;
 
     terminal->cursor = (TerminalCursor){0, 0, true};
     terminal->saved_cursor = (TerminalCursor){0, 0, true};
@@ -36,7 +35,6 @@ Terminal *terminal_create(int width, int height, TerminalRenderer *renderer)
 void terminal_destroy(Terminal *terminal)
 {
     utf8decoder_destroy(terminal->decoder);
-    terminal_renderer_destroy(terminal->renderer);
     free(terminal->buffer);
     free(terminal);
 }
@@ -132,8 +130,6 @@ void terminal_set_cell(Terminal *terminal, int x, int y, TerminalCell cell)
         {
             terminal->buffer[y * terminal->width + x] = cell;
             terminal->buffer[y * terminal->width + x].dirty = true;
-
-            terminal_on_paint(terminal, x, y, cell);
         }
     }
 }
@@ -143,8 +139,6 @@ void terminal_cursor_show(Terminal *terminal)
     if (!terminal->cursor.visible)
     {
         terminal->cursor.visible = true;
-
-        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -153,8 +147,6 @@ void terminal_cursor_hide(Terminal *terminal)
     if (terminal->cursor.visible)
     {
         terminal->cursor.visible = false;
-
-        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -193,8 +185,6 @@ void terminal_cursor_move(Terminal *terminal, int offx, int offy)
 
         assert(terminal->cursor.x >= 0 && terminal->cursor.x < terminal->width);
         assert(terminal->cursor.y >= 0 && terminal->cursor.y < terminal->height);
-
-        terminal_on_cursor(terminal, terminal->cursor);
     }
 }
 
@@ -202,8 +192,6 @@ void terminal_cursor_set(Terminal *terminal, int x, int y)
 {
     terminal->cursor.x = clamp(x, 0, terminal->width);
     terminal->cursor.y = clamp(y, 0, terminal->height);
-
-    terminal_on_cursor(terminal, terminal->cursor);
 }
 
 void terminal_scroll(Terminal *terminal, int how_many_line)
@@ -501,7 +489,7 @@ void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint)
 {
     switch (terminal->state)
     {
-    case TERMINAL_STATE_WAIT_ESC:
+    case TerminalState::WAIT_ESC:
         if (codepoint == U'\e')
         {
             for (int i = 0; i < TERMINAL_MAX_PARAMETERS; i++)
@@ -512,36 +500,36 @@ void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint)
 
             terminal->parameters_top = 0;
 
-            terminal->state = TERMINAL_STATE_EXPECT_BRACKET;
+            terminal->state = TerminalState::EXPECT_BRACKET;
         }
         else
         {
-            terminal->state = TERMINAL_STATE_WAIT_ESC;
+            terminal->state = TerminalState::WAIT_ESC;
             terminal_append(terminal, codepoint);
         }
         break;
 
-    case TERMINAL_STATE_EXPECT_BRACKET:
+    case TerminalState::EXPECT_BRACKET:
         if (codepoint == U'[')
         {
-            terminal->state = TERMINAL_STATE_READ_ATTRIBUTE;
+            terminal->state = TerminalState::READ_ATTRIBUTE;
         }
         else if (codepoint == U'c')
         {
             terminal->current_attributes = terminal->default_attributes;
-            terminal->state = TERMINAL_STATE_WAIT_ESC;
+            terminal->state = TerminalState::WAIT_ESC;
 
             terminal_cursor_set(terminal, 0, 0);
             terminal_clear_all(terminal);
         }
         else
         {
-            terminal->state = TERMINAL_STATE_WAIT_ESC;
+            terminal->state = TerminalState::WAIT_ESC;
             terminal_append(terminal, codepoint);
         }
         break;
 
-    case TERMINAL_STATE_READ_ATTRIBUTE:
+    case TerminalState::READ_ATTRIBUTE:
         if (codepoint_is_digit(codepoint))
         {
             terminal->parameters[terminal->parameters_top].empty = false;
@@ -556,7 +544,7 @@ void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint)
             }
             else
             {
-                terminal->state = TERMINAL_STATE_WAIT_ESC;
+                terminal->state = TerminalState::WAIT_ESC;
 
                 terminal_do_ansi(terminal, codepoint);
             }
@@ -579,42 +567,5 @@ void terminal_write(Terminal *terminal, const char *buffer, size_t size)
     for (size_t i = 0; i < size; i++)
     {
         terminal_write_char(terminal, buffer[i]);
-    }
-}
-
-void terminal_on_paint(Terminal *terminal, int x, int y, TerminalCell cell)
-{
-    if (terminal->renderer->on_paint)
-    {
-        terminal->renderer->on_paint(terminal, terminal->renderer, x, y, cell);
-    }
-}
-
-void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor)
-{
-    if (terminal->renderer->on_cursor)
-    {
-        terminal->renderer->on_cursor(terminal, terminal->renderer, cursor);
-    }
-}
-
-void terminal_on_blink(Terminal *terminal)
-{
-    if (terminal->renderer->on_blink)
-    {
-        terminal->renderer->on_blink(terminal, terminal->renderer);
-    }
-}
-
-void terminal_blink(Terminal *terminal)
-{
-    terminal_on_blink(terminal);
-}
-
-void terminal_repaint(Terminal *terminal)
-{
-    if (terminal->renderer->repaint)
-    {
-        terminal->renderer->repaint(terminal, terminal->renderer);
     }
 }

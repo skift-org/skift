@@ -7,15 +7,6 @@
 #include <libterminal/Terminal.h>
 #include <libwidget/Widget.h>
 
-struct TerminalWidget;
-
-struct TerminalWidgetRenderer
-{
-    TerminalRenderer renderer;
-
-    struct TerminalWidget *widget;
-};
-
 class TerminalWidget : public Widget
 {
 private:

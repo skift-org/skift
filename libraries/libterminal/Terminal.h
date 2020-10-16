@@ -4,15 +4,14 @@
 #include <libterminal/Attributes.h>
 #include <libterminal/Cell.h>
 #include <libterminal/Cursor.h>
-#include <libterminal/Renderer.h>
 
 struct Terminal;
 
-enum TerminalState
+enum class TerminalState
 {
-    TERMINAL_STATE_WAIT_ESC,
-    TERMINAL_STATE_EXPECT_BRACKET,
-    TERMINAL_STATE_READ_ATTRIBUTE,
+    WAIT_ESC,
+    EXPECT_BRACKET,
+    READ_ATTRIBUTE,
 };
 
 struct TerminalParameter
@@ -27,7 +26,6 @@ struct Terminal
     int width;
     TerminalCell *buffer;
     UTF8Decoder *decoder;
-    TerminalRenderer *renderer;
 
     TerminalState state;
     TerminalCursor saved_cursor;
@@ -41,7 +39,7 @@ struct Terminal
     TerminalParameter parameters[TERMINAL_MAX_PARAMETERS];
 };
 
-Terminal *terminal_create(int width, int height, TerminalRenderer *renderer);
+Terminal *terminal_create(int width, int height);
 void terminal_destroy(Terminal *terminal);
 
 void terminal_clear(Terminal *terminal, int fromx, int fromy, int tox, int toy);
@@ -65,14 +63,6 @@ void terminal_backspace(Terminal *terminal);
 
 void terminal_append(Terminal *terminal, Codepoint codepoint);
 void terminal_do_ansi(Terminal *terminal, Codepoint codepoint);
-
 void terminal_write_codepoint(Terminal *terminal, Codepoint codepoint);
 void terminal_write_char(Terminal *terminal, char c);
 void terminal_write(Terminal *terminal, const char *buffer, size_t size);
-
-void terminal_on_paint(Terminal *terminal, int x, int y, TerminalCell cell);
-void terminal_on_cursor(Terminal *terminal, TerminalCursor cursor);
-void terminal_on_blink(Terminal *terminal);
-
-void terminal_repaint(Terminal *terminal);
-void terminal_blink(Terminal *terminal);

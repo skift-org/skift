@@ -87,7 +87,7 @@ ARFLAGS:=rcs
 AS=nasm
 ASFLAGS=-f elf32
 
-include arch/.build.mk
+include architectures/.build.mk
 
 include thirdparty/.build.mk
 include protocols/.build.mk

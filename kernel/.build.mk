@@ -49,12 +49,12 @@ $(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(BUILD_DIRECTORY)/arch/%.o: arch/%.cpp
+$(BUILD_DIRECTORY)/architectures/%.o: architectures/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
+$(BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@
@@ -62,4 +62,4 @@ $(BUILD_DIRECTORY)/arch/%.s.o: arch/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T arch/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T architectures/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

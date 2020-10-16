@@ -4,7 +4,7 @@
 #include <libsystem/math/MinMax.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/VirtualMemory.h"
+#include "architectures/VirtualMemory.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"

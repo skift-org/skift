@@ -8,7 +8,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 
-#include "arch/Arch.h"
+#include "architectures/Architectures.h"
 #include "kernel/devices/Devices.h"
 #include "kernel/devices/Driver.h"
 #include "kernel/filesystem/DevicesFileSystem.h"

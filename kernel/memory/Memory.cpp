@@ -5,7 +5,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/VirtualMemory.h"
+#include "architectures/VirtualMemory.h"
 
 #include "kernel/graphics/Graphics.h"
 #include "kernel/memory/Memory.h"

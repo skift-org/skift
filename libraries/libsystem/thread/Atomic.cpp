@@ -1,7 +1,7 @@
 
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
+#include "architectures/Architectures.h"
 
 static bool atomic_enabled = false;
 static uint atomic_depth = 0;

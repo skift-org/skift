@@ -1,7 +1,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/VirtualMemory.h"
+#include "architectures/VirtualMemory.h"
 
 #include "kernel/tasking/Task-Memory.h"
 

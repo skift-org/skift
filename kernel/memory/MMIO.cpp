@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/VirtualMemory.h"
+#include "architectures/VirtualMemory.h"
 
 #include "kernel/memory/MMIO.h"
 #include "kernel/memory/Physical.h"

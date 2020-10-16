@@ -1,6 +1,6 @@
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Memory.h"
+#include "architectures/Memory.h"
 
 #include "kernel/memory/Physical.h"
 #include "kernel/system/System.h"

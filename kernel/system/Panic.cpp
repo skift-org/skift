@@ -1,6 +1,6 @@
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
+#include "architectures/Architectures.h"
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
 #include "kernel/scheduling/Scheduler.h"

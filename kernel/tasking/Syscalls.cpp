@@ -8,7 +8,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
+#include "architectures/Architectures.h"
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

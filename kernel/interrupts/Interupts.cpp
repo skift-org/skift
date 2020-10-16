@@ -1,6 +1,6 @@
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
+#include "architectures/Architectures.h"
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"
 

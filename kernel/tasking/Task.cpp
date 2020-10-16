@@ -3,9 +3,9 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
-#include "arch/VirtualMemory.h"
-#include "arch/x86_32/kernel/Interrupts.h" /* XXX */
+#include "architectures/Architectures.h"
+#include "architectures/VirtualMemory.h"
+#include "architectures/x86_32/kernel/Interrupts.h" /* XXX */
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

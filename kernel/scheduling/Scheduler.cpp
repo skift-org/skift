@@ -1,7 +1,7 @@
 #include <libsystem/thread/Atomic.h>
 
-#include "arch/Arch.h"
-#include "arch/VirtualMemory.h"
+#include "architectures/Architectures.h"
+#include "architectures/VirtualMemory.h"
 
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"

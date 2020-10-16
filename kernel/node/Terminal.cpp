@@ -88,11 +88,17 @@ Result FsTerminal::call(FsHandle &handle, IOCall request, void *args)
 {
     __unused(handle);
 
+    if (!master)
+    {
+        return ERR_STREAM_CLOSED;
+    }
+
     IOCallTerminalSizeArgs *size_args = (IOCallTerminalSizeArgs *)args;
 
     switch (request)
     {
     case IOCALL_TERMINAL_GET_SIZE:
+
         size_args->width = _width;
         size_args->height = _height;
 

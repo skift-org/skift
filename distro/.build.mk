@@ -1,3 +1,0 @@
-DISTRO_DIRECTORY:=distro/$(BUILD_DISTRO)
-
--include $(DISTRO_DIRECTORY)/.build.mk

@@ -95,7 +95,7 @@ include kernel/.build.mk
 include libraries/.build.mk
 include applications/.build.mk
 include icons/.build.mk
-include distro/.build.mk
+include distributions/.build.mk
 
 # --- Ramdisk -------------------------------------------- #
 

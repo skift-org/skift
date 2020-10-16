@@ -4,7 +4,7 @@
 
 Building skiftOS requires
 
-- A good Linux distro
+- A good Linux distributions
 - nasm
 - gcc
 - binutils

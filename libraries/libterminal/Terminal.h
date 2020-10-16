@@ -5,14 +5,17 @@
 #include <libterminal/Cell.h>
 #include <libterminal/Cursor.h>
 
-enum class TerminalState
+namespace terminal
+{
+
+enum class State
 {
     WAIT_ESC,
     EXPECT_BRACKET,
     READ_ATTRIBUTE,
 };
 
-struct TerminalParameter
+struct Parameter
 {
     int value;
     bool empty;
@@ -23,25 +26,25 @@ struct Terminal
 private:
     int _height;
     int _width;
-    TerminalCell *_buffer;
+    Cell *_buffer;
     UTF8Decoder _decoder;
 
-    TerminalState _state;
-    TerminalCursor _saved_cursor;
-    TerminalCursor _cursor;
+    State _state;
+    Cursor _saved_cursor;
+    Cursor _cursor;
 
-    TerminalAttributes _attributes;
+    Attributes _attributes;
 
     static constexpr int MAX_PARAMETERS = 8;
     int _parameters_top;
-    TerminalParameter _parameters[MAX_PARAMETERS];
+    Parameter _parameters[MAX_PARAMETERS];
 
 public:
     int width() { return _width; }
 
     int height() { return _height; }
 
-    const TerminalCursor &cursor() { return _cursor; }
+    const Cursor &cursor() { return _cursor; }
 
     Terminal(int width, int height);
 
@@ -55,11 +58,11 @@ public:
 
     void resize(int width, int height);
 
-    TerminalCell cell_at(int x, int y);
+    Cell cell_at(int x, int y);
 
     void cell_undirty(int x, int y);
 
-    void set_cell(int x, int y, TerminalCell cell);
+    void set_cell(int x, int y, Cell cell);
 
     void cursor_move(int offx, int offy);
 
@@ -81,3 +84,5 @@ public:
 
     void write(const char *buffer, size_t size);
 };
+
+} // namespace terminal

@@ -10,7 +10,7 @@
 class TerminalWidget : public Widget
 {
 private:
-    Terminal *_terminal;
+    terminal::Terminal *_terminal;
     bool _cursor_blink;
 
     Stream *_master_stream;
@@ -20,7 +20,7 @@ private:
     Notifier *_master_notifier;
 
 public:
-    Terminal *terminal() { return _terminal; }
+    terminal::Terminal *terminal() { return _terminal; }
 
     void blink() { _cursor_blink = !_cursor_blink; };
 

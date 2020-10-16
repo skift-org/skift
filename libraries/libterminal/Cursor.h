@@ -1,9 +1,13 @@
 #pragma once
 
-struct TerminalCursor
+namespace terminal
+{
+struct Cursor
 {
     int x;
     int y;
 
     bool visible;
 };
+
+} // namespace terminal

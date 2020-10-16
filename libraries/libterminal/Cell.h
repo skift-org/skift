@@ -3,9 +3,13 @@
 #include <libsystem/unicode/Codepoint.h>
 #include <libterminal/Attributes.h>
 
-struct TerminalCell
+namespace terminal
+{
+struct Cell
 {
     Codepoint codepoint;
-    TerminalAttributes attributes;
+    Attributes attributes;
     bool dirty;
 };
+
+} // namespace terminal

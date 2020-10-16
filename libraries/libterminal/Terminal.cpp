@@ -3,18 +3,21 @@
 #include <libsystem/math/MinMax.h>
 #include <libterminal/Terminal.h>
 
+namespace terminal
+{
+
 Terminal::Terminal(int width, int height)
 {
     _width = width;
     _height = height;
-    _buffer = (TerminalCell *)calloc(_width * _height, sizeof(TerminalCell));
+    _buffer = (Cell *)calloc(_width * _height, sizeof(Cell));
 
     _decoder.callback([this](auto codepoint) { write(codepoint); });
 
     _cursor = {0, 0, true};
     _saved_cursor = {0, 0, true};
 
-    _attributes = TerminalAttributes::defaults();
+    _attributes = Attributes::defaults();
 
     _parameters_top = 0;
 
@@ -36,10 +39,7 @@ void Terminal::clear(int fromx, int fromy, int tox, int toy)
 {
     for (int i = fromx + fromy * _width; i < tox + toy * _width; i++)
     {
-        set_cell(
-            i % _width,
-            i / _width,
-            (TerminalCell){U' ', _attributes, true});
+        set_cell(i % _width, i / _width, (Cell){U' ', _attributes, true});
     }
 }
 
@@ -54,21 +54,18 @@ void Terminal::clear_line(int line)
     {
         for (int i = 0; i < _width; i++)
         {
-            set_cell(
-                i,
-                line,
-                (TerminalCell){U' ', _attributes, true});
+            set_cell(i, line, (Cell){U' ', _attributes, true});
         }
     }
 }
 
 void Terminal::resize(int width, int height)
 {
-    TerminalCell *new_buffer = (TerminalCell *)malloc(sizeof(TerminalCell) * width * height);
+    Cell *new_buffer = (Cell *)malloc(sizeof(Cell) * width * height);
 
     for (int i = 0; i < width * height; i++)
     {
-        new_buffer[i] = (TerminalCell){U' ', _attributes, true};
+        new_buffer[i] = {U' ', _attributes, true};
     }
 
     for (int x = 0; x < MIN(width, _width); x++)
@@ -89,14 +86,14 @@ void Terminal::resize(int width, int height)
     _cursor.y = clamp(_cursor.y, 0, height - 1);
 }
 
-TerminalCell Terminal::cell_at(int x, int y)
+Cell Terminal::cell_at(int x, int y)
 {
     if (x >= 0 && x < _width && y >= 0 && y < _height)
     {
         return _buffer[y * _width + x];
     }
 
-    return (TerminalCell){U' ', _attributes, true};
+    return {U' ', _attributes, true};
 }
 
 void Terminal::cell_undirty(int x, int y)
@@ -107,12 +104,12 @@ void Terminal::cell_undirty(int x, int y)
     }
 }
 
-void Terminal::set_cell(int x, int y, TerminalCell cell)
+void Terminal::set_cell(int x, int y, Cell cell)
 {
     if (x >= 0 && x < _width &&
         y >= 0 && y < _height)
     {
-        TerminalCell old_cell = _buffer[y * _width + x];
+        Cell old_cell = _buffer[y * _width + x];
 
         if (old_cell.codepoint != cell.codepoint ||
             old_cell.attributes != cell.attributes)
@@ -402,7 +399,7 @@ void Terminal::do_ansi(Codepoint codepoint)
         {
             if (_parameters[i].empty || _parameters[i].value == 0)
             {
-                _attributes = TerminalAttributes::defaults();
+                _attributes = Attributes::defaults();
             }
             else
             {
@@ -422,19 +419,19 @@ void Terminal::do_ansi(Codepoint codepoint)
                 }
                 else if (attr >= 30 && attr <= 37)
                 {
-                    _attributes = _attributes.with_forground((TerminalColor)(attr - 30));
+                    _attributes = _attributes.with_forground((Color)(attr - 30));
                 }
                 else if (attr >= 90 && attr <= 97)
                 {
-                    _attributes = _attributes.with_forground((TerminalColor)(attr - 90 + 8));
+                    _attributes = _attributes.with_forground((Color)(attr - 90 + 8));
                 }
                 else if (attr >= 40 && attr <= 47)
                 {
-                    _attributes = _attributes.with_background((TerminalColor)(attr - 40));
+                    _attributes = _attributes.with_background((Color)(attr - 40));
                 }
                 else if (attr >= 100 && attr <= 107)
                 {
-                    _attributes = _attributes.with_background((TerminalColor)(attr - 100 + 8));
+                    _attributes = _attributes.with_background((Color)(attr - 100 + 8));
                 }
             }
         }
@@ -457,7 +454,7 @@ void Terminal::write(Codepoint codepoint)
 {
     switch (_state)
     {
-    case TerminalState::WAIT_ESC:
+    case State::WAIT_ESC:
         if (codepoint == U'\e')
         {
             for (int i = 0; i < MAX_PARAMETERS; i++)
@@ -468,36 +465,36 @@ void Terminal::write(Codepoint codepoint)
 
             _parameters_top = 0;
 
-            _state = TerminalState::EXPECT_BRACKET;
+            _state = State::EXPECT_BRACKET;
         }
         else
         {
-            _state = TerminalState::WAIT_ESC;
+            _state = State::WAIT_ESC;
             append(codepoint);
         }
         break;
 
-    case TerminalState::EXPECT_BRACKET:
+    case State::EXPECT_BRACKET:
         if (codepoint == U'[')
         {
-            _state = TerminalState::READ_ATTRIBUTE;
+            _state = State::READ_ATTRIBUTE;
         }
         else if (codepoint == U'c')
         {
-            _attributes = TerminalAttributes::defaults();
-            _state = TerminalState::WAIT_ESC;
+            _attributes = Attributes::defaults();
+            _state = State::WAIT_ESC;
 
             cursor_set(0, 0);
             clear_all();
         }
         else
         {
-            _state = TerminalState::WAIT_ESC;
+            _state = State::WAIT_ESC;
             append(codepoint);
         }
         break;
 
-    case TerminalState::READ_ATTRIBUTE:
+    case State::READ_ATTRIBUTE:
         if (codepoint_is_digit(codepoint))
         {
             _parameters[_parameters_top].empty = false;
@@ -512,7 +509,7 @@ void Terminal::write(Codepoint codepoint)
             }
             else
             {
-                _state = TerminalState::WAIT_ESC;
+                _state = State::WAIT_ESC;
 
                 do_ansi(codepoint);
             }
@@ -536,3 +533,5 @@ void Terminal::write(const char *buffer, size_t size)
         write(buffer[i]);
     }
 }
+
+} // namespace terminal

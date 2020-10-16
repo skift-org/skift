@@ -26,10 +26,9 @@ void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, Sel
     widget->should_repaint();
 }
 
-TerminalWidget::TerminalWidget(Widget *parent)
-    : Widget(parent)
+TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 {
-    _terminal = new Terminal(80, 24);
+    _terminal = new terminal::Terminal(80, 24);
 
     stream_create_term(
         &_master_stream,
@@ -47,7 +46,7 @@ TerminalWidget::TerminalWidget(Widget *parent)
         int cx = terminal()->cursor().x;
         int cy = terminal()->cursor().y;
 
-        should_repaint(terminal::cell_bound(cx, cy).offset(bound().position()));
+        should_repaint(cell_bound(cx, cy).offset(bound().position()));
     });
 
     _cursor_blink_timer->start();
@@ -78,14 +77,14 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 
     rectangle = rectangle.offset(-bound().position());
 
-    Terminal *terminal = _terminal;
+    terminal::Terminal *terminal = _terminal;
 
     for (int y = 0; y < terminal->height(); y++)
     {
         for (int x = 0; x < terminal->width(); x++)
         {
-            TerminalCell cell = terminal->cell_at(x, y);
-            terminal::render_cell(painter, x, y, cell);
+            terminal::Cell cell = terminal->cell_at(x, y);
+            render_cell(painter, x, y, cell);
             terminal->cell_undirty(x, y);
         }
     }
@@ -93,36 +92,32 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
     int cx = terminal->cursor().x;
     int cy = terminal->cursor().y;
 
-    if (terminal::cell_bound(cx, cy).colide_with(rectangle))
+    if (cell_bound(cx, cy).colide_with(rectangle))
     {
-        TerminalCell cell = terminal->cell_at(cx, cy);
+        terminal::Cell cell = terminal->cell_at(cx, cy);
 
         if (window()->focused())
         {
             if (_cursor_blink)
             {
-                terminal::render_cell(
+                render_cell(
                     painter,
                     cx,
                     cy,
                     cell.codepoint,
-                    TERMINAL_COLOR_DEFAULT_BACKGROUND,
-                    TERMINAL_COLOR_DEFAULT_FOREGROUND,
-                    TerminalAttributes::defaults());
+                    terminal::BACKGROUND,
+                    terminal::FOREGROUND,
+                    terminal::Attributes::defaults());
             }
             else
             {
-                terminal::render_cell(
-                    painter,
-                    cx,
-                    cy,
-                    cell);
+                render_cell(painter, cx, cy, cell);
             }
         }
         else
         {
-            terminal::render_cell(painter, cx, cy, cell);
-            painter.draw_rectangle(terminal::cell_bound(cx, cy), color(THEME_ANSI_CURSOR));
+            render_cell(painter, cx, cy, cell);
+            painter.draw_rectangle(cell_bound(cx, cy), color(THEME_ANSI_CURSOR));
         }
     }
 
@@ -243,8 +238,8 @@ void TerminalWidget::event(Event *event)
 
 void TerminalWidget::do_layout()
 {
-    int width = bound().width() / terminal::cell_size().x();
-    int height = bound().height() / terminal::cell_size().y();
+    int width = bound().width() / cell_size().x();
+    int height = bound().height() / cell_size().y();
 
     width = MAX(width, 8);
     height = MAX(height, 8);

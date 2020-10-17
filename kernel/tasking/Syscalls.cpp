@@ -82,6 +82,10 @@ Result sys_process_cancel(int pid)
     {
         return ERR_NO_SUCH_TASK;
     }
+    else if (!task->user)
+    {
+        return ERR_ACCESS_DENIED;
+    }
     else
     {
         task->cancel(-1);

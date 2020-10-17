@@ -33,7 +33,8 @@
     __ENTRY(ERR_WRITE_ONLY_STREAM, "Write only stream")                           \
     __ENTRY(ERR_DIRECTORY_NOT_EMPTY, "Directory not empty")                       \
     __ENTRY(ERR_WRITE_STDOUT, "Failed to write to stdout")                        \
-    __ENTRY(ERR_EXTENSION, "The file does not have an extension")
+    __ENTRY(ERR_EXTENSION, "The file does not have an extension")                 \
+    __ENTRY(ERR_ACCESS_DENIED, "Acces denied")                                      
 
 enum Result
 {

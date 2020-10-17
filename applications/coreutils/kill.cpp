@@ -6,7 +6,7 @@ int kill(const char *id)
 {
     int i = parse_uint_inline(PARSER_DECIMAL, id, -1);
 
-    if (i == -1)
+    if (i < 2)
     {
         return -1;
     }

@@ -26,7 +26,15 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++)
     {
-        result |= kill(argv[i]);
+        if (!isnumber(argv[i]))
+        {
+            stream_format(err_stream, "%s: invalid pid %s\n", argv[0], argv[i]);
+            result |= PROCESS_FAILURE;
+        }
+        else 
+        {
+            result |= kill(argv[i]);
+        }
     }
 
     return result;

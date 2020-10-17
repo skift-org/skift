@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #include <libsystem/Common.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/core/Printf.h>
@@ -471,4 +473,17 @@ char *strdup(const char *s)
     }
 
     return allocated_string;
+}
+
+bool isnumber(char *s)
+{
+    for (size_t i = 0; i < strlen(s); i++)
+    {
+        if (!isdigit(i))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

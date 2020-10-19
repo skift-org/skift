@@ -47,20 +47,20 @@ const char *path_filename(Path *path)
 
 String path_filename_without_extension(Path *file)
 {
-	const char *filename = path_filename(file);
-	const char *extension = path_extension(file);
+    const char *filename = path_filename(file);
+    const char *extension = path_extension(file);
 
-	size_t size = strlen(filename) - sizeof(extension);
-	char buf[size + 1];
+    size_t size = strlen(filename) - sizeof(extension);
+    char buf[size + 1];
 
-	size_t i;
-	for (i = 0; i < size - 1; i++)
-	{
-		buf[i] = filename[i];
-	}
-	buf[i] = '\0';
+    size_t i;
+    for (i = 0; i < size - 1; i++)
+    {
+        buf[i] = filename[i];
+    }
+    buf[i] = '\0';
 
-	return String(buf, size);
+    return String(buf, size);
 }
 
 const char *path_extension(Path *path)
@@ -226,11 +226,18 @@ void path_to_cstring(Path *path, char *buffer, uint size)
     }
     else
     {
+        int index = 0;
         list_foreach(const char, i, path->elements)
         {
             const char *element = (const char *)i;
-            strnapd(buffer, PATH_SEPARATOR, size);
+
+            if (index != 0 || path->is_absolute)
+            {
+                strnapd(buffer, PATH_SEPARATOR, size);
+            }
+
             strncat(buffer, element, size);
+            index++;
         }
     }
 }
@@ -245,10 +252,18 @@ char *path_as_string(Path *path)
     }
     else
     {
+        int index = 0;
+
         list_foreach(const char, element, path->elements)
         {
-            buffer_builder_append_chr(builder, PATH_SEPARATOR);
+            if (index != 0 || path->is_absolute)
+            {
+                buffer_builder_append_chr(builder, PATH_SEPARATOR);
+            }
+
             buffer_builder_append_str(builder, element);
+
+            index++;
         }
     }
 

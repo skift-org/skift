@@ -39,37 +39,37 @@ char *str_split(char *str, char *const sub_str)
     Similar to strtok in string.h
     May not work as expected when the str contains '\0' in between
     */
-    static char *start = NULL;
+    static char *start = nullptr;
 
-    if(!start)
+    if (start == nullptr)
     {
         start = str;
     }
 
-    if(!*start)
+    if (!*start)
     {
-        return NULL;
+        return nullptr;
     }
 
     char *split = strstr(start, sub_str);
 
-    if(split)
+    if (split)
     {
         (*split) = 0;
         char *tmp = start;
         start = split + strlen(sub_str);
         return tmp;
     }
-    
+
     int len = strlen(start);
     if (len)
     {
         char *tmp = start;
         start += len;
-        return tmp;   
+        return tmp;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Result tac(Stream *const input_stream)
@@ -89,32 +89,30 @@ Result tac(Stream *const input_stream)
 
     while ((read = stream_read(input_stream, buffer, 1024)) != 0)
     {
-        
+
         buffer[read] = 0;
         char *copy = strdup(buffer);
         split = str_split(copy, separator);
-        while (split != NULL)
+        while (split != nullptr)
         {
             temp.append(split);
-            if (!before)
+            split = str_split(NULL, separator);
+            if (!before && split)
             {
                 temp.append(separator);
             }
 
             lines.push_back(temp.finalize());
-            if (before)
+            if (before && split)
             {
                 temp.append(separator);
             }
-
-            split = str_split(NULL, separator);
         }
         if (temp.finalize().length())
         {
             lines.push_back(temp.finalize());
         }
     }
-
 
     for (size_t i = lines.count(); i > 0; i--)
     {

@@ -16,6 +16,19 @@ int __plug_process_this()
     return _cached_this;
 }
 
+static bool _has_cached_name = false;
+static char _cached_name[PROCESS_NAME_SIZE];
+
+const char *__plug_process_name()
+{
+    if (!_has_cached_name)
+    {
+        assert(__syscall(SYS_PROCESS_NAME, (uintptr_t)&_cached_name) == SUCCESS);
+    }
+
+    return _cached_name;
+}
+
 Result __plug_process_launch(Launchpad *launchpad, int *pid)
 {
     return __syscall(SYS_PROCESS_LAUNCH, (uintptr_t)launchpad, (uintptr_t)pid);

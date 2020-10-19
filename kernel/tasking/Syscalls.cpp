@@ -41,6 +41,13 @@ Result sys_process_this(int *pid)
     return SUCCESS;
 }
 
+Result sys_process_name(char *name)
+{
+    strlcpy(name, scheduler_running()->name, PROCESS_NAME_SIZE);
+
+    return SUCCESS;
+}
+
 Result sys_process_launch(Launchpad *launchpad, int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
@@ -440,6 +447,7 @@ Result sys_handle_accept(int handle, int *connection_handle)
 
 static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_PROCESS_THIS] = reinterpret_cast<SyscallHandler>(sys_process_this),
+    [SYS_PROCESS_NAME] = reinterpret_cast<SyscallHandler>(sys_process_name),
     [SYS_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(sys_process_launch),
     [SYS_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(sys_process_exit),
     [SYS_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(sys_process_cancel),

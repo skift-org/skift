@@ -59,6 +59,8 @@ uint __plug_system_get_ticks();
 
 int __plug_process_this();
 
+const char* __plug_process_name();
+
 Result __plug_process_launch(Launchpad *launchpad, int *pid);
 
 void __no_return __plug_process_exit(int code);

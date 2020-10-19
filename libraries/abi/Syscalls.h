@@ -5,6 +5,7 @@
 
 #define SYSCALL_LIST(__ENTRY)          \
     __ENTRY(SYS_PROCESS_THIS)          \
+    __ENTRY(SYS_PROCESS_NAME)          \
     __ENTRY(SYS_PROCESS_LAUNCH)        \
     __ENTRY(SYS_PROCESS_EXIT)          \
     __ENTRY(SYS_PROCESS_CANCEL)        \

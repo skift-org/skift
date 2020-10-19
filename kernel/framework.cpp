@@ -128,6 +128,18 @@ int __plug_process_this()
     return scheduler_running_id();
 }
 
+const char *__plug_process_name()
+{
+    if (scheduler_running())
+    {
+        return scheduler_running()->name;
+    }
+    else
+    {
+        return "early";
+    }
+}
+
 Result __plug_process_launch(Launchpad *launchpad, int *pid)
 {
     return task_launch(scheduler_running(), launchpad, pid);

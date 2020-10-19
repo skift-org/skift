@@ -37,6 +37,8 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
             stream_format(log_stream, "     ", process_this());
         }
 
+        stream_format(log_stream, "%s: ", process_name());
+
         DateTime datetime = datetime_now();
         stream_format(log_stream, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);
 

@@ -9,6 +9,11 @@ int process_this()
     return __plug_process_this();
 }
 
+const char *process_name()
+{
+    return __plug_process_name();
+}
+
 Result process_run(const char *command, int *pid)
 {
     Launchpad *launchpad = launchpad_create("shell", "/Applications/shell/shell");

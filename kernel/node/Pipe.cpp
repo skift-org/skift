@@ -13,7 +13,7 @@ bool FsPipe::can_read(FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !_buffer.empty() || !writers;
+    return !_buffer.empty() || !writers();
 }
 
 bool FsPipe::can_write(FsHandle *handle)
@@ -21,14 +21,14 @@ bool FsPipe::can_write(FsHandle *handle)
     __unused(handle);
 
     // FIXME: make this atomic or something...
-    return !_buffer.full() || !readers;
+    return !_buffer.full() || !readers();
 }
 
 ResultOr<size_t> FsPipe::read(FsHandle &handle, void *buffer, size_t size)
 {
     __unused(handle);
 
-    if (!writers)
+    if (!writers())
     {
         return ERR_STREAM_CLOSED;
     }
@@ -40,7 +40,7 @@ ResultOr<size_t> FsPipe::write(FsHandle &handle, const void *buffer, size_t size
 {
     __unused(handle);
 
-    if (!readers)
+    if (!readers())
     {
         return ERR_STREAM_CLOSED;
     }

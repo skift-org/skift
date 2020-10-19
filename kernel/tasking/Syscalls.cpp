@@ -325,7 +325,18 @@ Result sys_handle_open(int *handle, const char *path, OpenFlag flags)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_open(scheduler_running(), handle, path, flags);
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+
+    if (result_or_handle_index.success())
+    {
+        *handle = result_or_handle_index.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *handle = HANDLE_INVALID_ID;
+        return result_or_handle_index.result();
+    }
 }
 
 Result sys_handle_close(int handle)
@@ -388,7 +399,18 @@ Result sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_read(scheduler_running(), handle, buffer, size, read);
+    auto result_or_read = task_fshandle_read(scheduler_running(), handle, buffer, size);
+
+    if (result_or_read.success())
+    {
+        *read = result_or_read.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *read = 0;
+        return result_or_read.result();
+    }
 }
 
 Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
@@ -399,7 +421,18 @@ Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *wri
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_write(scheduler_running(), handle, buffer, size, written);
+    auto result_or_written = task_fshandle_write(scheduler_running(), handle, buffer, size);
+
+    if (result_or_written.success())
+    {
+        *written = result_or_written.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *written = 0;
+        return result_or_written.result();
+    }
 }
 
 Result sys_handle_call(int handle, IOCall request, void *args)
@@ -419,7 +452,18 @@ Result sys_handle_tell(int handle, Whence whence, int *offset)
         return ERR_BAD_ADDRESS;
     }
 
-    return task_fshandle_tell(scheduler_running(), handle, whence, offset);
+    auto result_of_offset = task_fshandle_tell(scheduler_running(), handle, whence);
+
+    if (result_of_offset.success())
+    {
+        *offset = result_of_offset.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *offset = 0;
+        return result_of_offset.result();
+    }
 }
 
 Result sys_handle_stat(int handle, FileState *state)
@@ -434,12 +478,34 @@ Result sys_handle_stat(int handle, FileState *state)
 
 Result sys_handle_connect(int *handle, const char *path)
 {
-    return task_fshandle_connect(scheduler_running(), handle, path);
+    auto result_or_handle_index = task_fshandle_connect(scheduler_running(), path);
+
+    if (result_or_handle_index.success())
+    {
+        *handle = result_or_handle_index.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *handle = ERR_INVALID_ARGUMENT;
+        return result_or_handle_index.result();
+    }
 }
 
 Result sys_handle_accept(int handle, int *connection_handle)
 {
-    return task_fshandle_accept(scheduler_running(), handle, connection_handle);
+    auto result_or_handle_index = task_fshandle_accept(scheduler_running(), handle);
+
+    if (result_or_handle_index.success())
+    {
+        *connection_handle = result_or_handle_index.take_value();
+        return SUCCESS;
+    }
+    else
+    {
+        *connection_handle = ERR_INVALID_ARGUMENT;
+        return result_or_handle_index.result();
+    }
 }
 
 #pragma GCC diagnostic push
@@ -522,7 +588,7 @@ int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int
 
     result = handler(arg0, arg1, arg2, arg3, arg4);
 
-    if (result != SUCCESS && result != TIMEOUT)
+    if (result != SUCCESS && result != TIMEOUT && result != ERR_STREAM_CLOSED)
     {
         logger_trace("%s(%08x, %08x, %08x, %08x, %08x) returned %s", syscall_names[syscall], arg0, arg1, arg2, arg3, arg4, result_to_string((Result)result));
     }

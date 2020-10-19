@@ -2,7 +2,7 @@
 
 #include "kernel/tasking/Task.h"
 
-Result task_fshandle_open(Task *task, int *handle_index, const char *path, OpenFlag flags);
+ResultOr<int> task_fshandle_open(Task *task, const char *file_path, OpenFlag flags);
 
 Result task_fshandle_close(Task *task, int handle_index);
 
@@ -15,25 +15,21 @@ Result task_fshandle_select(
     SelectEvent *selected_events,
     Timeout timeout);
 
-Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *read);
+ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size);
 
-Result task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written);
+ResultOr<size_t> task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size);
 
 Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence);
 
-Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset);
+ResultOr<int> task_fshandle_tell(Task *task, int handle_index, Whence whence);
 
 Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args);
 
 Result task_fshandle_stat(Task *task, int handle_index, FileState *stat);
 
-Result task_fshandle_connect(Task *task, int *handle_index, const char *path);
+ResultOr<int> task_fshandle_connect(Task *task, const char *socket_path);
 
-Result task_fshandle_accept(Task *task, int handle_index, int *connection_handle_index);
-
-Result task_fshandle_send(Task *task, int handle_index, const void *buffer, size_t size, size_t *sended);
-
-Result task_fshandle_receive(Task *task, int handle_index, void *buffer, size_t size, size_t *received);
+ResultOr<int> task_fshandle_accept(Task *task, int socket_handle_index);
 
 Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index);
 

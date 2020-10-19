@@ -2,40 +2,51 @@
 
 #include "kernel/node/Node.h"
 
-struct FsHandle
+class FsHandle
 {
-    Lock lock;
-    FsNode *node;
-    size_t offset;
-    OpenFlag flags;
+private:
+    Lock _lock;
+    RefPtr<FsNode> _node = nullptr;
+    OpenFlag _flags = 0;
+    size_t _offset = 0;
 
+public:
     void *attached;
     size_t attached_size;
 
-    bool has_flag(OpenFlag flag)
-    {
-        return (flags & flag) == flag;
-    }
+    auto node() { return _node; }
+
+    auto offset() { return _offset; }
+
+    auto flags() { return _flags; }
+
+    bool has_flag(OpenFlag flag) { return (_flags & flag) == flag; }
+
+    FsHandle(RefPtr<FsNode> node, OpenFlag flags);
+
+    FsHandle(FsHandle &other);
+
+    ~FsHandle();
+
+    bool locked();
+
+    void acquire(int who_acquire);
+
+    void release(int who_release);
+
+    SelectEvent poll(SelectEvent events);
+
+    ResultOr<size_t> read(void *buffer, size_t size);
+
+    ResultOr<size_t> write(const void *buffer, size_t size);
+
+    Result seek(int offset, Whence whence);
+
+    ResultOr<int> tell(Whence whence);
+
+    Result call(IOCall request, void *args);
+
+    Result stat(FileState *stat);
+
+    ResultOr<FsHandle *> accept();
 };
-
-FsHandle *fshandle_create(FsNode *node, OpenFlag flags);
-
-void fshandle_destroy(FsHandle *handle);
-FsHandle *fshandle_clone(FsHandle *handle);
-SelectEvent fshandle_select(FsHandle *handle, SelectEvent events);
-
-bool fshandle_is_locked(FsHandle *handle);
-void fshandle_acquire_lock(FsHandle *handle, int who_acquire);
-void fshandle_release_lock(FsHandle *handle, int who_release);
-
-Result fshandle_read(FsHandle *handle, void *buffer, size_t size, size_t *read);
-Result fshandle_write(FsHandle *handle, const void *buffer, size_t size, size_t *written);
-
-Result fshandle_seek(FsHandle *handle, int offset, Whence whence);
-Result fshandle_tell(FsHandle *handle, Whence whence, int *offset);
-
-Result fshandle_call(FsHandle *handle, IOCall request, void *args);
-Result fshandle_stat(FsHandle *handle, FileState *stat);
-
-Result fshandle_connect(FsNode *node, FsHandle **connection_handle);
-Result fshandle_accept(FsHandle *handle, FsHandle **connection_handle);

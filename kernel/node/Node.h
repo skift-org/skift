@@ -11,19 +11,34 @@ struct FsHandle;
 
 struct FsNode : public RefCounted<FsNode>
 {
-    FileType type;
+private:
     Lock _lock;
+    FileType _type;
 
-    uint readers = 0;
-    uint writers = 0;
-    uint clients = 0;
-    uint server = 0;
-    uint master = 0;
+    unsigned int _readers = 0;
+    unsigned int _writers = 0;
+    unsigned int _clients = 0;
+    unsigned int _server = 0;
+    unsigned int _master = 0;
 
 public:
+    FileType type() { return _type; }
+
+    unsigned int readers() { return _readers; }
+
+    unsigned int writers() { return _writers; }
+
+    unsigned int clients() { return _clients; }
+
+    unsigned int server() { return _server; }
+
+    unsigned int master() { return _master; }
+
     FsNode(FileType type);
 
-    virtual ~FsNode();
+    virtual ~FsNode()
+    {
+    }
 
     void ref_handle(FsHandle &handle);
 
@@ -86,14 +101,14 @@ public:
         return ERR_NOT_WRITABLE;
     }
 
-    virtual FsNode *find(const char *name)
+    virtual RefPtr<FsNode> find(const char *name)
     {
         __unused(name);
 
         return nullptr;
     }
 
-    virtual Result link(const char *name, FsNode *child)
+    virtual Result link(const char *name, RefPtr<FsNode> child)
     {
         __unused(name);
         __unused(child);
@@ -114,11 +129,11 @@ public:
     // Return true if the connection is accepted
     virtual bool is_accepted() { return false; }
 
-    virtual ResultOr<FsNode *> connect() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+    virtual ResultOr<RefPtr<FsNode>> connect() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
 
     virtual bool can_accept() { return false; }
 
-    virtual ResultOr<FsNode *> accept() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
+    virtual ResultOr<RefPtr<FsNode>> accept() { return ERR_SOCKET_OPERATION_ON_NON_SOCKET; }
 
     bool is_acquire();
 

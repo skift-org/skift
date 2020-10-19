@@ -11,11 +11,11 @@ bool FsTerminal::can_read(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_MASTER))
     {
-        return !slave_to_master_buffer.empty() || !writers;
+        return !slave_to_master_buffer.empty() || !writers();
     }
     else
     {
-        return !master_to_slave_buffer.empty() || !master;
+        return !master_to_slave_buffer.empty() || !master();
     }
 }
 
@@ -23,11 +23,11 @@ bool FsTerminal::can_write(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_MASTER))
     {
-        return !master_to_slave_buffer.full() || !readers;
+        return !master_to_slave_buffer.full() || !readers();
     }
     else
     {
-        return !slave_to_master_buffer.full() || !master;
+        return !slave_to_master_buffer.full() || !master();
     }
 }
 
@@ -35,7 +35,7 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 {
     if (handle.has_flag(OPEN_MASTER))
     {
-        if (writers)
+        if (writers())
         {
             return slave_to_master_buffer.read((char *)buffer, size);
         }
@@ -46,7 +46,7 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
     }
     else
     {
-        if (master)
+        if (master())
         {
             return master_to_slave_buffer.read((char *)buffer, size);
         }
@@ -59,10 +59,9 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t size)
 {
-
     if (handle.has_flag(OPEN_MASTER))
     {
-        if (readers)
+        if (readers())
         {
             return master_to_slave_buffer.write((const char *)buffer, size);
         }
@@ -73,7 +72,7 @@ ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t 
     }
     else
     {
-        if (master)
+        if (master())
         {
             return slave_to_master_buffer.write((const char *)buffer, size);
         }
@@ -88,7 +87,7 @@ Result FsTerminal::call(FsHandle &handle, IOCall request, void *args)
 {
     __unused(handle);
 
-    if (!master)
+    if (!master())
     {
         return ERR_STREAM_CLOSED;
     }

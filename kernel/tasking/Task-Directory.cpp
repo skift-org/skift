@@ -32,7 +32,7 @@ Result task_set_directory(Task *task, const char *buffer)
     Result result = SUCCESS;
 
     Path *path = task_resolve_directory_internal(task, buffer);
-    FsNode *node = filesystem_find_and_ref(path);
+    auto node = filesystem_find_and_ref(path);
 
     if (node == nullptr)
     {
@@ -40,7 +40,7 @@ Result task_set_directory(Task *task, const char *buffer)
         goto cleanup_and_return;
     }
 
-    if (node->type != FILE_TYPE_DIRECTORY)
+    if (node->type() != FILE_TYPE_DIRECTORY)
     {
         result = ERR_NOT_A_DIRECTORY;
         goto cleanup_and_return;
@@ -51,9 +51,6 @@ Result task_set_directory(Task *task, const char *buffer)
     path = nullptr;
 
 cleanup_and_return:
-    if (node)
-        node->deref();
-
     if (path)
         path_destroy(path);
 

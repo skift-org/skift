@@ -28,24 +28,24 @@ void ramdisk_load(Module *module)
         }
         else if ((block.typeflag & 8) == 0 || (block.typeflag & 8) == 5)
         {
-            FsHandle *handle = nullptr;
-            Result result = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE, &handle);
+            auto result_or_handle = filesystem_open(file_path, OPEN_WRITE | OPEN_CREATE);
 
-            if (result != SUCCESS)
+            if (!result_or_handle.success())
             {
-                logger_warn("Failed to open file %s! %s", block.name, result_to_string(result));
+                logger_warn("Failed to open file %s! %s", block.name, result_to_string(result_or_handle.result()));
                 continue;
             }
 
-            size_t written = 0;
-            result = fshandle_write(handle, block.data, block.size, &written);
+            auto handle = result_or_handle.take_value();
 
-            if (result != SUCCESS)
+            auto result_or_written = handle->write(block.data, block.size);
+
+            if (!result_or_written.success())
             {
-                logger_error("Failed to write file: %s", result_to_string(result));
+                logger_error("Failed to write file: %s", result_to_string(result_or_written.result()));
             }
 
-            fshandle_destroy(handle);
+            delete handle;
         }
         else if (block.name[strlen(block.name) - 1] != '/')
         {

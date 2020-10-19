@@ -41,10 +41,10 @@ ResultOr<size_t> FsFile::read(FsHandle &handle, void *buffer, size_t size)
 {
     size_t read = 0;
 
-    if (handle.offset <= _buffer_size)
+    if (handle.offset() <= _buffer_size)
     {
-        read = MIN(_buffer_size - handle.offset, size);
-        memcpy(buffer, (char *)_buffer + handle.offset, read);
+        read = MIN(_buffer_size - handle.offset(), size);
+        memcpy(buffer, (char *)_buffer + handle.offset(), read);
     }
 
     return read;
@@ -52,14 +52,14 @@ ResultOr<size_t> FsFile::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsFile::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    if ((handle.offset + size) > _buffer_allocated)
+    if ((handle.offset() + size) > _buffer_allocated)
     {
-        _buffer = (char *)realloc(_buffer, handle.offset + size);
-        _buffer_allocated = handle.offset + size;
+        _buffer = (char *)realloc(_buffer, handle.offset() + size);
+        _buffer_allocated = handle.offset() + size;
     }
 
-    _buffer_size = MAX(handle.offset + size, _buffer_size);
-    memcpy((char *)(_buffer) + handle.offset, buffer, size);
+    _buffer_size = MAX(handle.offset() + size, _buffer_size);
+    memcpy((char *)(_buffer) + handle.offset(), buffer, size);
 
     return size;
 }

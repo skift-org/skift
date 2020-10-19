@@ -29,12 +29,12 @@ bool BlockerRead::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !_handle->node->is_acquire() && _handle->node->can_read(_handle);
+    return !_handle->node()->is_acquire() && _handle->node()->can_read(_handle);
 }
 
 void BlockerRead::on_unblock(Task *task)
 {
-    _handle->node->acquire(task->id);
+    _handle->node()->acquire(task->id);
 }
 
 /* --- BlockerSelect -------------------------------------------------------- */
@@ -45,7 +45,7 @@ bool BlockerSelect::can_unblock(Task *task)
 
     for (size_t i = 0; i < _count; i++)
     {
-        if (fshandle_select(_handles[i], _events[i]) != 0)
+        if (_handles[i]->poll(_events[i]) != 0)
         {
             return true;
         }
@@ -60,7 +60,7 @@ void BlockerSelect::on_unblock(Task *task)
 
     for (size_t i = 0; i < _count; i++)
     {
-        SelectEvent events = fshandle_select(_handles[i], _events[i]);
+        SelectEvent events = _handles[i]->poll(_events[i]);
 
         if (events != 0)
         {
@@ -103,11 +103,11 @@ bool BlockerWrite::can_unblock(Task *task)
 {
     __unused(task);
 
-    return !_handle->node->is_acquire() &&
-           _handle->node->can_write(_handle);
+    return !_handle->node()->is_acquire() &&
+           _handle->node()->can_write(_handle);
 }
 
 void BlockerWrite::on_unblock(Task *task)
 {
-    _handle->node->acquire(task->id);
+    _handle->node()->acquire(task->id);
 }

@@ -58,12 +58,12 @@ size_t BGA::size(FsHandle &handle)
 
 ResultOr<size_t> BGA::read(FsHandle &handle, void *buffer, size_t size)
 {
-    return _framebuffer->read(handle.offset, buffer, size);
+    return _framebuffer->read(handle.offset(), buffer, size);
 }
 
 ResultOr<size_t> BGA::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    return _framebuffer->write(handle.offset, buffer, size);
+    return _framebuffer->write(handle.offset(), buffer, size);
 }
 
 Result BGA::call(FsHandle &handle, IOCall request, void *args)

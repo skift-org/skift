@@ -58,10 +58,10 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
 {
     size_t read = 0;
 
-    if (handle.offset <= handle.attached_size)
+    if (handle.offset() <= handle.attached_size)
     {
-        read = MIN(handle.attached_size - handle.offset, size);
-        memcpy(buffer, (char *)handle.attached + handle.offset, read);
+        read = MIN(handle.attached_size - handle.offset(), size);
+        memcpy(buffer, (char *)handle.attached + handle.offset(), read);
     }
 
     return read;
@@ -69,6 +69,5 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
 
 void device_info_initialize()
 {
-    auto device_info_device = new FsDeviceInfo();
-    filesystem_link_and_take_ref_cstring("/System/devices", device_info_device);
+    filesystem_link_cstring("/System/devices", make<FsDeviceInfo>());
 }

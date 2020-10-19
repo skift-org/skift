@@ -40,10 +40,10 @@ struct Blocker
 class BlockerAccept : public Blocker
 {
 private:
-    FsNode *_node;
+    RefPtr<FsNode> _node;
 
 public:
-    BlockerAccept(FsNode *node) : _node(node)
+    BlockerAccept(RefPtr<FsNode> node) : _node(node)
     {
     }
 
@@ -55,10 +55,10 @@ public:
 class BlockerConnect : public Blocker
 {
 private:
-    FsNode *_connection;
+    RefPtr<FsNode> _connection;
 
 public:
-    BlockerConnect(FsNode *connection)
+    BlockerConnect(RefPtr<FsNode> connection)
         : _connection(connection)
     {
     }

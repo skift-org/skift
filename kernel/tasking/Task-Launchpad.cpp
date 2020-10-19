@@ -97,9 +97,9 @@ void task_pass_handles(Task *parent_task, Task *child_task, Launchpad *launchpad
             parent_handle_id < PROCESS_HANDLE_COUNT &&
             parent_task->handles[parent_handle_id] != nullptr)
         {
-            fshandle_acquire_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
-            child_task->handles[child_handle_id] = fshandle_clone(parent_task->handles[parent_handle_id]);
-            fshandle_release_lock(parent_task->handles[parent_handle_id], scheduler_running_id());
+            parent_task->handles[parent_handle_id]->acquire(scheduler_running_id());
+            child_task->handles[child_handle_id] = new FsHandle(*parent_task->handles[parent_handle_id]);
+            parent_task->handles[parent_handle_id]->release(scheduler_running_id());
         }
     }
 }

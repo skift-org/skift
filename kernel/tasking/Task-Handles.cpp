@@ -9,25 +9,21 @@
 #include "kernel/tasking/Task-Directory.h"
 #include "kernel/tasking/Task-Handles.h"
 
-Result task_fshandle_add(Task *task, int *handle_index, FsHandle *handle)
+ResultOr<int> task_fshandle_add(Task *task, FsHandle *handle)
 {
     LockHolder holder(task->handles_lock);
-
-    Result result = ERR_TOO_MANY_OPEN_FILES;
 
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         if (task->handles[i] == nullptr)
         {
             task->handles[i] = handle;
-            *handle_index = i;
 
-            result = SUCCESS;
-            break;
+            return i;
         }
     }
 
-    return result;
+    return ERR_TOO_MANY_OPEN_FILES;
 }
 
 static bool is_valid_handle(Task *task, int handle)
@@ -46,7 +42,7 @@ Result task_fshandle_remove(Task *task, int handle_index)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    fshandle_destroy(task->handles[handle_index]);
+    delete task->handles[handle_index];
     task->handles[handle_index] = nullptr;
 
     return SUCCESS;
@@ -62,7 +58,7 @@ FsHandle *task_fshandle_acquire(Task *task, int handle_index)
         return nullptr;
     }
 
-    fshandle_acquire_lock(task->handles[handle_index], task->id);
+    task->handles[handle_index]->acquire(task->id);
     return task->handles[handle_index];
 }
 
@@ -76,34 +72,33 @@ Result task_fshandle_release(Task *task, int handle_index)
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    fshandle_release_lock(task->handles[handle_index], task->id);
+    task->handles[handle_index]->release(task->id);
     return SUCCESS;
 }
 
-Result task_fshandle_open(Task *task, int *handle_index, const char *file_path, OpenFlag flags)
+ResultOr<int> task_fshandle_open(Task *task, const char *file_path, OpenFlag flags)
 {
-    Path *p = task_resolve_directory(task, file_path);
+    auto p = task_resolve_directory(task, file_path);
 
-    FsHandle *handle = nullptr;
-    Result result = filesystem_open(p, flags, &handle);
+    auto result_or_handle = filesystem_open(p, flags);
 
     path_destroy(p);
 
-    if (handle == nullptr)
+    if (!result_or_handle.success())
     {
-        *handle_index = HANDLE_INVALID_ID;
-        return result;
+        return result_or_handle.result();
     }
 
-    result = task_fshandle_add(task, handle_index, handle);
+    auto handle = result_or_handle.take_value();
 
-    if (result != SUCCESS)
+    auto result_or_handle_index = task_fshandle_add(task, handle);
+
+    if (!result_or_handle_index.success())
     {
-        *handle_index = HANDLE_INVALID_ID;
-        fshandle_destroy(handle);
+        delete handle;
     }
 
-    return result;
+    return result_or_handle_index;
 }
 
 void task_fshandle_close_all(Task *task)
@@ -114,7 +109,7 @@ void task_fshandle_close_all(Task *task)
     {
         if (task->handles[i])
         {
-            fshandle_destroy(task->handles[i]);
+            delete task->handles[i];
             task->handles[i] = nullptr;
         }
     }
@@ -123,23 +118,6 @@ void task_fshandle_close_all(Task *task)
 Result task_fshandle_close(Task *task, int handle_index)
 {
     return task_fshandle_remove(task, handle_index);
-}
-
-Result task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size, size_t *read)
-{
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
-
-    if (handle == nullptr)
-    {
-        *read = 0;
-        return ERR_BAD_FILE_DESCRIPTOR;
-    }
-
-    Result result = fshandle_read(handle, buffer, size, read);
-
-    task_fshandle_release(task, handle_index);
-
-    return result;
 }
 
 Result task_fshandle_select(
@@ -207,64 +185,80 @@ cleanup_and_return:
     return result;
 }
 
-Result task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size, size_t *written)
+ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size)
 {
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
+    auto handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_write(handle, buffer, size, written);
+    auto result_or_read = handle->read(buffer, size);
 
     task_fshandle_release(task, handle_index);
 
-    return result;
+    return result_or_read;
 }
 
-Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args)
+ResultOr<size_t> task_fshandle_write(Task *task, int handle_index, const void *buffer, size_t size)
 {
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
+    auto handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_call(handle, request, args);
+    auto result_or_written = handle->write(buffer, size);
 
     task_fshandle_release(task, handle_index);
 
-    return result;
+    return result_or_written;
 }
 
 Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whence)
 {
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
+    auto handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_seek(handle, offset, whence);
+    auto result = handle->seek(offset, whence);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offset)
+ResultOr<int> task_fshandle_tell(Task *task, int handle_index, Whence whence)
 {
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
+    auto handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_tell(handle, whence, offset);
+    auto result_or_offset = handle->tell(whence);
+
+    task_fshandle_release(task, handle_index);
+
+    return result_or_offset;
+}
+
+Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *args)
+{
+    auto handle = task_fshandle_acquire(task, handle_index);
+
+    if (handle == nullptr)
+    {
+        return ERR_BAD_FILE_DESCRIPTOR;
+    }
+
+    auto result = handle->call(request, args);
 
     task_fshandle_release(task, handle_index);
 
@@ -273,45 +267,46 @@ Result task_fshandle_tell(Task *task, int handle_index, Whence whence, int *offs
 
 Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 {
-    FsHandle *handle = task_fshandle_acquire(task, handle_index);
+    auto handle = task_fshandle_acquire(task, handle_index);
 
     if (handle == nullptr)
     {
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    Result result = fshandle_stat(handle, stat);
+    auto result = handle->stat(stat);
 
     task_fshandle_release(task, handle_index);
 
     return result;
 }
 
-Result task_fshandle_connect(Task *task, int *connection_handle_index, const char *socket_path)
+ResultOr<int> task_fshandle_connect(Task *task, const char *socket_path)
 {
-    Path *resolved_path = task_resolve_directory(task, socket_path);
+    auto resolved_path = task_resolve_directory(task, socket_path);
 
-    FsHandle *connection_handle;
-    Result result = filesystem_connect(resolved_path, &connection_handle);
+    auto result_or_connection_handle = filesystem_connect(resolved_path);
 
     path_destroy(resolved_path);
 
-    if (result != SUCCESS)
+    if (!result_or_connection_handle.success())
     {
-        return result;
+        return result_or_connection_handle.result();
     }
 
-    result = task_fshandle_add(task, connection_handle_index, connection_handle);
+    auto connection_handle = result_or_connection_handle.take_value();
 
-    if (result != SUCCESS)
+    auto result_or_connection_handle_index = task_fshandle_add(task, connection_handle);
+
+    if (!result_or_connection_handle_index.success())
     {
-        fshandle_destroy(connection_handle);
+        delete connection_handle;
     }
 
-    return result;
+    return result_or_connection_handle_index;
 }
 
-Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection_handle_index)
+ResultOr<int> task_fshandle_accept(Task *task, int socket_handle_index)
 {
     FsHandle *socket_handle = task_fshandle_acquire(task, socket_handle_index);
 
@@ -320,22 +315,27 @@ Result task_fshandle_accept(Task *task, int socket_handle_index, int *connection
         return ERR_BAD_FILE_DESCRIPTOR;
     }
 
-    FsHandle *connection_handle;
-    Result result = fshandle_accept(socket_handle, &connection_handle);
+    auto result_or_connection_handle = socket_handle->accept();
 
-    if (result == SUCCESS)
+    if (!result_or_connection_handle.success())
     {
-        result = task_fshandle_add(task, connection_handle_index, connection_handle);
+        task_fshandle_release(task, socket_handle_index);
 
-        if (result != SUCCESS)
-        {
-            fshandle_destroy(connection_handle);
-        }
+        return result_or_connection_handle.result();
+    }
+
+    auto connection_handle = result_or_connection_handle.take_value();
+
+    auto result_or_connection_handle_index = task_fshandle_add(task, connection_handle);
+
+    if (!result_or_connection_handle_index.success())
+    {
+        delete connection_handle;
     }
 
     task_fshandle_release(task, socket_handle_index);
 
-    return result;
+    return result_or_connection_handle_index;
 }
 
 Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index)
@@ -343,49 +343,58 @@ Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle
     *reader_handle_index = HANDLE_INVALID_ID;
     *writer_handle_index = HANDLE_INVALID_ID;
 
-    Result result = SUCCESS;
+    auto pipe = make<FsPipe>();
 
-    FsNode *pipe = new FsPipe();
+    auto reader_handle = new FsHandle(pipe, OPEN_READ);
+    auto writer_handle = new FsHandle(pipe, OPEN_WRITE);
 
-    FsHandle *reader_handle = fshandle_create(pipe, OPEN_READ);
-    FsHandle *writer_handle = fshandle_create(pipe, OPEN_WRITE);
-
-    result = task_fshandle_add(task, reader_handle_index, reader_handle);
-
-    if (result != SUCCESS)
-    {
-        goto cleanup_and_return;
-    }
-
-    result = task_fshandle_add(task, writer_handle_index, writer_handle);
-
-    if (result != SUCCESS)
-    {
-        goto cleanup_and_return;
-    }
-
-cleanup_and_return:
-    if (result != SUCCESS)
-    {
+    auto close_opened_handles = [&]() {
         if (*reader_handle_index != HANDLE_INVALID_ID)
         {
             task_fshandle_remove(task, *reader_handle_index);
-            *reader_handle_index = HANDLE_INVALID_ID;
+        }
+
+        if (reader_handle)
+        {
+            delete reader_handle;
         }
 
         if (*writer_handle_index != HANDLE_INVALID_ID)
         {
             task_fshandle_remove(task, *writer_handle_index);
-            *writer_handle_index = HANDLE_INVALID_ID;
         }
 
-        fshandle_destroy(reader_handle);
-        fshandle_destroy(writer_handle);
+        if (writer_handle)
+        {
+            delete writer_handle;
+        }
+    };
+
+    auto result_or_reader_handle_index = task_fshandle_add(task, reader_handle);
+
+    if (!result_or_reader_handle_index.success())
+    {
+        close_opened_handles();
+        return result_or_reader_handle_index.result();
+    }
+    else
+    {
+        *reader_handle_index = result_or_reader_handle_index.take_value();
     }
 
-    pipe->deref();
+    auto result_or_writer_handle_index = task_fshandle_add(task, writer_handle);
 
-    return result;
+    if (!result_or_writer_handle_index.success())
+    {
+        close_opened_handles();
+        return result_or_writer_handle_index.result();
+    }
+    else
+    {
+        *writer_handle_index = result_or_writer_handle_index.take_value();
+    }
+
+    return SUCCESS;
 }
 
 Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_index)
@@ -393,47 +402,56 @@ Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_
     *master_handle_index = HANDLE_INVALID_ID;
     *slave_handle_index = HANDLE_INVALID_ID;
 
-    Result result = SUCCESS;
+    auto terminal = make<FsTerminal>();
 
-    FsNode *terminal = new FsTerminal();
+    FsHandle *master_handle = new FsHandle(terminal, OPEN_MASTER);
+    FsHandle *slave_handle = new FsHandle(terminal, OPEN_READ | OPEN_WRITE);
 
-    FsHandle *master_handle = fshandle_create(terminal, OPEN_MASTER);
-    FsHandle *slave_handle = fshandle_create(terminal, OPEN_READ | OPEN_WRITE);
-
-    result = task_fshandle_add(task, master_handle_index, master_handle);
-
-    if (result != SUCCESS)
-    {
-        goto cleanup_and_return;
-    }
-
-    result = task_fshandle_add(task, slave_handle_index, slave_handle);
-
-    if (result != SUCCESS)
-    {
-        goto cleanup_and_return;
-    }
-
-cleanup_and_return:
-    if (result != SUCCESS)
-    {
+    auto close_opened_handles = [&]() {
         if (*master_handle_index != HANDLE_INVALID_ID)
         {
             task_fshandle_remove(task, *master_handle_index);
-            *master_handle_index = HANDLE_INVALID_ID;
+        }
+
+        if (master_handle)
+        {
+            delete master_handle;
         }
 
         if (*slave_handle_index != HANDLE_INVALID_ID)
         {
             task_fshandle_remove(task, *slave_handle_index);
-            *slave_handle_index = HANDLE_INVALID_ID;
         }
 
-        fshandle_destroy(master_handle);
-        fshandle_destroy(slave_handle);
+        if (slave_handle)
+        {
+            delete slave_handle;
+        }
+    };
+
+    auto result_or_master_handle_index = task_fshandle_add(task, master_handle);
+
+    if (!result_or_master_handle_index.success())
+    {
+        close_opened_handles();
+        return result_or_master_handle_index.result();
+    }
+    else
+    {
+        *master_handle_index = result_or_master_handle_index.take_value();
     }
 
-    terminal->deref();
+    auto result_or_slave_handle_index = task_fshandle_add(task, slave_handle);
 
-    return result;
+    if (!result_or_slave_handle_index.success())
+    {
+        close_opened_handles();
+        return result_or_slave_handle_index.result();
+    }
+    else
+    {
+        *slave_handle_index = result_or_slave_handle_index.take_value();
+    }
+
+    return SUCCESS;
 }

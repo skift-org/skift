@@ -22,11 +22,11 @@ bool FsConnection::can_read(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_CLIENT))
     {
-        return !_data_to_client.empty() || !server;
+        return !_data_to_client.empty() || !server();
     }
     else
     {
-        return !_data_to_server.empty() || !clients;
+        return !_data_to_server.empty() || !clients();
     }
 }
 
@@ -34,11 +34,11 @@ bool FsConnection::can_write(FsHandle *handle)
 {
     if (handle->has_flag(OPEN_CLIENT))
     {
-        return !_data_to_server.full() || !server;
+        return !_data_to_server.full() || !server();
     }
     else
     {
-        return !_data_to_client.full() || !clients;
+        return !_data_to_client.full() || !clients();
     }
 }
 
@@ -46,7 +46,7 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
 {
     if (handle.has_flag(OPEN_CLIENT))
     {
-        if (server)
+        if (server())
         {
             return _data_to_client.read((char *)buffer, size);
         }
@@ -57,7 +57,7 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
     }
     else
     {
-        if (clients)
+        if (clients())
         {
             return _data_to_server.read((char *)buffer, size);
         }
@@ -70,10 +70,9 @@ ResultOr<size_t> FsConnection::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsConnection::write(FsHandle &handle, const void *buffer, size_t size)
 {
-
     if (handle.has_flag(OPEN_CLIENT))
     {
-        if (server)
+        if (server())
         {
             return _data_to_server.write((const char *)buffer, size);
         }
@@ -84,7 +83,7 @@ ResultOr<size_t> FsConnection::write(FsHandle &handle, const void *buffer, size_
     }
     else
     {
-        if (clients)
+        if (clients())
         {
             return _data_to_client.write((const char *)buffer, size);
         }

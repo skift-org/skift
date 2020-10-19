@@ -16,31 +16,29 @@
 
 static FsNode *_filesystem_root = nullptr;
 
-#define ASSERT_FILESYSTEM_READY                                              \
-    if (!root != nullptr)                                                    \
-    {                                                                        \
-        system_panic("Trying to use the filesystem before initialization."); \
-    }
+static RefPtr<FsNode> filesystem_root()
+{
+    assert(_filesystem_root);
+    return {*_filesystem_root};
+}
 
 void filesystem_initialize()
 {
     logger_info("Initializing filesystem...");
 
     _filesystem_root = new FsDirectory();
+    _filesystem_root->ref();
 
     logger_info("File system root at 0x%x", _filesystem_root);
 }
 
-FsNode *filesystem_find_and_ref(Path *path)
+RefPtr<FsNode> filesystem_find_and_ref(Path *path)
 {
-    assert(_filesystem_root != nullptr);
-
-    _filesystem_root->ref();
-    FsNode *current = _filesystem_root;
+    auto current = filesystem_root();
 
     for (size_t i = 0; i < path_element_count(path); i++)
     {
-        if (current && current->type == FILE_TYPE_DIRECTORY)
+        if (current && current->type() == FILE_TYPE_DIRECTORY)
         {
             const char *element = path_peek_at(path, i);
 
@@ -48,7 +46,6 @@ FsNode *filesystem_find_and_ref(Path *path)
             auto found = current->find(element);
             current->release(scheduler_running_id());
 
-            current->deref();
             current = found;
         }
         else
@@ -60,43 +57,39 @@ FsNode *filesystem_find_and_ref(Path *path)
     return current;
 }
 
-FsNode *filesystem_find_parent_and_ref(Path *path)
+RefPtr<FsNode> filesystem_find_parent_and_ref(Path *path)
 {
     const char *child_name = path_pop(path);
-    FsNode *parent = filesystem_find_and_ref(path);
+    auto parent = filesystem_find_and_ref(path);
     path_push(path, child_name);
 
     return parent;
 }
 
-Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
+ResultOr<FsHandle *> filesystem_open(Path *path, OpenFlag flags)
 {
-
-    *handle = nullptr;
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
-    FsNode *node = filesystem_find_and_ref(path);
+    auto node = filesystem_find_and_ref(path);
 
     if (!node && should_create_if_not_present)
     {
-        FsNode *parent = filesystem_find_parent_and_ref(path);
+        auto parent = filesystem_find_parent_and_ref(path);
 
         if (parent)
         {
             if (flags & OPEN_SOCKET)
             {
-                node = new FsSocket();
+                node = make<FsSocket>();
             }
             else
             {
-                node = new FsFile();
+                node = make<FsFile>();
             }
 
             parent->acquire(scheduler_running_id());
             parent->link(path_filename(path), node);
             parent->release(scheduler_running_id());
-
-            parent->deref();
         }
     }
 
@@ -105,59 +98,58 @@ Result filesystem_open(Path *path, OpenFlag flags, FsHandle **handle)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if ((flags & OPEN_DIRECTORY) && node->type != FILE_TYPE_DIRECTORY)
+    if ((flags & OPEN_DIRECTORY) && node->type() != FILE_TYPE_DIRECTORY)
     {
-        node->deref();
-
         return ERR_NOT_A_DIRECTORY;
     }
 
-    if ((flags & OPEN_SOCKET) && node->type != FILE_TYPE_SOCKET)
+    if ((flags & OPEN_SOCKET) && node->type() != FILE_TYPE_SOCKET)
     {
-        node->deref();
-
         return ERR_NOT_A_SOCKET;
     }
 
-    bool is_node_stream = node->type == FILE_TYPE_PIPE ||
-                          node->type == FILE_TYPE_REGULAR ||
-                          node->type == FILE_TYPE_DEVICE ||
-                          node->type == FILE_TYPE_TERMINAL;
+    bool is_node_stream = node->type() == FILE_TYPE_PIPE ||
+                          node->type() == FILE_TYPE_REGULAR ||
+                          node->type() == FILE_TYPE_DEVICE ||
+                          node->type() == FILE_TYPE_TERMINAL;
 
     if ((flags & OPEN_STREAM) && !(is_node_stream))
     {
-        node->deref();
-
         return ERR_NOT_A_STREAM;
     }
 
-    *handle = fshandle_create(node, flags);
-
-    node->deref();
-
-    return SUCCESS;
+    return new FsHandle(node, flags);
 }
 
-Result filesystem_connect(Path *path, FsHandle **connection_handle)
+ResultOr<FsHandle *> filesystem_connect(Path *path)
 {
-    FsNode *node = filesystem_find_and_ref(path);
+    auto node = filesystem_find_and_ref(path);
 
     if (!node)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (node->type != FILE_TYPE_SOCKET)
+    if (node->type() != FILE_TYPE_SOCKET)
     {
-        node->deref();
         return ERR_SOCKET_OPERATION_ON_NON_SOCKET;
     }
 
-    Result result = fshandle_connect(node, connection_handle);
+    node->acquire(scheduler_running_id());
+    auto connection_or_result = node->connect();
+    node->release(scheduler_running_id());
 
-    node->deref();
+    if (!connection_or_result.success())
+    {
+        return connection_or_result.result();
+    }
 
-    return result;
+    auto connection = connection_or_result.take_value();
+    auto connection_handle = new FsHandle(connection, OPEN_CLIENT);
+
+    task_block(scheduler_running(), new BlockerConnect(connection), -1);
+
+    return connection_handle;
 }
 
 Result filesystem_mkdir(Path *path)
@@ -168,61 +160,45 @@ Result filesystem_mkdir(Path *path)
         return ERR_FILE_EXISTS;
     }
 
-    auto directory = new FsDirectory();
-    Result result = filesystem_link(path, directory);
-    directory->deref();
-
-    return result;
+    return filesystem_link(path, make<FsDirectory>());
 }
 
 Result filesystem_mkpipe(Path *path)
 {
-    auto pipe = new FsPipe();
-
-    Result result = filesystem_link(path, pipe);
-
-    pipe->deref();
-
-    return result;
+    return filesystem_link(path, make<FsPipe>());
 }
 
 Result filesystem_mklink(Path *old_path, Path *new_path)
 {
-    FsNode *child = filesystem_find_and_ref(old_path);
+    auto destination = filesystem_find_and_ref(old_path);
 
-    if (child == nullptr)
+    if (!destination)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (child->type == FILE_TYPE_DIRECTORY)
+    if (destination->type() == FILE_TYPE_DIRECTORY)
     {
-        child->deref();
         return ERR_IS_A_DIRECTORY;
     }
 
-    return filesystem_link_and_take_ref(new_path, child);
+    return filesystem_link(new_path, destination);
 }
 
+// This version allow
 Result filesystem_mklink_for_tar(Path *old_path, Path *new_path)
 {
-    FsNode *child = filesystem_find_and_ref(old_path);
+    auto child = filesystem_find_and_ref(old_path);
 
-    if (child == nullptr)
+    if (!child)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    /*if (child->type == FILE_TYPE_DIRECTORY)
-    {
-        child->deref()
-        return ERR_IS_A_DIRECTORY;
-    }*/
-
-    return filesystem_link_and_take_ref(new_path, child);
+    return filesystem_link(new_path, child);
 }
 
-Result filesystem_link_cstring(const char *path, FsNode *node)
+Result filesystem_link_cstring(const char *path, RefPtr<FsNode> node)
 {
     Path *path_object = path_create(path);
     Result result = filesystem_link(path_object, node);
@@ -231,104 +207,63 @@ Result filesystem_link_cstring(const char *path, FsNode *node)
     return result;
 }
 
-Result filesystem_link(Path *path, FsNode *node)
+Result filesystem_link(Path *path, RefPtr<FsNode> node)
 {
-    Result result = SUCCESS;
-
-    FsNode *parent = filesystem_find_parent_and_ref(path);
+    auto parent = filesystem_find_parent_and_ref(path);
 
     if (!parent)
     {
-        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (parent->type != FILE_TYPE_DIRECTORY)
+    if (parent->type() != FILE_TYPE_DIRECTORY)
     {
-        result = ERR_NOT_A_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NOT_A_DIRECTORY;
     }
 
     parent->acquire(scheduler_running_id());
-    result = parent->link(path_filename(path), node);
+    auto result = parent->link(path_filename(path), node);
     parent->release(scheduler_running_id());
 
-cleanup_and_return:
-    if (parent != nullptr)
-        parent->deref();
-
-    return result;
-}
-
-Result filesystem_link_and_take_ref_cstring(const char *path, FsNode *node)
-{
-    Path *path_object = path_create(path);
-
-    Result result = filesystem_link(path_object, node);
-    node->deref();
-
-    path_destroy(path_object);
-    return result;
-}
-
-Result filesystem_link_and_take_ref(Path *path, FsNode *node)
-{
-    Result result = filesystem_link(path, node);
-    node->deref();
     return result;
 }
 
 Result filesystem_unlink(Path *path)
 {
-    Result result = SUCCESS;
-
-    FsNode *parent = filesystem_find_parent_and_ref(path);
+    auto parent = filesystem_find_parent_and_ref(path);
 
     if (!parent || !path_filename(path))
     {
-        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (parent->type != FILE_TYPE_DIRECTORY)
+    if (parent->type() != FILE_TYPE_DIRECTORY)
     {
-        result = ERR_NOT_A_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NOT_A_DIRECTORY;
     }
 
     parent->acquire(scheduler_running_id());
-    result = parent->unlink(path_filename(path));
+    auto result = parent->unlink(path_filename(path));
     parent->release(scheduler_running_id());
-
-cleanup_and_return:
-    if (parent)
-        parent->deref();
 
     return result;
 }
 
+// FIXME: check for loops when renaming directory
 Result filesystem_rename(Path *old_path, Path *new_path)
 {
-    // FIXME: check for loops when renaming directory
+    auto old_parent = filesystem_find_parent_and_ref(old_path);
+    auto new_parent = filesystem_find_parent_and_ref(new_path);
 
-    Result result = SUCCESS;
-
-    FsNode *child = nullptr;
-    FsNode *old_parent = filesystem_find_parent_and_ref(old_path);
-    FsNode *new_parent = filesystem_find_parent_and_ref(new_path);
-
-    if (!old_parent ||
-        !new_parent)
+    if (!old_parent || !new_parent)
     {
-        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    if (old_parent->type != FILE_TYPE_DIRECTORY ||
-        new_parent->type != FILE_TYPE_DIRECTORY)
+    if (old_parent->type() != FILE_TYPE_DIRECTORY ||
+        new_parent->type() != FILE_TYPE_DIRECTORY)
     {
-        result = ERR_NOT_A_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NOT_A_DIRECTORY;
     }
 
     new_parent->acquire(scheduler_running_id());
@@ -338,7 +273,9 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         old_parent->acquire(scheduler_running_id());
     }
 
-    child = old_parent->find(path_filename(old_path));
+    auto child = old_parent->find(path_filename(old_path));
+
+    Result result = SUCCESS;
 
     if (!child)
     {
@@ -361,16 +298,6 @@ unlock_cleanup_and_return:
     }
 
     new_parent->release(scheduler_running_id());
-
-cleanup_and_return:
-    if (child)
-        child->deref();
-
-    if (old_parent)
-        old_parent->deref();
-
-    if (new_parent)
-        new_parent->deref();
 
     return result;
 }

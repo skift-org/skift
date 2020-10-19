@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libutils/Vector.h>
+
 #include "kernel/node/Node.h"
 
 struct DirectoryListing
@@ -11,18 +13,16 @@ struct DirectoryListing
 struct FsDirectoryEntry
 {
     char name[FILE_NAME_LENGTH];
-    FsNode *node;
+    RefPtr<FsNode> node;
 };
 
 class FsDirectory : public FsNode
 {
 private:
-    List *_childs;
+    Vector<FsDirectoryEntry> _childs{};
 
 public:
     FsDirectory();
-
-    ~FsDirectory() override;
 
     Result open(FsHandle *handle) override;
 
@@ -30,9 +30,9 @@ public:
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
-    FsNode *find(const char *name) override;
+    RefPtr<FsNode> find(const char *name) override;
 
-    Result link(const char *name, FsNode *child) override;
+    Result link(const char *name, RefPtr<FsNode> child) override;
 
     Result unlink(const char *name) override;
 };

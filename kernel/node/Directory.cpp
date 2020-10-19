@@ -6,42 +6,31 @@
 #include "kernel/node/Directory.h"
 #include "kernel/node/Handle.h"
 
-static void directory_entry_destroy(FsDirectoryEntry *entry)
-{
-    entry->node->deref();
-    free(entry);
-}
-
 FsDirectory::FsDirectory() : FsNode(FILE_TYPE_DIRECTORY)
 {
-    _childs = list_create();
-}
-
-FsDirectory::~FsDirectory()
-{
-    list_destroy_with_callback(_childs, (ListDestroyElementCallback)directory_entry_destroy);
 }
 
 Result FsDirectory::open(FsHandle *handle)
 {
-    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * _childs->count());
+    DirectoryListing *listing = (DirectoryListing *)malloc(sizeof(DirectoryListing) + sizeof(DirectoryEntry) * _childs.count());
 
-    listing->count = _childs->count();
+    listing->count = _childs.count();
 
     int current_index = 0;
 
-    list_foreach(FsDirectoryEntry, entry, _childs)
-    {
-        DirectoryEntry *record = &listing->entries[current_index];
-        FsNode *node = entry->node;
+    _childs.foreach ([&](auto &entry) {
+        auto record = &listing->entries[current_index];
+        auto node = entry.node;
 
-        strcpy(record->name, entry->name);
+        strcpy(record->name, entry.name);
 
-        record->stat.type = node->type;
+        record->stat.type = node->type();
         record->stat.size = node->size();
 
         current_index++;
-    };
+
+        return Iteration::CONTINUE;
+    });
 
     handle->attached = listing;
 
@@ -57,7 +46,7 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
 {
     if (size == sizeof(DirectoryEntry))
     {
-        size_t index = handle.offset / sizeof(DirectoryEntry);
+        size_t index = handle.offset() / sizeof(DirectoryEntry);
 
         DirectoryListing *listing = (DirectoryListing *)handle.attached;
 
@@ -78,53 +67,54 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
     }
 }
 
-FsNode *FsDirectory::find(const char *name)
+RefPtr<FsNode> FsDirectory::find(const char *name)
 {
-    list_foreach(FsDirectoryEntry, entry, _childs)
-    {
-        if (strcmp(entry->name, name) == 0)
-        {
-            entry->node->ref();
-            return entry->node;
-        }
-    };
+    RefPtr<FsNode> result;
 
-    return nullptr;
+    _childs.foreach ([&](auto &entry) {
+        if (strcmp(entry.name, name) == 0)
+        {
+            result = entry.node;
+
+            return Iteration::STOP;
+        }
+
+        return Iteration::CONTINUE;
+    });
+
+    return result;
 }
 
-Result FsDirectory::link(const char *name, FsNode *child)
+Result FsDirectory::link(const char *name, RefPtr<FsNode> child)
 {
-    list_foreach(FsDirectoryEntry, entry, _childs)
+    if (find(name))
     {
-        if (strcmp(entry->name, name) == 0)
-        {
-            return ERR_FILE_EXISTS;
-        }
-    };
+        return ERR_FILE_EXISTS;
+    }
 
-    FsDirectoryEntry *new_entry = __create(FsDirectoryEntry);
+    FsDirectoryEntry entry = {};
 
-    child->ref();
-    new_entry->node = child;
-    strcpy(new_entry->name, name);
+    strcpy(entry.name, name);
+    entry.node = child;
 
-    list_pushback(_childs, new_entry);
+    _childs.push_back(entry);
 
     return SUCCESS;
 }
 
 Result FsDirectory::unlink(const char *name)
 {
-    list_foreach(FsDirectoryEntry, entry, _childs)
+    bool has_removed_an_entry = _childs.remove_all_match(
+        [&](auto &entry) {
+            return strcmp(entry.name, name) == 0;
+        });
+
+    if (has_removed_an_entry)
     {
-        if (strcmp(entry->name, name) == 0)
-        {
-            list_remove(_childs, entry);
-            directory_entry_destroy(entry);
-
-            return SUCCESS;
-        }
+        return SUCCESS;
     }
-
-    return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    else
+    {
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
 }

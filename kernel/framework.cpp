@@ -181,7 +181,14 @@ Result __plug_process_wait(int pid, int *exit_value)
 
 void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
 {
-    handle->result = task_fshandle_open(scheduler_running(), &handle->id, path, flags);
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+
+    handle->result = result_or_handle_index.result();
+
+    if (result_or_handle_index.success())
+    {
+        handle->id = result_or_handle_index.take_value();
+    }
 }
 
 void __plug_handle_close(Handle *handle)
@@ -205,11 +212,18 @@ size_t __plug_handle_read(Handle *handle, void *buffer, size_t size)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    size_t read = 0;
+    auto result_or_read = task_fshandle_read(scheduler_running(), handle->id, buffer, size);
 
-    handle->result = task_fshandle_read(scheduler_running(), handle->id, buffer, size, &read);
+    handle->result = result_or_read.result();
 
-    return read;
+    if (result_or_read.success())
+    {
+        return result_or_read.take_value();
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
@@ -225,11 +239,18 @@ size_t __plug_handle_write(Handle *handle, const void *buffer, size_t size)
     }
     else
     {
-        size_t written = 0;
+        auto result_or_write = task_fshandle_write(scheduler_running(), handle->id, buffer, size);
 
-        handle->result = task_fshandle_write(scheduler_running(), handle->id, buffer, size, &written);
+        handle->result = result_or_write.result();
 
-        return written;
+        if (result_or_write.success())
+        {
+            return result_or_write.take_value();
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
 
@@ -255,11 +276,18 @@ int __plug_handle_tell(Handle *handle, Whence whence)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
 
-    int offset = 0;
+    auto result_or_offset = task_fshandle_tell(scheduler_running(), handle->id, whence);
 
-    handle->result = task_fshandle_tell(scheduler_running(), handle->id, whence, &offset);
+    handle->result = result_or_offset.result();
 
-    return offset;
+    if (result_or_offset.success())
+    {
+        return result_or_offset.take_value();
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int __plug_handle_stat(Handle *handle, FileState *stat)
@@ -271,26 +299,38 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
     return 0;
 }
 
+// The following functions are stubbed on purpose.
+// The kernel is not supposed to connect to services
+// running in userspace using libsystem.
+
 void __plug_handle_connect(Handle *handle, const char *path)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
+    __unused(handle);
+    __unused(path);
 
-    handle->result = task_fshandle_connect(scheduler_running(), &handle->id, path);
+    ASSERT_NOT_REACHED();
 }
 
 void __plug_handle_accept(Handle *handle, Handle *connection_handle)
 {
-    assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
+    __unused(handle);
+    __unused(connection_handle);
 
-    handle->result = task_fshandle_accept(scheduler_running(), handle->id, &connection_handle->id);
+    ASSERT_NOT_REACHED();
 }
 
 Result __plug_create_pipe(int *reader_handle, int *writer_handle)
 {
-    return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
+    __unused(reader_handle);
+    __unused(writer_handle);
+
+    ASSERT_NOT_REACHED();
 }
 
 Result __plug_create_term(int *master_handle, int *slave_handle)
 {
-    return task_create_term(scheduler_running(), master_handle, slave_handle);
+    __unused(master_handle);
+    __unused(slave_handle);
+
+    ASSERT_NOT_REACHED();
 }

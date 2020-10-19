@@ -303,15 +303,20 @@ public:
     }
 
     template <typename MatchCallback>
-    void remove_all_match(MatchCallback match)
+    bool remove_all_match(MatchCallback match)
     {
+        bool has_removed_something = false;
+
         for (size_t i = 0; i < _count; i++)
         {
             while (match(_storage[i]) && i < _count)
             {
                 remove_index(i);
+                has_removed_something = true;
             }
         }
+
+        return has_removed_something;
     }
 
     T take_at(size_t index)

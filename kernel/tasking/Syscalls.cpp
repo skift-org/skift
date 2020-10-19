@@ -228,6 +228,17 @@ Result sys_filesystem_rename(const char *old_path, const char *new_path)
     return result;
 }
 
+Result sys_filesystem_chmod(const char *path, uint mode)
+{
+    Path * tpath = task_resolve_directory(scheduler_running(), path);
+
+    Result result = filesystem_chmod(tpath, mode);
+
+    path_destroy(tpath);
+
+    return result;
+}
+
 /* --- System info getter --------------------------------------------------- */
 
 Result sys_system_get_info(SystemInfo *info)
@@ -530,6 +541,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(sys_filesystem_rename),
     [SYS_FILESYSTEM_MKPIPE] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkpipe),
     [SYS_FILESYSTEM_MKDIR] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkdir),
+    [SYS_FILESYSTEM_CHMOD] = reinterpret_cast<SyscallHandler>(sys_filesystem_chmod),
     [SYS_SYSTEM_GET_INFO] = reinterpret_cast<SyscallHandler>(sys_system_get_info),
     [SYS_SYSTEM_GET_STATUS] = reinterpret_cast<SyscallHandler>(sys_system_get_status),
     [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),

@@ -31,3 +31,5 @@ Result filesystem_link(Path *path, RefPtr<FsNode> node);
 Result filesystem_unlink(Path *path);
 
 Result filesystem_rename(Path *old_path, Path *new_path);
+
+Result filesystem_chmod(Path *path, uint mode);

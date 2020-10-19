@@ -21,6 +21,8 @@ private:
     unsigned int _server = 0;
     unsigned int _master = 0;
 
+    Mode _mode = {true, true, true, true, true, true, true, true, true};
+
 public:
     FileType type() { return _type; }
 
@@ -33,6 +35,11 @@ public:
     unsigned int server() { return _server; }
 
     unsigned int master() { return _master; }
+
+    Mode get_mode() { return _mode; }
+
+    void set_mode(Mode mode) { _mode = mode; }
+
 
     FsNode(FileType type);
 
@@ -122,6 +129,7 @@ public:
 
         return ERR_OPERATION_NOT_SUPPORTED;
     }
+
 
     // Function called when the server accept the connection.
     virtual void accepted() {}

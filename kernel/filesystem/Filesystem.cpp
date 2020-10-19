@@ -118,6 +118,21 @@ ResultOr<FsHandle *> filesystem_open(Path *path, OpenFlag flags)
         return ERR_NOT_A_STREAM;
     }
 
+    if (!node->get_mode().u_r && (flags & OPEN_READ) == OPEN_READ)
+    {
+        return ERR_ACCESS_DENIED;
+    }
+
+    if (!node->get_mode().u_w && (flags & OPEN_WRITE) == OPEN_WRITE)
+    {
+        return ERR_ACCESS_DENIED;
+    }
+
+    if (!node->get_mode().u_x && (flags & OPEN_EXECUTE) == OPEN_EXECUTE)
+    {
+        return ERR_ACCESS_DENIED;
+    }
+
     return new FsHandle(node, flags);
 }
 
@@ -300,4 +315,22 @@ unlock_cleanup_and_return:
     new_parent->release(scheduler_running_id());
 
     return result;
+}
+
+Result filesystem_chmod(Path *path, uint mode)
+{
+    auto parent = filesystem_find_parent_and_ref(path);
+
+    if (!parent || !path_filename(path))
+    {
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
+    }
+
+    Mode fmode = {(mode | MODE_USER_READ) == MODE_USER_READ, (mode | MODE_USER_WRITE) == MODE_USER_WRITE, (mode | MODE_USER_EXECUTE) == MODE_USER_EXECUTE, (mode | MODE_GROUP_READ) == MODE_GROUP_READ, (mode | MODE_GROUP_WRITE) == MODE_GROUP_WRITE, (mode | MODE_GROUP_EXECUTE) == MODE_GROUP_EXECUTE, (mode | MODE_OTHER_READ) == MODE_OTHER_READ, (mode | MODE_OTHER_WRITE) == MODE_OTHER_WRITE, (mode | MODE_OTHER_EXECUTE) == MODE_OTHER_EXECUTE};
+
+    parent->acquire(scheduler_running_id());
+    parent->set_mode(fmode);
+    parent->release(scheduler_running_id());
+
+    return SUCCESS;
 }

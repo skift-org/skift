@@ -110,7 +110,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
 
     *pid = -1;
 
-    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *elf_file = stream_open(launchpad->executable, OPEN_READ | OPEN_EXECUTE);
 
     if (handle_has_error(elf_file))
     {

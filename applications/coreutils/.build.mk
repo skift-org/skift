@@ -23,6 +23,7 @@ UTILS = \
 	OPEN \
 	PANIC \
 	SYSFETCH \
+	TAC \
 	TOUCH \
 	UNLINK \
 	UPTIME \
@@ -107,6 +108,9 @@ RMDIR_NAME = rmdir
 
 SYSFETCH_LIBS =
 SYSFETCH_NAME = sysfetch
+
+TAC_LIBS = 
+TAC_NAME = tac
 
 TOUCH_LIBS =
 TOUCH_NAME = touch

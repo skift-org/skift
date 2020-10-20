@@ -326,7 +326,7 @@ Result filesystem_chmod(Path *path, uint mode)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    Mode fmode = {(mode | MODE_USER_READ) == MODE_USER_READ, (mode | MODE_USER_WRITE) == MODE_USER_WRITE, (mode | MODE_USER_EXECUTE) == MODE_USER_EXECUTE, (mode | MODE_GROUP_READ) == MODE_GROUP_READ, (mode | MODE_GROUP_WRITE) == MODE_GROUP_WRITE, (mode | MODE_GROUP_EXECUTE) == MODE_GROUP_EXECUTE, (mode | MODE_OTHER_READ) == MODE_OTHER_READ, (mode | MODE_OTHER_WRITE) == MODE_OTHER_WRITE, (mode | MODE_OTHER_EXECUTE) == MODE_OTHER_EXECUTE};
+    Mode fmode = {mode};
 
     parent->acquire(scheduler_running_id());
     parent->set_mode(fmode);

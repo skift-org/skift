@@ -21,7 +21,7 @@ private:
     unsigned int _server = 0;
     unsigned int _master = 0;
 
-    Mode _mode = {true, true, true, true, true, true, true, true, true};
+    Mode _mode = {511};
 
 public:
     FileType type() { return _type; }
@@ -129,7 +129,6 @@ public:
 
         return ERR_OPERATION_NOT_SUPPORTED;
     }
-
 
     // Function called when the server accept the connection.
     virtual void accepted() {}

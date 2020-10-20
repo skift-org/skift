@@ -27,20 +27,21 @@ enum FileType
     FILE_TYPE_TERMINAL,
 };
 
-struct Mode
-{
-public:
-    bool u_r;
-    bool u_w;
-    bool u_x;
+union Mode {
+    uint packed;
+    struct {
+        uint u_r : 1;
+        uint u_w : 1;
+        uint u_x : 1;
 
-    bool g_r;
-    bool g_w;
-    bool g_x;
+        uint g_r : 1;
+        uint g_w : 1;   
+        uint g_x : 1;
 
-    bool o_r;
-    bool o_w;
-    bool o_x;
+        uint o_r : 1;
+        uint o_w : 1;   
+        uint o_x : 1;
+    };
 };
 
 #define OPEN_READ (1 << 0)

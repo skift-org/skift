@@ -31,7 +31,8 @@ UTILS = \
 	TRUE \
 	FALSE \
 	YES \
-	PWD
+	PWD \
+	CHMOD
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -131,6 +132,9 @@ YES_NAME = yes
 
 PWD_LIBS = 
 PWD_NAME = pwd
+
+CHMOD_LIBS = 
+CHMOD_NAME = chmod
 
 define UTIL_TEMPLATE =
 

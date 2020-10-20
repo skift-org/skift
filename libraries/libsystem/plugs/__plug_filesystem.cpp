@@ -27,3 +27,8 @@ Result filesystem_rename(const char *old_path, const char *new_path)
 {
     return __syscall(SYS_FILESYSTEM_RENAME, (uintptr_t)old_path, (uintptr_t)new_path);
 }
+
+Result filesystem_chmod(const char *path, uint mode)
+{
+    return __syscall(SYS_FILESYSTEM_CHMOD, (uintptr_t)path, mode);
+}

@@ -55,7 +55,10 @@ char *str_split(char *str, char *const sub_str)
 
     if (split)
     {
-        (*split) = 0;
+        if (*(split + strlen(sub_str)))
+        {
+            (*split) = 0;
+        }
         char *tmp = start;
         start = split + strlen(sub_str);
         return tmp;
@@ -78,7 +81,6 @@ Result tac(Stream *const input_stream)
     char buffer[1024];
     char *split = nullptr;
 
-    String s;
     StringBuilder temp;
     Vector<String> lines(20);
     if (!separator)
@@ -87,12 +89,11 @@ Result tac(Stream *const input_stream)
         strcpy(separator, "\n");
     }
 
-    while ((read = stream_read(input_stream, buffer, 1024)) != 0)
+    while ((read = stream_read(input_stream, buffer, 1024 - 1)) != 0)
     {
 
         buffer[read] = 0;
-        char *copy = strdup(buffer);
-        split = str_split(copy, separator);
+        split = str_split(buffer, separator);
         while (split != nullptr)
         {
             temp.append(split);

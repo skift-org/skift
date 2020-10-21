@@ -10,7 +10,7 @@
 class CPUGraph : public Graph
 {
 private:
-    TaskModel *_model;
+    RefPtr<TaskModel> _model;
 
     Label *_label_average;
     Label *_label_greedy;
@@ -20,7 +20,7 @@ private:
     OwnPtr<Timer> _text_timer{};
 
 public:
-    CPUGraph(Widget *parent, TaskModel *model)
+    CPUGraph(Widget *parent, RefPtr<TaskModel> model)
         : Graph(parent, 256, Colors::SEAGREEN),
           _model(model)
     {
@@ -49,7 +49,7 @@ public:
 
         _text_timer = own<Timer>(1000, [&]() {
             SystemStatus status = system_get_status();
-            const char *greedy = task_model_get_greedy_process(_model, 1);
+            auto greedy = _model->cpu_greedy();
 
             char buffer_average[50];
             snprintf(buffer_average, 200, "Average: %i%%", (int)(average() * 100.0));

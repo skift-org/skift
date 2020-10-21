@@ -44,6 +44,8 @@ void path_to_cstring(Path *path, char *buffer, uint size);
 
 char *path_as_string(Path *path);
 
+String path_as_modern_string(Path *path);
+
 void path_dump(Path *path);
 
 bool path_equals(Path *left, Path *right);

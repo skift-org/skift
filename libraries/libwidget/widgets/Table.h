@@ -2,8 +2,7 @@
 
 #include <libutils/String.h>
 
-#include <libwidget/Model.h>
-#include <libwidget/Widget.h>
+#include <libwidget/model/TableModel.h>
 #include <libwidget/widgets/ScrollBar.h>
 
 class Table : public Widget
@@ -11,7 +10,9 @@ class Table : public Widget
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;
 
-    Model *_model;
+    RefPtr<TableModel> _model;
+    OwnPtr<Observer<TableModel>> _model_observer;
+
     int _selected = -1;
     int _scroll_offset = 0;
     ScrollBar *_scrollbar;
@@ -43,7 +44,7 @@ public:
             return;
         }
 
-        if (index < 0 || index >= model_row_count(_model))
+        if (index < 0 || index >= _model->rows())
         {
             return;
         }
@@ -60,7 +61,7 @@ public:
         should_relayout();
     }
 
-    Table(Widget *parent, Model *model);
+    Table(Widget *parent, RefPtr<TableModel> model);
 
     void paint(Painter &painter, Rectangle rectangle);
 

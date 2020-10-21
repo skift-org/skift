@@ -17,7 +17,7 @@ private:
     CPUGraph *_cpu_graph;
 
     Table *_table;
-    TaskModel *_table_model;
+    RefPtr<TaskModel> _table_model;
     OwnPtr<Timer> _table_timer;
 
 public:
@@ -39,11 +39,15 @@ public:
         });
 
         /// --- Table view --- //
-        _table_model = task_model_create();
+        _table_model = make<TaskModel>();
 
         _table = new Table(root(), _table_model);
         _table->attributes(LAYOUT_FILL);
-        _table_timer = own<Timer>(1000, [&]() { widget_table_update(); });
+
+        _table_timer = own<Timer>(1000, [&]() {
+            _table_model->update();
+        });
+
         _table_timer->start();
 
         /// --- Graphs --- ///
@@ -56,18 +60,6 @@ public:
         new Separator(graphs_container);
 
         _ram_graph = new RAMGraph(graphs_container, _table_model);
-    }
-
-    ~TaskManagerWindow()
-    {
-        model_destroy((Model *)_table_model);
-    }
-
-    void widget_table_update()
-    {
-        model_update((Model *)_table_model);
-        _table->should_repaint();
-        _table->should_relayout();
     }
 };
 

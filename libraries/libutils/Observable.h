@@ -7,10 +7,7 @@
 template <typename T>
 class Observable
 {
-private:
-    __noncopyable(Observable);
-    __nonmovable(Observable);
-
+public:
     struct Observer
     {
         Observable<T> *_observable;
@@ -39,6 +36,10 @@ private:
         }
     };
 
+private:
+    __noncopyable(Observable);
+    __nonmovable(Observable);
+
     Vector<Observer *> _observers{};
 
     void register_observer(Observer *ob)
@@ -59,7 +60,7 @@ public:
     {
     }
 
-    ~Observable()
+    virtual ~Observable()
     {
         for (size_t i = 0; i < _observers.count(); i++)
         {

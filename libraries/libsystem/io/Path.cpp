@@ -3,6 +3,7 @@
 #include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/utils/BufferBuilder.h>
+#include <libutils/StringBuilder.h>
 
 Path *path_create(const char *raw_path)
 {
@@ -268,6 +269,34 @@ char *path_as_string(Path *path)
     }
 
     return buffer_builder_finalize(builder);
+}
+
+String path_as_modern_string(Path *path)
+{
+    StringBuilder builder;
+
+    if (path_element_count(path) == 0)
+    {
+        builder.append(PATH_SEPARATOR);
+    }
+    else
+    {
+        int index = 0;
+
+        list_foreach(const char, element, path->elements)
+        {
+            if (index != 0 || path->is_absolute)
+            {
+                builder.append(PATH_SEPARATOR);
+            }
+
+            builder.append(element);
+
+            index++;
+        }
+    }
+
+    return builder.finalize();
 }
 
 void path_dump(Path *path)

@@ -35,7 +35,7 @@ Rectangle Table::row_bound(int row) const
 
 Rectangle Table::column_bound(int column) const
 {
-    int column_count = model_column_count(_model);
+    int column_count = _model->columns();
     int column_width = list_bound().width() / column_count;
 
     return Rectangle(
@@ -65,7 +65,7 @@ int Table::row_at(Vec2i position) const
 
     int row = (position.y() + _scroll_offset) / TABLE_ROW_HEIGHT;
 
-    if (row < 0 || row >= model_row_count(_model))
+    if (row < 0 || row >= _model->rows())
     {
         row = -1;
     }
@@ -76,7 +76,7 @@ int Table::row_at(Vec2i position) const
 void Table::paint_cell(Painter &painter, int row, int column)
 {
     Rectangle bound = cell_bound(row, column);
-    Variant data = model_data(_model, row, column);
+    Variant data = _model->data(row, column);
 
     painter.push();
     painter.clip(bound);
@@ -107,9 +107,15 @@ void Table::paint_cell(Painter &painter, int row, int column)
     painter.pop();
 }
 
-Table::Table(Widget *parent, Model *model) : Widget(parent)
+Table::Table(Widget *parent, RefPtr<TableModel> model)
+    : Widget(parent),
+      _model(model)
 {
-    _model = model;
+    _model_observer = model->observe([this](auto &) {
+        should_repaint();
+        should_relayout();
+    });
+
     _selected = -1;
     _scroll_offset = 0;
 
@@ -128,17 +134,17 @@ void Table::paint(Painter &painter, Rectangle rectangle)
     painter.push();
     painter.clip(bound());
 
-    int column_count = model_column_count(_model);
+    int column_count = _model->columns();
     int column_width = body_bound().width() / column_count;
 
-    if (model_row_count(_model) == 0)
+    if (_model->rows() == 0)
     {
         painter.draw_string_within(*font(), _empty_message.cstring(), list_bound().take_top(TABLE_ROW_HEIGHT), Position::CENTER, color(THEME_FOREGROUND));
     }
     else
     {
         for (int row = MAX(0, _scroll_offset / TABLE_ROW_HEIGHT - 1);
-             row < MIN(model_row_count(_model), ((_scroll_offset + list_bound().height()) / TABLE_ROW_HEIGHT) + 1);
+             row < MIN(_model->rows(), ((_scroll_offset + list_bound().height()) / TABLE_ROW_HEIGHT) + 1);
              row++)
         {
 
@@ -174,8 +180,8 @@ void Table::paint(Painter &painter, Rectangle rectangle)
             painter.fill_rectangle(header_bound_cell.take_right(1), color(THEME_BORDER));
         }
 
-        painter.draw_string(*font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
-        painter.draw_string(*font(), model_column_name(_model, column), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
+        painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
+        painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
     }
 
     painter.pop();
@@ -185,8 +191,7 @@ void Table::event(Event *event)
 {
     if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        _selected = row_at(event->mouse.position);
-        should_repaint();
+        select(row_at(event->mouse.position));
     }
     else if (event->type == Event::MOUSE_DOUBLE_CLICK)
     {
@@ -198,15 +203,11 @@ void Table::event(Event *event)
     {
         if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
-            _selected--;
-            _selected = clamp(_selected, 0, model_row_count(_model) - 1);
-            should_repaint();
+            select(_selected - 1);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
-            _selected++;
-            _selected = clamp(_selected, 0, model_row_count(_model) - 1);
-            should_repaint();
+            select(_selected + 1);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
         {
@@ -220,5 +221,5 @@ void Table::event(Event *event)
 void Table::do_layout()
 {
     _scrollbar->bound(scrollbar_bound());
-    _scrollbar->update(TABLE_ROW_HEIGHT * model_row_count(_model), list_bound().height(), _scroll_offset);
+    _scrollbar->update(TABLE_ROW_HEIGHT * _model->rows(), list_bound().height(), _scroll_offset);
 }

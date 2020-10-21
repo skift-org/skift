@@ -1,8 +1,3 @@
-#include <libsystem/Assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
-#include <libsystem/io/Directory.h>
-
 #include "task-manager/TaskModel.h"
 
 enum Column
@@ -17,67 +12,22 @@ enum Column
     __COLUMN_COUNT,
 };
 
-static void task_model_update(TaskModel *model)
+TaskModel::~TaskModel()
 {
-    if (model->data)
-    {
-        json::destroy(model->data);
-    }
-
-    model->data = json::parse_file("/System/processes");
+    json::destroy(_data);
 }
 
-static Variant task_model_data(TaskModel *model, int row, int column)
+int TaskModel::rows()
 {
-    auto task = json::array_get(model->data, (size_t)row);
-
-    switch (column)
-    {
-    case COLUMN_ID:
-    {
-        Variant value = Variant(json::integer_value(json::object_get(task, "id")));
-
-        if (json::is(json::object_get(task, "user"), json::TRUE))
-        {
-            return value.with_icon(Icon::get("account"));
-        }
-        else
-        {
-            return value.with_icon(Icon::get("cog"));
-        }
-    }
-
-    case COLUMN_NAME:
-        return Variant(json::string_value(json::object_get(task, "name")));
-
-    case COLUMN_STATE:
-        return Variant(json::string_value(json::object_get(task, "state")));
-
-    case COLUMN_CPU:
-        return Variant("%2d%%", json::integer_value(json::object_get(task, "cpu")));
-
-    case COLUMN_RAM:
-        return Variant("%5d Kio", json::integer_value(json::object_get(task, "ram")) / 1024);
-
-    case COLUMN_DIRECTORY:
-        return Variant(json::string_value(json::object_get(task, "directory")));
-
-    default:
-        ASSERT_NOT_REACHED();
-    }
+    return json::array_length(_data);
 }
 
-static int task_model_column_count()
+int TaskModel::columns()
 {
     return __COLUMN_COUNT;
 }
 
-static int task_model_row_count(TaskModel *model)
-{
-    return json::array_length(model->data);
-}
-
-static const char *task_model_column_name(int column)
+String TaskModel::header(int column)
 {
     switch (column)
     {
@@ -104,60 +54,86 @@ static const char *task_model_column_name(int column)
     }
 }
 
-static void task_model_destroy(TaskModel *model)
+Variant TaskModel::data(int row, int column)
 {
-    json::destroy(model->data);
-}
+    auto task = json::array_get(_data, (size_t)row);
 
-TaskModel *task_model_create()
-{
-    TaskModel *model = __create(TaskModel);
-
-    model->model_update = (ModelUpdateCallback)task_model_update;
-    model->model_data = (ModelDataCallback)task_model_data;
-    model->model_row_count = (ModelRowCountCallback)task_model_row_count;
-    model->model_column_count = (ModelColumnCountCallback)task_model_column_count;
-    model->model_column_name = (ModelColumnNameCallback)task_model_column_name;
-    model->model_destroy = (ModelDestroyCallback)task_model_destroy;
-
-    model_initialize((Model *)model);
-
-    return model;
-}
-
-const char *task_model_get_greedy_process(TaskModel *model, int ram_cpu)
-{
-    const char *greedy = "";
-
-    int row_count = json::array_length(model->data);
-    int list[row_count];
-
-    for (int row = 0; row < row_count; row++)
+    switch (column)
     {
-        // 0 means memory. 1 means processor
-        if (ram_cpu == 0)
+    case COLUMN_ID:
+    {
+        Variant value = json::integer_value(json::object_get(task, "id"));
+
+        if (json::is(json::object_get(task, "user"), json::TRUE))
         {
-            auto task = json::array_get(model->data, (size_t)row);
-            list[row] = json::integer_value(json::object_get(task, "ram"));
+            return value.with_icon(Icon::get("account"));
         }
-        else if (ram_cpu == 1)
+        else
         {
-            auto task = json::array_get(model->data, (size_t)row);
-            list[row] = json::integer_value(json::object_get(task, "cpu"));
+            return value.with_icon(Icon::get("cog"));
         }
     }
 
-    int greedy_index = 0;
-    for (int i = 0; i < row_count; i++)
+    case COLUMN_NAME:
+        return json::string_value(json::object_get(task, "name"));
+
+    case COLUMN_STATE:
+        return json::string_value(json::object_get(task, "state"));
+
+    case COLUMN_CPU:
+        return Variant("%2d%%", json::integer_value(json::object_get(task, "cpu")));
+
+    case COLUMN_RAM:
+        return Variant("%5d Kio", json::integer_value(json::object_get(task, "ram")) / 1024);
+
+    case COLUMN_DIRECTORY:
+        return json::string_value(json::object_get(task, "directory"));
+
+    default:
+        ASSERT_NOT_REACHED();
+    }
+}
+
+void TaskModel::update()
+{
+    if (_data)
     {
-        if (list[greedy_index] < list[i])
+        json::destroy(_data);
+    }
+
+    _data = json::parse_file("/System/processes");
+
+    did_update();
+}
+
+static String greedy(json::Value *data, const char *field)
+{
+    size_t most_greedy_index = 0;
+    int most_greedy_value = 0;
+
+    for (size_t i = 0; i < json::array_length(data); i++)
+    {
+        auto task = json::array_get(data, i);
+
+        auto value = json::integer_value(json::object_get(task, field));
+
+        if (value > most_greedy_value)
         {
-            greedy_index = i;
+            most_greedy_index = i;
+            most_greedy_value = value;
         }
     }
 
-    auto task = json::array_get(model->data, (size_t)greedy_index);
-    greedy = json::string_value(json::object_get(task, "name"));
+    auto task = json::array_get(data, most_greedy_index);
+    return json::string_value(json::object_get(task, "name"));
+}
 
-    return greedy;
+String TaskModel::ram_greedy()
+{
+    return greedy(_data, "ram");
+}
+
+String TaskModel::cpu_greedy()
+{
+    return greedy(_data, "cpu");
 }

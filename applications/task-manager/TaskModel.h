@@ -1,15 +1,27 @@
 #pragma once
 
 #include <libjson/Json.h>
-#include <libsystem/io/Path.h>
-#include <libsystem/utils/List.h>
-#include <libwidget/Model.h>
+#include <libwidget/model/TableModel.h>
 
-struct TaskModel : public Model
+class TaskModel : public TableModel
 {
-    json::Value *data;
+private:
+    json::Value *_data = nullptr;
+
+public:
+    ~TaskModel() override;
+
+    int rows() override;
+
+    int columns() override;
+
+    String header(int column) override;
+
+    Variant data(int row, int column) override;
+
+    void update() override;
+
+    String ram_greedy();
+
+    String cpu_greedy();
 };
-
-TaskModel *task_model_create();
-
-const char *task_model_get_greedy_process(TaskModel *model, int ram_cpu);

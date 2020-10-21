@@ -3,26 +3,38 @@
 #include <libsystem/io/Path.h>
 #include <libsystem/utils/List.h>
 #include <libutils/Vector.h>
-#include <libwidget/Model.h>
+#include <libwidget/model/TableModel.h>
 
 struct FileSystemNode
 {
-    char name[FILE_NAME_LENGTH];
+    String name;
     FileType type;
     RefPtr<Icon> icon;
     size_t size;
 };
 
-struct FileSystemModel : public Model
+class FileSystemModel : public TableModel
 {
-    char *current_path;
-    List *files;
+private:
+    String _current_path{};
+    Vector<FileSystemNode> _files{};
+
+public:
+    FileSystemModel(String path);
+
+    int rows() override;
+
+    int columns() override;
+
+    String header(int column) override;
+
+    Variant data(int row, int column) override;
+
+    void update() override;
+
+    void navigate(Path *path);
+
+    String file_name(int index);
+
+    FileType file_type(int index);
 };
-
-FileSystemModel *filesystem_model_create(const char *current_path);
-
-void filesystem_model_navigate(FileSystemModel *model, Path *path);
-
-const char *filesystem_model_filename_by_index(FileSystemModel *model, int index);
-
-FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index);

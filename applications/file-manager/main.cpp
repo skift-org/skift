@@ -27,7 +27,7 @@ private:
 
     /// --- Table view --- ///
     Table *_table;
-    FileSystemModel *_model;
+    RefPtr<FileSystemModel> _model;
 
     /// --- Navigation --- ///
     List *_backward_history;
@@ -103,7 +103,11 @@ public:
 
         new Separator(toolbar);
 
-        toolbar_icon_create(toolbar, Icon::get("refresh"));
+        auto refresh = toolbar_icon_create(toolbar, Icon::get("refresh"));
+
+        refresh->on(Event::ACTION, [&](auto) {
+            _model->update();
+        });
 
         Widget *terminal_button = toolbar_icon_create(toolbar, Icon::get("console"));
 
@@ -114,7 +118,7 @@ public:
         update_navigation_bar();
 
         /// --- Table view --- ///
-        _model = filesystem_model_create(path);
+        _model = make<FileSystemModel>(path);
 
         _table = new Table(root(), _model);
         _table->attributes(LAYOUT_FILL);
@@ -124,17 +128,17 @@ public:
         _table->on(Event::ACTION, [this](auto) {
             if (_table->selected() >= 0)
             {
-                if (filesystem_model_filetype_by_index(_model, _table->selected()) == FILE_TYPE_DIRECTORY)
+                if (_model->file_type(_table->selected()) == FILE_TYPE_DIRECTORY)
                 {
                     Path *new_path = path_clone(_current_path);
-                    path_push(new_path, strdup(filesystem_model_filename_by_index(_model, _table->selected())));
+                    path_push(new_path, strdup(_model->file_name(_table->selected()).cstring()));
                     clear_foreward_history();
                     navigate(new_path, RECORD_BACKWARD);
                 }
                 else
                 {
                     Launchpad *launchpad = launchpad_create("open", "/System/Binaries/open");
-                    launchpad_argument(launchpad, filesystem_model_filename_by_index(_model, _table->selected()));
+                    launchpad_argument(launchpad, strdup(_model->file_name(_table->selected()).cstring()));
                     launchpad_launch(launchpad, nullptr);
                 }
             }
@@ -143,7 +147,6 @@ public:
 
     ~FileExplorerWindow() override
     {
-        model_destroy((Model *)_model);
     }
 
     void update_navigation_bar()
@@ -182,7 +185,7 @@ public:
         _current_path = path;
 
         _breadcrumb->navigate(path);
-        filesystem_model_navigate(_model, path);
+        _model->navigate(path);
         update_navigation_bar();
     }
 

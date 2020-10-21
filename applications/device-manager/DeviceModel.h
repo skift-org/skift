@@ -1,17 +1,23 @@
 #pragma once
 
 #include <libjson/Json.h>
-#include <libsystem/io/Path.h>
-#include <libsystem/utils/List.h>
-#include <libwidget/Model.h>
+#include <libwidget/model/TableModel.h>
 
-struct DeviceModel : public Model
+class DeviceModel : public TableModel
 {
-    json::Value *data;
+private:
+    json::Value *_data = nullptr;
+
+public:
+    ~DeviceModel() override;
+
+    int rows() override;
+
+    int columns() override;
+
+    String header(int column) override;
+
+    Variant data(int row, int column) override;
+
+    void update() override;
 };
-
-DeviceModel *device_model_create();
-
-void device_model_navigate(DeviceModel *model, Path *path);
-
-const char *device_model_filename_by_index(DeviceModel *model, int index);

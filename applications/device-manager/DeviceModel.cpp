@@ -1,8 +1,3 @@
-#include <libsystem/Assert.h>
-#include <libsystem/Logger.h>
-#include <libsystem/core/CString.h>
-#include <libsystem/io/Directory.h>
-
 #include "device-manager/DeviceModel.h"
 
 enum Column
@@ -15,50 +10,22 @@ enum Column
     __COLUMN_COUNT,
 };
 
-static void device_model_update(DeviceModel *model)
+DeviceModel::~DeviceModel()
 {
-    if (model->data)
-    {
-        json::destroy(model->data);
-    }
-
-    model->data = json::parse_file("/System/devices");
+    json::destroy(_data);
 }
 
-static Variant device_model_data(DeviceModel *model, int row, int column)
+int DeviceModel::rows()
 {
-    auto device = json::array_get(model->data, (size_t)row);
-
-    switch (column)
-    {
-    case COLUMN_NAME:
-        return Variant(json::string_value(json::object_get(device, "name")));
-
-    case COLUMN_DESCRIPTION:
-        return Variant(json::string_value(json::object_get(device, "description")));
-
-    case COLUMN_PATH:
-        return Variant(json::string_value(json::object_get(device, "path")));
-
-    case COLUMN_ADDRESS:
-        return Variant(json::string_value(json::object_get(device, "address")));
-
-    default:
-        ASSERT_NOT_REACHED();
-    }
+    return json::array_length(_data);
 }
 
-static int device_model_column_count()
+int DeviceModel::columns()
 {
     return __COLUMN_COUNT;
 }
 
-static int device_model_row_count(DeviceModel *model)
-{
-    return json::array_length(model->data);
-}
-
-static const char *device_model_column_name(int column)
+String DeviceModel::header(int column)
 {
     switch (column)
     {
@@ -79,23 +46,37 @@ static const char *device_model_column_name(int column)
     }
 }
 
-static void device_model_destroy(DeviceModel *model)
+Variant DeviceModel::data(int row, int column)
 {
-    json::destroy(model->data);
+    auto device = json::array_get(_data, row);
+
+    switch (column)
+    {
+    case COLUMN_NAME:
+        return json::string_value(json::object_get(device, "name"));
+
+    case COLUMN_DESCRIPTION:
+        return json::string_value(json::object_get(device, "description"));
+
+    case COLUMN_PATH:
+        return json::string_value(json::object_get(device, "path"));
+
+    case COLUMN_ADDRESS:
+        return json::string_value(json::object_get(device, "address"));
+
+    default:
+        ASSERT_NOT_REACHED();
+    }
 }
 
-DeviceModel *device_model_create()
+void DeviceModel::update()
 {
-    DeviceModel *model = __create(DeviceModel);
+    if (_data)
+    {
+        json::destroy(_data);
+    }
 
-    model->model_update = (ModelUpdateCallback)device_model_update;
-    model->model_data = (ModelDataCallback)device_model_data;
-    model->model_row_count = (ModelRowCountCallback)device_model_row_count;
-    model->model_column_count = (ModelColumnCountCallback)device_model_column_count;
-    model->model_column_name = (ModelColumnNameCallback)device_model_column_name;
-    model->model_destroy = (ModelDestroyCallback)device_model_destroy;
+    _data = json::parse_file("/System/devices");
 
-    model_initialize((Model *)model);
-
-    return model;
+    did_update();
 }

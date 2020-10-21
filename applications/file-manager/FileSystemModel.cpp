@@ -7,15 +7,6 @@
 
 #include "file-manager/FileSystemModel.h"
 
-enum Column
-{
-    COLUMN_NAME,
-    COLUMN_TYPE,
-    COLUMN_SIZE,
-
-    __COLUMN_COUNT,
-};
-
 static auto get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
 {
     if (entry->stat.type == FILE_TYPE_DIRECTORY)
@@ -56,89 +47,33 @@ static auto get_icon_for_node(const char *current_directory, DirectoryEntry *ent
     }
 }
 
-static void filesystem_model_update(FileSystemModel *model)
+enum Column
 {
-    if (model->files)
-    {
-        list_clear_with_callback(model->files, free);
-    }
-    else
-    {
-        model->files = list_create();
-    }
+    COLUMN_NAME,
+    COLUMN_TYPE,
+    COLUMN_SIZE,
 
-    Directory *directory = directory_open(model->current_path, OPEN_READ);
+    __COLUMN_COUNT,
+};
 
-    if (handle_has_error(directory))
-    {
-        // FIXME: Use message box.
-        handle_printf_error(directory, "Failed to open directory '%s'", model->current_path);
-        directory_close(directory);
-        return;
-    }
-
-    DirectoryEntry entry;
-    while (directory_read(directory, &entry) > 0)
-    {
-        FileSystemNode *node = new FileSystemNode{
-            .name = {},
-            .type = entry.stat.type,
-            .icon = get_icon_for_node(model->current_path, &entry),
-            .size = entry.stat.size};
-
-        strcpy(node->name, entry.name);
-
-        list_pushback(model->files, node);
-    }
-
-    directory_close(directory);
+FileSystemModel::FileSystemModel(String path)
+{
+    _current_path = path;
+    process_set_directory(_current_path.cstring());
+    update();
 }
 
-static Variant filesystem_model_data(FileSystemModel *model, int row, int column)
+int FileSystemModel::rows()
 {
-    FileSystemNode *entry = nullptr;
-    assert(list_peekat(model->files, row, (void **)&entry));
-
-    switch (column)
-    {
-    case COLUMN_NAME:
-        return Variant(entry->name).with_icon(entry->icon);
-
-    case COLUMN_TYPE:
-        switch (entry->type)
-        {
-        case FILE_TYPE_REGULAR:
-            return Variant("Regular file");
-
-        case FILE_TYPE_DIRECTORY:
-            return Variant("Directory");
-
-        case FILE_TYPE_DEVICE:
-            return Variant("Device");
-
-        default:
-            return Variant("Special file");
-        }
-
-    case COLUMN_SIZE:
-        return Variant((int)entry->size);
-
-    default:
-        ASSERT_NOT_REACHED();
-    }
+    return _files.count();
 }
 
-static int filesystem_model_column_count()
+int FileSystemModel::columns()
 {
     return __COLUMN_COUNT;
 }
 
-static int filesystem_model_row_count(FileSystemModel *model)
-{
-    return model->files->count();
-}
-
-static const char *filesystem_model_column_name(int column)
+String FileSystemModel::header(int column)
 {
     switch (column)
     {
@@ -154,64 +89,82 @@ static const char *filesystem_model_column_name(int column)
     }
 }
 
-void filesystem_model_navigate(FileSystemModel *model, Path *path)
+Variant FileSystemModel::data(int row, int column)
 {
-    if (model->current_path)
+    auto &entry = _files[row];
+
+    switch (column)
     {
-        free(model->current_path);
+    case COLUMN_NAME:
+        return Variant(entry.name.cstring()).with_icon(entry.icon);
+
+    case COLUMN_TYPE:
+        switch (entry.type)
+        {
+        case FILE_TYPE_REGULAR:
+            return "Regular file";
+
+        case FILE_TYPE_DIRECTORY:
+            return "Directory";
+
+        case FILE_TYPE_DEVICE:
+            return "Device";
+
+        default:
+            return "Special file";
+        }
+
+    case COLUMN_SIZE:
+        return Variant((int)entry.size);
+
+    default:
+        ASSERT_NOT_REACHED();
+    }
+}
+
+void FileSystemModel::update()
+{
+    _files.clear();
+
+    auto directory = directory_open(_current_path.cstring(), OPEN_READ);
+
+    if (handle_has_error(directory))
+    {
+        directory_close(directory);
+        return;
     }
 
-    model->current_path = path_as_string(path);
-    process_set_directory(model->current_path);
-    model_update((Model *)model);
-}
-
-const char *filesystem_model_filename_by_index(FileSystemModel *model, int index)
-{
-    if (index >= 0 && index < model->files->count())
+    DirectoryEntry entry;
+    while (directory_read(directory, &entry) > 0)
     {
-        FileSystemNode *entry = nullptr;
-        assert(list_peekat(model->files, index, (void **)&entry));
+        FileSystemNode node{
+            .name = {entry.name, FILE_NAME_LENGTH},
+            .type = entry.stat.type,
+            .icon = get_icon_for_node(_current_path.cstring(), &entry),
+            .size = entry.stat.size,
+        };
 
-        return entry->name;
+        _files.push_back(node);
     }
 
-    return nullptr;
+    directory_close(directory);
+
+    did_update();
 }
 
-FileType filesystem_model_filetype_by_index(FileSystemModel *model, int index)
+void FileSystemModel::navigate(Path *path)
 {
-    if (index >= 0 && index < model->files->count())
-    {
-        FileSystemNode *entry = nullptr;
-        assert(list_peekat(model->files, index, (void **)&entry));
-
-        return entry->type;
-    }
-
-    return FILE_TYPE_UNKNOWN;
+    _current_path = path_as_modern_string(path);
+    process_set_directory(_current_path.cstring());
+    update();
 }
 
-static void filesystem_model_destroy(FileSystemModel *model)
+String FileSystemModel::file_name(int index)
 {
-    free(model->current_path);
+    return _files[index].name;
 }
 
-FileSystemModel *filesystem_model_create(const char *current_path)
+FileType FileSystemModel::file_type(int index)
 {
-    FileSystemModel *model = __create(FileSystemModel);
-
-    model->current_path = strdup(current_path);
-    process_set_directory(model->current_path);
-
-    model->model_update = (ModelUpdateCallback)filesystem_model_update;
-    model->model_data = (ModelDataCallback)filesystem_model_data;
-    model->model_row_count = (ModelRowCountCallback)filesystem_model_row_count;
-    model->model_column_count = (ModelColumnCountCallback)filesystem_model_column_count;
-    model->model_column_name = (ModelColumnNameCallback)filesystem_model_column_name;
-    model->model_destroy = (ModelDestroyCallback)filesystem_model_destroy;
-
-    model_initialize((Model *)model);
-
-    return model;
+    return _files[index].type;
 }

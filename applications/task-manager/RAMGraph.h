@@ -10,7 +10,7 @@
 class RAMGraph : public Graph
 {
 private:
-    TaskModel *_model;
+    RefPtr<TaskModel> _model;
 
     Label *_label_usage;
     Label *_label_available;
@@ -20,7 +20,7 @@ private:
     OwnPtr<Timer> _text_timer{};
 
 public:
-    RAMGraph(Widget *parent, TaskModel *model)
+    RAMGraph(Widget *parent, RefPtr<TaskModel> model)
         : Graph(parent, 256, Colors::ROYALBLUE),
           _model(model)
     {
@@ -60,7 +60,7 @@ public:
             snprintf(buffer_avaliable, 50, "Avaliable: %u Mio", avaliable);
             _label_available->text(buffer_avaliable);
 
-            const char *greedy = task_model_get_greedy_process(_model, 0);
+            auto greedy = _model->ram_greedy();
             _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());
         });
 

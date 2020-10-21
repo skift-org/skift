@@ -225,6 +225,11 @@ void object_remove(Value *object, const String &key)
 
 size_t array_length(Value *array)
 {
+    if (!array)
+    {
+        return 0;
+    }
+
     assert(is(array, ARRAY));
 
     return array->storage_array->count();

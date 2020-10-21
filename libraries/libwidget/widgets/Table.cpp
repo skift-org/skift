@@ -188,6 +188,33 @@ void Table::event(Event *event)
         _selected = row_at(event->mouse.position);
         should_repaint();
     }
+    else if (event->type == Event::MOUSE_DOUBLE_CLICK)
+    {
+        Event action_event = {};
+        action_event.type = Event::ACTION;
+        dispatch_event(&action_event);
+    }
+    else if (event->type == Event::KEYBOARD_KEY_TYPED)
+    {
+        if (event->keyboard.key == KEYBOARD_KEY_UP)
+        {
+            _selected--;
+            _selected = clamp(_selected, 0, model_row_count(_model) - 1);
+            should_repaint();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
+        {
+            _selected++;
+            _selected = clamp(_selected, 0, model_row_count(_model) - 1);
+            should_repaint();
+        }
+        else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
+        {
+            Event action_event = {};
+            action_event.type = Event::ACTION;
+            dispatch_event(&action_event);
+        }
+    }
 }
 
 void Table::do_layout()

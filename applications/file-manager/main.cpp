@@ -119,8 +119,9 @@ public:
         _table = new Table(root(), _model);
         _table->attributes(LAYOUT_FILL);
         _table->empty_message("This directory is empty.");
+        _table->focus();
 
-        _table->on(Event::MOUSE_DOUBLE_CLICK, [this](auto) {
+        _table->on(Event::ACTION, [this](auto) {
             if (_table->selected() >= 0)
             {
                 if (filesystem_model_filetype_by_index(_model, _table->selected()) == FILE_TYPE_DIRECTORY)

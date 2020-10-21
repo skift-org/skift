@@ -77,7 +77,11 @@ int main(int argc, char **argv)
 
     if (argc == 1)
     {
+        count = 1;
         char input_stream_name[] = "Standard Input";
+
+        stream_set_read_buffer_mode(in_stream, STREAM_BUFFERED_NONE); 
+        stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);       
         result = head(in_stream, input_stream_name);
         if (result != SUCCESS)
         {
@@ -171,8 +175,14 @@ Result head(Stream *const input_stream, char *const stream_name)
     }
     else // Line count mode
     {
-        while ((bytes_read = stream_read(input_stream, buffer, BUFFER_SIZE)) != 0 && counter < count)
+        while (counter < count)
         {
+            bytes_read = stream_read(input_stream, buffer, BUFFER_SIZE);
+            if (bytes_read == 0)
+            {
+                break;
+            }
+
             size_t buffer_iterator = 0;
             for (; buffer_iterator < bytes_read; buffer_iterator++)
             {

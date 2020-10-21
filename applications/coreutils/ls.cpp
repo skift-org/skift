@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < argc; i++)
     {
-        result = ls(argv[i], argc == 2);
+        result = ls(argv[i], argc > 2);
 
         if (result != SUCCESS)
         {

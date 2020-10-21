@@ -9,6 +9,7 @@ UTILS = \
 	DIRNAME \
 	ECHO \
 	GREP \
+	HEAD \
 	HEXDUMP \
 	INIT \
 	JSON \
@@ -63,6 +64,9 @@ ECHO_NAME = echo
 
 GREP_LIBS =
 GREP_NAME = grep
+
+HEAD_LIBS = 
+HEAD_NAME = head
 
 HEXDUMP_LIBS = 
 HEXDUMP_NAME = hexdump

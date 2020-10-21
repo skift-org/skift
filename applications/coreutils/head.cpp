@@ -1,7 +1,5 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Stream.h>
-#include <libutils/String.h>
-#include <libutils/StringBuilder.h>
 
 #define BUFFER_SIZE 1024
 
@@ -65,7 +63,7 @@ int main(int argc, char **argv)
 {
     argc = cmdline_parse(&cmdline, argc, argv);
 
-    if(count < 0)
+    if (count < 0)
     {
         /* TODO: print everthing but last COUNT lines when count is negative */
         stream_format(err_stream, "%s", get_result_description(ERR_FUNCTION_NOT_IMPLEMENTED));
@@ -80,8 +78,8 @@ int main(int argc, char **argv)
         count = 1;
         char input_stream_name[] = "Standard Input";
 
-        stream_set_read_buffer_mode(in_stream, STREAM_BUFFERED_NONE); 
-        stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);       
+        stream_set_read_buffer_mode(in_stream, STREAM_BUFFERED_LINE);
+        stream_set_write_buffer_mode(out_stream, STREAM_BUFFERED_NONE);
         result = head(in_stream, input_stream_name);
         if (result != SUCCESS)
         {
@@ -109,9 +107,9 @@ int main(int argc, char **argv)
         }
 
         result = head(file_stream, argv[i]);
-        if(argc > 2 && i != argc - 1)
+        if (argc > 2 && i != argc - 1)
         {
-            printf("\n");            
+            printf("\n");
         }
 
         if (result != SUCCESS)
@@ -131,12 +129,13 @@ Result head(Stream *const input_stream, char *const stream_name)
     size_t bytes_read;
     int counter = 0;
 
-    StringBuilder string;
-    String output_string;
-
     if (verbose)
     {
-        string.append("==> ").append(stream_name).append(" <==\n");
+        stream_format(out_stream, "==> %s <==\n", stream_name);
+        if (handle_has_error(out_stream))
+        {
+            return ERR_WRITE_STDOUT;
+        }
     }
 
     // Character mode
@@ -155,7 +154,12 @@ Result head(Stream *const input_stream, char *const stream_name)
             }
 
             buffer[bytes_read] = 0;
-            string.append(buffer, bytes_read);
+            stream_write(out_stream, buffer, bytes_read);
+            if (handle_has_error(out_stream))
+            {
+                return ERR_WRITE_STDOUT;
+            }
+
             counter++;
         }
 
@@ -163,14 +167,12 @@ Result head(Stream *const input_stream, char *const stream_name)
         if (bytes_read)
         {
             buffer[bytes_read] = 0;
-            string.append(buffer, bytes_read);
-        }
 
-        output_string = string.finalize();
-        stream_write(out_stream, output_string.cstring(), output_string.length());
-        if (handle_has_error(out_stream))
-        {
-            return ERR_WRITE_STDOUT;
+            stream_write(out_stream, buffer, bytes_read);
+            if (handle_has_error(out_stream))
+            {
+                return ERR_WRITE_STDOUT;
+            }
         }
     }
     else // Line count mode
@@ -182,6 +184,7 @@ Result head(Stream *const input_stream, char *const stream_name)
             {
                 break;
             }
+            buffer[bytes_read] = 0;
 
             size_t buffer_iterator = 0;
             for (; buffer_iterator < bytes_read; buffer_iterator++)
@@ -197,14 +200,11 @@ Result head(Stream *const input_stream, char *const stream_name)
                 }
             }
 
-            string.append(buffer, buffer_iterator);
-        }
-
-        output_string = string.finalize();
-        stream_write(out_stream, output_string.cstring(), output_string.length());
-        if (handle_has_error(out_stream))
-        {
-            return ERR_WRITE_STDOUT;
+            stream_write(out_stream, buffer, buffer_iterator);
+            if (handle_has_error(out_stream))
+            {
+                return ERR_WRITE_STDOUT;
+            }
         }
     }
 

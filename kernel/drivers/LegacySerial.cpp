@@ -1,3 +1,5 @@
+// manual/ressources/serport.txt
+
 #include "kernel/drivers/LegacySerial.h"
 
 LegacySerial::LegacySerial(DeviceAddress address) : LegacyDevice(address, DeviceClass::SERIAL)
@@ -10,10 +12,12 @@ void LegacySerial::handle_interrupt()
 {
     LockHolder holder(_buffer_lock);
 
-    while (com_can_read(port()))
+    uint8_t status = in8(port() + 2);
+
+    if (status == 0b100)
     {
         char byte = com_getc(port());
-        _buffer.write((const char *)&byte, sizeof(byte));
+        _buffer.put(byte);
     }
 }
 

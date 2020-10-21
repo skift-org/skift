@@ -16,6 +16,7 @@ private:
 
 public:
     RefPtr() {}
+
     RefPtr(nullptr_t) {}
 
     RefPtr(T &object) : _ptr(&object)
@@ -25,7 +26,7 @@ public:
 
     RefPtr(AdoptTag, T &object) : _ptr(const_cast<T *>(&object)) {}
 
-    RefPtr(RefPtr &other) : _ptr(other.naked())
+    RefPtr(const RefPtr &other) : _ptr(other.naked())
     {
         ref_if_not_null(_ptr);
     }
@@ -118,13 +119,13 @@ public:
 
     const T &operator*() const { return *_ptr; }
 
-    bool operator==(RefPtr<T> other) const { return _ptr == other._ptr; }
+    bool operator==(const RefPtr<T> other) const { return _ptr == other._ptr; }
 
-    bool operator!=(RefPtr<T> other) const { return _ptr != other._ptr; }
+    bool operator!=(const RefPtr<T> other) const { return _ptr != other._ptr; }
 
-    bool operator==(T *other) const { return _ptr == other; }
+    bool operator==(const T *other) const { return _ptr == other; }
 
-    bool operator!=(T *other) const { return _ptr != other; }
+    bool operator!=(const T *other) const { return _ptr != other; }
 
     operator bool() const
     {
@@ -155,7 +156,7 @@ public:
         return ptr;
     }
 
-    T *naked()
+    T *naked() const
     {
         return _ptr;
     }

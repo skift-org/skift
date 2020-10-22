@@ -10,21 +10,9 @@ static bool verbose = false;
 static bool zero_delimiter = false;
 static char delimiter = '\n';
 
-void set_delimiter_zero(CommandLine *cmdline, CommandLineOption *opt)
-{
-    __unused(cmdline);
-    __unused(opt);
-
-    delimiter = '\0';
-}
-
-void set_character_mode(CommandLine *cmdline, CommandLineOption *opt)
-{
-    __unused(cmdline);
-    __unused(opt);
-
-    count_lines = false;
-}
+void set_delimiter_zero(CommandLine *, CommandLineOption *);
+void set_character_mode(CommandLine *, CommandLineOption *);
+Result head(Stream *const, char *const);
 
 static const char *usages[] = {
     "[OPTION]... NAME...",
@@ -56,8 +44,6 @@ static CommandLine cmdline = CMDLINE(
     "Print the first 10 lines of each FILE to standard output. With more than one FILE, precede each with\
     a header giving the file name\n",
     "If no filename provided read from input stream\n");
-
-Result head(Stream *const, char *const);
 
 int main(int argc, char **argv)
 {
@@ -122,9 +108,25 @@ int main(int argc, char **argv)
     return process_status;
 }
 
+void set_delimiter_zero(CommandLine *cmdline, CommandLineOption *opt)
+{
+    __unused(cmdline);
+    __unused(opt);
+
+    delimiter = '\0';
+}
+
+void set_character_mode(CommandLine *cmdline, CommandLineOption *opt)
+{
+    __unused(cmdline);
+    __unused(opt);
+
+    count_lines = false;
+}
+
 Result head(Stream *const input_stream, char *const stream_name)
 {
-    char buffer[BUFFER_SIZE + 1]; // Adding 1 for null character
+    char buffer[BUFFER_SIZE];
 
     size_t bytes_read;
     int counter = 0;
@@ -147,13 +149,11 @@ Result head(Stream *const input_stream, char *const stream_name)
         while (counter < full_reads)
         {
             bytes_read = stream_read(input_stream, buffer, BUFFER_SIZE);
-
             if (bytes_read == 0)
             {
                 break;
             }
 
-            buffer[bytes_read] = 0;
             stream_write(out_stream, buffer, bytes_read);
             if (handle_has_error(out_stream))
             {
@@ -166,8 +166,6 @@ Result head(Stream *const input_stream, char *const stream_name)
         bytes_read = stream_read(input_stream, buffer, remainder);
         if (bytes_read)
         {
-            buffer[bytes_read] = 0;
-
             stream_write(out_stream, buffer, bytes_read);
             if (handle_has_error(out_stream))
             {
@@ -184,20 +182,19 @@ Result head(Stream *const input_stream, char *const stream_name)
             {
                 break;
             }
-            buffer[bytes_read] = 0;
 
             size_t buffer_iterator = 0;
-            for (; buffer_iterator < bytes_read; buffer_iterator++)
+            while (buffer_iterator < bytes_read)
             {
                 if (buffer[buffer_iterator] == delimiter)
                 {
                     counter++;
                     if (counter == count)
                     {
-                        buffer[buffer_iterator + 1] = 0;
                         break;
                     }
                 }
+                buffer_iterator++;
             }
 
             stream_write(out_stream, buffer, buffer_iterator);

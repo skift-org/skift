@@ -75,12 +75,15 @@ RefPtr<Node> start_tag(Lexer &lexer)
     {
         lexer.skip('>');
     }
+
+    return make<Node>();
 }
 
 void end_tag(Lexer &lexer, RefPtr<Node> node)
 {
+    __unused(node);
+
     lexer.skip_word(CLOSING_TAG);
-    __unused(lexer);
 
     lexer.skip('>');
 }

@@ -134,15 +134,15 @@ public:
 };
 
 template <typename PCIDeviceType>
-class PCIDeviceDriver : public DeviceDriver
+class PCIDeviceMatcher : public DeviceMatcher
 {
 private:
     uint16_t _vendor;
     uint16_t _device;
 
 public:
-    PCIDeviceDriver(const char *name, uint16_t vendor, uint16_t device)
-        : DeviceDriver(BUS_PCI, name),
+    PCIDeviceMatcher(const char *name, uint16_t vendor, uint16_t device)
+        : DeviceMatcher(BUS_PCI, name),
           _vendor(vendor),
           _device(device)
     {

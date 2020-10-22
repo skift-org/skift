@@ -17,14 +17,14 @@ public:
 };
 
 template <typename VirtioDeviceType>
-class VirtioDeviceDriver : public DeviceDriver
+class VirtioDeviceMatcher : public DeviceMatcher
 {
 private:
     VirtioAddress _address;
 
 public:
-    VirtioDeviceDriver(const char *name, VirtioAddress address)
-        : DeviceDriver(BUS_PCI, name), _address(address)
+    VirtioDeviceMatcher(const char *name, VirtioAddress address)
+        : DeviceMatcher(BUS_PCI, name), _address(address)
     {
     }
 

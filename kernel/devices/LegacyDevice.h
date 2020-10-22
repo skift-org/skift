@@ -42,14 +42,14 @@ public:
 };
 
 template <typename LegacyDeviceType>
-class LegacyDeviceDriver : public DeviceDriver
+class LegacyDeviceMatcher : public DeviceMatcher
 {
 private:
     LegacyAddress _address;
 
 public:
-    LegacyDeviceDriver(const char *name, LegacyAddress address)
-        : DeviceDriver(BUS_LEGACY, name),
+    LegacyDeviceMatcher(const char *name, LegacyAddress address)
+        : DeviceMatcher(BUS_LEGACY, name),
           _address(address)
     {
     }

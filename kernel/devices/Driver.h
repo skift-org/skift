@@ -3,7 +3,7 @@
 #include "kernel/devices/Device.h"
 #include "kernel/devices/DeviceAddress.h"
 
-class DeviceDriver
+class DeviceMatcher
 {
 private:
     DeviceBus _bus;
@@ -14,7 +14,7 @@ public:
 
     const char *name() const { return _name; }
 
-    constexpr DeviceDriver(DeviceBus bus, const char *name)
+    constexpr DeviceMatcher(DeviceBus bus, const char *name)
         : _bus(bus),
           _name(name)
     {
@@ -27,4 +27,4 @@ public:
 
 void driver_initialize();
 
-DeviceDriver *driver_for(DeviceAddress address);
+DeviceMatcher *driver_for(DeviceAddress address);

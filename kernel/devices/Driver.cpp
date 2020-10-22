@@ -18,52 +18,52 @@
 #include "kernel/drivers/VirtioGraphic.h"
 #include "kernel/drivers/VirtioNetwork.h"
 
-static Vector<DeviceDriver *> *_drivers;
+static Vector<DeviceMatcher *> *_matchers;
 
 void driver_initialize()
 {
     logger_info("Installing drivers...");
 
-    _drivers = new Vector<DeviceDriver *>();
+    _matchers = new Vector<DeviceMatcher *>();
 
-    _drivers->push_back(new PCIDeviceDriver<BGA>{"QEMU Graphics Adaptator", 0x1234, 0x1111});
-    _drivers->push_back(new PCIDeviceDriver<BGA>{"Virtual Box Graphics Adaptator", 0x80ee, 0xbeef});
+    _matchers->push_back(new PCIDeviceMatcher<BGA>{"QEMU Graphics Adaptator", 0x1234, 0x1111});
+    _matchers->push_back(new PCIDeviceMatcher<BGA>{"Virtual Box Graphics Adaptator", 0x80ee, 0xbeef});
 
-    _drivers->push_back(new PCIDeviceDriver<E1000>{"Intel 82577LM Ethernet Adaptator", 0x8086, 0x10EA});
-    _drivers->push_back(new PCIDeviceDriver<E1000>{"Intel I217 Ethernet Adaptator", 0x8086, 0x153A});
-    _drivers->push_back(new PCIDeviceDriver<E1000>{"Virtual Ethernet Adaptator", 0x8086, 0x100E});
+    _matchers->push_back(new PCIDeviceMatcher<E1000>{"Intel 82577LM Ethernet Adaptator", 0x8086, 0x10EA});
+    _matchers->push_back(new PCIDeviceMatcher<E1000>{"Intel I217 Ethernet Adaptator", 0x8086, 0x153A});
+    _matchers->push_back(new PCIDeviceMatcher<E1000>{"Virtual Ethernet Adaptator", 0x8086, 0x100E});
 
-    _drivers->push_back(new VirtioDeviceDriver<VirtioBlock>{"VirtI/O Block Device", VIRTIO_DEVICE_BLOCK});
-    _drivers->push_back(new VirtioDeviceDriver<VirtioConsole>{"VirtI/O Console Device", VIRTIO_DEVICE_CONSOLE});
-    _drivers->push_back(new VirtioDeviceDriver<VirtioEntropy>{"VirtI/O Entropy Device", VIRTIO_DEVICE_ENTROPY});
-    _drivers->push_back(new VirtioDeviceDriver<VirtioGraphic>{"VirtI/O Graphic Device", VIRTIO_DEVICE_GRAPHICS});
-    _drivers->push_back(new VirtioDeviceDriver<VirtioNetwork>{"VirtI/O Network Device", VIRTIO_DEVICE_NETWORK});
+    _matchers->push_back(new VirtioDeviceMatcher<VirtioBlock>{"VirtI/O Block Device", VIRTIO_DEVICE_BLOCK});
+    _matchers->push_back(new VirtioDeviceMatcher<VirtioConsole>{"VirtI/O Console Device", VIRTIO_DEVICE_CONSOLE});
+    _matchers->push_back(new VirtioDeviceMatcher<VirtioEntropy>{"VirtI/O Entropy Device", VIRTIO_DEVICE_ENTROPY});
+    _matchers->push_back(new VirtioDeviceMatcher<VirtioGraphic>{"VirtI/O Graphic Device", VIRTIO_DEVICE_GRAPHICS});
+    _matchers->push_back(new VirtioDeviceMatcher<VirtioNetwork>{"VirtI/O Network Device", VIRTIO_DEVICE_NETWORK});
 
-    _drivers->push_back(new LegacyDeviceDriver<LegacyKeyboard>{"Legacy Keyboard", LEGACY_KEYBOARD});
-    _drivers->push_back(new LegacyDeviceDriver<LegacyMouse>{"Legacy Mouse", LEGACY_MOUSE});
-    _drivers->push_back(new LegacyDeviceDriver<LegacySerial>{"Legacy Serial Port (COM1)", LEGACY_COM1});
-    _drivers->push_back(new LegacyDeviceDriver<LegacySerial>{"Legacy Serial Port (COM2)", LEGACY_COM2});
-    _drivers->push_back(new LegacyDeviceDriver<LegacySerial>{"Legacy Serial Port (COM3)", LEGACY_COM3});
-    _drivers->push_back(new LegacyDeviceDriver<LegacySerial>{"Legacy Serial Port (COM4)", LEGACY_COM4});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyKeyboard>{"Legacy Keyboard", LEGACY_KEYBOARD});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyMouse>{"Legacy Mouse", LEGACY_MOUSE});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM1)", LEGACY_COM1});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM2)", LEGACY_COM2});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM3)", LEGACY_COM3});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM4)", LEGACY_COM4});
 
-    _drivers->push_back(new UNIXDeviceDriver<UnixNull>{"Unix Null Device", UNIX_NULL});
-    _drivers->push_back(new UNIXDeviceDriver<UnixRandom>{"Unix Random Device", UNIX_RANDOM});
-    _drivers->push_back(new UNIXDeviceDriver<UnixZero>{"Unix Zero Device", UNIX_ZERO});
+    _matchers->push_back(new UNIXDeviceMatcher<UnixNull>{"Unix Null Device", UNIX_NULL});
+    _matchers->push_back(new UNIXDeviceMatcher<UnixRandom>{"Unix Random Device", UNIX_RANDOM});
+    _matchers->push_back(new UNIXDeviceMatcher<UnixZero>{"Unix Zero Device", UNIX_ZERO});
 
-    for (size_t i = 0; i < _drivers->count(); i++)
+    for (size_t i = 0; i < _matchers->count(); i++)
     {
-        logger_info("Driver: %s", (*_drivers)[i]->name());
+        logger_info("Driver: %s", (*_matchers)[i]->name());
     }
 }
 
-DeviceDriver *driver_for(DeviceAddress address)
+DeviceMatcher *driver_for(DeviceAddress address)
 {
-    for (size_t i = 0; i < _drivers->count(); i++)
+    for (size_t i = 0; i < _matchers->count(); i++)
     {
-        if ((*_drivers)[i]->bus() == address.bus() &&
-            (*_drivers)[i]->match(address))
+        if ((*_matchers)[i]->bus() == address.bus() &&
+            (*_matchers)[i]->match(address))
         {
-            return (*_drivers)[i];
+            return (*_matchers)[i];
         }
     }
 

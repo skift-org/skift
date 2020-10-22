@@ -17,14 +17,14 @@ public:
 };
 
 template <typename UNIXDeviceType>
-class UNIXDeviceDriver : public DeviceDriver
+class UNIXDeviceMatcher : public DeviceMatcher
 {
 private:
     UNIXAddress _address;
 
 public:
-    UNIXDeviceDriver(const char *name, UNIXAddress address)
-        : DeviceDriver(BUS_UNIX, name),
+    UNIXDeviceMatcher(const char *name, UNIXAddress address)
+        : DeviceMatcher(BUS_UNIX, name),
           _address(address)
     {
     }

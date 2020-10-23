@@ -171,61 +171,45 @@ Result sys_memory_get_handle(uintptr_t address, int *out_handle)
 
 Result sys_filesystem_mkdir(const char *dir_path)
 {
-    Path *path = task_resolve_directory(scheduler_running(), dir_path);
+    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
 
-    Result result = filesystem_mkdir(path);
-
-    path_destroy(path);
-
-    return result;
+    return filesystem_mkdir(task_resolve_directory(scheduler_running(), dir_path));
 }
 
 Result sys_filesystem_mkpipe(const char *fifo_path)
 {
-    Path *path = task_resolve_directory(scheduler_running(), fifo_path);
+    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
 
-    Result result = filesystem_mkpipe(path);
-
-    path_destroy(path);
-
-    return result;
+    return filesystem_mkpipe(task_resolve_directory(scheduler_running(), fifo_path));
 }
 
 Result sys_filesystem_link(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_resolve_directory(scheduler_running(), old_path);
-    Path *newp = task_resolve_directory(scheduler_running(), new_path);
+    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+
+    Path oldp = task_resolve_directory(scheduler_running(), old_path);
+    Path newp = task_resolve_directory(scheduler_running(), new_path);
 
     Result result = filesystem_mklink(oldp, newp);
-
-    path_destroy(oldp);
-    path_destroy(newp);
 
     return result;
 }
 
 Result sys_filesystem_unlink(const char *link_path)
 {
-    Path *path = task_resolve_directory(scheduler_running(), link_path);
+    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
 
-    Result result = filesystem_unlink(path);
-
-    path_destroy(path);
-
-    return result;
+    return filesystem_unlink(task_resolve_directory(scheduler_running(), link_path));
 }
 
 Result sys_filesystem_rename(const char *old_path, const char *new_path)
 {
-    Path *oldp = task_resolve_directory(scheduler_running(), old_path);
-    Path *newp = task_resolve_directory(scheduler_running(), new_path);
+    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
 
-    Result result = filesystem_rename(oldp, newp);
+    Path oldp = task_resolve_directory(scheduler_running(), old_path);
+    Path newp = task_resolve_directory(scheduler_running(), new_path);
 
-    path_destroy(oldp);
-    path_destroy(newp);
-
-    return result;
+    return filesystem_rename(oldp, newp);
 }
 
 /* --- System info getter --------------------------------------------------- */

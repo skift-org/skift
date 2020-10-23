@@ -152,9 +152,9 @@ void FileSystemModel::update()
     did_update();
 }
 
-void FileSystemModel::navigate(Path *path)
+void FileSystemModel::navigate(Path path)
 {
-    _current_path = path_as_modern_string(path);
+    _current_path = path.string();
     process_set_directory(_current_path.cstring());
     update();
 }

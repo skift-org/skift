@@ -78,11 +78,9 @@ Result task_fshandle_release(Task *task, int handle_index)
 
 ResultOr<int> task_fshandle_open(Task *task, const char *file_path, OpenFlag flags)
 {
-    auto p = task_resolve_directory(task, file_path);
+    auto resolved_path = task_resolve_directory(task, file_path);
 
-    auto result_or_handle = filesystem_open(p, flags);
-
-    path_destroy(p);
+    auto result_or_handle = filesystem_open(resolved_path, flags);
 
     if (!result_or_handle.success())
     {
@@ -286,8 +284,6 @@ ResultOr<int> task_fshandle_connect(Task *task, const char *socket_path)
     auto resolved_path = task_resolve_directory(task, socket_path);
 
     auto result_or_connection_handle = filesystem_connect(resolved_path);
-
-    path_destroy(resolved_path);
 
     if (!result_or_connection_handle.success())
     {

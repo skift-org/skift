@@ -1,6 +1,5 @@
 
 #include <libsystem/core/Plugs.h>
-#include <libsystem/io/Path.h>
 
 SystemInfo system_get_info()
 {

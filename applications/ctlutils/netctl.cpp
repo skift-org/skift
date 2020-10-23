@@ -1,4 +1,4 @@
-#include <abi/Paths.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 
 int main(int argc, char **argv)
@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 
     Stream *network_device = stream_open(NETWORK_DEVICE_PATH, OPEN_READ | OPEN_WRITE);
 
-    if (argc == 2 && String(argv[1]) == "-i")
+    if (argc == 2 && strcmp(argv[1], "-i") == 0)
     {
         IOCallNetworkSateAgs state = {};
 

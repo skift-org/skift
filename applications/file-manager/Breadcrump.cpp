@@ -3,22 +3,17 @@
 
 #include "file-manager/Breadcrumb.h"
 
-Breadcrumb::Breadcrumb(Widget *parent, Path *path) : Widget(parent)
+Breadcrumb::Breadcrumb(Widget *parent, Path path)
+    : Widget(parent), _path(path)
 {
-    _path = path_clone(path);
+    _path = path;
     _icon_computer = Icon::get("laptop");
     _icon_expand = Icon::get("chevron-right");
 }
 
-Breadcrumb::~Breadcrumb()
+void Breadcrumb::navigate(Path path)
 {
-    path_destroy(_path);
-}
-
-void Breadcrumb::navigate(Path *path)
-{
-    path_destroy(_path);
-    _path = path_clone(path);
+    _path = path;
     should_repaint();
 }
 
@@ -42,7 +37,7 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
 
     current += computer_icon_bound.width();
 
-    if (path_element_count(_path) != 0)
+    if (_path.length() > 0)
     {
         Rectangle expand_icon_bound(
             bound().x() + current,
@@ -59,11 +54,11 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
         current += expand_icon_bound.width();
     }
 
-    for (size_t i = 0; i < path_element_count(_path); i++)
+    for (size_t i = 0; i < _path.length(); i++)
     {
-        const char *element = path_peek_at(_path, i);
+        auto element = _path[i];
 
-        int text_width = font()->mesure_string(element).width();
+        int text_width = font()->mesure_string(element.cstring()).width();
 
         Rectangle element_bound(
             bound().x() + current,
@@ -73,13 +68,13 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
 
         painter.draw_string(
             *font(),
-            element,
+            element.cstring(),
             element_bound.position() + Vec2i(0, 19),
             color(THEME_FOREGROUND));
 
         current += text_width;
 
-        if (i != path_element_count(_path) - 1)
+        if (i != _path.length() - 1)
         {
             Rectangle expand_icon_bound(
                 bound().x() + current,

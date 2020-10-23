@@ -1,7 +1,7 @@
 #include <libsystem/core/CString.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Process.h>
+#include <libutils/Path.h>
 
 int main(int argc, char **argv)
 {
@@ -11,24 +11,8 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    Path *path = path_create(argv[1]);
-    const char *basename = path_filename(path);
-
-    if (basename == nullptr)
-    {
-        if (strcmp(argv[1], "") == 0)
-        {
-            printf(".\n");
-        }
-        else
-        {
-            printf("/\n");
-        }
-    }
-    else
-    {
-        printf("%s\n", basename);
-    }
+    Path path{argv[1]};
+    printf("%s\n", path.basename().cstring());
 
     return PROCESS_SUCCESS;
 }

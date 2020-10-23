@@ -47,8 +47,6 @@ public:
     {
     }
 
-    ~String() {}
-
     String &operator=(const String &other)
     {
         if (this != &other)
@@ -63,7 +61,7 @@ public:
     {
         if (this != &other)
         {
-            _buffer = move(other._buffer);
+            swap(_buffer, other._buffer);
         }
 
         return *this;
@@ -78,6 +76,11 @@ public:
 
     bool operator==(const String &other) const
     {
+        if (_buffer == other._buffer)
+        {
+            return true;
+        }
+
         if (length() != other.length())
         {
             return false;
@@ -116,6 +119,8 @@ public:
     {
         return at(index);
     }
+
+    RefPtr<StringStorage> underlying_storage() { return _buffer; }
 };
 
 template <>

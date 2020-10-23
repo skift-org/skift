@@ -22,7 +22,7 @@ Result FsDirectory::open(FsHandle *handle)
         auto record = &listing->entries[current_index];
         auto node = entry.node;
 
-        strcpy(record->name, entry.name);
+        strcpy(record->name, entry.name.cstring());
 
         record->stat.type = node->type();
         record->stat.size = node->size();
@@ -67,12 +67,12 @@ ResultOr<size_t> FsDirectory::read(FsHandle &handle, void *buffer, size_t size)
     }
 }
 
-RefPtr<FsNode> FsDirectory::find(const char *name)
+RefPtr<FsNode> FsDirectory::find(String name)
 {
     RefPtr<FsNode> result;
 
     _childs.foreach ([&](auto &entry) {
-        if (strcmp(entry.name, name) == 0)
+        if (entry.name == name)
         {
             result = entry.node;
 
@@ -85,28 +85,24 @@ RefPtr<FsNode> FsDirectory::find(const char *name)
     return result;
 }
 
-Result FsDirectory::link(const char *name, RefPtr<FsNode> child)
+Result FsDirectory::link(String name, RefPtr<FsNode> child)
 {
     if (find(name))
     {
         return ERR_FILE_EXISTS;
     }
 
-    FsDirectoryEntry entry = {};
-
-    strcpy(entry.name, name);
-    entry.node = child;
-
-    _childs.push_back(entry);
+    _childs.push_back({name, child});
 
     return SUCCESS;
 }
 
-Result FsDirectory::unlink(const char *name)
+Result FsDirectory::unlink(String name)
 {
+
     bool has_removed_an_entry = _childs.remove_all_match(
-        [&](auto &entry) {
-            return strcmp(entry.name, name) == 0;
+        [&](auto &e) {
+            return e.name == name;
         });
 
     if (has_removed_an_entry)

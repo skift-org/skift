@@ -28,6 +28,10 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
     {
         __plug_logger_lock();
 
+#ifndef __KERNEL__
+        stream_format(log_stream, "\e[1m");
+#endif
+
         if (process_this() >= 0)
         {
             stream_format(log_stream, "%3d: ", process_this());
@@ -38,6 +42,10 @@ void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ..
         }
 
         stream_format(log_stream, "%s: ", process_name());
+
+#ifndef __KERNEL__
+        stream_format(log_stream, "\e[m");
+#endif
 
         DateTime datetime = datetime_now();
         stream_format(log_stream, "%02d:%02d:%02d ", datetime.hour, datetime.minute, datetime.second);

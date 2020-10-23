@@ -1,25 +1,23 @@
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/tasking/Task.h"
 
-Path *task_resolve_directory_internal(Task *task, const char *buffer)
+Path task_resolve_directory_internal(Task *task, const char *buffer)
 {
     lock_assert(task->directory_lock);
 
-    Path *path = path_create(buffer);
+    Path path{buffer};
 
-    if (path_is_relative(path))
+    if (path.relative())
     {
-        Path *combined = path_combine(task->directory, path);
-        path_destroy(path);
-        path = combined;
+        path = *task->directory + path;
     }
 
-    path_normalize(path);
+    path = path.normalized();
 
     return path;
 }
 
-Path *task_resolve_directory(Task *task, const char *buffer)
+Path task_resolve_directory(Task *task, const char *buffer)
 {
     LockHolder holder(task->directory_lock);
 
@@ -29,39 +27,30 @@ Path *task_resolve_directory(Task *task, const char *buffer)
 Result task_set_directory(Task *task, const char *buffer)
 {
     LockHolder holder(task->directory_lock);
-    Result result = SUCCESS;
 
-    Path *path = task_resolve_directory_internal(task, buffer);
-    auto node = filesystem_find_and_ref(path);
+    Path path = task_resolve_directory_internal(task, buffer);
+    auto node = filesystem_find(path);
 
     if (node == nullptr)
     {
-        result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
     if (node->type() != FILE_TYPE_DIRECTORY)
     {
-        result = ERR_NOT_A_DIRECTORY;
-        goto cleanup_and_return;
+        return ERR_NOT_A_DIRECTORY;
     }
 
-    path_destroy(task->directory);
-    task->directory = path;
-    path = nullptr;
+    *task->directory = path;
 
-cleanup_and_return:
-    if (path)
-        path_destroy(path);
-
-    return result;
+    return SUCCESS;
 }
 
 Result task_get_directory(Task *task, char *buffer, uint size)
 {
     LockHolder holder(task->directory_lock);
 
-    path_to_cstring(task->directory, buffer, size);
+    strlcpy(buffer, task->directory->string().cstring(), size);
 
     return SUCCESS;
 }

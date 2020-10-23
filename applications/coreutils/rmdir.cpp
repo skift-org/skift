@@ -1,8 +1,8 @@
 #include <libsystem/cmdline/CMDLine.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Filesystem.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/Path.h>
 
 static bool ignore_fail_on_non_empty = false,
             remove_parents = false,
@@ -26,7 +26,8 @@ static CommandLineOption options[] = {
     COMMANDLINE_OPT_BOOL("verbose", 'v', verbose,
                          "output a diagnostic for every directory processed",
                          COMMANDLINE_NO_CALLBACK),
-    COMMANDLINE_OPT_END};
+    COMMANDLINE_OPT_END,
+};
 
 static CommandLine cmdline = CMDLINE(
     usages,
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
     {
         if (!remove_parents)
         {
-            Result result = rmdir(argv[i]);
+            auto result = rmdir(argv[i]);
 
             if (result_is_error(result))
             {
@@ -96,21 +97,18 @@ int main(int argc, char **argv)
         }
         else
         {
-            Path *p = path_create(argv[i]);
-            size_t children_count = path_element_count(p);
+            Path path{argv[i]};
 
-            for (size_t j = 0; j < children_count; j++)
+            while (path.length() > 0)
             {
-                Result result = rmdir(path_as_string(p));
-                path_pop(p);
+                auto result = rmdir(path.string().cstring());
+                path = {path.dirname()};
 
                 if (result_is_error(result))
                 {
                     printf("rmdir: failed to remove '%s': %s\n", argv[i], get_result_description(result));
                 }
             }
-
-            path_destroy(p);
         }
     }
 

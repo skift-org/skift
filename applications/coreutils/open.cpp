@@ -1,22 +1,22 @@
 #include <libjson/Json.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
+#include <libutils/Path.h>
 
 #define FILE_EXTENSIONS_DATABASE_PATH "/System/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/System/Configs/open/file-types.json"
 
-Result open(Path *path)
+Result open(Path path)
 {
-    char *pathstr = path_as_string(path);
-    const char *extension = path_extension(path);
+    auto extension = path.extension();
 
-    if (extension == nullptr)
+    if (extension == "")
     {
         return ERR_EXTENSION;
     }
+
     auto file_extensions = json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
 
     if (!json::is(file_extensions, json::OBJECT))
@@ -25,7 +25,7 @@ Result open(Path *path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    auto file_type = json::object_get(file_extensions, extension);
+    auto file_type = json::object_get(file_extensions, extension.cstring());
 
     if (!json::is(file_type, json::STRING))
     {
@@ -60,10 +60,8 @@ Result open(Path *path)
     snprintf(application_path, PATH_LENGTH, "/Applications/%s/%s", application_name, application_name);
 
     Launchpad *launchpad = launchpad_create(application_name, application_path);
-    launchpad_argument(launchpad, pathstr);
-
+    launchpad_argument(launchpad, path.string().cstring());
     Result result = launchpad_launch(launchpad, nullptr);
-    free(pathstr);
 
     return result;
 }
@@ -76,9 +74,8 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    Path *path = path_create(argv[1]);
+    Path path{argv[1]};
     Result result = open(path);
-
     if (result != SUCCESS)
     {
         stream_format(err_stream, "%s: %s: %s", argv[0], argv[1], get_result_description(result));

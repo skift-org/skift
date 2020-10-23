@@ -3,8 +3,9 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Lock.h>
-#include <libutils/RefCounted.h>
+#include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
+#include <libutils/String.h>
 
 struct FsNode;
 struct FsHandle;
@@ -101,14 +102,14 @@ public:
         return ERR_NOT_WRITABLE;
     }
 
-    virtual RefPtr<FsNode> find(const char *name)
+    virtual RefPtr<FsNode> find(String name)
     {
         __unused(name);
 
         return nullptr;
     }
 
-    virtual Result link(const char *name, RefPtr<FsNode> child)
+    virtual Result link(String name, RefPtr<FsNode> child)
     {
         __unused(name);
         __unused(child);
@@ -116,7 +117,7 @@ public:
         return ERR_OPERATION_NOT_SUPPORTED;
     }
 
-    virtual Result unlink(const char *name)
+    virtual Result unlink(String name)
     {
         __unused(name);
 

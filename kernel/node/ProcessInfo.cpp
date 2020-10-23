@@ -26,7 +26,7 @@ static Iteration serialize_task(json::Value *destination, Task *task)
     json::object_put(task_object, "id", json::create_integer(task->id));
     json::object_put(task_object, "name", json::create_string(task->name));
     json::object_put(task_object, "state", json::create_string(task_state_string(task->state())));
-    json::object_put(task_object, "directory", json::create_string_adopt(path_as_string(task->directory)));
+    json::object_put(task_object, "directory", json::create_string(task->directory->string().cstring()));
     json::object_put(task_object, "cpu", json::create_integer(scheduler_get_usage(task->id)));
     json::object_put(task_object, "ram", json::create_integer(task_memory_usage(task)));
     json::object_put(task_object, "user", json::create_boolean(task->user));
@@ -73,5 +73,5 @@ ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size
 
 void process_info_initialize()
 {
-    filesystem_link_cstring("/System/processes", make<FsProcessInfo>());
+    filesystem_link("/System/processes", make<FsProcessInfo>());
 }

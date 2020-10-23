@@ -2,31 +2,31 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/utils/BufferBuilder.h>
+#include <libutils/Path.h>
 
 void list_pages()
 {
     const char *manpages = "/System/Manuals/";
 
     Directory *directory = directory_open(manpages, OPEN_READ);
-    DirectoryEntry entry;
 
+    DirectoryEntry entry;
     while (directory_read(directory, &entry) > 0)
     {
-        auto buf = buffer_builder_create(strlen(manpages) + strlen(entry.name));
-        buffer_builder_append_str(buf, manpages);
-        buffer_builder_append_str(buf, entry.name);
+        Path manpage_path{
+            StringBuilder()
+                .append(manpages)
+                .append(entry.name)
+                .finalize(),
+        };
 
-        const char *buffer = buffer_builder_intermediate(buf);
-        Path *p = path_create(buffer);
-        if (strcmp(path_extension(p), ".json") == 0)
+        if (manpage_path.extension() == ".json")
         {
-            String file = path_filename_without_extension(p);
-            printf("%s\n", file.cstring());
+            printf("%s\n", manpage_path.basename_without_extension().cstring());
         }
-        path_destroy(p);
-        buffer_builder_destroy(buf);
     }
+
+    directory_close(directory);
 }
 
 int main(int argc, char **argv)

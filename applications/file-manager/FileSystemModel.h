@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libsystem/io/Path.h>
 #include <libsystem/utils/List.h>
+#include <libutils/Path.h>
 #include <libutils/Vector.h>
 #include <libwidget/model/TableModel.h>
 
@@ -32,7 +32,7 @@ public:
 
     void update() override;
 
-    void navigate(Path *path);
+    void navigate(Path path);
 
     String file_name(int index);
 

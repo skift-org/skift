@@ -15,13 +15,13 @@ void ramdisk_load(Module *module)
     TARBlock block;
     for (size_t i = 0; tar_read((void *)module->range.base(), &block, i); i++)
     {
-        Path *file_path = path_create(block.name);
+        Path file_path = {block.name};
 
         if (block.name[strlen(block.name) - 1] == '/')
         {
             Result result = filesystem_mkdir(file_path);
 
-            if (result < 0)
+            if (result != SUCCESS)
             {
                 logger_warn("Failed to create directory %s: %s", block.name, result_to_string(result));
             }
@@ -49,12 +49,8 @@ void ramdisk_load(Module *module)
         }
         else if (block.name[strlen(block.name) - 1] != '/')
         {
-            Path *linkname = path_create(block.linkname);
-            filesystem_mklink_for_tar(file_path, linkname);
-            path_destroy(linkname);
+            filesystem_mklink_for_tar(file_path, block.linkname);
         }
-
-        path_destroy(file_path);
     }
 
     memory_free(arch_kernel_address_space(), module->range);

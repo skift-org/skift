@@ -1,5 +1,6 @@
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/Path.h>
 
 // implementation of cp open a input stream from file to copied and create a new file and open it as output stream and
 // paste all the content into it.
@@ -9,24 +10,24 @@
 // - only copy if file already exists
 // - only logs if used with option -v
 
-Result copy_file(Path *src, Path *dst)
+Result copy_file(Path src, Path dst)
 {
-    char *pathsrc = path_as_string(src);
-    char *pathdst = path_as_string(dst);
+    auto pathsrc = src.string();
+    auto pathdst = dst.string();
 
-    __cleanup(stream_cleanup) Stream *streamin = stream_open(pathsrc, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *streamin = stream_open(pathsrc.cstring(), OPEN_READ);
 
     if (handle_has_error(streamin))
     {
-        handle_printf_error(streamin, "cp: Cannot access %s", pathsrc);
+        handle_printf_error(streamin, "cp: Cannot access %s", pathsrc.cstring());
         return handle_get_error(streamin);
     }
 
-    __cleanup(stream_cleanup) Stream *streamout = stream_open(pathdst, OPEN_WRITE | OPEN_CREATE);
+    __cleanup(stream_cleanup) Stream *streamout = stream_open(pathdst.cstring(), OPEN_WRITE | OPEN_CREATE);
 
     if (handle_has_error(streamout))
     {
-        handle_printf_error(streamout, "cp: Cannot access %s", pathdst);
+        handle_printf_error(streamout, "cp: Cannot access %s", pathdst.cstring());
         return handle_get_error(streamout);
     }
 
@@ -37,7 +38,7 @@ Result copy_file(Path *src, Path *dst)
     {
         if (handle_has_error(streamin))
         {
-            handle_printf_error(streamin, "cp: Failed to read from %s", pathsrc);
+            handle_printf_error(streamin, "cp: Failed to read from %s", pathsrc.cstring());
             return handle_get_error(streamin);
         }
 
@@ -45,15 +46,12 @@ Result copy_file(Path *src, Path *dst)
 
         if (handle_has_error(streamout))
         {
-            handle_printf_error(streamout, "cp: Failed to write to %s", pathdst);
+            handle_printf_error(streamout, "cp: Failed to write to %s", pathdst.cstring());
             return handle_get_error(streamout);
         }
     }
     stream_close(streamin);
     stream_close(streamout);
-
-    free(pathsrc);
-    free(pathdst);
 
     return SUCCESS;
 }
@@ -72,10 +70,7 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    Path *src = path_create(argv[1]);
-    Path *dst = path_create(argv[2]);
-
-    Result result = copy_file(src, dst);
+    Result result = copy_file(argv[1], argv[2]);
 
     if (result != SUCCESS)
     {

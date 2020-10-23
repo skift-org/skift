@@ -32,15 +32,15 @@ void filesystem_initialize()
     logger_info("File system root at 0x%x", _filesystem_root);
 }
 
-RefPtr<FsNode> filesystem_find_and_ref(Path *path)
+RefPtr<FsNode> filesystem_find(Path path)
 {
     auto current = filesystem_root();
 
-    for (size_t i = 0; i < path_element_count(path); i++)
+    for (size_t i = 0; i < path.length(); i++)
     {
         if (current && current->type() == FILE_TYPE_DIRECTORY)
         {
-            const char *element = path_peek_at(path, i);
+            auto element = path[i];
 
             current->acquire(scheduler_running_id());
             auto found = current->find(element);
@@ -57,24 +57,15 @@ RefPtr<FsNode> filesystem_find_and_ref(Path *path)
     return current;
 }
 
-RefPtr<FsNode> filesystem_find_parent_and_ref(Path *path)
-{
-    const char *child_name = path_pop(path);
-    auto parent = filesystem_find_and_ref(path);
-    path_push(path, child_name);
-
-    return parent;
-}
-
-ResultOr<FsHandle *> filesystem_open(Path *path, OpenFlag flags)
+ResultOr<FsHandle *> filesystem_open(Path path, OpenFlag flags)
 {
     bool should_create_if_not_present = (flags & OPEN_CREATE) == OPEN_CREATE;
 
-    auto node = filesystem_find_and_ref(path);
+    auto node = filesystem_find(path);
 
     if (!node && should_create_if_not_present)
     {
-        auto parent = filesystem_find_parent_and_ref(path);
+        auto parent = filesystem_find(path.dirpath());
 
         if (parent)
         {
@@ -88,7 +79,7 @@ ResultOr<FsHandle *> filesystem_open(Path *path, OpenFlag flags)
             }
 
             parent->acquire(scheduler_running_id());
-            parent->link(path_filename(path), node);
+            parent->link(path.basename(), node);
             parent->release(scheduler_running_id());
         }
     }
@@ -121,9 +112,9 @@ ResultOr<FsHandle *> filesystem_open(Path *path, OpenFlag flags)
     return new FsHandle(node, flags);
 }
 
-ResultOr<FsHandle *> filesystem_connect(Path *path)
+ResultOr<FsHandle *> filesystem_connect(Path path)
 {
-    auto node = filesystem_find_and_ref(path);
+    auto node = filesystem_find(path);
 
     if (!node)
     {
@@ -152,9 +143,9 @@ ResultOr<FsHandle *> filesystem_connect(Path *path)
     return connection_handle;
 }
 
-Result filesystem_mkdir(Path *path)
+Result filesystem_mkdir(Path path)
 {
-    if (path_element_count(path) == 0)
+    if (path.length() == 0)
     {
         // We are tring to create /
         return ERR_FILE_EXISTS;
@@ -163,14 +154,14 @@ Result filesystem_mkdir(Path *path)
     return filesystem_link(path, make<FsDirectory>());
 }
 
-Result filesystem_mkpipe(Path *path)
+Result filesystem_mkpipe(Path path)
 {
     return filesystem_link(path, make<FsPipe>());
 }
 
-Result filesystem_mklink(Path *old_path, Path *new_path)
+Result filesystem_mklink(Path old_path, Path new_path)
 {
-    auto destination = filesystem_find_and_ref(old_path);
+    auto destination = filesystem_find(old_path);
 
     if (!destination)
     {
@@ -186,9 +177,9 @@ Result filesystem_mklink(Path *old_path, Path *new_path)
 }
 
 // This version allow
-Result filesystem_mklink_for_tar(Path *old_path, Path *new_path)
+Result filesystem_mklink_for_tar(Path old_path, Path new_path)
 {
-    auto child = filesystem_find_and_ref(old_path);
+    auto child = filesystem_find(old_path);
 
     if (!child)
     {
@@ -198,21 +189,13 @@ Result filesystem_mklink_for_tar(Path *old_path, Path *new_path)
     return filesystem_link(new_path, child);
 }
 
-Result filesystem_link_cstring(const char *path, RefPtr<FsNode> node)
+Result filesystem_link(Path path, RefPtr<FsNode> node)
 {
-    Path *path_object = path_create(path);
-    Result result = filesystem_link(path_object, node);
-    path_destroy(path_object);
-
-    return result;
-}
-
-Result filesystem_link(Path *path, RefPtr<FsNode> node)
-{
-    auto parent = filesystem_find_parent_and_ref(path);
+    auto parent = filesystem_find(path.dirpath());
 
     if (!parent)
     {
+        ASSERT_NOT_REACHED();
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
@@ -222,17 +205,17 @@ Result filesystem_link(Path *path, RefPtr<FsNode> node)
     }
 
     parent->acquire(scheduler_running_id());
-    auto result = parent->link(path_filename(path), node);
+    auto result = parent->link(path.basename(), node);
     parent->release(scheduler_running_id());
 
     return result;
 }
 
-Result filesystem_unlink(Path *path)
+Result filesystem_unlink(Path path)
 {
-    auto parent = filesystem_find_parent_and_ref(path);
+    auto parent = filesystem_find(path.dirpath());
 
-    if (!parent || !path_filename(path))
+    if (!parent || path.length() == 0)
     {
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
@@ -243,17 +226,17 @@ Result filesystem_unlink(Path *path)
     }
 
     parent->acquire(scheduler_running_id());
-    auto result = parent->unlink(path_filename(path));
+    auto result = parent->unlink(path.basename());
     parent->release(scheduler_running_id());
 
     return result;
 }
 
 // FIXME: check for loops when renaming directory
-Result filesystem_rename(Path *old_path, Path *new_path)
+Result filesystem_rename(Path old_path, Path new_path)
 {
-    auto old_parent = filesystem_find_parent_and_ref(old_path);
-    auto new_parent = filesystem_find_parent_and_ref(new_path);
+    auto old_parent = filesystem_find(old_path.dirpath());
+    auto new_parent = filesystem_find(new_path.dirpath());
 
     if (!old_parent || !new_parent)
     {
@@ -273,7 +256,7 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         old_parent->acquire(scheduler_running_id());
     }
 
-    auto child = old_parent->find(path_filename(old_path));
+    auto child = old_parent->find(old_path.basename());
 
     Result result = SUCCESS;
 
@@ -283,11 +266,11 @@ Result filesystem_rename(Path *old_path, Path *new_path)
         goto unlock_cleanup_and_return;
     }
 
-    result = new_parent->link(path_filename(new_path), child);
+    result = new_parent->link(new_path.basename(), child);
 
     if (result == SUCCESS)
     {
-        result = old_parent->unlink(path_filename(old_path));
+        result = old_parent->unlink(old_path.basename());
     }
 
 unlock_cleanup_and_return:

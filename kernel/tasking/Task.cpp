@@ -73,11 +73,11 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     if (parent)
     {
-        task->directory = path_clone(parent->directory);
+        task->directory = new Path(*parent->directory);
     }
     else
     {
-        task->directory = path_create("/");
+        task->directory = new Path("/");
     }
 
     // Setup fildes
@@ -121,7 +121,7 @@ void task_destroy(Task *task)
 
     task_fshandle_close_all(task);
 
-    path_destroy(task->directory);
+    delete task->directory;
 
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});

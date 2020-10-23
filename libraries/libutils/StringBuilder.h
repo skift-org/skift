@@ -17,7 +17,13 @@ private:
     char *_buffer;
 
 public:
+    size_t length() const
+    {
+        return _used;
+    }
+
     StringBuilder() : StringBuilder(16) {}
+
     StringBuilder(size_t preallocated)
     {
         preallocated = MAX(preallocated, 16);
@@ -29,7 +35,8 @@ public:
 
     ~StringBuilder()
     {
-        delete[] _buffer;
+        if (_buffer)
+            delete[] _buffer;
     }
 
     String finalize()

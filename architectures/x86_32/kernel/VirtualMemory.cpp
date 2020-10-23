@@ -1,5 +1,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/thread/Atomic.h>
+#include <libsystem/Logger.h>
+#include <libsystem/core/CString.h>
 
 #include "architectures/VirtualMemory.h"
 #include "architectures/x86_32/kernel/Paging.h"

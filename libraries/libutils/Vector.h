@@ -10,22 +10,44 @@
 #include <libutils/RefPtr.h>
 
 template <typename T>
+void typed_copy(T *destination, T *source, size_t count)
+{
+    if constexpr (std::is_trivially_copyable_v<T>)
+    {
+        memcpy(destination, source, sizeof(T) * count);
+    }
+    else
+    {
+        for (size_t i = 0; i < count; i++)
+        {
+            new (&destination[i]) T(source[i]);
+        }
+    }
+}
+
+template <typename T>
+void typed_move(T *destination, T *source, size_t count)
+{
+    for (size_t i = 0; i < count; i++)
+    {
+        if (destination <= source)
+        {
+            new (&destination[i]) T(move(source[i]));
+        }
+        else
+        {
+            new (&destination[count - i - 1]) T(move(source[count - i - 1]));
+        }
+    }
+}
+
+template <typename T>
 class Vector
 {
 private:
     T *_storage = nullptr;
     size_t _count = 0;
     size_t _capacity = 0;
-
-    void remove_index_but_dont_destroy(size_t index)
-    {
-        for (size_t j = index + 1; j < _count; j++)
-        {
-            new (&_storage[j - 1]) T(move(_storage[j]));
-        }
-
-        shrink();
-    }
 
 public:
     size_t count() const { return _count; }
@@ -50,33 +72,19 @@ public:
     {
     }
 
-    Vector(Vector &other)
+    Vector(const Vector &other)
     {
         ensure_capacity(other.count());
 
         _count = other.count();
-        if constexpr (std::is_trivially_copyable_v<T>)
-        {
-            memcpy(_storage, other._storage, sizeof(T) * _count);
-        }
-        else
-        {
-            for (size_t i = 0; i < _count; i++)
-            {
-                new (&_storage[i]) T(other._storage[i]);
-            }
-        }
+        typed_copy(_storage, other._storage, _count);
     }
 
     Vector(Vector &&other)
     {
-        _storage = other._storage;
-        _capacity = other._capacity;
-        _count = other.count();
-
-        other._storage = nullptr;
-        other._capacity = 0;
-        other._count = 0;
+        swap(_storage, other._storage);
+        swap(_count, other._count);
+        swap(_capacity, other._capacity);
     }
 
     ~Vector()
@@ -87,6 +95,30 @@ public:
             free(_storage);
     }
 
+    Vector &operator=(const Vector &other)
+    {
+        if (this != &other)
+        {
+            ensure_capacity(other.count());
+            _count = other.count();
+            typed_copy(_storage, other._storage, _count);
+        }
+
+        return *this;
+    }
+
+    Vector &operator=(Vector &&other)
+    {
+        if (this != &other)
+        {
+            swap(_storage, other._storage);
+            swap(_count, other._count);
+            swap(_capacity, other._capacity);
+        }
+
+        return *this;
+    }
+
     T &operator[](size_t index)
     {
         assert(index < _count);
@@ -94,8 +126,43 @@ public:
         return _storage[index];
     }
 
+    const T &operator[](size_t index) const
+    {
+        assert(index < _count);
+
+        return _storage[index];
+    }
+
+    bool operator==(const Vector &other) const
+    {
+        if (this == &other)
+        {
+            return true;
+        }
+
+        if (_count != other._count)
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < _count; i++)
+        {
+            if (_storage[i] != other._storage[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void clear()
     {
+        if (!_storage)
+        {
+            return;
+        }
+
         if constexpr (!std::is_trivially_destructible_v<T>)
         {
             for (size_t i = 0; i < _count; i++)
@@ -152,7 +219,9 @@ public:
         capacity = MAX(_count, capacity);
 
         if (capacity <= _capacity)
+        {
             return;
+        }
 
         size_t new_capacity = _capacity;
 
@@ -208,6 +277,7 @@ public:
             for (size_t i = 0; i < _count; i++)
             {
                 new (&new_storage[i]) T(move(_storage[i]));
+                _storage[i].~T();
             }
 
             free(_storage);
@@ -276,7 +346,14 @@ public:
         assert(index < _count);
 
         _storage[index].~T();
-        remove_index_but_dont_destroy(index);
+
+        for (size_t i = index; i < _count - 1; ++i)
+        {
+            new (&_storage[i]) T(move(_storage[i + 1]));
+            _storage[i + 1].~T();
+        }
+
+        shrink();
     }
 
     void remove_value(const T &value)
@@ -338,7 +415,7 @@ public:
         return insert(_count, value);
     }
 
-    void push_back_many(Vector<T> &values)
+    void push_back_many(const Vector<T> &values)
     {
         for (size_t i = 0; i < values.count(); i++)
         {
@@ -351,8 +428,7 @@ public:
         assert(_count > 0);
 
         T value = move(_storage[0]);
-
-        remove_index_but_dont_destroy(0);
+        remove_index(0);
 
         return value;
     }
@@ -362,7 +438,7 @@ public:
         assert(_count > 0);
 
         T value = move(_storage[_count - 1]);
-        remove_index_but_dont_destroy(_count - 1);
+        remove_index(_count - 1);
 
         return value;
     }

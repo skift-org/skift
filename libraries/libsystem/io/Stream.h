@@ -2,11 +2,11 @@
 
 /* stream.h: generic io interface                                           */
 
-#include <libsystem/io/Handle.h>
-#include <libsystem/io/Path.h>
-
 #include <abi/Filesystem.h>
 #include <abi/IOCall.h>
+#include <abi/Paths.h>
+
+#include <libsystem/io/Handle.h>
 
 enum StreamBufferMode
 {

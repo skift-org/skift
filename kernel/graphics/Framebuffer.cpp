@@ -96,5 +96,5 @@ void framebuffer_initialize(Handover *handover)
 
     graphic_did_find_framebuffer(_framebuffer_virtual, _framebuffer_width, _framebuffer_height);
 
-    filesystem_link_cstring(FRAMEBUFFER_DEVICE_PATH, make<Framebuffer>());
+    filesystem_link(FRAMEBUFFER_DEVICE_PATH, make<Framebuffer>());
 }

@@ -4,7 +4,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
-#include <libsystem/io/Path.h>
+#include <libutils/Path.h>
 
 static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {

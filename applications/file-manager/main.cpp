@@ -30,12 +30,13 @@ private:
     RefPtr<FileSystemModel> _model;
 
     /// --- Navigation --- ///
-    List *_backward_history;
-    Path *_current_path;
-    List *_foreward_history;
+    Vector<Path> _backward_history{};
+    Path _current_path;
+    Vector<Path> _foreward_history{};
 
 public:
-    FileExplorerWindow(const char *path) : Window(WINDOW_RESIZABLE)
+    FileExplorerWindow(const char *path)
+        : Window(WINDOW_RESIZABLE), _current_path(path)
     {
         icon(Icon::get("folder"));
         title("File Manager");
@@ -43,57 +44,44 @@ public:
 
         root()->layout(VFLOW(0));
 
-        _current_path = path_create(path);
-        _backward_history = list_create();
-        _foreward_history = list_create();
-
         /// --- Navigation bar --- ///
         Widget *toolbar = toolbar_create(root());
 
         _go_backward = toolbar_icon_create(toolbar, Icon::get("arrow-left"));
 
         _go_backward->on(Event::ACTION, [this](auto) {
-            if (_backward_history->any())
+            if (_backward_history.any())
             {
-                Path *path = nullptr;
-                list_popback(_backward_history, (void **)&path);
-
-                navigate(path, RECORD_FOREWARD);
+                navigate(_backward_history.pop_back(), RECORD_FOREWARD);
             }
         });
 
         _go_foreward = toolbar_icon_create(toolbar, Icon::get("arrow-right"));
 
         _go_foreward->on(Event::ACTION, [this](auto) {
-            if (_foreward_history->any())
+            if (_foreward_history.any())
             {
-                Path *path = nullptr;
-                list_popback(_foreward_history, (void **)&path);
-
-                navigate(path, RECORD_BACKWARD);
+                navigate(_foreward_history.pop_back(), RECORD_BACKWARD);
             }
         });
 
         _go_up = toolbar_icon_create(toolbar, Icon::get("arrow-up"));
 
         _go_up->on(Event::ACTION, [this](auto) {
-            Path *new_path = path_clone(_current_path);
-            char *poped_element = path_pop(new_path);
-
-            if (poped_element)
+            if (_current_path.length() == 0)
             {
-                free(poped_element);
-
-                clear_foreward_history();
-                navigate(new_path, RECORD_BACKWARD);
+                return;
             }
+
+            clear_foreward_history();
+            navigate(_current_path.dirname(), RECORD_FOREWARD);
         });
 
         _go_home = toolbar_icon_create(toolbar, Icon::get("home"));
 
         _go_home->on(Event::ACTION, [this](auto) {
             clear_foreward_history();
-            navigate(path_create("/User"), RECORD_BACKWARD);
+            navigate("/User", RECORD_BACKWARD);
         });
 
         new Separator(toolbar);
@@ -130,9 +118,8 @@ public:
             {
                 if (_model->file_type(_table->selected()) == FILE_TYPE_DIRECTORY)
                 {
-                    Path *new_path = path_clone(_current_path);
-                    path_push(new_path, strdup(_model->file_name(_table->selected()).cstring()));
                     clear_foreward_history();
+                    auto new_path = _current_path + _model->file_name(_table->selected());
                     navigate(new_path, RECORD_BACKWARD);
                 }
                 else
@@ -151,16 +138,15 @@ public:
 
     void update_navigation_bar()
     {
-        _go_backward->enable_if(_backward_history->any());
-        _go_foreward->enable_if(_foreward_history->any());
-        _go_up->enable_if(path_element_count(_current_path) > 0);
+        _go_backward->enable_if(_backward_history.any());
+        _go_foreward->enable_if(_foreward_history.any());
+        _go_up->enable_if(_current_path.length() > 0);
     }
 
-    void navigate(Path *path, RecordHistory record_history)
+    void navigate(Path path, RecordHistory record_history)
     {
-        if (path_equals(_current_path, path))
+        if (_current_path == path)
         {
-            path_destroy(path);
             return;
         }
 
@@ -169,17 +155,11 @@ public:
 
         if (record_history == RECORD_BACKWARD)
         {
-            if (_current_path)
-            {
-                list_pushback(_backward_history, _current_path);
-            }
+            _backward_history.push_back(_current_path);
         }
         else if (record_history == RECORD_FOREWARD)
         {
-            if (_current_path)
-            {
-                list_pushback(_foreward_history, _current_path);
-            }
+            _foreward_history.push_back(_current_path);
         }
 
         _current_path = path;
@@ -191,7 +171,7 @@ public:
 
     void clear_foreward_history()
     {
-        list_clear_with_callback(_foreward_history, (ListDestroyElementCallback)path_destroy);
+        _foreward_history.clear();
     }
 };
 

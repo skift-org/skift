@@ -1,7 +1,7 @@
 #include <libgraphic/Bitmap.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io/Path.h>
 #include <libsystem/system/System.h>
+#include <libutils/Path.h>
 
 #include "compositor/Cursor.h"
 #include "compositor/Manager.h"

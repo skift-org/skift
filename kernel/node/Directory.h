@@ -12,7 +12,7 @@ struct DirectoryListing
 
 struct FsDirectoryEntry
 {
-    char name[FILE_NAME_LENGTH];
+    String name;
     RefPtr<FsNode> node;
 };
 
@@ -30,9 +30,9 @@ public:
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
-    RefPtr<FsNode> find(const char *name) override;
+    RefPtr<FsNode> find(String name) override;
 
-    Result link(const char *name, RefPtr<FsNode> child) override;
+    Result link(String name, RefPtr<FsNode> child) override;
 
-    Result unlink(const char *name) override;
+    Result unlink(String name) override;
 };

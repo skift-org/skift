@@ -56,6 +56,18 @@ int main(int argc, char **argv)
         button->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::DIVIDE); });
     });
 
+    window->with_widget<Button>("button_reciprocal", [&](auto button) {
+        button->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::RECIPROCAL); });
+    });
+
+    window->with_widget<Button>("button_sqrt", [&](auto button) {
+        button->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::SQRT); });
+    });
+
+    window->with_widget<Button>("button_exp", [&](auto button) {
+        button->on(Event::ACTION, [&](auto) { calculator.enter_operation(Operation::POWER); });
+    });
+
     window->with_widget<Button>("button_equal", [&](auto button) {
         button->on(Event::ACTION, [&](auto) { calculator.equal(); });
     });

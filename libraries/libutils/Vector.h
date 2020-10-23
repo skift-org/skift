@@ -386,7 +386,7 @@ public:
 
         for (size_t i = 0; i < _count; i++)
         {
-            while (match(_storage[i]) && i < _count)
+            while (i < _count && match(_storage[i]))
             {
                 remove_index(i);
                 has_removed_something = true;

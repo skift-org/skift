@@ -125,15 +125,15 @@ public:
     AC97(DeviceAddress address);
     ~AC97();
 
-    void handle_interrupt() override;
+    // void handle_interrupt() override;
 
     // bool can_write(FsHandle &handle) override;
 
     // bool can_read(FsHandle &handle) override;
 
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
+    // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
-    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
+    // ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
 
-    Result call(FsHandle &handle, IOCall request, void *args) override;
+    // Result call(FsHandle &handle, IOCall request, void *args) override;
 };

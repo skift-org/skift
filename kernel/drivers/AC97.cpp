@@ -41,6 +41,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
 
     // default the pcm output to full volume
     out16(nambar + AC97_PCM_OUT_VOLUME, 0x0000);
+
     initialise_buffers();
 
     // tell the ac97 where buffer descriptor list is
@@ -68,6 +69,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
 
     out8(nabmbar + AC97_PO_CR, in8(nabmbar + AC97_PO_CR) | AC97_X_CR_RPBM);
 
+    logger_trace("AC97 initialised successfully");
     // debug_print(NOTICE, "AC97 initialized successfully");
 
     //start device playing
@@ -87,3 +89,12 @@ void AC97::initialise_buffers()
         buffer_descriptors_list[i].cl |= AC97_CL_IOC;
     }
 }
+
+AC97::~AC97() { ; }
+
+// void AC97::handle_interrupt() { ; }
+// ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) { ; };
+
+// ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) { ; };
+
+// Result call(FsHandle &handle, IOCall request, void *args) { ; };

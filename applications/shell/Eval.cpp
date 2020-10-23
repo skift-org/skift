@@ -66,14 +66,7 @@ Result shell_exec(ShellCommand *command, Stream *stdin, Stream *stdout, int *pid
     launchpad_handle(launchpad, HANDLE(stdin), 0);
     launchpad_handle(launchpad, HANDLE(stdout), 1);
 
-    Result result = launchpad_launch(launchpad, pid);
-
-    if (result != SUCCESS)
-    {
-        printf("%s: Command not found! \e[90m%s\e[m\n", command->command, result_to_string(result));
-    }
-
-    return result;
+    return launchpad_launch(launchpad, pid);
 }
 
 int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
@@ -113,6 +106,16 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
             int command_result = -1;
             process_wait(pid, &command_result);
             return command_result;
+        }
+        else if (filesystem_exist(command->command, FILE_TYPE_DIRECTORY))
+        {
+            process_set_directory(command->command);
+
+            return PROCESS_SUCCESS;
+        }
+        else
+        {
+            printf("%s: Command not found! \e[90m%s\e[m\n", command->command, result_to_string(result));
         }
     }
     break;

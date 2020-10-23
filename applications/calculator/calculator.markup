@@ -16,9 +16,9 @@
         <Button id="button_clear_all" text="CE" outlined/>
         <Button id="button_clear" text="C" outlined/>
         <Button icon="backspace-outline" outlined/>
-        <Button text="1/x" outlined/>
-        <Button icon="exponent" outlined/>
-        <Button icon="square-root" outlined/>
+        <Button id="button_reciprocal" text="1/x" outlined/>
+        <Button id="button_exp" icon="exponent" outlined/>
+        <Button id="button_sqrt" icon="square-root" outlined/>
         <Button id="button_divide" icon="slash-forward" outlined/>
         <Button id="button_7" text="7"/>
         <Button id="button_8" text="8" />

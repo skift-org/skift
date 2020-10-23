@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libsystem/math/Math.h>
 #include <libutils/Observable.h>
 
 enum class Operation
@@ -9,6 +10,9 @@ enum class Operation
     SUBSTRACT,
     MULTIPLY,
     DIVIDE,
+    RECIPROCAL,
+    SQRT,
+    POWER,
 };
 
 class Calculator : public Observable<Calculator>
@@ -45,6 +49,22 @@ private:
         else if (_operation == Operation::DIVIDE)
         {
             _accumulator /= _working;
+        }
+        else if (_operation == Operation::RECIPROCAL)
+        {
+            if (_accumulator == 0)
+            {
+                return;
+            }
+            _accumulator = 1 / _accumulator;
+        }
+        else if (_operation == Operation::SQRT)
+        {
+            _accumulator = sqrt(_accumulator);
+        }
+        else if (_operation == Operation::POWER)
+        {
+            _accumulator = pow(_accumulator, _working);
         }
     }
 

@@ -20,9 +20,13 @@ $(BUILD_DIRECTORY_LIBS)/crtn.o: architectures/$(BUILD_ARCH)/crts/crt0.s
 	@echo [AS] $^
 	@$(AS) $(ASFLAGS) -o $@ $^
 
-
 KERNEL_SOURCES += \
-	$(wildcard architectures/$(BUILD_ARCH)/kernel/*.cpp)
+	$(wildcard architectures/$(BUILD_ARCH)/kernel/*.cpp) \
+	$(wildcard architectures/$(BUILD_ARCH)/kernel/*/*.cpp)
 
 KERNEL_ASSEMBLY_SOURCES += \
-	$(wildcard architectures/$(BUILD_ARCH)/kernel/*.s)
+	$(wildcard architectures/$(BUILD_ARCH)/kernel/*.s) \
+	$(wildcard architectures/$(BUILD_ARCH)/kernel/*/*.s)
+
+list-src:
+	@echo $(KERNEL_SOURCES)

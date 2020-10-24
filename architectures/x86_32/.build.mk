@@ -6,4 +6,5 @@ AS=nasm
 ASFLAGS=-f elf32
 
 KERNEL_SOURCES += $(wildcard architectures/x86/kernel/*.cpp)
+
 KERNEL_ASSEMBLY_SOURCES += $(wildcard architectures/x86/kernel/*.s)

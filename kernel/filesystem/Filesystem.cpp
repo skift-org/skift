@@ -195,7 +195,6 @@ Result filesystem_link(Path path, RefPtr<FsNode> node)
 
     if (!parent)
     {
-        ASSERT_NOT_REACHED();
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 

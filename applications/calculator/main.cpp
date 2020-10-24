@@ -80,6 +80,8 @@ int main(int argc, char **argv)
         button->on(Event::ACTION, [&](auto) { calculator.clear_all(); });
     });
 
+    calculator.did_update();
+
     window->show();
 
     return application_run();

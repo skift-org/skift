@@ -63,8 +63,12 @@ bool is_multiboot2(uint32_t magic);
 
 bool is_stivale1(uint32_t magic);
 
+bool is_stivale2(uint32_t magic);
+
 void multiboot1_parse_header(Handover *handover, void *header_ptr);
 
 void multiboot2_parse_header(Handover *handover, void *header_ptr);
 
 void stivale1_parse_header(Handover *handover, void *header_ptr);
+
+void stivale2_parse_header(Handover *handover, void *header_ptr);

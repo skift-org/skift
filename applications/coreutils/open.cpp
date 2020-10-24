@@ -8,8 +8,10 @@
 #define FILE_EXTENSIONS_DATABASE_PATH "/System/Configs/open/file-extensions.json"
 #define FILE_TYPES_DATABASE_PATH "/System/Configs/open/file-types.json"
 
-Result open(Path path)
+Result open(const char *raw_path)
 {
+    auto path = Path::parse(raw_path);
+
     auto extension = path.extension();
 
     if (extension == "")
@@ -74,8 +76,7 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    Path path{argv[1]};
-    Result result = open(path);
+    Result result = open(argv[1]);
     if (result != SUCCESS)
     {
         stream_format(err_stream, "%s: %s: %s", argv[0], argv[1], get_result_description(result));

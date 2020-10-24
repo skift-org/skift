@@ -69,5 +69,5 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
 
 void device_info_initialize()
 {
-    filesystem_link("/System/devices", make<FsDeviceInfo>());
+    filesystem_link(Path::parse("/System/devices"), make<FsDeviceInfo>());
 }

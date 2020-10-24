@@ -1,3 +1,4 @@
+#include <libsystem/io/File.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
 #include <libutils/Path.h>
@@ -10,70 +11,25 @@
 // - only copy if file already exists
 // - only logs if used with option -v
 
-Result copy_file(Path src, Path dst)
-{
-    auto pathsrc = src.string();
-    auto pathdst = dst.string();
-
-    __cleanup(stream_cleanup) Stream *streamin = stream_open(pathsrc.cstring(), OPEN_READ);
-
-    if (handle_has_error(streamin))
-    {
-        handle_printf_error(streamin, "cp: Cannot access %s", pathsrc.cstring());
-        return handle_get_error(streamin);
-    }
-
-    __cleanup(stream_cleanup) Stream *streamout = stream_open(pathdst.cstring(), OPEN_WRITE | OPEN_CREATE);
-
-    if (handle_has_error(streamout))
-    {
-        handle_printf_error(streamout, "cp: Cannot access %s", pathdst.cstring());
-        return handle_get_error(streamout);
-    }
-
-    size_t read;
-    char buffer[1024];
-
-    while ((read = stream_read(streamin, &buffer, 1024)) != 0)
-    {
-        if (handle_has_error(streamin))
-        {
-            handle_printf_error(streamin, "cp: Failed to read from %s", pathsrc.cstring());
-            return handle_get_error(streamin);
-        }
-
-        stream_write(streamout, buffer, read);
-
-        if (handle_has_error(streamout))
-        {
-            handle_printf_error(streamout, "cp: Failed to write to %s", pathdst.cstring());
-            return handle_get_error(streamout);
-        }
-    }
-    stream_close(streamin);
-    stream_close(streamout);
-
-    return SUCCESS;
-}
-
 int main(int argc, char **argv)
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "%s: missing file operand\n", argv[0]);
+        stream_format(err_stream, "%s: Missing file operand\n", argv[0]);
         return PROCESS_FAILURE;
     }
 
     if (argc == 2)
     {
-        stream_format(err_stream, "%s: missing destination file operand after '%s'\n", argv[0], argv[1]);
+        stream_format(err_stream, "%s: Missing destination file operand after '%s'\n", argv[0], argv[1]);
         return PROCESS_FAILURE;
     }
 
-    Result result = copy_file(argv[1], argv[2]);
+    Result result = file_copy(argv[1], argv[2]);
 
     if (result != SUCCESS)
     {
+        stream_format(err_stream, "%s: Failed to copy '%s' to '%s': %s", argv[1], argv[2], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     {
         char terminator = zero ? '\0' : '\n';
 
-        Path path{argv[i]};
+        auto path = Path::parse(argv[i]);
         printf("%s%c", path.dirname().cstring(), terminator);
     }
 

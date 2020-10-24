@@ -12,9 +12,9 @@ struct StringBuilder
     __nonmovable(StringBuilder);
 
 private:
-    size_t _used;
-    size_t _size;
-    char *_buffer;
+    size_t _used = 0;
+    size_t _size = 0;
+    char *_buffer = nullptr;
 
 public:
     size_t length() const

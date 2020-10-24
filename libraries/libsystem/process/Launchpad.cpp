@@ -22,7 +22,7 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     launchpad->handles[2] = 2;
     launchpad->handles[3] = 3;
 
-    Path executable_path{executable};
+    auto executable_path = Path::parse(executable);
     launchpad_argument(launchpad, executable_path.basename().cstring());
 
     return launchpad;

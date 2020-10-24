@@ -14,46 +14,83 @@ private:
     Vector<String> _elements{};
 
 public:
+    static constexpr int PARENT_SHORTHAND = 1; // .... -> ../../..
+
     bool absolute() const { return _absolute; }
 
     bool relative() const { return !_absolute; }
 
     size_t length() const { return _elements.count(); }
 
-    Path(const String &string)
-        : Path(string.cstring(), string.length())
+    static Path parse(const String &string)
     {
+        return parse(string.cstring(), string.length());
     }
 
-    Path(const char *path)
-        : Path(path, strlen(path))
+    static Path parse(const char *path)
     {
+        return parse(path, strlen(path));
     }
 
-    Path(const char *path, size_t size)
+    static Path parse(const char *path, size_t size, int flags = 0)
     {
         Lexer lexer{path, size};
-
         StringBuilder builder{};
+
+        bool absolute = false;
 
         if (lexer.skip(PATH_SEPARATOR))
         {
-            _absolute = true;
+            absolute = true;
         }
+
+        Vector<String> elements{};
 
         while (lexer.do_continue())
         {
             while (!lexer.skip(PATH_SEPARATOR) && lexer.do_continue())
             {
+                if ((flags & PARENT_SHORTHAND) && lexer.skip_word(".."))
+                {
+                    elements.push("..");
+
+                    while (lexer.skip('.'))
+                    {
+                        elements.push("..");
+                    }
+                }
+
                 builder.append(lexer.current());
                 lexer.foreward();
             }
 
             if (builder.length() > 0)
             {
-                _elements.push_back(builder.finalize());
+                elements.push_back(builder.finalize());
             }
         }
+
+        return {absolute, move(elements)};
+    }
+
+    static Path join(Path &left, String right)
+    {
+        return join(left, parse(right));
+    }
+
+    static Path join(Path &left, Path &&right)
+    {
+        return join(left, right);
+    }
+
+    static Path join(Path &left, Path &right)
+    {
+        Vector<String> combined_elements{};
+
+        combined_elements.push_back_many(left._elements);
+        combined_elements.push_back_many(right._elements);
+
+        return {left.absolute(), move(combined_elements)};
     }
 
     Path(const Path &other)
@@ -97,16 +134,6 @@ public:
     String operator[](size_t index) const
     {
         return _elements[index];
-    }
-
-    Path operator+(const Path &other)
-    {
-        Vector<String> combined_elements{};
-
-        combined_elements.push_back_many(_elements);
-        combined_elements.push_back_many(other._elements);
-
-        return {_absolute, move(combined_elements)};
     }
 
     bool operator==(const Path &other)

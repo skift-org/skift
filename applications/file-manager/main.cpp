@@ -36,7 +36,7 @@ private:
 
 public:
     FileExplorerWindow(const char *path)
-        : Window(WINDOW_RESIZABLE), _current_path(path)
+        : Window(WINDOW_RESIZABLE), _current_path(Path::parse(path))
     {
         icon(Icon::get("folder"));
         title("File Manager");
@@ -74,14 +74,14 @@ public:
             }
 
             clear_foreward_history();
-            navigate(_current_path.dirname(), RECORD_FOREWARD);
+            navigate(_current_path.dirpath(), RECORD_FOREWARD);
         });
 
         _go_home = toolbar_icon_create(toolbar, Icon::get("home"));
 
         _go_home->on(Event::ACTION, [this](auto) {
             clear_foreward_history();
-            navigate("/User", RECORD_BACKWARD);
+            navigate(Path::parse("/User"), RECORD_BACKWARD);
         });
 
         new Separator(toolbar);
@@ -119,7 +119,7 @@ public:
                 if (_model->file_type(_table->selected()) == FILE_TYPE_DIRECTORY)
                 {
                     clear_foreward_history();
-                    auto new_path = _current_path + _model->file_name(_table->selected());
+                    auto new_path = Path::join(_current_path, _model->file_name(_table->selected()));
                     navigate(new_path, RECORD_BACKWARD);
                 }
                 else

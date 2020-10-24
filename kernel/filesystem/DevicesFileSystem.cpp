@@ -50,12 +50,12 @@ public:
 
 void devices_filesystem_initialize()
 {
-    filesystem_mkdir(DEVICE_PATH);
+    filesystem_mkdir(Path::parse(DEVICE_PATH));
 
     device_iterate([](auto device) {
         String path = device->path();
         logger_info("Mounting %s to %s", device->address().as_static_cstring(), path.cstring());
-        filesystem_link(path, make<FsDevice>(device));
+        filesystem_link(Path::parse(path), make<FsDevice>(device));
 
         return Iteration::CONTINUE;
     });

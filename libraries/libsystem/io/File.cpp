@@ -75,3 +75,40 @@ bool file_exist(const char *path)
 
     return true;
 }
+
+Result file_copy(const char *src, const char *dst)
+{
+    __cleanup(stream_cleanup) Stream *streamin = stream_open(src, OPEN_READ);
+
+    if (handle_has_error(streamin))
+    {
+        return handle_get_error(streamin);
+    }
+
+    __cleanup(stream_cleanup) Stream *streamout = stream_open(dst, OPEN_WRITE | OPEN_CREATE);
+
+    if (handle_has_error(streamout))
+    {
+        return handle_get_error(streamout);
+    }
+
+    size_t read;
+    char buffer[1024];
+
+    while ((read = stream_read(streamin, &buffer, 1024)) != 0)
+    {
+        if (handle_has_error(streamin))
+        {
+            return handle_get_error(streamin);
+        }
+
+        stream_write(streamout, buffer, read);
+
+        if (handle_has_error(streamout))
+        {
+            return handle_get_error(streamout);
+        }
+    }
+
+    return SUCCESS;
+}

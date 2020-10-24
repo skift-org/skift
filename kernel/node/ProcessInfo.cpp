@@ -73,5 +73,5 @@ ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size
 
 void process_info_initialize()
 {
-    filesystem_link("/System/processes", make<FsProcessInfo>());
+    filesystem_link(Path::parse("/System/processes"), make<FsProcessInfo>());
 }

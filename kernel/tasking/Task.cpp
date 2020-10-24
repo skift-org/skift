@@ -77,7 +77,7 @@ Task *task_create(Task *parent, const char *name, bool user)
     }
     else
     {
-        task->directory = new Path("/");
+        task->directory = new Path(Path::parse("/"));
     }
 
     // Setup fildes

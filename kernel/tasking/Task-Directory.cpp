@@ -5,11 +5,11 @@ Path task_resolve_directory_internal(Task *task, const char *buffer)
 {
     lock_assert(task->directory_lock);
 
-    Path path{buffer};
+    Path path = Path::parse(buffer);
 
     if (path.relative())
     {
-        path = *task->directory + path;
+        path = Path::join(*task->directory, path);
     }
 
     path = path.normalized();

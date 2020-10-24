@@ -11,7 +11,7 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    Path path{argv[1]};
+    auto path = Path::parse(argv[1]);
     printf("%s\n", path.basename().cstring());
 
     return PROCESS_SUCCESS;

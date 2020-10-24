@@ -13,12 +13,11 @@ void list_pages()
     DirectoryEntry entry;
     while (directory_read(directory, &entry) > 0)
     {
-        Path manpage_path{
+        auto manpage_path = Path::parse(
             StringBuilder()
                 .append(manpages)
                 .append(entry.name)
-                .finalize(),
-        };
+                .finalize());
 
         if (manpage_path.extension() == ".json")
         {

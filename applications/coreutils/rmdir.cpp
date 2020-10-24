@@ -97,17 +97,18 @@ int main(int argc, char **argv)
         }
         else
         {
-            Path path{argv[i]};
+            auto path = Path::parse(argv[i]);
 
             while (path.length() > 0)
             {
                 auto result = rmdir(path.string().cstring());
-                path = {path.dirname()};
 
                 if (result_is_error(result))
                 {
                     printf("rmdir: failed to remove '%s': %s\n", argv[i], get_result_description(result));
                 }
+
+                path = path.dirpath();
             }
         }
     }

@@ -22,20 +22,19 @@ public:
 
     size_t length() const { return _elements.count(); }
 
-    static Path parse(const String &string)
+    static Path parse(const String &string, int flags = 0)
     {
-        return parse(string.cstring(), string.length());
+        return parse(string.cstring(), string.length(), flags);
     }
 
-    static Path parse(const char *path)
+    static Path parse(const char *path, int flags = 0)
     {
-        return parse(path, strlen(path));
+        return parse(path, strlen(path), flags);
     }
 
-    static Path parse(const char *path, size_t size, int flags = 0)
+    static Path parse(const char *path, size_t size, int flags)
     {
         Lexer lexer{path, size};
-        StringBuilder builder{};
 
         bool absolute = false;
 
@@ -44,29 +43,51 @@ public:
             absolute = true;
         }
 
-        Vector<String> elements{};
+        auto parse_element = [](auto &lexer) {
+            StringBuilder builder{};
 
-        while (lexer.do_continue())
-        {
-            while (!lexer.skip(PATH_SEPARATOR) && lexer.do_continue())
+            while (!lexer.skip(PATH_SEPARATOR) &&
+                   lexer.do_continue())
             {
-                if ((flags & PARENT_SHORTHAND) && lexer.skip_word(".."))
-                {
-                    elements.push("..");
-
-                    while (lexer.skip('.'))
-                    {
-                        elements.push("..");
-                    }
-                }
-
                 builder.append(lexer.current());
                 lexer.foreward();
             }
 
-            if (builder.length() > 0)
+            return builder.finalize();
+        };
+
+        auto parse_shorthand = [](auto &lexer) {
+            Vector<String> elements{};
+
+            lexer.skip_word("..");
+            elements.push("..");
+
+            while (lexer.skip('.'))
             {
-                elements.push_back(builder.finalize());
+                elements.push("..");
+            }
+
+            lexer.skip('/');
+
+            return move(elements);
+        };
+
+        Vector<String> elements{};
+
+        while (lexer.do_continue())
+        {
+            if ((flags & PARENT_SHORTHAND) && lexer.current_is_word(".."))
+            {
+                elements.push_back_many(parse_shorthand(lexer));
+            }
+            else
+            {
+                auto el = parse_element(lexer);
+
+                if (el.length() > 0)
+                {
+                    elements.push_back(el);
+                }
             }
         }
 

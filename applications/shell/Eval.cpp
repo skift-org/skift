@@ -103,8 +103,6 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
         Result result = shell_exec(command, stdin, stdout, &pid);
         auto path = Path::parse(command->command, Path::PARENT_SHORTHAND);
 
-        logger_debug("Resulting path is '%s' -> '%s'", command->command, path.string().cstring());
-
         if (result == SUCCESS)
         {
             int command_result = -1;

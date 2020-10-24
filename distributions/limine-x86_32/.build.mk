@@ -3,7 +3,7 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) $(DISTRO_DIRECTORY)/limine.cfg $(ECHFS)
 
 	rm -f $(BOOTDISK)
 
-	dd if=/dev/zero bs=1M count=0 seek=64 of=$(BOOTDISK)
+	dd if=/dev/zero bs=1M count=0 seek=256 of=$(BOOTDISK)
 
 	parted -s $(BOOTDISK) mklabel msdos
 	parted -s $(BOOTDISK) mkpart primary 1 100%

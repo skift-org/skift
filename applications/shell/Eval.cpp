@@ -7,6 +7,7 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
+#include <libutils/Path.h>
 
 #include "shell/Shell.h"
 
@@ -100,6 +101,9 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
 
         int pid;
         Result result = shell_exec(command, stdin, stdout, &pid);
+        auto path = Path::parse(command->command, Path::PARENT_SHORTHAND);
+
+        logger_debug("Resulting path is '%s' -> '%s'", command->command, path.string().cstring());
 
         if (result == SUCCESS)
         {
@@ -107,15 +111,16 @@ int shell_eval(ShellNode *node, Stream *stdin, Stream *stdout)
             process_wait(pid, &command_result);
             return command_result;
         }
-        else if (filesystem_exist(command->command, FILE_TYPE_DIRECTORY))
+        else if (filesystem_exist(path.string().cstring(), FILE_TYPE_DIRECTORY))
         {
-            process_set_directory(command->command);
+            process_set_directory(path.string().cstring());
 
             return PROCESS_SUCCESS;
         }
         else
         {
             printf("%s: Command not found! \e[90m%s\e[m\n", command->command, result_to_string(result));
+            return PROCESS_FAILURE;
         }
     }
     break;

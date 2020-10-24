@@ -30,7 +30,9 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     // set values
     // knobs = _knobs;
     playback_format = 0;
-    playback_speed = 0;
+    playback_speed = AC97_PLAYBACK_SPEED;
+    playback_volume_PCM = AC97_PCM_OUT_VOLUME;
+    playback_volume_master = AC97_MASTER_VOLUME;
 
     // get native audio bus master bar and native audio mixer bar
     nabmbar = pci_address().read16(AC97_NABMBAR) & ((uint32_t)-1) << 1;
@@ -56,6 +58,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     if (t == 0x1f)
     {
         // debug_print(WARNING, "This device only supports 5 bits of audio volume.");
+        logger_trace("This device only supports 5 bits of audio volume.");
         bits = 5;
         mask = 0x1f;
         out32(nambar + AC97_MASTER_VOLUME, 0x0f0f);
@@ -92,9 +95,31 @@ void AC97::initialise_buffers()
 
 AC97::~AC97() { ; }
 
-// void AC97::handle_interrupt() { ; }
+void AC97::handle_interrupt()
+{
+    logger_trace("interrupt received");
+}
 // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) { ; };
 
-// ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) { ; };
+ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
+{
+    __unused(handle);
+    __unused(size);
+    // __unused(buffer);
+    logger_trace("int write for ac97");
+    int final = 0;
+
+    for (int i = 0; i < 32; i++)
+    {
+        buffers[i]->write(i * AC97_BDL_BUFFER_LEN, buffer, AC97_BDL_BUFFER_LEN);
+        final = i;
+    }
+    buffer_descriptors_list[final].cl |= AC97_CL_BUP;
+    out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
+    out8(nabmbar + AC97_PO_LVI, final);
+    out8(nabmbar + AC97_PO_CR, AC97_PO_LVI);
+    logger_trace("out for ac97");
+    return SUCCESS;
+}
 
 // Result call(FsHandle &handle, IOCall request, void *args) { ; };

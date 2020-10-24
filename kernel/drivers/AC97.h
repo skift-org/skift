@@ -57,6 +57,8 @@
 #define AC97_EXT_AUDIO_STC 0x002A
 #define AC97_FRONT_SPLRATE 0x002C
 #define AC97_LR_SPLRATE 0x0032
+#define AC97_PLAYBACK_SPEED 48000
+
 // #define PORT_NABM_POBDBAR 0x0010
 // #define PORT_NABM_POLVI 0x0015
 // #define PORT_NABM_POCONTROL 0x001B
@@ -114,6 +116,9 @@ private:
 
     uint16_t playback_speed;
     uint16_t playback_format;
+    uint16_t playback_volume_PCM;
+    uint16_t playback_volume_master;
+    uint16_t current_buffer_index;
     // snd_knob_t *knobs;
 
     uintptr_t curr_file_buffer_ptr;
@@ -125,15 +130,15 @@ public:
     AC97(DeviceAddress address);
     ~AC97();
 
-    // void handle_interrupt() override;
+    void handle_interrupt() override;
 
-    // bool can_write(FsHandle &handle) override;
+    bool can_write(FsHandle &handle) override;
 
-    // bool can_read(FsHandle &handle) override;
+    bool can_read(FsHandle &handle) override;
 
-    // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
+    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
-    // ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
+    ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
 
-    // Result call(FsHandle &handle, IOCall request, void *args) override;
+    Result call(FsHandle &handle, IOCall request, void *args) override;
 };

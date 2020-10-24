@@ -20,7 +20,6 @@ private:
     unsigned int _writers = 0;
     unsigned int _clients = 0;
     unsigned int _server = 0;
-    unsigned int _master = 0;
 
 public:
     FileType type() { return _type; }
@@ -32,8 +31,6 @@ public:
     unsigned int clients() { return _clients; }
 
     unsigned int server() { return _server; }
-
-    unsigned int master() { return _master; }
 
     FsNode(FileType type);
 

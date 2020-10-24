@@ -85,7 +85,7 @@ Result __plug_create_pipe(int *reader_handle, int *writer_handle)
     return __syscall(SYS_CREATE_PIPE, (uintptr_t)reader_handle, (uintptr_t)writer_handle);
 }
 
-Result __plug_create_term(int *master_handle, int *slave_handle)
+Result __plug_create_term(int *server_handle, int *client_handle)
 {
-    return __syscall(SYS_CREATE_TERM, (uintptr_t)master_handle, (uintptr_t)slave_handle);
+    return __syscall(SYS_CREATE_TERM, (uintptr_t)server_handle, (uintptr_t)client_handle);
 }

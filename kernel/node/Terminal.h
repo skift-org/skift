@@ -14,8 +14,8 @@ private:
     int _height = 25;
 
 public:
-    RingBuffer master_to_slave_buffer{BUFFER_SIZE};
-    RingBuffer slave_to_master_buffer{BUFFER_SIZE};
+    RingBuffer server_to_client_buffer{BUFFER_SIZE};
+    RingBuffer client_to_server_buffer{BUFFER_SIZE};
 
     FsTerminal();
 

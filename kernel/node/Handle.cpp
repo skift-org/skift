@@ -94,7 +94,6 @@ SelectEvent FsHandle::poll(SelectEvent events)
 ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 {
     if (!has_flag(OPEN_READ) &&
-        !has_flag(OPEN_MASTER) &&
         !has_flag(OPEN_SERVER) &&
         !has_flag(OPEN_CLIENT))
     {
@@ -118,7 +117,6 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
 {
     if (!has_flag(OPEN_WRITE) &&
-        !has_flag(OPEN_MASTER) &&
         !has_flag(OPEN_SERVER) &&
         !has_flag(OPEN_CLIENT))
     {

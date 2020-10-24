@@ -9,16 +9,16 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-void terminal_widget_master_callback(TerminalWidget *widget, Stream *master, SelectEvent events)
+void terminal_widget_server_callback(TerminalWidget *widget, Stream *server, SelectEvent events)
 {
     __unused(events);
 
     char buffer[TERMINAL_IO_BUFFER_SIZE];
-    size_t size = stream_read(master, buffer, TERMINAL_IO_BUFFER_SIZE);
+    size_t size = stream_read(server, buffer, TERMINAL_IO_BUFFER_SIZE);
 
-    if (handle_has_error(master))
+    if (handle_has_error(server))
     {
-        handle_printf_error(master, "Terminal: read from master failed");
+        handle_printf_error(server, "Terminal: read from server failed");
         return;
     }
 
@@ -31,14 +31,14 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
     _terminal = new terminal::Terminal(80, 24);
 
     stream_create_term(
-        &_master_stream,
-        &_slave_stream);
+        &_server_stream,
+        &_client_stream);
 
-    _master_notifier = notifier_create(
+    _server_notifier = notifier_create(
         this,
-        HANDLE(_master_stream),
+        HANDLE(_server_stream),
         SELECT_READ,
-        (NotifierCallback)terminal_widget_master_callback);
+        (NotifierCallback)terminal_widget_server_callback);
 
     _cursor_blink_timer = own<Timer>(250, [this]() {
         blink();
@@ -52,9 +52,9 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
     _cursor_blink_timer->start();
 
     Launchpad *shell_launchpad = launchpad_create("shell", "/Applications/shell/shell");
-    launchpad_handle(shell_launchpad, HANDLE(_slave_stream), 0);
-    launchpad_handle(shell_launchpad, HANDLE(_slave_stream), 1);
-    launchpad_handle(shell_launchpad, HANDLE(_slave_stream), 2);
+    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 0);
+    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 1);
+    launchpad_handle(shell_launchpad, HANDLE(_client_stream), 2);
     launchpad_launch(shell_launchpad, nullptr);
 }
 
@@ -62,10 +62,10 @@ TerminalWidget::~TerminalWidget()
 {
     delete _terminal;
 
-    notifier_destroy(_master_notifier);
+    notifier_destroy(_server_notifier);
 
-    stream_close(_master_stream);
-    stream_close(_slave_stream);
+    stream_close(_server_stream);
+    stream_close(_client_stream);
 }
 
 void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
@@ -127,7 +127,7 @@ void TerminalWidget::paint(Painter &painter, Rectangle rectangle)
 void TerminalWidget::event(Event *event)
 {
     auto send_sequence = [&](auto sequence) {
-        stream_format(_master_stream, sequence);
+        stream_format(_server_stream, sequence);
         event->accepted = true;
     };
 
@@ -228,7 +228,7 @@ void TerminalWidget::event(Event *event)
             {
                 uint8_t buffer[5];
                 int size = codepoint_to_utf8(event->keyboard.codepoint, buffer);
-                stream_write(_master_stream, buffer, size);
+                stream_write(_server_stream, buffer, size);
                 event->accepted = true;
             }
             break;
@@ -250,6 +250,6 @@ void TerminalWidget::do_layout()
         _terminal->resize(width, height);
 
         IOCallTerminalSizeArgs args = {width, height};
-        stream_call(_master_stream, IOCALL_TERMINAL_SET_SIZE, &args);
+        stream_call(_server_stream, IOCALL_TERMINAL_SET_SIZE, &args);
     }
 }

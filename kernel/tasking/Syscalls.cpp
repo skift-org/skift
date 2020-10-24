@@ -289,15 +289,15 @@ Result sys_create_pipe(int *reader_handle, int *writer_handle)
     return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
 }
 
-Result sys_create_term(int *master_handle, int *slave_handle)
+Result sys_create_term(int *server_handle, int *client_handle)
 {
-    if (!syscall_validate_ptr((uintptr_t)master_handle, sizeof(int)) ||
-        !syscall_validate_ptr((uintptr_t)slave_handle, sizeof(int)))
+    if (!syscall_validate_ptr((uintptr_t)server_handle, sizeof(int)) ||
+        !syscall_validate_ptr((uintptr_t)client_handle, sizeof(int)))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    return task_create_term(scheduler_running(), master_handle, slave_handle);
+    return task_create_term(scheduler_running(), server_handle, client_handle);
 }
 
 /* --- Handles -------------------------------------------------------------- */

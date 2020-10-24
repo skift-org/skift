@@ -33,4 +33,4 @@ ResultOr<int> task_fshandle_accept(Task *task, int socket_handle_index);
 
 Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle_index);
 
-Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_index);
+Result task_create_term(Task *task, int *server_handle_index, int *client_handle_index);

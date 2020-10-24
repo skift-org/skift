@@ -393,60 +393,60 @@ Result task_create_pipe(Task *task, int *reader_handle_index, int *writer_handle
     return SUCCESS;
 }
 
-Result task_create_term(Task *task, int *master_handle_index, int *slave_handle_index)
+Result task_create_term(Task *task, int *server_handle_index, int *client_handle_index)
 {
-    *master_handle_index = HANDLE_INVALID_ID;
-    *slave_handle_index = HANDLE_INVALID_ID;
+    *server_handle_index = HANDLE_INVALID_ID;
+    *client_handle_index = HANDLE_INVALID_ID;
 
     auto terminal = make<FsTerminal>();
 
-    FsHandle *master_handle = new FsHandle(terminal, OPEN_MASTER);
-    FsHandle *slave_handle = new FsHandle(terminal, OPEN_READ | OPEN_WRITE);
+    FsHandle *server_handle = new FsHandle(terminal, OPEN_SERVER);
+    FsHandle *client_handle = new FsHandle(terminal, OPEN_READ | OPEN_WRITE);
 
     auto close_opened_handles = [&]() {
-        if (*master_handle_index != HANDLE_INVALID_ID)
+        if (*server_handle_index != HANDLE_INVALID_ID)
         {
-            task_fshandle_remove(task, *master_handle_index);
+            task_fshandle_remove(task, *server_handle_index);
         }
 
-        if (master_handle)
+        if (server_handle)
         {
-            delete master_handle;
+            delete server_handle;
         }
 
-        if (*slave_handle_index != HANDLE_INVALID_ID)
+        if (*client_handle_index != HANDLE_INVALID_ID)
         {
-            task_fshandle_remove(task, *slave_handle_index);
+            task_fshandle_remove(task, *client_handle_index);
         }
 
-        if (slave_handle)
+        if (client_handle)
         {
-            delete slave_handle;
+            delete client_handle;
         }
     };
 
-    auto result_or_master_handle_index = task_fshandle_add(task, master_handle);
+    auto result_or_server_handle_index = task_fshandle_add(task, server_handle);
 
-    if (!result_or_master_handle_index.success())
+    if (!result_or_server_handle_index.success())
     {
         close_opened_handles();
-        return result_or_master_handle_index.result();
+        return result_or_server_handle_index.result();
     }
     else
     {
-        *master_handle_index = result_or_master_handle_index.take_value();
+        *server_handle_index = result_or_server_handle_index.take_value();
     }
 
-    auto result_or_slave_handle_index = task_fshandle_add(task, slave_handle);
+    auto result_or_client_handle_index = task_fshandle_add(task, client_handle);
 
-    if (!result_or_slave_handle_index.success())
+    if (!result_or_client_handle_index.success())
     {
         close_opened_handles();
-        return result_or_slave_handle_index.result();
+        return result_or_client_handle_index.result();
     }
     else
     {
-        *slave_handle_index = result_or_slave_handle_index.take_value();
+        *client_handle_index = result_or_client_handle_index.take_value();
     }
 
     return SUCCESS;

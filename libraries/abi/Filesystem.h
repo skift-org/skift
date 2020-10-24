@@ -38,7 +38,6 @@ enum FileType
 #define OPEN_SOCKET (1 << 8)
 #define OPEN_CLIENT (1 << 9)
 #define OPEN_SERVER (1 << 10)
-#define OPEN_MASTER (1 << 11)
 
 typedef unsigned int OpenFlag;
 

@@ -327,10 +327,10 @@ Result __plug_create_pipe(int *reader_handle, int *writer_handle)
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_create_term(int *master_handle, int *slave_handle)
+Result __plug_create_term(int *server_handle, int *client_handle)
 {
-    __unused(master_handle);
-    __unused(slave_handle);
+    __unused(server_handle);
+    __unused(client_handle);
 
     ASSERT_NOT_REACHED();
 }

@@ -13,11 +13,11 @@ private:
     terminal::Terminal *_terminal;
     bool _cursor_blink;
 
-    Stream *_master_stream;
-    Stream *_slave_stream;
+    Stream *_server_stream;
+    Stream *_client_stream;
 
     OwnPtr<Timer> _cursor_blink_timer;
-    Notifier *_master_notifier;
+    Notifier *_server_notifier;
 
 public:
     terminal::Terminal *terminal() { return _terminal; }

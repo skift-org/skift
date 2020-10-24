@@ -47,20 +47,20 @@ Stream *stream_open_handle(int handle_id, OpenFlag flags)
     return stream;
 }
 
-Result stream_create_term(Stream **master, Stream **slave)
+Result stream_create_term(Stream **server, Stream **client)
 {
-    *master = nullptr;
-    *slave = nullptr;
+    *server = nullptr;
+    *client = nullptr;
 
-    int master_handle = HANDLE_INVALID_ID;
-    int slave_handle = HANDLE_INVALID_ID;
+    int server_handle = HANDLE_INVALID_ID;
+    int client_handle = HANDLE_INVALID_ID;
 
-    Result result = __plug_create_term(&master_handle, &slave_handle);
+    Result result = __plug_create_term(&server_handle, &client_handle);
 
     if (result == SUCCESS)
     {
-        *master = stream_open_handle(master_handle, OPEN_READ | OPEN_WRITE);
-        *slave = stream_open_handle(slave_handle, OPEN_READ | OPEN_WRITE);
+        *server = stream_open_handle(server_handle, OPEN_READ | OPEN_WRITE);
+        *client = stream_open_handle(client_handle, OPEN_READ | OPEN_WRITE);
     }
 
     return result;

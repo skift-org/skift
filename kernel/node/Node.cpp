@@ -31,11 +31,6 @@ void FsNode::ref_handle(FsHandle &handle)
     {
         __atomic_add_fetch(&_server, 1, __ATOMIC_SEQ_CST);
     }
-
-    if (handle.flags() & OPEN_MASTER)
-    {
-        __atomic_add_fetch(&_master, 1, __ATOMIC_SEQ_CST);
-    }
 }
 
 void FsNode::deref_handle(FsHandle &handle)
@@ -58,11 +53,6 @@ void FsNode::deref_handle(FsHandle &handle)
     if (handle.flags() & OPEN_SERVER)
     {
         __atomic_sub_fetch(&_server, 1, __ATOMIC_SEQ_CST);
-    }
-
-    if (handle.flags() & OPEN_MASTER)
-    {
-        __atomic_sub_fetch(&_master, 1, __ATOMIC_SEQ_CST);
     }
 }
 

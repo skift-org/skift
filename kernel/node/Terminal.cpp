@@ -9,35 +9,35 @@ FsTerminal::FsTerminal() : FsNode(FILE_TYPE_TERMINAL) {}
 
 bool FsTerminal::can_read(FsHandle *handle)
 {
-    if (handle->has_flag(OPEN_MASTER))
+    if (handle->has_flag(OPEN_SERVER))
     {
-        return !slave_to_master_buffer.empty() || !writers();
+        return !client_to_server_buffer.empty() || !writers();
     }
     else
     {
-        return !master_to_slave_buffer.empty() || !master();
+        return !server_to_client_buffer.empty() || !server();
     }
 }
 
 bool FsTerminal::can_write(FsHandle *handle)
 {
-    if (handle->has_flag(OPEN_MASTER))
+    if (handle->has_flag(OPEN_SERVER))
     {
-        return !master_to_slave_buffer.full() || !readers();
+        return !server_to_client_buffer.full() || !readers();
     }
     else
     {
-        return !slave_to_master_buffer.full() || !master();
+        return !client_to_server_buffer.full() || !server();
     }
 }
 
 ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 {
-    if (handle.has_flag(OPEN_MASTER))
+    if (handle.has_flag(OPEN_SERVER))
     {
         if (writers())
         {
-            return slave_to_master_buffer.read((char *)buffer, size);
+            return client_to_server_buffer.read((char *)buffer, size);
         }
         else
         {
@@ -46,9 +46,9 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
     }
     else
     {
-        if (master())
+        if (server())
         {
-            return master_to_slave_buffer.read((char *)buffer, size);
+            return server_to_client_buffer.read((char *)buffer, size);
         }
         else
         {
@@ -59,11 +59,11 @@ ResultOr<size_t> FsTerminal::read(FsHandle &handle, void *buffer, size_t size)
 
 ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t size)
 {
-    if (handle.has_flag(OPEN_MASTER))
+    if (handle.has_flag(OPEN_SERVER))
     {
         if (readers())
         {
-            return master_to_slave_buffer.write((const char *)buffer, size);
+            return server_to_client_buffer.write((const char *)buffer, size);
         }
         else
         {
@@ -72,9 +72,9 @@ ResultOr<size_t> FsTerminal::write(FsHandle &handle, const void *buffer, size_t 
     }
     else
     {
-        if (master())
+        if (server())
         {
-            return slave_to_master_buffer.write((const char *)buffer, size);
+            return client_to_server_buffer.write((const char *)buffer, size);
         }
         else
         {
@@ -87,7 +87,7 @@ Result FsTerminal::call(FsHandle &handle, IOCall request, void *args)
 {
     __unused(handle);
 
-    if (!master())
+    if (!server())
     {
         return ERR_STREAM_CLOSED;
     }

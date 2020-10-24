@@ -28,7 +28,7 @@ Stream *stream_open(const char *path, OpenFlag flags);
 
 Stream *stream_open_handle(int handle_id, OpenFlag flags);
 
-Result stream_create_term(Stream **master, Stream **slave);
+Result stream_create_term(Stream **server, Stream **client);
 
 void stream_close(Stream *stream);
 

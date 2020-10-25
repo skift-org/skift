@@ -12,6 +12,7 @@
 </p>
 
 # skiftOS
+
 ![Deploy](https://github.com/skiftOS/skift/workflows/Deploy/badge.svg?branch=master)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)
 ![GitHub last commit](https://img.shields.io/github/last-commit/skiftOS/skift)
@@ -19,37 +20,46 @@
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)
 
  - **skiftOS** is a simple, handmade, operating system for the x86 platform. Aiming for clean and pretty API while keeping the spirit of UNIX.
- - **skiftOS** is pretty easy to build from source, just follow the [build guide](manual/building.md)
- - **skiftOS is a student project, don't expect it to be secure or stable at this stage.**
+ - **skiftOS** feature an UNIX like terminal experience with many familiar UNIX utilities.
+ - **skiftOS** is pretty easy to build from source, just follow the [build guide](./building.md)
+ - **skiftOS** is capable of running on real hardware.
+ - **skiftOS** is a labor of love.
+ - **skiftOS** feature a graphical user interface, with composited windows.
+ - **skiftOS** include many applications like Image editor, Text editor, Terminal Emulator, etc...
+ - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # Screenshots
 
 <p align="center">
-<img src="manual/screenshots/2020-05-26.png" />
-skiftOS running in QEMU
+<img src="manual/screenshots/2020-10-25.png" />
+skiftOS running in QEMU 5.1
 </p>
 <br/>
-<p align="center">
-<img src="manual/screenshots/2020-07-12-real-hardware.png" />
-Running on real hardware (Thinkpad x250)
-</p>
 
+# Manual
 
-# Features
+See [manual/](./manual/readme.md)
 
- - Pre-emptive multitasking
- - I/O redirection
- - IPC sockets
- - Low level utility and system library (libsystem)
- - 2D and 3D graphic library (libgraphic)
- - PNG support through lodepng
- - Graphical user interface library (libwidget)
- - A compositing window manager (Compositor)
- - A terminal emulator which support unicode and vt100 escape sequence (Terminal)
- - [It can run DOOM :rage3:](https://github.com/skiftOS/port-doom)
+# Building
+
+See [building.md](./building.md)
+
+# Contributing
+
+See [contributing.md](./contributing.md)
+
+# Code of Conduct
+
+see [code_of_conduct.md](./code_of_conduct.md)
+
+# Contributors
+
+<a href="https://github.com/skiftOS/skift/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
+</a>
 
 # License
 
 The skift operating system and its core components are licensed under the **MIT License**.
 
-See: [LICENSE.md](./license.md)
+See [license.md](./license.md)

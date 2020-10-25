@@ -1,6 +1,21 @@
-# Building
+# Build Guide
 
-## 0. Supported environment
+## Table of content
+
+- [Build Guide](#build-guide)
+  - [Table of content](#table-of-content)
+  - [Supported environment](#supported-environment)
+    - [About WSL](#about-wsl)
+  - [Building skiftOS](#building-skiftos)
+    - [1. Get the source code](#1-get-the-source-code)
+    - [2. Setting up](#2-setting-up)
+    - [3. Building](#3-building)
+    - [4. Running in a virtual machine](#4-running-in-a-virtual-machine)
+    - [5. Tips](#5-tips)
+    - [6. Using the system](#6-using-the-system)
+    - [7. Contributing](#7-contributing)
+
+## Supported environment
 
 Building skiftOS requires
 
@@ -21,7 +36,14 @@ And for testing and debugging
 $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
 ```
 
-## 1. Get the source code
+### About WSL
+
+It's possible to build skiftOS WSL1 and WSL2 but it's not well tested.
+If you have any problems consider upgrading to linux.
+
+## Building skiftOS
+
+### 1. Get the source code
 
 Clone the repository with all its submodules.
 
@@ -31,7 +53,15 @@ $ git clone --recursive https://github.com/skiftOS/skift
 $ cd skift
 ```
 
-## 2. Setting up
+Or if you already clone this repo without `--recursive` do:
+
+```sh
+$ cd skift
+
+$ git submodule init
+```
+
+### 2. Setting up
 
 Building the toolchain is pretty straight-forward,
 first make sure you have all GCC and binutils dependencies:
@@ -62,7 +92,7 @@ The script will do the following operation without installing anything to the ho
  - Patch them using binutils.patch and gcc.patch which are located in the toolchain directory.
  - Then configure and build
 
-## 3. Building
+### 3. Building
 
 From the root of this repo do:
 
@@ -74,7 +104,7 @@ This command will build all the component of the project and generate an ISO boo
 
 > The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debuging and testing the system
 
-## 4. Running in a virtual machine
+### 4. Running in a virtual machine
 
 The build system allows you to create and start a virtual machine of skiftOS by using one of the following commands:
 
@@ -84,13 +114,13 @@ $ make run-qemu # for QEMU
 $ make run-vbox # for Virtual Box
 ```
 
-## 5. Tips
+### 5. Tips
 
 > If you made any modification to the source code or the content of the sysroot/ directory, the build system should be able to rebuild the project from step 3 automagically :^)
 
 > You can change the default keyboard layout by passing CONFIG_KEYBOARD_LAYOUT="fr_fr" to make.
 
-## 6. Using the system
+### 6. Using the system
 
 **How to change the keyboard layout?**
 
@@ -108,3 +138,9 @@ $ make run-vbox # for Virtual Box
 ```sh
 µ wallpaperctl /System/Wallpapers/paint.png
 ```
+
+### 7. Contributing
+
+A bug? A Missing feature? Please consider contributing to the project :hugs: ❤️
+
+See [contributing.md](./contributing.md)

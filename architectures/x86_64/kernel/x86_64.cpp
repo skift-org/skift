@@ -11,28 +11,27 @@
 #include "architectures/x86_64/kernel/IDT.h"
 #include "architectures/x86_64/kernel/x86_64.h"
 
-#include "thirdparty/limine/stivale/stivale.h"
+#include "kernel/graphics/Graphics.h"
+#include "kernel/handover/Handover.h"
+#include "kernel/system/System.h"
 
-__aligned(4096) static char stack[16384] = {};
-
-__attribute__((section(".stivalehdr"), used)) stivale_header header = {
-    .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = 1,
-    .framebuffer_width = 0,
-    .framebuffer_height = 0,
-    .framebuffer_bpp = 32,
-    .entry_point = 0,
-};
-
-extern "C" void _start(void *info)
+extern "C" void arch_main(void *info, uint32_t magic)
 {
-    __unused(info);
     __plug_init();
 
     com_initialize(COM1);
     com_initialize(COM2);
     com_initialize(COM3);
     com_initialize(COM4);
+
+    auto handover = handover_initialize(info, magic);
+
+    graphic_early_initialize(handover);
+
+    if (handover->memory_usable < 127 * 1024)
+    {
+        system_panic("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
+    }
 
     logger_info("Hello, world!");
     gdt_initialize();

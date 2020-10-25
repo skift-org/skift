@@ -8,12 +8,12 @@ struct Stream
 
     StreamBufferMode read_mode;
     void *write_buffer;
-    int write_used;
+    size_t write_used;
 
     StreamBufferMode write_mode;
     void *read_buffer;
-    int read_used;
-    int read_head;
+    size_t read_used;
+    size_t read_head;
 
     bool has_unget;
     int unget_char;

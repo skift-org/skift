@@ -123,23 +123,46 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
         return ERR_READ_ONLY_STREAM;
     }
 
-    task_block(scheduler_running(), new BlockerWrite(this), -1);
+    auto attemp_a_write = [&](const void *buffer, size_t size) {
+        task_block(scheduler_running(), new BlockerWrite(this), -1);
 
-    if (has_flag(OPEN_APPEND))
+        if (has_flag(OPEN_APPEND))
+        {
+            _offset = _node->size();
+        }
+
+        auto result_or_written = _node->write(*this, buffer, size);
+
+        if (result_or_written.success())
+        {
+            _offset += result_or_written.value();
+        }
+
+        _node->release(scheduler_running_id());
+
+        return result_or_written;
+    };
+
+    size_t written = 0;
+
+    do
     {
-        _offset = _node->size();
-    }
+        auto remaining = size - written;
+        auto remaining_buffer = reinterpret_cast<const char *>((reinterpret_cast<uintptr_t>(buffer)) + written);
 
-    auto result_or_written = _node->write(*this, buffer, size);
+        auto result_or_written = attemp_a_write(remaining_buffer, remaining);
 
-    if (result_or_written.success())
-    {
-        _offset += result_or_written.value();
-    }
+        if (!result_or_written.success())
+        {
+            return result_or_written;
+        }
+        else
+        {
+            written += result_or_written.value();
+        }
+    } while (written < size);
 
-    _node->release(scheduler_running_id());
-
-    return result_or_written;
+    return written;
 }
 
 Result FsHandle::seek(int offset, Whence whence)

@@ -1,4 +1,5 @@
 #include "architectures/VirtualMemory.h"
+#include "architectures/x86_64/kernel/Paging.h"
 
 void *arch_kernel_address_space()
 {

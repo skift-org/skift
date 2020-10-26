@@ -282,9 +282,11 @@ public:
 
     String extension()
     {
-        StringBuilder builder{basename().length()};
+        auto filename = basename();
 
-        Lexer lexer{basename().cstring(), basename().length()};
+        StringBuilder builder{filename.length()};
+
+        Lexer lexer{filename.cstring(), filename.length()};
 
         // It's not a file extention it's an hidden file.
         if (lexer.current_is("."))
@@ -292,7 +294,8 @@ public:
             lexer.foreward();
         }
 
-        while (!lexer.current_is("."))
+        while (!lexer.current_is(".") &&
+               lexer.do_continue())
         {
             lexer.foreward();
         }

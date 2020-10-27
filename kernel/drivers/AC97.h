@@ -97,7 +97,7 @@ class AC97 : public PCIDevice
 private:
     uint16_t nabmbar;
     uint16_t nambar;
-    size_t irq;
+
     uint8_t lvi;  // currently set last valid index ?
     uint8_t bits; // how many bits of volume are supported ?
     // AC97BufferDescriptor *bdl; // buffer descriptor list
@@ -111,7 +111,6 @@ private:
     Vector<RefPtr<MMIORange>> buffers;
 
     uint32_t mask;
-
     // char *name[];
 
     uint16_t playback_speed;
@@ -121,8 +120,7 @@ private:
     uint16_t current_buffer_index;
     // snd_knob_t *knobs;
 
-    uintptr_t curr_file_buffer_ptr;
-    uint8_t playing;
+    bool playing;
 
     void initialise_buffers();
 
@@ -134,11 +132,11 @@ public:
 
     bool can_write(FsHandle &handle) override;
 
-    bool can_read(FsHandle &handle) override;
+    // bool can_read(FsHandle &handle) override;
 
-    ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
+    // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
 
-    Result call(FsHandle &handle, IOCall request, void *args) override;
+    // Result call(FsHandle &handle, IOCall request, void *args) override;
 };

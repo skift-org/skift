@@ -99,7 +99,7 @@ public:
         uint32_t base;
 
         size_t size;
-        bool prefetchable;
+        bool prefetchable = false;
 
         if ((bar_value & 0b0111) == 0b0110)
         {

@@ -12,12 +12,12 @@ Done
 - allocated buffer memory
 - initialised driver
 - set max volume
-
-Left
-- set sample rate in initialise
 - add logging to functions
 - try to initialise driver in qemu
 - implement write function that starts playing
+
+Left
+- set sample rate in initialise
 - handle interrupt and filebuffer memory 
 - stop playing once buffer is complete or call received
 - implement record using read
@@ -35,11 +35,14 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     playback_volume_master = AC97_MASTER_VOLUME;
 
     // get native audio bus master bar and native audio mixer bar
-    nabmbar = pci_address().read16(AC97_NABMBAR) & ((uint32_t)-1) << 1;
-    nambar = pci_address().read32(PCI_BAR0) & ((uint32_t)-1) << 1;
+    nabmbar = bar(1).base();
+    nambar = bar(0).base();
+    lvi = 2;
 
     //  enable all device interrupts
     out8(nabmbar + AC97_PO_CR, AC97_X_CR_FEIE | AC97_X_CR_IOCE);
+
+    pci_address().write16(PCI_COMMAND, 0x5);
 
     // default the pcm output to full volume
     out16(nambar + AC97_PCM_OUT_VOLUME, 0x0000);
@@ -49,7 +52,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     // tell the ac97 where buffer descriptor list is
     out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
     // set last valid index
-    lvi = 2;
+    // lvi = 2;
     out8(nabmbar + AC97_PO_LVI, lvi);
 
     // detect wheter device supports MSB
@@ -89,7 +92,7 @@ void AC97::initialise_buffers()
         buffer_descriptors_list[i].pointer = buffers[i]->physical_base();
         AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, AC97_BDL_BUFFER_LEN);
         /* Set all buffers to interrupt */
-        buffer_descriptors_list[i].cl |= AC97_CL_IOC;
+        // buffer_descriptors_list[i].cl |= AC97_CL_IOC;
     }
 }
 
@@ -98,27 +101,86 @@ AC97::~AC97() { ; }
 void AC97::handle_interrupt()
 {
     logger_trace("interrupt received");
+    uint16_t sr = in16(nabmbar + AC97_PO_SR);
+    if (!sr)
+    {
+        return;
+    }
+
+    if (sr & AC97_X_SR_BCIS)
+    {
+        ;
+    }
+    else if (sr & AC97_X_SR_LVBCI)
+    {
+        logger_trace("ac97 irq is lvbci");
+        playing = false;
+    }
+    else if (sr & AC97_X_SR_FIFOE)
+    {
+        logger_trace("ac97 irq is fifoe");
+    }
+    else
+    {
+        /* don't handle it */
+        return;
+    }
+    logger_trace("ac97 status register: 0x%4x, %d", sr, sr);
+    // i dont know what this does (._.')
+    out16(nabmbar + AC97_PO_SR, sr & 0x1E);
+
+    return;
 }
 // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) { ; };
+
+bool AC97::can_write(FsHandle &handle)
+{
+    __unused(handle);
+    return !playing;
+    // return true;
+}
 
 ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
 {
     __unused(handle);
-    __unused(size);
+    // __unused(size);
     // __unused(buffer);
-    logger_trace("int write for ac97");
-    int final = 0;
+    // lvi = 0;
 
-    for (int i = 0; i < 32; i++)
+    logger_trace("in write for ac97 %d", size);
+    for (int i = 0; i < 32 && size; i++)
     {
-        buffers[i]->write(i * AC97_BDL_BUFFER_LEN, buffer, AC97_BDL_BUFFER_LEN);
-        final = i;
+        if (size >= AC97_BDL_BUFFER_LEN)
+        {
+            logger_trace("inhere");
+            AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, 0xFFFE);
+            size -= AC97_BDL_BUFFER_LEN;
+            buffers[i]->write(0, buffer, AC97_BDL_BUFFER_LEN);
+        }
+        else
+        {
+            logger_trace("here");
+            AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, size >> 1);
+            buffers[i]->write(0, buffer, size);
+            size = 0;
+        }
+        buffer_descriptors_list[i].cl |= AC97_CL_IOC;
+        if (size) // Another buffer
+        {
+            ;
+        }
+        else // no more buffer
+        {
+            buffer_descriptors_list[i].cl |= AC97_CL_BUP;
+            lvi = i; // The last valid buffer is this one
+            break;
+        }
     }
-    buffer_descriptors_list[final].cl |= AC97_CL_BUP;
     out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
-    out8(nabmbar + AC97_PO_LVI, final);
+    out8(nabmbar + AC97_PO_LVI, lvi);
     out8(nabmbar + AC97_PO_CR, AC97_PO_LVI);
-    logger_trace("out for ac97");
+    playing = true;
+    logger_trace("out for ac97 %d %d", lvi, size);
     return SUCCESS;
 }
 

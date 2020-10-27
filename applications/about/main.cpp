@@ -2,6 +2,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TextField.h>
 
 static auto logo_based_on_color_scheme()
 {
@@ -16,7 +17,6 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     Window *window = window_create_from_file("/Applications/about/about.markup");
-    window->type(WINDOW_TYPE_DIALOG);
 
     window->with_widget<Image>("system-image", [&](auto image) {
         image->change_bitmap(logo_based_on_color_scheme());
@@ -28,6 +28,20 @@ int main(int argc, char **argv)
 
     window->with_widget<Label>("commit-label", [&](auto label) {
         label->text(__BUILD_GITREF__ "/" __BUILD_CONFIG__);
+    });
+
+    window->with_widget<Button>("license-button", [&](auto button) {
+        button->on(Event::ACTION, [window](auto) {
+            auto license_window = new Window(WINDOW_RESIZABLE);
+            license_window->title("License");
+            license_window->size({320, 320});
+
+            auto field = new TextField(license_window->root(), TextModel::from_file("/Files/license.md"));
+            field->attributes(LAYOUT_FILL);
+            field->focus();
+
+            license_window->show();
+        });
     });
 
     window->with_widget<Button>("ok-button", [&](auto button) {

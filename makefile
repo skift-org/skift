@@ -116,6 +116,7 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 		$(SYSROOT)/System/Icons \
 		$(SYSROOT)/System/Includes \
 		$(SYSROOT)/System/Libraries \
+		$(SYSROOT)/Files \
 		$(SYSROOT)/User \
 		$(SYSROOT)/User/Applications \
 		$(SYSROOT)/User/Configs \
@@ -129,6 +130,7 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 		$(SYSROOT)/User/Sites
 
 	@cp -r sysroot/* $(SYSROOT)/
+	@cp license.md $(SYSROOT)/Files
 
 	@cd $(SYSROOT); tar -cf $@ *
 

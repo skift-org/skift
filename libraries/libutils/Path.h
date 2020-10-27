@@ -303,6 +303,7 @@ public:
         while (lexer.do_continue())
         {
             builder.append(lexer.current());
+            lexer.foreward();
         }
 
         return builder.finalize();

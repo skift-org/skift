@@ -4,7 +4,10 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/File.h>
+#include <libutils/HashMap.h>
 #include <libutils/Path.h>
+
+static HashMap<String, RefPtr<Font>> _fonts;
 
 static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {
@@ -33,23 +36,28 @@ static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)
 
 ResultOr<RefPtr<Font>> Font::create(String name)
 {
-    auto glyph_or_error = font_load_glyph(name);
-
-    if (!glyph_or_error.success())
+    if (!_fonts.has_key(name))
     {
-        logger_error("Failed to load font %s: missing glyphs", name.cstring());
-        return glyph_or_error.result();
+        auto glyph_or_error = font_load_glyph(name);
+
+        if (!glyph_or_error.success())
+        {
+            logger_error("Failed to load font %s: missing glyphs", name.cstring());
+            return glyph_or_error.result();
+        }
+
+        auto bitmap_or_error = font_load_bitmap(name);
+
+        if (!bitmap_or_error.success())
+        {
+            logger_error("Failed to load font %s: missing bitmap", name.cstring());
+            return bitmap_or_error.result();
+        }
+
+        _fonts[name] = make<Font>(bitmap_or_error.take_value(), glyph_or_error.take_value());
     }
 
-    auto bitmap_or_error = font_load_bitmap(name);
-
-    if (!bitmap_or_error.success())
-    {
-        logger_error("Failed to load font %s: missing bitmap", name.cstring());
-        return bitmap_or_error.result();
-    }
-
-    return make<Font>(bitmap_or_error.take_value(), glyph_or_error.take_value());
+    return _fonts[name];
 }
 
 Glyph &Font::glyph(Codepoint codepoint)

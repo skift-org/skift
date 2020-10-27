@@ -38,6 +38,9 @@ int main(int argc, char **argv)
 
             auto field = new TextField(license_window->root(), TextModel::from_file("/Files/license.md"));
             field->attributes(LAYOUT_FILL);
+            field->readonly(true);
+            field->linenumbers(false);
+            field->font(Font::create("mono").take_value());
             field->focus();
 
             license_window->show();

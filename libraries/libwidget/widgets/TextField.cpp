@@ -31,8 +31,18 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
 {
     __unused(rectangle);
 
-    painter.fill_rectangle(this->content_bound().take_left(32), color(THEME_BORDER));
-    painter.fill_rectangle(this->content_bound().take_left(32).take_right(1), color(THEME_BORDER));
+    if (_linenumbers)
+    {
+        painter.fill_rectangle(this->content_bound().take_left(32), color(THEME_BORDER));
+        painter.fill_rectangle(this->content_bound().take_left(32).take_right(1), color(THEME_BORDER));
+    }
+
+    auto paint_cursor = [this](Painter &painter, Vec2i position) {
+        if (!_readonly)
+        {
+            painter.draw_rectangle(Rectangle(position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+        }
+    };
 
     for (size_t i = MAX(0, _vscroll_offset / LINE_HEIGHT - 1);
          i < MIN(_model->line_count(), (((unsigned)this->content_bound().height() + _vscroll_offset) / LINE_HEIGHT) + 1);
@@ -40,30 +50,40 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
     {
         Rectangle line_bound = document_bound().row(_model->line_count(), i);
 
-        if (_cursor.line() == i)
+        if (!_readonly)
         {
-            painter.fill_rectangle(line_bound.cutoff_left_and_right(32, 0), color(THEME_BORDER));
+            if (_cursor.line() == i)
+            {
+                painter.fill_rectangle(line_bound.cutoff_left_and_right(32, 0), color(THEME_BORDER));
+            }
         }
 
-        // Line number
-        char buffer[16];
-        snprintf(buffer, 16, "%3d", (int)(i + 1));
-        if (_cursor.line() == i)
+        if (_linenumbers)
         {
-            painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND));
-        }
-        else
-        {
-            painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
+            // Line number
+            char buffer[16];
+            snprintf(buffer, 16, "%3d", (int)(i + 1));
+            if (_cursor.line() == i)
+            {
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND));
+            }
+            else
+            {
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
+            }
         }
 
         painter.push();
-        painter.clip(content_bound().cutoff_left_and_right(32, 0));
+
+        if (_linenumbers)
+        {
+            painter.clip(content_bound().cutoff_left_and_right(32, 0));
+        }
 
         // Line content
         auto &line = _model->line(i);
 
-        Vec2i current_position = line_bound.cutoff_left_and_right(32 + 4, 0).position() + Vec2i(0, LINE_HEIGHT / 2 + 4);
+        Vec2i current_position = line_bound.cutoff_left_and_right((_linenumbers ? 32 : 0) + 4, 0).position() + Vec2i(0, LINE_HEIGHT / 2 + 4);
 
         for (size_t j = 0; j < line.length(); j++)
         {
@@ -71,7 +91,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
 
             if (i == _cursor.line() && j == _cursor.column())
             {
-                painter.draw_rectangle(Rectangle(current_position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+                paint_cursor(painter, current_position);
             }
 
             if (codepoint == U'\t')
@@ -95,7 +115,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
 
         if (i == _cursor.line() && line.length() == _cursor.column())
         {
-            painter.draw_rectangle(Rectangle(current_position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+            paint_cursor(painter, current_position);
         }
 
         painter.pop();
@@ -188,25 +208,29 @@ void TextField::event(Event *event)
             _cursor.move_end_within(_model->line(_cursor.line()));
             scroll_to_cursor();
         }
-        else if (event->keyboard.key == KEYBOARD_KEY_BKSPC)
+
+        if (!_readonly)
         {
-            _model->backspace_at(_cursor);
-            scroll_to_cursor();
-        }
-        else if (event->keyboard.key == KEYBOARD_KEY_DELETE)
-        {
-            _model->delete_at(_cursor);
-            scroll_to_cursor();
-        }
-        else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
-        {
-            _model->newline_at(_cursor);
-            scroll_to_cursor();
-        }
-        else if (event->keyboard.codepoint != 0)
-        {
-            _model->append_at(_cursor, event->keyboard.codepoint);
-            scroll_to_cursor();
+            if (event->keyboard.key == KEYBOARD_KEY_BKSPC)
+            {
+                _model->backspace_at(_cursor);
+                scroll_to_cursor();
+            }
+            else if (event->keyboard.key == KEYBOARD_KEY_DELETE)
+            {
+                _model->delete_at(_cursor);
+                scroll_to_cursor();
+            }
+            else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
+            {
+                _model->newline_at(_cursor);
+                scroll_to_cursor();
+            }
+            else if (event->keyboard.codepoint != 0)
+            {
+                _model->append_at(_cursor, event->keyboard.codepoint);
+                scroll_to_cursor();
+            }
         }
 
         should_repaint();

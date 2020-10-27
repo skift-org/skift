@@ -21,6 +21,7 @@ private:
 
     bool _linenumbers = true;
     bool _multiline = true;
+    bool _readonly = false;
 
     void update_scrollbar();
 
@@ -82,6 +83,13 @@ public:
     void multiline(bool value)
     {
         _multiline = value;
+        should_relayout();
+        should_repaint();
+    }
+
+    void readonly(bool value)
+    {
+        _readonly = value;
         should_relayout();
         should_repaint();
     }

@@ -72,6 +72,7 @@ private:
     Insets _insets = {};
     WidgetColor _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
+    RefPtr<Font> _font;
     LayoutAttributes _layout_attributes = {};
 
     EventHandler _handlers[EventType::__COUNT] = {};
@@ -84,7 +85,20 @@ private:
 public:
     void id(const char *id);
 
-    RefPtr<Font> font();
+    RefPtr<Font> font()
+    {
+        if (!_font)
+        {
+            _font = Font::create("sans").take_value();
+        }
+
+        return _font;
+    }
+
+    void font(RefPtr<Font> font)
+    {
+        _font = font;
+    }
 
     Color color(ThemeColorRole role);
     void color(ThemeColorRole role, Color color);

@@ -551,17 +551,6 @@ void Widget::dispatch_event(Event *event)
     }
 }
 
-static RefPtr<Font> _widget_font = nullptr;
-RefPtr<Font> Widget::font()
-{
-    if (_widget_font == nullptr)
-    {
-        _widget_font = Font::create("sans").take_value();
-    }
-
-    return _widget_font;
-}
-
 Vec2i Widget::compute_size()
 {
     Vec2i size = this->size();

@@ -4,12 +4,12 @@
 
 #include <libsystem/Result.h>
 
-#define SELECT_READ (1 << 0)
-#define SELECT_WRITE (1 << 1)
-#define SELECT_CONNECT (1 << 2)
-#define SELECT_ACCEPT (1 << 3)
+#define POLL_READ (1 << 0)
+#define POLL_WRITE (1 << 1)
+#define POLL_CONNECT (1 << 2)
+#define POLL_ACCEPT (1 << 3)
 
-typedef unsigned int SelectEvent;
+typedef unsigned int PollEvent;
 
 struct Handle
 {
@@ -21,7 +21,7 @@ struct Handle
 struct HandleSet
 {
     int *handles;
-    SelectEvent *events;
+    PollEvent *events;
     size_t count;
 };
 

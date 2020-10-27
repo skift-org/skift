@@ -86,18 +86,18 @@ class BlockerSelect : public Blocker
 {
 private:
     FsHandle **_handles;
-    SelectEvent *_events;
+    PollEvent *_events;
     size_t _count;
 
     FsHandle **_selected;
-    SelectEvent *_selected_events;
+    PollEvent *_selected_events;
 
 public:
     BlockerSelect(FsHandle **handles,
-                  SelectEvent *events,
+                  PollEvent *events,
                   size_t count,
                   FsHandle **selected,
-                  SelectEvent *selected_events)
+                  PollEvent *selected_events)
         : _handles(handles),
           _events(events),
           _count(count),

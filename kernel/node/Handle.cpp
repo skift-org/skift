@@ -64,28 +64,28 @@ void FsHandle::release(int who_release)
     lock_release_by(_lock, who_release);
 }
 
-SelectEvent FsHandle::poll(SelectEvent events)
+PollEvent FsHandle::poll(PollEvent events)
 {
-    SelectEvent selected_events = 0;
+    PollEvent selected_events = 0;
 
-    if ((events & SELECT_READ) && _node->can_read(this))
+    if ((events & POLL_READ) && _node->can_read(this))
     {
-        selected_events |= SELECT_READ;
+        selected_events |= POLL_READ;
     }
 
-    if ((events & SELECT_WRITE) && _node->can_write(this))
+    if ((events & POLL_WRITE) && _node->can_write(this))
     {
-        selected_events |= SELECT_WRITE;
+        selected_events |= POLL_WRITE;
     }
 
-    if ((events & SELECT_CONNECT) && _node->is_accepted())
+    if ((events & POLL_CONNECT) && _node->is_accepted())
     {
-        selected_events |= SELECT_CONNECT;
+        selected_events |= POLL_CONNECT;
     }
 
-    if ((events & SELECT_ACCEPT) && _node->can_accept())
+    if ((events & POLL_ACCEPT) && _node->can_accept())
     {
-        selected_events |= SELECT_ACCEPT;
+        selected_events |= POLL_ACCEPT;
     }
 
     return selected_events;

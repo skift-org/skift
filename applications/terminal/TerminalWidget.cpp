@@ -9,7 +9,7 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-void terminal_widget_server_callback(TerminalWidget *widget, Stream *server, SelectEvent events)
+void terminal_widget_server_callback(TerminalWidget *widget, Stream *server, PollEvent events)
 {
     __unused(events);
 
@@ -37,7 +37,7 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
     _server_notifier = notifier_create(
         this,
         HANDLE(_server_stream),
-        SELECT_READ,
+        POLL_READ,
         (NotifierCallback)terminal_widget_server_callback);
 
     _cursor_blink_timer = own<Timer>(250, [this]() {

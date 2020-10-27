@@ -37,7 +37,7 @@ static EventType key_motion_to_event_type(KeyMotion motion)
     ASSERT_NOT_REACHED();
 }
 
-void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events)
+void keyboard_callback(void *target, Stream *keyboard_stream, PollEvent events)
 {
     __unused(target);
     __unused(events);
@@ -73,7 +73,7 @@ void keyboard_callback(void *target, Stream *keyboard_stream, SelectEvent events
     client_destroy_disconnected();
 }
 
-void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
+void mouse_callback(void *target, Stream *mouse_stream, PollEvent events)
 {
     __unused(target);
     __unused(events);
@@ -93,7 +93,7 @@ void mouse_callback(void *target, Stream *mouse_stream, SelectEvent events)
     client_destroy_disconnected();
 }
 
-void accept_callback(void *target, Socket *socket, SelectEvent events)
+void accept_callback(void *target, Socket *socket, PollEvent events)
 {
     __unused(target);
     __unused(events);
@@ -134,9 +134,9 @@ int main(int argc, char const *argv[])
     Stream *lock_stream = stream_open("/Session/compositor.lock", OPEN_CREATE);
     stream_close(lock_stream);
 
-    notifier_create(nullptr, HANDLE(keyboard_stream), SELECT_READ, (NotifierCallback)keyboard_callback);
-    notifier_create(nullptr, HANDLE(mouse_stream), SELECT_READ, (NotifierCallback)mouse_callback);
-    notifier_create(nullptr, HANDLE(socket), SELECT_ACCEPT, (NotifierCallback)accept_callback);
+    notifier_create(nullptr, HANDLE(keyboard_stream), POLL_READ, (NotifierCallback)keyboard_callback);
+    notifier_create(nullptr, HANDLE(mouse_stream), POLL_READ, (NotifierCallback)mouse_callback);
+    notifier_create(nullptr, HANDLE(socket), POLL_ACCEPT, (NotifierCallback)accept_callback);
 
     auto repaint_timer = own<Timer>(1000 / 60, []() {
         renderer_repaint_dirty();

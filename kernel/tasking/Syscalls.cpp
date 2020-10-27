@@ -328,17 +328,17 @@ Result sys_handle_close(int handle)
     return task_fshandle_close(scheduler_running(), handle);
 }
 
-Result sys_handle_select(
+Result sys_handle_poll(
     HandleSet *handles_set,
     int *selected,
-    SelectEvent *selected_events,
+    PollEvent *selected_events,
     Timeout timeout)
 {
     if (!syscall_validate_ptr((uintptr_t)handles_set, sizeof(HandleSet)) ||
         !syscall_validate_ptr((uintptr_t)handles_set->handles, sizeof(int) * handles_set->count) ||
-        !syscall_validate_ptr((uintptr_t)handles_set->events, sizeof(SelectEvent) * handles_set->count) ||
+        !syscall_validate_ptr((uintptr_t)handles_set->events, sizeof(PollEvent) * handles_set->count) ||
         !syscall_validate_ptr((uintptr_t)selected, sizeof(int)) ||
-        !syscall_validate_ptr((uintptr_t)selected_events, sizeof(SelectEvent)))
+        !syscall_validate_ptr((uintptr_t)selected_events, sizeof(PollEvent)))
     {
         return ERR_BAD_ADDRESS;
     }
@@ -348,21 +348,21 @@ Result sys_handle_select(
         return ERR_TOO_MANY_OPEN_FILES;
     }
 
-    // We need to copy these because this syscall uses task_fshandle_select
+    // We need to copy these because this syscall uses task_fshandle_poll
     // who block the current thread using a blocker which does a context switch.
 
     __cleanup_malloc int *handles_copy = (int *)calloc(handles_set->count, sizeof(int));
     memcpy(handles_copy, handles_set->handles, handles_set->count * sizeof(int));
 
-    __cleanup_malloc SelectEvent *events_copy = (SelectEvent *)calloc(handles_set->count, sizeof(SelectEvent));
-    memcpy(events_copy, handles_set->events, handles_set->count * sizeof(SelectEvent));
+    __cleanup_malloc PollEvent *events_copy = (PollEvent *)calloc(handles_set->count, sizeof(PollEvent));
+    memcpy(events_copy, handles_set->events, handles_set->count * sizeof(PollEvent));
 
     int selected_copy;
-    SelectEvent selected_event_copy;
+    PollEvent selected_event_copy;
 
     HandleSet handle_set = (HandleSet){handles_copy, events_copy, handles_set->count};
 
-    Result result = task_fshandle_select(
+    Result result = task_fshandle_poll(
         scheduler_running(),
         &handle_set,
         &selected_copy,
@@ -522,7 +522,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [SYS_SYSTEM_SHUTDOWN] = reinterpret_cast<SyscallHandler>(sys_system_shutdown),
     [SYS_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(sys_handle_open),
     [SYS_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(sys_handle_close),
-    [SYS_HANDLE_SELECT] = reinterpret_cast<SyscallHandler>(sys_handle_select),
+    [SYS_HANDLE_POLL] = reinterpret_cast<SyscallHandler>(sys_handle_poll),
     [SYS_HANDLE_READ] = reinterpret_cast<SyscallHandler>(sys_handle_read),
     [SYS_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(sys_handle_write),
     [SYS_HANDLE_CALL] = reinterpret_cast<SyscallHandler>(sys_handle_call),

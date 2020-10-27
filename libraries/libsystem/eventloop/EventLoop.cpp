@@ -18,7 +18,7 @@ static Vector<Invoker *> _eventloop_invoker;
 
 static size_t _eventloop_handles_count;
 static Handle *_eventloop_handles[PROCESS_HANDLE_COUNT];
-static SelectEvent _eventloop_events[PROCESS_HANDLE_COUNT];
+static PollEvent _eventloop_events[PROCESS_HANDLE_COUNT];
 
 static bool _eventloop_is_running = false;
 static bool _eventloop_is_initialize = false;
@@ -145,9 +145,9 @@ void eventloop_pump(bool pool)
     eventloop_update_timers();
 
     Handle *selected = nullptr;
-    SelectEvent selected_events = 0;
+    PollEvent selected_events = 0;
 
-    Result result = handle_select(
+    Result result = handle_poll(
         &_eventloop_handles[0],
         &_eventloop_events[0],
         _eventloop_handles_count,

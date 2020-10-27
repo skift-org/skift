@@ -34,7 +34,7 @@ public:
 
     void release(int who_release);
 
-    SelectEvent poll(SelectEvent events);
+    PollEvent poll(PollEvent events);
 
     ResultOr<size_t> read(void *buffer, size_t size);
 

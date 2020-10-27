@@ -112,7 +112,7 @@ void application_wait_for_ack()
 void application_request_callback(
     void *target,
     Connection *connection,
-    SelectEvent events)
+    PollEvent events)
 {
     __unused(target);
     __unused(events);
@@ -181,7 +181,7 @@ Result application_initialize(int argc, char **argv)
     _connection_notifier = notifier_create(
         nullptr,
         HANDLE(_connection),
-        SELECT_READ,
+        POLL_READ,
         (NotifierCallback)application_request_callback);
 
     _state = APPLICATION_INITALIZED;

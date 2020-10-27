@@ -34,7 +34,7 @@
                                        \
     __ENTRY(SYS_HANDLE_OPEN)           \
     __ENTRY(SYS_HANDLE_CLOSE)          \
-    __ENTRY(SYS_HANDLE_SELECT)         \
+    __ENTRY(SYS_HANDLE_POLL)           \
     __ENTRY(SYS_HANDLE_READ)           \
     __ENTRY(SYS_HANDLE_WRITE)          \
     __ENTRY(SYS_HANDLE_CALL)           \

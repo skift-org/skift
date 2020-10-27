@@ -60,7 +60,7 @@ void BlockerSelect::on_unblock(Task *task)
 
     for (size_t i = 0; i < _count; i++)
     {
-        SelectEvent events = _handles[i]->poll(_events[i]);
+        PollEvent events = _handles[i]->poll(_events[i]);
 
         if (events != 0)
         {

@@ -8,10 +8,10 @@
 
 int __handle_printf_error(Handle *handle, const char *fmt, ...);
 
-Result handle_select(
+Result handle_poll(
     Handle **handles,
-    SelectEvent *events,
+    PollEvent *events,
     size_t count,
     Handle **selected,
-    SelectEvent *selected_events,
+    PollEvent *selected_events,
     Timeout timeout);

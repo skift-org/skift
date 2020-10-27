@@ -118,11 +118,11 @@ Result task_fshandle_close(Task *task, int handle_index)
     return task_fshandle_remove(task, handle_index);
 }
 
-Result task_fshandle_select(
+Result task_fshandle_poll(
     Task *task,
     HandleSet *handles_set,
     int *selected_index,
-    SelectEvent *selected_events,
+    PollEvent *selected_events,
     Timeout timeout)
 {
     Result result = SUCCESS;

@@ -147,9 +147,9 @@ void client_handle_set_wallpaper(Client *client, CompositorSetWallaper set_wallp
     }
 }
 
-void client_request_callback(Client *client, Connection *connection, SelectEvent events)
+void client_request_callback(Client *client, Connection *connection, PollEvent events)
 {
-    assert(events & SELECT_READ);
+    assert(events & POLL_READ);
 
     CompositorMessage message = {};
     size_t message_size = connection_receive(connection, &message, sizeof(CompositorMessage));
@@ -229,7 +229,7 @@ Client::Client(Connection *connection)
     this->notifier = notifier_create(
         this,
         HANDLE(connection),
-        SELECT_READ,
+        POLL_READ,
         (NotifierCallback)client_request_callback);
 
     list_pushback(_connected_client, this);

@@ -16,12 +16,12 @@ int __handle_printf_error(Handle *handle, const char *fmt, ...)
     return result;
 }
 
-Result handle_select(
+Result handle_poll(
     Handle **handles,
-    SelectEvent *events,
+    PollEvent *events,
     size_t count,
     Handle **selected,
-    SelectEvent *selected_events,
+    PollEvent *selected_events,
     Timeout timeout)
 {
     int *handles_index = (int *)calloc(count, sizeof(int));
@@ -35,7 +35,7 @@ Result handle_select(
 
     HandleSet handleset = (HandleSet){handles_index, events, count};
 
-    Result result = __plug_handle_select(
+    Result result = __plug_handle_poll(
         &handleset,
         &selected_index,
         selected_events,

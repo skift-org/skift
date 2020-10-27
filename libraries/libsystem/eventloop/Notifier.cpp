@@ -1,12 +1,12 @@
 
+#include <libsystem/Logger.h>
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/eventloop/Notifier.h>
-#include <libsystem/Logger.h>
 
 Notifier *notifier_create(
     void *target,
     Handle *handle,
-    SelectEvent events,
+    PollEvent events,
     NotifierCallback callback)
 {
     Notifier *notifier = __create(Notifier);

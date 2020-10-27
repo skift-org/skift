@@ -20,12 +20,12 @@
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)
 
  - **skiftOS** is a simple, handmade, operating system for the x86 platform. Aiming for clean and pretty API while keeping the spirit of UNIX.
- - **skiftOS** feature an UNIX like terminal experience with many familiar UNIX utilities.
+ - **skiftOS** features an UNIX like terminal experience with many familiar UNIX utilities.
  - **skiftOS** is pretty easy to build from source, just follow the [build guide](./building.md)
  - **skiftOS** is capable of running on real hardware.
  - **skiftOS** is a labor of love.
- - **skiftOS** feature a graphical user interface, with composited windows.
- - **skiftOS** include many applications like Image editor, Text editor, Terminal Emulator, etc...
+ - **skiftOS** features a graphical user interface (GUI), with a compositor.
+ - **skiftOS** includes many applications like an [Image Viewer](./applications/image-viewer), [Text Editor](./applications/text-editor), [Terminal Emulator](./applications/terminal), [etc](./applications)...
  - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # Screenshots
@@ -36,21 +36,14 @@ skiftOS running in QEMU 5.1
 </p>
 <br/>
 
-# Manual
+# Links
+[Manual](./manual/readme.md)
 
-See [manual/](./manual/readme.md)
+[Building](./building.md)
 
-# Building
+[Contributing](./contributing.md)
 
-See [building.md](./building.md)
-
-# Contributing
-
-See [contributing.md](./contributing.md)
-
-# Code of Conduct
-
-see [code_of_conduct.md](./code_of_conduct.md)
+[Code of conduct](./code_of_conduct.md)
 
 # Contributors
 

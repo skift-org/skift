@@ -57,18 +57,20 @@ Rectangle Icon::bound(IconSize size)
 
 RefPtr<Bitmap> Icon::bitmap(IconSize size)
 {
-    if (_bitmaps[size])
+    if (!_bitmaps[size])
     {
-        return _bitmaps[size];
+        for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
+        {
+            if (_bitmaps[i])
+            {
+                return _bitmaps[i];
+            }
+        }
+
+        _bitmaps[size] = Bitmap::load_from_or_placeholder("none");
     }
 
-    for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
-    {
-        if (_bitmaps[i])
-        {
-            return _bitmaps[i];
-        }
-    }
+    return _bitmaps[size];
 
     ASSERT_NOT_REACHED();
 }

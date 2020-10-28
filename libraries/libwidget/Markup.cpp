@@ -311,6 +311,11 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
             Bitmap::load_from_or_placeholder(markup_node_get_attribute_or_default(node, "path", "null")));
     }
 
+    if (markup_node_is(node, "Slider"))
+    {
+        widget = new Slider(parent);
+    }
+
     if (widget == nullptr)
     {
         widget = new Placeholder(parent, markup_node_type(node));

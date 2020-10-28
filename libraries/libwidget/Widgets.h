@@ -10,5 +10,6 @@
 #include <libwidget/widgets/Placeholder.h>
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Separator.h>
+#include <libwidget/widgets/Slider.h>
 #include <libwidget/widgets/Table.h>
 #include <libwidget/widgets/Toolbar.h>

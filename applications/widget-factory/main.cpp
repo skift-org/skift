@@ -58,7 +58,7 @@ int main(int argc, char **argv)
         panel_grid->attributes(LAYOUT_FILL);
 
         new Panel(panel_grid);
-        new Panel(panel_grid);
+        new Slider(panel_grid);
         new Panel(panel_grid);
         new Panel(panel_grid);
 

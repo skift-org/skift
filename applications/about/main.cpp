@@ -32,14 +32,13 @@ int main(int argc, char **argv)
 
     window->with_widget<Button>("license-button", [&](auto button) {
         button->on(Event::ACTION, [window](auto) {
-            auto license_window = new Window(WINDOW_RESIZABLE);
+            auto license_window = new Window(WINDOW_NONE);
             license_window->title("License");
-            license_window->size({320, 320});
+            license_window->size({556, 416});
 
             auto field = new TextField(license_window->root(), TextModel::from_file("/Files/license.md"));
             field->attributes(LAYOUT_FILL);
             field->readonly(true);
-            field->linenumbers(false);
             field->font(Font::create("mono").take_value());
             field->focus();
 

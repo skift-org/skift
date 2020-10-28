@@ -38,6 +38,8 @@ int main(int argc, char **argv)
 
     auto field = new TextField(window->root(), model);
     field->attributes(LAYOUT_FILL);
+    field->overscroll(true);
+    field->linenumbers(true);
     field->focus();
 
     window->show();

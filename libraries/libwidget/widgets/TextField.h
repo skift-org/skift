@@ -19,9 +19,10 @@ private:
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
 
-    bool _linenumbers = true;
+    bool _linenumbers = false;
     bool _multiline = true;
     bool _readonly = false;
+    bool _overscroll = false;
 
     void update_scrollbar();
 
@@ -90,6 +91,13 @@ public:
     void readonly(bool value)
     {
         _readonly = value;
+        should_relayout();
+        should_repaint();
+    }
+
+    void overscroll(bool value)
+    {
+        _overscroll = value;
         should_relayout();
         should_repaint();
     }

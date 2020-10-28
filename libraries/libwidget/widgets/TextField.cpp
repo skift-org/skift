@@ -249,8 +249,15 @@ void TextField::event(Event *event)
 
 void TextField::update_scrollbar()
 {
+    int document_height = document_bound().height();
+
+    if (_overscroll)
+    {
+        document_height += view_bound().height() - LINE_HEIGHT;
+    }
+
     _vscrollbar->update(
-        document_bound().height() + view_bound().height() - LINE_HEIGHT,
+        document_height,
         view_bound().height(),
         _vscroll_offset);
 

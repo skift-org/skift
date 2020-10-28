@@ -1,0 +1,6 @@
+{
+    "name": "Media Player",
+    "comment": "A music/video playing app.",
+    "icon": "movie",
+    "command": "media-player"
+}

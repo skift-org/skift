@@ -331,9 +331,41 @@ void widget_create_childs_from_markup(Widget *parent, MarkupNode *node)
     }
 }
 
+WindowFlag window_flags_from_markup(MarkupNode *node)
+{
+    WindowFlag flags = 0;
+
+    if (markup_node_has_attribute(node, "borderless"))
+    {
+        flags |= WINDOW_BORDERLESS;
+    }
+
+    if (markup_node_has_attribute(node, "resizable"))
+    {
+        flags |= WINDOW_RESIZABLE;
+    }
+
+    if (markup_node_has_attribute(node, "always-focused"))
+    {
+        flags |= WINDOW_ALWAYS_FOCUSED;
+    }
+
+    if (markup_node_has_attribute(node, "swallow"))
+    {
+        flags |= WINDOW_SWALLOW;
+    }
+
+    if (markup_node_has_attribute(node, "transparent"))
+    {
+        flags |= WINDOW_TRANSPARENT;
+    }
+
+    return flags;
+}
+
 Window *window_create_from_markup(MarkupNode *node)
 {
-    Window *window = new Window(WINDOW_NONE);
+    auto window = new Window(window_flags_from_markup(node));
 
     int width = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "width"), 250);
 

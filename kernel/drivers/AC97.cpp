@@ -160,7 +160,7 @@ ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
             logger_trace("inhere");
             buffers[i]->write(0, buffer, AC97_BDL_BUFFER_LEN);
             AC97_CL_SET_LENGTH(buffer_descriptors_list[i % AC97_BDL_LEN].cl, AC97_BDL_BUFFER_LEN >> 1);
-            return_size += size;
+            return_size += AC97_BDL_BUFFER_LEN;
             size -= AC97_BDL_BUFFER_LEN;
         }
         else

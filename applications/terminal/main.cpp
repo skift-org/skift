@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     window->icon(Icon::get("console-line"));
     window->title("Terminal");
-    window->size(Vec2i(500, 400));
+    window->size(Vec2i(700, 500));
 
     Widget *widget = new TerminalWidget(window->root());
     widget->focus();

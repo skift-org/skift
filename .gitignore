@@ -7,5 +7,7 @@ toolchain/tarballs/
 toolchain/local/
 vm/
 disks/
+sysroot/User/Documents/sample.wav
+.gitignore
 
 *.ignored

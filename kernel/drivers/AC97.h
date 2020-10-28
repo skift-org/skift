@@ -57,39 +57,12 @@
 #define AC97_EXT_AUDIO_STC 0x002A
 #define AC97_FRONT_SPLRATE 0x002C
 #define AC97_LR_SPLRATE 0x0032
-#define AC97_PLAYBACK_SPEED 48000
-
-// #define PORT_NABM_POBDBAR 0x0010
-// #define PORT_NABM_POLVI 0x0015
-// #define PORT_NABM_POCONTROL 0x001B
-// #define PORT_NABM_GLB_CTRL_STAT 0x0060
-
-/* snd values */
-// #define AC97_SND_NAME "Intel AC'97"
-// #define AC97_PLAYBACK_SPEED 48000
-// #define AC97_PLAYBACK_FORMAT SND_FORMAT_L16SLE
-
-// #define AC97_KNOB_PCM_OUT (SND_KNOB_VENDOR + 0)
-
-// typedef struct snd_knob
-// {
-//     char name[256];
-//     uint32_t id;
-// } snd_knob_t;
-
-// static snd_knob_t _knobs[] = {
-//     {"Master",
-//      SND_KNOB_MASTER},
-//     {"PCM Out",
-//      SND_KNOB_VENDOR + 0}};
+#define AC97_PLAYBACK_SPEED 41400
 
 struct __packed AC97BufferDescriptor
 {
     uint32_t pointer;
     uint32_t cl;
-    // void *buffer;
-    // uint32_t length;
-    // int reserved
 };
 
 class AC97 : public PCIDevice
@@ -98,10 +71,8 @@ private:
     uint16_t nabmbar;
     uint16_t nambar;
 
-    uint8_t lvi;  // currently set last valid index ?
-    uint8_t bits; // how many bits of volume are supported ?
-    // AC97BufferDescriptor *bdl; // buffer descriptor list
-    // uint16_t *bufs[AC97_BDL_LEN];
+    uint8_t lvi;  // currently set last valid index in circular buffer
+    uint8_t bits; // how many bits of volume are supported
 
     // buffer descriptors range
     RefPtr<MMIORange> buffer_descriptors_range{};
@@ -113,13 +84,11 @@ private:
     uint32_t mask;
     // char *name[];
 
-    uint16_t playback_speed;
-    uint16_t playback_format;
     uint16_t playback_volume_PCM;
     uint16_t playback_volume_master;
-    uint16_t current_buffer_index;
     // snd_knob_t *knobs;
 
+    // to handle buffer allocation
     bool playing;
 
     void initialise_buffers();

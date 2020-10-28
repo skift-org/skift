@@ -15,11 +15,12 @@ Done
 - add logging to functions
 - try to initialise driver in qemu
 - implement write function that starts playing
-
-Left
 - set sample rate in initialise
 - handle interrupt and filebuffer memory 
-- stop playing once buffer is complete or call received
+- stop playing once buffer is complete 
+
+Left
+- stop playing once call received
 - implement record using read
 - implement volume control
 
@@ -28,9 +29,6 @@ Left
 AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
 {
     // set values
-    // knobs = _knobs;
-    playback_format = 0;
-    playback_speed = AC97_PLAYBACK_SPEED;
     playback_volume_PCM = AC97_PCM_OUT_VOLUME;
     playback_volume_master = AC97_MASTER_VOLUME;
 
@@ -40,7 +38,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     lvi = 0;
 
     //  enable all device interrupts
-    out8(nabmbar + AC97_PO_CR, AC97_X_CR_FEIE | AC97_X_CR_IOCE);
+    out8(nabmbar + AC97_PO_CR, AC97_X_CR_FEIE | AC97_X_CR_LVBIE | AC97_X_CR_IOCE);
     // out8(nabmbar + AC97_PO_CR, 0 << 4);
     pci_address().write16(PCI_COMMAND, 0x5);
 
@@ -54,7 +52,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
 
     // set last valid index
-    lvi = 2;
+    lvi = 0;
     out8(nabmbar + AC97_PO_LVI, lvi);
 
     // detect wheter device supports MSB
@@ -62,7 +60,6 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     uint16_t t = in32(nambar + AC97_MASTER_VOLUME) & 0x1f;
     if (t == 0x1f)
     {
-        // debug_print(WARNING, "This device only supports 5 bits of audio volume.");
         logger_trace("This device only supports 5 bits of audio volume.");
         bits = 5;
         mask = 0x1f;
@@ -75,12 +72,17 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
         out32(nambar + AC97_MASTER_VOLUME, 0x1f1f);
     }
 
+    // Enable variable rate audio
+    out16(nambar + AC97_EXT_AUDIO_STC, in16(nambar + AC97_EXT_AUDIO_STC) | 1);
+    task_sleep(scheduler_running(), 10);
+
+    // General Sample rate: 44100 Hz
+    out16(nambar + AC97_FRONT_SPLRATE, AC97_PLAYBACK_SPEED);
+    out16(nambar + AC97_LR_SPLRATE, AC97_PLAYBACK_SPEED);
+
     out8(nabmbar + AC97_PO_CR, in8(nabmbar + AC97_PO_CR) | AC97_X_CR_RPBM);
 
     logger_trace("AC97 initialised successfully");
-    // debug_print(NOTICE, "AC97 initialized successfully");
-
-    //start device playing
 }
 
 void AC97::initialise_buffers()
@@ -95,7 +97,6 @@ void AC97::initialise_buffers()
         AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, AC97_BDL_BUFFER_LEN);
         /* Set all buffers to interrupt */
         buffer_descriptors_list[i].cl |= AC97_CL_IOC;
-        // s
     }
 }
 
@@ -128,29 +129,26 @@ void AC97::handle_interrupt()
         /* don't handle it */
         return;
     }
-    // logger_trace("ac97 status register: %08x, %d", sr, sr);
+    logger_trace("ac97 status register: %08x, %d", sr, sr);
 
     // clear interrupt bits
     out16(nabmbar + AC97_PO_SR, sr & 0x1E);
 
     return;
 }
+
 // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) { ; };
 
 bool AC97::can_write(FsHandle &handle)
 {
     __unused(handle);
     return !playing;
-    // return true;
 }
 
 ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
 {
     __unused(handle);
-    // __unused(size);
-    // __unused(buffer);
-    // lvi = 0;
-    // logger_trace("in write for ac97 %d", size);
+
     playing = true;
     size_t return_size = 0;
     logger_trace("in write for ac97 %d ", size);
@@ -167,10 +165,7 @@ ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
         }
         else
         {
-            if (size % 2)
-            {
-                size += 1;
-            }
+
             return_size += size;
             buffers[i % AC97_BDL_LEN]->write(0, buffer, size);
             AC97_CL_SET_LENGTH(buffer_descriptors_list[i % AC97_BDL_LEN].cl, size >> 1);

@@ -187,10 +187,11 @@ void client_request_callback(Client *client, Connection *connection, PollEvent e
     case COMPOSITOR_MESSAGE_RESIZE_WINDOW:
         client_handle_resize_window(client, message.resize_window);
         break;
+
     case COMPOSITOR_MESSAGE_MOVE_WINDOW:
         client_handle_move_window(client, message.move_window);
-
         break;
+
     case COMPOSITOR_MESSAGE_FLIP_WINDOW:
         client_handle_flip_window(client, message.flip_window);
         break;

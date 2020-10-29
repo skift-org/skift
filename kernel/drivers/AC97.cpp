@@ -116,13 +116,9 @@ void AC97::handle_interrupt()
     if (sr & AC97_X_SR_BCIS)
     {
         logger_trace("interupt buffer finished playing");
-        playing = false;
-        // out16(nabmbar + AC97_PO_SR, 0 << 3);
     }
     else if (sr & AC97_X_SR_LVBCI)
     {
-        playing = false;
-        // out16(nabmbar + AC97_PO_SR, 0 << 2);
         logger_trace("ac97 irq is lvbci");
     }
     else if (sr & AC97_X_SR_FIFOE)
@@ -147,14 +143,13 @@ void AC97::handle_interrupt()
 bool AC97::can_write(FsHandle &handle)
 {
     __unused(handle);
-    return !playing;
+    return !_buffer.full();
 }
 
 ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
 {
     __unused(handle);
 
-    playing = true;
     size_t return_size = 0;
     logger_trace("in write for ac97 %d ", size);
     int j = 0;

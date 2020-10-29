@@ -25,8 +25,12 @@
 
 /* Bus mastering misc */
 /* Buffer descriptor list constants */
-#define AC97_BDL_LEN 32                               /* Buffer descriptor list length */
-#define AC97_BDL_BUFFER_LEN 0xF000                    /* Length of buffer in BDL */
+// max buffer len 64kb
+#define AC97_RINGBUFFER_LEN 0xF000
+#define AC97_BDL_LEN 32 /* Buffer descriptor list length */
+
+// buffer len 16kb so that device can buffer 4 buffers
+#define AC97_BDL_BUFFER_LEN 0x3c0                     /* Length of buffer in BDL */
 #define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFF)          /* Decode length from cl */
 #define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFF) /* Encode length to cl */
 #define AC97_CL_BUP ((uint32_t)1 << 30)               /* Buffer underrun policy in cl */
@@ -73,6 +77,9 @@ private:
 
     uint8_t lvi;  // currently set last valid index in circular buffer
     uint8_t bits; // how many bits of volume are supported
+
+    // device ring buffer
+    RingBuffer _buffer{AC97_RINGBUFFER_LEN};
 
     // buffer descriptors range
     RefPtr<MMIORange> buffer_descriptors_range{};

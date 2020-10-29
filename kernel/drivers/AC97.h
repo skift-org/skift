@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libutils/Vector.h>
-
 #include "kernel/devices/PCIDevice.h"
 #include "kernel/memory/MMIO.h"
+#include <libutils/RingBuffer.h>
+#include <libutils/Vector.h>
 
 /* Utility macros */
 #define N_ELEMENTS(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -26,7 +26,7 @@
 /* Bus mastering misc */
 /* Buffer descriptor list constants */
 #define AC97_BDL_LEN 32                               /* Buffer descriptor list length */
-#define AC97_BDL_BUFFER_LEN 0x1000                    /* Length of buffer in BDL */
+#define AC97_BDL_BUFFER_LEN 0xF000                    /* Length of buffer in BDL */
 #define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFF)          /* Decode length from cl */
 #define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFF) /* Encode length to cl */
 #define AC97_CL_BUP ((uint32_t)1 << 30)               /* Buffer underrun policy in cl */
@@ -61,7 +61,7 @@
 
 struct __packed AC97BufferDescriptor
 {
-    uint32_t pointer;
+    uintptr_t pointer;
     uint32_t cl;
 };
 
@@ -87,6 +87,8 @@ private:
     uint16_t playback_volume_PCM;
     uint16_t playback_volume_master;
     // snd_knob_t *knobs;
+
+    RingBuffer _buffer{AC97_BDL_BUFFER_LEN};
 
     // to handle buffer allocation
     bool playing;

@@ -33,7 +33,8 @@ UTILS = \
 	TRUE \
 	FALSE \
 	YES \
-	PWD
+	PWD	\
+	PLAY
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -52,6 +53,9 @@ CLEAR_NAME = clear
 
 CP_LIBS = 
 CP_NAME = cp
+
+PLAY_LIBS =
+PLAY_NAME = play
 
 DSTART_LIBS =
 DSTART_NAME = dstart

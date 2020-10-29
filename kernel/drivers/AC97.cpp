@@ -1,6 +1,8 @@
-#include <libsystem/Logger.h>
-
 #include "kernel/drivers/AC97.h"
+#include "kernel/scheduling/Scheduler.h"
+#include "kernel/tasking/Task.h"
+
+#include <libsystem/Logger.h>
 
 /*
 
@@ -94,7 +96,7 @@ void AC97::initialise_buffers()
     {
         buffers.push_back(make<MMIORange>(AC97_BDL_BUFFER_LEN));
         buffer_descriptors_list[i].pointer = buffers[i]->physical_base();
-        AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, AC97_BDL_BUFFER_LEN);
+        AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, 0);
         /* Set all buffers to interrupt */
         buffer_descriptors_list[i].cl |= AC97_CL_IOC;
     }
@@ -113,12 +115,15 @@ void AC97::handle_interrupt()
 
     if (sr & AC97_X_SR_BCIS)
     {
-        ;
+        logger_trace("interupt buffer finished playing");
+        playing = false;
+        // out16(nabmbar + AC97_PO_SR, 0 << 3);
     }
     else if (sr & AC97_X_SR_LVBCI)
     {
-        logger_trace("ac97 irq is lvbci");
         playing = false;
+        // out16(nabmbar + AC97_PO_SR, 0 << 2);
+        logger_trace("ac97 irq is lvbci");
     }
     else if (sr & AC97_X_SR_FIFOE)
     {
@@ -160,7 +165,7 @@ ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
             logger_trace("inhere");
             buffers[i]->write(0, buffer, AC97_BDL_BUFFER_LEN);
             AC97_CL_SET_LENGTH(buffer_descriptors_list[i % AC97_BDL_LEN].cl, AC97_BDL_BUFFER_LEN >> 1);
-            return_size += AC97_BDL_BUFFER_LEN;
+            return_size += size;
             size -= AC97_BDL_BUFFER_LEN;
         }
         else
@@ -174,15 +179,16 @@ ResultOr<size_t> AC97::write(FsHandle &handle, const void *buffer, size_t size)
             // buffer_descriptors_list[i % AC97_BDL_LEN].cl |= AC97_CL_IOC;
             size = 0;
         }
-        buffer_descriptors_list[i].cl |= AC97_CL_IOC;
+        buffer_descriptors_list[i % AC97_BDL_LEN].cl |= AC97_CL_IOC;
         if (size) // Another buffer
         {
             ;
         }
         else // no more buffer
         {
-            buffer_descriptors_list[i].cl |= AC97_CL_BUP;
-            lvi = i; // The last valid buffer is this one
+            buffer_descriptors_list[i % AC97_BDL_LEN].cl |= AC97_CL_BUP;
+            lvi = i % AC97_BDL_LEN; // The last valid buffer is this one
+            logger_trace("here lvi %d", lvi);
             break;
         }
     }

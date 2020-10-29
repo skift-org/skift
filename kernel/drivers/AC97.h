@@ -30,7 +30,7 @@
 #define AC97_BDL_LEN 32 /* Buffer descriptor list length */
 
 // buffer len 16kb so that device can buffer 4 buffers
-#define AC97_BDL_BUFFER_LEN 0x3c0                     /* Length of buffer in BDL */
+#define AC97_BDL_BUFFER_LEN 0x4000                    /* Length of buffer in BDL */
 #define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFF)          /* Decode length from cl */
 #define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFF) /* Encode length to cl */
 #define AC97_CL_BUP ((uint32_t)1 << 30)               /* Buffer underrun policy in cl */
@@ -88,14 +88,14 @@ private:
     // 32*4096 buffer array for playing sound using PCM 16 Bit out (DMA)
     Vector<RefPtr<MMIORange>> buffers;
 
+    void *read_buffer;
+
     uint32_t mask;
     // char *name[];
 
     uint16_t playback_volume_PCM;
     uint16_t playback_volume_master;
     // snd_knob_t *knobs;
-
-    RingBuffer _buffer{AC97_BDL_BUFFER_LEN};
 
     // to handle buffer allocation
     bool playing;

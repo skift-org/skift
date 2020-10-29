@@ -7,9 +7,8 @@ toolchain/tarballs/
 toolchain/local/
 vm/
 disks/
-sysroot/User/Documents/sample.wav
-sysroot/User/Documents/sample2.wav
+reference.md
 
-.gitignore
+sysroot/User/Documents/*.wav
 
 *.ignored

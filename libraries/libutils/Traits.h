@@ -10,37 +10,37 @@ struct EnableIf
 template <class T>
 struct EnableIf<true, T>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct AddConst
 {
-    typedef const T Type;
+    using Type = const T;
 };
 
 template <class T>
 struct RemoveConst
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemoveConst<const T>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemoveVolatile
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemoveVolatile<volatile T>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
@@ -53,15 +53,15 @@ template <class T, T v>
 struct IntegralConstant
 {
     static constexpr T value = v;
-    typedef T ValueType;
-    typedef IntegralConstant Type;
+    using ValueType = T;
+    using Type = IntegralConstant;
     constexpr operator ValueType() const { return value; }
     constexpr ValueType operator()() const { return value; }
 };
 
-typedef IntegralConstant<bool, false> FalseType;
+using FalseType = IntegralConstant<bool, false>;
 
-typedef IntegralConstant<bool, true> TrueType;
+using TrueType = IntegralConstant<bool, true>;
 
 template <class T>
 struct IsLvalueReference : FalseType
@@ -226,49 +226,41 @@ struct IsRvalueReference<T &&> : TrueType
 template <class T>
 struct RemovePointer
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemovePointer<T *>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemovePointer<T *const>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemovePointer<T *volatile>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemovePointer<T *const volatile>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <typename T, typename U>
-struct IsSame
+struct IsSame : FalseType
 {
-    enum
-    {
-        value = 0
-    };
 };
 
 template <typename T>
-struct IsSame<T, T>
+struct IsSame<T, T> : TrueType
 {
-    enum
-    {
-        value = 1
-    };
 };
 
 template <bool condition, class TrueType, class FalseType>
@@ -286,19 +278,19 @@ struct Conditional<false, TrueType, FalseType>
 template <typename T>
 struct RemoveReference
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemoveReference<T &>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <class T>
 struct RemoveReference<T &&>
 {
-    typedef T Type;
+    using Type = T;
 };
 
 template <typename T>

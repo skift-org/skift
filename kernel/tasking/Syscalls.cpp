@@ -95,7 +95,7 @@ Result sys_process_cancel(int pid)
     }
     else
     {
-        task->cancel(-1);
+        task->cancel(PROCESS_FAILURE);
         return SUCCESS;
     }
 }
@@ -148,6 +148,7 @@ Result sys_memory_free(uintptr_t address)
 
 Result sys_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
+
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
         !syscall_validate_ptr((uintptr_t)out_size, sizeof(size_t)))
     {

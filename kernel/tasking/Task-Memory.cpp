@@ -3,13 +3,37 @@
 
 #include "architectures/VirtualMemory.h"
 
+#include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Memory.h"
+
+static bool will_i_be_kill_if_i_allocate_that(Task *task, size_t size)
+{
+    auto usage = task_memory_usage(task);
+
+    if (usage + size > memory_get_total() / 2)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+static void task_kill_me_if_too_greedy(Task *task, size_t size)
+{
+    if (will_i_be_kill_if_i_allocate_that(task, size))
+    {
+        task_fshandle_write(task, 2, "(ulimit reached)\n", 17);
+        task->cancel(PROCESS_FAILURE);
+    }
+}
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object)
 {
     AtomicHolder holder;
 
-    MemoryMapping *memory_mapping = __create(MemoryMapping);
+    auto memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = arch_virtual_alloc(task->address_space, memory_object->range(), MEMORY_USER).base();
@@ -24,7 +48,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 {
     AtomicHolder holder;
 
-    MemoryMapping *memory_mapping = __create(MemoryMapping);
+    auto memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
     memory_mapping->address = arch_virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER);
@@ -77,9 +101,11 @@ bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
 
 Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
-    MemoryObject *memory_object = memory_object_create(size);
+    task_kill_me_if_too_greedy(task, size);
 
-    MemoryMapping *memory_mapping = task_memory_mapping_create(task, memory_object);
+    auto memory_object = memory_object_create(size);
+
+    auto memory_mapping = task_memory_mapping_create(task, memory_object);
 
     memory_object_deref(memory_object);
 
@@ -90,12 +116,14 @@ Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 
 Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
 {
+    task_kill_me_if_too_greedy(task, size);
+
     if (task_memory_mapping_colides(task, address, size))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    MemoryObject *memory_object = memory_object_create(size);
+    auto memory_object = memory_object_create(size);
 
     task_memory_mapping_create_at(task, memory_object, address);
 
@@ -111,7 +139,7 @@ Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags f
 
 Result task_memory_free(Task *task, uintptr_t address)
 {
-    MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
+    auto memory_mapping = task_memory_mapping_by_address(task, address);
 
     if (!memory_mapping)
     {
@@ -125,14 +153,20 @@ Result task_memory_free(Task *task, uintptr_t address)
 
 Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_t *out_size)
 {
-    MemoryObject *memory_object = memory_object_by_id(handle);
+    auto memory_object = memory_object_by_id(handle);
+
+    if (will_i_be_kill_if_i_allocate_that(task, memory_object->range().size()))
+    {
+        memory_object_deref(memory_object);
+        task_kill_me_if_too_greedy(task, memory_object->range().size());
+    }
 
     if (!memory_object)
     {
         return ERR_BAD_ADDRESS;
     }
 
-    MemoryMapping *memory_mapping = task_memory_mapping_create(task, memory_object);
+    auto memory_mapping = task_memory_mapping_create(task, memory_object);
 
     memory_object_deref(memory_object);
 
@@ -144,7 +178,7 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
 
 Result task_memory_get_handle(Task *task, uintptr_t address, int *out_handle)
 {
-    MemoryMapping *memory_mapping = task_memory_mapping_by_address(task, address);
+    auto memory_mapping = task_memory_mapping_by_address(task, address);
 
     if (!memory_mapping)
     {

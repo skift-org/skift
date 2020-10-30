@@ -307,7 +307,7 @@ public:
 
             if (lexer.skip_word("--"))
             {
-                auto argument = current.view(2, current.length() - 2);
+                String argument{current.cstring() + 2, current.length() - 2};
 
                 bool found_valid_option = false;
 

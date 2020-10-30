@@ -15,6 +15,8 @@ public:
     const char *cstring() const { return _buffer->cstring(); }
     char at(int index) const { return _buffer->cstring()[index]; }
 
+    bool null_or_empty() const { return _buffer == nullptr || _buffer->length() == 0; }
+
     String(const char *cstring = "")
     {
         _buffer = make<StringStorage>(cstring);
@@ -120,7 +122,10 @@ public:
         return at(index);
     }
 
-    RefPtr<StringStorage> underlying_storage() { return _buffer; }
+    RefPtr<StringStorage> underlying_storage()
+    {
+        return _buffer;
+    }
 };
 
 template <>

@@ -8,7 +8,7 @@ int kill(const char *id)
 
     if (i == -1)
     {
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     return process_cancel(i);

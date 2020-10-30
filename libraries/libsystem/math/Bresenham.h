@@ -1,6 +1,6 @@
-#include <libutils/Vector.h>
-#include <libsystem/math/Vec2.h>
 #include <libsystem/math/Math.h>
+#include <libsystem/math/Vec2.h>
+#include <libutils/Vector.h>
 
 template <typename TCallback>
 void bresenhamLow(int x0, int y0, int x1, int y1, int size, TCallback callback)
@@ -96,7 +96,6 @@ void bresenham(Vec2i start, Vec2i end, int size, TCallback callback)
         else
         {
             bresenhamHigh(x0, y0, x1, y1, size, callback);
-        }  
+        }
     }
 }
-

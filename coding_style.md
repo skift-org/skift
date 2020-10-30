@@ -202,5 +202,5 @@ printf("rmdir: failed to remove '%s': %s", path, result_to_string(result));
 
 # Authors
 
-- [@Keyboard-Slayer](https://github.com/Keyboard-Slayer)
-- [@sleepy-monax](https://github.com/sleepy-monax)
+- [@Keyboard-Slayer](https://github.com/Keyboard-Slayer), reach by e-mail [here](mailto:service-quality@skiftos.org)
+- [@sleepy-monax](https://github.com/sleepy-monax), reach by e-mail [here](mailto:contact@skiftos.org)

@@ -37,19 +37,29 @@ skiftOS running in QEMU 5.1
 <br/>
 
 # Links
-[Manual](./manual/readme.md)
 
-[Building](./building.md)
+- [Manual](./manual/readme.md)
+- [Building](./building.md) **(start here if you are new)**
+- [Contributing](./contributing.md)
+- [Code of conduct](./code_of_conduct.md)
 
-[Contributing](./contributing.md)
+# Acknowledgements
 
-[Code of conduct](./code_of_conduct.md)
-
-# Contributors
+## Contributors
 
 <a href="https://github.com/skiftOS/skift/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
 </a>
+
+## Projects
+
+- [echfs](https://github.com/qword-os/echfs)
+- [limine](https://github.com/limine-bootloader/limine) (BSD-2-Clause License)
+- [lodepng](https://github.com/lvandeve/lodepng) (zlib License)
+- [Material Design Icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
+- [std_truetype](https://github.com/nothings/stb) (MIT/Public Domain)
+- [serenityOS AK utilities](https://github.com/SerenityOS/serenity): 
+  while not directly used in skift, AK was a big inspiration in the creation of libutils.
 
 # License
 

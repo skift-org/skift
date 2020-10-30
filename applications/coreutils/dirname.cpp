@@ -1,16 +1,15 @@
-#include <libsystem/io/Stream.h>
 #include <libutils/ArgParse.h>
 #include <libutils/Path.h>
 
-#define HELP_PROLOGUE "Output each NAME with its last non - slash component and trailing slashes removed."
-#define HELP_EPILOGE "If NAME contains no /'s, output '.' (meaning the current directory)."
+#define PROLOGUE "Output each NAME with its last non - slash component and trailing slashes removed."
+#define EPILOGE "If NAME contains no /'s, output '.' (meaning the current directory)."
 #define OPTION_ZERO_DESCRIPTION "End each output line with NUL, not newline."
 
 int main(int argc, char const *argv[])
 {
     ArgParse args;
 
-    args.prologue(HELP_PROLOGUE);
+    args.prologue(PROLOGUE);
 
     args.usage("NAME...");
     args.usage("[OPTION] NAME...");
@@ -19,7 +18,7 @@ int main(int argc, char const *argv[])
     option_zero->longname("zero");
     option_zero->description(OPTION_ZERO_DESCRIPTION);
 
-    args.epiloge(HELP_EPILOGE);
+    args.epiloge(EPILOGE);
     args.show_help_if_no_operand_given();
 
     args.eval(argc, argv);

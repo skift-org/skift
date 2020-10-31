@@ -6,10 +6,12 @@
 #include <unistd.h>
 
 static bool parent = false;
+static bool verbose = false;
 
 static CommandLineOption options[] = {
     COMMANDLINE_OPT_HELP,
     COMMANDLINE_OPT_BOOL("parents", 'p', parent, "Make parent directories as needed.", COMMANDLINE_NO_CALLBACK),
+    COMMANDLINE_OPT_BOOL("verbose", 'v', verbose, "Print a message for each created directory.", COMMANDLINE_NO_CALLBACK),
     COMMANDLINE_OPT_END};
 
 static const char *usages[] = {
@@ -22,6 +24,12 @@ static CommandLine cmdline = CMDLINE(
     options,
     "Create the DIRECTORY(ies), if they do not already exist.",
     "Options can be combined.");
+
+void print_path(const char *path)
+{
+    if (verbose)
+        printf("%s\n", path);
+}
 
 void mkdir_parent_dirs(const char *path)
 {
@@ -50,6 +58,7 @@ void mkdir_parent_dirs(const char *path)
             if (!directory_exist(construct_parent_dirs))
             {
                 filesystem_mkdir(construct_parent_dirs);
+                print_path(construct_parent_dirs);
             }
         }
 
@@ -63,6 +72,7 @@ void mkdir_parent_dirs(const char *path)
         if (!directory_exist(construct_parent_dirs))
         {
             filesystem_mkdir(construct_parent_dirs);
+            print_path(construct_parent_dirs);
         }
     }
 
@@ -90,6 +100,7 @@ int main(int argc, char **argv)
         for (int i = 1; i < argc; i++)
         {
             result |= filesystem_mkdir(argv[i]);
+            print_path(argv[i]);
         }
 
         return result;

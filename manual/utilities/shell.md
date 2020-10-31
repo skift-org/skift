@@ -4,7 +4,7 @@
 
 ### Changing the current working directory
 
-The shell support the cd command:
+The shell supports the `cd` command:
 
 ```sh
 /a/b/c µ cd d # Change the current directory to d/
@@ -14,7 +14,7 @@ The shell support the cd command:
 /a/b/c µ
 ```
 
-But also navigation shorthand:
+But also shorthand navigation:
 
 ```sh
 /a/b/c µ d # Change the current directory to d/

@@ -28,7 +28,9 @@ static CommandLine cmdline = CMDLINE(
 void print_path(const char *path)
 {
     if (verbose)
-        printf("%s\n", path);
+    {
+        printf("mkdir: created directory %s\n", path);
+    }
 }
 
 void mkdir_parent_dirs(const char *path)

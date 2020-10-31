@@ -19,7 +19,7 @@
 
 Building skiftOS requires
 
-- A good Linux distributions
+- A good Linux distribution
 - nasm
 - gcc
 - binutils
@@ -32,7 +32,7 @@ And for testing and debugging
 
 
 ```sh
-# On Ubuntu
+# On Debian or Debian-based distributions
 $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
 ```
 

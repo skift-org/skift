@@ -169,7 +169,7 @@ public:
     template <typename... TArgs>
     auto operator()(TArgs &&... args)
     {
-        return (*naked())(forward<TArgs>(args)...);
+        return (*this->naked())(forward<TArgs>(args)...);
     }
 };
 

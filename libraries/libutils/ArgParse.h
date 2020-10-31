@@ -1,6 +1,8 @@
 #pragma once
 
+#include <libsystem/process/Process.h>
 #include <libsystem/utils/Lexer.h>
+
 #include <libutils/Callback.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
@@ -66,11 +68,11 @@ private:
     TValue _value{};
 
 public:
-    TValue value() { return _value; }
-
     void value(TValue value) { _value = value; }
 
     ValueOption(char shortname) : Option(shortname) {}
+
+    TValue operator()() { return _value; }
 };
 
 class OptionBool : public ValueOption<bool>
@@ -131,46 +133,49 @@ private:
     String _epiloge;
     Vector<String> _argv;
 
+    bool _should_abort_on_failure = false;
     bool _show_help_if_no_operand_given = false;
 
 public:
-    ArgParse()
-    {
-        auto help_option = option<OptionCallback>('h', [&]() { help(); });
-        help_option->longname("help");
-        help_option->description("Show this help message and exit.");
-    }
+    void prologue(String prologue) { _prologue = prologue; }
+
+    void usage(String usage) { _usages.push_back(usage); }
+
+    void epiloge(String epiloge) { _epiloge = epiloge; }
 
     auto argc() { return _argv.count(); }
 
     auto &argv() { return _argv; }
 
-    void show_help_if_no_operand_given()
+    void should_abort_on_failure() { _should_abort_on_failure = true; }
+
+    void show_help_if_no_operand_given() { _show_help_if_no_operand_given = true; }
+
+    ArgParse()
     {
-        _show_help_if_no_operand_given = true;
+        auto help_option = make<OptionCallback>('h', [&]() { help(); });
+        help_option->longname("help");
+        help_option->description("Show this help message and exit.");
+        _option.push_back(help_option);
     }
 
     template <ArgOption TOption, typename... TArgs>
-    RefPtr<TOption> option(TArgs... args)
+    auto option(TArgs &&... args)
     {
-        auto option = make<TOption>(forward<TArgs>(args)...);
-        _option.push_back(option);
-        return option;
-    }
-
-    void prologue(String prologue)
-    {
-        _prologue = prologue;
-    }
-
-    void usage(String usage)
-    {
-        _usages.push_back(usage);
-    }
-
-    void epiloge(String epiloge)
-    {
-        _epiloge = epiloge;
+        if constexpr (requires(TOption & t) {
+                          t();
+                      })
+        {
+            auto option = make_callable<TOption>(forward<TArgs>(args)...);
+            _option.push_back(option);
+            return option;
+        }
+        else
+        {
+            auto option = make<TOption>(forward<TArgs>(args)...);
+            _option.push_back(option);
+            return option;
+        }
     }
 
     void help()
@@ -280,6 +285,11 @@ public:
     void fail()
     {
         stream_format(err_stream, "Try '%s --help' for more information.\n", _name.cstring());
+
+        if (_should_abort_on_failure)
+        {
+            process_exit(PROCESS_FAILURE);
+        }
     }
 
     void usage()

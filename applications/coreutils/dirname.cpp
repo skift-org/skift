@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 
     args.eval(argc, argv);
 
-    char terminator = option_zero->value() ? '\0' : '\n';
+    char terminator = option_zero() ? '\0' : '\n';
 
     for (size_t i = 0; i < args.argc(); i++)
     {

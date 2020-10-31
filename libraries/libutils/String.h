@@ -133,3 +133,5 @@ inline uint32_t hash<String>(const String &value)
 {
     return hash(value.cstring(), value.length());
 }
+
+using ConstString = const char *;

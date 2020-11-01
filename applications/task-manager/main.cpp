@@ -1,7 +1,8 @@
 #include <libsystem/eventloop/Timer.h>
+#include <libutils/Path.h>
 #include <libsystem/system/System.h>
 #include <libsystem/utils/BufferBuilder.h>
-#include <libutils/Path.h>
+#include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/dialog/Dialog.h>
@@ -15,7 +16,7 @@ class TaskManagerWindow : public Window
 private:
     RAMGraph *_ram_graph;
     CPUGraph *_cpu_graph;
-
+    uint32_t _last_selected_pid;
     Table *_table;
     RefPtr<TaskModel> _table_model;
     OwnPtr<Timer> _table_timer;
@@ -23,6 +24,7 @@ private:
 public:
     TaskManagerWindow() : Window(WINDOW_RESIZABLE)
     {
+        _last_selected_pid = 0;
         icon(Icon::get("memory"));
         title("Task Manager");
         size(Vec2i(700, 500));
@@ -34,8 +36,13 @@ public:
         new Button(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
 
         auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
-        cancel_task_button->on(Event::ACTION, [](auto) {
-            dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO);
+        cancel_task_button->on(Event::ACTION, [&](auto) {
+            if(dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO) == DIALOG_BUTTON_YES){
+                if(_last_selected_pid!=0){
+
+                    process_cancel(_last_selected_pid);
+                }
+            };
         });
 
         /// --- Table view --- //
@@ -49,7 +56,11 @@ public:
         });
 
         _table_timer->start();
-
+        _table->on(EventType::MOUSE_BUTTON_PRESS, [&](auto) {
+            if (_table->selected() >= 0)
+            {
+               _last_selected_pid = _table_model->data(_table->selected(), 0).as_int();
+        }});
         /// --- Graphs --- ///
         auto graphs_container = new Panel(root());
         graphs_container->layout(HFLOW(0));

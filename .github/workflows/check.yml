@@ -55,3 +55,22 @@ jobs:
       with:
         name: disks
         path: disks/
+
+  codestyle:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install packages
+      run: |
+        sudo apt install -y nasm gcc g++ gcc-multilib g++-multilib make binutils grub-pc-bin qemu-system-x86 clang-tidy
+        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
+        sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo libfuse-dev
+
+    - id: files
+      uses: jitterbit/get-changed-files@v1
+    - run: |
+        for changed_file in ${{ steps.files.outputs.all }}; do
+          clang-tidy "${changed_file}" --checks="google-readability-braces-around-statements" --format-style=./.clang-format --warnings-as-errors="*"
+        done

@@ -15,7 +15,6 @@ class TaskManagerWindow : public Window
 private:
     RAMGraph *_ram_graph;
     CPUGraph *_cpu_graph;
-    uint32_t _last_selected_row;
     Table *_table;
     RefPtr<TaskModel> _table_model;
     OwnPtr<Timer> _table_timer;
@@ -23,7 +22,6 @@ private:
 public:
     TaskManagerWindow() : Window(WINDOW_RESIZABLE)
     {
-        _last_selected_row = 0;
         icon(Icon::get("memory"));
         title("Task Manager");
         size(Vec2i(700, 500));

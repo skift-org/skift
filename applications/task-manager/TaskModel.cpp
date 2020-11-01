@@ -141,5 +141,5 @@ String TaskModel::cpu_greedy()
 
 void TaskModel::kill_task(int row)
 {
-   process_cancel( data(row, 0).as_int());
+   process_cancel(data(row, COLUMN_ID).as_int());
 }

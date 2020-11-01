@@ -22,32 +22,32 @@ int main(int argc, char const *argv[])
     args.usage("");
     args.usage("OPTION...");
 
-    auto option_all = args.option<OptionBool>('a');
-    option_all->longname("all");
+    auto option_all = args.option<OptionBool>("all");
+    option_all->shortname('a');
     option_all->description(OPTION_ALL_DESCRIPTION);
 
-    auto option_kernel_name = args.option<OptionBool>('s');
-    option_kernel_name->longname("kernel-name");
+    auto option_kernel_name = args.option<OptionBool>("kernel-name");
+    option_kernel_name->shortname('s');
     option_kernel_name->description(OPTION_KERNEL_NAME_DESCRIPTION);
 
-    auto option_kernel_release = args.option<OptionBool>('r');
-    option_kernel_release->longname("kernel-release");
+    auto option_kernel_release = args.option<OptionBool>("kernel-release");
+    option_kernel_release->shortname('r');
     option_kernel_release->description(OPTION_KERNEL_RELEASE_DESCRIPTION);
 
-    auto option_kernel_version = args.option<OptionBool>('v');
-    option_kernel_version->longname("kernel-version");
+    auto option_kernel_version = args.option<OptionBool>("kernel-version");
+    option_kernel_version->shortname('v');
     option_kernel_version->description(OPTION_KERNEL_VERSION_DESCRIPTION);
 
-    auto option_machine = args.option<OptionBool>('m');
-    option_machine->longname("machine");
+    auto option_machine = args.option<OptionBool>("machine");
+    option_machine->shortname('m');
     option_machine->description(OPTION_MACHINE_DESCRIPTION);
 
-    auto option_nodename = args.option<OptionBool>('n');
-    option_nodename->longname("nodename");
+    auto option_nodename = args.option<OptionBool>("nodename");
+    option_nodename->shortname('n');
     option_nodename->description(OPTION_NODENAME_DESCRIPTION);
 
-    auto option_operating_system = args.option<OptionBool>('o');
-    option_operating_system->longname("operating-system");
+    auto option_operating_system = args.option<OptionBool>("operating-system");
+    option_operating_system->shortname('o');
     option_operating_system->description(OPTION_OPERATING_SYSTEM_DESCRIPTION);
 
     args.epiloge(EPILOGUE);

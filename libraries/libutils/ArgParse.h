@@ -36,22 +36,22 @@ public:
 class Option : public RefCounted<Option>
 {
 private:
-    char _shortname;
     String _longname{};
+    char _shortname;
     String _description{};
 
 public:
-    char shortname() { return _shortname; }
-
     const String &longname() { return _longname; }
 
-    void longname(String longname) { _longname = longname; }
+    char shortname() { return _shortname; }
+
+    void shortname(char shortname) { _shortname = shortname; }
 
     const String &description() { return _description; }
 
     void description(String description) { _description = description; }
 
-    Option(char shortname) : _shortname(shortname) {}
+    Option(String longname) : _longname(longname) {}
 
     virtual ~Option() {}
 
@@ -70,7 +70,7 @@ private:
 public:
     void value(TValue value) { _value = value; }
 
-    ValueOption(char shortname) : Option(shortname) {}
+    ValueOption(String longname) : Option(longname) {}
 
     TValue operator()() { return _value; }
 };
@@ -78,7 +78,7 @@ public:
 class OptionBool : public ValueOption<bool>
 {
 public:
-    OptionBool(char shortname) : ValueOption(shortname) {}
+    OptionBool(String longname) : ValueOption(longname) {}
 
     virtual void eval(EvalContext)
     {
@@ -89,7 +89,7 @@ public:
 class OptionString : public ValueOption<String>
 {
 public:
-    OptionString(char shortname) : ValueOption(shortname) {}
+    OptionString(String longname) : ValueOption(longname) {}
 
     virtual void eval(EvalContext context)
     {
@@ -110,7 +110,12 @@ private:
     Callback<void()> _callback;
 
 public:
-    OptionCallback(char shortname, Callback<void()> callback) : Option(shortname), _callback(callback)
+    void callback(Callback<void()> callback)
+    {
+        _callback = callback;
+    }
+
+    OptionCallback(String longname) : Option(longname)
     {
     }
 
@@ -153,9 +158,11 @@ public:
 
     ArgParse()
     {
-        auto help_option = make<OptionCallback>('h', [&]() { help(); });
-        help_option->longname("help");
+        auto help_option = make<OptionCallback>("help");
+        help_option->shortname('h');
         help_option->description("Show this help message and exit.");
+        help_option->callback([&]() { help(); });
+
         _option.push_back(help_option);
     }
 

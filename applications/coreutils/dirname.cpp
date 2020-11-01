@@ -14,8 +14,8 @@ int main(int argc, char const *argv[])
     args.usage("NAME...");
     args.usage("[OPTION] NAME...");
 
-    auto option_zero = args.option<OptionBool>('z');
-    option_zero->longname("zero");
+    auto option_zero = args.option<OptionBool>("zero");
+    option_zero->shortname('z');
     option_zero->description(OPTION_ZERO_DESCRIPTION);
 
     args.epiloge(EPILOGE);

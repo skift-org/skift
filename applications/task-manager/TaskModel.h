@@ -24,4 +24,6 @@ public:
     String ram_greedy();
 
     String cpu_greedy();
+
+    void kill_task(int row);
 };

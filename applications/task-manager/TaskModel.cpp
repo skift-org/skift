@@ -1,4 +1,5 @@
 #include "task-manager/TaskModel.h"
+#include <libsystem/process/Process.h>
 
 enum Column
 {
@@ -136,4 +137,9 @@ String TaskModel::ram_greedy()
 String TaskModel::cpu_greedy()
 {
     return greedy(_data, "cpu");
+}
+
+void TaskModel::kill_task(int row)
+{
+   process_cancel(data(row, COLUMN_ID).as_int());
 }

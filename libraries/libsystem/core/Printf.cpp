@@ -8,14 +8,14 @@
 
 int __printf_formate_binary(printf_info_t *info, va_list *va)
 {
-    uint v = va_arg(*va, uint);
+    unsigned long v = va_arg(*va, unsigned long);
 
-    char buffer[33] = {};
+    char buffer[65] = {};
 
     NumberFormater format = FORMAT_BINARY;
     format.padded_with_zero = false;
 
-    format_uint(format, v, buffer, 33);
+    format_uint(format, v, buffer, 65);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -31,14 +31,14 @@ int __printf_formate_binary(printf_info_t *info, va_list *va)
 
 int __printf_formate_octal(printf_info_t *info, va_list *va)
 {
-    uint v = va_arg(*va, uint);
+    unsigned long v = va_arg(*va, unsigned long);
 
-    char buffer[33] = {};
+    char buffer[65] = {};
 
     NumberFormater format = FORMAT_OCTAL;
     format.padded_with_zero = false;
 
-    format_uint(format, v, buffer, 33);
+    format_uint(format, v, buffer, 65);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -54,14 +54,14 @@ int __printf_formate_octal(printf_info_t *info, va_list *va)
 
 int __printf_formate_decimal(printf_info_t *info, va_list *va)
 {
-    int v = va_arg(*va, int);
+    long v = va_arg(*va, long);
 
-    char buffer[33] = {};
+    char buffer[65] = {};
 
     NumberFormater format = FORMAT_DECIMAL;
     format.padded_with_zero = false;
 
-    format_int(format, v, buffer, 33);
+    format_int(format, v, buffer, 65);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -77,14 +77,14 @@ int __printf_formate_decimal(printf_info_t *info, va_list *va)
 
 int __printf_formate_decimal_unsigned(printf_info_t *info, va_list *va)
 {
-    uint v = va_arg(*va, uint);
+    unsigned long v = va_arg(*va, unsigned long);
 
-    char buffer[33] = {};
+    char buffer[65] = {};
 
     NumberFormater format = FORMAT_DECIMAL;
     format.padded_with_zero = false;
 
-    format_uint(format, v, buffer, 33);
+    format_uint(format, v, buffer, 65);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 
@@ -100,14 +100,14 @@ int __printf_formate_decimal_unsigned(printf_info_t *info, va_list *va)
 
 int __printf_formate_hexadecimal(printf_info_t *info, va_list *va)
 {
-    uint v = va_arg(*va, uint);
+    unsigned long v = va_arg(*va, unsigned long);
 
-    char buffer[33] = {};
+    char buffer[65] = {};
 
     NumberFormater format = FORMAT_HEXADECIMAL;
     format.padded_with_zero = false;
 
-    format_uint(format, v, buffer, 33);
+    format_uint(format, v, buffer, 65);
 
     PRINTF_PADDING(buffer, PFALIGN_RIGHT);
 

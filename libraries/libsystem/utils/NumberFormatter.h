@@ -15,9 +15,9 @@ struct NumberFormater
 #define FORMAT_DECIMAL ((NumberFormater){10, 4, false, false})
 #define FORMAT_HEXADECIMAL ((NumberFormater){16, 4, true, false})
 
-size_t format_uint(NumberFormater formater, unsigned int value, char *str, size_t size);
+size_t format_uint(NumberFormater formater, unsigned long value, char *str, size_t size);
 
-size_t format_int(NumberFormater formater, int value, char *str, size_t size);
+size_t format_int(NumberFormater formater, long value, char *str, size_t size);
 
 #ifndef __KERNEL__
 

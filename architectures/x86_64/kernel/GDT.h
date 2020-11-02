@@ -61,13 +61,13 @@ struct __packed GDTEntry64
     {
     }
 
-    constexpr GDTEntry64(uint32_t base, uint32_t limit, uint8_t access, uint8_t flags)
+    constexpr GDTEntry64(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
         : limit0_15((uint16_t)((limit)&0xffff)),
           base0_15((uint16_t)((base)&0xffff)),
           base16_23((uint8_t)(((base) >> 16) & 0xff)),
           flags((flags)),
           limit16_19(((limit) >> 16) & 0x0f),
-          granularity((access)),
+          granularity((granularity)),
           base24_31((uint8_t)(((base) >> 24) & 0xff))
     {
     }
@@ -89,11 +89,10 @@ struct __packed GDTEntry64
                      flags,
                      base24_31);
     }
-    GDTEntry64( uint8_t flags, uint8_t gran)
+
+    constexpr GDTEntry64(uint8_t flags, uint8_t granularity)
+        : GDTEntry64(0, 0xffff, granularity, flags)
     {
-        limit0_15 = 0xffff;
-        granularity = gran;
-        this->flags = flags; 
     }
 };
 

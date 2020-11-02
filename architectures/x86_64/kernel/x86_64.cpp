@@ -1,6 +1,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
+#include <libsystem/thread/Atomic.h>
 
 #include "architectures/x86/kernel/COM.h"
 #include "architectures/x86/kernel/IOPort.h"
@@ -33,13 +34,12 @@ extern "C" void arch_main(void *info, uint32_t magic)
         system_panic("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
     }
 
-    logger_info("Hello, world!");
     gdt_initialize();
     idt_initialize();
     pic_initialize();
-    pit_initialize(1);
-    logger_info("Hello, world!");
+    pit_initialize(1000);
 
+    atomic_enable();
     sti();
 
     while (true)
@@ -48,15 +48,9 @@ extern "C" void arch_main(void *info, uint32_t magic)
     }
 }
 
-void arch_disable_interrupts()
-{
-    cli();
-}
+void arch_disable_interrupts() { cli(); }
 
-void arch_enable_interrupts()
-{
-    sti();
-}
+void arch_enable_interrupts() { sti(); }
 
 void arch_halt()
 {
@@ -101,7 +95,6 @@ __no_return void arch_reboot()
 __no_return void arch_shutdown()
 {
     logger_warn("STUB %s", __func__);
-
     ASSERT_NOT_REACHED();
 }
 

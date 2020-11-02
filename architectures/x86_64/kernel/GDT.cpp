@@ -19,20 +19,21 @@ static TSS64 tss = {
     .iopb_offset = 0,
 };
 
-static GDT64 gdt = {};
-
-static GDTDescriptor64 gdt_descriptor = {
-    .size = sizeof(GDT64),
-    .offset = (uint64_t)&gdt,
-};
+static GDT64 gdt;
+static GDTDescriptor64 gdt_descriptor;
 
 void gdt_initialize()
 {
     gdt.entries[0] = {0, 0, 0, 0}; // null descriptor
-    gdt.entries[1] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY );
-    gdt.entries[2] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE , 0 );
-    gdt.entries[3] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE| GDT_USER, GDT_LONG_MODE_GRANULARITY );
-    gdt.entries[4] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0 );
+    gdt.entries[1] = {GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY};
+    gdt.entries[2] = {GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0};
+    gdt.entries[3] = {GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY};
+    gdt.entries[4] = {GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0};
+
+    gdt_descriptor = {
+        .size = sizeof(GDT64),
+        .offset = (uint64_t)&gdt,
+    };
 
     gdt_flush((uint64_t)&gdt_descriptor);
 }

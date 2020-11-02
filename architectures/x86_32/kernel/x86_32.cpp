@@ -2,11 +2,11 @@
 #include <libsystem/core/Plugs.h>
 
 #include "architectures/x86/kernel/COM.h"
+#include "architectures/x86/kernel/CPUID.h"
 #include "architectures/x86/kernel/PIC.h"
 #include "architectures/x86/kernel/PIT.h"
 #include "architectures/x86/kernel/RTC.h"
 #include "architectures/x86_32/kernel/ACPI.h"
-#include "architectures/x86_32/kernel/CPUID.h"
 #include "architectures/x86_32/kernel/FPU.h"
 #include "architectures/x86_32/kernel/GDT.h"
 #include "architectures/x86_32/kernel/IDT.h"
@@ -143,7 +143,7 @@ void arch_panic_dump()
 
 struct Stackframe
 {
-    struct Stackframe *ebp;
+    Stackframe *ebp;
     uint32_t eip;
 };
 

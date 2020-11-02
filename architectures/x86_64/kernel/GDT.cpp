@@ -28,13 +28,11 @@ static GDTDescriptor64 gdt_descriptor = {
 
 void gdt_initialize()
 {
-    gdt.entries[0] = {0, 0, 0, 0};
-
-    gdt.entries[1] = {0, 0, GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, 0};
-    gdt.entries[2] = {0, 0, GDT_PRESENT | GDT_READWRITE, 0};
-
-    gdt.entries[3] = {0, 0, GDT_USER | GDT_PRESENT | GDT_READWRITE | GDT_EXECUTABLE, 0};
-    gdt.entries[4] = {0, 0, GDT_USER | GDT_PRESENT | GDT_READWRITE, 0};
+    gdt.entries[0] = {0, 0, 0, 0}; // null descriptor
+    gdt.entries[1] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY );
+    gdt.entries[2] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE , 0 );
+    gdt.entries[3] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_EXECUTABLE| GDT_USER, GDT_LONG_MODE_GRANULARITY );
+    gdt.entries[4] = GDTEntry64(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0 );
 
     gdt_flush((uint64_t)&gdt_descriptor);
 }

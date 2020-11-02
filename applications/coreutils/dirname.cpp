@@ -1,9 +1,9 @@
 #include <libutils/ArgParse.h>
 #include <libutils/Path.h>
 
-#define PROLOGUE "Output each NAME with its last non - slash component and trailing slashes removed."
-#define EPILOGE "If NAME contains no /'s, output '.' (meaning the current directory)."
-#define OPTION_ZERO_DESCRIPTION "End each output line with NUL, not newline."
+constexpr ConstString PROLOGUE = "Output each NAME with its last non - slash component and trailing slashes removed.";
+constexpr ConstString EPILOGE = "If NAME contains no /'s, output '.' (meaning the current directory).";
+constexpr ConstString OPTION_ZERO_DESCRIPTION = "End each output line with NUL, not newline.";
 
 int main(int argc, char const *argv[])
 {
@@ -14,16 +14,15 @@ int main(int argc, char const *argv[])
     args.usage("NAME...");
     args.usage("[OPTION] NAME...");
 
-    auto option_zero = args.option<OptionBool>("zero");
-    option_zero->shortname('z');
-    option_zero->description(OPTION_ZERO_DESCRIPTION);
+    bool option_zero = false;
+    args.option(option_zero, 'z', "zero", OPTION_ZERO_DESCRIPTION);
 
     args.epiloge(EPILOGE);
     args.show_help_if_no_operand_given();
 
     args.eval(argc, argv);
 
-    char terminator = option_zero() ? '\0' : '\n';
+    char terminator = option_zero ? '\0' : '\n';
 
     for (size_t i = 0; i < args.argc(); i++)
     {

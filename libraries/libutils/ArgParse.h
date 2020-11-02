@@ -8,13 +8,13 @@
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
 
-class EvalContext
+class ArgParseContext
 {
 private:
     Vector<String> _arguments;
 
 public:
-    EvalContext(int argc, char const *argv[])
+    ArgParseContext(int argc, char const *argv[])
     {
         for (int i = 0; i < argc; i++)
         {
@@ -33,99 +33,15 @@ public:
     }
 };
 
-class Option : public RefCounted<Option>
+using ArgParseOptionCallback = Callback<void(ArgParseContext &)>;
+
+struct ArgParseOption
 {
-private:
-    String _longname{};
-    char _shortname;
-    String _description{};
 
-public:
-    const String &longname() { return _longname; }
-
-    char shortname() { return _shortname; }
-
-    void shortname(char shortname) { _shortname = shortname; }
-
-    const String &description() { return _description; }
-
-    void description(String description) { _description = description; }
-
-    Option(String longname) : _longname(longname) {}
-
-    virtual ~Option() {}
-
-    virtual void eval(EvalContext){};
-};
-
-template <typename T>
-concept ArgOption = IsBaseOf<Option, T>::value;
-
-template <typename TValue>
-class ValueOption : public Option
-{
-private:
-    TValue _value{};
-
-public:
-    void value(TValue value) { _value = value; }
-
-    ValueOption(String longname) : Option(longname) {}
-
-    TValue operator()() { return _value; }
-};
-
-class OptionBool : public ValueOption<bool>
-{
-public:
-    OptionBool(String longname) : ValueOption(longname) {}
-
-    virtual void eval(EvalContext)
-    {
-        value(true);
-    }
-};
-
-class OptionString : public ValueOption<String>
-{
-public:
-    OptionString(String longname) : ValueOption(longname) {}
-
-    virtual void eval(EvalContext context)
-    {
-        if (context.any())
-        {
-            value(context.pop());
-        }
-    }
-};
-
-class OptionInt : public ValueOption<int>
-{
-};
-
-class OptionCallback : public Option
-{
-private:
-    Callback<void()> _callback;
-
-public:
-    void callback(Callback<void()> callback)
-    {
-        _callback = callback;
-    }
-
-    OptionCallback(String longname) : Option(longname)
-    {
-    }
-
-    virtual void eval(EvalContext)
-    {
-        if (_callback)
-        {
-            _callback();
-        }
-    }
+    char shortname;
+    String longname{};
+    String description{};
+    ArgParseOptionCallback callback;
 };
 
 class ArgParse
@@ -133,7 +49,7 @@ class ArgParse
 private:
     String _name;
     Vector<String> _usages;
-    Vector<RefPtr<Option>> _option;
+    Vector<ArgParseOption> _option;
     String _prologue;
     String _epiloge;
     Vector<String> _argv;
@@ -142,6 +58,8 @@ private:
     bool _show_help_if_no_operand_given = false;
 
 public:
+    static constexpr char NO_SHORT_NAME = '\0';
+
     void prologue(String prologue) { _prologue = prologue; }
 
     void usage(String usage) { _usages.push_back(usage); }
@@ -158,31 +76,34 @@ public:
 
     ArgParse()
     {
-        auto help_option = make<OptionCallback>("help");
-        help_option->shortname('h');
-        help_option->description("Show this help message and exit.");
-        help_option->callback([&]() { help(); });
-
-        _option.push_back(help_option);
+        _option.push_back({'h', "help", "Show this help message and exit.", [&](auto &) { help(); }});
     }
 
-    template <ArgOption TOption, typename... TArgs>
-    auto option(TArgs &&... args)
+    void option(char shortname, String longname, String description, ArgParseOptionCallback callback)
     {
-        if constexpr (requires(TOption & t) {
-                          t();
-                      })
-        {
-            auto option = make_callable<TOption>(forward<TArgs>(args)...);
-            _option.push_back(option);
-            return option;
-        }
-        else
-        {
-            auto option = make<TOption>(forward<TArgs>(args)...);
-            _option.push_back(option);
-            return option;
-        }
+        _option.push_back({shortname, longname, description, callback});
+    }
+
+    void option(bool &value, char shortname, String longname, String description)
+    {
+        option(shortname, longname, description, [&](auto &) {
+            value = true;
+        });
+    }
+
+    void option(String &value, char shortname, String longname, String description)
+    {
+        option(shortname, longname, description, [&](auto &ctx) {
+            if (ctx.any())
+            {
+                value = ctx.pop();
+            }
+            else
+            {
+                stream_format(err_stream, "'%s' missing operand!\n", longname.cstring());
+                fail();
+            }
+        });
     }
 
     void help()
@@ -212,9 +133,9 @@ public:
 
                 for (size_t i = 0; i < options.count(); i++)
                 {
-                    if (!options[i]->longname().null_or_empty())
+                    if (!options[i].longname.null_or_empty())
                     {
-                        max = MAX(max, options[i]->longname().length());
+                        max = MAX(max, options[i].longname.length());
                     }
                 }
 
@@ -231,16 +152,16 @@ public:
 
                 printf("    ");
 
-                if (opt->shortname() != '\0')
+                if (opt.shortname != '\0')
                 {
-                    printf("-%c", opt->shortname());
+                    printf("-%c", opt.shortname);
                 }
                 else
                 {
                     printf("   ");
                 }
 
-                if (opt->shortname() && !opt->longname().null_or_empty())
+                if (opt.shortname && !opt.longname.null_or_empty())
                 {
                     printf(", ");
                 }
@@ -249,13 +170,13 @@ public:
                     printf("  ");
                 }
 
-                if (!opt->longname().null_or_empty())
+                if (!opt.longname.null_or_empty())
                 {
-                    printf("--%s", opt->longname().cstring());
+                    printf("--%s", opt.longname.cstring());
 
-                    if (padding > opt->longname().length())
+                    if (padding > opt.longname.length())
                     {
-                        size_t computed_padding = padding - opt->longname().length();
+                        size_t computed_padding = padding - opt.longname.length();
 
                         for (size_t i = 0; i < computed_padding; i++)
                         {
@@ -271,10 +192,10 @@ public:
                     }
                 }
 
-                if (!opt->description().null_or_empty())
+                if (!opt.description.null_or_empty())
                 {
                     printf(" ");
-                    printf("%s", opt->description().cstring());
+                    printf("%s", opt.description.cstring());
                 }
 
                 printf("\n");
@@ -313,7 +234,7 @@ public:
 
     int eval(int argc, char const *argv[])
     {
-        EvalContext context{argc, argv};
+        ArgParseContext context{argc, argv};
 
         _name = context.pop();
 
@@ -330,9 +251,9 @@ public:
 
                 for (size_t i = 0; i < _option.count(); i++)
                 {
-                    if (_option[i]->longname() == argument)
+                    if (_option[i].longname == argument)
                     {
-                        _option[i]->eval(context);
+                        _option[i].callback(context);
 
                         found_valid_option = true;
                     }
@@ -352,9 +273,9 @@ public:
 
                     for (size_t i = 0; i < _option.count(); i++)
                     {
-                        if (_option[i]->shortname() == lexer.current())
+                        if (_option[i].shortname == lexer.current())
                         {
-                            _option[i]->eval(context);
+                            _option[i].callback(context);
 
                             found_valid_option = true;
                         }

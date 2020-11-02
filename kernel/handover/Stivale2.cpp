@@ -19,8 +19,6 @@ void stivale2_parse_header(Handover *handover, void *header_ptr)
 
     while (tag)
     {
-        logger_info("stivale 2: %08x", tag, tag->identifier);
-
         switch (tag->identifier)
         {
 

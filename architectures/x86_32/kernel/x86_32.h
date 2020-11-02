@@ -5,48 +5,6 @@
 
 #include <libsystem/Common.h>
 
-/* --- Assembly Helpers --------------------------------- */
-
-static inline uint32_t CR0()
-{
-    uint32_t r;
-    asm volatile("mov %%cr0, %0"
-                 : "=r"(r));
-    return r;
-}
-
-static inline uint32_t CR1()
-{
-    uint32_t r;
-    asm volatile("mov %%cr1, %0"
-                 : "=r"(r));
-    return r;
-}
-
-static inline uint32_t CR2()
-{
-    uint32_t r;
-    asm volatile("mov %%cr2, %0"
-                 : "=r"(r));
-    return r;
-}
-
-static inline uint32_t CR3()
-{
-    uint32_t r;
-    asm volatile("mov %%cr3, %0"
-                 : "=r"(r));
-    return r;
-}
-
-static inline uint32_t CR4()
-{
-    uint32_t r;
-    asm volatile("mov %%cr4, %0"
-                 : "=r"(r));
-    return r;
-}
-
 static inline uint32_t EBP()
 {
     uint32_t r;

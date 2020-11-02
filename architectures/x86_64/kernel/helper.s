@@ -5,7 +5,7 @@ gdt_flush:
     mov rbp, rsp
     lgdt [rdi]
 
-    mov ax, 16  
+    mov ax, 16
     mov ss, ax
     mov ds, ax
     mov es, ax
@@ -24,4 +24,18 @@ trampoline:
 global idt_flush
 idt_flush:
     lidt [rdi]
+    ret
+
+global cpuid_get_feature_EDX
+cpuid_get_feature_EDX:
+    mov eax, 1
+    cpuid
+    mov eax, edx
+    ret
+
+global cpuid_get_feature_ECX
+cpuid_get_feature_ECX:
+    mov eax, 1
+    cpuid
+    mov eax, ecx
     ret

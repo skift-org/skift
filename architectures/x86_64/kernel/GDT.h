@@ -4,7 +4,7 @@
 #include <libsystem/Logger.h>
 
 #define GDT_ENTRY_COUNT 5
-
+#define GDT_LONG_MODE_GRANULARITY 2
 #define GDT_SEGMENT 0b10000
 #define GDT_PRESENT 0b10000000     // Present bit. This must be 1 for all valid selectors.
 #define GDT_TSS_PRESENT 0b10000000 // Present bit. This must be 1 for all valid selectors.
@@ -88,6 +88,12 @@ struct __packed GDTEntry64
                      limit16_19,
                      flags,
                      base24_31);
+    }
+    GDTEntry64( uint8_t flags, uint8_t gran)
+    {
+        limit0_15 = 0xffff;
+        granularity = gran;
+        this->flags = flags; 
     }
 };
 

@@ -1,8 +1,8 @@
-
 #pragma once
 
 #include <libsystem/Common.h>
 #include <libsystem/Logger.h>
+
 #define GDT_ENTRY_COUNT 5
 
 #define GDT_SEGMENT 0b10000

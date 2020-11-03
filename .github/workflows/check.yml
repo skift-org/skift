@@ -64,9 +64,7 @@ jobs:
 
     - name: Install packages
       run: |
-        sudo apt install -y nasm gcc g++ gcc-multilib g++-multilib make binutils grub-pc-bin qemu-system-x86 clang-tidy
-        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
-        sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo libfuse-dev
+        sudo apt install -y gcc-multilib clang-tidy
 
     - id: files
       uses: jitterbit/get-changed-files@v1

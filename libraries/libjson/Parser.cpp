@@ -5,8 +5,9 @@
 #include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
-#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
+#include <libutils/Scanner.h>
+#include <libutils/ScannerUtils.h>
 
 namespace json
 {
@@ -14,41 +15,41 @@ static constexpr const char *WHITESPACE = " \n\r\t";
 static constexpr const char *DIGITS = "0123456789";
 static constexpr const char *ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
-static Value *value(Lexer &lexer);
+static Value *value(Scanner &scan);
 
-static void whitespace(Lexer &lexer)
+static void whitespace(Scanner &scan)
 {
-    lexer.eat(WHITESPACE);
+    scan.eat(WHITESPACE);
 }
 
-static int digits(Lexer &lexer)
+static int digits(Scanner &scan)
 {
     int digits = 0;
 
-    while (lexer.current_is(DIGITS))
+    while (scan.current_is(DIGITS))
     {
         digits *= 10;
-        digits += lexer.current() - '0';
-        lexer.foreward();
+        digits += scan.current() - '0';
+        scan.foreward();
     }
 
     return digits;
 }
 
-static Value *number(Lexer &lexer)
+static Value *number(Scanner &scan)
 {
     int ipart_sign = 1;
 
-    if (lexer.skip('-'))
+    if (scan.skip('-'))
     {
         ipart_sign = -1;
     }
 
     int ipart = 0;
 
-    if (lexer.current_is(DIGITS))
+    if (scan.current_is(DIGITS))
     {
-        ipart = digits(lexer);
+        ipart = digits(scan);
     }
 
 #ifdef __KERNEL__
@@ -56,34 +57,34 @@ static Value *number(Lexer &lexer)
 #else
     double fpart = 0;
 
-    if (lexer.skip('.'))
+    if (scan.skip('.'))
     {
         double multiplier = 0.1;
 
-        while (lexer.current_is(DIGITS))
+        while (scan.current_is(DIGITS))
         {
-            fpart += multiplier * (lexer.current() - '0');
+            fpart += multiplier * (scan.current() - '0');
             multiplier *= 0.1;
-            lexer.foreward();
+            scan.foreward();
         }
     }
 
     int exp = 0;
 
-    if (lexer.current_is("eE"))
+    if (scan.current_is("eE"))
     {
-        lexer.foreward();
+        scan.foreward();
         int exp_sign = 1;
 
-        if (lexer.current() == '-')
+        if (scan.current() == '-')
         {
             exp_sign = -1;
         }
 
-        if (lexer.current_is("+-"))
-            lexer.foreward();
+        if (scan.current_is("+-"))
+            scan.foreward();
 
-        exp = digits(lexer) * exp_sign;
+        exp = digits(scan) * exp_sign;
     }
 
     if (fpart == 0 && exp >= 0)
@@ -97,87 +98,87 @@ static Value *number(Lexer &lexer)
 #endif
 }
 
-static char *string(Lexer &lexer)
+static char *string(Scanner &scan)
 {
     BufferBuilder *builder = buffer_builder_create(16);
 
-    lexer.skip('"');
+    scan.skip('"');
 
-    while (lexer.current() != '"' &&
-           lexer.do_continue())
+    while (scan.current() != '"' &&
+           scan.do_continue())
     {
-        if (lexer.current() == '\\')
+        if (scan.current() == '\\')
         {
-            buffer_builder_append_str(builder, lexer.read_escape_sequence());
+            buffer_builder_append_str(builder, scan_json_escape_sequence(scan));
         }
         else
         {
-            buffer_builder_append_chr(builder, lexer.current());
-            lexer.foreward();
+            buffer_builder_append_chr(builder, scan.current());
+            scan.foreward();
         }
     }
 
-    lexer.skip('"');
+    scan.skip('"');
 
     return buffer_builder_finalize(builder);
 }
 
-static Value *array(Lexer &lexer)
+static Value *array(Scanner &scan)
 {
-    lexer.skip('[');
+    scan.skip('[');
 
     Value *array = create_array();
 
     int index = 0;
     do
     {
-        lexer.skip(',');
-        array_put(array, index, value(lexer));
+        scan.skip(',');
+        array_put(array, index, value(scan));
         index++;
-    } while (lexer.current() == ',');
+    } while (scan.current() == ',');
 
-    lexer.skip(']');
+    scan.skip(']');
 
     return array;
 }
 
-static Value *object(Lexer &lexer)
+static Value *object(Scanner &scan)
 {
-    lexer.skip('{');
+    scan.skip('{');
 
     Value *object = create_object();
 
-    whitespace(lexer);
-    while (lexer.current() != '}')
+    whitespace(scan);
+    while (scan.current() != '}')
     {
-        char *k __cleanup_malloc = string(lexer);
-        whitespace(lexer);
+        char *k __cleanup_malloc = string(scan);
+        whitespace(scan);
 
-        lexer.skip(':');
+        scan.skip(':');
 
-        Value *v = value(lexer);
+        Value *v = value(scan);
 
         object_put(object, k, v);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
+        whitespace(scan);
     }
 
-    lexer.skip('}');
+    scan.skip('}');
 
     return object;
 }
 
-static Value *keyword(Lexer &lexer)
+static Value *keyword(Scanner &scan)
 {
     BufferBuilder *builder = buffer_builder_create(6);
 
-    while (lexer.current_is(ALPHA) &&
-           lexer.do_continue())
+    while (scan.current_is(ALPHA) &&
+           scan.do_continue())
     {
-        buffer_builder_append_chr(builder, lexer.current());
-        lexer.foreward();
+        buffer_builder_append_chr(builder, scan.current());
+        scan.foreward();
     }
 
     __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
@@ -196,45 +197,45 @@ static Value *keyword(Lexer &lexer)
     }
 }
 
-static Value *value(Lexer &lexer)
+static Value *value(Scanner &scan)
 {
-    whitespace(lexer);
+    whitespace(scan);
 
     Value *value = nullptr;
 
-    if (lexer.current() == '"')
+    if (scan.current() == '"')
     {
-        value = create_string_adopt(string(lexer));
+        value = create_string_adopt(string(scan));
     }
-    else if (lexer.current_is("-0123456789"))
+    else if (scan.current_is("-0123456789"))
     {
-        value = number(lexer);
+        value = number(scan);
     }
-    else if (lexer.current() == '{')
+    else if (scan.current() == '{')
     {
-        value = object(lexer);
+        value = object(scan);
     }
-    else if (lexer.current() == '[')
+    else if (scan.current() == '[')
     {
-        value = array(lexer);
+        value = array(scan);
     }
     else
     {
-        value = keyword(lexer);
+        value = keyword(scan);
     }
 
-    whitespace(lexer);
+    whitespace(scan);
 
     return value;
 }
 
 Value *parse(const char *string, size_t size)
 {
-    Lexer lexer(string, size);
+    StringScanner scan{string, size};
     // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
+    scan.skip_word("\xEF\xBB\xBF");
 
-    Value *result = value(lexer);
+    Value *result = value(scan);
 
     return result;
 }
@@ -248,11 +249,11 @@ Value *parse_file(const char *path)
         return nullptr;
     }
 
-    Lexer lexer(json_file);
+    StreamScanner scan{json_file};
     // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
+    scan.skip_word("\xEF\xBB\xBF");
 
-    Value *result = value(lexer);
+    Value *result = value(scan);
 
     return result;
 }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libsystem/process/Process.h>
-#include <libsystem/utils/Lexer.h>
 
 #include <libutils/Callback.h>
+#include <libutils/Scanner.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
 #include <libutils/Vector.h>
@@ -241,9 +241,9 @@ public:
         while (context.any())
         {
             auto current = context.pop();
-            Lexer lexer{current.cstring(), current.length()};
+            StringScanner scan{current.cstring(), current.length()};
 
-            if (lexer.skip_word("--"))
+            if (scan.skip_word("--"))
             {
                 String argument{current.cstring() + 2, current.length() - 2};
 
@@ -265,15 +265,15 @@ public:
                     return PROCESS_FAILURE;
                 }
             }
-            else if (lexer.skip('-'))
+            else if (scan.skip('-'))
             {
-                while (lexer.do_continue())
+                while (scan.do_continue())
                 {
                     bool found_valid_option = false;
 
                     for (size_t i = 0; i < _option.count(); i++)
                     {
-                        if (_option[i].shortname == lexer.current())
+                        if (_option[i].shortname == scan.current())
                         {
                             _option[i].callback(context);
 
@@ -283,11 +283,11 @@ public:
 
                     if (!found_valid_option)
                     {
-                        invalid_option(lexer.current());
+                        invalid_option(scan.current());
                         return PROCESS_FAILURE;
                     }
 
-                    lexer.foreward();
+                    scan.foreward();
                 }
             }
             else

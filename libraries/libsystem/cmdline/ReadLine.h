@@ -4,7 +4,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/unicode/UTF8Decoder.h>
 #include <libsystem/unicode/UnicodeString.h>
-#include <libsystem/utils/Lexer.h>
+#include <libutils/Scanner.h>
 
 struct ReadLine
 {
@@ -18,8 +18,8 @@ struct ReadLine
     Stream *stream;
     UTF8Decoder *decoder;
     UnicodeString *string;
-    Lexer *lexer;
-} ;
+    StreamScanner *scan;
+};
 
 ReadLine *readline_create(Stream *stream);
 

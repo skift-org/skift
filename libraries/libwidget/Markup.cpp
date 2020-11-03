@@ -1,26 +1,26 @@
 #include <libmarkup/Markup.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
+#include <libutils/Scanner.h>
 
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
 
-static void whitespace(Lexer &lexer)
+static void whitespace(Scanner &scan)
 {
-    lexer.eat(" ");
+    scan.eat(" ");
 }
 
-static int number(Lexer &lexer)
+static int number(Scanner &scan)
 {
     int number = 0;
 
-    while (lexer.current_is("0123456789"))
+    while (scan.current_is("0123456789"))
     {
         number *= 10;
-        number += lexer.current() - '0';
-        lexer.foreward();
+        number += scan.current() - '0';
+        scan.foreward();
     }
 
     return number;
@@ -35,79 +35,79 @@ static Layout layout_parse(const char *string)
 
     Layout result = STACK();
 
-    Lexer lexer(string, strlen(string));
+    StringScanner scan(string, strlen(string));
 
-    if (lexer.skip_word("stack"))
+    if (scan.skip_word("stack"))
     {
         result = STACK();
     }
 
-    if (lexer.skip_word("grid"))
+    if (scan.skip_word("grid"))
     {
-        lexer.skip('(');
+        scan.skip('(');
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        int hcell = number(lexer);
+        int hcell = number(scan);
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        int vcell = number(lexer);
+        int vcell = number(scan);
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        int hspacing = number(lexer);
+        int hspacing = number(scan);
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        int vspacing = number(lexer);
+        int vspacing = number(scan);
 
         result = GRID(hcell, vcell, hspacing, vspacing);
     }
 
-    if (lexer.skip_word("vgrid"))
+    if (scan.skip_word("vgrid"))
     {
-        lexer.skip('(');
-        whitespace(lexer);
-        int spacing = number(lexer);
+        scan.skip('(');
+        whitespace(scan);
+        int spacing = number(scan);
         result = VGRID(spacing);
     }
 
-    if (lexer.skip_word("hgrid"))
+    if (scan.skip_word("hgrid"))
     {
-        lexer.skip('(');
-        whitespace(lexer);
-        int spacing = number(lexer);
+        scan.skip('(');
+        whitespace(scan);
+        int spacing = number(scan);
         result = HGRID(spacing);
     }
 
-    if (lexer.skip_word("vflow"))
+    if (scan.skip_word("vflow"))
     {
-        lexer.skip('(');
-        whitespace(lexer);
+        scan.skip('(');
+        whitespace(scan);
 
-        int spacing = number(lexer);
+        int spacing = number(scan);
         result = VFLOW(spacing);
     }
 
-    if (lexer.skip_word("hflow"))
+    if (scan.skip_word("hflow"))
     {
-        lexer.skip('(');
-        whitespace(lexer);
+        scan.skip('(');
+        whitespace(scan);
 
-        int spacing = number(lexer);
+        int spacing = number(scan);
         result = HFLOW(spacing);
     }
 
@@ -121,25 +121,25 @@ Insets insets_parse(const char *string)
         return Insets(0);
     }
 
-    Lexer lexer(string, strlen(string));
+    StringScanner scan{string, strlen(string)};
 
-    if (!lexer.skip_word("insets"))
+    if (!scan.skip_word("insets"))
     {
         return Insets(0);
     }
 
-    lexer.skip('(');
-    whitespace(lexer);
+    scan.skip('(');
+    whitespace(scan);
 
     int count;
     int args[4];
 
-    for (count = 0; count < 4 && lexer.current_is("0123456789"); count++)
+    for (count = 0; count < 4 && scan.current_is("0123456789"); count++)
     {
-        args[count] = number(lexer);
-        whitespace(lexer);
-        lexer.skip(',');
-        whitespace(lexer);
+        args[count] = number(scan);
+        whitespace(scan);
+        scan.skip(',');
+        whitespace(scan);
     }
 
     Insets result = Insets(0);

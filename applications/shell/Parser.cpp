@@ -1,100 +1,102 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/utils/BufferBuilder.h>
-#include <libsystem/utils/Lexer.h>
+
+#include <libutils/Scanner.h>
+#include <libutils/ScannerUtils.h>
 
 #include "shell/Nodes.h"
 
 #define SHELL_WHITESPACE " \r\n\t"
 
-static void whitespace(Lexer &lexer)
+static void whitespace(Scanner &scan)
 {
-    lexer.eat(SHELL_WHITESPACE);
+    scan.eat(SHELL_WHITESPACE);
 }
 
-static char *string(Lexer &lexer)
+static char *string(Scanner &scan)
 {
     BufferBuilder *builder = buffer_builder_create(16);
 
-    lexer.skip('"');
+    scan.skip('"');
 
-    while (lexer.current() != '"' &&
-           lexer.do_continue())
+    while (scan.current() != '"' &&
+           scan.do_continue())
     {
-        if (lexer.current() == '\\')
+        if (scan.current() == '\\')
         {
-            buffer_builder_append_str(builder, lexer.read_escape_sequence());
+            buffer_builder_append_str(builder, scan_json_escape_sequence(scan));
         }
         else
         {
-            buffer_builder_append_chr(builder, lexer.current());
-            lexer.foreward();
+            buffer_builder_append_chr(builder, scan.current());
+            scan.foreward();
         }
     }
 
-    lexer.skip('"');
+    scan.skip('"');
 
     return buffer_builder_finalize(builder);
 }
 
-static char *argument(Lexer &lexer)
+static char *argument(Scanner &scan)
 {
-    if (lexer.current() == '"')
+    if (scan.current() == '"')
     {
-        return string(lexer);
+        return string(scan);
     }
 
     BufferBuilder *builder = buffer_builder_create(16);
 
-    while (!lexer.current_is(SHELL_WHITESPACE) &&
-           lexer.do_continue())
+    while (!scan.current_is(SHELL_WHITESPACE) &&
+           scan.do_continue())
     {
-        if (lexer.current() == '\\')
+        if (scan.current() == '\\')
         {
-            lexer.foreward();
+            scan.foreward();
         }
 
-        if (lexer.do_continue())
+        if (scan.do_continue())
         {
-            buffer_builder_append_chr(builder, lexer.current());
-            lexer.foreward();
+            buffer_builder_append_chr(builder, scan.current());
+            scan.foreward();
         }
     }
 
     return buffer_builder_finalize(builder);
 }
 
-static ShellNode *command(Lexer &lexer)
+static ShellNode *command(Scanner &scan)
 {
-    char *command_name = argument(lexer);
+    char *command_name = argument(scan);
 
-    whitespace(lexer);
+    whitespace(scan);
 
     List *arguments = list_create();
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    while (lexer.do_continue() &&
-           lexer.current() != '|' &&
-           lexer.current() != '>')
+    while (scan.do_continue() &&
+           scan.current() != '|' &&
+           scan.current() != '>')
     {
-        list_pushback(arguments, argument(lexer));
-        whitespace(lexer);
+        list_pushback(arguments, argument(scan));
+        whitespace(scan);
     }
 
     return shell_command_create(command_name, arguments);
 }
 
-static ShellNode *pipeline(Lexer &lexer)
+static ShellNode *pipeline(Scanner &scan)
 {
     List *commands = list_create();
 
     do
     {
-        whitespace(lexer);
-        list_pushback(commands, command(lexer));
-        whitespace(lexer);
-    } while (lexer.skip('|'));
+        whitespace(scan);
+        list_pushback(commands, command(scan));
+        whitespace(scan);
+    } while (scan.skip('|'));
 
     if (commands->count() == 1)
     {
@@ -106,31 +108,30 @@ static ShellNode *pipeline(Lexer &lexer)
     return shell_pipeline_create(commands);
 }
 
-static ShellNode *redirect(Lexer &lexer)
+static ShellNode *redirect(Scanner &scan)
 {
-    ShellNode *node = pipeline(lexer);
+    ShellNode *node = pipeline(scan);
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    if (!lexer.skip('>'))
+    if (!scan.skip('>'))
     {
         return node;
     }
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    char *destination = argument(lexer);
+    char *destination = argument(scan);
 
     return shell_redirect_create(node, destination);
 }
 
 ShellNode *shell_parse(char *command_text)
 {
-
-    Lexer lexer(command_text, strlen(command_text));
+    StringScanner scan(command_text, strlen(command_text));
 
     // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
-    whitespace(lexer);
-    return redirect(lexer);
+    scan_skip_utf8bom(scan);
+    whitespace(scan);
+    return redirect(scan);
 }

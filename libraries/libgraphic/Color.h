@@ -3,7 +3,6 @@
 #include <libgraphic/ColorsNames.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/Lerp.h>
-#include <libsystem/utils/Lexer.h>
 
 struct Color
 {

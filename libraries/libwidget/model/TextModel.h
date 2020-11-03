@@ -1,8 +1,6 @@
 #pragma once
 
 #include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/Lexer.h>
-
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>

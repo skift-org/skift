@@ -1,3 +1,5 @@
+#include <libutils/Scanner.h>
+
 #include <libwidget/model/TextModel.h>
 
 RefPtr<TextModel> TextModel::empty()
@@ -13,22 +15,22 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
 
     Stream *stream = stream_open(path, OPEN_READ | OPEN_BUFFERED);
 
-    Lexer lexer(stream);
+    StreamScanner scan{stream};
 
     // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
+    scan.skip_word("\xEF\xBB\xBF");
 
-    while (lexer.do_continue())
+    while (scan.do_continue())
     {
         auto line = own<TextModelLine>();
 
-        while (lexer.do_continue() &&
-               lexer.current_codepoint() != '\n')
+        while (scan.do_continue() &&
+               scan.current_codepoint() != '\n')
         {
-            line->append(lexer.current_codepoint());
-            lexer.foreward_codepoint();
+            line->append(scan.current_codepoint());
+            scan.foreward_codepoint();
         }
-        lexer.skip('\n'); // skip the \n
+        scan.skip('\n'); // skip the \n
 
         model->append_line(line);
     }

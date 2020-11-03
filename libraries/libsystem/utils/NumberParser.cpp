@@ -1,7 +1,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
-#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
+#include <libutils/Scanner.h>
 
 static constexpr const char *XDIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
 static constexpr const char *XDIGITS_CAPITALIZED = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -98,15 +98,15 @@ bool parse_int(NumberParser parser, const char *str, size_t size, int *result)
 
 static constexpr const char *DIGITS = "0123456789";
 
-static int digits(Lexer &lexer)
+static int digits(Scanner &scan)
 {
     int digits = 0;
 
-    while (lexer.current_is(DIGITS))
+    while (scan.current_is(DIGITS))
     {
         digits *= 10;
-        digits += lexer.current() - '0';
-        lexer.foreward();
+        digits += scan.current() - '0';
+        scan.foreward();
     }
 
     return digits;
@@ -116,60 +116,60 @@ bool parse_double(NumberParser parser, const char *str, size_t size, double *res
 {
     assert(parser.base == 10);
 
-    Lexer lexer{str, size};
+    StringScanner scan{str, size};
 
     int ipart_sign = 1;
 
-    if (lexer.skip('-'))
+    if (scan.skip('-'))
     {
         ipart_sign = -1;
     }
 
-    if (lexer.skip('+'))
+    if (scan.skip('+'))
     {
         ipart_sign = +1;
     }
 
     int ipart = 0;
 
-    if (lexer.current_is(DIGITS))
+    if (scan.current_is(DIGITS))
     {
-        ipart = digits(lexer);
+        ipart = digits(scan);
     }
 
     double fpart = 0;
 
-    if (lexer.skip('.'))
+    if (scan.skip('.'))
     {
         double multiplier = 0.1;
 
-        while (lexer.current_is(DIGITS))
+        while (scan.current_is(DIGITS))
         {
-            fpart += multiplier * (lexer.current() - '0');
+            fpart += multiplier * (scan.current() - '0');
             multiplier *= 0.1;
-            lexer.foreward();
+            scan.foreward();
         }
     }
 
     int exp = 0;
 
-    if (lexer.current_is("eE"))
+    if (scan.current_is("eE"))
     {
-        lexer.foreward();
+        scan.foreward();
 
         int exp_sign = 1;
 
-        if (lexer.skip('-'))
+        if (scan.skip('-'))
         {
             exp_sign = -1;
         }
 
-        if (lexer.skip('+'))
+        if (scan.skip('+'))
         {
             exp_sign = -1;
         }
 
-        exp = digits(lexer) * exp_sign;
+        exp = digits(scan) * exp_sign;
     }
 
     *result = ipart_sign * (ipart + fpart) * pow(10, exp);

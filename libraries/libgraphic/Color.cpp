@@ -2,6 +2,7 @@
 #include <libgraphic/Color.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
+#include <libutils/Scanner.h>
 
 struct ColorName
 {
@@ -16,39 +17,39 @@ static constexpr ColorName _color_names[] = {
 #undef __ENTRY
 };
 
-static void whitespace(Lexer &lexer)
-{
-    lexer.eat(" \n\r\t");
-}
-
 static constexpr const char *DIGITS = "0123456789";
 static constexpr const char *HEXDIGITS = "0123456789abcdef";
 static constexpr const char *HEXDIGITS_MAj = "0123456789ABCDEF";
 
-static double number(Lexer &lexer)
+static void whitespace(Scanner &scan)
+{
+    scan.eat(" \n\r\t");
+}
+
+static double number(Scanner &scan)
 {
     int ipart = 0;
     double fpart = 0;
 
-    if (lexer.current_is(DIGITS))
+    if (scan.current_is(DIGITS))
     {
-        while (lexer.current_is(DIGITS))
+        while (scan.current_is(DIGITS))
         {
             ipart *= 10;
-            ipart += lexer.current() - '0';
-            lexer.foreward();
+            ipart += scan.current() - '0';
+            scan.foreward();
         }
     }
 
-    if (lexer.skip('.'))
+    if (scan.skip('.'))
     {
         double multiplier = 0.1;
 
-        while (lexer.current_is(DIGITS))
+        while (scan.current_is(DIGITS))
         {
-            fpart += multiplier * (lexer.current() - '0');
+            fpart += multiplier * (scan.current() - '0');
             multiplier *= 0.1;
-            lexer.foreward();
+            scan.foreward();
         }
     }
 
@@ -57,19 +58,19 @@ static double number(Lexer &lexer)
 
 Color Color::parse(const char *name)
 {
-    Lexer lexer{name, strlen(name)};
+    StringScanner scan{name, strlen(name)};
 
-    if (lexer.skip_word("#"))
+    if (scan.skip_word("#"))
     {
         size_t length = 0;
         char buffer[9];
 
-        while ((lexer.current_is(HEXDIGITS) || lexer.current_is(HEXDIGITS_MAj)) && length < 8)
+        while ((scan.current_is(HEXDIGITS) || scan.current_is(HEXDIGITS_MAj)) && length < 8)
         {
-            buffer[length] = lexer.current();
+            buffer[length] = scan.current();
             length++;
 
-            lexer.foreward();
+            scan.foreward();
         }
 
         buffer[length] = '\0';
@@ -135,111 +136,111 @@ Color Color::parse(const char *name)
 
         return from_hexa(parse_uint_inline(PARSER_HEXADECIMAL, hex, 0));
     }
-    else if (lexer.skip_word("rgb"))
+    else if (scan.skip_word("rgb"))
     {
-        lexer.skip('(');
+        scan.skip('(');
 
-        whitespace(lexer);
-        auto red = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto red = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto green = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto green = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto blue = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto blue = number(scan);
+        whitespace(scan);
 
-        lexer.skip(')');
+        scan.skip(')');
 
         return Color::from_rgb(red, green, blue);
     }
-    else if (lexer.skip_word("rgba"))
+    else if (scan.skip_word("rgba"))
     {
-        lexer.skip('(');
+        scan.skip('(');
 
-        whitespace(lexer);
-        auto red = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto red = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto green = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto green = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto blue = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto blue = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto alpha = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto alpha = number(scan);
+        whitespace(scan);
 
-        lexer.skip(')');
+        scan.skip(')');
 
         return Color::from_rgba(red, green, blue, alpha);
     }
-    else if (lexer.skip_word("hsl"))
+    else if (scan.skip_word("hsl"))
     {
-        lexer.skip('(');
+        scan.skip('(');
 
-        whitespace(lexer);
-        auto hue = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto hue = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto saturation = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto saturation = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto value = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto value = number(scan);
+        whitespace(scan);
 
-        lexer.skip(')');
+        scan.skip(')');
 
         return Color::from_hsv(hue, saturation, value);
     }
-    else if (lexer.skip_word("hsla"))
+    else if (scan.skip_word("hsla"))
     {
-        lexer.skip('(');
+        scan.skip('(');
 
-        whitespace(lexer);
-        auto hue = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto hue = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto saturation = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto saturation = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto value = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto value = number(scan);
+        whitespace(scan);
 
-        lexer.skip(',');
+        scan.skip(',');
 
-        whitespace(lexer);
-        auto alpha = number(lexer);
-        whitespace(lexer);
+        whitespace(scan);
+        auto alpha = number(scan);
+        whitespace(scan);
 
-        lexer.skip(')');
+        scan.skip(')');
 
         return Color::from_hsva(hue, saturation, value, alpha);
     }

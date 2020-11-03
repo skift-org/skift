@@ -1,12 +1,12 @@
 #pragma once
 
-#include <libsystem/utils/Lexer.h>
+#include <libutils/Scanner.h>
 
 #include <libhtml/dom/Node.h>
 
 namespace html
 {
 
-RefPtr<Node> parse(Lexer &lexer);
+RefPtr<Node> parse(Scanner &scan);
 
 } // namespace html

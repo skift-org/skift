@@ -4,69 +4,71 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/BufferBuilder.h>
-#include <libsystem/utils/Lexer.h>
 #include <libsystem/utils/NumberParser.h>
+
+#include <libutils/Scanner.h>
+#include <libutils/ScannerUtils.h>
 
 #define MARKUP_WHITESPACE " \n\r\t"
 #define MARKUP_XDIGITS "0123456789abcdef"
 #define MARKUP_ALPHA "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-static void whitespace(Lexer &lexer)
+static void whitespace(Scanner &scan)
 {
-    lexer.eat(MARKUP_WHITESPACE);
+    scan.eat(MARKUP_WHITESPACE);
 }
 
-static char *identifier(Lexer &lexer)
+static char *identifier(Scanner &scan)
 {
     BufferBuilder *builder = buffer_builder_create(6);
 
-    while (lexer.current_is(MARKUP_ALPHA) &&
-           lexer.do_continue())
+    while (scan.current_is(MARKUP_ALPHA) &&
+           scan.do_continue())
     {
-        buffer_builder_append_chr(builder, lexer.current());
-        lexer.foreward();
+        buffer_builder_append_chr(builder, scan.current());
+        scan.foreward();
     }
 
     return buffer_builder_finalize(builder);
 }
 
-char *string(Lexer &lexer)
+char *string(Scanner &scan)
 {
     BufferBuilder *builder = buffer_builder_create(16);
 
-    lexer.skip('"');
+    scan.skip('"');
 
-    while (lexer.current() != '"' &&
-           lexer.do_continue())
+    while (scan.current() != '"' &&
+           scan.do_continue())
     {
-        if (lexer.current() == '\\')
+        if (scan.current() == '\\')
         {
-            buffer_builder_append_str(builder, lexer.read_escape_sequence());
+            buffer_builder_append_str(builder, scan_json_escape_sequence(scan));
         }
         else
         {
-            buffer_builder_append_chr(builder, lexer.current());
-            lexer.foreward();
+            buffer_builder_append_chr(builder, scan.current());
+            scan.foreward();
         }
     }
 
-    lexer.skip('"');
+    scan.skip('"');
 
     return buffer_builder_finalize(builder);
 }
 
-static MarkupAttribute *attribute(Lexer &lexer)
+static MarkupAttribute *attribute(Scanner &scan)
 {
-    char *ident = identifier(lexer);
+    char *ident = identifier(scan);
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    if (lexer.skip('='))
+    if (scan.skip('='))
     {
 
-        whitespace(lexer);
+        whitespace(scan);
 
-        return markup_attribute_create_adopt(ident, string(lexer));
+        return markup_attribute_create_adopt(ident, string(scan));
     }
     else
     {
@@ -74,43 +76,43 @@ static MarkupAttribute *attribute(Lexer &lexer)
     }
 }
 
-static bool opening_tag(MarkupNode **node, Lexer &lexer)
+static bool opening_tag(MarkupNode **node, Scanner &scan)
 {
-    lexer.skip('<');
+    scan.skip('<');
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    *node = markup_node_create_adopt(identifier(lexer));
+    *node = markup_node_create_adopt(identifier(scan));
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    while (lexer.current_is(MARKUP_ALPHA) &&
-           lexer.do_continue())
+    while (scan.current_is(MARKUP_ALPHA) &&
+           scan.do_continue())
     {
-        markup_node_add_attribute(*node, attribute(lexer));
-        whitespace(lexer);
+        markup_node_add_attribute(*node, attribute(scan));
+        whitespace(scan);
     }
 
-    if (lexer.skip('/'))
+    if (scan.skip('/'))
     {
-        lexer.skip('>');
+        scan.skip('>');
 
         return false;
     }
 
-    lexer.skip('>');
+    scan.skip('>');
 
     return true;
 }
 
-static void closing_tag(MarkupNode *node, Lexer &lexer)
+static void closing_tag(MarkupNode *node, Scanner &scan)
 {
-    lexer.skip('<');
-    lexer.skip('/');
+    scan.skip('<');
+    scan.skip('/');
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    char *node_other_name = identifier(lexer);
+    char *node_other_name = identifier(scan);
 
     if (strcmp(markup_node_type(node), node_other_name) != 0)
     {
@@ -122,45 +124,43 @@ static void closing_tag(MarkupNode *node, Lexer &lexer)
 
     free(node_other_name);
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    lexer.skip('>');
+    scan.skip('>');
 }
 
-static MarkupNode *node(Lexer &lexer)
+static MarkupNode *node(Scanner &scan)
 {
-    whitespace(lexer);
+    whitespace(scan);
 
     MarkupNode *current_node = nullptr;
-    if (!opening_tag(&current_node, lexer))
+    if (!opening_tag(&current_node, scan))
     {
         return current_node;
     }
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    while (lexer.peek(0) == '<' &&
-           lexer.peek(1) != '/' &&
-           lexer.do_continue())
+    while (scan.peek(0) == '<' &&
+           scan.peek(1) != '/' &&
+           scan.do_continue())
     {
-        markup_node_add_child(current_node, node(lexer));
-        whitespace(lexer);
+        markup_node_add_child(current_node, node(scan));
+        whitespace(scan);
     }
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    closing_tag(current_node, lexer);
+    closing_tag(current_node, scan);
 
     return current_node;
 }
 
 MarkupNode *markup_parse(const char *string, size_t size)
 {
-    Lexer lexer(string, size);
-    // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
-
-    return node(lexer);
+    StringScanner scan{string, size};
+    scan_skip_utf8bom(scan);
+    return node(scan);
 }
 
 MarkupNode *markup_parse_file(const char *path)
@@ -172,9 +172,7 @@ MarkupNode *markup_parse_file(const char *path)
         return nullptr;
     }
 
-    Lexer lexer(markup_file);
-    // Skip the utf8 bom header if present.
-    lexer.skip_word("\xEF\xBB\xBF");
-
-    return node(lexer);
+    StreamScanner scan{markup_file};
+    scan_skip_utf8bom(scan);
+    return node(scan);
 }

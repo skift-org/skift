@@ -2,7 +2,7 @@
 
 #include <abi/Filesystem.h>
 
-#include <libsystem/utils/Lexer.h>
+#include <libutils/Scanner.h>
 #include <libutils/String.h>
 #include <libutils/StringBuilder.h>
 #include <libutils/Vector.h>
@@ -34,55 +34,55 @@ public:
 
     static Path parse(const char *path, size_t size, int flags)
     {
-        Lexer lexer{path, size};
+        StringScanner scan{path, size};
 
         bool absolute = false;
 
-        if (lexer.skip(PATH_SEPARATOR))
+        if (scan.skip(PATH_SEPARATOR))
         {
             absolute = true;
         }
 
-        auto parse_element = [](auto &lexer) {
+        auto parse_element = [](auto &scan) {
             StringBuilder builder{};
 
-            while (!lexer.skip(PATH_SEPARATOR) &&
-                   lexer.do_continue())
+            while (!scan.skip(PATH_SEPARATOR) &&
+                   scan.do_continue())
             {
-                builder.append(lexer.current());
-                lexer.foreward();
+                builder.append(scan.current());
+                scan.foreward();
             }
 
             return builder.finalize();
         };
 
-        auto parse_shorthand = [](auto &lexer) {
+        auto parse_shorthand = [](auto &scan) {
             Vector<String> elements{};
 
-            lexer.skip_word("..");
+            scan.skip_word("..");
             elements.push("..");
 
-            while (lexer.skip('.'))
+            while (scan.skip('.'))
             {
                 elements.push("..");
             }
 
-            lexer.skip('/');
+            scan.skip('/');
 
             return move(elements);
         };
 
         Vector<String> elements{};
 
-        while (lexer.do_continue())
+        while (scan.do_continue())
         {
-            if ((flags & PARENT_SHORTHAND) && lexer.current_is_word(".."))
+            if ((flags & PARENT_SHORTHAND) && scan.current_is_word(".."))
             {
-                elements.push_back_many(parse_shorthand(lexer));
+                elements.push_back_many(parse_shorthand(scan));
             }
             else
             {
-                auto el = parse_element(lexer);
+                auto el = parse_element(scan);
 
                 if (el.length() > 0)
                 {
@@ -218,19 +218,19 @@ public:
     {
         StringBuilder builder{basename().length()};
 
-        Lexer lexer{basename().cstring(), basename().length()};
+        StringScanner scan{basename().cstring(), basename().length()};
 
         // It's not a file extention it's an hidden file.
-        if (lexer.current_is("."))
+        if (scan.current_is("."))
         {
-            builder.append(lexer.current());
-            lexer.foreward();
+            builder.append(scan.current());
+            scan.foreward();
         }
 
-        while (!lexer.current_is(".") && lexer.do_continue())
+        while (!scan.current_is(".") && scan.do_continue())
         {
-            builder.append(lexer.current());
-            lexer.foreward();
+            builder.append(scan.current());
+            scan.foreward();
         }
 
         return builder.finalize();
@@ -286,24 +286,24 @@ public:
 
         StringBuilder builder{filename.length()};
 
-        Lexer lexer{filename.cstring(), filename.length()};
+        StringScanner scan{filename.cstring(), filename.length()};
 
         // It's not a file extention it's an hidden file.
-        if (lexer.current_is("."))
+        if (scan.current_is("."))
         {
-            lexer.foreward();
+            scan.foreward();
         }
 
-        while (!lexer.current_is(".") &&
-               lexer.do_continue())
+        while (!scan.current_is(".") &&
+               scan.do_continue())
         {
-            lexer.foreward();
+            scan.foreward();
         }
 
-        while (lexer.do_continue())
+        while (scan.do_continue())
         {
-            builder.append(lexer.current());
-            lexer.foreward();
+            builder.append(scan.current());
+            scan.foreward();
         }
 
         return builder.finalize();

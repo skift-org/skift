@@ -56,19 +56,19 @@ Result readline_readline(ReadLine *readline, char **line)
     readline->should_continue = true;
 
     while (readline->should_continue &&
-           !readline->lexer->ended())
+           !readline->scan->ended())
     {
-        if (readline->lexer->current() == U'\n' ||
-            readline->lexer->current() == U'\r')
+        if (readline->scan->current() == U'\n' ||
+            readline->scan->current() == U'\r')
         {
             readline_recale_history(readline);
 
             readline->should_continue = false;
 
-            readline->lexer->foreward();
+            readline->scan->foreward();
         }
-        else if (readline->lexer->current() == U'\b' ||
-                 readline->lexer->current() == 127 /*DEL*/)
+        else if (readline->scan->current() == U'\b' ||
+                 readline->scan->current() == 127 /*DEL*/)
         {
             readline_recale_history(readline);
 
@@ -78,24 +78,24 @@ Result readline_readline(ReadLine *readline, char **line)
                 unicode_string_remove(readline->string, readline->cursor);
             }
 
-            readline->lexer->foreward();
+            readline->scan->foreward();
         }
-        else if (readline->lexer->current() == U'\t')
+        else if (readline->scan->current() == U'\t')
         {
-            readline->lexer->foreward();
+            readline->scan->foreward();
         }
-        else if (readline->lexer->current() == U'\e')
+        else if (readline->scan->current() == U'\e')
         {
-            readline->lexer->foreward();
+            readline->scan->foreward();
 
-            if (readline->lexer->current() != '[')
+            if (readline->scan->current() != '[')
             {
                 continue;
             }
 
-            readline->lexer->foreward();
+            readline->scan->foreward();
 
-            if (readline->lexer->current() == 'A')
+            if (readline->scan->current() == 'A')
             {
                 if (readline->history_current < history_length())
                 {
@@ -103,7 +103,7 @@ Result readline_readline(ReadLine *readline, char **line)
                     readline->cursor = unicode_string_length(readline_string(readline));
                 }
             }
-            else if (readline->lexer->current() == 'B')
+            else if (readline->scan->current() == 'B')
             {
                 if (readline->history_current > 0)
                 {
@@ -111,29 +111,29 @@ Result readline_readline(ReadLine *readline, char **line)
                     readline->cursor = unicode_string_length(readline_string(readline));
                 }
             }
-            else if (readline->lexer->current() == 'C')
+            else if (readline->scan->current() == 'C')
             {
                 if (readline->cursor < unicode_string_length(readline_string(readline)))
                     readline->cursor++;
             }
-            else if (readline->lexer->current() == 'D')
+            else if (readline->scan->current() == 'D')
             {
                 if (readline->cursor > 0)
                     readline->cursor--;
             }
-            else if (readline->lexer->current_is("0123456789"))
+            else if (readline->scan->current_is("0123456789"))
             {
                 // https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_input_sequences
                 int digits = 0;
 
-                while (readline->lexer->current_is("0123456789"))
+                while (readline->scan->current_is("0123456789"))
                 {
                     digits *= 10;
-                    digits += readline->lexer->current() - '0';
-                    readline->lexer->foreward();
+                    digits += readline->scan->current() - '0';
+                    readline->scan->foreward();
                 }
 
-                if (readline->lexer->current() == '~')
+                if (readline->scan->current() == '~')
                 {
                     if (digits == 1) // Home
                     {
@@ -153,14 +153,14 @@ Result readline_readline(ReadLine *readline, char **line)
                 }
             }
 
-            readline->lexer->foreward();
+            readline->scan->foreward();
         }
         else
         {
             readline_recale_history(readline);
 
-            readline->decoder->write(readline->lexer->current());
-            readline->lexer->foreward();
+            readline->decoder->write(readline->scan->current());
+            readline->scan->foreward();
         }
 
         readline_repaint(readline);
@@ -193,14 +193,14 @@ ReadLine *readline_create(Stream *stream)
         readline->cursor++;
     });
 
-    readline->lexer = new Lexer(readline->stream);
+    readline->scan = new StreamScanner(readline->stream);
 
     return readline;
 }
 
 void readline_destroy(ReadLine *readline)
 {
-    delete readline->lexer;
+    delete readline->scan;
     delete readline->decoder;
     unicode_string_destroy(readline->string);
 

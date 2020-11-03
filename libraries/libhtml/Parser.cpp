@@ -13,112 +13,112 @@ static constexpr const char *NEWLINE = "\r\n";
 static constexpr const char *CLOSING_TAG = "</";
 static constexpr const char *SELF_CLOSING_TAG = "/>";
 
-void whitespace(Lexer &lexer)
+void whitespace(Scanner&scan)
 {
-    lexer.eat(WHITESPACE);
+    scan.eat(WHITESPACE);
 }
 
-void comment(Lexer &lexer)
+void comment(Scanner&scan)
 {
-    lexer.skip_word(COMMENT_START);
+    scan.skip_word(COMMENT_START);
 
-    while (!lexer.current_is_word(COMMENT_END))
+    while (!scan.current_is_word(COMMENT_END))
     {
-        lexer.foreward();
+        scan.foreward();
     }
 
-    lexer.skip_word(COMMENT_END);
+    scan.skip_word(COMMENT_END);
 }
 
-void whitespace_or_comment(Lexer &lexer)
+void whitespace_or_comment(Scanner&scan)
 {
-    whitespace(lexer);
+    whitespace(scan);
 
-    while (lexer.current_is_word(COMMENT_START))
+    while (scan.current_is_word(COMMENT_START))
     {
-        comment(lexer);
-        whitespace(lexer);
+        comment(scan);
+        whitespace(scan);
     }
 }
 
-void doctype(Lexer &lexer)
+void doctype(Scanner&scan)
 {
-    lexer.skip_word(DOCTYPE_START);
+    scan.skip_word(DOCTYPE_START);
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    assert(lexer.skip_word("html"));
+    assert(scan.skip_word("html"));
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    lexer.skip('>');
+    scan.skip('>');
 }
 
-void attribute(Lexer &lexer)
+void attribute(Scanner&scan)
 {
-    __unused(lexer);
+    __unused(scan);
 }
 
-RefPtr<Node> start_tag(Lexer &lexer)
+RefPtr<Node> start_tag(Scanner&scan)
 {
-    lexer.skip('<');
+    scan.skip('<');
 
-    whitespace(lexer);
+    whitespace(scan);
 
-    attribute(lexer);
+    attribute(scan);
 
-    if (lexer.current_is_word(SELF_CLOSING_TAG))
+    if (scan.current_is_word(SELF_CLOSING_TAG))
     {
-        lexer.skip_word(SELF_CLOSING_TAG);
+        scan.skip_word(SELF_CLOSING_TAG);
     }
     else
     {
-        lexer.skip('>');
+        scan.skip('>');
     }
 
     return make<Node>();
 }
 
-void end_tag(Lexer &lexer, RefPtr<Node> node)
+void end_tag(Scanner&scan, RefPtr<Node> node)
 {
     __unused(node);
 
-    lexer.skip_word(CLOSING_TAG);
+    scan.skip_word(CLOSING_TAG);
 
-    lexer.skip('>');
+    scan.skip('>');
 }
 
-RefPtr<Node> element(Lexer &lexer)
+RefPtr<Node> element(Scanner&scan)
 {
-    auto node = start_tag(lexer);
+    auto node = start_tag(scan);
 
     if (!node->self_closing())
     {
-        while (!lexer.current_is_word(CLOSING_TAG))
+        while (!scan.current_is_word(CLOSING_TAG))
         {
-            node->append(element(lexer));
+            node->append(element(scan));
         }
 
-        end_tag(lexer, node);
+        end_tag(scan, node);
     }
 
     return node;
 }
 
-RefPtr<Node> parse(Lexer &lexer)
+RefPtr<Node> parse(Scanner&scan)
 {
-    whitespace_or_comment(lexer);
+    whitespace_or_comment(scan);
 
-    if (lexer.current_is_word(DOCTYPE_START))
+    if (scan.current_is_word(DOCTYPE_START))
     {
-        doctype(lexer);
+        doctype(scan);
     }
 
-    whitespace_or_comment(lexer);
+    whitespace_or_comment(scan);
 
-    element(lexer);
+    element(scan);
 
-    whitespace_or_comment(lexer);
+    whitespace_or_comment(scan);
 
     return nullptr;
 }

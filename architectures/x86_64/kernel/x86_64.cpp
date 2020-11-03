@@ -103,6 +103,30 @@ void arch_panic_dump()
     cpuid_dump();
 }
 
+struct Stackframe
+{
+    Stackframe *rbp;
+    uint64_t rip;
+};
+
+void backtrace_internal(uint64_t rbp)
+{
+    bool empty = true;
+    Stackframe *stackframe = reinterpret_cast<Stackframe *>(rbp);
+
+    while (stackframe)
+    {
+        empty = false;
+        stream_format(log_stream, "\t%016x\n", stackframe->rip);
+        stackframe = stackframe->rbp;
+    }
+
+    if (empty)
+    {
+        stream_format(log_stream, "\t[EMPTY]\n");
+    }
+}
+
 void arch_dump_stack_frame(void *sfptr)
 {
     auto stackframe = reinterpret_cast<InterruptStackFrame *>(sfptr);
@@ -138,7 +162,8 @@ void arch_dump_stack_frame(void *sfptr)
 
     printf("\n");
 
-    printf("\tRIP=%016x CS=%016x RFLAGS=%016x RSP=%016x SS=%016x\n",
+    printf("\tRIP=%016x  CS=%016x FLG=%016x\n"
+           "\tRSP=%016x  SS=%016x\n",
            stackframe->rip,
            stackframe->cs,
            stackframe->rflags,
@@ -146,32 +171,9 @@ void arch_dump_stack_frame(void *sfptr)
            stackframe->ss);
 
     printf("\tCR0=%016x CR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
-}
 
-struct Stackframe
-{
-    Stackframe *rbp;
-    uint64_t rip;
-};
-
-extern int __stack_top;
-
-void backtrace_internal(uint64_t ebp)
-{
-    bool empty = true;
-    Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
-
-    while (stackframe)
-    {
-        empty = false;
-        stream_format(log_stream, "\t%016x\n", stackframe->rip);
-        stackframe = stackframe->rbp;
-    }
-
-    if (empty)
-    {
-        stream_format(log_stream, "\t[EMPTY]\n");
-    }
+    printf("\n\tBacktrace:\n");
+    backtrace_internal(stackframe->rbp);
 }
 
 void arch_backtrace()

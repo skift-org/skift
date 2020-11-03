@@ -2,17 +2,17 @@
 #include <libsystem/system/System.h>
 #include <libutils/ArgParse.h>
 
-constexpr ConstString PROLOGUE = "Print certain system information.  With no OPTION, same as -s.";
+constexpr auto PROLOGUE = "Print certain system information.  With no OPTION, same as -s.";
 
-constexpr ConstString OPTION_ALL_DESCRIPTION = "Print the kernel name.";
-constexpr ConstString OPTION_KERNEL_NAME_DESCRIPTION = "Print the kernel name.";
-constexpr ConstString OPTION_KERNEL_RELEASE_DESCRIPTION = "Print the kernel release.";
-constexpr ConstString OPTION_KERNEL_VERSION_DESCRIPTION = "Print the kernel version.";
-constexpr ConstString OPTION_MACHINE_DESCRIPTION = "Print the machine hardware name.";
-constexpr ConstString OPTION_NODENAME_DESCRIPTION = "Print the network node hostname.";
-constexpr ConstString OPTION_OPERATING_SYSTEM_DESCRIPTION = "Print the operating system.";
+constexpr auto OPTION_ALL_DESCRIPTION = "Print the kernel name.";
+constexpr auto OPTION_KERNEL_NAME_DESCRIPTION = "Print the kernel name.";
+constexpr auto OPTION_KERNEL_RELEASE_DESCRIPTION = "Print the kernel release.";
+constexpr auto OPTION_KERNEL_VERSION_DESCRIPTION = "Print the kernel version.";
+constexpr auto OPTION_MACHINE_DESCRIPTION = "Print the machine hardware name.";
+constexpr auto OPTION_NODENAME_DESCRIPTION = "Print the network node hostname.";
+constexpr auto OPTION_OPERATING_SYSTEM_DESCRIPTION = "Print the operating system.";
 
-constexpr ConstString EPILOGUE = "Options can be combined";
+constexpr auto EPILOGUE = "Options can be combined";
 
 int main(int argc, char const *argv[])
 {

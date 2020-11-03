@@ -6,7 +6,7 @@ struct __packed PageMappingLevel4Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
-    bool supervisor : 1;            // If 0, user-mode accesses are not allowed
+    bool user : 1;                  // If 0, user-mode accesses are not allowed
     bool write_thought : 1;         // Page-level write-through
     bool cache : 1;                 // Page-level cache disable
     bool accessed : 1;              // Indicates whether this entry has been used
@@ -33,7 +33,7 @@ struct __packed PageMappingLevel3Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
-    bool supervisor : 1;            // If 0, user-mode accesses are not allowed
+    bool user : 1;                  // If 0, user-mode accesses are not allowed
     bool write_thought : 1;         // Page-level write-through
     bool cache : 1;                 // Page-level cache disable
     bool accessed : 1;              // Indicates whether this entry has been used
@@ -62,7 +62,7 @@ struct __packed PageMappingLevel2Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
-    bool supervisor : 1;            // If 0, user-mode accesses are not allowed
+    bool user : 1;                  // If 0, user-mode accesses are not allowed
     bool write_thought : 1;         // Page-level write-through
     bool cache : 1;                 // Page-level cache disable
     bool accessed : 1;              // Indicates whether this entry has been used
@@ -91,7 +91,7 @@ struct __packed PageMappingLevel1Entry
 {
     bool present : 1;               // Must be 1 to reference a PML-1
     bool writable : 1;              // If 0, writes may not be allowed.
-    bool supervisor : 1;            // If 0, user-mode accesses are not allowed
+    bool user : 1;                  // If 0, user-mode accesses are not allowed
     bool write_thought : 1;         // Page-level write-through
     bool cache : 1;                 // Page-level cache disable
     bool accessed : 1;              // Indicates whether this entry has been used
@@ -117,3 +117,7 @@ static inline size_t pml1_index(uintptr_t address)
 
 static_assert(sizeof(PageMappingLevel1Entry) == sizeof(uint64_t));
 static_assert(sizeof(PageMappingLevel1) == 4096);
+
+extern "C" void paging_load_directory(uintptr_t directory);
+
+extern "C" void paging_invalidate_tlb();

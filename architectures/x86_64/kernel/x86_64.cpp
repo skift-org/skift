@@ -43,18 +43,9 @@ extern "C" void arch_main(void *info, uint32_t magic)
     pic_initialize();
     pit_initialize(1000);
 
-    atomic_enable();
-    sti();
+    system_main(handover);
 
-    asm("int $0");
-    logger_info("%x", 0xffffffff80000000);
-
-    cli();
-
-    //while (true)
-    //{
-    //    logger_info("Still alive!");
-    //}
+    ASSERT_NOT_REACHED();
 }
 
 void arch_disable_interrupts() { cli(); }
@@ -157,8 +148,33 @@ void arch_dump_stack_frame(void *sfptr)
     printf("\tCR0=%016x CR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
 }
 
+struct Stackframe
+{
+    Stackframe *rbp;
+    uint64_t rip;
+};
+
+extern int __stack_top;
+
+void backtrace_internal(uint64_t ebp)
+{
+    bool empty = true;
+    Stackframe *stackframe = reinterpret_cast<Stackframe *>(ebp);
+
+    while (stackframe)
+    {
+        empty = false;
+        stream_format(log_stream, "\t%016x\n", stackframe->rip);
+        stackframe = stackframe->rbp;
+    }
+
+    if (empty)
+    {
+        stream_format(log_stream, "\t[EMPTY]\n");
+    }
+}
+
 void arch_backtrace()
 {
-    logger_warn("STUB %s", __func__);
-    ASSERT_NOT_REACHED();
+    backtrace_internal(RBP());
 }

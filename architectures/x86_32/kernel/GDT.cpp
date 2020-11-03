@@ -32,7 +32,10 @@ static TSS tss = {
 
 static GDTEntry gdt[GDT_ENTRY_COUNT];
 
-static GDTDescriptor gdt_descriptor;
+static GDTDescriptor gdt_descriptor = {
+    .size = sizeof(GDTEntry) * GDT_ENTRY_COUNT,
+    .offset = (uint32_t)&gdt[0],
+};
 
 void gdt_initialize()
 {
@@ -42,11 +45,6 @@ void gdt_initialize()
     gdt[3] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER | GDT_EXECUTABLE, GDT_FLAGS};
     gdt[4] = {0, 0xffffffff, GDT_PRESENT | GDT_READWRITE | GDT_USER, GDT_FLAGS};
     gdt[5] = {&tss, GDT_TSS_PRESENT | GDT_ACCESSED | GDT_EXECUTABLE | GDT_USER, TSS_FLAGS};
-
-    gdt_descriptor = {
-        .size = sizeof(GDTEntry) * GDT_ENTRY_COUNT,
-        .offset = (uint32_t)&gdt[0],
-    };
 
     gdt_flush((uint32_t)&gdt_descriptor);
 }

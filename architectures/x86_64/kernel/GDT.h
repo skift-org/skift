@@ -91,7 +91,7 @@ struct __packed GDTEntry64
     }
 
     constexpr GDTEntry64(uint8_t flags, uint8_t granularity)
-        : GDTEntry64(0, 0xffff, granularity, flags)
+        : GDTEntry64(0, 0, granularity, flags)
     {
     }
 };

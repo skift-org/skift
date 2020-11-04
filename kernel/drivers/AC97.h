@@ -110,6 +110,8 @@ public:
 
     bool can_write(FsHandle &handle) override;
 
+    void query_from_buffer(void *destination, size_t size);
+
     // bool can_read(FsHandle &handle) override;
 
     // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;

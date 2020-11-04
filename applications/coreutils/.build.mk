@@ -32,6 +32,7 @@ UTILS = \
 	UNAME \
 	TRUE \
 	FALSE \
+	WC \
 	YES \
 	PWD
 
@@ -133,6 +134,9 @@ TRUE_NAME = true
 
 FALSE_LIBS = 
 FALSE_NAME = false
+
+WC_LIBS = 
+WC_NAME = wc
 
 YES_LIBS = 
 YES_NAME = yes

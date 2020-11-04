@@ -25,9 +25,9 @@ int main(int argc, char **argv)
     }
 
     size_t read;
-    char buffer[AC97_BDL_BUFFER_LEN];
+    char buffer[2 * AC97_BDL_BUFFER_LEN];
 
-    while ((read = stream_read(streamin, &buffer, AC97_BDL_BUFFER_LEN)) != 0)
+    while ((read = stream_read(streamin, &buffer, 2 * AC97_BDL_BUFFER_LEN)) != 0)
     {
         if (handle_has_error(streamin))
         {

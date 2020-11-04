@@ -30,7 +30,7 @@
 #define AC97_BDL_LEN 32 /* Buffer descriptor list length */
 
 // buffer len 16kb so that device can buffer 4 buffers
-#define AC97_BDL_BUFFER_LEN 0x1000                    /* Length of buffer in BDL */
+#define AC97_BDL_BUFFER_LEN 0x3c00                    /* Length of buffer in BDL */
 #define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFF)          /* Decode length from cl */
 #define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFF) /* Encode length to cl */
 #define AC97_CL_BUP ((uint32_t)1 << 30)               /* Buffer underrun policy in cl */
@@ -61,7 +61,7 @@
 #define AC97_EXT_AUDIO_STC 0x002A
 #define AC97_FRONT_SPLRATE 0x002C
 #define AC97_LR_SPLRATE 0x0032
-#define AC97_PLAYBACK_SPEED 41400
+#define AC97_PLAYBACK_SPEED 44100
 
 struct __packed AC97BufferDescriptor
 {

@@ -13,7 +13,8 @@
     __ENTRY(NETWORK, network)         \
     __ENTRY(NULL_, null)              \
     __ENTRY(CONSOLE, console)         \
-    __ENTRY(ZERO, zero)
+    __ENTRY(ZERO, zero)               \
+    __ENTRY(SOUND, sound)
 
 enum class DeviceClass : uint8_t
 {

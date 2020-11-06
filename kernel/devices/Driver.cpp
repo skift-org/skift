@@ -4,6 +4,7 @@
 #include "kernel/devices/PCIDevice.h"
 #include "kernel/devices/UNIXDevice.h"
 
+#include "kernel/drivers/AC97.h"
 #include "kernel/drivers/BGA.h"
 #include "kernel/drivers/E1000.h"
 #include "kernel/drivers/LegacyKeyboard.h"
@@ -32,6 +33,8 @@ void driver_initialize()
     _matchers->push_back(new PCIDeviceMatcher<E1000>{"Intel 82577LM Ethernet Adaptator", 0x8086, 0x10EA});
     _matchers->push_back(new PCIDeviceMatcher<E1000>{"Intel I217 Ethernet Adaptator", 0x8086, 0x153A});
     _matchers->push_back(new PCIDeviceMatcher<E1000>{"Virtual Ethernet Adaptator", 0x8086, 0x100E});
+
+    _matchers->push_back(new PCIDeviceMatcher<AC97>{"Intel ICH", 0x8086, 0x2415});
 
     _matchers->push_back(new VirtioDeviceMatcher<VirtioBlock>{"VirtI/O Block Device", VIRTIO_DEVICE_BLOCK});
     _matchers->push_back(new VirtioDeviceMatcher<VirtioConsole>{"VirtI/O Console Device", VIRTIO_DEVICE_CONSOLE});

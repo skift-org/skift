@@ -14,6 +14,10 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     nabmbar = bar(1).base();
     nambar = bar(0).base();
 
+    // reset
+    out16(nambar + AC97_RESET, 42);
+    out8(nabmbar + AC97_GLB_CTRL_STAT, 0x02);
+
     //  enable all device interrupts
     out8(nabmbar + AC97_PO_CR, AC97_X_CR_FEIE | AC97_X_CR_IOCE);
 
@@ -28,7 +32,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
 
     // set last valid index
-    lvi = 2;
+    lvi = 0;
     out8(nabmbar + AC97_PO_LVI, lvi);
 
     // detect wheter device supports MSB
@@ -57,6 +61,7 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     out16(nambar + AC97_LR_SPLRATE, AC97_PLAYBACK_SPEED);
 
     out8(nabmbar + AC97_PO_CR, in8(nabmbar + AC97_PO_CR) | AC97_X_CR_RPBM);
+    // out8(nabmbar + AC97_PO_CR, AC97_PO_LVI);
 
     logger_trace("AC97 initialised successfully");
 }
@@ -68,7 +73,7 @@ void AC97::initialise_buffers()
 
     for (size_t i = 0; i < AC97_BDL_LEN; i++)
     {
-        buffers.push_back(make<MMIORange>(AC97_BDL_BUFFER_LEN * 2));
+        buffers.push_back(make<MMIORange>((size_t)AC97_BDL_BUFFER_LEN * 2));
         buffer_descriptors_list[i].pointer = buffers[i]->physical_base();
         AC97_CL_SET_LENGTH(buffer_descriptors_list[i].cl, AC97_BDL_BUFFER_LEN);
         memset((char *)buffers[i]->base(), 0, AC97_BDL_BUFFER_LEN * 2);
@@ -85,9 +90,9 @@ void AC97::query_from_buffer(void *destination, size_t size)
 {
     size_t writtent = _buffer.read((char *)destination, size);
 
-    if (writtent < (AC97_BDL_BUFFER_LEN * 2))
+    if (writtent < size)
     {
-        memset((char *)destination + writtent, 255, (AC97_BDL_BUFFER_LEN * 2) - writtent);
+        memset((char *)destination + writtent, 0, size - writtent);
     }
 }
 
@@ -105,7 +110,6 @@ void AC97::handle_interrupt()
         size_t f = (lvi + 2) % AC97_BDL_LEN;
 
         query_from_buffer((void *)buffers[f]->base(), AC97_BDL_BUFFER_LEN * 2);
-
         lvi = (lvi + 1) % AC97_BDL_LEN;
         out8(nabmbar + AC97_PO_LVI, lvi);
     }

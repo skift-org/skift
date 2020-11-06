@@ -5,9 +5,6 @@
 #include <libutils/RingBuffer.h>
 #include <libutils/Vector.h>
 
-/* Utility macros */
-#define N_ELEMENTS(arr) (sizeof(arr) / sizeof((arr)[0]))
-
 #define SND_KNOB_MASTER 0
 #define SND_KNOB_VENDOR 1024
 
@@ -26,13 +23,13 @@
 /* Bus mastering misc */
 /* Buffer descriptor list constants */
 // max buffer len 64kb
-#define AC97_RINGBUFFER_LEN 0xF000
+#define AC97_RINGBUFFER_LEN 0x10000
 #define AC97_BDL_LEN 32 /* Buffer descriptor list length */
 
 // buffer len 16kb so that device can buffer 4 buffers
-#define AC97_BDL_BUFFER_LEN 0x3c00                    /* Length of buffer in BDL */
-#define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFF)          /* Decode length from cl */
-#define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFF) /* Encode length to cl */
+#define AC97_BDL_BUFFER_LEN 0x4000                    /* Length of buffer in BDL */
+#define AC97_CL_GET_LENGTH(cl) ((cl)&0xFFFE)          /* Decode length from cl */
+#define AC97_CL_SET_LENGTH(cl, v) ((cl) = (v)&0xFFFE) /* Encode length to cl */
 #define AC97_CL_BUP ((uint32_t)1 << 30)               /* Buffer underrun policy in cl */
 #define AC97_CL_IOC ((uint32_t)1 << 31)               /* Interrupt on completion flag in cl */
 
@@ -62,6 +59,7 @@
 #define AC97_FRONT_SPLRATE 0x002C
 #define AC97_LR_SPLRATE 0x0032
 #define AC97_PLAYBACK_SPEED 44100
+#define AC97_GLB_CTRL_STAT 0x0060
 
 struct __packed AC97BufferDescriptor
 {
@@ -85,22 +83,19 @@ private:
     RefPtr<MMIORange> buffer_descriptors_range{};
     // buffer descriptor list of size 32 (MAX SIZE FOR AC97)
     AC97BufferDescriptor *buffer_descriptors_list;
-    // 32*4096 buffer array for playing sound using PCM 16 Bit out (DMA)
+    // 32*30720 buffer array for playing sound using PCM 16 Bit out (DMA)
     Vector<RefPtr<MMIORange>> buffers;
 
-    void *read_buffer;
-
     uint32_t mask;
-    // char *name[];
 
     uint16_t _volume_PCM;
     uint16_t _volume_master;
-    // snd_knob_t *knobs;
 
     // to handle buffer allocation
-    bool playing;
-
     void initialise_buffers();
+
+    // handles buffers and sets 0 if data under run
+    void query_from_buffer(void *destination, size_t size);
 
 public:
     AC97(DeviceAddress address);
@@ -109,8 +104,6 @@ public:
     void handle_interrupt() override;
 
     bool can_write(FsHandle &handle) override;
-
-    void query_from_buffer(void *destination, size_t size);
 
     // bool can_read(FsHandle &handle) override;
 

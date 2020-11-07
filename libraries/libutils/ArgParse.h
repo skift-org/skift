@@ -37,7 +37,6 @@ using ArgParseOptionCallback = Callback<void(ArgParseContext &)>;
 
 struct ArgParseOption
 {
-
     char shortname;
     String longname{};
     String description{};
@@ -56,6 +55,7 @@ private:
 
     bool _should_abort_on_failure = false;
     bool _show_help_if_no_operand_given = false;
+    bool _show_help_if_no_option_given = false;
 
 public:
     static constexpr char NO_SHORT_NAME = '\0';
@@ -73,6 +73,8 @@ public:
     void should_abort_on_failure() { _should_abort_on_failure = true; }
 
     void show_help_if_no_operand_given() { _show_help_if_no_operand_given = true; }
+
+    void show_help_if_no_option_given() { _show_help_if_no_option_given = true; }
 
     ArgParse()
     {
@@ -238,6 +240,8 @@ public:
 
         _name = context.pop();
 
+        auto has_run_option = false;
+
         while (context.any())
         {
             auto current = context.pop();
@@ -254,7 +258,7 @@ public:
                     if (_option[i].longname == argument)
                     {
                         _option[i].callback(context);
-
+                        has_run_option = true;
                         found_valid_option = true;
                     }
                 }
@@ -277,6 +281,7 @@ public:
                         {
                             _option[i].callback(context);
 
+                            has_run_option = true;
                             found_valid_option = true;
                         }
                     }
@@ -297,6 +302,12 @@ public:
         }
 
         if (!this->argv().any() && _show_help_if_no_operand_given)
+        {
+            usage();
+            return PROCESS_FAILURE;
+        }
+
+        if (!has_run_option && _show_help_if_no_option_given)
         {
             usage();
             return PROCESS_FAILURE;

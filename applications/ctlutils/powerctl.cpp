@@ -1,14 +1,23 @@
 #include <abi/Syscalls.h>
 
-#include <libutils/String.h>
+#include <libutils/ArgParse.h>
 
-int main(int argc, char **argv)
+int main(int argc, char const *argv[])
 {
-    if (argc == 2 && String(argv[1]) == "--reboot")
-        __syscall(SYS_SYSTEM_REBOOT);
+    ArgParse args;
 
-    else if (argc == 2 && String(argv[1]) == "--shutdown")
-        __syscall(SYS_SYSTEM_SHUTDOWN);
+    args.should_abort_on_failure();
+    args.show_help_if_no_option_given();
 
-    return -1;
+    args.prologue("Change the power state of the system.");
+
+    args.option('r', "reboot", "Reboot the system.", [&](auto &) {
+        hj_system_reboot();
+    });
+
+    args.option('s', "shutdown", "Shutdown the system.", [&](auto &) {
+        hj_system_shutdown();
+    });
+
+    return args.eval(argc, argv);
 }

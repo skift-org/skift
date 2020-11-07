@@ -1,8 +1,9 @@
+#include <abi/Syscalls.h>
+
 #include <libsystem/core/CString.h>
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
-#include <libutils/Path.h>
 #include <libwidget/Application.h>
 #include <libwidget/Menu.h>
 #include <libwidget/Screen.h>
@@ -63,14 +64,17 @@ int main(int argc, char **argv)
     clock_timer->start();
 
     auto ram_timer = own<Timer>(500, [&]() {
-        SystemStatus status = system_get_status();
+        SystemStatus status{};
+        hj_system_status(&status);
+
         ram_graph->record(status.used_ram / (float)status.total_ram);
     });
 
     ram_timer->start();
 
     auto cpu_timer = own<Timer>(100, [&]() {
-        SystemStatus status = system_get_status();
+        SystemStatus status{};
+        hj_system_status(&status);
         cpu_graph->record(status.cpu_usage / 100.0);
     });
 

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <abi/Syscalls.h>
+
 #include <libsystem/eventloop/Timer.h>
-#include <libsystem/system/System.h>
 #include <libutils/StringBuilder.h>
 #include <libwidget/Widgets.h>
 
@@ -41,14 +42,17 @@ public:
         _label_greedy = new Label(this, "Most greedy: nil", Position::RIGHT);
 
         _graph_timer = own<Timer>(500, [&]() {
-            SystemStatus status = system_get_status();
+            SystemStatus status{};
+            hj_system_status(&status);
+
             record(status.used_ram / (float)status.total_ram);
         });
 
         _graph_timer->start();
 
         _text_timer = own<Timer>(1000, [&]() {
-            SystemStatus status = system_get_status();
+            SystemStatus status{};
+            hj_system_status(&status);
 
             unsigned usage = status.used_ram / 1024 / 1024;
             char buffer_usage[50];

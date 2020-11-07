@@ -55,19 +55,6 @@ void __plug_lock_assert_failed(Lock *lock, const char *file, const char *functio
 
 /* --- Systeme API ---------------------------------------------------------- */
 
-// We are the system so we doesn't need that ;)
-void __plug_system_get_info(SystemInfo *info)
-{
-    __unused(info);
-    ASSERT_NOT_REACHED();
-}
-
-void __plug_system_get_status(SystemStatus *status)
-{
-    __unused(status);
-    ASSERT_NOT_REACHED();
-}
-
 TimeStamp __plug_system_get_time()
 {
     return arch_get_time();
@@ -145,28 +132,6 @@ Result __plug_process_launch(Launchpad *launchpad, int *pid)
     return task_launch(scheduler_running(), launchpad, pid);
 }
 
-void __plug_process_exit(int code)
-{
-    scheduler_running()->cancel(code);
-    system_panic("Task exit failed!");
-}
-
-Result __plug_process_cancel(int pid)
-{
-    __unused(pid);
-    ASSERT_NOT_REACHED();
-}
-
-Result __plug_process_get_directory(char *buffer, uint size)
-{
-    return task_get_directory(scheduler_running(), buffer, size);
-}
-
-Result __plug_process_set_directory(const char *directory)
-{
-    return task_set_directory(scheduler_running(), directory);
-}
-
 Result __plug_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
@@ -179,9 +144,13 @@ Result __plug_process_wait(int pid, int *exit_value)
 
 /* ---Handles plugs --------------------------------------------------------- */
 
-void __plug_handle_open(Handle *handle, const char *path, OpenFlag flags)
+void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 {
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+    auto path = Path::parse(raw_path);
+
+    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), resolved_path, flags);
 
     handle->result = result_or_handle_index.result();
 
@@ -293,9 +262,7 @@ int __plug_handle_tell(Handle *handle, Whence whence)
 int __plug_handle_stat(Handle *handle, FileState *stat)
 {
     assert(handle->id != INTERNAL_LOG_STREAM_HANDLE);
-
     handle->result = task_fshandle_stat(scheduler_running(), handle->id, stat);
-
     return 0;
 }
 
@@ -303,34 +270,42 @@ int __plug_handle_stat(Handle *handle, FileState *stat)
 // The kernel is not supposed to connect to services
 // running in userspace using libsystem.
 
-void __plug_handle_connect(Handle *handle, const char *path)
+void __plug_process_exit(int)
 {
-    __unused(handle);
-    __unused(path);
-
     ASSERT_NOT_REACHED();
 }
 
-void __plug_handle_accept(Handle *handle, Handle *connection_handle)
+Result __plug_process_cancel(int)
 {
-    __unused(handle);
-    __unused(connection_handle);
-
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_create_pipe(int *reader_handle, int *writer_handle)
+Result __plug_process_get_directory(char *, uint)
 {
-    __unused(reader_handle);
-    __unused(writer_handle);
-
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_create_term(int *server_handle, int *client_handle)
+Result __plug_process_set_directory(const char *)
 {
-    __unused(server_handle);
-    __unused(client_handle);
+    ASSERT_NOT_REACHED();
+}
 
+void __plug_handle_connect(Handle *, const char *)
+{
+    ASSERT_NOT_REACHED();
+}
+
+void __plug_handle_accept(Handle *, Handle *)
+{
+    ASSERT_NOT_REACHED();
+}
+
+Result __plug_create_pipe(int *, int *)
+{
+    ASSERT_NOT_REACHED();
+}
+
+Result __plug_create_term(int *, int *)
+{
     ASSERT_NOT_REACHED();
 }

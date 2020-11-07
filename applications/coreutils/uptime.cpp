@@ -1,13 +1,14 @@
+#include <abi/Syscalls.h>
+
 #include <libsystem/io/Stream.h>
-#include <libsystem/system/System.h>
-#include <libutils/Path.h>
 
 int main(int argc, char const *argv[])
 {
     __unused(argc);
     __unused(argv);
 
-    SystemStatus status = system_get_status();
+    SystemStatus status{};
+    hj_system_status(&status);
 
     ElapsedTime seconds = status.uptime;
 

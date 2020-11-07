@@ -1,3 +1,5 @@
+#include <abi/Syscalls.h>
+
 #include <libsystem/BuildInfo.h>
 #include <libsystem/system/System.h>
 #include <libutils/ArgParse.h>
@@ -50,7 +52,8 @@ int main(int argc, char const *argv[])
 
     args.eval(argc, argv);
 
-    SystemInfo info = system_get_info();
+    SystemInfo info{};
+    hj_system_info(&info);
 
     if (argc == 1 || option_kernel_name || option_all)
     {

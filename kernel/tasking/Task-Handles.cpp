@@ -76,11 +76,9 @@ Result task_fshandle_release(Task *task, int handle_index)
     return SUCCESS;
 }
 
-ResultOr<int> task_fshandle_open(Task *task, const char *file_path, OpenFlag flags)
+ResultOr<int> task_fshandle_open(Task *task, Path &path, OpenFlag flags)
 {
-    auto resolved_path = task_resolve_directory(task, file_path);
-
-    auto result_or_handle = filesystem_open(resolved_path, flags);
+    auto result_or_handle = filesystem_open(path, flags);
 
     if (!result_or_handle.success())
     {
@@ -143,7 +141,15 @@ Result task_fshandle_poll(
     }
 
     {
-        BlockerResult blocker_result = task_block(task, new BlockerSelect(handles, handles_set->events, handles_set->count, &selected_handle, selected_events), timeout);
+        auto blocker = new BlockerSelect{
+            handles,
+            handles_set->events,
+            handles_set->count,
+            &selected_handle,
+            selected_events,
+        };
+
+        BlockerResult blocker_result = task_block(task, blocker, timeout);
 
         if (blocker_result == BLOCKER_TIMEOUT)
         {
@@ -279,11 +285,9 @@ Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
     return result;
 }
 
-ResultOr<int> task_fshandle_connect(Task *task, const char *socket_path)
+ResultOr<int> task_fshandle_connect(Task *task, Path &path)
 {
-    auto resolved_path = task_resolve_directory(task, socket_path);
-
-    auto result_or_connection_handle = filesystem_connect(resolved_path);
+    auto result_or_connection_handle = filesystem_connect(path);
 
     if (!result_or_connection_handle.success())
     {

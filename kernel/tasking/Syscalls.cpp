@@ -29,7 +29,7 @@ bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 
 /* --- Process -------------------------------------------------------------- */
 
-Result sys_process_this(int *pid)
+Result hj_process_this(int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
     {
@@ -41,14 +41,19 @@ Result sys_process_this(int *pid)
     return SUCCESS;
 }
 
-Result sys_process_name(char *name)
+Result hj_process_name(char *name, size_t size)
 {
-    strlcpy(name, scheduler_running()->name, PROCESS_NAME_SIZE);
+    if (!syscall_validate_ptr((uintptr_t)name, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    strlcpy(name, scheduler_running()->name, size);
 
     return SUCCESS;
 }
 
-Result sys_process_launch(Launchpad *launchpad, int *pid)
+Result hj_process_launch(Launchpad *launchpad, int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
         !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
@@ -73,13 +78,13 @@ Result sys_process_launch(Launchpad *launchpad, int *pid)
     return result;
 }
 
-Result sys_process_exit(int exit_code)
+Result hj_process_exit(int exit_code)
 {
     scheduler_running()->cancel(exit_code);
     ASSERT_NOT_REACHED();
 }
 
-Result sys_process_cancel(int pid)
+Result hj_process_cancel(int pid)
 {
     AtomicHolder holder;
 
@@ -100,22 +105,38 @@ Result sys_process_cancel(int pid)
     }
 }
 
-Result sys_process_get_directory(char *buffer, uint size)
+Result hj_process_get_directory(char *raw_path, size_t size)
 {
-    return task_get_directory(scheduler_running(), buffer, size);
+    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto cwd = task_get_directory(scheduler_running());
+
+    strlcpy(raw_path, cwd.string().cstring(), size);
+
+    return SUCCESS;
 }
 
-Result sys_process_set_directory(const char *path)
+Result hj_process_set_directory(const char *raw_path, size_t size)
 {
+    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto path = Path::parse(raw_path, size);
+
     return task_set_directory(scheduler_running(), path);
 }
 
-Result sys_process_sleep(int time)
+Result hj_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
 }
 
-Result sys_process_wait(int tid, int *user_exit_value)
+Result hj_process_wait(int tid, int *user_exit_value)
 {
     int exit_value;
 
@@ -131,7 +152,7 @@ Result sys_process_wait(int tid, int *user_exit_value)
 
 /* --- Shared memory -------------------------------------------------------- */
 
-Result sys_memory_alloc(size_t size, uintptr_t *out_address)
+Result hj_memory_alloc(size_t size, uintptr_t *out_address)
 {
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)))
     {
@@ -141,12 +162,12 @@ Result sys_memory_alloc(size_t size, uintptr_t *out_address)
     return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
-Result sys_memory_free(uintptr_t address)
+Result hj_memory_free(uintptr_t address)
 {
     return task_memory_free(scheduler_running(), address);
 }
 
-Result sys_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
+Result hj_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
 {
 
     if (!syscall_validate_ptr((uintptr_t)out_address, sizeof(uintptr_t)) ||
@@ -158,7 +179,7 @@ Result sys_memory_include(int handle, uintptr_t *out_address, size_t *out_size)
     return task_memory_include(scheduler_running(), handle, out_address, out_size);
 }
 
-Result sys_memory_get_handle(uintptr_t address, int *out_handle)
+Result hj_memory_get_handle(uintptr_t address, int *out_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)out_handle, sizeof(int)))
     {
@@ -170,52 +191,87 @@ Result sys_memory_get_handle(uintptr_t address, int *out_handle)
 
 /* --- Filesystem ----------------------------------------------------------- */
 
-Result sys_filesystem_mkdir(const char *dir_path)
+Result hj_filesystem_mkdir(const char *raw_path, size_t size)
 {
-    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
-    return filesystem_mkdir(task_resolve_directory(scheduler_running(), dir_path));
+    auto path = Path::parse(raw_path, size);
+
+    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+
+    return filesystem_mkdir(resolved_path);
 }
 
-Result sys_filesystem_mkpipe(const char *fifo_path)
+Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
 {
-    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
-    return filesystem_mkpipe(task_resolve_directory(scheduler_running(), fifo_path));
+    auto path = Path::parse(raw_path, size);
+    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+
+    return filesystem_mkpipe(resolved_path);
 }
 
-Result sys_filesystem_link(const char *old_path, const char *new_path)
+Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
+                          const char *raw_new_path, size_t new_size)
 {
-    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+    if (!syscall_validate_ptr((uintptr_t)raw_old_path, old_size) &&
+        !syscall_validate_ptr((uintptr_t)raw_new_path, new_size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
-    Path oldp = task_resolve_directory(scheduler_running(), old_path);
-    Path newp = task_resolve_directory(scheduler_running(), new_path);
+    Path old_path = Path::parse(raw_old_path, old_size);
+    Path resolved_old_path = task_resolve_directory(scheduler_running(), old_path);
 
-    Result result = filesystem_mklink(oldp, newp);
+    Path new_path = Path::parse(raw_new_path, new_size);
+    Path resolved_new_path = task_resolve_directory(scheduler_running(), new_path);
+
+    Result result = filesystem_mklink(resolved_old_path, resolved_new_path);
 
     return result;
 }
 
-Result sys_filesystem_unlink(const char *link_path)
+Result hj_filesystem_unlink(const char *raw_path, size_t size)
 {
-    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
-    return filesystem_unlink(task_resolve_directory(scheduler_running(), link_path));
+    auto path = Path::parse(raw_path, size);
+    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+
+    return filesystem_unlink(resolved_path);
 }
 
-Result sys_filesystem_rename(const char *old_path, const char *new_path)
+Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
+                            const char *raw_new_path, size_t new_size)
 {
-    // FIXME: THIS IS NOT SAFE, WE ARE NOT CHECKING FOR THE STRING SIZE!
+    if (!syscall_validate_ptr((uintptr_t)raw_old_path, old_size) &&
+        !syscall_validate_ptr((uintptr_t)raw_new_path, new_size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
 
-    Path oldp = task_resolve_directory(scheduler_running(), old_path);
-    Path newp = task_resolve_directory(scheduler_running(), new_path);
+    Path old_path = Path::parse(raw_old_path, old_size);
+    Path resolved_old_path = task_resolve_directory(scheduler_running(), old_path);
 
-    return filesystem_rename(oldp, newp);
+    Path new_path = Path::parse(raw_new_path, new_size);
+    Path resolved_new_path = task_resolve_directory(scheduler_running(), new_path);
+
+    return filesystem_rename(resolved_old_path, resolved_new_path);
 }
 
 /* --- System info getter --------------------------------------------------- */
 
-Result sys_system_get_info(SystemInfo *info)
+Result hj_system_info(SystemInfo *info)
 {
     strncpy(info->kernel_name, "hjert", SYSTEM_INFO_FIELD_SIZE);
 
@@ -233,7 +289,7 @@ Result sys_system_get_info(SystemInfo *info)
 
 ElapsedTime system_get_uptime();
 
-Result sys_system_get_status(SystemStatus *status)
+Result hj_system_status(SystemStatus *status)
 {
     // FIXME: get a real uptime value;
     status->uptime = system_get_uptime();
@@ -247,14 +303,14 @@ Result sys_system_get_status(SystemStatus *status)
     return SUCCESS;
 }
 
-Result sys_system_get_time(TimeStamp *timestamp)
+Result hj_system_get_time(TimeStamp *timestamp)
 {
     *timestamp = arch_get_time();
 
     return SUCCESS;
 }
 
-Result sys_system_get_ticks(uint32_t *tick)
+Result hj_system_get_ticks(uint32_t *tick)
 {
     if (!syscall_validate_ptr((uintptr_t)tick, sizeof(uintptr_t)))
     {
@@ -265,13 +321,13 @@ Result sys_system_get_ticks(uint32_t *tick)
     return SUCCESS;
 }
 
-Result sys_system_reboot()
+Result hj_system_reboot()
 {
     arch_reboot();
     ASSERT_NOT_REACHED();
 }
 
-Result sys_system_shutdown()
+Result hj_system_shutdown()
 {
     arch_shutdown();
     ASSERT_NOT_REACHED();
@@ -279,7 +335,7 @@ Result sys_system_shutdown()
 
 /* --- Create --------------------------------------------------------------- */
 
-Result sys_create_pipe(int *reader_handle, int *writer_handle)
+Result hj_create_pipe(int *reader_handle, int *writer_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)reader_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)writer_handle, sizeof(int)))
@@ -290,7 +346,7 @@ Result sys_create_pipe(int *reader_handle, int *writer_handle)
     return task_create_pipe(scheduler_running(), reader_handle, writer_handle);
 }
 
-Result sys_create_term(int *server_handle, int *client_handle)
+Result hj_create_term(int *server_handle, int *client_handle)
 {
     if (!syscall_validate_ptr((uintptr_t)server_handle, sizeof(int)) ||
         !syscall_validate_ptr((uintptr_t)client_handle, sizeof(int)))
@@ -303,14 +359,20 @@ Result sys_create_term(int *server_handle, int *client_handle)
 
 /* --- Handles -------------------------------------------------------------- */
 
-Result sys_handle_open(int *handle, const char *path, OpenFlag flags)
+Result hj_handle_open(int *handle,
+                      const char *raw_path, size_t size,
+                      OpenFlag flags)
 {
-    if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)))
+    if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)) ||
+        !syscall_validate_ptr((uintptr_t)raw_path, size))
     {
         return ERR_BAD_ADDRESS;
     }
 
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
+    auto path = Path::parse(raw_path, size);
+    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), resolved_path, flags);
 
     if (result_or_handle_index.success())
     {
@@ -324,12 +386,12 @@ Result sys_handle_open(int *handle, const char *path, OpenFlag flags)
     }
 }
 
-Result sys_handle_close(int handle)
+Result hj_handle_close(int handle)
 {
     return task_fshandle_close(scheduler_running(), handle);
 }
 
-Result sys_handle_poll(
+Result hj_handle_poll(
     HandleSet *handles_set,
     int *selected,
     PollEvent *selected_events,
@@ -376,7 +438,7 @@ Result sys_handle_poll(
     return result;
 }
 
-Result sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
+Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)read, sizeof(size_t)))
@@ -398,7 +460,7 @@ Result sys_handle_read(int handle, char *buffer, size_t size, size_t *read)
     }
 }
 
-Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *written)
+Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written)
 {
     if (!syscall_validate_ptr((uintptr_t)buffer, size) ||
         !syscall_validate_ptr((uintptr_t)written, sizeof(size_t)))
@@ -420,17 +482,17 @@ Result sys_handle_write(int handle, const char *buffer, size_t size, size_t *wri
     }
 }
 
-Result sys_handle_call(int handle, IOCall request, void *args)
+Result hj_handle_call(int handle, IOCall request, void *args)
 {
     return task_fshandle_call(scheduler_running(), handle, request, args);
 }
 
-Result sys_handle_seek(int handle, int offset, Whence whence)
+Result hj_handle_seek(int handle, int offset, Whence whence)
 {
     return task_fshandle_seek(scheduler_running(), handle, offset, whence);
 }
 
-Result sys_handle_tell(int handle, Whence whence, int *offset)
+Result hj_handle_tell(int handle, Whence whence, int *offset)
 {
     if (!syscall_validate_ptr((uintptr_t)offset, sizeof(int)))
     {
@@ -451,7 +513,7 @@ Result sys_handle_tell(int handle, Whence whence, int *offset)
     }
 }
 
-Result sys_handle_stat(int handle, FileState *state)
+Result hj_handle_stat(int handle, FileState *state)
 {
     if (!syscall_validate_ptr((uintptr_t)state, sizeof(FileState)))
     {
@@ -461,8 +523,16 @@ Result sys_handle_stat(int handle, FileState *state)
     return task_fshandle_stat(scheduler_running(), handle, state);
 }
 
-Result sys_handle_connect(int *handle, const char *path)
+Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
 {
+    if (!syscall_validate_ptr((uintptr_t)handle, sizeof(int)) &&
+        !syscall_validate_ptr((uintptr_t)raw_path, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    auto path = Path::parse(raw_path, size);
+
     auto result_or_handle_index = task_fshandle_connect(scheduler_running(), path);
 
     if (result_or_handle_index.success())
@@ -477,7 +547,7 @@ Result sys_handle_connect(int *handle, const char *path)
     }
 }
 
-Result sys_handle_accept(int handle, int *connection_handle)
+Result hj_handle_accept(int handle, int *connection_handle)
 {
     auto result_or_handle_index = task_fshandle_accept(scheduler_running(), handle);
 
@@ -497,43 +567,43 @@ Result sys_handle_accept(int handle, int *connection_handle)
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 
 static SyscallHandler syscalls[__SYSCALL_COUNT] = {
-    [SYS_PROCESS_THIS] = reinterpret_cast<SyscallHandler>(sys_process_this),
-    [SYS_PROCESS_NAME] = reinterpret_cast<SyscallHandler>(sys_process_name),
-    [SYS_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(sys_process_launch),
-    [SYS_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(sys_process_exit),
-    [SYS_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(sys_process_cancel),
-    [SYS_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(sys_process_sleep),
-    [SYS_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(sys_process_wait),
-    [SYS_PROCESS_GET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_get_directory),
-    [SYS_PROCESS_SET_DIRECTORY] = reinterpret_cast<SyscallHandler>(sys_process_set_directory),
-    [SYS_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(sys_memory_alloc),
-    [SYS_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(sys_memory_free),
-    [SYS_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(sys_memory_include),
-    [SYS_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(sys_memory_get_handle),
-    [SYS_FILESYSTEM_LINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_link),
-    [SYS_FILESYSTEM_UNLINK] = reinterpret_cast<SyscallHandler>(sys_filesystem_unlink),
-    [SYS_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(sys_filesystem_rename),
-    [SYS_FILESYSTEM_MKPIPE] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkpipe),
-    [SYS_FILESYSTEM_MKDIR] = reinterpret_cast<SyscallHandler>(sys_filesystem_mkdir),
-    [SYS_SYSTEM_GET_INFO] = reinterpret_cast<SyscallHandler>(sys_system_get_info),
-    [SYS_SYSTEM_GET_STATUS] = reinterpret_cast<SyscallHandler>(sys_system_get_status),
-    [SYS_SYSTEM_GET_TIME] = reinterpret_cast<SyscallHandler>(sys_system_get_time),
-    [SYS_SYSTEM_GET_TICKS] = reinterpret_cast<SyscallHandler>(sys_system_get_ticks),
-    [SYS_SYSTEM_REBOOT] = reinterpret_cast<SyscallHandler>(sys_system_reboot),
-    [SYS_SYSTEM_SHUTDOWN] = reinterpret_cast<SyscallHandler>(sys_system_shutdown),
-    [SYS_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(sys_handle_open),
-    [SYS_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(sys_handle_close),
-    [SYS_HANDLE_POLL] = reinterpret_cast<SyscallHandler>(sys_handle_poll),
-    [SYS_HANDLE_READ] = reinterpret_cast<SyscallHandler>(sys_handle_read),
-    [SYS_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(sys_handle_write),
-    [SYS_HANDLE_CALL] = reinterpret_cast<SyscallHandler>(sys_handle_call),
-    [SYS_HANDLE_SEEK] = reinterpret_cast<SyscallHandler>(sys_handle_seek),
-    [SYS_HANDLE_TELL] = reinterpret_cast<SyscallHandler>(sys_handle_tell),
-    [SYS_HANDLE_STAT] = reinterpret_cast<SyscallHandler>(sys_handle_stat),
-    [SYS_HANDLE_CONNECT] = reinterpret_cast<SyscallHandler>(sys_handle_connect),
-    [SYS_HANDLE_ACCEPT] = reinterpret_cast<SyscallHandler>(sys_handle_accept),
-    [SYS_CREATE_PIPE] = reinterpret_cast<SyscallHandler>(sys_create_pipe),
-    [SYS_CREATE_TERM] = reinterpret_cast<SyscallHandler>(sys_create_term),
+    [HJ_PROCESS_THIS] = reinterpret_cast<SyscallHandler>(hj_process_this),
+    [HJ_PROCESS_NAME] = reinterpret_cast<SyscallHandler>(hj_process_name),
+    [HJ_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(hj_process_launch),
+    [HJ_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(hj_process_exit),
+    [HJ_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(hj_process_cancel),
+    [HJ_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(hj_process_sleep),
+    [HJ_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(hj_process_wait),
+    [HJ_PROCESS_GET_DIRECTORY] = reinterpret_cast<SyscallHandler>(hj_process_get_directory),
+    [HJ_PROCESS_SET_DIRECTORY] = reinterpret_cast<SyscallHandler>(hj_process_set_directory),
+    [HJ_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(hj_memory_alloc),
+    [HJ_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(hj_memory_free),
+    [HJ_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(hj_memory_include),
+    [HJ_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(hj_memory_get_handle),
+    [HJ_FILESYSTEM_LINK] = reinterpret_cast<SyscallHandler>(hj_filesystem_link),
+    [HJ_FILESYSTEM_UNLINK] = reinterpret_cast<SyscallHandler>(hj_filesystem_unlink),
+    [HJ_FILESYSTEM_RENAME] = reinterpret_cast<SyscallHandler>(hj_filesystem_rename),
+    [HJ_FILESYSTEM_MKPIPE] = reinterpret_cast<SyscallHandler>(hj_filesystem_mkpipe),
+    [HJ_FILESYSTEM_MKDIR] = reinterpret_cast<SyscallHandler>(hj_filesystem_mkdir),
+    [HJ_SYSTEM_INFO] = reinterpret_cast<SyscallHandler>(hj_system_info),
+    [HJ_SYSTEM_STATUS] = reinterpret_cast<SyscallHandler>(hj_system_status),
+    [HJ_SYSTEM_TIME] = reinterpret_cast<SyscallHandler>(hj_system_get_time),
+    [HJ_SYSTEM_TICKS] = reinterpret_cast<SyscallHandler>(hj_system_get_ticks),
+    [HJ_SYSTEM_REBOOT] = reinterpret_cast<SyscallHandler>(hj_system_reboot),
+    [HJ_SYSTEM_SHUTDOWN] = reinterpret_cast<SyscallHandler>(hj_system_shutdown),
+    [HJ_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(hj_handle_open),
+    [HJ_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(hj_handle_close),
+    [HJ_HANDLE_POLL] = reinterpret_cast<SyscallHandler>(hj_handle_poll),
+    [HJ_HANDLE_READ] = reinterpret_cast<SyscallHandler>(hj_handle_read),
+    [HJ_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(hj_handle_write),
+    [HJ_HANDLE_CALL] = reinterpret_cast<SyscallHandler>(hj_handle_call),
+    [HJ_HANDLE_SEEK] = reinterpret_cast<SyscallHandler>(hj_handle_seek),
+    [HJ_HANDLE_TELL] = reinterpret_cast<SyscallHandler>(hj_handle_tell),
+    [HJ_HANDLE_STAT] = reinterpret_cast<SyscallHandler>(hj_handle_stat),
+    [HJ_HANDLE_CONNECT] = reinterpret_cast<SyscallHandler>(hj_handle_connect),
+    [HJ_HANDLE_ACCEPT] = reinterpret_cast<SyscallHandler>(hj_handle_accept),
+    [HJ_CREATE_PIPE] = reinterpret_cast<SyscallHandler>(hj_create_pipe),
+    [HJ_CREATE_TERM] = reinterpret_cast<SyscallHandler>(hj_create_term),
 };
 
 #pragma GCC diagnostic pop

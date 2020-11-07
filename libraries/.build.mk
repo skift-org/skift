@@ -12,11 +12,11 @@ define LIB_TEMPLATE =
 
 $(1)_ARCHIVE ?= $(BUILD_DIRECTORY_LIBS)/lib$($(1)_NAME).a
 
-$(1)_SOURCES = \
+$(1)_SOURCES += \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.cpp) \
 	$$(wildcard libraries/lib$($(1)_NAME)/*/*.cpp)
 
-$(1)_ASSEMBLY_SOURCES = \
+$(1)_ASSEMBLY_SOURCES += \
 	$$(wildcard libraries/lib$($(1)_NAME)/*.s) \
 	$$(wildcard libraries/lib$($(1)_NAME)/*/*.s)
 

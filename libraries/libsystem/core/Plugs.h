@@ -47,10 +47,6 @@ Result __plug_filesystem_mkdir(const char *path);
 
 /* --- System --------------------------------------------------------------- */
 
-void __plug_system_get_info(SystemInfo *info);
-
-void __plug_system_get_status(SystemStatus *status);
-
 TimeStamp __plug_system_get_time();
 
 uint __plug_system_get_ticks();

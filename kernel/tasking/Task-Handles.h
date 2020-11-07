@@ -2,18 +2,13 @@
 
 #include "kernel/tasking/Task.h"
 
-ResultOr<int> task_fshandle_open(Task *task, const char *file_path, OpenFlag flags);
+ResultOr<int> task_fshandle_open(Task *task, Path &path, OpenFlag flags);
 
 Result task_fshandle_close(Task *task, int handle_index);
 
 void task_fshandle_close_all(Task *task);
 
-Result task_fshandle_poll(
-    Task *task,
-    HandleSet *handles_set,
-    int *selected_index,
-    PollEvent *selected_events,
-    Timeout timeout);
+Result task_fshandle_poll(Task *task, HandleSet *handles_set, int *selected_index, PollEvent *selected_events, Timeout timeout);
 
 ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size);
 
@@ -27,7 +22,7 @@ Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *ar
 
 Result task_fshandle_stat(Task *task, int handle_index, FileState *stat);
 
-ResultOr<int> task_fshandle_connect(Task *task, const char *socket_path);
+ResultOr<int> task_fshandle_connect(Task *task, Path &socket_path);
 
 ResultOr<int> task_fshandle_accept(Task *task, int socket_handle_index);
 

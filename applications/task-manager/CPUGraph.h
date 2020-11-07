@@ -1,5 +1,7 @@
 #pragma once
 
+#include <abi/Syscalls.h>
+
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
 #include <libutils/StringBuilder.h>
@@ -41,14 +43,18 @@ public:
         _label_uptime = new Label(this, "Uptime: nil", Position::RIGHT);
 
         _graph_timer = own<Timer>(100, [&]() {
-            SystemStatus status = system_get_status();
+            SystemStatus status{};
+            hj_system_status(&status);
+
             record(status.cpu_usage / 100.0);
         });
 
         _graph_timer->start();
 
         _text_timer = own<Timer>(1000, [&]() {
-            SystemStatus status = system_get_status();
+            SystemStatus status{};
+            hj_system_status(&status);
+
             auto greedy = _model->cpu_greedy();
 
             char buffer_average[50];

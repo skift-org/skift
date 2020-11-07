@@ -1,11 +1,9 @@
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/tasking/Task.h"
 
-Path task_resolve_directory_internal(Task *task, const char *buffer)
+Path task_resolve_directory_internal(Task *task, Path &path)
 {
     lock_assert(task->directory_lock);
-
-    Path path = Path::parse(buffer);
 
     if (path.relative())
     {
@@ -17,18 +15,18 @@ Path task_resolve_directory_internal(Task *task, const char *buffer)
     return path;
 }
 
-Path task_resolve_directory(Task *task, const char *buffer)
+Path task_resolve_directory(Task *task, Path &path)
 {
     LockHolder holder(task->directory_lock);
 
-    return task_resolve_directory_internal(task, buffer);
+    return task_resolve_directory_internal(task, path);
 }
 
-Result task_set_directory(Task *task, const char *buffer)
+Result task_set_directory(Task *task, Path &path)
 {
     LockHolder holder(task->directory_lock);
 
-    Path path = task_resolve_directory_internal(task, buffer);
+    auto resolved_path = task_resolve_directory_internal(task, path);
     auto node = filesystem_find(path);
 
     if (node == nullptr)
@@ -41,16 +39,13 @@ Result task_set_directory(Task *task, const char *buffer)
         return ERR_NOT_A_DIRECTORY;
     }
 
-    *task->directory = path;
+    *task->directory = resolved_path;
 
     return SUCCESS;
 }
 
-Result task_get_directory(Task *task, char *buffer, uint size)
+Path task_get_directory(Task *task)
 {
     LockHolder holder(task->directory_lock);
-
-    strlcpy(buffer, task->directory->string().cstring(), size);
-
-    return SUCCESS;
+    return *task->directory;
 }

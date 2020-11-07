@@ -1,17 +1,17 @@
+#include <abi/Syscalls.h>
+
 #include <libsystem/io/Stream.h>
-#include <libsystem/system/System.h>
-#include <libutils/Path.h>
 
 int main(int argc, char **argv)
 {
     __unused(argc);
     __unused(argv);
 
-    // FIXME: - get the uptime from the kernel.
-    //        - get user and the machine name from the system
+    SystemInfo info{};
+    hj_system_info(&info);
 
-    SystemInfo info = system_get_info();
-    SystemStatus status = system_get_status();
+    SystemStatus status;
+    hj_system_status(&status);
 
     printf("\e[1;94m");
     printf("       ___      \n");

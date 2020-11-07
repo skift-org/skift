@@ -75,7 +75,7 @@ In order to get your PR through the review process as fast as possible, here are
 - When committing, the first line of your commit message should be "category: Brief description of what's being changed.". The "category" can be a subdirectory, but also something like "POSIX compliance" or "module-name". Whatever seems logical.
 - Don't touch anything outside the stated scope of the PR.
 - Don't iterate excessively on your design across multiple commits.
-- "Cleanup" PR are accepted but only if they improve the code objectively by reducing complexity or help the code follow more closely the KISS and SOLID principles.
+- "Cleanup" PR are accepted but only if they improve the code objectively by reducing complexity or help the code follow more closely the KISS principles.
 - Avoid using function and types from the libc and the std, prefer native skift libraries like libsystem and libutils.
 
 # Acknowledgements

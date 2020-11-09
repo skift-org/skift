@@ -36,10 +36,16 @@ int Value::as_integer() const
     {
         return _integer;
     }
+
+#ifndef __KERNEL__
+
     else if (_type == DOUBLE)
     {
         return _double;
     }
+
+#endif
+
     else if (_type == TRUE)
     {
         return 1;
@@ -57,6 +63,8 @@ int Value::as_integer() const
         return 0;
     }
 }
+
+#ifndef __KERNEL__
 
 double Value::as_double() const
 {
@@ -85,6 +93,8 @@ double Value::as_double() const
         return 0;
     }
 }
+
+#endif
 
 const Object &Value::as_object() const
 {
@@ -128,11 +138,15 @@ Value::Value(int value)
     _integer = value;
 }
 
+#ifndef __KERNEL__
+
 Value::Value(double value)
 {
     _type = DOUBLE;
     _double = value;
 }
+
+#endif
 
 Value::Value(const Object &object)
 {
@@ -192,9 +206,13 @@ Value::Value(const Value &other)
         _integer = other._integer;
         break;
 
+#ifndef __KERNEL__
+
     case DOUBLE:
         _double = other._double;
         break;
+
+#endif
 
     case OBJECT:
         _object = new Object(*other._object);
@@ -311,9 +329,13 @@ Value &Value::operator=(const Value &other)
         _integer = other._integer;
         break;
 
+#ifndef __KERNEL__
+
     case DOUBLE:
         _double = other._double;
         break;
+
+#endif
 
     case OBJECT:
         _object = new Object(*other._object);

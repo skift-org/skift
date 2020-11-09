@@ -14,7 +14,11 @@ enum Type
 
     STRING,
     INTEGER,
+
+#ifndef __KERNEL__
     DOUBLE,
+#endif
+
     OBJECT,
     ARRAY,
     TRUE,
@@ -32,7 +36,9 @@ private:
     union {
         StringStorage *_string;
         int _integer;
+#ifndef __KERNEL__
         double _double;
+#endif
         Object *_object;
         Array *_array;
 
@@ -49,7 +55,9 @@ public:
 
     int as_integer() const;
 
+#ifndef __KERNEL__
     double as_double() const;
+#endif
 
     const Object &as_object() const;
 
@@ -65,7 +73,9 @@ public:
 
     Value(int);
 
+#ifndef __KERNEL__
     Value(double);
+#endif
 
     Value(const Object &);
 

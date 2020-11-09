@@ -2,6 +2,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
+#include <libsystem/io/File.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
@@ -84,7 +85,11 @@ void load_menu(Vector<MenuEntry> &entries)
         {
             char path[PATH_LENGTH];
             snprintf(path, PATH_LENGTH, "/Applications/%s/manifest.json", entry.name);
-            entries.push_back(menu_entry_create(path));
+
+            if (file_exist(path))
+            {
+                entries.push_back(menu_entry_create(path));
+            }
         }
     }
 

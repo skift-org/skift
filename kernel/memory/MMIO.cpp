@@ -1,8 +1,8 @@
 #include <libsystem/Logger.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/VirtualMemory.h"
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/MMIO.h"
 #include "kernel/memory/Physical.h"
 
@@ -14,7 +14,7 @@ MMIORange::MMIORange(size_t size)
 {
     size = PAGE_ALIGN_UP(size);
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     _own_physical_range = true;
     _physical_range = {physical_alloc(size)};
@@ -23,7 +23,7 @@ MMIORange::MMIORange(size_t size)
 
 MMIORange::MMIORange(MemoryRange range)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     _physical_range = {range};
     _virtual_range = {arch_virtual_alloc(arch_kernel_address_space(), _physical_range, MEMORY_NONE)};
@@ -37,7 +37,7 @@ MMIORange::~MMIORange()
     if (empty())
         return;
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     arch_virtual_free(arch_kernel_address_space(), _virtual_range);
 

@@ -1,8 +1,8 @@
 #include <libsystem/core/CString.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/VirtualMemory.h"
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Memory.h"
 
@@ -31,7 +31,7 @@ static void task_kill_me_if_too_greedy(Task *task, size_t size)
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     auto memory_mapping = __create(MemoryMapping);
 
@@ -46,7 +46,7 @@ MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_objec
 
 MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_object, uintptr_t address)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     auto memory_mapping = __create(MemoryMapping);
 
@@ -61,7 +61,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
 
 void task_memory_mapping_destroy(Task *task, MemoryMapping *memory_mapping)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     arch_virtual_free(task->address_space, (MemoryRange){memory_mapping->address, memory_mapping->size});
     memory_object_deref(memory_mapping->object);

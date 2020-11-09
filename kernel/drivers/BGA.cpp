@@ -1,9 +1,9 @@
 #include <libsystem/math/MinMax.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "kernel/drivers/BGA.h"
 #include "kernel/graphics/Graphics.h"
 #include "kernel/handover/Handover.h"
+#include "kernel/interrupts/Interupts.h"
 
 void BGA::write_register(uint16_t address, uint16_t data)
 {

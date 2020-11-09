@@ -7,12 +7,12 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/io/Stream_internal.h>
 #include <libsystem/system/System.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/Architectures.h"
 #include "architectures/VirtualMemory.h"
 
 #include "kernel/graphics/EarlyConsole.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
@@ -69,13 +69,13 @@ uint __plug_system_get_ticks()
 
 int __plug_memalloc_lock()
 {
-    atomic_begin();
+    interrupts_retain();
     return 0;
 }
 
 int __plug_memalloc_unlock()
 {
-    atomic_end();
+    interrupts_release();
     return 0;
 }
 
@@ -95,12 +95,12 @@ void __plug_memalloc_free(void *address, size_t size)
 
 void __plug_logger_lock()
 {
-    atomic_begin();
+    interrupts_retain();
 }
 
 void __plug_logger_unlock()
 {
-    atomic_end();
+    interrupts_release();
 }
 
 void __no_return __plug_logger_fatal()

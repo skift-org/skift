@@ -1,7 +1,6 @@
-#include <libsystem/thread/Atomic.h>
-
 #include "architectures/Memory.h"
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/system/System.h"
 
@@ -44,7 +43,7 @@ void physical_page_set_free(uintptr_t address)
 
 MemoryRange physical_alloc(size_t size)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     assert(IS_PAGE_ALIGN(size));
 
@@ -65,7 +64,7 @@ MemoryRange physical_alloc(size_t size)
 
 void physical_free(MemoryRange range)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     assert(range.is_page_aligned());
 
@@ -74,7 +73,7 @@ void physical_free(MemoryRange range)
 
 bool physical_is_used(MemoryRange range)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     assert(range.is_page_aligned());
 
@@ -93,7 +92,7 @@ bool physical_is_used(MemoryRange range)
 
 void physical_set_used(MemoryRange range)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     assert(range.is_page_aligned());
 
@@ -111,7 +110,7 @@ void physical_set_used(MemoryRange range)
 
 void physical_set_free(MemoryRange range)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     assert(range.is_page_aligned());
 

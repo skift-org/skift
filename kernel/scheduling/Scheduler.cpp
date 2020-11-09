@@ -1,8 +1,8 @@
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/Architectures.h"
 #include "architectures/VirtualMemory.h"
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 
@@ -33,7 +33,7 @@ void scheduler_did_create_running_task(Task *task)
 
 void scheduler_did_change_task_state(Task *task, TaskState oldstate, TaskState newstate)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     if (oldstate != newstate)
     {
@@ -86,7 +86,7 @@ void scheduler_yield()
 
 int scheduler_get_usage(int task_id)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     int count = 0;
 

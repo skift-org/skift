@@ -2,7 +2,6 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/x86/kernel/COM.h"
 #include "architectures/x86/kernel/CPUID.h"
@@ -18,6 +17,7 @@
 
 #include "kernel/graphics/Graphics.h"
 #include "kernel/handover/Handover.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/system/System.h"
 
 extern "C" void arch_main(void *info, uint32_t magic)

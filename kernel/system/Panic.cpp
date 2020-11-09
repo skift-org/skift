@@ -1,8 +1,8 @@
-#include <libsystem/thread/Atomic.h>
-
 #include "architectures/Architectures.h"
+
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task.h"
@@ -55,8 +55,8 @@ void system_panic_internal(
     const char *message,
     ...)
 {
-    atomic_begin();
-    atomic_disable();
+    interrupts_retain();
+    interrupts_disable_holding();
 
     font_set_bg(0xff333333);
 

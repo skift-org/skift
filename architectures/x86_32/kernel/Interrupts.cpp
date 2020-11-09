@@ -1,13 +1,13 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/x86/kernel/PIC.h"
 #include "architectures/x86_32/kernel/Interrupts.h"
 #include "architectures/x86_32/kernel/x86_32.h"
 
 #include "kernel/interrupts/Dispatcher.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
@@ -81,7 +81,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     }
     else if (stackframe.intno < 48)
     {
-        atomic_disable();
+        interrupts_disable_holding();
 
         int irq = stackframe.intno - 32;
 
@@ -95,15 +95,15 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
             dispatcher_dispatch(irq);
         }
 
-        atomic_enable();
+        interrupts_enable_holding();
     }
     else if (stackframe.intno == 127)
     {
-        atomic_disable();
+        interrupts_disable_holding();
 
         esp = schedule(esp);
 
-        atomic_enable();
+        interrupts_enable_holding();
     }
     else if (stackframe.intno == 128)
     {

@@ -4,10 +4,10 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/node/DevicesInfo.h"
 #include "kernel/node/Handle.h"
 

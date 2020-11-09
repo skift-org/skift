@@ -1,4 +1,4 @@
-#include <libsystem/thread/Atomic.h>
+#include "kernel/interrupts/Interupts.h"
 
 #include "architectures/x86/kernel/COM.h"
 #include "architectures/x86_32/kernel/x86_32.h"
@@ -41,7 +41,7 @@ char com_getc(COMPort port)
 
 size_t com_write(COMPort port, const void *buffer, size_t size)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     for (size_t i = 0; i < size; i++)
     {

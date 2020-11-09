@@ -2,12 +2,12 @@
 
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/VirtualMemory.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"
+#include "kernel/interrupts/Interupts.h"
 
 static uintptr_t _framebuffer_physical = 0;
 static uintptr_t _framebuffer_virtual = 0;
@@ -45,7 +45,7 @@ public:
         {
             IOCallDisplayBlitArgs *blit = (IOCallDisplayBlitArgs *)args;
 
-            AtomicHolder holder;
+            InterruptsRetainer retainer;
 
             for (int y = MAX(0, blit->blit_y); y < MIN(_framebuffer_height, blit->blit_y + blit->blit_height); y++)
             {
@@ -72,7 +72,7 @@ public:
 
 void framebuffer_initialize(Handover *handover)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     _framebuffer_width = handover->framebuffer_width;
     _framebuffer_height = handover->framebuffer_height;

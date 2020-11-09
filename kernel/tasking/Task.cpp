@@ -1,12 +1,12 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/Architectures.h"
 #include "architectures/VirtualMemory.h"
 #include "architectures/x86_32/kernel/Interrupts.h" /* XXX */
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Task-Handles.h"
@@ -29,7 +29,7 @@ void Task::state(TaskState state)
 
 void Task::cancel(int exit_value)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     this->exit_value = exit_value;
     state(TASK_STATE_CANCELED);
@@ -43,7 +43,7 @@ void Task::cancel(int exit_value)
 
 Task *task_create(Task *parent, const char *name, bool user)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     if (_tasks == nullptr)
     {
@@ -103,12 +103,12 @@ Task *task_create(Task *parent, const char *name, bool user)
 
 void task_destroy(Task *task)
 {
-    atomic_begin();
+    interrupts_retain();
     task->state(TASK_STATE_NONE);
 
     list_remove(_tasks, task);
 
-    atomic_end();
+    interrupts_release();
 
     MemoryMapping *mapping = nullptr;
 
@@ -136,7 +136,7 @@ void task_destroy(Task *task)
 
 void task_iterate(void *target, TaskIterateCallback callback)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     if (!_tasks)
     {
@@ -159,7 +159,7 @@ Task *task_by_id(int id)
 
 int task_count()
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     if (!_tasks)
     {
@@ -171,7 +171,7 @@ int task_count()
 
 Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg, bool user)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     Task *task = task_create(parent, name, user);
 
@@ -252,7 +252,7 @@ uintptr_t task_user_stack_push(Task *task, const void *value, size_t size)
 
 void task_go(Task *task)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     if (task->user)
     {
@@ -302,7 +302,7 @@ Result task_sleep(Task *task, int timeout)
 
 Result task_wait(int task_id, int *exit_value)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     Task *task = task_by_id(task_id);
 
@@ -320,13 +320,13 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
 {
     assert(!task->blocker);
 
-    atomic_begin();
+    interrupts_retain();
     task->blocker = blocker;
     if (blocker->can_unblock(task))
     {
         blocker->on_unblock(task);
 
-        atomic_end();
+        interrupts_release();
 
         task->blocker = nullptr;
         delete blocker;
@@ -344,7 +344,7 @@ BlockerResult task_block(Task *task, Blocker *blocker, Timeout timeout)
     }
 
     task->state(TASK_STATE_BLOCKED);
-    atomic_end();
+    interrupts_release();
 
     scheduler_yield();
 
@@ -361,7 +361,7 @@ void task_dump(Task *task)
     if (!task)
         return;
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state()));

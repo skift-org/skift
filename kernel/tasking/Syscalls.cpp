@@ -1,15 +1,13 @@
-
-/* syscalls.c syscalls handeling code                                         */
-
 #include <libsystem/Assert.h>
 #include <libsystem/BuildInfo.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/Architectures.h"
+
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
@@ -86,7 +84,7 @@ Result hj_process_exit(int exit_code)
 
 Result hj_process_cancel(int pid)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     Task *task = task_by_id(pid);
 

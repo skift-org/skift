@@ -3,8 +3,8 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/thread/Atomic.h>
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
@@ -118,9 +118,9 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         return handle_get_error(elf_file);
     }
 
-    atomic_begin();
+    interrupts_retain();
     Task *task = task_create(parent_task, launchpad->name, true);
-    atomic_end();
+    interrupts_release();
 
 #ifdef __x86_64__
     Result result = ELFLoader<ELF64>::load(task, elf_file);

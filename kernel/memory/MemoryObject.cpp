@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
-#include <libsystem/thread/Atomic.h>
 #include <libsystem/utils/List.h>
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/MemoryObject.h"
 #include "kernel/memory/Physical.h"
@@ -16,7 +16,7 @@ void memory_object_initialize()
 
 MemoryObject *memory_object_create(size_t size)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     size = PAGE_ALIGN_UP(size);
 
@@ -48,7 +48,7 @@ MemoryObject *memory_object_ref(MemoryObject *memory_object)
 
 void memory_object_deref(MemoryObject *memory_object)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     if (__atomic_sub_fetch(&memory_object->refcount, 1, __ATOMIC_SEQ_CST) == 0)
     {
@@ -58,7 +58,7 @@ void memory_object_deref(MemoryObject *memory_object)
 
 MemoryObject *memory_object_by_id(int id)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     list_foreach(MemoryObject, memory_object, _memory_objects)
     {

@@ -1,11 +1,11 @@
-#include <libsystem/io/Stream.h>
-#include <libsystem/thread/Atomic.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
+#include <libsystem/io/Stream.h>
 
 #include "architectures/VirtualMemory.h"
 #include "architectures/x86_32/kernel/Paging.h"
 
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/Physical.h"
 #include "kernel/system/System.h"
@@ -38,7 +38,7 @@ void *arch_kernel_address_space()
 
 bool arch_virtual_present(void *address_space, uintptr_t virtual_address)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
@@ -60,7 +60,7 @@ bool arch_virtual_present(void *address_space, uintptr_t virtual_address)
 
 uintptr_t arch_virtual_to_physical(void *address_space, uintptr_t virtual_address)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
@@ -87,7 +87,7 @@ uintptr_t arch_virtual_to_physical(void *address_space, uintptr_t virtual_addres
 
 Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr_t virtual_address, MemoryFlags flags)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
@@ -130,7 +130,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
 MemoryRange arch_virtual_alloc(void *address_space, MemoryRange physical_range, MemoryFlags flags)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     bool is_user_memory = flags & MEMORY_USER;
 
@@ -169,7 +169,7 @@ MemoryRange arch_virtual_alloc(void *address_space, MemoryRange physical_range, 
 
 void arch_virtual_free(void *address_space, MemoryRange virtual_range)
 {
-    ASSERT_ATOMIC;
+    ASSERT_INTERRUPTS_RETAINED();
 
     auto page_directory = reinterpret_cast<PageDirectory *>(address_space);
 
@@ -199,7 +199,7 @@ void arch_virtual_free(void *address_space, MemoryRange virtual_range)
 
 void *arch_address_space_create()
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     PageDirectory *page_directory = nullptr;
 
@@ -228,7 +228,7 @@ void *arch_address_space_create()
 
 void arch_address_space_destroy(void *address_space)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     assert(address_space != arch_kernel_address_space());
 
@@ -265,7 +265,7 @@ void arch_address_space_destroy(void *address_space)
 
 void arch_address_space_switch(void *address_space)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
     paging_load_directory(arch_virtual_to_physical(arch_kernel_address_space(), (uintptr_t)address_space));
 }
 

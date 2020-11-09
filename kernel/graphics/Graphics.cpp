@@ -1,7 +1,7 @@
 #include <libsystem/Logger.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "kernel/graphics/Graphics.h"
+#include "kernel/interrupts/Interupts.h"
 
 static uintptr_t _framebuffer_address = 0;
 static int _framebuffer_width = 0;
@@ -26,7 +26,7 @@ void graphic_initialize(Handover *handover)
 
 void graphic_did_find_framebuffer(uintptr_t address, int width, int height)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     _framebuffer_address = address;
     _framebuffer_width = width;

@@ -1,11 +1,10 @@
-
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/thread/Atomic.h>
 #include <libutils/RingBuffer.h>
 
 #include "kernel/devices/Devices.h"
 #include "kernel/interrupts/Dispatcher.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/scheduling/Scheduler.h"
 
@@ -24,7 +23,7 @@ void dispatcher_dispatch(int interrupt)
 
 static bool dispatcher_has_interrupt()
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     int result = 0;
 
@@ -41,7 +40,7 @@ static bool dispatcher_has_interrupt()
 
 static void dispatcher_snapshot(bool *destination)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
     memcpy(destination, _pending_interrupts, sizeof(_pending_interrupts));
     memset(_pending_interrupts, 0, sizeof(_pending_interrupts));
 }

@@ -4,9 +4,9 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "kernel/filesystem/Filesystem.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/node/Handle.h"
 #include "kernel/node/ProcessInfo.h"
 #include "kernel/scheduling/Scheduler.h"

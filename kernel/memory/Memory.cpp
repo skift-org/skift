@@ -3,11 +3,11 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/thread/Atomic.h>
 
 #include "architectures/VirtualMemory.h"
 
 #include "kernel/graphics/Graphics.h"
+#include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Memory.h"
 #include "kernel/memory/MemoryObject.h"
 #include "kernel/memory/Physical.h"
@@ -84,14 +84,14 @@ void memory_dump()
 
 size_t memory_get_used()
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     return USED_MEMORY;
 }
 
 size_t memory_get_total()
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     return TOTAL_MEMORY;
 }
@@ -100,7 +100,7 @@ Result memory_map(void *address_space, MemoryRange virtual_range, MemoryFlags fl
 {
     assert(virtual_range.is_page_aligned());
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {
@@ -130,7 +130,7 @@ Result memory_map_identity(void *address_space, MemoryRange physical_range, Memo
 {
     assert(physical_range.is_page_aligned());
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     physical_set_used(physical_range);
     arch_virtual_map(address_space, physical_range, physical_range.base(), flags);
@@ -148,7 +148,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
 {
     assert(IS_PAGE_ALIGN(size));
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     if (!size)
     {
@@ -188,7 +188,7 @@ Result memory_alloc(void *address_space, size_t size, MemoryFlags flags, uintptr
 
 Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *out_address)
 {
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     for (size_t i = 1; i < 256 * 1024; i++)
     {
@@ -222,7 +222,7 @@ Result memory_free(void *address_space, MemoryRange virtual_range)
 {
     assert(virtual_range.is_page_aligned());
 
-    AtomicHolder holder;
+    InterruptsRetainer retainer;
 
     for (size_t i = 0; i < virtual_range.size() / ARCH_PAGE_SIZE; i++)
     {

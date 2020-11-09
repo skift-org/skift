@@ -55,3 +55,20 @@ jobs:
       with:
         name: disks
         path: disks/
+
+  codestyle:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install packages
+      run: |
+        sudo apt install -y gcc-multilib clang-tidy
+
+    - id: files
+      uses: jitterbit/get-changed-files@v1
+    - run: |
+        for changed_file in ${{ steps.files.outputs.all }}; do
+          clang-tidy "${changed_file}" --checks="google-readability-braces-around-statements" --format-style=./.clang-format --warnings-as-errors="*"
+        done

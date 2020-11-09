@@ -10,3 +10,8 @@ $(LIMINE):
 
 $(LIMINE_LOADER):
 	make -C thirdparty/limine/ all
+
+.PHONY: \
+	$(ECHFS) \
+	$(LIMINE) \
+	$(LIMINE_LOADER)

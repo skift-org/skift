@@ -211,7 +211,8 @@ void E1000::handle_interrupt()
     write_register(E1000_REG_IMASK, 0x0);
 
     uint32_t status = read_register(E1000_REG_STATUS);
-    logger_trace("e1000 interrupt (STATUS=%08x)!", status);
+
+    // logger_trace("e1000 interrupt (STATUS=%08x)!", status);
 
     if (status & 4)
     {

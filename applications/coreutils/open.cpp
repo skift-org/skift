@@ -21,51 +21,49 @@ Result open(const char *raw_path)
 
     auto file_extensions = json::parse_file(FILE_EXTENSIONS_DATABASE_PATH);
 
-    if (!json::is(file_extensions, json::OBJECT))
+    if (!file_extensions.is(json::OBJECT))
     {
         stream_format(err_stream, "The file extensions database is not found (" FILE_EXTENSIONS_DATABASE_PATH ").\n");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    auto file_type = json::object_get(file_extensions, extension.cstring());
+    auto &file_type = file_extensions.get(extension);
 
-    if (!json::is(file_type, json::STRING))
+    if (!file_type.is(json::STRING))
     {
         return ERR_EXTENSION;
     }
 
     auto file_types = json::parse_file(FILE_TYPES_DATABASE_PATH);
 
-    if (!json::is(file_types, json::OBJECT))
+    if (!file_types.is(json::OBJECT))
     {
         stream_format(err_stream, "The file types database is not found (" FILE_TYPES_DATABASE_PATH ").\n");
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    auto file_type_info = json::object_get(file_types, json::string_value(file_type));
+    auto file_type_info = file_types.get(file_type.as_string());
 
-    if (!json::is(file_type_info, json::OBJECT))
+    if (!file_type_info.is(json::OBJECT))
     {
         return ERR_EXTENSION;
     }
 
-    auto file_type_open_with = json::object_get(file_type_info, "open-with");
+    auto file_type_open_with = file_type_info.get("open-with");
 
-    if (!json::is(file_type_open_with, json::STRING))
+    if (!file_type_open_with.is(json::STRING))
     {
         return ERR_EXTENSION;
     }
 
-    const char *application_name = json::string_value(file_type_open_with);
+    auto application_name = file_type_open_with.as_string();
     char application_path[PATH_LENGTH] = {};
 
-    snprintf(application_path, PATH_LENGTH, "/Applications/%s/%s", application_name, application_name);
+    snprintf(application_path, PATH_LENGTH, "/Applications/%s/%s", application_name.cstring(), application_name.cstring());
 
-    Launchpad *launchpad = launchpad_create(application_name, application_path);
+    auto launchpad = launchpad_create(application_name.cstring(), application_path);
     launchpad_argument(launchpad, path.string().cstring());
-    Result result = launchpad_launch(launchpad, nullptr);
-
-    return result;
+    return launchpad_launch(launchpad, nullptr);
 }
 
 int main(int argc, char const *argv[])

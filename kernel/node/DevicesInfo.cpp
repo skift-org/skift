@@ -17,41 +17,36 @@ FsDeviceInfo::FsDeviceInfo() : FsNode(FILE_TYPE_DEVICE)
 
 Result FsDeviceInfo::open(FsHandle *handle)
 {
-    auto root = json::create_array();
+    json::Array root{};
 
     device_iterate([&](RefPtr<Device> device) {
-        auto device_object = json::create_object();
+        json::Object device_object{};
 
         auto *driver = driver_for(device->address());
 
         __unused(device);
 
-        json::object_put(device_object, "name", json::create_string(device->name().cstring()));
-        json::object_put(device_object, "path", json::create_string(device->path().cstring()));
-        json::object_put(device_object, "address", json::create_string(device->address().as_static_cstring()));
-        json::object_put(device_object, "interrupt", json::create_integer(device->interrupt()));
-        json::object_put(device_object, "refcount", json::create_integer(device->refcount()));
-        json::object_put(device_object, "description", json::create_string(driver->name()));
+        device_object["name"] = device->name().cstring();
+        device_object["path"] = device->path().cstring();
+        device_object["address"] = device->address().as_static_cstring();
+        device_object["interrupt"] = device->interrupt();
+        device_object["refcount"] = device->refcount();
+        device_object["description"] = driver->name();
 
-        json::array_append(root, device_object);
+        root.push_back(device_object);
 
         return Iteration::CONTINUE;
     });
 
-    handle->attached = json::stringify(root);
-    handle->attached_size = strlen((const char *)handle->attached);
-
-    json::destroy(root);
+    handle->attached = json::stringify(move(root)).underlying_storage().give_ref();
+    handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
 
     return SUCCESS;
 }
 
 void FsDeviceInfo::close(FsHandle *handle)
 {
-    if (handle->attached)
-    {
-        free(handle->attached);
-    }
+    deref_if_not_null(reinterpret_cast<StringStorage *>(handle->attached));
 }
 
 ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
@@ -61,7 +56,7 @@ ResultOr<size_t> FsDeviceInfo::read(FsHandle &handle, void *buffer, size_t size)
     if (handle.offset() <= handle.attached_size)
     {
         read = MIN(handle.attached_size - handle.offset(), size);
-        memcpy(buffer, (char *)handle.attached + handle.offset(), read);
+        memcpy(buffer, reinterpret_cast<StringStorage *>(handle.attached)->cstring() + handle.offset(), read);
     }
 
     return read;

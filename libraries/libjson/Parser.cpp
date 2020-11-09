@@ -4,10 +4,10 @@
 #include <libsystem/io/Stream.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>
-#include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
+#include <libutils/StringBuilder.h>
 
 namespace json
 {
@@ -15,7 +15,7 @@ static constexpr const char *WHITESPACE = " \n\r\t";
 static constexpr const char *DIGITS = "0123456789";
 static constexpr const char *ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
-static Value *value(Scanner &scan);
+static Value value(Scanner &scan);
 
 static void whitespace(Scanner &scan)
 {
@@ -36,7 +36,7 @@ static int digits(Scanner &scan)
     return digits;
 }
 
-static Value *number(Scanner &scan)
+static Value number(Scanner &scan)
 {
     int ipart_sign = 1;
 
@@ -53,8 +53,9 @@ static Value *number(Scanner &scan)
     }
 
 #ifdef __KERNEL__
-    return create_integer(ipart_sign * ipart);
+    return {ipart_sign * ipart};
 #else
+
     double fpart = 0;
 
     if (scan.skip('.'))
@@ -89,76 +90,75 @@ static Value *number(Scanner &scan)
 
     if (fpart == 0 && exp >= 0)
     {
-        return create_integer(ipart_sign * ipart * pow(10, exp));
+        return {ipart_sign * ipart * (int)pow(10, exp)};
     }
     else
     {
-        return create_double(ipart_sign * (ipart + fpart) * pow(10, exp));
+        return {ipart_sign * (ipart + fpart) * pow(10, exp)};
     }
 #endif
 }
 
-static char *string(Scanner &scan)
+static String string(Scanner &scan)
 {
-    BufferBuilder *builder = buffer_builder_create(16);
+    StringBuilder builder{};
 
     scan.skip('"');
 
-    while (scan.current() != '"' &&
-           scan.do_continue())
+    while (scan.current() != '"' && scan.do_continue())
     {
         if (scan.current() == '\\')
         {
-            buffer_builder_append_str(builder, scan_json_escape_sequence(scan));
+            builder.append(scan_json_escape_sequence(scan));
         }
         else
         {
-            buffer_builder_append_chr(builder, scan.current());
+            builder.append(scan.current());
             scan.foreward();
         }
     }
 
     scan.skip('"');
 
-    return buffer_builder_finalize(builder);
+    return builder.finalize();
 }
 
-static Value *array(Scanner &scan)
+static Value array(Scanner &scan)
 {
     scan.skip('[');
 
-    Value *array = create_array();
+    Array array{};
 
     int index = 0;
     do
     {
         scan.skip(',');
-        array_put(array, index, value(scan));
+        array.push_back(value(scan));
         index++;
     } while (scan.current() == ',');
 
     scan.skip(']');
 
-    return array;
+    return move(array);
 }
 
-static Value *object(Scanner &scan)
+static Value object(Scanner &scan)
 {
     scan.skip('{');
 
-    Value *object = create_object();
+    Object object{};
 
     whitespace(scan);
     while (scan.current() != '}')
     {
-        char *k __cleanup_malloc = string(scan);
+        auto k = string(scan);
         whitespace(scan);
 
         scan.skip(':');
 
-        Value *v = value(scan);
+        auto v = value(scan);
 
-        object_put(object, k, v);
+        object[k] = v;
 
         scan.skip(',');
 
@@ -170,42 +170,42 @@ static Value *object(Scanner &scan)
     return object;
 }
 
-static Value *keyword(Scanner &scan)
+static Value keyword(Scanner &scan)
 {
-    BufferBuilder *builder = buffer_builder_create(6);
+    StringBuilder builder{};
 
     while (scan.current_is(ALPHA) &&
            scan.do_continue())
     {
-        buffer_builder_append_chr(builder, scan.current());
+        builder.append(scan.current());
         scan.foreward();
     }
 
-    __cleanup_malloc char *keyword = buffer_builder_finalize(builder);
+    auto keyword = builder.finalize();
 
-    if (strcmp(keyword, "true") == 0)
+    if (keyword == "true")
     {
-        return create_boolean(true);
+        return true;
     }
-    else if (strcmp(keyword, "false") == 0)
+    else if (keyword == "false")
     {
-        return create_boolean(false);
+        return false;
     }
     else
     {
-        return create_nil();
+        return nullptr;
     }
 }
 
-static Value *value(Scanner &scan)
+static Value value(Scanner &scan)
 {
     whitespace(scan);
 
-    Value *value = nullptr;
+    Value value{};
 
     if (scan.current() == '"')
     {
-        value = create_string_adopt(string(scan));
+        value = string(scan);
     }
     else if (scan.current_is("-0123456789"))
     {
@@ -229,18 +229,19 @@ static Value *value(Scanner &scan)
     return value;
 }
 
-Value *parse(const char *string, size_t size)
+Value parse(Scanner &scan)
 {
-    StringScanner scan{string, size};
-    // Skip the utf8 bom header if present.
-    scan.skip_word("\xEF\xBB\xBF");
-
-    Value *result = value(scan);
-
-    return result;
+    scan_skip_utf8bom(scan);
+    return value(scan);
 }
 
-Value *parse_file(const char *path)
+Value parse(const char *str, size_t size)
+{
+    StringScanner scan{str, size};
+    return parse(scan);
+};
+
+Value parse_file(const char *path)
 {
     __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
 
@@ -250,11 +251,8 @@ Value *parse_file(const char *path)
     }
 
     StreamScanner scan{json_file};
-    // Skip the utf8 bom header if present.
-    scan.skip_word("\xEF\xBB\xBF");
-
-    Value *result = value(scan);
-
-    return result;
+    scan_skip_utf8bom(scan);
+    return value(scan);
 }
+
 } // namespace json

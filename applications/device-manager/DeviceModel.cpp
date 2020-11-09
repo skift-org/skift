@@ -10,14 +10,9 @@ enum Column
     __COLUMN_COUNT,
 };
 
-DeviceModel::~DeviceModel()
-{
-    json::destroy(_data);
-}
-
 int DeviceModel::rows()
 {
-    return json::array_length(_data);
+    return _data.length();
 }
 
 int DeviceModel::columns()
@@ -48,21 +43,21 @@ String DeviceModel::header(int column)
 
 Variant DeviceModel::data(int row, int column)
 {
-    auto device = json::array_get(_data, row);
+    auto &device = _data.get(row);
 
     switch (column)
     {
     case COLUMN_NAME:
-        return json::string_value(json::object_get(device, "name"));
+        return device.get("name").as_string();
 
     case COLUMN_DESCRIPTION:
-        return json::string_value(json::object_get(device, "description"));
+        return device.get("description").as_string();
 
     case COLUMN_PATH:
-        return json::string_value(json::object_get(device, "path"));
+        return device.get("path").as_string();
 
     case COLUMN_ADDRESS:
-        return json::string_value(json::object_get(device, "address"));
+        return device.get("address").as_string();
 
     default:
         ASSERT_NOT_REACHED();
@@ -71,11 +66,6 @@ Variant DeviceModel::data(int row, int column)
 
 void DeviceModel::update()
 {
-    if (_data)
-    {
-        json::destroy(_data);
-    }
-
     _data = json::parse_file("/System/devices");
 
     did_update();

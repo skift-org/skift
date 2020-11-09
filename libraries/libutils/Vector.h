@@ -175,7 +175,7 @@ public:
     }
 
     template <typename Callback>
-    Iteration foreach (Callback callback)
+    Iteration foreach (Callback callback) const
     {
         for (size_t i = 0; i < _count; i++)
         {

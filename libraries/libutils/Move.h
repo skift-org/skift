@@ -29,3 +29,11 @@ void swap(T &left, T &right)
     left = move(right);
     right = move(tmp);
 }
+
+template <typename T, typename U = T>
+constexpr T exchange_and_return_initial_value(T &slot, U &&value)
+{
+    T old = move(slot);
+    slot = forward<U>(value);
+    return old;
+}

@@ -15,7 +15,6 @@ UTILS = \
 	JSON \
 	KILL \
 	LS \
-	MAN \
 	MARKUP \
 	MKDIR \
 	RMDIR \
@@ -42,7 +41,7 @@ __TESTEXEC_NAME = __testexec
 __TESTTERM_LIBS =
 __TESTTERM_NAME = __testterm
 
-BASENAME_LIBS = 
+BASENAME_LIBS =
 BASENAME_NAME = basename
 
 CAT_LIBS =
@@ -51,7 +50,7 @@ CAT_NAME = cat
 CLEAR_LIBS =
 CLEAR_NAME = clear
 
-CP_LIBS = 
+CP_LIBS =
 CP_NAME = cp
 
 PLAY_LIBS =
@@ -69,10 +68,10 @@ ECHO_NAME = echo
 GREP_LIBS =
 GREP_NAME = grep
 
-HEAD_LIBS = 
+HEAD_LIBS =
 HEAD_NAME = head
 
-HEXDUMP_LIBS = 
+HEXDUMP_LIBS =
 HEXDUMP_NAME = hexdump
 
 INIT_LIBS =
@@ -89,9 +88,6 @@ LINK_NAME = link
 
 LS_LIBS =
 LS_NAME = ls
-
-MAN_LIBS = json
-MAN_NAME = man
 
 MARKUP_LIBS = markup
 MARKUP_NAME = markup
@@ -117,7 +113,7 @@ RMDIR_NAME = rmdir
 SYSFETCH_LIBS =
 SYSFETCH_NAME = sysfetch
 
-TAC_LIBS = 
+TAC_LIBS =
 TAC_NAME = tac
 
 TOUCH_LIBS =
@@ -129,19 +125,19 @@ UNLINK_NAME = unlink
 UPTIME_LIBS =
 UPTIME_NAME = uptime
 
-UNAME_LIBS = 
+UNAME_LIBS =
 UNAME_NAME = uname
 
-TRUE_LIBS = 
+TRUE_LIBS =
 TRUE_NAME = true
 
-FALSE_LIBS = 
+FALSE_LIBS =
 FALSE_NAME = false
 
-YES_LIBS = 
+YES_LIBS =
 YES_NAME = yes
 
-PWD_LIBS = 
+PWD_LIBS =
 PWD_NAME = pwd
 
 define UTIL_TEMPLATE =

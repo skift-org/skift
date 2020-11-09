@@ -54,19 +54,23 @@ public:
 };
 
 template <typename T>
-void ref_if_not_null(T *ptr)
+T *ref_if_not_null(T *ptr)
 {
     if (ptr)
     {
         ptr->ref();
     }
+
+    return ptr;
 }
 
 template <typename T>
-void deref_if_not_null(T *ptr)
+T *deref_if_not_null(T *ptr)
 {
     if (ptr)
     {
         ptr->deref();
     }
+
+    return ptr;
 }

@@ -26,6 +26,10 @@ Variant::Variant(const char *fmt, ...) : _type(VarianType::STRING)
     va_end(args);
 }
 
+Variant::Variant(String str) : Variant(str.cstring())
+{
+}
+
 int variant_cmp(Variant left, Variant right)
 {
     if (left.type() == VarianType::INT && right.type() == VarianType::INT)

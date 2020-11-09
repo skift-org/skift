@@ -6,11 +6,9 @@
 class TaskModel : public TableModel
 {
 private:
-    json::Value *_data = nullptr;
+    json::Value _data;
 
 public:
-    ~TaskModel() override;
-
     int rows() override;
 
     int columns() override;

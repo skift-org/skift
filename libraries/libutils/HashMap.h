@@ -70,6 +70,16 @@ public:
         }
     }
 
+    HashMap(const HashMap &other)
+        : _buckets(other._buckets)
+    {
+    }
+
+    HashMap(HashMap &&other)
+        : _buckets(move(other._buckets))
+    {
+    }
+
     void clear()
     {
         _buckets.clear();
@@ -120,13 +130,25 @@ public:
     }
 
     template <typename TCallback>
-    void foreach (TCallback callback)
+    void foreach (TCallback callback) const
     {
         _buckets.foreach ([&](auto &bucket) {
             return bucket.foreach ([&](auto &item) {
                 return callback(item.key, item.value);
             });
         });
+    }
+
+    HashMap &operator=(const HashMap &other)
+    {
+        _buckets = other._buckets;
+        return *this;
+    }
+
+    HashMap &operator=(HashMap &&other)
+    {
+        swap(_buckets, other._buckets);
+        return *this;
     }
 
     TValue &operator[](const TKey &key)

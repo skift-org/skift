@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
     auto json_object = json::parse_file(argv[1]);
     auto json_string = json::prettify(json_object);
 
-    printf("%s", json_string);
+    printf("%s", json_string.cstring());
 
-    return PROCESS_FAILURE;
+    return PROCESS_SUCCESS;
 }

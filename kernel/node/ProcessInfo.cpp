@@ -16,46 +16,41 @@ FsProcessInfo::FsProcessInfo() : FsNode(FILE_TYPE_DEVICE)
 {
 }
 
-static Iteration serialize_task(json::Value *destination, Task *task)
+static Iteration serialize_task(json::Array *list, Task *task)
 {
     if (task->id == 0)
         return Iteration::CONTINUE;
 
-    auto task_object = json::create_object();
+    json::Object task_object{};
 
-    json::object_put(task_object, "id", json::create_integer(task->id));
-    json::object_put(task_object, "name", json::create_string(task->name));
-    json::object_put(task_object, "state", json::create_string(task_state_string(task->state())));
-    json::object_put(task_object, "directory", json::create_string(task->directory->string().cstring()));
-    json::object_put(task_object, "cpu", json::create_integer(scheduler_get_usage(task->id)));
-    json::object_put(task_object, "ram", json::create_integer(task_memory_usage(task)));
-    json::object_put(task_object, "user", json::create_boolean(task->user));
+    task_object["id"] = task->id;
+    task_object["name"] = task->name;
+    task_object["state"] = task_state_string(task->state());
+    task_object["directory"] = task->directory->string().cstring();
+    task_object["cpu"] = scheduler_get_usage(task->id);
+    task_object["ram"] = (int)task_memory_usage(task);
+    task_object["user"] = task->user;
 
-    json::array_append(destination, task_object);
+    list->push_back(move(task_object));
 
     return Iteration::CONTINUE;
 }
 
 Result FsProcessInfo::open(FsHandle *handle)
 {
-    auto destination = json::create_array();
+    json::Array list{};
 
-    task_iterate(destination, (TaskIterateCallback)serialize_task);
+    task_iterate(&list, (TaskIterateCallback)serialize_task);
 
-    handle->attached = json::stringify(destination);
-    handle->attached_size = strlen((const char *)handle->attached);
-
-    json::destroy(destination);
+    handle->attached = json::stringify(move(list)).underlying_storage().give_ref();
+    handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
 
     return SUCCESS;
 }
 
 void FsProcessInfo::close(FsHandle *handle)
 {
-    if (handle->attached)
-    {
-        free(handle->attached);
-    }
+    deref_if_not_null(reinterpret_cast<StringStorage *>(handle->attached));
 }
 
 ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size)
@@ -65,7 +60,7 @@ ResultOr<size_t> FsProcessInfo::read(FsHandle &handle, void *buffer, size_t size
     if (handle.offset() <= handle.attached_size)
     {
         read = MIN(handle.attached_size - handle.offset(), size);
-        memcpy(buffer, (char *)handle.attached + handle.offset(), read);
+        memcpy(buffer, reinterpret_cast<StringStorage *>(handle.attached)->cstring() + handle.offset(), read);
     }
 
     return read;

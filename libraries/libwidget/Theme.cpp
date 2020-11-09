@@ -113,47 +113,32 @@ void theme_load(const char *path)
 
     auto root = json::parse_file(path);
 
-    if (!json::is(root, json::OBJECT) || !json::object_has(root, "colors"))
+    if (!root.has("colors"))
     {
-        json::destroy(root);
         memcpy(_theme_colors, _theme_default_colors, sizeof(_theme_default_colors));
         return;
     }
 
-    auto colors = json::object_get(root, "colors");
+    auto &colors = root.get("colors");
 
-    if (json::object_has(root, "dark"))
+    if (root.has("dark"))
     {
-        auto is_dark = json::object_get(root, "dark");
-
-        _theme_is_dark = json::is(is_dark, json::TRUE);
+        _theme_is_dark = root.get("dark").is(json::TRUE);
     }
     else
     {
         _theme_is_dark = false;
     }
 
-    if (!json::is(colors, json::OBJECT))
-    {
-        json::destroy(root);
-        memcpy(_theme_colors, _theme_default_colors, sizeof(_theme_default_colors));
-        return;
-    }
-
     for (int i = 0; i < __THEME_COLOR_COUNT; i++)
     {
-        if (json::object_has(colors, _theme_colors_names[i]))
-        {
-            auto color = json::object_get(colors, _theme_colors_names[i]);
+        auto &color = colors.get(_theme_colors_names[i]);
 
-            if (json::is(color, json::STRING))
-            {
-                _theme_colors[i] = Color::parse(json::string_value(color));
-            }
+        if (color.is(json::STRING))
+        {
+            _theme_colors[i] = Color::parse(color.as_string().cstring());
         }
     }
-
-    json::destroy(root);
 }
 
 Color theme_get_color(ThemeColorRole role)

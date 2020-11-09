@@ -6,11 +6,9 @@
 class DeviceModel : public TableModel
 {
 private:
-    json::Value *_data = nullptr;
+    json::Value _data = nullptr;
 
 public:
-    ~DeviceModel() override;
-
     int rows() override;
 
     int columns() override;

@@ -43,6 +43,8 @@ public:
 
     Variant(const char *fmt, ...);
 
+    Variant(String str);
+
     Variant with_icon(RefPtr<Icon> icon)
     {
         _icon = icon;

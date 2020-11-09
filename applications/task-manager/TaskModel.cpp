@@ -13,14 +13,9 @@ enum Column
     __COLUMN_COUNT,
 };
 
-TaskModel::~TaskModel()
-{
-    json::destroy(_data);
-}
-
 int TaskModel::rows()
 {
-    return json::array_length(_data);
+    return _data.length();
 }
 
 int TaskModel::columns()
@@ -57,15 +52,15 @@ String TaskModel::header(int column)
 
 Variant TaskModel::data(int row, int column)
 {
-    auto task = json::array_get(_data, (size_t)row);
+    auto &task = _data.get((size_t)row);
 
     switch (column)
     {
     case COLUMN_ID:
     {
-        Variant value = json::integer_value(json::object_get(task, "id"));
+        Variant value = task.get("id").as_integer();
 
-        if (json::is(json::object_get(task, "user"), json::TRUE))
+        if (task.get("user").is(json::TRUE))
         {
             return value.with_icon(Icon::get("account"));
         }
@@ -76,19 +71,19 @@ Variant TaskModel::data(int row, int column)
     }
 
     case COLUMN_NAME:
-        return json::string_value(json::object_get(task, "name"));
+        return task.get("name").as_string();
 
     case COLUMN_STATE:
-        return json::string_value(json::object_get(task, "state"));
+        return task.get("state").as_string();
 
     case COLUMN_CPU:
-        return Variant("%2d%%", json::integer_value(json::object_get(task, "cpu")));
+        return Variant("%2d%%", task.get("cpu").as_integer());
 
     case COLUMN_RAM:
-        return Variant("%5d Kio", json::integer_value(json::object_get(task, "ram")) / 1024);
+        return Variant("%5d Kio", task.get("ram").as_integer() / 1024);
 
     case COLUMN_DIRECTORY:
-        return json::string_value(json::object_get(task, "directory"));
+        return task.get("directory").as_string();
 
     default:
         ASSERT_NOT_REACHED();
@@ -97,26 +92,20 @@ Variant TaskModel::data(int row, int column)
 
 void TaskModel::update()
 {
-    if (_data)
-    {
-        json::destroy(_data);
-    }
-
     _data = json::parse_file("/System/processes");
-
     did_update();
 }
 
-static String greedy(json::Value *data, const char *field)
+static String greedy(json::Value &data, const char *field)
 {
     size_t most_greedy_index = 0;
     int most_greedy_value = 0;
 
-    for (size_t i = 0; i < json::array_length(data); i++)
+    for (size_t i = 0; i < data.length(); i++)
     {
-        auto task = json::array_get(data, i);
+        auto &task = data.get(i);
 
-        auto value = json::integer_value(json::object_get(task, field));
+        auto value = task.get(field).as_integer();
 
         if (value > most_greedy_value)
         {
@@ -125,8 +114,10 @@ static String greedy(json::Value *data, const char *field)
         }
     }
 
-    auto task = json::array_get(data, most_greedy_index);
-    return json::string_value(json::object_get(task, "name"));
+    return data
+        .get(most_greedy_index)
+        .get("name")
+        .as_string();
 }
 
 String TaskModel::ram_greedy()
@@ -141,5 +132,5 @@ String TaskModel::cpu_greedy()
 
 void TaskModel::kill_task(int row)
 {
-   process_cancel(data(row, COLUMN_ID).as_int());
+    process_cancel(data(row, COLUMN_ID).as_int());
 }

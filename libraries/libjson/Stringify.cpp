@@ -1,113 +1,164 @@
 #include <libjson/Json.h>
-#include <libsystem/utils/BufferBuilder.h>
 #include <libsystem/utils/NumberFormatter.h>
+#include <libutils/StringBuilder.h>
 
 namespace json
 {
-void stringify_internal(BufferBuilder *builder, Value *value);
-
-Iteration stringify_object(BufferBuilder *builder, String &key, Value *value)
+struct PrettifyState
 {
-    buffer_builder_append_str(builder, "\"");
-    buffer_builder_append_str(builder, key.cstring());
-    buffer_builder_append_str(builder, "\"");
-    buffer_builder_append_str(builder, " : ");
-    stringify_internal(builder, value);
-    buffer_builder_append_str(builder, ", ");
+    StringBuilder builder{};
+    int depth = 0;
+    bool color = true;
+    bool ident = true;
+};
 
-    return Iteration::CONTINUE;
+static const char *depth_color[] = {
+    "\e[91m",
+    "\e[92m",
+    "\e[93m",
+    "\e[94m",
+    "\e[95m",
+    "\e[96m",
+};
+
+static void prettify_internal(PrettifyState &state, const Value &value);
+
+static void prettify_ident(PrettifyState &state)
+{
+    if (state.ident)
+    {
+        state.builder.append('\n');
+
+        for (int i = 0; i < state.depth; i++)
+        {
+            state.builder.append("    ");
+        }
+    }
 }
 
-Iteration stringify_array(BufferBuilder *builder, Value *value)
+static Iteration prettify_object(PrettifyState &state, String &key, const Value &value)
 {
-    stringify_internal(builder, value);
-    buffer_builder_append_str(builder, ", ");
+    prettify_ident(state);
 
-    return Iteration::CONTINUE;
-}
-
-void stringify_internal(BufferBuilder *builder, Value *value)
-{
-    switch (value->type)
+    if (state.color)
     {
-    case STRING:
-        buffer_builder_append_str(builder, "\"");
-        buffer_builder_append_str(builder, value->storage_string);
-        buffer_builder_append_str(builder, "\"");
-        break;
-    case INTEGER:
-    {
-        char buffer[128];
-        format_int(FORMAT_DECIMAL, value->storage_integer, buffer, 128);
-        buffer_builder_append_str(builder, buffer);
-
-        break;
+        state.builder.append(depth_color[state.depth % 6]);
     }
 
+    state.builder.append("\"");
+    state.builder.append(key.cstring());
+    state.builder.append("\"");
+
+    if (state.color)
+    {
+        state.builder.append("\e[m");
+    }
+
+    state.builder.append(": ");
+    prettify_internal(state, value);
+    state.builder.append(',');
+
+    return Iteration::CONTINUE;
+}
+
+static Iteration prettify_array(PrettifyState &state, const Value &value)
+{
+    prettify_ident(state);
+    prettify_internal(state, value);
+    state.builder.append(',');
+
+    return Iteration::CONTINUE;
+}
+
+static void prettify_internal(PrettifyState &state, const Value &value)
+{
+    if (value.is(STRING))
+    {
+        state.builder.append('"');
+        state.builder.append(value.as_string());
+        state.builder.append('"');
+    }
+    else if (value.is(INTEGER))
+    {
+        char buffer[128];
+        format_int(FORMAT_DECIMAL, value.as_integer(), buffer, 128);
+        state.builder.append(buffer);
+    }
 #ifndef __KERNEL__
-
-    case DOUBLE:
+    else if (value.is(DOUBLE))
     {
         char buffer[128];
-        format_double(FORMAT_DECIMAL, value->storage_double, buffer, 128);
-        buffer_builder_append_str(builder, buffer);
-
-        break;
+        format_double(FORMAT_DECIMAL, value.as_double(), buffer, 128);
+        state.builder.append(buffer);
     }
-
 #endif
+    else if (value.is(OBJECT))
+    {
+        state.builder.append('{');
 
-    case OBJECT:
-        buffer_builder_append_str(builder, "{");
-
-        if (value->storage_object->count() > 0)
+        if (value.length() > 0)
         {
-            value->storage_object->foreach ([&](auto &key, auto &value) {
-                stringify_object(builder, key, value);
-                return Iteration::CONTINUE;
-            });
-            buffer_builder_rewind(builder, 2); // remove the last ", "
-        }
+            state.depth++;
 
-        buffer_builder_append_str(builder, "}");
-        break;
-    case ARRAY:
-        buffer_builder_append_str(builder, "[");
-
-        if (value->storage_array->count() > 0)
-        {
-            value->storage_array->foreach ([&](auto &value) {
-                stringify_array(builder, value);
+            value.as_object().foreach ([&](auto &key, auto &value) {
+                prettify_object(state, key, value);
                 return Iteration::CONTINUE;
             });
 
-            buffer_builder_rewind(builder, 2); // remove the last ", "
+            state.builder.rewind(1);
+            state.depth--;
         }
 
-        buffer_builder_append_str(builder, "]");
-        break;
-    case TRUE:
-        buffer_builder_append_str(builder, "true");
-        break;
-    case FALSE:
-        buffer_builder_append_str(builder, "false");
-        break;
-    case NIL:
-        buffer_builder_append_str(builder, "null");
-        break;
+        prettify_ident(state);
+        state.builder.append('}');
+    }
+    else if (value.is(ARRAY))
+    {
+        state.builder.append('[');
 
-    default:
-        break;
+        if (value.length() > 0)
+        {
+            state.depth++;
+
+            for (size_t i = 0; i < value.length(); i++)
+            {
+                prettify_array(state, value.get(i));
+            }
+
+            state.builder.rewind(1); // remove the last ","
+
+            state.depth--;
+        }
+
+        prettify_ident(state);
+
+        state.builder.append(']');
+    }
+    else
+    {
+        state.builder.append(value.as_string());
     }
 }
 
-char *stringify(Value *value)
+String prettify(const Value &value)
 {
-    BufferBuilder *builder = buffer_builder_create(128);
+    PrettifyState state{};
 
-    stringify_internal(builder, value);
+    prettify_internal(state, value);
 
-    return buffer_builder_finalize(builder);
+    return state.builder.finalize();
+}
+
+String stringify(const Value &value)
+{
+    PrettifyState state{};
+
+    state.color = false;
+    state.ident = false;
+
+    prettify_internal(state, value);
+
+    return state.builder.finalize();
 }
 
 } // namespace json

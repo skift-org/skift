@@ -1,265 +1,360 @@
-#include <libjson/Json.h>
-#include <libsystem/Assert.h>
-#include <libsystem/core/CString.h>
+#include <libjson/Array.h>
+#include <libjson/Object.h>
+#include <libjson/Value.h>
+#include <libutils/Move.h>
 
 namespace json
 {
 
-Value *create_string(const char *string)
+String Value::as_string() const
 {
-    if (string == nullptr)
+    if (_type == STRING)
     {
-        return create_nil();
+        return String(RefPtr<StringStorage>{*_string});
     }
-
-    Value *value = __create(Value);
-
-    value->type = STRING;
-    value->storage_string = strdup(string);
-
-    return value;
-}
-
-Value *create_string_adopt(char *string)
-{
-    if (string == nullptr)
+    else if (_type == TRUE)
     {
-        return create_nil();
+        return "true";
     }
-
-    Value *value = __create(Value);
-
-    value->type = STRING;
-    value->storage_string = string;
-
-    return value;
-}
-
-Value *create_integer(int integer)
-{
-    Value *value = __create(Value);
-
-    value->type = INTEGER;
-    value->storage_integer = integer;
-
-    return value;
-}
-
-Value *create_double(double double_)
-{
-    Value *value = __create(Value);
-
-    value->type = DOUBLE;
-    value->storage_double = double_;
-
-    return value;
-}
-
-Value *create_object()
-{
-    Value *value = __create(Value);
-
-    value->type = OBJECT;
-    value->storage_object = new HashMap<String, Value *>();
-
-    return value;
-}
-
-Value *create_array()
-{
-    Value *value = __create(Value);
-
-    value->type = ARRAY;
-    value->storage_array = new Vector<Value *>();
-
-    return value;
-}
-
-Value *create_boolean(bool boolean)
-{
-    Value *value = __create(Value);
-
-    if (boolean)
+    else if (_type == FALSE)
     {
-        value->type = TRUE;
+        return "false";
+    }
+    else if (_type == NIL)
+    {
+        return "null";
     }
     else
     {
-        value->type = FALSE;
+        ASSERT_NOT_REACHED();
+    }
+}
+
+int Value::as_integer() const
+{
+    if (_type == INTEGER)
+    {
+        return _integer;
+    }
+    else if (_type == DOUBLE)
+    {
+        return _double;
+    }
+    else if (_type == TRUE)
+    {
+        return 1;
+    }
+    else if (_type == FALSE)
+    {
+        return 0;
+    }
+    else if (_type == NIL)
+    {
+        return 0;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+double Value::as_double() const
+{
+    if (_type == INTEGER)
+    {
+        return _integer;
+    }
+    else if (_type == DOUBLE)
+    {
+        return _double;
+    }
+    else if (_type == TRUE)
+    {
+        return 1;
+    }
+    else if (_type == FALSE)
+    {
+        return 0;
+    }
+    else if (_type == NIL)
+    {
+        return 0;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+const Object &Value::as_object() const
+{
+    assert(is(OBJECT));
+    return *_object;
+}
+
+const Array &Value::as_array() const
+{
+    assert(is(ARRAY));
+    return *_array;
+}
+
+Value::Value()
+{
+    _type = NIL;
+    _all = 0;
+}
+
+Value::Value(String &value)
+{
+    _type = STRING;
+    _string = ref_if_not_null(value.underlying_storage().naked());
+}
+
+Value::Value(String &&value)
+{
+    _type = STRING;
+    _string = ref_if_not_null(value.underlying_storage().naked());
+}
+
+Value::Value(const char *cstring)
+{
+    _type = STRING;
+    _string = new StringStorage(cstring);
+}
+
+Value::Value(int value)
+{
+    _type = INTEGER;
+    _integer = value;
+}
+
+Value::Value(double value)
+{
+    _type = DOUBLE;
+    _double = value;
+}
+
+Value::Value(const Object &object)
+{
+    _type = OBJECT;
+    _object = new Object(object);
+}
+
+Value::Value(Object &&object)
+{
+    _type = OBJECT;
+    _object = new Object(move(object));
+}
+
+Value::Value(const Array &array)
+{
+    _type = ARRAY;
+    _array = new Array(array);
+}
+
+Value::Value(Array &&array)
+{
+    _type = ARRAY;
+    _array = new Array(move(array));
+}
+
+Value::Value(bool boolean)
+{
+    if (boolean)
+    {
+        _type = TRUE;
+    }
+    else
+    {
+        _type = FALSE;
     }
 
-    return value;
+    _all = 0;
 }
 
-Value *create_nil()
+Value::Value(nullptr_t)
 {
-    Value *value = __create(Value);
-
-    value->type = NIL;
-
-    return value;
+    _type = NIL;
+    _all = 0;
 }
 
-void destroy(Value *value)
+Value::Value(const Value &other)
 {
-    if (!value)
-        return;
+    _type = other._type;
 
-    switch (value->type)
+    switch (_type)
     {
     case STRING:
-        free(value->storage_string);
+        _string = ref_if_not_null(other._string);
         break;
+
+    case INTEGER:
+        _integer = other._integer;
+        break;
+
+    case DOUBLE:
+        _double = other._double;
+        break;
+
     case OBJECT:
-        value->storage_object->foreach ([](auto, auto value) {
-            destroy(value);
-            return Iteration::CONTINUE;
-        });
-        delete value->storage_object;
+        _object = new Object(*other._object);
         break;
+
     case ARRAY:
-        value->storage_array->foreach ([](auto value) {
-            destroy(value);
-            return Iteration::CONTINUE;
-        });
-        delete value->storage_array;
+        _array = new Array(*other._array);
         break;
+
+    default:
+        break;
+    }
+}
+
+Value::Value(Value &&other)
+{
+    _type = exchange_and_return_initial_value(other._type, NIL);
+    _all = exchange_and_return_initial_value(other._all, 0);
+}
+
+Value::~Value()
+{
+    clear();
+}
+
+bool Value::has(String key) const
+{
+    if (is(OBJECT))
+    {
+        return _object->has_key(key);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+const Value &Value::get(String key) const
+{
+    assert(is(OBJECT));
+
+    return _object->operator[](key);
+}
+
+void Value::put(String key, const Value &value)
+{
+    assert(is(OBJECT));
+    _object->operator[](key) = value;
+}
+
+void Value::remove(String key)
+{
+    assert(is(OBJECT));
+    _object->remove_key(key);
+}
+
+size_t Value::length() const
+{
+    if (is(OBJECT))
+    {
+        return _object->count();
+    }
+    else if (is(ARRAY))
+    {
+        return _array->count();
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+const Value &Value::get(size_t index) const
+{
+    assert(is(ARRAY));
+
+    return _array->operator[](index);
+}
+
+void Value::put(size_t index, const Value &value)
+{
+    assert(is(ARRAY));
+
+    _array->insert(index, value);
+}
+
+void Value::remove(size_t index)
+{
+    assert(is(ARRAY));
+
+    _array->remove_index(index);
+}
+
+void Value::append(const Value &value)
+{
+    assert(is(ARRAY));
+
+    _array->push_back(value);
+}
+
+Value &Value::operator=(const Value &other)
+{
+    clear();
+
+    _type = other._type;
+
+    switch (_type)
+    {
+    case STRING:
+        _string = ref_if_not_null(other._string);
+        break;
+
+    case INTEGER:
+        _integer = other._integer;
+        break;
+
+    case DOUBLE:
+        _double = other._double;
+        break;
+
+    case OBJECT:
+        _object = new Object(*other._object);
+        break;
+
+    case ARRAY:
+        _array = new Array(*other._array);
+        break;
+
     default:
         break;
     }
 
-    free(value);
+    return *this;
 }
 
-/* --- Value members ---------------------------------------------------- */
-
-bool is(Value *value, Type type)
+Value &Value::operator=(Value &&other)
 {
-    if (value == nullptr)
+    swap(_type, other._type);
+    swap(_all, other._all);
+
+    return *this;
+}
+
+void Value::clear()
+{
+    if (_type == STRING)
     {
-        return type == NIL;
+        deref_if_not_null(_string);
+    }
+    else if (_type == OBJECT)
+    {
+        delete _object;
+    }
+    else if (_type == ARRAY)
+    {
+        delete _array;
     }
 
-    return value->type == type;
-}
-
-const char *string_value(Value *value)
-{
-    assert(is(value, STRING));
-
-    return value->storage_string;
-}
-
-int integer_value(Value *value)
-{
-    if (is(value, INTEGER))
-    {
-        return value->storage_integer;
-    }
-    else if (is(value, INTEGER))
-    {
-        return value->storage_double;
-    }
-    else
-    {
-        ASSERT_NOT_REACHED();
-    }
-}
-
-#if !defined(__KERNEL__)
-
-double double_value(Value *value)
-{
-    if (is(value, INTEGER))
-    {
-        return value->storage_integer;
-    }
-    else if (is(value, INTEGER))
-    {
-        return value->storage_double;
-    }
-    else
-    {
-        ASSERT_NOT_REACHED();
-    }
-}
-
-#endif
-
-bool object_has(Value *object, const String &key)
-{
-    assert(is(object, OBJECT));
-
-    return object->storage_object->has_key(key);
-}
-
-Value *object_get(Value *object, const String &key)
-{
-    assert(is(object, OBJECT));
-
-    return (*object->storage_object)[key];
-}
-
-void object_put(Value *object, const String &key, Value *value)
-{
-    assert(is(object, OBJECT));
-
-    if (object->storage_object->has_key(key))
-    {
-        destroy((*object->storage_object)[key]);
-    }
-
-    (*object->storage_object)[key] = value;
-}
-
-void object_remove(Value *object, const String &key)
-{
-    assert(is(object, OBJECT));
-
-    if (object->storage_object->has_key(key))
-    {
-        destroy((*object->storage_object)[key]);
-        (*object->storage_object)[key] = nullptr;
-    }
-}
-
-size_t array_length(Value *array)
-{
-    if (!array)
-    {
-        return 0;
-    }
-
-    assert(is(array, ARRAY));
-
-    return array->storage_array->count();
-}
-
-Value *array_get(Value *array, size_t index)
-{
-    assert(is(array, ARRAY));
-
-    return (*array->storage_array)[index];
-}
-
-void array_put(Value *array, size_t index, Value *value)
-{
-    assert(is(array, ARRAY));
-    array->storage_array->insert(index, value);
-}
-
-void array_append(Value *array, Value *value)
-{
-    assert(is(array, ARRAY));
-    array->storage_array->push_back(value);
-}
-
-void array_remove(Value *array, size_t index)
-{
-    assert(is(array, ARRAY));
-
-    destroy((*array->storage_array)[index]);
-    array->storage_array->remove_index(index);
+    _all = 0;
+    _type = NIL;
 }
 
 } // namespace json

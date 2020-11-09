@@ -43,7 +43,7 @@ jobs:
     - name: Building skiftOS (x86_32)
       run: |
           make clean
-          make all BUILD_LOADER=grub2
+          make all BUILD_LOADER=grub
           make all BUILD_LOADER=limine
           echo "::set-env name=RELEASE_TAG::$(date +'%y.%W')"
 
@@ -65,15 +65,15 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload release assets (grub2-x86_32)
+    - name: Upload release assets (grub-x86_32)
       id: upload_release_assets_grub_x86_32
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: disks/bootdisk-grub2-x86_32.img
-        asset_name: bootdisk-grub2-x86_32.img
+        asset_path: disks/bootdisk-grub-x86_32.img
+        asset_name: bootdisk-grub-x86_32.img
         asset_content_type: application/x-ima
 
     - name: Upload release assets (limine-x86_32)

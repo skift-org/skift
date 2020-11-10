@@ -1,0 +1,28 @@
+name: Style
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  coding-style:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Installing dependencies
+      run: |
+        sudo toolchain/install-dependencies.sh
+
+    - id: files
+      name: Get Changed files
+      uses: jitterbit/get-changed-files@v1
+
+    - run: |
+        for changed_file in ${{ steps.files.outputs.all }}; do
+          clang-tidy "${changed_file}" --checks="google-readability-braces-around-statements" --format-style=./.clang-format --warnings-as-errors="*"
+        done

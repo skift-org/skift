@@ -11,14 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Installing packages
+    - name: Installing dependencies
       run: |
-        sudo apt update
-        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86
-        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
-        sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo libfuse-dev
+        toolchain/install-dependencies.sh
 
     - name: Fetching submodules
       run: |
@@ -56,18 +54,21 @@ jobs:
         name: disks
         path: disks/
 
-  codestyle:
+  coding-style:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Install packages
+    - name: Installing dependencies
       run: |
-        sudo apt install -y gcc-multilib clang-tidy
+        toolchain/install-dependencies.sh
 
     - id: files
+      name: Get Changed files
       uses: jitterbit/get-changed-files@v1
+
     - run: |
         for changed_file in ${{ steps.files.outputs.all }}; do
           clang-tidy "${changed_file}" --checks="google-readability-braces-around-statements" --format-style=./.clang-format --warnings-as-errors="*"

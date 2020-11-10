@@ -13,12 +13,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Installing packages
+    - name: Installing dependencies
       run: |
-        sudo apt update
-        sudo apt install -y nasm gcc make binutils grub-pc-bin qemu-system-x86
-        sudo apt install -y build-essential bison flex libgmp3-dev libmpc-dev
-        sudo apt install -y xorriso mtools inkscape libmpfr-dev texinfo libfuse-dev
+        toolchain/install-dependencies.sh
 
     - name: Fetching submodules
       run: |

@@ -48,8 +48,8 @@ CONFIG_VMACHINE       ?=qemu
 CONFIG_KEYBOARD_LAYOUT?=en_us
 
 # Set the bootloader.
-# Possible values: grub, grub2, limine
-CONFIG_LOADER         ?=grub2
+# Possible values: grub, limine
+CONFIG_LOADER         ?=grub
 
 # Enable/disable the logger.
 CONFIG_LOG            ?=true

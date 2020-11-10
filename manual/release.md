@@ -6,7 +6,7 @@ The recommended way of running skiftOS is in a virtual machine like QEMU or Virt
 
 **Choose this one if you are not sure**:
 
-- `bootdisk-grub2-x86_32.img`: 32bit version of skift using the grub2 bootloader.
+- `bootdisk-grub-x86_32.img`: 32bit version of skift using the grub bootloader.
 
 **Experimental, maybe broken:**
 

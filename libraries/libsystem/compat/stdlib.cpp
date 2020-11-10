@@ -6,7 +6,7 @@
 
 void abort()
 {
-    process_exit(-1);
+    process_abort();
 }
 
 int atoi(const char *nptr)

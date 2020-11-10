@@ -34,7 +34,7 @@ int shell_builtin_exit(int argc, const char **argv)
     }
     else
     {
-        process_exit(0);
+        process_exit(PROCESS_SUCCESS);
     }
 
     ASSERT_NOT_REACHED();

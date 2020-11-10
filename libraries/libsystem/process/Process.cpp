@@ -26,7 +26,13 @@ Result process_run(const char *command, int *pid)
 
 void __no_return process_exit(int code)
 {
-    __plug_process_exit(code);
+    __plug_fini(code);
+    __builtin_unreachable();
+}
+
+void __no_return process_abort()
+{
+    __plug_process_exit(PROCESS_FAILURE);
     __builtin_unreachable();
 }
 

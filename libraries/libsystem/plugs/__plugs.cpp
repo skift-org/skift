@@ -67,19 +67,19 @@ void __plug_fini(int exit_code)
         stream_flush(log_stream);
     }
 
-    process_exit(exit_code);
+    __plug_process_exit(exit_code);
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
 {
     logger_fatal("Assert failed: %s in %s:%s() ln%d!", expr, file, function, line);
-    process_exit(-1);
+    process_abort();
 }
 
 void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line)
 {
     logger_fatal("Lock assert failed: %s hold by %d in %s:%s() ln%d!", lock->name, lock->holder, file, function, line);
-    process_exit(-1);
+    process_abort();
 }
 
 void __plug_logger_lock()
@@ -95,7 +95,7 @@ void __plug_logger_unlock()
 void __no_return __plug_logger_fatal()
 {
     stream_format(err_stream, "Fatal error occurred (see logs)!\n");
-    __plug_process_exit(-1);
+    process_abort();
 }
 
 int __plug_memalloc_lock()

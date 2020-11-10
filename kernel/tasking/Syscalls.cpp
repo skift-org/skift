@@ -11,7 +11,6 @@
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
-#include "kernel/tasking/Task-Directory.h"
 #include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Lanchpad.h"
 #include "kernel/tasking/Task-Memory.h"
@@ -126,32 +125,6 @@ Result hj_process_cancel(int pid)
     }
 }
 
-Result hj_process_get_directory(char *raw_path, size_t size)
-{
-    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
-    {
-        return ERR_BAD_ADDRESS;
-    }
-
-    auto cwd = task_get_directory(scheduler_running());
-
-    strlcpy(raw_path, cwd.string().cstring(), size);
-
-    return SUCCESS;
-}
-
-Result hj_process_set_directory(const char *raw_path, size_t size)
-{
-    if (!syscall_validate_ptr((uintptr_t)raw_path, size))
-    {
-        return ERR_BAD_ADDRESS;
-    }
-
-    auto path = Path::parse(raw_path, size);
-
-    return task_set_directory(scheduler_running(), path);
-}
-
 Result hj_process_sleep(int time)
 {
     return task_sleep(scheduler_running(), time);
@@ -219,11 +192,9 @@ Result hj_filesystem_mkdir(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size);
+    auto path = Path::parse(raw_path, size).normalized();
 
-    auto resolved_path = task_resolve_directory(scheduler_running(), path);
-
-    return filesystem_mkdir(resolved_path);
+    return filesystem_mkdir(path);
 }
 
 Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
@@ -233,10 +204,9 @@ Result hj_filesystem_mkpipe(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size);
-    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+    auto path = Path::parse(raw_path, size).normalized();
 
-    return filesystem_mkpipe(resolved_path);
+    return filesystem_mkpipe(path);
 }
 
 Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
@@ -248,13 +218,11 @@ Result hj_filesystem_link(const char *raw_old_path, size_t old_size,
         return ERR_BAD_ADDRESS;
     }
 
-    Path old_path = Path::parse(raw_old_path, old_size);
-    Path resolved_old_path = task_resolve_directory(scheduler_running(), old_path);
+    Path old_path = Path::parse(raw_old_path, old_size).normalized();
 
-    Path new_path = Path::parse(raw_new_path, new_size);
-    Path resolved_new_path = task_resolve_directory(scheduler_running(), new_path);
+    Path new_path = Path::parse(raw_new_path, new_size).normalized();
 
-    Result result = filesystem_mklink(resolved_old_path, resolved_new_path);
+    Result result = filesystem_mklink(old_path, new_path);
 
     return result;
 }
@@ -266,10 +234,9 @@ Result hj_filesystem_unlink(const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size);
-    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+    auto path = Path::parse(raw_path, size).normalized();
 
-    return filesystem_unlink(resolved_path);
+    return filesystem_unlink(path);
 }
 
 Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
@@ -281,13 +248,11 @@ Result hj_filesystem_rename(const char *raw_old_path, size_t old_size,
         return ERR_BAD_ADDRESS;
     }
 
-    Path old_path = Path::parse(raw_old_path, old_size);
-    Path resolved_old_path = task_resolve_directory(scheduler_running(), old_path);
+    Path old_path = Path::parse(raw_old_path, old_size).normalized();
 
-    Path new_path = Path::parse(raw_new_path, new_size);
-    Path resolved_new_path = task_resolve_directory(scheduler_running(), new_path);
+    Path new_path = Path::parse(raw_new_path, new_size).normalized();
 
-    return filesystem_rename(resolved_old_path, resolved_new_path);
+    return filesystem_rename(old_path, new_path);
 }
 
 /* --- System info getter --------------------------------------------------- */
@@ -390,10 +355,9 @@ Result hj_handle_open(int *handle,
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size);
-    auto resolved_path = task_resolve_directory(scheduler_running(), path);
+    auto path = Path::parse(raw_path, size).normalized();
 
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), resolved_path, flags);
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
 
     if (result_or_handle_index.success())
     {
@@ -552,7 +516,7 @@ Result hj_handle_connect(int *handle, const char *raw_path, size_t size)
         return ERR_BAD_ADDRESS;
     }
 
-    auto path = Path::parse(raw_path, size);
+    auto path = Path::parse(raw_path, size).normalized();
 
     auto result_or_handle_index = task_fshandle_connect(scheduler_running(), path);
 
@@ -595,8 +559,6 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(hj_process_cancel),
     [HJ_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(hj_process_sleep),
     [HJ_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(hj_process_wait),
-    [HJ_PROCESS_GET_DIRECTORY] = reinterpret_cast<SyscallHandler>(hj_process_get_directory),
-    [HJ_PROCESS_SET_DIRECTORY] = reinterpret_cast<SyscallHandler>(hj_process_set_directory),
     [HJ_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(hj_memory_alloc),
     [HJ_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(hj_memory_free),
     [HJ_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(hj_memory_include),

@@ -6,6 +6,7 @@
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
+#include "kernel/tasking/Task-Lanchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 #include "kernel/tasking/Task.h"
 

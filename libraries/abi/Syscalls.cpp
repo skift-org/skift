@@ -25,16 +25,6 @@ Result hj_process_cancel(int pid)
     return __syscall(HJ_PROCESS_CANCEL, (uintptr_t)pid);
 }
 
-Result hj_process_get_directory(char *raw_path, size_t size)
-{
-    return __syscall(HJ_PROCESS_GET_DIRECTORY, (uintptr_t)raw_path, (uintptr_t)size);
-}
-
-Result hj_process_set_directory(const char *raw_path, size_t size)
-{
-    return __syscall(HJ_PROCESS_SET_DIRECTORY, (uintptr_t)raw_path, (uintptr_t)size);
-}
-
 Result hj_process_sleep(int time)
 {
     return __syscall(HJ_PROCESS_SLEEP, (uintptr_t)time);

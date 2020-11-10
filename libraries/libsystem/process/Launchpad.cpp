@@ -4,6 +4,7 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/process/Environment.h>
 #include <libsystem/process/Launchpad.h>
+#include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 
 Launchpad *launchpad_create(const char *name, const char *executable)
@@ -94,6 +95,8 @@ Result launchpad_launch(Launchpad *launchpad, int *pid)
     {
         pid = &discard;
     }
+
+    strcpy(launchpad->executable, process_resolve(launchpad->executable).cstring());
 
     Result result = __plug_process_launch(launchpad, pid);
 

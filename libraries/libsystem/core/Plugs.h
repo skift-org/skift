@@ -1,7 +1,5 @@
 #pragma once
 
-// this header list all "plugs" function between the library and the syscalls or the kernel
-
 #include <abi/Filesystem.h>
 #include <abi/Handle.h>
 #include <abi/IOCall.h>
@@ -10,6 +8,7 @@
 
 #include <libsystem/Time.h>
 #include <libsystem/thread/Lock.h>
+#include <libutils/String.h>
 
 extern "C" void __plug_init();
 
@@ -63,7 +62,9 @@ void __no_return __plug_process_exit(int code);
 
 Result __plug_process_cancel(int pid);
 
-Result __plug_process_get_directory(char *buffer, uint size);
+String __plug_process_resolve(String raw_path);
+
+Result __plug_process_get_directory(char *buffer, size_t size);
 
 Result __plug_process_set_directory(const char *directory);
 

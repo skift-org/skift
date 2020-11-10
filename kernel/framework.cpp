@@ -16,7 +16,6 @@
 #include "kernel/memory/Memory.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
-#include "kernel/tasking/Task-Directory.h"
 #include "kernel/tasking/Task-Handles.h"
 #include "kernel/tasking/Task-Lanchpad.h"
 #include "kernel/tasking/Task-Memory.h"
@@ -39,6 +38,11 @@ void __plug_init()
     out_stream = &internal_log_stream;
     err_stream = &internal_log_stream;
     log_stream = &internal_log_stream;
+}
+
+void __plug_fini(int)
+{
+    ASSERT_NOT_REACHED();
 }
 
 void __plug_assert_failed(const char *expr, const char *file, const char *function, int line)
@@ -148,9 +152,7 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 {
     auto path = Path::parse(raw_path);
 
-    auto resolved_path = task_resolve_directory(scheduler_running(), path);
-
-    auto result_or_handle_index = task_fshandle_open(scheduler_running(), resolved_path, flags);
+    auto result_or_handle_index = task_fshandle_open(scheduler_running(), path, flags);
 
     handle->result = result_or_handle_index.result();
 
@@ -280,7 +282,7 @@ Result __plug_process_cancel(int)
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_process_get_directory(char *, uint)
+Result __plug_process_get_directory(char *, size_t)
 {
     ASSERT_NOT_REACHED();
 }
@@ -288,6 +290,11 @@ Result __plug_process_get_directory(char *, uint)
 Result __plug_process_set_directory(const char *)
 {
     ASSERT_NOT_REACHED();
+}
+
+String __plug_process_resolve(String raw_path)
+{
+    return raw_path;
 }
 
 void __plug_handle_connect(Handle *, const char *)

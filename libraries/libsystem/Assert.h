@@ -1,11 +1,13 @@
 #pragma once
 
-#include <libsystem/core/Plugs.h>
+#include <libsystem/Common.h>
 
-#define assert(__expr) ((__expr) ? (void)(0) : __plug_assert_failed(#__expr, __FILE__, __FUNCTION__, __LINE__))
+void __no_return assert_failed(const char *expr, const char *file, const char *function, int line);
+
+#define assert(__expr) ((__expr) ? (void)(0) : assert_failed(#__expr, __FILE__, __FUNCTION__, __LINE__))
 
 #define ASSERT_NOT_REACHED() \
-    __plug_assert_failed("ASSERT_NOT_REACHED() reached!", __FILE__, __FUNCTION__, __LINE__)
+    assert_failed("ASSERT_NOT_REACHED() reached!", __FILE__, __FUNCTION__, __LINE__)
 
 #ifndef __cplusplus
 

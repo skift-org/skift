@@ -1,4 +1,3 @@
-
 #include <libsystem/Assert.h>
 #include <libsystem/Result.h>
 #include <libsystem/core/Plugs.h>
@@ -49,6 +48,11 @@ Result process_get_directory(char *buffer, size_t size)
 Result process_set_directory(const char *directory)
 {
     return __plug_process_set_directory(directory);
+}
+
+String process_resolve(String path)
+{
+    return __plug_process_resolve(path);
 }
 
 Result process_sleep(int time)

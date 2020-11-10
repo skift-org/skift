@@ -257,7 +257,7 @@ const Value &Value::get(String key) const
     return _object->operator[](key);
 }
 
-void Value::put(String key, const Value &value)
+void Value::put(String key, const Value &value) const
 {
     assert(is(OBJECT));
     _object->operator[](key) = value;

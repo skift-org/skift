@@ -5,17 +5,12 @@
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Pipe.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/process/Environment.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 #include <libutils/Path.h>
 
 #include "shell/Shell.h"
-
-static const char *PATH[] = {
-    "/System/Binaries",
-    "/System/Posix/bin",
-    "/Applications",
-};
 
 static bool find_command_path(char *buffer, const char *command)
 {
@@ -23,6 +18,7 @@ static bool find_command_path(char *buffer, const char *command)
         command[0] == '.')
     {
         snprintf(buffer, PATH_LENGTH, "%s", command);
+        
         return file_exist(buffer);
     }
     else
@@ -34,9 +30,11 @@ static bool find_command_path(char *buffer, const char *command)
             return true;
         }
 
-        for (size_t i = 0; i < __array_length(PATH); i++)
+        auto &path = environment().get("POSIX").get("PATH");
+
+        for (size_t i = 0; i < path.length(); i++)
         {
-            snprintf(buffer, PATH_LENGTH, "%s/%s", PATH[i], command);
+            snprintf(buffer, PATH_LENGTH, "%s/%s", path.get(i).as_string().cstring(), command);
 
             if (file_exist(buffer))
             {

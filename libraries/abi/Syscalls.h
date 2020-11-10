@@ -10,43 +10,41 @@
 #include <abi/Launchpad.h>
 #include <abi/System.h>
 
-#define SYSCALL_LIST(__ENTRY)         \
-    __ENTRY(HJ_PROCESS_THIS)          \
-    __ENTRY(HJ_PROCESS_NAME)          \
-    __ENTRY(HJ_PROCESS_LAUNCH)        \
-    __ENTRY(HJ_PROCESS_EXIT)          \
-    __ENTRY(HJ_PROCESS_CANCEL)        \
-    __ENTRY(HJ_PROCESS_SLEEP)         \
-    __ENTRY(HJ_PROCESS_WAIT)          \
-    __ENTRY(HJ_PROCESS_GET_DIRECTORY) \
-    __ENTRY(HJ_PROCESS_SET_DIRECTORY) \
-    __ENTRY(HJ_MEMORY_ALLOC)          \
-    __ENTRY(HJ_MEMORY_FREE)           \
-    __ENTRY(HJ_MEMORY_INCLUDE)        \
-    __ENTRY(HJ_MEMORY_GET_HANDLE)     \
-    __ENTRY(HJ_FILESYSTEM_LINK)       \
-    __ENTRY(HJ_FILESYSTEM_UNLINK)     \
-    __ENTRY(HJ_FILESYSTEM_RENAME)     \
-    __ENTRY(HJ_FILESYSTEM_MKPIPE)     \
-    __ENTRY(HJ_FILESYSTEM_MKDIR)      \
-    __ENTRY(HJ_SYSTEM_INFO)           \
-    __ENTRY(HJ_SYSTEM_STATUS)         \
-    __ENTRY(HJ_SYSTEM_TIME)           \
-    __ENTRY(HJ_SYSTEM_TICKS)          \
-    __ENTRY(HJ_SYSTEM_REBOOT)         \
-    __ENTRY(HJ_SYSTEM_SHUTDOWN)       \
-    __ENTRY(HJ_HANDLE_OPEN)           \
-    __ENTRY(HJ_HANDLE_CLOSE)          \
-    __ENTRY(HJ_HANDLE_POLL)           \
-    __ENTRY(HJ_HANDLE_READ)           \
-    __ENTRY(HJ_HANDLE_WRITE)          \
-    __ENTRY(HJ_HANDLE_CALL)           \
-    __ENTRY(HJ_HANDLE_SEEK)           \
-    __ENTRY(HJ_HANDLE_TELL)           \
-    __ENTRY(HJ_HANDLE_STAT)           \
-    __ENTRY(HJ_HANDLE_CONNECT)        \
-    __ENTRY(HJ_HANDLE_ACCEPT)         \
-    __ENTRY(HJ_CREATE_PIPE)           \
+#define SYSCALL_LIST(__ENTRY)     \
+    __ENTRY(HJ_PROCESS_THIS)      \
+    __ENTRY(HJ_PROCESS_NAME)      \
+    __ENTRY(HJ_PROCESS_LAUNCH)    \
+    __ENTRY(HJ_PROCESS_EXIT)      \
+    __ENTRY(HJ_PROCESS_CANCEL)    \
+    __ENTRY(HJ_PROCESS_SLEEP)     \
+    __ENTRY(HJ_PROCESS_WAIT)      \
+    __ENTRY(HJ_MEMORY_ALLOC)      \
+    __ENTRY(HJ_MEMORY_FREE)       \
+    __ENTRY(HJ_MEMORY_INCLUDE)    \
+    __ENTRY(HJ_MEMORY_GET_HANDLE) \
+    __ENTRY(HJ_FILESYSTEM_LINK)   \
+    __ENTRY(HJ_FILESYSTEM_UNLINK) \
+    __ENTRY(HJ_FILESYSTEM_RENAME) \
+    __ENTRY(HJ_FILESYSTEM_MKPIPE) \
+    __ENTRY(HJ_FILESYSTEM_MKDIR)  \
+    __ENTRY(HJ_SYSTEM_INFO)       \
+    __ENTRY(HJ_SYSTEM_STATUS)     \
+    __ENTRY(HJ_SYSTEM_TIME)       \
+    __ENTRY(HJ_SYSTEM_TICKS)      \
+    __ENTRY(HJ_SYSTEM_REBOOT)     \
+    __ENTRY(HJ_SYSTEM_SHUTDOWN)   \
+    __ENTRY(HJ_HANDLE_OPEN)       \
+    __ENTRY(HJ_HANDLE_CLOSE)      \
+    __ENTRY(HJ_HANDLE_POLL)       \
+    __ENTRY(HJ_HANDLE_READ)       \
+    __ENTRY(HJ_HANDLE_WRITE)      \
+    __ENTRY(HJ_HANDLE_CALL)       \
+    __ENTRY(HJ_HANDLE_SEEK)       \
+    __ENTRY(HJ_HANDLE_TELL)       \
+    __ENTRY(HJ_HANDLE_STAT)       \
+    __ENTRY(HJ_HANDLE_CONNECT)    \
+    __ENTRY(HJ_HANDLE_ACCEPT)     \
+    __ENTRY(HJ_CREATE_PIPE)       \
     __ENTRY(HJ_CREATE_TERM)
 
 #define SYSCALL_ENUM_ENTRY(__entry) __entry,
@@ -115,8 +113,6 @@ Result hj_process_name(char *name, size_t size);
 Result hj_process_launch(Launchpad *launchpad, int *pid);
 Result hj_process_exit(int exit_code);
 Result hj_process_cancel(int pid);
-Result hj_process_get_directory(char *raw_path, size_t size);
-Result hj_process_set_directory(const char *raw_path, size_t size);
 Result hj_process_sleep(int time);
 Result hj_process_wait(int tid, int *user_exit_value);
 

@@ -32,9 +32,6 @@ struct Task
     Lock handles_lock;
     FsHandle *handles[PROCESS_HANDLE_COUNT];
 
-    Lock directory_lock;
-    Path *directory;
-
     List *memory_mapping;
     void *address_space;
 

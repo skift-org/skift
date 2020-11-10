@@ -3,6 +3,7 @@
 #include <libsystem/io/Handle.h>
 #include <libsystem/io/Socket.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/process/Process.h>
 
 #include "compositor/Protocol.h"
 
@@ -35,7 +36,7 @@ int set_wallpaper(const char *path)
     };
 
     connection_send(compositor_connection, &message, sizeof(message));
-    __plug_process_sleep(1000); // FIXME: Find a better way to wait for the server...
+    process_sleep(1000); // FIXME: Find a better way to wait for the server...
 
     return 0;
 }

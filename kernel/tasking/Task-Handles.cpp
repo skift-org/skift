@@ -6,7 +6,6 @@
 #include "kernel/node/Terminal.h"
 #include "kernel/scheduling/Blocker.h"
 #include "kernel/scheduling/Scheduler.h"
-#include "kernel/tasking/Task-Directory.h"
 #include "kernel/tasking/Task-Handles.h"
 
 ResultOr<int> task_fshandle_add(Task *task, FsHandle *handle)

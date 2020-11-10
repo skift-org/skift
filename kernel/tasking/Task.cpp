@@ -43,6 +43,8 @@ void Task::cancel(int exit_value)
 
 Task *task_create(Task *parent, const char *name, bool user)
 {
+    __unused(parent);
+
     ASSERT_INTERRUPTS_RETAINED();
 
     if (_tasks == nullptr)
@@ -67,18 +69,6 @@ Task *task_create(Task *parent, const char *name, bool user)
 
     // Setup shms
     task->memory_mapping = list_create();
-
-    // Setup current working directory.
-    lock_init(task->directory_lock);
-
-    if (parent)
-    {
-        task->directory = new Path(*parent->directory);
-    }
-    else
-    {
-        task->directory = new Path(Path::parse("/"));
-    }
 
     // Setup fildes
     lock_init(task->handles_lock);
@@ -120,8 +110,6 @@ void task_destroy(Task *task)
     list_destroy(task->memory_mapping);
 
     task_fshandle_close_all(task);
-
-    delete task->directory;
 
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
@@ -180,8 +168,6 @@ Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg
 
     return task;
 }
-
-
 
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user)
 {

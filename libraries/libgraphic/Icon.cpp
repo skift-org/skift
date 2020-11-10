@@ -3,6 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>
 #include <libutils/HashMap.h>
+#include <libutils/Path.h>
 
 static HashMap<String, RefPtr<Icon>> _icons{};
 

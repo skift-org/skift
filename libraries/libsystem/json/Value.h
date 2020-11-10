@@ -99,7 +99,7 @@ public:
 
     const Value &get(String key) const;
 
-    void put(String key, const Value &value);
+    void put(String key, const Value &value) const;
 
     void remove(String key);
 

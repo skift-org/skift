@@ -2,6 +2,8 @@
 
 #include <abi/Memory.h>
 
+#include <libsystem/Result.h>
+
 #include "kernel/memory/MemoryRange.h"
 
 void *arch_kernel_address_space();

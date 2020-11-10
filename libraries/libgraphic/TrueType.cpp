@@ -2615,8 +2615,15 @@ static truetype_point *truetype_FlattenCurves(truetype_vertex *vertices, int num
         if (pass == 1)
         {
             points = (truetype_point *)malloc(num_points * sizeof(points[0]));
+
             if (points == nullptr)
-                goto error;
+            {
+                free(points);
+                free(*contour_lengths);
+                *contour_lengths = 0;
+                *num_contours = 0;
+                return nullptr;
+            }
         }
         num_points = 0;
         n = -1;
@@ -2659,12 +2666,6 @@ static truetype_point *truetype_FlattenCurves(truetype_vertex *vertices, int num
     }
 
     return points;
-error:
-    free(points);
-    free(*contour_lengths);
-    *contour_lengths = 0;
-    *num_contours = 0;
-    return nullptr;
 }
 
 void truetype_Rasterize(truetype_bitmap *result, float flatness_in_pixels, truetype_vertex *vertices, int num_verts, float scale_x, float scale_y, float shift_x, float shift_y, int x_off, int y_off, int invert)

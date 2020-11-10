@@ -47,10 +47,6 @@ void ramdisk_load(Module *module)
 
             delete handle;
         }
-        else if (block.name[strlen(block.name) - 1] != '/')
-        {
-            filesystem_mklink_for_tar(file_path, Path::parse(block.linkname));
-        }
     }
 
     memory_free(arch_kernel_address_space(), module->range);

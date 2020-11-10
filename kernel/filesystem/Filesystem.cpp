@@ -1,11 +1,4 @@
-
-/* filesystem.c: the skiftOS virtual filesystem.                              */
-
-#include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/Result.h>
-#include <libsystem/core/CString.h>
-#include <libsystem/math/Math.h>
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/node/Directory.h"
@@ -147,7 +140,7 @@ Result filesystem_mkdir(Path path)
 {
     if (path.length() == 0)
     {
-        // We are tring to create /
+        // We are trying to create /
         return ERR_FILE_EXISTS;
     }
 
@@ -174,19 +167,6 @@ Result filesystem_mklink(Path old_path, Path new_path)
     }
 
     return filesystem_link(new_path, destination);
-}
-
-// This version allow
-Result filesystem_mklink_for_tar(Path old_path, Path new_path)
-{
-    auto child = filesystem_find(old_path);
-
-    if (!child)
-    {
-        return ERR_NO_SUCH_FILE_OR_DIRECTORY;
-    }
-
-    return filesystem_link(new_path, child);
 }
 
 Result filesystem_link(Path path, RefPtr<FsNode> node)
@@ -257,22 +237,21 @@ Result filesystem_rename(Path old_path, Path new_path)
 
     auto child = old_parent->find(old_path.basename());
 
-    Result result = SUCCESS;
+    auto result = SUCCESS;
 
-    if (!child)
+    if (child)
+    {
+        result = new_parent->link(new_path.basename(), child);
+
+        if (result == SUCCESS)
+        {
+            result = old_parent->unlink(old_path.basename());
+        }
+    }
+    else
     {
         result = ERR_NO_SUCH_FILE_OR_DIRECTORY;
-        goto unlock_cleanup_and_return;
     }
-
-    result = new_parent->link(new_path.basename(), child);
-
-    if (result == SUCCESS)
-    {
-        result = old_parent->unlink(old_path.basename());
-    }
-
-unlock_cleanup_and_return:
 
     if (old_parent != new_parent)
     {

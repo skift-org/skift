@@ -1,7 +1,7 @@
-#include <libjson/Json.h>
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/json/Json.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/NumberParser.h>
@@ -129,6 +129,13 @@ static Value array(Scanner &scan)
 
     Array array{};
 
+    whitespace(scan);
+
+    if (scan.skip(']'))
+    {
+        return move(array);
+    }
+
     int index = 0;
     do
     {
@@ -149,6 +156,12 @@ static Value object(Scanner &scan)
     Object object{};
 
     whitespace(scan);
+
+    if (scan.skip('}'))
+    {
+        return move(object);
+    }
+
     while (scan.current() != '}')
     {
         auto k = string(scan);

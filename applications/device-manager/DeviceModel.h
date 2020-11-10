@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libjson/Json.h>
+#include <libsystem/json/Json.h>
 #include <libwidget/model/TableModel.h>
 
 class DeviceModel : public TableModel

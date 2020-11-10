@@ -62,7 +62,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg
 
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user);
 
-void task_pass_argv_argc(Task *task, const char **argv);
+void task_pass_argc_argv_env(Task *task, const char **argv, const char *env);
 
 uintptr_t task_kernel_stack_push(Task *task, const void *value, size_t size);
 

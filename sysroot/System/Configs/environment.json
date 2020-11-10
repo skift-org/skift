@@ -1,0 +1,13 @@
+{
+    "POSIX": {
+        "HOME": "/User",
+        "LOGNAME": "awesome-user",
+        "PATH": [
+            "/System/Binaries",
+            "/System/Posix/bin",
+            "/Applications"
+        ],
+        "TERM": "xterm",
+        "PWD": "/"
+    }
+}

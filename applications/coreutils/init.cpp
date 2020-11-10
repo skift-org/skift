@@ -3,6 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/process/Environment.h>
 #include <libsystem/process/Launchpad.h>
 #include <libsystem/process/Process.h>
 
@@ -19,6 +20,8 @@ int main(int argc, char **argv)
 
     // Start a "DEBUG" shell
     // process_run("shell", NULL);
+
+    environment() = json::parse_file("/System/Configs/environment.json");
 
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {

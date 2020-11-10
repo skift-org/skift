@@ -8,6 +8,7 @@ UTILS = \
 	DSTART \
 	DIRNAME \
 	ECHO \
+	ENV \
 	GREP \
 	HEAD \
 	HEXDUMP \
@@ -65,6 +66,9 @@ DIRNAME_NAME = dirname
 ECHO_LIBS =
 ECHO_NAME = echo
 
+ENV_LIBS =
+ENV_NAME = env
+
 GREP_LIBS =
 GREP_NAME = grep
 
@@ -77,7 +81,7 @@ HEXDUMP_NAME = hexdump
 INIT_LIBS =
 INIT_NAME = init
 
-JSON_LIBS = json
+JSON_LIBS =
 JSON_NAME = json
 
 KILL_LIBS =
@@ -101,7 +105,7 @@ MV_NAME = mv
 NOW_LIBS =
 NOW_NAME = now
 
-OPEN_LIBS = json
+OPEN_LIBS =
 OPEN_NAME = open
 
 PANIC_LIBS =

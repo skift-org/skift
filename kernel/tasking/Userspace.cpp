@@ -6,6 +6,11 @@
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/tasking/Userspace.h"
 
+#define DEFAULT_ENVIRONMENT \
+    "{"                     \
+    "\"PATH\": [],"         \
+    "}"
+
 void userspace_initialize()
 {
     logger_info("Starting the userspace...");
@@ -18,6 +23,8 @@ void userspace_initialize()
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 1);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 2);
     launchpad_handle(init_lauchpad, HANDLE(serial_device), 3);
+
+    launchpad_environment(init_lauchpad, DEFAULT_ENVIRONMENT);
 
     early_console_disable(); // We disable the early console to prevent artefact.
 

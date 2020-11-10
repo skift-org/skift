@@ -1,7 +1,7 @@
 APPS += PAINT
 
 PAINT_NAME = paint
-PAINT_LIBS = widget graphic json
+PAINT_LIBS = widget graphic
 PAINT_ICONS = \
 	brush \
 	pencil \

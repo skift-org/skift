@@ -51,10 +51,27 @@ Result hj_process_name(char *name, size_t size)
     return SUCCESS;
 }
 
+static bool validate_launchpad_arguments(Launchpad *launchpad)
+{
+    for (int i = 0; i < launchpad->argc; i++)
+    {
+        auto &arg = launchpad->argv[i];
+
+        if (!syscall_validate_ptr((uintptr_t)arg.buffer, arg.size))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 Result hj_process_launch(Launchpad *launchpad, int *pid)
 {
     if (!syscall_validate_ptr((uintptr_t)launchpad, sizeof(Launchpad)) ||
-        !syscall_validate_ptr((uintptr_t)pid, sizeof(int)))
+        !syscall_validate_ptr((uintptr_t)pid, sizeof(int)) ||
+        !validate_launchpad_arguments(launchpad) ||
+        !syscall_validate_ptr((uintptr_t)launchpad->env, launchpad->env_size))
     {
         return ERR_BAD_ADDRESS;
     }
@@ -63,14 +80,20 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
 
     for (int i = 0; i < launchpad->argc; i++)
     {
-        launchpad_copy.argv[i] = strdup(launchpad->argv[i]);
+        launchpad_copy.argv[i].buffer = strdup(launchpad->argv[i].buffer);
+        launchpad_copy.argv[i].size = launchpad->argv[i].size;
     }
+
+    launchpad_copy.env = strdup(launchpad->env);
+    launchpad_copy.env_size = launchpad->env_size;
 
     Result result = task_launch(scheduler_running(), &launchpad_copy, pid);
 
+    free(launchpad_copy.env);
+
     for (int i = 0; i < launchpad->argc; i++)
     {
-        free(launchpad_copy.argv[i]);
+        free(launchpad_copy.argv[i].buffer);
     }
 
     return result;

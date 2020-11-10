@@ -1,9 +1,9 @@
--include architectures/$(BUILD_ARCH)/.build.mk
-
 CRTS= \
 	$(BUILD_DIRECTORY_LIBS)/crt0.o \
 	$(BUILD_DIRECTORY_LIBS)/crti.o \
 	$(BUILD_DIRECTORY_LIBS)/crtn.o
+
+-include architectures/$(BUILD_ARCH)/.build.mk
 
 $(BUILD_DIRECTORY_LIBS)/crt0.o: architectures/$(BUILD_ARCH)/crts/crt0.s
 	$(DIRECTORY_GUARD)

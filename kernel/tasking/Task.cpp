@@ -181,53 +181,7 @@ Task *task_spawn(Task *parent, const char *name, TaskEntryPoint entry, void *arg
     return task;
 }
 
-static void pass_argc_argv_user(Task *task, const char **argv)
-{
-    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
 
-    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
-
-    int argc;
-    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
-    {
-        argv_list[argc] = task_user_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
-    }
-
-    uintptr_t argv_list_ref = task_user_stack_push(task, &argv_list, sizeof(argv_list));
-
-    task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
-    task_user_stack_push(task, &argc, sizeof(argc));
-
-    task_switch_address_space(scheduler_running(), parent_address_space);
-}
-
-static void pass_argc_argv_kernel(Task *task, const char **argv)
-{
-    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
-
-    int argc;
-    for (argc = 0; argv[argc] && argc < PROCESS_ARG_COUNT; argc++)
-    {
-        argv_list[argc] = task_kernel_stack_push(task, argv[argc], strlen(argv[argc]) + 1);
-    }
-
-    uintptr_t argv_list_ref = task_kernel_stack_push(task, &argv_list, sizeof(argv_list));
-
-    task_kernel_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
-    task_kernel_stack_push(task, &argc, sizeof(argc));
-}
-
-void task_pass_argv_argc(Task *task, const char **argv)
-{
-    if (task->user)
-    {
-        pass_argc_argv_user(task, argv);
-    }
-    else
-    {
-        pass_argc_argv_kernel(task, argv);
-    }
-}
 
 void task_set_entry(Task *task, TaskEntryPoint entry, bool user)
 {

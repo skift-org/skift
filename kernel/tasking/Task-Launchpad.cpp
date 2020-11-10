@@ -84,6 +84,30 @@ struct ELFLoader
     }
 };
 
+void task_pass_argc_argv_env(Task *task, Launchpad *launchpad)
+{
+    void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+
+    uintptr_t argv_list[PROCESS_ARG_COUNT] = {};
+
+    for (int i = 0; i < launchpad->argc; i++)
+    {
+        task_user_stack_push(task, "\0", 1); // null terminate the arg string
+        argv_list[i] = task_user_stack_push(task, launchpad->argv[i].buffer, launchpad->argv[i].size);
+    }
+
+    uintptr_t argv_list_ref = task_user_stack_push(task, &argv_list, sizeof(argv_list));
+
+    task_user_stack_push(task, "\0", 1); // null terminate the env string
+    uintptr_t env_ref = task_user_stack_push(task, launchpad->env, launchpad->env_size);
+
+    task_user_stack_push(task, &env_ref, sizeof(env_ref));
+    task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
+    task_user_stack_push(task, &launchpad->argc, sizeof(int));
+
+    task_switch_address_space(scheduler_running(), parent_address_space);
+}
+
 void task_pass_handles(Task *parent_task, Task *child_task, Launchpad *launchpad)
 {
     LockHolder holder(parent_task->handles_lock);
@@ -134,7 +158,7 @@ Result task_launch(Task *parent_task, Launchpad *launchpad, int *pid)
         return result;
     }
 
-    task_pass_argv_argc(task, (const char **)(launchpad->argv));
+    task_pass_argc_argv_env(task, launchpad);
 
     task_pass_handles(parent_task, task, launchpad);
 

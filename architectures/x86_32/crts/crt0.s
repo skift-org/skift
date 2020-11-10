@@ -1,16 +1,8 @@
 section .text
 
-extern __plug_init
-extern __plug_fini
-extern main
-extern process_exit
+extern __entry_point
 
 global _start:function (_start.end - _start)
 _start:
-	call __plug_init
-
-	call main
-
-	push eax
-	call __plug_fini
+	call __entry_point
 .end:

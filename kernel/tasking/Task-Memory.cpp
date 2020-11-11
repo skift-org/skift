@@ -51,8 +51,10 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
     auto memory_mapping = __create(MemoryMapping);
 
     memory_mapping->object = memory_object_ref(memory_object);
-    memory_mapping->address = arch_virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER);
+    memory_mapping->address = address;
     memory_mapping->size = memory_object->range().size();
+
+    arch_virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER);
 
     list_pushback(task->memory_mapping, memory_mapping);
 

@@ -8,7 +8,6 @@ enum Column
     COLUMN_STATE,
     COLUMN_CPU,
     COLUMN_RAM,
-    COLUMN_DIRECTORY,
 
     __COLUMN_COUNT,
 };
@@ -41,9 +40,6 @@ String TaskModel::header(int column)
 
     case COLUMN_RAM:
         return "RAM(Kio)";
-
-    case COLUMN_DIRECTORY:
-        return "Directory";
 
     default:
         ASSERT_NOT_REACHED();
@@ -81,9 +77,6 @@ Variant TaskModel::data(int row, int column)
 
     case COLUMN_RAM:
         return Variant("%5d Kio", task.get("ram").as_integer() / 1024);
-
-    case COLUMN_DIRECTORY:
-        return task.get("directory").as_string();
 
     default:
         ASSERT_NOT_REACHED();

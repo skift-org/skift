@@ -160,7 +160,9 @@ void backtrace_internal(uint32_t ebp)
     }
 
     if (empty)
+    {
         stream_format(log_stream, "\t[EMPTY]\n");
+    }
 }
 
 void arch_dump_stack_frame(void *sf)

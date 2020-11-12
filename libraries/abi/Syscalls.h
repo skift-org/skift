@@ -14,6 +14,7 @@
     __ENTRY(HJ_PROCESS_THIS)      \
     __ENTRY(HJ_PROCESS_NAME)      \
     __ENTRY(HJ_PROCESS_LAUNCH)    \
+    __ENTRY(HJ_PROCESS_CLONE)     \
     __ENTRY(HJ_PROCESS_EXIT)      \
     __ENTRY(HJ_PROCESS_CANCEL)    \
     __ENTRY(HJ_PROCESS_SLEEP)     \
@@ -111,6 +112,7 @@ __BEGIN_HEADER
 Result hj_process_this(int *pid);
 Result hj_process_name(char *name, size_t size);
 Result hj_process_launch(Launchpad *launchpad, int *pid);
+Result hj_process_clone(int *pid);
 Result hj_process_exit(int exit_code);
 Result hj_process_cancel(int pid);
 Result hj_process_sleep(int time);

@@ -46,6 +46,8 @@ struct Task
 
 Task *task_create(Task *parent, const char *name, bool user);
 
+Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip);
+
 void task_destroy(Task *task);
 
 typedef Iteration (*TaskIterateCallback)(void *target, Task *task);

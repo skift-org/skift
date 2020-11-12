@@ -9,6 +9,11 @@ struct MemoryMapping
 
     uintptr_t address;
     size_t size;
+
+    MemoryRange range()
+    {
+        return {address, size};
+    }
 };
 
 MemoryMapping *task_memory_mapping_create(Task *task, MemoryObject *memory_object);

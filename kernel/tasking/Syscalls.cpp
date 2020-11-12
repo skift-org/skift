@@ -98,6 +98,13 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
     return result;
 }
 
+Result hj_process_clone(int *pid)
+{
+    // Implemented in architectures/x86_32/kernel/Interrupts.cpp
+    __unused(pid);
+    ASSERT_NOT_REACHED();
+}
+
 Result hj_process_exit(int exit_code)
 {
     scheduler_running()->cancel(exit_code);
@@ -555,6 +562,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_PROCESS_THIS] = reinterpret_cast<SyscallHandler>(hj_process_this),
     [HJ_PROCESS_NAME] = reinterpret_cast<SyscallHandler>(hj_process_name),
     [HJ_PROCESS_LAUNCH] = reinterpret_cast<SyscallHandler>(hj_process_launch),
+    [HJ_PROCESS_CLONE] = reinterpret_cast<SyscallHandler>(hj_process_clone),
     [HJ_PROCESS_EXIT] = reinterpret_cast<SyscallHandler>(hj_process_exit),
     [HJ_PROCESS_CANCEL] = reinterpret_cast<SyscallHandler>(hj_process_cancel),
     [HJ_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(hj_process_sleep),

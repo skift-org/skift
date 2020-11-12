@@ -80,13 +80,81 @@ Task *task_create(Task *parent, const char *name, bool user)
     memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
     task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 
-    memory_map(task->address_space, MemoryRange(0xff000000, PROCESS_STACK_SIZE), MEMORY_USER);
-    task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
-    task->user_stack = (void *)0xff000000;
+    if (user)
+    {
+        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+        task_memory_map(task, 0xff000000, PROCESS_STACK_SIZE, MEMORY_CLEAR | MEMORY_USER);
+        task->user_stack_pointer = 0xff000000 + PROCESS_STACK_SIZE;
+        task->user_stack = (void *)0xff000000;
+        task_switch_address_space(scheduler_running(), parent_address_space);
+    }
 
     arch_save_context(task);
 
     list_pushback(_tasks, task);
+
+    return task;
+}
+
+Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
+{
+    ASSERT_INTERRUPTS_RETAINED();
+
+    if (_tasks == nullptr)
+    {
+        _tasks = list_create();
+    }
+
+    Task *task = __create(Task);
+
+    task->id = _task_ids++;
+    strlcpy(task->name, parent->name, PROCESS_NAME_SIZE);
+    task->_state = TASK_STATE_NONE;
+
+    task->address_space = arch_address_space_create();
+
+    // Setup shms
+    task->memory_mapping = list_create();
+
+    // Setup fildes
+    lock_init(task->handles_lock);
+    for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
+    {
+        if (parent->handles[i])
+        {
+            task->handles[i] = new FsHandle(*parent->handles[i]);
+        }
+    }
+
+    memory_alloc(task->address_space, PROCESS_STACK_SIZE, MEMORY_CLEAR, (uintptr_t *)&task->kernel_stack);
+    task->kernel_stack_pointer = ((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
+
+    list_foreach(MemoryMapping, mapping, parent->memory_mapping)
+    {
+        auto virtual_range = mapping->range();
+
+        auto physical_range = mapping->object->range();
+
+        void *buffer = malloc(physical_range.size());
+        assert(buffer);
+        assert(virtual_range.base());
+        memcpy(buffer, (void *)virtual_range.base(), virtual_range.size());
+
+        void *parent_address_space = task_switch_address_space(scheduler_running(), task->address_space);
+
+        task_memory_map(task, virtual_range.base(), virtual_range.size(), MEMORY_USER);
+        memcpy((void *)virtual_range.base(), buffer, virtual_range.size());
+
+        task_switch_address_space(scheduler_running(), parent_address_space);
+
+        free(buffer);
+    }
+
+    task->user_stack_pointer = sp;
+    task->entry_point = (TaskEntryPoint)ip;
+    task->user = true;
+
+    task_go(task);
 
     return task;
 }
@@ -112,7 +180,6 @@ void task_destroy(Task *task)
     task_fshandle_close_all(task);
 
     memory_free(task->address_space, MemoryRange{(uintptr_t)task->kernel_stack, PROCESS_STACK_SIZE});
-    memory_free(task->address_space, MemoryRange{(uintptr_t)task->user_stack, PROCESS_STACK_SIZE});
 
     if (task->address_space != arch_kernel_address_space())
     {
@@ -306,7 +373,12 @@ void task_dump(Task *task)
     printf("\n\t - Task %d %s", task->id, task->name);
     printf("\n\t   State: %s", task_state_string(task->state()));
     printf("\n\t   Memory: ");
-    arch_address_space_dump(task->address_space, false);
+
+    list_foreach(MemoryMapping, mapping, task->memory_mapping)
+    {
+        auto virtual_range = mapping->range();
+        printf("\n\t   - %08x %08x", virtual_range);
+    }
 
     if (task->address_space == arch_kernel_address_space())
     {

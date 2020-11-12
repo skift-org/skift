@@ -108,7 +108,26 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
     else if (stackframe.intno == 128)
     {
         sti();
-        stackframe.eax = task_do_syscall((Syscall)stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
+
+        if (stackframe.eax == HJ_PROCESS_CLONE)
+        {
+            InterruptsRetainer retainer;
+
+            auto usf = ((UserInterruptStackFrame *)&stackframe);
+
+            *((int *)stackframe.ebx) = 0;
+
+            auto child = task_clone(scheduler_running(), usf->user_esp, usf->eip);
+
+            *((int *)stackframe.ebx) = child->id;
+
+            stackframe.eax = SUCCESS;
+        }
+        else
+        {
+            stackframe.eax = task_do_syscall((Syscall)stackframe.eax, stackframe.ebx, stackframe.ecx, stackframe.edx, stackframe.esi, stackframe.edi);
+        }
+
         cli();
     }
 

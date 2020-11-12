@@ -6,16 +6,11 @@
 #include <libsystem/core/Plugs.h>
 #include <libutils/Path.h>
 
-static int _cached_this = -1;
-
 int __plug_process_this()
 {
-    if (_cached_this == -1)
-    {
-        assert(hj_process_this(&_cached_this) == SUCCESS);
-    }
-
-    return _cached_this;
+    int pid = -1;
+    assert(hj_process_this(&pid) == SUCCESS);
+    return pid;
 }
 
 static bool _has_cached_name = false;

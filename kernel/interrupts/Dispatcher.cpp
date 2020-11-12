@@ -19,6 +19,7 @@ void dispatcher_initialize()
 void dispatcher_dispatch(int interrupt)
 {
     _pending_interrupts[interrupt] = true;
+    devices_acknowledge_interrupt(interrupt);
 }
 
 static bool dispatcher_has_interrupt()

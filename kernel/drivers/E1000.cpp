@@ -206,10 +206,13 @@ E1000::E1000(DeviceAddress address) : PCIDevice(address, DeviceClass::NETWORK)
     enable_interrupt();
 }
 
-void E1000::handle_interrupt()
+void E1000::acknowledge_interrupt()
 {
     write_register(E1000_REG_IMASK, 0x0);
+}
 
+void E1000::handle_interrupt()
+{
     uint32_t status = read_register(E1000_REG_STATUS);
 
     // logger_trace("e1000 interrupt (STATUS=%08x)!", status);

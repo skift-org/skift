@@ -69,6 +69,18 @@ void device_iterate(IterationCallback<RefPtr<Device>> callback)
     }
 }
 
+void devices_acknowledge_interrupt(int interrupt)
+{
+    device_iterate([&](auto device) {
+        if (device->interrupt() == interrupt)
+        {
+            device->acknowledge_interrupt();
+        }
+
+        return Iteration::CONTINUE;
+    });
+}
+
 void devices_handle_interrupt(int interrupt)
 {
     device_iterate([&](auto device) {

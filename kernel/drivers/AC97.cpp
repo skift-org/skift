@@ -96,16 +96,19 @@ void AC97::query_from_buffer(void *destination, size_t size)
     }
 }
 
+void AC97::acknowledge_interrupt()
+{
+    _status = in16(nabmbar + AC97_PO_SR);
+
+    if (_status)
+    {
+        out16(nabmbar + AC97_PO_SR, _status & 0x1E);
+    }
+}
+
 void AC97::handle_interrupt()
 {
-    uint16_t sr = in16(nabmbar + AC97_PO_SR);
-
-    if (!sr)
-    {
-        return;
-    }
-
-    if (sr & AC97_X_SR_BCIS)
+    if (_status & AC97_X_SR_BCIS)
     {
         size_t f = (lvi + 2) % AC97_BDL_LEN;
 
@@ -113,20 +116,14 @@ void AC97::handle_interrupt()
         lvi = (lvi + 1) % AC97_BDL_LEN;
         out8(nabmbar + AC97_PO_LVI, lvi);
     }
-    else if (sr & AC97_X_SR_LVBCI)
+    else if (_status & AC97_X_SR_LVBCI)
     {
         logger_trace("IRQ is lvbci");
     }
-    else if (sr & AC97_X_SR_FIFOE)
+    else if (_status & AC97_X_SR_FIFOE)
     {
         logger_trace("IRQ is fifoe");
     }
-    else
-    {
-        return;
-    }
-
-    out16(nabmbar + AC97_PO_SR, sr & 0x1E);
 }
 
 bool AC97::can_write(FsHandle &handle)

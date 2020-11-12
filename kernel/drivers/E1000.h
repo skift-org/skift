@@ -145,6 +145,8 @@ private:
 public:
     E1000(DeviceAddress address);
 
+    void acknowledge_interrupt() override;
+
     void handle_interrupt() override;
 
     bool can_write(FsHandle &handle) override;

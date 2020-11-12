@@ -48,6 +48,8 @@ public:
 
     virtual int interrupt() { return -1; }
 
+    virtual void acknowledge_interrupt() {}
+
     virtual void handle_interrupt() {}
 
     virtual bool can_read(FsHandle &handle)

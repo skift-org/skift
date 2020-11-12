@@ -15,4 +15,6 @@ String device_claim_name(DeviceClass klass);
 
 void device_initialize();
 
+void devices_acknowledge_interrupt(int interrupt);
+
 void devices_handle_interrupt(int interrupt);

@@ -70,6 +70,8 @@ struct __packed AC97BufferDescriptor
 class AC97 : public PCIDevice
 {
 private:
+    uint16_t _status;
+
     uint16_t nabmbar;
     uint16_t nambar;
 
@@ -99,7 +101,10 @@ private:
 
 public:
     AC97(DeviceAddress address);
+
     ~AC97();
+
+    void acknowledge_interrupt() override;
 
     void handle_interrupt() override;
 

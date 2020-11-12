@@ -38,10 +38,10 @@ skiftOS running in QEMU 5.1
 
 # Links
 
-- [Manual](./manual/readme.md)
-- [Building](./building.md) **(start here if you are new)**
-- [Contributing](./contributing.md)
-- [Code of conduct](./code_of_conduct.md)
+- [Manual](manual/readme.md)
+- [Building](building.md) **(start here if you are new)**
+- [Contributing](contributing.md)
+- [Code of conduct](code_of_conduct.md)
 
 # Acknowledgements
 
@@ -65,4 +65,4 @@ skiftOS running in QEMU 5.1
 
 The skift operating system and its core components are licensed under the **MIT License**.
 
-See [license.md](./license.md)
+See [license.md](license.md)

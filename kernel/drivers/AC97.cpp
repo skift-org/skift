@@ -32,8 +32,8 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     out32(nabmbar + AC97_PO_BDBAR, buffer_descriptors_range->physical_base());
 
     // set last valid index
-    lvi = 0;
-    out8(nabmbar + AC97_PO_LVI, lvi);
+    _last_valid_index = 0;
+    out8(nabmbar + AC97_PO_LVI, _last_valid_index);
 
     // detect wheter device supports MSB
     out32(nambar + AC97_MASTER_VOLUME, 0x2020);
@@ -41,14 +41,12 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     if (t == 0x1f)
     {
         logger_trace("This device only supports 5 bits of audio volume.");
-        bits = 5;
-        mask = 0x1f;
+        _quirk_5bit_volume = true;
         out32(nambar + AC97_MASTER_VOLUME, 0x0f0f);
     }
     else
     {
-        bits = 6;
-        mask = 0x3f;
+        _quirk_5bit_volume = false;
         out32(nambar + AC97_MASTER_VOLUME, 0x1f1f);
     }
 
@@ -61,7 +59,6 @@ AC97::AC97(DeviceAddress address) : PCIDevice(address, DeviceClass::SOUND)
     out16(nambar + AC97_LR_SPLRATE, AC97_PLAYBACK_SPEED);
 
     out8(nabmbar + AC97_PO_CR, in8(nabmbar + AC97_PO_CR) | AC97_X_CR_RPBM);
-    // out8(nabmbar + AC97_PO_CR, AC97_PO_LVI);
 
     logger_trace("AC97 initialised successfully");
 }
@@ -110,11 +107,11 @@ void AC97::handle_interrupt()
 {
     if (_status & AC97_X_SR_BCIS)
     {
-        size_t f = (lvi + 2) % AC97_BDL_LEN;
+        size_t f = (_last_valid_index + 2) % AC97_BDL_LEN;
 
         query_from_buffer((void *)buffers[f]->base(), AC97_BDL_BUFFER_LEN * 2);
-        lvi = (lvi + 1) % AC97_BDL_LEN;
-        out8(nabmbar + AC97_PO_LVI, lvi);
+        _last_valid_index = (_last_valid_index + 1) % AC97_BDL_LEN;
+        out8(nabmbar + AC97_PO_LVI, _last_valid_index);
     }
     else if (_status & AC97_X_SR_LVBCI)
     {
@@ -129,6 +126,7 @@ void AC97::handle_interrupt()
 bool AC97::can_write(FsHandle &handle)
 {
     __unused(handle);
+
     return !_buffer.full();
 }
 
@@ -144,5 +142,6 @@ Result AC97::call(FsHandle &handle, IOCall request, void *args)
     __unused(handle);
     __unused(request);
     __unused(args);
-    return SUCCESS;
+
+    return ERR_INAPPROPRIATE_CALL_FOR_DEVICE;
 }

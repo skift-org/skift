@@ -58,7 +58,7 @@
 #define AC97_EXT_AUDIO_STC 0x002A
 #define AC97_FRONT_SPLRATE 0x002C
 #define AC97_LR_SPLRATE 0x0032
-#define AC97_PLAYBACK_SPEED 44100
+#define AC97_PLAYBACK_SPEED 48000
 #define AC97_GLB_CTRL_STAT 0x0060
 
 struct __packed AC97BufferDescriptor
@@ -75,8 +75,7 @@ private:
     uint16_t nabmbar;
     uint16_t nambar;
 
-    uint8_t lvi;  // currently set last valid index in circular buffer
-    uint8_t bits; // how many bits of volume are supported
+    uint8_t _last_valid_index;
 
     // device ring buffer
     RingBuffer _buffer{AC97_RINGBUFFER_LEN};
@@ -88,15 +87,13 @@ private:
     // 32*30720 buffer array for playing sound using PCM 16 Bit out (DMA)
     Vector<RefPtr<MMIORange>> buffers;
 
-    uint32_t mask;
+    bool _quirk_5bit_volume;
 
     uint16_t _volume_PCM;
     uint16_t _volume_master;
 
-    // to handle buffer allocation
     void initialise_buffers();
 
-    // handles buffers and sets 0 if data under run
     void query_from_buffer(void *destination, size_t size);
 
 public:
@@ -109,10 +106,6 @@ public:
     void handle_interrupt() override;
 
     bool can_write(FsHandle &handle) override;
-
-    // bool can_read(FsHandle &handle) override;
-
-    // ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override;
 
     ResultOr<size_t> write(FsHandle &handle, const void *buffer, size_t size) override;
 

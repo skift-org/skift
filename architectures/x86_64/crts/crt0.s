@@ -8,4 +8,4 @@ global _start:function (_start.end - _start)
     pop rdx ; env
 
     call __entry_point
-.end
+.end:

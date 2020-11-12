@@ -27,22 +27,34 @@ static Slice truetype_cff_get_index(Slice *slice)
         slice_skip(slice, offsize * count);
         slice_skip(slice, slice_get(slice, offsize) - 1);
     }
+
     return slice_range(slice, start, slice->cursor - start);
 }
 
 static uint32_t truetype_cff_int(Slice *b)
 {
     int b0 = slice_get8(b);
+
     if (b0 >= 32 && b0 <= 246)
+    {
         return b0 - 139;
+    }
     else if (b0 >= 247 && b0 <= 250)
+    {
         return (b0 - 247) * 256 + slice_get8(b) + 108;
+    }
     else if (b0 >= 251 && b0 <= 254)
+    {
         return -(b0 - 251) * 256 - slice_get8(b) - 108;
+    }
     else if (b0 == 28)
+    {
         return slice_get16(b);
+    }
     else if (b0 == 29)
+    {
         return slice_get32(b);
+    }
 
     ASSERT_NOT_REACHED();
 }
@@ -50,7 +62,9 @@ static uint32_t truetype_cff_int(Slice *b)
 static void truetype_cff_skip_operand(Slice *b)
 {
     int v, b0 = slice_peek8(b);
+
     assert(b0 >= 28);
+
     if (b0 == 30)
     {
         slice_skip(b, 1);
@@ -58,7 +72,9 @@ static void truetype_cff_skip_operand(Slice *b)
         {
             v = slice_get8(b);
             if ((v & 0xF) == 0xF || (v >> 4) == 0xF)
+            {
                 break;
+            }
         }
     }
     else
@@ -70,27 +86,41 @@ static void truetype_cff_skip_operand(Slice *b)
 static Slice truetype_dict_get(Slice *b, int key)
 {
     slice_seek(b, 0);
+
     while (b->cursor < b->size)
     {
         int start = b->cursor, end, op;
+
         while (slice_peek8(b) >= 28)
+        {
             truetype_cff_skip_operand(b);
+        }
+
         end = b->cursor;
         op = slice_get8(b);
+
         if (op == 12)
+        {
             op = slice_get8(b) | 0x100;
+        }
+
         if (op == key)
+        {
             return slice_range(b, start, end - start);
+        }
     }
+
     return slice_range(b, 0, 0);
 }
 
 static void truetype_dict_get_ints(Slice *b, int key, int outcount, uint32_t *out)
 {
-    int i;
     Slice operands = truetype_dict_get(b, key);
-    for (i = 0; i < outcount && operands.cursor < operands.size; i++)
+
+    for (int i = 0; i < outcount && operands.cursor < operands.size; i++)
+    {
         out[i] = truetype_cff_int(&operands);
+    }
 }
 
 static int truetype_cff_index_count(Slice *b)
@@ -101,15 +131,20 @@ static int truetype_cff_index_count(Slice *b)
 
 static Slice truetype_cff_index_get(Slice b, int i)
 {
-    int count, offsize, start, end;
     slice_seek(&b, 0);
-    count = slice_get16(&b);
-    offsize = slice_get8(&b);
+
+    int count = slice_get16(&b);
+    int offsize = slice_get8(&b);
+
     assert(i >= 0 && i < count);
     assert(offsize >= 1 && offsize <= 4);
+
     slice_skip(&b, i * offsize);
-    start = slice_get(&b, offsize);
-    end = slice_get(&b, offsize);
+
+    int start = slice_get(&b, offsize);
+
+    int end = slice_get(&b, offsize);
+
     return slice_range(&b, 2 + (count + 1) * offsize + start, end - start);
 }
 
@@ -129,30 +164,54 @@ static uint16_t ttUSHORT(uint8_t *p)
 {
     return p[0] * 256 + p[1];
 }
-static int16_t ttSHORT(uint8_t *p) { return p[0] * 256 + p[1]; }
-static uint32_t ttULONG(uint8_t *p) { return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3]; }
-static int32_t ttLONG(uint8_t *p) { return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3]; }
 
-#define truetype_tag4(p, c0, c1, c2, c3) ((p)[0] == (c0) && (p)[1] == (c1) && (p)[2] == (c2) && (p)[3] == (c3))
-#define truetype_tag(p, str) truetype_tag4(p, str[0], str[1], str[2], str[3])
+static int16_t ttSHORT(uint8_t *p)
+{
+    return p[0] * 256 + p[1];
+}
+
+static uint32_t ttULONG(uint8_t *p)
+{
+    return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
+}
+
+static int32_t ttLONG(uint8_t *p)
+{
+    return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
+}
+
+#define truetype_tag4(p, c0, c1, c2, c3) \
+    ((p)[0] == (c0) && (p)[1] == (c1) && (p)[2] == (c2) && (p)[3] == (c3))
+
+#define truetype_tag(p, str) \
+    truetype_tag4(p, str[0], str[1], str[2], str[3])
 
 static int truetype_isfont(uint8_t *font)
 {
-    // check the version number
-    if (truetype_tag4(font, '1', 0, 0, 0))
+    if (truetype_tag4(font, '1', 0, 0, 0)) // check the version number
+    {
         return 1; // TrueType 1
+    }
 
     if (truetype_tag(font, "typ1"))
+    {
         return 1; // TrueType with type 1 font -- we don't support this!
+    }
 
     if (truetype_tag(font, "OTTO"))
+    {
         return 1; // OpenType with CFF
+    }
 
     if (truetype_tag4(font, 0, 1, 0, 0))
+    {
         return 1; // OpenType 1.0
+    }
 
     if (truetype_tag(font, "true"))
+    {
         return 1; // Apple specification for TrueType fonts
+    }
 
     return 0;
 }
@@ -162,13 +221,17 @@ static uint32_t truetype_find_table(uint8_t *data, uint32_t fontstart, const cha
 {
     int32_t num_tables = ttUSHORT(data + fontstart + 4);
     uint32_t tabledir = fontstart + 12;
-    int32_t i;
-    for (i = 0; i < num_tables; ++i)
+
+    for (int32_t i = 0; i < num_tables; ++i)
     {
         uint32_t loc = tabledir + 16 * i;
+
         if (truetype_tag(data + loc + 0, tag))
+        {
             return ttULONG(data + loc + 8);
+        }
     }
+
     return 0;
 }
 
@@ -224,26 +287,6 @@ static Slice truetype_get_subrs(Slice cff, Slice fontdict)
         return slice_create(nullptr, 0);
     slice_seek(&cff, private_loc[1] + subrsoff);
     return truetype_cff_get_index(&cff);
-}
-
-// since most people won't use this, find this table the first time it's needed
-static int truetype_get_svg(truetype_fontinfo *info)
-{
-    uint32_t t;
-    if (info->svg < 0)
-    {
-        t = truetype_find_table(info->data, info->fontstart, "SVG ");
-        if (t)
-        {
-            uint32_t offset = ttULONG(info->data + t + 2);
-            info->svg = t + offset;
-        }
-        else
-        {
-            info->svg = 0;
-        }
-    }
-    return info->svg;
 }
 
 static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *data, int fontstart)
@@ -331,8 +374,6 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
         info->numGlyphs = ttUSHORT(data + t + 4);
     else
         info->numGlyphs = 0xffff;
-
-    info->svg = -1;
 
     // find a cmap encoding table we understand *now* to avoid searching
     // later. (todo: could make this installable)
@@ -1451,6 +1492,7 @@ static int32_t truetype_GetCoverageIndex(uint8_t *coverageTable, int glyph)
         // Binary search.
         int32_t l = 0, r = glyphCount - 1, m;
         int straw, needle = glyph;
+
         while (l <= r)
         {
             uint8_t *glyphArray = coverageTable + 4;
@@ -1798,49 +1840,6 @@ void freeShape(const truetype_fontinfo *info, truetype_vertex *v)
     __unused(info);
 
     free(v);
-}
-
-uint8_t *truetype_FindSVGDoc(const truetype_fontinfo *info, int gl)
-{
-    int i;
-    uint8_t *data = info->data;
-    uint8_t *svg_doc_list = data + truetype_get_svg((truetype_fontinfo *)info);
-
-    int numEntries = ttUSHORT(svg_doc_list);
-    uint8_t *svg_docs = svg_doc_list + 2;
-
-    for (i = 0; i < numEntries; i++)
-    {
-        uint8_t *svg_doc = svg_docs + (12 * i);
-        if ((gl >= ttUSHORT(svg_doc)) && (gl <= ttUSHORT(svg_doc + 2)))
-            return svg_doc;
-    }
-    return 0;
-}
-
-int truetype_GetGlyphSVG(const truetype_fontinfo *info, int gl, const char **svg)
-{
-    uint8_t *data = info->data;
-    uint8_t *svg_doc;
-
-    if (info->svg == 0)
-        return 0;
-
-    svg_doc = truetype_FindSVGDoc(info, gl);
-    if (svg_doc != nullptr)
-    {
-        *svg = (char *)data + info->svg + ttULONG(svg_doc + 4);
-        return ttULONG(svg_doc + 8);
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-int truetype_GetCodepointSVG(const truetype_fontinfo *info, int unicode_codepoint, const char **svg)
-{
-    return truetype_GetGlyphSVG(info, truetype_FindGlyphIndex(info, unicode_codepoint), svg);
 }
 
 //////////////////////////////////////////////////////////////////////////////

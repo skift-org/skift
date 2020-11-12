@@ -203,9 +203,9 @@ struct truetype_fontinfo
 
     int numGlyphs; // number of glyphs, needed for range checking
 
-    int loca, head, glyf, hhea, hmtx, kern, gpos, svg; // table locations as offset from start of .ttf
-    int index_map;                                     // a cmap mapping for our chosen character encoding
-    int indexToLocFormat;                              // format needed to map from glyph index to glyph
+    int loca, head, glyf, hhea, hmtx, kern, gpos; // table locations as offset from start of .ttf
+    int index_map;                                // a cmap mapping for our chosen character encoding
+    int indexToLocFormat;                         // format needed to map from glyph index to glyph
 
     Slice cff;         // cff font data
     Slice charstrings; // the charstring index
@@ -334,11 +334,6 @@ int truetype_GetGlyphShape(const truetype_fontinfo *info, int glyph_index, truet
 
 void truetype_FreeShape(const truetype_fontinfo *info, truetype_vertex *vertices);
 // frees the data allocated above
-
-int truetype_GetCodepointSVG(const truetype_fontinfo *info, int unicode_codepoint, const char **svg);
-int truetype_GetGlyphSVG(const truetype_fontinfo *info, int gl, const char **svg);
-// fills svg with the character's SVG data.
-// returns data size or 0 if SVG not found.
 
 //////////////////////////////////////////////////////////////////////////////
 //

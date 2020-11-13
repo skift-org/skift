@@ -22,7 +22,7 @@ static PollEvent _eventloop_events[PROCESS_HANDLE_COUNT];
 
 static bool _eventloop_is_running = false;
 static bool _eventloop_is_initialize = false;
-static int _eventloop_exit_value = 0;
+static int _eventloop_exit_value = PROCESS_SUCCESS;
 
 static bool _nested_eventloop_is_running = false;
 static int _nested_eventloop_exit_value = 0;
@@ -158,7 +158,7 @@ void eventloop_pump(bool pool)
     if (result_is_error(result))
     {
         logger_error("Failed to select : %s", result_to_string(result));
-        eventloop_exit(-1);
+        eventloop_exit(PROCESS_FAILURE);
     }
 
     eventloop_update_timers();

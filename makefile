@@ -147,7 +147,7 @@ QEMU=qemu-system-x86_64
 QEMU_FLAGS=-m $(CONFIG_MEMORY)M \
 		  -serial stdio \
 		  -rtc base=localtime \
-		  -device ac97
+		  -device AC97
 
 QEMU_DISK?=-cdrom $(BOOTDISK)
 
@@ -155,7 +155,7 @@ QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 				 -device virtio-serial \
 				 -nic user,model=virtio-net-pci \
 				 -vga virtio  \
-				 -device ac97
+				 -device AC97
 
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)

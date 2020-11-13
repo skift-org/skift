@@ -45,6 +45,11 @@ Result hj_memory_alloc(size_t size, uintptr_t *out_address)
     return __syscall(HJ_MEMORY_ALLOC, (uintptr_t)size, (uintptr_t)out_address);
 }
 
+Result hj_memory_map(uintptr_t address, size_t size, int flags)
+{
+    return __syscall(HJ_MEMORY_MAP, address, size, flags);
+}
+
 Result hj_memory_free(uintptr_t address)
 {
     return __syscall(HJ_MEMORY_FREE, (uintptr_t)address);

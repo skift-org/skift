@@ -20,6 +20,7 @@
     __ENTRY(HJ_PROCESS_SLEEP)     \
     __ENTRY(HJ_PROCESS_WAIT)      \
     __ENTRY(HJ_MEMORY_ALLOC)      \
+    __ENTRY(HJ_MEMORY_MAP)        \
     __ENTRY(HJ_MEMORY_FREE)       \
     __ENTRY(HJ_MEMORY_INCLUDE)    \
     __ENTRY(HJ_MEMORY_GET_HANDLE) \
@@ -119,6 +120,7 @@ Result hj_process_sleep(int time);
 Result hj_process_wait(int tid, int *user_exit_value);
 
 Result hj_memory_alloc(size_t size, uintptr_t *out_address);
+Result hj_memory_map(uintptr_t address, size_t size, int flags);
 Result hj_memory_free(uintptr_t address);
 Result hj_memory_include(int handle, uintptr_t *out_address, size_t *out_size);
 Result hj_memory_get_handle(uintptr_t address, int *out_handle);

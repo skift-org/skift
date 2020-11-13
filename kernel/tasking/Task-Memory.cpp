@@ -20,7 +20,7 @@ static bool will_i_be_kill_if_i_allocate_that(Task *task, size_t size)
     }
 }
 
-static void task_kill_me_if_too_greedy(Task *task, size_t size)
+static void kill_me_if_too_greedy(Task *task, size_t size)
 {
     if (will_i_be_kill_if_i_allocate_that(task, size))
     {
@@ -103,7 +103,7 @@ bool task_memory_mapping_colides(Task *task, uintptr_t address, size_t size)
 
 Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 {
-    task_kill_me_if_too_greedy(task, size);
+    kill_me_if_too_greedy(task, size);
 
     auto memory_object = memory_object_create(size);
 
@@ -118,7 +118,7 @@ Result task_memory_alloc(Task *task, size_t size, uintptr_t *out_address)
 
 Result task_memory_map(Task *task, uintptr_t address, size_t size, MemoryFlags flags)
 {
-    task_kill_me_if_too_greedy(task, size);
+    kill_me_if_too_greedy(task, size);
 
     if (task_memory_mapping_colides(task, address, size))
     {
@@ -160,7 +160,7 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
     if (will_i_be_kill_if_i_allocate_that(task, memory_object->range().size()))
     {
         memory_object_deref(memory_object);
-        task_kill_me_if_too_greedy(task, memory_object->range().size());
+        kill_me_if_too_greedy(task, memory_object->range().size());
     }
 
     if (!memory_object)

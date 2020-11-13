@@ -163,6 +163,16 @@ Result hj_memory_alloc(size_t size, uintptr_t *out_address)
     return task_memory_alloc(scheduler_running(), size, out_address);
 }
 
+Result hj_memory_map(uintptr_t address, size_t size, int flags)
+{
+    if (!syscall_validate_ptr(address, size))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_memory_map(scheduler_running(), address, size, flags);
+}
+
 Result hj_memory_free(uintptr_t address)
 {
     return task_memory_free(scheduler_running(), address);
@@ -568,6 +578,7 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_PROCESS_SLEEP] = reinterpret_cast<SyscallHandler>(hj_process_sleep),
     [HJ_PROCESS_WAIT] = reinterpret_cast<SyscallHandler>(hj_process_wait),
     [HJ_MEMORY_ALLOC] = reinterpret_cast<SyscallHandler>(hj_memory_alloc),
+    [HJ_MEMORY_MAP] = reinterpret_cast<SyscallHandler>(hj_memory_map),
     [HJ_MEMORY_FREE] = reinterpret_cast<SyscallHandler>(hj_memory_free),
     [HJ_MEMORY_INCLUDE] = reinterpret_cast<SyscallHandler>(hj_memory_include),
     [HJ_MEMORY_GET_HANDLE] = reinterpret_cast<SyscallHandler>(hj_memory_get_handle),

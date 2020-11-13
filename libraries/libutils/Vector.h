@@ -99,6 +99,8 @@ public:
     {
         if (this != &other)
         {
+            clear();
+
             ensure_capacity(other.count());
             _count = other.count();
             typed_copy(_storage, other._storage, _count);

@@ -133,7 +133,7 @@ public:
 
     void dispatch_event(Event *event);
 
-    void repaint(Rectangle rectangle);
+    virtual void repaint(Painter &painter, Rectangle rectangle);
 
     void repaint_dirty();
 

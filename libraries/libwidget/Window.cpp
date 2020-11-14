@@ -108,9 +108,8 @@ Window::~Window()
     delete header_container;
 }
 
-void Window::repaint(Rectangle rectangle)
+void Window::repaint(Painter &painter, Rectangle rectangle)
 {
-    Painter &painter = *backbuffer_painter;
 
     if (_flags & WINDOW_TRANSPARENT)
     {
@@ -162,9 +161,10 @@ void Window::repaint_dirty()
     }
 
     Rectangle repaited_regions = Rectangle::empty();
+    Painter &painter = *backbuffer_painter;
 
     _dirty_rects.foreach ([&](Rectangle &rect) {
-        repaint(rect);
+        repaint(painter, rect);
 
         if (repaited_regions.is_empty())
         {
@@ -250,7 +250,7 @@ void Window::size(Vec2i size)
     bound(bound_on_screen().resized(size));
 
     Event size_changed = {};
-    size_changed.type = Event::WINDOW_SIZE_CHANGED;
+    size_changed.type = Event::WINDOW_RESIZED;
     dispatch_event(&size_changed);
 }
 
@@ -264,7 +264,7 @@ void Window::show()
     window_change_framebuffer_if_needed(this);
 
     relayout();
-    repaint(bound());
+    repaint(*backbuffer_painter, bound());
 
     application_show_window(this);
 }
@@ -346,10 +346,6 @@ void window_do_resize(Window *window, Vec2i mouse_position)
     Event resize_event = {};
     resize_event.type = Event::WINDOW_RESIZED;
     window->dispatch_event(&resize_event);
-
-    Event size_changed = {};
-    size_changed.type = Event::WINDOW_SIZE_CHANGED;
-    window->dispatch_event(&size_changed);
 }
 
 void window_end_resize(Window *window)
@@ -722,7 +718,6 @@ void Window::bound(Rectangle new_bound)
         return;
 
     application_resize_window(this, _bound);
-
     window_change_framebuffer_if_needed(this);
 
     should_relayout();

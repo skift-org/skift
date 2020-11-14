@@ -40,7 +40,6 @@ struct Event
 
         WINDOW_CLOSING,
         WINDOW_RESIZED,
-		WINDOW_SIZE_CHANGED,
 
         MOUSE_MOVE,
         MOUSE_ENTER,

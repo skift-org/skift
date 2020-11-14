@@ -157,6 +157,16 @@ private:
     RingBuffer _peek{PEEK_SIZE};
     Stream *_stream = nullptr;
 
+    void refill()
+    {
+        char c = stream_getchar(_stream);
+
+        if (!handle_has_error(_stream))
+        {
+            _peek.put(c);
+        }
+    }
+
 public:
     StreamScanner(Stream *stream)
     {
@@ -173,22 +183,26 @@ public:
     {
         if (_peek.empty())
         {
-            _peek.put(stream_getchar(_stream));
+            refill();
         }
 
-        _peek.get();
+        if (!ended())
+        {
+            _peek.get();
+        }
     }
 
     char peek(size_t peek) override
     {
+
+        while (peek >= _peek.used() && !ended())
+        {
+            refill();
+        }
+
         if (ended())
         {
             return '\0';
-        }
-
-        while (peek >= _peek.used())
-        {
-            _peek.put(stream_getchar(_stream));
         }
 
         return _peek.peek(peek);

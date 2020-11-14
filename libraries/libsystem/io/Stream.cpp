@@ -179,9 +179,10 @@ int stream_read_buffered(Stream *stream, void *buffer, size_t size)
 
 size_t stream_read(Stream *stream, void *buffer, size_t size)
 {
-
     if (!stream)
         return 0;
+
+    size_t result = 0;
 
     if (stream->has_unget && size >= 1)
     {
@@ -189,9 +190,9 @@ size_t stream_read(Stream *stream, void *buffer, size_t size)
         stream->has_unget = false;
         buffer = &((char *)buffer)[1];
         size--;
-    }
 
-    size_t result = 0;
+        result = 1;
+    }
 
     if (stream->write_mode == STREAM_BUFFERED_NONE)
     {

@@ -2,6 +2,7 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/math/Dimension.h>
+#include <libsystem/math/Math.h>
 
 template <typename Scalar>
 class Vec2
@@ -18,6 +19,11 @@ public:
 
     Scalar x() const { return _x; }
     Scalar y() const { return _y; }
+
+    Scalar length()
+    {
+        return sqrt(pow(_x, 2) + pow(_y, 2));
+    }
 
     Vec2 extract_x() const { return Vec2(_x, 0); }
     Vec2 extract_y() const { return Vec2(0, _y); }
@@ -110,7 +116,29 @@ public:
         Scalar xx = MAX(min.x(), MIN(max.x(), x()));
         Scalar yy = MAX(min.y(), MIN(max.y(), y()));
 
-        return Vec2(xx, yy);
+        return {xx, yy};
+    }
+
+    Vec2 normalized()
+    {
+        Scalar magn = length();
+
+        if (magn != 0)
+        {
+            Scalar xx = _x / length();
+            Scalar yy = _y / length();
+
+            return {xx, yy};
+        }
+        else
+        {
+            return {0, 0};
+        }
+    }
+
+    Vec2 vector_to(Vec2 destination)
+    {
+        return (destination - *this).normalized();
     }
 
     Scalar component(Dimension dim)

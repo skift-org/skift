@@ -107,6 +107,8 @@ public:
 
     Vec2i size() const { return Vec2i(_width, _height); }
 
+    Vec2i center() const { return position() + size() / 2; }
+
     Vec2i top_left() const
     {
         return position();

@@ -1,0 +1,6 @@
+{
+    "name": "Neko",
+    "comment": "Cursor-chasing cat screenmate.",
+    "icon": "cat",
+    "command": "neko"
+}

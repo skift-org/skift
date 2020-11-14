@@ -35,7 +35,8 @@ Window *manager_get_window_at(Vec2i position)
     Window *result = nullptr;
 
     manager_iterate_front_to_back([&](Window *window) {
-        if (window->cursor_capture_bound().contains(position))
+        if (window->cursor_capture_bound().contains(position) &&
+            (window->flags() & WINDOW_NO_FOCUS) == 0)
         {
             result = window;
             return Iteration::STOP;

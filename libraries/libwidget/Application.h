@@ -33,3 +33,5 @@ void application_move_window(Window *window, Vec2i position);
 void application_resize_window(Window *window, Rectangle bound);
 
 void application_window_change_cursor(Window *window, CursorState state);
+
+Vec2i application_get_mouse_position();

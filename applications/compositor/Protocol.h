@@ -21,6 +21,9 @@ enum CompositorMessageType
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
     COMPOSITOR_MESSAGE_SET_RESOLUTION,
     COMPOSITOR_MESSAGE_SET_WALLPAPER,
+
+    COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
+    COMPOSITOR_MESSAGE_MOUSE_POSITION,
 };
 
 #define WINDOW_NONE (0)
@@ -128,12 +131,16 @@ struct CompositorChangedResolution
     Rectangle resolution;
 };
 
+struct CompositorMousePosition
+{
+    Vec2i position;
+};
+
 struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union
-    {
+    union {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;
@@ -146,5 +153,7 @@ struct CompositorMessage
         CompositorSetResolution set_resolution;
         CompositorSetWallaper set_wallaper;
         CompositorChangedResolution changed_resolution;
+
+        CompositorMousePosition mouse_position;
     };
 };

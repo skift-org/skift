@@ -409,3 +409,25 @@ void application_window_change_cursor(Window *window, CursorState state)
 
     application_send_message(message);
 }
+
+Vec2i application_get_mouse_position()
+{
+    CompositorMessage message = {
+        .type = COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
+        .mouse_position = {},
+    };
+
+    application_send_message(message);
+
+    auto resp = application_wait_for_message(COMPOSITOR_MESSAGE_MOUSE_POSITION);
+
+    auto result = Vec2i::zero();
+
+    if (resp)
+    {
+        result = resp->mouse_position.position;
+        free(resp);
+    }
+
+    return result;
+}

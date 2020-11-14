@@ -147,6 +147,15 @@ void client_handle_set_wallpaper(Client *client, CompositorSetWallaper set_wallp
     }
 }
 
+void client_handle_get_mouse_position(Client *client)
+{
+    CompositorMessage message = {};
+    message.type = COMPOSITOR_MESSAGE_MOUSE_POSITION;
+    message.mouse_position.position = cursor_position();
+
+    client->send_message(message);
+}
+
 void client_request_callback(Client *client, Connection *connection, PollEvent events)
 {
     assert(events & POLL_READ);
@@ -206,6 +215,10 @@ void client_request_callback(Client *client, Connection *connection, PollEvent e
 
     case COMPOSITOR_MESSAGE_SET_WALLPAPER:
         client_handle_set_wallpaper(client, message.set_wallaper);
+        break;
+
+    case COMPOSITOR_MESSAGE_GET_MOUSE_POSITION:
+        client_handle_get_mouse_position(client);
         break;
 
     default:

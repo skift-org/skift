@@ -169,3 +169,8 @@ Rectangle cursor_dirty_bound()
 {
     return cursor_dirty_bound_from_position(_mouse_position);
 }
+
+Vec2i cursor_position()
+{
+    return _mouse_position;
+}

@@ -157,15 +157,15 @@ Result task_memory_include(Task *task, int handle, uintptr_t *out_address, size_
 {
     auto memory_object = memory_object_by_id(handle);
 
+    if (!memory_object)
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
     if (will_i_be_kill_if_i_allocate_that(task, memory_object->range().size()))
     {
         memory_object_deref(memory_object);
         kill_me_if_too_greedy(task, memory_object->range().size());
-    }
-
-    if (!memory_object)
-    {
-        return ERR_BAD_ADDRESS;
     }
 
     auto memory_mapping = task_memory_mapping_create(task, memory_object);

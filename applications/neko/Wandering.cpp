@@ -22,10 +22,6 @@ Wandering::Wandering()
 {
 }
 
-Wandering::~Wandering()
-{
-}
-
 void Wandering::update(Neko &neko)
 {
     auto distance = neko.position().distance_to(_destination);
@@ -47,7 +43,7 @@ void Wandering::update(Neko &neko)
 
 Animation Wandering::animation(Neko &neko)
 {
-    return vector_to_move_animation(neko.position().vector_to(_destination));
+    return animation_from_vector(neko.position().vector_to(_destination));
 }
 
 } // namespace neko

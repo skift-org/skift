@@ -16,10 +16,6 @@ ChaseMouse::ChaseMouse() : _destination(pick_destination())
 {
 }
 
-ChaseMouse::~ChaseMouse()
-{
-}
-
 void ChaseMouse::update(Neko &neko)
 {
     auto distance = neko.position().distance_to(_destination);
@@ -39,7 +35,7 @@ void ChaseMouse::update(Neko &neko)
 
 Animation ChaseMouse::animation(Neko &neko)
 {
-    return vector_to_move_animation(neko.position().vector_to(_destination));
+    return animation_from_vector(neko.position().vector_to(_destination));
 }
 
 } // namespace neko

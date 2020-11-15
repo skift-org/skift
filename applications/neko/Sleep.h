@@ -13,8 +13,6 @@ private:
 public:
     Sleep();
 
-    ~Sleep() override;
-
     void update(Neko &neko) override;
 
     Animation animation(Neko &neko) override;

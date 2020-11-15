@@ -7,7 +7,6 @@ int main(int argc, char **argv)
     application_initialize(argc, argv);
 
     auto window = new neko::Window();
-
     window->show();
 
     return application_run();

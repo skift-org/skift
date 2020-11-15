@@ -12,8 +12,8 @@ namespace neko
 class Window : public ::Window
 {
 private:
-    Neko                   _neko;
-    OwnPtr<Timer>          _update_timer;
+    Neko _neko;
+    OwnPtr<Timer> _update_timer;
     OwnPtr<Observer<Neko>> _neko_observer;
 
 public:
@@ -32,10 +32,6 @@ public:
         });
 
         _update_timer->start();
-    }
-
-    ~Window()
-    {
     }
 
     void repaint(Painter &painter, Rectangle rectangle)

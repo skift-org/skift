@@ -13,9 +13,6 @@ Sleep::Sleep()
     _last_mouse_position = application_get_mouse_position();
 }
 
-Sleep::~Sleep()
-{
-}
 
 void Sleep::update(Neko &neko)
 {

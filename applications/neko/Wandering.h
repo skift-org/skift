@@ -19,8 +19,6 @@ private:
 public:
     Wandering();
 
-    ~Wandering() override;
-
     void update(Neko &neko) override;
 
     Animation animation(Neko &neko) override;

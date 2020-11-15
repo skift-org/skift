@@ -15,8 +15,6 @@ private:
 public:
     Itching();
 
-    ~Itching() override;
-
     void update(Neko &neko) override;
 
     Animation animation(Neko &neko) override;

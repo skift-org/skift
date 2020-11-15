@@ -13,10 +13,6 @@ Itching::Itching()
 {
 }
 
-Itching::~Itching()
-{
-}
-
 void Itching::update(Neko &neko)
 {
     auto new_mouse_position = application_get_mouse_position();

@@ -13,10 +13,6 @@ Playing::Playing()
 {
 }
 
-Playing::~Playing()
-{
-}
-
 void Playing::update(Neko &neko)
 {
     auto new_mouse_position = application_get_mouse_position();

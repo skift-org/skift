@@ -2,6 +2,8 @@
 
 #include <libsystem/math/Vec2.h>
 
+#include "neko/Sprites.h"
+
 namespace neko
 {
 
@@ -27,6 +29,8 @@ enum class Animation : int
     TOGI_RIGHT,
 };
 
-Animation vector_to_move_animation(Vec2f);
+Animation animation_from_vector(Vec2f vec);
+
+Sprite animation_play(Animation anim, int tick);
 
 } // namespace neko

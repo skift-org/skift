@@ -18,10 +18,6 @@ Idle::Idle()
 {
 }
 
-Idle::~Idle()
-{
-}
-
 void Idle::update(Neko &neko)
 {
     if (_timer < neko.tick())

@@ -13,8 +13,6 @@ private:
 public:
     Surprised();
 
-    ~Surprised() override;
-
     void update(Neko &neko) override;
 
     Animation animation(Neko &neko) override;

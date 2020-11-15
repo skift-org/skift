@@ -11,10 +11,6 @@ Surprised::Surprised()
 {
 }
 
-Surprised::~Surprised()
-{
-}
-
 void Surprised::update(Neko &neko)
 {
     if (neko.tick() > 2)

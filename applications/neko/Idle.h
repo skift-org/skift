@@ -11,12 +11,10 @@ class Idle : public Behavior
 {
 private:
     Random _random;
-    int    _timer;
+    int _timer;
 
 public:
     Idle();
-
-    ~Idle() override;
 
     void update(Neko &neko) override;
 

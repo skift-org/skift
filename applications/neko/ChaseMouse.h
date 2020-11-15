@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "neko/Behavior.h"
 
 namespace neko
@@ -15,8 +14,6 @@ private:
 
 public:
     ChaseMouse();
-
-    ~ChaseMouse() override;
 
     void update(Neko &neko) override;
 

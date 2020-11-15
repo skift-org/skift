@@ -13,15 +13,15 @@ namespace neko
 class Neko : public Observable<Neko>
 {
 private:
-    int              _tick = 0;
-    Vec2f            _position;
-    RefPtr<Bitmap>   _sprites;
+    int _tick = 0;
+    Vec2f _position;
+    RefPtr<Bitmap> _sprites;
     OwnPtr<Behavior> _behavior;
 
     Rectangle sprite();
 
 public:
-    static constexpr int SIZE  = 32;
+    static constexpr int SIZE = 32;
     static constexpr int SPEED = 16;
 
     int tick() { return _tick; }
@@ -29,8 +29,6 @@ public:
     Vec2f position() { return _position; }
 
     Neko(Vec2f starting_position);
-
-    ~Neko();
 
     void update();
 

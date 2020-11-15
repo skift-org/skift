@@ -146,29 +146,33 @@ run: run-qemu
 QEMU=qemu-system-x86_64
 QEMU_FLAGS=-m $(CONFIG_MEMORY)M \
 		  -serial stdio \
-		  -rtc base=localtime \
-		  -device ac97
+		  -rtc base=localtime
 
 QEMU_DISK?=-cdrom $(BOOTDISK)
 
 QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 				 -device virtio-serial \
 				 -nic user,model=virtio-net-pci \
-				 -vga virtio  \
-				 -device ac97
+				 -vga virtio
 
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA)
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -device ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -soundhw ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw ac97
 
 run-qemu-no-kvm: $(BOOTDISK)
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA)
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 || \
+        $(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw ac97
 
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
-	$(QEMU) $(QEMU_DISK)$(QEMU_FLAGS) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -device ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -soundhw ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -device ac97 || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -soundhw ac97
 
 .PHONY: run-bochs
 run-bochs: $(BOOTDISK)

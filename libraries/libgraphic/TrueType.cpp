@@ -10,11 +10,6 @@
 static_assert(TRUETYPE_MAX_OVERSAMPLE < 256, "TRUETYPE_MAX_OVERSAMPLE cannot be > 255");
 static_assert((TRUETYPE_MAX_OVERSAMPLE & (TRUETYPE_MAX_OVERSAMPLE - 1)) == 0, "Test oversample pow2");
 
-//////////////////////////////////////////////////////////////////////////
-//
-// Slice helpers to parse data from file
-//
-
 static Slice truetype_cff_get_index(Slice *slice)
 {
     int start = slice->cursor;
@@ -158,7 +153,6 @@ static Slice truetype_cff_index_get(Slice b, int i)
 
 #define ttBYTE(p) (*(uint8_t *)(p))
 #define ttCHAR(p) (*(int8_t *)(p))
-#define ttFixed(p) ttLONG(p)
 
 static uint16_t ttUSHORT(uint8_t *p)
 {
@@ -175,18 +169,13 @@ static uint32_t ttULONG(uint8_t *p)
     return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
 }
 
-static int32_t ttLONG(uint8_t *p)
-{
-    return (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
-}
-
 #define truetype_tag4(p, c0, c1, c2, c3) \
     ((p)[0] == (c0) && (p)[1] == (c1) && (p)[2] == (c2) && (p)[3] == (c3))
 
 #define truetype_tag(p, str) \
     truetype_tag4(p, str[0], str[1], str[2], str[3])
 
-static int truetype_isfont(uint8_t *font)
+int truetype_isfont(uint8_t *font)
 {
     if (truetype_tag4(font, '1', 0, 0, 0)) // check the version number
     {
@@ -217,10 +206,10 @@ static int truetype_isfont(uint8_t *font)
 }
 
 // @OPTIMIZE: binary search
-static uint32_t truetype_find_table(uint8_t *data, uint32_t fontstart, const char *tag)
+static uint32_t truetype_find_table(uint8_t *data, const char *tag)
 {
-    int32_t num_tables = ttUSHORT(data + fontstart + 4);
-    uint32_t tabledir = fontstart + 12;
+    int32_t num_tables = ttUSHORT(data + 4);
+    uint32_t tabledir = 12;
 
     for (int32_t i = 0; i < num_tables; ++i)
     {
@@ -232,45 +221,6 @@ static uint32_t truetype_find_table(uint8_t *data, uint32_t fontstart, const cha
         }
     }
 
-    return 0;
-}
-
-static int truetype_GetFontOffsetForIndex_internal(unsigned char *font_collection, int index)
-{
-    // if it's just a font, there's only one valid index
-    if (truetype_isfont(font_collection))
-        return index == 0 ? 0 : -1;
-
-    // check if it's a TTC
-    if (truetype_tag(font_collection, "ttcf"))
-    {
-        // version 1?
-        if (ttULONG(font_collection + 4) == 0x00010000 || ttULONG(font_collection + 4) == 0x00020000)
-        {
-            int32_t n = ttLONG(font_collection + 8);
-            if (index >= n)
-                return -1;
-            return ttULONG(font_collection + 12 + index * 4);
-        }
-    }
-    return -1;
-}
-
-static int truetype_GetNumberOfFonts_internal(unsigned char *font_collection)
-{
-    // if it's just a font, there's only one valid font
-    if (truetype_isfont(font_collection))
-        return 1;
-
-    // check if it's a TTC
-    if (truetype_tag(font_collection, "ttcf"))
-    {
-        // version 1?
-        if (ttULONG(font_collection + 4) == 0x00010000 || ttULONG(font_collection + 4) == 0x00020000)
-        {
-            return ttLONG(font_collection + 8);
-        }
-    }
     return 0;
 }
 
@@ -289,23 +239,23 @@ static Slice truetype_get_subrs(Slice cff, Slice fontdict)
     return truetype_cff_get_index(&cff);
 }
 
-static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *data, int fontstart)
+static int truetype_InitFont_internal(truetype::File *info, unsigned char *data)
 {
     info->data = data;
-    info->fontstart = fontstart;
     info->cff = slice_create(nullptr, 0);
 
-    uint32_t cmap = truetype_find_table(data, fontstart, "cmap"); // required
-    info->loca = truetype_find_table(data, fontstart, "loca");    // required
-    info->head = truetype_find_table(data, fontstart, "head");    // required
-    info->glyf = truetype_find_table(data, fontstart, "glyf");    // required
-    info->hhea = truetype_find_table(data, fontstart, "hhea");    // required
-    info->hmtx = truetype_find_table(data, fontstart, "hmtx");    // required
-    info->kern = truetype_find_table(data, fontstart, "kern");    // not required
-    info->gpos = truetype_find_table(data, fontstart, "GPOS");    // not required
+    uint32_t cmap = truetype_find_table(data, "cmap"); // required
+    info->loca = truetype_find_table(data, "loca");    // required
+    info->head = truetype_find_table(data, "head");    // required
+    info->glyf = truetype_find_table(data, "glyf");    // required
+    info->hhea = truetype_find_table(data, "hhea");    // required
+    info->hmtx = truetype_find_table(data, "hmtx");    // required
+    info->kern = truetype_find_table(data, "kern");    // not required
+    info->gpos = truetype_find_table(data, "GPOS");    // not required
 
     if (!cmap || !info->head || !info->hhea || !info->hmtx)
         return 0;
+
     if (info->glyf)
     {
         // required for truetype
@@ -319,7 +269,8 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
         uint32_t cstype = 2, charstrings = 0, fdarrayoff = 0, fdselectoff = 0;
         uint32_t cff;
 
-        cff = truetype_find_table(data, fontstart, "CFF ");
+        cff = truetype_find_table(data, "CFF ");
+
         if (!cff)
             return 0;
 
@@ -368,7 +319,7 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
         info->charstrings = truetype_cff_get_index(&b);
     }
 
-    uint32_t t = truetype_find_table(data, fontstart, "maxp");
+    uint32_t t = truetype_find_table(data, "maxp");
 
     if (t)
         info->numGlyphs = ttUSHORT(data + t + 4);
@@ -410,7 +361,7 @@ static int truetype_InitFont_internal(truetype_fontinfo *info, unsigned char *da
     return 1;
 }
 
-int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint)
+int truetype_FindGlyphIndex(const truetype::File *info, int unicode_codepoint)
 {
     uint8_t *data = info->data;
     uint32_t index_map = info->index_map;
@@ -420,16 +371,24 @@ int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint
     {
         // apple byte encoding
         int32_t bytes = ttUSHORT(data + index_map + 2);
+
         if (unicode_codepoint < bytes - 6)
+        {
             return ttBYTE(data + index_map + 6 + unicode_codepoint);
+        }
+
         return 0;
     }
     else if (format == 6)
     {
         uint32_t first = ttUSHORT(data + index_map + 6);
         uint32_t count = ttUSHORT(data + index_map + 8);
+
         if ((uint32_t)unicode_codepoint >= first && (uint32_t)unicode_codepoint < first + count)
+        {
             return ttUSHORT(data + index_map + 10 + (unicode_codepoint - first) * 2);
+        }
+
         return 0;
     }
     else if (format == 2)
@@ -518,11 +477,6 @@ int truetype_FindGlyphIndex(const truetype_fontinfo *info, int unicode_codepoint
     ASSERT_NOT_REACHED();
 }
 
-int truetype_GetCodepointShape(const truetype_fontinfo *info, int unicode_codepoint, truetype_vertex **vertices)
-{
-    return truetype_GetGlyphShape(info, truetype_FindGlyphIndex(info, unicode_codepoint), vertices);
-}
-
 static void truetype_setvertex(truetype_vertex *v, uint8_t type, int32_t x, int32_t y, int32_t cx, int32_t cy)
 {
     v->type = type;
@@ -532,7 +486,7 @@ static void truetype_setvertex(truetype_vertex *v, uint8_t type, int32_t x, int3
     v->cy = (int16_t)cy;
 }
 
-static int truetype_GetGlyfOffset(const truetype_fontinfo *info, int glyph_index)
+static int truetype_GetGlyfOffset(const truetype::File *info, int glyph_index)
 {
     int g1, g2;
 
@@ -557,9 +511,9 @@ static int truetype_GetGlyfOffset(const truetype_fontinfo *info, int glyph_index
     return g1 == g2 ? -1 : g1; // if length is 0, return -1
 }
 
-static int truetype_GetGlyphInfoT2(const truetype_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1);
+static int truetype_GetGlyphInfoT2(const truetype::File *info, int glyph_index, int *x0, int *y0, int *x1, int *y1);
 
-int truetype_GetGlyphBox(const truetype_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1)
+int truetype_GetGlyphBox(const truetype::File *info, int glyph_index, int *x0, int *y0, int *x1, int *y1)
 {
     if (info->cff.size)
     {
@@ -570,39 +524,54 @@ int truetype_GetGlyphBox(const truetype_fontinfo *info, int glyph_index, int *x0
         int g = truetype_GetGlyfOffset(info, glyph_index);
 
         if (g < 0)
+        {
             return 0;
+        }
 
         if (x0)
+        {
             *x0 = ttSHORT(info->data + g + 2);
+        }
 
         if (y0)
+        {
             *y0 = ttSHORT(info->data + g + 4);
+        }
 
         if (x1)
+        {
             *x1 = ttSHORT(info->data + g + 6);
+        }
 
         if (y1)
+        {
             *y1 = ttSHORT(info->data + g + 8);
+        }
     }
 
     return 1;
 }
 
-int truetype_GetCodepointBox(const truetype_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1)
+int truetype_GetCodepointBox(const truetype::File *info, int codepoint, int *x0, int *y0, int *x1, int *y1)
 {
     return truetype_GetGlyphBox(info, truetype_FindGlyphIndex(info, codepoint), x0, y0, x1, y1);
 }
 
-int truetype_IsGlyphEmpty(const truetype_fontinfo *info, int glyph_index)
+int truetype_IsGlyphEmpty(const truetype::File *info, int glyph_index)
 {
-    int16_t numberOfContours;
-    int g;
     if (info->cff.size)
+    {
         return truetype_GetGlyphInfoT2(info, glyph_index, nullptr, nullptr, nullptr, nullptr) == 0;
-    g = truetype_GetGlyfOffset(info, glyph_index);
+    }
+
+    int g = truetype_GetGlyfOffset(info, glyph_index);
+
     if (g < 0)
+    {
         return 1;
-    numberOfContours = ttSHORT(info->data + g);
+    }
+
+    auto numberOfContours = ttSHORT(info->data + g);
     return numberOfContours == 0;
 }
 
@@ -612,20 +581,27 @@ static int truetype_close_shape(truetype_vertex *vertices, int num_vertices, int
     if (start_off)
     {
         if (was_off)
+        {
             truetype_setvertex(&vertices[num_vertices++], TRUETYPE_vcurve, (cx + scx) >> 1, (cy + scy) >> 1, cx, cy);
+        }
+
         truetype_setvertex(&vertices[num_vertices++], TRUETYPE_vcurve, sx, sy, scx, scy);
     }
     else
     {
         if (was_off)
+        {
             truetype_setvertex(&vertices[num_vertices++], TRUETYPE_vcurve, sx, sy, cx, cy);
+        }
         else
+        {
             truetype_setvertex(&vertices[num_vertices++], TRUETYPE_vline, sx, sy, 0, 0);
+        }
     }
     return num_vertices;
 }
 
-static int truetype_GetGlyphShapeTT(const truetype_fontinfo *info, int glyph_index, truetype_vertex **pvertices)
+static int truetype_GetGlyphShapeTT(const truetype::File *info, int glyph_index, truetype_vertex **pvertices)
 {
     int16_t numberOfContours;
     uint8_t *endPtsOfContours;
@@ -1009,7 +985,7 @@ static Slice truetype_get_subr(Slice idx, int n)
     return truetype_cff_index_get(idx, n);
 }
 
-static Slice truetype_cid_get_glyph_subrs(const truetype_fontinfo *info, int glyph_index)
+static Slice truetype_cid_get_glyph_subrs(const truetype::File *info, int glyph_index)
 {
     Slice fdselect = info->fdselect;
     int nranges, start, end, v, fmt, fdselector = -1, i;
@@ -1043,7 +1019,7 @@ static Slice truetype_cid_get_glyph_subrs(const truetype_fontinfo *info, int gly
     return truetype_get_subrs(info->cff, truetype_cff_index_get(info->fontdicts, fdselector));
 }
 
-static int truetype_run_charstring(const truetype_fontinfo *info, int glyph_index, truetype_csctx *c)
+static int truetype_run_charstring(const truetype::File *info, int glyph_index, truetype_csctx *c)
 {
     int in_header = 1, maskbits = 0, subr_stack_height = 0, sp = 0, v, i, b0;
     int has_subrs = 0, clear_stack;
@@ -1346,7 +1322,7 @@ static int truetype_run_charstring(const truetype_fontinfo *info, int glyph_inde
 #undef TRUETYPE_CSERR
 }
 
-static int truetype_GetGlyphShapeT2(const truetype_fontinfo *info, int glyph_index, truetype_vertex **pvertices)
+static int truetype_GetGlyphShapeT2(const truetype::File *info, int glyph_index, truetype_vertex **pvertices)
 {
     // runs the charstring twice, once to count and once to output (to avoid realloc)
     truetype_csctx count_ctx = TRUETYPE_CSCTX_INIT(1);
@@ -1365,22 +1341,35 @@ static int truetype_GetGlyphShapeT2(const truetype_fontinfo *info, int glyph_ind
     return 0;
 }
 
-static int truetype_GetGlyphInfoT2(const truetype_fontinfo *info, int glyph_index, int *x0, int *y0, int *x1, int *y1)
+static int truetype_GetGlyphInfoT2(const truetype::File *info, int glyph_index, int *x0, int *y0, int *x1, int *y1)
 {
     truetype_csctx c = TRUETYPE_CSCTX_INIT(1);
     int r = truetype_run_charstring(info, glyph_index, &c);
+
     if (x0)
+    {
         *x0 = r ? c.min_x : 0;
+    }
+
     if (y0)
+    {
         *y0 = r ? c.min_y : 0;
+    }
+
     if (x1)
+    {
         *x1 = r ? c.max_x : 0;
+    }
+
     if (y1)
+    {
         *y1 = r ? c.max_y : 0;
+    }
+
     return r ? c.num_vertices : 0;
 }
 
-int truetype_GetGlyphShape(const truetype_fontinfo *info, int glyph_index, truetype_vertex **pvertices)
+int truetype_GetGlyphShape(const truetype::File *info, int glyph_index, truetype_vertex **pvertices)
 {
     if (!info->cff.size)
         return truetype_GetGlyphShapeTT(info, glyph_index, pvertices);
@@ -1388,58 +1377,78 @@ int truetype_GetGlyphShape(const truetype_fontinfo *info, int glyph_index, truet
         return truetype_GetGlyphShapeT2(info, glyph_index, pvertices);
 }
 
-void truetype_GetGlyphHMetrics(const truetype_fontinfo *info, int glyph_index, int *advanceWidth, int *leftSideBearing)
+void truetype_GetGlyphHMetrics(const truetype::File *info, int glyph_index, int *advanceWidth, int *leftSideBearing)
 {
     uint16_t numOfLongHorMetrics = ttUSHORT(info->data + info->hhea + 34);
+
     if (glyph_index < numOfLongHorMetrics)
     {
         if (advanceWidth)
+        {
             *advanceWidth = ttSHORT(info->data + info->hmtx + 4 * glyph_index);
+        }
+
         if (leftSideBearing)
+        {
             *leftSideBearing = ttSHORT(info->data + info->hmtx + 4 * glyph_index + 2);
+        }
     }
     else
     {
         if (advanceWidth)
+        {
             *advanceWidth = ttSHORT(info->data + info->hmtx + 4 * (numOfLongHorMetrics - 1));
+        }
+
         if (leftSideBearing)
+        {
             *leftSideBearing = ttSHORT(info->data + info->hmtx + 4 * numOfLongHorMetrics + 2 * (glyph_index - numOfLongHorMetrics));
+        }
     }
 }
 
-int truetype_GetKerningTableLength(const truetype_fontinfo *info)
+int truetype_GetKerningTableLength(const truetype::File *info)
 {
     uint8_t *data = info->data + info->kern;
 
     // we only look at the first table. it must be 'horizontal' and format 0.
     if (!info->kern)
+    {
         return 0;
-    if (ttUSHORT(data + 2) < 1) // number of tables, need at least 1
+    }
+
+    // number of tables, need at least 1
+    if (ttUSHORT(data + 2) < 1)
+    {
         return 0;
-    if (ttUSHORT(data + 8) != 1) // horizontal flag must be set in format
+    }
+
+    // horizontal flag must be set in format
+    if (ttUSHORT(data + 8) != 1)
+    {
         return 0;
+    }
 
     return ttUSHORT(data + 10);
 }
 
-int truetype_GetKerningTable(const truetype_fontinfo *info, truetype_kerningentry *table, int table_length)
+int truetype_GetKerningTable(const truetype::File *info, truetype_kerningentry *table, int table_length)
 {
-    uint8_t *data = info->data + info->kern;
-    int k, length;
+    int length = truetype_GetKerningTableLength(info);
 
-    // we only look at the first table. it must be 'horizontal' and format 0.
-    if (!info->kern)
+    if (!length)
+    {
         return 0;
-    if (ttUSHORT(data + 2) < 1) // number of tables, need at least 1
-        return 0;
-    if (ttUSHORT(data + 8) != 1) // horizontal flag must be set in format
-        return 0;
+    }
 
-    length = ttUSHORT(data + 10);
     if (table_length < length)
+    {
         length = table_length;
+    }
 
-    for (k = 0; k < length; k++)
+    uint8_t *data = info->data + info->kern;
+
+    for (int k = 0; k < length; k++)
     {
         table[k].glyph1 = ttUSHORT(data + 18 + (k * 6));
         table[k].glyph2 = ttUSHORT(data + 20 + (k * 6));
@@ -1449,34 +1458,42 @@ int truetype_GetKerningTable(const truetype_fontinfo *info, truetype_kerningentr
     return length;
 }
 
-static int truetype_GetGlyphKernInfoAdvance(const truetype_fontinfo *info, int glyph1, int glyph2)
+static int truetype_GetGlyphKernInfoAdvance(const truetype::File *info, int glyph1, int glyph2)
 {
     uint8_t *data = info->data + info->kern;
-    uint32_t needle, straw;
-    int l, r, m;
 
-    // we only look at the first table. it must be 'horizontal' and format 0.
-    if (!info->kern)
-        return 0;
-    if (ttUSHORT(data + 2) < 1) // number of tables, need at least 1
-        return 0;
-    if (ttUSHORT(data + 8) != 1) // horizontal flag must be set in format
-        return 0;
+    auto length = truetype_GetKerningTableLength(info);
 
-    l = 0;
-    r = ttUSHORT(data + 10) - 1;
-    needle = glyph1 << 16 | glyph2;
-    while (l <= r)
+    if (length == 0)
     {
-        m = (l + r) >> 1;
-        straw = ttULONG(data + 18 + (m * 6)); // note: unaligned read
-        if (needle < straw)
-            r = m - 1;
-        else if (needle > straw)
-            l = m + 1;
-        else
-            return ttSHORT(data + 22 + (m * 6));
+        return 0;
     }
+
+    int left = 0;
+    int right = length - 1;
+
+    uint32_t needle = glyph1 << 16 | glyph2;
+
+    while (left <= right)
+    {
+        int middle = (left + right) / 2;
+
+        uint32_t straw = ttULONG(data + 18 + (middle * 6)); // note: unaligned read
+
+        if (needle < straw)
+        {
+            right = middle - 1;
+        }
+        else if (needle > straw)
+        {
+            left = middle + 1;
+        }
+        else
+        {
+            return ttSHORT(data + 22 + (middle * 6));
+        }
+    }
+
     return 0;
 }
 
@@ -1490,20 +1507,29 @@ static int32_t truetype_GetCoverageIndex(uint8_t *coverageTable, int glyph)
         uint16_t glyphCount = ttUSHORT(coverageTable + 2);
 
         // Binary search.
-        int32_t l = 0, r = glyphCount - 1, m;
+        int32_t l = 0;
+        int32_t r = glyphCount - 1;
+
         int straw, needle = glyph;
 
         while (l <= r)
         {
             uint8_t *glyphArray = coverageTable + 4;
-            uint16_t glyphID;
-            m = (l + r) >> 1;
-            glyphID = ttUSHORT(glyphArray + 2 * m);
+
+            int32_t m = (l + r) >> 1;
+
+            uint16_t glyphID = ttUSHORT(glyphArray + 2 * m);
+
             straw = glyphID;
+
             if (needle < straw)
+            {
                 r = m - 1;
+            }
             else if (needle > straw)
+            {
                 l = m + 1;
+            }
             else
             {
                 return m;
@@ -1610,7 +1636,7 @@ static int32_t truetype_GetGlyphClass(uint8_t *classDefTable, int glyph)
 // Define to assert(x) if you want to break on unimplemented formats.
 #define TRUETYPE_GPOS_TODO_assert(x)
 
-static int32_t truetype_GetGlyphGPOSInfoAdvance(const truetype_fontinfo *info, int glyph1, int glyph2)
+static int32_t truetype_GetGlyphGPOSInfoAdvance(const truetype::File *info, int glyph1, int glyph2)
 {
     uint16_t lookupListOffset;
     uint8_t *lookupList;
@@ -1759,46 +1785,62 @@ static int32_t truetype_GetGlyphGPOSInfoAdvance(const truetype_fontinfo *info, i
     return 0;
 }
 
-int truetype_GetGlyphKernAdvance(const truetype_fontinfo *info, int g1, int g2)
+int truetype_GetGlyphKernAdvance(const truetype::File *info, int g1, int g2)
 {
-    int xAdvance = 0;
-
     if (info->gpos)
-        xAdvance += truetype_GetGlyphGPOSInfoAdvance(info, g1, g2);
+    {
+        return truetype_GetGlyphGPOSInfoAdvance(info, g1, g2);
+    }
     else if (info->kern)
-        xAdvance += truetype_GetGlyphKernInfoAdvance(info, g1, g2);
-
-    return xAdvance;
-}
-
-int truetype_GetCodepointKernAdvance(const truetype_fontinfo *info, int ch1, int ch2)
-{
-    if (!info->kern && !info->gpos) // if no kerning table, don't waste time looking up both codepoint->glyphs
+    {
+        return truetype_GetGlyphKernInfoAdvance(info, g1, g2);
+    }
+    else
+    {
         return 0;
-
-    return truetype_GetGlyphKernAdvance(info, truetype_FindGlyphIndex(info, ch1), truetype_FindGlyphIndex(info, ch2));
+    }
 }
 
-void truetype_GetCodepointHMetrics(const truetype_fontinfo *info, int codepoint, int *advanceWidth, int *leftSideBearing)
+int truetype_GetCodepointKernAdvance(const truetype::File *info, int ch1, int ch2)
+{
+    // if no kerning table, don't waste time looking up both codepoint->glyphs
+    if (!info->kern && !info->gpos)
+    {
+        return 0;
+    }
+
+    int left_glyph = truetype_FindGlyphIndex(info, ch1);
+    int right_glyph = truetype_FindGlyphIndex(info, ch2);
+
+    return truetype_GetGlyphKernAdvance(info, left_glyph, right_glyph);
+}
+
+void truetype_GetCodepointHMetrics(const truetype::File *info, int codepoint, int *advanceWidth, int *leftSideBearing)
 {
     truetype_GetGlyphHMetrics(info, truetype_FindGlyphIndex(info, codepoint), advanceWidth, leftSideBearing);
 }
 
-void truetype_GetFontVMetrics(const truetype_fontinfo *info, int *ascent, int *descent, int *lineGap)
+void truetype_GetFontVMetrics(const truetype::File *info, int *ascent, int *descent, int *lineGap)
 {
     if (ascent)
+    {
         *ascent = ttSHORT(info->data + info->hhea + 4);
+    }
 
     if (descent)
+    {
         *descent = ttSHORT(info->data + info->hhea + 6);
+    }
 
     if (lineGap)
+    {
         *lineGap = ttSHORT(info->data + info->hhea + 8);
+    }
 }
 
-int truetype_GetFontVMetricsOS2(const truetype_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap)
+int truetype_GetFontVMetricsOS2(const truetype::File *info, int *typoAscent, int *typoDescent, int *typoLineGap)
 {
-    int tab = truetype_find_table(info->data, info->fontstart, "OS/2");
+    int tab = truetype_find_table(info->data, "OS/2");
 
     if (!tab)
         return 0;
@@ -1815,7 +1857,7 @@ int truetype_GetFontVMetricsOS2(const truetype_fontinfo *info, int *typoAscent, 
     return 1;
 }
 
-void truetype_GetFontBoundingBox(const truetype_fontinfo *info, int *x0, int *y0, int *x1, int *y1)
+void truetype_GetFontBoundingBox(const truetype::File *info, int *x0, int *y0, int *x1, int *y1)
 {
     *x0 = ttSHORT(info->data + info->head + 36);
     *y0 = ttSHORT(info->data + info->head + 38);
@@ -1823,19 +1865,19 @@ void truetype_GetFontBoundingBox(const truetype_fontinfo *info, int *x0, int *y0
     *y1 = ttSHORT(info->data + info->head + 42);
 }
 
-float truetype_ScaleForPixelHeight(const truetype_fontinfo *info, float height)
+float truetype_ScaleForPixelHeight(const truetype::File *info, float height)
 {
     int fheight = ttSHORT(info->data + info->hhea + 4) - ttSHORT(info->data + info->hhea + 6);
     return (float)height / fheight;
 }
 
-float truetype_ScaleForMappingEmToPixels(const truetype_fontinfo *info, float pixels)
+float truetype_ScaleForMappingEmToPixels(const truetype::File *info, float pixels)
 {
     int unitsPerEm = ttUSHORT(info->data + info->head + 18);
     return pixels / unitsPerEm;
 }
 
-void freeShape(const truetype_fontinfo *info, truetype_vertex *v)
+void freeShape(const truetype::File *info, truetype_vertex *v)
 {
     __unused(info);
 
@@ -1847,49 +1889,68 @@ void freeShape(const truetype_fontinfo *info, truetype_vertex *v)
 // antialiasing software rasterizer
 //
 
-void truetype_GetGlyphBitmapBoxSubpixel(const truetype_fontinfo *font, int glyph, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
+void truetype_GetGlyphBitmapBoxSubpixel(const truetype::File *font, int glyph, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
 {
     int x0 = 0, y0 = 0, x1, y1; // =0 suppresses compiler warning
     if (!truetype_GetGlyphBox(font, glyph, &x0, &y0, &x1, &y1))
     {
         // e.g. space character
         if (ix0)
+        {
             *ix0 = 0;
+        }
+
         if (iy0)
+        {
             *iy0 = 0;
+        }
+
         if (ix1)
+        {
             *ix1 = 0;
+        }
+
         if (iy1)
+        {
             *iy1 = 0;
+        }
     }
     else
     {
         // move to integral bboxes (treating pixels as little squares, what pixels get touched)?
         if (ix0)
+        {
             *ix0 = floor(x0 * scale_x + shift_x);
+        }
 
         if (iy0)
+        {
             *iy0 = floor(-y1 * scale_y + shift_y);
+        }
 
         if (ix1)
+        {
             *ix1 = ceil(x1 * scale_x + shift_x);
+        }
 
         if (iy1)
+        {
             *iy1 = ceil(-y0 * scale_y + shift_y);
+        }
     }
 }
 
-void truetype_GetGlyphBitmapBox(const truetype_fontinfo *font, int glyph, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
+void truetype_GetGlyphBitmapBox(const truetype::File *font, int glyph, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
 {
     truetype_GetGlyphBitmapBoxSubpixel(font, glyph, scale_x, scale_y, 0.0f, 0.0f, ix0, iy0, ix1, iy1);
 }
 
-void truetype_GetCodepointBitmapBoxSubpixel(const truetype_fontinfo *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
+void truetype_GetCodepointBitmapBoxSubpixel(const truetype::File *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
 {
     truetype_GetGlyphBitmapBoxSubpixel(font, truetype_FindGlyphIndex(font, codepoint), scale_x, scale_y, shift_x, shift_y, ix0, iy0, ix1, iy1);
 }
 
-void truetype_GetCodepointBitmapBox(const truetype_fontinfo *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
+void truetype_GetCodepointBitmapBox(const truetype::File *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
 {
     truetype_GetCodepointBitmapBoxSubpixel(font, codepoint, scale_x, scale_y, 0.0f, 0.0f, ix0, iy0, ix1, iy1);
 }
@@ -2407,11 +2468,13 @@ static void truetype_sort_edges_quicksort(truetype_edge *p, int n)
                 if (!TRUETYPE_COMPARE(&p[i], &p[0]))
                     break;
             }
+
             for (;; --j)
             {
                 if (!TRUETYPE_COMPARE(&p[0], &p[j]))
                     break;
             }
+
             /* make sure we haven't crossed */
             if (i >= j)
                 break;
@@ -2686,7 +2749,7 @@ void freeBitmap(unsigned char *bitmap)
     free(bitmap);
 }
 
-unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int glyph, int *width, int *height, int *xoff, int *yoff)
+unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype::File *info, float scale_x, float scale_y, float shift_x, float shift_y, int glyph, int *width, int *height, int *xoff, int *yoff)
 {
     int ix0, iy0, ix1, iy1;
     truetype_bitmap gbm;
@@ -2713,13 +2776,24 @@ unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype_fontinfo *info, fl
     gbm.pixels = nullptr; // in case we error
 
     if (width)
+    {
         *width = gbm.w;
+    }
+
     if (height)
+    {
         *height = gbm.h;
+    }
+
     if (xoff)
+    {
         *xoff = ix0;
+    }
+
     if (yoff)
+    {
         *yoff = iy0;
+    }
 
     if (gbm.w && gbm.h)
     {
@@ -2731,16 +2805,18 @@ unsigned char *truetype_GetGlyphBitmapSubpixel(const truetype_fontinfo *info, fl
             truetype_Rasterize(&gbm, 0.35f, vertices, num_verts, scale_x, scale_y, shift_x, shift_y, ix0, iy0, 1);
         }
     }
+
     free(vertices);
+
     return gbm.pixels;
 }
 
-unsigned char *truetype_GetGlyphBitmap(const truetype_fontinfo *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff)
+unsigned char *truetype_GetGlyphBitmap(const truetype::File *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff)
 {
     return truetype_GetGlyphBitmapSubpixel(info, scale_x, scale_y, 0.0f, 0.0f, glyph, width, height, xoff, yoff);
 }
 
-void truetype_MakeGlyphBitmapSubpixel(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int glyph)
+void truetype_MakeGlyphBitmapSubpixel(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int glyph)
 {
     truetype_vertex *vertices = nullptr;
     int num_verts = truetype_GetGlyphShape(info, glyph, &vertices);
@@ -2761,116 +2837,40 @@ void truetype_MakeGlyphBitmapSubpixel(const truetype_fontinfo *info, unsigned ch
         free(vertices);
 }
 
-void truetype_MakeGlyphBitmap(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int glyph)
+void truetype_MakeGlyphBitmap(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int glyph)
 {
     truetype_MakeGlyphBitmapSubpixel(info, output, out_w, out_h, out_stride, scale_x, scale_y, 0.0f, 0.0f, glyph);
 }
 
-unsigned char *truetype_GetCodepointBitmapSubpixel(const truetype_fontinfo *info, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
+unsigned char *truetype_GetCodepointBitmapSubpixel(const truetype::File *info, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
 {
     return truetype_GetGlyphBitmapSubpixel(info, scale_x, scale_y, shift_x, shift_y, truetype_FindGlyphIndex(info, codepoint), width, height, xoff, yoff);
 }
 
-void truetype_MakeCodepointBitmapSubpixelPrefilter(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint)
+void truetype_MakeCodepointBitmapSubpixelPrefilter(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint)
 {
     truetype_MakeGlyphBitmapSubpixelPrefilter(info, output, out_w, out_h, out_stride, scale_x, scale_y, shift_x, shift_y, oversample_x, oversample_y, sub_x, sub_y, truetype_FindGlyphIndex(info, codepoint));
 }
 
-void truetype_MakeCodepointBitmapSubpixel(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint)
+void truetype_MakeCodepointBitmapSubpixel(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int codepoint)
 {
     truetype_MakeGlyphBitmapSubpixel(info, output, out_w, out_h, out_stride, scale_x, scale_y, shift_x, shift_y, truetype_FindGlyphIndex(info, codepoint));
 }
 
-unsigned char *truetype_GetCodepointBitmap(const truetype_fontinfo *info, float scale_x, float scale_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
+unsigned char *truetype_GetCodepointBitmap(const truetype::File *info, float scale_x, float scale_y, int codepoint, int *width, int *height, int *xoff, int *yoff)
 {
     return truetype_GetCodepointBitmapSubpixel(info, scale_x, scale_y, 0.0f, 0.0f, codepoint, width, height, xoff, yoff);
 }
 
-void truetype_MakeCodepointBitmap(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint)
+void truetype_MakeCodepointBitmap(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint)
 {
     truetype_MakeCodepointBitmapSubpixel(info, output, out_w, out_h, out_stride, scale_x, scale_y, 0.0f, 0.0f, codepoint);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// bitmap baking
-//
-// This is SUPER-CRAPPY packing to keep source code small
-
-static int truetype_BakeFontBitmap_internal(const unsigned char *data, int offset, // font location (use offset=0 for plain .ttf)
-                                            float pixel_height,                    // height of font in pixels
-                                            unsigned char *pixels, int pw, int ph, // bitmap to be filled in
-                                            int first_char, int num_chars,         // characters to bake
-                                            truetype_bakedchar *chardata)
-{
-    float scale;
-    int x, y, bottom_y, i;
-    truetype_fontinfo f;
-
-    if (!truetype_InitFont(&f, data, offset))
-        return -1;
-    memset(pixels, 0, pw * ph); // background of 0 around pixels
-    x = y = 1;
-    bottom_y = 1;
-
-    scale = truetype_ScaleForPixelHeight(&f, pixel_height);
-
-    for (i = 0; i < num_chars; ++i)
-    {
-        int advance, lsb, x0, y0, x1, y1, gw, gh;
-        int g = truetype_FindGlyphIndex(&f, first_char + i);
-        truetype_GetGlyphHMetrics(&f, g, &advance, &lsb);
-        truetype_GetGlyphBitmapBox(&f, g, scale, scale, &x0, &y0, &x1, &y1);
-        gw = x1 - x0;
-        gh = y1 - y0;
-        if (x + gw + 1 >= pw)
-            y = bottom_y, x = 1; // advance to next row
-        if (y + gh + 1 >= ph)    // check if it fits vertically AFTER potentially moving to next row
-            return -i;
-        assert(x + gw < pw);
-        assert(y + gh < ph);
-        truetype_MakeGlyphBitmap(&f, pixels + x + y * pw, gw, gh, pw, scale, scale, g);
-        chardata[i].x0 = (int16_t)x;
-        chardata[i].y0 = (int16_t)y;
-        chardata[i].x1 = (int16_t)(x + gw);
-        chardata[i].y1 = (int16_t)(y + gh);
-        chardata[i].xadvance = scale * advance;
-        chardata[i].xoff = (float)x0;
-        chardata[i].yoff = (float)y0;
-        x = x + gw + 1;
-        if (y + gh + 1 > bottom_y)
-            bottom_y = y + gh + 1;
-    }
-    return bottom_y;
-}
-
-void truetype_GetBakedQuad(const truetype_bakedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, truetype_aligned_quad *q, int opengl_fillrule)
-{
-    float d3d_bias = opengl_fillrule ? 0 : -0.5f;
-    float ipw = 1.0f / pw, iph = 1.0f / ph;
-    const truetype_bakedchar *b = chardata + char_index;
-    int round_x = floor((*xpos + b->xoff) + 0.5f);
-    int round_y = floor((*ypos + b->yoff) + 0.5f);
-
-    q->x0 = round_x + d3d_bias;
-    q->y0 = round_y + d3d_bias;
-    q->x1 = round_x + b->x1 - b->x0 + d3d_bias;
-    q->y1 = round_y + b->y1 - b->y0 + d3d_bias;
-
-    q->s0 = b->x0 * ipw;
-    q->t0 = b->y0 * iph;
-    q->s1 = b->x1 * ipw;
-    q->t1 = b->y1 * iph;
-
-    *xpos += b->xadvance;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // rectangle packing replacement routines if you don't have stb_rect_pack.h
 //
-
-#ifndef STB_RECT_PACK_VERSION
 
 typedef int stbrp_coord;
 
@@ -2926,7 +2926,6 @@ static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects, int num_rect
     for (; i < num_rects; ++i)
         rects[i].was_packed = 0;
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -2944,9 +2943,15 @@ int truetype_PackBegin(truetype_pack_context *spc, unsigned char *pixels, int pw
     if (context == nullptr || nodes == nullptr)
     {
         if (context != nullptr)
+        {
             free(context);
+        }
+
         if (nodes != nullptr)
+        {
             free(nodes);
+        }
+
         return 0;
     }
 
@@ -3067,7 +3072,7 @@ static float truetype_oversample_shift(int oversample)
 }
 
 // rects array must be big enough to accommodate all characters in the given ranges
-int truetype_PackFontGatherRects(truetype_pack_context *spc, const truetype_fontinfo *info, truetype_pack_range *range, stbrp_rect *rects)
+int truetype_PackFontGatherRects(truetype_pack_context *spc, const truetype::File *info, truetype_pack_range *range, stbrp_rect *rects)
 {
     int j, k;
     int missing_glyph_added = 0;
@@ -3105,7 +3110,7 @@ int truetype_PackFontGatherRects(truetype_pack_context *spc, const truetype_font
     return k;
 }
 
-void truetype_MakeGlyphBitmapSubpixelPrefilter(const truetype_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int prefilter_x, int prefilter_y, float *sub_x, float *sub_y, int glyph)
+void truetype_MakeGlyphBitmapSubpixelPrefilter(const truetype::File *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int prefilter_x, int prefilter_y, float *sub_x, float *sub_y, int glyph)
 {
     truetype_MakeGlyphBitmapSubpixel(info,
                                      output,
@@ -3129,7 +3134,7 @@ void truetype_MakeGlyphBitmapSubpixelPrefilter(const truetype_fontinfo *info, un
 }
 
 // rects array must be big enough to accommodate all characters in the given ranges
-int truetype_PackFontRenderIntoRects(truetype_pack_context *spc, const truetype_fontinfo *info, truetype_pack_range *range, stbrp_rect *rects)
+int truetype_PackFontRenderIntoRects(truetype_pack_context *spc, const truetype::File *info, truetype_pack_range *range, stbrp_rect *rects)
 {
     int j, k, missing_glyph = -1, return_value = 1;
 
@@ -3233,14 +3238,14 @@ void truetype_PackFontRangesPackRects(truetype_pack_context *spc, stbrp_rect *re
     stbrp_pack_rects((stbrp_context *)spc->pack_info, rects, num_rects);
 }
 
-int truetype_PackFontRange_internal(truetype_pack_context *spc, const unsigned char *fontdata, int font_index, truetype_pack_range *range)
+int truetype_PackFontRange_internal(truetype_pack_context *spc, const unsigned char *fontdata, truetype_pack_range *range)
 {
     memset(range->chardata_for_range, 0, range->num_chars * sizeof(truetype_packedchar));
 
     __cleanup_malloc stbrp_rect *rects = (stbrp_rect *)malloc(sizeof(*rects) * range->num_chars);
 
-    truetype_fontinfo info = {};
-    truetype_InitFont(&info, fontdata, truetype_GetFontOffsetForIndex(fontdata, font_index));
+    truetype::File info = {};
+    truetype_InitFont(&info, fontdata);
 
     int n = truetype_PackFontGatherRects(spc, &info, range, rects);
 
@@ -3249,7 +3254,7 @@ int truetype_PackFontRange_internal(truetype_pack_context *spc, const unsigned c
     return truetype_PackFontRenderIntoRects(spc, &info, range, rects);
 }
 
-int truetype_PackFontRange(truetype_pack_context *spc, const unsigned char *fontdata, int font_index, float font_size,
+int truetype_PackFontRange(truetype_pack_context *spc, const unsigned char *fontdata, float font_size,
                            int first_unicode_codepoint_in_range, int num_chars_in_range, truetype_packedchar *chardata_for_range)
 {
     truetype_pack_range range;
@@ -3260,299 +3265,10 @@ int truetype_PackFontRange(truetype_pack_context *spc, const unsigned char *font
     range.chardata_for_range = chardata_for_range;
     range.font_size = font_size;
 
-    return truetype_PackFontRange_internal(spc, fontdata, font_index, &range);
+    return truetype_PackFontRange_internal(spc, fontdata, &range);
 }
 
-void truetype_GetScaledFontVMetrics(const unsigned char *fontdata, int index, float size, float *ascent, float *descent, float *lineGap)
+int truetype_InitFont(truetype::File *info, const unsigned char *data)
 {
-    int i_ascent, i_descent, i_lineGap;
-    float scale;
-    truetype_fontinfo info;
-    truetype_InitFont(&info, fontdata, truetype_GetFontOffsetForIndex(fontdata, index));
-    scale = size > 0 ? truetype_ScaleForPixelHeight(&info, size) : truetype_ScaleForMappingEmToPixels(&info, -size);
-    truetype_GetFontVMetrics(&info, &i_ascent, &i_descent, &i_lineGap);
-    *ascent = (float)i_ascent * scale;
-    *descent = (float)i_descent * scale;
-    *lineGap = (float)i_lineGap * scale;
-}
-
-void truetype_GetPackedQuad(const truetype_packedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, truetype_aligned_quad *q, int align_to_integer)
-{
-    float ipw = 1.0f / pw, iph = 1.0f / ph;
-    const truetype_packedchar *b = chardata + char_index;
-
-    if (align_to_integer)
-    {
-        float x = (float)floor((*xpos + b->xoff) + 0.5f);
-        float y = (float)floor((*ypos + b->yoff) + 0.5f);
-        q->x0 = x;
-        q->y0 = y;
-        q->x1 = x + b->xoff2 - b->xoff;
-        q->y1 = y + b->yoff2 - b->yoff;
-    }
-    else
-    {
-        q->x0 = *xpos + b->xoff;
-        q->y0 = *ypos + b->yoff;
-        q->x1 = *xpos + b->xoff2;
-        q->y1 = *ypos + b->yoff2;
-    }
-
-    q->s0 = b->x0 * ipw;
-    q->t0 = b->y0 * iph;
-    q->s1 = b->x1 * ipw;
-    q->t1 = b->y1 * iph;
-
-    *xpos += b->xadvance;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// font name matching -- recommended not to use this
-//
-
-// check if a utf8 string contains a prefix which is the utf16 string; if so return length of matching utf8 string
-static int32_t truetype_CompareUTF8toUTF16_bigendian_prefix(uint8_t *s1, int32_t len1, uint8_t *s2, int32_t len2)
-{
-    int32_t i = 0;
-
-    // convert utf16 to utf8 and compare the results while converting
-    while (len2)
-    {
-        uint16_t ch = s2[0] * 256 + s2[1];
-        if (ch < 0x80)
-        {
-            if (i >= len1)
-                return -1;
-            if (s1[i++] != ch)
-                return -1;
-        }
-        else if (ch < 0x800)
-        {
-            if (i + 1 >= len1)
-                return -1;
-            if (s1[i++] != 0xc0 + (ch >> 6))
-                return -1;
-            if (s1[i++] != 0x80 + (ch & 0x3f))
-                return -1;
-        }
-        else if (ch >= 0xd800 && ch < 0xdc00)
-        {
-            uint32_t c;
-            uint16_t ch2 = s2[2] * 256 + s2[3];
-            if (i + 3 >= len1)
-                return -1;
-            c = ((ch - 0xd800) << 10) + (ch2 - 0xdc00) + 0x10000;
-            if (s1[i++] != 0xf0 + (c >> 18))
-                return -1;
-            if (s1[i++] != 0x80 + ((c >> 12) & 0x3f))
-                return -1;
-            if (s1[i++] != 0x80 + ((c >> 6) & 0x3f))
-                return -1;
-            if (s1[i++] != 0x80 + ((c)&0x3f))
-                return -1;
-            s2 += 2; // plus another 2 below
-            len2 -= 2;
-        }
-        else if (ch >= 0xdc00 && ch < 0xe000)
-        {
-            return -1;
-        }
-        else
-        {
-            if (i + 2 >= len1)
-                return -1;
-            if (s1[i++] != 0xe0 + (ch >> 12))
-                return -1;
-            if (s1[i++] != 0x80 + ((ch >> 6) & 0x3f))
-                return -1;
-            if (s1[i++] != 0x80 + ((ch)&0x3f))
-                return -1;
-        }
-        s2 += 2;
-        len2 -= 2;
-    }
-    return i;
-}
-
-static int truetype_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char *s2, int len2)
-{
-    return len1 == truetype_CompareUTF8toUTF16_bigendian_prefix((uint8_t *)s1, len1, (uint8_t *)s2, len2);
-}
-
-// returns results in whatever encoding you request... but note that 2-byte encodings
-// will be BIG-ENDIAN... use truetype_CompareUTF8toUTF16_bigendian() to compare
-const char *truetype_GetFontNameString(const truetype_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
-{
-    uint8_t *fc = font->data;
-    uint32_t offset = font->fontstart;
-    uint32_t name_table = truetype_find_table(fc, offset, "name");
-
-    if (!name_table)
-        return nullptr;
-
-    int32_t count = ttUSHORT(fc + name_table + 2);
-    int32_t stringOffset = name_table + ttUSHORT(fc + name_table + 4);
-
-    for (int i = 0; i < count; i++)
-    {
-        uint32_t loc = name_table + 6 + 12 * i;
-        if (platformID == ttUSHORT(fc + loc + 0) && encodingID == ttUSHORT(fc + loc + 2) && languageID == ttUSHORT(fc + loc + 4) && nameID == ttUSHORT(fc + loc + 6))
-        {
-            *length = ttUSHORT(fc + loc + 8);
-            return (const char *)(fc + stringOffset + ttUSHORT(fc + loc + 10));
-        }
-    }
-    return nullptr;
-}
-
-static int truetype_matchpair(uint8_t *fc, uint32_t nm, uint8_t *name, int32_t nlen, int32_t target_id, int32_t next_id)
-{
-    int32_t count = ttUSHORT(fc + nm + 2);
-    int32_t stringOffset = nm + ttUSHORT(fc + nm + 4);
-
-    for (int32_t i = 0; i < count; ++i)
-    {
-        uint32_t loc = nm + 6 + 12 * i;
-
-        int32_t id = ttUSHORT(fc + loc + 6);
-
-        if (id != target_id)
-        {
-            continue;
-        }
-
-        // find the encoding
-        int32_t platform = ttUSHORT(fc + loc + 0), encoding = ttUSHORT(fc + loc + 2), language = ttUSHORT(fc + loc + 4);
-
-        // is this a Unicode encoding?
-        if (platform == 0 ||
-            (platform == 3 && encoding == 1) ||
-            (platform == 3 && encoding == 10))
-        {
-            int32_t slen = ttUSHORT(fc + loc + 8);
-            int32_t off = ttUSHORT(fc + loc + 10);
-
-            // check if there's a prefix match
-            int32_t matchlen = truetype_CompareUTF8toUTF16_bigendian_prefix(name, nlen, fc + stringOffset + off, slen);
-            if (matchlen < 0)
-            {
-                continue;
-            }
-
-            // check for target_id+1 immediately following, with same encoding & language
-            if (i + 1 < count && ttUSHORT(fc + loc + 12 + 6) == next_id && ttUSHORT(fc + loc + 12) == platform && ttUSHORT(fc + loc + 12 + 2) == encoding && ttUSHORT(fc + loc + 12 + 4) == language)
-            {
-                slen = ttUSHORT(fc + loc + 12 + 8);
-                off = ttUSHORT(fc + loc + 12 + 10);
-                if (slen == 0)
-                {
-                    if (matchlen == nlen)
-                        return 1;
-                }
-                else if (matchlen < nlen && name[matchlen] == ' ')
-                {
-                    ++matchlen;
-                    if (truetype_CompareUTF8toUTF16_bigendian_internal((char *)(name + matchlen), nlen - matchlen, (char *)(fc + stringOffset + off), slen))
-                        return 1;
-                }
-            }
-            else
-            {
-                // if nothing immediately following
-                if (matchlen == nlen)
-                    return 1;
-            }
-        }
-
-        // @TODO handle other encodings
-    }
-    return 0;
-}
-
-static int truetype_matches(uint8_t *fc, uint32_t offset, uint8_t *name, int32_t flags)
-{
-    int32_t nlen = (int32_t)strlen((char *)name);
-    uint32_t nm, hd;
-    if (!truetype_isfont(fc + offset))
-        return 0;
-
-    // check italics/bold/underline flags in macStyle...
-    if (flags)
-    {
-        hd = truetype_find_table(fc, offset, "head");
-        if ((ttUSHORT(fc + hd + 44) & 7) != (flags & 7))
-            return 0;
-    }
-
-    nm = truetype_find_table(fc, offset, "name");
-    if (!nm)
-        return 0;
-
-    if (flags)
-    {
-        // if we checked the macStyle flags, then just check the family and ignore the subfamily
-        if (truetype_matchpair(fc, nm, name, nlen, 16, -1))
-            return 1;
-        if (truetype_matchpair(fc, nm, name, nlen, 1, -1))
-            return 1;
-        if (truetype_matchpair(fc, nm, name, nlen, 3, -1))
-            return 1;
-    }
-    else
-    {
-        if (truetype_matchpair(fc, nm, name, nlen, 16, 17))
-            return 1;
-        if (truetype_matchpair(fc, nm, name, nlen, 1, 2))
-            return 1;
-        if (truetype_matchpair(fc, nm, name, nlen, 3, -1))
-            return 1;
-    }
-
-    return 0;
-}
-
-static int truetype_FindMatchingFont_internal(unsigned char *font_collection, char *name_utf8, int32_t flags)
-{
-    int32_t i;
-    for (i = 0;; ++i)
-    {
-        int32_t off = truetype_GetFontOffsetForIndex(font_collection, i);
-        if (off < 0)
-            return off;
-        if (truetype_matches((uint8_t *)font_collection, off, (uint8_t *)name_utf8, flags))
-            return off;
-    }
-}
-
-int truetype_BakeFontBitmap(const unsigned char *data, int offset,
-                            float pixel_height, unsigned char *pixels, int pw, int ph,
-                            int first_char, int num_chars, truetype_bakedchar *chardata)
-{
-    return truetype_BakeFontBitmap_internal((unsigned char *)data, offset, pixel_height, pixels, pw, ph, first_char, num_chars, chardata);
-}
-
-int truetype_GetFontOffsetForIndex(const unsigned char *data, int index)
-{
-    return truetype_GetFontOffsetForIndex_internal((unsigned char *)data, index);
-}
-
-int truetype_GetNumberOfFonts(const unsigned char *data)
-{
-    return truetype_GetNumberOfFonts_internal((unsigned char *)data);
-}
-
-int truetype_InitFont(truetype_fontinfo *info, const unsigned char *data, int offset)
-{
-    return truetype_InitFont_internal(info, (unsigned char *)data, offset);
-}
-
-int truetype_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags)
-{
-    return truetype_FindMatchingFont_internal((unsigned char *)fontdata, (char *)name, flags);
-}
-
-int truetype_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const char *s2, int len2)
-{
-    return truetype_CompareUTF8toUTF16_bigendian_internal((char *)s1, len1, (char *)s2, len2);
+    return truetype_InitFont_internal(info, (unsigned char *)data);
 }

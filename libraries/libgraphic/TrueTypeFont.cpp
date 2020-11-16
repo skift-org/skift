@@ -6,7 +6,7 @@
 
 struct TrueTypeFamily
 {
-    truetype_fontinfo info;
+    truetype::File info;
     void *buffer;
     size_t buffer_size;
 };
@@ -36,10 +36,7 @@ TrueTypeFamily *truetype_family_create(const char *path)
 
     stream_read(font_file, family->buffer, state.size);
 
-    truetype_InitFont(
-        &family->info,
-        (unsigned char *)family->buffer,
-        truetype_GetFontOffsetForIndex((unsigned char *)family->buffer, 0));
+    truetype_InitFont(&family->info, (unsigned char *)family->buffer);
 
     return family;
 }
@@ -109,7 +106,7 @@ void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint en
     }
 
     __cleanup_malloc truetype_packedchar *packedchar = (truetype_packedchar *)calloc(0x02AF, sizeof(truetype_packedchar));
-    truetype_PackFontRange(&font->rasterizer, (unsigned char *)font->family->buffer, 0, font->size, start, count, packedchar);
+    truetype_PackFontRange(&font->rasterizer, (unsigned char *)font->family->buffer, font->size, start, count, packedchar);
 
     for (size_t i = 0; i < count; i++)
     {

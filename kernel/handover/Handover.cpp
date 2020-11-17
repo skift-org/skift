@@ -22,9 +22,7 @@ Handover *handover()
 
 void handover_assert(uint32_t magic)
 {
-    if (!(is_multiboot1(magic) ||
-          is_multiboot2(magic) ||
-          is_stivale1(magic) ||
+    if (!(is_multiboot2(magic) ||
           is_stivale2(magic)))
     {
         system_panic("Wrong bootloader please use any multiboot/stival bootloader\n\tMagic number: 0x%08x!", magic);
@@ -69,17 +67,9 @@ Handover *handover_initialize(void *header, uint32_t magic)
     logger_info("Parsing handover informations...");
     logger_info("Header=%08x, Magic=%08x", header, magic);
 
-    if (is_multiboot1(magic))
-    {
-        multiboot1_parse_header(&_handover, header);
-    }
-    else if (is_multiboot2(magic))
+    if (is_multiboot2(magic))
     {
         multiboot2_parse_header(&_handover, header);
-    }
-    else if (is_stivale1(magic))
-    {
-        stivale1_parse_header(&_handover, header);
     }
     else if (is_stivale2(magic))
     {

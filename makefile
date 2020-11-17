@@ -5,9 +5,6 @@ export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export PATH := $(shell toolbox/use-it.sh):$(PATH)
 export LC_ALL=C
 
-ifeq (, $(shell which inkscape))
-$(error "No inkscape in PATH, consider installing it")
-endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
@@ -59,9 +56,10 @@ BUILD_DEFINES:= \
 	-D__BUILD_VERSION__=\""$(CONFIG_VERSION)"\"
 
 # --- Configs -------------------------------------------- #
-CC:=i686-pc-skift-gcc
+CC:=gcc
 CFLAGS= \
 	-std=gnu11 \
+  -m32 \
 	-MD \
 	$(BUILD_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
@@ -69,19 +67,20 @@ CFLAGS= \
 	$(BUILD_DEFINES) \
 	$(BUILD_CONFIG)
 
-CXX:=i686-pc-skift-g++
+CXX:=g++
 CXXFLAGS:= \
 	-std=c++20 \
+  -m32 \
 	-MD \
 	$(BUILD_OPTIMISATIONS) \
 	$(BUILD_WARNING) \
 	$(BUILD_INCLUDE) \
 	$(BUILD_DEFINES)
 
-LD:=i686-pc-skift-ld
+LD:=ld
 LDFLAGS:=
 
-AR:=i686-pc-skift-ar
+AR:=ar
 ARFLAGS:=rcs
 
 AS=nasm

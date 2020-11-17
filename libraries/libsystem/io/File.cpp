@@ -32,6 +32,21 @@ Result file_read_all(const char *path, void **buffer, size_t *size)
     return SUCCESS;
 }
 
+ResultOr<Slice> file_read_all(String path)
+{
+    void *buff = nullptr;
+    size_t size = 0;
+
+    auto res = file_read_all(path.cstring(), &buff, &size);
+
+    if (res != SUCCESS)
+    {
+        return res;
+    }
+
+    return Slice{make<SliceStorage>(SliceStorage::ADOPT, buff, size)};
+}
+
 Result file_write_all(const char *path, void *buffer, size_t size)
 {
     __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE | OPEN_CREATE);

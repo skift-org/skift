@@ -1,0 +1,6 @@
+{
+    "name": "Font Viewer",
+    "comment": "View installed fonts on your system.",
+    "icon": "format-font",
+    "command": "font-viewer"
+}

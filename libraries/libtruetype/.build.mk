@@ -1,0 +1,3 @@
+LIBS += TRUETYPE
+
+TRUETYPE_NAME = truetype

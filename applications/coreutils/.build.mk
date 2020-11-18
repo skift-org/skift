@@ -11,6 +11,7 @@ UTILS = \
 	ENV \
 	GREP \
 	HEAD \
+  WC \
 	HEXDUMP \
 	INIT \
 	JSON \
@@ -122,6 +123,9 @@ TAC_NAME = tac
 
 TOUCH_LIBS =
 TOUCH_NAME = touch
+
+WC_LIBS = 
+WC_NAME = wc
 
 UNLINK_LIBS =
 UNLINK_NAME = unlink

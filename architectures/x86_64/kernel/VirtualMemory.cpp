@@ -1,11 +1,13 @@
+#include <libsystem/Logger.h>
+
 #include "architectures/VirtualMemory.h"
 #include "architectures/x86_64/kernel/Paging.h"
 
-PageMappingLevel4 kpml4 __aligned(ARCH_PAGE_SIZE);
-PageMappingLevel3 kpml3 __aligned(ARCH_PAGE_SIZE);
+PageMappingLevel4 kpml4 __aligned(ARCH_PAGE_SIZE) = {};
+PageMappingLevel3 kpml3 __aligned(ARCH_PAGE_SIZE) = {};
 
-PageMappingLevel2 kpml2 __aligned(ARCH_PAGE_SIZE);
-PageMappingLevel1 kpml1[512] __aligned(ARCH_PAGE_SIZE);
+PageMappingLevel2 kpml2 __aligned(ARCH_PAGE_SIZE) = {};
+PageMappingLevel1 kpml1[512] __aligned(ARCH_PAGE_SIZE) = {};
 
 #define PHYSICAL_OFFSET (0xffffffff80000000)
 #define FROM_KERNEL_TO_PHYSICAL(__addr) ((uintptr_t)(__addr)-PHYSICAL_OFFSET)
@@ -18,6 +20,7 @@ void *arch_kernel_address_space()
 
 void arch_virtual_initialize()
 {
+    logger_debug("Initializing virtual maps...");
     auto &pml4_entry = kpml4.entries[511];
     pml4_entry.user = 0;
     pml4_entry.writable = 1;
@@ -38,10 +41,13 @@ void arch_virtual_initialize()
         pml2_entry.present = 1;
         pml2_entry.physical_address = FROM_KERNEL_TO_PHYSICAL(&kpml1[i]) / ARCH_PAGE_SIZE;
     }
+
+    logger_debug("It works !");
 }
 
 void arch_virtual_memory_enable()
 {
+    logger_debug("Enabling paging");
     arch_address_space_switch(arch_kernel_address_space());
 }
 

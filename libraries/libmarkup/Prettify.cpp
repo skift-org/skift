@@ -6,7 +6,6 @@ namespace markup
 
 void prettify(Prettifier &pretty, Node &node)
 {
-    pretty.ident();
     pretty.append('<');
 
     pretty.color_depth();
@@ -40,6 +39,7 @@ void prettify(Prettifier &pretty, Node &node)
 
     node.foreach_child([&](auto &child) {
         pretty.push_ident();
+        pretty.ident();
 
         prettify(pretty, child);
 

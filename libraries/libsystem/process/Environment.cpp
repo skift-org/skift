@@ -23,7 +23,10 @@ String environment_copy()
 {
     if (_root)
     {
-        return json::stringify(*_root);
+        Prettifier pretty{};
+        json::prettify(pretty, *_root);
+
+        return pretty.finalize();
     }
     else
     {

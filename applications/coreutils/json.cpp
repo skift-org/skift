@@ -1,26 +1,60 @@
-#include <libsystem/io/Stream.h>
 #include <libsystem/json/Json.h>
+#include <libutils/ArgParse.h>
+
+constexpr auto PROLOGUE = "Reformats JSON to make it easier to read.";
+
+constexpr auto OPTION_COLOR_DESCRIPTION = "Color json levels using VT100 sequences.";
+constexpr auto OPTION_IDENT_DESCRIPTION = "Ident json levels.";
+
+constexpr auto EPILOGUE = "Options can be combined";
 
 int main(int argc, char const *argv[])
 {
-    if (argc == 1)
+    ArgParse args{};
+    args.should_abort_on_failure();
+    args.show_help_if_no_operand_given();
+
+    args.prologue(PROLOGUE);
+
+    args.usage("");
+    args.usage("OPTION...");
+    args.usage("OPTION... FILES...");
+
+    auto options = Prettifier::NONE;
+
+    args.option('c', "color", OPTION_COLOR_DESCRIPTION, [&](auto &) {
+        options |= Prettifier::COLORS;
+    });
+
+    args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
+        options |= Prettifier::INDENTS;
+    });
+
+    args.epiloge(EPILOGUE);
+
+    args.eval(argc, argv);
+
+    if (args.argc() == 0)
     {
-        StreamScanner scan{in_stream};
+        StreamScanner scanner{in_stream};
+        auto root = json::parse(scanner);
 
-        auto json_object = json::parse(scan);
-        auto json_string = json::prettify(json_object);
-
-        printf("%s", json_string.cstring());
-
-        return PROCESS_SUCCESS;
+        Prettifier pretty{options};
+        json::prettify(pretty, root);
+        printf("%s", pretty.finalize().cstring());
     }
     else
     {
-        auto json_object = json::parse_file(argv[1]);
-        auto json_string = json::prettify(json_object);
+        args.argv().foreach ([&](auto &path) {
+            auto root = json::parse_file(path.cstring());
 
-        printf("%s", json_string.cstring());
+            Prettifier pretty{options};
+            json::prettify(pretty, root);
+            printf("%s", pretty.finalize().cstring());
 
-        return PROCESS_SUCCESS;
+            return Iteration::CONTINUE;
+        });
     }
+
+    return PROCESS_SUCCESS;
 }

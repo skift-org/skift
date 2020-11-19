@@ -6,7 +6,6 @@ struct Prettifier : public StringBuilder
 {
 private:
     int _depth = 0;
-    bool _first_line = true;
     int _flags;
 
 public:
@@ -22,14 +21,7 @@ public:
     {
         if (_flags & INDENTS)
         {
-            if (_first_line)
-            {
-                _first_line = false;
-            }
-            else
-            {
-                append('\n');
-            }
+            append('\n');
 
             for (int i = 0; i < _depth; i++)
             {
@@ -68,7 +60,7 @@ public:
 
     void color_clear()
     {
-        if (_flags & INDENTS)
+        if (_flags & COLORS)
         {
             append("\e[m");
         }

@@ -1,5 +1,4 @@
 #include <libmarkup/Markup.h>
-#include <libsystem/io/Stream.h>
 #include <libutils/ArgParse.h>
 
 constexpr auto PROLOGUE = "Reformats MARKUP to make it easier to read.";
@@ -27,7 +26,7 @@ int main(int argc, char const *argv[])
         options |= Prettifier::COLORS;
     });
 
-    args.option('i', "indent", OPTION_COLOR_DESCRIPTION, [&](auto &) {
+    args.option('i', "indent", OPTION_IDENT_DESCRIPTION, [&](auto &) {
         options |= Prettifier::INDENTS;
     });
 

@@ -38,7 +38,10 @@ Result FsDeviceInfo::open(FsHandle *handle)
         return Iteration::CONTINUE;
     });
 
-    handle->attached = json::stringify(move(root)).underlying_storage().give_ref();
+    Prettifier pretty{};
+    json::prettify(pretty, root);
+
+    handle->attached = pretty.finalize().underlying_storage().give_ref();
     handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
 
     return SUCCESS;

@@ -42,7 +42,10 @@ Result FsProcessInfo::open(FsHandle *handle)
 
     task_iterate(&list, (TaskIterateCallback)serialize_task);
 
-    handle->attached = json::stringify(move(list)).underlying_storage().give_ref();
+    Prettifier pretty{};
+    json::prettify(pretty, list);
+
+    handle->attached = pretty.finalize().underlying_storage().give_ref();
     handle->attached_size = reinterpret_cast<StringStorage *>(handle->attached)->length();
 
     return SUCCESS;

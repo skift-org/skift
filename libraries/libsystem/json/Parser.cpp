@@ -169,9 +169,7 @@ static Value object(Scanner &scan)
 
         scan.skip(':');
 
-        auto v = value(scan);
-
-        object[k] = v;
+        object[k] = value(scan);
 
         scan.skip(',');
 

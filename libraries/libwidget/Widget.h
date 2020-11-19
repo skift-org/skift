@@ -83,7 +83,7 @@ private:
     List *_childs = {};
 
 public:
-    void id(const char *id);
+    void id(String id);
 
     RefPtr<Font> font()
     {

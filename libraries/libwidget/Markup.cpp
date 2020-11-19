@@ -206,41 +206,38 @@ Position position_parse(const char *string)
     return Position::LEFT;
 }
 
-void widget_apply_attribute_from_markup(Widget *widget, MarkupNode *node)
+void widget_apply_attribute_from_markup(Widget *widget, markup::Node &node)
 {
-    if (markup_node_has_attribute(node, "id"))
-    {
-        widget->id(markup_node_get_attribute(node, "id"));
-    }
+    node.with_attribute("id", [&](auto &id) {
+        widget->id(id);
+    });
 
-    if (markup_node_has_attribute(node, "layout"))
-    {
-        widget->layout(layout_parse(markup_node_get_attribute(node, "layout")));
-    }
+    node.with_attribute("layout", [&](auto &layout) {
+        widget->layout(layout_parse(layout.cstring()));
+    });
 
-    if (markup_node_has_attribute(node, "padding"))
-    {
-        widget->insets(insets_parse(markup_node_get_attribute(node, "padding")));
-    }
+    node.with_attribute("padding", [&](auto &insets) {
+        widget->insets(insets_parse(insets.cstring()));
+    });
 
-    if (markup_node_has_attribute(node, "fill"))
+    if (node.has_attribute("fill"))
     {
         widget->attributes(LAYOUT_FILL);
     }
 }
 
-Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
+Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
 {
     Widget *widget = nullptr;
 
-    if (markup_node_is(node, "Container"))
+    if (node.is("Container"))
     {
         widget = new Container(parent);
     }
 
-    if (markup_node_is(node, "Panel"))
+    if (node.is("Panel"))
     {
-        if (markup_node_has_attribute(node, "rounded"))
+        if (node.has_attribute("rounded"))
         {
             auto panel = new Panel(parent);
             panel->border_radius(6);
@@ -252,41 +249,41 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
         }
     }
 
-    if (markup_node_is(node, "Button"))
+    if (node.is("Button"))
     {
         ButtonStyle button_style = BUTTON_TEXT;
 
-        if (markup_node_has_attribute(node, "filled"))
+        if (node.has_attribute("filled"))
         {
             button_style = BUTTON_FILLED;
         }
 
-        if (markup_node_has_attribute(node, "outlined"))
+        if (node.has_attribute("outlined"))
         {
             button_style = BUTTON_OUTLINE;
         }
 
-        if (markup_node_has_attribute(node, "text") && markup_node_has_attribute(node, "icon"))
+        if (node.has_attribute("text") && node.has_attribute("icon"))
         {
             widget = new Button(
                 parent,
                 button_style,
-                Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")),
-                markup_node_get_attribute_or_default(node, "text", "Button"));
+                Icon::get(node.get_attribute_or_default("icon", "duck")),
+                node.get_attribute_or_default("text", "Button"));
         }
-        else if (markup_node_has_attribute(node, "text"))
+        else if (node.has_attribute("text"))
         {
             widget = new Button(
                 parent,
                 button_style,
-                markup_node_get_attribute_or_default(node, "text", "Button"));
+                node.get_attribute_or_default("text", "Button"));
         }
-        else if (markup_node_has_attribute(node, "icon"))
+        else if (node.has_attribute("icon"))
         {
             widget = new Button(
                 parent,
                 button_style,
-                Icon::get(markup_node_get_attribute_or_default(node, "icon", "duck")));
+                Icon::get(node.get_attribute_or_default("icon", "duck")));
         }
         else
         {
@@ -296,29 +293,29 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
         }
     }
 
-    if (markup_node_is(node, "Label"))
+    if (node.is("Label"))
     {
         widget = new Label(
             parent,
-            markup_node_get_attribute_or_default(node, "text", "Label"),
-            position_parse(markup_node_get_attribute_or_default(node, "position", "left")));
+            node.get_attribute_or_default("text", "Label"),
+            position_parse(node.get_attribute_or_default("position", "left").cstring()));
     }
 
-    if (markup_node_is(node, "Image"))
+    if (node.is("Image"))
     {
         widget = new Image(
             parent,
-            Bitmap::load_from_or_placeholder(markup_node_get_attribute_or_default(node, "path", "null")));
+            Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null").cstring()));
     }
 
-    if (markup_node_is(node, "Slider"))
+    if (node.is("Slider"))
     {
         widget = new Slider(parent);
     }
 
     if (widget == nullptr)
     {
-        widget = new Placeholder(parent, markup_node_type(node));
+        widget = new Placeholder(parent, node.type());
     }
 
     widget_apply_attribute_from_markup(widget, node);
@@ -326,41 +323,41 @@ Widget *widget_create_from_markup(Widget *parent, MarkupNode *node)
     return widget;
 }
 
-void widget_create_childs_from_markup(Widget *parent, MarkupNode *node)
+void widget_create_childs_from_markup(Widget *parent, markup::Node &node)
 {
-    list_foreach(MarkupNode, child, node->childs)
-    {
-        Widget *child_widget = widget_create_from_markup(parent, child);
+    node.foreach_child([&](auto &child) {
+        auto widget = widget_create_from_markup(parent, child);
+        widget_create_childs_from_markup(widget, child);
 
-        widget_create_childs_from_markup(child_widget, child);
-    }
+        return Iteration::CONTINUE;
+    });
 }
 
-WindowFlag window_flags_from_markup(MarkupNode *node)
+WindowFlag window_flags_from_markup(markup::Node &node)
 {
     WindowFlag flags = 0;
 
-    if (markup_node_has_attribute(node, "borderless"))
+    if (node.has_attribute("borderless"))
     {
         flags |= WINDOW_BORDERLESS;
     }
 
-    if (markup_node_has_attribute(node, "resizable"))
+    if (node.has_attribute("resizable"))
     {
         flags |= WINDOW_RESIZABLE;
     }
 
-    if (markup_node_has_attribute(node, "always-focused"))
+    if (node.has_attribute("always-focused"))
     {
         flags |= WINDOW_ALWAYS_FOCUSED;
     }
 
-    if (markup_node_has_attribute(node, "swallow"))
+    if (node.has_attribute("swallow"))
     {
         flags |= WINDOW_SWALLOW;
     }
 
-    if (markup_node_has_attribute(node, "transparent"))
+    if (node.has_attribute("transparent"))
     {
         flags |= WINDOW_TRANSPARENT;
     }
@@ -368,42 +365,35 @@ WindowFlag window_flags_from_markup(MarkupNode *node)
     return flags;
 }
 
-Window *window_create_from_markup(MarkupNode *node)
+Window *window_create_from_markup(markup::Node &node)
 {
     auto window = new Window(window_flags_from_markup(node));
 
-    int width = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "width"), 250);
+    int width = parse_int_inline(PARSER_DECIMAL, node.get_attribute("width").cstring(), 250);
 
-    int height = parse_int_inline(PARSER_DECIMAL, markup_node_get_attribute(node, "height"), 250);
+    int height = parse_int_inline(PARSER_DECIMAL, node.get_attribute("height").cstring(), 250);
 
     window->size(Vec2i(width, height));
 
-    const char *icon = markup_node_get_attribute(node, "icon");
-
-    if (icon)
-    {
+    node.with_attribute("icon", [&](auto &icon) {
         window->icon(Icon::get(icon));
-    }
+    });
 
-    const char *title = markup_node_get_attribute(node, "title");
-
-    if (title)
-    {
+    node.with_attribute("title", [&](auto &title) {
         window->title(title);
-    }
+    });
 
     return window;
 }
 
 Window *window_create_from_file(const char *path)
 {
-    MarkupNode *root = markup_parse_file(path);
+    auto root = markup::parse_file(path);
 
-    Window *window = window_create_from_markup(root);
+    auto window = window_create_from_markup(root);
+
     widget_apply_attribute_from_markup(window->root(), root);
     widget_create_childs_from_markup(window->root(), root);
-
-    markup_node_destroy(root);
 
     return window;
 }

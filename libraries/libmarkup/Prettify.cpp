@@ -1,110 +1,62 @@
 #include <libmarkup/Markup.h>
-#include <libsystem/utils/BufferBuilder.h>
+#include <libutils/StringBuilder.h>
 
-struct MarkupPrettifyState
+namespace markup
 {
-    BufferBuilder *builder;
-    int depth;
-    bool color;
-    bool first_line;
-};
 
-static const char *depth_color[] = {
-    "\e[91m",
-    "\e[92m",
-    "\e[93m",
-    "\e[94m",
-    "\e[95m",
-    "\e[96m",
-};
-
-static void markup_prettify_ident(MarkupPrettifyState *state)
+void prettify(Prettifier &pretty, Node &node)
 {
-    if (!state->first_line)
-        buffer_builder_append_chr(state->builder, '\n');
-    else
-        state->first_line = false;
+    pretty.ident();
+    pretty.append('<');
 
-    for (int i = 0; i < state->depth; i++)
-    {
-        buffer_builder_append_str(state->builder, "    ");
-    }
-}
+    pretty.color_depth();
+    pretty.append(node.type());
+    pretty.color_clear();
 
-static void markup_prettify_internal(MarkupPrettifyState *state, MarkupNode *node)
-{
-    markup_prettify_ident(state);
+    node.foreach_attributes([&](auto &key, auto &value) {
+        pretty.append(' ');
+        pretty.append(key);
 
-    buffer_builder_append_chr(state->builder, '<');
-
-    if (state->color)
-    {
-        buffer_builder_append_str(state->builder, depth_color[state->depth % 6]);
-    }
-
-    buffer_builder_append_str(state->builder, node->type);
-
-    if (state->color)
-    {
-        buffer_builder_append_str(state->builder, "\e[m");
-    }
-
-    list_foreach(MarkupAttribute, attribute, node->attributes)
-    {
-        buffer_builder_append_chr(state->builder, ' ');
-        buffer_builder_append_str(state->builder, attribute->name);
-
-        if (attribute->value)
+        if (value != "")
         {
-            buffer_builder_append_chr(state->builder, '=');
-            buffer_builder_append_chr(state->builder, '"');
-            buffer_builder_append_str(state->builder, attribute->value);
-            buffer_builder_append_chr(state->builder, '"');
+            pretty.append('=');
+            pretty.append('"');
+            pretty.append(value);
+            pretty.append('"');
         }
-    }
 
-    if (node->childs->empty())
+        return Iteration::CONTINUE;
+    });
+
+    if (node.count_child() == 0)
     {
-        buffer_builder_append_str(state->builder, "/>");
+        pretty.append("/>");
         return;
     }
     else
     {
-        buffer_builder_append_chr(state->builder, '>');
+        pretty.append('>');
     }
 
-    list_foreach(MarkupNode, child, node->childs)
-    {
-        state->depth++;
-        markup_prettify_internal(state, child);
-        state->depth--;
-    }
+    node.foreach_child([&](auto &child) {
+        pretty.push_ident();
 
-    markup_prettify_ident(state);
-    buffer_builder_append_str(state->builder, "</");
+        prettify(pretty, child);
 
-    if (state->color)
-    {
-        buffer_builder_append_str(state->builder, depth_color[state->depth % 6]);
-    }
+        pretty.pop_ident();
 
-    buffer_builder_append_str(state->builder, node->type);
+        return Iteration::CONTINUE;
+    });
 
-    if (state->color)
-    {
-        buffer_builder_append_str(state->builder, "\e[m");
-    }
+    pretty.ident();
 
-    buffer_builder_append_chr(state->builder, '>');
+    pretty.append("</");
+
+    pretty.color_depth();
+    pretty.append(node.type());
+    pretty.color_clear();
+
+    pretty.append('>');
 }
 
-char *markup_prettify(MarkupNode *root)
-{
-    BufferBuilder *builder = buffer_builder_create(128);
-
-    MarkupPrettifyState state = {builder, 0, true, true};
-
-    markup_prettify_internal(&state, root);
-
-    return buffer_builder_finalize(builder);
-}
+} // namespace markup

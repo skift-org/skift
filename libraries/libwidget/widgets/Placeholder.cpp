@@ -3,17 +3,12 @@
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Placeholder.h>
 
-Placeholder::Placeholder(Widget *parent, const char *text)
+Placeholder::Placeholder(Widget *parent, String text)
     : Widget(parent), _alert_icon(Icon::get("alert"))
 {
     char buffer[256];
-    snprintf(buffer, 256, "Cannot create an instance of \"%s\".", text);
-    _text = strdup(buffer);
-}
-
-Placeholder::~Placeholder()
-{
-    free(_text);
+    snprintf(buffer, 256, "Cannot create an instance of \"%s\".", text.cstring());
+    _text = buffer;
 }
 
 void Placeholder::paint(Painter &painter, Rectangle rectangle)
@@ -30,7 +25,7 @@ void Placeholder::paint(Painter &painter, Rectangle rectangle)
 
     painter.draw_string(
         *font(),
-        _text,
+        _text.cstring(),
         bound().position() + Vec2i(32, 10),
         color(THEME_FOREGROUND));
 }

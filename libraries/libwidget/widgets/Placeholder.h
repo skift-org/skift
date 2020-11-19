@@ -5,13 +5,11 @@
 class Placeholder : public Widget
 {
 private:
-    char *_text;
+    String _text;
     RefPtr<Icon> _alert_icon;
 
 public:
-    Placeholder(Widget *parent, const char *text);
-
-    ~Placeholder();
+    Placeholder(Widget *parent, String text);
 
     void paint(Painter &painter, Rectangle rectangle);
 };

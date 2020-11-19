@@ -1,6 +1,8 @@
 <Window
     icon="movie"
     title="Media Player"
+    width="700"
+    height="500"
     resizable
     >
 

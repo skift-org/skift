@@ -130,9 +130,9 @@ public:
     }
 
     template <typename TCallback>
-    void foreach (TCallback callback) const
+    Iteration foreach (TCallback callback) const
     {
-        _buckets.foreach ([&](auto &bucket) {
+        return _buckets.foreach ([&](auto &bucket) {
             return bucket.foreach ([&](auto &item) {
                 return callback(item.key, item.value);
             });

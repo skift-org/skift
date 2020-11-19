@@ -86,7 +86,7 @@ public:
 
                 if (el.length() > 0)
                 {
-                    elements.push_back(el);
+                    elements.push_back(move(el));
                 }
             }
         }

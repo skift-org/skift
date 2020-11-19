@@ -1,53 +1,125 @@
 #pragma once
 
-#include <libsystem/utils/List.h>
+#include <libutils/Enum.h>
+#include <libutils/HashMap.h>
+#include <libutils/Prettifier.h>
+#include <libutils/Scanner.h>
+#include <libutils/String.h>
+#include <libutils/Vector.h>
 
-struct MarkupAttribute
+namespace markup
 {
-    char *name;
-    char *value;
-} ;
 
-struct MarkupNode
+using Attributes = HashMap<String, String>;
+
+class Node
 {
-    char *type;
-    List *childs;
-    List *attributes;
-} ;
+private:
+    String _type;
+    int _flags;
+    Vector<Node> _childs;
+    HashMap<String, String> _attributes;
 
-MarkupNode *markup_node_create(char *type);
+public:
+    static constexpr auto NONE = 0;
+    static constexpr auto SELF_CLOSING = 1 << 0;
 
-MarkupNode *markup_node_create_adopt(char *type);
+    auto type() const { return _type; }
 
-void markup_node_destroy(MarkupNode *node);
+    auto is(String type) const { return _type == type; }
 
-bool markup_node_is(MarkupNode *node, const char *type);
+    auto flags() { return _flags; }
 
-void markup_node_add_child(MarkupNode *parent, MarkupNode *child);
+    auto count_child() { return _childs.count(); }
 
-void markup_node_add_attribute(MarkupNode *node, MarkupAttribute *attribute);
+    Node(String type, int flags = NONE)
+        : _type(type),
+          _flags(flags)
+    {
+    }
 
-const char *markup_node_get_attribute(MarkupNode *node, const char *name);
+    Node(String type, int flags, Attributes &&attributes)
+        : _type(type),
+          _flags(flags),
+          _attributes(attributes)
+    {
+    }
 
-const char *markup_node_get_attribute_or_default(MarkupNode *node, const char *name, const char *default_value);
+    bool has_attribute(String attribute)
+    {
+        return _attributes.has_key(attribute);
+    }
 
-bool markup_node_has_attribute(MarkupNode *node, const char *name);
+    void set_attribute(String attribute, String value)
+    {
+        _attributes[attribute] = value;
+    }
 
-const char *markup_node_type(MarkupNode *node);
+    String get_attribute(String attribute)
+    {
+        if (_attributes.has_key(attribute))
+        {
+            return _attributes[attribute];
+        }
+        else
+        {
+            return "";
+        }
+    }
 
-MarkupAttribute *markup_attribute_create(const char *name, const char *value);
+    template <typename TCallback>
+    bool with_attribute(String attribute, TCallback callback)
+    {
+        if (_attributes.has_key(attribute))
+        {
+            callback(_attributes[attribute]);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-MarkupAttribute *markup_attribute_create_adopt(char *name, char *value);
+    String get_attribute_or_default(String attribute, String fallback)
+    {
+        if (_attributes.has_key(attribute))
+        {
+            return _attributes[attribute];
+        }
+        else
+        {
+            return fallback;
+        }
+    }
 
-void markup_attribute_destroy(MarkupAttribute *attribute);
+    template <typename TCallback>
+    Iteration foreach_attributes(TCallback callback)
+    {
+        return _attributes.foreach (callback);
+    }
 
-/* --- Serialization and Deserialization ------------------------------------ */
+    void add_child(const Node &child)
+    {
+        _childs.push_back(child);
+    }
 
-char *
-markup_stringify(MarkupNode *root);
+    void add_child(Node &&child)
+    {
+        _childs.push_back(move(child));
+    }
 
-char *markup_prettify(MarkupNode *root);
+    template <typename TCallback>
+    Iteration foreach_child(TCallback callback)
+    {
+        return _childs.foreach (callback);
+    }
+};
 
-MarkupNode *markup_parse(const char *string, size_t size);
+Node parse(Scanner &scan);
 
-MarkupNode *markup_parse_file(const char *path);
+Node parse_file(const char *path);
+
+void prettify(Prettifier &pretty, Node &node);
+
+} // namespace markup

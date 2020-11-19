@@ -14,12 +14,12 @@ public:
 
     OwnPtr(T *ptr) : _ptr(ptr) {}
 
-    OwnPtr(OwnPtr &other) : _ptr(other.give_ref()) {}
-
-    template <typename U>
-    OwnPtr(OwnPtr<U> &other) : _ptr(static_cast<U *>(other.give_ref())) {}
+    OwnPtr(const OwnPtr &other) : _ptr(const_cast<OwnPtr &>(other).give_ref()) {}
 
     OwnPtr(OwnPtr &&other) : _ptr(other.give_ref()) {}
+
+    template <typename U>
+    OwnPtr(const OwnPtr<U> &other) : _ptr(static_cast<U *>(const_cast<OwnPtr<U>>(other).give_ref())) {}
 
     template <typename U>
     OwnPtr(OwnPtr<U> &&other) : _ptr(static_cast<U *>(other.give_ref())) {}

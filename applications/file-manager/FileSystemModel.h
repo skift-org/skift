@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libsystem/utils/List.h>
 #include <libutils/Path.h>
 #include <libutils/Vector.h>
 #include <libwidget/model/TableModel.h>

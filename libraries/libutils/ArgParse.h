@@ -78,7 +78,10 @@ public:
 
     ArgParse()
     {
-        _option.push_back({'h', "help", "Show this help message and exit.", [&](auto &) { help(); }});
+        _option.push_back({'h', "help", "Show this help message and exit.", [&](auto &) {
+                               help();
+                               process_exit(PROCESS_SUCCESS);
+                           }});
     }
 
     void option(char shortname, String longname, String description, ArgParseOptionCallback callback)

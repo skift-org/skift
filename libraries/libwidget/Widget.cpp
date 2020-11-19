@@ -10,7 +10,7 @@
 #include <libwidget/Widget.h>
 #include <libwidget/Window.h>
 
-void Widget::id(const char *id)
+void Widget::id(String id)
 {
     _window->register_widget_by_id(id, this);
 }

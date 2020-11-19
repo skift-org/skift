@@ -288,7 +288,12 @@ public:
         }
     }
 
-    T &insert(size_t index, T value)
+    T &insert(size_t index, const T &value)
+    {
+        return insert(index, T(value));
+    }
+
+    T &insert(size_t index, T &&value)
     {
         assert(index <= _count);
 
@@ -407,14 +412,24 @@ public:
         return copy;
     }
 
-    T &push(T value)
+    T &pash(const T &value)
     {
-        return insert(0, value);
+        return push(T(value));
     }
 
-    T &push_back(T value)
+    T &push(T &&value)
     {
-        return insert(_count, value);
+        return insert(0, move(value));
+    }
+
+    T &push_back(const T &value)
+    {
+        return push_back(T(value));
+    }
+
+    T &push_back(T &&value)
+    {
+        return insert(_count, move(value));
     }
 
     void push_back_many(const Vector<T> &values)

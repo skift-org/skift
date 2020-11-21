@@ -14,7 +14,7 @@ static Vector<Rectangle> _dirty_regions;
 void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
-    _wallpaper = Bitmap::load_from_or_placeholder("/System/Wallpapers/mountains.png");
+    _wallpaper = Bitmap::load_from_or_placeholder("/Files/Wallpapers/mountains.png");
 
     renderer_region_dirty(_framebuffer->resolution());
 }

@@ -1,5 +1,0 @@
-{
-    	"description": "prints text to the terminal",
-    	"usage": "echo [STRING]",
-    	"example": "echo hello world: hello world"
-}

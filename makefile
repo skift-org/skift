@@ -111,9 +111,9 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 		$(SYSROOT)/Session \
 		$(SYSROOT)/System \
 		$(SYSROOT)/System/Binaries \
-		$(SYSROOT)/System/Configs \
-		$(SYSROOT)/System/Fonts \
-		$(SYSROOT)/System/Icons \
+		$(SYSROOT)/Configs \
+		$(SYSROOT)/Files/Fonts \
+		$(SYSROOT)/Files/Icons \
 		$(SYSROOT)/System/Includes \
 		$(SYSROOT)/System/Libraries \
 		$(SYSROOT)/Files \

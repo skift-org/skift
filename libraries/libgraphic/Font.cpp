@@ -12,7 +12,7 @@ static HashMap<String, RefPtr<Font>> _fonts;
 static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 {
     char glyph_path[PATH_LENGTH];
-    snprintf(glyph_path, PATH_LENGTH, "/System/Fonts/%s.glyph", name.cstring());
+    snprintf(glyph_path, PATH_LENGTH, "/Files/Fonts/%s.glyph", name.cstring());
 
     Glyph *glyph_buffer = nullptr;
     size_t glyph_size = 0;
@@ -30,7 +30,7 @@ static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)
 {
     char bitmap_path[PATH_LENGTH];
-    snprintf(bitmap_path, PATH_LENGTH, "/System/Fonts/%s.png", name.cstring());
+    snprintf(bitmap_path, PATH_LENGTH, "/Files/Fonts/%s.png", name.cstring());
     return Bitmap::load_from(bitmap_path);
 }
 

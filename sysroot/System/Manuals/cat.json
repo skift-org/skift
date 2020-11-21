@@ -1,5 +1,0 @@
-{
-	"description": "not to be confused with the animal cat, cat reads a file and prints it's contents to the terminal",
-    	"usage": "cat [FILE]",
-    	"example": "cat document.txt"
-}

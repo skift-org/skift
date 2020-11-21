@@ -20,7 +20,7 @@ static RefPtr<Icon> icon_load(String name)
     for (size_t i = 0; i < __ICON_SIZE_COUNT; i++)
     {
         char path[PATH_LENGTH] = {};
-        snprintf(path, PATH_LENGTH, "/System/Icons/%s@%spx.png", name.cstring(), _icon_size_names[i]);
+        snprintf(path, PATH_LENGTH, "/Files/Icons/%s@%spx.png", name.cstring(), _icon_size_names[i]);
 
         auto bitmap_or_result = Bitmap::load_from(path);
         if (bitmap_or_result.success())

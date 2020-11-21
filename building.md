@@ -136,7 +136,7 @@ $ make run-vbox # for Virtual Box
 **How to change to wallpaper?**
 
 ```sh
-µ wallpaperctl /System/Wallpapers/paint.png
+µ wallpaperctl /Files/Wallpapers/paint.png
 ```
 
 ### 7. Contributing

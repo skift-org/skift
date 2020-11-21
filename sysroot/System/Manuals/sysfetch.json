@@ -1,5 +1,0 @@
-{
-    	"description": "grabs system information such as the kernel, version, uptime, shell, etc",
-    	"usage": "sysfetch",
-    	"example": "sysfetch"
-}

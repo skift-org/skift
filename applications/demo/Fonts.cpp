@@ -12,7 +12,7 @@ void fonts_draw(Painter &painter, Rectangle screen, float time)
 
     if (!_family)
     {
-        _family = truetype_family_create("/System/Fonts/Roboto/Roboto-Medium.ttf");
+        _family = truetype_family_create("/Files/Fonts/Roboto/Roboto-Medium.ttf");
 
         for (size_t i = 0; i < 16; i++)
         {

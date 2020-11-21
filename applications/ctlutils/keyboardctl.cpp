@@ -36,11 +36,11 @@ static CommandLine cmdline = CMDLINE(
 
 int loadkey_list_keymap()
 {
-    Directory *keymap_directory = directory_open("/System/Keyboards", OPEN_READ);
+    Directory *keymap_directory = directory_open("/Files/Keyboards", OPEN_READ);
 
     if (handle_has_error(keymap_directory))
     {
-        handle_printf_error(keymap_directory, "keyboardctl: Failed to query keymaps from /System/Keyboards");
+        handle_printf_error(keymap_directory, "keyboardctl: Failed to query keymaps from /Files/Keyboards");
         directory_close(keymap_directory);
 
         return -1;
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
     if (!option_get && !option_list && argc == 2)
     {
         char font_path[PATH_LENGTH] = {};
-        snprintf(font_path, PATH_LENGTH, "/System/Keyboards/%s.kmap", argv[1]);
+        snprintf(font_path, PATH_LENGTH, "/Files/Keyboards/%s.kmap", argv[1]);
 
         return loadkey_set_keymap(keyboard_device, font_path);
     }

@@ -148,7 +148,7 @@ Result application_initialize(int argc, char **argv)
         if (strcmp(argv[i], "--theme") == 0 && i + 1 < argc)
         {
             char buffer[256];
-            snprintf(buffer, 256, "/System/Themes/%s.json", argv[i + 1]);
+            snprintf(buffer, 256, "/Files/Themes/%s.json", argv[i + 1]);
             theme_load(buffer);
             theme_changed = true;
         }
@@ -160,7 +160,7 @@ Result application_initialize(int argc, char **argv)
     }
 
     if (!theme_changed)
-        theme_load("/System/Themes/skift-dark.json");
+        theme_load("/Files/Themes/skift-dark.json");
 
     _connection = socket_connect("/Session/compositor.ipc");
 

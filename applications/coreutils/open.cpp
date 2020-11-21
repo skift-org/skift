@@ -5,8 +5,8 @@
 #include <libsystem/process/Launchpad.h>
 #include <libutils/Path.h>
 
-#define FILE_EXTENSIONS_DATABASE_PATH "/System/Configs/open/file-extensions.json"
-#define FILE_TYPES_DATABASE_PATH "/System/Configs/open/file-types.json"
+#define FILE_EXTENSIONS_DATABASE_PATH "/Configs/open/file-extensions.json"
+#define FILE_TYPES_DATABASE_PATH "/Configs/open/file-types.json"
 
 Result open(const char *raw_path)
 {

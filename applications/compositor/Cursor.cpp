@@ -21,15 +21,15 @@ static uint _last_click = 0;
 void cursor_initialize()
 {
     const char *cursor_paths[] = {
-        "/System/Cursors/default.png",
-        "/System/Cursors/text.png",
-        "/System/Cursors/disabled.png",
-        "/System/Cursors/busy.png",
-        "/System/Cursors/move.png",
-        "/System/Cursors/resizeh.png",
-        "/System/Cursors/resizehv.png",
-        "/System/Cursors/resizev.png",
-        "/System/Cursors/resizevh.png",
+        "/Files/Cursors/default.png",
+        "/Files/Cursors/text.png",
+        "/Files/Cursors/disabled.png",
+        "/Files/Cursors/busy.png",
+        "/Files/Cursors/move.png",
+        "/Files/Cursors/resizeh.png",
+        "/Files/Cursors/resizehv.png",
+        "/Files/Cursors/resizev.png",
+        "/Files/Cursors/resizevh.png",
     };
 
     for (size_t i = 0; i < __CURSOR_COUNT; i++)

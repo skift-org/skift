@@ -1,5 +1,0 @@
-{
-    	"description": "sets the desktop background",
-    	"usage": "wallpaperctl [IMAGE]",
-    	"example": "wallpaperctl /System/Wallpapers/mountains.png"
-}

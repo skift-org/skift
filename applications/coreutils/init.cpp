@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 
     logger_level(LOGGER_TRACE);
 
-    environment() = json::parse_file("/System/Configs/environment.json");
+    environment() = json::parse_file("/Configs/environment.json");
 
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {

@@ -1,5 +1,0 @@
-{
-    	"description": "get or set graphics modes",
-    	"usage": "-h, --help		shows help message\n-l, --list		list all avaliable graphics modes\n-g, --get		get the current graphics mode\n-s, --set [VALUE]	Set the graphics mode",
-    	"example": "displayctl -s 1920x1080"
-}

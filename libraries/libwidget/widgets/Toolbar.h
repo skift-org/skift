@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libgraphic/Icon.h>
 #include <libwidget/Widget.h>
 
 Widget *toolbar_create(Widget *parent);

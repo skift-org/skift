@@ -4,6 +4,11 @@
 #include <libutils/Vector.h>
 #include <libwidget/model/TableModel.h>
 
+#include "file-manager/model/Navigation.h"
+
+namespace file_manager
+{
+
 struct FileSystemNode
 {
     String name;
@@ -12,14 +17,15 @@ struct FileSystemNode
     size_t size;
 };
 
-class FileSystemModel : public TableModel
+class Listing : public TableModel
 {
 private:
-    String _current_path{};
+    RefPtr<Navigation> _navigation;
     Vector<FileSystemNode> _files{};
+    OwnPtr<Observer<Navigation>> _observer;
 
 public:
-    FileSystemModel(String path);
+    Listing(RefPtr<Navigation> navigation);
 
     int rows() override;
 
@@ -31,9 +37,9 @@ public:
 
     void update() override;
 
-    void navigate(Path path);
-
     String file_name(int index);
 
     FileType file_type(int index);
 };
+
+} // namespace file_manager

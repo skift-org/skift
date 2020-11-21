@@ -107,18 +107,9 @@ void Table::paint_cell(Painter &painter, int row, int column)
     painter.pop();
 }
 
-Table::Table(Widget *parent, RefPtr<TableModel> model)
-    : Widget(parent),
-      _model(model)
+Table::Table(Widget *parent)
+    : Widget(parent)
 {
-    _model_observer = model->observe([this](auto &) {
-        should_repaint();
-        should_relayout();
-    });
-
-    _selected = -1;
-    _scroll_offset = 0;
-
     _scrollbar = new ScrollBar(this);
 
     _scrollbar->on(Event::VALUE_CHANGE, [this](auto) {
@@ -127,8 +118,19 @@ Table::Table(Widget *parent, RefPtr<TableModel> model)
     });
 }
 
+Table::Table(Widget *parent, RefPtr<TableModel> model)
+    : Table(parent)
+{
+    this->model(model);
+}
+
 void Table::paint(Painter &painter, Rectangle rectangle)
 {
+    if (!_model)
+    {
+        return;
+    }
+
     __unused(rectangle);
 
     painter.push();
@@ -189,6 +191,11 @@ void Table::paint(Painter &painter, Rectangle rectangle)
 
 void Table::event(Event *event)
 {
+    if (!_model)
+    {
+        return;
+    }
+
     if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         select(row_at(event->mouse.position));
@@ -220,6 +227,11 @@ void Table::event(Event *event)
 
 void Table::do_layout()
 {
+    if (!_model)
+    {
+        return;
+    }
+
     _scrollbar->bound(scrollbar_bound());
     _scrollbar->update(TABLE_ROW_HEIGHT * _model->rows(), list_bound().height(), _scroll_offset);
 }

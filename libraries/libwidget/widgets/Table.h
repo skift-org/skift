@@ -10,7 +10,7 @@ class Table : public Widget
 private:
     static constexpr int TABLE_ROW_HEIGHT = 32;
 
-    RefPtr<TableModel> _model;
+    RefPtr<TableModel> _model = nullptr;
     OwnPtr<Observer<TableModel>> _model_observer;
 
     int _selected = -1;
@@ -30,6 +30,15 @@ private:
     void paint_cell(Painter &painter, int row, int column);
 
 public:
+    void model(RefPtr<TableModel> model)
+    {
+        _model = model;
+        _model_observer = model->observe([this](auto &) {
+            should_repaint();
+            should_relayout();
+        });
+    }
+
     void empty_message(String message)
     {
         _empty_message = message;
@@ -60,6 +69,8 @@ public:
         should_repaint();
         should_relayout();
     }
+
+    Table(Widget *parent);
 
     Table(Widget *parent, RefPtr<TableModel> model);
 

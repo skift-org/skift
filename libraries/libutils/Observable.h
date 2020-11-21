@@ -8,18 +8,18 @@ template <typename T>
 class Observable
 {
 public:
-    struct Observer
+    struct _Observer
     {
         Observable<T> *_observable;
         Callback<void(T &)> _callback;
 
-        Observer(Observable<T> *observable, Callback<void(T &)> callback)
+        _Observer(Observable<T> *observable, Callback<void(T &)> callback)
             : _observable(observable),
               _callback(callback)
         {
             _observable->register_observer(this);
         }
-        ~Observer()
+        ~_Observer()
         {
             if (_observable)
                 _observable->unregister_observer(this);
@@ -40,9 +40,9 @@ private:
     __noncopyable(Observable);
     __nonmovable(Observable);
 
-    Vector<Observer *> _observers{};
+    Vector<_Observer *> _observers{};
 
-    void register_observer(Observer *ob)
+    void register_observer(_Observer *ob)
     {
         if (!_observers.contains(ob))
         {
@@ -50,7 +50,7 @@ private:
         }
     }
 
-    void unregister_observer(Observer *ob)
+    void unregister_observer(_Observer *ob)
     {
         _observers.remove_value(ob);
     }
@@ -70,7 +70,7 @@ public:
 
     void did_update()
     {
-        Vector<Observer *> observers_copy{_observers};
+        Vector<_Observer *> observers_copy{_observers};
 
         for (size_t i = 0; i < observers_copy.count(); i++)
         {
@@ -78,11 +78,11 @@ public:
         }
     }
 
-    OwnPtr<Observer> observe(Callback<void(T &)> callback)
+    OwnPtr<_Observer> observe(Callback<void(T &)> callback)
     {
-        return own<Observer>(this, callback);
+        return own<_Observer>(this, callback);
     }
 };
 
 template <typename T>
-using Observer = Observable<T>::Observer;
+using Observer = Observable<T>::_Observer;

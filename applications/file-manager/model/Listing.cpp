@@ -3,17 +3,19 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Directory.h>
 #include <libsystem/json/Json.h>
-#include <libsystem/process/Process.h>
 
-#include "file-manager/FileSystemModel.h"
+#include "file-manager/model/Listing.h"
 
-static auto get_icon_for_node(const char *current_directory, DirectoryEntry *entry)
+namespace file_manager
+{
+
+static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
 {
     if (entry->stat.type == FILE_TYPE_DIRECTORY)
     {
         char manifest_path[PATH_LENGTH];
 
-        snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory, entry->name);
+        snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory.cstring(), entry->name);
 
         auto root = json::parse_file(manifest_path);
 
@@ -54,24 +56,25 @@ enum Column
     __COLUMN_COUNT,
 };
 
-FileSystemModel::FileSystemModel(String path)
+Listing::Listing(RefPtr<Navigation> navigation)
+    : _navigation(navigation)
 {
-    _current_path = path;
-    process_set_directory(_current_path.cstring());
-    update();
+    _observer = navigation->observe([this](auto &) {
+        update();
+    });
 }
 
-int FileSystemModel::rows()
+int Listing::rows()
 {
     return _files.count();
 }
 
-int FileSystemModel::columns()
+int Listing::columns()
 {
     return __COLUMN_COUNT;
 }
 
-String FileSystemModel::header(int column)
+String Listing::header(int column)
 {
     switch (column)
     {
@@ -87,7 +90,7 @@ String FileSystemModel::header(int column)
     }
 }
 
-Variant FileSystemModel::data(int row, int column)
+Variant Listing::data(int row, int column)
 {
     auto &entry = _files[row];
 
@@ -120,11 +123,11 @@ Variant FileSystemModel::data(int row, int column)
     }
 }
 
-void FileSystemModel::update()
+void Listing::update()
 {
     _files.clear();
 
-    auto directory = directory_open(_current_path.cstring(), OPEN_READ);
+    auto directory = directory_open(_navigation->current().string().cstring(), OPEN_READ);
 
     if (handle_has_error(directory))
     {
@@ -138,7 +141,7 @@ void FileSystemModel::update()
         FileSystemNode node{
             .name = {entry.name, FILE_NAME_LENGTH},
             .type = entry.stat.type,
-            .icon = get_icon_for_node(_current_path.cstring(), &entry),
+            .icon = get_icon_for_node(_navigation->current().string(), &entry),
             .size = entry.stat.size,
         };
 
@@ -150,19 +153,14 @@ void FileSystemModel::update()
     did_update();
 }
 
-void FileSystemModel::navigate(Path path)
-{
-    _current_path = path.string();
-    process_set_directory(_current_path.cstring());
-    update();
-}
-
-String FileSystemModel::file_name(int index)
+String Listing::file_name(int index)
 {
     return _files[index].name;
 }
 
-FileType FileSystemModel::file_type(int index)
+FileType Listing::file_type(int index)
 {
     return _files[index].type;
 }
+
+} // namespace file_manager

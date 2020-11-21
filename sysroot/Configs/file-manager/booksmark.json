@@ -1,0 +1,52 @@
+[
+    {
+        "name": "User",
+        "icon": "folder-home",
+        "path": "/User/"
+    },
+    {
+        "name": "Desktop",
+        "icon": "folder",
+        "path": "/User/Desktop"
+    },
+    {
+        "name": "Documents",
+        "icon": "folder-text",
+        "path": "/User/Documents"
+    },
+    {
+        "name": "Download",
+        "icon": "folder-download",
+        "path": "/User/Download"
+    },
+    {
+        "name": "Movies",
+        "icon": "folder",
+        "path": "/User/Movies"
+    },
+    {
+        "name": "Music",
+        "icon": "folder-music",
+        "path": "/User/Music"
+    },
+    {
+        "name": "Pictures",
+        "icon": "folder-image",
+        "path": "/User/Pictures"
+    },
+    {
+        "name": "Public",
+        "icon": "folder-heart",
+        "path": "/User/Public"
+    },
+    {
+        "name": "Sites",
+        "icon": "folder",
+        "path": "/User/Sites"
+    },
+    {
+        "name": "Configs",
+        "icon": "folder-cog",
+        "path": "/User/Configs"
+    }
+]

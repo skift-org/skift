@@ -94,15 +94,13 @@ public:
         return {absolute, move(elements)};
     }
 
-    static Path join(Path &left, String right)
-    {
-        return join(left, parse(right));
-    }
+    static Path join(String left, String right) { return join(parse(left), parse(right)); }
 
-    static Path join(Path &left, Path &&right)
-    {
-        return join(left, right);
-    }
+    static Path join(Path &left, String right) { return join(left, parse(right)); }
+
+    static Path join(Path &&left, Path &&right) { return join(left, right); }
+
+    static Path join(Path &left, Path &&right) { return join(left, right); }
 
     static Path join(Path &left, Path &right)
     {
@@ -112,6 +110,10 @@ public:
         combined_elements.push_back_many(right._elements);
 
         return {left.absolute(), move(combined_elements)};
+    }
+
+    Path()
+    {
     }
 
     Path(const Path &other)
@@ -157,12 +159,12 @@ public:
         return _elements[index];
     }
 
-    bool operator==(const Path &other)
+    bool operator==(const Path &other) const
     {
         if (this == &other)
             return true;
 
-        if (_absolute == other._absolute)
+        if (_absolute != other._absolute)
             return false;
 
         return _elements == other._elements;
@@ -195,7 +197,7 @@ public:
         return {_absolute, move(stack)};
     }
 
-    String basename()
+    String basename() const
     {
         if (length() > 0)
         {
@@ -214,7 +216,7 @@ public:
         }
     }
 
-    String basename_without_extension()
+    String basename_without_extension() const
     {
         StringBuilder builder{basename().length()};
 
@@ -236,7 +238,7 @@ public:
         return builder.finalize();
     }
 
-    String dirname()
+    String dirname() const
     {
         StringBuilder builder{};
 
@@ -265,7 +267,7 @@ public:
         return builder.finalize();
     }
 
-    Path dirpath()
+    Path dirpath() const
     {
         Vector<String> stack{};
 
@@ -280,7 +282,7 @@ public:
         return {_absolute, move(stack)};
     }
 
-    String extension()
+    String extension() const
     {
         auto filename = basename();
 
@@ -309,7 +311,7 @@ public:
         return builder.finalize();
     }
 
-    String string()
+    String string() const
     {
         StringBuilder builder{};
 

@@ -99,6 +99,15 @@ public:
 
     const Value &get(String key) const;
 
+    template <typename TCallback>
+    void with(String key, TCallback callback) const
+    {
+        if (has(key))
+        {
+            callback(get(key));
+        }
+    }
+
     void put(String key, const Value &value) const;
 
     void remove(String key);

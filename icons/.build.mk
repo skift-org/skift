@@ -1,3 +1,13 @@
+ICONS += \
+	folder-home \
+	folder \
+	folder-text \
+	folder-download \
+	folder-music \
+	folder-image \
+	folder-heart \
+	folder-cog
+
 ICONS_SVGs = $(patsubst %, thirdparty/icons/svg/%.svg, $(ICONS))
 
 ICONS_AT_18PX = $(patsubst thirdparty/icons/svg/%.svg, $(SYSROOT)/Files/Icons/%@18px.png, $(ICONS_SVGs))

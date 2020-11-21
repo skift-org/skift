@@ -1,20 +1,22 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Window.h>
 
-#include "file-manager/Breadcrumb.h"
+#include "file-manager/widgets/Breadcrumb.h"
 
-Breadcrumb::Breadcrumb(Widget *parent, Path path)
-    : Widget(parent), _path(path)
+namespace file_manager
 {
-    _path = path;
+
+Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation)
+    : Widget(parent),
+      _navigation(navigation)
+{
     _icon_computer = Icon::get("laptop");
     _icon_expand = Icon::get("chevron-right");
-}
 
-void Breadcrumb::navigate(Path path)
-{
-    _path = path;
-    should_repaint();
+    _observer = _navigation->observe([&](auto &) {
+        should_relayout();
+        should_repaint();
+    });
 }
 
 void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
@@ -37,7 +39,9 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
 
     current += computer_icon_bound.width();
 
-    if (_path.length() > 0)
+    auto path = _navigation->current();
+
+    if (path.length() > 0)
     {
         Rectangle expand_icon_bound(
             bound().x() + current,
@@ -54,9 +58,9 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
         current += expand_icon_bound.width();
     }
 
-    for (size_t i = 0; i < _path.length(); i++)
+    for (size_t i = 0; i < path.length(); i++)
     {
-        auto element = _path[i];
+        auto element = path[i];
 
         int text_width = font()->mesure_string(element.cstring()).width();
 
@@ -74,7 +78,7 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
 
         current += text_width;
 
-        if (i != _path.length() - 1)
+        if (i != path.length() - 1)
         {
             Rectangle expand_icon_bound(
                 bound().x() + current,
@@ -92,3 +96,5 @@ void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
         }
     }
 }
+
+} // namespace file_manager

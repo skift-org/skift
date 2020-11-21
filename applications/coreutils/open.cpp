@@ -77,7 +77,7 @@ int main(int argc, char const *argv[])
     Result result = open(argv[1]);
     if (result != SUCCESS)
     {
-        stream_format(err_stream, "%s: %s: %s", argv[0], argv[1], get_result_description(result));
+        stream_format(err_stream, "%s: %s: %s\n", argv[0], argv[1], get_result_description(result));
         return PROCESS_FAILURE;
     }
 

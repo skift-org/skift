@@ -12,7 +12,7 @@ void graphics_draw(Painter &painter, Rectangle screen, float time)
 
     if (_test_image == nullptr)
     {
-        _test_image = Bitmap::load_from_or_placeholder("/System/skift.png");
+        _test_image = Bitmap::load_from_or_placeholder("/Applications/demo/test.png");
     }
 
     for (int x = 0; x < screen.width(); x++)

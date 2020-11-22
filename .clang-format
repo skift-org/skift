@@ -10,5 +10,7 @@ IndentCaseLabels: false
 ColumnLimit: 0
 AccessModifierOffset: -4
 FixNamespaceComments: true
-
+SpaceBeforeInheritanceColon: false
+BreakInheritanceList: AfterColon
+IndentPPDirectives: AfterHash
 ...

@@ -1,8 +1,8 @@
 #include <libwidget/Application.h>
 
-#include "neko/ChaseMouse.h"
-#include "neko/Idle.h"
 #include "neko/Neko.h"
+#include "neko/states/ChaseMouse.h"
+#include "neko/states/Idle.h"
 
 namespace neko
 {
@@ -12,7 +12,8 @@ Vec2f ChaseMouse::pick_destination()
     return application_get_mouse_position();
 }
 
-ChaseMouse::ChaseMouse() : _destination(pick_destination())
+ChaseMouse::ChaseMouse() :
+    _destination(pick_destination())
 {
 }
 

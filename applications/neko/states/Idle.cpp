@@ -1,20 +1,20 @@
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
-#include "neko/Idle.h"
-#include "neko/Itching.h"
 #include "neko/Neko.h"
-#include "neko/Playing.h"
-#include "neko/Surprised.h"
-#include "neko/Wandering.h"
-#include "neko/Yawning.h"
+#include "neko/states/Idle.h"
+#include "neko/states/Itching.h"
+#include "neko/states/Playing.h"
+#include "neko/states/Surprised.h"
+#include "neko/states/Wandering.h"
+#include "neko/states/Yawning.h"
 
 namespace neko
 {
 
-Idle::Idle()
-    : _random(random_create()),
-      _timer(random_uint32_max(&_random, 16) + 4)
+Idle::Idle() :
+    _random(random_create()),
+    _timer(random_uint32_max(&_random, 16) + 4)
 {
 }
 

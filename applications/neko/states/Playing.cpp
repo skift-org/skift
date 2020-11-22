@@ -1,15 +1,15 @@
 #include <libwidget/Application.h>
 
-#include "neko/Idle.h"
 #include "neko/Neko.h"
-#include "neko/Playing.h"
-#include "neko/Surprised.h"
+#include "neko/states/Idle.h"
+#include "neko/states/Playing.h"
+#include "neko/states/Surprised.h"
 
 namespace neko
 {
 
-Playing::Playing()
-    : _last_mouse_position(application_get_mouse_position())
+Playing::Playing() :
+    _last_mouse_position(application_get_mouse_position())
 {
 }
 

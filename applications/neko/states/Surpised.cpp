@@ -1,8 +1,8 @@
 #include <libwidget/Screen.h>
 
-#include "neko/ChaseMouse.h"
 #include "neko/Neko.h"
-#include "neko/Surprised.h"
+#include "neko/states/ChaseMouse.h"
+#include "neko/states/Surprised.h"
 
 namespace neko
 {

@@ -7,13 +7,13 @@
 namespace neko
 {
 
-class Playing : public Behavior
+class Yawning: public Behavior
 {
 private:
     Vec2i _last_mouse_position;
 
 public:
-    Playing();
+    Yawning();
 
     void update(Neko &neko) override;
 

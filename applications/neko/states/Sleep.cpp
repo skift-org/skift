@@ -2,8 +2,8 @@
 #include <libwidget/Screen.h>
 
 #include "neko/Neko.h"
-#include "neko/Sleep.h"
-#include "neko/Surprised.h"
+#include "neko/states/Sleep.h"
+#include "neko/states/Surprised.h"
 
 namespace neko
 {
@@ -12,7 +12,6 @@ Sleep::Sleep()
 {
     _last_mouse_position = application_get_mouse_position();
 }
-
 
 void Sleep::update(Neko &neko)
 {

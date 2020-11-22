@@ -1,19 +1,19 @@
 #include <libwidget/Application.h>
 
-#include "neko/Itching.h"
 #include "neko/Neko.h"
-#include "neko/Surprised.h"
-#include "neko/Yawning.h"
+#include "neko/states/Sleep.h"
+#include "neko/states/Surprised.h"
+#include "neko/states/Yawning.h"
 
 namespace neko
 {
 
-Itching::Itching()
-    : _last_mouse_position(application_get_mouse_position())
+Yawning::Yawning() :
+    _last_mouse_position(application_get_mouse_position())
 {
 }
 
-void Itching::update(Neko &neko)
+void Yawning::update(Neko &neko)
 {
     auto new_mouse_position = application_get_mouse_position();
 
@@ -21,9 +21,9 @@ void Itching::update(Neko &neko)
     {
         neko.behavior(own<Surprised>());
     }
-    else if (neko.tick() > 8)
+    else if (neko.tick() > 4)
     {
-        neko.behavior(own<Yawning>());
+        neko.behavior(own<Sleep>());
     }
 
     _last_mouse_position = new_mouse_position;
@@ -31,11 +31,11 @@ void Itching::update(Neko &neko)
     neko.did_update();
 }
 
-Animation Itching::animation(Neko &neko)
+Animation Yawning::animation(Neko &neko)
 {
     __unused(neko);
 
-    return Animation::KAKI;
+    return Animation::AKUBI;
 }
 
 } // namespace neko

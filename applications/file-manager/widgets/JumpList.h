@@ -45,11 +45,12 @@ public:
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {
-            auto &b = _bookmarks->all()[i];
+            auto bookmark = _bookmarks->all()[i];
 
-            auto button = new Button(this, ButtonStyle::BUTTON_TEXT, b.icon, b.name);
-            button->on(Event::ACTION, [&](auto) {
-                _navigation->navigate(b.path);
+            auto button = new Button(this, ButtonStyle::BUTTON_TEXT, bookmark.icon, bookmark.name);
+
+            button->on(Event::ACTION, [this, bookmark](auto) {
+                _navigation->navigate(bookmark.path);
             });
         }
     }

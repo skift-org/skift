@@ -72,7 +72,7 @@ public:
 
         _refresh = toolbar_icon_create(this, Icon::get("refresh"));
 
-        _refresh->on(Event::ACTION, [&](auto) {
+        _refresh->on(Event::ACTION, [this](auto) {
             _navigation->refresh();
         });
 
@@ -82,7 +82,7 @@ public:
             process_run("terminal", NULL);
         });
 
-        _observer = navigation->observe([&](auto &) {
+        _observer = navigation->observe([this](auto &) {
             _go_backward->enable_if(_navigation->can_go_backward());
             _go_foreward->enable_if(_navigation->can_go_forward());
             _go_up->enable_if(_navigation->can_go_up());

@@ -21,11 +21,11 @@ Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Boo
     _icon_bookmark = Icon::get("bookmark");
     _icon_bookmark_outline = Icon::get("bookmark-outline");
 
-    _navigation_observer = _navigation->observe([&](auto &) {
+    _navigation_observer = _navigation->observe([this](auto &) {
         render();
     });
 
-    _bookmarks_observer = _bookmarks->observe([&](auto &) {
+    _bookmarks_observer = _bookmarks->observe([this](auto &) {
         render();
     });
 }

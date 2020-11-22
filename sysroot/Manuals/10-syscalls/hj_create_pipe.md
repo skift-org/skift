@@ -15,4 +15,6 @@ Result hj_create_pipe(int *reader_handle, int *writer_handle);
 
 ## Return
 
-- SUCCESS: If the pipe was created.
+- SUCCESS: If the pipe has been created.
+- ERR_BAD_ADDRESS
+- ERR_TOO_MANY_OPEN_FILES

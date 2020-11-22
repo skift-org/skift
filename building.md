@@ -53,7 +53,7 @@ $ git clone --recursive https://github.com/skiftOS/skift
 $ cd skift
 ```
 
-Or if you already clone this repo without `--recursive` do:
+Or if you have already cloned this repo without `--recursive` do:
 
 ```sh
 $ cd skift
@@ -100,9 +100,9 @@ From the root of this repo do:
 $ make all
 ```
 
-This command will build all the component of the project and generate an ISO bootable in QEMU or VirtualBox.
+This command will build all the components of the operating system and generate an ISO bootable in QEMU or VirtualBox.
 
-> The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debuging and testing the system
+> The compatibility with virtual box is not guaranteed, as we use QEMU primarly for debuging and testing the system.
 
 ### 4. Running in a virtual machine
 
@@ -143,4 +143,4 @@ $ make run-vbox # for Virtual Box
 
 A bug? A Missing feature? Please consider contributing to the project :hugs: ❤️
 
-See [contributing.md](./contributing.md)
+See [contributing.md](contributing.md)

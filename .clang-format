@@ -13,4 +13,6 @@ FixNamespaceComments: true
 SpaceBeforeInheritanceColon: false
 BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
+BreakConstructorInitializers: AfterColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ...

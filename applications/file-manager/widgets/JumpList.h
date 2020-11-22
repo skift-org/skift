@@ -16,21 +16,28 @@ private:
     RefPtr<Navigation> _navigation;
     RefPtr<Bookmarks> _bookmarks;
 
+    OwnPtr<Observer<Bookmarks>> _bookmark_observer;
+
 public:
     JumpList(
         Widget *parent,
         RefPtr<Navigation> navigation,
-        RefPtr<Bookmarks> bookmarks)
-        : Panel(parent),
-          _navigation(navigation),
-          _bookmarks(bookmarks)
+        RefPtr<Bookmarks> bookmarks) :
+        Panel(parent),
+        _navigation(navigation),
+        _bookmarks(bookmarks)
     {
         layout(VFLOW(4));
         insets(Insets{4});
-        update();
+
+        _bookmark_observer = bookmarks->observe([this](auto &) {
+            render();
+        });
+
+        render();
     }
 
-    void update()
+    void render()
     {
         clear_children();
 
@@ -42,7 +49,7 @@ public:
 
             auto button = new Button(this, ButtonStyle::BUTTON_TEXT, b.icon, b.name);
             button->on(Event::ACTION, [&](auto) {
-                _navigation->navigate(b.path, Navigation::BACKWARD);
+                _navigation->navigate(b.path);
             });
         }
     }

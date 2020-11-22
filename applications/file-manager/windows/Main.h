@@ -16,9 +16,8 @@ class Main:
 {
 private:
 public:
-    Main(RefPtr<Navigation> navigation,
-         RefPtr<Bookmarks> bookmarks)
-        : Window(WINDOW_RESIZABLE)
+    Main(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks) :
+        Window(WINDOW_RESIZABLE)
     {
         icon(Icon::get("folder"));
         title("File Manager");
@@ -26,7 +25,7 @@ public:
 
         root()->layout(VFLOW(0));
 
-        new ToolBar(root(), navigation);
+        new ToolBar(root(), navigation, bookmarks);
 
         auto bookmarks_and_browser = new Container(root());
 

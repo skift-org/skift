@@ -14,4 +14,7 @@ FILE_MANAGER_ICONS = \
 	home \
 	refresh \
 	pipe \
-	console-network
+	console-network \
+	bookmark \
+	bookmark-outline \
+	bookmark-multiple

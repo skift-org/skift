@@ -56,8 +56,8 @@ enum Column
     __COLUMN_COUNT,
 };
 
-Listing::Listing(RefPtr<Navigation> navigation)
-    : _navigation(navigation)
+Listing::Listing(RefPtr<Navigation> navigation) :
+    _navigation(navigation)
 {
     _observer = navigation->observe([this](auto &) {
         update();
@@ -80,8 +80,10 @@ String Listing::header(int column)
     {
     case COLUMN_NAME:
         return "Name";
+
     case COLUMN_TYPE:
         return "Type";
+
     case COLUMN_SIZE:
         return "Size";
 

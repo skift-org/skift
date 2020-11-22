@@ -27,7 +27,8 @@ public:
 
     const Path &current() { return _current; }
 
-    Navigation() : _current(Path::parse(""))
+    Navigation() :
+        _current(Path::parse(""))
     {
     }
 
@@ -82,16 +83,16 @@ public:
         did_update();
     }
 
-    void navigate(String directory)
+    void navigate(String directory) { navigate(Path::parse(directory)); }
+
+    void navigate(Path path)
     {
         clear_foreward();
-        navigate(Path::parse(directory), BACKWARD);
+        navigate(path, BACKWARD);
     }
 
     void navigate(Path path, Direction record_history)
     {
-        logger_debug("Navigating to %s", path.string().cstring());
-
         if (path.relative())
         {
             path = Path::join(_current, path);
@@ -102,6 +103,8 @@ public:
         {
             return;
         }
+
+        logger_info("Navigating %s => %s", _current.string().cstring(), path.string().cstring());
 
         if (record_history == BACKWARD)
         {

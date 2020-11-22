@@ -10,10 +10,11 @@
 namespace file_manager
 {
 
-class ToolBar : public Panel
+class ToolBar: public Panel
 {
 private:
     RefPtr<Navigation> _navigation;
+    RefPtr<Bookmarks> _bookmarks;
 
     Widget *_go_backward;
     Widget *_go_foreward;
@@ -28,9 +29,10 @@ private:
     OwnPtr<Observer<Navigation>> _observer;
 
 public:
-    ToolBar(Widget *parent, RefPtr<Navigation> navigation)
-        : Panel(parent),
-          _navigation(navigation)
+    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks) :
+        Panel(parent),
+        _navigation(navigation),
+        _bookmarks(bookmarks)
     {
         layout(HFLOW(4));
         insets(Insets(4, 4));
@@ -63,7 +65,7 @@ public:
 
         new Separator(this);
 
-        _breadcrumb = new Breadcrumb(this, _navigation);
+        _breadcrumb = new Breadcrumb(this, _navigation, _bookmarks);
         _breadcrumb->attributes(LAYOUT_FILL);
 
         new Separator(this);

@@ -34,15 +34,21 @@ struct Bookmark
         }
     }
 
-    bool operator==(const Bookmark &other) const
+    Bookmark(const String &name, const RefPtr<Icon> icon, const Path &path) :
+        name(name),
+        icon(icon),
+        path(path)
+    {
+    }
+
+    bool
+    operator==(const Bookmark &other) const
     {
         return path == other.path;
     }
 };
 
-class Bookmarks
-    : public Observable<Bookmarks>,
-      public RefCounted<Bookmarks>
+class Bookmarks: public Observable<Bookmarks>, public RefCounted<Bookmarks>
 {
 private:
     Vector<Bookmark> _bookmarks;
@@ -50,8 +56,8 @@ private:
 public:
     Bookmarks() {}
 
-    Bookmarks(Vector<Bookmark> &&bookmarks)
-        : _bookmarks(bookmarks)
+    Bookmarks(Vector<Bookmark> &&bookmarks) :
+        _bookmarks(bookmarks)
     {
     }
 
@@ -62,21 +68,24 @@ public:
 
     void add(Bookmark &&bookmark)
     {
-        for (size_t i = 0; i < _bookmarks.count(); i++)
-        {
-            if (_bookmarks[i] == bookmark)
-            {
-                _bookmarks[i] = move(bookmark);
-                return;
-            }
-        }
-
         _bookmarks.push_back(bookmark);
-
         did_update();
     }
 
-    bool has(Path &path)
+    void remove(const Path &path)
+    {
+        for (size_t i = 0; i < _bookmarks.count(); i++)
+        {
+            if (_bookmarks[i].path == path)
+            {
+                _bookmarks.remove_index(i);
+                did_update();
+                return;
+            }
+        }
+    }
+
+    bool has(const Path &path)
     {
         for (size_t i = 0; i < _bookmarks.count(); i++)
         {

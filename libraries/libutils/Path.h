@@ -116,13 +116,13 @@ public:
     {
     }
 
-    Path(const Path &other)
-        : _absolute{other.absolute()}, _elements{other._elements}
+    Path(const Path &other) :
+        _absolute{other.absolute()}, _elements{other._elements}
     {
     }
 
-    Path(bool absolute, Vector<String> &&elements)
-        : _absolute(absolute), _elements(elements)
+    Path(bool absolute, Vector<String> &&elements) :
+        _absolute(absolute), _elements(elements)
     {
     }
 
@@ -162,10 +162,14 @@ public:
     bool operator==(const Path &other) const
     {
         if (this == &other)
+        {
             return true;
+        }
 
         if (_absolute != other._absolute)
+        {
             return false;
+        }
 
         return _elements == other._elements;
     }

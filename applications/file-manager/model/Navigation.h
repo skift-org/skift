@@ -8,9 +8,9 @@
 namespace file_manager
 {
 
-class Navigation
-    : public Observable<Navigation>,
-      public RefCounted<Navigation>
+class Navigation:
+    public Observable<Navigation>,
+    public RefCounted<Navigation>
 {
 private:
     Vector<Path> _backward{};
@@ -85,12 +85,13 @@ public:
     void navigate(String directory)
     {
         clear_foreward();
-        auto new_path = Path::join(".", directory);
-        navigate(new_path, BACKWARD);
+        navigate(Path::parse(directory), BACKWARD);
     }
 
     void navigate(Path path, Direction record_history)
     {
+        logger_debug("Navigating to %s", path.string().cstring());
+
         if (path.relative())
         {
             path = Path::join(_current, path);

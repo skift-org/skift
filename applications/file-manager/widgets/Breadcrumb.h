@@ -7,7 +7,7 @@
 namespace file_manager
 {
 
-struct Breadcrumb : public Widget
+struct Breadcrumb: public Widget
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -18,8 +18,6 @@ private:
 
 public:
     Breadcrumb(Widget *parent, RefPtr<Navigation> navigation);
-
-    void paint(Painter &painter, Rectangle rectangle);
 };
 
 } // namespace file_manager

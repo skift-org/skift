@@ -10,7 +10,7 @@
 namespace file_manager
 {
 
-class JumpList : public Panel
+class JumpList: public Panel
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -26,7 +26,6 @@ public:
           _bookmarks(bookmarks)
     {
         layout(VFLOW(4));
-        min_width(192);
         insets(Insets{4});
         update();
     }

@@ -311,6 +311,21 @@ public:
         return builder.finalize();
     }
 
+    Path parent(size_t index) const
+    {
+        Vector<String> stack{};
+
+        if (index <= length())
+        {
+            for (size_t i = 0; i <= index; i++)
+            {
+                stack.push_back(_elements[i]);
+            }
+        }
+
+        return {_absolute, move(stack)};
+    }
+
     String string() const
     {
         StringBuilder builder{};

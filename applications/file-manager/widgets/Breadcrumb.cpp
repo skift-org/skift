@@ -1,5 +1,7 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Window.h>
+#include <libwidget/widgets/Button.h>
+#include <libwidget/widgets/IconPanel.h>
 
 #include "file-manager/widgets/Breadcrumb.h"
 
@@ -10,91 +12,33 @@ Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation)
     : Widget(parent),
       _navigation(navigation)
 {
+    layout(HFLOW(0));
+
     _icon_computer = Icon::get("laptop");
     _icon_expand = Icon::get("chevron-right");
 
     _observer = _navigation->observe([&](auto &) {
-        should_relayout();
-        should_repaint();
-    });
-}
+        clear_children();
 
-void Breadcrumb::paint(Painter &painter, Rectangle rectangle)
-{
-    __unused(rectangle);
+        auto &path = _navigation->current();
 
-    int current = 0;
+        auto computer_button = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_computer);
 
-    Rectangle computer_icon_bound(
-        bound().x(),
-        bound().y(),
-        _icon_computer->bound(ICON_18PX).width() + 16,
-        bound().height());
+        computer_button->on(Event::ACTION, [&](auto) {
+            _navigation->navigate("/");
+        });
 
-    painter.blit_icon(
-        *_icon_computer,
-        ICON_18PX,
-        _icon_computer->bound(ICON_18PX).centered_within(computer_icon_bound),
-        color(THEME_FOREGROUND));
-
-    current += computer_icon_bound.width();
-
-    auto path = _navigation->current();
-
-    if (path.length() > 0)
-    {
-        Rectangle expand_icon_bound(
-            bound().x() + current,
-            bound().y(),
-            _icon_expand->bound(ICON_18PX).width(),
-            bound().height());
-
-        painter.blit_icon(
-            *_icon_expand,
-            ICON_18PX,
-            _icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
-            color(THEME_FOREGROUND));
-
-        current += expand_icon_bound.width();
-    }
-
-    for (size_t i = 0; i < path.length(); i++)
-    {
-        auto element = path[i];
-
-        int text_width = font()->mesure_string(element.cstring()).width();
-
-        Rectangle element_bound(
-            bound().x() + current,
-            bound().y(),
-            text_width,
-            bound().height());
-
-        painter.draw_string(
-            *font(),
-            element.cstring(),
-            element_bound.position() + Vec2i(0, 19),
-            color(THEME_FOREGROUND));
-
-        current += text_width;
-
-        if (i != path.length() - 1)
+        for (size_t i = 0; i < path.length(); i++)
         {
-            Rectangle expand_icon_bound(
-                bound().x() + current,
-                bound().y(),
-                _icon_expand->bound(ICON_18PX).width(),
-                bound().height());
+            new IconPanel(this, _icon_expand);
 
-            painter.blit_icon(
-                *_icon_expand,
-                ICON_18PX,
-                _icon_expand->bound(ICON_18PX).centered_within(expand_icon_bound),
-                color(THEME_FOREGROUND));
-
-            current += expand_icon_bound.width();
+            auto button = new Button(this, ButtonStyle::BUTTON_TEXT, path[i]);
+            button->min_width(0);
+            button->on(Event::ACTION, [&, i](auto) {
+                _navigation->navigate(_navigation->current().parent(i), Navigation::BACKWARD);
+            });
         }
-    }
+    });
 }
 
 } // namespace file_manager

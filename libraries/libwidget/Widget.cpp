@@ -442,6 +442,7 @@ void Widget::add_child(Widget *child)
     list_pushback(_childs, child);
 
     should_relayout();
+    should_repaint();
 }
 
 void Widget::remove_child(Widget *child)

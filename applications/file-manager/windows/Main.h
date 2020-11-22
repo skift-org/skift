@@ -11,7 +11,8 @@
 namespace file_manager
 {
 
-class Main : public Window
+class Main:
+    public Window
 {
 private:
 public:
@@ -32,7 +33,8 @@ public:
         bookmarks_and_browser->attributes(LAYOUT_FILL);
         bookmarks_and_browser->layout(HFLOW(1));
 
-        new JumpList(bookmarks_and_browser, navigation, bookmarks);
+        auto jump_list = new JumpList(bookmarks_and_browser, navigation, bookmarks);
+        jump_list->min_width(160);
 
         new Browser(bookmarks_and_browser, navigation);
     }

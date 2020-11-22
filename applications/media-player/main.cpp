@@ -14,6 +14,10 @@ int main(int argc, char **argv)
         });
     });
 
+    window->with_widget<Image>("cover", [&](Image *image) {
+        image->change_bitmap(Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
+    });
+
     window->show();
 
     return application_run();

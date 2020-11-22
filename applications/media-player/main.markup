@@ -11,13 +11,14 @@
         >
 
         <Container fill>
-
+            <Image id="cover" fill/>
         </Container>
 
         <Panel
             layout="hflow(4)"
             padding="insets(4)"
             >
+
             <Button id="play_pause_button" icon="play" filled/>
             <Button id="stop" icon="stop" />
             <Button id="mute_unmute_button" icon="volume-high"/>

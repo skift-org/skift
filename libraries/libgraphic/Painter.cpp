@@ -438,13 +438,13 @@ __flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
     const bool steep = abs(y1 - a.y()) > abs(x1 - x0);
     if (steep)
     {
-        __swap(double, x0, y0);
-        __swap(double, x1, y1);
+        swap(x0, y0);
+        swap(x1, y1);
     }
     if (x0 > x1)
     {
-        __swap(double, x0, x1);
-        __swap(double, y0, y1);
+        swap(x0, x1);
+        swap(y0, y1);
     }
 
     const float dx = x1 - x0;

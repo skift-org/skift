@@ -14,7 +14,7 @@ class Navigation:
 {
 private:
     Vector<Path> _backward{};
-    Path _current;
+    Path _current{};
     Vector<Path> _foreward{};
 
 public:
@@ -25,10 +25,9 @@ public:
         FOREWARD
     };
 
-    const Path &current() { return _current; }
+    const Path &current() const { return _current; }
 
-    Navigation() :
-        _current(Path::parse(""))
+    Navigation() : _current(Path::parse(""))
     {
     }
 
@@ -83,7 +82,10 @@ public:
         did_update();
     }
 
-    void navigate(String directory) { navigate(Path::parse(directory)); }
+    void navigate(String directory)
+    {
+        navigate(Path::parse(directory));
+    }
 
     void navigate(Path path)
     {

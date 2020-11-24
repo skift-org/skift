@@ -29,10 +29,10 @@ private:
     OwnPtr<Observer<Navigation>> _observer;
 
 public:
-    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks) :
-        Panel(parent),
-        _navigation(navigation),
-        _bookmarks(bookmarks)
+    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+        : Panel(parent),
+          _navigation(navigation),
+          _bookmarks(bookmarks)
     {
         layout(HFLOW(4));
         insets(Insets(4, 4));

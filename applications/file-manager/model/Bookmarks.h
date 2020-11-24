@@ -34,10 +34,10 @@ struct Bookmark
         }
     }
 
-    Bookmark(const String &name, const RefPtr<Icon> icon, const Path &path) :
-        name(name),
-        icon(icon),
-        path(path)
+    Bookmark(const String &name, const RefPtr<Icon> icon, const Path &path)
+        : name(name),
+          icon(icon),
+          path(path)
     {
     }
 
@@ -51,17 +51,12 @@ struct Bookmark
 class Bookmarks: public Observable<Bookmarks>, public RefCounted<Bookmarks>
 {
 private:
-    Vector<Bookmark> _bookmarks;
+    Vector<Bookmark> _bookmarks{};
 
 public:
     Bookmarks() {}
 
-    Bookmarks(Vector<Bookmark> &&bookmarks) :
-        _bookmarks(bookmarks)
-    {
-    }
-
-    const Vector<Bookmark> &all()
+    const Vector<Bookmark> &all() const
     {
         return _bookmarks;
     }
@@ -85,10 +80,15 @@ public:
         }
     }
 
-    bool has(const Path &path)
+    bool has(const Path &path) const
     {
         for (size_t i = 0; i < _bookmarks.count(); i++)
         {
+            logger_trace("'%s' ?= '%s' -> %s",
+                         _bookmarks[i].path.string().cstring(),
+                         path.string().cstring(),
+                         _bookmarks[i].path == path ? "true" : "false");
+
             if (_bookmarks[i].path == path)
             {
                 return true;

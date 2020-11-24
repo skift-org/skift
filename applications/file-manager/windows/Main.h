@@ -16,8 +16,8 @@ class Main:
 {
 private:
 public:
-    Main(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks) :
-        Window(WINDOW_RESIZABLE)
+    Main(RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+        : Window(WINDOW_RESIZABLE)
     {
         icon(Icon::get("folder"));
         title("File Manager");

@@ -15,7 +15,6 @@ $(1)_OBJECTS = $$(patsubst applications/%.cpp, $$(BUILD_DIRECTORY)/applications/
 
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)
-ICONS += $$($(1)_ICONS)
 
 $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%: applications/$($(1)_NAME)/%
 	$$(DIRECTORY_GUARD)

@@ -1,23 +1,11 @@
-ICONS += \
-	folder-home \
-	folder \
-	folder-text \
-	folder-download \
-	folder-music \
-	folder-image \
-	folder-heart \
-	folder-cog
+ICONS=$(wildcard icons/*.svg)
 
-ICONS_SVGs = $(patsubst %, icons/%.svg, $(ICONS))
-ICONS_AT_18PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@18px.png, $(ICONS_SVGs))
-ICONS_AT_24PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@24px.png, $(ICONS_SVGs))
-ICONS_AT_36PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@36px.png, $(ICONS_SVGs))
-ICONS_AT_48PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@48px.png, $(ICONS_SVGs))
+ICONS_AT_18PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@18px.png, $(ICONS))
+ICONS_AT_24PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@24px.png, $(ICONS))
+ICONS_AT_36PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@36px.png, $(ICONS))
+ICONS_AT_48PX = $(patsubst icons/%.svg, $(SYSROOT)/Files/Icons/%@48px.png, $(ICONS))
 
 TARGETS += $(ICONS_AT_18PX) $(ICONS_AT_24PX) $(ICONS_AT_36PX) $(ICONS_AT_48PX)
-
-list_icons:
-	@echo $(ICONS_SVGs)
 
 $(SYSROOT)/Files/Icons/%@18px.png: icons/%.svg
 	$(DIRECTORY_GUARD)

@@ -8,8 +8,8 @@
 namespace neko
 {
 
-Playing::Playing() :
-    _last_mouse_position(application_get_mouse_position())
+Playing::Playing()
+    : _last_mouse_position(application_get_mouse_position())
 {
 }
 

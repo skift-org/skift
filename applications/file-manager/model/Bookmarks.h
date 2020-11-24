@@ -48,7 +48,9 @@ struct Bookmark
     }
 };
 
-class Bookmarks: public Observable<Bookmarks>, public RefCounted<Bookmarks>
+class Bookmarks :
+    public Observable<Bookmarks>,
+    public RefCounted<Bookmarks>
 {
 private:
     Vector<Bookmark> _bookmarks{};

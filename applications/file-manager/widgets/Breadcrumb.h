@@ -8,7 +8,7 @@
 namespace file_manager
 {
 
-struct Breadcrumb: public Widget
+struct Breadcrumb : public Widget
 {
 private:
     RefPtr<Navigation> _navigation;

@@ -18,7 +18,7 @@ static bool find_command_path(char *buffer, const char *command)
         command[0] == '.')
     {
         snprintf(buffer, PATH_LENGTH, "%s", command);
-        
+
         return file_exist(buffer);
     }
     else

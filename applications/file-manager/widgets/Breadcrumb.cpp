@@ -9,10 +9,10 @@
 namespace file_manager
 {
 
-Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks) :
-    Widget(parent),
-    _navigation(navigation),
-    _bookmarks(bookmarks)
+Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    : Widget(parent),
+      _navigation(navigation),
+      _bookmarks(bookmarks)
 {
     layout(HFLOW(0));
 

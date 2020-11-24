@@ -10,7 +10,7 @@
 namespace file_manager
 {
 
-class ToolBar: public Panel
+class ToolBar : public Panel
 {
 private:
     RefPtr<Navigation> _navigation;

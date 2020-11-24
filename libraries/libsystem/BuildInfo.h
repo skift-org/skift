@@ -1,29 +1,29 @@
 #pragma once
 
 #ifndef __BUILD_ARCH__
-#define __BUILD_ARCH__ "unknown"
+#    define __BUILD_ARCH__ "unknown"
 #endif
 
 #ifndef __BUILD_CONFIG__
-#define __BUILD_CONFIG__ "unknown"
+#    define __BUILD_CONFIG__ "unknown"
 #endif
 
 #ifndef __BUILD_SYSTEM__
-#define __BUILD_SYSTEM__ "unknown"
+#    define __BUILD_SYSTEM__ "unknown"
 #endif
 
 #ifndef __BUILD_TARGET__
-#define __BUILD_TARGET__ "unknown"
+#    define __BUILD_TARGET__ "unknown"
 #endif
 
 #ifndef __BUILD_GITREF__
-#define __BUILD_GITREF__ "unknown"
+#    define __BUILD_GITREF__ "unknown"
 #endif
 
 #ifndef __BUILD_UNAME__
-#define __BUILD_UNAME__ "unknown"
+#    define __BUILD_UNAME__ "unknown"
 #endif
 
 #ifndef __BUILD_VERSION__
-#define __BUILD_VERSION__ "0000.0000"
+#    define __BUILD_VERSION__ "0000.0000"
 #endif

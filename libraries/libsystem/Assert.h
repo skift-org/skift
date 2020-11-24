@@ -10,7 +10,5 @@ void __no_return assert_failed(const char *expr, const char *file, const char *f
     assert_failed("ASSERT_NOT_REACHED() reached!", __FILE__, __FUNCTION__, __LINE__)
 
 #ifndef __cplusplus
-
-#define static_assert(__expr, __message) _Static_assert((__expr), __message)
-
+#    define static_assert(__expr, __message) _Static_assert((__expr), __message)
 #endif

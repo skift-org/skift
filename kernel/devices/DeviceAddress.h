@@ -24,7 +24,8 @@ class DeviceAddress
 private:
     DeviceBus _bus;
 
-    union {
+    union
+    {
         LegacyAddress _legacy;
         PCIAddress _pci;
         UNIXAddress _unix;

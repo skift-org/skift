@@ -11,7 +11,7 @@
 namespace file_manager
 {
 
-class Main:
+class Main :
     public Window
 {
 private:

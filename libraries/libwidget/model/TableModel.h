@@ -5,8 +5,9 @@
 
 #include <libwidget/utils/Variant.h>
 
-class TableModel : public RefCounted<TableModel>,
-                   public Observable<TableModel>
+class TableModel :
+    public RefCounted<TableModel>,
+    public Observable<TableModel>
 {
 public:
     TableModel() {}

@@ -7,7 +7,8 @@
 namespace neko
 {
 
-class Idle: public Behavior
+class Idle :
+    public Behavior
 {
 private:
     Random _random;

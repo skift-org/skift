@@ -66,7 +66,8 @@ enum
 struct __packed CPUID
 {
     char vendorid[16];
-    union __packed {
+    union __packed
+    {
         struct __packed
         {
             bool SSE3 : 1;
@@ -99,7 +100,8 @@ struct __packed CPUID
         uint32_t RAW_ECX;
     };
 
-    union __packed {
+    union __packed
+    {
         struct __packed
         {
             bool FPU : 1;

@@ -12,9 +12,9 @@
 namespace neko
 {
 
-Idle::Idle() :
-    _random(random_create()),
-    _timer(random_uint32_max(&_random, 16) + 4)
+Idle::Idle()
+    : _random(random_create()),
+      _timer(random_uint32_max(&_random, 16) + 4)
 {
 }
 

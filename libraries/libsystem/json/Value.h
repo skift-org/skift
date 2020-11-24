@@ -33,7 +33,8 @@ class Value
 private:
     Type _type;
 
-    union {
+    union
+    {
         StringStorage *_string;
         int _integer;
 #ifndef __KERNEL__

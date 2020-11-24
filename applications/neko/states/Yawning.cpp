@@ -8,8 +8,8 @@
 namespace neko
 {
 
-Yawning::Yawning() :
-    _last_mouse_position(application_get_mouse_position())
+Yawning::Yawning()
+    : _last_mouse_position(application_get_mouse_position())
 {
 }
 

@@ -16,10 +16,10 @@ Rectangle Neko::sprite()
     return {x * SIZE, y * SIZE, SIZE, SIZE};
 }
 
-Neko::Neko(Vec2f starting_position) :
-    _position(starting_position),
-    _sprites(Bitmap::load_from_or_placeholder("/Applications/neko/sprites.png")),
-    _behavior(own<ChaseMouse>())
+Neko::Neko(Vec2f starting_position)
+    : _position(starting_position),
+      _sprites(Bitmap::load_from_or_placeholder("/Applications/neko/sprites.png")),
+      _behavior(own<ChaseMouse>())
 {
 }
 

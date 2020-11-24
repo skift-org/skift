@@ -140,7 +140,8 @@ struct CompositorMessage
 {
     CompositorMessageType type;
 
-    union {
+    union
+    {
         CompositorGreetings greetings;
         CompositorEvent event;
         CompositorCreateWindow create_window;

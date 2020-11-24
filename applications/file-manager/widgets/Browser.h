@@ -9,7 +9,7 @@
 namespace file_manager
 {
 
-class Browser: public Table
+class Browser : public Table
 {
 private:
     RefPtr<Navigation> _navigation;

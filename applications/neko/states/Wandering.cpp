@@ -15,10 +15,10 @@ Vec2f Wandering::pick_destination()
     return {(float)x, (float)y};
 }
 
-Wandering::Wandering() :
-    _random(random_create()),
-    _destination(pick_destination()),
-    _timer(random_uint32_max(&_random, 64) + 8)
+Wandering::Wandering()
+    : _random(random_create()),
+      _destination(pick_destination()),
+      _timer(random_uint32_max(&_random, 64) + 8)
 {
 }
 

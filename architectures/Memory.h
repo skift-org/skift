@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef ARCH_PAGE_SIZE
-#define ARCH_PAGE_SIZE (4096)
+#    define ARCH_PAGE_SIZE (4096)
 #endif
 
 #define PAGE_ALIGN(__x) ((__x) + ARCH_PAGE_SIZE - ((__x) % ARCH_PAGE_SIZE))

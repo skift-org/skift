@@ -11,8 +11,8 @@ class Wandering : public Behavior
 {
 private:
     Random _random;
-    Vec2f  _destination;
-    int    _timer;
+    Vec2f _destination;
+    int _timer;
 
     Vec2f pick_destination();
 

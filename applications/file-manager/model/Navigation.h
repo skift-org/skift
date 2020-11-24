@@ -8,7 +8,7 @@
 namespace file_manager
 {
 
-class Navigation:
+class Navigation :
     public Observable<Navigation>,
     public RefCounted<Navigation>
 {

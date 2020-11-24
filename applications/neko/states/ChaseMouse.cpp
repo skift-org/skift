@@ -12,8 +12,8 @@ Vec2f ChaseMouse::pick_destination()
     return application_get_mouse_position();
 }
 
-ChaseMouse::ChaseMouse() :
-    _destination(pick_destination())
+ChaseMouse::ChaseMouse()
+    : _destination(pick_destination())
 {
 }
 

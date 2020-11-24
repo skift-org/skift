@@ -7,7 +7,7 @@
 namespace neko
 {
 
-class Playing: public Behavior
+class Playing : public Behavior
 {
 private:
     Vec2i _last_mouse_position;

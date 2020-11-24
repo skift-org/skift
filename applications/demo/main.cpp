@@ -33,8 +33,7 @@ int main(int argc, char **argv)
     navbar->bound(navbar->bound().with_height(32));
     navbar->bound(navbar->bound().with_width(128));
 
-    DemoWidget *demo_widget = nullptr;
-    demo_widget = new DemoWidget(window->root());
+    DemoWidget *demo_widget = new DemoWidget(window->root());
     demo_widget->attributes(LAYOUT_FILL);
     demo_widget->demo(&_demos[0]);
 

@@ -3,7 +3,8 @@
 #include <libsystem/core/CString.h>
 #include <libutils/RefCounted.h>
 
-class StringStorage: public RefCounted<StringStorage>
+class StringStorage :
+    public RefCounted<StringStorage>
 {
 private:
     size_t _length;

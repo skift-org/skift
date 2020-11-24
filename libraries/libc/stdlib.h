@@ -49,8 +49,12 @@ void abort(void);
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
-void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
-			  int (*compar)(const void *, const void *));
+void *bsearch(
+    const void *key,
+    const void *base,
+    size_t nmemb,
+    size_t size,
+    int (*compar)(const void *, const void *));
 
 char *mktemp(char *);
 int mkstemp(char *);
@@ -60,13 +64,13 @@ size_t wcstombs(char *dest, const wchar_t *src, size_t n);
 
 typedef struct
 {
-	int quot;
-	int rem;
+    int quot;
+    int rem;
 } div_t;
 typedef struct
 {
-	long int quot;
-	long int rem;
+    long int quot;
+    long int rem;
 } ldiv_t;
 
 div_t div(int numerator, int denominator);

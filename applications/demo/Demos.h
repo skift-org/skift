@@ -20,4 +20,4 @@ struct Demo
 {
     const char *name;
     DrawDemoCallback callback;
-} ;
+};

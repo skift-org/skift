@@ -10,7 +10,7 @@
 namespace file_manager
 {
 
-class JumpList: public Panel
+class JumpList : public Panel
 {
 private:
     RefPtr<Navigation> _navigation;

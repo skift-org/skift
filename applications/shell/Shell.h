@@ -8,7 +8,7 @@ struct ShellBuiltin
 {
     const char *name;
     ShellBuiltinCallback handler;
-} ;
+};
 
 ShellBuiltinCallback shell_get_builtin(const char *name);
 

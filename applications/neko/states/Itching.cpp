@@ -8,8 +8,8 @@
 namespace neko
 {
 
-Itching::Itching() :
-    _last_mouse_position(application_get_mouse_position())
+Itching::Itching()
+    : _last_mouse_position(application_get_mouse_position())
 {
 }
 

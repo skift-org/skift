@@ -1,4 +1,5 @@
 #include <libsystem/math/Math.h>
+
 #include "sin_data.h"
 
 double sin(double x)

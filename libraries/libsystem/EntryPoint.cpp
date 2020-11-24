@@ -1,7 +1,6 @@
 #ifndef __KERNEL__
-
-#include <libsystem/core/Plugs.h>
-#include <libsystem/process/Environment.h>
+#    include <libsystem/core/Plugs.h>
+#    include <libsystem/process/Environment.h>
 
 extern "C" int main(int argc, char **argv);
 

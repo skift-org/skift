@@ -39,7 +39,8 @@ struct Date
     int year;
 };
 
-union DateTime {
+union DateTime
+{
     struct
     {
         Time time;

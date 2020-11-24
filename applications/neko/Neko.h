@@ -10,7 +10,7 @@
 namespace neko
 {
 
-class Neko: public Observable<Neko>
+class Neko : public Observable<Neko>
 {
 private:
     int _tick = 0;

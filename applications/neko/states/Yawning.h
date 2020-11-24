@@ -7,7 +7,8 @@
 namespace neko
 {
 
-class Yawning: public Behavior
+class Yawning :
+    public Behavior
 {
 private:
     Vec2i _last_mouse_position;

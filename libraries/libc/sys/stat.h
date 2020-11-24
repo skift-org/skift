@@ -7,42 +7,42 @@ typedef int mode_t;
 
 struct stat
 {
-	uint16_t st_dev;
-	uint16_t st_ino;
-	uint32_t st_mode;
-	uint16_t st_nlink;
-	uint16_t st_uid;
-	uint16_t st_gid;
-	uint16_t st_rdev;
-	int32_t st_size;
-	uint32_t st_atime;
-	uint32_t __unused1;
-	int32_t st_mtime;
-	uint32_t __unused2;
-	uint32_t st_ctime;
-	uint32_t __unused3;
-	uint32_t st_blksize;
-	uint32_t st_blocks;
+    uint16_t st_dev;
+    uint16_t st_ino;
+    uint32_t st_mode;
+    uint16_t st_nlink;
+    uint16_t st_uid;
+    uint16_t st_gid;
+    uint16_t st_rdev;
+    int32_t st_size;
+    uint32_t st_atime;
+    uint32_t __unused1;
+    int32_t st_mtime;
+    uint32_t __unused2;
+    uint32_t st_ctime;
+    uint32_t __unused3;
+    uint32_t st_blksize;
+    uint32_t st_blocks;
 };
 
-#define _IFMT 0170000	/* type of file */
-#define _IFDIR 0040000	/* directory */
-#define _IFCHR 0020000	/* character special */
-#define _IFBLK 0060000	/* block special */
-#define _IFREG 0100000	/* regular */
-#define _IFLNK 0120000	/* symbolic link */
+#define _IFMT 0170000 /* type of file */
+#define _IFDIR 0040000 /* directory */
+#define _IFCHR 0020000 /* character special */
+#define _IFBLK 0060000 /* block special */
+#define _IFREG 0100000 /* regular */
+#define _IFLNK 0120000 /* symbolic link */
 #define _IFSOCK 0140000 /* socket */
-#define _IFIFO 0010000	/* fifo */
+#define _IFIFO 0010000 /* fifo */
 
 #define S_BLKSIZE 1024 /* size of a block */
 
-#define S_ISUID 0004000	 /* set user id on execution */
-#define S_ISGID 0002000	 /* set group id on execution */
-#define S_ISVTX 0001000	 /* save swapped text even after use */
-#define S_IREAD 0000400	 /* read permission, owner */
+#define S_ISUID 0004000 /* set user id on execution */
+#define S_ISGID 0002000 /* set group id on execution */
+#define S_ISVTX 0001000 /* save swapped text even after use */
+#define S_IREAD 0000400 /* read permission, owner */
 #define S_IWRITE 0000200 /* write permission, owner */
-#define S_IEXEC 0000100	 /* execute/search permission, owner */
-#define S_ENFMT 0002000	 /* enforcement-mode locking */
+#define S_IEXEC 0000100 /* execute/search permission, owner */
+#define S_ENFMT 0002000 /* enforcement-mode locking */
 
 #define S_IFMT _IFMT
 #define S_IFDIR _IFDIR

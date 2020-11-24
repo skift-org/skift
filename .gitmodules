@@ -3,11 +3,6 @@
 	url = https://github.com/skiftOS/lodepng
 	branch=master
 
-[submodule "thirdparty/icons"]
-	path = thirdparty/icons
-	url = https://github.com/skiftOS/icons
-	branch=master
-
 [submodule "thirdparty/limine"]
 	path = thirdparty/limine
 	url = https://github.com/skiftOS/limine

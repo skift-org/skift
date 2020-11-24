@@ -24,7 +24,7 @@ Building skiftOS requires
 - gcc
 - binutils
 - grub
-- inkscape
+- ImageMagick
 
 And for testing and debugging
 - qemu-system-i386
@@ -33,7 +33,7 @@ And for testing and debugging
 
 ```sh
 # On Debian or Debian-based distributions
-$ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools inkscape
+$ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools imagemagick
 ```
 
 ### About WSL

@@ -5,8 +5,8 @@ export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export PATH := $(shell toolbox/use-it.sh):$(PATH)
 export LC_ALL=C
 
-ifeq (, $(shell which inkscape))
-$(error "No inkscape in PATH, consider installing it")
+ifeq (, $(shell which convert))
+$(error "No ImageMagick in PATH, consider installing it")
 endif
 
 DIRECTORY_GUARD=@mkdir -p $(@D)

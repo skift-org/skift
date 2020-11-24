@@ -6,15 +6,15 @@
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
-struct StringBuilder
+class StringBuilder
 {
-    __noncopyable(StringBuilder);
-    __nonmovable(StringBuilder);
-
 private:
     size_t _used = 0;
     size_t _size = 0;
     char *_buffer = nullptr;
+
+    __noncopyable(StringBuilder);
+    __nonmovable(StringBuilder);
 
 public:
     size_t length() const
@@ -22,7 +22,9 @@ public:
         return _used;
     }
 
-    StringBuilder() : StringBuilder(16) {}
+    StringBuilder() : StringBuilder(16)
+    {
+    }
 
     StringBuilder(size_t preallocated)
     {
@@ -58,7 +60,12 @@ public:
 
     StringBuilder &append(String string)
     {
-        return append(string.cstring());
+        for (size_t i = 0; i < string.length(); i++)
+        {
+            append(string[i]);
+        }
+
+        return *this;
     }
 
     StringBuilder &append(const char *str)
@@ -106,8 +113,13 @@ public:
 
         if (_used + 1 == _size)
         {
-            _size += _size / 4;
-            _buffer = (char *)realloc(_buffer, _size);
+            auto new_size = _size + _size / 4;
+            auto new_buffer = new char[new_size];
+            memcpy(new_buffer, _buffer, _size);
+            delete[] _buffer;
+
+            _size = new_size;
+            _buffer = new_buffer;
         }
 
         _buffer[_used] = chr;

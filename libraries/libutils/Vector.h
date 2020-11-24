@@ -58,18 +58,17 @@ public:
 
     T *raw_storage() { return _storage; }
 
-    Vector() :
-        Vector(16) {}
+    Vector() : Vector(16) {}
 
     Vector(size_t capacity)
     {
         ensure_capacity(capacity);
     }
 
-    Vector(AdoptTag, T *storage, size_t size) :
-        _storage(storage),
-        _count(size),
-        _capacity(size)
+    Vector(AdoptTag, T *storage, size_t size)
+        : _storage(storage),
+          _count(size),
+          _capacity(size)
     {
     }
 
@@ -134,6 +133,11 @@ public:
         assert(index < _count);
 
         return _storage[index];
+    }
+
+    bool operator!=(const Vector &other) const
+    {
+        return !(*this == other);
     }
 
     bool operator==(const Vector &other) const

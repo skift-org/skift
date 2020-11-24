@@ -116,13 +116,11 @@ public:
     {
     }
 
-    Path(const Path &other) :
-        _absolute{other.absolute()}, _elements{other._elements}
+    Path(const Path &other) : _absolute{other.absolute()}, _elements{other._elements}
     {
     }
 
-    Path(bool absolute, Vector<String> &&elements) :
-        _absolute(absolute), _elements(elements)
+    Path(bool absolute, Vector<String> &&elements) : _absolute(absolute), _elements(elements)
     {
     }
 
@@ -157,6 +155,11 @@ public:
     String operator[](size_t index) const
     {
         return _elements[index];
+    }
+
+    bool operator!=(const Path &other) const
+    {
+        return !(*this == other);
     }
 
     bool operator==(const Path &other) const

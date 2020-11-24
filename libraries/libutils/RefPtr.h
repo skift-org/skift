@@ -163,7 +163,7 @@ public:
 };
 
 template <typename T>
-class CallableRefPtr : public RefPtr<T>
+class CallableRefPtr: public RefPtr<T>
 {
 public:
     template <typename... TArgs>

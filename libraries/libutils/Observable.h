@@ -13,12 +13,16 @@ public:
         Observable<T> *_observable;
         Callback<void(T &)> _callback;
 
+        __noncopyable(_Observer);
+        __nonmovable(_Observer);
+
         _Observer(Observable<T> *observable, Callback<void(T &)> callback)
             : _observable(observable),
               _callback(callback)
         {
             _observable->register_observer(this);
         }
+
         ~_Observer()
         {
             if (_observable)

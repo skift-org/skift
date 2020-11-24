@@ -9,3 +9,5 @@ vm/
 disks/
 
 *.ignored
+*.out
+*.d

@@ -12,6 +12,7 @@ private:
 
 public:
     size_t length() const { return _buffer->length(); }
+
     const char *cstring() const { return _buffer->cstring(); }
     char at(int index) const { return _buffer->cstring()[index]; }
 
@@ -74,6 +75,11 @@ public:
         _buffer = make<StringStorage>(*_buffer, *other._buffer);
 
         return *this;
+    }
+
+    bool operator!=(const String &other) const
+    {
+        return !(*this == other);
     }
 
     bool operator==(const String &other) const

@@ -26,8 +26,8 @@ class Bitmap : public RefCounted<Bitmap>
 private:
     int _handle;
     BitmapStorage _storage;
-    int _width;
-    int _height;
+    unsigned int _width;
+    unsigned int _height;
     BitmapFiltering _filtering;
     Color *_pixels;
 
@@ -50,8 +50,8 @@ public:
     Color *pixels() { return _pixels; }
 
     int handle() const { return _handle; }
-    int width() const { return _width; }
-    int height() const { return _height; }
+    unsigned int width() const { return _width; }
+    unsigned int height() const { return _height; }
     Vec2i size() const { return Vec2i(_width, _height); }
     Rectangle bound() const { return Rectangle(_width, _height); }
 

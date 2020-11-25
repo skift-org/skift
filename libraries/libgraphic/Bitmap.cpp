@@ -20,7 +20,7 @@ static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
 };
 
-ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
+ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(unsigned int width, unsigned int height)
 {
     Color *pixels = nullptr;
     Result result = memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
@@ -56,7 +56,7 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i wid
     return make<Bitmap>(handle, BITMAP_SHARED, width_and_height.x(), width_and_height.y(), pixels);
 }
 
-RefPtr<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
+RefPtr<Bitmap> Bitmap::create_static(unsigned int width, unsigned int height, Color *pixels)
 {
     return make<Bitmap>(-1, BITMAP_STATIC, width, height, pixels);
 }

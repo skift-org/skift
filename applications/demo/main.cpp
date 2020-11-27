@@ -8,6 +8,7 @@ static Demo _demos[] = {
     {"Colors", colors_draw},
     {"Graphics", graphics_draw},
     {"Lines", lines_draw},
+    {"Path", svg_draw},
     {nullptr, nullptr},
 };
 

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <libsystem/math/Math.h>
 #include <libutils/Scanner.h>
+#include <libutils/Strings.h>
 
 static inline const char *scan_json_escape_sequence(Scanner &scan)
 {
-    constexpr auto XDIGITS = "0123456789abcdef";
-
     scan.skip('\\');
 
     if (scan.ended())
@@ -46,7 +46,7 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
     {
         auto read_4hex = [&]() {
             char buffer[5];
-            for (size_t i = 0; i < 4 && scan.current_is(XDIGITS); i++)
+            for (size_t i = 0; i < 4 && scan.current_is(Strings::LOWERCASE_XDIGITS); i++)
             {
                 buffer[i] = scan.current();
                 scan.foreward();
@@ -103,6 +103,75 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
     buffer[1] = chr;
 
     return buffer;
+}
+
+static inline unsigned int scan_uint(Scanner &scan, int base)
+{
+    assert(base >= 2 && base <= 16);
+
+    unsigned int v = 0;
+    while (scan.current_is(Strings::LOWERCASE_XDIGITS, base))
+    {
+        v *= base;
+        v += scan.current() - '0';
+        scan.foreward();
+    }
+
+    return v;
+}
+
+static inline int scan_int(Scanner &scan, int base)
+{
+    assert(base >= 2 && base <= 16);
+
+    int sign = 1;
+
+    if (scan.current_is("-"))
+    {
+        sign = -1;
+    }
+
+    scan.skip("+-");
+
+    int digits = 0;
+
+    while (scan.current_is(Strings::LOWERCASE_XDIGITS, base))
+    {
+        digits *= base;
+        digits += scan.current() - '0';
+        scan.foreward();
+    }
+
+    return digits * sign;
+}
+
+static inline double scan_float(Scanner &scan)
+{
+    int ipart = scan_int(scan, 10);
+
+    double fpart = 0;
+
+    if (scan.skip('.'))
+    {
+        double multiplier = 0.1;
+
+        while (scan.current_is(Strings::DIGITS))
+        {
+            fpart += multiplier * (scan.current() - '0');
+            multiplier *= 0.1;
+            scan.foreward();
+        }
+    }
+
+    int exp = 0;
+
+    if (scan.current_is("eE"))
+    {
+        scan.foreward();
+        exp = scan_int(scan, 10);
+    }
+
+    return (ipart + fpart) * pow(10, exp);
 }
 
 static inline void scan_skip_utf8bom(Scanner &scan)

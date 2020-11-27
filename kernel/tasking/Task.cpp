@@ -377,7 +377,7 @@ void task_dump(Task *task)
     list_foreach(MemoryMapping, mapping, task->memory_mapping)
     {
         auto virtual_range = mapping->range();
-        printf("\n\t   - %08x %08x", virtual_range);
+        printf("\n\t   - %08x - %08x (%08x)", virtual_range.base(), virtual_range.end(), virtual_range.size());
     }
 
     if (task->address_space == arch_kernel_address_space())

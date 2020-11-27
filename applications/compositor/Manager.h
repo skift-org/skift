@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libgraphic/Shape.h>
+#include <libsystem/algebra/Rect.h>
 #include <libsystem/utils/List.h>
 
 #include "compositor/Protocol.h"

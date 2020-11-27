@@ -2,6 +2,7 @@
 
 #include <libsystem/math/Math.h>
 #include <libutils/StringBuilder.h>
+#include <libutils/Strings.h>
 
 struct NumberFormat
 {
@@ -36,9 +37,6 @@ struct NumberFormat
         return copy;
     }
 
-    static constexpr const char *XDIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
-    static constexpr const char *XDIGITS_CAPITALIZED = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     void format(StringBuilder &builder, unsigned int value)
     {
         if (value == 0)
@@ -54,11 +52,11 @@ struct NumberFormat
         {
             if (_capitalized)
             {
-                buffer[i] = XDIGITS[value % _base];
+                buffer[i] = Strings::LOWERCASE_XDIGITS[value % _base];
             }
             else
             {
-                buffer[i] = XDIGITS_CAPITALIZED[value % _base];
+                buffer[i] = Strings::UPPERCASE_XDIGITS[value % _base];
             }
 
             value /= _base;

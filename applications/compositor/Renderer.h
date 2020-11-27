@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libgraphic/Shape.h>
+#include <libsystem/algebra/Rect.h>
 
 void renderer_initialize();
 

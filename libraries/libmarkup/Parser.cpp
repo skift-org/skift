@@ -6,26 +6,23 @@
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>
+#include <libutils/Strings.h>
 
 #include <libmarkup/Markup.h>
-
-#define MARKUP_WHITESPACE " \n\r\t"
-#define MARKUP_XDIGITS "0123456789abcdef"
-#define MARKUP_ALPHA "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 namespace markup
 {
 
 static void whitespace(Scanner &scan)
 {
-    scan.eat(MARKUP_WHITESPACE);
+    scan.eat(Strings::WHITESPACE);
 }
 
 static String identifier(Scanner &scan)
 {
     StringBuilder builder{};
 
-    while (scan.current_is(MARKUP_ALPHA) &&
+    while (scan.current_is(Strings::ALL_ALPHA) &&
            scan.do_continue())
     {
         builder.append(scan.current());
@@ -92,7 +89,7 @@ static Node opening_tag(Scanner &scan)
 
     Attributes attr{};
 
-    while (scan.current_is(MARKUP_ALPHA) &&
+    while (scan.current_is(Strings::ALL_ALPHA) &&
            scan.do_continue())
     {
         attribute(scan, attr);

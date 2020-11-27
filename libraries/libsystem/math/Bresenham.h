@@ -1,5 +1,5 @@
+#include <libsystem/algebra/Vec2.h>
 #include <libsystem/math/Math.h>
-#include <libsystem/math/Vec2.h>
 #include <libutils/Vector.h>
 
 template <typename TCallback>

@@ -25,5 +25,5 @@
 #endif
 
 #ifndef __BUILD_VERSION__
-#    define __BUILD_VERSION__ "0000.0000"
+#    define __BUILD_VERSION__ "00.00"
 #endif

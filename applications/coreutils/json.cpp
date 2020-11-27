@@ -12,7 +12,6 @@ int main(int argc, char const *argv[])
 {
     ArgParse args{};
     args.should_abort_on_failure();
-    args.show_help_if_no_operand_given();
 
     args.prologue(PROLOGUE);
 

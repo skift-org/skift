@@ -139,6 +139,7 @@ public:
     }
 
     static Color parse(const char *name);
+    static Color parse(const char *name, size_t size);
 
     static constexpr Color blend(Color fg, Color gb)
     {

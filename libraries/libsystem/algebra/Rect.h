@@ -1,9 +1,9 @@
 #pragma once
 
 #include <libsystem/Logger.h>
+#include <libsystem/algebra/Vec2.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
-#include <libsystem/math/Vectors.h>
 #include <libutils/Enum.h>
 
 struct Insets

@@ -3,6 +3,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
+#include <libutils/ScannerUtils.h>
 
 struct ColorName
 {
@@ -17,55 +18,52 @@ static constexpr ColorName _color_names[] = {
 #undef __ENTRY
 };
 
-static constexpr const char *DIGITS = "0123456789";
-static constexpr const char *HEXDIGITS = "0123456789abcdef";
-static constexpr const char *HEXDIGITS_MAj = "0123456789ABCDEF";
-
 static void whitespace(Scanner &scan)
 {
-    scan.eat(" \n\r\t");
+    scan.eat(Strings::WHITESPACE);
 }
 
 static double number(Scanner &scan)
 {
-    int ipart = 0;
-    double fpart = 0;
-
-    if (scan.current_is(DIGITS))
-    {
-        while (scan.current_is(DIGITS))
-        {
-            ipart *= 10;
-            ipart += scan.current() - '0';
-            scan.foreward();
-        }
-    }
-
-    if (scan.skip('.'))
-    {
-        double multiplier = 0.1;
-
-        while (scan.current_is(DIGITS))
-        {
-            fpart += multiplier * (scan.current() - '0');
-            multiplier *= 0.1;
-            scan.foreward();
-        }
-    }
-
-    return ipart + fpart;
+    return scan_float(scan);
 }
 
 Color Color::parse(const char *name)
 {
-    StringScanner scan{name, strlen(name)};
+    return parse(name, strlen(name));
+}
+
+Color Color::parse(const char *name, size_t size)
+{
+    StringScanner scan{name, size};
+
+    auto parse_component = [&](StringScanner &scan) {
+        whitespace(scan);
+
+        auto value = number(scan);
+
+        whitespace(scan);
+
+        if (scan.skip('%'))
+        {
+            value /= 100;
+        }
+        else
+        {
+            value /= 255;
+        }
+
+        whitespace(scan);
+
+        return value;
+    };
 
     if (scan.skip_word("#"))
     {
         size_t length = 0;
         char buffer[9];
 
-        while ((scan.current_is(HEXDIGITS) || scan.current_is(HEXDIGITS_MAj)) && length < 8)
+        while (scan.current_is(Strings::ALL_XDIGITS) && length < 8)
         {
             buffer[length] = scan.current();
             length++;
@@ -140,21 +138,9 @@ Color Color::parse(const char *name)
     {
         scan.skip('(');
 
-        whitespace(scan);
-        auto red = number(scan);
-        whitespace(scan);
-
-        scan.skip(',');
-
-        whitespace(scan);
-        auto green = number(scan);
-        whitespace(scan);
-
-        scan.skip(',');
-
-        whitespace(scan);
-        auto blue = number(scan);
-        whitespace(scan);
+        auto red = parse_component(scan);
+        auto green = parse_component(scan);
+        auto blue = parse_component(scan);
 
         scan.skip(')');
 
@@ -164,23 +150,9 @@ Color Color::parse(const char *name)
     {
         scan.skip('(');
 
-        whitespace(scan);
-        auto red = number(scan);
-        whitespace(scan);
-
-        scan.skip(',');
-
-        whitespace(scan);
-        auto green = number(scan);
-        whitespace(scan);
-
-        scan.skip(',');
-
-        whitespace(scan);
-        auto blue = number(scan);
-        whitespace(scan);
-
-        scan.skip(',');
+        auto red = parse_component(scan);
+        auto green = parse_component(scan);
+        auto blue = parse_component(scan);
 
         whitespace(scan);
         auto alpha = number(scan);

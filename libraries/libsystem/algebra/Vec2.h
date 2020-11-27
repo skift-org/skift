@@ -3,6 +3,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/math/Dimension.h>
 #include <libsystem/math/Math.h>
+#include <libsystem/math/MinMax.h>
 
 template <typename Scalar>
 class Vec2
@@ -162,7 +163,25 @@ public:
 
         ASSERT_NOT_REACHED();
     }
+
+    Scalar angle_with(Vec2 other)
+    {
+        auto r = (x() * other.x() + y() + other.y()) / (this->length() * other.length());
+
+        if (r < -1.0f)
+        {
+            r = -1.0f;
+        }
+
+        if (r > 1.0f)
+        {
+            r = 1.0f;
+        }
+
+        return ((x() * other.y() < y() * other.x()) ? -1.0f : 1.0f) * acosf(r);
+    }
 };
 
 using Vec2i = Vec2<int>;
 using Vec2f = Vec2<float>;
+using Vec2d = Vec2<double>;

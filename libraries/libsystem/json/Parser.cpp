@@ -8,94 +8,24 @@
 #include <libutils/Scanner.h>
 #include <libutils/ScannerUtils.h>
 #include <libutils/StringBuilder.h>
+#include <libutils/Strings.h>
 
 namespace json
 {
-static constexpr const char *WHITESPACE = " \n\r\t";
-static constexpr const char *DIGITS = "0123456789";
-static constexpr const char *ALPHA = "abcdefghijklmnopqrstuvwxyz";
 
 static Value value(Scanner &scan);
 
 static void whitespace(Scanner &scan)
 {
-    scan.eat(WHITESPACE);
-}
-
-static int digits(Scanner &scan)
-{
-    int digits = 0;
-
-    while (scan.current_is(DIGITS))
-    {
-        digits *= 10;
-        digits += scan.current() - '0';
-        scan.foreward();
-    }
-
-    return digits;
+    scan.eat(Strings::WHITESPACE);
 }
 
 static Value number(Scanner &scan)
 {
-    int ipart_sign = 1;
-
-    if (scan.skip('-'))
-    {
-        ipart_sign = -1;
-    }
-
-    int ipart = 0;
-
-    if (scan.current_is(DIGITS))
-    {
-        ipart = digits(scan);
-    }
-
 #ifdef __KERNEL__
-    return {ipart_sign * ipart};
+    return Value{scan_int(scan, 10)};
 #else
-
-    double fpart = 0;
-
-    if (scan.skip('.'))
-    {
-        double multiplier = 0.1;
-
-        while (scan.current_is(DIGITS))
-        {
-            fpart += multiplier * (scan.current() - '0');
-            multiplier *= 0.1;
-            scan.foreward();
-        }
-    }
-
-    int exp = 0;
-
-    if (scan.current_is("eE"))
-    {
-        scan.foreward();
-        int exp_sign = 1;
-
-        if (scan.current() == '-')
-        {
-            exp_sign = -1;
-        }
-
-        if (scan.current_is("+-"))
-            scan.foreward();
-
-        exp = digits(scan) * exp_sign;
-    }
-
-    if (fpart == 0 && exp >= 0)
-    {
-        return {ipart_sign * ipart * (int)pow(10, exp)};
-    }
-    else
-    {
-        return {ipart_sign * (ipart + fpart) * pow(10, exp)};
-    }
+    return {scan_float(scan)};
 #endif
 }
 
@@ -137,6 +67,7 @@ static Value array(Scanner &scan)
     }
 
     int index = 0;
+
     do
     {
         scan.skip(',');
@@ -185,7 +116,7 @@ static Value keyword(Scanner &scan)
 {
     StringBuilder builder{};
 
-    while (scan.current_is(ALPHA) &&
+    while (scan.current_is(Strings::LOWERCASE_ALPHA) &&
            scan.do_continue())
     {
         builder.append(scan.current());
@@ -218,7 +149,8 @@ static Value value(Scanner &scan)
     {
         value = string(scan);
     }
-    else if (scan.current_is("-0123456789"))
+    else if (scan.current_is("-") ||
+             scan.current_is("0123456789"))
     {
         value = number(scan);
     }

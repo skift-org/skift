@@ -15,3 +15,17 @@ int atoi(const char *nptr)
     parse_int(PARSER_DECIMAL, nptr, strlen(nptr), &value);
     return value;
 }
+
+long int strtol(const char *nptr, char **endptr, int base)
+{
+    int value;
+    parse_int({base}, nptr, (uintptr_t)endptr - (uintptr_t)nptr, &value);
+    return value;
+}
+
+long long int strtoll(const char *nptr, char **endptr, int base)
+{
+    int value;
+    parse_int({base}, nptr, (uintptr_t)endptr - (uintptr_t)nptr, &value);
+    return value;
+}

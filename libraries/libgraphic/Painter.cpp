@@ -1,8 +1,11 @@
+#include <stdlib.h>
+
 #include <libgraphic/Font.h>
-#include <libgraphic/Painter.h>
 #include <libgraphic/StackBlur.h>
 #include <libsystem/Assert.h>
 #include <libsystem/math/Math.h>
+
+#include <libgraphic/Painter.h>
 
 Painter::Painter(RefPtr<Bitmap> bitmap)
 {
@@ -546,6 +549,28 @@ __flatten void Painter::draw_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color)
     draw_line(p0, p1, color);
     draw_line(p1, p2, color);
     draw_line(p2, p0, color);
+}
+
+void Painter::draw_path(const graphic::Path &path, Vec2f pos, Trans2f transform, Color color)
+{
+    for (size_t i = 0; i < path.subpath_count(); i++)
+    {
+        auto &subpath = path.subpath(i);
+
+        for (size_t i = 0; i < subpath.length(); i++)
+        {
+            auto curve = subpath.curves(i);
+
+            curve.start = transform.apply(curve.start) + pos;
+            curve.first_control_point = transform.apply(curve.first_control_point) + pos;
+            curve.second_contol_point = transform.apply(curve.second_contol_point) + pos;
+            curve.end = transform.apply(curve.end) + pos;
+
+            draw_line(curve.start, curve.first_control_point, color);
+            draw_line(curve.first_control_point, curve.second_contol_point, color);
+            draw_line(curve.second_contol_point, curve.end, color);
+        }
+    }
 }
 
 static double sample_draw_circle(Vec2i center, double radius, double thickness, Vec2i position)

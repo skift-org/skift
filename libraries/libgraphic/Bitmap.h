@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libgraphic/Color.h>
-#include <libgraphic/Shape.h>
 #include <libsystem/Result.h>
+#include <libsystem/algebra/Rect.h>
 #include <libsystem/math/Math.h>
 
 #include <libutils/RefPtr.h>

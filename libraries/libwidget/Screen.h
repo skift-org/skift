@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libgraphic/Shape.h>
+#include <libsystem/algebra/Rect.h>
 
 namespace Screen
 {

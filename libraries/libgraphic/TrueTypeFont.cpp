@@ -1,8 +1,8 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/TrueType.h>
 #include <libgraphic/TrueTypeFont.h>
+#include <libsystem/algebra/Vec2.h>
 #include <libsystem/io/Stream.h>
-#include <libsystem/math/Vectors.h>
 
 struct TrueTypeFamily
 {

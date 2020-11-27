@@ -88,7 +88,12 @@ public:
 
     bool current_is(const char *what)
     {
-        for (size_t i = 0; what[i]; i++)
+        return current_is(what, strlen(what));
+    }
+
+    bool current_is(const char *what, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
         {
             if (current() == what[i])
             {
@@ -124,6 +129,18 @@ public:
     bool skip(char chr)
     {
         if (current() == chr)
+        {
+            foreward();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool skip(const char *chr)
+    {
+        if (current_is(chr))
         {
             foreward();
 

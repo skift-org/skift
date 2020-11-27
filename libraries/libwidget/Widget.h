@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Font.h>
-#include <libgraphic/Shape.h>
+#include <libsystem/algebra/Rect.h>
 #include <libsystem/utils/List.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>

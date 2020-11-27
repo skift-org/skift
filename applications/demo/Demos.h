@@ -14,6 +14,8 @@ void graphics_draw(Painter &painter, Rectangle screen, float time);
 
 void lines_draw(Painter &painter, Rectangle screen, float time);
 
+void svg_draw(Painter &Painter, Rectangle screen, float time);
+
 typedef void (*DrawDemoCallback)(Painter &painter, Rectangle screen, float time);
 
 struct Demo

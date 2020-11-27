@@ -4,9 +4,9 @@
 
 #include <stddef.h>
 
-__BEGIN_HEADER
+#include <libsystem/bits/abs.h>
 
-int abs(int value);
+__BEGIN_HEADER
 
 void exit(int status);
 char *getenv(const char *name);
@@ -29,7 +29,6 @@ float strtof(const char *nptr, char **endptr);
 double atof(const char *nptr);
 int atoi(const char *nptr);
 long atol(const char *nptr);
-long int labs(long int j);
 long int strtol(const char *s, char **endptr, int base);
 long long int strtoll(const char *nptr, char **endptr, int base);
 unsigned long int strtoul(const char *nptr, char **endptr, int base);

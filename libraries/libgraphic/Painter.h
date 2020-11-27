@@ -4,6 +4,8 @@
 #include <libgraphic/Font.h>
 #include <libgraphic/Icon.h>
 #include <libgraphic/TrueTypeFont.h>
+#include <libgraphic/vector/Path.h>
+#include <libsystem/algebra/Trans2.h>
 
 #define STATESTACK_SIZE 32
 
@@ -61,9 +63,9 @@ public:
 
     void draw_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color);
 
-    void draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color);
+    void draw_path(const graphic::Path &path, Vec2f pos, Trans2f transform, Color color);
 
-    void blur_rectangle(Rectangle rectangle, int radius);
+    void draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color);
 
     void draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color);
 
@@ -76,6 +78,8 @@ public:
     void draw_truetype_string(TrueTypeFont *font, const char *string, Vec2i position, Color color);
 
     void draw_truetype_string_within(TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color);
+
+    void blur_rectangle(Rectangle rectangle, int radius);
 
 private:
     Rectangle clip() { return _state_stack[_state_stack_top].clip; }

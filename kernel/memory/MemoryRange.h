@@ -55,7 +55,7 @@ public:
         base += align;
         size -= align;
 
-        size -= size % ARCH_PAGE_SIZE;
+        size = __align_down(size, ARCH_PAGE_SIZE);
 
         return (MemoryRange){base, size};
     }
@@ -67,7 +67,7 @@ public:
         base -= align;
         size += align;
 
-        size += ARCH_PAGE_SIZE - size % ARCH_PAGE_SIZE;
+        size = __align_up(size, ARCH_PAGE_SIZE);
 
         return (MemoryRange){base, size};
     }

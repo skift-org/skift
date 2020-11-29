@@ -71,10 +71,16 @@ Widget::~Widget()
     list_destroy(_childs);
 
     if (_parent)
+    {
         _parent->remove_child(this);
+        _parent = nullptr;
+    }
 
     if (_window)
+    {
         _window->widget_removed(this);
+        _window = nullptr;
+    }
 }
 
 void Widget::paint(Painter &painter, Rectangle rectangle)
@@ -448,11 +454,7 @@ void Widget::add_child(Widget *child)
 void Widget::remove_child(Widget *child)
 {
     assert(child->_parent == this);
-
-    child->_parent = nullptr;
-    child->_window = nullptr;
     list_remove(_childs, child);
-
     should_relayout();
 }
 
@@ -490,7 +492,9 @@ void Widget::repaint(Painter &painter, Rectangle rectangle)
     painter.clip(bound());
 
     if (application_is_debbuging_layout())
+    {
         painter.fill_insets(bound(), _insets, Colors::MAGENTA.with_alpha(0.25));
+    }
 
     painter.push();
     paint(painter, rectangle);

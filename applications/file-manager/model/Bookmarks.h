@@ -86,11 +86,6 @@ public:
     {
         for (size_t i = 0; i < _bookmarks.count(); i++)
         {
-            logger_trace("'%s' ?= '%s' -> %s",
-                         _bookmarks[i].path.string().cstring(),
-                         path.string().cstring(),
-                         _bookmarks[i].path == path ? "true" : "false");
-
             if (_bookmarks[i].path == path)
             {
                 return true;

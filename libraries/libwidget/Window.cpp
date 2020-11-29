@@ -372,6 +372,8 @@ void window_update(Window *window); // for maximize
 
 void Window::dispatch_event(Event *event)
 {
+    assert(event);
+
     if (is_mouse_event(event))
     {
         event->mouse.position = event->mouse.position - _bound.position();

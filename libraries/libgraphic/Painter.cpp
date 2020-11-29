@@ -222,8 +222,7 @@ __flatten void Painter::fill_rectangle(Rectangle rectangle, Color color)
     {
         for (int y = 0; y < rectangle.height(); y++)
         {
-            _bitmap->blend_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y),
-                                          color);
+            _bitmap->blend_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y), color);
         }
     }
 }

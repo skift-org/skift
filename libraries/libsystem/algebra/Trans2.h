@@ -144,7 +144,10 @@ public:
 
     Vec2<Scalar> apply(const Vec2<Scalar> v) const
     {
-        return apply_no_translation(v) + Vec2<Scalar>{_m[4], _m[5]};
+        return {
+            v.x() * _m[0] + v.y() * _m[2] + _m[4],
+            v.x() * _m[1] + v.y() * _m[3] + _m[5],
+        };
     }
 
     Vec2<Scalar> apply_no_translation(const Vec2<Scalar> v) const

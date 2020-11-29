@@ -223,18 +223,21 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
 
     // Convert to center point parameterization.
     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+
     // 1) Compute x1', y1'
     float x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
     float y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
+
     d = pow2(x1p) / pow2(rx) + pow2(y1p) / pow2(ry);
+
     if (d > 1)
     {
         d = sqrtf(d);
         rx *= d;
         ry *= d;
     }
+
     // 2) Compute cx', cy'
-    float s = 0.0f;
     float sa = pow2(rx) * pow2(ry) - pow2(rx) * pow2(y1p) - pow2(ry) * pow2(x1p);
     float sb = pow2(rx) * pow2(y1p) + pow2(ry) * pow2(x1p);
 
@@ -242,6 +245,8 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     {
         sa = 0.0f;
     }
+
+    float s = 0.0f;
 
     if (sb > 0.0f)
     {
@@ -260,12 +265,12 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
     float cyp = s * -ry * x1p / rx;
 
     // 3) Compute cx,cy from cx',cy'
-    float cx = (x1 + x2) / 2.0f + cosrx * cxp - sinrx * cyp;
-    float cy = (y1 + y2) / 2.0f + sinrx * cxp + cosrx * cyp;
+    float cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0f;
+    float cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
     // 4) Calculate theta1, and delta theta.
-    Vec2f u = {(x1p - cxp) / rx, (y1p - cyp) / ry};
-    Vec2f v = {(-x1p - cxp) / rx, (-y1p - cyp) / ry};
+    Vec2f u{(x1p - cxp) / rx, (y1p - cyp) / ry};
+    Vec2f v{(-x1p - cxp) / rx, (-y1p - cyp) / ry};
 
     float a1 = Vec2f{1, 0}.angle_with(u); // Initial angle
     float da = u.angle_with(v);

@@ -19,6 +19,8 @@ public:
 
     BezierCurve curves(size_t index) const;
 
+    bool closed() const { return _closed; }
+
     Vec2f first_point() const;
 
     Vec2f last_point() const;

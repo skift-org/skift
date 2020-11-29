@@ -23,7 +23,7 @@ public:
 
     Scalar length()
     {
-        return sqrt(pow(_x, 2) + pow(_y, 2));
+        return sqrt(_x * _x + _y * _y);
     }
 
     Vec2 extract_x() const { return Vec2(_x, 0); }
@@ -166,7 +166,7 @@ public:
 
     Scalar angle_with(Vec2 other)
     {
-        auto r = (x() * other.x() + y() + other.y()) / (this->length() * other.length());
+        auto r = (x() * other.x() + y() + other.y()) / (length() * other.length());
 
         if (r < -1.0f)
         {

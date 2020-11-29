@@ -46,35 +46,41 @@ void Rasterizer::tessellate_cubic_bezier(BezierCurve &curve, int depth)
 void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f transform, Color color)
 {
     __unused(position);
-    __unused(transform);
 
     for (size_t i = 0; i < path.subpath_count(); i++)
     {
-        for (size_t j = 0; j < path.subpath(i).length(); j++)
+        _points.clear();
+
+        auto &subpath = path.subpath(i);
+
+        _points.push_back(transform.apply(subpath.first_point()));
+
+        for (size_t j = 0; j < subpath.length(); j++)
         {
-            auto curve = path.subpath(i).curves(j);
+            auto curve = subpath.curves(j);
 
             curve.start = transform.apply(curve.start);
             curve.first_control_point = transform.apply(curve.first_control_point);
             curve.second_contol_point = transform.apply(curve.second_contol_point);
             curve.end = transform.apply(curve.end);
 
-            _points.clear();
-
             flatten(curve);
+        }
 
-            if (_points.count() > 0)
+        if (_points.count() > 0)
+        {
+            for (size_t i = 0; i < _points.count() - 1; i += 1)
             {
-                for (size_t i = 0; i < _points.count() - 1; i += 1)
-                {
-                    painter.draw_line_antialias(_points[i], _points[i + 1], color);
-                }
-
-                for (size_t i = 0; i < _points.count(); i += 1)
-                {
-                    painter.fill_rectangle({_points[i] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::BLUE);
-                }
+                painter.draw_line_antialias(_points[i], _points[i + 1], color);
             }
+
+            for (size_t i = 0; i < _points.count(); i += 1)
+            {
+                painter.fill_rectangle({_points[i] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::BLUE);
+            }
+
+            painter.fill_rectangle({_points[0] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::GREEN);
+            painter.fill_rectangle({_points[_points.count() - 1] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::YELLOW);
         }
     }
 }

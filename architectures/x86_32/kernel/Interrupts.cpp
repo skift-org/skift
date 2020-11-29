@@ -51,7 +51,7 @@ extern "C" uint32_t interrupts_handler(uintptr_t esp, InterruptStackFrame stackf
 {
     if (stackframe.intno < 32)
     {
-        if (stackframe.eip >= 0x40000000)
+        if (stackframe.cs == 0x1B)
         {
             sti();
 

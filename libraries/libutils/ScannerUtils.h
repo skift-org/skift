@@ -1,6 +1,9 @@
 #pragma once
 
-#include <libsystem/math/Math.h>
+#ifndef __KERNEL__
+#    include <libsystem/math/Math.h>
+#endif
+
 #include <libutils/Scanner.h>
 #include <libutils/Strings.h>
 
@@ -145,6 +148,8 @@ static inline int scan_int(Scanner &scan, int base)
     return digits * sign;
 }
 
+#ifndef __KERNEL__
+
 static inline double scan_float(Scanner &scan)
 {
     int ipart = scan_int(scan, 10);
@@ -173,6 +178,8 @@ static inline double scan_float(Scanner &scan)
 
     return (ipart + fpart) * pow(10, exp);
 }
+
+#endif
 
 static inline void scan_skip_utf8bom(Scanner &scan)
 {

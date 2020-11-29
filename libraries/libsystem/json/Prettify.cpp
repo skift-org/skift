@@ -40,9 +40,9 @@ void prettify(Prettifier &pretty, const Value &value)
 
                 pretty.color_depth();
 
-                pretty.append("\"");
+                pretty.append('"');
                 pretty.append(key.cstring());
-                pretty.append("\"");
+                pretty.append('"');
 
                 pretty.color_clear();
 

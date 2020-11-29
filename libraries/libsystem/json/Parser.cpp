@@ -2,7 +2,6 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/json/Json.h>
-#include <libsystem/math/Math.h>
 #include <libsystem/unicode/Codepoint.h>
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>

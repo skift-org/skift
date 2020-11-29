@@ -13,11 +13,11 @@
 
 # skiftOS
 
-![Deploy](https://github.com/skiftOS/skift/workflows/Deploy/badge.svg?branch=master)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)
-![GitHub last commit](https://img.shields.io/github/last-commit/skiftOS/skift)
-![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)
+[![Deploy](https://github.com/skiftOS/skift/workflows/Deploy/badge.svg?branch=master)](https://github.com/skiftOS/skift/actions)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)](https://github.com/skiftOS/skift/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/skiftOS/skift)](https://github.com/skiftOS/skift/commits)
+[![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)](https://github.com/skiftOS/skift/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)](https://github.com/skiftOS/skift/pulls)
 
  - **skiftOS** is a simple, handmade operating system for the x86 platform, aiming for clean and pretty APIs while keeping the spirit of UNIX.
  - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.

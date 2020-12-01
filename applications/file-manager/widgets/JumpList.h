@@ -47,11 +47,11 @@ public:
             auto button = new Button(
                 this,
                 ButtonStyle::BUTTON_TEXT,
-                bookmark.icon,
-                bookmark.name);
+                bookmark.icon(),
+                bookmark.name());
 
             button->on(Event::ACTION, [this, bookmark](auto) {
-                _navigation->navigate(bookmark.path);
+                _navigation->navigate(bookmark.path());
             });
         }
     }

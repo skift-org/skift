@@ -47,7 +47,7 @@ ResultOr<Slice> file_read_all(String path)
     return Slice{make<SliceStorage>(SliceStorage::ADOPT, buff, size)};
 }
 
-Result file_write_all(const char *path, void *buffer, size_t size)
+Result file_write_all(const char *path, const void *buffer, size_t size)
 {
     __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE | OPEN_CREATE);
 

@@ -24,6 +24,7 @@ public:
         model(_listing);
 
         attributes(LAYOUT_FILL);
+
         empty_message("This directory is empty.");
 
         on(Event::ACTION, [this](auto) {

@@ -71,16 +71,8 @@ void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f tr
         {
             for (size_t i = 0; i < _points.count() - 1; i += 1)
             {
-                painter.draw_line_antialias(_points[i], _points[i + 1], color);
+                painter.draw_line(_points[i], _points[i + 1], color);
             }
-
-            for (size_t i = 0; i < _points.count(); i += 1)
-            {
-                painter.fill_rectangle({_points[i] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::BLUE);
-            }
-
-            painter.fill_rectangle({_points[0] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::GREEN);
-            painter.fill_rectangle({_points[_points.count() - 1] - Vec2i{1, 1}, Vec2i{3, 3}}, Colors::YELLOW);
         }
     }
 }

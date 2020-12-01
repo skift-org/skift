@@ -166,19 +166,21 @@ public:
 
     Scalar angle_with(Vec2 other)
     {
-        auto r = (x() * other.x() + y() + other.y()) / (length() * other.length());
-
-        if (r < -1.0f)
-        {
-            r = -1.0f;
-        }
+        auto r = (x() * other.x() + y() * other.y()) / (length() * other.length());
 
         if (r > 1.0f)
         {
             r = 1.0f;
         }
 
-        return ((x() * other.y() < y() * other.x()) ? -1.0f : 1.0f) * acosf(r);
+        if (r < -1.0f)
+        {
+            r = -1.0f;
+        }
+
+        auto sign = (x() * other.y() < y() * other.x()) ? -1.0f : 1.0f;
+
+        return sign * acosf(r);
     }
 };
 

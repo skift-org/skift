@@ -310,7 +310,7 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
 
     for (int i = 0; i <= ndivs; i++)
     {
-        float a = a1 + da * ((float)i / (float)ndivs);
+        float a = a1 + da * (i / (float)ndivs);
 
         dx = cosf(a);
         dy = sinf(a);

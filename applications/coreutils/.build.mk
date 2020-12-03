@@ -34,7 +34,8 @@ UTILS = \
 	FALSE \
 	YES \
 	PWD	\
-	PLAY
+	PLAY \
+	PIANO
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -143,6 +144,9 @@ YES_NAME = yes
 
 PWD_LIBS =
 PWD_NAME = pwd
+
+PIANO_LIBS = 
+PIANO_NAME = piano
 
 define UTIL_TEMPLATE =
 

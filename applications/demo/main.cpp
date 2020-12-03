@@ -3,12 +3,11 @@
 #include "demo/DemoWidget.h"
 
 static Demo _demos[] = {
-    {"Fonts", fonts_draw},
+    {"Path", path_draw},
     {"Latency", latency_draw},
     {"Colors", colors_draw},
     {"Graphics", graphics_draw},
     {"Lines", lines_draw},
-    {"Path", svg_draw},
     {nullptr, nullptr},
 };
 

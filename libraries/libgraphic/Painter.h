@@ -3,7 +3,6 @@
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Font.h>
 #include <libgraphic/Icon.h>
-#include <libgraphic/TrueTypeFont.h>
 #include <libgraphic/vector/Path.h>
 #include <libsystem/algebra/Trans2.h>
 
@@ -72,12 +71,6 @@ public:
     void draw_string(Font &font, const char *str, Vec2i position, Color color);
 
     void draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color);
-
-    void draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color);
-
-    void draw_truetype_string(TrueTypeFont *font, const char *string, Vec2i position, Color color);
-
-    void draw_truetype_string_within(TrueTypeFont *font, const char *str, Recti container, Anchor anchor, Color color);
 
     void blur_rectangle(Recti rectangle, int radius);
 

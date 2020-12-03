@@ -641,12 +641,12 @@ __flatten void Painter::blur_rectangle(Recti rectangle, int radius)
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
 
-    stackblurJob((unsigned char *)_bitmap->pixels(),
-                 _bitmap->width(),
-                 _bitmap->height(),
-                 radius,
-                 rectangle.x(), rectangle.x() + rectangle.width(),
-                 rectangle.y(), rectangle.y() + rectangle.height());
+    stackblur((unsigned char *)_bitmap->pixels(),
+              _bitmap->width(),
+              _bitmap->height(),
+              radius,
+              rectangle.x(), rectangle.x() + rectangle.width(),
+              rectangle.y(), rectangle.y() + rectangle.height());
 }
 
 __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)

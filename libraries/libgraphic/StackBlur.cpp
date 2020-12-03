@@ -36,15 +36,15 @@ static unsigned char const stackblur_shr[255] = {
     24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
     24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
 
-/// Stackblur algorithm body
-__attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< input image data
-                                                  unsigned int w,      ///< image width
-                                                  unsigned int h,      ///< image height
-                                                  unsigned int radius, ///< blur intensity (should be in 2..254 range)
-                                                  unsigned int minX,
-                                                  unsigned int maxX,
-                                                  unsigned int minY,
-                                                  unsigned int maxY)
+void stackblur(
+    unsigned char *src,  ///< input image data
+    unsigned int w,      ///< image width
+    unsigned int h,      ///< image height
+    unsigned int radius, ///< blur intensity (should be in 2..254 range)
+    unsigned int min_x,
+    unsigned int max_x,
+    unsigned int min_y,
+    unsigned int max_y)
 {
     __unused(h);
 
@@ -66,8 +66,8 @@ __attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< inpu
     unsigned long sum_out_g;
     unsigned long sum_out_b;
 
-    unsigned int wm = maxX - minX - 1;
-    unsigned int hm = maxY - minY - 1;
+    unsigned int wm = max_x - min_x - 1;
+    unsigned int hm = max_y - min_y - 1;
     unsigned int w4 = w * 4;
     unsigned int div = (radius * 2) + 1;
     unsigned int mul_sum = stackblur_mul[radius];
@@ -75,14 +75,13 @@ __attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< inpu
     unsigned char stack[div * 3];
 
     {
-
-        for (y = minY; y < maxY; y++)
+        for (y = min_y; y < max_y; y++)
         {
             sum_r = sum_g = sum_b =
                 sum_in_r = sum_in_g = sum_in_b =
                     sum_out_r = sum_out_g = sum_out_b = 0;
 
-            src_ptr = src + w4 * y + (minX * 4); // start of line (0,y)
+            src_ptr = src + w4 * y + (min_x * 4); // start of line (0,y)
 
             for (i = 0; i <= radius; i++)
             {
@@ -116,11 +115,15 @@ __attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< inpu
 
             sp = radius;
             xp = radius;
+
             if (xp > wm)
+            {
                 xp = wm;
-            src_ptr = src + 4 * (xp + y * w) + (minX * 4); //   img.pix_ptr(xp, y);
-            dst_ptr = src + y * w4 + (minX * 4);           // img.pix_ptr(0, y);
-            for (x = minX; x < maxX; x++)
+            }
+
+            src_ptr = src + 4 * (xp + y * w) + (min_x * 4);
+            dst_ptr = src + y * w4 + (min_x * 4);
+            for (x = min_x; x < max_x; x++)
             {
                 unsigned int alpha = dst_ptr[3];
                 dst_ptr[0] = clamp((sum_r * mul_sum) >> shr_sum, 0, alpha);
@@ -174,14 +177,13 @@ __attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< inpu
     }
 
     {
-
-        for (x = minX; x < maxX; x++)
+        for (x = min_x; x < max_x; x++)
         {
             sum_r = sum_g = sum_b =
                 sum_in_r = sum_in_g = sum_in_b =
                     sum_out_r = sum_out_g = sum_out_b = 0;
 
-            src_ptr = src + 4 * x + minY * w4; // x,0
+            src_ptr = src + 4 * x + min_y * w4; // x,0
             for (i = 0; i <= radius; i++)
             {
                 stack_ptr = &stack[i * 3];
@@ -214,12 +216,16 @@ __attribute__((optimize("O3"))) void stackblurJob(unsigned char *src,  ///< inpu
 
             sp = radius;
             yp = radius;
+
             if (yp > hm)
+            {
                 yp = hm;
-            src_ptr = src + 4 * (x + yp * w) + minY * w4; // img.pix_ptr(x, yp);
-            dst_ptr = src + 4 * x + minY * w4;
-            // img.pix_ptr(x, 0);
-            for (y = minY; y < maxY; y++)
+            }
+
+            src_ptr = src + 4 * (x + yp * w) + min_y * w4;
+            dst_ptr = src + 4 * x + min_y * w4;
+
+            for (y = min_y; y < max_y; y++)
             {
                 unsigned int alpha = dst_ptr[3];
                 dst_ptr[0] = clamp((sum_r * mul_sum) >> shr_sum, 0, alpha);

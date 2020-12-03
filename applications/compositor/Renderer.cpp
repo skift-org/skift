@@ -9,7 +9,7 @@
 static OwnPtr<Framebuffer> _framebuffer;
 static RefPtr<Bitmap> _wallpaper;
 
-static Vector<Rectangle> _dirty_regions;
+static Vector<Recti> _dirty_regions;
 
 void renderer_initialize()
 {
@@ -19,7 +19,7 @@ void renderer_initialize()
     renderer_region_dirty(_framebuffer->resolution());
 }
 
-void renderer_region_dirty(Rectangle new_region)
+void renderer_region_dirty(Recti new_region)
 {
     if (new_region.is_empty())
     {
@@ -28,13 +28,13 @@ void renderer_region_dirty(Rectangle new_region)
 
     bool merged = false;
 
-    _dirty_regions.foreach ([&](Rectangle &region) {
+    _dirty_regions.foreach ([&](Recti &region) {
         if (region.colide_with(new_region))
         {
-            Rectangle top;
-            Rectangle botton;
-            Rectangle left;
-            Rectangle right;
+            Recti top;
+            Recti botton;
+            Recti left;
+            Recti right;
 
             new_region.substract(region, top, botton, left, right);
 
@@ -59,12 +59,12 @@ void renderer_region_dirty(Rectangle new_region)
     }
 }
 
-void renderer_composite_wallpaper(Rectangle region)
+void renderer_composite_wallpaper(Recti region)
 {
     double scale_x = _wallpaper->width() / (double)_framebuffer->resolution().width();
     double scale_y = _wallpaper->height() / (double)_framebuffer->resolution().height();
 
-    Rectangle source(
+    Recti source(
         region.x() * scale_x,
         region.y() * scale_y,
         region.width() * scale_x,
@@ -74,7 +74,7 @@ void renderer_composite_wallpaper(Rectangle region)
     _framebuffer->mark_dirty(region);
 }
 
-void renderer_composite_region(Rectangle region, Window *window_transparent)
+void renderer_composite_region(Recti region, Window *window_transparent)
 {
     renderer_composite_wallpaper(region);
 
@@ -86,9 +86,9 @@ void renderer_composite_region(Rectangle region, Window *window_transparent)
 
         if (window->bound().colide_with(region))
         {
-            Rectangle destination = window->bound().clipped_with(region);
+            Recti destination = window->bound().clipped_with(region);
 
-            Rectangle source(
+            Recti source(
                 destination.position() - window->bound().position(),
                 destination.size());
 
@@ -101,7 +101,7 @@ void renderer_composite_region(Rectangle region, Window *window_transparent)
     _framebuffer->mark_dirty(region);
 }
 
-void renderer_region(Rectangle region)
+void renderer_region(Recti region)
 {
     bool should_paint_wallpaper = true;
 
@@ -113,9 +113,9 @@ void renderer_region(Rectangle region)
     manager_iterate_front_to_back([&](Window *window) {
         if (window->bound().colide_with(region))
         {
-            Rectangle destination = window->bound().clipped_with(region);
+            Recti destination = window->bound().clipped_with(region);
 
-            Rectangle source(
+            Recti source(
                 destination.position() - window->bound().position(),
                 destination.size());
 
@@ -132,10 +132,10 @@ void renderer_region(Rectangle region)
 
             _framebuffer->mark_dirty(destination);
 
-            Rectangle top;
-            Rectangle botton;
-            Rectangle left;
-            Rectangle right;
+            Recti top;
+            Recti botton;
+            Recti left;
+            Recti right;
 
             region.substract(destination, top, botton, left, right);
 
@@ -158,14 +158,14 @@ void renderer_region(Rectangle region)
     }
 }
 
-Rectangle renderer_bound()
+Recti renderer_bound()
 {
     return _framebuffer->resolution();
 }
 
 void renderer_repaint_dirty()
 {
-    _dirty_regions.foreach ([](Rectangle region) {
+    _dirty_regions.foreach ([](Recti region) {
         renderer_region(region);
 
         if (region.colide_with(cursor_bound()))

@@ -4,50 +4,50 @@
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Table.h>
 
-Rectangle Table::body_bound() const
+Recti Table::body_bound() const
 {
     return content_bound();
 }
 
-Rectangle Table::header_bound() const
+Recti Table::header_bound() const
 {
     return body_bound().take_top(TABLE_ROW_HEIGHT);
 }
 
-Rectangle Table::list_bound() const
+Recti Table::list_bound() const
 {
-    return body_bound().shrinked(Insets(TABLE_ROW_HEIGHT, 0, 0));
+    return body_bound().shrinked(Insetsi(TABLE_ROW_HEIGHT, 0, 0));
 }
 
-Rectangle Table::scrollbar_bound() const
+Recti Table::scrollbar_bound() const
 {
     return list_bound().take_right(16);
 }
 
-Rectangle Table::row_bound(int row) const
+Recti Table::row_bound(int row) const
 {
-    return Rectangle(
+    return Recti(
         list_bound().x(),
         list_bound().y() + row * TABLE_ROW_HEIGHT - _scroll_offset,
         list_bound().width(),
         TABLE_ROW_HEIGHT);
 }
 
-Rectangle Table::column_bound(int column) const
+Recti Table::column_bound(int column) const
 {
     int column_count = _model->columns();
     int column_width = list_bound().width() / column_count;
 
-    return Rectangle(
+    return Recti(
         list_bound().x() + column_width * column,
         list_bound().y(),
         column_width,
         list_bound().height());
 }
 
-Rectangle Table::cell_bound(int row, int column) const
+Recti Table::cell_bound(int row, int column) const
 {
-    return Rectangle(
+    return Recti(
         row_bound(row).x() + column * column_bound(column).width(),
         row_bound(row).y(),
         column_bound(column).width(),
@@ -75,7 +75,7 @@ int Table::row_at(Vec2i position) const
 
 void Table::paint_cell(Painter &painter, int row, int column)
 {
-    Rectangle bound = cell_bound(row, column);
+    Recti bound = cell_bound(row, column);
     Variant data = _model->data(row, column);
 
     painter.push();
@@ -86,7 +86,7 @@ void Table::paint_cell(Painter &painter, int row, int column)
         painter.blit_icon(
             *data.icon(),
             ICON_18PX,
-            Rectangle(bound.x() + 7, bound.y() + 7, 18, 18),
+            Recti(bound.x() + 7, bound.y() + 7, 18, 18),
             color(THEME_FOREGROUND));
 
         painter.draw_string(
@@ -124,7 +124,7 @@ Table::Table(Widget *parent, RefPtr<TableModel> model)
     this->model(model);
 }
 
-void Table::paint(Painter &painter, Rectangle rectangle)
+void Table::paint(Painter &painter, Recti rectangle)
 {
     if (!_model)
     {
@@ -171,7 +171,7 @@ void Table::paint(Painter &painter, Rectangle rectangle)
 
     for (int column = 0; column < column_count; column++)
     {
-        Rectangle header_bound_cell = Rectangle(
+        Recti header_bound_cell = Recti(
             header_bound().x() + column * column_width,
             header_bound().y(),
             column_width,

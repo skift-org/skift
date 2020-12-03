@@ -35,7 +35,7 @@ public:
           _bookmarks(bookmarks)
     {
         layout(HFLOW(4));
-        insets(Insets(4, 4));
+        insets(Insetsi(4, 4));
         max_height(38);
         min_height(38);
 

@@ -3,14 +3,14 @@
 namespace Screen
 {
 
-static Rectangle _bound;
+static Recti _bound;
 
-Rectangle bound()
+Recti bound()
 {
     return _bound;
 }
 
-void bound(Rectangle bound)
+void bound(Recti bound)
 {
     _bound = bound;
 }

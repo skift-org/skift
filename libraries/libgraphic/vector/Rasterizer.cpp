@@ -43,6 +43,10 @@ void Rasterizer::tessellate_cubic_bezier(BezierCurve &curve, int depth)
     tessellate_cubic_bezier(curve_b, depth + 1);
 }
 
+// void Rasterizer::fill(Path &path, Vec2f position, Trans2f transform, Color color)
+// {
+// }
+
 void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f transform, Color color)
 {
     __unused(position);
@@ -59,10 +63,10 @@ void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f tr
         {
             auto curve = subpath.curves(j);
 
-            curve.start = transform.apply(curve.start);
-            curve.first_control_point = transform.apply(curve.first_control_point);
-            curve.second_contol_point = transform.apply(curve.second_contol_point);
-            curve.end = transform.apply(curve.end);
+            curve.start = transform.apply(curve.start) + position;
+            curve.first_control_point = transform.apply(curve.first_control_point) + position;
+            curve.second_contol_point = transform.apply(curve.second_contol_point) + position;
+            curve.end = transform.apply(curve.end) + position;
 
             flatten(curve);
         }

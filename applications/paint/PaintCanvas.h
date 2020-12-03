@@ -14,14 +14,14 @@ private:
 public:
     void tool(OwnPtr<PaintTool> tool) { _tool = tool; }
 
-    Rectangle paint_area()
+    Recti paint_area()
     {
         return _document->bound().centered_within(bound());
     }
 
     PaintCanvas(Widget *parent, RefPtr<PaintDocument> document);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     void event(Event *event);
 };

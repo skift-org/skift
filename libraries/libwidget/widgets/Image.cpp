@@ -24,7 +24,7 @@ void Image::change_scaling(ImageScalling scaling)
     }
 }
 
-void Image::paint(Painter &painter, Rectangle rectangle)
+void Image::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -33,7 +33,7 @@ void Image::paint(Painter &painter, Rectangle rectangle)
         return;
     }
 
-    Rectangle destination = bound();
+    Recti destination = bound();
 
     if (_scalling == ImageScalling::CENTER)
     {

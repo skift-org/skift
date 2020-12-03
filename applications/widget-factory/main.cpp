@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     Widget *buttons = new Container(window->root());
     {
         buttons->layout(HFLOW(8));
-        buttons->insets(Insets(0, 8));
+        buttons->insets(Insetsi(0, 8));
 
         new Button(buttons, BUTTON_TEXT, "BUTTON");
         new Button(buttons, BUTTON_OUTLINE, "BUTTON");

@@ -4,7 +4,7 @@
 namespace neko
 {
 
-Rectangle Neko::sprite()
+Recti Neko::sprite()
 {
     auto animation = _behavior->animation(*this);
 

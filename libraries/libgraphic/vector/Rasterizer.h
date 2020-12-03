@@ -28,9 +28,7 @@ public:
 
     void rasterize();
 
-    // void fill(Path &path, Vec2f position, Trans2f transform, Color color)
-    // {
-    // }
+    void fill(Path &path, Vec2f position, Trans2f transform, Color color);
 
     void stroke(Painter &painter, Path &path, Vec2f position, Trans2f transform, Color color);
 };

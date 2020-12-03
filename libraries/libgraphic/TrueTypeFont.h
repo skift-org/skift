@@ -17,7 +17,7 @@ struct TrueTypeFontMetrics
 struct TrueTypeGlyph
 {
     Codepoint codepoint;
-    Rectangle bound;
+    Recti bound;
     Vec2i offset;
     int advance;
 };
@@ -41,7 +41,7 @@ TrueTypeAtlas *truetypefont_get_atlas(TrueTypeFont *font);
 
 TrueTypeGlyph *truetypefont_get_glyph_for_codepoint(TrueTypeFont *font, Codepoint codepoint);
 
-Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string);
+Recti truetypefont_mesure_string(TrueTypeFont *font, const char *string);
 
 int truetypefont_get_kerning_for_codepoints(TrueTypeFont *font, Codepoint left, Codepoint right);
 

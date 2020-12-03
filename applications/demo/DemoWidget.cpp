@@ -25,7 +25,7 @@ DemoWidget::~DemoWidget()
 {
 }
 
-void DemoWidget::paint(Painter &painter, Rectangle)
+void DemoWidget::paint(Painter &painter, Recti)
 {
     if (_bitmap == nullptr)
     {

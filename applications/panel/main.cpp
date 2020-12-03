@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     auto panel_container = new Container(window->root());
     panel_container->attributes(LAYOUT_FILL);
     panel_container->layout(HFLOW(8));
-    panel_container->insets(Insets(4));
+    panel_container->insets(Insetsi(4));
 
     new Separator(window->root());
 

@@ -2,6 +2,7 @@
 
 #include <libgraphic/vector/Arc.h>
 #include <libgraphic/vector/SubPath.h>
+#include <libsystem/algebra/Rect.h>
 #include <libutils/Scanner.h>
 #include <libutils/Vector.h>
 

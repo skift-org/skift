@@ -6,7 +6,7 @@ IconPanel::IconPanel(Widget *parent, RefPtr<Icon> icon)
 {
 }
 
-void IconPanel::paint(Painter &painter, Rectangle rectangle)
+void IconPanel::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -15,7 +15,7 @@ void IconPanel::paint(Painter &painter, Rectangle rectangle)
         return;
     }
 
-    Rectangle destination = _icon->bound(ICON_18PX).centered_within(content_bound());
+    Recti destination = _icon->bound(ICON_18PX).centered_within(content_bound());
 
     painter.blit_icon(
         *_icon,

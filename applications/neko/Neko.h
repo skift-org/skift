@@ -18,7 +18,7 @@ private:
     RefPtr<Bitmap> _sprites;
     OwnPtr<Behavior> _behavior;
 
-    Rectangle sprite();
+    Recti sprite();
 
 public:
     static constexpr int SIZE = 32;

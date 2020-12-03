@@ -25,7 +25,7 @@ public:
           _bookmarks(bookmarks)
     {
         layout(VFLOW(4));
-        insets(Insets{4});
+        insets(Insetsi{4});
 
         _bookmark_observer = bookmarks->observe([this](auto &) {
             render();

@@ -19,13 +19,13 @@ private:
 
     String _empty_message{"No data to display"};
 
-    Rectangle body_bound() const;
-    Rectangle scrollbar_bound() const;
-    Rectangle header_bound() const;
-    Rectangle list_bound() const;
-    Rectangle row_bound(int row) const;
-    Rectangle column_bound(int column) const;
-    Rectangle cell_bound(int row, int column) const;
+    Recti body_bound() const;
+    Recti scrollbar_bound() const;
+    Recti header_bound() const;
+    Recti list_bound() const;
+    Recti row_bound(int row) const;
+    Recti column_bound(int column) const;
+    Recti cell_bound(int row, int column) const;
     int row_at(Vec2i position) const;
     void paint_cell(Painter &painter, int row, int column);
 
@@ -74,7 +74,7 @@ public:
 
     Table(Widget *parent, RefPtr<TableModel> model);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     void event(Event *event);
 

@@ -17,7 +17,7 @@ private:
     WindowType _type;
 
     struct Client *_client;
-    Rectangle _bound;
+    Recti _bound;
     CursorState _cursor_state{};
 
     RefPtr<Bitmap> _frontbuffer;
@@ -45,19 +45,19 @@ public:
         WindowFlag flags,
         WindowType type,
         struct Client *client,
-        Rectangle bound,
+        Recti bound,
         RefPtr<Bitmap> frontbuffer,
         RefPtr<Bitmap> backbuffer);
 
     ~Window();
 
-    Rectangle bound();
+    Recti bound();
 
-    Rectangle cursor_capture_bound();
+    Recti cursor_capture_bound();
 
     void move(Vec2i new_position);
 
-    void resize(Rectangle new_bound);
+    void resize(Recti new_bound);
 
     void send_event(Event event);
 
@@ -71,5 +71,5 @@ public:
 
     void lost_focus();
 
-    void flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int backbuffer_handle, Vec2i backbuffer_size, Rectangle region);
+    void flip_buffers(int frontbuffer_handle, Vec2i frontbuffer_size, int backbuffer_handle, Vec2i backbuffer_size, Recti region);
 };

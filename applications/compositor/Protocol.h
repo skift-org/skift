@@ -47,7 +47,7 @@ enum WindowType
 
 struct CompositorGreetings
 {
-    Rectangle screen_bound;
+    Recti screen_bound;
 };
 
 struct CompositorEvent
@@ -66,7 +66,7 @@ struct CompositorCreateWindow
     int backbuffer;
     Vec2i backbuffer_size;
 
-    Rectangle bound;
+    Recti bound;
 };
 
 struct CompositorDestroyWindow
@@ -78,7 +78,7 @@ struct CompositorResizeWindow
 {
     int id;
 
-    Rectangle bound;
+    Recti bound;
 };
 
 struct CompositorMoveWindow
@@ -97,7 +97,7 @@ struct CompositorFlipWindow
     int backbuffer;
     Vec2i backbuffer_size;
 
-    Rectangle bound;
+    Recti bound;
 };
 
 struct CompositorEventWindow
@@ -128,7 +128,7 @@ struct CompositorSetWallaper
 
 struct CompositorChangedResolution
 {
-    Rectangle resolution;
+    Recti resolution;
 };
 
 struct CompositorMousePosition

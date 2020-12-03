@@ -114,18 +114,18 @@ static Layout layout_parse(const char *string)
     return result;
 }
 
-Insets insets_parse(const char *string)
+Insetsi insets_parse(const char *string)
 {
     if (!string)
     {
-        return Insets(0);
+        return Insetsi(0);
     }
 
     StringScanner scan{string, strlen(string)};
 
     if (!scan.skip_word("insets"))
     {
-        return Insets(0);
+        return Insetsi(0);
     }
 
     scan.skip('(');
@@ -142,23 +142,23 @@ Insets insets_parse(const char *string)
         whitespace(scan);
     }
 
-    Insets result = Insets(0);
+    Insetsi result = Insetsi(0);
 
     if (count == 1)
     {
-        result = Insets(args[0]);
+        result = Insetsi(args[0]);
     }
     else if (count == 2)
     {
-        result = Insets(args[0], args[1]);
+        result = Insetsi(args[0], args[1]);
     }
     else if (count == 3)
     {
-        result = Insets(args[0], args[1], args[2]);
+        result = Insetsi(args[0], args[1], args[2]);
     }
     else if (count == 4)
     {
-        result = Insets(args[0], args[1], args[2], args[3]);
+        result = Insetsi(args[0], args[1], args[2], args[3]);
     }
 
     return result;

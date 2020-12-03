@@ -8,7 +8,7 @@ PaintCanvas::PaintCanvas(Widget *parent, RefPtr<PaintDocument> document)
 {
 }
 
-void PaintCanvas::paint(Painter &painter, Rectangle rectangle)
+void PaintCanvas::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 

@@ -27,7 +27,7 @@ public:
           _model(model)
     {
         layout(VFLOW(0));
-        insets(Insets(8));
+        insets(Insetsi(8));
         attributes(LAYOUT_FILL);
 
         auto icon_and_text = new Container(this);

@@ -55,7 +55,7 @@ Widget::Widget(Widget *parent)
 {
     _enabled = true;
     _childs = list_create();
-    _bound = Rectangle(32, 32);
+    _bound = Recti(32, 32);
 
     if (parent)
     {
@@ -83,7 +83,7 @@ Widget::~Widget()
     }
 }
 
-void Widget::paint(Painter &painter, Rectangle rectangle)
+void Widget::paint(Painter &painter, Recti rectangle)
 {
     __unused(painter);
     __unused(rectangle);
@@ -112,8 +112,8 @@ void Widget::do_layout()
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
-            Rectangle row = content_bound().row(_layout.vcell, y, _layout.spacing.y());
-            Rectangle column = row.column(_layout.hcell, x, _layout.spacing.x());
+            Recti row = content_bound().row(_layout.vcell, y, _layout.spacing.y());
+            Recti column = row.column(_layout.hcell, x, _layout.spacing.x());
 
             child->bound(column);
             index++;
@@ -187,7 +187,7 @@ void Widget::do_layout()
         {
             if (child->attributes() & LAYOUT_FILL)
             {
-                child->bound(Rectangle(
+                child->bound(Recti(
                     current,
                     content_bound().y(),
                     fill_child_width,
@@ -199,7 +199,7 @@ void Widget::do_layout()
             {
                 if (child->attributes() & LAYOUT_SQUARE)
                 {
-                    child->bound(Rectangle(
+                    child->bound(Recti(
                         current,
                         content_bound().y(),
                         content_bound().height(),
@@ -209,7 +209,7 @@ void Widget::do_layout()
                 }
                 else
                 {
-                    child->bound(Rectangle(
+                    child->bound(Recti(
                         current,
                         content_bound().y(),
                         child->compute_size().x(),
@@ -256,7 +256,7 @@ void Widget::do_layout()
         {
             if (child->attributes() & LAYOUT_FILL)
             {
-                child->bound(Rectangle(
+                child->bound(Recti(
                     content_bound().x(),
                     current,
                     content_bound().width(),
@@ -268,7 +268,7 @@ void Widget::do_layout()
             {
                 if (child->attributes() & LAYOUT_SQUARE)
                 {
-                    child->bound(Rectangle(
+                    child->bound(Recti(
                         content_bound().x(),
                         current,
                         content_bound().width(),
@@ -278,7 +278,7 @@ void Widget::do_layout()
                 }
                 else
                 {
-                    child->bound(Rectangle(
+                    child->bound(Recti(
                         content_bound().x(),
                         current,
                         content_bound().width(),
@@ -483,7 +483,7 @@ void Widget::focus()
 
 /* --- Paint ---------------------------------------------------------------- */
 
-void Widget::repaint(Painter &painter, Rectangle rectangle)
+void Widget::repaint(Painter &painter, Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
         return;
@@ -524,7 +524,7 @@ void Widget::should_repaint()
     }
 }
 
-void Widget::should_repaint(Rectangle rectangle)
+void Widget::should_repaint(Recti rectangle)
 {
     if (_window)
     {

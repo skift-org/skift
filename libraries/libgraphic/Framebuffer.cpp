@@ -71,7 +71,7 @@ Result Framebuffer::set_resolution(Vec2i size)
     return SUCCESS;
 }
 
-void Framebuffer::mark_dirty(Rectangle new_bound)
+void Framebuffer::mark_dirty(Recti new_bound)
 {
     new_bound = _bitmap->bound().clipped_with(new_bound);
 
@@ -82,7 +82,7 @@ void Framebuffer::mark_dirty(Rectangle new_bound)
 
     bool merged = false;
 
-    _dirty_bounds.foreach ([&](Rectangle &region) {
+    _dirty_bounds.foreach ([&](Recti &region) {
         int region_area = region.area();
         int merge_area = region.merged_with(new_bound).area();
 

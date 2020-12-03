@@ -128,7 +128,7 @@ public:
         new Separator(toolbar);
 
         Widget *primary_color_container = new Container(toolbar);
-        primary_color_container->insets(Insets(4));
+        primary_color_container->insets(Insetsi(4));
         primary_color_container->attributes(LAYOUT_SQUARE);
 
         _primary_color = new Panel(primary_color_container);
@@ -136,7 +136,7 @@ public:
         _primary_color->color(THEME_MIDDLEGROUND, _document->primary_color());
 
         Widget *secondary_color_container = new Container(toolbar);
-        secondary_color_container->insets(Insets(4));
+        secondary_color_container->insets(Insetsi(4));
         secondary_color_container->attributes(LAYOUT_SQUARE);
 
         _secondary_color = new Panel(secondary_color_container);

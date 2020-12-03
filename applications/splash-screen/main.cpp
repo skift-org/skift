@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     framebuffer->painter().blit_bitmap(*logo, logo->bound(), logo_on_screen_bound);
 
-    auto loading_bar_on_screen_bound = Rectangle(0, 0, logo_on_screen_bound.width() * 1.4, 4)
+    auto loading_bar_on_screen_bound = Recti(0, 0, logo_on_screen_bound.width() * 1.4, 4)
                                            .centered_within(framebuffer->resolution())
                                            .offset(Vec2i(0, logo_on_screen_bound.height() + 32));
 
@@ -33,10 +33,10 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i <= 100; i++)
     {
-        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound.expended(Insets(16, 16)), Color::from_byte(0x33, 0x33, 0x33));
+        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound.expended(Insetsi(16, 16)), Color::from_byte(0x33, 0x33, 0x33));
         framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound, Color::from_byte(0x44, 0x44, 0x44));
 
-        Rectangle progress = loading_bar_on_screen_bound.take_left(loading_bar_on_screen_bound.width() * (i / 100.0));
+        Recti progress = loading_bar_on_screen_bound.take_left(loading_bar_on_screen_bound.width() * (i / 100.0));
 
         if (argc == 2 && strcmp(argv[1], "--nyan") == 0)
         {
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
             framebuffer->painter().fill_rectangle(progress.take_right(1), Color::from_byte(0xff, 0xff, 0xff, 100));
         }
 
-        framebuffer->mark_dirty(loading_bar_on_screen_bound.expended(Insets(16)));
+        framebuffer->mark_dirty(loading_bar_on_screen_bound.expended(Insetsi(16)));
         framebuffer->blit();
 
         process_sleep(5);

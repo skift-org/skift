@@ -32,5 +32,5 @@ public:
 
     void tick() { _time += 1.0 / 60; }
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 };

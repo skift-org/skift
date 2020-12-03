@@ -21,7 +21,7 @@ struct Window
 
     String _title;
     RefPtr<Icon> _icon;
-    Rectangle _bound;
+    Recti _bound;
     WindowFlag _flags;
     WindowType _type;
 
@@ -35,7 +35,7 @@ struct Window
     bool resize_vertical = false;
     bool resize_horizontal = false;
     Vec2i resize_begin;
-    Rectangle previous_bound;
+    Recti previous_bound;
 
     CursorState cursor_state;
 
@@ -45,7 +45,7 @@ struct Window
     RefPtr<Bitmap> backbuffer;
     OwnPtr<Painter> backbuffer_painter;
 
-    Vector<Rectangle> _dirty_rects{};
+    Vector<Recti> _dirty_rects{};
     bool dirty_layout;
 
     EventHandler handlers[EventType::__COUNT];
@@ -81,12 +81,12 @@ public:
     Vec2i size() { return bound().size(); }
     void size(Vec2i size);
 
-    Rectangle bound() { return _bound.moved({0, 0}); }
-    void bound(Rectangle bound);
+    Recti bound() { return _bound.moved({0, 0}); }
+    void bound(Recti bound);
 
-    Rectangle bound_on_screen() { return _bound; }
+    Recti bound_on_screen() { return _bound; }
 
-    Rectangle content_bound()
+    Recti content_bound()
     {
         if (_flags & WINDOW_BORDERLESS)
         {
@@ -94,7 +94,7 @@ public:
         }
         else
         {
-            return bound().shrinked(Insets(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+            return bound().shrinked(Insetsi(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
         }
     }
 
@@ -133,13 +133,13 @@ public:
 
     void dispatch_event(Event *event);
 
-    virtual void repaint(Painter &painter, Rectangle rectangle);
+    virtual void repaint(Painter &painter, Recti rectangle);
 
     void repaint_dirty();
 
     void relayout();
 
-    void should_repaint(Rectangle rectangle);
+    void should_repaint(Recti rectangle);
 
     void should_relayout();
 

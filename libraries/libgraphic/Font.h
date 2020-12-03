@@ -8,7 +8,7 @@
 struct Glyph
 {
     Codepoint codepoint;
-    Rectangle bound;
+    Recti bound;
     Vec2i origin;
     int advance;
 };
@@ -36,5 +36,5 @@ public:
 
     bool has_glyph(Codepoint codepoint);
 
-    Rectangle mesure_string(const char *string);
+    Recti mesure_string(const char *string);
 };

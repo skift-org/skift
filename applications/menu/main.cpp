@@ -102,7 +102,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
 
     list->layout(VFLOW(4));
     list->attributes(LAYOUT_FILL);
-    list->insets(Insets(4));
+    list->insets(Insetsi(4));
 
     entries.foreach ([&](MenuEntry &entry) {
         auto item = new Button(
@@ -111,7 +111,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
             entry.icon,
             entry.name);
 
-        item->insets(Insets(8));
+        item->insets(Insetsi(8));
 
         item->on(Event::ACTION, [entry](auto) {
             process_run(entry.command.cstring(), nullptr);

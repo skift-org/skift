@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     window->root()->layout(VFLOW(0));
 
     Widget *navbar = new Container(window->root());
-    navbar->insets(Insets(4, 4));
+    navbar->insets(Insetsi(4, 4));
     navbar->layout(HGRID(4));
     navbar->bound(navbar->bound().with_height(32));
     navbar->bound(navbar->bound().with_width(128));

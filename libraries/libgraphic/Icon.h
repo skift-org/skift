@@ -30,7 +30,7 @@ public:
 
     ~Icon();
 
-    Rectangle bound(IconSize size);
+    Recti bound(IconSize size);
 
     RefPtr<Bitmap> bitmap(IconSize size);
 

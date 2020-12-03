@@ -1,53 +1,11 @@
 #pragma once
 
 #include <libsystem/Logger.h>
+#include <libsystem/algebra/Insets.h>
 #include <libsystem/algebra/Vec2.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
 #include <libutils/Enum.h>
-
-struct Insets
-{
-private:
-    int _top;
-    int _bottom;
-    int _left;
-    int _right;
-
-public:
-    int top() const { return _top; }
-    int bottom() const { return _bottom; }
-    int left() const { return _left; }
-    int right() const { return _right; }
-
-    Insets()
-        : Insets(0, 0, 0, 0)
-    {
-    }
-
-    Insets(int tblr)
-        : Insets(tblr, tblr, tblr, tblr)
-    {
-    }
-
-    Insets(int tb, int lr)
-        : Insets(tb, tb, lr, lr)
-    {
-    }
-
-    Insets(int top, int bottom, int lr)
-        : Insets(top, bottom, lr, lr)
-    {
-    }
-
-    Insets(int top, int bottom, int left, int right)
-        : _top(top),
-          _bottom(bottom),
-          _left(left),
-          _right(right)
-    {
-    }
-};
 
 enum class Position
 {
@@ -62,7 +20,7 @@ enum class Position
     BOTTOM_RIGHT,
 };
 
-enum RectangleBorder : uint32_t
+enum Border : int
 {
     NONE = 0,
     TOP = (1 << 0),
@@ -70,93 +28,69 @@ enum RectangleBorder : uint32_t
     LEFT = (1 << 2),
     RIGHT = (1 << 3),
 };
-__enum_flags(RectangleBorder);
 
-struct __packed Rectangle
+template <typename Scalar>
+struct __packed Rect
 {
 private:
-    int _x;
-    int _y;
-    int _width;
-    int _height;
+    Scalar _x;
+    Scalar _y;
+    Scalar _width;
+    Scalar _height;
 
 public:
-    static Rectangle empty()
+    static Rect empty()
     {
-        return Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
     }
 
-    static Rectangle from_two_point(Vec2i a, Vec2i b)
+    static Rect from_two_point(Vec2<Scalar> a, Vec2<Scalar> b)
     {
-        int x0 = MIN(a.x(), b.x());
-        int y0 = MIN(a.y(), b.y());
-        int x1 = MAX(a.x(), b.x());
-        int y1 = MAX(a.y(), b.y());
+        auto x0 = MIN(a.x(), b.x());
+        auto y0 = MIN(a.y(), b.y());
+        auto x1 = MAX(a.x(), b.x());
+        auto y1 = MAX(a.y(), b.y());
 
         return {x0, y0, x1 - x0, y1 - y0};
     }
 
-    int x() const { return _x; }
+    auto x() const { return _x; }
 
-    int y() const { return _y; }
+    auto y() const { return _y; }
 
-    int width() const { return _width; }
+    auto width() const { return _width; }
 
-    int height() const { return _height; }
+    auto height() const { return _height; }
 
-    Vec2i position() const { return Vec2i(_x, _y); }
+    Vec2<Scalar> position() const { return {_x, _y}; }
 
-    Vec2i size() const { return Vec2i(_width, _height); }
+    Vec2<Scalar> size() const { return {_width, _height}; }
 
-    Vec2i center() const { return position() + size() / 2; }
+    Vec2<Scalar> center() const { return position() + size() / 2; }
 
-    Vec2i top_left() const
-    {
-        return position();
-    }
+    auto top_left() const { return position(); }
 
-    Vec2i bottom_left() const
-    {
-        return position() + size().extract_y();
-    }
+    auto bottom_left() const { return position() + size().extract_y(); }
 
-    Vec2i top_right() const
-    {
-        return position() + size().extract_x();
-    }
+    auto top_right() const { return position() + size().extract_x(); }
 
-    Vec2i bottom_right() const
-    {
-        return position() + size();
-    }
+    auto bottom_right() const { return position() + size(); }
 
-    int top() const
-    {
-        return y();
-    }
+    auto top() const { return y(); }
 
-    int bottom() const
-    {
-        return y() + height();
-    }
+    auto bottom() const { return y() + height(); }
 
-    int left() const
-    {
-        return x();
-    }
+    auto left() const { return x(); }
 
-    int right() const
-    {
-        return x() + width();
-    }
+    auto right() const { return x() + width(); }
 
-    int area() { return width() * height(); }
+    auto area() { return width() * height(); }
 
     bool is_empty() const { return _width == 0 || _height == 0; };
 
-    Rectangle() = default;
+    Rect() = default;
 
-    Rectangle(int width, int height)
+    Rect(Scalar width, Scalar height)
         : _x(0),
           _y(0),
           _width(width),
@@ -164,7 +98,7 @@ public:
     {
     }
 
-    Rectangle(Vec2i size)
+    Rect(Vec2<Scalar> size)
         : _x(0),
           _y(0),
           _width(size.x()),
@@ -172,7 +106,7 @@ public:
     {
     }
 
-    Rectangle(Vec2i position, Vec2i size)
+    Rect(Vec2<Scalar> position, Vec2<Scalar> size)
         : _x(position.x()),
           _y(position.y()),
           _width(size.x()),
@@ -180,7 +114,7 @@ public:
     {
     }
 
-    Rectangle(int x, int y, int width, int height)
+    Rect(int x, int y, int width, int height)
         : _x(x),
           _y(y),
           _width(width),
@@ -188,30 +122,30 @@ public:
     {
     }
 
-    Rectangle with_width(int width) const
+    Rect with_width(int width) const
     {
-        Rectangle new_rect = Rectangle(*this);
+        Rect new_rect = Rect(*this);
         new_rect._width = width;
         return new_rect;
     }
 
-    Rectangle with_height(int height) const
+    Rect with_height(int height) const
     {
-        Rectangle new_rect = Rectangle(*this);
+        Rect new_rect = Rect(*this);
         new_rect._height = height;
         return new_rect;
     }
 
-    Rectangle centered_within(Rectangle container) const
+    Rect centered_within(Rect container) const
     {
-        return Rectangle(
+        return Rect(
             container._x + container._width - container._width / 2 - _width / 2,
             container._y + container._height - container._height / 2 - _height / 2,
             _width,
             _height);
     }
 
-    Rectangle place_within(Rectangle container, Position position) const
+    Rect place_within(Rect container, Position position) const
     {
         int x = container._x;
         int y = container._y;
@@ -246,96 +180,98 @@ public:
             y += container._height - _height;
         }
 
-        return Rectangle(x, y, width, height);
+        return Rect(x, y, width, height);
     }
 
-    Rectangle merged_with(Rectangle other) const
+    Rect merged_with(Rect other) const
     {
-        Vec2i topleft(
+        Vec2<Scalar> topleft{
             MIN(_x, other._x),
-            MIN(_y, other._y));
+            MIN(_y, other._y),
+        };
 
-        Vec2i bottomright(
+        Vec2<Scalar> bottomright{
             MAX(_x + _width, other._x + other._width),
-            MAX(_y + _height, other._y + other._height));
+            MAX(_y + _height, other._y + other._height),
+        };
 
-        return Rectangle::from_two_point(topleft, bottomright);
+        return Rect::from_two_point(topleft, bottomright);
     }
 
-    Rectangle clipped_with(Rectangle other) const
+    Rect clipped_with(Rect other) const
     {
         if (!colide_with(other))
         {
             return empty();
         }
 
-        Vec2i topleft(
+        Vec2<Scalar> topleft(
             MAX(left(), other.left()),
             MAX(top(), other.top()));
 
-        Vec2i bottomright(
+        Vec2<Scalar> bottomright(
             MIN(right(), other.right()),
             MIN(bottom(), other.bottom()));
 
-        return Rectangle::from_two_point(topleft, bottomright);
+        return Rect::from_two_point(topleft, bottomright);
     }
 
-    Rectangle take_top(int size) const
+    Rect take_top(int size) const
     {
-        return Rectangle(x(), y(), width(), size);
+        return Rect(x(), y(), width(), size);
     }
 
-    Rectangle take_bottom(int size) const
+    Rect take_bottom(int size) const
     {
-        return Rectangle(x(), y() + height() - size, width(), size);
+        return Rect(x(), y() + height() - size, width(), size);
     }
 
-    Rectangle take_left(int size) const
+    Rect take_left(int size) const
     {
-        return Rectangle(x(), y(), size, height());
+        return Rect(x(), y(), size, height());
     }
 
-    Rectangle take_right(int size) const
+    Rect take_right(int size) const
     {
-        return Rectangle(x() + width() - size, y(), size, height());
+        return Rect(x() + width() - size, y(), size, height());
     }
 
-    Rectangle cutoff_top(int top) const
+    Rect cutoff_top(int top) const
     {
         return cutoff_top_and_botton(top, 0);
     }
 
-    Rectangle cutoff_botton(int bottom) const
+    Rect cutoff_botton(int bottom) const
     {
         return cutoff_top_and_botton(0, bottom);
     }
 
-    Rectangle cutoff_top_and_botton(int top, int bottom) const
+    Rect cutoff_top_and_botton(int top, int bottom) const
     {
-        return Rectangle(x(), y() + top, width(), height() - top - bottom);
+        return Rect(x(), y() + top, width(), height() - top - bottom);
     }
 
-    Rectangle cutoff_left(int left) const
+    Rect cutoff_left(int left) const
     {
         return cutoff_left_and_right(left, 0);
     }
 
-    Rectangle cutoff_right(int right) const
+    Rect cutoff_right(int right) const
     {
         return cutoff_left_and_right(0, right);
     }
 
-    Rectangle cutoff_left_and_right(int left, int right) const
+    Rect cutoff_left_and_right(int left, int right) const
     {
-        return Rectangle(x() + left, y(), width() - left - right, height());
+        return Rect(x() + left, y(), width() - left - right, height());
     }
 
-    Rectangle row(int row_count, int index) const
+    Rect row(int row_count, int index) const
     {
         return row(row_count, index, 0);
     }
 
-    Rectangle row(int row_count, int index, int spacing) const
+    Rect row(int row_count, int index, int spacing) const
     {
         assert(index >= 0);
         assert(row_count > 0);
@@ -360,7 +296,7 @@ public:
             (spacing * index) +
             MIN(index, correction);
 
-        return Rectangle{
+        return Rect{
             x(),
             y() + current_row_position,
             width(),
@@ -368,12 +304,12 @@ public:
         };
     }
 
-    Rectangle column(int column_count, int index) const
+    Rect column(int column_count, int index) const
     {
         return column(column_count, index, 0);
     }
 
-    Rectangle column(int column_count, int index, int spacing) const
+    Rect column(int column_count, int index, int spacing) const
     {
         assert(index >= 0);
         assert(column_count > 0);
@@ -387,6 +323,7 @@ public:
         int correction = available_width - (column_width * column_count);
 
         int current_column_width = column_width;
+
         if (index < correction)
         {
             current_column_width += 1;
@@ -397,7 +334,7 @@ public:
             (spacing * index) +
             MIN(index, correction);
 
-        return Rectangle{
+        return Rect{
             x() + current_column_position,
             y(),
             current_column_width,
@@ -405,54 +342,55 @@ public:
         };
     }
 
-    Rectangle shrinked(Insets insets) const
+    Rect shrinked(Insets<Scalar> insets) const
     {
         assert(insets.top() >= 0);
         assert(insets.bottom() >= 0);
         assert(insets.left() >= 0);
         assert(insets.right() >= 0);
 
-        return Rectangle(
+        return Rect{
             _x + insets.left(),
             _y + insets.top(),
             MAX(0, _width - insets.left() - insets.right()),
-            MAX(0, _height - insets.top() - insets.bottom()));
+            MAX(0, _height - insets.top() - insets.bottom()),
+        };
     }
 
-    Rectangle expended(Insets insets) const
+    Rect expended(Insets<Scalar> insets) const
     {
         assert(insets.top() >= 0);
         assert(insets.bottom() >= 0);
         assert(insets.left() >= 0);
         assert(insets.right() >= 0);
 
-        return Rectangle(
+        return Rect(
             _x - insets.left(),
             _y - insets.top(),
             _width + insets.left() + insets.right(),
             _height + insets.top() + insets.bottom());
     }
 
-    Rectangle resized(Vec2i size) const
+    Rect resized(Vec2<Scalar> size) const
     {
-        return Rectangle(
+        return Rect(
             _x,
             _y,
             size.x(),
             size.y());
     }
 
-    Rectangle moved(Vec2i position) const
+    Rect moved(Vec2<Scalar> position) const
     {
-        return Rectangle(position, size());
+        return Rect(position, size());
     }
 
-    Rectangle offset(Vec2i offset) const
+    Rect offset(Vec2<Scalar> offset) const
     {
-        return Rectangle(position() + offset, size());
+        return Rect(position() + offset, size());
     }
 
-    bool colide_with(Rectangle other) const
+    bool colide_with(Rect other) const
     {
         return _x < other._x + other._width &&
                _x + _width > other._x &&
@@ -460,56 +398,56 @@ public:
                _height + _y > other._y;
     }
 
-    bool contains(Vec2i p) const
+    bool contains(Vec2<Scalar> p) const
     {
         return p.x() >= left() && p.x() < right() &&
                p.y() >= top() && p.y() < bottom();
     }
 
-    bool contains(Rectangle other) const
+    bool contains(Rect other) const
     {
         return (_x <= other._x && (_x + _width) >= (other._x + other._width)) &&
                (_y <= other._y && (_y + _height) >= (other._y + other._width));
     }
 
-    RectangleBorder contains(Insets spacing, Vec2i position) const
+    Border contains(Insets<Scalar> spacing, Vec2<Scalar> position) const
     {
-        RectangleBorder borders = RectangleBorder::NONE;
+        int borders = Border::NONE;
 
         if (take_top(spacing.top()).contains(position))
         {
-            borders |= RectangleBorder::TOP;
+            borders |= Border::TOP;
         }
 
         if (take_bottom(spacing.bottom()).contains(position))
         {
-            borders |= RectangleBorder::BOTTOM;
+            borders |= Border::BOTTOM;
         }
 
         if (take_left(spacing.left()).contains(position))
         {
-            borders |= RectangleBorder::LEFT;
+            borders |= Border::LEFT;
         }
 
         if (take_right(spacing.right()).contains(position))
         {
-            borders |= RectangleBorder::RIGHT;
+            borders |= Border::RIGHT;
         }
 
-        return borders;
+        return (Border)borders;
     }
 
-    void substract(Rectangle other, Rectangle &t, Rectangle &b, Rectangle &l, Rectangle &r) const
+    void substract(Rect other, Rect &t, Rect &b, Rect &l, Rect &r) const
     {
         if (colide_with(other))
         {
             other = other.clipped_with(*this);
 
-            l = Rectangle(x(), y(), other.left() - left(), height());
-            r = Rectangle(other.right(), y(), right() - other.right(), height());
+            l = Rect(x(), y(), other.left() - left(), height());
+            r = Rect(other.right(), y(), right() - other.right(), height());
 
-            t = Rectangle(l.right(), y(), r.left() - l.right(), other.top() - top());
-            b = Rectangle(l.right(), other.bottom(), r.left() - l.right(), bottom() - other.bottom());
+            t = Rect(l.right(), y(), r.left() - l.right(), other.top() - top());
+            b = Rect(l.right(), other.bottom(), r.left() - l.right(), bottom() - other.bottom());
         }
         else
         {
@@ -520,3 +458,7 @@ public:
         }
     }
 };
+
+using Recti = Rect<int>;
+using Rectf = Rect<float>;
+using Rectd = Rect<double>;

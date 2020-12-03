@@ -5,7 +5,7 @@ Separator::Separator(Widget *parent) : Widget(parent)
 {
 }
 
-void Separator::paint(Painter &painter, Rectangle rectangle)
+void Separator::paint(Painter &painter, Recti rectangle)
 {
     painter.fill_rectangle(rectangle, color(THEME_BORDER));
 }

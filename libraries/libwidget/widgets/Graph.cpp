@@ -17,7 +17,7 @@ Graph::~Graph()
     free(_data);
 }
 
-void Graph::paint(Painter &painter, Rectangle rectangle)
+void Graph::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -43,7 +43,7 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
         float where = i / (float)bound().width();
         float data = graph_sample(where);
 
-        Rectangle bar(
+        Recti bar(
             bound().x() + i,
             (int)(bound().y() + bound().height() * (1.0 - data)),
             1,
@@ -55,7 +55,7 @@ void Graph::paint(Painter &painter, Rectangle rectangle)
         painter.plot_pixel(bar.position(), _color);
     }
 
-    Rectangle cursor(
+    Recti cursor(
         (int)(bound().x() + bound().width() * cursor_position),
         bound().y(),
         1,

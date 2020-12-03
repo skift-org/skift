@@ -11,7 +11,7 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-Rectangle window_header_bound(Window *window);
+Recti window_header_bound(Window *window);
 
 void window_populate_header(Window *window)
 {
@@ -71,7 +71,7 @@ Window::Window(WindowFlag flags)
     backbuffer = Bitmap::create_shared(250, 250).take_value();
     backbuffer_painter = own<Painter>(backbuffer);
 
-    _bound = Rectangle(250, 250);
+    _bound = Recti(250, 250);
 
     header_container = new Container(nullptr);
     header_container->window(this);
@@ -108,7 +108,7 @@ Window::~Window()
     delete header_container;
 }
 
-void Window::repaint(Painter &painter, Rectangle rectangle)
+void Window::repaint(Painter &painter, Recti rectangle)
 {
 
     if (_flags & WINDOW_TRANSPARENT)
@@ -160,10 +160,10 @@ void Window::repaint_dirty()
         relayout();
     }
 
-    Rectangle repaited_regions = Rectangle::empty();
+    Recti repaited_regions = Recti::empty();
     Painter &painter = *backbuffer_painter;
 
-    _dirty_rects.foreach ([&](Rectangle &rect) {
+    _dirty_rects.foreach ([&](Recti &rect) {
         repaint(painter, rect);
 
         if (repaited_regions.is_empty())
@@ -199,7 +199,7 @@ void Window::relayout()
     dirty_layout = false;
 }
 
-void Window::should_repaint(Rectangle rectangle)
+void Window::should_repaint(Recti rectangle)
 {
     if (!_visible)
         return;
@@ -281,14 +281,14 @@ void Window::hide()
     application_hide_window(this);
 }
 
-Rectangle window_header_bound(Window *window)
+Recti window_header_bound(Window *window)
 {
     return window->bound().take_top(WINDOW_HEADER_AREA);
 }
 
-RectangleBorder window_resize_bound_containe(Window *window, Vec2i position)
+Border window_resize_bound_containe(Window *window, Vec2i position)
 {
-    Rectangle resize_bound = window->bound().expended(Insets(WINDOW_RESIZE_AREA));
+    Recti resize_bound = window->bound().expended(Insets(WINDOW_RESIZE_AREA));
     return resize_bound.contains(Insets(WINDOW_RESIZE_AREA), position);
 }
 
@@ -296,19 +296,19 @@ void window_begin_resize(Window *window, Vec2i mouse_position)
 {
     window->is_resizing = true;
 
-    RectangleBorder borders = window_resize_bound_containe(window, mouse_position);
+    Border borders = window_resize_bound_containe(window, mouse_position);
 
-    window->resize_horizontal = borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT);
-    window->resize_vertical = borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM);
+    window->resize_horizontal = borders & (Border::LEFT | Border::RIGHT);
+    window->resize_vertical = borders & (Border::TOP | Border::BOTTOM);
 
     Vec2i resize_region_begin = window->position();
 
-    if (borders & RectangleBorder::TOP)
+    if (borders & Border::TOP)
     {
         resize_region_begin += Vec2i(0, window->height());
     }
 
-    if (borders & RectangleBorder::LEFT)
+    if (borders & Border::LEFT)
     {
         resize_region_begin += Vec2i(window->width(), 0);
     }
@@ -318,7 +318,7 @@ void window_begin_resize(Window *window, Vec2i mouse_position)
 
 void window_do_resize(Window *window, Vec2i mouse_position)
 {
-    Rectangle new_bound = Rectangle::from_two_point(
+    Recti new_bound = Recti::from_two_point(
         window->resize_begin,
         window->position() + mouse_position);
 
@@ -429,7 +429,7 @@ void Window::dispatch_event(Event *event)
 
     case Event::MOUSE_MOVE:
     {
-        RectangleBorder borders = window_resize_bound_containe(this, event->mouse.position);
+        Border borders = window_resize_bound_containe(this, event->mouse.position);
 
         if (is_dragging && !is_maximised)
         {
@@ -443,27 +443,27 @@ void Window::dispatch_event(Event *event)
         }
         else if (borders && (_flags & WINDOW_RESIZABLE) && !is_maximised)
         {
-            if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::LEFT))
+            if ((borders & Border::TOP) && (borders & Border::LEFT))
             {
                 cursor(CURSOR_RESIZEHV);
             }
-            else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::RIGHT))
+            else if ((borders & Border::BOTTOM) && (borders & Border::RIGHT))
             {
                 cursor(CURSOR_RESIZEHV);
             }
-            else if ((borders & RectangleBorder::TOP) && (borders & RectangleBorder::RIGHT))
+            else if ((borders & Border::TOP) && (borders & Border::RIGHT))
             {
                 cursor(CURSOR_RESIZEVH);
             }
-            else if ((borders & RectangleBorder::BOTTOM) && (borders & RectangleBorder::LEFT))
+            else if ((borders & Border::BOTTOM) && (borders & Border::LEFT))
             {
                 cursor(CURSOR_RESIZEVH);
             }
-            else if (borders & (RectangleBorder::TOP | RectangleBorder::BOTTOM))
+            else if (borders & (Border::TOP | Border::BOTTOM))
             {
                 cursor(CURSOR_RESIZEV);
             }
-            else if (borders & (RectangleBorder::LEFT | RectangleBorder::RIGHT))
+            else if (borders & (Border::LEFT | Border::RIGHT))
             {
                 cursor(CURSOR_RESIZEH);
             }
@@ -615,8 +615,8 @@ void Window::dispatch_event(Event *event)
         {
             is_maximised = true;
             previous_bound = _bound;
-            Rectangle new_size = Screen::bound();
-            new_size = Rectangle(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
+            Recti new_size = Screen::bound();
+            new_size = Recti(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
 
             bound(new_size);
         }
@@ -712,7 +712,7 @@ void Window::icon(RefPtr<Icon> icon)
     }
 }
 
-void Window::bound(Rectangle new_bound)
+void Window::bound(Recti new_bound)
 {
     _bound = new_bound;
 

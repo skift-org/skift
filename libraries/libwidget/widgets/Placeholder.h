@@ -11,5 +11,5 @@ private:
 public:
     Placeholder(Widget *parent, String text);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 };

@@ -341,7 +341,7 @@ void application_hide_window(Window *window)
     application_exit_if_all_windows_are_closed();
 }
 
-void application_flip_window(Window *window, Rectangle bound)
+void application_flip_window(Window *window, Recti bound)
 {
     assert(_state >= APPLICATION_INITALIZED);
     assert(list_contains(_windows, window));
@@ -378,7 +378,7 @@ void application_move_window(Window *window, Vec2i position)
     application_send_message(message);
 }
 
-void application_resize_window(Window *window, Rectangle bound)
+void application_resize_window(Window *window, Recti bound)
 {
     assert(_state >= APPLICATION_INITALIZED);
     assert(list_contains(_windows, window));

@@ -54,7 +54,7 @@ MouseButton cursor_pack_mouse_buttons(MousePacket packet)
     return buttons;
 }
 
-Vec2i vec2i_clamp_to_rect(Vec2i p, Rectangle rect)
+Vec2i vec2i_clamp_to_rect(Vec2i p, Recti rect)
 {
     return p.clamped(rect.position(), rect.position() + rect.size());
 }
@@ -131,11 +131,11 @@ void cursor_render(Painter &painter)
     painter.blit_bitmap(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
 }
 
-Rectangle cursor_bound_from_position(Vec2i position)
+Recti cursor_bound_from_position(Vec2i position)
 {
     CursorState state = cursor_get_state();
 
-    Rectangle bound(position, Vec2i(28, 28));
+    Recti bound(position, Vec2i(28, 28));
 
     if (state == CURSOR_MOVE ||
         state == CURSOR_RESIZEH ||
@@ -153,19 +153,19 @@ Rectangle cursor_bound_from_position(Vec2i position)
     return bound;
 }
 
-Rectangle cursor_bound()
+Recti cursor_bound()
 {
     return cursor_bound_from_position(_mouse_position);
 }
 
-Rectangle cursor_dirty_bound_from_position(Vec2i position)
+Recti cursor_dirty_bound_from_position(Vec2i position)
 {
-    return Rectangle(
+    return Recti(
         position + Vec2i(-28, -28),
         Vec2i(56, 56));
 }
 
-Rectangle cursor_dirty_bound()
+Recti cursor_dirty_bound()
 {
     return cursor_dirty_bound_from_position(_mouse_position);
 }

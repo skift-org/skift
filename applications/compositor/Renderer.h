@@ -5,9 +5,9 @@
 
 void renderer_initialize();
 
-Rectangle renderer_bound();
+Recti renderer_bound();
 
-void renderer_region_dirty(Rectangle region);
+void renderer_region_dirty(Recti region);
 
 void renderer_repaint_dirty();
 

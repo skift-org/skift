@@ -86,7 +86,7 @@ bool Font::has_glyph(Codepoint codepoint)
     return false;
 }
 
-Rectangle Font::mesure_string(const char *string)
+Recti Font::mesure_string(const char *string)
 {
     int width = 0;
 
@@ -95,5 +95,5 @@ Rectangle Font::mesure_string(const char *string)
         width += g.advance;
     });
 
-    return Rectangle(width, 16);
+    return Recti(width, 16);
 }

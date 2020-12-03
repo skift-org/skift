@@ -1,8 +1,8 @@
 #include <libwidget/widgets/Slider.h>
 
-Rectangle Slider::track_bound()
+Recti Slider::track_bound()
 {
-    return Rectangle{
+    return Recti{
         content_bound().x(),
         content_bound().y(),
         (content_bound().width() - THUMP_SIZE),
@@ -12,13 +12,13 @@ Rectangle Slider::track_bound()
         .centered_within(content_bound());
 }
 
-Rectangle Slider::value_bound()
+Recti Slider::value_bound()
 {
     return track_bound()
         .take_left(track_bound().width() * _value);
 }
 
-Rectangle Slider::thumb_bound()
+Recti Slider::thumb_bound()
 {
     int posx = value_bound().right() - THUMP_SIZE / 2;
 
@@ -68,7 +68,7 @@ void Slider::event(Event *event)
     }
 }
 
-void Slider::paint(Painter &painter, Rectangle rectangle)
+void Slider::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 

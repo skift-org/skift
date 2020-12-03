@@ -5,7 +5,7 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-void Button::paint(Painter &painter, Rectangle rectangle)
+void Button::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -73,7 +73,7 @@ Button::Button(Widget *parent, ButtonStyle style)
       _style(style)
 {
     layout(HFLOW(0));
-    insets(Insets(0, 16));
+    insets(Insetsi(0, 16));
     min_height(32);
     attributes(LAYOUT_GREEDY);
 }
@@ -82,7 +82,7 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insets(6));
+    insets(Insetsi(6));
 
     new IconPanel(this, icon);
 }
@@ -91,7 +91,7 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
     : Button(parent, style)
 {
     layout(STACK());
-    insets(Insets(0, 0, 6, 6));
+    insets(Insetsi(0, 0, 6, 6));
     min_width(64);
 
     new Label(this, text, Position::CENTER);
@@ -100,11 +100,11 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text)
     : Button(parent, style)
 {
-    insets(Insets(0, 0, 6, 10));
+    insets(Insetsi(0, 0, 6, 10));
     min_width(64);
 
     auto icon_panel = new IconPanel(this, icon);
-    icon_panel->insets(Insets(0, 0, 0, 4));
+    icon_panel->insets(Insetsi(0, 0, 0, 4));
 
     new Label(this, text);
 }

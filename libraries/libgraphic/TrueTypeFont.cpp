@@ -118,7 +118,7 @@ void truetypefont_raster_range(TrueTypeFont *font, Codepoint start, Codepoint en
 
         glyph->codepoint = start + i;
 
-        glyph->bound = Rectangle(
+        glyph->bound = Recti(
             packedchar[i].x0,
             packedchar[i].y0,
             packedchar[i].x1 - packedchar[i].x0,
@@ -158,7 +158,7 @@ TrueTypeGlyph *truetypefont_get_glyph_for_codepoint(TrueTypeFont *font, Codepoin
     return lookup_glyph(font, codepoint);
 }
 
-Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
+Recti truetypefont_mesure_string(TrueTypeFont *font, const char *string)
 {
     Codepoint codepoint = 0;
 
@@ -176,7 +176,7 @@ Rectangle truetypefont_mesure_string(TrueTypeFont *font, const char *string)
         string += size;
     }
 
-    return Rectangle(width, font->size);
+    return Recti(width, font->size);
 }
 
 #include <libsystem/Logger.h>

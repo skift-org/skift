@@ -12,5 +12,5 @@ public:
 
     Panel(Widget *parent);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 };

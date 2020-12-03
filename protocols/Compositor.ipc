@@ -15,19 +15,19 @@ protocol
             Vec2i frontbuffer_size,
             int backbuffer,
             Vec2i backbuffer_size,
-            Rectangle bound,
+            Recti bound,
         );
 
         request destroy_window(int id);
 
-        request resize_window(int id, Rectangle bound);
+        request resize_window(int id, Recti bound);
 
         request flip_window
         (
             int id,
             BitmapHandle frontbuffer,
             BitmapHandle backbuffer,
-            Rectangle bound
+            Recti bound
         );
 
         request cursor_window
@@ -45,7 +45,7 @@ protocol
 
     client application
     (
-        signal greetings(Rectangle screen_bound);
+        signal greetings(Recti screen_bound);
         signal event(Event event);
     );
 );

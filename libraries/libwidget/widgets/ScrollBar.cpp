@@ -9,7 +9,7 @@ ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
     _thumb = 512;
 }
 
-void ScrollBar::paint(Painter &painter, Rectangle rectangle)
+void ScrollBar::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 

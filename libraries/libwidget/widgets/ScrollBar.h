@@ -14,21 +14,21 @@ private:
     bool _mouse_over;
     bool _horizontal = false;
 
-    Rectangle track_bound()
+    Recti track_bound()
     {
-        return bound().shrinked(Insets(4, 4, 4));
+        return bound().shrinked(Insetsi(4, 4, 4));
     }
 
-    Rectangle thumb_bound()
+    Recti thumb_bound()
     {
-        Rectangle track = track_bound();
+        Recti track = track_bound();
 
         if (_horizontal)
         {
             int thumb_width = MIN(track.width() * (_thumb / (float)_track), track.width());
             int thump_position = track.width() * (_value / (float)_track);
 
-            return Rectangle(
+            return Recti(
                 track.x() + thump_position,
                 track.y(),
                 thumb_width,
@@ -39,7 +39,7 @@ private:
             int thumb_height = MIN(track.height() * (_thumb / (float)_track), track.height());
             int thump_position = track.height() * (_value / (float)_track);
 
-            return Rectangle(
+            return Recti(
                 track.x(),
                 track.y() + thump_position,
                 track.width(),
@@ -57,7 +57,7 @@ public:
 
     ScrollBar(Widget *parent);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     void event(Event *event);
 

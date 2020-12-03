@@ -53,7 +53,7 @@ public:
     int width() const { return _width; }
     int height() const { return _height; }
     Vec2i size() const { return Vec2i(_width, _height); }
-    Rectangle bound() const { return Rectangle(_width, _height); }
+    Recti bound() const { return Recti(_width, _height); }
 
     void filtering(BitmapFiltering filtering) { _filtering = filtering; }
 
@@ -107,7 +107,7 @@ public:
         return sample(bound(), position);
     }
 
-    __flatten Color sample(Rectangle source, Vec2f position)
+    __flatten Color sample(Recti source, Vec2f position)
     {
         Vec2i sample_position = source.position() + (source.size() * position);
 
@@ -127,7 +127,7 @@ public:
         return Color::blerp(c00, c10, c01, c11, xx - (int)xx, yy - (int)yy);
     }
 
-    __flatten void copy_from(Bitmap &source, Rectangle region)
+    __flatten void copy_from(Bitmap &source, Recti region)
     {
         region = region.clipped_with(source.bound());
         region = region.clipped_with(bound());

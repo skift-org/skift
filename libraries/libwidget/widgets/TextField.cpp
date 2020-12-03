@@ -27,7 +27,7 @@ TextField::~TextField()
 
 #define LINE_HEIGHT (18)
 
-void TextField::paint(Painter &painter, Rectangle rectangle)
+void TextField::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -40,7 +40,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
     auto paint_cursor = [this](Painter &painter, Vec2i position) {
         if (!_readonly)
         {
-            painter.draw_rectangle(Rectangle(position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
+            painter.draw_rectangle(Recti(position - Vec2(0, LINE_HEIGHT / 2 + 4), Vec2(2, LINE_HEIGHT)), color(THEME_ACCENT));
         }
     };
 
@@ -48,7 +48,7 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
          i < MIN(_model->line_count(), (((unsigned)this->content_bound().height() + _vscroll_offset) / LINE_HEIGHT) + 1);
          i++)
     {
-        Rectangle line_bound = document_bound().row(_model->line_count(), i);
+        Recti line_bound = document_bound().row(_model->line_count(), i);
 
         if (!_readonly)
         {
@@ -65,11 +65,11 @@ void TextField::paint(Painter &painter, Rectangle rectangle)
             snprintf(buffer, 16, "%3d", (int)(i + 1));
             if (_cursor.line() == i)
             {
-                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND));
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND));
             }
             else
             {
-                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insets(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
             }
         }
 

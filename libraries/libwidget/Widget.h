@@ -63,13 +63,13 @@ class Widget
 {
 private:
     bool _enabled;
-    Rectangle _bound;
+    Recti _bound;
 
     int _max_height = 0;
     int _max_width = 0;
     int _min_height = 0;
     int _min_width = 0;
-    Insets _insets = {};
+    Insetsi _insets = {};
     WidgetColor _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
     RefPtr<Font> _font;
@@ -103,13 +103,13 @@ public:
     Color color(ThemeColorRole role);
     void color(ThemeColorRole role, Color color);
 
-    Rectangle content_bound() const { return bound().shrinked(_insets); }
+    Recti content_bound() const { return bound().shrinked(_insets); }
 
-    Rectangle bound() const { return _bound; }
-    void bound(Rectangle value) { _bound = value; }
+    Recti bound() const { return _bound; }
+    void bound(Recti value) { _bound = value; }
 
-    Insets insets() const { return _insets; }
-    void insets(Insets insets)
+    Insetsi insets() const { return _insets; }
+    void insets(Insetsi insets)
     {
         _insets = insets;
         should_relayout();
@@ -146,7 +146,7 @@ public:
 
     virtual ~Widget();
 
-    virtual void paint(Painter &painter, Rectangle rectangle);
+    virtual void paint(Painter &painter, Recti rectangle);
 
     virtual void event(Event *event);
 
@@ -186,11 +186,11 @@ public:
 
     /* --- Paint ------------------------------------------------------------ */
 
-    void repaint(Painter &painter, Rectangle rectangle);
+    void repaint(Painter &painter, Recti rectangle);
 
     void should_repaint();
 
-    void should_repaint(Rectangle rectangle);
+    void should_repaint(Recti rectangle);
 
     /* --- Layout ----------------------------------------------------------- */
 

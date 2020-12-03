@@ -15,7 +15,7 @@ Label::Label(Widget *parent, String text, Position position)
     _position = position;
 }
 
-void Label::paint(Painter &painter, Rectangle rectangle)
+void Label::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 

@@ -42,7 +42,7 @@ Color color(terminal::Color terminal_color)
 
 static Vec2i _cell_size = Vec2i(7, 16);
 
-Rectangle cell_bound(int x, int y)
+Recti cell_bound(int x, int y)
 {
     return {
         Vec2i(x, y) * _cell_size,
@@ -64,7 +64,7 @@ void render_cell(
     terminal::Color background,
     terminal::Attributes attributes)
 {
-    Rectangle bound = cell_bound(x, y);
+    Recti bound = cell_bound(x, y);
 
     if (attributes.invert)
     {

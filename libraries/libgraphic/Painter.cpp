@@ -31,10 +31,10 @@ void Painter::pop()
     _state_stack_top--;
 }
 
-void Painter::clip(Rectangle rectangle)
+void Painter::clip(Recti rectangle)
 {
-    Rectangle transformed_rectangle = rectangle.offset(origine());
-    Rectangle clipped_rectangle = transformed_rectangle.clipped_with(clip());
+    Recti transformed_rectangle = rectangle.offset(origine());
+    Recti clipped_rectangle = transformed_rectangle.clipped_with(clip());
 
     _state_stack[_state_stack_top].clip = clipped_rectangle;
 }
@@ -44,7 +44,7 @@ void Painter::transform(Vec2i offset)
     _state_stack[_state_stack_top].origine += offset;
 }
 
-Rectangle Painter::apply_clip(Rectangle rectangle)
+Recti Painter::apply_clip(Recti rectangle)
 {
     if (rectangle.colide_with(clip()))
     {
@@ -55,11 +55,11 @@ Rectangle Painter::apply_clip(Rectangle rectangle)
     }
     else
     {
-        return Rectangle::empty();
+        return Recti::empty();
     }
 }
 
-Rectangle Painter::apply_transform(Rectangle rectangle)
+Recti Painter::apply_transform(Recti rectangle)
 {
 
     return rectangle.offset(_state_stack[_state_stack_top].origine);
@@ -75,12 +75,12 @@ void Painter::plot_pixel(Vec2i position, Color color)
     }
 }
 
-void Painter::blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_fast(Bitmap &bitmap, Recti source, Recti destination)
 {
-    Rectangle clipped_destination = apply_transform(destination);
+    Recti clipped_destination = apply_transform(destination);
     clipped_destination = apply_clip(clipped_destination);
 
-    Rectangle clipped_source = Rectangle(clipped_destination.width(), clipped_destination.height());
+    Recti clipped_source = Recti(clipped_destination.width(), clipped_destination.height());
     clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
 
     if (clipped_destination.is_empty())
@@ -99,7 +99,7 @@ void Painter::blit_bitmap_fast(Bitmap &bitmap, Rectangle source, Rectangle desti
     }
 }
 
-void Painter::blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_scaled(Bitmap &bitmap, Recti source, Recti destination)
 {
     if (destination.is_empty())
         return;
@@ -117,7 +117,7 @@ void Painter::blit_bitmap_scaled(Bitmap &bitmap, Rectangle source, Rectangle des
     }
 }
 
-__flatten void Painter::blit_bitmap(Bitmap &bitmap, Rectangle source, Rectangle destination)
+__flatten void Painter::blit_bitmap(Bitmap &bitmap, Recti source, Recti destination)
 {
     if (destination.is_empty())
         return;
@@ -133,12 +133,12 @@ __flatten void Painter::blit_bitmap(Bitmap &bitmap, Rectangle source, Rectangle 
     }
 }
 
-void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
-    Rectangle clipped_destination = apply_transform(destination);
+    Recti clipped_destination = apply_transform(destination);
     clipped_destination = apply_clip(clipped_destination);
 
-    Rectangle clipped_source = Rectangle(clipped_destination.width(), clipped_destination.height());
+    Recti clipped_source = Recti(clipped_destination.width(), clipped_destination.height());
     clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
 
     if (clipped_destination.is_empty())
@@ -156,7 +156,7 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Rectangle source, Rectan
     }
 }
 
-void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
+void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
     for (int x = 0; x < destination.width(); x++)
     {
@@ -171,7 +171,7 @@ void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Rectangle source, Rect
     }
 }
 
-__flatten void Painter::blit_bitmap_no_alpha(Bitmap &bitmap, Rectangle source, Rectangle destination)
+__flatten void Painter::blit_bitmap_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
     if (source.width() == destination.width() &&
         source.height() == destination.height())
@@ -189,7 +189,7 @@ __flatten void Painter::clear(Color color)
     clear_rectangle(_bitmap->bound(), color);
 }
 
-__flatten void Painter::clear_rectangle(Rectangle rectangle, Color color)
+__flatten void Painter::clear_rectangle(Recti rectangle, Color color)
 {
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
@@ -208,7 +208,7 @@ __flatten void Painter::clear_rectangle(Rectangle rectangle, Color color)
     }
 }
 
-__flatten void Painter::fill_rectangle(Rectangle rectangle, Color color)
+__flatten void Painter::fill_rectangle(Recti rectangle, Color color)
 {
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
@@ -227,13 +227,13 @@ __flatten void Painter::fill_rectangle(Rectangle rectangle, Color color)
     }
 }
 
-__flatten void Painter::fill_insets(Rectangle rectangle, Insets insets, Color color)
+__flatten void Painter::fill_insets(Recti rectangle, Insetsi insets, Color color)
 {
-    Rectangle left_ear = rectangle.take_left(insets.left());
-    Rectangle right_ear = rectangle.take_right(insets.right());
+    Recti left_ear = rectangle.take_left(insets.left());
+    Recti right_ear = rectangle.take_right(insets.right());
 
-    Rectangle top = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_top(insets.top());
-    Rectangle bottom = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_bottom(insets.bottom());
+    Recti top = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_top(insets.top());
+    Recti bottom = rectangle.cutoff_left_and_right(insets.left(), insets.right()).take_bottom(insets.bottom());
 
     fill_rectangle(left_ear, color);
     fill_rectangle(right_ear, color);
@@ -324,7 +324,7 @@ static float sample_fill_circle(Vec2i center, float radius, Vec2i position)
     return clamp(0.5 - distance, 0, 1);
 }
 
-static void fill_circle_helper(Painter &painter, Rectangle bound, Vec2i center, int radius, Color color)
+static void fill_circle_helper(Painter &painter, Recti bound, Vec2i center, int radius, Color color)
 {
     for (int x = 0; x < bound.width(); x++)
     {
@@ -338,13 +338,13 @@ static void fill_circle_helper(Painter &painter, Rectangle bound, Vec2i center, 
     }
 }
 
-__flatten void Painter::fill_rounded_rectangle(Rectangle bound, int radius, Color color)
+__flatten void Painter::fill_rounded_rectangle(Recti bound, int radius, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
 
-    Rectangle left_ear = bound.take_left(radius);
-    Rectangle right_ear = bound.take_right(radius);
+    Recti left_ear = bound.take_left(radius);
+    Recti right_ear = bound.take_right(radius);
 
     fill_circle_helper(*this, left_ear.take_top(radius), Vec2i(radius - 1, radius - 1), radius, color);
     fill_circle_helper(*this, left_ear.take_bottom(radius), Vec2i(radius - 1, 0), radius, color);
@@ -357,7 +357,7 @@ __flatten void Painter::fill_rounded_rectangle(Rectangle bound, int radius, Colo
     fill_rectangle(bound.cutoff_left_and_right(radius, radius), color);
 }
 
-__flatten void Painter::fill_checkboard(Rectangle bound, int cell_size, Color fg_color, Color bg_color)
+__flatten void Painter::fill_checkboard(Recti bound, int cell_size, Color fg_color, Color bg_color)
 {
     for (int x = 0; x < bound.width(); x++)
     {
@@ -529,7 +529,7 @@ __flatten void Painter::draw_line(Vec2i a, Vec2i b, Color color)
     }
 }
 
-__flatten void Painter::draw_rectangle(Rectangle rect, Color color)
+__flatten void Painter::draw_rectangle(Recti rect, Color color)
 {
     Vec2i topleft = rect.position();
     Vec2i topright = rect.position() + rect.size().extract_x() - Vec2i::oneX();
@@ -579,7 +579,7 @@ static double sample_draw_circle(Vec2i center, double radius, double thickness, 
     return clamp((0.5 - distance) + (thickness / 2), 0, 1);
 }
 
-void Painter::draw_circle_helper(Rectangle bound, Vec2i center, int radius, int thickness, Color color)
+void Painter::draw_circle_helper(Recti bound, Vec2i center, int radius, int thickness, Color color)
 {
     for (int x = 0; x < bound.width(); x++)
     {
@@ -595,13 +595,13 @@ void Painter::draw_circle_helper(Rectangle bound, Vec2i center, int radius, int 
     }
 }
 
-__flatten void Painter::draw_rounded_rectangle(Rectangle bound, int radius, int thickness, Color color)
+__flatten void Painter::draw_rounded_rectangle(Recti bound, int radius, int thickness, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
 
-    Rectangle left_ear = bound.take_left(radius);
-    Rectangle right_ear = bound.take_right(radius);
+    Recti left_ear = bound.take_left(radius);
+    Recti right_ear = bound.take_right(radius);
 
     draw_circle_helper(left_ear.take_top(radius), Vec2i(radius - 1, radius - 1), radius, thickness, color);
     draw_circle_helper(left_ear.take_bottom(radius), Vec2i(radius - 1, 0), radius, thickness, color);
@@ -616,7 +616,7 @@ __flatten void Painter::draw_rounded_rectangle(Rectangle bound, int radius, int 
     fill_rectangle(bound.cutoff_left_and_right(radius, radius).take_bottom(thickness), color);
 }
 
-__flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destination, Color color)
+__flatten void Painter::blit_icon(Icon &icon, IconSize size, Recti destination, Color color)
 {
     Bitmap &bitmap = *icon.bitmap(size);
 
@@ -636,7 +636,7 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Rectangle destinati
     }
 }
 
-__flatten void Painter::blur_rectangle(Rectangle rectangle, int radius)
+__flatten void Painter::blur_rectangle(Recti rectangle, int radius)
 {
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
@@ -649,7 +649,7 @@ __flatten void Painter::blur_rectangle(Rectangle rectangle, int radius)
                  rectangle.y(), rectangle.y() + rectangle.height());
 }
 
-__flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Rectangle source, Rectangle destination, Color color)
+__flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
 {
     for (int x = 0; x < destination.width(); x++)
     {
@@ -669,7 +669,7 @@ __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Rectangle source, Re
 
 void Painter::draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color)
 {
-    Rectangle dest(position - glyph.origin, glyph.bound.size());
+    Recti dest(position - glyph.origin, glyph.bound.size());
     blit_bitmap_colored(font.bitmap(), glyph.bound, dest, color);
 }
 
@@ -682,9 +682,9 @@ __flatten void Painter::draw_string(Font &font, const char *str, Vec2i position,
     });
 }
 
-void Painter::draw_string_within(Font &font, const char *str, Rectangle container, Position position, Color color)
+void Painter::draw_string_within(Font &font, const char *str, Recti container, Position position, Color color)
 {
-    Rectangle bound = font.mesure_string(str);
+    Recti bound = font.mesure_string(str);
 
     bound = bound.place_within(container, position);
 
@@ -693,7 +693,7 @@ void Painter::draw_string_within(Font &font, const char *str, Rectangle containe
 
 void Painter::draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2i position, Color color)
 {
-    Rectangle dest(position + glyph->offset, glyph->bound.size());
+    Recti dest(position + glyph->offset, glyph->bound.size());
     TrueTypeAtlas *atlas = truetypefont_get_atlas(font);
 
     for (int x = 0; x < dest.width(); x++)
@@ -715,7 +715,7 @@ void Painter::draw_truetype_glyph(TrueTypeFont *font, TrueTypeGlyph *glyph, Vec2
 
 __flatten void Painter::draw_truetype_string(TrueTypeFont *font, const char *string, Vec2i position, Color color)
 {
-    // Rectangle bound = truetypefont_mesure_string(font, string);
+    // Recti bound = truetypefont_mesure_string(font, string);
     // TrueTypeFontMetrics metrics = truetypefont_get_metrics(font);
     //
     // bound = rectangle_offset(bound, position);
@@ -751,9 +751,9 @@ __flatten void Painter::draw_truetype_string(TrueTypeFont *font, const char *str
     }
 }
 
-void Painter::draw_truetype_string_within(TrueTypeFont *font, const char *str, Rectangle container, Position position, Color color)
+void Painter::draw_truetype_string_within(TrueTypeFont *font, const char *str, Recti container, Position position, Color color)
 {
-    Rectangle bound =
+    Recti bound =
         truetypefont_mesure_string(font, str)
             .place_within(container, position);
 

@@ -13,11 +13,11 @@ private:
 
     double _value = 0.5;
 
-    Rectangle track_bound();
+    Recti track_bound();
 
-    Rectangle value_bound();
+    Recti value_bound();
 
-    Rectangle thumb_bound();
+    Recti thumb_bound();
 
     void slide_to(Vec2i position);
 
@@ -30,5 +30,5 @@ public:
 
     void event(Event *event) override;
 
-    void paint(Painter &painter, Rectangle rectangle) override;
+    void paint(Painter &painter, Recti rectangle) override;
 };

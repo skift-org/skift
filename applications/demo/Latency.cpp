@@ -6,7 +6,7 @@
 static int _last_tick = 0;
 static int __i;
 
-void latency_draw(Painter &painter, Rectangle screen, float time)
+void latency_draw(Painter &painter, Recti screen, float time)
 {
     __unused(time);
 

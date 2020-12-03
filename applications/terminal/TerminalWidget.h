@@ -28,7 +28,7 @@ public:
 
     ~TerminalWidget();
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     void event(Event *event);
 

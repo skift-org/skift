@@ -20,7 +20,7 @@ public:
 
     Label(Widget *parent, String text, Position position);
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     Vec2i size();
 };

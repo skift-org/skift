@@ -5,7 +5,7 @@
 
 RefPtr<Font> font();
 
-Rectangle cell_bound(int x, int y);
+Recti cell_bound(int x, int y);
 
 Vec2i cell_size();
 

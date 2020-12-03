@@ -28,7 +28,7 @@ private:
 
     void scroll_to_cursor();
 
-    Rectangle linenumbers_bound() const
+    Recti linenumbers_bound() const
     {
         if (_linenumbers)
         {
@@ -36,11 +36,11 @@ private:
         }
         else
         {
-            return Rectangle::empty();
+            return Recti::empty();
         }
     }
 
-    Rectangle view_bound() const
+    Recti view_bound() const
     {
         if (_linenumbers)
         {
@@ -52,9 +52,9 @@ private:
         }
     }
 
-    Rectangle document_bound() const
+    Recti document_bound() const
     {
-        return Rectangle{
+        return Recti{
             -_hscroll_offset,
             -_vscroll_offset,
             1024,
@@ -63,12 +63,12 @@ private:
             .offset(bound().position());
     }
 
-    Rectangle vscrollbar_bound() const
+    Recti vscrollbar_bound() const
     {
         return view_bound().take_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
     }
 
-    Rectangle hscrollbar_bound() const
+    Recti hscrollbar_bound() const
     {
         return view_bound().take_bottom(ScrollBar::SIZE).cutoff_right(ScrollBar::SIZE);
     }
@@ -106,7 +106,7 @@ public:
 
     ~TextField();
 
-    void paint(Painter &painter, Rectangle rectangle);
+    void paint(Painter &painter, Recti rectangle);
 
     void event(Event *event);
 

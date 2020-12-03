@@ -5,8 +5,8 @@
 namespace Screen
 {
 
-Rectangle bound();
+Recti bound();
 
-void bound(Rectangle);
+void bound(Recti);
 
 } // namespace Screen

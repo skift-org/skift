@@ -1,6 +1,6 @@
 #include "demo/Demos.h"
 
-void colors_draw(Painter &painter, Rectangle screen, float time)
+void colors_draw(Painter &painter, Recti screen, float time)
 {
     float hue = (int)(time * 80) % 360;
 

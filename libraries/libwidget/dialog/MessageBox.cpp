@@ -18,7 +18,7 @@ DialogButton dialog_message(
     window->type(WINDOW_TYPE_DIALOG);
     window->size(Vec2i(300, 200));
     window->root()->layout(VFLOW(0));
-    window->root()->insets(Insets(8));
+    window->root()->insets(Insetsi(8));
 
     window->on(Event::WINDOW_CLOSING, [window](auto) {
         application_exit_nested(DIALOG_BUTTON_CLOSED);

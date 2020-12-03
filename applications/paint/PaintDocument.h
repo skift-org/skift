@@ -17,7 +17,7 @@ private:
 public:
     Callback<void()> on_color_change;
 
-    Rectangle bound() { return _bitmap->bound(); }
+    Recti bound() { return _bitmap->bound(); }
     Bitmap &bitmap() { return *_bitmap; }
     Painter &painter() { return _painter; }
 

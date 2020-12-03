@@ -11,7 +11,7 @@ Placeholder::Placeholder(Widget *parent, String text)
     _text = buffer;
 }
 
-void Placeholder::paint(Painter &painter, Rectangle rectangle)
+void Placeholder::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 

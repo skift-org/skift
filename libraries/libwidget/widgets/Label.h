@@ -7,7 +7,7 @@ class Label : public Widget
 {
 private:
     String _text = "Label";
-    Position _position = Position::LEFT;
+    Anchor _anchor = Anchor::LEFT;
 
 public:
     void text(String text)
@@ -18,7 +18,7 @@ public:
 
     Label(Widget *parent, String text);
 
-    Label(Widget *parent, String text, Position position);
+    Label(Widget *parent, String text, Anchor anchor);
 
     void paint(Painter &painter, Recti rectangle);
 

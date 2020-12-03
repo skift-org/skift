@@ -37,9 +37,9 @@ public:
         auto cpu_filler = new Container(this);
         cpu_filler->attributes(LAYOUT_FILL);
 
-        _label_usage = new Label(this, "Usage: nil Mio", Position::RIGHT);
-        _label_available = new Label(this, "Available: nil Mio", Position::RIGHT);
-        _label_greedy = new Label(this, "Most greedy: nil", Position::RIGHT);
+        _label_usage = new Label(this, "Usage: nil Mio", Anchor::RIGHT);
+        _label_available = new Label(this, "Available: nil Mio", Anchor::RIGHT);
+        _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);
 
         _graph_timer = own<Timer>(500, [&]() {
             SystemStatus status{};

@@ -94,7 +94,7 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
     insets(Insetsi(0, 0, 6, 6));
     min_width(64);
 
-    new Label(this, text, Position::CENTER);
+    new Label(this, text, Anchor::CENTER);
 }
 
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text)

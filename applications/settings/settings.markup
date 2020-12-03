@@ -6,6 +6,6 @@
     layout="hflow(8)"
     >
     <Container padding="insets(0, 8, 0)" layout="vflow(8)" fill>
-    <Label text="Work In Progress" position="center" />
+    <Label text="Work In Progress" anchor="center" />
     </Container>
 </Window>

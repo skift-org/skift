@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         p3->attributes(LAYOUT_FILL);
     }
 
-    new Label(window->root(), "Buttons", Position::CENTER);
+    new Label(window->root(), "Buttons", Anchor::CENTER);
     Widget *buttons = new Container(window->root());
     {
         buttons->layout(HFLOW(8));
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
         new Button(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
     }
 
-    new Label(window->root(), "Grid layout", Position::CENTER);
+    new Label(window->root(), "Grid layout", Anchor::CENTER);
 
     Widget *panel_grid = new Container(window->root());
     {

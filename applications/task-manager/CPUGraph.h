@@ -38,9 +38,9 @@ public:
         auto cpu_filler = new Container(this);
         cpu_filler->attributes(LAYOUT_FILL);
 
-        _label_average = new Label(this, "Average: nil%", Position::RIGHT);
-        _label_greedy = new Label(this, "Most greedy: nil", Position::RIGHT);
-        _label_uptime = new Label(this, "Uptime: nil", Position::RIGHT);
+        _label_average = new Label(this, "Average: nil%", Anchor::RIGHT);
+        _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);
+        _label_uptime = new Label(this, "Uptime: nil", Anchor::RIGHT);
 
         _graph_timer = own<Timer>(100, [&]() {
             SystemStatus status{};

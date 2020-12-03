@@ -682,11 +682,11 @@ __flatten void Painter::draw_string(Font &font, const char *str, Vec2i position,
     });
 }
 
-void Painter::draw_string_within(Font &font, const char *str, Recti container, Position position, Color color)
+void Painter::draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color)
 {
     Recti bound = font.mesure_string(str);
 
-    bound = bound.place_within(container, position);
+    bound = bound.place_within(container, anchor);
 
     draw_string(font, str, Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4), color);
 }
@@ -751,11 +751,11 @@ __flatten void Painter::draw_truetype_string(TrueTypeFont *font, const char *str
     }
 }
 
-void Painter::draw_truetype_string_within(TrueTypeFont *font, const char *str, Recti container, Position position, Color color)
+void Painter::draw_truetype_string_within(TrueTypeFont *font, const char *str, Recti container, Anchor anchor, Color color)
 {
     Recti bound =
         truetypefont_mesure_string(font, str)
-            .place_within(container, position);
+            .place_within(container, anchor);
 
     draw_truetype_string(
 

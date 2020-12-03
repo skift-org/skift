@@ -1,24 +1,13 @@
 #pragma once
 
 #include <libsystem/Logger.h>
-#include <libsystem/algebra/Insets.h>
-#include <libsystem/algebra/Vec2.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
 #include <libutils/Enum.h>
 
-enum class Position
-{
-    LEFT,
-    CENTER,
-    RIGHT,
-    TOP_LEFT,
-    TOP_CENTER,
-    TOP_RIGHT,
-    BOTTOM_LEFT,
-    BOTTOM_CENTER,
-    BOTTOM_RIGHT,
-};
+#include <libsystem/algebra/Anchor.h>
+#include <libsystem/algebra/Insets.h>
+#include <libsystem/algebra/Vec2.h>
 
 enum Border : int
 {
@@ -145,37 +134,37 @@ public:
             _height);
     }
 
-    Rect place_within(Rect container, Position position) const
+    Rect place_within(Rect container, Anchor anchor) const
     {
         int x = container._x;
         int y = container._y;
         int width = _width;
         int height = _height;
 
-        if (position == Position::CENTER ||
-            position == Position::TOP_CENTER ||
-            position == Position::BOTTOM_CENTER)
+        if (anchor == Anchor::CENTER ||
+            anchor == Anchor::TOP_CENTER ||
+            anchor == Anchor::BOTTOM_CENTER)
         {
             x += container._width / 2 - _width / 2;
         }
 
-        if (position == Position::RIGHT ||
-            position == Position::TOP_RIGHT ||
-            position == Position::BOTTOM_RIGHT)
+        if (anchor == Anchor::RIGHT ||
+            anchor == Anchor::TOP_RIGHT ||
+            anchor == Anchor::BOTTOM_RIGHT)
         {
             x += container._width - _width;
         }
 
-        if (position == Position::LEFT ||
-            position == Position::CENTER ||
-            position == Position::RIGHT)
+        if (anchor == Anchor::LEFT ||
+            anchor == Anchor::CENTER ||
+            anchor == Anchor::RIGHT)
         {
             y += container._height / 2 - _height / 2;
         }
 
-        if (position == Position::BOTTOM_LEFT ||
-            position == Position::BOTTOM_CENTER ||
-            position == Position::BOTTOM_RIGHT)
+        if (anchor == Anchor::BOTTOM_LEFT ||
+            anchor == Anchor::BOTTOM_CENTER ||
+            anchor == Anchor::BOTTOM_RIGHT)
         {
             y += container._height - _height;
         }

@@ -164,46 +164,46 @@ Insetsi insets_parse(const char *string)
     return result;
 }
 
-Position position_parse(const char *string)
+Anchor anchor_parse(const char *string)
 {
     if (strcmp(string, "left") == 0)
     {
-        return Position::LEFT;
+        return Anchor::LEFT;
     }
     if (strcmp(string, "center") == 0)
     {
-        return Position::CENTER;
+        return Anchor::CENTER;
     }
     if (strcmp(string, "right") == 0)
     {
-        return Position::RIGHT;
+        return Anchor::RIGHT;
     }
     if (strcmp(string, "top_left") == 0)
     {
-        return Position::TOP_LEFT;
+        return Anchor::TOP_LEFT;
     }
     if (strcmp(string, "top_center") == 0)
     {
-        return Position::TOP_CENTER;
+        return Anchor::TOP_CENTER;
     }
     if (strcmp(string, "top_right") == 0)
     {
-        return Position::TOP_RIGHT;
+        return Anchor::TOP_RIGHT;
     }
     if (strcmp(string, "bottom_left") == 0)
     {
-        return Position::BOTTOM_LEFT;
+        return Anchor::BOTTOM_LEFT;
     }
     if (strcmp(string, "bottom_center") == 0)
     {
-        return Position::BOTTOM_CENTER;
+        return Anchor::BOTTOM_CENTER;
     }
     if (strcmp(string, "bottom_right") == 0)
     {
-        return Position::BOTTOM_RIGHT;
+        return Anchor::BOTTOM_RIGHT;
     }
 
-    return Position::LEFT;
+    return Anchor::LEFT;
 }
 
 void widget_apply_attribute_from_markup(Widget *widget, markup::Node &node)
@@ -298,14 +298,16 @@ Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
         widget = new Label(
             parent,
             node.get_attribute_or_default("text", "Label"),
-            position_parse(node.get_attribute_or_default("position", "left").cstring()));
+            anchor_parse(node.get_attribute_or_default("anchor", "left")
+                             .cstring()));
     }
 
     if (node.is("Image"))
     {
         widget = new Image(
             parent,
-            Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null").cstring()));
+            Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null")
+                                                 .cstring()));
     }
 
     if (node.is("Slider"))

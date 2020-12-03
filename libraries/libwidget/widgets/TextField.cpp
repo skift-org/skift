@@ -65,11 +65,11 @@ void TextField::paint(Painter &painter, Recti rectangle)
             snprintf(buffer, 16, "%3d", (int)(i + 1));
             if (_cursor.line() == i)
             {
-                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND));
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Anchor::RIGHT, color(THEME_FOREGROUND));
             }
             else
             {
-                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Position::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
+                painter.draw_string_within(*font(), buffer, line_bound.take_left(32).shrinked(Insetsi(0, 0, 0, 4)), Anchor::RIGHT, color(THEME_FOREGROUND).with_alpha(0.6));
             }
         }
 

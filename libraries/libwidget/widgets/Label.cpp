@@ -4,15 +4,15 @@
 #include <libwidget/widgets/Label.h>
 
 Label::Label(Widget *parent, String text)
-    : Label(parent, text, Position::LEFT)
+    : Label(parent, text, Anchor::LEFT)
 {
 }
 
-Label::Label(Widget *parent, String text, Position position)
+Label::Label(Widget *parent, String text, Anchor anchor)
     : Widget(parent)
 {
     _text = text;
-    _position = position;
+    _anchor = anchor;
 }
 
 void Label::paint(Painter &painter, Recti rectangle)
@@ -23,7 +23,7 @@ void Label::paint(Painter &painter, Recti rectangle)
         *font(),
         _text.cstring(),
         bound(),
-        _position,
+        _anchor,
         color(THEME_FOREGROUND));
 }
 

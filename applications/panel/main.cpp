@@ -37,17 +37,17 @@ int main(int argc, char **argv)
     auto menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
-    auto widget_date_and_time = new Label(panel_container, "", Position::CENTER);
+    auto widget_date_and_time = new Label(panel_container, "", Anchor::CENTER);
     widget_date_and_time->attributes(LAYOUT_FILL);
 
     auto graph_container = new Container(panel_container);
     graph_container->layout(VGRID(1));
 
     auto ram_graph = new Graph(graph_container, 50, Colors::ROYALBLUE);
-    new Label(ram_graph, "RAM", Position::CENTER);
+    new Label(ram_graph, "RAM", Anchor::CENTER);
 
     auto cpu_graph = new Graph(graph_container, 50, Colors::SEAGREEN);
-    new Label(cpu_graph, "CPU", Position::CENTER);
+    new Label(cpu_graph, "CPU", Anchor::CENTER);
 
     new Label(panel_container, "user");
 

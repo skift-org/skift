@@ -141,7 +141,7 @@ void Table::paint(Painter &painter, Recti rectangle)
 
     if (_model->rows() == 0)
     {
-        painter.draw_string_within(*font(), _empty_message.cstring(), list_bound().take_top(TABLE_ROW_HEIGHT), Position::CENTER, color(THEME_FOREGROUND));
+        painter.draw_string_within(*font(), _empty_message.cstring(), list_bound().take_top(TABLE_ROW_HEIGHT), Anchor::CENTER, color(THEME_FOREGROUND));
     }
     else
     {

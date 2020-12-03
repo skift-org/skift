@@ -14,7 +14,8 @@
     __ENTRY(NULL_, null)              \
     __ENTRY(CONSOLE, console)         \
     __ENTRY(ZERO, zero)               \
-    __ENTRY(SOUND, sound)
+    __ENTRY(SOUND, sound)             \
+    __ENTRY(PCSPEAKER, speaker)
 
 enum class DeviceClass : uint8_t
 {

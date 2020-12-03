@@ -158,21 +158,21 @@ QEMU_FLAGS_VIRTIO=-device virtio-rng-pci \
 .PHONY: run-qemu
 run-qemu: $(BOOTDISK)
 	@echo [QEMU] $^
-	@$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -device ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -soundhw ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw ac97
+	@$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -device ac97 -soundhw pcspk || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -enable-kvm -soundhw all || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 -soundhw pcspk || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw all
 
 run-qemu-no-kvm: $(BOOTDISK)
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 || \
-		$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw ac97
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 -soundhw pcspk || \
+		$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw all
 
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
-	@$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -device ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -soundhw ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -device ac97 || \
-	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -soundhw ac97
+	@$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -device ac97 -soundhw pcspk || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -soundhw all || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -device ac97 -soundhw pcspk || \
+	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -soundhw all
 
 .PHONY: run-bochs
 run-bochs: $(BOOTDISK)

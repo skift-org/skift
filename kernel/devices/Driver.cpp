@@ -10,6 +10,7 @@
 #include "kernel/drivers/LegacyKeyboard.h"
 #include "kernel/drivers/LegacyMouse.h"
 #include "kernel/drivers/LegacySerial.h"
+#include "kernel/drivers/PCSpeaker.h"
 #include "kernel/drivers/UnixNull.h"
 #include "kernel/drivers/UnixRandom.h"
 #include "kernel/drivers/UnixZero.h"
@@ -48,6 +49,7 @@ void driver_initialize()
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM2)", LEGACY_COM2});
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM3)", LEGACY_COM3});
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM4)", LEGACY_COM4});
+    _matchers->push_back(new LegacyDeviceMatcher<PCSpeaker>{"PCSpeaker", LEGACY_SPEAKER});
 
     _matchers->push_back(new UNIXDeviceMatcher<UnixNull>{"Unix Null Device", UNIX_NULL});
     _matchers->push_back(new UNIXDeviceMatcher<UnixRandom>{"Unix Random Device", UNIX_RANDOM});

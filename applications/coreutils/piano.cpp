@@ -3,6 +3,10 @@
 #include <libsystem/io/Stream.h>
 #include <libutils/Path.h>
 
+// piano utility takes a file that has notes data for eg:
+// echo "c5d5e5g5a5b5c6" > new.txt
+// piano new.txt
+
 int spkr = 0;
 
 struct spkr
@@ -26,7 +30,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1)
     {
-        stream_format(err_stream, "%s: Missing notes file operand\n", argv[0]);
+        stream_format(err_stream, "%s: Missing notes file operand\n Info : Write notes eg \"c5e5g5\" to a file and supply that files' path to this utility \n", argv[0]);
         return PROCESS_FAILURE;
     }
 

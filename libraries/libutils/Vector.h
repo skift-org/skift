@@ -304,7 +304,7 @@ public:
 
         grow();
 
-        for (size_t j = _count; j > index; j--)
+        for (size_t j = _count; j > index + 1; j--)
         {
             new (&_storage[j]) T(move(_storage[j - 1]));
         }

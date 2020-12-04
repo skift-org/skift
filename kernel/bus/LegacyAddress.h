@@ -4,6 +4,7 @@ enum LegacyAddress
 {
     LEGACY_MOUSE,
     LEGACY_KEYBOARD,
+    LEGACY_SPEAKER,
 
     LEGACY_COM1 = 0X3F8,
     LEGACY_COM2 = 0X2F8,

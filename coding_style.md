@@ -149,7 +149,7 @@ case mitzvah:
 
 * Don't use `type_t` naming. (If you see one in the code base (on non-posix standard libraries), please report it :sweat_smile:)
 * Don't typedef builtin types.
-* Use `CamelCase` for typedef'd types.
+* Use `PascalCase` for typedef'd types.
 
 ## Line length
 
@@ -204,3 +204,4 @@ printf("rmdir: failed to remove '%s': %s", path, result_to_string(result));
 
 - [@Keyboard-Slayer](https://github.com/Keyboard-Slayer)
 - [@sleepy-monax](https://github.com/sleepy-monax)
+- [@optimisticside](https://github.com/optimisticside)

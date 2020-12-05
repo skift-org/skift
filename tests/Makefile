@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := all
+
 TESTS=$(wildcard test_*.cpp)
 
 CXXFLAGS:= \

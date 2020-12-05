@@ -16,7 +16,7 @@
  * Specifically, this should be either control sequences
  * or raw characters (ie, for vt220 mode)
  */
-const char *colors[256] = {NULL};
+const char *colors[256] = {nullptr};
 
 /*
  * For most modes, we output spaces, but for some

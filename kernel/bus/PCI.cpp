@@ -35,13 +35,19 @@ Iteration pci_scan_slot(IterationCallback<PCIAddress> &callback, int bus, int sl
     PCIAddress address{bus, slot, 0};
 
     if (address.read16(PCI_VENDOR_ID) == PCI_NONE)
+    {
         return Iteration::CONTINUE;
+    }
 
     if (pci_scan_func(callback, address) == Iteration::STOP)
+    {
         return Iteration::STOP;
+    }
 
     if (!address.read8(PCI_HEADER_TYPE))
+    {
         return Iteration::CONTINUE;
+    }
 
     for (int func = 1; func < 8; func++)
     {

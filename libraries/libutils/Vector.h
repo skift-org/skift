@@ -442,8 +442,8 @@ public:
     {
         grow();
         
-        new(&_storage[_size]) T(forward<Args>(args)...);
-        return _storage[_size++];
+        new(&_storage[_count]) T(forward<Args>(args)...);
+        return _storage[_count++];
     }
 
     void push_back_many(const Vector<T> &values)

@@ -17,6 +17,19 @@ public:
     char at(int index) const { return _buffer->cstring()[index]; }
 
     bool null_or_empty() const { return _buffer == nullptr || _buffer->length() == 0; }
+    
+    String substr(size_t start, size_t length)
+    {
+        char str[length + 1];
+        
+        for (size_t i = 0; i <= length; i++)
+        {
+            str[i] = at(start + i);
+        }
+        
+        str[length] = '\0';
+        return str;
+    }
 
     String(const char *cstring = "")
     {

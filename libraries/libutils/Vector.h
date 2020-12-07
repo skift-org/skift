@@ -304,9 +304,10 @@ public:
 
         grow();
 
-        for (size_t j = _count; j > index + 1; j--)
+        for (size_t j = _count - 1; j > index; j--)
         {
             new (&_storage[j]) T(move(_storage[j - 1]));
+            at(j - 1).~T();
         }
 
         new (&_storage[index]) T(move(value));
@@ -417,7 +418,7 @@ public:
         return copy;
     }
 
-    T &pash(const T &value)
+    T &push(const T &value)
     {
         return push(T(value));
     }
@@ -425,6 +426,21 @@ public:
     T &push(T &&value)
     {
         return insert(0, move(value));
+    }
+
+    template <typename... Args>
+    T &emplace(Args &&... args)
+    {
+        grow();
+
+        for (size_t j = _count - 1; j > 0; j--)
+        {
+            new (&_storage[j]) T(move(_storage[j - 1]));
+            at(j - 1).~T();
+        }
+
+        new (&_storage[0]) T(forward<Args>(args)...);
+        return _storage[0];
     }
 
     T &push_back(const T &value)
@@ -436,14 +452,14 @@ public:
     {
         return insert(_count, move(value));
     }
-    
+
     template <typename... Args>
-    T& emplace_back(Args&&... args)
+    T &emplace_back(Args &&... args)
     {
         grow();
-        
-        new(&_storage[_count]) T(forward<Args>(args)...);
-        return _storage[_count++];
+
+        new (&_storage[_count - 1]) T(forward<Args>(args)...);
+        return _storage[_count - 1];
     }
 
     void push_back_many(const Vector<T> &values)

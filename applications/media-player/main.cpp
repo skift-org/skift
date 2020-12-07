@@ -2,21 +2,13 @@
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
 
+#include "media-player/windows/Main.h"
+
 int main(int argc, char **argv)
 {
     application_initialize(argc, argv);
 
-    Window *window = window_create_from_file("/Applications/media-player/main.markup");
-
-    window->with_widget<Slider>("volume_slider", [&](Slider *slider) {
-        slider->on(Event::VALUE_CHANGE, [&](auto) {
-            logger_trace("Value is %d", (int)(slider->value() * 100));
-        });
-    });
-
-    window->with_widget<Image>("cover", [&](Image *image) {
-        image->change_bitmap(Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
-    });
+    auto window = new media_player::Main();
 
     window->show();
 

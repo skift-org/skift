@@ -446,6 +446,22 @@ public:
             r = empty();
         }
     }
+
+    Rect cover(Rect rect)
+    {
+        double scale_x = rect.width() / (double)width();
+        double scale_y = rect.height() / (double)height();
+
+        double scale = MAX(scale_x, scale_y);
+
+        Rect scaled_rect{
+            0,
+            0,
+            (Scalar)(width() * scale),
+            (Scalar)(height() * scale)};
+
+        return {rect.center() - scaled_rect.center(), scaled_rect.size()};
+    }
 };
 
 using Recti = Rect<int>;

@@ -436,6 +436,15 @@ public:
     {
         return insert(_count, move(value));
     }
+    
+    template <typename... Args>
+    T& emplace_back(Args&&... args)
+    {
+        grow();
+        
+        new(&_storage[_count]) T(forward<Args>(args)...);
+        return _storage[_count++];
+    }
 
     void push_back_many(const Vector<T> &values)
     {

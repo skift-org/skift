@@ -7,8 +7,6 @@
 // echo "c5d5e5g5a5b5c6" > new.txt
 // piano new.txt
 
-int spkr = 0;
-
 struct spkr
 {
     int length;

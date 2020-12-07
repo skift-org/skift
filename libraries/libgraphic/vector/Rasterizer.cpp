@@ -49,8 +49,6 @@ void Rasterizer::tessellate_cubic_bezier(BezierCurve &curve, int depth)
 
 void Rasterizer::stroke(Painter &painter, Path &path, Vec2f position, Trans2f transform, Color color)
 {
-    __unused(position);
-
     for (size_t i = 0; i < path.subpath_count(); i++)
     {
         _points.clear();

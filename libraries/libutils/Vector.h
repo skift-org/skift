@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <initializer_list>
 
 #include <libsystem/core/CString.h>
 #include <libsystem/math/MinMax.h>
@@ -75,6 +76,16 @@ public:
     Vector(size_t capacity)
     {
         ensure_capacity(capacity);
+    }
+    
+    Vector(std::initializer_list<T> data)
+    {
+        ensure_capacity(data.size());
+        
+        for (size_t i = 0; i < data.size(); i++)
+        {
+            push_back(data[i]);
+        }
     }
 
     Vector(AdoptTag, T *storage, size_t size)

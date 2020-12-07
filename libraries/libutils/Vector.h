@@ -58,6 +58,18 @@ public:
 
     T *raw_storage() { return _storage; }
 
+    T &at(size_t index)
+    {
+        assert(index < _count);
+        return _storage[index];
+    }
+
+    const T &at(size_t index) const
+    {
+        assert(index < _count);
+        return _storage[index];
+    }
+
     Vector() : Vector(16) {}
 
     Vector(size_t capacity)

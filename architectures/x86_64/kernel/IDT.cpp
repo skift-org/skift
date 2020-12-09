@@ -15,7 +15,6 @@ void idt_initialize()
     for (int i = 0; i < 48; i++)
     {
         idt[i] = IDT64Entry(__interrupt_vector[i], 0, INTGATE);
-        idt[i] = IDT64Entry(__interrupt_vector[i], 0, INTGATE);
     }
 
     idt[127] = IDT64Entry(__interrupt_vector[48], 1, INTGATE);

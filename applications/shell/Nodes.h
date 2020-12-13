@@ -14,34 +14,25 @@ struct ShellNode;
 
 typedef void (*ShellNodeDestroyCallback)(struct ShellNode *node);
 
-#define SHELL_NODE      \
-    ShellNodeType type; \
-    ShellNodeDestroyCallback destroy;
-
 struct ShellNode
 {
-    SHELL_NODE;
+    ShellNodeType type;
+    ShellNodeDestroyCallback destroy;
 };
 
-struct ShellCommand
+struct ShellCommand : public ShellNode
 {
-    SHELL_NODE;
-
     char *command;
     List /* of cstring */ *arguments;
 };
 
-struct ShellPipeline
+struct ShellPipeline : public ShellNode
 {
-    SHELL_NODE;
-
     List *commands;
 };
 
-struct ShellRedirect
+struct ShellRedirect : public ShellNode
 {
-    SHELL_NODE;
-
     ShellNode *command;
     char *destination;
 };

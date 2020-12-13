@@ -90,7 +90,6 @@ ASFLAGS=-f elf32
 include architectures/.build.mk
 
 include thirdparty/.build.mk
-include protocols/.build.mk
 include kernel/.build.mk
 include libraries/.build.mk
 include applications/.build.mk

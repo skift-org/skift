@@ -56,12 +56,12 @@ Result open(const char *raw_path)
         return ERR_EXTENSION;
     }
 
-    auto application_name = file_type_open_with.as_string();
-    char application_path[PATH_LENGTH] = {};
+    auto app_name = file_type_open_with.as_string();
+    char app_path[PATH_LENGTH] = {};
 
-    snprintf(application_path, PATH_LENGTH, "/Applications/%s/%s", application_name.cstring(), application_name.cstring());
+    snprintf(app_path, PATH_LENGTH, "/Applications/%s/%s", app_name.cstring(), app_name.cstring());
 
-    auto launchpad = launchpad_create(application_name.cstring(), application_path);
+    auto launchpad = launchpad_create(app_name.cstring(), app_path);
     launchpad_argument(launchpad, path.string().cstring());
     return launchpad_launch(launchpad, nullptr);
 }

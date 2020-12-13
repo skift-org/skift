@@ -115,7 +115,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
 
         item->on(Event::ACTION, [entry](auto) {
             process_run(entry.command.cstring(), nullptr);
-            application_exit(0);
+            Application::exit(0);
         });
 
         return Iteration::CONTINUE;
@@ -124,7 +124,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     Vector<MenuEntry> entries{};
     load_menu(entries);
@@ -173,5 +173,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return application_run();
+    return Application::run();
 }

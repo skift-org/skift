@@ -13,7 +13,7 @@ static constexpr int PANEL_HEIGHT = 36;
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
 
@@ -84,5 +84,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return application_run();
+    return Application::run();
 }

@@ -182,7 +182,7 @@ public:
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     auto bitmap = Bitmap::create_shared(400, 400).take_value();
     bitmap->clear(Colors::BLACKTRANSPARENT);
@@ -192,5 +192,5 @@ int main(int argc, char **argv)
     auto window = new PaintWindow(document);
     window->show();
 
-    return application_run();
+    return Application::run();
 }

@@ -491,7 +491,7 @@ void Widget::repaint(Painter &painter, Recti rectangle)
     painter.push();
     painter.clip(bound());
 
-    if (application_is_debbuging_layout())
+    if (Application::show_wireframe())
     {
         painter.fill_insets(bound(), _insets, Colors::MAGENTA.with_alpha(0.25));
     }
@@ -508,7 +508,7 @@ void Widget::repaint(Painter &painter, Recti rectangle)
         }
     }
 
-    if (application_is_debbuging_layout())
+    if (Application::show_wireframe())
     {
         painter.draw_rectangle(bound(), Colors::CYAN.with_alpha(0.25));
     }

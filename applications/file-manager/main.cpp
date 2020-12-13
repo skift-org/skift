@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     auto navigation = make<file_manager::Navigation>();
     auto bookmarks = file_manager::Bookmarks::load();
@@ -15,5 +15,5 @@ int main(int argc, char **argv)
     navigation->navigate(Path::parse("/User"), file_manager::Navigation::NONE);
     window->show();
 
-    return application_run();
+    return Application::run();
 }

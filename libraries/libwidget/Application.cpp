@@ -13,35 +13,37 @@
 
 #include "compositor/Protocol.h"
 
-enum ApplicationState
+namespace Application
 {
-    APPLICATION_NONE,
 
-    APPLICATION_INITALIZED,
-    APPLICATION_RUNNING,
-    APPLICATION_EXITING,
+enum class State
+{
+    UNINITIALIZED,
+    INITALIZED,
+    EXITING,
 };
 
-static ApplicationState _state = APPLICATION_NONE;
-static List *_windows;
-static Connection *_connection;
-static Notifier *_connection_notifier;
-static bool _is_debbuging_layout = false;
+State _state = State::UNINITIALIZED;
+List *_windows;
+Connection *_connection;
+Notifier *_connection_notifier;
+bool _wireframe = false;
 
-void application_do_message(CompositorMessage *message)
+void do_message(const CompositorMessage &message)
 {
-    if (message->type == COMPOSITOR_MESSAGE_EVENT_WINDOW)
+    if (message.type == COMPOSITOR_MESSAGE_EVENT_WINDOW)
     {
-        Window *window = application_get_window(message->event_window.id);
+        Window *window = get_window(message.event_window.id);
 
         if (window)
         {
-            window->dispatch_event(&message->event_window.event);
+            Event copy = message.event_window.event;
+            window->dispatch_event(&copy);
         }
     }
-    else if (message->type == COMPOSITOR_MESSAGE_CHANGED_RESOLUTION)
+    else if (message.type == COMPOSITOR_MESSAGE_CHANGED_RESOLUTION)
     {
-        Screen::bound(message->changed_resolution.resolution);
+        Screen::bound(message.changed_resolution.resolution);
 
         list_foreach(Window, window, _windows)
         {
@@ -57,62 +59,59 @@ void application_do_message(CompositorMessage *message)
     }
     else
     {
-        logger_error("Got an invalid message from compositor (%d)!", message->type);
+        logger_error("Got an invalid message from compositor (%d)!", message.type);
         hexdump(&message, sizeof(CompositorMessage));
-        application_exit(-1);
+        Application::exit(-1);
     }
 }
 
-void application_send_message(CompositorMessage message)
+void send_message(CompositorMessage message)
 {
     connection_send(_connection, &message, sizeof(CompositorMessage));
 }
 
-CompositorMessage *application_wait_for_message(CompositorMessageType expected_message)
+ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_message)
 {
-    List *pending_messages = nullptr;
+    Vector<CompositorMessage> pendings;
 
-    CompositorMessage *message = __create(CompositorMessage);
-    connection_receive(_connection, message, sizeof(CompositorMessage));
+    CompositorMessage message{};
+    connection_receive(_connection, &message, sizeof(CompositorMessage));
 
-    while (message->type != expected_message)
+    if (handle_has_error(_connection))
     {
-        if (pending_messages == nullptr)
-        {
-            pending_messages = list_create();
-        }
-
-        list_pushback(pending_messages, message);
-        message = __create(CompositorMessage);
-        connection_receive(_connection, message, sizeof(CompositorMessage));
+        return handle_get_error(_connection);
     }
 
-    if (pending_messages)
+    while (message.type != expected_message)
     {
-        list_foreach(CompositorMessage, message, pending_messages)
-        {
-            application_do_message(message);
-        }
+        pendings.push_back(move(message));
+        connection_receive(_connection, &message, sizeof(CompositorMessage));
 
-        list_destroy_with_callback(pending_messages, free);
+        if (handle_has_error(_connection))
+        {
+            pendings.foreach ([&](auto &message) {
+                do_message(message);
+                return Iteration::CONTINUE;
+            });
+
+            return handle_get_error(_connection);
+        }
     }
+
+    pendings.foreach ([&](auto &message) {
+        do_message(message);
+        return Iteration::CONTINUE;
+    });
 
     return message;
 }
 
-void application_wait_for_ack()
+void wait_for_ack()
 {
-    CompositorMessage *ack_message = application_wait_for_message(COMPOSITOR_MESSAGE_ACK);
-    if (ack_message)
-    {
-        free(ack_message);
-    }
+    wait_for_message(COMPOSITOR_MESSAGE_ACK);
 }
 
-void application_request_callback(
-    void *target,
-    Connection *connection,
-    PollEvent events)
+void request_callback(void *target, Connection *connection, PollEvent events)
 {
     __unused(target);
     __unused(events);
@@ -124,22 +123,22 @@ void application_request_callback(
     if (handle_has_error(connection))
     {
         logger_error("Connection to the compositor closed %s!", handle_error_string(connection));
-        application_exit(-1);
+        Application::exit(-1);
     }
 
     if (message_size != sizeof(CompositorMessage))
     {
         logger_error("Got a message with an invalid size from compositor %u != %u!", sizeof(CompositorMessage), message_size);
         hexdump(&message, message_size);
-        application_exit(-1);
+        Application::exit(-1);
     }
 
-    application_do_message(&message);
+    do_message(message);
 }
 
-Result application_initialize(int argc, char **argv)
+Result initialize(int argc, char **argv)
 {
-    assert(_state == APPLICATION_NONE);
+    assert(_state == State::UNINITIALIZED);
 
     bool theme_changed = false;
 
@@ -153,14 +152,16 @@ Result application_initialize(int argc, char **argv)
             theme_changed = true;
         }
 
-        if (strcmp(argv[i], "--debug-layout") == 0)
+        if (strcmp(argv[i], "--wireframe") == 0)
         {
-            _is_debbuging_layout = true;
+            _wireframe = true;
         }
     }
 
     if (!theme_changed)
+    {
         theme_load("/Files/Themes/skift-dark.json");
+    }
 
     _connection = socket_connect("/Session/compositor.ipc");
 
@@ -182,51 +183,49 @@ Result application_initialize(int argc, char **argv)
         nullptr,
         HANDLE(_connection),
         POLL_READ,
-        (NotifierCallback)application_request_callback);
+        (NotifierCallback)request_callback);
 
-    _state = APPLICATION_INITALIZED;
+    _state = State::INITALIZED;
 
-    CompositorMessage *greetings_message = application_wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
+    auto result_or_greetings = wait_for_message(COMPOSITOR_MESSAGE_GREETINGS);
 
-    if (greetings_message)
+    if (result_or_greetings.success())
     {
-        Screen::bound((greetings_message->greetings.screen_bound));
+        auto greetings = result_or_greetings.take_value();
+
+        Screen::bound(greetings.greetings.screen_bound);
     }
 
     return SUCCESS;
 }
 
-int application_run()
+int run()
 {
-    assert(_state == APPLICATION_INITALIZED);
-    _state = APPLICATION_RUNNING;
+    assert(_state == State::INITALIZED);
 
     return eventloop_run();
 }
 
-int application_run_nested()
+int run_nested()
 {
-    assert(_state == APPLICATION_RUNNING);
+    assert(_state == State::INITALIZED);
 
     return eventloop_run_nested();
 }
 
-int application_pump()
+int pump()
 {
-    if (_state == APPLICATION_INITALIZED)
-    {
-        _state = APPLICATION_RUNNING;
-    }
+    assert(_state == State::INITALIZED);
 
     eventloop_pump(true);
 
     return 0;
 }
 
-void application_exit(int exit_value)
+void exit(int exit_value)
 {
-    assert(_state == APPLICATION_RUNNING);
-    _state = APPLICATION_EXITING;
+    assert(_state == State::INITALIZED);
+    _state = State::EXITING;
 
     Window *window = (Window *)list_peek(_windows);
     while (window)
@@ -237,60 +236,60 @@ void application_exit(int exit_value)
 
     eventloop_exit(exit_value);
 
-    _state = APPLICATION_NONE;
+    _state = State::UNINITIALIZED;
 }
 
-void application_exit_nested(int exit_value)
+void exit_nested(int exit_value)
 {
-    assert(_state == APPLICATION_RUNNING);
+    assert(_state == State::INITALIZED);
     eventloop_exit_nested(exit_value);
 }
 
-bool application_is_debbuging_layout()
+bool show_wireframe()
 {
-    return _is_debbuging_layout;
+    return _wireframe;
 }
 
-void application_exit_if_all_windows_are_closed()
+void exit_if_all_windows_are_closed()
 {
-    if (_state == APPLICATION_EXITING)
+    if (_state == State::EXITING)
     {
         return;
     }
 
-    bool should_application_close = true;
+    bool should_close = true;
 
     list_foreach(Window, window, _windows)
     {
         if (window->visible())
         {
-            should_application_close = false;
+            should_close = false;
         }
     }
 
-    if (should_application_close)
+    if (should_close)
     {
-        application_exit(0);
+        exit(0);
     }
 }
 
-void application_add_window(Window *window)
+void add_window(Window *window)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
 
     list_pushback(_windows, window);
 }
 
-void application_remove_window(Window *window)
+void remove_window(Window *window)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
 
     list_remove(_windows, window);
 }
 
-Window *application_get_window(int id)
+Window *get_window(int id)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
 
     list_foreach(Window, window, _windows)
     {
@@ -303,9 +302,9 @@ Window *application_get_window(int id)
     return nullptr;
 }
 
-void application_show_window(Window *window)
+void show_window(Window *window)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -322,12 +321,12 @@ void application_show_window(Window *window)
         },
     };
 
-    application_send_message(message);
+    send_message(message);
 }
 
-void application_hide_window(Window *window)
+void hide_window(Window *window)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -337,13 +336,13 @@ void application_hide_window(Window *window)
         },
     };
 
-    application_send_message(message);
-    application_exit_if_all_windows_are_closed();
+    send_message(message);
+    exit_if_all_windows_are_closed();
 }
 
-void application_flip_window(Window *window, Recti bound)
+void flip_window(Window *window, Recti bound)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -358,13 +357,13 @@ void application_flip_window(Window *window, Recti bound)
         },
     };
 
-    application_send_message(message);
-    application_wait_for_ack();
+    send_message(message);
+    wait_for_ack();
 }
 
-void application_move_window(Window *window, Vec2i position)
+void move_window(Window *window, Vec2i position)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -375,12 +374,12 @@ void application_move_window(Window *window, Vec2i position)
         },
     };
 
-    application_send_message(message);
+    send_message(message);
 }
 
-void application_resize_window(Window *window, Recti bound)
+void resize_window(Window *window, Recti bound)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -391,12 +390,12 @@ void application_resize_window(Window *window, Recti bound)
         },
     };
 
-    application_send_message(message);
+    send_message(message);
 }
 
-void application_window_change_cursor(Window *window, CursorState state)
+void window_change_cursor(Window *window, CursorState state)
 {
-    assert(_state >= APPLICATION_INITALIZED);
+    assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
 
     CompositorMessage message = {
@@ -407,27 +406,30 @@ void application_window_change_cursor(Window *window, CursorState state)
         },
     };
 
-    application_send_message(message);
+    send_message(message);
 }
 
-Vec2i application_get_mouse_position()
+Vec2i mouse_position()
 {
     CompositorMessage message = {
         .type = COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
         .mouse_position = {},
     };
 
-    application_send_message(message);
+    send_message(message);
 
-    auto resp = application_wait_for_message(COMPOSITOR_MESSAGE_MOUSE_POSITION);
+    auto result_or_mouse_position = wait_for_message(COMPOSITOR_MESSAGE_MOUSE_POSITION);
 
-    auto result = Vec2i::zero();
-
-    if (resp)
+    if (result_or_mouse_position.success())
     {
-        result = resp->mouse_position.position;
-        free(resp);
-    }
+        auto mouse_position = result_or_mouse_position.value();
 
-    return result;
+        return mouse_position.mouse_position.position;
+    }
+    else
+    {
+        return Vec2i::zero();
+    }
 }
+
+} // namespace Application

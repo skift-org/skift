@@ -21,7 +21,7 @@ DialogButton dialog_message(
     window->root()->insets(Insetsi(8));
 
     window->on(Event::WINDOW_CLOSING, [window](auto) {
-        application_exit_nested(DIALOG_BUTTON_CLOSED);
+        Application::exit_nested(DIALOG_BUTTON_CLOSED);
         window->hide();
     });
 
@@ -37,15 +37,15 @@ DialogButton dialog_message(
     Widget *button_yes = new Button(buttons_container, BUTTON_FILLED, "Yes");
 
     button_no->on(Event::ACTION, [&window](auto) {
-        application_exit_nested(DIALOG_BUTTON_CLOSED);
+        Application::exit_nested(DIALOG_BUTTON_CLOSED);
         window->hide();
     });
     button_yes->on(Event::ACTION, [&window](auto) {
-        application_exit_nested(DIALOG_BUTTON_YES);
+        Application::exit_nested(DIALOG_BUTTON_YES);
         window->hide();
     });
 
     window->show();
 
-    return application_run_nested();
+    return Application::run_nested();
 }

@@ -91,7 +91,7 @@ Window::Window(WindowFlag flags)
         relayout();
     });
 
-    application_add_window(this);
+    Application::add_window(this);
     position(Vec2i(96, 72));
 }
 
@@ -102,7 +102,7 @@ Window::~Window()
         hide();
     }
 
-    application_remove_window(this);
+    Application::remove_window(this);
 
     delete root_container;
     delete header_container;
@@ -185,7 +185,7 @@ void Window::repaint_dirty()
     swap(frontbuffer, backbuffer);
     swap(frontbuffer_painter, backbuffer_painter);
 
-    application_flip_window(this, repaited_regions);
+    Application::flip_window(this, repaited_regions);
 }
 
 void Window::relayout()
@@ -266,7 +266,7 @@ void Window::show()
     relayout();
     repaint(*backbuffer_painter, bound());
 
-    application_show_window(this);
+    Application::show_window(this);
 }
 
 void Window::hide()
@@ -278,7 +278,7 @@ void Window::hide()
         return;
 
     _visible = false;
-    application_hide_window(this);
+    Application::hide_window(this);
 }
 
 Recti window_header_bound(Window *window)
@@ -435,7 +435,7 @@ void Window::dispatch_event(Event *event)
         {
             Vec2i offset = event->mouse.position - event->mouse.old_position;
             _bound = _bound.offset(offset);
-            application_move_window(this, _bound.position());
+            Application::move_window(this, _bound.position());
         }
         else if (is_resizing && !is_maximised)
         {
@@ -640,7 +640,7 @@ void Window::cursor(CursorState state)
 
     if (cursor_state != state)
     {
-        application_window_change_cursor(this, state);
+        Application::window_change_cursor(this, state);
         cursor_state = state;
     }
 }
@@ -719,7 +719,7 @@ void Window::bound(Recti new_bound)
     if (!_visible)
         return;
 
-    application_resize_window(this, _bound);
+    Application::resize_window(this, _bound);
     window_change_framebuffer_if_needed(this);
 
     should_relayout();

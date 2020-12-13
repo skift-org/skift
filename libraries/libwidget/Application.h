@@ -2,36 +2,41 @@
 
 #include <libwidget/Window.h>
 
-Result application_initialize(int argc, char **argv);
+namespace Application
+{
 
-int application_run();
+Result initialize(int argc, char **argv);
 
-int application_run_nested();
+int run();
 
-int application_pump();
+int run_nested();
 
-void application_exit(int exit_value);
+int pump();
 
-void application_exit_nested(int exit_value);
+void exit(int exit_value);
 
-bool application_is_debbuging_layout();
+void exit_nested(int exit_value);
 
-void application_add_window(Window *window);
+bool show_wireframe();
 
-void application_remove_window(Window *window);
+void add_window(Window *window);
 
-Window *application_get_window(int id);
+void remove_window(Window *window);
 
-void application_show_window(Window *window);
+Window *get_window(int id);
 
-void application_hide_window(Window *window);
+void show_window(Window *window);
 
-void application_flip_window(Window *window, Recti bound);
+void hide_window(Window *window);
 
-void application_move_window(Window *window, Vec2i position);
+void flip_window(Window *window, Recti bound);
 
-void application_resize_window(Window *window, Recti bound);
+void move_window(Window *window, Vec2i position);
 
-void application_window_change_cursor(Window *window, CursorState state);
+void resize_window(Window *window, Recti bound);
 
-Vec2i application_get_mouse_position();
+void window_change_cursor(Window *window, CursorState state);
+
+Vec2i mouse_position();
+
+} // namespace Application

@@ -14,7 +14,7 @@ static auto logo_based_on_color_scheme()
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     Window *window = window_create_from_file("/Applications/about/about.markup");
 
@@ -54,5 +54,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return application_run();
+    return Application::run();
 }

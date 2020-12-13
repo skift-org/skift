@@ -31,11 +31,11 @@ public:
 
 int main(int argc, char **argv)
 {
-    application_initialize(argc, argv);
+    Application::initialize(argc, argv);
 
     auto window = new DeviceManagerWindow();
 
     window->show();
 
-    return application_run();
+    return Application::run();
 }

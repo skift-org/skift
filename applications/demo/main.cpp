@@ -13,7 +13,7 @@ static Demo _demos[] = {
 
 int main(int argc, char **argv)
 {
-    Result result = application_initialize(argc, argv);
+    Result result = Application::initialize(argc, argv);
 
     if (result != SUCCESS)
     {
@@ -48,5 +48,5 @@ int main(int argc, char **argv)
 
     window->show();
 
-    return application_run();
+    return Application::run();
 }

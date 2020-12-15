@@ -27,7 +27,6 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     auto executable_path = Path::parse(executable);
     launchpad_argument(launchpad, executable_path.basename().cstring());
 
-    // FIXME: get the environment from the current process.
     auto env_copy = environment_copy();
     launchpad_environment(launchpad, strdup(env_copy.cstring()));
 
@@ -67,6 +66,14 @@ void launchpad_argument(Launchpad *launchpad, const char *argument)
     launchpad->argv[launchpad->argc + 1].buffer = nullptr;
 
     launchpad->argc++;
+}
+
+void launchpad_arguments(Launchpad *launchpad, const Vector<String> &arguments)
+{
+    for (size_t i = 0; i < arguments.count(); i++)
+    {
+        launchpad_argument(launchpad, arguments[i].cstring());
+    }
 }
 
 void launchpad_handle(Launchpad *launchpad, Handle *handle_to_pass, int destination)

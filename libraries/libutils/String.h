@@ -13,22 +13,27 @@ private:
 public:
     size_t length() const { return _buffer->length(); }
 
-    const char *cstring() const { return _buffer->cstring(); }
-    char at(int index) const { return _buffer->cstring()[index]; }
-
-    bool null_or_empty() const { return _buffer == nullptr || _buffer->length() == 0; }
-    
-    String substr(size_t start, size_t length)
+    const char *cstring() const
     {
-        char str[length + 1];
-        
-        for (size_t i = 0; i <= length; i++)
-        {
-            str[i] = at(start + i);
-        }
-        
-        str[length] = '\0';
-        return str;
+        return _buffer->cstring();
+    }
+
+    const char &at(int index) const
+    {
+        return _buffer->cstring()[index];
+    }
+
+    bool null_or_empty() const
+    {
+        return _buffer == nullptr || _buffer->length() == 0;
+    }
+
+    String sub_string(size_t start, size_t length)
+    {
+        assert(start < this->length());
+        assert(start + length <= this->length());
+
+        return make<StringStorage>(&at(start), length);
     }
 
     String(const char *cstring = "")

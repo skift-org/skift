@@ -94,13 +94,45 @@ public:
         return {absolute, move(elements)};
     }
 
-    static Path join(String left, String right) { return join(parse(left), parse(right)); }
+    static Path join(String left, String right)
+    {
+        return join(parse(left), parse(right));
+    }
 
-    static Path join(Path &left, String right) { return join(left, parse(right)); }
+    static Path join(Path &&left, String right)
+    {
+        return join(left, parse(right));
+    }
 
-    static Path join(Path &&left, Path &&right) { return join(left, right); }
+    static Path join(String left, Path &&right)
+    {
+        return join(parse(left), right);
+    }
 
-    static Path join(Path &left, Path &&right) { return join(left, right); }
+    static Path join(Path &left, String right)
+    {
+        return join(left, parse(right));
+    }
+
+    static Path join(String left, Path &right)
+    {
+        return join(parse(left), right);
+    }
+
+    static Path join(Path &&left, Path &&right)
+    {
+        return join(left, right);
+    }
+
+    static Path join(Path &left, Path &&right)
+    {
+        return join(left, right);
+    }
+
+    static Path join(Path &&left, Path &right)
+    {
+        return join(left, right);
+    }
 
     static Path join(Path &left, Path &right)
     {

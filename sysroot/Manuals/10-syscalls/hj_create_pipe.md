@@ -10,11 +10,11 @@ Result hj_create_pipe(int *reader_handle, int *writer_handle);
 
 ## Parameters
 
-- reader_handle: Handle to the reading end of the pipe (int*).
-- writer_handle: Handle to the writing end of the pipe (int*).
+- `reader_handle`: Handle to the reading end of the pipe (int*).
+- `writer_handle`: Handle to the writing end of the pipe (int*).
 
 ## Return
 
 - SUCCESS: If the pipe has been created.
 - ERR_BAD_ADDRESS
-- ERR_TOO_MANY_OPEN_FILES
+- ERR_TOO_MANY_HANDLE

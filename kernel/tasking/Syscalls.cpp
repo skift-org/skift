@@ -393,6 +393,21 @@ Result hj_handle_close(int handle)
     return task_fshandle_close(scheduler_running(), handle);
 }
 
+Result hj_handle_reopen(int handle, int *reopened)
+{
+    if (!syscall_validate_ptr((uintptr_t)reopened, sizeof(int)))
+    {
+        return ERR_BAD_ADDRESS;
+    }
+
+    return task_fshandle_reopen(scheduler_running(), handle, reopened);
+}
+
+Result hj_handle_copy(int source, int destination)
+{
+    return task_fshandle_copy(scheduler_running(), source, destination);
+}
+
 Result hj_handle_poll(
     HandleSet *handles_set,
     int *selected,
@@ -410,7 +425,7 @@ Result hj_handle_poll(
 
     if (handles_set->count > PROCESS_HANDLE_COUNT)
     {
-        return ERR_TOO_MANY_OPEN_FILES;
+        return ERR_TOO_MANY_HANDLE;
     }
 
     // We need to copy these because this syscall uses task_fshandle_poll
@@ -595,6 +610,8 @@ static SyscallHandler syscalls[__SYSCALL_COUNT] = {
     [HJ_SYSTEM_SHUTDOWN] = reinterpret_cast<SyscallHandler>(hj_system_shutdown),
     [HJ_HANDLE_OPEN] = reinterpret_cast<SyscallHandler>(hj_handle_open),
     [HJ_HANDLE_CLOSE] = reinterpret_cast<SyscallHandler>(hj_handle_close),
+    [HJ_HANDLE_REOPEN] = reinterpret_cast<SyscallHandler>(hj_handle_reopen),
+    [HJ_HANDLE_COPY] = reinterpret_cast<SyscallHandler>(hj_handle_copy),
     [HJ_HANDLE_POLL] = reinterpret_cast<SyscallHandler>(hj_handle_poll),
     [HJ_HANDLE_READ] = reinterpret_cast<SyscallHandler>(hj_handle_read),
     [HJ_HANDLE_WRITE] = reinterpret_cast<SyscallHandler>(hj_handle_write),

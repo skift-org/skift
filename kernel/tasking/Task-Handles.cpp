@@ -22,7 +22,27 @@ ResultOr<int> task_fshandle_add(Task *task, FsHandle *handle)
         }
     }
 
-    return ERR_TOO_MANY_OPEN_FILES;
+    return ERR_TOO_MANY_HANDLE;
+}
+
+Result task_fshandle_add_at(Task *task, FsHandle *handle, int index)
+{
+    if (index < 0 && index >= PROCESS_HANDLE_COUNT)
+    {
+        return ERR_BAD_HANDLE;
+    }
+
+    LockHolder holder(task->handles_lock);
+
+    if (task->handles[index])
+    {
+        delete task->handles[index];
+        task->handles[index] = nullptr;
+    }
+
+    task->handles[index] = handle;
+
+    return SUCCESS;
 }
 
 static bool is_valid_handle(Task *task, int handle)
@@ -38,7 +58,7 @@ Result task_fshandle_remove(Task *task, int handle_index)
     if (!is_valid_handle(task, handle_index))
     {
         logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     delete task->handles[handle_index];
@@ -68,7 +88,7 @@ Result task_fshandle_release(Task *task, int handle_index)
     if (!is_valid_handle(task, handle_index))
     {
         logger_warn("Got a bad handle %d from task %d", handle_index, task->id);
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     task->handles[handle_index]->release(task->id);
@@ -96,6 +116,11 @@ ResultOr<int> task_fshandle_open(Task *task, Path &path, OpenFlag flags)
     return result_or_handle_index;
 }
 
+Result task_fshandle_close(Task *task, int handle_index)
+{
+    return task_fshandle_remove(task, handle_index);
+}
+
 void task_fshandle_close_all(Task *task)
 {
     LockHolder holder(task->handles_lock);
@@ -110,9 +135,49 @@ void task_fshandle_close_all(Task *task)
     }
 }
 
-Result task_fshandle_close(Task *task, int handle_index)
+Result task_fshandle_reopen(Task *task, int handle, int *reopened)
 {
-    return task_fshandle_remove(task, handle_index);
+    auto original_handle = task_fshandle_acquire(task, handle);
+
+    if (original_handle == nullptr)
+    {
+        return ERR_BAD_HANDLE;
+    }
+
+    auto reopened_handle = new FsHandle(*original_handle);
+
+    auto result_or_handle_index = task_fshandle_add(task, reopened_handle);
+
+    if (!result_or_handle_index.success())
+    {
+        delete reopened_handle;
+        return result_or_handle_index.result();
+    }
+
+    *reopened = result_or_handle_index.take_value();
+
+    return SUCCESS;
+}
+
+Result task_fshandle_copy(Task *task, int source, int destination)
+{
+    auto source_handle = task_fshandle_acquire(task, source);
+
+    if (source_handle == nullptr)
+    {
+        return ERR_BAD_HANDLE;
+    }
+
+    auto copy_handle = new FsHandle(*source_handle);
+
+    auto result = task_fshandle_add_at(task, copy_handle, destination);
+
+    if (result != SUCCESS)
+    {
+        delete copy_handle;
+    }
+
+    return result;
 }
 
 Result task_fshandle_poll(
@@ -133,7 +198,7 @@ Result task_fshandle_poll(
 
         if (handles[i] == nullptr)
         {
-            result = ERR_BAD_FILE_DESCRIPTOR;
+            result = ERR_BAD_HANDLE;
 
             goto cleanup_and_return;
         }
@@ -194,7 +259,7 @@ ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, 
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result_or_read = handle->read(buffer, size);
@@ -210,7 +275,7 @@ ResultOr<size_t> task_fshandle_write(Task *task, int handle_index, const void *b
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result_or_written = handle->write(buffer, size);
@@ -226,7 +291,7 @@ Result task_fshandle_seek(Task *task, int handle_index, int offset, Whence whenc
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result = handle->seek(offset, whence);
@@ -242,7 +307,7 @@ ResultOr<int> task_fshandle_tell(Task *task, int handle_index, Whence whence)
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result_or_offset = handle->tell(whence);
@@ -258,7 +323,7 @@ Result task_fshandle_call(Task *task, int handle_index, IOCall request, void *ar
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result = handle->call(request, args);
@@ -274,7 +339,7 @@ Result task_fshandle_stat(Task *task, int handle_index, FileState *stat)
 
     if (handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result = handle->stat(stat);
@@ -311,7 +376,7 @@ ResultOr<int> task_fshandle_accept(Task *task, int socket_handle_index)
 
     if (socket_handle == nullptr)
     {
-        return ERR_BAD_FILE_DESCRIPTOR;
+        return ERR_BAD_HANDLE;
     }
 
     auto result_or_connection_handle = socket_handle->accept();

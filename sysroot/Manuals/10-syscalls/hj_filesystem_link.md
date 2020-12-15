@@ -14,10 +14,10 @@ Create an hard-link at `new_path` to an existing file pointed by `old_path`.
 
 ## Parameters
 
-- old_path: path to the file being linked to (const char*).
-- old_size: size of the old path (size_t).
-- new_path: path of the new link (const char*).
-- new_size: size if the new path (size_t).
+- `old_path`: path to the file being linked to (const char*).
+- `old_size`: size of the old path (size_t).
+- `new_path`: path of the new link (const char*).
+- `new_size`: size if the new path (size_t).
 
 ## Return
 

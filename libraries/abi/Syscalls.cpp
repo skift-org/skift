@@ -153,6 +153,16 @@ Result hj_handle_close(int handle)
     return __syscall(HJ_HANDLE_CLOSE, (uintptr_t)handle);
 }
 
+Result hj_handle_reopen(int handle, int *reopened)
+{
+    return __syscall(HJ_HANDLE_REOPEN, (uintptr_t)handle, (uintptr_t)reopened);
+}
+
+Result hj_handle_copy(int source, int destination)
+{
+    return __syscall(HJ_HANDLE_COPY, (uintptr_t)source, (uintptr_t)destination);
+}
+
 Result hj_handle_poll(HandleSet *handles_set, int *selected, PollEvent *selected_events, Timeout timeout)
 {
     return __syscall(HJ_HANDLE_POLL, (uintptr_t)handles_set, (uintptr_t)selected, (uintptr_t)selected_events, (uintptr_t)timeout);

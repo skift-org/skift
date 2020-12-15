@@ -37,6 +37,8 @@
     __ENTRY(HJ_SYSTEM_SHUTDOWN)   \
     __ENTRY(HJ_HANDLE_OPEN)       \
     __ENTRY(HJ_HANDLE_CLOSE)      \
+    __ENTRY(HJ_HANDLE_REOPEN)     \
+    __ENTRY(HJ_HANDLE_COPY)       \
     __ENTRY(HJ_HANDLE_POLL)       \
     __ENTRY(HJ_HANDLE_READ)       \
     __ENTRY(HJ_HANDLE_WRITE)      \
@@ -143,6 +145,8 @@ Result hj_create_term(int *server_handle, int *client_handle);
 
 Result hj_handle_open(int *handle, const char *raw_path, size_t size, OpenFlag flags);
 Result hj_handle_close(int handle);
+Result hj_handle_reopen(int handle, int *reopened);
+Result hj_handle_copy(int source, int destination);
 Result hj_handle_poll(HandleSet *handles_set, int *selected, PollEvent *selected_events, Timeout timeout);
 Result hj_handle_read(int handle, void *buffer, size_t size, size_t *read);
 Result hj_handle_write(int handle, const void *buffer, size_t size, size_t *written);

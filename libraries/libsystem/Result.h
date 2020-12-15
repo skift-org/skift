@@ -4,7 +4,7 @@
     __ENTRY_WITH_VALUE(SUCCESS, 0, "Success")                                     \
     __ENTRY(TIMEOUT, "Timed out")                                                 \
     __ENTRY(ERR_BAD_ADDRESS, "Bad address")                                       \
-    __ENTRY(ERR_BAD_FILE_DESCRIPTOR, "Bad file descriptor")                       \
+    __ENTRY(ERR_BAD_HANDLE, "Bad file descriptor")                                \
     __ENTRY(ERR_BAD_FONT_FILE_FORMAT, "Bad font file format")                     \
     __ENTRY(ERR_BAD_IMAGE_FILE_FORMAT, "Bad image file format")                   \
     __ENTRY(ERR_CANNOT_ALLOCATE_MEMORY, "Cannot allocate memory")                 \
@@ -29,7 +29,7 @@
     __ENTRY(ERR_READ_ONLY_STREAM, "Read only stream")                             \
     __ENTRY(ERR_SOCKET_OPERATION_ON_NON_SOCKET, "Socket operation on non socket") \
     __ENTRY(ERR_STREAM_CLOSED, "Stream closed")                                   \
-    __ENTRY(ERR_TOO_MANY_OPEN_FILES, "Too many files open")                       \
+    __ENTRY(ERR_TOO_MANY_HANDLE, "Too many files open")                           \
     __ENTRY(ERR_WRITE_ONLY_STREAM, "Write only stream")                           \
     __ENTRY(ERR_DIRECTORY_NOT_EMPTY, "Directory not empty")                       \
     __ENTRY(ERR_WRITE_STDOUT, "Failed to write to stdout")                        \

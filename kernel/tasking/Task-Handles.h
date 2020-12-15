@@ -8,6 +8,10 @@ Result task_fshandle_close(Task *task, int handle_index);
 
 void task_fshandle_close_all(Task *task);
 
+Result task_fshandle_reopen(Task *task, int handle, int *reopened);
+
+Result task_fshandle_copy(Task *task, int source, int destination);
+
 Result task_fshandle_poll(Task *task, HandleSet *handles_set, int *selected_index, PollEvent *selected_events, Timeout timeout);
 
 ResultOr<size_t> task_fshandle_read(Task *task, int handle_index, void *buffer, size_t size);

@@ -10,11 +10,11 @@ Result hj_create_term(int *server_handle, int *client_handle);
 
 ## Parameters
 
-- server_handle: Handle to the server end of the term (int*).
-- client_handle: Handle to the client end of the term (int*).
+- `server_handle`: Handle to the server end of the term (int*).
+- `client_handle`: Handle to the client end of the term (int*).
 
 ## Return
 
 - SUCCESS: If the term was created.
 - ERR_BAD_ADDRESS
-- ERR_TOO_MANY_OPEN_FILES
+- ERR_TOO_MANY_HANDLE: If there is too many handle in the current process.

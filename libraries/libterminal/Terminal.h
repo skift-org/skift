@@ -29,7 +29,7 @@ private:
     Cell *_buffer;
     UTF8Decoder _decoder;
 
-    State _state;
+    State _state = State::WAIT_ESC;
     Cursor _saved_cursor;
     Cursor _cursor;
 

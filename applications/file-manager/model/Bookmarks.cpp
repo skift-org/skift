@@ -73,7 +73,8 @@ void Bookmarks::save()
 
     auto data = pretty.finalize();
 
-    file_write_all("/Configs/file-manager/booksmark.json", reinterpret_cast<const void *>(data.cstring()), data.length());
+    File file{"/Configs/file-manager/booksmark.json"};
+    file.write_all(reinterpret_cast<const void *>(data.cstring()), data.length());
 }
 
 } // namespace file_manager

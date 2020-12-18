@@ -16,7 +16,8 @@ static ResultOr<Vector<Glyph>> font_load_glyph(String name)
 
     Glyph *glyph_buffer = nullptr;
     size_t glyph_size = 0;
-    Result result = file_read_all(glyph_path, (void **)&glyph_buffer, &glyph_size);
+    File glyph_file{glyph_path};
+    Result result = glyph_file.read_all((void **)&glyph_buffer, &glyph_size);
 
     if (result != SUCCESS)
     {

@@ -26,13 +26,16 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared(int width, int height)
     Result result = memory_alloc(width * height * sizeof(Color), reinterpret_cast<uintptr_t *>(&pixels));
 
     if (result != SUCCESS)
+    {
         return result;
+    }
 
     int handle = -1;
     memory_get_handle(reinterpret_cast<uintptr_t>(pixels), &handle);
 
     auto bitmap = make<Bitmap>(handle, BITMAP_SHARED, width, height, pixels);
     bitmap->clear(Colors::BLACK);
+
     return bitmap;
 }
 
@@ -63,14 +66,15 @@ RefPtr<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
 
 ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
 {
-    void *rawdata;
-    size_t rawdata_size;
-    Result result = file_read_all(path, &rawdata, &rawdata_size);
+    File file{path};
+    auto result_or_read = file.read_all();
 
-    if (result != SUCCESS)
+    if (!result_or_read.success())
     {
-        return result;
+        return result_or_read.result();
     }
+
+    auto raw_data = result_or_read.take_value();
 
     uint decoded_width = 0;
     uint decoded_height = 0;
@@ -80,8 +84,8 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
         (unsigned char **)&decoded_data,
         &decoded_width,
         &decoded_height,
-        (const unsigned char *)rawdata,
-        rawdata_size);
+        (const unsigned char *)raw_data.start(),
+        raw_data.size());
 
     if (decode_result != 0)
     {
@@ -135,13 +139,14 @@ Result Bitmap::save_to(const char *path)
         return ERR_BAD_IMAGE_FILE_FORMAT;
     }
 
-    return file_write_all(path, outbuffer, outbuffer_size);
+    File file{path};
+    return file.write_all(outbuffer, outbuffer_size);
 }
 
 Bitmap::~Bitmap()
 {
     if (_storage == BITMAP_SHARED)
+    {
         memory_free(reinterpret_cast<uintptr_t>(_pixels));
-    else if (_storage == BITMAP_MALLOC)
-        free(_pixels);
+    }
 }

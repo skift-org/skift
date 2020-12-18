@@ -12,7 +12,6 @@ enum BitmapStorage
 {
     BITMAP_SHARED,
     BITMAP_STATIC,
-    BITMAP_MALLOC,
 };
 
 enum BitmapFiltering

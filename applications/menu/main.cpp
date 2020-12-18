@@ -86,7 +86,8 @@ void load_menu(Vector<MenuEntry> &entries)
             char path[PATH_LENGTH];
             snprintf(path, PATH_LENGTH, "/Applications/%s/manifest.json", entry.name);
 
-            if (file_exist(path))
+            File manifest_file{path};
+            if (manifest_file.exist())
             {
                 entries.push_back(menu_entry_create(path));
             }

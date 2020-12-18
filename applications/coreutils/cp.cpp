@@ -25,7 +25,9 @@ int main(int argc, char **argv)
         return PROCESS_FAILURE;
     }
 
-    Result result = file_copy(argv[1], argv[2]);
+    File file{argv[1]};
+
+    Result result = file.copy(argv[2]);
 
     if (result != SUCCESS)
     {

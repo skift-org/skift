@@ -64,12 +64,15 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     __cleanup_malloc KeyMap *keymap = nullptr;
     size_t keymap_size = 0;
-    Result result = file_read_all(keymap_path, (void **)&keymap, &keymap_size);
 
-    if (result != SUCCESS)
+    File file{keymap_path};
+    auto result_or_keymapdata = file.read_all();
+
+    if (!result_or_keymapdata.success())
     {
-        stream_format(err_stream, "keyboardctl: Failed to open the keymap file: %s", result_to_string(result));
-        return -1;
+        stream_format(err_stream, "keyboardctl: Failed to open the keymap file: %s", result_to_string(result_or_keymapdata.result()));
+
+        return PROCESS_FAILURE;
     }
 
     if (keymap_size < sizeof(KeyMap) ||
@@ -79,7 +82,8 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
         keymap->magic[3] != 'p')
     {
         stream_format(err_stream, "keyboardctl: Invalid keymap file format!\n");
-        return -1;
+
+        return PROCESS_FAILURE;
     }
 
     IOCallKeyboardSetKeymapArgs args = {
@@ -90,7 +94,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     printf("Keymap set to %s(%s)\n", keymap->language, keymap->region);
 
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
 int loadkey_get_keymap(Stream *keyboard_device)
@@ -100,11 +104,11 @@ int loadkey_get_keymap(Stream *keyboard_device)
     if (stream_call(keyboard_device, IOCALL_KEYBOARD_GET_KEYMAP, &keymap) != SUCCESS)
     {
         handle_printf_error(keyboard_device, "keyboardctl: Failed to retrived the current keymap");
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     printf("Current keymap is %s(%s)\n", keymap.language, keymap.region);
-    return 0;
+    return PROCESS_SUCCESS;
 }
 
 int main(int argc, char **argv)
@@ -117,7 +121,7 @@ int main(int argc, char **argv)
     {
         handle_printf_error(keyboard_device, "keyboardctl: Failed to open the keyboard device");
 
-        return -1;
+        return PROCESS_FAILURE;
     }
 
     if (!option_list && argc == 1)
@@ -143,5 +147,5 @@ int main(int argc, char **argv)
         return loadkey_set_keymap(keyboard_device, font_path);
     }
 
-    return 0;
+    return PROCESS_SUCCESS;
 }

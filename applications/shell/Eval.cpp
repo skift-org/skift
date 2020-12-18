@@ -19,13 +19,15 @@ static bool find_command_path(char *buffer, const char *command)
     {
         snprintf(buffer, PATH_LENGTH, "%s", command);
 
-        return file_exist(buffer);
+        File file{buffer};
+        return file.exist();
     }
     else
     {
         snprintf(buffer, PATH_LENGTH, "/Applications/%s/%s", command, command);
 
-        if (file_exist(buffer))
+        File file{buffer};
+        if (file.exist())
         {
             return true;
         }
@@ -36,7 +38,8 @@ static bool find_command_path(char *buffer, const char *command)
         {
             snprintf(buffer, PATH_LENGTH, "%s/%s", path.get(i).as_string().cstring(), command);
 
-            if (file_exist(buffer))
+            File file{buffer};
+            if (file.exist())
             {
                 return true;
             }

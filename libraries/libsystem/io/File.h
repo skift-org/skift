@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libutils/Path.h>
 #include <libutils/ResultOr.h>
 #include <libutils/Slice.h>
 #include <libutils/String.h>
@@ -7,12 +8,30 @@
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
 
-Result file_read_all(const char *path, void **buffer, size_t *size);
+class File
+{
+private:
+    Path _path;
 
-ResultOr<Slice> file_read_all(String path);
+public:
+    const Path &path()
+    {
+        return _path;
+    }
 
-Result file_write_all(const char *path, const void *buffer, size_t size);
+    File(const char *path) : File(Path::parse(path)) {}
 
-bool file_exist(const char *path);
+    File(String path) : File(Path::parse(path)) {}
 
-Result file_copy(const char *src, const char *dst);
+    File(Path path) : _path(path) {}
+
+    Result read_all(void **buffer, size_t *size);
+
+    ResultOr<Slice> read_all();
+
+    Result write_all(const void *buffer, size_t size);
+
+    bool exist();
+
+    Result copy(const char *destination);
+};

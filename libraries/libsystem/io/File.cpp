@@ -1,9 +1,9 @@
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
 
-Result file_read_all(const char *path, void **buffer, size_t *size)
+Result File::read_all(void **buffer, size_t *size)
 {
-    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(_path.string().cstring(), OPEN_READ);
 
     if (handle_has_error(stream))
     {
@@ -32,24 +32,26 @@ Result file_read_all(const char *path, void **buffer, size_t *size)
     return SUCCESS;
 }
 
-ResultOr<Slice> file_read_all(String path)
+ResultOr<Slice> File::read_all()
 {
     void *buff = nullptr;
     size_t size = 0;
 
-    auto res = file_read_all(path.cstring(), &buff, &size);
+    auto res = read_all(&buff, &size);
 
-    if (res != SUCCESS)
+    if (res == SUCCESS)
+    {
+        return Slice{make<SliceStorage>(SliceStorage::ADOPT, buff, size)};
+    }
+    else
     {
         return res;
     }
-
-    return Slice{make<SliceStorage>(SliceStorage::ADOPT, buff, size)};
 }
 
-Result file_write_all(const char *path, const void *buffer, size_t size)
+Result File::write_all(const void *buffer, size_t size)
 {
-    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_WRITE | OPEN_CREATE);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(_path.string().cstring(), OPEN_WRITE | OPEN_CREATE);
 
     if (handle_has_error(stream))
     {
@@ -71,9 +73,9 @@ Result file_write_all(const char *path, const void *buffer, size_t size)
     return SUCCESS;
 }
 
-bool file_exist(const char *path)
+bool File::exist()
 {
-    __cleanup(stream_cleanup) Stream *stream = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *stream = stream_open(_path.string().cstring(), OPEN_READ);
 
     if (handle_has_error(stream))
     {
@@ -83,24 +85,19 @@ bool file_exist(const char *path)
     FileState state = {};
     stream_stat(stream, &state);
 
-    if (state.type != FILE_TYPE_REGULAR)
-    {
-        return false;
-    }
-
-    return true;
+    return state.type == FILE_TYPE_REGULAR;
 }
 
-Result file_copy(const char *src, const char *dst)
+Result File::copy(const char *destination)
 {
-    __cleanup(stream_cleanup) Stream *streamin = stream_open(src, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *streamin = stream_open(_path.string().cstring(), OPEN_READ);
 
     if (handle_has_error(streamin))
     {
         return handle_get_error(streamin);
     }
 
-    __cleanup(stream_cleanup) Stream *streamout = stream_open(dst, OPEN_WRITE | OPEN_CREATE);
+    __cleanup(stream_cleanup) Stream *streamout = stream_open(destination, OPEN_WRITE | OPEN_CREATE);
 
     if (handle_has_error(streamout))
     {
@@ -108,9 +105,8 @@ Result file_copy(const char *src, const char *dst)
     }
 
     size_t read;
-    char buffer[1024];
-
-    while ((read = stream_read(streamin, &buffer, 1024)) != 0)
+    char buffer[4096];
+    while ((read = stream_read(streamin, &buffer, 4096)) != 0)
     {
         if (handle_has_error(streamin))
         {

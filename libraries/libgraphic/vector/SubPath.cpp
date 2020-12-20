@@ -326,6 +326,8 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
         current = p;
         ptan = tan;
     }
+
+    line_to(point);
 }
 
 void SubPath::arc_to_relative(float rx, float ry, float angle, int flags, Vec2f point)

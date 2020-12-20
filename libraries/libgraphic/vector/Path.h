@@ -82,7 +82,14 @@ public:
 
     void begin_subpath_relative(Vec2f point)
     {
-        begin_subpath(current().last_point() + point);
+        if (_subpath.count() > 0)
+        {
+            begin_subpath(current().last_point() + point);
+        }
+        else
+        {
+            begin_subpath(point);
+        }
     }
 
     void reset_subpath()

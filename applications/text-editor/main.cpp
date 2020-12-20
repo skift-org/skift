@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
+#include <libwidget/widgets/Button.h>
+#include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/TextField.h>
-#include <libwidget/widgets/Toolbar.h>
 
 int main(int argc, char **argv)
 {
@@ -23,10 +24,16 @@ int main(int argc, char **argv)
 
     window->root()->layout(VFLOW(0));
 
-    auto toolbar = toolbar_create(window->root());
-    toolbar_icon_create(toolbar, Icon::get("folder-open"));
-    toolbar_icon_create(toolbar, Icon::get("content-save"));
-    toolbar_icon_create(toolbar, Icon::get("file-plus"));
+    auto toolbar = new Panel(window->root());
+
+    toolbar->layout(HFLOW(4));
+    toolbar->insets(Insetsi(4, 4));
+    toolbar->max_height(38);
+    toolbar->min_height(38);
+
+    new Button(toolbar, BUTTON_TEXT, Icon::get("folder-open"));
+    new Button(toolbar, BUTTON_TEXT, Icon::get("content-save"));
+    new Button(toolbar, BUTTON_TEXT, Icon::get("file-plus"));
 
     auto model = TextModel::empty();
 

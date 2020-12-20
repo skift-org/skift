@@ -2,7 +2,6 @@
 
 #include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/Separator.h>
-#include <libwidget/widgets/Toolbar.h>
 
 #include "file-manager/model/Navigation.h"
 #include "file-manager/widgets/Breadcrumb.h"
@@ -39,25 +38,25 @@ public:
         max_height(38);
         min_height(38);
 
-        _go_backward = toolbar_icon_create(this, Icon::get("arrow-left"));
+        _go_backward = new Button(this, BUTTON_TEXT, Icon::get("arrow-left"));
 
         _go_backward->on(Event::ACTION, [this](auto) {
             _navigation->go_backward();
         });
 
-        _go_foreward = toolbar_icon_create(this, Icon::get("arrow-right"));
+        _go_foreward = new Button(this, BUTTON_TEXT, Icon::get("arrow-right"));
 
         _go_foreward->on(Event::ACTION, [this](auto) {
             _navigation->go_forward();
         });
 
-        _go_up = toolbar_icon_create(this, Icon::get("arrow-up"));
+        _go_up = new Button(this, BUTTON_TEXT, Icon::get("arrow-up"));
 
         _go_up->on(Event::ACTION, [this](auto) {
             _navigation->go_up();
         });
 
-        _go_home = toolbar_icon_create(this, Icon::get("home"));
+        _go_home = new Button(this, BUTTON_TEXT, Icon::get("home"));
 
         _go_home->on(Event::ACTION, [this](auto) {
             _navigation->go_home();
@@ -70,13 +69,13 @@ public:
 
         new Separator(this);
 
-        _refresh = toolbar_icon_create(this, Icon::get("refresh"));
+        _refresh = new Button(this, BUTTON_TEXT, Icon::get("refresh"));
 
         _refresh->on(Event::ACTION, [this](auto) {
             _navigation->refresh();
         });
 
-        Widget *terminal_button = toolbar_icon_create(this, Icon::get("console"));
+        Widget *terminal_button = new Button(this, BUTTON_TEXT, Icon::get("console"));
 
         terminal_button->on(Event::ACTION, [](auto) {
             process_run("terminal", NULL);

@@ -169,7 +169,15 @@ void Widget::do_layout()
             else
             {
                 fixed_child_count++;
-                fixed_child_total_width += child->compute_size().x();
+
+                if (child->attributes() & LAYOUT_SQUARE)
+                {
+                    fixed_child_total_width += content_bound().height();
+                }
+                else
+                {
+                    fixed_child_total_width += child->compute_size().x();
+                }
             }
         }
 

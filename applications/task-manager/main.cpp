@@ -28,7 +28,13 @@ public:
         root()->layout(VFLOW(0));
 
         /// --- Toolbar --- ///
-        auto toolbar = toolbar_create(root());
+        auto toolbar = new Panel(root());
+
+        toolbar->layout(HFLOW(4));
+        toolbar->insets(Insetsi(4, 4));
+        toolbar->max_height(38);
+        toolbar->min_height(38);
+
         new Button(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
 
         auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");

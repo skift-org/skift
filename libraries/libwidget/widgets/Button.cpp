@@ -83,6 +83,8 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 {
     layout(STACK());
     insets(Insetsi(6));
+    min_width(32);
+    attributes(LAYOUT_GREEDY | LAYOUT_SQUARE);
 
     new IconPanel(this, icon);
 }

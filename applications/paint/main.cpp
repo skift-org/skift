@@ -79,39 +79,44 @@ public:
 
     void create_toolbar(Widget *parent)
     {
-        Widget *toolbar = toolbar_create(parent);
+        auto toolbar = new Panel(parent);
 
-        _open_document = toolbar_icon_create(toolbar, Icon::get("folder-open"));
-        _save_document = toolbar_icon_create(toolbar, Icon::get("content-save"));
-        _new_document = toolbar_icon_create(toolbar, Icon::get("image-plus"));
+        toolbar->layout(HFLOW(4));
+        toolbar->insets(Insetsi(4, 4));
+        toolbar->max_height(38);
+        toolbar->min_height(38);
+
+        _open_document = new Button(toolbar, BUTTON_TEXT, Icon::get("folder-open"));
+        _save_document = new Button(toolbar, BUTTON_TEXT, Icon::get("content-save"));
+        _new_document = new Button(toolbar, BUTTON_TEXT, Icon::get("image-plus"));
 
         new Separator(toolbar);
 
-        _pencil = toolbar_icon_create(toolbar, Icon::get("pencil"));
+        _pencil = new Button(toolbar, BUTTON_TEXT, Icon::get("pencil"));
         _pencil->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PencilTool>());
             update_toolbar();
         });
 
-        _brush = toolbar_icon_create(toolbar, Icon::get("brush"));
+        _brush = new Button(toolbar, BUTTON_TEXT, Icon::get("brush"));
         _brush->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<BrushTool>());
             update_toolbar();
         });
 
-        _eraser = toolbar_icon_create(toolbar, Icon::get("eraser"));
+        _eraser = new Button(toolbar, BUTTON_TEXT, Icon::get("eraser"));
         _eraser->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<EraserTool>());
             update_toolbar();
         });
 
-        _fill = toolbar_icon_create(toolbar, Icon::get("format-color-fill"));
+        _fill = new Button(toolbar, BUTTON_TEXT, Icon::get("format-color-fill"));
         _fill->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<FillTool>());
             update_toolbar();
         });
 
-        _picker = toolbar_icon_create(toolbar, Icon::get("eyedropper"));
+        _picker = new Button(toolbar, BUTTON_TEXT, Icon::get("eyedropper"));
         _picker->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PickerTool>());
             update_toolbar();
@@ -120,10 +125,10 @@ public:
         new Separator(toolbar);
 
         // TODO:
-        _insert_text = toolbar_icon_create(toolbar, Icon::get("format-text-variant"));
-        _insert_line = toolbar_icon_create(toolbar, Icon::get("vector-line"));
-        _insert_rectangle = toolbar_icon_create(toolbar, Icon::get("rectangle-outline"));
-        _insert_circle = toolbar_icon_create(toolbar, Icon::get("circle-outline"));
+        _insert_text = new Button(toolbar, BUTTON_TEXT, Icon::get("format-text-variant"));
+        _insert_line = new Button(toolbar, BUTTON_TEXT, Icon::get("vector-line"));
+        _insert_rectangle = new Button(toolbar, BUTTON_TEXT, Icon::get("rectangle-outline"));
+        _insert_circle = new Button(toolbar, BUTTON_TEXT, Icon::get("circle-outline"));
 
         new Separator(toolbar);
 
@@ -146,7 +151,13 @@ public:
 
     void create_color_palette(Widget *parent)
     {
-        Widget *palette = toolbar_create(parent);
+        auto palette = new Panel(parent);
+
+        palette->layout(HFLOW(4));
+        palette->insets(Insetsi(4, 4));
+        palette->max_height(38);
+        palette->min_height(38);
+
         palette->layout(HFLOW(4));
 
         for (size_t i = 0; i < __array_length(_color_palette); i++)

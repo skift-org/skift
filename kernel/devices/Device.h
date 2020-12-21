@@ -5,6 +5,7 @@
 #include <libutils/RefPtr.h>
 #include <libutils/String.h>
 #include <libutils/StringBuilder.h>
+#include <libutils/Vector.h>
 
 #include "kernel/devices/DeviceAddress.h"
 #include "kernel/devices/DeviceClass.h"
@@ -16,6 +17,8 @@ private:
     DeviceAddress _address;
     DeviceClass _klass;
     String _name;
+
+    Vector<RefPtr<Device>> _childs{};
 
 public:
     DeviceClass klass()
@@ -40,6 +43,23 @@ public:
     DeviceAddress address()
     {
         return _address;
+    }
+
+    void add(RefPtr<Device> child)
+    {
+        _childs.push_back(child);
+    }
+
+    Iteration iterate(IterationCallback<RefPtr<Device>> &callback)
+    {
+        return _childs.foreach ([&](auto device) {
+            if (callback(device) == Iteration::STOP)
+            {
+                return Iteration::STOP;
+            }
+
+            return device->iterate(callback);
+        });
     }
 
     Device(DeviceAddress address, DeviceClass klass);

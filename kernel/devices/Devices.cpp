@@ -65,7 +65,14 @@ void device_iterate(IterationCallback<RefPtr<Device>> callback)
 {
     if (_devices)
     {
-        _devices->foreach (callback);
+        _devices->foreach ([&](auto &device) {
+            if (callback(device) == Iteration::STOP)
+            {
+                return Iteration::STOP;
+            }
+
+            return device->iterate(callback);
+        });
     }
 }
 

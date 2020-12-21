@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     window->root()->layout(VFLOW(0));
 
     auto panel_container = new Container(window->root());
-    panel_container->attributes(LAYOUT_FILL);
+    panel_container->flags(Widget::FILL);
     panel_container->layout(HFLOW(8));
     panel_container->insets(Insetsi(4));
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
     auto widget_date_and_time = new Label(panel_container, "", Anchor::CENTER);
-    widget_date_and_time->attributes(LAYOUT_FILL);
+    widget_date_and_time->flags(Widget::FILL);
 
     auto graph_container = new Container(panel_container);
     graph_container->layout(VGRID(1));

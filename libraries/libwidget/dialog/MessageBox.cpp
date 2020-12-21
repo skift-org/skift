@@ -26,12 +26,12 @@ DialogButton dialog_message(
     });
 
     Widget *message_label = new Label(window->root(), message, Anchor::CENTER);
-    message_label->attributes(LAYOUT_FILL);
+    message_label->flags(Widget::FILL);
 
     Widget *buttons_container = new Container(window->root());
     buttons_container->layout(HFLOW(4));
     auto spacer = new Container(buttons_container);
-    spacer->attributes(LAYOUT_FILL);
+    spacer->flags(Widget::FILL);
 
     Widget *button_no = new Button(buttons_container, BUTTON_OUTLINE, "No");
     Widget *button_yes = new Button(buttons_container, BUTTON_FILLED, "Yes");

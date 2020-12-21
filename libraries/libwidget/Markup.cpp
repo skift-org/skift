@@ -222,7 +222,7 @@ void widget_apply_attribute_from_markup(Widget *widget, markup::Node &node)
 
     if (node.has_attribute("fill"))
     {
-        widget->attributes(LAYOUT_FILL);
+        widget->flags(Widget::FILL);
     }
 }
 

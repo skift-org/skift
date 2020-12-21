@@ -28,13 +28,13 @@ int main(int argc, char **argv)
     window->root()->layout(VFLOW(0));
 
     Widget *navbar = new Container(window->root());
+
     navbar->insets(Insetsi(4, 4));
     navbar->layout(HGRID(4));
-    navbar->bound(navbar->bound().with_height(32));
-    navbar->bound(navbar->bound().with_width(128));
+    navbar->bound(navbar->bound().resized({128, 32}));
 
     DemoWidget *demo_widget = new DemoWidget(window->root());
-    demo_widget->attributes(LAYOUT_FILL);
+    demo_widget->flags(Widget::FILL);
     demo_widget->demo(&_demos[0]);
 
     for (size_t i = 0; _demos[i].name; i++)

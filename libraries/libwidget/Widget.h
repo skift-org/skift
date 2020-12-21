@@ -20,12 +20,6 @@ enum LayoutType
     LAYOUT_HFLOW,
 };
 
-#define LAYOUT_FILL (1 << 0)
-#define LAYOUT_GREEDY (1 << 1)
-#define LAYOUT_SQUARE (1 << 2)
-
-typedef unsigned LayoutAttributes;
-
 struct Layout
 {
     LayoutType type;
@@ -62,27 +56,32 @@ struct WidgetColor
 class Widget
 {
 private:
-    bool _enabled;
-    Recti _bound;
+    bool _enabled = true;
+    Recti _bound{};
+    int _flags = 0;
 
     int _max_height = 0;
     int _max_width = 0;
     int _min_height = 0;
     int _min_width = 0;
+
     Insetsi _insets = {};
     WidgetColor _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
     RefPtr<Font> _font;
-    LayoutAttributes _layout_attributes = {};
 
     EventHandler _handlers[EventType::__COUNT] = {};
 
     struct Widget *_parent = {};
     struct Window *_window = {};
 
-    List *_childs = {};
+    Vector<Widget *> _childs = {};
 
 public:
+    static constexpr auto FILL = (1 << 0);
+    static constexpr auto GREEDY = (1 << 1);
+    static constexpr auto SQUARE = (1 << 2);
+
     void id(String id);
 
     RefPtr<Font> font()
@@ -101,14 +100,17 @@ public:
     }
 
     Color color(ThemeColorRole role);
+
     void color(ThemeColorRole role, Color color);
 
     Recti content_bound() const { return bound().shrinked(_insets); }
 
     Recti bound() const { return _bound; }
+
     void bound(Recti value) { _bound = value; }
 
     Insetsi insets() const { return _insets; }
+
     void insets(Insetsi insets)
     {
         _insets = insets;
@@ -117,8 +119,9 @@ public:
 
     void layout(Layout layout) { _layout = layout; }
 
-    void attributes(LayoutAttributes attributes) { _layout_attributes = attributes; }
-    LayoutAttributes attributes() { return _layout_attributes; }
+    void flags(int attributes) { _flags = attributes; }
+
+    int flags() { return _flags; }
 
     void window(Window *window)
     {
@@ -193,8 +196,6 @@ public:
     void should_repaint(Recti rectangle);
 
     /* --- Layout ----------------------------------------------------------- */
-
-    void do_vhgrid_layout(Layout layout, Dimension dim);
 
     void relayout();
 

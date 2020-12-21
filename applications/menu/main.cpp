@@ -102,7 +102,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
     Widget *list = new Container(parent);
 
     list->layout(VFLOW(4));
-    list->attributes(LAYOUT_FILL);
+    list->flags(Widget::FILL);
     list->insets(Insetsi(4));
 
     entries.foreach ([&](MenuEntry &entry) {
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
     auto containter = new Container(window->root());
     containter->layout(VFLOW(0));
-    containter->attributes(LAYOUT_FILL);
+    containter->flags(Widget::FILL);
 
     menu_create_list(containter, entries);
 
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
     new IconPanel(bottom_container, Icon::get("account"));
 
     auto user_name_label = new Label(bottom_container, "User");
-    user_name_label->attributes(LAYOUT_FILL);
+    user_name_label->flags(Widget::FILL);
 
     auto folder_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
 

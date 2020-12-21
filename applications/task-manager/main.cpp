@@ -49,7 +49,7 @@ public:
         _table_model = make<TaskModel>();
 
         _table = new Table(root(), _table_model);
-        _table->attributes(LAYOUT_FILL);
+        _table->flags(Widget::FILL);
 
         _table_timer = own<Timer>(1000, [&]() {
             _table_model->update();

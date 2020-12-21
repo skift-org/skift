@@ -54,7 +54,6 @@ void Widget::color(ThemeColorRole role, Color color)
 Widget::Widget(Widget *parent)
 {
     _enabled = true;
-    _childs = list_create();
     _bound = Recti(32, 32);
 
     if (parent)
@@ -67,8 +66,6 @@ Widget::Widget(Widget *parent)
 Widget::~Widget()
 {
     clear_children();
-
-    list_destroy(_childs);
 
     if (_parent)
     {
@@ -83,32 +80,29 @@ Widget::~Widget()
     }
 }
 
-void Widget::paint(Painter &painter, Recti rectangle)
-{
-    __unused(painter);
-    __unused(rectangle);
-}
+void Widget::paint(Painter &, Recti) {}
 
-void Widget::event(Event *event)
-{
-    __unused(event);
-}
+void Widget::event(Event *) {}
 
 void Widget::do_layout()
 {
     switch (_layout.type)
     {
+
     case LAYOUT_STACK:
-        list_foreach(Widget, child, _childs)
-        {
+    {
+        _childs.foreach ([&](auto child) {
             child->bound(content_bound());
-        }
-        break;
+            return Iteration::CONTINUE;
+        });
+    }
+    break;
+
     case LAYOUT_GRID:
     {
         int index = 0;
-        list_foreach(Widget, child, _childs)
-        {
+
+        _childs.foreach ([&](auto child) {
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
@@ -117,39 +111,36 @@ void Widget::do_layout()
 
             child->bound(column);
             index++;
-        }
+            return Iteration::CONTINUE;
+        });
     }
     break;
 
     case LAYOUT_HGRID:
     {
         int index = 0;
-        list_foreach(Widget, child, _childs)
-        {
-            child->bound(
-                content_bound().column(
-                    _childs->count(),
-                    index,
-                    _layout.spacing.x()));
 
+        _childs.foreach ([&](auto child) {
+            auto bound = content_bound().column(_childs.count(), index, _layout.spacing.x());
+            child->bound(bound);
             index++;
-        }
+
+            return Iteration::CONTINUE;
+        });
     }
     break;
 
     case LAYOUT_VGRID:
     {
         int index = 0;
-        list_foreach(Widget, child, _childs)
-        {
-            child->bound(
-                content_bound().row(
-                    _childs->count(),
-                    index,
-                    _layout.spacing.y()));
 
+        _childs.foreach ([&](auto child) {
+            auto bound = content_bound().row(_childs.count(), index, _layout.spacing.y());
+            child->bound(bound);
             index++;
-        }
+
+            return Iteration::CONTINUE;
+        });
     }
     break;
 
@@ -160,9 +151,8 @@ void Widget::do_layout()
 
         int fill_child_count = 0;
 
-        list_foreach(Widget, child, _childs)
-        {
-            if (child->attributes() & LAYOUT_FILL)
+        _childs.foreach ([&](auto child) {
+            if (child->flags() & Widget::FILL)
             {
                 fill_child_count++;
             }
@@ -170,7 +160,7 @@ void Widget::do_layout()
             {
                 fixed_child_count++;
 
-                if (child->attributes() & LAYOUT_SQUARE)
+                if (child->flags() & Widget::SQUARE)
                 {
                     fixed_child_total_width += content_bound().height();
                 }
@@ -179,11 +169,13 @@ void Widget::do_layout()
                     fixed_child_total_width += child->compute_size().x();
                 }
             }
-        }
+
+            return Iteration::CONTINUE;
+        });
 
         int usable_space =
             content_bound().width() -
-            _layout.spacing.x() * (_childs->count() - 1);
+            _layout.spacing.x() * (_childs.count() - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
@@ -191,9 +183,8 @@ void Widget::do_layout()
 
         int current = content_bound().x();
 
-        list_foreach(Widget, child, _childs)
-        {
-            if (child->attributes() & LAYOUT_FILL)
+        _childs.foreach ([&](auto child) {
+            if (child->flags() & Widget::FILL)
             {
                 child->bound(Recti(
                     current,
@@ -205,7 +196,7 @@ void Widget::do_layout()
             }
             else
             {
-                if (child->attributes() & LAYOUT_SQUARE)
+                if (child->flags() & Widget::SQUARE)
                 {
                     child->bound(Recti(
                         current,
@@ -226,7 +217,9 @@ void Widget::do_layout()
                     current += child->compute_size().x() + _layout.spacing.x();
                 }
             }
-        }
+
+            return Iteration::CONTINUE;
+        });
     }
     break;
 
@@ -237,9 +230,8 @@ void Widget::do_layout()
 
         int fill_child_count = 0;
 
-        list_foreach(Widget, child, _childs)
-        {
-            if (child->attributes() & LAYOUT_FILL)
+        _childs.foreach ([&](auto child) {
+            if (child->flags() & Widget::FILL)
             {
                 fill_child_count++;
             }
@@ -248,11 +240,13 @@ void Widget::do_layout()
                 fixed_child_count++;
                 fixed_child_total_height += child->compute_size().y();
             }
-        }
+
+            return Iteration::CONTINUE;
+        });
 
         int usable_space =
             content_bound().height() -
-            _layout.spacing.y() * (_childs->count() - 1);
+            _layout.spacing.y() * (_childs.count() - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 
@@ -260,9 +254,8 @@ void Widget::do_layout()
 
         int current = content_bound().y();
 
-        list_foreach(Widget, child, _childs)
-        {
-            if (child->attributes() & LAYOUT_FILL)
+        _childs.foreach ([&](auto child) {
+            if (child->flags() & Widget::FILL)
             {
                 child->bound(Recti(
                     content_bound().x(),
@@ -274,7 +267,7 @@ void Widget::do_layout()
             }
             else
             {
-                if (child->attributes() & LAYOUT_SQUARE)
+                if (child->flags() & Widget::SQUARE)
                 {
                     child->bound(Recti(
                         content_bound().x(),
@@ -295,7 +288,9 @@ void Widget::do_layout()
                     current += child->compute_size().y() + _layout.spacing.y();
                 }
             }
-        }
+
+            return Iteration::CONTINUE;
+        });
     }
     break;
 
@@ -308,13 +303,15 @@ void Widget::relayout()
 {
     do_layout();
 
-    if (_childs->count() == 0)
-        return;
-
-    list_foreach(Widget, child, _childs)
+    if (_childs.empty())
     {
-        child->relayout();
+        return;
     }
+
+    _childs.foreach ([&](auto child) {
+        child->relayout();
+        return Iteration::CONTINUE;
+    });
 }
 
 void Widget::should_relayout()
@@ -327,7 +324,7 @@ void Widget::should_relayout()
 
 Vec2i Widget::size()
 {
-    if (_childs->count() == 0)
+    if (_childs.count() == 0)
     {
         return Vec2i(0);
     }
@@ -337,18 +334,18 @@ Vec2i Widget::size()
 
     if (_layout.type == LAYOUT_STACK)
     {
-        list_foreach(Widget, child, _childs)
-        {
+        _childs.foreach ([&](auto child) {
             Vec2i child_size = child->compute_size();
 
             width = MAX(width, child_size.x());
             height = MAX(height, child_size.y());
-        }
+
+            return Iteration::CONTINUE;
+        });
     }
     else
     {
-        list_foreach(Widget, child, _childs)
-        {
+        _childs.foreach ([&](auto child) {
             Vec2i child_size = child->compute_size();
 
             switch (_layout.type)
@@ -370,16 +367,18 @@ Vec2i Widget::size()
                 height = MAX(height, child_size.y());
                 break;
             }
-        }
+
+            return Iteration::CONTINUE;
+        });
 
         if (_layout.type == LAYOUT_HFLOW || _layout.type == LAYOUT_HGRID)
         {
-            width += _layout.spacing.x() * (_childs->count() - 1);
+            width += _layout.spacing.x() * (_childs.count() - 1);
         }
 
         if (_layout.type == LAYOUT_VFLOW || _layout.type == LAYOUT_VGRID)
         {
-            height += _layout.spacing.y() * (_childs->count() - 1);
+            height += _layout.spacing.y() * (_childs.count() - 1);
         }
     }
 
@@ -413,37 +412,52 @@ void Widget::disable()
 void Widget::disable_if(bool condition)
 {
     if (condition)
+    {
         disable();
+    }
     else
+    {
         enable();
+    }
 }
 
 void Widget::enable_if(bool condition)
 {
     if (condition)
+    {
         enable();
+    }
     else
+    {
         disable();
+    }
 }
 
 /* --- Childs --------------------------------------------------------------- */
 
 Widget *Widget::child_at(Vec2i position)
 {
-    if (_layout_attributes & LAYOUT_GREEDY)
+    if (_flags & Widget::GREEDY)
     {
         return this;
     }
 
-    list_foreach(Widget, child, _childs)
-    {
+    Widget *result = this;
+
+    _childs.foreach ([&](auto child) {
         if (child->bound().contains(position))
         {
-            return child->child_at(position);
-        }
-    }
+            result = child->child_at(position);
 
-    return this;
+            return Iteration::STOP;
+        }
+        else
+        {
+            return Iteration::CONTINUE;
+        }
+    });
+
+    return result;
 }
 
 void Widget::add_child(Widget *child)
@@ -453,7 +467,7 @@ void Widget::add_child(Widget *child)
 
     child->_parent = this;
     child->_window = _window;
-    list_pushback(_childs, child);
+    _childs.push_back(child);
 
     should_relayout();
     should_repaint();
@@ -462,17 +476,15 @@ void Widget::add_child(Widget *child)
 void Widget::remove_child(Widget *child)
 {
     assert(child->_parent == this);
-    list_remove(_childs, child);
+    _childs.remove_value(child);
     should_relayout();
 }
 
 void Widget::clear_children()
 {
-    Widget *child = (Widget *)list_peek(_childs);
-    while (child)
+    while (_childs.any())
     {
-        delete child;
-        child = (Widget *)list_peek(_childs);
+        delete _childs.peek();
     }
 }
 
@@ -494,7 +506,9 @@ void Widget::focus()
 void Widget::repaint(Painter &painter, Recti rectangle)
 {
     if (bound().width() == 0 || bound().height() == 0)
+    {
         return;
+    }
 
     painter.push();
     painter.clip(bound());
@@ -508,13 +522,14 @@ void Widget::repaint(Painter &painter, Recti rectangle)
     paint(painter, rectangle);
     painter.pop();
 
-    list_foreach(Widget, child, _childs)
-    {
+    _childs.foreach ([&](auto child) {
         if (rectangle.colide_with(child->bound()))
         {
             child->repaint(painter, rectangle);
         }
-    }
+
+        return Iteration::CONTINUE;
+    });
 
     if (Application::show_wireframe())
     {

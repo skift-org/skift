@@ -28,7 +28,7 @@ public:
     {
         layout(VFLOW(0));
         insets(Insetsi(8));
-        attributes(LAYOUT_FILL);
+        flags(Widget::FILL);
 
         auto icon_and_text = new Container(this);
         icon_and_text->layout(HFLOW(4));
@@ -36,7 +36,7 @@ public:
         new Label(icon_and_text, "Processor");
 
         auto cpu_filler = new Container(this);
-        cpu_filler->attributes(LAYOUT_FILL);
+        cpu_filler->flags(Widget::FILL);
 
         _label_average = new Label(this, "Average: nil%", Anchor::RIGHT);
         _label_greedy = new Label(this, "Most greedy: nil", Anchor::RIGHT);

@@ -21,19 +21,19 @@ int main(int argc, char **argv)
         panel_hflow->layout(HFLOW(8));
 
         auto p0 = new Panel(panel_hflow);
-        p0->attributes(LAYOUT_FILL);
+        p0->flags(Widget::FILL);
 
         auto p1 = new Panel(panel_hflow);
-        p1->attributes(LAYOUT_FILL);
+        p1->flags(Widget::FILL);
 
         auto button = new Button(panel_hflow, BUTTON_TEXT, "Hello, world!");
-        button->attributes(LAYOUT_FILL);
+        button->flags(Widget::FILL);
 
         auto p2 = new Panel(panel_hflow);
-        p2->attributes(LAYOUT_FILL);
+        p2->flags(Widget::FILL);
 
         auto p3 = new Panel(panel_hflow);
-        p3->attributes(LAYOUT_FILL);
+        p3->flags(Widget::FILL);
     }
 
     new Label(window->root(), "Buttons", Anchor::CENTER);
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     Widget *panel_grid = new Container(window->root());
     {
         panel_grid->layout(GRID(3, 3, 4, 4));
-        panel_grid->attributes(LAYOUT_FILL);
+        panel_grid->flags(Widget::FILL);
 
         new Panel(panel_grid);
         new Slider(panel_grid);

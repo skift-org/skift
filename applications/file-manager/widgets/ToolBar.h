@@ -65,7 +65,7 @@ public:
         new Separator(this);
 
         _breadcrumb = new Breadcrumb(this, _navigation, _bookmarks);
-        _breadcrumb->attributes(LAYOUT_FILL);
+        _breadcrumb->flags(Widget::FILL);
 
         new Separator(this);
 

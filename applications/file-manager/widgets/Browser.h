@@ -23,7 +23,7 @@ public:
         _listing = make<Listing>(navigation);
         model(_listing);
 
-        attributes(LAYOUT_FILL);
+        flags(Widget::FILL);
 
         empty_message("This directory is empty.");
 

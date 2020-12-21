@@ -29,7 +29,7 @@ public:
 
         auto bookmarks_and_browser = new Container(root());
 
-        bookmarks_and_browser->attributes(LAYOUT_FILL);
+        bookmarks_and_browser->flags(Widget::FILL);
         bookmarks_and_browser->layout(HFLOW(1));
 
         auto jump_list = new JumpList(bookmarks_and_browser, navigation, bookmarks);

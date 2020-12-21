@@ -75,7 +75,7 @@ Button::Button(Widget *parent, ButtonStyle style)
     layout(HFLOW(0));
     insets(Insetsi(0, 16));
     min_height(32);
-    attributes(LAYOUT_GREEDY);
+    flags(Widget::GREEDY);
 }
 
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
@@ -84,7 +84,7 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
     layout(STACK());
     insets(Insetsi(6));
     min_width(32);
-    attributes(LAYOUT_GREEDY | LAYOUT_SQUARE);
+    flags(Widget::GREEDY | Widget::SQUARE);
 
     new IconPanel(this, icon);
 }

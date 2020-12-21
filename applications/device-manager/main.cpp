@@ -25,7 +25,7 @@ public:
         model->update();
 
         _table = new Table(root(), model);
-        _table->attributes(LAYOUT_FILL);
+        _table->flags(Widget::FILL);
     }
 };
 

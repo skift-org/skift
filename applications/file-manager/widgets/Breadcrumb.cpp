@@ -54,7 +54,7 @@ void Breadcrumb::render()
         });
     }
 
-    (new Container(this))->attributes(LAYOUT_FILL);
+    (new Container(this))->flags(Widget::FILL);
 
     if (_bookmarks->has(_navigation->current()))
     {

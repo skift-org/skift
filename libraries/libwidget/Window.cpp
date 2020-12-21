@@ -27,7 +27,7 @@ void window_populate_header(Window *window)
         window->_title);
 
     auto spacer = new Container(window->header());
-    spacer->attributes(LAYOUT_FILL);
+    spacer->flags(Widget::FILL);
 
     if (window->_flags & WINDOW_RESIZABLE)
     {

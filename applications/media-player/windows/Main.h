@@ -24,7 +24,7 @@ public:
         auto cover = new Cover(root(), Bitmap::load_from_or_placeholder("/Applications/media-player/cover.png"));
 
         cover->layout(VFLOW(0));
-        cover->attributes(LAYOUT_FILL);
+        cover->flags(Widget::FILL);
 
         auto control_bar = new Panel(root());
 

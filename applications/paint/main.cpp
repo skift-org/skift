@@ -68,7 +68,7 @@ public:
         create_toolbar(root());
 
         _canvas = new PaintCanvas(root(), document);
-        _canvas->attributes(LAYOUT_FILL);
+        _canvas->flags(Widget::FILL);
 
         create_color_palette(root());
 
@@ -134,7 +134,7 @@ public:
 
         Widget *primary_color_container = new Container(toolbar);
         primary_color_container->insets(Insetsi(4));
-        primary_color_container->attributes(LAYOUT_SQUARE);
+        primary_color_container->flags(Widget::SQUARE);
 
         _primary_color = new Panel(primary_color_container);
         _primary_color->border_radius(4);
@@ -142,7 +142,7 @@ public:
 
         Widget *secondary_color_container = new Container(toolbar);
         secondary_color_container->insets(Insetsi(4));
-        secondary_color_container->attributes(LAYOUT_SQUARE);
+        secondary_color_container->flags(Widget::SQUARE);
 
         _secondary_color = new Panel(secondary_color_container);
         _secondary_color->border_radius(4);

@@ -296,9 +296,9 @@ void SubPath::arc_to(float rx, float ry, float angle, int flags, Vec2f point)
 
     // Split arc into max 90 degree segments.
     // The loop assumes an iteration per end point (including start and end), this +1.
-    int ndivs = (int)(abs(da) / (PI * 0.5f) + 1.0f);
+    int ndivs = (int)(fabsf(da) / (PI * 0.5f) + 1.0f);
     float hda = (da / (float)ndivs) / 2.0f;
-    float kappa = abs(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));
+    float kappa = fabsf(4.0f / 3.0f * (1.0f - cosf(hda)) / sinf(hda));
 
     if (da < 0.0f)
     {

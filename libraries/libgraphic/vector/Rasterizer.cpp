@@ -17,8 +17,8 @@ void Rasterizer::tessellate_cubic_bezier(BezierCurve &curve, int depth)
     auto d = curve.end;
 
     auto delta1 = d - a;
-    float delta2 = abs((b.x() - d.x()) * delta1.y() - (b.y() - d.y()) * delta1.x());
-    float delta3 = abs((c.x() - d.x()) * delta1.y() - (c.y() - d.y()) * delta1.x());
+    float delta2 = fabsf((b.x() - d.x()) * delta1.y() - (b.y() - d.y()) * delta1.x());
+    float delta3 = fabsf((c.x() - d.x()) * delta1.y() - (c.y() - d.y()) * delta1.x());
 
     if ((delta2 + delta3) * (delta2 + delta3) <
         TOLERANCE * (delta1.x() * delta1.x() + delta1.y() * delta1.y()))

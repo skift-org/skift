@@ -27,7 +27,7 @@ void Graph::paint(Painter &painter, Recti rectangle)
             from -= size;
         }
 
-        return abs(to - from) / (float)size;
+        return fabsf(to - from) / (float)size;
     };
 
     auto graph_sample = [&](float where) {

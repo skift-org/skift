@@ -2,6 +2,7 @@
 
 #include <__libc__.h>
 
+#include <libsystem/bits/abs.h>
 #include <libsystem/bits/float.h>
 #include <libsystem/bits/pi.h>
 
@@ -10,14 +11,11 @@ __BEGIN_HEADER
 #define HUGE_VAL (__builtin_huge_val())
 
 double floor(double x);
-int abs(int j);
 double pow(double x, double y);
 double exp(double x);
 double fmod(double x, double y);
 double sqrt(double x);
 float sqrtf(float x);
-double fabs(double x);
-float fabsf(float x);
 double sin(double x);
 double cos(double x);
 double frexp(double x, int *exp);

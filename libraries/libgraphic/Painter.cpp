@@ -437,7 +437,7 @@ __flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
     double x1 = b.x();
     double y1 = b.y();
 
-    const bool steep = abs(y1 - a.y()) > abs(x1 - x0);
+    const bool steep = fabs(y1 - a.y()) > fabs(x1 - x0);
     if (steep)
     {
         swap(x0, y0);
@@ -574,7 +574,7 @@ void Painter::draw_path(const graphic::Path &path, Vec2f pos, Trans2f transform,
 
 static double sample_draw_circle(Vec2i center, double radius, double thickness, Vec2i position)
 {
-    double distance = abs(center.distance_to(position) - (radius - thickness / 2));
+    double distance = fabs(center.distance_to(position) - (radius - thickness / 2));
 
     return clamp((0.5 - distance) + (thickness / 2), 0, 1);
 }

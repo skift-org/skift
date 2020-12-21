@@ -32,7 +32,7 @@ static void splash_screen()
     stream_format(log_stream, "                        |_| |_|\\___/|_____|_| \\_\\|_|                            \n");
     stream_format(log_stream, "                                                                                \n");
     stream_format(log_stream, "\u001b[34;1m--------------------------------------------------------------------------------\e[0m\n");
-    stream_format(log_stream, "                              Copyright (c) 2018-2020 The skiftOS contributors \n");
+    stream_format(log_stream, "                              Copyright (c) 2018-2021 The skiftOS contributors \n");
     stream_format(log_stream, "\n");
 }
 

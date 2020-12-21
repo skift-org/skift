@@ -1,4 +1,3 @@
-
 #include <libsystem/core/Plugs.h>
 
 #include <libsystem/Assert.h>
@@ -277,42 +276,18 @@ void __plug_process_exit(int)
     ASSERT_NOT_REACHED();
 }
 
-Result __plug_process_cancel(int)
-{
-    ASSERT_NOT_REACHED();
-}
+Result __plug_process_cancel(int) { ASSERT_NOT_REACHED(); }
 
-Result __plug_process_get_directory(char *, size_t)
-{
-    ASSERT_NOT_REACHED();
-}
+Result __plug_process_get_directory(char *, size_t) { ASSERT_NOT_REACHED(); }
 
-Result __plug_process_set_directory(const char *)
-{
-    ASSERT_NOT_REACHED();
-}
+Result __plug_process_set_directory(const char *) { ASSERT_NOT_REACHED(); }
 
-String __plug_process_resolve(String raw_path)
-{
-    return raw_path;
-}
+String __plug_process_resolve(String raw_path) { return raw_path; }
 
-void __plug_handle_connect(Handle *, const char *)
-{
-    ASSERT_NOT_REACHED();
-}
+void __plug_handle_connect(Handle *, const char *) { ASSERT_NOT_REACHED(); }
 
-void __plug_handle_accept(Handle *, Handle *)
-{
-    ASSERT_NOT_REACHED();
-}
+void __plug_handle_accept(Handle *, Handle *) { ASSERT_NOT_REACHED(); }
 
-Result __plug_create_pipe(int *, int *)
-{
-    ASSERT_NOT_REACHED();
-}
+Result __plug_create_pipe(int *, int *) { ASSERT_NOT_REACHED(); }
 
-Result __plug_create_term(int *, int *)
-{
-    ASSERT_NOT_REACHED();
-}
+Result __plug_create_term(int *, int *) { ASSERT_NOT_REACHED(); }

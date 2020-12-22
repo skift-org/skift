@@ -6,6 +6,7 @@
 
 #include "architectures/VirtualMemory.h"
 #include "architectures/x86_64/kernel/Paging.h"
+#include "architectures/x86_64/kernel/x86_64.h"
 
 PageMappingLevel4 kpml4 __aligned(ARCH_PAGE_SIZE) = {};
 PageMappingLevel3 kpml3 __aligned(ARCH_PAGE_SIZE) = {};
@@ -44,7 +45,6 @@ void arch_virtual_initialize()
 
 void arch_virtual_memory_enable()
 {
-    logger_debug("Enabling paging");
     arch_address_space_switch(arch_kernel_address_space());
 }
 
@@ -145,7 +145,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml4_entry->present = 1;
             pml4_entry->writable = 1;
-            pml4_entry->user = 1;
+            pml4_entry->user = 0;
             pml4_entry->physical_address = (uint64_t)(pml3) / ARCH_PAGE_SIZE;
         }
 
@@ -163,7 +163,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml3_entry->present = 1;
             pml3_entry->writable = 1;
-            pml3_entry->user = 1;
+            pml3_entry->user = 0;
             pml3_entry->physical_address = (uint64_t)(pml2) / ARCH_PAGE_SIZE;
         }
 
@@ -181,7 +181,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml2_entry->present = 1;
             pml2_entry->writable = 1;
-            pml2_entry->user = 1;
+            pml2_entry->user = 0;
             pml2_entry->physical_address = (uint64_t)(pml1) / ARCH_PAGE_SIZE;
         }
 
@@ -190,7 +190,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
         pml1_entry->present = 1;
         pml1_entry->writable = 1;
         pml1_entry->user = flags & MEMORY_USER;
-        pml1_entry->physical_address = (physical_range.base() + address) / ARCH_PAGE_SIZE;
+        pml1_entry->physical_address = (physical_range.base() + i * ARCH_PAGE_SIZE) / ARCH_PAGE_SIZE;
     }
 
     paging_invalidate_tlb();
@@ -294,8 +294,6 @@ void arch_address_space_destroy(void *address_space)
 
 void arch_address_space_switch(void *address_space)
 {
-    ASSERT_NOT_REACHED();
-    logger_info("Switching address space to %016x.", address_space);
     paging_load_directory((uintptr_t)address_space);
 }
 

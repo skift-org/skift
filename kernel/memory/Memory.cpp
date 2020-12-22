@@ -61,8 +61,8 @@ void memory_initialize(Handover *handover)
     physical_set_used(page_zero);
 
     arch_address_space_switch(arch_kernel_address_space());
-
     graphic_did_find_framebuffer(0, 0, 0);
+
     arch_virtual_memory_enable();
 
     logger_info("%uKio of memory detected", TOTAL_MEMORY / 1024);

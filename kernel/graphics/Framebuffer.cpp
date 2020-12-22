@@ -78,6 +78,14 @@ void framebuffer_initialize(Handover *handover)
     _framebuffer_height = handover->framebuffer_height;
     _framebuffer_pitch = handover->framebuffer_pitch;
 
+    logger_info("Framebuffer %dx%d", handover->framebuffer_width, handover->framebuffer_height);
+
+    if (_framebuffer_width == 0 || _framebuffer_height == 0)
+    {
+        logger_warn("No framebuffer!");
+        return;
+    }
+
     _framebuffer_physical = handover->framebuffer_addr;
     _framebuffer_virtual = arch_virtual_alloc(
                                arch_kernel_address_space(),

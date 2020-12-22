@@ -39,9 +39,9 @@ static void splash_screen()
 void system_main(Handover *handover)
 {
     splash_screen();
-
     system_initialize();
     memory_initialize(handover);
+
     scheduler_initialize();
     tasking_initialize();
     interrupts_initialize();

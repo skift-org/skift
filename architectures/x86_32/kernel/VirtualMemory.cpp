@@ -195,6 +195,8 @@ void arch_virtual_free(void *address_space, MemoryRange virtual_range)
             page_table_entry->as_uint = 0;
         }
     }
+
+    paging_invalidate_tlb();
 }
 
 void *arch_address_space_create()

@@ -163,14 +163,14 @@ void arch_dump_stack_frame(void *sfptr)
     printf("\n");
 
     printf("\tRIP=%016x  CS=%016x FLG=%016x\n"
-           "\tRSP=%016x  SS=%016x\n",
+           "\tRSP=%016x  SS=%016x",
            stackframe->rip,
            stackframe->cs,
            stackframe->rflags,
            stackframe->rsp,
            stackframe->ss);
 
-    printf("\tCR0=%016x CR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
+    printf(" CR0=%016x\n\tCR2=%016x CR3=%016x CR4=%016x\n", CR0(), CR2(), CR3(), CR4());
 
     printf("\n\tBacktrace:\n");
     backtrace_internal(stackframe->rbp);

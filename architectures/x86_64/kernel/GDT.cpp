@@ -2,17 +2,9 @@
 
 static TSS64 tss = {
     .reserved = 0,
-    .rsp0 = 0,
-    .rsp1 = 0,
-    .rsp2 = 0,
+    .rsp = {},
     .reserved0 = 0,
-    .ist1 = 0,
-    .ist2 = 0,
-    .ist3 = 0,
-    .ist4 = 0,
-    .ist5 = 0,
-    .ist6 = 0,
-    .ist7 = 0,
+    .ist = {},
     .reserved1 = 0,
     .reserved2 = 0,
     .reserved3 = 0,
@@ -41,5 +33,5 @@ void gdt_initialize()
 
 void set_kernel_stack(uint64_t stack)
 {
-    tss.rsp0 = stack;
+    tss.rsp[0] = stack;
 }

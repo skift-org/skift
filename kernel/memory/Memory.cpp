@@ -133,7 +133,7 @@ Result memory_map_identity(void *address_space, MemoryRange physical_range, Memo
     InterruptsRetainer retainer;
 
     physical_set_used(physical_range);
-    arch_virtual_map(address_space, physical_range, physical_range.base(), flags);
+    assert(SUCCESS == arch_virtual_map(address_space, physical_range, physical_range.base(), flags));
 
     if (flags & MEMORY_CLEAR)
     {

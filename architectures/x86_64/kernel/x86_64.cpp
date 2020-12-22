@@ -19,6 +19,7 @@
 #include "kernel/handover/Handover.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/system/System.h"
+#include "kernel/tasking/Task.h"
 
 extern "C" void arch_main(void *info, uint32_t magic)
 {
@@ -59,21 +60,54 @@ void arch_halt()
 
 void arch_yield()
 {
-    ASSERT_NOT_REACHED();
+    asm("int $127");
 }
 
 void arch_save_context(Task *task)
 {
     __unused(task);
 
-    ASSERT_NOT_REACHED();
+    // FIXME: xsave
 }
 
 void arch_load_context(Task *task)
 {
     __unused(task);
 
-    ASSERT_NOT_REACHED();
+    // FIXME: xload
+}
+
+void arch_task_go(Task *task)
+{
+    if (task->user)
+    {
+        InterruptStackFrame stackframe = {};
+
+        stackframe.rsp = task->user_stack_pointer;
+
+        stackframe.rflags = 0x202;
+        stackframe.rip = (uintptr_t)task->entry_point;
+        stackframe.rbp = 0;
+
+        stackframe.cs = 0x1b;
+        stackframe.ss = 0x23;
+
+        task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
+    }
+    else
+    {
+        InterruptStackFrame stackframe = {};
+
+        stackframe.rsp = task->kernel_stack_pointer;
+        stackframe.rflags = 0x202;
+        stackframe.rip = (uintptr_t)task->entry_point;
+        stackframe.rbp = 0;
+
+        stackframe.cs = 0x08;
+        stackframe.ss = 0x10;
+
+        task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
+    }
 }
 
 size_t arch_debug_write(const void *buffer, size_t size)

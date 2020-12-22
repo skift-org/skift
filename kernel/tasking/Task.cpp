@@ -261,41 +261,7 @@ void task_go(Task *task)
 {
     InterruptsRetainer retainer;
 
-    if (task->user)
-    {
-        UserInterruptStackFrame stackframe = {};
-
-        stackframe.user_esp = task->user_stack_pointer;
-
-        stackframe.eflags = 0x202;
-        stackframe.eip = (uintptr_t)task->entry_point;
-        stackframe.ebp = 0;
-
-        stackframe.cs = 0x1b;
-        stackframe.ds = 0x23;
-        stackframe.es = 0x23;
-        stackframe.fs = 0x23;
-        stackframe.gs = 0x23;
-        stackframe.ss = 0x23;
-
-        task_kernel_stack_push(task, &stackframe, sizeof(UserInterruptStackFrame));
-    }
-    else
-    {
-        InterruptStackFrame stackframe = {};
-
-        stackframe.eflags = 0x202;
-        stackframe.eip = (uintptr_t)task->entry_point;
-        stackframe.ebp = 0;
-
-        stackframe.cs = 0x08;
-        stackframe.ds = 0x10;
-        stackframe.es = 0x10;
-        stackframe.fs = 0x10;
-        stackframe.gs = 0x10;
-
-        task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
-    }
+    arch_task_go(task);
 
     task->state(TASK_STATE_RUNNING);
 }

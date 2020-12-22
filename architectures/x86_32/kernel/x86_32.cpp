@@ -38,6 +38,45 @@ void arch_load_context(Task *task)
     set_kernel_stack((uintptr_t)task->kernel_stack + PROCESS_STACK_SIZE);
 }
 
+void arch_task_go(Task *task)
+{
+    if (task->user)
+    {
+        UserInterruptStackFrame stackframe = {};
+
+        stackframe.user_esp = task->user_stack_pointer;
+
+        stackframe.eflags = 0x202;
+        stackframe.eip = (uintptr_t)task->entry_point;
+        stackframe.ebp = 0;
+
+        stackframe.cs = 0x1b;
+        stackframe.ds = 0x23;
+        stackframe.es = 0x23;
+        stackframe.fs = 0x23;
+        stackframe.gs = 0x23;
+        stackframe.ss = 0x23;
+
+        task_kernel_stack_push(task, &stackframe, sizeof(UserInterruptStackFrame));
+    }
+    else
+    {
+        InterruptStackFrame stackframe = {};
+
+        stackframe.eflags = 0x202;
+        stackframe.eip = (uintptr_t)task->entry_point;
+        stackframe.ebp = 0;
+
+        stackframe.cs = 0x08;
+        stackframe.ds = 0x10;
+        stackframe.es = 0x10;
+        stackframe.fs = 0x10;
+        stackframe.gs = 0x10;
+
+        task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
+    }
+}
+
 size_t arch_debug_write(const void *buffer, size_t size) { return com_write(COM1, buffer, size); }
 
 TimeStamp arch_get_time() { return rtc_now(); }

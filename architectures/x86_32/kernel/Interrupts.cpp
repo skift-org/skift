@@ -2,15 +2,15 @@
 #include <libsystem/Logger.h>
 #include <libsystem/io/Stream.h>
 
-#include "architectures/x86/kernel/PIC.h"
-#include "architectures/x86_32/kernel/Interrupts.h"
-#include "architectures/x86_32/kernel/x86_32.h"
-
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
 #include "kernel/tasking/Syscalls.h"
+
+#include "architectures/x86/kernel/PIC.h"
+#include "architectures/x86_32/kernel/Interrupts.h"
+#include "architectures/x86_32/kernel/x86_32.h"
 
 static const char *_exception_messages[32] = {
     "Division by zero",

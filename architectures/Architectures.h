@@ -16,6 +16,8 @@ void arch_save_context(Task *task);
 
 void arch_load_context(Task *task);
 
+void arch_task_go(Task *task);
+
 size_t arch_debug_write(const void *buffer, size_t size);
 
 TimeStamp arch_get_time();

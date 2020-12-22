@@ -280,7 +280,37 @@ void arch_virtual_free(void *address_space, MemoryRange virtual_range)
 
 void *arch_address_space_create()
 {
-    ASSERT_NOT_REACHED();
+    PageMappingLevel4 *pml4;
+    memory_alloc_identity(arch_kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml4);
+
+    PageMappingLevel3 *pml3;
+    memory_alloc_identity(arch_kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml3);
+
+    auto &pml4_entry = pml4->entries[0];
+    pml4_entry.user = 0;
+    pml4_entry.writable = 1;
+    pml4_entry.present = 1;
+    pml4_entry.physical_address = (uint64_t)&pml3 / ARCH_PAGE_SIZE;
+
+    PageMappingLevel2 *pml2;
+    memory_alloc_identity(arch_kernel_address_space(), MEMORY_CLEAR, (uintptr_t *)&pml2);
+
+    auto &pml3_entry = pml3->entries[0];
+    pml3_entry.user = 0;
+    pml3_entry.writable = 1;
+    pml3_entry.present = 1;
+    pml3_entry.physical_address = (uint64_t)&pml2 / ARCH_PAGE_SIZE;
+
+    for (size_t i = 0; i < 512; i++)
+    {
+        auto &pml2_entry = pml2->entries[i];
+        pml2_entry.user = 0;
+        pml2_entry.writable = 1;
+        pml2_entry.present = 1;
+        pml2_entry.physical_address = (uint64_t)&kpml1[i] / ARCH_PAGE_SIZE;
+    }
+
+    return pml4;
 }
 
 void arch_address_space_destroy(void *address_space)
@@ -295,12 +325,4 @@ void arch_address_space_destroy(void *address_space)
 void arch_address_space_switch(void *address_space)
 {
     paging_load_directory((uintptr_t)address_space);
-}
-
-void arch_address_space_dump(void *address_space, bool user)
-{
-    __unused(address_space);
-    __unused(user);
-
-    ASSERT_NOT_REACHED();
 }

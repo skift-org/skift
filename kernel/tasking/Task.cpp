@@ -4,7 +4,6 @@
 
 #include "architectures/Architectures.h"
 #include "architectures/VirtualMemory.h"
-#include "architectures/x86_32/kernel/Interrupts.h" /* XXX */
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"

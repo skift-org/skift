@@ -26,6 +26,8 @@ void garbage_collector()
 
 void tasking_initialize()
 {
+    logger_info("Initializing tasking...");
+
     Task *idle_task = task_spawn(nullptr, "Idle", system_hang, nullptr, false);
     task_go(idle_task);
     idle_task->state(TASK_STATE_HANG);
@@ -39,4 +41,6 @@ void tasking_initialize()
 
     Task *garbage_task = task_spawn(nullptr, "GarbageCollector", garbage_collector, nullptr, false);
     task_go(garbage_task);
+
+    logger_info("Tasking initialized!");
 }

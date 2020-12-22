@@ -10,7 +10,10 @@ void interrupts_initialize()
 {
     dispatcher_initialize();
     interrupts_enable_holding();
+
+    logger_info("Enabling interrupts!");
     arch_enable_interrupts();
+    logger_info("Enabling enabled!");
 }
 
 bool interrupts_retained()

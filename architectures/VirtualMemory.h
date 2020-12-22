@@ -28,4 +28,3 @@ void arch_address_space_destroy(void *address_space);
 
 void arch_address_space_switch(void *address_space);
 
-void arch_address_space_dump(void *address_space, bool user);

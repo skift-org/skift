@@ -12,12 +12,20 @@ IDT64Descriptor idt_descriptor = {
 
 void idt_initialize()
 {
-    for (int i = 0; i < 48; i++)
+    for (int i = 0; i < 3; i++)
     {
         idt[i] = IDT64Entry(__interrupt_vector[i], 0, INTGATE);
     }
 
-    idt[127] = IDT64Entry(__interrupt_vector[48], 1, INTGATE);
+    idt[3] = IDT64Entry(__interrupt_vector[3], 0x08, TRAPGATE);
+    idt[4] = IDT64Entry(__interrupt_vector[4], 0x08, TRAPGATE);
+
+    for (int i = 5; i < 48; i++)
+    {
+        idt[i] = IDT64Entry(__interrupt_vector[i], 0, INTGATE);
+    }
+
+    idt[127] = IDT64Entry(__interrupt_vector[48], 0, INTGATE);
 
     idt_flush((uint64_t)&idt_descriptor);
 }

@@ -70,16 +70,14 @@ uint __plug_system_get_ticks()
 
 /* --- Memory allocator plugs ----------------------------------------------- */
 
-int __plug_memalloc_lock()
+void __plug_memalloc_lock()
 {
     interrupts_retain();
-    return 0;
 }
 
-int __plug_memalloc_unlock()
+void __plug_memalloc_unlock()
 {
     interrupts_release();
-    return 0;
 }
 
 void *__plug_memalloc_alloc(size_t size)

@@ -28,9 +28,9 @@ void __no_return __plug_logger_fatal();
 
 /* --- Memory allocator ----------------------------------------------------- */
 
-int __plug_memalloc_lock();
+void __plug_memalloc_lock();
 
-int __plug_memalloc_unlock();
+void __plug_memalloc_unlock();
 
 void *__plug_memalloc_alloc(size_t size);
 

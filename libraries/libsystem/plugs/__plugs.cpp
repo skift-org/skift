@@ -98,16 +98,14 @@ void __no_return __plug_logger_fatal()
     process_abort();
 }
 
-int __plug_memalloc_lock()
+void __plug_memalloc_lock()
 {
     lock_acquire(memlock);
-    return 0;
 }
 
-int __plug_memalloc_unlock()
+void __plug_memalloc_unlock()
 {
     lock_release(memlock);
-    return 0;
 }
 
 void *__plug_memalloc_alloc(size_t size)

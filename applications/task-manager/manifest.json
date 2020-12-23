@@ -1,6 +1,6 @@
 {
     "name": "Task Manager",
-    "comment": "Manage running task on your system.",
+    "comment": "Manage running tasks on your system.",
     "icon": "memory",
     "command": "task-manager"
 }

@@ -59,10 +59,10 @@ public:
             snprintf(buffer_usage, 50, "Usage: %u Mio", usage);
             _label_usage->text(buffer_usage);
 
-            unsigned avaliable = status.total_ram / 1024 / 1024;
-            char buffer_avaliable[50];
-            snprintf(buffer_avaliable, 50, "Avaliable: %u Mio", avaliable);
-            _label_available->text(buffer_avaliable);
+            unsigned available = status.total_ram / 1024 / 1024;
+            char buffer_available[50];
+            snprintf(buffer_available, 50, "Available: %u Mio", available);
+            _label_available->text(buffer_available);
 
             auto greedy = _model->ram_greedy();
             _label_greedy->text(StringBuilder().append("Most greedy: ").append(greedy).finalize());

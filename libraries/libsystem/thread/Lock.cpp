@@ -22,7 +22,7 @@ void __lock_acquire(Lock *lock)
 void __lock_acquire_by(Lock *lock, int holder)
 {
     while (!__sync_bool_compare_and_swap(&lock->locked, 0, 1))
-        asm("hlt"); // Don't burn the CPU ;)
+        asm("pause"); // Don't burn the CPU ;)
 
     __sync_synchronize();
 

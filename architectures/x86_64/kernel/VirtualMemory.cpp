@@ -145,7 +145,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml4_entry->present = 1;
             pml4_entry->writable = 1;
-            pml4_entry->user = 0;
+            pml4_entry->user = 1;
             pml4_entry->physical_address = (uint64_t)(pml3) / ARCH_PAGE_SIZE;
         }
 
@@ -163,7 +163,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml3_entry->present = 1;
             pml3_entry->writable = 1;
-            pml3_entry->user = 0;
+            pml3_entry->user = 1;
             pml3_entry->physical_address = (uint64_t)(pml2) / ARCH_PAGE_SIZE;
         }
 
@@ -181,7 +181,7 @@ Result arch_virtual_map(void *address_space, MemoryRange physical_range, uintptr
 
             pml2_entry->present = 1;
             pml2_entry->writable = 1;
-            pml2_entry->user = 0;
+            pml2_entry->user = 1;
             pml2_entry->physical_address = (uint64_t)(pml1) / ARCH_PAGE_SIZE;
         }
 

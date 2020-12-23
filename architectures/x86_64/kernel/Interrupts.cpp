@@ -4,6 +4,7 @@
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"
 #include "kernel/system/System.h"
+#include "kernel/tasking/Syscalls.h"
 
 #include "architectures/x86/kernel/PIC.h"
 #include "architectures/x86_64/kernel/Interrupts.h"
@@ -103,6 +104,20 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
         rsp = schedule(rsp);
 
         interrupts_enable_holding();
+    }
+    else if (stackframe->intno == 128)
+    {
+        sti();
+
+        stackframe->rax = task_do_syscall(
+            (Syscall)stackframe->rax,
+            stackframe->rbx,
+            stackframe->rcx,
+            stackframe->rdx,
+            stackframe->rsi,
+            stackframe->rdi);
+
+        cli();
     }
 
     pic_ack(stackframe->intno);

@@ -15,7 +15,7 @@
 #include "kernel/tasking/Task-Lanchpad.h"
 #include "kernel/tasking/Task-Memory.h"
 
-typedef Result (*SyscallHandler)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+typedef Result (*SyscallHandler)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
 
 bool syscall_validate_ptr(uintptr_t ptr, size_t size)
 {
@@ -648,7 +648,7 @@ SyscallHandler syscall_get_handler(Syscall syscall)
 #define SYSCALL_NAMES_ENTRY(__entry) #__entry,
 static const char *syscall_names[] = {SYSCALL_LIST(SYSCALL_NAMES_ENTRY)};
 
-int task_do_syscall(Syscall syscall, int arg0, int arg1, int arg2, int arg3, int arg4)
+uintptr_t task_do_syscall(Syscall syscall, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4)
 {
     SyscallHandler handler = syscall_get_handler(syscall);
 

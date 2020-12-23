@@ -63,13 +63,11 @@ static inline Result __syscall(Syscall syscall, uintptr_t p1, uintptr_t p2, uint
     Result __ret = ERR_FUNCTION_NOT_IMPLEMENTED;
 
 #if defined(__x86_64__)
-    // TODO: x86_64 syscall.
-    __unused(syscall);
-    __unused(p1);
-    __unused(p2);
-    __unused(p3);
-    __unused(p4);
-    __unused(p5);
+
+    __asm__ __volatile__("int $0x80"
+                         : "=a"(__ret)
+                         : "0"(syscall), "r"(p1), "c"(p2), "d"(p3), "S"(p4), "D"(p5)
+                         : "memory");
 
 #elif defined(__i386__)
     __asm__ __volatile__("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx"

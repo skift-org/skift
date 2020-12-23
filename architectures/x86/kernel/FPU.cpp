@@ -1,6 +1,6 @@
 #include <libsystem/core/CString.h>
 
-#include "architectures/x86_32/kernel/FPU.h"
+#include "architectures/x86/kernel/FPU.h"
 
 void fpu_initialize()
 {

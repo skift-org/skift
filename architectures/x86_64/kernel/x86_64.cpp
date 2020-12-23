@@ -3,8 +3,15 @@
 #include <libsystem/core/Plugs.h>
 #include <libsystem/io/Stream.h>
 
+#include "kernel/graphics/Graphics.h"
+#include "kernel/handover/Handover.h"
+#include "kernel/interrupts/Interupts.h"
+#include "kernel/system/System.h"
+#include "kernel/tasking/Task.h"
+
 #include "architectures/x86/kernel/COM.h"
 #include "architectures/x86/kernel/CPUID.h"
+#include "architectures/x86/kernel/FPU.h"
 #include "architectures/x86/kernel/IOPort.h"
 #include "architectures/x86/kernel/PIC.h"
 #include "architectures/x86/kernel/PIT.h"
@@ -14,12 +21,6 @@
 #include "architectures/x86_64/kernel/IDT.h"
 #include "architectures/x86_64/kernel/Interrupts.h"
 #include "architectures/x86_64/kernel/x86_64.h"
-
-#include "kernel/graphics/Graphics.h"
-#include "kernel/handover/Handover.h"
-#include "kernel/interrupts/Interupts.h"
-#include "kernel/system/System.h"
-#include "kernel/tasking/Task.h"
 
 extern "C" void arch_main(void *info, uint32_t magic)
 {
@@ -42,6 +43,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
     gdt_initialize();
     idt_initialize();
     pic_initialize();
+    fpu_initialize();
     pit_initialize(1000);
 
     system_main(handover);
@@ -65,17 +67,13 @@ void arch_yield()
 
 void arch_save_context(Task *task)
 {
-    __unused(task);
-
-    // FIXME: xsave
+    fpu_save_context(task);
 }
 
 void arch_load_context(Task *task)
 {
-    __unused(task);
-
+    fpu_load_context(task);
     set_kernel_stack((uint64_t)task->kernel_stack);
-    // FIXME: xload
 }
 
 void arch_task_go(Task *task)

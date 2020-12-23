@@ -74,6 +74,7 @@ void arch_load_context(Task *task)
 {
     __unused(task);
 
+    set_kernel_stack((uint64_t)task->kernel_stack);
     // FIXME: xload
 }
 
@@ -89,8 +90,8 @@ void arch_task_go(Task *task)
         stackframe.rip = (uintptr_t)task->entry_point;
         stackframe.rbp = 0;
 
-        stackframe.cs = 0x23;
-        stackframe.ss = 0x1b;
+        stackframe.cs = 0x1b;
+        stackframe.ss = 0x23;
 
         task_kernel_stack_push(task, &stackframe, sizeof(InterruptStackFrame));
     }

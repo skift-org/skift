@@ -4,16 +4,16 @@
 #include <libsystem/Logger.h>
 
 #define GDT_ENTRY_COUNT 5
-#define GDT_LONG_MODE_GRANULARITY 2
-#define GDT_SEGMENT 0b10000
-#define GDT_PRESENT 0b10000000     // Present bit. This must be 1 for all valid selectors.
-#define GDT_TSS_PRESENT 0b10000000 // Present bit. This must be 1 for all valid selectors.
-#define GDT_USER 0b01100000        // Privilege, 2 bits. Contains the ring level, 0 = highest (kernel), 3 = lowest (user applications).
-#define GDT_EXECUTABLE 0b00001000  // Executable bit. If 1 code in this segment can be executed, ie. a code selector. If 0 it is a data selector.
-#define GDT_READWRITE 0b00000010   // Readable bit for code selectors //Writable bit for data selectors
+
+#define GDT_SEGMENT (0b00010000)
+#define GDT_PRESENT (0b10000000)
+#define GDT_USER (0b01100000)
+#define GDT_EXECUTABLE (0b00001000)
+#define GDT_READWRITE (0b00000010)
+
+#define GDT_LONG_MODE_GRANULARITY 0b0010
 
 #define GDT_FLAGS 0b1100
-#define TSS_FLAGS 0b0000
 
 struct __packed TSS64
 {
@@ -71,7 +71,7 @@ struct __packed GDTEntry64
 
     void dump(int i)
     {
-        logger_trace("GDT[%d] = limit0_15=%04x base0_15=%04x base16_23=%02x granularity=%02x limit16_19=%02x flags=%02x base24_31=%02x",
+        logger_trace("GDT[%d] = limit0_15=%04x base0_15=%04x base16_23=%02x granularity=%02x limit16_19=%02x flags=%08b base24_31=%02x",
                      i,
                      limit0_15,
                      base0_15,
@@ -132,4 +132,4 @@ extern "C" void gdt_flush(uint64_t);
 
 extern "C" void tss_flush(uint64_t);
 
-void set_kernel_stack(uint32_t stack);
+void set_kernel_stack(uint64_t stack);

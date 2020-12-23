@@ -215,14 +215,14 @@ void *arch_address_space_create()
     memset(page_directory, 0, sizeof(PageDirectory));
 
     // Copy first gigs of virtual memory (kernel space);
-    for (uint i = 0; i < 256; i++)
+    for (size_t i = 0; i < 256; i++)
     {
         PageDirectoryEntry *page_directory_entry = &page_directory->entries[i];
 
         page_directory_entry->User = 0;
         page_directory_entry->Write = 1;
         page_directory_entry->Present = 1;
-        page_directory_entry->PageFrameNumber = (uint)&_kernel_page_tables[i] / ARCH_PAGE_SIZE;
+        page_directory_entry->PageFrameNumber = (uint32_t)&_kernel_page_tables[i] / ARCH_PAGE_SIZE;
     }
 
     return page_directory;
@@ -270,4 +270,3 @@ void arch_address_space_switch(void *address_space)
     InterruptsRetainer retainer;
     paging_load_directory(arch_virtual_to_physical(arch_kernel_address_space(), (uintptr_t)address_space));
 }
-

@@ -50,12 +50,33 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
 
     if (stackframe->intno < 32)
     {
-        system_panic_with_context(
-            stackframe,
-            "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
-            _exception_messages[stackframe->intno],
-            stackframe->intno,
-            stackframe->err);
+        if (stackframe->cs == 0x1B)
+        {
+            sti();
+
+            logger_error("Task %s(%d) triggered an exception: '%s' %x.%x (IP=%08x CR2=%08x)",
+                         scheduler_running()->name,
+                         scheduler_running_id(),
+                         _exception_messages[stackframe->intno],
+                         stackframe->intno,
+                         stackframe->err,
+                         stackframe->rip,
+                         CR2());
+
+            task_dump(scheduler_running());
+            arch_dump_stack_frame(reinterpret_cast<void *>(&stackframe));
+
+            scheduler_running()->cancel(-1);
+        }
+        else
+        {
+            system_panic_with_context(
+                stackframe,
+                "CPU EXCEPTION: '%s' (INT:%d ERR:%x) !",
+                _exception_messages[stackframe->intno],
+                stackframe->intno,
+                stackframe->err);
+        }
     }
     else if (stackframe->intno < 48)
     {

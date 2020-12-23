@@ -23,6 +23,9 @@ gdt_flush:
     mov gs, ax
     mov ss, ax
 
+    mov ax, 0x28
+    ltr ax
+
     ret
 
 global idt_flush

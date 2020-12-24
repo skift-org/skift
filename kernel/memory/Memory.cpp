@@ -198,7 +198,7 @@ Result memory_alloc_identity(void *address_space, MemoryFlags flags, uintptr_t *
             !physical_is_used(identity_range))
         {
             physical_set_used(identity_range);
-            arch_virtual_map(address_space, identity_range, identity_range.base(), flags);
+            assert(SUCCESS == arch_virtual_map(address_space, identity_range, identity_range.base(), flags));
 
             if (flags & MEMORY_CLEAR)
             {

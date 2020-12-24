@@ -54,7 +54,7 @@ MemoryMapping *task_memory_mapping_create_at(Task *task, MemoryObject *memory_ob
     memory_mapping->address = address;
     memory_mapping->size = memory_object->range().size();
 
-    arch_virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER);
+    assert(SUCCESS == arch_virtual_map(task->address_space, memory_object->range(), address, MEMORY_USER));
 
     list_pushback(task->memory_mapping, memory_mapping);
 

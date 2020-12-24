@@ -153,7 +153,7 @@ MemoryRange arch_virtual_alloc(void *address_space, MemoryRange physical_range, 
 
             if (current_size == physical_range.size())
             {
-                arch_virtual_map(address_space, physical_range, virtual_address, flags);
+                assert(SUCCESS == arch_virtual_map(address_space, physical_range, virtual_address, flags));
 
                 return (MemoryRange){virtual_address, current_size};
             }

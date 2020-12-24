@@ -102,9 +102,9 @@ void task_pass_argc_argv_env(Task *task, Launchpad *launchpad)
     task_user_stack_push(task, "\0", 1); // null terminate the env string
     uintptr_t env_ref = task_user_stack_push(task, launchpad->env, launchpad->env_size);
 
-    task_user_stack_push(task, &env_ref, sizeof(env_ref));
-    task_user_stack_push(task, &argv_list_ref, sizeof(argv_list_ref));
-    task_user_stack_push(task, &launchpad->argc, sizeof(int));
+    task_user_stack_push_ptr(task, (void *)env_ref);
+    task_user_stack_push_ptr(task, (void *)argv_list_ref);
+    task_user_stack_push_long(task, launchpad->argc);
 
     task_switch_address_space(scheduler_running(), parent_address_space);
 }

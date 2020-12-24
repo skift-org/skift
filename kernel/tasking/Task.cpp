@@ -254,6 +254,16 @@ uintptr_t task_user_stack_push(Task *task, const void *value, size_t size)
     return task->user_stack_pointer;
 }
 
+uintptr_t task_user_stack_push_long(Task *task, long value)
+{
+    return task_user_stack_push(task, &value, sizeof(value));
+}
+
+uintptr_t task_user_stack_push_ptr(Task *task, void *ptr)
+{
+    return task_user_stack_push(task, &ptr, sizeof(ptr));
+}
+
 void task_go(Task *task)
 {
     InterruptsRetainer retainer;

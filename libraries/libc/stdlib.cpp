@@ -8,11 +8,7 @@
 
 void __no_return exit(int status)
 {
-    TRACE_FUNCTION_BEGIN;
-
     process_exit(status);
-
-    TRACE_FUNCTION_END;
 }
 
 int system(const char *command)

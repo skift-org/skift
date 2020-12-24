@@ -6,9 +6,10 @@
 static constexpr const char *XDIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
 static constexpr const char *XDIGITS_CAPITALIZED = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-unsigned int parse_uint_inline(NumberParser parser, const char *str, uint default_value)
+unsigned int parse_uint_inline(NumberParser parser, const char *str, unsigned int default_value)
 {
-    uint result = 0;
+    unsigned int result = 0;
+
     if (parse_uint(parser, str, strlen(str), &result))
     {
         return result;

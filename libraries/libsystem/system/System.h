@@ -2,4 +2,4 @@
 
 #include <abi/System.h>
 
-uint system_get_ticks();
+Tick system_get_ticks();

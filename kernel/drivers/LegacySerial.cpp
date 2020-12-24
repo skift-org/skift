@@ -4,7 +4,6 @@
 
 LegacySerial::LegacySerial(DeviceAddress address) : LegacyDevice(address, DeviceClass::SERIAL)
 {
-    lock_init(_buffer_lock);
     com_initialize(port());
 }
 

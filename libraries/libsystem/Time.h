@@ -25,6 +25,8 @@ typedef uint32_t TimeStamp;
 
 typedef uint32_t Timeout;
 
+typedef uint32_t Tick;
+
 struct Time
 {
     int second;

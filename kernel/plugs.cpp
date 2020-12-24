@@ -29,7 +29,7 @@ Stream *log_stream = nullptr;
 #define INTERNAL_LOG_STREAM_HANDLE HANDLE_INVALID_ID
 static Stream internal_log_stream = {};
 
-void __plug_init()
+void __plug_initialize()
 {
     internal_log_stream.handle.id = INTERNAL_LOG_STREAM_HANDLE;
 
@@ -39,7 +39,7 @@ void __plug_init()
     log_stream = &internal_log_stream;
 }
 
-void __plug_fini(int)
+void __plug_uninitialize(int)
 {
     ASSERT_NOT_REACHED();
 }
@@ -50,12 +50,6 @@ void __plug_assert_failed(const char *expr, const char *file, const char *functi
     ASSERT_NOT_REACHED();
 }
 
-void __plug_lock_assert_failed(Lock *lock, const char *file, const char *function, int line)
-{
-    logger_fatal("Lock assert failed: %s in %s:%s() ln%d!", (char *)lock->name, (char *)file, (char *)function, line);
-    ASSERT_NOT_REACHED();
-}
-
 /* --- Systeme API ---------------------------------------------------------- */
 
 TimeStamp __plug_system_get_time()
@@ -63,31 +57,31 @@ TimeStamp __plug_system_get_time()
     return arch_get_time();
 }
 
-uint __plug_system_get_ticks()
+Tick __plug_system_get_ticks()
 {
     return system_get_ticks();
 }
 
 /* --- Memory allocator plugs ----------------------------------------------- */
 
-void __plug_memalloc_lock()
+void __plug_memory_lock()
 {
     interrupts_retain();
 }
 
-void __plug_memalloc_unlock()
+void __plug_memory_unlock()
 {
     interrupts_release();
 }
 
-void *__plug_memalloc_alloc(size_t size)
+void *__plug_memory_alloc(size_t size)
 {
     uintptr_t address = 0;
     assert(memory_alloc(arch_kernel_address_space(), size, MEMORY_CLEAR, &address) == SUCCESS);
     return (void *)address;
 }
 
-void __plug_memalloc_free(void *address, size_t size)
+void __plug_memory_free(void *address, size_t size)
 {
     memory_free(arch_kernel_address_space(), (MemoryRange){(uintptr_t)address, size});
 }

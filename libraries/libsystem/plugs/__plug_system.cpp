@@ -11,9 +11,9 @@ TimeStamp __plug_system_get_time()
     return timestamp;
 }
 
-uint __plug_system_get_ticks()
+Tick __plug_system_get_ticks()
 {
-    uint result = 0;
+    Tick result = 0;
     assert(hj_system_tick(&result) == SUCCESS);
     return result;
 }

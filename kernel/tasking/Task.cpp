@@ -51,7 +51,7 @@ Task *task_create(Task *parent, const char *name, bool user)
         _tasks = list_create();
     }
 
-    Task *task = __create(Task);
+    Task *task = new Task{};
 
     task->id = _task_ids++;
     strlcpy(task->name, name, PROCESS_NAME_SIZE);
@@ -70,7 +70,6 @@ Task *task_create(Task *parent, const char *name, bool user)
     task->memory_mapping = list_create();
 
     // Setup fildes
-    lock_init(task->handles_lock);
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         task->handles[i] = nullptr;
@@ -104,7 +103,7 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
         _tasks = list_create();
     }
 
-    Task *task = __create(Task);
+    Task *task = new Task{};
 
     task->id = _task_ids++;
     strlcpy(task->name, parent->name, PROCESS_NAME_SIZE);
@@ -116,7 +115,6 @@ Task *task_clone(Task *parent, uintptr_t sp, uintptr_t ip)
     task->memory_mapping = list_create();
 
     // Setup fildes
-    lock_init(task->handles_lock);
     for (int i = 0; i < PROCESS_HANDLE_COUNT; i++)
     {
         if (parent->handles[i])

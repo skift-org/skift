@@ -25,12 +25,12 @@ struct __packed TARRawBlock
                         /* 500 */
 };
 
-uint get_file_size(TARRawBlock *header)
+size_t get_file_size(TARRawBlock *header)
 {
     unsigned int size = 0;
     unsigned int count = 1;
 
-    for (uint j = 11; j > 0; j--, count *= 8)
+    for (size_t j = 11; j > 0; j--, count *= 8)
     {
         size += ((header->size[j - 1] - '0') * count);
     }
@@ -38,10 +38,10 @@ uint get_file_size(TARRawBlock *header)
     return size;
 }
 
-uint tar_count(void *tarfile)
+size_t tar_count(void *tarfile)
 {
     TARRawBlock *header = (TARRawBlock *)tarfile;
-    uint count = 0;
+    size_t count = 0;
 
     while (header->name[0] != '\0')
     {
@@ -58,7 +58,7 @@ uint tar_count(void *tarfile)
     return count;
 }
 
-bool tar_read(void *tarfile, TARBlock *block, uint index)
+bool tar_read(void *tarfile, TARBlock *block, size_t index)
 {
     TARRawBlock *header = (TARRawBlock *)tarfile;
 

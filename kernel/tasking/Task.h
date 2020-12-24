@@ -29,13 +29,13 @@ struct Task
     TaskEntryPoint entry_point;
     char fpu_registers[512];
 
-    Lock handles_lock;
+    Lock handles_lock{"handles-lock"};
     FsHandle *handles[PROCESS_HANDLE_COUNT];
 
     List *memory_mapping;
     void *address_space;
 
-    int exit_value;
+    int exit_value = 0;
 
     TaskState state();
 

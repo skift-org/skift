@@ -5,7 +5,7 @@
 class FsHandle
 {
 private:
-    Lock _lock;
+    Lock _lock{"fshandle"};
     RefPtr<FsNode> _node = nullptr;
     OpenFlag _flags = 0;
     size_t _offset = 0;

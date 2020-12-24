@@ -32,7 +32,7 @@ typedef struct printf_info
     // Formating
     char padding;
     printf_align_t align;
-    uint length;
+    size_t length;
 
     void *output;
     int written;
@@ -63,15 +63,15 @@ typedef struct
         info->written++;                                               \
     }
 
-#define PRINTF_PADDING(__buffer, __a)                                    \
-    {                                                                    \
-        if (info->align == (__a) && strlen(__buffer) < info->length)     \
-        {                                                                \
-            for (uint i = 0; i < (info->length - strlen(__buffer)); i++) \
-            {                                                            \
-                PRINTF_APPEND(info->padding);                            \
-            }                                                            \
-        }                                                                \
+#define PRINTF_PADDING(__buffer, __a)                                      \
+    {                                                                      \
+        if (info->align == (__a) && strlen(__buffer) < info->length)       \
+        {                                                                  \
+            for (size_t i = 0; i < (info->length - strlen(__buffer)); i++) \
+            {                                                              \
+                PRINTF_APPEND(info->padding);                              \
+            }                                                              \
+        }                                                                  \
     }
 
 int __printf(printf_info_t *info, va_list va);

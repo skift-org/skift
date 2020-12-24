@@ -83,7 +83,7 @@ TimeStamp arch_get_time() { return rtc_now(); }
 
 extern "C" void arch_main(void *info, uint32_t magic)
 {
-    __plug_init();
+    __plug_initialize();
 
     com_initialize(COM1);
     com_initialize(COM2);

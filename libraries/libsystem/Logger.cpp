@@ -22,7 +22,7 @@ void logger_quiet(bool quiet)
     logger_is_quiet = quiet;
 }
 
-void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ...)
+void logger_log(LogLevel level, const char *file, int line, const char *fmt, ...)
 {
     if (level >= logger_log_level)
     {

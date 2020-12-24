@@ -11,4 +11,4 @@ struct TARBlock
     char *data;
 };
 
-bool tar_read(void *tarfile, TARBlock *block, uint index);
+bool tar_read(void *tarfile, TARBlock *block, size_t index);

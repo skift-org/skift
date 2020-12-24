@@ -18,7 +18,7 @@ void logger_colors(bool use_colors);
 
 void logger_quiet(bool quiet);
 
-void logger_log(LogLevel level, const char *file, uint line, const char *fmt, ...);
+void logger_log(LogLevel level, const char *file, int line, const char *fmt, ...);
 
 #define logger_trace(__args...) logger_log(LOGGER_TRACE, __FILE__, __LINE__, __args)
 

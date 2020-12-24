@@ -4,7 +4,7 @@
 #include "kernel/interrupts/Interupts.h"
 
 static bool _holded = false;
-static uint _depth = 0;
+static int _depth = 0;
 
 void interrupts_initialize()
 {

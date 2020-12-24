@@ -13,7 +13,7 @@ struct FsHandle;
 struct FsNode : public RefCounted<FsNode>
 {
 private:
-    Lock _lock;
+    Lock _lock{"fsnode"};
     FileType _type;
 
     unsigned int _readers = 0;

@@ -418,7 +418,7 @@ void strbs(char *str)
 
 void strnapd(char *str, char c, size_t n)
 {
-    for (uint i = 0; i < (n - 1); i++)
+    for (size_t i = 0; i < (n - 1); i++)
     {
         if (str[i] == '\0')
         {

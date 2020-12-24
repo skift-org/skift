@@ -16,7 +16,7 @@ static MouseButton _mouse_old_buttons;
 
 static RefPtr<Bitmap> _cursor_bitmaps[__CURSOR_COUNT] = {};
 
-static uint _last_click = 0;
+static Tick _last_click = 0;
 
 void cursor_initialize()
 {
@@ -96,7 +96,7 @@ void cursor_handle_packet(MousePacket packet)
     if (!(_mouse_old_buttons & MOUSE_BUTTON_LEFT) &&
         (_mouse_buttons & MOUSE_BUTTON_LEFT))
     {
-        uint current = system_get_ticks();
+        Tick current = system_get_ticks();
 
         if (current - _last_click < 250 && window_on_focus)
         {

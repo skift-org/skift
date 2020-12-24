@@ -55,12 +55,12 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
                 scan.foreward();
             }
 
-            uint value = 0;
+            uint32_t value = 0;
             parse_uint(PARSER_HEXADECIMAL, buffer, 5, (unsigned int *)&value);
             return value;
         };
 
-        uint first_surrogate = read_4hex();
+        uint32_t first_surrogate = read_4hex();
 
         if (first_surrogate >= 0xDC00 && first_surrogate <= 0xDFFF)
         {
@@ -82,7 +82,7 @@ static inline const char *scan_json_escape_sequence(Scanner &scan)
             return reinterpret_cast<const char *>(u8"�");
         }
 
-        uint second_surrogate = read_4hex();
+        uint32_t second_surrogate = read_4hex();
 
         if ((second_surrogate < 0xDC00) || (second_surrogate > 0xDFFF))
         {

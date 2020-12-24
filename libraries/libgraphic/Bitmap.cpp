@@ -76,8 +76,8 @@ ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
 
     auto raw_data = result_or_read.take_value();
 
-    uint decoded_width = 0;
-    uint decoded_height = 0;
+    unsigned int decoded_width = 0;
+    unsigned int decoded_height = 0;
     void *decoded_data = nullptr;
 
     int decode_result = lodepng_decode32(

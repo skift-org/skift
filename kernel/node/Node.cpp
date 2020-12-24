@@ -6,7 +6,6 @@
 
 FsNode::FsNode(FileType type)
 {
-    lock_init(_lock);
     _type = type;
 }
 
@@ -58,15 +57,15 @@ void FsNode::deref_handle(FsHandle &handle)
 
 bool FsNode::is_acquire()
 {
-    return lock_is_acquire(_lock);
+    return _lock.locked();
 }
 
 void FsNode::acquire(int who_acquire)
 {
-    lock_acquire_by(_lock, who_acquire);
+    _lock.acquire_for(who_acquire, SOURCE_LOCATION);
 }
 
 void FsNode::release(int who_release)
 {
-    lock_release_by(_lock, who_release);
+    _lock.release_for(who_release, SOURCE_LOCATION);
 }

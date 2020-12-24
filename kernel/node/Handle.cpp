@@ -12,8 +12,6 @@
 
 FsHandle::FsHandle(RefPtr<FsNode> node, OpenFlag flags)
 {
-    lock_init(_lock);
-
     _node = node;
     _flags = flags;
     _offset = 0;
@@ -27,8 +25,6 @@ FsHandle::FsHandle(RefPtr<FsNode> node, OpenFlag flags)
 
 FsHandle::FsHandle(FsHandle &other)
 {
-    lock_init(_lock);
-
     _node = other.node();
     _flags = other.flags();
     _offset = other.offset();
@@ -51,17 +47,17 @@ FsHandle::~FsHandle()
 
 bool FsHandle::locked()
 {
-    return lock_is_acquire(_lock);
+    return _lock.locked();
 }
 
 void FsHandle::acquire(int who_acquire)
 {
-    lock_acquire_by(_lock, who_acquire);
+    _lock.acquire_for(who_acquire, SOURCE_LOCATION);
 }
 
 void FsHandle::release(int who_release)
 {
-    lock_release_by(_lock, who_release);
+    _lock.release_for(who_release, SOURCE_LOCATION);
 }
 
 PollEvent FsHandle::poll(PollEvent events)

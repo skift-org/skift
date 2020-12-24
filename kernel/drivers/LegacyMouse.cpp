@@ -2,7 +2,7 @@
 
 void LegacyMouse::wait(int type)
 {
-    uint time_out = 100000;
+    int time_out = 100000;
     if (type == 0)
     {
         while (time_out--)

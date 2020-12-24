@@ -161,7 +161,6 @@ void LegacyKeyboard::handle_key(Key key, KeyMotion motion)
 
 LegacyKeyboard::LegacyKeyboard(DeviceAddress address) : LegacyDevice(address, DeviceClass::KEYBOARD)
 {
-    lock_init(_events_lock);
     _keymap = keyboard_load_keymap("/Files/Keyboards/" CONFIG_KEYBOARD_LAYOUT ".kmap");
 }
 

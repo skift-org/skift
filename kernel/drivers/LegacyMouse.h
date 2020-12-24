@@ -9,7 +9,7 @@
 class LegacyMouse : public LegacyDevice
 {
 private:
-    Lock _events_lock;
+    Lock _events_lock{"legacy-mouse-event"};
     RingBuffer _events{sizeof(MousePacket) * 1024};
     int _cycle = 0;
     uint8_t _packet[4];

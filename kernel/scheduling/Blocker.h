@@ -114,10 +114,10 @@ public:
 class BlockerTime : public Blocker
 {
 private:
-    uint _wakeup_tick;
+    Tick _wakeup_tick;
 
 public:
-    BlockerTime(uint wakeup_tick)
+    BlockerTime(Tick wakeup_tick)
         : _wakeup_tick(wakeup_tick)
     {
     }

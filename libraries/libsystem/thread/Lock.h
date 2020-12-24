@@ -1,43 +1,135 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libsystem/Logger.h>
+#include <libsystem/process/Process.h>
 
-struct Lock
+class Lock
 {
-    bool locked;
-    int holder;
-    const char *name;
+private:
+    static constexpr auto NO_HOLDER = 0xDEADDEAD;
+
+    bool _locked = false;
+    int _holder = NO_HOLDER;
+    const char *_name = "lock-not-initialized";
+
+    __SOURCE_LOCATION__ _last_acquire_location = INVALID_SOURCE_LOCATION;
+    __SOURCE_LOCATION__ _last_release_location = INVALID_SOURCE_LOCATION;
+
+    void ensure_failed(const char *raison, __SOURCE_LOCATION__ location)
+    {
+        logger_error("Ensuring lock{%s} at %s:%s() ln%d failled due of '%s'", name(), location.file, location.function, location.line, raison);
+        logger_info("- acquired at %s:%s() ln%d", acquire_location().file, acquire_location().function, acquire_location().line);
+        logger_info("- release at %s:%s() ln%d", acquire_location().file, acquire_location().function, acquire_location().line);
+        logger_fatal("Aborting now!");
+
+        ASSERT_NOT_REACHED();
+    }
+
+public:
+    bool locked() const
+    {
+        bool result;
+        __atomic_load(&_locked, &result, __ATOMIC_SEQ_CST);
+        return result;
+    }
+
+    int holder() const
+    {
+        int result;
+        __atomic_load(&_holder, &result, __ATOMIC_SEQ_CST);
+        return result;
+    }
+
+    const char *name() const
+    {
+        return _name;
+    }
+
+    __SOURCE_LOCATION__ acquire_location() { return _last_acquire_location; }
+
+    __SOURCE_LOCATION__ release_location() { return _last_release_location; }
+
+    constexpr Lock(const char *name) : _name{name}
+    {
+    }
+
+    void acquire(__SOURCE_LOCATION__ location)
+    {
+        acquire_for(process_this(), location);
+    }
+
+    void acquire_for(int holder, __SOURCE_LOCATION__ location)
+    {
+        while (!__sync_bool_compare_and_swap(&_locked, 0, 1))
+        {
+            asm("pause");
+        }
+
+        __sync_synchronize();
+        _last_acquire_location = location;
+        _holder = holder;
+    }
+
+    bool try_acquire(__SOURCE_LOCATION__ location)
+    {
+        return try_acquire_for(process_this(), location);
+    }
+
+    bool try_acquire_for(int holder, __SOURCE_LOCATION__ location)
+    {
+        if (__sync_bool_compare_and_swap(&_locked, 0, 1))
+        {
+            __sync_synchronize();
+
+            _last_acquire_location = location;
+            _holder = holder;
+
+            return true;
+        }
+        else
+        {
+            __sync_synchronize();
+
+            return false;
+        }
+    }
+
+    void release(__SOURCE_LOCATION__ location)
+    {
+        release_for(process_this(), location);
+    }
+
+    void release_for(int holder, __SOURCE_LOCATION__ location)
+    {
+        ensure_acquired_for(holder, location);
+
+        __sync_synchronize();
+
+        __atomic_store_n(&_locked, 0, __ATOMIC_SEQ_CST);
+
+        _last_release_location = location;
+        _holder = NO_HOLDER;
+    }
+
+    void ensure_acquired(__SOURCE_LOCATION__ location)
+    {
+        ensure_acquired_for(process_this(), location);
+    }
+
+    void ensure_acquired_for(int holder, __SOURCE_LOCATION__ location)
+    {
+        if (!locked())
+        {
+            ensure_failed("lock-not-held", location);
+            ASSERT_NOT_REACHED();
+        }
+
+        if (holder != this->holder())
+        {
+            ensure_failed("lock-held-by-someone-else", location);
+        }
+    }
 };
-
-void __lock_init(Lock *lock, const char *name);
-
-void __lock_acquire(Lock *lock);
-
-void __lock_acquire_by(Lock *lock, int holder);
-
-void __lock_release(Lock *lock, const char *file, const char *function, int line);
-
-void __lock_release_by(Lock *lock, int holder, const char *file, const char *function, int line);
-
-bool __lock_try_acquire(Lock *lock);
-
-void __lock_assert(Lock *lock, const char *file, const char *function, int line);
-
-#define lock_init(lock) __lock_init(&lock, #lock)
-
-#define lock_acquire(lock) __lock_acquire(&lock)
-
-#define lock_acquire_by(lock, __holder) __lock_acquire_by(&lock, __holder)
-
-#define lock_try_acquire(lock) __lock_try_acquire(&lock)
-
-#define lock_release(lock) __lock_release(&lock, __FILE__, __FUNCTION__, __LINE__)
-
-#define lock_release_by(lock, __holder) __lock_release_by(&lock, __holder, __FILE__, __FUNCTION__, __LINE__)
-
-#define lock_assert(lock) __lock_assert(&lock, __FILE__, __FUNCTION__, __LINE__)
-
-#define lock_is_acquire(__lock) ((&__lock)->locked)
 
 class LockHolder
 {
@@ -47,11 +139,11 @@ private:
 public:
     LockHolder(Lock &lock) : _lock(lock)
     {
-        lock_acquire(_lock);
+        _lock.acquire(SOURCE_LOCATION);
     }
 
     ~LockHolder()
     {
-        lock_release(_lock);
+        _lock.release(SOURCE_LOCATION);
     }
 };

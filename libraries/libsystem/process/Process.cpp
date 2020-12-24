@@ -34,7 +34,7 @@ int process_clone()
 
 void __no_return process_exit(int code)
 {
-    __plug_fini(code);
+    __plug_uninitialize(code);
     __builtin_unreachable();
 }
 

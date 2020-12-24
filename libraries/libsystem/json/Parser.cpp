@@ -185,7 +185,7 @@ Value parse(const char *str, size_t size)
 
 Value parse_file(const char *path)
 {
-    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ);
+    __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ | OPEN_BUFFERED);
 
     if (handle_has_error(json_file))
     {

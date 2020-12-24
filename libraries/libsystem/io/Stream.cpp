@@ -194,7 +194,7 @@ size_t stream_read(Stream *stream, void *buffer, size_t size)
         result = 1;
     }
 
-    if (stream->write_mode == STREAM_BUFFERED_NONE)
+    if (stream->read_mode == STREAM_BUFFERED_NONE)
     {
         result = __plug_handle_read(HANDLE(stream), buffer, size);
     }

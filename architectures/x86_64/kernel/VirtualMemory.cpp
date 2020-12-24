@@ -5,6 +5,7 @@
 #include "kernel/system/System.h"
 
 #include "architectures/VirtualMemory.h"
+
 #include "architectures/x86_64/kernel/Paging.h"
 #include "architectures/x86_64/kernel/x86_64.h"
 

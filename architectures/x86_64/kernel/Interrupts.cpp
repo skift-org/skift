@@ -7,6 +7,7 @@
 #include "kernel/tasking/Syscalls.h"
 
 #include "architectures/x86/kernel/PIC.h"
+
 #include "architectures/x86_64/kernel/Interrupts.h"
 #include "architectures/x86_64/kernel/x86_64.h"
 
@@ -65,7 +66,7 @@ extern "C" uint64_t interrupts_handler(uintptr_t rsp)
                          CR2());
 
             task_dump(scheduler_running());
-            arch_dump_stack_frame(reinterpret_cast<void *>(&stackframe));
+            arch_dump_stack_frame(stackframe);
 
             scheduler_running()->cancel(-1);
         }

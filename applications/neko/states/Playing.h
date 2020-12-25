@@ -1,7 +1,5 @@
 #pragma once
 
-#include <libsystem/system/Random.h>
-
 #include "neko/Behavior.h"
 
 namespace neko

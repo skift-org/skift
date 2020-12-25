@@ -1,21 +1,17 @@
 #pragma once
 
-#include <libsystem/system/Random.h>
+#include <libutils/Random.h>
 
 #include "kernel/devices/UNIXDevice.h"
 
 class UnixRandom : public UNIXDevice
 {
 private:
-    Random _random;
+    Random _random{};
 
 public:
     UnixRandom(DeviceAddress address) : UNIXDevice(address, DeviceClass::RANDOM)
     {
-        _random = (Random){
-            6389,
-            6389,
-        };
     }
 
     ResultOr<size_t> read(FsHandle &handle, void *buffer, size_t size) override
@@ -24,7 +20,7 @@ public:
 
         for (size_t i = 0; i < size; i++)
         {
-            ((char *)buffer)[i] = random_uint32_max(&_random, 255);
+            ((char *)buffer)[i] = _random.next_u8();
         }
 
         return size;

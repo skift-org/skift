@@ -13,8 +13,8 @@ namespace neko
 {
 
 Idle::Idle()
-    : _random(random_create()),
-      _timer(random_uint32_max(&_random, 16) + 4)
+    : _random{},
+      _timer(_random.next_u32(16) + 4)
 {
 }
 
@@ -29,7 +29,7 @@ void Idle::update(Neko &neko)
             own<Itching>(),
         };
 
-        neko.behavior(random_pick(&_random, next, __array_length(next)));
+        neko.behavior(_random.pick(next, __array_length(next)));
     }
     else if (Application::mouse_position().distance_to(neko.position()) > 64)
     {

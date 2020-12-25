@@ -1,5 +1,5 @@
 
-#include <libsystem/system/Random.h>
+#include <libutils/Random.h>
 
 #include "demo/Demos.h"
 
@@ -10,18 +10,11 @@ struct Line
     Color color;
 };
 
-static Random random = {};
-static bool random_initialized = false;
+static Random _random = {};
 
 void lines_draw(Painter &painter, Recti screen, float time)
 {
     __unused(time);
-
-    if (!random_initialized)
-    {
-        random = random_create();
-        random_initialized = true;
-    }
 
     painter.fill_rectangle(screen, Colors::BLACK.with_alpha(0.05));
 
@@ -29,13 +22,13 @@ void lines_draw(Painter &painter, Recti screen, float time)
     {
         Line line = {};
 
-        line.start = Vec2i(random_uint32_max(&random, screen.width()),
-                           random_uint32_max(&random, screen.height()));
+        line.start = Vec2i(_random.next_u32(screen.width()),
+                           _random.next_u32(screen.height()));
 
-        line.finish = Vec2i(random_uint32_max(&random, screen.width()),
-                            random_uint32_max(&random, screen.height()));
+        line.finish = Vec2i(_random.next_u32(screen.width()),
+                            _random.next_u32(screen.height()));
 
-        line.color = Color::from_hex(random_uint32_max(&random, 0xffffff));
+        line.color = Color::from_hsv(_random.next_u32(360), 1, 1);
 
         painter.draw_line_antialias(line.start, line.finish, line.color);
     }

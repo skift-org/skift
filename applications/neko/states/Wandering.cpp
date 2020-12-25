@@ -9,16 +9,16 @@ namespace neko
 
 Vec2f Wandering::pick_destination()
 {
-    int x = random_uint32_max(&_random, Screen::bound().width() - Neko::SIZE * 2) + Neko::SIZE;
-    int y = random_uint32_max(&_random, Screen::bound().height() - Neko::SIZE * 2) + Neko::SIZE;
+    int x = _random.next_u32(Screen::bound().width() - Neko::SIZE * 2) + Neko::SIZE;
+    int y = _random.next_u32(Screen::bound().height() - Neko::SIZE * 2) + Neko::SIZE;
 
     return {(float)x, (float)y};
 }
 
 Wandering::Wandering()
-    : _random(random_create()),
+    : _random{},
       _destination(pick_destination()),
-      _timer(random_uint32_max(&_random, 64) + 8)
+      _timer(_random.next_u32(64) + 8)
 {
 }
 

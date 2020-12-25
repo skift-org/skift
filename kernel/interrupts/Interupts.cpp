@@ -13,7 +13,6 @@ void interrupts_initialize()
 
     logger_info("Enabling interrupts!");
     arch_enable_interrupts();
-    logger_info("Enabling enabled!");
 }
 
 bool interrupts_retained()

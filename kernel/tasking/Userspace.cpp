@@ -6,10 +6,7 @@
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/tasking/Userspace.h"
 
-#define DEFAULT_ENVIRONMENT \
-    "{"                     \
-    "\"PATH\": [],"         \
-    "}"
+#define DEFAULT_ENVIRONMENT "{}"
 
 void userspace_initialize()
 {
@@ -26,7 +23,7 @@ void userspace_initialize()
 
     launchpad_environment(init_lauchpad, DEFAULT_ENVIRONMENT);
 
-    early_console_disable(); // We disable the early console to prevent artefact.
+    early_console_disable(); // We disable the early console to prevent artifact.
 
     int init_process = -1;
     Result result = launchpad_launch(init_lauchpad, &init_process);

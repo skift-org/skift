@@ -147,6 +147,8 @@ bool check_minor_magic(MinorBlock *min, void *ptr, void *caller)
 
 void *malloc(size_t req_size)
 {
+    req_size = __align_up(req_size, 16);
+
     unsigned long long bestSize = 0;
     unsigned long size = req_size;
 
@@ -500,6 +502,8 @@ __attribute__((optimize("O0"))) void *calloc(size_t nobj, size_t size)
 
 void *realloc(void *ptr, size_t size)
 {
+    size = __align_up(size, 16);
+
     if (size == 0)
     {
         free(ptr);

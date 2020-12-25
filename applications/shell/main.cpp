@@ -1,8 +1,10 @@
+#include <abi/Syscalls.h>
 
 #include <libsystem/Logger.h>
 #include <libsystem/cmdline/ReadLine.h>
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
+#include <libsystem/process/Environment.h>
 #include <libsystem/process/Process.h>
 
 #include "shell/Shell.h"
@@ -11,12 +13,18 @@
 
 void shell_prompt(int last_command_exit_value)
 {
-    printf("\n\e[m ");
+    printf("\n\e[m");
 
     if (last_command_exit_value != 0)
     {
         printf("(\e[;1;31m%d\e[m) ", last_command_exit_value);
     }
+
+    SystemInfo info{};
+    hj_system_info(&info);
+    auto user_name = environment().get("POSIX").get("LOGNAME").as_string();
+
+    printf("\e[94m%s\e[m@%s ", user_name.cstring(), info.machine);
 
     char buffer[PATH_LENGTH];
     process_get_directory(buffer, PATH_LENGTH);

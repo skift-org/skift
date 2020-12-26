@@ -28,7 +28,7 @@ void lines_draw(Painter &painter, Recti screen, float time)
         line.finish = Vec2i(_random.next_u32(screen.width()),
                             _random.next_u32(screen.height()));
 
-        line.color = Color::from_hsv(_random.next_u32(360), 1, 1);
+        line.color = Color::from_hsv(_random.next_u32(360), 0.75, 0.9);
 
         painter.draw_line_antialias(line.start, line.finish, line.color);
     }

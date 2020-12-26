@@ -135,13 +135,17 @@ public:
         return _window;
     }
 
-    void max_height(int value) { _max_height = value; }
-
-    void max_width(int value) { _max_width = value; }
-
     void min_height(int value) { _min_height = value; }
+    int min_height() { return _min_height; }
+
+    void max_height(int value) { _max_height = value; }
+    int max_height() { return _max_height; }
 
     void min_width(int value) { _min_width = value; }
+    int min_width() { return _min_width; }
+
+    void max_width(int value) { _max_width = value; }
+    int max_width() { return _max_width; }
 
     /* --- subclass API ----------------------------------------------------- */
 
@@ -157,7 +161,7 @@ public:
 
     virtual Vec2i size();
 
-    /* --- Enable/ Disable state -------------------------------------------- */
+    /* --- Enable/Disable state --------------------------------------------- */
 
     bool enabled();
 

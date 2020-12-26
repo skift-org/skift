@@ -91,8 +91,21 @@ void Widget::do_layout()
 
     case LAYOUT_STACK:
     {
-        _childs.foreach ([&](auto child) {
-            child->bound(content_bound());
+        _childs.foreach ([this](Widget *child) {
+            auto bound = content_bound();
+
+            if (child->max_width() > 0 && bound.width() > child->max_width())
+            {
+                bound = bound.with_width(child->max_width());
+            }
+
+            if (child->max_height() > 0 && bound.height() > child->max_height())
+            {
+                bound = bound.with_height(child->max_height());
+            }
+
+            child->bound(bound.centered_within(content_bound()));
+
             return Iteration::CONTINUE;
         });
     }

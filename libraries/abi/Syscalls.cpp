@@ -1,8 +1,17 @@
 #include <abi/Syscalls.h>
 
+static int _pid_cache = -1;
+
 Result hj_process_this(int *pid)
 {
-    return __syscall(HJ_PROCESS_THIS, (uintptr_t)pid);
+    if (_pid_cache == -1)
+    {
+        __syscall(HJ_PROCESS_THIS, (uintptr_t)&_pid_cache);
+    }
+
+    *pid = _pid_cache;
+
+    return SUCCESS;
 }
 
 Result hj_process_name(char *name, size_t size)
@@ -17,6 +26,8 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
 
 Result hj_process_clone(int *pid)
 {
+    _pid_cache = -1;
+
     return __syscall(HJ_PROCESS_CLONE, (uintptr_t)pid);
 }
 

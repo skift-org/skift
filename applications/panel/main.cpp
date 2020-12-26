@@ -2,6 +2,7 @@
 
 #include <libsystem/core/CString.h>
 #include <libsystem/eventloop/Timer.h>
+#include <libsystem/process/Environment.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
 #include <libwidget/Application.h>
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
     auto cpu_graph = new Graph(graph_container, 50, Colors::SEAGREEN);
     new Label(cpu_graph, "CPU", Anchor::CENTER);
 
-    new Label(panel_container, "user");
+    new Label(panel_container, environment().get("POSIX").get("LOGNAME").as_string());
 
     auto clock_timer = own<Timer>(1000, [&]() {
         TimeStamp timestamp = timestamp_now();

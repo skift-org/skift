@@ -1,7 +1,7 @@
 {
     "POSIX": {
         "HOME": "/User",
-        "LOGNAME": "awesome-user",
+        "LOGNAME": "anon",
         "PATH": [
             "/System/Binaries",
             "/System/Posix/bin",

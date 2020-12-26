@@ -162,10 +162,12 @@ run-qemu: $(BOOTDISK)
 	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 -soundhw pcspk || \
 	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw all
 
+.PHONY: run-qemu-no-kvm
 run-qemu-no-kvm: $(BOOTDISK)
 	$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -device ac97 -soundhw pcspk || \
 		$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS) $(QEMU_EXTRA) -soundhw all
 
+.PHONY: run-qemu-virtio
 run-qemu-virtio: $(BOOTDISK)
 	@echo [QEMU] $^
 	@$(QEMU) $(QEMU_DISK) $(QEMU_FLAGS_VIRTIO) $(QEMU_EXTRA) -enable-kvm -device ac97 -soundhw pcspk || \

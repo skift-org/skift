@@ -151,10 +151,9 @@ int main(int argc, char **argv)
     bottom_container->layout(HFLOW(4));
     bottom_container->insets({6});
 
-    new IconPanel(bottom_container, Icon::get("account"));
+    new Button(bottom_container, BUTTON_TEXT, Icon::get("account"), "User");
 
-    auto user_name_label = new Label(bottom_container, "User");
-    user_name_label->flags(Widget::FILL);
+    (new Container(bottom_container))->flags(Widget::FILL);
 
     auto folder_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
 
@@ -168,7 +167,10 @@ int main(int argc, char **argv)
         process_run("settings", nullptr);
     });
 
-    new Button(bottom_container, BUTTON_TEXT, Icon::get("power-standby"));
+    auto logout_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("power-standby"));
+    logout_button->on(EventType::ACTION, [&](auto) {
+        process_run("logout", nullptr);
+    });
 
     new Separator(window->root());
 

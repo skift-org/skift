@@ -1,6 +1,7 @@
 #include <libwidget/Screen.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/ChaseMouse.h"
 #include "neko/states/Surprised.h"
 
@@ -19,11 +20,9 @@ void Surprised::update(Neko &neko)
     }
 }
 
-Animation Surprised::animation(Neko &neko)
+Animation Surprised::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::AWAKE;
+    return Animations::AWAKE;
 }
 
 } // namespace neko

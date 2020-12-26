@@ -2,7 +2,7 @@
 
 #include <libutils/Random.h>
 
-#include "neko/Behavior.h"
+#include "neko/model/Behavior.h"
 
 namespace neko
 {
@@ -15,6 +15,8 @@ private:
     int _timer;
 
 public:
+    const char *name() override { return "Idle"; }
+
     Idle();
 
     void update(Neko &neko) override;

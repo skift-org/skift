@@ -1,12 +1,12 @@
 #include <libwidget/Application.h>
 
-#include "neko/Window.h"
+#include "neko/windows/MainWindow.h"
 
 int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    auto window = new neko::Window();
+    auto window = new neko::MainWindow();
     window->show();
 
     return Application::run();

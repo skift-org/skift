@@ -1,6 +1,6 @@
 #pragma once
 
-#include "neko/Behavior.h"
+#include "neko/model/Behavior.h"
 
 namespace neko
 {
@@ -11,6 +11,8 @@ private:
     Vec2i _last_mouse_position;
 
 public:
+    const char *name() override { return "Playing"; }
+
     Playing();
 
     void update(Neko &neko) override;

@@ -1,7 +1,8 @@
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/Idle.h"
 #include "neko/states/Itching.h"
 #include "neko/states/Playing.h"
@@ -37,11 +38,9 @@ void Idle::update(Neko &neko)
     }
 } // namespace neko
 
-Animation Idle::animation(Neko &neko)
+Animation Idle::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::STOP;
+    return Animations::STOP;
 }
 
 } // namespace neko

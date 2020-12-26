@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/Idle.h"
 #include "neko/states/Playing.h"
 #include "neko/states/Surprised.h"
@@ -31,11 +32,9 @@ void Playing::update(Neko &neko)
     neko.did_update();
 }
 
-Animation Playing::animation(Neko &neko)
+Animation Playing::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::JARE;
+    return Animations::JARE;
 }
 
 } // namespace neko

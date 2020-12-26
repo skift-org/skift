@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/Itching.h"
 #include "neko/states/Surprised.h"
 #include "neko/states/Yawning.h"
@@ -25,17 +26,17 @@ void Itching::update(Neko &neko)
     {
         neko.behavior(own<Yawning>());
     }
+    else
+    {
+        _last_mouse_position = new_mouse_position;
 
-    _last_mouse_position = new_mouse_position;
-
-    neko.did_update();
+        neko.did_update();
+    }
 }
 
-Animation Itching::animation(Neko &neko)
+Animation Itching::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::KAKI;
+    return Animations::KAKI;
 }
 
 } // namespace neko

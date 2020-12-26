@@ -1,7 +1,8 @@
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/Sleep.h"
 #include "neko/states/Surprised.h"
 
@@ -27,11 +28,9 @@ void Sleep::update(Neko &neko)
     neko.did_update();
 }
 
-Animation Sleep::animation(Neko &neko)
+Animation Sleep::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::SLEEP;
+    return Animations::SLEEP;
 }
 
 } // namespace neko

@@ -1,6 +1,7 @@
 #include <libwidget/Screen.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/ChaseMouse.h"
 #include "neko/states/Wandering.h"
 
@@ -43,7 +44,7 @@ void Wandering::update(Neko &neko)
 
 Animation Wandering::animation(Neko &neko)
 {
-    return animation_from_vector(neko.position().vector_to(_destination));
+    return Animations::from_vector(neko.position().vector_to(_destination));
 }
 
 } // namespace neko

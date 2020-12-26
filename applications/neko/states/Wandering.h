@@ -2,7 +2,7 @@
 
 #include <libutils/Random.h>
 
-#include "neko/Behavior.h"
+#include "neko/model/Behavior.h"
 
 namespace neko
 {
@@ -17,6 +17,8 @@ private:
     Vec2f pick_destination();
 
 public:
+    const char *name() override { return "Wandering"; }
+
     Wandering();
 
     void update(Neko &neko) override;

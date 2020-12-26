@@ -4,8 +4,8 @@
 #include <libgraphic/Painter.h>
 #include <libutils/Observable.h>
 
-#include "neko/Behavior.h"
-#include "neko/Sprites.h"
+#include "neko/graphics/Sprites.h"
+#include "neko/model/Behavior.h"
 
 namespace neko
 {
@@ -16,7 +16,9 @@ private:
     int _tick = 0;
     Vec2f _position;
     RefPtr<Bitmap> _sprites;
+
     OwnPtr<Behavior> _behavior;
+    OwnPtr<Behavior> _next_behavior;
 
     Recti sprite();
 

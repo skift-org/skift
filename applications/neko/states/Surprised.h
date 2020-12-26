@@ -1,6 +1,6 @@
 #pragma once
 
-#include "neko/Behavior.h"
+#include "neko/model/Behavior.h"
 
 namespace neko
 {
@@ -9,6 +9,8 @@ class Surprised : public Behavior
 {
 private:
 public:
+    const char *name() override { return "Surprised"; }
+
     Surprised();
 
     void update(Neko &neko) override;

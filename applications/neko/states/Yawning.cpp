@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/Sleep.h"
 #include "neko/states/Surprised.h"
 #include "neko/states/Yawning.h"
@@ -31,11 +32,9 @@ void Yawning::update(Neko &neko)
     neko.did_update();
 }
 
-Animation Yawning::animation(Neko &neko)
+Animation Yawning::animation(Neko &)
 {
-    __unused(neko);
-
-    return Animation::AKUBI;
+    return Animations::AKUBI;
 }
 
 } // namespace neko

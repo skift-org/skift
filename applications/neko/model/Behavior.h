@@ -1,6 +1,6 @@
 #pragma once
 
-#include "neko/Animation.h"
+#include "neko/graphics/Animation.h"
 
 namespace neko
 {
@@ -10,6 +10,8 @@ class Neko;
 class Behavior
 {
 public:
+    virtual const char *name() { return "undefined"; }
+
     virtual ~Behavior(){};
 
     virtual void update(Neko &) = 0;

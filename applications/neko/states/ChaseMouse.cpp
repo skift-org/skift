@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
 
-#include "neko/Neko.h"
+#include "neko/graphics/Animations.h"
+#include "neko/model/Neko.h"
 #include "neko/states/ChaseMouse.h"
 #include "neko/states/Idle.h"
 
@@ -26,17 +27,19 @@ void ChaseMouse::update(Neko &neko)
         _destination = pick_destination();
     }
 
-    if (distance == 0)
+    if (distance)
+    {
+        neko.move_to(_destination);
+    }
+    else
     {
         neko.behavior(own<Idle>());
     }
-
-    neko.move_to(_destination);
 }
 
 Animation ChaseMouse::animation(Neko &neko)
 {
-    return animation_from_vector(neko.position().vector_to(_destination));
+    return Animations::from_vector(neko.position().vector_to(_destination));
 }
 
 } // namespace neko

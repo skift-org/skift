@@ -4,12 +4,12 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Window.h>
 
-#include "neko/Neko.h"
+#include "neko/model/Neko.h"
 
 namespace neko
 {
 
-class Window : public ::Window
+class MainWindow : public Window
 {
 private:
     Neko _neko;
@@ -17,7 +17,9 @@ private:
     OwnPtr<Observer<Neko>> _neko_observer;
 
 public:
-    Window() : ::Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT | WINDOW_NO_FOCUS), _neko{Screen::bound().center()}
+    MainWindow()
+        : Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT | WINDOW_NO_FOCUS),
+          _neko{Screen::bound().center()}
     {
         type(WINDOW_TYPE_PANEL);
         size({Neko::SIZE, Neko::SIZE});

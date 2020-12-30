@@ -1,9 +1,11 @@
+#include <libutils/Path.h>
+
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
-#include <libutils/Path.h>
+
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
-#include <libwidget/dialog/Dialog.h>
+#include <libwidget/dialog/MessageDialog.h>
 
 #include "task-manager/CPUGraph.h"
 #include "task-manager/RAMGraph.h"
@@ -39,7 +41,13 @@ public:
 
         auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
         cancel_task_button->on(Event::ACTION, [&](auto) {
-            if (dialog_message(Icon::get("close"), "Cancel task", "Are you sure about that ?", DIALOG_BUTTON_YES | DIALOG_BUTTON_NO) == DIALOG_BUTTON_YES)
+            auto result = MessageDialog::create_and_show(
+                "Cancel task",
+                "Are you sure about that ?",
+                Icon::get("close"),
+                DialogButton::YES | DialogButton::NO);
+
+            if (result == DialogResult::YES)
             {
                 _table_model->kill_task(_table->selected());
             };

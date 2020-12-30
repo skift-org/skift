@@ -2,16 +2,57 @@
 
 #include <libgraphic/Icon.h>
 
-#define DIALOG_BUTTON_OK (1 << 0)
-#define DIALOG_BUTTON_CANCEL (1 << 1)
-#define DIALOG_BUTTON_YES (1 << 2)
-#define DIALOG_BUTTON_NO (1 << 3)
-#define DIALOG_BUTTON_CLOSED (1 << 4)
+#include <libwidget/Application.h>
 
-typedef unsigned DialogButton;
+enum DialogButton
+{
+    YES = (1 << 0),
+    NO = (1 << 1),
+    OK = (1 << 2),
+    CANCEL = (1 << 3)
+};
 
-DialogButton dialog_message(
-    RefPtr<Icon> icon,
-    const char *title,
-    const char *message,
-    DialogButton buttons);
+enum class DialogResult
+{
+    NONE,
+    YES,
+    NO,
+    OK,
+    CANCEL,
+    CLOSE,
+};
+
+class Dialog
+{
+private:
+    DialogResult _result = DialogResult::NONE;
+
+public:
+    Dialog()
+    {
+    }
+
+    DialogResult show()
+    {
+        Window *window = new Window(WINDOW_NONE);
+        window->type(WINDOW_TYPE_DIALOG);
+
+        render(window);
+
+        window->show();
+
+        Application::run_nested();
+
+        delete window;
+
+        return _result;
+    }
+
+    void close(DialogResult result)
+    {
+        Application::exit_nested(0);
+        _result = result;
+    }
+
+    virtual void render(Window *) {}
+};

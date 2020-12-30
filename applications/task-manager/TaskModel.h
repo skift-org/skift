@@ -23,5 +23,5 @@ public:
 
     String cpu_greedy();
 
-    void kill_task(int row);
+    Result kill_task(int row);
 };

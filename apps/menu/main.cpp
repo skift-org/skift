@@ -3,6 +3,7 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/io/File.h>
 #include <libsystem/json/Json.h>
+#include <libsystem/process/Environment.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
@@ -24,45 +25,21 @@ MenuEntry menu_entry_create(const char *path)
 
     if (root.is(json::OBJECT))
     {
-        if (root.has("name"))
-        {
-            auto value = root.get("name");
+        root.with("name", [&](auto &value) {
+            entry.name = value.as_string();
+        });
 
-            if (value.is(json::STRING))
-            {
-                entry.name = value.as_string();
-            }
-        }
+        root.with("comment", [&](auto &value) {
+            entry.comment = value.as_string();
+        });
 
-        if (root.has("comment"))
-        {
-            auto value = root.get("comment");
+        root.with("icon", [&](auto &value) {
+            entry.icon = value.as_string();
+        });
 
-            if (value.is(json::STRING))
-            {
-                entry.comment = value.as_string();
-            }
-        }
-
-        if (root.has("icon"))
-        {
-            auto value = root.get("icon");
-
-            if (value.is(json::STRING))
-            {
-                entry.icon = Icon::get(value.as_string());
-            }
-        }
-
-        if (root.has("command"))
-        {
-            auto value = root.get("command");
-
-            if (value.is(json::STRING))
-            {
-                entry.command = value.as_string();
-            }
-        }
+        root.with("command", [&](auto &value) {
+            entry.command = value.as_string();
+        });
     }
 
     return entry;
@@ -151,7 +128,7 @@ int main(int argc, char **argv)
     bottom_container->layout(HFLOW(4));
     bottom_container->insets({6});
 
-    new Button(bottom_container, BUTTON_TEXT, Icon::get("account"), "User");
+    new Button(bottom_container, BUTTON_TEXT, Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
 
     (new Container(bottom_container))->flags(Widget::FILL);
 

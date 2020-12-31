@@ -1,4 +1,4 @@
-#include "architectures/Architectures.h"
+#include "archs/Architectures.h"
 
 #include "kernel/graphics/EarlyConsole.h"
 #include "kernel/graphics/Font.h"

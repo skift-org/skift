@@ -4,7 +4,7 @@
 #include <libsystem/core/CString.h>
 #include <libsystem/io/Stream.h>
 
-#include "architectures/VirtualMemory.h"
+#include "archs/VirtualMemory.h"
 
 #include "kernel/graphics/Graphics.h"
 #include "kernel/interrupts/Interupts.h"

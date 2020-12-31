@@ -4,7 +4,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 
-#include "architectures/VirtualMemory.h"
+#include "archs/VirtualMemory.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/memory/Memory.h"

@@ -1,6 +1,6 @@
 #include <libsystem/core/CString.h>
 
-#include "architectures/VirtualMemory.h"
+#include "archs/VirtualMemory.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/tasking/Task-Handles.h"

@@ -4,7 +4,7 @@
 #include <libsystem/Result.h>
 #include <libsystem/core/CString.h>
 
-#include "architectures/Architectures.h"
+#include "archs/Architectures.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/interrupts/Interupts.h"
@@ -100,7 +100,7 @@ Result hj_process_launch(Launchpad *launchpad, int *pid)
 
 Result hj_process_clone(int *pid)
 {
-    // Implemented in architectures/x86_32/kernel/Interrupts.cpp
+    // Implemented in archs/x86_32/kernel/Interrupts.cpp
     __unused(pid);
     ASSERT_NOT_REACHED();
 }

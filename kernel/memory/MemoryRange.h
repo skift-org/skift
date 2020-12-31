@@ -2,7 +2,7 @@
 
 #include <libsystem/Assert.h>
 
-#include "architectures/Memory.h"
+#include "archs/Memory.h"
 
 class MemoryRange
 {

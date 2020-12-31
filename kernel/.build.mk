@@ -49,12 +49,12 @@ $(CONFIG_BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(CONFIG_BUILD_DIRECTORY)/architectures/%.o: architectures/%.cpp
+$(CONFIG_BUILD_DIRECTORY)/archs/%.o: archs/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(CONFIG_BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
+$(CONFIG_BUILD_DIRECTORY)/archs/%.s.o: archs/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@
@@ -62,4 +62,4 @@ $(CONFIG_BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T architectures/$(CONFIG_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T archs/$(CONFIG_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

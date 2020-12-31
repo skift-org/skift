@@ -1,6 +1,6 @@
 
-#include "architectures/Architectures.h"
-#include "architectures/VirtualMemory.h"
+#include "archs/Architectures.h"
+#include "archs/VirtualMemory.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/scheduling/Scheduler.h"

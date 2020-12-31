@@ -1,4 +1,4 @@
-#include "architectures/Memory.h"
+#include "archs/Memory.h"
 
 #include "kernel/interrupts/Interupts.h"
 #include "kernel/memory/Physical.h"

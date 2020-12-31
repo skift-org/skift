@@ -1,4 +1,4 @@
-#include "architectures/Architectures.h"
+#include "archs/Architectures.h"
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"

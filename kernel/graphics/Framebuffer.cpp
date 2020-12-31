@@ -3,7 +3,7 @@
 #include <libsystem/Logger.h>
 #include <libsystem/math/MinMax.h>
 
-#include "architectures/VirtualMemory.h"
+#include "archs/VirtualMemory.h"
 
 #include "kernel/filesystem/Filesystem.h"
 #include "kernel/graphics/Graphics.h"

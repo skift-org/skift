@@ -143,4 +143,4 @@ $ make run-vbox # for Virtual Box
 
 A bug? A Missing feature? Please consider contributing to the project :hugs: ❤️
 
-See [contributing.md](contributing.md)
+See [manual/contributing.md](manual/contributing.md)

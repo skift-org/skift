@@ -21,7 +21,7 @@
 
  - **skiftOS** is a simple, handmade operating system for the x86 platform, aiming for clean and pretty APIs while keeping the spirit of UNIX.
  - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
- - **skiftOS** is pretty easy to build from source, just follow the [build guide](./building.md).
+ - **skiftOS** is pretty easy to build from source, just follow the [build guide](./manual/building.md).
  - **skiftOS** is capable of running on real hardware.
  - **skiftOS** is a labor of love.
  - **skiftOS** features a graphical user interface (GUI), with a compositor.
@@ -39,9 +39,9 @@ skiftOS running in QEMU 5.1
 # Links
 
 - [Manual](manual/readme.md)
-- [Building](building.md) **(start here if you are new)**
-- [Contributing](contributing.md)
-- [Code of conduct](code_of_conduct.md)
+- [Building](manual/building.md) **(start here if you are new)**
+- [Contributing](manual/contributing.md)
+- [Code of conduct](manual/code_of_conduct.md)
 
 # Acknowledgements
 

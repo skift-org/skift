@@ -41,12 +41,12 @@ jobs:
     - name: Building skiftOS (x86_32)
       run: |
           make clean
-          make all BUILD_ARCH=x86_32 BUILD_LOADER=limine
+          make all CONFIG_ARCH=x86_32 CONFIG_LOADER=limine
 
     - name: Building skiftOS (x86_64)
       run: |
           make clean
-          make all BUILD_ARCH=x86_64 BUILD_LOADER=limine
+          make all CONFIG_ARCH=x86_64 CONFIG_LOADER=limine
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2

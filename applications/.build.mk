@@ -11,7 +11,7 @@ $(1)_ASSETS := $$(wildcard applications/$($(1)_NAME)/*.markup) \
 
 $(1)_ASSETS := $$(patsubst applications/$($(1)_NAME)/%, $(BUILD_DIRECTORY_APPS)/$($(1)_NAME)/%, $$($(1)_ASSETS))
 
-$(1)_OBJECTS = $$(patsubst applications/%.cpp, $$(BUILD_DIRECTORY)/applications/%.o, $$($(1)_SOURCES))
+$(1)_OBJECTS = $$(patsubst applications/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/applications/%.o, $$($(1)_SOURCES))
 
 TARGETS += $$($(1)_BINARY) $$($(1)_ASSETS)
 OBJECTS += $$($(1)_OBJECTS)
@@ -25,7 +25,7 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 	@echo [$(1)] [LD] $($(1)_NAME)
 	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
 
-$$(BUILD_DIRECTORY)/applications/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.cpp
+$$(CONFIG_BUILD_DIRECTORY)/applications/$$($(1)_NAME)/%.o: applications/$$($(1)_NAME)/%.cpp
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [CXX] $$<
 	@$(CXX) $(CXXFLAGS) -c -o $$@ $$<

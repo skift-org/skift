@@ -69,8 +69,8 @@ CONFIG_OPTIMISATIONS  ?=-O2
 # The version number (usualy year.week).
 CONFIG_VERSION        ?=${shell date +'%y.%W'}
 
-include configurations/$(CONFIG).mk
-include configurations/user.mk
+include configs/$(CONFIG).mk
+include configs/user.mk
 
 define BUILD_CONFIG_TEMPLATE =
 -D__$(1)__=\""$($(1))"\"

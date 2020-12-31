@@ -21,12 +21,12 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libsystem/system/*.cpp) \
 	$(wildcard libraries/libsystem/cxx/new-delete.cpp)
 
-KERNEL_BINARY = $(BUILD_DIRECTORY)/kernel.bin
+KERNEL_BINARY = $(CONFIG_BUILD_DIRECTORY)/kernel.bin
 
 KERNEL_OBJECTS = \
-	$(patsubst %.cpp, $(BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
-	$(patsubst %.s, $(BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
-	$(patsubst libraries/%.cpp, $(BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
+	$(patsubst %.cpp, $(CONFIG_BUILD_DIRECTORY)/%.o, $(KERNEL_SOURCES)) \
+	$(patsubst %.s, $(CONFIG_BUILD_DIRECTORY)/%.s.o, $(KERNEL_ASSEMBLY_SOURCES)) \
+	$(patsubst libraries/%.cpp, $(CONFIG_BUILD_DIRECTORY)/kernel/%.o, $(KERNEL_LIBRARIES_SOURCES))
 
 KERNEL_CXXFLAGS += \
 	$(CXXFLAGS) 	\
@@ -39,22 +39,22 @@ KERNEL_CXXFLAGS += \
 
 OBJECTS += $(KERNEL_OBJECTS)
 
-$(BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
+$(CONFIG_BUILD_DIRECTORY)/kernel/%.o: libraries/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
+$(CONFIG_BUILD_DIRECTORY)/kernel/%.o: kernel/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -ffreestanding -nostdlib -c -o $@ $<
 
-$(BUILD_DIRECTORY)/architectures/%.o: architectures/%.cpp
+$(CONFIG_BUILD_DIRECTORY)/architectures/%.o: architectures/%.cpp
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [CXX] $<
 	@$(CXX) $(KERNEL_CXXFLAGS) -c -o $@ $<
 
-$(BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
+$(CONFIG_BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [AS] $<
 	@$(AS) $(ASFLAGS) $^ -o $@
@@ -62,4 +62,4 @@ $(BUILD_DIRECTORY)/architectures/%.s.o: architectures/%.s
 $(KERNEL_BINARY): $(KERNEL_OBJECTS)
 	$(DIRECTORY_GUARD)
 	@echo [KERNEL] [LD] $(KERNEL_BINARY)
-	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T architectures/$(BUILD_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc
+	@$(CXX) $(LDFLAGS) $(KERNEL_LDFLAGS) -T architectures/$(CONFIG_ARCH)/link.ld -o $@ -ffreestanding $^ -nostdlib -lgcc

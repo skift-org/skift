@@ -30,7 +30,6 @@ And for testing and debugging
 - qemu-system-i386
 - gdb
 
-
 ```sh
 # On Debian or Debian-based distributions
 $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools imagemagick
@@ -39,7 +38,7 @@ $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mt
 ### About WSL
 
 It's possible to build skiftOS WSL1 and WSL2 but it's not well tested.
-If you have any problems consider upgrading to linux.
+If you have any problems consider upgrading to a GNU/linux distribution.
 
 ## Building skiftOS
 

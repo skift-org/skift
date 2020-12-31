@@ -39,7 +39,7 @@ BUILD_WARNING:= \
 
 BUILD_INCLUDE:= \
 	-I. \
-	-Iapplications \
+	-Iapps \
 	-Ilibraries \
 	-Ilibraries/libc
 
@@ -86,7 +86,7 @@ include architectures/.build.mk
 include thirdparty/.build.mk
 include kernel/.build.mk
 include libraries/.build.mk
-include applications/.build.mk
+include apps/.build.mk
 include icons/.build.mk
 include distributions/.build.mk
 

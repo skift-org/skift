@@ -23,8 +23,8 @@ WALLPAPERCTL_NAME = wallpaperctl
 define CTLUTIL_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
-$(1)_SOURCE  = applications/ctlutils/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst applications/ctlutils/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/applications/ctlutils/%.o, $$($(1)_SOURCE))
+$(1)_SOURCE  = apps/ctlutils/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst apps/ctlutils/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/apps/ctlutils/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)

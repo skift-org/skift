@@ -151,8 +151,8 @@ PIANO_NAME = piano
 define UTIL_TEMPLATE =
 
 $(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
-$(1)_SOURCE  = applications/coreutils/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst applications/coreutils/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/applications/coreutils/%.o, $$($(1)_SOURCE))
+$(1)_SOURCE  = apps/coreutils/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst apps/coreutils/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/apps/coreutils/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)

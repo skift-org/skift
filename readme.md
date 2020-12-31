@@ -25,7 +25,7 @@
  - **skiftOS** is capable of running on real hardware.
  - **skiftOS** is a labor of love.
  - **skiftOS** features a graphical user interface (GUI), with a compositor.
- - **skiftOS** includes many applications like an [Image Viewer](./applications/image-viewer), a [Text Editor](./applications/text-editor), a [Terminal Emulator](./applications/terminal), [etc](./applications)...
+ - **skiftOS** includes many applications like an [Image Viewer](./apps/image-viewer), a [Text Editor](./apps/text-editor), a [Terminal Emulator](./apps/terminal), [etc](./apps)...
  - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # Screenshots

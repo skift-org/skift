@@ -1,3 +1,4 @@
+#include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 
@@ -64,7 +65,12 @@ int main(int argc, char **argv)
 
         new Button(panel_grid, BUTTON_FILLED, "Grid layout!");
 
-        new Panel(panel_grid);
+        auto dialog_button = new Button(panel_grid, BUTTON_FILLED, "Open dialog!");
+        dialog_button->on(Event::ACTION, [&](auto) {
+            filepicker::Dialog picker{};
+            picker.show();
+        });
+
         new Panel(panel_grid);
         new Panel(panel_grid);
         new Panel(panel_grid);

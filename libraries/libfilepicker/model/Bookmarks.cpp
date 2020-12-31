@@ -1,6 +1,6 @@
-#include "file-manager/model/Bookmarks.h"
+#include <libfilepicker/model/Bookmarks.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 const Vector<Bookmark> &Bookmarks::all() const
@@ -77,4 +77,4 @@ void Bookmarks::save()
     file.write_all(reinterpret_cast<const void *>(data.cstring()), data.length());
 }
 
-} // namespace file_manager
+} // namespace filepicker

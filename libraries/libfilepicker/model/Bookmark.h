@@ -5,7 +5,7 @@
 #include <libutils/Path.h>
 #include <libutils/RefPtr.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 struct Bookmark
@@ -73,4 +73,4 @@ public:
     }
 };
 
-} // namespace file_manager
+} // namespace filepicker

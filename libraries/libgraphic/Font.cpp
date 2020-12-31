@@ -35,7 +35,7 @@ static ResultOr<RefPtr<Bitmap>> font_load_bitmap(String name)
     return Bitmap::load_from(bitmap_path);
 }
 
-ResultOr<RefPtr<Font>> Font::create(String name)
+ResultOr<RefPtr<Font>> Font::get(String name)
 {
     if (!_fonts.has_key(name))
     {

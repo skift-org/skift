@@ -4,9 +4,9 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/json/Json.h>
 
-#include "file-manager/model/Listing.h"
+#include <libfilepicker/model/Listing.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
@@ -62,6 +62,8 @@ Listing::Listing(RefPtr<Navigation> navigation)
     _observer = navigation->observe([this](auto &) {
         update();
     });
+
+    update();
 }
 
 int Listing::rows()
@@ -140,7 +142,7 @@ void Listing::update()
     DirectoryEntry entry;
     while (directory_read(directory, &entry) > 0)
     {
-        FileSystemNode node{
+        FileInfo node{
             .name = {entry.name, FILE_NAME_LENGTH},
             .type = entry.stat.type,
             .icon = get_icon_for_node(_navigation->current().string(), &entry),
@@ -155,14 +157,9 @@ void Listing::update()
     did_update();
 }
 
-String Listing::file_name(int index)
+const FileInfo &Listing::info(int index) const
 {
-    return _files[index].name;
+    return _files[index];
 }
 
-FileType Listing::file_type(int index)
-{
-    return _files[index].type;
-}
-
-} // namespace file_manager
+} // namespace filepicker

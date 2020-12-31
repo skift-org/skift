@@ -5,7 +5,7 @@
 
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
-#include <libwidget/dialog/MessageDialog.h>
+#include <libwidget/dialog/MessageBox.h>
 
 #include "task-manager/CPUGraph.h"
 #include "task-manager/RAMGraph.h"
@@ -41,7 +41,7 @@ public:
 
         auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
         cancel_task_button->on(Event::ACTION, [&](auto) {
-            auto result = MessageDialog::create_and_show(
+            auto result = MessageBox::create_and_show(
                 "Cancel task",
                 "Are you sure about that ?",
                 Icon::get("close"),

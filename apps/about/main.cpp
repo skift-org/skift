@@ -39,7 +39,7 @@ int main(int argc, char **argv)
             auto field = new TextField(license_window->root(), TextModel::from_file("/Files/license.md"));
             field->flags(Widget::FILL);
             field->readonly(true);
-            field->font(Font::create("mono").take_value());
+            field->font(Font::get("mono").take_value());
             field->focus();
 
             license_window->show();

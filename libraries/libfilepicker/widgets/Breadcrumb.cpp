@@ -4,9 +4,9 @@
 #include <libwidget/widgets/Container.h>
 #include <libwidget/widgets/IconPanel.h>
 
-#include "file-manager/widgets/Breadcrumb.h"
+#include <libfilepicker/widgets/Breadcrumb.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
@@ -25,9 +25,14 @@ Breadcrumb::Breadcrumb(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Boo
         render();
     });
 
-    _bookmarks_observer = _bookmarks->observe([this](auto &) {
-        render();
-    });
+    if (_bookmarks != nullptr)
+    {
+        _bookmarks_observer = _bookmarks->observe([this](auto &) {
+            render();
+        });
+    }
+
+    render();
 }
 
 void Breadcrumb::render()
@@ -56,28 +61,31 @@ void Breadcrumb::render()
 
     (new Container(this))->flags(Widget::FILL);
 
-    if (_bookmarks->has(_navigation->current()))
+    if (_bookmarks)
     {
-        auto remove_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark);
+        if (_bookmarks->has(_navigation->current()))
+        {
+            auto remove_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark);
 
-        remove_bookmark->on(Event::ACTION, [this](auto) {
-            _bookmarks->remove(_navigation->current());
-        });
-    }
-    else
-    {
-        auto add_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark_outline);
+            remove_bookmark->on(Event::ACTION, [this](auto) {
+                _bookmarks->remove(_navigation->current());
+            });
+        }
+        else
+        {
+            auto add_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark_outline);
 
-        add_bookmark->on(Event::ACTION, [this](auto) {
-            Bookmark bookmark{
-                _navigation->current().basename(),
-                Icon::get("folder"),
-                _navigation->current(),
-            };
+            add_bookmark->on(Event::ACTION, [this](auto) {
+                Bookmark bookmark{
+                    _navigation->current().basename(),
+                    Icon::get("folder"),
+                    _navigation->current(),
+                };
 
-            _bookmarks->add(move(bookmark));
-        });
+                _bookmarks->add(move(bookmark));
+            });
+        }
     }
 }
 
-} // namespace file_manager
+} // namespace filepicker

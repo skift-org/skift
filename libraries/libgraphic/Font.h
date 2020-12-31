@@ -23,7 +23,7 @@ private:
 public:
     Bitmap &bitmap() { return *_bitmap; }
 
-    static ResultOr<RefPtr<Font>> create(String name);
+    static ResultOr<RefPtr<Font>> get(String name);
 
     Font(RefPtr<Bitmap> bitmap, Vector<Glyph> glyphs)
         : _bitmap(bitmap),

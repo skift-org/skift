@@ -5,7 +5,7 @@
 #include <libutils/Path.h>
 #include <libutils/Vector.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 class Navigation :
@@ -43,6 +43,8 @@ public:
 
     void go_home();
 
+    void go_home_dont_record_history();
+
     void refresh();
 
     void navigate(String directory);
@@ -54,4 +56,4 @@ public:
     void clear_foreward();
 };
 
-} // namespace file_manager
+} // namespace filepicker

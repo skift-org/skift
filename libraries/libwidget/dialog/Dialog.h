@@ -3,6 +3,7 @@
 #include <libgraphic/Icon.h>
 
 #include <libwidget/Application.h>
+#include <libwidget/widgets/Button.h>
 
 enum DialogButton
 {
@@ -27,23 +28,49 @@ class Dialog
 private:
     DialogResult _result = DialogResult::NONE;
 
+    int _buttons = 0;
+    String _title = "";
+    Window *_window = nullptr;
+
 public:
+    void
+    title(String title)
+    {
+        _title = title;
+    }
+
+    void buttons(int buttons) { _buttons = buttons; }
+
     Dialog()
+    {
+    }
+
+    virtual ~Dialog()
     {
     }
 
     DialogResult show()
     {
-        Window *window = new Window(WINDOW_NONE);
-        window->type(WINDOW_TYPE_DIALOG);
+        assert(_window == nullptr);
 
-        render(window);
+        _window = new Window(WINDOW_NONE);
 
-        window->show();
+        _window->type(WINDOW_TYPE_DIALOG);
+        _window->title(_title);
+
+        _window->on(Event::WINDOW_CLOSING, [&](auto) {
+            close(DialogResult::CLOSE);
+            _window->hide();
+        });
+
+        render(_window);
+
+        _window->show();
 
         Application::run_nested();
 
-        delete window;
+        delete _window;
+        _window = nullptr;
 
         return _result;
     }
@@ -55,4 +82,43 @@ public:
     }
 
     virtual void render(Window *) {}
+
+    void create_buttons(Widget *parent)
+    {
+        if (_buttons & DialogButton::YES)
+        {
+            auto button = new Button(parent, BUTTON_OUTLINE, "Yes");
+            button->on(Event::ACTION, [&](auto) {
+                close(DialogResult::YES);
+                _window->hide();
+            });
+        }
+
+        if (_buttons & DialogButton::NO)
+        {
+            auto button = new Button(parent, BUTTON_OUTLINE, "No");
+            button->on(Event::ACTION, [&](auto) {
+                close(DialogResult::NO);
+                _window->hide();
+            });
+        }
+
+        if (_buttons & DialogButton::OK)
+        {
+            auto button = new Button(parent, BUTTON_OUTLINE, "Ok");
+            button->on(Event::ACTION, [&](auto) {
+                close(DialogResult::OK);
+                _window->hide();
+            });
+        }
+
+        if (_buttons & DialogButton::CANCEL)
+        {
+            auto button = new Button(parent, BUTTON_OUTLINE, "Cancel");
+            button->on(Event::ACTION, [&](auto) {
+                close(DialogResult::CANCEL);
+                _window->hide();
+            });
+        }
+    }
 };

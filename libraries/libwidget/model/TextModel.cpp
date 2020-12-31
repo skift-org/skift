@@ -30,6 +30,7 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
             line->append(scan.current_codepoint());
             scan.foreward_codepoint();
         }
+
         scan.skip('\n'); // skip the \n
 
         model->append_line(line);

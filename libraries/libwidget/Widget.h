@@ -88,7 +88,7 @@ public:
     {
         if (!_font)
         {
-            _font = Font::create("sans").take_value();
+            _font = Font::get("sans").take_value();
         }
 
         return _font;

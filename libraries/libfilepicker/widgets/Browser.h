@@ -3,10 +3,10 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/widgets/Table.h>
 
-#include "file-manager/model/Listing.h"
-#include "file-manager/model/Navigation.h"
+#include <libfilepicker/model/Listing.h>
+#include <libfilepicker/model/Navigation.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 class Browser : public Table
@@ -17,8 +17,7 @@ private:
 
 public:
     Browser(Widget *parent, RefPtr<Navigation> navigation)
-        : Table(parent),
-          _navigation(navigation)
+        : Table(parent), _navigation(navigation)
     {
         _listing = make<Listing>(navigation);
         model(_listing);
@@ -30,14 +29,14 @@ public:
         on(Event::ACTION, [this](auto) {
             if (selected() >= 0)
             {
-                if (_listing->file_type(selected()) == FILE_TYPE_DIRECTORY)
+                if (_listing->info(selected()).type == FILE_TYPE_DIRECTORY)
                 {
-                    _navigation->navigate(_listing->file_name(selected()));
+                    _navigation->navigate(_listing->info(selected()).name);
                 }
                 else
                 {
                     auto l = launchpad_create("open", "/System/Binaries/open");
-                    launchpad_argument(l, strdup(_listing->file_name(selected()).cstring()));
+                    launchpad_argument(l, _listing->info(selected()).name.cstring());
                     launchpad_launch(l, nullptr);
                 }
             }
@@ -45,4 +44,4 @@ public:
     }
 };
 
-} // namespace file_manager
+} // namespace filepicker

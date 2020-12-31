@@ -1,6 +1,6 @@
-#include "file-manager/model/Navigation.h"
+#include <libfilepicker/model/Navigation.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 Navigation::Navigation() : _current(Path::parse(""))
@@ -53,6 +53,12 @@ void Navigation::go_home()
     navigate(Path::parse("/User"), BACKWARD);
 }
 
+void Navigation::go_home_dont_record_history()
+{
+    clear_foreward();
+    navigate(Path::parse("/User"), NONE);
+}
+
 void Navigation::refresh()
 {
     did_update();
@@ -103,4 +109,4 @@ void Navigation::clear_foreward()
     _foreward.clear();
 }
 
-} // namespace file_manager
+} // namespace filepicker

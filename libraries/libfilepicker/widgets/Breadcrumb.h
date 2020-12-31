@@ -2,10 +2,10 @@
 
 #include <libwidget/Widget.h>
 
-#include "file-manager/model/Bookmarks.h"
-#include "file-manager/model/Navigation.h"
+#include <libfilepicker/model/Bookmarks.h>
+#include <libfilepicker/model/Navigation.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 struct Breadcrumb : public Widget
@@ -28,4 +28,4 @@ public:
     void render();
 };
 
-} // namespace file_manager
+} // namespace filepicker

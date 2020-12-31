@@ -8,7 +8,7 @@ RefPtr<Font> font()
 
     if (font == nullptr)
     {
-        font = Font::create("mono").take_value();
+        font = Font::get("mono").take_value();
     }
 
     return font;

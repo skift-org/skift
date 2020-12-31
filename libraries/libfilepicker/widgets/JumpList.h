@@ -4,10 +4,10 @@
 #include <libwidget/widgets/Label.h>
 #include <libwidget/widgets/Panel.h>
 
-#include "file-manager/model/Bookmarks.h"
-#include "file-manager/model/Navigation.h"
+#include <libfilepicker/model/Bookmarks.h>
+#include <libfilepicker/model/Navigation.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 class JumpList : public Panel
@@ -57,4 +57,4 @@ public:
     }
 };
 
-} // namespace file_manager
+} // namespace filepicker

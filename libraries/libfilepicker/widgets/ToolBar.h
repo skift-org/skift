@@ -1,12 +1,13 @@
 #pragma once
 
+#include <libwidget/widgets/Button.h>
 #include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/Separator.h>
 
-#include "file-manager/model/Navigation.h"
-#include "file-manager/widgets/Breadcrumb.h"
+#include <libfilepicker/model/Navigation.h>
+#include <libfilepicker/widgets/Breadcrumb.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 class ToolBar : public Panel
@@ -28,7 +29,9 @@ private:
     OwnPtr<Observer<Navigation>> _observer;
 
 public:
-    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
+    static constexpr int NO_OPEN_TERMINAL = 1 << 0;
+
+    ToolBar(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks, int flags = 0)
         : Panel(parent),
           _navigation(navigation),
           _bookmarks(bookmarks)
@@ -75,13 +78,16 @@ public:
             _navigation->refresh();
         });
 
-        Widget *terminal_button = new Button(this, BUTTON_TEXT, Icon::get("console"));
+        if (!(flags & NO_OPEN_TERMINAL))
+        {
+            Widget *terminal_button = new Button(this, BUTTON_TEXT, Icon::get("console"));
 
-        terminal_button->on(Event::ACTION, [](auto) {
-            process_run("terminal", NULL);
-        });
+            terminal_button->on(Event::ACTION, [](auto) {
+                process_run("terminal", NULL);
+            });
+        }
 
-        _observer = navigation->observe([this](auto &) {
+        _observer = _navigation->observe([this](auto &) {
             _go_backward->enable_if(_navigation->can_go_backward());
             _go_foreward->enable_if(_navigation->can_go_forward());
             _go_up->enable_if(_navigation->can_go_up());
@@ -91,4 +97,4 @@ public:
     ~ToolBar() override {}
 };
 
-} // namespace file_manager
+} // namespace filepicker

@@ -5,9 +5,9 @@
 #include <libutils/Observable.h>
 #include <libutils/Vector.h>
 
-#include "file-manager/model/Bookmark.h"
+#include <libfilepicker/model/Bookmark.h>
 
-namespace file_manager
+namespace filepicker
 {
 
 class Bookmarks :
@@ -35,4 +35,4 @@ public:
     void save();
 };
 
-} // namespace file_manager
+} // namespace filepicker

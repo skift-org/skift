@@ -1,0 +1,3 @@
+LIBS += FILEPICKER
+
+FILEPICKER_NAME = filepicker

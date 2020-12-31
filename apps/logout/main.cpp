@@ -1,4 +1,5 @@
 #include <abi/Syscalls.h>
+
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
     new Label(warning_container, "Shutdown or restart your computer.", Anchor::LEFT);
     new Label(warning_container, "Any unsaved work will be lost!", Anchor::LEFT);
 
-    (new Container(dialog))->flags(Widget::FILL);
+    new Spacer(dialog);
 
     auto shutdown_button = new Button(dialog, BUTTON_TEXT, Icon::get("power-standby"), "Shutdown");
 
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
 
     new Button(dialog, BUTTON_TEXT, Icon::get("logout"), "Logoff");
 
-    (new Container(dialog))->flags(Widget::FILL);
+    new Spacer(dialog);
 
     auto cancel_button = new Button(dialog, BUTTON_FILLED, "Cancel");
 

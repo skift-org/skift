@@ -38,11 +38,15 @@ int main(int argc, char **argv)
     auto menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
-    auto widget_date_and_time = new Label(panel_container, "", Anchor::CENTER);
-    widget_date_and_time->flags(Widget::FILL);
+    new Spacer(panel_container);
 
-    auto graph_container = new Container(panel_container);
+    auto widget_date_and_time = new Label(panel_container, "", Anchor::CENTER);
+
+    new Spacer(panel_container);
+
+    auto graph_container = new Button(panel_container, BUTTON_TEXT);
     graph_container->layout(VGRID(1));
+    graph_container->insets(0);
 
     auto ram_graph = new Graph(graph_container, 50, Colors::ROYALBLUE);
     new Label(ram_graph, "RAM", Anchor::CENTER);
@@ -81,7 +85,7 @@ int main(int argc, char **argv)
 
     cpu_timer->start();
 
-    graph_container->on(Event::MOUSE_BUTTON_PRESS, [](auto) { process_run("task-manager", nullptr); });
+    graph_container->on(Event::ACTION, [](auto) { process_run("task-manager", nullptr); });
 
     window->show();
 

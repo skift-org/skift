@@ -11,4 +11,5 @@
 #include <libwidget/widgets/ScrollBar.h>
 #include <libwidget/widgets/Separator.h>
 #include <libwidget/widgets/Slider.h>
+#include <libwidget/widgets/Spacer.h>
 #include <libwidget/widgets/Table.h>

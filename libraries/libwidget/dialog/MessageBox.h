@@ -1,9 +1,7 @@
 #pragma once
 
+#include <libwidget/Widgets.h>
 #include <libwidget/dialog/Dialog.h>
-#include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Container.h>
-#include <libwidget/widgets/Label.h>
 
 class MessageBox : public Dialog
 {
@@ -53,7 +51,7 @@ public:
         auto container = new Container(window->root());
         container->layout(HFLOW(4));
 
-        (new Container(container))->flags(Widget::FILL);
+        new Spacer(container);
 
         create_buttons(container);
     }

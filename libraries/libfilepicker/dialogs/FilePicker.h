@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libutils/RefPtr.h>
+#include <libwidget/Widgets.h>
 #include <libwidget/dialog/Dialog.h>
-#include <libwidget/widgets/Container.h>
 
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Browser.h>
@@ -41,7 +41,7 @@ public:
         action_container->layout(HFLOW(4));
         action_container->insets(Insetsi(4, 4));
 
-        (new Container(action_container))->flags(Widget::FILL);
+        new Spacer(action_container);
 
         create_buttons(action_container);
     }

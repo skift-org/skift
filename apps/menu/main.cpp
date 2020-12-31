@@ -34,7 +34,7 @@ MenuEntry menu_entry_create(const char *path)
         });
 
         root.with("icon", [&](auto &value) {
-            entry.icon = value.as_string();
+            entry.icon = Icon::get(value.as_string());
         });
 
         root.with("command", [&](auto &value) {
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 
     new Button(bottom_container, BUTTON_TEXT, Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
 
-    (new Container(bottom_container))->flags(Widget::FILL);
+    new Spacer(bottom_container);
 
     auto folder_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
 

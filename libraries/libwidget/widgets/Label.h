@@ -13,6 +13,7 @@ public:
     void text(String text)
     {
         _text = text;
+        should_relayout();
         should_repaint();
     }
 

@@ -1,8 +1,6 @@
 #include <libgraphic/Painter.h>
+#include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
-#include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Container.h>
-#include <libwidget/widgets/IconPanel.h>
 
 #include <libfilepicker/widgets/Breadcrumb.h>
 
@@ -59,7 +57,7 @@ void Breadcrumb::render()
         });
     }
 
-    (new Container(this))->flags(Widget::FILL);
+    new Spacer(this);
 
     if (_bookmarks)
     {

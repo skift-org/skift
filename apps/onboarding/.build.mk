@@ -1,0 +1,5 @@
+APPS += ONBOARDING
+
+ONBOARDING_NAME = onboarding
+ONBOARDING_LIBS = widget graphic
+ONBOARDING_ICONS =

@@ -268,6 +268,11 @@ void Window::show()
     relayout();
     repaint(*backbuffer_painter, bound());
 
+    frontbuffer->copy_from(*backbuffer, bound());
+
+    swap(frontbuffer, backbuffer);
+    swap(frontbuffer_painter, backbuffer_painter);
+
     Application::show_window(this);
 }
 

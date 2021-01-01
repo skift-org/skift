@@ -37,10 +37,10 @@ int main(int argc, char **argv)
 
     auto warning_container = new Container(icon_and_title_container);
     warning_container->flags(Widget::FILL);
-    warning_container->layout(VGRID(6));
+    warning_container->layout(VGRID(2));
 
-    new Label(warning_container, "Shutdown or restart your computer.", Anchor::LEFT);
-    new Label(warning_container, "Any unsaved work will be lost!", Anchor::LEFT);
+    new Label(warning_container, "Shutdown or restart your computer.", Anchor::BOTTOM_LEFT);
+    new Label(warning_container, "Any unsaved work will be lost!", Anchor::TOP_LEFT);
 
     new Spacer(dialog);
 

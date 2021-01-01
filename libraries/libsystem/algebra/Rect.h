@@ -265,7 +265,7 @@ public:
         assert(index >= 0);
         assert(row_count > 0);
 
-        int spacing_height = spacing * row_count - 1;
+        int spacing_height = spacing * (row_count - 1);
 
         int available_height = height() - spacing_height;
 

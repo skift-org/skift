@@ -9,6 +9,7 @@ $(LIMINE):
 	make -C thirdparty/limine/ limine-install
 
 $(LIMINE_LOADER):
+	make -C thirdparty/limine/ bootloader
 	make -C thirdparty/limine/ all
 
 .PHONY: \

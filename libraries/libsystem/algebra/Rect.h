@@ -389,14 +389,14 @@ public:
 
     bool contains(Vec2<Scalar> p) const
     {
-        return p.x() >= left() && p.x() < right() &&
-               p.y() >= top() && p.y() < bottom();
+        return left() <= p.x() && right() > p.x() &&
+               top() <= p.y() && bottom() > p.y();
     }
 
     bool contains(Rect other) const
     {
-        return (_x <= other._x && (_x + _width) >= (other._x + other._width)) &&
-               (_y <= other._y && (_y + _height) >= (other._y + other._width));
+        return left() <= other.left() && right() >= other.right() &&
+               right() <= other.top() && bottom() >= other.bottom();
     }
 
     Border contains(Insets<Scalar> spacing, Vec2<Scalar> position) const

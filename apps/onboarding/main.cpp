@@ -1,6 +1,7 @@
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
+#include <libwidget/Markup.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
@@ -36,24 +37,67 @@ int main(int argc, char **argv)
     illustration->border_radius(6);
     illustration->color(THEME_MIDDLEGROUND, Colors::WHITE);
 
-    new Image(illustration, Bitmap::load_from("/Applications/onboarding/illustration1.png").value());
+    auto image = new Image(illustration, Bitmap::placeholder());
 
     auto content = new Container(dialog);
     content->flags(Widget::FILL);
+    content->insets(16);
 
     auto navigation = new Container(dialog);
 
-    navigation->layout(HFLOW(0));
+    navigation->layout(HFLOW(4));
     navigation->insets(8);
 
     auto skipall_button = new Button(navigation, BUTTON_TEXT, "Skip all");
+
+    new Spacer(navigation);
+
+    auto back_button = new Button(navigation, BUTTON_OUTLINE, "Previous");
+
+    auto next_button = new Button(navigation, BUTTON_FILLED, "Next");
+
+    int current_page = 1;
+
+    auto set_current_page = [&](int index) {
+        current_page = index;
+
+        skipall_button->enable_if(current_page < 5);
+        back_button->enable_if(current_page > 1);
+
+        char image_path[PATH_LENGTH];
+        snprintf(image_path, PATH_LENGTH, "/Applications/onboarding/illustration%d.png", index);
+
+        char content_path[PATH_LENGTH];
+        snprintf(content_path, PATH_LENGTH, "/Applications/onboarding/content%d.markup", index);
+
+        content->clear_children();
+        image->change_bitmap(Bitmap::load_from(image_path).value());
+        widget_create_from_file(content, content_path);
+    };
+
+    set_current_page(1);
+
     skipall_button->on(Event::ACTION, [](auto) {
         Application::exit(PROCESS_SUCCESS);
     });
 
-    new Spacer(navigation);
+    back_button->on(Event::ACTION, [&](auto) {
+        if (current_page - 1 > 0)
+        {
+            set_current_page(current_page - 1);
+        }
+    });
 
-    new Button(navigation, BUTTON_FILLED, "Next");
+    next_button->on(Event::ACTION, [&](auto) {
+        if (current_page + 1 > 5)
+        {
+            Application::exit(PROCESS_SUCCESS);
+        }
+        else
+        {
+            set_current_page(current_page + 1);
+        }
+    });
 
     return Application::run();
 }

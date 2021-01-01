@@ -26,6 +26,6 @@ void Placeholder::paint(Painter &painter, Recti rectangle)
     painter.draw_string(
         *font(),
         _text.cstring(),
-        bound().position() + Vec2i(32, 10),
+        bound().position() + Vec2i(32, 20),
         color(THEME_FOREGROUND));
 }

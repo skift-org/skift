@@ -56,6 +56,8 @@ public:
 
     void filtering(BitmapFiltering filtering) { _filtering = filtering; }
 
+    static RefPtr<Bitmap> placeholder();
+
     static ResultOr<RefPtr<Bitmap>> create_shared(int width, int height);
 
     static ResultOr<RefPtr<Bitmap>> create_shared_from_handle(int handle, Vec2i width_and_height);

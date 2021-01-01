@@ -164,7 +164,8 @@ int main(int argc, char const *argv[])
     renderer_initialize();
 
     process_run("panel", nullptr);
-    process_run("terminal", nullptr);
+    //process_run("terminal", nullptr);
+    process_run("onboarding", nullptr);
 
     return eventloop_run();
 }

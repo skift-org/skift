@@ -399,3 +399,13 @@ Window *window_create_from_file(const char *path)
 
     return window;
 }
+
+Widget *widget_create_from_file(Widget *parent, const char *path)
+{
+    auto root = markup::parse_file(path);
+
+    auto widget = widget_create_from_markup(parent, root);
+    widget_create_childs_from_markup(widget, root);
+
+    return widget;
+}

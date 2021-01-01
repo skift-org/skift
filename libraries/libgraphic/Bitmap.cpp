@@ -64,6 +64,11 @@ RefPtr<Bitmap> Bitmap::create_static(int width, int height, Color *pixels)
     return make<Bitmap>(-1, BITMAP_STATIC, width, height, pixels);
 }
 
+RefPtr<Bitmap> Bitmap::placeholder()
+{
+    return create_static(2, 2, _placeholder_buffer);
+}
+
 ResultOr<RefPtr<Bitmap>> Bitmap::load_from(const char *path)
 {
     File file{path};
@@ -114,7 +119,7 @@ RefPtr<Bitmap> Bitmap::load_from_or_placeholder(const char *path)
 
     if (!result.success())
     {
-        return create_static(2, 2, _placeholder_buffer);
+        return placeholder();
     }
 
     return result.take_value();

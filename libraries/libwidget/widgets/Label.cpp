@@ -22,7 +22,7 @@ void Label::paint(Painter &painter, Recti rectangle)
     painter.draw_string_within(
         *font(),
         _text.cstring(),
-        bound(),
+        content_bound(),
         _anchor,
         color(THEME_FOREGROUND));
 }

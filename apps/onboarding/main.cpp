@@ -4,6 +4,7 @@
 #include <libwidget/Markup.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/PaginationDots.h>
 
 int main(int argc, char **argv)
 {
@@ -26,7 +27,7 @@ int main(int argc, char **argv)
     auto dialog = new Panel(background);
 
     dialog->max_width(400);
-    dialog->max_height(350);
+    dialog->max_height(400);
     dialog->layout(VFLOW(0));
     dialog->border_radius(6);
 
@@ -43,12 +44,17 @@ int main(int argc, char **argv)
     content->flags(Widget::FILL);
     content->insets(16);
 
+    auto dots_container = new Container(dialog);
+    dots_container->insets(16);
+
+    auto dots = new PaginationDots(dots_container, 5);
+
     auto navigation = new Container(dialog);
 
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = new Button(navigation, BUTTON_TEXT, "Skip all");
+    auto skipall_button = new Button(navigation, BUTTON_TEXT, "Skip All");
 
     new Spacer(navigation);
 
@@ -56,13 +62,14 @@ int main(int argc, char **argv)
 
     auto next_button = new Button(navigation, BUTTON_FILLED, "Next");
 
-    int current_page = 1;
+    int current_page = 0;
 
     auto set_current_page = [&](int index) {
         current_page = index;
 
-        skipall_button->enable_if(current_page < 5);
-        back_button->enable_if(current_page > 1);
+        skipall_button->enable_if(current_page < 4);
+        back_button->enable_if(current_page > 0);
+        dots->index(index);
 
         char image_path[PATH_LENGTH];
         snprintf(image_path, PATH_LENGTH, "/Applications/onboarding/illustration%d.png", index);
@@ -75,21 +82,21 @@ int main(int argc, char **argv)
         widget_create_from_file(content, content_path);
     };
 
-    set_current_page(1);
+    set_current_page(0);
 
     skipall_button->on(Event::ACTION, [](auto) {
         Application::exit(PROCESS_SUCCESS);
     });
 
     back_button->on(Event::ACTION, [&](auto) {
-        if (current_page - 1 > 0)
+        if (current_page > 0)
         {
             set_current_page(current_page - 1);
         }
     });
 
     next_button->on(Event::ACTION, [&](auto) {
-        if (current_page + 1 > 5)
+        if (current_page == 4)
         {
             Application::exit(PROCESS_SUCCESS);
         }

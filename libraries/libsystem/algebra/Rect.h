@@ -303,7 +303,7 @@ public:
         assert(index >= 0);
         assert(column_count > 0);
 
-        int spacing_width = spacing * column_count - 1;
+        int spacing_width = spacing * (column_count - 1);
 
         int available_width = width() - spacing_width;
 

@@ -75,3 +75,5 @@ bool theme_is_dark();
 void theme_load(const char *path);
 
 Color theme_get_color(ThemeColorRole role);
+
+void theme_set_color(ThemeColorRole role, Color color);

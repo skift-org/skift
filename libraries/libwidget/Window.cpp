@@ -257,7 +257,9 @@ void Window::size(Vec2i size)
 void Window::show()
 {
     if (_visible)
+    {
         return;
+    }
 
     _visible = true;
 
@@ -275,7 +277,9 @@ void Window::hide()
     _repaint_invoker->cancel();
 
     if (!_visible)
+    {
         return;
+    }
 
     _visible = false;
     Application::hide_window(this);
@@ -717,7 +721,9 @@ void Window::bound(Recti new_bound)
     _bound = new_bound;
 
     if (!_visible)
+    {
         return;
+    }
 
     Application::resize_window(this, _bound);
     window_change_framebuffer_if_needed(this);

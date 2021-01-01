@@ -145,3 +145,8 @@ Color theme_get_color(ThemeColorRole role)
 {
     return _theme_colors[role];
 }
+
+void theme_set_color(ThemeColorRole role, Color color)
+{
+    _theme_colors[role] = color;
+}

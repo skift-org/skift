@@ -80,4 +80,9 @@ public:
 
         should_repaint();
     }
+
+    virtual Vec2i size()
+    {
+        return {SIZE, SIZE};
+    }
 };

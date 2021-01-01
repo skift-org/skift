@@ -40,9 +40,28 @@ int shell_builtin_exit(int argc, const char **argv)
     ASSERT_NOT_REACHED();
 }
 
+int shell_which(int argc, const char **argv)
+{
+    for (int i = 1; i < argc; i++)
+    {
+        char path[PATH_LENGTH];
+        if (find_command_path(path, argv[i]))
+        {
+            printf("%s\n", path);
+        }
+        else
+        {
+            stream_format(err_stream, "%s: not in POSIX.PATH", argv[i]);
+        }
+    }
+
+    return 0;
+}
+
 static ShellBuiltin _shell_builtins[] = {
     {"cd", shell_builtin_cd},
     {"exit", shell_builtin_exit},
+    {"which", shell_which},
     {nullptr, nullptr},
 };
 

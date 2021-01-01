@@ -12,7 +12,7 @@
 
 #include "shell/Shell.h"
 
-static bool find_command_path(char *buffer, const char *command)
+bool find_command_path(char *buffer, const char *command)
 {
     if (command[0] == '/' ||
         command[0] == '.')

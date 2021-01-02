@@ -35,6 +35,11 @@ And for testing and debugging
 $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools imagemagick
 ```
 
+```sh
+# On Arch or Arch-based distributions
+$ sudo pacman -S qemu qemu-arch-extra qemu-block-gluster qemu-block-iscsi qemu-block-rbd samba nasm gcc make binutils xorriso mtools grub imagemagick
+```
+
 ### About WSL
 
 It's possible to build skiftOS WSL1 and WSL2 but it's not well tested.
@@ -75,6 +80,11 @@ first make sure you have all GCC and binutils dependencies:
 You can run the following command on ubuntu:
 ```sh
 $ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+```
+
+You can run the following command on arch:
+```sh
+$ sudo pacman -S base-devel bison flex gmp libmpc mpfr texinfo
 ```
 
 Then for building the toolchain run the `build-it.sh` script

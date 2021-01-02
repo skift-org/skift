@@ -14,6 +14,6 @@ $(BOOTDISK): $(RAMDISK) $(KERNEL_BINARY) $(DISTRO_DIRECTORY)/limine.cfg $(DISTRO
 	$(ECHFS) -m -p0 $(BOOTDISK) import $(DISTRO_DIRECTORY)/limine.cfg limine.cfg
 	$(ECHFS) -m -p0 $(BOOTDISK) import $(DISTRO_DIRECTORY)/background.bmp background.bmp
 
-	$(LIMINE) $(LIMINE_LOADER) $(BOOTDISK)
+	$(LIMINE) $(BOOTDISK) 1
 
 QEMU_DISK:=-hda $(BOOTDISK)

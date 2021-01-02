@@ -6,6 +6,7 @@ $(ECHFS):
 	make -C thirdparty/echfs/ all
 
 $(LIMINE):
+	make -C thirdparty/limine/ bootloader
 	make -C thirdparty/limine/ limine-install
 
 $(LIMINE_LOADER):

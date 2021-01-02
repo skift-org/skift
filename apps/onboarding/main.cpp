@@ -107,14 +107,19 @@ int main(int argc, char **argv)
     });
 
     window->on(Event::KEYBOARD_KEY_PRESS, [&](Event* event){
-        if(event->keyboard.key == KEYBOARD_KEY_ESC){
+        if(event->keyboard.key == KEYBOARD_KEY_ESC)
+        {
             Application::exit(PROCESS_SUCCESS);
-        }else if(event->keyboard.key == KEYBOARD_KEY_RIGHT){
+        }
+        else if(event->keyboard.key == KEYBOARD_KEY_RIGHT)
+        {
             if (current_page != 4)
             {
                 set_current_page(current_page + 1);
             }
-        }else if(event->keyboard.key == KEYBOARD_KEY_LEFT){
+        }
+        else if(event->keyboard.key == KEYBOARD_KEY_LEFT)
+        {
             if (current_page != 0)
             {
                 set_current_page(current_page - 1);

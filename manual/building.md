@@ -27,12 +27,17 @@ Building skiftOS requires
 - ImageMagick
 
 And for testing and debugging
-- qemu-system-i386
+- qemu
 - gdb
 
 ```sh
 # On Debian or Debian-based distributions
 $ sudo apt install nasm gcc make binutils grub-pc-bin qemu-system-x86 xorriso mtools imagemagick
+```
+
+```sh
+# On Arch or Arch-based distributions
+$ sudo pacman -S nasm gcc make binutils grub qemu libisoburn mtools imagemagick
 ```
 
 ### About WSL
@@ -73,8 +78,15 @@ first make sure you have all GCC and binutils dependencies:
  - texinfo
 
 You can run the following command on ubuntu:
+
 ```sh
+# On Debian or Debian-based distributions
 $ sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo
+```
+
+```sh
+# On Arch or Arch-based distributions
+$ sudo pacman -S base-devel bison flex mpc mpfr texinfo
 ```
 
 Then for building the toolchain run the `build-it.sh` script
@@ -108,9 +120,9 @@ This command will build all the components of the operating system and generate 
 The build system allows you to create and start a virtual machine of skiftOS by using one of the following commands:
 
 ```sh
-$ make run-qemu # for QEMU
+$ make run CONFIG_VMACHINE=qemu # for QEMU
 # or
-$ make run-vbox # for Virtual Box
+$ make run CONFIG_VMACHINE=vbox # for Virtual Box
 ```
 
 ### 5. Tips

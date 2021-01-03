@@ -3,12 +3,12 @@ set -e
 
 # ----- Configs -------------------------------------------------------------- #
 
-BINUTILS_VERSION=2.33.1
+BINUTILS_VERSION=2.35.1
 BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
 BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
 
-GCC_VERSION=10.1.0
+GCC_VERSION=10.2.0
 GCC_DIRECTORY="gcc-$GCC_VERSION"
 GCC_FILENAME="$GCC_DIRECTORY.tar.gz"
 GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"

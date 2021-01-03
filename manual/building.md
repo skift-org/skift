@@ -154,4 +154,4 @@ $ make run CONFIG_VMACHINE=vbox # for Virtual Box
 
 A bug? A Missing feature? Please consider contributing to the project :hugs: ❤️
 
-See [manual/contributing.md](manual/contributing.md)
+See [contributing.md](contributing.md)

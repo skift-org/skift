@@ -586,12 +586,15 @@ void Widget::on(EventType event_type, EventHandler handler)
 
 void Widget::dispatch_event(Event *event)
 {
-    this->event(event);
-
-    if (!event->accepted && _handlers[event->type])
+    if (enabled())
     {
-        event->accepted = true;
-        _handlers[event->type](event);
+        this->event(event);
+
+        if (!event->accepted && _handlers[event->type])
+        {
+            event->accepted = true;
+            _handlers[event->type](event);
+        }
     }
 
     if (!event->accepted && _parent)

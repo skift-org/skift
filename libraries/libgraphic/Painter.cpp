@@ -86,9 +86,9 @@ void Painter::blit_bitmap_fast(Bitmap &bitmap, Recti source, Recti destination)
     if (clipped_destination.is_empty())
         return;
 
-    for (int x = 0; x < clipped_destination.width(); x++)
+    for (int y = 0; y < clipped_destination.height(); y++)
     {
-        for (int y = 0; y < clipped_destination.height(); y++)
+        for (int x = 0; x < clipped_destination.width(); x++)
         {
             Vec2i position(x, y);
 
@@ -104,9 +104,9 @@ void Painter::blit_bitmap_scaled(Bitmap &bitmap, Recti source, Recti destination
     if (destination.is_empty())
         return;
 
-    for (int x = 0; x < destination.width(); x++)
+    for (int y = 0; y < destination.height(); y++)
     {
-        for (int y = 0; y < destination.height(); y++)
+        for (int x = 0; x < destination.width(); x++)
         {
             float xx = x / (float)destination.width();
             float yy = y / (float)destination.height();
@@ -144,9 +144,9 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti dest
     if (clipped_destination.is_empty())
         return;
 
-    for (int x = 0; x < clipped_destination.width(); x++)
+    for (int y = 0; y < clipped_destination.height(); y++)
     {
-        for (int y = 0; y < clipped_destination.height(); y++)
+        for (int x = 0; x < clipped_destination.width(); x++)
         {
             Vec2i position(x, y);
 
@@ -158,9 +158,9 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti dest
 
 void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
-    for (int x = 0; x < destination.width(); x++)
+    for (int y = 0; y < destination.height(); y++)
     {
-        for (int y = 0; y < destination.height(); y++)
+        for (int x = 0; x < destination.width(); x++)
         {
             float xx = x / (float)destination.width();
             float yy = y / (float)destination.height();
@@ -199,9 +199,9 @@ __flatten void Painter::clear_rectangle(Recti rectangle, Color color)
         return;
     }
 
-    for (int x = 0; x < rectangle.width(); x++)
+    for (int y = 0; y < rectangle.height(); y++)
     {
-        for (int y = 0; y < rectangle.height(); y++)
+        for (int x = 0; x < rectangle.width(); x++)
         {
             _bitmap->set_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y), color);
         }
@@ -218,9 +218,9 @@ __flatten void Painter::fill_rectangle(Recti rectangle, Color color)
         return;
     }
 
-    for (int x = 0; x < rectangle.width(); x++)
+    for (int y = 0; y < rectangle.height(); y++)
     {
-        for (int y = 0; y < rectangle.height(); y++)
+        for (int x = 0; x < rectangle.width(); x++)
         {
             _bitmap->blend_pixel_no_check(Vec2i(rectangle.x() + x, rectangle.y() + y), color);
         }
@@ -326,9 +326,9 @@ static float sample_fill_circle(Vec2i center, float radius, Vec2i position)
 
 static void fill_circle_helper(Painter &painter, Recti bound, Vec2i center, int radius, Color color)
 {
-    for (int x = 0; x < bound.width(); x++)
+    for (int y = 0; y < bound.height(); y++)
     {
-        for (int y = 0; y < bound.height(); y++)
+        for (int x = 0; x < bound.width(); x++)
         {
             float distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
             float alpha = color.alphaf() * distance;
@@ -359,9 +359,9 @@ __flatten void Painter::fill_rounded_rectangle(Recti bound, int radius, Color co
 
 __flatten void Painter::fill_checkboard(Recti bound, int cell_size, Color fg_color, Color bg_color)
 {
-    for (int x = 0; x < bound.width(); x++)
+    for (int y = 0; y < bound.height(); y++)
     {
-        for (int y = 0; y < bound.height(); y++)
+        for (int x = 0; x < bound.width(); x++)
         {
             Vec2i position = bound.position() + Vec2i(x, y);
 
@@ -581,9 +581,9 @@ static double sample_draw_circle(Vec2i center, double radius, double thickness, 
 
 void Painter::draw_circle_helper(Recti bound, Vec2i center, int radius, int thickness, Color color)
 {
-    for (int x = 0; x < bound.width(); x++)
+    for (int y = 0; y < bound.height(); y++)
     {
-        for (int y = 0; y < bound.height(); y++)
+        for (int x = 0; x < bound.width(); x++)
         {
             Vec2i position = Vec2i(x, y);
 
@@ -620,9 +620,9 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Recti destination, 
 {
     Bitmap &bitmap = *icon.bitmap(size);
 
-    for (int x = 0; x < destination.width(); x++)
+    for (int y = 0; y < destination.height(); y++)
     {
-        for (int y = 0; y < destination.height(); y++)
+        for (int x = 0; x < destination.width(); x++)
         {
             Vec2f sample_point(
                 x / (double)destination.width(),
@@ -651,9 +651,9 @@ __flatten void Painter::blur_rectangle(Recti rectangle, int radius)
 
 __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
 {
-    for (int x = 0; x < destination.width(); x++)
+    for (int y = 0; y < destination.height(); y++)
     {
-        for (int y = 0; y < destination.height(); y++)
+        for (int x = 0; x < destination.width(); x++)
         {
             Vec2f sample_point(
                 x / (double)destination.width(),

@@ -17,7 +17,7 @@ First thank you for considering contributing to the operating system :hugs: ‚ù§Ô
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [skiftOS Code of Conduct](manual/code_of_conduct.md). By participating, you are expected to uphold this code.
+This project and everyone participating in it is governed by the [skiftOS Code of Conduct](code_of_conduct.md). By participating, you are expected to uphold this code.
 Please report unacceptable behavior to [conduct@skiftos.org](mailto:conduct@skiftos.org).
 
 # How Can I Contribute?

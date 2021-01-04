@@ -52,9 +52,6 @@ void manager_iterate_front_to_back(Callback callback)
     if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)
         return;
 
-    if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_DIALOG, callback) == Iteration::STOP)
-        return;
-
     if (manager_iterate_by_type_front_to_back(WINDOW_TYPE_REGULAR, callback) == Iteration::STOP)
         return;
 
@@ -86,9 +83,6 @@ void manager_iterate_back_to_front(Callback callback)
         return;
 
     if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_REGULAR, callback) == Iteration::STOP)
-        return;
-
-    if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_DIALOG, callback) == Iteration::STOP)
         return;
 
     if (manager_iterate_by_type_back_to_front(WINDOW_TYPE_PANEL, callback) == Iteration::STOP)

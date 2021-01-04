@@ -33,8 +33,6 @@ void flip_window(Window *window, Recti bound);
 
 void move_window(Window *window, Vec2i position);
 
-void resize_window(Window *window, Recti bound);
-
 void window_change_cursor(Window *window, CursorState state);
 
 Vec2i mouse_position();

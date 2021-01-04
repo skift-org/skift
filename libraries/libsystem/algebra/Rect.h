@@ -111,6 +111,19 @@ public:
     {
     }
 
+    bool operator==(const Rect &other)
+    {
+        return _x == other._x &&
+               _y == other._y &&
+               _width == other._width &&
+               _height == other._height;
+    }
+
+    bool operator!=(const Rect &other)
+    {
+        return !(*this == other);
+    }
+
     Rect with_width(int width) const
     {
         Rect new_rect = Rect(*this);

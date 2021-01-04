@@ -730,7 +730,6 @@ void Window::bound(Recti new_bound)
         return;
     }
 
-    Application::resize_window(this, _bound);
     window_change_framebuffer_if_needed(this);
 
     should_relayout();

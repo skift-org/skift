@@ -56,19 +56,6 @@ void client_handle_destroy_window(Client *client, CompositorDestroyWindow destro
     delete window;
 }
 
-void client_handle_resize_window(Client *client, CompositorResizeWindow resize_window)
-{
-    Window *window = manager_get_window(client, resize_window.id);
-
-    if (!window)
-    {
-        logger_warn("Invalid window id %d for client %08x", resize_window.id, client);
-        return;
-    }
-
-    window->resize(resize_window.bound);
-}
-
 void client_handle_move_window(Client *client, CompositorMoveWindow move_window)
 {
     Window *window = manager_get_window(client, move_window.id);
@@ -92,7 +79,8 @@ void client_handle_flip_window(Client *client, CompositorFlipWindow flip_window)
         return;
     }
 
-    window->flip_buffers(flip_window.frontbuffer, flip_window.frontbuffer_size, flip_window.backbuffer, flip_window.backbuffer_size, flip_window.bound);
+    window->resize(flip_window.bound);
+    window->flip_buffers(flip_window.frontbuffer, flip_window.frontbuffer_size, flip_window.backbuffer, flip_window.backbuffer_size, flip_window.dirty);
 
     CompositorMessage message = {};
     message.type = COMPOSITOR_MESSAGE_ACK;
@@ -191,10 +179,6 @@ void client_request_callback(Client *client, Connection *connection, PollEvent e
 
     case COMPOSITOR_MESSAGE_DESTROY_WINDOW:
         client_handle_destroy_window(client, message.destroy_window);
-        break;
-
-    case COMPOSITOR_MESSAGE_RESIZE_WINDOW:
-        client_handle_resize_window(client, message.resize_window);
         break;
 
     case COMPOSITOR_MESSAGE_MOVE_WINDOW:

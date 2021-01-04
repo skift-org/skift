@@ -14,7 +14,6 @@ enum CompositorMessageType
 
     COMPOSITOR_MESSAGE_CREATE_WINDOW,
     COMPOSITOR_MESSAGE_DESTROY_WINDOW,
-    COMPOSITOR_MESSAGE_RESIZE_WINDOW,
     COMPOSITOR_MESSAGE_MOVE_WINDOW,
     COMPOSITOR_MESSAGE_FLIP_WINDOW,
     COMPOSITOR_MESSAGE_EVENT_WINDOW,
@@ -30,7 +29,6 @@ enum CompositorMessageType
 #define WINDOW_BORDERLESS (1 << 0)
 #define WINDOW_RESIZABLE (1 << 1)
 #define WINDOW_ALWAYS_FOCUSED (1 << 2)
-#define WINDOW_SWALLOW (1 << 3)
 #define WINDOW_TRANSPARENT (1 << 4)
 #define WINDOW_NO_FOCUS (1 << 5)
 
@@ -40,7 +38,6 @@ enum WindowType
 {
     WINDOW_TYPE_POPOVER,
     WINDOW_TYPE_PANEL,
-    WINDOW_TYPE_DIALOG,
     WINDOW_TYPE_REGULAR,
     WINDOW_TYPE_DESKTOP,
 };
@@ -74,13 +71,6 @@ struct CompositorDestroyWindow
     int id;
 };
 
-struct CompositorResizeWindow
-{
-    int id;
-
-    Recti bound;
-};
-
 struct CompositorMoveWindow
 {
     int id;
@@ -97,6 +87,7 @@ struct CompositorFlipWindow
     int backbuffer;
     Vec2i backbuffer_size;
 
+    Recti dirty;
     Recti bound;
 };
 
@@ -146,7 +137,6 @@ struct CompositorMessage
         CompositorEvent event;
         CompositorCreateWindow create_window;
         CompositorDestroyWindow destroy_window;
-        CompositorResizeWindow resize_window;
         CompositorMoveWindow move_window;
         CompositorFlipWindow flip_window;
         CompositorEventWindow event_window;

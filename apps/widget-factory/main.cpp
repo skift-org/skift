@@ -13,6 +13,7 @@ int main(int argc, char **argv)
     window->size(Vec2i(500, 400));
 
     window->root()->layout(VFLOW(8));
+    window->root()->insets(4);
 
     new Panel(window->root());
     new Panel(window->root());

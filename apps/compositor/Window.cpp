@@ -60,11 +60,13 @@ void Window::move(Vec2i new_position)
 
 void Window::resize(Recti new_bound)
 {
-    renderer_region_dirty(bound());
 
-    _bound = new_bound;
-
-    renderer_region_dirty(bound());
+    if (_bound != new_bound)
+    {
+        renderer_region_dirty(bound());
+        _bound = new_bound;
+        renderer_region_dirty(bound());
+    }
 }
 
 void Window::send_event(Event event)

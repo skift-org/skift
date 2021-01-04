@@ -340,7 +340,7 @@ void hide_window(Window *window)
     exit_if_all_windows_are_closed();
 }
 
-void flip_window(Window *window, Recti bound)
+void flip_window(Window *window, Recti dirty)
 {
     assert(_state >= State::INITALIZED);
     assert(list_contains(_windows, window));
@@ -353,7 +353,8 @@ void flip_window(Window *window, Recti bound)
             .frontbuffer_size = window->frontbuffer->size(),
             .backbuffer = window->backbuffer_handle(),
             .backbuffer_size = window->frontbuffer->size(),
-            .bound = bound,
+            .dirty = dirty,
+            .bound = window->bound_on_screen(),
         },
     };
 
@@ -371,22 +372,6 @@ void move_window(Window *window, Vec2i position)
         .move_window = {
             .id = window->handle(),
             .position = position,
-        },
-    };
-
-    send_message(message);
-}
-
-void resize_window(Window *window, Recti bound)
-{
-    assert(_state >= State::INITALIZED);
-    assert(list_contains(_windows, window));
-
-    CompositorMessage message = {
-        .type = COMPOSITOR_MESSAGE_RESIZE_WINDOW,
-        .resize_window = {
-            .id = window->handle(),
-            .bound = bound,
         },
     };
 

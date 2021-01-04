@@ -354,11 +354,6 @@ WindowFlag window_flags_from_markup(markup::Node &node)
         flags |= WINDOW_ALWAYS_FOCUSED;
     }
 
-    if (node.has_attribute("swallow"))
-    {
-        flags |= WINDOW_SWALLOW;
-    }
-
     if (node.has_attribute("transparent"))
     {
         flags |= WINDOW_TRANSPARENT;

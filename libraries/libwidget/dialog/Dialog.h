@@ -55,7 +55,7 @@ public:
 
         _window = new Window(WINDOW_NONE);
 
-        _window->type(WINDOW_TYPE_DIALOG);
+        _window->type(WINDOW_TYPE_POPOVER);
         _window->title(_title);
 
         _window->on(Event::WINDOW_CLOSING, [&](auto) {

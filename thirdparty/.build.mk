@@ -3,16 +3,11 @@ LIMINE:=thirdparty/limine/limine-install
 LIMINE_LOADER:=thirdparty/limine/limine.bin
 
 $(ECHFS):
-	make -C thirdparty/echfs/ all
+	cd thirdparty/echfs/ && $(MAKE) all
 
 $(LIMINE):
-	make -C thirdparty/limine/ bootloader && make -C thirdparty/limine/ limine-install
+	cd thirdparty/limine/ && $(MAKE) bootloader && $(MAKE) limine-install
 
 $(LIMINE_LOADER):
-	make -C thirdparty/limine/ bootloader && make -C thirdparty/limine/ all
-	
+	cd thirdparty/limine/ && $(MAKE) bootloader && $(MAKE) all
 
-.PHONY: \
-	$(ECHFS) \
-	$(LIMINE) \
-	$(LIMINE_LOADER)

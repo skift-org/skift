@@ -38,6 +38,10 @@ jobs:
       run: |
         toolchain/build-it.sh
 
+    - name: Dumping environement
+      run: |
+        toolchain/dump-it.sh
+
     - name: Building skiftOS (x86_32)
       run: |
           make clean

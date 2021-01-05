@@ -3,8 +3,8 @@
 
     <Container padding="insets(8, 0)" layout="vflow(2)">
         <Label text="Do you like skiftOS and want it to become even better?" anchor="center"/>
-        <Label text="Then there is four way to contribute to the project:" anchor="center"/>
-        <Label text="contributing code, reporting issues, donations and sponsorship" anchor="center"/>
+        <Label text="Then there are many ways to contribute to the project:" anchor="center"/>
+        <Label text="contributing code, reporting issues, donations and sponsorship." anchor="center"/>
     </Container>
 
     <Label text="https://skiftos.org/contributing" anchor="center"/>

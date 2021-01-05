@@ -151,6 +151,13 @@ int main(int argc, char **argv)
 
     new Separator(window->root());
 
+    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
+        if (event->keyboard.key == KEYBOARD_KEY_ESC)
+        {
+            Application::exit(PROCESS_SUCCESS);
+        }
+    });
+
     window->show();
 
     return Application::run();

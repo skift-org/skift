@@ -65,6 +65,16 @@ int main(int argc, char **argv)
     int current_page = 0;
 
     auto set_current_page = [&](int index) {
+        if (index == 5)
+        {
+            Application::exit(PROCESS_SUCCESS);
+        }
+
+        if (index < 0 || index > 4)
+        {
+            return;
+        }
+
         current_page = index;
 
         skipall_button->enable_if(current_page < 4);
@@ -89,21 +99,11 @@ int main(int argc, char **argv)
     });
 
     back_button->on(Event::ACTION, [&](auto) {
-        if (current_page > 0)
-        {
-            set_current_page(current_page - 1);
-        }
+        set_current_page(current_page - 1);
     });
 
     next_button->on(Event::ACTION, [&](auto) {
-        if (current_page == 4)
-        {
-            Application::exit(PROCESS_SUCCESS);
-        }
-        else
-        {
-            set_current_page(current_page + 1);
-        }
+        set_current_page(current_page + 1);
     });
 
     window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
@@ -113,17 +113,11 @@ int main(int argc, char **argv)
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
-            if (current_page != 4)
-            {
-                set_current_page(current_page + 1);
-            }
+            set_current_page(current_page + 1);
         }
         else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
-            if (current_page != 0)
-            {
-                set_current_page(current_page - 1);
-            }
+            set_current_page(current_page - 1);
         }
     });
 

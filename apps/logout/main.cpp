@@ -13,7 +13,6 @@ int main(int argc, char **argv)
     window->type(WINDOW_TYPE_POPOVER);
     window->bound(Screen::bound());
     window->opacity(0);
-    window->show();
     window->root()->layout(STACK());
 
     auto background = new Panel(window->root());
@@ -66,6 +65,15 @@ int main(int argc, char **argv)
     cancel_button->on(EventType::ACTION, [&](auto) {
         window->hide();
     });
+
+    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
+        if (event->keyboard.key == KEYBOARD_KEY_ESC)
+        {
+            Application::exit(PROCESS_SUCCESS);
+        }
+    });
+
+    window->show();
 
     return Application::run();
 }

@@ -1,12 +1,12 @@
 #include <libwidget/Application.h>
-#include <libwidget/Markup.h>
-#include <libwidget/Widgets.h>
+
+#include "settings/windows/MainWindow.h"
 
 int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    Window *window = window_create_from_file("/Applications/settings/settings.markup");
+    auto window = new settings::MainWindow();
     window->show();
 
     return Application::run();

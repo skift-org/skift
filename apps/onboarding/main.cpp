@@ -1,5 +1,3 @@
-#include <abi/Syscalls.h>
-
 #include <libwidget/Application.h>
 #include <libwidget/Markup.h>
 #include <libwidget/Screen.h>
@@ -13,7 +11,7 @@ int main(int argc, char **argv)
     Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
 
     window->title("Onboarding");
-    window->type(WINDOW_TYPE_PANEL);
+    window->type(WINDOW_TYPE_POPOVER);
     window->bound(Screen::bound());
     window->opacity(0);
     window->show();
@@ -23,11 +21,13 @@ int main(int argc, char **argv)
 
     background->layout(STACK());
     background->color(THEME_MIDDLEGROUND, Colors::BLACK.with_alpha(0.5));
+    background->flags(Widget::FILL);
 
     auto dialog = new Panel(background);
 
-    dialog->max_width(400);
-    dialog->max_height(400);
+    dialog->min_width(400);
+    dialog->min_height(400);
+
     dialog->layout(VFLOW(0));
     dialog->border_radius(6);
 
@@ -106,19 +106,19 @@ int main(int argc, char **argv)
         }
     });
 
-    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event* event){
-        if(event->keyboard.key == KEYBOARD_KEY_ESC)
+    window->on(Event::KEYBOARD_KEY_PRESS, [&](Event *event) {
+        if (event->keyboard.key == KEYBOARD_KEY_ESC)
         {
             Application::exit(PROCESS_SUCCESS);
         }
-        else if(event->keyboard.key == KEYBOARD_KEY_RIGHT)
+        else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
             if (current_page != 4)
             {
                 set_current_page(current_page + 1);
             }
         }
-        else if(event->keyboard.key == KEYBOARD_KEY_LEFT)
+        else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
             if (current_page != 0)
             {

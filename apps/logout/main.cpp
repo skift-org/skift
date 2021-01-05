@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
     Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
 
-    window->type(WINDOW_TYPE_PANEL);
+    window->type(WINDOW_TYPE_POPOVER);
     window->bound(Screen::bound());
     window->opacity(0);
     window->show();
@@ -20,11 +20,12 @@ int main(int argc, char **argv)
 
     background->layout(STACK());
     background->color(THEME_MIDDLEGROUND, Colors::BLACK.with_alpha(0.5));
+    background->flags(Widget::FILL);
 
     auto dialog = new Container(background);
 
-    dialog->max_width(256);
-    dialog->max_height(256);
+    dialog->min_width(256);
+    dialog->min_height(256);
     dialog->layout(VFLOW(8));
 
     auto icon_and_title_container = new Panel(dialog);

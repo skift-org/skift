@@ -92,26 +92,34 @@ void Widget::do_layout()
     case LAYOUT_STACK:
     {
         _childs.foreach ([this](Widget *child) {
-            auto bound = content_bound();
-
-            if (child->max_width() || child->max_height())
+            if (child->flags() & FILL)
             {
+                auto bound = content_bound();
 
-                if (child->max_width() > 0 && bound.width() > child->max_width())
+                if (child->max_width() || child->max_height())
                 {
-                    bound = bound.with_width(child->max_width());
-                }
+                    if (child->max_width() > 0 && bound.width() > child->max_width())
+                    {
+                        bound = bound.with_width(child->max_width());
+                    }
 
-                if (child->max_height() > 0 && bound.height() > child->max_height())
+                    if (child->max_height() > 0 && bound.height() > child->max_height())
+                    {
+                        bound = bound.with_height(child->max_height());
+                    }
+
+                    child->bound(bound.centered_within(content_bound()));
+                }
+                else
                 {
-                    bound = bound.with_height(child->max_height());
+                    child->bound(content_bound());
                 }
-
-                child->bound(bound.centered_within(content_bound()));
             }
             else
             {
-                child->bound(content_bound());
+                auto size = child->compute_size();
+
+                child->bound(Recti{{}, size}.centered_within(content_bound()));
             }
 
             return Iteration::CONTINUE;
@@ -363,6 +371,23 @@ Vec2i Widget::size()
 
             return Iteration::CONTINUE;
         });
+    }
+    else if (_layout.type == LAYOUT_GRID)
+    {
+        _childs.foreach ([&](auto child) {
+            Vec2i child_size = child->compute_size();
+
+            width = MAX(width, child_size.x());
+            height = MAX(height, child_size.y());
+
+            return Iteration::CONTINUE;
+        });
+
+        width = width * _layout.hcell;
+        height = height * _layout.vcell;
+
+        width += _layout.spacing.x() * _layout.hcell;
+        height += _layout.spacing.y() * _layout.vcell;
     }
     else
     {

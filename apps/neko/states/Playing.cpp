@@ -26,10 +26,11 @@ void Playing::update(Neko &neko)
     {
         neko.behavior(own<Idle>());
     }
-
-    _last_mouse_position = new_mouse_position;
-
-    neko.did_update();
+    else
+    {
+        _last_mouse_position = new_mouse_position;
+        neko.did_update();
+    }
 }
 
 Animation Playing::animation(Neko &)

@@ -26,10 +26,11 @@ void Yawning::update(Neko &neko)
     {
         neko.behavior(own<Sleep>());
     }
-
-    _last_mouse_position = new_mouse_position;
-
-    neko.did_update();
+    else
+    {
+        _last_mouse_position = new_mouse_position;
+        neko.did_update();
+    }
 }
 
 Animation Yawning::animation(Neko &)

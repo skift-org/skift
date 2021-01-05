@@ -22,10 +22,11 @@ void Sleep::update(Neko &neko)
     {
         neko.behavior(own<Surprised>());
     }
-
-    _last_mouse_position = new_mouse_position;
-
-    neko.did_update();
+    else
+    {
+        _last_mouse_position = new_mouse_position;
+        neko.did_update();
+    }
 }
 
 Animation Sleep::animation(Neko &)

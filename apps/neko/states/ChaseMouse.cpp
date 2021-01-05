@@ -20,12 +20,9 @@ ChaseMouse::ChaseMouse()
 
 void ChaseMouse::update(Neko &neko)
 {
-    auto distance = neko.position().distance_to(_destination);
+    _destination = pick_destination();
 
-    if (neko.tick() % 16)
-    {
-        _destination = pick_destination();
-    }
+    auto distance = neko.position().distance_to(_destination);
 
     if (distance)
     {

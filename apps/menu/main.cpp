@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     Vector<MenuEntry> entries{};
     load_menu(entries);
 
-    auto window = new Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT);
+    auto window = new Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT | WINDOW_AUTO_CLOSE);
 
     window->title("Panel");
     window->position(Vec2i::zero());

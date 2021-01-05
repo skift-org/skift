@@ -18,7 +18,7 @@ void window_populate_header(Window *window)
     window->header_container->clear_children();
 
     window->header()->layout(HFLOW(4));
-    window->header()->insets(Insets(6, 6));
+    window->header()->insets({6, 6});
 
     new Button(
         window->header(),
@@ -32,10 +32,10 @@ void window_populate_header(Window *window)
     if (window->_flags & WINDOW_RESIZABLE)
     {
         Widget *button_minimize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-minimize"));
-        button_minimize->insets(Insets(3));
+        button_minimize->insets(3);
 
         Widget *button_maximize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-maximize"));
-        button_maximize->insets(Insets(3));
+        button_maximize->insets(3);
         button_maximize->on(Event::ACTION, [window](auto) {
             Event maximise_event = {};
             maximise_event.type = Event::WINDOW_MAXIMIZING;
@@ -44,7 +44,7 @@ void window_populate_header(Window *window)
     }
 
     Widget *close_button = new Button(window->header(), BUTTON_TEXT, Icon::get("window-close"));
-    close_button->insets(Insets(3));
+    close_button->insets(3);
 
     close_button->on(Event::ACTION, [window](auto) {
         Event close_event = {};
@@ -412,20 +412,22 @@ void Window::dispatch_event(Event *event)
 
     case Event::LOST_FOCUS:
     {
-        _focused = false;
-        should_repaint(bound());
-
-        Event mouse_leave = *event;
-        mouse_leave.type = Event::MOUSE_LEAVE;
-
-        if (mouse_over_widget)
-        {
-            mouse_over_widget->dispatch_event(&mouse_leave);
-        }
-
-        if (_type == WINDOW_TYPE_POPOVER)
+        if (_flags & WINDOW_AUTO_CLOSE)
         {
             hide();
+        }
+        else
+        {
+            _focused = false;
+            should_repaint(bound());
+
+            Event mouse_leave = *event;
+            mouse_leave.type = Event::MOUSE_LEAVE;
+
+            if (mouse_over_widget)
+            {
+                mouse_over_widget->dispatch_event(&mouse_leave);
+            }
         }
     }
     break;

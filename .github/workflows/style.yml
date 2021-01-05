@@ -22,5 +22,5 @@ jobs:
 
     - run: |
         for changed_file in ${{ steps.files.outputs.all }}; do
-          clang-tidy "${changed_file}" --checks="google-readability-braces-around-statements" --format-style=./.clang-format --warnings-as-errors="*"
+          clang-tidy "${changed_file}" -- -I. -Ilibraries -Iapps -Ikernel -Ilibraries/libc/ -std=c++20
         done

@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
+    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC);
 
     window->title("Onboarding");
     window->type(WINDOW_TYPE_POPOVER);

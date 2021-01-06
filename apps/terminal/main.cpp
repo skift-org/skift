@@ -10,11 +10,12 @@ int main(int argc, char **argv)
 
     theme_set_color(THEME_BACKGROUND, theme_get_color(THEME_ANSI_BACKGROUND));
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    Window *window = new Window(WINDOW_RESIZABLE | WINDOW_ACRYLIC);
 
     window->icon(Icon::get("console-line"));
     window->title("Terminal");
     window->size(Vec2i(700, 500));
+    window->opacity(0.9);
 
     window->root()->insets(Insetsi{0, 6, 6, 6});
     window->root()->layout(HFLOW(0));

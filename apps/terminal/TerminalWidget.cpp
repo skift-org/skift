@@ -70,8 +70,6 @@ TerminalWidget::~TerminalWidget()
 
 void TerminalWidget::paint(Painter &painter, Recti rectangle)
 {
-    painter.clear_rectangle(rectangle, color(THEME_ANSI_BACKGROUND));
-
     painter.push();
     painter.transform(bound().position());
 

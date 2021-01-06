@@ -62,7 +62,16 @@ int main(int argc, char **argv)
         new Panel(panel_grid);
         new Slider(panel_grid);
         new Panel(panel_grid);
-        new Panel(panel_grid);
+
+        auto acrylic_button = new Button(panel_grid, BUTTON_FILLED, "Open acrylic window !");
+        acrylic_button->on(Event::ACTION, [&](auto) {
+            Window *window = new Window(WINDOW_ACRYLIC);
+
+            window->title("Acrylic!");
+            window->opacity(0.85);
+
+            window->show();
+        });
 
         new Button(panel_grid, BUTTON_FILLED, "Grid layout!");
 

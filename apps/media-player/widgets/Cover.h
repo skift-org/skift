@@ -21,8 +21,8 @@ public:
 
         Painter painter(_bitmap_scaled_and_blur);
         painter.blit_bitmap(*_bitmap, _bitmap->bound(), _bitmap->bound().cover(_bitmap_scaled_and_blur->bound()));
-        painter.blur_rectangle(_bitmap_scaled_and_blur->bound(), 8);
         painter.saturation(_bitmap_scaled_and_blur->bound(), 1);
+        painter.blur_rectangle(_bitmap_scaled_and_blur->bound(), 8);
     }
 
     void paint(Painter &painter, Recti) override

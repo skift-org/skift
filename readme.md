@@ -5,7 +5,8 @@
   <a href="https://discord.gg/gamGsfg">Discord</a> -
   <a href="https://skiftos.org/">Website</a> -
   <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
-  <a href="manual/readme.md">Manual</a>
+  <a href="manual/readme.md">Manual</a> -
+  <a href="manual/running_vm.md">Run as VM</a>
 </p>
 <p align="center">
   <b>Notice!</b> We've moved the project to C++ recently, so don't expect it to be idiomatic yet. There is still a lot of work to be done, and any help is very appreciated :)
@@ -23,6 +24,7 @@
  - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
  - **skiftOS** is constantly updated, for the latest release `.img` of skiftOS, click [here](https://github.com/skiftOS/skift/releases/latest).
  - **skiftOS** is also pretty easy to build from source, just follow the [build guide](./manual/building.md).
+ - **skiftOS** can function as a virtual machine, click [here](./manual/running_vm.md) to set up an instance on Virtual Box.
  - **skiftOS** is capable of running on real hardware.
  - **skiftOS** is a labor of love.
  - **skiftOS** features a graphical user interface (GUI), with a compositor.
@@ -63,6 +65,7 @@ skiftOS running in QEMU 5.1
 - [Building](manual/building.md) **(start here if you are new)**
 - [Contributing](manual/contributing.md)
 - [Code of conduct](manual/code_of_conduct.md)
+- [Running on Virtual Box](manuals/running_vm.md) **(click here to experience skiftOS)**
 
 # Acknowledgements
 

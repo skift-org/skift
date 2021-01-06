@@ -5,6 +5,7 @@
 #include <libsystem/process/Environment.h>
 #include <libsystem/process/Process.h>
 #include <libsystem/system/System.h>
+
 #include <libwidget/Application.h>
 #include <libwidget/Menu.h>
 #include <libwidget/Screen.h>
@@ -16,12 +17,12 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_TRANSPARENT);
+    Window *window = new Window(WINDOW_BORDERLESS | WINDOW_ALWAYS_FOCUSED | WINDOW_ACRYLIC);
 
     window->title("Panel");
     window->type(WINDOW_TYPE_PANEL);
     window->bound(Screen::bound().take_top(PANEL_HEIGHT));
-    window->opacity(0.95);
+    window->opacity(0.85);
     window->on(Event::DISPLAY_SIZE_CHANGED, [&](auto) {
         window->bound(Screen::bound().take_top(PANEL_HEIGHT));
     });

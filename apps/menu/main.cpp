@@ -107,13 +107,13 @@ int main(int argc, char **argv)
     Vector<MenuEntry> entries{};
     load_menu(entries);
 
-    auto window = new Window(WINDOW_BORDERLESS | WINDOW_TRANSPARENT | WINDOW_AUTO_CLOSE);
+    auto window = new Window(WINDOW_BORDERLESS | WINDOW_ACRYLIC | WINDOW_AUTO_CLOSE);
 
     window->title("Panel");
     window->position(Vec2i::zero());
     window->bound(Screen::bound().with_width(320));
     window->type(WINDOW_TYPE_POPOVER);
-    window->opacity(0.95);
+    window->opacity(0.85);
 
     window->root()->layout(HFLOW(0));
 

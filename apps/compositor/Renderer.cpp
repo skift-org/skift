@@ -6,15 +6,18 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
+#include "compositor/model/Wallpaper.h"
+
 static OwnPtr<Framebuffer> _framebuffer;
-static RefPtr<Bitmap> _wallpaper;
+static OwnPtr<compositor::Wallpaper> _wallpaper;
 
 static Vector<Recti> _dirty_regions;
 
 void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
-    _wallpaper = Bitmap::load_from_or_placeholder("/Files/Wallpapers/mountains.png");
+    _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
+    _wallpaper->change_image(Bitmap::load_from_or_placeholder("/Files/Wallpapers/mountains.png"));
 
     renderer_region_dirty(_framebuffer->resolution());
 }
@@ -61,16 +64,7 @@ void renderer_region_dirty(Recti new_region)
 
 void renderer_composite_wallpaper(Recti region)
 {
-    double scale_x = _wallpaper->width() / (double)_framebuffer->resolution().width();
-    double scale_y = _wallpaper->height() / (double)_framebuffer->resolution().height();
-
-    Recti source(
-        region.x() * scale_x,
-        region.y() * scale_y,
-        region.width() * scale_x,
-        region.height() * scale_y);
-
-    _framebuffer->painter().blit_bitmap_no_alpha(*_wallpaper, source, region);
+    _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->scaled(), region, region);
     _framebuffer->mark_dirty(region);
 }
 
@@ -122,7 +116,11 @@ void renderer_region(Recti region)
             if (window->flags() & WINDOW_TRANSPARENT)
             {
                 renderer_composite_region(destination, window);
-                //_framebuffer->painter().blur_rectangle(destination, 48);
+                _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+            }
+            else if (window->flags() & WINDOW_ACRYLIC)
+            {
+                _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->acrylic(), region, region);
                 _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
             }
             else
@@ -192,8 +190,6 @@ bool renderer_set_resolution(int width, int height)
 
 void renderer_set_wallaper(RefPtr<Bitmap> wallaper)
 {
-    _wallpaper = wallaper;
-    _wallpaper->filtering(BITMAP_FILTERING_LINEAR);
-
+    _wallpaper->change_image(wallaper);
     renderer_region_dirty(renderer_bound());
 }

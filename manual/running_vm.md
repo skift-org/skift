@@ -18,8 +18,6 @@
 
   ![Steps 5-8 gif](./screenshots/vm_step1.gif)
 
-## Final few Steps!
-
 9. Click on **Settings**, go to **Display** and increase **Video Memory** to 32MB.
 10. Next, click on **Storage** and under storage devices, click on the icon that looks like a _hard disk_ (located next to the CD icon) and in the window that appears,click on **Add**.
 11. Navigate to the `.hdd` file created in Step 3 and **choose** the file.

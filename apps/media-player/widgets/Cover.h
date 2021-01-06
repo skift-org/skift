@@ -11,20 +11,25 @@ class Cover : public Widget
 {
 private:
     RefPtr<Bitmap> _bitmap;
+    RefPtr<Bitmap> _bitmap_scaled_and_blur;
 
 public:
     Cover(Widget *parent, RefPtr<Bitmap> bitmap)
         : Widget(parent), _bitmap(bitmap)
     {
+        _bitmap_scaled_and_blur = Bitmap::create_shared(64, 64).value();
+
+        Painter painter(_bitmap_scaled_and_blur);
+        painter.blit_bitmap(*_bitmap, _bitmap->bound(), _bitmap->bound().cover(_bitmap_scaled_and_blur->bound()));
+        painter.blur_rectangle(_bitmap_scaled_and_blur->bound(), 8);
+        painter.saturation(_bitmap_scaled_and_blur->bound(), 1);
     }
 
     void paint(Painter &painter, Recti) override
     {
-        painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), _bitmap->bound().cover(bound()));
+        painter.blit_bitmap_no_alpha(*_bitmap_scaled_and_blur, _bitmap_scaled_and_blur->bound(), _bitmap_scaled_and_blur->bound().cover(bound()));
 
-        painter.fill_rectangle(bound(), Colors::BLACK.with_alpha(0.5));
-        painter.fill_rectangle(Recti{0, 0, 256, 256}.centered_within(bound()).offset({0, 8}), Colors::BLACK.with_alpha(0.5));
-        painter.blur_rectangle(bound(), 16);
+        painter.fill_rectangle(bound(), Colors::BLACK.with_alpha(0.8));
 
         painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), Recti{0, 0, 256, 256}.centered_within(bound()));
         painter.draw_rectangle(Recti{0, 0, 256, 256}.centered_within(bound()), Colors::WHITE.with_alpha(0.25));

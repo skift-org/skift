@@ -134,7 +134,9 @@ public:
         region = region.clipped_with(bound());
 
         if (region.is_empty())
+        {
             return;
+        }
 
         for (int y = region.y(); y < region.y() + region.height(); y++)
         {

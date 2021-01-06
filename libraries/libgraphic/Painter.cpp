@@ -158,15 +158,37 @@ void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti dest
 
 void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
-    for (int y = 0; y < destination.height(); y++)
+    if (destination.is_empty())
     {
-        for (int x = 0; x < destination.width(); x++)
-        {
-            float xx = x / (float)destination.width();
-            float yy = y / (float)destination.height();
+        return;
+    }
 
-            Color sample = bitmap.sample(source, Vec2f(xx, yy));
-            plot_pixel(destination.position() + Vec2i(x, y), sample);
+    Recti transformed_destination = apply_transform(destination);
+    Recti clipped_destination = apply_clip(transformed_destination);
+
+    if (clipped_destination.is_empty())
+    {
+        return;
+    }
+
+    double scalex = clipped_destination.width() / (double)destination.width();
+    double scaley = clipped_destination.height() / (double)destination.height();
+
+    double other_scalex = source.width() / (double)destination.width();
+    double other_scaley = source.height() / (double)destination.height();
+
+    Recti clipped_source = source.scaled(scalex, scaley);
+    clipped_source = clipped_source.offset((clipped_destination.position() - transformed_destination.position()) * Vec2d{other_scalex, other_scaley});
+
+    for (int y = 0; y < clipped_destination.height(); y++)
+    {
+        for (int x = 0; x < clipped_destination.width(); x++)
+        {
+            float xx = x / (float)clipped_destination.width();
+            float yy = y / (float)clipped_destination.height();
+
+            Color sample = bitmap.sample(clipped_source, Vec2f(xx, yy));
+            plot_pixel(clipped_destination.position() + Vec2i(x, y), sample);
         }
     }
 }

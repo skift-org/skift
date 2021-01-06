@@ -475,6 +475,16 @@ public:
 
         return {rect.center() - scaled_rect.center(), scaled_rect.size()};
     }
+
+    Rect scaled(double scalex, double scaley)
+    {
+        return {
+            x(),
+            y(),
+            (Scalar)(width() * scalex),
+            (Scalar)(height() * scaley),
+        };
+    }
 };
 
 using Recti = Rect<int>;

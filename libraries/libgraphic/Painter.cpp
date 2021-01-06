@@ -671,6 +671,29 @@ __flatten void Painter::blur_rectangle(Recti rectangle, int radius)
               rectangle.y(), rectangle.y() + rectangle.height());
 }
 
+__flatten void Painter::saturation(Recti rectangle, float value)
+{
+    for (int y = 0; y < rectangle.height(); y++)
+    {
+        for (int x = 0; x < rectangle.width(); x++)
+        {
+            Color color = _bitmap->get_pixel({x, y});
+
+            // weights from CCIR 601 spec
+            // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
+            double gray = 0.2989 * color.red() + 0.5870 * color.green() + 0.1140 * color.blue();
+
+            uint8_t red = (uint8_t)clamp(-gray * value + color.red() * (1 + value), 0, 255);
+            uint8_t green = (uint8_t)clamp(-gray * value + color.green() * (1 + value), 0, 255);
+            uint8_t blue = (uint8_t)clamp(-gray * value + color.blue() * (1 + value), 0, 255);
+
+            color = Color::from_byte(red, green, blue);
+
+            plot_pixel({x, y}, color);
+        }
+    }
+}
+
 __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
 {
     for (int y = 0; y < destination.height(); y++)

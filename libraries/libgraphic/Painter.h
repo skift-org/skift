@@ -74,8 +74,13 @@ public:
 
     void blur_rectangle(Recti rectangle, int radius);
 
+    void saturation(Recti rectangle, float value);
+
 private:
-    Recti clip() { return _state_stack[_state_stack_top].clip; }
+    Recti clip()
+    {
+        return _state_stack[_state_stack_top].clip;
+    }
 
     Vec2i origine() { return _state_stack[_state_stack_top].origine; };
 

@@ -1,11 +1,13 @@
 #include <stdlib.h>
 
-#include <libgraphic/Font.h>
-#include <libgraphic/StackBlur.h>
 #include <libsystem/Assert.h>
 #include <libsystem/math/Math.h>
 
+#include <libutils/Random.h>
+
+#include <libgraphic/Font.h>
 #include <libgraphic/Painter.h>
+#include <libgraphic/StackBlur.h>
 
 Painter::Painter(RefPtr<Bitmap> bitmap)
 {
@@ -673,6 +675,9 @@ __flatten void Painter::blur_rectangle(Recti rectangle, int radius)
 
 __flatten void Painter::saturation(Recti rectangle, float value)
 {
+    rectangle = apply_transform(rectangle);
+    rectangle = apply_clip(rectangle);
+
     for (int y = 0; y < rectangle.height(); y++)
     {
         for (int x = 0; x < rectangle.width(); x++)
@@ -689,7 +694,21 @@ __flatten void Painter::saturation(Recti rectangle, float value)
 
             color = Color::from_byte(red, green, blue);
 
-            plot_pixel({x, y}, color);
+            _bitmap->set_pixel({x, y}, color);
+        }
+    }
+}
+
+__flatten void Painter::noise(Recti rectangle, float opacity)
+{
+    Random rand;
+
+    for (int y = 0; y < rectangle.height(); y++)
+    {
+        for (int x = 0; x < rectangle.width(); x++)
+        {
+            double noise = rand.next_double();
+            plot_pixel({x, y}, Color::from_rgba(noise, noise, noise, opacity));
         }
     }
 }

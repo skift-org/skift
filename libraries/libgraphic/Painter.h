@@ -76,6 +76,8 @@ public:
 
     void saturation(Recti rectangle, float value);
 
+    void noise(Recti rectangle, float opacity);
+
 private:
     Recti clip()
     {

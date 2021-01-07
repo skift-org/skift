@@ -82,7 +82,7 @@ public:
         _acrylic->copy_from(*_scaled, _scaled->bound());
         Painter painter(*_acrylic);
 
-        painter.saturation(_acrylic->bound(), 0.6);
+        painter.saturation(_acrylic->bound(), 0.25);
         painter.blur_rectangle(_acrylic->bound(), 48);
         painter.noise(_acrylic->bound(), 0.05);
     }
@@ -97,6 +97,7 @@ public:
     {
         _resolution = resolution;
         _scaled = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
+        _acrylic = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
         render();
     }
 

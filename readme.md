@@ -7,9 +7,6 @@
   <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
   <a href="manual/readme.md">Manual</a>
 </p>
-<p align="center">
-  <b>Notice!</b> We've moved the project to C++ recently, so don't expect it to be idiomatic yet. There is still a lot of work to be done, and any help is very appreciated :)
-</p>
 
 # skiftOS
 

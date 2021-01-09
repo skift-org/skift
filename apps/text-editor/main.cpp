@@ -1,7 +1,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/widgets/Button.h>
 #include <libwidget/widgets/Panel.h>
-#include <libwidget/widgets/TextField.h>
+#include <libwidget/widgets/TextEditor.h>
 
 int main(int argc, char **argv)
 {
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
         model = TextModel::from_file(argv[1]);
     }
 
-    auto field = new TextField(window->root(), model);
+    auto field = new TextEditor(window->root(), model);
     field->flags(Widget::FILL);
     field->overscroll(true);
     field->linenumbers(true);

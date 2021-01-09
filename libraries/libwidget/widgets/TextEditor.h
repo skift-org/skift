@@ -4,7 +4,7 @@
 #include <libwidget/model/TextModel.h>
 #include <libwidget/widgets/ScrollBar.h>
 
-class TextField : public Widget
+class TextEditor : public Widget
 {
 private:
     static constexpr int LINE_HEIGHT = 18;
@@ -102,9 +102,9 @@ public:
         should_repaint();
     }
 
-    TextField(Widget *parent, RefPtr<TextModel> model);
+    TextEditor(Widget *parent, RefPtr<TextModel> model);
 
-    ~TextField();
+    ~TextEditor();
 
     void paint(Painter &painter, Recti rectangle);
 

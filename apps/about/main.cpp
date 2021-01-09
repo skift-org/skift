@@ -2,7 +2,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
-#include <libwidget/widgets/TextField.h>
+#include <libwidget/widgets/TextEditor.h>
 
 static auto logo_based_on_color_scheme()
 {
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
             license_window->title("License");
             license_window->size({556, 416});
 
-            auto field = new TextField(license_window->root(), TextModel::from_file("/Files/license.md"));
+            auto field = new TextEditor(license_window->root(), TextModel::from_file("/Files/license.md"));
             field->flags(Widget::FILL);
             field->readonly(true);
             field->font(Font::get("mono").take_value());

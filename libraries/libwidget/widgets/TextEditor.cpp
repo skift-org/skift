@@ -1,8 +1,8 @@
 #include <libgraphic/Painter.h>
 #include <libwidget/Window.h>
-#include <libwidget/widgets/TextField.h>
+#include <libwidget/widgets/TextEditor.h>
 
-TextField::TextField(Widget *parent, RefPtr<TextModel> model)
+TextEditor::TextEditor(Widget *parent, RefPtr<TextModel> model)
     : Widget(parent),
       _model(model)
 {
@@ -21,13 +21,13 @@ TextField::TextField(Widget *parent, RefPtr<TextModel> model)
     });
 }
 
-TextField::~TextField()
+TextEditor::~TextEditor()
 {
 }
 
 #define LINE_HEIGHT (18)
 
-void TextField::paint(Painter &painter, Recti rectangle)
+void TextEditor::paint(Painter &painter, Recti rectangle)
 {
     __unused(rectangle);
 
@@ -122,7 +122,7 @@ void TextField::paint(Painter &painter, Recti rectangle)
     }
 }
 
-void TextField::event(Event *event)
+void TextEditor::event(Event *event)
 {
     __unused(event);
 
@@ -247,7 +247,7 @@ void TextField::event(Event *event)
     }
 }
 
-void TextField::update_scrollbar()
+void TextEditor::update_scrollbar()
 {
     int document_height = document_bound().height();
 
@@ -267,7 +267,7 @@ void TextField::update_scrollbar()
         _hscroll_offset);
 }
 
-void TextField::do_layout()
+void TextEditor::do_layout()
 {
     _vscrollbar->bound(vscrollbar_bound());
     _hscrollbar->bound(hscrollbar_bound());
@@ -275,7 +275,7 @@ void TextField::do_layout()
     update_scrollbar();
 }
 
-void TextField::scroll_to_cursor()
+void TextEditor::scroll_to_cursor()
 {
     if ((int)_cursor.line() * LINE_HEIGHT < _vscroll_offset)
     {

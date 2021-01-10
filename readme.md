@@ -61,7 +61,7 @@ skiftOS running in QEMU 5.1
 - [Building](manual/building.md) **(start here if you are new)**
 - [Contributing](manual/contributing.md)
 - [Code of conduct](manual/code_of_conduct.md)
-- [Running on Virtual Box](manuals/running_vm.md) **(click here to experience skiftOS)**
+- [Running on Virtual Box](manual/running_vm.md) **(click here to experience skiftOS)**
 
 # Acknowledgements
 

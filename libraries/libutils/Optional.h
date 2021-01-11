@@ -85,13 +85,30 @@ public:
 
     Optional &operator=(const Optional &other)
     {
-        return *this = Optional(other);
+        if (this != &other)
+        {
+            clear();
+            _present = other._present;
+            if (other._present)
+            {
+                new (_storage) T(other.value());
+            }
+        }
+
+        return *this;
     }
 
     Optional &operator=(Optional &&other)
     {
-        swap(_storage, other._storage);
-        swap(_present, other._present);
+        if (this != &other)
+        {
+            clear();
+            _present = other._present;
+            if (other._present)
+            {
+                new (_storage) T(other.take_value());
+            }
+        }
 
         return *this;
     }

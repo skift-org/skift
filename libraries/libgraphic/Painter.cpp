@@ -731,16 +731,31 @@ __flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti 
     }
 }
 
-void Painter::draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color)
+void Painter::draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color)
 {
     Recti dest(position - glyph.origin, glyph.bound.size());
+
+    // auto metrics = font.metrics();
+    // auto baseline = position.y();
+    //
+    // auto draw_metric = [&](int value, Color color) {
+    //     draw_line_y_aligned(value, position.x(), position.x() + glyph.bound.width(), color);
+    // };
+    //
+    // draw_metric(metrics.fullascend(baseline), Colors::RED);
+    // draw_metric(metrics.ascend(baseline), Colors::ORANGE);
+    // draw_metric(metrics.captop(baseline), Colors::BLUE);
+    // draw_metric(baseline, Colors::MAGENTA);
+    // draw_metric(metrics.descend(baseline), Colors::ORANGE);
+    // draw_metric(metrics.fulldescend(baseline), Colors::RED);
+
     blit_bitmap_colored(font.bitmap(), glyph.bound, dest, color);
 }
 
 __flatten void Painter::draw_string(Font &font, const char *str, Vec2i position, Color color)
 {
     codepoint_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto codepoint) {
-        Glyph &glyph = font.glyph(codepoint);
+        auto &glyph = font.glyph(codepoint);
         draw_glyph(font, glyph, position, color);
         position = position + Vec2i(glyph.advance, 0);
     });
@@ -748,7 +763,7 @@ __flatten void Painter::draw_string(Font &font, const char *str, Vec2i position,
 
 void Painter::draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color)
 {
-    Recti bound = font.mesure_string(str);
+    Recti bound = font.mesure(str);
 
     bound = bound.place_within(container, anchor);
 

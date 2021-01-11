@@ -66,7 +66,7 @@ public:
 
     void draw_rounded_rectangle(Recti bound, int radius, int thickness, Color color);
 
-    void draw_glyph(Font &font, Glyph &glyph, Vec2i position, Color color);
+    void draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color);
 
     void draw_string(Font &font, const char *str, Vec2i position, Color color);
 

@@ -89,7 +89,7 @@ void render_cell(
         return;
     }
 
-    Glyph &glyph = font()->glyph(codepoint);
+    auto &glyph = font()->glyph(codepoint);
 
     painter.draw_glyph(
         *font(),

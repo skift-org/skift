@@ -57,14 +57,17 @@ void Button::event(Event *event)
     }
     else if (event->type == Event::MOUSE_BUTTON_RELEASE)
     {
-        _state = BUTTON_OVER;
-        should_repaint();
+        if (_state == BUTTON_PRESS)
+        {
+            _state = BUTTON_OVER;
+            should_repaint();
 
-        event->accepted = true;
+            event->accepted = true;
 
-        Event action_event = {};
-        action_event.type = Event::ACTION;
-        dispatch_event(&action_event);
+            Event action_event = {};
+            action_event.type = Event::ACTION;
+            dispatch_event(&action_event);
+        }
     }
 }
 

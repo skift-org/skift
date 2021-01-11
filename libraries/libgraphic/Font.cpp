@@ -61,20 +61,7 @@ ResultOr<RefPtr<Font>> Font::get(String name)
     return _fonts[name];
 }
 
-Glyph &Font::glyph(Codepoint codepoint)
-{
-    for (int i = 0; _glyphs[i].codepoint != 0; i++)
-    {
-        if (_glyphs[i].codepoint == codepoint)
-        {
-            return _glyphs[i];
-        }
-    }
-
-    return _default;
-}
-
-bool Font::has_glyph(Codepoint codepoint)
+bool Font::has(Codepoint codepoint) const
 {
     for (int i = 0; _glyphs[i].codepoint != 0; i++)
     {
@@ -87,14 +74,34 @@ bool Font::has_glyph(Codepoint codepoint)
     return false;
 }
 
-Recti Font::mesure_string(const char *string)
+const Glyph &Font::glyph(Codepoint codepoint) const
+{
+    for (int i = 0; _glyphs[i].codepoint != 0; i++)
+    {
+        if (_glyphs[i].codepoint == codepoint)
+        {
+            return _glyphs[i];
+        }
+    }
+
+    return _default;
+}
+
+Recti Font::mesure(Codepoint codepoint) const
+{
+    auto &g = glyph(codepoint);
+
+    return {g.advance, metrics().lineheight()};
+}
+
+Recti Font::mesure(const char *string) const
 {
     int width = 0;
 
     codepoint_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto codepoint) {
-        Glyph &g = glyph(codepoint);
+        auto &g = glyph(codepoint);
         width += g.advance;
     });
 
-    return Recti(width, 16);
+    return Recti(width, metrics().lineheight());
 }

@@ -152,12 +152,7 @@ void Table::paint(Painter &painter, Recti rectangle)
 
             if (_selected == row)
             {
-                painter.fill_rectangle(row_bound(row), color(THEME_SELECTION));
-                painter.draw_rectangle(row_bound(row), color(THEME_SELECTION));
-            }
-            else if (row % 2)
-            {
-                painter.fill_rectangle(row_bound(row), color(THEME_FOREGROUND).with_alpha(0.05));
+                painter.fill_rounded_rectangle(row_bound(row).shrinked({2}), 4, color(THEME_ACCENT));
             }
 
             for (int column = 0; column < column_count; column++)

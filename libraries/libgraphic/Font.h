@@ -5,6 +5,39 @@
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
+class FontMetrics
+{
+private:
+    int _lineheight;
+    int _baseline;
+    int _capheight;
+    int _leading;
+
+public:
+    int lineheight() const { return _lineheight; }
+    int baseline() const { return _baseline; }
+    int capheight() const { return _capheight; }
+    int leading() const { return _leading; }
+
+    int fulllineheight() const { return _lineheight + _leading; }
+    int halfleading() const { return leading() / 2; }
+
+    int captop(int baseline) const { return baseline - _capheight; }
+    int ascend(int baseline) const { return baseline - _baseline; }
+    int descend(int baseline) const { return ascend(baseline) + _lineheight; }
+
+    int fullascend(int baseline) const { return ascend(baseline) - halfleading(); }
+    int fulldescend(int baseline) const { return descend(baseline) + halfleading(); }
+
+    FontMetrics(int lineheight, int baseline, int capheight, int leading)
+        : _lineheight(lineheight),
+          _baseline(baseline),
+          _capheight(capheight),
+          _leading(leading)
+    {
+    }
+};
+
 struct Glyph
 {
     Codepoint codepoint;
@@ -21,6 +54,11 @@ private:
     Vector<Glyph> _glyphs;
 
 public:
+    const FontMetrics metrics() const
+    {
+        return {12, 10, 8, 4};
+    }
+
     Bitmap &bitmap() { return *_bitmap; }
 
     static ResultOr<RefPtr<Font>> get(String name);
@@ -32,9 +70,11 @@ public:
         _default = glyph(U'?');
     }
 
-    Glyph &glyph(Codepoint codepoint);
+    bool has(Codepoint codepoint) const;
 
-    bool has_glyph(Codepoint codepoint);
+    const Glyph &glyph(Codepoint codepoint) const;
 
-    Recti mesure_string(const char *string);
+    Recti mesure(Codepoint codepoint) const;
+
+    Recti mesure(const char *string) const;
 };

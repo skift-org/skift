@@ -7,9 +7,6 @@
 class TextEditor : public Widget
 {
 private:
-    static constexpr int LINE_HEIGHT = 18;
-    static constexpr int LINENUMBERS_WIDTH = 32;
-
     RefPtr<TextModel> _model;
     TextCursor _cursor{};
 
@@ -19,8 +16,6 @@ private:
     int _vscroll_offset = 0;
     int _hscroll_offset = 0;
 
-    bool _linenumbers = false;
-    bool _multiline = true;
     bool _readonly = false;
     bool _overscroll = false;
 
@@ -28,66 +23,60 @@ private:
 
     void scroll_to_cursor();
 
-    Recti linenumbers_bound() const
+    Recti minimum_view_bound()
     {
-        if (_linenumbers)
-        {
-            return bound().take_left(LINENUMBERS_WIDTH);
-        }
-        else
-        {
-            return Recti::empty();
-        }
+        return content_bound().cutoff_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
     }
 
-    Recti view_bound() const
+    Recti view_bound()
     {
-        if (_linenumbers)
+        auto bound = content_bound();
+
+        if (document_bound().height() > minimum_view_bound().height())
         {
-            return bound().cutoff_left(LINENUMBERS_WIDTH);
+            bound = bound.cutoff_right(ScrollBar::SIZE);
         }
-        else
+
+        if (document_bound().width() > minimum_view_bound().width())
         {
-            return bound();
+            bound = bound.cutoff_botton(ScrollBar::SIZE);
         }
+
+        return bound;
     }
 
-    Recti document_bound() const
+    Recti document_bound()
     {
-        return Recti{
-            -_hscroll_offset,
-            -_vscroll_offset,
-            1024,
-            (int)_model->line_count() * LINE_HEIGHT,
+        return _model->bound(*font())
+            .offset({-_hscroll_offset, -_vscroll_offset})
+            .offset(content_bound().position());
+    }
+
+    Recti vscrollbar_bound()
+    {
+        auto bound = content_bound().take_right(ScrollBar::SIZE);
+
+        if (document_bound().width() > minimum_view_bound().width())
+        {
+            bound = bound.cutoff_botton(ScrollBar::SIZE);
         }
-            .offset(bound().position());
+
+        return bound;
     }
 
-    Recti vscrollbar_bound() const
+    Recti hscrollbar_bound()
     {
-        return view_bound().take_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
-    }
+        auto bound = content_bound().take_bottom(ScrollBar::SIZE);
 
-    Recti hscrollbar_bound() const
-    {
-        return view_bound().take_bottom(ScrollBar::SIZE).cutoff_right(ScrollBar::SIZE);
+        if (document_bound().height() > minimum_view_bound().height())
+        {
+            bound = bound.cutoff_right(ScrollBar::SIZE);
+        }
+
+        return bound;
     }
 
 public:
-    void linenumbers(bool value)
-    {
-        _linenumbers = value;
-        should_relayout();
-        should_repaint();
-    }
-
-    void multiline(bool value)
-    {
-        _multiline = value;
-        should_relayout();
-        should_repaint();
-    }
-
     void readonly(bool value)
     {
         _readonly = value;

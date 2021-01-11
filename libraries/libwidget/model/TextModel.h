@@ -5,6 +5,7 @@
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
 
+#include <libgraphic/Font.h>
 #include <libwidget/Theme.h>
 
 struct TextCursor;
@@ -58,6 +59,18 @@ public:
     void delete_at(size_t index)
     {
         _codepoints.remove_index(index);
+    }
+
+    Recti bound(const Font &font)
+    {
+        int width = 0;
+
+        for (size_t i = 0; i < _codepoints.count(); i++)
+        {
+            width += font.mesure(_codepoints[i]).width();
+        }
+
+        return {width, font.metrics().fulllineheight()};
     }
 };
 
@@ -114,6 +127,21 @@ public:
     TextModel() {}
 
     ~TextModel() {}
+
+    Recti bound(const Font &font)
+    {
+        int width = 0;
+        int height = 0;
+
+        for (size_t i = 0; i < _lines.count(); i++)
+        {
+            auto line_bound = _lines[i]->bound(font);
+            width = MAX(width, line_bound.width());
+            height += line_bound.height();
+        }
+
+        return {width, height};
+    }
 
     /* --- Editing ---------------------------------------------------------- */
 

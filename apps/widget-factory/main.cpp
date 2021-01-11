@@ -1,6 +1,7 @@
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TextField.h>
 
 int main(int argc, char **argv)
 {
@@ -60,8 +61,9 @@ int main(int argc, char **argv)
         panel_grid->flags(Widget::FILL);
 
         new Panel(panel_grid);
-        new Slider(panel_grid);
-        new Panel(panel_grid);
+        new TextField(panel_grid, TextModel::empty());
+        auto text_field = new TextField(panel_grid, TextModel::empty());
+        text_field->focus();
 
         auto acrylic_button = new Button(panel_grid, BUTTON_FILLED, "Open acrylic window !");
         acrylic_button->on(Event::ACTION, [&](auto) {

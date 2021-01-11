@@ -163,7 +163,7 @@ public:
                 }
                 else
                 {
-                    printf("   ");
+                    printf("  ");
                 }
 
                 if (opt.shortname && !opt.longname.null_or_empty())

@@ -53,6 +53,12 @@ Key LegacyKeyboard::scancode_to_key(int scancode)
 
 Codepoint LegacyKeyboard::key_to_codepoint(Key key)
 {
+    if (!_keymap)
+    {
+        logger_warn("No keymap loaded!");
+        return 0;
+    }
+
     KeyMapping *mapping = keymap_lookup(_keymap, key);
 
     if (mapping == nullptr)

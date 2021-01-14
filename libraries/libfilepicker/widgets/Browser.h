@@ -14,6 +14,7 @@ class Browser : public Table
 private:
     RefPtr<Navigation> _navigation;
     RefPtr<Listing> _listing;
+    OwnPtr<Observer<Navigation>> _navigation_observer;
 
 public:
     Browser(Widget *parent, RefPtr<Navigation> navigation)
@@ -25,6 +26,10 @@ public:
         flags(Widget::FILL);
 
         empty_message("This directory is empty.");
+
+        _navigation_observer = navigation->observe([this](auto &) {
+            scroll_to_top();
+        });
 
         on(Event::ACTION, [this](auto) {
             if (selected() >= 0)

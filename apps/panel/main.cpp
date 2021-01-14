@@ -11,7 +11,7 @@
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
 
-static constexpr int PANEL_HEIGHT = 36;
+static constexpr int PANEL_HEIGHT = 38;
 
 int main(int argc, char **argv)
 {
@@ -35,6 +35,7 @@ int main(int argc, char **argv)
     panel_container->insets(Insetsi(4));
 
     new Separator(window->root());
+    (new Separator(window->root()))->color(THEME_BORDER, Colors::BLACK.with_alpha(0.25));
 
     auto menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });

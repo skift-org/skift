@@ -29,5 +29,5 @@ void Label::paint(Painter &painter, Recti rectangle)
 
 Vec2i Label::size()
 {
-    return font()->mesure(_text.cstring()).size();
+    return {font()->mesure_with_fulllineheight(_text.cstring()).size()};
 }

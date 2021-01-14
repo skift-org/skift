@@ -105,3 +105,15 @@ Recti Font::mesure(const char *string) const
 
     return Recti(width, metrics().lineheight());
 }
+
+Recti Font::mesure_with_fulllineheight(const char *string)
+{
+    int width = 0;
+
+    codepoint_foreach(reinterpret_cast<const uint8_t *>(string), [&](auto codepoint) {
+        auto &g = glyph(codepoint);
+        width += g.advance;
+    });
+
+    return Recti(width, metrics().fulllineheight());
+}

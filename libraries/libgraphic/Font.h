@@ -77,4 +77,6 @@ public:
     Recti mesure(Codepoint codepoint) const;
 
     Recti mesure(const char *string) const;
+
+    Recti mesure_with_fulllineheight(const char *string);
 };

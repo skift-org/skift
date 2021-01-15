@@ -10,87 +10,87 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Installing dependencies
-      run: |
-        sudo toolchain/install-dependencies.sh
+      - name: Installing dependencies
+        run: |
+          sudo toolchain/install-dependencies.sh
 
-    - name: Fetching submodules
-      run: |
-        git submodule update --init --recursive
+      - name: Fetching submodules
+        run: |
+          git submodule update --init --recursive
 
-    - name: Cache cross-toolchain
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-cross-toolchain
-      with:
-        path: |
-          **/toolchain/local
-        key: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
+      - name: Cache cross-toolchain
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-cross-toolchain
+        with:
+          path: |
+            **/toolchain/local
+          key: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
 
-    - name: Building cross-toolchain
-      run: |
-        toolchain/build-it.sh
+      - name: Building cross-toolchain
+        run: |
+          toolchain/build-it.sh
 
-    - name: Building skiftOS (x86_32)
-      run: |
+      - name: Building skiftOS (x86_32)
+        run: |
           make clean
-          make all CONFIG_LOADER=grub
-          make all CONFIG_LOADER=limine
+          make all CONFIG=release CONFIG_LOADER=grub
+          make all CONFIG=release CONFIG_LOADER=limine
           echo "RELEASE_TAG=$(date +'%y.%W')" >> $GITHUB_ENV
 
-    - name: Building skiftOS (x86_64)
-      run: |
+      - name: Building skiftOS (x86_64)
+        run: |
           make clean
-          make all CONFIG_ARCH=x86_64 CONFIG_LOADER=limine
+          make all CONFIG=release CONFIG_ARCH=x86_64 CONFIG_LOADER=limine
           echo "RELEASE_TAG=$(date +'%y.%W')" >> $GITHUB_ENV
 
-    - name: Creating Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ env.RELEASE_TAG  }}
-        release_name: ${{ env.RELEASE_TAG }}
-        body_path: manual/release.md
-        draft: false
-        prerelease: false
+      - name: Creating Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.RELEASE_TAG  }}
+          release_name: ${{ env.RELEASE_TAG }}
+          body_path: manual/release.md
+          draft: false
+          prerelease: false
 
-    - name: Upload release assets (grub-x86_32)
-      id: upload_release_assets_grub_x86_32
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: disks/bootdisk-grub-x86_32.img
-        asset_name: bootdisk-grub-x86_32.img
-        asset_content_type: application/x-ima
+      - name: Upload release assets (grub-x86_32)
+        id: upload_release_assets_grub_x86_32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: disks/bootdisk-grub-x86_32.img
+          asset_name: bootdisk-grub-x86_32.img
+          asset_content_type: application/x-ima
 
-    - name: Upload release assets (limine-x86_32)
-      id: upload_release_assets_limine_x86_32
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: disks/bootdisk-limine-x86_32.img
-        asset_name: bootdisk-limine-x86_32.img
-        asset_content_type: application/x-ima
+      - name: Upload release assets (limine-x86_32)
+        id: upload_release_assets_limine_x86_32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: disks/bootdisk-limine-x86_32.img
+          asset_name: bootdisk-limine-x86_32.img
+          asset_content_type: application/x-ima
 
-    - name: Upload release assets (limine-x86_64)
-      id: upload_release_assets_limine_x86_64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: disks/bootdisk-limine-x86_64.img
-        asset_name: bootdisk-limine-x86_64.img
-        asset_content_type: application/x-ima
+      - name: Upload release assets (limine-x86_64)
+        id: upload_release_assets_limine_x86_64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: disks/bootdisk-limine-x86_64.img
+          asset_name: bootdisk-limine-x86_64.img
+          asset_content_type: application/x-ima

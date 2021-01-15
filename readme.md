@@ -35,26 +35,6 @@
 skiftOS running in QEMU 5.1
 </p>
 
-<br>
-
-<p align="center">
-<a href="https://www.youtube.com/watch?v=nMaLGPecwAg">
-<img src="https://img.youtube.com/vi/nMaLGPecwAg/0.jpg" />
-<br>
-(Youtube) Systems with JT - SkiftOS (version 20.51)
-</a>
-</p>
-
-<br>
-
-<p align="center">
-<a href="https://www.youtube.com/watch?v=qC2Qkt2wapg">
-<img src="https://img.youtube.com/vi/qC2Qkt2wapg/0.jpg" />
-<br>
-(Youtube) Daimyo - Tribute to free softwares on SkiftOS.
-</a>
-</p>
-
 # Links
 
 - [Manual](manual/readme.md)

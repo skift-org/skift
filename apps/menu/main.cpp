@@ -8,6 +8,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TextField.h>
 
 struct MenuEntry
 {
@@ -117,13 +118,32 @@ int main(int argc, char **argv)
 
     window->root()->layout(HFLOW(0));
 
-    auto containter = new Container(window->root());
-    containter->layout(VFLOW(0));
-    containter->flags(Widget::FILL);
+    auto container = new Container(window->root());
+    container->layout(VFLOW(0));
+    container->flags(Widget::FILL);
 
-    menu_create_list(containter, entries);
+    auto seach_container = new Container(container);
+    seach_container->layout(VFLOW(0));
+    seach_container->insets({8});
 
-    auto bottom_container = new Panel(containter);
+    auto panel = new Panel(seach_container);
+    panel->layout(HFLOW(4));
+    panel->insets({6});
+    panel->border_radius(6);
+    panel->color(THEME_MIDDLEGROUND, Colors::WHITE);
+    panel->layout(HFLOW(4));
+
+    auto icon = new IconPanel(panel, Icon::get("search"));
+    icon->color(THEME_FOREGROUND, Colors::BLACK);
+
+    auto field = new TextField(panel, TextModel::empty());
+    field->flags(Widget::FILL);
+    field->color(THEME_FOREGROUND, Colors::BLACK);
+    field->focus();
+
+    menu_create_list(container, entries);
+
+    auto bottom_container = new Panel(container);
 
     bottom_container->layout(HFLOW(4));
     bottom_container->insets({6});

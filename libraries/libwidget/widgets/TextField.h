@@ -83,6 +83,11 @@ public:
     {
     }
 
+    Vec2i size() override
+    {
+        return _model->line(0).bound(*font()).size();
+    }
+
     void event(Event *event) override
     {
         if (event->type == Event::KEYBOARD_KEY_TYPED)

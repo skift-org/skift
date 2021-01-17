@@ -89,7 +89,12 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
     min_width(32);
     flags(Widget::GREEDY | Widget::SQUARE);
 
-    new IconPanel(this, icon);
+    auto icon_panel = new IconPanel(this, icon);
+
+    if (style == BUTTON_FILLED)
+    {
+        icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
+    }
 }
 
 Button::Button(Widget *parent, ButtonStyle style, String text)
@@ -99,7 +104,11 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
     insets(Insetsi(0, 0, 6, 6));
     min_width(64);
 
-    new Label(this, text, Anchor::CENTER);
+    auto label = new Label(this, text, Anchor::CENTER);
+    if (style == BUTTON_FILLED)
+    {
+        label->color(THEME_FOREGROUND, Colors::WHITE);
+    }
 }
 
 Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text)
@@ -111,5 +120,11 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text
     auto icon_panel = new IconPanel(this, icon);
     icon_panel->insets(Insetsi(0, 0, 0, 4));
 
-    new Label(this, text);
+    auto label = new Label(this, text);
+
+    if (style == BUTTON_FILLED)
+    {
+        label->color(THEME_FOREGROUND, Colors::WHITE);
+        icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
+    }
 }

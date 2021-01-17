@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     window->icon(Icon::get("console-line"));
     window->title("Terminal");
     window->size(Vec2i(700, 500));
-    window->opacity(0.9);
+    window->opacity(0.85);
 
     window->root()->insets(Insetsi{0, 6, 6, 6});
     window->root()->layout(HFLOW(0));

@@ -25,11 +25,12 @@ public:
 
         cover->layout(VFLOW(0));
         cover->flags(Widget::FILL);
+        cover->insets(12);
 
-        auto control_bar = new Panel(root());
+        new Spacer(cover);
+        auto control_bar = new Container(cover);
 
         control_bar->layout(HFLOW(4));
-        control_bar->insets({6, 4});
 
         new Button(control_bar, ButtonStyle::BUTTON_FILLED, Icon::get("play"));
         new Button(control_bar, ButtonStyle::BUTTON_OUTLINE, Icon::get("stop"));

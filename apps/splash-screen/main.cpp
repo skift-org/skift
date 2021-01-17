@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     auto logo_on_screen_bound = logo->bound().centered_within(framebuffer->resolution());
 
-    framebuffer->painter().clear(Color::from_byte(0x33, 0x33, 0x33));
+    framebuffer->painter().clear(Color::from_hex(0x18181B));
 
     framebuffer->painter().blit_bitmap(*logo, logo->bound(), logo_on_screen_bound);
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i <= 100; i++)
     {
-        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound.expended(Insetsi(16, 16)), Color::from_byte(0x33, 0x33, 0x33));
+        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound.expended(Insetsi(16, 16)), Color::from_hex(0x18181B));
         framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound, Color::from_byte(0x44, 0x44, 0x44));
 
         Recti progress = loading_bar_on_screen_bound.take_left(loading_bar_on_screen_bound.width() * (i / 100.0));

@@ -17,7 +17,7 @@ void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
-    _wallpaper->change_image(Bitmap::load_from_or_placeholder("/Files/Wallpapers/mountains.png"));
+    _wallpaper->change_image(Bitmap::load_from_or_placeholder("/Files/Wallpapers/ripples.png"));
 
     renderer_region_dirty(_framebuffer->resolution());
 }

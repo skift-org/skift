@@ -83,7 +83,7 @@ public:
         Painter painter(*_acrylic);
 
         painter.saturation(_acrylic->bound(), 0.25);
-        painter.blur_rectangle(_acrylic->bound(), 30);
+        painter.blur_rectangle(_acrylic->bound(), 16);
         painter.noise(_acrylic->bound(), 0.05);
     }
 

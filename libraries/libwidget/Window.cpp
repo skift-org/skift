@@ -426,8 +426,6 @@ void Window::dispatch_event(Event *event)
         }
         else
         {
-            // FIXME: Set the cursor based on the focused widget.
-
             Widget *result = window_child_at(this, event->mouse.position);
 
             if (result)

@@ -86,6 +86,11 @@ void renderer_composite_region(Recti region, Window *window_transparent)
                 destination.position() - window->bound().position(),
                 destination.size());
 
+            if (window->flags() & WINDOW_ACRYLIC)
+            {
+                _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->acrylic(), destination, destination);
+            }
+
             _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
         }
 

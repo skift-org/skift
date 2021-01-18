@@ -140,6 +140,7 @@ public:
     Widget *root() { return root_container; }
 
     Window(WindowFlag flags);
+
     virtual ~Window();
 
     void on(EventType event, EventHandler handler);

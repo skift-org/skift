@@ -6,6 +6,7 @@
 
 #include <libwidget/Markup.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TitleBar.h>
 
 static void whitespace(Scanner &scan)
 {
@@ -313,6 +314,11 @@ Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
     if (node.is("Slider"))
     {
         widget = new Slider(parent);
+    }
+
+    if (node.is("TitleBar"))
+    {
+        widget = new TitleBar(parent);
     }
 
     if (widget == nullptr)

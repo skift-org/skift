@@ -8,7 +8,7 @@ private:
 public:
     Spacer(Widget *parent) : Widget(parent)
     {
-        flags(Widget::FILL);
+        flags(Widget::FILL | Widget::NO_MOUSE_HIT);
     }
 
     ~Spacer() {}

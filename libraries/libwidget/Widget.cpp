@@ -51,6 +51,18 @@ void Widget::color(ThemeColorRole role, Color color)
     should_repaint();
 }
 
+CursorState Widget::cursor()
+{
+    return _cursor;
+}
+
+void Widget::cursor(CursorState cursor)
+{
+    _cursor = cursor;
+
+    window()->cursor(cursor);
+}
+
 Widget::Widget(Widget *parent)
 {
     _enabled = true;
@@ -490,8 +502,8 @@ Widget *Widget::child_at(Vec2i position)
 
     Widget *result = this;
 
-    _childs.foreach ([&](auto child) {
-        if (child->bound().contains(position))
+    _childs.foreach ([&](Widget *child) {
+        if (!(child->flags() & NO_MOUSE_HIT) && child->bound().contains(position))
         {
             result = child->child_at(position);
 

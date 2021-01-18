@@ -90,6 +90,8 @@ void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton b
         .mouse = {
             .position = position,
             .old_position = old_position,
+            .position_on_screen = position,
+            .old_position_on_screen = old_position,
             .button = MOUSE_NO_BUTTON,
             .buttons = buttons,
         },
@@ -113,6 +115,8 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             .mouse = {
                 .position = position,
                 .old_position = position,
+                .position_on_screen = position,
+                .old_position_on_screen = position,
                 .button = button,
                 .buttons = buttons,
             },
@@ -131,6 +135,8 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             .mouse = {
                 .position = position,
                 .old_position = position,
+                .position_on_screen = position,
+                .old_position_on_screen = position,
                 .button = button,
                 .buttons = buttons,
             },
@@ -157,6 +163,8 @@ void Window::handle_double_click(Vec2i position)
         .mouse = {
             .position = position,
             .old_position = position,
+            .position_on_screen = position,
+            .old_position_on_screen = position,
             .button = MOUSE_BUTTON_LEFT,
             .buttons = MOUSE_BUTTON_LEFT,
         },

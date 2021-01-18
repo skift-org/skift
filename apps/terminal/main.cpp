@@ -1,6 +1,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Window.h>
 #include <libwidget/widgets/ScrollBar.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "terminal/TerminalWidget.h"
 
@@ -17,12 +18,14 @@ int main(int argc, char **argv)
     window->size(Vec2i(700, 500));
     window->opacity(0.85);
 
-    window->root()->insets(Insetsi{0, 6, 6, 6});
-    window->root()->layout(HFLOW(0));
+    window->root()->layout(VFLOW(0));
+
+    new TitleBar(window->root());
 
     auto widget = new TerminalWidget(window->root());
     widget->focus();
     widget->flags(Widget::FILL);
+    widget->insets(Insetsi{0, 6, 6, 6});
 
     window->show();
 

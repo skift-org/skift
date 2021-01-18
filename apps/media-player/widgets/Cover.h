@@ -22,14 +22,13 @@ public:
         Painter painter(_bitmap_scaled_and_blur);
         painter.blit_bitmap(*_bitmap, _bitmap->bound(), _bitmap->bound().cover(_bitmap_scaled_and_blur->bound()));
         painter.saturation(_bitmap_scaled_and_blur->bound(), 1);
-        painter.blur_rectangle(_bitmap_scaled_and_blur->bound(), 8);
+        painter.blur_rectangle(_bitmap_scaled_and_blur->bound(), 4);
+        painter.fill_rectangle(_bitmap_scaled_and_blur->bound(), Colors::BLACK.with_alpha(0.5));
     }
 
     void paint(Painter &painter, Recti) override
     {
         painter.blit_bitmap_no_alpha(*_bitmap_scaled_and_blur, _bitmap_scaled_and_blur->bound(), _bitmap_scaled_and_blur->bound().cover(bound()));
-
-        painter.fill_rectangle(bound(), Colors::BLACK.with_alpha(0.8));
 
         painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), Recti{0, 0, 256, 256}.centered_within(bound()));
         painter.draw_rectangle(Recti{0, 0, 256, 256}.centered_within(bound()), Colors::WHITE.with_alpha(0.25));

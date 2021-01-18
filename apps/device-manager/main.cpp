@@ -3,6 +3,7 @@
 #include <libutils/Path.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "device-manager/DeviceModel.h"
 
@@ -19,6 +20,8 @@ public:
         size(Vec2i(700, 500));
 
         root()->layout(VFLOW(0));
+
+        new TitleBar(root());
 
         auto model = make<DeviceModel>();
 

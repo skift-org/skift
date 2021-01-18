@@ -1,6 +1,7 @@
 #include <libsystem/Assert.h>
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "paint/PaintCanvas.h"
 #include "paint/PaintDocument.h"
@@ -64,6 +65,8 @@ public:
         _document = document;
 
         root()->layout(VFLOW(0));
+
+        new TitleBar(root());
 
         create_toolbar(root());
 

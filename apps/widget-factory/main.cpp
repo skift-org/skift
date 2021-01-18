@@ -2,6 +2,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/widgets/TextField.h>
+#include <libwidget/widgets/TitleBar.h>
 
 int main(int argc, char **argv)
 {
@@ -14,10 +15,8 @@ int main(int argc, char **argv)
     window->size(Vec2i(500, 400));
 
     window->root()->layout(VFLOW(8));
-    window->root()->insets(4);
 
-    new Panel(window->root());
-    new Panel(window->root());
+    new TitleBar(window->root());
 
     Widget *panel_hflow = new Container(window->root());
     {

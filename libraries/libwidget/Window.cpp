@@ -11,46 +11,22 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
-Recti window_header_bound(Window *window);
-
-void window_populate_header(Window *window)
+void Window::toggle_maximise()
 {
-    window->header_container->clear_children();
-
-    window->header()->layout(HFLOW(4));
-    window->header()->insets({6, 6});
-
-    new Button(
-        window->header(),
-        BUTTON_TEXT,
-        window->_icon,
-        window->_title);
-
-    auto spacer = new Container(window->header());
-    spacer->flags(Widget::FILL);
-
-    if (window->_flags & WINDOW_RESIZABLE)
+    if (is_maximised == true)
     {
-        Widget *button_minimize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-minimize"));
-        button_minimize->insets(3);
-
-        Widget *button_maximize = new Button(window->header(), BUTTON_TEXT, Icon::get("window-maximize"));
-        button_maximize->insets(3);
-        button_maximize->on(Event::ACTION, [window](auto) {
-            Event maximise_event = {};
-            maximise_event.type = Event::WINDOW_MAXIMIZING;
-            window->dispatch_event(&maximise_event);
-        });
+        is_maximised = false;
+        bound(previous_bound);
     }
+    else
+    {
+        is_maximised = true;
+        previous_bound = _bound;
+        Recti new_size = Screen::bound();
+        new_size = Recti(0, 38, new_size.width(), new_size.height() - 38);
 
-    Widget *close_button = new Button(window->header(), BUTTON_TEXT, Icon::get("window-close"));
-    close_button->insets(3);
-
-    close_button->on(Event::ACTION, [window](auto) {
-        Event close_event = {};
-        close_event.type = Event::WINDOW_CLOSING;
-        window->dispatch_event(&close_event);
-    });
+        bound(new_size);
+    }
 }
 
 Window::Window(WindowFlag flags)
@@ -72,11 +48,6 @@ Window::Window(WindowFlag flags)
     backbuffer_painter = own<Painter>(backbuffer);
 
     _bound = Recti(250, 250);
-
-    header_container = new Container(nullptr);
-    header_container->window(this);
-
-    window_populate_header(this);
 
     root_container = new Container(nullptr);
     root_container->window(this);
@@ -105,7 +76,6 @@ Window::~Window()
     Application::remove_window(this);
 
     delete root_container;
-    delete header_container;
 }
 
 void Window::repaint(Painter &painter, Recti rectangle)
@@ -138,11 +108,6 @@ void Window::repaint(Painter &painter, Recti rectangle)
 
         if (!(_flags & WINDOW_BORDERLESS))
         {
-            if (header())
-            {
-                header()->repaint(painter, rectangle);
-            }
-
             painter.draw_rectangle(bound(), color(THEME_ACCENT));
         }
     }
@@ -189,9 +154,6 @@ void Window::repaint_dirty()
 
 void Window::relayout()
 {
-    header()->bound(window_header_bound(this));
-    header()->relayout();
-
     root()->bound(content_bound());
     root()->relayout();
 
@@ -289,11 +251,6 @@ void Window::hide()
     Application::hide_window(this);
 }
 
-Recti window_header_bound(Window *window)
-{
-    return window->bound().take_top(WINDOW_HEADER_AREA);
-}
-
 Border window_resize_bound_containe(Window *window, Vec2i position)
 {
     Recti resize_bound = window->bound().expended(Insets(WINDOW_RESIZE_AREA));
@@ -346,8 +303,8 @@ void window_do_resize(Window *window, Vec2i mouse_position)
 
     Vec2i content_size = window->root()->compute_size();
 
-    new_bound = new_bound.with_width(MAX(new_bound.width(), MAX(window->header()->compute_size().x(), content_size.x()) + WINDOW_CONTENT_PADDING * 2));
-    new_bound = new_bound.with_height(MAX(new_bound.height(), WINDOW_HEADER_AREA + content_size.y() + WINDOW_CONTENT_PADDING));
+    new_bound = new_bound.with_width(MAX(new_bound.width(), content_size.x() + WINDOW_CONTENT_PADDING * 2));
+    new_bound = new_bound.with_height(MAX(new_bound.height(), content_size.y() + WINDOW_CONTENT_PADDING));
 
     window->bound(new_bound);
 
@@ -366,11 +323,6 @@ Widget *window_child_at(Window *window, Vec2i position)
     if (window->root()->bound().contains(position))
     {
         return window->root()->child_at(position);
-    }
-
-    if (window->header()->bound().contains(position))
-    {
-        return window->header()->child_at(position);
     }
 
     return nullptr;
@@ -441,13 +393,7 @@ void Window::dispatch_event(Event *event)
     {
         Border borders = window_resize_bound_containe(this, event->mouse.position);
 
-        if (is_dragging && !is_maximised)
-        {
-            Vec2i offset = event->mouse.position - event->mouse.old_position;
-            _bound = _bound.offset(offset);
-            Application::move_window(this, _bound.position());
-        }
-        else if (is_resizing && !is_maximised)
+        if (is_resizing && !is_maximised)
         {
             window_do_resize(this, event->mouse.position);
         }
@@ -481,9 +427,17 @@ void Window::dispatch_event(Event *event)
         else
         {
             // FIXME: Set the cursor based on the focused widget.
-            cursor(CURSOR_DEFAULT);
 
             Widget *result = window_child_at(this, event->mouse.position);
+
+            if (result)
+            {
+                cursor(result->cursor());
+            }
+            else
+            {
+                cursor(CURSOR_DEFAULT);
+            }
 
             if (mouse_over_widget != result)
             {
@@ -530,26 +484,6 @@ void Window::dispatch_event(Event *event)
 
         if (!event->accepted && !(_flags & WINDOW_BORDERLESS))
         {
-            if (!event->accepted && header()->bound().contains(event->mouse.position))
-            {
-                Widget *widget = header()->child_at(event->mouse.position);
-
-                if (widget)
-                {
-                    widget->dispatch_event(event);
-                }
-            }
-
-            if (!event->accepted &&
-                !is_dragging &&
-                !is_maximised &&
-                event->mouse.button == MOUSE_BUTTON_LEFT &&
-                window_header_bound(this).contains(event->mouse.position))
-            {
-                is_dragging = true;
-                cursor(CURSOR_MOVE);
-            }
-
             if ((_flags & WINDOW_RESIZABLE) &&
                 !event->accepted &&
                 !is_resizing &&
@@ -571,13 +505,6 @@ void Window::dispatch_event(Event *event)
         {
             mouse_focused_widget = widget;
             widget->dispatch_event(event);
-        }
-
-        if (is_dragging &&
-            event->mouse.button == MOUSE_BUTTON_LEFT)
-        {
-            is_dragging = false;
-            cursor(CURSOR_DEFAULT);
         }
 
         if (is_resizing)
@@ -614,24 +541,10 @@ void Window::dispatch_event(Event *event)
         break;
     }
     case Event::DISPLAY_SIZE_CHANGED:
+    {
         break;
-    case Event::WINDOW_MAXIMIZING:
-        if (is_maximised == true)
-        {
-            is_maximised = false;
-            bound(previous_bound);
-        }
-        else
-        {
-            is_maximised = true;
-            previous_bound = _bound;
-            Recti new_size = Screen::bound();
-            new_size = Recti(0, WINDOW_HEADER_AREA, new_size.width(), new_size.height() - WINDOW_HEADER_AREA);
+    }
 
-            bound(new_size);
-        }
-
-        break;
     default:
         break;
     }
@@ -710,7 +623,6 @@ Color Window::color(ThemeColorRole role)
 void Window::title(String title)
 {
     _title = title;
-    window_populate_header(this);
 }
 
 void Window::icon(RefPtr<Icon> icon)
@@ -718,12 +630,14 @@ void Window::icon(RefPtr<Icon> icon)
     if (icon)
     {
         _icon = icon;
-        window_populate_header(this);
     }
 }
 
 void Window::bound(Recti new_bound)
 {
+    auto have_same_size = _bound.size() == new_bound.size();
+    auto have_same_position = _bound.position() == new_bound.position();
+
     _bound = new_bound;
 
     if (!_visible)
@@ -731,8 +645,16 @@ void Window::bound(Recti new_bound)
         return;
     }
 
-    window_change_framebuffer_if_needed(this);
+    if (!have_same_size)
+    {
+        window_change_framebuffer_if_needed(this);
 
-    should_relayout();
-    should_repaint(bound());
+        should_relayout();
+        should_repaint(bound());
+    }
+
+    if (!have_same_position)
+    {
+        Application::move_window(this, _bound.position());
+    }
 }

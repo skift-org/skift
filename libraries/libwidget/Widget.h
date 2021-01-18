@@ -1,8 +1,11 @@
 #pragma once
 
-#include <libgraphic/Font.h>
 #include <libsystem/algebra/Rect.h>
 #include <libsystem/utils/List.h>
+
+#include <libgraphic/Font.h>
+
+#include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 
@@ -70,6 +73,8 @@ private:
     Layout _layout = {};
     RefPtr<Font> _font;
 
+    CursorState _cursor = CURSOR_DEFAULT;
+
     EventHandler _handlers[EventType::__COUNT] = {};
 
     struct Widget *_parent = {};
@@ -81,6 +86,7 @@ public:
     static constexpr auto FILL = (1 << 0);
     static constexpr auto GREEDY = (1 << 1);
     static constexpr auto SQUARE = (1 << 2);
+    static constexpr auto NO_MOUSE_HIT = (1 << 3);
 
     void id(String id);
 
@@ -146,6 +152,10 @@ public:
 
     void max_width(int value) { _max_width = value; }
     int max_width() { return _max_width; }
+
+    CursorState cursor();
+
+    void cursor(CursorState cursor);
 
     /* --- subclass API ----------------------------------------------------- */
 

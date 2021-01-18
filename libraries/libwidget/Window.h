@@ -12,7 +12,6 @@
 #include "compositor/Protocol.h"
 
 #define WINDOW_RESIZE_AREA 16
-#define WINDOW_HEADER_AREA 36
 #define WINDOW_CONTENT_PADDING 1
 
 struct Window
@@ -29,11 +28,13 @@ struct Window
 
     bool _focused = false;
     bool _visible = false;
-    bool is_dragging = false;
+
     bool is_maximised = false;
     bool is_resizing = false;
+
     bool resize_vertical = false;
     bool resize_horizontal = false;
+
     Vec2i resize_begin;
     Recti previous_bound;
 
@@ -50,7 +51,6 @@ struct Window
 
     EventHandler handlers[EventType::__COUNT];
 
-    Widget *header_container;
     Widget *root_container;
 
     Widget *focused_widget = nullptr;
@@ -68,7 +68,12 @@ public:
     int backbuffer_handle() { return backbuffer->handle(); }
 
     void title(String title);
+    String title() { return _title; }
+
+    WindowFlag flags() { return _flags; }
+
     void icon(RefPtr<Icon> icon);
+    RefPtr<Icon> icon() { return _icon; }
 
     int x() { return position().x(); }
     int y() { return position().y(); }
@@ -94,14 +99,16 @@ public:
         }
         else
         {
-            return bound().shrinked(Insetsi(WINDOW_HEADER_AREA, WINDOW_CONTENT_PADDING, WINDOW_CONTENT_PADDING));
+            return bound().shrinked(WINDOW_CONTENT_PADDING);
         }
     }
 
     void opacity(float value) { _opacity = value; }
+
     float opacity() { return _opacity; }
 
     bool visible() { return _visible; }
+
     bool focused()
     {
         if (_flags & WINDOW_ALWAYS_FOCUSED)
@@ -114,13 +121,23 @@ public:
         }
     }
 
-    WindowType type() { return _type; }
+    bool maximised()
+    {
+        return is_maximised;
+    }
+
+    void toggle_maximise();
+
+    WindowType type()
+    {
+        return _type;
+    }
+
     void type(WindowType type) { _type = type; }
 
     Color color(ThemeColorRole role);
 
     Widget *root() { return root_container; }
-    Widget *header() { return header_container; }
 
     Window(WindowFlag flags);
     virtual ~Window();

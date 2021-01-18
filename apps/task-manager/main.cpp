@@ -6,6 +6,7 @@
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
 #include <libwidget/dialog/MessageBox.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "task-manager/CPUGraph.h"
 #include "task-manager/RAMGraph.h"
@@ -28,6 +29,8 @@ public:
         size(Vec2i(700, 500));
 
         root()->layout(VFLOW(0));
+
+        new TitleBar(root());
 
         /// --- Toolbar --- ///
         auto toolbar = new Panel(root());

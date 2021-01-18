@@ -2,6 +2,7 @@
 
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Container.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Browser.h>
@@ -21,6 +22,8 @@ public:
         size(Vec2i(700, 500));
 
         root()->layout(VFLOW(0));
+
+        new TitleBar(root());
 
         new filepicker::ToolBar(root(), navigation, bookmarks);
 

@@ -3,6 +3,7 @@
 #include <libgraphic/Icon.h>
 #include <libwidget/Window.h>
 #include <libwidget/widgets/Slider.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "media-player/widgets/Cover.h"
 
@@ -25,11 +26,13 @@ public:
 
         cover->layout(VFLOW(0));
         cover->flags(Widget::FILL);
-        cover->insets(12);
 
+        new TitleBar(cover);
         new Spacer(cover);
+
         auto control_bar = new Container(cover);
 
+        control_bar->insets(12);
         control_bar->layout(HFLOW(4));
 
         new Button(control_bar, ButtonStyle::BUTTON_FILLED, Icon::get("play"));

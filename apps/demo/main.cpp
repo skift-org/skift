@@ -1,4 +1,5 @@
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "demo/DemoWidget.h"
 
@@ -26,6 +27,8 @@ int main(int argc, char **argv)
     window->size(Vec2i(500, 400));
 
     window->root()->layout(VFLOW(0));
+
+    new TitleBar(window->root());
 
     Widget *navbar = new Container(window->root());
 

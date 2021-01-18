@@ -1,5 +1,6 @@
 #include <libwidget/Application.h>
 #include <libwidget/Widgets.h>
+#include <libwidget/widgets/TitleBar.h>
 
 int main(int argc, char **argv)
 {
@@ -14,6 +15,8 @@ int main(int argc, char **argv)
     window->icon(Icon::get("image"));
     window->title("Image Viewer");
     window->size(Vec2i(700, 500));
+
+    new TitleBar(window->root());
 
     new Image(window->root(), Bitmap::load_from_or_placeholder(argv[1]));
 

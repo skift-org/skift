@@ -2,6 +2,7 @@
 #include <libwidget/widgets/Button.h>
 #include <libwidget/widgets/Panel.h>
 #include <libwidget/widgets/TextEditor.h>
+#include <libwidget/widgets/TitleBar.h>
 
 int main(int argc, char **argv)
 {
@@ -23,6 +24,8 @@ int main(int argc, char **argv)
     window->size(Vec2i(700, 500));
 
     window->root()->layout(VFLOW(0));
+
+    new TitleBar(window->root());
 
     auto toolbar = new Panel(window->root());
 

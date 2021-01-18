@@ -2,6 +2,7 @@
 
 #include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
+#include <libwidget/widgets/TitleBar.h>
 
 #include "settings/pages/Home.h"
 
@@ -19,6 +20,8 @@ public:
         size({700, 500});
 
         root()->layout(VFLOW(0));
+
+        new TitleBar(root());
 
         auto navigation_bar = new Panel(root());
         navigation_bar->layout(HFLOW(4));

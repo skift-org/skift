@@ -4,10 +4,10 @@
     width="280"
     height="280"
     layout="vflow(8)"
-    padding="insets(6)"
     >
+    <TitleBar />
 
-    <Container layout="vflow(4)" fill>
+    <Container layout="vflow(4)" padding="insets(6)" fill>
         <Image id="system-image" fill/>
 
         <Label text="The skift operating system." anchor="center"/>
@@ -17,7 +17,7 @@
         <Label text="N. Van Bossuyt & contributors." anchor="center"/>
     </Container>
 
-    <Container layout="hflow(0)">
+    <Container layout="hflow(0)" padding="insets(6)">
         <Button id="license-button" text="License" outlined/>
         <Container fill/>
         <Button id="ok-button" text="Ok" filled/>

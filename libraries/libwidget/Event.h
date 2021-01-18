@@ -17,6 +17,9 @@ struct MouseEvent
     Vec2i position;
     Vec2i old_position;
 
+    Vec2i position_on_screen;
+    Vec2i old_position_on_screen;
+
     MouseButton button;
     MouseButton buttons;
 };
@@ -55,7 +58,6 @@ struct Event
 
         DISPLAY_SIZE_CHANGED,
 
-        WINDOW_MAXIMIZING,
         __COUNT,
     };
 

@@ -82,11 +82,11 @@ void Window::repaint(Painter &painter, Recti rectangle)
 {
     if (_flags & WINDOW_TRANSPARENT || _flags & WINDOW_ACRYLIC)
     {
-        painter.clear_rectangle(rectangle, color(THEME_BACKGROUND).with_alpha(_opacity));
+        painter.clear(rectangle, color(THEME_BACKGROUND).with_alpha(_opacity));
     }
     else
     {
-        painter.clear_rectangle(rectangle, color(THEME_BACKGROUND));
+        painter.clear(rectangle, color(THEME_BACKGROUND));
     }
 
     painter.push();

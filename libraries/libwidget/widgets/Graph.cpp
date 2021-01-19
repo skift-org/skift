@@ -52,7 +52,7 @@ void Graph::paint(Painter &painter, Recti rectangle)
         float dist = (1 - distance(where, cursor_position, 1)) * 0.5;
 
         painter.fill_rectangle(bar, _color.with_alpha(dist));
-        painter.plot_pixel(bar.position(), _color);
+        painter.plot(bar.position(), _color);
     }
 
     Recti cursor(

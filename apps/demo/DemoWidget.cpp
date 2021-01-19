@@ -47,7 +47,7 @@ void DemoWidget::paint(Painter &painter, Recti)
         _demo->callback(*_painter, _bitmap->bound(), _time);
     }
 
-    painter.blit_bitmap_no_alpha(*_bitmap, _bitmap->bound(), bound());
+    painter.blit_no_alpha(*_bitmap, _bitmap->bound(), bound());
 
     painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(9, 17), Colors::BLACK);
     painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(8, 16), Colors::WHITE);

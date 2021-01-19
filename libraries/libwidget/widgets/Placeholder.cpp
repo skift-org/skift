@@ -17,7 +17,7 @@ void Placeholder::paint(Painter &painter, Recti rectangle)
 
     painter.draw_rectangle(bound(), Colors::RED);
 
-    painter.blit_icon(
+    painter.blit(
         *_alert_icon,
         ICON_18PX,
         _alert_icon->bound(ICON_18PX).moved(bound().position() + Vec2i(8, 8)),

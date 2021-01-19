@@ -44,7 +44,7 @@ void Image::paint(Painter &painter, Recti rectangle)
         destination = bound();
     }
 
-    painter.blit_bitmap(*_bitmap, _bitmap->bound(), destination);
+    painter.blit(*_bitmap, _bitmap->bound(), destination);
 }
 
 Vec2i Image::size()

@@ -64,15 +64,15 @@ public:
         {
             if (_scaling == COVER)
             {
-                painter.blit_bitmap(*_orginal, _orginal->bound(), _orginal->bound().cover(_scaled->bound()));
+                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().cover(_scaled->bound()));
             }
             else if (_scaling == STRETCH)
             {
-                painter.blit_bitmap(*_orginal, _orginal->bound(), _scaled->bound());
+                painter.blit(*_orginal, _orginal->bound(), _scaled->bound());
             }
             else if (_scaling == COVER)
             {
-                painter.blit_bitmap(*_orginal, _orginal->bound(), _orginal->bound().centered_within(_scaled->bound()));
+                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().centered_within(_scaled->bound()));
             }
         }
     }
@@ -82,9 +82,7 @@ public:
         _acrylic->copy_from(*_scaled, _scaled->bound());
         Painter painter(*_acrylic);
 
-        painter.saturation(_acrylic->bound(), 0.25);
-        painter.blur_rectangle(_acrylic->bound(), 16);
-        painter.noise(_acrylic->bound(), 0.05);
+        painter.acrylic(_acrylic->bound());
     }
 
     void render()

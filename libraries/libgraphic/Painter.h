@@ -14,6 +14,17 @@ struct PainterState
     Recti clip;
 };
 
+struct SourceDestionation
+{
+    Recti source;
+    Recti destination;
+
+    bool is_empty()
+    {
+        return destination.is_empty();
+    }
+};
+
 class Painter
 {
 private:
@@ -24,6 +35,8 @@ private:
 public:
     Painter(RefPtr<Bitmap> bitmap);
 
+    /* --- context ---------------------------------------------------------- */
+
     void push();
 
     void pop();
@@ -32,31 +45,33 @@ public:
 
     void transform(Vec2i offset);
 
-    void plot_pixel(Vec2i position, Color color);
+    Recti apply(Recti rectangle);
 
-    void blit_bitmap(Bitmap &bitmap, Recti source, Recti destination);
+    SourceDestionation apply(Recti source, Recti destination);
 
-    void blit_bitmap_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
+    /* --- Drawing ---------------------------------------------------------- */
 
-    void blit_icon(Icon &icon, IconSize size, Recti destination, Color color);
+    void plot(Vec2i position, Color color);
+
+    void blit(Bitmap &bitmap, Recti source, Recti destination);
+
+    void blit_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
+
+    void blit(Icon &icon, IconSize size, Recti destination, Color color);
 
     void clear(Color color);
 
-    void clear_rectangle(Recti rectangle, Color color);
+    void clear(Recti rectangle, Color color);
 
     void fill_rectangle(Recti rectangle, Color color);
 
     void fill_insets(Recti rectangle, Insetsi insets, Color color);
 
-    void fill_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color);
-
-    void fill_rounded_rectangle(Recti bound, int radius, Color color);
+    void fill_rectangle_rounded(Recti bound, int radius, Color color);
 
     void fill_checkboard(Recti bound, int cell_size, Color fg_color, Color bg_color);
 
     void draw_line(Vec2i from, Vec2i to, Color color);
-
-    void draw_line_antialias(Vec2i from, Vec2i to, Color color);
 
     void draw_rectangle(Recti rectangle, Color color);
 
@@ -64,7 +79,7 @@ public:
 
     void draw_path(const graphic::Path &path, Vec2f pos, Trans2f transform, Color color);
 
-    void draw_rounded_rectangle(Recti bound, int radius, int thickness, Color color);
+    void draw_rectangle_rounded(Recti bound, int radius, int thickness, Color color);
 
     void draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color);
 
@@ -72,39 +87,37 @@ public:
 
     void draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color);
 
-    void blur_rectangle(Recti rectangle, int radius);
+    /* --- Effects ---------------------------------------------------------- */
+
+    void blur(Recti rectangle, int radius);
 
     void saturation(Recti rectangle, float value);
 
     void noise(Recti rectangle, float opacity);
 
+    void acrylic(Recti rectangle);
+
 private:
-    Recti clip()
+    Recti clip() const
     {
         return _state_stack[_state_stack_top].clip;
     }
 
-    Vec2i origine() { return _state_stack[_state_stack_top].origine; };
+    Vec2i origine() const { return _state_stack[_state_stack_top].origine; };
 
     Recti apply_clip(Recti rectangle);
 
     Recti apply_transform(Recti rectangle);
 
-    void blit_bitmap_fast(Bitmap &bitmap, Recti source, Recti destination);
+    void blit_fast(Bitmap &bitmap, Recti source, Recti destination);
 
-    void blit_bitmap_scaled(Bitmap &bitmap, Recti source, Recti destination);
+    void blit_scaled(Bitmap &bitmap, Recti source, Recti destination);
 
-    void blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
+    void blit_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
 
-    void blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
+    void blit_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination);
 
-    void draw_line_x_aligned(int x, int start, int end, Color color);
-
-    void draw_line_y_aligned(int y, int start, int end, Color color);
-
-    void draw_line_not_aligned(Vec2i a, Vec2i b, Color color);
-
-    void blit_bitmap_colored(Bitmap &src, Recti src_rect, Recti dst_rect, Color color);
+    void blit_colored(Bitmap &src, Recti source, Recti destination, Color color);
 
     void draw_circle_helper(Recti bound, Vec2i center, int radius, int thickness, Color color);
 };

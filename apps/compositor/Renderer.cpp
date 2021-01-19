@@ -64,7 +64,7 @@ void renderer_region_dirty(Recti new_region)
 
 void renderer_composite_wallpaper(Recti region)
 {
-    _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->scaled(), region, region);
+    _framebuffer->painter().blit_no_alpha(_wallpaper->scaled(), region, region);
     _framebuffer->mark_dirty(region);
 }
 
@@ -88,10 +88,10 @@ void renderer_composite_region(Recti region, Window *window_transparent)
 
             if (window->flags() & WINDOW_ACRYLIC)
             {
-                _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->acrylic(), destination, destination);
+                _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), destination, destination);
             }
 
-            _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+            _framebuffer->painter().blit(window->frontbuffer(), source, destination);
         }
 
         return Iteration::CONTINUE;
@@ -121,16 +121,16 @@ void renderer_region(Recti region)
             if (window->flags() & WINDOW_TRANSPARENT)
             {
                 renderer_composite_region(destination, window);
-                _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
             }
             else if (window->flags() & WINDOW_ACRYLIC)
             {
-                _framebuffer->painter().blit_bitmap_no_alpha(_wallpaper->acrylic(), region, region);
-                _framebuffer->painter().blit_bitmap(window->frontbuffer(), source, destination);
+                _framebuffer->painter().blit_no_alpha(_wallpaper->acrylic(), region, region);
+                _framebuffer->painter().blit(window->frontbuffer(), source, destination);
             }
             else
             {
-                _framebuffer->painter().blit_bitmap_no_alpha(window->frontbuffer(), source, destination);
+                _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
             }
 
             _framebuffer->mark_dirty(destination);

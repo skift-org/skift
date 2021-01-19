@@ -76,11 +76,11 @@ void Slider::paint(Painter &painter, Recti rectangle)
     {
         painter.fill_rectangle(track_bound(), color(THEME_BORDER));
         painter.fill_rectangle(value_bound(), color(THEME_ACCENT));
-        painter.fill_rounded_rectangle(thumb_bound(), content_bound().height() / 2, color(THEME_ACCENT));
+        painter.fill_rectangle_rounded(thumb_bound(), content_bound().height() / 2, color(THEME_ACCENT));
     }
     else
     {
         painter.fill_rectangle(value_bound(), color(THEME_BACKGROUND));
-        painter.fill_rounded_rectangle(thumb_bound(), content_bound().height() / 2, color(THEME_BACKGROUND));
+        painter.fill_rectangle_rounded(thumb_bound(), content_bound().height() / 2, color(THEME_BACKGROUND));
     }
 }

@@ -142,7 +142,7 @@ int font_height() { return 9; }
 
 int font_width() { return 9; }
 
-void plot_pixel(int x, int y, uint32_t color)
+void plot(int x, int y, uint32_t color)
 {
     graphic_framebuffer()[y * graphic_framebuffer_width() + x] = color;
 }
@@ -160,11 +160,11 @@ void font_draw(Codepoint cp, int x, int y)
 
             if (set)
             {
-                plot_pixel(x + xx, y + yy, fg);
+                plot(x + xx, y + yy, fg);
             }
             else
             {
-                plot_pixel(x + xx, y + yy, bg);
+                plot(x + xx, y + yy, bg);
             }
         }
     }

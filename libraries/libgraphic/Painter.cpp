@@ -19,6 +19,8 @@ Painter::Painter(RefPtr<Bitmap> bitmap)
     };
 }
 
+/* --- Context -------------------------------------------------------------- */
+
 void Painter::push()
 {
     assert(_state_stack_top < STATESTACK_SIZE);
@@ -67,102 +69,19 @@ Recti Painter::apply_transform(Recti rectangle)
     return rectangle.offset(_state_stack[_state_stack_top].origine);
 }
 
-void Painter::plot_pixel(Vec2i position, Color color)
+Recti Painter::apply(Recti rectangle)
 {
-    Vec2i transformed = position + _state_stack[_state_stack_top].origine;
+    Recti result = apply_transform(rectangle);
+    result = apply_clip(result);
 
-    if (clip().contains(transformed))
-    {
-        _bitmap->blend_pixel(transformed, color);
-    }
+    return result;
 }
 
-void Painter::blit_bitmap_fast(Bitmap &bitmap, Recti source, Recti destination)
-{
-    Recti clipped_destination = apply_transform(destination);
-    clipped_destination = apply_clip(clipped_destination);
-
-    Recti clipped_source = Recti(clipped_destination.width(), clipped_destination.height());
-    clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
-
-    if (clipped_destination.is_empty())
-        return;
-
-    for (int y = 0; y < clipped_destination.height(); y++)
-    {
-        for (int x = 0; x < clipped_destination.width(); x++)
-        {
-            Vec2i position(x, y);
-
-            Color sample = bitmap.get_pixel(clipped_source.position() + position);
-
-            _bitmap->blend_pixel(clipped_destination.position() + position, sample);
-        }
-    }
-}
-
-void Painter::blit_bitmap_scaled(Bitmap &bitmap, Recti source, Recti destination)
-{
-    if (destination.is_empty())
-        return;
-
-    for (int y = 0; y < destination.height(); y++)
-    {
-        for (int x = 0; x < destination.width(); x++)
-        {
-            float xx = x / (float)destination.width();
-            float yy = y / (float)destination.height();
-
-            Color sample = bitmap.sample(source, Vec2f(xx, yy));
-            plot_pixel(destination.position() + Vec2i(x, y), sample);
-        }
-    }
-}
-
-__flatten void Painter::blit_bitmap(Bitmap &bitmap, Recti source, Recti destination)
-{
-    if (destination.is_empty())
-        return;
-
-    if (source.width() == destination.width() &&
-        source.height() == destination.height())
-    {
-        blit_bitmap_fast(bitmap, source, destination);
-    }
-    else
-    {
-        blit_bitmap_scaled(bitmap, source, destination);
-    }
-}
-
-void Painter::blit_bitmap_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
-{
-    Recti clipped_destination = apply_transform(destination);
-    clipped_destination = apply_clip(clipped_destination);
-
-    Recti clipped_source = Recti(clipped_destination.width(), clipped_destination.height());
-    clipped_source = clipped_source.moved(source.position() + clipped_destination.position() - destination.position());
-
-    if (clipped_destination.is_empty())
-        return;
-
-    for (int y = 0; y < clipped_destination.height(); y++)
-    {
-        for (int x = 0; x < clipped_destination.width(); x++)
-        {
-            Vec2i position(x, y);
-
-            Color sample = bitmap.get_pixel(clipped_source.position() + position);
-            _bitmap->set_pixel_no_check(clipped_destination.position() + position, sample.with_alpha(1));
-        }
-    }
-}
-
-void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
+SourceDestionation Painter::apply(Recti source, Recti destination)
 {
     if (destination.is_empty())
     {
-        return;
+        return {Recti::empty(), Recti::empty()};
     }
 
     Recti transformed_destination = apply_transform(destination);
@@ -170,7 +89,7 @@ void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti de
 
     if (clipped_destination.is_empty())
     {
-        return;
+        return {Recti::empty(), Recti::empty()};
     }
 
     double scalex = clipped_destination.width() / (double)destination.width();
@@ -182,41 +101,142 @@ void Painter::blit_bitmap_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti de
     Recti clipped_source = source.scaled(scalex, scaley);
     clipped_source = clipped_source.offset((clipped_destination.position() - transformed_destination.position()) * Vec2d{other_scalex, other_scaley});
 
-    for (int y = 0; y < clipped_destination.height(); y++)
-    {
-        for (int x = 0; x < clipped_destination.width(); x++)
-        {
-            float xx = x / (float)clipped_destination.width();
-            float yy = y / (float)clipped_destination.height();
+    return {clipped_source, clipped_destination};
+}
 
-            Color sample = bitmap.sample(clipped_source, Vec2f(xx, yy));
-            plot_pixel(clipped_destination.position() + Vec2i(x, y), sample);
+/* --- Drawing -------------------------------------------------------------- */
+
+void Painter::plot(Vec2i position, Color color)
+{
+    Vec2i transformed = position + _state_stack[_state_stack_top].origine;
+
+    if (clip().contains(transformed))
+    {
+        _bitmap->blend_pixel(transformed, color);
+    }
+}
+
+void Painter::blit_fast(Bitmap &bitmap, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
+
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            Vec2i position(x, y);
+
+            Color sample = bitmap.get_pixel(result.source.position() + position);
+
+            _bitmap->blend_pixel(result.destination.position() + position, sample);
         }
     }
 }
 
-__flatten void Painter::blit_bitmap_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
+void Painter::blit_scaled(Bitmap &bitmap, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
+
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            float xx = x / (float)result.destination.width();
+            float yy = y / (float)result.destination.height();
+
+            Color sample = bitmap.sample(result.source, Vec2f(xx, yy));
+            _bitmap->blend_pixel(result.destination.position() + Vec2i(x, y), sample);
+        }
+    }
+}
+
+__flatten void Painter::blit(Bitmap &bitmap, Recti source, Recti destination)
 {
     if (source.width() == destination.width() &&
         source.height() == destination.height())
     {
-        blit_bitmap_fast_no_alpha(bitmap, source, destination);
+        blit_fast(bitmap, source, destination);
     }
     else
     {
-        blit_bitmap_scaled_no_alpha(bitmap, source, destination);
+        blit_scaled(bitmap, source, destination);
+    }
+}
+
+void Painter::blit_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
+
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            Vec2i position(x, y);
+
+            Color sample = bitmap.get_pixel(result.source.position() + position);
+            _bitmap->set_pixel_no_check(result.destination.position() + position, sample.with_alpha(1));
+        }
+    }
+}
+
+void Painter::blit_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
+{
+    auto result = apply(source, destination);
+
+    if (result.is_empty())
+    {
+        return;
+    }
+
+    for (int y = 0; y < result.destination.height(); y++)
+    {
+        for (int x = 0; x < result.destination.width(); x++)
+        {
+            float xx = x / (float)result.destination.width();
+            float yy = y / (float)result.destination.height();
+
+            Color sample = bitmap.sample(result.source, Vec2f(xx, yy));
+            plot(result.destination.position() + Vec2i(x, y), sample);
+        }
+    }
+}
+
+__flatten void Painter::blit_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
+{
+    if (source.width() == destination.width() &&
+        source.height() == destination.height())
+    {
+        blit_fast_no_alpha(bitmap, source, destination);
+    }
+    else
+    {
+        blit_scaled_no_alpha(bitmap, source, destination);
     }
 }
 
 __flatten void Painter::clear(Color color)
 {
-    clear_rectangle(_bitmap->bound(), color);
+    clear(_bitmap->bound(), color);
 }
 
-__flatten void Painter::clear_rectangle(Recti rectangle, Color color)
+__flatten void Painter::clear(Recti rectangle, Color color)
 {
-    rectangle = apply_transform(rectangle);
-    rectangle = apply_clip(rectangle);
+    rectangle = apply(rectangle);
 
     if (rectangle.is_empty())
     {
@@ -234,8 +254,7 @@ __flatten void Painter::clear_rectangle(Recti rectangle, Color color)
 
 __flatten void Painter::fill_rectangle(Recti rectangle, Color color)
 {
-    rectangle = apply_transform(rectangle);
-    rectangle = apply_clip(rectangle);
+    rectangle = apply(rectangle);
 
     if (rectangle.is_empty())
     {
@@ -265,104 +284,26 @@ __flatten void Painter::fill_insets(Recti rectangle, Insetsi insets, Color color
     fill_rectangle(bottom, color);
 }
 
-__flatten void Painter::fill_triangle(Vec2i p0, Vec2i p1, Vec2i p2, Color color)
-{
-    Vec2f a(p0);
-    Vec2f b(p1);
-    Vec2f c(p2);
-
-    if (a.y() > b.y())
-        swap(a, b);
-    if (a.y() > c.y())
-        swap(a, c);
-    if (b.y() > c.y())
-        swap(b, c);
-
-    Vec2f s = a;
-    Vec2f e = a;
-
-    float dx1 = 0;
-    float dx2 = 0;
-    float dx3 = 0;
-
-    if (b.y() - a.y() > 0)
-    {
-        dx1 = (b.x() - a.x()) / (float)(b.y() - a.y());
-    }
-
-    if (c.y() - a.y() > 0)
-    {
-        dx2 = (c.x() - a.x()) / (float)(c.y() - a.y());
-    }
-
-    if (c.y() - b.y() > 0)
-    {
-        dx3 = (c.x() - b.x()) / (float)(c.y() - b.y());
-    }
-
-    if (dx1 > dx2)
-    {
-        do
-        {
-            draw_line(Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
-
-            s += Vec2f(dx2, 1);
-            e += Vec2f(dx1, 1);
-        } while (s.y() <= b.y());
-
-        e = b;
-
-        do
-        {
-            draw_line(Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
-
-            s += Vec2f(dx2, 1);
-            e += Vec2f(dx3, 1);
-        } while (s.y() <= c.y());
-    }
-    else
-    {
-        do
-        {
-            draw_line(Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
-
-            s += Vec2f(dx1, 1);
-            e += Vec2f(dx2, 1);
-        } while (s.y() <= b.y());
-
-        s = b;
-
-        do
-        {
-            draw_line(Vec2i(s.x() - 1, s.y()), Vec2i(e.x() + 1, s.y()), color);
-
-            s += Vec2f(dx3, 1);
-            e += Vec2f(dx2, 1);
-        } while (s.y() <= c.y());
-    }
-}
-
-static float sample_fill_circle(Vec2i center, float radius, Vec2i position)
-{
-    float distance = center.distance_to(position) - radius;
-    return clamp(0.5 - distance, 0, 1);
-}
-
 static void fill_circle_helper(Painter &painter, Recti bound, Vec2i center, int radius, Color color)
 {
+    auto circle_distance = [](Vec2i center, float radius, Vec2i position) {
+        float distance = center.distance_to(position) - radius;
+        return clamp(0.5 - distance, 0, 1);
+    };
+
     for (int y = 0; y < bound.height(); y++)
     {
         for (int x = 0; x < bound.width(); x++)
         {
-            float distance = sample_fill_circle(center, radius - 0.5, Vec2i(x, y));
+            float distance = circle_distance(center, radius - 0.5, Vec2i(x, y));
             float alpha = color.alphaf() * distance;
 
-            painter.plot_pixel(Vec2i(bound.x() + x, bound.y() + y), color.with_alpha(alpha));
+            painter.plot(Vec2i(bound.x() + x, bound.y() + y), color.with_alpha(alpha));
         }
     }
 }
 
-__flatten void Painter::fill_rounded_rectangle(Recti bound, int radius, Color color)
+__flatten void Painter::fill_rectangle_rounded(Recti bound, int radius, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
@@ -391,59 +332,12 @@ __flatten void Painter::fill_checkboard(Recti bound, int cell_size, Color fg_col
 
             if (((y / cell_size) * bound.width() + (x / cell_size) + (y / cell_size) % 2) % 2 == 0)
             {
-                plot_pixel(position, fg_color);
+                plot(position, fg_color);
             }
             else
             {
-                plot_pixel(position, bg_color);
+                plot(position, bg_color);
             }
-        }
-    }
-}
-
-void Painter::draw_line_x_aligned(int x, int start, int end, Color color)
-{
-    for (int i = start; i <= end; i++)
-    {
-        plot_pixel(Vec2i(x, i), color);
-    }
-}
-
-void Painter::draw_line_y_aligned(int y, int start, int end, Color color)
-{
-    for (int i = start; i <= end; i++)
-    {
-        plot_pixel(Vec2i(i, y), color);
-    }
-}
-
-void Painter::draw_line_not_aligned(Vec2i a, Vec2i b, Color color)
-{
-    int dx = abs(b.x() - a.x());
-    int dy = abs(b.y() - a.y());
-
-    int sx = a.x() < b.x() ? 1 : -1;
-    int sy = a.y() < b.y() ? 1 : -1;
-
-    int err = (dx > dy ? dx : -dy) / 2, e2;
-
-    for (;;)
-    {
-        plot_pixel(a, color);
-
-        if (a.x() == b.x() && a.y() == b.y())
-            break;
-
-        e2 = err;
-        if (e2 > -dx)
-        {
-            err -= dy;
-            a += Vec2(sx, 0);
-        }
-        if (e2 < dy)
-        {
-            err += dx;
-            a += Vec2(0, sy);
         }
     }
 }
@@ -452,10 +346,30 @@ void Painter::draw_line_not_aligned(Vec2i a, Vec2i b, Color color)
 #define __round(X) ((int)(((double)(X)) + 0.5))
 #define __fpart(X) (((double)(X)) - (double)__ipart(X))
 #define __rfpart(X) (1.0 - __fpart(X))
-#define __plot(__x, __y, __brightness) plot_pixel(Vec2i((__x), (__y)), color.with_alpha(color.alphaf() * (__brightness)))
+#define __plot(__x, __y, __brightness) plot(Vec2i((__x), (__y)), color.with_alpha(color.alphaf() * (__brightness)))
 
-__flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
+__flatten void Painter::draw_line(Vec2i a, Vec2i b, Color color)
 {
+    if (a.x() == b.x())
+    {
+        for (int i = MIN(a.y(), b.y()); i <= MAX(a.y(), b.y()); i++)
+        {
+            plot(Vec2i(a.x(), i), color);
+        }
+
+        return;
+    }
+
+    if (a.y() == b.y())
+    {
+        for (int i = MIN(a.x(), b.x()); i <= MAX(a.x(), b.x()); i++)
+        {
+            plot(Vec2i(i, a.y()), color);
+        }
+
+        return;
+    }
+
     double x0 = a.x();
     double y0 = a.y();
     double x1 = b.x();
@@ -537,22 +451,6 @@ __flatten void Painter::draw_line_antialias(Vec2i a, Vec2i b, Color color)
     }
 }
 
-__flatten void Painter::draw_line(Vec2i a, Vec2i b, Color color)
-{
-    if (a.x() == b.x())
-    {
-        draw_line_x_aligned(a.x(), MIN(a.y(), b.y()), MAX(a.y(), b.y()), color);
-    }
-    else if (a.y() == b.y())
-    {
-        draw_line_y_aligned(a.y(), MIN(a.x(), b.x()), MAX(a.x(), b.x()), color);
-    }
-    else
-    {
-        draw_line_not_aligned(a, b, color);
-    }
-}
-
 __flatten void Painter::draw_rectangle(Recti rect, Color color)
 {
     Vec2i topleft = rect.position();
@@ -614,12 +512,12 @@ void Painter::draw_circle_helper(Recti bound, Vec2i center, int radius, int thic
             double distance = sample_draw_circle(center, radius - 0.5, thickness, position);
             double alpha = color.alphaf() * distance;
 
-            plot_pixel(bound.position() + position, color.with_alpha(alpha));
+            plot(bound.position() + position, color.with_alpha(alpha));
         }
     }
 }
 
-__flatten void Painter::draw_rounded_rectangle(Recti bound, int radius, int thickness, Color color)
+__flatten void Painter::draw_rectangle_rounded(Recti bound, int radius, int thickness, Color color)
 {
     radius = MIN(radius, bound.height() / 2);
     radius = MIN(radius, bound.width() / 2);
@@ -640,7 +538,7 @@ __flatten void Painter::draw_rounded_rectangle(Recti bound, int radius, int thic
     fill_rectangle(bound.cutoff_left_and_right(radius, radius).take_bottom(thickness), color);
 }
 
-__flatten void Painter::blit_icon(Icon &icon, IconSize size, Recti destination, Color color)
+__flatten void Painter::blit(Icon &icon, IconSize size, Recti destination, Color color)
 {
     Bitmap &bitmap = *icon.bitmap(size);
 
@@ -655,12 +553,71 @@ __flatten void Painter::blit_icon(Icon &icon, IconSize size, Recti destination, 
             Color sample = bitmap.sample(sample_point);
 
             auto alpha = sample.alphaf() * color.alphaf();
-            plot_pixel(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
+            plot(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
         }
     }
 }
 
-__flatten void Painter::blur_rectangle(Recti rectangle, int radius)
+__flatten void Painter::blit_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
+{
+    for (int y = 0; y < destination.height(); y++)
+    {
+        for (int x = 0; x < destination.width(); x++)
+        {
+            Vec2f sample_point(
+                x / (double)destination.width(),
+                y / (double)destination.height());
+
+            Color sample = bitmap.sample(source, sample_point);
+
+            auto alpha = sample.redf() * color.alphaf();
+            plot(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
+        }
+    }
+}
+
+void Painter::draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color)
+{
+    Recti dest(position - glyph.origin, glyph.bound.size());
+
+    // auto metrics = font.metrics();
+    // auto baseline = position.y();
+    //
+    // auto draw_metric = [&](int value, Color color) {
+    //     draw_line_y_aligned(value, position.x(), position.x() + glyph.bound.width(), color);
+    // };
+    //
+    // draw_metric(metrics.fullascend(baseline), Colors::RED);
+    // draw_metric(metrics.ascend(baseline), Colors::ORANGE);
+    // draw_metric(metrics.captop(baseline), Colors::BLUE);
+    // draw_metric(baseline, Colors::MAGENTA);
+    // draw_metric(metrics.descend(baseline), Colors::ORANGE);
+    // draw_metric(metrics.fulldescend(baseline), Colors::RED);
+
+    blit_colored(font.bitmap(), glyph.bound, dest, color);
+}
+
+__flatten void Painter::draw_string(Font &font, const char *str, Vec2i position, Color color)
+{
+    codepoint_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto codepoint) {
+        auto &glyph = font.glyph(codepoint);
+        draw_glyph(font, glyph, position, color);
+        position = position + Vec2i(glyph.advance, 0);
+    });
+}
+
+void Painter::draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color)
+{
+    Recti bound = font.mesure(str);
+
+    bound = bound.place_within(container, anchor);
+
+    draw_string(font, str, Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4), color);
+}
+
+/* --- Effects -------------------------------------------------------------- */
+
+__flatten void Painter::blur(Recti rectangle, int radius)
 {
     rectangle = apply_transform(rectangle);
     rectangle = apply_clip(rectangle);
@@ -708,64 +665,14 @@ __flatten void Painter::noise(Recti rectangle, float opacity)
         for (int x = 0; x < rectangle.width(); x++)
         {
             double noise = rand.next_double();
-            plot_pixel({x, y}, Color::from_rgba(noise, noise, noise, opacity));
+            plot({x, y}, Color::from_rgba(noise, noise, noise, opacity));
         }
     }
 }
 
-__flatten void Painter::blit_bitmap_colored(Bitmap &bitmap, Recti source, Recti destination, Color color)
+void Painter::acrylic(Recti rectangle)
 {
-    for (int y = 0; y < destination.height(); y++)
-    {
-        for (int x = 0; x < destination.width(); x++)
-        {
-            Vec2f sample_point(
-                x / (double)destination.width(),
-                y / (double)destination.height());
-
-            Color sample = bitmap.sample(source, sample_point);
-
-            auto alpha = sample.redf() * color.alphaf();
-            plot_pixel(destination.position() + Vec2i(x, y), color.with_alpha(alpha));
-        }
-    }
-}
-
-void Painter::draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color color)
-{
-    Recti dest(position - glyph.origin, glyph.bound.size());
-
-    // auto metrics = font.metrics();
-    // auto baseline = position.y();
-    //
-    // auto draw_metric = [&](int value, Color color) {
-    //     draw_line_y_aligned(value, position.x(), position.x() + glyph.bound.width(), color);
-    // };
-    //
-    // draw_metric(metrics.fullascend(baseline), Colors::RED);
-    // draw_metric(metrics.ascend(baseline), Colors::ORANGE);
-    // draw_metric(metrics.captop(baseline), Colors::BLUE);
-    // draw_metric(baseline, Colors::MAGENTA);
-    // draw_metric(metrics.descend(baseline), Colors::ORANGE);
-    // draw_metric(metrics.fulldescend(baseline), Colors::RED);
-
-    blit_bitmap_colored(font.bitmap(), glyph.bound, dest, color);
-}
-
-__flatten void Painter::draw_string(Font &font, const char *str, Vec2i position, Color color)
-{
-    codepoint_foreach(reinterpret_cast<const uint8_t *>(str), [&](auto codepoint) {
-        auto &glyph = font.glyph(codepoint);
-        draw_glyph(font, glyph, position, color);
-        position = position + Vec2i(glyph.advance, 0);
-    });
-}
-
-void Painter::draw_string_within(Font &font, const char *str, Recti container, Anchor anchor, Color color)
-{
-    Recti bound = font.mesure(str);
-
-    bound = bound.place_within(container, anchor);
-
-    draw_string(font, str, Vec2i(bound.x(), bound.y() + bound.height() / 2 + 4), color);
+    saturation(rectangle, 0.25);
+    blur(rectangle, 16);
+    noise(rectangle, 0.05);
 }

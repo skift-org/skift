@@ -20,7 +20,7 @@ void latency_draw(Painter &painter, Recti screen, float time)
 
     for (int y = 0; y < abs(current_tick - _last_tick) * 4; y++)
     {
-        painter.plot_pixel(Vec2i(screen.x() + x, screen.y() + y), Colors::MAGENTA);
+        painter.plot(Vec2i(screen.x() + x, screen.y() + y), Colors::MAGENTA);
     }
 
     _last_tick = current_tick;

@@ -30,6 +30,6 @@ void lines_draw(Painter &painter, Recti screen, float time)
 
         line.color = Color::from_hsv(_random.next_u32(360), 0.75, 0.9);
 
-        painter.draw_line_antialias(line.start, line.finish, line.color);
+        painter.draw_line(line.start, line.finish, line.color);
     }
 }

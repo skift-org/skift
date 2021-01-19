@@ -58,11 +58,11 @@ public:
 
             if (_index == i)
             {
-                painter.fill_rounded_rectangle(dot, DOTSIZE, color(THEME_FOREGROUND));
+                painter.fill_rectangle_rounded(dot, DOTSIZE, color(THEME_FOREGROUND));
             }
             else
             {
-                painter.fill_rounded_rectangle(dot, DOTSIZE, color(THEME_BORDER));
+                painter.fill_rectangle_rounded(dot, DOTSIZE, color(THEME_BORDER));
             }
         }
     }

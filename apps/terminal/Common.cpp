@@ -73,7 +73,7 @@ void render_cell(
 
     if (background != terminal::BACKGROUND)
     {
-        painter.clear_rectangle(bound, color(background));
+        painter.clear(bound, color(background));
     }
 
     if (attributes.underline)

@@ -13,21 +13,21 @@ void Button::paint(Painter &painter, Recti rectangle)
     {
         if (_style == BUTTON_OUTLINE)
         {
-            painter.draw_rounded_rectangle(bound(), 4, 1, color(THEME_BORDER));
+            painter.draw_rectangle_rounded(bound(), 4, 1, color(THEME_BORDER));
         }
         else if (_style == BUTTON_FILLED)
         {
-            painter.fill_rounded_rectangle(bound(), 4, color(THEME_ACCENT));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_ACCENT));
         }
 
         if (_state == BUTTON_OVER)
         {
-            painter.fill_rounded_rectangle(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
 
         if (_state == BUTTON_PRESS)
         {
-            painter.fill_rounded_rectangle(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.2));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.2));
         }
     }
 }

@@ -18,12 +18,12 @@ void ScrollBar::paint(Painter &painter, Recti rectangle)
 
     if (_mouse_over)
     {
-        painter.fill_rounded_rectangle(track_bound(), 4, color(THEME_BORDER));
-        painter.fill_rounded_rectangle(thumb_bound(), 4, color(THEME_BORDER));
+        painter.fill_rectangle_rounded(track_bound(), 4, color(THEME_BORDER));
+        painter.fill_rectangle_rounded(thumb_bound(), 4, color(THEME_BORDER));
     }
     else
     {
-        painter.fill_rounded_rectangle(thumb_bound(), 4, color(THEME_BORDER));
+        painter.fill_rectangle_rounded(thumb_bound(), 4, color(THEME_BORDER));
     }
 }
 

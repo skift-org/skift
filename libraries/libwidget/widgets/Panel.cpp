@@ -11,10 +11,10 @@ void Panel::paint(Painter &painter, Recti rectangle)
 {
     if (_border_radius > 0)
     {
-        painter.fill_rounded_rectangle(bound(), _border_radius, color(THEME_MIDDLEGROUND));
+        painter.fill_rectangle_rounded(bound(), _border_radius, color(THEME_MIDDLEGROUND));
     }
     else
     {
-        painter.clear_rectangle(rectangle, color(THEME_MIDDLEGROUND));
+        painter.clear(rectangle, color(THEME_MIDDLEGROUND));
     }
 }

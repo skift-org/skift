@@ -38,7 +38,7 @@ public:
 
     void repaint(Painter &painter, Recti rectangle)
     {
-        painter.clear_rectangle(rectangle, Colors::TRANSPARENT);
+        painter.clear(rectangle, Colors::TRANSPARENT);
         _neko.paint(painter);
     }
 };

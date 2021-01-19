@@ -128,7 +128,7 @@ void cursor_render(Painter &painter)
 {
     auto cursor_bitmap = _cursor_bitmaps[cursor_get_state()];
 
-    painter.blit_bitmap(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
+    painter.blit(*cursor_bitmap, cursor_bitmap->bound(), cursor_bound());
 }
 
 Recti cursor_bound_from_position(Vec2i position)

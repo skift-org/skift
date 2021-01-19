@@ -42,7 +42,7 @@ void Neko::update()
 
 void Neko::paint(Painter &painter)
 {
-    painter.blit_bitmap(*_sprites, sprite(), {SIZE, SIZE});
+    painter.blit(*_sprites, sprite(), {SIZE, SIZE});
 }
 
 void Neko::move_to(Vec2f destination)

@@ -15,7 +15,7 @@ void PaintCanvas::paint(Painter &painter, Recti rectangle)
     painter.fill_checkboard(paint_area(), 8, Colors::WHITE, Colors::GAINSBORO);
     painter.draw_rectangle(paint_area(), color(THEME_BORDER));
 
-    painter.blit_bitmap(
+    painter.blit(
         _document->bitmap(),
         _document->bound(), paint_area());
 }

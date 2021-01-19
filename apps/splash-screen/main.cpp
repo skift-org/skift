@@ -1,6 +1,10 @@
 #include <libgraphic/Framebuffer.h>
 #include <libsystem/process/Process.h>
 
+static const auto BACKGROUND = Color::from_hex(0x18181B);
+static const auto PROGRESS = Color::from_hex(0x0066ff);
+static const auto REMAINING = Color::from_hex(0x444444);
+
 int main(int argc, char **argv)
 {
     __unused(argc);
@@ -18,38 +22,41 @@ int main(int argc, char **argv)
     auto logo = Bitmap::load_from_or_placeholder("/Applications/splash-screen/logo.png");
     auto cat = Bitmap::load_from_or_placeholder("/Applications/splash-screen/cat.png");
 
-    auto logo_on_screen_bound = logo->bound().centered_within(framebuffer->resolution());
+    auto logo_container = logo->bound().centered_within(framebuffer->resolution());
 
-    framebuffer->painter().clear(Color::from_hex(0x18181B));
+    auto loading_container = Recti(0, 0, logo_container.width() * 1.4, 4)
+                                 .centered_within(framebuffer->resolution())
+                                 .offset(Vec2i(0, logo_container.height() + 26));
 
-    framebuffer->painter().blit_bitmap(*logo, logo->bound(), logo_on_screen_bound);
+    auto &painter = framebuffer->painter();
 
-    auto loading_bar_on_screen_bound = Recti(0, 0, logo_on_screen_bound.width() * 1.4, 4)
-                                           .centered_within(framebuffer->resolution())
-                                           .offset(Vec2i(0, logo_on_screen_bound.height() + 32));
+    painter.clear(BACKGROUND);
+
+    painter.blit(*logo, logo->bound(), logo_container);
 
     framebuffer->mark_dirty_all();
     framebuffer->blit();
 
     for (size_t i = 0; i <= 100; i++)
     {
-        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound.expended(Insetsi(16, 16)), Color::from_hex(0x18181B));
-        framebuffer->painter().clear_rectangle(loading_bar_on_screen_bound, Color::from_byte(0x44, 0x44, 0x44));
+        painter.clear(loading_container, REMAINING);
 
-        Recti progress = loading_bar_on_screen_bound.take_left(loading_bar_on_screen_bound.width() * (i / 100.0));
+        Recti progress = loading_container.take_left(loading_container.width() * (i / 100.0));
 
         if (argc == 2 && strcmp(argv[1], "--nyan") == 0)
         {
-            framebuffer->painter().clear_rectangle(progress, Color::from_hsv((int)(360 * (i / 100.0) * 2) % 360, 0.5, 1));
-            framebuffer->painter().blit_bitmap(*cat, cat->bound(), cat->bound().moved(progress.top_right() + Vec2i(-4, -2 - 8)));
+            auto color = Color::from_hsv((int)(360 * (i / 100.0) * 2) % 360, 0.5, 1);
+
+            painter.clear(progress, color);
+            painter.blit(*cat, cat->bound(), cat->bound().moved(progress.top_right() + Vec2i(-4, -2 - 8)));
         }
         else
         {
-            framebuffer->painter().clear_rectangle(progress, Color::from_byte(0x00, 0x66, 0xff));
-            framebuffer->painter().fill_rectangle(progress.take_right(1), Color::from_byte(0xff, 0xff, 0xff, 100));
+            painter.clear(progress, PROGRESS);
+            painter.fill_rectangle(progress.take_right(1), REMAINING);
         }
 
-        framebuffer->mark_dirty(loading_bar_on_screen_bound.expended(Insetsi(16)));
+        framebuffer->mark_dirty(loading_container.expended(Insetsi(16)));
         framebuffer->blit();
 
         process_sleep(5);

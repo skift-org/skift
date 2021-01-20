@@ -49,11 +49,7 @@ static const char *const witty_comments[] = {
 static bool has_panic = false;
 static bool nested_panic = false;
 
-void system_panic_internal(
-    __SOURCE_LOCATION__ location,
-    void *stackframe,
-    const char *message,
-    ...)
+void system_panic_internal(__SOURCE_LOCATION__ location, void *stackframe, const char *message, ...)
 {
     interrupts_retain();
     interrupts_disable_holding();
@@ -66,7 +62,9 @@ void system_panic_internal(
     va_start(va, message);
 
     if (nested_panic)
+    {
         system_stop();
+    }
 
     if (!has_panic)
     {

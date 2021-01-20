@@ -141,7 +141,7 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    eventloop_initialize();
+    EventLoop::initialize();
 
     Stream *keyboard_stream = stream_open(KEYBOARD_DEVICE_PATH, OPEN_READ);
     Stream *mouse_stream = stream_open(MOUSE_DEVICE_PATH, OPEN_READ);
@@ -174,5 +174,5 @@ int main(int argc, char const *argv[])
         process_run("onboarding", nullptr);
     }
 
-    return eventloop_run();
+    return EventLoop::run();
 }

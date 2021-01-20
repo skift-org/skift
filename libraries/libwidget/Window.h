@@ -18,27 +18,27 @@ struct Window
 {
     int _handle;
 
-    String _title;
+    String _title = "Window";
     RefPtr<Icon> _icon;
-    Recti _bound;
+    Recti _bound{250, 250};
     WindowFlag _flags;
-    WindowType _type;
+    WindowType _type = WINDOW_TYPE_REGULAR;
 
     float _opacity;
 
     bool _focused = false;
     bool _visible = false;
 
-    bool is_maximised = false;
-    bool is_resizing = false;
+    bool _is_maximised = false;
+    bool _is_resizing = false;
 
-    bool resize_vertical = false;
-    bool resize_horizontal = false;
+    bool _resize_vertical = false;
+    bool _resize_horizontal = false;
 
-    Vec2i resize_begin;
-    Recti previous_bound;
+    Vec2i _resize_begin;
+    Recti _previous_bound;
 
-    CursorState cursor_state;
+    CursorState cursor_state = CURSOR_DEFAULT;
 
     RefPtr<Bitmap> frontbuffer;
     OwnPtr<Painter> frontbuffer_painter;
@@ -51,15 +51,15 @@ struct Window
 
     EventHandler handlers[EventType::__COUNT];
 
-    Widget *root_container;
+    Widget *_root;
 
-    Widget *focused_widget = nullptr;
-    Widget *mouse_focused_widget = nullptr;
-    Widget *mouse_over_widget = nullptr;
+    Widget *_keyboard_focus = nullptr;
+    Widget *_mouse_focus = nullptr;
+    Widget *_mouse_over = nullptr;
+
     HashMap<String, Widget *> widget_by_id{};
 
     OwnPtr<Invoker> _repaint_invoker;
-
     OwnPtr<Invoker> _relayout_invoker;
 
 public:
@@ -111,55 +111,31 @@ public:
 
     bool focused()
     {
-        if (_flags & WINDOW_ALWAYS_FOCUSED)
-        {
-            return true;
-        }
-        else
-        {
-            return _focused;
-        }
+        return (_flags & WINDOW_ALWAYS_FOCUSED) || _focused;
     }
 
     bool maximised()
     {
-        return is_maximised;
+        return _is_maximised;
     }
 
     void toggle_maximise();
 
-    WindowType type()
-    {
-        return _type;
-    }
+    WindowType type() { return _type; }
 
     void type(WindowType type) { _type = type; }
 
     Color color(ThemeColorRole role);
 
-    Widget *root() { return root_container; }
+    Widget *root() { return _root; }
 
     Window(WindowFlag flags);
 
     virtual ~Window();
 
-    void on(EventType event, EventHandler handler);
-
     void show();
 
     void hide();
-
-    void dispatch_event(Event *event);
-
-    virtual void repaint(Painter &painter, Recti rectangle);
-
-    void repaint_dirty();
-
-    void relayout();
-
-    void should_repaint(Recti rectangle);
-
-    void should_relayout();
 
     template <typename WidgetType, typename CallbackType>
     void with_widget(String name, CallbackType callback)
@@ -182,4 +158,24 @@ public:
     void widget_removed(Widget *widget);
 
     void register_widget_by_id(String id, Widget *widget);
+
+    /* --- Layout ----------------------------------------------------------- */
+
+    void relayout();
+
+    void should_relayout();
+
+    /* --- Render ----------------------------------------------------------- */
+
+    virtual void repaint(Painter &painter, Recti rectangle);
+
+    void repaint_dirty();
+
+    void should_repaint(Recti rectangle);
+
+    /* --- Events ----------------------------------------------------------- */
+
+    void on(EventType event, EventHandler handler);
+
+    void dispatch_event(Event *event);
 };

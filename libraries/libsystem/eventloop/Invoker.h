@@ -13,12 +13,12 @@ private:
 public:
     Invoker(Callback<void()> callback) : _callback(callback)
     {
-        eventloop_register_invoker(this);
+        EventLoop::register_invoker(this);
     }
 
     ~Invoker()
     {
-        eventloop_unregister_invoker(this);
+        EventLoop::unregister_invoker(this);
     }
 
     bool should_be_invoke_later()

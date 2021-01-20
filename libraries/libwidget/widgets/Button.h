@@ -21,7 +21,7 @@ class Button : public Widget
 {
 private:
     ButtonState _state = BUTTON_IDLE;
-    ButtonStyle _style;
+    ButtonStyle _style = BUTTON_TEXT;
 
 public:
     Button(Widget *parent, ButtonStyle style);

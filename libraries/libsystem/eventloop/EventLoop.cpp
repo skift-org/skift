@@ -10,113 +10,76 @@
 #include <libsystem/utils/List.h>
 #include <libutils/Vector.h>
 
-static TimeStamp _eventloop_timer_last_fire = 0;
-
-static Vector<Timer *> _eventloop_timers;
-static List *_eventloop_notifiers = nullptr;
-static Vector<Invoker *> _eventloop_invoker;
-
-static size_t _eventloop_handles_count;
-static Handle *_eventloop_handles[PROCESS_HANDLE_COUNT];
-static PollEvent _eventloop_events[PROCESS_HANDLE_COUNT];
-
-static bool _eventloop_is_running = false;
-static bool _eventloop_is_initialize = false;
-static int _eventloop_exit_value = PROCESS_SUCCESS;
-
-static bool _nested_eventloop_is_running = false;
-static int _nested_eventloop_exit_value = 0;
-
-void eventloop_initialize()
+namespace EventLoop
 {
-    assert(!_eventloop_is_initialize);
 
-    _eventloop_timer_last_fire = system_get_ticks();
+/* --- Notifiers ------------------------------------------------------------ */
 
-    _eventloop_notifiers = list_create();
+static size_t _handles_count;
+static Handle *_handles[PROCESS_HANDLE_COUNT];
+static PollEvent _events[PROCESS_HANDLE_COUNT];
 
-    _eventloop_is_initialize = true;
-}
+static Vector<Notifier *> _notifiers;
 
-void eventloop_uninitialize()
+void update_notifier()
 {
-    assert(_eventloop_is_initialize);
-
-    list_destroy(_eventloop_notifiers);
-
-    _eventloop_is_initialize = false;
-}
-
-int eventloop_run()
-{
-    assert(_eventloop_is_initialize);
-    assert(!_eventloop_is_running);
-
-    _eventloop_is_running = true;
-
-    while (_eventloop_is_running)
+    for (size_t i = 0; i < _notifiers.count(); i++)
     {
-        eventloop_pump(false);
+        _handles[i] = _notifiers[i]->handle;
+        _events[i] = _notifiers[i]->events;
     }
 
-    eventloop_uninitialize();
-
-    return _eventloop_exit_value;
+    _handles_count = _notifiers.count();
 }
 
-int eventloop_run_nested()
+void register_notifier(Notifier *notifier)
 {
-    assert(_eventloop_is_initialize);
-    assert(_eventloop_is_running);
-    assert(!_nested_eventloop_is_running);
 
-    _nested_eventloop_is_running = true;
+    _notifiers.push_back(notifier);
 
-    while (_nested_eventloop_is_running)
+    update_notifier();
+}
+
+void unregister_notifier(Notifier *notifier)
+{
+    _notifiers.remove_all_value(notifier);
+
+    update_notifier();
+}
+
+void update_notifier(Handle *handle, PollEvent event)
+{
+    for (size_t i = 0; i < _notifiers.count(); i++)
     {
-        eventloop_pump(false);
-    }
-
-    return _nested_eventloop_exit_value;
-}
-
-static Timeout eventloop_get_timeout()
-{
-    Timeout timeout = UINT32_MAX;
-
-    TimeStamp current_tick = system_get_ticks();
-
-    _eventloop_timers.foreach ([&](auto timer) {
-        if (timer->running() && timer->interval() != 0)
+        if (_notifiers[i]->handle == handle)
         {
-            if (timer->scheduled() < current_tick)
-            {
-                timeout = 0;
-            }
-            else
-            {
-                Timeout remaining = timer->scheduled() - current_tick;
-
-                if (remaining <= timeout)
-                {
-                    timeout = remaining;
-                }
-            }
+            _notifiers[i]->callback(
+                _notifiers[i]->target,
+                _notifiers[i]->handle,
+                event);
         }
-
-        return Iteration::CONTINUE;
-    });
-
-    return timeout;
+    }
 }
 
-void eventloop_update_timers()
-{
-    assert(_eventloop_is_initialize);
+/* --- Timers --------------------------------------------------------------- */
 
+static Vector<Timer *> _timers;
+
+void register_timer(struct Timer *timer)
+{
+    _timers.push_back(timer);
+}
+
+void unregister_timer(struct Timer *timer)
+{
+    _timers.remove_value(timer);
+}
+
+void update_timers()
+{
     TimeStamp current_fire = system_get_ticks();
 
-    auto timers_list_copy = _eventloop_timers;
+    auto timers_list_copy = _timers;
 
     timers_list_copy.foreach ([&](auto timer) {
         if (timer->running() && timer->scheduled() <= current_fire)
@@ -127,51 +90,25 @@ void eventloop_update_timers()
 
         return Iteration::CONTINUE;
     });
-
-    _eventloop_timer_last_fire = current_fire;
 }
 
-void eventloop_pump(bool pool)
+/* --- Invokers ------------------------------------------------------------- */
+
+static Vector<Invoker *> _invoker;
+
+void register_invoker(struct Invoker *invoker)
 {
-    assert(_eventloop_is_initialize);
+    _invoker.push_back(invoker);
+}
 
-    Timeout timeout = eventloop_get_timeout();
+void unregister_invoker(struct Invoker *invoker)
+{
+    _invoker.remove_value(invoker);
+}
 
-    if (pool)
-    {
-        timeout = 0;
-    }
-
-    eventloop_update_timers();
-
-    Handle *selected = nullptr;
-    PollEvent selected_events = 0;
-
-    Result result = handle_poll(
-        &_eventloop_handles[0],
-        &_eventloop_events[0],
-        _eventloop_handles_count,
-        &selected,
-        &selected_events,
-        timeout);
-
-    if (result_is_error(result))
-    {
-        logger_error("Failed to select : %s", result_to_string(result));
-        eventloop_exit(PROCESS_FAILURE);
-    }
-
-    eventloop_update_timers();
-
-    list_foreach(Notifier, notifier, _eventloop_notifiers)
-    {
-        if (notifier->handle == selected)
-        {
-            notifier->callback(notifier->target, notifier->handle, selected_events);
-        }
-    }
-
-    _eventloop_invoker.foreach ([](Invoker *invoker) {
+void update_invoker()
+{
+    _invoker.foreach ([](Invoker *invoker) {
         if (invoker->should_be_invoke_later())
         {
             invoker->invoke();
@@ -181,74 +118,157 @@ void eventloop_pump(bool pool)
     });
 }
 
-void eventloop_exit(int exit_value)
-{
-    assert(_eventloop_is_initialize);
+/* --- Loop ----------------------------------------------------------------- */
 
-    _eventloop_is_running = false;
-    _eventloop_exit_value = exit_value;
+static bool _is_running = false;
+static bool _is_initialize = false;
+static int _exit_value = PROCESS_SUCCESS;
+
+static bool _nested_is_running = false;
+static int _nested_exit_value = 0;
+
+static Vector<AtExitHook> _atexit_hooks;
+
+void initialize()
+{
+    assert(!_is_initialize);
+
+    _is_initialize = true;
 }
 
-void eventloop_exit_nested(int exit_value)
+void uninitialize()
 {
-    assert(_eventloop_is_initialize);
-    assert(_nested_eventloop_is_running);
+    assert(_is_initialize);
 
-    _nested_eventloop_is_running = false;
-    _nested_eventloop_exit_value = exit_value;
-}
-
-void eventloop_update_notifier()
-{
-    _eventloop_handles_count = 0;
-
-    list_foreach(Notifier, notifier, _eventloop_notifiers)
+    for (size_t i = 0; i < _atexit_hooks.count(); i++)
     {
-        _eventloop_handles[_eventloop_handles_count] = notifier->handle;
-        _eventloop_events[_eventloop_handles_count] = notifier->events;
-
-        _eventloop_handles_count++;
+        _atexit_hooks[i]();
     }
+
+    _atexit_hooks.clear();
+
+    _is_initialize = false;
 }
-void eventloop_register_notifier(Notifier *notifier)
+
+static Timeout get_timeout()
 {
-    assert(_eventloop_is_initialize);
+    Timeout timeout = UINT32_MAX;
 
-    list_pushback(_eventloop_notifiers, notifier);
+    TimeStamp current_tick = system_get_ticks();
 
-    eventloop_update_notifier();
+    _timers.foreach ([&](auto timer) {
+        if (!timer->running() || timer->interval() == 0)
+        {
+            return Iteration::CONTINUE;
+        }
+
+        if (timer->scheduled() < current_tick)
+        {
+            timeout = 0;
+            return Iteration::CONTINUE;
+        }
+
+        Timeout remaining = timer->scheduled() - current_tick;
+
+        if (remaining <= timeout)
+        {
+            timeout = remaining;
+        }
+
+        return Iteration::CONTINUE;
+    });
+
+    return timeout;
 }
 
-void eventloop_unregister_notifier(Notifier *notifier)
+void atexit(AtExitHook hook)
 {
-    assert(_eventloop_is_initialize);
-
-    list_remove(_eventloop_notifiers, notifier);
-
-    eventloop_update_notifier();
+    _atexit_hooks.push_back(hook);
 }
 
-void eventloop_register_timer(struct Timer *timer)
+void pump(bool pool)
 {
-    assert(_eventloop_is_initialize);
+    assert(_is_initialize);
 
-    _eventloop_timers.push_back(timer);
+    Timeout timeout = 0;
+
+    if (!pool)
+    {
+        timeout = get_timeout();
+    }
+
+    Handle *selected = nullptr;
+    PollEvent selected_events = 0;
+
+    Result result = handle_poll(
+        &_handles[0],
+        &_events[0],
+        _handles_count,
+        &selected,
+        &selected_events,
+        timeout);
+
+    if (result_is_error(result))
+    {
+        logger_error("Failed to select : %s", result_to_string(result));
+        exit(PROCESS_FAILURE);
+    }
+
+    update_timers();
+
+    update_notifier(selected, selected_events);
+
+    update_invoker();
 }
 
-void eventloop_unregister_timer(struct Timer *timer)
+int run()
 {
-    assert(_eventloop_is_initialize);
-    _eventloop_timers.remove_value(timer);
+    assert(_is_initialize);
+    assert(!_is_running);
+
+    _is_running = true;
+
+    while (_is_running)
+    {
+        pump(false);
+    }
+
+    uninitialize();
+
+    return _exit_value;
 }
 
-void eventloop_register_invoker(struct Invoker *invoker)
+void exit(int exit_value)
 {
-    assert(_eventloop_is_initialize);
-    _eventloop_invoker.push_back(invoker);
+    assert(_is_initialize);
+
+    _is_running = false;
+    _exit_value = exit_value;
 }
 
-void eventloop_unregister_invoker(struct Invoker *invoker)
+int run_nested()
 {
-    assert(_eventloop_is_initialize);
-    _eventloop_invoker.remove_value(invoker);
+    assert(_is_initialize);
+    assert(_is_running);
+    assert(!_nested_is_running);
+
+    _nested_is_running = true;
+
+    while (_nested_is_running)
+    {
+        pump(false);
+    }
+
+    return _nested_exit_value;
 }
+
+void exit_nested(int exit_value)
+{
+    assert(_is_initialize);
+    assert(_nested_is_running);
+
+    _nested_is_running = false;
+    _nested_exit_value = exit_value;
+}
+
+} // namespace EventLoop

@@ -144,6 +144,15 @@ void client_handle_mouse_position(Client *client)
     client->send_message(message);
 }
 
+void client_handle_handle_goodbye(Client *client)
+{
+    client->disconnected = true;
+
+    CompositorMessage message = {};
+    message.type = COMPOSITOR_MESSAGE_ACK;
+    client->send_message(message);
+}
+
 void client_request_callback(Client *client, Connection *connection, PollEvent events)
 {
     assert(events & POLL_READ);
@@ -203,6 +212,10 @@ void client_request_callback(Client *client, Connection *connection, PollEvent e
 
     case COMPOSITOR_MESSAGE_GET_MOUSE_POSITION:
         client_handle_mouse_position(client);
+        break;
+
+    case COMPOSITOR_MESSAGE_GOODBYE:
+        client_handle_handle_goodbye(client);
         break;
 
     default:

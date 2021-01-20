@@ -16,13 +16,13 @@ Notifier *notifier_create(
     notifier->events = events;
     notifier->callback = callback;
 
-    eventloop_register_notifier(notifier);
+    EventLoop::register_notifier(notifier);
 
     return notifier;
 }
 
 void notifier_destroy(Notifier *notifier)
 {
-    eventloop_unregister_notifier(notifier);
+    EventLoop::unregister_notifier(notifier);
     free(notifier);
 }

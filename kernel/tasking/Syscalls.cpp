@@ -428,6 +428,14 @@ Result hj_handle_poll(
         return ERR_TOO_MANY_HANDLE;
     }
 
+    if (handles_set->count == 0)
+    {
+        *selected = -1;
+        *selected_events = 0;
+
+        return SUCCESS;
+    }
+
     // We need to copy these because this syscall uses task_fshandle_poll
     // who block the current thread using a blocker which does a context switch.
 

@@ -550,7 +550,7 @@ void Widget::clear_children()
 
 bool Widget::focused()
 {
-    return _window && _window->focused_widget == this;
+    return _window && _window->_keyboard_focus == this;
 }
 
 void Widget::focus()

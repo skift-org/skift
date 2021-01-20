@@ -17,7 +17,7 @@ void Timer::start()
     if (!_running)
     {
         _running = true;
-        eventloop_register_timer(this);
+        EventLoop::register_timer(this);
     }
 }
 
@@ -26,6 +26,6 @@ void Timer::stop()
     if (_running)
     {
         _running = false;
-        eventloop_unregister_timer(this);
+        EventLoop::unregister_timer(this);
     }
 }

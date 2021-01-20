@@ -8,28 +8,45 @@ class Timer;
 
 class Invoker;
 
-void eventloop_initialize();
+namespace EventLoop
+{
 
-int eventloop_run();
+/* --- Notifiers ------------------------------------------------------------ */
 
-int eventloop_run_nested();
+void register_notifier(struct Notifier *notifier);
 
-void eventloop_pump(bool pool);
+void unregister_notifier(struct Notifier *notifier);
 
-void eventloop_exit(int exit_value);
+/* --- Timers --------------------------------------------------------------- */
 
-void eventloop_exit_nested(int exit_value);
+void register_timer(struct Timer *timer);
 
-void eventloop_register_notifier(struct Notifier *notifier);
+void unregister_timer(struct Timer *timer);
 
-void eventloop_unregister_notifier(struct Notifier *notifier);
+/* --- Invokers ------------------------------------------------------------- */
 
-void eventloop_register_timer(struct Timer *timer);
+void register_invoker(struct Invoker *timer);
 
-void eventloop_unregister_timer(struct Timer *timer);
+void unregister_invoker(struct Invoker *timer);
 
-void eventloop_register_invoker(struct Invoker *timer);
+/* --- Loop ----------------------------------------------------------------- */
 
-void eventloop_unregister_invoker(struct Invoker *timer);
+using AtExitHook = void (*)(void);
 
-void eventloop_update_timers();
+void initialize();
+
+void uninitialize();
+
+void atexit(AtExitHook hook);
+
+void pump(bool pool);
+
+int run();
+
+void exit(int exit_value);
+
+int run_nested();
+
+void exit_nested(int exit_value);
+
+} // namespace EventLoop

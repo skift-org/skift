@@ -94,7 +94,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
 
         item->on(Event::ACTION, [entry](auto) {
             process_run(entry.command.cstring(), nullptr);
-            Application::exit(0);
+            Application::exit(PROCESS_SUCCESS);
         });
 
         return Iteration::CONTINUE;

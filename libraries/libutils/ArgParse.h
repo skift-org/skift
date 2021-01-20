@@ -3,6 +3,7 @@
 #include <libsystem/process/Process.h>
 
 #include <libutils/Callback.h>
+#include <libutils/Optional.h>
 #include <libutils/Scanner.h>
 #include <libutils/String.h>
 #include <libutils/Traits.h>
@@ -25,6 +26,35 @@ public:
     bool any()
     {
         return _arguments.any();
+    }
+
+    const String &current()
+    {
+        return _arguments.peek();
+    }
+
+    Vector<String> pop_operands()
+    {
+        Vector<String> operands;
+
+        while (any() && current()[0] != '-')
+        {
+            operands.push_back(pop());
+        }
+
+        return operands;
+    }
+
+    Optional<String> pop_operand()
+    {
+        if (current()[0] != '-')
+        {
+            return pop();
+        }
+        else
+        {
+            return {};
+        }
     }
 
     String pop()
@@ -87,6 +117,28 @@ public:
     void option(char shortname, String longname, String description, ArgParseOptionCallback callback)
     {
         _option.push_back({shortname, longname, description, callback});
+    }
+
+    void option_string(char shortname, String longname, String description, Callback<void(String &)> callback)
+    {
+        _option.push_back({
+            shortname,
+            longname,
+            description,
+
+            [this, callback](ArgParseContext &ctx) {
+                auto maybe_strings = ctx.pop_operand();
+
+                if (maybe_strings)
+                {
+                    callback(*maybe_strings);
+                }
+                else
+                {
+                    usage();
+                }
+            },
+        });
     }
 
     void option(bool &value, char shortname, String longname, String description)

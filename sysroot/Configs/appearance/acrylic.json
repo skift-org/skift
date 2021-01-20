@@ -1,0 +1,6 @@
+{
+    "enabled": true,
+    "blur": 30,
+    "noise": 0.05,
+    "saturation": 0.05
+}

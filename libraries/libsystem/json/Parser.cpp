@@ -183,6 +183,12 @@ Value parse(const char *str, size_t size)
     return parse(scan);
 };
 
+Value parse(const String &str)
+{
+    StringScanner scan{str.cstring(), str.length()};
+    return parse(scan);
+};
+
 Value parse_file(const char *path)
 {
     __cleanup(stream_cleanup) Stream *json_file = stream_open(path, OPEN_READ | OPEN_BUFFERED);

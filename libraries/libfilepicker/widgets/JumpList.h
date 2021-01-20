@@ -46,7 +46,7 @@ public:
 
             auto button = new Button(
                 this,
-                ButtonStyle::BUTTON_TEXT,
+                Button::TEXT,
                 bookmark.icon(),
                 bookmark.name());
 

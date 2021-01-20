@@ -1,5 +1,7 @@
 #pragma once
 
+#include <libsystem/Logger.h>
+
 #include <libgraphic/Icon.h>
 
 #include <libwidget/Application.h>
@@ -67,6 +69,8 @@ public:
 
         _window->show();
 
+        logger_trace("OwO");
+
         Application::run_nested();
 
         delete _window;
@@ -87,7 +91,7 @@ public:
     {
         if (_buttons & DialogButton::YES)
         {
-            auto button = new Button(parent, BUTTON_OUTLINE, "Yes");
+            auto button = new Button(parent, Button::OUTLINE, "Yes");
             button->on(Event::ACTION, [&](auto) {
                 close(DialogResult::YES);
                 _window->hide();
@@ -96,7 +100,7 @@ public:
 
         if (_buttons & DialogButton::NO)
         {
-            auto button = new Button(parent, BUTTON_OUTLINE, "No");
+            auto button = new Button(parent, Button::OUTLINE, "No");
             button->on(Event::ACTION, [&](auto) {
                 close(DialogResult::NO);
                 _window->hide();
@@ -105,7 +109,7 @@ public:
 
         if (_buttons & DialogButton::OK)
         {
-            auto button = new Button(parent, BUTTON_OUTLINE, "Ok");
+            auto button = new Button(parent, Button::OUTLINE, "Ok");
             button->on(Event::ACTION, [&](auto) {
                 close(DialogResult::OK);
                 _window->hide();
@@ -114,7 +118,7 @@ public:
 
         if (_buttons & DialogButton::CANCEL)
         {
-            auto button = new Button(parent, BUTTON_OUTLINE, "Cancel");
+            auto button = new Button(parent, Button::OUTLINE, "Cancel");
             button->on(Event::ACTION, [&](auto) {
                 close(DialogResult::CANCEL);
                 _window->hide();

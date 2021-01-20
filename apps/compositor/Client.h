@@ -11,6 +11,8 @@ struct Client
     Connection *_connection = nullptr;
     bool _disconnected = false;
 
+    static void connect(Connection *connection);
+
     Client(Connection *connection);
 
     ~Client();

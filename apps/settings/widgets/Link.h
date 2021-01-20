@@ -10,7 +10,7 @@ class Link : public Button
 private:
 public:
     Link(Widget *parent, RefPtr<Icon> icon, String name)
-        : Button(parent, BUTTON_TEXT)
+        : Button(parent, Button::TEXT)
     {
         layout(VFLOW(4));
         insets({8, 24});

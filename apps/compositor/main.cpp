@@ -122,7 +122,7 @@ int main(int argc, char const *argv[])
     auto socker_notifier = own<Notifier>(HANDLE(socket), POLL_ACCEPT, [&]() {
         Connection *incoming_connection = socket_accept(socket);
 
-        new Client(incoming_connection);
+        Client::connect(incoming_connection);
 
         client_destroy_disconnected();
     });

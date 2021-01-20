@@ -11,23 +11,23 @@ void Button::paint(Painter &painter, Recti rectangle)
 
     if (enabled())
     {
-        if (_style == BUTTON_OUTLINE)
+        if (_style == OUTLINE)
         {
             painter.draw_rectangle_rounded(bound(), 4, 1, color(THEME_BORDER));
         }
-        else if (_style == BUTTON_FILLED)
+        else if (_style == FILLED)
         {
             painter.fill_rectangle_rounded(bound(), 4, color(THEME_ACCENT));
         }
 
-        if (_state == BUTTON_OVER)
+        if (_mouse_over)
         {
             painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
 
-        if (_state == BUTTON_PRESS)
+        if (_mouse_press)
         {
-            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.2));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
     }
 }
@@ -36,42 +36,44 @@ void Button::event(Event *event)
 {
     if (event->type == Event::MOUSE_ENTER)
     {
-        _state = BUTTON_OVER;
-        should_repaint();
+        _mouse_over = true;
 
+        should_repaint();
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_LEAVE)
     {
-        _state = BUTTON_IDLE;
-        should_repaint();
+        _mouse_over = false;
 
+        should_repaint();
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        _state = BUTTON_PRESS;
-        should_repaint();
+        _mouse_press = true;
 
+        should_repaint();
         event->accepted = true;
     }
     else if (event->type == Event::MOUSE_BUTTON_RELEASE)
     {
-        if (_state == BUTTON_PRESS)
-        {
-            _state = BUTTON_OVER;
-            should_repaint();
+        _mouse_press = false;
 
-            event->accepted = true;
+        Event action_event = {};
+        action_event.type = Event::ACTION;
+        dispatch_event(&action_event);
 
-            Event action_event = {};
-            action_event.type = Event::ACTION;
-            dispatch_event(&action_event);
-        }
+        should_repaint();
+        event->accepted = true;
+    }
+    else if (event->type == Event::WIDGET_DISABLE)
+    {
+        _mouse_over = false;
+        _mouse_press = false;
     }
 }
 
-Button::Button(Widget *parent, ButtonStyle style)
+Button::Button(Widget *parent, Style style)
     : Widget(parent),
       _style(style)
 {
@@ -81,7 +83,7 @@ Button::Button(Widget *parent, ButtonStyle style)
     flags(Widget::GREEDY);
 }
 
-Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
+Button::Button(Widget *parent, Style style, RefPtr<Icon> icon)
     : Button(parent, style)
 {
     layout(STACK());
@@ -91,13 +93,13 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon)
 
     auto icon_panel = new IconPanel(this, icon);
 
-    if (style == BUTTON_FILLED)
+    if (style == FILLED)
     {
         icon_panel->color(THEME_FOREGROUND, Colors::WHITE);
     }
 }
 
-Button::Button(Widget *parent, ButtonStyle style, String text)
+Button::Button(Widget *parent, Style style, String text)
     : Button(parent, style)
 {
     layout(STACK());
@@ -105,13 +107,13 @@ Button::Button(Widget *parent, ButtonStyle style, String text)
     min_width(64);
 
     auto label = new Label(this, text, Anchor::CENTER);
-    if (style == BUTTON_FILLED)
+    if (style == FILLED)
     {
         label->color(THEME_FOREGROUND, Colors::WHITE);
     }
 }
 
-Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text)
+Button::Button(Widget *parent, Style style, RefPtr<Icon> icon, String text)
     : Button(parent, style)
 {
     insets(Insetsi(0, 0, 6, 10));
@@ -122,7 +124,7 @@ Button::Button(Widget *parent, ButtonStyle style, RefPtr<Icon> icon, String text
 
     auto label = new Label(this, text);
 
-    if (style == BUTTON_FILLED)
+    if (style == FILLED)
     {
         label->color(THEME_FOREGROUND, Colors::WHITE);
         icon_panel->color(THEME_FOREGROUND, Colors::WHITE);

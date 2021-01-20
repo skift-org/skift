@@ -34,9 +34,9 @@ int main(int argc, char **argv)
     toolbar->max_height(38);
     toolbar->min_height(38);
 
-    new Button(toolbar, BUTTON_TEXT, Icon::get("folder-open"));
-    new Button(toolbar, BUTTON_TEXT, Icon::get("content-save"));
-    new Button(toolbar, BUTTON_TEXT, Icon::get("file-plus"));
+    new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
+    new Button(toolbar, Button::TEXT, Icon::get("content-save"));
+    new Button(toolbar, Button::TEXT, Icon::get("file-plus"));
 
     auto model = TextModel::empty();
 

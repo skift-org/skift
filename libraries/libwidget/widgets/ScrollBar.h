@@ -11,7 +11,9 @@ private:
     int _thumb = 0;
     int _value = 0;
 
-    bool _mouse_over;
+    bool _mouse_over = false;
+    bool _mouse_drag = false;
+
     bool _horizontal = false;
 
     Recti track_bound()

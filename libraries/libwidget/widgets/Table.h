@@ -53,7 +53,7 @@ public:
             return;
         }
 
-        if (index < 0 || index >= _model->rows())
+        if (index < -1 || index >= _model->rows())
         {
             return;
         }

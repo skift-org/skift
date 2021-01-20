@@ -93,6 +93,8 @@ void cursor_handle_packet(MousePacket packet)
         }
     }
 
+    bool has_send_double_click = false;
+
     if (!(_mouse_old_buttons & MOUSE_BUTTON_LEFT) &&
         (_mouse_buttons & MOUSE_BUTTON_LEFT))
     {
@@ -101,12 +103,13 @@ void cursor_handle_packet(MousePacket packet)
         if (current - _last_click < 250 && window_on_focus)
         {
             window_on_focus->handle_double_click(_mouse_position);
+            has_send_double_click = true;
         }
 
         _last_click = current;
     }
 
-    if (window_on_focus)
+    if (window_on_focus && !has_send_double_click)
         window_on_focus->handle_mouse_buttons(_mouse_old_buttons, _mouse_buttons, _mouse_position);
 }
 

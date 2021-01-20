@@ -361,11 +361,12 @@ void Window::dispatch_event(Event *event)
 
             if (_mouse_focus)
             {
+                Widget *old_focus = _mouse_focus;
+                _mouse_focus = nullptr;
+
                 Event e = *event;
                 e.type = Event::MOUSE_BUTTON_RELEASE;
-                _mouse_focus->dispatch_event(&e);
-
-                _mouse_focus = nullptr;
+                old_focus->dispatch_event(&e);
             }
 
             if (_mouse_over)
@@ -500,8 +501,10 @@ void Window::dispatch_event(Event *event)
     {
         if (_mouse_focus)
         {
-            _mouse_focus->dispatch_event(event);
+            Widget *old_focus = _mouse_focus;
             _mouse_focus = nullptr;
+
+            old_focus->dispatch_event(event);
         }
 
         if (_is_resizing)

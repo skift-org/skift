@@ -89,37 +89,37 @@ public:
         toolbar->max_height(38);
         toolbar->min_height(38);
 
-        _open_document = new Button(toolbar, BUTTON_TEXT, Icon::get("folder-open"));
-        _save_document = new Button(toolbar, BUTTON_TEXT, Icon::get("content-save"));
-        _new_document = new Button(toolbar, BUTTON_TEXT, Icon::get("image-plus"));
+        _open_document = new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
+        _save_document = new Button(toolbar, Button::TEXT, Icon::get("content-save"));
+        _new_document = new Button(toolbar, Button::TEXT, Icon::get("image-plus"));
 
         new Separator(toolbar);
 
-        _pencil = new Button(toolbar, BUTTON_TEXT, Icon::get("pencil"));
+        _pencil = new Button(toolbar, Button::TEXT, Icon::get("pencil"));
         _pencil->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PencilTool>());
             update_toolbar();
         });
 
-        _brush = new Button(toolbar, BUTTON_TEXT, Icon::get("brush"));
+        _brush = new Button(toolbar, Button::TEXT, Icon::get("brush"));
         _brush->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<BrushTool>());
             update_toolbar();
         });
 
-        _eraser = new Button(toolbar, BUTTON_TEXT, Icon::get("eraser"));
+        _eraser = new Button(toolbar, Button::TEXT, Icon::get("eraser"));
         _eraser->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<EraserTool>());
             update_toolbar();
         });
 
-        _fill = new Button(toolbar, BUTTON_TEXT, Icon::get("format-color-fill"));
+        _fill = new Button(toolbar, Button::TEXT, Icon::get("format-color-fill"));
         _fill->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<FillTool>());
             update_toolbar();
         });
 
-        _picker = new Button(toolbar, BUTTON_TEXT, Icon::get("eyedropper"));
+        _picker = new Button(toolbar, Button::TEXT, Icon::get("eyedropper"));
         _picker->on(Event::ACTION, [this](auto) {
             _canvas->tool(own<PickerTool>());
             update_toolbar();
@@ -128,10 +128,10 @@ public:
         new Separator(toolbar);
 
         // TODO:
-        _insert_text = new Button(toolbar, BUTTON_TEXT, Icon::get("format-text-variant"));
-        _insert_line = new Button(toolbar, BUTTON_TEXT, Icon::get("vector-line"));
-        _insert_rectangle = new Button(toolbar, BUTTON_TEXT, Icon::get("rectangle-outline"));
-        _insert_circle = new Button(toolbar, BUTTON_TEXT, Icon::get("circle-outline"));
+        _insert_text = new Button(toolbar, Button::TEXT, Icon::get("format-text-variant"));
+        _insert_line = new Button(toolbar, Button::TEXT, Icon::get("vector-line"));
+        _insert_rectangle = new Button(toolbar, Button::TEXT, Icon::get("rectangle-outline"));
+        _insert_circle = new Button(toolbar, Button::TEXT, Icon::get("circle-outline"));
 
         new Separator(toolbar);
 

@@ -44,23 +44,23 @@ int main(int argc, char **argv)
 
     new Spacer(dialog);
 
-    auto shutdown_button = new Button(dialog, BUTTON_TEXT, Icon::get("power-standby"), "Shutdown");
+    auto shutdown_button = new Button(dialog, Button::TEXT, Icon::get("power-standby"), "Shutdown");
 
     shutdown_button->on(EventType::ACTION, [&](auto) {
         hj_system_shutdown();
     });
 
-    auto reboot_button = new Button(dialog, BUTTON_TEXT, Icon::get("restart"), "Reboot");
+    auto reboot_button = new Button(dialog, Button::TEXT, Icon::get("restart"), "Reboot");
 
     reboot_button->on(EventType::ACTION, [&](auto) {
         hj_system_reboot();
     });
 
-    new Button(dialog, BUTTON_TEXT, Icon::get("logout"), "Logoff");
+    new Button(dialog, Button::TEXT, Icon::get("logout"), "Logoff");
 
     new Spacer(dialog);
 
-    auto cancel_button = new Button(dialog, BUTTON_FILLED, "Cancel");
+    auto cancel_button = new Button(dialog, Button::FILLED, "Cancel");
 
     cancel_button->on(EventType::ACTION, [&](auto) {
         window->hide();

@@ -454,6 +454,11 @@ void Widget::enable()
     if (disabled())
     {
         _enabled = true;
+
+        Event e;
+        e.type = Event::WIDGET_ENABLE;
+        event(&e);
+
         should_repaint();
     }
 }
@@ -463,6 +468,11 @@ void Widget::disable()
     if (enabled())
     {
         _enabled = false;
+
+        Event e;
+        e.type = Event::WIDGET_DISABLE;
+        event(&e);
+
         should_repaint();
     }
 }

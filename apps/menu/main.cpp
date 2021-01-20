@@ -86,7 +86,7 @@ void menu_create_list(Widget *parent, Vector<MenuEntry> &entries)
     entries.foreach ([&](MenuEntry &entry) {
         auto item = new Button(
             list,
-            BUTTON_TEXT,
+            Button::TEXT,
             entry.icon,
             entry.name);
 
@@ -148,23 +148,23 @@ int main(int argc, char **argv)
     bottom_container->layout(HFLOW(4));
     bottom_container->insets({6});
 
-    new Button(bottom_container, BUTTON_TEXT, Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
+    new Button(bottom_container, Button::TEXT, Icon::get("account"), environment().get("POSIX").get("LOGNAME").as_string());
 
     new Spacer(bottom_container);
 
-    auto folder_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("folder"));
+    auto folder_button = new Button(bottom_container, Button::TEXT, Icon::get("folder"));
 
     folder_button->on(EventType::ACTION, [&](auto) {
         process_run("file-manager", nullptr);
     });
 
-    auto setting_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("cog"));
+    auto setting_button = new Button(bottom_container, Button::TEXT, Icon::get("cog"));
 
     setting_button->on(EventType::ACTION, [&](auto) {
         process_run("settings", nullptr);
     });
 
-    auto logout_button = new Button(bottom_container, BUTTON_TEXT, Icon::get("power-standby"));
+    auto logout_button = new Button(bottom_container, Button::TEXT, Icon::get("power-standby"));
     logout_button->on(EventType::ACTION, [&](auto) {
         process_run("logout", nullptr);
     });

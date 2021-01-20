@@ -44,6 +44,9 @@ struct Event
         WINDOW_CLOSING,
         WINDOW_RESIZED,
 
+        WIDGET_DISABLE,
+        WIDGET_ENABLE,
+
         MOUSE_MOVE,
         MOUSE_ENTER,
         MOUSE_LEAVE,

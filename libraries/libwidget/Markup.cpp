@@ -252,16 +252,16 @@ Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
 
     if (node.is("Button"))
     {
-        ButtonStyle button_style = BUTTON_TEXT;
+        Button::Style button_style = Button::TEXT;
 
         if (node.has_attribute("filled"))
         {
-            button_style = BUTTON_FILLED;
+            button_style = Button::FILLED;
         }
 
         if (node.has_attribute("outlined"))
         {
-            button_style = BUTTON_OUTLINE;
+            button_style = Button::OUTLINE;
         }
 
         if (node.has_attribute("text") && node.has_attribute("icon"))

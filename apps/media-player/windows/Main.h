@@ -35,9 +35,9 @@ public:
         control_bar->insets(12);
         control_bar->layout(HFLOW(4));
 
-        new Button(control_bar, ButtonStyle::BUTTON_FILLED, Icon::get("play"));
-        new Button(control_bar, ButtonStyle::BUTTON_OUTLINE, Icon::get("stop"));
-        new Button(control_bar, ButtonStyle::BUTTON_OUTLINE, Icon::get("volume-high"));
+        new Button(control_bar, Button::FILLED, Icon::get("play"));
+        new Button(control_bar, Button::OUTLINE, Icon::get("stop"));
+        new Button(control_bar, Button::OUTLINE, Icon::get("volume-high"));
 
         new Slider(control_bar);
     }

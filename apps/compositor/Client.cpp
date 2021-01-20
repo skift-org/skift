@@ -10,7 +10,7 @@
 #include "compositor/Renderer.h"
 #include "compositor/Window.h"
 
-static Vector<Client *> _clients;
+static Vector<OwnPtr<Client>> _clients;
 
 void Client::handle(const CompositorCreateWindow &create_window)
 {
@@ -151,6 +151,8 @@ void Client::handle_goodbye()
 
 void Client::handle_request()
 {
+    assert(!_disconnected);
+
     CompositorMessage message = {};
     size_t message_size = connection_receive(_connection, &message, sizeof(CompositorMessage));
 
@@ -170,7 +172,6 @@ void Client::handle_request()
 
         _disconnected = true;
         client_destroy_disconnected();
-
         return;
     }
 
@@ -223,6 +224,11 @@ void Client::handle_request()
     }
 }
 
+void Client::connect(Connection *connection)
+{
+    _clients.push_back(own<Client>(connection));
+}
+
 Client::Client(Connection *connection)
 {
     _connection = connection;
@@ -230,8 +236,6 @@ Client::Client(Connection *connection)
     _notifier = own<Notifier>(HANDLE(connection), POLL_READ, [this]() {
         this->handle_request();
     });
-
-    _clients.push_back(this);
 
     logger_info("Client %08x connected", this);
 
@@ -263,13 +267,12 @@ Client::~Client()
     logger_info("Disconnecting client %08x", this);
 
     client_close_all_windows(this);
-    _clients.remove_all_value(this);
     connection_close(_connection);
 }
 
 void client_broadcast(CompositorMessage message)
 {
-    _clients.foreach ([&](Client *client) {
+    _clients.foreach ([&](auto &client) {
         client->send_message(message);
         return Iteration::CONTINUE;
     });
@@ -296,5 +299,5 @@ Result Client::send_message(CompositorMessage message)
 
 void client_destroy_disconnected()
 {
-    _clients.remove_all_match([](Client *client) { return client->_disconnected; });
+    _clients.remove_all_match([](auto &client) { return client->_disconnected; });
 }

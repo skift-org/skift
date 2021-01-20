@@ -54,13 +54,13 @@ int main(int argc, char **argv)
     navigation->layout(HFLOW(4));
     navigation->insets(8);
 
-    auto skipall_button = new Button(navigation, BUTTON_TEXT, "Skip All");
+    auto skipall_button = new Button(navigation, Button::TEXT, "Skip All");
 
     new Spacer(navigation);
 
-    auto back_button = new Button(navigation, BUTTON_OUTLINE, "Previous");
+    auto back_button = new Button(navigation, Button::OUTLINE, "Previous");
 
-    auto next_button = new Button(navigation, BUTTON_FILLED, "Next");
+    auto next_button = new Button(navigation, Button::FILLED, "Next");
 
     int current_page = 0;
 

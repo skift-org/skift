@@ -39,7 +39,7 @@ void Breadcrumb::render()
 
     auto &path = _navigation->current();
 
-    auto computer_button = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_computer);
+    auto computer_button = new Button(this, Button::TEXT, _icon_computer);
 
     computer_button->on(Event::ACTION, [this](auto) {
         _navigation->navigate("/");
@@ -49,7 +49,7 @@ void Breadcrumb::render()
     {
         new IconPanel(this, _icon_expand);
 
-        auto button = new Button(this, ButtonStyle::BUTTON_TEXT, path[i]);
+        auto button = new Button(this, Button::TEXT, path[i]);
         button->min_width(0);
 
         button->on(Event::ACTION, [this, i](auto) {
@@ -63,7 +63,7 @@ void Breadcrumb::render()
     {
         if (_bookmarks->has(_navigation->current()))
         {
-            auto remove_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark);
+            auto remove_bookmark = new Button(this, Button::TEXT, _icon_bookmark);
 
             remove_bookmark->on(Event::ACTION, [this](auto) {
                 _bookmarks->remove(_navigation->current());
@@ -71,7 +71,7 @@ void Breadcrumb::render()
         }
         else
         {
-            auto add_bookmark = new Button(this, ButtonStyle::BUTTON_TEXT, _icon_bookmark_outline);
+            auto add_bookmark = new Button(this, Button::TEXT, _icon_bookmark_outline);
 
             add_bookmark->on(Event::ACTION, [this](auto) {
                 Bookmark bookmark{

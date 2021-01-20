@@ -28,6 +28,7 @@ public:
         empty_message("This directory is empty.");
 
         _navigation_observer = navigation->observe([this](auto &) {
+            select(-1);
             scroll_to_top();
         });
 

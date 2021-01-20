@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     new Separator(window->root());
     (new Separator(window->root()))->color(THEME_BORDER, Colors::BLACK.with_alpha(0.25));
 
-    auto menu = new Button(panel_container, BUTTON_TEXT, Icon::get("menu"), "Applications");
+    auto menu = new Button(panel_container, Button::TEXT, Icon::get("menu"), "Applications");
     menu->on(Event::ACTION, [](auto) { process_run("menu", nullptr); });
 
     new Spacer(panel_container);
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     new Spacer(panel_container);
 
-    auto graph_container = new Button(panel_container, BUTTON_TEXT);
+    auto graph_container = new Button(panel_container, Button::TEXT);
     graph_container->layout(VGRID(1));
     graph_container->insets(0);
 

@@ -246,6 +246,8 @@ void exit(int exit_value)
 
 int run_nested()
 {
+    logger_trace("NESTED!");
+
     assert(_is_initialize);
     assert(_is_running);
     assert(!_nested_is_running);

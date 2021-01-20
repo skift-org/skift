@@ -42,7 +42,7 @@ void menu_show(Menu *menu)
 
     list_foreach(Menu, item, menu->items)
     {
-        new Button(window->root(), BUTTON_TEXT, item->icon, item->text);
+        new Button(window->root(), Button::TEXT, item->icon, item->text);
     }
 
     window->show();

@@ -14,9 +14,11 @@ void ScrollBar::paint(Painter &painter, Recti rectangle)
     __unused(rectangle);
 
     if (_thumb >= _track)
+    {
         return;
+    }
 
-    if (_mouse_over)
+    if (_mouse_over || _mouse_drag)
     {
         painter.fill_rectangle_rounded(track_bound(), 4, color(THEME_BORDER));
         painter.fill_rectangle_rounded(thumb_bound(), 4, color(THEME_BORDER));
@@ -87,7 +89,8 @@ void ScrollBar::event(Event *event)
 
             event->accepted = true;
         }
-        else if (event->type == Event::MOUSE_BUTTON_PRESS)
+        else if (event->type == Event::MOUSE_BUTTON_PRESS &&
+                 event->mouse.button == MOUSE_BUTTON_LEFT)
         {
             if (thumb_bound().contains(mouse_event.position))
             {
@@ -99,7 +102,15 @@ void ScrollBar::event(Event *event)
                 _mouse_origine = thumb_bound().size() / 2;
             }
 
+            _mouse_drag = true;
+
             event->accepted = true;
+        }
+        else if (event->type == Event::MOUSE_BUTTON_RELEASE &&
+                 event->mouse.button == MOUSE_BUTTON_LEFT)
+        {
+            _mouse_drag = false;
+            should_repaint();
         }
     }
 }

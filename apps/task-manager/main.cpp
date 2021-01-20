@@ -40,9 +40,9 @@ public:
         toolbar->max_height(38);
         toolbar->min_height(38);
 
-        new Button(toolbar, BUTTON_FILLED, Icon::get("plus"), "New task");
+        new Button(toolbar, Button::FILLED, Icon::get("plus"), "New task");
 
-        auto cancel_task_button = new Button(toolbar, BUTTON_TEXT, Icon::get("close"), "Cancel task");
+        auto cancel_task_button = new Button(toolbar, Button::TEXT, Icon::get("close"), "Cancel task");
         cancel_task_button->on(Event::ACTION, [&](auto) {
             auto result = MessageBox::create_and_show(
                 "Cancel task",

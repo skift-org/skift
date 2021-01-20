@@ -32,7 +32,7 @@ int main(int argc, char **argv)
         auto p1 = new Panel(panel_hflow);
         p1->flags(Widget::FILL);
 
-        auto button = new Button(panel_hflow, BUTTON_TEXT, "Hello, world!");
+        auto button = new Button(panel_hflow, Button::TEXT, "Hello, world!");
         button->flags(Widget::FILL);
 
         auto p2 = new Panel(panel_hflow);
@@ -48,12 +48,12 @@ int main(int argc, char **argv)
         buttons->layout(HFLOW(8));
         buttons->insets(Insetsi(0, 8));
 
-        new Button(buttons, BUTTON_TEXT, "BUTTON");
-        new Button(buttons, BUTTON_OUTLINE, "BUTTON");
-        new Button(buttons, BUTTON_FILLED, "BUTTON");
-        new Button(buttons, BUTTON_TEXT, Icon::get("widgets"), "BUTTON");
-        new Button(buttons, BUTTON_OUTLINE, Icon::get("widgets"), "BUTTON");
-        new Button(buttons, BUTTON_FILLED, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::TEXT, "BUTTON");
+        new Button(buttons, Button::OUTLINE, "BUTTON");
+        new Button(buttons, Button::FILLED, "BUTTON");
+        new Button(buttons, Button::TEXT, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::OUTLINE, Icon::get("widgets"), "BUTTON");
+        new Button(buttons, Button::FILLED, Icon::get("widgets"), "BUTTON");
     }
 
     new Label(window->root(), "Grid layout", Anchor::CENTER);
@@ -68,14 +68,14 @@ int main(int argc, char **argv)
         auto text_field = new TextField(panel_grid, TextModel::empty());
         text_field->focus();
 
-        auto acrylic_button = new Button(panel_grid, BUTTON_FILLED, "Open acrylic window !");
+        auto acrylic_button = new Button(panel_grid, Button::FILLED, "Open acrylic window !");
         acrylic_button->on(Event::ACTION, [&](auto) {
             acrylic_window->show();
         });
 
-        new Button(panel_grid, BUTTON_FILLED, "Grid layout!");
+        new Button(panel_grid, Button::FILLED, "Grid layout!");
 
-        auto dialog_button = new Button(panel_grid, BUTTON_FILLED, "Open dialog!");
+        auto dialog_button = new Button(panel_grid, Button::FILLED, "Open dialog!");
         dialog_button->on(Event::ACTION, [&](auto) {
             filepicker::Dialog picker{};
             picker.show();

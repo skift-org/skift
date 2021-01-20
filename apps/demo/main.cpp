@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; _demos[i].name; i++)
     {
-        Widget *demo_button = new Button(navbar, BUTTON_TEXT, _demos[i].name);
+        Widget *demo_button = new Button(navbar, Button::TEXT, _demos[i].name);
 
         demo_button->on(Event::ACTION, [i, demo_widget](auto) {
             demo_widget->demo(&_demos[i]);

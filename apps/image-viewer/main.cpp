@@ -15,10 +15,24 @@ int main(int argc, char **argv)
     window->icon(Icon::get("image"));
     window->title("Image Viewer");
     window->size(Vec2i(700, 500));
+    window->root()->layout(VFLOW(0));
 
     new TitleBar(window->root());
 
-    new Image(window->root(), Bitmap::load_from_or_placeholder(argv[1]));
+    auto toolbar = new Panel(window->root());
+    toolbar->layout(HFLOW(0));
+    toolbar->insets(4);
+
+    auto bitmap = Bitmap::load_from_or_placeholder(argv[1]);
+
+    auto set_has_wallaper = new Button(toolbar, Button::TEXT, Icon::get("wallpaper"), "Set Has Wallpaper");
+
+    set_has_wallaper->on(Event::ACTION, [&](auto) {
+        Application::set_wallpaper(*bitmap);
+    });
+
+    auto image = new Image(window->root(), bitmap);
+    image->flags(Widget::FILL);
 
     window->show();
 

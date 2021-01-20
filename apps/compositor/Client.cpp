@@ -129,6 +129,10 @@ void Client::handle(const CompositorSetWallaper &set_wallpaper)
     {
         logger_warn("The client sent us a bad wallpaper handle.");
     }
+
+    CompositorMessage message = {};
+    message.type = COMPOSITOR_MESSAGE_ACK;
+    send_message(message);
 }
 
 void Client::handle_get_mouse_position()

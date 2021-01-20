@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
     auto bitmap = Bitmap::load_from_or_placeholder(argv[1]);
 
-    auto set_has_wallaper = new Button(toolbar, Button::TEXT, Icon::get("wallpaper"), "Set Has Wallpaper");
+    auto set_has_wallaper = new Button(toolbar, Button::TEXT, Icon::get("wallpaper"), "Set As Wallpaper");
 
     set_has_wallaper->on(Event::ACTION, [&](auto) {
         Application::set_wallpaper(*bitmap);

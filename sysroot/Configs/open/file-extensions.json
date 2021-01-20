@@ -10,5 +10,6 @@
     ".txt": "text",
     ".html": "text",
     ".css": "text",
-    ".js": "text"
+    ".js": "text",
+    ".md": "text",
 }

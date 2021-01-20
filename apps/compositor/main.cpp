@@ -37,83 +37,6 @@ static EventType key_motion_to_event_type(KeyMotion motion)
     ASSERT_NOT_REACHED();
 }
 
-void keyboard_callback(void *target, Stream *keyboard_stream, PollEvent events)
-{
-    __unused(target);
-    __unused(events);
-
-    KeyboardPacket packet;
-    size_t size = stream_read(keyboard_stream, &packet, sizeof(KeyboardPacket));
-
-    if (size == sizeof(KeyboardPacket))
-    {
-        Window *window = manager_focus_window();
-
-        if (window)
-        {
-            Event event = {
-                .type = key_motion_to_event_type(packet.motion),
-                .accepted = false,
-                .mouse = {},
-                .keyboard = {
-                    .key = packet.key,
-                    .modifiers = packet.modifiers,
-                    .codepoint = packet.codepoint,
-                },
-            };
-
-            window->send_event(event);
-        }
-    }
-    else
-    {
-        logger_warn("Invalid keyboard packet with size=%d !", size);
-    }
-
-    client_destroy_disconnected();
-}
-
-void mouse_callback(void *target, Stream *mouse_stream, PollEvent events)
-{
-    __unused(target);
-    __unused(events);
-
-    MousePacket packet;
-    size_t size = stream_read(mouse_stream, &packet, sizeof(MousePacket));
-
-    if (size == sizeof(MousePacket))
-    {
-        cursor_handle_packet(packet);
-    }
-    else
-    {
-        logger_warn("Invalid mouse packet with size=%d !", size);
-    }
-
-    client_destroy_disconnected();
-}
-
-void accept_callback(void *target, Socket *socket, PollEvent events)
-{
-    __unused(target);
-    __unused(events);
-
-    Connection *incoming_connection = socket_accept(socket);
-
-    new Client(incoming_connection);
-
-    client_destroy_disconnected();
-}
-
-void render_callback(void *target)
-{
-    __unused(target);
-
-    renderer_repaint_dirty();
-
-    client_destroy_disconnected();
-}
-
 bool acquire_lock()
 {
     Stream *socket_stream = stream_open("/Session/compositor.lock", OPEN_READ);
@@ -148,9 +71,61 @@ int main(int argc, char const *argv[])
 
     Socket *socket = socket_open("/Session/compositor.ipc", OPEN_CREATE);
 
-    notifier_create(nullptr, HANDLE(keyboard_stream), POLL_READ, (NotifierCallback)keyboard_callback);
-    notifier_create(nullptr, HANDLE(mouse_stream), POLL_READ, (NotifierCallback)mouse_callback);
-    notifier_create(nullptr, HANDLE(socket), POLL_ACCEPT, (NotifierCallback)accept_callback);
+    auto keyboard_notifier = own<Notifier>(HANDLE(keyboard_stream), POLL_READ, [&]() {
+        KeyboardPacket packet;
+        size_t size = stream_read(keyboard_stream, &packet, sizeof(KeyboardPacket));
+
+        if (size == sizeof(KeyboardPacket))
+        {
+            Window *window = manager_focus_window();
+
+            if (window)
+            {
+                Event event = {
+                    .type = key_motion_to_event_type(packet.motion),
+                    .accepted = false,
+                    .mouse = {},
+                    .keyboard = {
+                        .key = packet.key,
+                        .modifiers = packet.modifiers,
+                        .codepoint = packet.codepoint,
+                    },
+                };
+
+                window->send_event(event);
+            }
+        }
+        else
+        {
+            logger_warn("Invalid keyboard packet with size=%d !", size);
+        }
+
+        client_destroy_disconnected();
+    });
+
+    auto mouse_notifier = own<Notifier>(HANDLE(mouse_stream), POLL_READ, [&]() {
+        MousePacket packet;
+        size_t size = stream_read(mouse_stream, &packet, sizeof(MousePacket));
+
+        if (size == sizeof(MousePacket))
+        {
+            cursor_handle_packet(packet);
+        }
+        else
+        {
+            logger_warn("Invalid mouse packet with size=%d !", size);
+        }
+
+        client_destroy_disconnected();
+    });
+
+    auto socker_notifier = own<Notifier>(HANDLE(socket), POLL_ACCEPT, [&]() {
+        Connection *incoming_connection = socket_accept(socket);
+
+        new Client(incoming_connection);
+
+        client_destroy_disconnected();
+    });
 
     auto repaint_timer = own<Timer>(1000 / 60, []() {
         renderer_repaint_dirty();

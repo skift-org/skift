@@ -1,23 +1,40 @@
 #pragma once
 
+#include <libutils/Callback.h>
+
+#include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Handle.h>
 
 struct Notifier;
 
 typedef void (*NotifierCallback)(void *target, Handle *handle, PollEvent events);
 
-struct Notifier
+class Notifier
 {
-    void *target;
-    Handle *handle;
-    PollEvent events;
-    NotifierCallback callback;
+private:
+    Handle *_handle;
+    PollEvent _events;
+    Callback<void()> _callback;
+
+public:
+    Handle *handle() { return _handle; }
+    PollEvent events() { return _events; }
+
+    Notifier(Handle *handle, PollEvent events, Callback<void()> callback)
+        : _handle(handle),
+          _events(events),
+          _callback(callback)
+    {
+        EventLoop::register_notifier(this);
+    }
+
+    ~Notifier()
+    {
+        EventLoop::unregister_notifier(this);
+    }
+
+    void invoke()
+    {
+        _callback();
+    }
 };
-
-Notifier *notifier_create(
-    void *target,
-    Handle *handle,
-    PollEvent events,
-    NotifierCallback callback);
-
-void notifier_destroy(Notifier *notifier);

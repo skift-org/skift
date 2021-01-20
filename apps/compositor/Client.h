@@ -7,15 +7,35 @@
 
 struct Client
 {
-    Notifier *notifier = nullptr;
-    Connection *connection = nullptr;
-    bool disconnected = false;
+    OwnPtr<Notifier> _notifier = nullptr;
+    Connection *_connection = nullptr;
+    bool _disconnected = false;
 
     Client(Connection *connection);
 
     ~Client();
 
     Result send_message(CompositorMessage message);
+
+    void handle(const CompositorCreateWindow &create_window);
+
+    void handle(const CompositorDestroyWindow &destroy_window);
+
+    void handle(const CompositorMoveWindow &move_window);
+
+    void handle(const CompositorFlipWindow &flip_window);
+
+    void handle(const CompositorCursorWindow &cursor_window);
+
+    void handle(const CompositorSetResolution &set_resolution);
+
+    void handle(const CompositorSetWallaper &set_wallpaper);
+
+    void handle_get_mouse_position();
+
+    void handle_goodbye();
+
+    void handle_request();
 };
 
 void client_broadcast(CompositorMessage message);

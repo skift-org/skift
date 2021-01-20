@@ -10,18 +10,16 @@
 class TerminalWidget : public Widget
 {
 private:
-    terminal::Terminal *_terminal;
+    OwnPtr<terminal::Terminal> _terminal;
     bool _cursor_blink;
 
     Stream *_server_stream;
     Stream *_client_stream;
 
     OwnPtr<Timer> _cursor_blink_timer;
-    Notifier *_server_notifier;
+    OwnPtr<Notifier> _server_notifier;
 
 public:
-    terminal::Terminal *terminal() { return _terminal; }
-
     void blink() { _cursor_blink = !_cursor_blink; };
 
     TerminalWidget(Widget *parent);
@@ -33,4 +31,6 @@ public:
     void event(Event *event);
 
     void do_layout();
+
+    void handle_read();
 };

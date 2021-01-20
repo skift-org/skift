@@ -25,8 +25,8 @@ void update_notifier()
 {
     for (size_t i = 0; i < _notifiers.count(); i++)
     {
-        _handles[i] = _notifiers[i]->handle;
-        _events[i] = _notifiers[i]->events;
+        _handles[i] = _notifiers[i]->handle();
+        _events[i] = _notifiers[i]->events();
     }
 
     _handles_count = _notifiers.count();
@@ -51,12 +51,10 @@ void update_notifier(Handle *handle, PollEvent event)
 {
     for (size_t i = 0; i < _notifiers.count(); i++)
     {
-        if (_notifiers[i]->handle == handle)
+        if (_notifiers[i]->handle() == handle &&
+            _notifiers[i]->events() & event)
         {
-            _notifiers[i]->callback(
-                _notifiers[i]->target,
-                _notifiers[i]->handle,
-                event);
+            _notifiers[i]->invoke();
         }
     }
 }

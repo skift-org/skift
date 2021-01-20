@@ -18,7 +18,7 @@ class Server
 {
 private:
     Socket *_socket;
-    Notifier *_notifier;
+    OwnPtr<Notifier> _notifier;
 
     Vector<OwnPtr<ClientConnection>> _clients{};
     Repository &_repository;
@@ -28,12 +28,14 @@ public:
         : _repository(repository)
     {
         _socket = socket_open("/Session/settings.ipc", OPEN_CREATE);
-        _notifier = notifier_create(this, HANDLE(_socket), POLL_ACCEPT, (NotifierCallback)server_accept_callback);
+
+        _notifier = own<Notifier>(HANDLE(_socket), POLL_ACCEPT, [this]() {
+            handle_connection(socket_accept(_socket));
+        });
     }
 
     ~Server()
     {
-        notifier_destroy(_notifier);
         socket_close(_socket);
     }
 
@@ -43,10 +45,5 @@ public:
         _clients.push_back(own<ClientConnection>(client));
     }
 };
-
-void server_accept_callback(Server *target, Socket *socket, PollEvent events)
-{
-    target->handle_connection(socket_accept(socket));
-}
 
 } // namespace settings

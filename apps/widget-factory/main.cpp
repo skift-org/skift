@@ -8,7 +8,11 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
-    Window *window = new Window(WINDOW_RESIZABLE);
+    auto acrylic_window = own<Window>(WINDOW_ACRYLIC);
+    acrylic_window->title("Acrylic!");
+    new TitleBar(acrylic_window->root());
+
+    auto window = own<Window>(WINDOW_RESIZABLE);
 
     window->icon(Icon::get("widgets"));
     window->title("Widget Factory");
@@ -66,12 +70,7 @@ int main(int argc, char **argv)
 
         auto acrylic_button = new Button(panel_grid, BUTTON_FILLED, "Open acrylic window !");
         acrylic_button->on(Event::ACTION, [&](auto) {
-            Window *window = new Window(WINDOW_ACRYLIC);
-
-            window->title("Acrylic!");
-            window->opacity(0.85);
-
-            window->show();
+            acrylic_window->show();
         });
 
         new Button(panel_grid, BUTTON_FILLED, "Grid layout!");

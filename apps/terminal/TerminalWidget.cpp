@@ -9,42 +9,21 @@
 
 #define TERMINAL_IO_BUFFER_SIZE 4096
 
-void terminal_widget_server_callback(TerminalWidget *widget, Stream *server, PollEvent events)
-{
-    __unused(events);
-
-    char buffer[TERMINAL_IO_BUFFER_SIZE];
-    size_t size = stream_read(server, buffer, TERMINAL_IO_BUFFER_SIZE);
-
-    if (handle_has_error(server))
-    {
-        handle_printf_error(server, "Terminal: read from server failed");
-        return;
-    }
-
-    widget->terminal()->write(buffer, size);
-    widget->should_repaint();
-}
-
 TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 {
-    _terminal = new terminal::Terminal(80, 24);
+    _terminal = own<terminal::Terminal>(80, 24);
 
-    stream_create_term(
-        &_server_stream,
-        &_client_stream);
+    stream_create_term(&_server_stream, &_client_stream);
 
-    _server_notifier = notifier_create(
-        this,
-        HANDLE(_server_stream),
-        POLL_READ,
-        (NotifierCallback)terminal_widget_server_callback);
+    _server_notifier = own<Notifier>(HANDLE(_server_stream), POLL_READ, [this]() {
+        handle_read();
+    });
 
     _cursor_blink_timer = own<Timer>(250, [this]() {
         blink();
 
-        int cx = terminal()->cursor().x;
-        int cy = terminal()->cursor().y;
+        int cx = _terminal->cursor().x;
+        int cy = _terminal->cursor().y;
 
         should_repaint(cell_bound(cx, cy).offset(bound().position()));
     });
@@ -60,10 +39,6 @@ TerminalWidget::TerminalWidget(Widget *parent) : Widget(parent)
 
 TerminalWidget::~TerminalWidget()
 {
-    delete _terminal;
-
-    notifier_destroy(_server_notifier);
-
     stream_close(_server_stream);
     stream_close(_client_stream);
 }
@@ -75,24 +50,22 @@ void TerminalWidget::paint(Painter &painter, Recti rectangle)
 
     rectangle = rectangle.offset(-bound().position());
 
-    terminal::Terminal *terminal = _terminal;
-
-    for (int y = 0; y < terminal->height(); y++)
+    for (int y = 0; y < _terminal->height(); y++)
     {
-        for (int x = 0; x < terminal->width(); x++)
+        for (int x = 0; x < _terminal->width(); x++)
         {
-            terminal::Cell cell = terminal->cell_at(x, y);
+            terminal::Cell cell = _terminal->cell_at(x, y);
             render_cell(painter, x, y, cell);
-            terminal->cell_undirty(x, y);
+            _terminal->cell_undirty(x, y);
         }
     }
 
-    int cx = terminal->cursor().x;
-    int cy = terminal->cursor().y;
+    int cx = _terminal->cursor().x;
+    int cy = _terminal->cursor().y;
 
     if (cell_bound(cx, cy).colide_with(rectangle))
     {
-        terminal::Cell cell = terminal->cell_at(cx, cy);
+        terminal::Cell cell = _terminal->cell_at(cx, cy);
 
         if (window()->focused())
         {
@@ -250,4 +223,19 @@ void TerminalWidget::do_layout()
         IOCallTerminalSizeArgs args = {width, height};
         stream_call(_server_stream, IOCALL_TERMINAL_SET_SIZE, &args);
     }
+}
+
+void TerminalWidget::handle_read()
+{
+    char buffer[TERMINAL_IO_BUFFER_SIZE];
+    size_t size = stream_read(_server_stream, buffer, TERMINAL_IO_BUFFER_SIZE);
+
+    if (handle_has_error(_server_stream))
+    {
+        handle_printf_error(_server_stream, "Terminal: read from server failed");
+        return;
+    }
+
+    _terminal->write(buffer, size);
+    should_repaint();
 }

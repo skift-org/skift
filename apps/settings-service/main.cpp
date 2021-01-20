@@ -15,24 +15,19 @@ int main(int argc, const char **argv)
 
     EventLoop::initialize();
 
-    settings::Repository repositorzy;
+    settings::Repository repository;
 
     auto socket = socket_open("/Session/settings.ipc", OPEN_CREATE);
 
-    auto notifier = notifier_create(
-        nullptr,
-        HANDLE(socket),
-        POLL_ACCEPT,
-        [](void *, Handle *, PollEvent) {
-            logger_info("Client connected!");
-        });
+    auto notifier = own<Notifier>(HANDLE(socket), POLL_ACCEPT, []() {
+        logger_info("Client connected!");
+    });
 
     while (true)
     {
         EventLoop::pump(false);
     }
 
-    notifier_destroy(notifier);
     socket_close(socket);
 
     EventLoop::uninitialize();

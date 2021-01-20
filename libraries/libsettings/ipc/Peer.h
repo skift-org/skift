@@ -13,7 +13,7 @@ class Peer
 {
 private:
     Connection *_connection = nullptr;
-    Notifier *_notifier = nullptr;
+    OwnPtr<Notifier> _notifier = nullptr;
 
 public:
     bool connected()
@@ -24,18 +24,16 @@ public:
     Peer(Connection *connection)
     {
         _connection = connection;
-        _notifier = notifier_create(this, HANDLE(_connection), POLL_READ, [](void *target, Handle *handle, PollEvent) {
-            Peer *peer = reinterpret_cast<Peer *>(target);
-
-            auto result_of_message = Message::read_from((Connection *)handle);
+        _notifier = own<Notifier>(HANDLE(_connection), POLL_READ, [this]() {
+            auto result_of_message = Message::read_from(_connection);
 
             if (!result_of_message.success())
             {
-                peer->close();
+                close();
             }
             else
             {
-                peer->handle_message(result_of_message.value());
+                handle_message(result_of_message.value());
             }
         });
     }
@@ -92,8 +90,7 @@ public:
 
         auto result_or_message = receive();
 
-        while (result_or_message.success() &&
-               result_or_message.value().type != expected)
+        while (result_or_message.success() && result_or_message.value().type != expected)
         {
             handle_message(result_or_message.value());
 
@@ -109,7 +106,6 @@ public:
         {
             disconnected();
 
-            notifier_destroy(_notifier);
             _notifier = nullptr;
 
             connection_close(_connection);

@@ -28,7 +28,7 @@ enum class State
 Vector<Window *> _windows;
 State _state = State::UNINITIALIZED;
 Connection *_connection;
-Notifier *_connection_notifier;
+OwnPtr<Notifier> _connection_notifier;
 bool _wireframe = false;
 
 /* --- IPC ------------------------------------------------------------------ */
@@ -72,28 +72,6 @@ void do_message(const CompositorMessage &message)
         hexdump(&message, sizeof(CompositorMessage));
         Application::exit(PROCESS_FAILURE);
     }
-}
-
-void request_callback(void *, Connection *connection, PollEvent)
-{
-    CompositorMessage message = {};
-    memset((void *)&message, 0xff, sizeof(CompositorMessage));
-    size_t message_size = connection_receive(connection, &message, sizeof(CompositorMessage));
-
-    if (handle_has_error(connection))
-    {
-        logger_error("Connection to the compositor closed %s!", handle_error_string(connection));
-        Application::exit(PROCESS_FAILURE);
-    }
-
-    if (message_size != sizeof(CompositorMessage))
-    {
-        logger_error("Got a message with an invalid size from compositor %u != %u!", sizeof(CompositorMessage), message_size);
-        hexdump(&message, message_size);
-        Application::exit(PROCESS_FAILURE);
-    }
-
-    do_message(message);
 }
 
 ResultOr<CompositorMessage> wait_for_message(CompositorMessageType expected_message)
@@ -366,6 +344,7 @@ Result initialize(int argc, char **argv)
     if (handle_has_error(_connection))
     {
         logger_error("Failed to connect to the compositor: %s", handle_error_string(_connection));
+
         Result result = handle_get_error(_connection);
         connection_close(_connection);
         _connection = nullptr;
@@ -375,11 +354,26 @@ Result initialize(int argc, char **argv)
 
     EventLoop::initialize();
 
-    _connection_notifier = notifier_create(
-        nullptr,
-        HANDLE(_connection),
-        POLL_READ,
-        (NotifierCallback)request_callback);
+    _connection_notifier = own<Notifier>(HANDLE(_connection), POLL_READ, []() {
+        CompositorMessage message = {};
+        memset((void *)&message, 0xff, sizeof(CompositorMessage));
+        size_t message_size = connection_receive(_connection, &message, sizeof(CompositorMessage));
+
+        if (handle_has_error(_connection))
+        {
+            logger_error("Connection to the compositor closed %s!", handle_error_string(_connection));
+            Application::exit(PROCESS_FAILURE);
+        }
+
+        if (message_size != sizeof(CompositorMessage))
+        {
+            logger_error("Got a message with an invalid size from compositor %u != %u!", sizeof(CompositorMessage), message_size);
+            hexdump(&message, message_size);
+            Application::exit(PROCESS_FAILURE);
+        }
+
+        do_message(message);
+    });
 
     _state = State::RUNNING;
 
@@ -438,6 +432,9 @@ void exit(int exit_value)
     hide_all_windows();
 
     goodbye();
+
+    _connection_notifier = nullptr;
+    connection_close(_connection);
 
     EventLoop::exit(exit_value);
 }

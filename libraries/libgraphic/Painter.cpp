@@ -619,8 +619,7 @@ void Painter::draw_string_within(Font &font, const char *str, Recti container, A
 
 __flatten void Painter::blur(Recti rectangle, int radius)
 {
-    rectangle = apply_transform(rectangle);
-    rectangle = apply_clip(rectangle);
+    rectangle = apply(rectangle);
 
     stackblur((unsigned char *)_bitmap->pixels(),
               _bitmap->width(),
@@ -632,14 +631,13 @@ __flatten void Painter::blur(Recti rectangle, int radius)
 
 __flatten void Painter::saturation(Recti rectangle, float value)
 {
-    rectangle = apply_transform(rectangle);
-    rectangle = apply_clip(rectangle);
+    rectangle = apply(rectangle);
 
     for (int y = 0; y < rectangle.height(); y++)
     {
         for (int x = 0; x < rectangle.width(); x++)
         {
-            Color color = _bitmap->get_pixel({x, y});
+            Color color = _bitmap->get_pixel({rectangle.x() + x, rectangle.y() + y});
 
             // weights from CCIR 601 spec
             // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
@@ -651,7 +649,7 @@ __flatten void Painter::saturation(Recti rectangle, float value)
 
             color = Color::from_byte(red, green, blue);
 
-            _bitmap->set_pixel({x, y}, color);
+            _bitmap->set_pixel({rectangle.x() + x, rectangle.y() + y}, color);
         }
     }
 }
@@ -665,7 +663,7 @@ __flatten void Painter::noise(Recti rectangle, float opacity)
         for (int x = 0; x < rectangle.width(); x++)
         {
             double noise = rand.next_double();
-            plot({x, y}, Color::from_rgba(noise, noise, noise, opacity));
+            plot({rectangle.x() + x, rectangle.y() + y}, Color::from_rgba(noise, noise, noise, opacity));
         }
     }
 }

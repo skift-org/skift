@@ -21,6 +21,11 @@ public:
         seed(timestamp_now());
     }
 
+    Random(int32_t seed)
+    {
+        Random::seed(seed);
+    }
+
     uint8_t next_u8()
     {
         return (uint8_t)next_u32();

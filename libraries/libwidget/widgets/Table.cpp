@@ -161,8 +161,8 @@ void Table::paint(Painter &painter, Recti rectangle)
             }
         }
     }
-    painter.blur(header_bound(), 8);
-    painter.fill_rectangle(header_bound(), color(THEME_BACKGROUND).with_alpha(0.9));
+    painter.acrylic(header_bound());
+    painter.fill_rectangle(header_bound(), color(THEME_BACKGROUND).with_alpha(0.5));
 
     for (int column = 0; column < column_count; column++)
     {

@@ -41,7 +41,7 @@ public:
                 }
                 else
                 {
-                    auto l = launchpad_create("open", "/System/Binaries/open");
+                    auto l = launchpad_create("open", "/System/Utilities/open");
                     launchpad_argument(l, _listing->info(selected()).name.cstring());
                     launchpad_launch(l, nullptr);
                 }

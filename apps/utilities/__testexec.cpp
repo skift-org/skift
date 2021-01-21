@@ -10,6 +10,6 @@ int main(int argc, char **argv)
     __unused(argc);
     __unused(argv);
 
-    Launchpad *launchpad = launchpad_create("__testexec", "/System/Binaries/__testexec");
+    Launchpad *launchpad = launchpad_create("__testexec", "/System/Utilities/__testexec");
     return launchpad_launch(launchpad, NULL);
 }

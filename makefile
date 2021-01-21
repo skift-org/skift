@@ -30,7 +30,7 @@ RAMDISK=$(CONFIG_BUILD_DIRECTORY)/ramdisk.tar
 BUILD_DIRECTORY_LIBS=$(SYSROOT)/System/Libraries
 BUILD_DIRECTORY_INCLUDE=$(SYSROOT)/System/Includes
 BUILD_DIRECTORY_APPS=$(SYSROOT)/Applications
-BUILD_DIRECTORY_UTILS=$(SYSROOT)/System/Binaries
+BUILD_DIRECTORY_UTILITIES=$(SYSROOT)/System/Utilities
 
 BUILD_WARNING:= \
 	-Wall \
@@ -104,7 +104,7 @@ $(RAMDISK): $(CRTS) $(TARGETS) $(HEADERS) $(SYSROOT_CONTENT)
 		$(SYSROOT)/Applications \
 		$(SYSROOT)/Session \
 		$(SYSROOT)/System \
-		$(SYSROOT)/System/Binaries \
+		$(SYSROOT)/System/Utilities \
 		$(SYSROOT)/Configs \
 		$(SYSROOT)/Files/Fonts \
 		$(SYSROOT)/Files/Icons \

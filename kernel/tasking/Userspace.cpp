@@ -12,7 +12,7 @@ void userspace_initialize()
 {
     logger_info("Starting the userspace...");
 
-    Launchpad *init_lauchpad = launchpad_create("init", "/System/Binaries/init");
+    Launchpad *init_lauchpad = launchpad_create("init", "/System/Utilities/init");
 
     Stream *serial_device = stream_open("/Devices/serial", OPEN_WRITE | OPEN_READ);
 

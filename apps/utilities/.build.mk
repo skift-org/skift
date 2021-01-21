@@ -1,41 +1,47 @@
-UTILS = \
+UTILITIES = \
 	__TESTEXEC \
 	__TESTTERM \
 	BASENAME \
 	CAT \
 	CLEAR \
 	CP \
-	DSTART \
 	DIRNAME \
+	DISPLAYCTL \
+	DSTART \
 	ECHO \
 	ENV \
+	FALSE \
 	GREP \
 	HEAD \
 	HEXDUMP \
 	INIT \
 	JSON \
+	KEYBOARDCTL \
 	KILL \
+	LINK  \
 	LS \
 	MARKUP \
 	MKDIR \
-	RMDIR \
 	MV \
+	NETCTL\
 	NOW \
 	OPEN \
 	PANIC \
+	PIANO \
+	PLAY \
+	POWERCTL \
+	PWD	\
+	RMDIR \
+	SETTINGSCTL \
 	SYSFETCH \
 	TAC \
 	TOUCH \
+	TRUE \
+	UNAME \
 	UNLINK \
 	UPTIME \
-	LINK  \
-	UNAME \
-	TRUE \
-	FALSE \
-	YES \
-	PWD	\
-	PLAY \
-	PIANO
+	WALLPAPERCTL \
+	YES
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -148,11 +154,29 @@ PWD_NAME = pwd
 PIANO_LIBS = 
 PIANO_NAME = piano
 
+DISPLAYCTL_LIBS =
+DISPLAYCTL_NAME = displayctl
+
+KEYBOARDCTL_LIBS =
+KEYBOARDCTL_NAME = keyboardctl
+
+NETCTL_LIBS =
+NETCTL_NAME = netctl
+
+POWERCTL_LIBS =
+POWERCTL_NAME = powerctl
+
+SETTINGSCTL_LIBS = settings
+SETTINGSCTL_NAME = settingsctl
+
+WALLPAPERCTL_LIBS = graphic
+WALLPAPERCTL_NAME = wallpaperctl
+
 define UTIL_TEMPLATE =
 
-$(1)_BINARY  = $(BUILD_DIRECTORY_UTILS)/$($(1)_NAME)
-$(1)_SOURCE  = apps/coreutils/$($(1)_NAME).cpp
-$(1)_OBJECT  = $$(patsubst apps/coreutils/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/apps/coreutils/%.o, $$($(1)_SOURCE))
+$(1)_BINARY  = $(BUILD_DIRECTORY_UTILITIES)/$($(1)_NAME)
+$(1)_SOURCE  = apps/utilities/$($(1)_NAME).cpp
+$(1)_OBJECT  = $$(patsubst apps/utilities/%.cpp, $$(CONFIG_BUILD_DIRECTORY)/apps/utilities/%.o, $$($(1)_SOURCE))
 
 TARGETS += $$($(1)_BINARY)
 OBJECTS += $$($(1)_OBJECT)
@@ -169,4 +193,4 @@ $$($(1)_OBJECT): $$($(1)_SOURCE)
 
 endef
 
-$(foreach util, $(UTILS), $(eval $(call UTIL_TEMPLATE,$(util))))
+$(foreach util, $(UTILITIES), $(eval $(call UTIL_TEMPLATE,$(util))))

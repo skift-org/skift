@@ -3,7 +3,7 @@
         "HOME": "/User",
         "LOGNAME": "anon",
         "PATH": [
-            "/System/Binaries",
+            "/System/Utilities",
             "/System/Posix/bin",
             "/Applications"
         ],

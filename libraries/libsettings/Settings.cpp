@@ -52,7 +52,7 @@ void register_watcher(Watcher &watcher)
         message.type = MessageType::CLIENT_WATCH;
         message.path = watcher.path();
 
-        server().send(message);
+        server().request(message, MessageType::SERVER_ACK);
     }
 
     _watchers.push_back(&watcher);
@@ -69,7 +69,7 @@ void unregister_watcher(Watcher &watcher)
         message.type = MessageType::CLIENT_UNWATCH;
         message.path = watcher.path();
 
-        server().send(message);
+        server().request(message, MessageType::SERVER_ACK);
     }
 }
 

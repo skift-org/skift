@@ -64,6 +64,8 @@ public:
 
     const Array &as_array() const;
 
+    bool as_bool() const;
+
     Value();
 
     Value(String &);

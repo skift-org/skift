@@ -24,7 +24,7 @@ struct Repository
     {
         if (!domains.has_key(path.domain))
         {
-            return json::NIL;
+            return nullptr;
         }
 
         return domains[path.domain].read(path);

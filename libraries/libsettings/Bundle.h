@@ -20,7 +20,7 @@ struct Bundle
     {
         if (!keys.has_key(path.key))
         {
-            return json::NIL;
+            return nullptr;
         }
 
         return keys[path.key];

@@ -23,7 +23,7 @@ struct Domain
     {
         if (!bundles.has_key(path.bundle))
         {
-            return json::NIL;
+            return nullptr;
         }
 
         return bundles[path.bundle].read(path);

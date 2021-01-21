@@ -8,6 +8,8 @@
 #include <libsystem/process/Process.h>
 #include <libsystem/utils/Hexdump.h>
 
+#include <libsettings/Setting.h>
+
 #include <libwidget/Application.h>
 #include <libwidget/Screen.h>
 
@@ -327,31 +329,44 @@ Window *get_window(int id)
 void hide_all_windows();
 void uninitialized();
 
+static OwnPtr<settings::Setting> _setting_theme;
+static OwnPtr<settings::Setting> _setting_wireframe;
+
 Result initialize(int argc, char **argv)
 {
     assert(_state == State::UNINITIALIZED);
 
-    bool theme_changed = false;
+    _setting_theme = own<settings::Setting>(
+        "appearance:widgets.theme",
+        [](const json::Value &value) {
+            auto new_theme = value.as_string();
+
+            char buffer[256];
+            snprintf(buffer, 256, "/Files/Themes/%s.json", new_theme.cstring());
+            theme_load(buffer);
+
+            for (size_t i = 0; i < _windows.count(); i++)
+            {
+                _windows[i]->should_repaint(_windows[i]->bound());
+            }
+        });
+
+    _setting_wireframe = own<settings::Setting>(
+        "appearance:widgets.wireframe",
+        [](const json::Value &value) {
+            _wireframe = value.as_bool();
+            for (size_t i = 0; i < _windows.count(); i++)
+            {
+                _windows[i]->should_repaint(_windows[i]->bound());
+            }
+        });
 
     for (int i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "--theme") == 0 && i + 1 < argc)
-        {
-            char buffer[256];
-            snprintf(buffer, 256, "/Files/Themes/%s.json", argv[i + 1]);
-            theme_load(buffer);
-            theme_changed = true;
-        }
-
         if (strcmp(argv[i], "--wireframe") == 0)
         {
             _wireframe = true;
         }
-    }
-
-    if (!theme_changed)
-    {
-        theme_load("/Files/Themes/skift-dark.json");
     }
 
     _connection = socket_connect("/Session/compositor.ipc");

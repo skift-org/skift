@@ -108,6 +108,40 @@ const Array &Value::as_array() const
     return *_array;
 }
 
+bool Value::as_bool() const
+{
+    if (_type == INTEGER)
+    {
+        return _integer != 0;
+    }
+
+#ifndef __KERNEL__
+
+    else if (_type == DOUBLE)
+    {
+        return _double != 0.0;
+    }
+
+#endif
+
+    else if (_type == TRUE)
+    {
+        return true;
+    }
+    else if (_type == FALSE)
+    {
+        return false;
+    }
+    else if (_type == NIL)
+    {
+        return false;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 Value::Value()
 {
     _type = NIL;

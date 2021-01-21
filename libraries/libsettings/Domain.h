@@ -21,12 +21,26 @@ struct Domain
 
     json::Value read(const Path &path)
     {
-        if (!bundles.has_key(path.bundle))
+        if (path.domain == "*")
+        {
+            json::Object obj;
+
+            bundles.foreach ([&](auto &key, auto &value) {
+                obj[key] = value.read(path);
+
+                return Iteration::CONTINUE;
+            });
+
+            return obj;
+        }
+        else if (bundles.has_key(path.bundle))
+        {
+            return bundles[path.bundle].read(path);
+        }
+        else
         {
             return nullptr;
         }
-
-        return bundles[path.bundle].read(path);
     }
 };
 

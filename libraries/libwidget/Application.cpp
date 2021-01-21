@@ -212,21 +212,6 @@ void window_change_cursor(Window *window, CursorState state)
     send_message(message);
 }
 
-void set_wallpaper(Bitmap &bitmap)
-{
-    CompositorMessage message = (CompositorMessage){
-        .type = COMPOSITOR_MESSAGE_SET_WALLPAPER,
-        .set_wallaper = {
-            .wallpaper = bitmap.handle(),
-            .resolution = bitmap.size(),
-        },
-    };
-
-    send_message(message);
-
-    wait_for_ack();
-}
-
 Vec2i mouse_position()
 {
     CompositorMessage message = {

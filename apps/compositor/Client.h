@@ -31,8 +31,6 @@ struct Client
 
     void handle(const CompositorSetResolution &set_resolution);
 
-    void handle(const CompositorSetWallaper &set_wallpaper);
-
     void handle_get_mouse_position();
 
     void handle_goodbye();

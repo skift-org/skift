@@ -1,5 +1,5 @@
 {
-    "path": "/Files/Wallpapers/mountains.png",
-    "resize": "cover",
-    "background": "#18181B"
+    "image": "/Files/Wallpapers/ripples.png",
+    "scaling": "cover",
+    "color": "#18181B"
 }

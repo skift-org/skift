@@ -43,7 +43,7 @@ public:
         });
 
         _invoker = own<Invoker>([this]() {
-            _clients.remove_all_match([](auto client) {
+            _clients.remove_all_match([](auto& client) {
                 return !client->connected();
             });
         });
@@ -108,7 +108,7 @@ public:
 
     void handle_client_disconnected()
     {
-        _invoker->should_be_invoke_later();
+        _invoker->invoke_later();
     }
 
     ~Server()

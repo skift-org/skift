@@ -19,8 +19,6 @@ void window_change_cursor(Window *window, CursorState state);
 
 Vec2i mouse_position();
 
-void set_wallpaper(Bitmap &bitmap);
-
 /* --- Client --------------------------------------------------------------- */
 
 void add_window(Window *window);

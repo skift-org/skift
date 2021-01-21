@@ -2,6 +2,9 @@
 #include <libwidget/Widgets.h>
 #include <libwidget/widgets/TitleBar.h>
 
+#include <libsettings/Settings.h>
+#include <libsystem/process/Process.h>
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -28,7 +31,7 @@ int main(int argc, char **argv)
     auto set_has_wallaper = new Button(toolbar, Button::TEXT, Icon::get("wallpaper"), "Set As Wallpaper");
 
     set_has_wallaper->on(Event::ACTION, [&](auto) {
-        Application::set_wallpaper(*bitmap);
+        settings::write(settings::Path::parse("appearance:wallpaper.image"), process_resolve(argv[1]));
     });
 
     auto image = new Image(window->root(), bitmap);

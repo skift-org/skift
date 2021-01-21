@@ -50,9 +50,9 @@ struct Repository
 
                 if (!value.is(json::OBJECT))
                 {
-                    logger_trace("Big oof");
                     continue;
                 }
+
                 auto obj = value.as_object();
 
                 obj.foreach ([&](auto &key, auto &value) {

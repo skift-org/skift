@@ -117,24 +117,6 @@ void Client::handle(const CompositorSetResolution &set_resolution)
     }
 }
 
-void Client::handle(const CompositorSetWallaper &set_wallpaper)
-{
-    auto wallaper = Bitmap::create_shared_from_handle(set_wallpaper.wallpaper, set_wallpaper.resolution);
-
-    if (wallaper.success())
-    {
-        renderer_set_wallaper(wallaper.take_value());
-    }
-    else
-    {
-        logger_warn("The client sent us a bad wallpaper handle.");
-    }
-
-    CompositorMessage message = {};
-    message.type = COMPOSITOR_MESSAGE_ACK;
-    send_message(message);
-}
-
 void Client::handle_get_mouse_position()
 {
     CompositorMessage message = {};
@@ -205,9 +187,6 @@ void Client::handle_request()
         handle(message.set_resolution);
         break;
 
-    case COMPOSITOR_MESSAGE_SET_WALLPAPER:
-        handle(message.set_wallaper);
-        break;
 
     case COMPOSITOR_MESSAGE_GET_MOUSE_POSITION:
         handle_get_mouse_position();

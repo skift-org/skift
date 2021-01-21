@@ -17,7 +17,6 @@ void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
-    _wallpaper->change_image(Bitmap::load_from_or_placeholder("/Files/Wallpapers/ripples.png"));
 
     renderer_region_dirty(_framebuffer->resolution());
 }
@@ -194,8 +193,7 @@ bool renderer_set_resolution(int width, int height)
     return result == SUCCESS;
 }
 
-void renderer_set_wallaper(RefPtr<Bitmap> wallaper)
+void renderer_set_wallaper(RefPtr<Bitmap>)
 {
-    _wallpaper->change_image(wallaper);
     renderer_region_dirty(renderer_bound());
 }

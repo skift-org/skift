@@ -20,7 +20,6 @@ enum CompositorMessageType
     COMPOSITOR_MESSAGE_EVENT_WINDOW,
     COMPOSITOR_MESSAGE_CURSOR_WINDOW,
     COMPOSITOR_MESSAGE_SET_RESOLUTION,
-    COMPOSITOR_MESSAGE_SET_WALLPAPER,
 
     COMPOSITOR_MESSAGE_GET_MOUSE_POSITION,
     COMPOSITOR_MESSAGE_MOUSE_POSITION,
@@ -114,12 +113,6 @@ struct CompositorSetResolution
     int height;
 };
 
-struct CompositorSetWallaper
-{
-    int wallpaper;
-    Vec2i resolution;
-};
-
 struct CompositorChangedResolution
 {
     Recti resolution;
@@ -145,7 +138,6 @@ struct CompositorMessage
         CompositorEventWindow event_window;
         CompositorCursorWindow cursor_window;
         CompositorSetResolution set_resolution;
-        CompositorSetWallaper set_wallaper;
         CompositorChangedResolution changed_resolution;
 
         CompositorMousePosition mouse_position;

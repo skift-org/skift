@@ -2,7 +2,9 @@
 
 #include <libgraphic/Bitmap.h>
 #include <libgraphic/Painter.h>
-#include <libutils/Observable.h>
+
+#include <libsettings/Setting.h>
+#include <libsystem/eventloop/Invoker.h>
 
 namespace compositor
 {
@@ -15,6 +17,7 @@ public:
         CENTER,
         STRETCH,
         COVER,
+        FIT,
     };
 
 private:
@@ -25,6 +28,12 @@ private:
     RefPtr<Bitmap> _orginal = nullptr;
     RefPtr<Bitmap> _scaled = nullptr;
     RefPtr<Bitmap> _acrylic = nullptr;
+
+    OwnPtr<settings::Setting> _setting_image;
+    OwnPtr<settings::Setting> _setting_color;
+    OwnPtr<settings::Setting> _setting_scaling;
+
+    OwnPtr<Invoker> _render_invoker;
 
 public:
     Recti bound() { return {{}, _resolution}; }
@@ -47,6 +56,59 @@ public:
           _scaled(Bitmap::create_shared(resolution.x(), resolution.y()).value()),
           _acrylic(Bitmap::create_shared(resolution.x(), resolution.y()).value())
     {
+        _render_invoker = own<Invoker>([this]() {
+            render();
+        });
+
+        _setting_image = own<settings::Setting>("appearance:wallpaper.image", [this](auto &value) {
+            if (value.is(json::STRING))
+            {
+                _orginal = Bitmap::load_from_or_placeholder(value.as_string().cstring());
+            }
+            else
+            {
+                _orginal = nullptr;
+            }
+
+            _render_invoker->invoke_later();
+        });
+
+        _setting_color = own<settings::Setting>("appearance:wallpaper.color", [this](auto &value) {
+            if (value.is(json::STRING))
+            {
+                _background = Color::parse(value.as_string().cstring());
+            }
+            else
+            {
+                _background = Colors::MAGENTA;
+            }
+
+            _render_invoker->invoke_later();
+        });
+
+        _setting_scaling = own<settings::Setting>("appearance:wallpaper.scaling", [this](auto &value) {
+            auto scaling_name = value.as_string();
+
+            if (scaling_name == "center")
+            {
+                _scaling = CENTER;
+            }
+            else if (scaling_name == "stretch")
+            {
+                _scaling = STRETCH;
+            }
+            else if (scaling_name == "cover")
+            {
+                _scaling = COVER;
+            }
+            else if (scaling_name == "fit")
+            {
+                _scaling = FIT;
+            }
+
+            _render_invoker->invoke_later();
+        });
+
         render();
     }
 
@@ -70,9 +132,13 @@ public:
             {
                 painter.blit(*_orginal, _orginal->bound(), _scaled->bound());
             }
-            else if (_scaling == COVER)
+            else if (_scaling == CENTER)
             {
                 painter.blit(*_orginal, _orginal->bound(), _orginal->bound().centered_within(_scaled->bound()));
+            }
+            else if (_scaling == FIT)
+            {
+                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().fit(_scaled->bound()));
             }
         }
     }
@@ -89,6 +155,8 @@ public:
     {
         render_scaled();
         render_acrylic();
+
+        renderer_region_dirty(renderer_bound());
     }
 
     void change_resolution(Vec2i resolution)
@@ -96,26 +164,9 @@ public:
         _resolution = resolution;
         _scaled = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
         _acrylic = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
-        render();
-    }
 
-    void change_image(RefPtr<Bitmap> image)
-    {
-        _orginal = image;
-        render();
+        _render_invoker->invoke_later();
     }
-
-    void change_background(Color color)
-    {
-        _background = color;
-        render();
-    }
-
-    void change_scaling(Scaling scaling)
-    {
-        _scaling = scaling;
-        render();
-    }
-}; // namespace compositor
+};
 
 } // namespace compositor

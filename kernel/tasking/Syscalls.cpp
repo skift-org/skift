@@ -107,7 +107,7 @@ Result hj_process_clone(int *pid)
 
 Result hj_process_exit(int exit_code)
 {
-    if (exit_code != PROCESS_SUCCESS)
+    if (exit_code != PROCESS_SUCCESS) 
     {
         arch_backtrace();
     }

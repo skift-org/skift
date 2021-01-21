@@ -33,6 +33,20 @@ Result BGA::set_resolution(int width, int height)
         write_register(BGA_REG_BPP, 32);
         write_register(BGA_REG_ENABLE, BGA_ENABLED | BGA_LINEAR_FRAMEBUFFER);
 
+        if (read_register(BGA_REG_XRES) != width ||
+            read_register(BGA_REG_YRES) != height)
+        {
+            write_register(BGA_REG_ENABLE, BGA_DISABLED);
+
+            write_register(BGA_REG_XRES, _width);
+            write_register(BGA_REG_YRES, _height);
+
+            write_register(BGA_REG_BPP, 32);
+            write_register(BGA_REG_ENABLE, BGA_ENABLED | BGA_LINEAR_FRAMEBUFFER);
+
+            return ERR_INVALID_ARGUMENT;
+        }
+
         _width = width;
         _height = height;
 

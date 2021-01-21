@@ -188,9 +188,16 @@ void renderer_repaint_dirty()
 bool renderer_set_resolution(int width, int height)
 {
     auto result = _framebuffer->set_resolution(Vec2i(width, height));
+
+    if (result != SUCCESS)
+    {
+        return false;
+    }
+
     _wallpaper->change_resolution({width, height});
     renderer_region_dirty(renderer_bound());
-    return result == SUCCESS;
+
+    return true;
 }
 
 void renderer_set_wallaper(RefPtr<Bitmap>)

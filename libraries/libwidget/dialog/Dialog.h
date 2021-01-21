@@ -69,8 +69,6 @@ public:
 
         _window->show();
 
-        logger_trace("OwO");
-
         Application::run_nested();
 
         delete _window;

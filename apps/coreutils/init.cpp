@@ -20,14 +20,14 @@ int main(int argc, char **argv)
 
     if (filesystem_exist(FRAMEBUFFER_DEVICE_PATH, FILE_TYPE_DEVICE))
     {
-        logger_info("Starting desktop environement...");
-
+        logger_info("Starting settings-service...");
         process_run("settings-service", nullptr);
 
         int splash_pid = -1;
         process_run("splash-screen", &splash_pid);
         process_wait(splash_pid, nullptr);
 
+        logger_info("Starting desktop environement...");
         int compositor_pid = -1;
         process_run("compositor", &compositor_pid);
         process_wait(compositor_pid, nullptr);

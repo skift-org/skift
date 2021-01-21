@@ -68,4 +68,11 @@ bool Path::match(const Path &other) const
            (other.key == "*" || other.key == key);
 }
 
+bool Path::operator==(const Path &other)
+{
+    return domain == other.domain &&
+           bundle == other.domain &&
+           key == other.key;
+}
+
 } // namespace settings

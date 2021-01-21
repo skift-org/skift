@@ -16,17 +16,15 @@ static ServerConnection &server()
     {
         _server = ServerConnection::open();
 
-        
-
-        // _client->on_notify = [](Path &path, json::Value value) {
-        //     for (size_t i = 0; i < _watchers.count(); i++)
-        //     {
-        //         if (path.match(_watchers[i]->path()))
-        //         {
-        //             _watchers[i]->invoke(value);
-        //         }
-        //     }
-        // };
+        _server->on_notify = [](const Path &path, const json::Value &value) {
+            for (size_t i = 0; i < _watchers.count(); i++)
+            {
+                if (path.match(_watchers[i]->path()))
+                {
+                    _watchers[i]->invoke(value);
+                }
+            }
+        };
     }
 
     return *_server;

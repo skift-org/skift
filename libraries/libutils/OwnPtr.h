@@ -105,15 +105,20 @@ public:
 
     const T &operator*() const { return *_ptr; }
 
-    bool operator==(OwnPtr<T> other) const
+    bool operator==(const OwnPtr<T> &other) const
     {
         return _ptr == other._ptr;
     }
 
     template <typename U>
-    bool operator==(OwnPtr<U> other) const
+    bool operator==(const OwnPtr<U> &other) const
     {
         return _ptr == static_cast<U *>(other._ptr);
+    }
+
+    bool operator==(T *other) const
+    {
+        return _ptr == other;
     }
 
     operator bool() const
@@ -141,7 +146,7 @@ public:
 };
 
 template <typename Type, typename... Args>
-inline OwnPtr<Type> own(Args &&...args)
+inline OwnPtr<Type> own(Args &&... args)
 {
     return OwnPtr<Type>(new Type(forward<Args>(args)...));
 }

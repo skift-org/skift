@@ -19,6 +19,8 @@ struct Path
     void prettify(Prettifier &pretty) const;
 
     bool match(const Path &other) const;
+
+    bool operator==(const Path &other);
 };
 
 } // namespace settings

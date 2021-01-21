@@ -17,7 +17,7 @@ public:
     static OwnPtr<ServerConnection>
     open()
     {
-        return own<ServerConnection>(socket_connect("/Session/"));
+        return own<ServerConnection>(socket_connect("/Session/settings.ipc"));
     }
 
     void handle_message(const Message &message) override

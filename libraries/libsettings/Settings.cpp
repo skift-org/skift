@@ -69,7 +69,7 @@ void unregister_watcher(Watcher &watcher)
         message.type = MessageType::CLIENT_UNWATCH;
         message.path = watcher.path();
 
-        _server->send(message);
+        server().send(message);
     }
 }
 
@@ -94,11 +94,11 @@ bool write(const Path path, json::Value value)
 {
     Message message;
 
-    message.type = MessageType::CLIENT_READ;
+    message.type = MessageType::CLIENT_WRITE;
     message.path = path;
     message.payload = value;
 
-    auto result = _server->request(message, MessageType::SERVER_ACK);
+    auto result = server().request(message, MessageType::SERVER_ACK);
 
     return result.success();
 }

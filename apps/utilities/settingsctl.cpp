@@ -1,5 +1,7 @@
 #include <libutils/ArgParse.h>
 
+#include <libsystem/eventloop/EventLoop.h>
+
 #include <libsettings/Settings.h>
 #include <libsettings/Watcher.h>
 
@@ -9,7 +11,6 @@ int main(int argc, const char **argv)
 
     args.should_abort_on_failure();
     args.show_help_if_no_option_given();
-    args.show_help_if_no_operand_given();
 
     args.prologue("Read, write, or, watch system settings.");
 
@@ -60,12 +61,16 @@ int main(int argc, const char **argv)
             args.usage();
         }
 
+        EventLoop::initialize();
+
         watcher = own<settings::Watcher>(settings::Path::parse(*maybe_key_name), [&](auto &value) {
             Prettifier pretty;
             json::prettify(pretty, value);
 
-            stream_format(out_stream, "%s", pretty.finalize().cstring());
+            stream_format(out_stream, "%s\n", pretty.finalize().cstring());
         });
+
+        process_exit(EventLoop::run());
     });
 
     args.epiloge("Option cannot be combined.");

@@ -10,13 +10,14 @@ struct Repository
 {
     HashMap<String, Domain> domains;
 
-    Callback<void(const Path &path, const json::Value &value)> on_key_change;
-
     void write(const Path &path, const json::Value &value)
     {
-        domains[path.domain].write(path, value);
+        if (!domains.has_key(path.domain))
+        {
+            domains[path.domain] = {};
+        }
 
-        on_key_change(path, value);
+        domains[path.domain].write(path, value);
     }
 
     json::Value read(const Path &path)

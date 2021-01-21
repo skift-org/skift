@@ -24,7 +24,7 @@ ResultOr<Message> Message::read_from(Connection *connection)
 
     message.type = header.type;
 
-    if (header.path_length)
+    if (header.path_length > 0)
     {
         auto buffer = new char[header.path_length];
         connection_receive(connection, buffer, header.path_length);
@@ -39,7 +39,7 @@ ResultOr<Message> Message::read_from(Connection *connection)
         delete buffer;
     }
 
-    if (header.payload_length)
+    if (header.payload_length > 0)
     {
         auto buffer = new char[header.payload_length];
         connection_receive(connection, buffer, header.payload_length);
@@ -74,7 +74,7 @@ Result Message::write_to(Connection *connection) const
     {
         Prettifier pretty;
         json::prettify(pretty, *payload);
-        path_buffer = pretty.finalize();
+        payload_buffer = pretty.finalize();
     }
 
     SerializedMessage header;

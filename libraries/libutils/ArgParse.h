@@ -157,8 +157,7 @@ public:
             }
             else
             {
-                stream_format(err_stream, "'%s' missing operand!\n", longname.cstring());
-                fail();
+                usage();
             }
         });
     }

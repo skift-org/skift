@@ -45,7 +45,7 @@ public:
     {
         for (size_t i = 0; i < _subscriptions.count(); i++)
         {
-            if (_subscriptions[i].match(path))
+            if (path.match(_subscriptions[i]))
             {
                 return true;
             }

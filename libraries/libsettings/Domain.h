@@ -11,6 +11,11 @@ struct Domain
 
     void write(const Path &path, const json::Value &value)
     {
+        if (!bundles.has_key(path.bundle))
+        {
+            bundles[path.bundle] = {};
+        }
+
         bundles[path.bundle].write(path, value);
     }
 

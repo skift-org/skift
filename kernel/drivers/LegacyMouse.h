@@ -13,6 +13,7 @@ private:
     RingBuffer _events{sizeof(MousePacket) * 1024};
     int _cycle = 0;
     uint8_t _packet[4];
+    bool _quirk_no_mouse_whell = true;
 
     void wait(int type);
 

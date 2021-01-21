@@ -60,12 +60,19 @@ void LegacyMouse::handle_finished_packet(uint8_t packet0, uint8_t packet1, uint8
         offy -= 0x100;
     }
 
+    int scroll = 0;
+
+    if (!_quirk_no_mouse_whell)
+    {
+        scroll = (int8_t)packet3;
+    }
+
     // decode the new mouse packet
     MousePacket event;
 
     event.offx = offx;
     event.offy = -offy;
-    event.scroll = 0;
+    event.scroll = scroll;
     event.middle = (MouseButtonState)((packet0 >> 2) & 1);
     event.right = (MouseButtonState)((packet0 >> 1) & 1);
     event.left = (MouseButtonState)((packet0)&1);
@@ -94,9 +101,22 @@ void LegacyMouse::handle_packet(uint8_t packet)
     case 2:
         _packet[2] = packet;
 
+        if (_quirk_no_mouse_whell)
+        {
+
+            handle_finished_packet(_packet[0], _packet[1], _packet[2], _packet[3]);
+            _cycle = 0;
+        }
+        else
+        {
+            _cycle++;
+        }
+        break;
+    case 3:
+        _packet[3] = packet;
+
         handle_finished_packet(_packet[0], _packet[1], _packet[2], _packet[3]);
         _cycle = 0;
-        break;
     }
 }
 
@@ -125,6 +145,35 @@ LegacyMouse::LegacyMouse(DeviceAddress address) : LegacyDevice(address, DeviceCl
     // Enable the mouse
     write_register(0xF4);
     read_register(); //Acknowledge
+
+    // Try to  enable the scrollwhell
+    write_register(0xF2);
+    read_register();
+
+    read_register();
+    write_register(0xF3);
+    read_register();
+    write_register(200);
+    read_register();
+    
+    write_register(0xF3);
+    read_register();
+    write_register(100);
+    read_register();
+    
+
+    write_register(0xF3);
+    read_register();
+    write_register(80);
+    read_register();
+
+    write_register(0xF2);
+    read_register();
+    uint8_t result = read_register();
+    if (result == 3)
+    {
+        _quirk_no_mouse_whell = false;
+    }
 }
 
 void LegacyMouse::handle_interrupt()

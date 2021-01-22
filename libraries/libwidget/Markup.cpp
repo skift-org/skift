@@ -4,9 +4,15 @@
 #include <libsystem/utils/NumberParser.h>
 #include <libutils/Scanner.h>
 
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/Image.h>
+#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TitleBar.h>
+#include <libwidget/Panel.h>
+#include <libwidget/Placeholder.h>
+#include <libwidget/Slider.h>
+#include <libwidget/TitleBar.h>
 
 static void whitespace(Scanner &scan)
 {

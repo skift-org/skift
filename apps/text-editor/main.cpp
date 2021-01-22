@@ -1,8 +1,8 @@
 #include <libwidget/Application.h>
-#include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Panel.h>
-#include <libwidget/widgets/TextEditor.h>
-#include <libwidget/widgets/TitleBar.h>
+#include <libwidget/Button.h>
+#include <libwidget/Panel.h>
+#include <libwidget/TextEditor.h>
+#include <libwidget/TitleBar.h>
 
 int main(int argc, char **argv)
 {

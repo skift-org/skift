@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Label.h>
-#include <libwidget/widgets/Panel.h>
+#include <libwidget/Button.h>
+#include <libwidget/Label.h>
+#include <libwidget/Panel.h>
 
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>

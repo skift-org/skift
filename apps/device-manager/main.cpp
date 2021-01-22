@@ -1,9 +1,11 @@
+#include <libutils/Path.h>
+
 #include <libsystem/eventloop/Timer.h>
 #include <libsystem/system/System.h>
-#include <libutils/Path.h>
+
 #include <libwidget/Application.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TitleBar.h>
+#include <libwidget/Table.h>
+#include <libwidget/TitleBar.h>
 
 #include "device-manager/DeviceModel.h"
 

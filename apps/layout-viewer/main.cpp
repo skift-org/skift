@@ -15,6 +15,6 @@ int main(int argc, char **argv)
     }
     else
     {
-        return -1;
+        return PROCESS_FAILURE;
     }
 }

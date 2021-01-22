@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libsystem/process/Launchpad.h>
-#include <libwidget/widgets/Table.h>
+#include <libwidget/Table.h>
 
 #include <libfilepicker/model/Listing.h>
 #include <libfilepicker/model/Navigation.h>

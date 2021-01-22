@@ -7,9 +7,13 @@
 #include <libsystem/system/System.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/Menu.h>
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/Graph.h>
+#include <libwidget/Label.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Widgets.h>
+#include <libwidget/Separator.h>
+#include <libwidget/Spacer.h>
 
 static constexpr int PANEL_HEIGHT = 38;
 

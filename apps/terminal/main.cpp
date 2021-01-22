@@ -1,7 +1,7 @@
 #include <libwidget/Application.h>
+#include <libwidget/ScrollBar.h>
+#include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
-#include <libwidget/widgets/ScrollBar.h>
-#include <libwidget/widgets/TitleBar.h>
 
 #include "terminal/TerminalWidget.h"
 

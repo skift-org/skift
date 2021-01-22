@@ -1,9 +1,12 @@
-#include <libwidget/Application.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TitleBar.h>
-
 #include <libsettings/Settings.h>
+
 #include <libsystem/process/Process.h>
+
+#include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Image.h>
+#include <libwidget/Panel.h>
+#include <libwidget/TitleBar.h>
 
 int main(int argc, char **argv)
 {

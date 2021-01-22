@@ -1,8 +1,10 @@
 #include <libutils/NumberFormat.h>
 #include <libutils/StringBuilder.h>
+
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
-#include <libwidget/Widgets.h>
 
 #include "calculator/Calculator.h"
 

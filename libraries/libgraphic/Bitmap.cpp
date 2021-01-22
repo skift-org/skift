@@ -6,12 +6,13 @@
 #undef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
 #undef LODEPNG_NO_COMPILE_DISK
 
-#include <libgraphic/Bitmap.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/Result.h>
 #include <libsystem/io/File.h>
 #include <libsystem/system/Memory.h>
+
+#include <libgraphic/Bitmap.h>
 
 static Color _placeholder_buffer[] = {
     Colors::MAGENTA,
@@ -46,7 +47,9 @@ ResultOr<RefPtr<Bitmap>> Bitmap::create_shared_from_handle(int handle, Vec2i wid
     Result result = memory_include(handle, reinterpret_cast<uintptr_t *>(&pixels), &size);
 
     if (result != SUCCESS)
+    {
         return result;
+    }
 
     if (size < width_and_height.x() * width_and_height.y() * sizeof(Color))
     {

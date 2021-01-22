@@ -56,6 +56,15 @@ struct WidgetColor
     Color color;
 };
 
+struct WidgetMetrics
+{
+    Vec2i origine;
+
+    Recti overflow;
+    Recti bound;
+    Recti content;
+};
+
 class Widget
 {
 private:
@@ -68,7 +77,9 @@ private:
     int _min_height = 0;
     int _min_width = 0;
 
-    Insetsi _insets = {};
+    Insetsi _outsets{};
+    Insetsi _insets{};
+
     WidgetColor _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
     RefPtr<Font> _font;
@@ -115,12 +126,39 @@ public:
 
     void bound(Recti value) { _bound = value; }
 
+    Insetsi outsets() const { return _outsets; }
+
+    void outsets(Insetsi outsets)
+    {
+        _outsets = outsets;
+        should_relayout();
+    }
+
     Insetsi insets() const { return _insets; }
 
     void insets(Insetsi insets)
     {
         _insets = insets;
         should_relayout();
+    }
+
+    WidgetMetrics metrics() const
+    {
+        Vec2i origine{
+            _outsets.left(),
+            _outsets.top(),
+        };
+
+        Recti bound = Widget::bound().shrinked(_outsets).size();
+        Recti content = bound.shrinked(_insets);
+        Recti overflow = content.expended(_outsets);
+
+        return {
+            origine,
+            overflow,
+            bound,
+            content,
+        };
     }
 
     void layout(Layout layout) { _layout = layout; }
@@ -162,6 +200,8 @@ public:
     Widget(Widget *parent);
 
     virtual ~Widget();
+
+    virtual void paint(Painter &, const WidgetMetrics &, const Recti &){};
 
     virtual void paint(Painter &painter, Recti rectangle);
 

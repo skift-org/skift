@@ -4,11 +4,12 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Stream.h>
 #include <libsystem/system/Memory.h>
+
 #include <libwidget/Application.h>
+#include <libwidget/Container.h>
 #include <libwidget/Event.h>
 #include <libwidget/Screen.h>
 #include <libwidget/Theme.h>
-#include <libwidget/Widgets.h>
 #include <libwidget/Window.h>
 
 void Window::toggle_maximise()

@@ -1,8 +1,13 @@
 #include <abi/Syscalls.h>
 
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/IconPanel.h>
+#include <libwidget/Label.h>
+#include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Widgets.h>
+#include <libwidget/Spacer.h>
 
 int main(int argc, char **argv)
 {

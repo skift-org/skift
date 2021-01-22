@@ -28,9 +28,9 @@ public:
 
     DemoWidget(Widget *parent);
 
-    ~DemoWidget();
+    ~DemoWidget() override;
 
     void tick() { _time += 1.0 / 60; }
 
-    void paint(Painter &painter, Recti rectangle);
+    void paint(Painter &painter, Recti rectangle) override;
 };

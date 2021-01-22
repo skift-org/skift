@@ -1,5 +1,8 @@
 #include <libgraphic/Painter.h>
-#include <libwidget/Widgets.h>
+
+#include <libwidget/Button.h>
+#include <libwidget/IconPanel.h>
+#include <libwidget/Spacer.h>
 #include <libwidget/Window.h>
 
 #include <libfilepicker/widgets/Breadcrumb.h>

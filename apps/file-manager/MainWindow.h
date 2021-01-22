@@ -1,8 +1,8 @@
 #pragma once
 
+#include <libwidget/Container.h>
+#include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
-#include <libwidget/widgets/Container.h>
-#include <libwidget/widgets/TitleBar.h>
 
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Browser.h>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libwidget/widgets/Button.h>
-#include <libwidget/widgets/Panel.h>
-#include <libwidget/widgets/Separator.h>
+#include <libwidget/Button.h>
+#include <libwidget/Panel.h>
+#include <libwidget/Separator.h>
 
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/Breadcrumb.h>

@@ -1,8 +1,11 @@
 #include <libsystem/BuildInfo.h>
+
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Image.h>
+#include <libwidget/Label.h>
 #include <libwidget/Markup.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TextEditor.h>
+#include <libwidget/TextEditor.h>
 
 static auto logo_based_on_color_scheme()
 {

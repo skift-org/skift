@@ -1,8 +1,12 @@
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/Image.h>
 #include <libwidget/Markup.h>
+#include <libwidget/PaginationDots.h>
+#include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/PaginationDots.h>
+#include <libwidget/Spacer.h>
 
 int main(int argc, char **argv)
 {

@@ -1,8 +1,10 @@
 #include <libfilepicker/FilePicker.h>
 #include <libwidget/Application.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TextField.h>
-#include <libwidget/widgets/TitleBar.h>
+#include <libwidget/Container.h>
+#include <libwidget/Label.h>
+#include <libwidget/Panel.h>
+#include <libwidget/TextField.h>
+#include <libwidget/TitleBar.h>
 
 int main(int argc, char **argv)
 {

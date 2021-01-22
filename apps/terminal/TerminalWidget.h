@@ -26,11 +26,11 @@ public:
 
     ~TerminalWidget();
 
-    void paint(Painter &painter, Recti rectangle);
-
-    void event(Event *event);
-
-    void do_layout();
-
     void handle_read();
+
+    void paint(Painter &painter, Recti rectangle) override;
+
+    void event(Event *event) override;
+
+    void do_layout() override;
 };

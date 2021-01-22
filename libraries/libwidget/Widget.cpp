@@ -92,7 +92,19 @@ Widget::~Widget()
     }
 }
 
-void Widget::paint(Painter &, Recti) {}
+void Widget::paint(Painter &painter, Recti dirty)
+{
+    auto m = metrics();
+
+    painter.push();
+
+    painter.transform(bound().position() + m.origine);
+    painter.clip(m.bound);
+
+    paint(painter, m, dirty);
+
+    painter.pop();
+}
 
 void Widget::event(Event *) {}
 

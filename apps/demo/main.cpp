@@ -1,5 +1,6 @@
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TitleBar.h>
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/TitleBar.h>
 
 #include "demo/DemoWidget.h"
 

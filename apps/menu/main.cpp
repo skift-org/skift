@@ -5,10 +5,16 @@
 #include <libsystem/json/Json.h>
 #include <libsystem/process/Environment.h>
 #include <libsystem/process/Process.h>
+
 #include <libwidget/Application.h>
+#include <libwidget/Button.h>
+#include <libwidget/Container.h>
+#include <libwidget/IconPanel.h>
+#include <libwidget/Panel.h>
 #include <libwidget/Screen.h>
-#include <libwidget/Widgets.h>
-#include <libwidget/widgets/TextField.h>
+#include <libwidget/Separator.h>
+#include <libwidget/Spacer.h>
+#include <libwidget/TextField.h>
 
 struct MenuEntry
 {

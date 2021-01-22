@@ -5,7 +5,7 @@
 #include <libgraphic/Icon.h>
 
 #include <libwidget/Application.h>
-#include <libwidget/widgets/Button.h>
+#include <libwidget/Button.h>
 
 enum DialogButton
 {

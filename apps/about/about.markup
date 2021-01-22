@@ -1,9 +1,9 @@
 <Window
     title="About"
     icon="information"
-    width="280"
-    height="280"
-    layout="vflow(8)"
+    width="300"
+    height="300"
+    layout="vflow(0)"
     >
     <TitleBar />
 

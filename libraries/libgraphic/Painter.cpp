@@ -584,15 +584,15 @@ void Painter::draw_glyph(Font &font, const Glyph &glyph, Vec2i position, Color c
     // auto baseline = position.y();
     //
     // auto draw_metric = [&](int value, Color color) {
-    //     draw_line_y_aligned(value, position.x(), position.x() + glyph.bound.width(), color);
+    //     draw_line({position.x(), value}, {position.x() + glyph.bound.width(), value}, color);
     // };
     //
-    // draw_metric(metrics.fullascend(baseline), Colors::RED);
-    // draw_metric(metrics.ascend(baseline), Colors::ORANGE);
-    // draw_metric(metrics.captop(baseline), Colors::BLUE);
-    // draw_metric(baseline, Colors::MAGENTA);
-    // draw_metric(metrics.descend(baseline), Colors::ORANGE);
-    // draw_metric(metrics.fulldescend(baseline), Colors::RED);
+    //  draw_metric(metrics.fullascend(baseline), Colors::RED);
+    //  draw_metric(metrics.ascend(baseline), Colors::ORANGE);
+    //  draw_metric(metrics.captop(baseline), Colors::BLUE);
+    //  draw_metric(baseline, Colors::MAGENTA);
+    //  draw_metric(metrics.descend(baseline), Colors::ORANGE);
+    //  draw_metric(metrics.fulldescend(baseline), Colors::RED);
 
     blit_colored(font.bitmap(), glyph.bound, dest, color);
 }

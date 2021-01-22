@@ -79,8 +79,8 @@ void render_cell(
     if (attributes.underline)
     {
         painter.draw_line(
-            bound.position() + Vec2i(0, 13),
-            bound.position() + Vec2i(bound.width(), 13),
+            bound.position() + Vec2i(0, 14),
+            bound.position() + Vec2i(bound.width(), 14),
             color(foreground));
     }
 
@@ -94,7 +94,7 @@ void render_cell(
     painter.draw_glyph(
         *font(),
         glyph,
-        bound.position() + Vec2i(0, 12),
+        bound.position() + Vec2i(0, 13),
         color(foreground));
 
     if (attributes.bold)
@@ -102,7 +102,7 @@ void render_cell(
         painter.draw_glyph(
             *font(),
             glyph,
-            bound.position() + Vec2i(1, 12),
+            bound.position() + Vec2i(1, 13),
             color(foreground));
     }
 }

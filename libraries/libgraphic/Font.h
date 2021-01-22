@@ -56,7 +56,7 @@ private:
 public:
     const FontMetrics metrics() const
     {
-        return {12, 10, 8, 4};
+        return {16, 12, 10, 4};
     }
 
     Bitmap &bitmap() { return *_bitmap; }

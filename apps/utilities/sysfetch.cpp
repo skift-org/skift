@@ -65,7 +65,6 @@ int main(int argc, char **argv)
 
     printf("\n");
     printf("\e[16C \e[40m  \e[41m  \e[42m  \e[43m  \e[44m  \e[45m  \e[46m  \e[47m  \e[m\n");
-    printf("\n");
 
     return PROCESS_SUCCESS;
 }

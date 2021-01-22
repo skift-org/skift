@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libsystem/core/CString.h>
+#include <libutils/Vec2.h>
 
-#include <libsystem/algebra/Vec2.h>
+#include <libsystem/core/CString.h>
 #include <libsystem/math/Math.h>
 
 template <typename Scalar>

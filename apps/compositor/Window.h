@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libgraphic/Bitmap.h>
-#include <libsystem/algebra/Rect.h>
+#include <libutils/Rect.h>
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>
 

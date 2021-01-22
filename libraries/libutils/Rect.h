@@ -1,13 +1,13 @@
 #pragma once
 
+#include <libutils/Anchor.h>
+#include <libutils/Enum.h>
+#include <libutils/Insets.h>
+#include <libutils/Vec2.h>
+
 #include <libsystem/Logger.h>
 #include <libsystem/math/Math.h>
 #include <libsystem/math/MinMax.h>
-#include <libutils/Enum.h>
-
-#include <libsystem/algebra/Anchor.h>
-#include <libsystem/algebra/Insets.h>
-#include <libsystem/algebra/Vec2.h>
 
 enum Border : int
 {

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <abi/Keyboard.h>
-#include <libsystem/algebra/Rect.h>
+
+#include <libutils/Rect.h>
+
 #include <libsystem/unicode/Codepoint.h>
 #include <libutils/Callback.h>
 

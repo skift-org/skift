@@ -1,8 +1,9 @@
 #pragma once
 
-#include <libsystem/Time.h>
 #include <libutils/Callback.h>
 #include <libutils/RefPtr.h>
+
+#include <libsystem/Time.h>
 
 class Timer
 {
@@ -16,6 +17,8 @@ public:
     auto running() { return _running; }
 
     auto interval() { return _interval; }
+
+    void interval(Timeout interval) { _interval = interval; }
 
     auto scheduled() { return _scheduled; }
 

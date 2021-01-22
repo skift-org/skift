@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/algebra/Vec2.h>
+#include <libutils/Vec2.h>
 
 #include "neko/graphics/Sprites.h"
 

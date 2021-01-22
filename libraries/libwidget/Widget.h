@@ -1,9 +1,8 @@
 #pragma once
 
-#include <libsystem/algebra/Rect.h>
-#include <libsystem/utils/List.h>
-
 #include <libgraphic/Font.h>
+#include <libsystem/utils/List.h>
+#include <libutils/Rect.h>
 
 #include <libwidget/Cursor.h>
 #include <libwidget/Event.h>

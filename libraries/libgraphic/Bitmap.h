@@ -1,12 +1,12 @@
 #pragma once
 
-#include <libgraphic/Color.h>
 #include <libsystem/Result.h>
-#include <libsystem/algebra/Rect.h>
 #include <libsystem/math/Math.h>
-
+#include <libutils/Rect.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>
+
+#include <libgraphic/Color.h>
 
 enum BitmapStorage
 {

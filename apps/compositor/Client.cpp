@@ -187,7 +187,6 @@ void Client::handle_request()
         handle(message.set_resolution);
         break;
 
-
     case COMPOSITOR_MESSAGE_GET_MOUSE_POSITION:
         handle_get_mouse_position();
         break;

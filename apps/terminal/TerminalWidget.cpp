@@ -43,13 +43,8 @@ TerminalWidget::~TerminalWidget()
     stream_close(_client_stream);
 }
 
-void TerminalWidget::paint(Painter &painter, Recti rectangle)
+void TerminalWidget::paint(Painter &painter, const WidgetMetrics &, const Recti &dirty)
 {
-    painter.push();
-    painter.transform(bound().position());
-
-    rectangle = rectangle.offset(-bound().position());
-
     for (int y = 0; y < _terminal->height(); y++)
     {
         for (int x = 0; x < _terminal->width(); x++)
@@ -63,7 +58,7 @@ void TerminalWidget::paint(Painter &painter, Recti rectangle)
     int cx = _terminal->cursor().x;
     int cy = _terminal->cursor().y;
 
-    if (cell_bound(cx, cy).colide_with(rectangle))
+    if (cell_bound(cx, cy).colide_with(dirty))
     {
         terminal::Cell cell = _terminal->cell_at(cx, cy);
 
@@ -91,14 +86,12 @@ void TerminalWidget::paint(Painter &painter, Recti rectangle)
             painter.draw_rectangle(cell_bound(cx, cy), color(THEME_ANSI_CURSOR));
         }
     }
-
-    painter.pop();
 }
 
 void TerminalWidget::event(Event *event)
 {
     auto send_sequence = [&](auto sequence) {
-        stream_format(_server_stream, sequence);
+        stream_write(_server_stream, sequence, strlen(sequence));
         event->accepted = true;
     };
 

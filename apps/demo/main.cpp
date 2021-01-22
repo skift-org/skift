@@ -6,7 +6,6 @@
 
 static Demo _demos[] = {
     {"Path", path_draw},
-    {"Latency", latency_draw},
     {"Colors", colors_draw},
     {"Graphics", graphics_draw},
     {"Lines", lines_draw},

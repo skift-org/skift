@@ -15,14 +15,12 @@ Label::Label(Widget *parent, String text, Anchor anchor)
     _anchor = anchor;
 }
 
-void Label::paint(Painter &painter, Recti rectangle)
+void Label::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
 {
-    __unused(rectangle);
-
     painter.draw_string_within(
         *font(),
         _text.cstring(),
-        content_bound(),
+        metrics.content,
         _anchor,
         color(THEME_FOREGROUND));
 }

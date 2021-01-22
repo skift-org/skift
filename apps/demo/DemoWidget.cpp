@@ -21,34 +21,13 @@ DemoWidget::DemoWidget(Widget *parent)
     _timer->start();
 }
 
-DemoWidget::~DemoWidget()
+void DemoWidget::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
 {
-}
-
-void DemoWidget::paint(Painter &painter, Recti)
-{
-    if (_bitmap == nullptr)
-    {
-        _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
-        _painter = own<Painter>(_bitmap);
-        _painter->clear(Colors::BLACK);
-    }
-
-    if (bound().width() != _bitmap->width() ||
-        bound().height() != _bitmap->height())
-    {
-        _bitmap = Bitmap::create_shared(bound().width(), bound().height()).take_value();
-        _painter = own<Painter>(_bitmap);
-        _painter->clear(Colors::BLACK);
-    }
-
     if (_demo)
     {
-        _demo->callback(*_painter, _bitmap->bound(), _time);
+        _demo->callback(painter, metrics.bound, _time);
     }
 
-    painter.blit_no_alpha(*_bitmap, _bitmap->bound(), bound());
-
-    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(9, 17), Colors::BLACK);
-    painter.draw_string(*font(), _demo->name, bound().position() + Vec2i(8, 16), Colors::WHITE);
+    painter.draw_string(*font(), _demo->name, Vec2i(9, 17), Colors::BLACK);
+    painter.draw_string(*font(), _demo->name, Vec2i(8, 16), Colors::WHITE);
 }

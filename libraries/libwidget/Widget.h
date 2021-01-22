@@ -145,8 +145,8 @@ public:
     WidgetMetrics metrics() const
     {
         Vec2i origine{
-            _outsets.left(),
-            _outsets.top(),
+            _outsets.left() + bound().x(),
+            _outsets.top() + bound().y(),
         };
 
         Recti bound = Widget::bound().shrinked(_outsets).size();

@@ -34,7 +34,7 @@ public:
 
     ~PaginationDots() override;
 
-    void paint(Painter &painter, Recti) override;
+    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
 
     Vec2i size() override;
 };

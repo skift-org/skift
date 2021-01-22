@@ -98,10 +98,10 @@ void Widget::paint(Painter &painter, Recti dirty)
 
     painter.push();
 
-    painter.transform(bound().position() + m.origine);
+    painter.transform(m.origine);
     painter.clip(m.bound);
 
-    paint(painter, m, dirty);
+    paint(painter, m, dirty.offset(-m.origine));
 
     painter.pop();
 }

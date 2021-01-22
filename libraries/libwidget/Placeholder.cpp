@@ -11,21 +11,15 @@ Placeholder::Placeholder(Widget *parent, String text)
     _text = buffer;
 }
 
-void Placeholder::paint(Painter &painter, Recti rectangle)
+void Placeholder::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
 {
-    __unused(rectangle);
-
-    painter.draw_rectangle(bound(), Colors::RED);
+    painter.draw_rectangle(metrics.bound, Colors::RED);
 
     painter.blit(
         *_alert_icon,
         ICON_18PX,
-        _alert_icon->bound(ICON_18PX).moved(bound().position() + Vec2i(8, 8)),
+        _alert_icon->bound(ICON_18PX).moved(Vec2i(8, 8)),
         Colors::RED);
 
-    painter.draw_string(
-        *font(),
-        _text.cstring(),
-        bound().position() + Vec2i(32, 20),
-        color(THEME_FOREGROUND));
+    painter.draw_string(*font(), _text.cstring(), {32, 20}, color(THEME_FOREGROUND));
 }

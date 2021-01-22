@@ -9,9 +9,6 @@ class DemoWidget : public Widget
 private:
     double _time{};
     Demo *_demo;
-
-    RefPtr<Bitmap> _bitmap;
-    OwnPtr<Painter> _painter;
     OwnPtr<Timer> _timer;
 
 public:
@@ -19,18 +16,13 @@ public:
 
     void demo(Demo *demo)
     {
-        if (_painter)
-        {
-            _painter->clear(Colors::BLACK);
-        }
         _demo = demo;
+        should_repaint();
     }
 
     DemoWidget(Widget *parent);
 
-    ~DemoWidget() override;
-
     void tick() { _time += 1.0 / 60; }
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
 };

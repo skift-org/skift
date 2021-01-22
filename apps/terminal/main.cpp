@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     auto widget = new TerminalWidget(window->root());
     widget->focus();
     widget->flags(Widget::FILL);
-    widget->insets(Insetsi{0, 6, 6, 6});
+    widget->outsets({0, 6, 6, 6});
 
     window->show();
 

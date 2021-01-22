@@ -6,8 +6,6 @@
 
 void colors_draw(Painter &painter, Recti screen, float time);
 
-void latency_draw(Painter &painter, Recti screen, float time);
-
 void graphics_draw(Painter &painter, Recti screen, float time);
 
 void lines_draw(Painter &painter, Recti screen, float time);

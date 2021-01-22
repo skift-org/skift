@@ -21,7 +21,7 @@ public:
 
     void change_scaling(ImageScalling scaling);
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
 
     Vec2i size() override;
 };

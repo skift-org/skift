@@ -5,9 +5,9 @@ Separator::Separator(Widget *parent) : Widget(parent)
 {
 }
 
-void Separator::paint(Painter &painter, Recti rectangle)
+void Separator::paint(Painter &painter, const WidgetMetrics &, const Recti &dirty)
 {
-    painter.fill_rectangle(rectangle, color(THEME_BORDER));
+    painter.fill_rectangle(dirty, color(THEME_BORDER));
 }
 
 Vec2i Separator::size()

@@ -73,7 +73,9 @@ public:
     void set_pixel(Vec2i position, Color color)
     {
         if (bound().contains(position))
+        {
             _pixels[(int)(position.x() + position.y() * width())] = color;
+        }
     }
 
     void set_pixel_no_check(Vec2i position, Color color)

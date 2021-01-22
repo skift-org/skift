@@ -26,11 +26,12 @@ Recti Table::scrollbar_bound() const
 
 Recti Table::row_bound(int row) const
 {
-    return Recti(
+    return {
         list_bound().x(),
         list_bound().y() + row * TABLE_ROW_HEIGHT - _scroll_offset,
         list_bound().width(),
-        TABLE_ROW_HEIGHT);
+        TABLE_ROW_HEIGHT,
+    };
 }
 
 Recti Table::column_bound(int column) const
@@ -38,20 +39,22 @@ Recti Table::column_bound(int column) const
     int column_count = _model->columns();
     int column_width = list_bound().width() / column_count;
 
-    return Recti(
+    return {
         list_bound().x() + column_width * column,
         list_bound().y(),
         column_width,
-        list_bound().height());
+        list_bound().height(),
+    };
 }
 
 Recti Table::cell_bound(int row, int column) const
 {
-    return Recti(
+    return {
         row_bound(row).x() + column * column_bound(column).width(),
         row_bound(row).y(),
         column_bound(column).width(),
-        row_bound(row).height());
+        row_bound(row).height(),
+    };
 }
 
 int Table::row_at(Vec2i position) const
@@ -124,24 +127,24 @@ Table::Table(Widget *parent, RefPtr<TableModel> model)
     this->model(model);
 }
 
-void Table::paint(Painter &painter, Recti rectangle)
+void Table::paint(Painter &painter, Recti)
 {
     if (!_model)
     {
         return;
     }
 
-    __unused(rectangle);
-
-    painter.push();
-    painter.clip(bound());
-
     int column_count = _model->columns();
     int column_width = body_bound().width() / column_count;
 
     if (_model->rows() == 0)
     {
-        painter.draw_string_within(*font(), _empty_message.cstring(), list_bound().take_top(TABLE_ROW_HEIGHT), Anchor::CENTER, color(THEME_FOREGROUND));
+        painter.draw_string_within(
+            *font(),
+            _empty_message.cstring(),
+            list_bound().take_top(TABLE_ROW_HEIGHT),
+            Anchor::CENTER,
+            color(THEME_FOREGROUND));
     }
     else
     {
@@ -152,7 +155,7 @@ void Table::paint(Painter &painter, Recti rectangle)
 
             if (_selected == row)
             {
-                painter.fill_rectangle_rounded(row_bound(row).shrinked({2}), 4, color(THEME_ACCENT));
+                painter.fill_rectangle_rounded(row_bound(row).shrinked(2), 4, color(THEME_ACCENT));
             }
 
             for (int column = 0; column < column_count; column++)
@@ -161,16 +164,18 @@ void Table::paint(Painter &painter, Recti rectangle)
             }
         }
     }
+
     painter.acrylic(header_bound());
     painter.fill_rectangle(header_bound(), color(THEME_BACKGROUND).with_alpha(0.5));
 
     for (int column = 0; column < column_count; column++)
     {
-        Recti header_bound_cell = Recti(
+        Recti header_bound_cell{
             header_bound().x() + column * column_width,
             header_bound().y(),
             column_width,
-            TABLE_ROW_HEIGHT);
+            TABLE_ROW_HEIGHT,
+        };
 
         if (column < column_count - 1)
         {
@@ -180,8 +185,6 @@ void Table::paint(Painter &painter, Recti rectangle)
         painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
         painter.draw_string(*font(), _model->header(column).cstring(), Vec2i(header_bound_cell.x() + 7 + 1, header_bound_cell.y() + 20), color(THEME_FOREGROUND));
     }
-
-    painter.pop();
 }
 
 void Table::event(Event *event)

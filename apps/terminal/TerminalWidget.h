@@ -28,7 +28,7 @@ public:
 
     void handle_read();
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
 
     void event(Event *event) override;
 

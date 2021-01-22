@@ -211,7 +211,7 @@ void Painter::blit_scaled_no_alpha(Bitmap &bitmap, Recti source, Recti destinati
             float yy = y / (float)result.destination.height();
 
             Color sample = bitmap.sample(result.source, Vec2f(xx, yy));
-            plot(result.destination.position() + Vec2i(x, y), sample);
+            _bitmap->set_pixel_no_check(result.destination.position() + Vec2i(x, y), sample.with_alpha(1));
         }
     }
 }

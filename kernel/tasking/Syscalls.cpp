@@ -107,8 +107,9 @@ Result hj_process_clone(int *pid)
 
 Result hj_process_exit(int exit_code)
 {
-    if (exit_code != PROCESS_SUCCESS) 
+    if (exit_code != PROCESS_SUCCESS)
     {
+        logger_error("Process terminated with error code %d!", exit_code);
         arch_backtrace();
     }
 

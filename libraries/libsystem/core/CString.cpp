@@ -103,8 +103,6 @@ void *memmove(void *dest, const void *src, size_t n)
 
 void *memcpy(void *s1, const void *s2, size_t n)
 {
-    char *cdest;
-    char *csrc;
     unsigned int *ldest = (unsigned int *)s1;
     unsigned int *lsrc = (unsigned int *)s2;
 
@@ -114,8 +112,8 @@ void *memcpy(void *s1, const void *s2, size_t n)
         n -= sizeof(unsigned int);
     }
 
-    cdest = (char *)ldest;
-    csrc = (char *)lsrc;
+    char *cdest = (char *)ldest;
+    char *csrc = (char *)lsrc;
 
     while (n > 0)
     {

@@ -30,7 +30,7 @@
 # Screenshots
 
 <p align="center">
-<img src="manual/screenshots/2020-10-25.png" />
+<img src="manual/screenshots/2021-01-22.png" />
 <br>
 skiftOS running in QEMU 5.1
 </p>

@@ -113,6 +113,16 @@ public:
         return *this;
     }
 
+    bool operator==(const T &other) const
+    {
+        if (!present())
+        {
+            return false;
+        }
+
+        return value == other;
+    }
+
     ~Optional()
     {
         clear();

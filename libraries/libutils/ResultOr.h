@@ -48,19 +48,9 @@ public:
         return _result == result;
     }
 
-    bool operator!=(Result result) const
-    {
-        return _result != result;
-    }
-
     bool operator==(const T &other) const
     {
-        return *_value == value;
-    }
-
-    bool operator!=(const T &other) const
-    {
-        return *_value != value;
+        return _value == other;
     }
 
     operator bool() const { return _result == SUCCESS; }

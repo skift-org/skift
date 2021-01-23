@@ -43,7 +43,7 @@ TerminalWidget::~TerminalWidget()
     stream_close(_client_stream);
 }
 
-void TerminalWidget::paint(Painter &painter, const WidgetMetrics &, const Recti &dirty)
+void TerminalWidget::paint(Painter &painter, const Recti &dirty)
 {
     for (int y = 0; y < _terminal->height(); y++)
     {

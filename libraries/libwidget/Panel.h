@@ -12,5 +12,5 @@ public:
 
     Panel(Widget *parent);
 
-    void paint(Painter &painter, const WidgetMetrics &metrics, const Recti &) override;
+    void paint(Painter &painter, const Recti &) override;
 };

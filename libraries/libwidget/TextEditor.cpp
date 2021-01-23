@@ -25,12 +25,12 @@ TextEditor::~TextEditor()
 {
 }
 
-void TextEditor::paint(Painter &painter, Recti)
+void TextEditor::paint(Painter &painter, const Recti &)
 {
     auto metrics = font()->metrics();
 
     size_t first_visible_line = MAX(0, _vscroll_offset / metrics.fulllineheight() - 1);
-    size_t last_visible_line = MIN((int)_model->line_count(), (content_bound().height() + _vscroll_offset) / metrics.fulllineheight() + 1);
+    size_t last_visible_line = MIN((int)_model->line_count(), (bound().height() + _vscroll_offset) / metrics.fulllineheight() + 1);
 
     painter.push();
     painter.transform(Vec2i{0, -_vscroll_offset} + view_bound().position().extract_y());
@@ -41,11 +41,11 @@ void TextEditor::paint(Painter &painter, Recti)
         int linetop = metrics.fulllineheight() * i;
         int baseline = linetop + metrics.halfleading() + metrics.baseline();
 
-        //painter.draw_line({bound().x(), baseline}, {bound().width(), baseline}, Colors::RED);
+        //painter.draw_line({0, baseline}, {bound().width(), baseline}, Colors::RED);
 
         if (!_readonly && _cursor.line() == i)
         {
-            painter.fill_rectangle({bound().x(), linetop, bound().width(), metrics.fulllineheight()}, color(THEME_BORDER));
+            painter.fill_rectangle({0, linetop, bound().width(), metrics.fulllineheight()}, color(THEME_BORDER));
         }
 
         painter.push();
@@ -215,7 +215,7 @@ void TextEditor::event(Event *event)
     }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
-        size_t line = ((size_t)(event->mouse.position - content_bound().position()).y() + _vscroll_offset) / metrics.fulllineheight();
+        size_t line = ((size_t)(event->mouse.position - bound().position()).y() + _vscroll_offset) / metrics.fulllineheight();
 
         _cursor.move_to_within(*_model, line);
         should_repaint();
@@ -247,8 +247,8 @@ void TextEditor::update_scrollbar()
 
 void TextEditor::do_layout()
 {
-    _vscrollbar->bound(vscrollbar_bound());
-    _hscrollbar->bound(hscrollbar_bound());
+    _vscrollbar->container(vscrollbar_bound());
+    _hscrollbar->container(hscrollbar_bound());
 
     update_scrollbar();
 }
@@ -262,9 +262,9 @@ void TextEditor::scroll_to_cursor()
         _vscroll_offset = _cursor.line() * metrics.fulllineheight();
     }
 
-    if ((int)(_cursor.line()) * metrics.fulllineheight() > _vscroll_offset + content_bound().height() - metrics.fulllineheight() - metrics.fulllineheight())
+    if ((int)(_cursor.line()) * metrics.fulllineheight() > _vscroll_offset + bound().height() - metrics.fulllineheight() - metrics.fulllineheight())
     {
-        _vscroll_offset = (_cursor.line() + 2) * metrics.fulllineheight() - content_bound().height();
+        _vscroll_offset = (_cursor.line() + 2) * metrics.fulllineheight() - bound().height();
     }
 
     update_scrollbar();

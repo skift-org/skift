@@ -11,16 +11,11 @@ TextField::~TextField()
 {
 }
 
-void TextField::paint(Painter &painter, Recti rectangle)
+void TextField::paint(Painter &painter, const Recti &)
 {
-    __unused(rectangle);
-
-    painter.push();
-    painter.transform(content_bound().position());
-
     int advance = 0;
     auto metrics = font()->metrics();
-    int baseline = content_bound().height() / 2 + metrics.capheight() / 2;
+    int baseline = bound().height() / 2 + metrics.capheight() / 2;
 
     auto paint_cursor = [&](Painter &painter, int position) {
         Vec2 cursor_position{position, metrics.fullascend(baseline)};
@@ -64,8 +59,6 @@ void TextField::paint(Painter &painter, Recti rectangle)
     {
         paint_cursor(painter, advance);
     }
-
-    painter.pop();
 }
 
 void TextField::scroll_to_cursor()

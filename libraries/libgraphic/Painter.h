@@ -11,7 +11,7 @@
 
 struct PainterState
 {
-    Vec2i origine;
+    Vec2i origin;
     Recti clip;
 };
 
@@ -104,7 +104,7 @@ private:
         return _state_stack[_state_stack_top].clip;
     }
 
-    Vec2i origine() const { return _state_stack[_state_stack_top].origine; };
+    Vec2i origin() const { return _state_stack[_state_stack_top].origin; };
 
     Recti apply_clip(Recti rectangle);
 

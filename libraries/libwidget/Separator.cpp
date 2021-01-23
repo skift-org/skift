@@ -5,7 +5,7 @@ Separator::Separator(Widget *parent) : Widget(parent)
 {
 }
 
-void Separator::paint(Painter &painter, const WidgetMetrics &, const Recti &dirty)
+void Separator::paint(Painter &painter, const Recti &dirty)
 {
     painter.fill_rectangle(dirty, color(THEME_BORDER));
 }

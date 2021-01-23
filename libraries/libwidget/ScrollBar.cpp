@@ -9,10 +9,8 @@ ScrollBar::ScrollBar(Widget *parent) : Widget(parent)
     _thumb = 512;
 }
 
-void ScrollBar::paint(Painter &painter, Recti rectangle)
+void ScrollBar::paint(Painter &painter, const Recti &)
 {
-    __unused(rectangle);
-
     if (_thumb >= _track)
     {
         return;
@@ -84,7 +82,7 @@ void ScrollBar::event(Event *event)
 
         if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
-            Vec2i position = mouse_event.position - _mouse_origine;
+            Vec2i position = mouse_event.position - _mouse_origin;
             scroll_to(position);
 
             event->accepted = true;
@@ -94,12 +92,12 @@ void ScrollBar::event(Event *event)
         {
             if (thumb_bound().contains(mouse_event.position))
             {
-                _mouse_origine = mouse_event.position - thumb_bound().position();
+                _mouse_origin = mouse_event.position - thumb_bound().position();
             }
             else
             {
                 scroll_to(mouse_event.position);
-                _mouse_origine = thumb_bound().size() / 2;
+                _mouse_origin = thumb_bound().size() / 2;
             }
 
             _mouse_drag = true;

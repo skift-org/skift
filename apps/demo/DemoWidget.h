@@ -24,5 +24,5 @@ public:
 
     void tick() { _time += 1.0 / 60; }
 
-    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
+    void paint(Painter &, const Recti &) override;
 };

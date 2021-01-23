@@ -24,22 +24,22 @@ void Image::change_scaling(ImageScalling scaling)
     }
 }
 
-void Image::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void Image::paint(Painter &painter, const Recti &)
 {
     if (!_bitmap)
     {
         return;
     }
 
-    Recti destination = metrics.bound;
+    Recti destination = bound();
 
     if (_scalling == ImageScalling::CENTER)
     {
-        destination = _bitmap->bound().centered_within(metrics.bound);
+        destination = _bitmap->bound().centered_within(bound());
     }
     else if (_scalling == ImageScalling::STRETCH)
     {
-        destination = metrics.bound;
+        destination = bound();
     }
 
     painter.blit(*_bitmap, _bitmap->bound(), destination);

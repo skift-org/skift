@@ -37,7 +37,7 @@ void Painter::pop()
 
 void Painter::clip(Recti rectangle)
 {
-    Recti transformed_rectangle = rectangle.offset(origine());
+    Recti transformed_rectangle = rectangle.offset(origin());
     Recti clipped_rectangle = transformed_rectangle.clipped_with(clip());
 
     _state_stack[_state_stack_top].clip = clipped_rectangle;
@@ -45,7 +45,7 @@ void Painter::clip(Recti rectangle)
 
 void Painter::transform(Vec2i offset)
 {
-    _state_stack[_state_stack_top].origine += offset;
+    _state_stack[_state_stack_top].origin += offset;
 }
 
 Recti Painter::apply_clip(Recti rectangle)
@@ -66,7 +66,7 @@ Recti Painter::apply_clip(Recti rectangle)
 Recti Painter::apply_transform(Recti rectangle)
 {
 
-    return rectangle.offset(_state_stack[_state_stack_top].origine);
+    return rectangle.offset(_state_stack[_state_stack_top].origin);
 }
 
 Recti Painter::apply(Recti rectangle)
@@ -108,7 +108,7 @@ SourceDestionation Painter::apply(Recti source, Recti destination)
 
 void Painter::plot(Vec2i position, Color color)
 {
-    Vec2i transformed = position + _state_stack[_state_stack_top].origine;
+    Vec2i transformed = position + _state_stack[_state_stack_top].origin;
 
     if (clip().contains(transformed))
     {

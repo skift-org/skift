@@ -4,7 +4,7 @@
 #include <libwidget/IconPanel.h>
 #include <libwidget/Label.h>
 
-void Button::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &rectangle)
+void Button::paint(Painter &painter, const Recti &rectangle)
 {
     __unused(rectangle);
 
@@ -12,21 +12,21 @@ void Button::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &
     {
         if (_style == OUTLINE)
         {
-            painter.draw_rectangle_rounded(metrics.bound, 4, 1, color(THEME_BORDER));
+            painter.draw_rectangle_rounded(bound(), 4, 1, color(THEME_BORDER));
         }
         else if (_style == FILLED)
         {
-            painter.fill_rectangle_rounded(metrics.bound, 4, color(THEME_ACCENT));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_ACCENT));
         }
 
         if (_mouse_over)
         {
-            painter.fill_rectangle_rounded(metrics.bound, 4, color(THEME_FOREGROUND).with_alpha(0.1));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
 
         if (_mouse_press)
         {
-            painter.fill_rectangle_rounded(metrics.bound, 4, color(THEME_FOREGROUND).with_alpha(0.1));
+            painter.fill_rectangle_rounded(bound(), 4, color(THEME_FOREGROUND).with_alpha(0.1));
         }
     }
 }

@@ -21,7 +21,7 @@ public:
 
     PaintCanvas(Widget *parent, RefPtr<PaintDocument> document);
 
-    void paint(Painter &painter, const WidgetMetrics &metrics, const Recti &dirty) override;
+    void paint(Painter &painter, const Recti &dirty) override;
 
     void event(Event *event) override;
 };

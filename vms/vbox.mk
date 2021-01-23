@@ -23,7 +23,7 @@ run: $(BOOTDISK)
 		--storagectl IDE \
 		--port 0 \
 		--device 0 \
-		--type dvddrive \
+		--type hdd \
 		--medium $(BOOTDISK)
 
 ifeq ($(CONFIG_DISPLAY),sdl)

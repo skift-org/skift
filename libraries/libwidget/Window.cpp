@@ -142,7 +142,7 @@ void Window::repaint_dirty()
 
 void Window::relayout()
 {
-    root()->bound(content_bound());
+    root()->container(content_bound());
     root()->relayout();
 
     dirty_layout = false;
@@ -310,12 +310,7 @@ void window_end_resize(Window *window)
 
 Widget *window_child_at(Window *window, Vec2i position)
 {
-    if (window->root()->bound().contains(position))
-    {
-        return window->root()->child_at(position);
-    }
-
-    return nullptr;
+    return window->root()->child_at(position);
 }
 
 void Window::dispatch_event(Event *event)
@@ -425,7 +420,7 @@ void Window::dispatch_event(Event *event)
         }
         else
         {
-            Widget *result = window_child_at(this, event->mouse.position);
+            auto result = window_child_at(this, event->mouse.position);
 
             if (_mouse_focus)
             {
@@ -442,19 +437,20 @@ void Window::dispatch_event(Event *event)
 
             if (_mouse_over != result)
             {
-                Event mouse_leave = *event;
-                mouse_leave.type = Event::MOUSE_LEAVE;
 
                 if (_mouse_over)
                 {
+                    Event mouse_leave = *event;
+                    mouse_leave.type = Event::MOUSE_LEAVE;
+
                     _mouse_over->dispatch_event(&mouse_leave);
                 }
 
-                Event mouse_enter = *event;
-                mouse_enter.type = Event::MOUSE_ENTER;
-
                 if (result)
                 {
+                    Event mouse_enter = *event;
+                    mouse_enter.type = Event::MOUSE_ENTER;
+
                     result->dispatch_event(&mouse_enter);
                 }
 
@@ -463,7 +459,16 @@ void Window::dispatch_event(Event *event)
 
             if (_mouse_focus)
             {
-                _mouse_focus->dispatch_event(event);
+                auto window_position = result->position_in_window();
+
+                Event event_copy = *event;
+
+                event_copy.mouse.position -= window_position;
+                event_copy.mouse.old_position -= window_position;
+
+                _mouse_focus->dispatch_event(&event_copy);
+
+                event->accepted = event_copy.accepted;
             }
         }
 
@@ -474,12 +479,22 @@ void Window::dispatch_event(Event *event)
     {
         if (root()->bound().contains(event->mouse.position))
         {
-            Widget *widget = window_child_at(this, event->mouse.position);
 
-            if (widget)
+            auto result = window_child_at(this, event->mouse.position);
+
+            if (result)
             {
-                _mouse_focus = widget;
-                widget->dispatch_event(event);
+                auto window_position = result->position_in_window();
+
+                Event event_copy = *event;
+
+                event_copy.mouse.position -= window_position;
+                event_copy.mouse.old_position -= window_position;
+
+                _mouse_focus = result;
+                result->dispatch_event(&event_copy);
+
+                event->accepted = event_copy.accepted;
             }
         }
 
@@ -520,11 +535,11 @@ void Window::dispatch_event(Event *event)
     {
         if (root()->bound().contains(event->mouse.position))
         {
-            Widget *widget = window_child_at(this, event->mouse.position);
+            auto result = window_child_at(this, event->mouse.position);
 
-            if (widget)
+            if (result)
             {
-                widget->dispatch_event(event);
+                result->dispatch_event(event);
             }
         }
 

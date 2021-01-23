@@ -14,7 +14,7 @@ public:
 
     IconPanel(Widget *parent, RefPtr<Icon> icon);
 
-    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
+    void paint(Painter &, const Recti &) override;
 
     Vec2i size() override;
 };

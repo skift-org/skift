@@ -28,7 +28,7 @@ public:
 
     Button(Widget *parent, Style style, RefPtr<Icon> icon, String text);
 
-    void paint(Painter &painter, const WidgetMetrics &metrics, const Recti &rectangle) override;
+    void paint(Painter &painter, const Recti &rectangle) override;
 
     void event(Event *event) override;
 };

@@ -3,13 +3,11 @@
 Recti Slider::track_bound()
 {
     return Recti{
-        content_bound().x(),
-        content_bound().y(),
-        (content_bound().width() - THUMP_SIZE),
-        content_bound().height(),
+        (bound().width() - THUMP_SIZE),
+        bound().height(),
     }
         .with_height(TRACK_HEIGHT)
-        .centered_within(content_bound());
+        .centered_within(bound());
 }
 
 Recti Slider::value_bound()
@@ -24,7 +22,7 @@ Recti Slider::thumb_bound()
 
     return {
         posx,
-        content_bound().y() + content_bound().height() / 2 - THUMP_SIZE / 2,
+        bound().height() / 2 - THUMP_SIZE / 2,
         THUMP_SIZE,
         THUMP_SIZE,
     };
@@ -32,8 +30,8 @@ Recti Slider::thumb_bound()
 
 void Slider::slide_to(Vec2i position)
 {
-    Vec2i pos = position - content_bound().position();
-    _value = pos.x() / (double)content_bound().width();
+    Vec2i pos = position - bound().position();
+    _value = pos.x() / (double)bound().width();
     _value = clamp(_value, 0, 1);
 
     Event event_value_changed = {};
@@ -68,19 +66,17 @@ void Slider::event(Event *event)
     }
 }
 
-void Slider::paint(Painter &painter, Recti rectangle)
+void Slider::paint(Painter &painter, const Recti &)
 {
-    __unused(rectangle);
-
     if (window()->focused())
     {
         painter.fill_rectangle(track_bound(), color(THEME_BORDER));
         painter.fill_rectangle(value_bound(), color(THEME_ACCENT));
-        painter.fill_rectangle_rounded(thumb_bound(), content_bound().height() / 2, color(THEME_ACCENT));
+        painter.fill_rectangle_rounded(thumb_bound(), bound().height() / 2, color(THEME_ACCENT));
     }
     else
     {
         painter.fill_rectangle(value_bound(), color(THEME_BACKGROUND));
-        painter.fill_rectangle_rounded(thumb_bound(), content_bound().height() / 2, color(THEME_BACKGROUND));
+        painter.fill_rectangle_rounded(thumb_bound(), bound().height() / 2, color(THEME_BACKGROUND));
     }
 }

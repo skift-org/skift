@@ -15,7 +15,7 @@ private:
 public:
     Cover(Widget *parent, RefPtr<Bitmap> bitmap);
 
-    void paint(Painter &painter, const WidgetMetrics &metrics, const Recti &) override;
+    void paint(Painter &painter, const Recti &) override;
 };
 
 } // namespace media_player

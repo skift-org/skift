@@ -14,11 +14,11 @@ PaginationDots::~PaginationDots()
 {
 }
 
-void PaginationDots::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void PaginationDots::paint(Painter &painter, const Recti &)
 {
     for (int i = 0; i < _count; i++)
     {
-        auto dot = metrics.content.column(_count, i, DOTSPACING);
+        auto dot = content().column(_count, i, DOTSPACING);
 
         if (_index == i)
         {

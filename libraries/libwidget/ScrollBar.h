@@ -5,7 +5,7 @@
 class ScrollBar : public Widget
 {
 private:
-    Vec2i _mouse_origine;
+    Vec2i _mouse_origin;
 
     int _track = 0;
     int _thumb = 0;
@@ -79,7 +79,7 @@ public:
         should_repaint();
     }
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &, const Recti &) override;
 
     void event(Event *event) override;
 

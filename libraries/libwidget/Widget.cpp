@@ -66,7 +66,7 @@ void Widget::cursor(CursorState cursor)
 Widget::Widget(Widget *parent)
 {
     _enabled = true;
-    _bound = Recti(32, 32);
+    _container = Recti(32, 32);
 
     if (parent)
     {
@@ -92,20 +92,6 @@ Widget::~Widget()
     }
 }
 
-void Widget::paint(Painter &painter, Recti dirty)
-{
-    auto m = metrics();
-
-    painter.push();
-
-    painter.transform(m.origine);
-    painter.clip(m.bound);
-
-    paint(painter, m, dirty.offset(-m.origine));
-
-    painter.pop();
-}
-
 void Widget::event(Event *) {}
 
 void Widget::do_layout()
@@ -118,7 +104,7 @@ void Widget::do_layout()
         _childs.foreach ([this](Widget *child) {
             if (child->flags() & FILL)
             {
-                auto bound = content_bound();
+                auto bound = content();
 
                 if (child->max_width() || child->max_height())
                 {
@@ -132,18 +118,18 @@ void Widget::do_layout()
                         bound = bound.with_height(child->max_height());
                     }
 
-                    child->bound(bound.centered_within(content_bound()));
+                    child->container(bound.centered_within(content()));
                 }
                 else
                 {
-                    child->bound(content_bound());
+                    child->container(content());
                 }
             }
             else
             {
                 auto size = child->compute_size();
 
-                child->bound(Recti{{}, size}.centered_within(content_bound()));
+                child->container(Recti{size}.centered_within(content()));
             }
 
             return Iteration::CONTINUE;
@@ -159,10 +145,10 @@ void Widget::do_layout()
             int x = index % _layout.hcell;
             int y = index / _layout.hcell;
 
-            Recti row = content_bound().row(_layout.vcell, y, _layout.spacing.y());
+            Recti row = content().row(_layout.vcell, y, _layout.spacing.y());
             Recti column = row.column(_layout.hcell, x, _layout.spacing.x());
 
-            child->bound(column);
+            child->container(column);
             index++;
             return Iteration::CONTINUE;
         });
@@ -174,8 +160,8 @@ void Widget::do_layout()
         int index = 0;
 
         _childs.foreach ([&](auto child) {
-            auto bound = content_bound().column(_childs.count(), index, _layout.spacing.x());
-            child->bound(bound);
+            auto bound = content().column(_childs.count(), index, _layout.spacing.x());
+            child->container(bound);
             index++;
 
             return Iteration::CONTINUE;
@@ -188,8 +174,8 @@ void Widget::do_layout()
         int index = 0;
 
         _childs.foreach ([&](auto child) {
-            auto bound = content_bound().row(_childs.count(), index, _layout.spacing.y());
-            child->bound(bound);
+            auto bound = content().row(_childs.count(), index, _layout.spacing.y());
+            child->container(bound);
             index++;
 
             return Iteration::CONTINUE;
@@ -215,7 +201,7 @@ void Widget::do_layout()
 
                 if (child->flags() & Widget::SQUARE)
                 {
-                    fixed_child_total_width += content_bound().height();
+                    fixed_child_total_width += content().height();
                 }
                 else
                 {
@@ -227,23 +213,23 @@ void Widget::do_layout()
         });
 
         int usable_space =
-            content_bound().width() -
+            content().width() -
             _layout.spacing.x() * (_childs.count() - 1);
 
         int fill_child_total_width = MAX(0, usable_space - fixed_child_total_width);
 
         int fill_child_width = (fill_child_total_width) / MAX(1, fill_child_count);
 
-        int current = content_bound().x();
+        int current = content().x();
 
         _childs.foreach ([&](auto child) {
             if (child->flags() & Widget::FILL)
             {
-                child->bound(Recti(
+                child->container(Recti(
                     current,
-                    content_bound().y(),
+                    content().y(),
                     fill_child_width,
-                    content_bound().height()));
+                    content().height()));
 
                 current += fill_child_width + _layout.spacing.x();
             }
@@ -251,21 +237,21 @@ void Widget::do_layout()
             {
                 if (child->flags() & Widget::SQUARE)
                 {
-                    child->bound(Recti(
+                    child->container(Recti(
                         current,
-                        content_bound().y(),
-                        content_bound().height(),
-                        content_bound().height()));
+                        content().y(),
+                        content().height(),
+                        content().height()));
 
-                    current += content_bound().height() + _layout.spacing.x();
+                    current += content().height() + _layout.spacing.x();
                 }
                 else
                 {
-                    child->bound(Recti(
+                    child->container(Recti(
                         current,
-                        content_bound().y(),
+                        content().y(),
                         child->compute_size().x(),
-                        content_bound().height()));
+                        content().height()));
 
                     current += child->compute_size().x() + _layout.spacing.x();
                 }
@@ -297,24 +283,23 @@ void Widget::do_layout()
             return Iteration::CONTINUE;
         });
 
-        int usable_space =
-            content_bound().height() -
-            _layout.spacing.y() * (_childs.count() - 1);
+        int usable_space = content().height() - _layout.spacing.y() * (_childs.count() - 1);
 
         int fill_child_total_height = MAX(0, usable_space - fixed_child_total_height);
 
         int fill_child_height = (fill_child_total_height) / MAX(1, fill_child_count);
 
-        int current = content_bound().y();
+        int current = content().y();
 
         _childs.foreach ([&](auto child) {
             if (child->flags() & Widget::FILL)
             {
-                child->bound(Recti(
-                    content_bound().x(),
+                child->container({
+                    content().x(),
                     current,
-                    content_bound().width(),
-                    fill_child_height));
+                    content().width(),
+                    fill_child_height,
+                });
 
                 current += fill_child_height + _layout.spacing.y();
             }
@@ -322,21 +307,23 @@ void Widget::do_layout()
             {
                 if (child->flags() & Widget::SQUARE)
                 {
-                    child->bound(Recti(
-                        content_bound().x(),
+                    child->container({
+                        content().x(),
                         current,
-                        content_bound().width(),
-                        content_bound().width()));
+                        content().width(),
+                        content().width(),
+                    });
 
-                    current += content_bound().width() + _layout.spacing.y();
+                    current += content().width() + _layout.spacing.y();
                 }
                 else
                 {
-                    child->bound(Recti(
-                        content_bound().x(),
+                    child->container({
+                        content().x(),
                         current,
-                        content_bound().width(),
-                        child->compute_size().y()));
+                        content().width(),
+                        child->compute_size().y(),
+                    });
 
                     current += child->compute_size().y() + _layout.spacing.y();
                 }
@@ -517,17 +504,17 @@ void Widget::enable_if(bool condition)
 
 Widget *Widget::child_at(Vec2i position)
 {
-    if (_flags & Widget::GREEDY)
-    {
-        return this;
-    }
-
     Widget *result = this;
 
+    if (_flags & Widget::GREEDY)
+    {
+        return result;
+    }
+
     _childs.foreach ([&](Widget *child) {
-        if (!(child->flags() & NO_MOUSE_HIT) && child->bound().contains(position))
+        if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
-            result = child->child_at(position);
+            result = child->child_at(position - child->origin());
 
             return Iteration::STOP;
         }
@@ -578,7 +565,9 @@ bool Widget::focused()
 void Widget::focus()
 {
     if (_window)
+    {
         _window->focus_widget(this);
+    }
 }
 
 /* --- Paint ---------------------------------------------------------------- */
@@ -591,6 +580,7 @@ void Widget::repaint(Painter &painter, Recti rectangle)
     }
 
     painter.push();
+    painter.transform(origin());
     painter.clip(bound());
 
     if (Application::show_wireframe())
@@ -603,9 +593,11 @@ void Widget::repaint(Painter &painter, Recti rectangle)
     painter.pop();
 
     _childs.foreach ([&](auto child) {
-        if (rectangle.colide_with(child->bound()))
+        auto local_rectangle = rectangle.offset(-child->origin());
+
+        if (local_rectangle.colide_with(child->bound()))
         {
-            child->repaint(painter, rectangle);
+            child->repaint(painter, local_rectangle);
         }
 
         return Iteration::CONTINUE;
@@ -621,15 +613,24 @@ void Widget::repaint(Painter &painter, Recti rectangle)
 
 void Widget::should_repaint()
 {
-    if (_window)
-    {
-        _window->should_repaint(bound());
-    }
+    should_repaint(bound());
 }
 
 void Widget::should_repaint(Recti rectangle)
 {
-    if (_window)
+    if (!overflow().colide_with(rectangle))
+    {
+        return;
+    }
+
+    // Convert to the parent coordinate space.
+    rectangle = rectangle.offset(origin());
+
+    if (_parent)
+    {
+        _parent->should_repaint(rectangle);
+    }
+    else if (_window)
     {
         _window->should_repaint(rectangle);
     }

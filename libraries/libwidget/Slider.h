@@ -30,5 +30,5 @@ public:
 
     void event(Event *event) override;
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &painter, const Recti &) override;
 };

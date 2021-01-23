@@ -17,10 +17,10 @@ Graph::~Graph()
     free(_data);
 }
 
-void Graph::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void Graph::paint(Painter &painter, const Recti &)
 {
-    int height = metrics.bound.height();
-    int width = metrics.bound.width();
+    int height = bound().height();
+    int width = bound().width();
 
     auto distance = [](float from, float to, int size) {
         if (from > to)

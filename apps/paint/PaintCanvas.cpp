@@ -8,9 +8,9 @@ PaintCanvas::PaintCanvas(Widget *parent, RefPtr<PaintDocument> document)
 {
 }
 
-void PaintCanvas::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void PaintCanvas::paint(Painter &painter, const Recti &)
 {
-    auto paint_area = _document->bound().centered_within(metrics.bound);
+    auto paint_area = _document->bound().centered_within(bound());
 
     painter.fill_checkboard(paint_area, 8, Colors::WHITE, Colors::GAINSBORO);
     painter.draw_rectangle(paint_area, color(THEME_BORDER));

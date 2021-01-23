@@ -17,7 +17,7 @@ public:
 
     void scroll_to_cursor();
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &painter, const Recti &rectangle) override;
 
     Vec2i size() override;
 

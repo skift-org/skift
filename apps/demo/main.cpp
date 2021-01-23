@@ -34,7 +34,6 @@ int main(int argc, char **argv)
 
     navbar->insets(Insetsi(4, 4));
     navbar->layout(HGRID(4));
-    navbar->bound(navbar->bound().resized({128, 32}));
 
     DemoWidget *demo_widget = new DemoWidget(window->root());
     demo_widget->flags(Widget::FILL);

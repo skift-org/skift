@@ -11,5 +11,5 @@ private:
 public:
     Placeholder(Widget *parent, String text);
 
-    void paint(Painter &, const WidgetMetrics &, const Recti &) override;
+    void paint(Painter &, const Recti &) override;
 };

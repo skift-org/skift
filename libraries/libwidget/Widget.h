@@ -57,7 +57,7 @@ struct WidgetColor
 
 struct WidgetMetrics
 {
-    Vec2i origine;
+    Vec2i origin;
 
     Recti overflow;
     Recti bound;
@@ -68,8 +68,9 @@ class Widget
 {
 private:
     bool _enabled = true;
-    Recti _bound{};
     int _flags = 0;
+
+    Recti _container;
 
     int _max_height = 0;
     int _max_width = 0;
@@ -119,47 +120,6 @@ public:
 
     void color(ThemeColorRole role, Color color);
 
-    Recti content_bound() const { return bound().shrinked(_insets); }
-
-    Recti bound() const { return _bound; }
-
-    void bound(Recti value) { _bound = value; }
-
-    Insetsi outsets() const { return _outsets; }
-
-    void outsets(Insetsi outsets)
-    {
-        _outsets = outsets;
-        should_relayout();
-    }
-
-    Insetsi insets() const { return _insets; }
-
-    void insets(Insetsi insets)
-    {
-        _insets = insets;
-        should_relayout();
-    }
-
-    WidgetMetrics metrics() const
-    {
-        Vec2i origine{
-            _outsets.left() + bound().x(),
-            _outsets.top() + bound().y(),
-        };
-
-        Recti bound = Widget::bound().shrinked(_outsets).size();
-        Recti content = bound.shrinked(_insets);
-        Recti overflow = content.expended(_outsets);
-
-        return {
-            origine,
-            overflow,
-            bound,
-            content,
-        };
-    }
-
     void layout(Layout layout) { _layout = layout; }
 
     void flags(int attributes) { _flags = attributes; }
@@ -200,15 +160,60 @@ public:
 
     virtual ~Widget();
 
-    virtual void paint(Painter &, const WidgetMetrics &, const Recti &){};
-
-    virtual void paint(Painter &painter, Recti rectangle);
+    virtual void paint(Painter &, const Recti &) {}
 
     virtual void event(Event *event);
 
     virtual void do_layout();
 
     virtual Vec2i size();
+
+    /* --- Metrics ---------------------------------------------------------- */
+
+    Vec2i position_in_window()
+    {
+        if (_parent)
+        {
+            return _parent->position_in_window() + origin();
+        }
+        else
+        {
+            return origin();
+        }
+    }
+
+    Insetsi outsets() const { return _outsets; }
+
+    void outsets(Insetsi outsets)
+    {
+        _outsets = outsets;
+        should_relayout();
+    }
+
+    Insetsi insets() const { return _insets; }
+
+    void insets(Insetsi insets)
+    {
+        _insets = insets;
+        should_relayout();
+    }
+
+    Recti container() const { return _container; }
+    void container(Recti container) { _container = container; }
+
+    Vec2i origin() const
+    {
+        return {
+            _outsets.left() + container().x(),
+            _outsets.top() + container().y(),
+        };
+    }
+
+    Recti bound() const { return container().shrinked(_outsets).size(); }
+
+    Recti content() const { return bound().shrinked(_insets); }
+
+    Recti overflow() const { return bound().expended(_outsets); }
 
     /* --- Enable/Disable state --------------------------------------------- */
 

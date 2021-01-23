@@ -21,11 +21,11 @@ DemoWidget::DemoWidget(Widget *parent)
     _timer->start();
 }
 
-void DemoWidget::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void DemoWidget::paint(Painter &painter, const Recti &)
 {
     if (_demo)
     {
-        _demo->callback(painter, metrics.bound, _time);
+        _demo->callback(painter, bound(), _time);
     }
 
     painter.draw_string(*font(), _demo->name, Vec2i(9, 17), Colors::BLACK);

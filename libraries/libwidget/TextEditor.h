@@ -25,12 +25,12 @@ private:
 
     Recti minimum_view_bound()
     {
-        return content_bound().cutoff_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
+        return bound().cutoff_right(ScrollBar::SIZE).cutoff_botton(ScrollBar::SIZE);
     }
 
     Recti view_bound()
     {
-        auto bound = content_bound();
+        auto bound = Widget::bound();
 
         if (document_bound().height() > minimum_view_bound().height())
         {
@@ -49,12 +49,12 @@ private:
     {
         return _model->bound(*font())
             .offset({-_hscroll_offset, -_vscroll_offset})
-            .offset(content_bound().position());
+            .offset(bound().position());
     }
 
     Recti vscrollbar_bound()
     {
-        auto bound = content_bound().take_right(ScrollBar::SIZE);
+        auto bound = Widget::bound().take_right(ScrollBar::SIZE);
 
         if (document_bound().width() > minimum_view_bound().width())
         {
@@ -66,7 +66,7 @@ private:
 
     Recti hscrollbar_bound()
     {
-        auto bound = content_bound().take_bottom(ScrollBar::SIZE);
+        auto bound = Widget::bound().take_bottom(ScrollBar::SIZE);
 
         if (document_bound().height() > minimum_view_bound().height())
         {
@@ -95,7 +95,7 @@ public:
 
     ~TextEditor();
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &, const Recti &) override;
 
     void event(Event *event) override;
 

@@ -11,9 +11,9 @@ Placeholder::Placeholder(Widget *parent, String text)
     _text = buffer;
 }
 
-void Placeholder::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void Placeholder::paint(Painter &painter, const Recti &)
 {
-    painter.draw_rectangle(metrics.bound, Colors::RED);
+    painter.draw_rectangle(bound(), Colors::RED);
 
     painter.blit(
         *_alert_icon,

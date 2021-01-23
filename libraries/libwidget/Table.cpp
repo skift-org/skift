@@ -4,19 +4,14 @@
 #include <libwidget/Theme.h>
 #include <libwidget/Window.h>
 
-Recti Table::body_bound() const
-{
-    return content_bound();
-}
-
 Recti Table::header_bound() const
 {
-    return body_bound().take_top(TABLE_ROW_HEIGHT);
+    return bound().take_top(TABLE_ROW_HEIGHT);
 }
 
 Recti Table::list_bound() const
 {
-    return body_bound().shrinked(Insetsi(TABLE_ROW_HEIGHT, 0, 0));
+    return bound().shrinked(Insetsi(TABLE_ROW_HEIGHT, 0, 0));
 }
 
 Recti Table::scrollbar_bound() const
@@ -127,7 +122,7 @@ Table::Table(Widget *parent, RefPtr<TableModel> model)
     this->model(model);
 }
 
-void Table::paint(Painter &painter, Recti)
+void Table::paint(Painter &painter, const Recti &)
 {
     if (!_model)
     {
@@ -135,7 +130,7 @@ void Table::paint(Painter &painter, Recti)
     }
 
     int column_count = _model->columns();
-    int column_width = body_bound().width() / column_count;
+    int column_width = bound().width() / column_count;
 
     if (_model->rows() == 0)
     {
@@ -230,6 +225,6 @@ void Table::do_layout()
         return;
     }
 
-    _scrollbar->bound(scrollbar_bound());
+    _scrollbar->container(scrollbar_bound());
     _scrollbar->update(TABLE_ROW_HEIGHT * _model->rows(), list_bound().height(), _scroll_offset);
 }

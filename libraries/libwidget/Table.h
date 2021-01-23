@@ -19,7 +19,6 @@ private:
 
     String _empty_message{"No data to display"};
 
-    Recti body_bound() const;
     Recti scrollbar_bound() const;
     Recti header_bound() const;
     Recti list_bound() const;
@@ -74,7 +73,7 @@ public:
 
     Table(Widget *parent, RefPtr<TableModel> model);
 
-    void paint(Painter &painter, Recti rectangle) override;
+    void paint(Painter &painter, const Recti &dirty) override;
 
     void event(Event *event) override;
 

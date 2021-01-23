@@ -6,14 +6,14 @@ IconPanel::IconPanel(Widget *parent, RefPtr<Icon> icon)
 {
 }
 
-void IconPanel::paint(Painter &painter, const WidgetMetrics &metrics, const Recti &)
+void IconPanel::paint(Painter &painter, const Recti &)
 {
     if (!_icon)
     {
         return;
     }
 
-    Recti destination = _icon->bound(_icon_size).centered_within(metrics.content);
+    Recti destination = _icon->bound(_icon_size).centered_within(content());
 
     painter.blit(
         *_icon,

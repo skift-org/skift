@@ -34,7 +34,7 @@ public:
         return total / MIN(_current, _data_size);
     }
 
-    void paint(Painter &painter, const WidgetMetrics &metrics, const Recti &dirty) override;
+    void paint(Painter &painter, const Recti &dirty) override;
 
     Vec2i size() override;
 };

@@ -29,8 +29,8 @@ int main(int argc, char **argv)
 
     auto dialog = new Panel(background);
 
-    dialog->min_width(400);
-    dialog->min_height(400);
+    dialog->min_width(420);
+    dialog->min_height(420);
 
     dialog->layout(VFLOW(0));
     dialog->border_radius(6);

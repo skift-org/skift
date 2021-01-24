@@ -553,6 +553,9 @@ void Widget::clear_children()
     {
         delete _childs.peek();
     }
+
+    should_relayout();
+    should_repaint();
 }
 
 /* --- Focus state ---------------------------------------------------------- */

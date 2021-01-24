@@ -5,6 +5,12 @@
 TextField::TextField(Widget *parent, RefPtr<TextModel> model)
     : Widget(parent), _model(model)
 {
+    _model_observer = _model->observe([this](auto &) {
+        _cursor.clamp_within(*_model);
+
+        scroll_to_cursor();
+        should_repaint();
+    });
 }
 
 TextField::~TextField()
@@ -77,52 +83,42 @@ void TextField::event(Event *event)
         if (event->keyboard.key == KEYBOARD_KEY_UP && event->keyboard.modifiers & KEY_MODIFIER_ALT)
         {
             _model->move_line_up_at(_cursor);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN && event->keyboard.modifiers & KEY_MODIFIER_ALT)
         {
             _model->move_line_down_at(_cursor);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_UP)
         {
             _cursor.move_up_within(*_model);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DOWN)
         {
             _cursor.move_down_within(*_model);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_LEFT)
         {
             _cursor.move_left_within(*_model);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_RIGHT)
         {
             _cursor.move_right_within(*_model);
-            scroll_to_cursor();
         }
         if (event->keyboard.key == KEYBOARD_KEY_HOME)
         {
             _cursor.move_home_within(_model->line(_cursor.line()));
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_END)
         {
             _cursor.move_end_within(_model->line(_cursor.line()));
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_BKSPC)
         {
             _model->backspace_at(_cursor);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_DELETE)
         {
             _model->delete_at(_cursor);
-            scroll_to_cursor();
         }
         else if (event->keyboard.key == KEYBOARD_KEY_ENTER)
         {
@@ -131,10 +127,7 @@ void TextField::event(Event *event)
         else if (event->keyboard.codepoint != 0)
         {
             _model->append_at(_cursor, event->keyboard.codepoint);
-            scroll_to_cursor();
         }
-
-        should_repaint();
 
         event->accepted = true;
     }

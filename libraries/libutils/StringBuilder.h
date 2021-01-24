@@ -3,6 +3,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Common.h>
 #include <libsystem/math/MinMax.h>
+#include <libsystem/unicode/Codepoint.h>
 #include <libutils/String.h>
 #include <libutils/Vector.h>
 
@@ -31,6 +32,7 @@ public:
         preallocated = MAX(preallocated, 16);
 
         _buffer = new char[preallocated];
+        _buffer[0] = '\0';
         _size = preallocated;
         _used = 0;
     }
@@ -43,6 +45,11 @@ public:
 
     String finalize()
     {
+        if (!_buffer)
+        {
+            return "";
+        }
+
         char *result = _buffer;
         size_t size = _used;
 
@@ -98,6 +105,15 @@ public:
                 append(str[i]);
             }
         }
+
+        return *this;
+    }
+
+    StringBuilder &append_codepoint(Codepoint cp)
+    {
+        char buffer[5];
+        codepoint_to_utf8(cp, (uint8_t *)buffer);
+        append(buffer);
 
         return *this;
     }

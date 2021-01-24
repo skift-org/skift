@@ -1,4 +1,5 @@
 #include <libutils/Scanner.h>
+#include <libutils/StringBuilder.h>
 
 #include <libwidget/model/TextModel.h>
 
@@ -53,10 +54,31 @@ RefPtr<TextModel> TextModel::from_file(const char *path)
     return model;
 }
 
+String TextModel::string()
+{
+    StringBuilder builder;
+
+    for (size_t i = 0; i < _lines.count(); i++)
+    {
+        for (size_t j = 0; j < _lines[i]->length(); j++)
+        {
+            builder.append_codepoint(_lines[i]->operator[](j));
+        }
+
+        if (i + 1 < _lines.count())
+        {
+            builder.append('\n');
+        }
+    }
+
+    return builder.finalize();
+}
+
 void TextModel::append_at(TextCursor &cursor, Codepoint codepoint)
 {
     line(cursor.line()).append_at(cursor.column(), codepoint);
     cursor.move_right_within(*this);
+    did_update();
 }
 
 void TextModel::backspace_at(TextCursor &cursor)
@@ -71,11 +93,15 @@ void TextModel::backspace_at(TextCursor &cursor)
 
         cursor.move_up_within(*this);
         cursor.move_to_within(line(cursor.line()), line_length);
+
+        did_update();
     }
     else if (cursor.column() > 0 && line(cursor.line()).length() > 0)
     {
         line(cursor.line()).backspace_at(cursor.column());
         cursor.move_left_within(*this);
+
+        did_update();
     }
 }
 
@@ -86,10 +112,14 @@ void TextModel::delete_at(TextCursor &cursor)
         line(cursor.line()).append(line(cursor.line() + 1));
 
         _lines.remove_index(cursor.line() + 1);
+
+        did_update();
     }
     else if (cursor.column() < line(cursor.line()).length() && line(cursor.line()).length() > 0)
     {
         line(cursor.line()).delete_at(cursor.column());
+
+        did_update();
     }
 }
 
@@ -115,6 +145,8 @@ void TextModel::newline_at(TextCursor &cursor)
 
     cursor.move_down_within(*this);
     cursor.move_to_beginning_of_the_line();
+
+    did_update();
 }
 
 void TextModel::move_line_up_at(TextCursor &cursor)
@@ -123,6 +155,8 @@ void TextModel::move_line_up_at(TextCursor &cursor)
     {
         _lines.insert(cursor.line() - 1, _lines.take_at(cursor.line()));
         cursor.move_up_within(*this);
+
+        did_update();
     }
 }
 
@@ -132,5 +166,7 @@ void TextModel::move_line_down_at(TextCursor &cursor)
     {
         _lines.insert(cursor.line() + 1, _lines.take_at(cursor.line()));
         cursor.move_down_within(*this);
+
+        did_update();
     }
 }

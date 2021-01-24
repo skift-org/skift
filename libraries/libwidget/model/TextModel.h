@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsystem/unicode/Codepoint.h>
+#include <libutils/Observable.h>
 #include <libutils/OwnPtr.h>
 #include <libutils/RefCounted.h>
 #include <libutils/Vector.h>
@@ -41,7 +42,7 @@ public:
         _codepoints.push_back(codepoint);
     }
 
-    void append(TextModelLine &line)
+    void append(const TextModelLine &line)
     {
         _codepoints.push_back_many(line._codepoints);
     }
@@ -113,7 +114,9 @@ public:
     }
 };
 
-class TextModel : public RefCounted<TextModel>
+class TextModel :
+    public RefCounted<TextModel>,
+    public Observable<TextModel>
 {
 private:
     Vector<OwnPtr<TextModelLine>> _lines{1024};
@@ -141,6 +144,18 @@ public:
         }
 
         return {width, height};
+    }
+
+    String string();
+
+    void clear()
+    {
+        _lines.clear();
+        _spans.clear();
+
+        append_line(own<TextModelLine>());
+
+        did_update();
     }
 
     /* --- Editing ---------------------------------------------------------- */
@@ -324,6 +339,13 @@ public:
     {
         _line = model.line_count() - 1;
         _column = model.line(_line).length();
+
         _prefered_column = _column;
+    }
+
+    void clamp_within(TextModel &model)
+    {
+        _line = clamp(_line, 0, model.line_count() - 1);
+        _column = clamp(_column, 0, model.line(_line).length());
     }
 };

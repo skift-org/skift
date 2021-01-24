@@ -7,6 +7,8 @@ class TextField : public Widget
 {
 private:
     RefPtr<TextModel> _model;
+    OwnPtr<Observer<TextModel>> _model_observer;
+
     TextCursor _cursor{};
     int _hscroll_offset = 0;
 

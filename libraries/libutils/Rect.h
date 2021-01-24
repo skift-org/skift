@@ -124,6 +124,20 @@ public:
         return !(*this == other);
     }
 
+    Rect with_x(int x) const
+    {
+        Rect new_rect = Rect(*this);
+        new_rect._x = x;
+        return new_rect;
+    }
+
+    Rect with_y(int y) const
+    {
+        Rect new_rect = Rect(*this);
+        new_rect._y = y;
+        return new_rect;
+    }
+
     Rect with_width(int width) const
     {
         Rect new_rect = Rect(*this);

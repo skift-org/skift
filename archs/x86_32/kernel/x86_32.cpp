@@ -1,6 +1,7 @@
 #include <libsystem/Assert.h>
 #include <libsystem/core/Plugs.h>
 
+#include "archs/VirtualMemory.h"
 #include "archs/x86/kernel/COM.h"
 #include "archs/x86/kernel/CPUID.h"
 #include "archs/x86/kernel/FPU.h"
@@ -133,10 +134,22 @@ static void reboot_8042()
     logger_info("Trying to reboot using the 8042...");
 
     uint8_t good = 0x02;
+
     while (good & 0x02)
+    {
         good = in8(0x64);
+    }
+
     out8(0x64, 0xFE);
     arch_halt();
+}
+
+static void reboot_triple_fault()
+{
+    logger_info("Trying to reboot by doing a triple fault...");
+    cli();
+    arch_address_space_switch(0x0);
+    *(uint32_t *)0x0 = 0xDEADDEAD;
 }
 
 __no_return void arch_reboot()
@@ -145,6 +158,8 @@ __no_return void arch_reboot()
     logger_warn("We don't support shutting down real hardware!");
 
     reboot_8042();
+
+    reboot_triple_fault();
 
     logger_info("Failled to reboot: Halting!");
     system_stop();

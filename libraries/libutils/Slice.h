@@ -14,9 +14,9 @@ private:
     size_t _size = 0;
 
 public:
-    bool any() { return _size > 0; }
+    bool any() const { return _size > 0; }
 
-    size_t size() { return _size; }
+    size_t size() const { return _size; }
 
     const void *start()
     {

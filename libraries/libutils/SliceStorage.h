@@ -11,12 +11,22 @@ private:
     bool _owned = false;
 
 public:
-    const void *start()
+    void *start()
     {
         return _data;
     }
 
-    const void *end()
+    void *end()
+    {
+        return reinterpret_cast<char *>(_data) + _size;
+    }
+
+    const void *start() const
+    {
+        return _data;
+    }
+
+    const void *end() const
     {
         return reinterpret_cast<const char *>(_data) + _size;
     }

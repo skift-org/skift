@@ -13,6 +13,7 @@
 #include "archs/x86_32/kernel/IDT.h"
 #include "archs/x86_32/kernel/Interrupts.h"
 #include "archs/x86_32/kernel/LAPIC.h"
+#include "archs/x86_32/kernel/Power.h"
 #include "archs/x86_32/kernel/x86_32.h"
 
 #include "kernel/firmware/SMBIOS.h"
@@ -129,62 +130,25 @@ extern "C" void arch_main(void *info, uint32_t magic)
     system_main(handover);
 }
 
-static void reboot_8042()
-{
-    logger_info("Trying to reboot using the 8042...");
-
-    uint8_t good = 0x02;
-
-    while (good & 0x02)
-    {
-        good = in8(0x64);
-    }
-
-    out8(0x64, 0xFE);
-    arch_halt();
-}
-
-static void reboot_triple_fault()
-{
-    logger_info("Trying to reboot by doing a triple fault...");
-    cli();
-    arch_address_space_switch(0x0);
-    *(uint32_t *)0x0 = 0xDEADDEAD;
-}
-
 __no_return void arch_reboot()
 {
     early_console_enable();
-    logger_warn("We don't support shutting down real hardware!");
+    logger_info("Rebooting...");
 
-    reboot_8042();
-
-    reboot_triple_fault();
+    x86::reboot_8042();
+    x86::reboot_triple_fault();
 
     logger_info("Failled to reboot: Halting!");
     system_stop();
 }
 
-static void shutdown_virtual_machines()
-{
-    logger_info("Maybe your are running a VM, trying to shutdown using io ports...");
-
-    // Bochs, and older versions of QEMU(than 2.0)
-    out16(0xB004, 0x2000);
-
-    // Newer versions of QEMU
-    out16(0x604, 0x2000);
-
-    // Virtualbox
-    out16(0x4004, 0x3400);
-}
-
 __no_return void arch_shutdown()
 {
     early_console_enable();
-    logger_warn("We don't support shutting down real hardware!");
+    logger_info("Shuting down...");
 
-    shutdown_virtual_machines();
+    x86::shutdown_virtual_machines();
+    x86::shutdown_acpi();
 
     logger_error("Failled to shutdown: Halting!");
     system_stop();

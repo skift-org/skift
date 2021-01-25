@@ -6,6 +6,11 @@ Image::Image(Widget *parent, RefPtr<Bitmap> bitmap)
 {
 }
 
+Image::Image(Widget *parent, RefPtr<Bitmap> bitmap, BitmapScaling scaling)
+    : Widget(parent), _bitmap(bitmap), _scaling(scaling)
+{
+}
+
 void Image::change_bitmap(RefPtr<Bitmap> bitmap)
 {
     if (_bitmap != bitmap)
@@ -17,9 +22,9 @@ void Image::change_bitmap(RefPtr<Bitmap> bitmap)
 
 void Image::scaling(BitmapScaling scaling)
 {
-    if (_scalling != scaling)
+    if (_scaling != scaling)
     {
-        _scalling = scaling;
+        _scaling = scaling;
         should_repaint();
     }
 }
@@ -33,6 +38,5 @@ void Image::paint(Painter &painter, const Recti &)
 
     Recti destination = bound();
 
-    painter.blit(*_bitmap, _scalling, destination);
+    painter.blit(*_bitmap, _scaling, destination);
 }
-

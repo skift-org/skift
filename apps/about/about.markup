@@ -8,7 +8,7 @@
     <TitleBar />
 
     <Container layout="vflow(4)" padding="insets(6)" fill>
-        <Image id="system-image" fill/>
+        <Image id="system-image" scale="center" fill/>
 
         <Label text="The skift operating system." anchor="center"/>
         <Label id="version-label" anchor="center"/>

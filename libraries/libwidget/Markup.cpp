@@ -213,6 +213,31 @@ Anchor anchor_parse(const char *string)
     return Anchor::LEFT;
 }
 
+static BitmapScaling scaling_parse(const char *string)
+{
+    if (strcmp(string, "center") == 0)
+    {
+        return BitmapScaling::CENTER;
+    }
+
+    if (strcmp(string, "cover") == 0)
+    {
+        return BitmapScaling::COVER;
+    }
+
+    if (strcmp(string, "fit") == 0)
+    {
+        return BitmapScaling::FIT;
+    }
+
+    if (strcmp(string, "stretch") == 0)
+    {
+        return BitmapScaling::STRETCH;
+    }
+
+    return BitmapScaling::CENTER;
+}
+
 void widget_apply_attribute_from_markup(Widget *widget, markup::Node &node)
 {
     node.with_attribute("id", [&](auto &id) {
@@ -311,10 +336,9 @@ Widget *widget_create_from_markup(Widget *parent, markup::Node &node)
 
     if (node.is("Image"))
     {
-        widget = new Image(
-            parent,
-            Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null")
-                                                 .cstring()));
+        auto bitmap = Bitmap::load_from_or_placeholder(node.get_attribute_or_default("path", "null").cstring());
+
+        widget = new Image(parent, bitmap, scaling_parse(node.get_attribute_or_default("scaling", "center").cstring()));
     }
 
     if (node.is("Slider"))

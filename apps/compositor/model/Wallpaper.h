@@ -11,17 +11,8 @@ namespace compositor
 
 class Wallpaper
 {
-public:
-    enum Scaling
-    {
-        CENTER,
-        STRETCH,
-        COVER,
-        FIT,
-    };
-
 private:
-    Scaling _scaling = COVER;
+    BitmapScaling _scaling = BitmapScaling::COVER;
 
     Vec2i _resolution = {};
     Color _background = Colors::BLACK;
@@ -91,19 +82,19 @@ public:
 
             if (scaling_name == "center")
             {
-                _scaling = CENTER;
+                _scaling = BitmapScaling::CENTER;
             }
             else if (scaling_name == "stretch")
             {
-                _scaling = STRETCH;
+                _scaling = BitmapScaling::STRETCH;
             }
             else if (scaling_name == "cover")
             {
-                _scaling = COVER;
+                _scaling = BitmapScaling::COVER;
             }
             else if (scaling_name == "fit")
             {
-                _scaling = FIT;
+                _scaling = BitmapScaling::FIT;
             }
 
             _render_invoker->invoke_later();
@@ -124,22 +115,7 @@ public:
 
         if (_orginal)
         {
-            if (_scaling == COVER)
-            {
-                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().cover(_scaled->bound()));
-            }
-            else if (_scaling == STRETCH)
-            {
-                painter.blit(*_orginal, _orginal->bound(), _scaled->bound());
-            }
-            else if (_scaling == CENTER)
-            {
-                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().centered_within(_scaled->bound()));
-            }
-            else if (_scaling == FIT)
-            {
-                painter.blit(*_orginal, _orginal->bound(), _orginal->bound().fit(_scaled->bound()));
-            }
+            painter.blit(*_orginal, _scaling, _scaled->bound());
         }
     }
 

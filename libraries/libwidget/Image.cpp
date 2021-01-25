@@ -15,7 +15,7 @@ void Image::change_bitmap(RefPtr<Bitmap> bitmap)
     }
 }
 
-void Image::change_scaling(ImageScalling scaling)
+void Image::scaling(BitmapScaling scaling)
 {
     if (_scalling != scaling)
     {
@@ -33,26 +33,6 @@ void Image::paint(Painter &painter, const Recti &)
 
     Recti destination = bound();
 
-    if (_scalling == ImageScalling::CENTER)
-    {
-        destination = _bitmap->bound().centered_within(bound());
-    }
-    else if (_scalling == ImageScalling::STRETCH)
-    {
-        destination = bound();
-    }
-
-    painter.blit(*_bitmap, _bitmap->bound(), destination);
+    painter.blit(*_bitmap, _scalling, destination);
 }
 
-Vec2i Image::size()
-{
-    if (_bitmap)
-    {
-        return _bitmap->bound().size();
-    }
-    else
-    {
-        return bound().size();
-    }
-}

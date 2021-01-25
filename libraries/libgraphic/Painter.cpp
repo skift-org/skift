@@ -173,6 +173,30 @@ __flatten void Painter::blit(Bitmap &bitmap, Recti source, Recti destination)
     }
 }
 
+void Painter::blit(Bitmap &bitmap, BitmapScaling scaling, Recti destionation)
+{
+    if (scaling == BitmapScaling::COVER)
+    {
+        blit(bitmap, bitmap.bound(), bitmap.bound().cover(destionation));
+    }
+    else if (scaling == BitmapScaling::STRETCH)
+    {
+        blit(bitmap, bitmap.bound(), destionation);
+    }
+    else if (scaling == BitmapScaling::CENTER)
+    {
+        blit(bitmap, bitmap.bound(), bitmap.bound().centered_within(destionation));
+    }
+    else if (scaling == BitmapScaling::FIT)
+    {
+        blit(bitmap, bitmap.bound(), bitmap.bound().fit(destionation));
+    }
+    else
+    {
+        ASSERT_NOT_REACHED();
+    }
+}
+
 void Painter::blit_fast_no_alpha(Bitmap &bitmap, Recti source, Recti destination)
 {
     auto result = apply(source, destination);

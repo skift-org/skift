@@ -16,8 +16,16 @@ enum BitmapStorage
 
 enum BitmapFiltering
 {
-    BITMAP_FILTERING_NEAREST,
-    BITMAP_FILTERING_LINEAR,
+    NEAREST,
+    LINEAR,
+};
+
+enum class BitmapScaling
+{
+    CENTER,
+    STRETCH,
+    COVER,
+    FIT,
 };
 
 class Bitmap : public RefCounted<Bitmap>
@@ -39,7 +47,7 @@ public:
           _storage(storage),
           _width(width),
           _height(height),
-          _filtering(BITMAP_FILTERING_LINEAR),
+          _filtering(BitmapFiltering::LINEAR),
           _pixels(pixels)
     {
     }
@@ -114,7 +122,7 @@ public:
     {
         Vec2i sample_position = source.position() + (source.size() * position);
 
-        if (_filtering == BITMAP_FILTERING_NEAREST)
+        if (_filtering == BitmapFiltering::NEAREST)
         {
             return get_pixel(source.position() + sample_position);
         }

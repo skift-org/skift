@@ -492,10 +492,10 @@ public:
 
     Rect fit(Rect rect)
     {
-        double scale_x = width() / (double)rect.width();
-        double scale_y = height() / (double)rect.height();
+        double scale_x = rect.width() / (double)width();
+        double scale_y = rect.height() / (double)height();
 
-        double scale = MAX(scale_x, scale_y);
+        double scale = MIN(scale_x, scale_y);
 
         Rect scaled_rect{
             0,

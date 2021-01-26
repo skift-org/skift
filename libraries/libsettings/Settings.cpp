@@ -2,7 +2,7 @@
 
 #include <libsettings/Settings.h>
 #include <libsettings/Watcher.h>
-#include <libsettings/ipc/Client.h>
+#include <libsettings/ipc/ServerConnection.h>
 
 namespace settings
 {

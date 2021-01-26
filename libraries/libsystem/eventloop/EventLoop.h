@@ -13,21 +13,21 @@ namespace EventLoop
 
 /* --- Notifiers ------------------------------------------------------------ */
 
-void register_notifier(struct Notifier *notifier);
+void register_notifier(Notifier *notifier);
 
-void unregister_notifier(struct Notifier *notifier);
+void unregister_notifier(Notifier *notifier);
 
 /* --- Timers --------------------------------------------------------------- */
 
-void register_timer(struct Timer *timer);
+void register_timer(Timer *timer);
 
-void unregister_timer(struct Timer *timer);
+void unregister_timer(Timer *timer);
 
 /* --- Invokers ------------------------------------------------------------- */
 
-void register_invoker(struct Invoker *timer);
+void register_invoker(Invoker *timer);
 
-void unregister_invoker(struct Invoker *timer);
+void unregister_invoker(Invoker *timer);
 
 /* --- Loop ----------------------------------------------------------------- */
 

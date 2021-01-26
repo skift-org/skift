@@ -8,8 +8,8 @@
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 
-struct Widget;
-struct Painter;
+class Widget;
+class Painter;
 struct Window;
 
 enum LayoutType
@@ -88,8 +88,8 @@ private:
 
     EventHandler _handlers[EventType::__COUNT] = {};
 
-    struct Widget *_parent = {};
-    struct Window *_window = {};
+    Widget *_parent = {};
+    Window *_window = {};
 
     Vector<Widget *> _childs = {};
 

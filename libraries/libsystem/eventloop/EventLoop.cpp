@@ -63,12 +63,12 @@ void update_notifier(Handle *handle, PollEvent event)
 
 static Vector<Timer *> _timers;
 
-void register_timer(struct Timer *timer)
+void register_timer(Timer *timer)
 {
     _timers.push_back(timer);
 }
 
-void unregister_timer(struct Timer *timer)
+void unregister_timer(Timer *timer)
 {
     _timers.remove_value(timer);
 }
@@ -94,12 +94,12 @@ void update_timers()
 
 static Vector<Invoker *> _invoker;
 
-void register_invoker(struct Invoker *invoker)
+void register_invoker(Invoker *invoker)
 {
     _invoker.push_back(invoker);
 }
 
-void unregister_invoker(struct Invoker *invoker)
+void unregister_invoker(Invoker *invoker)
 {
     _invoker.remove_value(invoker);
 }

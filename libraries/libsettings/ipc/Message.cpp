@@ -31,12 +31,12 @@ ResultOr<Message> Message::read_from(Connection *connection)
 
         if (handle_has_error(connection))
         {
-            delete buffer;
+            delete[] buffer;
             return handle_get_error(connection);
         }
 
         message.path = Path::parse(buffer, header.path_length);
-        delete buffer;
+        delete[] buffer;
     }
 
     if (header.payload_length > 0)
@@ -46,12 +46,12 @@ ResultOr<Message> Message::read_from(Connection *connection)
 
         if (handle_has_error(connection))
         {
-            delete buffer;
+            delete[] buffer;
             return handle_get_error(connection);
         }
 
         message.payload = json::parse(buffer, header.payload_length);
-        delete buffer;
+        delete[] buffer;
     }
 
     return message;

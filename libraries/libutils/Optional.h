@@ -120,7 +120,7 @@ public:
             return false;
         }
 
-        return value == other;
+        return value() == other;
     }
 
     ~Optional()

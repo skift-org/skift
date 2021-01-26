@@ -37,12 +37,13 @@ int main(int argc, char **argv)
 
     auto illustration = new Panel(dialog);
 
-    illustration->max_height(160);
     illustration->min_height(160);
     illustration->border_radius(6);
     illustration->color(THEME_MIDDLEGROUND, Colors::WHITE);
 
     auto image = new Image(illustration, Bitmap::placeholder());
+    image->flags(Widget::FILL);
+    image->scaling(BitmapScaling::CENTER);
 
     auto content = new Container(dialog);
     content->flags(Widget::FILL);

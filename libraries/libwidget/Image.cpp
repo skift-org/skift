@@ -36,7 +36,5 @@ void Image::paint(Painter &painter, const Recti &)
         return;
     }
 
-    Recti destination = bound();
-
-    painter.blit(*_bitmap, _scaling, destination);
+    painter.blit(*_bitmap, _scaling, bound());
 }

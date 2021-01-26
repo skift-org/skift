@@ -5,8 +5,6 @@
 
 #include <libutils/Move.h>
 
-struct RingBuffer;
-
 class RingBuffer
 {
 private:

@@ -89,4 +89,4 @@ public:
 };
 
 template <typename T>
-using Observer = Observable<T>::_Observer;
+using Observer = typename Observable<T>::_Observer;

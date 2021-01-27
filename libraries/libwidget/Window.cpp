@@ -107,7 +107,7 @@ void Window::repaint_dirty()
 {
     // FIXME: find a better way to schedule update after layout.
 
-    if (dirty_layout)
+    if (_dirty_layout)
     {
         relayout();
     }
@@ -145,7 +145,7 @@ void Window::relayout()
     root()->container(content_bound());
     root()->relayout();
 
-    dirty_layout = false;
+    _dirty_layout = false;
 }
 
 void Window::should_repaint(Recti rectangle)
@@ -172,12 +172,12 @@ void Window::should_repaint(Recti rectangle)
 
 void Window::should_relayout()
 {
-    if (dirty_layout || !_visible)
+    if (_dirty_layout || !_visible)
     {
         return;
     }
 
-    dirty_layout = true;
+    _dirty_layout = true;
 
     _relayout_invoker->invoke_later();
 }
@@ -323,10 +323,10 @@ void Window::dispatch_event(Event *event)
         event->mouse.old_position = event->mouse.old_position - _bound.position();
     }
 
-    if (handlers[event->type])
+    if (_handlers[event->type])
     {
         event->accepted = true;
-        handlers[event->type](event);
+        _handlers[event->type](event);
     }
 
     if (event->accepted)
@@ -569,7 +569,7 @@ void Window::dispatch_event(Event *event)
 void Window::on(EventType event, EventHandler handler)
 {
     assert(event < EventType::__COUNT);
-    handlers[event] = move(handler);
+    _handlers[event] = move(handler);
 }
 
 void Window::cursor(CursorState state)
@@ -613,12 +613,12 @@ void Window::widget_removed(Widget *widget)
         _mouse_focus = nullptr;
     }
 
-    widget_by_id.remove_value(widget);
+    _widget_by_id.remove_value(widget);
 }
 
 void Window::register_widget_by_id(String id, Widget *widget)
 {
-    widget_by_id[id] = widget;
+    _widget_by_id[id] = widget;
 }
 
 Color Window::color(ThemeColorRole role)

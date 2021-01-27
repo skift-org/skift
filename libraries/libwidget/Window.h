@@ -48,9 +48,9 @@ private:
     OwnPtr<Painter> backbuffer_painter;
 
     Vector<Recti> _dirty_rects{};
-    bool dirty_layout;
+    bool _dirty_layout;
 
-    EventHandler handlers[EventType::__COUNT];
+    EventHandler _handlers[EventType::__COUNT];
 
     Widget *_root;
 
@@ -58,7 +58,7 @@ private:
     Widget *_mouse_focus = nullptr;
     Widget *_mouse_over = nullptr;
 
-    HashMap<String, Widget *> widget_by_id{};
+    HashMap<String, Widget *> _widget_by_id{};
 
     OwnPtr<Invoker> _repaint_invoker;
     OwnPtr<Invoker> _relayout_invoker;
@@ -147,9 +147,9 @@ public:
     template <typename WidgetType, typename CallbackType>
     void with_widget(String name, CallbackType callback)
     {
-        if (widget_by_id.has_key(name))
+        if (_widget_by_id.has_key(name))
         {
-            auto widget = dynamic_cast<WidgetType *>(widget_by_id[name]);
+            auto widget = dynamic_cast<WidgetType *>(_widget_by_id[name]);
 
             if (widget)
             {

@@ -82,9 +82,9 @@ public:
     {
         ensure_capacity(data.size());
 
-        for (size_t i = 0; i < data.size(); i++)
+        for (const auto& el : data)
         {
-            push_back(data[i]);
+            push_back(el);
         }
     }
 
@@ -245,6 +245,12 @@ public:
                 }
             }
         }
+    }
+
+    void resize(size_t newCount)
+    {
+        ensure_capacity(newCount);
+        _count = newCount;
     }
 
     void ensure_capacity(size_t capacity)

@@ -14,8 +14,9 @@
 #define WINDOW_RESIZE_AREA 16
 #define WINDOW_CONTENT_PADDING 1
 
-struct Window
+class Window
 {
+private:
     int _handle;
 
     String _title = "Window";
@@ -64,8 +65,14 @@ struct Window
 
 public:
     int handle() { return this->_handle; }
-    int frontbuffer_handle() { return frontbuffer->handle(); }
-    int backbuffer_handle() { return backbuffer->handle(); }
+
+    int frontbuffer_handle() const { return frontbuffer->handle(); }
+
+    Vec2i frontbuffer_size() const { return frontbuffer->size(); }
+
+    int backbuffer_handle() const { return backbuffer->handle(); }
+
+    Vec2i backbuffer_size() const { return backbuffer->size(); }
 
     void title(String title);
     String title() { return _title; }
@@ -158,6 +165,22 @@ public:
     void widget_removed(Widget *widget);
 
     void register_widget_by_id(String id, Widget *widget);
+
+    void change_framebuffer_if_needed();
+
+    Border resize_bound_containe(Vec2i position);
+
+    void begin_resize(Vec2i mouse_position);
+
+    void do_resize(Vec2i mouse_position);
+
+    void end_resize();
+
+    Widget *child_at(Vec2i position);
+
+    /* --- Focus ------------------------------------------------------------ */
+
+    bool has_keyboard_focus(Widget *widget);
 
     /* --- Layout ----------------------------------------------------------- */
 

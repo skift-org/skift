@@ -131,12 +131,12 @@ void show_window(Window *window)
         .type = COMPOSITOR_MESSAGE_CREATE_WINDOW,
         .create_window = {
             .id = window->handle(),
-            .flags = window->_flags,
+            .flags = window->flags(),
             .type = window->type(),
             .frontbuffer = window->frontbuffer_handle(),
-            .frontbuffer_size = window->frontbuffer->size(),
+            .frontbuffer_size = window->frontbuffer_size(),
             .backbuffer = window->backbuffer_handle(),
-            .backbuffer_size = window->frontbuffer->size(),
+            .backbuffer_size = window->backbuffer_size(),
             .bound = window->bound_on_screen(),
         },
     };
@@ -170,9 +170,9 @@ void flip_window(Window *window, Recti dirty)
         .flip_window = {
             .id = window->handle(),
             .frontbuffer = window->frontbuffer_handle(),
-            .frontbuffer_size = window->frontbuffer->size(),
+            .frontbuffer_size = window->frontbuffer_size(),
             .backbuffer = window->backbuffer_handle(),
-            .backbuffer_size = window->frontbuffer->size(),
+            .backbuffer_size = window->backbuffer_size(),
             .dirty = dirty,
             .bound = window->bound_on_screen(),
         },

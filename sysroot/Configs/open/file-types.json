@@ -4,5 +4,8 @@
     },
     "text": {
         "open-with": "text-editor"
+    },
+    "archive": {
+        "open-with": "archive-manager"
     }
 }

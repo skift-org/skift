@@ -28,18 +28,18 @@ void tasking_initialize()
 {
     logger_info("Initializing tasking...");
 
-    Task *idle_task = task_spawn(nullptr, "Idle", system_hang, nullptr, false);
+    Task *idle_task = task_spawn(nullptr, "idle", system_hang, nullptr, false);
     task_go(idle_task);
     idle_task->state(TASK_STATE_HANG);
 
     scheduler_did_create_idle_task(idle_task);
 
-    Task *kernel_task = task_spawn(nullptr, "System", nullptr, nullptr, false);
+    Task *kernel_task = task_spawn(nullptr, "system", nullptr, nullptr, false);
     task_go(kernel_task);
 
     scheduler_did_create_running_task(kernel_task);
 
-    Task *garbage_task = task_spawn(nullptr, "GarbageCollector", garbage_collector, nullptr, false);
+    Task *garbage_task = task_spawn(nullptr, "garbage-collector", garbage_collector, nullptr, false);
     task_go(garbage_task);
 
     logger_info("Tasking initialized!");

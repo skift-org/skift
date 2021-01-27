@@ -50,7 +50,7 @@ private:
     }
 
 public:
-    size_t count()
+    size_t count() const
     {
         size_t result = 0;
 

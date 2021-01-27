@@ -40,7 +40,8 @@ UTILITIES = \
 	UNAME \
 	UNLINK \
 	UPTIME \
-	YES
+	YES \
+	ZIP
 
 __TESTEXEC_LIBS =
 __TESTEXEC_NAME = __testexec
@@ -170,6 +171,9 @@ SETTINGSCTL_NAME = settingsctl
 
 WALLPAPERCTL_LIBS = graphic
 WALLPAPERCTL_NAME = wallpaperctl
+
+ZIP_LIBS =
+ZIP_NAME = zip
 
 define UTIL_TEMPLATE =
 

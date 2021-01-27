@@ -95,7 +95,7 @@ public:
         return *this;
     }
 
-    Slice slice(size_t offset, size_t size)
+    Slice slice(size_t offset, size_t size) const
     {
         if (_storage != nullptr)
         {

@@ -39,6 +39,7 @@ UTILITIES = \
 	TRUE \
 	UNAME \
 	UNLINK \
+	UNZIP \
 	UPTIME \
 	YES \
 	ZIP
@@ -174,6 +175,9 @@ WALLPAPERCTL_NAME = wallpaperctl
 
 ZIP_LIBS =
 ZIP_NAME = zip
+
+UNZIP_LIBS = file
+UNZIP_NAME = unzip
 
 define UTIL_TEMPLATE =
 

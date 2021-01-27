@@ -12,7 +12,7 @@ public:
         return _entry_count;
     }
 
-    const char *get_entry_name(unsigned int entry_index) override;
+    Entry get_entry(unsigned int entry_index) override;
 
     Result extract(unsigned int entry_index, const char *dest_path) override;
     Result insert(const char *entry_name, const char *src_path) override;

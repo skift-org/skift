@@ -1,6 +1,5 @@
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
-#include <libsystem/io/Stream.h>
 
 #include "kernel/interrupts/Dispatcher.h"
 #include "kernel/interrupts/Interupts.h"

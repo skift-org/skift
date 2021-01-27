@@ -1,7 +1,9 @@
 #pragma once
 
+#include <abi/IOCall.h>
+#include <abi/Filesystem.h>
+
 #include <libsystem/Result.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/thread/Lock.h>
 #include <libutils/RefPtr.h>
 #include <libutils/ResultOr.h>

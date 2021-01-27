@@ -1,3 +1,5 @@
+#include <libsystem/io/Stream.h>
+
 #include "kernel/Configs.h"
 
 #include "kernel/drivers/LegacyKeyboard.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <abi/Handle.h>
+
 #include "kernel/node/Node.h"
 
 class FsHandle

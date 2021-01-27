@@ -2,7 +2,6 @@
 
 #include <libsystem/Assert.h>
 #include <libsystem/core/CString.h>
-#include <libsystem/io/Stream.h>
 #include <libutils/Iteration.h>
 
 #include "kernel/bus/LegacyAddress.h"

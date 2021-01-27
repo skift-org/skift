@@ -15,19 +15,18 @@ enum BlockType
 class Inflate
 {
 public:
-    Result Perform(Vector<uint8_t> input, Vector<uint8_t> output);
+    Result perform(Vector<uint8_t> input, Vector<uint8_t> output);
 
 private:
-    void buildFixedHuffmanAlphabet();
-    void buildHuffmanAlphabet(Vector<unsigned int> &alphabet, Vector<unsigned int> codeBitLengths);
+    void build_fixed_huffman_alphabet();
+    void build_huffman_alphabet(Vector<unsigned int> &alphabet, Vector<unsigned int> code_bit_lengths);
 
-    void getBitLengthCount(HashMap<unsigned int, unsigned int> &bitLengthCount, Vector<unsigned int> &codeBitLengths);
-    void getFirstCode(HashMap<unsigned int, unsigned int> &firstCodes, HashMap<unsigned int, unsigned int> &bitLengthCount);
-    void assignHuffmanCodes(Vector<unsigned int> assignedCodes, Vector<unsigned int> &codeBitLengths, HashMap<unsigned int, unsigned int> &firstCodes);
-    unsigned int decodeHuffman(BitStream input, Vector<unsigned int> &alphabet, Vector<unsigned int> &codeBitLengths);
+    void get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths);
+    void get_first_code(HashMap<unsigned int, unsigned int> &firstCodes, HashMap<unsigned int, unsigned int> &bit_length_count);
+    void assign_huffman_codes(Vector<unsigned int> assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes);
 
-    Vector<unsigned int> _fixedAlphabet;
-    Vector<unsigned int> _fixedCodeBitLengths;
-    Vector<unsigned int> _fixedDistAlphabet;
-    Vector<unsigned int> _fixedDistCodeBitLengths;
+    Vector<unsigned int> _fixed_alphabet;
+    Vector<unsigned int> _fixed_code_bit_lengths;
+    Vector<unsigned int> _fixed_dist_alphabet;
+    Vector<unsigned int> _fixed_dist_code_bit_lengths;
 };

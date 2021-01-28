@@ -18,26 +18,16 @@ public:
         _index += num_bits;
     }
 
-    // Align our index to byte boundaries
-    inline uint8_t grab_byte()
-    {
-        auto alignment = _index % 8;
-        if (alignment > 0)
-            _index += (8 - alignment);
-
-        uint8_t byte = _index / 8;
-        _index += 8;
-        return byte;
-    }
-
     inline uint16_t grab_short()
     {
-        return grab_byte() + (grab_byte() << 8);
+        uint16_t result = _data[_index / 8] + (_data[(_index / 8) + 1] << 8);
+        _index += 16;
+        return result;
     }
 
-    inline bool peek_bit()
+    inline uint8_t peek_bit()
     {
-        return (_data[_index / 8] & (1 << (_index % 8)));
+        return (_data[_index / 8] & (1 << (_index % 8))) ? 1 : 0;
     }
 
     inline unsigned int grab_bits(unsigned int num_bits)
@@ -61,13 +51,13 @@ public:
 
     inline unsigned int grab_bits_reverse(unsigned int num_bits)
     {
-        unsigned int retVal = 0;
+        unsigned int ret_val = 0;
         for (unsigned int i = 0; i != num_bits; i++)
         {
-            retVal |= (unsigned int)peek_bit() << ((num_bits - 1) - i);
+            ret_val |= (unsigned int)peek_bit() << ((num_bits - 1) - i);
             _index++;
         }
-        return retVal;
+        return ret_val;
     }
 
     inline unsigned int peek_bits_reverse(unsigned int num_bits)

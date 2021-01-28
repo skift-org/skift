@@ -92,7 +92,7 @@ void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const V
             assigned_codes[i] = 0;
 }
 
-void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, Vector<unsigned int> code_bit_lengths)
+void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int>& code_bit_lengths)
 {
     HashMap<unsigned int, unsigned int> bit_length_count, first_codes;
 
@@ -137,12 +137,11 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
     const Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
     Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    while (true)
+    unsigned int bfinal;
+    do
     {
-        unsigned int bfinal = input.grab_bits(1);
+        bfinal = input.grab_bits(1);
         unsigned int btype = input.grab_bits(2);
-
-        printf("Process block: btype: %u bfinal: %u\n", btype, bfinal);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
@@ -150,7 +149,7 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
             // Align to byte bounadries
             input.skip_bits(5);
             auto len = input.grab_short();
-            printf("Uncompressed block: len: %u\n", len);
+
             // Skip complement of LEN
             input.skip_bits(16);
 
@@ -166,13 +165,11 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
-                printf("Build fixed huffman alphabet\n");
                 build_fixed_huffman_alphabet();
             }
             // Use a dynamic huffman alphabet
             else
             {
-                printf("Build dynamic huffman alphabet\n");
                 unsigned int hlit = input.grab_bits(5) + 257;
                 unsigned int hdist = input.grab_bits(5) + 1;
                 unsigned int hclen = input.grab_bits(4) + 4;
@@ -183,7 +180,6 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
                     return Result::ERR_INVALID_DATA;
                 }
 
-                printf("HCLEN: %u\n", hclen);
                 for (unsigned int i = 0; i < hclen; i++)
                 {
                     code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
@@ -197,7 +193,6 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
                 while (lit_len_and_dist_trees_unpacked.count() < (hdist + hlit))
                 {
                     unsigned int decoded_value = huffman.decode(input);
-                    //printf("D:%u ", decoded_value);
 
                     // Everything below 16 corresponds directly to a codelength. See https://tools.ietf.org/html/rfc1951#section-3.2.7
                     if (decoded_value < 16)
@@ -279,11 +274,8 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
         {
             return Result::ERR_INVALID_DATA;
         }
-
-        // Stop when we reached the final block
-        if (bfinal)
-            return Result::SUCCESS;
     }
+    while(!bfinal);
 
     return Result::SUCCESS;
 }

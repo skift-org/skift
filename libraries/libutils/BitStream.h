@@ -5,7 +5,7 @@
 class BitStream
 {
 public:
-    inline BitStream(Vector<uint8_t> data) : _data(data.raw_storage()), _size(data.count())
+    inline BitStream(const Vector<uint8_t>& data) : _data(data.raw_storage()), _size(data.count())
     {
     }
 

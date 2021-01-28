@@ -57,7 +57,7 @@ public:
 
     bool any() const { return !empty(); }
 
-    T *raw_storage() { return _storage; }
+    T *raw_storage() const { return _storage; }
 
     T &at(size_t index)
     {

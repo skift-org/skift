@@ -33,7 +33,6 @@ int main(int argc, char **argv)
         {
             auto &entry = archive.get_entry(i);
             printf("Entry: %s is being extracted...\n", entry.name.cstring());
-            printf("Compressed: %u Uncompressed: %u\n", entry.compressed_size, entry.uncompressed_size);
 
             archive.extract(i, entry.name.cstring());
         }

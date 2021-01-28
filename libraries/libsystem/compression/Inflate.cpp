@@ -1,5 +1,7 @@
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/compression/Inflate.h>
+#include <libsystem/Assert.h>
+#include <libsystem/io/Stream.h>
 
 static constexpr unsigned int BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
@@ -79,7 +81,7 @@ void Inflate::get_first_code(HashMap<unsigned int, unsigned int> &first_codes, H
     }
 }
 
-void Inflate::assign_huffman_codes(Vector<unsigned int> assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
+void Inflate::assign_huffman_codes(Vector<unsigned int>& assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
 {
     assigned_codes.resize(code_bit_lengths.count());
 
@@ -126,11 +128,12 @@ void Inflate::build_fixed_huffman_alphabet()
     build_huffman_alphabet(_fixed_dist_alphabet, _fixed_dist_code_bit_lengths);
 }
 
-Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
+Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t>& output)
 {
+    assert(input_data.count() > 0);
+    printf("Start inflate: %u\n", input_data.count());
     BitStream input(input_data);
-    // ZLib Header
-    input.grab_bits(16);
+    input.skip_bits(16);
 
     Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
     Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -138,19 +141,22 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
     while (true)
     {
         unsigned int bfinal = input.grab_bits(1);
-        __unused(bfinal);
         unsigned int btype = input.grab_bits(2);
+
+        printf("Process block: btype: %u bfinal: %u\n", btype, bfinal);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
         {
-            // This aligns to the next byte boundary (skips 5 bits)
+            // Align to byte bounadries
+            input.skip_bits(5);
             auto len = input.grab_short();
+            printf("Uncompressed block: len: %u\n",len);
             // Skip complement of LEN
             input.skip_bits(16);
 
             for (int i = 0; i != len; i++)
-                output.push_back(input.grab_byte());
+                output.push_back(input.grab_bits(8));
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
@@ -161,15 +167,25 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
+                printf("Build fixed huffman alphabet\n");
                 build_fixed_huffman_alphabet();
             }
             // Use a dynamic huffman alphabet
             else
             {
+                printf("Build dynamic huffman alphabet\n");
                 unsigned int hlit = input.grab_bits(5) + 257;
                 unsigned int hdist = input.grab_bits(5) + 1;
                 unsigned int hclen = input.grab_bits(4) + 4;
 
+                // See: https://github.com/madler/zlib/issues/82
+                if (hlit > 286 || hdist > 30)
+	        	{
+                    // TODO: come up with better error code
+                    return Result::ERR_INVALID_ARGUMENT;
+                }
+
+                printf("HCLEN: %u\n",hclen);
                 for (unsigned int i = 0; i < hclen; i++)
                 {
                     code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
@@ -183,6 +199,7 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
                 while (lit_len_and_dist_trees_unpacked.count() < (hdist + hlit))
                 {
                     unsigned int decoded_value = huffman.decode(input);
+                    //printf("D:%u ", decoded_value);
 
                     // Everything below 16 corresponds directly to a codelength. See https://tools.ietf.org/html/rfc1951#section-3.2.7
                     if (decoded_value < 16)
@@ -199,7 +216,7 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
                     // 3-6
                     case 16:
                         repeat_count = input.grab_bits(2) + 3;
-                        code_length_to_repeat = lit_len_and_dist_trees_unpacked[lit_len_and_dist_trees_unpacked.count() - 1];
+                        code_length_to_repeat = lit_len_and_dist_trees_unpacked.peek_back();
                         break;
                     // 3-10
                     case 17:
@@ -260,5 +277,11 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t> output)
                 }
             }
         }
+
+        // Stop when we reached the final block
+        if(bfinal)
+            return Result::SUCCESS;
     }
+
+    return Result::SUCCESS;
 }

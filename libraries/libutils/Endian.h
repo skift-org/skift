@@ -37,7 +37,7 @@ constexpr TValue swap_big_endian(TValue value)
 }
 
 template <typename TValue>
-class BigEndian
+class __packed BigEndian
 {
 private:
     TValue _value{0};

@@ -35,9 +35,9 @@ Color Widget::color(ThemeColorRole role)
         }
     }
 
-    if (_colors[role].overwritten)
+    if (_colors[role])
     {
-        return _colors[role].color;
+        return *_colors[role];
     }
 
     return _window->color(role);
@@ -45,8 +45,7 @@ Color Widget::color(ThemeColorRole role)
 
 void Widget::color(ThemeColorRole role, Color color)
 {
-    _colors[role].overwritten = true;
-    _colors[role].color = color;
+    _colors[role] = color;
 
     should_repaint();
 }
@@ -99,7 +98,7 @@ void Widget::do_layout()
     switch (_layout.type)
     {
 
-    case LAYOUT_STACK:
+    case Layout::STACK:
     {
         _childs.foreach ([this](Widget *child) {
             if (child->flags() & FILL)
@@ -137,7 +136,7 @@ void Widget::do_layout()
     }
     break;
 
-    case LAYOUT_GRID:
+    case Layout::GRID:
     {
         int index = 0;
 
@@ -155,7 +154,7 @@ void Widget::do_layout()
     }
     break;
 
-    case LAYOUT_HGRID:
+    case Layout::HGRID:
     {
         int index = 0;
 
@@ -169,7 +168,7 @@ void Widget::do_layout()
     }
     break;
 
-    case LAYOUT_VGRID:
+    case Layout::VGRID:
     {
         int index = 0;
 
@@ -183,7 +182,7 @@ void Widget::do_layout()
     }
     break;
 
-    case LAYOUT_HFLOW:
+    case Layout::HFLOW:
     {
         int fixed_child_count = 0;
         int fixed_child_total_width = 0;
@@ -262,7 +261,7 @@ void Widget::do_layout()
     }
     break;
 
-    case LAYOUT_VFLOW:
+    case Layout::VFLOW:
     {
         int fixed_child_count = 0;
         int fixed_child_total_height = 0;
@@ -372,7 +371,7 @@ Vec2i Widget::size()
     int width = 0;
     int height = 0;
 
-    if (_layout.type == LAYOUT_STACK)
+    if (_layout.type == Layout::STACK)
     {
         _childs.foreach ([&](auto child) {
             Vec2i child_size = child->compute_size();
@@ -383,7 +382,7 @@ Vec2i Widget::size()
             return Iteration::CONTINUE;
         });
     }
-    else if (_layout.type == LAYOUT_GRID)
+    else if (_layout.type == Layout::GRID)
     {
         _childs.foreach ([&](auto child) {
             Vec2i child_size = child->compute_size();
@@ -407,14 +406,14 @@ Vec2i Widget::size()
 
             switch (_layout.type)
             {
-            case LAYOUT_HFLOW:
-            case LAYOUT_HGRID:
+            case Layout::HFLOW:
+            case Layout::HGRID:
                 width += child_size.x();
                 height = MAX(height, child_size.y());
                 break;
 
-            case LAYOUT_VFLOW:
-            case LAYOUT_VGRID:
+            case Layout::VFLOW:
+            case Layout::VGRID:
                 width = MAX(width, child_size.x());
                 height += child_size.y();
                 break;
@@ -428,12 +427,12 @@ Vec2i Widget::size()
             return Iteration::CONTINUE;
         });
 
-        if (_layout.type == LAYOUT_HFLOW || _layout.type == LAYOUT_HGRID)
+        if (_layout.type == Layout::HFLOW || _layout.type == Layout::HGRID)
         {
             width += _layout.spacing.x() * (_childs.count() - 1);
         }
 
-        if (_layout.type == LAYOUT_VFLOW || _layout.type == LAYOUT_VGRID)
+        if (_layout.type == Layout::VFLOW || _layout.type == Layout::VGRID)
         {
             height += _layout.spacing.y() * (_childs.count() - 1);
         }

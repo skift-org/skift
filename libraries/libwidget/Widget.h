@@ -12,19 +12,19 @@ class Widget;
 class Painter;
 struct Window;
 
-enum LayoutType
-{
-    LAYOUT_STACK,
-    LAYOUT_GRID,
-    LAYOUT_VGRID,
-    LAYOUT_HGRID,
-    LAYOUT_VFLOW,
-    LAYOUT_HFLOW,
-};
-
 struct Layout
 {
-    LayoutType type;
+    enum Type
+    {
+        STACK,
+        GRID,
+        VGRID,
+        HGRID,
+        VFLOW,
+        HFLOW,
+    };
+
+    Type type;
 
     int hcell;
     int vcell;
@@ -32,37 +32,22 @@ struct Layout
 };
 
 #define STACK() \
-    ((Layout){LAYOUT_STACK, 0, 0, Vec2i::zero()})
+    (Layout{Layout::STACK, 0, 0, Vec2i::zero()})
 
 #define GRID(_hcell, _vcell, _hspacing, _vspacing) \
-    ((Layout){LAYOUT_GRID, (_hcell), (_vcell), Vec2i((_hspacing), (_vspacing))})
+    (Layout{Layout::GRID, (_hcell), (_vcell), Vec2i((_hspacing), (_vspacing))})
 
 #define VGRID(_vspacing) \
-    ((Layout){LAYOUT_VGRID, 0, 0, Vec2i(0, (_vspacing))})
+    (Layout{Layout::VGRID, 0, 0, Vec2i(0, (_vspacing))})
 
 #define HGRID(_hspacing) \
-    ((Layout){LAYOUT_HGRID, 0, 0, Vec2i((_hspacing), 0)})
+    (Layout{Layout::HGRID, 0, 0, Vec2i((_hspacing), 0)})
 
 #define VFLOW(_vspacing) \
-    ((Layout){LAYOUT_VFLOW, 0, 0, Vec2i(0, (_vspacing))})
+    (Layout{Layout::VFLOW, 0, 0, Vec2i(0, (_vspacing))})
 
 #define HFLOW(_hspacing) \
-    ((Layout){LAYOUT_HFLOW, 0, 0, Vec2i((_hspacing), 0)})
-
-struct WidgetColor
-{
-    bool overwritten;
-    Color color;
-};
-
-struct WidgetMetrics
-{
-    Vec2i origin;
-
-    Recti overflow;
-    Recti bound;
-    Recti content;
-};
+    (Layout{Layout::HFLOW, 0, 0, Vec2i((_hspacing), 0)})
 
 class Widget
 {
@@ -80,7 +65,7 @@ private:
     Insetsi _outsets{};
     Insetsi _insets{};
 
-    WidgetColor _colors[__THEME_COLOR_COUNT] = {};
+    Optional<Color> _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
     RefPtr<Font> _font;
 

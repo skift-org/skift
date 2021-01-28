@@ -1,6 +1,6 @@
+#include <libsystem/Assert.h>
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/compression/Inflate.h>
-#include <libsystem/Assert.h>
 #include <libsystem/io/Stream.h>
 
 static constexpr unsigned int BASE_LENGTH_EXTRA_BITS[] = {
@@ -81,7 +81,7 @@ void Inflate::get_first_code(HashMap<unsigned int, unsigned int> &first_codes, H
     }
 }
 
-void Inflate::assign_huffman_codes(Vector<unsigned int>& assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
+void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const Vector<unsigned int> &code_bit_lengths, HashMap<unsigned int, unsigned int> &first_codes)
 {
     assigned_codes.resize(code_bit_lengths.count());
 
@@ -128,14 +128,13 @@ void Inflate::build_fixed_huffman_alphabet()
     build_huffman_alphabet(_fixed_dist_alphabet, _fixed_dist_code_bit_lengths);
 }
 
-Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t>& output)
+Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &output)
 {
     assert(input_data.count() > 0);
     printf("Start inflate: %u\n", input_data.count());
     BitStream input(input_data);
-    input.skip_bits(16);
 
-    Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
+    const Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
     Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     while (true)
@@ -151,7 +150,7 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t>& output)
             // Align to byte bounadries
             input.skip_bits(5);
             auto len = input.grab_short();
-            printf("Uncompressed block: len: %u\n",len);
+            printf("Uncompressed block: len: %u\n", len);
             // Skip complement of LEN
             input.skip_bits(16);
 
@@ -180,12 +179,11 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t>& output)
 
                 // See: https://github.com/madler/zlib/issues/82
                 if (hlit > 286 || hdist > 30)
-	        	{
-                    // TODO: come up with better error code
-                    return Result::ERR_INVALID_ARGUMENT;
+                {
+                    return Result::ERR_INVALID_DATA;
                 }
 
-                printf("HCLEN: %u\n",hclen);
+                printf("HCLEN: %u\n", hclen);
                 for (unsigned int i = 0; i < hclen; i++)
                 {
                     code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
@@ -277,9 +275,13 @@ Result Inflate::perform(Vector<uint8_t> input_data, Vector<uint8_t>& output)
                 }
             }
         }
+        else
+        {
+            return Result::ERR_INVALID_DATA;
+        }
 
         // Stop when we reached the final block
-        if(bfinal)
+        if (bfinal)
             return Result::SUCCESS;
     }
 

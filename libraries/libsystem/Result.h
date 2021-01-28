@@ -14,6 +14,7 @@
     __ENTRY(ERR_FUNCTION_NOT_IMPLEMENTED, "Function not implemented")             \
     __ENTRY(ERR_INAPPROPRIATE_CALL_FOR_DEVICE, "Inappropriate call for device")   \
     __ENTRY(ERR_INVALID_ARGUMENT, "Invalid argument")                             \
+    __ENTRY(ERR_INVALID_DATA, "Invalid data")                                     \
     __ENTRY(ERR_IS_A_DIRECTORY, "File is a directory")                            \
     __ENTRY(ERR_MEMORY_NOT_ALIGNED, "Memory not aligned")                         \
     __ENTRY(ERR_NO_SUCH_DEVICE, "No such device")                                 \

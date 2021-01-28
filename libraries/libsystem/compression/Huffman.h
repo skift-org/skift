@@ -1,7 +1,7 @@
 #pragma once
-#include <libutils/BitStream.h>
 #include <libsystem/Assert.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/BitStream.h>
 
 class HuffmanDecoder
 {
@@ -30,7 +30,7 @@ public:
             unsigned int code = input.peek_bits_reverse(cbl);
             if (_alphabet[i] == code)
             {
-                printf("Decoded symbol: i:%u code:%u\n",i,_alphabet[i]);
+                printf("Decoded symbol: i:%u code:%u\n", i, _alphabet[i]);
                 input.grab_bits(cbl);
                 return i;
             }

@@ -161,7 +161,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
 
     File dest_file(dest_path);
     dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());
-    __unused(entry_index);
+
     // TODO: use inflate to extract the compressed entry and write it to the dest_path
     return Result::SUCCESS;
 }

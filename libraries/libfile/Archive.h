@@ -12,14 +12,23 @@ public:
         String name;
         unsigned int uncompressed_size;
         unsigned int compressed_size;
+        unsigned int archive_offset;
+        unsigned int compression;
     };
 
     Archive(File file) : _file(file)
     {
     }
 
-    virtual unsigned int get_entry_count() = 0;
-    virtual Entry get_entry(unsigned int entry_index) = 0;
+    inline unsigned int get_entry_count()
+    {
+        return _entries.count();
+    }
+
+    inline Entry &get_entry(unsigned int entry_index)
+    {
+        return _entries[entry_index];
+    }
 
     virtual Result extract(unsigned int entry_index, const char *dest_path) = 0;
     virtual Result insert(const char *entry_name, const char *src_dir) = 0;

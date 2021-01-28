@@ -11,6 +11,7 @@ KERNEL_LIBRARIES_SOURCES = \
 	$(wildcard libraries/libfile/*.cpp) \
 	$(wildcard libraries/libsystem/json/*.cpp) \
 	$(wildcard libraries/libsystem/*.cpp) \
+	$(wildcard libraries/libsystem/compression/*.cpp) \
 	$(wildcard libraries/libsystem/io/*.cpp) \
 	$(wildcard libraries/libsystem/compat/ctype.cpp) \
 	$(wildcard libraries/libsystem/unicode/*.cpp) \

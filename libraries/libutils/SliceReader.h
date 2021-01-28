@@ -8,15 +8,22 @@ public:
     SliceReader(Slice &slice) : _slice(slice)
     {
     }
+
+    template<typename T>
+    inline T peek()
+    {
+        auto size = sizeof(T);
+        auto sub_slice = _slice.slice(_index,size);
+        return *(T*)sub_slice.start();
+    }
     
     template<typename T>
     inline T get()
     {
         //TODO: check size
-        auto size = sizeof(T);
-        auto sub_slice = _slice.slice(_index,size);
-        _index += size;
-        return *(T*)sub_slice.start();
+        const auto& result = peek<T>();
+        _index += sizeof(T);
+        return result; 
     }
 
     inline String get_fixed_len_string(unsigned int len)
@@ -24,12 +31,17 @@ public:
         auto sub_slice = _slice.slice(_index,len);
         const char* cstr = reinterpret_cast<const char*>(sub_slice.start());
         _index += len;
-        return String(cstr,len);
+        return String(make<StringStorage>(cstr,len));
     }
 
     inline void skip(unsigned int num_bytes)
     {
         _index += num_bytes;
+    }
+
+    inline unsigned int index()
+    {
+        return _index;
     }
 
     inline bool good()

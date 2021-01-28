@@ -8,7 +8,6 @@
 #include <libwidget/Event.h>
 #include <libwidget/Theme.h>
 
-class Widget;
 class Painter;
 struct Window;
 
@@ -64,6 +63,7 @@ private:
 
     Insetsi _outsets{};
     Insetsi _insets{};
+    Vec2i _content_scroll{};
 
     Optional<Color> _colors[__THEME_COLOR_COUNT] = {};
     Layout _layout = {};
@@ -83,6 +83,7 @@ public:
     static constexpr auto GREEDY = (1 << 1);
     static constexpr auto SQUARE = (1 << 2);
     static constexpr auto NO_MOUSE_HIT = (1 << 3);
+    static constexpr auto NOT_AFFECTED_BY_SCROLL = (1 << 4);
 
     void id(String id);
 
@@ -184,14 +185,25 @@ public:
     }
 
     Recti container() const { return _container; }
+
     void container(Recti container) { _container = container; }
 
     Vec2i origin() const
     {
-        return {
-            _outsets.left() + container().x(),
-            _outsets.top() + container().y(),
-        };
+        if (_parent && !(_flags & NOT_AFFECTED_BY_SCROLL))
+        {
+            return {
+                _outsets.left() + container().x() - _parent->scroll().x(),
+                _outsets.top() + container().y() - _parent->scroll().y(),
+            };
+        }
+        else
+        {
+            return {
+                _outsets.left() + container().x(),
+                _outsets.top() + container().y(),
+            };
+        }
     }
 
     Recti bound() const { return container().shrinked(_outsets).size(); }
@@ -199,6 +211,14 @@ public:
     Recti content() const { return bound().shrinked(_insets); }
 
     Recti overflow() const { return bound().expended(_outsets); }
+
+    Vec2i scroll() { return _content_scroll; }
+
+    void scroll(Vec2i content_scroll)
+    {
+        _content_scroll = content_scroll;
+        should_repaint();
+    }
 
     /* --- Enable/Disable state --------------------------------------------- */
 

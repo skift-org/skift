@@ -510,7 +510,7 @@ Widget *Widget::child_at(Vec2i position)
         return result;
     }
 
-    _childs.foreach ([&](Widget *child) {
+    _childs.foreach_reversed([&](Widget *child) {
         if (!(child->flags() & NO_MOUSE_HIT) && child->container().contains(position))
         {
             result = child->child_at(position - child->origin());

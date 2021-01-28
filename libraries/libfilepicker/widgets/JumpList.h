@@ -3,6 +3,7 @@
 #include <libwidget/Button.h>
 #include <libwidget/Label.h>
 #include <libwidget/Panel.h>
+#include <libwidget/VScroll.h>
 
 #include <libfilepicker/model/Bookmarks.h>
 #include <libfilepicker/model/Navigation.h>
@@ -18,34 +19,40 @@ private:
 
     OwnPtr<Observer<Bookmarks>> _bookmark_observer;
 
+    VScroll *_listing;
+
 public:
     JumpList(Widget *parent, RefPtr<Navigation> navigation, RefPtr<Bookmarks> bookmarks)
         : Panel(parent),
           _navigation(navigation),
           _bookmarks(bookmarks)
     {
-        layout(VFLOW(4));
+        layout(VFLOW(6));
         insets(Insetsi{4});
 
         _bookmark_observer = bookmarks->observe([this](auto &) {
             render();
         });
 
+        new Label(this, "Bookmarks");
+
+        _listing = new VScroll(this);
+        _listing->flags(Widget::FILL);
+
         render();
     }
 
     void render()
     {
-        clear_children();
-
-        new Label(this, "Bookmarks");
+        _listing->host()->clear_children();
+        _listing->host()->layout(VFLOW(4));
 
         for (size_t i = 0; i < _bookmarks->all().count(); i++)
         {
             auto bookmark = _bookmarks->all()[i];
 
             auto button = new Button(
-                this,
+                _listing->host(),
                 Button::TEXT,
                 bookmark.icon(),
                 bookmark.name());

@@ -218,6 +218,20 @@ public:
         return Iteration::CONTINUE;
     }
 
+    template <typename Callback>
+    Iteration foreach_reversed(Callback callback) const
+    {
+        for (size_t i = _count; i > 0; i--)
+        {
+            if (callback(_storage[i - 1]) == Iteration::STOP)
+            {
+                return Iteration::STOP;
+            }
+        }
+
+        return Iteration::CONTINUE;
+    }
+
     template <typename Comparator>
     void sort(Comparator comparator)
     {

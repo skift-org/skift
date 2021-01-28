@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libwidget/Container.h>
+#include <libwidget/VScroll.h>
 
 namespace panel
 {
 
-class ApplicationListing : public Container
+class ApplicationListing : public VScroll
 {
 private:
     String _filter;

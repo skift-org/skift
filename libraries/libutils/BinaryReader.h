@@ -2,10 +2,10 @@
 #include <libutils/Slice.h>
 #include <libutils/String.h>
 
-class SliceReader
+class BinaryReader
 {
 public:
-    SliceReader(Slice &slice) : _slice(slice)
+    BinaryReader(Slice &slice) : _slice(slice)
     {
     }
 

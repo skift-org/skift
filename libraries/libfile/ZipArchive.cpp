@@ -1,5 +1,6 @@
 #include <libfile/ZipArchive.h>
 #include <libsystem/Logger.h>
+#include <libsystem/compression/Deflate.h>
 #include <libsystem/compression/Inflate.h>
 #include <libutils/Endian.h>
 #include <libutils/SliceReader.h>
@@ -160,7 +161,7 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     Vector<uint8_t> uncompressed_data(entry.uncompressed_size);
 
     auto result = inf.perform(compressed_data, uncompressed_data);
-    if(result != Result::SUCCESS)
+    if (result != Result::SUCCESS)
     {
         return result;
     }
@@ -168,14 +169,33 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     File dest_file(dest_path);
     dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());
 
-    // TODO: use inflate to extract the compressed entry and write it to the dest_path
     return Result::SUCCESS;
 }
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)
 {
+    File in_file(src_path);
+    ResultOr<Slice> content = in_file.read_all();
+
+    if (!content.success())
+    {
+        return content.result();
+    }
+
+    // Read the uncompressed data from the file
+    Slice slice_uncompressed = content.value();
+    Deflate def(5);
+    Vector<uint8_t> uncompressed_data(ADOPT, (uint8_t *)slice_uncompressed.start(), slice_uncompressed.size());
+
+    Vector<uint8_t> compressed_data;
+    auto result = def.perform(uncompressed_data, compressed_data);
+    if (result != Result::SUCCESS)
+    {
+        return result;
+    }
+
+    // TODO: create a new entry and write it to the output file
+
     __unused(entry_name);
-    __unused(src_path);
-    // TODO: use deflate to compress the src_path and store it in entry_name
     return Result::ERR_FUNCTION_NOT_IMPLEMENTED;
 }

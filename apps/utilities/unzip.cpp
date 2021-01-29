@@ -34,7 +34,11 @@ int main(int argc, char **argv)
             auto &entry = archive.get_entry(i);
             printf("Entry: %s is being extracted...\n", entry.name.cstring());
 
-            archive.extract(i, entry.name.cstring());
+            auto result = archive.extract(i, entry.name.cstring());
+            if(result != Result::SUCCESS)
+            {
+                stream_format(err_stream, "%s: Failed to extract entry with error %i", entry.name.cstring(), result);
+            }
         }
     }
 

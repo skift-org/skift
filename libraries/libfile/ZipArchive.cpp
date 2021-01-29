@@ -151,13 +151,19 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
         return content.result();
     }
 
+    // Read the compressed data from the file
     Slice slice_compressed = content.value().slice(entry.archive_offset, entry.compressed_size);
     Inflate inf;
     Vector<uint8_t> compressed_data(ADOPT, (uint8_t *)slice_compressed.start(), slice_compressed.size());
-    Vector<uint8_t> uncompressed_data;
-    inf.perform(compressed_data, uncompressed_data);
 
-    printf("Uncompressed size: %u\n", uncompressed_data.count());
+    // Pre-Allocate the uncompressed output buffer
+    Vector<uint8_t> uncompressed_data(entry.uncompressed_size);
+
+    auto result = inf.perform(compressed_data, uncompressed_data);
+    if(result != Result::SUCCESS)
+    {
+        return result;
+    }
 
     File dest_file(dest_path);
     dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());

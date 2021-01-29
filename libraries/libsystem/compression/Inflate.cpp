@@ -1,4 +1,5 @@
 #include <libsystem/Assert.h>
+#include <libsystem/compression/Common.h>
 #include <libsystem/compression/Huffman.h>
 #include <libsystem/compression/Inflate.h>
 #include <libsystem/io/Stream.h>
@@ -92,7 +93,7 @@ void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const V
             assigned_codes[i] = 0;
 }
 
-void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int>& code_bit_lengths)
+void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int> &code_bit_lengths)
 {
     HashMap<unsigned int, unsigned int> bit_length_count, first_codes;
 
@@ -101,6 +102,7 @@ void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vecto
     assign_huffman_codes(alphabet, code_bit_lengths, first_codes);
 }
 
+// TODO: use a constexpr function to calculate these tables
 void Inflate::build_fixed_huffman_alphabet()
 {
     if (_fixed_code_bit_lengths.count())
@@ -128,11 +130,10 @@ void Inflate::build_fixed_huffman_alphabet()
     build_huffman_alphabet(_fixed_dist_alphabet, _fixed_dist_code_bit_lengths);
 }
 
-Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &output)
+Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &uncompressed)
 {
-    assert(input_data.count() > 0);
-    printf("Start inflate: %u\n", input_data.count());
-    BitStream input(input_data);
+    assert(compressed.count() > 0);
+    BitReader input(compressed);
 
     const Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
     Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -154,7 +155,7 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
             input.skip_bits(16);
 
             for (int i = 0; i != len; i++)
-                output.push_back(input.grab_bits(8));
+                uncompressed.push_back(input.grab_bits(8));
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
@@ -248,7 +249,7 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
                 unsigned int decoded_symbol = symbol_decoder.decode(input);
                 if (decoded_symbol <= 255)
                 {
-                    output.push_back((unsigned char)decoded_symbol);
+                    uncompressed.push_back((unsigned char)decoded_symbol);
                 }
                 else if (decoded_symbol == 256)
                 {
@@ -261,11 +262,11 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
                     unsigned int dist_code = dist_decoder.decode(input);
 
                     unsigned int total_dist = BASE_DISTANCE[dist_code] + input.grab_bits(BASE_DISTANCE_EXTRA_BITS[dist_code]);
-                    unsigned char *pos = &output[output.count() - total_dist];
+                    unsigned char *pos = &uncompressed[uncompressed.count() - total_dist];
                     for (unsigned int i = 0; i != total_length; i++)
                     {
-                        output.push_back(*pos);
-                        pos = &output[output.count() - total_dist];
+                        uncompressed.push_back(*pos);
+                        pos = &uncompressed[uncompressed.count() - total_dist];
                     }
                 }
             }
@@ -274,8 +275,7 @@ Result Inflate::perform(const Vector<uint8_t> &input_data, Vector<uint8_t> &outp
         {
             return Result::ERR_INVALID_DATA;
         }
-    }
-    while(!bfinal);
+    } while (!bfinal);
 
     return Result::SUCCESS;
 }

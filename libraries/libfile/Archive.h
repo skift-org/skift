@@ -46,5 +46,5 @@ public:
 protected:
     Vector<Entry> _entries;
     File _file;
-    bool _valid = false;
+    bool _valid = true;
 };

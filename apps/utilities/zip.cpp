@@ -1,8 +1,7 @@
 
+#include <libfile/ZipArchive.h>
 #include <libsystem/io/File.h>
-#include <libsystem/io/Filesystem.h>
 #include <libsystem/io/Stream.h>
-#include <libutils/Path.h>
 
 int main(int argc, char **argv)
 {
@@ -19,13 +18,23 @@ int main(int argc, char **argv)
     }
 
     File file{argv[1]};
-
-    Result result = file.copy(argv[2]);
-
-    if (result != SUCCESS)
+    if (file.exist())
     {
-        stream_format(err_stream, "%s: Failed to copy '%s' to '%s': %s", argv[1], argv[2], get_result_description(result));
+        stream_format(err_stream, "%s: Destination archive already exists '%s'\n", argv[0], argv[1]);
         return PROCESS_FAILURE;
+    }
+
+    ZipArchive archive(file, false);
+
+    // Pack all files that were passed as arguments
+    for (int i = 2; i < argc; i++)
+    {
+        printf("%s: Entry: %s is being inserted...\n", argv[0], argv[i]);
+        auto result = archive.insert(argv[i], argv[i]);
+        if (result != Result::SUCCESS)
+        {
+            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], argv[i], result);
+        }
     }
 
     return PROCESS_SUCCESS;

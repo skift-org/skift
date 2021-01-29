@@ -9,35 +9,36 @@ int main(int argc, char **argv)
 {
     if (argc == 1)
     {
-        stream_format(err_stream, "%s: Missing archive operand(s)\n", argv[0]);
+        stream_format(err_stream, "%s: Missing archive argument(s)\n", argv[0]);
         return PROCESS_FAILURE;
     }
 
+    // Unzip all archives that were passed as arguments
     for (int i = 1; i < argc; i++)
     {
         File file{argv[i]};
         if (!file.exist())
         {
-            stream_format(err_stream, "%s: File does not exist", argv[i]);
+            stream_format(err_stream, "%s: File does not exist '%s'", argv[0], argv[i]);
         }
 
         ZipArchive archive(file);
 
         if (!archive.valid())
         {
-            stream_format(err_stream, "%s: Failed to read zip archive", argv[i]);
+            stream_format(err_stream, "%s: Failed to read zip archive '%s'", argv[0], argv[i]);
             return PROCESS_FAILURE;
         }
 
         for (unsigned int i = 0; i < archive.get_entry_count(); i++)
         {
             auto &entry = archive.get_entry(i);
-            printf("Entry: %s is being extracted...\n", entry.name.cstring());
+            printf("%s: Entry: %s is being extracted...\n", argv[0], entry.name.cstring());
 
             auto result = archive.extract(i, entry.name.cstring());
-            if(result != Result::SUCCESS)
+            if (result != Result::SUCCESS)
             {
-                stream_format(err_stream, "%s: Failed to extract entry with error %i", entry.name.cstring(), result);
+                stream_format(err_stream, "%s: Failed to extract entry '%s' with error '%i'", argv[0], entry.name.cstring(), result);
             }
         }
     }

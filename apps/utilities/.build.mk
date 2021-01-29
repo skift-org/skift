@@ -173,7 +173,7 @@ SETTINGSCTL_NAME = settingsctl
 WALLPAPERCTL_LIBS = graphic
 WALLPAPERCTL_NAME = wallpaperctl
 
-ZIP_LIBS =
+ZIP_LIBS = file
 ZIP_NAME = zip
 
 UNZIP_LIBS = file

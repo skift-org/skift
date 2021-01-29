@@ -36,6 +36,7 @@ public:
     {
         ref_if_not_null(_storage);
 
+        _start = _storage->start();
         _start = static_cast<const void *>(static_cast<const char *>(_start) + offset);
         _size = size;
     }

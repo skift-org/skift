@@ -25,7 +25,7 @@ Result File::read_all(void **buffer, size_t *size)
 
     if (handle_has_error(stream))
     {
-        free(buffer);
+        free(*buffer);
         return handle_get_error(stream);
     }
 

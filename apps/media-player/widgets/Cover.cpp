@@ -8,7 +8,7 @@ namespace media_player
 Cover::Cover(Widget *parent, RefPtr<Bitmap> bitmap)
     : Widget(parent), _cover(bitmap)
 {
-    _backdrop = Bitmap::create_shared(64, 64).value();
+    _backdrop = *Bitmap::create_shared(64, 64);
 
     Painter painter(_backdrop);
 

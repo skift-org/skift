@@ -10,7 +10,7 @@ template <typename T>
 class ResultOr
 {
 private:
-    Result _result;
+    Result _result = SUCCESS;
     Optional<T> _value;
 
 public:
@@ -38,6 +38,11 @@ public:
     }
 
     Result result() const { return _result; }
+
+    const char *description()
+    {
+        return get_result_description(_result);
+    }
 
     ResultOr(Result result) : _result{result}, _value{} {}
 

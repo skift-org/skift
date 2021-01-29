@@ -223,9 +223,9 @@ Vec2i mouse_position()
 
     auto result_or_mouse_position = wait_for_message(COMPOSITOR_MESSAGE_MOUSE_POSITION);
 
-    if (result_or_mouse_position.success())
+    if (result_or_mouse_position)
     {
-        auto mouse_position = result_or_mouse_position.value();
+        auto mouse_position = *result_or_mouse_position;
 
         return mouse_position.mouse_position.position;
     }

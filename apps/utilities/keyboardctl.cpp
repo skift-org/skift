@@ -70,7 +70,7 @@ int loadkey_set_keymap(Stream *keyboard_device, const char *keymap_path)
 
     if (!result_or_keymapdata.success())
     {
-        stream_format(err_stream, "keyboardctl: Failed to open the keymap file: %s", result_to_string(result_or_keymapdata.result()));
+        stream_format(err_stream, "keyboardctl: Failed to open the keymap file: %s", result_or_keymapdata.description());
 
         return PROCESS_FAILURE;
     }

@@ -27,13 +27,13 @@ public:
         _notifier = own<Notifier>(HANDLE(_connection), POLL_READ, [this]() {
             auto result_of_message = Message::read_from(_connection);
 
-            if (!result_of_message.success())
+            if (result_of_message)
             {
-                close();
+                handle_message(*result_of_message);
             }
             else
             {
-                handle_message(result_of_message.value());
+                close();
             }
         });
     }
@@ -90,9 +90,9 @@ public:
 
         auto result_or_message = receive();
 
-        while (result_or_message.success() && result_or_message.value().type != expected)
+        while (result_or_message && (*result_or_message).type != expected)
         {
-            handle_message(result_or_message.value());
+            handle_message(*result_or_message);
 
             auto result_or_message = receive();
         }

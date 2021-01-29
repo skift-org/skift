@@ -93,7 +93,7 @@ int main(int argc, char **argv)
         snprintf(content_path, PATH_LENGTH, "/Applications/onboarding/content%d.markup", index);
 
         content->clear_children();
-        image->change_bitmap(Bitmap::load_from(image_path).value());
+        image->change_bitmap(*Bitmap::load_from(image_path));
         widget_create_from_file(content, content_path);
     };
 

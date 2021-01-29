@@ -44,8 +44,8 @@ public:
 
     Wallpaper(Vec2i resolution)
         : _resolution(resolution),
-          _scaled(Bitmap::create_shared(resolution.x(), resolution.y()).value()),
-          _acrylic(Bitmap::create_shared(resolution.x(), resolution.y()).value())
+          _scaled(*Bitmap::create_shared(resolution.x(), resolution.y())),
+          _acrylic(*Bitmap::create_shared(resolution.x(), resolution.y()))
     {
         _render_invoker = own<Invoker>([this]() {
             render();
@@ -138,8 +138,8 @@ public:
     void change_resolution(Vec2i resolution)
     {
         _resolution = resolution;
-        _scaled = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
-        _acrylic = Bitmap::create_shared(_resolution.x(), _resolution.y()).value();
+        _scaled = *Bitmap::create_shared(_resolution.x(), _resolution.y());
+        _acrylic = *Bitmap::create_shared(_resolution.x(), _resolution.y());
 
         _render_invoker->invoke_later();
     }

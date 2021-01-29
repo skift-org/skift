@@ -149,7 +149,7 @@ void __plug_handle_open(Handle *handle, const char *raw_path, OpenFlag flags)
 
     if (result_or_handle_index.success())
     {
-        handle->id = result_or_handle_index.take_value();
+        handle->id = *result_or_handle_index;
     }
 }
 

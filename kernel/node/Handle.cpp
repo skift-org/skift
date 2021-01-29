@@ -100,9 +100,9 @@ ResultOr<size_t> FsHandle::read(void *buffer, size_t size)
 
     auto result_or_read = _node->read(*this, buffer, size);
 
-    if (result_or_read.success())
+    if (result_or_read)
     {
-        _offset += result_or_read.value();
+        _offset += *result_or_read;
     }
 
     _node->release(scheduler_running_id());
@@ -129,9 +129,9 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
 
         auto result_or_written = _node->write(*this, buffer, size);
 
-        if (result_or_written.success())
+        if (result_or_written)
         {
-            _offset += result_or_written.value();
+            _offset += *result_or_written;
         }
 
         _node->release(scheduler_running_id());
@@ -148,13 +148,13 @@ ResultOr<size_t> FsHandle::write(const void *buffer, size_t size)
 
         auto result_or_written = attemp_a_write(remaining_buffer, remaining);
 
-        if (!result_or_written.success())
+        if (result_or_written)
         {
-            return result_or_written;
+            written += *result_or_written;
         }
         else
         {
-            written += result_or_written.value();
+            return result_or_written;
         }
     } while (written < size);
 

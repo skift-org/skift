@@ -13,12 +13,13 @@ public:
     Result perform(const Vector<uint8_t> &uncompressed, Vector<uint8_t> &compressed);
 
 private:
+    static void write_block_header(BitWriter &out_stream, BlockType block_type, bool final);
     static void write_uncompressed_block(uint8_t *data, uint16_t data_len, BitWriter &out_stream, bool final);
     static void write_uncompressed_blocks(const Vector<uint8_t> &in_data, BitWriter &out_stream, bool final);
 
-    static void compress_none(const Vector<uint8_t> &, Vector<uint8_t> &);
+    static Result compress_none(const Vector<uint8_t> &, Vector<uint8_t> &);
 
-    Callback<void(const Vector<uint8_t> &, Vector<uint8_t> &)> _compression_impl;
+    Callback<Result(const Vector<uint8_t> &, Vector<uint8_t> &)> _compression_impl;
     unsigned int _compression_level;
     unsigned int _min_size_to_compress;
 };

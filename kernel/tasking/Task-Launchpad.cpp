@@ -1,5 +1,4 @@
-#include <libfile/ELF32.h>
-#include <libfile/ELF64.h>
+#include <libfile/ELF.h>
 #include <libsystem/Assert.h>
 #include <libsystem/Logger.h>
 #include <libsystem/core/CString.h>

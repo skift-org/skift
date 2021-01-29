@@ -167,7 +167,7 @@ class CallableRefPtr : public RefPtr<T>
 {
 public:
     template <typename... TArgs>
-    auto operator()(TArgs &&...args)
+    auto operator()(TArgs &&... args)
     {
         return (*this->naked())(forward<TArgs>(args)...);
     }
@@ -180,13 +180,13 @@ inline RefPtr<T> adopt(T &object)
 }
 
 template <typename Type, typename... Args>
-inline RefPtr<Type> make(Args &&...args)
+inline RefPtr<Type> make(Args &&... args)
 {
     return RefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
 }
 
 template <typename Type, typename... Args>
-inline CallableRefPtr<Type> make_callable(Args &&...args)
+inline CallableRefPtr<Type> make_callable(Args &&... args)
 {
     return CallableRefPtr<Type>(adopt(*new Type(forward<Args>(args)...)));
 }

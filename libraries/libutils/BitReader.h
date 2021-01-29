@@ -2,14 +2,14 @@
 #include <libsystem/Common.h>
 #include <libutils/Vector.h>
 
-class BitStream
+class BitReader
 {
 public:
-    inline BitStream(const Vector<uint8_t>& data) : _data(data.raw_storage()), _size(data.count())
+    inline BitReader(const Vector<uint8_t> &data) : _data(data.raw_storage()), _size(data.count())
     {
     }
 
-    inline BitStream(uint8_t *data, uint32_t size) : _data(data), _size(size)
+    inline BitReader(uint8_t *data, uint32_t size) : _data(data), _size(size)
     {
     }
 

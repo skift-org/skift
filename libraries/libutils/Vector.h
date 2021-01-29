@@ -82,7 +82,7 @@ public:
     {
         ensure_capacity(data.size());
 
-        for (const auto& el : data)
+        for (const auto &el : data)
         {
             push_back(el);
         }

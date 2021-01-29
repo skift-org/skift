@@ -9,29 +9,29 @@ public:
     {
     }
 
-    template<typename T>
+    template <typename T>
     inline T peek()
     {
         auto size = sizeof(T);
-        auto sub_slice = _slice.slice(_index,size);
-        return *(T*)sub_slice.start();
+        auto sub_slice = _slice.slice(_index, size);
+        return *(T *)sub_slice.start();
     }
-    
-    template<typename T>
+
+    template <typename T>
     inline T get()
     {
         //TODO: check size
-        const auto& result = peek<T>();
+        const auto &result = peek<T>();
         _index += sizeof(T);
-        return result; 
+        return result;
     }
 
     inline String get_fixed_len_string(unsigned int len)
     {
-        auto sub_slice = _slice.slice(_index,len);
-        const char* cstr = reinterpret_cast<const char*>(sub_slice.start());
+        auto sub_slice = _slice.slice(_index, len);
+        const char *cstr = reinterpret_cast<const char *>(sub_slice.start());
         _index += len;
-        return String(make<StringStorage>(cstr,len));
+        return String(make<StringStorage>(cstr, len));
     }
 
     inline void skip(unsigned int num_bytes)

@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-    RefPtr &operator=(RefPtr &other)
+    RefPtr &operator=(const RefPtr &other)
     {
         if (_ptr != other.naked())
         {

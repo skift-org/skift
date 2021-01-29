@@ -9,8 +9,8 @@
 class Slice
 {
 private:
-    RefPtr<SliceStorage> _storage = nullptr;
-    size_t _offset = 0;
+    SliceStorage *_storage = nullptr;
+    const void *_start = nullptr;
     size_t _size = 0;
 
 public:
@@ -18,12 +18,12 @@ public:
 
     size_t size() const { return _size; }
 
-    const void *start()
+    const void *start() const
     {
-        return reinterpret_cast<const char *>(_storage->start()) + _offset;
+        return _start;
     }
 
-    const void *end()
+    const void *end() const
     {
         return reinterpret_cast<const char *>(start()) + _size;
     }
@@ -32,25 +32,90 @@ public:
     {
     }
 
-    Slice(RefPtr<SliceStorage> storage)
-        : _storage(storage),
-          _offset(0),
-          _size(storage->size())
+    Slice(SliceStorage &storage, size_t offset, size_t size) : _storage(&storage)
     {
+        ref_if_not_null(_storage);
+
+        _start = static_cast<const void *>(static_cast<const char *>(_start) + offset);
+        _size = size;
     }
 
-    Slice(RefPtr<SliceStorage> storage, size_t offset, size_t size)
-        : _storage(storage),
-          _offset(offset),
-          _size(size)
+    Slice(RefPtr<SliceStorage> &&storage) : _storage(storage.give_ref())
     {
-        assert(offset <= storage->size());
-        assert(offset + size <= storage->size());
+        _start = _storage->start();
+        _size = _storage->size();
+    }
+
+    Slice(const void *start, size_t size)
+    {
+        _start = start;
+        _size = size;
+    }
+
+    Slice(const Slice &other) : _storage(other._storage)
+    {
+        ref_if_not_null(_storage);
+
+        _start = other.start();
+        _size = other.size();
+    }
+
+    Slice(Slice &&other) : _storage(other.give_storage())
+    {
+        _start = other.start();
+        _size = other.size();
+    }
+
+    ~Slice()
+    {
+        deref_if_not_null(_storage);
+    }
+
+    Slice &operator=(const Slice &other)
+    {
+        if (_storage != other.naked_storage())
+        {
+            deref_if_not_null(_storage);
+            _storage = other.naked_storage();
+            ref_if_not_null(_storage);
+        }
+
+        return *this;
+    }
+
+    Slice &operator=(Slice &&other)
+    {
+        if (this != &other)
+        {
+            deref_if_not_null(_storage);
+            _storage = other.give_storage();
+        }
+
+        return *this;
     }
 
     Slice slice(size_t offset, size_t size)
     {
-        // FIXME: bound checking.
-        return {_storage, _offset + offset, size};
+        if (_storage != nullptr)
+        {
+            return {*_storage, offset, size};
+        }
+        else
+        {
+            auto start = static_cast<const void *>(static_cast<const char *>(_start) + offset);
+            return {start, size};
+        }
+    }
+
+    [[nodiscard]] SliceStorage *give_storage()
+    {
+        SliceStorage *storage = _storage;
+        _storage = nullptr;
+        return storage;
+    }
+
+    SliceStorage *naked_storage() const
+    {
+        return _storage;
     }
 };

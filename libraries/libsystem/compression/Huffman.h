@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Assert.h>
 #include <libsystem/io/Stream.h>
-#include <libutils/BitStream.h>
+#include <libutils/BitReader.h>
 
 class HuffmanDecoder
 {
@@ -10,7 +10,7 @@ public:
     {
     }
 
-    unsigned int decode(BitStream &input)
+    unsigned int decode(BitReader &input)
     {
         for (unsigned int i = 0; i < (unsigned int)_code_bit_lengths.count(); i++)
         {

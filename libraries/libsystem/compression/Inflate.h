@@ -4,18 +4,10 @@
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 
-// See https://tools.ietf.org/html/rfc1951#section-3.2.3
-enum BlockType
-{
-    BT_UNCOMPRESSED = 0,
-    BT_FIXED_HUFFMAN = 1,
-    BT_DYNAMIC_HUFFMAN = 2,
-};
-
 class Inflate
 {
 public:
-    Result perform(const Vector<uint8_t> &input, Vector<uint8_t> &output);
+    Result perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &uncompressed);
 
 private:
     void build_fixed_huffman_alphabet();

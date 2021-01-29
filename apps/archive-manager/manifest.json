@@ -1,6 +1,6 @@
 {
     "name": "Archive Manager",
     "comment": "A simple archive manager.",
-    "icon": "folder",
+    "icon": "folder-zip",
     "command": "archive-manager"
 }

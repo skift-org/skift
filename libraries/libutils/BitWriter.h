@@ -16,7 +16,7 @@ public:
 
     inline void put_bits(unsigned int v, const unsigned int num_bits)
     {
-        _bit_buffer |= bits << os->bitcount;
+        _bit_buffer |= v << _bit_count;
         _bit_count += num_bits;
     }
 

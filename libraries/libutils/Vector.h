@@ -557,4 +557,24 @@ public:
 
         return false;
     }
+
+    // Vector iteration
+    class iterator
+    {
+    public:
+        iterator(T *ptr) : _ptr(ptr) {}
+        iterator operator++()
+        {
+            ++_ptr;
+            return *this;
+        }
+        bool operator!=(const iterator &other) const { return _ptr != other._ptr; }
+        const T &operator*() const { return *_ptr; }
+
+    private:
+        T *_ptr;
+    };
+
+    iterator begin() const { return iterator(_storage); }
+    iterator end() const { return iterator(_storage + _count); }
 };

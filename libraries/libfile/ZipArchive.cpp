@@ -222,8 +222,6 @@ void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, const Vec
     header.len_extrafield = 0;
     header.signature = ZIP_LOCAL_DIR_HEADER_SIG;
 
-    printf("writing entry: CS: %i US: %i\n", header.compressed_size(), header.uncompressed_size());
-
     writer.put(header);
     writer.put_fixed_len_string(entry.name);
     writer.put_data(compressed_data.raw_storage(), compressed_data.count());
@@ -239,6 +237,7 @@ void ZipArchive::write_central_directory(BinaryWriter &writer)
         header.compressed_size = entry.compressed_size;
         header.compression = CM_DEFLATED;
         header.uncompressed_size = entry.uncompressed_size;
+        header.local_header_offset = entry.archive_offset - sizeof(LocalHeader) - entry.name.length();
         header.len_filename = entry.name.length();
         header.len_extrafield = 0;
         header.len_comment = 0;
@@ -284,19 +283,17 @@ Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
     }
 
     File dest_file(dest_path);
-    dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());
-
-    return Result::SUCCESS;
+    return dest_file.write_all(uncompressed_data.raw_storage(), uncompressed_data.count());
 }
 
 Result ZipArchive::insert(const char *entry_name, const char *src_path)
 {
     File in_file(src_path);
-    ResultOr<Slice> content = in_file.read_all();
+    ResultOr<Slice> result = in_file.read_all();
 
-    if (!content.success())
+    if (!result.success())
     {
-        return content.result();
+        return result.result();
     }
 
     // TODO: create a new entry and write it to the output file
@@ -313,15 +310,16 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     }
 
     // Read the uncompressed data from the file
-    Slice slice_uncompressed = content.value();
+    Slice data = *result;
     Deflate def(5);
-    Vector<uint8_t> file_uncompressed_data(ADOPT, (uint8_t *)slice_uncompressed.start(), slice_uncompressed.size());
+    Vector<uint8_t> file_uncompressed_data(ADOPT, (uint8_t *)data.start(), data.size());
 
+    // Perform deflate on the data
     Vector<uint8_t> new_compressed_data;
-    auto result = def.perform(file_uncompressed_data, new_compressed_data);
-    if (result != Result::SUCCESS)
+    auto def_result = def.perform(file_uncompressed_data, new_compressed_data);
+    if (def_result != Result::SUCCESS)
     {
-        return result;
+        return def_result;
     }
 
     // Write our new entry
@@ -329,8 +327,8 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     new_entry.name = String(entry_name);
     new_entry.compressed_size = new_compressed_data.count();
     new_entry.compression = CM_DEFLATED;
-    new_entry.uncompressed_size = slice_uncompressed.size();
-    new_entry.archive_offset = archive_data.count() + sizeof(LocalHeader);
+    new_entry.uncompressed_size = data.size();
+    new_entry.archive_offset = archive_data.count() + sizeof(LocalHeader) + new_entry.name.length();
 
     write_entry(new_entry, archive_writer, new_compressed_data);
 

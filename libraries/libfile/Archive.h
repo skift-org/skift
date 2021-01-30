@@ -4,7 +4,8 @@
 #include <libsystem/Result.h>
 #include <libsystem/io/File.h>
 
-class Archive
+class Archive : public RefCounted<Archive>
+
 {
 public:
     struct Entry
@@ -20,14 +21,9 @@ public:
     {
     }
 
-    inline unsigned int get_entry_count()
+    inline const Vector<Entry> &entries()
     {
-        return _entries.count();
-    }
-
-    inline Entry &get_entry(unsigned int entry_index)
-    {
-        return _entries[entry_index];
+        return _entries;
     }
 
     virtual Result extract(unsigned int entry_index, const char *dest_path) = 0;

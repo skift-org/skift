@@ -1,7 +1,7 @@
 #include <libwidget/Spacer.h>
 
 #include <libfilepicker/dialogs/FilePicker.h>
-#include <libfilepicker/widgets/Browser.h>
+#include <libfilepicker/widgets/DirectoryBrowser.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
 namespace filepicker
@@ -24,7 +24,7 @@ void Dialog::render(Window *window)
     window->root()->layout(VFLOW(0));
 
     new ToolBar(window->root(), _navigation, nullptr, ToolBar::NO_OPEN_TERMINAL);
-    new Browser(window->root(), _navigation);
+    new DirectoryBrowser(window->root(), _navigation);
 
     auto action_container = new Panel(window->root());
 

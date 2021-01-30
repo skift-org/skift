@@ -4,11 +4,11 @@
 #include <libsystem/io/Directory.h>
 #include <libsystem/json/Json.h>
 
-#include <libfilepicker/model/Listing.h>
+#include <libfilepicker/model/ArchiveListing.h>
 
 namespace filepicker
 {
-
+/*
 static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
 {
     if (entry->stat.type == FILE_TYPE_DIRECTORY)
@@ -46,18 +46,20 @@ static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
         return Icon::get("file");
     }
 }
+*/
 
 enum Column
 {
     COLUMN_NAME,
     COLUMN_TYPE,
-    COLUMN_SIZE,
+    COLUMN_COMPRESSED_SIZE,
+    COLUMN_UNCOMPRESSED_SIZE,
 
     __COLUMN_COUNT,
 };
 
-Listing::Listing(RefPtr<Navigation> navigation)
-    : _navigation(navigation)
+ArchiveListing::ArchiveListing(RefPtr<Navigation> navigation, RefPtr<Archive> archive)
+    : _navigation(navigation), _archive(archive)
 {
     _observer = navigation->observe([this](auto &) {
         update();
@@ -66,17 +68,17 @@ Listing::Listing(RefPtr<Navigation> navigation)
     update();
 }
 
-int Listing::rows()
+int ArchiveListing::rows()
 {
-    return _files.count();
+    return _entries.count();
 }
 
-int Listing::columns()
+int ArchiveListing::columns()
 {
     return __COLUMN_COUNT;
 }
 
-String Listing::header(int column)
+String ArchiveListing::header(int column)
 {
     switch (column)
     {
@@ -86,17 +88,20 @@ String Listing::header(int column)
     case COLUMN_TYPE:
         return "Type";
 
-    case COLUMN_SIZE:
-        return "Size";
+    case COLUMN_COMPRESSED_SIZE:
+        return "Compressed Size";
+
+    case COLUMN_UNCOMPRESSED_SIZE:
+        return "Uncompressed Size";
 
     default:
         ASSERT_NOT_REACHED();
     }
 }
 
-Variant Listing::data(int row, int column)
+Variant ArchiveListing::data(int row, int column)
 {
-    auto &entry = _files[row];
+    auto &entry = _entries[row];
 
     switch (column)
     {
@@ -112,54 +117,44 @@ Variant Listing::data(int row, int column)
         case FILE_TYPE_DIRECTORY:
             return "Directory";
 
-        case FILE_TYPE_DEVICE:
-            return "Device";
-
         default:
             return "Special file";
         }
 
-    case COLUMN_SIZE:
-        return Variant((int)entry.size);
+    case COLUMN_COMPRESSED_SIZE:
+        return Variant((int)entry.compressed_size);
+
+    case COLUMN_UNCOMPRESSED_SIZE:
+        return Variant((int)entry.uncompressed_size);
 
     default:
         ASSERT_NOT_REACHED();
     }
 }
 
-void Listing::update()
+void ArchiveListing::update()
 {
-    _files.clear();
+    _entries.clear();
 
-    auto directory = directory_open(_navigation->current().string().cstring(), OPEN_READ);
+    auto current = _navigation->current();
 
-    if (handle_has_error(directory))
+    // Filter this by current
+    for (const auto &entry : _archive->entries())
     {
-        directory_close(directory);
-        return;
+        auto &entry_info = _entries.emplace_back();
+        entry_info.compressed_size = entry.compressed_size;
+        entry_info.uncompressed_size = entry.uncompressed_size;
+        entry_info.type = FILE_TYPE_REGULAR;
+        entry_info.name = entry.name;
+        entry_info.icon = Icon::get("file");
     }
-
-    DirectoryEntry entry;
-    while (directory_read(directory, &entry) > 0)
-    {
-        FileInfo node{
-            .name = {entry.name, FILE_NAME_LENGTH},
-            .type = entry.stat.type,
-            .icon = get_icon_for_node(_navigation->current().string(), &entry),
-            .size = entry.stat.size,
-        };
-
-        _files.push_back(node);
-    }
-
-    directory_close(directory);
 
     did_update();
 }
 
-const FileInfo &Listing::info(int index) const
+const ArchiveEntryInfo &ArchiveListing::info(int index) const
 {
-    return _files[index];
+    return _entries[index];
 }
 
 } // namespace filepicker

@@ -8,45 +8,6 @@
 
 namespace filepicker
 {
-/*
-static auto get_icon_for_node(String current_directory, DirectoryEntry *entry)
-{
-    if (entry->stat.type == FILE_TYPE_DIRECTORY)
-    {
-        char manifest_path[PATH_LENGTH];
-
-        snprintf(manifest_path, PATH_LENGTH, "%s/%s/manifest.json", current_directory.cstring(), entry->name);
-
-        auto root = json::parse_file(manifest_path);
-
-        if (root.is(json::OBJECT))
-        {
-            auto icon_name = root.get("icon");
-
-            if (icon_name.is(json::STRING))
-            {
-                return Icon::get(icon_name.as_string());
-            }
-        }
-
-        return Icon::get("folder");
-    }
-    else if (entry->stat.type == FILE_TYPE_PIPE ||
-             entry->stat.type == FILE_TYPE_DEVICE ||
-             entry->stat.type == FILE_TYPE_SOCKET)
-    {
-        return Icon::get("pipe");
-    }
-    else if (entry->stat.type == FILE_TYPE_TERMINAL)
-    {
-        return Icon::get("console-network");
-    }
-    else
-    {
-        return Icon::get("file");
-    }
-}
-*/
 
 enum Column
 {

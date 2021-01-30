@@ -16,7 +16,7 @@ Deflate::Deflate(unsigned int compression_level) : _compression_level(compressio
     {
     // TODO: set the compression method according to the level
     default:
-        _compression_impl = compress_none;
+        _compression_method = compress_none;
     }
 }
 
@@ -30,8 +30,8 @@ void Deflate::write_uncompressed_block(uint8_t *data, uint16_t data_len, BitWrit
 {
     write_block_header(out_writer, BlockType::BT_UNCOMPRESSED, final);
     out_writer.align();
-    out_writer.put_short(data_len);
-    out_writer.put_short(~data_len);
+    out_writer.put_uint16(data_len);
+    out_writer.put_uint16(~data_len);
     out_writer.put_data(data, data_len);
 }
 
@@ -67,5 +67,5 @@ Result Deflate::perform(const Vector<uint8_t> &uncompressed, Vector<uint8_t> &co
         return compress_none(uncompressed, compressed);
     }
 
-    return _compression_impl(uncompressed, compressed);
+    return _compression_method(uncompressed, compressed);
 }

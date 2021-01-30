@@ -9,16 +9,16 @@ public:
     {
     }
 
-    inline BitReader(uint8_t *data, uint32_t size) : _data(data), _size(size)
+    inline BitReader(uint8_t *data, size_t size) : _data(data), _size(size)
     {
     }
 
-    inline void skip_bits(uint32_t num_bits)
+    inline void skip_bits(size_t num_bits)
     {
         _index += num_bits;
     }
 
-    inline uint16_t grab_short()
+    inline uint16_t grab_uint16()
     {
         uint16_t result = _data[_index / 8] + (_data[(_index / 8) + 1] << 8);
         _index += 16;
@@ -41,7 +41,7 @@ public:
         return ret_val;
     }
 
-    inline unsigned int peek_bits(unsigned int num_bits)
+    inline unsigned int peek_bits(size_t num_bits)
     {
         unsigned int cached_index = _index;
         unsigned int result = grab_bits(num_bits);
@@ -49,7 +49,7 @@ public:
         return result;
     }
 
-    inline unsigned int grab_bits_reverse(unsigned int num_bits)
+    inline unsigned int grab_bits_reverse(size_t num_bits)
     {
         unsigned int ret_val = 0;
         for (unsigned int i = 0; i != num_bits; i++)
@@ -60,7 +60,7 @@ public:
         return ret_val;
     }
 
-    inline unsigned int peek_bits_reverse(unsigned int num_bits)
+    inline unsigned int peek_bits_reverse(size_t num_bits)
     {
         unsigned int cached_index = _index;
         unsigned int result = grab_bits_reverse(num_bits);
@@ -70,6 +70,6 @@ public:
 
 private:
     const uint8_t *_data;
-    const uint32_t _size;
-    uint32_t _index = 0;
+    const size_t _size;
+    size_t _index = 0;
 };

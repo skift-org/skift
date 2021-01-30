@@ -16,7 +16,7 @@ public:
         put_data(bytes, sizeof(T));
     }
 
-    inline void put_data(uint8_t *data, unsigned int len)
+    inline void put_data(uint8_t *data, size_t len)
     {
         _data.push_back_many({ADOPT, data, len});
     }
@@ -26,7 +26,7 @@ public:
         put_data((uint8_t *)str.cstring(), str.length());
     }
 
-    inline unsigned int pos()
+    inline size_t pos()
     {
         return _data.count();
     }

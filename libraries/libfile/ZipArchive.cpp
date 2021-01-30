@@ -208,7 +208,7 @@ void ZipArchive::get_compressed_data(const Entry &entry, Vector<uint8_t> &compre
 {
     // Read the compressed data from the file
     Slice slice_compressed = Slice(_data + entry.archive_offset, entry.compressed_size);
-    compressed_data = Vector<uint8_t>(ADOPT, (uint8_t *)slice_compressed.start(), slice_compressed.size());
+    compressed_data.push_back_data((uint8_t *)slice_compressed.start(), slice_compressed.size());
 }
 
 void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, const Vector<uint8_t> &compressed_data)
@@ -312,7 +312,8 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Read the uncompressed data from the file
     Slice data = *result;
     Deflate def(5);
-    Vector<uint8_t> file_uncompressed_data(ADOPT, (uint8_t *)data.start(), data.size());
+    Vector<uint8_t> file_uncompressed_data;
+    file_uncompressed_data.push_back_data((uint8_t *)data.start(), data.size());
 
     // Perform deflate on the data
     Vector<uint8_t> new_compressed_data;

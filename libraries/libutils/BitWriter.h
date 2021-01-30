@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
-#include <libutils/Vector.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/Vector.h>
 
 class BitWriter
 {
@@ -23,7 +23,7 @@ public:
 
     inline void put_data(uint8_t *data, size_t len)
     {
-        _data.push_back_many(Vector<uint8_t>(ADOPT, data, len));
+        _data.push_back_data(data, len);
     }
 
     inline void put_uint16(uint16_t v)
@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    uint32_t _bit_buffer;
+    uint_fast32_t _bit_buffer;
     uint8_t _bit_count;
     size_t _index;
     Vector<uint8_t> &_data;

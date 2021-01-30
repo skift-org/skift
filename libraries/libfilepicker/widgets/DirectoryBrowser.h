@@ -3,24 +3,24 @@
 #include <libsystem/process/Launchpad.h>
 #include <libwidget/Table.h>
 
-#include <libfilepicker/model/Listing.h>
+#include <libfilepicker/model/DirectoryListing.h>
 #include <libfilepicker/model/Navigation.h>
 
 namespace filepicker
 {
 
-class Browser : public Table
+class DirectoryBrowser : public Table
 {
 private:
     RefPtr<Navigation> _navigation;
-    RefPtr<Listing> _listing;
+    RefPtr<DirectoryListing> _listing;
     OwnPtr<Observer<Navigation>> _navigation_observer;
 
 public:
-    Browser(Widget *parent, RefPtr<Navigation> navigation)
+    DirectoryBrowser(Widget *parent, RefPtr<Navigation> navigation)
         : Table(parent), _navigation(navigation)
     {
-        _listing = make<Listing>(navigation);
+        _listing = make<DirectoryListing>(navigation);
         model(_listing);
 
         flags(Widget::FILL);

@@ -260,7 +260,7 @@ void ZipArchive::write_central_directory(BinaryWriter &writer)
 Result ZipArchive::extract(unsigned int entry_index, const char *dest_path)
 {
     // Read the compressed data from the entry
-    const auto &entry = get_entry(entry_index);
+    const auto &entry = _entries[entry_index];
 
     if (entry.compression != CM_DEFLATED)
     {

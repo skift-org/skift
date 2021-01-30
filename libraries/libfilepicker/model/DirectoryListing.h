@@ -10,7 +10,7 @@
 namespace filepicker
 {
 
-class Listing : public TableModel
+class DirectoryListing : public TableModel
 {
 private:
     RefPtr<Navigation> _navigation;
@@ -18,7 +18,7 @@ private:
     OwnPtr<Observer<Navigation>> _observer;
 
 public:
-    Listing(RefPtr<Navigation> navigation);
+    DirectoryListing(RefPtr<Navigation> navigation);
 
     int rows() override;
 

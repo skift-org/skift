@@ -18,7 +18,7 @@ public:
 
     inline void put_data(uint8_t *data, size_t len)
     {
-        _data.push_back_many({ADOPT, data, len});
+        _data.push_back_data(data, len);
     }
 
     inline void put_fixed_len_string(const String &str)

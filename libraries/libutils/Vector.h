@@ -513,6 +513,14 @@ public:
         }
     }
 
+    void push_back_data(T *data, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            push_back(data[i]);
+        }
+    }
+
     T pop()
     {
         assert(_count > 0);

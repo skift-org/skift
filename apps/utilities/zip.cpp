@@ -29,13 +29,13 @@ int main(int argc, char const *argv[])
         return PROCESS_FAILURE;
     }
 
-    ZipArchive archive(file, false);
+    auto archive = make<ZipArchive>(file, false);
 
     // Pack all files that were passed as arguments
     for (unsigned int i = 1; i < args.argc(); i++)
     {
         printf("%s: Entry: %s is being inserted...\n", argv[0], args.argv()[i].cstring());
-        auto result = archive.insert(args.argv()[i].cstring(), args.argv()[i].cstring());
+        auto result = archive->insert(args.argv()[i].cstring(), args.argv()[i].cstring());
         if (result != Result::SUCCESS)
         {
             stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], args.argv()[i], result);

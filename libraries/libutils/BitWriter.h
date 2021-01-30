@@ -1,6 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
 #include <libutils/Vector.h>
+#include <libsystem/io/Stream.h>
 
 class BitWriter
 {
@@ -40,7 +41,7 @@ public:
     inline void flush()
     {
         // Flush one byte at a time
-        while (_bit_count > 8)
+        while (_bit_count >= 8)
         {
             _data.emplace_back() = _bit_buffer;
             _bit_count -= 8;

@@ -20,22 +20,22 @@ Deflate::Deflate(unsigned int compression_level) : _compression_level(compressio
     }
 }
 
-void Deflate::write_block_header(BitWriter &out_stream, BlockType block_type, bool final)
+void Deflate::write_block_header(BitWriter &out_writer, BlockType block_type, bool final)
 {
-    out_stream.put_bits(final, 1);
-    out_stream.put_bits(block_type, 2);
+    out_writer.put_bits(final ? 1 : 0, 1);
+    out_writer.put_bits(block_type, 2);
 }
 
-void Deflate::write_uncompressed_block(uint8_t *data, uint16_t data_len, BitWriter &out_stream, bool final)
+void Deflate::write_uncompressed_block(uint8_t *data, uint16_t data_len, BitWriter &out_writer, bool final)
 {
-    write_block_header(out_stream, BlockType::BT_UNCOMPRESSED, final);
-    out_stream.align();
-    out_stream.put_short(data_len);
-    out_stream.put_short(~data_len);
-    out_stream.put_data(data, data_len);
+    write_block_header(out_writer, BlockType::BT_UNCOMPRESSED, final);
+    out_writer.align();
+    out_writer.put_short(data_len);
+    out_writer.put_short(~data_len);
+    out_writer.put_data(data, data_len);
 }
 
-void Deflate::write_uncompressed_blocks(const Vector<uint8_t> &in_data, BitWriter &out_stream, bool final)
+void Deflate::write_uncompressed_blocks(const Vector<uint8_t> &in_data, BitWriter &out_writer, bool final)
 {
     uint8_t *data = in_data.raw_storage();
     auto data_length = in_data.count();
@@ -44,7 +44,7 @@ void Deflate::write_uncompressed_blocks(const Vector<uint8_t> &in_data, BitWrite
     {
         uint16_t len = MIN(data_length, UINT16_MAX);
 
-        write_uncompressed_block(data, len, out_stream, final && len == data_length);
+        write_uncompressed_block(data, len, out_writer, final && (len == data_length));
         data += len;
         data_length -= len;
     } while (data_length != 0);

@@ -98,7 +98,7 @@ extern "C" void arch_main(void *info, uint32_t magic)
 
     if (handover->memory_usable < 127 * 1024)
     {
-        system_panic("No enoughs memory (%uKio)!", handover->memory_usable / 1024);
+        system_panic("No enough memory (%uKio)!", handover->memory_usable / 1024);
     }
 
     gdt_initialize();
@@ -138,19 +138,19 @@ __no_return void arch_reboot()
     x86::reboot_8042();
     x86::reboot_triple_fault();
 
-    logger_info("Failled to reboot: Halting!");
+    logger_info("Failed to reboot: Halting!");
     system_stop();
 }
 
 __no_return void arch_shutdown()
 {
     early_console_enable();
-    logger_info("Shuting down...");
+    logger_info("Shutting down...");
 
     x86::shutdown_virtual_machines();
     x86::shutdown_acpi();
 
-    logger_error("Failled to shutdown: Halting!");
+    logger_error("Failed to shutdown: Halting!");
     system_stop();
 }
 

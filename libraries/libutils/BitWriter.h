@@ -15,18 +15,18 @@ public:
         flush();
     }
 
-    inline void put_bits(unsigned int v, const unsigned int num_bits)
+    inline void put_bits(unsigned int v, const size_t num_bits)
     {
         _bit_buffer |= v << _bit_count;
         _bit_count += num_bits;
     }
 
-    inline void put_data(uint8_t *data, unsigned int len)
+    inline void put_data(uint8_t *data, size_t len)
     {
         _data.push_back_many(Vector<uint8_t>(ADOPT, data, len));
     }
 
-    inline void put_short(unsigned short v)
+    inline void put_uint16(uint16_t v)
     {
         _data.push_back(v & 0xFF);
         _data.push_back(v >> 8);
@@ -43,15 +43,15 @@ public:
         // Flush one byte at a time
         while (_bit_count >= 8)
         {
-            _data.emplace_back() = _bit_buffer;
+            _data.push_back(_bit_buffer);
             _bit_count -= 8;
             _bit_buffer >>= 8;
         }
     }
 
 private:
-    unsigned int _bit_buffer;
-    unsigned int _bit_count;
-    unsigned int _index;
+    uint32_t _bit_buffer;
+    uint8_t _bit_count;
+    size_t _index;
     Vector<uint8_t> &_data;
 };

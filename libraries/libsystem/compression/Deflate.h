@@ -20,7 +20,7 @@ private:
 
     static Result compress_none(const Vector<uint8_t> &, Vector<uint8_t> &);
 
-    Callback<Result(const Vector<uint8_t> &, Vector<uint8_t> &)> _compression_impl;
+    Callback<Result(const Vector<uint8_t> &, Vector<uint8_t> &)> _compression_method;
     unsigned int _compression_level;
     unsigned int _min_size_to_compress;
 };

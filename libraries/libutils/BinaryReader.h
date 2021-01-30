@@ -26,7 +26,7 @@ public:
         return result;
     }
 
-    inline String get_fixed_len_string(unsigned int len)
+    inline String get_fixed_len_string(size_t len)
     {
         auto sub_slice = _slice.slice(_index, len);
         const char *cstr = reinterpret_cast<const char *>(sub_slice.start());
@@ -34,12 +34,12 @@ public:
         return String(make<StringStorage>(cstr, len));
     }
 
-    inline void skip(unsigned int num_bytes)
+    inline void skip(size_t num_bytes)
     {
         _index += num_bytes;
     }
 
-    inline unsigned int index()
+    inline size_t index()
     {
         return _index;
     }
@@ -51,5 +51,5 @@ public:
 
 private:
     const Slice &_slice;
-    unsigned int _index = 0;
+    size_t _index = 0;
 };

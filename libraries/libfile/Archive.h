@@ -11,9 +11,9 @@ public:
     struct Entry
     {
         String name;
-        unsigned int uncompressed_size;
-        unsigned int compressed_size;
-        unsigned int archive_offset;
+        size_t uncompressed_size;
+        size_t compressed_size;
+        size_t archive_offset;
         unsigned int compression;
     };
 

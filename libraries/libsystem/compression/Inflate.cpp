@@ -4,7 +4,7 @@
 #include <libsystem/compression/Inflate.h>
 #include <libsystem/io/Stream.h>
 
-static constexpr unsigned int BASE_LENGTH_EXTRA_BITS[] = {
+static constexpr uint8_t BASE_LENGTH_EXTRA_BITS[] = {
     0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
     1, 1, 1, 1,             //265 - 268
     2, 2, 2, 2,             //269 - 273
@@ -14,7 +14,7 @@ static constexpr unsigned int BASE_LENGTH_EXTRA_BITS[] = {
     0                       //285
 };
 
-static constexpr int BASE_LENGTHS[] = {
+static constexpr uint16_t BASE_LENGTHS[] = {
     3, 4, 5, 6, 7, 8, 9, 10, //257 - 264
     11, 13, 15, 17,          //265 - 268
     19, 23, 27, 31,          //269 - 273
@@ -24,7 +24,7 @@ static constexpr int BASE_LENGTHS[] = {
     258                      //285
 };
 
-static constexpr unsigned int BASE_DISTANCE[] = {
+static constexpr uint16_t BASE_DISTANCE[] = {
     1, 2, 3, 4,   //0-3
     5, 7,         //4-5
     9, 13,        //6-7
@@ -42,7 +42,7 @@ static constexpr unsigned int BASE_DISTANCE[] = {
     0, 0          //30-31, error, shouldn't occur
 };
 
-static constexpr unsigned int BASE_DISTANCE_EXTRA_BITS[] = {
+static constexpr uint8_t BASE_DISTANCE_EXTRA_BITS[] = {
     0, 0, 0, 0, //0-3
     1, 1,       //4-5
     2, 2,       //6-7
@@ -130,26 +130,96 @@ void Inflate::build_fixed_huffman_alphabet()
     build_huffman_alphabet(_fixed_dist_alphabet, _fixed_dist_code_bit_lengths);
 }
 
+Result Inflate::build_dynamic_huffman_alphabet(BitReader &input)
+{
+    Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
+    Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    unsigned int hlit = input.grab_bits(5) + 257;
+    unsigned int hdist = input.grab_bits(5) + 1;
+    unsigned int hclen = input.grab_bits(4) + 4;
+
+    // See: https://github.com/madler/zlib/issues/82
+    if (hlit > 286 || hdist > 30)
+    {
+        return Result::ERR_INVALID_DATA;
+    }
+
+    for (unsigned int i = 0; i < hclen; i++)
+    {
+        code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
+    }
+
+    Vector<unsigned int> lit_len_and_dist_alphabets;
+    build_huffman_alphabet(lit_len_and_dist_alphabets, code_length_of_code_length);
+
+    Vector<unsigned int> lit_len_and_dist_trees_unpacked;
+    HuffmanDecoder huffman(lit_len_and_dist_alphabets, code_length_of_code_length);
+    while (lit_len_and_dist_trees_unpacked.count() < (hdist + hlit))
+    {
+        unsigned int decoded_value = huffman.decode(input);
+
+        // Everything below 16 corresponds directly to a codelength. See https://tools.ietf.org/html/rfc1951#section-3.2.7
+        if (decoded_value < 16)
+        {
+            lit_len_and_dist_trees_unpacked.push_back(decoded_value);
+            continue;
+        }
+
+        unsigned int repeat_count = 0;
+        unsigned int code_length_to_repeat = 0;
+
+        switch (decoded_value)
+        {
+        // 3-6
+        case 16:
+            repeat_count = input.grab_bits(2) + 3;
+            code_length_to_repeat = lit_len_and_dist_trees_unpacked.peek_back();
+            break;
+        // 3-10
+        case 17:
+            repeat_count = input.grab_bits(3) + 3;
+            break;
+        // 11 - 138
+        case 18:
+            repeat_count = input.grab_bits(7) + 11;
+            break;
+        }
+
+        for (unsigned int i = 0; i != repeat_count; i++)
+            lit_len_and_dist_trees_unpacked.push_back(code_length_to_repeat);
+    }
+
+    _lit_len_code_bit_length.resize(hlit);
+    for (unsigned int i = 0; i < _lit_len_code_bit_length.count(); i++)
+        _lit_len_code_bit_length[i] = lit_len_and_dist_trees_unpacked[i];
+
+    _dist_code_bit_length.resize(lit_len_and_dist_trees_unpacked.count() - hlit);
+    for (unsigned int i = 0; i < _dist_code_bit_length.count(); i++)
+        _dist_code_bit_length[i] = lit_len_and_dist_trees_unpacked[hlit + i];
+
+    build_huffman_alphabet(_lit_len_alphabet, _lit_len_code_bit_length);
+    build_huffman_alphabet(_dist_alphabet, _dist_code_bit_length);
+    return Result::SUCCESS;
+}
+
 Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &uncompressed)
 {
     assert(compressed.count() > 0);
     BitReader input(compressed);
 
-    const Vector<unsigned int> code_length_of_code_length_order = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
-    Vector<unsigned int> code_length_of_code_length = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    unsigned int bfinal;
+    uint8_t bfinal;
     do
     {
         bfinal = input.grab_bits(1);
-        unsigned int btype = input.grab_bits(2);
+        uint8_t btype = input.grab_bits(2);
 
         // Uncompressed block
         if (btype == BT_UNCOMPRESSED)
         {
             // Align to byte bounadries
             input.skip_bits(5);
-            auto len = input.grab_short();
+            auto len = input.grab_uint16();
 
             // Skip complement of LEN
             input.skip_bits(16);
@@ -160,9 +230,6 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)
         {
-            Vector<unsigned int> lit_len_code_bit_length, lit_len_alphabet;
-            Vector<unsigned int> dist_code_bit_length, dist_alphabet;
-
             // Use a fixed huffman alphabet
             if (btype == BT_FIXED_HUFFMAN)
             {
@@ -171,79 +238,19 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
             // Use a dynamic huffman alphabet
             else
             {
-                unsigned int hlit = input.grab_bits(5) + 257;
-                unsigned int hdist = input.grab_bits(5) + 1;
-                unsigned int hclen = input.grab_bits(4) + 4;
-
-                // See: https://github.com/madler/zlib/issues/82
-                if (hlit > 286 || hdist > 30)
+                auto result = build_dynamic_huffman_alphabet(input);
+                if (result != Result::SUCCESS)
                 {
-                    return Result::ERR_INVALID_DATA;
+                    return result;
                 }
-
-                for (unsigned int i = 0; i < hclen; i++)
-                {
-                    code_length_of_code_length[code_length_of_code_length_order[i]] = input.grab_bits(3);
-                }
-
-                Vector<unsigned int> lit_len_and_dist_alphabets;
-                build_huffman_alphabet(lit_len_and_dist_alphabets, code_length_of_code_length);
-
-                Vector<unsigned int> lit_len_and_dist_trees_unpacked;
-                HuffmanDecoder huffman(lit_len_and_dist_alphabets, code_length_of_code_length);
-                while (lit_len_and_dist_trees_unpacked.count() < (hdist + hlit))
-                {
-                    unsigned int decoded_value = huffman.decode(input);
-
-                    // Everything below 16 corresponds directly to a codelength. See https://tools.ietf.org/html/rfc1951#section-3.2.7
-                    if (decoded_value < 16)
-                    {
-                        lit_len_and_dist_trees_unpacked.push_back(decoded_value);
-                        continue;
-                    }
-
-                    unsigned int repeat_count = 0;
-                    unsigned int code_length_to_repeat = 0;
-
-                    switch (decoded_value)
-                    {
-                    // 3-6
-                    case 16:
-                        repeat_count = input.grab_bits(2) + 3;
-                        code_length_to_repeat = lit_len_and_dist_trees_unpacked.peek_back();
-                        break;
-                    // 3-10
-                    case 17:
-                        repeat_count = input.grab_bits(3) + 3;
-                        break;
-                    // 11 - 138
-                    case 18:
-                        repeat_count = input.grab_bits(7) + 11;
-                        break;
-                    }
-
-                    for (unsigned int i = 0; i != repeat_count; i++)
-                        lit_len_and_dist_trees_unpacked.push_back(code_length_to_repeat);
-                }
-
-                lit_len_code_bit_length.resize(hlit);
-                for (unsigned int i = 0; i < lit_len_code_bit_length.count(); i++)
-                    lit_len_code_bit_length[i] = lit_len_and_dist_trees_unpacked[i];
-
-                dist_code_bit_length.resize(lit_len_and_dist_trees_unpacked.count() - hlit);
-                for (unsigned int i = 0; i < dist_code_bit_length.count(); i++)
-                    dist_code_bit_length[i] = lit_len_and_dist_trees_unpacked[hlit + i];
-
-                build_huffman_alphabet(lit_len_alphabet, lit_len_code_bit_length);
-                build_huffman_alphabet(dist_alphabet, dist_code_bit_length);
             }
 
             // Do the actual huffman decoding
-            HuffmanDecoder symbol_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_alphabet : lit_len_alphabet,
-                                          btype == BT_FIXED_HUFFMAN ? _fixed_code_bit_lengths : lit_len_code_bit_length);
+            HuffmanDecoder symbol_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_alphabet : _lit_len_alphabet,
+                                          btype == BT_FIXED_HUFFMAN ? _fixed_code_bit_lengths : _lit_len_code_bit_length);
 
-            HuffmanDecoder dist_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_dist_alphabet : dist_alphabet,
-                                        btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : dist_code_bit_length);
+            HuffmanDecoder dist_decoder(btype == BT_FIXED_HUFFMAN ? _fixed_dist_alphabet : _dist_alphabet,
+                                        btype == BT_FIXED_HUFFMAN ? _fixed_dist_code_bit_lengths : _dist_code_bit_length);
             while (true)
             {
                 unsigned int decoded_symbol = symbol_decoder.decode(input);

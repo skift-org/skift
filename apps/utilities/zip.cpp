@@ -2,19 +2,24 @@
 #include <libfile/ZipArchive.h>
 #include <libsystem/io/File.h>
 #include <libsystem/io/Stream.h>
+#include <libutils/ArgParse.h>
 
-int main(int argc, char **argv)
+int main(int argc, char const *argv[])
 {
-    if (argc == 1)
-    {
-        stream_format(err_stream, "%s: Missing archive operand\n", argv[0]);
-        return PROCESS_FAILURE;
-    }
+    ArgParse args;
 
-    if (argc == 2)
+    args.show_help_if_no_operand_given();
+    args.should_abort_on_failure();
+
+    args.usage("ARCHIVE FILES...");
+    args.usage("OPTION... ARCHIVE FILES...");
+
+    args.eval(argc, argv);
+
+    if (args.argc() < 2)
     {
-        stream_format(err_stream, "%s: Missing files to pack into archive '%s'\n", argv[0], argv[1]);
-        return PROCESS_FAILURE;
+        args.help();
+        args.fail();
     }
 
     File file{argv[1]};
@@ -27,13 +32,14 @@ int main(int argc, char **argv)
     ZipArchive archive(file, false);
 
     // Pack all files that were passed as arguments
-    for (int i = 2; i < argc; i++)
+    for (unsigned int i = 1; i < args.argc(); i++)
     {
-        printf("%s: Entry: %s is being inserted...\n", argv[0], argv[i]);
-        auto result = archive.insert(argv[i], argv[i]);
+        printf("%s: Entry: %s is being inserted...\n", argv[0], args.argv()[i].cstring());
+        auto result = archive.insert(args.argv()[i].cstring(), args.argv()[i].cstring());
         if (result != Result::SUCCESS)
         {
-            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], argv[i], result);
+            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], args.argv()[i], result);
+            return PROCESS_FAILURE;
         }
     }
 

@@ -5,7 +5,7 @@
 #include <libwidget/Window.h>
 
 #include <libfilepicker/model/Navigation.h>
-#include <libfilepicker/widgets/Browser.h>
+#include <libfilepicker/widgets/DirectoryBrowser.h>
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
@@ -35,6 +35,6 @@ public:
         auto jump_list = new filepicker::JumpList(bookmarks_and_browser, navigation, bookmarks);
         jump_list->min_width(160);
 
-        new filepicker::Browser(bookmarks_and_browser, navigation);
+        new filepicker::DirectoryBrowser(bookmarks_and_browser, navigation);
     }
 };

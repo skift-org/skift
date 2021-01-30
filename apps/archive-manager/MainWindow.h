@@ -5,7 +5,7 @@
 #include <libwidget/Window.h>
 
 #include <libfilepicker/model/Navigation.h>
-#include <libfilepicker/widgets/Browser.h>
+#include <libfilepicker/widgets/ArchiveBrowser.h>
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
 
@@ -14,10 +14,10 @@ class MainWindow :
 {
 private:
 public:
-    MainWindow()
+    MainWindow(RefPtr<filepicker::Navigation> navigation, RefPtr<Archive> archive)
         : Window(WINDOW_RESIZABLE)
     {
-        icon(Icon::get("folder"));
+        icon(Icon::get("folder-zip"));
         title("Archive Manager");
         size(Vec2i(700, 500));
 
@@ -30,5 +30,6 @@ public:
         browser->flags(Widget::FILL);
         browser->layout(HFLOW(1));
 
+        new filepicker::ArchiveBrowser(browser, navigation, archive);
     }
 };

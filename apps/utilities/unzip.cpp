@@ -30,9 +30,8 @@ int main(int argc, char **argv)
             return PROCESS_FAILURE;
         }
 
-        for (unsigned int i = 0; i < archive.get_entry_count(); i++)
+        for (auto& entry : archive.entries())
         {
-            auto &entry = archive.get_entry(i);
             printf("%s: Entry: %s is being extracted...\n", argv[0], entry.name.cstring());
 
             auto result = archive.extract(i, entry.name.cstring());

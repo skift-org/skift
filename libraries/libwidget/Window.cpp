@@ -459,12 +459,12 @@ void Window::dispatch_event(Event *event)
 
             if (_mouse_focus)
             {
-                auto window_position = result->position_in_window();
+                auto position_in_window = _mouse_focus->position_in_window();
 
                 Event event_copy = *event;
 
-                event_copy.mouse.position -= window_position;
-                event_copy.mouse.old_position -= window_position;
+                event_copy.mouse.position -= position_in_window;
+                event_copy.mouse.old_position -= position_in_window;
 
                 _mouse_focus->dispatch_event(&event_copy);
 

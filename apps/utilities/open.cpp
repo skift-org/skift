@@ -27,7 +27,7 @@ Result open(const char *raw_path)
         return ERR_NO_SUCH_FILE_OR_DIRECTORY;
     }
 
-    auto &file_type = file_extensions.get(extension);
+    const auto &file_type = file_extensions.get(extension);
 
     if (!file_type.is(json::STRING))
     {
@@ -61,7 +61,7 @@ Result open(const char *raw_path)
 
     snprintf(app_path, PATH_LENGTH, "/Applications/%s/%s", app_name.cstring(), app_name.cstring());
 
-    auto launchpad = launchpad_create(app_name.cstring(), app_path);
+    auto *launchpad = launchpad_create(app_name.cstring(), app_path);
     launchpad_argument(launchpad, path.string().cstring());
     return launchpad_launch(launchpad, nullptr);
 }

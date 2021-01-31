@@ -1,9 +1,9 @@
 #pragma once
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
+#include <libutils/BitReader.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
-#include <libutils/BitReader.h>
 
 class Inflate
 {
@@ -12,7 +12,7 @@ public:
 
 private:
     void build_fixed_huffman_alphabet();
-    Result build_dynamic_huffman_alphabet(BitReader& input);
+    Result build_dynamic_huffman_alphabet(BitReader &input);
     void build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int> &code_bit_lengths);
 
     void get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths);
@@ -24,10 +24,10 @@ private:
     Vector<unsigned int> _fixed_code_bit_lengths;
     Vector<unsigned int> _fixed_dist_alphabet;
     Vector<unsigned int> _fixed_dist_code_bit_lengths;
-    
+
     // Dynamic huffmann
     Vector<unsigned int> _lit_len_alphabet;
     Vector<unsigned int> _lit_len_code_bit_length;
     Vector<unsigned int> _dist_code_bit_length;
-    Vector<unsigned int> _dist_alphabet; 
+    Vector<unsigned int> _dist_alphabet;
 };

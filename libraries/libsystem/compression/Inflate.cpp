@@ -63,10 +63,14 @@ static constexpr uint8_t BASE_DISTANCE_EXTRA_BITS[] = {
 void Inflate::get_bit_length_count(HashMap<unsigned int, unsigned int> &bit_length_count, const Vector<unsigned int> &code_bit_lengths)
 {
     for (unsigned int i = 0; i != code_bit_lengths.count(); i++)
+    {
         bit_length_count[code_bit_lengths[i]] = 0;
+    }
 
     for (unsigned int i = 0; i != code_bit_lengths.count(); i++)
+    {
         bit_length_count[code_bit_lengths[i]]++;
+    }
 }
 
 void Inflate::get_first_code(HashMap<unsigned int, unsigned int> &first_codes, HashMap<unsigned int, unsigned int> &bit_length_count)
@@ -76,7 +80,9 @@ void Inflate::get_first_code(HashMap<unsigned int, unsigned int> &first_codes, H
     for (unsigned int i = 1; i <= (unsigned int)bit_length_count.count(); i++)
     {
         if (i >= 2)
+        {
             prev_bl_count = bit_length_count[i - 1];
+        }
         code = (code + prev_bl_count) << 1;
         first_codes[i] = code;
     }
@@ -87,10 +93,16 @@ void Inflate::assign_huffman_codes(Vector<unsigned int> &assigned_codes, const V
     assigned_codes.resize(code_bit_lengths.count());
 
     for (unsigned int i = 0; i < (unsigned int)code_bit_lengths.count(); i++)
+    {
         if (code_bit_lengths[i])
+        {
             assigned_codes[i] = first_codes[code_bit_lengths[i]]++;
+        }
         else
+        {
             assigned_codes[i] = 0;
+        }
+    }
 }
 
 void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vector<unsigned int> &code_bit_lengths)
@@ -106,7 +118,9 @@ void Inflate::build_huffman_alphabet(Vector<unsigned int> &alphabet, const Vecto
 void Inflate::build_fixed_huffman_alphabet()
 {
     if (_fixed_code_bit_lengths.count())
+    {
         return;
+    }
 
     _fixed_code_bit_lengths.resize(288);
     _fixed_dist_code_bit_lengths.resize(32);
@@ -114,17 +128,27 @@ void Inflate::build_fixed_huffman_alphabet()
     for (int i = 0; i <= 287; i++)
     {
         if (i >= 0 && i <= 143)
+        {
             _fixed_code_bit_lengths[i] = 8;
+        }
         else if (i >= 144 && i <= 255)
+        {
             _fixed_code_bit_lengths[i] = 9;
+        }
         else if (i >= 256 && i <= 279)
+        {
             _fixed_code_bit_lengths[i] = 7;
+        }
         else if (i >= 280 && i <= 287)
+        {
             _fixed_code_bit_lengths[i] = 8;
+        }
     }
 
     for (int i = 0; i != 32; i++)
+    {
         _fixed_dist_code_bit_lengths[i] = 5;
+    }
 
     build_huffman_alphabet(_fixed_alphabet, _fixed_code_bit_lengths);
     build_huffman_alphabet(_fixed_dist_alphabet, _fixed_dist_code_bit_lengths);
@@ -187,16 +211,22 @@ Result Inflate::build_dynamic_huffman_alphabet(BitReader &input)
         }
 
         for (unsigned int i = 0; i != repeat_count; i++)
+        {
             lit_len_and_dist_trees_unpacked.push_back(code_length_to_repeat);
+        }
     }
 
     _lit_len_code_bit_length.resize(hlit);
     for (unsigned int i = 0; i < _lit_len_code_bit_length.count(); i++)
+    {
         _lit_len_code_bit_length[i] = lit_len_and_dist_trees_unpacked[i];
+    }
 
     _dist_code_bit_length.resize(lit_len_and_dist_trees_unpacked.count() - hlit);
     for (unsigned int i = 0; i < _dist_code_bit_length.count(); i++)
+    {
         _dist_code_bit_length[i] = lit_len_and_dist_trees_unpacked[hlit + i];
+    }
 
     build_huffman_alphabet(_lit_len_alphabet, _lit_len_code_bit_length);
     build_huffman_alphabet(_dist_alphabet, _dist_code_bit_length);
@@ -225,7 +255,9 @@ Result Inflate::perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &unco
             input.skip_bits(16);
 
             for (int i = 0; i != len; i++)
+            {
                 uncompressed.push_back(input.grab_bits(8));
+            }
         }
         else if (btype == BT_FIXED_HUFFMAN ||
                  btype == BT_DYNAMIC_HUFFMAN)

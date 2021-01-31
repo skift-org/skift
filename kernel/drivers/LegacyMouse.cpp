@@ -155,12 +155,11 @@ LegacyMouse::LegacyMouse(DeviceAddress address) : LegacyDevice(address, DeviceCl
     read_register();
     write_register(200);
     read_register();
-    
+
     write_register(0xF3);
     read_register();
     write_register(100);
     read_register();
-    
 
     write_register(0xF3);
     read_register();

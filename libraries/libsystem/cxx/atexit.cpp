@@ -18,7 +18,9 @@ extern "C"
     int __cxa_atexit(AtExitFunction exit_function, void *parameter, void *dso_handle)
     {
         if (__exit_entry_count >= 1024)
+        {
             return -1;
+        }
 
         __exit_entries[__exit_entry_count++] = {exit_function, parameter, dso_handle, false};
 

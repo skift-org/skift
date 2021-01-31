@@ -131,7 +131,7 @@ void DirectoryListing::update()
 {
     _files.clear();
 
-    auto directory = directory_open(_navigation->current().string().cstring(), OPEN_READ);
+    auto *directory = directory_open(_navigation->current().string().cstring(), OPEN_READ);
 
     if (handle_has_error(directory))
     {

@@ -50,7 +50,9 @@ void ls_print_entry(DirectoryEntry *entry)
     }
 
     if (option_all || entry->name[0] != '.')
+    {
         printf((stat->type == FILE_TYPE_DIRECTORY && option_color) ? "\e[1;34m%s\e[0m/ " : "%s  ", entry->name);
+    }
 
     if (option_list)
     {

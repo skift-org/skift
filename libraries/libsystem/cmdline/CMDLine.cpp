@@ -13,8 +13,12 @@
 CommandLineOption *get_long_option(CommandLine *cmdline, const char *name)
 {
     for (int i = 0; cmdline->options[i].type != COMMANDLINE_END; i++)
+    {
         if (strcmp(cmdline->options[i].long_name, name) == 0)
+        {
             return &cmdline->options[i];
+        }
+    }
 
     return nullptr;
 }
@@ -22,8 +26,12 @@ CommandLineOption *get_long_option(CommandLine *cmdline, const char *name)
 CommandLineOption *get_short_option(CommandLine *cmdline, const char name)
 {
     for (int i = 0; cmdline->options[i].type != COMMANDLINE_END; i++)
+    {
         if (cmdline->options[i].short_name == name)
+        {
             return &cmdline->options[i];
+        }
+    }
 
     return nullptr;
 }

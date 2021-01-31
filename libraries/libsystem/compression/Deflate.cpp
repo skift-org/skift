@@ -62,10 +62,11 @@ Result Deflate::perform(const Vector<uint8_t> &uncompressed, Vector<uint8_t> &co
 {
     // If the data amount is too small it's not worth compressing it.
     // Depends on the compression level
-    if (uncompressed.count() < _min_size_to_compress) [[unlikely]]
-    {
-        return compress_none(uncompressed, compressed);
-    }
+    if (uncompressed.count() < _min_size_to_compress)
+        [[unlikely]]
+        {
+            return compress_none(uncompressed, compressed);
+        }
 
     return _compression_method(uncompressed, compressed);
 }

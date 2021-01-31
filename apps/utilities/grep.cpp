@@ -36,7 +36,9 @@ int matchstar(int c, char *re, char *text)
     {
         // a * matches zero or more instances
         if (matchhere(re, text))
+        {
             return 1;
+        }
     } while (*text != '\0' && (*text++ == c || c == '.'));
 
     return 0;

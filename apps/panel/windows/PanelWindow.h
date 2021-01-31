@@ -3,8 +3,8 @@
 #include <libwidget/Window.h>
 
 #include "panel/windows/DateAndTimeWindow.h"
-#include "panel/windows/QuickSettingsWindow.h"
 #include "panel/windows/MenuWindow.h"
+#include "panel/windows/QuickSettingsWindow.h"
 
 namespace panel
 {

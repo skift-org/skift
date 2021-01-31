@@ -34,7 +34,9 @@ int vsnprintf(char *s, size_t n, const char *fmt, va_list va)
 {
 
     if (n == 0)
+    {
         return 0;
+    }
 
     printf_info_t info = {};
 
@@ -90,12 +92,16 @@ void *memmove(void *dest, const void *src, size_t n)
     if (udest < usrc)
     {
         for (i = 0; i < n; i++)
+        {
             udest[i] = usrc[i];
+        }
     }
     else if (udest > usrc)
     {
         for (i = n; i > 0; i--)
+        {
             udest[i - 1] = usrc[i - 1];
+        }
     }
 
     return dest;
@@ -176,7 +182,9 @@ size_t strlcat(char *dst, const char *src, size_t maxlen)
     const size_t srclen = strlen(src);
     const size_t dstlen = strnlen(dst, maxlen);
     if (dstlen == maxlen)
+    {
         return maxlen + srclen;
+    }
     if (srclen < maxlen - dstlen)
     {
         memcpy(dst + dstlen, src, srclen + 1);
@@ -197,9 +205,13 @@ char *strchr(const char *p, int ch)
     for (;; ++p)
     {
         if (*p == c)
+        {
             return ((char *)p);
+        }
         if (*p == '\0')
+        {
             return (nullptr);
+        }
     }
 }
 
@@ -210,7 +222,9 @@ int strcmp(const char *stra, const char *strb)
     for (i = 0; stra[i] == strb[i]; i++)
     {
         if (stra[i] == '\0')
+        {
             return 0;
+        }
     }
 
     return stra[i] - strb[i];
@@ -225,10 +239,14 @@ int strncmp(const char *s1, const char *s2, size_t n)
         u1 = (unsigned char)*s1++;
         u2 = (unsigned char)*s2++;
         if (u1 != u2)
+        {
             return u1 - u2;
+        }
 
         if (u1 == '\0')
+        {
             return 0;
+        }
     }
     return 0;
 }
@@ -246,7 +264,9 @@ char *strcpy(char *s1, const char *s2)
 {
     char *s = s1;
     while ((*s++ = *s2++) != 0)
+    {
         ;
+    }
     return (s1);
 }
 
@@ -254,7 +274,9 @@ char *strncpy(char *s1, const char *s2, size_t n)
 {
     size_t size = strnlen(s2, n);
     if (size != n)
+    {
         memset(s1 + size, '\0', n - size);
+    }
     return (char *)memcpy(s1, s2, size);
 }
 
@@ -302,7 +324,9 @@ size_t strlen(const char *str)
 {
     size_t length = 0;
     while (str[length])
+    {
         length++;
+    }
     return length;
 }
 
@@ -313,7 +337,9 @@ size_t strnlen(const char *s, size_t maxlen)
     for (len = 0; len < maxlen; len++, s++)
     {
         if (!*s)
+        {
             break;
+        }
     }
     return (len);
 }
@@ -332,7 +358,9 @@ char *strrchr(const char *s, int c)
     do
     {
         if (*s == c)
+        {
             rtnval = (char *)s;
+        }
     } while (*s++);
     return (rtnval);
 }
@@ -346,10 +374,14 @@ size_t strspn(const char *p, const char *s)
         for (j = 0; s[j]; j++)
         {
             if (s[j] == p[i])
+            {
                 break;
+            }
         }
         if (!s[j])
+        {
             break;
+        }
     }
     return (i);
 }
@@ -362,7 +394,9 @@ char *strstr(const char *s1, const char *s2)
     for (; (p = strchr(p, *s2)) != 0; p++)
     {
         if (strncmp(p, s2, len) == 0)
+        {
             return (char *)p;
+        }
     }
     return nullptr;
 }
@@ -378,16 +412,22 @@ char *strtok_r(char *s, const char *delim, char **state)
     int ch;
 
     if (s == 0)
+    {
         s = *state;
+    }
     do
     {
         if ((ch = *s++) == '\0')
+        {
             return 0;
+        }
     } while (strchr(delim, ch));
     --s;
     *state = s + strcspn(s, delim);
     if (**state != 0)
+    {
         **state++ = 0;
+    }
     return s;
 }
 
@@ -443,7 +483,9 @@ void strleadtrim(char *str, char c)
     char *start = str;
 
     while (*start == c)
+    {
         start++;
+    }
 
     memmove(str, start, strlen(str + 1));
 }
@@ -453,7 +495,9 @@ void strtrailtrim(char *str, char c)
     char *end = str + strlen(str) - 1;
 
     while (end > str && *end == c)
+    {
         end--;
+    }
 
     end[1] = '\0';
 }

@@ -339,6 +339,8 @@ Result ZipArchive::insert(const char *entry_name, const char *src_path)
     // Do this properly...
     _file.write_all(archive_data.raw_storage(), archive_data.count());
     if (_data != nullptr)
+    {
         delete[] _data;
+    }
     return _file.read_all((void **)&_data, &_size);
 }

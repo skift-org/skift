@@ -119,7 +119,7 @@ void theme_load(const char *path)
         return;
     }
 
-    auto &colors = root.get("colors");
+    const auto &colors = root.get("colors");
 
     if (root.has("dark"))
     {
@@ -132,7 +132,7 @@ void theme_load(const char *path)
 
     for (int i = 0; i < __THEME_COLOR_COUNT; i++)
     {
-        auto &color = colors.get(_theme_colors_names[i]);
+        const auto &color = colors.get(_theme_colors_names[i]);
 
         if (color.is(json::STRING))
         {

@@ -218,11 +218,11 @@ Color Color::parse(const char *name, size_t size)
     }
     else
     {
-        for (size_t i = 0; i < __array_length(_color_names); i++)
+        for (const auto &_color_name : _color_names)
         {
-            if (strcmp(name, _color_names[i].name) == 0)
+            if (strcmp(name, _color_name.name) == 0)
             {
-                return _color_names[i].color;
+                return _color_name.color;
             }
         }
     }

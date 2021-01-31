@@ -69,7 +69,7 @@
 
 ## 3. Files
 
- - [manifest.json](30-files/manifest.md)
+ - [manifest.md](30-files/manifest.md)
 
 ## 4. Human Interface
 

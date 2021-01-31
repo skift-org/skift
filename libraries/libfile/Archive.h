@@ -16,7 +16,7 @@ public:
         unsigned int compression;
     };
 
-    Archive(File file) : _file(file)
+    Archive(Path path) : _path(path)
     {
     }
 
@@ -28,9 +28,9 @@ public:
     virtual Result extract(unsigned int entry_index, const char *dest_path) = 0;
     virtual Result insert(const char *entry_name, const char *src_dir) = 0;
 
-    inline File get_file()
+    inline const Path &get_path()
     {
-        return _file;
+        return _path;
     }
 
     inline bool valid()
@@ -40,6 +40,6 @@ public:
 
 protected:
     Vector<Entry> _entries;
-    File _file;
+    Path _path;
     bool _valid = true;
 };

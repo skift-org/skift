@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
             return Iteration::STOP;
         }
 
-        auto archive = make<ZipArchive>(file);
+        auto archive = make<ZipArchive>(Path::parse(path));
 
         if (!archive->valid())
         {

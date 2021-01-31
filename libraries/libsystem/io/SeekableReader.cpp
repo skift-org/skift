@@ -1,11 +1,11 @@
-#include <libutils/Reader.h>
-#include <libutils/Writer.h>
+#include <libsystem/io/SeekableReader.h>
+#include <libsystem/io/Writer.h>
 
 #define COPY_CHUNK_SIZE 4096
 
-void Reader::copy_to(Writer &writer)
+void SeekableReader::copy_to(Writer &writer)
 {
-    assert(position() == 0);
+    seek(0, WHENCE_START);
 
     uint8_t copy_chunk[COPY_CHUNK_SIZE];
     size_t chunk_size = 0;

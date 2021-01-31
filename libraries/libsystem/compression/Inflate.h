@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
-#include <libutils/BitReader.h>
+#include <libsystem/io/BitReader.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 

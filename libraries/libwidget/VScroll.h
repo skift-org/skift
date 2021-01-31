@@ -39,6 +39,15 @@ public:
         _scrollbar->update(content_height, content().height(), scroll().x());
     }
 
+    void event(Event *event) override
+    {
+        if (event->type == Event::MOUSE_SCROLL)
+        {
+            event->accepted = true;
+            _scrollbar->dispatch_event(event);
+        }
+    }
+
     Vec2i size() override
     {
         return {_host->size().x(), 0};

@@ -88,6 +88,7 @@ void Window::handle_mouse_move(Vec2i old_position, Vec2i position, MouseButton b
         .type = Event::MOUSE_MOVE,
         .accepted = false,
         .mouse = {
+            .scroll = 0,
             .position = position,
             .old_position = old_position,
             .position_on_screen = position,
@@ -113,6 +114,7 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             .type = Event::MOUSE_BUTTON_PRESS,
             .accepted = false,
             .mouse = {
+                .scroll = 0,
                 .position = position,
                 .old_position = position,
                 .position_on_screen = position,
@@ -133,6 +135,7 @@ static void handle_mouse_button(Window &window, MouseButton button, MouseButton 
             .type = Event::MOUSE_BUTTON_RELEASE,
             .accepted = false,
             .mouse = {
+                .scroll = 0,
                 .position = position,
                 .old_position = position,
                 .position_on_screen = position,
@@ -161,12 +164,34 @@ void Window::handle_double_click(Vec2i position)
         .type = Event::MOUSE_DOUBLE_CLICK,
         .accepted = false,
         .mouse = {
+            .scroll = 0,
             .position = position,
             .old_position = position,
             .position_on_screen = position,
             .old_position_on_screen = position,
             .button = MOUSE_BUTTON_LEFT,
             .buttons = MOUSE_BUTTON_LEFT,
+        },
+
+        .keyboard = {},
+    };
+
+    send_event(event);
+}
+
+void Window::handle_mouse_scroll(Vec2i position, int scroll)
+{
+    Event event = {
+        .type = Event::MOUSE_SCROLL,
+        .accepted = false,
+        .mouse = {
+            .scroll = scroll,
+            .position = position,
+            .old_position = position,
+            .position_on_screen = position,
+            .old_position_on_screen = position,
+            .button = MOUSE_NO_BUTTON,
+            .buttons = MOUSE_NO_BUTTON,
         },
 
         .keyboard = {},

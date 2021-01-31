@@ -79,8 +79,19 @@ void ScrollBar::event(Event *event)
 
             event->accepted = true;
         }
+        else if (event->type == Event::MOUSE_SCROLL)
+        {
+            value(value() + 48 * event->mouse.scroll);
 
-        if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
+            Event event_value_changed = {};
+            event_value_changed.type = Event::VALUE_CHANGE;
+            dispatch_event(&event_value_changed);
+
+            should_repaint();
+
+            event->accepted = true;
+        }
+        else if (event->type == Event::MOUSE_MOVE && mouse_event.buttons & MOUSE_BUTTON_LEFT)
         {
             Vec2i position = mouse_event.position - _mouse_origin;
             scroll_to(position);

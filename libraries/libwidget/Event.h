@@ -16,6 +16,8 @@ typedef unsigned int MouseButton;
 
 struct MouseEvent
 {
+    int scroll;
+
     Vec2i position;
     Vec2i old_position;
 
@@ -50,6 +52,7 @@ struct Event
         WIDGET_ENABLE,
 
         MOUSE_MOVE,
+        MOUSE_SCROLL,
         MOUSE_ENTER,
         MOUSE_LEAVE,
 
@@ -78,6 +81,7 @@ using EventHandler = Callback<void(Event *)>;
 
 #define is_mouse_event(__event)                                   \
     (((Event *)(__event))->type == Event::MOUSE_MOVE ||           \
+     ((Event *)(__event))->type == Event::MOUSE_SCROLL ||         \
      ((Event *)(__event))->type == Event::MOUSE_ENTER ||          \
      ((Event *)(__event))->type == Event::MOUSE_LEAVE ||          \
      ((Event *)(__event))->type == Event::MOUSE_BUTTON_PRESS ||   \

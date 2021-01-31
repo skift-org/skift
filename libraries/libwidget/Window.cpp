@@ -475,11 +475,31 @@ void Window::dispatch_event(Event *event)
         break;
     }
 
+    case Event::MOUSE_SCROLL:
+    {
+        auto result = child_at(event->mouse.position);
+
+        if (result)
+        {
+            auto window_position = result->position_in_window();
+
+            Event event_copy = *event;
+
+            event_copy.mouse.position -= window_position;
+            event_copy.mouse.old_position -= window_position;
+
+            result->dispatch_event(&event_copy);
+
+            event->accepted = event_copy.accepted;
+        }
+
+        break;
+    }
+
     case Event::MOUSE_BUTTON_PRESS:
     {
         if (root()->bound().contains(event->mouse.position))
         {
-
             auto result = child_at(event->mouse.position);
 
             if (result)

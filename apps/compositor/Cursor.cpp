@@ -81,7 +81,9 @@ void cursor_handle_packet(MousePacket packet)
         renderer_region_dirty(cursor_dirty_bound_from_position(_mouse_position));
 
         if (window_on_focus)
+        {
             window_on_focus->handle_mouse_move(_mouse_old_position, _mouse_position, _mouse_buttons);
+        }
     }
 
     if (_mouse_old_buttons < _mouse_buttons)
@@ -110,7 +112,14 @@ void cursor_handle_packet(MousePacket packet)
     }
 
     if (window_on_focus && !has_send_double_click)
+    {
         window_on_focus->handle_mouse_buttons(_mouse_old_buttons, _mouse_buttons, _mouse_position);
+    }
+
+    if (window_on_focus && packet.scroll != 0)
+    {
+        window_on_focus->handle_mouse_scroll(_mouse_position, packet.scroll);
+    }
 }
 
 CursorState cursor_get_state()

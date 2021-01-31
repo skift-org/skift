@@ -67,6 +67,8 @@ public:
 
     void handle_double_click(Vec2i position);
 
+    void handle_mouse_scroll(Vec2i position, int scroll);
+
     void get_focus();
 
     void lost_focus();

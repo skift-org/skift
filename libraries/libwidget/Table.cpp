@@ -199,6 +199,11 @@ void Table::event(Event *event)
         action_event.type = Event::ACTION;
         dispatch_event(&action_event);
     }
+    else if (event->type == Event::MOUSE_SCROLL)
+    {
+        event->accepted = true;
+        _scrollbar->dispatch_event(event);
+    }
     else if (event->type == Event::KEYBOARD_KEY_TYPED)
     {
         if (event->keyboard.key == KEYBOARD_KEY_UP)

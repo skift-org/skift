@@ -43,9 +43,6 @@ uint8_t LegacyMouse::read_register()
 
 void LegacyMouse::handle_finished_packet(uint8_t packet0, uint8_t packet1, uint8_t packet2, uint8_t packet3)
 {
-    //TODO: Scroll whell not suported yet
-    __unused(packet3);
-
     int offx = packet1;
 
     if (offx && (packet0 & (1 << 4)))
@@ -103,7 +100,6 @@ void LegacyMouse::handle_packet(uint8_t packet)
 
         if (_quirk_no_mouse_whell)
         {
-
             handle_finished_packet(_packet[0], _packet[1], _packet[2], _packet[3]);
             _cycle = 0;
         }
@@ -111,6 +107,7 @@ void LegacyMouse::handle_packet(uint8_t packet)
         {
             _cycle++;
         }
+
         break;
     case 3:
         _packet[3] = packet;

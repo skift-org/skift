@@ -10,7 +10,9 @@ static const char *digits_capitalized = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 size_t format_uint(NumberFormater formater, unsigned long value, char *str, size_t size)
 {
     if (size == 0)
+    {
         return 0;
+    }
 
     size_t written = 0;
 
@@ -53,7 +55,9 @@ size_t format_uint(NumberFormater formater, unsigned long value, char *str, size
 size_t format_int(NumberFormater formater, long value, char *str, size_t size)
 {
     if (size == 0)
+    {
         return 0;
+    }
 
     size_t written = 0;
     str[0] = '\0';

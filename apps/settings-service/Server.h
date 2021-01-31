@@ -43,7 +43,7 @@ public:
         });
 
         _invoker = own<Invoker>([this]() {
-            _clients.remove_all_match([](auto& client) {
+            _clients.remove_all_match([](auto &client) {
                 return !client->connected();
             });
         });

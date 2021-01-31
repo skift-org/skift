@@ -26,7 +26,7 @@ ResultOr<Message> Message::read_from(Connection *connection)
 
     if (header.path_length > 0)
     {
-        auto buffer = new char[header.path_length];
+        auto *buffer = new char[header.path_length];
         connection_receive(connection, buffer, header.path_length);
 
         if (handle_has_error(connection))
@@ -41,7 +41,7 @@ ResultOr<Message> Message::read_from(Connection *connection)
 
     if (header.payload_length > 0)
     {
-        auto buffer = new char[header.payload_length];
+        auto *buffer = new char[header.payload_length];
         connection_receive(connection, buffer, header.payload_length);
 
         if (handle_has_error(connection))

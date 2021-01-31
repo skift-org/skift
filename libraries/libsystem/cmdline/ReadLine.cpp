@@ -114,12 +114,16 @@ Result readline_readline(ReadLine *readline, char **line)
             else if (readline->scan->current() == 'C')
             {
                 if (readline->cursor < unicode_string_length(readline_string(readline)))
+                {
                     readline->cursor++;
+                }
             }
             else if (readline->scan->current() == 'D')
             {
                 if (readline->cursor > 0)
+                {
                     readline->cursor--;
+                }
             }
             else if (readline->scan->current_is("0123456789"))
             {

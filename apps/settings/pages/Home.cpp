@@ -3,7 +3,7 @@
 
 namespace settings
 {
-    
+
 HomePage::HomePage(Widget *parent)
     : Container(parent)
 {

@@ -14,9 +14,9 @@ Launchpad *launchpad_create(const char *name, const char *executable)
     strcpy(launchpad->name, name);
     strcpy(launchpad->executable, executable);
 
-    for (size_t i = 0; i < PROCESS_HANDLE_COUNT; i++)
+    for (int &handle : launchpad->handles)
     {
-        launchpad->handles[i] = HANDLE_INVALID_ID;
+        handle = HANDLE_INVALID_ID;
     }
 
     launchpad->handles[0] = 0;

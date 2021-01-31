@@ -227,7 +227,9 @@ void *malloc(size_t req_size)
             maj->next = heap_major_block_create(size);
 
             if (maj->next == nullptr)
+            {
                 break; // no more memory :sad:
+            }
 
             maj->next->prev = maj;
             maj = maj->next;

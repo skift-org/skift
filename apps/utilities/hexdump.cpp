@@ -23,9 +23,9 @@ int main(int argc, char **argv)
     while ((read = stream_read(stream, buffer, 16)) != 0)
     {
         printf("%08x ", offset * 16);
-        for (size_t i = 0; i < 16; i++)
+        for (unsigned char i : buffer)
         {
-            printf("%02x ", buffer[i]);
+            printf("%02x ", i);
         }
 
         printf("\n");

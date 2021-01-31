@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libutils/Rect.h>
 #include <libsystem/utils/List.h>
+#include <libutils/Rect.h>
 
 #include "compositor/Protocol.h"
 

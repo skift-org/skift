@@ -180,7 +180,9 @@ int stream_read_buffered(Stream *stream, void *buffer, size_t size)
 size_t stream_read(Stream *stream, void *buffer, size_t size)
 {
     if (!stream)
+    {
         return 0;
+    }
 
     size_t result = 0;
 
@@ -262,7 +264,9 @@ static size_t stream_write_buffered(Stream *stream, const void *buffer, size_t s
 size_t stream_write(Stream *stream, const void *buffer, size_t size)
 {
     if (!stream)
+    {
         return 0;
+    }
 
     switch (stream->write_mode)
     {
@@ -283,7 +287,9 @@ size_t stream_write(Stream *stream, const void *buffer, size_t size)
 void stream_flush(Stream *stream)
 {
     if (!stream)
+    {
         return;
+    }
 
     if (stream->write_buffer != nullptr && stream->write_used > 0)
     {

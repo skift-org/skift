@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
         }
 
         unsigned int i = 0;
-        for (auto &entry : archive->entries())
+        for (const auto &entry : archive->entries())
         {
             stream_format(err_stream, "%s: Entry: %s is being extracted...\n", argv[0], entry.name.cstring());
 

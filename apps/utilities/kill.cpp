@@ -20,7 +20,7 @@ int killall(String name)
 
     for (size_t i = 0; i < processes.length(); i++)
     {
-        auto &proc = processes.get(i);
+        const auto &proc = processes.get(i);
 
         if (proc.get("name").as_string() == name)
         {

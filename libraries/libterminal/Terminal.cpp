@@ -22,10 +22,10 @@ Terminal::Terminal(int width, int height)
 
     _parameters_top = 0;
 
-    for (int i = 0; i < MAX_PARAMETERS; i++)
+    for (auto &_parameter : _parameters)
     {
-        _parameters[i].empty = true;
-        _parameters[i].value = 0;
+        _parameter.empty = true;
+        _parameter.value = 0;
     }
 
     clear_all();
@@ -458,10 +458,10 @@ void Terminal::write(Codepoint codepoint)
     case State::WAIT_ESC:
         if (codepoint == U'\e')
         {
-            for (int i = 0; i < MAX_PARAMETERS; i++)
+            for (auto &_parameter : _parameters)
             {
-                _parameters[i].empty = true;
-                _parameters[i].value = 0;
+                _parameter.empty = true;
+                _parameter.value = 0;
             }
 
             _parameters_top = 0;

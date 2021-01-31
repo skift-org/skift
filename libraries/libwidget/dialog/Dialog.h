@@ -35,8 +35,7 @@ private:
     Window *_window = nullptr;
 
 public:
-    void
-    title(String title)
+    void title(String title)
     {
         _title = title;
     }

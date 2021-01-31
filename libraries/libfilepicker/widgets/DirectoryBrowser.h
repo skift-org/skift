@@ -17,6 +17,14 @@ private:
     OwnPtr<Observer<Navigation>> _navigation_observer;
 
 public:
+    Optional<String> selected_path()
+    {
+
+        return process_resolve(_listing->info(selected()).name);
+    }
+
+    Callback<void(String &path)> on_element_selected;
+
     DirectoryBrowser(Widget *parent, RefPtr<Navigation> navigation)
         : Table(parent), _navigation(navigation)
     {
@@ -39,11 +47,10 @@ public:
                 {
                     _navigation->navigate(_listing->info(selected()).name);
                 }
-                else
+                else if (on_element_selected)
                 {
-                    auto l = launchpad_create("open", "/System/Utilities/open");
-                    launchpad_argument(l, _listing->info(selected()).name.cstring());
-                    launchpad_launch(l, nullptr);
+                    auto resolved_path = process_resolve(_listing->info(selected()).name);
+                    on_element_selected(resolved_path);
                 }
             }
         });

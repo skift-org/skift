@@ -8,15 +8,19 @@ int main(int argc, char **argv)
 {
     Application::initialize(argc, argv);
 
+    auto navigation = make<filepicker::Navigation>();
+
+    MainWindow *window = nullptr;
+
     if (argc != 2)
     {
-        return PROCESS_FAILURE;
+        window = new MainWindow(navigation, nullptr);
     }
-
-    auto navigation = make<filepicker::Navigation>();
-    auto archive = make<ZipArchive>(argv[1]);
-
-    auto window = new MainWindow(navigation, archive);
+    else
+    {
+        auto archive = make<ZipArchive>(argv[1]);
+        window = new MainWindow(navigation, archive);
+    }
 
     window->show();
 

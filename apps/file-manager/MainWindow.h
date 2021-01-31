@@ -33,8 +33,15 @@ public:
         bookmarks_and_browser->layout(HFLOW(1));
 
         auto jump_list = new filepicker::JumpList(bookmarks_and_browser, navigation, bookmarks);
+
         jump_list->min_width(160);
 
-        new filepicker::DirectoryBrowser(bookmarks_and_browser, navigation);
+        auto browser = new filepicker::DirectoryBrowser(bookmarks_and_browser, navigation);
+
+        browser->on_element_selected = [&](String &path) {
+            auto l = launchpad_create("open", "/System/Utilities/open");
+            launchpad_argument(l, path.cstring());
+            launchpad_launch(l, nullptr);
+        };
     }
 };

@@ -1,8 +1,8 @@
 #include <libutils/Vector.h>
 
+#include <libsettings/ServerConnection.h>
 #include <libsettings/Settings.h>
 #include <libsettings/Watcher.h>
-#include <libsettings/ipc/ServerConnection.h>
 
 namespace settings
 {
@@ -49,10 +49,10 @@ void register_watcher(Watcher &watcher)
     {
         Message message;
 
-        message.type = MessageType::CLIENT_WATCH;
+        message.type = Message::CLIENT_WATCH;
         message.path = watcher.path();
 
-        server().request(message, MessageType::SERVER_ACK);
+        server().request(message, Message::SERVER_ACK);
     }
 
     _watchers.push_back(&watcher);
@@ -66,10 +66,10 @@ void unregister_watcher(Watcher &watcher)
     {
         Message message;
 
-        message.type = MessageType::CLIENT_UNWATCH;
+        message.type = Message::CLIENT_UNWATCH;
         message.path = watcher.path();
 
-        server().request(message, MessageType::SERVER_ACK);
+        server().request(message, Message::SERVER_ACK);
     }
 }
 
@@ -77,10 +77,10 @@ Optional<json::Value> read(const Path path)
 {
     Message message;
 
-    message.type = MessageType::CLIENT_READ;
+    message.type = Message::CLIENT_READ;
     message.path = path;
 
-    auto result_or_response = server().request(message, MessageType::SERVER_VALUE);
+    auto result_or_response = server().request(message, Message::SERVER_VALUE);
 
     if (!result_or_response)
     {
@@ -94,11 +94,11 @@ bool write(const Path path, json::Value value)
 {
     Message message;
 
-    message.type = MessageType::CLIENT_WRITE;
+    message.type = Message::CLIENT_WRITE;
     message.path = path;
     message.payload = value;
 
-    auto result = server().request(message, MessageType::SERVER_ACK);
+    auto result = server().request(message, Message::SERVER_ACK);
 
     return result.success();
 }

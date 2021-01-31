@@ -1,10 +1,10 @@
 #pragma once
 
+#include <libsettings/Path.h>
 #include <libsystem/io/Directory.h>
 #include <libutils/Path.h>
 
-#include <libsettings/Domain.h>
-#include <libsettings/Path.h>
+#include "settings-service/Domain.h"
 
 namespace settings
 {

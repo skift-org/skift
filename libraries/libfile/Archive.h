@@ -5,7 +5,6 @@
 #include <libsystem/io/File.h>
 
 class Archive : public RefCounted<Archive>
-
 {
 public:
     struct Entry

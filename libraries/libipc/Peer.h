@@ -5,6 +5,7 @@
 #include <libsystem/io/Socket.h>
 
 #include <libutils/Callback.h>
+#include <libutils/ResultOr.h>
 
 namespace ipc
 {
@@ -30,7 +31,7 @@ public:
 
             if (result_or_message)
             {
-                on_message(*result_or_message);
+                handle_message(*result_or_message);
             }
             else
             {
@@ -61,7 +62,7 @@ public:
         return result;
     }
 
-    ResultOr<Protocol::Message> receive()
+    ResultOr<typename Protocol::Message> receive()
     {
         if (!_connection)
         {
@@ -78,7 +79,8 @@ public:
         return result_or_message;
     }
 
-    ResultOr<Protocol::Message> request(Protocol::Message message, Protocol::Type expected)
+    template <typename TPredicate>
+    ResultOr<typename Protocol::Message> send_and_wait_for(Protocol::Message message, TPredicate predicate)
     {
         auto send_result = send(message);
 
@@ -89,9 +91,9 @@ public:
 
         auto result_or_message = receive();
 
-        while (result_or_message && (*result_or_message).type != expected)
+        while (result_or_message && !predicate(*result_or_message))
         {
-            on_message(*result_or_message);
+            handle_message(*result_or_message);
 
             auto result_or_message = receive();
         }
@@ -103,7 +105,7 @@ public:
     {
         if (_connection)
         {
-            on_disconnect();
+            handle_disconnect();
 
             _notifier = nullptr;
 
@@ -112,8 +114,8 @@ public:
         }
     }
 
-    virtual void on_message(const Protocol::Message &) {}
-    virtual void on_disconnect() {}
+    virtual void handle_message(const Protocol::Message &) {}
+    virtual void handle_disconnect() {}
 };
 
 } // namespace ipc

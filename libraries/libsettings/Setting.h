@@ -9,6 +9,7 @@ class Setting
 {
 private:
     __noncopyable(Setting);
+    __nonmovable(Setting);
 
     OwnPtr<Watcher> _watcher;
     settings::Path _path;

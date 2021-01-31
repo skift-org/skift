@@ -5,10 +5,6 @@
 #include <libsystem/eventloop/EventLoop.h>
 #include <libsystem/io/Handle.h>
 
-struct Notifier;
-
-typedef void (*NotifierCallback)(void *target, Handle *handle, PollEvent events);
-
 class Notifier
 {
 private:

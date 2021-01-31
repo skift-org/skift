@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsettings/Bundle.h>
+#include "settings-service/Bundle.h"
 
 namespace settings
 {

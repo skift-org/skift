@@ -1,23 +1,22 @@
 #pragma once
 
+#include <libipc/Peer.h>
+#include <libsettings/Protocol.h>
 #include <libutils/Vector.h>
-
-#include <libsettings/Repository.h>
-#include <libsettings/ipc/Peer.h>
 
 namespace settings
 {
 
-class ClientConnection : public Peer
+class Client : public ipc::Peer<Protocol>
 {
 private:
     Vector<Path> _subscriptions;
 
 public:
-    Callback<void(ClientConnection &, const Message &message)> on_message;
+    Callback<void(Client &, const Message &message)> on_message;
     Callback<void()> on_disconnect;
 
-    ClientConnection(Connection *connection) : Peer(connection)
+    Client(Connection *connection) : Peer(connection)
     {
     }
 
@@ -26,7 +25,7 @@ public:
         on_message(*this, message);
     }
 
-    void disconnected() override
+    void handle_disconnect() override
     {
         on_disconnect();
     }

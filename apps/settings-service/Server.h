@@ -4,9 +4,8 @@
 #include <libsystem/eventloop/Notifier.h>
 #include <libsystem/io/Socket.h>
 
-#include <libsettings/Repository.h>
-
-#include "settings-service/ClientConnection.h"
+#include "settings-service/Client.h"
+#include "settings-service/Repository.h"
 
 namespace settings
 {
@@ -18,7 +17,7 @@ private:
     OwnPtr<Notifier> _notifier;
     OwnPtr<Invoker> _invoker;
 
-    Vector<OwnPtr<ClientConnection>> _clients{};
+    Vector<OwnPtr<Client>> _clients{};
     Repository &_repository;
 
 public:
@@ -29,7 +28,7 @@ public:
         _notifier = own<Notifier>(HANDLE(_socket), POLL_ACCEPT, [this]() {
             auto connection = socket_accept(_socket);
 
-            auto client = own<ClientConnection>(connection);
+            auto client = own<Client>(connection);
 
             client->on_message = [this](auto &client, auto &message) {
                 handle_client_message(client, message);
@@ -49,19 +48,18 @@ public:
         });
     }
 
-    void handle_client_message(ClientConnection &client, const Message &message)
+    void handle_client_message(Client &client, const Message &message)
     {
-        if (message.type == MessageType::CLIENT_READ)
+        if (message.type == Message::CLIENT_READ)
         {
-            Message r;
+            Message response;
+            response.type = Message::SERVER_VALUE;
+            response.path = *message.path;
+            response.payload = _repository.read(*message.path);
 
-            r.type = MessageType::SERVER_VALUE;
-            r.path = *message.path;
-            r.payload = _repository.read(*message.path);
-
-            client.send(r);
+            client.send(response);
         }
-        else if (message.type == MessageType::CLIENT_WRITE)
+        else if (message.type == Message::CLIENT_WRITE)
         {
             _repository.write(*message.path, *message.payload);
 
@@ -70,35 +68,37 @@ public:
                 if (_clients[i] != &client &&
                     _clients[i]->is_subscribe(*message.path))
                 {
-                    Message m;
+                    Message notification;
+                    notification.type = Message::SERVER_NOTIFY;
+                    notification.path = *message.path;
+                    notification.payload = _repository.read(*message.path);
 
-                    m.type = MessageType::SERVER_NOTIFY;
-                    m.path = *message.path;
-                    m.payload = _repository.read(*message.path);
-
-                    _clients[i]->send(m);
+                    _clients[i]->send(notification);
                 }
             }
 
-            Message r;
-            r.type = MessageType::SERVER_ACK;
-            client.send(r);
+            Message response;
+            response.type = Message::SERVER_ACK;
+
+            client.send(response);
         }
-        else if (message.type == MessageType::CLIENT_WATCH)
+        else if (message.type == Message::CLIENT_WATCH)
         {
             client.subscribe(*message.path);
 
-            Message r;
-            r.type = MessageType::SERVER_ACK;
-            client.send(r);
+            Message response;
+            response.type = Message::SERVER_ACK;
+
+            client.send(response);
         }
-        else if (message.type == MessageType::CLIENT_UNWATCH)
+        else if (message.type == Message::CLIENT_UNWATCH)
         {
             client.unsubscribe(*message.path);
 
-            Message r;
-            r.type = MessageType::SERVER_ACK;
-            client.send(r);
+            Message response;
+            response.type = Message::SERVER_ACK;
+
+            client.send(response);
         }
         else
         {

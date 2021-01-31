@@ -54,7 +54,7 @@ public:
             load_button->on(Event::ACTION, [&](auto) {
                 if (_dialog.show() == DialogResult::OK)
                 {
-                    set_archive(make<ZipArchive>(*_dialog.selected_file()));
+                    set_archive(make<ZipArchive>(Path::parse(*_dialog.selected_file())));
                 }
             });
         }

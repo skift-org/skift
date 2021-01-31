@@ -1,1 +1,1 @@
-Checks: '-*,clang-diagnostic-*,llvm-*,misc-*,google-readability-braces-around-statements'
+Checks: '-*,clang-diagnostic-*,llvm-*,misc-*,google-readability-braces-around-statements,modernize-loop-convert'

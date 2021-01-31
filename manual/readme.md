@@ -73,4 +73,4 @@
 
 ## 4. Human Interface
 
-- [Guidlines](40-human-interface/guidlines.md)
+- [Guidelines](40-human-interface/guidelines.md)

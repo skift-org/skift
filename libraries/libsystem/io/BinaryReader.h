@@ -1,5 +1,5 @@
 #pragma once
-#include <libutils/SeekableReader.h>
+#include <libsystem/io/SeekableReader.h>
 #include <libutils/Slice.h>
 #include <libutils/String.h>
 
@@ -36,6 +36,11 @@ public:
     inline void skip(size_t num_bytes)
     {
         _reader.seek(num_bytes, WHENCE_HERE);
+    }
+
+    inline size_t length()
+    {
+        return _reader.length();
     }
 
     inline size_t position()

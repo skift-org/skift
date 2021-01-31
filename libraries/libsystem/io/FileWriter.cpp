@@ -1,4 +1,4 @@
-#include <libutils/FileWriter.h>
+#include <libsystem/io/FileWriter.h>
 
 FileWriter::FileWriter(const char *path) : _file(stream_open(path, OPEN_WRITE | OPEN_CREATE))
 {

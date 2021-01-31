@@ -22,14 +22,14 @@ int main(int argc, char const *argv[])
         args.fail();
     }
 
-    File file{argv[1]};
+    File file{args.argv()[0]};
     if (file.exist())
     {
-        stream_format(err_stream, "%s: Destination archive already exists '%s'\n", argv[0], argv[1]);
+        stream_format(err_stream, "%s: Destination archive already exists '%s'\n", argv[0], args.argv()[0]);
         return PROCESS_FAILURE;
     }
 
-    auto archive = make<ZipArchive>(Path::parse(argv[1]), false);
+    auto archive = make<ZipArchive>(Path::parse(args.argv()[0]), false);
 
     // Pack all files that were passed as arguments
     for (unsigned int i = 1; i < args.argc(); i++)
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
         auto result = archive->insert(args.argv()[i].cstring(), args.argv()[i].cstring());
         if (result != Result::SUCCESS)
         {
-            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], args.argv()[i], result);
+            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], args.argv()[i].cstring(), result);
             return PROCESS_FAILURE;
         }
     }

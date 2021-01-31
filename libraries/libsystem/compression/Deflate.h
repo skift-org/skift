@@ -2,7 +2,7 @@
 #include <libsystem/Common.h>
 #include <libsystem/Result.h>
 #include <libsystem/compression/Common.h>
-#include <libutils/BitWriter.h>
+#include <libsystem/io/BitWriter.h>
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 

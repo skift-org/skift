@@ -1,15 +1,13 @@
 #pragma once
 #include <libsystem/io/Stream.h>
 #include <libutils/Path.h>
-#include <libutils/SeekableReader.h>
+#include <libsystem/io/SeekableReader.h>
 
-class FileReader final : public SeekableReader
+class MemoryReader final : public SeekableReader
 {
 public:
-    FileReader(const char *path);
-    FileReader(Path &path);
-
-    ~FileReader();
+    MemoryReader(const uint8_t *data, size_t size);
+    MemoryReader(const Vector<uint8_t> &buffer);
 
     virtual size_t length() override;
     virtual size_t position() override;
@@ -18,5 +16,7 @@ public:
     virtual size_t seek(size_t pos, Whence whence) override;
 
 private:
-    Stream *_file = nullptr;
+    const uint8_t *_data;
+    size_t _size;
+    size_t _position = 0;
 };

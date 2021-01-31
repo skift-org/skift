@@ -513,7 +513,7 @@ public:
         }
     }
 
-    void push_back_data(T *data, size_t size)
+    void push_back_data(const T *data, size_t size)
     {
         for (size_t i = 0; i < size; i++)
         {

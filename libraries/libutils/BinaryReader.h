@@ -1,55 +1,53 @@
 #pragma once
+#include <libutils/SeekableReader.h>
 #include <libutils/Slice.h>
 #include <libutils/String.h>
 
 class BinaryReader
 {
 public:
-    BinaryReader(Slice &slice) : _slice(slice)
+    BinaryReader(SeekableReader &reader) : _reader(reader)
     {
     }
 
     template <typename T>
     inline T peek()
     {
-        auto size = sizeof(T);
-        auto sub_slice = _slice.slice(_index, size);
-        return *(T *)sub_slice.start();
+        T result = get<T>();
+        _reader.seek(-sizeof(T), WHENCE_HERE);
+        return result;
     }
 
     template <typename T>
     inline T get()
     {
-        //TODO: check size
-        const auto &result = peek<T>();
-        _index += sizeof(T);
+        T result;
+        assert(_reader.read(&result, sizeof(T)) == sizeof(T));
         return result;
     }
 
     inline String get_fixed_len_string(size_t len)
     {
-        auto sub_slice = _slice.slice(_index, len);
-        const char *cstr = reinterpret_cast<const char *>(sub_slice.start());
-        _index += len;
+        char *cstr = new char[len];
+        assert(_reader.read(cstr, len) == len);
         return String(make<StringStorage>(cstr, len));
     }
 
     inline void skip(size_t num_bytes)
     {
-        _index += num_bytes;
+        _reader.seek(num_bytes, WHENCE_HERE);
     }
 
-    inline size_t index()
+    inline size_t position()
     {
-        return _index;
+        return _reader.position();
     }
 
     inline bool good()
     {
-        return _index < _slice.size();
+        return _reader.position() < _reader.length();
     }
 
 private:
-    const Slice &_slice;
-    size_t _index = 0;
+    SeekableReader &_reader;
 };

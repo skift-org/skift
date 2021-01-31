@@ -16,6 +16,8 @@ public:
         unsigned int compression;
     };
 
+    static RefPtr<Archive> open(Path path, bool read = true);
+
     Archive(Path path) : _path(path)
     {
     }

@@ -1,15 +1,15 @@
 #pragma once
 
+#include <libfile/Archive.h>
 #include <libwidget/Container.h>
 #include <libwidget/TitleBar.h>
 #include <libwidget/Window.h>
 
+#include <libfilepicker/FilePicker.h>
 #include <libfilepicker/model/Navigation.h>
 #include <libfilepicker/widgets/ArchiveBrowser.h>
 #include <libfilepicker/widgets/JumpList.h>
 #include <libfilepicker/widgets/ToolBar.h>
-
-#include <libfilepicker/FilePicker.h>
 
 class MainWindow :
     public Window
@@ -54,7 +54,7 @@ public:
             load_button->on(Event::ACTION, [&](auto) {
                 if (_dialog.show() == DialogResult::OK)
                 {
-                    set_archive(make<ZipArchive>(Path::parse(*_dialog.selected_file())));
+                    set_archive(Archive::open(Path::parse(*_dialog.selected_file())));
                 }
             });
         }

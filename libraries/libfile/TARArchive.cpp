@@ -22,7 +22,22 @@ struct __packed TARRawBlock
     char devmajor[8];   /* 329 */
     char devminor[8];   /* 337 */
     char prefix[155];   /* 345 */
-                        /* 500 */
+    /* 500 */
+
+    char __padding[12];
+
+    size_t file_size()
+    {
+        size_t size = 0;
+        size_t count = 1;
+
+        for (size_t j = 11; j > 0; j--, count *= 8)
+        {
+            size += ((this->size[j - 1] - '0') * count);
+        }
+
+        return size;
+    }
 };
 
 size_t get_file_size(TARRawBlock *header)
@@ -93,4 +108,69 @@ bool tar_read(void *tarfile, TARBlock *block, size_t index)
     block->data = (char *)header + 512;
 
     return true;
+}
+
+#include <libfile/TARArchive.h>
+#include <libsystem/io/FileReader.h>
+
+TARArchive::TARArchive(Path path, bool read) : Archive(path)
+{
+    if (read)
+    {
+        read_archive();
+    }
+}
+
+Result TARArchive::extract(unsigned int entry_index, const char *dest_path)
+{
+    __unused(entry_index);
+    __unused(dest_path);
+
+    return ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+Result TARArchive::insert(const char *entry_name, const char *src_path)
+{
+    __unused(entry_name);
+    __unused(src_path);
+
+    return ERR_FUNCTION_NOT_IMPLEMENTED;
+}
+
+void TARArchive::read_archive()
+{
+    _valid = false;
+
+    File archive_file = File(_path);
+
+    // Archive does not exist
+    if (!archive_file.exist())
+    {
+        printf("Archive does not exist: %s", _path.string().cstring());
+        return;
+    }
+
+    stream_format(log_stream, "Opening file: '%s'", _path.string().cstring());
+
+    FileReader file_reader(_path);
+
+    TARRawBlock block;
+    while (file_reader.read(&block, sizeof(TARRawBlock)) == sizeof(TARRawBlock))
+    {
+        if (block.name[0] == '\0')
+        {
+            _valid = true;
+            return;
+        }
+
+        _entries.push_back({
+            String{block.name},
+            block.file_size(),
+            block.file_size(),
+            file_reader.position(),
+            0,
+        });
+
+        file_reader.seek(__align_up(block.file_size(), 512), WHENCE_HERE);
+    }
 }

@@ -1,4 +1,4 @@
-#include <libfile/ZipArchive.h>
+#include <libfile/Archive.h>
 #include <libsystem/process/Process.h>
 #include <libwidget/Application.h>
 
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        auto archive = make<ZipArchive>(Path::parse(argv[1]));
+        auto archive = Archive::open(Path::parse(argv[1]));
         window = new MainWindow(navigation, archive);
     }
 

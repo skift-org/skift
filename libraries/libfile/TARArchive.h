@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libsystem/Common.h>
+#include <libfile/Archive.h>
 
 struct TARBlock
 {
@@ -12,3 +12,15 @@ struct TARBlock
 };
 
 bool tar_read(void *tarfile, TARBlock *block, size_t index);
+
+class TARArchive : public Archive
+{
+private:
+    void read_archive();
+
+public:
+    TARArchive(Path path, bool read = true);
+
+    Result extract(unsigned int entry_index, const char *dest_path) override;
+    Result insert(const char *entry_name, const char *src_path) override;
+};

@@ -63,7 +63,7 @@ void do_foo()
 
 ## Comments
 
-* Avoid comment that paraphrases the code. Comments should answer the why and the code the how.
+* Avoid comment that paraphrases the code. Comments should answer the `why` and the code the `how`.
 
 ## Functions
 

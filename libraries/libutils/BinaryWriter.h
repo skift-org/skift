@@ -1,11 +1,12 @@
 #pragma once
 #include <libsystem/Common.h>
-#include <libutils/Vector.h>
+#include <libutils/String.h>
+#include <libutils/Writer.h>
 
 class BinaryWriter
 {
 public:
-    BinaryWriter(Vector<uint8_t> &data) : _data(data)
+    BinaryWriter(Writer &writer) : _writer(writer)
     {
     }
 
@@ -18,7 +19,7 @@ public:
 
     inline void put_data(uint8_t *data, size_t len)
     {
-        _data.push_back_data(data, len);
+        _writer.write(data, len);
     }
 
     inline void put_fixed_len_string(const String &str)
@@ -26,11 +27,11 @@ public:
         put_data((uint8_t *)str.cstring(), str.length());
     }
 
-    inline size_t pos()
+    inline size_t position()
     {
-        return _data.count();
+        return _writer.length();
     }
 
 private:
-    Vector<uint8_t> &_data;
+    Writer &_writer;
 };

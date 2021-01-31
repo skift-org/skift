@@ -1,5 +1,3 @@
-// manual/ressources/serport.txt
-
 #include "kernel/drivers/LegacySerial.h"
 
 LegacySerial::LegacySerial(DeviceAddress address) : LegacyDevice(address, DeviceClass::SERIAL)

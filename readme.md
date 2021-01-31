@@ -17,20 +17,18 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)](https://github.com/skiftOS/skift/pulls)
 
  - **skiftOS** is a simple, handmade operating system for the x86 platform, aiming for clean and pretty APIs while keeping the spirit of UNIX.
- - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
- - **skiftOS** is constantly updated, for the latest release `.img` of skiftOS, click [here](https://github.com/skiftOS/skift/releases/latest).
- - **skiftOS** is also pretty easy to build from source, just follow the [build guide](./manual/building.md).
- - **skiftOS** can function as a virtual machine, click [here](./manual/running_vm.md) to set up an instance on Virtual Box.
- - **skiftOS** is capable of running on real hardware.
- - **skiftOS** is a labor of love.
- - **skiftOS** features a graphical user interface (GUI), with a compositor.
  - **skiftOS** includes many applications like an [Image Viewer](./apps/image-viewer), a [Text Editor](./apps/text-editor), a [Terminal Emulator](./apps/terminal), [etc](./apps)...
+ - **skiftOS** features an UNIX-like terminal experience with many familiar UNIX utilities.
+ - **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/00-meta/building.md).
+ - **skiftOS** is capable of running on real hardware.
+ - **skiftOS** features a graphical user interface (GUI), with a compositor.
+ - **skiftOS** is constantly updated, for the latest release `.img` of skiftOS, click [here](https://github.com/skiftOS/skift/releases/latest).
  - **skiftOS** can [run DOOM :rage3:](https://github.com/skiftOS/port-doom)
 
 # Screenshots
 
 <p align="center">
-<img src="manual/screenshots/2021-01-22.png" />
+<img src="manual/100-screenshots/2021-01-22.png" />
 <br>
 skiftOS running in QEMU 5.1
 </p>
@@ -38,10 +36,10 @@ skiftOS running in QEMU 5.1
 # Links
 
 - [Manual](manual/readme.md)
-- [Building](manual/building.md) **(start here if you are new)**
-- [Contributing](manual/contributing.md)
-- [Code of conduct](manual/code_of_conduct.md)
-- [Running on Virtual Box](manual/running_vm.md) **(click here to experience skiftOS)**
+- [Building](manual/00-meta/building.md) **(start here if you are new)**
+- [Contributing](manual/00-meta/contributing.md)
+- [Code of conduct](manual/00-meta/code_of_conduct.md)
+- [Running on Virtual Box](manual/00-meta/running_in_vbox.md) **(click here to experience skiftOS)**
 
 # Acknowledgements
 
@@ -57,7 +55,6 @@ skiftOS running in QEMU 5.1
 - [limine](https://github.com/limine-bootloader/limine) (BSD-2-Clause License)
 - [lodepng](https://github.com/lvandeve/lodepng) (zlib License)
 - [Material Design Icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
-- [std_truetype](https://github.com/nothings/stb) (MIT/Public Domain)
 - [serenityOS AK utilities](https://github.com/SerenityOS/serenity): 
   while not directly used in skift, AK was a big inspiration in the creation of libutils.
 

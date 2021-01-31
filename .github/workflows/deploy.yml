@@ -58,7 +58,7 @@ jobs:
         with:
           tag_name: v${{ env.RELEASE_TAG  }}
           release_name: ${{ env.RELEASE_TAG }}
-          body_path: manual/release.md
+          body_path: .github/release.md
           draft: false
           prerelease: false
 

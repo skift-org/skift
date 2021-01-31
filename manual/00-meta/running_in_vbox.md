@@ -8,7 +8,7 @@
 
 > **NOTE:** Incase you are using windows, file extensions may not be displayed. Read this [guide](https://www.partitionwizard.com/partitionmanager/change-file-extension-windows-10.html) to enable extensions and then rename the file.
 
-4. Great! You now have all the files required to run skiftOS
+4. Great! You now have all the files required to run skiftOS.
 
 ## Creating the VM on Virtual Box
 

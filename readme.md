@@ -2,10 +2,10 @@
 ![Banner](manual/header.png)
 
 <p align="center">
-  <a href="https://discord.gg/gamGsfg">Discord</a> -
   <a href="https://skiftos.org/">Website</a> -
-  <a href="https://github.com/skiftOS/skift/releases">Releases</a> -
-  <a href="manual/readme.md">Manual</a>
+  <a href="manual/readme.md">Manual</a> -
+  <a href="https://discord.gg/gamGsfg">Discord</a> -
+  <a href="https://github.com/skiftOS/skift/releases">Releases</a>
 </p>
 
 # skiftOS
@@ -28,7 +28,7 @@
 # Screenshots
 
 <p align="center">
-<img src="manual/100-screenshots/2021-01-22.png" />
+<img src="manual/90-screenshots/2021-01-22.png" />
 <br>
 skiftOS running in QEMU 5.1
 </p>

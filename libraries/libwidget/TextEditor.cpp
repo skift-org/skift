@@ -213,6 +213,11 @@ void TextEditor::event(Event *event)
 
         event->accepted = true;
     }
+    else if (event->type == Event::MOUSE_SCROLL)
+    {
+        event->accepted = true;
+        _vscrollbar->dispatch_event(event);
+    }
     else if (event->type == Event::MOUSE_BUTTON_PRESS)
     {
         size_t line = ((size_t)(event->mouse.position - bound().position()).y() + _vscroll_offset) / metrics.fulllineheight();

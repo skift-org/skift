@@ -93,7 +93,7 @@ Then for building the toolchain run the `build-it.sh` script
 
 ```sh
 ## Build the tool chain
-$ toolchain/build-it.sh
+$ sh toolchain/build-it.sh
 
 ## Then wait for completion
 ```

@@ -6,6 +6,7 @@
 #include <libwidget/Label.h>
 #include <libwidget/Markup.h>
 #include <libwidget/TextEditor.h>
+#include <libwidget/TitleBar.h>
 
 static auto logo_based_on_color_scheme()
 {
@@ -37,7 +38,10 @@ int main(int argc, char **argv)
         button->on(Event::ACTION, [window](auto) {
             auto license_window = new Window(WINDOW_NONE);
             license_window->title("License");
-            license_window->size({556, 416});
+            license_window->size({570, 416});
+            license_window->root()->layout(VFLOW(0));
+
+            new TitleBar(license_window->root());
 
             auto field = new TextEditor(license_window->root(), TextModel::from_file("/Files/license.md"));
             field->flags(Widget::FILL);

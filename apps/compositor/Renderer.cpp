@@ -132,7 +132,7 @@ void renderer_region(Recti region)
                 _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
             }
 
-            _framebuffer->painter().sepia(destination, 0.5);
+            // _framebuffer->painter().sepia(destination, 0.5);
             _framebuffer->mark_dirty(destination);
 
             Recti top;
@@ -158,7 +158,7 @@ void renderer_region(Recti region)
     if (should_paint_wallpaper)
     {
         renderer_composite_wallpaper(region);
-        _framebuffer->painter().sepia(region, 0.5);
+        // _framebuffer->painter().sepia(region, 0.5);
     }
 }
 

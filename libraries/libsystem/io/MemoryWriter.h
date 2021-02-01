@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/io/Stream.h>
-#include <libutils/Path.h>
 #include <libsystem/io/Writer.h>
+#include <libutils/Path.h>
 
 class MemoryWriter final : public Writer
 {

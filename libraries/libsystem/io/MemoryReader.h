@@ -1,7 +1,7 @@
 #pragma once
+#include <libsystem/io/SeekableReader.h>
 #include <libsystem/io/Stream.h>
 #include <libutils/Path.h>
-#include <libsystem/io/SeekableReader.h>
 
 class MemoryReader final : public SeekableReader
 {

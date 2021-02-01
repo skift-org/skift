@@ -39,6 +39,8 @@ public:
         clear_children();
 
         auto icon = new IconPanel(this, _icon);
+        icon->insets(Insetsi(0, 0, 0, 4));
+
         auto label = new Label(this, _name);
 
         if (_enabled)

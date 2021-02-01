@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
     File file{args.argv()[0]};
     if (file.exist())
     {
-        stream_format(err_stream, "%s: Destination archive already exists '%s'\n", argv[0], args.argv()[0]);
+        stream_format(err_stream, "%s: Destination archive already exists '%s'\n", argv[0], args.argv()[0].cstring());
         return PROCESS_FAILURE;
     }
 
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
         auto result = archive->insert(args.argv()[i].cstring(), args.argv()[i].cstring());
         if (result != Result::SUCCESS)
         {
-            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%i'", argv[0], args.argv()[i].cstring(), result);
+            stream_format(err_stream, "%s: Failed to insert entry '%s' with error '%s'", argv[0], args.argv()[i].cstring(), get_result_description(result));
             return PROCESS_FAILURE;
         }
     }

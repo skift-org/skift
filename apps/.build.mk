@@ -24,6 +24,7 @@ $$($(1)_BINARY): $$($(1)_OBJECTS) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
 	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECTS) $$(patsubst %, -l%, $$($(1)_LIBS))
+	@echo [$(1)] [STRIP] $($(1)_NAME)
 	@$(STRIP) $$@
 
 $$(CONFIG_BUILD_DIRECTORY)/apps/$$($(1)_NAME)/%.o: apps/$$($(1)_NAME)/%.cpp

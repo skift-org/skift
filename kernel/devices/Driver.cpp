@@ -7,6 +7,7 @@
 #include "kernel/drivers/AC97.h"
 #include "kernel/drivers/BGA.h"
 #include "kernel/drivers/E1000.h"
+#include "kernel/drivers/LegacyATA.h"
 #include "kernel/drivers/LegacyKeyboard.h"
 #include "kernel/drivers/LegacyMouse.h"
 #include "kernel/drivers/LegacySerial.h"
@@ -50,6 +51,11 @@ void driver_initialize()
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM3)", LEGACY_COM3});
     _matchers->push_back(new LegacyDeviceMatcher<LegacySerial>{"Legacy Serial Port (COM4)", LEGACY_COM4});
     _matchers->push_back(new LegacyDeviceMatcher<PCSpeaker>{"PCSpeaker", LEGACY_SPEAKER});
+
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA0 Disk", LEGACY_ATA0});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA1 Disk", LEGACY_ATA1});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA2 Disk", LEGACY_ATA2});
+    _matchers->push_back(new LegacyDeviceMatcher<LegacyATA>{"ATA3 Disk", LEGACY_ATA3});
 
     _matchers->push_back(new UNIXDeviceMatcher<UnixNull>{"Unix Null Device", UNIX_NULL});
     _matchers->push_back(new UNIXDeviceMatcher<UnixRandom>{"Unix Random Device", UNIX_RANDOM});

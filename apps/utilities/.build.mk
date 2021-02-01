@@ -192,6 +192,7 @@ $$($(1)_BINARY): $$($(1)_OBJECT) $$(patsubst %, $$(BUILD_DIRECTORY_LIBS)/lib%.a,
 	$$(DIRECTORY_GUARD)
 	@echo [$(1)] [LD] $($(1)_NAME)
 	@$(CXX) $(LDFLAGS) -o $$@ $$($(1)_OBJECT) $$(patsubst %, -l%, $$($(1)_LIBS))
+	@$(STRIP) $$@
 
 $$($(1)_OBJECT): $$($(1)_SOURCE)
 	$$(DIRECTORY_GUARD)

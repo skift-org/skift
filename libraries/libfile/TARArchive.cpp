@@ -150,7 +150,7 @@ void TARArchive::read_archive()
         return;
     }
 
-    stream_format(log_stream, "Opening file: '%s'", _path.string().cstring());
+    logger_trace("Opening file: '%s'", _path.string().cstring());
 
     FileReader file_reader(_path);
 

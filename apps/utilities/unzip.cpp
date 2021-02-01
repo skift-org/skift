@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
 
     // Unzip all archives that were passed as arguments
     args.argv().foreach ([&](auto &path) {
-        stream_format(log_stream, "%s: Unzip '%s'", argv[0], path.cstring());
+        stream_format(err_stream, "%s: Unzip '%s'", argv[0], path.cstring());
 
         File file{path};
         if (!file.exist())

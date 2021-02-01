@@ -118,7 +118,7 @@ void ZipArchive::read_local_headers(BinaryReader &reader)
     // Read all local file headers and data descriptors
     while (reader.position() < (reader.length() - sizeof(LocalHeader)))
     {
-        stream_format(log_stream, "Read local header: '%s'", _path.string().cstring());
+        logger_trace("Read local header: '%s'", _path.string().cstring());
         auto local_header = reader.peek<LocalHeader>();
 
         // Check if this is a local header
@@ -167,7 +167,7 @@ Result ZipArchive::read_central_directory(BinaryReader &reader)
     // Central directory starts here
     while (reader.position() < (reader.length() - sizeof(CentralDirectoryFileHeader)))
     {
-        stream_format(log_stream, "Read central directory header: '%s'", _path.string().cstring());
+        logger_trace("Read central directory header: '%s'", _path.string().cstring());
         auto cd_file_header = reader.peek<CentralDirectoryFileHeader>();
 
         // Check if this is a central directory file header
@@ -207,7 +207,7 @@ void ZipArchive::read_archive()
         return;
     }
 
-    stream_format(log_stream, "Opening file: '%s'", _path.string().cstring());
+    logger_trace("Opening file: '%s'", _path.string().cstring());
 
     FileReader file_reader(_path);
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
-#include <libutils/Vector.h>
 #include <libsystem/io/Reader.h>
+#include <libutils/Vector.h>
 
 class BitReader
 {

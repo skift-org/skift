@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Assert.h>
-#include <libsystem/io/Stream.h>
 #include <libsystem/io/BitReader.h>
+#include <libsystem/io/Stream.h>
 
 class HuffmanDecoder
 {

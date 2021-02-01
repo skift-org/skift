@@ -19,5 +19,12 @@ public:
         return result;
     };
 
+    virtual void read_all(void **buffer, size_t *size)
+    {
+        *buffer = new uint8_t[length()];
+        *size = length();
+        assert(read(*buffer, length()) == length());
+    }
+
     virtual void copy_to(Writer &writer);
 };

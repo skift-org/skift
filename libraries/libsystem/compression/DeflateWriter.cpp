@@ -6,7 +6,6 @@
 
 DeflateWriter::DeflateWriter(Writer &writer, int level) : _deflate(level), _writer(writer)
 {
-
 }
 
 DeflateWriter::~DeflateWriter()
@@ -35,7 +34,7 @@ void DeflateWriter::write(const void *buffer, size_t size)
 {
     _mem_buffer.write(buffer, size);
 
-    if(_mem_buffer.length() > MAX_BLOCK_SIZE)
+    if (_mem_buffer.length() > MAX_BLOCK_SIZE)
     {
         flush();
     }

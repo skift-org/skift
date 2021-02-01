@@ -1,7 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
-#include <libutils/String.h>
 #include <libsystem/io/Writer.h>
+#include <libutils/String.h>
 
 class BinaryWriter
 {

@@ -13,11 +13,27 @@ static OwnPtr<compositor::Wallpaper> _wallpaper;
 
 static Vector<Recti> _dirty_regions;
 
+static OwnPtr<settings::Setting> _night_light_enable_setting;
+bool _night_light_enable = false;
+
+static OwnPtr<settings::Setting> _night_light_stenght_setting;
+double _night_light_strenght = 0.5;
+
 void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
     _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
+
+    _night_light_enable_setting = own<settings::Setting>("appearance:night-light.enable", [](auto &value) {
+        _night_light_enable = value.as_bool();
+        renderer_region_dirty(renderer_bound());
+    });
+
+    _night_light_stenght_setting = own<settings::Setting>("appearance:night-light.stenght", [](auto &value) {
+        _night_light_strenght = value.as_double();
+        renderer_region_dirty(renderer_bound());
+    });
 
     renderer_region_dirty(_framebuffer->resolution());
 }
@@ -133,7 +149,11 @@ void renderer_region(Recti region)
                 _framebuffer->painter().blit_no_alpha(window->frontbuffer(), source, destination);
             }
 
-            // _framebuffer->painter().sepia(destination, 0.5);
+            if (_night_light_enable)
+            {
+                _framebuffer->painter().sepia(destination, _night_light_strenght);
+            }
+
             _framebuffer->mark_dirty(destination);
 
             Recti top;
@@ -159,7 +179,11 @@ void renderer_region(Recti region)
     if (should_paint_wallpaper)
     {
         renderer_composite_wallpaper(region);
-        // _framebuffer->painter().sepia(region, 0.5);
+
+        if (_night_light_enable)
+        {
+            _framebuffer->painter().sepia(region, _night_light_strenght);
+        }
     }
 }
 

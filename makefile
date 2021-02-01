@@ -82,6 +82,8 @@ ARFLAGS:=rcs
 AS=nasm
 ASFLAGS=-f elf32
 
+STRIP:=i686-pc-skift-strip
+
 include archs/.build.mk
 
 include thirdparty/.build.mk

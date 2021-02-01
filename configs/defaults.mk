@@ -57,6 +57,9 @@ CONFIG_LOG            ?=true
 # Enable/disable the LTO.
 CONFIG_LTO            ?=true
 
+# Enable/disable stripping of binaries.
+CONFIG_STRIP		  ?=true
+
 # How many megabyte of memory is allocated to the virtual machine.
 CONFIG_MEMORY         ?=256
 

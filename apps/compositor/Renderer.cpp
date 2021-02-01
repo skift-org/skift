@@ -17,6 +17,7 @@ void renderer_initialize()
 {
     _framebuffer = Framebuffer::open().take_value();
     _wallpaper = own<compositor::Wallpaper>(_framebuffer->resolution().size());
+    _wallpaper->on_change = []() { renderer_region_dirty(renderer_bound()); };
 
     renderer_region_dirty(_framebuffer->resolution());
 }

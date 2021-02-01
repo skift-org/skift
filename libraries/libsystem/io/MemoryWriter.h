@@ -14,6 +14,9 @@ public:
     virtual void flush() override;
     virtual void write(const void *buffer, size_t size) override;
 
+    void clear();
+    void pop_front(size_t size);
+
     const Vector<uint8_t> &data()
     {
         return _data;

@@ -18,6 +18,11 @@ void MemoryWriter::flush()
 {
 }
 
+void MemoryWriter::clear()
+{
+    _data.clear();
+}
+
 void MemoryWriter::write(const void *buffer, size_t size)
 {
     _data.push_back_data((const uint8_t *)buffer, size);

@@ -1,6 +1,7 @@
 #pragma once
 #include <libsystem/Common.h>
 #include <libutils/Vector.h>
+#include <libsystem/io/Reader.h>
 
 class BitReader
 {
@@ -11,6 +12,11 @@ public:
 
     inline BitReader(uint8_t *data, size_t size) : _data(data), _size(size)
     {
+    }
+
+    inline BitReader(Reader &reader) : _data(new uint8_t[reader.length()]), _size(reader.length())
+    {
+        reader.read((uint8_t *)_data, reader.length());
     }
 
     inline void skip_bits(size_t num_bits)

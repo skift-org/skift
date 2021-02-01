@@ -5,10 +5,12 @@
 #include <libutils/HashMap.h>
 #include <libutils/Vector.h>
 
+class Reader;
+class Writer;
 class Inflate
 {
 public:
-    Result perform(const Vector<uint8_t> &compressed, Vector<uint8_t> &uncompressed);
+    Result perform(Reader &compressed, Writer &uncompressed);
 
 private:
     void build_fixed_huffman_alphabet();

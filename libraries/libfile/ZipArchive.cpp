@@ -234,9 +234,6 @@ void ZipArchive::read_archive()
 
 void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &compressed)
 {
-    Vector<uint8_t> compressed_data(compressed.length());
-    assert(compressed.read(compressed_data.raw_storage(), compressed_data.count()) == compressed_data.count());
-
     LocalHeader header;
     header.flags = EF_NONE;
     header.compressed_size = compressed.length();
@@ -248,7 +245,12 @@ void ZipArchive::write_entry(const Entry &entry, BinaryWriter &writer, Reader &c
 
     writer.put(header);
     writer.put_fixed_len_string(entry.name);
-    writer.put_data(compressed_data.raw_storage(), compressed_data.count());
+
+    uint8_t *data_buffer = nullptr;
+    size_t data_size = 0;
+    compressed.read_all((void **)&data_buffer, &data_size);
+    writer.put_data(data_buffer, data_size);
+    delete[] data_buffer;
 }
 
 void ZipArchive::write_central_directory(BinaryWriter &writer)

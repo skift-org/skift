@@ -110,9 +110,8 @@ static uint8_t _isa_remaps[4] = {};
 void pci_initialize_isa_bridge()
 {
     auto is_isa_bridge = [](PCIAddress &address) {
-        return address.read16(PCI_VENDOR_ID) == 0x8086 &&
-               (address.read16(PCI_DEVICE_ID) == 0x7000 ||
-                address.read16(PCI_DEVICE_ID) == 0x7110);
+        return address.read16(PCI_CLASS) == 0x06 &&
+               address.read16(PCI_SUBCLASS) == 0x01;
     };
 
     pci_scan([&](PCIAddress address) {

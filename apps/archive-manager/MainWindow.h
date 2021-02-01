@@ -71,6 +71,16 @@ public:
 
             new Button(toolbar, Button::TEXT, Icon::get("archive-arrow-up"), "Extract All");
 
+            new Separator(toolbar);
+
+            auto load_button = new Button(toolbar, Button::TEXT, Icon::get("folder-open"));
+            load_button->on(Event::ACTION, [&](auto) {
+                if (_dialog.show() == DialogResult::OK)
+                {
+                    set_archive(Archive::open(Path::parse(*_dialog.selected_file())));
+                }
+            });
+
             new filepicker::ArchiveBrowser(browser, _navigation, _archive);
         }
     }
